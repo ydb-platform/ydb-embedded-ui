@@ -2,6 +2,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {Label} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
+import type {ECapacityAlert} from '../../types/api/enums';
 import {getCapacityAlertTheme} from '../../utils/capacityAlerts';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatPercent} from '../../utils/dataFormatters/dataFormatters';
@@ -25,7 +26,7 @@ export function getPDiskUsageColumn<T extends {MaxPDiskUsage?: number}>(): Colum
 }
 
 export function getVDiskSlotUsageColumn<
-    T extends {MaxVDiskSlotUsage?: number; CapacityAlert?: string},
+    T extends {MaxVDiskSlotUsage?: number; CapacityAlert?: ECapacityAlert},
 >(): Column<T> {
     return {
         name: CAPACITY_METRICS_COLUMN_IDS.MaxVDiskSlotUsage,
@@ -46,7 +47,7 @@ export function getVDiskSlotUsageColumn<
     };
 }
 
-export function getCapacityAlertColumn<T extends {CapacityAlert?: string}>(): Column<T> {
+export function getCapacityAlertColumn<T extends {CapacityAlert?: ECapacityAlert}>(): Column<T> {
     return {
         name: CAPACITY_METRICS_COLUMN_IDS.CapacityAlert,
         header: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,

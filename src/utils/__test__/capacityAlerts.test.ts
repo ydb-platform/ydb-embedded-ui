@@ -1,24 +1,32 @@
+import {ECapacityAlert} from '../../types/api/enums';
 import {getCapacityAlertSeverity, getCapacityAlertTheme} from '../capacityAlerts';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../disks/constants';
 
 describe('getCapacityAlertSeverity', () => {
     test('Should return Green severity for GREEN and CYAN alerts', () => {
-        expect(getCapacityAlertSeverity('GREEN')).toEqual(
+        expect(getCapacityAlertSeverity(ECapacityAlert.GREEN)).toEqual(
             DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
         );
-        expect(getCapacityAlertSeverity('CYAN')).toEqual(
+        expect(getCapacityAlertSeverity(ECapacityAlert.CYAN)).toEqual(
             DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
         );
     });
 
     test('Should return Yellow severity for LIGHT_YELLOW alert', () => {
-        expect(getCapacityAlertSeverity('LIGHT_YELLOW')).toEqual(
+        expect(getCapacityAlertSeverity(ECapacityAlert.LIGHTYELLOW)).toEqual(
             DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
         );
     });
 
     test('Should return Red severity for YELLOW through BLACK alerts', () => {
-        const dangerAlerts = ['YELLOW', 'LIGHT_ORANGE', 'PRE_ORANGE', 'ORANGE', 'RED', 'BLACK'];
+        const dangerAlerts: ECapacityAlert[] = [
+            ECapacityAlert.YELLOW,
+            ECapacityAlert.LIGHTORANGE,
+            ECapacityAlert.PREORANGE,
+            ECapacityAlert.ORANGE,
+            ECapacityAlert.RED,
+            ECapacityAlert.BLACK,
+        ];
         for (const alert of dangerAlerts) {
             expect(getCapacityAlertSeverity(alert)).toEqual(
                 DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
@@ -30,7 +38,7 @@ describe('getCapacityAlertSeverity', () => {
         expect(getCapacityAlertSeverity(undefined)).toEqual(
             DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
         );
-        expect(getCapacityAlertSeverity('UNKNOWN')).toEqual(
+        expect(getCapacityAlertSeverity('UNKNOWN' as ECapacityAlert)).toEqual(
             DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
         );
     });
@@ -38,16 +46,23 @@ describe('getCapacityAlertSeverity', () => {
 
 describe('getCapacityAlertTheme', () => {
     test('Should return success theme for GREEN and CYAN alerts', () => {
-        expect(getCapacityAlertTheme('GREEN')).toEqual('success');
-        expect(getCapacityAlertTheme('CYAN')).toEqual('success');
+        expect(getCapacityAlertTheme(ECapacityAlert.GREEN)).toEqual('success');
+        expect(getCapacityAlertTheme(ECapacityAlert.CYAN)).toEqual('success');
     });
 
     test('Should return warning theme for LIGHT_YELLOW alert', () => {
-        expect(getCapacityAlertTheme('LIGHT_YELLOW')).toEqual('warning');
+        expect(getCapacityAlertTheme(ECapacityAlert.LIGHTYELLOW)).toEqual('warning');
     });
 
     test('Should return danger theme for YELLOW through BLACK alerts', () => {
-        const dangerAlerts = ['YELLOW', 'LIGHT_ORANGE', 'PRE_ORANGE', 'ORANGE', 'RED', 'BLACK'];
+        const dangerAlerts: ECapacityAlert[] = [
+            ECapacityAlert.YELLOW,
+            ECapacityAlert.LIGHTORANGE,
+            ECapacityAlert.PREORANGE,
+            ECapacityAlert.ORANGE,
+            ECapacityAlert.RED,
+            ECapacityAlert.BLACK,
+        ];
         for (const alert of dangerAlerts) {
             expect(getCapacityAlertTheme(alert)).toEqual('danger');
         }
@@ -55,6 +70,6 @@ describe('getCapacityAlertTheme', () => {
 
     test('Should return normal theme for undefined or unknown alerts', () => {
         expect(getCapacityAlertTheme(undefined)).toEqual('normal');
-        expect(getCapacityAlertTheme('UNKNOWN')).toEqual('normal');
+        expect(getCapacityAlertTheme('UNKNOWN' as ECapacityAlert)).toEqual('normal');
     });
 });

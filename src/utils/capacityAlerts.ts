@@ -1,5 +1,7 @@
 import type {LabelProps} from '@gravity-ui/uikit';
 
+import type {ECapacityAlert} from '../types/api/enums';
+
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from './disks/constants';
 
 type NumericSeverity =
@@ -14,7 +16,7 @@ const SEVERITY_TO_THEME: Record<NumericSeverity, LabelProps['theme']> = {
     [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red]: 'danger',
 };
 
-export function getCapacityAlertSeverity(capacityAlert?: string): NumericSeverity {
+export function getCapacityAlertSeverity(capacityAlert?: ECapacityAlert): NumericSeverity {
     switch (capacityAlert) {
         case 'GREEN':
         case 'CYAN':
@@ -33,7 +35,7 @@ export function getCapacityAlertSeverity(capacityAlert?: string): NumericSeverit
     }
 }
 
-export function getCapacityAlertTheme(capacityAlert?: string): LabelProps['theme'] {
+export function getCapacityAlertTheme(capacityAlert?: ECapacityAlert): LabelProps['theme'] {
     const severity = getCapacityAlertSeverity(capacityAlert);
     return SEVERITY_TO_THEME[severity];
 }

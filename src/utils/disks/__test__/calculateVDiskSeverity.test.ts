@@ -33,7 +33,7 @@ describe('VDisk state', () => {
             FrontQueues: EFlag.Red, // severity 5, red — but capped at yellow
         });
 
-        expect(severity1).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+        expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
     });
 
     test('Should display DiskSpace Orange as Red severity', () => {
@@ -189,9 +189,9 @@ describe('VDisk CapacityAlert', () => {
             CapacityAlert: ECapacityAlert.GREEN,
         });
 
-        // CapacityAlert GREEN maps to Green severity
-        // DiskSpaceSeverity is capped at Yellow (3), FrontQueuesSeverity is capped at Yellow (3)
-        // VDiskStateSeverity is Green (1), VDiskSpaceSeverity is Green (1) from CapacityAlert
+        // CapacityAlert GREEN maps to Green severity and overrides DiskSpace completely
+        // VDiskStateSeverity is Green (1), CapacityAlert-derived severity is Green (1)
+        // FrontQueuesSeverity is Orange (4), but capped at Yellow (3)
         // max(1, 3, 1, 3) = Yellow
         expect(severity).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
     });
