@@ -6,7 +6,11 @@ import {getPDiskPagePath} from '../../routes';
 import type {VDiskData} from '../../store/reducers/vdisk/types';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatNumber, formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {
+    formatMetricBytes,
+    formatMetricPercent,
+    getConsistentMetricBytesSize,
+} from '../../utils/storageMetrics';
 
 import {vDiskPageKeyset} from './i18n';
 
@@ -37,24 +41,6 @@ interface DetailItemProps {
 
 interface TruncatedDetailValueProps {
     value?: string | number;
-}
-
-function formatStorageMetric(value?: number) {
-    const [formattedValue] = formatStorageValuesToGb(value);
-
-    return formattedValue || EMPTY_DATA_PLACEHOLDER;
-}
-
-function formatUsage(value?: number) {
-    const numericValue = Number(value);
-
-    if (!Number.isFinite(numericValue)) {
-        return EMPTY_DATA_PLACEHOLDER;
-    }
-
-    const formattedValue = formatNumber(numericValue);
-
-    return formattedValue ? `${formattedValue}%` : EMPTY_DATA_PLACEHOLDER;
 }
 
 function MetricItem({title, value, isUsage}: MetricItemProps) {
@@ -140,6 +126,7 @@ export function VDiskStorageDetails({className, data}: VDiskStorageDetailsProps)
     const total = Number(data?.SizeLimit);
     const usage = Number(data?.AllocatedPercent);
     const free = Number(data?.FreeSize);
+    const metricsSize = getConsistentMetricBytesSize([used, total, free]);
 
     const {NodeDC, NodeRack, NodeHost, NodeId, PDiskId} = data || {};
 
@@ -157,19 +144,19 @@ export function VDiskStorageDetails({className, data}: VDiskStorageDetailsProps)
                 <div className={b('card', {metrics: true})}>
                     <MetricItem
                         title={vDiskPageKeyset('field_storage-details-used')}
-                        value={formatStorageMetric(used)}
+                        value={formatMetricBytes(used, metricsSize)}
                     />
                     <MetricItem
                         title={vDiskPageKeyset('field_storage-details-total')}
-                        value={formatStorageMetric(total)}
+                        value={formatMetricBytes(total, metricsSize)}
                     />
                     <MetricItem
                         title={vDiskPageKeyset('field_storage-details-free')}
-                        value={formatStorageMetric(free)}
+                        value={formatMetricBytes(free, metricsSize)}
                     />
                     <MetricItem
                         title={vDiskPageKeyset('field_storage-details-usage')}
-                        value={formatUsage(usage)}
+                        value={formatMetricPercent(usage)}
                         isUsage
                     />
                 </div>

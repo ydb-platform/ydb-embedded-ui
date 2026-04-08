@@ -1,7 +1,9 @@
-import type {BytesSizes} from '../../../../utils/bytesParsers';
-import {getBytesSizeUnit, sizes} from '../../../../utils/bytesParsers';
-import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from '../../../../utils/constants';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatNumber, formatPercent} from '../../../../utils/dataFormatters/dataFormatters';
+import {
+    formatMetricBytes as formatMetricBytesShared,
+    getConsistentMetricBytesSize as getConsistentMetricBytesSizeShared,
+} from '../../../../utils/storageMetrics';
 
 export const STORAGE_USAGE_INITIAL_ROWS_COUNT = 3;
 
@@ -10,54 +12,8 @@ const MIN_SHARE_PERCENT_WITH_FRACTION = 1;
 const PERCENT_MULTIPLIER = 100;
 const MAX_PROGRESS_PERCENT = 100;
 
-function getMetricBytesDecimalPlaces(size: BytesSizes, convertedValue: number) {
-    if (size === 'b' || size === 'kb' || size === 'mb') {
-        return convertedValue % 1 === 0 ? 0 : 1;
-    }
-    if (size === 'gb') {
-        if (convertedValue < 1) {
-            return 2;
-        }
-        return convertedValue % 1 === 0 ? 0 : 1;
-    }
-    // TB and PB: <10 → 2 decimal places, 10+ → 1 decimal place
-    if (convertedValue < 10) {
-        return 2;
-    }
-    return 1;
-}
-
-export function getConsistentMetricBytesSize(values: Array<string | number | undefined>) {
-    const maxValue = values.reduce<number>((currentMaxValue, value) => {
-        const numericValue = Number(value);
-
-        if (!Number.isFinite(numericValue) || numericValue < 0) {
-            return currentMaxValue;
-        }
-
-        return Math.max(currentMaxValue, numericValue);
-    }, 0);
-
-    return getBytesSizeUnit(maxValue);
-}
-
-export function formatMetricBytes(value?: string | number, size?: BytesSizes) {
-    const numericValue = Number(value);
-
-    if (!Number.isFinite(numericValue)) {
-        return EMPTY_DATA_PLACEHOLDER;
-    }
-
-    const resolvedSize = size ?? getBytesSizeUnit(numericValue);
-    const convertedValue = numericValue / sizes[resolvedSize].value;
-    const decimalPlaces = getMetricBytesDecimalPlaces(resolvedSize, convertedValue);
-    const rounded = Number(convertedValue.toFixed(decimalPlaces));
-    const formatted = formatNumber(rounded);
-
-    return formatted
-        ? `${formatted}${UNBREAKABLE_GAP}${sizes[resolvedSize].label}`
-        : EMPTY_DATA_PLACEHOLDER;
-}
+export const getConsistentMetricBytesSize = getConsistentMetricBytesSizeShared;
+export const formatMetricBytes = formatMetricBytesShared;
 
 export function formatOverhead(
     diskUsage: number | undefined,
