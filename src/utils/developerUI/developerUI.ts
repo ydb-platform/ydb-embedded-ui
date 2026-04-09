@@ -6,7 +6,7 @@ function getCurrentHost() {
     // It always has correct backend
     const host = window.api.viewer.getPath('');
     const firstSegment = uiFactory.developerUiFirstPathSegment
-        ? `/${uiFactory.developerUiFirstPathSegment}`
+        ? `/${uiFactory.developerUiFirstPathSegment.replace(/^\//, '')}`
         : '';
     return `${host}${firstSegment}`;
 }
