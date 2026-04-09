@@ -3,6 +3,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNumber, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../utils/generateEvaluator';
+import {LabelWithPopover} from '../LabelWithPopover/LabelWithPopover';
 import {LinkToSchemaObject} from '../LinkToSchemaObject/LinkToSchemaObject';
 import {NodeId} from '../NodeId/NodeId';
 import {TabletNameWrapper} from '../TabletNameWrapper/TabletNameWrapper';
@@ -10,6 +11,7 @@ import {UsageLabel} from '../UsageLabel/UsageLabel';
 
 import type {TopShardsColumnId} from './constants';
 import {TOP_SHARDS_COLUMNS_IDS, TOP_SHARDS_COLUMNS_TITLES} from './constants';
+import i18n from './i18n';
 import type {GetShardsColumn} from './types';
 import {prepareDateTimeValue} from './utils';
 
@@ -31,7 +33,12 @@ export const getPathColumn: GetShardsColumn = ({databaseFullPath = ''}) => {
 export const getDataSizeColumn: GetShardsColumn = () => {
     return {
         name: TOP_SHARDS_COLUMNS_IDS.DataSize,
-        header: TOP_SHARDS_COLUMNS_TITLES.DataSize,
+        header: (
+            <LabelWithPopover
+                text={TOP_SHARDS_COLUMNS_TITLES.DataSize}
+                popoverContent={i18n('data-size-popover')}
+            />
+        ),
         render: ({row}) => {
             return formatNumber(row.DataSize);
         },

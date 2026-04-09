@@ -2,6 +2,7 @@
   "tablet-id": "TabletId",
   "cpu-cores": "CPUCores",
   "data-size": "DataSize (B)",
+  "data-size-popover": "The total data size in bytes for a single table shard",
   "path": "Path",
   "node-id": "NodeId",
   "peak-time": "PeakTime",
