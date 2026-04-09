@@ -2,13 +2,31 @@ import {uiFactory} from '../../uiFactory/uiFactory';
 import {useIsUserAllowedToMakeChanges} from '../hooks/useIsUserAllowedToMakeChanges';
 import {pad9} from '../utils';
 
+function appendPathSegment(host: string, firstSegment: string) {
+    const normalizedFirstSegment = firstSegment.replace(/^\/+|\/+$/g, '');
+    const normalizedHost = host.replace(/\/+$/g, '');
+
+    if (!normalizedFirstSegment) {
+        return normalizedHost || host;
+    }
+
+    if (!normalizedHost) {
+        return `/${normalizedFirstSegment}`;
+    }
+
+    return `${normalizedHost}/${normalizedFirstSegment}`;
+}
+
 function getCurrentHost() {
     // It always has correct backend
-    const host = window.api.viewer.getPath('');
-    const firstSegment = uiFactory.developerUiFirstPathSegment
-        ? `/${uiFactory.developerUiFirstPathSegment.replace(/^\//, '')}`
-        : '';
-    return `${host}${firstSegment}`;
+    const host = String(window.api.viewer.getPath(''));
+    const firstSegment = uiFactory.developerUiFirstPathSegment;
+
+    if (!firstSegment) {
+        return host;
+    }
+
+    return appendPathSegment(host, firstSegment);
 }
 
 export function createDeveloperUIInternalPageHref(host = getCurrentHost()) {
