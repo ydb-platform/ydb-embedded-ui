@@ -36,7 +36,7 @@ export const getDataSizeColumn: GetShardsColumn = () => {
         header: (
             <LabelWithPopover
                 text={TOP_SHARDS_COLUMNS_TITLES.DataSize}
-                popoverContent={i18n('data-size-popover')}
+                popoverContent={i18n('context_data-size')}
             />
         ),
         render: ({row}) => {
