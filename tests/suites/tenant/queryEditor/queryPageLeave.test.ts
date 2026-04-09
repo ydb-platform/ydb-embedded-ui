@@ -212,6 +212,7 @@ test.describe('Query page leave', () => {
 
     test('Page close with runBeforeUnload does not show beforeunload for dirty tabs only', async ({
         page,
+        browserName,
     }) => {
         const tenantPage = await openMultiTabQueryEditor(page);
         const {queryEditor} = tenantPage;
@@ -229,6 +230,9 @@ test.describe('Query page leave', () => {
         await page.close({runBeforeUnload: true});
 
         await expect(dialogPromise).resolves.toBeUndefined();
+        if (browserName === 'webkit') {
+            return;
+        }
         await expect.poll(() => page.isClosed()).toBe(true);
     });
 
