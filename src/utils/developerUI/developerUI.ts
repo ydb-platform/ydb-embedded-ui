@@ -4,7 +4,11 @@ import {pad9} from '../utils';
 
 function getCurrentHost() {
     // It always has correct backend
-    return window.api.viewer.getPath('');
+    const host = window.api.viewer.getPath('');
+    const firstSegment = uiFactory.developerUiFirstPathSegment
+        ? `/${uiFactory.developerUiFirstPathSegment}`
+        : '';
+    return `${host}${firstSegment}`;
 }
 
 export function createDeveloperUIInternalPageHref(host = getCurrentHost()) {

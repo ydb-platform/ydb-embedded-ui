@@ -93,6 +93,8 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     hideNewFeaturesNotifications?: {
         navigationV2?: boolean;
     };
+
+    developerUiFirstPathSegment?: string;
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;
