@@ -106,7 +106,16 @@ export class Table {
         const headerCount = await headers.count();
         const headerNames = [];
         for (let i = 0; i < headerCount; i++) {
-            headerNames.push(await headers.nth(i).innerText());
+            const headerText = await headers.nth(i).evaluate((node) => {
+                const title = node.getAttribute('title');
+                if (title) {
+                    return title;
+                }
+
+                const textContainer = node.querySelector('.data-table__head-cell > div');
+                return textContainer?.textContent || '';
+            });
+            headerNames.push(headerText.replace(/\s+/g, ' ').trim());
         }
         return headerNames;
     }
