@@ -35,6 +35,7 @@ import {
     setupWhoami503TextMock,
     setupWhoamiHybridNetworkErrorMock,
     setupWhoamiNetworkErrorMock,
+    setupWhoamiRecoveredXhrNetworkErrorMock,
 } from './errorDisplayMocks';
 
 const FULL_PAGE_DIR = 'playwright-artifacts/full-page-screenshots';
@@ -50,6 +51,7 @@ const FULL_PAGE_DIR = 'playwright-artifacts/full-page-screenshots';
 //   Full-page: Whoami → 502 HTML body + x-proxy-name + x-trace-id
 //   Full-page: Whoami → 503 text body + x-worker-name
 //   Full-page: Whoami → hybrid ERR_NETWORK + nested 404/headers
+//   Full-page: Whoami → recoverable ERR_NETWORK with XHR 504/details
 //   Full-page: Whoami → network error (ERR_NETWORK)
 //   Access:    Tenant → 403 AccessDenied
 //   Access:    Capabilities → 401 Unauthenticated
@@ -551,6 +553,47 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         );
         await page.screenshot({
             path: `${FULL_PAGE_DIR}/full-whoami-hybrid-network.png`,
+            fullPage: true,
+        });
+    });
+
+    test('Full-page — whoami recoverable XHR network error restores 504 and worker details', async ({
+        page,
+    }) => {
+        await setupWhoamiRecoveredXhrNetworkErrorMock(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto();
+
+        const errorDisplay = new ErrorDisplayModel(page);
+        await errorDisplay.waitForPageError();
+
+        const title = await errorDisplay.getPageErrorTitle();
+        expect(title).toContain('504');
+        expect(title).toContain('Deadline Exceeded');
+
+        expect(await errorDisplay.isPageErrorFieldsVisible()).toBe(true);
+
+        const errorCode = await errorDisplay.getPageErrorDetailValue('Code');
+        expect(errorCode).toBe('ERR_NETWORK');
+
+        const message = await errorDisplay.getPageErrorDetailValue('Message');
+        expect(message).toBe('Network Error');
+
+        const url = await errorDisplay.getPageErrorDetailValue('URL');
+        expect(url).toContain('https://test-oidc-proxy.example.test');
+        expect(url).toContain('/node/50465/viewer/json/whoami');
+
+        const workerName = await errorDisplay.getPageErrorDetailValue('x-worker-name');
+        expect(workerName).toBe('oidc-proxy-worker-preprod.example.test');
+
+        expect(await errorDisplay.isPageErrorResponseBodyTriggerVisible()).toBe(false);
+
+        await expect(errorDisplay.getPageErrorLocator()).toHaveScreenshot(
+            'error-full-page-whoami-recovered-xhr-network.png',
+        );
+        await page.screenshot({
+            path: `${FULL_PAGE_DIR}/full-whoami-recovered-xhr-network.png`,
             fullPage: true,
         });
     });

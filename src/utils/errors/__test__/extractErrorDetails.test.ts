@@ -665,6 +665,37 @@ describe('extractErrorDetails', () => {
         );
     });
 
+    test('should extract HTTP details from recovered ERR_NETWORK response', () => {
+        const error = {
+            status: 504,
+            statusText: 'Deadline Exceeded',
+            code: 'ERR_NETWORK',
+            message: 'Network Error',
+            data: '',
+            headers: {
+                'x-worker-name': 'oidc-proxy-1-vm-preprod.example.net',
+            },
+            config: {
+                url: 'https://oidc-proxy-preprod.example.net/viewer/json/whoami?database=%2Fdb',
+                method: 'get',
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details).toEqual(
+            expect.objectContaining({
+                status: 504,
+                statusText: 'Deadline Exceeded',
+                title: '504 Deadline Exceeded',
+                errorCode: 'ERR_NETWORK',
+                workerName: 'oidc-proxy-1-vm-preprod.example.net',
+                requestUrl:
+                    'https://oidc-proxy-preprod.example.net/viewer/json/whoami?database=%2Fdb',
+                method: 'GET',
+            }),
+        );
+    });
+
     test('should extract config from enriched fetch error without title', () => {
         const error = Object.assign(new TypeError('Failed to fetch'), {
             config: {url: '/viewer/query?timeout=60000', method: 'POST'},
