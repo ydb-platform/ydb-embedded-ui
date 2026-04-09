@@ -25,7 +25,7 @@ export function getQueryPageLeaveState(
         firstRunningTabId,
         hasRunningTabs,
         hasDirtyTabs,
-        shouldPromptOnPageLeave: hasRunningTabs || hasDirtyTabs,
+        shouldPromptOnPageLeave: hasRunningTabs,
     };
 }
 

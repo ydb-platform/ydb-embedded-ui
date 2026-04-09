@@ -59,7 +59,7 @@ describe('getQueryPageLeaveState', () => {
         );
     });
 
-    test('prompts on dirty tabs even when there are no running tabs', () => {
+    test('does not prompt on dirty tabs when there are no running tabs', () => {
         const tabsById = {
             first: createTabState('first'),
             second: createTabState('second', {isDirty: true}),
@@ -69,7 +69,7 @@ describe('getQueryPageLeaveState', () => {
             firstRunningTabId: undefined,
             hasRunningTabs: false,
             hasDirtyTabs: true,
-            shouldPromptOnPageLeave: true,
+            shouldPromptOnPageLeave: false,
         });
     });
 

@@ -159,19 +159,25 @@ test.describe('Query page leave', () => {
         await expect(queryEditor.waitForAnyStatus(['Running', 'Fetching'])).resolves.toBeTruthy();
     });
 
-    test('Reload shows beforeunload when a non-active tab is dirty', async ({page}) => {
+    test('Reload does not show beforeunload when only a non-active tab is dirty', async ({
+        page,
+    }) => {
         const tenantPage = await openMultiTabQueryEditor(page);
         const {queryEditor} = tenantPage;
         const {dirtyTabId, cleanTabId} = await prepareInactiveDirtyTab(tenantPage);
 
-        const {dialog, triggerPromise} = await waitForBeforeUnloadDialog(page, () =>
-            page.reload({timeout: 5000}),
-        );
+        const dialogPromise = page
+            .waitForEvent('dialog', {timeout: 1000})
+            .then(async (dialog) => {
+                await dialog.dismiss();
+                return dialog.type();
+            })
+            .catch(() => undefined);
 
-        await dialog.dismiss();
-        await triggerPromise;
+        await page.reload({timeout: 5000});
 
         expect(page.isClosed()).toBe(false);
+        await expect(dialogPromise).resolves.toBeUndefined();
         await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(2);
         await expect(queryEditor.editorTabs.getActiveTabId()).resolves.toBe(cleanTabId);
 
@@ -204,11 +210,43 @@ test.describe('Query page leave', () => {
         await expect(queryEditor.waitForAnyStatus(['Running', 'Fetching'])).resolves.toBeTruthy();
     });
 
-    test('Page close with runBeforeUnload closes page after accept', async ({page}) => {
+    test('Page close with runBeforeUnload does not show beforeunload for dirty tabs only', async ({
+        page,
+    }) => {
         const tenantPage = await openMultiTabQueryEditor(page);
         const {queryEditor} = tenantPage;
 
-        await queryEditor.setQuery('SELECT 1 AS close_after_accept;');
+        await queryEditor.setQuery('SELECT 1 AS close_without_beforeunload;');
+
+        const dialogPromise = page
+            .waitForEvent('dialog', {timeout: 1000})
+            .then(async (dialog) => {
+                await dialog.dismiss();
+                return dialog.type();
+            })
+            .catch(() => undefined);
+
+        const pageClosePromise = page.waitForEvent('close');
+
+        await page.close({runBeforeUnload: true});
+        await pageClosePromise;
+
+        await expect(dialogPromise).resolves.toBeUndefined();
+        expect(page.isClosed()).toBe(true);
+    });
+
+    test('Page close with runBeforeUnload closes page after accept for running query', async ({
+        page,
+    }) => {
+        const tenantPage = await openMultiTabQueryEditor(page);
+        const {queryEditor} = tenantPage;
+
+        await toggleExperiment(page, 'on', 'Query Streaming');
+        await setupMockStreamingFetch(page, {chunkIntervalMs: 1000});
+
+        await queryEditor.setQuery(longRunningStreamQuery);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.waitForAnyStatus(['Running', 'Fetching'])).resolves.toBeTruthy();
 
         const pageClosePromise = page.waitForEvent('close');
         const {dialog, triggerPromise} = await waitForBeforeUnloadDialog(page, () =>
