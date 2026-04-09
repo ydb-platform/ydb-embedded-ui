@@ -96,6 +96,36 @@ describe('recoverXhrResponseFromNetworkError', () => {
         expect(error.status).toBe(504);
     });
 
+    test('does not treat array-like errors as recoverable records', () => {
+        const error = Object.assign([], createNetworkError(createXhrRequestMock()));
+
+        const response = recoverXhrResponseFromNetworkError(error);
+
+        expect(response).toBeUndefined();
+        expect(error.response).toBeUndefined();
+    });
+
+    test('restores recovered auth response in shape compatible with redirect-to-auth checks', () => {
+        const error = createNetworkError(
+            createXhrRequestMock({
+                status: 401,
+                statusText: 'Unauthorized',
+                responseText: JSON.stringify({authUrl: 'https://auth.example.com/login'}),
+                rawHeaders: 'Content-Type: application/json',
+            }),
+        );
+
+        const response = recoverXhrResponseFromNetworkError(error);
+
+        expect(response).toEqual(
+            expect.objectContaining({
+                status: 401,
+                data: {authUrl: 'https://auth.example.com/login'},
+            }),
+        );
+        expect(isRedirectToAuth(response)).toBe(true);
+    });
+
     test.each([
         {
             title: 'status is zero',
@@ -130,27 +160,6 @@ describe('recoverXhrResponseFromNetworkError', () => {
 describe('handleBaseApiResponseError', () => {
     afterEach(() => {
         jest.restoreAllMocks();
-    });
-
-    test('restores recovered auth response in shape compatible with redirect-to-auth checks', () => {
-        const error = createNetworkError(
-            createXhrRequestMock({
-                status: 401,
-                statusText: 'Unauthorized',
-                responseText: JSON.stringify({authUrl: 'https://auth.example.com/login'}),
-                rawHeaders: 'Content-Type: application/json',
-            }),
-        );
-
-        const response = recoverXhrResponseFromNetworkError(error);
-
-        expect(response).toEqual(
-            expect.objectContaining({
-                status: 401,
-                data: {authUrl: 'https://auth.example.com/login'},
-            }),
-        );
-        expect(isRedirectToAuth(response)).toBe(true);
     });
 
     test('preserves NEED_RESET behavior after recovered response JSON parsing', async () => {
