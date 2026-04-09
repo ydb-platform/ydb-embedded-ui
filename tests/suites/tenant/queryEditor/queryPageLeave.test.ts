@@ -226,13 +226,10 @@ test.describe('Query page leave', () => {
             })
             .catch(() => undefined);
 
-        const pageClosePromise = page.waitForEvent('close');
-
         await page.close({runBeforeUnload: true});
-        await pageClosePromise;
 
         await expect(dialogPromise).resolves.toBeUndefined();
-        expect(page.isClosed()).toBe(true);
+        await expect.poll(() => page.isClosed()).toBe(true);
     });
 
     test('Page close with runBeforeUnload closes page after accept for running query', async ({
