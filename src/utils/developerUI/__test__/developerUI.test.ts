@@ -56,6 +56,16 @@ describe('Developer UI links generators', () => {
         test('should create relative link with no host', () => {
             expect(createDeveloperUILinkWithNodeId(1)).toBe('/node/1');
         });
+        test('should strip existing node path from current host when no firstSegment', () => {
+            jest.mocked(window.api.viewer.getPath).mockReturnValue('/node/3');
+            expect(createDeveloperUILinkWithNodeId(1)).toBe('/node/1');
+        });
+        test('should strip existing node path from current absolute host when no firstSegment', () => {
+            jest.mocked(window.api.viewer.getPath).mockReturnValue(
+                'http://my-ydb-host.net:8765/node/3',
+            );
+            expect(createDeveloperUILinkWithNodeId(1)).toBe('http://my-ydb-host.net:8765/node/1');
+        });
         test('should create relative link with existing relative path with nodeId', () => {
             expect(createDeveloperUILinkWithNodeId(1, '/node/3/')).toBe('/node/1');
         });
@@ -219,13 +229,13 @@ describe('Developer UI links generators', () => {
                 expect(createDeveloperUILinkWithNodeId(1, '/custom/node/3')).toBe('/custom/node/1');
             });
 
-            test('should append first segment after current host before adding node path', () => {
+            test('should strip existing node path and append first segment before adding node path', () => {
                 configureUIFactory({developerUiFirstPathSegment: 'custom'});
                 jest.mocked(window.api.viewer.getPath).mockReturnValue(
                     'http://my-ydb-host.net:8765/node/3',
                 );
                 expect(createDeveloperUILinkWithNodeId(1)).toBe(
-                    'http://my-ydb-host.net:8765/node/3/custom/node/1',
+                    'http://my-ydb-host.net:8765/custom/node/1',
                 );
             });
         });
