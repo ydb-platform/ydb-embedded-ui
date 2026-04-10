@@ -289,6 +289,96 @@ export async function setupWhoamiHybridNetworkErrorMock(page: Page) {
     });
 }
 
+export async function setupWhoamiRecoveredXhrNetworkErrorMock(page: Page) {
+    await page.addInitScript(() => {
+        const originalApiDescriptor = Object.getOwnPropertyDescriptor(window, 'api');
+        let currentApi: unknown;
+
+        Object.defineProperty(window, 'api', {
+            configurable: true,
+            enumerable: originalApiDescriptor?.enumerable ?? true,
+            get() {
+                return currentApi;
+            },
+            set(value) {
+                if (
+                    !value ||
+                    typeof value !== 'object' ||
+                    !('viewer' in value) ||
+                    !value.viewer ||
+                    typeof value.viewer !== 'object'
+                ) {
+                    currentApi = value;
+                    return;
+                }
+
+                const viewer = value.viewer as {
+                    _axios?: {
+                        interceptors?: {
+                            request?: {
+                                use?: (
+                                    onFulfilled: (config: {
+                                        url?: string;
+                                        method?: string;
+                                    }) => unknown,
+                                ) => void;
+                            };
+                        };
+                    };
+                };
+
+                if (!viewer._axios?.interceptors?.request?.use) {
+                    currentApi = value;
+                    return;
+                }
+
+                viewer._axios.interceptors.request.use(
+                    (config: {url?: string; method?: string; adapter?: () => Promise<never>}) => {
+                        if (
+                            typeof config.url !== 'string' ||
+                            !config.url.includes('/viewer/json/whoami')
+                        ) {
+                            return config;
+                        }
+
+                        const query = config.url.includes('?')
+                            ? config.url.slice(config.url.indexOf('?'))
+                            : '';
+                        const responseURL = `https://test-oidc-proxy.example.test/ydbproxy-preprod.example.test:8765/node/50465/viewer/json/whoami${query}`;
+
+                        return {
+                            ...config,
+                            adapter: async () => {
+                                const request = {
+                                    readyState: 4,
+                                    status: 504,
+                                    statusText: 'Deadline Exceeded',
+                                    responseText: '',
+                                    responseURL,
+                                    getAllResponseHeaders: () =>
+                                        [
+                                            'Content-Length: 0',
+                                            'X-Worker-Name: oidc-proxy-worker-preprod.example.test',
+                                        ].join('\r\n'),
+                                };
+
+                                throw Object.assign(new Error('Network Error'), {
+                                    name: 'AxiosError',
+                                    code: 'ERR_NETWORK',
+                                    config,
+                                    request,
+                                });
+                            },
+                        };
+                    },
+                );
+
+                currentApi = value;
+            },
+        });
+    });
+}
+
 export async function setupWhoami502HtmlMock(page: Page) {
     const html =
         '<html><body><h1>502 Bad Gateway</h1><p>The upstream server returned an invalid response</p></body></html>';

@@ -24,6 +24,160 @@ export interface BaseAPIParams {
     useRelativePath: undefined | boolean;
 }
 
+interface XhrLikeRequest {
+    readyState: number;
+    status: number;
+    statusText?: string;
+    responseText?: string;
+    responseURL?: string;
+    getAllResponseHeaders: () => string;
+}
+
+interface RecoveredNetworkResponse {
+    status: number;
+    statusText: string;
+    data?: unknown;
+    headers: Record<string, string>;
+    config: Record<string, unknown>;
+    request: XhrLikeRequest;
+    code?: string;
+    message?: string;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function isXhrLikeRequest(request: unknown): request is XhrLikeRequest {
+    return Boolean(
+        isRecord(request) &&
+            typeof request.readyState === 'number' &&
+            typeof request.status === 'number' &&
+            typeof request.getAllResponseHeaders === 'function',
+    );
+}
+
+function parseXhrResponseHeaders(rawHeaders: string): Record<string, string> {
+    if (!rawHeaders.trim()) {
+        return {};
+    }
+
+    const headers: Record<string, string> = {};
+
+    for (const line of rawHeaders.split(/\r?\n/)) {
+        const separatorIndex = line.indexOf(':');
+        if (separatorIndex <= 0) {
+            continue;
+        }
+
+        const headerName = line.slice(0, separatorIndex).trim().toLowerCase();
+        const headerValue = line.slice(separatorIndex + 1).trim();
+
+        if (!headerName || !headerValue) {
+            continue;
+        }
+
+        headers[headerName] = headers[headerName]
+            ? `${headers[headerName]}, ${headerValue}`
+            : headerValue;
+    }
+
+    return headers;
+}
+
+function parseRecoveredResponseData(
+    responseText: string | undefined,
+    headers: Record<string, string>,
+): unknown {
+    if (typeof responseText !== 'string') {
+        return undefined;
+    }
+
+    const trimmedResponse = responseText.trim();
+    if (!trimmedResponse) {
+        return responseText;
+    }
+
+    const contentType = headers['content-type']?.toLowerCase();
+    const shouldParseJson =
+        Boolean(contentType?.includes('json')) ||
+        trimmedResponse.startsWith('{') ||
+        trimmedResponse.startsWith('[');
+
+    if (!shouldParseJson) {
+        return responseText;
+    }
+
+    try {
+        return JSON.parse(responseText) as unknown;
+    } catch {
+        return responseText;
+    }
+}
+
+export function recoverXhrResponseFromNetworkError(
+    error: unknown,
+): RecoveredNetworkResponse | undefined {
+    if (!isRecord(error) || error.code !== 'ERR_NETWORK' || error.response) {
+        return undefined;
+    }
+
+    const request = error.request;
+    if (!isXhrLikeRequest(request) || request.readyState !== 4 || request.status <= 0) {
+        return undefined;
+    }
+
+    const headers = parseXhrResponseHeaders(request.getAllResponseHeaders());
+    const config = isRecord(error.config) ? {...error.config} : {};
+
+    if (request.responseURL) {
+        config.url = request.responseURL;
+    }
+
+    const recoveredResponse: RecoveredNetworkResponse = {
+        status: request.status,
+        statusText: typeof request.statusText === 'string' ? request.statusText : '',
+        data: parseRecoveredResponseData(request.responseText, headers),
+        headers,
+        config,
+        request,
+    };
+
+    if (typeof error.code === 'string') {
+        recoveredResponse.code = error.code;
+    }
+
+    if (typeof error.message === 'string') {
+        recoveredResponse.message = error.message;
+    }
+
+    Object.assign(error, {
+        response: recoveredResponse,
+        status: request.status,
+    });
+
+    return recoveredResponse;
+}
+
+export function handleBaseApiResponseError(error: unknown): Promise<never> {
+    recoverXhrResponseFromNetworkError(error);
+
+    const response =
+        isRecord(error) && 'response' in error && isRecord(error.response)
+            ? error.response
+            : undefined;
+
+    if (isRedirectToAuth(response)) {
+        window.location.assign(response.data.authUrl);
+    }
+
+    if (isNeedResetResponse(response?.data) && document.visibilityState === 'visible') {
+        processNeedReset();
+    }
+
+    return Promise.reject(error);
+}
+
 export class BaseYdbAPI extends AxiosWrapper {
     DEFAULT_RETRIES_COUNT = 0;
 
@@ -73,22 +227,7 @@ export class BaseYdbAPI extends AxiosWrapper {
         });
 
         // Interceptor to process OIDC auth and NEED_RESET
-        this._axios.interceptors.response.use(null, function (error) {
-            const response = error.response;
-
-            // OIDC proxy returns 401 response with authUrl in it
-            // authUrl - external auth service link, after successful auth additional cookies will be appended
-            // that will allow access to clusters where OIDC proxy is a balancer
-            if (isRedirectToAuth(response)) {
-                window.location.assign(response.data.authUrl);
-            }
-
-            if (isNeedResetResponse(response?.data) && document.visibilityState === 'visible') {
-                processNeedReset();
-            }
-
-            return Promise.reject(error);
-        });
+        this._axios.interceptors.response.use(null, handleBaseApiResponseError);
     }
 
     getPath(path: string) {
