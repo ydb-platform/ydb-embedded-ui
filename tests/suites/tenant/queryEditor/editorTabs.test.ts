@@ -52,7 +52,7 @@ async function expectSelectQueryTemplateLoaded(queryEditor: QueryEditor) {
     expect(editorContent).toContain('LIMIT');
 }
 
-test.describe.only('Editor tabs', () => {
+test.describe('Editor tabs', () => {
     let tenantPage: TenantPage;
     let queryEditor: QueryEditor;
 

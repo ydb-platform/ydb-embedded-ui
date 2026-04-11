@@ -303,6 +303,14 @@ export default function QueryEditor({
     }, []);
 
     React.useEffect(() => {
+        if (isMultiTabQueryEditorEnabled || hasTabs) {
+            return;
+        }
+
+        handleNewTabClick();
+    }, [handleNewTabClick, hasTabs, isMultiTabQueryEditorEnabled]);
+
+    React.useEffect(() => {
         if (!hasTabs) {
             return;
         }
