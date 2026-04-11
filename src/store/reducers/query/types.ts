@@ -106,7 +106,7 @@ export interface QueryTabState {
 }
 
 export interface QueryState {
-    activeTabId: string;
+    activeTabId?: string;
     tabsOrder: string[];
     tabsById: Record<string, QueryTabState>;
     newTabCounter: number;

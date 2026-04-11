@@ -56,6 +56,7 @@ export class QueryEditor {
     private page: Page;
     private selector: Locator;
     private monacoEditor: Locator;
+    private zeroTabsState: Locator;
     private runButton: Locator;
     private explainButton: Locator;
     private stopButton: Locator;
@@ -75,6 +76,7 @@ export class QueryEditor {
         this.selector = page.locator('.query-editor');
         this.monacoEditor = this.selector.locator('.query-editor__monaco .monaco-editor');
         this.editorTextArea = this.selector.locator('.query-editor__monaco textarea');
+        this.zeroTabsState = this.selector.locator('[data-qa="query-editor-zero-tabs-state"]');
         this.runButton = this.selector.getByRole('button', {name: ButtonNames.Run});
         this.stopButton = this.selector.getByRole('button', {name: ButtonNames.Stop});
         this.stopBanner = this.selector.locator('.ydb-query-stopped-banner');
@@ -152,9 +154,10 @@ export class QueryEditor {
     }
 
     async focusHotkeysTarget() {
-        const addTabButton = this.page.getByRole('button', {name: 'New editor tab'});
-        await addTabButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await addTabButton.focus();
+        await this.page.evaluate(() => {
+            document.body.tabIndex = -1;
+            document.body.focus();
+        });
     }
 
     async clickSaveButton() {
@@ -213,6 +216,8 @@ export class QueryEditor {
                 return resultArea.locator('.ydb-query-json-viewer__tree');
             case ExplainResultType.AST:
                 return resultArea.locator('.ydb-query-ast');
+            default:
+                throw new Error(`Unsupported explain result type: ${type}`);
         }
     }
 
@@ -318,6 +323,39 @@ export class QueryEditor {
 
     async waitForEditorReady() {
         await this.monacoEditor.waitFor({state: 'visible'});
+    }
+
+    async isZeroTabsStateVisible() {
+        await this.zeroTabsState.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async isZeroTabsStateHidden() {
+        await this.zeroTabsState.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async clickZeroTabsState() {
+        await this.zeroTabsState.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.zeroTabsState.click();
+    }
+
+    getZeroTabsStateLocator() {
+        return this.zeroTabsState;
+    }
+
+    async hoverZeroTabsState() {
+        await this.zeroTabsState.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.zeroTabsState.hover();
+    }
+
+    async getRequiredActiveTabId() {
+        const activeTabId = await this.editorTabs.getActiveTabId();
+        if (!activeTabId) {
+            throw new Error('Expected an active editor tab');
+        }
+
+        return activeTabId;
     }
 
     async selectResultTypeRadio(type: ExplainResultType) {

@@ -66,6 +66,7 @@ import {useSavedQueries} from '../utils/useSavedQueries';
 
 import {EditorTabs} from './EditorTabs/EditorTabs';
 import {RENAME_QUERY_DIALOG} from './EditorTabs/RenameQueryDialog';
+import {QueryEditorZeroTabsState} from './QueryEditorZeroTabsState';
 import {YqlEditor} from './YqlEditor/YqlEditor';
 import {useEditorTabsGlobalHotkeys} from './hooks/useEditorTabsGlobalHotkeys';
 import {useQueryPageLeaveGuard} from './hooks/useQueryPageLeaveGuard';
@@ -153,6 +154,7 @@ export default function QueryEditor({
 
     const {
         activeTabId: tabsActiveTabId,
+        tabsOrder,
         handleNewTabClick,
         handleCloseActiveTab,
         handleCloseOtherTabs: closeOtherTabs,
@@ -165,9 +167,14 @@ export default function QueryEditor({
     const activeTab = useTypedSelector(selectActiveTab);
     const {savedQueries} = useSavedQueries();
     const createSaveQueryHandler = useSaveQueryWithTabSync();
+    const hasTabs = tabsOrder.length > 0;
 
     const handleGlobalRenameTab = React.useCallback(() => {
         const tabIdToRename = tabsActiveTabId;
+        if (!tabIdToRename) {
+            return;
+        }
+
         NiceModal.show(RENAME_QUERY_DIALOG, {
             title: activeTab?.title || '',
             onRename: (title: string) => {
@@ -177,20 +184,32 @@ export default function QueryEditor({
     }, [tabsActiveTabId, activeTab?.title, dispatch]);
 
     const handleGlobalDuplicateTab = React.useCallback(() => {
+        if (!tabsActiveTabId) {
+            return;
+        }
+
         handleDuplicateTab(tabsActiveTabId);
     }, [handleDuplicateTab, tabsActiveTabId]);
 
     const handleGlobalCloseOtherTabs = React.useCallback(() => {
+        if (!tabsActiveTabId) {
+            return;
+        }
+
         closeOtherTabs(tabsActiveTabId);
     }, [closeOtherTabs, tabsActiveTabId]);
 
     const handleGlobalSaveQueryAs = React.useCallback(() => {
+        if (!activeTab) {
+            return;
+        }
+
         const defaultQueryName = getTabTitleForSave(activeTab);
 
         NiceModal.show(SAVE_QUERY_DIALOG, {
             savedQueries,
-            onSaveQuery: createSaveQueryHandler(activeTab?.id),
-            queryBody: activeTab?.input ?? '',
+            onSaveQuery: createSaveQueryHandler(activeTab.id),
+            queryBody: activeTab.input,
             defaultQueryName,
         });
     }, [activeTab, createSaveQueryHandler, savedQueries]);
@@ -284,6 +303,10 @@ export default function QueryEditor({
     }, []);
 
     React.useEffect(() => {
+        if (!hasTabs) {
+            return;
+        }
+
         if (showPreview || isResultLoaded) {
             // Only expand to default size if the pane is collapsed.
             // If the user has manually resized the pane, keep their layout.
@@ -293,9 +316,13 @@ export default function QueryEditor({
         } else {
             dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
         }
-    }, [showPreview, isResultLoaded]);
+    }, [hasTabs, showPreview, isResultLoaded]);
 
     const handleSendExecuteClick = useEventHandler((text: string, partial?: boolean) => {
+        if (!activeTabId) {
+            return;
+        }
+
         runSetStoppableTimeout();
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
         dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: text}));
@@ -435,6 +462,10 @@ export default function QueryEditor({
     };
 
     const handleGetExplainQueryClick = useEventHandler((text: string) => {
+        if (!activeTabId) {
+            return;
+        }
+
         runSetStoppableTimeout();
         setLastUsedQueryAction(QUERY_ACTIONS.explain);
         dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: text}));
@@ -501,62 +532,66 @@ export default function QueryEditor({
 
     return (
         <div className={b({multiTab: isMultiTabQueryEditorEnabled})}>
-            <SplitPane
-                direction="vertical"
-                defaultSizePaneKey={DEFAULT_SIZE_RESULT_PANE_KEY}
-                triggerCollapse={resultVisibilityState.triggerCollapse}
-                triggerExpand={resultVisibilityState.triggerExpand}
-                minSize={[0, 52]}
-                collapsedSizes={[100, 0]}
-                onSplitStartDragAdditional={onSplitStartDragAdditional}
-            >
-                <div
-                    className={b('pane-wrapper', {
-                        top: true,
-                        loading: isMultiTabQueryEditorEnabled && !isEditorReady,
-                    })}
+            {hasTabs ? (
+                <SplitPane
+                    direction="vertical"
+                    defaultSizePaneKey={DEFAULT_SIZE_RESULT_PANE_KEY}
+                    triggerCollapse={resultVisibilityState.triggerCollapse}
+                    triggerExpand={resultVisibilityState.triggerExpand}
+                    minSize={[0, 52]}
+                    collapsedSizes={[100, 0]}
+                    onSplitStartDragAdditional={onSplitStartDragAdditional}
                 >
-                    {isMultiTabQueryEditorEnabled && !isEditorReady ? (
-                        <div className={b('editor-loader')}>
-                            <Loader size="l" />
+                    <div
+                        className={b('pane-wrapper', {
+                            top: true,
+                            loading: isMultiTabQueryEditorEnabled && !isEditorReady,
+                        })}
+                    >
+                        {isMultiTabQueryEditorEnabled && !isEditorReady ? (
+                            <div className={b('editor-loader')}>
+                                <Loader size="l" />
+                            </div>
+                        ) : null}
+                        {isMultiTabQueryEditorEnabled ? <EditorTabs /> : null}
+                        <div className={b('monaco-wrapper')}>
+                            <div className={b('monaco')}>
+                                <YqlEditor
+                                    changeUserInput={changeUserInput}
+                                    theme={theme}
+                                    handleSendExecuteClick={handleSendExecuteClick}
+                                    handleGetExplainQueryClick={handleGetExplainQueryClick}
+                                    historyQueries={historyQueries}
+                                    goToPreviousQuery={goToPreviousQuery}
+                                    goToNextQuery={goToNextQuery}
+                                    onEditorReady={handleEditorReady}
+                                />
+                            </div>
                         </div>
-                    ) : null}
-                    {isMultiTabQueryEditorEnabled ? <EditorTabs /> : null}
-                    <div className={b('monaco-wrapper')}>
-                        <div className={b('monaco')}>
-                            <YqlEditor
-                                changeUserInput={changeUserInput}
-                                theme={theme}
-                                handleSendExecuteClick={handleSendExecuteClick}
-                                handleGetExplainQueryClick={handleGetExplainQueryClick}
-                                historyQueries={historyQueries}
-                                goToPreviousQuery={goToPreviousQuery}
-                                goToNextQuery={goToNextQuery}
-                                onEditorReady={handleEditorReady}
-                            />
-                        </div>
+                        {renderControls()}
                     </div>
-                    {renderControls()}
-                </div>
-                <div className={b('pane-wrapper')}>
-                    <Result
-                        resultVisibilityState={resultVisibilityState}
-                        onExpandResultHandler={onExpandResultHandler}
-                        onCollapseResultHandler={onCollapseResultHandler}
-                        type={type}
-                        subType={subType}
-                        theme={theme}
-                        key={result?.queryId}
-                        result={result}
-                        database={database}
-                        databaseFullPath={databaseFullPath}
-                        path={path}
-                        showPreview={showPreview}
-                        queryText={lastExecutedQueryText}
-                        tableSettings={tableSettings}
-                    />
-                </div>
-            </SplitPane>
+                    <div className={b('pane-wrapper')}>
+                        <Result
+                            resultVisibilityState={resultVisibilityState}
+                            onExpandResultHandler={onExpandResultHandler}
+                            onCollapseResultHandler={onCollapseResultHandler}
+                            type={type}
+                            subType={subType}
+                            theme={theme}
+                            key={result?.queryId}
+                            result={result}
+                            database={database}
+                            databaseFullPath={databaseFullPath}
+                            path={path}
+                            showPreview={showPreview}
+                            queryText={lastExecutedQueryText}
+                            tableSettings={tableSettings}
+                        />
+                    </div>
+                </SplitPane>
+            ) : (
+                <QueryEditorZeroTabsState onCreateTab={handleNewTabClick} />
+            )}
             <QuerySettingsDialog />
         </div>
     );

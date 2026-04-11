@@ -12,10 +12,11 @@ describe('Query tabs sessionStorage migration', () => {
         const {default: queryReducer} = await import('../query');
 
         const state = queryReducer(undefined, {type: 'query/init'});
+        const activeTabId = state.tabsOrder[0];
 
         expect(state.tabsOrder).toHaveLength(1);
-        expect(state.activeTabId).toBe(state.tabsOrder[0]);
-        expect(state.tabsById[state.activeTabId]?.input).toBe('SELECT 1;');
+        expect(state.activeTabId).toBe(activeTabId);
+        expect(state.tabsById[activeTabId]?.input).toBe('SELECT 1;');
 
         const migratedRaw = sessionStorage.getItem(QUERY_EDITOR_CURRENT_QUERY_KEY);
         expect(migratedRaw).toBeTruthy();
@@ -31,13 +32,14 @@ describe('Query tabs sessionStorage migration', () => {
         const {default: queryReducer} = await import('../query');
 
         const state = queryReducer(undefined, {type: 'query/init'});
+        const activeTabId = state.tabsOrder[0];
 
         expect(state.tabsOrder).toHaveLength(1);
-        expect(state.tabsById[state.activeTabId]?.isDirty).toBe(true);
+        expect(state.tabsById[activeTabId]?.isDirty).toBe(true);
 
         const migratedDirtyRaw = sessionStorage.getItem(QUERY_EDITOR_DIRTY_KEY);
         expect(migratedDirtyRaw).toBeTruthy();
         const migratedDirty = migratedDirtyRaw ? JSON.parse(migratedDirtyRaw) : null;
-        expect(migratedDirty).toEqual({[state.activeTabId]: true});
+        expect(migratedDirty).toEqual({[activeTabId]: true});
     });
 });
