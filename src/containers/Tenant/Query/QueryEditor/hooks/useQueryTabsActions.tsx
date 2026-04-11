@@ -73,7 +73,11 @@ export function useQueryTabsActions() {
     );
 
     const handleCloseTab = React.useCallback(
-        async (tabId: string) => {
+        async (tabId?: string) => {
+            if (!tabId) {
+                return;
+            }
+
             const targetTab = getCurrentTab(tabId);
             if (!targetTab) {
                 return;
@@ -150,7 +154,11 @@ export function useQueryTabsActions() {
     );
 
     const handleCloseOtherTabs = React.useCallback(
-        async (baseTabId: string) => {
+        async (baseTabId?: string) => {
+            if (!baseTabId) {
+                return;
+            }
+
             const tabsToClose = tabsOrder.filter((tabId) => tabId !== baseTabId);
             await closeTabsWithConfirmation(tabsToClose);
 
@@ -166,7 +174,11 @@ export function useQueryTabsActions() {
     }, [closeTabsWithConfirmation, tabsOrder]);
 
     const handleDuplicateTab = React.useCallback(
-        (baseTabId: string) => {
+        (baseTabId?: string) => {
+            if (!baseTabId) {
+                return;
+            }
+
             const tab = tabsById[baseTabId];
             if (!tab) {
                 return;
@@ -212,7 +224,7 @@ export function useQueryTabsActions() {
                 return;
             }
 
-            const currentIndex = tabsOrder.indexOf(activeTabId);
+            const currentIndex = activeTabId ? tabsOrder.indexOf(activeTabId) : -1;
             if (currentIndex === -1) {
                 handleTabSwitch(tabsOrder[0]);
                 return;

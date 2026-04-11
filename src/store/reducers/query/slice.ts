@@ -136,7 +136,7 @@ function createInitialTabsState(): Pick<
     const persistedTabs = isQueryTabsPersistedState(rawTabs) ? rawTabs : undefined;
     const persistedDirty = isQueryTabsDirtyPersistedState(rawDirty) ? rawDirty : undefined;
 
-    if (!persistedTabs || Object.keys(persistedTabs.tabsById).length === 0) {
+    if (!persistedTabs) {
         const tabId = uuidv4();
         return {
             activeTabId: tabId,
@@ -145,6 +145,20 @@ function createInitialTabsState(): Pick<
                 [tabId]: createDefaultTabState({tabId}),
             },
             newTabCounter: 1,
+        };
+    }
+
+    if (
+        Object.keys(persistedTabs.tabsById).length === 0 &&
+        persistedTabs.tabsOrder.length === 0 &&
+        persistedTabs.activeTabId === undefined
+    ) {
+        return {
+            activeTabId: undefined,
+            tabsOrder: [],
+            tabsById: {},
+            newTabCounter:
+                typeof persistedTabs.newTabCounter === 'number' ? persistedTabs.newTabCounter : 0,
         };
     }
 
@@ -179,9 +193,10 @@ function createInitialTabsState(): Pick<
         });
     }
 
-    const activeTabId = tabsById[persistedTabs.activeTabId]
-        ? persistedTabs.activeTabId
-        : tabsOrder[0];
+    const activeTabId =
+        persistedTabs.activeTabId && tabsById[persistedTabs.activeTabId]
+            ? persistedTabs.activeTabId
+            : tabsOrder[0];
 
     const newTabCounter =
         typeof persistedTabs.newTabCounter === 'number'
@@ -197,7 +212,7 @@ function createInitialTabsState(): Pick<
 }
 
 function getActiveTab(state: QueryState): QueryTabState | undefined {
-    return state.tabsById[state.activeTabId];
+    return state.activeTabId ? state.tabsById[state.activeTabId] : undefined;
 }
 
 function getSetQueryTabContentTitle({
@@ -426,17 +441,10 @@ const slice = createSlice({
 
             const isLastTab = state.tabsOrder.length <= 1;
             if (isLastTab) {
-                const tab = state.tabsById[tabId];
-                tab.input = '';
-                tab.savedInput = '';
-                tab.title = '';
-                tab.isTitleUserDefined = false;
-                tab.isTouched = undefined;
-                tab.isDirty = false;
-                tab.result = undefined;
-                tab.lastExecutedQueryText = undefined;
-                tab.savedQueryName = undefined;
-                tab.updatedAt = Date.now();
+                state.activeTabId = undefined;
+                state.tabsOrder = [];
+                state.tabsById = {};
+                state.newTabCounter = 0;
 
                 persistTabsStateToSessionStorage(state);
                 persistDirtyStateToSessionStorage(state);
@@ -541,20 +549,30 @@ const slice = createSlice({
         selectTabsOrder: (state) => state.tabsOrder,
         selectTabsById: (state) => state.tabsById,
         selectNewTabCounter: (state) => state.newTabCounter,
-        selectActiveTab: (state) => state.tabsById[state.activeTabId],
+        selectActiveTab: (state) =>
+            state.activeTabId ? state.tabsById[state.activeTabId] : undefined,
         selectQueriesHistoryFilter: (state) => state.historyFilter || '',
         selectHistoryCurrentQueryId: (state) => state.historyCurrentQueryId,
         selectTenantPath: (state) => state.tenantPath,
-        selectResult: (state) => state.tabsById[state.activeTabId]?.result,
-        selectStartTime: (state) => state.tabsById[state.activeTabId]?.result?.startTime,
-        selectEndTime: (state) => state.tabsById[state.activeTabId]?.result?.endTime,
-        selectUserInput: (state) => state.tabsById[state.activeTabId]?.input || '',
-        selectIsDirty: (state) => state.tabsById[state.activeTabId]?.isDirty || false,
+        selectResult: (state) =>
+            state.activeTabId ? state.tabsById[state.activeTabId]?.result : undefined,
+        selectStartTime: (state) =>
+            state.activeTabId ? state.tabsById[state.activeTabId]?.result?.startTime : undefined,
+        selectEndTime: (state) =>
+            state.activeTabId ? state.tabsById[state.activeTabId]?.result?.endTime : undefined,
+        selectUserInput: (state) =>
+            state.activeTabId ? state.tabsById[state.activeTabId]?.input || '' : '',
+        selectIsDirty: (state) =>
+            state.activeTabId ? state.tabsById[state.activeTabId]?.isDirty || false : false,
         selectResultTab: (state) => state.selectedResultTab,
         selectLastExecutedQueryText: (state) =>
-            state.tabsById[state.activeTabId]?.lastExecutedQueryText,
-        selectActiveTabPendingSnippet: (state) => state.tabsById[state.activeTabId]?.pendingSnippet,
-        selectActiveTabSavedQueryName: (state) => state.tabsById[state.activeTabId]?.savedQueryName,
+            state.activeTabId
+                ? state.tabsById[state.activeTabId]?.lastExecutedQueryText
+                : undefined,
+        selectActiveTabPendingSnippet: (state) =>
+            state.activeTabId ? state.tabsById[state.activeTabId]?.pendingSnippet : undefined,
+        selectActiveTabSavedQueryName: (state) =>
+            state.activeTabId ? state.tabsById[state.activeTabId]?.savedQueryName : undefined,
     },
 });
 
