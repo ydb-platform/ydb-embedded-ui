@@ -197,7 +197,7 @@ function getVDiskFreeSize({
     }
 
     if (!Number.isFinite(allocated) || allocated < 0) {
-        return sizeLimit;
+        return hasSizeLimitFallback ? NaN : sizeLimit;
     }
 
     if (hasSizeLimitFallback) {
