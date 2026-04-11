@@ -21,7 +21,7 @@ const uiFactoryBase: UIFactory = {
     hasAccess: true,
     useDatabaseId: false,
     settingsBackend: undefined,
-    enableMultiTabQueryEditor: true,
+    enableMultiTabQueryEditor: false,
     hasDeveloperUi: true,
 };
 
