@@ -136,11 +136,6 @@ const operations = {
 const monitoring = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.monitoring,
     title: i18n('title_monitoring'),
-    badge: {
-        text: i18n('value_new'),
-        theme: 'normal' as const,
-        size: 'xs' as const,
-    },
 };
 
 const ASYNC_REPLICATION_PAGES = [overview, tablets, describe, access];
