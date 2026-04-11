@@ -261,6 +261,22 @@ describe('prepareVDiskSizeFields', () => {
         });
     });
 
+    test('Should preserve known free size when AllocatedSize is invalid outside SlotSize fallback', () => {
+        expect(
+            prepareVDiskSizeFields({
+                AvailableSize: '400',
+                AllocatedSize: undefined,
+                SlotSize: '500',
+            }),
+        ).toEqual({
+            AvailableSize: 400,
+            AllocatedSize: NaN,
+            SizeLimit: NaN,
+            FreeSize: 400,
+            AllocatedPercent: NaN,
+        });
+    });
+
     test('Should use allocated when SlotSize is undefined and available is 0', () => {
         expect(
             prepareVDiskSizeFields({
