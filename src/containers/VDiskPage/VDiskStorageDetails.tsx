@@ -1,4 +1,4 @@
-import {Button, Flex, Text} from '@gravity-ui/uikit';
+import {Button, Divider, Flex, Text} from '@gravity-ui/uikit';
 
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
 import {ClipboardButton} from '../../components/ClipboardButton/ClipboardButton';
@@ -26,7 +26,6 @@ interface VDiskStorageDetailsProps {
 interface MetricItemProps {
     title: string;
     value: string;
-    isUsage?: boolean;
 }
 
 interface CopyableDetailItemProps {
@@ -43,9 +42,9 @@ interface TruncatedDetailValueProps {
     value?: string | number;
 }
 
-function MetricItem({title, value, isUsage}: MetricItemProps) {
+function MetricItem({title, value}: MetricItemProps) {
     return (
-        <div className={b('metric', {usage: isUsage})}>
+        <div className={b('metric')}>
             <Text variant="subheader-2" className={b('value')}>
                 {value}
             </Text>
@@ -112,6 +111,7 @@ function CopyableDetailItem({title, value}: CopyableDetailItemProps) {
                     copyText={normalizedValue}
                     withLabel={false}
                     view="flat-secondary"
+                    size="s"
                 />
             </Flex>
             <Text color="secondary" className={b('label')}>
@@ -154,10 +154,10 @@ export function VDiskStorageDetails({className, data}: VDiskStorageDetailsProps)
                         title={vDiskPageKeyset('field_storage-details-free')}
                         value={formatMetricBytes(free, metricsSize)}
                     />
+                    <Divider orientation="vertical" />
                     <MetricItem
                         title={vDiskPageKeyset('field_storage-details-usage')}
                         value={formatMetricPercent(usage)}
-                        isUsage
                     />
                 </div>
                 <div className={b('card', {details: true})}>
