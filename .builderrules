@@ -1,0 +1,65 @@
+# Builder rules for `ydb-embedded-ui`
+
+Use these rules when generating or editing code in this repo. Prefer small, behavior-preserving diffs.
+
+## Do
+- Use React 18 and TypeScript 5 patterns already established in the repo.
+- Use `import React from 'react'` in TSX files and keep `import type` statements as separate top-level imports.
+- Use `React.Fragment` instead of fragment shorthand.
+- Use React Router v5 patterns. Start from `src/containers/App/App.tsx` and `src/containers/App/Providers.tsx`.
+- Prefer Gravity UI components before custom UI. Reuse primitives such as `Flex`, `Button`, `Text`, `Select`, and existing local components.
+- For data fetching, define RTK Query endpoints with `api.injectEndpoints()` and `queryFn`, and call `window.api.module.method()`. Start from `src/store/reducers/api.ts` and `src/store/reducers/clusters/clusters.ts`.
+- Prefer `use-query-params` for new URL state and use Zod schemas with safe fallbacks for enum-like values. See `src/containers/Tenant/useTenantQueryParams.ts` and `src/store/reducers/storage/types.ts`.
+- Put user-facing strings in per-component `i18n/` keysets via `registerKeysets()`. Follow `i18n-naming-ruleset.md`. See `src/containers/VDiskPage/i18n/index.ts`.
+- Render missing UI values with `EMPTY_DATA_PLACEHOLDER` from `src/utils/constants.ts`. Treat `''`, `null`, and `undefined` as missing unless the feature explicitly requires otherwise. See `src/containers/VDiskPage/VDiskStorageDetails.tsx`.
+- Use BEM class names through `cn()`. Prefix new root blocks with `ydb-` unless the surrounding feature already uses an established local convention.
+- Prefer `PaginatedTable` for standard virtualized data grids. See `src/components/PaginatedTable/PaginatedTable.tsx`.
+
+## Don't
+- Do not use `React.FC`.
+- Do not use JSX fragment shorthand `<>`.
+- Do not hardcode user-facing strings, colors, or empty placeholders.
+- Do not fetch directly in components or bypass `window.api`.
+- Do not import components through `index.ts` re-exports unless the local pattern explicitly requires it. Do not create new re-export-only `index.ts` files.
+- Do not manually validate enum-like URL params when a Zod schema with fallback fits the use case.
+- Do not interpolate raw user input into SQL or YQL.
+- Do not introduce repo-wide rewrites, speculative abstractions, or heavy dependencies without approval.
+
+## Commands
+Use only verified repo commands from `package.json`:
+- `npm run typecheck`
+- `npm run lint`
+- `npm test`
+- `npm run build:embedded`
+- `npm run package`
+- `npm run test:e2e`
+
+Do not invent file-scoped commands that are not defined in this repo. Prefer the lightest relevant command; use build and E2E only when necessary or explicitly requested.
+
+## Safety and permissions
+Ask first before:
+- package installs
+- deleting or moving files
+- changing shared auth, config, infra, CI/workflows, or core agent instruction files
+- running heavy validation (`npm run build:embedded`, `npm run package`, `npm run test:e2e`) when not explicitly requested
+- broad refactors or generated-code rewrites
+
+## Project structure
+- App shell and providers: `src/containers/App/App.tsx`, `src/containers/App/Providers.tsx`
+- RTK Query base: `src/store/reducers/api.ts`
+- Example data endpoint: `src/store/reducers/clusters/clusters.ts`
+- Shared constants and placeholders: `src/utils/constants.ts`
+- Existing AI guidance: `.github/copilot-instructions.md`, `AGENTS.md`
+- i18n naming rules: `i18n-naming-ruleset.md`
+
+## Good examples
+- Gravity UI plus repo styling pattern: `src/containers/Clusters/Clusters.tsx`
+- Placeholder normalization and copyable details: `src/containers/VDiskPage/VDiskStorageDetails.tsx`
+- i18n keyset registration: `src/containers/VDiskPage/i18n/index.ts`
+- URL params with `use-query-params`: `src/containers/Tenant/useTenantQueryParams.ts`
+- Zod enum fallbacks: `src/store/reducers/storage/types.ts`
+
+## When stuck
+- Inspect adjacent files and copy the local pattern instead of inventing a new one.
+- If routing, provider wiring, API shape, i18n placement, or table behavior is unclear, start from the example files above.
+- Ask for clarification instead of guessing architecture.
