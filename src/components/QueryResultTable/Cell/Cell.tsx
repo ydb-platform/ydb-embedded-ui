@@ -13,6 +13,9 @@ interface CellProps {
 function tryFormatJson(value: string): {formatted: string; isJson: boolean} {
     try {
         const parsed = JSON.parse(value);
+        if (typeof parsed !== 'object' || parsed === null) {
+            return {formatted: value, isJson: false};
+        }
         return {formatted: JSON.stringify(parsed, null, 2), isJson: true};
     } catch {
         return {formatted: value, isJson: false};
