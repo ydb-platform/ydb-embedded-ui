@@ -302,7 +302,7 @@ export default function QueryEditor({
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
     }, []);
 
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
         if (isMultiTabQueryEditorEnabled || hasTabs) {
             return;
         }

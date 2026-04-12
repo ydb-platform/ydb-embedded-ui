@@ -53,8 +53,8 @@ describe('Query zero-tabs state', () => {
 
         const persistedStateRaw = sessionStorage.getItem(QUERY_EDITOR_CURRENT_QUERY_KEY);
         const persistedState = persistedStateRaw ? JSON.parse(persistedStateRaw) : null;
+        expect('activeTabId' in persistedState).toBe(false);
         expect(persistedState).toEqual({
-            activeTabId: undefined,
             tabsOrder: [],
             tabsById: {},
             newTabCounter: 0,

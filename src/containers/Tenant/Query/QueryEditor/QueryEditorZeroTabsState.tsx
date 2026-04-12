@@ -7,7 +7,7 @@ import {HOTKEY_LABELS} from './constants';
 
 import './QueryEditorZeroTabsState.scss';
 
-const b = cn('query-editor-zero-tabs-state');
+const b = cn('ydb-query-editor-zero-tabs-state');
 
 interface QueryEditorZeroTabsStateProps {
     onCreateTab: VoidFunction;

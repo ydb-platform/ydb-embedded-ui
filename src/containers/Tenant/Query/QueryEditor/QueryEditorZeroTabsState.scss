@@ -1,4 +1,4 @@
-.query-editor-zero-tabs-state {
+.ydb-query-editor-zero-tabs-state {
     display: flex;
     flex: 1 1 auto;
     justify-content: center;
@@ -46,7 +46,7 @@
         justify-content: space-between;
         align-items: center;
 
-        width: 282px;
+        width: 100%;
         padding: var(--g-spacing-2) var(--g-spacing-3);
     }
 
