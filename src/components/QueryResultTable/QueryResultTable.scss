@@ -13,6 +13,23 @@
         word-break: break-word;
     }
 
+    &__cell-popup-json {
+        overflow-x: auto;
+
+        max-height: 300px;
+        margin: 0;
+
+        font-family: monospace;
+        font-size: 12px;
+        white-space: pre;
+    }
+
+    &__cell-popup-copy {
+        display: flex;
+
+        margin-top: 8px;
+    }
+
     &__message {
         padding: 15px 10px;
     }
