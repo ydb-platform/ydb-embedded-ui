@@ -93,6 +93,13 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     hideNewFeaturesNotifications?: {
         navigationV2?: boolean;
     };
+
+    /**
+     * First URL path segment for Developer UI routes.
+     * Must be a single path segment without leading/trailing slashes, for example `devui`.
+     * Do not pass `/devui/` or nested paths like `devui/node`.
+     */
+    developerUiFirstPathSegment?: string;
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;
