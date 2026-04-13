@@ -1,0 +1,71 @@
+# Builder rules for `ydb-embedded-ui`
+
+Use these rules when generating or editing code in this repo. Prefer small, behavior-preserving diffs.
+
+## Operating principles
+- Prefer small, composable, behavior-preserving diffs over broad rewrites.
+- Match adjacent local patterns before introducing new ones.
+- If requirements are unclear, choose the smallest reasonable interpretation and ask instead of guessing.
+
+## Do
+- Use React 18 and TypeScript 5 patterns already established in the repo.
+- Use `import React from 'react'` in TSX files and keep `import type` statements as separate top-level imports.
+- Use `React.Fragment` instead of fragment shorthand.
+- Use React Router v5 patterns. For routing and providers, start from `src/containers/App/`.
+- Prefer existing shared components from `src/components/` first. Reuse Gravity UI primitives such as `Flex`, `Button`, `Text`, and `Select` before building custom UI.
+- For data fetching, define RTK Query endpoints with `api.injectEndpoints()` and `queryFn`, and call `window.api.module.method()`. Start from `src/store/reducers/api.ts` and `src/services/api/`.
+- Prefer `use-query-params` for new URL state and use Zod schemas with safe fallbacks for enum-like values.
+- Put user-facing strings in per-component `i18n/` keysets via `registerKeysets()`. Follow `i18n-naming-ruleset.md` and the shared utilities in `src/utils/i18n/`.
+- Use `EMPTY_DATA_PLACEHOLDER` from `src/utils/constants.ts` for missing UI values. Treat `''`, `null`, and `undefined` as missing unless the feature explicitly requires otherwise.
+- Use BEM class names through `cn()`. Prefix new root blocks with `ydb-` unless the surrounding feature already uses an established local convention.
+- Prefer existing shared table components from `src/components/` for standard virtualized data grids, with `PaginatedTable` as the default choice.
+- For async UI, include loading, error, and empty states where the surface can reach them.
+- When changing user-visible behavior, update connected surfaces such as i18n, URL/query params, persisted or shareable state, details or drawers, and tests when applicable.
+
+## Don't
+- Do not use `React.FC`.
+- Do not use JSX fragment shorthand `<>`.
+- Do not hardcode user-facing strings, colors, or empty placeholders.
+- Do not fetch directly in components or bypass `window.api`.
+- Do not import components through `index.ts` re-exports unless the local pattern explicitly requires it. Do not create new re-export-only `index.ts` files.
+- Do not manually validate enum-like URL params when a Zod schema with fallback fits the use case.
+- Do not interpolate raw user input into SQL or YQL.
+- Do not introduce repo-wide rewrites, speculative abstractions, or heavy dependencies without approval.
+
+## Commands
+Use only verified repo commands from `package.json`:
+- `npm run typecheck`
+- `npm run lint`
+- `npm test`
+- `npm run build:embedded`
+- `npm run package`
+- `npm run test:e2e`
+
+Do not invent file-scoped commands that are not defined in this repo. Prefer the lightest relevant command; use build and E2E only when necessary or explicitly requested.
+
+## Safety and permissions
+Ask first before:
+- package installs
+- deleting or moving files
+- changing shared auth, config, infra, CI/workflows, or core agent instruction files
+- running heavy validation (`npm run build:embedded`, `npm run package`, `npm run test:e2e`) when not explicitly requested
+- broad refactors or generated-code rewrites
+
+## Stable anchors
+- Repo-wide guidance: `AGENTS.md`, `.github/copilot-instructions.md`
+- Routing and providers: `src/containers/App/`
+- Shared UI patterns and reusable components: `src/components/`
+- RTK Query base and reducers: `src/store/reducers/api.ts`, `src/store/reducers/`
+- API module structure: `src/services/api/`
+- Shared constants and placeholders: `src/utils/constants.ts`
+- i18n conventions and utilities: `i18n-naming-ruleset.md`, `src/utils/i18n/`
+
+## Done checklist
+- Relevant checks from `package.json` are run when applicable, or explicitly skipped when not needed.
+- The diff stays small and focused.
+- Tests and directly affected connected surfaces are updated when behavior changes.
+
+## When stuck
+- Inspect adjacent files and copy the local pattern instead of inventing a new one.
+- If routing, provider wiring, API shape, i18n placement, or table behavior is unclear, start from the stable anchors above and the current feature directory.
+- Ask for clarification instead of guessing architecture.
