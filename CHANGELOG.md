@@ -1,5 +1,12 @@
 # Changelog
 
+## [15.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.1.0...v15.2.0) (2026-04-13)
+
+
+### Features
+
+* vdisk storage ([#3777](https://github.com/ydb-platform/ydb-embedded-ui/issues/3777)) ([a0a848f](https://github.com/ydb-platform/ydb-embedded-ui/commit/a0a848f62768532e5621579b9d3358f1990e73c9))
+
 ## [15.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.0.0...v15.1.0) (2026-04-13)
 
 
