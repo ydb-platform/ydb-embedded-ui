@@ -3,6 +3,7 @@ import {isNil} from 'lodash';
 import type {TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import {stringifyVdiskId} from '../dataFormatters/dataFormatters';
+import {isNumeric} from '../utils';
 
 import {calculatePDiskSeverity} from './calculatePDiskSeverity';
 import {calculateVDiskSeverity} from './calculateVDiskSeverity';
@@ -151,26 +152,73 @@ export function prepareVDiskSizeFields({
     AllocatedSize: string | number | undefined;
     SlotSize: string | number | undefined;
 }) {
-    const available = Number(AvailableSize ?? 0);
+    const parsedAvailable = Number(AvailableSize);
+    const hasKnownAvailableSize = isNumeric(AvailableSize) && parsedAvailable >= 0;
+    const available = hasKnownAvailableSize ? parsedAvailable : 0;
     // Unlike available, allocated is displayed in UI, it is incorrect to fallback it to 0
     const allocated = Number(AllocatedSize);
     const slotSize = Number(SlotSize);
+    const hasSizeLimitFallback = !available && Boolean(slotSize);
 
     let sizeLimit = allocated + available;
 
     // If no available size or available size is 0, slot size should be used as limit
-    if (!available && slotSize) {
+    if (hasSizeLimitFallback) {
         sizeLimit = slotSize;
     }
 
+    const freeSize = getVDiskFreeSize({
+        available,
+        allocated,
+        sizeLimit,
+        hasKnownAvailableSize,
+        hasSizeLimitFallback,
+    });
     const allocatedPercent = sizeLimit > 0 ? Math.floor((allocated * 100) / sizeLimit) : NaN;
 
     return {
         AvailableSize: available,
         AllocatedSize: allocated,
         SizeLimit: sizeLimit,
+        FreeSize: freeSize,
         AllocatedPercent: allocatedPercent,
     };
+}
+
+function getVDiskFreeSize({
+    available,
+    allocated,
+    sizeLimit,
+    hasKnownAvailableSize,
+    hasSizeLimitFallback,
+}: {
+    available: number;
+    allocated: number;
+    sizeLimit: number;
+    hasKnownAvailableSize: boolean;
+    hasSizeLimitFallback: boolean;
+}) {
+    if (!hasSizeLimitFallback && hasKnownAvailableSize) {
+        return available;
+    }
+
+    if (!Number.isFinite(sizeLimit) || sizeLimit < 0) {
+        return NaN;
+    }
+
+    if (!Number.isFinite(allocated) || allocated < 0) {
+        return hasSizeLimitFallback ? NaN : sizeLimit;
+    }
+
+    if (hasSizeLimitFallback) {
+        return Math.max(sizeLimit - allocated, 0);
+    }
+
+    if (Number.isFinite(available) && available >= 0) {
+        return available;
+    }
+
+    return Math.max(sizeLimit - allocated, 0);
 }
 
 export function preparePDiskSizeFields({

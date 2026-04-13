@@ -36,6 +36,7 @@ export interface PreparedVDisk
     AllocatedSize?: number;
     AllocatedPercent?: number;
     SizeLimit?: number;
+    FreeSize?: number;
 
     Donors?: PreparedVDisk[];
 

@@ -1,0 +1,129 @@
+.ydb-vdisk-storage-details {
+    &__title {
+        margin-bottom: var(--g-spacing-4);
+    }
+
+    &__cards {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: var(--g-spacing-1);
+
+        width: fit-content;
+        max-width: 100%;
+    }
+
+    &__card {
+        min-width: 0;
+        padding: var(--g-spacing-4) var(--g-spacing-5);
+
+        border-radius: var(--g-border-radius-m) var(--g-border-radius-xs) var(--g-border-radius-xs)
+            var(--g-border-radius-m);
+        background-color: var(--g-color-base-generic);
+
+        &_metrics {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: stretch;
+            gap: var(--g-spacing-5);
+
+            width: max-content;
+            max-width: 100%;
+            min-height: 74px;
+        }
+
+        &_details {
+            display: flex;
+            flex: 0 1 auto;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            align-items: center;
+            gap: var(--g-spacing-4);
+
+            width: fit-content;
+            max-width: 100%;
+            min-height: 74px;
+
+            border-radius: var(--g-border-radius-xs) var(--g-border-radius-m)
+                var(--g-border-radius-m) var(--g-border-radius-xs);
+        }
+    }
+
+    &__details {
+        display: flex;
+        flex: 0 1 auto;
+        flex-wrap: wrap;
+        align-items: stretch;
+        gap: var(--g-spacing-4);
+
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    &__metric,
+    &__detail {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: var(--g-spacing-1);
+
+        min-width: 0;
+        padding-right: var(--g-spacing-4);
+    }
+
+    &__detail {
+        flex: 0 1 auto;
+
+        min-width: 100px;
+        max-width: 200px;
+    }
+
+    &__value,
+    &__label {
+        display: block;
+
+        white-space: nowrap;
+    }
+
+    &__value-row &__value {
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+    }
+
+    &__value-row {
+        flex-wrap: nowrap;
+
+        width: 100%;
+        min-width: 0;
+        height: 20px;
+
+        &_copyable {
+            width: auto;
+            max-width: 100%;
+        }
+    }
+
+    &__value-popover {
+        flex: 1 1 auto;
+
+        min-width: 0;
+
+        &_copyable {
+            flex: 0 1 auto;
+
+            max-width: 100%;
+        }
+    }
+
+    &__value-popover-content {
+        width: 100%;
+        min-width: 0;
+
+        &_copyable {
+            width: auto;
+            max-width: 100%;
+        }
+    }
+}

@@ -2,9 +2,35 @@ import {uiFactory} from '../../uiFactory/uiFactory';
 import {useIsUserAllowedToMakeChanges} from '../hooks/useIsUserAllowedToMakeChanges';
 import {pad9} from '../utils';
 
+function appendPathSegment(host: string, firstSegment: string) {
+    const normalizedFirstSegment = firstSegment.replace(/^\/+|\/+$/g, '');
+    const normalizedHost = host.replace(/\/+$/g, '');
+
+    if (!normalizedFirstSegment) {
+        return normalizedHost || host;
+    }
+
+    if (!normalizedHost) {
+        return `/${normalizedFirstSegment}`;
+    }
+
+    return `${normalizedHost}/${normalizedFirstSegment}`;
+}
+
 function getCurrentHost() {
     // It always has correct backend
-    return window.api.viewer.getPath('');
+    const host = String(window.api.viewer.getPath(''));
+    const firstSegment = uiFactory.developerUiFirstPathSegment;
+
+    if (!firstSegment) {
+        return host;
+    }
+
+    return appendPathSegment(host, firstSegment);
+}
+
+function replaceNodePath(host: string, replacement = '') {
+    return host.replace(/\/node\/\d+\/?$/, replacement);
 }
 
 export function createDeveloperUIInternalPageHref(host = getCurrentHost()) {
@@ -16,19 +42,21 @@ export function createDeveloperUIMonitoringPageHref(host = getCurrentHost()) {
 }
 
 // Current node connects with target node by itself using nodeId
-export const createDeveloperUILinkWithNodeId = (
-    nodeId: number | string,
-    host = getCurrentHost(),
-) => {
-    const nodePathRegexp = /\/node\/\d+\/?$/g;
+export const createDeveloperUILinkWithNodeId = (nodeId: number | string, host?: string) => {
+    const nodePath = `/node/${nodeId}`;
 
-    // In case current backend is already relative node path ({host}/node/{nodeId})
-    // We replace existing nodeId path with new nodeId path
-    if (nodePathRegexp.test(String(host))) {
-        return String(host).replace(nodePathRegexp, `/node/${nodeId}`);
+    if (host !== undefined) {
+        return `${replaceNodePath(host)}${nodePath}`;
     }
 
-    return `${host ?? ''}/node/${nodeId}`;
+    // When using current host, strip any existing /node/{id} before appending firstSegment
+    const rawHost = window.api.viewer.getPath('');
+    const baseHost = replaceNodePath(rawHost);
+    const firstSegment = uiFactory.developerUiFirstPathSegment;
+
+    const hostWithSegment = firstSegment ? appendPathSegment(baseHost, firstSegment) : baseHost;
+
+    return `${hostWithSegment}${nodePath}`;
 };
 
 interface PDiskDeveloperUILinkParams {
