@@ -148,8 +148,9 @@ export function getPDiskPagePath(
     pDiskId: string | number,
     nodeId: string | number,
     query: Query = {},
+    options?: CreateHrefOptions,
 ) {
-    return createHref(routes.pDisk, undefined, {...query, nodeId, pDiskId});
+    return createHref(routes.pDisk, undefined, {...query, nodeId, pDiskId}, options);
 }
 
 export function getStorageGroupPath(groupId: string | number, query: Query = {}) {
