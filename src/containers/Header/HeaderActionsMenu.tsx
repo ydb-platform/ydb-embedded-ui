@@ -1,8 +1,8 @@
 import React from 'react';
 
-import {Ellipsis, Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
-import type {DropdownMenuItem, DropdownMenuProps} from '@gravity-ui/uikit';
-import {Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
+import {Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
+import type {DropdownMenuItem} from '@gravity-ui/uikit';
+import {DropdownMenu, Icon} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
@@ -13,6 +13,7 @@ import {uiFactory} from '../../uiFactory/uiFactory';
 import {getInfoTabLinks} from '../../utils/additionalProps';
 import {useAdditionalTenantsProps} from '../AppWithClusters/utils/useAdditionalTenantsProps';
 
+import {b} from './constants';
 import {headerKeyset} from './i18n';
 
 export interface HeaderActionsMenuProps {
@@ -124,14 +125,6 @@ export function DBHeaderActionsMenu({
         isDeleteDBAvailable,
     ]);
 
-    const renderSwitcher: DropdownMenuProps<unknown>['renderSwitcher'] = (props) => {
-        return (
-            <Button {...props} view="flat" loading={isDatabaseDataLoading} size="m">
-                <Icon data={Ellipsis} />
-            </Button>
-        );
-    };
-
     if (!menuItems.length) {
         return null;
     }
@@ -139,9 +132,9 @@ export function DBHeaderActionsMenu({
     return (
         <DropdownMenu
             items={menuItems}
-            renderSwitcher={renderSwitcher}
-            menuProps={{size: 'm'}}
             popupProps={{placement: 'bottom-end'}}
+            switcherWrapperClassName={b('actions-menu')}
+            defaultSwitcherProps={{loading: isDatabaseDataLoading}}
         />
     );
 }

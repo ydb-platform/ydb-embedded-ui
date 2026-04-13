@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Card, DefinitionList, Flex, Text} from '@gravity-ui/uikit';
+import {Card, DefinitionList, Divider, Flex, Text} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
@@ -9,13 +9,13 @@ import type {ClusterGroupsStats} from '../../../store/reducers/cluster/types';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
 import type {TBridgePile, TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
+import {useClusterLinks} from '../../../utils/clusterLinks/useClusterLinks';
 import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
 import {BridgeInfoTable} from '../ClusterOverview/components/BridgeInfoTable';
 import i18n from '../i18n';
 
 import {StorageGroupStats} from './components/DiskGroupsStatsBars/DiskGroupsStats';
 import {b} from './shared';
-import {useClusterLinks} from './utils/useClusterLinks';
 
 import './ClusterInfo.scss';
 
@@ -38,10 +38,9 @@ export const ClusterInfo = ({
 }: ClusterInfoProps) => {
     const {info = [], links = []} = additionalClusterProps;
 
-    const clusterLinks = useClusterLinks();
-    const linksList = links.concat(clusterLinks);
+    const clusterLinks = useClusterLinks(links);
 
-    const noDetails = (error && !cluster) || (!info.length && !linksList.length);
+    const noDetails = (error && !cluster) || (!info.length && !clusterLinks.length);
 
     const renderDetailSection = () => {
         if (loading) {
@@ -63,24 +62,43 @@ export const ClusterInfo = ({
                     {i18n('title_details')}
                 </Text>
                 <Card view="outlined" className={b('section')}>
-                    <DefinitionList nameMaxWidth={200} className={b('details')}>
-                        {info.map(({label, value}) => {
-                            return (
-                                <DefinitionList.Item key={label} name={label}>
-                                    <div className={b('details-value')}>{value}</div>
-                                </DefinitionList.Item>
-                            );
-                        })}
-                        {linksList.length > 0 && (
-                            <DefinitionList.Item name={i18n('title_links')}>
-                                <Flex direction="column" gap={2}>
-                                    {linksList.map(({title, url}) => {
-                                        return <LinkWithIcon key={title} title={title} url={url} />;
-                                    })}
-                                </Flex>
-                            </DefinitionList.Item>
+                    <Flex direction="column" className={b('details-container')}>
+                        {info.length > 0 && (
+                            <DefinitionList nameMaxWidth={200} className={b('details')}>
+                                {info.map(({label, value}) => {
+                                    return (
+                                        <DefinitionList.Item key={label} name={label}>
+                                            <div className={b('details-value')}>{value}</div>
+                                        </DefinitionList.Item>
+                                    );
+                                })}
+                            </DefinitionList>
                         )}
-                    </DefinitionList>
+                        {clusterLinks.length > 0 && (
+                            <Flex direction="row" gap={3}>
+                                {clusterLinks.map(({title, url, icon, description}, index) => {
+                                    const delimiter =
+                                        index < clusterLinks.length - 1 ? (
+                                            <Divider orientation="vertical" />
+                                        ) : (
+                                            ''
+                                        );
+                                    return (
+                                        <Flex gap={3} wrap="wrap">
+                                            <LinkWithIcon
+                                                key={title}
+                                                title={title}
+                                                url={url}
+                                                icon={icon}
+                                                description={description}
+                                            />
+                                            {delimiter}
+                                        </Flex>
+                                    );
+                                })}
+                            </Flex>
+                        )}
+                    </Flex>
                 </Card>
             </InfoSection>
         );

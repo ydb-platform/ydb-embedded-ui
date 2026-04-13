@@ -1,9 +1,8 @@
 import React from 'react';
 
 import {ArrowDownToLine, ArrowUpRightFromSquare} from '@gravity-ui/icons';
-import type {DropdownMenuItem} from '@gravity-ui/uikit';
-import {Text} from '@gravity-ui/uikit';
 
+import type {DropdownMenuItemWithDescription} from '../../../../../../components/DropdownMenu';
 import {planToSvgApi} from '../../../../../../store/reducers/planToSvg';
 import type {QueryPlan, ScriptPlan, TKqpStatsQuery} from '../../../../../../types/api/query';
 import createToast from '../../../../../../utils/createToast';
@@ -11,24 +10,6 @@ import {createAndDownloadJsonFile, downloadFile} from '../../../../../../utils/d
 import {prepareCommonErrorMessage} from '../../../../../../utils/errors';
 import {parseQueryError} from '../../../../../../utils/query';
 import i18n from '../../i18n';
-
-import {b} from './shared';
-
-export interface MenuItemContentProps {
-    title: string;
-    description: string;
-}
-
-export function MenuItemContent({title, description}: MenuItemContentProps) {
-    return (
-        <div className={b('menu-item-content')}>
-            <Text variant="body-1">{title}</Text>
-            <Text variant="body-1" color="secondary">
-                {description}
-            </Text>
-        </div>
-    );
-}
 
 export interface QueryResultsInfo {
     ast?: string;
@@ -66,8 +47,8 @@ export function useQueryInfoMenuItems({
         };
     }, [blobUrl]);
 
-    const items = React.useMemo<DropdownMenuItem[][]>(() => {
-        const menuItems: DropdownMenuItem[][] = [];
+    const items = React.useMemo<DropdownMenuItemWithDescription[][]>(() => {
+        const menuItems: DropdownMenuItemWithDescription[][] = [];
 
         const plan = queryResultsInfo.plan;
         if (plan && hasPlanToSvg) {
@@ -113,26 +94,16 @@ export function useQueryInfoMenuItems({
 
             menuItems.push([
                 {
-                    text: (
-                        <MenuItemContent
-                            title={i18n('text_open-execution-plan')}
-                            description={i18n('text_open-execution-plan_description')}
-                        />
-                    ),
-                    iconStart: <ArrowUpRightFromSquare className={b('icon')} />,
+                    title: i18n('text_open-execution-plan'),
+                    description: i18n('text_open-execution-plan_description'),
+                    iconStart: ArrowUpRightFromSquare,
                     action: handleOpenInNewTab,
-                    className: b('menu-item'),
                 },
                 {
-                    text: (
-                        <MenuItemContent
-                            title={i18n('text_download')}
-                            description={i18n('text_download_description')}
-                        />
-                    ),
-                    iconStart: <ArrowDownToLine className={b('icon')} />,
+                    title: i18n('text_download'),
+                    description: i18n('text_download_description'),
+                    iconStart: ArrowDownToLine,
                     action: handleDownload,
-                    className: b('menu-item'),
                 },
             ]);
         }
@@ -154,15 +125,10 @@ export function useQueryInfoMenuItems({
 
             menuItems.push([
                 {
-                    text: (
-                        <MenuItemContent
-                            title={i18n('text_diagnostics')}
-                            description={i18n('text_diagnostics_description')}
-                        />
-                    ),
-                    iconStart: <ArrowDownToLine className={b('icon')} />,
+                    title: i18n('text_diagnostics'),
+                    description: i18n('text_diagnostics_description'),
+                    iconStart: ArrowDownToLine,
                     action: handleDiagnosticsDownload,
-                    className: b('menu-item'),
                 },
             ]);
         }

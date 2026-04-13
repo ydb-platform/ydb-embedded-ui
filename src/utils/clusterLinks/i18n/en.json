@@ -1,0 +1,8 @@
+{
+  "title_cores-default": "Coredumps",
+  "title_logging-default": "Logging",
+  "title_slo-logs-default": "SLO Logs",
+  "description_monitoring-default": "Monitoring and metrics dashboard",
+  "description_cores-default": "Crash reports for debugging",
+  "description_logging-default": "System and application logs"
+}

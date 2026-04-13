@@ -3,6 +3,7 @@ import {z} from 'zod';
 import type {
     MetaBaseClusterInfo,
     MetaClusterCoresUrl,
+    MetaClusterLinks,
     MetaClusterLogsUrls,
     MetaClusterSettings,
     MetaClusterTraceView,
@@ -83,6 +84,29 @@ export function parseSettingsField(
         return settings ? settingsSchema.parse(JSON.parse(settings)) : undefined;
     } catch (e) {
         console.error('Error parsing settings field:', e);
+    }
+
+    return undefined;
+}
+
+const linksSchema = z.array(
+    z.object({
+        title: z.string().optional(),
+        description: z.string().optional(),
+        url: z.string(),
+        type: z.string(),
+        context: z.string().optional(),
+    }),
+);
+
+export function parseLinksField(links: MetaBaseClusterInfo['links']): MetaClusterLinks | undefined {
+    if (Array.isArray(links)) {
+        return links;
+    }
+    try {
+        return links ? linksSchema.parse(JSON.parse(links)) : undefined;
+    } catch (e) {
+        console.error('Error parsing links field:', e);
     }
 
     return undefined;

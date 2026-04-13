@@ -51,6 +51,7 @@ export interface MetaBaseClusterInfo {
     trace_view?: string | MetaClusterTraceView;
     trace_check?: string | MetaClusterTraceCheck;
     settings?: string | MetaClusterSettings;
+    links?: string | MetaClusterLinks;
 }
 
 export interface MetaGeneralClusterInfo extends MetaBaseClusterInfo {
@@ -102,3 +103,13 @@ export interface MetaClusterSettings {
     cluster_domain?: string;
     cluster_external_name?: string;
 }
+
+export interface MetaClusterLink {
+    title?: string;
+    url: string;
+    type: string;
+    context?: string;
+    description?: string;
+}
+
+export type MetaClusterLinks = MetaClusterLink[];

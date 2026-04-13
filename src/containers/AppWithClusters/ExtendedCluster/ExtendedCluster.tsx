@@ -4,6 +4,7 @@ import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
 import type {GetClusterLinks, GetDatabaseLinks} from '../../../uiFactory/types';
 import {cn} from '../../../utils/cn';
+import {MONITORING_UI_TITLE} from '../../../utils/constants';
 import type {GetLogsLink} from '../../../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../../utils/monitoring';
 import {getCleanBalancerValue} from '../../../utils/parseBalancer';
@@ -33,7 +34,7 @@ interface GetAdditionalClusterProps {
     getClusterLinks?: GetClusterLinks;
 }
 
-const useAdditionalClusterProps = ({
+export const useAdditionalClusterProps = ({
     getMonitoringClusterLink,
     getClusterLinks,
 }: GetAdditionalClusterProps) => {
@@ -46,7 +47,11 @@ const useAdditionalClusterProps = ({
         const clusterLink = getMonitoringClusterLink(monitoring, clusterName);
 
         if (clusterLink) {
-            additionalClusterProps.links.push({title: 'Monitoring', url: clusterLink});
+            additionalClusterProps.links.push({
+                title: MONITORING_UI_TITLE,
+                url: clusterLink,
+                context: 'monitoring',
+            });
         }
     }
 
