@@ -1,5 +1,21 @@
 # Changelog
 
+## [15.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.0.0...v15.1.0) (2026-04-13)
+
+
+### Features
+
+* **ShardsTable:** add explanation for column DataSize ([#3781](https://github.com/ydb-platform/ydb-embedded-ui/issues/3781)) ([708cbb5](https://github.com/ydb-platform/ydb-embedded-ui/commit/708cbb52ea97ecb0ec4d43b436eb04de76f3f6e7))
+* **uiFactory:** support developerUiFirstPathSegment ([#3780](https://github.com/ydb-platform/ydb-embedded-ui/issues/3780)) ([3a47390](https://github.com/ydb-platform/ydb-embedded-ui/commit/3a47390e2854221deb9d0af3b79f4f27be5a652d))
+* **VDisk:** improve severity calculation ([#3769](https://github.com/ydb-platform/ydb-embedded-ui/issues/3769)) ([7d9163a](https://github.com/ydb-platform/ydb-embedded-ui/commit/7d9163a3814b568e28457348a7fcd6c07021ed4c))
+
+
+### Bug Fixes
+
+* downgrade libs ([#3802](https://github.com/ydb-platform/ydb-embedded-ui/issues/3802)) ([a393e98](https://github.com/ydb-platform/ydb-embedded-ui/commit/a393e98eb891887de844e4fb65f23253bb32597e))
+* enhance oidc logs ([#3787](https://github.com/ydb-platform/ydb-embedded-ui/issues/3787)) ([269d0f7](https://github.com/ydb-platform/ydb-embedded-ui/commit/269d0f794f0977f3e2204e253139fcc92fae1304))
+* remove new badge from monitoring tab ([#3793](https://github.com/ydb-platform/ydb-embedded-ui/issues/3793)) ([f9176d1](https://github.com/ydb-platform/ydb-embedded-ui/commit/f9176d1ce0a8d3a68c3ba9d0bee4ef4059ed9dd7))
+
 ## [15.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.17.0...v15.0.0) (2026-04-07)
 
 
