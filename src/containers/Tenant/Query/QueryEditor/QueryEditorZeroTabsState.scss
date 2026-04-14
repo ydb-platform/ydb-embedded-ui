@@ -8,7 +8,12 @@
     padding: 16px;
 
     border-radius: var(--g-border-radius-xl);
-    background: linear-gradient(180deg, #2d2c33 0%, #34333d 100%);
+    background: linear-gradient(180deg, #fff 0%, #f1f1f1 100%);
+
+    .g-root_theme_dark &,
+    .g-root_theme_dark-hc & {
+        background: linear-gradient(180deg, #2d2c33 0%, #34333d 100%);
+    }
 
     &__card {
         display: block;
