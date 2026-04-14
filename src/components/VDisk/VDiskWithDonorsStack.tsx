@@ -2,8 +2,6 @@ import React from 'react';
 
 import type {PopupPlacement} from '@gravity-ui/uikit';
 
-import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
-import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {Stack} from '../Stack/Stack';
 
@@ -76,18 +74,14 @@ export function VDiskWithDonorsStack({
         donors && donors.length > 0 ? (
             <Stack className={stackClassName}>
                 <VDisk placement={mainDiskPlacement} data={data} {...mainVDiskProps} />
-                {donors.map((donor) => {
-                    const isFullData = isFullVDiskData(donor);
-
-                    return (
-                        <VDisk
-                            key={stringifyVdiskId(isFullData ? donor.VDiskId : donor)}
-                            data={donor}
-                            placement={diskInStackPlacement}
-                            {...donorVDiskProps}
-                        />
-                    );
-                })}
+                {donors.map((donor, index) => (
+                    <VDisk
+                        key={`${String(index)}-${donor.StringifiedId}`}
+                        data={donor}
+                        placement={diskInStackPlacement}
+                        {...donorVDiskProps}
+                    />
+                ))}
             </Stack>
         ) : (
             <VDisk data={data} withIcon={withIcon} {...mainVDiskProps} />
