@@ -76,7 +76,7 @@ export function VDiskWithDonorsStack({
                 <VDisk placement={mainDiskPlacement} data={data} {...mainVDiskProps} />
                 {donors.map((donor, index) => (
                     <VDisk
-                        key={`${String(index)}-${donor.StringifiedId}`}
+                        key={`${index}-${donor.StringifiedId}`}
                         data={donor}
                         placement={diskInStackPlacement}
                         {...donorVDiskProps}
