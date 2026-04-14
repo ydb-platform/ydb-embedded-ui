@@ -7,12 +7,16 @@
     min-height: 0;
     padding: 16px;
 
+    border-radius: var(--g-border-radius-xl);
+    background: linear-gradient(180deg, #2d2c33 0%, #34333d 100%);
+
     &__card {
         display: block;
 
+        box-sizing: border-box;
         width: 350px;
         height: 100px;
-        padding: var(--g-spacing-half);
+        padding: 3px;
 
         cursor: pointer;
 
@@ -21,7 +25,7 @@
         background: transparent;
     }
 
-    &__card:hover &__card-inner {
+    &__card &__card-inner {
         background: var(--g-color-base-generic);
     }
 
@@ -52,30 +56,5 @@
 
     &__title {
         color: var(--g-color-text-primary);
-    }
-
-    &__hotkey {
-        // Override Gravity UI's individual-chip style: render as a single badge
-        padding: 1px 5px;
-
-        color: var(--g-color-text-primary);
-        border-radius: var(--g-border-radius-xs);
-        background: var(--g-color-base-generic);
-
-        // Remove individual <kbd> chip backgrounds/borders inside the badge
-        kbd {
-            padding: 0;
-
-            color: inherit;
-            border: none;
-            border-radius: 0;
-            background: none;
-            box-shadow: none;
-        }
-
-        // Style the "+" separators with hint color
-        .g-hotkey__plus {
-            color: var(--g-color-text-hint);
-        }
     }
 }
