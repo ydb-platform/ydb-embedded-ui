@@ -32,7 +32,7 @@ import {MetricsTabs} from './MetricsTabs/MetricsTabs';
 import {TenantCpu} from './TenantCpu/TenantCpu';
 import {TenantMemory} from './TenantMemory/TenantMemory';
 import {TenantNetwork} from './TenantNetwork/TenantNetwork';
-import {TenantStorage} from './TenantStorage/TenantStorage';
+import {TenantStorageMode} from './TenantStorage/TenantStorageMode';
 import i18n from './i18n';
 import {b} from './utils';
 
@@ -131,9 +131,12 @@ export function TenantOverview({
             }
             case TENANT_METRICS_TABS_IDS.storage: {
                 return (
-                    <TenantStorage
+                    <TenantStorageMode
                         database={database}
+                        databaseFullPath={databaseFullPath}
                         metrics={storageMetrics}
+                        blobStorageStats={blobStorageStats}
+                        tabletStorageStats={tabletStorageStats}
                         databaseType={Type}
                     />
                 );

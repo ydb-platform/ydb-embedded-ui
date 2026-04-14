@@ -65,6 +65,7 @@ export interface TTenant {
     StorageUsage?: TStorageUsage[];
     QuotaUsage?: TStorageUsage[];
     TablesStorage?: TStorageUsage[];
+    DatabaseStorage?: TStorageUsage[];
 
     /** value is float */
     NetworkUtilization?: number;
@@ -192,6 +193,15 @@ export interface DatabaseQuotas {
     data_stream_reserved_storage_quota?: string;
     /** uint32 */
     ttl_min_run_internal_seconds?: string;
+    storage_quotas?: StorageQuotas[];
+}
+
+interface StorageQuotas {
+    unit_kind?: string;
+    /** uint64 */
+    data_size_hard_quota?: string;
+    /** uint64 */
+    data_size_soft_quota?: string;
 }
 
 interface TStorageUsage {
@@ -200,6 +210,10 @@ interface TStorageUsage {
     Size?: string;
     /** uint64 */
     Limit?: string;
+    /** uint64 */
+    SoftQuota?: string;
+    /** uint64 */
+    HardQuota?: string;
 }
 
 export enum EType {
