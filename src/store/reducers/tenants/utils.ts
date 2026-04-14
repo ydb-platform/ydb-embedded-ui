@@ -8,6 +8,7 @@ import {
     DEFAULT_WARNING_THRESHOLD,
     EMPTY_DATA_PLACEHOLDER,
 } from '../../../utils/constants';
+import {normalizeMediaType} from '../../../utils/disks/normalizeMediaType';
 import {isNumeric, safeParseNumber} from '../../../utils/utils';
 
 import {METRIC_STATUS} from './contants';
@@ -54,6 +55,16 @@ const calculatePoolsStats = (
         .filter((stats): stats is TenantPoolsStats => stats !== undefined);
 };
 
+function getTenantStorageType(unitKind?: string) {
+    const normalizedType = normalizeMediaType(unitKind?.toUpperCase());
+
+    if (normalizedType === EType.SSD || normalizedType === EType.HDD) {
+        return normalizedType;
+    }
+
+    return EType.None;
+}
+
 export const calculateTenantMetrics = (tenant: TTenant = {}) => {
     const {
         CoresUsed,
@@ -63,6 +74,7 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         StorageAllocatedLimit,
         PoolStats,
         DatabaseQuotas = {},
+        DatabaseStorage,
         StorageUsage,
         QuotaUsage,
         TablesStorage,
@@ -90,11 +102,35 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
             const size = Number(storageType.Size) || 0;
             return sum + size;
         }, 0) ?? 0;
+    const storageQuotasByType =
+        DatabaseQuotas.storage_quotas?.reduce<Map<EType, number>>((result, quota) => {
+            const type = getTenantStorageType(quota.unit_kind);
+            const softQuota = Number(quota.data_size_soft_quota);
+            const currentQuota = result.get(type) ?? 0;
+
+            result.set(type, currentQuota + (Number.isFinite(softQuota) ? softQuota : 0));
+
+            return result;
+        }, new Map()) ?? new Map<EType, number>();
 
     let blobStorageStats: TenantStorageStats[];
     let tabletStorageStats: TenantStorageStats[] | undefined;
 
-    if (StorageUsage) {
+    if (DatabaseStorage?.length) {
+        blobStorageStats = DatabaseStorage.map((value) => {
+            const {Type, Size, Limit} = value;
+
+            const used = Number(Size);
+            const limit = Number(Limit);
+
+            return {
+                name: Type,
+                used,
+                limit,
+                usage: calculateUsage(used, limit),
+            };
+        });
+    } else if (StorageUsage) {
         blobStorageStats = StorageUsage.map((value) => {
             const {Type, Size, Limit} = value;
 
@@ -119,7 +155,22 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         ];
     }
 
-    if (QuotaUsage) {
+    if (TablesStorage?.length) {
+        tabletStorageStats = TablesStorage.map((value) => {
+            const {Type, Size, Limit, SoftQuota} = value;
+
+            const used = Number(Size);
+            const typedQuota = storageQuotasByType.get(Type);
+            const limit = Number(SoftQuota ?? typedQuota ?? Limit);
+
+            return {
+                name: Type,
+                used,
+                limit,
+                usage: calculateUsage(used, limit),
+            };
+        });
+    } else if (QuotaUsage) {
         tabletStorageStats = QuotaUsage.map((value) => {
             const {Type, Size, Limit} = value;
 

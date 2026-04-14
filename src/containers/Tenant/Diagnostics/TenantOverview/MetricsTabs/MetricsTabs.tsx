@@ -84,12 +84,27 @@ export function MetricsTabs({
         [poolsCpuStats],
     );
     const cpuMetrics = React.useMemo(() => calculateMetricAggregates(cpuPools), [cpuPools]);
+    const isServerless = databaseType === 'Serverless';
 
     // Calculate storage metrics using utility
-    const storageStats = React.useMemo(
-        () => tabletStorageStats || blobStorageStats || [],
-        [tabletStorageStats, blobStorageStats],
-    );
+    const storageStats = React.useMemo(() => {
+        const hasLimit = (stats?: TenantStorageStats[]) =>
+            Boolean(stats?.some((item) => Number(item.limit) > 0));
+
+        if (isServerless) {
+            return tabletStorageStats || blobStorageStats || [];
+        }
+
+        if (hasLimit(blobStorageStats)) {
+            return blobStorageStats || [];
+        }
+
+        if (hasLimit(tabletStorageStats)) {
+            return tabletStorageStats || [];
+        }
+
+        return blobStorageStats || tabletStorageStats || [];
+    }, [blobStorageStats, isServerless, tabletStorageStats]);
     const storageMetrics = React.useMemo(
         () => calculateMetricAggregates(storageStats),
         [storageStats],
@@ -105,8 +120,6 @@ export function MetricsTabs({
     const [showNetworkUtilization] = useSetting<boolean>(SETTING_KEYS.SHOW_NETWORK_UTILIZATION);
 
     // card variant is handled within subcomponents
-
-    const isServerless = databaseType === 'Serverless';
 
     const renderNetworkTab = () => {
         if (!showNetworkUtilization) {

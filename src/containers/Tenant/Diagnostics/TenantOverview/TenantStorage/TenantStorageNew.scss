@@ -1,0 +1,159 @@
+@use '../../../../../styles/mixins.scss';
+
+.ydb-tenant-storage-new {
+    &__summary-card {
+        display: flex;
+        flex-direction: column;
+        gap: var(--g-spacing-4);
+
+        padding: var(--g-spacing-4);
+
+        border-radius: var(--g-border-radius-m);
+        background: var(--g-color-base-generic);
+    }
+
+    &__summary-copy {
+        display: flex;
+        flex-direction: column;
+        gap: var(--g-spacing-half);
+
+        min-width: 0;
+    }
+
+    &__summary-metrics {
+        display: flex;
+        align-items: stretch;
+        gap: var(--g-spacing-6);
+    }
+
+    &__summary-metric {
+        min-width: 0;
+        padding-left: var(--g-spacing-6);
+
+        border-left: 1px solid var(--g-color-line-generic);
+
+        &_emphasize {
+            padding: var(--g-spacing-2) var(--g-spacing-3);
+
+            border-left: 0;
+            border-radius: var(--g-border-radius-m);
+            background: var(--g-color-base-generic-accent);
+        }
+    }
+
+    &__summary-metric-label {
+        margin-top: var(--g-spacing-1);
+    }
+
+    &__summary-progress {
+        width: 100%;
+    }
+
+    &__summary-progress-bar {
+        --g-progress-empty-background-color: var(--g-color-sfx-shadow);
+
+        overflow: hidden;
+
+        height: 20px;
+
+        border-radius: var(--g-border-radius-xs);
+    }
+
+    &__summary-progress-bar .g-progress__item {
+        border-radius: var(--g-border-radius-xs);
+
+        transition: none;
+    }
+
+    &__summary-legend {
+        min-width: 0;
+    }
+
+    &__legend-item {
+        white-space: nowrap;
+    }
+
+    &__legend-dot {
+        flex: 0 0 8px;
+
+        width: 8px;
+        height: 8px;
+
+        border-radius: 50%;
+    }
+
+    &__summary-used {
+        white-space: nowrap;
+    }
+
+    &__type-cell {
+        min-width: 0;
+    }
+
+    &__type-icon {
+        display: inline-flex;
+        flex: 0 0 auto;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__object-cell {
+        min-width: 0;
+    }
+
+    &__object-link {
+        min-width: 0;
+    }
+
+    &__space-cell {
+        flex-wrap: nowrap;
+
+        min-width: 0;
+    }
+
+    &__space-progress {
+        flex: 0 0 148px;
+    }
+
+    &__space-progress-bar {
+        --g-progress-filled-background-color: var(--g-color-base-positive-medium);
+        --g-progress-empty-background-color: var(--g-color-base-positive-light);
+
+        height: 10px;
+
+        border-radius: var(--g-border-radius-xs);
+    }
+
+    &__space-progress-bar .g-progress__item {
+        border-radius: var(--g-border-radius-xs) 0 0 var(--g-border-radius-xs);
+
+        transition: none;
+    }
+
+    &__space-value {
+        min-width: 42px;
+
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .ydb-stats-wrapper {
+        gap: var(--g-spacing-3);
+    }
+
+    .ydb-stats-wrapper__header {
+        align-items: baseline;
+    }
+
+    .ydb-resizeable-data-table {
+        width: 100%;
+    }
+
+    .data-table__th {
+        @include mixins.subheader-1-typography();
+    }
+
+    .data-table__row {
+        height: 56px;
+    }
+}
