@@ -37,14 +37,70 @@ import i18n from '../i18n';
 
 import type {TenantStorageProps} from './types';
 import {useTenantStorageNewData} from './useTenantStorageNewData';
-import type {TenantStorageMediaSection, TenantStorageSummary, TenantStorageTopRow} from './utils';
-import {buildTenantStorageMediaSections, isSystemStoragePath} from './utils';
+import type {
+    TenantStorageData,
+    TenantStorageMediaSection,
+    TenantStorageSegment,
+    TenantStorageSegmentKey,
+    TenantStorageSummary,
+    TenantStorageSystemDetail,
+    TenantStorageSystemDetailKey,
+    TenantStorageTopRow,
+} from './utils';
+import {
+    TENANT_STORAGE_SEGMENT_KEYS,
+    TENANT_STORAGE_SYSTEM_DETAIL_KEYS,
+    buildTenantStorageMediaSections,
+    getTenantStorageMediaKey,
+    getTenantStoragePhysicalDisplaySegments,
+    getTenantStorageUserDataDisplaySummary,
+    isSystemStoragePath,
+} from './utils';
 
 import './TenantStorageNew.scss';
 
 const b = cn('ydb-tenant-storage-new');
 
 const TENANT_STORAGE_COLUMNS_WIDTH_LS_KEY = 'tenantStorageTopUsageTableColumnsWidth';
+
+const SEGMENT_COLORS: Record<TenantStorageSegmentKey, string> = {
+    [TENANT_STORAGE_SEGMENT_KEYS.rowTables]: 'var(--ydb-storage-segment-row-tables)',
+    [TENANT_STORAGE_SEGMENT_KEYS.columnTables]: 'var(--ydb-storage-segment-column-tables)',
+    [TENANT_STORAGE_SEGMENT_KEYS.topics]: 'var(--ydb-storage-segment-topics)',
+    [TENANT_STORAGE_SEGMENT_KEYS.system]: 'var(--ydb-storage-segment-system)',
+    [TENANT_STORAGE_SEGMENT_KEYS.unknown]: 'var(--ydb-storage-segment-unknown)',
+};
+
+const SEGMENT_LABELS: Record<TenantStorageSegmentKey, string> = {
+    [TENANT_STORAGE_SEGMENT_KEYS.rowTables]: i18n('storage.new.row-tables'),
+    [TENANT_STORAGE_SEGMENT_KEYS.columnTables]: i18n('storage.new.column-tables'),
+    [TENANT_STORAGE_SEGMENT_KEYS.topics]: i18n('storage.new.topics'),
+    [TENANT_STORAGE_SEGMENT_KEYS.system]: i18n('storage.new.system'),
+    [TENANT_STORAGE_SEGMENT_KEYS.unknown]: i18n('storage.new.unknown'),
+};
+
+const SYSTEM_DETAIL_LABELS: Record<TenantStorageSystemDetailKey, string> = {
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive]: i18n('storage.new.system-detail.hive'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.coordinator]: i18n('storage.new.system-detail.coordinator'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.mediator]: i18n('storage.new.system-detail.mediator'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.schemeShard]: i18n('storage.new.system-detail.scheme-shard'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.sysViewProcessor]: i18n(
+        'storage.new.system-detail.sys-view-processor',
+    ),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.graphShard]: i18n('storage.new.system-detail.graph-shard'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.statisticsAggregator]: i18n(
+        'storage.new.system-detail.statistics-aggregator',
+    ),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.bsController]: i18n(
+        'storage.new.system-detail.bs-controller',
+    ),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.cms]: i18n('storage.new.system-detail.cms'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.nodeBroker]: i18n('storage.new.system-detail.node-broker'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.tenantSlotBroker]: i18n(
+        'storage.new.system-detail.tenant-slot-broker',
+    ),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.console]: i18n('storage.new.system-detail.console'),
+};
 
 interface SummaryMetricProps {
     label: string;
@@ -60,6 +116,11 @@ interface SummaryCardProps {
     metrics: SummaryMetricProps[];
     showHelpOnDescription?: boolean;
     displayNoLimit?: 'empty' | 'filled';
+    segments?: TenantStorageSegment[];
+    formatLegendValue?: (value: number) => string;
+    formatSystemDetailValue?: (value: number) => string;
+    position?: 'first' | 'last';
+    systemDetails?: TenantStorageSystemDetail[];
 }
 
 function renderPathTypeIcon(row: TenantStorageTopRow) {
@@ -117,6 +178,96 @@ function getMediaSectionLabel(mediaType?: EType) {
     return mediaType;
 }
 
+function SegmentedProgressBar({
+    segments,
+    total,
+}: {
+    segments: TenantStorageSegment[];
+    total?: number;
+}) {
+    const activeSegments = segments.filter((s) => s.value > 0);
+
+    if (!total || activeSegments.length === 0) {
+        return <Progress value={0} size="s" className={b('summary-progress-bar')} />;
+    }
+
+    const segmentSum = segments.reduce((sum, s) => sum + s.value, 0);
+    const cappedTotal = Math.max(total, segmentSum);
+
+    return (
+        <div className={b('segment-progress')}>
+            {activeSegments.map((segment) => (
+                <div
+                    key={segment.key}
+                    className={b('segment-item')}
+                    style={{
+                        width: `${(segment.value / cappedTotal) * 100}%`,
+                        background: SEGMENT_COLORS[segment.key],
+                    }}
+                />
+            ))}
+            <div className={b('segment-empty')} />
+        </div>
+    );
+}
+
+function LegendItems({
+    segments,
+    formatValue,
+    formatSystemDetailValue,
+    systemDetails,
+}: {
+    segments: TenantStorageSegment[];
+    formatValue: (value: number) => string;
+    formatSystemDetailValue?: (value: number) => string;
+    systemDetails?: TenantStorageSystemDetail[];
+}) {
+    const activeSegments = segments.filter((s) => s.value > 0);
+    const visibleSystemDetails = (systemDetails ?? []).filter((detail) => detail.value > 0);
+
+    if (activeSegments.length === 0) {
+        return null;
+    }
+
+    return (
+        <div className={b('legend-items')}>
+            {activeSegments.map((segment) => (
+                <div key={segment.key} className={b('legend-item')}>
+                    <div
+                        className={b('legend-dot')}
+                        style={{background: SEGMENT_COLORS[segment.key]}}
+                    />
+                    <div className={b('legend-label')}>
+                        <Text>{SEGMENT_LABELS[segment.key]}</Text>
+                        {segment.key === TENANT_STORAGE_SEGMENT_KEYS.system &&
+                        visibleSystemDetails.length > 0 ? (
+                            <HelpMark iconSize="s">
+                                <Flex direction="column" gap="1" className={b('system-tooltip')}>
+                                    {visibleSystemDetails.map((detail) => (
+                                        <Flex
+                                            key={detail.key}
+                                            justifyContent="space-between"
+                                            gap="4"
+                                            className={b('system-tooltip-row')}
+                                        >
+                                            <Text>{SYSTEM_DETAIL_LABELS[detail.key]}</Text>
+                                            <Text color="secondary">
+                                                {formatSystemDetailValue?.(detail.value) ??
+                                                    formatValue(detail.value)}
+                                            </Text>
+                                        </Flex>
+                                    ))}
+                                </Flex>
+                            </HelpMark>
+                        ) : null}
+                    </div>
+                    <Text color="secondary">{formatValue(segment.value)}</Text>
+                </div>
+            ))}
+        </div>
+    );
+}
+
 function SummaryMetric({label, note, value, emphasize}: SummaryMetricProps) {
     return (
         <div className={b('summary-metric', {emphasize})}>
@@ -136,8 +287,16 @@ function SummaryCard({
     metrics,
     showHelpOnDescription = false,
     displayNoLimit,
+    segments,
+    formatLegendValue,
+    formatSystemDetailValue,
+    position,
+    systemDetails,
 }: SummaryCardProps) {
     const total = summary.quota ?? summary.total;
+    const activeSegments = (segments ?? []).filter((s) => s.value > 0);
+    const hasSegments = activeSegments.length > 0;
+
     let percent = 0;
 
     if (total) {
@@ -147,7 +306,9 @@ function SummaryCard({
     }
 
     return (
-        <div className={b('summary-card')}>
+        <div
+            className={b('summary-card', {first: position === 'first', last: position === 'last'})}
+        >
             <Flex justifyContent="space-between" alignItems="flex-start" gap="4">
                 <div className={b('summary-copy')}>
                     <Text variant="subheader-3">{title}</Text>
@@ -165,16 +326,29 @@ function SummaryCard({
                 </div>
             </Flex>
             <div className={b('summary-progress')}>
-                <Progress
-                    value={percent}
-                    size="s"
-                    className={b('summary-progress-bar')}
-                    text={undefined}
-                    theme="success"
-                />
+                {hasSegments ? (
+                    <SegmentedProgressBar segments={segments ?? []} total={total} />
+                ) : (
+                    <Progress
+                        value={percent}
+                        size="s"
+                        className={b('summary-progress-bar')}
+                        text={undefined}
+                        theme="success"
+                    />
+                )}
             </div>
             <Flex justifyContent="space-between" alignItems="center" gap="4">
-                <div />
+                {hasSegments && formatLegendValue ? (
+                    <LegendItems
+                        segments={segments ?? []}
+                        formatValue={formatLegendValue}
+                        formatSystemDetailValue={formatSystemDetailValue}
+                        systemDetails={systemDetails}
+                    />
+                ) : (
+                    <div />
+                )}
                 <Text color="secondary" className={b('summary-used')}>
                     {!total && displayNoLimit === 'filled'
                         ? i18n('storage.new.quota-unlimited')
@@ -291,12 +465,19 @@ function getTopUsageColumns(): Column<TenantStorageTopRow>[] {
     ];
 }
 
-function renderUserSummary(summary: TenantStorageSummary) {
+function renderUserSummary(summary: TenantStorageSummary, segments?: TenantStorageSegment[]) {
     const metricsSize = getConsistentMetricBytesSize([
         summary.available,
         summary.used,
         summary.quota,
     ]);
+
+    const formatLegendValue = (value: number) => formatMetricBytes(value, metricsSize);
+    const availableValue = formatMetricBytes(summary.available, metricsSize);
+    const formattedAvailableValue =
+        summary.availableApproximate && availableValue !== EMPTY_DATA_PLACEHOLDER
+            ? `~${availableValue}`
+            : availableValue;
 
     return (
         <SummaryCard
@@ -304,10 +485,16 @@ function renderUserSummary(summary: TenantStorageSummary) {
             description={i18n('storage.new.user-data-description')}
             summary={summary}
             showHelpOnDescription
+            segments={segments}
+            formatLegendValue={formatLegendValue}
+            position="first"
             metrics={[
                 {
                     label: i18n('storage.new.available'),
-                    value: formatMetricBytes(summary.available, metricsSize),
+                    note: summary.availableApproximate
+                        ? i18n('storage.new.available-approximate-description')
+                        : undefined,
+                    value: formattedAvailableValue,
                 },
                 {
                     label: i18n('storage.new.used'),
@@ -315,29 +502,42 @@ function renderUserSummary(summary: TenantStorageSummary) {
                 },
                 {
                     label: i18n('storage.new.quota'),
-                    note:
+                    value:
                         summary.quota === undefined
-                            ? i18n('storage.new.quota-missing-description')
-                            : undefined,
-                    value: formatMetricBytes(summary.quota, metricsSize),
+                            ? EMPTY_DATA_PLACEHOLDER
+                            : formatMetricBytes(summary.quota, metricsSize),
                 },
             ]}
         />
     );
 }
 
-function renderPhysicalSummary(summary: TenantStorageSummary) {
+function renderPhysicalSummary(
+    summary: TenantStorageSummary,
+    segments?: TenantStorageSegment[],
+    systemDetails?: TenantStorageSystemDetail[],
+) {
     const metricsSize = getConsistentMetricBytesSize([
         summary.available,
         summary.used,
         summary.total,
     ]);
 
+    const formatLegendValue = (value: number) => formatMetricBytes(value, metricsSize);
+    const systemDetailsSize = getConsistentMetricBytesSize(
+        (systemDetails ?? []).map((detail) => detail.value),
+    );
+    const formatSystemDetailValue = (value: number) => formatMetricBytes(value, systemDetailsSize);
+
     return (
         <SummaryCard
             title={i18n('storage.new.physical-title')}
             description={i18n('storage.new.physical-description')}
             summary={summary}
+            segments={segments}
+            formatLegendValue={formatLegendValue}
+            formatSystemDetailValue={formatSystemDetailValue}
+            position="last"
             metrics={[
                 {
                     emphasize: true,
@@ -359,18 +559,59 @@ function renderPhysicalSummary(summary: TenantStorageSummary) {
                 },
             ]}
             displayNoLimit="filled"
+            systemDetails={systemDetails}
         />
     );
+}
+
+function getMediaBreakdownKey({
+    mediaType,
+    physicalSegmentsByMedia,
+}: {
+    mediaType: EType;
+    physicalSegmentsByMedia: Record<string, TenantStorageSegment[]>;
+}) {
+    const mediaKey = getTenantStorageMediaKey(mediaType);
+
+    if (physicalSegmentsByMedia[mediaKey]) {
+        return mediaKey;
+    }
+
+    const mediaKeys = Object.keys(physicalSegmentsByMedia);
+
+    if (mediaType === EType.None && mediaKeys.length === 1) {
+        return mediaKeys[0];
+    }
+
+    return mediaKey;
 }
 
 function MediaSection({
     section,
     showMediaTypeLabel,
+    data,
 }: {
     section: TenantStorageMediaSection;
     showMediaTypeLabel: boolean;
+    data: TenantStorageData;
 }) {
     const mediaLabel = getMediaSectionLabel(section.mediaType);
+    const userDataSummary = getTenantStorageUserDataDisplaySummary({
+        summary: section.userData,
+        logicalUserData: data.logicalUserData,
+        useLogicalBreakdown: !showMediaTypeLabel,
+        physical: section.physical,
+    });
+    const userSegments = showMediaTypeLabel ? undefined : data.userDataSegments;
+    const mediaBreakdownKey = getMediaBreakdownKey({
+        mediaType: section.mediaType,
+        physicalSegmentsByMedia: data.physicalSegmentsByMedia,
+    });
+    const physicalSegments = getTenantStoragePhysicalDisplaySegments({
+        segments: data.physicalSegmentsByMedia[mediaBreakdownKey],
+        used: section.physical.used,
+    });
+    const systemDetails = data.systemDetailsByMedia[mediaBreakdownKey];
 
     return (
         <Flex direction="column" gap={3} className={b('media-section')}>
@@ -379,8 +620,8 @@ function MediaSection({
                     {mediaLabel}
                 </Text>
             ) : null}
-            {renderUserSummary(section.userData)}
-            {renderPhysicalSummary(section.physical)}
+            {renderUserSummary(userDataSummary, userSegments)}
+            {renderPhysicalSummary(section.physical, physicalSegments, systemDetails)}
         </Flex>
     );
 }
@@ -414,14 +655,30 @@ export function TenantStorageNew({
     return (
         <LoaderWrapper loading={loading}>
             <Flex direction="column" gap={4} className={b()}>
-                {mediaSections.map((section, index) => (
-                    <MediaSection
-                        key={`${section.mediaType}-${index}`}
-                        section={section}
-                        showMediaTypeLabel={mediaSections.length > 1}
-                    />
-                ))}
-                <StatsWrapper title={i18n('storage.new.top-space-title')}>
+                <div className={b('sections-group')}>
+                    <div className={b('sections-inner')}>
+                        {mediaSections.map((section, index) => (
+                            <MediaSection
+                                key={`${section.mediaType}-${index}`}
+                                section={section}
+                                showMediaTypeLabel={mediaSections.length > 1}
+                                data={data}
+                            />
+                        ))}
+                    </div>
+                </div>
+                <StatsWrapper
+                    title={
+                        <React.Fragment>
+                            <Text variant="subheader-3">
+                                {i18n('storage.new.top-space-title-main')}
+                            </Text>{' '}
+                            <Text variant="subheader-3" color="hint">
+                                {i18n('storage.new.top-space-title-suffix')}
+                            </Text>
+                        </React.Fragment>
+                    }
+                >
                     <TenantOverviewTableLayout
                         loading={loading}
                         error={error}

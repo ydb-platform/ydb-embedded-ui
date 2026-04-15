@@ -1,22 +1,54 @@
 import {EPathType} from '../../../../../../types/api/schema';
-import {EType as ETabletType} from '../../../../../../types/api/tablet';
 import {EType} from '../../../../../../types/api/tenant';
 import {
     TENANT_STORAGE_SEGMENT_KEYS,
+    TENANT_STORAGE_SYSTEM_DETAIL_KEYS,
     buildTenantStorageData,
     buildTenantStorageMediaSections,
+    getTenantStoragePhysicalDisplaySegments,
+    getTenantStorageUserDataDisplaySummary,
     isSystemStoragePath,
 } from '../utils';
 
 describe('buildTenantStorageData', () => {
-    test('maps tablet types to user and physical segments and calculates derived metrics', () => {
+    test('maps logical user data and physical segments by media', () => {
         const result = buildTenantStorageData(
             {
+                logicalUserData: {
+                    rowTables: 300,
+                    topics: 50,
+                },
                 tabletTypeRows: [
-                    {Type: ETabletType.DataShard, DataSize: 300, StorageSize: 500},
-                    {Type: ETabletType.ColumnShard, DataSize: 100, StorageSize: 150},
-                    {Type: ETabletType.PersQueue, DataSize: 50, StorageSize: 75},
-                    {Type: ETabletType.PersQueueReadBalancer, DataSize: 0, StorageSize: 25},
+                    {
+                        Type: 'DataShard',
+                        StorageSize: 500,
+                        Media: [{Kind: 'SSD,Kind:0', StorageSize: 500}],
+                    },
+                    {
+                        Type: 'ColumnShard',
+                        StorageSize: 150,
+                        Media: [{Kind: 'SSD,Kind:0', StorageSize: 150}],
+                    },
+                    {
+                        Type: 'PersQueue',
+                        StorageSize: 75,
+                        Media: [{Kind: 'ROT,Kind:0', StorageSize: 75}],
+                    },
+                    {
+                        Type: 'PersQueueReadBalancer',
+                        StorageSize: 25,
+                        Media: [{Kind: 'ROT,Kind:0', StorageSize: 25}],
+                    },
+                    {
+                        Type: 'Hive',
+                        StorageSize: 175,
+                        Media: [{Kind: 'SSD,Kind:0', StorageSize: 175}],
+                    },
+                    {
+                        Type: 'Unknown',
+                        StorageSize: 50,
+                        Media: [{Kind: 'SSD,Kind:0', StorageSize: 50}],
+                    },
                 ],
                 topRows: [
                     {
@@ -28,33 +60,54 @@ describe('buildTenantStorageData', () => {
                 ],
             },
             {
-                blobStorageUsed: 900,
+                blobStorageUsed: 950,
                 blobStorageLimit: 1_200,
                 tabletStorageUsed: 450,
                 tabletStorageLimit: 1_000,
             },
         );
 
-        expect(result.summary.userData.used).toBe(450);
-        expect(result.summary.userData.available).toBe(550);
-        expect(result.summary.userData.usedPercent).toBe(45);
-        expect(result.summary.userData.segments).toEqual([
+        expect(result.logicalUserData).toEqual({
+            rowTables: 300,
+            topics: 50,
+        });
+        expect(result.userDataSegments).toEqual([
             {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 300},
-            {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 100},
             {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 50},
         ]);
+        expect(result.summary.userData.used).toBe(350);
+        expect(result.summary.userData.available).toBe(650);
 
-        expect(result.summary.physical.used).toBe(900);
-        expect(result.summary.physical.available).toBe(300);
-        expect(result.summary.physical.total).toBe(1_200);
-        expect(result.summary.physical.usedPercent).toBe(75);
-        expect(result.summary.physical.overhead).toBe(2);
-        expect(result.summary.physical.segments).toEqual([
+        expect(result.physicalSegmentsByMedia.SSD).toEqual([
             {key: TENANT_STORAGE_SEGMENT_KEYS.system, value: 175},
             {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 500},
             {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 150},
-            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 75},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 50},
         ]);
+        expect(result.physicalSegmentsByMedia.HDD).toEqual([
+            {key: TENANT_STORAGE_SEGMENT_KEYS.system, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 100},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 0},
+        ]);
+        expect(result.systemDetailsByMedia.SSD).toEqual([
+            {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive, value: 175},
+            {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.coordinator, value: 0},
+            {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.mediator, value: 0},
+            {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.schemeShard, value: 0},
+            {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.sysViewProcessor, value: 0},
+            {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.graphShard, value: 0},
+            {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.statisticsAggregator, value: 0},
+            {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.bsController, value: 0},
+            {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.cms, value: 0},
+            {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.nodeBroker, value: 0},
+            {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.tenantSlotBroker, value: 0},
+            {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.console, value: 0},
+        ]);
+        expect(result.summary.physical.used).toBe(950);
+        expect(result.summary.physical.overhead).toBeCloseTo(950 / 350);
 
         expect(result.topRows).toEqual([
             {
@@ -62,34 +115,152 @@ describe('buildTenantStorageData', () => {
                 pathType: EPathType.EPathTypeTable,
                 userData: 200,
                 physicalDisk: 300,
-                dbShare: 300 / 900,
+                dbShare: 300 / 950,
                 overhead: 1.5,
             },
         ]);
     });
 
-    test('falls back to overview tablet storage when user data breakdown is unavailable', () => {
-        const result = buildTenantStorageData(
-            {
-                tabletTypeRows: [],
-                topRows: [],
-            },
-            {
-                blobStorageUsed: 600,
-                blobStorageLimit: 1_000,
-                tabletStorageUsed: 240,
-                tabletStorageLimit: 500,
-            },
-        );
+    test('adds unknown remainder to physical display segments', () => {
+        const result = getTenantStoragePhysicalDisplaySegments({
+            segments: [
+                {key: TENANT_STORAGE_SEGMENT_KEYS.system, value: 175},
+                {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 500},
+                {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 150},
+                {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 100},
+                {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 0},
+            ],
+            used: 1_000,
+        });
 
-        expect(result.summary.userData.used).toBe(240);
-        expect(result.summary.userData.available).toBe(260);
-        expect(result.summary.physical.overhead).toBe(2.5);
-        expect(result.summary.userData.segments).toEqual([
-            {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 0},
-            {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 0},
-            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 0},
+        expect(result).toEqual([
+            {key: TENANT_STORAGE_SEGMENT_KEYS.system, value: 175},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 500},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 150},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 100},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 75},
         ]);
+    });
+
+    test('uses logical user data only when requested', () => {
+        const result = getTenantStorageUserDataDisplaySummary({
+            summary: {
+                used: 120,
+                quota: 300,
+                available: 180,
+                usedPercent: 40,
+                segments: [],
+            },
+            logicalUserData: {
+                rowTables: 60,
+                topics: 20,
+            },
+            useLogicalBreakdown: true,
+            physical: {
+                used: 400,
+                total: 800,
+                available: 400,
+                usedPercent: 50,
+                segments: [],
+            },
+        });
+
+        expect(result).toEqual({
+            used: 80,
+            quota: 300,
+            available: 220,
+            usedPercent: expect.any(Number),
+            segments: [],
+        });
+        expect(result.usedPercent).toBeCloseTo(26.666666666666668);
+    });
+
+    test('keeps summary unchanged when logical breakdown is disabled', () => {
+        const summary = {
+            used: 120,
+            quota: 300,
+            available: 180,
+            usedPercent: 40,
+            segments: [],
+        };
+
+        expect(
+            getTenantStorageUserDataDisplaySummary({
+                summary,
+                logicalUserData: {
+                    rowTables: 60,
+                    topics: 20,
+                },
+                useLogicalBreakdown: false,
+                physical: {
+                    used: 400,
+                    total: 800,
+                    available: 400,
+                    usedPercent: 50,
+                    segments: [],
+                },
+            }),
+        ).toBe(summary);
+    });
+
+    test('estimates logical available when quota is missing', () => {
+        const result = getTenantStorageUserDataDisplaySummary({
+            summary: {
+                used: 120,
+                quota: undefined,
+                available: undefined,
+                usedPercent: 0,
+                segments: [],
+            },
+            logicalUserData: {
+                rowTables: 100,
+                topics: 20,
+            },
+            useLogicalBreakdown: true,
+            physical: {
+                used: 360,
+                total: 600,
+                available: 240,
+                usedPercent: 60,
+                segments: [],
+            },
+        });
+
+        expect(result.availableApproximate).toBe(true);
+        expect(result.used).toBe(120);
+        expect(result.available).toBeCloseTo(80);
+        expect(result.total).toBeCloseTo(200);
+        expect(result.usedPercent).toBeCloseTo(60);
+        expect(result.quota).toBeUndefined();
+    });
+
+    test('does not estimate logical available when overhead inputs are missing', () => {
+        const result = getTenantStorageUserDataDisplaySummary({
+            summary: {
+                used: 0,
+                quota: undefined,
+                available: undefined,
+                usedPercent: 0,
+                segments: [],
+            },
+            logicalUserData: {
+                rowTables: 0,
+                topics: 0,
+            },
+            useLogicalBreakdown: true,
+            physical: {
+                used: 360,
+                total: 600,
+                available: 240,
+                usedPercent: 60,
+                segments: [],
+            },
+        });
+
+        expect(result.availableApproximate).toBeUndefined();
+        expect(result.available).toBeUndefined();
+        expect(result.total).toBeUndefined();
+        expect(result.usedPercent).toBe(0);
     });
 
     test('treats paths under .sys and .metadata as system objects', () => {

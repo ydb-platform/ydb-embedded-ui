@@ -11,7 +11,7 @@ export function normalizeMediaType(mediaType?: string) {
     }
 
     const [rawMediaType] = mediaType.split(MEDIA_TYPE_SEPARATOR);
-    const normalizedMediaType = rawMediaType?.trim();
+    const normalizedMediaType = rawMediaType?.trim().toUpperCase();
 
     if (!normalizedMediaType) {
         return UNKNOWN_MEDIA_TYPE;
@@ -19,6 +19,10 @@ export function normalizeMediaType(mediaType?: string) {
 
     if (normalizedMediaType === ROT_MEDIA_TYPE) {
         return HDD_MEDIA_TYPE;
+    }
+
+    if (normalizedMediaType === UNKNOWN_MEDIA_TYPE.toUpperCase()) {
+        return UNKNOWN_MEDIA_TYPE;
     }
 
     return normalizedMediaType;

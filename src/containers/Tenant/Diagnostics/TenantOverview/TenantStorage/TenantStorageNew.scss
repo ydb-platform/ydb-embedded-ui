@@ -1,6 +1,23 @@
 @use '../../../../../styles/mixins.scss';
 
 .ydb-tenant-storage-new {
+    --ydb-storage-segment-row-tables: #5282ff;
+    --ydb-storage-segment-column-tables: #ff7112;
+    --ydb-storage-segment-topics: #ed2a7a;
+    --ydb-storage-segment-system: rgba(255, 255, 255, 0.25);
+    --ydb-storage-segment-unknown: rgba(255, 255, 255, 0.4);
+
+    &__sections-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__sections-inner {
+        display: flex;
+        flex-direction: column;
+        gap: var(--g-spacing-3);
+    }
+
     &__summary-card {
         display: flex;
         flex-direction: column;
@@ -8,8 +25,18 @@
 
         padding: var(--g-spacing-4);
 
-        border-radius: var(--g-border-radius-m);
+        border-radius: var(--g-border-radius-xs);
         background: var(--g-color-base-generic);
+
+        &_first {
+            border-radius: var(--g-border-radius-m) var(--g-border-radius-xs)
+                var(--g-border-radius-xs) var(--g-border-radius-xs);
+        }
+
+        &_last {
+            border-radius: var(--g-border-radius-xs) var(--g-border-radius-xs)
+                var(--g-border-radius-m) var(--g-border-radius-m);
+        }
     }
 
     &__summary-copy {
@@ -27,6 +54,10 @@
     }
 
     &__summary-metric {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
         min-width: 0;
         padding-left: var(--g-spacing-6);
 
@@ -65,12 +96,58 @@
         transition: none;
     }
 
+    &__segment-progress {
+        display: flex;
+        overflow: hidden;
+        gap: 4px;
+
+        height: 20px;
+
+        border-radius: var(--g-border-radius-xs);
+    }
+
+    &__segment-item {
+        min-width: 0;
+        height: 100%;
+
+        border-radius: var(--g-border-radius-xs);
+    }
+
+    &__segment-empty {
+        flex: 1;
+
+        height: 100%;
+
+        opacity: 0.75;
+        border-radius: var(--g-border-radius-xs);
+        background: var(--g-color-sfx-shadow);
+    }
+
     &__summary-legend {
         min-width: 0;
     }
 
+    &__legend-items {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--g-spacing-4);
+
+        min-width: 0;
+    }
+
     &__legend-item {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-2);
+
         white-space: nowrap;
+    }
+
+    &__legend-label {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
     }
 
     &__legend-dot {
@@ -83,6 +160,14 @@
     }
 
     &__summary-used {
+        white-space: nowrap;
+    }
+
+    &__system-tooltip {
+        min-width: 180px;
+    }
+
+    &__system-tooltip-row {
         white-space: nowrap;
     }
 

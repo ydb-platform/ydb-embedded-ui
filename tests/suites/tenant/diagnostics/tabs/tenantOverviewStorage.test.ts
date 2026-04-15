@@ -113,20 +113,24 @@ async function setupStorageStats(page: Page) {
                             Type: 'DataShard',
                             DataSize: 118000000000,
                             StorageSize: 118000000000,
+                            Media: [{Kind: 'SSD', StorageSize: 118000000000}],
                         },
                         {
                             Type: 'ColumnShard',
                             DataSize: 1000000000,
                             StorageSize: 1000000000,
+                            Media: [{Kind: 'SSD', StorageSize: 1000000000}],
                         },
                         {
                             Type: 'PersQueue',
                             DataSize: 1000000000,
                             StorageSize: 1000000000,
+                            Media: [{Kind: 'SSD', StorageSize: 1000000000}],
                         },
                         {
                             Type: 'PersQueueReadBalancer',
                             StorageSize: 236000000000,
+                            Media: [{Kind: 'SSD', StorageSize: 236000000000}],
                         },
                     ],
                 }),
@@ -223,6 +227,16 @@ async function setupDescribe(page: Page) {
                         Self: {
                             Name: 'local',
                             PathType: 'EPathTypeSubDomain',
+                        },
+                        DomainDescription: {
+                            DiskSpaceUsage: {
+                                Tables: {
+                                    DataSize: '3100000000000',
+                                },
+                                Topics: {
+                                    DataSize: '0',
+                                },
+                            },
                         },
                         Children: [
                             {

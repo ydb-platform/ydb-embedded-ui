@@ -1,5 +1,5 @@
 import type {AxiosOptions} from '../../../../services/api/base';
-import type {EPathSubType, EPathType} from '../../../../types/api/schema';
+import type {EPathSubType, EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import type {
     StorageStatsResponse,
     TStorageStatsPathEntry,
@@ -18,6 +18,10 @@ export interface TenantStorageRawTopRow {
 }
 
 export interface TenantStorageRawData {
+    logicalUserData?: {
+        rowTables: number;
+        topics: number;
+    };
     topRows: TenantStorageRawTopRow[];
     tabletTypeRows: TStorageStatsTabletTypeEntry[];
 }
@@ -159,8 +163,22 @@ async function getTopRowsByQuery(
         .slice(0, TOP_STORAGE_OBJECTS_LIMIT);
 }
 
-async function getTopRowTypes(
-    rows: TenantStorageRawTopRow[],
+function getLogicalUserData(schemaResponse: TEvDescribeSchemeResult | null | undefined) {
+    const diskSpaceUsage = schemaResponse?.PathDescription?.DomainDescription?.DiskSpaceUsage;
+    const tablesDataSize = diskSpaceUsage?.Tables?.DataSize;
+    const topicsDataSize = diskSpaceUsage?.Topics?.DataSize;
+
+    if (tablesDataSize === undefined && topicsDataSize === undefined) {
+        return undefined;
+    }
+
+    return {
+        rowTables: normalizeNumericValue(tablesDataSize),
+        topics: normalizeNumericValue(topicsDataSize),
+    };
+}
+
+async function getRootSchemaData(
     {database, databaseFullPath, useMetaProxy}: GetTenantStorageRawParams,
     options?: AxiosOptions,
 ) {
@@ -196,9 +214,26 @@ async function getTopRowTypes(
                 pathSubType: PathSubType,
             });
         }
+
+        return {
+            logicalUserData: getLogicalUserData(rootSchema),
+            topRowTypes: result,
+        };
     } catch {
-        return result;
+        return {
+            logicalUserData: undefined,
+            topRowTypes: result,
+        };
     }
+}
+
+async function getTopRowTypes(
+    rows: TenantStorageRawTopRow[],
+    {database, databaseFullPath, useMetaProxy}: GetTenantStorageRawParams,
+    initialTypes: Map<string, Pick<TenantStorageRawTopRow, 'pathType' | 'pathSubType'>>,
+    options?: AxiosOptions,
+) {
+    const result = new Map(initialTypes);
 
     const missingPaths = rows.map(({path}) => path).filter((path) => !result.has(path));
 
@@ -305,19 +340,20 @@ export async function fetchTenantStorageRawData(
     params: GetTenantStorageRawParams,
     options?: AxiosOptions,
 ) {
-    const {database, databaseFullPath, useMetaProxy} = params;
+    const {database} = params;
 
-    const [tabletTypeResponse, queryTopRows] = await Promise.all([
+    const [tabletTypeResponse, queryTopRows, rootSchemaData] = await Promise.all([
         window.api.viewer.getStorageStats(
             {
                 database,
-                path: {path: databaseFullPath, databaseFullPath, useMetaProxy},
                 groupBy: 'tablet_type',
                 tablets: true,
+                media: true,
             },
             options,
         ),
         getTopRowsByQuery(params, options),
+        getRootSchemaData(params, options),
     ]);
 
     const storageStatsByPath = await getStorageStatsForTopRows(
@@ -329,9 +365,15 @@ export async function fetchTenantStorageRawData(
         ...row,
         physicalDisk: storageStatsByPath.get(row.path),
     }));
-    const topRowTypes = await getTopRowTypes(topRowsWithoutTypes, params, options);
+    const topRowTypes = await getTopRowTypes(
+        topRowsWithoutTypes,
+        params,
+        rootSchemaData?.topRowTypes ?? new Map(),
+        options,
+    );
 
     return {
+        logicalUserData: rootSchemaData?.logicalUserData,
         topRows: mergeTopRows(queryTopRows, topRowTypes, storageStatsByPath),
         tabletTypeRows: tabletTypeResponse.Tablets ?? [],
     };

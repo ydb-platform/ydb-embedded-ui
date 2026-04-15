@@ -64,6 +64,10 @@ describe('storageUsage helpers', () => {
         expect(normalizeMediaType('SSD,Kind:0')).toBe('SSD');
     });
 
+    test('normalizeMediaType normalizes lowercase ssd to SSD', () => {
+        expect(normalizeMediaType('ssd')).toBe('SSD');
+    });
+
     test('normalizeMediaType keeps unknown tokens stable', () => {
         expect(normalizeMediaType('NVME,Kind:0')).toBe('NVME');
     });
