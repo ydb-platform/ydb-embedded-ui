@@ -43,7 +43,7 @@ function renderMenuItemText({
 function mapMenuItem<T = HTMLElement>(
     item: DropdownMenuItemWithDescription<T>,
 ): DropdownMenuItem<T> {
-    const {title, description, iconStart, ...restItem} = item;
+    const {title, description, iconStart, className, ...restItem} = item;
 
     return {
         ...restItem,
@@ -54,7 +54,9 @@ function mapMenuItem<T = HTMLElement>(
                 className={b('icon', {'with-description': Boolean(description)})}
             />
         ) : undefined,
-        className: b('menu-item', {'with-description': Boolean(description)}),
+        className: [className, b('menu-item', {'with-description': Boolean(description)})]
+            .filter(Boolean)
+            .join(' '),
     } as DropdownMenuItem<T>;
 }
 
