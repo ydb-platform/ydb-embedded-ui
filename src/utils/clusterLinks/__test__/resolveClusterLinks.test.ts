@@ -48,9 +48,9 @@ describe('substituteUrlParams', () => {
         expect(substituteUrlParams('https://example.com/{id}', {})).toBeUndefined();
     });
 
-    test('ignores non-string values in source object', () => {
+    test('ignores non-string and non-number values in source object', () => {
         expect(
-            substituteUrlParams('https://example.com/{name}/{count}', {
+            substituteUrlParams('https://example.com/{name}/{data}', {
                 name: 'test',
                 count: 42,
                 data: {nested: true},
@@ -58,14 +58,14 @@ describe('substituteUrlParams', () => {
         ).toBeUndefined();
     });
 
-    test('uses only string values for substitution', () => {
+    test('uses string and number values for substitution', () => {
         expect(
-            substituteUrlParams('https://example.com/{name}', {
+            substituteUrlParams('https://example.com/{name}/{scale}', {
                 name: 'test',
                 scale: 1,
                 settings: {use_meta_proxy: false},
             }),
-        ).toBe('https://example.com/test');
+        ).toBe('https://example.com/test/1');
     });
 });
 

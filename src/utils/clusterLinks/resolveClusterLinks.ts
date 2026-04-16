@@ -24,7 +24,7 @@ const CONTEXT_DEFAULT_DESCRIPTIONS: Partial<Record<ClusterLinkContext, string>> 
 
 /**
  * Replaces `{param}` placeholders in a URL template with values from the source object.
- * Only string values from the source are used for substitution.
+ * Only string and number values from the source are used for substitution.
  * Returns `undefined` if any placeholder remains unresolved after substitution.
  */
 export function substituteUrlParams(
