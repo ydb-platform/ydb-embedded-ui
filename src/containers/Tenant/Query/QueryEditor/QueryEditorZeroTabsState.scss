@@ -1,11 +1,6 @@
 .ydb-query-editor-zero-tabs-state {
-    display: flex;
-    flex: 1 1 auto;
-    justify-content: center;
-    align-items: center;
-
     min-height: 0;
-    padding: 16px;
+    padding: var(--g-spacing-4);
 
     border-radius: var(--g-border-radius-xl);
     background: linear-gradient(180deg, #fff 0%, #f1f1f1 100%);
@@ -40,10 +35,6 @@
     }
 
     &__card-inner {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
         width: 100%;
         height: 100%;
 
@@ -51,10 +42,6 @@
     }
 
     &__content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
         width: 282px;
         padding: var(--g-spacing-2) var(--g-spacing-3);
     }

@@ -1,4 +1,4 @@
-import {Hotkey, Text} from '@gravity-ui/uikit';
+import {Flex, Hotkey, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../utils/cn';
 import i18n from '../i18n';
@@ -15,7 +15,7 @@ interface QueryEditorZeroTabsStateProps {
 
 export function QueryEditorZeroTabsState({onCreateTab}: QueryEditorZeroTabsStateProps) {
     return (
-        <div className={b()}>
+        <Flex className={b()} grow={1} justifyContent="center" alignItems="center">
             <button
                 type="button"
                 className={b('card')}
@@ -23,15 +23,19 @@ export function QueryEditorZeroTabsState({onCreateTab}: QueryEditorZeroTabsState
                 aria-label={i18n('editor-tabs.empty-state.create-query')}
                 data-qa="query-editor-zero-tabs-state"
             >
-                <div className={b('card-inner')}>
-                    <div className={b('content')}>
+                <Flex className={b('card-inner')} justifyContent="center" alignItems="center">
+                    <Flex
+                        className={b('content')}
+                        justifyContent="space-between"
+                        alignItems="center"
+                    >
                         <Text as="span" variant="subheader-2" className={b('title')}>
                             {i18n('editor-tabs.empty-state.create-query')}
                         </Text>
                         <Hotkey value={HOTKEY_LABELS.newTab} className={b('hotkey')} />
-                    </div>
-                </div>
+                    </Flex>
+                </Flex>
             </button>
-        </div>
+        </Flex>
     );
 }
