@@ -136,7 +136,7 @@ export function YqlEditor({
     );
 
     React.useEffect(() => {
-        if (!isMultiTabQueryEditorEnabled) {
+        if (!isMultiTabQueryEditorEnabled || !activeTabId) {
             return;
         }
 
@@ -163,7 +163,7 @@ export function YqlEditor({
     }, [isMultiTabQueryEditorEnabled, tabsOrder]);
 
     React.useEffect(() => {
-        if (!isMultiTabQueryEditorEnabled || !pendingSnippet || !isEditorMounted) {
+        if (!isMultiTabQueryEditorEnabled || !activeTabId || !pendingSnippet || !isEditorMounted) {
             if (!pendingSnippet) {
                 appliedPendingSnippetRef.current = null;
             }
@@ -231,6 +231,10 @@ export function YqlEditor({
 
     const handleRenameTabAction = useEventHandler(() => {
         const tabIdToRename = activeTabId;
+        if (!tabIdToRename) {
+            return;
+        }
+
         NiceModal.show(RENAME_QUERY_DIALOG, {
             title: activeTab?.title || '',
             onRename: (title: string) => {
@@ -240,11 +244,15 @@ export function YqlEditor({
     });
 
     const handleSaveQueryAsAction = useEventHandler(() => {
+        if (!activeTab) {
+            return;
+        }
+
         const defaultQueryName = getTabTitleForSave(activeTab);
 
         NiceModal.show(SAVE_QUERY_DIALOG, {
             savedQueries,
-            onSaveQuery: createSaveQueryHandler(activeTab?.id),
+            onSaveQuery: createSaveQueryHandler(activeTab.id),
             queryBody: input,
             defaultQueryName,
         });
@@ -277,7 +285,7 @@ export function YqlEditor({
         monacoRef.current = monaco;
         setIsEditorMounted(true);
 
-        if (isMultiTabQueryEditorEnabled) {
+        if (isMultiTabQueryEditorEnabled && activeTabId) {
             tabsManagerRef.current.setActiveTabModel({
                 tabId: activeTabId,
                 nextValue: input,

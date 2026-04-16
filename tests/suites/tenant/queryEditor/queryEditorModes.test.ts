@@ -44,6 +44,32 @@ test.describe('Query Editor modes', () => {
         await expect(tenantPage.queryEditor.editorTabs.getTabCount()).resolves.toBe(1);
     });
 
+    test('Single-tab mode recreates the editor after restoring zero-tabs state', async ({page}) => {
+        const tenantPage = await openQueryEditorMode(page, QueryEditorMode.MultiTab);
+
+        await tenantPage.queryEditor.editorTabs.openTabMenu('New Query');
+        await tenantPage.queryEditor.editorTabs.clickMenuAction('Close tab');
+        await expect(tenantPage.queryEditor.isZeroTabsStateVisible()).resolves.toBe(true);
+
+        await tenantPage.gotoQueryEditor({
+            schema: database,
+            database,
+            mode: QueryEditorMode.SingleTab,
+        });
+
+        await expect(tenantPage.queryEditor.editorTabs.isHidden()).resolves.toBe(true);
+        await expect
+            .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
+            .toBe('');
+
+        const newSqlDropdown = new NewSqlDropdownMenu(page);
+        await selectAsyncReplicationTemplate(newSqlDropdown, AsyncReplicationTemplates.Create);
+
+        await expect
+            .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
+            .not.toBe('');
+    });
+
     test('Single-tab mode asks for confirmation before replacing dirty editor content with template', async ({
         page,
     }) => {

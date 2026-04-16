@@ -132,7 +132,7 @@ export interface QueryTabPersistedState {
 }
 
 export interface QueryTabsPersistedState {
-    activeTabId: string;
+    activeTabId?: string;
     tabsOrder: string[];
     tabsById: Record<string, QueryTabPersistedState>;
     newTabCounter?: number;
@@ -176,7 +176,9 @@ export function isQueryTabsPersistedState(value: unknown): value is QueryTabsPer
     }
 
     if (
-        typeof value.activeTabId !== 'string' ||
+        ('activeTabId' in value &&
+            value.activeTabId !== undefined &&
+            typeof value.activeTabId !== 'string') ||
         !isStringArray(value.tabsOrder) ||
         !isRecord(value.tabsById)
     ) {

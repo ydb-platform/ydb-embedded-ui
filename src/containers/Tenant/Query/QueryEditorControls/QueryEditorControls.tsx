@@ -94,6 +94,10 @@ export const QueryEditorControls = ({
         reachMetricaGoal('stopQuery');
         try {
             if (isStreamingEnabled) {
+                if (!activeTabId) {
+                    return;
+                }
+
                 queryExecutionManagerInstance.abortQuery(activeTabId);
             } else if (queryId) {
                 await sendCancelQuery({queryId, database}).unwrap();

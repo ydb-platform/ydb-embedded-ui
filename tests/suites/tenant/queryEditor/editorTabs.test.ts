@@ -108,6 +108,74 @@ test.describe('Editor tabs', () => {
         await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
     });
 
+    test('Close tab action on the last clean tab shows zero-tabs state', async () => {
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Close tab');
+
+        await expect(queryEditor.editorTabs.isHidden()).resolves.toBe(true);
+        await expect(queryEditor.isZeroTabsStateVisible()).resolves.toBe(true);
+        await expect(queryEditor.isResultsControlsHidden()).resolves.toBe(true);
+    });
+
+    test('Clicking zero-tabs state creates a new editor tab', async () => {
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Close tab');
+        await expect(queryEditor.isZeroTabsStateVisible()).resolves.toBe(true);
+
+        await queryEditor.clickZeroTabsState();
+
+        await expect(queryEditor.editorTabs.isVisible()).resolves.toBe(true);
+        await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(1);
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
+        await expect(queryEditor.isZeroTabsStateHidden()).resolves.toBe(true);
+    });
+
+    test('Hotkey creates a new tab from zero-tabs state', async ({page}) => {
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Close tab');
+        await expect(queryEditor.isZeroTabsStateVisible()).resolves.toBe(true);
+
+        await queryEditor.focusHotkeysTarget();
+        await pressTabHotkey(page, 'newTab');
+
+        await expect(queryEditor.editorTabs.isVisible()).resolves.toBe(true);
+        await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(1);
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
+    });
+
+    test('Reload restores zero-tabs state', async ({page}) => {
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Close tab');
+        await expect(queryEditor.isZeroTabsStateVisible()).resolves.toBe(true);
+
+        await page.reload();
+
+        await expect(queryEditor.editorTabs.isHidden()).resolves.toBe(true);
+        await expect(queryEditor.isZeroTabsStateVisible()).resolves.toBe(true);
+    });
+
+    test('Zero-tabs state matches the default view', async () => {
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Close tab');
+        await expect(queryEditor.isZeroTabsStateVisible()).resolves.toBe(true);
+
+        await expect(queryEditor.getZeroTabsStateLocator()).toHaveScreenshot(
+            'query-editor-zero-tabs-state.png',
+        );
+    });
+
+    test('Zero-tabs state matches the hover view', async () => {
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Close tab');
+        await expect(queryEditor.isZeroTabsStateVisible()).resolves.toBe(true);
+
+        await queryEditor.hoverZeroTabsState();
+
+        await expect(queryEditor.getZeroTabsStateLocator()).toHaveScreenshot(
+            'query-editor-zero-tabs-state-hover.png',
+        );
+    });
+
     test('Hotkey shows save changes dialog when closing a dirty active tab', async ({page}) => {
         const saveChangesDialog = new SaveChangesDialog(page);
 
@@ -134,7 +202,7 @@ test.describe('Editor tabs', () => {
     test('Hotkey opens rename dialog for the active tab', async ({page}) => {
         const renameQueryDialog = new RenameQueryDialog(page);
 
-        await queryEditor.focusHotkeysTarget();
+        await queryEditor.focusEditor();
         await pressTabHotkey(page, 'renameTab');
 
         await expect(renameQueryDialog.isVisible()).resolves.toBe(true);
@@ -284,9 +352,9 @@ test.describe('Editor tabs', () => {
     });
 
     test('Tab menu shows the expected actions', async () => {
-        const activeTabId = await queryEditor.editorTabs.getActiveTabId();
+        const activeTabId = await queryEditor.getRequiredActiveTabId();
 
-        await queryEditor.editorTabs.openTabMenuById(activeTabId!);
+        await queryEditor.editorTabs.openTabMenuById(activeTabId);
         const menuActions = await queryEditor.editorTabs.getMenuActions();
 
         expect(menuActions.some((action) => action.includes('Rename'))).toBe(true);
@@ -301,18 +369,21 @@ test.describe('Editor tabs', () => {
         const queryText = 'SELECT 1;';
 
         await queryEditor.setQuery(queryText);
-        const originalTabId = await queryEditor.editorTabs.getActiveTabId();
+        const originalTabId = await queryEditor.getRequiredActiveTabId();
         const originalTitle = await queryEditor.editorTabs.getActiveTabTitle();
         const initialTabIds = await queryEditor.editorTabs.getTabIds();
 
-        await queryEditor.editorTabs.openTabMenuById(originalTabId!);
+        await queryEditor.editorTabs.openTabMenuById(originalTabId);
         await queryEditor.editorTabs.clickMenuAction('Duplicate');
 
         await expect(queryEditor.editorTabs.waitForTabCount(2)).resolves.toBe(true);
         const nextTabIds = await queryEditor.editorTabs.getTabIds();
         const duplicatedTabId = nextTabIds.find((tabId) => !initialTabIds.includes(tabId));
         expect(duplicatedTabId).not.toBe(originalTabId);
-        await expect(queryEditor.editorTabs.getTabTitleById(duplicatedTabId!)).resolves.toBe(
+        if (!duplicatedTabId) {
+            throw new Error('Expected duplicated tab id');
+        }
+        await expect(queryEditor.editorTabs.getTabTitleById(duplicatedTabId)).resolves.toBe(
             `${originalTitle} copy`,
         );
         await expect
@@ -327,10 +398,10 @@ test.describe('Editor tabs', () => {
         const saveQueryDialog = new SaveQueryDialog(page);
 
         await queryEditor.setQuery('SELECT 1;');
-        const activeTabId = await queryEditor.editorTabs.getActiveTabId();
+        const activeTabId = await queryEditor.getRequiredActiveTabId();
         const activeTabTitle = await queryEditor.editorTabs.getActiveTabTitle();
 
-        await queryEditor.editorTabs.openTabMenuById(activeTabId!);
+        await queryEditor.editorTabs.openTabMenuById(activeTabId);
         await queryEditor.editorTabs.clickMenuAction('Save query as...');
 
         await expect(saveQueryDialog.isVisible()).resolves.toBe(true);
@@ -342,9 +413,9 @@ test.describe('Editor tabs', () => {
         const saveQueryDialog = new SaveQueryDialog(page);
 
         await queryEditor.setQuery('SELECT 1;');
-        const activeTabId = await queryEditor.editorTabs.getActiveTabId();
+        const activeTabId = await queryEditor.getRequiredActiveTabId();
 
-        await queryEditor.editorTabs.openTabMenuById(activeTabId!);
+        await queryEditor.editorTabs.openTabMenuById(activeTabId);
         await queryEditor.editorTabs.clickMenuAction('Save query as...');
 
         await expect(saveQueryDialog.isVisible()).resolves.toBe(true);
@@ -363,9 +434,9 @@ test.describe('Editor tabs', () => {
         const queryName = `Saved From Tab Menu ${Date.now()}`;
 
         await queryEditor.setQuery(queryText);
-        const activeTabId = await queryEditor.editorTabs.getActiveTabId();
+        const activeTabId = await queryEditor.getRequiredActiveTabId();
 
-        await queryEditor.editorTabs.openTabMenuById(activeTabId!);
+        await queryEditor.editorTabs.openTabMenuById(activeTabId);
         await queryEditor.editorTabs.clickMenuAction('Save query as...');
 
         await expect(saveQueryDialog.isVisible()).resolves.toBe(true);
@@ -400,9 +471,9 @@ test.describe('Editor tabs', () => {
 
     test('Close tab action in tab menu closes the current clean tab', async () => {
         await queryEditor.editorTabs.clickAddTab();
-        const activeTabId = await queryEditor.editorTabs.getActiveTabId();
+        const activeTabId = await queryEditor.getRequiredActiveTabId();
 
-        await queryEditor.editorTabs.openTabMenuById(activeTabId!);
+        await queryEditor.editorTabs.openTabMenuById(activeTabId);
         await queryEditor.editorTabs.clickMenuAction('Close tab');
 
         await expect(queryEditor.editorTabs.waitForTabCount(1)).resolves.toBe(true);
@@ -414,21 +485,21 @@ test.describe('Editor tabs', () => {
 
         await tenantPage.saveQuery('SELECT 1;', savedQueryName);
         await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(savedQueryName);
-        const savedTabId = await queryEditor.editorTabs.getActiveTabId();
+        const savedTabId = await queryEditor.getRequiredActiveTabId();
         await expect(queryEditor.isEditButtonVisible()).resolves.toBe(true);
         await expect(queryEditor.isSaveButtonVisible(1000)).resolves.toBe(false);
 
         await queryEditor.editorTabs.clickAddTab();
-        const newTabId = await queryEditor.editorTabs.getActiveTabId();
+        const newTabId = await queryEditor.getRequiredActiveTabId();
         await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query 1');
         await expect(queryEditor.isSaveButtonVisible()).resolves.toBe(true);
         await expect(queryEditor.isEditButtonVisible(1000)).resolves.toBe(false);
 
-        await queryEditor.editorTabs.selectTabById(savedTabId!);
+        await queryEditor.editorTabs.selectTabById(savedTabId);
         await expect(queryEditor.isEditButtonVisible()).resolves.toBe(true);
         await expect(queryEditor.isSaveButtonVisible(1000)).resolves.toBe(false);
 
-        await queryEditor.editorTabs.selectTabById(newTabId!);
+        await queryEditor.editorTabs.selectTabById(newTabId);
         await expect(queryEditor.isSaveButtonVisible()).resolves.toBe(true);
         await expect(queryEditor.isEditButtonVisible(1000)).resolves.toBe(false);
     });
@@ -494,7 +565,9 @@ test.describe('Editor tabs', () => {
         await queryEditor.editorTabs.hoverTab('New Query');
         await queryEditor.editorTabs.closeTab('New Query');
 
-        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
+        await expect
+            .poll(() => queryEditor.editorTabs.getActiveTabTitle(), {timeout: 5000})
+            .toBe('New Query');
         await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
         await saveChangesDialog.clickCancel();
 
@@ -514,7 +587,9 @@ test.describe('Editor tabs', () => {
         await queryEditor.editorTabs.openTabMenu('New Query');
         await queryEditor.editorTabs.clickMenuAction('Close tab');
 
-        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
+        await expect
+            .poll(() => queryEditor.editorTabs.getActiveTabTitle(), {timeout: 5000})
+            .toBe('New Query');
         await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
         await saveChangesDialog.clickCancel();
 
@@ -544,6 +619,20 @@ test.describe('Editor tabs', () => {
 
         await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(1);
         await expect(queryEditor.editorTabs.isTabSelected(nextTitle)).resolves.toBe(true);
+    });
+
+    test('Closing the last dirty tab can end in zero-tabs state', async ({page}) => {
+        const saveChangesDialog = new SaveChangesDialog(page);
+
+        await queryEditor.setQuery('SELECT 1 AS zero_tabs_dirty_last;');
+
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Close tab');
+        await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
+        await saveChangesDialog.clickDontSave();
+
+        await expect(queryEditor.editorTabs.isHidden()).resolves.toBe(true);
+        await expect(queryEditor.isZeroTabsStateVisible()).resolves.toBe(true);
     });
 
     test('Shows confirmation when closing a running tab and stops it after confirmation', async ({
@@ -592,12 +681,32 @@ test.describe('Editor tabs', () => {
         await queryEditor.editorTabs.openTabMenu('New Query');
         await queryEditor.editorTabs.clickMenuAction('Close tab');
 
-        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
+        await expect
+            .poll(() => queryEditor.editorTabs.getActiveTabTitle(), {timeout: 5000})
+            .toBe('New Query');
         await expect(runningQueryDialog.isVisible()).resolves.toBe(true);
         await runningQueryDialog.clickCancel();
 
         await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(2);
         await expect(queryEditor.editorTabs.isTabSelected('New Query')).resolves.toBe(true);
+    });
+
+    test('Closing the last running tab can end in zero-tabs state', async ({page}) => {
+        const runningQueryDialog = new RunningQueryDialog(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+        await setupMockStreamingFetch(page, {chunkIntervalMs: 1000});
+
+        await queryEditor.setQuery(longRunningStreamQuery);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Close tab');
+        await expect(runningQueryDialog.isVisible()).resolves.toBe(true);
+        await runningQueryDialog.clickStopAndClose();
+
+        await expect(queryEditor.editorTabs.isHidden()).resolves.toBe(true);
+        await expect(queryEditor.isZeroTabsStateVisible()).resolves.toBe(true);
     });
 
     test('Close other tabs closes clean tabs immediately and stops on save changes cancel', async ({
@@ -622,9 +731,7 @@ test.describe('Editor tabs', () => {
         ]);
     });
 
-    test('Close all tabs leaves a single cleared tab after dont save confirmation', async ({
-        page,
-    }) => {
+    test('Close all tabs shows zero-tabs state after dont save confirmation', async ({page}) => {
         const saveChangesDialog = new SaveChangesDialog(page);
 
         await queryEditor.setQuery('SELECT 1;');
@@ -636,9 +743,8 @@ test.describe('Editor tabs', () => {
         await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
         await saveChangesDialog.clickDontSave();
 
-        await expect(queryEditor.editorTabs.waitForTabCount(1)).resolves.toBe(true);
-        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
-        await expect.poll(() => queryEditor.getEditorContent(), {timeout: 5000}).toBe('');
+        await expect(queryEditor.editorTabs.isHidden()).resolves.toBe(true);
+        await expect(queryEditor.isZeroTabsStateVisible()).resolves.toBe(true);
     });
 
     test('Close all tabs validates duplicate saved query names across consecutive save dialogs', async ({

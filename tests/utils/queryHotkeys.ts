@@ -9,7 +9,7 @@ function getModifierKey(page: Page) {
     return {
         isMac,
         browserName,
-        modifierKey: browserName === 'webkit' ? 'Meta' : 'Control',
+        modifierKey: isMac ? 'Meta' : 'Control',
     };
 }
 
@@ -61,24 +61,72 @@ type TabHotkeyAction =
     | 'previousTab';
 
 const TAB_HOTKEYS: Record<TabHotkeyAction, HotkeyDescriptor> = {
-    newTab: {key: 'T', alt: true},
-    renameTab: {key: 'R', alt: true},
-    duplicateTab: {key: 'C', alt: true},
+    newTab: {key: 'KeyT', alt: true},
+    renameTab: {key: 'KeyR', alt: true},
+    duplicateTab: {key: 'KeyC', alt: true},
     closeTab: {key: 'Backspace'},
     closeOtherTabs: {key: 'Backspace', alt: true},
     closeAllTabs: {key: 'Backspace', shift: true},
-    saveQueryAs: {key: 'S', shift: true},
+    saveQueryAs: {key: 'KeyS', shift: true},
     nextTab: {key: 'ArrowRight', alt: true},
     previousTab: {key: 'ArrowLeft', alt: true},
 };
 
+const KEY_VALUES_BY_CODE: Record<string, string> = {
+    KeyT: 'T',
+    KeyR: 'R',
+    KeyC: 'C',
+    KeyS: 'S',
+    ArrowRight: 'ArrowRight',
+    ArrowLeft: 'ArrowLeft',
+    Backspace: 'Backspace',
+};
+
 async function pressTabHotkeyCombo(page: Page, descriptor: HotkeyDescriptor) {
-    const modifierKey = process.platform === 'darwin' ? 'Meta' : 'Control';
+    const modifierKey = await page.evaluate(() => {
+        const nav = navigator as Navigator & {userAgentData?: {platform?: string}};
+        const platform = nav.userAgentData?.platform || navigator.platform || '';
+        return platform.toUpperCase().includes('MAC') ? 'Meta' : 'Control';
+    });
+
+    if (descriptor.key === 'KeyR' && descriptor.alt) {
+        await page.evaluate(
+            ({modifierKey}) => {
+                const keyCode = 82;
+                const eventInit = {
+                    key: 'r',
+                    code: 'KeyR',
+                    keyCode,
+                    which: keyCode,
+                    ctrlKey: modifierKey === 'Control',
+                    metaKey: modifierKey === 'Meta',
+                    altKey: true,
+                    shiftKey: false,
+                    bubbles: true,
+                    cancelable: true,
+                    composed: true,
+                };
+
+                for (const target of [document.body, document, window]) {
+                    if (!target) {
+                        continue;
+                    }
+
+                    target.dispatchEvent(new KeyboardEvent('keydown', eventInit));
+                    target.dispatchEvent(new KeyboardEvent('keyup', eventInit));
+                }
+            },
+            {modifierKey},
+        );
+        await page.waitForTimeout(300);
+        return;
+    }
+
     const comboParts = [
         modifierKey,
         descriptor.alt ? 'Alt' : '',
         descriptor.shift ? 'Shift' : '',
-        descriptor.key,
+        KEY_VALUES_BY_CODE[descriptor.key] || descriptor.key,
     ]
         .filter(Boolean)
         .join('+');
