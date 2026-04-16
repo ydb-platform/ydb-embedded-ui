@@ -71,5 +71,5 @@ export function DropdownMenu<T = HTMLElement>({items, ...props}: DropdownMenuPro
         });
     }, [items]);
 
-    return <GravityDropdownMenu {...props} items={mappedItems} menuProps={{size: 'l'}} />;
+    return <GravityDropdownMenu {...props} items={mappedItems} />;
 }
