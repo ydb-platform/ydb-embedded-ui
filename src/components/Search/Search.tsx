@@ -26,6 +26,13 @@ export const Search = ({
     inputRef,
     ...props
 }: SearchProps) => {
+    const onUpdate = React.useCallback(
+        (newValue: string) => {
+            onChange(newValue.trim());
+        },
+        [onChange],
+    );
+
     return (
         <DebouncedTextInput
             debounce={debounce}
@@ -35,7 +42,7 @@ export const Search = ({
             style={{width}}
             className={b(null, className)}
             value={value}
-            onUpdate={onChange}
+            onUpdate={onUpdate}
             {...props}
         />
     );
