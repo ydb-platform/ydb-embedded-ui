@@ -84,9 +84,8 @@ export const ClusterInfo = ({
                                             ''
                                         );
                                     return (
-                                        <Flex gap={3} wrap="wrap">
+                                        <Flex gap={3} wrap="wrap" key={title}>
                                             <LinkWithIcon
-                                                key={title}
                                                 title={title}
                                                 url={url}
                                                 icon={icon}

@@ -7,6 +7,7 @@ import {useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {ClusterRightControls} from './ClusterRightControls';
 import {ClustersHomeControls} from './ClustersHomeControls';
 import {DatabaseRightControls} from './DatabaseRightControls';
+import {DeveloperUIControl} from './GlobalRightControls';
 
 interface HeaderRightControlsProps {
     clusterName?: string;
@@ -70,6 +71,8 @@ export function HeaderRightControls({
                     handleDeleteCluster={handleDeleteCluster}
                 />
             ) : null}
+
+            {!isDatabasePage && !isClusterPage && showDeveloperUI ? <DeveloperUIControl /> : null}
         </Flex>
     );
 }
