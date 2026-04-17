@@ -79,6 +79,7 @@
     }
 
     &__details {
+        @include mixins.body-1-typography();
         @container overview-wrapper (min-width: 804px) {
             max-width: calc(
                 var(--cluster-overview-section) - var(--cluster-overview-vertical-padding) * 2
@@ -87,8 +88,5 @@
     }
     &__details-value {
         word-break: break-all;
-    }
-    &__details-container {
-        gap: calc(var(--g-spacing-2) + var(--g-spacing-half));
     }
 }

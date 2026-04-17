@@ -62,7 +62,7 @@ export const ClusterInfo = ({
                     {i18n('title_details')}
                 </Text>
                 <Card view="outlined" className={b('section')}>
-                    <Flex direction="column" className={b('details-container')}>
+                    <Flex direction="column" gap={3}>
                         {info.length > 0 && (
                             <DefinitionList nameMaxWidth={200} className={b('details')}>
                                 {info.map(({label, value}) => {
@@ -75,7 +75,7 @@ export const ClusterInfo = ({
                             </DefinitionList>
                         )}
                         {clusterLinks.length > 0 && (
-                            <Flex direction="row" gap={3}>
+                            <Flex direction="row" gap={3} wrap="wrap">
                                 {clusterLinks.map(({title, url, icon, description}, index) => {
                                     const delimiter =
                                         index < clusterLinks.length - 1 ? (
