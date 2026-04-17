@@ -23,7 +23,12 @@ const getAdditionalBalancerInfo = (balancer: string) => {
         value: (
             <div className={b('balancer')}>
                 {cleanedValue}
-                <ClipboardButton text={cleanedValue} size="s" className={b('clipboard-button')} />
+                <ClipboardButton
+                    view="flat-secondary"
+                    text={cleanedValue}
+                    size="xs"
+                    className={b('clipboard-button')}
+                />
             </div>
         ),
     };
