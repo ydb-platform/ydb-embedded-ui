@@ -85,7 +85,7 @@ export function ClusterDrawerHealthcheck({children, database}: ClusterDrawerHeal
 
     return (
         <DrawerWrapper
-            isDrawerVisible={Boolean(showHealthcheck)}
+            isDrawerVisible={Boolean(showHealthcheck) && Boolean(database)}
             onCloseDrawer={handleCloseDrawer}
             renderDrawerContent={renderDrawerContent}
             drawerId="cluster-healthcheck-details"
@@ -101,6 +101,7 @@ export function ClusterDrawerHealthcheck({children, database}: ClusterDrawerHeal
                         <ActionTooltip title={i18n('action_download-healthcheck')}>
                             <Button
                                 view="flat"
+                                disabled={!healthcheckData}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     createAndDownloadJsonFile(
