@@ -26,13 +26,20 @@ interface ClusterDrawerHealthcheckProps {
 export function useClusterHealthcheckQueryParams() {
     const [{showHealthcheck, issuesFilter, view}, setQueryParams] = useQueryParams({
         showHealthcheck: BooleanParam,
+        database: StringParam,
         issuesFilter: StringParam,
         view: StringParam,
     });
 
     const handleShowHealthcheckChange = React.useCallback(
-        (value?: boolean) => {
-            setQueryParams({showHealthcheck: value || undefined}, 'replaceIn');
+        (value?: boolean, database?: string) => {
+            setQueryParams(
+                {
+                    showHealthcheck: value || undefined,
+                    database: value ? database : undefined,
+                },
+                'replaceIn',
+            );
         },
         [setQueryParams],
     );
@@ -74,7 +81,7 @@ export function ClusterDrawerHealthcheck({children, database}: ClusterDrawerHeal
     const healthcheckData = useTypedSelector((state) => selectAllHealthcheckInfo(state, database));
 
     const handleCloseDrawer = React.useCallback(() => {
-        handleShowHealthcheckChange(false);
+        handleShowHealthcheckChange(false, undefined);
         handleIssuesFilterChange(undefined);
         handleHealthcheckViewChange(undefined);
     }, [handleShowHealthcheckChange, handleIssuesFilterChange, handleHealthcheckViewChange]);

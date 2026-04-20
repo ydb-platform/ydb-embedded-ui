@@ -123,9 +123,11 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
         return clusterTabs.filter((el) => !skippedTabs.includes(el.id));
     }, [shouldShowEventsTab, shouldShowNetworkTable, showConfigs]);
 
+    const clusterDatabase = cluster?.Domain || '';
+
     const handleStatusClick = React.useCallback(() => {
-        handleShowHealthcheckChange(true);
-    }, [handleShowHealthcheckChange]);
+        handleShowHealthcheckChange(true, clusterDatabase);
+    }, [handleShowHealthcheckChange, clusterDatabase]);
 
     const getClusterTitle = () => {
         if (infoLoading) {
