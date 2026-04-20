@@ -7,4 +7,8 @@
         color: var(--g-color-private-orange-500);
         background-color: var(--g-color-private-orange-100);
     }
+
+    &_clickable.g-label {
+        cursor: pointer;
+    }
 }

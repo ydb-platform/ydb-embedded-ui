@@ -34,5 +34,8 @@
   "tab_versions": "Versions",
   "tab_tablets": "Tablets",
   "tab_events": "Events",
-  "tab_configs": "Configs"
+  "tab_configs": "Configs",
+
+  "title_healthcheck-dashboard": "Healthcheck Dashboard",
+  "action_download-healthcheck": "Download healthcheck data"
 }
