@@ -8,17 +8,14 @@
   "breadcrumbs.tablet": "Tablet",
   "breadcrumbs.tablets": "Tablets",
   "breadcrumbs.storageGroup": "Storage Group",
-
   "title_connect": "Connect",
   "title_add-cluster": "Add Cluster",
-
   "action_edit-db": "Edit database",
   "action_delete-db": "Delete database",
   "action_connect-to-db": "Connect to database",
   "action_manage": "Manage",
-
-  "title_admin-ui": "Admin UI",
-  "description_admin-ui": "Previous version of the interface with a full set of administrative functions",
+  "title_developer-ui": "Developer UI",
+  "description_developer-ui": "Previous version of the interface with a full set of administrative functions",
   "description_connect-to-db": "Connect to database",
   "description_monitoring": "Monitoring and metrics dashboard"
 }

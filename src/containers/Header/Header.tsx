@@ -354,13 +354,13 @@ function RightControls({
         return null;
     }, [database, isDatabasePage, isV2NavigationEnabled]);
 
-    const renderAdminUIButton = React.useCallback(() => {
+    const renderDeveloperUIButton = React.useCallback(() => {
         if (!isHomePage && hasDeveloperUi) {
             return (
-                <ActionTooltip title={headerKeyset('description_admin-ui')}>
+                <ActionTooltip title={headerKeyset('description_developer-ui')}>
                     <Button view="flat" href={createDeveloperUIInternalPageHref()} target="_blank">
                         <Icon data={ArrowUpRightFromSquare} />
-                        {headerKeyset('title_admin-ui')}
+                        {headerKeyset('title_developer-ui')}
                     </Button>
                 </ActionTooltip>
             );
@@ -395,7 +395,7 @@ function RightControls({
             {renderAddClusterButton()}
             {renderMonitoringButton()}
             {renderConnectToDBButton()}
-            {renderAdminUIButton()}
+            {renderDeveloperUIButton()}
             {renderDBActionsMenu()}
         </Flex>
     );
