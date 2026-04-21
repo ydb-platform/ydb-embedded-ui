@@ -139,6 +139,7 @@ describe('state-url-mapping', () => {
                 expect(params.getAll('from')).toEqual(['1771092117420']);
                 expect(params.getAll('to')).toEqual(['1771178517420']);
                 expect(params.getAll('interval')).toEqual(['1d']);
+                expect(params.has('utm_referrer')).toBe(false);
             },
         );
     });

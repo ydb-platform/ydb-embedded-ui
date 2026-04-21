@@ -1,7 +1,6 @@
 import React from 'react';
 
 import type {Location} from 'history';
-import isEmpty from 'lodash/isEmpty';
 import {compile, match} from 'path-to-regexp';
 import qs from 'qs';
 import type {QueryParamConfig} from 'use-query-params';
@@ -15,6 +14,7 @@ import {backend, basename, clusterName, environment, webVersion} from './store';
 import {uiFactory} from './uiFactory/uiFactory';
 import {normalizePathSlashes} from './utils';
 import {useDatabaseFromQuery} from './utils/hooks/useDatabaseFromQuery';
+import {omitVolatileQueryParams} from './utils/queryParams';
 
 export const CLUSTER = 'cluster';
 export const TENANT = 'tenant';
@@ -63,26 +63,8 @@ const prepareRoute = (route: string) => {
 
 type Query = AnyRecord;
 
-const VOLATILE_QUERY_PARAMS = ['utm_referrer'] as const;
-
 export interface CreateHrefOptions {
     withBasename?: boolean;
-}
-
-function omitVolatileQueryParams(query: Query): Query {
-    let result = query;
-
-    VOLATILE_QUERY_PARAMS.forEach((param) => {
-        if (Object.prototype.hasOwnProperty.call(result, param)) {
-            if (result === query) {
-                result = {...query};
-            }
-
-            delete result[param];
-        }
-    });
-
-    return result;
 }
 
 // eslint-disable-next-line complexity
@@ -123,12 +105,11 @@ export function createHref(
     }
 
     const normalizedQuery = omitVolatileQueryParams(extendedQuery);
-    const search = isEmpty(normalizedQuery)
-        ? ''
-        : `?${qs.stringify(normalizedQuery, {
-              arrayFormat: 'repeat',
-              encoder: encodeURIComponent,
-          })}`;
+    const queryString = qs.stringify(normalizedQuery, {
+        arrayFormat: 'repeat',
+        encoder: encodeURIComponent,
+    });
+    const search = queryString ? `?${queryString}` : '';
 
     const preparedRoute = prepareRoute(route);
 

@@ -12,6 +12,8 @@ import {getMatchingDeclaredPath} from 'redux-location-state/lib/helpers';
 import {parseQuery} from 'redux-location-state/lib/parseQuery';
 import {stateToParams} from 'redux-location-state/lib/stateToParams';
 
+import {omitVolatileQueryParams} from '../utils/queryParams';
+
 import {initialState as initialHeatmapState} from './reducers/heatmap';
 import {initialState as initialTenantState} from './reducers/tenant/tenant';
 
@@ -25,7 +27,6 @@ const SCALAR_QUERY_PARAMS = [
     'from',
     'to',
     'interval',
-    'utm_referrer',
     'queryTab',
     'diagnosticsTab',
     'summaryTab',
@@ -204,7 +205,9 @@ function normalizeScalarQueryParams(params: ParsedQs) {
 
 export function restoreUnknownParams(location: Location, prevLocation: Location) {
     const {search, ...rest} = location;
-    const params = normalizeScalarQueryParams(qs.parse(prevLocation.search.slice(1)));
+    const params = normalizeScalarQueryParams(
+        omitVolatileQueryParams(qs.parse(prevLocation.search.slice(1))),
+    );
 
     // figure out which path key inside paramSetup matches location.pathname
     const declaredPath = getMatchingDeclaredPath(paramSetup, location);
