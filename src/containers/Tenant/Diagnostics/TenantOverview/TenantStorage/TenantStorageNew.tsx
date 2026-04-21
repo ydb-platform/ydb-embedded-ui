@@ -55,6 +55,7 @@ import {
     getTenantStoragePhysicalDisplaySegments,
     getTenantStorageUserDataDisplaySummary,
     isSystemStoragePath,
+    mergeSystemDetailsByMedia,
 } from './utils';
 
 import './TenantStorageNew.scss';
@@ -186,13 +187,14 @@ function SegmentedProgressBar({
     total?: number;
 }) {
     const activeSegments = segments.filter((s) => s.value > 0);
+    const segmentSum = activeSegments.reduce((sum, s) => sum + s.value, 0);
+    const effectiveTotal = total === undefined ? segmentSum : total;
 
-    if (!total || activeSegments.length === 0) {
+    if (!Number.isFinite(effectiveTotal) || effectiveTotal <= 0 || segmentSum <= 0) {
         return <Progress value={0} size="s" className={b('summary-progress-bar')} />;
     }
 
-    const segmentSum = segments.reduce((sum, s) => sum + s.value, 0);
-    const cappedTotal = Math.max(total, segmentSum);
+    const cappedTotal = Math.max(effectiveTotal, segmentSum);
 
     return (
         <div className={b('segment-progress')}>
@@ -398,7 +400,8 @@ function ObjectPathCell({row}: {row: TenantStorageTopRow}) {
 }
 
 function DatabaseSpaceCell({row}: {row: TenantStorageTopRow}) {
-    const percent = Math.min(row.dbShare * 100, 100);
+    const share = Math.min(Math.max(row.dbShare, 0), 1);
+    const percent = share * 100;
     const precision = percent > 0 && percent < 1 ? 1 : 0;
 
     return (
@@ -407,7 +410,7 @@ function DatabaseSpaceCell({row}: {row: TenantStorageTopRow}) {
                 <Progress value={percent} size="s" className={b('space-progress-bar')} />
             </div>
             <Text className={b('space-value')}>
-                {formatPercent(row.dbShare, precision) || EMPTY_DATA_PLACEHOLDER}
+                {formatPercent(share, precision) || EMPTY_DATA_PLACEHOLDER}
             </Text>
         </Flex>
     );
@@ -564,28 +567,6 @@ function renderPhysicalSummary(
     );
 }
 
-function getMediaBreakdownKey({
-    mediaType,
-    physicalSegmentsByMedia,
-}: {
-    mediaType: EType;
-    physicalSegmentsByMedia: Record<string, TenantStorageSegment[]>;
-}) {
-    const mediaKey = getTenantStorageMediaKey(mediaType);
-
-    if (physicalSegmentsByMedia[mediaKey]) {
-        return mediaKey;
-    }
-
-    const mediaKeys = Object.keys(physicalSegmentsByMedia);
-
-    if (mediaType === EType.None && mediaKeys.length === 1) {
-        return mediaKeys[0];
-    }
-
-    return mediaKey;
-}
-
 function MediaSection({
     section,
     showMediaTypeLabel,
@@ -603,15 +584,21 @@ function MediaSection({
         physical: section.physical,
     });
     const userSegments = showMediaTypeLabel ? undefined : data.userDataSegments;
-    const mediaBreakdownKey = getMediaBreakdownKey({
-        mediaType: section.mediaType,
-        physicalSegmentsByMedia: data.physicalSegmentsByMedia,
-    });
-    const physicalSegments = getTenantStoragePhysicalDisplaySegments({
-        segments: data.physicalSegmentsByMedia[mediaBreakdownKey],
-        used: section.physical.used,
-    });
-    const systemDetails = data.systemDetailsByMedia[mediaBreakdownKey];
+    let physicalSegments: TenantStorageSegment[];
+    let systemDetails: TenantStorageSystemDetail[] | undefined;
+
+    if (section.mediaType === EType.None) {
+        physicalSegments = data.summary.physical.segments;
+        systemDetails = mergeSystemDetailsByMedia(data.systemDetailsByMedia);
+    } else {
+        const mediaBreakdownKey = getTenantStorageMediaKey(section.mediaType);
+
+        physicalSegments = getTenantStoragePhysicalDisplaySegments({
+            segments: data.physicalSegmentsByMedia[mediaBreakdownKey],
+            used: section.physical.used,
+        });
+        systemDetails = data.systemDetailsByMedia[mediaBreakdownKey];
+    }
 
     return (
         <Flex direction="column" gap={3} className={b('media-section')}>
@@ -652,6 +639,8 @@ export function TenantStorageNew({
         return <ResponseError error={error} />;
     }
 
+    const topRowsError = data.topRowsError ?? error;
+
     return (
         <LoaderWrapper loading={loading}>
             <Flex direction="column" gap={4} className={b()}>
@@ -681,7 +670,7 @@ export function TenantStorageNew({
                 >
                     <TenantOverviewTableLayout
                         loading={loading}
-                        error={error}
+                        error={topRowsError}
                         withData={Boolean(currentData)}
                     >
                         <ResizeableDataTable

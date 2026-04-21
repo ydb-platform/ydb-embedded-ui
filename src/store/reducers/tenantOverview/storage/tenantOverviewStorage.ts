@@ -23,10 +23,11 @@ export interface TenantStorageRawData {
         topics: number;
     };
     topRows: TenantStorageRawTopRow[];
+    topRowsError?: unknown;
     tabletTypeRows: TStorageStatsTabletTypeEntry[];
 }
 
-interface GetTenantStorageRawParams {
+export interface GetTenantStorageRawParams {
     database: string;
     databaseFullPath: string;
     useMetaProxy?: boolean;
@@ -158,9 +159,7 @@ async function getTopRowsByQuery(
         })
         .filter((row): row is Pick<TenantStorageRawTopRow, 'path' | 'userData'> => {
             return row !== undefined;
-        })
-        .sort((left, right) => right.userData - left.userData)
-        .slice(0, TOP_STORAGE_OBJECTS_LIMIT);
+        });
 }
 
 function getLogicalUserData(schemaResponse: TEvDescribeSchemeResult | null | undefined) {
@@ -342,7 +341,7 @@ export async function fetchTenantStorageRawData(
 ) {
     const {database} = params;
 
-    const [tabletTypeResponse, queryTopRows, rootSchemaData] = await Promise.all([
+    const [tabletTypeResponse, topRowsResult, rootSchemaData] = await Promise.all([
         window.api.viewer.getStorageStats(
             {
                 database,
@@ -352,9 +351,12 @@ export async function fetchTenantStorageRawData(
             },
             options,
         ),
-        getTopRowsByQuery(params, options),
+        getTopRowsByQuery(params, options)
+            .then((rows) => ({rows, error: undefined}))
+            .catch((error: unknown) => ({rows: [], error})),
         getRootSchemaData(params, options),
     ]);
+    const queryTopRows = topRowsResult.rows;
 
     const storageStatsByPath = await getStorageStatsForTopRows(
         queryTopRows.map(({path}) => path),
@@ -375,6 +377,7 @@ export async function fetchTenantStorageRawData(
     return {
         logicalUserData: rootSchemaData?.logicalUserData,
         topRows: mergeTopRows(queryTopRows, topRowTypes, storageStatsByPath),
+        topRowsError: topRowsResult.error,
         tabletTypeRows: tabletTypeResponse.Tablets ?? [],
     };
 }
