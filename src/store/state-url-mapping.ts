@@ -137,16 +137,43 @@ function mergeLocationToState<S>(state: S, location: Pick<LocationWithQuery, 'qu
     return merge({}, state, location.query);
 }
 
-function normalizeScalarQueryParam(value: ParsedQs[string]) {
-    if (!Array.isArray(value)) {
+function normalizeScalarQueryParam(value: ParsedQs[string]): string | undefined {
+    if (typeof value === 'string') {
         return value;
     }
 
-    for (let index = value.length - 1; index >= 0; index--) {
-        const item = value[index];
+    if (value === null || value === undefined) {
+        return undefined;
+    }
 
-        if (typeof item === 'string') {
-            return item;
+    if (!Array.isArray(value)) {
+        const sortedKeys = Object.keys(value).sort((left, right) => {
+            const leftNumber = Number(left);
+            const rightNumber = Number(right);
+
+            if (Number.isNaN(leftNumber) || Number.isNaN(rightNumber)) {
+                return 0;
+            }
+
+            return leftNumber - rightNumber;
+        });
+
+        for (let index = sortedKeys.length - 1; index >= 0; index--) {
+            const normalizedValue = normalizeScalarQueryParam(value[sortedKeys[index]]);
+
+            if (normalizedValue !== undefined) {
+                return normalizedValue;
+            }
+        }
+
+        return undefined;
+    }
+
+    for (let index = value.length - 1; index >= 0; index--) {
+        const normalizedValue = normalizeScalarQueryParam(value[index]);
+
+        if (normalizedValue !== undefined) {
+            return normalizedValue;
         }
     }
 

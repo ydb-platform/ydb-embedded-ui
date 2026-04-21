@@ -80,6 +80,36 @@ describe('state-url-mapping', () => {
             expect(params.getAll('schema')).toEqual(['/db/table2']);
         });
 
+        test('should normalize high-index bracket scalar params parsed as objects', () => {
+            const result = restoreUnknownParams(
+                createLocation('?currentMetric=RowUpdates'),
+                createLocation(
+                    '?currentMetric=Old&clusterName%5B0%5D=stale&clusterName%5B21%5D=global&database%5B21%5D=db&tenantPage%5B0%5D=query&tenantPage%5B21%5D=diagnostics&schema%5B21%5D=%2Fdb%2Ftable',
+                ),
+            );
+            const params = getSearchParams(result.search);
+
+            expectNoBracketKeys(result.search);
+            expect(params.getAll('clusterName')).toEqual(['global']);
+            expect(params.getAll('database')).toEqual(['db']);
+            expect(params.getAll('tenantPage')).toEqual(['diagnostics']);
+            expect(params.getAll('schema')).toEqual(['/db/table']);
+        });
+
+        test('should normalize mixed scalar arrays that contain indexed objects', () => {
+            const result = restoreUnknownParams(
+                createLocation('?currentMetric=RowUpdates'),
+                createLocation(
+                    '?currentMetric=Old&tenantPage=query&tenantPage%5B21%5D=diagnostics&clusterName=global&clusterName%5B21%5D=global',
+                ),
+            );
+            const params = getSearchParams(result.search);
+
+            expectNoBracketKeys(result.search);
+            expect(params.getAll('tenantPage')).toEqual(['diagnostics']);
+            expect(params.getAll('clusterName')).toEqual(['global']);
+        });
+
         test('should not add a dangling delimiter when all previous params are mapped', () => {
             const result = restoreUnknownParams(
                 createLocation('?currentMetric=RowUpdates'),
