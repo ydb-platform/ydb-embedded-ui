@@ -17,7 +17,9 @@ import {omitVolatileQueryParams} from '../utils/queryParams';
 import {initialState as initialHeatmapState} from './reducers/heatmap';
 import {initialState as initialTenantState} from './reducers/tenant/tenant';
 
-const SCALAR_QUERY_PARAMS = [
+// These query params represent a single current UI state value. Legacy URLs can contain repeated
+// or indexed copies, so restore the latest value before carrying unknown params forward.
+const SINGLE_VALUE_QUERY_PARAMS = [
     'clusterName',
     'database',
     'tenantPage',
@@ -138,7 +140,7 @@ function mergeLocationToState<S>(state: S, location: Pick<LocationWithQuery, 'qu
     return merge({}, state, location.query);
 }
 
-function normalizeScalarQueryParam(value: ParsedQs[string]): string | undefined {
+function normalizeSingleValueQueryParam(value: ParsedQs[string]): string | undefined {
     if (typeof value === 'string') {
         return value;
     }
@@ -160,7 +162,7 @@ function normalizeScalarQueryParam(value: ParsedQs[string]): string | undefined 
         });
 
         for (let index = sortedKeys.length - 1; index >= 0; index--) {
-            const normalizedValue = normalizeScalarQueryParam(value[sortedKeys[index]]);
+            const normalizedValue = normalizeSingleValueQueryParam(value[sortedKeys[index]]);
 
             if (normalizedValue !== undefined) {
                 return normalizedValue;
@@ -171,7 +173,7 @@ function normalizeScalarQueryParam(value: ParsedQs[string]): string | undefined 
     }
 
     for (let index = value.length - 1; index >= 0; index--) {
-        const normalizedValue = normalizeScalarQueryParam(value[index]);
+        const normalizedValue = normalizeSingleValueQueryParam(value[index]);
 
         if (normalizedValue !== undefined) {
             return normalizedValue;
@@ -181,17 +183,17 @@ function normalizeScalarQueryParam(value: ParsedQs[string]): string | undefined 
     return undefined;
 }
 
-function normalizeScalarQueryParams(params: ParsedQs) {
+function normalizeSingleValueQueryParams(params: ParsedQs) {
     const normalizedParams = {...params};
 
-    SCALAR_QUERY_PARAMS.forEach((param) => {
+    SINGLE_VALUE_QUERY_PARAMS.forEach((param) => {
         const value = normalizedParams[param];
 
         if (value === undefined) {
             return;
         }
 
-        const normalizedValue = normalizeScalarQueryParam(value);
+        const normalizedValue = normalizeSingleValueQueryParam(value);
 
         if (normalizedValue === undefined) {
             delete normalizedParams[param];
@@ -205,7 +207,7 @@ function normalizeScalarQueryParams(params: ParsedQs) {
 
 export function restoreUnknownParams(location: Location, prevLocation: Location) {
     const {search, ...rest} = location;
-    const params = normalizeScalarQueryParams(
+    const params = normalizeSingleValueQueryParams(
         omitVolatileQueryParams(qs.parse(prevLocation.search.slice(1))),
     );
 
