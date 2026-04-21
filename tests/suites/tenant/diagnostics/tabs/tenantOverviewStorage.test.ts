@@ -1,11 +1,15 @@
 import {expect, test} from '@playwright/test';
-import type {Page, Route} from '@playwright/test';
+import type {Locator, Page, Route} from '@playwright/test';
 
 import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 
 const TOP_ROW_PATH = '/local/kv_test';
 const SECOND_TOP_ROW_PATH = '/local/orders_cdc';
+const STORAGE_VIEW_SELECTOR = '.ydb-tenant-storage-new';
+const MEDIA_SECTION_SELECTOR = '.ydb-tenant-storage-new__media-section';
+const SUMMARY_CARD_SELECTOR = '.ydb-tenant-storage-new__summary-card';
+const SUMMARY_METRIC_SELECTOR = '.ydb-tenant-storage-new__summary-metric';
 
 async function enableNewStorageView(page: Page) {
     await page.addInitScript(() => {
@@ -263,6 +267,14 @@ async function openStorageMetricsTab(page: Page) {
     await storageTab.click();
 }
 
+function getSummaryCard(container: Locator, title: string) {
+    return container.locator(SUMMARY_CARD_SELECTOR).filter({hasText: title});
+}
+
+function getSummaryMetric(card: Locator, label: string) {
+    return card.locator(SUMMARY_METRIC_SELECTOR).filter({hasText: label});
+}
+
 test.describe('Tenant Overview storage metrics tab', () => {
     test('renders the new storage layout when experiment and storage_stats are enabled', async ({
         page,
@@ -284,15 +296,21 @@ test.describe('Tenant Overview storage metrics tab', () => {
 
         await openStorageMetricsTab(page);
 
-        const storageView = page.locator('.ydb-tenant-storage-new');
+        const storageView = page.locator(STORAGE_VIEW_SELECTOR);
+        const userDataSummary = getSummaryCard(storageView, 'User data');
+        const physicalSummary = getSummaryCard(storageView, 'Physical disk usage');
 
         await expect(storageView).toBeVisible();
         await expect(storageView.getByText('User data', {exact: true})).toBeVisible();
         await expect(storageView.getByText('Physical disk usage', {exact: true})).toBeVisible();
         await expect(storageView.getByText('Top 10 by space usage', {exact: true})).toBeVisible();
         await expect(storageView.getByText('Row table', {exact: true})).toBeVisible();
-        await expect(storageView.getByText('3.1 TB', {exact: true})).toBeVisible();
-        await expect(storageView.getByText('26.4 TB', {exact: true})).toBeVisible();
+        await expect(
+            getSummaryMetric(userDataSummary, 'Used').getByText('3.1 TB', {exact: true}),
+        ).toBeVisible();
+        await expect(
+            getSummaryMetric(physicalSummary, 'Used').getByText('26.4 TB', {exact: true}),
+        ).toBeVisible();
         await expect(storageView.getByRole('link', {name: 'kv_test'})).toHaveAttribute(
             'href',
             /schema=\/local\/kv_test/,
@@ -336,12 +354,20 @@ test.describe('Tenant Overview storage metrics tab', () => {
 
         await openStorageMetricsTab(page);
 
-        const storageView = page.locator('.ydb-tenant-storage-new');
+        const storageView = page.locator(STORAGE_VIEW_SELECTOR);
+        const ssdSection = storageView.locator(MEDIA_SECTION_SELECTOR).filter({hasText: 'SSD'});
+        const hddSection = storageView.locator(MEDIA_SECTION_SELECTOR).filter({hasText: 'HDD'});
+        const ssdUserDataSummary = getSummaryCard(ssdSection, 'User data');
+        const hddPhysicalSummary = getSummaryCard(hddSection, 'Physical disk usage');
 
         await expect(storageView.getByText('SSD', {exact: true})).toBeVisible();
         await expect(storageView.getByText('HDD', {exact: true})).toBeVisible();
-        await expect(storageView.getByText('250 GB', {exact: true})).toBeVisible();
-        await expect(storageView.getByText('600 GB', {exact: true})).toBeVisible();
+        await expect(
+            getSummaryMetric(ssdUserDataSummary, 'Used').getByText('250 GB', {exact: true}),
+        ).toBeVisible();
+        await expect(
+            getSummaryMetric(hddPhysicalSummary, 'Used').getByText('600 GB', {exact: true}),
+        ).toBeVisible();
     });
 
     test('keeps legacy dedicated storage layout when experiment is disabled', async ({page}) => {
@@ -359,7 +385,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
 
         await openStorageMetricsTab(page);
 
-        await expect(page.locator('.ydb-tenant-storage-new')).toHaveCount(0);
+        await expect(page.locator(STORAGE_VIEW_SELECTOR)).toHaveCount(0);
         await expect(page.getByText('Storage Details', {exact: true})).toBeVisible();
         await expect(page.getByText('Top tables by size', {exact: true})).toBeVisible();
     });
@@ -382,7 +408,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
 
         await openStorageMetricsTab(page);
 
-        await expect(page.locator('.ydb-tenant-storage-new')).toHaveCount(0);
+        await expect(page.locator(STORAGE_VIEW_SELECTOR)).toHaveCount(0);
         await expect(page.getByText('Storage Details', {exact: true})).toBeVisible();
         await expect(page.getByText('Top tables by size', {exact: true})).toBeVisible();
     });
@@ -403,7 +429,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
 
         await openStorageMetricsTab(page);
 
-        await expect(page.locator('.ydb-tenant-storage-new')).toHaveCount(0);
+        await expect(page.locator(STORAGE_VIEW_SELECTOR)).toHaveCount(0);
         await expect(page.getByText('Top tables by size', {exact: true})).toBeVisible();
     });
 });

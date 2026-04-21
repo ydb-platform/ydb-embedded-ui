@@ -65,6 +65,14 @@ function getTenantStorageType(unitKind?: string) {
     return EType.None;
 }
 
+function getStorageUsed(value?: string | number) {
+    return isNumeric(value) ? Number(value) : 0;
+}
+
+function getStorageLimit(value?: string | number) {
+    return isNumeric(value) ? Number(value) : undefined;
+}
+
 export const calculateTenantMetrics = (tenant: TTenant = {}) => {
     const {
         CoresUsed,
@@ -120,8 +128,8 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         blobStorageStats = DatabaseStorage.map((value) => {
             const {Type, Size, Limit} = value;
 
-            const used = Number(Size);
-            const limit = Number(Limit);
+            const used = getStorageUsed(Size);
+            const limit = getStorageLimit(Limit);
 
             return {
                 name: Type,
@@ -134,8 +142,8 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         blobStorageStats = StorageUsage.map((value) => {
             const {Type, Size, Limit} = value;
 
-            const used = Number(Size);
-            const limit = Number(Limit);
+            const used = getStorageUsed(Size);
+            const limit = getStorageLimit(Limit);
 
             return {
                 name: Type,
@@ -159,9 +167,9 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         tabletStorageStats = TablesStorage.map((value) => {
             const {Type, Size, Limit, SoftQuota} = value;
 
-            const used = Number(Size);
+            const used = getStorageUsed(Size);
             const typedQuota = storageQuotasByType.get(Type);
-            const limit = Number(SoftQuota ?? typedQuota ?? Limit);
+            const limit = getStorageLimit(SoftQuota) ?? typedQuota ?? getStorageLimit(Limit);
 
             return {
                 name: Type,
@@ -174,8 +182,8 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         tabletStorageStats = QuotaUsage.map((value) => {
             const {Type, Size, Limit} = value;
 
-            const used = Number(Size);
-            const limit = Number(Limit);
+            const used = getStorageUsed(Size);
+            const limit = getStorageLimit(Limit);
 
             return {
                 name: Type,

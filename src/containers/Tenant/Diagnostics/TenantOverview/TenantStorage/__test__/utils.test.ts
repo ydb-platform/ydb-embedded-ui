@@ -8,10 +8,12 @@ import {
     getTenantStoragePhysicalDisplaySegments,
     getTenantStorageUserDataDisplaySummary,
     isSystemStoragePath,
+    mergeSystemDetailsByMedia,
 } from '../utils';
 
 describe('buildTenantStorageData', () => {
     test('maps logical user data and physical segments by media', () => {
+        const topRowsError = new Error('top rows failed');
         const result = buildTenantStorageData(
             {
                 logicalUserData: {
@@ -58,6 +60,7 @@ describe('buildTenantStorageData', () => {
                         physicalDisk: 300,
                     },
                 ],
+                topRowsError,
             },
             {
                 blobStorageUsed: 950,
@@ -119,6 +122,7 @@ describe('buildTenantStorageData', () => {
                 overhead: 1.5,
             },
         ]);
+        expect(result.topRowsError).toBe(topRowsError);
     });
 
     test('adds unknown remainder to physical display segments', () => {
@@ -267,6 +271,27 @@ describe('buildTenantStorageData', () => {
         expect(isSystemStoragePath('/local/db/.sys/internal/table')).toBe(true);
         expect(isSystemStoragePath('/local/db/.metadata/migrations')).toBe(true);
         expect(isSystemStoragePath('/local/db/regular-table')).toBe(false);
+    });
+
+    test('aggregates system details across media', () => {
+        const result = mergeSystemDetailsByMedia({
+            SSD: [
+                {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive, value: 10},
+                {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.coordinator, value: 3},
+            ],
+            HDD: [
+                {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive, value: 15},
+                {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.schemeShard, value: 7},
+            ],
+        });
+
+        expect(result).toEqual(
+            expect.arrayContaining([
+                {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive, value: 25},
+                {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.coordinator, value: 3},
+                {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.schemeShard, value: 7},
+            ]),
+        );
     });
 
     test('builds media sections from TablesStorage and DatabaseStorage', () => {

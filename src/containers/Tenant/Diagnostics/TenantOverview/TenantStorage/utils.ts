@@ -80,6 +80,7 @@ export interface TenantStorageData {
         physical: TenantStorageSummary;
     };
     topRows: TenantStorageTopRow[];
+    topRowsError?: unknown;
     userDataSegments: TenantStorageSegment[];
     physicalSegmentsByMedia: Record<string, TenantStorageSegment[]>;
     systemDetailsByMedia: Record<string, TenantStorageSystemDetail[]>;
@@ -251,6 +252,20 @@ function mergeSegments(segmentsByMedia: Record<string, TenantStorageSegment[]>) 
 
         return nextResult;
     }, getPhysicalSegmentsBase());
+}
+
+export function mergeSystemDetailsByMedia(
+    detailsByMedia: Record<string, TenantStorageSystemDetail[]>,
+) {
+    return Object.values(detailsByMedia).reduce<TenantStorageSystemDetail[]>((result, details) => {
+        let nextResult = result;
+
+        for (const detail of details) {
+            nextResult = accumulateSystemDetail(nextResult, detail.key, detail.value);
+        }
+
+        return nextResult;
+    }, getSystemDetailsBase());
 }
 
 function buildPhysicalSegmentsByMedia(tabletTypeRows: TStorageStatsTabletTypeEntry[] | undefined) {
@@ -613,6 +628,7 @@ export function buildTenantStorageData(
                 overhead: row.userData > 0 ? physicalDisk / row.userData : undefined,
             };
         }),
+        topRowsError: rawData?.topRowsError,
         userDataSegments,
         physicalSegmentsByMedia,
         systemDetailsByMedia,
