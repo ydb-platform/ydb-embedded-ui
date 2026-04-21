@@ -4,6 +4,7 @@ import each from 'lodash/each';
 import keys from 'lodash/keys';
 import merge from 'lodash/merge';
 import qs from 'qs';
+import type {ParsedQs} from 'qs';
 import type {LocationWithQuery, ParamSetup} from 'redux-location-state';
 import {createReduxLocationActions} from 'redux-location-state';
 import {LOCATION_POP, LOCATION_PUSH} from 'redux-location-state/lib/constants';
@@ -13,6 +14,25 @@ import {stateToParams} from 'redux-location-state/lib/stateToParams';
 
 import {initialState as initialHeatmapState} from './reducers/heatmap';
 import {initialState as initialTenantState} from './reducers/tenant/tenant';
+
+const SCALAR_QUERY_PARAMS = [
+    'clusterName',
+    'database',
+    'tenantPage',
+    'schema',
+    'backend',
+    'monitoringTab',
+    'from',
+    'to',
+    'interval',
+    'utm_referrer',
+    'queryTab',
+    'diagnosticsTab',
+    'summaryTab',
+    'metricsTab',
+    'currentMetric',
+    'selectedConsumer',
+] as const;
 
 export const paramSetup = {
     // Do not delete, without `global` params redux-location-state goes crazy
@@ -117,9 +137,47 @@ function mergeLocationToState<S>(state: S, location: Pick<LocationWithQuery, 'qu
     return merge({}, state, location.query);
 }
 
-function restoreUnknownParams(location: Location, prevLocation: Location) {
+function normalizeScalarQueryParam(value: ParsedQs[string]) {
+    if (!Array.isArray(value)) {
+        return value;
+    }
+
+    for (let index = value.length - 1; index >= 0; index--) {
+        const item = value[index];
+
+        if (typeof item === 'string') {
+            return item;
+        }
+    }
+
+    return undefined;
+}
+
+function normalizeScalarQueryParams(params: ParsedQs) {
+    const normalizedParams = {...params};
+
+    SCALAR_QUERY_PARAMS.forEach((param) => {
+        const value = normalizedParams[param];
+
+        if (value === undefined) {
+            return;
+        }
+
+        const normalizedValue = normalizeScalarQueryParam(value);
+
+        if (normalizedValue === undefined) {
+            delete normalizedParams[param];
+        } else {
+            normalizedParams[param] = normalizedValue;
+        }
+    });
+
+    return normalizedParams;
+}
+
+export function restoreUnknownParams(location: Location, prevLocation: Location) {
     const {search, ...rest} = location;
-    const params = qs.parse(prevLocation.search.slice(1));
+    const params = normalizeScalarQueryParams(qs.parse(prevLocation.search.slice(1)));
 
     // figure out which path key inside paramSetup matches location.pathname
     const declaredPath = getMatchingDeclaredPath(paramSetup, location);
@@ -134,7 +192,14 @@ function restoreUnknownParams(location: Location, prevLocation: Location) {
         delete params[param];
     });
 
-    const restoredParams = qs.stringify(params, {encoder: encodeURIComponent});
+    const restoredParams = qs.stringify(params, {
+        arrayFormat: 'repeat',
+        encoder: encodeURIComponent,
+    });
+    if (!restoredParams) {
+        return {search, ...rest};
+    }
+
     const searchDelimiter = search.startsWith('?') ? '&' : '?';
 
     return {search: `${search}${searchDelimiter}${restoredParams}`, ...rest};
@@ -193,7 +258,7 @@ function makeReducersWithLocation<S, A extends UnknownAction, P = A>(
     };
 }
 
-export default function getLocationMiddleware<S = any, A extends Action = UnknownAction, P = S>(
+export default function getLocationMiddleware<S = unknown, A extends Action = UnknownAction, P = S>(
     history: History,
     rootReducer: Reducer<S, A, P>,
 ) {

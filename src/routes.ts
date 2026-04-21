@@ -63,8 +63,26 @@ const prepareRoute = (route: string) => {
 
 type Query = AnyRecord;
 
+const VOLATILE_QUERY_PARAMS = ['utm_referrer'] as const;
+
 export interface CreateHrefOptions {
     withBasename?: boolean;
+}
+
+function omitVolatileQueryParams(query: Query): Query {
+    let result = query;
+
+    VOLATILE_QUERY_PARAMS.forEach((param) => {
+        if (Object.prototype.hasOwnProperty.call(result, param)) {
+            if (result === query) {
+                result = {...query};
+            }
+
+            delete result[param];
+        }
+    });
+
+    return result;
 }
 
 // eslint-disable-next-line complexity
@@ -104,9 +122,13 @@ export function createHref(
         extendedParams = {...extendedParams, environment};
     }
 
-    const search = isEmpty(extendedQuery)
+    const normalizedQuery = omitVolatileQueryParams(extendedQuery);
+    const search = isEmpty(normalizedQuery)
         ? ''
-        : `?${qs.stringify(extendedQuery, {encode: false, arrayFormat: 'repeat'})}`;
+        : `?${qs.stringify(normalizedQuery, {
+              arrayFormat: 'repeat',
+              encoder: encodeURIComponent,
+          })}`;
 
     const preparedRoute = prepareRoute(route);
 
