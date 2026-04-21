@@ -51,6 +51,7 @@ interface EntityStatusLabelProps {
     withStatusName?: boolean;
     size?: LabelProps['size'];
     iconSize?: number;
+    onClick?: () => void;
 }
 
 function EntityStatusLabel({
@@ -60,6 +61,7 @@ function EntityStatusLabel({
     note,
     size = 'm',
     iconSize = 14,
+    onClick,
 }: EntityStatusLabelProps) {
     const theme = EFlagToLabelTheme[status];
     return (
@@ -68,7 +70,8 @@ function EntityStatusLabel({
                 theme={theme === 'orange' ? undefined : theme}
                 icon={<StatusIcon size={iconSize} status={status} />}
                 size={size}
-                className={b({orange: theme === 'orange'})}
+                className={b({orange: theme === 'orange', clickable: Boolean(onClick)})}
+                onClick={onClick}
             >
                 <Flex gap="2" wrap="nowrap">
                     {children}
