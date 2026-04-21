@@ -1,5 +1,19 @@
 # Changelog
 
+## [15.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.2.0...v15.3.0) (2026-04-20)
+
+
+### Features
+
+* implement empty state view when the last empty tab is closed ([#3796](https://github.com/ydb-platform/ydb-embedded-ui/issues/3796)) ([399c66e](https://github.com/ydb-platform/ydb-embedded-ui/commit/399c66e540c86ead874f57d592ecb58b67dd9e19))
+* revert admin ui to developer ui ([#3825](https://github.com/ydb-platform/ydb-embedded-ui/issues/3825)) ([ae80d92](https://github.com/ydb-platform/ydb-embedded-ui/commit/ae80d9298d5c12e82e7451a554a8fb3a066dacb8))
+
+
+### Bug Fixes
+
+* trim whitespace on Search filter fields to prevent failed searches ([#3811](https://github.com/ydb-platform/ydb-embedded-ui/issues/3811)) ([3c02025](https://github.com/ydb-platform/ydb-embedded-ui/commit/3c02025e1db1e95a15a3f66965582c60a71a7a30))
+* **VDiskWithDonorsStack:** prevent same key for donors ([#3808](https://github.com/ydb-platform/ydb-embedded-ui/issues/3808)) ([3ae6577](https://github.com/ydb-platform/ydb-embedded-ui/commit/3ae65773cd0e288ed0165a37669d9944ff76d05a))
+
 ## [15.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.1.0...v15.2.0) (2026-04-13)
 
 
