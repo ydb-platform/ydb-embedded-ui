@@ -6,6 +6,7 @@ import {isEmpty} from 'lodash';
 import {InternalLink} from '../../../../../components/InternalLink';
 import {getPDiskPagePath, useVDiskPagePath} from '../../../../../routes';
 import type {Location} from '../../../../../types/api/healthcheck';
+import {useHealthcheckContext} from '../../HealthcheckContext';
 import i18n from '../../i18n';
 
 import {NodeInfo} from './NodeInfo';
@@ -99,6 +100,7 @@ function GroupInfo({location}: StorageSectionProps) {
 
 function VDiskInfo({location}: StorageSectionProps) {
     const getVDiskPagePath = useVDiskPagePath();
+    const {clusterName} = useHealthcheckContext();
     const {node, pool} = location ?? {};
     const {group} = pool ?? {};
     const {vdisk} = group ?? {};
@@ -118,10 +120,13 @@ function VDiskInfo({location}: StorageSectionProps) {
                             ids={ids}
                             renderItem={(id) => (
                                 <InternalLink
-                                    to={getVDiskPagePath({
-                                        vDiskId: id,
-                                        nodeId: node?.id,
-                                    })}
+                                    to={getVDiskPagePath(
+                                        {
+                                            vDiskId: id,
+                                            nodeId: node?.id,
+                                        },
+                                        {clusterName},
+                                    )}
                                 >
                                     {id}
                                 </InternalLink>
@@ -135,6 +140,7 @@ function VDiskInfo({location}: StorageSectionProps) {
     );
 }
 function PDiskInfo({location}: StorageSectionProps) {
+    const {clusterName} = useHealthcheckContext();
     const {pool} = location ?? {};
     const {group} = pool ?? {};
     const {vdisk} = group ?? {};
@@ -160,7 +166,7 @@ function PDiskInfo({location}: StorageSectionProps) {
                     {
                         value:
                             nodeId && pdiskId ? (
-                                <InternalLink to={getPDiskPagePath(pdiskId, nodeId)}>
+                                <InternalLink to={getPDiskPagePath(pdiskId, nodeId, {clusterName})}>
                                     {disk.id}
                                 </InternalLink>
                             ) : (

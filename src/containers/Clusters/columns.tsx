@@ -78,9 +78,14 @@ export function getFirstVersion(preparedVersions: PreparedVersion[]): string | u
 interface ClustersColumnsParams {
     isEditClusterAvailable?: boolean;
     isDeleteClusterAvailable?: boolean;
+    onStatusClick?: (row: PreparedCluster) => void;
 }
 
-function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: ClustersColumnsParams) {
+function getTitleColumn({
+    isEditClusterAvailable,
+    isDeleteClusterAvailable,
+    onStatusClick,
+}: ClustersColumnsParams) {
     return {
         name: COLUMNS_NAMES.TITLE,
         header: COLUMNS_TITLES[COLUMNS_NAMES.TITLE],
@@ -136,15 +141,32 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
             };
 
             const renderStatus = () => {
-                if (clusterStatus) {
-                    return <EntityStatus.Label status={clusterStatus} size="xs" />;
-                }
-                return (
+                const statusLabel = clusterStatus ? (
+                    <EntityStatus.Label status={clusterStatus} size="xs" />
+                ) : (
                     <EntityStatus.Label
                         status={EFlag.Grey}
                         note={row.cluster?.error || i18n('tooltip_no-cluster-data')}
                         size="xs"
                     />
+                );
+
+                if (!onStatusClick || !clusterStatus) {
+                    return statusLabel;
+                }
+
+                return (
+                    <button
+                        type="button"
+                        className={b('status-button')}
+                        onClickCapture={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            onStatusClick(row);
+                        }}
+                    >
+                        {statusLabel}
+                    </button>
                 );
             };
 

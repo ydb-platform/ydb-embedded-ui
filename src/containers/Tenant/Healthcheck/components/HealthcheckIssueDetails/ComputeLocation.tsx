@@ -6,6 +6,7 @@ import {isEmpty} from 'lodash';
 import {InternalLink} from '../../../../../components/InternalLink';
 import {useTabletPagePath} from '../../../../../routes';
 import type {Location} from '../../../../../types/api/healthcheck';
+import {useHealthcheckContext} from '../../HealthcheckContext';
 import i18n from '../../i18n';
 
 import {NodeInfo} from './NodeInfo';
@@ -70,6 +71,7 @@ interface ComputeSectionProps {
 
 function TabletInfo({location}: ComputeSectionProps) {
     const getTabletPagePath = useTabletPagePath();
+    const {clusterName} = useHealthcheckContext();
     const {tablet} = location ?? {};
 
     if (!tablet) {
@@ -84,7 +86,9 @@ function TabletInfo({location}: ComputeSectionProps) {
                         <IdList
                             ids={tablet.id}
                             renderItem={(id) => (
-                                <InternalLink to={getTabletPagePath(id)}>{id}</InternalLink>
+                                <InternalLink to={getTabletPagePath(id, {clusterName})}>
+                                    {id}
+                                </InternalLink>
                             )}
                         />
                     ) : undefined,

@@ -62,6 +62,7 @@ export const nodePageQueryParams = {
     database: StringParam,
     pdiskId: StringParam,
     vdiskId: StringParam,
+    clusterName: StringParam,
 };
 
 export type NodePageQuery = QueryParamsTypeFromQueryObject<typeof nodePageQueryParams>;

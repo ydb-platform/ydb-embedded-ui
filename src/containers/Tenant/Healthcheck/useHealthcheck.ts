@@ -1,5 +1,6 @@
 import {
     healthcheckApi,
+    selectClusterLeavesIssues,
     selectLeavesIssues,
 } from '../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
@@ -37,6 +38,36 @@ export const useHealthcheck = (
 
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
     const leavesIssues = useTypedSelector((state) => selectLeavesIssues(state, database));
+
+    return {
+        loading: data === undefined && isFetching,
+        error,
+        refetch,
+        selfCheckResult,
+        fulfilledTimeStamp,
+        leavesIssues,
+    };
+};
+
+export const useClusterHealthcheck = (
+    clusterName: string,
+    {autorefresh}: {autorefresh?: number} = {},
+): HealthcheckParams => {
+    const {
+        currentData: data,
+        isFetching,
+        error,
+        refetch,
+        fulfilledTimeStamp,
+    } = healthcheckApi.useGetClusterHealthcheckInfoQuery(
+        {clusterName},
+        {
+            pollingInterval: autorefresh,
+        },
+    );
+
+    const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
+    const leavesIssues = useTypedSelector((state) => selectClusterLeavesIssues(state, clusterName));
 
     return {
         loading: data === undefined && isFetching,

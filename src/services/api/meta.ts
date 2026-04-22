@@ -1,5 +1,6 @@
 import type {MetaCapabilitiesResponse} from '../../types/api/capabilities';
 import type {MetaEnvironmentsResponse} from '../../types/api/environments';
+import type {HealthCheckAPIResponse} from '../../types/api/healthcheck';
 import type {
     MetaBaseClusterInfo,
     MetaBaseClusters,
@@ -88,5 +89,16 @@ export class MetaAPI extends BaseMetaAPI {
             },
             {concurrentId, requestConfig: {signal}},
         ).then((data) => data.clusters[0]);
+    }
+
+    getClusterHealth(
+        {clusterName}: {clusterName: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<HealthCheckAPIResponse>(
+            this.getPath('/meta/cluster_health'),
+            {cluster_name: clusterName},
+            {concurrentId, requestConfig: {signal}},
+        );
     }
 }

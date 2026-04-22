@@ -29,6 +29,17 @@
         color: var(--g-color-text-secondary);
     }
 
+    &__status-button {
+        display: inline-flex;
+
+        padding: 0;
+
+        cursor: pointer;
+
+        border: 0;
+        background: transparent;
+    }
+
     & .g-progress__item {
         transition: none;
     }

@@ -219,7 +219,7 @@ export function useVDiskPagePath() {
                 nodeId: string | number | undefined;
                 vDiskId: string | undefined;
             },
-            query: {activeTab?: string} = {},
+            query: {activeTab?: string; clusterName?: string} = {},
         ) => {
             if (!params.vDiskId) {
                 return undefined;

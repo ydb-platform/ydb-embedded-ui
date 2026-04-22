@@ -1,10 +1,12 @@
 import React from 'react';
 
+import {dateTimeParse} from '@gravity-ui/date-utils';
 import {Flex} from '@gravity-ui/uikit';
 
 import {InternalLink} from '../../../../../components/InternalLink';
 import {useTabletPagePath} from '../../../../../routes';
 import type {IssuesTree} from '../../../../../store/reducers/healthcheckInfo/types';
+import {useHealthcheckContext} from '../../HealthcheckContext';
 import i18n from '../../i18n';
 
 import type {LocationFieldCompute} from './ComputeLocation';
@@ -18,6 +20,7 @@ interface HealthcheckIssueDetailsProps {
 
 export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
     const getTabletPagePath = useTabletPagePath();
+    const {clusterName} = useHealthcheckContext();
 
     const {detailsFields, hiddenStorageFields, hiddenComputeFields} = React.useMemo(() => {
         const hiddenStorageFields: LocationFieldStorage[] = [];
@@ -25,6 +28,12 @@ export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
         const fields: {value?: React.ReactNode; title: string}[] = [
             {value: issue.message, title: i18n('label_description')},
         ];
+        if (issue.begin_time) {
+            fields.push({
+                value: dateTimeParse(issue.begin_time)?.format('YYYY-MM-DD HH:mm:ss'),
+                title: i18n('label_begin-time'),
+            });
+        }
         if (issue.type === 'STORAGE_POOL') {
             fields.push({
                 value: issue.location?.storage?.pool?.name,
@@ -47,7 +56,9 @@ export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
                         <IdList
                             ids={tablet.id}
                             renderItem={(id) => (
-                                <InternalLink to={getTabletPagePath(id)}>{id}</InternalLink>
+                                <InternalLink to={getTabletPagePath(id, {clusterName})}>
+                                    {id}
+                                </InternalLink>
                             )}
                         />
                     ) : undefined,
@@ -65,7 +76,7 @@ export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
             hiddenComputeFields.push('tablet');
         }
         return {detailsFields: fields, hiddenComputeFields, hiddenStorageFields};
-    }, [issue, getTabletPagePath]);
+    }, [issue, getTabletPagePath, clusterName]);
 
     const {location} = issue;
 

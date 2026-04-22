@@ -27,6 +27,20 @@ export const healthcheckApi = api.injectEndpoints({
             },
             providesTags: ['All'],
         }),
+        getClusterHealthcheckInfo: builder.query({
+            queryFn: async ({clusterName}: {clusterName: string}, {signal}) => {
+                try {
+                    if (!window.api.meta) {
+                        throw new Error('Meta API is not available');
+                    }
+                    const data = await window.api.meta.getClusterHealth({clusterName}, {signal});
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
     }),
     overrideExisting: 'throw',
 });
@@ -85,5 +99,42 @@ export const selectLeavesIssues = createSelector(
 export const selectAllHealthcheckInfo = createSelector(
     (state: RootState) => state,
     (_state: RootState, database: string) => createGetHealthcheckInfoSelector(database),
+    (state: RootState, selectGetPost) => selectGetPost(state).data,
+);
+
+const createGetClusterHealthcheckInfoSelector = createSelector(
+    (clusterName: string) => clusterName,
+    (clusterName) => healthcheckApi.endpoints.getClusterHealthcheckInfo.select({clusterName}),
+);
+
+export const selectClusterCheckStatus = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, clusterName: string) =>
+        createGetClusterHealthcheckInfoSelector(clusterName),
+    (state: RootState, selectGetPost) => selectGetPost(state).data?.self_check_result,
+);
+
+const getClusterIssuesLog = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, clusterName: string) =>
+        createGetClusterHealthcheckInfoSelector(clusterName),
+    (state: RootState, selectGetPost) => selectGetPost(state).data?.issue_log || [],
+);
+
+const selectClusterIssuesTreesRoots = createSelector(getClusterIssuesLog, (issues = []) =>
+    getRoots(issues),
+);
+
+export const selectClusterLeavesIssues = createSelector(
+    [getClusterIssuesLog, selectClusterIssuesTreesRoots],
+    (data = [], roots = []) => {
+        return roots.map((root) => sortIssues(getLeavesFromTree(data, root))).flat();
+    },
+);
+
+export const selectAllClusterHealthcheckInfo = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, clusterName: string) =>
+        createGetClusterHealthcheckInfoSelector(clusterName),
     (state: RootState, selectGetPost) => selectGetPost(state).data,
 );

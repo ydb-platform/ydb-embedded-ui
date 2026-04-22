@@ -65,6 +65,17 @@ export default defineConfig({
             },
         }),
     ],
+    server: {
+        proxy:
+            process.env.META_YDB_BACKEND && process.env.META_YDB_BACKEND !== 'undefined'
+                ? {
+                      '/meta': {
+                          target: process.env.META_YDB_BACKEND,
+                          changeOrigin: true,
+                      },
+                  }
+                : undefined,
+    },
     source: {
         entry: {
             index: './src/index.tsx',
