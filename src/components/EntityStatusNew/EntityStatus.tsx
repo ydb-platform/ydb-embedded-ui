@@ -64,14 +64,16 @@ function EntityStatusLabel({
     onClick,
 }: EntityStatusLabelProps) {
     const theme = EFlagToLabelTheme[status];
+    const isClickable = Boolean(onClick);
     return (
         <ActionTooltip title={EFlagToDescription[status]} disabled={Boolean(note)}>
             <Label
                 theme={theme === 'orange' ? undefined : theme}
                 icon={<StatusIcon size={iconSize} status={status} />}
                 size={size}
-                className={b({orange: theme === 'orange', clickable: Boolean(onClick)})}
+                className={b({orange: theme === 'orange', clickable: isClickable})}
                 onClick={onClick}
+                interactive={isClickable}
             >
                 <Flex gap="2" wrap="nowrap">
                     {children}

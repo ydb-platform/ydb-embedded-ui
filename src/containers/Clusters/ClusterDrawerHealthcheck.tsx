@@ -71,6 +71,7 @@ export function ClusterDrawerHealthcheck({
                         <ActionTooltip title={tenantI18n('label_download')}>
                             <Button
                                 view="flat"
+                                disabled={!healthcheckData}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     createAndDownloadJsonFile(

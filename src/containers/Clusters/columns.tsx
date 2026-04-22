@@ -156,25 +156,17 @@ function getTitleColumn({
                 }
 
                 return (
-                    <span
-                        role="button"
-                        tabIndex={0}
+                    <button
+                        type="button"
                         className={b('status-button')}
                         onClickCapture={(e) => {
                             e.stopPropagation();
                             e.preventDefault();
                             onStatusClick(row);
                         }}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                onStatusClick(row);
-                            }
-                        }}
                     >
                         {statusLabel}
-                    </span>
+                    </button>
                 );
             };
 
