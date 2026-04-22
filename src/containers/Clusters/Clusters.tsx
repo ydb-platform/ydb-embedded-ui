@@ -24,6 +24,7 @@ import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
 
+import {ClusterDrawerHealthcheck} from './ClusterDrawerHealthcheck';
 import {CLUSTERS_COLUMNS_WIDTH_LS_KEY, getClustersColumns} from './columns';
 import {
     CLUSTERS_SELECTED_COLUMNS_KEY,
@@ -70,9 +71,25 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         dispatch(changeClustersFilters({version: value}));
     };
 
+    const [healthcheckClusterName, setHealthcheckClusterName] = React.useState<string | undefined>(
+        undefined,
+    );
+    const handleStatusClick = React.useCallback((row: {name?: string}) => {
+        if (row.name) {
+            setHealthcheckClusterName(row.name);
+        }
+    }, []);
+    const handleDrawerClose = React.useCallback(() => {
+        setHealthcheckClusterName(undefined);
+    }, []);
+
     const rawColumns = React.useMemo(() => {
-        return getClustersColumns({isEditClusterAvailable, isDeleteClusterAvailable});
-    }, [isDeleteClusterAvailable, isEditClusterAvailable]);
+        return getClustersColumns({
+            isEditClusterAvailable,
+            isDeleteClusterAvailable,
+            onStatusClick: handleStatusClick,
+        });
+    }, [isDeleteClusterAvailable, isEditClusterAvailable, handleStatusClick]);
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         rawColumns,
@@ -208,21 +225,27 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     };
 
     return (
-        <TableWithControlsLayout fullHeight className={b(null)}>
-            <TableWithControlsLayout.Controls
-                className={b('controls')}
-                renderExtraControls={renderColumnSetup}
-            >
-                {renderControls()}
-            </TableWithControlsLayout.Controls>
-            {query.isError ? <ResponseError error={query.error} /> : null}
-            {renderClustersCount()}
-            <TableWithControlsLayout.Table
-                scrollContainerRef={scrollContainerRef}
-                className={b('table-wrapper')}
-            >
-                {renderContent()}
-            </TableWithControlsLayout.Table>
-        </TableWithControlsLayout>
+        <ClusterDrawerHealthcheck
+            clusterName={healthcheckClusterName}
+            isVisible={Boolean(healthcheckClusterName)}
+            onClose={handleDrawerClose}
+        >
+            <TableWithControlsLayout fullHeight className={b(null)}>
+                <TableWithControlsLayout.Controls
+                    className={b('controls')}
+                    renderExtraControls={renderColumnSetup}
+                >
+                    {renderControls()}
+                </TableWithControlsLayout.Controls>
+                {query.isError ? <ResponseError error={query.error} /> : null}
+                {renderClustersCount()}
+                <TableWithControlsLayout.Table
+                    scrollContainerRef={scrollContainerRef}
+                    className={b('table-wrapper')}
+                >
+                    {renderContent()}
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        </ClusterDrawerHealthcheck>
     );
 }

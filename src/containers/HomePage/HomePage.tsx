@@ -5,6 +5,7 @@ import {Helmet} from 'react-helmet-async';
 import {Redirect, Route, Switch, useHistory} from 'react-router-dom';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
+import {DrawerContextProvider} from '../../components/Drawer/DrawerContext';
 import {PageError} from '../../components/Errors/PageError/PageError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import type {HomePageTab} from '../../routes';
@@ -262,10 +263,12 @@ export function HomePage() {
             <LoaderWrapper loading={environmentsLoading}>
                 {renderHelmet()}
                 <GetMetaUser>
-                    <Flex direction="column" className={b()} ref={scrollContainerRef}>
-                        {renderTabs()}
-                        <Flex className={b('content-wrapper')}>{renderContent()}</Flex>
-                    </Flex>
+                    <DrawerContextProvider className={b('drawer-context')}>
+                        <Flex direction="column" className={b()} ref={scrollContainerRef}>
+                            {renderTabs()}
+                            <Flex className={b('content-wrapper')}>{renderContent()}</Flex>
+                        </Flex>
+                    </DrawerContextProvider>
                 </GetMetaUser>
             </LoaderWrapper>
         </PageError>

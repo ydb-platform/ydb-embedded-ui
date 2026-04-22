@@ -24,6 +24,7 @@
   "label_storage_location": "Storage Location",
   "label_compute_location": "Compute Location",
   "label_description": "Description",
+  "label_begin-time": "Begin time",
   "label_node-id": "Node ID",
   "label_node-host": "Node Host",
   "label_node-port": "Node Port",

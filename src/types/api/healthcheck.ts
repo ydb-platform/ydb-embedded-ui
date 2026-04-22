@@ -92,6 +92,8 @@ export interface IssueLog {
     level?: number;
     listed?: number;
     count?: number;
+    /** ISO 8601 timestamp of when the issue began. Provided by cluster-level healthcheck. */
+    begin_time?: string;
 }
 
 interface StoragePDiskStatus {

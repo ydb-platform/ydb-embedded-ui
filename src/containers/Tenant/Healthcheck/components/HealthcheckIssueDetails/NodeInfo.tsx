@@ -2,6 +2,7 @@ import {InternalLink} from '../../../../../components/InternalLink';
 import {getDefaultNodePath} from '../../../../../routes';
 import type {Location} from '../../../../../types/api/healthcheck';
 import {useTenantQueryParams} from '../../../useTenantQueryParams';
+import {useHealthcheckContext} from '../../HealthcheckContext';
 import i18n from '../../i18n';
 
 import {LocationDetails} from './utils';
@@ -13,12 +14,15 @@ interface NodeInfoProps {
 
 export function NodeInfo({node, title}: NodeInfoProps) {
     const {database} = useTenantQueryParams();
+    const {clusterName} = useHealthcheckContext();
     if (!node) {
         return null;
     }
 
     const nodeLink = node.id ? (
-        <InternalLink to={getDefaultNodePath({id: node.id}, {database})}>{node.id}</InternalLink>
+        <InternalLink to={getDefaultNodePath({id: node.id}, {database, clusterName})}>
+            {node.id}
+        </InternalLink>
     ) : undefined;
 
     return (
