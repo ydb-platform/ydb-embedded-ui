@@ -352,6 +352,45 @@ describe('buildTenantStorageData', () => {
         ]);
     });
 
+    test('uses aggregate section when only tablet stats have media split', () => {
+        const result = buildTenantStorageMediaSections({
+            metrics: {
+                blobStorageUsed: 1_000,
+                blobStorageLimit: 3_000,
+                tabletStorageUsed: 300,
+                tabletStorageLimit: 700,
+            },
+            tabletStorageStats: [
+                {name: EType.SSD, used: 250, limit: 500},
+                {name: EType.HDD, used: 50, limit: 200},
+            ],
+        });
+
+        expect(result).toEqual([
+            {
+                mediaType: EType.None,
+                userData: {
+                    available: 400,
+                    quota: 700,
+                    used: 300,
+                    usedPercent: expect.any(Number),
+                    segments: [],
+                },
+                physical: {
+                    available: 2_000,
+                    overhead: expect.any(Number),
+                    total: 3_000,
+                    used: 1_000,
+                    usedPercent: expect.any(Number),
+                    segments: [],
+                },
+            },
+        ]);
+        expect(result[0]?.userData.usedPercent).toBeCloseTo(42.857142857142854);
+        expect(result[0]?.physical.overhead).toBeCloseTo(1_000 / 300);
+        expect(result[0]?.physical.usedPercent).toBeCloseTo(33.333333333333336);
+    });
+
     test('falls back to overall quotas for single-media sections when per-type limits are missing', () => {
         const result = buildTenantStorageMediaSections({
             blobStorageStats: [{name: EType.SSD, used: 500}],
