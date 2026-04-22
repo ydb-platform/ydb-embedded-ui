@@ -151,7 +151,7 @@ function getTitleColumn({
                     />
                 );
 
-                if (!onStatusClick) {
+                if (!onStatusClick || !clusterStatus) {
                     return statusLabel;
                 }
 
