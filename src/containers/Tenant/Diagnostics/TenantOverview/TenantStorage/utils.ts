@@ -493,12 +493,9 @@ export function buildTenantStorageMediaSections({
     const blobStatsByType = buildStatsByType(blobStorageStats);
     const tabletStatsByType = buildStatsByType(tabletStorageStats);
 
-    const mediaTypes = Array.from(
-        new Set<EType>([
-            ...Array.from(blobStatsByType.keys()),
-            ...Array.from(tabletStatsByType.keys()),
-        ]),
-    ).sort((left, right) => getMediaSortOrder(left) - getMediaSortOrder(right));
+    const mediaTypes = Array.from(blobStatsByType.keys()).sort(
+        (left, right) => getMediaSortOrder(left) - getMediaSortOrder(right),
+    );
 
     if (mediaTypes.length === 0) {
         const userUsed = normalizeNumber(metrics.tabletStorageUsed);

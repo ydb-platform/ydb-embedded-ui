@@ -366,7 +366,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
             getSummaryMetric(ssdUserDataSummary, 'Used').getByText('250 GB', {exact: true}),
         ).toBeVisible();
         await expect(
-            getSummaryMetric(hddPhysicalSummary, 'Used').getByText('600 GB', {exact: true}),
+            getSummaryMetric(hddPhysicalSummary, 'Used').getByText('0.6 TB', {exact: true}),
         ).toBeVisible();
     });
 
