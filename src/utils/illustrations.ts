@@ -30,12 +30,15 @@ function normalizeIllustrationComponent(illustration: unknown): IllustrationComp
     }
 
     if (typeof normalizedValue === 'string') {
-        return function IllustrationImage(props) {
-            const imgProps = props as unknown as React.ImgHTMLAttributes<HTMLImageElement>;
+        return function IllustrationImage({width, height, className, style, onClick}) {
             return React.createElement('img', {
-                ...imgProps,
+                width,
+                height,
+                className,
+                style,
+                onClick,
                 src: normalizedValue,
-                alt: imgProps.alt ?? '',
+                alt: '',
             });
         };
     }
