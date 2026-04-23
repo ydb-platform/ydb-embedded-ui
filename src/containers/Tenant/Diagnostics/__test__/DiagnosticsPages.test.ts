@@ -41,4 +41,36 @@ describe('DiagnosticsPages', () => {
             TENANT_DIAGNOSTICS_TABS_IDS.storageUsage,
         );
     });
+
+    test('shows backups tab for serverless databases when backups are available', () => {
+        const pages = getPagesByType(EPathType.EPathTypeExtSubDomain, undefined, {
+            ...BASE_OPTIONS,
+            isDatabase: true,
+            databaseType: 'Serverless',
+        });
+
+        expect(pages.map((page) => page.id)).toContain(TENANT_DIAGNOSTICS_TABS_IDS.backups);
+    });
+
+    test('hides backups tab for serverless databases when backups are unavailable', () => {
+        const pages = getPagesByType(EPathType.EPathTypeExtSubDomain, undefined, {
+            ...BASE_OPTIONS,
+            hasBackups: false,
+            isDatabase: true,
+            databaseType: 'Serverless',
+        });
+
+        expect(pages.map((page) => page.id)).not.toContain(TENANT_DIAGNOSTICS_TABS_IDS.backups);
+    });
+
+    test('shows backups tab for serverless databases in database pages display mode', () => {
+        const pages = getPagesByType(EPathType.EPathTypeExtSubDomain, undefined, {
+            ...BASE_OPTIONS,
+            isDatabase: true,
+            databaseType: 'Serverless',
+            databasePagesDisplay: 'database',
+        });
+
+        expect(pages.map((page) => page.id)).toContain(TENANT_DIAGNOSTICS_TABS_IDS.backups);
+    });
 });
