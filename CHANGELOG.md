@@ -1,5 +1,18 @@
 # Changelog
 
+## [15.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.3.0...v15.4.0) (2026-04-23)
+
+
+### Features
+
+* add Cluster Healthcheck drawer and integrate healthcheck ([#3822](https://github.com/ydb-platform/ydb-embedded-ui/issues/3822)) ([a16854a](https://github.com/ydb-platform/ydb-embedded-ui/commit/a16854a0c2a57efee5d488a51e45895c95758aff))
+* add cluster healthcheck status ([#3830](https://github.com/ydb-platform/ydb-embedded-ui/issues/3830)) ([be05de0](https://github.com/ydb-platform/ydb-embedded-ui/commit/be05de0dc21cd3168604999f532db5eee6be8cbf))
+
+
+### Bug Fixes
+
+* show backups tab on serverless databases ([#3832](https://github.com/ydb-platform/ydb-embedded-ui/issues/3832)) ([19aa028](https://github.com/ydb-platform/ydb-embedded-ui/commit/19aa0285ec574c31e1071278479d3dc9a65b6ccf))
+
 ## [15.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.2.0...v15.3.0) (2026-04-20)
 
 
