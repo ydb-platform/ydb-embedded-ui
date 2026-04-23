@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
     AccessDenied,
     Identity,
@@ -17,6 +19,30 @@ const defaults: Record<IllustrationName, IllustrationComponent> = {
     SuccessOperation,
 };
 
+function normalizeIllustrationComponent(illustration: unknown): IllustrationComponent | undefined {
+    const normalizedValue =
+        typeof illustration === 'object' && illustration !== null && 'default' in illustration
+            ? (illustration as {default?: unknown}).default
+            : illustration;
+
+    if (typeof normalizedValue === 'function') {
+        return normalizedValue as IllustrationComponent;
+    }
+
+    if (typeof normalizedValue === 'string') {
+        return function IllustrationImage(props) {
+            const imgProps = props as unknown as React.ImgHTMLAttributes<HTMLImageElement>;
+            return React.createElement('img', {
+                ...imgProps,
+                src: normalizedValue,
+                alt: imgProps.alt ?? '',
+            });
+        };
+    }
+
+    return undefined;
+}
+
 export function getIllustration(name: IllustrationName): IllustrationComponent {
-    return uiFactory.illustrations?.[name] ?? defaults[name];
+    return normalizeIllustrationComponent(uiFactory.illustrations?.[name]) ?? defaults[name];
 }
