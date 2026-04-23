@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {render} from '@testing-library/react';
+
 import {configureUIFactory} from '../../uiFactory/uiFactory';
 import {getIllustration} from '../illustrations';
 
@@ -34,16 +36,11 @@ describe('getIllustration', () => {
         expect(rendered.props.width).toBe(100);
         expect(rendered.props.height).toBe(100);
 
-        if (typeof rendered.type !== 'function') {
-            throw new Error('Expected image illustration to be rendered as a function component');
-        }
-
-        const imgElement = (rendered.type as (props: typeof rendered.props) => React.ReactElement)(
-            rendered.props,
-        );
-        expect(imgElement.type).toBe('img');
-        expect(imgElement.props.src).toBe('/assets/no-search-results.svg');
-        expect(imgElement.props.width).toBe(100);
-        expect(imgElement.props.height).toBe(100);
+        const {container} = render(rendered);
+        const imgElement = container.querySelector('img');
+        expect(imgElement).not.toBeNull();
+        expect(imgElement?.getAttribute('src')).toBe('/assets/no-search-results.svg');
+        expect(imgElement?.getAttribute('width')).toBe('100');
+        expect(imgElement?.getAttribute('height')).toBe('100');
     });
 });
