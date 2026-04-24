@@ -621,7 +621,7 @@ export function buildTenantStorageData(
             return {
                 ...row,
                 physicalDisk,
-                dbShare: physicalUsed > 0 ? physicalDisk / physicalUsed : 0,
+                dbShare: userUsed > 0 ? row.userData / userUsed : 0,
                 overhead: row.userData > 0 ? physicalDisk / row.userData : undefined,
             };
         }),
