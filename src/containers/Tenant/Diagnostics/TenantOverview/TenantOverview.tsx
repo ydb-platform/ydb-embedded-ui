@@ -10,7 +10,7 @@ import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/Quer
 import {ServerlessDBLabel} from '../../../../components/ServerlessDBLabel/ServerlessDBLabel';
 import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {healthcheckApi} from '../../../../store/reducers/healthcheckInfo/healthcheckInfo';
-import {selfCheckResultToColorFlag} from '../../../../store/reducers/healthcheckInfo/utils';
+import {hcStatusToColorFlag} from '../../../../store/reducers/healthcheckInfo/utils';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_METRICS_TABS_IDS,
@@ -74,7 +74,7 @@ export function TenantOverview({
     const {Name, Type, Overall, ControlPlane, CoresTotal} = tenant || {};
     const isServerless = Type === 'Serverless';
 
-    // Use healthcheck self_check_result as the database status color when available;
+    // Use healthcheck database_status.overall as the database status color when available;
     // fall back to tenantinfo.Overall (e.g. for Serverless databases where healthcheck is skipped).
     const {currentData: healthcheckData} = healthcheckApi.useGetHealthcheckInfoQuery(
         {database},
@@ -83,10 +83,8 @@ export function TenantOverview({
             skip: isServerless,
         },
     );
-    const healthcheckStatus = healthcheckData?.self_check_result;
-    const databaseStatus = healthcheckStatus
-        ? selfCheckResultToColorFlag[healthcheckStatus]
-        : Overall;
+    const healthcheckStatus = healthcheckData?.database_status?.[0]?.overall;
+    const databaseStatus = healthcheckStatus ? hcStatusToColorFlag[healthcheckStatus] : Overall;
     const activeMetricsTab =
         isServerless &&
         metricsTab !== TENANT_METRICS_TABS_IDS.cpu &&
