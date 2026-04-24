@@ -118,11 +118,61 @@ describe('buildTenantStorageData', () => {
                 pathType: EPathType.EPathTypeTable,
                 userData: 200,
                 physicalDisk: 300,
-                dbShare: 300 / 950,
+                dbShare: 200 / 350,
                 overhead: 1.5,
             },
         ]);
         expect(result.topRowsError).toBe(topRowsError);
+    });
+
+    test('falls back to tablet storage metric for database share', () => {
+        const result = buildTenantStorageData(
+            {
+                tabletTypeRows: [],
+                topRows: [
+                    {
+                        path: '/local/db/table-a',
+                        userData: 120,
+                        physicalDisk: 360,
+                    },
+                ],
+            },
+            {
+                blobStorageUsed: 900,
+                tabletStorageUsed: 480,
+            },
+        );
+
+        expect(result.summary.userData.used).toBe(480);
+        expect(result.topRows[0]?.dbShare).toBe(120 / 480);
+        expect(result.topRows[0]?.overhead).toBe(3);
+    });
+
+    test('returns zero database share when logical used is zero', () => {
+        const result = buildTenantStorageData(
+            {
+                logicalUserData: {
+                    rowTables: 0,
+                    topics: 0,
+                },
+                tabletTypeRows: [],
+                topRows: [
+                    {
+                        path: '/local/db/table-a',
+                        userData: 120,
+                        physicalDisk: 360,
+                    },
+                ],
+            },
+            {
+                blobStorageUsed: 900,
+                tabletStorageUsed: 480,
+            },
+        );
+
+        expect(result.summary.userData.used).toBe(0);
+        expect(result.topRows[0]?.dbShare).toBe(0);
+        expect(result.topRows[0]?.overhead).toBe(3);
     });
 
     test('adds unknown remainder to physical display segments', () => {
