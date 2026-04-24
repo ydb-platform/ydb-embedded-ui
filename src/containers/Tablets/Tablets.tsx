@@ -2,6 +2,7 @@ import React from 'react';
 
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
@@ -11,6 +12,9 @@ import {valueIsDefined} from '../../utils';
 import {useAutoRefreshInterval, useTypedSelector} from '../../utils/hooks';
 
 import {TabletsTable} from './TabletsTable';
+
+const TABLET_ID_SEARCH_DEBOUNCE = 1000;
+const TABLET_ID_PATTERN = /^\d+$/;
 
 const activeStatuses: ETabletState[] = [
     ETabletState.Created,
@@ -51,8 +55,36 @@ export function Tablets({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const useMetaProxy = useClusterWithProxy();
 
-    let params: TabletsApiRequestParams = {};
-    const filter = onlyActive ? `(State=[${activeStatuses.join(',')}])` : undefined;
+    // When tablets are opened on a database page, allow searching for any
+    // tablet of the database via the backend. On other schema objects the
+    // search remains client-side over the already loaded tablets list.
+    const isDatabasePage = !isNil(path) && !isNil(databaseFullPath) && path === databaseFullPath;
+
+    const [{tabletsSearch}] = useQueryParams({tabletsSearch: StringParam});
+
+    // Debounce the search value before sending it to the backend, since the
+    // request can be heavy.
+    const [debouncedSearch, setDebouncedSearch] = React.useState(tabletsSearch ?? '');
+    React.useEffect(() => {
+        const value = tabletsSearch ?? '';
+        const timer = window.setTimeout(() => {
+            setDebouncedSearch(value);
+        }, TABLET_ID_SEARCH_DEBOUNCE);
+        return () => {
+            window.clearTimeout(timer);
+        };
+    }, [tabletsSearch]);
+
+    const useBackendSearch = isDatabasePage && TABLET_ID_PATTERN.test(debouncedSearch);
+
+    const filterParts: string[] = [];
+    if (useBackendSearch) {
+        filterParts.push(`TabletId=${debouncedSearch}`);
+    }
+    if (onlyActive) {
+        filterParts.push(`State=[${activeStatuses.join(',')}]`);
+    }
+    const filter = filterParts.length ? `(${filterParts.join(';')})` : undefined;
 
     const schemaPathParam = React.useMemo(() => {
         if (!isNil(path) && !isNil(databaseFullPath)) {
@@ -61,8 +93,13 @@ export function Tablets({
         return undefined;
     }, [path, databaseFullPath, useMetaProxy]);
 
+    let params: TabletsApiRequestParams = {};
     if (valueIsDefined(nodeId)) {
         params = {nodeId, database, filter};
+    } else if (useBackendSearch) {
+        // Search across the entire database: omit the schema path so the
+        // backend returns any tablet with the given TabletId.
+        params = {database, filter};
     } else if (schemaPathParam) {
         params = {path: schemaPathParam, database, filter};
     }
