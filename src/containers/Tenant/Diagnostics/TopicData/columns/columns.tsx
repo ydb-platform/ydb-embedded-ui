@@ -252,9 +252,8 @@ function Offset({offset, removed, notLoaded}: PartitionIdProps) {
     });
 
     const handleClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
-        // Cmd+Click (Mac) or Ctrl+Click (Windows/Linux) opens in a new tab
-        if (e.metaKey || e.ctrlKey) {
-            // Allow default link behavior (open in new tab)
+        // Let the browser handle modified clicks (new tab/window) natively
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
             e.stopPropagation();
             return;
         }
