@@ -14,9 +14,9 @@ const WARMUP_PAGES = [
     // Storage page
     'cluster/storage',
     // Database diagnostics
-    'database?schema=/local&database=/local&tenantPage=diagnostics',
+    'database?schema=/local&database=/local&databasePage=diagnostics',
     // Query editor (triggers Monaco Editor lazy load + YDB query session init)
-    'database?schema=/local&database=/local&tenantPage=query',
+    'database?schema=/local&database=/local&databasePage=query',
 ];
 
 async function waitForPageReady(page: PageModel) {
@@ -57,7 +57,7 @@ async function warmupApplication(page: PageModel) {
 
     // Execute a simple query to warm up KQP compile cache and query session
     try {
-        await page.page.goto(`${baseURL}database?schema=/local&database=/local&tenantPage=query`);
+        await page.page.goto(`${baseURL}database?schema=/local&database=/local&databasePage=query`);
         await waitForPageReady(page);
 
         // Wait for Monaco editor to load

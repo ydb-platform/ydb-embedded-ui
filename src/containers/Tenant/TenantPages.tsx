@@ -4,11 +4,13 @@ import type {paramSetup} from '../../store/state-url-mapping';
 import type {ExtractType} from '../../types/common';
 
 type TenantQueryParams = {
-    [K in keyof (typeof paramSetup)['/tenant']]?: ExtractType<(typeof paramSetup)['/tenant'][K]>;
+    [K in keyof (typeof paramSetup)['/database']]?: ExtractType<
+        (typeof paramSetup)['/database'][K]
+    >;
 };
 
 type AdditionalQueryParams = {
-    tenantPage?: TenantPage;
+    databasePage?: TenantPage;
     database?: string;
     name?: string;
     clusterName?: string;

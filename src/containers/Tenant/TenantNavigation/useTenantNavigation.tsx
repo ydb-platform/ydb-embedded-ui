@@ -7,7 +7,11 @@ import {StringParam, useQueryParams} from 'use-query-params';
 
 import routes, {getTenantPath, parseQuery} from '../../../routes';
 import {DEFAULT_USER_SETTINGS, SETTING_KEYS} from '../../../store/reducers/settings/constants';
-import {TENANT_PAGE, TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
+import {
+    LEGACY_TENANT_PAGE,
+    TENANT_PAGE,
+    TENANT_PAGES_IDS,
+} from '../../../store/reducers/tenant/constants';
 import {tenantPageSchema} from '../../../store/reducers/tenant/types';
 import type {TenantPage} from '../../../store/reducers/tenant/types';
 import {useSetting} from '../../../utils/hooks';
@@ -100,9 +104,17 @@ export function useTenantNavigation(): TenantNavigationItem[] {
 }
 
 export function useTenantPage() {
-    const [{tenantPage: tenantPageFromQuery}, setQueryParams] = useQueryParams({
-        tenantPage: StringParam,
+    const [
+        {databasePage: databasePageFromQuery, tenantPage: legacyTenantPageFromQuery},
+        setQueryParams,
+    ] = useQueryParams({
+        [TENANT_PAGE]: StringParam,
+        [LEGACY_TENANT_PAGE]: StringParam,
     });
+
+    // Backward compatibility: prefer the new `databasePage` param, but fall back to
+    // the legacy `tenantPage` param if it's the only one present (old bookmarks/links).
+    const tenantPageFromQuery = databasePageFromQuery ?? legacyTenantPageFromQuery;
 
     const [initialTenantPage, setInitialTenantPage] = useSetting<TenantPage | undefined>(
         SETTING_KEYS.TENANT_INITIAL_PAGE,
@@ -110,7 +122,7 @@ export function useTenantPage() {
 
     const handleTenantPageChange = React.useCallback(
         (value?: TenantPage) => {
-            setQueryParams({tenantPage: value});
+            setQueryParams({[TENANT_PAGE]: value, [LEGACY_TENANT_PAGE]: undefined});
             setInitialTenantPage(value);
         },
         [setQueryParams, setInitialTenantPage],
@@ -130,13 +142,30 @@ export function useTenantPage() {
     );
 
     React.useEffect(() => {
+        // Migrate legacy `tenantPage` to `databasePage` and drop the old key from the URL.
+        if (legacyTenantPageFromQuery !== undefined && legacyTenantPageFromQuery !== null) {
+            setQueryParams(
+                {
+                    [TENANT_PAGE]: databasePageFromQuery ?? legacyTenantPageFromQuery,
+                    [LEGACY_TENANT_PAGE]: undefined,
+                },
+                'replaceIn',
+            );
+            return;
+        }
         try {
             tenantPageSchema.parse(tenantPageFromQuery);
         } catch {
             // Invalid value in URL - replace with valid fallback
-            setQueryParams({tenantPage: parsedInitialPage}, 'replaceIn');
+            setQueryParams({[TENANT_PAGE]: parsedInitialPage}, 'replaceIn');
         }
-    }, [parsedInitialPage, setQueryParams, tenantPageFromQuery]);
+    }, [
+        parsedInitialPage,
+        setQueryParams,
+        tenantPageFromQuery,
+        legacyTenantPageFromQuery,
+        databasePageFromQuery,
+    ]);
 
     return {tenantPage, handleTenantPageChange} as const;
 }
