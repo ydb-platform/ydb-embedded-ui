@@ -4,7 +4,7 @@ import {SelfCheckResult, StatusFlag} from '../../../types/api/healthcheck';
 
 import type {IssuesTree} from './types';
 
-export const hcStatusToColorFlag: Record<StatusFlag | SelfCheckResult, EFlag> = {
+export const hcStatusToColorFlag: Record<StatusFlag, EFlag> = {
     [StatusFlag.UNSPECIFIED]: EFlag.Grey,
     [StatusFlag.GREY]: EFlag.Grey,
     [StatusFlag.GREEN]: EFlag.Green,
@@ -12,10 +12,14 @@ export const hcStatusToColorFlag: Record<StatusFlag | SelfCheckResult, EFlag> = 
     [StatusFlag.YELLOW]: EFlag.Yellow,
     [StatusFlag.ORANGE]: EFlag.Orange,
     [StatusFlag.RED]: EFlag.Red,
-    [SelfCheckResult.GOOD]: EFlag.Green,
-    [SelfCheckResult.DEGRADED]: EFlag.Blue,
-    [SelfCheckResult.MAINTENANCE_REQUIRED]: EFlag.Yellow,
-    [SelfCheckResult.EMERGENCY]: EFlag.Red,
+};
+
+export const selfCheckResultToHcStatus: Record<SelfCheckResult, StatusFlag> = {
+    [SelfCheckResult.UNSPECIFIED]: StatusFlag.GREY,
+    [SelfCheckResult.GOOD]: StatusFlag.GREEN,
+    [SelfCheckResult.DEGRADED]: StatusFlag.YELLOW,
+    [SelfCheckResult.MAINTENANCE_REQUIRED]: StatusFlag.RED,
+    [SelfCheckResult.EMERGENCY]: StatusFlag.RED,
 };
 
 function getTypeForUI(type?: string) {

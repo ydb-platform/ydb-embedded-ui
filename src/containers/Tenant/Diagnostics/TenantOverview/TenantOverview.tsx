@@ -10,7 +10,10 @@ import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/Quer
 import {ServerlessDBLabel} from '../../../../components/ServerlessDBLabel/ServerlessDBLabel';
 import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {healthcheckApi} from '../../../../store/reducers/healthcheckInfo/healthcheckInfo';
-import {hcStatusToColorFlag} from '../../../../store/reducers/healthcheckInfo/utils';
+import {
+    hcStatusToColorFlag,
+    selfCheckResultToHcStatus,
+} from '../../../../store/reducers/healthcheckInfo/utils';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_METRICS_TABS_IDS,
@@ -86,8 +89,12 @@ export function TenantOverview({
         },
     );
     const selfCheckResult = healthcheckData?.self_check_result;
+    const healthcheckStatus =
+        selfCheckResult === undefined ? undefined : selfCheckResultToHcStatus[selfCheckResult];
     const databaseStatus =
-        selfCheckResult === undefined ? Overall : (hcStatusToColorFlag[selfCheckResult] ?? Overall);
+        healthcheckStatus === undefined
+            ? Overall
+            : (hcStatusToColorFlag[healthcheckStatus] ?? Overall);
     const activeMetricsTab =
         isServerless &&
         metricsTab !== TENANT_METRICS_TABS_IDS.cpu &&
