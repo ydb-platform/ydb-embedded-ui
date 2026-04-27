@@ -10,7 +10,7 @@ import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
 import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
-import routes, {getClusterPath} from '../../routes';
+import routes, {CLUSTER, getClusterPath} from '../../routes';
 import type {RootState} from '../../store';
 import {
     useAllCapabilitiesLoaded,
@@ -178,6 +178,24 @@ export function Content(props: ContentProps) {
                                     pathname: location.pathname.replace(
                                         /\/tenant(\/|$)/,
                                         '/database$1',
+                                    ),
+                                    search: location.search,
+                                    hash: location.hash,
+                                }}
+                            />
+                        )}
+                    />
+                    {/* Backwards compatibility: redirect legacy `/cluster/tenants` URL to `/cluster/databases`,
+                        preserving any query params and hash from old bookmarks. */}
+                    <Route
+                        path={`/:environment?/${CLUSTER}/tenants`}
+                        exact
+                        render={({location}) => (
+                            <Redirect
+                                to={{
+                                    pathname: location.pathname.replace(
+                                        /\/cluster\/tenants(\/|$)/,
+                                        '/cluster/databases$1',
                                     ),
                                     search: location.search,
                                     hash: location.hash,

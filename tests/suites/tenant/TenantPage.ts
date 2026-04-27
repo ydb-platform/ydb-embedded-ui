@@ -1,7 +1,7 @@
 import type {Locator, Page} from '@playwright/test';
 
 import {PageModel} from '../../models/PageModel';
-import {tenantPage} from '../../utils/constants';
+import {databasePage} from '../../utils/constants';
 
 import {QueryEditor, QueryTabs} from './queryEditor/models/QueryEditor';
 import {SaveQueryDialog} from './queryEditor/models/SaveQueryDialog';
@@ -33,7 +33,7 @@ export class TenantPage extends PageModel {
     private emptyStateTitle: Locator;
 
     constructor(page: Page) {
-        super(page, tenantPage);
+        super(page, databasePage);
 
         this.navigation = page.locator('.ydb-tenant-navigation');
         this.radioGroup = this.navigation.locator('.g-segmented-radio-group');
@@ -90,7 +90,7 @@ export class TenantPage extends PageModel {
         return this.goto({
             schema,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         });
     }
 

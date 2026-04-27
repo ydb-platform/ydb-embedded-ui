@@ -31,6 +31,9 @@ const routes = {
     homePage: `/home/:activeTab?`,
     cluster: `/:environment?/${CLUSTER}/:activeTab?`,
     tenant: `/:environment?/${DATABASE}`,
+    // Alias of `routes.tenant` reflecting the new URL segment. Prefer `routes.database` in new code;
+    // `routes.tenant` is kept for the existing internal naming (`getTenantPath`, etc.).
+    database: `/:environment?/${DATABASE}`,
     node: `/:environment?/${NODE}/:id/:activeTab?`,
     pDisk: `/:environment?/${PDISK}`,
     vDisk: `/:environment?/${VDISK}`,
