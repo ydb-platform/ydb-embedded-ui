@@ -351,8 +351,12 @@ export default function QueryEditor({
             const currentQuery = historyCurrentQueryId
                 ? historyQueries.find((q) => q.queryId === historyCurrentQueryId)
                 : null;
-            // if it is query with results stored in server (has operationId) save every launch into history
-            if (text !== currentQuery?.queryText || currentQuery?.operationId) {
+            const lastQuery = historyQueries.at(-1);
+            // Don't add the same query as the previous one to the query history
+            if (text === lastQuery?.queryText) {
+                historyQueryId = lastQuery.queryId;
+            } else if (text !== currentQuery?.queryText || currentQuery?.operationId) {
+                // if it is query with results stored in server (has operationId) save every launch into history
                 historyQueryId = newQueryId;
                 saveQueryToHistory(text, newQueryId, startTime);
             }
