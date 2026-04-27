@@ -24,8 +24,8 @@ export const VDISK = 'vDisk';
 export const STORAGE_GROUP = 'storageGroup';
 export const TABLET = 'tablet';
 
-// Old segment kept only to support redirecting legacy URLs to new ones.
-export const LEGACY_TENANT = 'tenant';
+// Legacy URL segment kept internal — only used to redirect old `/tenant` URLs to the new `/database` URL.
+const LEGACY_TENANT = 'tenant';
 
 const routes = {
     homePage: `/home/:activeTab?`,
