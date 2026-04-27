@@ -75,7 +75,7 @@ export function Tablets({
         };
     }, [currentSearch]);
 
-    const useBackendSearch = isDatabasePage && TABLET_ID_PATTERN.test(debouncedSearch);
+    const backendSearchActive = isDatabasePage && TABLET_ID_PATTERN.test(debouncedSearch);
     // If the user is typing a numeric tablet id and the debounce hasn't fired
     // yet, the backend request is still pending. Treat the table as loading so
     // we don't flash the existing (about-to-be-replaced) results or an empty
@@ -86,7 +86,7 @@ export function Tablets({
         (TABLET_ID_PATTERN.test(currentSearch) || TABLET_ID_PATTERN.test(debouncedSearch));
 
     const filterParts: string[] = [];
-    if (useBackendSearch) {
+    if (backendSearchActive) {
         filterParts.push(`TabletId=${debouncedSearch}`);
     }
     if (onlyActive) {
@@ -104,7 +104,7 @@ export function Tablets({
     let params: TabletsApiRequestParams = {};
     if (valueIsDefined(nodeId)) {
         params = {nodeId, database, filter};
-    } else if (useBackendSearch) {
+    } else if (backendSearchActive) {
         // Search across the entire database: omit the schema path so the
         // backend returns any tablet with the given TabletId.
         params = {database, filter};
@@ -127,7 +127,7 @@ export function Tablets({
             loading={isLoading || isBackendSearchPending}
             error={error}
             nodeId={nodeId}
-            useBackendSearch={useBackendSearch || isBackendSearchPending}
+            backendSearchActive={backendSearchActive || isBackendSearchPending}
         />
     );
 }
