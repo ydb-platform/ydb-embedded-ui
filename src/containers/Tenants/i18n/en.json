@@ -1,5 +1,6 @@
 {
   "create-database": "Create database",
+  "no-databases": "No such databases",
 
   "column-name": "Database",
   "column-type": "Type",
@@ -10,7 +11,5 @@
   "column-network": "Network",
   "column-nodes": "Nodes",
   "column-groups": "Groups",
-  "column-pools": "Pools",
-
-  "empty_no-databases": "No such databases"
+  "column-pools": "Pools"
 }
