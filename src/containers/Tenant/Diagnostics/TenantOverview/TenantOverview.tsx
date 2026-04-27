@@ -76,15 +76,20 @@ export function TenantOverview({
 
     // Use healthcheck database_status.overall as the database status color when available;
     // fall back to tenantinfo.Overall (e.g. for Serverless databases where healthcheck is skipped).
+    // Polling is managed by HealthcheckPreview (deduped via the same cache key); the database
+    // status badge is only rendered when !isV2NavigationEnabled, so skip the query in V2 mode
+    // and until tenant info is loaded to avoid spurious requests.
     const {currentData: healthcheckData} = healthcheckApi.useGetHealthcheckInfoQuery(
         {database},
         {
-            pollingInterval: autoRefreshInterval,
-            skip: isServerless,
+            skip: isServerless || isV2NavigationEnabled || tenant === undefined,
         },
     );
     const healthcheckStatus = healthcheckData?.database_status?.[0]?.overall;
-    const databaseStatus = healthcheckStatus ? hcStatusToColorFlag[healthcheckStatus] : Overall;
+    const databaseStatus =
+        healthcheckStatus === undefined
+            ? Overall
+            : (hcStatusToColorFlag[healthcheckStatus] ?? Overall);
     const activeMetricsTab =
         isServerless &&
         metricsTab !== TENANT_METRICS_TABS_IDS.cpu &&
