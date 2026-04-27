@@ -1,6 +1,6 @@
 import {EFlag} from '../../../types/api/enums';
 import type {IssueLog} from '../../../types/api/healthcheck';
-import {StatusFlag} from '../../../types/api/healthcheck';
+import {SelfCheckResult, StatusFlag} from '../../../types/api/healthcheck';
 
 import type {IssuesTree} from './types';
 
@@ -12,6 +12,14 @@ export const hcStatusToColorFlag: Record<StatusFlag, EFlag> = {
     [StatusFlag.YELLOW]: EFlag.Yellow,
     [StatusFlag.ORANGE]: EFlag.Orange,
     [StatusFlag.RED]: EFlag.Red,
+};
+
+export const selfCheckResultToHcStatus: Record<SelfCheckResult, StatusFlag> = {
+    [SelfCheckResult.UNSPECIFIED]: StatusFlag.GREY,
+    [SelfCheckResult.GOOD]: StatusFlag.GREEN,
+    [SelfCheckResult.DEGRADED]: StatusFlag.YELLOW,
+    [SelfCheckResult.MAINTENANCE_REQUIRED]: StatusFlag.RED,
+    [SelfCheckResult.EMERGENCY]: StatusFlag.RED,
 };
 
 function getTypeForUI(type?: string) {
