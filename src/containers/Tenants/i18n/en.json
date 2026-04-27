@@ -1,5 +1,6 @@
 {
   "create-database": "Create database",
+  "no-databases": "No such databases",
 
   "column-name": "Database",
   "column-type": "Type",
