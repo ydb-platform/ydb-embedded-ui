@@ -61,21 +61,29 @@ export function Tablets({
     const isDatabasePage = !isNil(path) && !isNil(databaseFullPath) && path === databaseFullPath;
 
     const [{tabletsSearch}] = useQueryParams({tabletsSearch: StringParam});
+    const currentSearch = tabletsSearch ?? '';
 
     // Debounce the search value before sending it to the backend, since the
     // request can be heavy.
-    const [debouncedSearch, setDebouncedSearch] = React.useState(tabletsSearch ?? '');
+    const [debouncedSearch, setDebouncedSearch] = React.useState(currentSearch);
     React.useEffect(() => {
-        const value = tabletsSearch ?? '';
         const timer = window.setTimeout(() => {
-            setDebouncedSearch(value);
+            setDebouncedSearch(currentSearch);
         }, TABLET_ID_SEARCH_DEBOUNCE);
         return () => {
             window.clearTimeout(timer);
         };
-    }, [tabletsSearch]);
+    }, [currentSearch]);
 
     const useBackendSearch = isDatabasePage && TABLET_ID_PATTERN.test(debouncedSearch);
+    // If the user is typing a numeric tablet id and the debounce hasn't fired
+    // yet, the backend request is still pending. Treat the table as loading so
+    // we don't flash the existing (about-to-be-replaced) results or an empty
+    // state in between.
+    const isBackendSearchPending =
+        isDatabasePage &&
+        currentSearch !== debouncedSearch &&
+        (TABLET_ID_PATTERN.test(currentSearch) || TABLET_ID_PATTERN.test(debouncedSearch));
 
     const filterParts: string[] = [];
     if (useBackendSearch) {
@@ -116,9 +124,10 @@ export function Tablets({
         <TabletsTable
             scrollContainerRef={scrollContainerRef}
             tablets={tablets}
-            loading={isLoading}
+            loading={isLoading || isBackendSearchPending}
             error={error}
             nodeId={nodeId}
+            useBackendSearch={useBackendSearch || isBackendSearchPending}
         />
     );
 }

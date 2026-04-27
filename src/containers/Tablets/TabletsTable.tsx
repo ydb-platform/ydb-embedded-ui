@@ -213,6 +213,11 @@ interface TabletsTableProps {
     error?: unknown;
     scrollContainerRef: React.RefObject<HTMLElement>;
     nodeId?: string | number;
+    /**
+     * When true, the search value is applied on the backend and the table
+     * should not filter the already-fetched tablets by `tabletsSearch`.
+     */
+    useBackendSearch?: boolean;
 }
 
 export function TabletsTable({
@@ -221,6 +226,7 @@ export function TabletsTable({
     error,
     scrollContainerRef,
     nodeId,
+    useBackendSearch,
 }: TabletsTableProps) {
     const [{tabletsSearch}, setQueryParams] = useQueryParams({
         tabletsSearch: StringParam,
@@ -234,11 +240,14 @@ export function TabletsTable({
         return {
             filteredTablets: tablets.filter((tablet) => {
                 showEnd = showEnd || Boolean(tablet.EndOfRangeKeyPrefix);
+                if (useBackendSearch) {
+                    return true;
+                }
                 return String(tablet.TabletId).includes(tabletsSearch ?? '');
             }),
             showEndOfRange: showEnd,
         };
-    }, [tablets, tabletsSearch]);
+    }, [tablets, tabletsSearch, useBackendSearch]);
 
     const columns = React.useMemo(
         () => getColumns({nodeId, showEndOfRange}),
