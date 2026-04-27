@@ -10,7 +10,7 @@ import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/Quer
 import {ServerlessDBLabel} from '../../../../components/ServerlessDBLabel/ServerlessDBLabel';
 import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {healthcheckApi} from '../../../../store/reducers/healthcheckInfo/healthcheckInfo';
-import {hcStatusToColorFlag} from '../../../../store/reducers/healthcheckInfo/utils';
+import {selfCheckResultToColorFlag} from '../../../../store/reducers/healthcheckInfo/utils';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_METRICS_TABS_IDS,
@@ -74,7 +74,7 @@ export function TenantOverview({
     const {Name, Type, Overall, ControlPlane, CoresTotal} = tenant || {};
     const isServerless = Type === 'Serverless';
 
-    // Use healthcheck database_status.overall as the database status color when available;
+    // Use healthcheck self_check_result as the database status color when available;
     // fall back to tenantinfo.Overall (e.g. for Serverless databases where healthcheck is skipped).
     // Polling is managed by HealthcheckPreview (deduped via the same cache key); the database
     // status badge is only rendered when !isV2NavigationEnabled, so skip the query in V2 mode
@@ -85,11 +85,11 @@ export function TenantOverview({
             skip: isServerless || isV2NavigationEnabled || tenant === undefined,
         },
     );
-    const healthcheckStatus = healthcheckData?.database_status?.[0]?.overall;
+    const selfCheckResult = healthcheckData?.self_check_result;
     const databaseStatus =
-        healthcheckStatus === undefined
+        selfCheckResult === undefined
             ? Overall
-            : (hcStatusToColorFlag[healthcheckStatus] ?? Overall);
+            : (selfCheckResultToColorFlag[selfCheckResult] ?? Overall);
     const activeMetricsTab =
         isServerless &&
         metricsTab !== TENANT_METRICS_TABS_IDS.cpu &&
