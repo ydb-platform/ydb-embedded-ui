@@ -4,7 +4,7 @@ import {SelfCheckResult, StatusFlag} from '../../../types/api/healthcheck';
 
 import type {IssuesTree} from './types';
 
-export const hcStatusToColorFlag: Record<StatusFlag, EFlag> = {
+export const hcStatusToColorFlag: Record<StatusFlag | SelfCheckResult, EFlag> = {
     [StatusFlag.UNSPECIFIED]: EFlag.Grey,
     [StatusFlag.GREY]: EFlag.Grey,
     [StatusFlag.GREEN]: EFlag.Green,
@@ -12,10 +12,6 @@ export const hcStatusToColorFlag: Record<StatusFlag, EFlag> = {
     [StatusFlag.YELLOW]: EFlag.Yellow,
     [StatusFlag.ORANGE]: EFlag.Orange,
     [StatusFlag.RED]: EFlag.Red,
-};
-
-export const selfCheckResultToColorFlag: Record<SelfCheckResult, EFlag> = {
-    [SelfCheckResult.UNSPECIFIED]: EFlag.Grey,
     [SelfCheckResult.GOOD]: EFlag.Green,
     [SelfCheckResult.DEGRADED]: EFlag.Blue,
     [SelfCheckResult.MAINTENANCE_REQUIRED]: EFlag.Yellow,
