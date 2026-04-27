@@ -5,7 +5,7 @@ import {uiFactory} from '../../uiFactory/uiFactory';
 import i18n from './i18n';
 
 export const clusterTabsIds = {
-    tenants: 'tenants',
+    tenants: 'databases',
     nodes: 'nodes',
     storage: 'storage',
     network: 'network',

@@ -7,16 +7,16 @@ import {PageModel} from './models/PageModel';
 const baseURL = (config.use?.baseURL || 'http://localhost:3000/').replace(/\/?$/, '/');
 
 const WARMUP_PAGES = [
-    // Cluster overview (tenants list)
-    'cluster/tenants',
+    // Cluster overview (databases list)
+    'cluster/databases',
     // Nodes page
     'cluster/nodes',
     // Storage page
     'cluster/storage',
-    // Tenant diagnostics
-    'tenant?schema=/local&database=/local&tenantPage=diagnostics',
+    // Database diagnostics
+    'database?schema=/local&database=/local&tenantPage=diagnostics',
     // Query editor (triggers Monaco Editor lazy load + YDB query session init)
-    'tenant?schema=/local&database=/local&tenantPage=query',
+    'database?schema=/local&database=/local&tenantPage=query',
 ];
 
 async function waitForPageReady(page: PageModel) {
@@ -57,7 +57,7 @@ async function warmupApplication(page: PageModel) {
 
     // Execute a simple query to warm up KQP compile cache and query session
     try {
-        await page.page.goto(`${baseURL}tenant?schema=/local&database=/local&tenantPage=query`);
+        await page.page.goto(`${baseURL}database?schema=/local&database=/local&tenantPage=query`);
         await waitForPageReady(page);
 
         // Wait for Monaco editor to load

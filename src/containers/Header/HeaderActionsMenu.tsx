@@ -12,6 +12,7 @@ import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {getInfoTabLinks} from '../../utils/additionalProps';
 import {useAdditionalTenantsProps} from '../AppWithClusters/utils/useAdditionalTenantsProps';
+import {clusterTabsIds} from '../Cluster/utils';
 
 import {headerKeyset} from './i18n';
 
@@ -99,7 +100,7 @@ export function DBHeaderActionsMenu({
                 action: () => {
                     onDeleteDB({clusterName, databaseData}).then((isDeleted) => {
                         if (isDeleted) {
-                            const path = getClusterPath({activeTab: 'tenants'});
+                            const path = getClusterPath({activeTab: clusterTabsIds.tenants});
                             history.push(path);
                         }
                     });

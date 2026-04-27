@@ -287,7 +287,7 @@ test.describe('Diagnostics Queries tab', async () => {
         // Get the copied URL from clipboard
         const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
         expect(clipboardText).toBeTruthy();
-        expect(clipboardText).toContain('/tenant');
+        expect(clipboardText).toContain('/database');
 
         // Navigate to the copied URL
         await page.goto(clipboardText);

@@ -1,10 +1,10 @@
 // Pages
-export const tenantsPage = 'cluster/tenants';
+export const tenantsPage = 'cluster/databases';
 export const nodesPage = 'cluster/nodes';
 export const storagePage = 'cluster/storage';
-export const clusterPage = 'cluster/tenants';
+export const clusterPage = 'cluster/databases';
 export const authPage = 'auth';
-export const tenantPage = 'tenant';
+export const tenantPage = 'database';
 
 // Entities
 export const database = '/local';

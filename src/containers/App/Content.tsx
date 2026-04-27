@@ -169,6 +169,22 @@ export function Content(props: ContentProps) {
                     {routesSlots.map((route) => {
                         return renderRouteSlot(slots, route);
                     })}
+                    {/* Backwards compatibility: redirect legacy `/tenant` URL to `/database` */}
+                    <Route
+                        path={routes.legacyTenant}
+                        render={({location}) => (
+                            <Redirect
+                                to={{
+                                    pathname: location.pathname.replace(
+                                        /\/tenant(\/|$)/,
+                                        '/database$1',
+                                    ),
+                                    search: location.search,
+                                    hash: location.hash,
+                                }}
+                            />
+                        )}
+                    />
                     <Route
                         path={redirectProps.from || redirectProps.path}
                         exact={redirectProps.exact}

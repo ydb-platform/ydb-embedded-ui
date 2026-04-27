@@ -369,7 +369,7 @@ export const TenantsTable = ({
                 data={filteredTenants}
                 columns={columnsToShow}
                 settings={DEFAULT_TABLE_SETTINGS}
-                emptyDataMessage="No such tenants"
+                emptyDataMessage={i18n('empty_no-databases')}
                 onSortChange={setSortParams}
             />
         );

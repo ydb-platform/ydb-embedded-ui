@@ -10,5 +10,7 @@
   "column-network": "Network",
   "column-nodes": "Nodes",
   "column-groups": "Groups",
-  "column-pools": "Pools"
+  "column-pools": "Pools",
+
+  "empty_no-databases": "No such databases"
 }

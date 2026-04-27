@@ -17,23 +17,28 @@ import {normalizePathSlashes} from './utils';
 import {useDatabaseFromQuery} from './utils/hooks/useDatabaseFromQuery';
 
 export const CLUSTER = 'cluster';
-export const TENANT = 'tenant';
+export const DATABASE = 'database';
 export const NODE = 'node';
 export const PDISK = 'pDisk';
 export const VDISK = 'vDisk';
 export const STORAGE_GROUP = 'storageGroup';
 export const TABLET = 'tablet';
 
+// Old segment kept only to support redirecting legacy URLs to new ones.
+export const LEGACY_TENANT = 'tenant';
+
 const routes = {
     homePage: `/home/:activeTab?`,
     cluster: `/:environment?/${CLUSTER}/:activeTab?`,
-    tenant: `/:environment?/${TENANT}`,
+    tenant: `/:environment?/${DATABASE}`,
     node: `/:environment?/${NODE}/:id/:activeTab?`,
     pDisk: `/:environment?/${PDISK}`,
     vDisk: `/:environment?/${VDISK}`,
     storageGroup: `/:environment?/${STORAGE_GROUP}`,
     tablet: `/:environment?/${TABLET}/:id`,
     auth: `/:environment?/auth`,
+    // Legacy route — redirects to `routes.tenant` (the database page).
+    legacyTenant: `/:environment?/${LEGACY_TENANT}`,
 } as const;
 
 export default routes;
