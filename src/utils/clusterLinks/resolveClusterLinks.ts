@@ -190,7 +190,7 @@ function processDynamicLinks(
                 icon,
                 description,
                 context: link.context,
-            });
+            } satisfies ClusterLinkWithTitle);
 
             if (link.context) {
                 coveredContexts.add(link.context);
@@ -222,7 +222,7 @@ function processAdditionalLinks(
                 continue;
             }
 
-            const icon = getContextIcon(link.context);
+            const icon = link.icon ?? getContextIcon(link.context);
             const description = getLinkDescription(link.description, link.context);
 
             result.push({...link, title, icon, description});

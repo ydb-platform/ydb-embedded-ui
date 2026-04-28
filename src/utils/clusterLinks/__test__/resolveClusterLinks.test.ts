@@ -1,8 +1,15 @@
+import type {IconData} from '@gravity-ui/uikit';
+
 import type {ClusterInfo} from '../../../store/reducers/cluster/cluster';
 import type {ClusterLink} from '../../../types/additionalProps';
 import type {MetaClusterLink} from '../../../types/api/meta';
 import type {SubstitutionNamespaces} from '../resolveClusterLinks';
 import {resolveClusterLinks, substituteUrlParams} from '../resolveClusterLinks';
+
+/** Helper to build a minimal SubstitutionNamespaces for substituteUrlParams tests */
+function makeNamespaces(obj: Record<string, Record<string, unknown>>): SubstitutionNamespaces {
+    return obj as unknown as SubstitutionNamespaces;
+}
 
 /** Helper to build a minimal ClusterInfo with the given overrides */
 function makeClusterInfo(overrides: Partial<ClusterInfo> = {}): ClusterInfo {
@@ -15,14 +22,14 @@ function makeClusterInfo(overrides: Partial<ClusterInfo> = {}): ClusterInfo {
 
 describe('substituteUrlParams', () => {
     test('replaces all placeholders with matching string values', () => {
-        const namespaces = {cluster: {name: 'my-cluster', env: 'prod'}} as SubstitutionNamespaces;
+        const namespaces = makeNamespaces({cluster: {name: 'my-cluster', env: 'prod'}});
         expect(substituteUrlParams('https://example.com/{name}/{env}', 'cluster', namespaces)).toBe(
             'https://example.com/my-cluster/prod',
         );
     });
 
     test('returns undefined when a placeholder has no matching param', () => {
-        const namespaces = {cluster: {name: 'my-cluster'}} as SubstitutionNamespaces;
+        const namespaces = makeNamespaces({cluster: {name: 'my-cluster'}});
         expect(
             substituteUrlParams('https://example.com/{name}/{missing}', 'cluster', namespaces),
         ).toBeUndefined();
@@ -30,14 +37,16 @@ describe('substituteUrlParams', () => {
 
     test('returns the URL as-is when there are no placeholders', () => {
         expect(
-            substituteUrlParams('https://example.com/static', 'cluster', {
-                cluster: {name: 'my-cluster'},
-            } as SubstitutionNamespaces),
+            substituteUrlParams(
+                'https://example.com/static',
+                'cluster',
+                makeNamespaces({cluster: {name: 'my-cluster'}}),
+            ),
         ).toBe('https://example.com/static');
     });
 
     test('returns the URL when all placeholders are resolved even with extra params', () => {
-        const namespaces = {cluster: {name: 'test', extra: 'unused'}} as SubstitutionNamespaces;
+        const namespaces = makeNamespaces({cluster: {name: 'test', extra: 'unused'}});
         expect(substituteUrlParams('https://example.com/{name}', 'cluster', namespaces)).toBe(
             'https://example.com/test',
         );
@@ -70,9 +79,9 @@ describe('substituteUrlParams', () => {
     });
 
     test('resolves {cluster.balancer} using namespaces map', () => {
-        const namespaces = {
+        const namespaces = makeNamespaces({
             cluster: {balancer: 'https://balancer.example.com'},
-        } as SubstitutionNamespaces;
+        });
         expect(
             substituteUrlParams(
                 'https://example.com/?balancer={cluster.balancer}',
@@ -83,21 +92,21 @@ describe('substituteUrlParams', () => {
     });
 
     test('returns undefined for deeply nested dotted paths (only single-level prefix.field supported)', () => {
-        const namespaces = {cluster: {a: 'value'}} as SubstitutionNamespaces;
+        const namespaces = makeNamespaces({cluster: {a: 'value'}});
         expect(
             substituteUrlParams('https://example.com/{cluster.a.b}', 'cluster', namespaces),
         ).toBeUndefined();
     });
 
     test('returns undefined for unknown dotted prefix not in namespaces', () => {
-        const namespaces = {cluster: {bar: 'value'}} as SubstitutionNamespaces;
+        const namespaces = makeNamespaces({cluster: {bar: 'value'}});
         expect(
             substituteUrlParams('https://example.com/{foo.bar}', 'cluster', namespaces),
         ).toBeUndefined();
     });
 
     test('returns undefined when dotted field is missing from namespace', () => {
-        const namespaces = {cluster: {name: 'my-cluster'}} as SubstitutionNamespaces;
+        const namespaces = makeNamespaces({cluster: {name: 'my-cluster'}});
         expect(
             substituteUrlParams(
                 'https://example.com/?balancer={cluster.balancer}',
@@ -119,9 +128,9 @@ describe('substituteUrlParams', () => {
     });
 
     test('mixes flat and dotted placeholders in the same template', () => {
-        const namespaces = {
+        const namespaces = makeNamespaces({
             cluster: {name: 'my-cluster', balancer: 'https://balancer.example.com'},
-        } as SubstitutionNamespaces;
+        });
         expect(
             substituteUrlParams(
                 'https://example.com/{name}?balancer={cluster.balancer}',
@@ -132,9 +141,9 @@ describe('substituteUrlParams', () => {
     });
 
     test('returns undefined when flat placeholder resolves but dotted does not', () => {
-        const namespaces = {
+        const namespaces = makeNamespaces({
             cluster: {name: 'my-cluster', balancer: 'value'},
-        } as SubstitutionNamespaces;
+        });
         expect(
             substituteUrlParams(
                 'https://example.com/{name}?b={cluster.missing}',
@@ -145,24 +154,24 @@ describe('substituteUrlParams', () => {
     });
 
     test('resolves dotted placeholder with number value', () => {
-        const namespaces = {cluster: {scale: 42}} as SubstitutionNamespaces;
+        const namespaces = makeNamespaces({cluster: {scale: 42}});
         expect(
             substituteUrlParams('https://example.com/{cluster.scale}', 'other', namespaces),
         ).toBe('https://example.com/42');
     });
 
     test('dotted placeholder does not fall back to flat source', () => {
-        const namespaces = {flat: {balancer: 'val'}} as SubstitutionNamespaces;
+        const namespaces = makeNamespaces({flat: {balancer: 'val'}});
         expect(
             substituteUrlParams('https://example.com/{cluster.balancer}', 'flat', namespaces),
         ).toBeUndefined();
     });
 
     test('supports multiple namespace prefixes', () => {
-        const namespaces = {
+        const namespaces = makeNamespaces({
             cluster: {balancer: 'balancer-val'},
             database: {name: 'db-name'},
-        } as SubstitutionNamespaces;
+        });
         expect(
             substituteUrlParams(
                 'https://example.com/{cluster.balancer}/{database.name}',
@@ -664,6 +673,55 @@ describe('resolveClusterLinks', () => {
             const result = resolveClusterLinks(makeClusterInfo(), additionalLinks);
 
             expect(result).toHaveLength(0);
+        });
+
+        test('additional link with custom icon preserves it even with known context', () => {
+            const customIcon = (() => null) as unknown as IconData;
+            const additionalLinks: ClusterLink[] = [
+                {
+                    title: 'Custom Cores',
+                    url: 'https://cores.example.com',
+                    context: 'cores',
+                    icon: customIcon,
+                },
+            ];
+
+            const result = resolveClusterLinks(makeClusterInfo(), additionalLinks);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].icon).toBe(customIcon);
+        });
+
+        test('additional link without icon falls back to context icon', () => {
+            const additionalLinks: ClusterLink[] = [
+                {
+                    title: 'Cores Link',
+                    url: 'https://cores.example.com',
+                    context: 'cores',
+                },
+            ];
+
+            const result = resolveClusterLinks(makeClusterInfo(), additionalLinks);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].icon).toBeDefined();
+        });
+
+        test('additional link with custom icon and unknown context keeps custom icon', () => {
+            const customIcon = (() => null) as unknown as IconData;
+            const additionalLinks: ClusterLink[] = [
+                {
+                    title: 'Custom Link',
+                    url: 'https://example.com',
+                    context: 'unknown-context',
+                    icon: customIcon,
+                },
+            ];
+
+            const result = resolveClusterLinks(makeClusterInfo(), additionalLinks);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].icon).toBe(customIcon);
         });
     });
 });
