@@ -1,5 +1,23 @@
 # Changelog
 
+## [15.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.4.0...v15.5.0) (2026-04-28)
+
+
+### Features
+
+* **Header:** redesign header for Cluster page ([#3813](https://github.com/ydb-platform/ydb-embedded-ui/issues/3813)) ([845f0d7](https://github.com/ydb-platform/ydb-embedded-ui/commit/845f0d7eb8b4c5d347a1e6958291f4014f2add89))
+* search tablets via backend on the database page ([#3838](https://github.com/ydb-platform/ydb-embedded-ui/issues/3838)) ([3a71810](https://github.com/ydb-platform/ydb-embedded-ui/commit/3a71810a7922eb122d3d72a397dc166a8f8c2f2e))
+
+
+### Bug Fixes
+
+* params duplication ([#3828](https://github.com/ydb-platform/ydb-embedded-ui/issues/3828)) ([8b10e3a](https://github.com/ydb-platform/ydb-embedded-ui/commit/8b10e3abca85cc46d610472e6ec25ac63e7c149a))
+* **QueryEditor:** skip saving consecutive duplicate queries in history ([#3841](https://github.com/ydb-platform/ydb-embedded-ui/issues/3841)) ([a22900f](https://github.com/ydb-platform/ydb-embedded-ui/commit/a22900f35243617655bd9915a5cc37abae782416))
+* rename experiment toggle ([#3835](https://github.com/ydb-platform/ydb-embedded-ui/issues/3835)) ([cf318f5](https://github.com/ydb-platform/ydb-embedded-ui/commit/cf318f57f43badbdfef67036bbeccfaebf8e409f))
+* replace "no such tenants" with "no such databases" in Databases table ([#3844](https://github.com/ydb-platform/ydb-embedded-ui/issues/3844)) ([4539975](https://github.com/ydb-platform/ydb-embedded-ui/commit/45399753ae5b7449160672b548c1a322da211908))
+* **TopicData:** allow open offset in new tab ([#3847](https://github.com/ydb-platform/ydb-embedded-ui/issues/3847)) ([784c002](https://github.com/ydb-platform/ydb-embedded-ui/commit/784c002bb45fe8af22da30ef05349b5cf7000e1f))
+* use healthcheck self_check_result for database status color ([#3837](https://github.com/ydb-platform/ydb-embedded-ui/issues/3837)) ([a8e3324](https://github.com/ydb-platform/ydb-embedded-ui/commit/a8e3324866f38ce94a001cc046d3b34795fae7d7))
+
 ## [15.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.3.0...v15.4.0) (2026-04-23)
 
 
