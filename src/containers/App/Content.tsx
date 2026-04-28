@@ -10,7 +10,7 @@ import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
 import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
-import routes, {getClusterPath} from '../../routes';
+import routes, {CLUSTER, getClusterPath} from '../../routes';
 import type {RootState} from '../../store';
 import {
     useAllCapabilitiesLoaded,
@@ -41,6 +41,7 @@ import {
     TenantSlot,
     VDiskPageSlot,
 } from './appSlots';
+import {getLegacyClusterTenantsRedirect, getLegacyTenantRedirect} from './legacyRedirects';
 
 import './App.scss';
 
@@ -160,6 +161,22 @@ export function Content(props: ContentProps) {
             <Route>
                 <Header />
                 <Switch>
+                    {/* Backwards compatibility: redirect legacy `/cluster/tenants` URL to `/cluster/databases`,
+                        preserving any query params and hash from old bookmarks. Must appear before the
+                        cluster route so it wins the Switch match (otherwise the cluster page's internal
+                        unknown-tab fallback would redirect via `getClusterPath()` and drop search/hash). */}
+                    <Route
+                        path={`/:environment?/${CLUSTER}/tenants`}
+                        exact
+                        render={({location}) => (
+                            <Redirect to={getLegacyClusterTenantsRedirect(location)} />
+                        )}
+                    />
+                    {/* Backwards compatibility: redirect legacy `/tenant` URL to `/database`. */}
+                    <Route
+                        path={routes.legacyTenant}
+                        render={({location}) => <Redirect to={getLegacyTenantRedirect(location)} />}
+                    />
                     {singleClusterMode
                         ? null
                         : multiClusterRoutes.map((route) => {

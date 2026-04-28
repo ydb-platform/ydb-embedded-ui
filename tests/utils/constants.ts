@@ -1,10 +1,15 @@
 // Pages
-export const tenantsPage = 'cluster/tenants';
+export const databasesPage = 'cluster/databases';
 export const nodesPage = 'cluster/nodes';
 export const storagePage = 'cluster/storage';
-export const clusterPage = 'cluster/tenants';
+export const clusterPage = 'cluster/databases';
 export const authPage = 'auth';
-export const tenantPage = 'tenant';
+export const databasePage = 'database';
+
+// Deprecated aliases — kept temporarily for callers still using the old names.
+// Prefer `databasePage` / `databasesPage` in new code.
+export const tenantPage = databasePage;
+export const tenantsPage = databasesPage;
 
 // Entities
 export const database = '/local';

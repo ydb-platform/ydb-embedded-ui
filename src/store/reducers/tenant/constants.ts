@@ -1,4 +1,7 @@
-export const TENANT_PAGE = 'tenantPage';
+export const TENANT_PAGE = 'databasePage';
+// Legacy URL query param kept only for backward compatibility — old bookmarks
+// and links use `tenantPage`; we migrate them to `databasePage` on the fly.
+export const LEGACY_TENANT_PAGE = 'tenantPage';
 
 export const TENANT_PAGES_IDS = {
     query: 'query',

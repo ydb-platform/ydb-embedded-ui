@@ -17,23 +17,31 @@ import {useDatabaseFromQuery} from './utils/hooks/useDatabaseFromQuery';
 import {omitVolatileQueryParams} from './utils/queryParams';
 
 export const CLUSTER = 'cluster';
-export const TENANT = 'tenant';
+export const DATABASE = 'database';
 export const NODE = 'node';
 export const PDISK = 'pDisk';
 export const VDISK = 'vDisk';
 export const STORAGE_GROUP = 'storageGroup';
 export const TABLET = 'tablet';
 
+// Legacy URL segment kept internal — only used to redirect old `/tenant` URLs to the new `/database` URL.
+const LEGACY_TENANT = 'tenant';
+
 const routes = {
     homePage: `/home/:activeTab?`,
     cluster: `/:environment?/${CLUSTER}/:activeTab?`,
-    tenant: `/:environment?/${TENANT}`,
+    tenant: `/:environment?/${DATABASE}`,
+    // Alias of `routes.tenant` reflecting the new URL segment. Prefer `routes.database` in new code;
+    // `routes.tenant` is kept for the existing internal naming (`getTenantPath`, etc.).
+    database: `/:environment?/${DATABASE}`,
     node: `/:environment?/${NODE}/:id/:activeTab?`,
     pDisk: `/:environment?/${PDISK}`,
     vDisk: `/:environment?/${VDISK}`,
     storageGroup: `/:environment?/${STORAGE_GROUP}`,
     tablet: `/:environment?/${TABLET}/:id`,
     auth: `/:environment?/auth`,
+    // Legacy route — redirects to `routes.tenant` (the database page).
+    legacyTenant: `/:environment?/${LEGACY_TENANT}`,
 } as const;
 
 export default routes;

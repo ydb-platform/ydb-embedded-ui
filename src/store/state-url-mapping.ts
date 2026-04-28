@@ -14,103 +14,64 @@ import {stateToParams} from 'redux-location-state/lib/stateToParams';
 import {initialState as initialHeatmapState} from './reducers/heatmap';
 import {initialState as initialTenantState} from './reducers/tenant/tenant';
 
+const databasePageParams = {
+    sort: {
+        stateKey: 'heatmap.sort',
+        initialState: initialHeatmapState.sort,
+        type: 'bool',
+    },
+    heatmap: {
+        stateKey: 'heatmap.heatmap',
+        initialState: initialHeatmapState.heatmap,
+        type: 'bool',
+    },
+    currentMetric: {
+        stateKey: 'heatmap.currentMetric',
+        initialState: initialHeatmapState.currentMetric,
+    },
+    queryTab: {
+        stateKey: 'tenant.queryTab',
+    },
+    diagnosticsTab: {
+        stateKey: 'tenant.diagnosticsTab',
+    },
+    summaryTab: {
+        stateKey: 'tenant.summaryTab',
+    },
+    metricsTab: {
+        stateKey: 'tenant.metricsTab',
+        initialState: initialTenantState.metricsTab,
+    },
+    shardsMode: {
+        stateKey: 'shardsWorkload.mode',
+    },
+    shardsDateFrom: {
+        stateKey: 'shardsWorkload.from',
+    },
+    shardsDateTo: {
+        stateKey: 'shardsWorkload.to',
+    },
+    topQueriesDateFrom: {
+        stateKey: 'executeTopQueries.from',
+    },
+    topQueriesDateTo: {
+        stateKey: 'executeTopQueries.to',
+    },
+    selectedConsumer: {
+        stateKey: 'partitions.selectedConsumer',
+    },
+} as const;
+
 export const paramSetup = {
     // Do not delete, without `global` params redux-location-state goes crazy
     global: {},
-    '/tenant': {
-        sort: {
-            stateKey: 'heatmap.sort',
-            initialState: initialHeatmapState.sort,
-            type: 'bool',
-        },
-        heatmap: {
-            stateKey: 'heatmap.heatmap',
-            initialState: initialHeatmapState.heatmap,
-            type: 'bool',
-        },
-        currentMetric: {
-            stateKey: 'heatmap.currentMetric',
-            initialState: initialHeatmapState.currentMetric,
-        },
-        queryTab: {
-            stateKey: 'tenant.queryTab',
-        },
-        diagnosticsTab: {
-            stateKey: 'tenant.diagnosticsTab',
-        },
-        summaryTab: {
-            stateKey: 'tenant.summaryTab',
-        },
-        metricsTab: {
-            stateKey: 'tenant.metricsTab',
-            initialState: initialTenantState.metricsTab,
-        },
-        shardsMode: {
-            stateKey: 'shardsWorkload.mode',
-        },
-        shardsDateFrom: {
-            stateKey: 'shardsWorkload.from',
-        },
-        shardsDateTo: {
-            stateKey: 'shardsWorkload.to',
-        },
-        topQueriesDateFrom: {
-            stateKey: 'executeTopQueries.from',
-        },
-        topQueriesDateTo: {
-            stateKey: 'executeTopQueries.to',
-        },
-        selectedConsumer: {
-            stateKey: 'partitions.selectedConsumer',
-        },
-    },
-    '/*/tenant': {
-        sort: {
-            stateKey: 'heatmap.sort',
-            initialState: initialHeatmapState.sort,
-            type: 'bool',
-        },
-        heatmap: {
-            stateKey: 'heatmap.heatmap',
-            initialState: initialHeatmapState.heatmap,
-            type: 'bool',
-        },
-        currentMetric: {
-            stateKey: 'heatmap.currentMetric',
-            initialState: initialHeatmapState.currentMetric,
-        },
-        queryTab: {
-            stateKey: 'tenant.queryTab',
-        },
-        diagnosticsTab: {
-            stateKey: 'tenant.diagnosticsTab',
-        },
-        summaryTab: {
-            stateKey: 'tenant.summaryTab',
-        },
-        metricsTab: {
-            stateKey: 'tenant.metricsTab',
-            initialState: initialTenantState.metricsTab,
-        },
-        shardsMode: {
-            stateKey: 'shardsWorkload.mode',
-        },
-        shardsDateFrom: {
-            stateKey: 'shardsWorkload.from',
-        },
-        shardsDateTo: {
-            stateKey: 'shardsWorkload.to',
-        },
-        topQueriesDateFrom: {
-            stateKey: 'executeTopQueries.from',
-        },
-        topQueriesDateTo: {
-            stateKey: 'executeTopQueries.to',
-        },
-        selectedConsumer: {
-            stateKey: 'partitions.selectedConsumer',
-        },
-    },
+    // Database page (current URL).
+    '/database': databasePageParams,
+    '/*/database': databasePageParams,
+    // Legacy `/tenant` URL — kept so query params resolve correctly during the
+    // brief moment before the redirect to `/database` runs.
+    '/tenant': databasePageParams,
+    '/*/tenant': databasePageParams,
 } as const;
 
 function mergeLocationToState<S>(state: S, location: Pick<LocationWithQuery, 'query'>): S {
