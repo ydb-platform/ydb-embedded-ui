@@ -251,7 +251,12 @@ function Offset({offset, removed, notLoaded}: PartitionIdProps) {
         activeOffset: String(offset),
     });
 
-    const handleClick: React.MouseEventHandler<HTMLSpanElement> = (e) => {
+    const handleClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
+        // Let the browser handle modified clicks (new tab/window) natively
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+            e.stopPropagation();
+            return;
+        }
         //if allow to navigate link, the table will be rerendered
         e.stopPropagation();
         e.preventDefault();
