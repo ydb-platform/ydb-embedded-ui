@@ -22,8 +22,33 @@ export const selfCheckResultToHcStatus: Record<SelfCheckResult, StatusFlag> = {
     [SelfCheckResult.EMERGENCY]: StatusFlag.RED,
 };
 
+// State storage related issue types are categorized under "storage" in the UI,
+// so that ring/board/state-storage issues appear in the storage tab and can
+// share the same parent-chain (breadcrumb) rendering as disk issues.
+const STATE_STORAGE_RELATED_PREFIXES = ['SCHEME_BOARD', 'BOARD', 'STATE_STORAGE'];
+
+// Root issue types that should be included in the breadcrumb chain.
+// For these roots, the leaf preserves a parent link to the root so that the
+// breadcrumb shows e.g. "Scheme board ring / Scheme board node",
+// similar to how disk issues show "Storage / Storage pool / ... / PDisk".
+const RING_ROOT_TYPES = new Set(['SCHEME_BOARD_RING', 'BOARD_RING', 'STATE_STORAGE_RING']);
+
+export function isStorageRelatedType(type?: string): boolean {
+    if (!type) {
+        return false;
+    }
+    if (type.startsWith('STORAGE')) {
+        return true;
+    }
+    return STATE_STORAGE_RELATED_PREFIXES.some((prefix) => type.startsWith(prefix));
+}
+
+export function isComputeRelatedType(type?: string): boolean {
+    return Boolean(type?.startsWith('COMPUTE'));
+}
+
 function getTypeForUI(type?: string) {
-    if (type?.startsWith('STORAGE') || type?.startsWith('COMPUTE')) {
+    if (isStorageRelatedType(type) || isComputeRelatedType(type)) {
         return type;
     } else {
         return 'unknown';
@@ -49,14 +74,24 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
         return [extendIssue(root)];
     }
 
+    // Include the root in the parent chain for ring-style roots so that the
+    // breadcrumb shows e.g. "Scheme board ring / Scheme board node".
+    const includeRootInChain = RING_ROOT_TYPES.has(root.type ?? '');
+
     for (const issueId of root.reason) {
         const directChild: IssuesTree | undefined = issues.find((issue) => issue.id === issueId);
         if (!directChild) {
             continue;
         }
-        const stack: IssuesTree[] = [directChild];
 
         const directChildType = getTypeForUI(directChild.type);
+
+        const initialNode: IssuesTree = includeRootInChain
+            ? extendIssue(directChild, directChildType, {
+                  parent: extendIssue(root, directChildType),
+              })
+            : directChild;
+        const stack: IssuesTree[] = [initialNode];
 
         while (stack.length > 0) {
             const currentNode = stack.pop()!;
