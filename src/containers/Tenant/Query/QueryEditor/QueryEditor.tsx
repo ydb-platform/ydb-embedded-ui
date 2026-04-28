@@ -21,6 +21,7 @@ import {
     selectLastExecutedQueryText,
     selectResult,
     selectTenantPath,
+    setHistoryCurrentQueryId,
     setIsDirty,
     setLastExecutedQueryText,
     setTenantPath,
@@ -351,8 +352,18 @@ export default function QueryEditor({
             const currentQuery = historyCurrentQueryId
                 ? historyQueries.find((q) => q.queryId === historyCurrentQueryId)
                 : null;
-            // if it is query with results stored in server (has operationId) save every launch into history
-            if (text !== currentQuery?.queryText || currentQuery?.operationId) {
+            const lastQuery = historyQueries.at(-1);
+            if (text === lastQuery?.queryText && !lastQuery.operationId) {
+                // Don't add the same query as the previous one to the query history,
+                // unless it has server-stored results (operationId) — then save every launch.
+                historyQueryId = lastQuery.queryId;
+                // Keep history navigation anchored to the entry we are updating
+                if (historyCurrentQueryId !== lastQuery.queryId) {
+                    dispatch(setHistoryCurrentQueryId(lastQuery.queryId));
+                }
+            } else if (text !== currentQuery?.queryText || currentQuery?.operationId) {
+                // Queries with results stored on the server (operationId) get a separate history
+                // entry per launch, unless they match the most recent history item (handled above).
                 historyQueryId = newQueryId;
                 saveQueryToHistory(text, newQueryId, startTime);
             }
@@ -436,7 +447,8 @@ export default function QueryEditor({
             });
 
             query
-                .then(({data}) => {
+                .unwrap()
+                .then((data) => {
                     // save in history failed query only if it has operationId. It means that query is saved in server side and its results may be retrieved.
                     if (data?.historyQueryId) {
                         updateQueryInHistory(
