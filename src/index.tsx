@@ -25,16 +25,12 @@ function applyE2EQueryEditorModeOverride() {
 }
 
 function applyE2EMonitoringOverride() {
-    if (!E2E_UI_OVERRIDES_ENABLED) {
+    if (!E2E_UI_OVERRIDES_ENABLED || !window.e2eMonitoringError) {
         return;
     }
 
     configureUIFactory({
-        renderMonitoring: () => {
-            return window.e2eMonitoringError ? (
-                <ResponseError error={window.e2eMonitoringError} />
-            ) : null;
-        },
+        renderMonitoring: () => <ResponseError error={window.e2eMonitoringError} />,
     });
 }
 

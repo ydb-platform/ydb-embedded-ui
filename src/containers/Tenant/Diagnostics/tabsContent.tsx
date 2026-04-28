@@ -24,6 +24,7 @@ import {TopQueries} from './TopQueries/TopQueries';
 import {TopShards} from './TopShards/TopShards';
 import {TopicData} from './TopicData/TopicData';
 import i18n from './i18n';
+import {b} from './shared';
 
 interface DiagnosticsTabContentOptions {
     activeTabId: TenantDiagnosticsTab;
@@ -181,11 +182,15 @@ const diagnosticsTabRenderers: Record<TenantDiagnosticsTab, DiagnosticsTabRender
             database,
             scrollContainerRef,
         }),
-    [TENANT_DIAGNOSTICS_TABS_IDS.monitoring]: ({database, databaseFullPath}) => (
-        <div className="kv-tenant-diagnostics__monitoring-content">
-            {uiFactory.renderMonitoring?.({database, databaseFullPath})}
-        </div>
-    ),
+    [TENANT_DIAGNOSTICS_TABS_IDS.monitoring]: ({database, databaseFullPath}) => {
+        const content = uiFactory.renderMonitoring?.({database, databaseFullPath});
+
+        return content === null || content === undefined ? (
+            content
+        ) : (
+            <div className={b('monitoring-content')}>{content}</div>
+        );
+    },
 };
 
 export function renderDiagnosticsTabContent({

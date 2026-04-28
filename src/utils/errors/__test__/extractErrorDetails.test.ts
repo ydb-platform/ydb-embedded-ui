@@ -321,6 +321,26 @@ describe('extractErrorDetails', () => {
         );
     });
 
+    test('should not treat array details as gateway-shaped error', () => {
+        const error = {
+            status: 404,
+            message: 'Not found',
+            details: [{description: 'Unexpected shape'}],
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details).toEqual(
+            expect.objectContaining({
+                status: 404,
+                title: '404',
+                message: 'Not found',
+            }),
+        );
+        expect(details?.dataMessage).toBeUndefined();
+        expect(details?.responseBody).toBeUndefined();
+        expect(details?.grpcCode).toBeUndefined();
+    });
+
     test('should extract gateway-shaped response data details', () => {
         const error = {
             status: 404,
