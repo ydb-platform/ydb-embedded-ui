@@ -1,6 +1,10 @@
 const VOLATILE_QUERY_PARAMS = ['utm_referrer'] as const;
 
-export function omitVolatileQueryParams<T extends Record<string, unknown>>(query: T): T {
+type VolatileQueryParam = (typeof VOLATILE_QUERY_PARAMS)[number];
+
+export function omitVolatileQueryParams<T extends Record<string, unknown>>(
+    query: T,
+): Omit<T, VolatileQueryParam> {
     let result = query;
 
     VOLATILE_QUERY_PARAMS.forEach((param) => {
