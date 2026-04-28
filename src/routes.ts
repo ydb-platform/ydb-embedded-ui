@@ -1,7 +1,6 @@
 import React from 'react';
 
 import type {Location} from 'history';
-import isEmpty from 'lodash/isEmpty';
 import {compile, match} from 'path-to-regexp';
 import qs from 'qs';
 import type {QueryParamConfig} from 'use-query-params';
@@ -15,6 +14,7 @@ import {backend, basename, clusterName, environment, webVersion} from './store';
 import {uiFactory} from './uiFactory/uiFactory';
 import {normalizePathSlashes} from './utils';
 import {useDatabaseFromQuery} from './utils/hooks/useDatabaseFromQuery';
+import {omitVolatileQueryParams} from './utils/queryParams';
 
 export const CLUSTER = 'cluster';
 export const DATABASE = 'database';
@@ -112,9 +112,12 @@ export function createHref(
         extendedParams = {...extendedParams, environment};
     }
 
-    const search = isEmpty(extendedQuery)
-        ? ''
-        : `?${qs.stringify(extendedQuery, {encode: false, arrayFormat: 'repeat'})}`;
+    const normalizedQuery = omitVolatileQueryParams(extendedQuery);
+    const queryString = qs.stringify(normalizedQuery, {
+        arrayFormat: 'repeat',
+        encoder: encodeURIComponent,
+    });
+    const search = queryString ? `?${queryString}` : '';
 
     const preparedRoute = prepareRoute(route);
 
