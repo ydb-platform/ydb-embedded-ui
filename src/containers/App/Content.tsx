@@ -41,6 +41,7 @@ import {
     TenantSlot,
     VDiskPageSlot,
 } from './appSlots';
+import {getLegacyClusterTenantsRedirect, getLegacyTenantRedirect} from './legacyRedirects';
 
 import './App.scss';
 
@@ -168,33 +169,13 @@ export function Content(props: ContentProps) {
                         path={`/:environment?/${CLUSTER}/tenants`}
                         exact
                         render={({location}) => (
-                            <Redirect
-                                to={{
-                                    pathname: location.pathname.replace(
-                                        /\/cluster\/tenants(\/|$)/,
-                                        '/cluster/databases$1',
-                                    ),
-                                    search: location.search,
-                                    hash: location.hash,
-                                }}
-                            />
+                            <Redirect to={getLegacyClusterTenantsRedirect(location)} />
                         )}
                     />
                     {/* Backwards compatibility: redirect legacy `/tenant` URL to `/database`. */}
                     <Route
                         path={routes.legacyTenant}
-                        render={({location}) => (
-                            <Redirect
-                                to={{
-                                    pathname: location.pathname.replace(
-                                        /\/tenant(\/|$)/,
-                                        '/database$1',
-                                    ),
-                                    search: location.search,
-                                    hash: location.hash,
-                                }}
-                            />
-                        )}
+                        render={({location}) => <Redirect to={getLegacyTenantRedirect(location)} />}
                     />
                     {singleClusterMode
                         ? null
