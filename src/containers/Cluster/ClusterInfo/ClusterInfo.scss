@@ -66,11 +66,11 @@
 
     &__section {
         width: 100%;
-        min-width: max-content;
         padding: var(--cluster-overview-vertical-padding);
 
         @container overview-wrapper (min-width: 804px) {
             width: var(--cluster-overview-section);
+            min-width: var(--cluster-overview-section);
         }
     }
 
@@ -79,6 +79,7 @@
     }
 
     &__details {
+        @include mixins.body-1-typography();
         @container overview-wrapper (min-width: 804px) {
             max-width: calc(
                 var(--cluster-overview-section) - var(--cluster-overview-vertical-padding) * 2

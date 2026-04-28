@@ -18,6 +18,7 @@ const config: Config = {
     moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
     moduleNameMapper: {
         '\\.(css|less|scss|sass)$': 'jest-transform-css',
+        '\\.svg$': '<rootDir>/src/__mocks__/svgMock.ts',
     },
 
     transform: {

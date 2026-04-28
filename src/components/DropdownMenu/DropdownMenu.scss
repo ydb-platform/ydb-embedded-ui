@@ -1,0 +1,14 @@
+.ydb-dropdown-menu {
+    &__item-content {
+        padding: var(--g-spacing-1) 0;
+    }
+    &__icon {
+        margin-right: calc(var(--g-spacing-1) + var(--g-spacing-half));
+    }
+    &__icon_with-description {
+        margin-top: calc(var(--g-spacing-1) + var(--g-spacing-half));
+    }
+    &__menu-item_with-description {
+        align-items: flex-start;
+    }
+}

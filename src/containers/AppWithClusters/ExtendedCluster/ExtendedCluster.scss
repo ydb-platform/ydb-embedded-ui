@@ -4,11 +4,12 @@
     height: 100%;
 
     &__balancer {
+        --g-button-height: var(--g-text-body-1-line-height);
         display: flex;
         flex-direction: row;
         align-items: center;
     }
     &__clipboard-button {
-        margin-left: 5px;
+        margin-left: var(--g-spacing-half);
     }
 }

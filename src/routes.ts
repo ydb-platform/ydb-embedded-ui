@@ -264,3 +264,8 @@ export function checkIsTenantPage(pathname: string) {
     const matchFn = match(routes.tenant);
     return Boolean(matchFn(pathname));
 }
+
+export function checkIsClusterPage(pathname: string) {
+    const matchFn = match(routes.cluster);
+    return Boolean(matchFn(pathname));
+}
