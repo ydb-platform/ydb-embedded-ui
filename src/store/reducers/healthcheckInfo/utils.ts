@@ -103,13 +103,26 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
     }
 
     for (const issueId of root.reason) {
-        const directChild: IssuesTree | undefined = issues.find((issue) => issue.id === issueId);
+        const directChild: IssueLog | undefined = issues.find((issue) => issue.id === issueId);
         if (!directChild) {
             continue;
         }
-        const stack: IssuesTree[] = [directChild];
 
+        // Tab classification follows the direct child's type so that a
+        // generic root (e.g. `DATABASE`, which is `unknown`) doesn't pull
+        // storage-related leaves into the Unknown tab.
         const directChildType = getTypeForUI(directChild.type);
+
+        // Include the root in the breadcrumb chain as the parent of the
+        // direct child so that every API issue is surfaced — either as a
+        // standalone card (when it has no `reason` and is not referenced
+        // by any other issue) or as a tab in some leaf's breadcrumb. The
+        // leaf (issue without `reason`) is the rightmost tab.
+        const rootNode = extendIssue(root, directChildType);
+        const initialNode: IssuesTree = extendIssue(directChild, directChildType, {
+            parent: rootNode,
+        });
+        const stack: IssuesTree[] = [initialNode];
 
         while (stack.length > 0) {
             const currentNode = stack.pop()!;
@@ -120,7 +133,7 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
             }
 
             for (const reason of currentNode.reason) {
-                const child: IssuesTree | undefined = issues.find((issue) => issue.id === reason);
+                const child: IssueLog | undefined = issues.find((issue) => issue.id === reason);
                 if (!child) {
                     continue;
                 }

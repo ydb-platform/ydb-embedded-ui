@@ -8,7 +8,7 @@ import {hcStatusToColorFlag} from '../../../../store/reducers/healthcheckInfo/ut
 import {b} from '../shared';
 
 import {IssueDetails} from './HealthcheckIssueDetails/HealthcheckIssueDetails';
-import {HealthcheckIssueTabs, getTypeText} from './HealthcheckIssueTabs';
+import {HealthcheckIssueTabs} from './HealthcheckIssueTabs';
 
 interface HealthcheckIssueProps {
     issue: IssuesTree;
@@ -31,17 +31,6 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
         return parents.find((parent) => parent.id === selectedTab);
     }, [parents, selectedTab]);
 
-    const collapsedBreadcrumb = React.useMemo(() => {
-        const labels = parents
-            .map((parent) => parent.type)
-            .filter((type): type is string => Boolean(type))
-            .map(getTypeText);
-        if (labels.length <= 1) {
-            return null;
-        }
-        return labels.join(' / ');
-    }, [parents]);
-
     return (
         <Flex className={b('issue-wrapper')}>
             <Disclosure className={b('issue-content')} defaultExpanded={expanded}>
@@ -56,16 +45,6 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                             >
                                 <Flex direction="column" gap={1} alignSelf="center">
                                     <Text variant="subheader-2">{issue.message}</Text>
-
-                                    {collapsedBreadcrumb && !props.expanded && (
-                                        <Text
-                                            variant="caption-2"
-                                            color="secondary"
-                                            className={b('issue-breadcrumb')}
-                                        >
-                                            {collapsedBreadcrumb}
-                                        </Text>
-                                    )}
 
                                     {issue.status && (
                                         <div className={b('issue-status')}>
