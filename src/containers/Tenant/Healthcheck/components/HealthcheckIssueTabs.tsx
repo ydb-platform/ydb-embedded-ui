@@ -6,7 +6,7 @@ import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types'
 import type {StatusFlag} from '../../../../types/api/healthcheck';
 import {b} from '../shared';
 
-function getTypeText(type: string) {
+export function getTypeText(type: string) {
     const normalizedType = type.split('_').join(' ');
     let result = normalizedType.charAt(0).toUpperCase() + normalizedType.slice(1).toLowerCase();
     result = result.replace(/\bvdisk\b/gi, 'VDisk').replace(/\bpdisk\b/gi, 'PDisk');

@@ -28,11 +28,15 @@ export const selfCheckResultToHcStatus: Record<SelfCheckResult, StatusFlag> = {
 // BOARD_NODE and avoid silently capturing any unrelated future BOARD* types.
 const STORAGE_TAB_PREFIXES = ['STORAGE', 'SCHEME_BOARD', 'BOARD_', 'STATE_STORAGE'];
 
-// Root issue types that should be included in the breadcrumb chain.
-// For these roots, the leaf preserves a parent link to the root so that the
-// breadcrumb shows e.g. "Scheme board ring / Scheme board node",
-// similar to how disk issues show "Storage / Storage pool / ... / PDisk".
-const RING_ROOT_TYPES = new Set(['SCHEME_BOARD_RING', 'BOARD_RING', 'STATE_STORAGE_RING']);
+// Maps a state-storage summary issue type to the corresponding `_RING` type.
+// Backend reports the summary (BLUE) and the detailed RING/NODE chain as
+// independent trees; we link them so that the UI shows a single chain
+// "<summary> / Ring / Node" instead of two unrelated cards.
+const STATE_STORAGE_SUMMARY_TO_RING: Record<string, string> = {
+    SCHEME_BOARD: 'SCHEME_BOARD_RING',
+    BOARD: 'BOARD_RING',
+    STATE_STORAGE: 'STATE_STORAGE_RING',
+};
 
 export function isStorageRelatedType(type?: string): boolean {
     if (!type) {
@@ -43,6 +47,32 @@ export function isStorageRelatedType(type?: string): boolean {
 
 export function isComputeRelatedType(type?: string): boolean {
     return Boolean(type?.startsWith('COMPUTE'));
+}
+
+/**
+ * Links state-storage summary issues (`SCHEME_BOARD`, `BOARD`, `STATE_STORAGE`)
+ * to their corresponding `_RING` issues by synthesizing a `reason` array.
+ *
+ * Backend emits these as parallel trees — the summary as a BLUE root with no
+ * reason, and the RING/NODE chain as a separate RED root. After linking, the
+ * RING is no longer a root (because the summary references it) and the leaf
+ * inherits a breadcrumb chain `<summary> / Ring / Node`, mirroring the
+ * existing `Storage / Storage pool / ... / PDisk` rendering.
+ */
+export function linkStateStorageSummaries(issues: IssueLog[]): IssueLog[] {
+    return issues.map((issue) => {
+        const ringType = issue.type ? STATE_STORAGE_SUMMARY_TO_RING[issue.type] : undefined;
+        if (!ringType || (issue.reason && issue.reason.length > 0)) {
+            return issue;
+        }
+        const ringIds = issues
+            .filter((candidate) => candidate.type === ringType)
+            .map((candidate) => candidate.id);
+        if (ringIds.length === 0) {
+            return issue;
+        }
+        return {...issue, reason: ringIds};
+    });
 }
 
 function getTypeForUI(type?: string) {
@@ -72,24 +102,14 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
         return [extendIssue(root)];
     }
 
-    // Include the root in the parent chain for ring-style roots so that the
-    // breadcrumb shows e.g. "Scheme board ring / Scheme board node".
-    const includeRootInChain = RING_ROOT_TYPES.has(root.type ?? '');
-
     for (const issueId of root.reason) {
         const directChild: IssuesTree | undefined = issues.find((issue) => issue.id === issueId);
         if (!directChild) {
             continue;
         }
+        const stack: IssuesTree[] = [directChild];
 
         const directChildType = getTypeForUI(directChild.type);
-
-        const initialNode: IssuesTree = includeRootInChain
-            ? extendIssue(directChild, directChildType, {
-                  parent: extendIssue(root, getTypeForUI(root.type)),
-              })
-            : directChild;
-        const stack: IssuesTree[] = [initialNode];
 
         while (stack.length > 0) {
             const currentNode = stack.pop()!;
