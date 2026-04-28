@@ -67,15 +67,42 @@ export function isComputeRelatedType(type?: string): boolean {
  * existing `Storage / Storage pool / ... / PDisk` rendering.
  */
 export function linkStateStorageSummaries(issues: IssueLog[]): IssueLog[] {
+    // Pre-index ids by type once so we don't do O(n) lookups per issue.
+    const idsByType: Partial<Record<string, string[]>> = {};
+    for (const issue of issues) {
+        if (!issue.type) {
+            continue;
+        }
+        const bucket = idsByType[issue.type];
+        if (bucket) {
+            bucket.push(issue.id);
+        } else {
+            idsByType[issue.type] = [issue.id];
+        }
+    }
+
+    // Detect whether any summary actually needs patching; if not, return the
+    // original array so downstream selectors keep their reference equality.
+    const needsLinking = issues.some((issue) => {
+        const ringType = issue.type ? STATE_STORAGE_SUMMARY_TO_RING[issue.type] : undefined;
+        if (!ringType || (issue.reason && issue.reason.length > 0)) {
+            return false;
+        }
+        const ringIds = idsByType[ringType];
+        return Boolean(ringIds && ringIds.length > 0);
+    });
+
+    if (!needsLinking) {
+        return issues;
+    }
+
     return issues.map((issue) => {
         const ringType = issue.type ? STATE_STORAGE_SUMMARY_TO_RING[issue.type] : undefined;
         if (!ringType || (issue.reason && issue.reason.length > 0)) {
             return issue;
         }
-        const ringIds = issues
-            .filter((candidate) => candidate.type === ringType)
-            .map((candidate) => candidate.id);
-        if (ringIds.length === 0) {
+        const ringIds = idsByType[ringType];
+        if (!ringIds || ringIds.length === 0) {
             return issue;
         }
         return {...issue, reason: ringIds};

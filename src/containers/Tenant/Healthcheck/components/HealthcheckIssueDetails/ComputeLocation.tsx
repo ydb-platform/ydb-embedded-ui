@@ -134,7 +134,15 @@ function StateStorageInfo({location}: ComputeSectionProps) {
     return (
         <Flex direction="column" gap={3}>
             <LocationDetails
-                fields={[{value: stateStorage.ring, title: i18n('label_state-storage-ring')}]}
+                fields={[
+                    {
+                        value:
+                            stateStorage.ring !== undefined && stateStorage.ring !== null
+                                ? String(stateStorage.ring)
+                                : undefined,
+                        title: i18n('label_state-storage-ring'),
+                    },
+                ]}
             />
             <NodeInfo node={stateStorage.node} />
         </Flex>
