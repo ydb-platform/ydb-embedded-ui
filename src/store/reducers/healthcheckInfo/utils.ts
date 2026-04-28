@@ -22,10 +22,11 @@ export const selfCheckResultToHcStatus: Record<SelfCheckResult, StatusFlag> = {
     [SelfCheckResult.EMERGENCY]: StatusFlag.RED,
 };
 
-// State storage related issue types are categorized under "storage" in the UI,
-// so that ring/board/state-storage issues appear in the storage tab and can
-// share the same parent-chain (breadcrumb) rendering as disk issues.
-const STATE_STORAGE_RELATED_PREFIXES = ['SCHEME_BOARD', 'BOARD', 'STATE_STORAGE'];
+// Issue type prefixes that should be routed to the "storage" tab in the UI,
+// covering ring/board/state-storage issues alongside regular disk issues.
+// 'BOARD_' (with underscore) is intentionally narrow to match only BOARD_RING /
+// BOARD_NODE and avoid silently capturing any unrelated future BOARD* types.
+const STORAGE_TAB_PREFIXES = ['SCHEME_BOARD', 'BOARD_', 'STATE_STORAGE'];
 
 // Root issue types that should be included in the breadcrumb chain.
 // For these roots, the leaf preserves a parent link to the root so that the
@@ -40,7 +41,7 @@ export function isStorageRelatedType(type?: string): boolean {
     if (type.startsWith('STORAGE')) {
         return true;
     }
-    return STATE_STORAGE_RELATED_PREFIXES.some((prefix) => type.startsWith(prefix));
+    return STORAGE_TAB_PREFIXES.some((prefix) => type.startsWith(prefix));
 }
 
 export function isComputeRelatedType(type?: string): boolean {
@@ -88,7 +89,7 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
 
         const initialNode: IssuesTree = includeRootInChain
             ? extendIssue(directChild, directChildType, {
-                  parent: extendIssue(root, directChildType),
+                  parent: extendIssue(root, getTypeForUI(root.type)),
               })
             : directChild;
         const stack: IssuesTree[] = [initialNode];

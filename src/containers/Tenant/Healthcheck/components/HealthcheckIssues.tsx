@@ -46,14 +46,17 @@ export function Issues({issues}: IssuesProps) {
         () =>
             view
                 ? filteredIssues.filter((issue) => {
-                      const type = issue.rootTypeForUI || issue.type;
+                      const type = issue.rootTypeForUI ?? issue.type;
+                      const isStorageRelated = isStorageRelatedType(type);
+                      const isComputeRelated = isComputeRelatedType(type);
+
                       if (view === 'storage') {
-                          return isStorageRelatedType(type);
+                          return isStorageRelated;
                       }
                       if (view === 'compute') {
-                          return isComputeRelatedType(type);
+                          return isComputeRelated;
                       }
-                      return !isStorageRelatedType(type) && !isComputeRelatedType(type);
+                      return !isStorageRelated && !isComputeRelated;
                   })
                 : [],
         [filteredIssues, view],
