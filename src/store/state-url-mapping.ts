@@ -4,7 +4,6 @@ import each from 'lodash/each';
 import keys from 'lodash/keys';
 import merge from 'lodash/merge';
 import qs from 'qs';
-import type {ParsedQs} from 'qs';
 import type {LocationWithQuery, ParamSetup} from 'redux-location-state';
 import {createReduxLocationActions} from 'redux-location-state';
 import {LOCATION_POP, LOCATION_PUSH} from 'redux-location-state/lib/constants';
@@ -12,30 +11,8 @@ import {getMatchingDeclaredPath} from 'redux-location-state/lib/helpers';
 import {parseQuery} from 'redux-location-state/lib/parseQuery';
 import {stateToParams} from 'redux-location-state/lib/stateToParams';
 
-import {omitVolatileQueryParams} from '../utils/queryParams';
-
 import {initialState as initialHeatmapState} from './reducers/heatmap';
 import {initialState as initialTenantState} from './reducers/tenant/tenant';
-
-// These query params represent a single current UI state value. Legacy URLs can contain repeated
-// or indexed copies, so restore the latest value before carrying unknown params forward.
-const SINGLE_VALUE_QUERY_PARAMS = [
-    'clusterName',
-    'database',
-    'tenantPage',
-    'schema',
-    'backend',
-    'monitoringTab',
-    'from',
-    'to',
-    'interval',
-    'queryTab',
-    'diagnosticsTab',
-    'summaryTab',
-    'metricsTab',
-    'currentMetric',
-    'selectedConsumer',
-] as const;
 
 export const paramSetup = {
     // Do not delete, without `global` params redux-location-state goes crazy
@@ -140,76 +117,9 @@ function mergeLocationToState<S>(state: S, location: Pick<LocationWithQuery, 'qu
     return merge({}, state, location.query);
 }
 
-function normalizeSingleValueQueryParam(value: ParsedQs[string]): string | undefined {
-    if (typeof value === 'string') {
-        return value;
-    }
-
-    if (value === null || value === undefined) {
-        return undefined;
-    }
-
-    if (!Array.isArray(value)) {
-        const sortedKeys = Object.keys(value).sort((left, right) => {
-            const leftNumber = Number(left);
-            const rightNumber = Number(right);
-
-            if (Number.isNaN(leftNumber) || Number.isNaN(rightNumber)) {
-                return 0;
-            }
-
-            return leftNumber - rightNumber;
-        });
-
-        for (let index = sortedKeys.length - 1; index >= 0; index--) {
-            const normalizedValue = normalizeSingleValueQueryParam(value[sortedKeys[index]]);
-
-            if (normalizedValue !== undefined) {
-                return normalizedValue;
-            }
-        }
-
-        return undefined;
-    }
-
-    for (let index = value.length - 1; index >= 0; index--) {
-        const normalizedValue = normalizeSingleValueQueryParam(value[index]);
-
-        if (normalizedValue !== undefined) {
-            return normalizedValue;
-        }
-    }
-
-    return undefined;
-}
-
-function normalizeSingleValueQueryParams(params: ParsedQs) {
-    const normalizedParams = {...params};
-
-    SINGLE_VALUE_QUERY_PARAMS.forEach((param) => {
-        const value = normalizedParams[param];
-
-        if (value === undefined) {
-            return;
-        }
-
-        const normalizedValue = normalizeSingleValueQueryParam(value);
-
-        if (normalizedValue === undefined) {
-            delete normalizedParams[param];
-        } else {
-            normalizedParams[param] = normalizedValue;
-        }
-    });
-
-    return normalizedParams;
-}
-
-export function restoreUnknownParams(location: Location, prevLocation: Location) {
+function restoreUnknownParams(location: Location, prevLocation: Location) {
     const {search, ...rest} = location;
-    const params = normalizeSingleValueQueryParams(
-        omitVolatileQueryParams(qs.parse(prevLocation.search.slice(1))),
-    );
+    const params = qs.parse(prevLocation.search.slice(1));
 
     // figure out which path key inside paramSetup matches location.pathname
     const declaredPath = getMatchingDeclaredPath(paramSetup, location);
@@ -224,14 +134,7 @@ export function restoreUnknownParams(location: Location, prevLocation: Location)
         delete params[param];
     });
 
-    const restoredParams = qs.stringify(params, {
-        arrayFormat: 'repeat',
-        encoder: encodeURIComponent,
-    });
-    if (!restoredParams) {
-        return {search, ...rest};
-    }
-
+    const restoredParams = qs.stringify(params, {encoder: encodeURIComponent});
     const searchDelimiter = search.startsWith('?') ? '&' : '?';
 
     return {search: `${search}${searchDelimiter}${restoredParams}`, ...rest};
@@ -290,7 +193,7 @@ function makeReducersWithLocation<S, A extends UnknownAction, P = A>(
     };
 }
 
-export default function getLocationMiddleware<S = unknown, A extends Action = UnknownAction, P = S>(
+export default function getLocationMiddleware<S = any, A extends Action = UnknownAction, P = S>(
     history: History,
     rootReducer: Reducer<S, A, P>,
 ) {
