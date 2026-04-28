@@ -160,33 +160,10 @@ export function Content(props: ContentProps) {
             <Route>
                 <Header />
                 <Switch>
-                    {singleClusterMode
-                        ? null
-                        : multiClusterRoutes.map((route) => {
-                              return renderRouteSlot(slots, route);
-                          })}
-                    {/* Single cluster routes */}
-                    {routesSlots.map((route) => {
-                        return renderRouteSlot(slots, route);
-                    })}
-                    {/* Backwards compatibility: redirect legacy `/tenant` URL to `/database` */}
-                    <Route
-                        path={routes.legacyTenant}
-                        render={({location}) => (
-                            <Redirect
-                                to={{
-                                    pathname: location.pathname.replace(
-                                        /\/tenant(\/|$)/,
-                                        '/database$1',
-                                    ),
-                                    search: location.search,
-                                    hash: location.hash,
-                                }}
-                            />
-                        )}
-                    />
                     {/* Backwards compatibility: redirect legacy `/cluster/tenants` URL to `/cluster/databases`,
-                        preserving any query params and hash from old bookmarks. */}
+                        preserving any query params and hash from old bookmarks. Must appear before the
+                        cluster route so it wins the Switch match (otherwise the cluster page's internal
+                        unknown-tab fallback would redirect via `getClusterPath()` and drop search/hash). */}
                     <Route
                         path={`/:environment?/${CLUSTER}/tenants`}
                         exact
@@ -203,6 +180,31 @@ export function Content(props: ContentProps) {
                             />
                         )}
                     />
+                    {/* Backwards compatibility: redirect legacy `/tenant` URL to `/database`. */}
+                    <Route
+                        path={routes.legacyTenant}
+                        render={({location}) => (
+                            <Redirect
+                                to={{
+                                    pathname: location.pathname.replace(
+                                        /\/tenant(\/|$)/,
+                                        '/database$1',
+                                    ),
+                                    search: location.search,
+                                    hash: location.hash,
+                                }}
+                            />
+                        )}
+                    />
+                    {singleClusterMode
+                        ? null
+                        : multiClusterRoutes.map((route) => {
+                              return renderRouteSlot(slots, route);
+                          })}
+                    {/* Single cluster routes */}
+                    {routesSlots.map((route) => {
+                        return renderRouteSlot(slots, route);
+                    })}
                     <Route
                         path={redirectProps.from || redirectProps.path}
                         exact={redirectProps.exact}
