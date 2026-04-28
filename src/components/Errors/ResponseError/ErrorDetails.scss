@@ -27,7 +27,9 @@
     }
 
     &__field-value {
-        word-break: break-all;
+        overflow-wrap: anywhere;
+
+        word-break: normal;
     }
 
     &__details-trigger {

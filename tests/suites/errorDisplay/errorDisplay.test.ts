@@ -16,6 +16,7 @@ import {
     setupCluster400PlainTextMock,
     setupCluster503ProxyHeadersMock,
     setupDescribe403Mock,
+    setupMonitoringGatewayErrorMock,
     setupNodeNetworkErrorMock,
     setupPDisk503EmptyBodyMock,
     setupQueryResult500Mock,
@@ -652,6 +653,52 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         );
         await page.screenshot({
             path: `${FULL_PAGE_DIR}/full-tenant-overview-400.png`,
+            fullPage: true,
+        });
+    });
+
+    test('Monitoring — gateway JSON error is readable and expandable', async ({page}) => {
+        await setupMonitoringGatewayErrorMock(page);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: database,
+            database,
+            tenantPage: 'database',
+            diagnosticsTab: 'monitoring',
+        });
+
+        const errorDisplay = new ErrorDisplayModel(page);
+        await errorDisplay.waitForResponseError();
+
+        const errorText = await errorDisplay.getResponseErrorText();
+        expect(errorText).toContain('404');
+        expect(errorText).toContain('dashboard ewfewfwefewfewff not found');
+
+        expect(await errorDisplay.isFieldsVisible()).toBe(true);
+
+        const errorCode = await errorDisplay.getDetailValue('Code');
+        expect(errorCode).toBe('GATEWAY_REQUEST_ERROR');
+
+        const grpcCode = await errorDisplay.getDetailValue('gRPC code');
+        expect(grpcCode).toBe('5');
+
+        await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
+            'error-monitoring-gateway-json-collapsed.png',
+        );
+
+        expect(await errorDisplay.isResponseBodyTriggerVisible()).toBe(true);
+        await errorDisplay.expandResponseBody();
+
+        const responseBody = await errorDisplay.getResponseBodyText();
+        expect(responseBody).toContain('"code": "GATEWAY_REQUEST_ERROR"');
+        expect(responseBody).toContain('"grpcCode": 5');
+
+        await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
+            'error-monitoring-gateway-json-expanded.png',
+        );
+        await page.screenshot({
+            path: `${FULL_PAGE_DIR}/full-monitoring-gateway-json.png`,
             fullPage: true,
         });
     });

@@ -23,6 +23,7 @@ export interface ErrorDetails {
     requestUrl?: string;
     method?: string;
     errorCode?: string;
+    grpcCode?: number;
     responseBody?: string;
     hasIssues?: boolean;
     issues?: IssueMessage[];
@@ -113,6 +114,10 @@ function normalizeStringValue(value: unknown): string | undefined {
 
     const trimmedValue = value.trim();
     return trimmedValue || undefined;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return Boolean(value && typeof value === 'object');
 }
 
 function normalizeErrorOrigin(value: unknown): ErrorDetails['errorOrigin'] | undefined {
@@ -447,7 +452,7 @@ function extractResponseBody(data: unknown): string | undefined {
 
     if (typeof data === 'object') {
         try {
-            const json = JSON.stringify(data);
+            const json = JSON.stringify(data, null, 2);
             if (!json || json === '{}') {
                 return undefined;
             }
@@ -463,6 +468,37 @@ function extractResponseBody(data: unknown): string | undefined {
     return undefined;
 }
 
+function extractGatewayErrorPayload(
+    error: Record<string, unknown>,
+): Record<string, unknown> | null {
+    const data = error.data;
+    const candidates = isRecord(data) ? [data, error] : [error];
+
+    for (const candidate of candidates) {
+        const hasNumericStatus = typeof candidate.status === 'number';
+        const hasCode = typeof candidate.code === 'string';
+        const hasDetails = isRecord(candidate.details);
+
+        if (hasNumericStatus && hasDetails && (hasCode || typeof candidate.message === 'string')) {
+            return candidate;
+        }
+    }
+
+    return null;
+}
+
+function pickGatewayResponseBodyPayload(payload: Record<string, unknown>): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+
+    for (const key of ['status', 'message', 'code', 'details']) {
+        if (key in payload) {
+            result[key] = payload[key];
+        }
+    }
+
+    return result;
+}
+
 /**
  * Short plain text responses can be used as the data message;
  * longer or formatted bodies are shown only in the Response disclosure.
@@ -474,6 +510,10 @@ function isShortPlainText(value: string): boolean {
 }
 
 function extractMessageFromObject(data: object): string | undefined {
+    if ('message' in data && typeof data.message === 'string') {
+        return data.message;
+    }
+
     if ('error' in data && typeof data.error === 'string') {
         return data.error;
     }
@@ -488,8 +528,13 @@ function extractMessageFromObject(data: object): string | undefined {
         return data.error.message;
     }
 
-    if ('message' in data && typeof data.message === 'string') {
-        return data.message;
+    if ('details' in data && data.details && typeof data.details === 'object') {
+        const description = normalizeStringValue(
+            (data.details as Record<string, unknown>).description,
+        );
+        if (description) {
+            return description;
+        }
     }
 
     if ('code' in data && typeof data.code === 'string') {
@@ -536,16 +581,21 @@ function formatTitle(
 
 function extractBasicProperties(error: Record<string, unknown>): Partial<ErrorDetails> {
     const result: Partial<ErrorDetails> = {};
+    const gatewayPayload = extractGatewayErrorPayload(error);
 
     if (typeof error.status === 'number') {
         result.status = error.status;
+    } else if (typeof gatewayPayload?.status === 'number') {
+        result.status = gatewayPayload.status;
     }
 
     if (typeof error.statusText === 'string') {
         result.statusText = error.statusText;
     }
 
-    if (typeof error.code === 'string') {
+    if (typeof gatewayPayload?.code === 'string') {
+        result.errorCode = gatewayPayload.code;
+    } else if (typeof error.code === 'string') {
         result.errorCode = error.code;
     }
 
@@ -558,6 +608,25 @@ function extractBasicProperties(error: Record<string, unknown>): Partial<ErrorDe
         const dataMsg = extractDataMessage(error.data);
         if (dataMsg) {
             result.dataMessage = dataMsg;
+        }
+    } else if (gatewayPayload) {
+        const body = extractResponseBody(pickGatewayResponseBodyPayload(gatewayPayload));
+        if (body) {
+            result.responseBody = body;
+        }
+    }
+
+    if (!result.dataMessage && gatewayPayload) {
+        const gatewayDataMessage = extractMessageFromObject(gatewayPayload);
+        if (gatewayDataMessage) {
+            result.dataMessage = gatewayDataMessage;
+        }
+    }
+
+    if (isRecord(gatewayPayload?.details)) {
+        const grpcCode = gatewayPayload.details.grpcCode;
+        if (typeof grpcCode === 'number') {
+            result.grpcCode = grpcCode;
         }
     }
 

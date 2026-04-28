@@ -41,6 +41,36 @@ describe('prepareCommonErrorMessage', () => {
         expect(prepareCommonErrorMessage(error)).toBe('Throughput limit exceeded');
     });
 
+    test('should return top-level message for gateway-shaped response errors', () => {
+        const error = {
+            status: 404,
+            message: 'dashboard ewfewfwefewfewff not found',
+            code: 'GATEWAY_REQUEST_ERROR',
+            details: {
+                title: 'Error',
+                description: 'dashboard wefewfewfewfewf not found',
+                grpcCode: 5,
+            },
+        };
+        expect(prepareCommonErrorMessage(error)).toBe('dashboard ewfewfwefewfewff not found');
+    });
+
+    test('should return details description for gateway-shaped response data', () => {
+        const error = {
+            status: 404,
+            data: {
+                status: 404,
+                code: 'GATEWAY_REQUEST_ERROR',
+                details: {
+                    title: 'Error',
+                    description: 'dashboard wefewfewfewfewf not found',
+                    grpcCode: 5,
+                },
+            },
+        };
+        expect(prepareCommonErrorMessage(error)).toBe('dashboard wefewfewfewfewf not found');
+    });
+
     test('should return data.error.message for response errors with error object', () => {
         const error = {
             status: 429,

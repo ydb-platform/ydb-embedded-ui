@@ -28,7 +28,9 @@
 
     &__code {
         white-space: pre-wrap;
-        word-break: break-all;
+        overflow-wrap: anywhere;
+
+        word-break: normal;
     }
 
     &__copy-button {

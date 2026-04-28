@@ -1,7 +1,7 @@
 import {isQueryErrorResponse} from '../query';
 import {isNetworkError, isResponseError} from '../response';
 
-import {extractDataMessage} from './extractErrorDetails';
+import {extractDataMessage, extractErrorDetails} from './extractErrorDetails';
 import i18n from './i18n';
 
 export {extractErrorDetails} from './extractErrorDetails';
@@ -31,7 +31,7 @@ export function prepareCommonErrorMessage(err: unknown, defaultMessage?: string)
     }
 
     if (isResponseError(err)) {
-        const dataMessage = extractDataMessage(err.data);
+        const dataMessage = extractDataMessage(err.data) ?? extractErrorDetails(err)?.dataMessage;
         if (err.status === 403) {
             return dataMessage || i18n('access-forbidden');
         }

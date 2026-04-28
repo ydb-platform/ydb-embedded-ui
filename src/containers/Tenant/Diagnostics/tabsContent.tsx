@@ -181,8 +181,11 @@ const diagnosticsTabRenderers: Record<TenantDiagnosticsTab, DiagnosticsTabRender
             database,
             scrollContainerRef,
         }),
-    [TENANT_DIAGNOSTICS_TABS_IDS.monitoring]: ({database, databaseFullPath}) =>
-        uiFactory.renderMonitoring?.({database, databaseFullPath}),
+    [TENANT_DIAGNOSTICS_TABS_IDS.monitoring]: ({database, databaseFullPath}) => (
+        <div className="kv-tenant-diagnostics__monitoring-content">
+            {uiFactory.renderMonitoring?.({database, databaseFullPath})}
+        </div>
+    ),
 };
 
 export function renderDiagnosticsTabContent({

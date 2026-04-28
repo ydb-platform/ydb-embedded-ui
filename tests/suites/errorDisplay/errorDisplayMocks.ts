@@ -407,6 +407,50 @@ export async function setupTenantInfo400Mock(page: Page) {
     });
 }
 
+export async function setupMonitoringGatewayErrorMock(page: Page) {
+    await page.addInitScript(() => {
+        window.e2eMonitoringError = {
+            status: 404,
+            message: 'dashboard ewfewfwefewfewff not found',
+            code: 'GATEWAY_REQUEST_ERROR',
+            details: {
+                title: 'Error',
+                description: 'dashboard wefewfewfewfewf not found',
+                grpcCode: 5,
+            },
+        };
+    });
+
+    await mockRoute(page, ROUTES.tenantInfo, {
+        status: 200,
+        body: JSON.stringify({
+            TenantInfo: [
+                {
+                    Name: '/local',
+                    Id: '/local',
+                    ControlPlane: {
+                        id: 'e2e-control-plane-id',
+                        name: 'e2e-control-plane',
+                    },
+                },
+            ],
+        }),
+    });
+
+    await mockRoute(page, ROUTES.describe, {
+        status: 200,
+        body: JSON.stringify({
+            Path: '/local',
+            PathDescription: {
+                Self: {
+                    Name: 'local',
+                    PathType: 'EPathTypeDir',
+                },
+            },
+        }),
+    });
+}
+
 export async function setupCapabilities401Mock(page: Page) {
     await mockRoute(page, ROUTES.capabilities, {
         status: 401,
