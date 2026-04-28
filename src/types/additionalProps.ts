@@ -4,10 +4,26 @@ import type {TSystemStateInfo} from './api/nodes';
 import type {ETenantType} from './api/tenant';
 import type {InfoItem} from './components';
 
-export interface ClusterLink {
-    title: string;
+interface ClusterLinkBase {
     url: string;
+    icon?: IconData;
+    description?: string;
 }
+
+/** A link with an explicit title (context is optional) */
+export interface ClusterLinkWithTitle extends ClusterLinkBase {
+    title: string;
+    context?: string;
+}
+
+/** A link with a known context that provides a default title */
+interface ClusterLinkWithContext extends ClusterLinkBase {
+    title?: string;
+    context: string;
+}
+
+/** Input cluster link: either title or context (or both) must be provided */
+export type ClusterLink = ClusterLinkWithTitle | ClusterLinkWithContext;
 
 export interface DatabaseLink {
     title: string;

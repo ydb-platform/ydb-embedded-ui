@@ -24,7 +24,7 @@
   "page_title": "Clusters",
 
   "edit-cluster": "Edit Cluster",
-  "remove-cluster": "Remove Cluster",
+  "remove-cluster": "Delete Cluster",
 
   "field_cluster": "Cluster",
   "field_versions": "Versions",

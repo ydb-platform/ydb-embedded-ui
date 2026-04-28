@@ -1,4 +1,4 @@
-import {parseCoresUrl, parseLoggingUrls, parseTraceField} from '../parseFields';
+import {parseCoresUrl, parseLinksField, parseLoggingUrls, parseTraceField} from '../parseFields';
 
 // Mock console.error to avoid Jest issues with error logging
 const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -102,5 +102,92 @@ describe('parseTraceField', () => {
     test('It should return the object as-is if input is already an object', () => {
         const traceObject = {url: 'https://tracing.com/trace?cluster=my_cluster'};
         expect(parseTraceField(traceObject)).toEqual(traceObject);
+    });
+});
+
+describe('parseLinksField', () => {
+    test('It should parse stringified json with links array', () => {
+        expect(
+            parseLinksField(
+                '[{"title":"Node dashboard","url":"https://monitoring.com/node?host={nodeHostname}","type":"node"}]',
+            ),
+        ).toEqual([
+            {
+                title: 'Node dashboard',
+                url: 'https://monitoring.com/node?host={nodeHostname}',
+                type: 'node',
+            },
+        ]);
+    });
+
+    test('It should parse stringified json with multiple links of different types', () => {
+        const input = JSON.stringify([
+            {
+                title: 'Cluster monitoring',
+                url: 'https://monitoring.com/cluster?balancer={cluster.balancer}',
+                type: 'cluster',
+            },
+            {
+                title: 'Database dashboard',
+                url: 'https://monitoring.com/db?name={database}',
+                type: 'database',
+            },
+            {
+                title: 'Node dashboard',
+                url: 'https://monitoring.com/node?host={nodeHostname}',
+                type: 'node',
+            },
+        ]);
+
+        expect(parseLinksField(input)).toEqual([
+            {
+                title: 'Cluster monitoring',
+                url: 'https://monitoring.com/cluster?balancer={cluster.balancer}',
+                type: 'cluster',
+            },
+            {
+                title: 'Database dashboard',
+                url: 'https://monitoring.com/db?name={database}',
+                type: 'database',
+            },
+            {
+                title: 'Node dashboard',
+                url: 'https://monitoring.com/node?host={nodeHostname}',
+                type: 'node',
+            },
+        ]);
+    });
+
+    test('It should return undefined if input is undefined', () => {
+        expect(parseLinksField(undefined)).toEqual(undefined);
+    });
+
+    test('It should return undefined if input is incorrect', () => {
+        expect(parseLinksField('hello')).toEqual(undefined);
+    });
+
+    test('It should return undefined if input is invalid json array with missing required fields', () => {
+        expect(parseLinksField('[{"title":"Link"}]')).toEqual(undefined);
+    });
+
+    test('It should parse links with unknown type values', () => {
+        expect(
+            parseLinksField('[{"title":"Link","url":"https://example.com","type":"custom"}]'),
+        ).toEqual([{title: 'Link', url: 'https://example.com', type: 'custom'}]);
+    });
+
+    test('It should return the array as-is if input is already an array', () => {
+        const linksArray = [
+            {
+                title: 'Node dashboard',
+                url: 'https://monitoring.com/node?host={nodeHostname}',
+                type: 'node' as const,
+            },
+        ];
+        expect(parseLinksField(linksArray)).toEqual(linksArray);
+    });
+
+    test('It should parse empty array', () => {
+        expect(parseLinksField('[]')).toEqual([]);
     });
 });

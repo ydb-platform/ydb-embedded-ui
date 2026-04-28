@@ -1,14 +1,12 @@
 import {Ellipsis} from '@gravity-ui/icons';
 import type {ButtonProps} from '@gravity-ui/uikit';
-import {ActionTooltip, Button, DropdownMenu} from '@gravity-ui/uikit';
+import {ActionTooltip, Button} from '@gravity-ui/uikit';
 
+import {DropdownMenu} from '../../../../../../components/DropdownMenu';
 import i18n from '../../i18n';
 
-import {b} from './shared';
 import type {QueryResultsInfo} from './useQueryInfoMenuItems';
 import {useQueryInfoMenuItems} from './useQueryInfoMenuItems';
-
-import './QueryInfoDropdown.scss';
 
 export interface QueryInfoDropdownProps {
     queryResultsInfo: QueryResultsInfo;
@@ -51,7 +49,6 @@ export function QueryInfoDropdown({
             popupProps={{
                 placement: ['bottom-end', 'left'],
             }}
-            switcherWrapperClassName={b('query-info-switcher-wrapper')}
             renderSwitcher={renderSwitcher}
             items={items}
             size="xl"
