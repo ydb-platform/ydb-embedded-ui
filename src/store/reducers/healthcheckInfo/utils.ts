@@ -23,10 +23,10 @@ export const selfCheckResultToHcStatus: Record<SelfCheckResult, StatusFlag> = {
 };
 
 // Issue type prefixes that should be routed to the "storage" tab in the UI,
-// covering ring/board/state-storage issues alongside regular disk issues.
+// covering regular disk issues alongside ring/board/state-storage issues.
 // 'BOARD_' (with underscore) is intentionally narrow to match only BOARD_RING /
 // BOARD_NODE and avoid silently capturing any unrelated future BOARD* types.
-const STORAGE_TAB_PREFIXES = ['SCHEME_BOARD', 'BOARD_', 'STATE_STORAGE'];
+const STORAGE_TAB_PREFIXES = ['STORAGE', 'SCHEME_BOARD', 'BOARD_', 'STATE_STORAGE'];
 
 // Root issue types that should be included in the breadcrumb chain.
 // For these roots, the leaf preserves a parent link to the root so that the
@@ -37,9 +37,6 @@ const RING_ROOT_TYPES = new Set(['SCHEME_BOARD_RING', 'BOARD_RING', 'STATE_STORA
 export function isStorageRelatedType(type?: string): boolean {
     if (!type) {
         return false;
-    }
-    if (type.startsWith('STORAGE')) {
-        return true;
     }
     return STORAGE_TAB_PREFIXES.some((prefix) => type.startsWith(prefix));
 }
