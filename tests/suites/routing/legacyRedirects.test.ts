@@ -14,7 +14,13 @@ test.describe('Legacy redirects', () => {
     test('redirects tenant URL to database page', async ({page}) => {
         await page.goto('tenant?schema=%2Flocal&database=%2Flocal&tenantPage=diagnostics');
 
-        await expect(page).toHaveURL(/\/database\?/);
+        await expect(page).toHaveURL((url) => {
+            return (
+                url.pathname === '/database' &&
+                url.searchParams.get('databasePage') === 'diagnostics' &&
+                !url.searchParams.has('tenantPage')
+            );
+        });
 
         const url = new URL(page.url());
         expect(url.pathname).toBe('/database');
