@@ -23,25 +23,79 @@ const CONTEXT_DEFAULT_DESCRIPTIONS: Partial<Record<ClusterLinkContext, string>> 
 };
 
 /**
- * Replaces `{param}` placeholders in a URL template with values from the source object.
- * Only string and number values from the source are used for substitution.
+ * Map of namespace prefixes to their source objects for dotted placeholder resolution.
+ * Currently supports `cluster`; extend this interface when new namespaces are needed
+ * (e.g. `database`).
+ */
+export interface SubstitutionNamespaces {
+    cluster?: ClusterInfo;
+    /** Allow arbitrary namespace prefixes for forward-compatibility */
+    [key: string]: Record<string, unknown> | undefined;
+}
+
+/** Matches `{param}` and `{prefix.param}` placeholders */
+const PLACEHOLDER_PATTERN = /\{([\w.]+)\}/g;
+
+/**
+ * Resolves a placeholder key from the namespaces map.
+ *
+ * - Flat keys like `name` are resolved as `namespaces[source][name]`.
+ * - Dotted keys like `cluster.balancer` are resolved as `namespaces[cluster][balancer]`.
+ *   Only single-level dotted paths (`prefix.field`) are supported.
+ *
+ * Returns the resolved value if it is a string or number, otherwise `undefined`.
+ */
+function resolveParam(
+    key: string,
+    source: string,
+    namespaces: SubstitutionNamespaces,
+): string | number | undefined {
+    let prefix: string;
+    let field: string;
+
+    if (key.includes('.')) {
+        const parts = key.split('.');
+        if (parts.length !== 2) {
+            return undefined;
+        }
+        [prefix, field] = parts;
+    } else {
+        prefix = source;
+        field = key;
+    }
+
+    const value = namespaces[prefix]?.[field];
+
+    return typeof value === 'string' || typeof value === 'number' ? value : undefined;
+}
+
+/**
+ * Replaces `{param}` and `{prefix.param}` placeholders in a URL template.
+ *
+ * - Flat placeholders like `{balancer}` are resolved via `namespaces[source][balancer]`.
+ * - Dotted placeholders like `{cluster.balancer}` are resolved via `namespaces[cluster][balancer]`.
+ *   Only single-level dotted paths are supported; unknown prefixes are unresolvable.
+ *
+ * Only string and number values are used for substitution.
  * Returns `undefined` if any placeholder remains unresolved after substitution.
  */
 export function substituteUrlParams(
     template: string,
-    source: Record<string, unknown>,
+    source: string,
+    namespaces: SubstitutionNamespaces = {},
 ): string | undefined {
-    const result = template.replace(/\{(\w+)\}/g, (match, key: string) => {
-        const value = source[key];
-        return typeof value === 'string' || typeof value === 'number' ? String(value) : match;
+    let hasUnresolved = false;
+
+    const result = template.replace(PLACEHOLDER_PATTERN, (match, key: string) => {
+        const value = resolveParam(key, source, namespaces);
+        if (value === undefined) {
+            hasUnresolved = true;
+            return match;
+        }
+        return String(value);
     });
 
-    // If any unresolved placeholders remain, the URL is invalid
-    if (/\{(\w+)\}/.test(result)) {
-        return undefined;
-    }
-
-    return result;
+    return hasUnresolved ? undefined : result;
 }
 
 /**
@@ -106,7 +160,7 @@ function buildLegacyLinks(clusterInfo: ClusterInfo): ClusterLink[] {
  */
 function processDynamicLinks(
     dynamicLinks: MetaClusterLink[] | undefined,
-    clusterInfo: ClusterInfo,
+    namespaces: SubstitutionNamespaces,
 ): {result: ClusterLinkWithTitle[]; coveredContexts: Set<string>} {
     const result: ClusterLinkWithTitle[] = [];
     const coveredContexts = new Set<string>();
@@ -117,7 +171,7 @@ function processDynamicLinks(
                 continue;
             }
 
-            const resolvedUrl = substituteUrlParams(link.url, clusterInfo);
+            const resolvedUrl = substituteUrlParams(link.url, link.type, namespaces);
             if (!resolvedUrl) {
                 continue;
             }
@@ -199,10 +253,9 @@ export function resolveClusterLinks(
     const legacyLinks = buildLegacyLinks(clusterInfo);
     const allAdditionalLinks = additionalLinks.concat(legacyLinks);
 
-    const {result: dynamicResult, coveredContexts} = processDynamicLinks(
-        clusterInfo.links,
-        clusterInfo,
-    );
+    const {result: dynamicResult, coveredContexts} = processDynamicLinks(clusterInfo.links, {
+        cluster: clusterInfo,
+    });
 
     const additionalResult = processAdditionalLinks(allAdditionalLinks, coveredContexts);
 
