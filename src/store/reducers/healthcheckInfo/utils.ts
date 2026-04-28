@@ -26,7 +26,14 @@ export const selfCheckResultToHcStatus: Record<SelfCheckResult, StatusFlag> = {
 // covering regular disk issues alongside ring/board/state-storage issues.
 // 'BOARD_' (with underscore) is intentionally narrow to match only BOARD_RING /
 // BOARD_NODE and avoid silently capturing any unrelated future BOARD* types.
-const STORAGE_TAB_PREFIXES = ['STORAGE', 'SCHEME_BOARD', 'BOARD_', 'STATE_STORAGE'];
+const STORAGE_TAB_PREFIXES = [
+    'STORAGE',
+    'PDISK',
+    'VDISK',
+    'SCHEME_BOARD',
+    'BOARD_',
+    'STATE_STORAGE',
+];
 
 // Maps a state-storage summary issue type to the corresponding `_RING` type.
 // Backend reports the summary (BLUE) and the detailed RING/NODE chain as
