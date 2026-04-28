@@ -47,16 +47,14 @@ export function Issues({issues}: IssuesProps) {
             view
                 ? filteredIssues.filter((issue) => {
                       const type = issue.rootTypeForUI ?? issue.type;
-                      const isStorageRelated = isStorageRelatedType(type);
-                      const isComputeRelated = isComputeRelatedType(type);
 
                       if (view === 'storage') {
-                          return isStorageRelated;
+                          return isStorageRelatedType(type);
                       }
                       if (view === 'compute') {
-                          return isComputeRelated;
+                          return isComputeRelatedType(type);
                       }
-                      return !isStorageRelated && !isComputeRelated;
+                      return type?.toLowerCase().startsWith(view);
                   })
                 : [],
         [filteredIssues, view],
