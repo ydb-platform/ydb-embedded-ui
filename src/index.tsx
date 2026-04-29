@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom/client';
 
+import {ResponseError} from './components/Errors/ResponseError';
 import {ErrorBoundary} from './lib';
 import reportWebVitals from './reportWebVitals';
 import {history, store} from './store/defaultStore';
@@ -23,8 +24,19 @@ function applyE2EQueryEditorModeOverride() {
     }
 }
 
+function applyE2EMonitoringOverride() {
+    if (!E2E_UI_OVERRIDES_ENABLED || !window.e2eMonitoringError) {
+        return;
+    }
+
+    configureUIFactory({
+        renderMonitoring: () => <ResponseError error={window.e2eMonitoringError} />,
+    });
+}
+
 async function render() {
     applyE2EQueryEditorModeOverride();
+    applyE2EMonitoringOverride();
 
     let App;
     if (

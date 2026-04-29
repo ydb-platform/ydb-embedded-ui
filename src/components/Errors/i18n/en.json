@@ -7,6 +7,7 @@
   "error.title": "Error",
   "error-details.label_url": "URL",
   "error-details.label_error-code": "Code",
+  "error-details.label_grpc-code": "gRPC code",
   "error-details.label_message": "Message",
   "error-details.label_error-origin": "Error origin",
   "error-details.label_error-stage": "Error stage",

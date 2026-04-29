@@ -283,7 +283,90 @@ describe('extractErrorDetails', () => {
         const error = {status: 500, data: {error: 'Internal server error'}};
         const details = extractErrorDetails(error);
 
-        expect(details?.responseBody).toBe('{"error":"Internal server error"}');
+        expect(details?.responseBody).toBe('{\n  "error": "Internal server error"\n}');
+    });
+
+    test('should extract gateway-shaped top-level error details', () => {
+        const error = {
+            status: 404,
+            message: 'dashboard ewfewfwefewfewff not found',
+            code: 'GATEWAY_REQUEST_ERROR',
+            details: {
+                title: 'Error',
+                description: 'dashboard wefewfewfewfewf not found',
+                grpcCode: 5,
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details).toEqual(
+            expect.objectContaining({
+                status: 404,
+                title: '404',
+                dataMessage: 'dashboard ewfewfwefewfewff not found',
+                errorCode: 'GATEWAY_REQUEST_ERROR',
+                grpcCode: 5,
+                responseBody:
+                    '{\n' +
+                    '  "status": 404,\n' +
+                    '  "message": "dashboard ewfewfwefewfewff not found",\n' +
+                    '  "code": "GATEWAY_REQUEST_ERROR",\n' +
+                    '  "details": {\n' +
+                    '    "title": "Error",\n' +
+                    '    "description": "dashboard wefewfewfewfewf not found",\n' +
+                    '    "grpcCode": 5\n' +
+                    '  }\n' +
+                    '}',
+            }),
+        );
+    });
+
+    test('should not treat array details as gateway-shaped error', () => {
+        const error = {
+            status: 404,
+            message: 'Not found',
+            details: [{description: 'Unexpected shape'}],
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details).toEqual(
+            expect.objectContaining({
+                status: 404,
+                title: '404',
+                message: 'Not found',
+            }),
+        );
+        expect(details?.dataMessage).toBeUndefined();
+        expect(details?.responseBody).toBeUndefined();
+        expect(details?.grpcCode).toBeUndefined();
+    });
+
+    test('should extract gateway-shaped response data details', () => {
+        const error = {
+            status: 404,
+            data: {
+                status: 404,
+                code: 'GATEWAY_REQUEST_ERROR',
+                details: {
+                    title: 'Error',
+                    description: 'dashboard wefewfewfewfewf not found',
+                    grpcCode: 5,
+                },
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details).toEqual(
+            expect.objectContaining({
+                status: 404,
+                title: '404',
+                dataMessage: 'dashboard wefewfewfewfewf not found',
+                errorCode: 'GATEWAY_REQUEST_ERROR',
+                grpcCode: 5,
+            }),
+        );
+        expect(details?.responseBody).toContain('"code": "GATEWAY_REQUEST_ERROR"');
+        expect(details?.responseBody).toContain('"grpcCode": 5');
     });
 
     test('should not extract responseBody from empty string data', () => {
@@ -694,6 +777,8 @@ describe('extractErrorDetails', () => {
                 method: 'GET',
             }),
         );
+        expect(details?.dataMessage).toBeUndefined();
+        expect(details?.message).toBe('Network Error');
     });
 
     test('should extract config from enriched fetch error without title', () => {
