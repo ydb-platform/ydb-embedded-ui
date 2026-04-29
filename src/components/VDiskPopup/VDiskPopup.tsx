@@ -10,7 +10,11 @@ import {EFlag} from '../../types/api/enums';
 import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatDurationSeconds, stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
+import {
+    formatDurationSeconds,
+    parseVdiskId,
+    stringifyVdiskId,
+} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculateVDiskSeverity';
 import {
@@ -327,7 +331,10 @@ const buildVDiskFooter = (
 
     const hasLinks = vDiskPagePath || vDiskInternalViewerPath;
 
-    const isVDiskParamsDefined = isAllVdiskParamsDefined(VDiskId);
+    const resolvedVDiskId = isAllVdiskParamsDefined(VDiskId)
+        ? VDiskId
+        : parseVdiskId(StringifiedId);
+    const isVDiskParamsDefined = isAllVdiskParamsDefined(resolvedVDiskId);
 
     if (!hasLinks && !isVDiskParamsDefined) {
         return null;
@@ -355,7 +362,7 @@ const buildVDiskFooter = (
             )}
             {isVDiskParamsDefined && (
                 <EvictVDiskButton
-                    vDiskId={VDiskId}
+                    vDiskId={resolvedVDiskId}
                     donorMode={DonorMode}
                     fullWidth
                     onSuccess={onSuccess}
