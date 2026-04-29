@@ -5,7 +5,6 @@ import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
 import {getTenantPath} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import type {ETenantType} from '../../../../../types/api/tenant';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {useSearchQuery} from '../../../../../utils/hooks';
 import {TenantTabsGroups} from '../../../TenantPages';
@@ -16,19 +15,9 @@ import i18n from '../i18n';
 import {TopGroups} from './TopGroups';
 import {TopTables} from './TopTables';
 import {storageDashboardConfig} from './storageDashboardConfig';
+import type {TenantStorageProps} from './types';
 
-export interface TenantStorageMetrics {
-    blobStorageUsed?: number;
-    blobStorageLimit?: number;
-    tabletStorageUsed?: number;
-    tabletStorageLimit?: number;
-}
-
-interface TenantStorageProps {
-    database: string;
-    metrics: TenantStorageMetrics;
-    databaseType?: ETenantType;
-}
+export type {TenantStorageMetrics} from './types';
 
 export function TenantStorage({database, metrics, databaseType}: TenantStorageProps) {
     const {blobStorageUsed, tabletStorageUsed, blobStorageLimit, tabletStorageLimit} = metrics;
