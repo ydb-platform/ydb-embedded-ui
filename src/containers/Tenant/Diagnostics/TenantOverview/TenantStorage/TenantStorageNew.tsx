@@ -80,6 +80,14 @@ const SEGMENT_LABELS: Record<TenantStorageSegmentKey, string> = {
     [TENANT_STORAGE_SEGMENT_KEYS.unknown]: i18n('storage.new.unknown'),
 };
 
+const SEGMENT_ORDER_INDEX: Record<TenantStorageSegmentKey, number> = {
+    [TENANT_STORAGE_SEGMENT_KEYS.system]: 0,
+    [TENANT_STORAGE_SEGMENT_KEYS.rowTables]: 1,
+    [TENANT_STORAGE_SEGMENT_KEYS.columnTables]: 2,
+    [TENANT_STORAGE_SEGMENT_KEYS.topics]: 3,
+    [TENANT_STORAGE_SEGMENT_KEYS.unknown]: 4,
+};
+
 const SYSTEM_DETAIL_LABELS: Record<TenantStorageSystemDetailKey, string> = {
     [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive]: i18n('storage.new.system-detail.hive'),
     [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.coordinator]: i18n('storage.new.system-detail.coordinator'),
@@ -203,6 +211,12 @@ function getMediaSectionLabel(mediaType?: EType) {
     return mediaType;
 }
 
+function getActiveDisplaySegments(segments: TenantStorageSegment[]) {
+    return segments
+        .filter((segment) => segment.value > 0)
+        .sort((left, right) => SEGMENT_ORDER_INDEX[left.key] - SEGMENT_ORDER_INDEX[right.key]);
+}
+
 function SegmentedProgressBar({
     segments,
     total,
@@ -210,7 +224,7 @@ function SegmentedProgressBar({
     segments: TenantStorageSegment[];
     total?: number;
 }) {
-    const activeSegments = segments.filter((s) => s.value > 0);
+    const activeSegments = getActiveDisplaySegments(segments);
     const segmentSum = activeSegments.reduce((sum, s) => sum + s.value, 0);
     const effectiveTotal = total === undefined ? segmentSum : total;
 
@@ -248,7 +262,7 @@ function LegendItems({
     formatSystemDetailValue?: (value: number) => string;
     systemDetails?: TenantStorageSystemDetail[];
 }) {
-    const activeSegments = segments.filter((s) => s.value > 0);
+    const activeSegments = getActiveDisplaySegments(segments);
     const visibleSystemDetails = (systemDetails ?? []).filter((detail) => detail.value > 0);
 
     if (activeSegments.length === 0) {

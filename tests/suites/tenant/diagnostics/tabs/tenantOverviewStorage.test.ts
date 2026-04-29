@@ -7,14 +7,24 @@ import {TenantPage} from '../../TenantPage';
 const TOP_ROW_PATH = '/local/kv_test';
 const SECOND_TOP_ROW_PATH = '/local/orders_cdc';
 const STORAGE_VIEW_SELECTOR = '.ydb-tenant-storage-new';
+const STORAGE_SECTIONS_SELECTOR = '.ydb-tenant-storage-new__sections-inner';
 const MEDIA_SECTION_SELECTOR = '.ydb-tenant-storage-new__media-section';
 const SUMMARY_CARD_SELECTOR = '.ydb-tenant-storage-new__summary-card';
 const SUMMARY_METRIC_SELECTOR = '.ydb-tenant-storage-new__summary-metric';
+const STORAGE_SCREENSHOT_THEMES = ['light', 'dark'] as const;
 
-async function enableNewStorageView(page: Page) {
+type StorageScreenshotTheme = (typeof STORAGE_SCREENSHOT_THEMES)[number];
+
+async function enableNewStorageView(page: Page, theme?: StorageScreenshotTheme) {
     await page.addInitScript(() => {
         localStorage.setItem('enableNewStorageView', JSON.stringify(true));
     });
+
+    if (theme) {
+        await page.addInitScript((themeName) => {
+            localStorage.setItem('theme', themeName);
+        }, theme);
+    }
 }
 
 async function setupCapabilities(page: Page, storageStatsVersion: number) {
@@ -114,27 +124,59 @@ async function setupStorageStats(page: Page) {
                 body: JSON.stringify({
                     Tablets: [
                         {
-                            Type: 'DataShard',
-                            DataSize: 118000000000,
-                            StorageSize: 118000000000,
-                            Media: [{Kind: 'SSD', StorageSize: 118000000000}],
+                            Type: 'Mediator',
+                            StorageSize: 12820,
+                            Media: [{Kind: 'ssd', StorageSize: 12820}],
                         },
                         {
-                            Type: 'ColumnShard',
-                            DataSize: 1000000000,
-                            StorageSize: 1000000000,
-                            Media: [{Kind: 'SSD', StorageSize: 1000000000}],
+                            Type: 'Coordinator',
+                            StorageSize: 13026534,
+                            Media: [{Kind: 'ssd', StorageSize: 13026534}],
+                        },
+                        {
+                            Type: 'Hive',
+                            StorageSize: 142572169,
+                            Media: [{Kind: 'ssd', StorageSize: 142572169}],
+                        },
+                        {
+                            Type: 'SchemeShard',
+                            StorageSize: 14850162,
+                            Media: [{Kind: 'ssd', StorageSize: 14850162}],
+                        },
+                        {
+                            Type: 'DataShard',
+                            StorageSize: 71262508656,
+                            Media: [{Kind: 'ssd', StorageSize: 71262508656}],
                         },
                         {
                             Type: 'PersQueue',
-                            DataSize: 1000000000,
-                            StorageSize: 1000000000,
-                            Media: [{Kind: 'SSD', StorageSize: 1000000000}],
+                            StorageSize: 490192343,
+                            Media: [{Kind: 'ssd', StorageSize: 490192343}],
                         },
                         {
                             Type: 'PersQueueReadBalancer',
-                            StorageSize: 236000000000,
-                            Media: [{Kind: 'SSD', StorageSize: 236000000000}],
+                            StorageSize: 23506713,
+                            Media: [{Kind: 'ssd', StorageSize: 23506713}],
+                        },
+                        {
+                            Type: 'SysViewProcessor',
+                            StorageSize: 72956425,
+                            Media: [{Kind: 'ssd', StorageSize: 72956425}],
+                        },
+                        {
+                            Type: 'ColumnShard',
+                            StorageSize: 2244552896,
+                            Media: [{Kind: 'ssd', StorageSize: 2244552896}],
+                        },
+                        {
+                            Type: 'StatisticsAggregator',
+                            StorageSize: 2179029,
+                            Media: [{Kind: 'ssd', StorageSize: 2179029}],
+                        },
+                        {
+                            Type: 'GraphShard',
+                            StorageSize: 15781,
+                            Media: [{Kind: 'ssd', StorageSize: 15781}],
                         },
                     ],
                 }),
@@ -276,101 +318,114 @@ function getSummaryMetric(card: Locator, label: string) {
 }
 
 test.describe('Tenant Overview storage metrics tab', () => {
-    test('renders the new storage layout when experiment and storage_stats are enabled', async ({
-        page,
-    }) => {
-        await enableNewStorageView(page);
-        await setupWhoami(page);
-        await setupCapabilities(page, 1);
-        await setupTenantInfo(page, 'Dedicated');
-        await setupPartitionStatsQuery(page);
-        await setupStorageStats(page);
-        await setupDescribe(page);
+    test.describe.configure({timeout: 60_000});
 
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto({
-            schema: database,
-            database,
-            tenantPage: 'diagnostics',
+    for (const theme of STORAGE_SCREENSHOT_THEMES) {
+        test(`renders the new storage layout in ${theme} theme`, async ({page}) => {
+            await enableNewStorageView(page, theme);
+            await setupWhoami(page);
+            await setupCapabilities(page, 1);
+            await setupTenantInfo(page, 'Dedicated');
+            await setupPartitionStatsQuery(page);
+            await setupStorageStats(page);
+            await setupDescribe(page);
+
+            const tenantPage = new TenantPage(page);
+            await tenantPage.goto({
+                schema: database,
+                database,
+                tenantPage: 'diagnostics',
+            });
+
+            await openStorageMetricsTab(page);
+
+            const storageView = page.locator(STORAGE_VIEW_SELECTOR);
+            const userDataSummary = getSummaryCard(storageView, 'User data');
+            const physicalSummary = getSummaryCard(storageView, 'Physical disk usage');
+
+            await expect(storageView).toBeVisible();
+            await expect(storageView.getByText('User data', {exact: true})).toBeVisible();
+            await expect(storageView.getByText('Physical disk usage', {exact: true})).toBeVisible();
+            await expect(
+                storageView.getByText('Top 10 by space usage', {exact: true}),
+            ).toBeVisible();
+            await expect(storageView.getByText('Row table', {exact: true})).toBeVisible();
+            await expect(storageView.getByText('System', {exact: true})).toBeVisible();
+            await expect(
+                getSummaryMetric(userDataSummary, 'Used').getByText('3.10 TB', {exact: true}),
+            ).toBeVisible();
+            await expect(
+                getSummaryMetric(physicalSummary, 'Used').getByText('26.40 TB', {exact: true}),
+            ).toBeVisible();
+            await expect(userDataSummary.getByText('used 15%', {exact: true})).toBeVisible();
+            await expect(physicalSummary.getByText('used 13%', {exact: true})).toBeVisible();
+            await expect(storageView.getByRole('link', {name: 'kv_test'})).toHaveAttribute(
+                'href',
+                /schema=%2Flocal%2Fkv_test/,
+            );
+            await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(
+                `tenant-overview-storage-single-media-${theme}.png`,
+            );
         });
 
-        await openStorageMetricsTab(page);
+        test(`renders separate summary sections for multiple storage types in ${theme} theme`, async ({
+            page,
+        }) => {
+            await enableNewStorageView(page, theme);
+            await setupWhoami(page);
+            await setupCapabilities(page, 1);
+            await setupTenantInfo(page, 'Dedicated', {
+                databaseStorage: [
+                    {Type: 'SSD', Size: '400000000000', Limit: '1000000000000'},
+                    {Type: 'HDD', Size: '600000000000', Limit: '2000000000000'},
+                ],
+                tablesStorage: [
+                    {
+                        Type: 'SSD',
+                        Size: '250000000000',
+                        Limit: '500000000000',
+                        SoftQuota: '500000000000',
+                    },
+                    {
+                        Type: 'HDD',
+                        Size: '50000000000',
+                        Limit: '200000000000',
+                        SoftQuota: '200000000000',
+                    },
+                ],
+            });
+            await setupPartitionStatsQuery(page);
+            await setupStorageStats(page);
+            await setupDescribe(page);
 
-        const storageView = page.locator(STORAGE_VIEW_SELECTOR);
-        const userDataSummary = getSummaryCard(storageView, 'User data');
-        const physicalSummary = getSummaryCard(storageView, 'Physical disk usage');
+            const tenantPage = new TenantPage(page);
+            await tenantPage.goto({
+                schema: database,
+                database,
+                tenantPage: 'diagnostics',
+            });
 
-        await expect(storageView).toBeVisible();
-        await expect(storageView.getByText('User data', {exact: true})).toBeVisible();
-        await expect(storageView.getByText('Physical disk usage', {exact: true})).toBeVisible();
-        await expect(storageView.getByText('Top 10 by space usage', {exact: true})).toBeVisible();
-        await expect(storageView.getByText('Row table', {exact: true})).toBeVisible();
-        await expect(
-            getSummaryMetric(userDataSummary, 'Used').getByText('3.10 TB', {exact: true}),
-        ).toBeVisible();
-        await expect(
-            getSummaryMetric(physicalSummary, 'Used').getByText('26.40 TB', {exact: true}),
-        ).toBeVisible();
-        await expect(userDataSummary.getByText('used 15%', {exact: true})).toBeVisible();
-        await expect(physicalSummary.getByText('used 13%', {exact: true})).toBeVisible();
-        await expect(storageView.getByRole('link', {name: 'kv_test'})).toHaveAttribute(
-            'href',
-            /schema=%2Flocal%2Fkv_test/,
-        );
-    });
+            await openStorageMetricsTab(page);
 
-    test('renders separate summary sections for multiple storage types', async ({page}) => {
-        await enableNewStorageView(page);
-        await setupWhoami(page);
-        await setupCapabilities(page, 1);
-        await setupTenantInfo(page, 'Dedicated', {
-            databaseStorage: [
-                {Type: 'SSD', Size: '400000000000', Limit: '1000000000000'},
-                {Type: 'HDD', Size: '600000000000', Limit: '2000000000000'},
-            ],
-            tablesStorage: [
-                {
-                    Type: 'SSD',
-                    Size: '250000000000',
-                    Limit: '500000000000',
-                    SoftQuota: '500000000000',
-                },
-                {
-                    Type: 'HDD',
-                    Size: '50000000000',
-                    Limit: '200000000000',
-                    SoftQuota: '200000000000',
-                },
-            ],
+            const storageView = page.locator(STORAGE_VIEW_SELECTOR);
+            const ssdSection = storageView.locator(MEDIA_SECTION_SELECTOR).filter({hasText: 'SSD'});
+            const hddSection = storageView.locator(MEDIA_SECTION_SELECTOR).filter({hasText: 'HDD'});
+            const ssdUserDataSummary = getSummaryCard(ssdSection, 'User data');
+            const hddPhysicalSummary = getSummaryCard(hddSection, 'Physical disk usage');
+
+            await expect(storageView.getByText('SSD', {exact: true})).toBeVisible();
+            await expect(storageView.getByText('HDD', {exact: true})).toBeVisible();
+            await expect(
+                getSummaryMetric(ssdUserDataSummary, 'Used').getByText('250 GB', {exact: true}),
+            ).toBeVisible();
+            await expect(
+                getSummaryMetric(hddPhysicalSummary, 'Used').getByText('0.60 TB', {exact: true}),
+            ).toBeVisible();
+            await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(
+                `tenant-overview-storage-multi-media-${theme}.png`,
+            );
         });
-        await setupPartitionStatsQuery(page);
-        await setupStorageStats(page);
-        await setupDescribe(page);
-
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto({
-            schema: database,
-            database,
-            tenantPage: 'diagnostics',
-        });
-
-        await openStorageMetricsTab(page);
-
-        const storageView = page.locator(STORAGE_VIEW_SELECTOR);
-        const ssdSection = storageView.locator(MEDIA_SECTION_SELECTOR).filter({hasText: 'SSD'});
-        const hddSection = storageView.locator(MEDIA_SECTION_SELECTOR).filter({hasText: 'HDD'});
-        const ssdUserDataSummary = getSummaryCard(ssdSection, 'User data');
-        const hddPhysicalSummary = getSummaryCard(hddSection, 'Physical disk usage');
-
-        await expect(storageView.getByText('SSD', {exact: true})).toBeVisible();
-        await expect(storageView.getByText('HDD', {exact: true})).toBeVisible();
-        await expect(
-            getSummaryMetric(ssdUserDataSummary, 'Used').getByText('250 GB', {exact: true}),
-        ).toBeVisible();
-        await expect(
-            getSummaryMetric(hddPhysicalSummary, 'Used').getByText('0.60 TB', {exact: true}),
-        ).toBeVisible();
-    });
+    }
 
     test('keeps legacy dedicated storage layout when experiment is disabled', async ({page}) => {
         await setupWhoami(page);

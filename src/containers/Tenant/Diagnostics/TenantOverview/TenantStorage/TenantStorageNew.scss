@@ -4,8 +4,8 @@
     --ydb-storage-segment-row-tables: #5282ff;
     --ydb-storage-segment-column-tables: #ff7112;
     --ydb-storage-segment-topics: #ed2a7a;
-    --ydb-storage-segment-system: rgba(255, 255, 255, 0.25);
-    --ydb-storage-segment-unknown: rgba(255, 255, 255, 0.4);
+    --ydb-storage-segment-system: var(--g-color-base-generic-medium);
+    --ydb-storage-segment-unknown: var(--g-color-text-misc);
 
     &__sections-group {
         display: flex;
