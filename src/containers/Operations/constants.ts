@@ -34,9 +34,15 @@ export const BASE_COLUMNS = [
 ];
 
 export const OPERATION_KINDS: {value: OperationKind; content: string}[] = [
+    {value: 'export', content: i18n('kind_export')},
     {value: 'export/s3', content: i18n('kind_export_s3')},
     {value: 'export/yt', content: i18n('kind_export_yt')},
+    {value: 'export/nfs', content: i18n('kind_export_nfs')},
     {value: 'import/s3', content: i18n('kind_import_s3')},
+    {value: 'import/nfs', content: i18n('kind_import_nfs')},
     {value: 'ss/backgrounds', content: i18n('kind_ssBackgrounds')},
     {value: 'buildindex', content: i18n('kind_buildIndex')},
+    {value: 'compaction', content: i18n('kind_compaction')},
+    {value: 'incbackup', content: i18n('kind_incbackup')},
+    {value: 'restore', content: i18n('kind_restore')},
 ];

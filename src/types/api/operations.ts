@@ -116,8 +116,13 @@ export enum IndexBuildState {
 export const OPERATION_METADATA_TYPE_URLS = {
     IndexBuild: 'type.googleapis.com/Ydb.Table.IndexBuildMetadata',
     ImportFromS3: 'type.googleapis.com/Ydb.Import.ImportFromS3Metadata',
+    ImportFromFs: 'type.googleapis.com/Ydb.Import.ImportFromFsMetadata',
     ExportToS3: 'type.googleapis.com/Ydb.Export.ExportToS3Metadata',
     ExportToYt: 'type.googleapis.com/Ydb.Export.ExportToYtMetadata',
+    ExportToFs: 'type.googleapis.com/Ydb.Export.ExportToFsMetadata',
+    Compact: 'type.googleapis.com/Ydb.Table.CompactMetadata',
+    IncrementalBackup: 'type.googleapis.com/Ydb.Backup.IncrementalBackupMetadata',
+    Restore: 'type.googleapis.com/Ydb.Backup.RestoreMetadata',
 } as const;
 
 export type OperationMetadataTypeUrl =
@@ -203,11 +208,101 @@ export interface ExportToYtMetadata {
     items_progress?: ImportExportItemProgress[];
 }
 
+/**
+ * Import from file system (NFS) metadata
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_import.proto
+ */
+export interface ImportFromFsMetadata {
+    '@type'?: typeof OPERATION_METADATA_TYPE_URLS.ImportFromFs;
+    settings?: {
+        base_path?: string;
+        items?: Array<{
+            source_path?: string;
+            source_path_db?: string;
+            destination_path?: string;
+        }>;
+        [key: string]: unknown;
+    };
+    progress?: ImportExportProgress | string;
+    items_progress?: ImportExportItemProgress[];
+}
+
+/**
+ * Export to file system (NFS) metadata
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_export.proto
+ */
+export interface ExportToFsMetadata {
+    '@type'?: typeof OPERATION_METADATA_TYPE_URLS.ExportToFs;
+    settings?: {
+        base_path?: string;
+        items?: Array<{
+            source_path?: string;
+            destination_path?: string;
+        }>;
+        [key: string]: unknown;
+    };
+    progress?: ImportExportProgress | string;
+    items_progress?: ImportExportItemProgress[];
+}
+
+/**
+ * Backup progress enum (covers IncrementalBackup and Restore)
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/draft/ydb_backup.proto
+ */
+export enum BackupProgress {
+    PROGRESS_UNSPECIFIED = 'PROGRESS_UNSPECIFIED',
+    PROGRESS_PREPARING = 'PROGRESS_PREPARING',
+    PROGRESS_TRANSFER_DATA = 'PROGRESS_TRANSFER_DATA',
+    PROGRESS_DONE = 'PROGRESS_DONE',
+    PROGRESS_CANCELLATION = 'PROGRESS_CANCELLATION',
+    PROGRESS_CANCELLED = 'PROGRESS_CANCELLED',
+}
+
+/**
+ * Incremental backup metadata
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/draft/ydb_backup.proto
+ */
+export interface IncrementalBackupMetadata {
+    '@type'?: typeof OPERATION_METADATA_TYPE_URLS.IncrementalBackup;
+    progress?: BackupProgress | string;
+    progress_percent?: number;
+}
+
+/**
+ * Restore metadata
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/draft/ydb_backup.proto
+ */
+export interface RestoreMetadata {
+    '@type'?: typeof OPERATION_METADATA_TYPE_URLS.Restore;
+    progress?: BackupProgress | string;
+    progress_percent?: number;
+}
+
+/**
+ * Compact table metadata
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_table.proto
+ */
+export interface CompactMetadata {
+    '@type'?: typeof OPERATION_METADATA_TYPE_URLS.Compact;
+    path?: string;
+    cascade?: boolean;
+    state?: IndexBuildState | string;
+    progress?: number;
+    shards_done?: number;
+    shards_total?: number;
+    max_shards_in_flight?: number;
+}
+
 export type TOperationMetadata =
     | IndexBuildMetadata
     | ImportFromS3Metadata
+    | ImportFromFsMetadata
     | ExportToS3Metadata
-    | ExportToYtMetadata;
+    | ExportToYtMetadata
+    | ExportToFsMetadata
+    | CompactMetadata
+    | IncrementalBackupMetadata
+    | RestoreMetadata;
 
 export interface TCostInfo {
     consumed_units?: number;
@@ -236,9 +331,15 @@ export type OperationKind =
     | 'ss/backgrounds'
     | 'import'
     | 'import/s3'
+    | 'import/nfs'
+    | 'export'
     | 'export/s3'
     | 'export/yt'
+    | 'export/nfs'
     | 'buildindex'
+    | 'compaction'
+    | 'incbackup'
+    | 'restore'
     | 'scriptexec';
 
 export interface OperationListRequestParams {

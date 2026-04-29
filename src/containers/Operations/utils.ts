@@ -1,8 +1,13 @@
 import type {
+    CompactMetadata,
+    ExportToFsMetadata,
     ExportToS3Metadata,
     ExportToYtMetadata,
+    ImportFromFsMetadata,
     ImportFromS3Metadata,
+    IncrementalBackupMetadata,
     IndexBuildMetadata,
+    RestoreMetadata,
     TOperation,
 } from '../../types/api/operations';
 import {OPERATION_METADATA_TYPE_URLS} from '../../types/api/operations';
@@ -28,6 +33,16 @@ export function isImportFromS3Metadata(
     return metadata['@type'] === OPERATION_METADATA_TYPE_URLS.ImportFromS3;
 }
 
+export function isImportFromFsMetadata(
+    metadata: TOperation['metadata'],
+): metadata is ImportFromFsMetadata {
+    if (!metadata) {
+        return false;
+    }
+
+    return metadata['@type'] === OPERATION_METADATA_TYPE_URLS.ImportFromFs;
+}
+
 export function isExportToS3Metadata(
     metadata: TOperation['metadata'],
 ): metadata is ExportToS3Metadata {
@@ -48,13 +63,56 @@ export function isExportToYtMetadata(
     return metadata['@type'] === OPERATION_METADATA_TYPE_URLS.ExportToYt;
 }
 
+export function isExportToFsMetadata(
+    metadata: TOperation['metadata'],
+): metadata is ExportToFsMetadata {
+    if (!metadata) {
+        return false;
+    }
+
+    return metadata['@type'] === OPERATION_METADATA_TYPE_URLS.ExportToFs;
+}
+
+export function isCompactMetadata(metadata: TOperation['metadata']): metadata is CompactMetadata {
+    if (!metadata) {
+        return false;
+    }
+
+    return metadata['@type'] === OPERATION_METADATA_TYPE_URLS.Compact;
+}
+
+export function isIncrementalBackupMetadata(
+    metadata: TOperation['metadata'],
+): metadata is IncrementalBackupMetadata {
+    if (!metadata) {
+        return false;
+    }
+
+    return metadata['@type'] === OPERATION_METADATA_TYPE_URLS.IncrementalBackup;
+}
+
+export function isRestoreMetadata(metadata: TOperation['metadata']): metadata is RestoreMetadata {
+    if (!metadata) {
+        return false;
+    }
+
+    return metadata['@type'] === OPERATION_METADATA_TYPE_URLS.Restore;
+}
+
 export function isImportExportMetadata(
     metadata: TOperation['metadata'],
-): metadata is ImportFromS3Metadata | ExportToS3Metadata | ExportToYtMetadata {
+): metadata is
+    | ImportFromS3Metadata
+    | ImportFromFsMetadata
+    | ExportToS3Metadata
+    | ExportToYtMetadata
+    | ExportToFsMetadata {
     return (
         isImportFromS3Metadata(metadata) ||
+        isImportFromFsMetadata(metadata) ||
         isExportToS3Metadata(metadata) ||
-        isExportToYtMetadata(metadata)
+        isExportToYtMetadata(metadata) ||
+        isExportToFsMetadata(metadata)
     );
 }
 
@@ -76,12 +134,17 @@ export type OperationProgressKey =
  * Calculates overall progress based on items_progress array:
  * - Sums all parts_total and parts_completed across all items
  * - Returns percentage rounded to nearest integer
- *
  * @param metadata - Import/Export operation metadata
  * @returns Progress percentage (0-100) or null if cannot be calculated
  */
 export function calculateImportExportProgress(
-    metadata: ImportFromS3Metadata | ExportToS3Metadata | ExportToYtMetadata | undefined,
+    metadata:
+        | ImportFromS3Metadata
+        | ImportFromFsMetadata
+        | ExportToS3Metadata
+        | ExportToYtMetadata
+        | ExportToFsMetadata
+        | undefined,
 ): number | null {
     if (!metadata?.items_progress || metadata.items_progress.length === 0) {
         return null;
@@ -110,7 +173,6 @@ export function calculateImportExportProgress(
  * Handles different progress formats:
  * - BuildIndex: numeric progress (0-100) -> "75%"
  * - Import/Export: calculated from items_progress -> "45%" or enum value -> "Done"
- *
  * @param operation - Operation to get progress for
  * @param translateProgress - Function to translate progress enum values (i18n)
  * @returns Formatted progress string or null if no progress available
@@ -125,9 +187,34 @@ export function getOperationProgress(
         return null;
     }
 
-    if (isIndexBuildMetadata(metadata)) {
+    if (isIndexBuildMetadata(metadata) || isCompactMetadata(metadata)) {
         if (typeof metadata.progress === 'number') {
             return `${Math.round(metadata.progress)}%`;
+        }
+    }
+
+    // IncrementalBackup / Restore: numeric progress_percent (0-100), fallback to enum
+    if (isIncrementalBackupMetadata(metadata) || isRestoreMetadata(metadata)) {
+        if (typeof metadata.progress_percent === 'number') {
+            return `${Math.round(metadata.progress_percent)}%`;
+        }
+
+        if (metadata.progress) {
+            const progressValue =
+                typeof metadata.progress === 'string'
+                    ? metadata.progress
+                    : String(metadata.progress);
+            const base = progressValue.replace(/^PROGRESS_/, '').toLowerCase();
+            const i18nKey = `value_progress_${base}` as OperationProgressKey;
+
+            try {
+                const translated = translateProgress(i18nKey);
+                if (translated && translated !== i18nKey) {
+                    return translated;
+                }
+            } catch {}
+
+            return progressValue;
         }
     }
 
