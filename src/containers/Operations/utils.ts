@@ -132,13 +132,7 @@ export function getOperationProgress(
         return null;
     }
 
-    if (isIndexBuildMetadata(metadata)) {
-        if (typeof metadata.progress === 'number') {
-            return `${Math.round(metadata.progress)}%`;
-        }
-    }
-
-    if (isCompactMetadata(metadata)) {
+    if (isIndexBuildMetadata(metadata) || isCompactMetadata(metadata)) {
         if (typeof metadata.progress === 'number') {
             return `${Math.round(metadata.progress)}%`;
         }
