@@ -1,5 +1,14 @@
 # Changelog
 
+## [15.5.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.5.0...v15.5.1) (2026-04-29)
+
+
+### Bug Fixes
+
+* align healthcheck status colors with database status colors ([#3856](https://github.com/ydb-platform/ydb-embedded-ui/issues/3856)) ([27e2f1e](https://github.com/ydb-platform/ydb-embedded-ui/commit/27e2f1e0134305cc0a953eb08ab86e19366e9b8e))
+* monitoring error message looks really bad ([#3850](https://github.com/ydb-platform/ydb-embedded-ui/issues/3850)) ([dac73d5](https://github.com/ydb-platform/ydb-embedded-ui/commit/dac73d5c09395bc38b30d416cc02ab3f94b10be7))
+* only allow cluster status click when overall_source is healthcheck ([#3849](https://github.com/ydb-platform/ydb-embedded-ui/issues/3849)) ([229e332](https://github.com/ydb-platform/ydb-embedded-ui/commit/229e332728c028742e4445fe8c3c99030e2b3ec2))
+
 ## [15.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.4.0...v15.5.0) (2026-04-28)
 
 
