@@ -2,7 +2,9 @@ import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
-import {Flex, HelpMark, Progress, Text} from '@gravity-ui/uikit';
+import {Flex, HelpMark, Popup, Progress, Text} from '@gravity-ui/uikit';
+import type {PopupPlacement} from '@gravity-ui/uikit';
+import {debounce} from 'lodash';
 import {
     ColumnTableIcon,
     ExternalTableIcon,
@@ -63,6 +65,24 @@ import './TenantStorageNew.scss';
 const b = cn('ydb-tenant-storage-new');
 
 const TENANT_STORAGE_COLUMNS_WIDTH_LS_KEY = 'tenantStorageTopUsageTableColumnsWidth';
+const SEGMENT_HOVER_DELAY = 100;
+const SEGMENT_POPUP_PLACEMENT: PopupPlacement = [
+    'top-start',
+    'bottom-start',
+    'top',
+    'bottom',
+    'top-end',
+    'bottom-end',
+];
+type SegmentPopupState = {
+    anchor: HTMLElement | null;
+    key?: TenantStorageSegmentKey;
+};
+
+const EMPTY_SEGMENT_POPUP_STATE: SegmentPopupState = {
+    anchor: null,
+    key: undefined,
+};
 
 const SEGMENT_COLORS: Record<TenantStorageSegmentKey, string> = {
     [TENANT_STORAGE_SEGMENT_KEYS.rowTables]: 'var(--ydb-storage-segment-row-tables)',
@@ -131,6 +151,7 @@ interface SummaryCardProps {
     formatSystemDetailValue?: (value: number) => string;
     position?: 'first' | 'last';
     systemDetails?: TenantStorageSystemDetail[];
+    tooltipTotalLabel: string;
 }
 
 function renderPathTypeIcon(row: TenantStorageTopRow) {
@@ -217,10 +238,59 @@ function getActiveDisplaySegments(segments: TenantStorageSegment[]) {
         .sort((left, right) => SEGMENT_ORDER_INDEX[left.key] - SEGMENT_ORDER_INDEX[right.key]);
 }
 
+function formatSegmentPercent(value: number, total: number) {
+    if (!Number.isFinite(total) || total <= 0 || value <= 0) {
+        return '';
+    }
+
+    const percent = value / total;
+    const precision = percent > 0 && percent < 0.01 ? 1 : 0;
+
+    return formatPercent(percent, precision);
+}
+
+function SegmentTooltipContent({
+    formatValue,
+    segment,
+    total,
+    totalLabel,
+}: {
+    formatValue: (value: number) => string;
+    segment: TenantStorageSegment;
+    total: number;
+    totalLabel: string;
+}) {
+    const percent = formatSegmentPercent(segment.value, total);
+
+    return (
+        <ul className={b('segment-tooltip')}>
+            <li>{formatValue(segment.value)}</li>
+            {percent ? (
+                <li>{i18n('storage.new.context-segment-share', {value: percent, totalLabel})}</li>
+            ) : null}
+        </ul>
+    );
+}
+
 function SegmentedProgressBar({
+    activeSegmentKey,
+    formatValue,
+    onSegmentClick,
+    onSegmentMouseEnter,
+    onSegmentMouseLeave,
+    registerSegmentAnchor,
     segments,
     total,
 }: {
+    activeSegmentKey?: TenantStorageSegmentKey;
+    formatValue: (value: number) => string;
+    onSegmentClick: (segmentKey: TenantStorageSegmentKey, anchor: HTMLElement) => void;
+    onSegmentMouseEnter: (segmentKey: TenantStorageSegmentKey, anchor: HTMLElement) => void;
+    onSegmentMouseLeave: VoidFunction;
+    registerSegmentAnchor: (
+        segmentKey: TenantStorageSegmentKey,
+        anchor: HTMLDivElement | null,
+    ) => void;
     segments: TenantStorageSegment[];
     total?: number;
 }) {
@@ -236,30 +306,60 @@ function SegmentedProgressBar({
 
     return (
         <div className={b('segment-progress')}>
-            {activeSegments.map((segment) => (
-                <div
-                    key={segment.key}
-                    className={b('segment-item')}
-                    style={{
-                        width: `${(segment.value / cappedTotal) * 100}%`,
-                        background: SEGMENT_COLORS[segment.key],
-                    }}
-                />
-            ))}
-            <div className={b('segment-empty')} />
+            {activeSegments.map((segment) => {
+                const inactive = activeSegmentKey !== undefined && activeSegmentKey !== segment.key;
+
+                return (
+                    <div
+                        key={segment.key}
+                        aria-label={`${SEGMENT_LABELS[segment.key]}: ${formatValue(segment.value)}`}
+                        aria-pressed={activeSegmentKey === segment.key}
+                        className={b('segment-item', {inactive})}
+                        ref={(anchor) => registerSegmentAnchor(segment.key, anchor)}
+                        onBlur={onSegmentMouseLeave}
+                        onClick={(event) => onSegmentClick(segment.key, event.currentTarget)}
+                        onFocus={(event) => onSegmentMouseEnter(segment.key, event.currentTarget)}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                onSegmentClick(segment.key, event.currentTarget);
+                            }
+                        }}
+                        onMouseEnter={(event) =>
+                            onSegmentMouseEnter(segment.key, event.currentTarget)
+                        }
+                        onMouseLeave={onSegmentMouseLeave}
+                        role="button"
+                        style={{
+                            width: `${(segment.value / cappedTotal) * 100}%`,
+                            background: SEGMENT_COLORS[segment.key],
+                        }}
+                        tabIndex={0}
+                    />
+                );
+            })}
+            <div className={b('segment-empty', {inactive: activeSegmentKey !== undefined})} />
         </div>
     );
 }
 
 function LegendItems({
+    activeSegmentKey,
     segments,
     formatValue,
     formatSystemDetailValue,
+    onSegmentClick,
+    onSegmentMouseEnter,
+    onSegmentMouseLeave,
     systemDetails,
 }: {
+    activeSegmentKey?: TenantStorageSegmentKey;
     segments: TenantStorageSegment[];
     formatValue: (value: number) => string;
     formatSystemDetailValue?: (value: number) => string;
+    onSegmentClick: (segmentKey: TenantStorageSegmentKey, anchor: HTMLElement) => void;
+    onSegmentMouseEnter: (segmentKey: TenantStorageSegmentKey, anchor: HTMLElement) => void;
+    onSegmentMouseLeave: VoidFunction;
     systemDetails?: TenantStorageSystemDetail[];
 }) {
     const activeSegments = getActiveDisplaySegments(segments);
@@ -274,9 +374,29 @@ function LegendItems({
             {activeSegments.map((segment) => {
                 const isSystemSegment = segment.key === TENANT_STORAGE_SEGMENT_KEYS.system;
                 const showSystemDetails = isSystemSegment && visibleSystemDetails.length > 0;
+                const inactive = activeSegmentKey !== undefined && activeSegmentKey !== segment.key;
 
                 return (
-                    <div key={segment.key} className={b('legend-item')}>
+                    <div
+                        key={segment.key}
+                        aria-pressed={activeSegmentKey === segment.key}
+                        className={b('legend-item', {inactive})}
+                        onBlur={onSegmentMouseLeave}
+                        onClick={(event) => onSegmentClick(segment.key, event.currentTarget)}
+                        onFocus={(event) => onSegmentMouseEnter(segment.key, event.currentTarget)}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                onSegmentClick(segment.key, event.currentTarget);
+                            }
+                        }}
+                        onMouseEnter={(event) =>
+                            onSegmentMouseEnter(segment.key, event.currentTarget)
+                        }
+                        onMouseLeave={onSegmentMouseLeave}
+                        role="button"
+                        tabIndex={0}
+                    >
                         <div
                             className={b('legend-dot')}
                             style={{background: SEGMENT_COLORS[segment.key]}}
@@ -336,10 +456,115 @@ function SummaryCard({
     formatSystemDetailValue,
     position,
     systemDetails,
+    tooltipTotalLabel,
 }: SummaryCardProps) {
     const total = summary.quota ?? summary.total;
     const activeSegments = (segments ?? []).filter((s) => s.value > 0);
     const hasSegments = activeSegments.length > 0;
+    const segmentAnchorsRef = React.useRef<
+        Partial<Record<TenantStorageSegmentKey, HTMLDivElement | null>>
+    >({});
+    const [hoveredSegmentState, setHoveredSegmentState] =
+        React.useState<SegmentPopupState>(EMPTY_SEGMENT_POPUP_STATE);
+    const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
+    const [pinnedSegmentState, setPinnedSegmentState] =
+        React.useState<SegmentPopupState>(EMPTY_SEGMENT_POPUP_STATE);
+    const isPinnedRef = React.useRef(false);
+    const isPopupContentHoveredRef = React.useRef(false);
+    const clearHoveredSegmentState = React.useMemo(() => {
+        return debounce(() => {
+            if (isPinnedRef.current || isPopupContentHoveredRef.current) {
+                return;
+            }
+
+            setHoveredSegmentState(EMPTY_SEGMENT_POPUP_STATE);
+        }, SEGMENT_HOVER_DELAY);
+    }, []);
+    const activeSegmentKey = pinnedSegmentState.key ?? hoveredSegmentState.key;
+    const activeSegmentAnchor = pinnedSegmentState.anchor ?? hoveredSegmentState.anchor;
+    const activeSegment = activeSegments.find((segment) => segment.key === activeSegmentKey);
+    const popupOpen = Boolean(activeSegmentAnchor && activeSegment);
+
+    React.useEffect(() => {
+        isPinnedRef.current = Boolean(pinnedSegmentState.key);
+    }, [pinnedSegmentState.key]);
+
+    React.useEffect(() => {
+        isPopupContentHoveredRef.current = isPopupContentHovered;
+    }, [isPopupContentHovered]);
+
+    const registerSegmentAnchor = React.useCallback(
+        (segmentKey: TenantStorageSegmentKey, anchor: HTMLDivElement | null) => {
+            segmentAnchorsRef.current[segmentKey] = anchor;
+        },
+        [],
+    );
+    const resolveSegmentAnchor = React.useCallback(
+        (segmentKey: TenantStorageSegmentKey, fallbackAnchor: HTMLElement) => {
+            return segmentAnchorsRef.current[segmentKey] ?? fallbackAnchor;
+        },
+        [],
+    );
+    const handleSegmentMouseEnter = React.useCallback(
+        (segmentKey: TenantStorageSegmentKey, anchor: HTMLElement) => {
+            if (isPinnedRef.current) {
+                return;
+            }
+
+            clearHoveredSegmentState.cancel();
+            setHoveredSegmentState({
+                anchor: resolveSegmentAnchor(segmentKey, anchor),
+                key: segmentKey,
+            });
+        },
+        [clearHoveredSegmentState, resolveSegmentAnchor],
+    );
+    const handleSegmentMouseLeave = React.useCallback(() => {
+        if (isPinnedRef.current) {
+            return;
+        }
+
+        clearHoveredSegmentState();
+    }, [clearHoveredSegmentState]);
+    const handleSegmentClick = React.useCallback(
+        (segmentKey: TenantStorageSegmentKey, anchor: HTMLElement) => {
+            clearHoveredSegmentState.cancel();
+            setHoveredSegmentState(EMPTY_SEGMENT_POPUP_STATE);
+            setIsPopupContentHovered(false);
+
+            setPinnedSegmentState((state) => {
+                if (state.key === segmentKey) {
+                    return EMPTY_SEGMENT_POPUP_STATE;
+                }
+
+                return {anchor: resolveSegmentAnchor(segmentKey, anchor), key: segmentKey};
+            });
+        },
+        [clearHoveredSegmentState, resolveSegmentAnchor],
+    );
+    const handlePopupMouseEnter = React.useCallback(() => {
+        clearHoveredSegmentState.cancel();
+        setIsPopupContentHovered(true);
+    }, [clearHoveredSegmentState]);
+    const handlePopupMouseLeave = React.useCallback(() => {
+        setIsPopupContentHovered(false);
+
+        if (!isPinnedRef.current) {
+            clearHoveredSegmentState();
+        }
+    }, [clearHoveredSegmentState]);
+    const handlePopupClose = React.useCallback(() => {
+        clearHoveredSegmentState.cancel();
+        setHoveredSegmentState(EMPTY_SEGMENT_POPUP_STATE);
+        setPinnedSegmentState(EMPTY_SEGMENT_POPUP_STATE);
+        setIsPopupContentHovered(false);
+    }, [clearHoveredSegmentState]);
+
+    React.useEffect(() => {
+        return () => {
+            clearHoveredSegmentState.cancel();
+        };
+    }, [clearHoveredSegmentState]);
 
     let percent = 0;
 
@@ -371,7 +596,16 @@ function SummaryCard({
             </Flex>
             <div className={b('summary-progress')}>
                 {hasSegments ? (
-                    <SegmentedProgressBar segments={segments ?? []} total={total} />
+                    <SegmentedProgressBar
+                        activeSegmentKey={activeSegmentKey}
+                        formatValue={formatLegendValue ?? formatNumber}
+                        onSegmentClick={handleSegmentClick}
+                        onSegmentMouseEnter={handleSegmentMouseEnter}
+                        onSegmentMouseLeave={handleSegmentMouseLeave}
+                        registerSegmentAnchor={registerSegmentAnchor}
+                        segments={segments ?? []}
+                        total={total}
+                    />
                 ) : (
                     <Progress
                         value={percent}
@@ -385,9 +619,13 @@ function SummaryCard({
             <Flex justifyContent="space-between" alignItems="center" gap="4">
                 {hasSegments && formatLegendValue ? (
                     <LegendItems
+                        activeSegmentKey={activeSegmentKey}
                         segments={segments ?? []}
                         formatValue={formatLegendValue}
                         formatSystemDetailValue={formatSystemDetailValue}
+                        onSegmentClick={handleSegmentClick}
+                        onSegmentMouseEnter={handleSegmentMouseEnter}
+                        onSegmentMouseLeave={handleSegmentMouseLeave}
                         systemDetails={systemDetails}
                     />
                 ) : (
@@ -399,6 +637,28 @@ function SummaryCard({
                         : formatSummaryPercent(summary.usedPercent)}
                 </Text>
             </Flex>
+            {popupOpen && activeSegmentAnchor && activeSegment ? (
+                <Popup
+                    anchorElement={activeSegmentAnchor}
+                    hasArrow
+                    open
+                    placement={SEGMENT_POPUP_PLACEMENT}
+                    onOutsideClick={handlePopupClose}
+                >
+                    <div
+                        className={b('segment-popup')}
+                        onMouseEnter={handlePopupMouseEnter}
+                        onMouseLeave={handlePopupMouseLeave}
+                    >
+                        <SegmentTooltipContent
+                            formatValue={formatLegendValue ?? formatNumber}
+                            segment={activeSegment}
+                            total={summary.used}
+                            totalLabel={tooltipTotalLabel}
+                        />
+                    </div>
+                </Popup>
+            ) : null}
         </div>
     );
 }
@@ -533,6 +793,7 @@ function renderUserSummary(summary: TenantStorageSummary, segments?: TenantStora
             segments={segments}
             formatLegendValue={formatLegendValue}
             position="first"
+            tooltipTotalLabel={i18n('storage.new.context-total-user-data')}
             metrics={[
                 {
                     hideDivider: true,
@@ -584,6 +845,7 @@ function renderPhysicalSummary(
             formatLegendValue={formatLegendValue}
             formatSystemDetailValue={formatSystemDetailValue}
             position="last"
+            tooltipTotalLabel={i18n('storage.new.context-total-physical-disk-usage')}
             metrics={[
                 {
                     emphasize: true,

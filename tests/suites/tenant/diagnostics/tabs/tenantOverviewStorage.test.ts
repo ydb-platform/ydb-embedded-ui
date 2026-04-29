@@ -317,7 +317,7 @@ function getSummaryMetric(card: Locator, label: string) {
     return card.locator(SUMMARY_METRIC_SELECTOR).filter({hasText: label});
 }
 
-test.describe('Tenant Overview storage metrics tab', () => {
+test.describe.only('Tenant Overview storage metrics tab', () => {
     test.describe.configure({timeout: 60_000});
 
     for (const theme of STORAGE_SCREENSHOT_THEMES) {
@@ -446,6 +446,124 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await expect(page.getByText('Storage Details', {exact: true})).toBeVisible();
         await expect(page.getByText('Top tables by size', {exact: true})).toBeVisible();
     });
+
+    for (const theme of STORAGE_SCREENSHOT_THEMES) {
+        test(`highlights hovered storage segment and shows rich tooltip in ${theme} theme`, async ({
+            page,
+        }) => {
+            await enableNewStorageView(page, theme);
+            await setupWhoami(page);
+            await setupCapabilities(page, 1);
+            await setupTenantInfo(page, 'Dedicated');
+            await setupPartitionStatsQuery(page);
+            await setupStorageStats(page);
+            await setupDescribe(page);
+
+            const tenantPage = new TenantPage(page);
+            await tenantPage.goto({
+                schema: database,
+                database,
+                tenantPage: 'diagnostics',
+            });
+
+            await openStorageMetricsTab(page);
+
+            const storageView = page.locator(STORAGE_VIEW_SELECTOR);
+            const physicalSummary = getSummaryCard(storageView, 'Physical disk usage');
+            const columnSegment = physicalSummary.getByRole('button', {name: /Column tables:/});
+
+            await columnSegment.hover();
+
+            await expect(page.getByText('of total physical disk usage')).toBeVisible();
+            await expect(
+                physicalSummary.locator('.ydb-tenant-storage-new__segment-item_inactive'),
+            ).toHaveCount(4);
+            await expect(
+                physicalSummary.locator('.ydb-tenant-storage-new__segment-empty_inactive'),
+            ).toHaveCount(1);
+            await expect(
+                physicalSummary.locator('.ydb-tenant-storage-new__legend-item_inactive'),
+            ).toHaveCount(4);
+            await expect(
+                physicalSummary
+                    .locator('.ydb-tenant-storage-new__legend-item')
+                    .filter({hasText: 'Column tables'}),
+            ).not.toHaveClass(/legend-item_inactive/);
+            await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(
+                `tenant-overview-storage-hover-${theme}.png`,
+            );
+
+            await page.mouse.move(0, 0);
+
+            await expect(
+                physicalSummary.locator('.ydb-tenant-storage-new__segment-item_inactive'),
+            ).toHaveCount(0);
+            await expect(
+                physicalSummary.locator('.ydb-tenant-storage-new__legend-item_inactive'),
+            ).toHaveCount(0);
+        });
+
+        test(`shows tooltip on legend hover and pins state on click in ${theme} theme`, async ({
+            page,
+        }) => {
+            await enableNewStorageView(page, theme);
+            await setupWhoami(page);
+            await setupCapabilities(page, 1);
+            await setupTenantInfo(page, 'Dedicated');
+            await setupPartitionStatsQuery(page);
+            await setupStorageStats(page);
+            await setupDescribe(page);
+
+            const tenantPage = new TenantPage(page);
+            await tenantPage.goto({
+                schema: database,
+                database,
+                tenantPage: 'diagnostics',
+            });
+
+            await openStorageMetricsTab(page);
+
+            const storageView = page.locator(STORAGE_VIEW_SELECTOR);
+            const physicalSummary = getSummaryCard(storageView, 'Physical disk usage');
+            const columnLegendItem = physicalSummary
+                .locator('.ydb-tenant-storage-new__legend-item')
+                .filter({hasText: 'Column tables'});
+            const columnSegment = physicalSummary.getByRole('button', {name: /Column tables:/});
+
+            await columnLegendItem.hover();
+
+            await expect(page.getByText('of total physical disk usage')).toBeVisible();
+            await expect(
+                physicalSummary.locator('.ydb-tenant-storage-new__legend-item_inactive'),
+            ).toHaveCount(4);
+            await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(
+                `tenant-overview-storage-legend-hover-${theme}.png`,
+            );
+
+            await columnSegment.click();
+            await page.mouse.move(0, 0);
+
+            await expect(page.getByText('of total physical disk usage')).toBeVisible();
+            await expect(
+                physicalSummary.locator('.ydb-tenant-storage-new__segment-item_inactive'),
+            ).toHaveCount(4);
+            await expect(
+                physicalSummary.locator('.ydb-tenant-storage-new__legend-item_inactive'),
+            ).toHaveCount(4);
+            await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(
+                `tenant-overview-storage-pinned-${theme}.png`,
+            );
+
+            await storageView.getByText('Top 10 by space usage', {exact: true}).click();
+
+            await expect(
+                physicalSummary.locator('.ydb-tenant-storage-new__segment-item_inactive'),
+            ).toHaveCount(0);
+            await expect(
+                physicalSummary.locator('.ydb-tenant-storage-new__legend-item_inactive'),
+            ).toHaveCount(0);
+        });
+    }
 
     test('keeps legacy dedicated storage layout when storage_stats capability is unavailable', async ({
         page,
