@@ -253,10 +253,15 @@ export type OperationKind =
     | 'ss/backgrounds'
     | 'import'
     | 'import/s3'
+    | 'import/nfs'
+    | 'export'
     | 'export/s3'
     | 'export/yt'
+    | 'export/nfs'
     | 'buildindex'
     | 'compaction'
+    | 'incbackup'
+    | 'restore'
     | 'scriptexec';
 
 export interface OperationListRequestParams {
