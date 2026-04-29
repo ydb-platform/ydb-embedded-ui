@@ -39,4 +39,5 @@ export const OPERATION_KINDS: {value: OperationKind; content: string}[] = [
     {value: 'import/s3', content: i18n('kind_import_s3')},
     {value: 'ss/backgrounds', content: i18n('kind_ssBackgrounds')},
     {value: 'buildindex', content: i18n('kind_buildIndex')},
+    {value: 'compaction', content: i18n('kind_compaction')},
 ];

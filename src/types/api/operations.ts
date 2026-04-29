@@ -118,6 +118,7 @@ export const OPERATION_METADATA_TYPE_URLS = {
     ImportFromS3: 'type.googleapis.com/Ydb.Import.ImportFromS3Metadata',
     ExportToS3: 'type.googleapis.com/Ydb.Export.ExportToS3Metadata',
     ExportToYt: 'type.googleapis.com/Ydb.Export.ExportToYtMetadata',
+    Compact: 'type.googleapis.com/Ydb.Table.CompactMetadata',
 } as const;
 
 export type OperationMetadataTypeUrl =
@@ -203,11 +204,27 @@ export interface ExportToYtMetadata {
     items_progress?: ImportExportItemProgress[];
 }
 
+/**
+ * Compact table metadata
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_table.proto
+ */
+export interface CompactMetadata {
+    '@type'?: typeof OPERATION_METADATA_TYPE_URLS.Compact;
+    path?: string;
+    cascade?: boolean;
+    state?: IndexBuildState | string;
+    progress?: number;
+    shards_done?: number;
+    shards_total?: number;
+    max_shards_in_flight?: number;
+}
+
 export type TOperationMetadata =
     | IndexBuildMetadata
     | ImportFromS3Metadata
     | ExportToS3Metadata
-    | ExportToYtMetadata;
+    | ExportToYtMetadata
+    | CompactMetadata;
 
 export interface TCostInfo {
     consumed_units?: number;
@@ -239,6 +256,7 @@ export type OperationKind =
     | 'export/s3'
     | 'export/yt'
     | 'buildindex'
+    | 'compaction'
     | 'scriptexec';
 
 export interface OperationListRequestParams {
