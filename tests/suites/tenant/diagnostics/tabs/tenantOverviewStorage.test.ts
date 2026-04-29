@@ -306,14 +306,16 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await expect(storageView.getByText('Top 10 by space usage', {exact: true})).toBeVisible();
         await expect(storageView.getByText('Row table', {exact: true})).toBeVisible();
         await expect(
-            getSummaryMetric(userDataSummary, 'Used').getByText('3.1 TB', {exact: true}),
+            getSummaryMetric(userDataSummary, 'Used').getByText('3.10 TB', {exact: true}),
         ).toBeVisible();
         await expect(
-            getSummaryMetric(physicalSummary, 'Used').getByText('26.4 TB', {exact: true}),
+            getSummaryMetric(physicalSummary, 'Used').getByText('26.40 TB', {exact: true}),
         ).toBeVisible();
+        await expect(userDataSummary.getByText('used 15%', {exact: true})).toBeVisible();
+        await expect(physicalSummary.getByText('used 13%', {exact: true})).toBeVisible();
         await expect(storageView.getByRole('link', {name: 'kv_test'})).toHaveAttribute(
             'href',
-            /schema=\/local\/kv_test/,
+            /schema=%2Flocal%2Fkv_test/,
         );
     });
 
@@ -366,7 +368,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
             getSummaryMetric(ssdUserDataSummary, 'Used').getByText('250 GB', {exact: true}),
         ).toBeVisible();
         await expect(
-            getSummaryMetric(hddPhysicalSummary, 'Used').getByText('0.6 TB', {exact: true}),
+            getSummaryMetric(hddPhysicalSummary, 'Used').getByText('0.60 TB', {exact: true}),
         ).toBeVisible();
     });
 

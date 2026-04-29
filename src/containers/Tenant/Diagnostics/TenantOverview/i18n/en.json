@@ -42,6 +42,7 @@
   "storage.db-storage-description": "Size of data stored in distributed storage with all overheads for redundancy",
   "storage.new.user-data-title": "User data",
   "storage.new.user-data-description": "Data usage by type",
+  "storage.new.user-data-description-tooltip": "Logical user data volume by object type (row tables, column tables, topics, etc.). Does not include system overhead, replication, or physical storage size.",
   "storage.new.physical-title": "Physical disk usage",
   "storage.new.physical-description": "Including written data plus system and metadata overhead",
   "storage.new.user-available-description": "Remaining user data quota for this database.",

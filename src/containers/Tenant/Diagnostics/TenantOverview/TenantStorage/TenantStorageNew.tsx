@@ -19,17 +19,17 @@ import {LoaderWrapper} from '../../../../../components/LoaderWrapper/LoaderWrapp
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {EPathType} from '../../../../../types/api/schema';
 import {EType} from '../../../../../types/api/tenant';
+import type {BytesSizes} from '../../../../../utils/bytesParsers';
+import {sizes} from '../../../../../utils/bytesParsers';
 import {cn} from '../../../../../utils/cn';
 import {
     EMPTY_DATA_PLACEHOLDER,
     TENANT_OVERVIEW_TABLES_SETTINGS,
+    UNBREAKABLE_GAP,
 } from '../../../../../utils/constants';
 import {formatNumber, formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
-import {
-    formatMetricBytes,
-    formatMetricPercent,
-    getConsistentMetricBytesSize,
-} from '../../../../../utils/storageMetrics';
+import {configuredNumeral} from '../../../../../utils/numeral';
+import {formatMetricBytes, getConsistentMetricBytesSize} from '../../../../../utils/storageMetrics';
 import {mapPathTypeToEntityName, mapPathTypeToNavigationTreeType} from '../../../utils/schema';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
@@ -108,6 +108,7 @@ interface SummaryMetricProps {
     note?: string;
     value: string;
     emphasize?: boolean;
+    hideDivider?: boolean;
 }
 
 interface SummaryCardProps {
@@ -115,7 +116,7 @@ interface SummaryCardProps {
     description: string;
     summary: TenantStorageSummary;
     metrics: SummaryMetricProps[];
-    showHelpOnDescription?: boolean;
+    descriptionHelpText?: string;
     displayNoLimit?: 'empty' | 'filled';
     segments?: TenantStorageSegment[];
     formatLegendValue?: (value: number) => string;
@@ -157,7 +158,30 @@ function getObjectName(path: string) {
 }
 
 function formatSummaryPercent(value: number) {
-    return value > 0 ? i18n('storage.new.used-percent', {value: formatMetricPercent(value)}) : '';
+    const formattedValue = formatPercent(value / 100, 0);
+
+    return value > 0 && formattedValue
+        ? i18n('storage.new.used-percent', {value: formattedValue})
+        : '';
+}
+
+function formatSummaryMetricBytes(value?: string | number, size?: BytesSizes) {
+    if (size !== 'tb') {
+        return formatMetricBytes(value, size);
+    }
+
+    const numericValue = Number(value);
+
+    if (!Number.isFinite(numericValue)) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+
+    const convertedValue = numericValue / sizes[size].value;
+    const formattedValue = configuredNumeral(convertedValue).format('0,0.00');
+
+    return formattedValue
+        ? `${formattedValue}${UNBREAKABLE_GAP}${sizes[size].label}`
+        : EMPTY_DATA_PLACEHOLDER;
 }
 
 function formatOverheadValue(value?: number) {
@@ -233,16 +257,21 @@ function LegendItems({
 
     return (
         <div className={b('legend-items')}>
-            {activeSegments.map((segment) => (
-                <div key={segment.key} className={b('legend-item')}>
-                    <div
-                        className={b('legend-dot')}
-                        style={{background: SEGMENT_COLORS[segment.key]}}
-                    />
-                    <div className={b('legend-label')}>
-                        <Text>{SEGMENT_LABELS[segment.key]}</Text>
-                        {segment.key === TENANT_STORAGE_SEGMENT_KEYS.system &&
-                        visibleSystemDetails.length > 0 ? (
+            {activeSegments.map((segment) => {
+                const isSystemSegment = segment.key === TENANT_STORAGE_SEGMENT_KEYS.system;
+                const showSystemDetails = isSystemSegment && visibleSystemDetails.length > 0;
+
+                return (
+                    <div key={segment.key} className={b('legend-item')}>
+                        <div
+                            className={b('legend-dot')}
+                            style={{background: SEGMENT_COLORS[segment.key]}}
+                        />
+                        <div className={b('legend-label')}>
+                            <Text>{SEGMENT_LABELS[segment.key]}</Text>
+                        </div>
+                        <Text color="secondary">{formatValue(segment.value)}</Text>
+                        {showSystemDetails ? (
                             <HelpMark iconSize="s">
                                 <Flex direction="column" gap="1" className={b('system-tooltip')}>
                                     {visibleSystemDetails.map((detail) => (
@@ -263,16 +292,15 @@ function LegendItems({
                             </HelpMark>
                         ) : null}
                     </div>
-                    <Text color="secondary">{formatValue(segment.value)}</Text>
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 }
 
-function SummaryMetric({label, note, value, emphasize}: SummaryMetricProps) {
+function SummaryMetric({label, note, value, emphasize, hideDivider}: SummaryMetricProps) {
     return (
-        <div className={b('summary-metric', {emphasize})}>
+        <div className={b('summary-metric', {emphasize, 'hide-divider': hideDivider})}>
             <Text variant="subheader-2">{value}</Text>
             <Flex alignItems="center" gap="1" className={b('summary-metric-label')}>
                 <Text color="secondary">{label}</Text>
@@ -287,7 +315,7 @@ function SummaryCard({
     description,
     summary,
     metrics,
-    showHelpOnDescription = false,
+    descriptionHelpText,
     displayNoLimit,
     segments,
     formatLegendValue,
@@ -316,8 +344,8 @@ function SummaryCard({
                     <Text variant="subheader-3">{title}</Text>
                     <Flex alignItems="center" gap="1">
                         <Text color="secondary">{description}</Text>
-                        {showHelpOnDescription ? (
-                            <HelpMark iconSize="s">{description}</HelpMark>
+                        {descriptionHelpText ? (
+                            <HelpMark iconSize="s">{descriptionHelpText}</HelpMark>
                         ) : null}
                     </Flex>
                 </div>
@@ -476,7 +504,7 @@ function renderUserSummary(summary: TenantStorageSummary, segments?: TenantStora
     ]);
 
     const formatLegendValue = (value: number) => formatMetricBytes(value, metricsSize);
-    const availableValue = formatMetricBytes(summary.available, metricsSize);
+    const availableValue = formatSummaryMetricBytes(summary.available, metricsSize);
     const formattedAvailableValue =
         summary.availableApproximate && availableValue !== EMPTY_DATA_PLACEHOLDER
             ? `~${availableValue}`
@@ -487,12 +515,13 @@ function renderUserSummary(summary: TenantStorageSummary, segments?: TenantStora
             title={i18n('storage.new.user-data-title')}
             description={i18n('storage.new.user-data-description')}
             summary={summary}
-            showHelpOnDescription
+            descriptionHelpText={i18n('storage.new.user-data-description-tooltip')}
             segments={segments}
             formatLegendValue={formatLegendValue}
             position="first"
             metrics={[
                 {
+                    hideDivider: true,
                     label: i18n('storage.new.available'),
                     note: summary.availableApproximate
                         ? i18n('storage.new.available-approximate-description')
@@ -501,14 +530,14 @@ function renderUserSummary(summary: TenantStorageSummary, segments?: TenantStora
                 },
                 {
                     label: i18n('storage.new.used'),
-                    value: formatMetricBytes(summary.used, metricsSize),
+                    value: formatSummaryMetricBytes(summary.used, metricsSize),
                 },
                 {
                     label: i18n('storage.new.quota'),
                     value:
                         summary.quota === undefined
                             ? EMPTY_DATA_PLACEHOLDER
-                            : formatMetricBytes(summary.quota, metricsSize),
+                            : formatSummaryMetricBytes(summary.quota, metricsSize),
                 },
             ]}
         />
@@ -549,16 +578,17 @@ function renderPhysicalSummary(
                     value: formatOverheadValue(summary.overhead),
                 },
                 {
+                    hideDivider: true,
                     label: i18n('storage.new.available'),
-                    value: formatMetricBytes(summary.available, metricsSize),
+                    value: formatSummaryMetricBytes(summary.available, metricsSize),
                 },
                 {
                     label: i18n('storage.new.used'),
-                    value: formatMetricBytes(summary.used, metricsSize),
+                    value: formatSummaryMetricBytes(summary.used, metricsSize),
                 },
                 {
                     label: i18n('storage.new.total'),
-                    value: formatMetricBytes(summary.total, metricsSize),
+                    value: formatSummaryMetricBytes(summary.total, metricsSize),
                 },
             ]}
             displayNoLimit="filled"
