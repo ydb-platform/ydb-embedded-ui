@@ -37,6 +37,22 @@ export const stringifyVdiskId = (id?: TVDiskID | TVSlotId) => {
     return id ? Object.values(id).join('-') : '';
 };
 
+export function parseVdiskId(id: string | null | undefined): TVDiskID | undefined {
+    const match = /^(\d+)-(\d+)-(\d+)-(\d+)-(\d+)$/.exec(id ?? '');
+    if (!match) {
+        return undefined;
+    }
+
+    const [, GroupID, GroupGeneration, Ring, Domain, VDisk] = match;
+    return {
+        GroupID: Number(GroupID),
+        GroupGeneration: Number(GroupGeneration),
+        Ring: Number(Ring),
+        Domain: Number(Domain),
+        VDisk: Number(VDisk),
+    };
+}
+
 /**
  * It works well only with positive values,
  * if you want to get negative formatted duration, use some wrapper like getDowntimeFromDateFormatted

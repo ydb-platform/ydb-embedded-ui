@@ -22,8 +22,8 @@ import {api} from '../../store/reducers/api';
 import {useNewStorageViewEnabled} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
-import type {TVDiskID} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
+import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {VDISK_LABEL_CONFIG} from '../../utils/disks/constants';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
@@ -119,8 +119,7 @@ export function VDiskPage() {
         StringifiedId,
     } = vDiskData || {};
 
-    const resolvedVDiskId =
-        VDiskId || (!loading && getVDiskIdFromString(vDiskIdParam)) || undefined;
+    const resolvedVDiskId = VDiskId || (!loading && parseVdiskId(vDiskIdParam)) || undefined;
     const {GroupID} = resolvedVDiskId || {};
 
     const vDiskId = vDiskData?.StringifiedId || (loading ? undefined : vDiskIdParam);
@@ -326,20 +325,4 @@ export function VDiskPage() {
             {renderContent()}
         </div>
     );
-}
-
-function getVDiskIdFromString(input: string | null | undefined): TVDiskID | undefined {
-    const match = /^(\d+)-(\d+)-(\d+)-(\d+)-(\d+)$/.exec(input ?? '');
-    if (!match) {
-        return undefined;
-    }
-
-    const [, GroupID, GroupGeneration, Ring, Domain, VDisk] = match;
-    return {
-        GroupID: Number(GroupID),
-        GroupGeneration: Number(GroupGeneration),
-        Ring: Number(Ring),
-        Domain: Number(Domain),
-        VDisk: Number(VDisk),
-    };
 }
