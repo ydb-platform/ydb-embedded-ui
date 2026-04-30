@@ -1,5 +1,16 @@
 # Changelog
 
+## [15.5.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.5.0...v15.5.1) (2026-04-30)
+
+
+### Bug Fixes
+
+* align healthcheck status colors with database status colors ([#3856](https://github.com/ydb-platform/ydb-embedded-ui/issues/3856)) ([27e2f1e](https://github.com/ydb-platform/ydb-embedded-ui/commit/27e2f1e0134305cc0a953eb08ab86e19366e9b8e))
+* **healthcheck:** place ring/state-storage issues into storage tab ([#3848](https://github.com/ydb-platform/ydb-embedded-ui/issues/3848)) ([95722ec](https://github.com/ydb-platform/ydb-embedded-ui/commit/95722ec5aaccbc46c886c82c42e4e04cd20bcce6))
+* monitoring error message looks really bad ([#3850](https://github.com/ydb-platform/ydb-embedded-ui/issues/3850)) ([dac73d5](https://github.com/ydb-platform/ydb-embedded-ui/commit/dac73d5c09395bc38b30d416cc02ab3f94b10be7))
+* only allow cluster status click when overall_source is healthcheck ([#3849](https://github.com/ydb-platform/ydb-embedded-ui/issues/3849)) ([229e332](https://github.com/ydb-platform/ydb-embedded-ui/commit/229e332728c028742e4445fe8c3c99030e2b3ec2))
+* show Evict VDisk button in popup for unavailable VDisks ([#3854](https://github.com/ydb-platform/ydb-embedded-ui/issues/3854)) ([7478108](https://github.com/ydb-platform/ydb-embedded-ui/commit/7478108fb34825183eb854844a5d8500c22f6c75))
+
 ## [15.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.4.0...v15.5.0) (2026-04-28)
 
 
