@@ -220,7 +220,7 @@ export function TenantOverview({
                                     size="xs"
                                     title={title}
                                 >
-                                    <Icon data={icon} />
+                                    {icon && <Icon data={icon} />}
                                 </Button>
                             ))}
                         </Flex>

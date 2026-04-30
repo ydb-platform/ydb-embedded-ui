@@ -12,6 +12,7 @@ import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {getDatabaseLinks} from '../../utils/additionalProps';
+import {useDatabaseLinks} from '../../utils/clusterLinks/useDatabaseLinks';
 import {cn} from '../../utils/cn';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {canShowTenantMonitoring} from '../../utils/monitoringVisibility';
@@ -48,12 +49,14 @@ export function TenantNameWrapper({
     const backend = getTenantBackend(tenant, additionalTenantsProps);
     const isExternalLink = externalLink || Boolean(backend);
 
-    const links = getDatabaseLinks(additionalTenantsProps, tenant?.Name, tenant?.Type);
+    const legacyLinks = getDatabaseLinks(additionalTenantsProps, tenant?.Name, tenant?.Type);
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();
     const showMonitoring = canShowTenantMonitoring(tenant?.ControlPlane, clusterMonitoring);
-    const filteredLinks = showMonitoring
-        ? links
-        : links.filter(({title}) => title !== i18n('field_monitoring-link'));
+    const filteredLegacyLinks = showMonitoring
+        ? legacyLinks
+        : legacyLinks.filter(({title}) => title !== i18n('field_monitoring-link'));
+
+    const resolvedLinks = useDatabaseLinks(tenant, filteredLegacyLinks);
 
     const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
 
@@ -77,10 +80,11 @@ export function TenantNameWrapper({
         }
 
         const linksItems: DropdownMenuItem[] = [];
-        for (const link of filteredLinks) {
+
+        for (const link of resolvedLinks) {
             linksItems.push({
                 text: link.title,
-                iconStart: <Icon data={link.icon} />,
+                iconStart: link.icon ? <Icon data={link.icon} /> : undefined,
                 iconEnd: <ArrowUpRightFromSquare />,
                 href: link.url,
             });
@@ -127,7 +131,7 @@ export function TenantNameWrapper({
         return menuItems;
     }, [
         isUserAllowedToMakeChanges,
-        filteredLinks,
+        resolvedLinks,
         clusterName,
         isEditDBAvailable,
         isDeleteDBAvailable,

@@ -9,9 +9,8 @@ import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDial
 import {getClusterPath} from '../../routes';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
+import type {ClusterLinkWithTitle} from '../../types/additionalProps';
 import {uiFactory} from '../../uiFactory/uiFactory';
-import {getInfoTabLinks} from '../../utils/additionalProps';
-import {useAdditionalTenantsProps} from '../AppWithClusters/utils/useAdditionalTenantsProps';
 import {clusterTabsIds} from '../Cluster/utils';
 
 import {b} from './constants';
@@ -23,6 +22,7 @@ export interface HeaderActionsMenuProps {
     databaseData?: PreparedTenant;
     isDatabaseDataLoading: boolean;
     isV2NavigationEnabled: boolean;
+    databaseLinks: ClusterLinkWithTitle[];
 }
 
 export function DBHeaderActionsMenu({
@@ -31,15 +31,11 @@ export function DBHeaderActionsMenu({
     databaseData,
     isDatabaseDataLoading,
     isV2NavigationEnabled,
+    databaseLinks,
 }: HeaderActionsMenuProps) {
     const history = useHistory();
 
     const emMetaAvailable = useEmMetaAvailable();
-
-    const additionalTenantProps = useAdditionalTenantsProps({
-        getLogsLink: uiFactory.getLogsLink,
-        getDatabaseLinks: uiFactory.getDatabaseLinks,
-    });
 
     const isEditDBAvailable = emMetaAvailable && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable = emMetaAvailable && uiFactory.onDeleteDB !== undefined;
@@ -47,24 +43,18 @@ export function DBHeaderActionsMenu({
     const menuItems = React.useMemo(() => {
         const menuItems: DropdownMenuItem[][] = [];
 
-        const links = getInfoTabLinks(
-            additionalTenantProps,
-            databaseData?.Name,
-            databaseData?.Type,
-        );
+        const linksItems: DropdownMenuItem[] = [];
 
-        if (links.length) {
-            const linksItems: DropdownMenuItem[] = [];
+        for (const link of databaseLinks) {
+            linksItems.push({
+                text: link.title,
+                iconStart: link.icon ? <Icon data={link.icon} /> : undefined,
+                href: link.url,
+                target: '_blank',
+            });
+        }
 
-            for (const link of links) {
-                linksItems.push({
-                    text: link.title,
-                    iconStart: <Icon data={link.icon} />,
-                    href: link.url,
-                    target: '_blank',
-                });
-            }
-
+        if (linksItems.length) {
             menuItems.push(linksItems);
         }
 
@@ -119,7 +109,7 @@ export function DBHeaderActionsMenu({
         database,
         clusterName,
         databaseData,
-        additionalTenantProps,
+        databaseLinks,
         isV2NavigationEnabled,
         history,
         isEditDBAvailable,
