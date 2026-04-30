@@ -1270,5 +1270,90 @@ describe('resolveDatabaseLinks', () => {
                 'Extra Link',
             ]);
         });
+
+        test('additional link preserves explicit description', () => {
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Monitoring',
+                    url: 'https://monitoring.example.com',
+                    icon: mockIcon,
+                    context: 'monitoring',
+                    description: 'Custom monitoring description',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                undefined,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0].description).toBe('Custom monitoring description');
+        });
+
+        test('additional link without description falls back to context default description', () => {
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Monitoring',
+                    url: 'https://monitoring.example.com',
+                    icon: mockIcon,
+                    context: 'monitoring',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                undefined,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0].description).toBeDefined();
+            expect(result[0].description).not.toBe('');
+        });
+
+        test('additional link without icon falls back to context icon', () => {
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Monitoring',
+                    url: 'https://monitoring.example.com',
+                    context: 'monitoring',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                undefined,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0].icon).toBeDefined();
+        });
+
+        test('additional link with custom icon preserves it even with known context', () => {
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Monitoring',
+                    url: 'https://monitoring.example.com',
+                    icon: mockIcon,
+                    context: 'monitoring',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                undefined,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0].icon).toBe(mockIcon);
+        });
     });
 });

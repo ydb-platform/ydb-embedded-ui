@@ -346,12 +346,10 @@ function processAdditionalDatabaseLinks(
                 continue;
             }
 
-            result.push({
-                title: link.title,
-                url: link.url,
-                icon: link.icon,
-                context: link.context,
-            });
+            const icon = link.icon ?? getContextIcon(link.context);
+            const description = getLinkDescription(link.description, link.context);
+
+            result.push({...link, icon, description});
 
             if (link.context) {
                 coveredContexts.add(link.context);

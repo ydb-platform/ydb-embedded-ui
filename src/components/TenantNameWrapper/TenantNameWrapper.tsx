@@ -12,6 +12,7 @@ import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {getDatabaseLinks} from '../../utils/additionalProps';
+import {CLUSTER_LINK_CONTEXT} from '../../utils/clusterLinks/clusterLinkConstants';
 import {useDatabaseLinks} from '../../utils/clusterLinks/useDatabaseLinks';
 import {cn} from '../../utils/cn';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
@@ -49,14 +50,24 @@ export function TenantNameWrapper({
     const backend = getTenantBackend(tenant, additionalTenantsProps);
     const isExternalLink = externalLink || Boolean(backend);
 
-    const legacyLinks = getDatabaseLinks(additionalTenantsProps, tenant?.Name, tenant?.Type);
+    const legacyLinks = React.useMemo(
+        () => getDatabaseLinks(additionalTenantsProps, tenant?.Name, tenant?.Type),
+        [additionalTenantsProps, tenant?.Name, tenant?.Type],
+    );
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();
     const showMonitoring = canShowTenantMonitoring(tenant?.ControlPlane, clusterMonitoring);
-    const filteredLegacyLinks = showMonitoring
-        ? legacyLinks
-        : legacyLinks.filter(({title}) => title !== i18n('field_monitoring-link'));
 
-    const resolvedLinks = useDatabaseLinks(tenant, filteredLegacyLinks);
+    const allResolvedLinks = useDatabaseLinks(tenant, legacyLinks);
+
+    const resolvedLinks = React.useMemo(
+        () =>
+            showMonitoring
+                ? allResolvedLinks
+                : allResolvedLinks.filter(
+                      ({context}) => context !== CLUSTER_LINK_CONTEXT.MONITORING,
+                  ),
+        [allResolvedLinks, showMonitoring],
+    );
 
     const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
 
