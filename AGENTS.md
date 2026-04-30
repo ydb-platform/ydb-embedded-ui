@@ -191,9 +191,9 @@ const handleTitleChange = React.useCallback((value: string) => {
 To test with a local YDB instance:
 
 ```bash
-# Pull and run YDB docker (use specific version or nightly)
-docker pull ghcr.io/ydb-platform/local-ydb:nightly
-docker run -dp 8765:8765 ghcr.io/ydb-platform/local-ydb:nightly
+# Pull and run YDB docker
+docker pull ghcr.io/ydb-platform/local-ydb:26.1.1.6
+docker run -dp 8765:8765 ghcr.io/ydb-platform/local-ydb:26.1.1.6
 
 # Start the UI
 npm run dev
@@ -240,7 +240,7 @@ The following checks run on every PR and merge group (`ci.yml`):
 
 Additional quality checks (`quality.yml`) — run on PRs and pushes to main:
 
-- Playwright E2E tests (against a `local-ydb:nightly` Docker service, sharded across 8 parallel runners)
+- Playwright E2E tests (against a `local-ydb:26.1.1.6` Docker service, sharded across 8 parallel runners)
 - Bundle size comparison (current branch vs. main, on PRs only)
 - Test report deployment to GitHub Pages
 - Automatic PR description updates with test results and bundle size diff
