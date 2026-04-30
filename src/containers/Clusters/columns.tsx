@@ -151,7 +151,9 @@ function getTitleColumn({
                     />
                 );
 
-                if (!onStatusClick || !clusterStatus) {
+                const isHealthcheckSource = row.cluster?.overall_source === 'healthcheck';
+
+                if (!onStatusClick || !clusterStatus || !isHealthcheckSource) {
                     return statusLabel;
                 }
 

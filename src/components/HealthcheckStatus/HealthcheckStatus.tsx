@@ -14,8 +14,8 @@ import i18n from './i18n';
 
 const SelfCheckResultToLabelTheme: Record<SelfCheckResult, LabelProps['theme']> = {
     [SelfCheckResult.GOOD]: 'success',
-    [SelfCheckResult.DEGRADED]: 'info',
-    [SelfCheckResult.MAINTENANCE_REQUIRED]: 'warning',
+    [SelfCheckResult.DEGRADED]: 'warning',
+    [SelfCheckResult.MAINTENANCE_REQUIRED]: 'danger',
     [SelfCheckResult.EMERGENCY]: 'danger',
     [SelfCheckResult.UNSPECIFIED]: 'normal',
 };
