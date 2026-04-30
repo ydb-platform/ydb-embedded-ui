@@ -285,7 +285,8 @@ export function resolveClusterLinks(
 
 /**
  * Processes dynamic links with type === 'database' and collects covered contexts.
- * Links without a title or with unresolvable URLs are dropped.
+ * Links without an explicit title and without a known-context default title, or with
+ * unresolvable URLs, are dropped.
  */
 function processDynamicDatabaseLinks(
     dynamicLinks: MetaClusterLink[] | undefined,
