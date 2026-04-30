@@ -936,6 +936,205 @@ describe('resolveDatabaseLinks', () => {
         });
     });
 
+    describe('legacy lowercase alias resolution', () => {
+        test('resolves {name} alias to PreparedTenant.Name', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://logs.example.com/{name}',
+                    title: 'DB Logs',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://logs.example.com//Root/mydb');
+        });
+
+        test('resolves {id} alias to PreparedTenant.Id', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/db/{id}',
+                    title: 'DB by ID',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo({Id: 'abc-123'}));
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/db/abc-123');
+        });
+
+        test('resolves {type} alias to PreparedTenant.Type', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{type}',
+                    title: 'DB by Type',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/Dedicated');
+        });
+
+        test('resolves {cluster} alias to PreparedTenant.Cluster', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{cluster}',
+                    title: 'DB Cluster',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/my-cluster');
+        });
+
+        test('resolves mixed legacy and PascalCase placeholders', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{name}?id={Id}&type={type}',
+                    title: 'Mixed Link',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com//Root/mydb?id=db-123&type=Dedicated');
+        });
+
+        test('resolves {database.name} dotted alias from database info', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{database.name}',
+                    title: 'DB Link',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com//Root/mydb');
+        });
+
+        test('PascalCase field takes priority when tenant already has a lowercase field', () => {
+            // If PreparedTenant somehow already has a 'name' field, alias should not overwrite it
+            const dbInfo = makeDatabaseInfo({name: 'custom-lowercase-name'});
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{name}',
+                    title: 'DB Link',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, dbInfo);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/custom-lowercase-name');
+        });
+
+        test('legacy aliases combined with cluster dotted placeholders', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://monitoring.com/{name}?balancer={cluster.balancer}',
+                    title: 'Monitoring',
+                },
+            ];
+
+            const clusterInfo = makeClusterInfo({balancer: 'https://balancer.example.com'});
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo(), clusterInfo);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe(
+                'https://monitoring.com//Root/mydb?balancer=https://balancer.example.com',
+            );
+        });
+
+        test('resolves {database.user-attributes.cloud_id} via kebab-case alias', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{database.user-attributes.cloud_id}',
+                    title: 'Cloud Link',
+                },
+            ];
+
+            const dbInfo = makeDatabaseInfo({
+                UserAttributes: {cloud_id: 'cloud-abc'},
+            });
+            const result = resolveDatabaseLinks(dynamicLinks, dbInfo);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/cloud-abc');
+        });
+
+        test('resolves {database.UserAttributes.cloud_id} via PascalCase field', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{database.UserAttributes.cloud_id}',
+                    title: 'Cloud Link',
+                },
+            ];
+
+            const dbInfo = makeDatabaseInfo({
+                UserAttributes: {cloud_id: 'cloud-abc'},
+            });
+            const result = resolveDatabaseLinks(dynamicLinks, dbInfo);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/cloud-abc');
+        });
+
+        test('resolves flat {user-attributes} placeholder is not supported (nested object)', () => {
+            // user-attributes is an object, not a string/number, so flat {user-attributes} should fail
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{user-attributes}',
+                    title: 'Bad Link',
+                },
+            ];
+
+            const dbInfo = makeDatabaseInfo({
+                UserAttributes: {cloud_id: 'cloud-abc'},
+            });
+            const result = resolveDatabaseLinks(dynamicLinks, dbInfo);
+
+            expect(result).toHaveLength(0);
+        });
+
+        test('resolves {database.user-attributes.folder_id} via kebab-case alias', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{database.user-attributes.folder_id}',
+                    title: 'Folder Link',
+                },
+            ];
+
+            const dbInfo = makeDatabaseInfo({
+                UserAttributes: {folder_id: 'folder-xyz'},
+            });
+            const result = resolveDatabaseLinks(dynamicLinks, dbInfo);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/folder-xyz');
+        });
+    });
+
     describe('title and context handling', () => {
         test('uses explicit title', () => {
             const dynamicLinks: MetaClusterLink[] = [

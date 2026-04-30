@@ -37,8 +37,23 @@ export interface SubstitutionNamespaces {
     database?: PreparedTenant;
 }
 
-/** Matches `{param}` and `{prefix.param}` placeholders */
-const PLACEHOLDER_PATTERN = /\{([\w.]+)\}/g;
+/**
+ * Converts a lowercase or kebab-case segment to PascalCase.
+ *
+ * Examples:
+ * - `name`            → `Name`
+ * - `user-attributes` → `UserAttributes`
+ * - `id`              → `Id`
+ * - `cloud_id`        → `cloud_id` (underscores are preserved as-is)
+ *
+ * Already-PascalCase segments pass through unchanged.
+ */
+function toPascalCase(segment: string): string {
+    return segment.replace(/(^|-)([a-z])/g, (_match, _sep, letter: string) => letter.toUpperCase());
+}
+
+/** Matches `{param}` and `{prefix.param}` placeholders (allows hyphens for kebab-case keys) */
+const PLACEHOLDER_PATTERN = /\{([\w.-]+)\}/g;
 
 /**
  * Resolves a placeholder key from the namespaces map.
@@ -51,6 +66,12 @@ const PLACEHOLDER_PATTERN = /\{([\w.]+)\}/g;
  * The first segment of a dotted key is always the namespace prefix.
  * Traversal stops and returns `undefined` if any intermediate value is not
  * a plain object (null, undefined, primitives, and arrays are not traversed).
+ *
+ * Each segment is first looked up as-is; if not found, it is normalised to
+ * PascalCase and retried. This applies to all namespaces, so lowercase and
+ * kebab-case placeholders resolve against PascalCase fields
+ * (e.g. `{name}` → `Name`, `{user-attributes}` → `UserAttributes`).
+ *
  * Returns the resolved value if it is a string or number, otherwise `undefined`.
  */
 function resolveParam(
@@ -68,6 +89,7 @@ function resolveParam(
         prefix = source;
         fields = [key];
     }
+
     const ns = (namespaces as Record<string, Record<string, unknown> | undefined>)[prefix];
 
     let value: unknown = ns;
@@ -80,7 +102,15 @@ function resolveParam(
         ) {
             return undefined;
         }
-        value = (value as Record<string, unknown>)[segment];
+        const record = value as Record<string, unknown>;
+        // Try the original segment first; if it doesn't match,
+        // normalise it to PascalCase and retry so that lowercase /
+        // kebab-case placeholders resolve against PascalCase fields.
+        if (segment in record) {
+            value = record[segment];
+        } else {
+            value = record[toPascalCase(segment)];
+        }
     }
 
     return typeof value === 'string' || typeof value === 'number' ? value : undefined;
@@ -97,6 +127,8 @@ function resolveParam(
  * The first segment of a dotted key is always the namespace prefix.
  * Traversal stops if any intermediate value is not a plain object
  * (null, undefined, primitives, and arrays are not traversed).
+ * Lowercase and kebab-case segments are normalised to PascalCase as a fallback
+ * (see {@link resolveParam} for details).
  * Only string and number leaf values are used for substitution.
  * Returns `undefined` if any placeholder remains unresolved after substitution.
  */
@@ -259,10 +291,10 @@ function processAdditionalLinks(
 
 /**
  * Builds the final list of cluster links by:
- * 1. Extracting URL substitution params from cluster info string fields
- * 2. Building legacy links from cores/logging fields in cluster info
- * 3. Processing dynamic links (type === 'cluster') with URL param substitution
- * 4. Adding additional links (legacy + user-provided) only for contexts NOT already covered
+ * 1. Building legacy links from cores/logging fields in cluster info
+ * 2. Processing dynamic links (type === 'cluster') with URL param substitution
+ *    (cluster info is used as the `cluster` namespace for placeholder resolution)
+ * 3. Adding additional links (legacy + user-provided) only for contexts NOT already covered
  *
  * Links without both title and context are dropped.
  * Links whose URL cannot be fully resolved are dropped.
@@ -366,7 +398,7 @@ function processAdditionalDatabaseLinks(
  * 2. Adding additional (legacy) links only for contexts NOT already covered
  *
  * Uses both database info and cluster info for URL placeholder substitution:
- * - Flat placeholders like `{name}` resolve from `databaseInfo`.
+ * - Flat placeholders like `{name}` resolve from `databaseInfo` (the `database` namespace).
  * - Dotted placeholders like `{cluster.name}` resolve from `clusterInfo`.
  * - Dotted placeholders like `{database.name}` resolve from `databaseInfo`.
  *
