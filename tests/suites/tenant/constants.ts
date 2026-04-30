@@ -2,6 +2,7 @@
 // May cause Memory exceed on real database
 
 export const simpleQuery = 'SELECT 1;';
+export const VISIBILITY_TIMEOUT = 10 * 1000;
 export const longTableSelect = (limit?: number) =>
     'SELECT * FROM `.sys/pg_class`' + (limit ? ` LIMIT ${limit};` : ';');
 

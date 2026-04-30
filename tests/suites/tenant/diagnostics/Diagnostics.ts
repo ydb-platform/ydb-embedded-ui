@@ -5,9 +5,11 @@ import {MemoryViewer} from '../../memoryViewer/MemoryViewer';
 import {NodesPage} from '../../nodes/NodesPage';
 import type {Sidebar} from '../../sidebar/Sidebar';
 import {StoragePage} from '../../storage/StoragePage';
-import {VISIBILITY_TIMEOUT} from '../TenantPage';
+import {VISIBILITY_TIMEOUT} from '../constants';
 
 import {OperationsTable} from './tabs/OperationsModel';
+
+const OWNER_CARD_VISIBILITY_TIMEOUT = VISIBILITY_TIMEOUT * 2;
 
 export enum DiagnosticsTab {
     Info = 'overview',
@@ -518,9 +520,17 @@ export class Diagnostics {
         return rowElementClass?.includes('kv-top-queries__row_active') || false;
     }
 
-    async isOwnerCardVisible(): Promise<boolean> {
-        await this.ownerCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return true;
+    async isOwnerCardVisible(timeout = OWNER_CARD_VISIBILITY_TIMEOUT): Promise<boolean> {
+        try {
+            await this.ownerCard.waitFor({state: 'visible', timeout});
+            return true;
+        } catch (error) {
+            if (error instanceof Error && error.name === 'TimeoutError') {
+                return false;
+            }
+
+            throw error;
+        }
     }
 
     async getOwnerName(): Promise<string> {
