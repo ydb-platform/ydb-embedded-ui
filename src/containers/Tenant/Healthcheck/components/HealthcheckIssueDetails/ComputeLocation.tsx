@@ -13,7 +13,7 @@ import {NodeInfo} from './NodeInfo';
 import {PoolInfo} from './PoolInfo';
 import {IdList, LocationDetails, SectionWithTitle} from './utils';
 
-export type LocationFieldCompute = 'tablet' | 'schema' | 'node' | 'pool';
+export type LocationFieldCompute = 'tablet' | 'schema' | 'node' | 'pool' | 'state_storage';
 
 type ComputeLocationType = Location['compute'];
 
@@ -25,6 +25,9 @@ const LocationFieldRenderer: Record<
     pool: (location: ComputeLocationType) => <PoolInfo location={location} key="pool" />,
     tablet: (location: ComputeLocationType) => <TabletInfo location={location} key="tablet" />,
     schema: (location: ComputeLocationType) => <SchemaInfo location={location} key="schema" />,
+    state_storage: (location: ComputeLocationType) => (
+        <StateStorageInfo location={location} key="state_storage" />
+    ),
 };
 
 interface ComputeLocationProps {
@@ -33,7 +36,7 @@ interface ComputeLocationProps {
 }
 
 export function ComputeLocation({location, hiddenFields = []}: ComputeLocationProps) {
-    const {node, tablet, schema, pool} = location ?? {};
+    const {node, tablet, schema, pool, state_storage: stateStorage} = location ?? {};
 
     const fields = React.useMemo(() => {
         const fields: LocationFieldCompute[] = [];
@@ -49,8 +52,11 @@ export function ComputeLocation({location, hiddenFields = []}: ComputeLocationPr
         if (schema) {
             fields.push('schema');
         }
+        if (stateStorage) {
+            fields.push('state_storage');
+        }
         return fields.filter((field) => !hiddenFields.includes(field));
-    }, [node, pool, tablet, schema, hiddenFields]);
+    }, [node, pool, tablet, schema, stateStorage, hiddenFields]);
 
     if (!location || isEmpty(location) || fields.length === 0) {
         return null;
@@ -115,5 +121,30 @@ function SchemaInfo({location}: ComputeSectionProps) {
                 {value: schema.path, title: i18n('label_schema-path')},
             ]}
         />
+    );
+}
+
+function StateStorageInfo({location}: ComputeSectionProps) {
+    const stateStorage = location?.state_storage;
+
+    if (!stateStorage) {
+        return null;
+    }
+
+    return (
+        <Flex direction="column" gap={3}>
+            <LocationDetails
+                fields={[
+                    {
+                        value:
+                            stateStorage.ring !== undefined && stateStorage.ring !== null
+                                ? String(stateStorage.ring)
+                                : undefined,
+                        title: i18n('label_state-storage-ring'),
+                    },
+                ]}
+            />
+            <NodeInfo node={stateStorage.node} />
+        </Flex>
     );
 }

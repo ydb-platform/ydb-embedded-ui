@@ -39,5 +39,6 @@
   "label_pdisk-id": "PDisk ID",
   "label_pdisk-path": "PDisk Path",
   "label_node_location": "Node Location",
-  "label_peer_location": "Peer Node Location"
+  "label_peer_location": "Peer Node Location",
+  "label_state-storage-ring": "Ring"
 }

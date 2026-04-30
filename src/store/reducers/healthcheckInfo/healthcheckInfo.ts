@@ -4,7 +4,7 @@ import type {IssueLog, StatusFlag} from '../../../types/api/healthcheck';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 
-import {getLeavesFromTree} from './utils';
+import {getLeavesFromTree, linkStateStorageSummaries} from './utils';
 
 export const healthcheckApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -84,7 +84,8 @@ export const selectCheckStatus = createSelector(
 const getIssuesLog = createSelector(
     (state: RootState) => state,
     (_state: RootState, database: string) => createGetHealthcheckInfoSelector(database),
-    (state: RootState, selectGetPost) => selectGetPost(state).data?.issue_log || [],
+    (state: RootState, selectGetPost) =>
+        linkStateStorageSummaries(selectGetPost(state).data?.issue_log || []),
 );
 
 const selectIssuesTreesRoots = createSelector(getIssuesLog, (issues = []) => getRoots(issues));
@@ -118,7 +119,8 @@ const getClusterIssuesLog = createSelector(
     (state: RootState) => state,
     (_state: RootState, clusterName: string) =>
         createGetClusterHealthcheckInfoSelector(clusterName),
-    (state: RootState, selectGetPost) => selectGetPost(state).data?.issue_log || [],
+    (state: RootState, selectGetPost) =>
+        linkStateStorageSummaries(selectGetPost(state).data?.issue_log || []),
 );
 
 const selectClusterIssuesTreesRoots = createSelector(getClusterIssuesLog, (issues = []) =>
