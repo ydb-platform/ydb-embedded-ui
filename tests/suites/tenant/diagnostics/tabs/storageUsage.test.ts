@@ -2,7 +2,8 @@ import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
 import {database} from '../../../../utils/constants';
-import {TenantPage, VISIBILITY_TIMEOUT} from '../../TenantPage';
+import {TenantPage} from '../../TenantPage';
+import {VISIBILITY_TIMEOUT} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
