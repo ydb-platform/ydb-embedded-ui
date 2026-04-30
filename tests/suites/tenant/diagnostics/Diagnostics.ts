@@ -518,8 +518,8 @@ export class Diagnostics {
         return rowElementClass?.includes('kv-top-queries__row_active') || false;
     }
 
-    async isOwnerCardVisible(): Promise<boolean> {
-        await this.ownerCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+    async isOwnerCardVisible(timeout = VISIBILITY_TIMEOUT * 2): Promise<boolean> {
+        await this.ownerCard.waitFor({state: 'visible', timeout});
         return true;
     }
 

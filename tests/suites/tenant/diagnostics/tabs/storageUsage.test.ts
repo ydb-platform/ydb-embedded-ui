@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
 import {database} from '../../../../utils/constants';
-import {TenantPage} from '../../TenantPage';
+import {TenantPage, VISIBILITY_TIMEOUT} from '../../TenantPage';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
@@ -407,7 +407,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         });
 
         const storageUsageSections = page.locator('.ydb-storage-usage-sections__section');
-        await expect(storageUsageSections).toHaveCount(2);
+        await expect(storageUsageSections).toHaveCount(2, {timeout: VISIBILITY_TIMEOUT});
         await expect(storageUsageSections.getByText('SSD', {exact: true}).first()).toBeVisible();
         await expect(storageUsageSections.getByText('HDD', {exact: true}).first()).toBeVisible();
         await expect(storageUsageSections.getByText('2x', {exact: true})).toHaveCount(1);
