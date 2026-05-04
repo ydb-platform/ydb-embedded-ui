@@ -3,6 +3,7 @@ import React from 'react';
 import {Wrench} from '@gravity-ui/icons';
 import {Button, Divider, Flex} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
+import {useHistory} from 'react-router-dom';
 
 import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
@@ -324,6 +325,7 @@ const buildVDiskFooter = (
         vDiskId: string | undefined;
     }) => string | undefined,
     onSuccess?: () => void,
+    onNavigate?: (path: string) => void,
 ): React.ReactNode | null => {
     const {NodeId, PDiskId, VDiskSlotId, StringifiedId, DonorMode} = data;
 
@@ -365,7 +367,7 @@ const buildVDiskFooter = (
             {(vDiskPagePath || resolvedVDiskId) && (
                 <Flex wrap="wrap" gap={2}>
                     {vDiskPagePath && (
-                        <Button href={vDiskPagePath} view="action" size="m">
+                        <Button onClick={() => onNavigate?.(vDiskPagePath)} view="action" size="m">
                             {vDiskPopupKeyset('action_go-to-vdisk')}
                         </Button>
                     )}
@@ -431,6 +433,7 @@ interface VDiskPopupProps {
 
 export const VDiskPopup = ({data}: VDiskPopupProps) => {
     const dispatch = useTypedDispatch();
+    const history = useHistory();
     const isFullData = isFullVDiskData(data);
     const isViewerUser = useIsViewerUser();
 
@@ -465,12 +468,27 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
         [data, isFullData],
     );
 
+    const handleNavigateToPath = React.useCallback((path: string) => history.push(path), [history]);
+
     const vdiskFooter = React.useMemo(
         () =>
             isFullData
-                ? buildVDiskFooter(data, hasDeveloperUi, getVDiskLink, handleAfterEvictVDisk)
+                ? buildVDiskFooter(
+                      data,
+                      hasDeveloperUi,
+                      getVDiskLink,
+                      handleAfterEvictVDisk,
+                      handleNavigateToPath,
+                  )
                 : buildUnavailableVDiskFooter(data, hasDeveloperUi),
-        [data, isFullData, hasDeveloperUi, getVDiskLink, handleAfterEvictVDisk],
+        [
+            data,
+            isFullData,
+            hasDeveloperUi,
+            getVDiskLink,
+            handleAfterEvictVDisk,
+            handleNavigateToPath,
+        ],
     );
 
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
@@ -485,8 +503,11 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
     );
 
     const pdiskFooter = React.useMemo(
-        () => (isFullData && data.PDisk ? buildPDiskFooter(data.PDisk, hasDeveloperUi) : null),
-        [data, isFullData, hasDeveloperUi],
+        () =>
+            isFullData && data.PDisk
+                ? buildPDiskFooter(data.PDisk, hasDeveloperUi, handleNavigateToPath)
+                : null,
+        [data, isFullData, hasDeveloperUi, handleNavigateToPath],
     );
 
     const vdiskId = isFullData ? data.StringifiedId : undefined;

@@ -3,6 +3,7 @@ import React from 'react';
 import {Wrench} from '@gravity-ui/icons';
 import {Button, Flex, Label} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
+import {useHistory} from 'react-router-dom';
 
 import {getPDiskPagePath} from '../../routes';
 import {selectNodesMap} from '../../store/reducers/nodesList';
@@ -113,6 +114,7 @@ export const preparePDiskHeaderLabels = (data: PreparedPDisk): YDBDefinitionList
 export const buildPDiskFooter = (
     data: PreparedPDisk,
     withDeveloperUILink?: boolean,
+    onNavigate?: (path: string) => void,
 ): React.ReactNode | null => {
     const {NodeId, PDiskId} = data;
 
@@ -137,7 +139,11 @@ export const buildPDiskFooter = (
                     hideEndIcon
                 />
             )}
-            <Button href={getPDiskPagePath(PDiskId, NodeId)} view="action" size="m">
+            <Button
+                onClick={() => onNavigate?.(getPDiskPagePath(PDiskId, NodeId))}
+                view="action"
+                size="m"
+            >
                 {pDiskPopupKeyset('action_go-to-pdisk')}
             </Button>
         </Flex>
@@ -150,6 +156,7 @@ interface PDiskPopupProps {
 
 export const PDiskPopup = ({data}: PDiskPopupProps) => {
     const database = useDatabaseFromQuery();
+    const history = useHistory();
     const hasDeveloperUi = useHasDeveloperUi();
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
     const nodeData = isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId);
@@ -161,9 +168,11 @@ export const PDiskPopup = ({data}: PDiskPopupProps) => {
         [data],
     );
 
+    const handleNavigateToPath = React.useCallback((path: string) => history.push(path), [history]);
+
     const footer = React.useMemo(
-        () => buildPDiskFooter(data, hasDeveloperUi),
-        [data, hasDeveloperUi],
+        () => buildPDiskFooter(data, hasDeveloperUi, handleNavigateToPath),
+        [data, hasDeveloperUi, handleNavigateToPath],
     );
 
     const pdiskId = data.StringifiedId;
