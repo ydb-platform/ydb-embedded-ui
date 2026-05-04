@@ -1,8 +1,10 @@
 import React from 'react';
 
-import {Flex, Label} from '@gravity-ui/uikit';
+import {Wrench} from '@gravity-ui/icons';
+import {Button, Flex, Label} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
+import {getPDiskPagePath} from '../../routes';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
@@ -14,8 +16,6 @@ import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {bytesToGB, isNumeric} from '../../utils/utils';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
-import {pDiskInfoKeyset} from '../PDiskInfo/i18n';
-import {PDiskPageLink} from '../PDiskPageLink/PDiskPageLink';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 import type {
     YDBDefinitionListHeaderLabel,
@@ -128,14 +128,18 @@ export const buildPDiskFooter = (
         : undefined;
 
     return (
-        <Flex gap={2} wrap="wrap">
-            <PDiskPageLink pDiskId={PDiskId} nodeId={NodeId} />
+        <Flex direction="column" gap={5} alignItems="flex-start">
             {pDiskInternalViewerPath && (
                 <LinkWithIcon
-                    title={pDiskInfoKeyset('developer-ui')}
+                    title={pDiskPopupKeyset('action_open-in-developer-ui')}
                     url={pDiskInternalViewerPath}
+                    icon={Wrench}
+                    hideEndIcon
                 />
             )}
+            <Button href={getPDiskPagePath(PDiskId, NodeId)} view="action" size="m">
+                {pDiskPopupKeyset('action_go-to-pdisk')}
+            </Button>
         </Flex>
     );
 };
