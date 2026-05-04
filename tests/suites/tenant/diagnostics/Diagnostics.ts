@@ -13,6 +13,7 @@ const OWNER_CARD_VISIBILITY_TIMEOUT = VISIBILITY_TIMEOUT * 2;
 
 export enum DiagnosticsTab {
     Info = 'overview',
+    Database = 'database',
     Schema = 'schema',
     TopShards = 'topShards',
     Queries = 'topQueries',
@@ -23,7 +24,11 @@ export enum DiagnosticsTab {
     HotKeys = 'hotKeys',
     Describe = 'describe',
     Storage = 'storage',
+    Network = 'network',
+    Configs = 'configs',
+    Monitoring = 'monitoring',
     Operations = 'operations',
+    Backups = 'backups',
     Access = 'access',
 }
 
