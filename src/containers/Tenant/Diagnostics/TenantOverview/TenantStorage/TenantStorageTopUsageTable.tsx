@@ -1,0 +1,217 @@
+import React from 'react';
+
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
+import {Flex, HelpMark, Progress, Text} from '@gravity-ui/uikit';
+import {
+    ColumnTableIcon,
+    ExternalTableIcon,
+    TableIcon,
+    TableIndexIcon,
+    TopicIcon,
+    ViewIcon,
+} from 'ydb-ui-components';
+
+import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWithPopover';
+import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
+import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
+import {EPathType} from '../../../../../types/api/schema';
+import {cn} from '../../../../../utils/cn';
+import {
+    EMPTY_DATA_PLACEHOLDER,
+    TENANT_OVERVIEW_TABLES_SETTINGS,
+} from '../../../../../utils/constants';
+import {formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
+import {formatMetricBytes} from '../../../../../utils/storageMetrics';
+import {mapPathTypeToEntityName, mapPathTypeToNavigationTreeType} from '../../../utils/schema';
+import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
+import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
+import i18n from '../i18n';
+
+import {formatOverheadValue} from './displayFormatters';
+import type {TenantStorageTopRow} from './utils';
+import {isSystemStoragePath} from './utils';
+
+import './TenantStorageTopUsageTable.scss';
+
+const b = cn('ydb-tenant-storage-top-usage-table');
+
+const TENANT_STORAGE_COLUMNS_WIDTH_LS_KEY = 'tenantStorageTopUsageTableColumnsWidth';
+
+interface TenantStorageTopUsageTableProps {
+    error?: unknown;
+    loading: boolean;
+    rows: TenantStorageTopRow[];
+    withData: boolean;
+}
+
+function renderPathTypeIcon(row: TenantStorageTopRow) {
+    if (isSystemStoragePath(row.path)) {
+        return <TableIcon />;
+    }
+
+    switch (mapPathTypeToNavigationTreeType(row.pathType, row.pathSubType, 'directory')) {
+        case 'column_table':
+            return <ColumnTableIcon />;
+        case 'topic':
+            return <TopicIcon />;
+        case 'index':
+            return <TableIndexIcon />;
+        case 'view':
+            return <ViewIcon />;
+        case 'external_table':
+            return <ExternalTableIcon />;
+        case 'table':
+        case 'index_table':
+        case 'system_table':
+            return <TableIcon />;
+        default:
+            return null;
+    }
+}
+
+function getObjectName(path: string) {
+    const normalizedPath = path.endsWith('/') ? path.slice(0, -1) : path;
+    const pathParts = normalizedPath.split('/');
+
+    return pathParts[pathParts.length - 1] || normalizedPath;
+}
+
+function TypeCell({row}: {row: TenantStorageTopRow}) {
+    const defaultLabel =
+        mapPathTypeToEntityName(row.pathType, row.pathSubType) ?? i18n('storage.new.type-unknown');
+    let label = defaultLabel;
+
+    if (isSystemStoragePath(row.path)) {
+        label = i18n('storage.new.type-system');
+    } else if (row.pathType === EPathType.EPathTypeTable) {
+        label = i18n('storage.new.type-row-table');
+    }
+
+    return (
+        <Flex alignItems="center" gap="2" className={b('type-cell')}>
+            <div className={b('type-icon')}>{renderPathTypeIcon(row)}</div>
+            <Text>{label}</Text>
+        </Flex>
+    );
+}
+
+function ObjectPathCell({row}: {row: TenantStorageTopRow}) {
+    const objectName = getObjectName(row.path);
+
+    return (
+        <Flex direction="column" gap="1" className={b('object-cell')}>
+            <CellWithPopover content={objectName} disabled={!objectName}>
+                <LinkToSchemaObject path={row.path} className={b('object-link')}>
+                    {objectName}
+                </LinkToSchemaObject>
+            </CellWithPopover>
+            <CellWithPopover content={row.path}>
+                <Text color="secondary" ellipsis>
+                    {row.path}
+                </Text>
+            </CellWithPopover>
+        </Flex>
+    );
+}
+
+function DatabaseSpaceCell({row}: {row: TenantStorageTopRow}) {
+    const share = Math.min(Math.max(row.dbShare, 0), 1);
+    const percent = share * 100;
+    const precision = percent > 0 && percent < 1 ? 1 : 0;
+
+    return (
+        <Flex alignItems="center" gap="2" className={b('space-cell')}>
+            <div className={b('space-progress')}>
+                <Progress value={percent} size="s" className={b('space-progress-bar')} />
+            </div>
+            <Text className={b('space-value')}>
+                {formatPercent(share, precision) || EMPTY_DATA_PLACEHOLDER}
+            </Text>
+        </Flex>
+    );
+}
+
+function getTopUsageColumns(): Column<TenantStorageTopRow>[] {
+    return [
+        {
+            name: 'type',
+            header: i18n('storage.new.table.type'),
+            width: 180,
+            align: DataTable.LEFT,
+            render: ({row}) => <TypeCell row={row} />,
+        },
+        {
+            name: 'path',
+            header: i18n('storage.new.table.object-path'),
+            width: 320,
+            align: DataTable.LEFT,
+            render: ({row}) => <ObjectPathCell row={row} />,
+        },
+        {
+            name: 'dbShare',
+            header: i18n('storage.new.table.database-space'),
+            width: 200,
+            align: DataTable.LEFT,
+            render: ({row}) => <DatabaseSpaceCell row={row} />,
+        },
+        {
+            name: 'dataSize',
+            header: i18n('storage.new.table.user-data'),
+            width: 120,
+            align: DataTable.LEFT,
+            render: ({row}) => formatMetricBytes(row.userData, 'gb'),
+        },
+        {
+            name: 'storageSize',
+            header: i18n('storage.new.table.physical-disk'),
+            width: 140,
+            align: DataTable.LEFT,
+            render: ({row}) => formatMetricBytes(row.physicalDisk, 'gb'),
+        },
+        {
+            name: 'overhead',
+            header: (
+                <Flex alignItems="center" gap="1">
+                    <span>{i18n('storage.new.table.overhead')}</span>
+                    <HelpMark iconSize="s">{i18n('storage.new.overhead-description')}</HelpMark>
+                </Flex>
+            ),
+            width: 110,
+            align: DataTable.LEFT,
+            render: ({row}) => formatOverheadValue(row.overhead),
+        },
+    ];
+}
+
+export function TenantStorageTopUsageTable({
+    error,
+    loading,
+    rows,
+    withData,
+}: TenantStorageTopUsageTableProps) {
+    const columns = React.useMemo(() => getTopUsageColumns(), []);
+
+    return (
+        <StatsWrapper
+            className={b()}
+            title={
+                <React.Fragment>
+                    <Text variant="subheader-3">{i18n('storage.new.top-space-title-main')}</Text>{' '}
+                    <Text variant="subheader-3" color="hint">
+                        {i18n('storage.new.top-space-title-suffix')}
+                    </Text>
+                </React.Fragment>
+            }
+        >
+            <TenantOverviewTableLayout loading={loading} error={error} withData={withData}>
+                <ResizeableDataTable
+                    columnsWidthLSKey={TENANT_STORAGE_COLUMNS_WIDTH_LS_KEY}
+                    columns={columns}
+                    data={rows}
+                    settings={TENANT_OVERVIEW_TABLES_SETTINGS}
+                />
+            </TenantOverviewTableLayout>
+        </StatsWrapper>
+    );
+}

@@ -8,9 +8,13 @@ const TOP_ROW_PATH = '/local/kv_test';
 const SECOND_TOP_ROW_PATH = '/local/orders_cdc';
 const STORAGE_VIEW_SELECTOR = '.ydb-tenant-storage-new';
 const STORAGE_SECTIONS_SELECTOR = '.ydb-tenant-storage-new__sections-inner';
-const MEDIA_SECTION_SELECTOR = '.ydb-tenant-storage-new__media-section';
-const SUMMARY_CARD_SELECTOR = '.ydb-tenant-storage-new__summary-card';
-const SUMMARY_METRIC_SELECTOR = '.ydb-tenant-storage-new__summary-metric';
+const MEDIA_SECTION_SELECTOR = '.ydb-tenant-storage-summary-sections';
+const SUMMARY_CARD_SELECTOR = '.ydb-tenant-storage-summary-card';
+const SUMMARY_METRIC_SELECTOR = '.ydb-tenant-storage-summary-card__metric';
+const SEGMENT_ITEM_INACTIVE_SELECTOR = '.ydb-tenant-storage-segments__item_inactive';
+const SEGMENT_EMPTY_INACTIVE_SELECTOR = '.ydb-tenant-storage-segments__empty_inactive';
+const LEGEND_ITEM_SELECTOR = '.ydb-tenant-storage-segments__legend-item';
+const LEGEND_ITEM_INACTIVE_SELECTOR = '.ydb-tenant-storage-segments__legend-item_inactive';
 const STORAGE_SCREENSHOT_THEMES = ['light', 'dark'] as const;
 
 type StorageScreenshotTheme = (typeof STORAGE_SCREENSHOT_THEMES)[number];
@@ -317,7 +321,7 @@ function getSummaryMetric(card: Locator, label: string) {
     return card.locator(SUMMARY_METRIC_SELECTOR).filter({hasText: label});
 }
 
-test.describe.only('Tenant Overview storage metrics tab', () => {
+test.describe('Tenant Overview storage metrics tab', () => {
     test.describe.configure({timeout: 60_000});
 
     for (const theme of STORAGE_SCREENSHOT_THEMES) {
@@ -475,19 +479,11 @@ test.describe.only('Tenant Overview storage metrics tab', () => {
             await columnSegment.hover();
 
             await expect(page.getByText('of total physical disk usage')).toBeVisible();
+            await expect(physicalSummary.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
+            await expect(physicalSummary.locator(SEGMENT_EMPTY_INACTIVE_SELECTOR)).toHaveCount(1);
+            await expect(physicalSummary.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
             await expect(
-                physicalSummary.locator('.ydb-tenant-storage-new__segment-item_inactive'),
-            ).toHaveCount(4);
-            await expect(
-                physicalSummary.locator('.ydb-tenant-storage-new__segment-empty_inactive'),
-            ).toHaveCount(1);
-            await expect(
-                physicalSummary.locator('.ydb-tenant-storage-new__legend-item_inactive'),
-            ).toHaveCount(4);
-            await expect(
-                physicalSummary
-                    .locator('.ydb-tenant-storage-new__legend-item')
-                    .filter({hasText: 'Column tables'}),
+                physicalSummary.locator(LEGEND_ITEM_SELECTOR).filter({hasText: 'Column tables'}),
             ).not.toHaveClass(/legend-item_inactive/);
             await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(
                 `tenant-overview-storage-hover-${theme}.png`,
@@ -495,12 +491,8 @@ test.describe.only('Tenant Overview storage metrics tab', () => {
 
             await page.mouse.move(0, 0);
 
-            await expect(
-                physicalSummary.locator('.ydb-tenant-storage-new__segment-item_inactive'),
-            ).toHaveCount(0);
-            await expect(
-                physicalSummary.locator('.ydb-tenant-storage-new__legend-item_inactive'),
-            ).toHaveCount(0);
+            await expect(physicalSummary.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
+            await expect(physicalSummary.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
         });
 
         test(`shows tooltip on legend hover and pins state on click in ${theme} theme`, async ({
@@ -526,16 +518,14 @@ test.describe.only('Tenant Overview storage metrics tab', () => {
             const storageView = page.locator(STORAGE_VIEW_SELECTOR);
             const physicalSummary = getSummaryCard(storageView, 'Physical disk usage');
             const columnLegendItem = physicalSummary
-                .locator('.ydb-tenant-storage-new__legend-item')
+                .locator(LEGEND_ITEM_SELECTOR)
                 .filter({hasText: 'Column tables'});
             const columnSegment = physicalSummary.getByRole('button', {name: /Column tables:/});
 
             await columnLegendItem.hover();
 
             await expect(page.getByText('of total physical disk usage')).toBeVisible();
-            await expect(
-                physicalSummary.locator('.ydb-tenant-storage-new__legend-item_inactive'),
-            ).toHaveCount(4);
+            await expect(physicalSummary.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
             await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(
                 `tenant-overview-storage-legend-hover-${theme}.png`,
             );
@@ -544,24 +534,16 @@ test.describe.only('Tenant Overview storage metrics tab', () => {
             await page.mouse.move(0, 0);
 
             await expect(page.getByText('of total physical disk usage')).toBeVisible();
-            await expect(
-                physicalSummary.locator('.ydb-tenant-storage-new__segment-item_inactive'),
-            ).toHaveCount(4);
-            await expect(
-                physicalSummary.locator('.ydb-tenant-storage-new__legend-item_inactive'),
-            ).toHaveCount(4);
+            await expect(physicalSummary.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
+            await expect(physicalSummary.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
             await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(
                 `tenant-overview-storage-pinned-${theme}.png`,
             );
 
             await storageView.getByText('Top 10 by space usage', {exact: true}).click();
 
-            await expect(
-                physicalSummary.locator('.ydb-tenant-storage-new__segment-item_inactive'),
-            ).toHaveCount(0);
-            await expect(
-                physicalSummary.locator('.ydb-tenant-storage-new__legend-item_inactive'),
-            ).toHaveCount(0);
+            await expect(physicalSummary.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
+            await expect(physicalSummary.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
         });
     }
 

@@ -1,0 +1,123 @@
+@use '../../../../../styles/mixins.scss';
+
+.ydb-tenant-storage-segments {
+    &__progress {
+        display: flex;
+        overflow: hidden;
+        gap: 4px;
+
+        height: 20px;
+
+        border-radius: var(--g-border-radius-xs);
+    }
+
+    &__progress-bar {
+        --g-progress-empty-background-color: var(--g-color-sfx-shadow);
+
+        overflow: hidden;
+
+        height: 20px;
+
+        border-radius: var(--g-border-radius-xs);
+    }
+
+    &__progress-bar .g-progress__item {
+        border-radius: var(--g-border-radius-xs);
+
+        transition: none;
+    }
+
+    &__item {
+        min-width: 8px;
+        height: 100%;
+
+        border-radius: var(--g-border-radius-xs);
+
+        &_inactive {
+            opacity: 0.5;
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--g-color-line-focus);
+            outline-offset: 1px;
+        }
+    }
+
+    &__empty {
+        flex: 1;
+
+        height: 100%;
+
+        opacity: 0.75;
+        border-radius: var(--g-border-radius-xs);
+        background: var(--g-color-sfx-shadow);
+
+        &_inactive {
+            opacity: 0.5;
+        }
+    }
+
+    &__tooltip {
+        margin: 0;
+        padding-inline-start: var(--g-spacing-4);
+
+        white-space: nowrap;
+
+        color: var(--g-tooltip-text-color, var(--g-color-text-primary));
+
+        @include mixins.body-1-typography();
+    }
+
+    &__tooltip li + li {
+        margin-top: var(--g-spacing-half);
+    }
+
+    &__legend-items {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--g-spacing-4);
+
+        min-width: 0;
+    }
+
+    &__legend-item {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-2);
+
+        white-space: nowrap;
+
+        &_inactive {
+            opacity: 0.5;
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--g-color-line-focus);
+            outline-offset: 2px;
+        }
+    }
+
+    &__legend-label {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
+    }
+
+    &__legend-dot {
+        flex: 0 0 8px;
+
+        width: 8px;
+        height: 8px;
+
+        border-radius: 50%;
+    }
+
+    &__system-tooltip {
+        min-width: 180px;
+    }
+
+    &__system-tooltip-row {
+        white-space: nowrap;
+    }
+}
