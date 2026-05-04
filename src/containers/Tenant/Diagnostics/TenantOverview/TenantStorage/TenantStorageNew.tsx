@@ -6,7 +6,10 @@ import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../../../../components/LoaderWrapper/LoaderWrapper';
 import {cn} from '../../../../../utils/cn';
 
-import {TenantStorageMediaSectionView} from './TenantStorageSummarySections';
+import {
+    TenantStorageGroupedMediaSectionsView,
+    TenantStorageMediaSectionView,
+} from './TenantStorageSummarySections';
 import {TenantStorageTopUsageTable} from './TenantStorageTopUsageTable';
 import type {TenantStorageProps} from './types';
 import {useTenantStorageNewData} from './useTenantStorageNewData';
@@ -48,14 +51,21 @@ export function TenantStorageNew({
             <Flex direction="column" gap={4} className={b()}>
                 <div className={b('sections-group')}>
                     <div className={b('sections-inner')}>
-                        {mediaSections.map((section, index) => (
-                            <TenantStorageMediaSectionView
-                                key={`${section.mediaType}-${index}`}
-                                section={section}
-                                showMediaTypeLabel={mediaSections.length > 1}
+                        {mediaSections.length > 1 ? (
+                            <TenantStorageGroupedMediaSectionsView
+                                sections={mediaSections}
                                 data={data}
                             />
-                        ))}
+                        ) : (
+                            mediaSections.map((section, index) => (
+                                <TenantStorageMediaSectionView
+                                    key={`${section.mediaType}-${index}`}
+                                    section={section}
+                                    showMediaTypeLabel={false}
+                                    data={data}
+                                />
+                            ))
+                        )}
                     </div>
                 </div>
                 <TenantStorageTopUsageTable

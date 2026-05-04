@@ -288,6 +288,30 @@ describe('buildTenantStorageData', () => {
         expect(result.quota).toBeUndefined();
     });
 
+    test('estimates media user data available when quota is missing', () => {
+        const result = getTenantStorageUserDataDisplaySummary({
+            summary: {
+                used: 120,
+                quota: undefined,
+                available: undefined,
+                usedPercent: 0,
+                segments: [],
+            },
+            useLogicalBreakdown: false,
+            physical: {
+                used: 360,
+                total: 600,
+                available: 240,
+                usedPercent: 60,
+                segments: [],
+            },
+        });
+
+        expect(result.availableApproximate).toBe(true);
+        expect(result.available).toBeCloseTo(80);
+        expect(result.usedPercent).toBeCloseTo(60);
+    });
+
     test('does not estimate logical available when overhead inputs are missing', () => {
         const result = getTenantStorageUserDataDisplaySummary({
             summary: {

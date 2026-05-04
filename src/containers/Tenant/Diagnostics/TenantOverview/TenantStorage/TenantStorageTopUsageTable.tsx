@@ -2,7 +2,7 @@ import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
-import {Flex, HelpMark, Progress, Text} from '@gravity-ui/uikit';
+import {ClipboardButton, Flex, HelpMark, Progress, Text} from '@gravity-ui/uikit';
 import {
     ColumnTableIcon,
     ExternalTableIcon,
@@ -22,13 +22,15 @@ import {
     TENANT_OVERVIEW_TABLES_SETTINGS,
 } from '../../../../../utils/constants';
 import {formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
-import {formatMetricBytes} from '../../../../../utils/storageMetrics';
 import {mapPathTypeToEntityName, mapPathTypeToNavigationTreeType} from '../../../utils/schema';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import i18n from '../i18n';
 
-import {formatOverheadValue} from './displayFormatters';
+import {
+    formatTenantStorageTableMetric,
+    formatTenantStorageTableOverhead,
+} from './displayFormatters';
 import type {TenantStorageTopRow} from './utils';
 import {isSystemStoragePath} from './utils';
 
@@ -106,10 +108,18 @@ function ObjectPathCell({row}: {row: TenantStorageTopRow}) {
                     {objectName}
                 </LinkToSchemaObject>
             </CellWithPopover>
-            <CellWithPopover content={row.path}>
-                <Text color="secondary" ellipsis>
-                    {row.path}
-                </Text>
+            <CellWithPopover content={row.path} fullWidth>
+                <div className={b('path-row')}>
+                    <Text color="secondary" ellipsis className={b('path-text')}>
+                        {row.path}
+                    </Text>
+                    <ClipboardButton
+                        size="xs"
+                        view="flat-secondary"
+                        text={row.path}
+                        className={b('path-copy')}
+                    />
+                </div>
             </CellWithPopover>
         </Flex>
     );
@@ -160,14 +170,14 @@ function getTopUsageColumns(): Column<TenantStorageTopRow>[] {
             header: i18n('storage.new.table.user-data'),
             width: 120,
             align: DataTable.LEFT,
-            render: ({row}) => formatMetricBytes(row.userData, 'gb'),
+            render: ({row}) => formatTenantStorageTableMetric(row.userData),
         },
         {
             name: 'storageSize',
             header: i18n('storage.new.table.physical-disk'),
             width: 140,
             align: DataTable.LEFT,
-            render: ({row}) => formatMetricBytes(row.physicalDisk, 'gb'),
+            render: ({row}) => formatTenantStorageTableMetric(row.physicalDisk),
         },
         {
             name: 'overhead',
@@ -179,7 +189,7 @@ function getTopUsageColumns(): Column<TenantStorageTopRow>[] {
             ),
             width: 110,
             align: DataTable.LEFT,
-            render: ({row}) => formatOverheadValue(row.overhead),
+            render: ({row}) => formatTenantStorageTableOverhead(row.overhead),
         },
     ];
 }

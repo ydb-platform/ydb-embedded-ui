@@ -42,6 +42,22 @@
         min-width: 0;
     }
 
+    &__path-row {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
+
+        min-width: 0;
+    }
+
+    &__path-text {
+        min-width: 0;
+    }
+
+    &__path-copy {
+        flex: 0 0 auto;
+    }
+
     &__space-cell {
         flex-wrap: nowrap;
 

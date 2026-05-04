@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Flex, HelpMark, Popup, Progress, Text} from '@gravity-ui/uikit';
+import {Flex, HelpMark, Label, Popup, Progress, Text} from '@gravity-ui/uikit';
 import type {PopupPlacement} from '@gravity-ui/uikit';
 import {debounce} from 'lodash';
 
@@ -41,7 +41,7 @@ const EMPTY_SEGMENT_POPUP_STATE: SegmentPopupState = {
     key: undefined,
 };
 
-interface SummaryMetricProps {
+export interface SummaryMetricProps {
     label: string;
     note?: string;
     value: string;
@@ -49,19 +49,34 @@ interface SummaryMetricProps {
     hideDivider?: boolean;
 }
 
-interface SummaryCardProps {
-    title: string;
-    description: string;
+interface SummaryCardRowBaseProps {
     summary: TenantStorageSummary;
     metrics: SummaryMetricProps[];
-    descriptionHelpText?: string;
     displayNoLimit?: 'empty' | 'filled';
     segments?: TenantStorageSegment[];
     formatLegendValue?: (value: number) => string;
     formatSystemDetailValue?: (value: number) => string;
-    position?: 'first' | 'last';
+    formatTooltipValue?: (value: number) => string;
     systemDetails?: TenantStorageSystemDetail[];
     tooltipTotalLabel: string;
+}
+
+interface SummaryCardProps {
+    title: string;
+    description: string;
+    descriptionHelpText?: string;
+    position?: 'first' | 'last';
+}
+
+type SummaryCardPropsWithRow = SummaryCardProps & SummaryCardRowBaseProps;
+
+export interface GroupedSummaryCardRow extends SummaryCardRowBaseProps {
+    id: string;
+    mediaLabel?: string;
+}
+
+interface GroupedSummaryCardProps extends SummaryCardProps {
+    rows: GroupedSummaryCardRow[];
 }
 
 function SummaryMetric({label, note, value, emphasize, hideDivider}: SummaryMetricProps) {
@@ -72,6 +87,31 @@ function SummaryMetric({label, note, value, emphasize, hideDivider}: SummaryMetr
                 <Text color="secondary">{label}</Text>
                 {note ? <HelpMark iconSize="s">{note}</HelpMark> : null}
             </Flex>
+        </div>
+    );
+}
+
+function GroupedSummaryMetric({label, note, value, emphasize, hideDivider}: SummaryMetricProps) {
+    if (emphasize) {
+        return (
+            <div className={b('metric', {emphasize, grouped: true, 'hide-divider': hideDivider})}>
+                <Label theme="normal" size="xs" value={value}>
+                    {label}
+                </Label>
+                {note ? <HelpMark iconSize="s">{note}</HelpMark> : null}
+            </div>
+        );
+    }
+
+    return (
+        <div className={b('metric', {grouped: true, 'hide-divider': hideDivider})}>
+            <Flex alignItems="center" gap="1" className={b('metric-label')}>
+                <Text color="secondary">{label}</Text>
+                {note ? <HelpMark iconSize="s">{note}</HelpMark> : null}
+            </Flex>
+            <Text variant="subheader-1" className={b('metric-value')}>
+                {value}
+            </Text>
         </div>
     );
 }
@@ -197,20 +237,41 @@ function useSegmentPopupState(activeSegments: TenantStorageSegment[]) {
     };
 }
 
-export function SummaryCard({
-    title,
+function SummaryCardCopy({
     description,
-    summary,
-    metrics,
     descriptionHelpText,
+    title,
+}: {
+    description: string;
+    descriptionHelpText?: string;
+    title: string;
+}) {
+    return (
+        <div className={b('copy')}>
+            <Text variant="subheader-3">{title}</Text>
+            <Flex alignItems="center" gap="1">
+                <Text color="secondary">{description}</Text>
+                {descriptionHelpText ? (
+                    <HelpMark iconSize="s">{descriptionHelpText}</HelpMark>
+                ) : null}
+            </Flex>
+        </div>
+    );
+}
+
+function SummaryCardRow({
     displayNoLimit,
-    segments,
     formatLegendValue,
     formatSystemDetailValue,
-    position,
+    formatTooltipValue,
+    header,
+    grouped,
+    metrics,
+    segments,
+    summary,
     systemDetails,
     tooltipTotalLabel,
-}: SummaryCardProps) {
+}: SummaryCardRowBaseProps & {grouped?: boolean; header: React.ReactNode}) {
     const total = summary.quota ?? summary.total;
     const activeSegments = (segments ?? []).filter((s) => s.value > 0);
     const hasSegments = activeSegments.length > 0;
@@ -237,21 +298,22 @@ export function SummaryCard({
     }
 
     return (
-        <div className={b({first: position === 'first', last: position === 'last'})}>
-            <Flex justifyContent="space-between" alignItems="flex-start" gap="4">
-                <div className={b('copy')}>
-                    <Text variant="subheader-3">{title}</Text>
-                    <Flex alignItems="center" gap="1">
-                        <Text color="secondary">{description}</Text>
-                        {descriptionHelpText ? (
-                            <HelpMark iconSize="s">{descriptionHelpText}</HelpMark>
-                        ) : null}
-                    </Flex>
-                </div>
+        <div className={b('row', {grouped})}>
+            <Flex
+                justifyContent="space-between"
+                alignItems="flex-start"
+                gap="4"
+                className={b('row-header')}
+            >
+                {header}
                 <div className={b('metrics')}>
-                    {metrics.map((metric) => (
-                        <SummaryMetric key={metric.label} {...metric} />
-                    ))}
+                    {metrics.map((metric) =>
+                        grouped ? (
+                            <GroupedSummaryMetric key={metric.label} {...metric} />
+                        ) : (
+                            <SummaryMetric key={metric.label} {...metric} />
+                        ),
+                    )}
                 </div>
             </Flex>
             <div className={b('progress')}>
@@ -311,7 +373,7 @@ export function SummaryCard({
                         onMouseLeave={handlePopupMouseLeave}
                     >
                         <SegmentTooltipContent
-                            formatValue={formatLegendValue ?? formatNumber}
+                            formatValue={formatTooltipValue ?? formatLegendValue ?? formatNumber}
                             segment={activeSegment}
                             total={summary.used}
                             totalLabel={tooltipTotalLabel}
@@ -319,6 +381,61 @@ export function SummaryCard({
                     </div>
                 </Popup>
             ) : null}
+        </div>
+    );
+}
+
+export function SummaryCard({
+    title,
+    description,
+    descriptionHelpText,
+    position,
+    ...rowProps
+}: SummaryCardPropsWithRow) {
+    return (
+        <div className={b({first: position === 'first', last: position === 'last'})}>
+            <SummaryCardRow
+                {...rowProps}
+                header={
+                    <SummaryCardCopy
+                        title={title}
+                        description={description}
+                        descriptionHelpText={descriptionHelpText}
+                    />
+                }
+            />
+        </div>
+    );
+}
+
+export function GroupedSummaryCard({
+    title,
+    description,
+    descriptionHelpText,
+    position,
+    rows,
+}: GroupedSummaryCardProps) {
+    return (
+        <div className={b({first: position === 'first', grouped: true, last: position === 'last'})}>
+            <SummaryCardCopy
+                title={title}
+                description={description}
+                descriptionHelpText={descriptionHelpText}
+            />
+            <div className={b('rows')}>
+                {rows.map(({id, mediaLabel, ...rowProps}) => (
+                    <SummaryCardRow
+                        key={id}
+                        {...rowProps}
+                        grouped
+                        header={
+                            <Text variant="subheader-2" className={b('row-label')}>
+                                {mediaLabel}
+                            </Text>
+                        }
+                    />
+                ))}
+            </div>
         </div>
     );
 }

@@ -11,11 +11,16 @@ const STORAGE_SECTIONS_SELECTOR = '.ydb-tenant-storage-new__sections-inner';
 const MEDIA_SECTION_SELECTOR = '.ydb-tenant-storage-summary-sections';
 const SUMMARY_CARD_SELECTOR = '.ydb-tenant-storage-summary-card';
 const SUMMARY_METRIC_SELECTOR = '.ydb-tenant-storage-summary-card__metric';
+const SUMMARY_ROW_SELECTOR = '.ydb-tenant-storage-summary-card__row';
 const SEGMENT_ITEM_INACTIVE_SELECTOR = '.ydb-tenant-storage-segments__item_inactive';
 const SEGMENT_EMPTY_INACTIVE_SELECTOR = '.ydb-tenant-storage-segments__empty_inactive';
 const LEGEND_ITEM_SELECTOR = '.ydb-tenant-storage-segments__legend-item';
 const LEGEND_ITEM_INACTIVE_SELECTOR = '.ydb-tenant-storage-segments__legend-item_inactive';
+const TOP_USAGE_TABLE_SELECTOR = '.ydb-tenant-storage-top-usage-table';
+const TOP_USAGE_PATH_COPY_SELECTOR = '.ydb-tenant-storage-top-usage-table__path-copy';
 const STORAGE_SCREENSHOT_THEMES = ['light', 'dark'] as const;
+const STORAGE_SCREENSHOT_VIEWPORT = {width: 1600, height: 1000};
+const EXACT_COLUMN_TABLE_BYTES_REGEXP = /2\s244\s552\s896\sB/;
 
 type StorageScreenshotTheme = (typeof STORAGE_SCREENSHOT_THEMES)[number];
 
@@ -29,6 +34,10 @@ async function enableNewStorageView(page: Page, theme?: StorageScreenshotTheme) 
             localStorage.setItem('theme', themeName);
         }, theme);
     }
+}
+
+async function setupStorageScreenshotViewport(page: Page) {
+    await page.setViewportSize(STORAGE_SCREENSHOT_VIEWPORT);
 }
 
 async function setupCapabilities(page: Page, storageStatsVersion: number) {
@@ -67,9 +76,18 @@ async function setupTenantInfo(
     page: Page,
     tenantType: 'Dedicated' | 'Serverless' = 'Dedicated',
     {
+        databaseQuotas,
         databaseStorage,
         tablesStorage,
     }: {
+        databaseQuotas?: {
+            data_size_soft_quota?: string;
+            storage_quotas?: Array<{
+                data_size_hard_quota?: string;
+                data_size_soft_quota?: string;
+                unit_kind: string;
+            }>;
+        };
         databaseStorage?: Array<{Type: string; Size: string; Limit: string}>;
         tablesStorage?: Array<{
             Type: string;
@@ -93,6 +111,7 @@ async function setupTenantInfo(
                         StorageAllocatedSize: '26400000000000',
                         StorageAllocatedLimit: '201000000000000',
                         StorageGroups: '2',
+                        DatabaseQuotas: databaseQuotas,
                         TablesStorage: tablesStorage ?? [
                             {
                                 Type: 'SSD',
@@ -116,73 +135,124 @@ async function setupTenantInfo(
     });
 }
 
-async function setupStorageStats(page: Page) {
+async function setupStorageStats(
+    page: Page,
+    {withMultiMedia = false}: {withMultiMedia?: boolean} = {},
+) {
     await page.route('**/viewer/storage_stats?*', async (route: Route) => {
         const url = new URL(route.request().url());
         const groupBy = url.searchParams.get('group_by');
 
         if (groupBy === 'tablet_type') {
+            const tablets = withMultiMedia
+                ? [
+                      {
+                          Type: 'Unknown',
+                          StorageSize: 6605648,
+                          Media: [{Kind: 'ssd', StorageSize: 6605648}],
+                      },
+                      {
+                          Type: 'Mediator',
+                          StorageSize: 9873,
+                          Media: [{Kind: 'ssd', StorageSize: 9873}],
+                      },
+                      {
+                          Type: 'Coordinator',
+                          StorageSize: 13759836,
+                          Media: [{Kind: 'ssd', StorageSize: 13759836}],
+                      },
+                      {
+                          Type: 'Hive',
+                          StorageSize: 36872858,
+                          Media: [{Kind: 'ssd', StorageSize: 36872858}],
+                      },
+                      {
+                          Type: 'SchemeShard',
+                          StorageSize: 39347449,
+                          Media: [{Kind: 'ssd', StorageSize: 39347449}],
+                      },
+                      {
+                          Type: 'DataShard',
+                          StorageSize: 1045486055921,
+                          Media: [
+                              {Kind: 'hdd', StorageSize: 1045106959268},
+                              {Kind: 'ssd', StorageSize: 379096653},
+                          ],
+                      },
+                      {
+                          Type: 'SysViewProcessor',
+                          StorageSize: 15764712,
+                          Media: [{Kind: 'ssd', StorageSize: 15764712}],
+                      },
+                      {
+                          Type: 'StatisticsAggregator',
+                          StorageSize: 1448581,
+                          Media: [{Kind: 'ssd', StorageSize: 1448581}],
+                      },
+                  ]
+                : [
+                      {
+                          Type: 'Mediator',
+                          StorageSize: 12820,
+                          Media: [{Kind: 'ssd', StorageSize: 12820}],
+                      },
+                      {
+                          Type: 'Coordinator',
+                          StorageSize: 13026534,
+                          Media: [{Kind: 'ssd', StorageSize: 13026534}],
+                      },
+                      {
+                          Type: 'Hive',
+                          StorageSize: 142572169,
+                          Media: [{Kind: 'ssd', StorageSize: 142572169}],
+                      },
+                      {
+                          Type: 'SchemeShard',
+                          StorageSize: 14850162,
+                          Media: [{Kind: 'ssd', StorageSize: 14850162}],
+                      },
+                      {
+                          Type: 'DataShard',
+                          StorageSize: 71262508656,
+                          Media: [{Kind: 'ssd', StorageSize: 71262508656}],
+                      },
+                      {
+                          Type: 'PersQueue',
+                          StorageSize: 490192343,
+                          Media: [{Kind: 'ssd', StorageSize: 490192343}],
+                      },
+                      {
+                          Type: 'PersQueueReadBalancer',
+                          StorageSize: 23506713,
+                          Media: [{Kind: 'ssd', StorageSize: 23506713}],
+                      },
+                      {
+                          Type: 'SysViewProcessor',
+                          StorageSize: 72956425,
+                          Media: [{Kind: 'ssd', StorageSize: 72956425}],
+                      },
+                      {
+                          Type: 'ColumnShard',
+                          StorageSize: 2244552896,
+                          Media: [{Kind: 'ssd', StorageSize: 2244552896}],
+                      },
+                      {
+                          Type: 'StatisticsAggregator',
+                          StorageSize: 2179029,
+                          Media: [{Kind: 'ssd', StorageSize: 2179029}],
+                      },
+                      {
+                          Type: 'GraphShard',
+                          StorageSize: 15781,
+                          Media: [{Kind: 'ssd', StorageSize: 15781}],
+                      },
+                  ];
+
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
                 body: JSON.stringify({
-                    Tablets: [
-                        {
-                            Type: 'Mediator',
-                            StorageSize: 12820,
-                            Media: [{Kind: 'ssd', StorageSize: 12820}],
-                        },
-                        {
-                            Type: 'Coordinator',
-                            StorageSize: 13026534,
-                            Media: [{Kind: 'ssd', StorageSize: 13026534}],
-                        },
-                        {
-                            Type: 'Hive',
-                            StorageSize: 142572169,
-                            Media: [{Kind: 'ssd', StorageSize: 142572169}],
-                        },
-                        {
-                            Type: 'SchemeShard',
-                            StorageSize: 14850162,
-                            Media: [{Kind: 'ssd', StorageSize: 14850162}],
-                        },
-                        {
-                            Type: 'DataShard',
-                            StorageSize: 71262508656,
-                            Media: [{Kind: 'ssd', StorageSize: 71262508656}],
-                        },
-                        {
-                            Type: 'PersQueue',
-                            StorageSize: 490192343,
-                            Media: [{Kind: 'ssd', StorageSize: 490192343}],
-                        },
-                        {
-                            Type: 'PersQueueReadBalancer',
-                            StorageSize: 23506713,
-                            Media: [{Kind: 'ssd', StorageSize: 23506713}],
-                        },
-                        {
-                            Type: 'SysViewProcessor',
-                            StorageSize: 72956425,
-                            Media: [{Kind: 'ssd', StorageSize: 72956425}],
-                        },
-                        {
-                            Type: 'ColumnShard',
-                            StorageSize: 2244552896,
-                            Media: [{Kind: 'ssd', StorageSize: 2244552896}],
-                        },
-                        {
-                            Type: 'StatisticsAggregator',
-                            StorageSize: 2179029,
-                            Media: [{Kind: 'ssd', StorageSize: 2179029}],
-                        },
-                        {
-                            Type: 'GraphShard',
-                            StorageSize: 15781,
-                            Media: [{Kind: 'ssd', StorageSize: 15781}],
-                        },
-                    ],
+                    Tablets: tablets,
                 }),
             });
             return;
@@ -212,7 +282,7 @@ async function setupStorageStats(page: Page) {
                         if (path === SECOND_TOP_ROW_PATH) {
                             return {
                                 FullPath: SECOND_TOP_ROW_PATH,
-                                StorageSize: 10000000000,
+                                StorageSize: 300000000,
                             };
                         }
 
@@ -253,7 +323,7 @@ async function setupPartitionStatsQuery(page: Page) {
                         ],
                         rows: [
                             [TOP_ROW_PATH, 112000000000, 112000000000],
-                            [SECOND_TOP_ROW_PATH, 4000000000, 4000000000],
+                            [SECOND_TOP_ROW_PATH, 500000, 500000],
                         ],
                     },
                 ],
@@ -321,11 +391,16 @@ function getSummaryMetric(card: Locator, label: string) {
     return card.locator(SUMMARY_METRIC_SELECTOR).filter({hasText: label});
 }
 
+function getSummaryRow(card: Locator, label: string) {
+    return card.locator(SUMMARY_ROW_SELECTOR).filter({hasText: label});
+}
+
 test.describe('Tenant Overview storage metrics tab', () => {
     test.describe.configure({timeout: 60_000});
 
     for (const theme of STORAGE_SCREENSHOT_THEMES) {
         test(`renders the new storage layout in ${theme} theme`, async ({page}) => {
+            await setupStorageScreenshotViewport(page);
             await enableNewStorageView(page, theme);
             await setupWhoami(page);
             await setupCapabilities(page, 1);
@@ -344,23 +419,63 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await openStorageMetricsTab(page);
 
             const storageView = page.locator(STORAGE_VIEW_SELECTOR);
+            const topUsageTable = storageView.locator(TOP_USAGE_TABLE_SELECTOR);
             const userDataSummary = getSummaryCard(storageView, 'User data');
             const physicalSummary = getSummaryCard(storageView, 'Physical disk usage');
 
             await expect(storageView).toBeVisible();
-            await expect(storageView.getByText('User data', {exact: true})).toBeVisible();
-            await expect(storageView.getByText('Physical disk usage', {exact: true})).toBeVisible();
+            await expect(userDataSummary).toBeVisible();
+            await expect(physicalSummary).toBeVisible();
             await expect(
                 storageView.getByText('Top 10 by space usage', {exact: true}),
             ).toBeVisible();
             await expect(storageView.getByText('Row table', {exact: true})).toBeVisible();
             await expect(storageView.getByText('System', {exact: true})).toBeVisible();
             await expect(
-                getSummaryMetric(userDataSummary, 'Used').getByText('3.10 TB', {exact: true}),
+                getSummaryMetric(userDataSummary, 'Used').getByText('3.1 TB', {exact: true}),
             ).toBeVisible();
             await expect(
-                getSummaryMetric(physicalSummary, 'Used').getByText('26.40 TB', {exact: true}),
+                getSummaryMetric(physicalSummary, 'Used').getByText('26.4 TB', {exact: true}),
             ).toBeVisible();
+            await expect(
+                physicalSummary
+                    .locator(LEGEND_ITEM_SELECTOR)
+                    .filter({hasText: 'System'})
+                    .getByText('245.6 MB', {exact: true}),
+            ).toBeVisible();
+            await expect(
+                physicalSummary
+                    .locator(LEGEND_ITEM_SELECTOR)
+                    .filter({hasText: 'Row tables'})
+                    .getByText('71.3 GB', {exact: true}),
+            ).toBeVisible();
+            await expect(
+                physicalSummary
+                    .locator(LEGEND_ITEM_SELECTOR)
+                    .filter({hasText: 'Column tables'})
+                    .getByText('2.2 GB', {exact: true}),
+            ).toBeVisible();
+            await expect(
+                physicalSummary
+                    .locator(LEGEND_ITEM_SELECTOR)
+                    .filter({hasText: 'Unknown'})
+                    .getByText('26.3 TB', {exact: true}),
+            ).toBeVisible();
+            await expect(physicalSummary.getByText('0 TB', {exact: true})).toHaveCount(0);
+            await expect(topUsageTable.getByText('User data, GB', {exact: true})).toHaveCount(0);
+            await expect(topUsageTable.getByText('Physical disk, GB', {exact: true})).toHaveCount(
+                0,
+            );
+            await expect(topUsageTable.getByText('User data', {exact: true}).first()).toBeVisible();
+            await expect(
+                topUsageTable.getByText('Physical disk', {exact: true}).first(),
+            ).toBeVisible();
+            await expect(topUsageTable.getByText('112 GB', {exact: true})).toBeVisible();
+            await expect(topUsageTable.getByText('360 GB', {exact: true})).toBeVisible();
+            await expect(topUsageTable.getByText('500 KB', {exact: true})).toBeVisible();
+            await expect(topUsageTable.getByText('300 MB', {exact: true})).toBeVisible();
+            await expect(topUsageTable.getByText('>500x', {exact: true})).toBeVisible();
+            await expect(topUsageTable.locator(TOP_USAGE_PATH_COPY_SELECTOR).first()).toBeVisible();
             await expect(userDataSummary.getByText('used 15%', {exact: true})).toBeVisible();
             await expect(physicalSummary.getByText('used 13%', {exact: true})).toBeVisible();
             await expect(storageView.getByRole('link', {name: 'kv_test'})).toHaveAttribute(
@@ -370,36 +485,54 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(
                 `tenant-overview-storage-single-media-${theme}.png`,
             );
+            await expect(topUsageTable).toHaveScreenshot(
+                `tenant-overview-storage-top-usage-${theme}.png`,
+            );
         });
 
-        test(`renders separate summary sections for multiple storage types in ${theme} theme`, async ({
+        test(`renders grouped summary sections for multiple storage types in ${theme} theme`, async ({
             page,
         }) => {
+            await setupStorageScreenshotViewport(page);
             await enableNewStorageView(page, theme);
             await setupWhoami(page);
             await setupCapabilities(page, 1);
             await setupTenantInfo(page, 'Dedicated', {
+                databaseQuotas: {
+                    data_size_soft_quota: '612032839680',
+                    storage_quotas: [
+                        {
+                            unit_kind: 'ssd',
+                            data_size_soft_quota: '306016419840',
+                            data_size_hard_quota: '322122547200',
+                        },
+                        {
+                            unit_kind: 'hdd',
+                            data_size_soft_quota: '2089072092774',
+                            data_size_hard_quota: '2199023255552',
+                        },
+                    ],
+                },
                 databaseStorage: [
-                    {Type: 'SSD', Size: '400000000000', Limit: '1000000000000'},
-                    {Type: 'HDD', Size: '600000000000', Limit: '2000000000000'},
+                    {Type: 'HDD', Size: '1353743073280', Limit: '17999012094860'},
+                    {Type: 'SSD', Size: '98419343360', Limit: '1873981472766'},
                 ],
                 tablesStorage: [
                     {
-                        Type: 'SSD',
-                        Size: '250000000000',
-                        Limit: '500000000000',
-                        SoftQuota: '500000000000',
+                        Type: 'HDD',
+                        Size: '289166965049',
+                        Limit: '612032839680',
+                        SoftQuota: '612032839680',
+                        HardQuota: '644245094400',
                     },
                     {
-                        Type: 'HDD',
-                        Size: '50000000000',
-                        Limit: '200000000000',
-                        SoftQuota: '200000000000',
+                        Type: 'SSD',
+                        Size: '986',
                     },
                 ],
             });
             await setupPartitionStatsQuery(page);
-            await setupStorageStats(page);
+            await setupStorageStats(page, {withMultiMedia: true});
             await setupDescribe(page);
 
             const tenantPage = new TenantPage(page);
@@ -412,22 +545,58 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await openStorageMetricsTab(page);
 
             const storageView = page.locator(STORAGE_VIEW_SELECTOR);
-            const ssdSection = storageView.locator(MEDIA_SECTION_SELECTOR).filter({hasText: 'SSD'});
-            const hddSection = storageView.locator(MEDIA_SECTION_SELECTOR).filter({hasText: 'HDD'});
-            const ssdUserDataSummary = getSummaryCard(ssdSection, 'User data');
-            const hddPhysicalSummary = getSummaryCard(hddSection, 'Physical disk usage');
+            const userDataSummary = getSummaryCard(storageView, 'User data');
+            const physicalSummary = getSummaryCard(storageView, 'Physical disk usage');
+            const ssdUserDataRow = getSummaryRow(userDataSummary, 'SSD');
+            const hddUserDataRow = getSummaryRow(userDataSummary, 'HDD');
+            const ssdPhysicalRow = getSummaryRow(physicalSummary, 'SSD');
+            const hddPhysicalRow = getSummaryRow(physicalSummary, 'HDD');
 
-            await expect(storageView.getByText('SSD', {exact: true})).toBeVisible();
-            await expect(storageView.getByText('HDD', {exact: true})).toBeVisible();
+            await expect(storageView.locator(MEDIA_SECTION_SELECTOR)).toHaveCount(1);
+            await expect(userDataSummary).toHaveCount(1);
+            await expect(physicalSummary).toHaveCount(1);
+            await expect(ssdUserDataRow).toBeVisible();
+            await expect(hddUserDataRow).toBeVisible();
+            await expect(ssdPhysicalRow).toBeVisible();
+            await expect(hddPhysicalRow).toBeVisible();
             await expect(
-                getSummaryMetric(ssdUserDataSummary, 'Used').getByText('250 GB', {exact: true}),
+                getSummaryMetric(hddUserDataRow, 'Used').getByText('289.2 GB', {exact: true}),
             ).toBeVisible();
             await expect(
-                getSummaryMetric(hddPhysicalSummary, 'Used').getByText('0.60 TB', {exact: true}),
+                getSummaryMetric(ssdUserDataRow, 'Quota').getByText('306 GB', {exact: true}),
+            ).toBeVisible();
+            await expect(hddUserDataRow.getByText('used 47%', {exact: true})).toBeVisible();
+            await expect(userDataSummary.locator(LEGEND_ITEM_SELECTOR)).toHaveCount(0);
+            await expect(
+                getSummaryMetric(hddPhysicalRow, 'Overhead').getByText('4.7x', {exact: true}),
+            ).toBeVisible();
+            await expect(
+                hddPhysicalRow.locator(LEGEND_ITEM_SELECTOR).filter({hasText: 'Row tables'}),
+            ).toBeVisible();
+            await expect(
+                hddPhysicalRow.locator(LEGEND_ITEM_SELECTOR).filter({hasText: 'Unknown'}),
             ).toBeVisible();
             await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(
                 `tenant-overview-storage-multi-media-${theme}.png`,
             );
+
+            const hddRowTablesSegment = hddPhysicalRow.getByRole('button', {
+                name: /Row tables:/,
+            });
+
+            await hddRowTablesSegment.hover();
+
+            await expect(page.getByText('of total physical disk usage')).toBeVisible();
+            await expect(hddPhysicalRow.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(1);
+            await expect(hddPhysicalRow.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(1);
+            await expect(ssdPhysicalRow.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
+            await expect(ssdPhysicalRow.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
+
+            await hddRowTablesSegment.click();
+            await page.mouse.move(0, 0);
+
+            await expect(hddPhysicalRow.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(1);
+            await expect(ssdPhysicalRow.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
         });
     }
 
@@ -455,6 +624,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
         test(`highlights hovered storage segment and shows rich tooltip in ${theme} theme`, async ({
             page,
         }) => {
+            await setupStorageScreenshotViewport(page);
             await enableNewStorageView(page, theme);
             await setupWhoami(page);
             await setupCapabilities(page, 1);
@@ -478,6 +648,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
 
             await columnSegment.hover();
 
+            await expect(page.getByText(EXACT_COLUMN_TABLE_BYTES_REGEXP)).toBeVisible();
+            await expect(page.getByText('2.2 GB', {exact: true})).toBeVisible();
             await expect(page.getByText('of total physical disk usage')).toBeVisible();
             await expect(physicalSummary.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
             await expect(physicalSummary.locator(SEGMENT_EMPTY_INACTIVE_SELECTOR)).toHaveCount(1);
@@ -498,6 +670,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
         test(`shows tooltip on legend hover and pins state on click in ${theme} theme`, async ({
             page,
         }) => {
+            await setupStorageScreenshotViewport(page);
             await enableNewStorageView(page, theme);
             await setupWhoami(page);
             await setupCapabilities(page, 1);

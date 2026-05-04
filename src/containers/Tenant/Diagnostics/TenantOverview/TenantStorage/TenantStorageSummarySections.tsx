@@ -3,11 +3,18 @@ import {Flex, Text} from '@gravity-ui/uikit';
 import {EType} from '../../../../../types/api/tenant';
 import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
-import {formatMetricBytes, getConsistentMetricBytesSize} from '../../../../../utils/storageMetrics';
 import i18n from '../i18n';
 
-import {SummaryCard} from './TenantStorageSummaryCard';
-import {formatOverheadValue, formatSummaryMetricBytes} from './displayFormatters';
+import {GroupedSummaryCard, SummaryCard} from './TenantStorageSummaryCard';
+import type {GroupedSummaryCardRow} from './TenantStorageSummaryCard';
+import {
+    formatOverheadValue,
+    formatTenantStorageApproximateMetric,
+    formatTenantStorageSummaryMetric,
+    formatTenantStorageTooltipMetric,
+    getTenantStorageLegendValueFormatter,
+    getTenantStorageSummaryMetricUnit,
+} from './displayFormatters';
 import type {
     TenantStorageData,
     TenantStorageMediaSection,
@@ -34,53 +41,135 @@ function getMediaSectionLabel(mediaType?: EType) {
     return mediaType;
 }
 
-function renderUserSummary(summary: TenantStorageSummary, segments?: TenantStorageSegment[]) {
-    const metricsSize = getConsistentMetricBytesSize([
+function getUserSummaryRow({
+    id,
+    mediaLabel,
+    segments,
+    summary,
+}: {
+    id: string;
+    mediaLabel?: string;
+    segments?: TenantStorageSegment[];
+    summary: TenantStorageSummary;
+}): GroupedSummaryCardRow {
+    const metricsSize = getTenantStorageSummaryMetricUnit([
         summary.available,
         summary.used,
         summary.quota,
     ]);
 
-    const formatLegendValue = (value: number) => formatMetricBytes(value, metricsSize);
-    const availableValue = formatSummaryMetricBytes(summary.available, metricsSize);
-    const formattedAvailableValue =
-        summary.availableApproximate && availableValue !== EMPTY_DATA_PLACEHOLDER
-            ? `~${availableValue}`
-            : availableValue;
+    const formatLegendValue = getTenantStorageLegendValueFormatter(
+        (segments ?? []).map((segment) => segment.value),
+    );
+    const formattedAvailableValue = summary.availableApproximate
+        ? formatTenantStorageApproximateMetric(summary.available, metricsSize)
+        : formatTenantStorageSummaryMetric(summary.available, metricsSize);
+
+    return {
+        id,
+        mediaLabel,
+        summary,
+        segments,
+        formatLegendValue,
+        formatTooltipValue: formatTenantStorageTooltipMetric,
+        tooltipTotalLabel: i18n('storage.new.context-total-user-data'),
+        metrics: [
+            {
+                hideDivider: true,
+                label: i18n('storage.new.available'),
+                note: summary.availableApproximate
+                    ? i18n('storage.new.available-approximate-description')
+                    : undefined,
+                value: formattedAvailableValue,
+            },
+            {
+                label: i18n('storage.new.used'),
+                value: formatTenantStorageSummaryMetric(summary.used, metricsSize),
+            },
+            {
+                label: i18n('storage.new.quota'),
+                value:
+                    summary.quota === undefined
+                        ? EMPTY_DATA_PLACEHOLDER
+                        : formatTenantStorageSummaryMetric(summary.quota, metricsSize),
+            },
+        ],
+    };
+}
+
+function renderUserSummary(summary: TenantStorageSummary, segments?: TenantStorageSegment[]) {
+    const row = getUserSummaryRow({id: 'user-data', summary, segments});
 
     return (
         <SummaryCard
             title={i18n('storage.new.user-data-title')}
             description={i18n('storage.new.user-data-description')}
-            summary={summary}
             descriptionHelpText={i18n('storage.new.user-data-description-tooltip')}
-            segments={segments}
-            formatLegendValue={formatLegendValue}
             position="first"
-            tooltipTotalLabel={i18n('storage.new.context-total-user-data')}
-            metrics={[
-                {
-                    hideDivider: true,
-                    label: i18n('storage.new.available'),
-                    note: summary.availableApproximate
-                        ? i18n('storage.new.available-approximate-description')
-                        : undefined,
-                    value: formattedAvailableValue,
-                },
-                {
-                    label: i18n('storage.new.used'),
-                    value: formatSummaryMetricBytes(summary.used, metricsSize),
-                },
-                {
-                    label: i18n('storage.new.quota'),
-                    value:
-                        summary.quota === undefined
-                            ? EMPTY_DATA_PLACEHOLDER
-                            : formatSummaryMetricBytes(summary.quota, metricsSize),
-                },
-            ]}
+            {...row}
         />
     );
+}
+
+function getPhysicalSummaryRow({
+    id,
+    mediaLabel,
+    segments,
+    summary,
+    systemDetails,
+}: {
+    id: string;
+    mediaLabel?: string;
+    segments?: TenantStorageSegment[];
+    summary: TenantStorageSummary;
+    systemDetails?: TenantStorageSystemDetail[];
+}): GroupedSummaryCardRow {
+    const metricsSize = getTenantStorageSummaryMetricUnit([
+        summary.available,
+        summary.used,
+        summary.total,
+    ]);
+
+    const formatLegendValue = getTenantStorageLegendValueFormatter(
+        (segments ?? []).map((segment) => segment.value),
+    );
+    const formatSystemDetailValue = getTenantStorageLegendValueFormatter(
+        (systemDetails ?? []).map((detail) => detail.value),
+    );
+
+    return {
+        id,
+        mediaLabel,
+        summary,
+        segments,
+        formatLegendValue,
+        formatSystemDetailValue,
+        formatTooltipValue: formatTenantStorageTooltipMetric,
+        tooltipTotalLabel: i18n('storage.new.context-total-physical-disk-usage'),
+        displayNoLimit: 'filled',
+        systemDetails,
+        metrics: [
+            {
+                emphasize: true,
+                label: i18n('storage.new.overhead'),
+                note: i18n('storage.new.overhead-description'),
+                value: formatOverheadValue(summary.overhead),
+            },
+            {
+                hideDivider: true,
+                label: i18n('storage.new.available'),
+                value: formatTenantStorageSummaryMetric(summary.available, metricsSize),
+            },
+            {
+                label: i18n('storage.new.used'),
+                value: formatTenantStorageSummaryMetric(summary.used, metricsSize),
+            },
+            {
+                label: i18n('storage.new.total'),
+                value: formatTenantStorageSummaryMetric(summary.total, metricsSize),
+            },
+        ],
+    };
 }
 
 function renderPhysicalSummary(
@@ -88,63 +177,28 @@ function renderPhysicalSummary(
     segments?: TenantStorageSegment[],
     systemDetails?: TenantStorageSystemDetail[],
 ) {
-    const metricsSize = getConsistentMetricBytesSize([
-        summary.available,
-        summary.used,
-        summary.total,
-    ]);
-
-    const formatLegendValue = (value: number) => formatMetricBytes(value, metricsSize);
-    const systemDetailsSize = getConsistentMetricBytesSize(
-        (systemDetails ?? []).map((detail) => detail.value),
-    );
-    const formatSystemDetailValue = (value: number) => formatMetricBytes(value, systemDetailsSize);
+    const row = getPhysicalSummaryRow({id: 'physical', summary, segments, systemDetails});
 
     return (
         <SummaryCard
             title={i18n('storage.new.physical-title')}
             description={i18n('storage.new.physical-description')}
-            summary={summary}
-            segments={segments}
-            formatLegendValue={formatLegendValue}
-            formatSystemDetailValue={formatSystemDetailValue}
             position="last"
-            tooltipTotalLabel={i18n('storage.new.context-total-physical-disk-usage')}
-            metrics={[
-                {
-                    emphasize: true,
-                    label: i18n('storage.new.overhead'),
-                    note: i18n('storage.new.overhead-description'),
-                    value: formatOverheadValue(summary.overhead),
-                },
-                {
-                    hideDivider: true,
-                    label: i18n('storage.new.available'),
-                    value: formatSummaryMetricBytes(summary.available, metricsSize),
-                },
-                {
-                    label: i18n('storage.new.used'),
-                    value: formatSummaryMetricBytes(summary.used, metricsSize),
-                },
-                {
-                    label: i18n('storage.new.total'),
-                    value: formatSummaryMetricBytes(summary.total, metricsSize),
-                },
-            ]}
-            displayNoLimit="filled"
-            systemDetails={systemDetails}
+            {...row}
         />
     );
 }
 
-export function TenantStorageMediaSectionView({
+function getMediaSectionRows({
+    data,
+    index = 0,
     section,
     showMediaTypeLabel,
-    data,
 }: {
+    data: TenantStorageData;
+    index?: number;
     section: TenantStorageMediaSection;
     showMediaTypeLabel: boolean;
-    data: TenantStorageData;
 }) {
     const mediaLabel = getMediaSectionLabel(section.mediaType);
     const userDataSummary = getTenantStorageUserDataDisplaySummary({
@@ -170,6 +224,39 @@ export function TenantStorageMediaSectionView({
         systemDetails = data.systemDetailsByMedia[mediaBreakdownKey];
     }
 
+    return {
+        mediaLabel,
+        physical: getPhysicalSummaryRow({
+            id: `physical-${section.mediaType}-${index}`,
+            mediaLabel,
+            summary: section.physical,
+            segments: physicalSegments,
+            systemDetails,
+        }),
+        user: getUserSummaryRow({
+            id: `user-${section.mediaType}-${index}`,
+            mediaLabel,
+            summary: userDataSummary,
+            segments: userSegments,
+        }),
+    };
+}
+
+export function TenantStorageMediaSectionView({
+    section,
+    showMediaTypeLabel,
+    data,
+}: {
+    section: TenantStorageMediaSection;
+    showMediaTypeLabel: boolean;
+    data: TenantStorageData;
+}) {
+    const {mediaLabel, physical, user} = getMediaSectionRows({
+        data,
+        section,
+        showMediaTypeLabel,
+    });
+
     return (
         <Flex direction="column" gap={3} className={b()}>
             {showMediaTypeLabel && mediaLabel ? (
@@ -177,8 +264,43 @@ export function TenantStorageMediaSectionView({
                     {mediaLabel}
                 </Text>
             ) : null}
-            {renderUserSummary(userDataSummary, userSegments)}
-            {renderPhysicalSummary(section.physical, physicalSegments, systemDetails)}
+            {renderUserSummary(user.summary, user.segments)}
+            {renderPhysicalSummary(physical.summary, physical.segments, physical.systemDetails)}
+        </Flex>
+    );
+}
+
+export function TenantStorageGroupedMediaSectionsView({
+    data,
+    sections,
+}: {
+    data: TenantStorageData;
+    sections: TenantStorageMediaSection[];
+}) {
+    const rows = sections.map((section, index) => {
+        return getMediaSectionRows({
+            data,
+            index,
+            section,
+            showMediaTypeLabel: true,
+        });
+    });
+
+    return (
+        <Flex direction="column" gap={1} className={b({grouped: true})}>
+            <GroupedSummaryCard
+                title={i18n('storage.new.user-data-title')}
+                description={i18n('storage.new.user-data-description')}
+                descriptionHelpText={i18n('storage.new.user-data-description-tooltip')}
+                position="first"
+                rows={rows.map((row) => row.user)}
+            />
+            <GroupedSummaryCard
+                title={i18n('storage.new.physical-title')}
+                description={i18n('storage.new.physical-description')}
+                position="last"
+                rows={rows.map((row) => row.physical)}
+            />
         </Flex>
     );
 }
