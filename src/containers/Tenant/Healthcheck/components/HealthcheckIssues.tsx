@@ -19,7 +19,7 @@ interface IssuesProps {
 }
 
 export function Issues({issues}: IssuesProps) {
-    const NoSearchResultsImage = getIllustration('NoSearchResults');
+    const SuccessImage = getIllustration('SuccessOperation');
 
     const {view, issuesFilter} = useTenantQueryParams();
 
@@ -64,7 +64,7 @@ export function Issues({issues}: IssuesProps) {
         return (
             <Flex grow={1} justifyContent="center" alignItems="center">
                 <EmptyState
-                    image={<NoSearchResultsImage width={100} height={100} />}
+                    image={<SuccessImage width={100} height={100} />}
                     position="center"
                     size="xs"
                     title={i18n('label_no-issues')}
