@@ -8,6 +8,7 @@ type TenantStorageSummaryMetricUnit = 'tb' | 'gb' | 'mb';
 
 const MIXED_UNIT_RATIO_THRESHOLD = 100;
 const TABLE_OVERHEAD_LIMIT = 500;
+const BYTE_UNITS: BytesSizes[] = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
 
 export function formatSummaryPercent(value: number) {
     const formattedValue = formatPercent(value / 100, 0);
@@ -104,7 +105,13 @@ export function formatTenantStorageAdaptiveMetric(value?: string | number) {
     return formatByteMetric(value);
 }
 
-export function getTenantStorageLegendValueFormatter(values: Array<string | number | undefined>) {
+function getLowerByteUnit(size: BytesSizes) {
+    const index = BYTE_UNITS.indexOf(size);
+
+    return BYTE_UNITS[Math.max(index - 1, 0)] ?? 'b';
+}
+
+export function getTenantStorageSegmentValueFormatters(values: Array<string | number | undefined>) {
     const numericValues = values
         .map((value) => getNumericByteValue(value))
         .filter((value): value is number => value !== undefined && value > 0);
@@ -113,26 +120,36 @@ export function getTenantStorageLegendValueFormatter(values: Array<string | numb
     const shouldUseMixedUnits =
         numericValues.length === 0 || maxValue / minValue >= MIXED_UNIT_RATIO_THRESHOLD;
     const commonSize = shouldUseMixedUnits ? undefined : getBytesSizeUnit(maxValue);
+    const getLegendSize = (value?: string | number) => {
+        const numericValue = getNumericByteValue(value);
 
-    return (value: number) => formatByteMetric(value, commonSize);
+        if (numericValue === undefined) {
+            return undefined;
+        }
+
+        return commonSize ?? getBytesSizeUnit(numericValue);
+    };
+
+    return {
+        formatLegendValue: (value?: string | number) => formatByteMetric(value, commonSize),
+        formatTooltipValue: (value?: string | number) => {
+            const legendSize = getLegendSize(value);
+
+            if (legendSize === undefined) {
+                return EMPTY_DATA_PLACEHOLDER;
+            }
+
+            return formatByteMetric(value, getLowerByteUnit(legendSize));
+        },
+    };
+}
+
+export function getTenantStorageLegendValueFormatter(values: Array<string | number | undefined>) {
+    return getTenantStorageSegmentValueFormatters(values).formatLegendValue;
 }
 
 export function formatTenantStorageTableMetric(value?: string | number) {
     return formatTenantStorageAdaptiveMetric(value);
-}
-
-export function formatTenantStorageTooltipMetric(value?: string | number) {
-    const numericValue = getNumericByteValue(value);
-
-    if (numericValue === undefined) {
-        return EMPTY_DATA_PLACEHOLDER;
-    }
-
-    const formattedValue = formatNumber(numericValue);
-
-    return formattedValue
-        ? `${formattedValue}${UNBREAKABLE_GAP}${sizes.b.label}`
-        : EMPTY_DATA_PLACEHOLDER;
 }
 
 export function formatOverheadValue(value?: number) {

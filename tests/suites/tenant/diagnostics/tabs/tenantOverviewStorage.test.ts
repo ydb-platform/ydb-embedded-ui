@@ -18,9 +18,14 @@ const LEGEND_ITEM_SELECTOR = '.ydb-tenant-storage-segments__legend-item';
 const LEGEND_ITEM_INACTIVE_SELECTOR = '.ydb-tenant-storage-segments__legend-item_inactive';
 const TOP_USAGE_TABLE_SELECTOR = '.ydb-tenant-storage-top-usage-table';
 const TOP_USAGE_PATH_COPY_SELECTOR = '.ydb-tenant-storage-top-usage-table__path-copy';
+const HELP_MARK_SELECTOR = '.g-help-mark';
 const STORAGE_SCREENSHOT_THEMES = ['light', 'dark'] as const;
 const STORAGE_SCREENSHOT_VIEWPORT = {width: 1600, height: 1000};
-const EXACT_COLUMN_TABLE_BYTES_REGEXP = /2\s244\s552\s896\sB/;
+const EXACT_COLUMN_TABLE_TOOLTIP_REGEXP = /2\s244\.6\sMB/;
+const EMPTY_DATA_PLACEHOLDER_TEXT = String.fromCharCode(8212);
+const QUOTA_MISSING_TITLE = 'No quota? This is wrong.';
+const QUOTA_MISSING_DESCRIPTION =
+    'This mode lets your database consume shared storage and is only for dev/test. Set a quota for stability.';
 
 type StorageScreenshotTheme = (typeof STORAGE_SCREENSHOT_THEMES)[number];
 
@@ -395,6 +400,20 @@ function getSummaryRow(card: Locator, label: string) {
     return card.locator(SUMMARY_ROW_SELECTOR).filter({hasText: label});
 }
 
+async function expectQuotaMissingHelpMark(page: Page, metric: Locator) {
+    const helpMark = metric.locator(HELP_MARK_SELECTOR);
+
+    await expect(metric.getByText(EMPTY_DATA_PLACEHOLDER_TEXT, {exact: true})).toBeVisible();
+    await expect(helpMark).toHaveCount(1);
+
+    await helpMark.hover();
+
+    await expect(page.getByText(QUOTA_MISSING_TITLE, {exact: true})).toBeVisible();
+    await expect(page.getByText(QUOTA_MISSING_DESCRIPTION, {exact: true})).toBeVisible();
+    await expect(page.getByText('Learn more', {exact: true})).toHaveCount(0);
+    await expect(page.getByText('Set up quota', {exact: true})).toHaveCount(0);
+}
+
 test.describe('Tenant Overview storage metrics tab', () => {
     test.describe.configure({timeout: 60_000});
 
@@ -586,7 +605,9 @@ test.describe('Tenant Overview storage metrics tab', () => {
 
             await hddRowTablesSegment.hover();
 
-            await expect(page.getByText('of total physical disk usage')).toBeVisible();
+            await expect(
+                page.getByText('77.2% of total physical disk usage', {exact: true}),
+            ).toBeVisible();
             await expect(hddPhysicalRow.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(1);
             await expect(hddPhysicalRow.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(1);
             await expect(ssdPhysicalRow.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
@@ -599,6 +620,93 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await expect(ssdPhysicalRow.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
         });
     }
+
+    test('shows quota missing helpmark for a single-media user data summary without quota', async ({
+        page,
+    }) => {
+        await enableNewStorageView(page);
+        await setupWhoami(page);
+        await setupCapabilities(page, 1);
+        await setupTenantInfo(page, 'Dedicated', {
+            tablesStorage: [
+                {
+                    Type: 'SSD',
+                    Size: '3100000000000',
+                },
+            ],
+        });
+        await setupPartitionStatsQuery(page);
+        await setupStorageStats(page);
+        await setupDescribe(page);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: database,
+            database,
+            tenantPage: 'diagnostics',
+        });
+
+        await openStorageMetricsTab(page);
+
+        const storageView = page.locator(STORAGE_VIEW_SELECTOR);
+        const userDataSummary = getSummaryCard(storageView, 'User data');
+        const quotaMetric = getSummaryMetric(userDataSummary, 'Quota');
+
+        await expectQuotaMissingHelpMark(page, quotaMetric);
+    });
+
+    test('shows quota missing helpmark only for multi-media rows without quota', async ({page}) => {
+        await enableNewStorageView(page);
+        await setupWhoami(page);
+        await setupCapabilities(page, 1);
+        await setupTenantInfo(page, 'Dedicated', {
+            databaseQuotas: {
+                storage_quotas: [
+                    {
+                        unit_kind: 'ssd',
+                        data_size_soft_quota: '306016419840',
+                    },
+                ],
+            },
+            databaseStorage: [
+                {Type: 'HDD', Size: '1353743073280', Limit: '17999012094860'},
+                {Type: 'SSD', Size: '98419343360', Limit: '1873981472766'},
+            ],
+            tablesStorage: [
+                {
+                    Type: 'HDD',
+                    Size: '289166965049',
+                },
+                {
+                    Type: 'SSD',
+                    Size: '986',
+                },
+            ],
+        });
+        await setupPartitionStatsQuery(page);
+        await setupStorageStats(page, {withMultiMedia: true});
+        await setupDescribe(page);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: database,
+            database,
+            tenantPage: 'diagnostics',
+        });
+
+        await openStorageMetricsTab(page);
+
+        const storageView = page.locator(STORAGE_VIEW_SELECTOR);
+        const userDataSummary = getSummaryCard(storageView, 'User data');
+        const hddUserDataRow = getSummaryRow(userDataSummary, 'HDD');
+        const ssdUserDataRow = getSummaryRow(userDataSummary, 'SSD');
+        const hddQuotaMetric = getSummaryMetric(hddUserDataRow, 'Quota');
+        const ssdQuotaMetric = getSummaryMetric(ssdUserDataRow, 'Quota');
+
+        await expectQuotaMissingHelpMark(page, hddQuotaMetric);
+        await expect(ssdQuotaMetric.locator(HELP_MARK_SELECTOR)).toHaveCount(0);
+        await expect(ssdQuotaMetric.getByText('306 GB', {exact: true})).toBeVisible();
+    });
 
     test('keeps legacy dedicated storage layout when experiment is disabled', async ({page}) => {
         await setupWhoami(page);
@@ -648,9 +756,11 @@ test.describe('Tenant Overview storage metrics tab', () => {
 
             await columnSegment.hover();
 
-            await expect(page.getByText(EXACT_COLUMN_TABLE_BYTES_REGEXP)).toBeVisible();
+            await expect(page.getByText(EXACT_COLUMN_TABLE_TOOLTIP_REGEXP)).toBeVisible();
             await expect(page.getByText('2.2 GB', {exact: true})).toBeVisible();
-            await expect(page.getByText('of total physical disk usage')).toBeVisible();
+            await expect(
+                page.getByText('0.01% of total physical disk usage', {exact: true}),
+            ).toBeVisible();
             await expect(physicalSummary.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
             await expect(physicalSummary.locator(SEGMENT_EMPTY_INACTIVE_SELECTOR)).toHaveCount(1);
             await expect(physicalSummary.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
@@ -697,7 +807,9 @@ test.describe('Tenant Overview storage metrics tab', () => {
 
             await columnLegendItem.hover();
 
-            await expect(page.getByText('of total physical disk usage')).toBeVisible();
+            await expect(
+                page.getByText('0.01% of total physical disk usage', {exact: true}),
+            ).toBeVisible();
             await expect(physicalSummary.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
             await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(
                 `tenant-overview-storage-legend-hover-${theme}.png`,
@@ -706,7 +818,9 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await columnSegment.click();
             await page.mouse.move(0, 0);
 
-            await expect(page.getByText('of total physical disk usage')).toBeVisible();
+            await expect(
+                page.getByText('0.01% of total physical disk usage', {exact: true}),
+            ).toBeVisible();
             await expect(physicalSummary.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
             await expect(physicalSummary.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
             await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(

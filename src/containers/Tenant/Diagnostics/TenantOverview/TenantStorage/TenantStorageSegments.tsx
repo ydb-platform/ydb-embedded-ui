@@ -75,9 +75,8 @@ function formatSegmentPercent(value: number, total: number) {
     }
 
     const percent = value / total;
-    const precision = percent > 0 && percent < 0.01 ? 1 : 0;
 
-    return formatPercent(percent, precision);
+    return formatPercent(percent, 2);
 }
 
 export function SegmentTooltipContent({

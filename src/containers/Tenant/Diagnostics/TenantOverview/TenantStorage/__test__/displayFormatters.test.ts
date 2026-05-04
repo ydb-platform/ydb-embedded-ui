@@ -5,8 +5,8 @@ import {
     formatTenantStorageSummaryMetric,
     formatTenantStorageTableMetric,
     formatTenantStorageTableOverhead,
-    formatTenantStorageTooltipMetric,
     getTenantStorageLegendValueFormatter,
+    getTenantStorageSegmentValueFormatters,
     getTenantStorageSummaryMetricUnit,
 } from '../displayFormatters';
 
@@ -108,9 +108,44 @@ describe('TenantStorage display formatters', () => {
         expect(formatValue(21_000_000_000_000)).toBe(withUnit('21', 'TB'));
     });
 
-    test('formats tooltip metric as exact bytes', () => {
-        expect(formatTenantStorageTooltipMetric(3_123_456_789)).toBe(
-            withUnit(['3', '123', '456', '789'].join(UNBREAKABLE_GAP), 'B'),
+    test('formats segment tooltip values one unit below the common legend unit', () => {
+        const gbFormatters = getTenantStorageSegmentValueFormatters([
+            600_000_000_000, 900_000_000_000,
+        ]);
+        const mbFormatters = getTenantStorageSegmentValueFormatters([3_000_000, 5_000_000]);
+
+        expect(gbFormatters.formatLegendValue(600_000_000_000)).toBe(withUnit('600', 'GB'));
+        expect(gbFormatters.formatTooltipValue(600_000_000_000)).toBe(
+            withUnit(['600', '000'].join(UNBREAKABLE_GAP), 'MB'),
         );
+        expect(mbFormatters.formatLegendValue(3_000_000)).toBe(withUnit('3', 'MB'));
+        expect(mbFormatters.formatTooltipValue(3_000_000)).toBe(
+            withUnit(['3', '000'].join(UNBREAKABLE_GAP), 'KB'),
+        );
+    });
+
+    test('formats mixed-unit segment tooltips one unit below each adaptive legend unit', () => {
+        const formatters = getTenantStorageSegmentValueFormatters([
+            70_000_000_000, 21_000_000_000_000,
+        ]);
+
+        expect(formatters.formatLegendValue(21_000_000_000_000)).toBe(withUnit('21', 'TB'));
+        expect(formatters.formatTooltipValue(21_000_000_000_000)).toBe(
+            withUnit(['21', '000'].join(UNBREAKABLE_GAP), 'GB'),
+        );
+        expect(formatters.formatLegendValue(70_000_000_000)).toBe(withUnit('70', 'GB'));
+        expect(formatters.formatTooltipValue(70_000_000_000)).toBe(
+            withUnit(['70', '000'].join(UNBREAKABLE_GAP), 'MB'),
+        );
+    });
+
+    test('keeps bytes as the lowest segment tooltip unit', () => {
+        const formatters = getTenantStorageSegmentValueFormatters([500_000, 800_000]);
+
+        expect(formatters.formatLegendValue(500_000)).toBe(withUnit('500', 'KB'));
+        expect(formatters.formatTooltipValue(500_000)).toBe(
+            withUnit(['500', '000'].join(UNBREAKABLE_GAP), 'B'),
+        );
+        expect(formatters.formatTooltipValue(undefined)).toBe(EMPTY_DATA_PLACEHOLDER);
     });
 });

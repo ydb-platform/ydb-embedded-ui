@@ -44,6 +44,8 @@ const EMPTY_SEGMENT_POPUP_STATE: SegmentPopupState = {
 export interface SummaryMetricProps {
     label: string;
     note?: string;
+    notePlacement?: 'label' | 'value';
+    noteTitle?: string;
     value: string;
     emphasize?: boolean;
     hideDivider?: boolean;
@@ -79,26 +81,68 @@ interface GroupedSummaryCardProps extends SummaryCardProps {
     rows: GroupedSummaryCardRow[];
 }
 
-function SummaryMetric({label, note, value, emphasize, hideDivider}: SummaryMetricProps) {
+function SummaryMetricNote({note, noteTitle}: Pick<SummaryMetricProps, 'note' | 'noteTitle'>) {
+    if (!note && !noteTitle) {
+        return null;
+    }
+
+    const content = noteTitle ? (
+        <div className={b('metric-note')}>
+            <Text variant="subheader-2">{noteTitle}</Text>
+            {note ? <Text>{note}</Text> : null}
+        </div>
+    ) : (
+        note
+    );
+
+    return <HelpMark iconSize="s">{content}</HelpMark>;
+}
+
+function SummaryMetric({
+    label,
+    note,
+    notePlacement = 'label',
+    noteTitle,
+    value,
+    emphasize,
+    hideDivider,
+}: SummaryMetricProps) {
+    const noteElement = <SummaryMetricNote note={note} noteTitle={noteTitle} />;
+
     return (
         <div className={b('metric', {emphasize, 'hide-divider': hideDivider})}>
-            <Text variant="subheader-2">{value}</Text>
+            <Flex alignItems="center" gap="1">
+                <Text variant="subheader-2" className={b('metric-value')}>
+                    {value}
+                </Text>
+                {notePlacement === 'value' ? noteElement : null}
+            </Flex>
             <Flex alignItems="center" gap="1" className={b('metric-label')}>
                 <Text color="secondary">{label}</Text>
-                {note ? <HelpMark iconSize="s">{note}</HelpMark> : null}
+                {notePlacement === 'label' ? noteElement : null}
             </Flex>
         </div>
     );
 }
 
-function GroupedSummaryMetric({label, note, value, emphasize, hideDivider}: SummaryMetricProps) {
+function GroupedSummaryMetric({
+    label,
+    note,
+    notePlacement = 'label',
+    noteTitle,
+    value,
+    emphasize,
+    hideDivider,
+}: SummaryMetricProps) {
+    const noteElement = <SummaryMetricNote note={note} noteTitle={noteTitle} />;
+
     if (emphasize) {
         return (
             <div className={b('metric', {emphasize, grouped: true, 'hide-divider': hideDivider})}>
                 <Label theme="normal" size="xs" value={value}>
                     {label}
                 </Label>
-                {note ? <HelpMark iconSize="s">{note}</HelpMark> : null}
+                {noteElement}
             </div>
         );
     }
@@ -107,11 +151,14 @@ function GroupedSummaryMetric({label, note, value, emphasize, hideDivider}: Summ
         <div className={b('metric', {grouped: true, 'hide-divider': hideDivider})}>
             <Flex alignItems="center" gap="1" className={b('metric-label')}>
                 <Text color="secondary">{label}</Text>
-                {note ? <HelpMark iconSize="s">{note}</HelpMark> : null}
+                {notePlacement === 'label' ? noteElement : null}
             </Flex>
-            <Text variant="subheader-1" className={b('metric-value')}>
-                {value}
-            </Text>
+            <Flex alignItems="center" gap="1">
+                <Text variant="subheader-1" className={b('metric-value')}>
+                    {value}
+                </Text>
+                {notePlacement === 'value' ? noteElement : null}
+            </Flex>
         </div>
     );
 }

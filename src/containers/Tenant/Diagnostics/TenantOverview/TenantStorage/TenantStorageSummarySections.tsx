@@ -11,8 +11,8 @@ import {
     formatOverheadValue,
     formatTenantStorageApproximateMetric,
     formatTenantStorageSummaryMetric,
-    formatTenantStorageTooltipMetric,
     getTenantStorageLegendValueFormatter,
+    getTenantStorageSegmentValueFormatters,
     getTenantStorageSummaryMetricUnit,
 } from './displayFormatters';
 import type {
@@ -58,12 +58,13 @@ function getUserSummaryRow({
         summary.quota,
     ]);
 
-    const formatLegendValue = getTenantStorageLegendValueFormatter(
+    const {formatLegendValue, formatTooltipValue} = getTenantStorageSegmentValueFormatters(
         (segments ?? []).map((segment) => segment.value),
     );
     const formattedAvailableValue = summary.availableApproximate
         ? formatTenantStorageApproximateMetric(summary.available, metricsSize)
         : formatTenantStorageSummaryMetric(summary.available, metricsSize);
+    const hasQuota = summary.quota !== undefined;
 
     return {
         id,
@@ -71,7 +72,7 @@ function getUserSummaryRow({
         summary,
         segments,
         formatLegendValue,
-        formatTooltipValue: formatTenantStorageTooltipMetric,
+        formatTooltipValue,
         tooltipTotalLabel: i18n('storage.new.context-total-user-data'),
         metrics: [
             {
@@ -88,10 +89,12 @@ function getUserSummaryRow({
             },
             {
                 label: i18n('storage.new.quota'),
-                value:
-                    summary.quota === undefined
-                        ? EMPTY_DATA_PLACEHOLDER
-                        : formatTenantStorageSummaryMetric(summary.quota, metricsSize),
+                note: hasQuota ? undefined : i18n('storage.new.quota-missing-description'),
+                notePlacement: 'value',
+                noteTitle: hasQuota ? undefined : i18n('storage.new.quota-missing-title'),
+                value: hasQuota
+                    ? formatTenantStorageSummaryMetric(summary.quota, metricsSize)
+                    : EMPTY_DATA_PLACEHOLDER,
             },
         ],
     };
@@ -130,7 +133,7 @@ function getPhysicalSummaryRow({
         summary.total,
     ]);
 
-    const formatLegendValue = getTenantStorageLegendValueFormatter(
+    const {formatLegendValue, formatTooltipValue} = getTenantStorageSegmentValueFormatters(
         (segments ?? []).map((segment) => segment.value),
     );
     const formatSystemDetailValue = getTenantStorageLegendValueFormatter(
@@ -144,7 +147,7 @@ function getPhysicalSummaryRow({
         segments,
         formatLegendValue,
         formatSystemDetailValue,
-        formatTooltipValue: formatTenantStorageTooltipMetric,
+        formatTooltipValue,
         tooltipTotalLabel: i18n('storage.new.context-total-physical-disk-usage'),
         displayNoLimit: 'filled',
         systemDetails,

@@ -124,6 +124,14 @@
         margin-top: var(--g-spacing-1);
     }
 
+    &__metric-note {
+        display: flex;
+        flex-direction: column;
+        gap: var(--g-spacing-2);
+
+        max-width: 280px;
+    }
+
     &__row_grouped &__metric-label {
         margin-top: 0;
     }
