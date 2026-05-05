@@ -9,8 +9,12 @@ import {
     getTenantStorageSegmentValueFormatters,
     getTenantStorageSummaryMetricUnit,
 } from '../displayFormatters';
+import type {TenantStorageSegment} from '../utils';
+import {TENANT_STORAGE_SEGMENT_KEYS, getTenantStorageSegmentDisplayValue} from '../utils';
 
 const withUnit = (value: string, unit: string) => `${value}${UNBREAKABLE_GAP}${unit}`;
+const GB = 1_000_000_000;
+const TB = 1_000_000_000_000;
 
 describe('TenantStorage display formatters', () => {
     test('formats summary terabyte values without redundant decimal zeros', () => {
@@ -106,6 +110,35 @@ describe('TenantStorage display formatters', () => {
 
         expect(formatValue(70_000_000_000)).toBe(withUnit('70', 'GB'));
         expect(formatValue(21_000_000_000_000)).toBe(withUnit('21', 'TB'));
+    });
+
+    test('selects legend units from displayed segment values', () => {
+        const segments: TenantStorageSegment[] = [
+            {
+                key: TENANT_STORAGE_SEGMENT_KEYS.rowTables,
+                value: 1.8 * TB,
+                displayValue: 118 * GB,
+                progressValue: 2.56 * TB,
+            },
+            {
+                key: TENANT_STORAGE_SEGMENT_KEYS.columnTables,
+                value: 0.65 * TB,
+                displayValue: GB,
+                progressValue: 1.135 * TB,
+            },
+            {
+                key: TENANT_STORAGE_SEGMENT_KEYS.topics,
+                value: 0.65 * TB,
+                displayValue: GB,
+                progressValue: 1.135 * TB,
+            },
+        ];
+        const displayValues = segments.map(getTenantStorageSegmentDisplayValue);
+        const formatValue = getTenantStorageLegendValueFormatter(displayValues);
+
+        expect(formatValue(displayValues[0])).toBe(withUnit('118', 'GB'));
+        expect(formatValue(displayValues[1])).toBe(withUnit('1', 'GB'));
+        expect(formatValue(displayValues[2])).toBe(withUnit('1', 'GB'));
     });
 
     test('formats segment tooltip values one unit below the common legend unit', () => {

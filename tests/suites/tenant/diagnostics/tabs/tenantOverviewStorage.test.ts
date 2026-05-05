@@ -599,9 +599,9 @@ test.describe('Tenant Overview storage metrics tab', () => {
                 `tenant-overview-storage-multi-media-${theme}.png`,
             );
 
-            const hddRowTablesSegment = hddPhysicalRow.getByRole('button', {
-                name: /Row tables:/,
-            });
+            const hddRowTablesSegment = hddPhysicalRow.locator(
+                '.ydb-tenant-storage-segments__item[aria-label^="Row tables:"]',
+            );
 
             await hddRowTablesSegment.hover();
 
@@ -616,7 +616,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await hddRowTablesSegment.click();
             await page.mouse.move(0, 0);
 
-            await expect(hddPhysicalRow.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(1);
+            await expect(hddPhysicalRow.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
             await expect(ssdPhysicalRow.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
         });
     }
@@ -752,7 +752,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
 
             const storageView = page.locator(STORAGE_VIEW_SELECTOR);
             const physicalSummary = getSummaryCard(storageView, 'Physical disk usage');
-            const columnSegment = physicalSummary.getByRole('button', {name: /Column tables:/});
+            const columnSegment = physicalSummary.locator('[aria-label^="Column tables:"]').first();
 
             await columnSegment.hover();
 
@@ -777,7 +777,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await expect(physicalSummary.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
         });
 
-        test(`shows tooltip on legend hover and pins state on click in ${theme} theme`, async ({
+        test(`shows tooltip on legend hover and clears state after click in ${theme} theme`, async ({
             page,
         }) => {
             await setupStorageScreenshotViewport(page);
@@ -803,7 +803,6 @@ test.describe('Tenant Overview storage metrics tab', () => {
             const columnLegendItem = physicalSummary
                 .locator(LEGEND_ITEM_SELECTOR)
                 .filter({hasText: 'Column tables'});
-            const columnSegment = physicalSummary.getByRole('button', {name: /Column tables:/});
 
             await columnLegendItem.hover();
 
@@ -815,19 +814,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
                 `tenant-overview-storage-legend-hover-${theme}.png`,
             );
 
-            await columnSegment.click();
+            await columnLegendItem.click();
             await page.mouse.move(0, 0);
-
-            await expect(
-                page.getByText('0.01% of total physical disk usage', {exact: true}),
-            ).toBeVisible();
-            await expect(physicalSummary.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
-            await expect(physicalSummary.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(4);
-            await expect(storageView.locator(STORAGE_SECTIONS_SELECTOR)).toHaveScreenshot(
-                `tenant-overview-storage-pinned-${theme}.png`,
-            );
-
-            await storageView.getByText('Top 10 by space usage', {exact: true}).click();
 
             await expect(physicalSummary.locator(SEGMENT_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
             await expect(physicalSummary.locator(LEGEND_ITEM_INACTIVE_SELECTOR)).toHaveCount(0);
