@@ -40,6 +40,8 @@ export type TenantStorageSystemDetailKey =
 export interface TenantStorageSegment {
     key: TenantStorageSegmentKey;
     value: number;
+    displayValue?: number;
+    progressValue?: number;
 }
 
 export interface TenantStorageSystemDetail {
@@ -51,6 +53,7 @@ export interface TenantStorageSummary {
     available?: number;
     availableApproximate?: boolean;
     overhead?: number;
+    preserveDisplayValues?: boolean;
     quota?: number;
     total?: number;
     used: number;
@@ -59,6 +62,8 @@ export interface TenantStorageSummary {
 }
 
 export interface TenantStorageTopRow {
+    displayPath?: string;
+    displayTypeLabel?: string;
     path: string;
     pathType?: EPathType;
     pathSubType?: EPathSubType;
@@ -90,6 +95,10 @@ export interface TenantStorageMediaSection {
     mediaType: EType;
     userData: TenantStorageSummary;
     physical: TenantStorageSummary;
+}
+
+export function getTenantStorageSegmentDisplayValue(segment: TenantStorageSegment) {
+    return segment.displayValue ?? segment.value;
 }
 
 const SYSTEM_STORAGE_PATH_PATTERN = /(^|\/)\.(sys|metadata)(\/|$)/;
@@ -400,6 +409,10 @@ export function getTenantStorageUserDataDisplaySummary({
     useLogicalBreakdown: boolean;
     physical: TenantStorageSummary;
 }) {
+    if (summary.preserveDisplayValues) {
+        return summary;
+    }
+
     const used =
         useLogicalBreakdown && logicalUserData
             ? logicalUserData.rowTables + logicalUserData.topics

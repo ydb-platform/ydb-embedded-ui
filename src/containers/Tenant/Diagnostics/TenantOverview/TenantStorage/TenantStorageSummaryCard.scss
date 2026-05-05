@@ -61,6 +61,7 @@
 
     &__metrics {
         display: flex;
+        flex: 0 0 auto;
         align-items: stretch;
         gap: var(--g-spacing-10);
     }
@@ -76,12 +77,14 @@
         flex-direction: column;
         justify-content: center;
 
+        width: 101px;
         min-width: 0;
         padding-left: var(--g-spacing-10);
 
         border-left: 1px solid var(--g-color-line-generic);
 
         &_emphasize {
+            width: auto;
             margin-top: calc(-1 * var(--g-spacing-2));
             margin-bottom: calc(-1 * var(--g-spacing-2));
             padding: var(--g-spacing-2) var(--g-spacing-3);
@@ -92,6 +95,7 @@
         }
 
         &_hide-divider {
+            width: 70px;
             padding-left: 0;
 
             border-left: 0;
@@ -103,6 +107,7 @@
             align-items: center;
             gap: var(--g-spacing-1);
 
+            width: auto;
             min-width: 88px;
             padding-left: var(--g-spacing-6);
 
