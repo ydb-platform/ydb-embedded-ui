@@ -18,10 +18,10 @@
   "action_manage": "Manage",
 
   "title_developer-ui": "Developer UI",
-  "description_developer-ui": "Developer interface with a full set of administrative functions",
+  "description_developer-ui": "Developer interface with a full set\nof administrative functions",
   "description_connect-to-db": "Connect to database",
-  "description_monitoring": "Monitoring and metrics dashboard",
 
   "title_monitoring": "Open in {{system}}",
+  "description_monitoring": "Dashboards in {{system}}",
   "action_copy-path": "Copy path"
 }
