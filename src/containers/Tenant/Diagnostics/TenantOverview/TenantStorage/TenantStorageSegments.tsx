@@ -1,4 +1,7 @@
-import {Flex, HelpMark, Progress, Text} from '@gravity-ui/uikit';
+import React from 'react';
+
+import {Flex, HelpMark, Progress, Text, Tooltip} from '@gravity-ui/uikit';
+import type {PopupPlacement} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../../utils/cn';
 import {formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
@@ -10,11 +13,19 @@ import type {
     TenantStorageSystemDetail,
     TenantStorageSystemDetailKey,
 } from './utils';
-import {TENANT_STORAGE_SEGMENT_KEYS, TENANT_STORAGE_SYSTEM_DETAIL_KEYS} from './utils';
+import {
+    TENANT_STORAGE_SEGMENT_KEYS,
+    TENANT_STORAGE_SYSTEM_DETAIL_KEYS,
+    getTenantStorageSegmentDisplayValue,
+} from './utils';
 
 import './TenantStorageSegments.scss';
 
 const b = cn('ydb-tenant-storage-segments');
+
+const SEGMENT_TOOLTIP_OPEN_DELAY = 100;
+const SEGMENT_TOOLTIP_CLOSE_DELAY = 100;
+const SEGMENT_TOOLTIP_PLACEMENT: PopupPlacement = ['top', 'bottom'];
 
 const SEGMENT_COLORS: Record<TenantStorageSegmentKey, string> = {
     [TENANT_STORAGE_SEGMENT_KEYS.rowTables]: 'var(--ydb-storage-segment-row-tables)',
@@ -63,9 +74,13 @@ const SYSTEM_DETAIL_LABELS: Record<TenantStorageSystemDetailKey, string> = {
     [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.console]: i18n('storage.new.system-detail.console'),
 };
 
+function getSegmentProgressValue(segment: TenantStorageSegment) {
+    return segment.progressValue ?? segment.value;
+}
+
 function getActiveDisplaySegments(segments: TenantStorageSegment[]) {
     return segments
-        .filter((segment) => segment.value > 0)
+        .filter((segment) => getSegmentProgressValue(segment) > 0)
         .sort((left, right) => SEGMENT_ORDER_INDEX[left.key] - SEGMENT_ORDER_INDEX[right.key]);
 }
 
@@ -90,11 +105,11 @@ export function SegmentTooltipContent({
     total: number;
     totalLabel: string;
 }) {
-    const percent = formatSegmentPercent(segment.value, total);
+    const percent = formatSegmentPercent(getSegmentProgressValue(segment), total);
 
     return (
         <ul className={b('tooltip')}>
-            <li>{formatValue(segment.value)}</li>
+            <li>{formatValue(getTenantStorageSegmentDisplayValue(segment))}</li>
             {percent ? (
                 <li>{i18n('storage.new.context-segment-share', {value: percent, totalLabel})}</li>
             ) : null}
@@ -102,30 +117,62 @@ export function SegmentTooltipContent({
     );
 }
 
+function SegmentTooltip({
+    children,
+    formatValue,
+    onOpenChange,
+    segment,
+    total,
+    totalLabel,
+}: {
+    children: React.ReactElement;
+    formatValue: (value: number) => string;
+    onOpenChange: (segmentKey: TenantStorageSegmentKey, open: boolean) => void;
+    segment: TenantStorageSegment;
+    total: number;
+    totalLabel: string;
+}) {
+    return (
+        <Tooltip
+            placement={SEGMENT_TOOLTIP_PLACEMENT}
+            openDelay={SEGMENT_TOOLTIP_OPEN_DELAY}
+            closeDelay={SEGMENT_TOOLTIP_CLOSE_DELAY}
+            content={
+                <SegmentTooltipContent
+                    formatValue={formatValue}
+                    segment={segment}
+                    total={total}
+                    totalLabel={totalLabel}
+                />
+            }
+            onOpenChange={(open) => onOpenChange(segment.key, open)}
+        >
+            {children}
+        </Tooltip>
+    );
+}
+
 export function SegmentedProgressBar({
     activeSegmentKey,
     formatValue,
-    onSegmentClick,
-    onSegmentMouseEnter,
-    onSegmentMouseLeave,
-    registerSegmentAnchor,
+    formatTooltipValue,
+    onSegmentOpenChange,
     segments,
+    tooltipTotal,
+    tooltipTotalLabel,
     total,
 }: {
     activeSegmentKey?: TenantStorageSegmentKey;
     formatValue: (value: number) => string;
-    onSegmentClick: (segmentKey: TenantStorageSegmentKey, anchor: HTMLElement) => void;
-    onSegmentMouseEnter: (segmentKey: TenantStorageSegmentKey, anchor: HTMLElement) => void;
-    onSegmentMouseLeave: VoidFunction;
-    registerSegmentAnchor: (
-        segmentKey: TenantStorageSegmentKey,
-        anchor: HTMLDivElement | null,
-    ) => void;
+    formatTooltipValue: (value: number) => string;
+    onSegmentOpenChange: (segmentKey: TenantStorageSegmentKey, open: boolean) => void;
     segments: TenantStorageSegment[];
+    tooltipTotal: number;
+    tooltipTotalLabel: string;
     total?: number;
 }) {
     const activeSegments = getActiveDisplaySegments(segments);
-    const segmentSum = activeSegments.reduce((sum, s) => sum + s.value, 0);
+    const segmentSum = activeSegments.reduce((sum, s) => sum + getSegmentProgressValue(s), 0);
     const effectiveTotal = total === undefined ? segmentSum : total;
 
     if (!Number.isFinite(effectiveTotal) || effectiveTotal <= 0 || segmentSum <= 0) {
@@ -140,32 +187,25 @@ export function SegmentedProgressBar({
                 const inactive = activeSegmentKey !== undefined && activeSegmentKey !== segment.key;
 
                 return (
-                    <div
+                    <SegmentTooltip
                         key={segment.key}
-                        aria-label={`${SEGMENT_LABELS[segment.key]}: ${formatValue(segment.value)}`}
-                        aria-pressed={activeSegmentKey === segment.key}
-                        className={b('item', {inactive})}
-                        ref={(anchor) => registerSegmentAnchor(segment.key, anchor)}
-                        onBlur={onSegmentMouseLeave}
-                        onClick={(event) => onSegmentClick(segment.key, event.currentTarget)}
-                        onFocus={(event) => onSegmentMouseEnter(segment.key, event.currentTarget)}
-                        onKeyDown={(event) => {
-                            if (event.key === 'Enter' || event.key === ' ') {
-                                event.preventDefault();
-                                onSegmentClick(segment.key, event.currentTarget);
-                            }
-                        }}
-                        onMouseEnter={(event) =>
-                            onSegmentMouseEnter(segment.key, event.currentTarget)
-                        }
-                        onMouseLeave={onSegmentMouseLeave}
-                        role="button"
-                        style={{
-                            width: `${(segment.value / cappedTotal) * 100}%`,
-                            background: SEGMENT_COLORS[segment.key],
-                        }}
-                        tabIndex={0}
-                    />
+                        formatValue={formatTooltipValue}
+                        onOpenChange={onSegmentOpenChange}
+                        segment={segment}
+                        total={tooltipTotal}
+                        totalLabel={tooltipTotalLabel}
+                    >
+                        <div
+                            aria-label={`${SEGMENT_LABELS[segment.key]}: ${formatValue(getTenantStorageSegmentDisplayValue(segment))}`}
+                            className={b('item', {inactive})}
+                            onMouseDown={(event) => event.preventDefault()}
+                            style={{
+                                width: `${(getSegmentProgressValue(segment) / cappedTotal) * 100}%`,
+                                background: SEGMENT_COLORS[segment.key],
+                            }}
+                            tabIndex={0}
+                        />
+                    </SegmentTooltip>
                 );
             })}
             <div className={b('empty', {inactive: activeSegmentKey !== undefined})} />
@@ -177,20 +217,22 @@ export function LegendItems({
     activeSegmentKey,
     segments,
     formatValue,
+    formatTooltipValue,
     formatSystemDetailValue,
-    onSegmentClick,
-    onSegmentMouseEnter,
-    onSegmentMouseLeave,
+    onSegmentOpenChange,
     systemDetails,
+    tooltipTotal,
+    tooltipTotalLabel,
 }: {
     activeSegmentKey?: TenantStorageSegmentKey;
     segments: TenantStorageSegment[];
     formatValue: (value: number) => string;
+    formatTooltipValue: (value: number) => string;
     formatSystemDetailValue?: (value: number) => string;
-    onSegmentClick: (segmentKey: TenantStorageSegmentKey, anchor: HTMLElement) => void;
-    onSegmentMouseEnter: (segmentKey: TenantStorageSegmentKey, anchor: HTMLElement) => void;
-    onSegmentMouseLeave: VoidFunction;
+    onSegmentOpenChange: (segmentKey: TenantStorageSegmentKey, open: boolean) => void;
     systemDetails?: TenantStorageSystemDetail[];
+    tooltipTotal: number;
+    tooltipTotalLabel: string;
 }) {
     const activeSegments = getActiveDisplaySegments(segments);
     const visibleSystemDetails = (systemDetails ?? []).filter((detail) => detail.value > 0);
@@ -207,55 +249,56 @@ export function LegendItems({
                 const inactive = activeSegmentKey !== undefined && activeSegmentKey !== segment.key;
 
                 return (
-                    <div
+                    <SegmentTooltip
                         key={segment.key}
-                        aria-pressed={activeSegmentKey === segment.key}
-                        className={b('legend-item', {inactive})}
-                        onBlur={onSegmentMouseLeave}
-                        onClick={(event) => onSegmentClick(segment.key, event.currentTarget)}
-                        onFocus={(event) => onSegmentMouseEnter(segment.key, event.currentTarget)}
-                        onKeyDown={(event) => {
-                            if (event.key === 'Enter' || event.key === ' ') {
-                                event.preventDefault();
-                                onSegmentClick(segment.key, event.currentTarget);
-                            }
-                        }}
-                        onMouseEnter={(event) =>
-                            onSegmentMouseEnter(segment.key, event.currentTarget)
-                        }
-                        onMouseLeave={onSegmentMouseLeave}
-                        role="button"
-                        tabIndex={0}
+                        formatValue={formatTooltipValue}
+                        onOpenChange={onSegmentOpenChange}
+                        segment={segment}
+                        total={tooltipTotal}
+                        totalLabel={tooltipTotalLabel}
                     >
                         <div
-                            className={b('legend-dot')}
-                            style={{background: SEGMENT_COLORS[segment.key]}}
-                        />
-                        <div className={b('legend-label')}>
-                            <Text>{SEGMENT_LABELS[segment.key]}</Text>
+                            aria-label={`${SEGMENT_LABELS[segment.key]}: ${formatValue(getTenantStorageSegmentDisplayValue(segment))}`}
+                            className={b('legend-item', {inactive})}
+                            onMouseDown={(event) => event.preventDefault()}
+                            tabIndex={0}
+                        >
+                            <div
+                                className={b('legend-dot')}
+                                style={{background: SEGMENT_COLORS[segment.key]}}
+                            />
+                            <div className={b('legend-label')}>
+                                <Text>{SEGMENT_LABELS[segment.key]}</Text>
+                            </div>
+                            <Text color="secondary">
+                                {formatValue(getTenantStorageSegmentDisplayValue(segment))}
+                            </Text>
+                            {showSystemDetails ? (
+                                <HelpMark iconSize="s">
+                                    <Flex
+                                        direction="column"
+                                        gap="1"
+                                        className={b('system-tooltip')}
+                                    >
+                                        {visibleSystemDetails.map((detail) => (
+                                            <Flex
+                                                key={detail.key}
+                                                justifyContent="space-between"
+                                                gap="4"
+                                                className={b('system-tooltip-row')}
+                                            >
+                                                <Text>{SYSTEM_DETAIL_LABELS[detail.key]}</Text>
+                                                <Text color="secondary">
+                                                    {formatSystemDetailValue?.(detail.value) ??
+                                                        formatValue(detail.value)}
+                                                </Text>
+                                            </Flex>
+                                        ))}
+                                    </Flex>
+                                </HelpMark>
+                            ) : null}
                         </div>
-                        <Text color="secondary">{formatValue(segment.value)}</Text>
-                        {showSystemDetails ? (
-                            <HelpMark iconSize="s">
-                                <Flex direction="column" gap="1" className={b('system-tooltip')}>
-                                    {visibleSystemDetails.map((detail) => (
-                                        <Flex
-                                            key={detail.key}
-                                            justifyContent="space-between"
-                                            gap="4"
-                                            className={b('system-tooltip-row')}
-                                        >
-                                            <Text>{SYSTEM_DETAIL_LABELS[detail.key]}</Text>
-                                            <Text color="secondary">
-                                                {formatSystemDetailValue?.(detail.value) ??
-                                                    formatValue(detail.value)}
-                                            </Text>
-                                        </Flex>
-                                    ))}
-                                </Flex>
-                            </HelpMark>
-                        ) : null}
-                    </div>
+                    </SegmentTooltip>
                 );
             })}
         </div>

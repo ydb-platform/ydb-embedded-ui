@@ -80,13 +80,14 @@ function getObjectName(path: string) {
 }
 
 function TypeCell({row}: {row: TenantStorageTopRow}) {
-    const defaultLabel =
-        mapPathTypeToEntityName(row.pathType, row.pathSubType) ?? i18n('storage.new.type-unknown');
-    let label = defaultLabel;
+    let label =
+        row.displayTypeLabel ??
+        mapPathTypeToEntityName(row.pathType, row.pathSubType) ??
+        i18n('storage.new.type-unknown');
 
-    if (isSystemStoragePath(row.path)) {
+    if (!row.displayTypeLabel && isSystemStoragePath(row.path)) {
         label = i18n('storage.new.type-system');
-    } else if (row.pathType === EPathType.EPathTypeTable) {
+    } else if (!row.displayTypeLabel && row.pathType === EPathType.EPathTypeTable) {
         label = i18n('storage.new.type-row-table');
     }
 
@@ -99,7 +100,8 @@ function TypeCell({row}: {row: TenantStorageTopRow}) {
 }
 
 function ObjectPathCell({row}: {row: TenantStorageTopRow}) {
-    const objectName = getObjectName(row.path);
+    const pathLabel = row.displayPath ?? row.path;
+    const objectName = getObjectName(pathLabel);
 
     return (
         <Flex direction="column" gap="1" className={b('object-cell')}>
@@ -108,15 +110,15 @@ function ObjectPathCell({row}: {row: TenantStorageTopRow}) {
                     {objectName}
                 </LinkToSchemaObject>
             </CellWithPopover>
-            <CellWithPopover content={row.path} fullWidth>
+            <CellWithPopover content={pathLabel} fullWidth>
                 <div className={b('path-row')}>
                     <Text color="secondary" ellipsis className={b('path-text')}>
-                        {row.path}
+                        {pathLabel}
                     </Text>
                     <ClipboardButton
                         size="xs"
                         view="flat-secondary"
-                        text={row.path}
+                        text={pathLabel}
                         className={b('path-copy')}
                     />
                 </div>
@@ -147,28 +149,28 @@ function getTopUsageColumns(): Column<TenantStorageTopRow>[] {
         {
             name: 'type',
             header: i18n('storage.new.table.type'),
-            width: 180,
+            width: 130,
             align: DataTable.LEFT,
             render: ({row}) => <TypeCell row={row} />,
         },
         {
             name: 'path',
             header: i18n('storage.new.table.object-path'),
-            width: 320,
+            width: undefined,
             align: DataTable.LEFT,
             render: ({row}) => <ObjectPathCell row={row} />,
         },
         {
             name: 'dbShare',
             header: i18n('storage.new.table.database-space'),
-            width: 200,
+            width: 220,
             align: DataTable.LEFT,
             render: ({row}) => <DatabaseSpaceCell row={row} />,
         },
         {
             name: 'dataSize',
             header: i18n('storage.new.table.user-data'),
-            width: 120,
+            width: 100,
             align: DataTable.LEFT,
             render: ({row}) => formatTenantStorageTableMetric(row.userData),
         },
@@ -187,7 +189,7 @@ function getTopUsageColumns(): Column<TenantStorageTopRow>[] {
                     <HelpMark iconSize="s">{i18n('storage.new.overhead-description')}</HelpMark>
                 </Flex>
             ),
-            width: 110,
+            width: 106,
             align: DataTable.LEFT,
             render: ({row}) => formatTenantStorageTableOverhead(row.overhead),
         },

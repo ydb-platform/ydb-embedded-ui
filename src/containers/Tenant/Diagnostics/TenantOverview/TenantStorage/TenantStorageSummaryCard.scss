@@ -9,6 +9,8 @@
     background: var(--g-color-base-generic);
 
     &_first {
+        padding-bottom: var(--g-spacing-3);
+
         border-radius: var(--g-border-radius-m) var(--g-border-radius-xs) var(--g-border-radius-xs)
             var(--g-border-radius-xs);
     }
@@ -39,13 +41,13 @@
     &__row {
         display: flex;
         flex-direction: column;
-        gap: var(--g-spacing-4);
+        gap: 0;
 
         min-width: 0;
     }
 
     &__row_grouped {
-        gap: var(--g-spacing-2);
+        gap: 0;
     }
 
     &__row-header {
@@ -60,7 +62,7 @@
     &__metrics {
         display: flex;
         align-items: stretch;
-        gap: var(--g-spacing-6);
+        gap: var(--g-spacing-10);
     }
 
     &__row_grouped &__metrics {
@@ -75,11 +77,13 @@
         justify-content: center;
 
         min-width: 0;
-        padding-left: var(--g-spacing-6);
+        padding-left: var(--g-spacing-10);
 
         border-left: 1px solid var(--g-color-line-generic);
 
         &_emphasize {
+            margin-top: calc(-1 * var(--g-spacing-2));
+            margin-bottom: calc(-1 * var(--g-spacing-2));
             padding: var(--g-spacing-2) var(--g-spacing-3);
 
             border-left: 0;
@@ -142,6 +146,16 @@
 
     &__progress {
         width: 100%;
+        margin-top: var(--g-spacing-4);
+    }
+
+    &__legend {
+        margin-top: var(--g-spacing-3);
+    }
+
+    &__row_grouped &__progress,
+    &__row_grouped &__legend {
+        margin-top: var(--g-spacing-2);
     }
 
     &__row_grouped &__progress-bar,
@@ -167,19 +181,5 @@
 
     &__used {
         white-space: nowrap;
-    }
-
-    &__segment-popup {
-        overflow: hidden;
-
-        box-sizing: border-box;
-        max-width: 360px;
-        max-height: 368px;
-        padding: var(--g-tooltip-padding, var(--g-spacing-1) var(--g-spacing-2));
-
-        color: var(--g-tooltip-text-color, var(--g-color-text-primary));
-        border-radius: var(--g-tooltip-border-radius, 4px);
-        background: var(--g-tooltip-background-color, var(--g-color-base-float));
-        box-shadow: var(--g-tooltip-box-shadow, 0 1px 5px 0 var(--g-color-sfx-shadow));
     }
 }

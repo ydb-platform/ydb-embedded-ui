@@ -25,6 +25,7 @@ import type {
 import {
     getTenantStorageMediaKey,
     getTenantStoragePhysicalDisplaySegments,
+    getTenantStorageSegmentDisplayValue,
     getTenantStorageUserDataDisplaySummary,
     mergeSystemDetailsByMedia,
 } from './utils';
@@ -59,7 +60,7 @@ function getUserSummaryRow({
     ]);
 
     const {formatLegendValue, formatTooltipValue} = getTenantStorageSegmentValueFormatters(
-        (segments ?? []).map((segment) => segment.value),
+        (segments ?? []).map(getTenantStorageSegmentDisplayValue),
     );
     const formattedAvailableValue = summary.availableApproximate
         ? formatTenantStorageApproximateMetric(summary.available, metricsSize)
@@ -134,7 +135,7 @@ function getPhysicalSummaryRow({
     ]);
 
     const {formatLegendValue, formatTooltipValue} = getTenantStorageSegmentValueFormatters(
-        (segments ?? []).map((segment) => segment.value),
+        (segments ?? []).map(getTenantStorageSegmentDisplayValue),
     );
     const formatSystemDetailValue = getTenantStorageLegendValueFormatter(
         (systemDetails ?? []).map((detail) => detail.value),
@@ -261,7 +262,7 @@ export function TenantStorageMediaSectionView({
     });
 
     return (
-        <Flex direction="column" gap={3} className={b()}>
+        <Flex direction="column" gap={1} className={b()}>
             {showMediaTypeLabel && mediaLabel ? (
                 <Text variant="subheader-2" className={b('media-title')}>
                     {mediaLabel}
