@@ -25,15 +25,19 @@ EXTERNAL_BACKEND="${PLAYWRIGHT_APP_BACKEND:-}"
 DEFAULT_INTERNAL_BACKEND="http://${YDB_CONTAINER_NAME}:8765"
 INTERNAL_BROWSER_BACKEND="http://localhost:8765"
 PLAYWRIGHT_BACKEND="${EXTERNAL_BACKEND:-$INTERNAL_BROWSER_BACKEND}"
-YDB_PROXY_TARGET="${EXTERNAL_BACKEND:-$DEFAULT_INTERNAL_BACKEND}"
 PLAYWRIGHT_BASE_URL_VALUE="${PLAYWRIGHT_BASE_URL:-}"
 YDB_PLATFORM="${PLAYWRIGHT_YDB_PLATFORM:-}"
 PLAYWRIGHT_PLATFORM="${PLAYWRIGHT_PLATFORM:-}"
 START_INTERNAL_BACKEND=0
 NETWORK_CREATED=0
+YDB_PROXY_TARGET=""
 
 if [ -z "$EXTERNAL_BACKEND" ]; then
   START_INTERNAL_BACKEND=1
+  YDB_PROXY_TARGET="$DEFAULT_INTERNAL_BACKEND"
+elif [[ "$EXTERNAL_BACKEND" =~ ^https?://(localhost|127\.0\.0\.1)(:|/|$) ]]; then
+  YDB_PROXY_TARGET="${EXTERNAL_BACKEND//localhost/host.docker.internal}"
+  YDB_PROXY_TARGET="${YDB_PROXY_TARGET//127.0.0.1/host.docker.internal}"
 fi
 
 cleanup() {
@@ -133,13 +137,13 @@ if [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
       --platform "$YDB_PLATFORM" \
       --name "$YDB_CONTAINER_NAME" \
       --network "$NETWORK_NAME" \
-      -p 8765:8765 \
+      -e YDB_ALLOW_ORIGIN="http://localhost:3000" \
       "$YDB_IMAGE"
   else
     docker run -d --rm \
       --name "$YDB_CONTAINER_NAME" \
       --network "$NETWORK_NAME" \
-      -p 8765:8765 \
+      -e YDB_ALLOW_ORIGIN="http://localhost:3000" \
       "$YDB_IMAGE"
   fi
   print_ydb_diagnostics
@@ -155,6 +159,7 @@ if [ -n "$PLAYWRIGHT_PLATFORM" ] && [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
   docker run --rm \
     --platform "$PLAYWRIGHT_PLATFORM" \
     --network "$NETWORK_NAME" \
+    --add-host host.docker.internal:host-gateway \
     -v "${PROJECT_DIR}:/work" \
     -v "ydb-embedded-ui-node-modules:/work/node_modules" \
     -w /work \
@@ -170,6 +175,7 @@ elif [ -n "$PLAYWRIGHT_PLATFORM" ]; then
   echo "Requested Playwright platform: ${PLAYWRIGHT_PLATFORM}"
   docker run --rm \
     --platform "$PLAYWRIGHT_PLATFORM" \
+    --add-host host.docker.internal:host-gateway \
     -v "${PROJECT_DIR}:/work" \
     -v "ydb-embedded-ui-node-modules:/work/node_modules" \
     -w /work \
@@ -184,6 +190,7 @@ elif [ -n "$PLAYWRIGHT_PLATFORM" ]; then
 elif [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
   docker run --rm \
     --network "$NETWORK_NAME" \
+    --add-host host.docker.internal:host-gateway \
     -v "${PROJECT_DIR}:/work" \
     -v "ydb-embedded-ui-node-modules:/work/node_modules" \
     -w /work \
@@ -197,6 +204,7 @@ elif [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
     /bin/bash -c "$PLAYWRIGHT_COMMAND" -- "$@"
 else
   docker run --rm \
+    --add-host host.docker.internal:host-gateway \
     -v "${PROJECT_DIR}:/work" \
     -v "ydb-embedded-ui-node-modules:/work/node_modules" \
     -w /work \
