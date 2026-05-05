@@ -1,11 +1,17 @@
 import type {ClusterInfo} from '../../store/reducers/cluster/cluster';
-import type {ClusterLink, ClusterLinkWithTitle} from '../../types/additionalProps';
+import type {PreparedTenant} from '../../store/reducers/tenants/types';
+import type {ClusterLink, ClusterLinkWithTitle, DatabaseLink} from '../../types/additionalProps';
 import type {MetaClusterLink} from '../../types/api/meta';
 import {MONITORING_UI_TITLE} from '../constants';
 
 import type {ClusterLinkContext} from './clusterLinkConstants';
 import {CLUSTER_LINK_CONTEXT, getContextIcon} from './clusterLinkConstants';
 import i18n from './i18n';
+
+const KnownLinkType = {
+    cluster: 'cluster',
+    database: 'database',
+};
 
 /** Default titles for known contexts, used when the link has no explicit title */
 const CONTEXT_DEFAULT_TITLES: Record<ClusterLinkContext, string> = {
@@ -19,29 +25,51 @@ const CONTEXT_DEFAULT_TITLES: Record<ClusterLinkContext, string> = {
 const CONTEXT_DEFAULT_DESCRIPTIONS: Partial<Record<ClusterLinkContext, string>> = {
     [CLUSTER_LINK_CONTEXT.CORES]: i18n('description_cores-default'),
     [CLUSTER_LINK_CONTEXT.LOGGING]: i18n('description_logging-default'),
-    [CLUSTER_LINK_CONTEXT.MONITORING]: i18n('description_monitoring-default'),
 };
 
 /**
  * Map of namespace prefixes to their source objects for dotted placeholder resolution.
- * Currently supports `cluster`; extend this interface when new namespaces are needed
- * (e.g. `database`).
+ * Supports `cluster` and `database` namespaces for URL placeholder substitution.
  */
 export interface SubstitutionNamespaces {
     cluster?: ClusterInfo;
-    /** Allow arbitrary namespace prefixes for forward-compatibility */
-    [key: string]: Record<string, unknown> | undefined;
+    database?: PreparedTenant;
 }
 
-/** Matches `{param}` and `{prefix.param}` placeholders */
-const PLACEHOLDER_PATTERN = /\{([\w.]+)\}/g;
+/**
+ * Converts a lowercase or kebab-case segment to PascalCase.
+ *
+ * Examples:
+ * - `name`            → `Name`
+ * - `user-attributes` → `UserAttributes`
+ * - `id`              → `Id`
+ * - `cloud_id`        → `cloud_id` (underscores are preserved as-is)
+ *
+ * Already-PascalCase segments pass through unchanged.
+ */
+function toPascalCase(segment: string): string {
+    return segment.replace(/(^|-)([a-z])/g, (_match, _sep, letter: string) => letter.toUpperCase());
+}
+
+/** Matches `{param}` and `{prefix.param}` placeholders (allows hyphens for kebab-case keys) */
+const PLACEHOLDER_PATTERN = /\{([\w.-]+)\}/g;
 
 /**
  * Resolves a placeholder key from the namespaces map.
  *
  * - Flat keys like `name` are resolved as `namespaces[source][name]`.
  * - Dotted keys like `cluster.balancer` are resolved as `namespaces[cluster][balancer]`.
- *   Only single-level dotted paths (`prefix.field`) are supported.
+ * - Multi-level dotted keys like `cluster.settings.proxy` are resolved by
+ *   traversing the nested object: `namespaces[cluster][settings][proxy]`.
+ *
+ * The first segment of a dotted key is always the namespace prefix.
+ * Traversal stops and returns `undefined` if any intermediate value is not
+ * a plain object (null, undefined, primitives, and arrays are not traversed).
+ *
+ * Each segment is first looked up as-is; if not found, it is normalised to
+ * PascalCase and retried. This applies to all namespaces, so lowercase and
+ * kebab-case placeholders resolve against PascalCase fields
+ * (e.g. `{name}` → `Name`, `{user-attributes}` → `UserAttributes`).
  *
  * Returns the resolved value if it is a string or number, otherwise `undefined`.
  */
@@ -51,32 +79,56 @@ function resolveParam(
     namespaces: SubstitutionNamespaces,
 ): string | number | undefined {
     let prefix: string;
-    let field: string;
+    let fields: string[];
 
     if (key.includes('.')) {
         const parts = key.split('.');
-        if (parts.length !== 2) {
-            return undefined;
-        }
-        [prefix, field] = parts;
+        [prefix, ...fields] = parts;
     } else {
         prefix = source;
-        field = key;
+        fields = [key];
     }
 
-    const value = namespaces[prefix]?.[field];
+    const ns = (namespaces as Record<string, Record<string, unknown> | undefined>)[prefix];
+
+    let value: unknown = ns;
+    for (const segment of fields) {
+        if (
+            value === null ||
+            value === undefined ||
+            typeof value !== 'object' ||
+            Array.isArray(value)
+        ) {
+            return undefined;
+        }
+        const record = value as Record<string, unknown>;
+        // Try the original segment first; if it doesn't match,
+        // normalise it to PascalCase and retry so that lowercase /
+        // kebab-case placeholders resolve against PascalCase fields.
+        if (segment in record) {
+            value = record[segment];
+        } else {
+            value = record[toPascalCase(segment)];
+        }
+    }
 
     return typeof value === 'string' || typeof value === 'number' ? value : undefined;
 }
 
 /**
- * Replaces `{param}` and `{prefix.param}` placeholders in a URL template.
+ * Replaces `{param}` and `{prefix.field}` placeholders in a URL template.
  *
  * - Flat placeholders like `{balancer}` are resolved via `namespaces[source][balancer]`.
  * - Dotted placeholders like `{cluster.balancer}` are resolved via `namespaces[cluster][balancer]`.
- *   Only single-level dotted paths are supported; unknown prefixes are unresolvable.
+ * - Multi-level dotted placeholders like `{cluster.settings.proxy}` are resolved by
+ *   traversing nested objects: `namespaces[cluster][settings][proxy]`.
  *
- * Only string and number values are used for substitution.
+ * The first segment of a dotted key is always the namespace prefix.
+ * Traversal stops if any intermediate value is not a plain object
+ * (null, undefined, primitives, and arrays are not traversed).
+ * Lowercase and kebab-case segments are normalised to PascalCase as a fallback
+ * (see {@link resolveParam} for details).
+ * Only string and number leaf values are used for substitution.
  * Returns `undefined` if any placeholder remains unresolved after substitution.
  */
 export function substituteUrlParams(
@@ -167,7 +219,7 @@ function processDynamicLinks(
 
     if (dynamicLinks) {
         for (const link of dynamicLinks) {
-            if (link.type !== 'cluster') {
+            if (link.type !== KnownLinkType.cluster) {
                 continue;
             }
 
@@ -238,10 +290,10 @@ function processAdditionalLinks(
 
 /**
  * Builds the final list of cluster links by:
- * 1. Extracting URL substitution params from cluster info string fields
- * 2. Building legacy links from cores/logging fields in cluster info
- * 3. Processing dynamic links (type === 'cluster') with URL param substitution
- * 4. Adding additional links (legacy + user-provided) only for contexts NOT already covered
+ * 1. Building legacy links from cores/logging fields in cluster info
+ * 2. Processing dynamic links (type === 'cluster') with URL param substitution
+ *    (cluster info is used as the `cluster` namespace for placeholder resolution)
+ * 3. Adding additional links (legacy + user-provided) only for contexts NOT already covered
  *
  * Links without both title and context are dropped.
  * Links whose URL cannot be fully resolved are dropped.
@@ -258,6 +310,117 @@ export function resolveClusterLinks(
     });
 
     const additionalResult = processAdditionalLinks(allAdditionalLinks, coveredContexts);
+
+    return dynamicResult.concat(additionalResult);
+}
+
+/**
+ * Processes dynamic links with type === 'database' and collects covered contexts.
+ * Links without an explicit title and without a known-context default title, or with
+ * unresolvable URLs, are dropped.
+ */
+function processDynamicDatabaseLinks(
+    dynamicLinks: MetaClusterLink[] | undefined,
+    namespaces: SubstitutionNamespaces,
+): {result: ClusterLinkWithTitle[]; coveredContexts: Set<string>} {
+    const result: ClusterLinkWithTitle[] = [];
+    const coveredContexts = new Set<string>();
+    if (dynamicLinks) {
+        for (const link of dynamicLinks) {
+            if (link.type !== KnownLinkType.database) {
+                continue;
+            }
+
+            const resolvedUrl = substituteUrlParams(link.url, link.type, namespaces);
+            if (!resolvedUrl) {
+                continue;
+            }
+
+            const title = getLinkTitle(link.title, link.context);
+            if (!title) {
+                continue;
+            }
+
+            const icon = getContextIcon(link.context);
+            const description = getLinkDescription(link.description, link.context);
+
+            result.push({
+                title,
+                url: resolvedUrl,
+                icon,
+                description,
+                context: link.context,
+            } satisfies ClusterLinkWithTitle);
+
+            if (link.context) {
+                coveredContexts.add(link.context);
+            }
+        }
+    }
+
+    return {result, coveredContexts};
+}
+
+/**
+ * Adds additional database links for contexts not already covered by dynamic links.
+ * Links whose context is already covered are suppressed.
+ */
+function processAdditionalDatabaseLinks(
+    additionalLinks: DatabaseLink[] | undefined,
+    coveredContexts: Set<string>,
+): ClusterLinkWithTitle[] {
+    const result: ClusterLinkWithTitle[] = [];
+
+    if (additionalLinks) {
+        for (const link of additionalLinks) {
+            if (link.context && coveredContexts.has(link.context)) {
+                continue;
+            }
+
+            const icon = link.icon ?? getContextIcon(link.context);
+            const description = getLinkDescription(link.description, link.context);
+
+            result.push({...link, icon, description});
+
+            if (link.context) {
+                coveredContexts.add(link.context);
+            }
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Builds the final list of database links by:
+ * 1. Processing dynamic links (type === 'database') with URL param substitution
+ * 2. Adding additional (legacy) links only for contexts NOT already covered
+ *
+ * Uses both database info and cluster info for URL placeholder substitution:
+ * - Flat placeholders like `{name}` resolve from `databaseInfo` (the `database` namespace).
+ * - Dotted placeholders like `{cluster.name}` resolve from `clusterInfo`.
+ * - Dotted placeholders like `{database.name}` resolve from `databaseInfo`.
+ *
+ * Links without a title are dropped.
+ * Links whose URL cannot be fully resolved are dropped.
+ */
+export function resolveDatabaseLinks(
+    dynamicLinks: MetaClusterLink[] | undefined,
+    databaseInfo: PreparedTenant,
+    clusterInfo?: ClusterInfo,
+    additionalLinks: DatabaseLink[] = [],
+): ClusterLinkWithTitle[] {
+    const namespaces: SubstitutionNamespaces = {
+        database: databaseInfo,
+        cluster: clusterInfo,
+    };
+
+    const {result: dynamicResult, coveredContexts} = processDynamicDatabaseLinks(
+        dynamicLinks,
+        namespaces,
+    );
+
+    const additionalResult = processAdditionalDatabaseLinks(additionalLinks, coveredContexts);
 
     return dynamicResult.concat(additionalResult);
 }

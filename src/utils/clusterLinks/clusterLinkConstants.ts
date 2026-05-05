@@ -1,4 +1,4 @@
-import {CircleXmark, FileCode, ListUl} from '@gravity-ui/icons';
+import {CircleXmark, FileCode, Link, ListUl} from '@gravity-ui/icons';
 import type {IconData} from '@gravity-ui/uikit';
 
 import MoniumIcon from '../../assets/icons/monium.svg';
@@ -22,8 +22,7 @@ export const CONTEXT_ICONS: Record<ClusterLinkContext, IconData> = {
 };
 
 export function getContextIcon(context: string | undefined): IconData | undefined {
-    if (!context) {
-        return undefined;
-    }
-    return CONTEXT_ICONS[context as ClusterLinkContext];
+    const contextIcon = context ? CONTEXT_ICONS[context as ClusterLinkContext] : undefined;
+
+    return contextIcon ?? Link;
 }

@@ -1,5 +1,5 @@
-import {ChartAreaStacked, CirclePlus, Code, Copy, PlugConnection} from '@gravity-ui/icons';
-import {Flex, Spin} from '@gravity-ui/uikit';
+import {CirclePlus, Code, Copy, PlugConnection} from '@gravity-ui/icons';
+import {Flex, Icon, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import {v4 as uuidv4} from 'uuid';
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
@@ -57,6 +57,8 @@ import {
     upsertQueryTemplate,
 } from './schemaQueryTemplates';
 import type {YdbNavigationTreeProps} from './types';
+
+import MoniumIcon from '../../../assets/icons/monium.svg';
 
 const TRAILING_ELLIPSIS = /\.{3}$/;
 function stripEllipsis(text: string): string {
@@ -314,7 +316,7 @@ export const getActions =
         const monitoringItem = {
             text: i18n('actions.openMonitoring'),
             action: actions.openMonitoring,
-            iconStart: <ChartAreaStacked />,
+            iconStart: <Icon data={MoniumIcon} />,
         };
 
         const createEntitiesSet = [

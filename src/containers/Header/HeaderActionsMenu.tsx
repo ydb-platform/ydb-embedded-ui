@@ -1,17 +1,16 @@
 import React from 'react';
 
 import {Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
-import type {DropdownMenuItem} from '@gravity-ui/uikit';
-import {DropdownMenu, Icon} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
+import type {DropdownMenuItemWithDescription} from '../../components/DropdownMenu';
+import {DropdownMenu} from '../../components/DropdownMenu';
 import {getClusterPath} from '../../routes';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
+import type {ClusterLinkWithTitle} from '../../types/additionalProps';
 import {uiFactory} from '../../uiFactory/uiFactory';
-import {getInfoTabLinks} from '../../utils/additionalProps';
-import {useAdditionalTenantsProps} from '../AppWithClusters/utils/useAdditionalTenantsProps';
 import {clusterTabsIds} from '../Cluster/utils';
 
 import {b} from './constants';
@@ -23,6 +22,7 @@ export interface HeaderActionsMenuProps {
     databaseData?: PreparedTenant;
     isDatabaseDataLoading: boolean;
     isV2NavigationEnabled: boolean;
+    databaseLinks: ClusterLinkWithTitle[];
 }
 
 export function DBHeaderActionsMenu({
@@ -31,40 +31,31 @@ export function DBHeaderActionsMenu({
     databaseData,
     isDatabaseDataLoading,
     isV2NavigationEnabled,
+    databaseLinks,
 }: HeaderActionsMenuProps) {
     const history = useHistory();
 
     const emMetaAvailable = useEmMetaAvailable();
 
-    const additionalTenantProps = useAdditionalTenantsProps({
-        getLogsLink: uiFactory.getLogsLink,
-        getDatabaseLinks: uiFactory.getDatabaseLinks,
-    });
-
     const isEditDBAvailable = emMetaAvailable && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable = emMetaAvailable && uiFactory.onDeleteDB !== undefined;
 
     const menuItems = React.useMemo(() => {
-        const menuItems: DropdownMenuItem[][] = [];
+        const menuItems: DropdownMenuItemWithDescription[][] = [];
 
-        const links = getInfoTabLinks(
-            additionalTenantProps,
-            databaseData?.Name,
-            databaseData?.Type,
-        );
+        const linksItems: DropdownMenuItemWithDescription[] = [];
 
-        if (links.length) {
-            const linksItems: DropdownMenuItem[] = [];
+        for (const link of databaseLinks) {
+            linksItems.push({
+                title: link.title,
+                description: link.description,
+                iconStart: link.icon,
+                href: link.url,
+                target: '_blank',
+            });
+        }
 
-            for (const link of links) {
-                linksItems.push({
-                    text: link.title,
-                    iconStart: <Icon data={link.icon} />,
-                    href: link.url,
-                    target: '_blank',
-                });
-            }
-
+        if (linksItems.length) {
             menuItems.push(linksItems);
         }
 
@@ -72,8 +63,8 @@ export function DBHeaderActionsMenu({
         if (isV2NavigationEnabled) {
             menuItems.push([
                 {
-                    text: headerKeyset('action_connect-to-db'),
-                    iconStart: <PlugConnection />,
+                    title: headerKeyset('action_connect-to-db'),
+                    iconStart: PlugConnection,
                     action: () => getConnectToDBDialog({database}),
                 },
             ]);
@@ -83,12 +74,12 @@ export function DBHeaderActionsMenu({
 
         const isEnoughData = clusterName && databaseData;
 
-        const manageDBGroup: DropdownMenuItem[] = [];
+        const manageDBGroup: DropdownMenuItemWithDescription[] = [];
 
         if (isEditDBAvailable && onEditDB && isEnoughData) {
             manageDBGroup.push({
-                text: headerKeyset('action_edit-db'),
-                iconStart: <Pencil />,
+                title: headerKeyset('action_edit-db'),
+                iconStart: Pencil,
                 action: () => {
                     onEditDB({clusterName, databaseData});
                 },
@@ -96,8 +87,8 @@ export function DBHeaderActionsMenu({
         }
         if (isDeleteDBAvailable && onDeleteDB && isEnoughData) {
             manageDBGroup.push({
-                text: headerKeyset('action_delete-db'),
-                iconStart: <TrashBin />,
+                title: headerKeyset('action_delete-db'),
+                iconStart: TrashBin,
                 action: () => {
                     onDeleteDB({clusterName, databaseData}).then((isDeleted) => {
                         if (isDeleted) {
@@ -119,7 +110,7 @@ export function DBHeaderActionsMenu({
         database,
         clusterName,
         databaseData,
-        additionalTenantProps,
+        databaseLinks,
         isV2NavigationEnabled,
         history,
         isEditDBAvailable,
@@ -131,11 +122,12 @@ export function DBHeaderActionsMenu({
     }
 
     return (
-        <DropdownMenu
-            items={menuItems}
-            popupProps={{placement: 'bottom-end'}}
-            switcherWrapperClassName={b('actions-menu')}
-            defaultSwitcherProps={{loading: isDatabaseDataLoading}}
-        />
+        <div className={b('actions-menu')}>
+            <DropdownMenu
+                items={menuItems}
+                popupProps={{placement: 'bottom-end'}}
+                defaultSwitcherProps={{loading: isDatabaseDataLoading}}
+            />
+        </div>
     );
 }
