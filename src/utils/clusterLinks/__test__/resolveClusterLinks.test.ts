@@ -358,7 +358,7 @@ describe('resolveClusterLinks', () => {
             expect(result[0].icon).toBeDefined();
         });
 
-        test('no icon for unknown context', () => {
+        test('uses fallback icon for unknown context', () => {
             const dynamicLinks: MetaClusterLink[] = [
                 {type: 'cluster', url: 'https://example.com', context: 'unknown', title: 'Unknown'},
             ];
@@ -366,7 +366,7 @@ describe('resolveClusterLinks', () => {
             const result = resolveClusterLinks(makeClusterInfo({links: dynamicLinks}));
 
             expect(result).toHaveLength(1);
-            expect(result[0].icon).toBeUndefined();
+            expect(result[0].icon).toBeDefined();
         });
 
         test('resolves {cluster.balancer} dotted placeholder from cluster info', () => {
@@ -1189,7 +1189,7 @@ describe('resolveDatabaseLinks', () => {
             expect(result[0].icon).toBeDefined();
         });
 
-        test('no icon for unknown context', () => {
+        test('uses fallback icon for unknown context', () => {
             const dynamicLinks: MetaClusterLink[] = [
                 {
                     type: 'database',
@@ -1202,7 +1202,7 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
 
             expect(result).toHaveLength(1);
-            expect(result[0].icon).toBeUndefined();
+            expect(result[0].icon).toBeDefined();
         });
 
         test('preserves description from link', () => {
