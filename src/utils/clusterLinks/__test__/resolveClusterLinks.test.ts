@@ -331,6 +331,18 @@ describe('resolveClusterLinks', () => {
             expect(result[0].title).toBe('Logging');
         });
 
+        test('uses resolved default title in context default description', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {type: 'cluster', url: 'https://monitoring.example.com', context: 'monitoring'},
+            ];
+
+            const result = resolveClusterLinks(makeClusterInfo({links: dynamicLinks}));
+
+            expect(result).toHaveLength(1);
+            expect(result[0].title).toBe('Monium');
+            expect(result[0].description).toBe('Dashboards in Monium');
+        });
+
         test('uses explicit title over context default title', () => {
             const dynamicLinks: MetaClusterLink[] = [
                 {
@@ -1160,6 +1172,18 @@ describe('resolveDatabaseLinks', () => {
 
             expect(result).toHaveLength(1);
             expect(result[0].title).toBe('Logging');
+        });
+
+        test('uses resolved default title in context default description', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {type: 'database', url: 'https://monitoring.example.com', context: 'monitoring'},
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].title).toBe('Monium');
+            expect(result[0].description).toBe('Dashboards in Monium');
         });
 
         test('uses explicit title over context default title', () => {

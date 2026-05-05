@@ -1,12 +1,32 @@
-import type {MetaClusterSettings, MetaExtendedClusterInfo} from '../../../types/api/meta';
+import type {
+    MetaBaseClusterInfo,
+    MetaClusterCoresUrl,
+    MetaClusterLinks,
+    MetaClusterLogsUrls,
+    MetaClusterSettings,
+    MetaClusterTraceView,
+    MetaExtendedClusterInfo,
+} from '../../../types/api/meta';
 import type {PreparedVersion} from '../../../utils/versions/types';
 
-export interface PreparedCluster extends Omit<MetaExtendedClusterInfo, 'settings'> {
+export interface PreparedCluster
+    extends Omit<
+            MetaExtendedClusterInfo,
+            'name' | 'title' | 'settings' | 'links' | 'cores' | 'logging' | 'solomon' | 'trace_view'
+        >,
+        Record<string, unknown> {
+    name: string | undefined;
+    title: string | undefined;
     preparedVersions: PreparedVersion[];
     preparedComputeVersions: PreparedVersion[];
     preparedStorageVersions: PreparedVersion[];
     preparedBackend?: string;
-    settings?: MetaClusterSettings;
+    settings: MetaClusterSettings | undefined;
+    links: MetaClusterLinks | undefined;
+    cores: MetaClusterCoresUrl | undefined;
+    logging: MetaClusterLogsUrls | undefined;
+    monitoring: MetaBaseClusterInfo['solomon'];
+    traceView: MetaClusterTraceView | undefined;
     clusterDomain?: string;
     clusterExternalName?: string;
 }

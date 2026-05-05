@@ -22,6 +22,5 @@
   "description_connect-to-db": "Connect to database",
 
   "title_monitoring": "Open in {{system}}",
-  "description_monitoring": "Dashboards in {{system}}",
   "action_copy-path": "Copy path"
 }
