@@ -1495,10 +1495,10 @@ describe('resolveDatabaseLinks', () => {
         test('additional link without description falls back to context default description', () => {
             const additionalLinks: DatabaseLink[] = [
                 {
-                    title: 'Monitoring',
-                    url: 'https://monitoring.example.com',
+                    title: 'Logs',
+                    url: 'https://logs.example.com',
                     icon: mockIcon,
-                    context: 'monitoring',
+                    context: 'logging',
                 },
             ];
 
