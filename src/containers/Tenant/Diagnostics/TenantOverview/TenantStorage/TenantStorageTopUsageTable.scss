@@ -2,7 +2,7 @@
 
 .ydb-tenant-storage-top-usage-table {
     --data-table-cell-align: top;
-    --data-table-cell-vertical-padding: var(--g-spacing-3);
+    --data-table-cell-vertical-padding: 10.5px;
 
     .tenant-overview__title {
         display: flex;
@@ -63,14 +63,23 @@
         gap: var(--g-spacing-1);
 
         min-width: 0;
+        height: var(--g-text-caption-2-line-height);
     }
 
     &__path-text {
         min-width: 0;
     }
 
-    &__path-copy {
+    &__path-copy.g-button {
+        --g-button-height: 16px;
+
         flex: 0 0 auto;
+
+        min-width: 16px;
+        height: 16px;
+        min-height: 16px;
+
+        line-height: 16px;
     }
 
     &__space-cell {
