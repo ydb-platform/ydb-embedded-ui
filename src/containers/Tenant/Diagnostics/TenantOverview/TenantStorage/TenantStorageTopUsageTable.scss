@@ -1,6 +1,9 @@
 @use '../../../../../styles/mixins.scss';
 
 .ydb-tenant-storage-top-usage-table {
+    --data-table-cell-align: top;
+    --data-table-cell-vertical-padding: var(--g-spacing-3);
+
     .tenant-overview__title {
         display: flex;
         align-items: baseline;
@@ -25,7 +28,11 @@
     }
 
     .data-table__row {
-        height: 56px;
+        height: auto;
+    }
+
+    .data-table__td {
+        line-height: var(--g-text-body-1-line-height);
     }
 
     &__type-cell {
@@ -37,6 +44,8 @@
         flex: 0 0 auto;
         justify-content: center;
         align-items: center;
+
+        height: var(--g-text-body-1-line-height);
     }
 
     &__object-cell {
@@ -45,6 +54,7 @@
 
     &__object-link {
         min-width: 0;
+        @include mixins.body-1-typography();
     }
 
     &__path-row {
@@ -70,7 +80,11 @@
     }
 
     &__space-progress {
-        flex: 0 0 154px;
+        flex: 1 1 0;
+
+        min-width: 0;
+        /* visually center the 10px progress bar with the body-1 text baseline */
+        padding-top: 4px;
     }
 
     &__space-progress-bar {
@@ -82,6 +96,11 @@
         border-radius: var(--g-border-radius-xs);
     }
 
+    &__space-progress-bar_warning {
+        --g-progress-filled-background-color: var(--g-color-base-warning-medium);
+        --g-progress-empty-background-color: var(--g-color-base-warning-light);
+    }
+
     &__space-progress-bar .g-progress__item {
         border-radius: var(--g-border-radius-xs) 0 0 var(--g-border-radius-xs);
 
@@ -89,9 +108,10 @@
     }
 
     &__space-value {
+        flex: 0 0 auto;
+
         min-width: 42px;
 
-        text-align: right;
         white-space: nowrap;
     }
 }

@@ -91,9 +91,9 @@ function TypeCell({row}: {row: TenantStorageTopRow}) {
     }
 
     return (
-        <Flex alignItems="center" gap="2" className={b('type-cell')}>
+        <Flex alignItems="flex-start" gap="2" className={b('type-cell')}>
             <div className={b('type-icon')}>{renderPathTypeIcon(row)}</div>
-            <Text>{label}</Text>
+            <Text variant="body-1">{label}</Text>
         </Flex>
     );
 }
@@ -103,7 +103,7 @@ function ObjectPathCell({row}: {row: TenantStorageTopRow}) {
     const objectName = getObjectName(pathLabel);
 
     return (
-        <Flex direction="column" gap="1" className={b('object-cell')}>
+        <Flex direction="column" gap="0" className={b('object-cell')}>
             <CellWithPopover content={objectName} disabled={!objectName}>
                 <LinkToSchemaObject path={row.path} className={b('object-link')}>
                     {objectName}
@@ -111,7 +111,7 @@ function ObjectPathCell({row}: {row: TenantStorageTopRow}) {
             </CellWithPopover>
             <CellWithPopover content={pathLabel} fullWidth>
                 <div className={b('path-row')}>
-                    <Text color="secondary" ellipsis className={b('path-text')}>
+                    <Text variant="caption-2" color="secondary" ellipsis className={b('path-text')}>
                         {pathLabel}
                     </Text>
                     <ClipboardButton
@@ -126,17 +126,24 @@ function ObjectPathCell({row}: {row: TenantStorageTopRow}) {
     );
 }
 
+const SPACE_WARNING_THRESHOLD = 0.6;
+
 function DatabaseSpaceCell({row}: {row: TenantStorageTopRow}) {
     const share = Math.min(Math.max(row.dbShare, 0), 1);
     const percent = share * 100;
     const precision = percent > 0 && percent < 1 ? 1 : 0;
+    const isWarning = share >= SPACE_WARNING_THRESHOLD;
 
     return (
-        <Flex alignItems="center" gap="2" className={b('space-cell')}>
+        <Flex alignItems="flex-start" gap="2" className={b('space-cell')}>
             <div className={b('space-progress')}>
-                <Progress value={percent} size="s" className={b('space-progress-bar')} />
+                <Progress
+                    value={percent}
+                    size="s"
+                    className={b('space-progress-bar', {warning: isWarning})}
+                />
             </div>
-            <Text className={b('space-value')}>
+            <Text variant="body-1" className={b('space-value')}>
                 {formatPercent(share, precision) || EMPTY_DATA_PLACEHOLDER}
             </Text>
         </Flex>
@@ -171,14 +178,18 @@ function getTopUsageColumns(): Column<TenantStorageTopRow>[] {
             header: i18n('storage.new.table.user-data'),
             width: 100,
             align: DataTable.LEFT,
-            render: ({row}) => formatTenantStorageTableMetric(row.userData),
+            render: ({row}) => (
+                <Text variant="body-1">{formatTenantStorageTableMetric(row.userData)}</Text>
+            ),
         },
         {
             name: 'storageSize',
             header: i18n('storage.new.table.physical-disk'),
             width: 140,
             align: DataTable.LEFT,
-            render: ({row}) => formatTenantStorageTableMetric(row.physicalDisk),
+            render: ({row}) => (
+                <Text variant="body-1">{formatTenantStorageTableMetric(row.physicalDisk)}</Text>
+            ),
         },
         {
             name: 'overhead',
@@ -190,7 +201,9 @@ function getTopUsageColumns(): Column<TenantStorageTopRow>[] {
             ),
             width: 106,
             align: DataTable.LEFT,
-            render: ({row}) => formatTenantStorageTableOverhead(row.overhead),
+            render: ({row}) => (
+                <Text variant="body-1">{formatTenantStorageTableOverhead(row.overhead)}</Text>
+            ),
         },
     ];
 }
