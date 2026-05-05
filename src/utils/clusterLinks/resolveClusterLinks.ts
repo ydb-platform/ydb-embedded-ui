@@ -25,7 +25,6 @@ const CONTEXT_DEFAULT_TITLES: Record<ClusterLinkContext, string> = {
 const CONTEXT_DEFAULT_DESCRIPTIONS: Partial<Record<ClusterLinkContext, string>> = {
     [CLUSTER_LINK_CONTEXT.CORES]: i18n('description_cores-default'),
     [CLUSTER_LINK_CONTEXT.LOGGING]: i18n('description_logging-default'),
-    [CLUSTER_LINK_CONTEXT.MONITORING]: i18n('description_monitoring-default'),
 };
 
 /**
