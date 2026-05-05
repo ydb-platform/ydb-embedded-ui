@@ -16,8 +16,8 @@ export {setSettingValue, getSettingValue} from './store/reducers/settings/settin
 
 export {componentsRegistry} from './components/ComponentsProvider/componentsRegistry';
 export {useSetting, useTypedSelector} from './utils/hooks';
-export {getMonitoringLink, getMonitoringClusterLink} from './utils/monitoring';
-export {parseMonitoringField as parseMonitoringData} from './store/reducers/cluster/parseFields';
+export {getMonitoringLink, getMonitoringClusterLink, parseMonitoringData} from './utils/monitoring';
+export {parseMonitoringField} from './store/reducers/cluster/parseFields';
 export {i18n, Lang, registerKeysets} from './utils/i18n';
 export {toaster} from './utils/createToast';
 export {cn} from './utils/cn';

@@ -1,5 +1,5 @@
 import {parseMonitoringField} from '../store/reducers/cluster/parseFields';
-import type {MetaBaseClusterInfo} from '../types/api/meta';
+import type {MetaBaseClusterInfo, MetaClusterMonitoringData} from '../types/api/meta';
 import type {ETenantType, TTenant} from '../types/api/tenant';
 
 interface GetMonitoringLinkProps {
@@ -9,6 +9,26 @@ interface GetMonitoringLinkProps {
     clusterName?: string;
     controlPlane?: TTenant['ControlPlane'];
     userAttributes?: TTenant['UserAttributes'];
+}
+
+/**
+ * @deprecated Use parseMonitoringField from store/reducers/cluster/parseFields instead.
+ */
+export function parseMonitoringData(
+    monitoring: MetaBaseClusterInfo['solomon'],
+): MetaClusterMonitoringData | undefined {
+    if (monitoring && typeof monitoring === 'object') {
+        return monitoring;
+    }
+
+    try {
+        const data = monitoring ? JSON.parse(monitoring) : undefined;
+        if (typeof data === 'object' && 'monitoring_url' in data) {
+            return data;
+        }
+    } catch {}
+
+    return undefined;
 }
 
 export type GetMonitoringLink = typeof getMonitoringLink;
