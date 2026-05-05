@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {ChartAreaStacked} from '@gravity-ui/icons';
 import {Button, Flex, Icon} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
@@ -40,6 +39,8 @@ import {TenantNetwork} from './TenantNetwork/TenantNetwork';
 import {TenantStorage} from './TenantStorage/TenantStorage';
 import i18n from './i18n';
 import {b} from './utils';
+
+import MoniumIcon from '../../../../assets/icons/monium.svg';
 
 import './TenantOverview.scss';
 
@@ -203,7 +204,7 @@ export function TenantOverview({
                     {tenantType}
                     {monitoringTabAvailable && (
                         <Button view="normal" onClick={handleOpenMonitoring}>
-                            <Icon data={ChartAreaStacked} size={16} />
+                            <Icon data={MoniumIcon} size={16} />
                             {i18n('action_open-monitoring')}
                         </Button>
                     )}
