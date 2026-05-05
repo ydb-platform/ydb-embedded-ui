@@ -445,9 +445,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await expect(storageView).toBeVisible();
             await expect(userDataSummary).toBeVisible();
             await expect(physicalSummary).toBeVisible();
-            await expect(
-                storageView.getByText('Top 10 by space usage', {exact: true}),
-            ).toBeVisible();
+            await expect(topUsageTable.getByText('Top 10', {exact: true})).toBeVisible();
+            await expect(topUsageTable.getByText('by space usage', {exact: true})).toBeVisible();
             await expect(storageView.getByText('Row table', {exact: true})).toBeVisible();
             await expect(storageView.getByText('System', {exact: true})).toBeVisible();
             await expect(
@@ -507,6 +506,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await expect(topUsageTable).toHaveScreenshot(
                 `tenant-overview-storage-top-usage-${theme}.png`,
             );
+            await expect(storageView).toHaveScreenshot(`tenant-overview-storage-full-${theme}.png`);
         });
 
         test(`renders grouped summary sections for multiple storage types in ${theme} theme`, async ({

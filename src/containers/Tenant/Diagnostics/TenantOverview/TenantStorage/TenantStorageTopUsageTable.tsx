@@ -23,7 +23,6 @@ import {
 } from '../../../../../utils/constants';
 import {formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
 import {mapPathTypeToEntityName, mapPathTypeToNavigationTreeType} from '../../../utils/schema';
-import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import i18n from '../i18n';
 
@@ -205,18 +204,22 @@ export function TenantStorageTopUsageTable({
     const columns = React.useMemo(() => getTopUsageColumns(), []);
 
     return (
-        <StatsWrapper
-            className={b()}
-            title={
-                <React.Fragment>
-                    <Text variant="subheader-3">{i18n('storage.new.top-space-title-main')}</Text>{' '}
-                    <Text variant="subheader-3" color="hint">
-                        {i18n('storage.new.top-space-title-suffix')}
-                    </Text>
-                </React.Fragment>
-            }
-        >
-            <TenantOverviewTableLayout loading={loading} error={error} withData={withData}>
+        <div className={b()}>
+            <TenantOverviewTableLayout
+                loading={loading}
+                error={error}
+                withData={withData}
+                title={
+                    <React.Fragment>
+                        <Text variant="subheader-3">
+                            {i18n('storage.new.top-space-title-main')}
+                        </Text>
+                        <Text variant="subheader-3" color="hint">
+                            {i18n('storage.new.top-space-title-suffix')}
+                        </Text>
+                    </React.Fragment>
+                }
+            >
                 <ResizeableDataTable
                     columnsWidthLSKey={TENANT_STORAGE_COLUMNS_WIDTH_LS_KEY}
                     columns={columns}
@@ -224,6 +227,6 @@ export function TenantStorageTopUsageTable({
                     settings={TENANT_OVERVIEW_TABLES_SETTINGS}
                 />
             </TenantOverviewTableLayout>
-        </StatsWrapper>
+        </div>
     );
 }
