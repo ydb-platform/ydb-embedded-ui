@@ -53,7 +53,9 @@ export function getMonitoringLink({
         const dashboard =
             dbType === 'Serverless' ? data.serverless_dashboard : data.dedicated_dashboard;
 
-        url.pathname += `/${dashboard}`;
+        if (dashboard) {
+            url.pathname += `/${dashboard}`;
+        }
     }
 
     if (!url.searchParams.has('p.cluster')) {
