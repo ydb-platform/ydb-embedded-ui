@@ -113,7 +113,7 @@ Run tests. If `PLAYWRIGHT_BASE_URL` is provided, tests run on this url, otherwis
 npm run test:e2e
 ```
 
-Run tests in Playwright Docker. By default, the script starts a `ghcr.io/ydb-platform/local-ydb:nightly` backend container on a dedicated Docker network and points Playwright to it automatically. To use an existing backend instead, set `PLAYWRIGHT_APP_BACKEND`.
+Run tests in Playwright Docker.
 
 ```
 npm run test:e2e:docker
