@@ -13,10 +13,10 @@ fi
 
 DOCKER_IMAGE="mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-noble"
 YDB_IMAGE="${PLAYWRIGHT_YDB_IMAGE:-ghcr.io/ydb-platform/local-ydb:nightly}"
-YDB_CONTAINER_NAME="${PLAYWRIGHT_YDB_CONTAINER_NAME:-ydb-e2e-local-ydb}"
+RUN_ID="$(date +%Y%m%d%H%M%S)-$$"
+YDB_CONTAINER_NAME="${PLAYWRIGHT_YDB_CONTAINER_NAME:-ydb-e2e-local-ydb-${RUN_ID}}"
 NETWORK_NAME="${PLAYWRIGHT_DOCKER_NETWORK:-ydb-e2e-network}"
 REPORT_DIR="${PROJECT_DIR}/playwright-artifacts/playwright-report"
-RUN_ID="$(date +%Y%m%d%H%M%S)-$$"
 PLAYWRIGHT_OUTPUT_DIR="/work/playwright-artifacts/test-results-${RUN_ID}"
 REPORT_HOST="${PLAYWRIGHT_HTML_HOST:-127.0.0.1}"
 REPORT_PORT="${PLAYWRIGHT_HTML_PORT:-9323}"
@@ -30,6 +30,7 @@ YDB_PLATFORM="${PLAYWRIGHT_YDB_PLATFORM:-}"
 PLAYWRIGHT_PLATFORM="${PLAYWRIGHT_PLATFORM:-}"
 START_INTERNAL_BACKEND=0
 NETWORK_CREATED=0
+YDB_CONTAINER_STARTED=0
 YDB_PROXY_TARGET=""
 
 if [ -z "$EXTERNAL_BACKEND" ]; then
@@ -41,7 +42,7 @@ elif [[ "$EXTERNAL_BACKEND" =~ ^https?://(localhost|127\.0\.0\.1)(:|/|$) ]]; the
 fi
 
 cleanup() {
-  if [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
+  if [ "$YDB_CONTAINER_STARTED" -eq 1 ]; then
     echo "Cleaning up YDB backend container ${YDB_CONTAINER_NAME}"
     docker rm -f "$YDB_CONTAINER_NAME" >/dev/null 2>&1 || true
   fi
@@ -130,8 +131,6 @@ if [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
     docker network create "$NETWORK_NAME" >/dev/null
     NETWORK_CREATED=1
   fi
-  docker rm -f "$YDB_CONTAINER_NAME" >/dev/null 2>&1 || true
-
   if [ -n "$YDB_PLATFORM" ]; then
     docker run -d --rm \
       --platform "$YDB_PLATFORM" \
@@ -146,6 +145,7 @@ if [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
       -e YDB_ALLOW_ORIGIN="http://localhost:3000" \
       "$YDB_IMAGE"
   fi
+  YDB_CONTAINER_STARTED=1
   print_ydb_diagnostics
   wait_for_ydb
 else
