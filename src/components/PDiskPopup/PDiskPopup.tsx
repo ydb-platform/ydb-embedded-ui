@@ -113,8 +113,8 @@ export const preparePDiskHeaderLabels = (data: PreparedPDisk): YDBDefinitionList
 
 export const buildPDiskFooter = (
     data: PreparedPDisk,
-    withDeveloperUILink?: boolean,
-    onNavigate?: (path: string) => void,
+    withDeveloperUILink: boolean,
+    onNavigate: (path: string) => void,
 ): React.ReactNode | null => {
     const {NodeId, PDiskId} = data;
 
@@ -140,7 +140,7 @@ export const buildPDiskFooter = (
                 />
             )}
             <Button
-                onClick={() => onNavigate?.(getPDiskPagePath(PDiskId, NodeId))}
+                onClick={() => onNavigate(getPDiskPagePath(PDiskId, NodeId))}
                 view="action"
                 size="m"
             >
