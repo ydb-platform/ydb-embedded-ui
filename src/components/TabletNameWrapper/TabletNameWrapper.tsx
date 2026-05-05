@@ -1,5 +1,10 @@
 import {useTabletPagePath} from '../../routes';
+import {cn} from '../../utils/cn';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
+
+import './TabletNameWrapper.scss';
+
+const b = cn('ydb-tablet-name-wrapper');
 
 interface TabletNameWrapperProps {
     tabletId: string | number;
@@ -12,6 +17,12 @@ export function TabletNameWrapper({tabletId, followerId}: TabletNameWrapperProps
     const tabletName = `${tabletId}${followerId ? `.${followerId}` : ''}`;
 
     return (
-        <EntityStatus name={tabletName} path={tabletPath} hasClipboardButton showStatus={false} />
+        <EntityStatus
+            name={tabletName}
+            path={tabletPath}
+            hasClipboardButton
+            showStatus={false}
+            className={b()}
+        />
     );
 }

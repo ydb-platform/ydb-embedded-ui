@@ -122,6 +122,10 @@
             border-left: unset;
         }
 
+        &__td:has(a) {
+            color: var(--g-color-text-link);
+        }
+
         &__th {
             font-weight: bold;
         }
