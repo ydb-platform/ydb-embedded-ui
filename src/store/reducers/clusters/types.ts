@@ -9,11 +9,7 @@ import type {
 } from '../../../types/api/meta';
 import type {PreparedVersion} from '../../../utils/versions/types';
 
-export interface PreparedCluster
-    extends Omit<
-        MetaExtendedClusterInfo,
-        'name' | 'title' | 'settings' | 'links' | 'cores' | 'logging' | 'solomon' | 'trace_view'
-    > {
+export interface PreparedCluster extends Omit<MetaExtendedClusterInfo, 'name' | 'title'> {
     name: string | undefined;
     title: string | undefined;
     preparedVersions: PreparedVersion[];

@@ -50,21 +50,11 @@ export const prepareClustersData = (data: MetaClusters): PreparedCluster[] => {
             }
         }
 
-        const {
-            trace_view: _traceView,
-            cores: _cores,
-            logging: _logging,
-            settings: _settings,
-            links: _links,
-            solomon: _solomon,
-            ...restCluster
-        } = cluster;
-
         const clusterName = cluster.name;
         const clusterTitle = cluster.title || clusterName;
 
         return {
-            ...restCluster,
+            ...cluster,
             name: clusterName,
             title: clusterTitle,
             ...parsedFields,
