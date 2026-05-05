@@ -136,6 +136,7 @@ export const buildPDiskFooter = (
                     title={pDiskPopupKeyset('action_open-in-developer-ui')}
                     url={pDiskInternalViewerPath}
                     icon={Wrench}
+                    hideEndIcon
                 />
             )}
             <Button

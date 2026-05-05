@@ -104,6 +104,7 @@ const buildUnavailableVDiskFooter = (
                 title={vDiskPopupKeyset('action_open-in-developer-ui')}
                 url={vDiskInternalViewerPath}
                 icon={Wrench}
+                hideEndIcon
             />
         </div>
     );
@@ -360,6 +361,7 @@ const buildVDiskFooter = (
                     title={vDiskPopupKeyset('action_open-in-developer-ui')}
                     url={vDiskInternalViewerPath}
                     icon={Wrench}
+                    hideEndIcon
                 />
             )}
             {(vDiskPagePath || resolvedVDiskId) && (
