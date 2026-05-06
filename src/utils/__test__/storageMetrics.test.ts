@@ -14,6 +14,21 @@ describe('storageMetrics', () => {
         expect(formatMetricBytes(521_000_000, 'gb')).toBe(`0.52${UNBREAKABLE_GAP}GB`);
     });
 
+    test('formatMetricBytes supports custom precision for shared unit formatting', () => {
+        expect(formatMetricBytes(521_000_000, 'gb', {gbDecimalPlacesBelowOne: 1})).toBe(
+            `0.5${UNBREAKABLE_GAP}GB`,
+        );
+        expect(formatMetricBytes(123.4, 'b', {bytesDecimalPlaces: 0})).toBe(
+            `123${UNBREAKABLE_GAP}B`,
+        );
+    });
+
+    test('formatMetricBytes can reject negative values', () => {
+        expect(formatMetricBytes(-1, undefined, {allowNegative: false})).toBe(
+            EMPTY_DATA_PLACEHOLDER,
+        );
+    });
+
     test('formatMetricPercent keeps integer usage values without decimals', () => {
         expect(formatMetricPercent(50)).toBe('50%');
     });

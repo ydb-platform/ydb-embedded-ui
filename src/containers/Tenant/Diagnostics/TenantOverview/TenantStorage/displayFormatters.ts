@@ -1,7 +1,8 @@
 import type {BytesSizes} from '../../../../../utils/bytesParsers';
 import {getBytesSizeUnit, sizes} from '../../../../../utils/bytesParsers';
-import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from '../../../../../utils/constants';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatNumber, formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
+import {formatMetricBytes} from '../../../../../utils/storageMetrics';
 import i18n from '../i18n';
 
 type TenantStorageSummaryMetricUnit = 'pb' | 'tb' | 'gb' | 'mb';
@@ -9,6 +10,11 @@ type TenantStorageSummaryMetricUnit = 'pb' | 'tb' | 'gb' | 'mb';
 const MIXED_UNIT_RATIO_THRESHOLD = 100;
 const TABLE_OVERHEAD_LIMIT = 500;
 const BYTE_UNITS: BytesSizes[] = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
+const TENANT_STORAGE_FORMAT_OPTIONS = {
+    allowNegative: false,
+    bytesDecimalPlaces: 0,
+    gbDecimalPlacesBelowOne: 1,
+} as const;
 
 export function formatSummaryPercent(value: number) {
     const precision = value > 0 && value < 1 ? 1 : 0;
@@ -25,38 +31,8 @@ function getNumericByteValue(value?: string | number) {
     return Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : undefined;
 }
 
-function getMetricBytesDecimalPlaces(size: BytesSizes, convertedValue: number) {
-    if (size === 'b') {
-        return 0;
-    }
-
-    if (size === 'kb' || size === 'mb' || size === 'gb') {
-        return Number.isInteger(convertedValue) ? 0 : 1;
-    }
-
-    if (convertedValue >= 10) {
-        return Number.isInteger(convertedValue) ? 0 : 1;
-    }
-
-    return Number.isInteger(convertedValue) ? 0 : 2;
-}
-
 function formatByteMetric(value?: string | number, size?: BytesSizes) {
-    const numericValue = getNumericByteValue(value);
-
-    if (numericValue === undefined) {
-        return EMPTY_DATA_PLACEHOLDER;
-    }
-
-    const resolvedSize = size ?? getBytesSizeUnit(numericValue);
-    const convertedValue = numericValue / sizes[resolvedSize].value;
-    const decimalPlaces = getMetricBytesDecimalPlaces(resolvedSize, convertedValue);
-    const roundedValue = Number(convertedValue.toFixed(decimalPlaces));
-    const formattedValue = formatNumber(roundedValue);
-
-    return formattedValue
-        ? `${formattedValue}${UNBREAKABLE_GAP}${sizes[resolvedSize].label}`
-        : EMPTY_DATA_PLACEHOLDER;
+    return formatMetricBytes(value, size, TENANT_STORAGE_FORMAT_OPTIONS);
 }
 
 export function getTenantStorageSummaryMetricUnit(
