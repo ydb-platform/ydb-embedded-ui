@@ -135,12 +135,14 @@ if [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
     docker run -d --rm \
       --platform "$YDB_PLATFORM" \
       --name "$YDB_CONTAINER_NAME" \
+      --hostname localhost \
       --network "$NETWORK_NAME" \
       -e YDB_ALLOW_ORIGIN="http://localhost:3000" \
       "$YDB_IMAGE"
   else
     docker run -d --rm \
       --name "$YDB_CONTAINER_NAME" \
+      --hostname localhost \
       --network "$NETWORK_NAME" \
       -e YDB_ALLOW_ORIGIN="http://localhost:3000" \
       "$YDB_IMAGE"
