@@ -15,7 +15,7 @@ import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {bytesToGB, isNumeric} from '../../utils/utils';
-import {InternalButtonLink} from '../InternalButtonLink';
+import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 import type {
@@ -139,9 +139,9 @@ export const buildPDiskFooter = (
                     hideEndIcon
                 />
             )}
-            <InternalButtonLink href={pDiskPagePath} view="action" size="m">
+            <InternalLinkButton href={pDiskPagePath} view="action" size="m">
                 {pDiskPopupKeyset('action_go-to-pdisk')}
-            </InternalButtonLink>
+            </InternalLinkButton>
         </Flex>
     );
 };

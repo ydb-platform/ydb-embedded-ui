@@ -2,7 +2,7 @@ import React from 'react';
 
 import {fireEvent, render, screen} from '@testing-library/react';
 
-import {InternalButtonLink} from '../InternalButtonLink';
+import {InternalLinkButton} from '../InternalLinkButton';
 
 const mockPush = jest.fn();
 const mockCreateHref = jest.fn(({pathname, search, hash}) => `${pathname}${search}${hash}`);
@@ -14,7 +14,7 @@ jest.mock('react-router-dom', () => ({
     }),
 }));
 
-describe('InternalButtonLink', () => {
+describe('InternalLinkButton', () => {
     beforeEach(() => {
         mockPush.mockClear();
         mockCreateHref.mockClear();
@@ -25,7 +25,7 @@ describe('InternalButtonLink', () => {
 
     test('renders browser href created by history.createHref', () => {
         render(
-            <InternalButtonLink href="/vDisk?nodeId=4&vDiskId=0-1-0-3-0">VDisk</InternalButtonLink>,
+            <InternalLinkButton href="/vDisk?nodeId=4&vDiskId=0-1-0-3-0">VDisk</InternalLinkButton>,
         );
 
         const link = screen.getByRole('link', {name: 'VDisk'});
@@ -42,9 +42,9 @@ describe('InternalButtonLink', () => {
         const onClick = jest.fn();
 
         render(
-            <InternalButtonLink href="/pDisk?nodeId=4&pDiskId=1001" onClick={onClick}>
+            <InternalLinkButton href="/pDisk?nodeId=4&pDiskId=1001" onClick={onClick}>
                 PDisk
-            </InternalButtonLink>,
+            </InternalLinkButton>,
         );
 
         const link = screen.getByRole('link', {name: 'PDisk'});
@@ -62,9 +62,9 @@ describe('InternalButtonLink', () => {
         });
 
         render(
-            <InternalButtonLink href="/pDisk?nodeId=4&pDiskId=1001" onClick={onClick}>
+            <InternalLinkButton href="/pDisk?nodeId=4&pDiskId=1001" onClick={onClick}>
                 PDisk
-            </InternalButtonLink>,
+            </InternalLinkButton>,
         );
 
         const link = screen.getByRole('link', {name: 'PDisk'});
@@ -85,9 +85,9 @@ describe('InternalButtonLink', () => {
         const onClick = jest.fn();
 
         render(
-            <InternalButtonLink href="/vDisk?nodeId=4&vDiskId=0-1-0-3-0" onClick={onClick}>
+            <InternalLinkButton href="/vDisk?nodeId=4&vDiskId=0-1-0-3-0" onClick={onClick}>
                 VDisk
-            </InternalButtonLink>,
+            </InternalLinkButton>,
         );
 
         const link = screen.getByRole('link', {name: 'VDisk'});
@@ -100,9 +100,9 @@ describe('InternalButtonLink', () => {
 
     test('lets browser handle links with non-self target', () => {
         render(
-            <InternalButtonLink href="/vDisk?nodeId=4&vDiskId=0-1-0-3-0" target="_blank">
+            <InternalLinkButton href="/vDisk?nodeId=4&vDiskId=0-1-0-3-0" target="_blank">
                 VDisk
-            </InternalButtonLink>,
+            </InternalLinkButton>,
         );
 
         const link = screen.getByRole('link', {name: 'VDisk'});

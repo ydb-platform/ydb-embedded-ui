@@ -27,8 +27,8 @@ import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
 import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/EvictVDiskButton';
-import {InternalButtonLink} from '../InternalButtonLink';
 import {InternalLink} from '../InternalLink';
+import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {
     buildPDiskFooter,
@@ -366,9 +366,9 @@ const buildVDiskFooter = (
             {(vDiskPagePath || resolvedVDiskId) && (
                 <Flex wrap="wrap" gap={2}>
                     {vDiskPagePath && (
-                        <InternalButtonLink href={vDiskPagePath} view="action" size="m">
+                        <InternalLinkButton href={vDiskPagePath} view="action" size="m">
                             {vDiskPopupKeyset('action_go-to-vdisk')}
-                        </InternalButtonLink>
+                        </InternalLinkButton>
                     )}
                     {resolvedVDiskId && (
                         <EvictVDiskButton

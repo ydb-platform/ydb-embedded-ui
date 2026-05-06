@@ -6,12 +6,12 @@ import {useHistory} from 'react-router-dom';
 
 import {getLocationObjectFromHref} from '../../routes';
 
-type InternalButtonLinkProps = ButtonProps & {
+type InternalLinkButtonProps = ButtonProps & {
     href: string;
     onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
-export function InternalButtonLink({href, onClick, target, ...props}: InternalButtonLinkProps) {
+export function InternalLinkButton({href, onClick, target, ...props}: InternalLinkButtonProps) {
     const history = useHistory();
     const linkHref = React.useMemo(
         () => history.createHref(getLocationObjectFromHref(href)),
