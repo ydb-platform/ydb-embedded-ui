@@ -5,6 +5,7 @@ import {
     TENANT_STORAGE_SYSTEM_DETAIL_KEYS,
     buildTenantStorageData,
     buildTenantStorageMediaSections,
+    getTenantStorageMediaKey,
     getTenantStoragePhysicalDisplaySegments,
     getTenantStoragePhysicalMediaBreakdown,
     getTenantStorageUserDataDisplaySummary,
@@ -124,6 +125,44 @@ describe('buildTenantStorageData', () => {
             },
         ]);
         expect(result.topRowsError).toBe(topRowsError);
+    });
+
+    test('maps unknown tablet media to aggregate physical breakdown', () => {
+        const result = buildTenantStorageData(
+            {
+                tabletTypeRows: [
+                    {
+                        Type: 'DataShard',
+                        StorageSize: 120,
+                        Media: [{Kind: 'Unknown', StorageSize: 120}],
+                    },
+                    {
+                        Type: 'Hive',
+                        StorageSize: 30,
+                        Media: [{Kind: 'UNKNOWN,Kind:0', StorageSize: 30}],
+                    },
+                ],
+                topRows: [],
+            },
+            {
+                blobStorageUsed: 150,
+                tabletStorageUsed: 50,
+            },
+        );
+
+        expect(getTenantStorageMediaKey('Unknown')).toBe(EType.None);
+        expect(getTenantStorageMediaKey('UNKNOWN,Kind:0')).toBe(EType.None);
+        expect(result.physicalSegmentsByMedia.Unknown).toBeUndefined();
+        expect(result.physicalSegmentsByMedia[EType.None]).toEqual([
+            {key: TENANT_STORAGE_SEGMENT_KEYS.system, value: 30},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 120},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 0},
+        ]);
+        expect(result.systemDetailsByMedia[EType.None]).toEqual(
+            expect.arrayContaining([{key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive, value: 30}]),
+        );
     });
 
     test('falls back to tablet storage metric for database share', () => {

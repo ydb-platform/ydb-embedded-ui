@@ -4,7 +4,10 @@ import type {EPathSubType, EPathType} from '../../../../../types/api/schema';
 import type {TStorageStatsTabletTypeEntry} from '../../../../../types/api/storage';
 import {EType as ETabletType} from '../../../../../types/api/tablet';
 import {EType} from '../../../../../types/api/tenant';
-import {normalizeMediaType} from '../../../../../utils/disks/normalizeMediaType';
+import {
+    UNKNOWN_MEDIA_TYPE,
+    normalizeMediaType,
+} from '../../../../../utils/disks/normalizeMediaType';
 
 import type {TenantStorageMetrics} from './types';
 
@@ -243,7 +246,10 @@ export function getTenantStorageMediaKey(mediaType?: string) {
 
     const normalizedMediaType = normalizeMediaType(mediaType);
 
-    if (normalizedMediaType === EType.None.toUpperCase()) {
+    if (
+        normalizedMediaType === UNKNOWN_MEDIA_TYPE ||
+        normalizedMediaType === EType.None.toUpperCase()
+    ) {
         return EType.None;
     }
 
