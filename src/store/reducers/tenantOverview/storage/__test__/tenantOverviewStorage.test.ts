@@ -134,6 +134,11 @@ describe('fetchTenantStorageRawData', () => {
         expect(getStorageStats).toHaveBeenCalledTimes(2);
         expect(getSchema).toHaveBeenCalledTimes(1);
         expect(sendQuery).toHaveBeenCalledTimes(1);
+        expect(sendQuery.mock.calls[0]?.[0]).toEqual(
+            expect.objectContaining({
+                query: expect.stringMatching(/WHERE\s+TabletId != 0\s+GROUP BY Path/),
+            }),
+        );
     });
 
     test('keeps top rows and surfaces schema enrichment errors', async () => {

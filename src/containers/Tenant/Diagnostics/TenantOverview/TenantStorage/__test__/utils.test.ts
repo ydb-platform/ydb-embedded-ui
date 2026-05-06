@@ -148,6 +148,32 @@ describe('buildTenantStorageData', () => {
         expect(result.topRows[0]?.overhead).toBe(3);
     });
 
+    test('preserves missing top row physical disk size as unknown', () => {
+        const result = buildTenantStorageData(
+            {
+                tabletTypeRows: [],
+                topRows: [
+                    {
+                        path: '/local/db/table-a',
+                        userData: 120,
+                    },
+                ],
+            },
+            {
+                blobStorageUsed: 900,
+                tabletStorageUsed: 480,
+            },
+        );
+
+        expect(result.topRows[0]).toEqual({
+            path: '/local/db/table-a',
+            userData: 120,
+            physicalDisk: undefined,
+            dbShare: 120 / 480,
+            overhead: undefined,
+        });
+    });
+
     test('returns zero database share when logical used is zero', () => {
         const result = buildTenantStorageData(
             {

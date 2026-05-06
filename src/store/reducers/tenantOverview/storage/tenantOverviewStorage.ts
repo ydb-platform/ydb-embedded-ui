@@ -41,6 +41,7 @@ SELECT
     Path,
     SUM(DataSize) AS UserData
 FROM \`.sys/partition_stats\`
+WHERE TabletId != 0
 GROUP BY Path
 ORDER BY UserData DESC
 LIMIT ${TOP_STORAGE_OBJECTS_LIMIT}

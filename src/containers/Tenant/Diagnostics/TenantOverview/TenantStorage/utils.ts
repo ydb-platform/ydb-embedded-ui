@@ -655,13 +655,17 @@ export function buildTenantStorageData(
             },
         },
         topRows: (rawData?.topRows ?? []).map((row) => {
-            const physicalDisk = normalizeNumber(row.physicalDisk);
+            const physicalDisk =
+                row.physicalDisk === undefined ? undefined : normalizeNumber(row.physicalDisk);
 
             return {
                 ...row,
                 physicalDisk,
                 dbShare: userUsed > 0 ? row.userData / userUsed : 0,
-                overhead: row.userData > 0 ? physicalDisk / row.userData : undefined,
+                overhead:
+                    row.userData > 0 && physicalDisk !== undefined
+                        ? physicalDisk / row.userData
+                        : undefined,
             };
         }),
         topRowsError: rawData?.topRowsError,
