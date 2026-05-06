@@ -1,5 +1,6 @@
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from '../../../../../../utils/constants';
 import {
+    formatSummaryPercent,
     formatTenantStorageAdaptiveMetric,
     formatTenantStorageApproximateMetric,
     formatTenantStorageSummaryMetric,
@@ -15,6 +16,7 @@ import {TENANT_STORAGE_SEGMENT_KEYS, getTenantStorageSegmentDisplayValue} from '
 const withUnit = (value: string, unit: string) => `${value}${UNBREAKABLE_GAP}${unit}`;
 const GB = 1_000_000_000;
 const TB = 1_000_000_000_000;
+const PB = 1_000_000_000_000_000;
 
 describe('TenantStorage display formatters', () => {
     test('formats summary terabyte values without redundant decimal zeros', () => {
@@ -35,7 +37,23 @@ describe('TenantStorage display formatters', () => {
         );
     });
 
-    test('selects summary units by TB, GB, MB priority', () => {
+    test('formats summary petabyte values without redundant decimal zeros', () => {
+        expect(formatTenantStorageSummaryMetric(1_200_000_000_000_000, 'pb')).toBe(
+            withUnit('1.2', 'PB'),
+        );
+        expect(formatTenantStorageSummaryMetric(3_450_000_000_000_000, 'pb')).toBe(
+            withUnit('3.45', 'PB'),
+        );
+        expect(formatTenantStorageSummaryMetric(18_000_000_000_000_000, 'pb')).toBe(
+            withUnit('18', 'PB'),
+        );
+        expect(formatTenantStorageSummaryMetric(306_400_000_000_000_000, 'pb')).toBe(
+            withUnit('306.4', 'PB'),
+        );
+    });
+
+    test('selects summary units by PB, TB, GB, MB priority', () => {
+        expect(getTenantStorageSummaryMetricUnit([1.2 * PB, 300 * TB, 900 * TB])).toBe('pb');
         expect(
             getTenantStorageSummaryMetricUnit([
                 18_000_000_000_000, 4_800_000_000_000, 21_000_000_000_000,
@@ -56,6 +74,12 @@ describe('TenantStorage display formatters', () => {
 
     test('keeps summary values in the requested unit', () => {
         expect(formatTenantStorageSummaryMetric(600_000_000_000, 'tb')).toBe(withUnit('0.6', 'TB'));
+    });
+
+    test('formats summary used percent with one decimal below one percent', () => {
+        expect(formatSummaryPercent(0)).toBe('');
+        expect(formatSummaryPercent(0.5)).toBe('used 0.5%');
+        expect(formatSummaryPercent(23.4)).toBe('used 23%');
     });
 
     test('formats adaptive byte values with readable units', () => {

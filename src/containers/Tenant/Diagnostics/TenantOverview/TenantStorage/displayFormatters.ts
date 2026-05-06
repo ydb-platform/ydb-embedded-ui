@@ -4,14 +4,15 @@ import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from '../../../../../utils/cons
 import {formatNumber, formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
 import i18n from '../i18n';
 
-type TenantStorageSummaryMetricUnit = 'tb' | 'gb' | 'mb';
+type TenantStorageSummaryMetricUnit = 'pb' | 'tb' | 'gb' | 'mb';
 
 const MIXED_UNIT_RATIO_THRESHOLD = 100;
 const TABLE_OVERHEAD_LIMIT = 500;
 const BYTE_UNITS: BytesSizes[] = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
 
 export function formatSummaryPercent(value: number) {
-    const formattedValue = formatPercent(value / 100, 0);
+    const precision = value > 0 && value < 1 ? 1 : 0;
+    const formattedValue = formatPercent(value / 100, precision);
 
     return value > 0 && formattedValue
         ? i18n('storage.new.used-percent', {value: formattedValue})
@@ -64,6 +65,10 @@ export function getTenantStorageSummaryMetricUnit(
     const numericValues = values
         .map((value) => getNumericByteValue(value))
         .filter((value): value is number => value !== undefined);
+
+    if (numericValues.some((value) => value >= sizes.pb.value)) {
+        return 'pb';
+    }
 
     if (numericValues.some((value) => value >= sizes.tb.value)) {
         return 'tb';
