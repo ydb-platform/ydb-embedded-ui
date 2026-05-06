@@ -42,7 +42,7 @@ async function enableStorageDisksColumn(page: Page) {
 async function waitForDiskPopup(page: Page, actionName: string) {
     const popup = page
         .locator('.g-popup .ydb-popover')
-        .filter({has: page.getByRole('button', {name: actionName})})
+        .filter({has: page.getByRole('link', {name: actionName})})
         .first();
     await expect(popup).toBeVisible();
     return popup;
@@ -194,7 +194,7 @@ test.describe('Storage disk popup snapshots', () => {
 
         const popup = await waitForDiskPopup(page, 'Go to VDisk');
         await expectDeveloperUILink(popup, getDeveloperUIActorPath('vdisks'));
-        await expect(popup.getByRole('button', {name: 'Go to VDisk'})).toBeVisible();
+        await expect(popup.getByRole('link', {name: 'Go to VDisk'})).toBeVisible();
         await expect(popup.getByRole('button', {name: 'Evict VDisk'})).toBeVisible();
 
         await expect(popup).toHaveScreenshot('vdisk-popup-actions.png');
@@ -215,7 +215,7 @@ test.describe('Storage disk popup snapshots', () => {
 
         const popup = await waitForDiskPopup(page, 'Go to PDisk');
         await expectDeveloperUILink(popup, getDeveloperUIActorPath('pdisks'));
-        await expect(popup.getByRole('button', {name: 'Go to PDisk'})).toBeVisible();
+        await expect(popup.getByRole('link', {name: 'Go to PDisk'})).toBeVisible();
 
         await expect(popup).toHaveScreenshot('pdisk-popup-actions.png');
     });
