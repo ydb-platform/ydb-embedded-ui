@@ -299,6 +299,21 @@ function mergeSegments(segmentsByMedia: Record<string, TenantStorageSegment[]>) 
     }, getPhysicalSegmentsBase());
 }
 
+function mergeOptionalSegments(
+    segments: TenantStorageSegment[] | undefined,
+    fallbackSegments: TenantStorageSegment[] | undefined,
+) {
+    if (!segments) {
+        return fallbackSegments;
+    }
+
+    if (!fallbackSegments) {
+        return segments;
+    }
+
+    return mergeSegments({fallbackSegments, segments});
+}
+
 export function mergeSystemDetailsByMedia(
     detailsByMedia: Record<string, TenantStorageSystemDetail[]>,
 ) {
@@ -311,6 +326,21 @@ export function mergeSystemDetailsByMedia(
 
         return nextResult;
     }, getSystemDetailsBase());
+}
+
+function mergeOptionalSystemDetails(
+    systemDetails: TenantStorageSystemDetail[] | undefined,
+    fallbackSystemDetails: TenantStorageSystemDetail[] | undefined,
+) {
+    if (!systemDetails) {
+        return fallbackSystemDetails;
+    }
+
+    if (!fallbackSystemDetails) {
+        return systemDetails;
+    }
+
+    return mergeSystemDetailsByMedia({fallbackSystemDetails, systemDetails});
 }
 
 export function getTenantStoragePhysicalMediaBreakdown({
@@ -328,13 +358,16 @@ export function getTenantStoragePhysicalMediaBreakdown({
     const segments = physicalSegmentsByMedia[mediaKey];
     const systemDetails = systemDetailsByMedia[mediaKey];
 
-    if (segments || systemDetails || !allowAggregateFallback || mediaKey === EType.None) {
+    if (!allowAggregateFallback || mediaKey === EType.None) {
         return {segments, systemDetails};
     }
 
+    const fallbackSegments = physicalSegmentsByMedia[EType.None];
+    const fallbackSystemDetails = systemDetailsByMedia[EType.None];
+
     return {
-        segments: physicalSegmentsByMedia[EType.None],
-        systemDetails: systemDetailsByMedia[EType.None],
+        segments: mergeOptionalSegments(segments, fallbackSegments),
+        systemDetails: mergeOptionalSystemDetails(systemDetails, fallbackSystemDetails),
     };
 }
 
@@ -570,6 +603,46 @@ function buildStatsByType(stats: TenantStorageStats[] | undefined) {
     return result;
 }
 
+function buildAggregateTenantStorageMediaSection({
+    metrics,
+    userStats,
+}: {
+    metrics: TenantStorageMetrics;
+    userStats?: TenantStorageStats;
+}): TenantStorageMediaSection {
+    const userUsed =
+        userStats === undefined
+            ? normalizeNumber(metrics.tabletStorageUsed)
+            : normalizeNumber(userStats.used);
+    const userQuota =
+        toOptionalNumber(userStats?.limit) ?? toOptionalNumber(metrics.tabletStorageLimit);
+    const userAvailable = userQuota === undefined ? undefined : Math.max(userQuota - userUsed, 0);
+
+    const physicalUsed = normalizeNumber(metrics.blobStorageUsed);
+    const physicalTotal = toOptionalNumber(metrics.blobStorageLimit);
+    const physicalAvailable =
+        physicalTotal === undefined ? undefined : Math.max(physicalTotal - physicalUsed, 0);
+
+    return {
+        mediaType: EType.None,
+        userData: {
+            used: userUsed,
+            quota: userQuota,
+            available: userAvailable,
+            usedPercent: calculateUsedPercent(userUsed, userQuota),
+            segments: [],
+        },
+        physical: {
+            used: physicalUsed,
+            total: physicalTotal,
+            available: physicalAvailable,
+            overhead: userUsed > 0 ? physicalUsed / userUsed : undefined,
+            usedPercent: calculateUsedPercent(physicalUsed, physicalTotal),
+            segments: [],
+        },
+    };
+}
+
 export function buildTenantStorageMediaSections({
     blobStorageStats,
     metrics,
@@ -587,35 +660,17 @@ export function buildTenantStorageMediaSections({
         .sort((left, right) => getMediaSortOrder(left) - getMediaSortOrder(right));
 
     if (mediaTypes.length === 0) {
-        const userUsed = normalizeNumber(metrics.tabletStorageUsed);
-        const userQuota = toOptionalNumber(metrics.tabletStorageLimit);
-        const userAvailable =
-            userQuota === undefined ? undefined : Math.max(userQuota - userUsed, 0);
+        return [buildAggregateTenantStorageMediaSection({metrics})];
+    }
 
-        const physicalUsed = normalizeNumber(metrics.blobStorageUsed);
-        const physicalTotal = toOptionalNumber(metrics.blobStorageLimit);
-        const physicalAvailable =
-            physicalTotal === undefined ? undefined : Math.max(physicalTotal - physicalUsed, 0);
+    const hasUserMediaStats = mediaTypes.some((mediaType) => tabletStatsByType.has(mediaType));
 
+    if (mediaTypes.length > 1 && !hasUserMediaStats) {
         return [
-            {
-                mediaType: EType.None,
-                userData: {
-                    used: userUsed,
-                    quota: userQuota,
-                    available: userAvailable,
-                    usedPercent: calculateUsedPercent(userUsed, userQuota),
-                    segments: [],
-                },
-                physical: {
-                    used: physicalUsed,
-                    total: physicalTotal,
-                    available: physicalAvailable,
-                    overhead: userUsed > 0 ? physicalUsed / userUsed : undefined,
-                    usedPercent: calculateUsedPercent(physicalUsed, physicalTotal),
-                    segments: [],
-                },
-            },
+            buildAggregateTenantStorageMediaSection({
+                metrics,
+                userStats: tabletStatsByType.get(EType.None),
+            }),
         ];
     }
 

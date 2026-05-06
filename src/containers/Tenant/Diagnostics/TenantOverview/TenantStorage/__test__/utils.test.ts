@@ -361,6 +361,61 @@ describe('buildTenantStorageData', () => {
         });
     });
 
+    test('merges aggregate and concrete physical breakdown for single concrete media', () => {
+        const result = buildTenantStorageData(
+            {
+                tabletTypeRows: [
+                    {
+                        Type: 'DataShard',
+                        StorageSize: 500,
+                        Media: [{Kind: 'SSD,Kind:0', StorageSize: 500}],
+                    },
+                    {
+                        Type: 'Hive',
+                        StorageSize: 100,
+                    },
+                ],
+                topRows: [],
+            },
+            {
+                blobStorageUsed: 600,
+                blobStorageLimit: 1_000,
+                tabletStorageUsed: 300,
+                tabletStorageLimit: 700,
+            },
+        );
+
+        const breakdownWithFallback = getTenantStoragePhysicalMediaBreakdown({
+            allowAggregateFallback: true,
+            mediaType: EType.SSD,
+            physicalSegmentsByMedia: result.physicalSegmentsByMedia,
+            systemDetailsByMedia: result.systemDetailsByMedia,
+        });
+        const breakdownWithoutFallback = getTenantStoragePhysicalMediaBreakdown({
+            mediaType: EType.SSD,
+            physicalSegmentsByMedia: result.physicalSegmentsByMedia,
+            systemDetailsByMedia: result.systemDetailsByMedia,
+        });
+
+        expect(breakdownWithFallback.segments).toEqual([
+            {key: TENANT_STORAGE_SEGMENT_KEYS.system, value: 100},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 500},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 0},
+        ]);
+        expect(breakdownWithFallback.systemDetails).toEqual(
+            expect.arrayContaining([{key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive, value: 100}]),
+        );
+        expect(breakdownWithoutFallback.segments).toEqual([
+            {key: TENANT_STORAGE_SEGMENT_KEYS.system, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 500},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 0},
+        ]);
+    });
+
     test('returns zero database share when logical used is zero', () => {
         const result = buildTenantStorageData(
             {
@@ -754,6 +809,43 @@ describe('buildTenantStorageData', () => {
         expect(result[0]?.mediaType).toBe(EType.None);
         expect(result[0]?.userData.used).toBe(300);
         expect(result[0]?.physical.used).toBe(1_000);
+    });
+
+    test('uses aggregate section when blob stats have media split but tablet stats are aggregate', () => {
+        const result = buildTenantStorageMediaSections({
+            blobStorageStats: [
+                {name: EType.SSD, used: 400, limit: 1_000},
+                {name: EType.HDD, used: 600, limit: 2_000},
+            ],
+            metrics: {
+                blobStorageUsed: 1_000,
+                blobStorageLimit: 3_000,
+                tabletStorageUsed: 300,
+                tabletStorageLimit: 700,
+            },
+            tabletStorageStats: [{name: EType.None, used: 300, limit: 700}],
+        });
+
+        expect(result).toHaveLength(1);
+        expect(result[0]?.mediaType).toBe(EType.None);
+        expect(result[0]?.userData).toEqual({
+            available: 400,
+            quota: 700,
+            used: 300,
+            usedPercent: expect.any(Number),
+            segments: [],
+        });
+        expect(result[0]?.physical).toEqual({
+            available: 2_000,
+            overhead: expect.any(Number),
+            total: 3_000,
+            used: 1_000,
+            usedPercent: expect.any(Number),
+            segments: [],
+        });
+        expect(result[0]?.userData.usedPercent).toBeCloseTo(42.857142857142854);
+        expect(result[0]?.physical.overhead).toBeCloseTo(1_000 / 300);
+        expect(result[0]?.physical.usedPercent).toBeCloseTo(33.333333333333336);
     });
 
     test('uses aggregate tablet fallback for a single concrete blob media section', () => {
