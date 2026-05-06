@@ -114,20 +114,30 @@ const PHYSICAL_SEGMENT_KEYS = [
     TENANT_STORAGE_SEGMENT_KEYS.unknown,
 ] as const;
 
-const PHYSICAL_SYSTEM_TABLET_TYPES = new Set<string>([
-    TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive,
-    TENANT_STORAGE_SYSTEM_DETAIL_KEYS.coordinator,
-    TENANT_STORAGE_SYSTEM_DETAIL_KEYS.mediator,
-    TENANT_STORAGE_SYSTEM_DETAIL_KEYS.schemeShard,
-    TENANT_STORAGE_SYSTEM_DETAIL_KEYS.sysViewProcessor,
-    TENANT_STORAGE_SYSTEM_DETAIL_KEYS.graphShard,
-    TENANT_STORAGE_SYSTEM_DETAIL_KEYS.statisticsAggregator,
-    TENANT_STORAGE_SYSTEM_DETAIL_KEYS.bsController,
-    TENANT_STORAGE_SYSTEM_DETAIL_KEYS.cms,
-    TENANT_STORAGE_SYSTEM_DETAIL_KEYS.nodeBroker,
-    TENANT_STORAGE_SYSTEM_DETAIL_KEYS.tenantSlotBroker,
-    TENANT_STORAGE_SYSTEM_DETAIL_KEYS.console,
-]);
+const PHYSICAL_SYSTEM_TABLET_DETAIL_KEY_BY_TYPE: Partial<
+    Record<string, TenantStorageSystemDetailKey>
+> = {
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive]: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive,
+    [ETabletType.OldHive]: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive,
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.coordinator]: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.coordinator,
+    [ETabletType.OldCoordinator]: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.coordinator,
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.mediator]: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.mediator,
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.schemeShard]: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.schemeShard,
+    [ETabletType.OldSchemeShard]: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.schemeShard,
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.sysViewProcessor]:
+        TENANT_STORAGE_SYSTEM_DETAIL_KEYS.sysViewProcessor,
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.graphShard]: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.graphShard,
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.statisticsAggregator]:
+        TENANT_STORAGE_SYSTEM_DETAIL_KEYS.statisticsAggregator,
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.bsController]:
+        TENANT_STORAGE_SYSTEM_DETAIL_KEYS.bsController,
+    [ETabletType.OldBSController]: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.bsController,
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.cms]: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.cms,
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.nodeBroker]: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.nodeBroker,
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.tenantSlotBroker]:
+        TENANT_STORAGE_SYSTEM_DETAIL_KEYS.tenantSlotBroker,
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.console]: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.console,
+};
 
 function normalizeNumber(value: number | string | undefined) {
     const numericValue = Number(value);
@@ -216,6 +226,10 @@ function sumSegments(segments: TenantStorageSegment[]) {
     return segments.reduce((sum, segment) => sum + segment.value, 0);
 }
 
+function getSystemDetailKey(type?: string) {
+    return type ? PHYSICAL_SYSTEM_TABLET_DETAIL_KEY_BY_TYPE[type] : undefined;
+}
+
 function getPhysicalSegmentKey(type?: string) {
     switch (type) {
         case ETabletType.DataShard:
@@ -229,14 +243,10 @@ function getPhysicalSegmentKey(type?: string) {
         case 'Unknown':
             return TENANT_STORAGE_SEGMENT_KEYS.unknown;
         default:
-            return PHYSICAL_SYSTEM_TABLET_TYPES.has(type ?? '')
+            return getSystemDetailKey(type)
                 ? TENANT_STORAGE_SEGMENT_KEYS.system
                 : TENANT_STORAGE_SEGMENT_KEYS.unknown;
     }
-}
-
-function isSystemTabletType(type?: string): type is TenantStorageSystemDetailKey {
-    return PHYSICAL_SYSTEM_TABLET_TYPES.has(type ?? '');
 }
 
 export function getTenantStorageMediaKey(mediaType?: string) {
@@ -334,6 +344,7 @@ function buildPhysicalSegmentsByMedia(tabletTypeRows: TStorageStatsTabletTypeEnt
 
     for (const row of tabletTypeRows ?? []) {
         const physicalKey = getPhysicalSegmentKey(row.Type);
+        const systemDetailKey = getSystemDetailKey(row.Type);
         const mediaEntries = getTabletTypeMediaEntries(row);
 
         for (const mediaEntry of mediaEntries) {
@@ -345,7 +356,7 @@ function buildPhysicalSegmentsByMedia(tabletTypeRows: TStorageStatsTabletTypeEnt
                 mediaEntry.storageSize,
             );
 
-            if (!isSystemTabletType(row.Type)) {
+            if (!systemDetailKey) {
                 continue;
             }
 
@@ -353,7 +364,7 @@ function buildPhysicalSegmentsByMedia(tabletTypeRows: TStorageStatsTabletTypeEnt
                 systemDetailsByMedia[mediaEntry.mediaKey] ?? getSystemDetailsBase();
             systemDetailsByMedia[mediaEntry.mediaKey] = accumulateSystemDetail(
                 currentDetails,
-                row.Type,
+                systemDetailKey,
                 mediaEntry.storageSize,
             );
         }

@@ -127,6 +127,56 @@ describe('buildTenantStorageData', () => {
         expect(result.topRowsError).toBe(topRowsError);
     });
 
+    test('maps old system tablet types to system physical details', () => {
+        const result = buildTenantStorageData(
+            {
+                tabletTypeRows: [
+                    {
+                        Type: 'OldHive',
+                        StorageSize: 10,
+                        Media: [{Kind: 'SSD,Kind:0', StorageSize: 10}],
+                    },
+                    {
+                        Type: 'OldCoordinator',
+                        StorageSize: 20,
+                        Media: [{Kind: 'SSD,Kind:0', StorageSize: 20}],
+                    },
+                    {
+                        Type: 'OldSchemeShard',
+                        StorageSize: 30,
+                        Media: [{Kind: 'SSD,Kind:0', StorageSize: 30}],
+                    },
+                    {
+                        Type: 'OldBSController',
+                        StorageSize: 40,
+                        Media: [{Kind: 'SSD,Kind:0', StorageSize: 40}],
+                    },
+                ],
+                topRows: [],
+            },
+            {
+                blobStorageUsed: 100,
+                tabletStorageUsed: 50,
+            },
+        );
+
+        expect(result.physicalSegmentsByMedia.SSD).toEqual([
+            {key: TENANT_STORAGE_SEGMENT_KEYS.system, value: 100},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 0},
+        ]);
+        expect(result.systemDetailsByMedia.SSD).toEqual(
+            expect.arrayContaining([
+                {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive, value: 10},
+                {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.coordinator, value: 20},
+                {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.schemeShard, value: 30},
+                {key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.bsController, value: 40},
+            ]),
+        );
+    });
+
     test('maps unknown tablet media to aggregate physical breakdown', () => {
         const result = buildTenantStorageData(
             {
