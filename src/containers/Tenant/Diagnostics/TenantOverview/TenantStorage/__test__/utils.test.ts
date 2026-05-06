@@ -174,6 +174,50 @@ describe('buildTenantStorageData', () => {
         });
     });
 
+    test('falls back to aggregate tablet type storage size when media breakdown is missing', () => {
+        const result = buildTenantStorageData(
+            {
+                tabletTypeRows: [
+                    {
+                        Type: 'DataShard',
+                        StorageSize: 500,
+                    },
+                    {
+                        Type: 'Hive',
+                        StorageSize: 100,
+                    },
+                    {
+                        Type: 'PersQueue',
+                        StorageSize: 50,
+                    },
+                ],
+                topRows: [],
+            },
+            {
+                blobStorageUsed: 650,
+                blobStorageLimit: 1_000,
+                tabletStorageUsed: 350,
+                tabletStorageLimit: 700,
+            },
+        );
+
+        expect(result.physicalSegmentsByMedia[EType.None]).toEqual([
+            {key: TENANT_STORAGE_SEGMENT_KEYS.system, value: 100},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 500},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 50},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 0},
+        ]);
+        expect(result.summary.physical.segments).toEqual([
+            {key: TENANT_STORAGE_SEGMENT_KEYS.system, value: 100},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 500},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 50},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 0},
+        ]);
+        expect(result.summary.physical.overhead).toBeCloseTo(650 / 350);
+    });
+
     test('returns zero database share when logical used is zero', () => {
         const result = buildTenantStorageData(
             {

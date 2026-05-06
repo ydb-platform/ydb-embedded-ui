@@ -251,14 +251,24 @@ export function getTenantStorageMediaKey(mediaType?: string) {
 }
 
 function getTabletTypeMediaEntries(row: TStorageStatsTabletTypeEntry) {
-    if (!Array.isArray(row.Media)) {
+    const mediaEntries = Array.isArray(row.Media)
+        ? row.Media.map((mediaEntry) => ({
+              mediaKey: getTenantStorageMediaKey(mediaEntry.Kind),
+              storageSize: normalizeNumber(mediaEntry.StorageSize),
+          })).filter((mediaEntry) => mediaEntry.storageSize > 0)
+        : [];
+
+    if (mediaEntries.length > 0) {
+        return mediaEntries;
+    }
+
+    const aggregateStorageSize = normalizeNumber(row.StorageSize);
+
+    if (aggregateStorageSize <= 0) {
         return [];
     }
 
-    return row.Media.map((mediaEntry) => ({
-        mediaKey: getTenantStorageMediaKey(mediaEntry.Kind),
-        storageSize: normalizeNumber(mediaEntry.StorageSize),
-    })).filter((mediaEntry) => mediaEntry.storageSize > 0);
+    return [{mediaKey: EType.None, storageSize: aggregateStorageSize}];
 }
 
 function mergeSegments(segmentsByMedia: Record<string, TenantStorageSegment[]>) {

@@ -193,4 +193,68 @@ describe('fetchTenantStorageRawData', () => {
         expect(getSchema).toHaveBeenCalledTimes(2);
         expect(sendQuery).toHaveBeenCalledTimes(1);
     });
+
+    test('keeps summary data and surfaces error when tablet type stats request fails', async () => {
+        const tabletTypeError = new Error('tablet type stats unavailable');
+        const getStorageStats = jest
+            .fn()
+            .mockRejectedValueOnce(tabletTypeError)
+            .mockResolvedValueOnce({
+                Paths: [{FullPath: '/local/table-a', StorageSize: 300}],
+            });
+        const getSchema = jest.fn().mockResolvedValue({
+            Path: '/local',
+            PathDescription: {
+                DomainDescription: {
+                    DiskSpaceUsage: {
+                        Tables: {DataSize: '120'},
+                        Topics: {DataSize: '30'},
+                    },
+                },
+                Children: [
+                    {
+                        Name: 'table-a',
+                        PathType: 'EPathTypeTable',
+                    },
+                ],
+            },
+        });
+        const sendQuery = jest
+            .fn()
+            .mockResolvedValue(createTopRowsQueryResponse([['/local/table-a', 100]]));
+
+        window.api = {
+            viewer: {
+                getStorageStats,
+                getSchema,
+                sendQuery,
+            },
+        } as unknown as YdbEmbeddedAPI;
+
+        const result = await fetchTenantStorageRawData({
+            database: '/local',
+            databaseFullPath: '/local',
+        });
+
+        expect(result).toEqual({
+            logicalUserData: {
+                rowTables: 120,
+                topics: 30,
+            },
+            topRows: [
+                {
+                    path: '/local/table-a',
+                    userData: 100,
+                    physicalDisk: 300,
+                    pathType: 'EPathTypeTable',
+                    pathSubType: undefined,
+                },
+            ],
+            topRowsError: tabletTypeError,
+            tabletTypeRows: [],
+        });
+        expect(getStorageStats).toHaveBeenCalledTimes(2);
+        expect(getSchema).toHaveBeenCalledTimes(1);
+        expect(sendQuery).toHaveBeenCalledTimes(1);
+    });
 });

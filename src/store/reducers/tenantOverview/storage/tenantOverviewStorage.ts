@@ -352,16 +352,25 @@ export async function fetchTenantStorageRawData(
 ) {
     const {database} = params;
 
-    const [tabletTypeResponse, topRowsResult, rootSchemaData] = await Promise.all([
-        window.api.viewer.getStorageStats(
-            {
-                database,
-                groupBy: 'tablet_type',
-                tablets: true,
-                media: true,
-            },
-            options,
-        ),
+    const [tabletTypeResult, topRowsResult, rootSchemaData] = await Promise.all([
+        window.api.viewer
+            .getStorageStats(
+                {
+                    database,
+                    groupBy: 'tablet_type',
+                    tablets: true,
+                    media: true,
+                },
+                options,
+            )
+            .then((response) => ({
+                tabletTypeRows: response.Tablets ?? [],
+                error: undefined,
+            }))
+            .catch((error: unknown) => ({
+                tabletTypeRows: [] as TStorageStatsTabletTypeEntry[],
+                error,
+            })),
         getTopRowsByQuery(params, options)
             .then((rows) => ({rows, error: undefined}))
             .catch((error: unknown) => ({rows: [], error})),
@@ -393,8 +402,8 @@ export async function fetchTenantStorageRawData(
     return {
         logicalUserData: rootSchemaData?.logicalUserData,
         topRows: mergeTopRows(queryTopRows, topRowTypesResult.topRowTypes, storageStatsByPath),
-        topRowsError: topRowsResult.error ?? enrichmentError,
-        tabletTypeRows: tabletTypeResponse.Tablets ?? [],
+        topRowsError: topRowsResult.error ?? enrichmentError ?? tabletTypeResult.error,
+        tabletTypeRows: tabletTypeResult.tabletTypeRows,
     };
 }
 
