@@ -92,7 +92,7 @@ export interface TenantStorageData {
 }
 
 export interface TenantStorageMediaSection {
-    mediaType: EType;
+    mediaType: string;
     userData: TenantStorageSummary;
     physical: TenantStorageSummary;
 }
@@ -237,7 +237,17 @@ function isSystemTabletType(type?: string): type is TenantStorageSystemDetailKey
 }
 
 export function getTenantStorageMediaKey(mediaType?: string) {
-    return normalizeMediaType(mediaType);
+    if (!mediaType || mediaType === EType.None) {
+        return EType.None;
+    }
+
+    const normalizedMediaType = normalizeMediaType(mediaType);
+
+    if (normalizedMediaType === EType.None.toUpperCase()) {
+        return EType.None;
+    }
+
+    return normalizedMediaType;
 }
 
 function getTabletTypeMediaEntries(row: TStorageStatsTabletTypeEntry) {
@@ -467,7 +477,7 @@ export function isSystemStoragePath(path: string) {
     return SYSTEM_STORAGE_PATH_PATTERN.test(path);
 }
 
-function getMediaSortOrder(type: EType) {
+function getMediaSortOrder(type: string) {
     switch (type) {
         case EType.SSD:
             return 0;
@@ -479,16 +489,30 @@ function getMediaSortOrder(type: EType) {
 }
 
 function buildStatsByType(stats: TenantStorageStats[] | undefined) {
-    const result = new Map<EType, TenantStorageStats>();
+    const result = new Map<string, TenantStorageStats>();
 
     for (const item of stats ?? []) {
-        const type = item.name;
+        const type = getTenantStorageMediaKey(item.name);
 
-        if (!type) {
+        if (!item.name || !type) {
             continue;
         }
 
-        result.set(type, item);
+        const previousStats = result.get(type);
+        const used = normalizeNumber(previousStats?.used) + normalizeNumber(item.used);
+        const previousLimit = toOptionalNumber(previousStats?.limit);
+        const itemLimit = toOptionalNumber(item.limit);
+        const limit =
+            previousLimit === undefined && itemLimit === undefined
+                ? undefined
+                : (previousLimit ?? 0) + (itemLimit ?? 0);
+
+        result.set(type, {
+            ...item,
+            name: type,
+            used,
+            limit,
+        });
     }
 
     return result;
@@ -506,9 +530,9 @@ export function buildTenantStorageMediaSections({
     const blobStatsByType = buildStatsByType(blobStorageStats);
     const tabletStatsByType = buildStatsByType(tabletStorageStats);
 
-    const mediaTypes = Array.from(blobStatsByType.keys()).sort(
-        (left, right) => getMediaSortOrder(left) - getMediaSortOrder(right),
-    );
+    const mediaTypes = Array.from(blobStatsByType.keys())
+        .filter((mediaType) => mediaType !== EType.None)
+        .sort((left, right) => getMediaSortOrder(left) - getMediaSortOrder(right));
 
     if (mediaTypes.length === 0) {
         const userUsed = normalizeNumber(metrics.tabletStorageUsed);
@@ -544,7 +568,9 @@ export function buildTenantStorageMediaSections({
     }
 
     return mediaTypes.map<TenantStorageMediaSection>((mediaType) => {
-        const userStats = tabletStatsByType.get(mediaType);
+        const userStats =
+            tabletStatsByType.get(mediaType) ??
+            (mediaTypes.length === 1 ? tabletStatsByType.get(EType.None) : undefined);
         const physicalStats = blobStatsByType.get(mediaType);
 
         const userUsed = normalizeNumber(userStats?.used);

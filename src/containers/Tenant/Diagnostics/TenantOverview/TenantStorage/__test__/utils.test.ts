@@ -426,6 +426,63 @@ describe('buildTenantStorageData', () => {
         ]);
     });
 
+    test('normalizes and sums duplicate media stats', () => {
+        const result = buildTenantStorageMediaSections({
+            blobStorageStats: [
+                {name: 'ssd', used: 100, limit: 1_000},
+                {name: EType.SSD, used: 50, limit: 500},
+            ],
+            metrics: {
+                blobStorageUsed: 150,
+                blobStorageLimit: 1_500,
+                tabletStorageUsed: 50,
+                tabletStorageLimit: 300,
+            },
+            tabletStorageStats: [
+                {name: 'SSD', used: 20, limit: 100},
+                {name: 'ssd', used: 30, limit: 200},
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+        expect(result[0]?.mediaType).toBe(EType.SSD);
+        expect(result[0]?.userData).toEqual({
+            available: 250,
+            quota: 300,
+            used: 50,
+            usedPercent: expect.any(Number),
+            segments: [],
+        });
+        expect(result[0]?.physical).toEqual({
+            available: 1_350,
+            overhead: 3,
+            total: 1_500,
+            used: 150,
+            usedPercent: 10,
+            segments: [],
+        });
+        expect(result[0]?.userData.usedPercent).toBeCloseTo(16.666666666666668);
+    });
+
+    test('matches aliased blob and tablet media types', () => {
+        const result = buildTenantStorageMediaSections({
+            blobStorageStats: [{name: 'ROT', used: 200, limit: 400}],
+            metrics: {
+                blobStorageUsed: 200,
+                blobStorageLimit: 400,
+                tabletStorageUsed: 50,
+                tabletStorageLimit: 100,
+            },
+            tabletStorageStats: [{name: 'hdd', used: 50, limit: 100}],
+        });
+
+        expect(result).toHaveLength(1);
+        expect(result[0]?.mediaType).toBe(EType.HDD);
+        expect(result[0]?.userData.used).toBe(50);
+        expect(result[0]?.userData.quota).toBe(100);
+        expect(result[0]?.physical.used).toBe(200);
+    });
+
     test('uses aggregate section when only tablet stats have media split', () => {
         const result = buildTenantStorageMediaSections({
             metrics: {
@@ -463,6 +520,45 @@ describe('buildTenantStorageData', () => {
         expect(result[0]?.userData.usedPercent).toBeCloseTo(42.857142857142854);
         expect(result[0]?.physical.overhead).toBeCloseTo(1_000 / 300);
         expect(result[0]?.physical.usedPercent).toBeCloseTo(33.333333333333336);
+    });
+
+    test('uses aggregate section when blob storage stats have only None fallback', () => {
+        const result = buildTenantStorageMediaSections({
+            blobStorageStats: [{name: EType.None, used: 1_000, limit: 3_000}],
+            metrics: {
+                blobStorageUsed: 1_000,
+                blobStorageLimit: 3_000,
+                tabletStorageUsed: 300,
+                tabletStorageLimit: 700,
+            },
+            tabletStorageStats: [
+                {name: EType.SSD, used: 250, limit: 500},
+                {name: EType.HDD, used: 50, limit: 200},
+            ],
+        });
+
+        expect(result).toHaveLength(1);
+        expect(result[0]?.mediaType).toBe(EType.None);
+        expect(result[0]?.userData.used).toBe(300);
+        expect(result[0]?.physical.used).toBe(1_000);
+    });
+
+    test('uses aggregate tablet fallback for a single concrete blob media section', () => {
+        const result = buildTenantStorageMediaSections({
+            blobStorageStats: [{name: EType.SSD, used: 1_000, limit: 3_000}],
+            metrics: {
+                blobStorageUsed: 1_000,
+                blobStorageLimit: 3_000,
+                tabletStorageUsed: 300,
+                tabletStorageLimit: 700,
+            },
+            tabletStorageStats: [{name: EType.None, used: 300, limit: 700}],
+        });
+
+        expect(result).toHaveLength(1);
+        expect(result[0]?.mediaType).toBe(EType.SSD);
+        expect(result[0]?.userData.used).toBe(300);
+        expect(result[0]?.userData.quota).toBe(700);
     });
 
     test('falls back to overall quotas for single-media sections when per-type limits are missing', () => {

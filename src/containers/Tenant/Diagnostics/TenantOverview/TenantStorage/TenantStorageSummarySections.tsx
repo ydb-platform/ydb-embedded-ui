@@ -34,7 +34,7 @@ import './TenantStorageSummarySections.scss';
 
 const b = cn('ydb-tenant-storage-summary-sections');
 
-function getMediaSectionLabel(mediaType?: EType) {
+function getMediaSectionLabel(mediaType?: string) {
     if (!mediaType || mediaType === EType.None) {
         return undefined;
     }

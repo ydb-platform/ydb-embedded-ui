@@ -239,7 +239,10 @@ async function getTopRowTypes(
     const uniqueMissingPaths = Array.from(new Set(missingPaths));
 
     if (uniqueMissingPaths.length === 0) {
-        return result;
+        return {
+            topRowTypes: result,
+            error: undefined,
+        };
     }
 
     const responses = await Promise.allSettled(
@@ -253,6 +256,10 @@ async function getTopRowTypes(
             ),
         ),
     );
+
+    const firstError = responses.find(
+        (response): response is PromiseRejectedResult => response.status === 'rejected',
+    )?.reason;
 
     responses.forEach((response, index) => {
         if (response.status !== 'fulfilled') {
@@ -268,7 +275,10 @@ async function getTopRowTypes(
         });
     });
 
-    return result;
+    return {
+        topRowTypes: result,
+        error: firstError,
+    };
 }
 
 function getStorageStatsByPath(response: StorageStatsResponse, params: GetTenantStorageRawParams) {
@@ -358,26 +368,31 @@ export async function fetchTenantStorageRawData(
     ]);
     const queryTopRows = topRowsResult.rows;
 
-    const storageStatsByPath = await getStorageStatsForTopRows(
+    const storageStatsResult = await getStorageStatsForTopRows(
         queryTopRows.map(({path}) => path),
         params,
         options,
-    );
+    )
+        .then((storageStatsByPath) => ({storageStatsByPath, error: undefined}))
+        .catch((error: unknown) => ({storageStatsByPath: new Map<string, number>(), error}));
+    const storageStatsByPath = storageStatsResult.storageStatsByPath;
     const topRowsWithoutTypes = queryTopRows.map((row) => ({
         ...row,
         physicalDisk: storageStatsByPath.get(row.path),
     }));
-    const topRowTypes = await getTopRowTypes(
+    const initialTopRowTypes = rootSchemaData?.topRowTypes ?? new Map();
+    const topRowTypesResult = await getTopRowTypes(
         topRowsWithoutTypes,
         params,
-        rootSchemaData?.topRowTypes ?? new Map(),
+        initialTopRowTypes,
         options,
-    );
+    ).catch((error: unknown) => ({topRowTypes: initialTopRowTypes, error}));
+    const enrichmentError = storageStatsResult.error ?? topRowTypesResult.error;
 
     return {
         logicalUserData: rootSchemaData?.logicalUserData,
-        topRows: mergeTopRows(queryTopRows, topRowTypes, storageStatsByPath),
-        topRowsError: topRowsResult.error,
+        topRows: mergeTopRows(queryTopRows, topRowTypesResult.topRowTypes, storageStatsByPath),
+        topRowsError: topRowsResult.error ?? enrichmentError,
         tabletTypeRows: tabletTypeResponse.Tablets ?? [],
     };
 }

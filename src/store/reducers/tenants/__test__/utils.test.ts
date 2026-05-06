@@ -60,4 +60,48 @@ describe('calculateTenantMetrics', () => {
         expect(result.tabletStorageStats?.[0]?.usage).toBeCloseTo(47.247);
         expect(result.tabletStorageStats?.[1]?.usage).toBeCloseTo(0.000000322);
     });
+
+    test('ignores invalid per-media quota and falls back to table storage limit', () => {
+        const result = calculateTenantMetrics({
+            DatabaseQuotas: {
+                storage_quotas: [{unit_kind: EType.SSD, data_size_soft_quota: 'invalid'}],
+            },
+            TablesStorage: [{Type: EType.SSD, Size: '100', Limit: '300'}],
+        });
+
+        expect(result.tabletStorageStats).toEqual([
+            {name: EType.SSD, used: 100, limit: 300, usage: expect.any(Number)},
+        ]);
+        expect(result.tabletStorageStats?.[0]?.usage).toBeCloseTo(33.333333333333336);
+    });
+
+    test('normalizes table storage type before per-media quota lookup', () => {
+        const result = calculateTenantMetrics({
+            DatabaseQuotas: {
+                storage_quotas: [{unit_kind: 'hdd', data_size_soft_quota: '900'}],
+            },
+            TablesStorage: [{Type: 'ROT', Size: '90'}],
+        });
+
+        expect(result.tabletStorageStats).toEqual([
+            {name: EType.HDD, used: 90, limit: 900, usage: 10},
+        ]);
+    });
+
+    test('marks aggregate storage fallbacks with None media type', () => {
+        const result = calculateTenantMetrics({
+            StorageAllocatedSize: '100',
+            StorageAllocatedLimit: '500',
+            DatabaseQuotas: {
+                data_size_soft_quota: '1000',
+            },
+        });
+
+        expect(result.blobStorageStats).toEqual([
+            {name: EType.None, used: 100, limit: 500, usage: 20},
+        ]);
+        expect(result.tabletStorageStats).toEqual([
+            {name: EType.None, used: 0, limit: 1000, usage: undefined},
+        ]);
+    });
 });

@@ -205,7 +205,7 @@ interface StorageQuotas {
 }
 
 interface TStorageUsage {
-    Type: EType;
+    Type: string;
     /** uint64 */
     Size?: string;
     /** uint64 */

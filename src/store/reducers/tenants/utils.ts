@@ -8,7 +8,7 @@ import {
     DEFAULT_WARNING_THRESHOLD,
     EMPTY_DATA_PLACEHOLDER,
 } from '../../../utils/constants';
-import {normalizeMediaType} from '../../../utils/disks/normalizeMediaType';
+import {UNKNOWN_MEDIA_TYPE, normalizeMediaType} from '../../../utils/disks/normalizeMediaType';
 import {isNumeric, safeParseNumber} from '../../../utils/utils';
 
 import {METRIC_STATUS} from './contants';
@@ -30,7 +30,12 @@ export interface TenantMetricStats<T = string> {
 }
 
 export type TenantPoolsStats = TenantMetricStats<PoolName>;
-export type TenantStorageStats = TenantMetricStats<EType>;
+export type TenantStorageStats = TenantMetricStats<string>;
+
+type TenantStorageUsage = NonNullable<TTenant['DatabaseStorage']>[number];
+type TenantStorageQuota = NonNullable<
+    NonNullable<TTenant['DatabaseQuotas']>['storage_quotas']
+>[number];
 
 const calculatePoolsStats = (
     poolsStats: TPoolStats[] | undefined,
@@ -56,13 +61,17 @@ const calculatePoolsStats = (
 };
 
 function getTenantStorageType(unitKind?: string) {
-    const normalizedType = normalizeMediaType(unitKind?.toUpperCase());
-
-    if (normalizedType === EType.SSD || normalizedType === EType.HDD) {
-        return normalizedType;
+    if (!unitKind || unitKind === EType.None) {
+        return EType.None;
     }
 
-    return EType.None;
+    const normalizedType = normalizeMediaType(unitKind);
+
+    if (normalizedType === UNKNOWN_MEDIA_TYPE || normalizedType === EType.None.toUpperCase()) {
+        return EType.None;
+    }
+
+    return normalizedType;
 }
 
 function getStorageUsed(value?: string | number) {
@@ -71,6 +80,130 @@ function getStorageUsed(value?: string | number) {
 
 function getStorageLimit(value?: string | number) {
     return isNumeric(value) ? Number(value) : undefined;
+}
+
+function buildStorageQuotaMap(storageQuotas: TenantStorageQuota[] | undefined) {
+    return (
+        storageQuotas?.reduce<Map<string, number>>((result, quota) => {
+            const type = getTenantStorageType(quota.unit_kind);
+            const softQuota = getStorageLimit(quota.data_size_soft_quota);
+
+            if (type === EType.None || softQuota === undefined) {
+                return result;
+            }
+
+            const currentQuota = result.get(type) ?? 0;
+
+            result.set(type, currentQuota + softQuota);
+
+            return result;
+        }, new Map()) ?? new Map<string, number>()
+    );
+}
+
+function buildStorageStats(values: TenantStorageUsage[]) {
+    return values.map((value) => {
+        const {Type, Size, Limit} = value;
+
+        const used = getStorageUsed(Size);
+        const limit = getStorageLimit(Limit);
+
+        return {
+            name: Type,
+            used,
+            limit,
+            usage: calculateUsage(used, limit),
+        };
+    });
+}
+
+function buildBlobStorageStats({
+    blobStorage,
+    blobStorageLimit,
+    databaseStorage,
+    storageUsage,
+}: {
+    blobStorage: number;
+    blobStorageLimit?: number;
+    databaseStorage: TTenant['DatabaseStorage'];
+    storageUsage: TTenant['StorageUsage'];
+}) {
+    const source = databaseStorage?.length ? databaseStorage : storageUsage;
+
+    if (source) {
+        return buildStorageStats(source);
+    }
+
+    return [
+        {
+            name: EType.None,
+            used: blobStorage,
+            limit: blobStorageLimit,
+            usage: calculateUsage(blobStorage, blobStorageLimit),
+        },
+    ];
+}
+
+function buildTabletStorageStats({
+    quotaUsage,
+    storageQuotasByType,
+    tabletStorage,
+    tabletStorageLimit,
+    tablesStorage,
+}: {
+    quotaUsage: TTenant['QuotaUsage'];
+    storageQuotasByType: Map<string, number>;
+    tabletStorage: number;
+    tabletStorageLimit?: number;
+    tablesStorage: TTenant['TablesStorage'];
+}) {
+    if (tablesStorage?.length) {
+        return tablesStorage.map((value) => {
+            const {Type, Size, Limit, SoftQuota} = value;
+
+            const type = getTenantStorageType(Type);
+            const used = getStorageUsed(Size);
+            const typedQuota = type === EType.None ? undefined : storageQuotasByType.get(type);
+            const limit = getStorageLimit(SoftQuota) ?? typedQuota ?? getStorageLimit(Limit);
+
+            return {
+                name: type,
+                used,
+                limit,
+                usage: calculateUsage(used, limit),
+            };
+        });
+    }
+
+    if (quotaUsage) {
+        return quotaUsage.map((value) => {
+            const {Type, Size, Limit} = value;
+
+            const type = getTenantStorageType(Type);
+            const used = getStorageUsed(Size);
+            const limit = getStorageLimit(Limit);
+
+            return {
+                name: type,
+                used,
+                limit,
+                usage: calculateUsage(used, limit),
+            };
+        });
+    }
+
+    if (tabletStorageLimit) {
+        return [
+            {
+                name: EType.None,
+                used: tabletStorage,
+                limit: tabletStorageLimit,
+                usage: calculateUsage(tabletStorage, tabletStorageLimit),
+            },
+        ];
+    }
+
+    return undefined;
 }
 
 export const calculateTenantMetrics = (tenant: TTenant = {}) => {
@@ -110,98 +243,20 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
             const size = Number(storageType.Size) || 0;
             return sum + size;
         }, 0) ?? 0;
-    const storageQuotasByType =
-        DatabaseQuotas.storage_quotas?.reduce<Map<EType, number>>((result, quota) => {
-            const type = getTenantStorageType(quota.unit_kind);
-            const softQuota = Number(quota.data_size_soft_quota);
-            const currentQuota = result.get(type) ?? 0;
-
-            result.set(type, currentQuota + (Number.isFinite(softQuota) ? softQuota : 0));
-
-            return result;
-        }, new Map()) ?? new Map<EType, number>();
-
-    let blobStorageStats: TenantStorageStats[];
-    let tabletStorageStats: TenantStorageStats[] | undefined;
-
-    if (DatabaseStorage?.length) {
-        blobStorageStats = DatabaseStorage.map((value) => {
-            const {Type, Size, Limit} = value;
-
-            const used = getStorageUsed(Size);
-            const limit = getStorageLimit(Limit);
-
-            return {
-                name: Type,
-                used,
-                limit,
-                usage: calculateUsage(used, limit),
-            };
-        });
-    } else if (StorageUsage) {
-        blobStorageStats = StorageUsage.map((value) => {
-            const {Type, Size, Limit} = value;
-
-            const used = getStorageUsed(Size);
-            const limit = getStorageLimit(Limit);
-
-            return {
-                name: Type,
-                used,
-                limit,
-                usage: calculateUsage(used, limit),
-            };
-        });
-    } else {
-        blobStorageStats = [
-            {
-                name: EType.SSD,
-                used: blobStorage,
-                limit: blobStorageLimit,
-                usage: calculateUsage(blobStorage, blobStorageLimit),
-            },
-        ];
-    }
-
-    if (TablesStorage?.length) {
-        tabletStorageStats = TablesStorage.map((value) => {
-            const {Type, Size, Limit, SoftQuota} = value;
-
-            const used = getStorageUsed(Size);
-            const typedQuota = storageQuotasByType.get(Type);
-            const limit = getStorageLimit(SoftQuota) ?? typedQuota ?? getStorageLimit(Limit);
-
-            return {
-                name: Type,
-                used,
-                limit,
-                usage: calculateUsage(used, limit),
-            };
-        });
-    } else if (QuotaUsage) {
-        tabletStorageStats = QuotaUsage.map((value) => {
-            const {Type, Size, Limit} = value;
-
-            const used = getStorageUsed(Size);
-            const limit = getStorageLimit(Limit);
-
-            return {
-                name: Type,
-                used,
-                limit,
-                usage: calculateUsage(used, limit),
-            };
-        });
-    } else if (tabletStorageLimit) {
-        tabletStorageStats = [
-            {
-                name: EType.SSD,
-                used: tabletStorage,
-                limit: tabletStorageLimit,
-                usage: calculateUsage(tabletStorage, tabletStorageLimit),
-            },
-        ];
-    }
+    const storageQuotasByType = buildStorageQuotaMap(DatabaseQuotas.storage_quotas);
+    const blobStorageStats = buildBlobStorageStats({
+        blobStorage,
+        blobStorageLimit,
+        databaseStorage: DatabaseStorage,
+        storageUsage: StorageUsage,
+    });
+    const tabletStorageStats = buildTabletStorageStats({
+        quotaUsage: QuotaUsage,
+        storageQuotasByType,
+        tabletStorage,
+        tabletStorageLimit,
+        tablesStorage: TablesStorage,
+    });
 
     const memoryStats: TenantMetricStats[] = [
         {
