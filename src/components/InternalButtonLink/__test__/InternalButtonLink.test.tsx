@@ -35,7 +35,7 @@ describe('InternalButtonLink', () => {
             search: '?nodeId=4&vDiskId=0-1-0-3-0',
             hash: '',
         });
-        expect(link).toHaveAttribute('href', '/base/vDisk?nodeId=4&vDiskId=0-1-0-3-0');
+        expect(link.getAttribute('href')).toBe('/base/vDisk?nodeId=4&vDiskId=0-1-0-3-0');
     });
 
     test('navigates internally on unmodified left click', () => {
@@ -109,7 +109,7 @@ describe('InternalButtonLink', () => {
         const wasNotPrevented = fireEvent.click(link, {button: 0});
 
         expect(wasNotPrevented).toBe(true);
-        expect(link).toHaveAttribute('target', '_blank');
+        expect(link.getAttribute('target')).toBe('_blank');
         expect(mockPush).not.toHaveBeenCalled();
     });
 });
