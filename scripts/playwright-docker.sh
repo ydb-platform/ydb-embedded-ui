@@ -26,6 +26,8 @@ DEFAULT_INTERNAL_BACKEND="http://${YDB_CONTAINER_NAME}:8765"
 INTERNAL_BROWSER_BACKEND="http://localhost:8765"
 PLAYWRIGHT_BACKEND="${EXTERNAL_BACKEND:-$INTERNAL_BROWSER_BACKEND}"
 PLAYWRIGHT_BASE_URL_VALUE="${PLAYWRIGHT_BASE_URL:-}"
+DEFAULT_YDB_ALLOW_ORIGIN="http://localhost:3000"
+YDB_ALLOW_ORIGIN="${PLAYWRIGHT_YDB_ALLOW_ORIGIN:-$DEFAULT_YDB_ALLOW_ORIGIN}"
 YDB_PLATFORM="${PLAYWRIGHT_YDB_PLATFORM:-}"
 PLAYWRIGHT_PLATFORM="${PLAYWRIGHT_PLATFORM:-}"
 START_INTERNAL_BACKEND=0
@@ -39,6 +41,18 @@ if [ -z "$EXTERNAL_BACKEND" ]; then
 elif [[ "$EXTERNAL_BACKEND" =~ ^https?://(localhost|127\.0\.0\.1)(:|/|$) ]]; then
   YDB_PROXY_TARGET="${EXTERNAL_BACKEND//localhost/host.docker.internal}"
   YDB_PROXY_TARGET="${YDB_PROXY_TARGET//127.0.0.1/host.docker.internal}"
+fi
+
+if [ -z "${PLAYWRIGHT_YDB_ALLOW_ORIGIN:-}" ] && [ -n "$PLAYWRIGHT_BASE_URL_VALUE" ]; then
+  YDB_ALLOW_ORIGIN=$(PLAYWRIGHT_BASE_URL="$PLAYWRIGHT_BASE_URL_VALUE" node <<'NODE'
+try {
+  console.log(new URL(process.env.PLAYWRIGHT_BASE_URL).origin);
+} catch (error) {
+  console.error(`Error: PLAYWRIGHT_BASE_URL must be an absolute URL, got "${process.env.PLAYWRIGHT_BASE_URL}"`);
+  process.exit(1);
+}
+NODE
+)
 fi
 
 cleanup() {
@@ -124,6 +138,7 @@ echo "Docker network: ${NETWORK_NAME}"
 
 if [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
   echo "Starting YDB backend container: ${YDB_IMAGE}"
+  echo "Allowed YDB CORS origin: ${YDB_ALLOW_ORIGIN}"
   if [ -n "$YDB_PLATFORM" ]; then
     echo "Requested YDB platform: ${YDB_PLATFORM}"
   fi
@@ -137,14 +152,14 @@ if [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
       --name "$YDB_CONTAINER_NAME" \
       --hostname localhost \
       --network "$NETWORK_NAME" \
-      -e YDB_ALLOW_ORIGIN="http://localhost:3000" \
+      -e YDB_ALLOW_ORIGIN="$YDB_ALLOW_ORIGIN" \
       "$YDB_IMAGE"
   else
     docker run -d --rm \
       --name "$YDB_CONTAINER_NAME" \
       --hostname localhost \
       --network "$NETWORK_NAME" \
-      -e YDB_ALLOW_ORIGIN="http://localhost:3000" \
+      -e YDB_ALLOW_ORIGIN="$YDB_ALLOW_ORIGIN" \
       "$YDB_IMAGE"
   fi
   YDB_CONTAINER_STARTED=1
