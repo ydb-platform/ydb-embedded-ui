@@ -4,11 +4,11 @@ import type {ClusterLinkWithTitle} from '../../types/additionalProps';
 
 import {headerKeyset} from './i18n';
 
-interface ClusterMonitoringControlProps {
+interface MonitoringControlProps {
     link: ClusterLinkWithTitle;
 }
 
-export function ClusterMonitoringControl({link}: ClusterMonitoringControlProps) {
+export function MonitoringControl({link}: MonitoringControlProps) {
     return (
         <ActionTooltip title={link.description || ''} disabled={!link.description}>
             <Button view="flat" href={link.url} target="_blank">

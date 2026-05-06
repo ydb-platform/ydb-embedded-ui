@@ -38,7 +38,6 @@ function defaultRenderName(name?: string) {
     return name ?? '';
 }
 
-// eslint-disable-next-line complexity
 export function EntityStatus({
     status = EFlag.Grey,
     name = '',
@@ -95,9 +94,16 @@ export function EntityStatus({
                     className={b('wrapper', {
                         'with-clipboard-button': hasClipboardButton,
                         'with-info-button': Boolean(infoPopoverContent),
+                        'with-link': Boolean(path),
                     })}
                 >
-                    <span className={b('link', {'with-left-trim': withLeftTrim})} title={name}>
+                    <span
+                        className={b('link', {
+                            'with-left-trim': withLeftTrim,
+                            'with-path': Boolean(path),
+                        })}
+                        title={name}
+                    >
                         {renderLink()}
                     </span>
                     {(hasClipboardButton || infoPopoverContent) && (

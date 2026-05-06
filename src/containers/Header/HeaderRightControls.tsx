@@ -20,8 +20,8 @@ interface HeaderRightControlsProps {
     isDatabaseDataLoading: boolean;
     isAddClusterAvailable: boolean;
     isV2NavigationEnabled: boolean;
-    monitoringLinkUrl: string | null;
     clusterLinks: ClusterLinkWithTitle[];
+    databaseLinks: ClusterLinkWithTitle[];
     handleEditCluster?: () => Promise<boolean>;
     handleDeleteCluster?: () => Promise<boolean>;
 }
@@ -37,8 +37,8 @@ export function HeaderRightControls({
     isDatabaseDataLoading,
     isAddClusterAvailable,
     isV2NavigationEnabled,
-    monitoringLinkUrl,
     clusterLinks,
+    databaseLinks,
     handleEditCluster,
     handleDeleteCluster,
 }: HeaderRightControlsProps) {
@@ -58,8 +58,8 @@ export function HeaderRightControls({
                     databaseData={databaseData}
                     isDatabaseDataLoading={isDatabaseDataLoading}
                     isV2NavigationEnabled={isV2NavigationEnabled}
-                    monitoringLinkUrl={monitoringLinkUrl}
                     showDeveloperUI={showDeveloperUI}
+                    databaseLinks={databaseLinks}
                 />
             ) : null}
 

@@ -33,6 +33,7 @@ export function HeaderLeftControls({
                         text={databaseData.Name}
                         color="secondary"
                         size="s"
+                        tooltipInitialText={headerKeyset('action_copy-path')}
                     />
                 ) : null}
                 <ActionTooltip title={headerKeyset('description_connect-to-db')}>

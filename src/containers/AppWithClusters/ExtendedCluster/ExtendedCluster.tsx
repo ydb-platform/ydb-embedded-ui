@@ -3,6 +3,7 @@ import {ClipboardButton} from '@gravity-ui/uikit';
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
 import type {GetClusterLinks, GetDatabaseLinks} from '../../../uiFactory/types';
+import {CLUSTER_LINK_CONTEXT} from '../../../utils/clusterLinks/clusterLinkConstants';
 import {cn} from '../../../utils/cn';
 import {MONITORING_UI_TITLE} from '../../../utils/constants';
 import type {GetLogsLink} from '../../../utils/logs';
@@ -55,7 +56,7 @@ export const useAdditionalClusterProps = ({
             additionalClusterProps.links.push({
                 title: MONITORING_UI_TITLE,
                 url: clusterLink,
-                context: 'monitoring',
+                context: CLUSTER_LINK_CONTEXT.MONITORING,
             });
         }
     }
