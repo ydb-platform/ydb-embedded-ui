@@ -1,9 +1,8 @@
 import React from 'react';
 
 import {Wrench} from '@gravity-ui/icons';
-import {Button, Flex, Label} from '@gravity-ui/uikit';
+import {Flex, Label} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
-import {useHistory} from 'react-router-dom';
 
 import {getPDiskPagePath} from '../../routes';
 import {selectNodesMap} from '../../store/reducers/nodesList';
@@ -16,6 +15,7 @@ import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {bytesToGB, isNumeric} from '../../utils/utils';
+import {InternalButtonLink} from '../InternalButtonLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 import type {
@@ -113,8 +113,7 @@ export const preparePDiskHeaderLabels = (data: PreparedPDisk): YDBDefinitionList
 
 export const buildPDiskFooter = (
     data: PreparedPDisk,
-    withDeveloperUILink: boolean,
-    onNavigate: (path: string) => void,
+    withDeveloperUILink?: boolean,
 ): React.ReactNode | null => {
     const {NodeId, PDiskId} = data;
 
@@ -128,6 +127,7 @@ export const buildPDiskFooter = (
               pDiskId: PDiskId,
           })
         : undefined;
+    const pDiskPagePath = getPDiskPagePath(PDiskId, NodeId);
 
     return (
         <Flex direction="column" gap={5} alignItems="flex-start">
@@ -139,13 +139,9 @@ export const buildPDiskFooter = (
                     hideEndIcon
                 />
             )}
-            <Button
-                onClick={() => onNavigate(getPDiskPagePath(PDiskId, NodeId))}
-                view="action"
-                size="m"
-            >
+            <InternalButtonLink href={pDiskPagePath} view="action" size="m">
                 {pDiskPopupKeyset('action_go-to-pdisk')}
-            </Button>
+            </InternalButtonLink>
         </Flex>
     );
 };
@@ -156,7 +152,6 @@ interface PDiskPopupProps {
 
 export const PDiskPopup = ({data}: PDiskPopupProps) => {
     const database = useDatabaseFromQuery();
-    const history = useHistory();
     const hasDeveloperUi = useHasDeveloperUi();
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
     const nodeData = isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId);
@@ -168,11 +163,9 @@ export const PDiskPopup = ({data}: PDiskPopupProps) => {
         [data],
     );
 
-    const handleNavigateToPath = React.useCallback((path: string) => history.push(path), [history]);
-
     const footer = React.useMemo(
-        () => buildPDiskFooter(data, hasDeveloperUi, handleNavigateToPath),
-        [data, hasDeveloperUi, handleNavigateToPath],
+        () => buildPDiskFooter(data, hasDeveloperUi),
+        [data, hasDeveloperUi],
     );
 
     const pdiskId = data.StringifiedId;
