@@ -123,6 +123,10 @@
         }
     }
 
+    &__link_with-path {
+        color: var(--g-color-text-link);
+    }
+
     &__link_with-left-trim {
         text-align: end;
         direction: rtl;

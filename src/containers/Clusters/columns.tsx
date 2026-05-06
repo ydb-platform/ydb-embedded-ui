@@ -1,10 +1,8 @@
 import {Pencil, TrashBin} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
-import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {
     ClipboardButton,
-    DropdownMenu,
     Link as ExternalLink,
     Flex,
     Label,
@@ -12,12 +10,17 @@ import {
     Text,
 } from '@gravity-ui/uikit';
 
+import type {DropdownMenuItemWithDescription} from '../../components/DropdownMenu';
+import {DropdownMenu} from '../../components/DropdownMenu';
 import {EntityStatus} from '../../components/EntityStatusNew/EntityStatus';
 import {VersionsBar} from '../../components/VersionsBar/VersionsBar';
 import type {PreparedCluster} from '../../store/reducers/clusters/types';
+import type {ClusterLink} from '../../types/additionalProps';
 import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
-import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {CLUSTER_LINK_CONTEXT} from '../../utils/clusterLinks/clusterLinkConstants';
+import {resolveClusterLinks} from '../../utils/clusterLinks/resolveClusterLinks';
+import {EMPTY_DATA_PLACEHOLDER, MONITORING_UI_TITLE} from '../../utils/constants';
 import {formatNumber, formatStorageValuesToTb} from '../../utils/dataFormatters/dataFormatters';
 import {getCleanBalancerValue} from '../../utils/parseBalancer';
 import type {PreparedVersion} from '../../utils/versions/types';
@@ -98,28 +101,71 @@ function getTitleColumn({
             const cleanedBalancer = row.balancer ? getCleanBalancerValue(row.balancer) : null;
 
             const renderActions = () => {
-                const menuItems: (DropdownMenuItem | DropdownMenuItem[])[] = [];
+                const menuItems: (
+                    | DropdownMenuItemWithDescription
+                    | DropdownMenuItemWithDescription[]
+                )[] = [];
+
+                const additionalLinks: ClusterLink[] = [];
+
+                if (row.monitoring) {
+                    const monitoringUrl = uiFactory.getMonitoringClusterLink?.(
+                        row.monitoring,
+                        row.name,
+                    );
+
+                    if (monitoringUrl) {
+                        additionalLinks.push({
+                            title: MONITORING_UI_TITLE,
+                            url: monitoringUrl,
+                            context: CLUSTER_LINK_CONTEXT.MONITORING,
+                        });
+                    }
+                }
+
+                if (uiFactory.getClusterLinks) {
+                    additionalLinks.push(...uiFactory.getClusterLinks({clusterInfo: row}));
+                }
+
+                const clusterLinks = resolveClusterLinks(row, additionalLinks);
+
+                if (clusterLinks.length) {
+                    menuItems.push(
+                        clusterLinks.map((link) => ({
+                            title: link.title,
+                            description: link.description,
+                            iconStart: link.icon,
+                            href: link.url,
+                        })),
+                    );
+                }
 
                 const {onEditCluster, onDeleteCluster} = uiFactory;
 
+                const manageItems: DropdownMenuItemWithDescription[] = [];
+
                 if (isEditClusterAvailable && onEditCluster) {
-                    menuItems.push({
-                        text: i18n('edit-cluster'),
-                        iconStart: <Pencil />,
+                    manageItems.push({
+                        title: i18n('edit-cluster'),
+                        iconStart: Pencil,
                         action: () => {
                             onEditCluster({clusterData: row});
                         },
                     });
                 }
                 if (isDeleteClusterAvailable && onDeleteCluster) {
-                    menuItems.push({
-                        text: i18n('remove-cluster'),
-                        iconStart: <TrashBin />,
+                    manageItems.push({
+                        title: i18n('remove-cluster'),
+                        iconStart: TrashBin,
                         action: () => {
                             onDeleteCluster({clusterData: row});
                         },
                         theme: 'danger',
                     });
+                }
+
+                if (manageItems.length) {
+                    menuItems.push(manageItems);
                 }
 
                 if (!menuItems.length) {

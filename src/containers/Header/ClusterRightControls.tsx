@@ -7,8 +7,8 @@ import {DropdownMenu} from '../../components/DropdownMenu';
 import type {ClusterLinkWithTitle} from '../../types/additionalProps';
 import {CLUSTER_LINK_CONTEXT} from '../../utils/clusterLinks/clusterLinkConstants';
 
-import {ClusterMonitoringControl} from './ClusterMonitoringControl';
 import {DeveloperUIControl} from './GlobalRightControls';
+import {MonitoringControl} from './MonitoringControl';
 import {headerKeyset} from './i18n';
 
 interface ClusterRightControlsProps {
@@ -80,9 +80,7 @@ export function ClusterRightControls({
 
     return (
         <React.Fragment>
-            {monitoringClusterLink ? (
-                <ClusterMonitoringControl link={monitoringClusterLink} />
-            ) : null}
+            {monitoringClusterLink ? <MonitoringControl link={monitoringClusterLink} /> : null}
 
             {showDeveloperUI ? <DeveloperUIControl /> : null}
 

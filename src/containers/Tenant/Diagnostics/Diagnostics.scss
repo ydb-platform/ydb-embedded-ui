@@ -35,4 +35,10 @@
         // This prevents inheritance issues with percentage-based calculations
         container-type: size;
     }
+
+    &__monitoring-content {
+        .ydb-response-error {
+            max-width: 900px;
+        }
+    }
 }

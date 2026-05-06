@@ -63,11 +63,17 @@ interface LocationComputeSchema {
     path?: string;
 }
 
+interface LocationComputeStateStorage {
+    node?: LocationNode;
+    ring?: number;
+}
+
 interface LocationCompute {
     node?: LocationNode;
     pool?: LocationComputePool;
     tablet?: LocationComputeTablet;
     schema?: LocationComputeSchema;
+    state_storage?: LocationComputeStateStorage;
 }
 
 interface LocationDatabase {

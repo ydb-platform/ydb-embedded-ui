@@ -7,10 +7,11 @@ import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
+import type {TVDiskID} from '../../types/api/vdisk';
 import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatDurationSeconds, stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
+import {formatDurationSeconds, parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculateVDiskSeverity';
 import {
@@ -297,6 +298,19 @@ const prepareVDiskData = (
     return vdiskData;
 };
 
+/**
+ * Resolve VDiskId from PreparedVDisk data.
+ * Prefers the structured VDiskId when all fields are present,
+ * falls back to parsing StringifiedId (e.g. "123-1-0-0-0").
+ */
+const resolveVDiskId = (data: PreparedVDisk): Required<TVDiskID> | undefined => {
+    if (isAllVdiskParamsDefined(data.VDiskId)) {
+        return data.VDiskId;
+    }
+    const parsed = parseVdiskId(data.StringifiedId);
+    return isAllVdiskParamsDefined(parsed) ? parsed : undefined;
+};
+
 const buildVDiskFooter = (
     data: PreparedVDisk,
     withDeveloperUILink?: boolean,
@@ -306,7 +320,7 @@ const buildVDiskFooter = (
     }) => string | undefined,
     onSuccess?: () => void,
 ): React.ReactNode | null => {
-    const {NodeId, PDiskId, VDiskSlotId, StringifiedId, VDiskId, DonorMode} = data;
+    const {NodeId, PDiskId, VDiskSlotId, StringifiedId, DonorMode} = data;
 
     const vDiskInternalViewerPath =
         withDeveloperUILink && !isNil(VDiskSlotId) && !isNil(NodeId) && !isNil(PDiskId)
@@ -327,9 +341,9 @@ const buildVDiskFooter = (
 
     const hasLinks = vDiskPagePath || vDiskInternalViewerPath;
 
-    const isVDiskParamsDefined = isAllVdiskParamsDefined(VDiskId);
+    const resolvedVDiskId = resolveVDiskId(data);
 
-    if (!hasLinks && !isVDiskParamsDefined) {
+    if (!hasLinks && !resolvedVDiskId) {
         return null;
     }
 
@@ -353,9 +367,9 @@ const buildVDiskFooter = (
                     )}
                 </Flex>
             )}
-            {isVDiskParamsDefined && (
+            {resolvedVDiskId && (
                 <EvictVDiskButton
-                    vDiskId={VDiskId}
+                    vDiskId={resolvedVDiskId}
                     donorMode={DonorMode}
                     fullWidth
                     onSuccess={onSuccess}
@@ -429,7 +443,8 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
     );
 
     const handleAfterEvictVDisk = React.useCallback(() => {
-        const vDiskId = 'VDiskId' in data ? stringifyVdiskId(data.VDiskId) : undefined;
+        // Use StringifiedId directly — it matches the cache key used by getVDiskData
+        const vDiskId = isFullData ? data.StringifiedId : undefined;
         dispatch(
             api.util.invalidateTags([
                 'TableData',
@@ -440,7 +455,7 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
                 },
             ]),
         );
-    }, [dispatch, data]);
+    }, [dispatch, data, isFullData]);
 
     const vdiskHeaderLabels: YDBDefinitionListHeaderLabel[] = React.useMemo(
         () => (isFullData ? prepareHeaderLabels(data) : []),

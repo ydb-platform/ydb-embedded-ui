@@ -13,7 +13,7 @@ const config: PlaywrightTestConfig = {
             animations: 'disabled',
         },
     },
-    outputDir: './playwright-artifacts/test-results',
+    outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR || './playwright-artifacts/test-results',
     reporter: process.env.CI
         ? [['blob', {outputDir: './blob-report'}]]
         : [
@@ -26,8 +26,12 @@ const config: PlaywrightTestConfig = {
     webServer: baseUrl
         ? undefined
         : {
-              command: 'npm run dev',
+              command: 'npm start',
               env: {
+                  DISABLE_ESLINT_PLUGIN: 'true',
+                  TSC_COMPILE_ON_ERROR: 'true',
+                  REACT_APP_BACKEND: process.env.PLAYWRIGHT_APP_BACKEND || 'http://localhost:8765',
+                  REACT_APP_META_BACKEND: 'undefined',
                   REACT_APP_DISABLE_CHECKS: 'true',
                   REACT_APP_E2E_UI_OVERRIDES: 'true',
               },

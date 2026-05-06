@@ -59,6 +59,7 @@ export function ErrorFieldsList({
         requestUrl,
         method,
         errorCode,
+        grpcCode,
         message,
         errorOrigin,
         errorStage,
@@ -91,6 +92,14 @@ export function ErrorFieldsList({
                     copyText={errorCode}
                 >
                     <span className={valueClassName}>{errorCode}</span>
+                </DefinitionList.Item>
+            )}
+            {grpcCode !== undefined && (
+                <DefinitionList.Item
+                    name={i18n('error-details.label_grpc-code')}
+                    copyText={String(grpcCode)}
+                >
+                    <span className={valueClassName}>{grpcCode}</span>
                 </DefinitionList.Item>
             )}
             {showMessage && (
@@ -187,6 +196,7 @@ export function hasVisibleFields(details: ErrorDetails, renderedTitle?: string):
     const {
         requestUrl,
         errorCode,
+        grpcCode,
         errorOrigin,
         errorStage,
         traceId,
@@ -206,6 +216,7 @@ export function hasVisibleFields(details: ErrorDetails, renderedTitle?: string):
     return Boolean(
         requestUrl ||
             errorCode ||
+            grpcCode !== undefined ||
             showMessage ||
             errorOrigin ||
             errorStage ||

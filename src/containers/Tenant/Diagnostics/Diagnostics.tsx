@@ -8,12 +8,12 @@ import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/consta
 import {setDiagnosticsTab, useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import type {EPathSubType, EPathType} from '../../../types/api/schema';
-import {cn} from '../../../utils/cn';
 import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
 import type {DatabasePagesDisplay} from './DiagnosticsPages';
 import {DiagnosticsTabs} from './DiagnosticsTabs/DiagnosticsTabs';
+import {b} from './shared';
 import {renderDiagnosticsTabContent} from './tabsContent';
 import {useDiagnosticsPages} from './useDiagnosticsPages';
 
@@ -29,8 +29,6 @@ interface DiagnosticsProps {
     databasePagesDisplay?: DatabasePagesDisplay;
     additionalTenantProps?: AdditionalTenantsProps;
 }
-
-const b = cn('kv-tenant-diagnostics');
 
 function Diagnostics({
     path,

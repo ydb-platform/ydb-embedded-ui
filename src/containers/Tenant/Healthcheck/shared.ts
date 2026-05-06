@@ -1,4 +1,8 @@
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
+import {
+    isComputeRelatedType,
+    isStorageRelatedType,
+} from '../../../store/reducers/healthcheckInfo/utils';
 import {cn} from '../../../utils/cn';
 
 import i18n from './i18n';
@@ -43,9 +47,9 @@ export function countHealthcheckIssuesByType(
         if (!type) {
             continue;
         }
-        if (type.startsWith('STORAGE')) {
+        if (isStorageRelatedType(type)) {
             result.storage++;
-        } else if (type.startsWith('COMPUTE')) {
+        } else if (isComputeRelatedType(type)) {
             result.compute++;
         } else {
             result.unknown++;
