@@ -21,12 +21,25 @@ Open http://localhost:8765 to view it in the browser.
 ## Development
 
 1. Run on a machine with Docker installed:
+
    ```
    docker run --rm -ti --name ydb-local -h localhost \
       -p 8765:8765 \
       -e MON_PORT=8765 \
       ghcr.io/ydb-platform/local-ydb:nightly
    ```
+
+   On macOS with Colima on Apple Silicon, `ghcr.io/ydb-platform/local-ydb:nightly` can require `linux/amd64` emulation. Start Colima with Rosetta and run the container with an explicit platform:
+
+   ```
+   colima start --vm-type vz --vz-rosetta --cpu 4 --memory 8
+   docker context use colima
+   docker run --rm -ti --name ydb-local -h localhost --platform linux/amd64 \
+      -p 8765:8765 \
+      -e MON_PORT=8765 \
+      ghcr.io/ydb-platform/local-ydb:nightly
+   ```
+
 2. Install dependencies with `npm ci`
 3. Run the frontend app in the development mode, via invoking `npm run dev`
 4. Open [localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits.\
@@ -114,7 +127,7 @@ npm run test:e2e:docker:report
 
 ### CI
 
-E2E tests are run in CI in `e2e_tests` job. Tests run on Playwright `webServer` (it is started with `npm run dev`), `webServer` uses docker container `ghcr.io/ydb-platform/local-ydb:nightly` as backend.
+E2E tests are run in CI in `e2e_tests` job. Tests run on Playwright `webServer` (it is started with `npm run dev`), and the Docker test flow uses `ghcr.io/ydb-platform/local-ydb:nightly` as backend.
 
 ## Making a production bundle.
 
