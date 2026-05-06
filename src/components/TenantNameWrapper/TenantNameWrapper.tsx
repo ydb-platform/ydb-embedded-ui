@@ -1,8 +1,7 @@
 import React from 'react';
 
-import {ArrowUpRightFromSquare, Pencil, TrashBin} from '@gravity-ui/icons';
-import type {DropdownMenuItem} from '@gravity-ui/uikit';
-import {ClipboardButton, DropdownMenu, Flex, Icon, Link, Text} from '@gravity-ui/uikit';
+import {Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
+import {ClipboardButton, Flex, Link, Text} from '@gravity-ui/uikit';
 
 import {getTenantPath} from '../../routes';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
@@ -17,6 +16,9 @@ import {useDatabaseLinks} from '../../utils/clusterLinks/useDatabaseLinks';
 import {cn} from '../../utils/cn';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {canShowTenantMonitoring} from '../../utils/monitoringVisibility';
+import {getConnectToDBDialog} from '../ConnectToDB/ConnectToDBDialog';
+import type {DropdownMenuItemWithDescription} from '../DropdownMenu';
+import {DropdownMenu} from '../DropdownMenu';
 import {EntityStatus} from '../EntityStatusNew/EntityStatus';
 import {InternalLink} from '../InternalLink/InternalLink';
 
@@ -84,19 +86,15 @@ export function TenantNameWrapper({
     const dbStatus = tenant.Overall;
 
     const dbActions = React.useMemo(() => {
-        const menuItems: DropdownMenuItem[][] = [];
+        const menuItems: DropdownMenuItemWithDescription[][] = [];
 
-        if (!isUserAllowedToMakeChanges) {
-            return [];
-        }
-
-        const linksItems: DropdownMenuItem[] = [];
+        const linksItems: DropdownMenuItemWithDescription[] = [];
 
         for (const link of resolvedLinks) {
             linksItems.push({
-                text: link.title,
-                iconStart: link.icon ? <Icon data={link.icon} /> : undefined,
-                iconEnd: <ArrowUpRightFromSquare />,
+                title: link.title,
+                description: link.description,
+                iconStart: link.icon,
                 href: link.url,
             });
         }
@@ -105,13 +103,21 @@ export function TenantNameWrapper({
             menuItems.push(linksItems);
         }
 
+        menuItems.push([
+            {
+                title: i18n('action_connect-to-db'),
+                iconStart: PlugConnection,
+                action: () => getConnectToDBDialog({database: tenant.Name}),
+            },
+        ]);
+
         // Do not show edit and delete actions for domain
         if (tenant.Type !== 'Domain' && clusterName) {
-            const manageDbItems: DropdownMenuItem[] = [];
-            if (isEditDBAvailable) {
+            const manageDbItems: DropdownMenuItemWithDescription[] = [];
+            if (isEditDBAvailable && isUserAllowedToMakeChanges) {
                 manageDbItems.push({
-                    text: i18n('action_edit'),
-                    iconStart: <Pencil />,
+                    title: i18n('action_edit'),
+                    iconStart: Pencil,
                     action: () => {
                         uiFactory.onEditDB?.({
                             clusterName,
@@ -120,10 +126,10 @@ export function TenantNameWrapper({
                     },
                 });
             }
-            if (isDeleteDBAvailable) {
+            if (isDeleteDBAvailable && isUserAllowedToMakeChanges) {
                 manageDbItems.push({
-                    text: i18n('action_remove'),
-                    iconStart: <TrashBin />,
+                    title: i18n('action_remove'),
+                    iconStart: TrashBin,
                     action: () => {
                         uiFactory.onDeleteDB?.({
                             clusterName,

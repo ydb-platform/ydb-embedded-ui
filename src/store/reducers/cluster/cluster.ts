@@ -174,7 +174,7 @@ export function useClusterWithProxy() {
     return settings?.use_meta_proxy !== false;
 }
 
-export type ClusterInfo = ReturnType<typeof useClusterBaseInfo> & Record<string, unknown>;
+export type ClusterInfo = ReturnType<typeof useClusterBaseInfo>;
 
 const createClusterInfoSelector = createSelector(
     (clusterName?: string) => clusterName,

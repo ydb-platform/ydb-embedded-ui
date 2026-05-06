@@ -3,6 +3,7 @@
   "field_monitoring-link": "Monitoring",
   "field_logs-link": "Logs",
   "context_unknown": "unknown database",
-  "action_edit": "Edit",
-  "action_remove": "Remove"
+  "action_edit": "Edit Database",
+  "action_remove": "Remove Database",
+  "action_connect-to-db": "Connect to database"
 }

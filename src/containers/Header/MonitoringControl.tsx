@@ -9,10 +9,8 @@ interface MonitoringControlProps {
 }
 
 export function MonitoringControl({link}: MonitoringControlProps) {
-    const description =
-        link.description || headerKeyset('description_monitoring', {system: link.title});
     return (
-        <ActionTooltip title={description}>
+        <ActionTooltip title={link.description || ''} disabled={!link.description}>
             <Button view="flat" href={link.url} target="_blank">
                 {link.icon && <Icon data={link.icon} />}
                 {headerKeyset('title_monitoring', {system: link.title})}

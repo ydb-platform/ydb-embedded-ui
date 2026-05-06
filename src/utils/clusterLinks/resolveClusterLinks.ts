@@ -11,7 +11,16 @@ import i18n from './i18n';
 const KnownLinkType = {
     cluster: 'cluster',
     database: 'database',
-};
+} as const;
+
+const DESCRIPTION_I18N_KEYS = {
+    cores: 'description_cores-default',
+    logging: 'description_logging-default',
+    monitoring: 'description_monitoring-default',
+} as const satisfies Partial<Record<ClusterLinkContext, string>>;
+
+type DescriptionI18nKey = (typeof DESCRIPTION_I18N_KEYS)[keyof typeof DESCRIPTION_I18N_KEYS];
+type DescriptionI18nParams = {system: string};
 
 /** Default titles for known contexts, used when the link has no explicit title */
 const CONTEXT_DEFAULT_TITLES: Record<ClusterLinkContext, string> = {
@@ -21,11 +30,28 @@ const CONTEXT_DEFAULT_TITLES: Record<ClusterLinkContext, string> = {
     [CLUSTER_LINK_CONTEXT.MONITORING]: MONITORING_UI_TITLE,
 };
 
+function isClusterLinkContext(context: string | undefined): context is ClusterLinkContext {
+    return context !== undefined && context in CONTEXT_DEFAULT_TITLES;
+}
+
 /** Default descriptions for known contexts, used when the link has no explicit description */
-const CONTEXT_DEFAULT_DESCRIPTIONS: Partial<Record<ClusterLinkContext, string>> = {
-    [CLUSTER_LINK_CONTEXT.CORES]: i18n('description_cores-default'),
-    [CLUSTER_LINK_CONTEXT.LOGGING]: i18n('description_logging-default'),
+const CONTEXT_DEFAULT_DESCRIPTIONS_KEYS: Partial<Record<ClusterLinkContext, DescriptionI18nKey>> = {
+    [CLUSTER_LINK_CONTEXT.CORES]: DESCRIPTION_I18N_KEYS.cores,
+    [CLUSTER_LINK_CONTEXT.LOGGING]: DESCRIPTION_I18N_KEYS.logging,
+    [CLUSTER_LINK_CONTEXT.MONITORING]: DESCRIPTION_I18N_KEYS.monitoring,
 };
+
+function getDefaultContext(
+    context: ClusterLinkContext,
+    params?: DescriptionI18nParams,
+): string | undefined {
+    const i18nKey = CONTEXT_DEFAULT_DESCRIPTIONS_KEYS[context];
+    if (i18nKey) {
+        return i18n(i18nKey, params);
+    }
+
+    return undefined;
+}
 
 /**
  * Map of namespace prefixes to their source objects for dotted placeholder resolution.
@@ -153,12 +179,12 @@ export function substituteUrlParams(
 /**
  * Resolves the title for a link: explicit title > default title by context > undefined.
  */
-function getLinkTitle(title?: string, context?: string) {
+function getLinkTitle(title?: string, context?: string): string | undefined {
     if (title) {
         return title;
     }
-    if (context) {
-        return CONTEXT_DEFAULT_TITLES[context as ClusterLinkContext];
+    if (isClusterLinkContext(context)) {
+        return CONTEXT_DEFAULT_TITLES[context];
     }
     return undefined;
 }
@@ -166,12 +192,16 @@ function getLinkTitle(title?: string, context?: string) {
 /**
  * Resolves the description for a link: explicit description > default description by context > undefined.
  */
-function getLinkDescription(description?: string, context?: string) {
+function getLinkDescription(
+    description?: string,
+    context?: string,
+    params?: DescriptionI18nParams,
+): string | undefined {
     if (description) {
         return description;
     }
-    if (context) {
-        return CONTEXT_DEFAULT_DESCRIPTIONS[context as ClusterLinkContext];
+    if (isClusterLinkContext(context)) {
+        return getDefaultContext(context, params);
     }
     return undefined;
 }
@@ -234,7 +264,9 @@ function processDynamicLinks(
             }
 
             const icon = getContextIcon(link.context);
-            const description = getLinkDescription(link.description, link.context);
+            const description = getLinkDescription(link.description, link.context, {
+                system: title,
+            });
 
             result.push({
                 title,
@@ -275,7 +307,9 @@ function processAdditionalLinks(
             }
 
             const icon = link.icon ?? getContextIcon(link.context);
-            const description = getLinkDescription(link.description, link.context);
+            const description = getLinkDescription(link.description, link.context, {
+                system: title,
+            });
 
             result.push({...link, title, icon, description});
 
@@ -342,7 +376,9 @@ function processDynamicDatabaseLinks(
             }
 
             const icon = getContextIcon(link.context);
-            const description = getLinkDescription(link.description, link.context);
+            const description = getLinkDescription(link.description, link.context, {
+                system: title,
+            });
 
             result.push({
                 title,
@@ -378,7 +414,9 @@ function processAdditionalDatabaseLinks(
             }
 
             const icon = link.icon ?? getContextIcon(link.context);
-            const description = getLinkDescription(link.description, link.context);
+            const description = getLinkDescription(link.description, link.context, {
+                system: link.title,
+            });
 
             result.push({...link, icon, description});
 
