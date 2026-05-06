@@ -109,6 +109,20 @@ function createStorageGroupsResponse({
     };
 }
 
+async function setupMonitoringUserMock(page: Page) {
+    await page.route('**/viewer/json/whoami*', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                UserID: 'e2e-storage-popup-user',
+                IsMonitoringAllowed: true,
+                IsViewerAllowed: true,
+            }),
+        });
+    });
+}
+
 async function setupCapabilitiesMock(page: Page) {
     await page.route('**/viewer/capabilities*', async (route) => {
         await route.fulfill({
@@ -231,6 +245,7 @@ export async function setupPDiskInfoMock(page: Page) {
 }
 
 export async function setupVDiskPageMocks(page: Page, options: SetupVDiskPageMocksOptions = {}) {
+    await setupMonitoringUserMock(page);
     await setupCapabilitiesMock(page);
     await setupNodeInfoMock(page, options);
     await setupStorageGroupsMock(page, options);

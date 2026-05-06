@@ -18,6 +18,7 @@ interface ExternalLinkWithIconProps {
     className?: string;
     icon?: IconData;
     description?: string;
+    hideEndIcon?: boolean;
 }
 
 export const LinkWithIcon = ({
@@ -27,14 +28,19 @@ export const LinkWithIcon = ({
     className,
     icon,
     description,
+    hideEndIcon,
 }: ExternalLinkWithIconProps) => {
     const linkContent = (
         <React.Fragment>
             {icon ? <Icon data={icon} size={16} /> : null}
             {icon ? '\u00a0' : null}
             {title}
-            {'\u00a0'}
-            <ArrowUpRightFromSquare />
+            {hideEndIcon ? null : (
+                <React.Fragment>
+                    {'\u00a0'}
+                    <ArrowUpRightFromSquare />
+                </React.Fragment>
+            )}
         </React.Fragment>
     );
 

@@ -20,5 +20,7 @@
   "label_read": "Read",
   "label_write": "Write",
   "label_replication": "Replication",
-  "label_recipient": "Recipient"
+  "label_recipient": "Recipient",
+  "action_open-in-developer-ui": "Open in Developer UI",
+  "action_go-to-vdisk": "Go to VDisk"
 }

@@ -9,5 +9,7 @@
   "label_realtime": "Realtime",
   "label_device": "Device",
   "value_unknown": "unknown",
-  "value_of": "of"
+  "value_of": "of",
+  "action_open-in-developer-ui": "Open in Developer UI",
+  "action_go-to-pdisk": "Go to PDisk"
 }
