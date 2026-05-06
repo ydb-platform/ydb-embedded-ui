@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {Wrench} from '@gravity-ui/icons';
 import {Divider, Flex} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
@@ -27,6 +28,7 @@ import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
 import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/EvictVDiskButton';
 import {InternalLink} from '../InternalLink';
+import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {
     buildPDiskFooter,
@@ -34,7 +36,6 @@ import {
     preparePDiskHeaderLabels,
 } from '../PDiskPopup/PDiskPopup';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
-import {vDiskInfoKeyset} from '../VDiskInfo/i18n';
 import type {
     YDBDefinitionListHeaderLabel,
     YDBDefinitionListItem,
@@ -99,7 +100,12 @@ const buildUnavailableVDiskFooter = (
 
     return (
         <div className={b('links')}>
-            <LinkWithIcon title={'Developer UI'} url={vDiskInternalViewerPath} />
+            <LinkWithIcon
+                title={vDiskPopupKeyset('action_open-in-developer-ui')}
+                url={vDiskInternalViewerPath}
+                icon={Wrench}
+                hideEndIcon
+            />
         </div>
     );
 };
@@ -348,32 +354,30 @@ const buildVDiskFooter = (
     }
 
     return (
-        <Flex direction="column" gap={3}>
-            {hasLinks && (
-                <Flex className={b('links')} wrap="wrap" gap={2}>
+        <Flex direction="column" gap={5}>
+            {vDiskInternalViewerPath && (
+                <LinkWithIcon
+                    title={vDiskPopupKeyset('action_open-in-developer-ui')}
+                    url={vDiskInternalViewerPath}
+                    icon={Wrench}
+                    hideEndIcon
+                />
+            )}
+            {(vDiskPagePath || resolvedVDiskId) && (
+                <Flex wrap="wrap" gap={2}>
                     {vDiskPagePath && (
-                        <LinkWithIcon
-                            key={vDiskPagePath}
-                            title={vDiskInfoKeyset('vdisk-page')}
-                            url={vDiskPagePath}
-                            external={false}
-                        />
+                        <InternalLinkButton href={vDiskPagePath} view="action" size="m">
+                            {vDiskPopupKeyset('action_go-to-vdisk')}
+                        </InternalLinkButton>
                     )}
-                    {vDiskInternalViewerPath && (
-                        <LinkWithIcon
-                            title={vDiskInfoKeyset('developer-ui')}
-                            url={vDiskInternalViewerPath}
+                    {resolvedVDiskId && (
+                        <EvictVDiskButton
+                            vDiskId={resolvedVDiskId}
+                            donorMode={DonorMode}
+                            onSuccess={onSuccess}
                         />
                     )}
                 </Flex>
-            )}
-            {resolvedVDiskId && (
-                <EvictVDiskButton
-                    vDiskId={resolvedVDiskId}
-                    donorMode={DonorMode}
-                    fullWidth
-                    onSuccess={onSuccess}
-                />
             )}
         </Flex>
     );
