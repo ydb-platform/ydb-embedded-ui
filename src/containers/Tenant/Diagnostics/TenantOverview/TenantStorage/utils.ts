@@ -297,6 +297,31 @@ export function mergeSystemDetailsByMedia(
     }, getSystemDetailsBase());
 }
 
+export function getTenantStoragePhysicalMediaBreakdown({
+    allowAggregateFallback = false,
+    mediaType,
+    physicalSegmentsByMedia,
+    systemDetailsByMedia,
+}: {
+    allowAggregateFallback?: boolean;
+    mediaType?: string;
+    physicalSegmentsByMedia: Record<string, TenantStorageSegment[]>;
+    systemDetailsByMedia: Record<string, TenantStorageSystemDetail[]>;
+}) {
+    const mediaKey = getTenantStorageMediaKey(mediaType);
+    const segments = physicalSegmentsByMedia[mediaKey];
+    const systemDetails = systemDetailsByMedia[mediaKey];
+
+    if (segments || systemDetails || !allowAggregateFallback || mediaKey === EType.None) {
+        return {segments, systemDetails};
+    }
+
+    return {
+        segments: physicalSegmentsByMedia[EType.None],
+        systemDetails: systemDetailsByMedia[EType.None],
+    };
+}
+
 function buildPhysicalSegmentsByMedia(tabletTypeRows: TStorageStatsTabletTypeEntry[] | undefined) {
     const segmentsByMedia: Record<string, TenantStorageSegment[]> = {};
     const systemDetailsByMedia: Record<string, TenantStorageSystemDetail[]> = {};

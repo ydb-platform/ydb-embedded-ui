@@ -23,8 +23,8 @@ import type {
     TenantStorageSystemDetail,
 } from './utils';
 import {
-    getTenantStorageMediaKey,
     getTenantStoragePhysicalDisplaySegments,
+    getTenantStoragePhysicalMediaBreakdown,
     getTenantStorageSegmentDisplayValue,
     getTenantStorageUserDataDisplaySummary,
     mergeSystemDetailsByMedia,
@@ -219,13 +219,18 @@ function getMediaSectionRows({
         physicalSegments = data.summary.physical.segments;
         systemDetails = mergeSystemDetailsByMedia(data.systemDetailsByMedia);
     } else {
-        const mediaBreakdownKey = getTenantStorageMediaKey(section.mediaType);
+        const mediaBreakdown = getTenantStoragePhysicalMediaBreakdown({
+            allowAggregateFallback: !showMediaTypeLabel,
+            mediaType: section.mediaType,
+            physicalSegmentsByMedia: data.physicalSegmentsByMedia,
+            systemDetailsByMedia: data.systemDetailsByMedia,
+        });
 
         physicalSegments = getTenantStoragePhysicalDisplaySegments({
-            segments: data.physicalSegmentsByMedia[mediaBreakdownKey],
+            segments: mediaBreakdown.segments,
             used: section.physical.used,
         });
-        systemDetails = data.systemDetailsByMedia[mediaBreakdownKey];
+        systemDetails = mediaBreakdown.systemDetails;
     }
 
     return {

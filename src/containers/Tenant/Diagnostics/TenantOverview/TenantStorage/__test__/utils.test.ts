@@ -6,6 +6,7 @@ import {
     buildTenantStorageData,
     buildTenantStorageMediaSections,
     getTenantStoragePhysicalDisplaySegments,
+    getTenantStoragePhysicalMediaBreakdown,
     getTenantStorageUserDataDisplaySummary,
     isSystemStoragePath,
     mergeSystemDetailsByMedia,
@@ -216,6 +217,59 @@ describe('buildTenantStorageData', () => {
             {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 0},
         ]);
         expect(result.summary.physical.overhead).toBeCloseTo(650 / 350);
+    });
+
+    test('uses aggregate physical breakdown for single concrete media when per-media breakdown is missing', () => {
+        const result = buildTenantStorageData(
+            {
+                tabletTypeRows: [
+                    {
+                        Type: 'DataShard',
+                        StorageSize: 500,
+                    },
+                    {
+                        Type: 'Hive',
+                        StorageSize: 100,
+                    },
+                ],
+                topRows: [],
+            },
+            {
+                blobStorageUsed: 600,
+                blobStorageLimit: 1_000,
+                tabletStorageUsed: 300,
+                tabletStorageLimit: 700,
+            },
+        );
+
+        const breakdownWithFallback = getTenantStoragePhysicalMediaBreakdown({
+            allowAggregateFallback: true,
+            mediaType: EType.SSD,
+            physicalSegmentsByMedia: result.physicalSegmentsByMedia,
+            systemDetailsByMedia: result.systemDetailsByMedia,
+        });
+        const breakdownWithoutFallback = getTenantStoragePhysicalMediaBreakdown({
+            mediaType: EType.SSD,
+            physicalSegmentsByMedia: result.physicalSegmentsByMedia,
+            systemDetailsByMedia: result.systemDetailsByMedia,
+        });
+
+        expect(breakdownWithFallback.segments).toBe(result.physicalSegmentsByMedia[EType.None]);
+        expect(breakdownWithFallback.systemDetails).toBe(result.systemDetailsByMedia[EType.None]);
+        expect(breakdownWithFallback.segments).toEqual([
+            {key: TENANT_STORAGE_SEGMENT_KEYS.system, value: 100},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 500},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.columnTables, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 0},
+        ]);
+        expect(breakdownWithFallback.systemDetails).toEqual(
+            expect.arrayContaining([{key: TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive, value: 100}]),
+        );
+        expect(breakdownWithoutFallback).toEqual({
+            segments: undefined,
+            systemDetails: undefined,
+        });
     });
 
     test('returns zero database share when logical used is zero', () => {
