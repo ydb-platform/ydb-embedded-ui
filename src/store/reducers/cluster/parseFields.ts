@@ -9,6 +9,55 @@ import type {
     MetaClusterTraceView,
 } from '../../../types/api/meta';
 
+export interface PreparedClusterLinks {
+    monitoring: MetaBaseClusterInfo['solomon'];
+    traceView: MetaClusterTraceView | undefined;
+    cores: MetaClusterCoresUrl | undefined;
+    logging: MetaClusterLogsUrls | undefined;
+    settings: MetaClusterSettings | undefined;
+    links: MetaClusterLinks | undefined;
+}
+
+const monitoringSchema = z.object({
+    monitoring_url: z.string().url(),
+    serverless_dashboard: z.string().optional(),
+    dedicated_dashboard: z.string().optional(),
+    cluster_dashboard: z.string().optional(),
+    host: z.string().optional(),
+    slot: z.string().optional(),
+    cluster_name: z.string().optional(),
+});
+
+export function parseMonitoringField(
+    monitoring: MetaBaseClusterInfo['solomon'],
+): MetaBaseClusterInfo['solomon'] {
+    if (!monitoring) {
+        return undefined;
+    }
+
+    if (typeof monitoring === 'object') {
+        return monitoringSchema.safeParse(monitoring).data;
+    }
+
+    const trimmedMonitoring = monitoring.trim();
+
+    if (!trimmedMonitoring) {
+        return undefined;
+    }
+
+    try {
+        const parsedMonitoring = JSON.parse(trimmedMonitoring);
+
+        if (typeof parsedMonitoring === 'string') {
+            return parsedMonitoring;
+        }
+
+        return monitoringSchema.safeParse(parsedMonitoring).data;
+    } catch {
+        return trimmedMonitoring;
+    }
+}
+
 const traceViewSchema = z.object({
     url: z.string().url(),
 });
@@ -110,4 +159,20 @@ export function parseLinksField(links: MetaBaseClusterInfo['links']): MetaCluste
     }
 
     return undefined;
+}
+
+export function prepareClusterLinksFields(
+    data: Pick<
+        MetaBaseClusterInfo,
+        'solomon' | 'trace_view' | 'cores' | 'logging' | 'settings' | 'links'
+    >,
+): PreparedClusterLinks {
+    return {
+        monitoring: parseMonitoringField(data.solomon),
+        traceView: parseTraceField(data.trace_view),
+        cores: parseCoresUrl(data.cores),
+        logging: parseLoggingUrls(data.logging),
+        settings: parseSettingsField(data.settings),
+        links: parseLinksField(data.links),
+    };
 }

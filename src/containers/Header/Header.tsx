@@ -36,8 +36,8 @@ export function Header() {
         handleDeleteCluster,
         databaseData,
         isDatabaseDataLoading,
-        monitoringLinkUrl,
         clusterLinks,
+        databaseLinks,
     } = useHeaderData({
         metaCapabilitiesLoaded,
         database,
@@ -89,8 +89,8 @@ export function Header() {
                 isDatabaseDataLoading={isDatabaseDataLoading}
                 isAddClusterAvailable={isAddClusterAvailable}
                 isV2NavigationEnabled={isV2NavigationEnabled}
-                monitoringLinkUrl={monitoringLinkUrl}
                 clusterLinks={clusterLinks}
+                databaseLinks={databaseLinks}
                 handleEditCluster={handleEditCluster}
                 handleDeleteCluster={handleDeleteCluster}
             />
