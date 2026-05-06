@@ -122,7 +122,7 @@
             border-left: unset;
         }
 
-        &__td:has(a) {
+        &__td:has(> a) {
             color: var(--g-color-text-link);
         }
 

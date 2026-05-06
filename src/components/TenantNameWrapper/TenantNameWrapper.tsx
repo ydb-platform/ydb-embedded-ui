@@ -88,10 +88,6 @@ export function TenantNameWrapper({
     const dbActions = React.useMemo(() => {
         const menuItems: DropdownMenuItemWithDescription[][] = [];
 
-        if (!isUserAllowedToMakeChanges) {
-            return [];
-        }
-
         const linksItems: DropdownMenuItemWithDescription[] = [];
 
         for (const link of resolvedLinks) {
@@ -118,7 +114,7 @@ export function TenantNameWrapper({
         // Do not show edit and delete actions for domain
         if (tenant.Type !== 'Domain' && clusterName) {
             const manageDbItems: DropdownMenuItemWithDescription[] = [];
-            if (isEditDBAvailable) {
+            if (isEditDBAvailable && isUserAllowedToMakeChanges) {
                 manageDbItems.push({
                     title: i18n('action_edit'),
                     iconStart: Pencil,
@@ -130,7 +126,7 @@ export function TenantNameWrapper({
                     },
                 });
             }
-            if (isDeleteDBAvailable) {
+            if (isDeleteDBAvailable && isUserAllowedToMakeChanges) {
                 manageDbItems.push({
                     title: i18n('action_remove'),
                     iconStart: TrashBin,
