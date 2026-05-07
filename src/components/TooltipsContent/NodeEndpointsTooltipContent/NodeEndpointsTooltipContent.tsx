@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {Wrench} from '@gravity-ui/icons';
-import {Flex} from '@gravity-ui/uikit';
 
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import {uiFactory} from '../../../uiFactory/uiFactory';
@@ -74,7 +73,7 @@ export const NodeEndpointsTooltipContent = ({data}: NodeEdpointsTooltipProps) =>
         }
 
         return (
-            <Flex direction="column" gap={5}>
+            <React.Fragment>
                 {developerUIInternalHref ? (
                     <LinkWithIcon
                         title={i18n('context_developer-ui')}
@@ -84,7 +83,7 @@ export const NodeEndpointsTooltipContent = ({data}: NodeEdpointsTooltipProps) =>
                     />
                 ) : null}
                 {nodeActions}
-            </Flex>
+            </React.Fragment>
         );
     }, [developerUIInternalHref, nodeActions]);
 
