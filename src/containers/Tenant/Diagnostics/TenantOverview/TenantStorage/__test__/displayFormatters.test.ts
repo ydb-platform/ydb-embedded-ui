@@ -70,6 +70,7 @@ describe('TenantStorage display formatters', () => {
         expect(getTenantStorageSummaryMetricUnit([600_000_000, 250_000_000, 900_000_000])).toBe(
             'mb',
         );
+        expect(getTenantStorageSummaryMetricUnit([500_000, undefined])).toBe('mb');
     });
 
     test('keeps summary values in the requested unit', () => {

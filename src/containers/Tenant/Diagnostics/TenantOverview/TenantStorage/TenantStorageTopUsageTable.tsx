@@ -24,12 +24,12 @@ import {
 import {formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
 import {mapPathTypeToEntityName, mapPathTypeToNavigationTreeType} from '../../../utils/schema';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
-import i18n from '../i18n';
 
 import {
     formatTenantStorageTableMetric,
     formatTenantStorageTableOverhead,
 } from './displayFormatters';
+import i18n from './i18n';
 import type {TenantStorageTopRow} from './utils';
 import {isSystemStoragePath} from './utils';
 
@@ -82,12 +82,12 @@ function TypeCell({row}: {row: TenantStorageTopRow}) {
     let label =
         row.displayTypeLabel ??
         mapPathTypeToEntityName(row.pathType, row.pathSubType) ??
-        i18n('storage.new.type-unknown');
+        i18n('value_object');
 
     if (!row.displayTypeLabel && isSystemStoragePath(row.path)) {
-        label = i18n('storage.new.type-system');
+        label = i18n('value_system-table');
     } else if (!row.displayTypeLabel && row.pathType === EPathType.EPathTypeTable) {
-        label = i18n('storage.new.type-row-table');
+        label = i18n('value_row-table');
     }
 
     return (
@@ -126,22 +126,15 @@ function ObjectPathCell({row}: {row: TenantStorageTopRow}) {
     );
 }
 
-const SPACE_WARNING_THRESHOLD = 0.6;
-
 function DatabaseSpaceCell({row}: {row: TenantStorageTopRow}) {
     const share = Math.min(Math.max(row.dbShare, 0), 1);
     const percent = share * 100;
     const precision = percent > 0 && percent < 1 ? 1 : 0;
-    const isWarning = share >= SPACE_WARNING_THRESHOLD;
 
     return (
         <Flex alignItems="flex-start" gap="2" className={b('space-cell')}>
             <div className={b('space-progress')}>
-                <Progress
-                    value={percent}
-                    size="s"
-                    className={b('space-progress-bar', {warning: isWarning})}
-                />
+                <Progress value={percent} size="s" className={b('space-progress-bar')} />
             </div>
             <Text variant="body-1" className={b('space-value')}>
                 {formatPercent(share, precision) || EMPTY_DATA_PLACEHOLDER}
@@ -154,28 +147,28 @@ function getTopUsageColumns(): Column<TenantStorageTopRow>[] {
     return [
         {
             name: 'type',
-            header: i18n('storage.new.table.type'),
+            header: i18n('field_type'),
             width: 130,
             align: DataTable.LEFT,
             render: ({row}) => <TypeCell row={row} />,
         },
         {
             name: 'path',
-            header: i18n('storage.new.table.object-path'),
+            header: i18n('field_object-path'),
             width: undefined,
             align: DataTable.LEFT,
             render: ({row}) => <ObjectPathCell row={row} />,
         },
         {
             name: 'dbShare',
-            header: i18n('storage.new.table.database-space'),
+            header: i18n('field_database-space'),
             width: 220,
             align: DataTable.LEFT,
             render: ({row}) => <DatabaseSpaceCell row={row} />,
         },
         {
             name: 'dataSize',
-            header: i18n('storage.new.table.user-data'),
+            header: i18n('field_user-data'),
             width: 100,
             align: DataTable.LEFT,
             render: ({row}) => (
@@ -184,7 +177,7 @@ function getTopUsageColumns(): Column<TenantStorageTopRow>[] {
         },
         {
             name: 'storageSize',
-            header: i18n('storage.new.table.physical-disk'),
+            header: i18n('field_physical-disk'),
             width: 140,
             align: DataTable.LEFT,
             render: ({row}) => (
@@ -195,8 +188,8 @@ function getTopUsageColumns(): Column<TenantStorageTopRow>[] {
             name: 'overhead',
             header: (
                 <Flex alignItems="center" gap="1">
-                    <span>{i18n('storage.new.table.overhead')}</span>
-                    <HelpMark iconSize="s">{i18n('storage.new.overhead-description')}</HelpMark>
+                    <span>{i18n('field_overhead')}</span>
+                    <HelpMark iconSize="s">{i18n('context_overhead-description')}</HelpMark>
                 </Flex>
             ),
             width: 106,
@@ -224,11 +217,9 @@ export function TenantStorageTopUsageTable({
                 withData={withData}
                 title={
                     <React.Fragment>
-                        <Text variant="subheader-3">
-                            {i18n('storage.new.top-space-title-main')}
-                        </Text>
+                        <Text variant="subheader-3">{i18n('title_top-space-usage-main')}</Text>
                         <Text variant="subheader-3" color="hint">
-                            {i18n('storage.new.top-space-title-suffix')}
+                            {i18n('title_top-space-usage-suffix')}
                         </Text>
                     </React.Fragment>
                 }

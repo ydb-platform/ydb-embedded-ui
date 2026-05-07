@@ -8,6 +8,7 @@ import {
     UNKNOWN_MEDIA_TYPE,
     normalizeMediaType,
 } from '../../../../../utils/disks/normalizeMediaType';
+import {parseNonNegativeNumber, parseOptionalNonNegativeNumber} from '../../../../../utils/utils';
 
 import type {TenantStorageMetrics} from './types';
 
@@ -140,15 +141,11 @@ const PHYSICAL_SYSTEM_TABLET_DETAIL_KEY_BY_TYPE: Partial<
 };
 
 function normalizeNumber(value: number | string | undefined) {
-    const numericValue = Number(value);
-
-    return Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : 0;
+    return parseNonNegativeNumber(value);
 }
 
 function toOptionalNumber(value: number | string | undefined) {
-    const numericValue = Number(value);
-
-    return Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : undefined;
+    return parseOptionalNonNegativeNumber(value);
 }
 
 function calculateUsedPercent(used: number, total?: number) {

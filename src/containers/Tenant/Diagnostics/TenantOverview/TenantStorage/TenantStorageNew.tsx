@@ -19,55 +19,56 @@ import './TenantStorageNew.scss';
 
 const b = cn('ydb-tenant-storage-new');
 
-function TenantStorageSummarySkeleton({grouped}: {grouped: boolean}) {
-    const cardRowsCount = grouped ? 2 : 1;
-
+function TenantStorageSummarySkeleton() {
     return (
-        <div className={b('sections-group')}>
-            <div className={b('sections-inner')}>
+        <Flex direction="column" className={b('sections-group')}>
+            <Flex direction="column" gap={3} className={b('sections-inner')}>
                 {[0, 1].map((cardIndex) => (
-                    <div key={cardIndex} className={b('summary-skeleton-card')}>
+                    <Flex
+                        key={cardIndex}
+                        direction="column"
+                        gap={3}
+                        className={b('summary-skeleton-card')}
+                    >
                         <Skeleton className={b('summary-skeleton-title')} delay={0} />
                         <Skeleton className={b('summary-skeleton-description')} delay={0} />
-                        <div className={b('summary-skeleton-rows')}>
-                            {Array.from({length: cardRowsCount}).map((_, rowIndex) => (
-                                <div key={rowIndex} className={b('summary-skeleton-row')}>
-                                    <div className={b('summary-skeleton-header')}>
-                                        {grouped ? (
+                        <Flex direction="column" gap={3} className={b('summary-skeleton-rows')}>
+                            <Flex direction="column" gap={3} className={b('summary-skeleton-row')}>
+                                <Flex
+                                    justifyContent="space-between"
+                                    alignItems="flex-start"
+                                    gap={4}
+                                    className={b('summary-skeleton-header')}
+                                >
+                                    <div />
+                                    <Flex
+                                        wrap
+                                        justifyContent="flex-end"
+                                        gap={3}
+                                        className={b('summary-skeleton-metrics')}
+                                    >
+                                        {[0, 1, 2].map((metricIndex) => (
                                             <Skeleton
-                                                className={b('summary-skeleton-label')}
+                                                key={metricIndex}
+                                                className={b('summary-skeleton-metric')}
                                                 delay={0}
                                             />
-                                        ) : (
-                                            <div />
-                                        )}
-                                        <div className={b('summary-skeleton-metrics')}>
-                                            {[0, 1, 2].map((metricIndex) => (
-                                                <Skeleton
-                                                    key={metricIndex}
-                                                    className={b('summary-skeleton-metric')}
-                                                    delay={0}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <Skeleton
-                                        className={b('summary-skeleton-progress')}
-                                        delay={0}
-                                    />
-                                    <div className={b('summary-skeleton-footer')}>
-                                        <Skeleton
-                                            className={b('summary-skeleton-percent')}
-                                            delay={0}
-                                        />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                                        ))}
+                                    </Flex>
+                                </Flex>
+                                <Skeleton className={b('summary-skeleton-progress')} delay={0} />
+                                <Flex
+                                    justifyContent="flex-end"
+                                    className={b('summary-skeleton-footer')}
+                                >
+                                    <Skeleton className={b('summary-skeleton-percent')} delay={0} />
+                                </Flex>
+                            </Flex>
+                        </Flex>
+                    </Flex>
                 ))}
-            </div>
-        </div>
+            </Flex>
+        </Flex>
     );
 }
 
@@ -102,7 +103,7 @@ export function TenantStorageNew({
     if (loading) {
         return (
             <Flex direction="column" gap={4} className={b()}>
-                <TenantStorageSummarySkeleton grouped={grouped} />
+                <TenantStorageSummarySkeleton />
                 <TenantStorageTopUsageTable loading error={undefined} rows={[]} withData={false} />
             </Flex>
         );

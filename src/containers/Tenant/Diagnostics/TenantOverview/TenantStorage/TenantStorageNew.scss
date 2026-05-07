@@ -17,10 +17,6 @@
     }
 
     &__summary-skeleton-card {
-        display: flex;
-        flex-direction: column;
-        gap: var(--g-spacing-3);
-
         padding: var(--g-spacing-4);
 
         border-radius: var(--g-border-radius-xs);
@@ -37,37 +33,6 @@
         height: 20px;
     }
 
-    &__summary-skeleton-rows {
-        display: flex;
-        flex-direction: column;
-        gap: var(--g-spacing-3);
-    }
-
-    &__summary-skeleton-row {
-        display: flex;
-        flex-direction: column;
-        gap: var(--g-spacing-3);
-    }
-
-    &__summary-skeleton-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: var(--g-spacing-4);
-    }
-
-    &__summary-skeleton-label {
-        width: 56px;
-        height: 24px;
-    }
-
-    &__summary-skeleton-metrics {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: var(--g-spacing-3);
-    }
-
     &__summary-skeleton-metric {
         width: 92px;
         height: 42px;
@@ -76,11 +41,6 @@
     &__summary-skeleton-progress {
         width: 100%;
         height: 20px;
-    }
-
-    &__summary-skeleton-footer {
-        display: flex;
-        justify-content: flex-end;
     }
 
     &__summary-skeleton-percent {

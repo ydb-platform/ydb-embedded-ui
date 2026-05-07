@@ -97,17 +97,12 @@
     }
 
     &__space-progress-bar {
-        --g-progress-filled-background-color: var(--g-color-base-positive-medium);
-        --g-progress-empty-background-color: var(--g-color-base-positive-light);
+        --g-progress-filled-background-color: var(--g-color-base-info-medium);
+        --g-progress-empty-background-color: var(--g-color-base-info-light);
 
         height: 10px;
 
         border-radius: var(--g-border-radius-xs);
-    }
-
-    &__space-progress-bar_warning {
-        --g-progress-filled-background-color: var(--g-color-base-warning-medium);
-        --g-progress-empty-background-color: var(--g-color-base-warning-light);
     }
 
     &__space-progress-bar .g-progress__item {

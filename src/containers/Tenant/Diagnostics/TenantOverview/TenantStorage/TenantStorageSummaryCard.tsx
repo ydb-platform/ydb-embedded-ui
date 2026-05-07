@@ -4,10 +4,10 @@ import {Flex, HelpMark, Label, Progress, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../../utils/cn';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
-import i18n from '../i18n';
 
 import {LegendItems, SegmentedProgressBar} from './TenantStorageSegments';
 import {formatSummaryPercent} from './displayFormatters';
+import i18n from './i18n';
 import type {
     TenantStorageSegment,
     TenantStorageSegmentKey,
@@ -265,7 +265,7 @@ function SummaryCardRow({
                 )}
                 <Text color="secondary" className={b('used')}>
                     {!total && displayNoLimit === 'filled'
-                        ? i18n('storage.new.quota-unlimited')
+                        ? i18n('value_no-limit')
                         : formatSummaryPercent(summary.usedPercent)}
                 </Text>
             </Flex>

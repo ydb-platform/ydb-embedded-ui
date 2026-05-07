@@ -103,6 +103,27 @@ export function isNumeric(value?: unknown): value is number | string {
     return false;
 }
 
+interface ParseOptionalNonNegativeNumberOptions {
+    emptyStringAsUndefined?: boolean;
+}
+
+export function parseOptionalNonNegativeNumber(
+    value: unknown,
+    {emptyStringAsUndefined = false}: ParseOptionalNonNegativeNumberOptions = {},
+) {
+    if (emptyStringAsUndefined && typeof value === 'string' && value.trim() === '') {
+        return undefined;
+    }
+
+    const numericValue = Number(value);
+
+    return Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : undefined;
+}
+
+export function parseNonNegativeNumber(value: unknown, defaultValue = 0) {
+    return parseOptionalNonNegativeNumber(value) ?? defaultValue;
+}
+
 export function toExponential(value: number, precision?: number) {
     return Number(value).toExponential(precision);
 }

@@ -7,6 +7,7 @@ import type {
 } from '../../../../types/api/storage';
 import {QUERY_TECHNICAL_MARK} from '../../../../utils/constants';
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../../utils/query';
+import {parseNonNegativeNumber, parseOptionalNonNegativeNumber} from '../../../../utils/utils';
 import {api} from '../../api';
 
 export interface TenantStorageRawTopRow {
@@ -49,19 +50,11 @@ LIMIT ${TOP_STORAGE_OBJECTS_LIMIT}
 }
 
 function normalizeNumericValue(value: number | string | undefined) {
-    const numericValue = Number(value);
-
-    return Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : 0;
+    return parseNonNegativeNumber(value);
 }
 
 function toOptionalNumericValue(value: number | string | undefined) {
-    if (value === undefined || (typeof value === 'string' && value.trim() === '')) {
-        return undefined;
-    }
-
-    const numericValue = Number(value);
-
-    return Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : undefined;
+    return parseOptionalNonNegativeNumber(value, {emptyStringAsUndefined: true});
 }
 
 function getAbsolutePath({

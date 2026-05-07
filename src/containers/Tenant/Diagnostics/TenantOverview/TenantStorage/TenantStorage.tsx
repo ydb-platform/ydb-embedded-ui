@@ -10,10 +10,10 @@ import {useSearchQuery} from '../../../../../utils/hooks';
 import {TenantTabsGroups} from '../../../TenantPages';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
-import i18n from '../i18n';
 
 import {TopGroups} from './TopGroups';
 import {TopTables} from './TopTables';
+import i18n from './i18n';
 import {storageDashboardConfig} from './storageDashboardConfig';
 import type {TenantStorageProps} from './types';
 
@@ -27,8 +27,8 @@ export function TenantStorage({database, metrics, databaseType}: TenantStoragePr
         {
             label: (
                 <LabelWithPopover
-                    text={i18n('storage.tablet-storage-title')}
-                    popoverContent={i18n('storage.tablet-storage-description')}
+                    text={i18n('title_tablet-storage')}
+                    popoverContent={i18n('context_tablet-storage-description')}
                 />
             ),
             value: (
@@ -43,8 +43,8 @@ export function TenantStorage({database, metrics, databaseType}: TenantStoragePr
         {
             label: (
                 <LabelWithPopover
-                    text={i18n('storage.db-storage-title')}
-                    popoverContent={i18n('storage.db-storage-description')}
+                    text={i18n('title_database-storage')}
+                    popoverContent={i18n('context_database-storage-description')}
                 />
             ),
             value: (

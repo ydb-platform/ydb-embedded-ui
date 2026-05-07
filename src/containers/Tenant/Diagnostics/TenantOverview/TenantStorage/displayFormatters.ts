@@ -3,7 +3,9 @@ import {getBytesSizeUnit, sizes} from '../../../../../utils/bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatNumber, formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatMetricBytes} from '../../../../../utils/storageMetrics';
-import i18n from '../i18n';
+import {parseOptionalNonNegativeNumber} from '../../../../../utils/utils';
+
+import i18n from './i18n';
 
 type TenantStorageSummaryMetricUnit = 'pb' | 'tb' | 'gb' | 'mb';
 
@@ -20,41 +22,27 @@ export function formatSummaryPercent(value: number) {
     const precision = value > 0 && value < 1 ? 1 : 0;
     const formattedValue = formatPercent(value / 100, precision);
 
-    return value > 0 && formattedValue
-        ? i18n('storage.new.used-percent', {value: formattedValue})
-        : '';
-}
-
-function getNumericByteValue(value?: string | number) {
-    const numericValue = Number(value);
-
-    return Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : undefined;
+    return value > 0 && formattedValue ? i18n('context_used-percent', {value: formattedValue}) : '';
 }
 
 function formatByteMetric(value?: string | number, size?: BytesSizes) {
     return formatMetricBytes(value, size, TENANT_STORAGE_FORMAT_OPTIONS);
 }
 
+function normalizeTenantStorageSummaryMetricUnit(unit: BytesSizes): TenantStorageSummaryMetricUnit {
+    return unit === 'b' || unit === 'kb' ? 'mb' : unit;
+}
+
 export function getTenantStorageSummaryMetricUnit(
     values: Array<string | number | undefined>,
 ): TenantStorageSummaryMetricUnit {
-    const numericValues = values
-        .map((value) => getNumericByteValue(value))
-        .filter((value): value is number => value !== undefined);
+    const maxValue = values.reduce<number>((currentMax, value) => {
+        const numericValue = parseOptionalNonNegativeNumber(value);
 
-    if (numericValues.some((value) => value >= sizes.pb.value)) {
-        return 'pb';
-    }
+        return numericValue === undefined ? currentMax : Math.max(currentMax, numericValue);
+    }, 0);
 
-    if (numericValues.some((value) => value >= sizes.tb.value)) {
-        return 'tb';
-    }
-
-    if (numericValues.some((value) => value >= sizes.gb.value)) {
-        return 'gb';
-    }
-
-    return 'mb';
+    return normalizeTenantStorageSummaryMetricUnit(getBytesSizeUnit(maxValue));
 }
 
 export function formatTenantStorageSummaryMetric(
@@ -68,7 +56,7 @@ export function formatTenantStorageApproximateMetric(
     value?: string | number,
     size?: TenantStorageSummaryMetricUnit,
 ) {
-    const numericValue = getNumericByteValue(value);
+    const numericValue = parseOptionalNonNegativeNumber(value);
 
     if (numericValue === undefined) {
         return EMPTY_DATA_PLACEHOLDER;
@@ -94,7 +82,7 @@ function getLowerByteUnit(size: BytesSizes) {
 
 export function getTenantStorageSegmentValueFormatters(values: Array<string | number | undefined>) {
     const numericValues = values
-        .map((value) => getNumericByteValue(value))
+        .map((value) => parseOptionalNonNegativeNumber(value))
         .filter((value): value is number => value !== undefined && value > 0);
     const minValue = Math.min(...numericValues);
     const maxValue = Math.max(...numericValues);
@@ -102,7 +90,7 @@ export function getTenantStorageSegmentValueFormatters(values: Array<string | nu
         numericValues.length === 0 || maxValue / minValue >= MIXED_UNIT_RATIO_THRESHOLD;
     const commonSize = shouldUseMixedUnits ? undefined : getBytesSizeUnit(maxValue);
     const getLegendSize = (value?: string | number) => {
-        const numericValue = getNumericByteValue(value);
+        const numericValue = parseOptionalNonNegativeNumber(value);
 
         if (numericValue === undefined) {
             return undefined;

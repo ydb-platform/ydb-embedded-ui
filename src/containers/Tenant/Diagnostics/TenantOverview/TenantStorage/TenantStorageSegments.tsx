@@ -5,8 +5,8 @@ import type {PopupPlacement} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../../utils/cn';
 import {formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
-import i18n from '../i18n';
 
+import i18n from './i18n';
 import type {
     TenantStorageSegment,
     TenantStorageSegmentKey,
@@ -36,11 +36,11 @@ const SEGMENT_COLORS: Record<TenantStorageSegmentKey, string> = {
 };
 
 const SEGMENT_LABELS: Record<TenantStorageSegmentKey, string> = {
-    [TENANT_STORAGE_SEGMENT_KEYS.rowTables]: i18n('storage.new.row-tables'),
-    [TENANT_STORAGE_SEGMENT_KEYS.columnTables]: i18n('storage.new.column-tables'),
-    [TENANT_STORAGE_SEGMENT_KEYS.topics]: i18n('storage.new.topics'),
-    [TENANT_STORAGE_SEGMENT_KEYS.system]: i18n('storage.new.system'),
-    [TENANT_STORAGE_SEGMENT_KEYS.unknown]: i18n('storage.new.unknown'),
+    [TENANT_STORAGE_SEGMENT_KEYS.rowTables]: i18n('value_row-tables'),
+    [TENANT_STORAGE_SEGMENT_KEYS.columnTables]: i18n('value_column-tables'),
+    [TENANT_STORAGE_SEGMENT_KEYS.topics]: i18n('value_topics'),
+    [TENANT_STORAGE_SEGMENT_KEYS.system]: i18n('value_system'),
+    [TENANT_STORAGE_SEGMENT_KEYS.unknown]: i18n('value_unknown'),
 };
 
 const SEGMENT_ORDER_INDEX: Record<TenantStorageSegmentKey, number> = {
@@ -52,26 +52,24 @@ const SEGMENT_ORDER_INDEX: Record<TenantStorageSegmentKey, number> = {
 };
 
 const SYSTEM_DETAIL_LABELS: Record<TenantStorageSystemDetailKey, string> = {
-    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive]: i18n('storage.new.system-detail.hive'),
-    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.coordinator]: i18n('storage.new.system-detail.coordinator'),
-    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.mediator]: i18n('storage.new.system-detail.mediator'),
-    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.schemeShard]: i18n('storage.new.system-detail.scheme-shard'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.hive]: i18n('value_system-detail-hive'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.coordinator]: i18n('value_system-detail-coordinator'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.mediator]: i18n('value_system-detail-mediator'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.schemeShard]: i18n('value_system-detail-scheme-shard'),
     [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.sysViewProcessor]: i18n(
-        'storage.new.system-detail.sys-view-processor',
+        'value_system-detail-sys-view-processor',
     ),
-    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.graphShard]: i18n('storage.new.system-detail.graph-shard'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.graphShard]: i18n('value_system-detail-graph-shard'),
     [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.statisticsAggregator]: i18n(
-        'storage.new.system-detail.statistics-aggregator',
+        'value_system-detail-statistics-aggregator',
     ),
-    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.bsController]: i18n(
-        'storage.new.system-detail.bs-controller',
-    ),
-    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.cms]: i18n('storage.new.system-detail.cms'),
-    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.nodeBroker]: i18n('storage.new.system-detail.node-broker'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.bsController]: i18n('value_system-detail-bs-controller'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.cms]: i18n('value_system-detail-cms'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.nodeBroker]: i18n('value_system-detail-node-broker'),
     [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.tenantSlotBroker]: i18n(
-        'storage.new.system-detail.tenant-slot-broker',
+        'value_system-detail-tenant-slot-broker',
     ),
-    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.console]: i18n('storage.new.system-detail.console'),
+    [TENANT_STORAGE_SYSTEM_DETAIL_KEYS.console]: i18n('value_system-detail-console'),
 };
 
 function getSegmentProgressValue(segment: TenantStorageSegment) {
@@ -111,7 +109,7 @@ export function SegmentTooltipContent({
         <ul className={b('tooltip')}>
             <li>{formatValue(getTenantStorageSegmentDisplayValue(segment))}</li>
             {percent ? (
-                <li>{i18n('storage.new.context-segment-share', {value: percent, totalLabel})}</li>
+                <li>{i18n('context_segment-share', {value: percent, totalLabel})}</li>
             ) : null}
         </ul>
     );
