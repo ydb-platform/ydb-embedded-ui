@@ -145,6 +145,7 @@ export type RenderMonitoring = (props: {
 }) => React.ReactNode;
 
 export type RenderNodeTooltipActions = (props: {data?: PreparedStorageNode}) => React.ReactNode;
+
 export interface UiMetricaGoals {
     runQuery?: string;
     stopQuery?: string;
