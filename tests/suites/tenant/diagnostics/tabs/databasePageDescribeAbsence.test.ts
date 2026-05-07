@@ -14,9 +14,6 @@ test.describe('Database page in v2 navigation - no /describe calls', () => {
     });
 
     test('/describe is not called when navigating through Database page tabs', async ({page}) => {
-        // Give this test extra time since it navigates multiple tabs
-        test.setTimeout(60 * 1000);
-
         const describeCalls: string[] = [];
 
         page.on('request', (request) => {
