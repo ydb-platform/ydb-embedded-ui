@@ -25,11 +25,7 @@ interface ClusterLinkWithContext extends ClusterLinkBase {
 /** Input cluster link: either title or context (or both) must be provided */
 export type ClusterLink = ClusterLinkWithTitle | ClusterLinkWithContext;
 
-export interface DatabaseLink {
-    title: string;
-    url: string;
-    icon: IconData;
-}
+export interface DatabaseLink extends ClusterLinkWithTitle {}
 
 export interface AdditionalClusterProps {
     info?: InfoItem[];

@@ -180,7 +180,7 @@ export class PaginatedTable {
         await this.tableSelector.waitFor({state: 'visible'});
     }
 
-    async waitForTableData(timeout = 2000) {
+    async waitForTableData(timeout = VISIBILITY_TIMEOUT) {
         await this.page.waitForFunction(
             () => {
                 const rows = document.querySelectorAll('.ydb-paginated-table__row');
@@ -191,6 +191,7 @@ export class PaginatedTable {
                     loadingRows.length === 0
                 );
             },
+            undefined,
             {timeout},
         );
 

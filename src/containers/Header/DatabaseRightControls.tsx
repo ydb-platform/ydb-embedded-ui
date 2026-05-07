@@ -1,14 +1,16 @@
 import React from 'react';
 
-import {ChartAreaStacked, PlugConnection} from '@gravity-ui/icons';
+import {PlugConnection} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Icon} from '@gravity-ui/uikit';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
-import {MONITORING_UI_TITLE} from '../../utils/constants';
+import type {ClusterLinkWithTitle} from '../../types/additionalProps';
+import {CLUSTER_LINK_CONTEXT} from '../../utils/clusterLinks/clusterLinkConstants';
 
 import {DeveloperUIControl} from './GlobalRightControls';
 import {DBHeaderActionsMenu} from './HeaderActionsMenu';
+import {MonitoringControl} from './MonitoringControl';
 import {headerKeyset} from './i18n';
 
 interface DatabaseRightControlsProps {
@@ -17,8 +19,8 @@ interface DatabaseRightControlsProps {
     databaseData?: PreparedTenant;
     isDatabaseDataLoading: boolean;
     isV2NavigationEnabled: boolean;
-    monitoringLinkUrl: string | null;
     showDeveloperUI: boolean;
+    databaseLinks: ClusterLinkWithTitle[];
 }
 
 export function DatabaseRightControls({
@@ -27,21 +29,23 @@ export function DatabaseRightControls({
     databaseData,
     isDatabaseDataLoading,
     isV2NavigationEnabled,
-    monitoringLinkUrl,
     showDeveloperUI,
+    databaseLinks,
 }: DatabaseRightControlsProps) {
-    const showMonitoring = Boolean(monitoringLinkUrl);
+    const monitoringDatabaseLink = React.useMemo(
+        () => databaseLinks.find((link) => link.context === CLUSTER_LINK_CONTEXT.MONITORING),
+        [databaseLinks],
+    );
+
+    const actionDatabaseLinks = React.useMemo(
+        () => databaseLinks.filter((link) => link.context !== CLUSTER_LINK_CONTEXT.MONITORING),
+        [databaseLinks],
+    );
+
     const showLegacyConnect = !isV2NavigationEnabled;
     return (
         <React.Fragment>
-            {showMonitoring && monitoringLinkUrl ? (
-                <ActionTooltip title={headerKeyset('description_monitoring')}>
-                    <Button view="flat" href={monitoringLinkUrl} target="_blank">
-                        <Icon data={ChartAreaStacked} />
-                        {MONITORING_UI_TITLE}
-                    </Button>
-                </ActionTooltip>
-            ) : null}
+            {monitoringDatabaseLink ? <MonitoringControl link={monitoringDatabaseLink} /> : null}
 
             {showLegacyConnect ? (
                 <ActionTooltip title={headerKeyset('description_connect-to-db')}>
@@ -58,6 +62,7 @@ export function DatabaseRightControls({
                 databaseData={databaseData}
                 isDatabaseDataLoading={isDatabaseDataLoading}
                 isV2NavigationEnabled={isV2NavigationEnabled}
+                databaseLinks={actionDatabaseLinks}
             />
         </React.Fragment>
     );

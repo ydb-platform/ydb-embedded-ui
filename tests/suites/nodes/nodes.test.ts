@@ -57,21 +57,14 @@ test.describe('Test Nodes Paginated Table', async () => {
 
     test('Table groups displayed correctly if group by option is selected', async ({page}) => {
         const nodesPage = new NodesPage(page);
-        const nodesTable = new ClusterNodesTable(page);
-
-        await nodesTable.waitForTableToLoad();
-        await nodesTable.waitForTableData();
-
-        const rowData = await nodesTable.getRowData(0);
-        const host = rowData['Host'];
 
         await nodesPage.selectGroupByOption('Host');
         await nodesPage.waitForTableGroupsLoaded();
 
-        await nodesPage.selectTableGroup(host).isVisible();
+        await expect(nodesPage.selectFirstTableGroup()).toBeVisible();
 
-        await nodesPage.expandTableGroup(host);
-        await nodesPage.selectTableGroupContent(host).isVisible();
+        await nodesPage.expandFirstTableGroup();
+        await expect(nodesPage.selectFirstTableGroupContent()).toBeVisible();
     });
 
     test('Node count is displayed correctly', async ({page}) => {

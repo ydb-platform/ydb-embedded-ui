@@ -1,10 +1,15 @@
 import type {IconData} from '@gravity-ui/uikit';
 
 import type {ClusterInfo} from '../../../store/reducers/cluster/cluster';
-import type {ClusterLink} from '../../../types/additionalProps';
+import type {PreparedTenant} from '../../../store/reducers/tenants/types';
+import type {ClusterLink, DatabaseLink} from '../../../types/additionalProps';
 import type {MetaClusterLink} from '../../../types/api/meta';
 import type {SubstitutionNamespaces} from '../resolveClusterLinks';
-import {resolveClusterLinks, substituteUrlParams} from '../resolveClusterLinks';
+import {
+    resolveClusterLinks,
+    resolveDatabaseLinks,
+    substituteUrlParams,
+} from '../resolveClusterLinks';
 
 /** Helper to build a minimal SubstitutionNamespaces for substituteUrlParams tests */
 function makeNamespaces(obj: Record<string, Record<string, unknown>>): SubstitutionNamespaces {
@@ -91,8 +96,44 @@ describe('substituteUrlParams', () => {
         ).toBe('https://example.com/?balancer=https://balancer.example.com');
     });
 
-    test('returns undefined for deeply nested dotted paths (only single-level prefix.field supported)', () => {
-        const namespaces = makeNamespaces({cluster: {a: 'value'}});
+    test('resolves deeply nested dotted paths by traversing objects', () => {
+        const namespaces = {
+            cluster: {a: {b: 'deep-value'}},
+        } as Record<string, Record<string, unknown>>;
+        expect(
+            substituteUrlParams('https://example.com/{cluster.a.b}', 'cluster', namespaces),
+        ).toBe('https://example.com/deep-value');
+    });
+
+    test('resolves three-level nested dotted paths', () => {
+        const namespaces = {
+            cluster: {a: {b: {c: 'very-deep'}}},
+        } as Record<string, Record<string, unknown>>;
+        expect(
+            substituteUrlParams('https://example.com/{cluster.a.b.c}', 'cluster', namespaces),
+        ).toBe('https://example.com/very-deep');
+    });
+
+    test('returns undefined for deeply nested path when intermediate is not an object', () => {
+        const namespaces = {
+            cluster: {a: 'string-value'},
+        } as Record<string, Record<string, unknown>>;
+        expect(
+            substituteUrlParams('https://example.com/{cluster.a.b}', 'cluster', namespaces),
+        ).toBeUndefined();
+    });
+
+    test('returns undefined for deeply nested path when intermediate is missing', () => {
+        const namespaces = makeNamespaces({cluster: {x: 'value'}});
+        expect(
+            substituteUrlParams('https://example.com/{cluster.a.b}', 'cluster', namespaces),
+        ).toBeUndefined();
+    });
+
+    test('returns undefined for deeply nested path when intermediate is an array', () => {
+        const namespaces = {
+            cluster: {a: ['not', 'an', 'object']},
+        } as Record<string, Record<string, unknown>>;
         expect(
             substituteUrlParams('https://example.com/{cluster.a.b}', 'cluster', namespaces),
         ).toBeUndefined();
@@ -290,6 +331,18 @@ describe('resolveClusterLinks', () => {
             expect(result[0].title).toBe('Logging');
         });
 
+        test('uses resolved default title in context default description', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {type: 'cluster', url: 'https://monitoring.example.com', context: 'monitoring'},
+            ];
+
+            const result = resolveClusterLinks(makeClusterInfo({links: dynamicLinks}));
+
+            expect(result).toHaveLength(1);
+            expect(result[0].title).toBe('Monium');
+            expect(result[0].description).toBe('Dashboards in Monium');
+        });
+
         test('uses explicit title over context default title', () => {
             const dynamicLinks: MetaClusterLink[] = [
                 {
@@ -317,7 +370,7 @@ describe('resolveClusterLinks', () => {
             expect(result[0].icon).toBeDefined();
         });
 
-        test('no icon for unknown context', () => {
+        test('uses fallback icon for unknown context', () => {
             const dynamicLinks: MetaClusterLink[] = [
                 {type: 'cluster', url: 'https://example.com', context: 'unknown', title: 'Unknown'},
             ];
@@ -325,7 +378,7 @@ describe('resolveClusterLinks', () => {
             const result = resolveClusterLinks(makeClusterInfo({links: dynamicLinks}));
 
             expect(result).toHaveLength(1);
-            expect(result[0].icon).toBeUndefined();
+            expect(result[0].icon).toBeDefined();
         });
 
         test('resolves {cluster.balancer} dotted placeholder from cluster info', () => {
@@ -722,6 +775,808 @@ describe('resolveClusterLinks', () => {
 
             expect(result).toHaveLength(1);
             expect(result[0].icon).toBe(customIcon);
+        });
+    });
+});
+
+/** Helper to build a minimal database info object with TTenant-like field names */
+function makeDatabaseInfo(overrides: Record<string, unknown> = {}): PreparedTenant {
+    return {
+        Name: '/Root/mydb',
+        Type: 'Dedicated',
+        Id: 'db-123',
+        Cluster: 'my-cluster',
+        ...overrides,
+    } as PreparedTenant;
+}
+
+describe('resolveDatabaseLinks', () => {
+    describe('basic processing', () => {
+        test('returns empty array when dynamicLinks is undefined', () => {
+            const result = resolveDatabaseLinks(undefined, makeDatabaseInfo());
+            expect(result).toHaveLength(0);
+        });
+
+        test('returns empty array when dynamicLinks is empty', () => {
+            const result = resolveDatabaseLinks([], makeDatabaseInfo());
+            expect(result).toHaveLength(0);
+        });
+
+        test('processes database type links with successful URL substitution', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://logs.example.com/{Name}',
+                    title: 'DB Logs',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0]).toEqual(
+                expect.objectContaining({
+                    title: 'DB Logs',
+                    url: 'https://logs.example.com//Root/mydb',
+                }),
+            );
+        });
+
+        test('skips links with non-database type', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {type: 'cluster', url: 'https://cluster.example.com', title: 'Cluster Link'},
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+            expect(result).toHaveLength(0);
+        });
+
+        test('skips links with unresolvable URL placeholders', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{unknownParam}',
+                    title: 'Bad Link',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+            expect(result).toHaveLength(0);
+        });
+
+        test('skips links without title and without known context', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {type: 'database', url: 'https://example.com'},
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+            expect(result).toHaveLength(0);
+        });
+    });
+
+    describe('placeholder resolution', () => {
+        test('resolves flat placeholders from database info', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{Name}?type={Type}',
+                    title: 'DB Link',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com//Root/mydb?type=Dedicated');
+        });
+
+        test('resolves {database.Name} dotted placeholder from database info', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{database.Name}',
+                    title: 'DB Link',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com//Root/mydb');
+        });
+
+        test('resolves {cluster.name} dotted placeholder from cluster info', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{cluster.name}/{database.Name}',
+                    title: 'DB Link',
+                },
+            ];
+
+            const clusterInfo = makeClusterInfo({name: 'prod-cluster'});
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo(), clusterInfo);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/prod-cluster//Root/mydb');
+        });
+
+        test('resolves {cluster.balancer} from cluster info in database links', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://monitoring.com/?balancer={cluster.balancer}&db={database.Name}',
+                    title: 'Monitoring',
+                },
+            ];
+
+            const clusterInfo = makeClusterInfo({balancer: 'https://balancer.example.com'});
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo(), clusterInfo);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe(
+                'https://monitoring.com/?balancer=https://balancer.example.com&db=/Root/mydb',
+            );
+        });
+
+        test('skips links with unresolvable cluster placeholders when no cluster info', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{cluster.balancer}',
+                    title: 'Bad Link',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+            expect(result).toHaveLength(0);
+        });
+
+        test('resolves {database.Id} placeholder', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/db/{database.Id}',
+                    title: 'DB by ID',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo({Id: 'abc-123'}));
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/db/abc-123');
+        });
+    });
+
+    describe('legacy lowercase alias resolution', () => {
+        test('resolves {name} alias to PreparedTenant.Name', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://logs.example.com/{name}',
+                    title: 'DB Logs',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://logs.example.com//Root/mydb');
+        });
+
+        test('resolves {id} alias to PreparedTenant.Id', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/db/{id}',
+                    title: 'DB by ID',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo({Id: 'abc-123'}));
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/db/abc-123');
+        });
+
+        test('resolves {type} alias to PreparedTenant.Type', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{type}',
+                    title: 'DB by Type',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/Dedicated');
+        });
+
+        test('resolves {cluster} alias to PreparedTenant.Cluster', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{cluster}',
+                    title: 'DB Cluster',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/my-cluster');
+        });
+
+        test('resolves mixed legacy and PascalCase placeholders', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{name}?id={Id}&type={type}',
+                    title: 'Mixed Link',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com//Root/mydb?id=db-123&type=Dedicated');
+        });
+
+        test('resolves {database.name} dotted alias from database info', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{database.name}',
+                    title: 'DB Link',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com//Root/mydb');
+        });
+
+        test('PascalCase field takes priority when tenant already has a lowercase field', () => {
+            // If PreparedTenant somehow already has a 'name' field, alias should not overwrite it
+            const dbInfo = makeDatabaseInfo({name: 'custom-lowercase-name'});
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{name}',
+                    title: 'DB Link',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, dbInfo);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/custom-lowercase-name');
+        });
+
+        test('legacy aliases combined with cluster dotted placeholders', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://monitoring.com/{name}?balancer={cluster.balancer}',
+                    title: 'Monitoring',
+                },
+            ];
+
+            const clusterInfo = makeClusterInfo({balancer: 'https://balancer.example.com'});
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo(), clusterInfo);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe(
+                'https://monitoring.com//Root/mydb?balancer=https://balancer.example.com',
+            );
+        });
+
+        test('resolves {database.user-attributes.cloud_id} via kebab-case alias', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{database.user-attributes.cloud_id}',
+                    title: 'Cloud Link',
+                },
+            ];
+
+            const dbInfo = makeDatabaseInfo({
+                UserAttributes: {cloud_id: 'cloud-abc'},
+            });
+            const result = resolveDatabaseLinks(dynamicLinks, dbInfo);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/cloud-abc');
+        });
+
+        test('resolves {database.UserAttributes.cloud_id} via PascalCase field', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{database.UserAttributes.cloud_id}',
+                    title: 'Cloud Link',
+                },
+            ];
+
+            const dbInfo = makeDatabaseInfo({
+                UserAttributes: {cloud_id: 'cloud-abc'},
+            });
+            const result = resolveDatabaseLinks(dynamicLinks, dbInfo);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/cloud-abc');
+        });
+
+        test('resolves flat {user-attributes} placeholder is not supported (nested object)', () => {
+            // user-attributes is an object, not a string/number, so flat {user-attributes} should fail
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{user-attributes}',
+                    title: 'Bad Link',
+                },
+            ];
+
+            const dbInfo = makeDatabaseInfo({
+                UserAttributes: {cloud_id: 'cloud-abc'},
+            });
+            const result = resolveDatabaseLinks(dynamicLinks, dbInfo);
+
+            expect(result).toHaveLength(0);
+        });
+
+        test('resolves {database.user-attributes.folder_id} via kebab-case alias', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{database.user-attributes.folder_id}',
+                    title: 'Folder Link',
+                },
+            ];
+
+            const dbInfo = makeDatabaseInfo({
+                UserAttributes: {folder_id: 'folder-xyz'},
+            });
+            const result = resolveDatabaseLinks(dynamicLinks, dbInfo);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://example.com/folder-xyz');
+        });
+    });
+
+    describe('title and context handling', () => {
+        test('uses explicit title', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com',
+                    title: 'Custom Title',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].title).toBe('Custom Title');
+        });
+
+        test('uses default title from known context when title is not provided', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {type: 'database', url: 'https://example.com', context: 'logging'},
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].title).toBe('Logging');
+        });
+
+        test('uses resolved default title in context default description', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {type: 'database', url: 'https://monitoring.example.com', context: 'monitoring'},
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].title).toBe('Monium');
+            expect(result[0].description).toBe('Dashboards in Monium');
+        });
+
+        test('uses explicit title over context default title', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com',
+                    context: 'logging',
+                    title: 'Custom Logs',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].title).toBe('Custom Logs');
+        });
+
+        test('assigns icon based on context', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {type: 'database', url: 'https://example.com', context: 'cores', title: 'Cores'},
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].icon).toBeDefined();
+        });
+
+        test('uses fallback icon for unknown context', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com',
+                    context: 'unknown',
+                    title: 'Unknown',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].icon).toBeDefined();
+        });
+
+        test('preserves description from link', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com',
+                    title: 'DB Link',
+                    description: 'Custom description',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(1);
+            expect(result[0].description).toBe('Custom description');
+        });
+    });
+
+    describe('mixed link types', () => {
+        test('only processes database type links, ignores cluster type', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {type: 'database', url: 'https://db.example.com', title: 'DB Link'},
+                {type: 'cluster', url: 'https://cluster.example.com', title: 'Cluster Link'},
+                {type: 'database', url: 'https://db2.example.com', title: 'DB Link 2'},
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(2);
+            expect(result[0].title).toBe('DB Link');
+            expect(result[1].title).toBe('DB Link 2');
+        });
+
+        test('processes multiple database links preserving order', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {type: 'database', url: 'https://first.example.com', title: 'First'},
+                {type: 'database', url: 'https://second.example.com', title: 'Second'},
+                {type: 'database', url: 'https://third.example.com', title: 'Third'},
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result).toHaveLength(3);
+            expect(result.map((l) => l.title)).toEqual(['First', 'Second', 'Third']);
+        });
+    });
+
+    describe('context-based deduplication with additional links', () => {
+        const mockIcon = (() => null) as unknown as IconData;
+
+        test('includes additional links when no dynamic links exist', () => {
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Monitoring',
+                    url: 'https://monitoring.example.com',
+                    icon: mockIcon,
+                    context: 'monitoring',
+                },
+                {
+                    title: 'Logs',
+                    url: 'https://logs.example.com',
+                    icon: mockIcon,
+                    context: 'logging',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                undefined,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result).toHaveLength(2);
+            expect(result[0].title).toBe('Monitoring');
+            expect(result[1].title).toBe('Logs');
+        });
+
+        test('dynamic logging link suppresses additional logging link', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://new-logs.example.com/{Name}',
+                    context: 'logging',
+                    title: 'New Logs',
+                },
+            ];
+
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Logs',
+                    url: 'https://logs.example.com',
+                    icon: mockIcon,
+                    context: 'logging',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                dynamicLinks,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            const loggingLinks = result.filter((l) => l.context === 'logging');
+            expect(loggingLinks).toHaveLength(1);
+            expect(loggingLinks[0].title).toBe('New Logs');
+        });
+
+        test('dynamic monitoring link suppresses additional monitoring link', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://new-monitoring.example.com',
+                    context: 'monitoring',
+                    title: 'New Monitoring',
+                },
+            ];
+
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Monitoring',
+                    url: 'https://monitoring.example.com',
+                    icon: mockIcon,
+                    context: 'monitoring',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                dynamicLinks,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            const monitoringLinks = result.filter((l) => l.context === 'monitoring');
+            expect(monitoringLinks).toHaveLength(1);
+            expect(monitoringLinks[0].title).toBe('New Monitoring');
+        });
+
+        test('uncovered contexts still get additional links', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://new-logs.example.com',
+                    context: 'logging',
+                    title: 'New Logs',
+                },
+            ];
+
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Monitoring',
+                    url: 'https://monitoring.example.com',
+                    icon: mockIcon,
+                    context: 'monitoring',
+                },
+                {
+                    title: 'Logs',
+                    url: 'https://logs.example.com',
+                    icon: mockIcon,
+                    context: 'logging',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                dynamicLinks,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result).toHaveLength(2);
+            expect(result.map((l) => l.title)).toEqual(['New Logs', 'Monitoring']);
+        });
+
+        test('failed dynamic link does not suppress additional link for same context', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com/{missingField}',
+                    context: 'logging',
+                    title: 'Bad Link',
+                },
+            ];
+
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Logs',
+                    url: 'https://logs.example.com',
+                    icon: mockIcon,
+                    context: 'logging',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                dynamicLinks,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            const loggingLinks = result.filter((l) => l.context === 'logging');
+            expect(loggingLinks).toHaveLength(1);
+            expect(loggingLinks[0].title).toBe('Logs');
+        });
+
+        test('additional links without context are always included', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://example.com',
+                    context: 'logging',
+                    title: 'Dynamic Logs',
+                },
+            ];
+
+            const additionalLinks: DatabaseLink[] = [
+                {title: 'Custom Link', url: 'https://custom.example.com', icon: mockIcon},
+            ];
+
+            const result = resolveDatabaseLinks(
+                dynamicLinks,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result).toHaveLength(2);
+            expect(result[1].title).toBe('Custom Link');
+        });
+
+        test('additional links are placed after dynamic links', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://dynamic.example.com',
+                    context: 'logging',
+                    title: 'Dynamic Logging',
+                },
+            ];
+
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Monitoring',
+                    url: 'https://monitoring.example.com',
+                    icon: mockIcon,
+                    context: 'monitoring',
+                },
+                {title: 'Extra Link', url: 'https://extra.example.com', icon: mockIcon},
+            ];
+
+            const result = resolveDatabaseLinks(
+                dynamicLinks,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result.map((l) => l.title)).toEqual([
+                'Dynamic Logging',
+                'Monitoring',
+                'Extra Link',
+            ]);
+        });
+
+        test('additional link preserves explicit description', () => {
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Monitoring',
+                    url: 'https://monitoring.example.com',
+                    icon: mockIcon,
+                    context: 'monitoring',
+                    description: 'Custom monitoring description',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                undefined,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0].description).toBe('Custom monitoring description');
+        });
+
+        test('additional link without description falls back to context default description', () => {
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Logs',
+                    url: 'https://logs.example.com',
+                    icon: mockIcon,
+                    context: 'logging',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                undefined,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0].description).toBeDefined();
+            expect(result[0].description).not.toBe('');
+        });
+
+        test('additional link without icon falls back to context icon', () => {
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Monitoring',
+                    url: 'https://monitoring.example.com',
+                    context: 'monitoring',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                undefined,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0].icon).toBeDefined();
+        });
+
+        test('additional link with custom icon preserves it even with known context', () => {
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Monitoring',
+                    url: 'https://monitoring.example.com',
+                    icon: mockIcon,
+                    context: 'monitoring',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                undefined,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0].icon).toBe(mockIcon);
         });
     });
 });

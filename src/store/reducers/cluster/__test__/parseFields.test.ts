@@ -1,4 +1,10 @@
-import {parseCoresUrl, parseLinksField, parseLoggingUrls, parseTraceField} from '../parseFields';
+import {
+    parseCoresUrl,
+    parseLinksField,
+    parseLoggingUrls,
+    parseMonitoringField,
+    parseTraceField,
+} from '../parseFields';
 
 // Mock console.error to avoid Jest issues with error logging
 const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -73,6 +79,53 @@ describe('parseLoggingUrls', () => {
     test('It should return the object as-is if input is already an object with only slo_logs_url', () => {
         const loggingObject = {slo_logs_url: 'https://logging.com/slo-logs?cluster=my_cluster'};
         expect(parseLoggingUrls(loggingObject)).toEqual(loggingObject);
+    });
+});
+
+describe('parseMonitoringField', () => {
+    test('It should parse stringified json with monitoring data', () => {
+        expect(
+            parseMonitoringField(
+                '{"monitoring_url":"https://monitoring.com","serverless_dashboard":"serverless","cluster_dashboard":"cluster","host":"cluster","slot":"static","cluster_name":"my_cluster"}',
+            ),
+        ).toEqual({
+            monitoring_url: 'https://monitoring.com',
+            serverless_dashboard: 'serverless',
+            cluster_dashboard: 'cluster',
+            host: 'cluster',
+            slot: 'static',
+            cluster_name: 'my_cluster',
+        });
+    });
+
+    test('It should return undefined if input is undefined', () => {
+        expect(parseMonitoringField(undefined)).toEqual(undefined);
+    });
+
+    test('It should return undefined if input is empty string', () => {
+        expect(parseMonitoringField('')).toEqual(undefined);
+    });
+
+    test('It should return cluster_name for plain string', () => {
+        expect(parseMonitoringField('https://monitoring.com/some_value')).toEqual(
+            'https://monitoring.com/some_value',
+        );
+    });
+
+    test('It should trim plain string input', () => {
+        expect(parseMonitoringField('  ydb_testing_s3  ')).toEqual('ydb_testing_s3');
+    });
+
+    test('It should return undefined if parsed json does not match schema', () => {
+        expect(parseMonitoringField('{"host":"cluster"}')).toEqual(undefined);
+    });
+
+    test('It should return parsed object if input is already an object matching schema', () => {
+        const monitoringObject = {
+            monitoring_url: 'https://monitoring.com',
+            dedicated_dashboard: 'dedicated',
+        };
+        expect(parseMonitoringField(monitoringObject)).toEqual(monitoringObject);
     });
 });
 
