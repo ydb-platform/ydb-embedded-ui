@@ -1,8 +1,12 @@
 {
   "field_rack": "Rack",
   "field_host": "Host",
-  "field_links": "Links",
   "context_developer-ui": "Developer UI",
+  "context_ssh": "nobody SSH",
+  "context_root-ssh": "root SSH",
+  "context_break-glass-hint": "Request Break Glass in Deploy",
+  "action_open-stage": "Open stage",
+  "action_open-docs": "Documentation",
   "field_database": "Database",
   "field_roles": "Roles"
 }

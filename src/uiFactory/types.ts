@@ -8,6 +8,7 @@ import type {
 } from '../containers/Tenant/Healthcheck/shared';
 import type {ClusterInfo} from '../store/reducers/cluster/cluster';
 import type {IssuesTree} from '../store/reducers/healthcheckInfo/types';
+import type {PreparedStorageNode} from '../store/reducers/storage/types';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
 import type {ClusterLink, DatabaseLink} from '../types/additionalProps';
 import type {MetaBaseClusterInfo} from '../types/api/meta';
@@ -45,6 +46,7 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     renderBackups?: RenderBackups;
     renderEvents?: RenderEvents;
     renderMonitoring?: RenderMonitoring;
+    renderNodeTooltipActions?: RenderNodeTooltipActions;
     clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
     enableMultiTabQueryEditor?: boolean;
@@ -142,6 +144,7 @@ export type RenderMonitoring = (props: {
     databaseFullPath?: string;
 }) => React.ReactNode;
 
+export type RenderNodeTooltipActions = (props: {data?: PreparedStorageNode}) => React.ReactNode;
 export interface UiMetricaGoals {
     runQuery?: string;
     stopQuery?: string;
