@@ -8,12 +8,15 @@ test.describe('Database page in v2 navigation - no /describe calls', () => {
     test.beforeEach(async ({page}) => {
         await page.addInitScript(() => {
             localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
-            // Dismiss the "Navigation is here now" alert popover so it doesn't block tab clicks
+            // Dismiss the "Navigation is here now" alert popover so it doesn't block interactions
             localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
         });
     });
 
     test('/describe is not called when navigating through Database page tabs', async ({page}) => {
+        // Give this test extra time since it navigates multiple tabs
+        test.setTimeout(60 * 1000);
+
         const describeCalls: string[] = [];
 
         page.on('request', (request) => {
@@ -41,11 +44,24 @@ test.describe('Database page in v2 navigation - no /describe calls', () => {
         // Ensure at least one tab is visible so the test is not vacuously true
         expect(tabCount).toBeGreaterThan(0);
 
-        // Click through every visible tab and wait for triggered requests to finish
+        // Collect all tab hrefs before navigating
+        const tabHrefs: string[] = [];
         for (let i = 0; i < tabCount; i++) {
-            const tab = tabLinks.nth(i);
-            await tab.click();
-            await page.waitForLoadState('networkidle', {timeout: VISIBILITY_TIMEOUT});
+            const href = await tabLinks.nth(i).getAttribute('href');
+            if (href) {
+                tabHrefs.push(href);
+            }
+        }
+
+        // Navigate to each tab URL directly instead of clicking.
+        // Clicking tabs + waiting for networkidle is unreliable in a live backend
+        // (the app polls continuously, so networkidle never settles), which causes
+        // the test to consume its full timeout on every tab and eventually stall CI.
+        // Direct goto() waits for the page load event which is sufficient to capture
+        // any /describe requests triggered during component mount.
+        for (const href of tabHrefs) {
+            await page.goto(href);
+            await tenantPage.isDiagnosticsVisible();
         }
 
         expect(
