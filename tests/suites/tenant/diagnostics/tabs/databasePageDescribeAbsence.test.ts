@@ -8,6 +8,8 @@ test.describe('Database page in v2 navigation - no /describe calls', () => {
     test.beforeEach(async ({page}) => {
         await page.addInitScript(() => {
             localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
+            // Dismiss the "Navigation is here now" alert popover so it doesn't block tab clicks
+            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
         });
     });
 
