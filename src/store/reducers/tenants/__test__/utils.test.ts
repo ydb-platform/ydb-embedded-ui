@@ -2,6 +2,60 @@ import {EType} from '../../../../types/api/tenant';
 import {calculateTenantMetrics} from '../utils';
 
 describe('calculateTenantMetrics', () => {
+    test('keeps legacy storage metric card values for prod payload without tablet quota', () => {
+        const result = calculateTenantMetrics({
+            TablesStorage: [{Type: EType.SSD, Size: '35915303563'}],
+            StorageAllocatedSize: '492778291200',
+            StorageAllocatedLimit: '6399113297920',
+            DatabaseStorage: [
+                {
+                    Type: EType.SSD,
+                    Size: '492778291200',
+                    Limit: '6399113297920',
+                },
+            ],
+            DatabaseQuotas: {},
+        });
+
+        expect(result.tabletStorage).toBe(35_915_303_563);
+        expect(result.tabletStorageStats).toEqual([
+            {
+                name: EType.SSD,
+                used: 35_915_303_563,
+                limit: undefined,
+                usage: undefined,
+            },
+        ]);
+        expect(result.storageMetricStats).toEqual([
+            {
+                name: EType.SSD,
+                used: 492_778_291_200,
+                limit: 6_399_113_297_920,
+                usage: expect.any(Number),
+            },
+        ]);
+        expect(result.storageMetricStats[0]?.usage).toBeCloseTo(7.701);
+    });
+
+    test('keeps per-media quotas out of legacy storage metric card values', () => {
+        const result = calculateTenantMetrics({
+            StorageAllocatedSize: '500',
+            StorageAllocatedLimit: '1000',
+            DatabaseStorage: [{Type: EType.SSD, Size: '500', Limit: '1000'}],
+            DatabaseQuotas: {
+                storage_quotas: [{unit_kind: EType.SSD, data_size_soft_quota: '900'}],
+            },
+            TablesStorage: [{Type: EType.SSD, Size: '90'}],
+        });
+
+        expect(result.tabletStorageStats).toEqual([
+            {name: EType.SSD, used: 90, limit: 900, usage: 10},
+        ]);
+        expect(result.storageMetricStats).toEqual([
+            {name: EType.SSD, used: 500, limit: 1000, usage: 50},
+        ]);
+    });
+
     test('normalizes invalid storage sizes and limits', () => {
         const result = calculateTenantMetrics({
             DatabaseStorage: [{Type: EType.SSD}, {Type: EType.HDD, Size: '200', Limit: 'invalid'}],

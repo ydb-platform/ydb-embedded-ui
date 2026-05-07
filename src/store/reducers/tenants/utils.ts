@@ -32,7 +32,7 @@ export interface TenantMetricStats<T = string> {
 export type TenantPoolsStats = TenantMetricStats<PoolName>;
 export type TenantStorageStats = TenantMetricStats<string>;
 
-type TenantStorageUsage = NonNullable<TTenant['DatabaseStorage']>[number];
+type TenantStorageUsage = NonNullable<TTenant['StorageUsage']>[number];
 type TenantStorageQuota = NonNullable<
     NonNullable<TTenant['DatabaseQuotas']>['storage_quotas']
 >[number];
@@ -144,6 +144,29 @@ function buildBlobStorageStats({
     ];
 }
 
+function buildLegacyBlobStorageStats({
+    blobStorage,
+    blobStorageLimit,
+    storageUsage,
+}: {
+    blobStorage: number;
+    blobStorageLimit?: number;
+    storageUsage: TTenant['StorageUsage'];
+}) {
+    if (storageUsage) {
+        return buildStorageStats(storageUsage);
+    }
+
+    return [
+        {
+            name: EType.SSD,
+            used: blobStorage,
+            limit: blobStorageLimit,
+            usage: calculateUsage(blobStorage, blobStorageLimit),
+        },
+    ];
+}
+
 function buildTabletStorageStats({
     quotaUsage,
     storageQuotasByType,
@@ -206,6 +229,33 @@ function buildTabletStorageStats({
     return undefined;
 }
 
+function buildLegacyTabletStorageStats({
+    quotaUsage,
+    tabletStorage,
+    tabletStorageLimit,
+}: {
+    quotaUsage: TTenant['QuotaUsage'];
+    tabletStorage: number;
+    tabletStorageLimit?: number;
+}) {
+    if (quotaUsage) {
+        return buildStorageStats(quotaUsage);
+    }
+
+    if (tabletStorageLimit) {
+        return [
+            {
+                name: EType.SSD,
+                used: tabletStorage,
+                limit: tabletStorageLimit,
+                usage: calculateUsage(tabletStorage, tabletStorageLimit),
+            },
+        ];
+    }
+
+    return undefined;
+}
+
 export const calculateTenantMetrics = (tenant: TTenant = {}) => {
     const {
         CoresUsed,
@@ -243,6 +293,16 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
             const size = Number(storageType.Size) || 0;
             return sum + size;
         }, 0) ?? 0;
+    const legacyBlobStorageStats = buildLegacyBlobStorageStats({
+        blobStorage,
+        blobStorageLimit,
+        storageUsage: StorageUsage,
+    });
+    const legacyTabletStorageStats = buildLegacyTabletStorageStats({
+        quotaUsage: QuotaUsage,
+        tabletStorage,
+        tabletStorageLimit,
+    });
     const storageQuotasByType = buildStorageQuotaMap(DatabaseQuotas.storage_quotas);
     const blobStorageStats = buildBlobStorageStats({
         blobStorage,
@@ -286,6 +346,7 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         cpu,
         poolsStats,
         memoryStats,
+        storageMetricStats: legacyTabletStorageStats || legacyBlobStorageStats || [],
         blobStorageStats,
         tabletStorageStats,
         networkUtilization,
