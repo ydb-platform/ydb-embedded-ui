@@ -65,7 +65,7 @@ export const NodeEndpointsTooltipContent = ({data}: NodeEdpointsTooltipProps) =>
 
     const info = React.useMemo(() => prepareNodeEndpointsData(data), [data]);
 
-    const nodeActions = React.useMemo(() => uiFactory.renderNodeTooltipActions?.({data}), [data]);
+    const nodeActions = uiFactory.renderNodeTooltipActions?.({data});
 
     const footer = React.useMemo(() => {
         if (!developerUIInternalHref && !nodeActions) {
