@@ -77,8 +77,8 @@ export interface TenantStorageTopRow {
 }
 
 export interface TenantStorageLogicalUserData {
-    rowTables: number;
-    topics: number;
+    rowTables?: number;
+    topics?: number;
 }
 
 export interface TenantStorageData {
@@ -159,15 +159,38 @@ function calculateUsedPercent(used: number, total?: number) {
     return Math.min((used / total) * 100, 100);
 }
 
-function getUserLogicalSegments(logicalUserData?: TenantStorageLogicalUserData) {
-    return [
+function hasCompleteLogicalUserData(
+    logicalUserData?: TenantStorageLogicalUserData,
+): logicalUserData is Required<TenantStorageLogicalUserData> {
+    return logicalUserData?.rowTables !== undefined && logicalUserData.topics !== undefined;
+}
+
+function getUserLogicalSegments(
+    logicalUserData: TenantStorageLogicalUserData | undefined,
+    used: number,
+) {
+    const rowTables = logicalUserData?.rowTables ?? 0;
+    const topics = logicalUserData?.topics ?? 0;
+    const segments: TenantStorageSegment[] = [
         {
             key: TENANT_STORAGE_SEGMENT_KEYS.rowTables,
-            value: logicalUserData?.rowTables ?? 0,
+            value: rowTables,
         },
         {
             key: TENANT_STORAGE_SEGMENT_KEYS.topics,
-            value: logicalUserData?.topics ?? 0,
+            value: topics,
+        },
+    ];
+
+    if (!logicalUserData || hasCompleteLogicalUserData(logicalUserData)) {
+        return segments;
+    }
+
+    return [
+        ...segments,
+        {
+            key: TENANT_STORAGE_SEGMENT_KEYS.unknown,
+            value: Math.max(used - rowTables - topics, 0),
         },
     ];
 }
@@ -509,7 +532,7 @@ export function getTenantStorageUserDataDisplaySummary({
     }
 
     const used =
-        useLogicalBreakdown && logicalUserData
+        useLogicalBreakdown && hasCompleteLogicalUserData(logicalUserData)
             ? logicalUserData.rowTables + logicalUserData.topics
             : summary.used;
     const quota = summary.quota;
@@ -720,16 +743,16 @@ export function buildTenantStorageData(
     metrics: TenantStorageMetrics,
 ): TenantStorageData {
     const logicalUserData = rawData?.logicalUserData;
-    const userDataSegments = getUserLogicalSegments(logicalUserData);
     const {physicalSegmentsByMedia, systemDetailsByMedia} = buildPhysicalSegmentsByMedia(
         rawData?.tabletTypeRows,
     );
 
-    const logicalUsed = logicalUserData
+    const logicalUsed = hasCompleteLogicalUserData(logicalUserData)
         ? logicalUserData.rowTables + logicalUserData.topics
         : undefined;
     const userUsed =
         logicalUsed === undefined ? normalizeNumber(metrics.tabletStorageUsed) : logicalUsed;
+    const userDataSegments = getUserLogicalSegments(logicalUserData, userUsed);
     const userQuota = toOptionalNumber(metrics.tabletStorageLimit);
     const userAvailable = userQuota === undefined ? undefined : Math.max(userQuota - userUsed, 0);
 

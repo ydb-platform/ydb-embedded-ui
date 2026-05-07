@@ -73,6 +73,111 @@ describe('fetchTenantStorageRawData', () => {
         expect(sendQuery).toHaveBeenCalledTimes(1);
     });
 
+    test('keeps partial logical user data without converting missing fields to zero', async () => {
+        const getStorageStats = jest.fn().mockResolvedValue({Tablets: []});
+        const getSchema = jest.fn().mockResolvedValue({
+            Path: '/local',
+            PathDescription: {
+                DomainDescription: {
+                    DiskSpaceUsage: {
+                        Tables: {DataSize: '120'},
+                        Topics: {},
+                    },
+                },
+                Children: [],
+            },
+        });
+        const sendQuery = jest.fn().mockResolvedValue(createTopRowsQueryResponse([]));
+
+        window.api = {
+            viewer: {
+                getStorageStats,
+                getSchema,
+                sendQuery,
+            },
+        } as unknown as YdbEmbeddedAPI;
+
+        const result = await fetchTenantStorageRawData({
+            database: '/local',
+            databaseFullPath: '/local',
+        });
+
+        expect(result.logicalUserData).toEqual({
+            rowTables: 120,
+            topics: undefined,
+        });
+    });
+
+    test('treats empty logical data size as unknown', async () => {
+        const getStorageStats = jest.fn().mockResolvedValue({Tablets: []});
+        const getSchema = jest.fn().mockResolvedValue({
+            Path: '/local',
+            PathDescription: {
+                DomainDescription: {
+                    DiskSpaceUsage: {
+                        Tables: {DataSize: '120'},
+                        Topics: {DataSize: ''},
+                    },
+                },
+                Children: [],
+            },
+        });
+        const sendQuery = jest.fn().mockResolvedValue(createTopRowsQueryResponse([]));
+
+        window.api = {
+            viewer: {
+                getStorageStats,
+                getSchema,
+                sendQuery,
+            },
+        } as unknown as YdbEmbeddedAPI;
+
+        const result = await fetchTenantStorageRawData({
+            database: '/local',
+            databaseFullPath: '/local',
+        });
+
+        expect(result.logicalUserData).toEqual({
+            rowTables: 120,
+            topics: undefined,
+        });
+    });
+
+    test('keeps zero logical data size when the field is present', async () => {
+        const getStorageStats = jest.fn().mockResolvedValue({Tablets: []});
+        const getSchema = jest.fn().mockResolvedValue({
+            Path: '/local',
+            PathDescription: {
+                DomainDescription: {
+                    DiskSpaceUsage: {
+                        Tables: {DataSize: '120'},
+                        Topics: {DataSize: '0'},
+                    },
+                },
+                Children: [],
+            },
+        });
+        const sendQuery = jest.fn().mockResolvedValue(createTopRowsQueryResponse([]));
+
+        window.api = {
+            viewer: {
+                getStorageStats,
+                getSchema,
+                sendQuery,
+            },
+        } as unknown as YdbEmbeddedAPI;
+
+        const result = await fetchTenantStorageRawData({
+            database: '/local',
+            databaseFullPath: '/local',
+        });
+
+        expect(result.logicalUserData).toEqual({
+            rowTables: 120,
+            topics: 0,
+        });
+    });
+
     test('keeps top rows when secondary storage stats request fails', async () => {
         const tabletTypeRows = [
             {

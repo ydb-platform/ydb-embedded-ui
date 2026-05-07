@@ -238,6 +238,38 @@ describe('buildTenantStorageData', () => {
         expect(result.topRows[0]?.overhead).toBe(3);
     });
 
+    test('falls back to tablet storage metric when logical user data is partial', () => {
+        const result = buildTenantStorageData(
+            {
+                logicalUserData: {
+                    rowTables: 120,
+                    topics: undefined,
+                },
+                tabletTypeRows: [],
+                topRows: [
+                    {
+                        path: '/local/db/table-a',
+                        userData: 120,
+                        physicalDisk: 360,
+                    },
+                ],
+            },
+            {
+                blobStorageUsed: 900,
+                tabletStorageUsed: 480,
+            },
+        );
+
+        expect(result.summary.userData.used).toBe(480);
+        expect(result.userDataSegments).toEqual([
+            {key: TENANT_STORAGE_SEGMENT_KEYS.rowTables, value: 120},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.topics, value: 0},
+            {key: TENANT_STORAGE_SEGMENT_KEYS.unknown, value: 360},
+        ]);
+        expect(result.topRows[0]?.dbShare).toBe(120 / 480);
+        expect(result.topRows[0]?.overhead).toBe(3);
+    });
+
     test('preserves missing top row physical disk size as unknown', () => {
         const result = buildTenantStorageData(
             {

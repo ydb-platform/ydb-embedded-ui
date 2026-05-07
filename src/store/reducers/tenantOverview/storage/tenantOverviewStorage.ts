@@ -19,8 +19,8 @@ export interface TenantStorageRawTopRow {
 
 export interface TenantStorageRawData {
     logicalUserData?: {
-        rowTables: number;
-        topics: number;
+        rowTables?: number;
+        topics?: number;
     };
     topRows: TenantStorageRawTopRow[];
     topRowsError?: unknown;
@@ -52,6 +52,16 @@ function normalizeNumericValue(value: number | string | undefined) {
     const numericValue = Number(value);
 
     return Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : 0;
+}
+
+function toOptionalNumericValue(value: number | string | undefined) {
+    if (value === undefined || (typeof value === 'string' && value.trim() === '')) {
+        return undefined;
+    }
+
+    const numericValue = Number(value);
+
+    return Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : undefined;
 }
 
 function getAbsolutePath({
@@ -165,16 +175,16 @@ async function getTopRowsByQuery(
 
 function getLogicalUserData(schemaResponse: TEvDescribeSchemeResult | null | undefined) {
     const diskSpaceUsage = schemaResponse?.PathDescription?.DomainDescription?.DiskSpaceUsage;
-    const tablesDataSize = diskSpaceUsage?.Tables?.DataSize;
-    const topicsDataSize = diskSpaceUsage?.Topics?.DataSize;
+    const tablesDataSize = toOptionalNumericValue(diskSpaceUsage?.Tables?.DataSize);
+    const topicsDataSize = toOptionalNumericValue(diskSpaceUsage?.Topics?.DataSize);
 
     if (tablesDataSize === undefined && topicsDataSize === undefined) {
         return undefined;
     }
 
     return {
-        rowTables: normalizeNumericValue(tablesDataSize),
-        topics: normalizeNumericValue(topicsDataSize),
+        rowTables: tablesDataSize,
+        topics: topicsDataSize,
     };
 }
 
