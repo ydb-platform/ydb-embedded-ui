@@ -33,7 +33,7 @@ The project serves dual purposes:
 - **Split Panes**: `react-split`
 - **Testing**: Jest 30 + React Testing Library (unit), Playwright 1.x (E2E)
 - **Package Manager**: npm
-- **Node Version**: 24+ required (`engines` field enforces `>=24.0`)
+- **Node Version**: 24+ required (`engines` field enforces `>=24.0`); npm 11.x is expected (`^11.0.0`)
 
 ## Essential Development Commands
 
@@ -41,7 +41,8 @@ The project serves dual purposes:
 
 ```bash
 npm ci              # Install dependencies
-npm run dev         # Start development server (port 3000)
+npm run dev         # Start development server (port 3000, local backend defaults)
+npm start           # Start dev server using environment variables/.env overrides
 ```
 
 ### Build Commands
@@ -59,6 +60,9 @@ npm run package                 # Build library distribution (output: dist/)
 
 ```bash
 npm run lint        # Run all linters (JS/TS + CSS + Prettier)
+npm run lint:js     # ESLint only
+npm run lint:styles # Stylelint only
+npm run lint:other  # Prettier check for JSON/YAML/Markdown
 npm run typecheck   # TypeScript type checking
 npm run unused      # Find unused code (uses knip)
 ```
@@ -69,12 +73,16 @@ npm run unused      # Find unused code (uses knip)
 npm test                                     # Run unit tests (Jest 30)
 npm test -- --watch                          # Run tests in watch mode
 npm test -- path/to/file                     # Run a single test file
+npm run test:e2e:install                     # Install Playwright browsers/dependencies
 npm run test:e2e                             # Run Playwright E2E tests
 npm run test:e2e:update-snapshots            # Update E2E snapshots (local browsers)
+npm run test:e2e:local                       # Run E2E against existing local dev server
 npm run test:e2e:docker                      # Run E2E tests in Docker
+npm run test:e2e:docker:report               # Run Docker E2E and serve HTML report
 npm run test:e2e:docker:update-snapshots     # Update E2E snapshots in Docker
-npm run test:e2e:local                       # Run E2E against local dev server
 ```
+
+Docker E2E arguments are forwarded to Playwright, so CI shard behavior can be reproduced locally, for example `bash scripts/playwright-docker.sh --shard=1/8`. The Docker runner derives the Playwright image tag from `package-lock.json` and starts `ghcr.io/ydb-platform/local-ydb:nightly` unless `PLAYWRIGHT_APP_BACKEND` is provided.
 
 ### Local Verification Chain (run before committing)
 
@@ -204,11 +212,15 @@ npm run dev
 
 ### Environment Configuration
 
-Create `.env` file for custom backend:
+Create `.env` file for custom backend, then use `npm start` so the file controls the dev-server environment:
 
 ```
 REACT_APP_BACKEND=http://your-cluster:8765  # Single cluster mode
+REACT_APP_META_BACKEND=undefined
+META_YDB_BACKEND=undefined
 ```
+
+For multi-cluster development, set `REACT_APP_META_BACKEND` instead of `REACT_APP_BACKEND`; if the dev server itself must proxy to meta backend, use `META_YDB_BACKEND`.
 
 ### Before Committing
 
@@ -303,7 +315,10 @@ import * as React from 'react';
 - Test artifacts are stored in `./playwright-artifacts/` directory
 - Environment variables for E2E tests:
   - `PLAYWRIGHT_BASE_URL` - Override test URL
-  - `PLAYWRIGHT_APP_BACKEND` - Specify backend for tests
+  - `PLAYWRIGHT_APP_BACKEND` - Specify backend for tests; Docker E2E starts local YDB only when this is unset
+  - `PLAYWRIGHT_YDB_IMAGE` - Override the Docker YDB image used by `scripts/playwright-docker.sh`
+  - `PLAYWRIGHT_HTML_HOST` / `PLAYWRIGHT_HTML_PORT` - Override the report host/port for `npm run test:e2e:docker:report`
+  - `PLAYWRIGHT_VIDEO` - Override Playwright video mode
 
 ### Routing
 
