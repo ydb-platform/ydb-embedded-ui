@@ -46,7 +46,10 @@ test.describe('Database page in v2 navigation - no /describe calls', () => {
         const tabHrefs: string[] = [];
         for (let i = 0; i < tabCount; i++) {
             const href = await tabLinks.nth(i).getAttribute('href');
-            expect(href, `Tab ${i} (a[data-tab]) has no href — it would be silently skipped`).toBeTruthy();
+            expect(
+                href,
+                `Tab ${i} (a[data-tab]) has no href — it would be silently skipped`,
+            ).toBeTruthy();
             if (href) {
                 tabHrefs.push(href);
             }
