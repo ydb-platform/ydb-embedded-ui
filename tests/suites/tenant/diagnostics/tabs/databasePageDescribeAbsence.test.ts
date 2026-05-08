@@ -41,10 +41,12 @@ test.describe('Database page in v2 navigation - no /describe calls', () => {
         // Ensure at least one tab is visible so the test is not vacuously true
         expect(tabCount).toBeGreaterThan(0);
 
-        // Collect all tab hrefs before navigating
+        // Collect all tab hrefs before navigating.
+        // Assert every tab link has an href so no tab is silently skipped.
         const tabHrefs: string[] = [];
         for (let i = 0; i < tabCount; i++) {
             const href = await tabLinks.nth(i).getAttribute('href');
+            expect(href, `Tab ${i} (a[data-tab]) has no href — it would be silently skipped`).toBeTruthy();
             if (href) {
                 tabHrefs.push(href);
             }
@@ -60,6 +62,9 @@ test.describe('Database page in v2 navigation - no /describe calls', () => {
             await page.goto(href);
             await tenantPage.isDiagnosticsVisible();
         }
+
+        // Give deferred effects on the last tab a moment to fire before asserting.
+        await page.waitForTimeout(500);
 
         expect(
             describeCalls,
