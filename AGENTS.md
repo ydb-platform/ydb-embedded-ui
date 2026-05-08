@@ -32,7 +32,7 @@ The project serves dual purposes:
 - **Keyboard Shortcuts**: `hotkeys-js`
 - **Split Panes**: `react-split`
 - **Testing**: Jest 30 + React Testing Library (unit), Playwright 1.x (E2E)
-- **Package Manager**: npm
+- **Package Manager**: npm 11.x (`engines` enforces `^11.0.0`)
 - **Node Version**: 24+ required (`engines` field enforces `>=24.0`)
 
 ## Essential Development Commands
@@ -42,6 +42,7 @@ The project serves dual purposes:
 ```bash
 npm ci              # Install dependencies
 npm run dev         # Start development server (port 3000)
+npm run start       # Start Rsbuild dev server using .env values
 ```
 
 ### Build Commands
@@ -69,9 +70,12 @@ npm run unused      # Find unused code (uses knip)
 npm test                                     # Run unit tests (Jest 30)
 npm test -- --watch                          # Run tests in watch mode
 npm test -- path/to/file                     # Run a single test file
+npm run test:e2e:install                     # Install Playwright browsers/deps
 npm run test:e2e                             # Run Playwright E2E tests
+npm run test:e2e -- --project=chromium       # Run a specific Playwright project
 npm run test:e2e:update-snapshots            # Update E2E snapshots (local browsers)
 npm run test:e2e:docker                      # Run E2E tests in Docker
+npm run test:e2e:docker:report               # Run Docker E2E and serve HTML report
 npm run test:e2e:docker:update-snapshots     # Update E2E snapshots in Docker
 npm run test:e2e:local                       # Run E2E against local dev server
 ```
@@ -210,6 +214,8 @@ Create `.env` file for custom backend:
 REACT_APP_BACKEND=http://your-cluster:8765  # Single cluster mode
 ```
 
+Copy `.env.example` to `.env` and run `npm run start` when you need custom local settings. `npm run dev` intentionally hardcodes a localhost backend (`REACT_APP_BACKEND=http://localhost:8765`) and disables blocking compile/lint checks for faster local iteration.
+
 ### Before Committing
 
 - The project uses Husky pre-commit hooks that automatically run `lint-staged`
@@ -240,10 +246,13 @@ The following checks run on every PR and merge group (`ci.yml`):
 
 Additional quality checks (`quality.yml`) — run on PRs and pushes to main:
 
-- Playwright E2E tests (against a `local-ydb:nightly` Docker service, sharded across 8 parallel runners)
-- Bundle size comparison (current branch vs. main, on PRs only)
+- Playwright E2E tests via `bash scripts/playwright-docker.sh --shard=N/8` (against a `local-ydb:nightly` Docker service, sharded across 8 parallel runners)
+- Playwright report merge via `npx playwright merge-reports --config=merge.config.ts ./all-blob-reports`
+- Bundle size comparison via `npm run build` on the current branch and `main` (PRs only)
 - Test report deployment to GitHub Pages
 - Automatic PR description updates with test results and bundle size diff
+
+Release workflow (`release.yml`) runs on `main`, `hotfix/v*` branches, and manual dispatch. It runs `npm test`, uses release-please, publishes the npm package when a release is created, builds `npm run build:embedded:archive`, uploads `embedded-ui.zip`, and dispatches an `embedded_ui_refresh` event to `ydb-platform/ydb`.
 
 ### UI Framework
 
@@ -304,6 +313,9 @@ import * as React from 'react';
 - Environment variables for E2E tests:
   - `PLAYWRIGHT_BASE_URL` - Override test URL
   - `PLAYWRIGHT_APP_BACKEND` - Specify backend for tests
+  - `PLAYWRIGHT_YDB_IMAGE` - Override the Docker YDB image used by `scripts/playwright-docker.sh`
+  - `PLAYWRIGHT_YDB_PLATFORM` / `PLAYWRIGHT_PLATFORM` - Set Docker platforms when emulation is required
+  - `PLAYWRIGHT_HTML_HOST` / `PLAYWRIGHT_HTML_PORT` - Override the local HTML report server for `npm run test:e2e:docker:report`
 
 ### Routing
 
