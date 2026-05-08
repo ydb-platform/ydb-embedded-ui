@@ -931,4 +931,23 @@ describe('buildTenantStorageData', () => {
         expect(result[0]?.physical.overhead).toBeCloseTo(500 / 35.8);
         expect(result[0]?.physical.usedPercent).toBeCloseTo(5.813953488372093);
     });
+
+    test('treats empty per-media limits as missing when applying aggregate fallback', () => {
+        const result = buildTenantStorageMediaSections({
+            blobStorageStats: [{name: EType.SSD, used: 500, limit: '' as unknown as number}],
+            metrics: {
+                blobStorageUsed: 500,
+                blobStorageLimit: 8_600,
+                tabletStorageUsed: 35.8,
+                tabletStorageLimit: 120,
+            },
+            tabletStorageStats: [{name: EType.SSD, used: 35.8, limit: '' as unknown as number}],
+        });
+
+        expect(result).toHaveLength(1);
+        expect(result[0]?.userData.quota).toBe(120);
+        expect(result[0]?.userData.available).toBe(84.2);
+        expect(result[0]?.physical.total).toBe(8_600);
+        expect(result[0]?.physical.available).toBe(8_100);
+    });
 });

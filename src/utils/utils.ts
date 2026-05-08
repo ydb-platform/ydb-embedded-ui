@@ -109,7 +109,7 @@ interface ParseOptionalNonNegativeNumberOptions {
 
 export function parseOptionalNonNegativeNumber(
     value: unknown,
-    {emptyStringAsUndefined = false}: ParseOptionalNonNegativeNumberOptions = {},
+    {emptyStringAsUndefined = true}: ParseOptionalNonNegativeNumberOptions = {},
 ) {
     if (emptyStringAsUndefined && typeof value === 'string' && value.trim() === '') {
         return undefined;
