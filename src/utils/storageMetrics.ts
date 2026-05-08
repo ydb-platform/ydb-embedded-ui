@@ -3,13 +3,28 @@ import {getBytesSizeUnit, sizes} from './bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from './constants';
 import {formatNumber, formatPercent} from './dataFormatters/dataFormatters';
 
-function getMetricBytesDecimalPlaces(size: BytesSizes, convertedValue: number) {
-    if (size === 'b' || size === 'kb' || size === 'mb') {
+interface FormatMetricBytesOptions {
+    allowNegative?: boolean;
+    bytesDecimalPlaces?: 0 | 1;
+    gbDecimalPlacesBelowOne?: 1 | 2;
+}
+
+function getMetricBytesDecimalPlaces(
+    size: BytesSizes,
+    convertedValue: number,
+    {bytesDecimalPlaces = 1, gbDecimalPlacesBelowOne = 2}: FormatMetricBytesOptions = {},
+) {
+    if (size === 'b') {
+        return convertedValue % 1 === 0 ? 0 : bytesDecimalPlaces;
+    }
+
+    if (size === 'kb' || size === 'mb') {
         return convertedValue % 1 === 0 ? 0 : 1;
     }
+
     if (size === 'gb') {
         if (convertedValue < 1) {
-            return 2;
+            return convertedValue % 1 === 0 ? 0 : gbDecimalPlacesBelowOne;
         }
         return convertedValue % 1 === 0 ? 0 : 1;
     }
@@ -33,16 +48,20 @@ export function getConsistentMetricBytesSize(values: Array<string | number | und
     return getBytesSizeUnit(maxValue);
 }
 
-export function formatMetricBytes(value?: string | number, size?: BytesSizes) {
+export function formatMetricBytes(
+    value?: string | number,
+    size?: BytesSizes,
+    options: FormatMetricBytesOptions = {},
+) {
     const numericValue = Number(value);
 
-    if (!Number.isFinite(numericValue)) {
+    if (!Number.isFinite(numericValue) || (options.allowNegative === false && numericValue < 0)) {
         return EMPTY_DATA_PLACEHOLDER;
     }
 
     const resolvedSize = size ?? getBytesSizeUnit(numericValue);
     const convertedValue = numericValue / sizes[resolvedSize].value;
-    const decimalPlaces = getMetricBytesDecimalPlaces(resolvedSize, convertedValue);
+    const decimalPlaces = getMetricBytesDecimalPlaces(resolvedSize, convertedValue, options);
     const rounded = Number(convertedValue.toFixed(decimalPlaces));
     const formatted = formatNumber(rounded);
 
