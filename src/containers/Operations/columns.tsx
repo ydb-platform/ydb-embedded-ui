@@ -5,7 +5,12 @@ import {ActionTooltip, Flex, Icon, Text} from '@gravity-ui/uikit';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
 import {operationsApi} from '../../store/reducers/operations';
-import type {IndexBuildMetadata, OperationKind, TOperation} from '../../types/api/operations';
+import type {
+    CompactMetadata,
+    IndexBuildMetadata,
+    OperationKind,
+    TOperation,
+} from '../../types/api/operations';
 import {EStatusCode} from '../../types/api/operations';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import createToast from '../../utils/createToast';
@@ -54,6 +59,7 @@ export function getColumns({
     kind: OperationKind;
 }): DataTableColumn<TOperation>[] {
     const isBuildIndex = kind === 'buildindex';
+    const isCompaction = kind === 'compaction';
 
     // Helper function to get description tooltip content (buildindex-only)
     const getDescriptionTooltip = (operation: TOperation): string => {
@@ -94,13 +100,13 @@ export function getColumns({
         },
     ];
 
-    // Add buildindex-specific state column
-    if (isBuildIndex) {
+    // Add state column for kinds that expose a state (buildindex, compaction)
+    if (isBuildIndex || isCompaction) {
         columns.push({
             name: COLUMNS_NAMES.STATE,
             header: COLUMNS_TITLES[COLUMNS_NAMES.STATE],
             render: ({row}) => {
-                const metadata = row.metadata as IndexBuildMetadata | undefined;
+                const metadata = row.metadata as IndexBuildMetadata | CompactMetadata | undefined;
                 if (!metadata?.state) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
