@@ -113,6 +113,13 @@ export enum IndexBuildState {
     STATE_REJECTED = 'STATE_REJECTED',
 }
 
+export enum CompactState {
+    STATE_UNSPECIFIED = 'STATE_UNSPECIFIED',
+    STATE_IN_PROGRESS = 'STATE_IN_PROGRESS',
+    STATE_DONE = 'STATE_DONE',
+    STATE_CANCELLED = 'STATE_CANCELLED',
+}
+
 export const OPERATION_METADATA_TYPE_URLS = {
     IndexBuild: 'type.googleapis.com/Ydb.Table.IndexBuildMetadata',
     ImportFromS3: 'type.googleapis.com/Ydb.Import.ImportFromS3Metadata',
@@ -264,7 +271,7 @@ export enum BackupProgress {
  */
 export interface IncrementalBackupMetadata {
     '@type'?: typeof OPERATION_METADATA_TYPE_URLS.IncrementalBackup;
-    progress?: BackupProgress | string;
+    progress?: BackupProgress;
     progress_percent?: number;
 }
 
@@ -274,7 +281,7 @@ export interface IncrementalBackupMetadata {
  */
 export interface RestoreMetadata {
     '@type'?: typeof OPERATION_METADATA_TYPE_URLS.Restore;
-    progress?: BackupProgress | string;
+    progress?: BackupProgress;
     progress_percent?: number;
 }
 
@@ -286,7 +293,7 @@ export interface CompactMetadata {
     '@type'?: typeof OPERATION_METADATA_TYPE_URLS.Compact;
     path?: string;
     cascade?: boolean;
-    state?: IndexBuildState | string;
+    state?: CompactState;
     progress?: number;
     shards_done?: number;
     shards_total?: number;
