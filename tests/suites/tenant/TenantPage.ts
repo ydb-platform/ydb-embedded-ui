@@ -3,12 +3,13 @@ import type {Locator, Page} from '@playwright/test';
 import {PageModel} from '../../models/PageModel';
 import {databasePage} from '../../utils/constants';
 
+import {VISIBILITY_TIMEOUT} from './constants';
 import {QueryEditor, QueryTabs} from './queryEditor/models/QueryEditor';
 import {SaveQueryDialog} from './queryEditor/models/SaveQueryDialog';
 import {UnsavedChangesModal} from './queryEditor/models/UnsavedChangesModal';
 import {SavedQueriesTable} from './savedQueries/models/SavedQueriesTable';
 
-export const VISIBILITY_TIMEOUT = 10 * 1000;
+export {VISIBILITY_TIMEOUT};
 
 export enum NavigationTabs {
     Query = 'Query',

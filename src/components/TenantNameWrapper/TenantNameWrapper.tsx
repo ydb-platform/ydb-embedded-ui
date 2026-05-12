@@ -1,8 +1,7 @@
 import React from 'react';
 
-import {ArrowUpRightFromSquare, Pencil, TrashBin} from '@gravity-ui/icons';
-import type {DropdownMenuItem} from '@gravity-ui/uikit';
-import {ClipboardButton, DropdownMenu, Flex, Icon, Link, Text} from '@gravity-ui/uikit';
+import {Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
+import {ClipboardButton, Flex, Link, Text} from '@gravity-ui/uikit';
 
 import {getTenantPath} from '../../routes';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
@@ -12,9 +11,14 @@ import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {getDatabaseLinks} from '../../utils/additionalProps';
+import {CLUSTER_LINK_CONTEXT} from '../../utils/clusterLinks/clusterLinkConstants';
+import {useDatabaseLinks} from '../../utils/clusterLinks/useDatabaseLinks';
 import {cn} from '../../utils/cn';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {canShowTenantMonitoring} from '../../utils/monitoringVisibility';
+import {getConnectToDBDialog} from '../ConnectToDB/ConnectToDBDialog';
+import type {DropdownMenuItemWithDescription} from '../DropdownMenu';
+import {DropdownMenu} from '../DropdownMenu';
 import {EntityStatus} from '../EntityStatusNew/EntityStatus';
 import {InternalLink} from '../InternalLink/InternalLink';
 
@@ -48,12 +52,24 @@ export function TenantNameWrapper({
     const backend = getTenantBackend(tenant, additionalTenantsProps);
     const isExternalLink = externalLink || Boolean(backend);
 
-    const links = getDatabaseLinks(additionalTenantsProps, tenant?.Name, tenant?.Type);
+    const legacyLinks = React.useMemo(
+        () => getDatabaseLinks(additionalTenantsProps, tenant?.Name, tenant?.Type),
+        [additionalTenantsProps, tenant?.Name, tenant?.Type],
+    );
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();
     const showMonitoring = canShowTenantMonitoring(tenant?.ControlPlane, clusterMonitoring);
-    const filteredLinks = showMonitoring
-        ? links
-        : links.filter(({title}) => title !== i18n('field_monitoring-link'));
+
+    const allResolvedLinks = useDatabaseLinks(tenant, legacyLinks);
+
+    const resolvedLinks = React.useMemo(
+        () =>
+            showMonitoring
+                ? allResolvedLinks
+                : allResolvedLinks.filter(
+                      ({context}) => context !== CLUSTER_LINK_CONTEXT.MONITORING,
+                  ),
+        [allResolvedLinks, showMonitoring],
+    );
 
     const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
 
@@ -70,18 +86,15 @@ export function TenantNameWrapper({
     const dbStatus = tenant.Overall;
 
     const dbActions = React.useMemo(() => {
-        const menuItems: DropdownMenuItem[][] = [];
+        const menuItems: DropdownMenuItemWithDescription[][] = [];
 
-        if (!isUserAllowedToMakeChanges) {
-            return [];
-        }
+        const linksItems: DropdownMenuItemWithDescription[] = [];
 
-        const linksItems: DropdownMenuItem[] = [];
-        for (const link of filteredLinks) {
+        for (const link of resolvedLinks) {
             linksItems.push({
-                text: link.title,
-                iconStart: <Icon data={link.icon} />,
-                iconEnd: <ArrowUpRightFromSquare />,
+                title: link.title,
+                description: link.description,
+                iconStart: link.icon,
                 href: link.url,
             });
         }
@@ -90,13 +103,21 @@ export function TenantNameWrapper({
             menuItems.push(linksItems);
         }
 
+        menuItems.push([
+            {
+                title: i18n('action_connect-to-db'),
+                iconStart: PlugConnection,
+                action: () => getConnectToDBDialog({database: tenant.Name}),
+            },
+        ]);
+
         // Do not show edit and delete actions for domain
         if (tenant.Type !== 'Domain' && clusterName) {
-            const manageDbItems: DropdownMenuItem[] = [];
-            if (isEditDBAvailable) {
+            const manageDbItems: DropdownMenuItemWithDescription[] = [];
+            if (isEditDBAvailable && isUserAllowedToMakeChanges) {
                 manageDbItems.push({
-                    text: i18n('action_edit'),
-                    iconStart: <Pencil />,
+                    title: i18n('action_edit'),
+                    iconStart: Pencil,
                     action: () => {
                         uiFactory.onEditDB?.({
                             clusterName,
@@ -105,10 +126,10 @@ export function TenantNameWrapper({
                     },
                 });
             }
-            if (isDeleteDBAvailable) {
+            if (isDeleteDBAvailable && isUserAllowedToMakeChanges) {
                 manageDbItems.push({
-                    text: i18n('action_remove'),
-                    iconStart: <TrashBin />,
+                    title: i18n('action_remove'),
+                    iconStart: TrashBin,
                     action: () => {
                         uiFactory.onDeleteDB?.({
                             clusterName,
@@ -127,7 +148,7 @@ export function TenantNameWrapper({
         return menuItems;
     }, [
         isUserAllowedToMakeChanges,
-        filteredLinks,
+        resolvedLinks,
         clusterName,
         isEditDBAvailable,
         isDeleteDBAvailable,

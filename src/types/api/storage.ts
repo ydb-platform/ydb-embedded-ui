@@ -422,7 +422,7 @@ export interface StorageStatsResponse {
 
 export interface StorageStatsRequestParams {
     database: string;
-    path: SchemaPathParam;
+    path?: SchemaPathParam;
     groupBy?: StorageStatsGroupBy;
     everything?: boolean;
     groups?: boolean;

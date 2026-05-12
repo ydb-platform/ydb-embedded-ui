@@ -39,4 +39,8 @@
     &__left-controls {
         padding-left: var(--g-spacing-2);
     }
+
+    &__developer-ui-tooltip {
+        white-space: pre-wrap;
+    }
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {Wrench} from '@gravity-ui/icons';
 import {Divider, Flex} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
@@ -7,10 +8,11 @@ import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
+import type {TVDiskID} from '../../types/api/vdisk';
 import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatDurationSeconds, stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
+import {formatDurationSeconds, parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculateVDiskSeverity';
 import {
@@ -26,6 +28,7 @@ import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
 import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/EvictVDiskButton';
 import {InternalLink} from '../InternalLink';
+import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {
     buildPDiskFooter,
@@ -33,7 +36,6 @@ import {
     preparePDiskHeaderLabels,
 } from '../PDiskPopup/PDiskPopup';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
-import {vDiskInfoKeyset} from '../VDiskInfo/i18n';
 import type {
     YDBDefinitionListHeaderLabel,
     YDBDefinitionListItem,
@@ -98,7 +100,12 @@ const buildUnavailableVDiskFooter = (
 
     return (
         <div className={b('links')}>
-            <LinkWithIcon title={'Developer UI'} url={vDiskInternalViewerPath} />
+            <LinkWithIcon
+                title={vDiskPopupKeyset('action_open-in-developer-ui')}
+                url={vDiskInternalViewerPath}
+                icon={Wrench}
+                hideEndIcon
+            />
         </div>
     );
 };
@@ -297,6 +304,19 @@ const prepareVDiskData = (
     return vdiskData;
 };
 
+/**
+ * Resolve VDiskId from PreparedVDisk data.
+ * Prefers the structured VDiskId when all fields are present,
+ * falls back to parsing StringifiedId (e.g. "123-1-0-0-0").
+ */
+const resolveVDiskId = (data: PreparedVDisk): Required<TVDiskID> | undefined => {
+    if (isAllVdiskParamsDefined(data.VDiskId)) {
+        return data.VDiskId;
+    }
+    const parsed = parseVdiskId(data.StringifiedId);
+    return isAllVdiskParamsDefined(parsed) ? parsed : undefined;
+};
+
 const buildVDiskFooter = (
     data: PreparedVDisk,
     withDeveloperUILink?: boolean,
@@ -306,7 +326,7 @@ const buildVDiskFooter = (
     }) => string | undefined,
     onSuccess?: () => void,
 ): React.ReactNode | null => {
-    const {NodeId, PDiskId, VDiskSlotId, StringifiedId, VDiskId, DonorMode} = data;
+    const {NodeId, PDiskId, VDiskSlotId, StringifiedId, DonorMode} = data;
 
     const vDiskInternalViewerPath =
         withDeveloperUILink && !isNil(VDiskSlotId) && !isNil(NodeId) && !isNil(PDiskId)
@@ -327,39 +347,37 @@ const buildVDiskFooter = (
 
     const hasLinks = vDiskPagePath || vDiskInternalViewerPath;
 
-    const isVDiskParamsDefined = isAllVdiskParamsDefined(VDiskId);
+    const resolvedVDiskId = resolveVDiskId(data);
 
-    if (!hasLinks && !isVDiskParamsDefined) {
+    if (!hasLinks && !resolvedVDiskId) {
         return null;
     }
 
     return (
-        <Flex direction="column" gap={3}>
-            {hasLinks && (
-                <Flex className={b('links')} wrap="wrap" gap={2}>
+        <Flex direction="column" gap={5}>
+            {vDiskInternalViewerPath && (
+                <LinkWithIcon
+                    title={vDiskPopupKeyset('action_open-in-developer-ui')}
+                    url={vDiskInternalViewerPath}
+                    icon={Wrench}
+                    hideEndIcon
+                />
+            )}
+            {(vDiskPagePath || resolvedVDiskId) && (
+                <Flex wrap="wrap" gap={2}>
                     {vDiskPagePath && (
-                        <LinkWithIcon
-                            key={vDiskPagePath}
-                            title={vDiskInfoKeyset('vdisk-page')}
-                            url={vDiskPagePath}
-                            external={false}
-                        />
+                        <InternalLinkButton href={vDiskPagePath} view="action" size="m">
+                            {vDiskPopupKeyset('action_go-to-vdisk')}
+                        </InternalLinkButton>
                     )}
-                    {vDiskInternalViewerPath && (
-                        <LinkWithIcon
-                            title={vDiskInfoKeyset('developer-ui')}
-                            url={vDiskInternalViewerPath}
+                    {resolvedVDiskId && (
+                        <EvictVDiskButton
+                            vDiskId={resolvedVDiskId}
+                            donorMode={DonorMode}
+                            onSuccess={onSuccess}
                         />
                     )}
                 </Flex>
-            )}
-            {isVDiskParamsDefined && (
-                <EvictVDiskButton
-                    vDiskId={VDiskId}
-                    donorMode={DonorMode}
-                    fullWidth
-                    onSuccess={onSuccess}
-                />
             )}
         </Flex>
     );
@@ -429,7 +447,8 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
     );
 
     const handleAfterEvictVDisk = React.useCallback(() => {
-        const vDiskId = 'VDiskId' in data ? stringifyVdiskId(data.VDiskId) : undefined;
+        // Use StringifiedId directly — it matches the cache key used by getVDiskData
+        const vDiskId = isFullData ? data.StringifiedId : undefined;
         dispatch(
             api.util.invalidateTags([
                 'TableData',
@@ -440,7 +459,7 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
                 },
             ]),
         );
-    }, [dispatch, data]);
+    }, [dispatch, data, isFullData]);
 
     const vdiskHeaderLabels: YDBDefinitionListHeaderLabel[] = React.useMemo(
         () => (isFullData ? prepareHeaderLabels(data) : []),

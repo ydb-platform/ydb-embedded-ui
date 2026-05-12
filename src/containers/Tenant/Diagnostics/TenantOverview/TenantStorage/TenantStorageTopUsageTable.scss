@@ -1,0 +1,121 @@
+@use '../../../../../styles/mixins.scss';
+
+.ydb-tenant-storage-top-usage-table {
+    --data-table-cell-align: top;
+    --data-table-cell-vertical-padding: 10.5px;
+
+    .tenant-overview__title {
+        display: flex;
+        align-items: baseline;
+        gap: var(--g-spacing-1);
+
+        margin-bottom: var(--g-spacing-3);
+    }
+
+    .tenant-overview__table {
+        padding: var(--g-spacing-2) var(--g-spacing-4);
+
+        border: 1px solid var(--g-color-line-generic);
+        border-radius: var(--g-border-radius-m);
+    }
+
+    .ydb-resizeable-data-table {
+        width: 100%;
+    }
+
+    .data-table__th {
+        @include mixins.subheader-1-typography();
+    }
+
+    .data-table__row {
+        height: auto;
+    }
+
+    .data-table__td {
+        line-height: var(--g-text-body-1-line-height);
+    }
+
+    &__type-cell {
+        min-width: 0;
+    }
+
+    &__type-icon {
+        display: inline-flex;
+        flex: 0 0 auto;
+        justify-content: center;
+        align-items: center;
+
+        height: var(--g-text-body-1-line-height);
+    }
+
+    &__object-cell {
+        min-width: 0;
+    }
+
+    &__object-link {
+        min-width: 0;
+        @include mixins.body-1-typography();
+    }
+
+    &__path-row {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
+
+        min-width: 0;
+        height: var(--g-text-caption-2-line-height);
+    }
+
+    &__path-text {
+        min-width: 0;
+    }
+
+    &__path-copy.g-button {
+        --g-button-height: 16px;
+
+        flex: 0 0 auto;
+
+        min-width: 16px;
+        height: 16px;
+        min-height: 16px;
+
+        line-height: 16px;
+    }
+
+    &__space-cell {
+        flex-wrap: nowrap;
+
+        min-width: 0;
+    }
+
+    &__space-progress {
+        flex: 1 1 0;
+
+        min-width: 0;
+        /* visually center the 10px progress bar with the body-1 text baseline */
+        padding-top: 4px;
+    }
+
+    &__space-progress-bar {
+        --g-progress-filled-background-color: var(--g-color-base-info-medium);
+        --g-progress-empty-background-color: var(--g-color-base-info-light);
+
+        height: 10px;
+
+        border-radius: var(--g-border-radius-xs);
+    }
+
+    &__space-progress-bar .g-progress__item {
+        border-radius: var(--g-border-radius-xs) 0 0 var(--g-border-radius-xs);
+
+        transition: none;
+    }
+
+    &__space-value {
+        flex: 0 0 auto;
+
+        min-width: 42px;
+
+        white-space: nowrap;
+    }
+}

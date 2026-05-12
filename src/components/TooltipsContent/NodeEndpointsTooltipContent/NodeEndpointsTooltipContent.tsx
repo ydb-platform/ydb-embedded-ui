@@ -1,6 +1,9 @@
 import React from 'react';
 
+import {Wrench} from '@gravity-ui/icons';
+
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
+import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useNodeDeveloperUIHref} from '../../../utils/hooks/useNodeDeveloperUIHref';
 import {LinkWithIcon} from '../../LinkWithIcon/LinkWithIcon';
 import type {YDBDefinitionListItem} from '../../YDBDefinitionList/YDBDefinitionList';
@@ -60,23 +63,31 @@ const prepareNodeEndpointsData = (data?: PreparedStorageNode): YDBDefinitionList
 export const NodeEndpointsTooltipContent = ({data}: NodeEdpointsTooltipProps) => {
     const developerUIInternalHref = useNodeDeveloperUIHref(data);
 
-    const info = React.useMemo(() => {
-        const items = prepareNodeEndpointsData(data);
+    const info = React.useMemo(() => prepareNodeEndpointsData(data), [data]);
 
-        if (developerUIInternalHref) {
-            items.push({
-                name: i18n('field_links'),
-                content: (
+    const nodeActions = uiFactory.renderNodeTooltipActions?.({data});
+
+    const footer = React.useMemo(() => {
+        if (!developerUIInternalHref && !nodeActions) {
+            return undefined;
+        }
+
+        return (
+            <React.Fragment>
+                {developerUIInternalHref ? (
                     <LinkWithIcon
                         title={i18n('context_developer-ui')}
                         url={developerUIInternalHref}
+                        icon={Wrench}
+                        hideEndIcon
                     />
-                ),
-            });
-        }
+                ) : null}
+                {nodeActions}
+            </React.Fragment>
+        );
+    }, [developerUIInternalHref, nodeActions]);
 
-        return items;
-    }, [data, developerUIInternalHref]);
-
-    return <YDBDefinitionList items={info} compact responsive nameMaxWidth="auto" />;
+    return (
+        <YDBDefinitionList items={info} footer={footer} compact responsive nameMaxWidth="auto" />
+    );
 };

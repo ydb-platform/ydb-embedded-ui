@@ -4,6 +4,10 @@ import {Flex} from '@gravity-ui/uikit';
 
 import {EmptyState} from '../../../../components/EmptyState';
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
+import {
+    isComputeRelatedType,
+    isStorageRelatedType,
+} from '../../../../store/reducers/healthcheckInfo/utils';
 import {getIllustration} from '../../../../utils/illustrations';
 import {useTenantQueryParams} from '../../useTenantQueryParams';
 import i18n from '../i18n';
@@ -15,7 +19,7 @@ interface IssuesProps {
 }
 
 export function Issues({issues}: IssuesProps) {
-    const NoSearchResultsImage = getIllustration('NoSearchResults');
+    const SuccessImage = getIllustration('SuccessOperation');
 
     const {view, issuesFilter} = useTenantQueryParams();
 
@@ -42,7 +46,14 @@ export function Issues({issues}: IssuesProps) {
         () =>
             view
                 ? filteredIssues.filter((issue) => {
-                      const type = issue.rootTypeForUI || issue.type;
+                      const type = issue.rootTypeForUI ?? issue.type;
+
+                      if (view === 'storage') {
+                          return isStorageRelatedType(type);
+                      }
+                      if (view === 'compute') {
+                          return isComputeRelatedType(type);
+                      }
                       return type?.toLowerCase().startsWith(view);
                   })
                 : [],
@@ -53,7 +64,7 @@ export function Issues({issues}: IssuesProps) {
         return (
             <Flex grow={1} justifyContent="center" alignItems="center">
                 <EmptyState
-                    image={<NoSearchResultsImage width={100} height={100} />}
+                    image={<SuccessImage width={100} height={100} />}
                     position="center"
                     size="xs"
                     title={i18n('label_no-issues')}

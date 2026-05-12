@@ -3,6 +3,24 @@ import {calculateProgressStatus} from '../../../utils/progress';
 
 import type {ClusterMetricsBaseProps, ClusterMetricsCommonProps} from './shared';
 
+function parseDiagramValue(value: number | string) {
+    if (typeof value === 'string' && value.trim() === '') {
+        return NaN;
+    }
+
+    const parsedValue = Number(value);
+
+    return Number.isFinite(parsedValue) ? parsedValue : NaN;
+}
+
+function calculateFillWidth(value: number, capacity: number) {
+    if (!Number.isFinite(value) || !Number.isFinite(capacity) || capacity <= 0) {
+        return 0;
+    }
+
+    return (value / capacity) * 100;
+}
+
 export function calculateBaseDiagramValues({
     colorizeProgress = true,
     warningThreshold,
@@ -33,9 +51,9 @@ export function getDiagramValues({
 }: ClusterMetricsCommonProps & {
     legendFormatter: (params: {value: number; capacity: number}) => string;
 }) {
-    const parsedValue = parseFloat(String(value));
-    const parsedCapacity = parseFloat(String(capacity));
-    const fillWidth = (parsedValue / parsedCapacity) * 100 || 0;
+    const parsedValue = parseDiagramValue(value);
+    const parsedCapacity = parseDiagramValue(capacity);
+    const fillWidth = calculateFillWidth(parsedValue, parsedCapacity);
 
     const legend = legendFormatter({
         value: parsedValue,

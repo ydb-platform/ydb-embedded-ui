@@ -34,21 +34,32 @@ export class NodesPage extends PageModel {
 
     async selectGroupByOption(option: NodesGroupByOptions) {
         await this.groupBySelect.click();
-        await this.groupByPopup.isVisible();
+        await this.groupByPopup.waitFor({state: 'visible'});
         await this.groupByPopup.locator('.g-select-list__option').getByText(option).click();
     }
     async waitForTableGroupsLoaded() {
-        await this.page.locator('.table-skeleton').isHidden();
-        await this.tableGroupsWrapper.isVisible();
+        await this.page.locator('.table-skeleton').waitFor({state: 'hidden'});
+        await this.tableGroupsWrapper.waitFor({state: 'visible'});
     }
     selectTableGroup(name: string) {
         return this.tableGroupsWrapper.locator('.ydb-table-group').filter({hasText: name}).first();
     }
+    selectFirstTableGroup() {
+        return this.tableGroupsWrapper.locator('.ydb-table-group').first();
+    }
     async expandTableGroup(name: string) {
-        await this.selectTableGroup(name).getByRole('button').click();
+        await this.selectTableGroup(name).locator('.ydb-table-group__button').click();
+    }
+    async expandFirstTableGroup() {
+        await this.selectFirstTableGroup().locator('.ydb-table-group__button').click();
     }
     selectTableGroupContent(name: string) {
         return this.selectTableGroup(name)
+            .locator('.ydb-table-group__content')
+            .locator('.ydb-paginated-table');
+    }
+    selectFirstTableGroupContent() {
+        return this.selectFirstTableGroup()
             .locator('.ydb-table-group__content')
             .locator('.ydb-paginated-table');
     }

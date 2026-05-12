@@ -1,8 +1,12 @@
-import {ChartAreaStacked, ListUl} from '@gravity-ui/icons';
+import {ListUl} from '@gravity-ui/icons';
 
 import i18n from '../components/TenantNameWrapper/i18n';
 import type {AdditionalTenantsProps, DatabaseLink} from '../types/additionalProps';
 import type {ETenantType} from '../types/api/tenant';
+
+import {CLUSTER_LINK_CONTEXT} from './clusterLinks/clusterLinkConstants';
+
+import MoniumIcon from '../assets/icons/monium.svg';
 
 export function getDatabaseLinks(
     additionalProps?: AdditionalTenantsProps,
@@ -20,7 +24,8 @@ export function getDatabaseLinks(
             links.push({
                 title: i18n('field_monitoring-link'),
                 url: link,
-                icon: ChartAreaStacked,
+                icon: MoniumIcon,
+                context: CLUSTER_LINK_CONTEXT.MONITORING,
             });
         }
     }
@@ -28,7 +33,12 @@ export function getDatabaseLinks(
     if (additionalProps.getLogsLink) {
         const link = additionalProps.getLogsLink(name);
         if (link) {
-            links.push({title: i18n('field_logs-link'), url: link, icon: ListUl});
+            links.push({
+                title: i18n('field_logs-link'),
+                url: link,
+                icon: ListUl,
+                context: CLUSTER_LINK_CONTEXT.LOGGING,
+            });
         }
     }
 
@@ -53,7 +63,12 @@ export function getInfoTabLinks(
     if (additionalProps.getLogsLink) {
         const link = additionalProps.getLogsLink(name);
         if (link) {
-            links.push({title: i18n('field_logs-link'), url: link, icon: ListUl});
+            links.push({
+                title: i18n('field_logs-link'),
+                url: link,
+                icon: ListUl,
+                context: CLUSTER_LINK_CONTEXT.LOGGING,
+            });
         }
     }
 

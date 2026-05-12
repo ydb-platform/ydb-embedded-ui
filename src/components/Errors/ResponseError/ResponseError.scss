@@ -6,11 +6,17 @@
         min-width: 0;
     }
 
+    .g-alert__title {
+        overflow-wrap: anywhere;
+    }
+
     &__message {
         min-width: 0;
     }
 
     &__data-message {
         display: block;
+
+        overflow-wrap: anywhere;
     }
 }
