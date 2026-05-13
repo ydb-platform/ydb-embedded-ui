@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../components/InternalLink';
@@ -26,7 +28,7 @@ import './PDiskSpaceDistribution.scss';
 
 const b = cn('ydb-pdisk-space-distribution');
 
-const SLOT_HEIGHT = 40;
+const BASE_SLOT_HEIGHT = 40;
 
 interface PDiskSpaceDistributionProps {
     data: PDiskData;
@@ -38,13 +40,33 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
 
     const {PDiskId, NodeId} = data;
 
-    const containerHeight = SLOT_HEIGHT * (SlotItems?.length || 1);
+    // Find the minimum Total among non-log slots to use as the base unit for height scaling
+    const minNonLogTotal = React.useMemo(() => {
+        if (!SlotItems?.length) {
+            return 1;
+        }
+
+        let minTotal = Infinity;
+
+        for (const item of SlotItems) {
+            if (item.SlotType === 'log') {
+                continue;
+            }
+            const value = Number(item.Total) || 1;
+            if (value < minTotal) {
+                minTotal = value;
+            }
+        }
+
+        return minTotal === Infinity ? 1 : minTotal;
+    }, [SlotItems]);
 
     const renderSlots = () => {
         return SlotItems?.map((item, index) => {
             return (
                 <Slot
                     item={item}
+                    minNonLogTotal={minNonLogTotal}
                     pDiskId={PDiskId}
                     nodeId={NodeId}
                     getVDiskPagePath={getVDiskPagePath}
@@ -59,13 +81,7 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
     }
 
     return (
-        <div
-            className={b(null)}
-            style={{
-                height: containerHeight,
-                minHeight: containerHeight,
-            }}
-        >
+        <div className={b(null)}>
             <DiskStateProgressBar
                 className={b('pdisk-bar')}
                 severity={data.Severity}
@@ -80,6 +96,7 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
 
 interface SlotProps<T extends SlotItemType> {
     item: SlotItem<T>;
+    minNonLogTotal: number;
 
     pDiskId?: string | number;
     nodeId?: string | number;
@@ -89,7 +106,12 @@ interface SlotProps<T extends SlotItemType> {
     ) => string | undefined;
 }
 
-function Slot<T extends SlotItemType>({item, nodeId, getVDiskPagePath}: SlotProps<T>) {
+function Slot<T extends SlotItemType>({
+    item,
+    minNonLogTotal,
+    nodeId,
+    getVDiskPagePath,
+}: SlotProps<T>) {
     const renderContent = () => {
         if (isVDiskSlot(item)) {
             const vDiskPagePath = getVDiskPagePath?.({
@@ -175,8 +197,14 @@ function Slot<T extends SlotItemType>({item, nodeId, getVDiskPagePath}: SlotProp
         return null;
     };
 
+    // Log slots get half the base height; others scale proportionally to the smallest non-log slot
+    const slotHeight =
+        item.SlotType === 'log'
+            ? BASE_SLOT_HEIGHT / 2
+            : ((Number(item.Total) || 1) / minNonLogTotal) * BASE_SLOT_HEIGHT;
+
     return (
-        <div className={b('slot-wrapper')} style={{flexGrow: Number(item.Total) || 1}}>
+        <div className={b('slot-wrapper')} style={{height: slotHeight}}>
             {renderContent()}
         </div>
     );
