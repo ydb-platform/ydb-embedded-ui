@@ -93,7 +93,7 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
                     value={Number(Used)}
                     capacity={Number(Limit)}
                     formatValues={formatStorageValuesToGb}
-                    colorizeProgress={true}
+                    defaultStatus="info"
                 />
             ),
         });

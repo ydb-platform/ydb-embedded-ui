@@ -2,7 +2,7 @@ import {useTheme} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {calculateProgressStatus, defaultFormatProgressValues} from '../../utils/progress';
-import type {FormatProgressViewerValues} from '../../utils/progress';
+import type {FormatProgressViewerValues, ProgressStatus} from '../../utils/progress';
 import {isNumeric} from '../../utils/utils';
 
 import './ProgressViewer.scss';
@@ -19,10 +19,9 @@ Props description:
 3) formatValues - function for formatting the value and capacity
 4) percents - display progress in percents
 5) colorizeProgress - change the color of the progress bar depending on its value
-6) inverseColorize - invert the colors of the progress bar
-7) warningThreshold - the percentage of fullness at which the color of the progress bar changes to yellow
-8) dangerThreshold - the percentage of fullness at which the color of the progress bar changes to red
-9) withOverflow - percents may be more that 100%
+6) warningThreshold - the percentage of fullness at which the color of the progress bar changes to yellow
+7) dangerThreshold - the percentage of fullness at which the color of the progress bar changes to red
+8) withOverflow - percents may be more that 100%
 */
 
 export interface ProgressViewerProps {
@@ -33,9 +32,9 @@ export interface ProgressViewerProps {
     className?: string;
     size?: ProgressViewerSize;
     colorizeProgress?: boolean;
-    inverseColorize?: boolean;
     warningThreshold?: number;
     dangerThreshold?: number;
+    defaultStatus?: ProgressStatus | 'info';
     hideCapacity?: boolean;
     withOverflow?: boolean;
 }
@@ -49,9 +48,9 @@ export function ProgressViewer({
     className,
     size = 'xs',
     colorizeProgress,
-    inverseColorize,
     warningThreshold,
     dangerThreshold,
+    defaultStatus,
     hideCapacity,
 }: ProgressViewerProps) {
     const theme = useTheme();
@@ -71,13 +70,14 @@ export function ProgressViewer({
         [valueText, capacityText] = formatValues(Number(value), Number(capacity));
     }
 
-    const status = calculateProgressStatus({
-        fillWidth,
-        warningThreshold,
-        dangerThreshold,
-        colorizeProgress,
-        inverseColorize,
-    });
+    const status =
+        defaultStatus ??
+        calculateProgressStatus({
+            fillWidth,
+            warningThreshold,
+            dangerThreshold,
+            colorizeProgress,
+        });
     if (colorizeProgress && !isNumeric(capacity)) {
         fillWidth = 100;
     }

@@ -50,6 +50,12 @@
                 background-color: var(--ydb-color-status-red);
             }
         }
+        &_info {
+            background-color: var(--g-color-base-info-light);
+            #{$block}__line {
+                background-color: var(--ydb-color-status-blue);
+            }
+        }
     }
 
     &__line {
