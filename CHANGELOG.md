@@ -1,5 +1,23 @@
 # Changelog
 
+## [15.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.5.1...v15.6.0) (2026-05-12)
+
+
+### Features
+
+* add missing database operation kinds to filter ([#3860](https://github.com/ydb-platform/ydb-embedded-ui/issues/3860)) ([9b0ba4a](https://github.com/ydb-platform/ydb-embedded-ui/commit/9b0ba4a49ff2aac71c962efa4e8b3d3df7735219))
+* database storage ([#3829](https://github.com/ydb-platform/ydb-embedded-ui/issues/3829)) ([258635b](https://github.com/ydb-platform/ydb-embedded-ui/commit/258635b36f853d78e0722b0a2948f0ec294ff65c))
+* dynamic links for Clusters and Databases tables ([#3877](https://github.com/ydb-platform/ydb-embedded-ui/issues/3877)) ([3b1185d](https://github.com/ydb-platform/ydb-embedded-ui/commit/3b1185d7ac792b8b441ef0b6988e3075052d0a2c))
+* **Header:** redesign database links ([#3863](https://github.com/ydb-platform/ydb-embedded-ui/issues/3863)) ([a438815](https://github.com/ydb-platform/ydb-embedded-ui/commit/a4388150bd4a3a5bf03ae53ccf37ec3772068678))
+* redesign disk popup actions ([#3873](https://github.com/ydb-platform/ydb-embedded-ui/issues/3873)) ([a8ef081](https://github.com/ydb-platform/ydb-embedded-ui/commit/a8ef081763f97dc1f47a0eac3be6ceb2c22f22eb))
+* support custom actions for Node tooltip ([#3882](https://github.com/ydb-platform/ydb-embedded-ui/issues/3882)) ([649cb9a](https://github.com/ydb-platform/ydb-embedded-ui/commit/649cb9ad31866d0ccb34cf26b3d63b85b8ecf179))
+
+
+### Bug Fixes
+
+* diagnostics timeout ([#3862](https://github.com/ydb-platform/ydb-embedded-ui/issues/3862)) ([7dcb392](https://github.com/ydb-platform/ydb-embedded-ui/commit/7dcb392855b25466312faa02b00b87681f978f8e))
+* **Healthcheck:** use SuccessOperation illustration for no-issues ([#3870](https://github.com/ydb-platform/ydb-embedded-ui/issues/3870)) ([f7c34ac](https://github.com/ydb-platform/ydb-embedded-ui/commit/f7c34acdcdada98bfec347ce469c860a2bc89b18))
+
 ## [15.5.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.5.0...v15.5.1) (2026-04-30)
 
 
