@@ -109,4 +109,42 @@ describe('copyToClipboard', () => {
         const after = document.querySelectorAll('textarea').length;
         expect(after).toBe(before);
     });
+
+    it('resolves to false (does not reject) when document.body is missing', async () => {
+        setNavigator({});
+        const originalBody = document.body;
+        Object.defineProperty(document, 'body', {
+            value: null,
+            configurable: true,
+        });
+        try {
+            await expect(copyTextDataToClipboard('hello')).resolves.toBe(false);
+        } finally {
+            Object.defineProperty(document, 'body', {
+                value: originalBody,
+                configurable: true,
+            });
+        }
+    });
+
+    it('resolves to false (does not reject) when string materialization throws', async () => {
+        // Simulate the V8 max string length case where joining throws RangeError
+        // by stubbing Array.prototype.join. Both async clipboard methods reject
+        // so the execCommand fallback runs and must catch the throw.
+        const write = jest.fn().mockRejectedValue(new Error('nope'));
+        const writeText = jest.fn().mockRejectedValue(new Error('nope'));
+        setNavigator({clipboard: {write, writeText}});
+
+        const originalJoin = Array.prototype.join;
+        // eslint-disable-next-line no-extend-native
+        Array.prototype.join = function () {
+            throw new RangeError('Invalid string length');
+        };
+        try {
+            await expect(copyTextDataToClipboard('hello')).resolves.toBe(false);
+        } finally {
+            // eslint-disable-next-line no-extend-native
+            Array.prototype.join = originalJoin;
+        }
+    });
 });

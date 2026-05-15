@@ -20,6 +20,17 @@ async function copyBlobPartsToClipboard(parts: BlobPart[]) {
         return false;
     }
 
+    // Lazily materialise the joined string only when a fallback path needs
+    // it, and cache it so we don't allocate the (potentially very large)
+    // TSV string twice if both async methods fail.
+    let cachedText: string | undefined;
+    const getText = (): string => {
+        if (cachedText === undefined) {
+            cachedText = blobPartsToString(parts);
+        }
+        return cachedText;
+    };
+
     // Async Clipboard API requires a secure context (HTTPS or localhost).
     // YDB Embedded UI is often served over plain HTTP on internal hosts,
     // where `navigator.clipboard` is undefined, so we must guard the access
@@ -42,7 +53,7 @@ async function copyBlobPartsToClipboard(parts: BlobPart[]) {
         if (navigator.clipboard.writeText) {
             try {
                 // Fallback for older browsers without clipboard.write() support (Firefox < 127)
-                await navigator.clipboard.writeText(blobPartsToString(parts));
+                await navigator.clipboard.writeText(getText());
                 return true;
             } catch {
                 // Fall through to execCommand fallback below.
@@ -50,19 +61,37 @@ async function copyBlobPartsToClipboard(parts: BlobPart[]) {
         }
     }
 
-    return copyTextWithExecCommand(blobPartsToString(parts));
+    // Final fallback: hidden-textarea + document.execCommand('copy').
+    // Materializing the joined string can throw `RangeError: Invalid string
+    // length` for huge result sets — the same scenario that motivated the
+    // chunked BlobPart path — so guard the whole step and resolve to false
+    // instead of rejecting.
+    try {
+        return copyTextWithExecCommand(getText());
+    } catch {
+        return false;
+    }
 }
 
 function blobPartsToString(parts: BlobPart[]): string {
     const stringParts: string[] = [];
     for (const part of parts) {
-        stringParts.push(typeof part === 'string' ? part : String(part));
+        if (typeof part === 'string') {
+            stringParts.push(part);
+        } else if (part instanceof ArrayBuffer || ArrayBuffer.isView(part)) {
+            stringParts.push(new TextDecoder().decode(part));
+        } else {
+            // Blob: callers in this module currently only pass strings, so
+            // this branch exists for type-completeness; Blob contents cannot
+            // be read synchronously, so fall back to the type tag.
+            stringParts.push(String(part));
+        }
     }
     return stringParts.join('');
 }
 
 function copyTextWithExecCommand(text: string): boolean {
-    if (typeof document === 'undefined') {
+    if (typeof document === 'undefined' || !document.body) {
         return false;
     }
 
@@ -84,15 +113,16 @@ function copyTextWithExecCommand(text: string): boolean {
     textarea.style.background = 'transparent';
     textarea.style.opacity = '0';
 
-    document.body.appendChild(textarea);
-
     try {
+        document.body.appendChild(textarea);
         textarea.select();
         textarea.setSelectionRange(0, text.length);
         return document.execCommand('copy');
     } catch {
         return false;
     } finally {
-        document.body.removeChild(textarea);
+        if (textarea.parentNode) {
+            textarea.parentNode.removeChild(textarea);
+        }
     }
 }
