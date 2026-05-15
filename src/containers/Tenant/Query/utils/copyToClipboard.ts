@@ -54,11 +54,11 @@ async function copyBlobPartsToClipboard(parts: BlobPart[]) {
 }
 
 function blobPartsToString(parts: BlobPart[]): string {
-    let result = '';
+    const stringParts: string[] = [];
     for (const part of parts) {
-        result += typeof part === 'string' ? part : String(part);
+        stringParts.push(typeof part === 'string' ? part : String(part));
     }
-    return result;
+    return stringParts.join('');
 }
 
 function copyTextWithExecCommand(text: string): boolean {
@@ -70,6 +70,8 @@ function copyTextWithExecCommand(text: string): boolean {
     textarea.value = text;
     // Avoid scrolling to the bottom and keep the textarea off-screen.
     textarea.setAttribute('readonly', '');
+    textarea.setAttribute('aria-hidden', 'true');
+    textarea.tabIndex = -1;
     textarea.style.position = 'fixed';
     textarea.style.top = '0';
     textarea.style.left = '0';
