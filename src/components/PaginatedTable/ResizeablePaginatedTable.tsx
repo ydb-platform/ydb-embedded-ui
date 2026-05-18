@@ -17,11 +17,13 @@ function updateColumnsWidth<T>(columns: Column<T>[], columnsWidthSetup: ColumnWi
 interface ResizeablePaginatedTableProps<T, F>
     extends Omit<PaginatedTableProps<T, F>, 'onColumnsResize'> {
     columnsWidthLSKey: string;
+    extraContainerClassName?: string;
 }
 
 export function ResizeablePaginatedTable<T, F>({
     columnsWidthLSKey,
     columns,
+    extraContainerClassName,
     ...props
 }: ResizeablePaginatedTableProps<T, F>) {
     const [tableColumnsWidth, setTableColumnsWidth, isTableWidthLoading] =
@@ -37,7 +39,9 @@ export function ResizeablePaginatedTable<T, F>({
         <PaginatedTable
             columns={updatedColumns}
             onColumnsResize={setTableColumnsWidth}
-            containerClassName={b('resizeable-table-container')}
+            //! looks like container class is being added above its parent
+            //! according to .ydb-paginated-table
+            containerClassName={b('resizeable-table-container', extraContainerClassName)}
             {...props}
         />
     );
