@@ -1,12 +1,9 @@
-export interface BuildTemplateOptions {
-    tableName: string;
-    columns?: Column[];
-    values?: {[key: string]: string | null};
-    secondaryIndexes?: SecondaryIndex[];
-    deletedColumns?: Column[];
-    updatedSecondaryIndexes?: UpdatedSecondaryIndex[];
-    columnsHash?: string[];
-    settings?: TableSettings;
+type TableType = 'row' | 'column' | 'document';
+
+interface DocumentSecondaryIndex {
+    name: string;
+    shardColumn: string;
+    sortColumn?: string;
 }
 
 interface EntitySchemeEntry {
@@ -24,11 +21,6 @@ type Int64 = string;
 interface Timestamp {
     seconds: Int64;
     nanos?: number;
-}
-
-export enum TableFeatureFlag {
-    Enabled = 'ENABLED',
-    Disabled = 'DISABLED',
 }
 
 interface TableChangefeed {
@@ -206,4 +198,34 @@ export interface UpdatedSecondaryIndex {
     name: string;
     newName: string;
     isDeleted: boolean;
+}
+
+export enum TableFeatureFlag {
+    Enabled = 'ENABLED',
+    Disabled = 'DISABLED',
+}
+
+export interface BuildTemplateOptions {
+    tableName: string;
+    columns?: Column[];
+    values?: {[key: string]: string | null};
+    secondaryIndexes?: SecondaryIndex[];
+    deletedColumns?: Column[];
+    updatedSecondaryIndexes?: UpdatedSecondaryIndex[];
+    columnsHash?: string[];
+    settings?: TableSettings;
+}
+
+export interface FormValues {
+    name: string;
+    type: TableType;
+    columns: ColumnField[];
+    documentColumns: ColumnField[];
+    secondaryIndexes: SecondaryIndex[];
+    documentSecondaryIndexes: (DocumentSecondaryIndex & {_id: string})[];
+    deletedColumns: Column[];
+    updatedSecondaryIndexes: UpdatedSecondaryIndex[];
+    partitionKey: string[];
+    partitionCount: number;
+    settings: TableSettings;
 }

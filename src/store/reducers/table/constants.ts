@@ -33,3 +33,8 @@ WITH (
     %settings%
 );
 `.trim();
+
+export const UPDATE_TABLE_QUERY_TEMPLATE = `
+ALTER TABLE %tableName%
+%actions%
+`.trim();

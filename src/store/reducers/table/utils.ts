@@ -1,11 +1,19 @@
 import {duration} from '@gravity-ui/date-utils';
 
+import type {TColumnTableDescription} from '../../../types/api/schema/columnEntity';
+import {EPathType} from '../../../types/api/schema/schema';
+import type {TEvDescribeSchemeResult} from '../../../types/api/schema/schema';
+import {EColumnCodec, EUnit} from '../../../types/api/schema/shared';
+import type {TColumnDescription} from '../../../types/api/schema/shared';
+import type {TTableDescription} from '../../../types/api/schema/table';
+
 import {
     CREATE_COLUMN_TABLE_QUERY_TEMPLATE,
     CREATE_TABLE_QUERY_TEMPLATE,
     NAME_REGEX,
     SECONDS_A_DAY,
     SERIAL_TYPES_MAP,
+    UPDATE_TABLE_QUERY_TEMPLATE,
 } from './constants';
 import {PartitionsType} from './types';
 import type {
@@ -13,7 +21,9 @@ import type {
     Column,
     ColumnFamilyDescription,
     ColumnField,
+    FormValues,
     SecondaryIndex,
+    TTLSettings,
     TableSettings,
     UpdatedSecondaryIndex,
 } from './types';
@@ -445,12 +455,204 @@ function buildTemplate(
         });
 }
 
+function mapColumnCodec(codec?: EColumnCodec): string | undefined {
+    switch (codec) {
+        case EColumnCodec.ColumnCodecLZ4:
+            return 'COMPRESSION_LZ4';
+        case EColumnCodec.ColumnCodecZSTD:
+            return 'COMPRESSION_ZSTD';
+        case EColumnCodec.ColumnCodecPlain:
+            return 'COMPRESSION_NONE';
+        default:
+            return undefined;
+    }
+}
+
+function mapEpochUnit(unit: EUnit): TTLSettings['epochMode'] {
+    switch (unit) {
+        case EUnit.UNIT_SECONDS:
+            return 'seconds';
+        case EUnit.UNIT_MILLISECONDS:
+            return 'milliseconds';
+        case EUnit.UNIT_MICROSECONDS:
+            return 'microseconds';
+        case EUnit.UNIT_NANOSECONDS:
+            return 'nanoseconds';
+        default:
+            return undefined;
+    }
+}
+
+function rawColumnToColumnField(
+    col: TColumnDescription,
+    keyColumnNames: string[],
+    index: number,
+): ColumnField {
+    const name = col.Name ?? '';
+    const keyOrder = keyColumnNames.indexOf(name);
+    const literalValue = col.DefaultFromLiteral?.value;
+    const defaultValue = literalValue
+        ? (Object.values(literalValue)[0] as string | number | boolean)
+        : undefined;
+
+    return {
+        _id: String(col.Id ?? index),
+        name,
+        type: col.Type ?? '',
+        notNull: col.NotNull ?? false,
+        key: keyOrder >= 0,
+        keyOrder: keyOrder >= 0 ? keyOrder : undefined,
+        family: col.FamilyName,
+        autoincrement: !!col.DefaultFromSequence,
+        defaultValue,
+        withDefaultValue: defaultValue !== undefined,
+        isDeletable: true,
+    };
+}
+
+function prepareTTLSettings(enabled?: {
+    ColumnName?: string;
+    ExpireAfterSeconds?: number;
+    ColumnUnit?: EUnit;
+}): TTLSettings {
+    if (!enabled) {
+        return {status: 'disabled'};
+    }
+    const {ColumnName: column, ExpireAfterSeconds, ColumnUnit} = enabled;
+    const isEpochMode = ColumnUnit !== undefined && ColumnUnit !== EUnit.UNIT_AUTO;
+
+    if (isEpochMode) {
+        return {
+            status: 'enabled',
+            column,
+            columnWithEpochMode: true,
+            lifetime: ExpireAfterSeconds,
+            epochMode: mapEpochUnit(ColumnUnit),
+        };
+    }
+    return {
+        status: 'enabled',
+        column,
+        columnWithEpochMode: false,
+        lifetime: ExpireAfterSeconds,
+        unit: 'seconds',
+    };
+}
+
+function prepareRowTableSettings(table: TTableDescription): TableSettings {
+    const partitioningPolicy = table.PartitionConfig?.PartitioningPolicy;
+    const sizeToSplit = partitioningPolicy?.SizeToSplit;
+    const autoPartitionBySize = !!sizeToSplit && sizeToSplit !== '0';
+
+    let partitionsType: PartitionsType = PartitionsType.None;
+    if (table.UniformPartitionsCount) {
+        partitionsType = PartitionsType.Uniform;
+    } else if (table.SplitBoundary && table.SplitBoundary.length > 0) {
+        partitionsType = PartitionsType.Explicit;
+    }
+
+    const rawFamilies = table.PartitionConfig?.ColumnFamilies ?? [];
+    const columnFamilies: ColumnFamilyDescription[] = rawFamilies
+        .filter((fam) => fam.Name)
+        .map((fam) => ({
+            name: fam.Name!,
+            compression: mapColumnCodec(fam.ColumnCodec),
+            data: fam.StorageConfig?.Data?.PreferredPoolKind
+                ? {media: fam.StorageConfig.Data.PreferredPoolKind}
+                : undefined,
+        }));
+
+    return {
+        partitionsType,
+        uniformPartitions: table.UniformPartitionsCount
+            ? String(table.UniformPartitionsCount)
+            : undefined,
+        autoPartitionBySize,
+        autoPartitionBySizeMb:
+            autoPartitionBySize && sizeToSplit
+                ? Math.round(parseInt(sizeToSplit, 10) / (1024 * 1024))
+                : undefined,
+        autoPartitionByLoad: partitioningPolicy?.SplitByLoadSettings?.Enabled ?? false,
+        autoPartitionMinPartitions:
+            partitioningPolicy?.MinPartitionsCount !== undefined
+                ? String(partitioningPolicy.MinPartitionsCount)
+                : undefined,
+        autoPartitionMaxPartitions:
+            partitioningPolicy?.MaxPartitionsCount !== undefined
+                ? String(partitioningPolicy.MaxPartitionsCount)
+                : undefined,
+        keyBloomFilter: table.PartitionConfig?.EnableFilterByKey ?? false,
+        ttl: prepareTTLSettings(table.TTLSettings?.Enabled),
+        columnFamilies: columnFamilies.length > 0 ? columnFamilies : undefined,
+    };
+}
+
+function prepareColumnTableSettings(table: TColumnTableDescription): TableSettings {
+    return {
+        ttl: prepareTTLSettings(table.TtlSettings?.Enabled),
+    };
+}
+
+export function prepareFormValues(response: TEvDescribeSchemeResult): FormValues {
+    const pathDesc = response.PathDescription;
+    const name = pathDesc?.Self?.Name ?? '';
+    const pathType = pathDesc?.Self?.PathType;
+
+    if (pathType === EPathType.EPathTypeColumnTable && pathDesc?.ColumnTableDescription) {
+        const desc = pathDesc.ColumnTableDescription;
+        const keyColumnNames = desc.Schema?.KeyColumnNames ?? [];
+
+        return {
+            name,
+            type: 'column',
+            columns: (desc.Schema?.Columns ?? []).map((col, i) =>
+                rawColumnToColumnField(col as TColumnDescription, keyColumnNames, i),
+            ),
+            documentColumns: [],
+            secondaryIndexes: [],
+            documentSecondaryIndexes: [],
+            deletedColumns: [],
+            updatedSecondaryIndexes: [],
+            partitionKey: desc.Sharding?.HashSharding?.Columns ?? [],
+            partitionCount: desc.ColumnShardCount ?? 64,
+            settings: prepareColumnTableSettings(desc),
+        };
+    }
+
+    const desc = pathDesc?.Table;
+    const keyColumnNames = desc?.KeyColumnNames ?? [];
+
+    return {
+        name,
+        type: 'row',
+        columns: (desc?.Columns ?? []).map((col, i) =>
+            rawColumnToColumnField(col, keyColumnNames, i),
+        ),
+        documentColumns: [],
+        secondaryIndexes: (desc?.TableIndexes ?? []).map((idx) => ({
+            name: idx.Name ?? '',
+            key: idx.KeyColumnNames ?? [],
+            cover: idx.DataColumnNames,
+        })),
+        documentSecondaryIndexes: [],
+        deletedColumns: [],
+        updatedSecondaryIndexes: [],
+        partitionKey: [],
+        partitionCount: 0,
+        settings: desc ? prepareRowTableSettings(desc) : {ttl: {status: 'disabled'}},
+    };
+}
+
 export function buildCreateTableQuery(options: BuildTemplateOptions) {
     return buildTemplate(CREATE_TABLE_QUERY_TEMPLATE, options);
 }
 
 export function buildCreateColumnTableQuery(options: BuildTemplateOptions) {
     return buildTemplate(CREATE_COLUMN_TABLE_QUERY_TEMPLATE, options);
+}
+
+export function buildUpdateTableQuery(options: BuildTemplateOptions) {
+    return buildTemplate(UPDATE_TABLE_QUERY_TEMPLATE, options);
 }
 
 export function prepareYdbCreateQueryColumns(columns: ColumnField[]): Column[] {
