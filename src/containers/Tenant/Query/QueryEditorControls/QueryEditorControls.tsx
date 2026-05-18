@@ -7,6 +7,7 @@ import {cn} from '../../../../utils/cn';
 import createToast from '../../../../utils/createToast';
 import {useTypedSelector} from '../../../../utils/hooks';
 import {reachMetricaGoal} from '../../../../utils/yaMetrica';
+import {CreateTopicButton} from '../CreateTopicDialog/CreateTopicDialog';
 import {NewSQL} from '../NewSQL/NewSQL';
 import {queryExecutionManagerInstance} from '../QueryEditor/utils/queryExecutionManager';
 import {SaveQuery} from '../SaveQuery/SaveQuery';
@@ -175,6 +176,7 @@ export const QueryEditorControls = ({
                 <EditorButton.Settings onClick={onSettingsButtonClick} isLoading={isLoading} />
             </div>
             <div className={b('right')}>
+                <CreateTopicButton database={database} disabled={disabled} />
                 <NewSQL />
                 <SaveQuery buttonProps={{disabled}} />
             </div>
