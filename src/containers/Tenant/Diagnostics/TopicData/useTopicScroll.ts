@@ -80,13 +80,25 @@ export function useTopicScroll({
     // seeded from the URL via getInitialTarget(), and overwriting it here would
     // discard the user's URL-specified offset (e.g. an offset that points into a
     // sparse partition where the first available message has a different offset).
+    //
+    // We compare against previous values stored in refs rather than using a
+    // didMount guard, because refs persist across React 18 Strict Mode's double
+    // effect invocation. A didMount guard would be flipped to `true` on the first
+    // run and then trigger the "after mount" branch on the second run, clobbering
+    // the URL-seeded pendingTarget. Both Strict Mode runs see identical initial
+    // values, so the equality check correctly returns false on both.
     const shouldResolveFirstMessage = React.useRef(false);
-    const didMount = React.useRef(false);
+    const prevSelectedOffset = React.useRef(selectedOffset);
+    const prevStartTimestamp = React.useRef(startTimestamp);
     React.useEffect(() => {
-        if (!didMount.current) {
-            didMount.current = true;
+        if (
+            prevSelectedOffset.current === selectedOffset &&
+            prevStartTimestamp.current === startTimestamp
+        ) {
             return;
         }
+        prevSelectedOffset.current = selectedOffset;
+        prevStartTimestamp.current = startTimestamp;
         shouldResolveFirstMessage.current = true;
     }, [selectedOffset, startTimestamp]);
 
