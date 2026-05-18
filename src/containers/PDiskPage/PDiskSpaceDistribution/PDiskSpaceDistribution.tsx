@@ -29,6 +29,11 @@ import './PDiskSpaceDistribution.scss';
 const b = cn('ydb-pdisk-space-distribution');
 
 const BASE_SLOT_HEIGHT = 40;
+// Upper bound for how much a single slot can be scaled relative to the smallest one.
+// Protects layout from degenerate cases where a VDisk reports an implausibly small Total
+// (e.g. a mostly empty disk where Total falls back to AllocatedSize), which would otherwise
+// blow up other slots' heights to thousands of pixels.
+const MAX_SLOT_HEIGHT_MULTIPLIER = 10;
 
 interface PDiskSpaceDistributionProps {
     data: PDiskData;
@@ -109,6 +114,22 @@ interface SlotProps<T extends SlotItemType> {
         params: {nodeId: string | number | undefined; vDiskId: string | undefined},
         query?: {activeTab?: string},
     ) => string | undefined;
+}
+
+function getSlotHeight<T extends SlotItemType>(item: SlotItem<T>, minNonLogTotal: number) {
+    // Log slots get a fixed half-height.
+    if (item.SlotType === 'log') {
+        return BASE_SLOT_HEIGHT / 2;
+    }
+    // Slots with a missing/zero Total fall back to BASE_SLOT_HEIGHT so they stay visible.
+    const totalValue = Number(item.Total);
+    if (totalValue <= 0) {
+        return BASE_SLOT_HEIGHT;
+    }
+    // Others scale proportionally to the smallest non-log slot, clamped from above so an
+    // implausibly small Total can't blow up other slots' heights.
+    const multiplier = Math.min(totalValue / minNonLogTotal, MAX_SLOT_HEIGHT_MULTIPLIER);
+    return multiplier * BASE_SLOT_HEIGHT;
 }
 
 function Slot<T extends SlotItemType>({
@@ -202,11 +223,7 @@ function Slot<T extends SlotItemType>({
         return null;
     };
 
-    // Log slots get half the base height; others scale proportionally to the smallest non-log slot
-    const slotHeight =
-        item.SlotType === 'log'
-            ? BASE_SLOT_HEIGHT / 2
-            : ((Number(item.Total) || 1) / minNonLogTotal) * BASE_SLOT_HEIGHT;
+    const slotHeight = getSlotHeight(item, minNonLogTotal);
 
     return (
         <div className={b('slot-wrapper')} style={{height: slotHeight}}>
