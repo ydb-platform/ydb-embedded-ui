@@ -136,6 +136,7 @@ export const HoverPopup = ({
                         }
                     }}
                     placement={placement}
+                    returnFocus={false}
                     hasArrow
                     open={open}
                     // bigger offset for easier switching to neighbour nodes
