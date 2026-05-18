@@ -20,13 +20,35 @@ interface UseTopicScrollParams {
     selectedOffset: number | null | undefined;
     startTimestamp: number | null | undefined;
     activeOffset: string | null | undefined;
-    /** Current data from the probe query, used to scroll to first message */
+    /** Current data from the probe query, used to resolve the first-message offset. */
     currentData: TopicDataResponse | undefined;
     isFetching: boolean;
 }
 
 interface UseTopicScrollResult {
     scrollToOffset: (newOffset: number) => void;
+}
+
+/** Page (1-based) that contains the given absolute offset, given the partition's base offset. */
+function getTargetPage(offset: number, baseOffset: number): number {
+    return Math.floor((offset - baseOffset) / TOPIC_DATA_DEFAULT_PAGE_SIZE) + 1;
+}
+
+/**
+ * Initial pending scroll target from URL params: explicit selectedOffset wins,
+ * otherwise fall back to activeOffset (which may legitimately be "0").
+ */
+function getInitialTarget(
+    selectedOffset: number | null | undefined,
+    activeOffset: string | null | undefined,
+): number | undefined {
+    if (!isNil(selectedOffset)) {
+        return selectedOffset;
+    }
+    if (isNil(activeOffset)) {
+        return undefined;
+    }
+    return safeParseNumber(activeOffset);
 }
 
 export function useTopicScroll({
@@ -44,22 +66,40 @@ export function useTopicScroll({
     currentData,
     isFetching,
 }: UseTopicScrollParams): UseTopicScrollResult {
-    // Ref to store pending scroll target after page change
-    const pendingScrollOffset = React.useRef<number | undefined>();
+    // The next offset we want to scroll to once the table is ready.
+    // Seeded from the URL on first render, written by scrollToOffset() on cross-page
+    // navigation, and resolved from the probe response when shouldResolveFirstMessage
+    // is set. Cleared only after a successful scroll so effect re-runs don't lose it.
+    const pendingTarget = React.useRef<number | undefined>(
+        getInitialTarget(selectedOffset, activeOffset),
+    );
 
-    // Scroll to top synchronously before paint when page or partition changes
+    // When selectedOffset/startTimestamp change, the actual target is the first message
+    // from the probe response; we resolve it inside the data effect once data arrives.
+    const shouldResolveFirstMessage = React.useRef(false);
+    React.useEffect(() => {
+        shouldResolveFirstMessage.current = true;
+    }, [selectedOffset, startTimestamp]);
+
+    // Reset scroll on page/partition change so the visual transition is clean.
+    // Invalidate any pending scroll on partition switch — its offset is meaningless
+    // in the new partition.
     const prevPage = React.useRef(currentPage);
     const prevPartition = React.useRef(selectedPartition);
     React.useLayoutEffect(() => {
         const pageChanged = prevPage.current !== currentPage;
         const partitionChanged = prevPartition.current !== selectedPartition;
-        if (pageChanged || partitionChanged) {
-            prevPage.current = currentPage;
-            prevPartition.current = selectedPartition;
-            const container = scrollContainerRef.current;
-            if (container) {
-                container.scrollTop = 0;
-            }
+        if (!pageChanged && !partitionChanged) {
+            return;
+        }
+        prevPage.current = currentPage;
+        prevPartition.current = selectedPartition;
+        if (partitionChanged) {
+            pendingTarget.current = undefined;
+            shouldResolveFirstMessage.current = false;
+        }
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTop = 0;
         }
     }, [currentPage, selectedPartition, scrollContainerRef]);
 
@@ -68,31 +108,22 @@ export function useTopicScroll({
             if (isNil(baseOffset) || isNil(endOffset) || isNil(pageStartOffset)) {
                 return;
             }
-
-            // Guard: offset is out of partition range — nothing to navigate to
             if (newOffset < baseOffset || newOffset >= endOffset) {
                 return;
             }
 
             if (usePagination) {
-                // Calculate which page this offset belongs to (1-based)
-                const absoluteRow = newOffset - baseOffset;
-                const targetPage = Math.floor(absoluteRow / TOPIC_DATA_DEFAULT_PAGE_SIZE) + 1;
-
+                const targetPage = getTargetPage(newOffset, baseOffset);
                 if (targetPage !== currentPage) {
-                    // Need to switch page first, then scroll after render
-                    pendingScrollOffset.current = newOffset;
+                    // Queue the scroll for after the page switch; the data effect performs it.
+                    pendingTarget.current = newOffset;
                     setCurrentPage(targetPage);
                     return;
                 }
             }
 
-            const scrollTop = (newOffset - pageStartOffset) * DEFAULT_TABLE_ROW_HEIGHT;
-            const normalizedScrollTop = Math.max(0, scrollTop);
-            scrollContainerRef.current?.scrollTo({
-                top: normalizedScrollTop,
-                behavior: 'instant',
-            });
+            const scrollTop = Math.max(0, (newOffset - pageStartOffset) * DEFAULT_TABLE_ROW_HEIGHT);
+            scrollContainerRef.current?.scrollTo({top: scrollTop, behavior: 'instant'});
         },
         [
             pageStartOffset,
@@ -105,55 +136,77 @@ export function useTopicScroll({
         ],
     );
 
-    // Keep a ref to the latest scrollToOffset to avoid stale closure in useEffect
-    const scrollToOffsetRef = React.useRef(scrollToOffset);
-    React.useLayoutEffect(() => {
-        scrollToOffsetRef.current = scrollToOffset;
-    }, [scrollToOffset]);
-
-    // Handle pending scroll after page change.
-    // Uses scrollToOffsetRef to always call the latest version without adding scrollToOffset to deps.
     React.useEffect(() => {
-        const pending = pendingScrollOffset.current;
-        if (!isNil(pending)) {
-            pendingScrollOffset.current = undefined;
-            scrollToOffsetRef.current(pending);
-        }
-    }, [currentPage]);
-
-    // On first open: scroll to the offset from URL (selectedOffset or activeOffset).
-    // Consumed once and cleared so subsequent data loads don't re-trigger the scroll.
-    const initialScrollToOffset = React.useRef(selectedOffset ?? activeOffset);
-
-    // When selectedOffset or startTimestamp changes, scroll to the first message returned by the API.
-    const shouldScrollToFirstMessage = React.useRef(false);
-    React.useEffect(() => {
-        shouldScrollToFirstMessage.current = true;
-    }, [selectedOffset, startTimestamp]);
-
-    React.useEffect(() => {
-        if (isFetching || isNil(baseOffset) || isNil(endOffset)) {
-            return;
+        if (isFetching || isNil(baseOffset) || isNil(endOffset) || isNil(pageStartOffset)) {
+            return undefined;
         }
 
-        // Case 1: first open — scroll to the initial offset from URL
-        if (!isNil(initialScrollToOffset.current)) {
-            const targetOffset = Number(initialScrollToOffset.current);
-            initialScrollToOffset.current = undefined;
-            shouldScrollToFirstMessage.current = false;
-            scrollToOffsetRef.current(targetOffset);
-            return;
-        }
-
-        // Case 2: selectedOffset changed — scroll to the first message from API response
-        if (shouldScrollToFirstMessage.current) {
-            shouldScrollToFirstMessage.current = false;
+        // Resolve "scroll to first message" intent now that the probe response is here.
+        if (shouldResolveFirstMessage.current) {
             const firstMessage = currentData?.Messages?.[0];
             if (!isNil(firstMessage)) {
-                scrollToOffsetRef.current(safeParseNumber(firstMessage.Offset));
+                pendingTarget.current = safeParseNumber(firstMessage.Offset);
+                shouldResolveFirstMessage.current = false;
             }
         }
-    }, [currentData, isFetching, baseOffset, endOffset]);
+
+        const target = pendingTarget.current;
+        if (isNil(target)) {
+            return undefined;
+        }
+
+        if (target < baseOffset || target >= endOffset) {
+            pendingTarget.current = undefined;
+            return undefined;
+        }
+
+        // Target is on a different page — switch pages; pendingTarget stays set,
+        // and the next effect run (after page change) will perform the actual scroll.
+        if (usePagination) {
+            const targetPage = getTargetPage(target, baseOffset);
+            if (targetPage !== currentPage) {
+                setCurrentPage(targetPage);
+                return undefined;
+            }
+        }
+
+        const container = scrollContainerRef.current;
+        const tableEl = container?.querySelector('table');
+        if (!container || !tableEl) {
+            return undefined;
+        }
+        const targetScrollTop = Math.max(0, (target - pageStartOffset) * DEFAULT_TABLE_ROW_HEIGHT);
+
+        // Wait for the table to reflect the current page's content before scrolling.
+        // Reading scrollHeight synchronously here is unsafe: React may have committed
+        // a new currentPage but PaginatedTable's chunk renderer hasn't yet recomputed
+        // separator-row heights, so scrollHeight could still describe the previous
+        // page's layout. ResizeObserver delivers its first callback after the next
+        // layout flush, guaranteeing we measure the fresh DOM, and fires again on
+        // every subsequent growth (chunk fetches expanding the virtual height).
+        const observer = new ResizeObserver(() => {
+            if (container.scrollHeight < targetScrollTop + container.clientHeight) {
+                return;
+            }
+            container.scrollTo({top: targetScrollTop, behavior: 'instant'});
+            if (pendingTarget.current === target) {
+                pendingTarget.current = undefined;
+            }
+            observer.disconnect();
+        });
+        observer.observe(tableEl);
+        return () => observer.disconnect();
+    }, [
+        currentData,
+        isFetching,
+        baseOffset,
+        endOffset,
+        pageStartOffset,
+        usePagination,
+        currentPage,
+        setCurrentPage,
+        scrollContainerRef,
+    ]);
 
     return {scrollToOffset};
 }
