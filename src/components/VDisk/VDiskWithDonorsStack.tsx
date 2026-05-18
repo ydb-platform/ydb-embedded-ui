@@ -18,12 +18,14 @@ interface VDiskWithDonorsStackProps extends VDiskProps {
 }
 
 const diskInStackPlacement: PopupPlacement = ['left', 'right'];
+const diskInStackPopupOffset = {mainAxis: 14, crossAxis: 0};
 
 export function VDiskWithDonorsStack({
     data,
     className,
     stackClassName,
     withIcon,
+    compact,
     highlightedVDisk,
     setHighlightedVDisk,
     showPopup: _showPopup,
@@ -35,15 +37,28 @@ export function VDiskWithDonorsStack({
     const donors = data?.Donors;
 
     const stackId = data?.StringifiedId;
-    const isHighlighted = Boolean(stackId && highlightedVDisk === stackId);
 
-    const handleShowPopup = React.useCallback(() => {
+    const [internalHighlightedVDisk, setInternalHighlightedVDisk] = React.useState<string>();
+
+    const highlightedVDiskInStack = React.useMemo(() => {
+        const donorIds = donors?.map((donor) => donor.StringifiedId) ?? [];
+
+        return Boolean(
+            internalHighlightedVDisk &&
+                (internalHighlightedVDisk === stackId ||
+                    donorIds.includes(internalHighlightedVDisk)),
+        );
+    }, [internalHighlightedVDisk, stackId, donors]);
+
+    const onShowPopup = React.useCallback(() => {
         if (stackId) {
+            setInternalHighlightedVDisk(stackId);
             setHighlightedVDisk?.(stackId);
         }
-    }, [stackId, setHighlightedVDisk]);
+    }, [setHighlightedVDisk, stackId]);
 
-    const handleHidePopup = React.useCallback(() => {
+    const onHidePopup = React.useCallback(() => {
+        setInternalHighlightedVDisk(undefined);
         setHighlightedVDisk?.(undefined);
     }, [setHighlightedVDisk]);
 
@@ -51,11 +66,12 @@ export function VDiskWithDonorsStack({
     // external code from breaking the stack's highlight/popup coordination.
     const mainVDiskProps: Partial<VDiskProps> = {
         ...restProps,
+        compact,
         withIcon,
-        showPopup: isHighlighted,
-        highlighted: isHighlighted,
-        onShowPopup: handleShowPopup,
-        onHidePopup: handleHidePopup,
+        showPopup: stackId === highlightedVDisk,
+        highlighted: stackId === highlightedVDisk,
+        onShowPopup,
+        onHidePopup,
     };
 
     // Donor VDisks intentionally omit popup handlers (showPopup, onShowPopup, onHidePopup).
@@ -64,21 +80,41 @@ export function VDiskWithDonorsStack({
     // Popup-related props are destructured and excluded from restProps above.
     const donorVDiskProps: Partial<VDiskProps> = {
         ...restProps,
+        compact,
         withIcon,
-        highlighted: isHighlighted,
+        popupOffset: diskInStackPopupOffset,
     };
 
     const mainDiskPlacement = donors?.length ? diskInStackPlacement : undefined;
 
     const content =
         donors && donors.length > 0 ? (
-            <Stack className={stackClassName}>
-                <VDisk placement={mainDiskPlacement} data={data} {...mainVDiskProps} />
+            <Stack
+                className={stackClassName}
+                itemsCount={1 + donors.length}
+                compact={compact}
+                expanded={highlightedVDiskInStack}
+            >
+                <VDisk
+                    placement={mainDiskPlacement}
+                    data={data}
+                    popupOffset={highlightedVDiskInStack ? diskInStackPopupOffset : undefined}
+                    {...mainVDiskProps}
+                />
                 {donors.map((donor, index) => (
                     <VDisk
                         key={`${index}-${donor.StringifiedId}`}
                         data={donor}
                         placement={diskInStackPlacement}
+                        highlighted={donor.StringifiedId === internalHighlightedVDisk}
+                        onShowPopup={() => {
+                            if (donor.StringifiedId) {
+                                setInternalHighlightedVDisk?.(donor.StringifiedId);
+                            }
+                        }}
+                        onHidePopup={() => {
+                            setInternalHighlightedVDisk(undefined);
+                        }}
                         {...donorVDiskProps}
                     />
                 ))}

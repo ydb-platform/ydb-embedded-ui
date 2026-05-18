@@ -39,7 +39,9 @@
 
         // Elevate row z-index when a Stack inside it is hovered,
         // so expanded donors appear above the next row
-        &:has(.stack:hover) {
+        &:has(.ydb-stack:hover),
+        &:has(.ydb-stack:focus-within),
+        &:has(.ydb-stack_expanded) {
             z-index: 2;
         }
 

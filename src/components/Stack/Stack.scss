@@ -1,42 +1,134 @@
-.stack {
+.ydb-stack {
+    $block: &;
+
     --ydb-stack-base-z-index: 100;
-    --ydb-stack-offset-x: 4px;
-    --ydb-stack-offset-y: 4px;
-    --ydb-stack-offset-x-hover: 4px;
-    --ydb-stack-offset-y-hover: 16px;
+    --ydb-stack-offset-x: 50%;
+    --ydb-stack-gap: 4px;
+    --ydb-stack-padding: 5px;
+    --ydb-stack-border-width: 1px;
+    --ydb-stack-visible-donor-scale: 0.85;
+    --ydb-stack-offset-y-base: 8px;
+    --ydb-stack-offset-y: calc(
+        var(--ydb-stack-offset-y-base) + var(--ydb-stack-item-height) *
+            (1 - var(--ydb-stack-visible-donor-scale)) * 0.5
+    );
+    --ydb-stack-visible-donor-offset-x: calc(
+        var(--ydb-stack-offset-x) - var(--ydb-stack-offset-x) * var(--ydb-stack-visible-donor-scale)
+    );
+    --ydb-stack-item-height: var(--progress-bar-full-height, var(--g-text-subheader-2-line-height));
+    --ydb-stack-panel-inset: calc(var(--ydb-stack-padding) + var(--ydb-stack-border-width));
+    --ydb-stack-background-collapsed-height: calc(
+        var(--ydb-stack-item-height) + 2 * var(--ydb-stack-padding) + 2 *
+            var(--ydb-stack-border-width) + var(--ydb-stack-offset-y)
+    );
+    --ydb-stack-background-expanded-height: calc(
+        var(--ydb-stack-items-count) * var(--ydb-stack-item-height) +
+            (var(--ydb-stack-items-count) - 1) * var(--ydb-stack-gap) + 2 *
+            var(--ydb-stack-padding) + 2 * var(--ydb-stack-border-width)
+    );
 
     position: relative;
+    z-index: var(--ydb-stack-base-z-index);
 
-    &__layer {
-        transition: transform 0.15s ease-out;
+    &_compact {
+        --ydb-stack-item-height: var(--progress-bar-compact-height, 20px);
+    }
 
-        &:first-child {
+    &__background {
+        position: absolute;
+        z-index: calc(var(--ydb-stack-base-z-index) - 1);
+        top: calc(-1 * var(--ydb-stack-panel-inset));
+        left: calc(-1 * var(--ydb-stack-panel-inset));
+
+        visibility: hidden;
+
+        box-sizing: border-box;
+        width: calc(100% + 2 * var(--ydb-stack-panel-inset));
+        height: var(--ydb-stack-background-collapsed-height);
+
+        pointer-events: none;
+
+        opacity: 0;
+        border: var(--ydb-stack-border-width) solid var(--g-color-line-generic);
+        border-radius: var(--g-border-radius-xl);
+        background: var(--g-color-base-background);
+        box-shadow: 0 4px 12px var(--g-color-sfx-shadow);
+
+        transition:
+            height 0.15s ease-out,
+            opacity 0.15s ease-out,
+            visibility 0s linear 0.15s,
+            transform 0.15s ease-out;
+    }
+
+    &__item {
+        transition:
+            top 0.15s ease-out,
+            opacity 0.15s ease-out,
+            visibility 0s linear 0.15s,
+            transform 0.15s ease-out;
+
+        &_main {
             position: relative;
-            z-index: var(--ydb-stack-base-z-index);
+            z-index: calc(var(--ydb-stack-base-z-index) + 2);
         }
 
-        & + & {
+        &_donor {
             position: absolute;
-            z-index: calc(var(--ydb-stack-base-z-index) - var(--ydb-stack-level));
+            z-index: var(--ydb-stack-base-z-index);
             top: 0;
             left: 0;
 
             width: 100%;
             height: 100%;
 
-            transform: translate(
-                calc(var(--ydb-stack-level) * var(--ydb-stack-offset-x)),
-                calc(var(--ydb-stack-level) * var(--ydb-stack-offset-y))
-            );
+            transform: translate(var(--ydb-stack-visible-donor-offset-x), var(--ydb-stack-offset-y))
+                scale(var(--ydb-stack-visible-donor-scale));
+            transform-origin: top left;
+        }
+
+        &_collapsed-hidden {
+            visibility: hidden;
+
+            pointer-events: none;
+
+            opacity: 0;
         }
     }
 
-    &:hover {
-        .stack__layer + .stack__layer {
-            transform: translate(
-                calc(var(--ydb-stack-level) * var(--ydb-stack-offset-x-hover)),
-                calc(var(--ydb-stack-level) * var(--ydb-stack-offset-y-hover))
+    &:hover,
+    &:focus-within,
+    &_expanded {
+        #{$block}__background {
+            visibility: visible;
+
+            height: var(--ydb-stack-background-expanded-height);
+
+            pointer-events: auto;
+
+            opacity: 1;
+
+            transition-delay: 0s;
+        }
+
+        #{$block}__item {
+            position: absolute;
+            top: calc(
+                var(--ydb-stack-level) * (var(--ydb-stack-item-height) + var(--ydb-stack-gap))
             );
+            left: 0;
+
+            visibility: visible;
+
+            width: 100%;
+            height: 100%;
+
+            pointer-events: auto;
+
+            opacity: 1;
+
+            transition-delay: 0s;
+            transform: none;
         }
     }
 }

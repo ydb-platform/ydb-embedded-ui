@@ -36,7 +36,7 @@
 
         min-width: var(--pdisk-vdisk-width);
 
-        .stack__layer {
+        .ydb-stack__item {
             .data-table__row:hover & {
                 background: var(--ydb-data-table-color-hover);
             }
