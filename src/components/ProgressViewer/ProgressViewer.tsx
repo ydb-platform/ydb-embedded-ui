@@ -21,7 +21,7 @@ Props description:
 5) colorizeProgress - change the color of the progress bar depending on its value
 6) warningThreshold - the percentage of fullness at which the color of the progress bar changes to yellow
 7) dangerThreshold - the percentage of fullness at which the color of the progress bar changes to red
-8) withOverflow - percents may be more that 100%
+8) withOverflow - percents may be more than 100%
 */
 
 export interface ProgressViewerProps {

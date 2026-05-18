@@ -21,7 +21,6 @@ interface CalculateProgressStatusProps {
     warningThreshold?: number;
     colorizeProgress?: boolean;
     fillWidth: number;
-    defaultStatus?: ProgressStatus;
 }
 
 export function calculateProgressStatus({
