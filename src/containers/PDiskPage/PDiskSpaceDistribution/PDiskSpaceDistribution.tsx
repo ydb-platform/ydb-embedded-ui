@@ -121,9 +121,11 @@ function getSlotHeight<T extends SlotItemType>(item: SlotItem<T>, minNonLogTotal
     if (item.SlotType === 'log') {
         return BASE_SLOT_HEIGHT / 2;
     }
-    // Slots with a missing/zero Total fall back to BASE_SLOT_HEIGHT so they stay visible.
+    // Slots with a missing/non-numeric/zero Total fall back to BASE_SLOT_HEIGHT so they
+    // stay visible and never produce NaN in the inline style.
+    // Same falsy-check pattern as in minNonLogTotal: catches NaN, 0, undefined, null.
     const totalValue = Number(item.Total);
-    if (totalValue <= 0) {
+    if (!totalValue || totalValue < 0) {
         return BASE_SLOT_HEIGHT;
     }
     // Others scale proportionally to the smallest non-log slot, clamped from above so an
