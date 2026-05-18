@@ -30,6 +30,8 @@
     position: relative;
     z-index: var(--ydb-stack-base-z-index);
 
+    min-height: 100%;
+
     &_compact {
         --ydb-stack-item-height: var(--progress-bar-compact-height, 20px);
     }
