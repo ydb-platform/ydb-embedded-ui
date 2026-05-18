@@ -147,6 +147,74 @@ test.describe('VDisk page storage tab', () => {
         await expect(inactiveDisks).toHaveCount(2);
     });
 
+    test('expands vDisk stack on hover', async ({page}) => {
+        await setupVDiskPageMocks(page, {withDonors: true});
+        await page.goto(VDISK_PAGE_PATH);
+
+        const storageTable = new ClusterStorageTable(page);
+        await storageTable.waitForTableToLoad();
+        await storageTable.waitForTableData();
+
+        const row = page.locator('.ydb-paginated-table__row').first();
+        const stack = row.locator('.ydb-stack').first();
+        const items = stack.locator('.ydb-stack__item');
+        const background = stack.locator('.ydb-stack__background');
+
+        await expect(stack).toBeVisible();
+        await expect(items).toHaveCount(3);
+        await expect(items.nth(0)).toBeVisible();
+        await expect(items.nth(1)).not.toBeVisible();
+        await expect(items.nth(2)).toBeVisible();
+        await expect(background).not.toBeVisible();
+
+        await items.nth(0).hover();
+
+        await expect(background).toBeVisible();
+        await expect(items.nth(2)).toBeVisible();
+        await expect(row).toHaveCSS('z-index', '2');
+
+        await page.mouse.move(0, 0);
+        await expect(background).not.toBeVisible();
+
+        const visibleDonorBox = await items
+            .nth(2)
+            .locator('.storage-disk-progress-bar')
+            .boundingBox();
+        expect(visibleDonorBox).not.toBeNull();
+        await page.mouse.move(
+            visibleDonorBox!.x + visibleDonorBox!.width - 1,
+            visibleDonorBox!.y + visibleDonorBox!.height - 1,
+        );
+
+        await expect(background).toBeVisible();
+        await expect(items.nth(2)).toBeVisible();
+    });
+
+    test('renders expanded vDisk stack snapshot', async ({page}) => {
+        await page.setViewportSize({width: 1500, height: 1000});
+        await setupVDiskPageMocks(page, {withDonors: true});
+        await page.goto(VDISK_PAGE_PATH);
+
+        const storageTable = new ClusterStorageTable(page);
+        await storageTable.waitForTableToLoad();
+        await storageTable.waitForTableData();
+
+        const row = page.locator('.ydb-paginated-table__row').first();
+        const stack = row.locator('.ydb-stack').first();
+
+        await expect(stack).toBeVisible();
+        await stack.hover();
+        const background = stack.locator('.ydb-stack__background').first();
+        await expect(background).toBeVisible();
+
+        await expect(background).toHaveCSS('height', '80px');
+
+        const backgroundBox = await background.boundingBox();
+        expect(backgroundBox).not.toBeNull();
+
+        await expect(page).toHaveScreenshot('vdisk-stack-expanded.png', {clip: backgroundBox!});
+    });
+
     test('Go to PDisk navigates to PDisk page', async ({page}) => {
         await setupVDiskPageMocks(page);
         await setupPDiskInfoMock(page);

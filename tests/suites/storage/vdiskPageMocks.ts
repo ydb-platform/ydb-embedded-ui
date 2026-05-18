@@ -3,6 +3,8 @@ import type {Page} from '@playwright/test';
 export const VDISK_ID = '2181038080-1-0-0-0';
 export const SIBLING_VDISK_ID = '2181038080-1-0-0-1';
 export const ANOTHER_PDISK_VDISK_ID = '2181038080-1-0-0-2';
+export const DONOR_VDISK_ID = '2181038080-1-0-1-0';
+export const SECOND_DONOR_VDISK_ID = '2181038080-1-0-1-1';
 export const NODE_ID = '42';
 export const PDISK_ID = '1000';
 export const SECOND_PDISK_ID = '1001';
@@ -20,11 +22,13 @@ export interface SetupVDiskPageMocksOptions {
     rack?: string;
     host?: string;
     pDiskId?: string;
+    withDonors?: boolean;
 }
 
 function createStorageGroupsResponse({
     pDiskId = PDISK_ID,
-}: Pick<SetupVDiskPageMocksOptions, 'pDiskId'> = {}) {
+    withDonors,
+}: Pick<SetupVDiskPageMocksOptions, 'pDiskId' | 'withDonors'> = {}) {
     return {
         StorageGroups: [
             {
@@ -46,6 +50,7 @@ function createStorageGroupsResponse({
                         StoragePoolName: STORAGE_POOL_NAME,
                         DiskSpace: 'Green',
                         FrontQueues: 'Green',
+                        ...(withDonors ? {VDiskState: 'OK', Replicated: false} : {}),
                         SatisfactionRank: {
                             FreshRank: {
                                 Flag: 'Green',
@@ -58,6 +63,34 @@ function createStorageGroupsResponse({
                             PDiskId: `${NODE_ID}-${pDiskId}`,
                             Type: 'ROT',
                         },
+                        Donors: withDonors
+                            ? [
+                                  {
+                                      VDiskId: DONOR_VDISK_ID,
+                                      NodeId: Number(NODE_ID),
+                                      VDiskSlotId: 1011,
+                                      AllocatedSize: '1000000000',
+                                      AvailableSize: '195000000000',
+                                      StoragePoolName: STORAGE_POOL_NAME,
+                                      DiskSpace: 'Green',
+                                      FrontQueues: 'Green',
+                                      VDiskState: 'OK',
+                                      Replicated: false,
+                                  },
+                                  {
+                                      VDiskId: SECOND_DONOR_VDISK_ID,
+                                      NodeId: Number(NODE_ID),
+                                      VDiskSlotId: 1012,
+                                      AllocatedSize: '2000000000',
+                                      AvailableSize: '194000000000',
+                                      StoragePoolName: STORAGE_POOL_NAME,
+                                      DiskSpace: 'Green',
+                                      FrontQueues: 'Green',
+                                      VDiskState: 'OK',
+                                      Replicated: false,
+                                  },
+                              ]
+                            : undefined,
                     },
                     {
                         VDiskId: SIBLING_VDISK_ID,
@@ -171,13 +204,16 @@ async function setupNodeInfoMock(
 
 async function setupStorageGroupsMock(
     page: Page,
-    {pDiskId = PDISK_ID}: Pick<SetupVDiskPageMocksOptions, 'pDiskId'> = {},
+    {
+        pDiskId = PDISK_ID,
+        withDonors,
+    }: Pick<SetupVDiskPageMocksOptions, 'pDiskId' | 'withDonors'> = {},
 ) {
     await page.route('**/storage/groups?*', async (route) => {
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify(createStorageGroupsResponse({pDiskId})),
+            body: JSON.stringify(createStorageGroupsResponse({pDiskId, withDonors})),
         });
     });
 }
