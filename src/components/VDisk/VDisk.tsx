@@ -1,4 +1,4 @@
-import type {PopupPlacement} from '@gravity-ui/uikit';
+import type {PopupPlacement, PopupProps} from '@gravity-ui/uikit';
 
 import {useVDiskPagePath} from '../../routes';
 import {cn} from '../../utils/cn';
@@ -15,6 +15,8 @@ import './VDisk.scss';
 
 const b = cn('ydb-vdisk-component');
 
+const DEFAULT_POPUP_OFFSET: PopupProps['offset'] = {mainAxis: 2, crossAxis: 0};
+
 export interface VDiskProps {
     data?: PreparedVDisk;
     compact?: boolean;
@@ -28,6 +30,7 @@ export interface VDiskProps {
     withIcon?: boolean;
     highlighted?: boolean;
     placement?: PopupPlacement;
+    popupOffset?: PopupProps['offset'];
 }
 
 export const VDisk = ({
@@ -43,6 +46,7 @@ export const VDisk = ({
     withIcon,
     highlighted,
     placement = ['top', 'bottom', 'left', 'right'],
+    popupOffset = DEFAULT_POPUP_OFFSET,
 }: VDiskProps) => {
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
@@ -57,7 +61,7 @@ export const VDisk = ({
             onShowPopup={onShowPopup}
             onHidePopup={onHidePopup}
             renderPopupContent={() => <VDiskPopup data={data} />}
-            offset={{mainAxis: 2, crossAxis: 0}}
+            offset={popupOffset}
             delayClose={delayClose}
             delayOpen={delayOpen}
             // Allow all placement options, component should choose first available
