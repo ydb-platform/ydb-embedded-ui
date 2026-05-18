@@ -105,6 +105,15 @@ export function useTopicScroll({
     // Reset scroll on page/partition change so the visual transition is clean.
     // Invalidate any pending scroll on partition switch — its offset is meaningless
     // in the new partition.
+    //
+    // Important: the initial `undefined → <auto-selected>` transition (when the URL
+    // omits selectedPartition and useTopicPartitions auto-selects the first one) is
+    // NOT a user partition switch — it's the resolution of the same selection. The
+    // URL-seeded pendingTarget points into exactly the partition being auto-selected,
+    // so we must not clobber it. Only treat the change as a real switch when leaving
+    // a previously-defined partition (defined → different defined). The ref-based
+    // comparison also survives Strict Mode's double effect invocation: both runs see
+    // the same initial `prevPartition.current`, so the guard returns false on both.
     const prevPage = React.useRef(currentPage);
     const prevPartition = React.useRef(selectedPartition);
     React.useLayoutEffect(() => {
@@ -113,9 +122,10 @@ export function useTopicScroll({
         if (!pageChanged && !partitionChanged) {
             return;
         }
+        const isRealPartitionSwitch = partitionChanged && !isNil(prevPartition.current);
         prevPage.current = currentPage;
         prevPartition.current = selectedPartition;
-        if (partitionChanged) {
+        if (isRealPartitionSwitch) {
             pendingTarget.current = undefined;
             shouldResolveFirstMessage.current = false;
         }
