@@ -118,7 +118,7 @@ export const PaginatedStorageGroupsTable = ({
                 rowHeight={
                     hasVDisksColumns ? STORAGE_GROUPS_TABLE_ROW_HEIGHT_WITH_VDISKS : undefined
                 }
-                containerClassName={tableContainerClassName}
+                extraContainerClassName={tableContainerClassName}
                 fetchData={fetchData}
                 initialEntitiesCount={initialEntitiesCount}
                 renderErrorMessage={renderErrorMessage}
