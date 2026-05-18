@@ -40,7 +40,9 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
 
     const {PDiskId, NodeId} = data;
 
-    // Find the minimum Total among non-log slots to use as the base unit for height scaling
+    // Find the minimum Total among non-log slots to use as the base unit for height scaling.
+    // Slots with missing/zero Total are skipped so that they don't collapse the base unit to 1
+    // and inflate every other slot's computed height to an unrenderable value.
     const minNonLogTotal = React.useMemo(() => {
         if (!SlotItems?.length) {
             return 1;
@@ -52,7 +54,10 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
             if (item.SlotType === 'log') {
                 continue;
             }
-            const value = Number(item.Total) || 1;
+            const value = Number(item.Total);
+            if (!value || value <= 0) {
+                continue;
+            }
             if (value < minTotal) {
                 minTotal = value;
             }
