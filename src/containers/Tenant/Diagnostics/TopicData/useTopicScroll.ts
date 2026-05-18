@@ -74,10 +74,19 @@ export function useTopicScroll({
         getInitialTarget(selectedOffset, activeOffset),
     );
 
-    // When selectedOffset/startTimestamp change, the actual target is the first message
-    // from the probe response; we resolve it inside the data effect once data arrives.
+    // When selectedOffset/startTimestamp change *after mount*, the actual target is
+    // the first message from the probe response; we resolve it inside the data effect
+    // once data arrives. We must NOT flip this on mount — pendingTarget is already
+    // seeded from the URL via getInitialTarget(), and overwriting it here would
+    // discard the user's URL-specified offset (e.g. an offset that points into a
+    // sparse partition where the first available message has a different offset).
     const shouldResolveFirstMessage = React.useRef(false);
+    const didMount = React.useRef(false);
     React.useEffect(() => {
+        if (!didMount.current) {
+            didMount.current = true;
+            return;
+        }
         shouldResolveFirstMessage.current = true;
     }, [selectedOffset, startTimestamp]);
 
@@ -185,10 +194,28 @@ export function useTopicScroll({
         // layout flush, guaranteeing we measure the fresh DOM, and fires again on
         // every subsequent growth (chunk fetches expanding the virtual height).
         const observer = new ResizeObserver(() => {
-            if (container.scrollHeight < targetScrollTop + container.clientHeight) {
+            // Wait until the target row itself is laid out. We can't require a full
+            // viewport of content below it: when the target sits in the last viewport
+            // of a paginated page, there isn't one, and scrollHeight will never reach
+            // targetScrollTop + clientHeight. The browser will clamp scrollTo to the
+            // maximum scroll position and still reveal the row.
+            //
+            // Exception: if the content is already shorter than the target offset
+            // (targetScrollTop > maxScrollTop), the row will never appear at the
+            // expected position no matter how long we wait — the table is simply
+            // too short (few rows, non-paginated mode, short last page, etc.).
+            // In that case, clamp to the end, clear the pending target and stop
+            // observing, otherwise pendingTarget stays set across effect re-runs.
+            const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
+            const rowLaidOut = container.scrollHeight >= targetScrollTop + DEFAULT_TABLE_ROW_HEIGHT;
+            const targetReachable = targetScrollTop <= maxScrollTop;
+            if (!rowLaidOut && !targetReachable) {
                 return;
             }
-            container.scrollTo({top: targetScrollTop, behavior: 'instant'});
+            container.scrollTo({
+                top: Math.min(targetScrollTop, maxScrollTop),
+                behavior: 'instant',
+            });
             if (pendingTarget.current === target) {
                 pendingTarget.current = undefined;
             }
