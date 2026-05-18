@@ -9,5 +9,5 @@
     "importHelpers": true
   },
   "include": ["src/**/*"],
-  "exclude": ["src/setup*", "src/index.tsx", "**/__tests__", "**/tests"]
+  "exclude": ["src/setup*", "src/index.tsx", "**/__test__", "**/__tests__", "**/tests"]
 }
