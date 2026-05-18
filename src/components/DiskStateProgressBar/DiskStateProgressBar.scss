@@ -73,6 +73,10 @@
         box-shadow: 0 0 0 $border-width var(--entity-state-shadow-color) inset;
     }
 
+    &_borderless {
+        box-shadow: none;
+    }
+
     &__fill-bar {
         position: absolute;
         top: 0;

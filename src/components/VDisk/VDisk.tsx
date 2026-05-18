@@ -75,6 +75,7 @@ export const VDisk = ({
                         compact={compact}
                         inactive={inactive}
                         striped={isReplicatingColor || isDonor}
+                        borderless={isReplicatingColor && !isDonor}
                         isDonor={isDonor}
                         className={progressBarClassName}
                         withIcon={withIcon}
