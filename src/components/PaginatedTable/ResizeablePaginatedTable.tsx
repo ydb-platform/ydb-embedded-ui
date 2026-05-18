@@ -39,8 +39,6 @@ export function ResizeablePaginatedTable<T, F>({
         <PaginatedTable
             columns={updatedColumns}
             onColumnsResize={setTableColumnsWidth}
-            //! looks like container class is being added above its parent
-            //! according to .ydb-paginated-table
             containerClassName={b('resizeable-table-container', extraContainerClassName)}
             {...props}
         />
