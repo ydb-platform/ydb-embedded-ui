@@ -413,6 +413,15 @@ export function useTopicScroll({
         // layout flush, guaranteeing we measure the fresh DOM, and fires again on
         // every subsequent growth (chunk fetches expanding the virtual height).
         const observer = new ResizeObserver(() => {
+            // If the intent we were resolving has been superseded (user click,
+            // new filter, partition switch, user page switch), abandon this
+            // scroll entirely — don't move the viewport based on a stale target.
+            // Reference equality is sufficient because intent replacements are
+            // always whole-object writes.
+            if (scrollIntentRef.current !== observedIntent) {
+                observer.disconnect();
+                return;
+            }
             // Wait until the target row itself is laid out. We can't require a full
             // viewport of content below it: when the target sits in the last viewport
             // of a paginated page, there isn't one, and scrollHeight will never reach
@@ -434,12 +443,7 @@ export function useTopicScroll({
                 top: Math.min(targetScrollTop, maxScrollTop),
                 behavior: 'instant',
             });
-            // Reference equality: only clear if the intent we resolved is still
-            // the active one. If anything has replaced it (user click, new
-            // filter, partition switch) the new intent is preserved untouched.
-            if (scrollIntentRef.current === observedIntent) {
-                scrollIntentRef.current = {kind: 'none'};
-            }
+            scrollIntentRef.current = {kind: 'none'};
             observer.disconnect();
         });
         observer.observe(tableEl);
