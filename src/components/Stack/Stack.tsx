@@ -7,7 +7,6 @@ import './Stack.scss';
 interface StackProps {
     className?: string;
     children: React.ReactNode;
-    itemsCount: number;
     compact?: boolean;
     expanded?: boolean;
 }
@@ -17,7 +16,12 @@ const LEVEL_CSS_VAR = '--ydb-stack-level';
 
 const b = cn('ydb-stack');
 
-export function Stack({children, className, itemsCount, compact, expanded}: StackProps) {
+export function Stack({children, className, compact, expanded}: StackProps) {
+    const validChildren = React.Children.toArray(children).filter(
+        (child): child is React.ReactElement => React.isValidElement(child),
+    );
+    const itemsCount = validChildren.length;
+
     return (
         <div
             className={b({compact, expanded}, className)}
@@ -28,17 +32,14 @@ export function Stack({children, className, itemsCount, compact, expanded}: Stac
             }
         >
             <div className={b('background')} />
-            {React.Children.map(children, (child, index) => {
-                if (!React.isValidElement(child)) {
-                    return null;
-                }
-
+            {validChildren.map((child, index) => {
                 const isMain = index === 0;
                 const isDonor = index > 0;
                 const isCollapsedHidden = isDonor && index !== itemsCount - 1;
 
                 return (
                     <div
+                        key={child.key ?? index}
                         className={b('item', {
                             main: isMain,
                             donor: isDonor,

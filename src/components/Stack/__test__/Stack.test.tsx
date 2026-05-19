@@ -3,11 +3,14 @@ import {render, screen} from '@testing-library/react';
 import {Stack} from '../Stack';
 
 describe('Stack', () => {
-    test('passes total items count to the root css variable', () => {
+    test('derives total items count from valid children', () => {
         const {container} = render(
-            <Stack itemsCount={3}>
+            <Stack>
                 <div>main</div>
+                text child
                 <div>donor-1</div>
+                {null}
+                {false}
                 <div>donor-2</div>
             </Stack>,
         );
@@ -19,9 +22,12 @@ describe('Stack', () => {
 
     test('passes item index and semantic modifiers to each valid child wrapper', () => {
         const {container} = render(
-            <Stack itemsCount={3}>
+            <Stack>
+                text child
                 <div>main</div>
+                {null}
                 <div>donor-1</div>
+                {false}
                 <div>donor-2</div>
             </Stack>,
         );
@@ -42,7 +48,7 @@ describe('Stack', () => {
 
     test('does not render item wrappers for non-element children', () => {
         const {container} = render(
-            <Stack itemsCount={1}>
+            <Stack>
                 text child
                 <div>main</div>
                 {null}
@@ -51,13 +57,15 @@ describe('Stack', () => {
         );
 
         expect(container.querySelectorAll('.ydb-stack__item')).toHaveLength(1);
+        expect(container.querySelector('.ydb-stack')).toHaveStyle({'--ydb-stack-items-count': '1'});
+        expect(container.querySelector('.ydb-stack__item')).toHaveStyle({'--ydb-stack-level': '0'});
         expect(screen.getByText('main')).toBeVisible();
         expect(screen.queryByText('text child')).not.toBeInTheDocument();
     });
 
     test('applies compact modifier when compact prop is enabled', () => {
         const {container} = render(
-            <Stack itemsCount={1} compact>
+            <Stack compact>
                 <div>main</div>
             </Stack>,
         );
@@ -67,7 +75,7 @@ describe('Stack', () => {
 
     test('applies expanded modifier when expanded prop is enabled', () => {
         const {container} = render(
-            <Stack itemsCount={1} expanded>
+            <Stack expanded>
                 <div>main</div>
             </Stack>,
         );

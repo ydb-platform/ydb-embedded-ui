@@ -68,16 +68,15 @@ export function VDiskWithDonorsStack({
         ...restProps,
         compact,
         withIcon,
-        showPopup: stackId === highlightedVDisk,
-        highlighted: stackId === highlightedVDisk,
+        showPopup: Boolean(stackId && stackId === highlightedVDisk),
+        highlighted: Boolean(stackId && stackId === highlightedVDisk),
         onShowPopup,
         onHidePopup,
     };
 
-    // Donor VDisks intentionally omit popup handlers (showPopup, onShowPopup, onHidePopup).
+    // Donor VDisks intentionally avoid using and changing highlightedVDiskState.
     // Only the main VDisk acts as the hover target for the entire stack to avoid
     // conflicting interactions when hovering over stacked elements.
-    // Popup-related props are destructured and excluded from restProps above.
     const donorVDiskProps: Partial<VDiskProps> = {
         ...restProps,
         compact,
@@ -89,12 +88,7 @@ export function VDiskWithDonorsStack({
 
     const content =
         donors && donors.length > 0 ? (
-            <Stack
-                className={stackClassName}
-                itemsCount={1 + donors.length}
-                compact={compact}
-                expanded={highlightedVDiskInStack}
-            >
+            <Stack className={stackClassName} compact={compact} expanded={highlightedVDiskInStack}>
                 <VDisk
                     placement={mainDiskPlacement}
                     data={data}
