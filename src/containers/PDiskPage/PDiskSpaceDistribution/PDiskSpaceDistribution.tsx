@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import type {InfoViewerItem} from '../../../components/InfoViewer';
@@ -25,7 +27,12 @@ import './PDiskSpaceDistribution.scss';
 
 const b = cn('ydb-pdisk-space-distribution');
 
-const SLOT_HEIGHT = 40;
+const BASE_SLOT_HEIGHT = 40;
+// Upper bound for how much a single slot can be scaled relative to the smallest one.
+// Protects layout from degenerate cases where a VDisk reports an implausibly small Total
+// (e.g. a mostly empty disk where Total falls back to AllocatedSize), which would otherwise
+// blow up other slots' heights to thousands of pixels.
+const MAX_SLOT_HEIGHT_MULTIPLIER = 10;
 
 interface PDiskSpaceDistributionProps {
     data: PDiskData;
@@ -37,13 +44,38 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
 
     const {PDiskId, NodeId} = data;
 
-    const containerHeight = SLOT_HEIGHT * (SlotItems?.length || 1);
+    // Find the minimum Total among non-log slots to use as the base unit for height scaling.
+    // Slots with missing/zero Total are skipped so that they don't collapse the base unit to 1
+    // and inflate every other slot's computed height to an unrenderable value.
+    const minNonLogTotal = React.useMemo(() => {
+        if (!SlotItems?.length) {
+            return 1;
+        }
+
+        let minTotal = Infinity;
+
+        for (const item of SlotItems) {
+            if (item.SlotType === 'log') {
+                continue;
+            }
+            const value = Number(item.Total);
+            if (!value || value <= 0) {
+                continue;
+            }
+            if (value < minTotal) {
+                minTotal = value;
+            }
+        }
+
+        return minTotal === Infinity ? 1 : minTotal;
+    }, [SlotItems]);
 
     const renderSlots = () => {
         return SlotItems?.map((item, index) => {
             return (
                 <Slot
                     item={item}
+                    minNonLogTotal={minNonLogTotal}
                     pDiskId={PDiskId}
                     nodeId={NodeId}
                     getVDiskPagePath={getVDiskPagePath}
@@ -58,13 +90,7 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
     }
 
     return (
-        <div
-            className={b(null)}
-            style={{
-                height: containerHeight,
-                minHeight: containerHeight,
-            }}
-        >
+        <div className={b(null)}>
             <DiskStateProgressBar
                 className={b('pdisk-bar')}
                 severity={data.Severity}
@@ -78,6 +104,7 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
 
 interface SlotProps<T extends SlotItemType> {
     item: SlotItem<T>;
+    minNonLogTotal: number;
 
     pDiskId?: string | number;
     nodeId?: string | number;
@@ -87,7 +114,30 @@ interface SlotProps<T extends SlotItemType> {
     ) => string | undefined;
 }
 
-function Slot<T extends SlotItemType>({item, nodeId, getVDiskPagePath}: SlotProps<T>) {
+function getSlotHeight<T extends SlotItemType>(item: SlotItem<T>, minNonLogTotal: number) {
+    // Log slots get a fixed half-height.
+    if (item.SlotType === 'log') {
+        return BASE_SLOT_HEIGHT / 2;
+    }
+    // Slots with a missing/non-numeric/zero Total fall back to BASE_SLOT_HEIGHT so they
+    // stay visible and never produce NaN in the inline style.
+    // Same falsy-check pattern as in minNonLogTotal: catches NaN, 0, undefined, null.
+    const totalValue = Number(item.Total);
+    if (!totalValue || totalValue < 0) {
+        return BASE_SLOT_HEIGHT;
+    }
+    // Others scale proportionally to the smallest non-log slot, clamped from above so an
+    // implausibly small Total can't blow up other slots' heights.
+    const multiplier = Math.min(totalValue / minNonLogTotal, MAX_SLOT_HEIGHT_MULTIPLIER);
+    return multiplier * BASE_SLOT_HEIGHT;
+}
+
+function Slot<T extends SlotItemType>({
+    item,
+    minNonLogTotal,
+    nodeId,
+    getVDiskPagePath,
+}: SlotProps<T>) {
     const renderContent = () => {
         if (isVDiskSlot(item)) {
             const vDiskPagePath = getVDiskPagePath?.({
@@ -168,8 +218,10 @@ function Slot<T extends SlotItemType>({item, nodeId, getVDiskPagePath}: SlotProp
         return null;
     };
 
+    const slotHeight = getSlotHeight(item, minNonLogTotal);
+
     return (
-        <div className={b('slot-wrapper')} style={{flexGrow: Number(item.Total) || 1}}>
+        <div className={b('slot-wrapper')} style={{height: slotHeight}}>
             {renderContent()}
         </div>
     );
