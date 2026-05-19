@@ -51,7 +51,7 @@ describe('PaginatedStorageGroupsTable', () => {
         expect(ResizeablePaginatedTableMock).toHaveBeenCalledWith(
             expect.objectContaining({
                 rowHeight: 46,
-                extraContainerClassName: 'ydb-storage-groups-table_with-vdisks',
+                containerClassName: 'ydb-storage-groups-table ydb-storage-groups-table_with-vdisks',
             }),
             {},
         );
@@ -63,7 +63,7 @@ describe('PaginatedStorageGroupsTable', () => {
         expect(ResizeablePaginatedTableMock).toHaveBeenCalledWith(
             expect.objectContaining({
                 rowHeight: 46,
-                extraContainerClassName: 'ydb-storage-groups-table_with-vdisks',
+                containerClassName: 'ydb-storage-groups-table ydb-storage-groups-table_with-vdisks',
             }),
             {},
         );
@@ -75,7 +75,7 @@ describe('PaginatedStorageGroupsTable', () => {
         expect(ResizeablePaginatedTableMock).toHaveBeenCalledWith(
             expect.objectContaining({
                 rowHeight: undefined,
-                extraContainerClassName: undefined,
+                containerClassName: 'ydb-storage-groups-table',
             }),
             {},
         );

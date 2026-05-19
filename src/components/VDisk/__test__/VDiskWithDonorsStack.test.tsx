@@ -112,11 +112,11 @@ describe('VDiskWithDonorsStack', () => {
         const [main, donor] = screen.getAllByTestId('mock-vdisk');
 
         expect(main).not.toHaveAttribute('data-popup-offset');
-        expect(donor).toHaveAttribute('data-popup-offset', '{"mainAxis":14,"crossAxis":0}');
+        expect(donor).toHaveAttribute('data-popup-offset', '{"mainAxis":7,"crossAxis":0}');
 
         fireEvent.mouseEnter(main);
 
-        expect(main).toHaveAttribute('data-popup-offset', '{"mainAxis":14,"crossAxis":0}');
+        expect(main).toHaveAttribute('data-popup-offset', '{"mainAxis":7,"crossAxis":0}');
     });
 
     test('does not expand stack when highlighted vdisk comes from props', () => {

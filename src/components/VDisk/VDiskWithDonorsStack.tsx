@@ -18,7 +18,7 @@ interface VDiskWithDonorsStackProps extends VDiskProps {
 }
 
 const diskInStackPlacement: PopupPlacement = ['left', 'right'];
-const diskInStackPopupOffset = {mainAxis: 14, crossAxis: 0};
+const diskInStackPopupOffset = {mainAxis: 7, crossAxis: 0};
 
 export function VDiskWithDonorsStack({
     data,
@@ -37,18 +37,19 @@ export function VDiskWithDonorsStack({
     const donors = data?.Donors;
 
     const stackId = data?.StringifiedId;
+    const isHighlighted = Boolean(stackId && highlightedVDisk === stackId);
 
     const [internalHighlightedVDisk, setInternalHighlightedVDisk] = React.useState<string>();
 
-    const highlightedVDiskInStack = React.useMemo(() => {
-        const donorIds = donors?.map((donor) => donor.StringifiedId) ?? [];
+    const donorIds = React.useMemo(
+        () => new Set(donors?.map((donor) => donor.StringifiedId) ?? []),
+        [donors],
+    );
 
-        return Boolean(
-            internalHighlightedVDisk &&
-                (internalHighlightedVDisk === stackId ||
-                    donorIds.includes(internalHighlightedVDisk)),
-        );
-    }, [internalHighlightedVDisk, stackId, donors]);
+    const highlightedVDiskInStack = Boolean(
+        internalHighlightedVDisk &&
+            (internalHighlightedVDisk === stackId || donorIds.has(internalHighlightedVDisk)),
+    );
 
     const onShowPopup = React.useCallback(() => {
         if (stackId) {
@@ -68,8 +69,8 @@ export function VDiskWithDonorsStack({
         ...restProps,
         compact,
         withIcon,
-        showPopup: Boolean(stackId && stackId === highlightedVDisk),
-        highlighted: Boolean(stackId && stackId === highlightedVDisk),
+        showPopup: isHighlighted,
+        highlighted: isHighlighted,
         onShowPopup,
         onHidePopup,
     };

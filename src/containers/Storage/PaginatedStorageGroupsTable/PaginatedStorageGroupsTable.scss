@@ -1,9 +1,11 @@
-.ydb-storage-groups-table_with-vdisks {
-    --paginated-table-cell-vertical-padding: 10px;
+.ydb-storage-groups-table {
+    &_with-vdisks {
+        --paginated-table-cell-vertical-padding: 10px;
 
-    .ydb-paginated-table {
-        &__row-cell {
-            vertical-align: top;
+        .ydb-paginated-table {
+            &__row-cell {
+                vertical-align: top;
+            }
         }
     }
 }
