@@ -4,7 +4,7 @@ import {isNil} from 'lodash';
 
 import {DEFAULT_TABLE_ROW_HEIGHT} from '../../../../components/PaginatedTable';
 import type {TopicDataResponse} from '../../../../types/api/topic';
-import {safeParseNumber} from '../../../../utils/utils';
+import {isNumeric} from '../../../../utils/utils';
 
 import {TOPIC_DATA_DEFAULT_PAGE_SIZE} from './utils/constants';
 
@@ -29,26 +29,136 @@ interface UseTopicScrollResult {
     scrollToOffset: (newOffset: number) => void;
 }
 
+// ---------------------------------------------------------------------------
+// Scroll intent model
+// ---------------------------------------------------------------------------
+//
+// The hook tracks one atomic intent describing where the table should scroll
+// next. Every trigger (URL filter change, user click, partition/page switch)
+// produces a complete replacement intent — there's no second flag to forget
+// to reset.
+//
+//   - filter-probe: a URL filter (selectedOffset or startTimestamp) is active
+//                   and the probe query is authoritative for the target. The
+//                   actual offset comes from the probe's first message; the
+//                   filter value itself is not used as a target. This handles
+//                   sparse partitions and stale URLs uniformly: the backend
+//                   returns the first existing message at/after the filter.
+//
+//   - direct-offset: an absolute offset to scroll to, known without needing
+//                    the probe. Two sources:
+//                      * 'user' — explicit scrollToOffset() call. Out-of-range
+//                                 values are clamped to the nearest boundary.
+//                      * 'active-offset' — URL has only activeOffset (no
+//                                 selectedOffset, no startTimestamp). The
+//                                 probe query is skipped in this case, so we
+//                                 can't resolve via probe; fall back to clamp.
+//
+//   - none: nothing to do.
+
+type ScrollIntent =
+    | {kind: 'none'}
+    | {
+          kind: 'filter-probe';
+          source: 'selected-offset' | 'timestamp';
+          // For selected-offset: the explicit offset the user pinned in the URL,
+          // used as a fallback target when the probe returns no message (e.g. the
+          // offset is out of range — probe errors out — but we still want the
+          // table to scroll to the requested position, clamped to bounds).
+          // For timestamp: no fallback offset is available.
+          fallbackOffset?: number;
+      }
+    | {kind: 'direct-offset'; offset: number; origin: 'user' | 'active-offset'};
+
+// ---------------------------------------------------------------------------
+// Pure helpers
+// ---------------------------------------------------------------------------
+
 /** Page (1-based) that contains the given absolute offset, given the partition's base offset. */
 function getTargetPage(offset: number, baseOffset: number): number {
     return Math.floor((offset - baseOffset) / TOPIC_DATA_DEFAULT_PAGE_SIZE) + 1;
 }
 
 /**
- * Initial pending scroll target from URL params: explicit selectedOffset wins,
- * otherwise fall back to activeOffset (which may legitimately be "0").
+ * Derive the scroll intent expressed by URL filter params at mount time.
+ *
+ * Priority:
+ *   1. activeOffset — highest, but only honoured at mount. After mount,
+ *      activeOffset changes come from in-table clicks on already-visible rows;
+ *      scrolling to them would be jarring. Mount-time activeOffset comes from
+ *      a deep-link, which is what should drive the initial scroll.
+ *   2. startTimestamp — mirrors the probe query's own priority over selectedOffset
+ *      ({@link useTopicProbeQuery} sets read_timestamp and ignores offset when both are set).
+ *   3. selectedOffset — falls back to probe resolution.
  */
-function getInitialTarget(
+function getInitialIntent(
     selectedOffset: number | null | undefined,
+    startTimestamp: number | null | undefined,
     activeOffset: string | null | undefined,
-): number | undefined {
-    if (!isNil(selectedOffset)) {
-        return selectedOffset;
+): ScrollIntent {
+    if (!isNil(activeOffset) && isNumeric(activeOffset)) {
+        return {kind: 'direct-offset', offset: Number(activeOffset), origin: 'active-offset'};
     }
-    if (isNil(activeOffset)) {
+    if (!isNil(startTimestamp)) {
+        return {kind: 'filter-probe', source: 'timestamp'};
+    }
+    if (!isNil(selectedOffset)) {
+        return {
+            kind: 'filter-probe',
+            source: 'selected-offset',
+            fallbackOffset: selectedOffset,
+        };
+    }
+    return {kind: 'none'};
+}
+
+/**
+ * Derive the scroll intent from a *post-mount* filter change. activeOffset is
+ * intentionally excluded — clicks on table rows update activeOffset but the row
+ * is already on-screen, so re-scrolling would be jarring.
+ */
+function getFilterChangeIntent(
+    selectedOffset: number | null | undefined,
+    startTimestamp: number | null | undefined,
+): ScrollIntent {
+    if (!isNil(startTimestamp)) {
+        return {kind: 'filter-probe', source: 'timestamp'};
+    }
+    if (!isNil(selectedOffset)) {
+        return {
+            kind: 'filter-probe',
+            source: 'selected-offset',
+            fallbackOffset: selectedOffset,
+        };
+    }
+    return {kind: 'none'};
+}
+
+/** Read the first message's offset from a probe response, if any. */
+function getProbeOffset(currentData: TopicDataResponse | undefined): number | undefined {
+    const offset = currentData?.Messages?.[0]?.Offset;
+    return isNumeric(offset) ? Number(offset) : undefined;
+}
+
+/**
+ * Clamp an explicit offset into the partition's [baseOffset, endOffset) window.
+ * Returns undefined when the window is empty.
+ */
+function clampOffsetToBounds(
+    offset: number,
+    baseOffset: number,
+    endOffset: number,
+): number | undefined {
+    if (endOffset <= baseOffset) {
         return undefined;
     }
-    return safeParseNumber(activeOffset);
+    if (offset < baseOffset) {
+        return baseOffset;
+    }
+    if (offset >= endOffset) {
+        return endOffset - 1;
+    }
+    return offset;
 }
 
 export function useTopicScroll({
@@ -66,56 +176,66 @@ export function useTopicScroll({
     currentData,
     isFetching,
 }: UseTopicScrollParams): UseTopicScrollResult {
-    // The next offset we want to scroll to once the table is ready.
-    // Seeded from the URL on first render, written by scrollToOffset() on cross-page
-    // navigation, and resolved from the probe response when shouldResolveFirstMessage
-    // is set. Cleared only after a successful scroll so effect re-runs don't lose it.
-    const pendingTarget = React.useRef<number | undefined>(
-        getInitialTarget(selectedOffset, activeOffset),
+    // Single atomic intent. Seeded from the URL on first render so that an
+    // immediate filter-probe / activeOffset URL is honoured even before any
+    // effect runs.
+    const scrollIntentRef = React.useRef<ScrollIntent>(
+        getInitialIntent(selectedOffset, startTimestamp, activeOffset),
     );
 
-    // When selectedOffset/startTimestamp change *after mount*, the actual target is
-    // the first message from the probe response; we resolve it inside the data effect
-    // once data arrives. We must NOT flip this on mount — pendingTarget is already
-    // seeded from the URL via getInitialTarget(), and overwriting it here would
-    // discard the user's URL-specified offset (e.g. an offset that points into a
-    // sparse partition where the first available message has a different offset).
+    // Track previous filter values via refs (not state) for two reasons:
+    //   1. Updating them must not re-render.
+    //   2. Refs persist across React 18 Strict Mode's double effect invocation,
+    //      so the equality check correctly returns false on both runs (both
+    //      runs see the same initial values).
     //
-    // We compare against previous values stored in refs rather than using a
-    // didMount guard, because refs persist across React 18 Strict Mode's double
-    // effect invocation. A didMount guard would be flipped to `true` on the first
-    // run and then trigger the "after mount" branch on the second run, clobbering
-    // the URL-seeded pendingTarget. Both Strict Mode runs see identical initial
-    // values, so the equality check correctly returns false on both.
-    const shouldResolveFirstMessage = React.useRef(false);
+    // activeOffset is deliberately NOT tracked here: post-mount changes to it
+    // come from clicking already-visible rows in the table (the click writes
+    // activeOffset into the URL to open the drawer). Triggering a scroll on
+    // those would yank the user away from the row they just clicked. Initial
+    // mount-time activeOffset (from a shared deep-link) is still honoured —
+    // it's seeded into scrollIntentRef above.
     const prevSelectedOffset = React.useRef(selectedOffset);
     const prevStartTimestamp = React.useRef(startTimestamp);
+
     React.useEffect(() => {
-        if (
-            prevSelectedOffset.current === selectedOffset &&
-            prevStartTimestamp.current === startTimestamp
-        ) {
+        const filtersChanged =
+            prevSelectedOffset.current !== selectedOffset ||
+            prevStartTimestamp.current !== startTimestamp;
+        if (!filtersChanged) {
             return;
         }
         prevSelectedOffset.current = selectedOffset;
         prevStartTimestamp.current = startTimestamp;
-        shouldResolveFirstMessage.current = true;
+        // Atomically replace any in-flight intent — the user just expressed a
+        // new filter selection, so any prior target (whether a stale probe
+        // resolve or a pending user scroll) is now obsolete by definition.
+        scrollIntentRef.current = getFilterChangeIntent(selectedOffset, startTimestamp);
     }, [selectedOffset, startTimestamp]);
 
-    // Reset scroll on page/partition change so the visual transition is clean.
-    // Invalidate any pending scroll on partition switch — its offset is meaningless
-    // in the new partition.
+    // ---------------------------------------------------------------------------
+    // Partition / page change handling
+    // ---------------------------------------------------------------------------
     //
-    // Important: the initial `undefined → <auto-selected>` transition (when the URL
-    // omits selectedPartition and useTopicPartitions auto-selects the first one) is
-    // NOT a user partition switch — it's the resolution of the same selection. The
-    // URL-seeded pendingTarget points into exactly the partition being auto-selected,
-    // so we must not clobber it. Only treat the change as a real switch when leaving
-    // a previously-defined partition (defined → different defined). The ref-based
-    // comparison also survives Strict Mode's double effect invocation: both runs see
-    // the same initial `prevPartition.current`, so the guard returns false on both.
+    // Reset scroll on page/partition change so the visual transition is clean.
+    //
+    // Distinguishing user vs programmatic page switches:
+    //   When the data effect resolves a filter-probe or direct-offset intent
+    //   and the target lives on a different page, it calls setCurrentPage()
+    //   AND sets `expectedPageSwitchRef.current = true`. The layout effect
+    //   below reads-and-clears that flag, so any page change without the flag
+    //   set is treated as a user-driven navigation that must cancel the
+    //   pending intent.
+    //
+    // Partition handling:
+    //   The initial `undefined → <auto-selected>` transition (URL omits the
+    //   partition, useTopicPartitions auto-selects the first) is NOT a user
+    //   partition switch — the URL-seeded intent points into exactly that
+    //   partition. Only treat the change as a real switch when leaving a
+    //   previously-defined partition (defined → different defined).
     const prevPage = React.useRef(currentPage);
     const prevPartition = React.useRef(selectedPartition);
+    const expectedPageSwitchRef = React.useRef(false);
     React.useLayoutEffect(() => {
         const pageChanged = prevPage.current !== currentPage;
         const partitionChanged = prevPartition.current !== selectedPartition;
@@ -123,38 +243,81 @@ export function useTopicScroll({
             return;
         }
         const isRealPartitionSwitch = partitionChanged && !isNil(prevPartition.current);
+        const isExpectedPageSwitch = pageChanged && expectedPageSwitchRef.current;
+        expectedPageSwitchRef.current = false;
         prevPage.current = currentPage;
         prevPartition.current = selectedPartition;
+
         if (isRealPartitionSwitch) {
-            pendingTarget.current = undefined;
-            shouldResolveFirstMessage.current = false;
+            // New partition — any offset from the previous partition is meaningless.
+            scrollIntentRef.current = {kind: 'none'};
+        } else if (pageChanged && !isExpectedPageSwitch) {
+            // User-driven page switch (pagination control, keyboard, etc.) while
+            // an intent was still pending — cancel it so the in-flight filter
+            // probe (or queued direct target) doesn't yank the user away from
+            // the page they just navigated to.
+            scrollIntentRef.current = {kind: 'none'};
         }
+
         if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollTop = 0;
         }
     }, [currentPage, selectedPartition, scrollContainerRef]);
 
+    // ---------------------------------------------------------------------------
+    // Imperative user scroll
+    // ---------------------------------------------------------------------------
+    //
+    // Any explicit scrollToOffset() replaces the intent atomically. This:
+    //   - cancels a pending filter-probe so a late-arriving probe response
+    //     cannot overwrite the user's target;
+    //   - applies bounds clamping (out-of-range becomes nearest boundary
+    //     instead of silently doing nothing);
+    //   - delegates the actual scroll to the data effect so the page-switch /
+    //     ResizeObserver logic is in one place.
     const scrollToOffset = React.useCallback(
         (newOffset: number) => {
-            if (isNil(baseOffset) || isNil(endOffset) || isNil(pageStartOffset)) {
+            if (isNil(baseOffset) || isNil(endOffset)) {
                 return;
             }
-            if (newOffset < baseOffset || newOffset >= endOffset) {
+            const clamped = clampOffsetToBounds(newOffset, baseOffset, endOffset);
+            if (isNil(clamped)) {
+                scrollIntentRef.current = {kind: 'none'};
                 return;
             }
+            scrollIntentRef.current = {kind: 'direct-offset', offset: clamped, origin: 'user'};
 
+            // Same-page targets can avoid a re-render; cross-page targets need
+            // setCurrentPage, which the data effect will pick up. We still go
+            // through the data effect so that ResizeObserver waits for the
+            // table to be laid out before scrolling, identical to filter-probe
+            // resolution. Trigger an immediate effect re-run by bumping a
+            // dummy state? No — currentData/isFetching haven't changed, so
+            // the existing data-effect dependencies wouldn't fire. For the
+            // same-page case we can scroll synchronously here; for the cross-
+            // page case we queue the page switch and let the effect handle it.
+            if (isNil(pageStartOffset)) {
+                return;
+            }
             if (usePagination) {
-                const targetPage = getTargetPage(newOffset, baseOffset);
+                const targetPage = getTargetPage(clamped, baseOffset);
                 if (targetPage !== currentPage) {
-                    // Queue the scroll for after the page switch; the data effect performs it.
-                    pendingTarget.current = newOffset;
+                    expectedPageSwitchRef.current = true;
                     setCurrentPage(targetPage);
                     return;
                 }
             }
-
-            const scrollTop = Math.max(0, (newOffset - pageStartOffset) * DEFAULT_TABLE_ROW_HEIGHT);
+            const scrollTop = Math.max(0, (clamped - pageStartOffset) * DEFAULT_TABLE_ROW_HEIGHT);
             scrollContainerRef.current?.scrollTo({top: scrollTop, behavior: 'instant'});
+            // Same-page scroll completed — clear intent so a later probe
+            // response cannot reinterpret it.
+            if (
+                scrollIntentRef.current.kind === 'direct-offset' &&
+                scrollIntentRef.current.offset === clamped &&
+                scrollIntentRef.current.origin === 'user'
+            ) {
+                scrollIntentRef.current = {kind: 'none'};
+            }
         },
         [
             pageStartOffset,
@@ -167,35 +330,64 @@ export function useTopicScroll({
         ],
     );
 
+    // ---------------------------------------------------------------------------
+    // Intent resolution effect
+    // ---------------------------------------------------------------------------
+    //
+    // Runs whenever data or layout-relevant inputs change. Resolves the current
+    // intent into a concrete scroll, switching pages first if needed and
+    // waiting for the table DOM via ResizeObserver before performing the
+    // actual scrollTo.
     React.useEffect(() => {
-        if (isFetching || isNil(baseOffset) || isNil(endOffset) || isNil(pageStartOffset)) {
+        if (isNil(baseOffset) || isNil(endOffset) || isNil(pageStartOffset)) {
+            return undefined;
+        }
+        const intent = scrollIntentRef.current;
+        if (intent.kind === 'none') {
             return undefined;
         }
 
-        // Resolve "scroll to first message" intent now that the probe response is here.
-        if (shouldResolveFirstMessage.current) {
-            const firstMessage = currentData?.Messages?.[0];
-            if (!isNil(firstMessage)) {
-                pendingTarget.current = safeParseNumber(firstMessage.Offset);
-                shouldResolveFirstMessage.current = false;
+        // Resolve intent → concrete target offset.
+        let target: number | undefined;
+        if (intent.kind === 'filter-probe') {
+            // Probe is authoritative. Wait for the probe response; while it's
+            // in flight do nothing (next data update will re-run this effect).
+            if (isFetching) {
+                return undefined;
             }
+            const probeOffset = getProbeOffset(currentData);
+            if (!isNil(probeOffset)) {
+                target = clampOffsetToBounds(probeOffset, baseOffset, endOffset);
+            } else if (isNil(intent.fallbackOffset)) {
+                // Timestamp-only filter with empty probe response — nothing to
+                // scroll to. Drop the intent so we don't spin re-evaluating it.
+                scrollIntentRef.current = {kind: 'none'};
+                return undefined;
+            } else {
+                // Probe returned no message (e.g. selectedOffset is out of range
+                // and the backend errored). The user still pinned an explicit
+                // offset in the URL — scroll to the nearest valid position so
+                // the navigation isn't silently dropped.
+                target = clampOffsetToBounds(intent.fallbackOffset, baseOffset, endOffset);
+            }
+        } else {
+            // direct-offset: already clamped at intent creation, but bounds may
+            // have moved (probe response shifted base/end), so reclamp.
+            target = clampOffsetToBounds(intent.offset, baseOffset, endOffset);
         }
 
-        const target = pendingTarget.current;
         if (isNil(target)) {
+            scrollIntentRef.current = {kind: 'none'};
             return undefined;
         }
 
-        if (target < baseOffset || target >= endOffset) {
-            pendingTarget.current = undefined;
-            return undefined;
-        }
-
-        // Target is on a different page — switch pages; pendingTarget stays set,
-        // and the next effect run (after page change) will perform the actual scroll.
+        // Page switch if needed. Mark it expected so the layout effect doesn't
+        // cancel the intent. `pendingTarget` lives entirely inside the intent
+        // ref, so there's nothing else to thread through.
         if (usePagination) {
             const targetPage = getTargetPage(target, baseOffset);
             if (targetPage !== currentPage) {
+                expectedPageSwitchRef.current = true;
                 setCurrentPage(targetPage);
                 return undefined;
             }
@@ -207,6 +399,11 @@ export function useTopicScroll({
             return undefined;
         }
         const targetScrollTop = Math.max(0, (target - pageStartOffset) * DEFAULT_TABLE_ROW_HEIGHT);
+
+        // Capture the intent identity at observer creation so a later atomic
+        // replacement (user click, partition switch, filter change) doesn't
+        // get its new intent prematurely cleared by this observer's callback.
+        const observedIntent = intent;
 
         // Wait for the table to reflect the current page's content before scrolling.
         // Reading scrollHeight synchronously here is unsafe: React may have committed
@@ -226,8 +423,7 @@ export function useTopicScroll({
             // (targetScrollTop > maxScrollTop), the row will never appear at the
             // expected position no matter how long we wait — the table is simply
             // too short (few rows, non-paginated mode, short last page, etc.).
-            // In that case, clamp to the end, clear the pending target and stop
-            // observing, otherwise pendingTarget stays set across effect re-runs.
+            // In that case, clamp to the end, clear the intent and stop observing.
             const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
             const rowLaidOut = container.scrollHeight >= targetScrollTop + DEFAULT_TABLE_ROW_HEIGHT;
             const targetReachable = targetScrollTop <= maxScrollTop;
@@ -238,8 +434,11 @@ export function useTopicScroll({
                 top: Math.min(targetScrollTop, maxScrollTop),
                 behavior: 'instant',
             });
-            if (pendingTarget.current === target) {
-                pendingTarget.current = undefined;
+            // Reference equality: only clear if the intent we resolved is still
+            // the active one. If anything has replaced it (user click, new
+            // filter, partition switch) the new intent is preserved untouched.
+            if (scrollIntentRef.current === observedIntent) {
+                scrollIntentRef.current = {kind: 'none'};
             }
             observer.disconnect();
         });
