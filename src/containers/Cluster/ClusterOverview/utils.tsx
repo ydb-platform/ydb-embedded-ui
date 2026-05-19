@@ -25,7 +25,6 @@ export function calculateBaseDiagramValues({
     colorizeProgress = true,
     warningThreshold,
     dangerThreshold,
-    inverseColorize = false,
     fillWidth,
     percentPrecision,
 }: ClusterMetricsBaseProps & {fillWidth: number}) {
@@ -35,7 +34,6 @@ export function calculateBaseDiagramValues({
         warningThreshold,
         dangerThreshold,
         colorizeProgress,
-        inverseColorize,
     });
 
     const percents = formatPercent(fillWidth / 100, percentPrecision);

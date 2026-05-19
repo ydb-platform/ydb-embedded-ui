@@ -17,7 +17,6 @@ export const defaultFormatProgressValues: FormatProgressViewerValues = (value, t
 };
 
 interface CalculateProgressStatusProps {
-    inverseColorize?: boolean;
     dangerThreshold?: number;
     warningThreshold?: number;
     colorizeProgress?: boolean;
@@ -25,18 +24,17 @@ interface CalculateProgressStatusProps {
 }
 
 export function calculateProgressStatus({
-    inverseColorize,
     warningThreshold = DEFAULT_WARNING_THRESHOLD,
     dangerThreshold = DEFAULT_DANGER_THRESHOLD,
     colorizeProgress,
     fillWidth,
 }: CalculateProgressStatusProps) {
-    let status: ProgressStatus = inverseColorize ? 'danger' : 'good';
+    let status: ProgressStatus = 'good';
     if (colorizeProgress) {
         if (fillWidth > warningThreshold && fillWidth <= dangerThreshold) {
             status = 'warning';
         } else if (fillWidth > dangerThreshold) {
-            status = inverseColorize ? 'good' : 'danger';
+            status = 'danger';
         }
     }
     return status;
