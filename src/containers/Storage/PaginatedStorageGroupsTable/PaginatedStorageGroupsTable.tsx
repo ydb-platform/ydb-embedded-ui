@@ -10,12 +10,24 @@ import {
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
 import type {GroupsGroupByField} from '../../../types/api/storage';
+import {cn} from '../../../utils/cn';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
-import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
+import {STORAGE_GROUPS_COLUMNS_IDS, STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
 import type {StorageGroupsColumn} from './columns/types';
 import {useGroupsGetter} from './getGroups';
 import i18n from './i18n';
+
+import './PaginatedStorageGroupsTable.scss';
+
+const b = cn('ydb-storage-groups-table');
+
+const STORAGE_GROUPS_TABLE_ROW_HEIGHT_WITH_VDISKS = 46;
+
+const columnsWithVDisks = new Set<string>([
+    STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+    STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+]);
 
 interface PaginatedStorageGroupsTableProps {
     columns: StorageGroupsColumn[];
@@ -56,6 +68,12 @@ export const PaginatedStorageGroupsTable = ({
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
 
     const fetchData = useGroupsGetter(groupsHandlerAvailable);
+
+    const hasVDisksColumns = React.useMemo(() => {
+        return columns.some((column) => columnsWithVDisks.has(column.name));
+    }, [columns]);
+
+    const tableContainerClassName = b({'with-vdisks': hasVDisksColumns});
 
     const tableFilters = React.useMemo(() => {
         return {
@@ -98,6 +116,10 @@ export const PaginatedStorageGroupsTable = ({
                 columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
                 scrollContainerRef={scrollContainerRef}
                 columns={columns}
+                rowHeight={
+                    hasVDisksColumns ? STORAGE_GROUPS_TABLE_ROW_HEIGHT_WITH_VDISKS : undefined
+                }
+                containerClassName={tableContainerClassName}
                 fetchData={fetchData}
                 initialEntitiesCount={initialEntitiesCount}
                 renderErrorMessage={renderErrorMessage}

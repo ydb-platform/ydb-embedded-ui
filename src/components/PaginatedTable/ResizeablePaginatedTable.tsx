@@ -17,11 +17,13 @@ function updateColumnsWidth<T>(columns: Column<T>[], columnsWidthSetup: ColumnWi
 interface ResizeablePaginatedTableProps<T, F>
     extends Omit<PaginatedTableProps<T, F>, 'onColumnsResize'> {
     columnsWidthLSKey: string;
+    containerClassName?: string;
 }
 
 export function ResizeablePaginatedTable<T, F>({
     columnsWidthLSKey,
     columns,
+    containerClassName,
     ...props
 }: ResizeablePaginatedTableProps<T, F>) {
     const [tableColumnsWidth, setTableColumnsWidth, isTableWidthLoading] =
@@ -37,7 +39,7 @@ export function ResizeablePaginatedTable<T, F>({
         <PaginatedTable
             columns={updatedColumns}
             onColumnsResize={setTableColumnsWidth}
-            containerClassName={b('resizeable-table-container')}
+            containerClassName={b('resizeable-table-container', containerClassName)}
             {...props}
         />
     );

@@ -1,0 +1,6 @@
+.ydb-storage-groups-table {
+    &_with-vdisks {
+        --paginated-table-cell-vertical-padding: 10px;
+        --paginated-table-cell-vertical-align: top;
+    }
+}
