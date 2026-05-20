@@ -3,8 +3,16 @@ import type {
     OperationForgetRequestParams,
     OperationKind,
     OperationListRequestParams,
+    TOperation,
     TOperationList,
 } from '../../types/api/operations';
+import {isQueryErrorResponse} from '../../utils/query';
+import {
+    TABLE_COMPACTION_OPERATION_PAGE_SIZE,
+    createTableCompactionQuery,
+    findRunningTableCompactionOperation,
+} from '../../utils/tableCompaction';
+import type {StartTableCompactionParams} from '../../utils/tableCompaction';
 
 import {api} from './api';
 
@@ -55,6 +63,53 @@ export const operationsApi = api.injectEndpoints({
                 }
             },
             providesTags: ['All'],
+        }),
+        getTableCompaction: build.query<TOperation | undefined, {database: string; path: string}>({
+            queryFn: async ({database, path}, {signal}) => {
+                try {
+                    const params: OperationListRequestParams = {
+                        database,
+                        kind: 'compaction',
+                        page_size: TABLE_COMPACTION_OPERATION_PAGE_SIZE,
+                    };
+                    const data = await window.api.operation.getOperationList(params, {signal});
+                    const validatedData = validateOperationListResponse(data);
+
+                    return {
+                        data: findRunningTableCompactionOperation(validatedData.operations, path),
+                    };
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+        startTableCompaction: build.mutation<void, StartTableCompactionParams>({
+            queryFn: async ({database, path, cascade, maxShardsInFlight}, {signal}) => {
+                try {
+                    const response = await window.api.viewer.sendQuery(
+                        {
+                            query: createTableCompactionQuery(path, {
+                                cascade,
+                                maxShardsInFlight,
+                            }),
+                            database,
+                            action: 'execute-query',
+                            internal_call: true,
+                        },
+                        {signal, withRetries: true},
+                    );
+
+                    if (isQueryErrorResponse(response)) {
+                        return {error: response.error};
+                    }
+
+                    return {data: undefined};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            invalidatesTags: ['All'],
         }),
         cancelOperation: build.mutation({
             queryFn: async (params: OperationCancelRequestParams, {signal}) => {

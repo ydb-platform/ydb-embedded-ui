@@ -50,6 +50,7 @@ import {
 import {isTableType} from '../utils/schema';
 import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
+import {CompactTableAction} from './CompactTableAction/CompactTableAction';
 import {ObjectTree} from './ObjectTree';
 import {SchemaActions} from './SchemaActions';
 import {RefreshTreeButton} from './SchemaTree/RefreshTreeButton';
@@ -418,8 +419,16 @@ export function ObjectSummary({
 
     const renderCommonInfoControls = () => {
         const showPreview = isTableType(type);
+        const showTableCompaction = type === EPathType.EPathTypeTable;
         return (
             <React.Fragment>
+                {showTableCompaction && (
+                    <CompactTableAction
+                        path={path}
+                        database={database}
+                        databaseFullPath={databaseFullPath}
+                    />
+                )}
                 {showPreview &&
                     getSummaryControls(
                         dispatch,
