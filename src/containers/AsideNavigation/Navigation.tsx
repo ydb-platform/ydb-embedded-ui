@@ -5,7 +5,6 @@ import {Alert, Popover} from '@gravity-ui/uikit';
 import {useRouteMatch} from 'react-router-dom';
 
 import {useComponent} from '../../components/ComponentsProvider/ComponentsProvider';
-import {InternalLink} from '../../components/InternalLink';
 import routes from '../../routes';
 import {selectUser} from '../../store/reducers/authentication/authentication';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
@@ -73,64 +72,56 @@ export function Navigation({children, userSettings}: NavigationProps) {
             buttonCnParams,
             makeItem,
             makeItemParams,
-            href,
         }: {
             wrapperCnParams: Record<string, boolean>;
             buttonCnParams: Record<string, boolean>;
             makeItem: (p: MakeItemParams) => React.ReactNode;
             makeItemParams: MakeItemParams;
-            href: string;
         }) => {
             // span1: full width wrapper to ensure proper button position
             // span2: wrapper with additional background and animation
-            // span3: button wrapper for proper active and hover colors
-            // Capture phase fires on the anchor BEFORE the inner makeItem button's
-            // onClick. For modifier-clicks (cmd/ctrl/shift/alt) and middle-clicks
-            // we stop propagation so the inner button doesn't fire onItemClick and
-            // switch the current page. We don't preventDefault — the browser still
-            // follows the href and opens the link in a new tab/window.
-            const handleClickCapture = (e: React.MouseEvent<HTMLAnchorElement>) => {
-                if (isModifiedClickEvent(e)) {
-                    e.stopPropagation();
-                }
-            };
-
-            const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-                if (isModifiedClickEvent(e)) {
-                    return;
-                }
-                // For a regular click, suppress full-page navigation: the underlying
-                // makeItem button handles in-app navigation via query params.
-                e.preventDefault();
-            };
-
+            // span3: styling-only wrapper for active/hover colors.
+            //   The actual interactive element is the <a> produced by makeItem
+            //   (because we pass `link` on the MenuItem), so we don't wrap it in
+            //   another <a>/button — that would create nested interactive content.
             return (
                 <span className={b('nav-item-wrapper')}>
                     <span className={b('nav-item-bg', wrapperCnParams)}>
-                        <InternalLink
-                            className={b('button-wrapper', buttonCnParams)}
-                            to={href}
-                            // The inner makeItem button is the real keyboard-focusable
-                            // control; remove the anchor from the tab order so Tab
-                            // doesn't stop on both the <InternalLink> and the inner button.
-                            tabIndex={-1}
-                            onClickCapture={handleClickCapture}
-                            onClick={handleClick}
-                        >
+                        <span className={b('button-wrapper', buttonCnParams)}>
                             {makeItem(makeItemParams)}
-                        </InternalLink>
+                        </span>
                     </span>
                 </span>
             );
         };
 
         return tenantNavigationItems.map((item) => {
+            // makeItem renders the inner element as <a href={item.link}> when `link`
+            // is set, which gives us real link semantics for free (hover preview,
+            // cmd+click → open in new tab, copy link address, right-click menu).
+            // The onItemClick handler still fires on every primary click and lets us
+            // do the in-app navigation (query-param update) without a full reload.
+            // For modifier/middle-clicks we bail out so the browser handles the
+            // anchor natively without our SPA handler also switching the current page.
+            const handleItemClick = (
+                _menuItem: MenuItem,
+                _collapsed: boolean,
+                event: React.MouseEvent<HTMLElement>,
+            ) => {
+                if (isModifiedClickEvent(event)) {
+                    return;
+                }
+                event.preventDefault();
+                item.onForward();
+            };
+
             const navigationItem: MenuItem = {
                 id: item.id,
                 title: item.title,
                 icon: item.icon,
                 current: item.current,
-                onItemClick: item.onForward,
+                link: item.path,
+                onItemClick: handleItemClick,
                 tooltipText: item.title,
                 itemWrapper: (params, makeItem, options) => {
                     const baseCnParams = {
@@ -190,7 +181,6 @@ export function Navigation({children, userSettings}: NavigationProps) {
                                     buttonCnParams,
                                     makeItem,
                                     makeItemParams: params,
-                                    href: item.path,
                                 })}
                             </Popover>
                         );
@@ -201,7 +191,6 @@ export function Navigation({children, userSettings}: NavigationProps) {
                         buttonCnParams,
                         makeItem,
                         makeItemParams: params,
-                        href: item.path,
                     });
                 },
             };
