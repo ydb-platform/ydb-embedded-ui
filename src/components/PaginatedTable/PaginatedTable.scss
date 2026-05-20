@@ -5,6 +5,7 @@
     $cell-border: 1px solid var(--paginated-table-border-color);
     --paginated-table-cell-vertical-padding: 5px;
     --paginated-table-cell-horizontal-padding: 10px;
+    --paginated-table-cell-vertical-align: middle;
 
     --paginated-table-border-color: var(--g-color-base-generic-hover);
     --paginated-table-hover-color: var(--g-color-base-simple-hover-solid);
@@ -160,7 +161,7 @@
         padding: var(--paginated-table-cell-vertical-padding)
             var(--paginated-table-cell-horizontal-padding);
 
-        vertical-align: middle;
+        vertical-align: var(--paginated-table-cell-vertical-align);
         white-space: nowrap;
         text-overflow: ellipsis;
 

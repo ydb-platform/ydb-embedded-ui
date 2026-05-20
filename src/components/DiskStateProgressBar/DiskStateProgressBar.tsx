@@ -13,10 +13,6 @@ import './DiskStateProgressBar.scss';
 
 const b = cn('storage-disk-progress-bar');
 
-const BORDERLESS_STYLE = {
-    '--entity-state-shadow-color': 'none',
-} as React.CSSProperties;
-
 interface DiskStateProgressBarProps {
     diskAllocatedPercent?: number;
     severity?: number;
@@ -30,7 +26,6 @@ interface DiskStateProgressBarProps {
     isDonor?: boolean;
     withIcon?: boolean;
     highlighted?: boolean;
-    borderless?: boolean;
     noDataPlaceholder?: React.ReactNode;
 }
 
@@ -47,7 +42,6 @@ export function DiskStateProgressBar({
     isDonor,
     withIcon,
     highlighted,
-    borderless,
     noDataPlaceholder,
 }: DiskStateProgressBarProps) {
     const [inverted] = useSetting<boolean | undefined>(SETTING_KEYS.INVERTED_DISKS);
@@ -61,8 +55,6 @@ export function DiskStateProgressBar({
         striped,
         highlighted,
     };
-
-    const style = borderless ? BORDERLESS_STYLE : undefined;
 
     if (isDonor) {
         mods[DONOR_COLOR.toLocaleLowerCase()] = true;
@@ -131,7 +123,6 @@ export function DiskStateProgressBar({
             alignItems="center"
             justifyContent={justifyContent}
             className={b(mods, className)}
-            style={style}
             role="meter"
             aria-label="Disk allocated space"
             aria-valuemin={0}
