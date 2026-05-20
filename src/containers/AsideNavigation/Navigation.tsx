@@ -5,12 +5,14 @@ import {Alert, Popover} from '@gravity-ui/uikit';
 import {useRouteMatch} from 'react-router-dom';
 
 import {useComponent} from '../../components/ComponentsProvider/ComponentsProvider';
+import {InternalLink} from '../../components/InternalLink';
 import routes from '../../routes';
 import {selectUser} from '../../store/reducers/authentication/authentication';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {useSetting} from '../../store/reducers/settings/useSetting';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
+import {isModifiedClickEvent} from '../../utils/events';
 import {useDelayed, useTypedSelector} from '../../utils/hooks';
 import {useTenantNavigation} from '../Tenant/TenantNavigation/useTenantNavigation';
 import {useNavigationV2Enabled} from '../Tenant/utils/useNavigationV2Enabled';
@@ -71,21 +73,52 @@ export function Navigation({children, userSettings}: NavigationProps) {
             buttonCnParams,
             makeItem,
             makeItemParams,
+            href,
         }: {
             wrapperCnParams: Record<string, boolean>;
             buttonCnParams: Record<string, boolean>;
             makeItem: (p: MakeItemParams) => React.ReactNode;
             makeItemParams: MakeItemParams;
+            href: string;
         }) => {
             // span1: full width wrapper to ensure proper button position
             // span2: wrapper with additional background and animation
             // span3: button wrapper for proper active and hover colors
+            // Capture phase fires on the anchor BEFORE the inner makeItem button's
+            // onClick. For modifier-clicks (cmd/ctrl/shift/alt) and middle-clicks
+            // we stop propagation so the inner button doesn't fire onItemClick and
+            // switch the current page. We don't preventDefault — the browser still
+            // follows the href and opens the link in a new tab/window.
+            const handleClickCapture = (e: React.MouseEvent<HTMLAnchorElement>) => {
+                if (isModifiedClickEvent(e)) {
+                    e.stopPropagation();
+                }
+            };
+
+            const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+                if (isModifiedClickEvent(e)) {
+                    return;
+                }
+                // For a regular click, suppress full-page navigation: the underlying
+                // makeItem button handles in-app navigation via query params.
+                e.preventDefault();
+            };
+
             return (
                 <span className={b('nav-item-wrapper')}>
                     <span className={b('nav-item-bg', wrapperCnParams)}>
-                        <span className={b('button-wrapper', buttonCnParams)}>
+                        <InternalLink
+                            className={b('button-wrapper', buttonCnParams)}
+                            to={href}
+                            // The inner makeItem button is the real keyboard-focusable
+                            // control; remove the anchor from the tab order so Tab
+                            // doesn't stop on both the <InternalLink> and the inner button.
+                            tabIndex={-1}
+                            onClickCapture={handleClickCapture}
+                            onClick={handleClick}
+                        >
                             {makeItem(makeItemParams)}
-                        </span>
+                        </InternalLink>
                     </span>
                 </span>
             );
@@ -157,6 +190,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
                                     buttonCnParams,
                                     makeItem,
                                     makeItemParams: params,
+                                    href: item.path,
                                 })}
                             </Popover>
                         );
@@ -167,6 +201,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
                         buttonCnParams,
                         makeItem,
                         makeItemParams: params,
+                        href: item.path,
                     });
                 },
             };
