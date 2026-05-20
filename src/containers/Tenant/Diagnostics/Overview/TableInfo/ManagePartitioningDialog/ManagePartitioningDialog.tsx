@@ -46,12 +46,14 @@ function ManagePartitioningDialog({
     const {
         control,
         handleSubmit,
+        watch,
         trigger,
         formState: {errors, isValid},
     } = useManagePartitioningForm({
         initialValue,
         maxSplitSizeBytes: DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
     });
+    const splitSizeEnabled = watch('splitSizeEnabled');
 
     const handleApply = handleSubmit(async (data) => {
         setApiError(null);
@@ -77,6 +79,27 @@ function ManagePartitioningDialog({
                         <Text variant="subheader-1">{i18n('title_partitioning')}</Text>
 
                         <Flex className={b('row')} gap="3" alignItems="center">
+                            <label htmlFor="splitSizeEnabled" className={b('label')}>
+                                {i18n('field_size')}
+                            </label>
+
+                            <Controller
+                                name="splitSizeEnabled"
+                                control={control}
+                                render={({field}) => (
+                                    <Switch
+                                        id="splitSizeEnabled"
+                                        checked={field.value}
+                                        onUpdate={(next) => {
+                                            field.onChange(next);
+                                            trigger('splitSize');
+                                        }}
+                                    />
+                                )}
+                            />
+                        </Flex>
+
+                        <Flex className={b('row')} gap="3" alignItems="center">
                             <label htmlFor="splitSize" className={b('label')}>
                                 {i18n('field_split-size')}
                             </label>
@@ -90,6 +113,7 @@ function ManagePartitioningDialog({
                                         type="number"
                                         value={field.value}
                                         onUpdate={field.onChange}
+                                        disabled={!splitSizeEnabled}
                                         className={b('input')}
                                         errorMessage={errors.splitSize?.message}
                                         validationState={errors.splitSize ? 'invalid' : undefined}
@@ -101,6 +125,7 @@ function ManagePartitioningDialog({
                                                     <SplitUnitSelect
                                                         value={unitField.value}
                                                         options={UNIT_OPTIONS}
+                                                        disabled={!splitSizeEnabled}
                                                         onChange={(nextUnit) => {
                                                             unitField.onChange(nextUnit);
                                                             trigger('splitSize');

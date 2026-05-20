@@ -14,6 +14,7 @@ const b = cn('split-unit-select');
 interface SplitUnitSelectProps {
     value: string;
     options: UnitOptionsType;
+    disabled?: boolean;
     width?: number;
     size?: SelectProps['size'];
     onChange: (nextValue: string) => void;
@@ -22,6 +23,7 @@ interface SplitUnitSelectProps {
 export function SplitUnitSelect({
     value,
     options,
+    disabled = false,
     width = 55,
     size = 's',
     onChange,
@@ -44,7 +46,13 @@ export function SplitUnitSelect({
 
     const renderControl: SelectProps['renderControl'] = React.useCallback(
         () => (
-            <Button type="button" className={b('button')} size={size} onClick={handleToggleOpen}>
+            <Button
+                type="button"
+                className={b('button')}
+                size={size}
+                onClick={handleToggleOpen}
+                disabled={disabled}
+            >
                 <Flex
                     justifyContent="space-between"
                     alignItems="center"
@@ -56,11 +64,12 @@ export function SplitUnitSelect({
                 </Flex>
             </Button>
         ),
-        [handleToggleOpen, selectedLabel, size],
+        [disabled, handleToggleOpen, selectedLabel, size],
     );
 
     return (
         <Select
+            disabled={disabled}
             size={size}
             className={b('select')}
             options={options}

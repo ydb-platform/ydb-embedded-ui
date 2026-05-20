@@ -242,9 +242,12 @@ const prepareManagePartitioningDialogConfig = (
 ) => {
     const policy = partitionConfig?.PartitioningPolicy;
 
+    const splitBySizeEnabled = Number(policy?.SizeToSplit) > 0;
     const splitByLoadEnabled = Boolean(policy?.SplitByLoadSettings?.Enabled);
 
-    const bytes = Number(policy?.SizeToSplit ?? DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES);
+    const bytes = Number(
+        splitBySizeEnabled ? policy?.SizeToSplit : DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
+    );
     const size = formatBytes({
         value: bytes,
         withSizeLabel: false,
@@ -253,7 +256,8 @@ const prepareManagePartitioningDialogConfig = (
     const unit = getBytesSizeUnit(bytes);
 
     return {
-        splitSize: size,
+        splitSizeEnabled: splitBySizeEnabled,
+        splitSize: splitBySizeEnabled ? size : '',
         splitUnit: unit,
         loadEnabled: splitByLoadEnabled,
         minimum: String(progress?.minPartitions),
