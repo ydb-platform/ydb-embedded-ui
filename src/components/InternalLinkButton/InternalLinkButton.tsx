@@ -5,6 +5,7 @@ import {Button} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
 import {getLocationObjectFromHref} from '../../routes';
+import {isModifiedClickEvent} from '../../utils/events';
 
 type InternalLinkButtonProps = ButtonProps & {
     href: string;
@@ -23,12 +24,9 @@ export function InternalLinkButton({href, onClick, target, ...props}: InternalLi
         (event) => {
             onClick?.(event);
 
-            const isModifiedEvent =
-                event.metaKey || event.altKey || event.ctrlKey || event.shiftKey;
             const shouldHandleInternally =
                 !event.defaultPrevented &&
-                event.button === 0 &&
-                !isModifiedEvent &&
+                !isModifiedClickEvent(event) &&
                 (!target || target === '_self');
 
             if (!shouldHandleInternally) {

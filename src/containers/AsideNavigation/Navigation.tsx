@@ -11,6 +11,7 @@ import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {useSetting} from '../../store/reducers/settings/useSetting';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
+import {isModifiedClickEvent} from '../../utils/events';
 import {useDelayed, useTypedSelector} from '../../utils/hooks';
 import {useTenantNavigation} from '../Tenant/TenantNavigation/useTenantNavigation';
 import {useNavigationV2Enabled} from '../Tenant/utils/useNavigationV2Enabled';
@@ -79,7 +80,10 @@ export function Navigation({children, userSettings}: NavigationProps) {
         }) => {
             // span1: full width wrapper to ensure proper button position
             // span2: wrapper with additional background and animation
-            // span3: button wrapper for proper active and hover colors
+            // span3: styling-only wrapper for active/hover colors.
+            //   The actual interactive element is the <a> produced by makeItem
+            //   (because we pass `link` on the MenuItem), so we don't wrap it in
+            //   another <a>/button — that would create nested interactive content.
             return (
                 <span className={b('nav-item-wrapper')}>
                     <span className={b('nav-item-bg', wrapperCnParams)}>
@@ -92,12 +96,32 @@ export function Navigation({children, userSettings}: NavigationProps) {
         };
 
         return tenantNavigationItems.map((item) => {
+            // makeItem renders the inner element as <a href={item.link}> when `link`
+            // is set, which gives us real link semantics for free (hover preview,
+            // cmd+click → open in new tab, copy link address, right-click menu).
+            // The onItemClick handler still fires on every primary click and lets us
+            // do the in-app navigation (query-param update) without a full reload.
+            // For modifier/middle-clicks we bail out so the browser handles the
+            // anchor natively without our SPA handler also switching the current page.
+            const handleItemClick = (
+                _menuItem: MenuItem,
+                _collapsed: boolean,
+                event: React.MouseEvent<HTMLElement>,
+            ) => {
+                if (isModifiedClickEvent(event)) {
+                    return;
+                }
+                event.preventDefault();
+                item.onForward();
+            };
+
             const navigationItem: MenuItem = {
                 id: item.id,
                 title: item.title,
                 icon: item.icon,
                 current: item.current,
-                onItemClick: item.onForward,
+                link: item.path,
+                onItemClick: handleItemClick,
                 tooltipText: item.title,
                 itemWrapper: (params, makeItem, options) => {
                     const baseCnParams = {
