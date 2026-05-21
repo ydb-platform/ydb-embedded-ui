@@ -1,5 +1,21 @@
 # Changelog
 
+## [15.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.6.0...v15.7.0) (2026-05-21)
+
+
+### Features
+
+* better hover for replicating disks ([#3911](https://github.com/ydb-platform/ydb-embedded-ui/issues/3911)) ([8c2cb95](https://github.com/ydb-platform/ydb-embedded-ui/commit/8c2cb95078856c025727565d98cb654de94a695c))
+* **StorageGroupInfo:** use blue theme for used space ([#3898](https://github.com/ydb-platform/ydb-embedded-ui/issues/3898)) ([5741a69](https://github.com/ydb-platform/ydb-embedded-ui/commit/5741a690db6f2b54df579435c3cfdf1ec250e621))
+
+
+### Bug Fixes
+
+* copy results button works on plain HTTP (non-secure contexts) ([#3900](https://github.com/ydb-platform/ydb-embedded-ui/issues/3900)) ([42ac28d](https://github.com/ydb-platform/ydb-embedded-ui/commit/42ac28dc705e81f050557b77ae1dacdce601bbbd))
+* **PDiskSpaceDistribution:** slot height calculation ([#3897](https://github.com/ydb-platform/ydb-embedded-ui/issues/3897)) ([632fa86](https://github.com/ydb-platform/ydb-embedded-ui/commit/632fa869eafd280635ddc8f86335fedddb525304))
+* show access tab for serverless databases ([#3922](https://github.com/ydb-platform/ydb-embedded-ui/issues/3922)) ([8c946be](https://github.com/ydb-platform/ydb-embedded-ui/commit/8c946beeae7278f9dd918431f5f2433c0cb08951))
+* **useTopicScroll:** initial scroll logic ([#3908](https://github.com/ydb-platform/ydb-embedded-ui/issues/3908)) ([759ad10](https://github.com/ydb-platform/ydb-embedded-ui/commit/759ad10b3d75313b7f32d9f0424dfbaad3a79a7f))
+
 ## [15.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.5.1...v15.6.0) (2026-05-12)
 
 
