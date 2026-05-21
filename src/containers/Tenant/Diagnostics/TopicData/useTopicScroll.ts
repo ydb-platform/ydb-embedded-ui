@@ -243,7 +243,7 @@ export function useTopicScroll({
             return;
         }
         const isRealPartitionSwitch = partitionChanged && !isNil(prevPartition.current);
-        const isExpectedPageSwitch = pageChanged && expectedPageSwitchRef.current;
+        const isUnexpectedPageSwitch = pageChanged && !expectedPageSwitchRef.current;
         expectedPageSwitchRef.current = false;
         prevPage.current = currentPage;
         prevPartition.current = selectedPartition;
@@ -251,7 +251,7 @@ export function useTopicScroll({
         if (isRealPartitionSwitch) {
             // New partition — any offset from the previous partition is meaningless.
             scrollIntentRef.current = {kind: 'none'};
-        } else if (pageChanged && !isExpectedPageSwitch) {
+        } else if (isUnexpectedPageSwitch) {
             // User-driven page switch (pagination control, keyboard, etc.) while
             // an intent was still pending — cancel it so the in-flight filter
             // probe (or queued direct target) doesn't yank the user away from
