@@ -8,6 +8,8 @@ import type {
 
 import {
     AggregateFunctions,
+    CompressionSettings,
+    EncodingSettings,
     EntitySettings,
     Pragmas,
     SimpleFunctions,
@@ -100,6 +102,12 @@ export async function getPragmas() {
 }
 export async function getEntitySettings(entityType: YQLEntity) {
     return EntitySettings[entityType];
+}
+export async function getCompressionSettings() {
+    return CompressionSettings;
+}
+export async function getEncodingSettings() {
+    return EncodingSettings;
 }
 export async function getUdfs() {
     return Udfs;
