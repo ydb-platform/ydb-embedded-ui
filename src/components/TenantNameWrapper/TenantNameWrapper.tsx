@@ -96,7 +96,7 @@ export function TenantNameWrapper({
                 description: link.description,
                 iconStart: link.icon,
                 href: link.url,
-                target: '_blank',
+                target: link.target,
             });
         }
 
