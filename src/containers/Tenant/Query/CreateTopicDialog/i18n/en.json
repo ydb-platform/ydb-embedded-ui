@@ -1,0 +1,66 @@
+{
+  "action_create-topic": "Create topic",
+  "action_apply": "Create",
+  "action_cancel": "Cancel",
+  "action_enable": "Enable",
+
+  "title_create-topic": "Create topic",
+
+  "section_general-parameters": "General parameters",
+  "section_stream-parameters": "Stream parameters",
+
+  "field_name": "Name",
+  "context_field_name": "Minimum {{min}} characters",
+
+  "label_shard-write-quota": "Shard throughput",
+  "context_shards-write-quota": "The maximum allowed write speed per segment",
+  "label_throughput-info": "Total throughput: up to {{speed}}",
+  "label_throughput-info-range": "Total throughput: from {{from}} to {{to}}",
+
+  "label_auto-partitioning": "Autopartitioning",
+  "context_auto-partitioning": "Dynamic scaling of the topic depending on the write speed",
+  "label_auto-partitioning-mode": "Autopartitioning mode",
+  "context_auto-partitioning-mode": "Autopartitioning mode for the topic",
+  "label_auto-partitioning-mode-restricted": "Autopartitioning cannot be enabled with size storage mode",
+  "label_auto-partitioning-paused": "Paused",
+  "label_auto-partitioning-scale-up": "Scale up",
+  "label_auto-partitioning-settings": "Advanced settings",
+  "label_auto-partitioning-stabilization-window": "Stabilization period",
+  "context_auto-partitioning-stabilization-window": "The period of time after a load change when the number of segments will change",
+  "label_auto-partitioning-up-utilization": "Upper utilization limit",
+  "context_auto-partitioning-up-utilization": "The threshold at which the number of segments increases",
+  "label_confirm-auto-partitioning-title": "Enable autopartitioning?",
+  "label_confirm-auto-partitioning-message": "The Kafka protocol does not support topic auto-partitioning. If you enable auto-partitioning, you will not be able to work with the topics you create using the Kafka protocol. You can not disable auto-partitioning for a specific topic.",
+
+  "label_shards": "Shards",
+  "context_shards": "Number of segments in the stream",
+  "label_shards-info": "The number of shards cannot be reduced",
+  "label_min": "Min",
+  "label_max": "Max",
+
+  "label_data-storage-options": "Data storage mode",
+  "context_data-storage-options": "Data storage limits: by storage time, by storage volume",
+  "label_data-storage-time-limit": "Time Limit",
+  "label_data-storage-size-limit": "Size Limit",
+  "label_data-storage-options-restricted": "Size storage mode cannot be enabled with autopartitioning",
+  "label_data-storage-note": "The last {{total}} GB ({{size}} GB x {{count}} segments) of data will be stored for 7 days",
+  "label_retention-unavailable": "Available only with {{speed}} throughput",
+  "label_retention-period_1h": "1 hour",
+  "label_retention-period_4h": "4 hours",
+  "label_retention-period_12h": "12 hours",
+  "label_retention-period_24h": "1 day",
+
+  "unit_seconds-short": "sec",
+  "unit_percent-short": "%",
+  "unit_kb-per-second": "{{value}} KB/s",
+  "unit_gb": "{{value}} GB",
+
+  "error_required": "The field is required",
+  "error_name-min": "Minimum {{min}} characters",
+  "error_min-greater-max": "Min must be less than max",
+  "error_max-less-min": "Max must be greater than min",
+  "error_positive-int": "Value must be a positive integer",
+
+  "toast_created-title": "Topic created",
+  "toast_created-content": "Topic \"{{name}}\" has been created"
+}
