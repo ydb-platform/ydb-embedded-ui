@@ -266,7 +266,6 @@ export function VDiskInfo<T extends PreparedVDisk>({
                 key={vDiskPagePath}
                 title={vDiskInfoKeyset('vdisk-page')}
                 url={vDiskPagePath}
-                external={false}
             />,
         );
     }

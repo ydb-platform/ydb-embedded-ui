@@ -9,11 +9,5 @@ interface PDiskPageLinkProps {
 }
 
 export function PDiskPageLink({pDiskId: PDiskId, nodeId}: PDiskPageLinkProps) {
-    return (
-        <LinkWithIcon
-            title={i18n('pdisk-page')}
-            url={getPDiskPagePath(PDiskId, nodeId)}
-            external={false}
-        />
-    );
+    return <LinkWithIcon title={i18n('pdisk-page')} url={getPDiskPagePath(PDiskId, nodeId)} />;
 }
