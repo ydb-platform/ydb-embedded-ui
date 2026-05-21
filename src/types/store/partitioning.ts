@@ -1,4 +1,5 @@
 export interface UpdateTablePartitioningValues {
+    splitBySize: boolean;
     partitionSizeMb: number;
     minPartitions: number;
     maxPartitions: number;

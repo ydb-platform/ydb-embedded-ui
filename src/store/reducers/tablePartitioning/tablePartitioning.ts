@@ -6,14 +6,15 @@ import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {isQueryErrorResponse} from '../../../utils/query';
 import {api} from '../api';
 
-function alterPartitioningSQL(path: string, values: UpdateTablePartitioningValues) {
+export function alterPartitioningSQL(path: string, values: UpdateTablePartitioningValues) {
     const safePath = path.replace(/`/g, '``');
 
+    const bySize = values.splitBySize ? 'ENABLED' : 'DISABLED';
     const byLoad = values.splitByLoad ? 'ENABLED' : 'DISABLED';
 
     return `${QUERY_TECHNICAL_MARK}
 ALTER TABLE \`${safePath}\` SET (
-    AUTO_PARTITIONING_BY_SIZE = ENABLED,
+    AUTO_PARTITIONING_BY_SIZE = ${bySize},
     AUTO_PARTITIONING_PARTITION_SIZE_MB = ${values.partitionSizeMb},
     AUTO_PARTITIONING_MIN_PARTITIONS_COUNT = ${values.minPartitions},
     AUTO_PARTITIONING_MAX_PARTITIONS_COUNT = ${values.maxPartitions},
