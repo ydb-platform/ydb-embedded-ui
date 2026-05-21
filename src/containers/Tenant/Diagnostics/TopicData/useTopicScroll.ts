@@ -311,13 +311,7 @@ export function useTopicScroll({
             scrollContainerRef.current?.scrollTo({top: scrollTop, behavior: 'instant'});
             // Same-page scroll completed — clear intent so a later probe
             // response cannot reinterpret it.
-            if (
-                scrollIntentRef.current.kind === 'direct-offset' &&
-                scrollIntentRef.current.offset === clamped &&
-                scrollIntentRef.current.origin === 'user'
-            ) {
-                scrollIntentRef.current = {kind: 'none'};
-            }
+            scrollIntentRef.current = {kind: 'none'};
         },
         [
             pageStartOffset,
