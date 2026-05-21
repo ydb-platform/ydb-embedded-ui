@@ -93,7 +93,7 @@ describe('substituteUrlParams', () => {
                 'other',
                 namespaces,
             ),
-        ).toBe('https://example.com/?balancer=https://balancer.example.com');
+        ).toBe('https://example.com/?balancer=https%3A%2F%2Fbalancer.example.com');
     });
 
     test('resolves deeply nested dotted paths by traversing objects', () => {
@@ -178,7 +178,7 @@ describe('substituteUrlParams', () => {
                 'cluster',
                 namespaces,
             ),
-        ).toBe('https://example.com/my-cluster?balancer=https://balancer.example.com');
+        ).toBe('https://example.com/my-cluster?balancer=https%3A%2F%2Fbalancer.example.com');
     });
 
     test('returns undefined when flat placeholder resolves but dotted does not', () => {
@@ -220,6 +220,35 @@ describe('substituteUrlParams', () => {
                 namespaces,
             ),
         ).toBe('https://example.com/balancer-val/db-name');
+    });
+
+    test('replaces URL-encoded placeholders with encoded values', () => {
+        const namespaces = makeNamespaces({
+            cluster: {name: 'prod cluster'},
+            database: {name: '/Root/my db'},
+        });
+
+        expect(
+            substituteUrlParams(
+                'https://monitoring.example.com/projects/example/logs?query=%7Bproject+%3D+%22example%22%2C+cluster+%3D+%22%7Bcluster.name%7D%22%2C+database+%3D+%22%7Bdatabase.name%7D%22%7D',
+                'other',
+                namespaces,
+            ),
+        ).toBe(
+            'https://monitoring.example.com/projects/example/logs?query=%7Bproject+%3D+%22example%22%2C+cluster+%3D+%22prod%20cluster%22%2C+database+%3D+%22%2FRoot%2Fmy%20db%22%7D',
+        );
+    });
+
+    test('returns undefined when URL-encoded placeholder is unresolved', () => {
+        const namespaces = makeNamespaces({cluster: {name: 'my-cluster'}});
+
+        expect(
+            substituteUrlParams(
+                'https://example.com/logs?query=%7Bcluster+%3D+%22%7Bcluster.missing%7D%22%7D',
+                'cluster',
+                namespaces,
+            ),
+        ).toBeUndefined();
     });
 });
 
@@ -397,7 +426,7 @@ describe('resolveClusterLinks', () => {
 
             expect(result).toHaveLength(1);
             expect(result[0].url).toBe(
-                'https://monitoring.com/?balancer=https://balancer.example.com',
+                'https://monitoring.com/?balancer=https%3A%2F%2Fbalancer.example.com',
             );
         });
 
@@ -451,7 +480,7 @@ describe('resolveClusterLinks', () => {
 
             expect(result).toHaveLength(1);
             expect(result[0].url).toBe(
-                'https://monitoring.com/my-cluster?balancer=https://balancer.example.com',
+                'https://monitoring.com/my-cluster?balancer=https%3A%2F%2Fbalancer.example.com',
             );
         });
     });
@@ -820,8 +849,8 @@ describe('resolveDatabaseLinks', () => {
             expect(result[0]).toEqual(
                 expect.objectContaining({
                     title: 'DB Logs',
-                    url: 'https://logs.example.com//Root/mydb',
                     target: '_blank',
+                    url: 'https://logs.example.com/%2FRoot%2Fmydb',
                 }),
             );
         });
@@ -871,7 +900,7 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
 
             expect(result).toHaveLength(1);
-            expect(result[0].url).toBe('https://example.com//Root/mydb?type=Dedicated');
+            expect(result[0].url).toBe('https://example.com/%2FRoot%2Fmydb?type=Dedicated');
         });
 
         test('resolves {database.Name} dotted placeholder from database info', () => {
@@ -886,7 +915,7 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
 
             expect(result).toHaveLength(1);
-            expect(result[0].url).toBe('https://example.com//Root/mydb');
+            expect(result[0].url).toBe('https://example.com/%2FRoot%2Fmydb');
         });
 
         test('resolves {cluster.name} dotted placeholder from cluster info', () => {
@@ -902,7 +931,29 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo(), clusterInfo);
 
             expect(result).toHaveLength(1);
-            expect(result[0].url).toBe('https://example.com/prod-cluster//Root/mydb');
+            expect(result[0].url).toBe('https://example.com/prod-cluster/%2FRoot%2Fmydb');
+        });
+
+        test('resolves encoded placeholders in Monitoring logs URL', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://monitoring.example.com/projects/example/logs?query=%7Bproject+%3D+%22example%22%2C+service+%3D+%22database%22%2C+cluster+%3D+%22%7Bcluster.name%7D%22%2C+database+%3D+%22%7Bdatabase.name%7D%22%2C+message+%3D~+%22sanitized_token%22%7D&from=now-1d&to=now&columns=level%2Ctime%2Cmessage%2Chost&groupByField=level&chartType=line&linesMode=single',
+                    title: 'DB Logs',
+                },
+            ];
+
+            const clusterInfo = makeClusterInfo({name: 'prod cluster'});
+            const result = resolveDatabaseLinks(
+                dynamicLinks,
+                makeDatabaseInfo({Name: '/Root/my db'}),
+                clusterInfo,
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe(
+                'https://monitoring.example.com/projects/example/logs?query=%7Bproject+%3D+%22example%22%2C+service+%3D+%22database%22%2C+cluster+%3D+%22prod%20cluster%22%2C+database+%3D+%22%2FRoot%2Fmy%20db%22%2C+message+%3D~+%22sanitized_token%22%7D&from=now-1d&to=now&columns=level%2Ctime%2Cmessage%2Chost&groupByField=level&chartType=line&linesMode=single',
+            );
         });
 
         test('resolves {cluster.balancer} from cluster info in database links', () => {
@@ -919,7 +970,7 @@ describe('resolveDatabaseLinks', () => {
 
             expect(result).toHaveLength(1);
             expect(result[0].url).toBe(
-                'https://monitoring.com/?balancer=https://balancer.example.com&db=/Root/mydb',
+                'https://monitoring.com/?balancer=https%3A%2F%2Fbalancer.example.com&db=%2FRoot%2Fmydb',
             );
         });
 
@@ -965,7 +1016,7 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
 
             expect(result).toHaveLength(1);
-            expect(result[0].url).toBe('https://logs.example.com//Root/mydb');
+            expect(result[0].url).toBe('https://logs.example.com/%2FRoot%2Fmydb');
         });
 
         test('resolves {id} alias to PreparedTenant.Id', () => {
@@ -1025,7 +1076,9 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
 
             expect(result).toHaveLength(1);
-            expect(result[0].url).toBe('https://example.com//Root/mydb?id=db-123&type=Dedicated');
+            expect(result[0].url).toBe(
+                'https://example.com/%2FRoot%2Fmydb?id=db-123&type=Dedicated',
+            );
         });
 
         test('resolves {database.name} dotted alias from database info', () => {
@@ -1040,7 +1093,7 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
 
             expect(result).toHaveLength(1);
-            expect(result[0].url).toBe('https://example.com//Root/mydb');
+            expect(result[0].url).toBe('https://example.com/%2FRoot%2Fmydb');
         });
 
         test('PascalCase field takes priority when tenant already has a lowercase field', () => {
@@ -1074,7 +1127,7 @@ describe('resolveDatabaseLinks', () => {
 
             expect(result).toHaveLength(1);
             expect(result[0].url).toBe(
-                'https://monitoring.com//Root/mydb?balancer=https://balancer.example.com',
+                'https://monitoring.com/%2FRoot%2Fmydb?balancer=https%3A%2F%2Fbalancer.example.com',
             );
         });
 
