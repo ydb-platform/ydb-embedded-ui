@@ -27,6 +27,7 @@ const CONTEXT_DEFAULT_TITLES: Record<ClusterLinkContext, string> = {
     [CLUSTER_LINK_CONTEXT.CORES]: i18n('title_cores-default'),
     [CLUSTER_LINK_CONTEXT.LOGGING]: i18n('title_logging-default'),
     [CLUSTER_LINK_CONTEXT.SLO_LOGS]: i18n('title_slo-logs-default'),
+    [CLUSTER_LINK_CONTEXT.AUDIT_LOGS]: i18n('title_audit-logs-default'),
     [CLUSTER_LINK_CONTEXT.MONITORING]: MONITORING_UI_TITLE,
 };
 
@@ -159,8 +160,10 @@ function resolveParam(
  * Lowercase and kebab-case segments are normalised to PascalCase as a fallback
  * (see {@link resolveParam} for details).
  * Only string and number leaf values are used for substitution.
- * Substituted values are encoded with `encodeURIComponent(value)` to keep the
- * resulting URL safe regardless of where the placeholder is used.
+ * Substituted values are treated as URL component values and are always
+ * encoded with `encodeURIComponent(value)`. Placeholders should not be used
+ * for URL structural parts such as scheme, host, path separators, or query
+ * delimiters; keep those parts in the template itself.
  * Returns `undefined` if any placeholder remains unresolved after substitution.
  */
 export function substituteUrlParams(
