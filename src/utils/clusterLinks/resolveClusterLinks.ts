@@ -77,8 +77,11 @@ function toPascalCase(segment: string): string {
     return segment.replace(/(^|-)([a-z])/g, (_match, _sep, letter: string) => letter.toUpperCase());
 }
 
-/** Matches `{param}` and `{prefix.param}` placeholders (allows hyphens for kebab-case keys) */
-const PLACEHOLDER_PATTERN = /\{([\w.-]+)\}/g;
+/**
+ * Matches raw `{param}` placeholders and their URL-encoded `%7Bparam%7D` form
+ * (allows hyphens for kebab-case keys).
+ */
+const PLACEHOLDER_PATTERN = /\{([\w.-]+)\}|%7B([\w.-]+)%7D/gi;
 
 /**
  * Resolves a placeholder key from the namespaces map.
@@ -142,7 +145,8 @@ function resolveParam(
 }
 
 /**
- * Replaces `{param}` and `{prefix.field}` placeholders in a URL template.
+ * Replaces raw `{param}` / `{prefix.field}` placeholders and their URL-encoded
+ * `%7Bparam%7D` / `%7Bprefix.field%7D` forms in a URL template.
  *
  * - Flat placeholders like `{balancer}` are resolved via `namespaces[source][balancer]`.
  * - Dotted placeholders like `{cluster.balancer}` are resolved via `namespaces[cluster][balancer]`.
@@ -155,6 +159,8 @@ function resolveParam(
  * Lowercase and kebab-case segments are normalised to PascalCase as a fallback
  * (see {@link resolveParam} for details).
  * Only string and number leaf values are used for substitution.
+ * Substituted values are encoded with `encodeURIComponent(value)` to keep the
+ * resulting URL safe regardless of where the placeholder is used.
  * Returns `undefined` if any placeholder remains unresolved after substitution.
  */
 export function substituteUrlParams(
@@ -164,14 +170,24 @@ export function substituteUrlParams(
 ): string | undefined {
     let hasUnresolved = false;
 
-    const result = template.replace(PLACEHOLDER_PATTERN, (match, key: string) => {
-        const value = resolveParam(key, source, namespaces);
-        if (value === undefined) {
-            hasUnresolved = true;
-            return match;
-        }
-        return String(value);
-    });
+    const result = template.replace(
+        PLACEHOLDER_PATTERN,
+        (match, rawKey: string | undefined, encodedKey: string | undefined) => {
+            const key = rawKey ?? encodedKey;
+            if (!key) {
+                hasUnresolved = true;
+                return match;
+            }
+
+            const value = resolveParam(key, source, namespaces);
+            if (value === undefined) {
+                hasUnresolved = true;
+                return match;
+            }
+
+            return encodeURIComponent(String(value));
+        },
+    );
 
     return hasUnresolved ? undefined : result;
 }
