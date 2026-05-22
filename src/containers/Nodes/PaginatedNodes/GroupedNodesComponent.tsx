@@ -144,7 +144,7 @@ export function GroupedNodesComponent({
         {
             path: schemaPathParam,
             database,
-            filter: searchValue,
+            filter: searchValue.trim(),
             filter_peer_role: peerRoleFilter,
             group: groupByParam,
             limit: 0,

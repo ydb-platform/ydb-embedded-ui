@@ -112,7 +112,7 @@ export function GroupedStorageNodesComponent({
         {
             database,
             with: 'all',
-            filter: nodesSearchValue,
+            filter: nodesSearchValue.trim(),
             node_id: nodeId,
             group_id: groupId,
             group: storageNodesGroupByParam,

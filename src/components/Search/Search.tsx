@@ -28,7 +28,7 @@ export const Search = ({
 }: SearchProps) => {
     const onUpdate = React.useCallback(
         (newValue: string) => {
-            onChange(newValue.trim());
+            onChange(newValue);
         },
         [onChange],
     );

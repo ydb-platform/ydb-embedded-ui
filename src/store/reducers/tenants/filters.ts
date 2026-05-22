@@ -13,8 +13,10 @@ export function filterTenantsByProblems(tenants: PreparedTenant[], withProblems:
     return tenants;
 }
 export function filterTenantsBySearch(tenants: PreparedTenant[], search: string) {
+    const preparedSearch = search.trim();
+
     return tenants.filter((item) => {
-        const re = new RegExp(escapeRegExp(search), 'i');
+        const re = new RegExp(escapeRegExp(preparedSearch), 'i');
         return re.test(item.Name || '') || re.test(item.controlPlaneName);
     });
 }
