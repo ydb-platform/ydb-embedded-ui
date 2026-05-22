@@ -274,6 +274,7 @@ function processDynamicLinks(
                 icon,
                 description,
                 context: link.context,
+                target: '_blank',
             } satisfies ClusterLinkWithTitle);
 
             if (link.context) {
@@ -311,7 +312,9 @@ function processAdditionalLinks(
                 system: title,
             });
 
-            result.push({...link, title, icon, description});
+            const target = link.target ?? '_blank';
+
+            result.push({...link, title, icon, description, target});
 
             if (link.context) {
                 coveredContexts.add(link.context);
@@ -386,6 +389,7 @@ function processDynamicDatabaseLinks(
                 icon,
                 description,
                 context: link.context,
+                target: '_blank',
             } satisfies ClusterLinkWithTitle);
 
             if (link.context) {
@@ -418,7 +422,9 @@ function processAdditionalDatabaseLinks(
                 system: link.title,
             });
 
-            result.push({...link, icon, description});
+            const target = link.target ?? '_blank';
+
+            result.push({...link, icon, description, target});
 
             if (link.context) {
                 coveredContexts.add(link.context);

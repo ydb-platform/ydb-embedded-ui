@@ -8,6 +8,7 @@ interface ClusterLinkBase {
     url: string;
     icon?: IconData;
     description?: string;
+    target?: '_blank';
 }
 
 /** A link with an explicit title (context is optional) */

@@ -8,6 +8,9 @@ interface PDiskPageLinkProps {
     nodeId: string | number;
 }
 
+/**
+ * @deprecated Use direct links to the PDisk page instead.
+ */
 export function PDiskPageLink({pDiskId: PDiskId, nodeId}: PDiskPageLinkProps) {
     return (
         <LinkWithIcon

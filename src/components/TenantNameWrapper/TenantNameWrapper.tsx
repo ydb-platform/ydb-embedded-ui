@@ -96,6 +96,7 @@ export function TenantNameWrapper({
                 description: link.description,
                 iconStart: link.icon,
                 href: link.url,
+                target: link.target,
             });
         }
 
@@ -173,7 +174,7 @@ export function TenantNameWrapper({
     const renderName = React.useCallback(() => {
         if (isExternalLink) {
             return (
-                <Link href={dbUrl} className={b('db-name')}>
+                <Link href={dbUrl} target="_blank" className={b('db-name')}>
                     {dbName}
                 </Link>
             );
