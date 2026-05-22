@@ -31,7 +31,7 @@ function formatColumnCodec(codec?: EColumnCodec, level?: number): string {
         return PLAIN_COLUMN_CODEC;
     }
 
-    const formattedCodec = codec.replace('ColumnCodec', '').toLocaleLowerCase();
+    const formattedCodec = codec.replace('ColumnCodec', '').toLowerCase();
 
     if (!isNil(level)) {
         return `${formattedCodec} (${level})`;
