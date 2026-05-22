@@ -27,7 +27,6 @@ function SpecifyOffsetDialog({
     path,
     consumer,
     partitionId,
-    readSessionId,
     onClose,
     onSuccess,
     open,
@@ -58,7 +57,6 @@ function SpecifyOffsetDialog({
                 consumer,
                 partitionId,
                 offset: numericOffset,
-                readSessionId,
             }).unwrap();
 
             createToast({
@@ -72,16 +70,7 @@ function SpecifyOffsetDialog({
         } catch {
             // error is captured by the mutation hook state
         }
-    }, [
-        offsetValue,
-        commitOffset,
-        database,
-        path,
-        consumer,
-        partitionId,
-        readSessionId,
-        onSuccess,
-    ]);
+    }, [offsetValue, commitOffset, database, path, consumer, partitionId, onSuccess]);
 
     return (
         <Dialog

@@ -177,7 +177,6 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                 startOffset={row.startOffset}
                 endOffset={row.endOffset}
                 partitionId={row.partitionId}
-                readSessionId={row.readSessionId}
             />
         ),
     },
