@@ -724,6 +724,10 @@ export const TableFunction = [];
 
 export const Pragmas = ['TablePathPrefix', 'Warning'];
 
+export const CompressionSettings = ['algorithm', 'level'];
+
+export const EncodingSettings = ['OFF', 'DICT'];
+
 export const EntitySettings: Record<YQLEntity, string[]> = {
     table: [
         'AUTO_PARTITIONING_BY_SIZE',
