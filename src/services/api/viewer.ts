@@ -213,7 +213,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 database,
                 path: this.getSchemaPath(path),
                 enums: true,
-                partition_stats: true,
+                partition_stats: false,
                 subs: 0,
             },
             {concurrentId: concurrentId || `getDescribe|${path}`, requestConfig: {signal}, timeout},
