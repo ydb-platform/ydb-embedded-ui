@@ -286,6 +286,7 @@ describe('resolveClusterLinks', () => {
                 expect.objectContaining({
                     title: 'My Logs',
                     url: 'https://logs.example.com/my-cluster',
+                    target: '_blank',
                 }),
             );
         });
@@ -590,12 +591,14 @@ describe('resolveClusterLinks', () => {
                 expect.objectContaining({
                     title: 'Monitoring',
                     url: 'https://monitoring.example.com',
+                    target: '_blank',
                 }),
             );
             expect(result[1]).toEqual(
                 expect.objectContaining({
                     title: 'Custom Link',
                     url: 'https://custom.example.com',
+                    target: '_blank',
                 }),
             );
         });
@@ -818,6 +821,7 @@ describe('resolveDatabaseLinks', () => {
                 expect.objectContaining({
                     title: 'DB Logs',
                     url: 'https://logs.example.com//Root/mydb',
+                    target: '_blank',
                 }),
             );
         });
@@ -1304,6 +1308,8 @@ describe('resolveDatabaseLinks', () => {
             expect(result).toHaveLength(2);
             expect(result[0].title).toBe('Monitoring');
             expect(result[1].title).toBe('Logs');
+            expect(result[0].target).toBe('_blank');
+            expect(result[1].target).toBe('_blank');
         });
 
         test('dynamic logging link suppresses additional logging link', () => {
