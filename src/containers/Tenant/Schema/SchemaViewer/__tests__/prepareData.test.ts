@@ -1,5 +1,5 @@
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
-import {EPathType} from '../../../../../types/api/schema';
+import {EColumnCodec, EPathType} from '../../../../../types/api/schema';
 import {prepareSchemaData, prepareViewSchema} from '../prepareData';
 
 describe('prepareSchemaData', () => {
@@ -86,10 +86,10 @@ describe('prepareSchemaData', () => {
                 type: 'Uint64',
                 notNull: false,
                 autoIncrement: false,
-                defaultValue: '-',
+                defaultValue: '—',
                 familyName: 'default',
                 prefferedPoolKind: 'ssd',
-                columnCodec: undefined,
+                columnCodec: '—',
             },
             {
                 id: 2,
@@ -98,10 +98,10 @@ describe('prepareSchemaData', () => {
                 type: 'Uint64',
                 notNull: true,
                 autoIncrement: false,
-                defaultValue: '-',
+                defaultValue: '—',
                 familyName: 'default',
                 prefferedPoolKind: 'ssd',
-                columnCodec: undefined,
+                columnCodec: '—',
             },
             {
                 id: 3,
@@ -113,7 +113,7 @@ describe('prepareSchemaData', () => {
                 defaultValue: 'Ivan',
                 familyName: 'default',
                 prefferedPoolKind: 'ssd',
-                columnCodec: undefined,
+                columnCodec: '—',
             },
             {
                 id: 4,
@@ -122,10 +122,10 @@ describe('prepareSchemaData', () => {
                 type: 'Datetime',
                 notNull: false,
                 autoIncrement: false,
-                defaultValue: '-',
+                defaultValue: '—',
                 familyName: 'default',
                 prefferedPoolKind: 'ssd',
-                columnCodec: undefined,
+                columnCodec: '—',
             },
         ];
 
@@ -147,6 +147,12 @@ describe('prepareSchemaData', () => {
                                 StorageId: '',
                                 DefaultValue: {},
                                 ColumnFamilyId: 0,
+                                Serializer: {
+                                    ClassName: 'ARROW_SERIALIZER',
+                                    ArrowCompression: {
+                                        Codec: EColumnCodec.ColumnCodecPlain,
+                                    },
+                                },
                             },
                             {
                                 Id: 2,
@@ -157,6 +163,13 @@ describe('prepareSchemaData', () => {
                                 StorageId: '',
                                 DefaultValue: {},
                                 ColumnFamilyId: 0,
+                                Serializer: {
+                                    ClassName: 'ARROW_SERIALIZER',
+                                    ArrowCompression: {
+                                        Codec: EColumnCodec.ColumnCodecZSTD,
+                                        Level: 4,
+                                    },
+                                },
                             },
                             {
                                 Id: 3,
@@ -213,6 +226,7 @@ describe('prepareSchemaData', () => {
                 partitioningColumnIndex: 2,
                 type: 'Utf8',
                 notNull: true,
+                columnCodec: 'None',
             },
             {
                 id: 2,
@@ -221,6 +235,8 @@ describe('prepareSchemaData', () => {
                 partitioningColumnIndex: 1,
                 type: 'Utf8',
                 notNull: true,
+                columnCodec: 'zstd (4)',
+                columnCodecLevel: 4,
             },
             {
                 id: 3,
@@ -229,6 +245,7 @@ describe('prepareSchemaData', () => {
                 partitioningColumnIndex: 0,
                 type: 'Int64',
                 notNull: true,
+                columnCodec: '—',
             },
             {
                 id: 4,
@@ -237,6 +254,7 @@ describe('prepareSchemaData', () => {
                 partitioningColumnIndex: -1,
                 type: 'Utf8',
                 notNull: false,
+                columnCodec: '—',
             },
         ];
         expect(prepareSchemaData(EPathType.EPathTypeColumnTable, data)).toEqual(result);
