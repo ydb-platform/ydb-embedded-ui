@@ -28,7 +28,6 @@ interface CommittedOffsetCellProps {
     startOffset: string;
     endOffset: string;
     partitionId: string | number;
-    readSessionId?: string;
 }
 
 export function CommittedOffsetCell({
@@ -36,7 +35,6 @@ export function CommittedOffsetCell({
     startOffset,
     endOffset,
     partitionId,
-    readSessionId,
 }: CommittedOffsetCellProps) {
     const {path, database, databaseFullPath} = useCurrentSchema();
     const useMetaProxy = useClusterWithProxy();
@@ -54,7 +52,6 @@ export function CommittedOffsetCell({
                 consumer: selectedConsumer,
                 partitionId: Number(partitionId),
                 offset,
-                readSessionId,
             })
                 .unwrap()
                 .then(() => {
@@ -82,7 +79,6 @@ export function CommittedOffsetCell({
             useMetaProxy,
             selectedConsumer,
             partitionId,
-            readSessionId,
         ],
     );
 
@@ -162,7 +158,6 @@ export function CommittedOffsetCell({
                                 path: {path, databaseFullPath, useMetaProxy},
                                 consumer: selectedConsumer,
                                 partitionId: Number(partitionId),
-                                readSessionId,
                             });
                         }
                     },
@@ -182,7 +177,6 @@ export function CommittedOffsetCell({
         path,
         databaseFullPath,
         useMetaProxy,
-        readSessionId,
     ]);
 
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);

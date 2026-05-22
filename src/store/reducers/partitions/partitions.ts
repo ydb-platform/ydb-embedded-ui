@@ -72,7 +72,7 @@ export const partitionsApi = api.injectEndpoints({
         }),
         commitOffset: build.mutation({
             queryFn: async (
-                {database, path, consumer, partitionId, offset, readSessionId}: CommitOffsetParams,
+                {database, path, consumer, partitionId, offset}: CommitOffsetParams,
                 {signal},
             ) => {
                 try {
@@ -83,7 +83,6 @@ export const partitionsApi = api.injectEndpoints({
                             consumer,
                             partitionId,
                             offset,
-                            readSessionId,
                         },
                         {signal},
                     );
