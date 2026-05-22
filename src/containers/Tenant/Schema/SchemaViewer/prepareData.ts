@@ -23,7 +23,7 @@ import {PLAIN_COLUMN_CODEC} from './shared';
 import type {SchemaData} from './types';
 
 function formatColumnCodec(codec?: EColumnCodec, level?: number): string {
-    if (isNil(codec)) {
+    if (!codec) {
         return EMPTY_DATA_PLACEHOLDER;
     }
 
