@@ -10,6 +10,7 @@ import type {
     TTableDescription,
 } from '../../../../types/api/schema';
 import {EColumnCodec} from '../../../../types/api/schema';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import type {Nullable} from '../../../../utils/typecheckers';
 import {
     isColumnEntityType,
@@ -18,16 +19,25 @@ import {
     isSystemViewType,
 } from '../../utils/schema';
 
+import {PLAIN_COLUMN_CODEC} from './shared';
 import type {SchemaData} from './types';
 
-function formatColumnCodec(codec?: EColumnCodec) {
-    if (!codec) {
-        return undefined;
+function formatColumnCodec(codec?: EColumnCodec, level?: number): string {
+    if (isNil(codec)) {
+        return EMPTY_DATA_PLACEHOLDER;
     }
+
     if (codec === EColumnCodec.ColumnCodecPlain) {
-        return 'None';
+        return PLAIN_COLUMN_CODEC;
     }
-    return codec.replace('ColumnCodec', '').toLocaleLowerCase();
+
+    const formattedCodec = codec.replace('ColumnCodec', '').toLocaleLowerCase();
+
+    if (!isNil(level)) {
+        return `${formattedCodec} (${level})`;
+    }
+
+    return formattedCodec;
 }
 
 function prepareFamilies(data?: TTableDescription): Record<number, TFamilyDescription> {
@@ -79,7 +89,8 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
             type: Type,
             notNull: NotNull,
             autoIncrement: Boolean(DefaultFromSequence),
-            defaultValue: Object.values(DefaultFromLiteral?.value || {})[0] ?? '-',
+            defaultValue:
+                Object.values(DefaultFromLiteral?.value || {})[0] ?? EMPTY_DATA_PLACEHOLDER,
             familyName,
             prefferedPoolKind,
             columnCodec,
@@ -111,7 +122,8 @@ function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaDat
     const {Columns: HashColumns = []} = HashSharding;
 
     const preparedColumns = Columns?.map((column) => {
-        const {Id, Name, Type, NotNull} = column;
+        const {Id, Name, Type, NotNull, Serializer} = column;
+        const compressionLevel = Serializer?.ArrowCompression?.Level;
 
         const keyColumnIndex =
             KeyColumnNames?.findIndex((keyColumnName) => keyColumnName === Name) ?? -1;
@@ -126,6 +138,8 @@ function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaDat
             partitioningColumnIndex,
             type: Type,
             notNull: NotNull,
+            columnCodec: formatColumnCodec(Serializer?.ArrowCompression?.Codec, compressionLevel),
+            columnCodecLevel: compressionLevel,
         };
     });
 

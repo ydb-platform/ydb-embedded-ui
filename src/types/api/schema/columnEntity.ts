@@ -108,7 +108,7 @@ interface TOlapColumnDescription {
     NotNull?: boolean;
 
     DictionaryEncoding?: TDictionaryEncodingSettings;
-    Serializer?: unknown;
+    Serializer?: TOlapColumnSerializer;
     StorageId?: string;
     DefaultValue?: unknown;
     DataAccessorConstructor?: unknown;
@@ -134,6 +134,16 @@ interface THashSharding {
 interface TCompressionOptions {
     CompressionCodec?: EColumnCodec;
     CompressionLevel?: number;
+}
+
+interface TOlapColumnSerializer {
+    ClassName?: string;
+    ArrowCompression?: TArrowCompressionOptions;
+}
+
+interface TArrowCompressionOptions {
+    Codec?: EColumnCodec;
+    Level?: number;
 }
 
 interface TDictionaryEncodingSettings {

@@ -11,6 +11,7 @@ export type SchemaData = {
     familyName?: string;
     prefferedPoolKind?: string;
     columnCodec?: string;
+    columnCodecLevel?: number;
     defaultValue?: string | number | boolean;
 };
 

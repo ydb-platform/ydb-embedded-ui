@@ -1,10 +1,11 @@
 import DataTable from '@gravity-ui/react-data-table';
 import {Icon} from '@gravity-ui/uikit';
 
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {getColumnWidth} from '../../../../utils/getColumnWidth';
 
 import i18n from './i18n';
-import {b} from './shared';
+import {PLAIN_COLUMN_CODEC, b} from './shared';
 import type {SchemaColumn, SchemaData} from './types';
 
 import KeyIcon from '@gravity-ui/icons/svgs/key.svg';
@@ -114,12 +115,29 @@ const mediaColumn: SchemaColumn = {
     width: 100,
     render: ({row}) => row.prefferedPoolKind,
 };
+
+function getCompressionSortValue({columnCodec, columnCodecLevel}: SchemaData) {
+    if (
+        !columnCodec ||
+        columnCodec === EMPTY_DATA_PLACEHOLDER ||
+        columnCodec === PLAIN_COLUMN_CODEC
+    ) {
+        return undefined;
+    }
+
+    const codecName = columnCodec.replace(/ \(\d+\)$/, '');
+    const levelOrder = (columnCodecLevel ?? -1) + 1;
+
+    return `${codecName}:${String(levelOrder).padStart(3, '0')}`;
+}
+
 const compressionColumn: SchemaColumn = {
     name: SCHEMA_TABLE_COLUMS_IDS.columnCodec,
     get header() {
         return i18n('column-title.compression');
     },
     width: 130,
+    sortAccessor: getCompressionSortValue,
     render: ({row}) => row.columnCodec,
 };
 
@@ -153,7 +171,10 @@ export function getExternalTableColumns(data?: SchemaData[]): SchemaColumn[] {
     return normalizeColumns([idColumn, nameColumn, typeColumn, notNullColumn], data);
 }
 export function getColumnTableColumns(data?: SchemaData[]): SchemaColumn[] {
-    return normalizeColumns([idColumn, nameColumn, typeColumn, notNullColumn], data);
+    return normalizeColumns(
+        [idColumn, nameColumn, typeColumn, notNullColumn, compressionColumn],
+        data,
+    );
 }
 export function getRowTableColumns(
     data: SchemaData[] | undefined,
