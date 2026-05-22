@@ -86,11 +86,17 @@ function toPascalCase(segment: string): string {
     return segment.replace(/(^|-)([a-z])/g, (_match, _sep, letter: string) => letter.toUpperCase());
 }
 
+function isTraversableObject(value: unknown): value is Record<string, unknown> {
+    return (
+        value !== null && value !== undefined && typeof value === 'object' && !Array.isArray(value)
+    );
+}
+
 /**
- * Matches raw `{param}` placeholders and their URL-encoded `%7Bparam%7D` form
- * (allows hyphens for kebab-case keys).
+ * Matches raw `{param}` placeholders (allows hyphens for kebab-case keys).
+ * URL-encoded braces are treated as URL literals, not placeholders.
  */
-const PLACEHOLDER_PATTERN = /\{([\w.-]+)\}|%7B([\w.-]+)%7D/gi;
+const PLACEHOLDER_PATTERN = /\{([\w.-]+)\}/g;
 
 /**
  * Resolves a placeholder key from the namespaces map.
@@ -131,15 +137,10 @@ function resolveParam(
 
     let value: unknown = ns;
     for (const segment of fields) {
-        if (
-            value === null ||
-            value === undefined ||
-            typeof value !== 'object' ||
-            Array.isArray(value)
-        ) {
+        if (!isTraversableObject(value)) {
             return undefined;
         }
-        const record = value as Record<string, unknown>;
+        const record = value;
         // Try the original segment first; if it doesn't match,
         // normalise it to PascalCase and retry so that lowercase /
         // kebab-case placeholders resolve against PascalCase fields.
@@ -154,8 +155,7 @@ function resolveParam(
 }
 
 /**
- * Replaces raw `{param}` / `{prefix.field}` placeholders and their URL-encoded
- * `%7Bparam%7D` / `%7Bprefix.field%7D` forms in a URL template.
+ * Replaces raw `{param}` / `{prefix.field}` placeholders in a URL template.
  *
  * - Flat placeholders like `{balancer}` are resolved via `namespaces[source][balancer]`.
  * - Dotted placeholders like `{cluster.balancer}` are resolved via `namespaces[cluster][balancer]`.
@@ -181,24 +181,20 @@ export function substituteUrlParams(
 ): string | undefined {
     let hasUnresolved = false;
 
-    const result = template.replace(
-        PLACEHOLDER_PATTERN,
-        (match, rawKey: string | undefined, encodedKey: string | undefined) => {
-            const key = rawKey ?? encodedKey;
-            if (!key) {
-                hasUnresolved = true;
-                return match;
-            }
+    const result = template.replace(PLACEHOLDER_PATTERN, (match, key: string | undefined) => {
+        if (!key) {
+            hasUnresolved = true;
+            return match;
+        }
 
-            const value = resolveParam(key, source, namespaces);
-            if (value === undefined) {
-                hasUnresolved = true;
-                return match;
-            }
+        const value = resolveParam(key, source, namespaces);
+        if (value === undefined) {
+            hasUnresolved = true;
+            return match;
+        }
 
-            return encodeURIComponent(String(value));
-        },
-    );
+        return encodeURIComponent(String(value));
+    });
 
     return hasUnresolved ? undefined : result;
 }

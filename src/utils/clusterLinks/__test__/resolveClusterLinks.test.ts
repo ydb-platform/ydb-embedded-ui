@@ -222,7 +222,7 @@ describe('substituteUrlParams', () => {
         ).toBe('https://example.com/balancer-val/db-name');
     });
 
-    test('replaces URL-encoded placeholders with encoded values', () => {
+    test('replaces raw placeholders inside encoded query text with encoded values', () => {
         const namespaces = makeNamespaces({
             cluster: {name: 'prod cluster'},
             database: {name: '/Root/my db'},
@@ -230,7 +230,7 @@ describe('substituteUrlParams', () => {
 
         expect(
             substituteUrlParams(
-                'https://monitoring.example.com/projects/example/logs?query=%7Bproject+%3D+%22example%22%2C+cluster+%3D+%22%7Bcluster.name%7D%22%2C+database+%3D+%22%7Bdatabase.name%7D%22%7D',
+                'https://monitoring.example.com/projects/example/logs?query=%7Bproject+%3D+%22example%22%2C+cluster+%3D+%22{cluster.name}%22%2C+database+%3D+%22{database.name}%22%7D',
                 'other',
                 namespaces,
             ),
@@ -239,16 +239,30 @@ describe('substituteUrlParams', () => {
         );
     });
 
-    test('returns undefined when URL-encoded placeholder is unresolved', () => {
+    test('returns undefined when a raw namespace placeholder is unresolved', () => {
         const namespaces = makeNamespaces({cluster: {name: 'my-cluster'}});
 
         expect(
             substituteUrlParams(
-                'https://example.com/logs?query=%7Bcluster+%3D+%22%7Bcluster.missing%7D%22%7D',
+                'https://example.com/logs?query=%7Bcluster+%3D+%22{cluster.missing}%22%7D',
                 'cluster',
                 namespaces,
             ),
         ).toBeUndefined();
+    });
+
+    test('keeps URL-encoded brace literals as static URL text', () => {
+        const namespaces = makeNamespaces({cluster: {name: 'my-cluster'}});
+
+        expect(
+            substituteUrlParams(
+                'https://example.com/logs?query=message%3D~%22id-%5C%5Cd%7B4%7D%22+token%3D%22%7Bliteral_token%7D%22+encodedCluster%3D%22%7Bcluster.name%7D%22+cluster%3D%22{cluster.name}%22',
+                'cluster',
+                namespaces,
+            ),
+        ).toBe(
+            'https://example.com/logs?query=message%3D~%22id-%5C%5Cd%7B4%7D%22+token%3D%22%7Bliteral_token%7D%22+encodedCluster%3D%22%7Bcluster.name%7D%22+cluster%3D%22my-cluster%22',
+        );
     });
 });
 
@@ -985,11 +999,11 @@ describe('resolveDatabaseLinks', () => {
             expect(result[0].url).toBe('https://example.com/prod-cluster/%2FRoot%2Fmydb');
         });
 
-        test('resolves encoded placeholders in Monitoring logs URL', () => {
+        test('resolves raw placeholders in Monitoring logs URL', () => {
             const dynamicLinks: MetaClusterLink[] = [
                 {
                     type: 'database',
-                    url: 'https://monitoring.example.com/projects/example/logs?query=%7Bproject+%3D+%22example%22%2C+service+%3D+%22database%22%2C+cluster+%3D+%22%7Bcluster.name%7D%22%2C+database+%3D+%22%7Bdatabase.name%7D%22%2C+message+%3D~+%22sanitized_token%22%7D&from=now-1d&to=now&columns=level%2Ctime%2Cmessage%2Chost&groupByField=level&chartType=line&linesMode=single',
+                    url: 'https://monitoring.example.com/projects/example/logs?query=%7Bproject+%3D+%22example%22%2C+service+%3D+%22database%22%2C+cluster+%3D+%22{cluster.name}%22%2C+database+%3D+%22{database.name}%22%2C+message+%3D~+%22sanitized_token%22%7D&from=now-1d&to=now&columns=level%2Ctime%2Cmessage%2Chost&groupByField=level&chartType=line&linesMode=single',
                     title: 'DB Logs',
                 },
             ];
