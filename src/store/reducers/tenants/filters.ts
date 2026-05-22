@@ -14,9 +14,9 @@ export function filterTenantsByProblems(tenants: PreparedTenant[], withProblems:
 }
 export function filterTenantsBySearch(tenants: PreparedTenant[], search: string) {
     const preparedSearch = search.trim();
+    const re = new RegExp(escapeRegExp(preparedSearch), 'i');
 
     return tenants.filter((item) => {
-        const re = new RegExp(escapeRegExp(preparedSearch), 'i');
         return re.test(item.Name || '') || re.test(item.controlPlaneName);
     });
 }
