@@ -31,6 +31,14 @@ const CONTEXT_DEFAULT_TITLES: Record<ClusterLinkContext, string> = {
     [CLUSTER_LINK_CONTEXT.MONITORING]: MONITORING_UI_TITLE,
 };
 
+const CONTEXT_PRIORITY: Record<ClusterLinkContext, number> = {
+    [CLUSTER_LINK_CONTEXT.MONITORING]: 0,
+    [CLUSTER_LINK_CONTEXT.LOGGING]: 1,
+    [CLUSTER_LINK_CONTEXT.SLO_LOGS]: 2,
+    [CLUSTER_LINK_CONTEXT.AUDIT_LOGS]: 3,
+    [CLUSTER_LINK_CONTEXT.CORES]: 4,
+};
+
 function isClusterLinkContext(context: string | undefined): context is ClusterLinkContext {
     return context !== undefined && context in CONTEXT_DEFAULT_TITLES;
 }
@@ -225,6 +233,16 @@ function getLinkDescription(
     return undefined;
 }
 
+function getContextPriority(context: string | undefined): number {
+    return isClusterLinkContext(context) ? CONTEXT_PRIORITY[context] : Infinity;
+}
+
+function sortByContextPriority(links: ClusterLinkWithTitle[]): ClusterLinkWithTitle[] {
+    return links.toSorted((left, right) => {
+        return getContextPriority(left.context) - getContextPriority(right.context);
+    });
+}
+
 /** Builds legacy links from cores and logging fields in cluster info */
 function buildLegacyLinks(clusterInfo: ClusterInfo): ClusterLink[] {
     const result: ClusterLink[] = [];
@@ -366,8 +384,11 @@ export function resolveClusterLinks(
     });
 
     const additionalResult = processAdditionalLinks(allAdditionalLinks, coveredContexts);
+    const result = dynamicResult.concat(additionalResult);
 
-    return dynamicResult.concat(additionalResult);
+    // Dynamic-only links should preserve their source order. Once additional or legacy links are
+    // appended, normalize the merged list by known context priority; unknown/no-context links stay last.
+    return additionalResult.length ? sortByContextPriority(result) : result;
 }
 
 /**
@@ -484,6 +505,9 @@ export function resolveDatabaseLinks(
     );
 
     const additionalResult = processAdditionalDatabaseLinks(additionalLinks, coveredContexts);
+    const result = dynamicResult.concat(additionalResult);
 
-    return dynamicResult.concat(additionalResult);
+    // Dynamic-only links should preserve their source order. Once additional links are appended,
+    // normalize the merged list by known context priority; unknown/no-context links stay last.
+    return additionalResult.length ? sortByContextPriority(result) : result;
 }
