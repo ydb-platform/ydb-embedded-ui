@@ -1,20 +1,19 @@
-import React from 'react';
-
 import {render, screen} from '@testing-library/react';
+import {MemoryRouter} from 'react-router-dom';
 
 import {PDiskPageLink} from '../PDiskPageLink';
 
 describe('PDiskPageLink', () => {
-    test('opens PDisk page link in a new tab', () => {
+    test('renders PDisk page link as an internal link', () => {
         render(
-            <React.Fragment>
+            <MemoryRouter>
                 <PDiskPageLink pDiskId={1001} nodeId={37} />
-            </React.Fragment>,
+            </MemoryRouter>,
         );
 
         const link = screen.getByRole('link', {name: /PDisk page/});
 
         expect(link).toHaveAttribute('href', '/pDisk?nodeId=37&pDiskId=1001');
-        expect(link).toHaveAttribute('target', '_blank');
+        expect(link).not.toHaveAttribute('target', '_blank');
     });
 });
