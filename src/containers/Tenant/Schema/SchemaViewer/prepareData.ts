@@ -80,7 +80,8 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
         const family = isNil(Family) ? undefined : families[Family];
         const familyName = family?.Name ?? FamilyName;
         const prefferedPoolKind = family?.StorageConfig?.Data?.PreferredPoolKind;
-        const columnCodec = formatColumnCodec(family?.ColumnCodec);
+        const rawColumnCodec = family?.ColumnCodec;
+        const columnCodec = formatColumnCodec(rawColumnCodec);
 
         return {
             id: Id,
@@ -94,6 +95,7 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
             familyName,
             prefferedPoolKind,
             columnCodec,
+            rawColumnCodec,
         };
     });
 
@@ -123,6 +125,7 @@ function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaDat
 
     const preparedColumns = Columns?.map((column) => {
         const {Id, Name, Type, NotNull, Serializer} = column;
+        const rawColumnCodec = Serializer?.ArrowCompression?.Codec;
         const compressionLevel = Serializer?.ArrowCompression?.Level;
 
         const keyColumnIndex =
@@ -138,7 +141,8 @@ function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaDat
             partitioningColumnIndex,
             type: Type,
             notNull: NotNull,
-            columnCodec: formatColumnCodec(Serializer?.ArrowCompression?.Codec, compressionLevel),
+            columnCodec: formatColumnCodec(rawColumnCodec, compressionLevel),
+            rawColumnCodec,
             columnCodecLevel: compressionLevel,
         };
     });

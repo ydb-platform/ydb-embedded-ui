@@ -2,4 +2,4 @@ import {cn} from '../../../../utils/cn';
 
 export const b = cn('schema-viewer');
 
-export const PLAIN_COLUMN_CODEC = 'None';
+export const PLAIN_COLUMN_CODEC = 'Turned off';

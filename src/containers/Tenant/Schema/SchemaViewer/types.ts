@@ -1,5 +1,7 @@
 import type {Column} from '@gravity-ui/react-data-table';
 
+import type {EColumnCodec} from '../../../../types/api/schema';
+
 export type SchemaData = {
     id?: number;
     name?: string;
@@ -11,6 +13,7 @@ export type SchemaData = {
     familyName?: string;
     prefferedPoolKind?: string;
     columnCodec?: string;
+    rawColumnCodec?: EColumnCodec;
     columnCodecLevel?: number;
     defaultValue?: string | number | boolean;
 };

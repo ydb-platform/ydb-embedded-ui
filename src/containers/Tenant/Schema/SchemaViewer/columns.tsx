@@ -1,11 +1,11 @@
 import DataTable from '@gravity-ui/react-data-table';
 import {Icon} from '@gravity-ui/uikit';
 
-import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
+import {EColumnCodec} from '../../../../types/api/schema';
 import {getColumnWidth} from '../../../../utils/getColumnWidth';
 
 import i18n from './i18n';
-import {PLAIN_COLUMN_CODEC, b} from './shared';
+import {b} from './shared';
 import type {SchemaColumn, SchemaData} from './types';
 
 import KeyIcon from '@gravity-ui/icons/svgs/key.svg';
@@ -116,19 +116,46 @@ const mediaColumn: SchemaColumn = {
     render: ({row}) => row.prefferedPoolKind,
 };
 
-function getCompressionSortValue({columnCodec, columnCodecLevel}: SchemaData) {
-    if (
-        !columnCodec ||
-        columnCodec === EMPTY_DATA_PLACEHOLDER ||
-        columnCodec === PLAIN_COLUMN_CODEC
-    ) {
-        return undefined;
+function getCompressionSortGroup({rawColumnCodec}: SchemaData) {
+    if (!rawColumnCodec) {
+        return 2;
     }
 
-    const codecName = columnCodec.replace(/ \(\d+\)$/, '');
-    const levelOrder = (columnCodecLevel ?? -1) + 1;
+    if (rawColumnCodec === EColumnCodec.ColumnCodecPlain) {
+        return 1;
+    }
 
-    return `${codecName}:${String(levelOrder).padStart(3, '0')}`;
+    return 0;
+}
+
+function getCompressionCodecName({rawColumnCodec}: SchemaData) {
+    return rawColumnCodec ?? '';
+}
+
+function sortCompressionAscending(left: {row: SchemaData}, right: {row: SchemaData}) {
+    const leftGroup = getCompressionSortGroup(left.row);
+    const rightGroup = getCompressionSortGroup(right.row);
+
+    if (leftGroup !== rightGroup) {
+        return leftGroup - rightGroup;
+    }
+
+    if (leftGroup !== 0) {
+        return 0;
+    }
+
+    const leftName = getCompressionCodecName(left.row);
+    const rightName = getCompressionCodecName(right.row);
+
+    if (leftName < rightName) {
+        return -1;
+    }
+
+    if (leftName > rightName) {
+        return 1;
+    }
+
+    return (left.row.columnCodecLevel ?? -1) - (right.row.columnCodecLevel ?? -1);
 }
 
 const compressionColumn: SchemaColumn = {
@@ -137,7 +164,7 @@ const compressionColumn: SchemaColumn = {
         return i18n('column-title.compression');
     },
     width: 130,
-    sortAccessor: getCompressionSortValue,
+    sortAscending: sortCompressionAscending,
     render: ({row}) => row.columnCodec,
 };
 

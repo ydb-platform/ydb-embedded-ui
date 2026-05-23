@@ -1,6 +1,7 @@
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {EColumnCodec, EPathType} from '../../../../../types/api/schema';
 import {prepareSchemaData, prepareViewSchema} from '../prepareData';
+import {PLAIN_COLUMN_CODEC} from '../shared';
 
 describe('prepareSchemaData', () => {
     test('correctly parses row table data', () => {
@@ -23,8 +24,8 @@ describe('prepareSchemaData', () => {
                             Type: 'Uint64',
                             TypeId: 4,
                             Id: 2,
-                            Family: 0,
-                            FamilyName: 'default',
+                            Family: 1,
+                            FamilyName: 'compressed',
                             NotNull: true,
                         },
                         {
@@ -32,8 +33,8 @@ describe('prepareSchemaData', () => {
                             Type: 'Utf8',
                             TypeId: 4608,
                             Id: 3,
-                            Family: 0,
-                            FamilyName: 'default',
+                            Family: 1,
+                            FamilyName: 'compressed',
                             DefaultFromLiteral: {
                                 type: {
                                     type_id: 'UTF8',
@@ -72,6 +73,16 @@ describe('prepareSchemaData', () => {
                                     },
                                 },
                             },
+                            {
+                                Id: 1,
+                                Name: 'compressed',
+                                ColumnCodec: EColumnCodec.ColumnCodecLZ4,
+                                StorageConfig: {
+                                    Data: {
+                                        PreferredPoolKind: 'ssd',
+                                    },
+                                },
+                            },
                         ],
                     },
                 },
@@ -99,9 +110,10 @@ describe('prepareSchemaData', () => {
                 notNull: true,
                 autoIncrement: false,
                 defaultValue: '—',
-                familyName: 'default',
+                familyName: 'compressed',
                 prefferedPoolKind: 'ssd',
-                columnCodec: '—',
+                columnCodec: 'lz4',
+                rawColumnCodec: EColumnCodec.ColumnCodecLZ4,
             },
             {
                 id: 3,
@@ -111,9 +123,10 @@ describe('prepareSchemaData', () => {
                 notNull: true,
                 autoIncrement: false,
                 defaultValue: 'Ivan',
-                familyName: 'default',
+                familyName: 'compressed',
                 prefferedPoolKind: 'ssd',
-                columnCodec: '—',
+                columnCodec: 'lz4',
+                rawColumnCodec: EColumnCodec.ColumnCodecLZ4,
             },
             {
                 id: 4,
@@ -226,7 +239,8 @@ describe('prepareSchemaData', () => {
                 partitioningColumnIndex: 2,
                 type: 'Utf8',
                 notNull: true,
-                columnCodec: 'None',
+                columnCodec: PLAIN_COLUMN_CODEC,
+                rawColumnCodec: EColumnCodec.ColumnCodecPlain,
             },
             {
                 id: 2,
@@ -236,6 +250,7 @@ describe('prepareSchemaData', () => {
                 type: 'Utf8',
                 notNull: true,
                 columnCodec: 'zstd (4)',
+                rawColumnCodec: EColumnCodec.ColumnCodecZSTD,
                 columnCodecLevel: 4,
             },
             {
