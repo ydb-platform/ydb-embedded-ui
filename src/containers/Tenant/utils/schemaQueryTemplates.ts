@@ -155,7 +155,7 @@ export const manageReadReplicasTemplate = (params?: SchemaQueryParams) => {
 )`;
 };
 
-export const manageTTLTemplate = (params?: SchemaQueryParams) => {
+export const enableTTLTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
         : '${1:<my_table>}';
@@ -169,9 +169,18 @@ ALTER TABLE ${path} SET (
     -- Examples:
     --   TTL = Interval("PT1H") ON created_at  -- Delete rows 1 hour after created_at
     --   TTL = Interval("P7D") ON expire_at    -- Delete rows 7 days after expire_at
-    -- To disable TTL:
-    --   TTL = Interval("PT0S") ON column_name -- Set interval to 0 to disable TTL
 )`;
+};
+
+export const manageTTLTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
+
+    return `-- Disable Time to Live (TTL) for automatic row deletion, see docs for more information
+-- https://ydb.tech/docs/en/yql/reference/recipes/ttl?version=main#disable
+
+ALTER TABLE ${path} RESET (TTL);`;
 };
 
 export const selectQueryTemplate = (params?: SchemaQueryParams) => {
