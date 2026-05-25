@@ -6,6 +6,8 @@ import {QUERY_TECHNICAL_MARK} from './constants';
 
 export const FORCED_COMPACTION_FEATURE_FLAG = 'EnableForcedCompactions';
 export const TABLE_COMPACTION_OPERATION_PAGE_SIZE = 100;
+export const TABLE_COMPACTION_OPERATION_PAGE_LIMIT = 10;
+export const TABLE_COMPACTION_STATUS_POLLING_INTERVAL = 5000;
 
 export interface TableCompactionOptions {
     cascade: boolean;
@@ -79,11 +81,7 @@ export function isRunningTableCompactionOperation(operation: TOperation, path: s
         return false;
     }
 
-    return (
-        operation.ready !== true &&
-        metadata.state !== CompactState.STATE_DONE &&
-        metadata.state !== CompactState.STATE_CANCELLED
-    );
+    return operation.ready !== true && metadata.state === CompactState.STATE_IN_PROGRESS;
 }
 
 export function findRunningTableCompactionOperation(

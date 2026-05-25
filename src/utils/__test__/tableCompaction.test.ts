@@ -63,6 +63,14 @@ describe('tableCompaction utils', () => {
                 },
                 runningOperation,
                 {
+                    ready: false,
+                    metadata: {
+                        '@type': OPERATION_METADATA_TYPE_URLS.Compact,
+                        path: '/Root/db/table',
+                        state: CompactState.STATE_UNSPECIFIED,
+                    },
+                },
+                {
                     ready: true,
                     metadata: {
                         '@type': OPERATION_METADATA_TYPE_URLS.Compact,

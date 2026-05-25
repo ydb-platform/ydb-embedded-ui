@@ -154,8 +154,8 @@ export function CompactTableAction({
             view="normal"
             size="s"
             onClick={handleOpenDialog}
-            disabled={Boolean(runningCompaction)}
-            loading={isFetching && !runningCompaction}
+            disabled={Boolean(runningCompaction) || isStarting}
+            loading={isStarting || (isFetching && !runningCompaction)}
             aria-label={i18n('action_compaction')}
         >
             <Icon data={GearPlay} size={16} />
@@ -197,6 +197,7 @@ function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialo
     const [maxShardsInFlight, setMaxShardsInFlight] = React.useState(DEFAULT_MAX_SHARDS_IN_FLIGHT);
     const [maxShardsError, setMaxShardsError] = React.useState('');
     const [requestErrorMessage, setRequestErrorMessage] = React.useState('');
+    const submitInProgressRef = React.useRef(false);
 
     const resetFormState = React.useCallback(() => {
         setCascade(true);
@@ -225,6 +226,10 @@ function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialo
         async (event?: React.FormEvent) => {
             event?.preventDefault();
 
+            if (loading || submitInProgressRef.current) {
+                return;
+            }
+
             const parsedMaxShardsInFlight = parseMaxShardsInFlight(maxShardsInFlight);
 
             if (parsedMaxShardsInFlight === null) {
@@ -233,6 +238,7 @@ function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialo
             }
 
             setRequestErrorMessage('');
+            submitInProgressRef.current = true;
 
             try {
                 await onApply({
@@ -242,9 +248,11 @@ function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialo
                 handleClose();
             } catch (error) {
                 setRequestErrorMessage(prepareErrorMessage(error));
+            } finally {
+                submitInProgressRef.current = false;
             }
         },
-        [cascade, handleClose, maxShardsInFlight, onApply],
+        [cascade, handleClose, loading, maxShardsInFlight, onApply],
     );
 
     return (

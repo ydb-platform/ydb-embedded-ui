@@ -8,9 +8,9 @@ import type {
 } from '../../types/api/operations';
 import {isQueryErrorResponse} from '../../utils/query';
 import {
+    TABLE_COMPACTION_OPERATION_PAGE_LIMIT,
     TABLE_COMPACTION_OPERATION_PAGE_SIZE,
     createTableCompactionQuery,
-    findRunningTableCompactionOperation,
 } from '../../utils/tableCompaction';
 import type {StartTableCompactionParams} from '../../utils/tableCompaction';
 
@@ -32,6 +32,10 @@ function validateOperationListResponse(data: TOperationList): TOperationList {
     return data;
 }
 
+function getNextPageToken(data: TOperationList) {
+    return data.next_page_token && data.next_page_token !== '0' ? data.next_page_token : undefined;
+}
+
 export const operationsApi = api.injectEndpoints({
     endpoints: (build) => ({
         getOperationList: build.infiniteQuery<
@@ -43,7 +47,7 @@ export const operationsApi = api.injectEndpoints({
                 initialPageParam: undefined,
                 getNextPageParam: (lastPage) => {
                     // Return next page token if available, undefined if no more pages
-                    return lastPage.next_page_token === '0' ? undefined : lastPage.next_page_token;
+                    return getNextPageToken(lastPage);
                 },
             },
             queryFn: async ({queryArg, pageParam}, {signal}) => {
@@ -64,19 +68,30 @@ export const operationsApi = api.injectEndpoints({
             },
             providesTags: ['All'],
         }),
-        getTableCompaction: build.query<TOperation | undefined, {database: string; path: string}>({
-            queryFn: async ({database, path}, {signal}) => {
+        getCompactionList: build.query<TOperation[], {database: string}>({
+            queryFn: async ({database}, {signal}) => {
                 try {
-                    const params: OperationListRequestParams = {
-                        database,
-                        kind: 'compaction',
-                        page_size: TABLE_COMPACTION_OPERATION_PAGE_SIZE,
-                    };
-                    const data = await window.api.operation.getOperationList(params, {signal});
-                    const validatedData = validateOperationListResponse(data);
+                    const operations: TOperation[] = [];
+                    let pageToken: string | undefined;
+                    let pageCount = 0;
+
+                    do {
+                        pageCount += 1;
+                        const params: OperationListRequestParams = {
+                            database,
+                            kind: 'compaction',
+                            page_size: TABLE_COMPACTION_OPERATION_PAGE_SIZE,
+                            page_token: pageToken,
+                        };
+                        const data = await window.api.operation.getOperationList(params, {signal});
+                        const validatedData = validateOperationListResponse(data);
+
+                        operations.push(...(validatedData.operations ?? []));
+                        pageToken = getNextPageToken(validatedData);
+                    } while (pageToken && pageCount < TABLE_COMPACTION_OPERATION_PAGE_LIMIT);
 
                     return {
-                        data: findRunningTableCompactionOperation(validatedData.operations, path),
+                        data: operations,
                     };
                 } catch (error) {
                     return {error};

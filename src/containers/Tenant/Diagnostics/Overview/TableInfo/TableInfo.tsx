@@ -13,7 +13,11 @@ import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 import createToast from '../../../../../utils/createToast';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
-import {isForcedCompactionEnabled} from '../../../../../utils/tableCompaction';
+import {
+    TABLE_COMPACTION_STATUS_POLLING_INTERVAL,
+    findRunningTableCompactionOperation,
+    isForcedCompactionEnabled,
+} from '../../../../../utils/tableCompaction';
 import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import {EntityTitle} from '../../../EntityTitle/EntityTitle';
 import {isRowTableType} from '../../../utils/schema';
@@ -81,16 +85,22 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
         {skip: !isRowTable || !featureFlagsAvailable},
     );
     const compactionEnabled = isRowTable && isForcedCompactionEnabled(featureFlags);
+    const compactionPollingInterval =
+        autoRefreshInterval || TABLE_COMPACTION_STATUS_POLLING_INTERVAL;
     const {
-        currentData: runningCompaction,
+        currentData: compactionOperations,
         isFetching: isCompactionFetching,
-        refetch: refetchCompaction,
-    } = operationsApi.useGetTableCompactionQuery(
-        {database, path},
+        refetch: refetchCompactionList,
+    } = operationsApi.useGetCompactionListQuery(
+        {database},
         {
-            pollingInterval: autoRefreshInterval,
+            pollingInterval: compactionPollingInterval,
             skip: !compactionEnabled,
         },
+    );
+    const runningCompaction = React.useMemo(
+        () => findRunningTableCompactionOperation(compactionOperations, path),
+        [compactionOperations, path],
     );
     const [startTableCompaction, {isLoading: isCompactionStarting}] =
         operationsApi.useStartTableCompactionMutation();
@@ -118,9 +128,9 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const handleStartCompaction = React.useCallback(
         async ({cascade, maxShardsInFlight}: {cascade: boolean; maxShardsInFlight?: number}) => {
             await startTableCompaction({database, path, cascade, maxShardsInFlight}).unwrap();
-            refetchCompaction().catch(() => undefined);
+            refetchCompactionList().catch(() => undefined);
         },
-        [database, path, refetchCompaction, startTableCompaction],
+        [database, path, refetchCompactionList, startTableCompaction],
     );
 
     return (
