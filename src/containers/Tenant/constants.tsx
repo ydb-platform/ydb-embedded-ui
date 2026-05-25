@@ -14,8 +14,12 @@ import i18n from './i18n';
 
 export const ROW_COUNT_NOTE = {
     children: (
-        <Flex width="500px">
-            <Text whiteSpace="break-spaces">{i18n('note_row-count')}</Text>
+        <Flex width="528px" direction="column" gap={2}>
+            {i18n('note_row-count')
+                .split('\n')
+                .map((paragraph) => (
+                    <Text key={paragraph}>{paragraph}</Text>
+                ))}
         </Flex>
     ),
     popoverProps: {placement: 'right' as const},
