@@ -7,8 +7,8 @@ import {isMacOS} from '../../../../utils/platform';
 export const HOTKEY_LABELS = {
     newTab: 'mod+alt+t',
     renameTab: 'mod+alt+r',
-    duplicateTab: 'mod+alt+c',
-    closeTab: 'mod+shift+w',
+    duplicateTab: 'mod+shift+d',
+    closeTab: 'mod+alt+c',
     closeOtherTabs: 'mod+alt+backspace',
     closeAllTabs: 'mod+shift+backspace',
     saveQueryAs: 'mod+shift+s',
