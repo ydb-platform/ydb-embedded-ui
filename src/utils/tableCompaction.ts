@@ -7,7 +7,6 @@ import {QUERY_TECHNICAL_MARK} from './constants';
 export const FORCED_COMPACTION_FEATURE_FLAG = 'EnableForcedCompactions';
 export const TABLE_COMPACTION_OPERATION_PAGE_SIZE = 100;
 export const TABLE_COMPACTION_OPERATION_PAGE_LIMIT = 10;
-export const TABLE_COMPACTION_STATUS_POLLING_INTERVAL = 5000;
 
 export interface TableCompactionOptions {
     cascade: boolean;

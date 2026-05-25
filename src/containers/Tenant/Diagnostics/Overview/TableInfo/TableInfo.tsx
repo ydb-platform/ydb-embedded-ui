@@ -14,7 +14,6 @@ import {cn} from '../../../../../utils/cn';
 import createToast from '../../../../../utils/createToast';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {
-    TABLE_COMPACTION_STATUS_POLLING_INTERVAL,
     findRunningTableCompactionOperation,
     isForcedCompactionEnabled,
 } from '../../../../../utils/tableCompaction';
@@ -85,8 +84,6 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
         {skip: !isRowTable || !featureFlagsAvailable},
     );
     const compactionEnabled = isRowTable && isForcedCompactionEnabled(featureFlags);
-    const compactionPollingInterval =
-        autoRefreshInterval || TABLE_COMPACTION_STATUS_POLLING_INTERVAL;
     const {
         currentData: compactionOperations,
         isFetching: isCompactionFetching,
@@ -94,7 +91,7 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     } = operationsApi.useGetCompactionListQuery(
         {database},
         {
-            pollingInterval: compactionPollingInterval,
+            pollingInterval: autoRefreshInterval,
             skip: !compactionEnabled,
         },
     );
