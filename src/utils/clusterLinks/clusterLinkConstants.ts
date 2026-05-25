@@ -1,4 +1,4 @@
-import {CircleXmark, FileCode, Link, ListUl} from '@gravity-ui/icons';
+import {CircleXmark, FileCode, Link, ListCheckLock, ListUl} from '@gravity-ui/icons';
 import type {IconData} from '@gravity-ui/uikit';
 
 import MoniumIcon from '../../assets/icons/monium.svg';
@@ -8,6 +8,7 @@ export const CLUSTER_LINK_CONTEXT = {
     CORES: 'cores',
     LOGGING: 'logging',
     SLO_LOGS: 'slo-logs',
+    AUDIT_LOGS: 'audit-logs',
     MONITORING: 'monitoring',
 } as const;
 
@@ -17,6 +18,7 @@ export type ClusterLinkContext = (typeof CLUSTER_LINK_CONTEXT)[keyof typeof CLUS
 export const CONTEXT_ICONS: Record<ClusterLinkContext, IconData> = {
     [CLUSTER_LINK_CONTEXT.CORES]: CircleXmark,
     [CLUSTER_LINK_CONTEXT.LOGGING]: ListUl,
+    [CLUSTER_LINK_CONTEXT.AUDIT_LOGS]: ListCheckLock,
     [CLUSTER_LINK_CONTEXT.SLO_LOGS]: FileCode,
     [CLUSTER_LINK_CONTEXT.MONITORING]: MoniumIcon,
 };

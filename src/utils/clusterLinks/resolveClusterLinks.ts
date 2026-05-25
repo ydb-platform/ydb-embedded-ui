@@ -27,7 +27,16 @@ const CONTEXT_DEFAULT_TITLES: Record<ClusterLinkContext, string> = {
     [CLUSTER_LINK_CONTEXT.CORES]: i18n('title_cores-default'),
     [CLUSTER_LINK_CONTEXT.LOGGING]: i18n('title_logging-default'),
     [CLUSTER_LINK_CONTEXT.SLO_LOGS]: i18n('title_slo-logs-default'),
+    [CLUSTER_LINK_CONTEXT.AUDIT_LOGS]: i18n('title_audit-logs-default'),
     [CLUSTER_LINK_CONTEXT.MONITORING]: MONITORING_UI_TITLE,
+};
+
+const CONTEXT_PRIORITY: Record<ClusterLinkContext, number> = {
+    [CLUSTER_LINK_CONTEXT.MONITORING]: 0,
+    [CLUSTER_LINK_CONTEXT.LOGGING]: 1,
+    [CLUSTER_LINK_CONTEXT.SLO_LOGS]: 2,
+    [CLUSTER_LINK_CONTEXT.AUDIT_LOGS]: 3,
+    [CLUSTER_LINK_CONTEXT.CORES]: 4,
 };
 
 function isClusterLinkContext(context: string | undefined): context is ClusterLinkContext {
@@ -77,7 +86,16 @@ function toPascalCase(segment: string): string {
     return segment.replace(/(^|-)([a-z])/g, (_match, _sep, letter: string) => letter.toUpperCase());
 }
 
-/** Matches `{param}` and `{prefix.param}` placeholders (allows hyphens for kebab-case keys) */
+function isTraversableObject(value: unknown): value is Record<string, unknown> {
+    return (
+        value !== null && value !== undefined && typeof value === 'object' && !Array.isArray(value)
+    );
+}
+
+/**
+ * Matches raw `{param}` placeholders (allows hyphens for kebab-case keys).
+ * URL-encoded braces are treated as URL literals, not placeholders.
+ */
 const PLACEHOLDER_PATTERN = /\{([\w.-]+)\}/g;
 
 /**
@@ -119,15 +137,10 @@ function resolveParam(
 
     let value: unknown = ns;
     for (const segment of fields) {
-        if (
-            value === null ||
-            value === undefined ||
-            typeof value !== 'object' ||
-            Array.isArray(value)
-        ) {
+        if (!isTraversableObject(value)) {
             return undefined;
         }
-        const record = value as Record<string, unknown>;
+        const record = value;
         // Try the original segment first; if it doesn't match,
         // normalise it to PascalCase and retry so that lowercase /
         // kebab-case placeholders resolve against PascalCase fields.
@@ -142,7 +155,7 @@ function resolveParam(
 }
 
 /**
- * Replaces `{param}` and `{prefix.field}` placeholders in a URL template.
+ * Replaces raw `{param}` / `{prefix.field}` placeholders in a URL template.
  *
  * - Flat placeholders like `{balancer}` are resolved via `namespaces[source][balancer]`.
  * - Dotted placeholders like `{cluster.balancer}` are resolved via `namespaces[cluster][balancer]`.
@@ -155,6 +168,10 @@ function resolveParam(
  * Lowercase and kebab-case segments are normalised to PascalCase as a fallback
  * (see {@link resolveParam} for details).
  * Only string and number leaf values are used for substitution.
+ * Substituted values are treated as URL component values and are always
+ * encoded with `encodeURIComponent(value)`. Placeholders should not be used
+ * for URL structural parts such as scheme, host, path separators, or query
+ * delimiters; keep those parts in the template itself.
  * Returns `undefined` if any placeholder remains unresolved after substitution.
  */
 export function substituteUrlParams(
@@ -164,13 +181,19 @@ export function substituteUrlParams(
 ): string | undefined {
     let hasUnresolved = false;
 
-    const result = template.replace(PLACEHOLDER_PATTERN, (match, key: string) => {
+    const result = template.replace(PLACEHOLDER_PATTERN, (match, key: string | undefined) => {
+        if (!key) {
+            hasUnresolved = true;
+            return match;
+        }
+
         const value = resolveParam(key, source, namespaces);
         if (value === undefined) {
             hasUnresolved = true;
             return match;
         }
-        return String(value);
+
+        return encodeURIComponent(String(value));
     });
 
     return hasUnresolved ? undefined : result;
@@ -204,6 +227,16 @@ function getLinkDescription(
         return getDefaultContext(context, params);
     }
     return undefined;
+}
+
+function getContextPriority(context: string | undefined): number {
+    return isClusterLinkContext(context) ? CONTEXT_PRIORITY[context] : Infinity;
+}
+
+function sortByContextPriority(links: ClusterLinkWithTitle[]): ClusterLinkWithTitle[] {
+    return links.toSorted((left, right) => {
+        return getContextPriority(left.context) - getContextPriority(right.context);
+    });
 }
 
 /** Builds legacy links from cores and logging fields in cluster info */
@@ -347,8 +380,11 @@ export function resolveClusterLinks(
     });
 
     const additionalResult = processAdditionalLinks(allAdditionalLinks, coveredContexts);
+    const result = dynamicResult.concat(additionalResult);
 
-    return dynamicResult.concat(additionalResult);
+    // Dynamic-only links should preserve their source order. Once additional or legacy links are
+    // appended, normalize the merged list by known context priority; unknown/no-context links stay last.
+    return additionalResult.length ? sortByContextPriority(result) : result;
 }
 
 /**
@@ -465,6 +501,9 @@ export function resolveDatabaseLinks(
     );
 
     const additionalResult = processAdditionalDatabaseLinks(additionalLinks, coveredContexts);
+    const result = dynamicResult.concat(additionalResult);
 
-    return dynamicResult.concat(additionalResult);
+    // Dynamic-only links should preserve their source order. Once additional links are appended,
+    // normalize the merged list by known context priority; unknown/no-context links stay last.
+    return additionalResult.length ? sortByContextPriority(result) : result;
 }
