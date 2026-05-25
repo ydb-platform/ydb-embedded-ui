@@ -39,10 +39,9 @@ export function getFiltersConditions(tableName: string, filters?: TopQueriesFilt
         conditions.push(`${intervalEndColumn} IN ${getMaxIntervalSubquery(tableName)}`);
     }
 
-    if (filters?.text) {
-        conditions.push(
-            `(QueryText ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%')`,
-        );
+    const textFilter = filters?.text?.trim();
+    if (textFilter) {
+        conditions.push(`(QueryText ILIKE '%${textFilter}%' OR UserSID ILIKE '%${textFilter}%')`);
     }
 
     return conditions.join(' AND ');

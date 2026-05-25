@@ -57,7 +57,7 @@ export const Consumers = ({path, database, type, databaseFullPath}: ConsumersPro
             return [];
         }
 
-        const searchRe = new RegExp(escapeRegExp(searchValue), 'i');
+        const searchRe = new RegExp(escapeRegExp(searchValue.trim()), 'i');
 
         return consumers.filter((consumer) => {
             return searchRe.test(String(consumer.name));

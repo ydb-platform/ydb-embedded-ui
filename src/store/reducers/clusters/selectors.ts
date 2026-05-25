@@ -41,11 +41,12 @@ export const splitNameIntoParts = (name: string | undefined): string[] => {
 };
 
 const isMatchesByTextQuery = (clusterData: PreparedCluster, searchQuery = '') => {
-    if (!searchQuery) {
+    const preparedSearchQuery = searchQuery.trim().toLowerCase();
+
+    if (!preparedSearchQuery) {
         return true;
     }
 
-    const preparedSearchQuery = searchQuery.toLowerCase();
     const searchTokens = preparedSearchQuery.split(' ');
 
     const clusterNameParts = splitNameIntoParts(clusterData.title);

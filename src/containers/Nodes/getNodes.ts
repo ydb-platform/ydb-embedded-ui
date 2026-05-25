@@ -52,7 +52,7 @@ export const getNodes: FetchData<
         sort,
         path: schemePathParam,
         database,
-        filter: searchValue,
+        filter: searchValue?.trim(),
         problems_only: withProblems,
         uptime: getUptimeParamValue(uptimeFilter),
         filter_peer_role: peerRoleFilter,

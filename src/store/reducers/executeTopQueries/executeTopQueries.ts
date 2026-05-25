@@ -80,8 +80,9 @@ function getRunningQueriesText(
     sortOrder?: SortOrder[],
     limit?: number,
 ) {
-    const filterConditions = filters?.text
-        ? `(Query ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%')`
+    const textFilter = filters?.text?.trim();
+    const filterConditions = textFilter
+        ? `(Query ILIKE '%${textFilter}%' OR UserSID ILIKE '%${textFilter}%')`
         : '';
 
     const orderBy = prepareOrderByFromTableSort(sortOrder);

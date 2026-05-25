@@ -12,7 +12,7 @@ describe('Search', () => {
         jest.useRealTimers();
     });
 
-    it('trims leading and trailing whitespace from the onChange value', async () => {
+    it('preserves leading and trailing whitespace in the onChange value', async () => {
         const onChange = jest.fn();
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
 
@@ -24,7 +24,7 @@ describe('Search', () => {
         jest.runAllTimers();
 
         const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-        expect(lastCall[0]).toBe('hello');
+        expect(lastCall[0]).toBe('  hello  ');
     });
 
     it('preserves internal spaces in the onChange value', async () => {
@@ -41,8 +41,7 @@ describe('Search', () => {
         const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
         expect(lastCall[0]).toBe('hello world');
     });
-
-    it('calls onChange with empty string for whitespace-only input', async () => {
+    it('preserves whitespace-only input', async () => {
         const onChange = jest.fn();
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
 
@@ -54,6 +53,6 @@ describe('Search', () => {
         jest.runAllTimers();
 
         const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-        expect(lastCall[0]).toBe('');
+        expect(lastCall[0]).toBe('   ');
     });
 });

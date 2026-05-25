@@ -39,12 +39,12 @@ export function useOperationsInfiniteQuery({
     }, [data]);
 
     const filteredOperations = React.useMemo(() => {
-        if (!searchValue) {
+        const preparedSearchValue = searchValue.trim().toLowerCase();
+
+        if (!preparedSearchValue) {
             return allOperations;
         }
-        return allOperations.filter((op) =>
-            op.id?.toLowerCase().includes(searchValue.toLowerCase()),
-        );
+        return allOperations.filter((op) => op.id?.toLowerCase().includes(preparedSearchValue));
     }, [allOperations, searchValue]);
 
     // Auto-load more pages to fill viewport
