@@ -247,7 +247,7 @@ function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialo
     );
 
     return (
-        <Dialog open={open} size="s" onClose={handleClose} onEnterKeyDown={() => handleSubmit()}>
+        <Dialog open={open} size="s" onClose={handleClose}>
             <Dialog.Header
                 caption={<Text variant="subheader-3">{i18n('compaction.dialog-title')}</Text>}
             />
