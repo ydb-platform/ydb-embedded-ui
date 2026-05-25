@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Gear} from '@gravity-ui/icons';
+import {GearPlay} from '@gravity-ui/icons';
 import {
     ActionTooltip,
     Button,
@@ -108,7 +108,7 @@ export function CompactTableStatusBanner({operation}: {operation: TOperation}) {
 
     return (
         <Flex className={b('compaction-banner')} gap="3" alignItems="flex-start">
-            <Icon className={b('compaction-banner-icon')} data={Gear} size={20} />
+            <Icon className={b('compaction-banner-icon')} data={GearPlay} size={20} />
             <Flex direction="column" gap="2" className={b('compaction-banner-content')}>
                 <Text variant="subheader-2">{i18n('compaction.banner-title')}</Text>
                 <Text variant="body-1">{i18n('compaction.banner-description')}</Text>
@@ -157,7 +157,7 @@ export function CompactTableAction({
             loading={isFetching && !runningCompaction}
             aria-label={i18n('action_compaction')}
         >
-            <Icon data={Gear} size={16} />
+            <Icon data={GearPlay} size={16} />
             {i18n('action_compaction')}
         </Button>
     );
