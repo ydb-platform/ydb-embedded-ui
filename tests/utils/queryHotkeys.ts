@@ -52,7 +52,6 @@ type HotkeyDescriptor = {
 type TabHotkeyAction =
     | 'newTab'
     | 'renameTab'
-    | 'duplicateTab'
     | 'closeTab'
     | 'closeOtherTabs'
     | 'closeAllTabs'
@@ -63,8 +62,7 @@ type TabHotkeyAction =
 const TAB_HOTKEYS: Record<TabHotkeyAction, HotkeyDescriptor> = {
     newTab: {key: 'KeyT', alt: true},
     renameTab: {key: 'KeyR', alt: true},
-    duplicateTab: {key: 'KeyC', alt: true},
-    closeTab: {key: 'Backspace'},
+    closeTab: {key: 'KeyC', alt: true},
     closeOtherTabs: {key: 'Backspace', alt: true},
     closeAllTabs: {key: 'Backspace', shift: true},
     saveQueryAs: {key: 'KeyS', shift: true},

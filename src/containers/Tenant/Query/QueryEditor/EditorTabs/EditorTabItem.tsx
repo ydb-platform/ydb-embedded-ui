@@ -143,7 +143,6 @@ export function EditorTabItem({
                 {
                     text: i18n('editor-tabs.duplicate'),
                     iconStart: <Copy />,
-                    iconEnd: <Hotkey value={HOTKEY_LABELS.duplicateTab} />,
                     action: createMenuAction(handleDuplicateClick),
                 },
             ],

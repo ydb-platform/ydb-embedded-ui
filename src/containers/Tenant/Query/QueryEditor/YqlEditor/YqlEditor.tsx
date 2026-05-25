@@ -427,7 +427,6 @@ export function YqlEditor({
             editor.addAction({
                 id: 'duplicateEditorTab',
                 label: i18n('editor-tabs.duplicate'),
-                keybindings: [keybindings.duplicateTab],
                 run: () => handleDuplicateActiveTabAction(),
             });
             editor.addAction({
