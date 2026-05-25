@@ -27,6 +27,7 @@ import i18n from '../i18n';
 import './CompactTableAction.scss';
 
 const b = cn('ydb-diagnostics-table-info');
+const DEFAULT_MAX_SHARDS_IN_FLIGHT = '1';
 
 interface CompactTableActionProps {
     runningCompaction?: TOperation;
@@ -193,13 +194,13 @@ interface CompactTableDialogProps {
 
 function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialogProps) {
     const [cascade, setCascade] = React.useState(true);
-    const [maxShardsInFlight, setMaxShardsInFlight] = React.useState('');
+    const [maxShardsInFlight, setMaxShardsInFlight] = React.useState(DEFAULT_MAX_SHARDS_IN_FLIGHT);
     const [maxShardsError, setMaxShardsError] = React.useState('');
     const [requestErrorMessage, setRequestErrorMessage] = React.useState('');
 
     const resetFormState = React.useCallback(() => {
         setCascade(true);
-        setMaxShardsInFlight('');
+        setMaxShardsInFlight(DEFAULT_MAX_SHARDS_IN_FLIGHT);
         setMaxShardsError('');
         setRequestErrorMessage('');
     }, []);
