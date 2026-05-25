@@ -5,11 +5,17 @@ import {
     CircleXmarkFill,
     TriangleExclamationFill,
 } from '@gravity-ui/icons';
+import {Flex} from '@gravity-ui/uikit';
 import type {IconData} from '@gravity-ui/uikit';
 
 import {SelfCheckResult} from '../../types/api/healthcheck';
 
 import i18n from './i18n';
+
+export const ROW_COUNT_NOTE = {
+    children: <Flex width={300}>{i18n('note_row-count')}</Flex>,
+    popoverProps: {placement: 'right' as const},
+};
 
 export const HEALTHCHECK_RESULT_TO_TEXT: Record<SelfCheckResult, string> = {
     [SelfCheckResult.UNSPECIFIED]: '',

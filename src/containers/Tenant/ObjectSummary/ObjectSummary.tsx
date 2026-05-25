@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {DefinitionListItemProps} from '@gravity-ui/uikit';
 import {
     ClipboardButton,
     DefinitionList,
@@ -40,6 +41,7 @@ import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {useCurrentSchema} from '../TenantContext';
 import {useTenantPage} from '../TenantNavigation/useTenantNavigation';
 import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPages';
+import {ROW_COUNT_NOTE} from '../constants';
 import {useTenantQueryParams} from '../useTenantQueryParams';
 import {getSummaryControls} from '../utils/controls';
 import {
@@ -161,7 +163,11 @@ export function ObjectSummary({
         }
         const {CreateStep, PathType, PathSubType, PathId, PathVersion} = currentSchemaData;
 
-        const overview = [];
+        const overview: {
+            name: string;
+            content?: React.ReactNode;
+            note?: DefinitionListItemProps['note'];
+        }[] = [];
 
         const normalizedType = isDomain(path, PathType)
             ? 'Domain'
@@ -200,6 +206,7 @@ export function ObjectSummary({
                 {
                     name: i18n('field_row-count'),
                     content: formatNumber(RowCount),
+                    note: ROW_COUNT_NOTE,
                 },
             );
         }
@@ -232,7 +239,12 @@ export function ObjectSummary({
 
         const getPathTypeOverview: Record<
             EPathType,
-            (() => {name: string; content?: React.ReactNode}[]) | undefined
+            | (() => {
+                  name: string;
+                  content?: React.ReactNode;
+                  note?: DefinitionListItemProps['note'];
+              }[])
+            | undefined
         > = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
@@ -373,7 +385,7 @@ export function ObjectSummary({
                 </div>
                 <DefinitionList responsive>
                     {listItems.map((item) => (
-                        <DefinitionList.Item key={item.name} name={item.name}>
+                        <DefinitionList.Item key={item.name} name={item.name} note={item.note}>
                             {item.content}
                         </DefinitionList.Item>
                     ))}

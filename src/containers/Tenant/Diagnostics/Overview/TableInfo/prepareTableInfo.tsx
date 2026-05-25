@@ -25,6 +25,7 @@ import {formatBytes, getBytesSizeUnit} from '../../../../../utils/bytesParsers';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
 import {isNumeric} from '../../../../../utils/utils';
+import {ROW_COUNT_NOTE} from '../../../constants';
 
 import {DEFAULT_MANAGE_PARTITIONING_VALUE} from './ManagePartitioningDialog/constants';
 import type {ManagePartitioningFormState} from './ManagePartitioningDialog/types';
@@ -341,7 +342,14 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         RowCount,
         DataSize,
         IndexSize,
-    });
+    }).map((item) =>
+        item.name === 'RowCount'
+            ? {
+                  ...item,
+                  note: ROW_COUNT_NOTE,
+              }
+            : item,
+    );
 
     const bloomFilterItems: YDBDefinitionListItem[] = [];
 
