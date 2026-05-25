@@ -73,7 +73,7 @@
   "schema.tree.dialog.buttonApply": "Create",
   "label_healthcheck-dashboard": "Healthcheck Dashboard",
 
-  "note_row-count": "RowCount is an approximate number of rows from YDB partition statistics, not an exact SELECT COUNT(*) result. Because YDB stores table data in LSM levels and updates these stats asynchronously, the estimate can temporarily include rows that will be superseded or removed by background merge/compaction and can lag behind recent writes or deletes. It is useful for observing table size trends, but not for exact row counting. Use SELECT COUNT(*) when an exact, transactionally consistent count is required.",
+  "note_row-count": "RowCount is an approximate number of rows from YDB partition statistics, not an exact SELECT COUNT(*) result.\nBecause YDB stores table data in LSM levels and updates these stats asynchronously, the estimate can temporarily include rows that will be superseded or removed by background merge/compaction and can lag behind recent writes or deletes.\nIt is useful for observing table size trends, but not for exact row counting.\nUse SELECT COUNT(*) when an exact, transactionally consistent count is required.",
 
   "description_ok": "Everything is working fine.",
   "description_degraded": "Some issues, but still working.",

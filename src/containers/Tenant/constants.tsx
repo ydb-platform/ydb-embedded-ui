@@ -5,7 +5,7 @@ import {
     CircleXmarkFill,
     TriangleExclamationFill,
 } from '@gravity-ui/icons';
-import {Flex} from '@gravity-ui/uikit';
+import {Flex, Text} from '@gravity-ui/uikit';
 import type {IconData} from '@gravity-ui/uikit';
 
 import {SelfCheckResult} from '../../types/api/healthcheck';
@@ -13,7 +13,11 @@ import {SelfCheckResult} from '../../types/api/healthcheck';
 import i18n from './i18n';
 
 export const ROW_COUNT_NOTE = {
-    children: <Flex width={300}>{i18n('note_row-count')}</Flex>,
+    children: (
+        <Flex width="500px">
+            <Text whiteSpace="break-spaces">{i18n('note_row-count')}</Text>
+        </Flex>
+    ),
     popoverProps: {placement: 'right' as const},
 };
 
