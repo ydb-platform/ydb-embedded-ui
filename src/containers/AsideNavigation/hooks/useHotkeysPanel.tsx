@@ -44,7 +44,6 @@ export const EDITOR_TABS_HOTKEY_GROUP: HotkeysGroup = {
         {title: i18n('hotkeys.new-tab'), value: HOTKEY_LABELS.newTab},
         {title: i18n('hotkeys.close-tab'), value: HOTKEY_LABELS.closeTab},
         {title: i18n('hotkeys.rename-tab'), value: HOTKEY_LABELS.renameTab},
-        {title: i18n('hotkeys.duplicate-tab'), value: HOTKEY_LABELS.duplicateTab},
         {title: i18n('hotkeys.next-tab'), value: HOTKEY_LABELS.nextTab},
         {title: i18n('hotkeys.previous-tab'), value: HOTKEY_LABELS.previousTab},
         {title: i18n('hotkeys.close-other-tabs'), value: HOTKEY_LABELS.closeOtherTabs},
