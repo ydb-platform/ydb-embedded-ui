@@ -118,7 +118,7 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const handleStartCompaction = React.useCallback(
         async ({cascade, maxShardsInFlight}: {cascade: boolean; maxShardsInFlight?: number}) => {
             await startTableCompaction({database, path, cascade, maxShardsInFlight}).unwrap();
-            await refetchCompaction();
+            refetchCompaction().catch(() => undefined);
         },
         [database, path, refetchCompaction, startTableCompaction],
     );
