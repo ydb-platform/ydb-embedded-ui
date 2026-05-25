@@ -39,6 +39,17 @@ describe('routes', () => {
     });
 
     describe('getTenantPath', () => {
+        test('should prepend basename when requested for href-based links', () => {
+            expect(
+                getTenantPath(
+                    {database: '/dev02/home/xenoxeno/db1', databasePage: 'query'},
+                    {withBasename: true},
+                ),
+            ).toBe(
+                '/monitoring/database?database=%2Fdev02%2Fhome%2Fxenoxeno%2Fdb1&databasePage=query',
+            );
+        });
+
         test('should not expose nested utm_referrer params as top-level params', () => {
             const location = new URL(URL_WITH_NESTED_REFERRER);
             const query = parseQuery({search: location.search} as Location);

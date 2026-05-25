@@ -79,7 +79,10 @@ export function useTenantNavigation(): TenantNavigationItem[] {
 
         const items = pages.map((key) => {
             const pageId = TENANT_PAGES_IDS[key];
-            const pagePath = getTenantPath({...queryParams, [TENANT_PAGE]: pageId});
+            const pagePath = getTenantPath(
+                {...queryParams, [TENANT_PAGE]: pageId},
+                {withBasename: true},
+            );
             const icon = isV2Enabled ? mapPageToIcon2[key] : mapPageToIcon[key];
             const title = isV2Enabled ? mapPageToTitle2[key] : mapPageToTitle[key];
 
