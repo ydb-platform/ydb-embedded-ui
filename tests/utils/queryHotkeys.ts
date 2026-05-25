@@ -61,10 +61,10 @@ type TabHotkeyAction =
     | 'previousTab';
 
 const TAB_HOTKEYS: Record<TabHotkeyAction, HotkeyDescriptor> = {
-    newTab: {key: 'KeyT', alt: true},
+    newTab: {key: 'KeyN', alt: true},
     renameTab: {key: 'KeyR', alt: true},
     duplicateTab: {key: 'KeyC', alt: true},
-    closeTab: {key: 'Backspace'},
+    closeTab: {key: 'KeyW', alt: true},
     closeOtherTabs: {key: 'Backspace', alt: true},
     closeAllTabs: {key: 'Backspace', shift: true},
     saveQueryAs: {key: 'KeyS', shift: true},
@@ -73,9 +73,10 @@ const TAB_HOTKEYS: Record<TabHotkeyAction, HotkeyDescriptor> = {
 };
 
 const KEY_VALUES_BY_CODE: Record<string, string> = {
-    KeyT: 'T',
+    KeyN: 'N',
     KeyR: 'R',
     KeyC: 'C',
+    KeyW: 'W',
     KeyS: 'S',
     ArrowRight: 'ArrowRight',
     ArrowLeft: 'ArrowLeft',
