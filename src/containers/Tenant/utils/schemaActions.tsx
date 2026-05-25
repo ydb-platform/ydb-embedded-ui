@@ -41,6 +41,7 @@ import {
     createTopicTemplate,
     createTransferTemplate,
     createViewTemplate,
+    disableTTLTemplate,
     dropAsyncReplicationTemplate,
     dropExternalTableTemplate,
     dropStreamingQueryTemplate,
@@ -49,9 +50,9 @@ import {
     dropTopicTemplate,
     dropTransferTemplate,
     dropViewTemplate,
+    enableTTLTemplate,
     manageAutoPartitioningTemplate,
     manageReadReplicasTemplate,
-    manageTTLTemplate,
     selectQueryTemplate,
     showCreateTableTemplate,
     upsertQueryTemplate,
@@ -192,7 +193,8 @@ const bindActions = (
             manageReadReplicasTemplate,
             stripEllipsis(i18n('actions.manageReadReplicas')),
         ),
-        manageTTL: inputQuery(manageTTLTemplate, stripEllipsis(i18n('actions.manageTTL'))),
+        enableTTL: inputQuery(enableTTLTemplate, stripEllipsis(i18n('actions.enableTTL'))),
+        disableTTL: inputQuery(disableTTLTemplate, stripEllipsis(i18n('actions.disableTTL'))),
         selectQuery: inputQuery(selectQueryTemplate, stripEllipsis(i18n('actions.selectQuery'))),
         showCreateTable: inputQuery(
             showCreateTableTemplate,
@@ -344,9 +346,13 @@ export const getActions =
             text: i18n('actions.manageReadReplicas'),
             action: actions.manageReadReplicas,
         };
-        const manageTTLItem = {
-            text: i18n('actions.manageTTL'),
-            action: actions.manageTTL,
+        const enableTTLItem = {
+            text: i18n('actions.enableTTL'),
+            action: actions.enableTTL,
+        };
+        const disableTTLItem = {
+            text: i18n('actions.disableTTL'),
+            action: actions.disableTTL,
         };
 
         const alterRowTableGroupItem = {
@@ -355,12 +361,13 @@ export const getActions =
                 manageColumnsItem,
                 manageAutoPartitioningItem,
                 manageReadReplicasItem,
-                manageTTLItem,
+                enableTTLItem,
+                disableTTLItem,
             ],
         };
         const alterColumnTableGroupItem = {
             text: i18n('actions.alterTable'),
-            items: [manageColumnsItem, manageAutoPartitioningItem, manageTTLItem],
+            items: [manageColumnsItem, manageAutoPartitioningItem, enableTTLItem],
         };
 
         let DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
