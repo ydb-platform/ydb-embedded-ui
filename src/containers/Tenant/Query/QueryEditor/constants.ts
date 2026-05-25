@@ -4,9 +4,6 @@ import {isMacOS} from '../../../../utils/platform';
  * Hotkey labels for display in Gravity UI Hotkey component.
  * Uses `mod` prefix which maps to Cmd on Mac / Ctrl on other platforms.
  */
-const NEXT_TAB_HOTKEY = isMacOS() ? 'mod+alt+right' : 'ctrl+pagedown';
-const PREVIOUS_TAB_HOTKEY = isMacOS() ? 'mod+alt+left' : 'ctrl+pageup';
-
 export const HOTKEY_LABELS = {
     newTab: 'mod+alt+n',
     renameTab: 'mod+alt+r',
@@ -15,8 +12,8 @@ export const HOTKEY_LABELS = {
     closeOtherTabs: 'mod+alt+backspace',
     closeAllTabs: 'mod+shift+backspace',
     saveQueryAs: 'mod+shift+s',
-    nextTab: NEXT_TAB_HOTKEY,
-    previousTab: PREVIOUS_TAB_HOTKEY,
+    nextTab: 'mod+alt+right',
+    previousTab: 'mod+alt+left',
 } as const;
 
 /**

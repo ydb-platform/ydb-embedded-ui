@@ -1,7 +1,5 @@
 import type Monaco from 'monaco-editor';
 
-import {isMacOS} from '../../../../../utils/platform';
-
 export function getKeyBindings(monaco: typeof Monaco) {
     const {KeyMod, KeyCode} = monaco;
 
@@ -21,7 +19,7 @@ export function getKeyBindings(monaco: typeof Monaco) {
         closeTab: ctrlKey | altKey | KeyCode.KeyW,
         closeOtherTabs: ctrlKey | altKey | KeyCode.Backspace,
         closeAllTabs: ctrlKey | shiftKey | KeyCode.Backspace,
-        nextTab: isMacOS() ? ctrlKey | altKey | KeyCode.RightArrow : ctrlKey | KeyCode.PageDown,
-        previousTab: isMacOS() ? ctrlKey | altKey | KeyCode.LeftArrow : ctrlKey | KeyCode.PageUp,
+        nextTab: ctrlKey | altKey | KeyCode.RightArrow,
+        previousTab: ctrlKey | altKey | KeyCode.LeftArrow,
     };
 }
