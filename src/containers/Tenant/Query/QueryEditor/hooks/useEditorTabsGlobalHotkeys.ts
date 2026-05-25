@@ -61,13 +61,6 @@ export function useEditorTabsGlobalHotkeys(
                 },
             },
             {
-                combo: toHotkeysJsFormat(HOTKEY_LABELS.duplicateTab),
-                handler: (e) => {
-                    e.preventDefault();
-                    handlersRef.current.handleDuplicateTab();
-                },
-            },
-            {
                 combo: toHotkeysJsFormat(HOTKEY_LABELS.nextTab),
                 handler: (e) => {
                     e.preventDefault();

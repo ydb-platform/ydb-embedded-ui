@@ -15,7 +15,6 @@ export function getKeyBindings(monaco: typeof Monaco) {
         shortcutsHotkey: ctrlKey | KeyCode.KeyK,
         newTab: ctrlKey | altKey | KeyCode.KeyT,
         renameTab: ctrlKey | altKey | KeyCode.KeyR,
-        duplicateTab: ctrlKey | shiftKey | KeyCode.KeyD,
         closeTab: ctrlKey | altKey | KeyCode.KeyC,
         closeOtherTabs: ctrlKey | altKey | KeyCode.Backspace,
         closeAllTabs: ctrlKey | shiftKey | KeyCode.Backspace,
