@@ -5,7 +5,7 @@ import {isMacOS} from '../../../../utils/platform';
  * Uses `mod` prefix which maps to Cmd on Mac / Ctrl on other platforms.
  */
 export const HOTKEY_LABELS = {
-    newTab: 'mod+alt+n',
+    newTab: 'mod+alt+t',
     renameTab: 'mod+alt+r',
     duplicateTab: 'mod+alt+c',
     closeTab: 'mod+alt+w',
@@ -17,8 +17,8 @@ export const HOTKEY_LABELS = {
 } as const;
 
 /**
- * Converts a Gravity UI hotkey label (e.g. `mod+alt+n`) to
- * a `hotkeys-js` compatible string (e.g. `command+alt+n` on Mac, `ctrl+alt+n` on others).
+ * Converts a Gravity UI hotkey label (e.g. `mod+alt+t`) to
+ * a `hotkeys-js` compatible string (e.g. `command+alt+t` on Mac, `ctrl+alt+t` on others).
  */
 export function toHotkeysJsFormat(label: string): string {
     const platformMod = isMacOS() ? 'command' : 'ctrl';

@@ -13,7 +13,7 @@ export function getKeyBindings(monaco: typeof Monaco) {
         saveQuery: ctrlKey | KeyCode.KeyS,
         saveQueryAs: ctrlKey | shiftKey | KeyCode.KeyS,
         shortcutsHotkey: ctrlKey | KeyCode.KeyK,
-        newTab: ctrlKey | altKey | KeyCode.KeyN,
+        newTab: ctrlKey | altKey | KeyCode.KeyT,
         renameTab: ctrlKey | altKey | KeyCode.KeyR,
         duplicateTab: ctrlKey | altKey | KeyCode.KeyC,
         closeTab: ctrlKey | altKey | KeyCode.KeyW,

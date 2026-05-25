@@ -61,7 +61,7 @@ type TabHotkeyAction =
     | 'previousTab';
 
 const TAB_HOTKEYS: Record<TabHotkeyAction, HotkeyDescriptor> = {
-    newTab: {key: 'KeyN', alt: true},
+    newTab: {key: 'KeyT', alt: true},
     renameTab: {key: 'KeyR', alt: true},
     duplicateTab: {key: 'KeyC', alt: true},
     closeTab: {key: 'KeyW', alt: true},
@@ -73,7 +73,7 @@ const TAB_HOTKEYS: Record<TabHotkeyAction, HotkeyDescriptor> = {
 };
 
 const KEY_VALUES_BY_CODE: Record<string, string> = {
-    KeyN: 'N',
+    KeyT: 'T',
     KeyR: 'R',
     KeyC: 'C',
     KeyW: 'W',
