@@ -172,7 +172,7 @@ ALTER TABLE ${path} SET (
 )`;
 };
 
-export const manageTTLTemplate = (params?: SchemaQueryParams) => {
+export const disableTTLTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
         : '${1:<my_table>}';

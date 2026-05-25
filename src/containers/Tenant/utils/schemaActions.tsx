@@ -41,6 +41,7 @@ import {
     createTopicTemplate,
     createTransferTemplate,
     createViewTemplate,
+    disableTTLTemplate,
     dropAsyncReplicationTemplate,
     dropExternalTableTemplate,
     dropStreamingQueryTemplate,
@@ -52,7 +53,6 @@ import {
     enableTTLTemplate,
     manageAutoPartitioningTemplate,
     manageReadReplicasTemplate,
-    manageTTLTemplate,
     selectQueryTemplate,
     showCreateTableTemplate,
     upsertQueryTemplate,
@@ -194,7 +194,7 @@ const bindActions = (
             stripEllipsis(i18n('actions.manageReadReplicas')),
         ),
         enableTTL: inputQuery(enableTTLTemplate, stripEllipsis(i18n('actions.enableTTL'))),
-        manageTTL: inputQuery(manageTTLTemplate, stripEllipsis(i18n('actions.disableTTL'))),
+        disableTTL: inputQuery(disableTTLTemplate, stripEllipsis(i18n('actions.disableTTL'))),
         selectQuery: inputQuery(selectQueryTemplate, stripEllipsis(i18n('actions.selectQuery'))),
         showCreateTable: inputQuery(
             showCreateTableTemplate,
@@ -350,9 +350,9 @@ export const getActions =
             text: i18n('actions.enableTTL'),
             action: actions.enableTTL,
         };
-        const manageTTLItem = {
+        const disableTTLItem = {
             text: i18n('actions.disableTTL'),
-            action: actions.manageTTL,
+            action: actions.disableTTL,
         };
 
         const alterRowTableGroupItem = {
@@ -362,7 +362,7 @@ export const getActions =
                 manageAutoPartitioningItem,
                 manageReadReplicasItem,
                 enableTTLItem,
-                manageTTLItem,
+                disableTTLItem,
             ],
         };
         const alterColumnTableGroupItem = {

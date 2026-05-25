@@ -1,4 +1,4 @@
-import {enableTTLTemplate, manageTTLTemplate} from '../schemaQueryTemplates';
+import {disableTTLTemplate, enableTTLTemplate} from '../schemaQueryTemplates';
 
 describe('schemaQueryTemplates', () => {
     describe('enableTTLTemplate', () => {
@@ -12,9 +12,9 @@ describe('schemaQueryTemplates', () => {
         });
     });
 
-    describe('manageTTLTemplate', () => {
+    describe('disableTTLTemplate', () => {
         test('resets TTL for the selected table', () => {
-            const template = manageTTLTemplate({path: '/local/table', relativePath: 'table'});
+            const template = disableTTLTemplate({path: '/local/table', relativePath: 'table'});
 
             expect(template).toContain('https://ydb.tech/docs/en/yql/reference/recipes/ttl');
             expect(template).toContain('ALTER TABLE `table` RESET (TTL);');
