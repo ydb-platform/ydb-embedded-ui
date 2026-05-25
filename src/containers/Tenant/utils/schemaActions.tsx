@@ -194,7 +194,7 @@ const bindActions = (
             stripEllipsis(i18n('actions.manageReadReplicas')),
         ),
         enableTTL: inputQuery(enableTTLTemplate, stripEllipsis(i18n('actions.enableTTL'))),
-        manageTTL: inputQuery(manageTTLTemplate, stripEllipsis(i18n('actions.manageTTL'))),
+        manageTTL: inputQuery(manageTTLTemplate, stripEllipsis(i18n('actions.disableTTL'))),
         selectQuery: inputQuery(selectQueryTemplate, stripEllipsis(i18n('actions.selectQuery'))),
         showCreateTable: inputQuery(
             showCreateTableTemplate,
@@ -351,7 +351,7 @@ export const getActions =
             action: actions.enableTTL,
         };
         const manageTTLItem = {
-            text: i18n('actions.manageTTL'),
+            text: i18n('actions.disableTTL'),
             action: actions.manageTTL,
         };
 

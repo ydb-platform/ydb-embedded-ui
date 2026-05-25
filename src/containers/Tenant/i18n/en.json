@@ -47,7 +47,7 @@
   "actions.manageAutoPartitioning": "Manage auto partitioning...",
   "actions.manageReadReplicas": "Add read-only replicas...",
   "actions.enableTTL": "Enable TTL...",
-  "actions.manageTTL": "Disable TTL...",
+  "actions.disableTTL": "Disable TTL...",
   "actions.addTableIndex": "Add index...",
   "actions.addVectorIndex": "Add vector index...",
   "actions.addFulltextIndex": "Add fulltext index...",

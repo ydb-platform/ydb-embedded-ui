@@ -178,7 +178,7 @@ export const manageTTLTemplate = (params?: SchemaQueryParams) => {
         : '${1:<my_table>}';
 
     return `-- Disable Time to Live (TTL) for automatic row deletion, see docs for more information
--- https://ydb.tech/docs/en/yql/reference/recipes/ttl?version=main#disable
+-- https://ydb.tech/docs/en/yql/reference/recipes/ttl#disable
 
 ALTER TABLE ${path} RESET (TTL);`;
 };
