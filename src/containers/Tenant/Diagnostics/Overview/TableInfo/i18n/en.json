@@ -3,7 +3,11 @@
   "title_table-stats": "Stats",
   "title_tablet-metrics": "Metrics",
   "title_partition-config": "Partition config",
+  "action_cancel": "Cancel",
+  "action_manage": "Manage",
   "action_manage-partition-config": "Manage partition config",
+  "action_compaction": "Compaction",
+  "action_run-compaction": "Run table compaction",
 
   "button_show-more": "Show more",
   "button_show-less": "Show less",
@@ -30,6 +34,23 @@
 
   "hint_current-partitions-below-limits": "The current partition size is below the limits. To prevent automatic splits and maintain performance, adjust the partition limits",
   "hint_current-partitions-exceeds-limits": "The current partition size exceeds the limits. To prevent automatic splits and maintain performance, adjust the partition limits",
+
+  "compaction.action-start": "Start",
+  "compaction.dialog-title": "Run table compaction",
+  "compaction.field-cascade": "Cascade",
+  "compaction.field-max-shards": "Max shards in flight",
+  "compaction.error-positive-integer": "Value must be a positive integer",
+  "compaction.banner-title": "Compaction in progress",
+  "compaction.banner-description": "Manual compaction is running to merge old row versions and reduce overhead",
+  "compaction.banner-progress": "Progress: {{progress}}% — {{status}}",
+  "compaction.status-starting": "Starting compaction...",
+  "compaction.status-running": "Compacting table...",
+  "compaction.status-done": "Done",
+  "compaction.status-cancelled": "Cancelled",
+  "compaction.status-title": "Compaction",
+  "compaction.status-state": "State: {{state}}",
+  "compaction.status-progress": "Progress: {{progress}}%",
+  "compaction.status-shards": "Shards: {{done}} / {{total}}",
 
   "toast_partitioning-updated": "Partitioning settings applied"
 }

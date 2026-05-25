@@ -4,14 +4,24 @@ import {ChevronDown, ChevronUp, Gear} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Disclosure, Flex, Icon} from '@gravity-ui/uikit';
 
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {useFeatureFlagsAvailable} from '../../../../../store/reducers/capabilities/hooks';
+import {configsApi} from '../../../../../store/reducers/configs';
+import {operationsApi} from '../../../../../store/reducers/operations';
 import {tablePartitioningApi} from '../../../../../store/reducers/tablePartitioning/tablePartitioning';
-import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
+import {EPathType} from '../../../../../types/api/schema';
+import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 import createToast from '../../../../../utils/createToast';
+import {useAutoRefreshInterval} from '../../../../../utils/hooks';
+import {isForcedCompactionEnabled} from '../../../../../utils/tableCompaction';
 import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import {EntityTitle} from '../../../EntityTitle/EntityTitle';
 import {isRowTableType} from '../../../utils/schema';
 
+import {
+    CompactTableAction,
+    CompactTableStatusBanner,
+} from './CompactTableAction/CompactTableAction';
 import {openManagePartitioningDialog} from './ManagePartitioningDialog/ManagePartitioningDialog';
 import {PartitionsProgress} from './PartitionsProgress/PartitionsProgress';
 import i18n from './i18n';
@@ -42,6 +52,9 @@ const TableInfoHeader = ({data}: {data?: TEvDescribeSchemeResult}) => {
 };
 
 export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
+    const [autoRefreshInterval] = useAutoRefreshInterval();
+    const isRowTable = type === EPathType.EPathTypeTable;
+    const featureFlagsAvailable = useFeatureFlagsAvailable();
     const {
         generalInfoLeft = [],
         generalInfoRight = [],
@@ -63,6 +76,24 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const hasMore = hasMoreLeft || hasMoreRight;
 
     const [updatePartitioning] = tablePartitioningApi.useUpdateTablePartitioningMutation();
+    const {currentData: featureFlags} = configsApi.useGetFeatureFlagsQuery(
+        {database},
+        {skip: !isRowTable || !featureFlagsAvailable},
+    );
+    const compactionEnabled = isRowTable && isForcedCompactionEnabled(featureFlags);
+    const {
+        currentData: runningCompaction,
+        isFetching: isCompactionFetching,
+        refetch: refetchCompaction,
+    } = operationsApi.useGetTableCompactionQuery(
+        {database, path},
+        {
+            pollingInterval: autoRefreshInterval,
+            skip: !compactionEnabled,
+        },
+    );
+    const [startTableCompaction, {isLoading: isCompactionStarting}] =
+        operationsApi.useStartTableCompactionMutation();
 
     const handleOpenManagePartitioning = React.useCallback(() => {
         reachMetricaGoal('openManagePartitioning');
@@ -84,8 +115,19 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
         });
     }, [managePartitioningDialogConfig, database, path, updatePartitioning]);
 
+    const handleStartCompaction = React.useCallback(
+        async ({cascade, maxShardsInFlight}: {cascade: boolean; maxShardsInFlight?: number}) => {
+            await startTableCompaction({database, path, cascade, maxShardsInFlight}).unwrap();
+            await refetchCompaction();
+        },
+        [database, path, refetchCompaction, startTableCompaction],
+    );
+
     return (
         <div className={b()}>
+            {compactionEnabled && runningCompaction && (
+                <CompactTableStatusBanner operation={runningCompaction} />
+            )}
             <Flex
                 className={b('header')}
                 justifyContent="space-between"
@@ -93,18 +135,29 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                 gap="2"
             >
                 <TableInfoHeader data={data} />
-                {managePartitioningDialogConfig && (
-                    <ActionTooltip title={i18n('action_manage-partition-config')}>
-                        <Button
-                            view="normal"
-                            size="s"
-                            onClick={handleOpenManagePartitioning}
-                            aria-label={i18n('action_manage-partition-config')}
-                        >
-                            <Icon data={Gear} size={16} />
-                        </Button>
-                    </ActionTooltip>
-                )}
+                <Flex gap="2" alignItems="center">
+                    {managePartitioningDialogConfig && (
+                        <ActionTooltip title={i18n('action_manage-partition-config')}>
+                            <Button
+                                view="normal"
+                                size="s"
+                                onClick={handleOpenManagePartitioning}
+                                aria-label={i18n('action_manage-partition-config')}
+                            >
+                                <Icon data={Gear} size={16} />
+                                {i18n('action_manage')}
+                            </Button>
+                        </ActionTooltip>
+                    )}
+                    {compactionEnabled && (
+                        <CompactTableAction
+                            runningCompaction={runningCompaction}
+                            isFetching={isCompactionFetching}
+                            isStarting={isCompactionStarting}
+                            onApply={handleStartCompaction}
+                        />
+                    )}
+                </Flex>
             </Flex>
             {partitionProgressConfig && (
                 <div className={b('progress-bar')}>

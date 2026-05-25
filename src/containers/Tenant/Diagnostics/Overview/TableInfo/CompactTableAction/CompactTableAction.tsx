@@ -1,31 +1,38 @@
 import React from 'react';
 
-import {GearPlay} from '@gravity-ui/icons';
-import {Button, Dialog, Flex, Icon, Popover, Switch, Text, TextInput} from '@gravity-ui/uikit';
+import {Gear} from '@gravity-ui/icons';
+import {
+    ActionTooltip,
+    Button,
+    Dialog,
+    Flex,
+    Icon,
+    Popover,
+    Switch,
+    Text,
+    TextInput,
+} from '@gravity-ui/uikit';
 
-import {useFeatureFlagsAvailable} from '../../../../store/reducers/capabilities/hooks';
-import {configsApi} from '../../../../store/reducers/configs';
-import {operationsApi} from '../../../../store/reducers/operations';
-import type {TOperation} from '../../../../types/api/operations';
-import {useAutoRefreshInterval} from '../../../../utils/hooks';
-import {prepareErrorMessage} from '../../../../utils/prepareErrorMessage';
+import type {TOperation} from '../../../../../../types/api/operations';
+import {CompactState} from '../../../../../../types/api/operations';
+import {cn} from '../../../../../../utils/cn';
+import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
 import {
     getCompactionProgress,
     getCompactionShardProgress,
     isCompactMetadata,
-    isForcedCompactionEnabled,
-} from '../../../../utils/tableCompaction';
+} from '../../../../../../utils/tableCompaction';
 import i18n from '../i18n';
-import {transformPath} from '../transformPath';
-
-import {b} from './shared';
 
 import './CompactTableAction.scss';
 
+const b = cn('ydb-diagnostics-table-info');
+
 interface CompactTableActionProps {
-    path: string;
-    database: string;
-    databaseFullPath: string;
+    runningCompaction?: TOperation;
+    isFetching: boolean;
+    isStarting: boolean;
+    onApply: (value: {cascade: boolean; maxShardsInFlight?: number}) => Promise<void>;
 }
 
 function parseMaxShardsInFlight(value: string) {
@@ -38,15 +45,36 @@ function parseMaxShardsInFlight(value: string) {
     return Number.isInteger(parsedValue) && parsedValue > 0 ? parsedValue : null;
 }
 
-function formatProgress(operation?: TOperation) {
-    const progress = getCompactionProgress(operation);
-
-    return typeof progress === 'number' ? `${progress}%` : undefined;
+function getProgress(operation?: TOperation) {
+    return getCompactionProgress(operation) ?? 0;
 }
 
-function CompactTableStatus({operation}: {operation: TOperation}) {
+function getCompactionProgressDescription(operation: TOperation) {
     const {metadata} = operation;
-    const progress = formatProgress(operation);
+    const progress = getProgress(operation);
+
+    if (!isCompactMetadata(metadata)) {
+        return i18n('compaction.status-starting');
+    }
+
+    if (metadata.state === CompactState.STATE_IN_PROGRESS && progress > 0) {
+        return i18n('compaction.status-running');
+    }
+
+    if (metadata.state === CompactState.STATE_DONE) {
+        return i18n('compaction.status-done');
+    }
+
+    if (metadata.state === CompactState.STATE_CANCELLED) {
+        return i18n('compaction.status-cancelled');
+    }
+
+    return i18n('compaction.status-starting');
+}
+
+function CompactTableStatusDetails({operation}: {operation: TOperation}) {
+    const {metadata} = operation;
+    const progress = getCompactionProgress(operation);
     const shardProgress = getCompactionShardProgress(operation);
 
     if (!isCompactMetadata(metadata)) {
@@ -54,12 +82,14 @@ function CompactTableStatus({operation}: {operation: TOperation}) {
     }
 
     return (
-        <Flex className={b('popover')} direction="column" gap="1">
+        <Flex className={b('compaction-popover')} direction="column" gap="1">
             <Text variant="subheader-1">{i18n('compaction.status-title')}</Text>
             {metadata.state && (
                 <Text>{i18n('compaction.status-state', {state: metadata.state})}</Text>
             )}
-            {progress && <Text>{i18n('compaction.status-progress', {progress})}</Text>}
+            {typeof progress === 'number' && (
+                <Text>{i18n('compaction.status-progress', {progress})}</Text>
+            )}
             {shardProgress && (
                 <Text>
                     {i18n('compaction.status-shards', {
@@ -72,30 +102,43 @@ function CompactTableStatus({operation}: {operation: TOperation}) {
     );
 }
 
-export function CompactTableAction({path, database, databaseFullPath}: CompactTableActionProps) {
-    const [autoRefreshInterval] = useAutoRefreshInterval();
+export function CompactTableStatusBanner({operation}: {operation: TOperation}) {
+    const progress = getProgress(operation);
+    const progressWidth = `${progress}%`;
+
+    return (
+        <Flex className={b('compaction-banner')} gap="3" alignItems="flex-start">
+            <Icon className={b('compaction-banner-icon')} data={Gear} size={20} />
+            <Flex direction="column" gap="2" className={b('compaction-banner-content')}>
+                <Text variant="subheader-2">{i18n('compaction.banner-title')}</Text>
+                <Text variant="body-1">{i18n('compaction.banner-description')}</Text>
+                <div
+                    className={b('compaction-progress')}
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={progress}
+                >
+                    <div className={b('compaction-progress-fill')} style={{width: progressWidth}} />
+                </div>
+                <Text variant="body-1" color="secondary">
+                    {i18n('compaction.banner-progress', {
+                        progress,
+                        status: getCompactionProgressDescription(operation),
+                    })}
+                </Text>
+            </Flex>
+        </Flex>
+    );
+}
+
+export function CompactTableAction({
+    runningCompaction,
+    isFetching,
+    isStarting,
+    onApply,
+}: CompactTableActionProps) {
     const [dialogOpen, setDialogOpen] = React.useState(false);
-    const featureFlagsAvailable = useFeatureFlagsAvailable();
-
-    const {currentData: featureFlags} = configsApi.useGetFeatureFlagsQuery(
-        {database},
-        {skip: !featureFlagsAvailable},
-    );
-    const compactionEnabled = isForcedCompactionEnabled(featureFlags);
-
-    const {
-        currentData: runningCompaction,
-        isFetching: isCompactionFetching,
-        refetch: refetchCompaction,
-    } = operationsApi.useGetTableCompactionQuery(
-        {database, path},
-        {
-            pollingInterval: autoRefreshInterval,
-            skip: !compactionEnabled,
-        },
-    );
-    const [startTableCompaction, startTableCompactionResponse] =
-        operationsApi.useStartTableCompactionMutation();
 
     const handleCloseDialog = React.useCallback(() => {
         setDialogOpen(false);
@@ -105,43 +148,17 @@ export function CompactTableAction({path, database, databaseFullPath}: CompactTa
         setDialogOpen(true);
     }, []);
 
-    const handleApply = React.useCallback(
-        async ({cascade, maxShardsInFlight}: {cascade: boolean; maxShardsInFlight?: number}) => {
-            await startTableCompaction({
-                database,
-                path: transformPath(path, databaseFullPath),
-                cascade,
-                maxShardsInFlight,
-            }).unwrap();
-
-            await refetchCompaction();
-        },
-        [database, databaseFullPath, path, refetchCompaction, startTableCompaction],
-    );
-
-    if (!compactionEnabled) {
-        return null;
-    }
-
-    const progress = formatProgress(runningCompaction);
-    const buttonText = runningCompaction
-        ? progress || i18n('compaction.action-running')
-        : i18n('compaction.action-run');
-
     const button = (
         <Button
-            view="flat-secondary"
-            title={
-                runningCompaction
-                    ? i18n('compaction.action-running-title')
-                    : i18n('compaction.action-run')
-            }
+            view="normal"
+            size="s"
             onClick={handleOpenDialog}
             disabled={Boolean(runningCompaction)}
-            loading={isCompactionFetching && !runningCompaction}
+            loading={isFetching && !runningCompaction}
+            aria-label={i18n('action_compaction')}
         >
-            <Icon data={GearPlay} size={16} />
-            {buttonText}
+            <Icon data={Gear} size={16} />
+            {i18n('action_compaction')}
         </Button>
     );
 
@@ -149,19 +166,19 @@ export function CompactTableAction({path, database, databaseFullPath}: CompactTa
         <React.Fragment>
             {runningCompaction ? (
                 <Popover
-                    content={<CompactTableStatus operation={runningCompaction} />}
+                    content={<CompactTableStatusDetails operation={runningCompaction} />}
                     placement="bottom-end"
                 >
-                    <span className={b('disabled-button-wrapper')}>{button}</span>
+                    <span className={b('compaction-disabled-button-wrapper')}>{button}</span>
                 </Popover>
             ) : (
-                button
+                <ActionTooltip title={i18n('action_run-compaction')}>{button}</ActionTooltip>
             )}
             <CompactTableDialog
                 open={dialogOpen}
                 onClose={handleCloseDialog}
-                onApply={handleApply}
-                loading={startTableCompactionResponse.isLoading}
+                onApply={onApply}
+                loading={isStarting}
             />
         </React.Fragment>
     );
@@ -231,12 +248,17 @@ function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialo
 
     return (
         <Dialog open={open} size="s" onClose={handleClose} onEnterKeyDown={() => handleSubmit()}>
-            <Dialog.Header caption={i18n('compaction.dialog-title')} />
+            <Dialog.Header
+                caption={<Text variant="subheader-3">{i18n('compaction.dialog-title')}</Text>}
+            />
             <form onSubmit={handleSubmit}>
-                <Dialog.Body className={b('dialog-body')}>
-                    <Flex direction="column" gap="3" alignItems="flex-start">
-                        <Flex className={b('dialog-row')} gap="3" alignItems="center">
-                            <label htmlFor="tableCompactionCascade" className={b('label')}>
+                <Dialog.Body className={b('compaction-dialog-body')}>
+                    <Flex direction="column" gap="4" alignItems="flex-start">
+                        <Flex className={b('compaction-dialog-row')} gap="3" alignItems="center">
+                            <label
+                                htmlFor="tableCompactionCascade"
+                                className={b('compaction-label')}
+                            >
                                 {i18n('compaction.field-cascade')}
                             </label>
                             <Switch
@@ -245,8 +267,11 @@ function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialo
                                 onUpdate={handleCascadeUpdate}
                             />
                         </Flex>
-                        <Flex className={b('dialog-row')} gap="3" alignItems="center">
-                            <label htmlFor="tableCompactionMaxShards" className={b('label')}>
+                        <Flex className={b('compaction-dialog-row')} gap="3" alignItems="center">
+                            <label
+                                htmlFor="tableCompactionMaxShards"
+                                className={b('compaction-label')}
+                            >
                                 {i18n('compaction.field-max-shards')}
                             </label>
                             <TextInput
@@ -254,21 +279,25 @@ function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialo
                                 type="number"
                                 value={maxShardsInFlight}
                                 onUpdate={handleMaxShardsUpdate}
-                                className={b('input')}
+                                className={b('compaction-input')}
                                 errorMessage={maxShardsError}
                                 validationState={maxShardsError ? 'invalid' : undefined}
                                 hasClear
                             />
                         </Flex>
                         {requestErrorMessage && (
-                            <Text color="danger" className={b('error')} title={requestErrorMessage}>
+                            <Text
+                                color="danger"
+                                className={b('compaction-error')}
+                                title={requestErrorMessage}
+                            >
                                 {requestErrorMessage}
                             </Text>
                         )}
                     </Flex>
                 </Dialog.Body>
                 <Dialog.Footer
-                    textButtonCancel={i18n('compaction.action-cancel')}
+                    textButtonCancel={i18n('action_cancel')}
                     textButtonApply={i18n('compaction.action-start')}
                     onClickButtonCancel={handleClose}
                     loading={loading}
