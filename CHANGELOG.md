@@ -1,5 +1,31 @@
 # Changelog
 
+## [15.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.6.0...v15.7.0) (2026-05-25)
+
+
+### Features
+
+* better hover for replicating disks ([#3911](https://github.com/ydb-platform/ydb-embedded-ui/issues/3911)) ([8c2cb95](https://github.com/ydb-platform/ydb-embedded-ui/commit/8c2cb95078856c025727565d98cb654de94a695c))
+* **Navigation:** items as links ([#3914](https://github.com/ydb-platform/ydb-embedded-ui/issues/3914)) ([e6e2359](https://github.com/ydb-platform/ydb-embedded-ui/commit/e6e2359a00dc1472fa90384919d9b660bec6a878))
+* show column compression settings for column tables ([#3933](https://github.com/ydb-platform/ydb-embedded-ui/issues/3933)) ([6232edc](https://github.com/ydb-platform/ydb-embedded-ui/commit/6232edc2b6da324166fa0ab21fb02d5621e916e8))
+* **StorageGroupInfo:** use blue theme for used space ([#3898](https://github.com/ydb-platform/ydb-embedded-ui/issues/3898)) ([5741a69](https://github.com/ydb-platform/ydb-embedded-ui/commit/5741a690db6f2b54df579435c3cfdf1ec250e621))
+* update yql grammar ([#3925](https://github.com/ydb-platform/ydb-embedded-ui/issues/3925)) ([501287c](https://github.com/ydb-platform/ydb-embedded-ui/commit/501287c2245a9f72130806c679879863193e64ed))
+
+
+### Bug Fixes
+
+* add disable ttl table action ([#3938](https://github.com/ydb-platform/ydb-embedded-ui/issues/3938)) ([cb8a1cf](https://github.com/ydb-platform/ydb-embedded-ui/commit/cb8a1cf6dcedc8715caa0e66e9fc3f94ccd6e85d))
+* copy results button works on plain HTTP (non-secure contexts) ([#3900](https://github.com/ydb-platform/ydb-embedded-ui/issues/3900)) ([42ac28d](https://github.com/ydb-platform/ydb-embedded-ui/commit/42ac28dc705e81f050557b77ae1dacdce601bbbd))
+* disable partition stats in describe request ([#3929](https://github.com/ydb-platform/ydb-embedded-ui/issues/3929)) ([905c72d](https://github.com/ydb-platform/ydb-embedded-ui/commit/905c72d264f66d60bcb7d2564272fae9b68cddae))
+* encode dynamic links params ([#3923](https://github.com/ydb-platform/ydb-embedded-ui/issues/3923)) ([733c964](https://github.com/ydb-platform/ydb-embedded-ui/commit/733c964281981a6a2145c4b2c37b65997e4e29b0))
+* not pass read_session_id to commit_offset ([#3932](https://github.com/ydb-platform/ydb-embedded-ui/issues/3932)) ([dd32338](https://github.com/ydb-platform/ydb-embedded-ui/commit/dd323383343b5339d194192dcbafc6c2c4ef540d))
+* open external interface links in new tabs ([#3920](https://github.com/ydb-platform/ydb-embedded-ui/issues/3920)) ([4c9f123](https://github.com/ydb-platform/ydb-embedded-ui/commit/4c9f123f7831207f5a4228fa419ec106a090e7d9))
+* **PDiskSpaceDistribution:** slot height calculation ([#3897](https://github.com/ydb-platform/ydb-embedded-ui/issues/3897)) ([632fa86](https://github.com/ydb-platform/ydb-embedded-ui/commit/632fa869eafd280635ddc8f86335fedddb525304))
+* **Search:** should not change user input ([#3936](https://github.com/ydb-platform/ydb-embedded-ui/issues/3936)) ([633ad76](https://github.com/ydb-platform/ydb-embedded-ui/commit/633ad761482120d7998bb65639238fc1a3cf0311))
+* show access tab for serverless databases ([#3922](https://github.com/ydb-platform/ydb-embedded-ui/issues/3922)) ([8c946be](https://github.com/ydb-platform/ydb-embedded-ui/commit/8c946beeae7278f9dd918431f5f2433c0cb08951))
+* tune editor shortcuts ([#3939](https://github.com/ydb-platform/ydb-embedded-ui/issues/3939)) ([17e5ad3](https://github.com/ydb-platform/ydb-embedded-ui/commit/17e5ad35bad406db88fcc458b9c9110c135ff2e2))
+* **useTopicScroll:** initial scroll logic ([#3908](https://github.com/ydb-platform/ydb-embedded-ui/issues/3908)) ([759ad10](https://github.com/ydb-platform/ydb-embedded-ui/commit/759ad10b3d75313b7f32d9f0424dfbaad3a79a7f))
+
 ## [15.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.5.1...v15.6.0) (2026-05-12)
 
 
