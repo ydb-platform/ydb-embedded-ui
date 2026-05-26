@@ -8,7 +8,6 @@ import type {
 } from '../../types/api/operations';
 import {isQueryErrorResponse} from '../../utils/query';
 import {
-    TABLE_COMPACTION_OPERATION_PAGE_LIMIT,
     TABLE_COMPACTION_OPERATION_PAGE_SIZE,
     createTableCompactionQuery,
 } from '../../utils/tableCompaction';
@@ -71,27 +70,16 @@ export const operationsApi = api.injectEndpoints({
         getCompactionList: build.query<TOperation[], {database: string}>({
             queryFn: async ({database}, {signal}) => {
                 try {
-                    const operations: TOperation[] = [];
-                    let pageToken: string | undefined;
-                    let pageCount = 0;
-
-                    do {
-                        pageCount += 1;
-                        const params: OperationListRequestParams = {
-                            database,
-                            kind: 'compaction',
-                            page_size: TABLE_COMPACTION_OPERATION_PAGE_SIZE,
-                            page_token: pageToken,
-                        };
-                        const data = await window.api.operation.getOperationList(params, {signal});
-                        const validatedData = validateOperationListResponse(data);
-
-                        operations.push(...(validatedData.operations ?? []));
-                        pageToken = getNextPageToken(validatedData);
-                    } while (pageToken && pageCount < TABLE_COMPACTION_OPERATION_PAGE_LIMIT);
+                    const params: OperationListRequestParams = {
+                        database,
+                        kind: 'compaction',
+                        page_size: TABLE_COMPACTION_OPERATION_PAGE_SIZE,
+                    };
+                    const data = await window.api.operation.getOperationList(params, {signal});
+                    const validatedData = validateOperationListResponse(data);
 
                     return {
-                        data: operations,
+                        data: validatedData.operations ?? [],
                     };
                 } catch (error) {
                     return {error};

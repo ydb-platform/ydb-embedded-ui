@@ -52,13 +52,12 @@ function getProgress(operation?: TOperation) {
 
 function getCompactionProgressDescription(operation: TOperation) {
     const {metadata} = operation;
-    const progress = getProgress(operation);
 
     if (!isCompactMetadata(metadata)) {
         return i18n('compaction.status-starting');
     }
 
-    if (metadata.state === CompactState.STATE_IN_PROGRESS && progress > 0) {
+    if (metadata.state === CompactState.STATE_IN_PROGRESS) {
         return i18n('compaction.status-running');
     }
 
