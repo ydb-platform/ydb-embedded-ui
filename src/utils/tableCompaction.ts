@@ -9,7 +9,7 @@ export const TABLE_COMPACTION_OPERATION_PAGE_SIZE = 100;
 
 export interface TableCompactionOptions {
     cascade: boolean;
-    maxShardsInFlight?: number;
+    parallel?: number;
 }
 
 export interface StartTableCompactionParams extends TableCompactionOptions {
@@ -32,11 +32,11 @@ export function createTableCompactionQuery(path: string, options: TableCompactio
     const queryOptions = [`CASCADE = ${options.cascade ? 'true' : 'false'}`];
 
     if (
-        typeof options.maxShardsInFlight === 'number' &&
-        Number.isInteger(options.maxShardsInFlight) &&
-        options.maxShardsInFlight > 0
+        typeof options.parallel === 'number' &&
+        Number.isInteger(options.parallel) &&
+        options.parallel > 0
     ) {
-        queryOptions.push(`MAX_SHARDS_IN_FLIGHT = ${options.maxShardsInFlight}`);
+        queryOptions.push(`PARALLEL = ${options.parallel}`);
     }
 
     return `${QUERY_TECHNICAL_MARK}\nALTER TABLE \`${safePath}\` COMPACT WITH (${queryOptions.join(', ')})`;

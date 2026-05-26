@@ -38,7 +38,7 @@
   "compaction.action-start": "Start",
   "compaction.dialog-title": "Run table compaction",
   "compaction.field-cascade": "Cascade",
-  "compaction.field-max-shards": "Max shards in flight",
+  "compaction.field-parallel": "Parallel shards",
   "compaction.error-positive-integer": "Value must be a positive integer",
   "compaction.banner-title": "Compaction in progress",
   "compaction.banner-description": "Manual compaction is running to merge old row versions and reduce overhead",

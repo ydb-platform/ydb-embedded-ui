@@ -27,16 +27,16 @@ import i18n from '../i18n';
 import './CompactTableAction.scss';
 
 const b = cn('ydb-diagnostics-table-info');
-const DEFAULT_MAX_SHARDS_IN_FLIGHT = '1';
+const DEFAULT_PARALLEL_SHARDS = '1';
 
 interface CompactTableActionProps {
     runningCompaction?: TOperation;
     isFetching: boolean;
     isStarting: boolean;
-    onApply: (value: {cascade: boolean; maxShardsInFlight?: number}) => Promise<void>;
+    onApply: (value: {cascade: boolean; parallel?: number}) => Promise<void>;
 }
 
-function parseMaxShardsInFlight(value: string) {
+function parseParallel(value: string) {
     if (!value.trim()) {
         return undefined;
     }
@@ -188,7 +188,7 @@ export function CompactTableAction({
 interface CompactTableDialogProps {
     open: boolean;
     onClose: () => void;
-    onApply: (value: {cascade: boolean; maxShardsInFlight?: number}) => Promise<void>;
+    onApply: (value: {cascade: boolean; parallel?: number}) => Promise<void>;
     loading: boolean;
     hasRunningCompaction: boolean;
 }
@@ -201,16 +201,16 @@ function CompactTableDialog({
     hasRunningCompaction,
 }: CompactTableDialogProps) {
     const [cascade, setCascade] = React.useState(true);
-    const [maxShardsInFlight, setMaxShardsInFlight] = React.useState(DEFAULT_MAX_SHARDS_IN_FLIGHT);
-    const [maxShardsError, setMaxShardsError] = React.useState('');
+    const [parallel, setParallel] = React.useState(DEFAULT_PARALLEL_SHARDS);
+    const [parallelError, setParallelError] = React.useState('');
     const [requestErrorMessage, setRequestErrorMessage] = React.useState('');
     const submitInProgressRef = React.useRef(false);
     const submitDisabled = loading || hasRunningCompaction;
 
     const resetFormState = React.useCallback(() => {
         setCascade(true);
-        setMaxShardsInFlight(DEFAULT_MAX_SHARDS_IN_FLIGHT);
-        setMaxShardsError('');
+        setParallel(DEFAULT_PARALLEL_SHARDS);
+        setParallelError('');
         setRequestErrorMessage('');
     }, []);
 
@@ -224,9 +224,9 @@ function CompactTableDialog({
         setRequestErrorMessage('');
     }, []);
 
-    const handleMaxShardsUpdate = React.useCallback((value: string) => {
-        setMaxShardsInFlight(value);
-        setMaxShardsError('');
+    const handleParallelUpdate = React.useCallback((value: string) => {
+        setParallel(value);
+        setParallelError('');
         setRequestErrorMessage('');
     }, []);
 
@@ -238,10 +238,10 @@ function CompactTableDialog({
                 return;
             }
 
-            const parsedMaxShardsInFlight = parseMaxShardsInFlight(maxShardsInFlight);
+            const parsedParallel = parseParallel(parallel);
 
-            if (parsedMaxShardsInFlight === null) {
-                setMaxShardsError(i18n('compaction.error-positive-integer'));
+            if (parsedParallel === null) {
+                setParallelError(i18n('compaction.error-positive-integer'));
                 return;
             }
 
@@ -251,7 +251,7 @@ function CompactTableDialog({
             try {
                 await onApply({
                     cascade,
-                    maxShardsInFlight: parsedMaxShardsInFlight,
+                    parallel: parsedParallel,
                 });
                 handleClose();
             } catch (error) {
@@ -260,7 +260,7 @@ function CompactTableDialog({
                 submitInProgressRef.current = false;
             }
         },
-        [cascade, handleClose, maxShardsInFlight, onApply, submitDisabled],
+        [cascade, handleClose, onApply, parallel, submitDisabled],
     );
 
     return (
@@ -286,19 +286,19 @@ function CompactTableDialog({
                         </Flex>
                         <Flex className={b('compaction-dialog-row')} gap="3" alignItems="center">
                             <label
-                                htmlFor="tableCompactionMaxShards"
+                                htmlFor="tableCompactionParallel"
                                 className={b('compaction-label')}
                             >
-                                {i18n('compaction.field-max-shards')}
+                                {i18n('compaction.field-parallel')}
                             </label>
                             <TextInput
-                                id="tableCompactionMaxShards"
+                                id="tableCompactionParallel"
                                 type="number"
-                                value={maxShardsInFlight}
-                                onUpdate={handleMaxShardsUpdate}
+                                value={parallel}
+                                onUpdate={handleParallelUpdate}
                                 className={b('compaction-input')}
-                                errorMessage={maxShardsError}
-                                validationState={maxShardsError ? 'invalid' : undefined}
+                                errorMessage={parallelError}
+                                validationState={parallelError ? 'invalid' : undefined}
                                 hasClear
                             />
                         </Flex>

@@ -88,13 +88,13 @@ export const operationsApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
         startTableCompaction: build.mutation<void, StartTableCompactionParams>({
-            queryFn: async ({database, path, cascade, maxShardsInFlight}, {signal}) => {
+            queryFn: async ({database, path, cascade, parallel}, {signal}) => {
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
                             query: createTableCompactionQuery(path, {
                                 cascade,
-                                maxShardsInFlight,
+                                parallel,
                             }),
                             database,
                             action: 'execute-query',

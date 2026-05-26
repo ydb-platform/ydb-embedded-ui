@@ -123,8 +123,8 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     }, [managePartitioningDialogConfig, database, path, updatePartitioning]);
 
     const handleStartCompaction = React.useCallback(
-        async ({cascade, maxShardsInFlight}: {cascade: boolean; maxShardsInFlight?: number}) => {
-            await startTableCompaction({database, path, cascade, maxShardsInFlight}).unwrap();
+        async ({cascade, parallel}: {cascade: boolean; parallel?: number}) => {
+            await startTableCompaction({database, path, cascade, parallel}).unwrap();
             refetchCompactionList().catch(() => undefined);
         },
         [database, path, refetchCompactionList, startTableCompaction],

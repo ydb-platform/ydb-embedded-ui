@@ -31,10 +31,10 @@ describe('tableCompaction utils', () => {
         expect(
             createTableCompactionQuery('folder/table`name', {
                 cascade: false,
-                maxShardsInFlight: 3,
+                parallel: 3,
             }),
         ).toBe(
-            '/*UI-QUERY-EXCLUDE*/\nALTER TABLE `folder/table``name` COMPACT WITH (CASCADE = false, MAX_SHARDS_IN_FLIGHT = 3)',
+            '/*UI-QUERY-EXCLUDE*/\nALTER TABLE `folder/table``name` COMPACT WITH (CASCADE = false, PARALLEL = 3)',
         );
     });
 
