@@ -179,6 +179,7 @@ export function CompactTableAction({
                 onClose={handleCloseDialog}
                 onApply={onApply}
                 loading={isStarting}
+                hasRunningCompaction={Boolean(runningCompaction)}
             />
         </React.Fragment>
     );
@@ -189,14 +190,22 @@ interface CompactTableDialogProps {
     onClose: () => void;
     onApply: (value: {cascade: boolean; maxShardsInFlight?: number}) => Promise<void>;
     loading: boolean;
+    hasRunningCompaction: boolean;
 }
 
-function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialogProps) {
+function CompactTableDialog({
+    open,
+    onClose,
+    onApply,
+    loading,
+    hasRunningCompaction,
+}: CompactTableDialogProps) {
     const [cascade, setCascade] = React.useState(true);
     const [maxShardsInFlight, setMaxShardsInFlight] = React.useState(DEFAULT_MAX_SHARDS_IN_FLIGHT);
     const [maxShardsError, setMaxShardsError] = React.useState('');
     const [requestErrorMessage, setRequestErrorMessage] = React.useState('');
     const submitInProgressRef = React.useRef(false);
+    const submitDisabled = loading || hasRunningCompaction;
 
     const resetFormState = React.useCallback(() => {
         setCascade(true);
@@ -225,7 +234,7 @@ function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialo
         async (event?: React.FormEvent) => {
             event?.preventDefault();
 
-            if (loading || submitInProgressRef.current) {
+            if (submitDisabled || submitInProgressRef.current) {
                 return;
             }
 
@@ -251,7 +260,7 @@ function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialo
                 submitInProgressRef.current = false;
             }
         },
-        [cascade, handleClose, loading, maxShardsInFlight, onApply],
+        [cascade, handleClose, maxShardsInFlight, onApply, submitDisabled],
     );
 
     return (
@@ -311,7 +320,7 @@ function CompactTableDialog({open, onClose, onApply, loading}: CompactTableDialo
                     loading={loading}
                     propsButtonApply={{
                         type: 'submit',
-                        disabled: loading,
+                        disabled: submitDisabled,
                     }}
                 />
             </form>
