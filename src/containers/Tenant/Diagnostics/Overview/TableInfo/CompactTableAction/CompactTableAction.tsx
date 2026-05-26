@@ -54,22 +54,22 @@ function getCompactionProgressDescription(operation: TOperation) {
     const {metadata} = operation;
 
     if (!isCompactMetadata(metadata)) {
-        return i18n('compaction.status-starting');
+        return i18n('value_compaction-starting');
     }
 
     if (metadata.state === CompactState.STATE_IN_PROGRESS) {
-        return i18n('compaction.status-running');
+        return i18n('value_compaction-running');
     }
 
     if (metadata.state === CompactState.STATE_DONE) {
-        return i18n('compaction.status-done');
+        return i18n('value_compaction-done');
     }
 
     if (metadata.state === CompactState.STATE_CANCELLED) {
-        return i18n('compaction.status-cancelled');
+        return i18n('value_compaction-cancelled');
     }
 
-    return i18n('compaction.status-starting');
+    return i18n('value_compaction-starting');
 }
 
 function CompactTableStatusDetails({operation}: {operation: TOperation}) {
@@ -83,16 +83,16 @@ function CompactTableStatusDetails({operation}: {operation: TOperation}) {
 
     return (
         <Flex className={b('compaction-popover')} direction="column" gap="1">
-            <Text variant="subheader-1">{i18n('compaction.status-title')}</Text>
+            <Text variant="subheader-1">{i18n('title_compaction')}</Text>
             {metadata.state && (
-                <Text>{i18n('compaction.status-state', {state: metadata.state})}</Text>
+                <Text>{i18n('field_compaction-state', {state: metadata.state})}</Text>
             )}
             {typeof progress === 'number' && (
-                <Text>{i18n('compaction.status-progress', {progress})}</Text>
+                <Text>{i18n('field_compaction-progress', {progress})}</Text>
             )}
             {shardProgress && (
                 <Text>
-                    {i18n('compaction.status-shards', {
+                    {i18n('field_compaction-shards', {
                         done: shardProgress.shardsDone,
                         total: shardProgress.shardsTotal,
                     })}
@@ -110,8 +110,8 @@ export function CompactTableStatusBanner({operation}: {operation: TOperation}) {
         <Flex className={b('compaction-banner')} gap="3" alignItems="flex-start">
             <Icon className={b('compaction-banner-icon')} data={GearPlay} size={20} />
             <Flex direction="column" gap="2" className={b('compaction-banner-content')}>
-                <Text variant="subheader-2">{i18n('compaction.banner-title')}</Text>
-                <Text variant="body-1">{i18n('compaction.banner-description')}</Text>
+                <Text variant="subheader-2">{i18n('title_compaction-in-progress')}</Text>
+                <Text variant="body-1">{i18n('context_compaction-in-progress')}</Text>
                 <div
                     className={b('compaction-progress')}
                     role="progressbar"
@@ -122,7 +122,7 @@ export function CompactTableStatusBanner({operation}: {operation: TOperation}) {
                     <div className={b('compaction-progress-fill')} style={{width: progressWidth}} />
                 </div>
                 <Text variant="body-1" color="secondary">
-                    {i18n('compaction.banner-progress', {
+                    {i18n('context_compaction-progress', {
                         progress,
                         status: getCompactionProgressDescription(operation),
                     })}
@@ -241,7 +241,7 @@ function CompactTableDialog({
             const parsedParallel = parseParallel(parallel);
 
             if (parsedParallel === null) {
-                setParallelError(i18n('compaction.error-positive-integer'));
+                setParallelError(i18n('alert_positive-integer'));
                 return;
             }
 
@@ -266,7 +266,7 @@ function CompactTableDialog({
     return (
         <Dialog open={open} size="s" onClose={handleClose}>
             <Dialog.Header
-                caption={<Text variant="subheader-3">{i18n('compaction.dialog-title')}</Text>}
+                caption={<Text variant="subheader-3">{i18n('title_run-table-compaction')}</Text>}
             />
             <form onSubmit={handleSubmit}>
                 <Dialog.Body className={b('compaction-dialog-body')}>
@@ -276,7 +276,7 @@ function CompactTableDialog({
                                 htmlFor="tableCompactionCascade"
                                 className={b('compaction-label')}
                             >
-                                {i18n('compaction.field-cascade')}
+                                {i18n('field_cascade')}
                             </label>
                             <Switch
                                 id="tableCompactionCascade"
@@ -289,7 +289,7 @@ function CompactTableDialog({
                                 htmlFor="tableCompactionParallel"
                                 className={b('compaction-label')}
                             >
-                                {i18n('compaction.field-parallel')}
+                                {i18n('field_parallel-shards')}
                             </label>
                             <TextInput
                                 id="tableCompactionParallel"
@@ -315,7 +315,7 @@ function CompactTableDialog({
                 </Dialog.Body>
                 <Dialog.Footer
                     textButtonCancel={i18n('action_cancel')}
-                    textButtonApply={i18n('compaction.action-start')}
+                    textButtonApply={i18n('action_start-compaction')}
                     onClickButtonCancel={handleClose}
                     loading={loading}
                     propsButtonApply={{

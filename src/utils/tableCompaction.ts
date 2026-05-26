@@ -3,6 +3,7 @@ import type {CompactMetadata, TOperation} from '../types/api/operations';
 import {CompactState, OPERATION_METADATA_TYPE_URLS} from '../types/api/operations';
 
 import {QUERY_TECHNICAL_MARK} from './constants';
+import {isFeatureFlagEnabled} from './featureFlags';
 
 export const FORCED_COMPACTION_FEATURE_FLAG = 'EnableForcedCompactions';
 export const TABLE_COMPACTION_OPERATION_PAGE_SIZE = 100;
@@ -15,12 +16,6 @@ export interface TableCompactionOptions {
 export interface StartTableCompactionParams extends TableCompactionOptions {
     database: string;
     path: string;
-}
-
-export function isFeatureFlagEnabled(featureFlags: FeatureFlagConfig[] | undefined, name: string) {
-    const featureFlag = featureFlags?.find((flag) => flag.Name === name);
-
-    return Boolean(featureFlag && (featureFlag.Current ?? featureFlag.Default));
 }
 
 export function isForcedCompactionEnabled(featureFlags: FeatureFlagConfig[] | undefined) {

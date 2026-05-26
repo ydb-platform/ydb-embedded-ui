@@ -84,17 +84,14 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
         {skip: !isRowTable || !featureFlagsAvailable},
     );
     const compactionEnabled = isRowTable && isForcedCompactionEnabled(featureFlags);
-    const {
-        currentData: compactionOperations,
-        isFetching: isCompactionFetching,
-        refetch: refetchCompactionList,
-    } = operationsApi.useGetCompactionListQuery(
-        {database},
-        {
-            pollingInterval: autoRefreshInterval,
-            skip: !compactionEnabled,
-        },
-    );
+    const {currentData: compactionOperations, isFetching: isCompactionFetching} =
+        operationsApi.useGetCompactionListQuery(
+            {database},
+            {
+                pollingInterval: autoRefreshInterval,
+                skip: !compactionEnabled,
+            },
+        );
     const runningCompaction = React.useMemo(
         () => findRunningTableCompactionOperation(compactionOperations, path),
         [compactionOperations, path],
@@ -125,9 +122,8 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const handleStartCompaction = React.useCallback(
         async ({cascade, parallel}: {cascade: boolean; parallel?: number}) => {
             await startTableCompaction({database, path, cascade, parallel}).unwrap();
-            refetchCompactionList().catch(() => undefined);
         },
-        [database, path, refetchCompactionList, startTableCompaction],
+        [database, path, startTableCompaction],
     );
 
     return (
