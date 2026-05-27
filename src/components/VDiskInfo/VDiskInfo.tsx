@@ -29,6 +29,7 @@ const b = cn('ydb-vdisk-info');
 
 interface VDiskInfoProps<T extends PreparedVDisk> {
     data?: T;
+    /** @deprecated VDisk page link is now rendered externally */
     withVDiskPageLink?: boolean;
     withTitle?: boolean;
     className?: string;

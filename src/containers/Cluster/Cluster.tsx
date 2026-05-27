@@ -30,6 +30,7 @@ import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {DEFAULT_CLUSTER_TAB_KEY} from '../../utils/constants';
+import {isModifiedClickEvent} from '../../utils/events';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useSetting} from '../../utils/hooks/useSetting';
@@ -345,7 +346,7 @@ function useClusterTab() {
 
     const onClusterTabClick = React.useCallback(
         (event: React.MouseEvent<HTMLElement>) => {
-            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) {
+            if (isModifiedClickEvent(event)) {
                 return;
             }
 

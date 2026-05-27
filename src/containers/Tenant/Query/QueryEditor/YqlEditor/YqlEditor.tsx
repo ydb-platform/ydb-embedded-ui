@@ -40,6 +40,10 @@ import {TabsManager} from '../utils/tabsManager';
 import {getKeyBindings} from './keybindings';
 
 const CONTEXT_MENU_GROUP_ID = 'navigation';
+const AUTOCOMPLETE_OPEN_PARENTHESIS = '(';
+const AUTOCOMPLETE_CLOSE_PARENTHESIS = ')';
+const TRIGGER_SUGGEST_ACTION_ID = 'editor.action.triggerSuggest';
+const TRIGGER_SUGGEST_SOURCE = 'ydb-parenthesis-autocomplete';
 
 type SnippetController = {insert: (snippet: string) => void};
 type PendingSnippetKey = {tabId: string; snippet: string};
@@ -96,6 +100,7 @@ export function YqlEditor({
     const [monacoGhostInstance, setMonacoGhostInstance] =
         React.useState<ReturnType<typeof createMonacoGhostInstance>>();
     const [isCodeAssistEnabled] = useSetting(SETTING_KEYS.ENABLE_CODE_ASSISTANT);
+    const [enableAutocomplete] = useSetting(SETTING_KEYS.ENABLE_AUTOCOMPLETE);
 
     const editorOptions = useEditorOptions();
     const updateErrorsHighlighting = useUpdateErrorsHighlighting();
@@ -107,6 +112,7 @@ export function YqlEditor({
     const [isEditorMounted, setIsEditorMounted] = React.useState(false);
 
     const isMultiTabQueryEditorEnabled = useMultiTabQueryEditorEnabled();
+    const isAutocompleteEnabled = useEventHandler(() => Boolean(enableAutocomplete));
 
     const applyPendingSnippet = React.useCallback(
         (editor: Monaco.editor.IStandaloneCodeEditor, tabId: string, snippet: string): boolean => {
@@ -311,6 +317,7 @@ export function YqlEditor({
             setMonacoGhostInstance(createMonacoGhostInstance(editor));
         }
 
+        initAutocompleteInParenthesesHandler(editor, isAutocompleteEnabled);
         initResizeHandler(editor);
         if (!isMultiTabQueryEditorEnabled) {
             initUserPrompt(editor, getLastQueryText);
@@ -420,7 +427,6 @@ export function YqlEditor({
             editor.addAction({
                 id: 'duplicateEditorTab',
                 label: i18n('editor-tabs.duplicate'),
-                keybindings: [keybindings.duplicateTab],
                 run: () => handleDuplicateActiveTabAction(),
             });
             editor.addAction({
@@ -473,6 +479,51 @@ export function YqlEditor({
             editorWillUnmount={editorWillUnmount}
         />
     );
+}
+
+function initAutocompleteInParenthesesHandler(
+    editor: Monaco.editor.IStandaloneCodeEditor,
+    isAutocompleteEnabled: () => boolean,
+) {
+    // Use content changes as a guard for cursor changes: cursor events alone would also fire
+    // when the user clicks or navigates into existing empty parentheses. We only want to
+    // trigger suggestions after a just-typed opening parenthesis or Monaco auto-closing `()`.
+    let shouldTriggerSuggest = false;
+
+    const modelContentDisposable = editor.onDidChangeModelContent(({changes}) => {
+        shouldTriggerSuggest = changes.some(({text}) => {
+            return text === AUTOCOMPLETE_OPEN_PARENTHESIS || text === '()';
+        });
+    });
+
+    const cursorPositionDisposable = editor.onDidChangeCursorPosition(({position}) => {
+        if (!shouldTriggerSuggest) {
+            return;
+        }
+        shouldTriggerSuggest = false;
+
+        if (!isAutocompleteEnabled()) {
+            return;
+        }
+
+        const model = editor.getModel();
+        if (!model) {
+            return;
+        }
+
+        const lineContent = model.getLineContent(position.lineNumber);
+        const nextCharacter = lineContent[position.column - 1];
+        if (nextCharacter !== AUTOCOMPLETE_CLOSE_PARENTHESIS) {
+            return;
+        }
+
+        editor.trigger(TRIGGER_SUGGEST_SOURCE, TRIGGER_SUGGEST_ACTION_ID, undefined);
+    });
+
+    editor.onDidDispose(() => {
+        modelContentDisposable.dispose();
+        cursorPositionDisposable.dispose();
+    });
 }
 
 function initResizeHandler(editor: Monaco.editor.IStandaloneCodeEditor) {

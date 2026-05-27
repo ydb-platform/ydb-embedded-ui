@@ -95,7 +95,7 @@ export const FeatureFlags = ({database, className}: FeatureFlagsProps) => {
         error,
     } = configsApi.useGetFeatureFlagsQuery({database}, {pollingInterval: autoRefreshInterval});
 
-    const featureFlagsFilter = search?.toLocaleLowerCase();
+    const featureFlagsFilter = search?.trim()?.toLocaleLowerCase();
     const featureFlags = featureFlagsFilter
         ? currentData.filter((item) => item.Name.toLocaleLowerCase().includes(featureFlagsFilter))
         : currentData;
@@ -104,7 +104,7 @@ export const FeatureFlags = ({database, className}: FeatureFlagsProps) => {
         <TableWithControlsLayout className={className}>
             <TableWithControlsLayout.Controls>
                 <Search
-                    value={featureFlagsFilter}
+                    value={search ?? ''}
                     onChange={handleSearchChange}
                     placeholder={i18n('search-placeholder')}
                     width={300}

@@ -28,7 +28,7 @@ export function NodeNetworkTable({
     const filters = React.useMemo(
         () => ({
             nodeId,
-            searchValue: searchValue || undefined,
+            searchValue: searchValue.trim() || undefined,
         }),
         [nodeId, searchValue],
     );

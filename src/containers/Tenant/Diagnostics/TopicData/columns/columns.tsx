@@ -16,6 +16,7 @@ import type {TopicMessageEnhanced} from '../../../../../types/api/topic';
 import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatBytes, formatTimestamp} from '../../../../../utils/dataFormatters/dataFormatters';
+import {isModifiedClickEvent} from '../../../../../utils/events';
 import {formatToMs} from '../../../../../utils/timeParsers';
 import {safeParseNumber} from '../../../../../utils/utils';
 import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
@@ -253,7 +254,7 @@ function Offset({offset, removed, notLoaded}: PartitionIdProps) {
 
     const handleClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
         // Let the browser handle modified clicks (new tab/window) natively
-        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+        if (isModifiedClickEvent(e)) {
             e.stopPropagation();
             return;
         }

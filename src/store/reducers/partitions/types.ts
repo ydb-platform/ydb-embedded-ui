@@ -36,5 +36,4 @@ export interface CommitOffsetParams {
     consumer: string;
     partitionId: number;
     offset: number;
-    readSessionId?: string;
 }

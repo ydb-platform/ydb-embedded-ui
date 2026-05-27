@@ -170,13 +170,14 @@ const ALL_SERVERLESS_DB_PAGES = [
     tablets,
     describe,
     configs,
+    access,
     operations,
     backups,
 ];
 
 const SERVERLESS_DB_PAGES = [database, monitoring, topQueries, configs, operations, backups];
 
-const DIAGNOSTICS_SERVERLESS_DB_PAGES = [overview, topShards, tablets, describe];
+const DIAGNOSTICS_SERVERLESS_DB_PAGES = [overview, topShards, tablets, describe, access];
 
 const TABLE_PAGES = [
     overview,

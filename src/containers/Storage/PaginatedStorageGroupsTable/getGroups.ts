@@ -40,7 +40,7 @@ export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
                 limit,
                 offset,
                 sort,
-                filter: searchValue,
+                filter: searchValue?.trim(),
                 with: visibleEntities,
                 database,
                 nodeId,

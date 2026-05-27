@@ -50,7 +50,7 @@ export const getStorageNodes: FetchData<
         limit,
         offset,
         sort,
-        filter: searchValue,
+        filter: searchValue?.trim(),
         uptime: getUptimeParamValue(nodesUptimeFilter),
         with: visibleEntities,
         database,

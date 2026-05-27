@@ -34,7 +34,7 @@ export function useQueriesHistory() {
     }, [savedHistoryQueries]);
 
     const filteredHistoryQueries = React.useMemo(() => {
-        const normalizedFilter = queriesFilter?.toLowerCase();
+        const normalizedFilter = queriesFilter?.trim().toLowerCase();
         return normalizedFilter
             ? preparedQueries.filter((item) =>
                   item.queryText.toLowerCase().includes(normalizedFilter),

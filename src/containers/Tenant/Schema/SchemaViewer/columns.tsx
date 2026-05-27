@@ -1,6 +1,7 @@
 import DataTable from '@gravity-ui/react-data-table';
 import {Icon} from '@gravity-ui/uikit';
 
+import {EColumnCodec} from '../../../../types/api/schema';
 import {getColumnWidth} from '../../../../utils/getColumnWidth';
 
 import i18n from './i18n';
@@ -114,12 +115,56 @@ const mediaColumn: SchemaColumn = {
     width: 100,
     render: ({row}) => row.prefferedPoolKind,
 };
+
+function getCompressionSortGroup({rawColumnCodec}: SchemaData) {
+    if (!rawColumnCodec) {
+        return 2;
+    }
+
+    if (rawColumnCodec === EColumnCodec.ColumnCodecPlain) {
+        return 1;
+    }
+
+    return 0;
+}
+
+function getCompressionCodecName({rawColumnCodec}: SchemaData) {
+    return rawColumnCodec ?? '';
+}
+
+function sortCompressionAscending(left: {row: SchemaData}, right: {row: SchemaData}) {
+    const leftGroup = getCompressionSortGroup(left.row);
+    const rightGroup = getCompressionSortGroup(right.row);
+
+    if (leftGroup !== rightGroup) {
+        return leftGroup - rightGroup;
+    }
+
+    if (leftGroup !== 0) {
+        return 0;
+    }
+
+    const leftName = getCompressionCodecName(left.row);
+    const rightName = getCompressionCodecName(right.row);
+
+    if (leftName < rightName) {
+        return -1;
+    }
+
+    if (leftName > rightName) {
+        return 1;
+    }
+
+    return (left.row.columnCodecLevel ?? -1) - (right.row.columnCodecLevel ?? -1);
+}
+
 const compressionColumn: SchemaColumn = {
     name: SCHEMA_TABLE_COLUMS_IDS.columnCodec,
     get header() {
         return i18n('column-title.compression');
     },
     width: 130,
+    sortAscending: sortCompressionAscending,
     render: ({row}) => row.columnCodec,
 };
 
@@ -153,7 +198,10 @@ export function getExternalTableColumns(data?: SchemaData[]): SchemaColumn[] {
     return normalizeColumns([idColumn, nameColumn, typeColumn, notNullColumn], data);
 }
 export function getColumnTableColumns(data?: SchemaData[]): SchemaColumn[] {
-    return normalizeColumns([idColumn, nameColumn, typeColumn, notNullColumn], data);
+    return normalizeColumns(
+        [idColumn, nameColumn, typeColumn, notNullColumn, compressionColumn],
+        data,
+    );
 }
 export function getRowTableColumns(
     data: SchemaData[] | undefined,

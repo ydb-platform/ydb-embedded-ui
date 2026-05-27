@@ -247,10 +247,13 @@ export function TabletsTable({
             }
             return {filteredTablets: tablets, showEndOfRange: showEnd};
         }
+
+        const preparedTabletsSearch = tabletsSearch?.trim() ?? '';
+
         return {
             filteredTablets: tablets.filter((tablet) => {
                 showEnd = showEnd || Boolean(tablet.EndOfRangeKeyPrefix);
-                return String(tablet.TabletId).includes(tabletsSearch ?? '');
+                return String(tablet.TabletId).includes(preparedTabletsSearch);
             }),
             showEndOfRange: showEnd,
         };

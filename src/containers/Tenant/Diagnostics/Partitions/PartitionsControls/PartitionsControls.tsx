@@ -34,8 +34,8 @@ export const PartitionsControls = ({
             return;
         }
 
-        const partitionIdRe = new RegExp(escapeRegExp(partitionIdSearchValue), 'i');
-        const generalRe = new RegExp(escapeRegExp(generalSearchValue), 'i');
+        const partitionIdRe = new RegExp(escapeRegExp(partitionIdSearchValue.trim()), 'i');
+        const generalRe = new RegExp(escapeRegExp(generalSearchValue.trim()), 'i');
 
         const filteredPartitions = partitions.filter((partition) => {
             const {

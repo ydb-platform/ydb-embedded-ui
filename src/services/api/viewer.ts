@@ -213,7 +213,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 database,
                 path: this.getSchemaPath(path),
                 enums: true,
-                partition_stats: true,
+                partition_stats: false,
                 subs: 0,
             },
             {concurrentId: concurrentId || `getDescribe|${path}`, requestConfig: {signal}, timeout},
@@ -662,7 +662,7 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     commitOffset(
-        {database, path, consumer, partitionId, offset, readSessionId}: CommitOffsetParams,
+        {database, path, consumer, partitionId, offset}: CommitOffsetParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.post(
@@ -673,7 +673,6 @@ export class ViewerAPI extends BaseYdbAPI {
                 consumer,
                 partition_id: partitionId,
                 offset,
-                read_session_id: readSessionId,
             },
             {},
             {concurrentId, requestConfig: {signal}},

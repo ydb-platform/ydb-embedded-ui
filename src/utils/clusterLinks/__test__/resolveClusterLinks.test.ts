@@ -93,7 +93,7 @@ describe('substituteUrlParams', () => {
                 'other',
                 namespaces,
             ),
-        ).toBe('https://example.com/?balancer=https://balancer.example.com');
+        ).toBe('https://example.com/?balancer=https%3A%2F%2Fbalancer.example.com');
     });
 
     test('resolves deeply nested dotted paths by traversing objects', () => {
@@ -178,7 +178,7 @@ describe('substituteUrlParams', () => {
                 'cluster',
                 namespaces,
             ),
-        ).toBe('https://example.com/my-cluster?balancer=https://balancer.example.com');
+        ).toBe('https://example.com/my-cluster?balancer=https%3A%2F%2Fbalancer.example.com');
     });
 
     test('returns undefined when flat placeholder resolves but dotted does not', () => {
@@ -221,6 +221,49 @@ describe('substituteUrlParams', () => {
             ),
         ).toBe('https://example.com/balancer-val/db-name');
     });
+
+    test('replaces raw placeholders inside encoded query text with encoded values', () => {
+        const namespaces = makeNamespaces({
+            cluster: {name: 'prod cluster'},
+            database: {name: '/Root/my db'},
+        });
+
+        expect(
+            substituteUrlParams(
+                'https://monitoring.example.com/projects/example/logs?query=%7Bproject+%3D+%22example%22%2C+cluster+%3D+%22{cluster.name}%22%2C+database+%3D+%22{database.name}%22%7D',
+                'other',
+                namespaces,
+            ),
+        ).toBe(
+            'https://monitoring.example.com/projects/example/logs?query=%7Bproject+%3D+%22example%22%2C+cluster+%3D+%22prod%20cluster%22%2C+database+%3D+%22%2FRoot%2Fmy%20db%22%7D',
+        );
+    });
+
+    test('returns undefined when a raw namespace placeholder is unresolved', () => {
+        const namespaces = makeNamespaces({cluster: {name: 'my-cluster'}});
+
+        expect(
+            substituteUrlParams(
+                'https://example.com/logs?query=%7Bcluster+%3D+%22{cluster.missing}%22%7D',
+                'cluster',
+                namespaces,
+            ),
+        ).toBeUndefined();
+    });
+
+    test('keeps URL-encoded brace literals as static URL text', () => {
+        const namespaces = makeNamespaces({cluster: {name: 'my-cluster'}});
+
+        expect(
+            substituteUrlParams(
+                'https://example.com/logs?query=message%3D~%22id-%5C%5Cd%7B4%7D%22+token%3D%22%7Bliteral_token%7D%22+encodedCluster%3D%22%7Bcluster.name%7D%22+cluster%3D%22{cluster.name}%22',
+                'cluster',
+                namespaces,
+            ),
+        ).toBe(
+            'https://example.com/logs?query=message%3D~%22id-%5C%5Cd%7B4%7D%22+token%3D%22%7Bliteral_token%7D%22+encodedCluster%3D%22%7Bcluster.name%7D%22+cluster%3D%22my-cluster%22',
+        );
+    });
 });
 
 describe('resolveClusterLinks', () => {
@@ -236,20 +279,20 @@ describe('resolveClusterLinks', () => {
             expect(result).toHaveLength(3);
             expect(result[0]).toEqual(
                 expect.objectContaining({
-                    title: 'Coredumps',
-                    url: 'https://cores.example.com',
-                }),
-            );
-            expect(result[1]).toEqual(
-                expect.objectContaining({
                     title: 'Logging',
                     url: 'https://logging.example.com',
                 }),
             );
-            expect(result[2]).toEqual(
+            expect(result[1]).toEqual(
                 expect.objectContaining({
                     title: 'SLO Logs',
                     url: 'https://slo.example.com',
+                }),
+            );
+            expect(result[2]).toEqual(
+                expect.objectContaining({
+                    title: 'Coredumps',
+                    url: 'https://cores.example.com',
                 }),
             );
         });
@@ -286,6 +329,7 @@ describe('resolveClusterLinks', () => {
                 expect.objectContaining({
                     title: 'My Logs',
                     url: 'https://logs.example.com/my-cluster',
+                    target: '_blank',
                 }),
             );
         });
@@ -381,6 +425,33 @@ describe('resolveClusterLinks', () => {
             expect(result[0].icon).toBeDefined();
         });
 
+        test('keeps dynamic-only links in source order', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'cluster',
+                    url: 'https://cores.example.com',
+                    context: 'cores',
+                    title: 'Cores',
+                },
+                {
+                    type: 'cluster',
+                    url: 'https://monitoring.example.com',
+                    context: 'monitoring',
+                    title: 'Monitoring',
+                },
+                {
+                    type: 'cluster',
+                    url: 'https://logs.example.com',
+                    context: 'logging',
+                    title: 'Logs',
+                },
+            ];
+
+            const result = resolveClusterLinks(makeClusterInfo({links: dynamicLinks}));
+
+            expect(result.map((l) => l.title)).toEqual(['Cores', 'Monitoring', 'Logs']);
+        });
+
         test('resolves {cluster.balancer} dotted placeholder from cluster info', () => {
             const dynamicLinks: MetaClusterLink[] = [
                 {
@@ -396,7 +467,7 @@ describe('resolveClusterLinks', () => {
 
             expect(result).toHaveLength(1);
             expect(result[0].url).toBe(
-                'https://monitoring.com/?balancer=https://balancer.example.com',
+                'https://monitoring.com/?balancer=https%3A%2F%2Fbalancer.example.com',
             );
         });
 
@@ -450,7 +521,7 @@ describe('resolveClusterLinks', () => {
 
             expect(result).toHaveLength(1);
             expect(result[0].url).toBe(
-                'https://monitoring.com/my-cluster?balancer=https://balancer.example.com',
+                'https://monitoring.com/my-cluster?balancer=https%3A%2F%2Fbalancer.example.com',
             );
         });
     });
@@ -550,7 +621,7 @@ describe('resolveClusterLinks', () => {
 
             // logging is covered by dynamic, but cores and slo-logs should fall back to legacy
             expect(result).toHaveLength(3);
-            expect(result.map((l) => l.title)).toEqual(['New Logging', 'Coredumps', 'SLO Logs']);
+            expect(result.map((l) => l.title)).toEqual(['New Logging', 'SLO Logs', 'Coredumps']);
         });
 
         test('failed dynamic link does not suppress legacy link for same context', () => {
@@ -590,12 +661,14 @@ describe('resolveClusterLinks', () => {
                 expect.objectContaining({
                     title: 'Monitoring',
                     url: 'https://monitoring.example.com',
+                    target: '_blank',
                 }),
             );
             expect(result[1]).toEqual(
                 expect.objectContaining({
                     title: 'Custom Link',
                     url: 'https://custom.example.com',
+                    target: '_blank',
                 }),
             );
         });
@@ -661,7 +734,7 @@ describe('resolveClusterLinks', () => {
             expect(coresLinks[0].title).toBe('Custom Cores');
         });
 
-        test('additional links are placed after dynamic links', () => {
+        test('sorts final result by context priority when additional links are present', () => {
             const dynamicLinks: MetaClusterLink[] = [
                 {
                     type: 'cluster',
@@ -673,6 +746,7 @@ describe('resolveClusterLinks', () => {
 
             const additionalLinks: ClusterLink[] = [
                 {title: 'Coredumps', url: 'https://cores.example.com', context: 'cores'},
+                {title: 'Monitoring', url: 'https://monitoring.example.com', context: 'monitoring'},
                 {title: 'Extra Link', url: 'https://extra.example.com'},
             ];
 
@@ -682,9 +756,32 @@ describe('resolveClusterLinks', () => {
             );
 
             expect(result.map((l) => l.title)).toEqual([
+                'Monitoring',
                 'Dynamic Logging',
                 'Coredumps',
                 'Extra Link',
+            ]);
+        });
+
+        test('sorts known additional contexts by priority and preserves unknown-context order', () => {
+            const additionalLinks: ClusterLink[] = [
+                {title: 'Coredumps', url: 'https://cores.example.com', context: 'cores'},
+                {title: 'Audit Logs', url: 'https://audit.example.com', context: 'audit-logs'},
+                {title: 'Custom Link', url: 'https://custom.example.com'},
+                {title: 'SLO Logs', url: 'https://slo.example.com', context: 'slo-logs'},
+                {title: 'Logging', url: 'https://logs.example.com', context: 'logging'},
+                {title: 'Monitoring', url: 'https://monitoring.example.com', context: 'monitoring'},
+            ];
+
+            const result = resolveClusterLinks(makeClusterInfo(), additionalLinks);
+
+            expect(result.map((l) => l.title)).toEqual([
+                'Monitoring',
+                'Logging',
+                'SLO Logs',
+                'Audit Logs',
+                'Coredumps',
+                'Custom Link',
             ]);
         });
 
@@ -817,7 +914,8 @@ describe('resolveDatabaseLinks', () => {
             expect(result[0]).toEqual(
                 expect.objectContaining({
                     title: 'DB Logs',
-                    url: 'https://logs.example.com//Root/mydb',
+                    target: '_blank',
+                    url: 'https://logs.example.com/%2FRoot%2Fmydb',
                 }),
             );
         });
@@ -867,7 +965,7 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
 
             expect(result).toHaveLength(1);
-            expect(result[0].url).toBe('https://example.com//Root/mydb?type=Dedicated');
+            expect(result[0].url).toBe('https://example.com/%2FRoot%2Fmydb?type=Dedicated');
         });
 
         test('resolves {database.Name} dotted placeholder from database info', () => {
@@ -882,7 +980,7 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
 
             expect(result).toHaveLength(1);
-            expect(result[0].url).toBe('https://example.com//Root/mydb');
+            expect(result[0].url).toBe('https://example.com/%2FRoot%2Fmydb');
         });
 
         test('resolves {cluster.name} dotted placeholder from cluster info', () => {
@@ -898,7 +996,29 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo(), clusterInfo);
 
             expect(result).toHaveLength(1);
-            expect(result[0].url).toBe('https://example.com/prod-cluster//Root/mydb');
+            expect(result[0].url).toBe('https://example.com/prod-cluster/%2FRoot%2Fmydb');
+        });
+
+        test('resolves raw placeholders in Monitoring logs URL', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://monitoring.example.com/projects/example/logs?query=%7Bproject+%3D+%22example%22%2C+service+%3D+%22database%22%2C+cluster+%3D+%22{cluster.name}%22%2C+database+%3D+%22{database.name}%22%2C+message+%3D~+%22sanitized_token%22%7D&from=now-1d&to=now&columns=level%2Ctime%2Cmessage%2Chost&groupByField=level&chartType=line&linesMode=single',
+                    title: 'DB Logs',
+                },
+            ];
+
+            const clusterInfo = makeClusterInfo({name: 'prod cluster'});
+            const result = resolveDatabaseLinks(
+                dynamicLinks,
+                makeDatabaseInfo({Name: '/Root/my db'}),
+                clusterInfo,
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe(
+                'https://monitoring.example.com/projects/example/logs?query=%7Bproject+%3D+%22example%22%2C+service+%3D+%22database%22%2C+cluster+%3D+%22prod%20cluster%22%2C+database+%3D+%22%2FRoot%2Fmy%20db%22%2C+message+%3D~+%22sanitized_token%22%7D&from=now-1d&to=now&columns=level%2Ctime%2Cmessage%2Chost&groupByField=level&chartType=line&linesMode=single',
+            );
         });
 
         test('resolves {cluster.balancer} from cluster info in database links', () => {
@@ -915,7 +1035,7 @@ describe('resolveDatabaseLinks', () => {
 
             expect(result).toHaveLength(1);
             expect(result[0].url).toBe(
-                'https://monitoring.com/?balancer=https://balancer.example.com&db=/Root/mydb',
+                'https://monitoring.com/?balancer=https%3A%2F%2Fbalancer.example.com&db=%2FRoot%2Fmydb',
             );
         });
 
@@ -961,7 +1081,7 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
 
             expect(result).toHaveLength(1);
-            expect(result[0].url).toBe('https://logs.example.com//Root/mydb');
+            expect(result[0].url).toBe('https://logs.example.com/%2FRoot%2Fmydb');
         });
 
         test('resolves {id} alias to PreparedTenant.Id', () => {
@@ -1021,7 +1141,9 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
 
             expect(result).toHaveLength(1);
-            expect(result[0].url).toBe('https://example.com//Root/mydb?id=db-123&type=Dedicated');
+            expect(result[0].url).toBe(
+                'https://example.com/%2FRoot%2Fmydb?id=db-123&type=Dedicated',
+            );
         });
 
         test('resolves {database.name} dotted alias from database info', () => {
@@ -1036,7 +1158,7 @@ describe('resolveDatabaseLinks', () => {
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
 
             expect(result).toHaveLength(1);
-            expect(result[0].url).toBe('https://example.com//Root/mydb');
+            expect(result[0].url).toBe('https://example.com/%2FRoot%2Fmydb');
         });
 
         test('PascalCase field takes priority when tenant already has a lowercase field', () => {
@@ -1070,7 +1192,7 @@ describe('resolveDatabaseLinks', () => {
 
             expect(result).toHaveLength(1);
             expect(result[0].url).toBe(
-                'https://monitoring.com//Root/mydb?balancer=https://balancer.example.com',
+                'https://monitoring.com/%2FRoot%2Fmydb?balancer=https%3A%2F%2Fbalancer.example.com',
             );
         });
 
@@ -1273,6 +1395,33 @@ describe('resolveDatabaseLinks', () => {
             expect(result).toHaveLength(3);
             expect(result.map((l) => l.title)).toEqual(['First', 'Second', 'Third']);
         });
+
+        test('keeps dynamic-only database links in source order', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'database',
+                    url: 'https://cores.example.com',
+                    context: 'cores',
+                    title: 'Cores',
+                },
+                {
+                    type: 'database',
+                    url: 'https://monitoring.example.com',
+                    context: 'monitoring',
+                    title: 'Monitoring',
+                },
+                {
+                    type: 'database',
+                    url: 'https://logs.example.com',
+                    context: 'logging',
+                    title: 'Logs',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo());
+
+            expect(result.map((l) => l.title)).toEqual(['Cores', 'Monitoring', 'Logs']);
+        });
     });
 
     describe('context-based deduplication with additional links', () => {
@@ -1304,6 +1453,8 @@ describe('resolveDatabaseLinks', () => {
             expect(result).toHaveLength(2);
             expect(result[0].title).toBe('Monitoring');
             expect(result[1].title).toBe('Logs');
+            expect(result[0].target).toBe('_blank');
+            expect(result[1].target).toBe('_blank');
         });
 
         test('dynamic logging link suppresses additional logging link', () => {
@@ -1401,7 +1552,7 @@ describe('resolveDatabaseLinks', () => {
             );
 
             expect(result).toHaveLength(2);
-            expect(result.map((l) => l.title)).toEqual(['New Logs', 'Monitoring']);
+            expect(result.map((l) => l.title)).toEqual(['Monitoring', 'New Logs']);
         });
 
         test('failed dynamic link does not suppress additional link for same context', () => {
@@ -1460,7 +1611,7 @@ describe('resolveDatabaseLinks', () => {
             expect(result[1].title).toBe('Custom Link');
         });
 
-        test('additional links are placed after dynamic links', () => {
+        test('sorts final result by context priority when additional links are present', () => {
             const dynamicLinks: MetaClusterLink[] = [
                 {
                     type: 'database',
@@ -1488,9 +1639,61 @@ describe('resolveDatabaseLinks', () => {
             );
 
             expect(result.map((l) => l.title)).toEqual([
-                'Dynamic Logging',
                 'Monitoring',
+                'Dynamic Logging',
                 'Extra Link',
+            ]);
+        });
+
+        test('sorts known additional contexts by priority and preserves unknown-context order', () => {
+            const additionalLinks: DatabaseLink[] = [
+                {
+                    title: 'Coredumps',
+                    url: 'https://cores.example.com',
+                    icon: mockIcon,
+                    context: 'cores',
+                },
+                {
+                    title: 'Audit Logs',
+                    url: 'https://audit.example.com',
+                    icon: mockIcon,
+                    context: 'audit-logs',
+                },
+                {title: 'Custom Link', url: 'https://custom.example.com', icon: mockIcon},
+                {
+                    title: 'SLO Logs',
+                    url: 'https://slo.example.com',
+                    icon: mockIcon,
+                    context: 'slo-logs',
+                },
+                {
+                    title: 'Logging',
+                    url: 'https://logs.example.com',
+                    icon: mockIcon,
+                    context: 'logging',
+                },
+                {
+                    title: 'Monitoring',
+                    url: 'https://monitoring.example.com',
+                    icon: mockIcon,
+                    context: 'monitoring',
+                },
+            ];
+
+            const result = resolveDatabaseLinks(
+                undefined,
+                makeDatabaseInfo(),
+                undefined,
+                additionalLinks,
+            );
+
+            expect(result.map((l) => l.title)).toEqual([
+                'Monitoring',
+                'Logging',
+                'SLO Logs',
+                'Audit Logs',
+                'Coredumps',
+                'Custom Link',
             ]);
         });
 
