@@ -18,7 +18,7 @@ import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
 import {StorageVisibleEntitiesFilter} from '../StorageVisibleEntitiesFilter/StorageVisibleEntitiesFilter';
 import i18n from '../i18n';
 import {b} from '../shared';
-import {useStorageQueryParams} from '../useStorageQueryParams';
+import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
 
 interface StorageControlsProps {
     withTypeSelector?: boolean;
@@ -42,7 +42,6 @@ export function StorageGroupsControls({
         storageType,
         visibleEntities,
         storageGroupsGroupByParam,
-        storageExpertMode,
         handleTextFilterGroupsChange,
         handleStorageTypeChange,
         handleVisibleEntitiesChange,
@@ -54,6 +53,7 @@ export function StorageGroupsControls({
     const [storageExpertModeSettingEnabled] = useSetting<boolean>(
         SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
     );
+    const isStorageExpertMode = useIsStorageExpertMode();
     const bridgeModeEnabled = useBridgeModeEnabled();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
@@ -123,8 +123,8 @@ export function StorageGroupsControls({
             />
             {storageExpertModeSettingEnabled ? (
                 <Button
-                    selected={storageExpertMode}
-                    onClick={() => handleStorageExpertModeChange(!storageExpertMode)}
+                    selected={isStorageExpertMode}
+                    onClick={() => handleStorageExpertModeChange(!isStorageExpertMode)}
                 >
                     <Icon data={ChartTreemap} />
                     {i18n('controls_expert-mode')}

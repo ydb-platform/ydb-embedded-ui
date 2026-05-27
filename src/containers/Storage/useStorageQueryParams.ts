@@ -171,6 +171,15 @@ export function useStorageQueryParams() {
     };
 }
 
+export function useIsStorageExpertMode() {
+    const [storageExpertModeSettingEnabled] = useSetting<boolean>(
+        SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
+    );
+    const [storageExpertModeQueryParam] = useQueryParam('storageExpertMode', BooleanParam);
+
+    return Boolean(storageExpertModeSettingEnabled) && Boolean(storageExpertModeQueryParam);
+}
+
 export function useSaveStorageType() {
     const [queryStorageType, setQueryStorageType] = useQueryParam('type', StringParam);
     const [savedStorageType] = useSetting<StorageType>(
