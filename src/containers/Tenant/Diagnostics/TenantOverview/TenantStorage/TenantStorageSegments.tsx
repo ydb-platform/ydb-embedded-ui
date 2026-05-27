@@ -25,7 +25,8 @@ const b = cn('ydb-tenant-storage-segments');
 
 const SEGMENT_TOOLTIP_OPEN_DELAY = 100;
 const SEGMENT_TOOLTIP_CLOSE_DELAY = 100;
-const SEGMENT_TOOLTIP_PLACEMENT: PopupPlacement = ['top', 'bottom'];
+const PROGRESS_TOOLTIP_PLACEMENT: PopupPlacement = ['top', 'bottom'];
+const LEGEND_TOOLTIP_PLACEMENT: PopupPlacement = ['bottom', 'top'];
 
 const SEGMENT_COLORS: Record<TenantStorageSegmentKey, string> = {
     [TENANT_STORAGE_SEGMENT_KEYS.rowTables]: 'var(--ydb-storage-segment-row-tables)',
@@ -119,6 +120,7 @@ function SegmentTooltip({
     children,
     formatValue,
     onOpenChange,
+    placement,
     segment,
     total,
     totalLabel,
@@ -126,13 +128,14 @@ function SegmentTooltip({
     children: React.ReactElement;
     formatValue: (value: number) => string;
     onOpenChange: (segmentKey: TenantStorageSegmentKey, open: boolean) => void;
+    placement: PopupPlacement;
     segment: TenantStorageSegment;
     total: number;
     totalLabel: string;
 }) {
     return (
         <Tooltip
-            placement={SEGMENT_TOOLTIP_PLACEMENT}
+            placement={placement}
             openDelay={SEGMENT_TOOLTIP_OPEN_DELAY}
             closeDelay={SEGMENT_TOOLTIP_CLOSE_DELAY}
             content={
@@ -189,6 +192,7 @@ export function SegmentedProgressBar({
                         key={segment.key}
                         formatValue={formatTooltipValue}
                         onOpenChange={onSegmentOpenChange}
+                        placement={PROGRESS_TOOLTIP_PLACEMENT}
                         segment={segment}
                         total={tooltipTotal}
                         totalLabel={tooltipTotalLabel}
@@ -251,6 +255,7 @@ export function LegendItems({
                         key={segment.key}
                         formatValue={formatTooltipValue}
                         onOpenChange={onSegmentOpenChange}
+                        placement={LEGEND_TOOLTIP_PLACEMENT}
                         segment={segment}
                         total={tooltipTotal}
                         totalLabel={tooltipTotalLabel}
