@@ -1,6 +1,7 @@
 import React from 'react';
 
-import {Select, Text} from '@gravity-ui/uikit';
+import {ChartTreemap} from '@gravity-ui/icons';
+import {Button, Icon, Select, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
@@ -9,6 +10,8 @@ import {
     useBlobStorageCapacityMetricsEnabled,
     useBridgeModeEnabled,
 } from '../../../store/reducers/capabilities/hooks';
+import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
+import {useSetting} from '../../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {STORAGE_GROUPS_GROUP_BY_OPTIONS} from '../PaginatedStorageGroupsTable/columns/constants';
 import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
@@ -39,13 +42,18 @@ export function StorageGroupsControls({
         storageType,
         visibleEntities,
         storageGroupsGroupByParam,
+        storageExpertMode,
         handleTextFilterGroupsChange,
         handleStorageTypeChange,
         handleVisibleEntitiesChange,
         handleStorageGroupsGroupByParamChange,
+        handleStorageExpertModeChange,
     } = useStorageQueryParams();
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const [storageExpertModeSettingEnabled] = useSetting<boolean>(
+        SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
+    );
     const bridgeModeEnabled = useBridgeModeEnabled();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
@@ -113,6 +121,15 @@ export function StorageGroupsControls({
                 total={entitiesCountTotal}
                 current={entitiesCountCurrent}
             />
+            {storageExpertModeSettingEnabled ? (
+                <Button
+                    selected={storageExpertMode}
+                    onClick={() => handleStorageExpertModeChange(!storageExpertMode)}
+                >
+                    <Icon data={ChartTreemap} />
+                    {i18n('controls_expert-mode')}
+                </Button>
+            ) : null}
         </React.Fragment>
     );
 }

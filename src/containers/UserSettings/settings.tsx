@@ -144,6 +144,12 @@ export const enableTenantNavigationV2Setting: SettingProps = {
     description: i18n('settings.enableTenantNavigationV2.description'),
 };
 
+export const enableStorageExpertModeSetting: SettingProps = {
+    settingKey: SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
+    title: i18n('settings.enableStorageExpertMode.title'),
+    description: i18n('settings.enableStorageExpertMode.description'),
+};
+
 export function applyClusterSpecificQueryStreamingSetting(
     settings: YDBEmbeddedUISettings,
     clusterName?: string,
@@ -291,6 +297,7 @@ export const experimentsSection: SettingsSection = {
         enableBlobStorageCapacityMetricsSetting,
         enableTenantNavigationV2Setting,
         enableNewStorageViewSetting,
+        enableStorageExpertModeSetting,
     ],
 };
 
