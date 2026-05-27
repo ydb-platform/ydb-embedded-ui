@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {StringParam, useQueryParam, useQueryParams} from 'use-query-params';
+import {BooleanParam, StringParam, useQueryParam, useQueryParams} from 'use-query-params';
 
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
@@ -24,6 +24,7 @@ export function useStorageQueryParams() {
         uptimeFilter: StringParam,
         storageNodesGroupBy: StringParam,
         storageGroupsGroupBy: StringParam,
+        storageExpertMode: BooleanParam,
     });
 
     const [_savedStorageType, setSavedStorageType] = useSetting<StorageType>(
@@ -46,6 +47,8 @@ export function useStorageQueryParams() {
     const storageNodesGroupByParam = storageNodesGroupByParamSchema.parse(
         queryParams.storageNodesGroupBy,
     );
+
+    const storageExpertMode = Boolean(queryParams.storageExpertMode);
 
     React.useEffect(() => {
         if (queryParams.search) {
@@ -89,6 +92,13 @@ export function useStorageQueryParams() {
     const handleStorageNodesGroupByParamChange = React.useCallback(
         (value: string) => {
             setQueryParams({storageNodesGroupBy: value || undefined}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+
+    const handleStorageExpertModeChange = React.useCallback(
+        (value: boolean) => {
+            setQueryParams({storageExpertMode: value ? true : undefined}, 'replaceIn');
         },
         [setQueryParams],
     );
@@ -144,6 +154,7 @@ export function useStorageQueryParams() {
         nodesUptimeFilter,
         storageGroupsGroupByParam,
         storageNodesGroupByParam,
+        storageExpertMode,
 
         handleTextFilterGroupsChange,
         handleTextFilterNodesChange,
@@ -153,6 +164,7 @@ export function useStorageQueryParams() {
 
         handleStorageGroupsGroupByParamChange,
         handleStorageNodesGroupByParamChange,
+        handleStorageExpertModeChange,
 
         handleShowAllGroups,
         handleShowAllNodes,
