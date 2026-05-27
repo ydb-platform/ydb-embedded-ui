@@ -22,6 +22,7 @@ import {
     getCompactionShardProgress,
     isCompactMetadata,
 } from '../../../../../../utils/tableCompaction';
+import {reachMetricaGoal} from '../../../../../../utils/yaMetrica';
 import i18n from '../i18n';
 
 import './CompactTableAction.scss';
@@ -145,6 +146,7 @@ export function CompactTableAction({
     }, []);
 
     const handleOpenDialog = React.useCallback(() => {
+        reachMetricaGoal('openCompactionDialog');
         setDialogOpen(true);
     }, []);
 
@@ -249,6 +251,7 @@ function CompactTableDialog({
             submitInProgressRef.current = true;
 
             try {
+                reachMetricaGoal('startCompaction');
                 await onApply({
                     cascade,
                     parallel: parsedParallel,

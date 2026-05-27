@@ -85,7 +85,7 @@ export const operationsApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: ['All', 'CompactionList'],
         }),
         startTableCompaction: build.mutation<void, StartTableCompactionParams>({
             queryFn: async ({database, path, cascade, parallel}, {signal}) => {
@@ -112,7 +112,7 @@ export const operationsApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            invalidatesTags: ['All'],
+            invalidatesTags: ['CompactionList'],
         }),
         cancelOperation: build.mutation({
             queryFn: async (params: OperationCancelRequestParams, {signal}) => {
