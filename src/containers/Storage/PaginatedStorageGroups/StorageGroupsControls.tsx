@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ChartTreemap} from '@gravity-ui/icons';
-import {Button, Icon, Select, Text} from '@gravity-ui/uikit';
+import {Button, Flex, Icon, Select, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
@@ -14,6 +14,7 @@ import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {useSetting} from '../../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {STORAGE_GROUPS_GROUP_BY_OPTIONS} from '../PaginatedStorageGroupsTable/columns/constants';
+import {StorageExpertModePanel} from '../StorageExpertModePanel/StorageExpertModePanel';
 import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
 import {StorageVisibleEntitiesFilter} from '../StorageVisibleEntitiesFilter/StorageVisibleEntitiesFilter';
 import i18n from '../i18n';
@@ -84,53 +85,56 @@ export function StorageGroupsControls({
     const displayTypeSelector = withTypeSelector && isUserAllowedToMakeChanges;
 
     return (
-        <React.Fragment>
-            <Search
-                value={groupsSearchValue}
-                onChange={handleTextFilterGroupsChange}
-                placeholder={i18n('controls_groups-search-placeholder')}
-                className={b('search')}
-            />
-            {displayTypeSelector && (
-                <StorageTypeFilter value={storageType} onChange={handleStorageTypeChange} />
-            )}
-            {withGroupBySelect ? null : (
-                <StorageVisibleEntitiesFilter
-                    value={visibleEntities}
-                    onChange={handleVisibleEntitiesChange}
+        <Flex direction="column" gap={2} width="100%">
+            <Flex gap={2} alignItems="center" wrap className={b('controls-row')}>
+                <Search
+                    value={groupsSearchValue}
+                    onChange={handleTextFilterGroupsChange}
+                    placeholder={i18n('controls_groups-search-placeholder')}
+                    className={b('search')}
                 />
-            )}
-            {withGroupBySelect ? (
-                <React.Fragment>
-                    <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>
-                    <Select
-                        hasClear
-                        placeholder={'-'}
-                        width={150}
-                        defaultValue={
-                            storageGroupsGroupByParam ? [storageGroupsGroupByParam] : undefined
-                        }
-                        onUpdate={handleGroupBySelectUpdate}
-                        options={groupByOptions}
+                {displayTypeSelector && (
+                    <StorageTypeFilter value={storageType} onChange={handleStorageTypeChange} />
+                )}
+                {withGroupBySelect ? null : (
+                    <StorageVisibleEntitiesFilter
+                        value={visibleEntities}
+                        onChange={handleVisibleEntitiesChange}
                     />
-                </React.Fragment>
-            ) : null}
-            <EntitiesCount
-                label={i18n('groups')}
-                loading={entitiesLoading}
-                total={entitiesCountTotal}
-                current={entitiesCountCurrent}
-            />
-            {storageExpertModeSettingEnabled ? (
-                <Button
-                    selected={isStorageExpertMode}
-                    onClick={() => handleStorageExpertModeChange(!isStorageExpertMode)}
-                >
-                    <Icon data={ChartTreemap} />
-                    {i18n('controls_expert-mode')}
-                </Button>
-            ) : null}
-        </React.Fragment>
+                )}
+                {withGroupBySelect ? (
+                    <React.Fragment>
+                        <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>
+                        <Select
+                            hasClear
+                            placeholder={'-'}
+                            width={150}
+                            defaultValue={
+                                storageGroupsGroupByParam ? [storageGroupsGroupByParam] : undefined
+                            }
+                            onUpdate={handleGroupBySelectUpdate}
+                            options={groupByOptions}
+                        />
+                    </React.Fragment>
+                ) : null}
+                <EntitiesCount
+                    label={i18n('groups')}
+                    loading={entitiesLoading}
+                    total={entitiesCountTotal}
+                    current={entitiesCountCurrent}
+                />
+                {storageExpertModeSettingEnabled ? (
+                    <Button
+                        selected={isStorageExpertMode}
+                        onClick={() => handleStorageExpertModeChange(!isStorageExpertMode)}
+                    >
+                        <Icon data={ChartTreemap} />
+                        {i18n('controls_expert-mode')}
+                    </Button>
+                ) : null}
+            </Flex>
+            {isStorageExpertMode ? <StorageExpertModePanel /> : null}
+        </Flex>
     );
 }
 
