@@ -151,6 +151,8 @@ export interface UiMetricaGoals {
     stopQuery?: string;
     openManagePartitioning?: string;
     applyManagePartitioning?: string;
+    openCompactionDialog?: string;
+    startCompaction?: string;
     createQueryTab?: string;
     closeQueryTab?: string;
     duplicateQueryTab?: string;
