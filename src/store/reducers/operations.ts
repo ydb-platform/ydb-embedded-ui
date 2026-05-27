@@ -3,8 +3,15 @@ import type {
     OperationForgetRequestParams,
     OperationKind,
     OperationListRequestParams,
+    TOperation,
     TOperationList,
 } from '../../types/api/operations';
+import {isQueryErrorResponse} from '../../utils/query';
+import {
+    TABLE_COMPACTION_OPERATION_PAGE_SIZE,
+    createTableCompactionQuery,
+} from '../../utils/tableCompaction';
+import type {StartTableCompactionParams} from '../../utils/tableCompaction';
 
 import {api} from './api';
 
@@ -24,6 +31,10 @@ function validateOperationListResponse(data: TOperationList): TOperationList {
     return data;
 }
 
+function getNextPageToken(data: TOperationList) {
+    return data.next_page_token && data.next_page_token !== '0' ? data.next_page_token : undefined;
+}
+
 export const operationsApi = api.injectEndpoints({
     endpoints: (build) => ({
         getOperationList: build.infiniteQuery<
@@ -35,7 +46,7 @@ export const operationsApi = api.injectEndpoints({
                 initialPageParam: undefined,
                 getNextPageParam: (lastPage) => {
                     // Return next page token if available, undefined if no more pages
-                    return lastPage.next_page_token === '0' ? undefined : lastPage.next_page_token;
+                    return getNextPageToken(lastPage);
                 },
             },
             queryFn: async ({queryArg, pageParam}, {signal}) => {
@@ -55,6 +66,53 @@ export const operationsApi = api.injectEndpoints({
                 }
             },
             providesTags: ['All'],
+        }),
+        getCompactionList: build.query<TOperation[], {database: string}>({
+            queryFn: async ({database}, {signal}) => {
+                try {
+                    const params: OperationListRequestParams = {
+                        database,
+                        kind: 'compaction',
+                        page_size: TABLE_COMPACTION_OPERATION_PAGE_SIZE,
+                    };
+                    const data = await window.api.operation.getOperationList(params, {signal});
+                    const validatedData = validateOperationListResponse(data);
+
+                    return {
+                        data: validatedData.operations ?? [],
+                    };
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All', 'CompactionList'],
+        }),
+        startTableCompaction: build.mutation<void, StartTableCompactionParams>({
+            queryFn: async ({database, path, cascade, parallel}, {signal}) => {
+                try {
+                    const response = await window.api.viewer.sendQuery(
+                        {
+                            query: createTableCompactionQuery(path, {
+                                cascade,
+                                parallel,
+                            }),
+                            database,
+                            action: 'execute-query',
+                            internal_call: true,
+                        },
+                        {signal},
+                    );
+
+                    if (isQueryErrorResponse(response)) {
+                        return {error: response.error};
+                    }
+
+                    return {data: undefined};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            invalidatesTags: ['CompactionList'],
         }),
         cancelOperation: build.mutation({
             queryFn: async (params: OperationCancelRequestParams, {signal}) => {

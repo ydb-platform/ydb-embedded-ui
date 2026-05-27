@@ -2,6 +2,7 @@ import type {BytesSizes} from '../../../../../utils/bytesParsers';
 import {getBytesSizeUnit, sizes} from '../../../../../utils/bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatNumber, formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
+import type {FormatMetricBytesOptions} from '../../../../../utils/storageMetrics';
 import {formatMetricBytes} from '../../../../../utils/storageMetrics';
 import {parseOptionalNonNegativeNumber} from '../../../../../utils/utils';
 
@@ -25,8 +26,12 @@ export function formatSummaryPercent(value: number) {
     return value > 0 && formattedValue ? i18n('context_used-percent', {value: formattedValue}) : '';
 }
 
-function formatByteMetric(value?: string | number, size?: BytesSizes) {
-    return formatMetricBytes(value, size, TENANT_STORAGE_FORMAT_OPTIONS);
+function formatByteMetric(
+    value?: string | number,
+    size?: BytesSizes,
+    options?: FormatMetricBytesOptions,
+) {
+    return formatMetricBytes(value, size, {...TENANT_STORAGE_FORMAT_OPTIONS, ...options});
 }
 
 function normalizeTenantStorageSummaryMetricUnit(unit: BytesSizes): TenantStorageSummaryMetricUnit {
@@ -64,8 +69,8 @@ export function formatTenantStorageApproximateMetric(
 
     const shouldUseAdaptiveUnit = size !== undefined && numericValue < sizes[size].value;
     const formattedValue = shouldUseAdaptiveUnit
-        ? formatTenantStorageAdaptiveMetric(numericValue)
-        : formatTenantStorageSummaryMetric(numericValue, size);
+        ? formatByteMetric(numericValue, undefined, {coarseApproximateRounding: true})
+        : formatByteMetric(numericValue, size, {coarseApproximateRounding: true});
 
     return formattedValue === EMPTY_DATA_PLACEHOLDER ? formattedValue : `~${formattedValue}`;
 }

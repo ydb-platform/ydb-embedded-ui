@@ -3,17 +3,34 @@ import {getBytesSizeUnit, sizes} from './bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from './constants';
 import {formatNumber, formatPercent} from './dataFormatters/dataFormatters';
 
-interface FormatMetricBytesOptions {
+export interface FormatMetricBytesOptions {
     allowNegative?: boolean;
     bytesDecimalPlaces?: 0 | 1;
+    coarseApproximateRounding?: boolean;
     gbDecimalPlacesBelowOne?: 1 | 2;
+}
+
+function getCoarseApproximateMetricBytesDecimalPlaces(size: BytesSizes, convertedValue: number) {
+    if ((size === 'tb' || size === 'pb') && convertedValue > 1 && convertedValue < 10) {
+        return 1;
+    }
+
+    return 0;
 }
 
 function getMetricBytesDecimalPlaces(
     size: BytesSizes,
     convertedValue: number,
-    {bytesDecimalPlaces = 1, gbDecimalPlacesBelowOne = 2}: FormatMetricBytesOptions = {},
+    {
+        bytesDecimalPlaces = 1,
+        coarseApproximateRounding = false,
+        gbDecimalPlacesBelowOne = 2,
+    }: FormatMetricBytesOptions = {},
 ) {
+    if (coarseApproximateRounding) {
+        return getCoarseApproximateMetricBytesDecimalPlaces(size, convertedValue);
+    }
+
     if (size === 'b') {
         return convertedValue % 1 === 0 ? 0 : bytesDecimalPlaces;
     }

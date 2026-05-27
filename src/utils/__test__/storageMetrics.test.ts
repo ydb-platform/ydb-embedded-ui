@@ -23,6 +23,26 @@ describe('storageMetrics', () => {
         );
     });
 
+    test('formatMetricBytes keeps default precision when coarse approximate rounding is disabled', () => {
+        expect(formatMetricBytes(3_450_000_000_000, 'tb')).toBe(`3.45${UNBREAKABLE_GAP}TB`);
+        expect(formatMetricBytes(521_000_000_000, 'tb')).toBe(`0.52${UNBREAKABLE_GAP}TB`);
+    });
+
+    test('formatMetricBytes supports coarse approximate rounding', () => {
+        expect(formatMetricBytes(521_000_000_000, 'gb', {coarseApproximateRounding: true})).toBe(
+            `521${UNBREAKABLE_GAP}GB`,
+        );
+        expect(formatMetricBytes(3_450_000_000_000, 'tb', {coarseApproximateRounding: true})).toBe(
+            `3.5${UNBREAKABLE_GAP}TB`,
+        );
+        expect(
+            formatMetricBytes(1_700_000_000_000_000, 'pb', {coarseApproximateRounding: true}),
+        ).toBe(`1.7${UNBREAKABLE_GAP}PB`);
+        expect(formatMetricBytes(10_400_000_000_000, 'tb', {coarseApproximateRounding: true})).toBe(
+            `10${UNBREAKABLE_GAP}TB`,
+        );
+    });
+
     test('formatMetricBytes can reject negative values', () => {
         expect(formatMetricBytes(-1, undefined, {allowNegative: false})).toBe(
             EMPTY_DATA_PLACEHOLDER,
