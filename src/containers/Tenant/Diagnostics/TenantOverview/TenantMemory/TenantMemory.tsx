@@ -1,12 +1,10 @@
 import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
 import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
-import {getTenantPath} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {TMemoryStats} from '../../../../../types/api/nodes';
 import {cn} from '../../../../../utils/cn';
 import {formatStorageValuesToGb} from '../../../../../utils/dataFormatters/dataFormatters';
-import {useSearchQuery} from '../../../../../utils/hooks';
-import {TenantTabsGroups} from '../../../TenantPages';
+import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
@@ -27,7 +25,7 @@ interface TenantMemoryProps {
 const b = cn('tenant-memory');
 
 export function TenantMemory({database, memoryStats, memoryUsed, memoryLimit}: TenantMemoryProps) {
-    const query = useSearchQuery();
+    const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
     const renderMemoryDetails = () => {
         if (memoryStats) {
             return <MemoryDetailsSection memoryStats={memoryStats} />;
@@ -65,10 +63,7 @@ export function TenantMemory({database, memoryStats, memoryUsed, memoryLimit}: T
 
             <StatsWrapper
                 title={i18n('title_top-nodes-by-memory')}
-                allEntitiesLink={getTenantPath({
-                    ...query,
-                    [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
-                })}
+                allEntitiesLink={getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.nodes)}
             >
                 <TopNodesByMemory database={database} />
             </StatsWrapper>

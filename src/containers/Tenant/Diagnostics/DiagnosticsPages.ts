@@ -4,7 +4,11 @@ import type {LabelProps} from '@gravity-ui/uikit';
 import {useLocation} from 'react-router-dom';
 
 import {getTenantPath, parseQuery} from '../../../routes';
-import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
+import {
+    TENANT_DIAGNOSTICS_TABS_IDS,
+    TENANT_PAGE,
+    TENANT_PAGES_IDS,
+} from '../../../store/reducers/tenant/constants';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
@@ -331,6 +335,10 @@ export const useDiagnosticsPageLinkGetter = () => {
         (tab: string, params?: TenantQuery) => {
             return getTenantPath({
                 ...queryParams,
+                // Ensure we land on the diagnostics page, since with tenant navigation v2
+                // the Overview lives on a separate `database` page and the tab parameter
+                // alone wouldn't switch the page.
+                [TENANT_PAGE]: TENANT_PAGES_IDS.diagnostics,
                 [TenantTabsGroups.diagnosticsTab]: tab,
                 ...params,
             });
