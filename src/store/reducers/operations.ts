@@ -100,7 +100,7 @@ export const operationsApi = api.injectEndpoints({
                             action: 'execute-query',
                             internal_call: true,
                         },
-                        {signal, withRetries: true},
+                        {signal},
                     );
 
                     if (isQueryErrorResponse(response)) {
