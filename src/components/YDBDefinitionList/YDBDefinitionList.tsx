@@ -1,6 +1,11 @@
 import React from 'react';
 
-import type {DefinitionListProps, IconData, LabelProps} from '@gravity-ui/uikit';
+import type {
+    DefinitionListItemProps,
+    DefinitionListProps,
+    IconData,
+    LabelProps,
+} from '@gravity-ui/uikit';
 import {ClipboardButton, DefinitionList, Flex, Icon, Label, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
@@ -15,6 +20,7 @@ export type YDBDefinitionListItem = {
     name: string;
     content: React.ReactNode;
     copyText?: string | number;
+    note?: DefinitionListItemProps['note'];
 };
 
 export interface YDBDefinitionListHeaderLabel {
