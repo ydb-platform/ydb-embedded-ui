@@ -222,8 +222,7 @@ interface LegendItemContentProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const LegendItemContent = React.forwardRef<HTMLDivElement, LegendItemContentProps>(
     ({className, formatValue, onMouseDown, segment, ...props}, ref) => {
-        const displayValue = getTenantStorageSegmentDisplayValue(segment);
-        const formattedValue = formatValue(displayValue);
+        const formattedValue = formatValue(getTenantStorageSegmentDisplayValue(segment));
         const handleMouseDown = React.useCallback(
             (event: React.MouseEvent<HTMLDivElement>) => {
                 onMouseDown?.(event);
@@ -236,7 +235,7 @@ const LegendItemContent = React.forwardRef<HTMLDivElement, LegendItemContentProp
             <div
                 {...props}
                 ref={ref}
-                className={className ? `${b('legend-content')} ${className}` : b('legend-content')}
+                className={b('legend-content', className)}
                 onMouseDown={handleMouseDown}
                 tabIndex={0}
             >
