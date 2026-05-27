@@ -353,7 +353,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         });
 
         const storageUsage = page.locator('.ydb-storage-usage');
-        await expect(storageUsage).toBeVisible();
+        await expect(storageUsage).toBeVisible({timeout: VISIBILITY_TIMEOUT});
         await expect(storageUsage.getByText('SSD', {exact: true}).first()).toBeVisible();
         await expect(storageUsage.getByText('HDD', {exact: true}).first()).toBeVisible();
         await expect(storageUsage).toHaveScreenshot('storage-usage-multi-media.png');
@@ -551,7 +551,9 @@ test.describe('Diagnostics Storage usage tab', async () => {
 
         const diagnostics = new Diagnostics(page);
 
-        await expect(diagnostics.getTab(DiagnosticsTab.StorageUsage)).toBeVisible();
+        await expect(diagnostics.getTab(DiagnosticsTab.StorageUsage)).toBeVisible({
+            timeout: VISIBILITY_TIMEOUT,
+        });
 
         await page.getByRole('button', {name: 'Show 1 more'}).click();
 
