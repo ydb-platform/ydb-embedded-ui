@@ -1,5 +1,19 @@
 # Changelog
 
+## [15.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.7.0...v15.8.0) (2026-05-27)
+
+
+### Features
+
+* add description for RowCount ([#3942](https://github.com/ydb-platform/ydb-embedded-ui/issues/3942)) ([08a620e](https://github.com/ydb-platform/ydb-embedded-ui/commit/08a620e2290d6714d497009c752c778e02aced94))
+* add forced table compaction action ([#3916](https://github.com/ydb-platform/ydb-embedded-ui/issues/3916)) ([7905ec5](https://github.com/ydb-platform/ydb-embedded-ui/commit/7905ec54c54b032225af1092580e574fec8f09e0))
+
+
+### Bug Fixes
+
+* design review storage iteration 2 ([#3948](https://github.com/ydb-platform/ydb-embedded-ui/issues/3948)) ([4f9b85b](https://github.com/ydb-platform/ydb-embedded-ui/commit/4f9b85b06510df2b7b687a8773b848a98a9245bb))
+* navigation to tenant diagnostics ([#3947](https://github.com/ydb-platform/ydb-embedded-ui/issues/3947)) ([652bc63](https://github.com/ydb-platform/ydb-embedded-ui/commit/652bc630900dbdfeb82550eaac67712501c3778f))
+
 ## [15.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.6.0...v15.7.0) (2026-05-25)
 
 
