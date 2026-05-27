@@ -3,11 +3,9 @@ import {Flex} from '@gravity-ui/uikit';
 import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
-import {getTenantPath} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
-import {useSearchQuery} from '../../../../../utils/hooks';
-import {TenantTabsGroups} from '../../../TenantPages';
+import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 
@@ -21,7 +19,7 @@ export type {TenantStorageMetrics} from './types';
 
 export function TenantStorage({database, metrics, databaseType}: TenantStorageProps) {
     const {blobStorageUsed, tabletStorageUsed, blobStorageLimit, tabletStorageLimit} = metrics;
-    const query = useSearchQuery();
+    const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 
     const info = [
         {
@@ -63,10 +61,7 @@ export function TenantStorage({database, metrics, databaseType}: TenantStoragePr
             <Flex direction="column" gap={4}>
                 <StatsWrapper
                     title={i18n('title_top-tables-by-size')}
-                    allEntitiesLink={getTenantPath({
-                        ...query,
-                        [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.storage,
-                    })}
+                    allEntitiesLink={getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.storage)}
                 >
                     <TopTables database={database} />
                 </StatsWrapper>
@@ -83,10 +78,7 @@ export function TenantStorage({database, metrics, databaseType}: TenantStoragePr
             </StatsWrapper>
             <StatsWrapper
                 title={i18n('title_top-groups-by-usage')}
-                allEntitiesLink={getTenantPath({
-                    ...query,
-                    [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.storage,
-                })}
+                allEntitiesLink={getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.storage)}
             >
                 <TopGroups tenant={database} />
             </StatsWrapper>
