@@ -106,14 +106,14 @@ describe('TenantStorage display formatters', () => {
         expect(formatTenantStorageTableOverhead(513)).toBe('>500x');
     });
 
-    test('formats approximate metrics with a readable lower unit when needed', () => {
-        expect(formatTenantStorageApproximateMetric(18_000_000_000_000, 'tb')).toBe(
+    test('formats approximate metrics with coarse rounding', () => {
+        expect(formatTenantStorageApproximateMetric(18_400_000_000_000, 'tb')).toBe(
             `~${withUnit('18', 'TB')}`,
         );
-        expect(formatTenantStorageApproximateMetric(4_800_000_000_000, 'tb')).toBe(
+        expect(formatTenantStorageApproximateMetric(4_840_000_000_000, 'tb')).toBe(
             `~${withUnit('4.8', 'TB')}`,
         );
-        expect(formatTenantStorageApproximateMetric(600_000_000_000, 'tb')).toBe(
+        expect(formatTenantStorageApproximateMetric(600_400_000_000, 'tb')).toBe(
             `~${withUnit('600', 'GB')}`,
         );
         expect(formatTenantStorageApproximateMetric(undefined, 'tb')).toBe(EMPTY_DATA_PLACEHOLDER);
