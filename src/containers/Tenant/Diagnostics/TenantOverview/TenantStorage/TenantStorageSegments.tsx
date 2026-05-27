@@ -253,6 +253,7 @@ const LegendItemContent = React.forwardRef<HTMLDivElement, LegendItemContentProp
         );
     },
 );
+LegendItemContent.displayName = 'LegendItemContent';
 
 function SystemDetailsHelpMark({
     describedBy,
