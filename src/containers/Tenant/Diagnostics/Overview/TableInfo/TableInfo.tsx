@@ -154,6 +154,7 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                     )}
                     {compactionEnabled && (
                         <CompactTableAction
+                            key={`${database}/${path}`}
                             runningCompaction={runningCompaction}
                             isFetching={isCompactionFetching}
                             isStarting={isCompactionStarting}
