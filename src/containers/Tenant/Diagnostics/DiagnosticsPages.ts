@@ -9,11 +9,12 @@ import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
 } from '../../../store/reducers/tenant/constants';
-import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
+import type {TenantDiagnosticsTab, TenantPage} from '../../../store/reducers/tenant/types';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
 import type {TenantQuery} from '../TenantPages';
 import {TenantTabsGroups} from '../TenantPages';
+import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
 import i18n from './i18n';
 
@@ -327,23 +328,54 @@ export const getPagesByType = (
     return applyFilters(seeded, options);
 };
 
+// In tenant navigation v2 the database-overview tabs are split across two
+// top-level pages: the "stats"/management tabs (topQueries, storage, network,
+// monitoring, configs, operations, backups) live on `databasePage=database`,
+// while the rest (overview, topShards, nodes, tablets, describe, access) live
+// on `databasePage=diagnostics`. We have to route every "See all" link to the
+// correct top-level page, otherwise the target tab is missing from the active
+// page and Diagnostics silently falls back to its first tab. In v1 everything
+// lives under `databasePage=diagnostics`.
+//
+// Derive the set from the same DB_PAGES list used to render navigation, so the
+// two stay in sync automatically if pages are moved between sections later.
+// Serverless drops a few tabs from DB_PAGES (storage, network, nodes), but the
+// set is only used to *decide which top-level page hosts a tab*; missing tabs
+// just won't be rendered on either page, so we can safely use the regular-DB
+// arrays without branching on databaseType.
+const V2_DATABASE_PAGE_TABS = new Set<string>(DB_PAGES.map((page) => page.id));
+
+function getTenantPageForTab(tab: string, isV2Enabled: boolean): TenantPage {
+    if (!isV2Enabled) {
+        return TENANT_PAGES_IDS.diagnostics;
+    }
+    return V2_DATABASE_PAGE_TABS.has(tab)
+        ? TENANT_PAGES_IDS.database
+        : TENANT_PAGES_IDS.diagnostics;
+}
+
 export const useDiagnosticsPageLinkGetter = () => {
     const location = useLocation();
     const queryParams = parseQuery(location);
+    const isV2Enabled = useNavigationV2Enabled();
 
     const getLink = React.useCallback(
         (tab: string, params?: TenantQuery) => {
             return getTenantPath({
                 ...queryParams,
-                // Ensure we land on the diagnostics page, since with tenant navigation v2
-                // the Overview lives on a separate `database` page and the tab parameter
-                // alone wouldn't switch the page.
-                [TENANT_PAGE]: TENANT_PAGES_IDS.diagnostics,
-                [TenantTabsGroups.diagnosticsTab]: tab,
                 ...params,
+                // Make sure the link points to the page that actually owns this tab
+                // (database vs diagnostics in v2; always diagnostics in v1). Without
+                // this, switching only `diagnosticsTab` either does nothing (v2,
+                // staying on the database overview) or lands on a page where the
+                // tab does not exist (and gets silently replaced by the first tab).
+                // Spread after `params` so callers cannot accidentally override the
+                // page/tab the helper is responsible for.
+                [TENANT_PAGE]: getTenantPageForTab(tab, isV2Enabled),
+                [TenantTabsGroups.diagnosticsTab]: tab,
             });
         },
-        [queryParams],
+        [queryParams, isV2Enabled],
     );
 
     return getLink;
