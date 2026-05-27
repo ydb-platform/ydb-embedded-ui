@@ -11,7 +11,7 @@ export interface FormatMetricBytesOptions {
 }
 
 function getCoarseApproximateMetricBytesDecimalPlaces(size: BytesSizes, convertedValue: number) {
-    if (size === 'tb' && convertedValue > 1 && convertedValue < 10) {
+    if ((size === 'tb' || size === 'pb') && convertedValue > 1 && convertedValue < 10) {
         return 1;
     }
 
