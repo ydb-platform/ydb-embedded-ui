@@ -10,6 +10,8 @@
   "device": "Device",
   "realtime": "Realtime",
 
+  "value_no-data": "No data",
+
   "space": "Space",
   "usage": "Usage",
   "slots": "Slots",
