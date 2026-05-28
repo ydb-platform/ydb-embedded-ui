@@ -5,6 +5,7 @@
   "media-type": "Media Type",
   "erasure-species": "Erasure Species",
   "used-space": "Used Space",
+  "no-data": "No data",
   "usage": "Usage",
   "read-throughput": "Read Throughput",
   "write-throughput": "Write Throughput",

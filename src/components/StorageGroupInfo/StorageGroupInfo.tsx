@@ -85,9 +85,14 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
     const storageGroupInfoSecondColumn = [];
 
     if (valueIsDefined(Used) && valueIsDefined(Limit)) {
+        const usedNum = Number(Used);
+        const limitNum = Number(Limit);
+        const hasSpaceData = Number.isFinite(usedNum) && Number.isFinite(limitNum);
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('used-space'),
-            value: formatStorageValuesToGb(Number(Used), Number(Limit)).join(' / '),
+            value: hasSpaceData
+                ? formatStorageValuesToGb(usedNum, limitNum).join(' / ')
+                : storageGroupInfoKeyset('no-data'),
         });
     }
     if (valueIsDefined(Available)) {
