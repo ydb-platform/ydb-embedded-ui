@@ -1,11 +1,17 @@
-import React from 'react';
-
 import {Flex, SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../../utils/cn';
 import {useStorageQueryParams} from '../useStorageQueryParams';
 
+import {
+    AllLegend,
+    CompactionLegend,
+    FrontQueuesLegend,
+    SpaceLegend,
+    StateLegend,
+} from './components';
 import {VDisksGroupBy} from './constants';
+import type {VDisksGroupByValue} from './constants';
 import i18n from './i18n';
 
 import './StorageExpertModePanel.scss';
@@ -14,6 +20,23 @@ const b = cn('ydb-storage-expert-mode-panel');
 
 interface StorageExpertModePanelProps {
     className?: string;
+}
+
+function renderLegend(vdisksGroupBy: VDisksGroupByValue) {
+    switch (vdisksGroupBy) {
+        case VDisksGroupBy.State:
+            return <StateLegend />;
+        case VDisksGroupBy.Space:
+            return <SpaceLegend />;
+        case VDisksGroupBy.FrontQueues:
+            return <FrontQueuesLegend />;
+        case VDisksGroupBy.Compaction:
+            return <CompactionLegend />;
+        case VDisksGroupBy.All:
+            return <AllLegend />;
+        default:
+            return null;
+    }
 }
 
 export function StorageExpertModePanel({className}: StorageExpertModePanelProps) {
@@ -44,6 +67,7 @@ export function StorageExpertModePanel({className}: StorageExpertModePanelProps)
                         {i18n('value_all')}
                     </SegmentedRadioGroup.Option>
                 </SegmentedRadioGroup>
+                {renderLegend(vdisksGroupBy)}
             </Flex>
         </div>
     );
