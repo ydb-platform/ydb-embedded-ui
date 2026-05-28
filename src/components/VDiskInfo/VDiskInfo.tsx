@@ -87,14 +87,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     if (Number(AllocatedSize) >= 0 && Number(SizeLimit) >= 0) {
         leftColumn.push({
             label: vDiskInfoKeyset('size'),
-            value: (
-                <ProgressViewer
-                    value={AllocatedSize}
-                    capacity={SizeLimit}
-                    formatValues={formatStorageValuesToGb}
-                    colorizeProgress={true}
-                />
-            ),
+            value: formatStorageValuesToGb(Number(AllocatedSize), Number(SizeLimit)).join(' / '),
         });
     }
     if (!isNaN(Number(AllocatedPercent))) {
@@ -158,7 +151,6 @@ export function VDiskInfo<T extends PreparedVDisk>({
                     <ProgressViewer
                         value={Math.round(ReplicationProgress * 100)}
                         percents
-                        colorizeProgress={true}
                         capacity={100}
                     />
                 ),

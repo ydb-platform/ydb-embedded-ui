@@ -99,16 +99,13 @@ function getPDiskInfo<T extends PreparedPDisk>({
 
     const spaceInfo: InfoViewerItem[] = [];
 
+    const hasSpaceData =
+        Number.isFinite(Number(AllocatedSize)) && Number.isFinite(Number(TotalSize));
     spaceInfo.push({
         label: pDiskInfoKeyset('space'),
-        value: (
-            <ProgressViewer
-                value={AllocatedSize}
-                capacity={TotalSize}
-                formatValues={formatStorageValuesToGb}
-                colorizeProgress={true}
-            />
-        ),
+        value: hasSpaceData
+            ? formatStorageValuesToGb(Number(AllocatedSize), Number(TotalSize)).join(' / ')
+            : pDiskInfoKeyset('value_no-data'),
     });
     if (!isNaN(Number(AllocatedPercent))) {
         spaceInfo.push({
