@@ -109,22 +109,9 @@ export function linkStateStorageSummaries(issues: IssueLog[]): IssueLog[] {
     });
 }
 
-function getTypeForUI(type?: string) {
-    if (isStorageRelatedType(type) || isComputeRelatedType(type)) {
-        return type;
-    } else {
-        return 'unknown';
-    }
-}
-
-function extendIssue(
-    issue: IssueLog,
-    rootTypeForUI?: string,
-    fields?: {parent: IssuesTree},
-): IssuesTree {
+function extendIssue(issue: IssueLog, fields?: {parent: IssuesTree}): IssuesTree {
     return {
         ...issue,
-        rootTypeForUI: rootTypeForUI ?? getTypeForUI(issue.type),
         ...fields,
     };
 }
@@ -142,18 +129,13 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
             continue;
         }
 
-        // Tab classification follows the direct child's type so that a
-        // generic root (e.g. `DATABASE`, which is `unknown`) doesn't pull
-        // storage-related leaves into the Unknown tab.
-        const directChildType = getTypeForUI(directChild.type);
-
         // Include the root in the breadcrumb chain as the parent of the
         // direct child so that every API issue is surfaced — either as a
         // standalone card (when it has no `reason` and is not referenced
         // by any other issue) or as a tab in some leaf's breadcrumb. The
         // leaf (issue without `reason`) is the rightmost tab.
-        const rootNode = extendIssue(root, directChildType);
-        const initialNode: IssuesTree = extendIssue(directChild, directChildType, {
+        const rootNode = extendIssue(root);
+        const initialNode: IssuesTree = extendIssue(directChild, {
             parent: rootNode,
         });
         const stack: IssuesTree[] = [initialNode];
@@ -162,7 +144,7 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
             const currentNode = stack.pop()!;
 
             if (!currentNode.reason || currentNode.reason.length === 0) {
-                result.push(extendIssue(currentNode, directChildType));
+                result.push(extendIssue(currentNode));
                 continue;
             }
 
@@ -171,7 +153,7 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
                 if (!child) {
                     continue;
                 }
-                stack.push(extendIssue(child, directChildType, {parent: currentNode}));
+                stack.push(extendIssue(child, {parent: currentNode}));
             }
         }
     }

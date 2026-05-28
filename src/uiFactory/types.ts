@@ -52,9 +52,12 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     enableMultiTabQueryEditor?: boolean;
 
     healthcheck: {
+        issueTypes: ReadonlyArray<H>;
+        isIssueOfType: (issue: IssuesTree, type: H) => boolean;
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;
         getHealthcheckViewsOrder: GetHealthcheckViewsOrder<H>;
-        countHealthcheckIssuesByType: (issueTrees: IssuesTree[]) => Record<H, number>;
+        /** @deprecated default implementation uses issueTypes and isIssueOfType to calculate the result */
+        countHealthcheckIssuesByType: (issueTrees: IssuesTree[]) => Record<H | 'unknown', number>;
     };
     hasAccess?: boolean;
     hideGrantAccess?: boolean;

@@ -30,7 +30,7 @@ import './Healthcheck.scss';
 interface HealthcheckBaseProps {
     countIssueTypes?: (
         issueTrees: IssuesTree[],
-    ) => Record<CommonIssueType, number> & Record<string, number>;
+    ) => Record<CommonIssueType | 'unknown', number> & Record<string, number>;
 }
 
 type HealthcheckDetailsProps = HealthcheckBaseProps &

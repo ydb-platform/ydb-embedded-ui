@@ -4,10 +4,7 @@ import {Flex} from '@gravity-ui/uikit';
 
 import {EmptyState} from '../../../../components/EmptyState';
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
-import {
-    isComputeRelatedType,
-    isStorageRelatedType,
-} from '../../../../store/reducers/healthcheckInfo/utils';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {getIllustration} from '../../../../utils/illustrations';
 import {useTenantQueryParams} from '../../useTenantQueryParams';
 import i18n from '../i18n';
@@ -46,15 +43,25 @@ export function Issues({issues}: IssuesProps) {
         () =>
             view
                 ? filteredIssues.filter((issue) => {
-                      const type = issue.rootTypeForUI ?? issue.type;
+                      if (uiFactory.healthcheck.issueTypes.includes(view as any)) {
+                          return uiFactory.healthcheck.isIssueOfType(issue, view as any);
+                      }
 
-                      if (view === 'storage') {
-                          return isStorageRelatedType(type);
+                      const type = issue.type;
+                      if (!type) {
+                          return view === 'unknown';
                       }
-                      if (view === 'compute') {
-                          return isComputeRelatedType(type);
+
+                      if (view === 'unknown') {
+                          for (const knownType of uiFactory.healthcheck.issueTypes) {
+                              if (uiFactory.healthcheck.isIssueOfType(issue, knownType)) {
+                                  return false;
+                              }
+                          }
+                          return true;
                       }
-                      return type?.toLowerCase().startsWith(view);
+
+                      return type.toLowerCase().startsWith(view);
                   })
                 : [],
         [filteredIssues, view],
