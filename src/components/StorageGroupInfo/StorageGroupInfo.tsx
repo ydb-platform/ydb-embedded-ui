@@ -7,7 +7,6 @@ import {formatToMs} from '../../utils/timeParsers';
 import {bytesToSpeed} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
-import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 
 import {storageGroupInfoKeyset} from './i18n';
@@ -88,14 +87,7 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
     if (valueIsDefined(Used) && valueIsDefined(Limit)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('used-space'),
-            value: (
-                <ProgressViewer
-                    value={Number(Used)}
-                    capacity={Number(Limit)}
-                    formatValues={formatStorageValuesToGb}
-                    defaultStatus="info"
-                />
-            ),
+            value: formatStorageValuesToGb(Number(Used), Number(Limit)).join(' / '),
         });
     }
     if (valueIsDefined(Available)) {
