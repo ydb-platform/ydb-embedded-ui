@@ -12,6 +12,8 @@ import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../util
 
 import {storageGroupsGroupByParamSchema} from './PaginatedStorageGroupsTable/columns/constants';
 import {storageNodesGroupByParamSchema} from './PaginatedStorageNodesTable/columns/constants';
+import {vdisksGroupBySchema} from './StorageExpertModePanel/constants';
+import type {VDisksGroupByValue} from './StorageExpertModePanel/constants';
 import {STORAGE_SEARCH_PARAM_BY_TYPE} from './constants';
 
 export function useStorageQueryParams() {
@@ -25,6 +27,7 @@ export function useStorageQueryParams() {
         storageNodesGroupBy: StringParam,
         storageGroupsGroupBy: StringParam,
         storageExpertMode: BooleanParam,
+        vdisksGroupBy: StringParam,
     });
 
     const [_savedStorageType, setSavedStorageType] = useSetting<StorageType>(
@@ -49,6 +52,8 @@ export function useStorageQueryParams() {
     );
 
     const storageExpertMode = Boolean(queryParams.storageExpertMode);
+
+    const vdisksGroupBy = vdisksGroupBySchema.parse(queryParams.vdisksGroupBy);
 
     React.useEffect(() => {
         if (queryParams.search) {
@@ -99,6 +104,13 @@ export function useStorageQueryParams() {
     const handleStorageExpertModeChange = React.useCallback(
         (value: boolean) => {
             setQueryParams({storageExpertMode: value ? true : undefined}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+
+    const handleVDisksGroupByChange = React.useCallback(
+        (value: VDisksGroupByValue) => {
+            setQueryParams({vdisksGroupBy: value}, 'replaceIn');
         },
         [setQueryParams],
     );
@@ -155,6 +167,7 @@ export function useStorageQueryParams() {
         storageGroupsGroupByParam,
         storageNodesGroupByParam,
         storageExpertMode,
+        vdisksGroupBy,
 
         handleTextFilterGroupsChange,
         handleTextFilterNodesChange,
@@ -165,6 +178,7 @@ export function useStorageQueryParams() {
         handleStorageGroupsGroupByParamChange,
         handleStorageNodesGroupByParamChange,
         handleStorageExpertModeChange,
+        handleVDisksGroupByChange,
 
         handleShowAllGroups,
         handleShowAllNodes,

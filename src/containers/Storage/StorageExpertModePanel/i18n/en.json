@@ -1,0 +1,8 @@
+{
+  "label_vdisks": "VDisks:",
+  "value_state": "State",
+  "value_space": "Space",
+  "value_front-queues": "Front queues",
+  "value_compaction": "Compaction",
+  "value_all": "All"
+}
