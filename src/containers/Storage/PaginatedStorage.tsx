@@ -3,7 +3,11 @@ import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedT
 import {PaginatedStorageGroups} from './PaginatedStorageGroups';
 import {PaginatedStorageNodes} from './PaginatedStorageNodes';
 import type {StorageViewContext} from './types';
-import {useSaveStorageType, useStorageQueryParams} from './useStorageQueryParams';
+import {
+    useSaveStorageExpertMode,
+    useSaveStorageType,
+    useStorageQueryParams,
+} from './useStorageQueryParams';
 import {getStorageGroupsInitialEntitiesCount, getStorageNodesInitialEntitiesCount} from './utils';
 
 export interface PaginatedStorageProps {
@@ -22,6 +26,7 @@ export interface PaginatedStorageProps {
 export const PaginatedStorage = (props: PaginatedStorageProps) => {
     const {storageType} = useStorageQueryParams();
     useSaveStorageType();
+    useSaveStorageExpertMode();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const isNodes = storageType === 'nodes';

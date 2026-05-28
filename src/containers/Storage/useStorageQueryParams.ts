@@ -51,6 +51,10 @@ export function useStorageQueryParams() {
         queryParams.storageNodesGroupBy,
     );
 
+    const [_savedStorageExpertMode, setSavedStorageExpertMode] = useSetting<boolean>(
+        SETTING_KEYS.STORAGE_EXPERT_MODE,
+    );
+
     const storageExpertMode = Boolean(queryParams.storageExpertMode);
 
     const vdisksGroupBy = vdisksGroupBySchema.parse(queryParams.vdisksGroupBy);
@@ -104,8 +108,9 @@ export function useStorageQueryParams() {
     const handleStorageExpertModeChange = React.useCallback(
         (value: boolean) => {
             setQueryParams({storageExpertMode: value ? true : undefined}, 'replaceIn');
+            setSavedStorageExpertMode(value);
         },
-        [setQueryParams],
+        [setQueryParams, setSavedStorageExpertMode],
     );
 
     const handleVDisksGroupByChange = React.useCallback(
@@ -192,6 +197,25 @@ export function useIsStorageExpertMode() {
     const [storageExpertModeQueryParam] = useQueryParam('storageExpertMode', BooleanParam);
 
     return Boolean(storageExpertModeSettingEnabled) && Boolean(storageExpertModeQueryParam);
+}
+
+export function useSaveStorageExpertMode() {
+    const [queryStorageExpertMode, setQueryStorageExpertMode] = useQueryParam(
+        'storageExpertMode',
+        BooleanParam,
+    );
+    const [savedStorageExpertMode] = useSetting<boolean>(SETTING_KEYS.STORAGE_EXPERT_MODE);
+
+    const normalizedStorageExpertMode = React.useMemo(
+        () => Boolean(queryStorageExpertMode ?? savedStorageExpertMode),
+        [queryStorageExpertMode, savedStorageExpertMode],
+    );
+
+    React.useEffect(() => {
+        if (normalizedStorageExpertMode !== Boolean(queryStorageExpertMode)) {
+            setQueryStorageExpertMode(normalizedStorageExpertMode ? true : undefined, 'replaceIn');
+        }
+    }, [normalizedStorageExpertMode, queryStorageExpertMode, setQueryStorageExpertMode]);
 }
 
 export function useSaveStorageType() {
