@@ -45,6 +45,12 @@ export function configureUIFactory<H extends string, T extends string = string>(
     if (healthcheck) {
         const merged = {...uiFactoryBase.healthcheck, ...healthcheck};
 
+        if (merged.issueCategories.some((c) => c.toLowerCase() === 'unknown')) {
+            throw new Error(
+                'Healthcheck misconfiguration: issueCategories contains the `unknown` category. This category is reserved and calculated automatically.',
+            );
+        }
+
         if (
             !isEqual(
                 merged.issueCategories.toSorted(),
@@ -52,7 +58,7 @@ export function configureUIFactory<H extends string, T extends string = string>(
             )
         ) {
             throw new Error(
-                'Healthcheck misconfiguration: the `viewsOrder` should contain the same category as the `issueCategories`',
+                'Healthcheck misconfiguration: the `viewsOrder` should contain the same category as the `issueCategories`.',
             );
         }
 
