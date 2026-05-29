@@ -231,7 +231,7 @@ test.describe('Query Templates', () => {
         expect(editorValue.trim()).toBe(testQuery.trim());
     });
 
-    test('Add vector index template contains overlap_clusters parameter', async ({page}) => {
+    test('Add vector index template only contains distance setting', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);
 
@@ -245,7 +245,7 @@ test.describe('Query Templates', () => {
             .toContain('vector_kmeans_tree');
 
         const editorContent = await queryEditor.getEditorContent();
-        expect(editorContent).toContain('overlap_clusters');
+        expect(editorContent).toContain('distance=cosine');
     });
 
     test('Add fulltext index template contains fulltext_relevance and use_filter_snowball', async ({

@@ -451,12 +451,7 @@ ADD INDEX \${2:my_vector_index}
 GLOBAL USING vector_kmeans_tree
 ON (\${3:embedding})
 WITH (
-    distance=cosine,
-    vector_type="uint8",
-    vector_dimension=\${4:512},
-    levels=\${5:2},
-    clusters=\${6:128},
-    overlap_clusters=\${7:3}
+    distance=cosine
 );`;
 };
 
