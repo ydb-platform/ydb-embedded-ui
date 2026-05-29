@@ -71,6 +71,7 @@ describe('healthcheck issue categories', () => {
 
                     return isIssueTypeOfCategory(type, category);
                 },
+                getHealthcheckViewsOrder: () => ['storage', 'network'],
             },
         });
 
@@ -100,6 +101,7 @@ describe('healthcheck issue categories', () => {
             healthcheck: {
                 issueCategories: ['storage'],
                 isIssueTypeOfCategory: (type) => type.startsWith('STORAGE'),
+                getHealthcheckViewsOrder: () => ['storage'],
             },
         });
 
