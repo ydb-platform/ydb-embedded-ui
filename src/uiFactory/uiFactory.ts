@@ -43,18 +43,20 @@ export function configureUIFactory<H extends string, T extends string = string>(
 
     Object.assign(uiFactoryBase, restOverrides);
     if (healthcheck) {
-        Object.assign(uiFactoryBase.healthcheck, healthcheck);
+        const merged = {...uiFactoryBase.healthcheck, ...healthcheck};
 
         if (
             !isEqual(
-                uiFactoryBase.healthcheck.issueCategories.toSorted(),
-                uiFactory.healthcheck.getHealthcheckViewsOrder().toSorted(),
+                merged.issueCategories.toSorted(),
+                merged.getHealthcheckViewsOrder().toSorted(),
             )
         ) {
             throw new Error(
                 'Healthcheck misconfiguration: the `viewsOrder` should contain the same category as the `issueCategories`',
             );
         }
+
+        Object.assign(uiFactoryBase.healthcheck, healthcheck);
     }
 }
 
