@@ -2,12 +2,11 @@ import type React from 'react';
 
 import type {EmptyStateProps} from '../components/EmptyState';
 import type {
-    CommonIssueType,
+    CommonIssueCategory,
     GetHealthcheckViewTitles,
     GetHealthcheckViewsOrder,
 } from '../containers/Tenant/Healthcheck/shared';
 import type {ClusterInfo} from '../store/reducers/cluster/cluster';
-import type {IssuesTree} from '../store/reducers/healthcheckInfo/types';
 import type {PreparedStorageNode} from '../store/reducers/storage/types';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
 import type {ClusterLink, DatabaseLink} from '../types/additionalProps';
@@ -25,7 +24,7 @@ export type IllustrationName =
     | 'NoSearchResults'
     | 'SuccessOperation';
 
-export interface UIFactory<H extends string = CommonIssueType, T extends string = string> {
+export interface UIFactory<H extends string = CommonIssueCategory, T extends string = string> {
     onCreateDB?: HandleCreateDB;
     onEditDB?: HandleEditDB;
     onDeleteDB?: HandleDeleteDB;
@@ -52,9 +51,10 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     enableMultiTabQueryEditor?: boolean;
 
     healthcheck: {
+        issueCategories: ReadonlyArray<H>;
+        isIssueTypeOfCategory: (type: string, category: H) => boolean;
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;
         getHealthcheckViewsOrder: GetHealthcheckViewsOrder<H>;
-        countHealthcheckIssuesByType: (issueTrees: IssuesTree[]) => Record<H, number>;
     };
     hasAccess?: boolean;
     hideGrantAccess?: boolean;

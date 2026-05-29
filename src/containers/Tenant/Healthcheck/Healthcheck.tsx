@@ -8,7 +8,6 @@ import {HealthcheckStatus} from '../../../components/HealthcheckStatus/Healthche
 import {Loader} from '../../../components/Loader';
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
 import {SelfCheckResult} from '../../../types/api/healthcheck';
-import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useTypedSelector} from '../../../utils/hooks';
 import {getIllustration} from '../../../utils/illustrations';
 import {HEALTHCHECK_RESULT_TO_TEXT} from '../constants';
@@ -19,63 +18,37 @@ import {Issues} from './components/HealthcheckIssues';
 import {HealthcheckRefresh} from './components/HealthcheckRefresh';
 import {HealthcheckView} from './components/HealthcheckView';
 import i18n from './i18n';
-import type {CommonIssueType} from './shared';
 import {b} from './shared';
 import {useClusterHealthcheck, useHealthcheck} from './useHealthcheck';
+import {countHealthcheckIssuesByCategory} from './utils';
 
 import cryCatIcon from '../../../assets/icons/cry-cat.svg';
 
 import './Healthcheck.scss';
 
-interface HealthcheckBaseProps {
-    countIssueTypes?: (
-        issueTrees: IssuesTree[],
-    ) => Record<CommonIssueType, number> & Record<string, number>;
-}
+type HealthcheckDetailsProps =
+    | {database: string; clusterName?: undefined}
+    | {clusterName: string; database?: undefined};
 
-type HealthcheckDetailsProps = HealthcheckBaseProps &
-    ({database: string; clusterName?: undefined} | {clusterName: string; database?: undefined});
-
-export function Healthcheck({
-    database,
-    clusterName,
-    countIssueTypes = uiFactory.healthcheck.countHealthcheckIssuesByType,
-}: HealthcheckDetailsProps) {
+export function Healthcheck({database, clusterName}: HealthcheckDetailsProps) {
     if (clusterName) {
         return (
             <HealthcheckContext.Provider value={{clusterName}}>
-                <ClusterHealthcheckInner
-                    clusterName={clusterName}
-                    countIssueTypes={countIssueTypes}
-                />
+                <ClusterHealthcheckInner clusterName={clusterName} />
             </HealthcheckContext.Provider>
         );
     }
-    return (
-        <DatabaseHealthcheckInner database={database as string} countIssueTypes={countIssueTypes} />
-    );
+    return <DatabaseHealthcheckInner database={database as string} />;
 }
 
-function DatabaseHealthcheckInner({
-    database,
-    countIssueTypes,
-}: {
-    database: string;
-    countIssueTypes: NonNullable<HealthcheckBaseProps['countIssueTypes']>;
-}) {
+function DatabaseHealthcheckInner({database}: {database: string}) {
     const healthcheck = useHealthcheck(database);
-    return <HealthcheckContent healthcheck={healthcheck} countIssueTypes={countIssueTypes} />;
+    return <HealthcheckContent healthcheck={healthcheck} />;
 }
 
-function ClusterHealthcheckInner({
-    clusterName,
-    countIssueTypes,
-}: {
-    clusterName: string;
-    countIssueTypes: NonNullable<HealthcheckBaseProps['countIssueTypes']>;
-}) {
+function ClusterHealthcheckInner({clusterName}: {clusterName: string}) {
     const healthcheck = useClusterHealthcheck(clusterName);
-    return <HealthcheckContent healthcheck={healthcheck} countIssueTypes={countIssueTypes} />;
+    return <HealthcheckContent healthcheck={healthcheck} />;
 }
 
 interface HealthcheckResult {
@@ -87,13 +60,7 @@ interface HealthcheckResult {
     fulfilledTimeStamp?: number;
 }
 
-function HealthcheckContent({
-    healthcheck,
-    countIssueTypes,
-}: {
-    healthcheck: HealthcheckResult;
-    countIssueTypes: NonNullable<HealthcheckBaseProps['countIssueTypes']>;
-}) {
+function HealthcheckContent({healthcheck}: {healthcheck: HealthcheckResult}) {
     const SuccessImage = getIllustration('SuccessOperation');
 
     const fullscreen = useTypedSelector((state) => state.fullscreen);
@@ -101,8 +68,8 @@ function HealthcheckContent({
         healthcheck;
 
     const issuesCount = React.useMemo(
-        () => countIssueTypes(leavesIssues),
-        [leavesIssues, countIssueTypes],
+        () => countHealthcheckIssuesByCategory(leavesIssues),
+        [leavesIssues],
     );
 
     const renderControls = () => {

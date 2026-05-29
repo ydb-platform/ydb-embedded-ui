@@ -4,16 +4,11 @@ import {SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 
 import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {useTenantQueryParams} from '../../useTenantQueryParams';
-import type {CommonIssueType} from '../shared';
-import {b} from '../shared';
-
-const HealthcheckViewValues: Record<string, CommonIssueType> = {
-    storage: 'storage',
-    compute: 'compute',
-};
+import {HealthcheckViewTitles, b} from '../shared';
+import type {countHealthcheckIssuesByCategory} from '../utils';
 
 interface HealthcheckViewProps {
-    issuesCount: ReturnType<typeof uiFactory.healthcheck.countHealthcheckIssuesByType>;
+    issuesCount: ReturnType<typeof countHealthcheckIssuesByCategory>;
     viewTitles?: ReturnType<typeof uiFactory.healthcheck.getHealthckechViewTitles>;
     sortOrder?: ReturnType<typeof uiFactory.healthcheck.getHealthcheckViewsOrder>;
 }
@@ -25,41 +20,34 @@ export function HealthcheckView({
 }: HealthcheckViewProps) {
     const {view, handleHealthcheckViewChange, handleIssuesFilterChange} = useTenantQueryParams();
 
-    const issuesTypes = React.useMemo(() => Object.keys(issuesCount), [issuesCount]);
-    const normalizedSortOrder = React.useMemo(
-        () =>
-            sortOrder.filter((type) => {
-                // only "Unknown" option should be hidden if no such issues are presented. Otherwise option should be shown with count 0
-                return type !== 'unknown' || (type === 'unknown' && issuesCount[type] > 0);
-            }),
+    type SortOrder = (typeof sortOrder)[number];
+    type ExtendedSortOrder = SortOrder | 'unknown';
+
+    const normalizedSortOrder: ExtendedSortOrder[] = React.useMemo(
+        () => (issuesCount.unknown > 0 ? [...sortOrder, 'unknown'] : sortOrder),
         [issuesCount, sortOrder],
     );
 
     React.useEffect(() => {
-        if (view) {
+        if (view && normalizedSortOrder.includes(view as ExtendedSortOrder)) {
             return;
         }
-        if (issuesCount[HealthcheckViewValues.storage]) {
-            handleHealthcheckViewChange(HealthcheckViewValues.storage);
-        } else if (issuesCount[HealthcheckViewValues.compute]) {
-            handleHealthcheckViewChange(HealthcheckViewValues.compute);
-        } else {
-            const firstIssueTypeWithIssues = sortOrder.find(
-                (issueType) => issuesCount[issueType] > 0,
-            );
-            handleHealthcheckViewChange(firstIssueTypeWithIssues);
-        }
-    }, [view, handleHealthcheckViewChange, issuesCount, issuesTypes, sortOrder]);
+        const firstIssueTypeWithIssues = normalizedSortOrder.find(
+            (issueType) => issuesCount[issueType] > 0,
+        );
+        handleHealthcheckViewChange(firstIssueTypeWithIssues);
+    }, [view, handleHealthcheckViewChange, issuesCount, normalizedSortOrder]);
 
-    const renderCount = (view: (typeof sortOrder)[number]) => {
-        return <Text color="secondary">{issuesCount[view] ?? 0}</Text>;
+    const renderCount = (category: ExtendedSortOrder) => {
+        return <Text color="secondary">{issuesCount[category] ?? 0}</Text>;
     };
 
-    const renderHealthcheckViewOption = (view: (typeof sortOrder)[number]) => {
+    const renderHealthcheckViewOption = (category: ExtendedSortOrder) => {
         return (
-            <SegmentedRadioGroup.Option value={view} key={view}>
-                {viewTitles[view] ?? view}&nbsp;
-                {renderCount(view)}
+            <SegmentedRadioGroup.Option value={category} key={category}>
+                {viewTitles[category as SortOrder] ?? HealthcheckViewTitles[category] ?? category}
+                &nbsp;
+                {renderCount(category)}
             </SegmentedRadioGroup.Option>
         );
     };

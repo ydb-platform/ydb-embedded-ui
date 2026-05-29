@@ -1,7 +1,10 @@
+import isEqual from 'lodash/isEqual';
+
 import {
-    countHealthcheckIssuesByType,
     getHealthcheckViewsOrder,
     getHealthckechViewTitles,
+    isIssueTypeOfCategory,
+    issueCategories,
 } from '../containers/Tenant/Healthcheck/shared';
 import {
     getMonitoringClusterLink as getMonitoringClusterLinkDefault,
@@ -14,9 +17,10 @@ const uiFactoryBase: UIFactory = {
     getMonitoringLink: getMonitoringLinkDefault,
     getMonitoringClusterLink: getMonitoringClusterLinkDefault,
     healthcheck: {
+        issueCategories,
+        isIssueTypeOfCategory,
         getHealthckechViewTitles,
         getHealthcheckViewsOrder,
-        countHealthcheckIssuesByType,
     },
     hasAccess: true,
     useDatabaseId: false,
@@ -25,10 +29,41 @@ const uiFactoryBase: UIFactory = {
     hasDeveloperUi: true,
 };
 
+type UIFactoryOverrides<H extends string, T extends string> = Omit<
+    Partial<UIFactory<H, T>>,
+    'healthcheck'
+> & {
+    healthcheck?: Partial<UIFactory<H, T>['healthcheck']>;
+};
+
 export function configureUIFactory<H extends string, T extends string = string>(
-    overrides: Partial<UIFactory<H, T>>,
+    overrides: UIFactoryOverrides<H, T>,
 ) {
-    Object.assign(uiFactoryBase, overrides);
+    const {healthcheck, ...restOverrides} = overrides;
+
+    Object.assign(uiFactoryBase, restOverrides);
+    if (healthcheck) {
+        const merged = {...uiFactoryBase.healthcheck, ...healthcheck};
+
+        if (merged.issueCategories.some((c) => c.toLowerCase() === 'unknown')) {
+            throw new Error(
+                'Healthcheck misconfiguration: issueCategories contains the `unknown` category. This category is reserved and calculated automatically.',
+            );
+        }
+
+        if (
+            !isEqual(
+                merged.issueCategories.toSorted(),
+                merged.getHealthcheckViewsOrder().toSorted(),
+            )
+        ) {
+            throw new Error(
+                'Healthcheck misconfiguration: the `viewsOrder` should contain the same category as the `issueCategories`.',
+            );
+        }
+
+        Object.assign(uiFactoryBase.healthcheck, healthcheck);
+    }
 }
 
 export const uiFactory = new Proxy(uiFactoryBase, {

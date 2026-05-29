@@ -1,4 +1,3 @@
-import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
 import {
     isComputeRelatedType,
     isStorageRelatedType,
@@ -9,9 +8,9 @@ import i18n from './i18n';
 
 export const b = cn('ydb-healthcheck');
 
-export type CommonIssueType = 'compute' | 'storage' | 'unknown';
+export type CommonIssueCategory = 'compute' | 'storage';
 
-const HealthcheckViewTitles = {
+export const HealthcheckViewTitles = {
     get storage() {
         return i18n('label_storage');
     },
@@ -23,7 +22,25 @@ const HealthcheckViewTitles = {
     },
 };
 
-const DefaultSortOrder: CommonIssueType[] = ['storage', 'compute', 'unknown'];
+const DefaultSortOrder: CommonIssueCategory[] = ['storage', 'compute'];
+
+export const issueCategories = ['storage', 'compute'] satisfies CommonIssueCategory[];
+
+export function isIssueTypeOfCategory(issueType: string, category: string) {
+    if (!issueType) {
+        return false;
+    }
+
+    if (category === 'storage') {
+        return isStorageRelatedType(issueType);
+    }
+
+    if (category === 'compute') {
+        return isComputeRelatedType(issueType);
+    }
+
+    return issueType.toLowerCase().startsWith(category);
+}
 
 export function getHealthckechViewTitles() {
     return HealthcheckViewTitles;
@@ -31,31 +48,6 @@ export function getHealthckechViewTitles() {
 
 export function getHealthcheckViewsOrder() {
     return DefaultSortOrder;
-}
-
-export function countHealthcheckIssuesByType(
-    issueTrees: IssuesTree[],
-): Record<CommonIssueType, number> {
-    const result: Record<CommonIssueType, number> = {
-        storage: 0,
-        compute: 0,
-        unknown: 0,
-    };
-
-    for (const issue of issueTrees) {
-        const type = issue.rootTypeForUI ?? issue.type;
-        if (!type) {
-            continue;
-        }
-        if (isStorageRelatedType(type)) {
-            result.storage++;
-        } else if (isComputeRelatedType(type)) {
-            result.compute++;
-        } else {
-            result.unknown++;
-        }
-    }
-    return result;
 }
 
 export type GetHealthcheckViewTitles<T extends string> = () => Record<T, string>;
