@@ -5,9 +5,10 @@ import {SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {useTenantQueryParams} from '../../useTenantQueryParams';
 import {HealthcheckViewTitles, b} from '../shared';
+import type {countHealthcheckIssuesByCategory} from '../utils';
 
 interface HealthcheckViewProps {
-    issuesCount: ReturnType<typeof uiFactory.healthcheck.countHealthcheckIssuesByType>;
+    issuesCount: ReturnType<typeof countHealthcheckIssuesByCategory>;
     viewTitles?: ReturnType<typeof uiFactory.healthcheck.getHealthckechViewTitles>;
     sortOrder?: ReturnType<typeof uiFactory.healthcheck.getHealthcheckViewsOrder>;
 }
@@ -37,15 +38,16 @@ export function HealthcheckView({
         handleHealthcheckViewChange(firstIssueTypeWithIssues);
     }, [view, handleHealthcheckViewChange, issuesCount, normalizedSortOrder]);
 
-    const renderCount = (view: ExtendedSortOrder) => {
-        return <Text color="secondary">{issuesCount[view] ?? 0}</Text>;
+    const renderCount = (category: ExtendedSortOrder) => {
+        return <Text color="secondary">{issuesCount[category] ?? 0}</Text>;
     };
 
-    const renderHealthcheckViewOption = (view: ExtendedSortOrder) => {
+    const renderHealthcheckViewOption = (category: ExtendedSortOrder) => {
         return (
-            <SegmentedRadioGroup.Option value={view} key={view}>
-                {viewTitles[view as SortOrder] ?? HealthcheckViewTitles[view] ?? view}&nbsp;
-                {renderCount(view)}
+            <SegmentedRadioGroup.Option value={category} key={category}>
+                {viewTitles[category as SortOrder] ?? HealthcheckViewTitles[category] ?? category}
+                &nbsp;
+                {renderCount(category)}
             </SegmentedRadioGroup.Option>
         );
     };

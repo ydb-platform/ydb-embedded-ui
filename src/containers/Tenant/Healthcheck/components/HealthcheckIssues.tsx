@@ -4,7 +4,6 @@ import {Flex} from '@gravity-ui/uikit';
 
 import {EmptyState} from '../../../../components/EmptyState';
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
-import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {getIllustration} from '../../../../utils/illustrations';
 import {useTenantQueryParams} from '../../useTenantQueryParams';
 import i18n from '../i18n';
@@ -40,30 +39,7 @@ export function Issues({issues}: IssuesProps) {
     }, [issues, issuesFilter]);
 
     const filteredIssuesCurrentView = React.useMemo(
-        () =>
-            view
-                ? filteredIssues.filter((issue) => {
-                      if (uiFactory.healthcheck.issueTypes.includes(view as any)) {
-                          return uiFactory.healthcheck.isIssueOfType(issue, view as any);
-                      }
-
-                      const type = issue.type;
-                      if (!type) {
-                          return view === 'unknown';
-                      }
-
-                      if (view === 'unknown') {
-                          for (const knownType of uiFactory.healthcheck.issueTypes) {
-                              if (uiFactory.healthcheck.isIssueOfType(issue, knownType)) {
-                                  return false;
-                              }
-                          }
-                          return true;
-                      }
-
-                      return type.toLowerCase().startsWith(view);
-                  })
-                : [],
+        () => (view ? filteredIssues.filter((issue) => issue.categoryForUI === view) : []),
         [filteredIssues, view],
     );
 

@@ -1,4 +1,3 @@
-import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
 import {
     isComputeRelatedType,
     isStorageRelatedType,
@@ -9,7 +8,7 @@ import i18n from './i18n';
 
 export const b = cn('ydb-healthcheck');
 
-export type CommonIssueType = 'compute' | 'storage';
+export type CommonIssueCategory = 'compute' | 'storage';
 
 export const HealthcheckViewTitles = {
     get storage() {
@@ -23,25 +22,24 @@ export const HealthcheckViewTitles = {
     },
 };
 
-const DefaultSortOrder: CommonIssueType[] = ['storage', 'compute'];
+const DefaultSortOrder: CommonIssueCategory[] = ['storage', 'compute'];
 
-export const issueTypes = ['storage', 'compute'] satisfies CommonIssueType[];
+export const issueCategories = ['storage', 'compute'] satisfies CommonIssueCategory[];
 
-export function isIssueOfType(issue: IssuesTree, type: string) {
-    const issueType = issue.type;
+export function isIssueTypeOfCategory(issueType: string, category: string) {
     if (!issueType) {
         return false;
     }
 
-    if (type === 'storage') {
+    if (category === 'storage') {
         return isStorageRelatedType(issueType);
     }
 
-    if (type === 'compute') {
+    if (category === 'compute') {
         return isComputeRelatedType(issueType);
     }
 
-    return issueType.toLowerCase().startsWith(type);
+    return issueType.toLowerCase().startsWith(category);
 }
 
 export function getHealthckechViewTitles() {

@@ -1,10 +1,9 @@
 import {
     getHealthcheckViewsOrder,
     getHealthckechViewTitles,
-    isIssueOfType,
-    issueTypes,
+    isIssueTypeOfCategory,
+    issueCategories,
 } from '../containers/Tenant/Healthcheck/shared';
-import type {IssuesTree} from '../store/reducers/healthcheckInfo/types';
 import {
     getMonitoringClusterLink as getMonitoringClusterLinkDefault,
     getMonitoringLink as getMonitoringLinkDefault,
@@ -16,11 +15,10 @@ const uiFactoryBase: UIFactory = {
     getMonitoringLink: getMonitoringLinkDefault,
     getMonitoringClusterLink: getMonitoringClusterLinkDefault,
     healthcheck: {
-        issueTypes,
-        isIssueOfType,
+        issueCategories,
+        isIssueTypeOfCategory,
         getHealthckechViewTitles,
         getHealthcheckViewsOrder,
-        countHealthcheckIssuesByType,
     },
     hasAccess: true,
     useDatabaseId: false,
@@ -52,31 +50,3 @@ export const uiFactory = new Proxy(uiFactoryBase, {
         throw new Error('Use configureUIFactory(...) method instead of direct modifications');
     },
 });
-
-function countHealthcheckIssuesByType<H extends string>(
-    issueTrees: IssuesTree[],
-): Record<H | 'unknown', number> {
-    const result: Record<string, number> = {
-        unknown: 0,
-    };
-
-    const types = uiFactory.healthcheck.issueTypes;
-    for (const knownType of types) {
-        result[knownType] = 0;
-    }
-
-    for (const issue of issueTrees) {
-        let found = false;
-        for (const knownType of types) {
-            if (uiFactory.healthcheck.isIssueOfType(issue, knownType)) {
-                result[knownType]++;
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            result.unknown++;
-        }
-    }
-    return result;
-}
