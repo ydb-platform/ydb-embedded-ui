@@ -22,7 +22,7 @@ const HELP_MARK_SELECTOR = '.g-help-mark';
 const STORAGE_SCREENSHOT_THEMES = ['light', 'dark'] as const;
 const STORAGE_SCREENSHOT_VIEWPORT = {width: 1600, height: 1000};
 const EXACT_COLUMN_TABLE_TOOLTIP_REGEXP = /2\s244\.6\sMB/;
-const EMPTY_DATA_PLACEHOLDER_TEXT = String.fromCharCode(8212);
+const NO_DATA_TEXT = 'No data';
 const QUOTA_MISSING_TITLE = 'No quota? This is wrong.';
 const QUOTA_MISSING_DESCRIPTION =
     'This mode lets your database consume shared storage and is only for dev/test. Set a quota for stability.';
