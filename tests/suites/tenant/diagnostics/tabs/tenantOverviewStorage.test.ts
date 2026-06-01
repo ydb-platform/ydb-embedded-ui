@@ -403,7 +403,7 @@ function getSummaryRow(card: Locator, label: string) {
 async function expectQuotaMissingHelpMark(page: Page, metric: Locator) {
     const helpMark = metric.locator(HELP_MARK_SELECTOR);
 
-    await expect(metric.getByText(EMPTY_DATA_PLACEHOLDER_TEXT, {exact: true})).toBeVisible();
+    await expect(metric.getByText(NO_DATA_TEXT, {exact: true})).toBeVisible();
     await expect(helpMark).toHaveCount(1);
 
     await helpMark.hover();
