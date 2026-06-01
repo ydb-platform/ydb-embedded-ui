@@ -13,7 +13,7 @@
   "button_show-less": "Show less",
 
   "field_current-partitions": "Current partitions",
-  "field_ttl-for-rows": "TTL for rows",
+  "field_ttl-for-rows": "TTL for rows",
   "field_standalone": "Standalone",
   "field_partitioning": "Partitioning",
   "field_partitioning-by-size": "Partitioning by size",
