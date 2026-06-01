@@ -8,6 +8,7 @@ export const selectClusterNameFilter = (state: ClustersStateSlice) => state.clus
 export const selectStatusFilter = (state: ClustersStateSlice) => state.clusters.status;
 export const selectServiceFilter = (state: ClustersStateSlice) => state.clusters.service;
 export const selectVersionFilter = (state: ClustersStateSlice) => state.clusters.version;
+export const selectGalaxyFilter = (state: ClustersStateSlice) => state.clusters.galaxy;
 
 // ==== Filters ====
 
@@ -22,6 +23,13 @@ const isMatchesByService = (clusterData: PreparedCluster, selectedServices: stri
     return (
         selectedServices.length === 0 ||
         (clusterData.service && selectedServices.includes(clusterData.service))
+    );
+};
+
+const isMatchesByGalaxy = (clusterData: PreparedCluster, selectedGalaxies: string[]) => {
+    return (
+        selectedGalaxies.length === 0 ||
+        (clusterData.galaxy && selectedGalaxies.includes(clusterData.galaxy))
     );
 };
 
@@ -77,6 +85,7 @@ const isMatchesByTextQuery = (clusterData: PreparedCluster, searchQuery = '') =>
 export function filterClusters(clusters: PreparedCluster[], filters: ClustersFilters) {
     return clusters.filter((cluster) => {
         return (
+            isMatchesByGalaxy(cluster, filters.galaxy) &&
             isMatchesByStatus(cluster, filters.status) &&
             isMatchesByService(cluster, filters.service) &&
             isMatchesByVersion(cluster, filters.version) &&

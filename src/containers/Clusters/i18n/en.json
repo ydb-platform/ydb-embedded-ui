@@ -2,6 +2,7 @@
   "controls_status-select-label": "Status:",
   "controls_service-select-label": "Service:",
   "controls_version-select-label": "Version:",
+  "controls_galaxy-select-label": "Galaxy:",
 
   "controls_search-placeholder": "Cluster name, version, domain, host...",
   "controls_select-placeholder": "All",
