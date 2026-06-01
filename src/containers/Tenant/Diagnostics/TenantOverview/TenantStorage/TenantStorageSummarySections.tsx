@@ -141,7 +141,6 @@ function getPhysicalSummaryRow({
     const formatSystemDetailValue = getTenantStorageLegendValueFormatter(
         (systemDetails ?? []).map((detail) => detail.value),
     );
-    const overheadNoData = isNil(summary.overhead);
 
     return {
         id,
@@ -159,7 +158,7 @@ function getPhysicalSummaryRow({
                 emphasize: true,
                 label: i18n('field_overhead'),
                 note: i18n('context_overhead-description'),
-                noData: overheadNoData,
+                noData: isNil(summary.overhead),
                 value: formatOverheadValue(summary.overhead),
             },
             {
