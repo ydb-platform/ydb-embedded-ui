@@ -248,7 +248,7 @@ describe('fetchTenantStorageRawData', () => {
         );
     });
 
-    test('returns storage stats problems from successful responses', async () => {
+    test('returns merged storage stats problems from successful responses', async () => {
         const getStorageStats = jest
             .fn()
             .mockResolvedValueOnce({
@@ -257,7 +257,7 @@ describe('fetchTenantStorageRawData', () => {
             })
             .mockResolvedValueOnce({
                 Paths: [{FullPath: '/local/table-a', StorageSize: 300}],
-                Problems: ['ignored-secondary-problem'],
+                Problems: [EStorageStatsProblem.DataIncomplete, 'secondary-problem'],
             });
         const getSchema = jest.fn().mockResolvedValue({
             Path: '/local',
@@ -287,7 +287,7 @@ describe('fetchTenantStorageRawData', () => {
             databaseFullPath: '/local',
         });
 
-        expect(result.problems).toEqual([EStorageStatsProblem.DataIncomplete]);
+        expect(result.problems).toEqual([EStorageStatsProblem.DataIncomplete, 'secondary-problem']);
         expect(getStorageStats).toHaveBeenCalledTimes(2);
     });
 
