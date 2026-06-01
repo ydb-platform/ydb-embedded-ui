@@ -94,6 +94,9 @@ export function TenantStorageNew({
             tabletStorageStats,
         });
     }, [blobStorageStats, metrics, tabletStorageStats]);
+    const showDataIncompleteAlert = React.useMemo(() => {
+        return (currentData?.problems ?? []).includes(EStorageStatsProblem.DataIncomplete);
+    }, [currentData?.problems]);
 
     if (error && !currentData) {
         return <ResponseError error={error} />;
@@ -101,8 +104,6 @@ export function TenantStorageNew({
 
     const topRowsError = data.topRowsError ?? error;
     const grouped = mediaSections.length > 1;
-    const showDataIncompleteAlert =
-        currentData?.problems?.includes(EStorageStatsProblem.DataIncomplete) ?? false;
 
     if (loading) {
         return (
