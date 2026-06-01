@@ -6,6 +6,10 @@ import {cn} from '../../../../../utils/cn';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 
 import {LegendItems, SegmentedProgressBar} from './TenantStorageSegments';
+import type {
+    TenantStorageSegmentOpenChange,
+    TenantStorageSegmentOpenSource,
+} from './TenantStorageSegments';
 import {formatSummaryPercent} from './displayFormatters';
 import i18n from './i18n';
 import type {
@@ -49,6 +53,11 @@ interface SummaryCardProps {
 }
 
 type SummaryCardPropsWithRow = SummaryCardProps & SummaryCardRowBaseProps;
+
+interface ActiveStorageSegment {
+    key: TenantStorageSegmentKey;
+    source: TenantStorageSegmentOpenSource;
+}
 
 export interface GroupedSummaryCardRow extends SummaryCardRowBaseProps {
     id: string;
@@ -179,15 +188,18 @@ function SummaryCardRow({
     const total = summary.quota ?? summary.total;
     const activeSegments = (segments ?? []).filter((s) => s.value > 0);
     const hasSegments = activeSegments.length > 0;
-    const [activeSegmentKey, setActiveSegmentKey] = React.useState<TenantStorageSegmentKey>();
-    const handleSegmentOpenChange = React.useCallback(
-        (segmentKey: TenantStorageSegmentKey, open: boolean) => {
-            setActiveSegmentKey((currentKey) => {
+    const [activeSegment, setActiveSegment] = React.useState<ActiveStorageSegment>();
+    const activeSegmentKey = activeSegment?.key;
+    const handleSegmentOpenChange = React.useCallback<TenantStorageSegmentOpenChange>(
+        (segmentKey, open, source) => {
+            setActiveSegment((currentSegment) => {
                 if (open) {
-                    return segmentKey;
+                    return {key: segmentKey, source};
                 }
 
-                return currentKey === segmentKey ? undefined : currentKey;
+                return currentSegment?.key === segmentKey && currentSegment.source === source
+                    ? undefined
+                    : currentSegment;
             });
         },
         [],
