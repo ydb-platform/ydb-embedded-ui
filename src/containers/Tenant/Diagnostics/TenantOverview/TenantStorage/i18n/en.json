@@ -21,6 +21,7 @@
   "alert_missing-quota-title": "No quota? This is wrong.",
   "alert_missing-quota-description": "This mode lets your database consume shared storage and is only for dev/test. Set a quota for stability.",
   "alert_data-incomplete": "Some disks are currently unavailable. Storage statistics may be incomplete.",
+  "value_no-data": "No data",
   "value_no-limit": "no limit",
   "value_row-tables": "Row tables",
   "value_column-tables": "Column tables",
