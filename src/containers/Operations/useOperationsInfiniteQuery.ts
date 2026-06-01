@@ -22,7 +22,7 @@ export function useOperationsInfiniteQuery({
     searchValue,
     scrollContainerRef,
 }: UseOperationsInfiniteQueryProps) {
-    const {data, error, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, refetch} =
+    const {data, error, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage} =
         operationsApi.useGetOperationListInfiniteQuery({
             database,
             kind,
@@ -115,6 +115,5 @@ export function useOperationsInfiniteQuery({
         isLoading,
         isLoadingMore: isFetchingNextPage,
         error,
-        refreshTable: refetch,
     };
 }

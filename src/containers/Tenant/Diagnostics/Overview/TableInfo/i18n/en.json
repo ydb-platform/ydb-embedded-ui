@@ -4,7 +4,7 @@
   "title_tablet-metrics": "Metrics",
   "title_partition-config": "Partition config",
   "action_cancel": "Cancel",
-  "action_manage": "Manage",
+  "action_manage-partitioning": "Manage partitioning",
   "action_manage-partition-config": "Manage partition config",
   "action_compaction": "Compaction",
   "action_run-compaction": "Run table compaction",

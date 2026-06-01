@@ -26,7 +26,7 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
     const {kind, searchValue, pageSize, handleKindChange, handleSearchChange} =
         useOperationsQueryParams();
 
-    const {operations, isLoading, isLoadingMore, error, refreshTable} = useOperationsInfiniteQuery({
+    const {operations, isLoading, isLoadingMore, error} = useOperationsInfiniteQuery({
         database,
         kind,
         pageSize,
@@ -71,7 +71,7 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
                     <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
                         {!hasNoData || isLoading ? (
                             <ResizeableDataTable
-                                columns={getColumns({database, refreshTable, kind})}
+                                columns={getColumns({database, kind})}
                                 columnsWidthLSKey={OPERATIONS_SELECTED_COLUMNS_KEY}
                                 data={operations}
                                 settings={settings}

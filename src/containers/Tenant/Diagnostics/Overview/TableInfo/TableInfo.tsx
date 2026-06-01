@@ -14,6 +14,7 @@ import {cn} from '../../../../../utils/cn';
 import createToast from '../../../../../utils/createToast';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {
+    TABLE_COMPACTION_OPERATION_PAGE_SIZE,
     findRunningTableCompactionOperation,
     isForcedCompactionEnabled,
 } from '../../../../../utils/tableCompaction';
@@ -84,14 +85,30 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
         {skip: !isRowTable || !featureFlagsAvailable},
     );
     const compactionEnabled = isRowTable && isForcedCompactionEnabled(featureFlags);
-    const {currentData: compactionOperations, isFetching: isCompactionFetching} =
-        operationsApi.useGetCompactionListQuery(
-            {database},
-            {
-                pollingInterval: autoRefreshInterval,
-                skip: !compactionEnabled,
-            },
-        );
+    const {
+        currentData: compactionData,
+        isFetching: isCompactionFetching,
+        hasNextPage,
+        fetchNextPage,
+    } = operationsApi.useGetOperationListInfiniteQuery(
+        {database, kind: 'compaction', page_size: TABLE_COMPACTION_OPERATION_PAGE_SIZE},
+        {
+            pollingInterval: autoRefreshInterval,
+            skip: !compactionEnabled,
+        },
+    );
+
+    // Automatically fetch all pages
+    React.useEffect(() => {
+        if (hasNextPage && !isCompactionFetching) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isCompactionFetching, fetchNextPage]);
+
+    const compactionOperations = React.useMemo(
+        () => compactionData?.pages?.flatMap((page) => page.operations ?? []),
+        [compactionData],
+    );
     const runningCompaction = React.useMemo(
         () => findRunningTableCompactionOperation(compactionOperations, path),
         [compactionOperations, path],
@@ -148,7 +165,7 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                                 aria-label={i18n('action_manage-partition-config')}
                             >
                                 <Icon data={Gear} size={16} />
-                                {i18n('action_manage')}
+                                {i18n('action_manage-partitioning')}
                             </Button>
                         </ActionTooltip>
                     )}
