@@ -48,6 +48,7 @@ interface SummaryCardProps {
     description: string;
     descriptionHelpText?: string;
     position?: 'first' | 'last';
+    qa?: string;
 }
 
 type SummaryCardPropsWithRow = SummaryCardProps & SummaryCardRowBaseProps;
@@ -304,10 +305,11 @@ export function SummaryCard({
     description,
     descriptionHelpText,
     position,
+    qa,
     ...rowProps
 }: SummaryCardPropsWithRow) {
     return (
-        <div className={b({first: position === 'first', last: position === 'last'})}>
+        <div className={b({first: position === 'first', last: position === 'last'})} data-qa={qa}>
             <SummaryCardRow
                 {...rowProps}
                 header={
@@ -327,10 +329,14 @@ export function GroupedSummaryCard({
     description,
     descriptionHelpText,
     position,
+    qa,
     rows,
 }: GroupedSummaryCardProps) {
     return (
-        <div className={b({first: position === 'first', grouped: true, last: position === 'last'})}>
+        <div
+            className={b({first: position === 'first', grouped: true, last: position === 'last'})}
+            data-qa={qa}
+        >
             <SummaryCardCopy
                 title={title}
                 description={description}

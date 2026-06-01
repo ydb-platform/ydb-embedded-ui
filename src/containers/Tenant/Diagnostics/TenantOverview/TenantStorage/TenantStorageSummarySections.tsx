@@ -110,6 +110,7 @@ function renderUserSummary(summary: TenantStorageSummary, segments?: TenantStora
             description={i18n('context_user-data-by-type')}
             descriptionHelpText={i18n('context_user-data-tooltip')}
             position="first"
+            qa="tenant-storage-user-data-summary-card"
             {...row}
         />
     );
@@ -192,6 +193,7 @@ function renderPhysicalSummary(
             title={i18n('title_physical-disk-usage')}
             description={i18n('context_physical-disk-usage-description')}
             position="last"
+            qa="tenant-storage-physical-summary-card"
             {...row}
         />
     );
@@ -306,12 +308,14 @@ export function TenantStorageGroupedMediaSectionsView({
                 description={i18n('context_user-data-by-type')}
                 descriptionHelpText={i18n('context_user-data-tooltip')}
                 position="first"
+                qa="tenant-storage-grouped-user-data-summary-card"
                 rows={rows.map((row) => row.user)}
             />
             <GroupedSummaryCard
                 title={i18n('title_physical-disk-usage')}
                 description={i18n('context_physical-disk-usage-description')}
                 position="last"
+                qa="tenant-storage-grouped-physical-summary-card"
                 rows={rows.map((row) => row.physical)}
             />
         </Flex>
