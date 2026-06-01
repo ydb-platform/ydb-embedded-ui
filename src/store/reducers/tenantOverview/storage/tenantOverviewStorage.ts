@@ -23,6 +23,7 @@ export interface TenantStorageRawData {
         rowTables?: number;
         topics?: number;
     };
+    problems?: string[];
     topRows: TenantStorageRawTopRow[];
     topRowsError?: unknown;
     tabletTypeRows: TStorageStatsTabletTypeEntry[];
@@ -307,6 +308,12 @@ function getStorageStatsByPath(response: StorageStatsResponse, params: GetTenant
     }, new Map());
 }
 
+function getStorageStatsProblems(response: StorageStatsResponse) {
+    return Array.isArray(response.Problems)
+        ? response.Problems.filter((problem): problem is string => typeof problem === 'string')
+        : [];
+}
+
 async function getStorageStatsForTopRows(
     paths: string[],
     params: GetTenantStorageRawParams,
@@ -367,10 +374,12 @@ export async function fetchTenantStorageRawData(
                 options,
             )
             .then((response) => ({
+                problems: getStorageStatsProblems(response),
                 tabletTypeRows: response.Tablets ?? [],
                 error: undefined,
             }))
             .catch((error: unknown) => ({
+                problems: [] as string[],
                 tabletTypeRows: [] as TStorageStatsTabletTypeEntry[],
                 error,
             })),
@@ -404,6 +413,7 @@ export async function fetchTenantStorageRawData(
 
     return {
         logicalUserData: rootSchemaData?.logicalUserData,
+        problems: tabletTypeResult.problems,
         topRows: mergeTopRows(queryTopRows, topRowTypesResult.topRowTypes, storageStatsByPath),
         topRowsError: topRowsResult.error ?? enrichmentError ?? tabletTypeResult.error,
         tabletTypeRows: tabletTypeResult.tabletTypeRows,

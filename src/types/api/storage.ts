@@ -415,7 +415,12 @@ export interface TStorageStatsTabletTypeEntry extends TStorageStatsSizeEntry {
     Media?: number | TStorageStatsMediaEntry[];
 }
 
+export enum EStorageStatsProblem {
+    DataIncomplete = 'data-incomplete',
+}
+
 export interface StorageStatsResponse {
+    Problems?: string[];
     Paths?: TStorageStatsPathEntry[];
     Tablets?: TStorageStatsTabletTypeEntry[];
 }
