@@ -1,10 +1,11 @@
 import React from 'react';
 
-import {DefinitionList, Flex, Label, Text} from '@gravity-ui/uikit';
+import {ArrowChevronRight, Ban, CircleCheck, CirclePause, LinkSlash} from '@gravity-ui/icons';
+import {Flex, HelpMark, Icon, Label, Text} from '@gravity-ui/uikit';
 import type {LabelProps} from '@gravity-ui/uikit';
 
 import type {TBridgePile} from '../../../../types/api/cluster';
-import {BridgePileState} from '../../../../types/api/cluster';
+import {BridgePileGroupStatus, BridgePileState} from '../../../../types/api/cluster';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
@@ -13,26 +14,212 @@ import i18n from '../../i18n';
 import './BridgeInfoTable.scss';
 
 const b = cn('bridge-info-table');
+const progressB = cn('bridge-info-table-progress');
+const legendB = cn('bridge-info-table-legend');
 
-function getBridgePileStateTheme(state?: string): NonNullable<LabelProps['theme']> {
-    if (!state) {
-        return 'unknown';
-    }
+type GroupStatusTheme = 'positive' | 'warning' | 'danger' | 'dark-complementary' | 'secondary';
 
-    switch (state.toUpperCase()) {
+interface PreparedGroupStatus {
+    label: string;
+    theme: GroupStatusTheme;
+    value: number;
+}
+
+function getBridgePileStateTheme(state?: BridgePileState): NonNullable<LabelProps['theme']> {
+    switch (state) {
+        case BridgePileState.SYNCHRONIZED:
+            return 'success';
+        case BridgePileState.SUSPENDED:
+            return 'warning';
+        case BridgePileState.NOT_SYNCHRONIZED:
         case BridgePileState.PRIMARY:
         case BridgePileState.PROMOTED:
-        case BridgePileState.SYNCHRONIZED:
-            return 'success'; // Green - healthy states
-        case BridgePileState.NOT_SYNCHRONIZED:
-            return 'warning'; // Yellow - needs attention
-        case BridgePileState.SUSPENDED:
-        case BridgePileState.DISCONNECTED:
-            return 'danger'; // Red - critical states
+            return 'normal';
         case BridgePileState.UNSPECIFIED:
         default:
-            return 'unknown'; // Purple - unknown state
+            return 'unknown';
     }
+}
+
+function getBridgePileStateLabel(state?: BridgePileState) {
+    switch (state) {
+        case BridgePileState.PRIMARY:
+            return i18n('value_bridge-state-primary');
+        case BridgePileState.PROMOTED:
+            return i18n('value_bridge-state-promoted');
+        case BridgePileState.SYNCHRONIZED:
+            return i18n('value_bridge-state-synchronised');
+        case BridgePileState.NOT_SYNCHRONIZED:
+            return i18n('value_bridge-state-not-synchronised');
+        case BridgePileState.SUSPENDED:
+            return i18n('value_bridge-state-suspended');
+        case BridgePileState.DISCONNECTED:
+            return i18n('value_bridge-state-disconnected');
+        case BridgePileState.UNSPECIFIED:
+            return i18n('value_bridge-state-unspecified');
+        default:
+            return state || EMPTY_DATA_PLACEHOLDER;
+    }
+}
+
+function getBridgePileStateIcon(state?: BridgePileState) {
+    switch (state) {
+        case BridgePileState.PROMOTED:
+            return <Icon data={ArrowChevronRight} size={12} />;
+        case BridgePileState.SYNCHRONIZED:
+            return <Icon data={CircleCheck} size={12} />;
+        case BridgePileState.NOT_SYNCHRONIZED:
+            return <Icon data={Ban} size={12} />;
+        case BridgePileState.SUSPENDED:
+            return <Icon data={CirclePause} size={12} />;
+        case BridgePileState.DISCONNECTED:
+            return <Icon data={LinkSlash} size={12} />;
+        default:
+            return undefined;
+    }
+}
+
+function getBridgePileStateHelp(state?: BridgePileState) {
+    switch (state) {
+        case BridgePileState.PROMOTED:
+            return i18n('context_bridge-pile-state-promoted');
+        case BridgePileState.SYNCHRONIZED:
+            return i18n('context_bridge-pile-state-synchronised');
+        case BridgePileState.NOT_SYNCHRONIZED:
+            return i18n('context_bridge-pile-state-not-synchronised');
+        case BridgePileState.SUSPENDED:
+            return i18n('context_bridge-pile-state-suspended');
+        case BridgePileState.DISCONNECTED:
+            return i18n('context_bridge-pile-state-disconnected');
+        default:
+            return undefined;
+    }
+}
+
+function getNodesLabel(nodes?: number) {
+    if (nodes === undefined) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+
+    if (nodes === 1) {
+        return i18n('value_nodes-one');
+    }
+
+    return i18n('value_nodes-other', {count: formatNumber(nodes)});
+}
+
+function getBridgePileGroupStatusLabel(status?: BridgePileGroupStatus) {
+    switch (status) {
+        case BridgePileGroupStatus.UNKNOWN:
+            return i18n('value_bridge-group-status-unknown');
+        case BridgePileGroupStatus.FULL:
+            return i18n('value_bridge-group-status-full');
+        case BridgePileGroupStatus.PARTIAL:
+            return i18n('value_bridge-group-status-partial');
+        case BridgePileGroupStatus.DEGRADED:
+            return i18n('value_bridge-group-status-degraded');
+        case BridgePileGroupStatus.DISINTEGRATED:
+            return i18n('value_bridge-group-status-disintegrated');
+        default:
+            return EMPTY_DATA_PLACEHOLDER;
+    }
+}
+
+function getBridgePileGroupStatus(status: string): BridgePileGroupStatus | undefined {
+    if (Object.values(BridgePileGroupStatus).includes(status as BridgePileGroupStatus)) {
+        return status as BridgePileGroupStatus;
+    }
+
+    return undefined;
+}
+
+function getBridgePileGroupStatusTheme(status?: BridgePileGroupStatus): GroupStatusTheme {
+    switch (status) {
+        case BridgePileGroupStatus.FULL:
+            return 'positive';
+        case BridgePileGroupStatus.PARTIAL:
+            return 'warning';
+        case BridgePileGroupStatus.DEGRADED:
+            return 'danger';
+        case BridgePileGroupStatus.DISINTEGRATED:
+            return 'dark-complementary';
+        case BridgePileGroupStatus.UNKNOWN:
+        default:
+            return 'secondary';
+    }
+}
+
+function prepareGroupStatuses(groupStatuses?: TBridgePile['GroupStatuses']): PreparedGroupStatus[] {
+    return Object.entries(groupStatuses ?? {})
+        .map(([status, value]) => {
+            const groupStatus = getBridgePileGroupStatus(status);
+            const label = groupStatus ? getBridgePileGroupStatusLabel(groupStatus) : status;
+            const numericValue = Number(value);
+
+            if (!Number.isFinite(numericValue) || numericValue <= 0) {
+                return undefined;
+            }
+
+            return {
+                label,
+                theme: getBridgePileGroupStatusTheme(groupStatus),
+                value: numericValue,
+            };
+        })
+        .filter((status): status is PreparedGroupStatus => status !== undefined);
+}
+
+function SegmentedProgressBar({statuses}: {statuses: PreparedGroupStatus[]}) {
+    const total = statuses.reduce((sum, {value}) => sum + value, 0);
+
+    if (!Number.isFinite(total) || total <= 0) {
+        return <div className={progressB({empty: true})} />;
+    }
+
+    return (
+        <div className={progressB()} aria-label={i18n('context_group-statuses')}>
+            {statuses.map(({label, theme, value}) => (
+                <div
+                    key={`${label}-${value}`}
+                    className={progressB('item', {theme})}
+                    style={{
+                        width: `${(value / total) * 100}%`,
+                    }}
+                />
+            ))}
+        </div>
+    );
+}
+
+function GroupStatusesLegend({statuses}: {statuses: PreparedGroupStatus[]}) {
+    if (!statuses.length) {
+        return (
+            <Text variant="caption-2" color="secondary">
+                {EMPTY_DATA_PLACEHOLDER}
+            </Text>
+        );
+    }
+
+    return (
+        <Flex gap={2} wrap className={legendB()}>
+            {statuses.map(({label, theme, value}) => (
+                <Flex
+                    key={`${label}-${value}`}
+                    alignItems="center"
+                    gap={1}
+                    className={legendB('item')}
+                >
+                    <span aria-hidden="true" className={legendB('dot', {theme})} />
+                    <Text variant="caption-2" className={legendB('label')}>
+                        {label}
+                    </Text>
+                    <Text variant="caption-2" color="secondary">
+                        {formatNumber(value)}
+                    </Text>
+                </Flex>
+            ))}
+        </Flex>
+    );
 }
 
 interface BridgeInfoTableProps {
@@ -44,40 +231,61 @@ interface BridgePileCardProps {
 }
 
 const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCardProps) {
-    const renderStateStatus = React.useCallback(() => {
-        if (!pile.State) {
-            return EMPTY_DATA_PLACEHOLDER;
-        }
-
+    const stateStatus = React.useMemo(() => {
+        const stateLabel = getBridgePileStateLabel(pile.State);
         const theme = getBridgePileStateTheme(pile.State);
-        return <Label theme={theme}>{pile.State}</Label>;
+        const icon = getBridgePileStateIcon(pile.State);
+        const stateHelp = getBridgePileStateHelp(pile.State);
+        const showStateHelp = Boolean(stateHelp);
+
+        return (
+            <Label
+                theme={theme}
+                size="xs"
+                icon={icon}
+                className={b('state-label', {'with-help': showStateHelp})}
+            >
+                <span>{stateLabel}</span>
+                {showStateHelp ? (
+                    <HelpMark
+                        iconSize="s"
+                        className={b('state-help', {theme})}
+                        popoverProps={{
+                            placement: ['top', 'bottom'],
+                            className: b('state-help-popover'),
+                        }}
+                    >
+                        {stateHelp}
+                    </HelpMark>
+                ) : null}
+            </Label>
+        );
     }, [pile.State]);
 
-    const info = React.useMemo(
-        () => [
-            {
-                name: i18n('field_state'),
-                content: renderStateStatus(),
-            },
-            {
-                name: i18n('field_nodes'),
-                content:
-                    pile.Nodes === undefined ? EMPTY_DATA_PLACEHOLDER : formatNumber(pile.Nodes),
-            },
-        ],
-        [renderStateStatus, pile.Nodes],
+    const groupStatuses = React.useMemo(
+        () => prepareGroupStatuses(pile.GroupStatuses),
+        [pile.GroupStatuses],
     );
 
     return (
-        <Flex direction="column" gap={3} className={b('pile-card')}>
-            <Text variant="body-2">{pile.Name || EMPTY_DATA_PLACEHOLDER}</Text>
-            <DefinitionList nameMaxWidth={160}>
-                {info.map(({name, content}) => (
-                    <DefinitionList.Item key={name} name={name}>
-                        {content}
-                    </DefinitionList.Item>
-                ))}
-            </DefinitionList>
+        <Flex direction="column" gap={2} className={b('pile')}>
+            <Flex justifyContent="space-between" alignItems="flex-start" gap={3}>
+                <Flex direction="column" className={b('pile-title')}>
+                    <Text variant="subheader-1" ellipsis>
+                        {pile.Name || EMPTY_DATA_PLACEHOLDER}
+                    </Text>
+                    <Text variant="caption-2" color="secondary">
+                        {getNodesLabel(pile.Nodes)}
+                    </Text>
+                </Flex>
+                <Flex gap={1} wrap="nowrap" className={b('pile-labels')}>
+                    {stateStatus}
+                </Flex>
+            </Flex>
+            <Flex direction="column" gap={1} className={b('statuses')}>
+                <SegmentedProgressBar statuses={groupStatuses} />
+                <GroupStatusesLegend statuses={groupStatuses} />
+            </Flex>
         </Flex>
     );
 });
@@ -89,7 +297,7 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({piles}: Brid
     );
 
     return (
-        <Flex gap={2} className={b()}>
+        <Flex gap={2} wrap className={b()}>
             {renderedPiles}
         </Flex>
     );

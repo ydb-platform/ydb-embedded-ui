@@ -1,11 +1,31 @@
 @use '../../../../styles/mixins.scss';
 
+@mixin bridge-group-status-background {
+    &_theme_positive {
+        background-color: var(--g-color-text-positive);
+    }
+
+    &_theme_warning {
+        background-color: var(--g-color-text-warning);
+    }
+
+    &_theme_danger {
+        background-color: var(--g-color-text-danger);
+    }
+
+    &_theme_dark-complementary {
+        background-color: var(--g-color-text-dark-complementary);
+    }
+
+    &_theme_secondary {
+        background-color: var(--g-color-text-secondary);
+    }
+}
+
 .bridge-info-table {
     height: 100%;
 
-    &__pile-card {
-        --g-definition-list-item-gap: var(--g-spacing-3);
-
+    &__pile {
         width: 321px;
         padding: var(--g-spacing-3) var(--g-spacing-4);
 
@@ -15,13 +35,115 @@
         @include mixins.body-2-typography();
     }
 
-    &__status-icon {
-        &_primary {
-            color: var(--g-color-text-positive);
+    &__pile-title {
+        min-width: 0;
+    }
+
+    &__pile-labels {
+        flex-shrink: 0;
+    }
+
+    &__state-label {
+        &_with-help {
+            --_--margin-inline: var(--g-spacing-1);
         }
 
-        &:not(&_primary) {
-            color: var(--g-color-private-white-250);
+        .g-label__content {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--g-spacing-2);
         }
+    }
+
+    &__state-help {
+        display: inline-flex;
+        align-items: center;
+
+        &_theme_normal {
+            color: var(--g-color-text-misc-heavy);
+        }
+
+        &_theme_success {
+            color: var(--g-color-text-positive-heavy);
+        }
+
+        &_theme_info {
+            color: var(--g-color-text-info-heavy);
+        }
+
+        &_theme_warning {
+            color: var(--g-color-text-warning-heavy);
+        }
+
+        &_theme_danger {
+            color: var(--g-color-text-danger-heavy);
+        }
+
+        &_theme_utility {
+            color: var(--g-color-text-utility-heavy);
+        }
+
+        &_theme_unknown,
+        &_theme_clear {
+            color: var(--g-color-text-complementary);
+        }
+    }
+
+    &__state-help-popover {
+        white-space: pre-line;
+    }
+
+    &__statuses {
+        width: 100%;
+    }
+}
+
+.bridge-info-table-progress {
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    gap: var(--g-spacing-half);
+
+    height: 10px;
+
+    border-radius: var(--g-border-radius-xs);
+
+    &_empty {
+        background-color: var(--g-color-sfx-shadow);
+    }
+
+    &__item {
+        min-width: 8px;
+        height: 4px;
+
+        border-radius: var(--g-border-radius-xs);
+
+        @include bridge-group-status-background();
+    }
+}
+
+.bridge-info-table-legend {
+    min-width: 0;
+
+    &__item {
+        min-width: 0;
+    }
+
+    &__dot {
+        flex: 0 0 6px;
+
+        width: 6px;
+        height: 6px;
+
+        border-radius: 50%;
+
+        @include bridge-group-status-background();
+    }
+
+    &__label {
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 }
