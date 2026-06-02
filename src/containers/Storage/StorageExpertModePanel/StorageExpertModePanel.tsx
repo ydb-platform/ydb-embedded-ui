@@ -1,6 +1,5 @@
 import {Flex, SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 
-import {cn} from '../../../utils/cn';
 import {useStorageQueryParams} from '../useStorageQueryParams';
 
 import {
@@ -10,13 +9,11 @@ import {
     SpaceLegend,
     StateLegend,
 } from './components';
-import {VDisksGroupBy} from './constants';
+import {VDisksGroupBy, b} from './constants';
 import type {VDisksGroupByValue} from './constants';
 import i18n from './i18n';
 
 import './StorageExpertModePanel.scss';
-
-const b = cn('ydb-storage-expert-mode-panel');
 
 interface StorageExpertModePanelProps {
     className?: string;
