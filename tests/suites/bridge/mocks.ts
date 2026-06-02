@@ -1,6 +1,6 @@
 import type {Page, Route} from '@playwright/test';
 
-import {BridgePileState} from '../../../src/types/api/cluster';
+import {BridgePileGroupStatus, BridgePileState} from '../../../src/types/api/cluster';
 
 export const mockCapabilities = (page: Page, enabled: boolean) => {
     return page.route(`**/viewer/capabilities`, async (route: Route) => {
@@ -73,36 +73,72 @@ export const mockClusterWithAllBridgePileStates = (page: Page) => {
                             Name: 'primary-pile',
                             State: BridgePileState.PRIMARY,
                             Nodes: 16,
+                            GroupStatuses: {
+                                [BridgePileGroupStatus.FULL]: 24,
+                                [BridgePileGroupStatus.DEGRADED]: 2,
+                            },
                         },
                         {
                             PileId: 2,
                             Name: 'promoting-pile',
                             State: BridgePileState.PROMOTED,
                             Nodes: 12,
+                            GroupStatuses: {
+                                [BridgePileGroupStatus.FULL]: 18,
+                                [BridgePileGroupStatus.DEGRADED]: 4,
+                            },
                         },
                         {
                             PileId: 3,
                             Name: 'sync-pile',
                             State: BridgePileState.SYNCHRONIZED,
                             Nodes: 8,
+                            GroupStatuses: {
+                                [BridgePileGroupStatus.FULL]: 24,
+                            },
                         },
                         {
                             PileId: 4,
                             Name: 'not-sync-pile',
                             State: BridgePileState.NOT_SYNCHRONIZED,
                             Nodes: 4,
+                            GroupStatuses: {
+                                [BridgePileGroupStatus.FULL]: 12,
+                                [BridgePileGroupStatus.DEGRADED]: 4,
+                                [BridgePileGroupStatus.DISINTEGRATED]: 1,
+                            },
                         },
                         {
                             PileId: 5,
                             Name: 'suspended-pile',
                             State: BridgePileState.SUSPENDED,
                             Nodes: 6,
+                            GroupStatuses: {
+                                [BridgePileGroupStatus.DEGRADED]: 8,
+                                [BridgePileGroupStatus.DISINTEGRATED]: 2,
+                            },
                         },
                         {
                             PileId: 6,
                             Name: 'disconnected-pile',
                             State: BridgePileState.DISCONNECTED,
                             Nodes: 0,
+                            GroupStatuses: {
+                                [BridgePileGroupStatus.UNKNOWN]: 18,
+                            },
+                        },
+                        {
+                            PileId: 7,
+                            Name: 'all-group-statuses-pile',
+                            State: BridgePileState.NOT_SYNCHRONIZED,
+                            Nodes: 19,
+                            GroupStatuses: {
+                                [BridgePileGroupStatus.UNKNOWN]: 1,
+                                [BridgePileGroupStatus.FULL]: 4,
+                                [BridgePileGroupStatus.PARTIAL]: 12,
+                                [BridgePileGroupStatus.DEGRADED]: 1,
+                                [BridgePileGroupStatus.DISINTEGRATED]: 1,
+                            },
                         },
                     ],
                 },
@@ -191,12 +227,32 @@ export const mockClusterWithBridgePiles = (page: Page) => {
                             Name: 'r1',
                             State: BridgePileState.PRIMARY,
                             Nodes: 16,
+                            GroupStatuses: {
+                                [BridgePileGroupStatus.FULL]: 24,
+                                [BridgePileGroupStatus.DEGRADED]: 2,
+                            },
                         },
                         {
                             PileId: 2,
                             Name: 'r2',
                             State: BridgePileState.SYNCHRONIZED,
                             Nodes: 12,
+                            GroupStatuses: {
+                                [BridgePileGroupStatus.FULL]: 36,
+                            },
+                        },
+                        {
+                            PileId: 3,
+                            Name: 'all-group-statuses-pile',
+                            State: BridgePileState.NOT_SYNCHRONIZED,
+                            Nodes: 19,
+                            GroupStatuses: {
+                                [BridgePileGroupStatus.UNKNOWN]: 1,
+                                [BridgePileGroupStatus.DISINTEGRATED]: 1,
+                                [BridgePileGroupStatus.DEGRADED]: 1,
+                                [BridgePileGroupStatus.PARTIAL]: 12,
+                                [BridgePileGroupStatus.FULL]: 4,
+                            },
                         },
                     ],
                 },
