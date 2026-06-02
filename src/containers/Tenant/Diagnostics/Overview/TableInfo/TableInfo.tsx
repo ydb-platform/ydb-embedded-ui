@@ -69,7 +69,7 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const hasMoreRight = tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0;
 
     // Compaction logic (only for row tables)
-    const {compactionEnabled} = useCompactionFeature(database);
+    const {compactionEnabled} = useCompactionFeature(database, isRowTable);
     const compactionEnabledForTable = isRowTable && compactionEnabled;
     const {runningCompaction, isFetching: isCompactionFetching} = useTableCompaction(
         database,

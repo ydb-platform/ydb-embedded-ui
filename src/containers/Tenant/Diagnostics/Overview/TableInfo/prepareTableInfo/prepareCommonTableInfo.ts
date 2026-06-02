@@ -11,6 +11,7 @@ import {
 } from '../../../../../../components/YDBDefinitionList/formatters/table';
 import {formatObjectToDefinitionItems} from '../../../../../../components/YDBDefinitionList/utils';
 import type {TPartitionConfig, TTableStats} from '../../../../../../types/api/schema';
+import type {TMetrics} from '../../../../../../types/api/tenant';
 import {isNumeric} from '../../../../../../utils/utils';
 import {ROW_COUNT_NOTE} from '../../../../constants';
 
@@ -99,8 +100,8 @@ export function prepareTableStatsInfo(
  */
 export function prepareGeneralMetrics(TabletMetrics: Record<string, unknown> = {}) {
     return formatObjectToDefinitionItems(
-        formatTabletMetricsItem as any,
-        pick(TabletMetrics, GENERAL_METRICS_KEYS) as any,
+        formatTabletMetricsItem,
+        pick(TabletMetrics, GENERAL_METRICS_KEYS) as Partial<TMetrics>,
     );
 }
 
@@ -109,14 +110,14 @@ export function prepareGeneralMetrics(TabletMetrics: Record<string, unknown> = {
  */
 export function prepareTabletMetricsInfo(TabletMetrics: Record<string, unknown> = {}) {
     return formatObjectToDefinitionItems(
-        formatTabletMetricsItem as any,
+        formatTabletMetricsItem,
         omit(TabletMetrics, [
             ...GENERAL_METRICS_KEYS,
             'GroupReadIops',
             'GroupReadThroughput',
             'GroupWriteIops',
             'GroupWriteThroughput',
-        ]) as any,
+        ]) as Partial<TMetrics>,
     );
 }
 

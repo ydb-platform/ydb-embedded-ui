@@ -92,8 +92,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const {operations: compactionOperations} = useTableCompaction(database, '', compactionEnabled);
 
     // Compaction mutations
-    const [startTableCompaction, {isLoading: isCompactionStarting}] =
-        operationsApi.useStartTableCompactionMutation();
+    const [startTableCompaction] = operationsApi.useStartTableCompactionMutation();
 
     // Check if a specific table has running compaction
     const hasRunningCompaction = React.useCallback(
@@ -197,11 +196,10 @@ export function SchemaTree(props: SchemaTreeProps) {
                         isClosable: true,
                     });
                 },
-                loading: isCompactionStarting,
-                hasRunningCompaction: false,
+                hasRunningCompaction: hasRunningCompaction(path),
             });
         },
-        [database, startTableCompaction, isCompactionStarting],
+        [database, startTableCompaction, hasRunningCompaction],
     );
 
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();

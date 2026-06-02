@@ -170,10 +170,9 @@ export function CompactTableAction({
         reachMetricaGoal('openCompactionDialog');
         openCompactTableDialog({
             onApply,
-            loading: isStarting,
             hasRunningCompaction: Boolean(runningCompaction),
         });
-    }, [onApply, isStarting, runningCompaction]);
+    }, [onApply, runningCompaction]);
 
     const button = (
         <Button
@@ -203,7 +202,6 @@ export function CompactTableAction({
 
 interface CompactTableDialogProps {
     onApply: (value: {cascade: boolean; parallel?: number}) => Promise<void>;
-    loading: boolean;
     hasRunningCompaction: boolean;
 }
 
@@ -216,15 +214,14 @@ function CompactTableDialog({
     open,
     onClose,
     onApply,
-    loading,
     hasRunningCompaction,
 }: CompactTableDialogNiceModalProps) {
     const [cascade, setCascade] = React.useState(true);
     const [parallel, setParallel] = React.useState(DEFAULT_PARALLEL_SHARDS);
     const [parallelError, setParallelError] = React.useState('');
     const [requestErrorMessage, setRequestErrorMessage] = React.useState('');
-    const submitInProgressRef = React.useRef(false);
-    const submitDisabled = loading || hasRunningCompaction;
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const submitDisabled = isSubmitting || hasRunningCompaction;
 
     const resetFormState = React.useCallback(() => {
         setCascade(true);
@@ -253,7 +250,7 @@ function CompactTableDialog({
         async (event?: React.FormEvent) => {
             event?.preventDefault();
 
-            if (submitDisabled || submitInProgressRef.current) {
+            if (submitDisabled) {
                 return;
             }
 
@@ -265,7 +262,7 @@ function CompactTableDialog({
             }
 
             setRequestErrorMessage('');
-            submitInProgressRef.current = true;
+            setIsSubmitting(true);
 
             try {
                 reachMetricaGoal('startCompaction');
@@ -277,7 +274,7 @@ function CompactTableDialog({
             } catch (error) {
                 setRequestErrorMessage(prepareErrorMessage(error));
             } finally {
-                submitInProgressRef.current = false;
+                setIsSubmitting(false);
             }
         },
         [cascade, handleClose, onApply, parallel, submitDisabled],
@@ -337,7 +334,7 @@ function CompactTableDialog({
                     textButtonCancel={i18n('action_cancel')}
                     textButtonApply={i18n('action_start-compaction')}
                     onClickButtonCancel={handleClose}
-                    loading={loading}
+                    loading={isSubmitting}
                     propsButtonApply={{
                         type: 'submit',
                         disabled: submitDisabled,
