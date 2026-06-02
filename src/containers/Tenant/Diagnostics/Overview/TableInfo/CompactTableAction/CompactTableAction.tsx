@@ -1,6 +1,7 @@
 import React from 'react';
 
-import {GearPlay} from '@gravity-ui/icons';
+import * as NiceModal from '@ebay/nice-modal-react';
+import {CircleStop, GearPlay} from '@gravity-ui/icons';
 import {
     ActionTooltip,
     Button,
@@ -29,6 +30,7 @@ import './CompactTableAction.scss';
 
 const b = cn('ydb-diagnostics-table-info');
 const DEFAULT_PARALLEL_SHARDS = '1';
+const COMPACT_TABLE_DIALOG = 'compact-table-dialog';
 
 interface CompactTableActionProps {
     runningCompaction?: TOperation;
@@ -103,31 +105,56 @@ function CompactTableStatusDetails({operation}: {operation: TOperation}) {
     );
 }
 
-export function CompactTableStatusBanner({operation}: {operation: TOperation}) {
+export function CompactTableStatusBanner({
+    operation,
+    onCancel,
+    isCancelling,
+}: {
+    operation: TOperation;
+    onCancel: () => void;
+    isCancelling: boolean;
+}) {
     const progress = getProgress(operation);
     const progressWidth = `${progress}%`;
 
     return (
         <Flex className={b('compaction-banner')} gap="3" alignItems="flex-start">
             <Icon className={b('compaction-banner-icon')} data={GearPlay} size={20} />
-            <Flex direction="column" gap="2" className={b('compaction-banner-content')}>
-                <Text variant="subheader-2">{i18n('title_compaction-in-progress')}</Text>
-                <Text variant="body-1">{i18n('context_compaction-in-progress')}</Text>
-                <div
-                    className={b('compaction-progress')}
-                    role="progressbar"
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-valuenow={progress}
+            <Flex gap="5" alignItems="center" grow>
+                <Flex direction="column" gap="2" className={b('compaction-banner-content')}>
+                    <Text variant="subheader-2">{i18n('title_compaction-in-progress')}</Text>
+                    <Text variant="body-1">{i18n('context_compaction-in-progress')}</Text>
+
+                    <div
+                        className={b('compaction-progress')}
+                        role="progressbar"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={progress}
+                    >
+                        <div
+                            className={b('compaction-progress-fill')}
+                            style={{width: progressWidth}}
+                        />
+                    </div>
+
+                    <Text variant="body-1" color="secondary">
+                        {i18n('context_compaction-progress', {
+                            progress,
+                            status: getCompactionProgressDescription(operation),
+                        })}
+                    </Text>
+                </Flex>
+                <Button
+                    view="normal-contrast"
+                    onClick={onCancel}
+                    loading={isCancelling}
+                    disabled={isCancelling}
+                    aria-label={i18n('action_stop-compaction')}
                 >
-                    <div className={b('compaction-progress-fill')} style={{width: progressWidth}} />
-                </div>
-                <Text variant="body-1" color="secondary">
-                    {i18n('context_compaction-progress', {
-                        progress,
-                        status: getCompactionProgressDescription(operation),
-                    })}
-                </Text>
+                    <Icon data={CircleStop} size={16} />
+                    {i18n('action_stop')}
+                </Button>
             </Flex>
         </Flex>
     );
@@ -139,16 +166,14 @@ export function CompactTableAction({
     isStarting,
     onApply,
 }: CompactTableActionProps) {
-    const [dialogOpen, setDialogOpen] = React.useState(false);
-
-    const handleCloseDialog = React.useCallback(() => {
-        setDialogOpen(false);
-    }, []);
-
     const handleOpenDialog = React.useCallback(() => {
         reachMetricaGoal('openCompactionDialog');
-        setDialogOpen(true);
-    }, []);
+        openCompactTableDialog({
+            onApply,
+            loading: isStarting,
+            hasRunningCompaction: Boolean(runningCompaction),
+        });
+    }, [onApply, isStarting, runningCompaction]);
 
     const button = (
         <Button
@@ -164,35 +189,27 @@ export function CompactTableAction({
         </Button>
     );
 
-    return (
-        <React.Fragment>
-            {runningCompaction ? (
-                <Popover
-                    content={<CompactTableStatusDetails operation={runningCompaction} />}
-                    placement="bottom-end"
-                >
-                    <span className={b('compaction-disabled-button-wrapper')}>{button}</span>
-                </Popover>
-            ) : (
-                <ActionTooltip title={i18n('action_run-compaction')}>{button}</ActionTooltip>
-            )}
-            <CompactTableDialog
-                open={dialogOpen}
-                onClose={handleCloseDialog}
-                onApply={onApply}
-                loading={isStarting}
-                hasRunningCompaction={Boolean(runningCompaction)}
-            />
-        </React.Fragment>
+    return runningCompaction ? (
+        <Popover
+            content={<CompactTableStatusDetails operation={runningCompaction} />}
+            placement="bottom-end"
+        >
+            <span className={b('compaction-disabled-button-wrapper')}>{button}</span>
+        </Popover>
+    ) : (
+        <ActionTooltip title={i18n('action_run-compaction')}>{button}</ActionTooltip>
     );
 }
 
 interface CompactTableDialogProps {
-    open: boolean;
-    onClose: () => void;
     onApply: (value: {cascade: boolean; parallel?: number}) => Promise<void>;
     loading: boolean;
     hasRunningCompaction: boolean;
+}
+
+interface CompactTableDialogNiceModalProps extends CompactTableDialogProps {
+    open: boolean;
+    onClose: () => void;
 }
 
 function CompactTableDialog({
@@ -201,7 +218,7 @@ function CompactTableDialog({
     onApply,
     loading,
     hasRunningCompaction,
-}: CompactTableDialogProps) {
+}: CompactTableDialogNiceModalProps) {
     const [cascade, setCascade] = React.useState(true);
     const [parallel, setParallel] = React.useState(DEFAULT_PARALLEL_SHARDS);
     const [parallelError, setParallelError] = React.useState('');
@@ -329,4 +346,34 @@ function CompactTableDialog({
             </form>
         </Dialog>
     );
+}
+
+export const CompactTableDialogNiceModal = NiceModal.create((props: CompactTableDialogProps) => {
+    const modal = NiceModal.useModal();
+
+    const handleClose = () => {
+        modal.hide();
+        modal.remove();
+    };
+
+    return (
+        <CompactTableDialog
+            {...props}
+            onApply={async (value) => {
+                await props.onApply(value);
+                handleClose();
+            }}
+            onClose={handleClose}
+            open={modal.visible}
+        />
+    );
+});
+
+NiceModal.register(COMPACT_TABLE_DIALOG, CompactTableDialogNiceModal);
+
+export function openCompactTableDialog(props: CompactTableDialogProps): void {
+    NiceModal.show(COMPACT_TABLE_DIALOG, {
+        id: COMPACT_TABLE_DIALOG,
+        ...props,
+    });
 }

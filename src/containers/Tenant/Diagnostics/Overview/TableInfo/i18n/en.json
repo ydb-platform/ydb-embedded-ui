@@ -4,10 +4,12 @@
   "title_tablet-metrics": "Metrics",
   "title_partition-config": "Partition config",
   "action_cancel": "Cancel",
+  "action_stop": "Stop",
   "action_manage-partitioning": "Manage partitioning",
   "action_manage-partition-config": "Manage partition config",
   "action_compaction": "Compaction",
   "action_run-compaction": "Run table compaction",
+  "action_stop-compaction": "Stop compaction",
 
   "button_show-more": "Show more",
   "button_show-less": "Show less",
@@ -52,5 +54,6 @@
   "field_compaction-progress": "Progress: {{progress}}%",
   "field_compaction-shards": "Shards: {{done}} / {{total}}",
 
-  "toast_partitioning-updated": "Partitioning settings applied"
+  "toast_partitioning-updated": "Partitioning settings applied",
+  "toast_compaction-started": "Table compaction started"
 }

@@ -3,13 +3,12 @@ import React from 'react';
 import {ChevronDown, ChevronUp, Gear} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Disclosure, Flex, Icon} from '@gravity-ui/uikit';
 
-import {useFeatureFlagsAvailable} from '../../../../../store/reducers/capabilities/hooks';
-import {configsApi} from '../../../../../store/reducers/configs';
 import {operationsApi} from '../../../../../store/reducers/operations';
 import {EPathType} from '../../../../../types/api/schema';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
-import {isForcedCompactionEnabled} from '../../../../../utils/tableCompaction';
+import createToast from '../../../../../utils/createToast';
+import {useCompactionFeature} from '../../../../../utils/hooks/useCompactionFeature';
 import {EntityTitle} from '../../../EntityTitle/EntityTitle';
 import {isRowTableType} from '../../../utils/schema';
 
@@ -49,7 +48,6 @@ const TableInfoHeader = ({data}: {data?: TEvDescribeSchemeResult}) => {
 
 export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const isRowTable = type === EPathType.EPathTypeTable;
-    const featureFlagsAvailable = useFeatureFlagsAvailable();
 
     // Prepare all table information
     const tableInfo = React.useMemo(() => prepareTableInfo(data, type), [data, type]);
@@ -71,26 +69,40 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const hasMoreRight = tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0;
 
     // Compaction logic (only for row tables)
-    const {currentData: featureFlags} = configsApi.useGetFeatureFlagsQuery(
-        {database},
-        {skip: !isRowTable || !featureFlagsAvailable},
-    );
-    const compactionEnabled = isRowTable && isForcedCompactionEnabled(featureFlags);
+    const {compactionEnabled} = useCompactionFeature(database);
+    const compactionEnabledForTable = isRowTable && compactionEnabled;
     const {runningCompaction, isFetching: isCompactionFetching} = useTableCompaction(
         database,
         path,
-        compactionEnabled,
+        compactionEnabledForTable,
     );
 
     const [startTableCompaction, {isLoading: isCompactionStarting}] =
         operationsApi.useStartTableCompactionMutation();
 
+    const [cancelOperation, {isLoading: isCancellingOperation}] =
+        operationsApi.useCancelOperationMutation();
+
     const handleStartCompaction = React.useCallback(
         async ({cascade, parallel}: {cascade: boolean; parallel?: number}) => {
             await startTableCompaction({database, path, cascade, parallel}).unwrap();
+
+            createToast({
+                name: 'startTableCompaction',
+                content: i18n('toast_compaction-started'),
+                autoHiding: 3000,
+                isClosable: true,
+            });
         },
         [database, path, startTableCompaction],
     );
+
+    const handleCancelCompaction = React.useCallback(async () => {
+        if (!runningCompaction?.id) {
+            return;
+        }
+        await cancelOperation({database, id: runningCompaction.id}).unwrap();
+    }, [database, cancelOperation, runningCompaction?.id]);
 
     // Partitioning logic
     const {handleOpenManagePartitioning} = useTablePartitioning(
@@ -106,8 +118,12 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
 
     return (
         <div className={b()}>
-            {compactionEnabled && runningCompaction && (
-                <CompactTableStatusBanner operation={runningCompaction} />
+            {compactionEnabledForTable && runningCompaction && (
+                <CompactTableStatusBanner
+                    operation={runningCompaction}
+                    onCancel={handleCancelCompaction}
+                    isCancelling={isCancellingOperation}
+                />
             )}
             <Flex
                 className={b('header')}
@@ -130,7 +146,7 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                             </Button>
                         </ActionTooltip>
                     )}
-                    {compactionEnabled && (
+                    {compactionEnabledForTable && (
                         <CompactTableAction
                             key={`${database}/${path}`}
                             runningCompaction={runningCompaction}

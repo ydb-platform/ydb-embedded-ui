@@ -1,4 +1,4 @@
-import {CirclePlus, Code, Copy, PlugConnection} from '@gravity-ui/icons';
+import {CirclePlus, Code, Copy, GearPlay, PlugConnection} from '@gravity-ui/icons';
 import {Flex, Icon, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import {v4 as uuidv4} from 'uuid';
@@ -73,6 +73,8 @@ interface ActionsAdditionalParams {
     showCreateDirectoryDialog?: (path: string) => void;
     getConfirmation?: () => Promise<boolean>;
     getConnectToDBDialog?: (params: SnippetParams) => Promise<boolean>;
+    showCompactionDialog?: (path: string) => void;
+    hasRunningCompaction?: (path: string) => boolean;
     schemaData?: SchemaData[];
     isSchemaDataLoading?: boolean;
     hasMonitoring?: boolean;
@@ -102,6 +104,7 @@ const bindActions = (
         showCreateDirectoryDialog,
         getConfirmation,
         getConnectToDBDialog,
+        showCompactionDialog,
         schemaData,
         streamingQueryData,
         showCreateTableData,
@@ -152,6 +155,9 @@ const bindActions = (
               }
             : undefined,
         getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.database}),
+        openCompactionDialog: () => {
+            showCompactionDialog?.(params.path);
+        },
         openMonitoring: () => {
             setTenantPage(TENANT_PAGES_IDS.diagnostics);
             dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
@@ -416,7 +422,19 @@ export const getActions =
                 {text: i18n('actions.addFulltextIndex'), action: actions.addFulltextIndex},
                 {text: i18n('actions.createCdcStream'), action: actions.createCdcStream},
             ],
-            [showCreateTableItem],
+            [
+                ...(additionalEffects.showCompactionDialog
+                    ? [
+                          {
+                              text: i18n('actions.compaction'),
+                              action: actions.openCompactionDialog,
+                              iconStart: <Icon data={GearPlay} />,
+                              disabled: additionalEffects.hasRunningCompaction?.(path),
+                          },
+                      ]
+                    : []),
+                showCreateTableItem,
+            ],
         ];
         const COLUMN_TABLE_SET: ActionsSet = [
             [copyItem],
