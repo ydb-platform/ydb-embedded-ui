@@ -1,6 +1,7 @@
 import React from 'react';
 
-import {Flex, HelpMark, Label, Progress, Text} from '@gravity-ui/uikit';
+import {CloudSlash} from '@gravity-ui/icons';
+import {Flex, HelpMark, Icon, Label, Progress, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../../utils/cn';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
@@ -24,6 +25,7 @@ export interface SummaryMetricProps {
     note?: string;
     notePlacement?: 'label' | 'value';
     noteTitle?: string;
+    noData?: boolean;
     value: string;
     emphasize?: boolean;
     hideDivider?: boolean;
@@ -46,6 +48,7 @@ interface SummaryCardProps {
     description: string;
     descriptionHelpText?: string;
     position?: 'first' | 'last';
+    qa?: string;
 }
 
 type SummaryCardPropsWithRow = SummaryCardProps & SummaryCardRowBaseProps;
@@ -76,11 +79,22 @@ function SummaryMetricNote({note, noteTitle}: Pick<SummaryMetricProps, 'note' | 
     return <HelpMark iconSize="s">{content}</HelpMark>;
 }
 
+function NoDataLabel({label}: {label?: string}) {
+    const content = label ? `${label}: ${i18n('value_no-data')}` : i18n('value_no-data');
+
+    return (
+        <Label theme="unknown" size="xs" icon={<Icon data={CloudSlash} />}>
+            {content}
+        </Label>
+    );
+}
+
 function SummaryMetric({
     label,
     note,
     notePlacement = 'label',
     noteTitle,
+    noData,
     value,
     emphasize,
     hideDivider,
@@ -88,11 +102,15 @@ function SummaryMetric({
     const noteElement = <SummaryMetricNote note={note} noteTitle={noteTitle} />;
 
     return (
-        <div className={b('metric', {emphasize, 'hide-divider': hideDivider})}>
+        <div className={b('metric', {emphasize, 'hide-divider': hideDivider, 'no-data': noData})}>
             <Flex alignItems="center" gap="1">
-                <Text variant="subheader-2" className={b('metric-value')}>
-                    {value}
-                </Text>
+                {noData ? (
+                    <NoDataLabel />
+                ) : (
+                    <Text variant="subheader-2" className={b('metric-value')}>
+                        {value}
+                    </Text>
+                )}
                 {notePlacement === 'value' ? noteElement : null}
             </Flex>
             <Flex alignItems="center" gap="1" className={b('metric-label')}>
@@ -108,6 +126,7 @@ function GroupedSummaryMetric({
     note,
     notePlacement = 'label',
     noteTitle,
+    noData,
     value,
     emphasize,
     hideDivider,
@@ -117,9 +136,13 @@ function GroupedSummaryMetric({
     if (emphasize) {
         return (
             <div className={b('metric', {emphasize, grouped: true, 'hide-divider': hideDivider})}>
-                <Label theme="normal" size="xs" value={value}>
-                    {label}
-                </Label>
+                {noData ? (
+                    <NoDataLabel label={label} />
+                ) : (
+                    <Label theme="normal" size="xs" value={value}>
+                        {label}
+                    </Label>
+                )}
                 {noteElement}
             </div>
         );
@@ -132,9 +155,13 @@ function GroupedSummaryMetric({
                 {notePlacement === 'label' ? noteElement : null}
             </Flex>
             <Flex alignItems="center" gap="1">
-                <Text variant="subheader-1" className={b('metric-value')}>
-                    {value}
-                </Text>
+                {noData ? (
+                    <NoDataLabel />
+                ) : (
+                    <Text variant="subheader-1" className={b('metric-value')}>
+                        {value}
+                    </Text>
+                )}
                 {notePlacement === 'value' ? noteElement : null}
             </Flex>
         </div>
@@ -278,10 +305,11 @@ export function SummaryCard({
     description,
     descriptionHelpText,
     position,
+    qa,
     ...rowProps
 }: SummaryCardPropsWithRow) {
     return (
-        <div className={b({first: position === 'first', last: position === 'last'})}>
+        <div className={b({first: position === 'first', last: position === 'last'})} data-qa={qa}>
             <SummaryCardRow
                 {...rowProps}
                 header={
@@ -301,10 +329,14 @@ export function GroupedSummaryCard({
     description,
     descriptionHelpText,
     position,
+    qa,
     rows,
 }: GroupedSummaryCardProps) {
     return (
-        <div className={b({first: position === 'first', grouped: true, last: position === 'last'})}>
+        <div
+            className={b({first: position === 'first', grouped: true, last: position === 'last'})}
+            data-qa={qa}
+        >
             <SummaryCardCopy
                 title={title}
                 description={description}

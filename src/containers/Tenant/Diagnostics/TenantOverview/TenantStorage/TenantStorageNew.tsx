@@ -1,9 +1,10 @@
 import React from 'react';
 
-import {Flex} from '@gravity-ui/uikit';
+import {Alert, Flex} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Skeleton} from '../../../../../components/Skeleton/Skeleton';
+import {EStorageStatsProblem} from '../../../../../types/api/storage';
 import {cn} from '../../../../../utils/cn';
 
 import {
@@ -11,6 +12,7 @@ import {
     TenantStorageMediaSectionView,
 } from './TenantStorageSummarySections';
 import {TenantStorageTopUsageTable} from './TenantStorageTopUsageTable';
+import i18n from './i18n';
 import type {TenantStorageProps} from './types';
 import {useTenantStorageNewData} from './useTenantStorageNewData';
 import {buildTenantStorageMediaSections} from './utils';
@@ -92,6 +94,9 @@ export function TenantStorageNew({
             tabletStorageStats,
         });
     }, [blobStorageStats, metrics, tabletStorageStats]);
+    const showDataIncompleteAlert = React.useMemo(() => {
+        return (currentData?.problems ?? []).includes(EStorageStatsProblem.DataIncomplete);
+    }, [currentData?.problems]);
 
     if (error && !currentData) {
         return <ResponseError error={error} />;
@@ -111,6 +116,9 @@ export function TenantStorageNew({
 
     return (
         <Flex direction="column" gap={4} className={b()}>
+            {showDataIncompleteAlert ? (
+                <Alert theme="warning" view="filled" message={i18n('alert_data-incomplete')} />
+            ) : null}
             <div className={b('sections-group')}>
                 <div className={b('sections-inner')}>
                     {grouped ? (

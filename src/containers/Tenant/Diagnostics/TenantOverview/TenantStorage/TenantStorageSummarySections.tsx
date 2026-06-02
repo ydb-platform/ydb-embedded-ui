@@ -1,8 +1,8 @@
 import {Flex, Text} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {EType} from '../../../../../types/api/tenant';
 import {cn} from '../../../../../utils/cn';
-import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 
 import {GroupedSummaryCard, SummaryCard} from './TenantStorageSummaryCard';
 import type {GroupedSummaryCardRow} from './TenantStorageSummaryCard';
@@ -82,6 +82,7 @@ function getUserSummaryRow({
                 note: summary.availableApproximate
                     ? i18n('context_available-approximate')
                     : undefined,
+                noData: isNil(summary.available),
                 value: formattedAvailableValue,
             },
             {
@@ -93,9 +94,8 @@ function getUserSummaryRow({
                 note: hasQuota ? undefined : i18n('alert_missing-quota-description'),
                 notePlacement: 'value',
                 noteTitle: hasQuota ? undefined : i18n('alert_missing-quota-title'),
-                value: hasQuota
-                    ? formatTenantStorageSummaryMetric(summary.quota, metricsSize)
-                    : EMPTY_DATA_PLACEHOLDER,
+                noData: isNil(summary.quota),
+                value: formatTenantStorageSummaryMetric(summary.quota, metricsSize),
             },
         ],
     };
@@ -110,6 +110,7 @@ function renderUserSummary(summary: TenantStorageSummary, segments?: TenantStora
             description={i18n('context_user-data-by-type')}
             descriptionHelpText={i18n('context_user-data-tooltip')}
             position="first"
+            qa="tenant-storage-user-data-summary-card"
             {...row}
         />
     );
@@ -157,11 +158,13 @@ function getPhysicalSummaryRow({
                 emphasize: true,
                 label: i18n('field_overhead'),
                 note: i18n('context_overhead-description'),
+                noData: isNil(summary.overhead),
                 value: formatOverheadValue(summary.overhead),
             },
             {
                 hideDivider: true,
                 label: i18n('field_available'),
+                noData: isNil(summary.available),
                 value: formatTenantStorageSummaryMetric(summary.available, metricsSize),
             },
             {
@@ -170,6 +173,7 @@ function getPhysicalSummaryRow({
             },
             {
                 label: i18n('field_total'),
+                noData: isNil(summary.total),
                 value: formatTenantStorageSummaryMetric(summary.total, metricsSize),
             },
         ],
@@ -188,6 +192,7 @@ function renderPhysicalSummary(
             title={i18n('title_physical-disk-usage')}
             description={i18n('context_physical-disk-usage-description')}
             position="last"
+            qa="tenant-storage-physical-summary-card"
             {...row}
         />
     );
@@ -302,12 +307,14 @@ export function TenantStorageGroupedMediaSectionsView({
                 description={i18n('context_user-data-by-type')}
                 descriptionHelpText={i18n('context_user-data-tooltip')}
                 position="first"
+                qa="tenant-storage-grouped-user-data-summary-card"
                 rows={rows.map((row) => row.user)}
             />
             <GroupedSummaryCard
                 title={i18n('title_physical-disk-usage')}
                 description={i18n('context_physical-disk-usage-description')}
                 position="last"
+                qa="tenant-storage-grouped-physical-summary-card"
                 rows={rows.map((row) => row.physical)}
             />
         </Flex>

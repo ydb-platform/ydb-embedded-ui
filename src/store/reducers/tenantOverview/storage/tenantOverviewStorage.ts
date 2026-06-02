@@ -23,6 +23,7 @@ export interface TenantStorageRawData {
         rowTables?: number;
         topics?: number;
     };
+    problems?: string[];
     topRows: TenantStorageRawTopRow[];
     topRowsError?: unknown;
     tabletTypeRows: TStorageStatsTabletTypeEntry[];
@@ -307,15 +308,26 @@ function getStorageStatsByPath(response: StorageStatsResponse, params: GetTenant
     }, new Map());
 }
 
+function getStorageStatsProblems(response: StorageStatsResponse) {
+    return Array.isArray(response.Problems)
+        ? response.Problems.filter((problem): problem is string => typeof problem === 'string')
+        : [];
+}
+
 async function getStorageStatsForTopRows(
     paths: string[],
     params: GetTenantStorageRawParams,
     options?: AxiosOptions,
 ) {
+    const emptyResult = {
+        storageStatsByPath: new Map<string, number>(),
+        problems: [] as string[],
+    };
+
     const {database, databaseFullPath, useMetaProxy} = params;
 
     if (paths.length === 0) {
-        return new Map<string, number>();
+        return emptyResult;
     }
 
     const response = await window.api.viewer.getStorageStats(
@@ -332,7 +344,10 @@ async function getStorageStatsForTopRows(
         options,
     );
 
-    return getStorageStatsByPath(response, params);
+    return {
+        storageStatsByPath: getStorageStatsByPath(response, params),
+        problems: getStorageStatsProblems(response),
+    };
 }
 
 function mergeTopRows(
@@ -367,10 +382,12 @@ export async function fetchTenantStorageRawData(
                 options,
             )
             .then((response) => ({
+                problems: getStorageStatsProblems(response),
                 tabletTypeRows: response.Tablets ?? [],
                 error: undefined,
             }))
             .catch((error: unknown) => ({
+                problems: [] as string[],
                 tabletTypeRows: [] as TStorageStatsTabletTypeEntry[],
                 error,
             })),
@@ -386,8 +403,16 @@ export async function fetchTenantStorageRawData(
         params,
         options,
     )
-        .then((storageStatsByPath) => ({storageStatsByPath, error: undefined}))
-        .catch((error: unknown) => ({storageStatsByPath: new Map<string, number>(), error}));
+        .then(({storageStatsByPath, problems}) => ({
+            storageStatsByPath,
+            problems,
+            error: undefined,
+        }))
+        .catch((error: unknown) => ({
+            storageStatsByPath: new Map<string, number>(),
+            problems: [] as string[],
+            error,
+        }));
     const storageStatsByPath = storageStatsResult.storageStatsByPath;
     const topRowsWithoutTypes = queryTopRows.map((row) => ({
         ...row,
@@ -401,9 +426,13 @@ export async function fetchTenantStorageRawData(
         options,
     ).catch((error: unknown) => ({topRowTypes: initialTopRowTypes, error}));
     const enrichmentError = storageStatsResult.error ?? topRowTypesResult.error;
+    const problems = Array.from(
+        new Set([...tabletTypeResult.problems, ...storageStatsResult.problems]),
+    );
 
     return {
         logicalUserData: rootSchemaData?.logicalUserData,
+        problems,
         topRows: mergeTopRows(queryTopRows, topRowTypesResult.topRowTypes, storageStatsByPath),
         topRowsError: topRowsResult.error ?? enrichmentError ?? tabletTypeResult.error,
         tabletTypeRows: tabletTypeResult.tabletTypeRows,

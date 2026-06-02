@@ -19,10 +19,14 @@ const LEGEND_ITEM_INACTIVE_SELECTOR = '.ydb-tenant-storage-segments__legend-item
 const TOP_USAGE_TABLE_SELECTOR = '.ydb-tenant-storage-top-usage-table';
 const TOP_USAGE_PATH_COPY_SELECTOR = '.ydb-tenant-storage-top-usage-table__path-copy';
 const HELP_MARK_SELECTOR = '.g-help-mark';
+const USER_DATA_SUMMARY_CARD_QA = 'tenant-storage-user-data-summary-card';
+const PHYSICAL_SUMMARY_CARD_QA = 'tenant-storage-physical-summary-card';
+const GROUPED_USER_DATA_SUMMARY_CARD_QA = 'tenant-storage-grouped-user-data-summary-card';
+const GROUPED_PHYSICAL_SUMMARY_CARD_QA = 'tenant-storage-grouped-physical-summary-card';
 const STORAGE_SCREENSHOT_THEMES = ['light', 'dark'] as const;
 const STORAGE_SCREENSHOT_VIEWPORT = {width: 1600, height: 1000};
 const EXACT_COLUMN_TABLE_TOOLTIP_REGEXP = /2\s244\.6\sMB/;
-const EMPTY_DATA_PLACEHOLDER_TEXT = String.fromCharCode(8212);
+const NO_DATA_TEXT = 'No data';
 const QUOTA_MISSING_TITLE = 'No quota? This is wrong.';
 const QUOTA_MISSING_DESCRIPTION =
     'This mode lets your database consume shared storage and is only for dev/test. Set a quota for stability.';
@@ -83,6 +87,7 @@ async function setupTenantInfo(
     {
         databaseQuotas,
         databaseStorage,
+        storageAllocatedLimit = '201000000000000',
         tablesStorage,
     }: {
         databaseQuotas?: {
@@ -93,7 +98,8 @@ async function setupTenantInfo(
                 unit_kind: string;
             }>;
         };
-        databaseStorage?: Array<{Type: string; Size: string; Limit: string}>;
+        databaseStorage?: Array<{Type: string; Size: string; Limit?: string}>;
+        storageAllocatedLimit?: string;
         tablesStorage?: Array<{
             Type: string;
             Size: string;
@@ -114,7 +120,7 @@ async function setupTenantInfo(
                         Type: tenantType,
                         Overall: 'Green',
                         StorageAllocatedSize: '26400000000000',
-                        StorageAllocatedLimit: '201000000000000',
+                        StorageAllocatedLimit: storageAllocatedLimit,
                         StorageGroups: '2',
                         DatabaseQuotas: databaseQuotas,
                         TablesStorage: tablesStorage ?? [
@@ -337,7 +343,13 @@ async function setupPartitionStatsQuery(page: Page) {
     });
 }
 
-async function setupDescribe(page: Page) {
+async function setupDescribe(
+    page: Page,
+    {
+        tablesDataSize = '3100000000000',
+        topicsDataSize = '0',
+    }: {tablesDataSize?: string; topicsDataSize?: string} = {},
+) {
     await page.route('**/viewer/json/describe?*', async (route: Route) => {
         const url = new URL(route.request().url());
         const requestPath = url.searchParams.get('path');
@@ -356,10 +368,10 @@ async function setupDescribe(page: Page) {
                         DomainDescription: {
                             DiskSpaceUsage: {
                                 Tables: {
-                                    DataSize: '3100000000000',
+                                    DataSize: tablesDataSize,
                                 },
                                 Topics: {
-                                    DataSize: '0',
+                                    DataSize: topicsDataSize,
                                 },
                             },
                         },
@@ -403,7 +415,7 @@ function getSummaryRow(card: Locator, label: string) {
 async function expectQuotaMissingHelpMark(page: Page, metric: Locator) {
     const helpMark = metric.locator(HELP_MARK_SELECTOR);
 
-    await expect(metric.getByText(EMPTY_DATA_PLACEHOLDER_TEXT, {exact: true})).toBeVisible();
+    await expect(metric.getByText(NO_DATA_TEXT, {exact: true})).toBeVisible();
     await expect(helpMark).toHaveCount(1);
 
     await helpMark.hover();
@@ -414,8 +426,169 @@ async function expectQuotaMissingHelpMark(page: Page, metric: Locator) {
     await expect(page.getByText('Set up quota', {exact: true})).toHaveCount(0);
 }
 
+async function openTenantStorageMetricsTab(page: Page) {
+    const tenantPage = new TenantPage(page);
+
+    await tenantPage.goto({
+        schema: database,
+        database,
+        tenantPage: 'diagnostics',
+    });
+
+    await openStorageMetricsTab(page);
+
+    const storageView = page.locator(STORAGE_VIEW_SELECTOR);
+
+    await expect(storageView).toBeVisible();
+
+    return storageView;
+}
+
+async function setupSingleMediaSummaryScreenshotMocks(page: Page) {
+    await setupStorageScreenshotViewport(page);
+    await enableNewStorageView(page, 'light');
+    await setupWhoami(page);
+    await setupCapabilities(page, 1);
+    await setupTenantInfo(page, 'Dedicated', {
+        storageAllocatedLimit: 'invalid',
+        databaseStorage: [
+            {
+                Type: 'SSD',
+                Size: '26400000000000',
+            },
+        ],
+        tablesStorage: [
+            {
+                Type: 'SSD',
+                Size: '0',
+            },
+        ],
+    });
+    await setupPartitionStatsQuery(page);
+    await setupStorageStats(page);
+    await setupDescribe(page, {
+        tablesDataSize: '2700000000000',
+        topicsDataSize: '400000000000',
+    });
+}
+
+async function setupGroupedSummaryScreenshotMocks(page: Page) {
+    await setupStorageScreenshotViewport(page);
+    await enableNewStorageView(page, 'light');
+    await setupWhoami(page);
+    await setupCapabilities(page, 1);
+    await setupTenantInfo(page, 'Dedicated', {
+        storageAllocatedLimit: 'invalid',
+        databaseStorage: [
+            {Type: 'HDD', Size: '1353743073280'},
+            {Type: 'SSD', Size: '98419343360'},
+        ],
+        tablesStorage: [
+            {
+                Type: 'HDD',
+                Size: '0',
+            },
+            {
+                Type: 'SSD',
+                Size: '0',
+            },
+        ],
+    });
+    await setupPartitionStatsQuery(page);
+    await setupStorageStats(page, {withMultiMedia: true});
+    await setupDescribe(page);
+}
+
 test.describe('Tenant Overview storage metrics tab', () => {
     test.describe.configure({timeout: 60_000});
+
+    test('screenshots single-media user data summary card', async ({page}) => {
+        await setupSingleMediaSummaryScreenshotMocks(page);
+
+        const storageView = await openTenantStorageMetricsTab(page);
+        const userDataSummary = storageView.getByTestId(USER_DATA_SUMMARY_CARD_QA);
+
+        await expect(userDataSummary).toBeVisible();
+        await expect(userDataSummary.getByText('Row tables', {exact: true})).toBeVisible();
+        await expect(userDataSummary.getByText('Topics', {exact: true})).toBeVisible();
+        await expect(
+            getSummaryMetric(userDataSummary, 'Available').getByText(NO_DATA_TEXT),
+        ).toBeVisible();
+        await expect(
+            getSummaryMetric(userDataSummary, 'Quota').getByText(NO_DATA_TEXT),
+        ).toBeVisible();
+
+        await expect(userDataSummary).toHaveScreenshot(
+            'tenant-overview-storage-user-data-summary-card.png',
+        );
+    });
+
+    test('screenshots single-media physical summary card', async ({page}) => {
+        await setupSingleMediaSummaryScreenshotMocks(page);
+
+        const storageView = await openTenantStorageMetricsTab(page);
+        const physicalSummary = storageView.getByTestId(PHYSICAL_SUMMARY_CARD_QA);
+
+        await expect(physicalSummary).toBeVisible();
+        await expect(physicalSummary.getByText('System', {exact: true})).toBeVisible();
+        await expect(
+            getSummaryMetric(physicalSummary, 'Overhead').getByText(NO_DATA_TEXT),
+        ).toBeVisible();
+        await expect(
+            getSummaryMetric(physicalSummary, 'Available').getByText(NO_DATA_TEXT),
+        ).toBeVisible();
+        await expect(
+            getSummaryMetric(physicalSummary, 'Total').getByText(NO_DATA_TEXT),
+        ).toBeVisible();
+
+        await expect(physicalSummary).toHaveScreenshot(
+            'tenant-overview-storage-physical-summary-card.png',
+        );
+    });
+
+    test('screenshots grouped user data summary card', async ({page}) => {
+        await setupGroupedSummaryScreenshotMocks(page);
+
+        const storageView = await openTenantStorageMetricsTab(page);
+        const userDataSummary = storageView.getByTestId(GROUPED_USER_DATA_SUMMARY_CARD_QA);
+        const ssdUserDataRow = getSummaryRow(userDataSummary, 'SSD');
+        const hddUserDataRow = getSummaryRow(userDataSummary, 'HDD');
+
+        await expect(userDataSummary).toBeVisible();
+        await expect(ssdUserDataRow).toBeVisible();
+        await expect(hddUserDataRow).toBeVisible();
+        for (const row of [ssdUserDataRow, hddUserDataRow]) {
+            await expect(getSummaryMetric(row, 'Available').getByText(NO_DATA_TEXT)).toBeVisible();
+            await expect(getSummaryMetric(row, 'Quota').getByText(NO_DATA_TEXT)).toBeVisible();
+        }
+
+        await expect(userDataSummary).toHaveScreenshot(
+            'tenant-overview-storage-grouped-user-data-card.png',
+        );
+    });
+
+    test('screenshots grouped physical summary card', async ({page}) => {
+        await setupGroupedSummaryScreenshotMocks(page);
+
+        const storageView = await openTenantStorageMetricsTab(page);
+        const physicalSummary = storageView.getByTestId(GROUPED_PHYSICAL_SUMMARY_CARD_QA);
+        const ssdPhysicalRow = getSummaryRow(physicalSummary, 'SSD');
+        const hddPhysicalRow = getSummaryRow(physicalSummary, 'HDD');
+
+        await expect(physicalSummary).toBeVisible();
+        await expect(ssdPhysicalRow).toBeVisible();
+        await expect(hddPhysicalRow).toBeVisible();
+        await expect(ssdPhysicalRow.getByText('System', {exact: true})).toBeVisible();
+        for (const row of [ssdPhysicalRow, hddPhysicalRow]) {
+            await expect(getSummaryMetric(row, 'Overhead').getByText(NO_DATA_TEXT)).toBeVisible();
+            await expect(getSummaryMetric(row, 'Available').getByText(NO_DATA_TEXT)).toBeVisible();
+            await expect(getSummaryMetric(row, 'Total').getByText(NO_DATA_TEXT)).toBeVisible();
+        }
+
+        await expect(physicalSummary).toHaveScreenshot(
+            'tenant-overview-storage-grouped-physical-card.png',
+        );
+    });
 
     for (const theme of STORAGE_SCREENSHOT_THEMES) {
         test(`renders the new storage layout in ${theme} theme`, async ({page}) => {

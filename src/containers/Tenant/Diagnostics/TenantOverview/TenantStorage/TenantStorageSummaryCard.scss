@@ -77,8 +77,7 @@
         flex-direction: column;
         justify-content: center;
 
-        width: 101px;
-        min-width: 0;
+        min-width: 101px;
         padding-left: var(--g-spacing-10);
 
         border-left: 1px solid var(--g-color-line-generic);
@@ -94,8 +93,12 @@
             background: var(--g-color-base-generic-accent);
         }
 
+        &_no-data {
+            background: transparent;
+        }
+
         &_hide-divider {
-            width: 70px;
+            min-width: 70px;
             padding-left: 0;
 
             border-left: 0;

@@ -1,4 +1,5 @@
 import type {YdbEmbeddedAPI} from '../../../../../services/api';
+import {EStorageStatsProblem} from '../../../../../types/api/storage';
 import {fetchTenantStorageRawData} from '../tenantOverviewStorage';
 
 function createTopRowsQueryResponse(rows: Array<[string, number | string]>) {
@@ -64,6 +65,7 @@ describe('fetchTenantStorageRawData', () => {
                 rowTables: 120,
                 topics: 30,
             },
+            problems: [],
             topRows: [],
             topRowsError,
             tabletTypeRows,
@@ -246,6 +248,49 @@ describe('fetchTenantStorageRawData', () => {
         );
     });
 
+    test('returns merged storage stats problems from successful responses', async () => {
+        const getStorageStats = jest
+            .fn()
+            .mockResolvedValueOnce({
+                Problems: [EStorageStatsProblem.DataIncomplete],
+                Tablets: [],
+            })
+            .mockResolvedValueOnce({
+                Paths: [{FullPath: '/local/table-a', StorageSize: 300}],
+                Problems: [EStorageStatsProblem.DataIncomplete, 'secondary-problem'],
+            });
+        const getSchema = jest.fn().mockResolvedValue({
+            Path: '/local',
+            PathDescription: {
+                Children: [
+                    {
+                        Name: 'table-a',
+                        PathType: 'EPathTypeTable',
+                    },
+                ],
+            },
+        });
+        const sendQuery = jest
+            .fn()
+            .mockResolvedValue(createTopRowsQueryResponse([['/local/table-a', 100]]));
+
+        window.api = {
+            viewer: {
+                getStorageStats,
+                getSchema,
+                sendQuery,
+            },
+        } as unknown as YdbEmbeddedAPI;
+
+        const result = await fetchTenantStorageRawData({
+            database: '/local',
+            databaseFullPath: '/local',
+        });
+
+        expect(result.problems).toEqual([EStorageStatsProblem.DataIncomplete, 'secondary-problem']);
+        expect(getStorageStats).toHaveBeenCalledTimes(2);
+    });
+
     test('keeps top rows and surfaces schema enrichment errors', async () => {
         const schemaError = new Error('schema unavailable');
         const getStorageStats = jest
@@ -346,6 +391,7 @@ describe('fetchTenantStorageRawData', () => {
                 rowTables: 120,
                 topics: 30,
             },
+            problems: [],
             topRows: [
                 {
                     path: '/local/table-a',
