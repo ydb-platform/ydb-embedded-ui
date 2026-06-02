@@ -4,5 +4,12 @@
   "value_space": "Space",
   "value_front-queues": "Front queues",
   "value_compaction": "Compaction",
-  "value_all": "All"
+  "value_all": "All",
+  "value_ok": "Ok",
+  "value_replication": "Replication",
+  "value_initial": "Initial",
+  "value_pdisk-error": "PDisk Error",
+  "value_error": "Error",
+  "value_no-data": "N/D",
+  "context_no-statistics": "No statistics available"
 }

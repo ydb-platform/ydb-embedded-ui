@@ -7,6 +7,15 @@ $block: '.ydb-storage-expert-mode-panel';
 
     border-radius: var(--g-border-radius-l);
     background-color: var(--g-color-base-float);
+
+    &__empty-statistics {
+        font-style: italic;
+    }
+
+    &__label-danger-heavy {
+        color: var(--g-color-text-brand-contrast);
+        background-color: var(--g-color-base-danger-heavy);
+    }
 }
 
 // When the expert-mode panel is rendered inside the table layout, grow the
