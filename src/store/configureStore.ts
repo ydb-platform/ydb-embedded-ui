@@ -73,7 +73,7 @@ export const metaBackend = parseJson(window.meta_backend);
 export const multiClusterMode = parseJson(window.multi_cluster_mode);
 export const codeAssistBackend = parseJson(window.code_assist_backend);
 
-const isSingleClusterMode = isNil(multiClusterMode) ? !metaBackend : multiClusterMode;
+const isSingleClusterMode = isNil(multiClusterMode) ? !metaBackend : !multiClusterMode;
 
 export function configureStore({
     aRootReducer = rootReducer,
