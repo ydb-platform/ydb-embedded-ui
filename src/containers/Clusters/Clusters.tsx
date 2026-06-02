@@ -161,7 +161,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                     value={clusterName}
                     width={320}
                 />
-                {galaxiesToSelect.length > 0 ? (
+                {galaxiesToSelect.length > 0 || galaxy.length > 0 ? (
                     <Select
                         multiple
                         filterable
@@ -174,7 +174,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                         width={200}
                     />
                 ) : null}
-                {statuses.length > 0 ? (
+                {statuses.length > 0 || status.length > 0 ? (
                     <Select
                         multiple
                         filterable
@@ -187,7 +187,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                         width={200}
                     />
                 ) : null}
-                {servicesToSelect.length > 0 ? (
+                {servicesToSelect.length > 0 || service.length > 0 ? (
                     <Select
                         multiple
                         filterable
@@ -200,7 +200,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                         width={200}
                     />
                 ) : null}
-                {versions.length > 0 ? (
+                {versions.length > 0 || version.length > 0 ? (
                     <Select
                         multiple
                         filterable
