@@ -5,6 +5,20 @@
         overflow: visible; // to enable stacked disks overflow the row
     }
 
+    &__disks-column {
+        --paginated-table-cell-horizontal-padding: 0;
+    }
+
+    &__disks-column-header {
+        display: grid;
+        grid-template-columns: var(--storage-groups-vdisks-width, 1fr) 1fr;
+        gap: var(--g-spacing-4);
+
+        width: 100%;
+
+        text-align: left;
+    }
+
     &__pool-name-wrapper {
         direction: rtl;
     }
