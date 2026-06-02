@@ -2,6 +2,7 @@ import {configureStore as configureReduxStore} from '@reduxjs/toolkit';
 import type {Action, Dispatch, Middleware, Reducer, UnknownAction} from '@reduxjs/toolkit';
 import type {History} from 'history';
 import {createBrowserHistory} from 'history';
+import {isNil} from 'lodash';
 import {listenForHistoryChange} from 'redux-location-state';
 
 import {YdbEmbeddedAPI} from '../services/api';
@@ -69,9 +70,10 @@ function _configureStore<
 export const webVersion = Boolean(parseJson(window.web_version));
 export const customBackend = parseJson(window.custom_backend);
 export const metaBackend = parseJson(window.meta_backend);
+export const multiClusterMode = parseJson(window.multi_cluster_mode);
 export const codeAssistBackend = parseJson(window.code_assist_backend);
 
-const isSingleClusterMode = !metaBackend;
+const isSingleClusterMode = isNil(multiClusterMode) ? !metaBackend : multiClusterMode;
 
 export function configureStore({
     aRootReducer = rootReducer,
