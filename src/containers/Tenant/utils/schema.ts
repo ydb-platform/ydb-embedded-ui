@@ -62,6 +62,10 @@ export const tableTypeToPathType: Partial<Record<NavigationTreeNodeType, EPathTy
     column_table: EPathType.EPathTypeColumnTable,
 };
 
+export const rowTableNodeTypeToPathType: Partial<Record<NavigationTreeNodeType, EPathType>> = {
+    table: EPathType.EPathTypeTable,
+};
+
 export const nodeStreamingQueryTypeToPathType: Partial<Record<NavigationTreeNodeType, EPathType>> =
     {
         streaming_query: EPathType.EPathTypeStreamingQuery,

@@ -274,13 +274,31 @@ export const setupMalformedOperationsMock = async (page: Page) => {
 };
 
 export const setupPartialMalformedOperationsMock = async (page: Page) => {
-    let requestCount = 0;
+    let buildIndexRequestCount = 0;
 
     await page.route(`${backend}/operation/list*`, async (route) => {
-        requestCount++;
+        const url = new URL(route.request().url());
+        const kind = url.searchParams.get('kind') || 'buildindex';
 
-        // First request returns valid data
-        if (requestCount === 1) {
+        if (kind !== 'buildindex') {
+            await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
+
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    next_page_token: '0',
+                    status: 'SUCCESS',
+                    operations: [],
+                }),
+            });
+            return;
+        }
+
+        buildIndexRequestCount++;
+
+        // First buildindex request returns valid data
+        if (buildIndexRequestCount === 1) {
             const operations = generateBuildIndexOperations(0, 20);
             const response = {
                 next_page_token: '1',
@@ -296,7 +314,7 @@ export const setupPartialMalformedOperationsMock = async (page: Page) => {
                 body: JSON.stringify(response),
             });
         } else {
-            // Subsequent requests return malformed response
+            // Subsequent buildindex requests return malformed response
             const response = {
                 status: 'SUCCESS',
                 next_page_token: '2',

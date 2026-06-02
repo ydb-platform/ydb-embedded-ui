@@ -36,6 +36,7 @@ import {
     mapPathTypeToNavigationTreeType,
     nodeStreamingQueryTypeToPathType,
     nodeTableTypeToPathType,
+    rowTableNodeTypeToPathType,
     tableTypeToPathType,
 } from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
@@ -83,11 +84,17 @@ export function SchemaTree(props: SchemaTreeProps) {
     const setSchemaTreeKey = useDispatchTreeKey();
     const schemaTreeKey = useTreeKey();
 
+    const [compactionActionsOpen, setCompactionActionsOpen] = React.useState(false);
+
     // Compaction feature flag check
     const {compactionEnabled} = useCompactionFeature(database);
 
-    // Use table compaction hook to track all running compactions
-    const {operations: compactionOperations} = useTableCompaction(database, '', compactionEnabled);
+    // Use table compaction hook to track all running compactions only while table actions are open
+    const {operations: compactionOperations, isFetching: isCompactionFetching} = useTableCompaction(
+        database,
+        '',
+        compactionEnabled && compactionActionsOpen,
+    );
 
     // Compaction helper hook
     const startCompaction = useStartCompaction();
@@ -211,6 +218,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 getConnectToDBDialog,
                 showCompactionDialog: compactionEnabled ? handleOpenCompactionDialog : undefined,
                 hasRunningCompaction: compactionEnabled ? hasRunningCompaction : undefined,
+                isCompactionLoading: isCompactionFetching,
                 schemaData: actionsSchemaData,
                 isSchemaDataLoading: isActionsDataFetching,
                 hasMonitoring,
@@ -243,6 +251,7 @@ export function SchemaTree(props: SchemaTreeProps) {
         compactionEnabled,
         handleOpenCompactionDialog,
         hasRunningCompaction,
+        isCompactionFetching,
     ]);
 
     return (
@@ -282,6 +291,9 @@ export function SchemaTree(props: SchemaTreeProps) {
                         const relativePath = transformPath(path, databaseFullPath);
                         getShowCreateTable({path: relativePath, database});
                     }
+
+                    const rowTableType = rowTableNodeTypeToPathType[type];
+                    setCompactionActionsOpen(isOpen && Boolean(rowTableType));
 
                     const streamingPathType = nodeStreamingQueryTypeToPathType[type];
                     if (isOpen && streamingPathType) {

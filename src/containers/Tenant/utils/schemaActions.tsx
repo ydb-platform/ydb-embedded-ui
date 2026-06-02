@@ -75,6 +75,7 @@ interface ActionsAdditionalParams {
     getConnectToDBDialog?: (params: SnippetParams) => Promise<boolean>;
     showCompactionDialog?: (path: string) => void;
     hasRunningCompaction?: (path: string) => boolean;
+    isCompactionLoading?: boolean;
     schemaData?: SchemaData[];
     isSchemaDataLoading?: boolean;
     hasMonitoring?: boolean;
@@ -276,10 +277,11 @@ interface ActionConfig {
     text: string;
     action: () => void;
     isLoading?: boolean;
+    disabled?: boolean;
     iconStart?: React.ReactNode;
 }
 
-const getActionWithLoader = ({text, action, isLoading, iconStart}: ActionConfig) => ({
+const getActionWithLoader = ({text, action, isLoading, disabled, iconStart}: ActionConfig) => ({
     text: (
         <Flex justifyContent="space-between" alignItems="center">
             {text}
@@ -287,7 +289,7 @@ const getActionWithLoader = ({text, action, isLoading, iconStart}: ActionConfig)
         </Flex>
     ),
     action,
-    disabled: isLoading,
+    disabled: isLoading || disabled,
     iconStart,
 });
 
@@ -401,6 +403,13 @@ export const getActions =
             isLoading: additionalEffects.isShowCreateTableLoading,
             iconStart: <Code />,
         });
+        const compactionItem = getActionWithLoader({
+            text: i18n('actions.compaction'),
+            action: actions.openCompactionDialog,
+            iconStart: <Icon data={GearPlay} />,
+            isLoading: additionalEffects.isCompactionLoading,
+            disabled: additionalEffects.hasRunningCompaction?.(path),
+        });
 
         const ROW_TABLE_SET: ActionsSet = [
             [copyItem],
@@ -423,16 +432,7 @@ export const getActions =
                 {text: i18n('actions.createCdcStream'), action: actions.createCdcStream},
             ],
             [
-                ...(additionalEffects.showCompactionDialog
-                    ? [
-                          {
-                              text: i18n('actions.compaction'),
-                              action: actions.openCompactionDialog,
-                              iconStart: <Icon data={GearPlay} />,
-                              disabled: additionalEffects.hasRunningCompaction?.(path),
-                          },
-                      ]
-                    : []),
+                ...(additionalEffects.showCompactionDialog ? [compactionItem] : []),
                 showCreateTableItem,
             ],
         ];
@@ -524,6 +524,10 @@ export const getActions =
 
         // verbose mapping to guarantee a correct actions set for new node types
         // TS will error when a new type is added in the lib but is not mapped here
+        const INDEX_TABLE_SET = additionalEffects.showCompactionDialog
+            ? [[copyItem], [compactionItem]]
+            : JUST_COPY;
+
         const nodeTypeToActions: Record<NavigationTreeNodeType, ActionsSet> = {
             async_replication: ASYNC_REPLICATION_SET,
             transfer: TRANSFER_SET,
@@ -537,7 +541,7 @@ export const getActions =
             column_table: COLUMN_TABLE_SET,
             system_table: SYSTEM_VIEW_SET,
 
-            index_table: JUST_COPY,
+            index_table: INDEX_TABLE_SET,
             topic: TOPIC_SET,
             stream: JUST_COPY,
 
