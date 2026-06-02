@@ -7,8 +7,8 @@ import {operationsApi} from '../../../../../store/reducers/operations';
 import {EPathType} from '../../../../../types/api/schema';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
-import createToast from '../../../../../utils/createToast';
 import {useCompactionFeature} from '../../../../../utils/hooks/useCompactionFeature';
+import {useStartCompaction} from '../../../../../utils/hooks/useStartCompaction';
 import {EntityTitle} from '../../../EntityTitle/EntityTitle';
 import {isRowTableType} from '../../../utils/schema';
 
@@ -77,24 +77,21 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
         compactionEnabledForTable,
     );
 
-    const [startTableCompaction, {isLoading: isCompactionStarting}] =
-        operationsApi.useStartTableCompactionMutation();
+    const startCompaction = useStartCompaction();
 
     const [cancelOperation, {isLoading: isCancellingOperation}] =
         operationsApi.useCancelOperationMutation();
 
     const handleStartCompaction = React.useCallback(
         async ({cascade, parallel}: {cascade: boolean; parallel?: number}) => {
-            await startTableCompaction({database, path, cascade, parallel}).unwrap();
-
-            createToast({
-                name: 'startTableCompaction',
-                content: i18n('toast_compaction-started'),
-                autoHiding: 3000,
-                isClosable: true,
+            await startCompaction({
+                database,
+                path,
+                cascade,
+                parallel,
             });
         },
-        [database, path, startTableCompaction],
+        [database, path, startCompaction],
     );
 
     const handleCancelCompaction = React.useCallback(async () => {
@@ -151,7 +148,6 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                             key={`${database}/${path}`}
                             runningCompaction={runningCompaction}
                             isFetching={isCompactionFetching}
-                            isStarting={isCompactionStarting}
                             onApply={handleStartCompaction}
                         />
                     )}

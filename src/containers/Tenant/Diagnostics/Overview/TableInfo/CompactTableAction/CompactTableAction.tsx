@@ -35,7 +35,6 @@ const COMPACT_TABLE_DIALOG = 'compact-table-dialog';
 interface CompactTableActionProps {
     runningCompaction?: TOperation;
     isFetching: boolean;
-    isStarting: boolean;
     onApply: (value: {cascade: boolean; parallel?: number}) => Promise<void>;
 }
 
@@ -163,7 +162,6 @@ export function CompactTableStatusBanner({
 export function CompactTableAction({
     runningCompaction,
     isFetching,
-    isStarting,
     onApply,
 }: CompactTableActionProps) {
     const handleOpenDialog = React.useCallback(() => {
@@ -179,8 +177,8 @@ export function CompactTableAction({
             view="normal"
             size="s"
             onClick={handleOpenDialog}
-            disabled={Boolean(runningCompaction) || isStarting}
-            loading={isStarting || (isFetching && !runningCompaction)}
+            disabled={Boolean(runningCompaction)}
+            loading={isFetching && !runningCompaction}
             aria-label={i18n('action_compaction')}
         >
             <Icon data={GearPlay} size={16} />
