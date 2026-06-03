@@ -269,19 +269,21 @@ const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCard
                 icon={icon}
                 className={b('state-label', {'with-help': showStateHelp})}
             >
-                <span>{stateLabel}</span>
-                {showStateHelp ? (
-                    <HelpMark
-                        iconSize="s"
-                        className={b('state-help', {theme})}
-                        popoverProps={{
-                            placement: ['top', 'bottom'],
-                            className: b('state-help-popover'),
-                        }}
-                    >
-                        {stateHelp}
-                    </HelpMark>
-                ) : null}
+                <Flex alignItems="center" gap={2} wrap="nowrap">
+                    {stateLabel}
+                    {showStateHelp ? (
+                        <HelpMark
+                            iconSize="s"
+                            className={b('state-help')}
+                            popoverProps={{
+                                placement: ['top', 'bottom'],
+                                className: b('state-help-popover'),
+                            }}
+                        >
+                            {stateHelp}
+                        </HelpMark>
+                    ) : null}
+                </Flex>
             </Label>
         );
     }, [pile.State]);
@@ -303,11 +305,7 @@ const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCard
                         {getNodesLabel(pile.Nodes)}
                     </Text>
                 </Flex>
-                {stateStatus ? (
-                    <Flex gap={1} wrap="nowrap" className={b('pile-labels')}>
-                        {stateStatus}
-                    </Flex>
-                ) : null}
+                {stateStatus}
             </Flex>
             <Flex direction="column" gap={1} className={b('statuses')}>
                 <SegmentedProgressBar

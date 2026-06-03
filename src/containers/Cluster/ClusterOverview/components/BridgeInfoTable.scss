@@ -47,46 +47,10 @@
         &_with-help {
             --_--margin-inline: var(--g-spacing-1);
         }
-
-        .g-label__content {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--g-spacing-2);
-        }
     }
 
-    &__state-help {
-        display: inline-flex;
-        align-items: center;
-
-        &_theme_normal {
-            color: var(--g-color-text-misc-heavy);
-        }
-
-        &_theme_success {
-            color: var(--g-color-text-positive-heavy);
-        }
-
-        &_theme_info {
-            color: var(--g-color-text-info-heavy);
-        }
-
-        &_theme_warning {
-            color: var(--g-color-text-warning-heavy);
-        }
-
-        &_theme_danger {
-            color: var(--g-color-text-danger-heavy);
-        }
-
-        &_theme_utility {
-            color: var(--g-color-text-utility-heavy);
-        }
-
-        &_theme_unknown,
-        &_theme_clear {
-            color: var(--g-color-text-complementary);
-        }
+    &__state-help.g-help-mark {
+        color: inherit;
     }
 
     &__state-help-popover {
