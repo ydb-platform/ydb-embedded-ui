@@ -1,4 +1,4 @@
-import {CirclePlus, Code, Copy, GearPlay, PlugConnection} from '@gravity-ui/icons';
+import {CirclePlus, Code, Copy, GearPlay, Pencil, PlugConnection} from '@gravity-ui/icons';
 import {Flex, Icon, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import {v4 as uuidv4} from 'uuid';
@@ -75,6 +75,10 @@ interface ActionsAdditionalParams {
     setTenantPage: (page: TenantPage) => void;
     isMultiTabEnabled?: boolean;
     showCreateDirectoryDialog?: (path: string) => void;
+    showCreateTableDialog?: (path: string) => void;
+    showCreateTopicDialog?: (path: string) => void;
+    showUpdateTableDialog?: (path: string) => void;
+    showUpdateTopicDialog?: (path: string) => void;
     getConfirmation?: () => Promise<boolean>;
     getConnectToDBDialog?: (params: SnippetParams) => Promise<boolean>;
     showCompactionDialog?: (path: string) => void;
@@ -108,6 +112,10 @@ const bindActions = (
         setTenantPage,
         isMultiTabEnabled,
         showCreateDirectoryDialog,
+        showCreateTableDialog,
+        showCreateTopicDialog,
+        showUpdateTableDialog,
+        showUpdateTopicDialog,
         getConfirmation,
         getConnectToDBDialog,
         showCompactionDialog,
@@ -166,6 +174,16 @@ const bindActions = (
                   showCreateDirectoryDialog(params.path);
               }
             : undefined,
+        createTableDialog: showCreateTableDialog
+            ? () => {
+                  showCreateTableDialog(params.path);
+              }
+            : undefined,
+        createTopicDialog: showCreateTopicDialog
+            ? () => {
+                  showCreateTopicDialog(params.path);
+              }
+            : undefined,
         getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.database}),
         openCompactionDialog: () => {
             showCompactionDialog?.(params.path);
@@ -181,6 +199,7 @@ const bindActions = (
             setActivePath(params.path);
         },
         createTable: inputQuery(createTableTemplate, stripEllipsis(i18n('actions.createTable'))),
+        updateTable: () => showUpdateTableDialog?.(params.path),
         createColumnTable: inputQuery(
             createColumnTableTemplate,
             stripEllipsis(i18n('actions.createColumnTable')),
@@ -237,6 +256,7 @@ const bindActions = (
             stripEllipsis(i18n('actions.selectQuery')),
         ),
         createTopic: inputQuery(createTopicTemplate, stripEllipsis(i18n('actions.createTopic'))),
+        updateTopic: () => showUpdateTopicDialog?.(params.path),
         alterTopic: inputQuery(alterTopicTemplate, stripEllipsis(i18n('actions.alterTopic'))),
         dropTopic: inputQuery(dropTopicTemplate, stripEllipsis(i18n('actions.dropTopic'))),
         createView: inputQuery(createViewTemplate, stripEllipsis(i18n('actions.createView'))),
@@ -403,15 +423,41 @@ export const getActions =
             DB_SET = [[copyItem, connectToDBItem, monitoringItem], createEntitiesSet];
         }
 
-        if (actions.createDirectory) {
-            const createDirectoryItem = {
-                text: i18n('actions.createDirectory'),
-                action: actions.createDirectory,
-                iconStart: <CirclePlus />,
-            };
+        const createDirectoryItem = actions.createDirectory
+            ? {
+                  text: i18n('actions.createDirectory'),
+                  action: actions.createDirectory,
+                  iconStart: <CirclePlus />,
+              }
+            : undefined;
+        const createTableItem = actions.createTableDialog
+            ? {
+                  text: stripEllipsis(i18n('actions.createTable')),
+                  action: actions.createTableDialog,
+                  iconStart: <CirclePlus />,
+              }
+            : undefined;
+        const createTopicItem = actions.createTopicDialog
+            ? {
+                  text: stripEllipsis(i18n('actions.createTopic')),
+                  action: actions.createTopicDialog,
+                  iconStart: <CirclePlus />,
+              }
+            : undefined;
+        const createDialogItems: typeof createEntitiesSet = [];
+        if (createDirectoryItem) {
+            createDialogItems.push(createDirectoryItem);
+        }
+        if (createTableItem) {
+            createDialogItems.push(createTableItem);
+        }
+        if (createTopicItem) {
+            createDialogItems.push(createTopicItem);
+        }
 
-            DB_SET.splice(1, 0, [createDirectoryItem]);
-            DIR_SET.splice(1, 0, [createDirectoryItem]);
+        if (createDialogItems.length) {
+            DB_SET.splice(1, 0, createDialogItems);
+            DIR_SET.splice(1, 0, createDialogItems);
         }
 
         const showCreateTableItem = getActionWithLoader({
@@ -428,8 +474,21 @@ export const getActions =
             disabled: additionalEffects.hasRunningCompaction?.(path),
         });
 
+        const updateTableItem = {
+            text: i18n('actions.updateTable'),
+            action: actions.updateTable,
+            iconStart: <Pencil />,
+        };
+
+        const updateTopicItem = {
+            text: i18n('actions.updateTopic'),
+            action: actions.updateTopic,
+            iconStart: <Pencil />,
+        };
+
         const ROW_TABLE_SET: ActionsSet = [
             [copyItem],
+            [updateTableItem],
             [
                 alterRowTableGroupItem,
                 {text: i18n('actions.dropTable'), action: actions.dropTable},
@@ -455,6 +514,7 @@ export const getActions =
         ];
         const COLUMN_TABLE_SET: ActionsSet = [
             [copyItem],
+            [updateTableItem],
             [
                 alterColumnTableGroupItem,
                 {text: i18n('actions.dropTable'), action: actions.dropTable},
@@ -467,6 +527,7 @@ export const getActions =
 
         const TOPIC_SET: ActionsSet = [
             [copyItem],
+            [updateTopicItem],
             [
                 {text: i18n('actions.alterTopic'), action: actions.alterTopic},
                 {text: i18n('actions.dropTopic'), action: actions.dropTopic},

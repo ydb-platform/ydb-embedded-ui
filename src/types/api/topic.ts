@@ -140,6 +140,8 @@ interface PartitioningSettings {
      */
     min_active_partitions?: string;
 
+    max_active_partitions?: string;
+
     /**
      * int64
      *
@@ -148,6 +150,27 @@ interface PartitioningSettings {
      * Zero value means default - 100.
      */
     partition_count_limit?: string;
+
+    auto_partitioning_settings?: AutoPartitioningSettings;
+}
+
+interface AutoPartitioningSettings {
+    strategy?: AutoPartitioningStrategy;
+    partition_write_speed?: AutoPartitioningWriteSpeedStrategy;
+}
+
+interface AutoPartitioningWriteSpeedStrategy {
+    stabilization_window?: string | IProtobufTimeObject;
+    up_utilization_percent?: number;
+    down_utilization_percent?: number;
+}
+
+enum AutoPartitioningStrategy {
+    AUTO_PARTITIONING_STRATEGY_UNSPECIFIED = 'AUTO_PARTITIONING_STRATEGY_UNSPECIFIED',
+    AUTO_PARTITIONING_STRATEGY_DISABLED = 'AUTO_PARTITIONING_STRATEGY_DISABLED',
+    AUTO_PARTITIONING_STRATEGY_SCALE_UP = 'AUTO_PARTITIONING_STRATEGY_SCALE_UP',
+    AUTO_PARTITIONING_STRATEGY_SCALE_UP_AND_DOWN = 'AUTO_PARTITIONING_STRATEGY_SCALE_UP_AND_DOWN',
+    AUTO_PARTITIONING_STRATEGY_PAUSED = 'AUTO_PARTITIONING_STRATEGY_PAUSED',
 }
 
 enum MeteringMode {

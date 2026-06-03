@@ -1,0 +1,148 @@
+.ydb-topic-form-dialog {
+    &__modal {
+        overscroll-behavior: none;
+    }
+
+    &__body {
+        padding-top: var(--g-spacing-5);
+    }
+
+    &__form {
+        width: 100%;
+    }
+
+    &__section + &__section {
+        margin-top: var(--g-spacing-6);
+    }
+
+    &__section-title {
+        margin-bottom: var(--g-spacing-4);
+    }
+
+    &__row {
+        display: grid;
+        align-items: start;
+        grid-template-columns: 190px minmax(0, 1fr);
+        gap: var(--g-spacing-3);
+
+        & + & {
+            margin-top: var(--g-spacing-4);
+        }
+    }
+
+    &__label {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
+
+        padding-top: 7px;
+
+        font-weight: 500;
+    }
+
+    &__label-title {
+        min-width: 0;
+    }
+
+    &__help-mark {
+        flex-shrink: 0;
+    }
+
+    &__help-mark-popup {
+        max-width: 300px;
+    }
+
+    &__required {
+        color: var(--g-color-text-danger);
+    }
+
+    &__fixed-value {
+        min-height: 28px;
+        padding-top: 5px;
+    }
+
+    &__control-stack {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--g-spacing-2);
+    }
+
+    &__control,
+    &__control.g-text-input,
+    &__control.g-select {
+        width: 320px;
+        max-width: 100%;
+    }
+
+    &__input-s {
+        width: 120px;
+    }
+
+    &__select-s {
+        width: 180px;
+        max-width: 100%;
+    }
+
+    &__dual-inputs {
+        display: flex;
+        gap: var(--g-spacing-4);
+    }
+
+    &__input-details {
+        margin-right: var(--g-spacing-2);
+
+        text-transform: capitalize;
+
+        color: var(--g-color-text-secondary);
+    }
+
+    &__divider {
+        margin: var(--g-spacing-6) 0;
+    }
+
+    &__disclosure {
+        margin-top: var(--g-spacing-4);
+    }
+
+    &__switch-row {
+        padding-top: var(--g-spacing-1);
+    }
+
+    &__settings-content {
+        padding-top: var(--g-spacing-4);
+    }
+
+    &__incompatible-popover {
+        padding: var(--g-spacing-3);
+    }
+
+    &__storage-control {
+        display: flex;
+        flex-direction: column;
+        gap: var(--g-spacing-1);
+
+        width: 100%;
+        max-width: 320px;
+    }
+
+    &__warning-icon {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    &__popover-target {
+        display: inline-flex;
+    }
+
+    &__error {
+        max-width: 100%;
+    }
+
+    &__loader {
+        display: flex;
+        justify-content: center;
+
+        padding: var(--g-spacing-8) 0;
+    }
+}

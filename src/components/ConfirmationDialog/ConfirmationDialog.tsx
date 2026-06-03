@@ -22,6 +22,7 @@ interface CommonDialogProps {
     textButtonApply?: string;
     buttonApplyView?: ButtonView;
     className?: string;
+    disableOutsideClick?: boolean;
     onConfirm?: () => void;
 }
 
@@ -40,6 +41,8 @@ export const CONFIRMATION_DIALOG = 'confirmation-dialog';
 function ConfirmationDialog({
     caption = '',
     children,
+    message,
+    body,
     onConfirm,
     onClose,
     progress,
@@ -47,6 +50,7 @@ function ConfirmationDialog({
     textButtonCancel,
     buttonApplyView = 'normal',
     className,
+    disableOutsideClick = true,
     renderButtons,
     open,
     confirmOnEnter,
@@ -56,12 +60,12 @@ function ConfirmationDialog({
             className={block(null, className)}
             size="s"
             onClose={onClose}
-            disableOutsideClick
+            disableOutsideClick={disableOutsideClick}
             open={open}
             onEnterKeyDown={confirmOnEnter ? onConfirm : undefined}
         >
             <Dialog.Header caption={<span className={block('caption')}>{caption}</span>} />
-            <Dialog.Body>{children}</Dialog.Body>
+            <Dialog.Body>{children ?? body ?? message}</Dialog.Body>
             <Dialog.Footer
                 onClickButtonApply={onConfirm}
                 propsButtonApply={{view: buttonApplyView}}
