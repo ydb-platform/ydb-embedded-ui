@@ -39,11 +39,9 @@
         min-width: 0;
     }
 
-    &__pile-labels {
-        flex-shrink: 0;
-    }
-
     &__state-label {
+        flex-shrink: 0;
+
         &_with-help {
             --_--margin-inline: var(--g-spacing-1);
         }

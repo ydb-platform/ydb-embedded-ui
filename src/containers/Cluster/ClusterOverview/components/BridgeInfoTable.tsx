@@ -25,76 +25,71 @@ interface PreparedGroupStatus {
     value: number;
 }
 
-function getBridgePileStateTheme(state?: BridgePileState): NonNullable<LabelProps['theme']> {
-    switch (state) {
-        case BridgePileState.SYNCHRONIZED:
-            return 'success';
-        case BridgePileState.SUSPENDED:
-            return 'warning';
-        case BridgePileState.NOT_SYNCHRONIZED:
-        case BridgePileState.PRIMARY:
-        case BridgePileState.PROMOTED:
-            return 'normal';
-        case BridgePileState.UNSPECIFIED:
-        case BridgePileState.DISCONNECTED:
-        default:
-            return 'unknown';
-    }
+interface BridgePileStateInfo {
+    label?: string;
+    theme: NonNullable<LabelProps['theme']>;
+    icon?: React.ReactNode;
+    help?: string;
 }
 
-function getBridgePileStateLabel(state?: BridgePileState) {
+function getBridgePileStateInfo(state?: BridgePileState): BridgePileStateInfo {
     switch (state) {
         case BridgePileState.PRIMARY:
-            return i18n('value_bridge-state-primary');
+            return {
+                label: i18n('value_bridge-state-primary'),
+                theme: 'normal',
+            };
         case BridgePileState.PROMOTED:
-            return i18n('value_bridge-state-promoted');
+            return {
+                label: i18n('value_bridge-state-promoted'),
+                theme: 'normal',
+                icon: <Icon data={ArrowChevronRight} size={12} />,
+                help: i18n('context_bridge-pile-state-promoted'),
+            };
         case BridgePileState.SYNCHRONIZED:
-            return i18n('value_bridge-state-synchronised');
+            return {
+                label: i18n('value_bridge-state-synchronised'),
+                theme: 'success',
+                icon: <Icon data={CircleCheck} size={12} />,
+                help: i18n('context_bridge-pile-state-synchronised'),
+            };
         case BridgePileState.NOT_SYNCHRONIZED:
-            return i18n('value_bridge-state-not-synchronised');
+            return {
+                label: i18n('value_bridge-state-not-synchronised'),
+                theme: 'normal',
+                icon: <Icon data={Ban} size={12} />,
+                help: i18n('context_bridge-pile-state-not-synchronised'),
+            };
         case BridgePileState.SUSPENDED:
-            return i18n('value_bridge-state-suspended');
+            return {
+                label: i18n('value_bridge-state-suspended'),
+                theme: 'warning',
+                icon: <Icon data={CirclePause} size={12} />,
+                help: i18n('context_bridge-pile-state-suspended'),
+            };
         case BridgePileState.DISCONNECTED:
-            return i18n('value_bridge-state-disconnected');
+            return {
+                label: i18n('value_bridge-state-disconnected'),
+                theme: 'unknown',
+                icon: <Icon data={LinkSlash} size={12} />,
+                help: i18n('context_bridge-pile-state-disconnected'),
+            };
         case BridgePileState.UNSPECIFIED:
-            return i18n('value_bridge-state-unspecified');
+            return {
+                label: i18n('value_bridge-state-unspecified'),
+                theme: 'unknown',
+            };
         default:
-            return state;
+            return {
+                label: state,
+                theme: 'unknown',
+            };
     }
 }
 
-function getBridgePileStateIcon(state?: BridgePileState) {
-    switch (state) {
-        case BridgePileState.PROMOTED:
-            return <Icon data={ArrowChevronRight} size={12} />;
-        case BridgePileState.SYNCHRONIZED:
-            return <Icon data={CircleCheck} size={12} />;
-        case BridgePileState.NOT_SYNCHRONIZED:
-            return <Icon data={Ban} size={12} />;
-        case BridgePileState.SUSPENDED:
-            return <Icon data={CirclePause} size={12} />;
-        case BridgePileState.DISCONNECTED:
-            return <Icon data={LinkSlash} size={12} />;
-        default:
-            return undefined;
-    }
-}
-
-function getBridgePileStateHelp(state?: BridgePileState) {
-    switch (state) {
-        case BridgePileState.PROMOTED:
-            return i18n('context_bridge-pile-state-promoted');
-        case BridgePileState.SYNCHRONIZED:
-            return i18n('context_bridge-pile-state-synchronised');
-        case BridgePileState.NOT_SYNCHRONIZED:
-            return i18n('context_bridge-pile-state-not-synchronised');
-        case BridgePileState.SUSPENDED:
-            return i18n('context_bridge-pile-state-suspended');
-        case BridgePileState.DISCONNECTED:
-            return i18n('context_bridge-pile-state-disconnected');
-        default:
-            return undefined;
-    }
+interface BridgePileGroupStatusInfo {
+    label: string;
+    theme: GroupStatusTheme;
 }
 
 function getNodesLabel(nodes?: number) {
@@ -109,20 +104,38 @@ function getNodesLabel(nodes?: number) {
     return i18n('value_nodes-other', {count: formatNumber(nodes)});
 }
 
-function getBridgePileGroupStatusLabel(status?: BridgePileGroupStatus) {
+function getBridgePileGroupStatusInfo(status?: BridgePileGroupStatus): BridgePileGroupStatusInfo {
     switch (status) {
         case BridgePileGroupStatus.UNKNOWN:
-            return i18n('value_bridge-group-status-unknown');
+            return {
+                label: i18n('value_bridge-group-status-unknown'),
+                theme: 'secondary',
+            };
         case BridgePileGroupStatus.FULL:
-            return i18n('value_bridge-group-status-full');
+            return {
+                label: i18n('value_bridge-group-status-full'),
+                theme: 'positive',
+            };
         case BridgePileGroupStatus.PARTIAL:
-            return i18n('value_bridge-group-status-partial');
+            return {
+                label: i18n('value_bridge-group-status-partial'),
+                theme: 'warning',
+            };
         case BridgePileGroupStatus.DEGRADED:
-            return i18n('value_bridge-group-status-degraded');
+            return {
+                label: i18n('value_bridge-group-status-degraded'),
+                theme: 'danger',
+            };
         case BridgePileGroupStatus.DISINTEGRATED:
-            return i18n('value_bridge-group-status-disintegrated');
+            return {
+                label: i18n('value_bridge-group-status-disintegrated'),
+                theme: 'dark-complementary',
+            };
         default:
-            return EMPTY_DATA_PLACEHOLDER;
+            return {
+                label: EMPTY_DATA_PLACEHOLDER,
+                theme: 'secondary',
+            };
     }
 }
 
@@ -134,27 +147,13 @@ function getBridgePileGroupStatus(status: string): BridgePileGroupStatus | undef
     return undefined;
 }
 
-function getBridgePileGroupStatusTheme(status?: BridgePileGroupStatus): GroupStatusTheme {
-    switch (status) {
-        case BridgePileGroupStatus.FULL:
-            return 'positive';
-        case BridgePileGroupStatus.PARTIAL:
-            return 'warning';
-        case BridgePileGroupStatus.DEGRADED:
-            return 'danger';
-        case BridgePileGroupStatus.DISINTEGRATED:
-            return 'dark-complementary';
-        case BridgePileGroupStatus.UNKNOWN:
-        default:
-            return 'secondary';
-    }
-}
-
 function prepareGroupStatuses(groupStatuses?: TBridgePile['GroupStatuses']): PreparedGroupStatus[] {
     return Object.entries(groupStatuses ?? {})
         .map(([status, value]) => {
             const groupStatus = getBridgePileGroupStatus(status);
-            const label = groupStatus ? getBridgePileGroupStatusLabel(groupStatus) : status;
+            const {label, theme} = groupStatus
+                ? getBridgePileGroupStatusInfo(groupStatus)
+                : {label: status, theme: 'secondary' as const};
             const numericValue = Number(value);
 
             if (!Number.isFinite(numericValue) || numericValue <= 0) {
@@ -163,7 +162,7 @@ function prepareGroupStatuses(groupStatuses?: TBridgePile['GroupStatuses']): Pre
 
             return {
                 label,
-                theme: getBridgePileGroupStatusTheme(groupStatus),
+                theme,
                 value: numericValue,
             };
         })
@@ -252,15 +251,12 @@ const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCard
     const groupStatusesLegendId = React.useId();
 
     const stateStatus = React.useMemo(() => {
-        const stateLabel = getBridgePileStateLabel(pile.State);
-        if (!stateLabel) {
+        const {label, theme, icon, help} = getBridgePileStateInfo(pile.State);
+        if (!label) {
             return null;
         }
 
-        const theme = getBridgePileStateTheme(pile.State);
-        const icon = getBridgePileStateIcon(pile.State);
-        const stateHelp = getBridgePileStateHelp(pile.State);
-        const showStateHelp = Boolean(stateHelp);
+        const showStateHelp = Boolean(help);
 
         return (
             <Label
@@ -270,7 +266,7 @@ const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCard
                 className={b('state-label', {'with-help': showStateHelp})}
             >
                 <Flex alignItems="center" gap={2} wrap="nowrap">
-                    {stateLabel}
+                    {label}
                     {showStateHelp ? (
                         <HelpMark
                             iconSize="s"
@@ -280,7 +276,7 @@ const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCard
                                 className: b('state-help-popover'),
                             }}
                         >
-                            {stateHelp}
+                            {help}
                         </HelpMark>
                     ) : null}
                 </Flex>
