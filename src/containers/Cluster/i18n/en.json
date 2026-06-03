@@ -33,6 +33,7 @@
   "context_bridge-pile-state-suspended": "Pile is being gracefully transitioned to DISCONNECTED\nstate. It remains in this state during the graceful shutdown.\nAfter completion, YDB will automatically move it\nto DISCONNECTED.",
   "context_bridge-pile-state-disconnected": "Pile is disconnected from PRIMARY and does\nnot participate in operation execution.",
   "context_group-statuses": "Storage group statuses",
+  "context_group-statuses-empty": "No storage group status data",
   "context_cpu": "CPU load",
   "context_memory": "Memory used",
   "title_storage-by-type": "Storage {{type}}",

@@ -123,9 +123,21 @@
 }
 
 .bridge-info-table-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--g-spacing-2);
+
     min-width: 0;
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
 
     &__item {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
+
         min-width: 0;
     }
 

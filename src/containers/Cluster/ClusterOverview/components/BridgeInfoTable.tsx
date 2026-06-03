@@ -36,6 +36,7 @@ function getBridgePileStateTheme(state?: BridgePileState): NonNullable<LabelProp
         case BridgePileState.PROMOTED:
             return 'normal';
         case BridgePileState.UNSPECIFIED:
+        case BridgePileState.DISCONNECTED:
         default:
             return 'unknown';
     }
@@ -58,7 +59,7 @@ function getBridgePileStateLabel(state?: BridgePileState) {
         case BridgePileState.UNSPECIFIED:
             return i18n('value_bridge-state-unspecified');
         default:
-            return state || EMPTY_DATA_PLACEHOLDER;
+            return state;
     }
 }
 
@@ -169,19 +170,36 @@ function prepareGroupStatuses(groupStatuses?: TBridgePile['GroupStatuses']): Pre
         .filter((status): status is PreparedGroupStatus => status !== undefined);
 }
 
-function SegmentedProgressBar({statuses}: {statuses: PreparedGroupStatus[]}) {
+interface SegmentedProgressBarProps {
+    statuses: PreparedGroupStatus[];
+    describedBy?: string;
+}
+
+function SegmentedProgressBar({statuses, describedBy}: SegmentedProgressBarProps) {
     const total = statuses.reduce((sum, {value}) => sum + value, 0);
 
     if (!Number.isFinite(total) || total <= 0) {
-        return <div className={progressB({empty: true})} />;
+        return (
+            <div
+                className={progressB({empty: true})}
+                role="img"
+                aria-label={i18n('context_group-statuses-empty')}
+            />
+        );
     }
 
     return (
-        <div className={progressB()} aria-label={i18n('context_group-statuses')}>
+        <div
+            className={progressB()}
+            role="img"
+            aria-label={i18n('context_group-statuses')}
+            aria-describedby={describedBy}
+        >
             {statuses.map(({label, theme, value}) => (
                 <div
                     key={`${label}-${value}`}
                     className={progressB('item', {theme})}
+                    aria-hidden="true"
                     style={{
                         width: `${(value / total) * 100}%`,
                     }}
@@ -191,7 +209,12 @@ function SegmentedProgressBar({statuses}: {statuses: PreparedGroupStatus[]}) {
     );
 }
 
-function GroupStatusesLegend({statuses}: {statuses: PreparedGroupStatus[]}) {
+interface GroupStatusesLegendProps {
+    statuses: PreparedGroupStatus[];
+    id?: string;
+}
+
+function GroupStatusesLegend({statuses, id}: GroupStatusesLegendProps) {
     if (!statuses.length) {
         return (
             <Text variant="caption-2" color="secondary">
@@ -201,14 +224,9 @@ function GroupStatusesLegend({statuses}: {statuses: PreparedGroupStatus[]}) {
     }
 
     return (
-        <Flex gap={2} wrap className={legendB()}>
+        <ul id={id} className={legendB()} aria-label={i18n('context_group-statuses')}>
             {statuses.map(({label, theme, value}) => (
-                <Flex
-                    key={`${label}-${value}`}
-                    alignItems="center"
-                    gap={1}
-                    className={legendB('item')}
-                >
+                <li key={`${label}-${value}`} className={legendB('item')}>
                     <span aria-hidden="true" className={legendB('dot', {theme})} />
                     <Text variant="caption-2" className={legendB('label')}>
                         {label}
@@ -216,9 +234,9 @@ function GroupStatusesLegend({statuses}: {statuses: PreparedGroupStatus[]}) {
                     <Text variant="caption-2" color="secondary">
                         {formatNumber(value)}
                     </Text>
-                </Flex>
+                </li>
             ))}
-        </Flex>
+        </ul>
     );
 }
 
@@ -231,8 +249,14 @@ interface BridgePileCardProps {
 }
 
 const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCardProps) {
+    const groupStatusesLegendId = React.useId();
+
     const stateStatus = React.useMemo(() => {
         const stateLabel = getBridgePileStateLabel(pile.State);
+        if (!stateLabel) {
+            return null;
+        }
+
         const theme = getBridgePileStateTheme(pile.State);
         const icon = getBridgePileStateIcon(pile.State);
         const stateHelp = getBridgePileStateHelp(pile.State);
@@ -266,25 +290,31 @@ const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCard
         () => prepareGroupStatuses(pile.GroupStatuses),
         [pile.GroupStatuses],
     );
+    const groupStatusesDescriptionId = groupStatuses.length ? groupStatusesLegendId : undefined;
 
     return (
         <Flex direction="column" gap={2} className={b('pile')}>
             <Flex justifyContent="space-between" alignItems="flex-start" gap={3}>
                 <Flex direction="column" className={b('pile-title')}>
                     <Text variant="subheader-1" ellipsis>
-                        {pile.Name || EMPTY_DATA_PLACEHOLDER}
+                        {pile.Name?.trim() || EMPTY_DATA_PLACEHOLDER}
                     </Text>
                     <Text variant="caption-2" color="secondary">
                         {getNodesLabel(pile.Nodes)}
                     </Text>
                 </Flex>
-                <Flex gap={1} wrap="nowrap" className={b('pile-labels')}>
-                    {stateStatus}
-                </Flex>
+                {stateStatus ? (
+                    <Flex gap={1} wrap="nowrap" className={b('pile-labels')}>
+                        {stateStatus}
+                    </Flex>
+                ) : null}
             </Flex>
             <Flex direction="column" gap={1} className={b('statuses')}>
-                <SegmentedProgressBar statuses={groupStatuses} />
-                <GroupStatusesLegend statuses={groupStatuses} />
+                <SegmentedProgressBar
+                    statuses={groupStatuses}
+                    describedBy={groupStatusesDescriptionId}
+                />
+                <GroupStatusesLegend statuses={groupStatuses} id={groupStatusesDescriptionId} />
             </Flex>
         </Flex>
     );

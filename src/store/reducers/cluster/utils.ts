@@ -1,4 +1,10 @@
-import type {TClusterInfoV2, TStorageStats} from '../../../types/api/cluster';
+import type {
+    TBridgePile,
+    TClusterInfo,
+    TClusterInfoV2,
+    TClusterInfoV5,
+    TStorageStats,
+} from '../../../types/api/cluster';
 import type {ExecuteQueryResponse, KeyValueRow} from '../../../types/api/query';
 import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {normalizeMediaType} from '../../../utils/disks/normalizeMediaType';
@@ -91,6 +97,40 @@ export const parseGroupsStatsQueryResponse = (
 
 export function getGroupStatsFromClusterInfo(info: TClusterInfoV2) {
     return getGroupStats(info.StorageStats);
+}
+
+function isClusterInfoWithBridgeInfo(info: TClusterInfo): info is TClusterInfoV5 {
+    return 'BridgeInfo' in info;
+}
+
+function hasBridgePileDisplayData(pile: TBridgePile) {
+    const hasGroupStatuses = Object.values(pile.GroupStatuses ?? {}).some((value) => {
+        const numericValue = Number(value);
+
+        return Number.isFinite(numericValue) && numericValue > 0;
+    });
+
+    return Boolean(pile.Name?.trim() || pile.State || pile.Nodes !== undefined || hasGroupStatuses);
+}
+
+export function prepareClusterInfo(info: TClusterInfo): TClusterInfo {
+    if (!isClusterInfoWithBridgeInfo(info) || !info.BridgeInfo?.Piles) {
+        return info;
+    }
+
+    const visiblePiles = info.BridgeInfo.Piles.filter(hasBridgePileDisplayData);
+
+    if (visiblePiles.length === info.BridgeInfo.Piles.length) {
+        return info;
+    }
+
+    return {
+        ...info,
+        BridgeInfo: {
+            ...info.BridgeInfo,
+            Piles: visiblePiles,
+        },
+    };
 }
 
 export function normalizeDomain(domain?: string) {
