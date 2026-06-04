@@ -1,5 +1,12 @@
 # Changelog
 
+## [15.7.0-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.7.0...v15.7.0-hotfix.1) (2026-06-04)
+
+
+### Bug Fixes
+
+* configure if detailed storage view available ([#3974](https://github.com/ydb-platform/ydb-embedded-ui/issues/3974)) ([19b6a3b](https://github.com/ydb-platform/ydb-embedded-ui/commit/19b6a3b3635fec05b3f74e0f7867a64b9ca81766))
+
 ## [15.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.6.0...v15.7.0) (2026-05-25)
 
 
