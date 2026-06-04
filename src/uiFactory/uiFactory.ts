@@ -27,6 +27,7 @@ const uiFactoryBase: UIFactory = {
     settingsBackend: undefined,
     enableMultiTabQueryEditor: false,
     hasDeveloperUi: true,
+    isDetailedStorageViewAvailable: () => true,
 };
 
 type UIFactoryOverrides<H extends string, T extends string> = Omit<

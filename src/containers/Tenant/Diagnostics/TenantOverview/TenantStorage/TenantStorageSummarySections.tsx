@@ -256,15 +256,19 @@ function getMediaSectionRows({
     };
 }
 
+interface TenantStorageMediaSectionViewProps {
+    section: TenantStorageMediaSection;
+    showMediaTypeLabel: boolean;
+    data: TenantStorageData;
+    showPhysicalDiskUsage?: boolean;
+}
+
 export function TenantStorageMediaSectionView({
     section,
     showMediaTypeLabel,
     data,
-}: {
-    section: TenantStorageMediaSection;
-    showMediaTypeLabel: boolean;
-    data: TenantStorageData;
-}) {
+    showPhysicalDiskUsage,
+}: TenantStorageMediaSectionViewProps) {
     const {mediaLabel, physical, user} = getMediaSectionRows({
         data,
         section,
@@ -279,18 +283,24 @@ export function TenantStorageMediaSectionView({
                 </Text>
             ) : null}
             {renderUserSummary(user.summary, user.segments)}
-            {renderPhysicalSummary(physical.summary, physical.segments, physical.systemDetails)}
+            {showPhysicalDiskUsage
+                ? renderPhysicalSummary(physical.summary, physical.segments, physical.systemDetails)
+                : null}
         </Flex>
     );
+}
+
+interface TenantStorageGroupedMediaSectionsViewProps {
+    data: TenantStorageData;
+    sections: TenantStorageMediaSection[];
+    showPhysicalDiskUsage?: boolean;
 }
 
 export function TenantStorageGroupedMediaSectionsView({
     data,
     sections,
-}: {
-    data: TenantStorageData;
-    sections: TenantStorageMediaSection[];
-}) {
+    showPhysicalDiskUsage,
+}: TenantStorageGroupedMediaSectionsViewProps) {
     const rows = sections.map((section, index) => {
         return getMediaSectionRows({
             data,
@@ -310,13 +320,15 @@ export function TenantStorageGroupedMediaSectionsView({
                 qa="tenant-storage-grouped-user-data-summary-card"
                 rows={rows.map((row) => row.user)}
             />
-            <GroupedSummaryCard
-                title={i18n('title_physical-disk-usage')}
-                description={i18n('context_physical-disk-usage-description')}
-                position="last"
-                qa="tenant-storage-grouped-physical-summary-card"
-                rows={rows.map((row) => row.physical)}
-            />
+            {showPhysicalDiskUsage ? (
+                <GroupedSummaryCard
+                    title={i18n('title_physical-disk-usage')}
+                    description={i18n('context_physical-disk-usage-description')}
+                    position="last"
+                    qa="tenant-storage-grouped-physical-summary-card"
+                    rows={rows.map((row) => row.physical)}
+                />
+            ) : null}
         </Flex>
     );
 }

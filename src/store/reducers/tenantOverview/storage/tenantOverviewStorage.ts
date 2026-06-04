@@ -339,7 +339,6 @@ async function getStorageStatsForTopRows(
                 useMetaProxy,
             },
             groupBy: 'path',
-            everything: true,
         },
         options,
     );
