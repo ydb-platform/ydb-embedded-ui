@@ -10,6 +10,7 @@ import {
     useIsViewerUser,
 } from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
+import {useIsStorageExpertMode} from '../../useStorageQueryParams';
 
 import {getStorageGroupsColumns} from './columns';
 import type {StorageGroupsColumnId} from './constants';
@@ -33,6 +34,7 @@ export function useStorageGroupsSelectedColumns({
     const isViewerUser = useIsViewerUser();
     const bridgeModeEnabled = useBridgeModeEnabled();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+    const isStorageExpertMode = useIsStorageExpertMode();
 
     const skippedColumnIds = React.useMemo(() => {
         const skipped: StorageGroupsColumnId[] = [];
@@ -57,8 +59,18 @@ export function useStorageGroupsSelectedColumns({
             }
         }
 
+        if (isStorageExpertMode) {
+            skipped.push(STORAGE_GROUPS_COLUMNS_IDS.VDisks);
+        }
+
         return skipped;
-    }, [bridgeModeEnabled, blobMetricsEnabled, isUserAllowedToMakeChanges, isViewerUser]);
+    }, [
+        bridgeModeEnabled,
+        blobMetricsEnabled,
+        isUserAllowedToMakeChanges,
+        isStorageExpertMode,
+        isViewerUser,
+    ]);
 
     const columns = React.useMemo(() => {
         const allColumns = getStorageGroupsColumns({viewContext});
@@ -79,13 +91,17 @@ export function useStorageGroupsSelectedColumns({
     }, [visibleEntities]);
 
     const defaultColumns = React.useMemo(() => {
+        const defaultStorageGroupsColumns = isStorageExpertMode
+            ? [...DEFAULT_STORAGE_GROUPS_COLUMNS, STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks]
+            : DEFAULT_STORAGE_GROUPS_COLUMNS;
+
         if (!bridgeModeEnabled) {
-            return DEFAULT_STORAGE_GROUPS_COLUMNS;
+            return defaultStorageGroupsColumns;
         }
-        return DEFAULT_STORAGE_GROUPS_COLUMNS.includes(STORAGE_GROUPS_COLUMNS_IDS.PileName)
-            ? DEFAULT_STORAGE_GROUPS_COLUMNS
-            : [...DEFAULT_STORAGE_GROUPS_COLUMNS, STORAGE_GROUPS_COLUMNS_IDS.PileName];
-    }, [bridgeModeEnabled]);
+        return defaultStorageGroupsColumns.includes(STORAGE_GROUPS_COLUMNS_IDS.PileName)
+            ? defaultStorageGroupsColumns
+            : [...defaultStorageGroupsColumns, STORAGE_GROUPS_COLUMNS_IDS.PileName];
+    }, [bridgeModeEnabled, isStorageExpertMode]);
 
     return useSelectedColumns(
         columns,
