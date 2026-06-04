@@ -37,6 +37,7 @@ interface Window {
     web_version?: boolean;
     custom_backend?: string;
     meta_backend?: string;
+    multi_cluster_mode?: boolean;
     code_assist_backend?: string;
 
     react_app_disable_checks?: boolean;
