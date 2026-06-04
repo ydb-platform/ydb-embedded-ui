@@ -13,7 +13,11 @@ import {
 import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {useSetting} from '../../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {STORAGE_GROUPS_GROUP_BY_OPTIONS} from '../PaginatedStorageGroupsTable/columns/constants';
+import {
+    STORAGE_GROUPS_COLUMNS_IDS,
+    STORAGE_GROUPS_GROUP_BY_OPTIONS,
+} from '../PaginatedStorageGroupsTable/columns/constants';
+import type {StorageGroupsColumn} from '../PaginatedStorageGroupsTable/columns/types';
 import {StorageExpertModePanel} from '../StorageExpertModePanel/StorageExpertModePanel';
 import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
 import {StorageVisibleEntitiesFilter} from '../StorageVisibleEntitiesFilter/StorageVisibleEntitiesFilter';
@@ -25,6 +29,8 @@ interface StorageControlsProps {
     withTypeSelector?: boolean;
     withGroupBySelect?: boolean;
 
+    columns?: StorageGroupsColumn[];
+
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
     entitiesLoading: boolean;
@@ -33,6 +39,8 @@ interface StorageControlsProps {
 export function StorageGroupsControls({
     withTypeSelector,
     withGroupBySelect,
+
+    columns = [],
 
     entitiesCountCurrent,
     entitiesCountTotal,
@@ -57,6 +65,10 @@ export function StorageGroupsControls({
     const isStorageExpertMode = useIsStorageExpertMode();
     const bridgeModeEnabled = useBridgeModeEnabled();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+
+    const isVDisksPDisksColumnVisible = React.useMemo(() => {
+        return columns.some((column) => column.name === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks);
+    }, [columns]);
 
     const groupByOptions = React.useMemo(() => {
         const skippedValues: string[] = [];
@@ -133,7 +145,7 @@ export function StorageGroupsControls({
                     </Button>
                 ) : null}
             </Flex>
-            {isStorageExpertMode ? <StorageExpertModePanel /> : null}
+            {isStorageExpertMode && isVDisksPDisksColumnVisible ? <StorageExpertModePanel /> : null}
         </Flex>
     );
 }
@@ -141,9 +153,11 @@ export function StorageGroupsControls({
 export function StorageGroupsControlsWithTableState({
     withTypeSelector,
     withGroupBySelect,
+    columns,
 }: {
     withTypeSelector?: boolean;
     withGroupBySelect?: boolean;
+    columns?: StorageGroupsColumn[];
 }) {
     const {tableState} = usePaginatedTableState();
 
@@ -151,6 +165,7 @@ export function StorageGroupsControlsWithTableState({
         <StorageGroupsControls
             withTypeSelector={withTypeSelector}
             withGroupBySelect={withGroupBySelect}
+            columns={columns}
             entitiesCountCurrent={tableState.foundEntities}
             entitiesCountTotal={tableState.totalEntities}
             entitiesLoading={tableState.isInitialLoad}
