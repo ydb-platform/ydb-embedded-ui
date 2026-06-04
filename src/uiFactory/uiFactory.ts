@@ -23,6 +23,7 @@ const uiFactoryBase: UIFactory = {
     settingsBackend: undefined,
     enableMultiTabQueryEditor: false,
     hasDeveloperUi: true,
+    isDetailedStorageViewAvailable: () => true,
 };
 
 export function configureUIFactory<H extends string, T extends string = string>(

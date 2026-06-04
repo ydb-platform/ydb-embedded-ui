@@ -90,6 +90,8 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
 
     getReportProblemUrl?: GetReportProblemUrl;
 
+    isDetailedStorageViewAvailable?: IsDetailedStorageViewAvailable;
+
     illustrations?: Partial<Record<IllustrationName, IllustrationComponent>>;
 
     hideNewFeaturesNotifications?: {
@@ -129,6 +131,8 @@ export type GetDatabaseLinks = (params: {
 }) => DatabaseLink[];
 
 export type GetClusterLinks = (params: {clusterInfo: ClusterInfo}) => ClusterLink[];
+
+export type IsDetailedStorageViewAvailable = (params: {clusterInfo: ClusterInfo}) => boolean;
 
 export type RenderBackups = (props: {
     database: string;

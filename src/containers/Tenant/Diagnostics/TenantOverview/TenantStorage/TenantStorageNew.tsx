@@ -5,6 +5,7 @@ import {Flex} from '@gravity-ui/uikit';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Skeleton} from '../../../../../components/Skeleton/Skeleton';
 import {cn} from '../../../../../utils/cn';
+import {useIsViewerUser} from '../../../../../utils/hooks/useIsUserAllowedToMakeChanges';
 
 import {
     TenantStorageGroupedMediaSectionsView,
@@ -19,11 +20,19 @@ import './TenantStorageNew.scss';
 
 const b = cn('ydb-tenant-storage-new');
 
-function TenantStorageSummarySkeleton() {
+interface TenantStorageSummarySkeletonProps {
+    showPhysicalDiskUsage?: boolean;
+}
+
+function TenantStorageSummarySkeleton({showPhysicalDiskUsage}: TenantStorageSummarySkeletonProps) {
+    const skeletonCards = React.useMemo(() => {
+        return Array.from({length: showPhysicalDiskUsage ? 2 : 1}, (_, index) => index);
+    }, [showPhysicalDiskUsage]);
+
     return (
         <Flex direction="column" className={b('sections-group')}>
             <Flex direction="column" gap={3} className={b('sections-inner')}>
-                {[0, 1].map((cardIndex) => (
+                {skeletonCards.map((cardIndex) => (
                     <Flex
                         key={cardIndex}
                         direction="column"
@@ -85,6 +94,7 @@ export function TenantStorageNew({
         metrics,
     });
     const loading = isFetching && currentData === undefined;
+    const isViewerUser = useIsViewerUser();
     const mediaSections = React.useMemo(() => {
         return buildTenantStorageMediaSections({
             blobStorageStats,
@@ -103,7 +113,7 @@ export function TenantStorageNew({
     if (loading) {
         return (
             <Flex direction="column" gap={4} className={b()}>
-                <TenantStorageSummarySkeleton />
+                <TenantStorageSummarySkeleton showPhysicalDiskUsage={isViewerUser} />
                 <TenantStorageTopUsageTable loading error={undefined} rows={[]} withData={false} />
             </Flex>
         );
@@ -117,6 +127,7 @@ export function TenantStorageNew({
                         <TenantStorageGroupedMediaSectionsView
                             sections={mediaSections}
                             data={data}
+                            showPhysicalDiskUsage={isViewerUser}
                         />
                     ) : (
                         mediaSections.map((section, index) => (
@@ -125,6 +136,7 @@ export function TenantStorageNew({
                                 section={section}
                                 showMediaTypeLabel={false}
                                 data={data}
+                                showPhysicalDiskUsage={isViewerUser}
                             />
                         ))
                     )}

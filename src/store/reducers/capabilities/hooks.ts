@@ -2,6 +2,7 @@ import type {Capability, MetaCapability, SecuritySetting} from '../../../types/a
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useSetting, useTypedSelector} from '../../../utils/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
+import {useClusterBaseInfo} from '../cluster/cluster';
 import {SETTING_KEYS} from '../settings/constants';
 
 import {
@@ -67,10 +68,17 @@ export const useStorageStatsAvailable = () => {
     return useGetFeatureVersion('/viewer/storage_stats') > 0;
 };
 
+export const useDetailedStorageViewAvailable = () => {
+    const clusterInfo = useClusterBaseInfo();
+
+    return uiFactory.isDetailedStorageViewAvailable?.({clusterInfo});
+};
+
 export const useNewStorageViewEnabled = () => {
     const [enabled] = useSetting(SETTING_KEYS.ENABLE_NEW_STORAGE_VIEW, false);
+    const detailedStorageViewAvailable = useDetailedStorageViewAvailable();
 
-    return enabled;
+    return enabled && detailedStorageViewAvailable;
 };
 
 export const useBlobIndexStatWithVdiskId = () => {

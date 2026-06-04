@@ -33,7 +33,13 @@ export const UserSettings = ({settings: userSettings}: UserSettingsProps) => {
                                                 </Settings.Item>
                                             );
                                         }
-                                        const {description, ...rest} = setting;
+                                        // `effectiveValue` is consumed by `Setting`, but should not
+                                        // be forwarded to the external Settings.Item component.
+                                        const {
+                                            description,
+                                            effectiveValue: _effectiveValue,
+                                            ...rest
+                                        } = setting;
                                         return (
                                             <Settings.Item
                                                 key={setting.title}
