@@ -15,9 +15,15 @@ export interface SettingProps {
     type?: SettingsElementType;
     title: string;
     description?: React.ReactNode;
+    disabled?: boolean;
     settingKey: string;
     options?: {value: string; content: string}[];
     defaultValue?: unknown;
+    /**
+     * Displayed value when the setting is effectively overridden by runtime context.
+     * The persisted user setting is still kept unchanged.
+     */
+    effectiveValue?: unknown;
     onValueUpdate?: VoidFunction;
 }
 
@@ -26,9 +32,12 @@ export const Setting = ({
     settingKey,
     options,
     defaultValue,
+    effectiveValue,
     onValueUpdate,
+    disabled,
 }: SettingProps) => {
     const [settingValue, setValue] = useSetting(settingKey, defaultValue);
+    const displayedValue = effectiveValue ?? settingValue;
 
     const onUpdate = (value: unknown) => {
         setValue(value);
@@ -37,7 +46,9 @@ export const Setting = ({
 
     switch (type) {
         case 'switch': {
-            return <Switch checked={Boolean(settingValue)} onUpdate={onUpdate} />;
+            return (
+                <Switch checked={Boolean(displayedValue)} onUpdate={onUpdate} disabled={disabled} />
+            );
         }
 
         case 'radio': {
@@ -46,7 +57,11 @@ export const Setting = ({
             }
 
             return (
-                <SegmentedRadioGroup value={String(settingValue)} onUpdate={onUpdate}>
+                <SegmentedRadioGroup
+                    value={String(displayedValue)}
+                    onUpdate={onUpdate}
+                    disabled={disabled}
+                >
                     {options.map(({value, content}) => {
                         return (
                             <SegmentedRadioGroup.Option value={value} key={value}>

@@ -175,14 +175,17 @@ export function applyClusterSpecificQueryStreamingSetting(
     });
 }
 
-export function applyBlobStorageCapacityMetricsSettingAvailability(
-    settings: YDBEmbeddedUISettings,
-    available: boolean,
-): YDBEmbeddedUISettings {
-    if (available) {
-        return settings;
-    }
+function isSettingWithKey(
+    setting: SettingProps | SettingsInfoFieldProps,
+    settingKey: string,
+): setting is SettingProps {
+    return 'settingKey' in setting && setting.settingKey === settingKey;
+}
 
+function hideExperimentSetting(
+    settings: YDBEmbeddedUISettings,
+    settingKey: string,
+): YDBEmbeddedUISettings {
     return settings.map((page) => {
         if (page.id !== PAGE_IDS.EXPERIMENTS) {
             return page;
@@ -195,13 +198,31 @@ export function applyBlobStorageCapacityMetricsSettingAvailability(
                 return;
             }
 
-            section.settings = section.settings.filter(
-                (s) =>
-                    !('settingKey' in s) ||
-                    s.settingKey !== SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS,
-            );
+            section.settings = section.settings.filter((s) => !isSettingWithKey(s, settingKey));
         });
     });
+}
+
+export function applyDetailedStorageViewSettingAvailability(
+    settings: YDBEmbeddedUISettings,
+    available: boolean,
+): YDBEmbeddedUISettings {
+    if (available) {
+        return settings;
+    }
+
+    return hideExperimentSetting(settings, SETTING_KEYS.ENABLE_NEW_STORAGE_VIEW);
+}
+
+export function applyBlobStorageCapacityMetricsSettingAvailability(
+    settings: YDBEmbeddedUISettings,
+    available: boolean,
+): YDBEmbeddedUISettings {
+    if (available) {
+        return settings;
+    }
+
+    return hideExperimentSetting(settings, SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS);
 }
 
 export const showNetworkUtilizationSetting: SettingProps = {
