@@ -25,8 +25,16 @@ const b = cn('ydb-tenant-storage-segments');
 
 const SEGMENT_TOOLTIP_OPEN_DELAY = 100;
 const SEGMENT_TOOLTIP_CLOSE_DELAY = 100;
+const SEGMENT_TOOLTIP_WITH_HELP_MARK_CLOSE_DELAY = 250;
 const PROGRESS_TOOLTIP_PLACEMENT: PopupPlacement = ['top', 'bottom'];
 const LEGEND_TOOLTIP_PLACEMENT: PopupPlacement = ['bottom', 'top'];
+
+export type TenantStorageSegmentOpenSource = 'progress' | 'legend' | 'system-details';
+export type TenantStorageSegmentOpenChange = (
+    segmentKey: TenantStorageSegmentKey,
+    open: boolean,
+    source: TenantStorageSegmentOpenSource,
+) => void;
 
 const SEGMENT_COLORS: Record<TenantStorageSegmentKey, string> = {
     [TENANT_STORAGE_SEGMENT_KEYS.rowTables]: 'var(--ydb-storage-segment-row-tables)',
@@ -118,18 +126,22 @@ export function SegmentTooltipContent({
 
 function SegmentTooltip({
     children,
+    closeDelay = SEGMENT_TOOLTIP_CLOSE_DELAY,
     formatValue,
     onOpenChange,
     placement,
     segment,
+    source,
     total,
     totalLabel,
 }: {
     children: React.ReactElement;
+    closeDelay?: number;
     formatValue: (value: number) => string;
-    onOpenChange: (segmentKey: TenantStorageSegmentKey, open: boolean) => void;
+    onOpenChange: TenantStorageSegmentOpenChange;
     placement: PopupPlacement;
     segment: TenantStorageSegment;
+    source: TenantStorageSegmentOpenSource;
     total: number;
     totalLabel: string;
 }) {
@@ -137,7 +149,7 @@ function SegmentTooltip({
         <Tooltip
             placement={placement}
             openDelay={SEGMENT_TOOLTIP_OPEN_DELAY}
-            closeDelay={SEGMENT_TOOLTIP_CLOSE_DELAY}
+            closeDelay={closeDelay}
             content={
                 <SegmentTooltipContent
                     formatValue={formatValue}
@@ -146,7 +158,7 @@ function SegmentTooltip({
                     totalLabel={totalLabel}
                 />
             }
-            onOpenChange={(open) => onOpenChange(segment.key, open)}
+            onOpenChange={(open) => onOpenChange(segment.key, open, source)}
         >
             {children}
         </Tooltip>
@@ -166,7 +178,7 @@ export function SegmentedProgressBar({
     activeSegmentKey?: TenantStorageSegmentKey;
     formatValue: (value: number) => string;
     formatTooltipValue: (value: number) => string;
-    onSegmentOpenChange: (segmentKey: TenantStorageSegmentKey, open: boolean) => void;
+    onSegmentOpenChange: TenantStorageSegmentOpenChange;
     segments: TenantStorageSegment[];
     tooltipTotal: number;
     tooltipTotalLabel: string;
@@ -194,6 +206,7 @@ export function SegmentedProgressBar({
                         onOpenChange={onSegmentOpenChange}
                         placement={PROGRESS_TOOLTIP_PLACEMENT}
                         segment={segment}
+                        source="progress"
                         total={tooltipTotal}
                         totalLabel={tooltipTotalLabel}
                     >
@@ -266,12 +279,12 @@ function SystemDetailsHelpMark({
     details: TenantStorageSystemDetail[];
     formatSystemDetailValue?: (value: number) => string;
     formatValue: (value: number) => string;
-    onOpenChange: (segmentKey: TenantStorageSegmentKey, open: boolean) => void;
+    onOpenChange: TenantStorageSegmentOpenChange;
     segmentKey: TenantStorageSegmentKey;
 }) {
     const handleOpenChange = React.useCallback(
         (open: boolean) => {
-            onOpenChange(segmentKey, open);
+            onOpenChange(segmentKey, open, 'system-details');
         },
         [onOpenChange, segmentKey],
     );
@@ -282,6 +295,7 @@ function SystemDetailsHelpMark({
             iconSize="s"
             popoverProps={{
                 placement: LEGEND_TOOLTIP_PLACEMENT,
+                openDelay: SEGMENT_TOOLTIP_OPEN_DELAY,
                 onOpenChange: handleOpenChange,
             }}
         >
@@ -320,7 +334,7 @@ function LegendItem({
     formatSystemDetailValue?: (value: number) => string;
     formatTooltipValue: (value: number) => string;
     formatValue: (value: number) => string;
-    onSegmentOpenChange: (segmentKey: TenantStorageSegmentKey, open: boolean) => void;
+    onSegmentOpenChange: TenantStorageSegmentOpenChange;
     segment: TenantStorageSegment;
     showSystemDetails: boolean;
     systemDetails: TenantStorageSystemDetail[];
@@ -329,14 +343,17 @@ function LegendItem({
 }) {
     const contentId = React.useId();
     const inactive = activeSegmentKey !== undefined && activeSegmentKey !== segment.key;
+    const closeDelay = showSystemDetails ? SEGMENT_TOOLTIP_WITH_HELP_MARK_CLOSE_DELAY : undefined;
 
     return (
         <div aria-labelledby={contentId} className={b('legend-item', {inactive})} role="group">
             <SegmentTooltip
+                closeDelay={closeDelay}
                 formatValue={formatTooltipValue}
                 onOpenChange={onSegmentOpenChange}
                 placement={LEGEND_TOOLTIP_PLACEMENT}
                 segment={segment}
+                source="legend"
                 total={tooltipTotal}
                 totalLabel={tooltipTotalLabel}
             >
@@ -372,7 +389,7 @@ export function LegendItems({
     formatValue: (value: number) => string;
     formatTooltipValue: (value: number) => string;
     formatSystemDetailValue?: (value: number) => string;
-    onSegmentOpenChange: (segmentKey: TenantStorageSegmentKey, open: boolean) => void;
+    onSegmentOpenChange: TenantStorageSegmentOpenChange;
     systemDetails?: TenantStorageSystemDetail[];
     tooltipTotal: number;
     tooltipTotalLabel: string;
