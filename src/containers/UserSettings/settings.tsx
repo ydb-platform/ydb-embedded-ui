@@ -205,7 +205,7 @@ function hideExperimentSetting(
 
 export function applyDetailedStorageViewSettingAvailability(
     settings: YDBEmbeddedUISettings,
-    available: boolean,
+    available?: boolean,
 ): YDBEmbeddedUISettings {
     if (available) {
         return settings;
