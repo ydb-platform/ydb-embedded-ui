@@ -42,6 +42,7 @@ export interface MetaBaseClusterInfo {
     description?: string;
     balancer?: string;
     service?: string;
+    galaxy?: string;
     use_embedded_ui?: boolean;
 
     // Depending on meta version, these fields could be stringified objects or valid JSON

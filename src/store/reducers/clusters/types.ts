@@ -30,6 +30,7 @@ export interface ClustersFilters {
     status: string[];
     service: string[];
     version: string[];
+    galaxy: string[];
     clusterName: string;
 }
 

@@ -14,6 +14,7 @@ import {changeClustersFilters, clustersApi} from '../../store/reducers/clusters/
 import {
     filterClusters,
     selectClusterNameFilter,
+    selectGalaxyFilter,
     selectServiceFilter,
     selectStatusFilter,
     selectVersionFilter,
@@ -57,6 +58,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const status = useTypedSelector(selectStatusFilter);
     const service = useTypedSelector(selectServiceFilter);
     const version = useTypedSelector(selectVersionFilter);
+    const galaxy = useTypedSelector(selectGalaxyFilter);
 
     const changeStatus = (value: string[]) => {
         dispatch(changeClustersFilters({status: value}));
@@ -69,6 +71,9 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     };
     const changeVersion = (value: string[]) => {
         dispatch(changeClustersFilters({version: value}));
+    };
+    const changeGalaxy = (value: string[]) => {
+        dispatch(changeClustersFilters({galaxy: value}));
     };
 
     const [healthcheckClusterName, setHealthcheckClusterName] = React.useState<string | undefined>(
@@ -101,14 +106,18 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
 
     const clusters = query.data;
 
-    const {servicesToSelect, versions} = React.useMemo(() => {
+    const {servicesToSelect, versions, galaxiesToSelect} = React.useMemo(() => {
         const clustersServices = new Set<string>();
         const uniqVersions = new Set<string>();
+        const clustersGalaxies = new Set<string>();
 
         const clusterList = clusters ?? [];
         clusterList.forEach((cluster) => {
             if (cluster.service) {
                 clustersServices.add(cluster.service);
+            }
+            if (cluster.galaxy) {
+                clustersGalaxies.add(cluster.galaxy);
             }
             cluster.cluster?.Versions?.forEach((v) => {
                 uniqVersions.add(getMinorVersion(v));
@@ -121,12 +130,16 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                 content: value,
             })),
             versions: Array.from(uniqVersions).map((value) => ({value, content: value})),
+            galaxiesToSelect: Array.from(clustersGalaxies).map((value) => ({
+                value,
+                content: value,
+            })),
         };
     }, [clusters]);
 
     const filteredClusters = React.useMemo(() => {
-        return filterClusters(clusters ?? [], {clusterName, status, service, version});
-    }, [clusterName, clusters, service, status, version]);
+        return filterClusters(clusters ?? [], {clusterName, status, service, version, galaxy});
+    }, [clusterName, clusters, service, status, version, galaxy]);
 
     const statuses = React.useMemo(() => {
         return Array.from(
@@ -148,39 +161,58 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                     value={clusterName}
                     width={320}
                 />
-                <Select
-                    multiple
-                    filterable
-                    hasClear
-                    placeholder={i18n('controls_select-placeholder')}
-                    label={i18n('controls_status-select-label')}
-                    value={status}
-                    options={statuses}
-                    onUpdate={changeStatus}
-                    width={200}
-                />
-                <Select
-                    multiple
-                    filterable
-                    hasClear
-                    placeholder={i18n('controls_select-placeholder')}
-                    label={i18n('controls_service-select-label')}
-                    value={service}
-                    options={servicesToSelect}
-                    onUpdate={changeService}
-                    width={200}
-                />
-                <Select
-                    multiple
-                    filterable
-                    hasClear
-                    placeholder={i18n('controls_select-placeholder')}
-                    label={i18n('controls_version-select-label')}
-                    value={version}
-                    options={versions}
-                    onUpdate={changeVersion}
-                    width={200}
-                />
+                {galaxiesToSelect.length > 0 || galaxy.length > 0 ? (
+                    <Select
+                        multiple
+                        filterable
+                        hasClear
+                        placeholder={i18n('controls_select-placeholder')}
+                        label={i18n('controls_galaxy-select-label')}
+                        value={galaxy}
+                        options={galaxiesToSelect}
+                        onUpdate={changeGalaxy}
+                        width={200}
+                    />
+                ) : null}
+                {statuses.length > 0 || status.length > 0 ? (
+                    <Select
+                        multiple
+                        filterable
+                        hasClear
+                        placeholder={i18n('controls_select-placeholder')}
+                        label={i18n('controls_status-select-label')}
+                        value={status}
+                        options={statuses}
+                        onUpdate={changeStatus}
+                        width={200}
+                    />
+                ) : null}
+                {servicesToSelect.length > 0 || service.length > 0 ? (
+                    <Select
+                        multiple
+                        filterable
+                        hasClear
+                        placeholder={i18n('controls_select-placeholder')}
+                        label={i18n('controls_service-select-label')}
+                        value={service}
+                        options={servicesToSelect}
+                        onUpdate={changeService}
+                        width={200}
+                    />
+                ) : null}
+                {versions.length > 0 || version.length > 0 ? (
+                    <Select
+                        multiple
+                        filterable
+                        hasClear
+                        placeholder={i18n('controls_select-placeholder')}
+                        label={i18n('controls_version-select-label')}
+                        value={version}
+                        options={versions}
+                        onUpdate={changeVersion}
+                        width={200}
+                    />
+                ) : null}
             </React.Fragment>
         );
     };

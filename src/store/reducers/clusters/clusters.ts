@@ -11,6 +11,7 @@ const initialState: ClustersFilters = {
     status: [],
     service: [],
     version: [],
+    galaxy: [],
 };
 
 const slice = createSlice({
