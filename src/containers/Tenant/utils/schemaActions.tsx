@@ -1,4 +1,4 @@
-import {CirclePlus, Code, Copy, PlugConnection} from '@gravity-ui/icons';
+import {CirclePlus, Code, Copy, GearPlay, PlugConnection} from '@gravity-ui/icons';
 import {Flex, Icon, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import {v4 as uuidv4} from 'uuid';
@@ -73,6 +73,9 @@ interface ActionsAdditionalParams {
     showCreateDirectoryDialog?: (path: string) => void;
     getConfirmation?: () => Promise<boolean>;
     getConnectToDBDialog?: (params: SnippetParams) => Promise<boolean>;
+    showCompactionDialog?: (path: string) => void;
+    hasRunningCompaction?: (path: string) => boolean;
+    isCompactionLoading?: boolean;
     schemaData?: SchemaData[];
     isSchemaDataLoading?: boolean;
     hasMonitoring?: boolean;
@@ -102,6 +105,7 @@ const bindActions = (
         showCreateDirectoryDialog,
         getConfirmation,
         getConnectToDBDialog,
+        showCompactionDialog,
         schemaData,
         streamingQueryData,
         showCreateTableData,
@@ -152,6 +156,9 @@ const bindActions = (
               }
             : undefined,
         getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.database}),
+        openCompactionDialog: () => {
+            showCompactionDialog?.(params.path);
+        },
         openMonitoring: () => {
             setTenantPage(TENANT_PAGES_IDS.diagnostics);
             dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
@@ -270,10 +277,11 @@ interface ActionConfig {
     text: string;
     action: () => void;
     isLoading?: boolean;
+    disabled?: boolean;
     iconStart?: React.ReactNode;
 }
 
-const getActionWithLoader = ({text, action, isLoading, iconStart}: ActionConfig) => ({
+const getActionWithLoader = ({text, action, isLoading, disabled, iconStart}: ActionConfig) => ({
     text: (
         <Flex justifyContent="space-between" alignItems="center">
             {text}
@@ -281,7 +289,7 @@ const getActionWithLoader = ({text, action, isLoading, iconStart}: ActionConfig)
         </Flex>
     ),
     action,
-    disabled: isLoading,
+    disabled: isLoading || disabled,
     iconStart,
 });
 
@@ -395,6 +403,13 @@ export const getActions =
             isLoading: additionalEffects.isShowCreateTableLoading,
             iconStart: <Code />,
         });
+        const compactionItem = getActionWithLoader({
+            text: i18n('actions.compaction'),
+            action: actions.openCompactionDialog,
+            iconStart: <Icon data={GearPlay} />,
+            isLoading: additionalEffects.isCompactionLoading,
+            disabled: additionalEffects.hasRunningCompaction?.(path),
+        });
 
         const ROW_TABLE_SET: ActionsSet = [
             [copyItem],
@@ -416,7 +431,10 @@ export const getActions =
                 {text: i18n('actions.addFulltextIndex'), action: actions.addFulltextIndex},
                 {text: i18n('actions.createCdcStream'), action: actions.createCdcStream},
             ],
-            [showCreateTableItem],
+            [
+                ...(additionalEffects.showCompactionDialog ? [compactionItem] : []),
+                showCreateTableItem,
+            ],
         ];
         const COLUMN_TABLE_SET: ActionsSet = [
             [copyItem],
@@ -506,6 +524,10 @@ export const getActions =
 
         // verbose mapping to guarantee a correct actions set for new node types
         // TS will error when a new type is added in the lib but is not mapped here
+        const INDEX_TABLE_SET = additionalEffects.showCompactionDialog
+            ? [[copyItem], [compactionItem]]
+            : JUST_COPY;
+
         const nodeTypeToActions: Record<NavigationTreeNodeType, ActionsSet> = {
             async_replication: ASYNC_REPLICATION_SET,
             transfer: TRANSFER_SET,
@@ -519,7 +541,7 @@ export const getActions =
             column_table: COLUMN_TABLE_SET,
             system_table: SYSTEM_VIEW_SET,
 
-            index_table: JUST_COPY,
+            index_table: INDEX_TABLE_SET,
             topic: TOPIC_SET,
             stream: JUST_COPY,
 

@@ -22,7 +22,7 @@ export function useOperationsInfiniteQuery({
     searchValue,
     scrollContainerRef,
 }: UseOperationsInfiniteQueryProps) {
-    const {data, error, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, refetch} =
+    const {data, error, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage} =
         operationsApi.useGetOperationListInfiniteQuery({
             database,
             kind,
@@ -74,27 +74,32 @@ export function useOperationsInfiniteQuery({
     }, [data, isFetchingNextPage, checkAndLoadMorePages]);
 
     // Scroll handler for infinite scrolling
+    const handleScroll = React.useCallback(() => {
+        const scrollContainer = scrollContainerRef?.current;
+        if (!scrollContainer) {
+            return;
+        }
+
+        const {scrollTop, scrollHeight, clientHeight} = scrollContainer;
+
+        if (
+            scrollHeight - scrollTop - clientHeight < DEFAULT_SCROLL_MARGIN &&
+            hasNextPage &&
+            !isFetchingNextPage
+        ) {
+            fetchNextPage();
+        }
+    }, [scrollContainerRef, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
     React.useEffect(() => {
         const scrollContainer = scrollContainerRef?.current;
         if (!scrollContainer) {
             return undefined;
         }
 
-        const handleScroll = () => {
-            const {scrollTop, scrollHeight, clientHeight} = scrollContainer;
-
-            if (
-                scrollHeight - scrollTop - clientHeight < DEFAULT_SCROLL_MARGIN &&
-                hasNextPage &&
-                !isFetchingNextPage
-            ) {
-                fetchNextPage();
-            }
-        };
-
         scrollContainer.addEventListener('scroll', handleScroll);
         return () => scrollContainer.removeEventListener('scroll', handleScroll);
-    }, [scrollContainerRef, hasNextPage, isFetchingNextPage, fetchNextPage]);
+    }, [scrollContainerRef, handleScroll]);
 
     // Resize handler to check if more content is needed when viewport changes
     React.useEffect(() => {
@@ -115,6 +120,5 @@ export function useOperationsInfiniteQuery({
         isLoading,
         isLoadingMore: isFetchingNextPage,
         error,
-        refreshTable: refetch,
     };
 }

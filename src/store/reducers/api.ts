@@ -26,7 +26,7 @@ export const api = createApi({
         'AccessRights',
         'Backups',
         'BackupsSchedule',
-        'CompactionList',
+        'OperationList',
     ],
 });
 

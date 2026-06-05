@@ -22,8 +22,13 @@ import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/sch
 import {valueIsDefined} from '../../../../utils';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useCompactionFeature} from '../../../../utils/hooks/useCompactionFeature';
+import {useStartCompaction} from '../../../../utils/hooks/useStartCompaction';
 import {getConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
+import {findRunningTableCompactionOperation} from '../../../../utils/tableCompaction';
+import {openCompactTableDialog} from '../../Diagnostics/Overview/TableInfo/CompactTableAction/CompactTableAction';
+import {useTableCompaction} from '../../Diagnostics/Overview/TableInfo/hooks/useTableCompaction';
 import {useTenantPage} from '../../TenantNavigation/useTenantNavigation';
 import {getSchemaControls} from '../../utils/controls';
 import {
@@ -31,6 +36,7 @@ import {
     mapPathTypeToNavigationTreeType,
     nodeStreamingQueryTypeToPathType,
     nodeTableTypeToPathType,
+    rowTableNodeTypeToPathType,
     tableTypeToPathType,
 } from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
@@ -77,6 +83,29 @@ export function SchemaTree(props: SchemaTreeProps) {
     const [parentPath, setParentPath] = React.useState('');
     const setSchemaTreeKey = useDispatchTreeKey();
     const schemaTreeKey = useTreeKey();
+
+    const [compactionActionsOpen, setCompactionActionsOpen] = React.useState(false);
+
+    // Compaction feature flag check
+    const {compactionEnabled} = useCompactionFeature(database);
+
+    // Use table compaction hook to track all running compactions only while table actions are open
+    const {operations: compactionOperations, isFetching: isCompactionFetching} = useTableCompaction(
+        database,
+        '',
+        compactionEnabled && compactionActionsOpen,
+    );
+
+    // Compaction helper hook
+    const startCompaction = useStartCompaction();
+
+    // Check if a specific table has running compaction
+    const hasRunningCompaction = React.useCallback(
+        (path: string) => {
+            return Boolean(findRunningTableCompactionOperation(compactionOperations, path));
+        },
+        [compactionOperations],
+    );
 
     const rootNodeType = isDomain(databaseFullPath, rootType)
         ? 'database'
@@ -154,6 +183,23 @@ export function SchemaTree(props: SchemaTreeProps) {
         setCreateDirectoryOpen(true);
     };
 
+    const handleOpenCompactionDialog = React.useCallback(
+        (path: string) => {
+            openCompactTableDialog({
+                onApply: async ({cascade, parallel}: {cascade: boolean; parallel?: number}) => {
+                    await startCompaction({
+                        database,
+                        path,
+                        cascade,
+                        parallel,
+                    });
+                },
+                hasRunningCompaction: hasRunningCompaction(path),
+            });
+        },
+        [database, startCompaction, hasRunningCompaction],
+    );
+
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();
     const {controlPlane} = useTenantBaseInfo(database);
     const getTreeNodeActions = React.useMemo(() => {
@@ -170,6 +216,9 @@ export function SchemaTree(props: SchemaTreeProps) {
                 getConfirmation:
                     input && isDirty && !isMultiTabEnabled ? getConfirmation : undefined,
                 getConnectToDBDialog,
+                showCompactionDialog: compactionEnabled ? handleOpenCompactionDialog : undefined,
+                hasRunningCompaction: compactionEnabled ? hasRunningCompaction : undefined,
+                isCompactionLoading: isCompactionFetching,
                 schemaData: actionsSchemaData,
                 isSchemaDataLoading: isActionsDataFetching,
                 hasMonitoring,
@@ -199,6 +248,10 @@ export function SchemaTree(props: SchemaTreeProps) {
         isStreamingInfoFetching,
         databaseFullPath,
         database,
+        compactionEnabled,
+        handleOpenCompactionDialog,
+        hasRunningCompaction,
+        isCompactionFetching,
     ]);
 
     return (
@@ -238,6 +291,9 @@ export function SchemaTree(props: SchemaTreeProps) {
                         const relativePath = transformPath(path, databaseFullPath);
                         getShowCreateTable({path: relativePath, database});
                     }
+
+                    const rowTableType = rowTableNodeTypeToPathType[type];
+                    setCompactionActionsOpen(isOpen && Boolean(rowTableType));
 
                     const streamingPathType = nodeStreamingQueryTypeToPathType[type];
                     if (isOpen && streamingPathType) {

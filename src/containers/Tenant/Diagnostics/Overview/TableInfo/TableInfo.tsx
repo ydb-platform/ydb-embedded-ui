@@ -3,21 +3,12 @@ import React from 'react';
 import {ChevronDown, ChevronUp, Gear} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Disclosure, Flex, Icon} from '@gravity-ui/uikit';
 
-import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
-import {useFeatureFlagsAvailable} from '../../../../../store/reducers/capabilities/hooks';
-import {configsApi} from '../../../../../store/reducers/configs';
 import {operationsApi} from '../../../../../store/reducers/operations';
-import {tablePartitioningApi} from '../../../../../store/reducers/tablePartitioning/tablePartitioning';
 import {EPathType} from '../../../../../types/api/schema';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
-import createToast from '../../../../../utils/createToast';
-import {useAutoRefreshInterval} from '../../../../../utils/hooks';
-import {
-    findRunningTableCompactionOperation,
-    isForcedCompactionEnabled,
-} from '../../../../../utils/tableCompaction';
-import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
+import {useCompactionFeature} from '../../../../../utils/hooks/useCompactionFeature';
+import {useStartCompaction} from '../../../../../utils/hooks/useStartCompaction';
 import {EntityTitle} from '../../../EntityTitle/EntityTitle';
 import {isRowTableType} from '../../../utils/schema';
 
@@ -25,11 +16,12 @@ import {
     CompactTableAction,
     CompactTableStatusBanner,
 } from './CompactTableAction/CompactTableAction';
-import {openManagePartitioningDialog} from './ManagePartitioningDialog/ManagePartitioningDialog';
 import {PartitionsProgress} from './PartitionsProgress/PartitionsProgress';
+import {TableInfoSection} from './components/TableInfoSection';
+import {useTableCompaction} from './hooks/useTableCompaction';
+import {useTablePartitioning} from './hooks/useTablePartitioning';
 import i18n from './i18n';
 import {prepareTableInfo} from './prepareTableInfo';
-import {prepareUpdatePartitioningRequest} from './utils';
 
 import './TableInfo.scss';
 
@@ -55,9 +47,11 @@ const TableInfoHeader = ({data}: {data?: TEvDescribeSchemeResult}) => {
 };
 
 export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
-    const [autoRefreshInterval] = useAutoRefreshInterval();
     const isRowTable = type === EPathType.EPathTypeTable;
-    const featureFlagsAvailable = useFeatureFlagsAvailable();
+
+    // Prepare all table information
+    const tableInfo = React.useMemo(() => prepareTableInfo(data, type), [data, type]);
+
     const {
         generalInfoLeft = [],
         generalInfoRight = [],
@@ -68,68 +62,65 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
         partitionConfigInfo = [],
         partitionProgressConfig,
         managePartitioningDialogConfig,
-    } = React.useMemo(() => prepareTableInfo(data, type), [data, type]);
+    } = tableInfo;
 
-    const [expanded, setExpanded] = React.useState(false);
-
-    const handleExpandedChange = React.useCallback((value: boolean) => setExpanded(value), []);
-
+    // Calculate if there's expandable content
     const hasMoreLeft = tableStatsInfo.some((items) => items.length > 0);
     const hasMoreRight = tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0;
-    const hasMore = hasMoreLeft || hasMoreRight;
 
-    const [updatePartitioning] = tablePartitioningApi.useUpdateTablePartitioningMutation();
-    const {currentData: featureFlags} = configsApi.useGetFeatureFlagsQuery(
-        {database},
-        {skip: !isRowTable || !featureFlagsAvailable},
+    // Compaction logic (only for row tables)
+    const {compactionEnabled} = useCompactionFeature(database, isRowTable);
+    const compactionEnabledForTable = isRowTable && compactionEnabled;
+    const {runningCompaction, isFetching: isCompactionFetching} = useTableCompaction(
+        database,
+        path,
+        compactionEnabledForTable,
     );
-    const compactionEnabled = isRowTable && isForcedCompactionEnabled(featureFlags);
-    const {currentData: compactionOperations, isFetching: isCompactionFetching} =
-        operationsApi.useGetCompactionListQuery(
-            {database},
-            {
-                pollingInterval: autoRefreshInterval,
-                skip: !compactionEnabled,
-            },
-        );
-    const runningCompaction = React.useMemo(
-        () => findRunningTableCompactionOperation(compactionOperations, path),
-        [compactionOperations, path],
-    );
-    const [startTableCompaction, {isLoading: isCompactionStarting}] =
-        operationsApi.useStartTableCompactionMutation();
 
-    const handleOpenManagePartitioning = React.useCallback(() => {
-        reachMetricaGoal('openManagePartitioning');
-        openManagePartitioningDialog({
-            initialValue: managePartitioningDialogConfig,
-            onApply: async (value) => {
-                reachMetricaGoal('applyManagePartitioning');
-                await updatePartitioning(
-                    prepareUpdatePartitioningRequest(value, database, path),
-                ).unwrap();
+    const startCompaction = useStartCompaction();
 
-                createToast({
-                    name: 'updateTablePartitioning',
-                    content: i18n('toast_partitioning-updated'),
-                    autoHiding: 3000,
-                    isClosable: true,
-                });
-            },
-        });
-    }, [managePartitioningDialogConfig, database, path, updatePartitioning]);
+    const [cancelOperation, {isLoading: isCancellingOperation}] =
+        operationsApi.useCancelOperationMutation();
 
     const handleStartCompaction = React.useCallback(
         async ({cascade, parallel}: {cascade: boolean; parallel?: number}) => {
-            await startTableCompaction({database, path, cascade, parallel}).unwrap();
+            await startCompaction({
+                database,
+                path,
+                cascade,
+                parallel,
+            });
         },
-        [database, path, startTableCompaction],
+        [database, path, startCompaction],
     );
+
+    const handleCancelCompaction = React.useCallback(async () => {
+        if (!runningCompaction?.id) {
+            return;
+        }
+        await cancelOperation({database, id: runningCompaction.id}).unwrap();
+    }, [database, cancelOperation, runningCompaction?.id]);
+
+    // Partitioning logic
+    const {handleOpenManagePartitioning} = useTablePartitioning(
+        database,
+        path,
+        managePartitioningDialogConfig,
+    );
+
+    // UI state
+    const [expanded, setExpanded] = React.useState(false);
+    const handleExpandedChange = React.useCallback((value: boolean) => setExpanded(value), []);
+    const hasMore = React.useMemo(() => hasMoreLeft || hasMoreRight, [hasMoreLeft, hasMoreRight]);
 
     return (
         <div className={b()}>
-            {compactionEnabled && runningCompaction && (
-                <CompactTableStatusBanner operation={runningCompaction} />
+            {compactionEnabledForTable && runningCompaction && (
+                <CompactTableStatusBanner
+                    operation={runningCompaction}
+                    onCancel={handleCancelCompaction}
+                    isCancelling={isCancellingOperation}
+                />
             )}
             <Flex
                 className={b('header')}
@@ -148,16 +139,15 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                                 aria-label={i18n('action_manage-partition-config')}
                             >
                                 <Icon data={Gear} size={16} />
-                                {i18n('action_manage')}
+                                {i18n('action_manage-partitioning')}
                             </Button>
                         </ActionTooltip>
                     )}
-                    {compactionEnabled && (
+                    {compactionEnabledForTable && (
                         <CompactTableAction
                             key={`${database}/${path}`}
                             runningCompaction={runningCompaction}
                             isFetching={isCompactionFetching}
-                            isStarting={isCompactionStarting}
                             onApply={handleStartCompaction}
                         />
                     )}
@@ -174,50 +164,28 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
             )}
             <div className={b('row', {'general-info': true})}>
                 <div className={b('col')}>
-                    {generalInfoLeft.length > 0 ? (
-                        <YDBDefinitionList
-                            nameMaxWidth="auto"
-                            responsive
-                            className={b('info-block')}
-                            items={generalInfoLeft}
-                        />
-                    ) : null}
+                    <TableInfoSection items={generalInfoLeft} className={b('info-block')} />
                 </div>
                 <div className={b('col')}>
-                    {generalInfoRight.length > 0 ? (
-                        <YDBDefinitionList
-                            nameMaxWidth="auto"
-                            responsive
-                            className={b('info-block')}
-                            items={generalInfoRight}
-                        />
-                    ) : null}
+                    <TableInfoSection items={generalInfoRight} className={b('info-block')} />
                 </div>
             </div>
 
             <div className={b('row')}>
                 <div className={b('col')}>
-                    {generalStats.length > 0 ? (
-                        <YDBDefinitionList
-                            items={generalStats}
-                            title={i18n('title_table-stats')}
-                            className={b('info-block')}
-                            nameMaxWidth="auto"
-                            responsive
-                        />
-                    ) : null}
+                    <TableInfoSection
+                        items={generalStats}
+                        title={i18n('title_table-stats')}
+                        className={b('info-block')}
+                    />
                 </div>
 
                 <div className={b('col')}>
-                    {generalMetrics.length > 0 ? (
-                        <YDBDefinitionList
-                            items={generalMetrics}
-                            title={i18n('title_tablet-metrics')}
-                            className={b('info-block')}
-                            nameMaxWidth="auto"
-                            responsive
-                        />
-                    ) : null}
+                    <TableInfoSection
+                        items={generalMetrics}
+                        title={i18n('title_tablet-metrics')}
+                        className={b('info-block')}
+                    />
                 </div>
             </div>
 
@@ -242,34 +210,24 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                                 {tableStatsInfo
                                     .filter((items) => items.length > 0)
                                     .map((items, index) => (
-                                        <YDBDefinitionList
+                                        <TableInfoSection
                                             key={index}
                                             items={items}
                                             className={b('info-block')}
-                                            nameMaxWidth="auto"
-                                            responsive
                                         />
                                     ))}
                             </div>
 
                             <div className={b('col')}>
-                                {tabletMetricsInfo.length > 0 ? (
-                                    <YDBDefinitionList
-                                        items={tabletMetricsInfo}
-                                        className={b('info-block')}
-                                        nameMaxWidth="auto"
-                                        responsive
-                                    />
-                                ) : null}
-                                {partitionConfigInfo.length > 0 ? (
-                                    <YDBDefinitionList
-                                        items={partitionConfigInfo}
-                                        title={i18n('title_partition-config')}
-                                        className={b('info-block')}
-                                        nameMaxWidth="auto"
-                                        responsive
-                                    />
-                                ) : null}
+                                <TableInfoSection
+                                    items={tabletMetricsInfo}
+                                    className={b('info-block')}
+                                />
+                                <TableInfoSection
+                                    items={partitionConfigInfo}
+                                    title={i18n('title_partition-config')}
+                                    className={b('info-block')}
+                                />
                             </div>
                         </div>
                     </Disclosure.Details>

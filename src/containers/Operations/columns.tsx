@@ -51,11 +51,9 @@ function renderStatusCell(row: TOperation) {
 
 export function getColumns({
     database,
-    refreshTable,
     kind,
 }: {
     database: string;
-    refreshTable: VoidFunction;
     kind: OperationKind;
 }): DataTableColumn<TOperation>[] {
     const isBuildIndex = kind === 'buildindex';
@@ -180,13 +178,7 @@ export function getColumns({
         resizeable: false,
         header: '',
         render: ({row}) => {
-            return (
-                <OperationsActions
-                    operation={row}
-                    database={database}
-                    refreshTable={refreshTable}
-                />
-            );
+            return <OperationsActions operation={row} database={database} />;
         },
     });
 
@@ -196,10 +188,9 @@ export function getColumns({
 interface OperationsActionsProps {
     operation: TOperation;
     database: string;
-    refreshTable: VoidFunction;
 }
 
-function OperationsActions({operation, database, refreshTable}: OperationsActionsProps) {
+function OperationsActions({operation, database}: OperationsActionsProps) {
     const [cancelOperation, {isLoading: isCancelLoading}] =
         operationsApi.useCancelOperationMutation();
     const [forgetOperation, {isLoading: isForgetLoading}] =
@@ -234,7 +225,6 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
                                         title: i18n('text_forgotten', {id}),
                                         theme: 'success',
                                     });
-                                    refreshTable();
                                 })
                         }
                         buttonDisabled={isForgetButtonDisabled}
@@ -263,7 +253,6 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
                                         title: i18n('text_cancelled', {id}),
                                         theme: 'success',
                                     });
-                                    refreshTable();
                                 })
                         }
                         buttonDisabled={isCancelButtonDisabled}

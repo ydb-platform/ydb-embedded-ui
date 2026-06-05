@@ -52,6 +52,7 @@
   "actions.addVectorIndex": "Add vector index...",
   "actions.addFulltextIndex": "Add fulltext index...",
   "actions.createCdcStream": "Create changefeed...",
+  "actions.compaction": "Compaction",
   "actions.showCreateTable": "Show Create SQL...",
   "actions.alterTopic": "Alter topic...",
   "actions.selectQuery": "Select query...",
