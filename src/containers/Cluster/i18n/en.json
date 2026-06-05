@@ -13,8 +13,10 @@
   "label_overview": "Overview",
   "field_state": "State",
   "field_nodes": "Nodes",
-  "value_nodes-one": "1 node",
-  "value_nodes-other": "{{count}} nodes",
+  "value_nodes": {
+    "one": "{{formattedCount}} node",
+    "other": "{{formattedCount}} nodes"
+  },
   "value_bridge-state-primary": "Primary",
   "value_bridge-state-promoted": "Promoted",
   "value_bridge-state-synchronised": "Synchronised",

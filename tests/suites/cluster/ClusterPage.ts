@@ -13,7 +13,7 @@ export class ClusterPage extends PageModel {
 
         this.clusterInfo = this.selector.locator('.cluster-info');
         this.bridgeSection = this.clusterInfo.locator('.cluster-info__bridge-section');
-        this.pileCards = this.bridgeSection.locator('.bridge-info-table__pile');
+        this.pileCards = this.bridgeSection.locator('.ydb-bridge-info-table__pile');
     }
 
     async isBridgeSectionVisible(): Promise<boolean> {

@@ -22,7 +22,7 @@
     }
 }
 
-.bridge-info-table {
+.ydb-bridge-info-table {
     height: 100%;
 
     &__pile {
@@ -42,12 +42,12 @@
     &__state-label {
         flex-shrink: 0;
 
-        &_with-help {
-            --_--margin-inline: var(--g-spacing-1);
+        &_with-help .g-label__text {
+            margin-inline: var(--g-spacing-1) var(--g-spacing-1);
         }
     }
 
-    &__state-help.g-help-mark {
+    &__state-help {
         color: inherit;
     }
 
@@ -60,7 +60,7 @@
     }
 }
 
-.bridge-info-table-progress {
+.ydb-bridge-info-table-progress {
     display: flex;
     overflow: hidden;
     align-items: center;
@@ -84,7 +84,7 @@
     }
 }
 
-.bridge-info-table-legend {
+.ydb-bridge-info-table-legend {
     display: flex;
     flex-wrap: wrap;
     gap: var(--g-spacing-2);

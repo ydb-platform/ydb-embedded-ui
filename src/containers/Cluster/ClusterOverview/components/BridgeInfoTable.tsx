@@ -13,9 +13,9 @@ import i18n from '../../i18n';
 
 import './BridgeInfoTable.scss';
 
-const b = cn('bridge-info-table');
-const progressB = cn('bridge-info-table-progress');
-const legendB = cn('bridge-info-table-legend');
+const b = cn('ydb-bridge-info-table');
+const progressB = cn('ydb-bridge-info-table-progress');
+const legendB = cn('ydb-bridge-info-table-legend');
 
 type GroupStatusTheme = 'positive' | 'warning' | 'danger' | 'dark-complementary' | 'secondary';
 
@@ -97,11 +97,10 @@ function getNodesLabel(nodes?: number) {
         return EMPTY_DATA_PLACEHOLDER;
     }
 
-    if (nodes === 1) {
-        return i18n('value_nodes-one');
-    }
-
-    return i18n('value_nodes-other', {count: formatNumber(nodes)});
+    return i18n('value_nodes', {
+        count: nodes,
+        formattedCount: formatNumber(nodes),
+    });
 }
 
 function getBridgePileGroupStatusInfo(status?: BridgePileGroupStatus): BridgePileGroupStatusInfo {

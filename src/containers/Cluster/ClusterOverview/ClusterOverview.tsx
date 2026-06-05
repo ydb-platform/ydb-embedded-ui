@@ -48,13 +48,13 @@ export function ClusterOverview(props: ClusterOverviewProps) {
     useResizeObserverTrigger([expandDashboard], 110);
     const bridgeModeEnabled = useBridgeModeEnabled();
 
-    const bridgeInfo = React.useMemo(() => {
+    const bridgePiles = React.useMemo(() => {
         if (!bridgeModeEnabled || !isClusterInfoV5(props.cluster)) {
             return undefined;
         }
 
         const {BridgeInfo} = props.cluster;
-        return BridgeInfo?.Piles?.length ? BridgeInfo : undefined;
+        return BridgeInfo?.Piles?.length ? BridgeInfo.Piles : undefined;
     }, [props.cluster, bridgeModeEnabled]);
     if (props.error) {
         return <ResponseError error={props.error} className={b('error')} />;
@@ -86,7 +86,7 @@ export function ClusterOverview(props: ClusterOverviewProps) {
         >
             <div className={b('disclosure-content')}>
                 <ClusterDashboard {...props} />
-                <ClusterInfo {...props} bridgePiles={bridgeInfo?.Piles} />
+                <ClusterInfo {...props} bridgePiles={bridgePiles} />
             </div>
         </Disclosure>
     );
