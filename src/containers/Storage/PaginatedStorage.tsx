@@ -6,6 +6,7 @@ import type {StorageViewContext} from './types';
 import {
     useSaveStorageExpertMode,
     useSaveStorageType,
+    useSaveVDisksGroupBy,
     useStorageQueryParams,
 } from './useStorageQueryParams';
 import {getStorageGroupsInitialEntitiesCount, getStorageNodesInitialEntitiesCount} from './utils';
@@ -27,6 +28,7 @@ export const PaginatedStorage = (props: PaginatedStorageProps) => {
     const {storageType} = useStorageQueryParams();
     useSaveStorageType();
     useSaveStorageExpertMode();
+    useSaveVDisksGroupBy();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const isNodes = storageType === 'nodes';

@@ -47,6 +47,7 @@ export const SETTING_KEYS = {
     IS_V2_NAVIGATION_ALERT_SEEN: 'isV2NavigationAlertSeen',
     ENABLE_STORAGE_EXPERT_MODE: 'enableStorageExpertMode',
     STORAGE_EXPERT_MODE: 'storageExpertMode',
+    STORAGE_VDISKS_GROUP_BY: 'storageVDisksGroupBy',
 } as const;
 
 export type SettingKey = ValueOf<typeof SETTING_KEYS>;
@@ -91,6 +92,7 @@ export const DEFAULT_USER_SETTINGS = {
     [SETTING_KEYS.IS_V2_NAVIGATION_ALERT_SEEN]: false,
     [SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE]: false,
     [SETTING_KEYS.STORAGE_EXPERT_MODE]: false,
+    [SETTING_KEYS.STORAGE_VDISKS_GROUP_BY]: 'State',
 } as const satisfies Record<SettingKey, unknown>;
 
 export const SETTINGS_OPTIONS: Record<string, SettingOptions | undefined> = {
