@@ -1,5 +1,28 @@
 # Changelog
 
+## [16.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.8.0...v16.0.0) (2026-06-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* **healthcheck:** allow to rewrite issue types ([#3954](https://github.com/ydb-platform/ydb-embedded-ui/issues/3954))
+
+### Features
+
+* alert for incomplete data ([#3963](https://github.com/ydb-platform/ydb-embedded-ui/issues/3963)) ([b125b63](https://github.com/ydb-platform/ydb-embedded-ui/commit/b125b63f87624f41b2286bd6b738cc04cb71216b))
+* **Clusters:** support filter by galaxy ([#3966](https://github.com/ydb-platform/ydb-embedded-ui/issues/3966)) ([ab05d4e](https://github.com/ydb-platform/ydb-embedded-ui/commit/ab05d4e592bae396b364d48fe56e2fcef7e0dfdb))
+* **configureStore:** support multi_cluster_mode variable ([#3969](https://github.com/ydb-platform/ydb-embedded-ui/issues/3969)) ([bb3fd25](https://github.com/ydb-platform/ydb-embedded-ui/commit/bb3fd25581275997f7c8311998dfa52f1d003a06))
+* **healthcheck:** allow to rewrite issue types ([#3954](https://github.com/ydb-platform/ydb-embedded-ui/issues/3954)) ([a8cf9f4](https://github.com/ydb-platform/ydb-embedded-ui/commit/a8cf9f4ce6693af75f4b9c44f963ae8a41ebdc05))
+* **Schema:** scroll to active element ([#3955](https://github.com/ydb-platform/ydb-embedded-ui/issues/3955)) ([c9975c2](https://github.com/ydb-platform/ydb-embedded-ui/commit/c9975c25a241a0fa2644d507320d61d4c2109147))
+
+
+### Bug Fixes
+
+* configure if detailed storage view available ([#3974](https://github.com/ydb-platform/ydb-embedded-ui/issues/3974)) ([a2f878a](https://github.com/ydb-platform/ydb-embedded-ui/commit/a2f878ad6503e8b784cc27aa3fa1366d11dcc5b1))
+* flashing active element in storage progress bar ([#3973](https://github.com/ydb-platform/ydb-embedded-ui/issues/3973)) ([46045d0](https://github.com/ydb-platform/ydb-embedded-ui/commit/46045d0ba33fc62defd5472fe68cda187e76f5ba))
+* keysets ([#3951](https://github.com/ydb-platform/ydb-embedded-ui/issues/3951)) ([07028ac](https://github.com/ydb-platform/ydb-embedded-ui/commit/07028ac55cab21c89475f2d9c6e02e26747d5d6a))
+* **PDisk, VDisk, Group:** do not use colorized progress for size ([#3953](https://github.com/ydb-platform/ydb-embedded-ui/issues/3953)) ([dbd6261](https://github.com/ydb-platform/ydb-embedded-ui/commit/dbd626114c4b8c3c5f9aa54bd59f2b71b1efefd3))
+
 ## [15.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.7.0...v15.8.0) (2026-05-27)
 
 
