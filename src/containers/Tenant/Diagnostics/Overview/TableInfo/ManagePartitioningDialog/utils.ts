@@ -28,15 +28,15 @@ export const splitUnitSchema = z.custom<BytesSizes>((value) => {
     return value in sizes;
 }, i18n('error_invalid-unit'));
 
-// Required positive number (> 0)
-const requiredPositiveNumber = (requiredMessage: string) =>
+// Optional positive number (> 0)
+const optionalPositiveNumber = () =>
     preprocessEmptyStringToUndefined(
         z.coerce
             .number({
-                required_error: requiredMessage,
-                invalid_type_error: requiredMessage,
+                invalid_type_error: i18n('error_required'),
             })
-            .gt(0),
+            .gt(0)
+            .optional(),
     );
 
 // Required positive integer (> 0)
@@ -56,7 +56,8 @@ export const managePartitioningSchema = (
 ) =>
     z
         .object({
-            splitSize: requiredPositiveNumber(i18n('error_required')),
+            splitSizeEnabled: z.boolean(),
+            splitSize: optionalPositiveNumber(),
             splitUnit: splitUnitSchema,
 
             loadEnabled: z.boolean(),
@@ -65,22 +66,35 @@ export const managePartitioningSchema = (
             maximum: requiredPositiveInt(i18n('error_required')),
         })
         .superRefine((data, ctx) => {
-            const {bytes, partitionSizeMb} = splitToPartitionSizeMb(data.splitSize, data.splitUnit);
-
-            if (bytes > maxSplitSizeBytes) {
+            if (data.splitSizeEnabled && data.splitSize === undefined) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     path: ['splitSize'],
-                    message: i18n('error_value-greater-maximum'),
+                    message: i18n('error_required'),
                 });
             }
 
-            if (partitionSizeMb < 1) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    path: ['splitSize'],
-                    message: i18n('error_value-too-small'),
-                });
+            if (data.splitSizeEnabled && data.splitSize !== undefined) {
+                const {bytes, partitionSizeMb} = splitToPartitionSizeMb(
+                    data.splitSize,
+                    data.splitUnit,
+                );
+
+                if (bytes > maxSplitSizeBytes) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ['splitSize'],
+                        message: i18n('error_value-greater-maximum'),
+                    });
+                }
+
+                if (partitionSizeMb < 1) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ['splitSize'],
+                        message: i18n('error_value-too-small'),
+                    });
+                }
             }
 
             if (data.minimum > data.maximum) {
