@@ -96,7 +96,7 @@ describe('substituteUrlParams', () => {
         ).toBe('https://example.com/?balancer=https%3A%2F%2Fbalancer.example.com');
     });
 
-    test('resolves {balancer} as full URL without encoding (http)', () => {
+    test('resolves {balancer} as full URL without encoding at start (http)', () => {
         const namespaces = makeNamespaces({
             cluster: {balancer: 'http://meta.ydb.yandex.net:8765'},
         });
@@ -105,7 +105,7 @@ describe('substituteUrlParams', () => {
         );
     });
 
-    test('resolves {balancer} as full URL without encoding (https)', () => {
+    test('resolves {balancer} as full URL without encoding at start (https)', () => {
         const namespaces = makeNamespaces({
             cluster: {balancer: 'https://balancer.example.com'},
         });
@@ -114,7 +114,7 @@ describe('substituteUrlParams', () => {
         );
     });
 
-    test('resolves {cluster.balancer} as full URL without encoding', () => {
+    test('resolves {cluster.balancer} as full URL without encoding at start', () => {
         const namespaces = makeNamespaces({
             cluster: {balancer: 'https://balancer.example.com'},
         });
@@ -507,7 +507,7 @@ describe('resolveClusterLinks', () => {
             );
         });
 
-        test('resolves {balancer} as full URL without encoding', () => {
+        test('resolves {balancer} as full URL without encoding at start', () => {
             const dynamicLinks: MetaClusterLink[] = [
                 {
                     type: 'cluster',
@@ -524,7 +524,7 @@ describe('resolveClusterLinks', () => {
             expect(result[0].url).toBe('http://meta.ydb.yandex.net:8765/monitoring/cluster');
         });
 
-        test('resolves {cluster.balancer} as full URL without encoding', () => {
+        test('resolves {cluster.balancer} as full URL without encoding at start', () => {
             const dynamicLinks: MetaClusterLink[] = [
                 {
                     type: 'cluster',
