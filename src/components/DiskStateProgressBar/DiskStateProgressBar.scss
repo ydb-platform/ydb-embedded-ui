@@ -33,6 +33,61 @@
 
     @include mixins.entity-state-colors($block);
 
+    // SolidRed severity (6): solid red background for critical errors in State mode
+    &_solidred {
+        --entity-state-font-color: var(--g-color-text-light-primary);
+        --entity-state-border-color: var(--g-color-base-danger-heavy);
+        --entity-state-background-color: var(--g-color-base-danger-heavy);
+        --entity-state-fill-color: var(--g-color-base-danger-heavy);
+        --entity-state-icon-color: var(--g-color-text-light-primary);
+    }
+
+    // State mode: specific visual variants
+    &_mode-state {
+        // OK state
+        &#{$block}_green {
+            --entity-state-background-color: var(--g-color-base-positive-light);
+            --entity-state-border-color: var(--g-color-base-positive-medium);
+            --entity-state-fill-color: var(--g-color-base-positive-medium);
+            --entity-state-compact-background-color: var(--g-color-base-positive-light);
+        }
+
+        // Initial state
+        &#{$block}_yellow {
+            --entity-state-background-color: var(--g-color-base-warning-light);
+            --entity-state-border-color: var(--g-color-base-warning-medium);
+            --entity-state-fill-color: var(--g-color-base-warning-medium);
+            --entity-state-compact-background-color: var(--g-color-base-warning-light);
+            --entity-state-icon-color: var(--g-color-text-warning-heavy);
+        }
+
+        // PDisk Error
+        &#{$block}_red {
+            --entity-state-background-color: var(--g-color-base-danger-medium);
+            --entity-state-border-color: var(--g-color-base-danger-heavy);
+            --entity-state-fill-color: var(--g-color-base-danger-medium);
+            --entity-state-compact-background-color: var(--g-color-base-danger-medium);
+        }
+
+        // Error (other): solid red background and border
+        // Figma: background #EA0805, border #EA0805
+        // This will be handled by adding additional modifier or severity level
+        // For now, red severity covers this case
+
+        // No data
+        &#{$block}_grey {
+            --entity-state-background-color: var(--g-color-base-neutral-medium);
+            --entity-state-border-color: none;
+            --entity-state-fill-color: var(--g-color-base-neutral-medium);
+            --entity-state-compact-background-color: var(--g-color-base-neutral-medium);
+        }
+
+        // Blue (replication) - keep default behavior
+        &#{$block}_blue {
+            // No changes needed, use default blue styles
+        }
+    }
+
     &_compact {
         min-width: 8px;
         height: var(--progress-bar-compact-height);
