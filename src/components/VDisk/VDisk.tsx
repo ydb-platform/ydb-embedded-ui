@@ -4,6 +4,7 @@ import {useVDiskPagePath} from '../../routes';
 import {cn} from '../../utils/cn';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../utils/disks/constants';
 import type {PreparedVDisk} from '../../utils/disks/types';
+import {useDiskDisplayState} from '../../utils/disks/useDiskDisplayState';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {InternalLink} from '../InternalLink';
@@ -32,6 +33,8 @@ export interface VDiskProps {
     placement?: PopupPlacement;
     popupOffset?: PopupProps['offset'];
     withOpaqueBackground?: boolean;
+    /** Enable expert mode display state (modifiers, icons, etc.) */
+    withExpertMode?: boolean;
 }
 
 export const VDisk = ({
@@ -49,13 +52,20 @@ export const VDisk = ({
     placement = ['top', 'bottom', 'left', 'right'],
     popupOffset = DEFAULT_POPUP_OFFSET,
     withOpaqueBackground,
+    withExpertMode: enableExpertMode,
 }: VDiskProps) => {
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
 
-    const severity = data.Severity;
-    const isReplicatingColor = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
     const isDonor = data.DonorMode;
+
+    // Get severity, icon and mode modifier based on expert mode settings
+    const {severity, icon, modeModifier} = useDiskDisplayState(data, isDonor, enableExpertMode);
+
+    const isReplicatingColor = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
+
+    // In expert mode, don't show disk allocation (filled bar)
+    const diskAllocatedPercent = modeModifier ? undefined : data.AllocatedPercent;
 
     return (
         <HoverPopup
@@ -78,7 +88,7 @@ export const VDisk = ({
                     })}
                 >
                     <DiskStateProgressBar
-                        diskAllocatedPercent={data.AllocatedPercent}
+                        diskAllocatedPercent={diskAllocatedPercent}
                         severity={severity}
                         compact={compact}
                         inactive={inactive}
@@ -86,6 +96,8 @@ export const VDisk = ({
                         isDonor={isDonor}
                         className={progressBarClassName}
                         withIcon={withIcon}
+                        icon={icon}
+                        modeModifier={modeModifier}
                         highlighted={highlighted}
                         noDataPlaceholder={i18n('context_no-data')}
                     />

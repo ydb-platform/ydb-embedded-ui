@@ -33,6 +33,11 @@ export function getSeverityColor(severity: number | undefined) {
         return NOT_AVAILABLE_SEVERITY_COLOR;
     }
 
+    // Special case: SOLID_RED_SEVERITY (6) maps to 'solidred' CSS class
+    if (severity === 6) {
+        return 'SolidRed' as EFlag;
+    }
+
     return DISK_NUMERIC_SEVERITY_TO_STATE_COLOR[severity] || NOT_AVAILABLE_SEVERITY_COLOR;
 }
 

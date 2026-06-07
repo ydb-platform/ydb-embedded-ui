@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {IconData} from '@gravity-ui/uikit';
 import {Flex, Icon} from '@gravity-ui/uikit';
 
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
@@ -25,6 +26,8 @@ interface DiskStateProgressBarProps {
     className?: string;
     isDonor?: boolean;
     withIcon?: boolean;
+    icon?: IconData;
+    modeModifier?: string;
     highlighted?: boolean;
     noDataPlaceholder?: React.ReactNode;
 }
@@ -41,6 +44,8 @@ export function DiskStateProgressBar({
     className,
     isDonor,
     withIcon,
+    icon: providedIcon,
+    modeModifier,
     highlighted,
     noDataPlaceholder,
 }: DiskStateProgressBarProps) {
@@ -55,6 +60,11 @@ export function DiskStateProgressBar({
         striped,
         highlighted,
     };
+
+    // Add mode modifier if present
+    if (modeModifier) {
+        mods[modeModifier] = true;
+    }
 
     if (isDonor) {
         mods[DONOR_COLOR.toLocaleLowerCase()] = true;
@@ -108,7 +118,8 @@ export function DiskStateProgressBar({
     let iconElement: React.ReactNode = null;
 
     if (withIcon) {
-        const icon = getVDiskStatusIcon(severity, isDonor);
+        // Use provided icon if available, otherwise calculate
+        const icon = providedIcon ?? getVDiskStatusIcon(severity, isDonor);
 
         if (icon) {
             iconElement = <Icon className={b('icon')} data={icon} size={12} />;

@@ -22,6 +22,9 @@ export const DISK_COLOR_STATE_TO_NUMERIC_SEVERITY: Record<EFlag, number> = {
     Red: 5,
 } as const;
 
+// Additional severity level for State mode: solid red background for critical errors
+export const SOLID_RED_SEVERITY = 6;
+
 export const DONOR_COLOR = 'DarkGrey';
 
 type SeverityToColor = Record<number, keyof typeof DISK_COLOR_STATE_TO_NUMERIC_SEVERITY>;
@@ -36,6 +39,7 @@ export const NOT_AVAILABLE_SEVERITY_COLOR =
 
 export const ERROR_SEVERITY = DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red;
 
+// Default mode: VDisk state severity mapping (used in combined severity calculation)
 export const VDISK_STATE_SEVERITY: Record<EVDiskState, number> = {
     [EVDiskState.OK]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
 
@@ -45,6 +49,20 @@ export const VDISK_STATE_SEVERITY: Record<EVDiskState, number> = {
     [EVDiskState.LocalRecoveryError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
     [EVDiskState.SyncGuidRecoveryError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
     [EVDiskState.PDiskError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+};
+
+// State mode: VDisk state severity mapping (used in State grouping mode)
+export const VDISK_STATE_SEVERITY_FOR_STATE_MODE: Record<EVDiskState, number> = {
+    [EVDiskState.OK]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
+
+    // Initial states are Yellow in State mode
+    [EVDiskState.Initial]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
+    [EVDiskState.SyncGuidRecovery]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
+
+    // Error states use different severities in State mode
+    [EVDiskState.LocalRecoveryError]: SOLID_RED_SEVERITY, // Solid red for critical errors
+    [EVDiskState.SyncGuidRecoveryError]: SOLID_RED_SEVERITY, // Solid red for critical errors
+    [EVDiskState.PDiskError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red, // Regular red for PDisk error
 };
 
 export const PDISK_STATE_SEVERITY = {
