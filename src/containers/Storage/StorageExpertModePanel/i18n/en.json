@@ -11,5 +11,14 @@
   "value_pdisk-error": "PDisk Error",
   "value_error": "Error",
   "value_no-data": "N/D",
-  "context_no-statistics": "No statistics available"
+  "context_no-statistics": "No statistics available",
+  "space_green": "G",
+  "space_cyan": "C",
+  "space_light-yellow": "LY",
+  "space_yellow": "Y",
+  "space_light-orange": "LO",
+  "space_pre-orange": "PO",
+  "space_orange": "O",
+  "space_red": "R",
+  "space_black": "B"
 }

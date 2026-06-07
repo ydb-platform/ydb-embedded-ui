@@ -1,0 +1,38 @@
+// Custom space legend colors for VDisk space visualization
+// These colors are used in the Storage Expert Mode Panel
+
+.g-root {
+    // Cyan colors
+    --ydb-space-cyan-bg: rgba(71, 247, 235, 0.15);
+
+    // Light Yellow colors
+    --ydb-space-light-yellow-bg: rgba(212, 255, 113, 0.3);
+
+    // Light Orange colors
+    --ydb-space-light-orange-bg: rgba(255, 178, 0, 0.3);
+
+    // Pre Orange colors
+    --ydb-space-pre-orange-bg: rgba(255, 128, 0, 0.2);
+
+    // Orange colors
+    --ydb-space-orange-bg: rgba(255, 89, 0, 0.2);
+
+    // Theme-specific text colors
+    &_theme_light,
+    &_theme_light-hc {
+        --ydb-space-cyan-text: rgba(11, 153, 144, 1);
+        --ydb-space-light-yellow-text: rgba(128, 118, 0, 1);
+        --ydb-space-light-orange-text: rgba(221, 125, 0, 1);
+        --ydb-space-pre-orange-text: rgba(225, 112, 0, 1);
+        --ydb-space-orange-text: rgba(206, 77, 9, 1);
+    }
+
+    &_theme_dark,
+    &_theme_dark-hc {
+        --ydb-space-cyan-text: rgba(4, 202, 188, 1);
+        --ydb-space-light-yellow-text: rgba(244, 255, 26, 1);
+        --ydb-space-light-orange-text: rgba(255, 178, 0, 1);
+        --ydb-space-pre-orange-text: rgba(255, 128, 0, 1);
+        --ydb-space-orange-text: rgba(255, 89, 0, 1);
+    }
+}
