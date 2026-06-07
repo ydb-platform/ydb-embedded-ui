@@ -170,6 +170,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         blackCapacityAlertVDisk.Whiteboard.CapacityAlert = ECapacityAlert.BLACK;
     }
 
+    // VDisk without CapacityAlert - should show N/A in Space mode
+    const noCapacityAlertVDisk = createMockVDisk({
+        index: stateVDisks.length + 2,
+        state: EVDiskState.OK,
+    });
+    if (noCapacityAlertVDisk.Whiteboard) {
+        noCapacityAlertVDisk.Whiteboard.CapacityAlert = undefined;
+    }
+
     const missingStateVDisk: TStorageVDisk = {
         ...createMockVDisk({
             index: stateVDisks.length + 1,
@@ -350,6 +359,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
                     ...stateVDisks,
                     criticalSpaceVDisk,
                     blackCapacityAlertVDisk,
+                    noCapacityAlertVDisk,
                     missingStateVDisk,
                 ],
                 MaxPDiskUsage: 70,

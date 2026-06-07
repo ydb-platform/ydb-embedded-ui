@@ -49,7 +49,6 @@
             --entity-state-background-color: var(--g-color-base-positive-light);
             --entity-state-border-color: var(--g-color-base-positive-medium);
             --entity-state-fill-color: var(--g-color-base-positive-medium);
-            --entity-state-compact-background-color: var(--g-color-base-positive-light);
         }
 
         // Initial state
@@ -57,7 +56,6 @@
             --entity-state-background-color: var(--g-color-base-warning-light);
             --entity-state-border-color: var(--g-color-base-warning-medium);
             --entity-state-fill-color: var(--g-color-base-warning-medium);
-            --entity-state-compact-background-color: var(--g-color-base-warning-light);
             --entity-state-icon-color: var(--g-color-text-warning-heavy);
         }
 
@@ -66,7 +64,6 @@
             --entity-state-background-color: var(--g-color-base-danger-medium);
             --entity-state-border-color: var(--g-color-base-danger-heavy);
             --entity-state-fill-color: var(--g-color-base-danger-medium);
-            --entity-state-compact-background-color: var(--g-color-base-danger-medium);
         }
 
         // Error (other): solid red background and border
@@ -79,7 +76,6 @@
             --entity-state-background-color: var(--g-color-base-neutral-medium);
             --entity-state-border-color: none;
             --entity-state-fill-color: var(--g-color-base-neutral-medium);
-            --entity-state-compact-background-color: var(--g-color-base-neutral-medium);
         }
 
         // Blue (replication) - keep default behavior
@@ -88,15 +84,96 @@
         }
     }
 
+    // Space mode: specific visual variants with colors from space-colors.scss
+    &_mode-space {
+        // Green
+        &#{$block}_spacegreen {
+            --entity-state-background-color: var(--g-color-base-positive-light);
+            --entity-state-border-color: var(--g-color-text-positive-heavy);
+            --ydb-progress-bar-font-color: var(--g-color-text-positive-heavy);
+        }
+
+        // Cyan
+        &#{$block}_spacecyan {
+            --entity-state-background-color: var(--ydb-space-cyan-bg);
+            --entity-state-border-color: var(--ydb-space-cyan-text);
+            --ydb-progress-bar-font-color: var(--ydb-space-cyan-text);
+        }
+
+        // Light Yellow
+        &#{$block}_spacelightyellow {
+            --entity-state-background-color: var(--ydb-space-light-yellow-bg);
+            --entity-state-border-color: var(--ydb-space-light-yellow-text);
+            --ydb-progress-bar-font-color: var(--ydb-space-light-yellow-text);
+        }
+
+        // Yellow
+        &#{$block}_spaceyellow {
+            --entity-state-background-color: var(--g-color-base-warning-light);
+            --entity-state-border-color: var(--g-color-text-warning-heavy);
+            --ydb-progress-bar-font-color: var(--g-color-text-warning-heavy);
+        }
+
+        // Light Orange
+        &#{$block}_spacelightorange {
+            --entity-state-background-color: var(--ydb-space-light-orange-bg);
+            --entity-state-border-color: var(--ydb-space-light-orange-text);
+            --ydb-progress-bar-font-color: var(--ydb-space-light-orange-text);
+        }
+
+        // Pre Orange
+        &#{$block}_spacepreorange {
+            --entity-state-background-color: var(--ydb-space-pre-orange-bg);
+            --entity-state-border-color: var(--ydb-space-pre-orange-text);
+            --ydb-progress-bar-font-color: var(--ydb-space-pre-orange-text);
+        }
+
+        // Orange
+        &#{$block}_spaceorange {
+            --entity-state-background-color: var(--ydb-space-orange-bg);
+            --entity-state-border-color: var(--ydb-space-orange-text);
+            --ydb-progress-bar-font-color: var(--ydb-space-orange-text);
+        }
+
+        // Red
+        &#{$block}_spacered {
+            --entity-state-background-color: var(--g-color-base-danger-light);
+            --entity-state-border-color: var(--g-color-base-danger-heavy);
+            --ydb-progress-bar-font-color: var(--g-color-base-danger-heavy);
+        }
+
+        // Black
+        &#{$block}_spaceblack {
+            --entity-state-background-color: var(--ydb-space-black-bg);
+            --entity-state-border-color: var(--ydb-space-black-border);
+            --ydb-progress-bar-font-color: var(--ydb-space-black-text);
+        }
+
+        // No data (Grey) - same as State mode
+        &#{$block}_grey {
+            --entity-state-background-color: var(--g-color-base-neutral-medium);
+            --entity-state-border-color: none;
+            --entity-state-fill-color: var(--g-color-base-neutral-medium);
+        }
+    }
+
+    // Legend inactive: hide border and text labels in Space mode
+    &_legend-inactive {
+        &#{$block}_mode-space {
+            border: none;
+
+            // Exception: BLACK keeps border but uses line-generic color
+            &#{$block}_spaceblack:not(#{$block}_striped) {
+                border: $border-width solid var(--g-color-line-generic);
+            }
+        }
+    }
+
     &_compact {
         min-width: 8px;
         height: var(--progress-bar-compact-height);
 
         border-radius: $outer-compact-border-radius;
-        background-color: var(
-            --entity-state-compact-background-color,
-            var(--entity-state-fill-color)
-        );
     }
 
     &_faded {
@@ -126,6 +203,30 @@
             var(--entity-state-fill-color) var(--stripe-step)
         );
         box-shadow: 0 0 0 $border-width var(--entity-state-shadow-color) inset;
+
+        // Space mode: keep border and alternate between background color and base-background
+        // But NOT for donors - they keep default striped style
+        &#{$block}_mode-space:not(#{$block}_darkgrey) {
+            border: $border-width solid var(--entity-state-border-color);
+            background-image: repeating-linear-gradient(
+                135deg,
+                var(--g-color-base-background) 0,
+                var(--g-color-base-background) var(--stripe-width),
+                var(--entity-state-background-color) var(--stripe-width),
+                var(--entity-state-background-color) var(--stripe-step)
+            );
+            box-shadow: none;
+
+            // Hide border for inactive legend items
+            &#{$block}_legend-inactive {
+                border: none;
+            }
+        }
+
+        // Black striped: use neutral-light background in dark theme
+        &#{$block}_spaceblack {
+            --entity-state-background-color: var(--ydb-space-black-bg-stripped);
+        }
     }
 
     &__fill-bar {
@@ -185,5 +286,16 @@
         margin-left: calc(var(--g-spacing-1) - $border-width);
 
         color: var(--entity-state-icon-color, var(--entity-state-border-color));
+    }
+
+    &__text-label {
+        position: relative;
+        z-index: 2;
+
+        margin-left: var(--g-spacing-1);
+
+        font-size: var(--g-text-caption-2-font-size);
+
+        color: var(--ydb-progress-bar-font-color, var(--entity-state-border-color));
     }
 }

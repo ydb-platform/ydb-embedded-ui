@@ -13,6 +13,7 @@ import {
     DISPLAYED_DISK_ERROR_ICON,
     DONOR_ICON,
     NOT_AVAILABLE_SEVERITY_COLOR,
+    SPACE_SEVERITY,
 } from './constants';
 import type {PreparedVDisk} from './types';
 
@@ -36,6 +37,35 @@ export function getSeverityColor(severity: number | undefined) {
     // Special case: SOLID_RED_SEVERITY (6) maps to 'solidred' CSS class
     if (severity === 6) {
         return 'SolidRed' as EFlag;
+    }
+
+    // Space mode severities (7-15) map to specific space color classes
+    if (severity === SPACE_SEVERITY.GREEN) {
+        return 'SpaceGreen' as EFlag;
+    }
+    if (severity === SPACE_SEVERITY.CYAN) {
+        return 'SpaceCyan' as EFlag;
+    }
+    if (severity === SPACE_SEVERITY.LIGHT_YELLOW) {
+        return 'SpaceLightYellow' as EFlag;
+    }
+    if (severity === SPACE_SEVERITY.YELLOW) {
+        return 'SpaceYellow' as EFlag;
+    }
+    if (severity === SPACE_SEVERITY.LIGHT_ORANGE) {
+        return 'SpaceLightOrange' as EFlag;
+    }
+    if (severity === SPACE_SEVERITY.PRE_ORANGE) {
+        return 'SpacePreOrange' as EFlag;
+    }
+    if (severity === SPACE_SEVERITY.ORANGE) {
+        return 'SpaceOrange' as EFlag;
+    }
+    if (severity === SPACE_SEVERITY.RED) {
+        return 'SpaceRed' as EFlag;
+    }
+    if (severity === SPACE_SEVERITY.BLACK) {
+        return 'SpaceBlack' as EFlag;
     }
 
     return DISK_NUMERIC_SEVERITY_TO_STATE_COLOR[severity] || NOT_AVAILABLE_SEVERITY_COLOR;

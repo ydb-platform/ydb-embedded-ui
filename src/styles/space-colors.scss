@@ -17,7 +17,7 @@
     // Orange colors
     --ydb-space-orange-bg: rgba(255, 89, 0, 0.2);
 
-    // Theme-specific text colors
+    // Theme-specific text and background colors
     &_theme_light,
     &_theme_light-hc {
         --ydb-space-cyan-text: rgba(11, 153, 144, 1);
@@ -25,6 +25,10 @@
         --ydb-space-light-orange-text: rgba(221, 125, 0, 1);
         --ydb-space-pre-orange-text: rgba(225, 112, 0, 1);
         --ydb-space-orange-text: rgba(206, 77, 9, 1);
+        --ydb-space-black-bg: var(--g-color-base-neutral-medium);
+        --ydb-space-black-bg-stripped: var(--g-color-base-neutral-medium);
+        --ydb-space-black-text: var(--g-color-text-primary);
+        --ydb-space-black-border: var(--g-color-text-complementary);
     }
 
     &_theme_dark,
@@ -34,5 +38,9 @@
         --ydb-space-light-orange-text: rgba(255, 178, 0, 1);
         --ydb-space-pre-orange-text: rgba(255, 128, 0, 1);
         --ydb-space-orange-text: rgba(255, 89, 0, 1);
+        --ydb-space-black-bg: var(--g-color-base-background);
+        --ydb-space-black-bg-stripped: var(--g-color-base-neutral-light);
+        --ydb-space-black-text: var(--g-color-text-brand-contrast);
+        --ydb-space-black-border: var(--g-color-line-light);
     }
 }
