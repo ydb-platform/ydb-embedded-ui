@@ -25,6 +25,19 @@ export const DISK_COLOR_STATE_TO_NUMERIC_SEVERITY: Record<EFlag, number> = {
 // Additional severity level for State mode: solid red background for critical errors
 export const SOLID_RED_SEVERITY = 6;
 
+// Space mode: detailed severity levels for each capacityAlert
+export const SPACE_SEVERITY = {
+    GREEN: 7,
+    CYAN: 8,
+    LIGHT_YELLOW: 9,
+    YELLOW: 10,
+    LIGHT_ORANGE: 11,
+    PRE_ORANGE: 12,
+    ORANGE: 13,
+    RED: 14,
+    BLACK: 15,
+} as const;
+
 export const DONOR_COLOR = 'DarkGrey';
 
 type SeverityToColor = Record<number, keyof typeof DISK_COLOR_STATE_TO_NUMERIC_SEVERITY>;

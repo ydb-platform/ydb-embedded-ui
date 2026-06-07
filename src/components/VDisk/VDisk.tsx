@@ -60,9 +60,20 @@ export const VDisk = ({
     const isDonor = data.DonorMode;
 
     // Get severity, icon and mode modifier based on expert mode settings
-    const {severity, icon, modeModifier} = useDiskDisplayState(data, isDonor, enableExpertMode);
+    const {severity, icon, modeModifier, isLegendInactive} = useDiskDisplayState(
+        data,
+        isDonor,
+        enableExpertMode,
+    );
 
-    const isReplicatingColor = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
+    // Check if disk is replicating (not replicated yet) and should show stripes
+    let isReplicating: boolean;
+    if (!modeModifier || modeModifier === 'mode-state') {
+        isReplicating = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
+    } else {
+        // Space mode and other expert modes: show stripes for any Replicated=false disk
+        isReplicating = data.Replicated === false;
+    }
 
     // In expert mode, don't show disk allocation (filled bar)
     const diskAllocatedPercent = modeModifier ? undefined : data.AllocatedPercent;
@@ -92,7 +103,7 @@ export const VDisk = ({
                         severity={severity}
                         compact={compact}
                         inactive={inactive}
-                        striped={isReplicatingColor || isDonor}
+                        striped={isReplicating || isDonor}
                         isDonor={isDonor}
                         className={progressBarClassName}
                         withIcon={withIcon}
@@ -100,6 +111,7 @@ export const VDisk = ({
                         modeModifier={modeModifier}
                         highlighted={highlighted}
                         noDataPlaceholder={i18n('context_no-data')}
+                        isLegendInactive={isLegendInactive}
                     />
                 </InternalLink>
             </div>

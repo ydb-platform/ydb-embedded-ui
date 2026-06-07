@@ -1,9 +1,9 @@
-import {EFlag, isCapacityAlert} from '../../types/api/enums';
-import {getCapacityAlertSeverity} from '../capacityAlerts';
+import {ECapacityAlert, isCapacityAlert} from '../../types/api/enums';
 
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     NOT_AVAILABLE_SEVERITY,
+    SPACE_SEVERITY,
     VDISK_STATE_SEVERITY_FOR_STATE_MODE,
 } from './constants';
 import {getColorSeverity} from './helpers';
@@ -40,23 +40,39 @@ export function calculateStateSeverity(vDisk: PreparedVDisk): number {
 /**
  * Calculate severity based only on disk space usage
  * Used in Space grouping mode
+ * Maps capacityAlert to detailed severity levels for visual differentiation
  */
 export function calculateSpaceSeverity(vDisk: PreparedVDisk): number {
-    if (vDisk.CapacityAlert && isCapacityAlert(vDisk.CapacityAlert)) {
-        return getCapacityAlertSeverity(vDisk.CapacityAlert);
-    }
-
-    const diskSpace = vDisk.DiskSpace;
-    if (!diskSpace) {
+    // In Space mode, CapacityAlert is the primary indicator
+    // If CapacityAlert is not available, show N/A (NOT_AVAILABLE_SEVERITY)
+    if (!vDisk.CapacityAlert || !isCapacityAlert(vDisk.CapacityAlert)) {
         return NOT_AVAILABLE_SEVERITY;
     }
 
-    // DiskSpace Orange and Red indicate critical issues
-    if (diskSpace === EFlag.Orange || diskSpace === EFlag.Red) {
-        return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red;
+    // Use detailed capacityAlert mapping
+    const alert = vDisk.CapacityAlert;
+    switch (alert) {
+        case ECapacityAlert.GREEN:
+            return SPACE_SEVERITY.GREEN;
+        case ECapacityAlert.CYAN:
+            return SPACE_SEVERITY.CYAN;
+        case ECapacityAlert.LIGHTYELLOW:
+            return SPACE_SEVERITY.LIGHT_YELLOW;
+        case ECapacityAlert.YELLOW:
+            return SPACE_SEVERITY.YELLOW;
+        case ECapacityAlert.LIGHTORANGE:
+            return SPACE_SEVERITY.LIGHT_ORANGE;
+        case ECapacityAlert.PREORANGE:
+            return SPACE_SEVERITY.PRE_ORANGE;
+        case ECapacityAlert.ORANGE:
+            return SPACE_SEVERITY.ORANGE;
+        case ECapacityAlert.RED:
+            return SPACE_SEVERITY.RED;
+        case ECapacityAlert.BLACK:
+            return SPACE_SEVERITY.BLACK;
+        default:
+            return NOT_AVAILABLE_SEVERITY;
     }
-
-    return Math.min(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow, getColorSeverity(diskSpace));
 }
 
 /**

@@ -1,12 +1,14 @@
 import {CircleExclamationFill, CircleXmarkFill, ClockFill} from '@gravity-ui/icons';
 import type {IconData} from '@gravity-ui/uikit';
 
+import {ECapacityAlert, isCapacityAlert} from '../../types/api/enums';
 import {EVDiskState} from '../../types/api/vdisk';
 
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     DISPLAYED_DISK_ERROR_ICON,
     DONOR_ICON,
+    SPACE_SEVERITY,
 } from './constants';
 import type {PreparedVDisk} from './types';
 
@@ -14,7 +16,7 @@ export type IconCalculator = (
     vDisk: PreparedVDisk,
     severity: number,
     isDonor?: boolean,
-) => IconData | undefined;
+) => IconData | string | undefined;
 
 /**
  * Default icon logic - show icon only for errors and donors
@@ -72,21 +74,71 @@ export function calculateStateIcon(
 }
 
 /**
- * Space-based icon logic - show icons for critical space issues only
+ * Space-based icon logic - show text labels for capacityAlert levels
+ * Returns text labels (e.g., "G", "C", "LY") instead of icons
  */
+// eslint-disable-next-line complexity
 export function calculateSpaceIcon(
-    _vDisk: PreparedVDisk,
+    vDisk: PreparedVDisk,
     severity: number,
     isDonor?: boolean,
-): IconData | undefined {
+): IconData | string | undefined {
     if (isDonor) {
         return DONOR_ICON;
     }
 
-    // Show icon only for critical space (Red severity)
-    const isCritical = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red;
-    if (isCritical) {
-        return DISPLAYED_DISK_ERROR_ICON;
+    // Map severity to text label based on capacityAlert
+    if (vDisk.CapacityAlert && isCapacityAlert(vDisk.CapacityAlert)) {
+        const alert = vDisk.CapacityAlert as ECapacityAlert;
+        switch (alert) {
+            case ECapacityAlert.GREEN:
+                return 'G';
+            case ECapacityAlert.CYAN:
+                return 'C';
+            case ECapacityAlert.LIGHTYELLOW:
+                return 'LY';
+            case ECapacityAlert.YELLOW:
+                return 'Y';
+            case ECapacityAlert.LIGHTORANGE:
+                return 'LO';
+            case ECapacityAlert.PREORANGE:
+                return 'PO';
+            case ECapacityAlert.ORANGE:
+                return 'O';
+            case ECapacityAlert.RED:
+                return 'R';
+            case ECapacityAlert.BLACK:
+                return 'B';
+        }
+    }
+
+    // Fallback: map severity to text label
+    if (severity === SPACE_SEVERITY.GREEN) {
+        return 'G';
+    }
+    if (severity === SPACE_SEVERITY.CYAN) {
+        return 'C';
+    }
+    if (severity === SPACE_SEVERITY.LIGHT_YELLOW) {
+        return 'LY';
+    }
+    if (severity === SPACE_SEVERITY.YELLOW) {
+        return 'Y';
+    }
+    if (severity === SPACE_SEVERITY.LIGHT_ORANGE) {
+        return 'LO';
+    }
+    if (severity === SPACE_SEVERITY.PRE_ORANGE) {
+        return 'PO';
+    }
+    if (severity === SPACE_SEVERITY.ORANGE) {
+        return 'O';
+    }
+    if (severity === SPACE_SEVERITY.RED) {
+        return 'R';
+    }
+    if (severity === SPACE_SEVERITY.BLACK) {
+        return 'B';
     }
 
     return undefined;
