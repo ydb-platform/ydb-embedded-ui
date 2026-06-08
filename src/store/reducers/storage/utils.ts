@@ -15,7 +15,7 @@ import {EVDiskState} from '../../../types/api/vdisk';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {
     getColorSeverity,
-    getSeverityColor,
+    getDataSeverityColor,
     setDonorRecipientReferences,
 } from '../../../utils/disks/helpers';
 import {
@@ -54,10 +54,15 @@ const normalizeMaxPercent = (value: number | string | null | undefined): number 
 function getGroupDiskSpaceStatus(group: TStorageGroupInfo | TGroupsStorageGroupInfo): EFlag {
     const {DiskSpace, VDisks = []} = group;
 
-    return (
-        DiskSpace ||
-        getSeverityColor(Math.max(...VDisks.map((disk) => getColorSeverity(disk.DiskSpace))))
-    );
+    if (DiskSpace) {
+        return DiskSpace;
+    }
+
+    // Calculate max severity from VDisks and convert back to EFlag
+    const maxSeverity = Math.max(...VDisks.map((disk) => getColorSeverity(disk.DiskSpace)));
+    // getDisplaySeverityColor returns DiskColor, but for basic severities (0-5) it's always EFlag
+    // We cast it since we know VDisk.DiskSpace is always EFlag
+    return getDataSeverityColor(maxSeverity);
 }
 
 const prepareVDisk = (vDisk: TVDiskStateInfo, poolName: string | undefined) => {
