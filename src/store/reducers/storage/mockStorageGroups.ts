@@ -164,6 +164,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
     const blackCapacityAlertVDisk = createMockVDisk({
         index: stateVDisks.length + 1,
         state: EVDiskState.OK,
+        frontQueues: EFlag.Green,
     });
     // Override capacity alert to BLACK
     if (blackCapacityAlertVDisk.Whiteboard) {
@@ -174,6 +175,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
     const noCapacityAlertVDisk = createMockVDisk({
         index: stateVDisks.length + 2,
         state: EVDiskState.OK,
+        frontQueues: EFlag.Red,
     });
     if (noCapacityAlertVDisk.Whiteboard) {
         noCapacityAlertVDisk.Whiteboard.CapacityAlert = undefined;
@@ -181,15 +183,17 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
 
     const missingStateVDisk: TStorageVDisk = {
         ...createMockVDisk({
-            index: stateVDisks.length + 1,
+            index: stateVDisks.length + 3,
             state: EVDiskState.OK,
+            frontQueues: EFlag.Grey,
         }),
-        VDiskId: `${MOCK_GROUP_ID}-${MOCK_GROUP_GENERATION}-0-0-${stateVDisks.length + 1}`,
+        VDiskId: `${MOCK_GROUP_ID}-${MOCK_GROUP_GENERATION}-0-0-${stateVDisks.length + 3}`,
         Status: 'ERROR',
         Whiteboard: {
             ...createMockVDisk({
-                index: stateVDisks.length + 1,
+                index: stateVDisks.length + 3,
                 state: EVDiskState.OK,
+                frontQueues: EFlag.Grey,
             }).Whiteboard,
             VDiskState: undefined,
             Overall: EFlag.Grey,
@@ -262,6 +266,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
     const replicatingBlackCapacityAlertVDisk = createMockVDisk({
         index: stateVDisks.length,
         state: EVDiskState.OK,
+        frontQueues: EFlag.Green,
         replicated: false,
     });
     replicatingBlackCapacityAlertVDisk.VDiskId = `${replicatingGroupId}-${replicatingGroupGeneration}-0-0-${vDiskStates.length}`;
@@ -294,18 +299,37 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         };
     }
 
+    const replicatingRedFrontQueuesVDisk = createMockVDisk({
+        index: stateVDisks.length + 1,
+        state: EVDiskState.OK,
+        frontQueues: EFlag.Red,
+        replicated: false,
+    });
+    replicatingRedFrontQueuesVDisk.VDiskId = `${replicatingGroupId}-${replicatingGroupGeneration}-0-0-${vDiskStates.length + 1}`;
+    if (replicatingRedFrontQueuesVDisk.Whiteboard) {
+        replicatingRedFrontQueuesVDisk.Whiteboard.VDiskId = {
+            GroupID: replicatingGroupId,
+            GroupGeneration: replicatingGroupGeneration,
+            Ring: 0,
+            Domain: 0,
+            VDisk: vDiskStates.length + 1,
+        };
+    }
+
     const replicatingMissingStateVDisk: TStorageVDisk = {
         ...createMockVDisk({
-            index: stateVDisks.length + 1,
+            index: stateVDisks.length + 2,
             state: EVDiskState.OK,
+            frontQueues: EFlag.Grey,
             replicated: false,
         }),
-        VDiskId: `${replicatingGroupId}-${replicatingGroupGeneration}-0-0-${vDiskStates.length + 1}`,
+        VDiskId: `${replicatingGroupId}-${replicatingGroupGeneration}-0-0-${vDiskStates.length + 2}`,
         Status: 'REPLICATING',
         Whiteboard: {
             ...createMockVDisk({
-                index: stateVDisks.length + 1,
+                index: stateVDisks.length + 2,
                 state: EVDiskState.OK,
+                frontQueues: EFlag.Grey,
                 replicated: false,
             }).Whiteboard,
             VDiskId: {
@@ -313,7 +337,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
                 GroupGeneration: replicatingGroupGeneration,
                 Ring: 0,
                 Domain: 0,
-                VDisk: vDiskStates.length + 1,
+                VDisk: vDiskStates.length + 2,
             },
             VDiskState: undefined,
             Overall: EFlag.Grey,
@@ -325,6 +349,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         ...replicatingStateVDisks,
         replicatingBlackCapacityAlertVDisk,
         replicatingCriticalSpaceVDisk,
+        replicatingRedFrontQueuesVDisk,
         replicatingMissingStateVDisk,
     ];
 
