@@ -20,5 +20,9 @@
   "space_pre-orange": "PO",
   "space_orange": "O",
   "space_red": "R",
-  "space_black": "B"
+  "space_black": "B",
+  "front-queues_ok": "OK",
+  "front-queues_notice": "Notice",
+  "front-queues_warning": "Warning",
+  "front-queues_impaired": "Impaired"
 }
