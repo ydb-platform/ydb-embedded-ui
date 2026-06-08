@@ -1,5 +1,18 @@
 # Changelog
 
+## [16.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v16.0.0...v16.1.0) (2026-06-08)
+
+
+### Features
+
+* implement UI for Bridge Piles storage (2DC) ([#3970](https://github.com/ydb-platform/ydb-embedded-ui/issues/3970)) ([c21e64b](https://github.com/ydb-platform/ydb-embedded-ui/commit/c21e64b66601d0c692a112cd399c952364404626))
+* improve table compaction ([#3967](https://github.com/ydb-platform/ydb-embedded-ui/issues/3967)) ([4665f40](https://github.com/ydb-platform/ydb-embedded-ui/commit/4665f40160fe6993906b1fcc88c262cb1b8bc274))
+
+
+### Bug Fixes
+
+* **resolveClusterLinks:** preserve full URLs ([#3979](https://github.com/ydb-platform/ydb-embedded-ui/issues/3979)) ([65aedd2](https://github.com/ydb-platform/ydb-embedded-ui/commit/65aedd282890223f6cdbff14411b1778a866d832))
+
 ## [16.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v15.8.0...v16.0.0) (2026-06-05)
 
 
