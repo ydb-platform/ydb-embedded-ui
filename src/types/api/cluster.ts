@@ -107,15 +107,25 @@ export enum BridgePileState {
     DISCONNECTED = 'DISCONNECTED',
 }
 
+export enum BridgePileGroupStatus {
+    UNKNOWN = 'UNKNOWN',
+    FULL = 'FULL',
+    PARTIAL = 'PARTIAL',
+    DEGRADED = 'DEGRADED',
+    DISINTEGRATED = 'DISINTEGRATED',
+}
+
 export interface TBridgePile {
     /** unique pile identifier */
     PileId?: number;
     /** pile name, e.g., r1 */
     Name?: string;
     /** pile state from backend */
-    State?: string;
+    State?: BridgePileState;
     /** number of nodes in the pile */
     Nodes?: number;
+    /** storage group statuses in the pile */
+    GroupStatuses?: Partial<Record<BridgePileGroupStatus, number>>;
 }
 
 export interface TBridgeInfo {

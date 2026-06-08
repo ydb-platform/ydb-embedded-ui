@@ -17,8 +17,8 @@ export class PageModel extends BaseModel {
         this.query = query;
     }
 
-    async goto(query: QueryParams = {}) {
+    async goto(query: QueryParams = {}, options?: Parameters<Page['goto']>[1]) {
         this.query = {...this.query, ...query};
-        return this.page.goto(`${this.path}?${qs.stringify(this.query, {encode: false})}`);
+        return this.page.goto(`${this.path}?${qs.stringify(this.query, {encode: false})}`, options);
     }
 }
