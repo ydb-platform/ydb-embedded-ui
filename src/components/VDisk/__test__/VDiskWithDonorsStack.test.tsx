@@ -11,6 +11,7 @@ jest.mock('../VDisk', () => ({
         popupOffset,
         showPopup,
         highlighted,
+        withOpaqueBackground,
         onShowPopup,
         onHidePopup,
     }: VDiskProps) => (
@@ -21,6 +22,7 @@ jest.mock('../VDisk', () => ({
             data-placement={Array.isArray(placement) ? placement.join(',') : ''}
             data-show-popup={showPopup ? 'true' : 'false'}
             data-highlighted={highlighted ? 'true' : 'false'}
+            data-with-opaque-background={withOpaqueBackground ? 'true' : 'false'}
             onMouseEnter={onShowPopup}
             onMouseLeave={onHidePopup}
             type="button"
@@ -39,6 +41,10 @@ describe('VDiskWithDonorsStack', () => {
         expect(container.querySelector('.ydb-stack')).not.toBeInTheDocument();
         expect(screen.getAllByTestId('mock-vdisk')).toHaveLength(1);
         expect(screen.getByText('main')).toBeVisible();
+        expect(screen.getByTestId('mock-vdisk')).toHaveAttribute(
+            'data-with-opaque-background',
+            'false',
+        );
     });
 
     test('renders stack with main vdisk and one donor', () => {
@@ -59,6 +65,9 @@ describe('VDiskWithDonorsStack', () => {
         expect(screen.getAllByTestId('mock-vdisk')).toHaveLength(2);
         expect(screen.getByText('main')).toBeVisible();
         expect(screen.getByText('donor-1')).toBeVisible();
+        screen.getAllByTestId('mock-vdisk').forEach((vDisk) => {
+            expect(vDisk).toHaveAttribute('data-with-opaque-background', 'true');
+        });
     });
 
     test('renders several donors in the original order', () => {
