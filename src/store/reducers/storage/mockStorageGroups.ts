@@ -11,8 +11,6 @@ const MOCK_NODE_ID_BASE = 7000;
 const MOCK_PDISK_ID_BASE = 100;
 const MOCK_VDISK_SLOT_ID_BASE = 200;
 
-const vDiskStates = Object.values(EVDiskState);
-
 function createMockPDisk(index: number, state = TPDiskState.Normal): TStorageVDisk['PDisk'] {
     return {
         PDiskId: `${MOCK_NODE_ID_BASE + index}-${MOCK_PDISK_ID_BASE + index}`,
@@ -47,17 +45,23 @@ function createMockPDisk(index: number, state = TPDiskState.Normal): TStorageVDi
 
 function createMockVDisk({
     index,
+    groupId = MOCK_GROUP_ID,
+    groupGeneration = MOCK_GROUP_GENERATION,
     state,
     diskSpace = EFlag.Green,
     frontQueues = EFlag.Green,
+    capacityAlert,
     replicated = true,
     donorMode = false,
     pDiskState = TPDiskState.Normal,
 }: {
     index: number;
+    groupId?: number;
+    groupGeneration?: number;
     state: EVDiskState;
     diskSpace?: EFlag;
     frontQueues?: EFlag;
+    capacityAlert?: ECapacityAlert;
     replicated?: boolean;
     donorMode?: boolean;
     pDiskState?: TPDiskState;
@@ -68,22 +72,8 @@ function createMockVDisk({
     const allocatedSize = MOCK_ALLOCATED_SIZE_BASE * (index + 1);
     const availableSize = MOCK_SLOT_SIZE - allocatedSize;
 
-    // Cycle through different capacity alert values for VDisks
-    const capacityAlerts = [
-        ECapacityAlert.GREEN,
-        ECapacityAlert.CYAN,
-        ECapacityAlert.LIGHTYELLOW,
-        ECapacityAlert.YELLOW,
-        ECapacityAlert.LIGHTORANGE,
-        ECapacityAlert.PREORANGE,
-        ECapacityAlert.ORANGE,
-        ECapacityAlert.RED,
-        ECapacityAlert.BLACK,
-    ];
-    const capacityAlert = capacityAlerts[index % capacityAlerts.length];
-
     return {
-        VDiskId: `${MOCK_GROUP_ID}-${MOCK_GROUP_GENERATION}-0-0-${index}`,
+        VDiskId: `${groupId}-${groupGeneration}-0-0-${index}`,
         NodeId: nodeId,
         AllocatedSize: String(allocatedSize),
         AvailableSize: String(availableSize),
@@ -99,8 +89,8 @@ function createMockVDisk({
         PDisk: createMockPDisk(index, pDiskState),
         Whiteboard: {
             VDiskId: {
-                GroupID: MOCK_GROUP_ID,
-                GroupGeneration: MOCK_GROUP_GENERATION,
+                GroupID: groupId,
+                GroupGeneration: groupGeneration,
                 Ring: 0,
                 Domain: 0,
                 VDisk: index,
@@ -140,112 +130,113 @@ function createMockVDisk({
 }
 
 export function createMockStorageGroupsResponse(): StorageGroupsResponse {
-    const stateVDisks = vDiskStates.map((state, index) =>
+    // Define 10 VDisks with different combinations of State, CapacityAlert, and FrontQueues
+    // Covers all 6 EVDiskState values and various ECapacityAlert values (including undefined for N/A)
+    const vDiskConfigs = [
+        {
+            state: EVDiskState.OK,
+            capacityAlert: ECapacityAlert.GREEN,
+            frontQueues: EFlag.Green,
+            diskSpace: EFlag.Green,
+        },
+        {
+            state: EVDiskState.OK,
+            capacityAlert: ECapacityAlert.CYAN,
+            frontQueues: EFlag.Blue,
+            diskSpace: EFlag.Green,
+        },
+        {
+            state: EVDiskState.OK,
+            capacityAlert: ECapacityAlert.YELLOW,
+            frontQueues: EFlag.Yellow,
+            diskSpace: EFlag.Yellow,
+        },
+        {
+            state: EVDiskState.OK,
+            capacityAlert: ECapacityAlert.ORANGE,
+            frontQueues: EFlag.Orange,
+            diskSpace: EFlag.Orange,
+        },
+        {
+            state: EVDiskState.OK,
+            capacityAlert: ECapacityAlert.RED,
+            frontQueues: EFlag.Red,
+            diskSpace: EFlag.Red,
+        },
+        {
+            state: EVDiskState.Initial,
+            capacityAlert: ECapacityAlert.LIGHTYELLOW,
+            frontQueues: EFlag.Green,
+            diskSpace: EFlag.Green,
+        },
+        {
+            state: EVDiskState.SyncGuidRecovery,
+            capacityAlert: ECapacityAlert.LIGHTORANGE,
+            frontQueues: EFlag.Yellow,
+            diskSpace: EFlag.Yellow,
+        },
+        {
+            state: EVDiskState.SyncGuidRecoveryError,
+            capacityAlert: ECapacityAlert.PREORANGE,
+            frontQueues: EFlag.Orange,
+            diskSpace: EFlag.Red,
+        },
+        {
+            state: EVDiskState.LocalRecoveryError,
+            capacityAlert: ECapacityAlert.BLACK,
+            frontQueues: EFlag.Grey,
+            diskSpace: EFlag.Red,
+        },
+        {
+            state: EVDiskState.PDiskError,
+            capacityAlert: undefined,
+            frontQueues: EFlag.Red,
+            diskSpace: EFlag.Red,
+        },
+    ];
+
+    // First group - without replication
+    const firstGroupVDisks = vDiskConfigs.map((config, index) =>
         createMockVDisk({
             index,
-            state,
-            diskSpace:
-                state === EVDiskState.OK
-                    ? EFlag.Green
-                    : state === EVDiskState.SyncGuidRecovery
-                      ? EFlag.Yellow
-                      : EFlag.Red,
-            frontQueues: state === EVDiskState.OK ? EFlag.Green : EFlag.Yellow,
+            state: config.state,
+            capacityAlert: config.capacityAlert,
+            frontQueues: config.frontQueues,
+            diskSpace: config.diskSpace,
+            replicated: true,
         }),
     );
 
-    const criticalSpaceVDisk = createMockVDisk({
-        index: stateVDisks.length,
-        state: EVDiskState.OK,
-        diskSpace: EFlag.Orange,
-        frontQueues: EFlag.Orange,
-    });
-
-    const blackCapacityAlertVDisk = createMockVDisk({
-        index: stateVDisks.length + 1,
-        state: EVDiskState.OK,
-        frontQueues: EFlag.Green,
-    });
-    // Override capacity alert to BLACK
-    if (blackCapacityAlertVDisk.Whiteboard) {
-        blackCapacityAlertVDisk.Whiteboard.CapacityAlert = ECapacityAlert.BLACK;
-    }
-
-    // VDisk without CapacityAlert - should show N/A in Space mode
-    const noCapacityAlertVDisk = createMockVDisk({
-        index: stateVDisks.length + 2,
-        state: EVDiskState.OK,
-        frontQueues: EFlag.Red,
-    });
-    if (noCapacityAlertVDisk.Whiteboard) {
-        noCapacityAlertVDisk.Whiteboard.CapacityAlert = undefined;
-    }
-
-    const missingStateVDisk: TStorageVDisk = {
-        ...createMockVDisk({
-            index: stateVDisks.length + 3,
-            state: EVDiskState.OK,
-            frontQueues: EFlag.Grey,
-        }),
-        VDiskId: `${MOCK_GROUP_ID}-${MOCK_GROUP_GENERATION}-0-0-${stateVDisks.length + 3}`,
-        Status: 'ERROR',
-        Whiteboard: {
-            ...createMockVDisk({
-                index: stateVDisks.length + 3,
-                state: EVDiskState.OK,
-                frontQueues: EFlag.Grey,
-            }).Whiteboard,
-            VDiskState: undefined,
-            Overall: EFlag.Grey,
-            DiskSpace: EFlag.Grey,
-        },
-    };
-
-    // Second group with all disks in replication state
+    // Second group - with replication (same disks but replicating)
     const replicatingGroupId = MOCK_GROUP_ID + 1;
     const replicatingGroupGeneration = 1;
-    const replicatingGroupBaseIndex = stateVDisks.length + 10;
+    const replicatingGroupBaseIndex = 100;
 
-    const replicatingStateVDisks = vDiskStates.map((state, index) => {
+    const secondGroupVDisks = vDiskConfigs.map((config, index) => {
         const replicatingVDisk = createMockVDisk({
             index,
-            state,
-            diskSpace:
-                state === EVDiskState.OK
-                    ? EFlag.Green
-                    : state === EVDiskState.SyncGuidRecovery
-                      ? EFlag.Yellow
-                      : EFlag.Red,
-            frontQueues: state === EVDiskState.OK ? EFlag.Green : EFlag.Yellow,
+            groupId: replicatingGroupId,
+            groupGeneration: replicatingGroupGeneration,
+            state: config.state,
+            capacityAlert: config.capacityAlert,
+            frontQueues: config.frontQueues,
+            diskSpace: config.diskSpace,
             replicated: false,
         });
 
         const donorVDisk = createMockVDisk({
             index: replicatingGroupBaseIndex + index,
-            state,
-            diskSpace:
-                state === EVDiskState.OK
-                    ? EFlag.Green
-                    : state === EVDiskState.SyncGuidRecovery
-                      ? EFlag.Yellow
-                      : EFlag.Red,
-            frontQueues: state === EVDiskState.OK ? EFlag.Green : EFlag.Yellow,
+            groupId: replicatingGroupId,
+            groupGeneration: replicatingGroupGeneration,
+            state: config.state,
+            capacityAlert: config.capacityAlert,
+            frontQueues: config.frontQueues,
+            diskSpace: config.diskSpace,
             replicated: false,
             donorMode: true,
         });
 
-        // Update VDiskId to use the new group ID
-        replicatingVDisk.VDiskId = `${replicatingGroupId}-${replicatingGroupGeneration}-0-0-${index}`;
-        if (replicatingVDisk.Whiteboard) {
-            replicatingVDisk.Whiteboard.VDiskId = {
-                GroupID: replicatingGroupId,
-                GroupGeneration: replicatingGroupGeneration,
-                Ring: 0,
-                Domain: 0,
-                VDisk: index,
-            };
-        }
-
+        // Update VDiskId for donor
         donorVDisk.VDiskId = `${replicatingGroupId}-${replicatingGroupGeneration}-0-0-${index + 100}`;
         if (donorVDisk.Whiteboard) {
             donorVDisk.Whiteboard.VDiskId = {
@@ -263,96 +254,6 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         };
     });
 
-    const replicatingBlackCapacityAlertVDisk = createMockVDisk({
-        index: stateVDisks.length,
-        state: EVDiskState.OK,
-        frontQueues: EFlag.Green,
-        replicated: false,
-    });
-    replicatingBlackCapacityAlertVDisk.VDiskId = `${replicatingGroupId}-${replicatingGroupGeneration}-0-0-${vDiskStates.length}`;
-    if (replicatingBlackCapacityAlertVDisk.Whiteboard) {
-        replicatingBlackCapacityAlertVDisk.Whiteboard.VDiskId = {
-            GroupID: replicatingGroupId,
-            GroupGeneration: replicatingGroupGeneration,
-            Ring: 0,
-            Domain: 0,
-            VDisk: vDiskStates.length,
-        };
-        replicatingBlackCapacityAlertVDisk.Whiteboard.CapacityAlert = ECapacityAlert.BLACK;
-    }
-
-    const replicatingCriticalSpaceVDisk = createMockVDisk({
-        index: stateVDisks.length,
-        state: EVDiskState.OK,
-        diskSpace: EFlag.Orange,
-        frontQueues: EFlag.Orange,
-        replicated: false,
-    });
-    replicatingCriticalSpaceVDisk.VDiskId = `${replicatingGroupId}-${replicatingGroupGeneration}-0-0-${vDiskStates.length}`;
-    if (replicatingCriticalSpaceVDisk.Whiteboard) {
-        replicatingCriticalSpaceVDisk.Whiteboard.VDiskId = {
-            GroupID: replicatingGroupId,
-            GroupGeneration: replicatingGroupGeneration,
-            Ring: 0,
-            Domain: 0,
-            VDisk: vDiskStates.length,
-        };
-    }
-
-    const replicatingRedFrontQueuesVDisk = createMockVDisk({
-        index: stateVDisks.length + 1,
-        state: EVDiskState.OK,
-        frontQueues: EFlag.Red,
-        replicated: false,
-    });
-    replicatingRedFrontQueuesVDisk.VDiskId = `${replicatingGroupId}-${replicatingGroupGeneration}-0-0-${vDiskStates.length + 1}`;
-    if (replicatingRedFrontQueuesVDisk.Whiteboard) {
-        replicatingRedFrontQueuesVDisk.Whiteboard.VDiskId = {
-            GroupID: replicatingGroupId,
-            GroupGeneration: replicatingGroupGeneration,
-            Ring: 0,
-            Domain: 0,
-            VDisk: vDiskStates.length + 1,
-        };
-    }
-
-    const replicatingMissingStateVDisk: TStorageVDisk = {
-        ...createMockVDisk({
-            index: stateVDisks.length + 2,
-            state: EVDiskState.OK,
-            frontQueues: EFlag.Grey,
-            replicated: false,
-        }),
-        VDiskId: `${replicatingGroupId}-${replicatingGroupGeneration}-0-0-${vDiskStates.length + 2}`,
-        Status: 'REPLICATING',
-        Whiteboard: {
-            ...createMockVDisk({
-                index: stateVDisks.length + 2,
-                state: EVDiskState.OK,
-                frontQueues: EFlag.Grey,
-                replicated: false,
-            }).Whiteboard,
-            VDiskId: {
-                GroupID: replicatingGroupId,
-                GroupGeneration: replicatingGroupGeneration,
-                Ring: 0,
-                Domain: 0,
-                VDisk: vDiskStates.length + 2,
-            },
-            VDiskState: undefined,
-            Overall: EFlag.Grey,
-            DiskSpace: EFlag.Grey,
-        },
-    };
-
-    const replicatingVDisks = [
-        ...replicatingStateVDisks,
-        replicatingBlackCapacityAlertVDisk,
-        replicatingCriticalSpaceVDisk,
-        replicatingRedFrontQueuesVDisk,
-        replicatingMissingStateVDisk,
-    ];
-
     return {
         Version: 10,
         TotalGroups: 2,
@@ -369,7 +270,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
                 DiskSpace: EFlag.Red,
                 AllocationUnits: '1',
                 State: 'mock: all vdisk states',
-                MissingDisks: String(vDiskStates.length - 1),
+                MissingDisks: '3',
                 Used: String(MOCK_ALLOCATED_SIZE_BASE * 32),
                 Limit: String(MOCK_SLOT_SIZE * 10),
                 Available: String(MOCK_SLOT_SIZE * 7),
@@ -380,13 +281,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
                 LatencyPutTabletLog: '1000',
                 LatencyPutUserData: '2000',
                 LatencyGetFast: '500',
-                VDisks: [
-                    ...stateVDisks,
-                    criticalSpaceVDisk,
-                    blackCapacityAlertVDisk,
-                    noCapacityAlertVDisk,
-                    missingStateVDisk,
-                ],
+                VDisks: firstGroupVDisks,
                 MaxPDiskUsage: 70,
                 MaxVDiskSlotUsage: 82,
                 MaxVDiskRawUsage: 64,
@@ -415,7 +310,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
                 LatencyPutTabletLog: '1000',
                 LatencyPutUserData: '2000',
                 LatencyGetFast: '500',
-                VDisks: replicatingVDisks,
+                VDisks: secondGroupVDisks,
                 MaxPDiskUsage: 70,
                 MaxVDiskSlotUsage: 82,
                 MaxVDiskRawUsage: 64,
