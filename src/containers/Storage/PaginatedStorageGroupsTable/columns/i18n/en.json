@@ -18,5 +18,5 @@
   "latency": "Latency",
   "allocation-units": "Allocation Units",
   "vdisks": "VDisks",
-  "vdisks-pdisks": "VDisks with PDisks"
+  "vdisks-pdisks": "VDisks PDisks"
 }

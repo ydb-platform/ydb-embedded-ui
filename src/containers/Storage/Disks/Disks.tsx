@@ -16,7 +16,7 @@ import './Disks.scss';
 
 const b = cn('ydb-storage-disks');
 
-const VDISKS_CONTAINER_WIDTH = 316;
+export const VDISKS_CONTAINER_WIDTH = 316;
 
 interface DisksProps {
     vDisks?: PreparedVDisk[];
@@ -33,6 +33,12 @@ export function Disks({vDisks = [], viewContext, erasure, withIcon}: DisksProps)
     const {
         theme: {spaceBaseSize},
     } = useLayoutContext();
+
+    // Now you can use _isStorageExpertMode and _vdisksGroupBy
+    // Example: conditional rendering or logic based on these values
+    // if (_isStorageExpertMode && _vdisksGroupBy) {
+    //     // Apply expert mode logic with grouping
+    // }
 
     if (!vDisks.length) {
         return null;
@@ -110,6 +116,7 @@ function VDiskItem({
                 highlightedVDisk={highlightedVDisk}
                 setHighlightedVDisk={setHighlightedVDisk}
                 progressBarClassName={b('vdisk-progress-bar')}
+                withExpertMode
             />
         </div>
     );

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {ShieldKeyhole} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import {Flex, Icon, Label, Popover} from '@gravity-ui/uikit';
@@ -22,7 +24,7 @@ import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../../../utils/generateEvaluator';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
-import {Disks} from '../../Disks/Disks';
+import {Disks, VDISKS_CONTAINER_WIDTH} from '../../Disks/Disks';
 import {VDisks} from '../../VDisks/VDisks';
 import {getDegradedSeverity} from '../../utils';
 import i18n from '../i18n';
@@ -262,10 +264,28 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
     };
 };
 
+const getDisksColumnHeader = () => {
+    const [vDisksTitle, pDisksTitle] = STORAGE_GROUPS_COLUMNS_TITLES.VDisksPDisks.split(' ');
+
+    return (
+        <div
+            className={b('disks-column-header')}
+            style={
+                {
+                    '--storage-groups-vdisks-width': `${VDISKS_CONTAINER_WIDTH}px`,
+                } as React.CSSProperties
+            }
+        >
+            <span>{vDisksTitle}</span>
+            <span>{pDisksTitle}</span>
+        </div>
+    );
+};
+
 const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
     return {
         name: STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
-        header: STORAGE_GROUPS_COLUMNS_TITLES.VDisksPDisks,
+        header: getDisksColumnHeader(),
         className: b('disks-column'),
         render: ({row}) => (
             <Disks
@@ -275,7 +295,7 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
                 withIcon
             />
         ),
-        align: DataTable.CENTER,
+        align: DataTable.LEFT,
         width: 800,
         resizeable: false,
         sortable: false,
