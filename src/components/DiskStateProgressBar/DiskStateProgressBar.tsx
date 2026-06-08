@@ -6,7 +6,7 @@ import {Flex, Icon} from '@gravity-ui/uikit';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {cn} from '../../utils/cn';
 import {DONOR_COLOR, NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
-import {getSeverityColor, getVDiskStatusIcon} from '../../utils/disks/helpers';
+import {getDisplaySeverityColor, getVDiskStatusIcon} from '../../utils/disks/helpers';
 import {useSetting} from '../../utils/hooks';
 import {isNumeric} from '../../utils/utils';
 
@@ -72,7 +72,7 @@ export function DiskStateProgressBar({
     if (isDonor) {
         mods[DONOR_COLOR.toLocaleLowerCase()] = true;
     } else {
-        const color = getSeverityColor(severity);
+        const color = getDisplaySeverityColor(severity);
         if (color) {
             mods[color.toLocaleLowerCase()] = true;
         }

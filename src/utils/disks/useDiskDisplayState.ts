@@ -11,12 +11,13 @@ import {
 } from '../../containers/Storage/useStorageQueryParams';
 import type {ECapacityAlert} from '../../types/api/enums';
 
+import {DATA_SEVERITY} from './constants';
 import {getIconCalculator} from './getIconStrategy';
 import {getSeverityCalculator} from './getSeverityStrategy';
-import type {PreparedVDisk} from './types';
+import type {DisplaySeverity, PreparedVDisk} from './types';
 
 export interface DiskDisplayState {
-    severity: number;
+    severity: DisplaySeverity;
     icon: IconData | string | undefined;
     modeModifier: string | undefined;
     isLegendInactive?: boolean;
@@ -61,7 +62,7 @@ export function useDiskDisplayState(
     const inactiveLegendItems = useSpaceLegendSelection();
 
     return React.useMemo(() => {
-        let severity: number;
+        let severity: DisplaySeverity;
         let icon: IconData | string | undefined;
         let modeModifier: string | undefined;
         let isLegendInactive = false;
@@ -86,7 +87,7 @@ export function useDiskDisplayState(
             }
         } else {
             // Default mode (Expert Mode OFF): use pre-calculated Severity
-            severity = vDisk.Severity ?? 0;
+            severity = (vDisk.Severity ?? DATA_SEVERITY.GREY) as DisplaySeverity;
 
             // Default icon: let DiskStateProgressBar handle it via getVDiskStatusIcon fallback
             icon = undefined;

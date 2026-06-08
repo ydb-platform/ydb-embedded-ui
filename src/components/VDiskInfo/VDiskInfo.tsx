@@ -11,7 +11,7 @@ import {
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
-import {getSeverityColor} from '../../utils/disks/helpers';
+import {getDataSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {bytesToSpeed} from '../../utils/utils';
 import {InternalLink} from '../InternalLink';
@@ -316,7 +316,7 @@ function VDiskTitle<T extends PreparedVDisk>({data}: VDiskTitleProps<T>) {
     return (
         <Flex gap={2} alignItems="center">
             {vDiskInfoKeyset('vdiks-title')}
-            <StatusIcon status={getSeverityColor(data.Severity)} />
+            <StatusIcon status={getDataSeverityColor(data.Severity)} />
             {data.StringifiedId}
         </Flex>
     );

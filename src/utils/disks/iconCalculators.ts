@@ -1,4 +1,11 @@
-import {CircleExclamationFill, CircleXmarkFill, ClockFill} from '@gravity-ui/icons';
+import {
+    CircleExclamationFill,
+    CircleXmarkFill,
+    ClockFill,
+    Dots9,
+    Ellipsis,
+    GripHorizontal,
+} from '@gravity-ui/icons';
 import type {IconData} from '@gravity-ui/uikit';
 
 import {ECapacityAlert, isCapacityAlert} from '../../types/api/enums';
@@ -8,6 +15,7 @@ import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     DISPLAYED_DISK_ERROR_ICON,
     DONOR_ICON,
+    FRONT_QUEUES_SEVERITY,
     SPACE_SEVERITY,
 } from './constants';
 import type {PreparedVDisk} from './types';
@@ -145,7 +153,12 @@ export function calculateSpaceIcon(
 }
 
 /**
- * FrontQueues-based icon logic - show icon for queue problems
+ * FrontQueues-based icon logic - show icons based on queue status
+ * Matches FrontQueuesLegend icons:
+ * - OK (Green): no icon
+ * - Notice (Yellow): Ellipsis icon
+ * - Warning (Orange): GripHorizontal icon
+ * - Impaired (Red): Dots9 icon
  */
 export function calculateFrontQueuesIcon(
     _vDisk: PreparedVDisk,
@@ -156,11 +169,20 @@ export function calculateFrontQueuesIcon(
         return DONOR_ICON;
     }
 
-    // Show icon for Yellow or Red severity
-    if (severity >= DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow) {
-        return DISPLAYED_DISK_ERROR_ICON;
+    // Map severity to icon based on FrontQueues status
+    if (severity === FRONT_QUEUES_SEVERITY.NOTICE) {
+        return Ellipsis;
     }
 
+    if (severity === FRONT_QUEUES_SEVERITY.WARNING) {
+        return GripHorizontal;
+    }
+
+    if (severity === FRONT_QUEUES_SEVERITY.IMPAIRED) {
+        return Dots9;
+    }
+
+    // OK status and replication - no icon
     return undefined;
 }
 
