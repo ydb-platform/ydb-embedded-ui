@@ -24,5 +24,10 @@
   "front-queues_ok": "OK",
   "front-queues_notice": "Notice",
   "front-queues_warning": "Warning",
-  "front-queues_impaired": "Impaired"
+  "front-queues_impaired": "Impaired",
+  "compaction_key": "Fresh / Level Rank Satisfaction:",
+  "compaction_ok": "OK",
+  "compaction_notice": "Notice",
+  "compaction_warning": "Warning",
+  "compaction_impaired": "Impaired"
 }
