@@ -275,6 +275,8 @@ export interface TopicMessage {
      */
     SeqNo?: string;
 
+    Ip?: string;
+
     /**
      * Message metadata
      */

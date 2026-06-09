@@ -33,6 +33,7 @@ const dataGroups: {
         {name: TOPIC_DATA_COLUMNS_IDS.CODEC},
         {name: TOPIC_DATA_COLUMNS_IDS.PRODUCERID, copy: (row) => row.ProducerId},
         {name: TOPIC_DATA_COLUMNS_IDS.SEQNO, copy: (row) => row.SeqNo},
+        {name: TOPIC_DATA_COLUMNS_IDS.IP, copy: (row) => row.Ip},
     ],
 ];
 

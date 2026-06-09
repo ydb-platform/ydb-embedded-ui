@@ -17,6 +17,7 @@ export const TOPIC_DATA_COLUMNS_IDS = {
     CODEC: 'codec',
     PRODUCERID: 'producerID',
     SEQNO: 'seqNo',
+    IP: 'ip',
 } as const;
 
 export type TopicDataColumnId = ValueOf<typeof TOPIC_DATA_COLUMNS_IDS>;

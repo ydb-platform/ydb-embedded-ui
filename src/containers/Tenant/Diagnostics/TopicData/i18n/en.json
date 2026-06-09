@@ -12,6 +12,7 @@
   "label_codec": "Codec",
   "label_producerid": "ProducerID",
   "label_seqno": "SeqNo",
+  "label_ip": "IP",
   "label_partition-id": "Partition ID: ",
   "context_ts-diff": "Timestamp Write - Timestamp Create, ms",
   "label_full-value": "Full value",

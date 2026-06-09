@@ -178,6 +178,19 @@ export const seqNoColumn: Column<TopicMessageEnhanced> = {
     width: 100,
 };
 
+export const ipColumn: Column<TopicMessageEnhanced> = {
+    name: TOPIC_DATA_COLUMNS_IDS.IP,
+    header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.IP],
+    align: DataTable.LEFT,
+    render: ({row}) =>
+        row.Ip ? (
+            <EntityStatus showStatus={false} name={row.Ip} hasClipboardButton />
+        ) : (
+            EMPTY_DATA_PLACEHOLDER
+        ),
+    width: 220,
+};
+
 export function getAllColumns() {
     const columns: Column<TopicMessageEnhanced>[] = [
         offsetColumn,
@@ -191,6 +204,7 @@ export function getAllColumns() {
         codecColumn,
         producerIdColumn,
         seqNoColumn,
+        ipColumn,
     ];
     return columns;
 }
