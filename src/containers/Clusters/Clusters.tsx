@@ -21,7 +21,12 @@ import {
 } from '../../store/reducers/clusters/selectors';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {
+    useAutoRefreshInterval,
+    useSetting,
+    useTypedDispatch,
+    useTypedSelector,
+} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
 
@@ -96,15 +101,77 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         });
     }, [isDeleteClusterAvailable, isEditClusterAvailable, handleStatusClick]);
 
+    const clusters = query.data;
+
+    // Check which columns have data across all clusters
+    const {hasAnyStatus, hasAnyService, hasAnyGalaxy} = React.useMemo(() => {
+        if (!clusters || clusters.length === 0) {
+            return {hasAnyStatus: true, hasAnyService: true, hasAnyGalaxy: true};
+        }
+
+        return {
+            hasAnyStatus: clusters.some((cluster) => cluster.status),
+            hasAnyService: clusters.some((cluster) => cluster.service),
+            hasAnyGalaxy: clusters.some((cluster) => cluster.galaxy),
+        };
+    }, [clusters]);
+
+    // Get saved columns to check if user has explicitly saved specific columns
+    const [savedColumns] = useSetting<unknown[]>(CLUSTERS_SELECTED_COLUMNS_KEY);
+
+    // Parse saved columns to check which specific columns user has saved
+    const savedColumnIds = React.useMemo(() => {
+        if (!Array.isArray(savedColumns)) {
+            return new Set<string>();
+        }
+
+        const ids = new Set<string>();
+        savedColumns.forEach((saved) => {
+            if (typeof saved === 'string') {
+                ids.add(saved);
+            } else if (saved && typeof saved === 'object' && 'id' in saved) {
+                ids.add(String(saved.id));
+            }
+        });
+        return ids;
+    }, [savedColumns]);
+
+    // Filter columns: remove empty columns unless user has explicitly saved them
+    const filteredColumns = React.useMemo(() => {
+        return rawColumns.filter((column) => {
+            // If user has explicitly saved this column, always show it
+            if (savedColumnIds.has(column.name)) {
+                return true;
+            }
+
+            // If user hasn't saved preferences, hide empty columns
+            if (column.name === COLUMNS_NAMES.STATUS && !hasAnyStatus) {
+                return false;
+            }
+            if (column.name === COLUMNS_NAMES.SERVICE && !hasAnyService) {
+                return false;
+            }
+            if (column.name === COLUMNS_NAMES.GALAXY && !hasAnyGalaxy) {
+                return false;
+            }
+
+            return true;
+        });
+    }, [rawColumns, savedColumnIds, hasAnyStatus, hasAnyService, hasAnyGalaxy]);
+
+    // Adjust default columns to match filtered columns
+    const adjustedDefaultColumns = React.useMemo(() => {
+        const filteredColumnNames = new Set(filteredColumns.map((col) => col.name));
+        return DEFAULT_COLUMNS.filter((columnName) => filteredColumnNames.has(columnName));
+    }, [filteredColumns]);
+
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
-        rawColumns,
+        filteredColumns,
         CLUSTERS_SELECTED_COLUMNS_KEY,
         COLUMNS_TITLES,
-        DEFAULT_COLUMNS,
+        adjustedDefaultColumns,
         [COLUMNS_NAMES.TITLE],
     );
-
-    const clusters = query.data;
 
     const {servicesToSelect, versions, galaxiesToSelect} = React.useMemo(() => {
         const clustersServices = new Set<string>();
