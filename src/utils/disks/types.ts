@@ -33,8 +33,8 @@ export type DiskColor = EFlag | ExtendedDiskColor;
 export type DataSeverity = 0 | 1 | 2 | 3 | 4 | 5;
 
 /**
- * Extended severity levels for display (0-19).
- * Includes basic levels (0-5) plus expert mode levels (6-19).
+ * Extended severity levels for display (0-22).
+ * Includes basic levels (0-5) plus expert mode levels (6-22).
  * Used for dynamic coloring in Expert Mode based on grouping strategy.
  *
  * Ranges:
@@ -42,6 +42,7 @@ export type DataSeverity = 0 | 1 | 2 | 3 | 4 | 5;
  * - 6: SolidRed (State mode critical errors)
  * - 7-15: Space mode detailed capacity alerts
  * - 16-19: FrontQueues mode queue status
+ * - 20-22: Compaction mode satisfaction ranks
  */
 export type DisplaySeverity =
     | DataSeverity // 0-5: basic colors
@@ -58,7 +59,10 @@ export type DisplaySeverity =
     | 16
     | 17
     | 18
-    | 19; // FrontQueues mode (16-19)
+    | 19 // FrontQueues mode (16-19)
+    | 20
+    | 21
+    | 22; // Compaction mode (20-22)
 
 export type PreparedPDisk = Omit<
     TPDiskStateInfo,

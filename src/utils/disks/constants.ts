@@ -61,6 +61,13 @@ export const FRONT_QUEUES_SEVERITY = {
     IMPAIRED: 19 as DisplaySeverity, // SolidRed - Impaired
 } as const;
 
+// Compaction mode: severity levels based on Fresh/Level rank satisfaction
+export const COMPACTION_SEVERITY = {
+    OK: 20 as DisplaySeverity, // Green - both Fresh and Level are OK
+    NOTICE: 21 as DisplaySeverity, // Yellow - at least one is Yellow
+    WARNING: 22 as DisplaySeverity, // Red - at least one is Red
+} as const;
+
 export const DONOR_COLOR = 'DarkGrey';
 
 type SeverityToColor = Record<number, DiskColor>;

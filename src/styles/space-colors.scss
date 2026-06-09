@@ -6,10 +6,10 @@
     --ydb-space-cyan-bg: rgba(71, 247, 235, 0.15);
 
     // Light Yellow colors
-    --ydb-space-light-yellow-bg: rgba(212, 255, 113, 0.3);
+    --ydb-space-light-yellow-bg: rgba(212, 255, 113, 0.15);
 
     // Light Orange colors
-    --ydb-space-light-orange-bg: rgba(255, 178, 0, 0.3);
+    --ydb-space-light-orange-bg: rgba(255, 178, 0, 0.2);
 
     // Pre Orange colors
     --ydb-space-pre-orange-bg: rgba(255, 128, 0, 0.2);
@@ -21,26 +21,42 @@
     &_theme_light,
     &_theme_light-hc {
         --ydb-space-cyan-text: rgba(11, 153, 144, 1);
+        --ydb-space-cyan-bg-hover: rgba(9, 202, 189, 0.3);
         --ydb-space-light-yellow-text: rgba(128, 118, 0, 1);
+        --ydb-space-light-yellow-bg-hover: rgba(242, 255, 2, 0.4);
         --ydb-space-light-orange-text: rgba(221, 125, 0, 1);
+        --ydb-space-light-orange-bg-hover: rgba(255, 178, 0, 0.3);
         --ydb-space-pre-orange-text: rgba(225, 112, 0, 1);
+        --ydb-space-pre-orange-bg-hover: rgba(255, 128, 0, 0.3);
         --ydb-space-orange-text: rgba(206, 77, 9, 1);
+        --ydb-space-orange-bg-hover: rgba(255, 100, 17, 0.3);
         --ydb-space-black-bg: var(--g-color-base-neutral-medium);
+        --ydb-space-black-bg-hover: var(--g-color-base-neutral-medium-hover);
         --ydb-space-black-bg-stripped: var(--g-color-base-neutral-medium);
+        --ydb-space-black-bg-stripped-hover: var(--g-color-base-neutral-medium-hover);
         --ydb-space-black-text: var(--g-color-text-primary);
         --ydb-space-black-border: var(--g-color-text-complementary);
+        --ydb-space-black-border-hover: var(--g-color-text-primary);
     }
 
     &_theme_dark,
     &_theme_dark-hc {
         --ydb-space-cyan-text: rgba(4, 202, 188, 1);
+        --ydb-space-cyan-bg-hover: rgba(9, 202, 189, 0.25);
         --ydb-space-light-yellow-text: rgba(244, 255, 26, 1);
+        --ydb-space-light-yellow-bg-hover: rgba(205, 230, 16, 0.25);
         --ydb-space-light-orange-text: rgba(255, 178, 0, 1);
+        --ydb-space-light-orange-bg-hover: rgba(255, 183, 1, 0.3);
         --ydb-space-pre-orange-text: rgba(255, 128, 0, 1);
+        --ydb-space-pre-orange-bg-hover: rgba(255, 128, 0, 0.3);
         --ydb-space-orange-text: rgba(255, 89, 0, 1);
+        --ydb-space-orange-bg-hover: rgba(255, 100, 17, 0.3);
         --ydb-space-black-bg: var(--g-color-base-background);
+        --ydb-space-black-bg-hover: var(--g-color-base-float);
         --ydb-space-black-bg-stripped: var(--g-color-base-neutral-light);
+        --ydb-space-black-bg-stripped-hover: var(--g-color-base-neutral-light-hover);
         --ydb-space-black-text: var(--g-color-text-brand-contrast);
         --ydb-space-black-border: var(--g-color-line-light);
+        --ydb-space-black-border-hover: var(--g-color-text-primary);
     }
 }
