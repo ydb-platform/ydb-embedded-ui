@@ -8,6 +8,7 @@ import {stringifyVdiskId} from '../dataFormatters/dataFormatters';
 import {generateEvaluator} from '../generateEvaluator';
 
 import {
+    COMPACTION_SEVERITY,
     DATA_SEVERITY,
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     DISK_NUMERIC_SEVERITY_TO_STATE_COLOR,
@@ -49,10 +50,10 @@ export function getDataSeverityColor(severity: number | undefined): EFlag {
 }
 
 /**
- * Convert display severity (0-19) to disk color.
+ * Convert display severity (0-22) to disk color.
  * Used for dynamic coloring in Expert Mode based on grouping strategy.
- * Handles extended severity ranges for State, Space, and FrontQueues modes.
- * @param severity - Extended severity level (0-19), or any number
+ * Handles extended severity ranges for State, Space, FrontQueues, and Compaction modes.
+ * @param severity - Extended severity level (0-22), or any number
  * @returns Disk color for visualization
  */
 export function getDisplaySeverityColor(severity: number | undefined): DiskColor {
@@ -107,6 +108,18 @@ export function getDisplaySeverityColor(severity: number | undefined): DiskColor
     }
     if (severity === FRONT_QUEUES_SEVERITY.IMPAIRED) {
         return 'SolidRed';
+    }
+
+    // Compaction mode severities (20-22) map to colors
+    // Green -> OK, Yellow -> Notice, Red -> Warning
+    if (severity === COMPACTION_SEVERITY.OK) {
+        return EFlag.Green;
+    }
+    if (severity === COMPACTION_SEVERITY.NOTICE) {
+        return EFlag.Yellow;
+    }
+    if (severity === COMPACTION_SEVERITY.WARNING) {
+        return EFlag.Red;
     }
 
     // Fallback to basic colors for 0-5

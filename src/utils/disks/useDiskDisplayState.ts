@@ -14,11 +14,12 @@ import type {ECapacityAlert} from '../../types/api/enums';
 import {DATA_SEVERITY} from './constants';
 import {getIconCalculator} from './getIconStrategy';
 import {getSeverityCalculator} from './getSeverityStrategy';
+import type {IconWithColor} from './iconCalculators';
 import type {DisplaySeverity, PreparedVDisk} from './types';
 
 export interface DiskDisplayState {
     severity: DisplaySeverity;
-    icon: IconData | string | undefined;
+    icon: IconData | IconWithColor[] | string | undefined;
     modeModifier: string | undefined;
     isLegendInactive?: boolean;
 }
@@ -63,7 +64,7 @@ export function useDiskDisplayState(
 
     return React.useMemo(() => {
         let severity: DisplaySeverity;
-        let icon: IconData | string | undefined;
+        let icon: IconData | IconWithColor[] | string | undefined;
         let modeModifier: string | undefined;
         let isLegendInactive = false;
 

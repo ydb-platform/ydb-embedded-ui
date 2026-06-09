@@ -1,14 +1,16 @@
 import {
+    CircleCheckFill,
     CircleExclamationFill,
     CircleXmarkFill,
     ClockFill,
     Dots9,
     Ellipsis,
     GripHorizontal,
+    TriangleExclamationFill,
 } from '@gravity-ui/icons';
 import type {IconData} from '@gravity-ui/uikit';
 
-import {ECapacityAlert, isCapacityAlert} from '../../types/api/enums';
+import {ECapacityAlert, EFlag, isCapacityAlert} from '../../types/api/enums';
 import {EVDiskState} from '../../types/api/vdisk';
 
 import {
@@ -20,11 +22,16 @@ import {
 } from './constants';
 import type {PreparedVDisk} from './types';
 
+export interface IconWithColor {
+    icon: IconData;
+    color?: string;
+}
+
 export type IconCalculator = (
     vDisk: PreparedVDisk,
     severity: number,
     isDonor?: boolean,
-) => IconData | string | undefined;
+) => IconData | IconWithColor[] | string | undefined;
 
 /**
  * Default icon logic - show icon only for errors and donors
@@ -187,24 +194,88 @@ export function calculateFrontQueuesIcon(
 }
 
 /**
- * Compaction-based icon logic
- * TODO: Implement when Compaction requirements are defined
+ * Get icon and color for a single compaction rank (Fresh or Level)
+ * Maps EFlag to corresponding icon and color from CompactionLegend
+ */
+function getCompactionRankIconWithColor(flag: EFlag | undefined): IconWithColor | undefined {
+    if (!flag) {
+        return undefined;
+    }
+
+    switch (flag) {
+        case EFlag.Green:
+            return {
+                icon: CircleCheckFill,
+                color: 'var(--g-color-text-positive)',
+            };
+        case EFlag.Yellow:
+            return {
+                icon: TriangleExclamationFill,
+                color: 'var(--g-color-text-warning)',
+            };
+        case EFlag.Orange:
+            return {
+                icon: CircleExclamationFill,
+                color: 'var(--g-color-text-danger)',
+            };
+        case EFlag.Red:
+            return {
+                icon: CircleXmarkFill,
+                color: 'var(--g-color-text-primary)',
+            };
+        default:
+            return undefined;
+    }
+}
+
+/**
+ * Compaction-based icon logic - shows two icons (Fresh + Level) side by side
+ * Each icon has its own color based on its rank
+ * Icons are only shown if at least one rank is not green
+ * Returns an array of icons with colors: [FreshIcon, LevelIcon]
+ *
+ * Icon mapping from CompactionLegend:
+ * - Green: CircleCheckFill (text-positive)
+ * - Yellow: TriangleExclamationFill (text-warning)
+ * - Orange: CircleExclamationFill (text-danger)
+ * - Red: CircleXmarkFill (base-danger-heavy)
  */
 export function calculateCompactionIcon(
-    _vDisk: PreparedVDisk,
-    severity: number,
+    vDisk: PreparedVDisk,
+    _severity: number,
     isDonor?: boolean,
-): IconData | undefined {
+): IconData | IconWithColor[] | undefined {
     if (isDonor) {
         return DONOR_ICON;
     }
 
-    // Placeholder: show icon for issues
-    if (severity >= DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow) {
-        return DISPLAYED_DISK_ERROR_ICON;
+    const freshFlag = vDisk.SatisfactionRank?.FreshRank?.Flag;
+    const levelFlag = vDisk.SatisfactionRank?.LevelRank?.Flag;
+
+    // If no data, no icon
+    if (!freshFlag && !levelFlag) {
+        return undefined;
     }
 
-    return undefined;
+    // If both are green, no icon
+    if (freshFlag === EFlag.Green && levelFlag === EFlag.Green) {
+        return undefined;
+    }
+
+    // At least one is not green - show both icons with their respective colors
+    const freshIconWithColor = getCompactionRankIconWithColor(freshFlag);
+    const levelIconWithColor = getCompactionRankIconWithColor(levelFlag);
+
+    // Return array of icons with colors [Fresh, Level]
+    const icons: IconWithColor[] = [];
+    if (freshIconWithColor) {
+        icons.push(freshIconWithColor);
+    }
+    if (levelIconWithColor) {
+        icons.push(levelIconWithColor);
+    }
+
+    return icons.length > 0 ? icons : undefined;
 }
 
 /**
