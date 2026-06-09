@@ -34,6 +34,7 @@
   "field_dc": "DC",
   "field_service": "Service",
   "field_domain": "Domain",
+  "field_galaxy": "Galaxy",
   "field_status": "Status",
   "field_nodes": "Nodes",
   "field_load": "Load",

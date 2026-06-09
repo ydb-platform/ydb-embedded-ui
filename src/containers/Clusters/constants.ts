@@ -10,6 +10,7 @@ export const COLUMNS_NAMES = {
     DC: 'dc',
     SERVICE: 'service',
     DOMAIN: 'domain',
+    GALAXY: 'galaxy',
     STATUS: 'status',
     NODES: 'nodes',
     LOAD: 'load',
@@ -54,6 +55,9 @@ export const COLUMNS_TITLES = {
     },
     get [COLUMNS_NAMES.DOMAIN]() {
         return i18n('field_domain');
+    },
+    get [COLUMNS_NAMES.GALAXY]() {
+        return i18n('field_galaxy');
     },
     get [COLUMNS_NAMES.STATUS]() {
         return i18n('field_status');
