@@ -54,6 +54,7 @@ function createMockVDisk({
     replicated = true,
     donorMode = false,
     pDiskState = TPDiskState.Normal,
+    satisfactionRank,
 }: {
     index: number;
     groupId?: number;
@@ -65,6 +66,10 @@ function createMockVDisk({
     replicated?: boolean;
     donorMode?: boolean;
     pDiskState?: TPDiskState;
+    satisfactionRank?: {
+        FreshRank?: {RankPercent: number; Flag: EFlag};
+        LevelRank?: {RankPercent: number; Flag: EFlag};
+    };
 }): TStorageVDisk {
     const nodeId = MOCK_NODE_ID_BASE + index;
     const pDiskId = MOCK_PDISK_ID_BASE + index;
@@ -115,83 +120,111 @@ function createMockVDisk({
             WriteThroughput: String((index + 1) * 512 * 1024),
             StoragePoolName: 'mock-vdisk-states',
             CapacityAlert: capacityAlert,
-            SatisfactionRank: {
-                FreshRank: {
-                    RankPercent: state === EVDiskState.OK ? 80 : 140,
-                    Flag: state === EVDiskState.OK ? EFlag.Green : EFlag.Red,
-                },
-                LevelRank: {
-                    RankPercent: state === EVDiskState.OK ? 75 : 120,
-                    Flag: state === EVDiskState.OK ? EFlag.Green : EFlag.Yellow,
-                },
-            },
+            SatisfactionRank: satisfactionRank,
         },
     };
 }
 
 export function createMockStorageGroupsResponse(): StorageGroupsResponse {
-    // Define 10 VDisks with different combinations of State, CapacityAlert, and FrontQueues
-    // Covers all 6 EVDiskState values and various ECapacityAlert values (including undefined for N/A)
+    // Define 10 VDisks with different combinations of State, CapacityAlert, FrontQueues, and SatisfactionRank
+    // Covers all 6 EVDiskState values, various ECapacityAlert values, and multiple Fresh/Level Rank combinations
     const vDiskConfigs = [
         {
             state: EVDiskState.OK,
             capacityAlert: ECapacityAlert.GREEN,
             frontQueues: EFlag.Green,
             diskSpace: EFlag.Green,
+            satisfactionRank: {
+                FreshRank: {RankPercent: 50, Flag: EFlag.Green},
+                LevelRank: {RankPercent: 45, Flag: EFlag.Green},
+            },
         },
         {
             state: EVDiskState.OK,
             capacityAlert: ECapacityAlert.CYAN,
             frontQueues: EFlag.Blue,
             diskSpace: EFlag.Green,
+            satisfactionRank: {
+                FreshRank: {RankPercent: 85, Flag: EFlag.Yellow},
+                LevelRank: {RankPercent: 60, Flag: EFlag.Green},
+            },
         },
         {
             state: EVDiskState.OK,
             capacityAlert: ECapacityAlert.YELLOW,
             frontQueues: EFlag.Yellow,
             diskSpace: EFlag.Yellow,
+            satisfactionRank: {
+                FreshRank: {RankPercent: 95, Flag: EFlag.Orange},
+                LevelRank: {RankPercent: 88, Flag: EFlag.Yellow},
+            },
         },
         {
             state: EVDiskState.OK,
             capacityAlert: ECapacityAlert.ORANGE,
             frontQueues: EFlag.Orange,
             diskSpace: EFlag.Orange,
+            satisfactionRank: {
+                FreshRank: {RankPercent: 110, Flag: EFlag.Red},
+                LevelRank: {RankPercent: 92, Flag: EFlag.Orange},
+            },
         },
         {
             state: EVDiskState.OK,
             capacityAlert: ECapacityAlert.RED,
             frontQueues: EFlag.Red,
             diskSpace: EFlag.Red,
+            satisfactionRank: {
+                FreshRank: {RankPercent: 150, Flag: EFlag.Red},
+                LevelRank: {RankPercent: 130, Flag: EFlag.Red},
+            },
         },
         {
             state: EVDiskState.Initial,
             capacityAlert: ECapacityAlert.LIGHTYELLOW,
             frontQueues: EFlag.Green,
             diskSpace: EFlag.Green,
+            satisfactionRank: {
+                FreshRank: {RankPercent: 70, Flag: EFlag.Green},
+                LevelRank: {RankPercent: 105, Flag: EFlag.Red},
+            },
         },
         {
             state: EVDiskState.SyncGuidRecovery,
             capacityAlert: ECapacityAlert.LIGHTORANGE,
             frontQueues: EFlag.Yellow,
             diskSpace: EFlag.Yellow,
+            satisfactionRank: {
+                FreshRank: {RankPercent: 120, Flag: EFlag.Red},
+                LevelRank: {RankPercent: 75, Flag: EFlag.Yellow},
+            },
         },
         {
             state: EVDiskState.SyncGuidRecoveryError,
             capacityAlert: ECapacityAlert.PREORANGE,
             frontQueues: EFlag.Orange,
             diskSpace: EFlag.Red,
+            satisfactionRank: {
+                FreshRank: {RankPercent: 55, Flag: EFlag.Green},
+                LevelRank: {RankPercent: 98, Flag: EFlag.Orange},
+            },
         },
         {
             state: EVDiskState.LocalRecoveryError,
             capacityAlert: ECapacityAlert.BLACK,
             frontQueues: EFlag.Grey,
             diskSpace: EFlag.Red,
+            satisfactionRank: {
+                FreshRank: {RankPercent: 90, Flag: EFlag.Orange},
+                LevelRank: {RankPercent: 50, Flag: EFlag.Green},
+            },
         },
         {
             state: EVDiskState.PDiskError,
             capacityAlert: undefined,
             frontQueues: EFlag.Red,
             diskSpace: EFlag.Red,
+            satisfactionRank: undefined, // No data for this disk
         },
     ];
 
@@ -204,6 +237,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             frontQueues: config.frontQueues,
             diskSpace: config.diskSpace,
             replicated: true,
+            satisfactionRank: config.satisfactionRank,
         }),
     );
 
@@ -222,6 +256,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             frontQueues: config.frontQueues,
             diskSpace: config.diskSpace,
             replicated: false,
+            satisfactionRank: config.satisfactionRank,
         });
 
         const donorVDisk = createMockVDisk({
@@ -234,6 +269,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             diskSpace: config.diskSpace,
             replicated: false,
             donorMode: true,
+            satisfactionRank: config.satisfactionRank,
         });
 
         // Update VDiskId for donor
