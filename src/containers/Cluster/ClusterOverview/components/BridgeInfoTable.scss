@@ -1,11 +1,31 @@
 @use '../../../../styles/mixins.scss';
 
-.bridge-info-table {
+@mixin bridge-group-status-background {
+    &_theme_positive {
+        background-color: var(--g-color-text-positive);
+    }
+
+    &_theme_warning {
+        background-color: var(--g-color-text-warning);
+    }
+
+    &_theme_danger {
+        background-color: var(--g-color-text-danger);
+    }
+
+    &_theme_dark-complementary {
+        background-color: var(--g-color-text-dark-complementary);
+    }
+
+    &_theme_secondary {
+        background-color: var(--g-color-text-secondary);
+    }
+}
+
+.ydb-bridge-info-table {
     height: 100%;
 
-    &__pile-card {
-        --g-definition-list-item-gap: var(--g-spacing-3);
-
+    &__pile {
         width: 321px;
         padding: var(--g-spacing-3) var(--g-spacing-4);
 
@@ -15,13 +35,89 @@
         @include mixins.body-2-typography();
     }
 
-    &__status-icon {
-        &_primary {
-            color: var(--g-color-text-positive);
-        }
+    &__pile-title {
+        min-width: 0;
+    }
 
-        &:not(&_primary) {
-            color: var(--g-color-private-white-250);
+    &__state-label {
+        flex-shrink: 0;
+
+        &_with-help .g-label__text {
+            margin-inline: var(--g-spacing-1) var(--g-spacing-1);
         }
+    }
+
+    &__state-help {
+        color: inherit;
+    }
+
+    &__state-help-popover {
+        white-space: pre-line;
+    }
+
+    &__statuses {
+        width: 100%;
+    }
+}
+
+.ydb-bridge-info-table-progress {
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    gap: var(--g-spacing-half);
+
+    height: 10px;
+
+    border-radius: var(--g-border-radius-xs);
+
+    &_empty {
+        background-color: var(--g-color-sfx-shadow);
+    }
+
+    &__item {
+        min-width: 8px;
+        height: 4px;
+
+        border-radius: var(--g-border-radius-xs);
+
+        @include bridge-group-status-background();
+    }
+}
+
+.ydb-bridge-info-table-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--g-spacing-2);
+
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+
+    &__item {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
+
+        min-width: 0;
+    }
+
+    &__dot {
+        flex: 0 0 6px;
+
+        width: 6px;
+        height: 6px;
+
+        border-radius: 50%;
+
+        @include bridge-group-status-background();
+    }
+
+    &__label {
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 }

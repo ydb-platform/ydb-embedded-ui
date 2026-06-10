@@ -136,7 +136,7 @@ function ClusterDoughnuts({cluster, loading, collapsed}: ClusterOverviewProps) {
         const {MapStorageUsed, MapStorageTotal} = cluster;
         const storageTypes = Array.from(
             new Set(Object.keys(MapStorageUsed).concat(Object.keys(MapStorageTotal))),
-        );
+        ).sort();
         storageTypes.forEach((storageType) => {
             const used = MapStorageUsed[storageType];
             const total = MapStorageTotal[storageType];

@@ -321,6 +321,15 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         sortable: true,
     },
     {
+        name: COLUMNS_NAMES.GALAXY,
+        header: COLUMNS_TITLES[COLUMNS_NAMES.GALAXY],
+        width: 120,
+        sortable: true,
+        render: ({row}) => {
+            return row.galaxy || EMPTY_CELL;
+        },
+    },
+    {
         name: COLUMNS_NAMES.DC,
         header: COLUMNS_TITLES[COLUMNS_NAMES.DC],
         width: 120,

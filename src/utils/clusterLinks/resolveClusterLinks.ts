@@ -168,10 +168,12 @@ function resolveParam(
  * Lowercase and kebab-case segments are normalised to PascalCase as a fallback
  * (see {@link resolveParam} for details).
  * Only string and number leaf values are used for substitution.
- * Substituted values are treated as URL component values and are always
- * encoded with `encodeURIComponent(value)`. Placeholders should not be used
- * for URL structural parts such as scheme, host, path separators, or query
- * delimiters; keep those parts in the template itself.
+ * Substituted values are treated as URL component values and are encoded with
+ * `encodeURIComponent(value)`, except when the value is a complete URL
+ * (starts with `http://` or `https://`) at the very start of the template.
+ * This allows placeholders like `{balancer}` to be used as full URL bases in
+ * patterns like `{balancer}/path`, while still encoding them everywhere else,
+ * including query strings like `?url={balancer}`.
  * Returns `undefined` if any placeholder remains unresolved after substitution.
  */
 export function substituteUrlParams(
@@ -181,20 +183,32 @@ export function substituteUrlParams(
 ): string | undefined {
     let hasUnresolved = false;
 
-    const result = template.replace(PLACEHOLDER_PATTERN, (match, key: string | undefined) => {
-        if (!key) {
-            hasUnresolved = true;
-            return match;
-        }
+    const result = template.replace(
+        PLACEHOLDER_PATTERN,
+        (match, key: string | undefined, offset: number) => {
+            if (!key) {
+                hasUnresolved = true;
+                return match;
+            }
 
-        const value = resolveParam(key, source, namespaces);
-        if (value === undefined) {
-            hasUnresolved = true;
-            return match;
-        }
+            const value = resolveParam(key, source, namespaces);
+            if (value === undefined) {
+                hasUnresolved = true;
+                return match;
+            }
 
-        return encodeURIComponent(String(value));
-    });
+            const stringValue = String(value);
+            // Don't encode complete URLs only at the very start of the template
+            if (
+                offset === 0 &&
+                (stringValue.startsWith('http://') || stringValue.startsWith('https://'))
+            ) {
+                return stringValue;
+            }
+
+            return encodeURIComponent(stringValue);
+        },
+    );
 
     return hasUnresolved ? undefined : result;
 }

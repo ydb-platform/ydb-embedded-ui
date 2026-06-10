@@ -83,7 +83,7 @@ describe('substituteUrlParams', () => {
         ).toBe('https://example.com/test/1');
     });
 
-    test('resolves {cluster.balancer} using namespaces map', () => {
+    test('resolves {cluster.balancer} as query param (encoded)', () => {
         const namespaces = makeNamespaces({
             cluster: {balancer: 'https://balancer.example.com'},
         });
@@ -94,6 +94,42 @@ describe('substituteUrlParams', () => {
                 namespaces,
             ),
         ).toBe('https://example.com/?balancer=https%3A%2F%2Fbalancer.example.com');
+    });
+
+    test('resolves {balancer} as full URL without encoding at start (http)', () => {
+        const namespaces = makeNamespaces({
+            cluster: {balancer: 'http://meta.ydb.yandex.net:8765'},
+        });
+        expect(substituteUrlParams('{balancer}/monitoring/cluster', 'cluster', namespaces)).toBe(
+            'http://meta.ydb.yandex.net:8765/monitoring/cluster',
+        );
+    });
+
+    test('resolves {balancer} as full URL without encoding at start (https)', () => {
+        const namespaces = makeNamespaces({
+            cluster: {balancer: 'https://balancer.example.com'},
+        });
+        expect(substituteUrlParams('{balancer}/path', 'cluster', namespaces)).toBe(
+            'https://balancer.example.com/path',
+        );
+    });
+
+    test('resolves {cluster.balancer} as full URL without encoding at start', () => {
+        const namespaces = makeNamespaces({
+            cluster: {balancer: 'https://balancer.example.com'},
+        });
+        expect(substituteUrlParams('{cluster.balancer}/monitoring', 'other', namespaces)).toBe(
+            'https://balancer.example.com/monitoring',
+        );
+    });
+
+    test('encodes non-URL values normally', () => {
+        const namespaces = makeNamespaces({
+            cluster: {name: 'my cluster with spaces'},
+        });
+        expect(substituteUrlParams('https://example.com/{name}', 'cluster', namespaces)).toBe(
+            'https://example.com/my%20cluster%20with%20spaces',
+        );
     });
 
     test('resolves deeply nested dotted paths by traversing objects', () => {
@@ -452,7 +488,7 @@ describe('resolveClusterLinks', () => {
             expect(result.map((l) => l.title)).toEqual(['Cores', 'Monitoring', 'Logs']);
         });
 
-        test('resolves {cluster.balancer} dotted placeholder from cluster info', () => {
+        test('resolves {cluster.balancer} dotted placeholder from cluster info as query param (encoded)', () => {
             const dynamicLinks: MetaClusterLink[] = [
                 {
                     type: 'cluster',
@@ -469,6 +505,40 @@ describe('resolveClusterLinks', () => {
             expect(result[0].url).toBe(
                 'https://monitoring.com/?balancer=https%3A%2F%2Fbalancer.example.com',
             );
+        });
+
+        test('resolves {balancer} as full URL without encoding at start', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'cluster',
+                    url: '{balancer}/monitoring/cluster',
+                    title: 'Monitoring',
+                },
+            ];
+
+            const result = resolveClusterLinks(
+                makeClusterInfo({links: dynamicLinks, balancer: 'http://meta.ydb.yandex.net:8765'}),
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('http://meta.ydb.yandex.net:8765/monitoring/cluster');
+        });
+
+        test('resolves {cluster.balancer} as full URL without encoding at start', () => {
+            const dynamicLinks: MetaClusterLink[] = [
+                {
+                    type: 'cluster',
+                    url: '{cluster.balancer}/monitoring/cluster',
+                    title: 'Monitoring',
+                },
+            ];
+
+            const result = resolveClusterLinks(
+                makeClusterInfo({links: dynamicLinks, balancer: 'https://balancer.example.com'}),
+            );
+
+            expect(result).toHaveLength(1);
+            expect(result[0].url).toBe('https://balancer.example.com/monitoring/cluster');
         });
 
         test('resolves {cluster.name} dotted placeholder from cluster info', () => {

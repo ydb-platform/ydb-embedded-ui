@@ -28,6 +28,7 @@ import {
     getGroupStatsFromClusterInfo,
     normalizeDomain,
     parseGroupsStatsQueryResponse,
+    prepareClusterInfo,
 } from './utils';
 
 export const INITIAL_DEFAULT_CLUSTER_TAB = clusterTabsIds.tenants;
@@ -66,9 +67,10 @@ export const clusterApi = api.injectEndpoints({
         >({
             queryFn: async (clusterName, {signal}) => {
                 try {
-                    const clusterData = await window.api.viewer.getClusterInfo(clusterName, {
+                    const rawClusterData = await window.api.viewer.getClusterInfo(clusterName, {
                         signal,
                     });
+                    const clusterData = prepareClusterInfo(rawClusterData);
 
                     const clusterRoot = clusterData.Domain;
                     // Without domain we cannot get stats from system tables
