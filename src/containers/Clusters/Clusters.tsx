@@ -111,76 +111,42 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         };
     }, [clusters]);
 
-    // Filter columns: remove empty columns unless user has explicitly selected them
-    // We need to do this before calling useSelectedColumns to avoid showing empty columns in the selector
-    const filteredColumns = React.useMemo(() => {
-        return rawColumns.filter((column) => {
-            // Check if this is one of the columns we want to hide when empty
-            const isEmptyCheckColumn =
-                column.name === COLUMNS_NAMES.STATUS ||
-                column.name === COLUMNS_NAMES.SERVICE ||
-                column.name === COLUMNS_NAMES.GALAXY;
-
-            if (!isEmptyCheckColumn) {
-                // Not a column we're checking, always include
-                return true;
-            }
-
-            // Hide empty columns (will be overridden by useSelectedColumns if user selected them)
-            if (column.name === COLUMNS_NAMES.STATUS && !hasAnyStatus) {
-                return false;
-            }
-            if (column.name === COLUMNS_NAMES.SERVICE && !hasAnyService) {
-                return false;
-            }
-            if (column.name === COLUMNS_NAMES.GALAXY && !hasAnyGalaxy) {
-                return false;
-            }
-
-            return true;
-        });
-    }, [rawColumns, hasAnyStatus, hasAnyService, hasAnyGalaxy]);
-
-    // Adjust default columns to match filtered columns
-    const adjustedDefaultColumns = React.useMemo(() => {
-        const filteredColumnNames = new Set(filteredColumns.map((col) => col.name));
-        return DEFAULT_COLUMNS.filter((columnName) => filteredColumnNames.has(columnName));
-    }, [filteredColumns]);
-
     const {columnsToShow, columnsToSelect, setColumns, selectedColumnIds} = useSelectedColumns(
-        filteredColumns,
+        rawColumns,
         CLUSTERS_SELECTED_COLUMNS_KEY,
         COLUMNS_TITLES,
-        adjustedDefaultColumns,
+        DEFAULT_COLUMNS,
         [COLUMNS_NAMES.TITLE],
     );
 
-    // Re-add explicitly selected empty columns that were filtered out
-    const finalColumnsToShow = React.useMemo(() => {
-        const columnsToAdd: typeof rawColumns = [];
+    // Filter out empty columns that user has NOT explicitly selected
+    // This hides them from both the table and the column selector
+    const filteredColumnsToSelect = React.useMemo(() => {
+        return columnsToSelect.filter((column) => {
+            // If user explicitly selected this column, always show it
+            if (selectedColumnIds.has(column.id)) {
+                return true;
+            }
 
-        // Check if user explicitly selected any of the empty columns
-        if (selectedColumnIds.has(COLUMNS_NAMES.STATUS) && !hasAnyStatus) {
-            const statusColumn = rawColumns.find((col) => col.name === COLUMNS_NAMES.STATUS);
-            if (statusColumn && !columnsToShow.includes(statusColumn)) {
-                columnsToAdd.push(statusColumn);
+            // Otherwise, hide empty columns
+            if (column.id === COLUMNS_NAMES.STATUS && !hasAnyStatus) {
+                return false;
             }
-        }
-        if (selectedColumnIds.has(COLUMNS_NAMES.SERVICE) && !hasAnyService) {
-            const serviceColumn = rawColumns.find((col) => col.name === COLUMNS_NAMES.SERVICE);
-            if (serviceColumn && !columnsToShow.includes(serviceColumn)) {
-                columnsToAdd.push(serviceColumn);
+            if (column.id === COLUMNS_NAMES.SERVICE && !hasAnyService) {
+                return false;
             }
-        }
-        if (selectedColumnIds.has(COLUMNS_NAMES.GALAXY) && !hasAnyGalaxy) {
-            const galaxyColumn = rawColumns.find((col) => col.name === COLUMNS_NAMES.GALAXY);
-            if (galaxyColumn && !columnsToShow.includes(galaxyColumn)) {
-                columnsToAdd.push(galaxyColumn);
+            if (column.id === COLUMNS_NAMES.GALAXY && !hasAnyGalaxy) {
+                return false;
             }
-        }
+            return true;
+        });
+    }, [columnsToSelect, selectedColumnIds, hasAnyStatus, hasAnyService, hasAnyGalaxy]);
 
-        return columnsToAdd.length > 0 ? [...columnsToShow, ...columnsToAdd] : columnsToShow;
-    }, [columnsToShow, rawColumns, selectedColumnIds, hasAnyStatus, hasAnyService, hasAnyGalaxy]);
+    // Filter columns to show based on filtered selector
+    const filteredColumnsToShow = React.useMemo(() => {
+        const allowedColumnIds = new Set(filteredColumnsToSelect.map((col) => col.id));
+        return columnsToShow.filter((column) => allowedColumnIds.has(column.name));
+    }, [columnsToShow, filteredColumnsToSelect]);
 
     const {servicesToSelect, versions, galaxiesToSelect} = React.useMemo(() => {
         const clustersServices = new Set<string>();
@@ -297,7 +263,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         return (
             <TableColumnSetup
                 popupWidth={242}
-                items={columnsToSelect}
+                items={filteredColumnsToSelect}
                 showStatus
                 onUpdate={setColumns}
             />
@@ -322,7 +288,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                 columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
                 wrapperClassName={b('table')}
                 data={filteredClusters}
-                columns={finalColumnsToShow}
+                columns={filteredColumnsToShow}
                 settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
                 initialSortOrder={{
                     columnId: COLUMNS_NAMES.TITLE,
