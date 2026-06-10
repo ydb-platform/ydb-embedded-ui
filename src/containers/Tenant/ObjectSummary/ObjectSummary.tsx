@@ -252,7 +252,7 @@ export function ObjectSummary({
             [EPathType.EPathTypeTable]: () => [
                 {
                     name: i18n('field_partitions'),
-                    content: PathDescription?.TablePartitions?.length,
+                    content: PathDescription?.TableStats?.PartCount,
                 },
             ],
             [EPathType.EPathTypeSysView]: () => [

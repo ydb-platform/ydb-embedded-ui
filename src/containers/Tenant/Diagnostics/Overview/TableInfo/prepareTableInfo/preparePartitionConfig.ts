@@ -1,4 +1,4 @@
-import type {TPartitionConfig, TTablePartition} from '../../../../../../types/api/schema';
+import type {TPartitionConfig, TTableStats} from '../../../../../../types/api/schema';
 import {formatBytes, getBytesSizeUnit} from '../../../../../../utils/bytesParsers';
 import {DEFAULT_MANAGE_PARTITIONING_VALUE} from '../ManagePartitioningDialog/constants';
 import type {ManagePartitioningFormState} from '../ManagePartitioningDialog/types';
@@ -7,11 +7,11 @@ import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 import type {PartitionProgressConfig} from './renderHelpers';
 
 /**
- * Prepares partition progress configuration from partition config and actual partitions
+ * Prepares partition progress configuration from partition config and table stats
  */
 export function preparePartitionProgressConfig(
     PartitionConfig: TPartitionConfig,
-    TablePartitions?: TTablePartition[],
+    TableStats?: TTableStats,
 ): PartitionProgressConfig {
     const {PartitioningPolicy} = PartitionConfig;
 
@@ -19,7 +19,7 @@ export function preparePartitionProgressConfig(
     // fallback and clamp to 1 if value is missing.
     const minPartitions = Math.max(1, PartitioningPolicy?.MinPartitionsCount ?? 1);
     const maxPartitions = PartitioningPolicy?.MaxPartitionsCount;
-    const partitionsCount = TablePartitions?.length ?? 1;
+    const partitionsCount = Number(TableStats?.PartCount ?? 1);
 
     return {
         minPartitions,

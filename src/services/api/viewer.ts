@@ -214,6 +214,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 path: this.getSchemaPath(path),
                 enums: true,
                 partition_stats: false,
+                partitioning_info: false,
                 subs: 0,
             },
             {concurrentId: concurrentId || `getDescribe|${path}`, requestConfig: {signal}, timeout},

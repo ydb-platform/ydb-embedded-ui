@@ -55,7 +55,6 @@ export function prepareTableInfo(
     const {PathDescription = {}} = data;
 
     const {
-        TablePartitions,
         TableStats = {},
         TabletMetrics = {},
         Table: {PartitionConfig = {}, TTLSettings} = {},
@@ -70,10 +69,7 @@ export function prepareTableInfo(
     // Prepare type-specific information
     switch (type) {
         case EPathType.EPathTypeTable: {
-            partitionProgressConfig = preparePartitionProgressConfig(
-                PartitionConfig,
-                TablePartitions,
-            );
+            partitionProgressConfig = preparePartitionProgressConfig(PartitionConfig, TableStats);
 
             managePartitioningDialogConfig = prepareManagePartitioningDialogConfig(
                 PartitionConfig,
