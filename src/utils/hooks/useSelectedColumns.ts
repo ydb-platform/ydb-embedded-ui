@@ -119,9 +119,15 @@ export const useSelectedColumns = <T extends {name: string}>(
         [setSavedColumns],
     );
 
+    // Get set of column IDs that are explicitly selected by user
+    const selectedColumnIds = React.useMemo(() => {
+        return new Set(normalizedSavedColumns.filter((col) => col.selected).map((col) => col.id));
+    }, [normalizedSavedColumns]);
+
     return {
         columnsToShow,
         columnsToSelect,
         setColumns,
+        selectedColumnIds,
     };
 };

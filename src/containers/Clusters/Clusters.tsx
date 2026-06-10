@@ -21,12 +21,7 @@ import {
 } from '../../store/reducers/clusters/selectors';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {
-    useAutoRefreshInterval,
-    useSetting,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
 
@@ -116,35 +111,22 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         };
     }, [clusters]);
 
-    // Get saved columns to check if user has explicitly saved specific columns
-    const [savedColumns] = useSetting<unknown[]>(CLUSTERS_SELECTED_COLUMNS_KEY);
-
-    // Parse saved columns to check which specific columns user has saved
-    const savedColumnIds = React.useMemo(() => {
-        if (!Array.isArray(savedColumns)) {
-            return new Set<string>();
-        }
-
-        const ids = new Set<string>();
-        savedColumns.forEach((saved) => {
-            if (typeof saved === 'string') {
-                ids.add(saved);
-            } else if (saved && typeof saved === 'object' && 'id' in saved) {
-                ids.add(String(saved.id));
-            }
-        });
-        return ids;
-    }, [savedColumns]);
-
-    // Filter columns: remove empty columns unless user has explicitly saved them
+    // Filter columns: remove empty columns unless user has explicitly selected them
+    // We need to do this before calling useSelectedColumns to avoid showing empty columns in the selector
     const filteredColumns = React.useMemo(() => {
         return rawColumns.filter((column) => {
-            // If user has explicitly saved this column, always show it
-            if (savedColumnIds.has(column.name)) {
+            // Check if this is one of the columns we want to hide when empty
+            const isEmptyCheckColumn =
+                column.name === COLUMNS_NAMES.STATUS ||
+                column.name === COLUMNS_NAMES.SERVICE ||
+                column.name === COLUMNS_NAMES.GALAXY;
+
+            if (!isEmptyCheckColumn) {
+                // Not a column we're checking, always include
                 return true;
             }
 
-            // If user hasn't saved preferences, hide empty columns
+            // Hide empty columns (will be overridden by useSelectedColumns if user selected them)
             if (column.name === COLUMNS_NAMES.STATUS && !hasAnyStatus) {
                 return false;
             }
@@ -157,7 +139,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
 
             return true;
         });
-    }, [rawColumns, savedColumnIds, hasAnyStatus, hasAnyService, hasAnyGalaxy]);
+    }, [rawColumns, hasAnyStatus, hasAnyService, hasAnyGalaxy]);
 
     // Adjust default columns to match filtered columns
     const adjustedDefaultColumns = React.useMemo(() => {
@@ -165,13 +147,40 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         return DEFAULT_COLUMNS.filter((columnName) => filteredColumnNames.has(columnName));
     }, [filteredColumns]);
 
-    const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
+    const {columnsToShow, columnsToSelect, setColumns, selectedColumnIds} = useSelectedColumns(
         filteredColumns,
         CLUSTERS_SELECTED_COLUMNS_KEY,
         COLUMNS_TITLES,
         adjustedDefaultColumns,
         [COLUMNS_NAMES.TITLE],
     );
+
+    // Re-add explicitly selected empty columns that were filtered out
+    const finalColumnsToShow = React.useMemo(() => {
+        const columnsToAdd: typeof rawColumns = [];
+
+        // Check if user explicitly selected any of the empty columns
+        if (selectedColumnIds.has(COLUMNS_NAMES.STATUS) && !hasAnyStatus) {
+            const statusColumn = rawColumns.find((col) => col.name === COLUMNS_NAMES.STATUS);
+            if (statusColumn && !columnsToShow.includes(statusColumn)) {
+                columnsToAdd.push(statusColumn);
+            }
+        }
+        if (selectedColumnIds.has(COLUMNS_NAMES.SERVICE) && !hasAnyService) {
+            const serviceColumn = rawColumns.find((col) => col.name === COLUMNS_NAMES.SERVICE);
+            if (serviceColumn && !columnsToShow.includes(serviceColumn)) {
+                columnsToAdd.push(serviceColumn);
+            }
+        }
+        if (selectedColumnIds.has(COLUMNS_NAMES.GALAXY) && !hasAnyGalaxy) {
+            const galaxyColumn = rawColumns.find((col) => col.name === COLUMNS_NAMES.GALAXY);
+            if (galaxyColumn && !columnsToShow.includes(galaxyColumn)) {
+                columnsToAdd.push(galaxyColumn);
+            }
+        }
+
+        return columnsToAdd.length > 0 ? [...columnsToShow, ...columnsToAdd] : columnsToShow;
+    }, [columnsToShow, rawColumns, selectedColumnIds, hasAnyStatus, hasAnyService, hasAnyGalaxy]);
 
     const {servicesToSelect, versions, galaxiesToSelect} = React.useMemo(() => {
         const clustersServices = new Set<string>();
@@ -313,7 +322,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                 columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
                 wrapperClassName={b('table')}
                 data={filteredClusters}
-                columns={columnsToShow}
+                columns={finalColumnsToShow}
                 settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
                 initialSortOrder={{
                     columnId: COLUMNS_NAMES.TITLE,
