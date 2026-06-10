@@ -68,6 +68,13 @@ const seqNoColumn: TopicMessageDetailsField = {
         return valueOrPlaceholder(row.SeqNo);
     },
 };
+const ipColumn: TopicMessageDetailsField = {
+    name: TOPIC_DATA_COLUMNS_IDS.IP,
+    header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.IP],
+    render: ({row}) => {
+        return valueOrPlaceholder(row.Ip);
+    },
+};
 
 function PartitionId() {
     const {selectedPartition} = useTopicDataQueryParams();
@@ -87,4 +94,5 @@ export const fields: TopicMessageDetailsField[] = [
     codecColumn,
     producerIdColumn,
     seqNoColumn,
+    ipColumn,
 ];

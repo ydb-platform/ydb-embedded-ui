@@ -45,6 +45,9 @@ export const TOPIC_DATA_COLUMNS_TITLES: Record<TopicDataColumnId, string> = {
     get seqNo() {
         return i18n('label_seqno');
     },
+    get ip() {
+        return i18n('label_ip');
+    },
 } as const;
 
 export const TOPIC_DATA_COLUMNS_WIDTH_LS_KEY = 'topicDataColumnsWidth';
