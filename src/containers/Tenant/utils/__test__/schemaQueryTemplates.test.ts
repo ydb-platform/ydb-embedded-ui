@@ -35,7 +35,7 @@ describe('schemaQueryTemplates', () => {
             });
 
             expect(template).toBe(`ALTER TABLE \`my_column_table\`
-ADD INDEX \${2:my_column_table_min_max_index_column_name}
+ADD INDEX \${2:my_min_max_index}
 LOCAL USING min_max
 ON (\${3:column_name});`);
         });
