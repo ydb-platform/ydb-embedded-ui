@@ -22,6 +22,12 @@ describe('schemaQueryTemplates', () => {
     });
 
     describe('addMinMaxIndex', () => {
+        test('uses placeholder table path without selected table', () => {
+            const template = addMinMaxIndex();
+
+            expect(template).toContain('ALTER TABLE ${1:<my_column_table>}');
+        });
+
         test('adds local min_max index for the selected column table', () => {
             const template = addMinMaxIndex({
                 path: '/local/my_column_table',
