@@ -89,6 +89,10 @@ export function NewSQL() {
                     action: actions.addFulltextIndex,
                 },
                 {
+                    text: i18n('action.add-min-max-index'),
+                    action: actions.addMinMaxIndex,
+                },
+                {
                     text: i18n('action.drop-index'),
                     action: actions.dropTableIndex,
                 },

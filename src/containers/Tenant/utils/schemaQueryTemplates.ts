@@ -440,6 +440,17 @@ WITH (
 );`;
 };
 
+export const addMinMaxIndex = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_column_table>}';
+
+    return `ALTER TABLE ${path}
+ADD INDEX \${2:my_column_table_min_max_index_column_name}
+LOCAL USING min_max
+ON (\${3:column_name});`;
+};
+
 export const addVectorIndex = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``

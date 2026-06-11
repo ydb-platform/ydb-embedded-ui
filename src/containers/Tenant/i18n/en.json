@@ -51,6 +51,7 @@
   "actions.addTableIndex": "Add index...",
   "actions.addVectorIndex": "Add vector index...",
   "actions.addFulltextIndex": "Add fulltext index...",
+  "actions.addMinMaxIndex": "Add min_max index...",
   "actions.createCdcStream": "Create changefeed...",
   "actions.compaction": "Compaction",
   "actions.showCreateTable": "Show Create SQL...",
