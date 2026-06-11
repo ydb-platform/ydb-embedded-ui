@@ -446,7 +446,7 @@ export const addMinMaxIndex = (params?: SchemaQueryParams) => {
         : '${1:<my_column_table>}';
 
     return `ALTER TABLE ${path}
-ADD INDEX \${2:my_column_table_min_max_index_column_name}
+ADD INDEX \${2:my_min_max_index}
 LOCAL USING min_max
 ON (\${3:column_name});`;
 };
