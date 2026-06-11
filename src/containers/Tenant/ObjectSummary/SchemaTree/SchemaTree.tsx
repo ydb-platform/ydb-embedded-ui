@@ -8,10 +8,12 @@ import {NavigationTree} from 'ydb-ui-components';
 import {getConnectToDBDialog} from '../../../../components/ConnectToDB/ConnectToDBDialog';
 import {
     useCreateDirectoryFeatureAvailable,
+    useExecuteQueryAndForgetAvailable,
     useMultiTabQueryEditorEnabled,
     useTopicDataAvailable,
 } from '../../../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo, useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
+import {operationsApi} from '../../../../store/reducers/operations';
 import {selectIsDirty, selectUserInput} from '../../../../store/reducers/query/query';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {showCreateTableApi} from '../../../../store/reducers/showCreateTable/showCreateTable';
@@ -23,7 +25,6 @@ import {valueIsDefined} from '../../../../utils';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useCompactionFeature} from '../../../../utils/hooks/useCompactionFeature';
-import {useStartCompaction} from '../../../../utils/hooks/useStartCompaction';
 import {getConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
 import {findRunningTableCompactionOperation} from '../../../../utils/tableCompaction';
@@ -90,14 +91,14 @@ export function SchemaTree(props: SchemaTreeProps) {
     const {compactionEnabled} = useCompactionFeature(database);
 
     // Use table compaction hook to track all running compactions only while table actions are open
-    const {operations: compactionOperations, isFetching: isCompactionFetching} = useTableCompaction(
-        database,
-        '',
-        compactionEnabled && compactionActionsOpen,
-    );
+    const {
+        operations: compactionOperations,
+        isFetching: isCompactionFetching,
+        refresh: refreshCompactions,
+    } = useTableCompaction(database, '', compactionEnabled && compactionActionsOpen);
 
-    // Compaction helper hook
-    const startCompaction = useStartCompaction();
+    const executeQueryAndForgetAvailable = useExecuteQueryAndForgetAvailable();
+    const [startTableCompaction] = operationsApi.useStartTableCompactionMutation();
 
     // Check if a specific table has running compaction
     const hasRunningCompaction = React.useCallback(
@@ -187,17 +188,26 @@ export function SchemaTree(props: SchemaTreeProps) {
         (path: string) => {
             openCompactTableDialog({
                 onApply: async ({cascade, parallel}: {cascade: boolean; parallel?: number}) => {
-                    await startCompaction({
+                    return startTableCompaction({
                         database,
                         path,
                         cascade,
                         parallel,
-                    });
+                        executeAndForget: executeQueryAndForgetAvailable,
+                    }).unwrap();
                 },
+                onRefreshCompactions: refreshCompactions,
                 hasRunningCompaction: hasRunningCompaction(path),
+                executeQueryAndForgetAvailable,
             });
         },
-        [database, startCompaction, hasRunningCompaction],
+        [
+            database,
+            executeQueryAndForgetAvailable,
+            startTableCompaction,
+            hasRunningCompaction,
+            refreshCompactions,
+        ],
     );
 
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();

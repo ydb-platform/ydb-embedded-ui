@@ -3,12 +3,12 @@ import React from 'react';
 import {ChevronDown, ChevronUp, Gear} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Disclosure, Flex, Icon} from '@gravity-ui/uikit';
 
+import {useExecuteQueryAndForgetAvailable} from '../../../../../store/reducers/capabilities/hooks';
 import {operationsApi} from '../../../../../store/reducers/operations';
 import {EPathType} from '../../../../../types/api/schema';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 import {useCompactionFeature} from '../../../../../utils/hooks/useCompactionFeature';
-import {useStartCompaction} from '../../../../../utils/hooks/useStartCompaction';
 import {EntityTitle} from '../../../EntityTitle/EntityTitle';
 import {isRowTableType} from '../../../utils/schema';
 
@@ -71,28 +71,34 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     // Compaction logic (only for row tables)
     const {compactionEnabled} = useCompactionFeature(database, isRowTable);
     const compactionEnabledForTable = isRowTable && compactionEnabled;
-    const {runningCompaction, isFetching: isCompactionFetching} = useTableCompaction(
-        database,
-        path,
-        compactionEnabledForTable,
-    );
+    const {
+        runningCompaction,
+        isFetching: isCompactionFetching,
+        refresh: refreshCompactions,
+    } = useTableCompaction(database, path, compactionEnabledForTable);
 
-    const startCompaction = useStartCompaction();
+    const executeQueryAndForgetAvailable = useExecuteQueryAndForgetAvailable();
 
+    const [startTableCompaction] = operationsApi.useStartTableCompactionMutation();
     const [cancelOperation, {isLoading: isCancellingOperation}] =
         operationsApi.useCancelOperationMutation();
 
     const handleStartCompaction = React.useCallback(
         async ({cascade, parallel}: {cascade: boolean; parallel?: number}) => {
-            await startCompaction({
+            return startTableCompaction({
                 database,
                 path,
                 cascade,
                 parallel,
-            });
+                executeAndForget: executeQueryAndForgetAvailable,
+            }).unwrap();
         },
-        [database, path, startCompaction],
+        [database, executeQueryAndForgetAvailable, path, startTableCompaction],
     );
+
+    const handleRefreshCompactions = React.useCallback(() => {
+        refreshCompactions();
+    }, [refreshCompactions]);
 
     const handleCancelCompaction = React.useCallback(async () => {
         if (!runningCompaction?.id) {
@@ -149,6 +155,8 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                             runningCompaction={runningCompaction}
                             isFetching={isCompactionFetching}
                             onApply={handleStartCompaction}
+                            onRefreshCompactions={handleRefreshCompactions}
+                            executeQueryAndForgetAvailable={executeQueryAndForgetAvailable}
                         />
                     )}
                 </Flex>

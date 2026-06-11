@@ -16,6 +16,11 @@ export interface TableCompactionOptions {
 export interface StartTableCompactionParams extends TableCompactionOptions {
     database: string;
     path: string;
+    executeAndForget?: boolean;
+}
+
+export interface StartTableCompactionResult {
+    runningInBackground: boolean;
 }
 
 export function isForcedCompactionEnabled(featureFlags: FeatureFlagConfig[] | undefined) {

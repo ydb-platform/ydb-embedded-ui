@@ -41,6 +41,8 @@
   "title_run-table-compaction": "Run table compaction",
   "field_cascade": "Cascade",
   "field_parallel-shards": "Parallel shards",
+  "help_cascade": "Compact secondary indexes together with the table.",
+  "help_parallel-shards": "Maximum number of partitions compacted at the same time.",
   "alert_positive-integer": "Value must be a positive integer",
   "title_compaction-in-progress": "Compaction in progress",
   "context_compaction-in-progress": "Manual compaction is running to merge old row versions and reduce overhead",
@@ -55,5 +57,6 @@
   "field_compaction-shards": "Shards: {{done}} / {{total}}",
 
   "toast_partitioning-updated": "Partitioning settings applied",
-  "toast_compaction-started": "Table compaction started"
+  "toast_compaction-started": "Table compaction started",
+  "toast_compaction-completed": "Table compaction completed"
 }
