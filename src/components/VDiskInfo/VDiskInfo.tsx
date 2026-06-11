@@ -153,7 +153,6 @@ export function VDiskInfo<T extends PreparedVDisk>({
                     <ProgressViewer
                         value={Math.round(ReplicationProgress * 100)}
                         percents
-                        defaultStatus="info"
                         capacity={100}
                     />
                 ),
