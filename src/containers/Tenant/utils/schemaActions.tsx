@@ -24,6 +24,7 @@ import i18n from '../i18n';
 import type {TemplateFn} from './schemaQueryTemplates';
 import {
     addFulltextIndex,
+    addMinMaxIndex,
     addTableIndex,
     addVectorIndex,
     alterAsyncReplicationTemplate,
@@ -246,6 +247,7 @@ const bindActions = (
             stripEllipsis(i18n('actions.dropStreamingQuery')),
         ),
         dropIndex: inputQuery(dropTableIndex, i18n('actions.dropIndex')),
+        addMinMaxIndex: inputQuery(addMinMaxIndex, stripEllipsis(i18n('actions.addMinMaxIndex'))),
         addVectorIndex: inputQuery(addVectorIndex, stripEllipsis(i18n('actions.addVectorIndex'))),
         addTableIndex: inputQuery(addTableIndex, stripEllipsis(i18n('actions.addTableIndex'))),
         createCdcStream: inputQuery(
@@ -443,6 +445,7 @@ export const getActions =
                 {text: i18n('actions.dropTable'), action: actions.dropTable},
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
+                {text: i18n('actions.addMinMaxIndex'), action: actions.addMinMaxIndex},
             ],
             [showCreateTableItem],
         ];

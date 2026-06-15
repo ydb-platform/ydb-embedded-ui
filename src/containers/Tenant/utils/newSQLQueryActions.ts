@@ -6,6 +6,7 @@ import i18n from '../Query/NewSQL/i18n';
 
 import {
     addFulltextIndex,
+    addMinMaxIndex,
     addTableIndex,
     addVectorIndex,
     alterAsyncReplicationTemplate,
@@ -128,6 +129,7 @@ export const bindActions = (
         revokePrivilege: inputQuery(revokePrivilegeTemplate, i18n('action.revoke-privilege')),
         dropUser: inputQuery(dropUserTemplate, i18n('action.drop-user')),
         dropGroup: inputQuery(dropGroupTemplate, i18n('action.drop-group')),
+        addMinMaxIndex: inputQuery(addMinMaxIndex, i18n('action.add-min-max-index')),
         addVectorIndex: inputQuery(addVectorIndex, i18n('action.add-vector-index')),
         addTableIndex: inputQuery(addTableIndex, i18n('action.add-index')),
         dropTableIndex: inputQuery(dropTableIndex, i18n('action.drop-index')),

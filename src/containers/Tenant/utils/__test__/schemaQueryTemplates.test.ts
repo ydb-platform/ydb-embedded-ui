@@ -1,4 +1,4 @@
-import {disableTTLTemplate, enableTTLTemplate} from '../schemaQueryTemplates';
+import {addMinMaxIndex, disableTTLTemplate, enableTTLTemplate} from '../schemaQueryTemplates';
 
 describe('schemaQueryTemplates', () => {
     describe('enableTTLTemplate', () => {
@@ -18,6 +18,26 @@ describe('schemaQueryTemplates', () => {
 
             expect(template).toContain('https://ydb.tech/docs/en/yql/reference/recipes/ttl');
             expect(template).toContain('ALTER TABLE `table` RESET (TTL);');
+        });
+    });
+
+    describe('addMinMaxIndex', () => {
+        test('uses placeholder table path without selected table', () => {
+            const template = addMinMaxIndex();
+
+            expect(template).toContain('ALTER TABLE ${1:<my_column_table>}');
+        });
+
+        test('adds local min_max index for the selected column table', () => {
+            const template = addMinMaxIndex({
+                path: '/local/my_column_table',
+                relativePath: 'my_column_table',
+            });
+
+            expect(template).toBe(`ALTER TABLE \`my_column_table\`
+ADD INDEX \${2:my_min_max_index}
+LOCAL USING min_max
+ON (\${3:column_name});`);
         });
     });
 });
