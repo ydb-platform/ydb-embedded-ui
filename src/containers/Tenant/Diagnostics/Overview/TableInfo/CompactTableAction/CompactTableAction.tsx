@@ -306,25 +306,29 @@ function CompactTableDialog({
                 }
 
                 const result = await Promise.race([
-                    applyPromise.then(() => 'success' as const),
-                    new Promise<typeof START_COMPACTION_TIMEOUT_RESULT>((resolve) => {
+                    applyPromise
+                        .then(() => ({status: 'success'}) as const)
+                        .catch((error) => ({status: 'error' as const, error})),
+                    new Promise<{status: typeof START_COMPACTION_TIMEOUT_RESULT}>((resolve) => {
                         timeoutId = window.setTimeout(
-                            () => resolve(START_COMPACTION_TIMEOUT_RESULT),
+                            () => resolve({status: START_COMPACTION_TIMEOUT_RESULT}),
                             START_COMPACTION_RESPONSE_TIMEOUT,
                         );
                     }),
                 ]);
 
-                showCompactionToast(
-                    result === START_COMPACTION_TIMEOUT_RESULT
-                        ? i18n('toast_compaction-started')
-                        : i18n('toast_compaction-completed'),
-                );
-                handleClose();
-
-                if (result === START_COMPACTION_TIMEOUT_RESULT) {
-                    onRefreshCompactions?.();
+                if (result.status === 'error') {
+                    setRequestErrorMessage(prepareErrorMessage(result.error));
+                    return;
                 }
+
+                if (result.status === START_COMPACTION_TIMEOUT_RESULT) {
+                    showCompactionToast(i18n('toast_compaction-started'));
+                    onRefreshCompactions?.();
+                } else {
+                    showCompactionToast(i18n('toast_compaction-completed'));
+                }
+                handleClose();
             } catch (error) {
                 setRequestErrorMessage(prepareErrorMessage(error));
             } finally {

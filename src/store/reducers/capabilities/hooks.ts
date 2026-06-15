@@ -124,7 +124,7 @@ export const useSnapshotReadWriteAvailable = () => {
 };
 
 export const useExecuteQueryAndForgetAvailable = () => {
-    return useGetFeatureVersion('/viewer/query') >= 13;
+    return useGetFeatureVersion('/viewer/query') >= 12;
 };
 
 export const useStreamingAvailable = () => {

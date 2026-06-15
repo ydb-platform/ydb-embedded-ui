@@ -96,10 +96,6 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
         [database, executeQueryAndForgetAvailable, path, startTableCompaction],
     );
 
-    const handleRefreshCompactions = React.useCallback(() => {
-        refreshCompactions();
-    }, [refreshCompactions]);
-
     const handleCancelCompaction = React.useCallback(async () => {
         if (!runningCompaction?.id) {
             return;
@@ -155,7 +151,7 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                             runningCompaction={runningCompaction}
                             isFetching={isCompactionFetching}
                             onApply={handleStartCompaction}
-                            onRefreshCompactions={handleRefreshCompactions}
+                            onRefreshCompactions={refreshCompactions}
                             executeQueryAndForgetAvailable={executeQueryAndForgetAvailable}
                         />
                     )}
