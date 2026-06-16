@@ -25,7 +25,6 @@ import {
     getCompactionShardProgress,
     isCompactMetadata,
 } from '../../../../../../utils/tableCompaction';
-import type {StartTableCompactionResult} from '../../../../../../utils/tableCompaction';
 import {reachMetricaGoal} from '../../../../../../utils/yaMetrica';
 import i18n from '../i18n';
 
@@ -35,12 +34,11 @@ const b = cn('ydb-diagnostics-table-info');
 const DEFAULT_PARALLEL_SHARDS = '1';
 const COMPACT_TABLE_DIALOG = 'compact-table-dialog';
 const START_COMPACTION_RESPONSE_TIMEOUT = 1000;
-const START_COMPACTION_TIMEOUT_RESULT = 'timeout' as const;
 
 interface CompactTableActionProps {
     runningCompaction?: TOperation;
     isFetching: boolean;
-    onApply: (value: {cascade: boolean; parallel?: number}) => Promise<StartTableCompactionResult>;
+    onApply: (value: {cascade: boolean; parallel?: number}) => Promise<void>;
     onRefreshCompactions?: () => void;
     executeQueryAndForgetAvailable?: boolean;
 }
@@ -219,7 +217,7 @@ export function CompactTableAction({
 }
 
 interface CompactTableDialogProps {
-    onApply: (value: {cascade: boolean; parallel?: number}) => Promise<StartTableCompactionResult>;
+    onApply: (value: {cascade: boolean; parallel?: number}) => Promise<void>;
     onRefreshCompactions?: () => void;
     hasRunningCompaction: boolean;
     executeQueryAndForgetAvailable?: boolean;
@@ -294,40 +292,33 @@ function CompactTableDialog({
                     cascade,
                     parallel: parsedParallel,
                 });
+
                 if (executeQueryAndForgetAvailable) {
-                    const result = await applyPromise;
-                    showCompactionToast(
-                        result.runningInBackground
-                            ? i18n('toast_compaction-started')
-                            : i18n('toast_compaction-completed'),
-                    );
-                    handleClose();
-                    return;
-                }
-
-                const result = await Promise.race([
-                    applyPromise
-                        .then(() => ({status: 'success'}) as const)
-                        .catch((error) => ({status: 'error' as const, error})),
-                    new Promise<{status: typeof START_COMPACTION_TIMEOUT_RESULT}>((resolve) => {
-                        timeoutId = window.setTimeout(
-                            () => resolve({status: START_COMPACTION_TIMEOUT_RESULT}),
-                            START_COMPACTION_RESPONSE_TIMEOUT,
-                        );
-                    }),
-                ]);
-
-                if (result.status === 'error') {
-                    setRequestErrorMessage(prepareErrorMessage(result.error));
-                    return;
-                }
-
-                if (result.status === START_COMPACTION_TIMEOUT_RESULT) {
-                    showCompactionToast(i18n('toast_compaction-started'));
-                    onRefreshCompactions?.();
+                    // Backend returns immediately once compaction is scheduled in the background
+                    await applyPromise;
                 } else {
-                    showCompactionToast(i18n('toast_compaction-completed'));
+                    // Compaction query is long-running, so do not block the dialog on it.
+                    // Treat reaching the response timeout without an error as a success.
+                    const result = await Promise.race([
+                        applyPromise
+                            .then(() => ({status: 'success'}) as const)
+                            .catch((error) => ({status: 'error' as const, error})),
+                        new Promise<{status: 'timeout'}>((resolve) => {
+                            timeoutId = window.setTimeout(
+                                () => resolve({status: 'timeout'}),
+                                START_COMPACTION_RESPONSE_TIMEOUT,
+                            );
+                        }),
+                    ]);
+
+                    if (result.status === 'error') {
+                        setRequestErrorMessage(prepareErrorMessage(result.error));
+                        return;
+                    }
                 }
+
+                showCompactionToast(i18n('toast_compaction-started'));
+                onRefreshCompactions?.();
                 handleClose();
             } catch (error) {
                 setRequestErrorMessage(prepareErrorMessage(error));
