@@ -1,9 +1,9 @@
 import React from 'react';
 
 import {ArrowRight, ChevronDown, ChevronUp, Database} from '@gravity-ui/icons';
-import {Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
-import {useHistory} from 'react-router-dom';
+import {ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
 
+import {InternalLinkButton} from '../../../components/InternalLinkButton/InternalLinkButton';
 import {VersionsBar} from '../../../components/VersionsBar/VersionsBar';
 import {getTenantPath} from '../../../routes';
 import {cn} from '../../../utils/cn';
@@ -37,18 +37,13 @@ export const NodesTreeTitle = ({
     preparedVersions,
     onClick,
 }: NodesTreeTitleProps) => {
-    const history = useHistory();
+    const handleClick = React.useCallback(() => {
+        onClick?.();
+    }, [onClick]);
 
-    const handleClick = React.useCallback<React.MouseEventHandler<HTMLDivElement>>(
-        (event) => {
-            const shouldSkip = event.nativeEvent.composedPath().some(isActiveButtonTarget);
-
-            if (!shouldSkip) {
-                onClick?.();
-            }
-        },
-        [onClick],
-    );
+    const stopPropagation = React.useCallback((event: React.MouseEvent) => {
+        event.stopPropagation();
+    }, []);
 
     const nodesAmount = React.useMemo(() => {
         if (items) {
@@ -66,15 +61,14 @@ export const NodesTreeTitle = ({
     const renderNodesCount = () => {
         if (isDatabase) {
             return (
-                <Button
+                <InternalLinkButton
                     size="s"
-                    onClick={() =>
-                        history.push(getTenantPath({database: title, diagnosticsTab: 'nodes'}))
-                    }
+                    href={getTenantPath({database: title, diagnosticsTab: 'nodes'})}
+                    onClick={stopPropagation}
                 >
                     {i18n('nodes-count', {count: nodesAmount})}
                     <Icon data={ArrowRight} />
-                </Button>
+                </InternalLinkButton>
             );
         }
 
@@ -95,12 +89,14 @@ export const NodesTreeTitle = ({
                 {title ? (
                     <React.Fragment>
                         {title}
-                        <ClipboardButton
-                            text={title}
-                            size="s"
-                            className={b('clipboard-button')}
-                            view="flat"
-                        />
+                        <span onClick={stopPropagation}>
+                            <ClipboardButton
+                                text={title}
+                                size="s"
+                                className={b('clipboard-button')}
+                                view="flat"
+                            />
+                        </span>
                     </React.Fragment>
                 ) : null}
                 {renderNodesCount()}
@@ -116,13 +112,3 @@ export const NodesTreeTitle = ({
         </div>
     );
 };
-
-function isActiveButtonTarget(target: EventTarget) {
-    return (
-        target instanceof HTMLElement &&
-        ((target.nodeName === 'BUTTON' &&
-            !target.hasAttribute('disabled') &&
-            target.getAttribute('aria-disabled') !== 'true') ||
-            (target.hasAttribute('tabindex') && target.tabIndex > -1))
-    );
-}
