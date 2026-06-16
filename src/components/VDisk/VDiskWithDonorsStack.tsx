@@ -8,7 +8,7 @@ import {Stack} from '../Stack/Stack';
 import type {VDiskProps} from './VDisk';
 import {VDisk} from './VDisk';
 
-interface VDiskWithDonorsStackProps extends VDiskProps {
+interface VDiskWithDonorsStackProps extends Omit<VDiskProps, 'withOpaqueBackground'> {
     data?: PreparedVDisk;
     className?: string;
     stackClassName?: string;
@@ -83,6 +83,7 @@ export function VDiskWithDonorsStack({
         compact,
         withIcon,
         popupOffset: diskInStackPopupOffset,
+        withOpaqueBackground: true,
     };
 
     const mainDiskPlacement = donors?.length ? diskInStackPlacement : undefined;
@@ -95,6 +96,7 @@ export function VDiskWithDonorsStack({
                     data={data}
                     popupOffset={highlightedVDiskInStack ? diskInStackPopupOffset : undefined}
                     {...mainVDiskProps}
+                    withOpaqueBackground
                 />
                 {donors.map((donor, index) => (
                     <VDisk

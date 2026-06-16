@@ -31,6 +31,7 @@ export interface VDiskProps {
     highlighted?: boolean;
     placement?: PopupPlacement;
     popupOffset?: PopupProps['offset'];
+    withOpaqueBackground?: boolean;
 }
 
 export const VDisk = ({
@@ -47,6 +48,7 @@ export const VDisk = ({
     highlighted,
     placement = ['top', 'bottom', 'left', 'right'],
     popupOffset = DEFAULT_POPUP_OFFSET,
+    withOpaqueBackground,
 }: VDiskProps) => {
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
@@ -68,7 +70,13 @@ export const VDisk = ({
             placement={placement}
         >
             <div className={b()}>
-                <InternalLink to={vDiskPath} className={b('content', {compact})}>
+                <InternalLink
+                    to={vDiskPath}
+                    className={b('content', {
+                        compact,
+                        'with-opaque-background': withOpaqueBackground,
+                    })}
+                >
                     <DiskStateProgressBar
                         diskAllocatedPercent={data.AllocatedPercent}
                         severity={severity}
