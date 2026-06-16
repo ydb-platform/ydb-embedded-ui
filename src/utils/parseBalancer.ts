@@ -1,13 +1,11 @@
 import {environment} from '../store';
 
+import {removeBalancerViewerPathname} from './balancer';
+
 import {normalizePathSlashes} from '.';
 
 const protocolRegex = /^http[s]?:\/\//;
-const viewerPathnameRegex = /\/viewer(\/json)?$/;
 
-export const removeViewerPathname = (value: string) => {
-    return value.replace(viewerPathnameRegex, '');
-};
 export const removeProtocol = (value: string) => {
     return value.replace(protocolRegex, '');
 };
@@ -29,7 +27,7 @@ interface ParsedBalancer {
  */
 export const parseBalancer = (rawBalancer: string): ParsedBalancer => {
     // Delete protocol and viewer/json path from raw value
-    const value = removeViewerPathname(removeProtocol(rawBalancer));
+    const value = removeBalancerViewerPathname(removeProtocol(rawBalancer));
 
     // After split the first element is considered a proxy, other - balancer value
     const parts = value.split('/');
@@ -56,7 +54,7 @@ export const getCleanBalancerValue = (rawBalancer: string) => {
 };
 
 export function prepareBackendFromBalancer(rawBalancer: string) {
-    const preparedBalancer = removeViewerPathname(rawBalancer);
+    const preparedBalancer = removeBalancerViewerPathname(rawBalancer);
 
     // Test if balancer starts with protocol
     // It means it is a full url and it can be used as it is

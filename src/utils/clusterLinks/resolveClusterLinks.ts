@@ -2,6 +2,7 @@ import type {ClusterInfo} from '../../store/reducers/cluster/cluster';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {ClusterLink, ClusterLinkWithTitle, DatabaseLink} from '../../types/additionalProps';
 import type {MetaClusterLink} from '../../types/api/meta';
+import {removeBalancerViewerPathname} from '../balancer';
 import {MONITORING_UI_TITLE} from '../constants';
 
 import type {ClusterLinkContext} from './clusterLinkConstants';
@@ -154,6 +155,16 @@ function resolveParam(
     return typeof value === 'string' || typeof value === 'number' ? value : undefined;
 }
 
+function prepareResolvedValue(key: string, value: string | number): string {
+    const stringValue = String(value);
+
+    if (key.split('.').at(-1) === 'balancer') {
+        return removeBalancerViewerPathname(stringValue);
+    }
+
+    return stringValue;
+}
+
 /**
  * Replaces raw `{param}` / `{prefix.field}` placeholders in a URL template.
  *
@@ -197,7 +208,7 @@ export function substituteUrlParams(
                 return match;
             }
 
-            const stringValue = String(value);
+            const stringValue = prepareResolvedValue(key, value);
             // Don't encode complete URLs only at the very start of the template
             if (
                 offset === 0 &&

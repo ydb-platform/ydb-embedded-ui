@@ -96,6 +96,19 @@ describe('substituteUrlParams', () => {
         ).toBe('https://example.com/?balancer=https%3A%2F%2Fbalancer.example.com');
     });
 
+    test('trims viewer/json suffix for {cluster.balancer} query param', () => {
+        const namespaces = makeNamespaces({
+            cluster: {balancer: 'https://balancer.example.com/viewer/json'},
+        });
+        expect(
+            substituteUrlParams(
+                'https://example.com/?balancer={cluster.balancer}',
+                'other',
+                namespaces,
+            ),
+        ).toBe('https://example.com/?balancer=https%3A%2F%2Fbalancer.example.com');
+    });
+
     test('resolves {balancer} as full URL without encoding at start (http)', () => {
         const namespaces = makeNamespaces({
             cluster: {balancer: 'http://meta.ydb.yandex.net:8765'},
@@ -111,6 +124,24 @@ describe('substituteUrlParams', () => {
         });
         expect(substituteUrlParams('{balancer}/path', 'cluster', namespaces)).toBe(
             'https://balancer.example.com/path',
+        );
+    });
+
+    test('trims viewer/json suffix for {balancer} used as full URL', () => {
+        const namespaces = makeNamespaces({
+            cluster: {balancer: 'https://balancer.example.com/viewer/json'},
+        });
+        expect(substituteUrlParams('{balancer}/path', 'cluster', namespaces)).toBe(
+            'https://balancer.example.com/path',
+        );
+    });
+
+    test('does not trim viewer/json suffix for non-balancer params', () => {
+        const namespaces = makeNamespaces({
+            cluster: {url: 'https://example.com/viewer/json'},
+        });
+        expect(substituteUrlParams('https://proxy.com/?url={url}', 'cluster', namespaces)).toBe(
+            'https://proxy.com/?url=https%3A%2F%2Fexample.com%2Fviewer%2Fjson',
         );
     });
 
@@ -498,7 +529,10 @@ describe('resolveClusterLinks', () => {
             ];
 
             const result = resolveClusterLinks(
-                makeClusterInfo({links: dynamicLinks, balancer: 'https://balancer.example.com'}),
+                makeClusterInfo({
+                    links: dynamicLinks,
+                    balancer: 'https://balancer.example.com/viewer/json',
+                }),
             );
 
             expect(result).toHaveLength(1);
@@ -517,7 +551,10 @@ describe('resolveClusterLinks', () => {
             ];
 
             const result = resolveClusterLinks(
-                makeClusterInfo({links: dynamicLinks, balancer: 'http://meta.ydb.yandex.net:8765'}),
+                makeClusterInfo({
+                    links: dynamicLinks,
+                    balancer: 'http://meta.ydb.yandex.net:8765/viewer/json',
+                }),
             );
 
             expect(result).toHaveLength(1);
@@ -534,7 +571,10 @@ describe('resolveClusterLinks', () => {
             ];
 
             const result = resolveClusterLinks(
-                makeClusterInfo({links: dynamicLinks, balancer: 'https://balancer.example.com'}),
+                makeClusterInfo({
+                    links: dynamicLinks,
+                    balancer: 'https://balancer.example.com/viewer/json',
+                }),
             );
 
             expect(result).toHaveLength(1);
@@ -585,7 +625,7 @@ describe('resolveClusterLinks', () => {
                 makeClusterInfo({
                     links: dynamicLinks,
                     name: 'my-cluster',
-                    balancer: 'https://balancer.example.com',
+                    balancer: 'https://balancer.example.com/viewer/json',
                 }),
             );
 
@@ -1100,7 +1140,9 @@ describe('resolveDatabaseLinks', () => {
                 },
             ];
 
-            const clusterInfo = makeClusterInfo({balancer: 'https://balancer.example.com'});
+            const clusterInfo = makeClusterInfo({
+                balancer: 'https://balancer.example.com/viewer/json',
+            });
             const result = resolveDatabaseLinks(dynamicLinks, makeDatabaseInfo(), clusterInfo);
 
             expect(result).toHaveLength(1);
