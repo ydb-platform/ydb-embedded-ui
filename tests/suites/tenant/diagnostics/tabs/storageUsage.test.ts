@@ -280,7 +280,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         });
 
         const storageUsage = page.locator('.ydb-storage-usage');
-        await expect(storageUsage).toBeVisible();
+        await expect(storageUsage).toBeVisible({timeout: VISIBILITY_TIMEOUT});
         await expect(storageUsage.getByText('SSD', {exact: true})).toHaveCount(0);
         await expect(storageUsage).toHaveScreenshot('storage-usage-single-media.png');
     });
