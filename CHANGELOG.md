@@ -1,5 +1,22 @@
 # Changelog
 
+## [16.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v16.1.0...v16.2.0) (2026-06-16)
+
+
+### Features
+
+* **Clusters:** add column for galaxies ([#3985](https://github.com/ydb-platform/ydb-embedded-ui/issues/3985)) ([d164516](https://github.com/ydb-platform/ydb-embedded-ui/commit/d1645168cc17a107e3be1e96b713cbe14b14b5ea))
+* display min_max indexes in CS ([#3993](https://github.com/ydb-platform/ydb-embedded-ui/issues/3993)) ([7273537](https://github.com/ydb-platform/ydb-embedded-ui/commit/727353767220f78f46e6be0309c7445b59aebed6))
+* **Topic:** add Ip column for data table ([#3984](https://github.com/ydb-platform/ydb-embedded-ui/issues/3984)) ([37272c0](https://github.com/ydb-platform/ydb-embedded-ui/commit/37272c0186433807bd91be2b3a25a1369b3926ca))
+
+
+### Bug Fixes
+
+* **ClusterOverview:** preserve order for storage types ([#3983](https://github.com/ydb-platform/ydb-embedded-ui/issues/3983)) ([6602d32](https://github.com/ydb-platform/ydb-embedded-ui/commit/6602d32396e662af99a8197b6c495e62e77f42fa))
+* implement correct VDisks colors ([#3981](https://github.com/ydb-platform/ydb-embedded-ui/issues/3981)) ([aa76672](https://github.com/ydb-platform/ydb-embedded-ui/commit/aa766725012529324c6d5e646190efb18d51d708))
+* **resolveClusterLinks:** prepare balancer before use ([#4009](https://github.com/ydb-platform/ydb-embedded-ui/issues/4009)) ([249995a](https://github.com/ydb-platform/ydb-embedded-ui/commit/249995a71c6e9559a59f167752fc4c791c50900f))
+* **Versions:** use link for nodes counter ([#4000](https://github.com/ydb-platform/ydb-embedded-ui/issues/4000)) ([b103442](https://github.com/ydb-platform/ydb-embedded-ui/commit/b103442125599b6cc17d8b642398ee96442a8570))
+
 ## [16.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v16.0.0...v16.1.0) (2026-06-08)
 
 
