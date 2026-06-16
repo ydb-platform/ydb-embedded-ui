@@ -2,8 +2,8 @@ import type {ClusterInfo} from '../../store/reducers/cluster/cluster';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {ClusterLink, ClusterLinkWithTitle, DatabaseLink} from '../../types/additionalProps';
 import type {MetaClusterLink} from '../../types/api/meta';
+import {removeBalancerViewerPathname} from '../balancer';
 import {MONITORING_UI_TITLE} from '../constants';
-import {removeViewerPathname} from '../parseBalancer';
 
 import type {ClusterLinkContext} from './clusterLinkConstants';
 import {CLUSTER_LINK_CONTEXT, getContextIcon} from './clusterLinkConstants';
@@ -159,7 +159,7 @@ function prepareResolvedValue(key: string, value: string | number): string {
     const stringValue = String(value);
 
     if (key.split('.').at(-1) === 'balancer') {
-        return removeViewerPathname(stringValue);
+        return removeBalancerViewerPathname(stringValue);
     }
 
     return stringValue;

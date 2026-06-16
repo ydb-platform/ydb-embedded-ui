@@ -1,10 +1,10 @@
+import {removeBalancerViewerPathname} from '../balancer';
 import {
     getCleanBalancerValue,
     parseBalancer,
     prepareBackendFromBalancer,
     removePort,
     removeProtocol,
-    removeViewerPathname,
 } from '../parseBalancer';
 
 describe('parseBalancer', () => {
@@ -60,23 +60,23 @@ describe('parseBalancer', () => {
     });
 });
 
-describe('removeViewerPathname', () => {
+describe('removeBalancerViewerPathname', () => {
     test('should remove /viewer/json pathname', () => {
         const initialValue = 'https://ydb-testing-0000.search.net:8765/viewer/json';
         const result = 'https://ydb-testing-0000.search.net:8765';
 
-        expect(removeViewerPathname(initialValue)).toBe(result);
+        expect(removeBalancerViewerPathname(initialValue)).toBe(result);
     });
     test('should remove /viewer pathname', () => {
         const initialValue = 'https://ydb-testing-0000.search.net:8765/viewer';
         const result = 'https://ydb-testing-0000.search.net:8765';
 
-        expect(removeViewerPathname(initialValue)).toBe(result);
+        expect(removeBalancerViewerPathname(initialValue)).toBe(result);
     });
     test('should not change input if there is no /viewer or /viewer/json', () => {
         const initialValue = 'https://ydb-testing-0000.search.net:8765';
 
-        expect(removeViewerPathname(initialValue)).toBe(initialValue);
+        expect(removeBalancerViewerPathname(initialValue)).toBe(initialValue);
     });
 });
 describe('removeProtocol', () => {
