@@ -37,16 +37,13 @@ export const NodesTreeTitle = ({
     preparedVersions,
     onClick,
 }: NodesTreeTitleProps) => {
-    const handleClick = React.useCallback<React.MouseEventHandler<HTMLDivElement>>(
-        (event) => {
-            const shouldSkip = event.nativeEvent.composedPath().some(isActiveButtonTarget);
+    const handleClick = React.useCallback(() => {
+        onClick?.();
+    }, [onClick]);
 
-            if (!shouldSkip) {
-                onClick?.();
-            }
-        },
-        [onClick],
-    );
+    const stopPropagation = React.useCallback((event: React.MouseEvent) => {
+        event.stopPropagation();
+    }, []);
 
     const nodesAmount = React.useMemo(() => {
         if (items) {
@@ -67,6 +64,7 @@ export const NodesTreeTitle = ({
                 <InternalLinkButton
                     size="s"
                     href={getTenantPath({database: title, diagnosticsTab: 'nodes'})}
+                    onClick={stopPropagation}
                 >
                     {i18n('nodes-count', {count: nodesAmount})}
                     <Icon data={ArrowRight} />
@@ -91,12 +89,14 @@ export const NodesTreeTitle = ({
                 {title ? (
                     <React.Fragment>
                         {title}
-                        <ClipboardButton
-                            text={title}
-                            size="s"
-                            className={b('clipboard-button')}
-                            view="flat"
-                        />
+                        <span onClick={stopPropagation}>
+                            <ClipboardButton
+                                text={title}
+                                size="s"
+                                className={b('clipboard-button')}
+                                view="flat"
+                            />
+                        </span>
                     </React.Fragment>
                 ) : null}
                 {renderNodesCount()}
@@ -112,13 +112,3 @@ export const NodesTreeTitle = ({
         </div>
     );
 };
-
-function isActiveButtonTarget(target: EventTarget) {
-    return (
-        target instanceof HTMLElement &&
-        (((target.nodeName === 'BUTTON' || target.nodeName === 'A') &&
-            !target.hasAttribute('disabled') &&
-            target.getAttribute('aria-disabled') !== 'true') ||
-            (target.hasAttribute('tabindex') && target.tabIndex > -1))
-    );
-}
