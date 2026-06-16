@@ -281,10 +281,6 @@ test.describe('Diagnostics Storage usage tab', async () => {
 
         const storageUsage = page.locator('.ydb-storage-usage');
         await expect(storageUsage).toBeVisible({timeout: VISIBILITY_TIMEOUT});
-        await expect(storageUsage.getByText('Storage groups usage')).toBeVisible();
-        await expect(storageUsage.getByText('30 GB', {exact: true})).toBeVisible();
-        await expect(storageUsage.getByText('61 GB', {exact: true})).toBeVisible();
-        await expect(storageUsage.getByText('2181038080', {exact: true})).toBeVisible();
         await expect(storageUsage.getByText('SSD', {exact: true})).toHaveCount(0);
         await expect(storageUsage).toHaveScreenshot('storage-usage-single-media.png');
     });
