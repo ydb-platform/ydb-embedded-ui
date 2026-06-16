@@ -57,6 +57,5 @@
   "field_compaction-shards": "Shards: {{done}} / {{total}}",
 
   "toast_partitioning-updated": "Partitioning settings applied",
-  "toast_compaction-started": "Table compaction started",
-  "toast_compaction-completed": "Table compaction completed"
+  "toast_compaction-started": "Table compaction started"
 }

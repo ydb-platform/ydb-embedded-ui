@@ -19,10 +19,6 @@ export interface StartTableCompactionParams extends TableCompactionOptions {
     executeAndForget?: boolean;
 }
 
-export interface StartTableCompactionResult {
-    runningInBackground: boolean;
-}
-
 export function isForcedCompactionEnabled(featureFlags: FeatureFlagConfig[] | undefined) {
     return isFeatureFlagEnabled(featureFlags, FORCED_COMPACTION_FEATURE_FLAG);
 }

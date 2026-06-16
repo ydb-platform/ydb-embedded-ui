@@ -7,10 +7,7 @@ import type {
 } from '../../types/api/operations';
 import {isQueryErrorResponse} from '../../utils/query';
 import {createTableCompactionQuery} from '../../utils/tableCompaction';
-import type {
-    StartTableCompactionParams,
-    StartTableCompactionResult,
-} from '../../utils/tableCompaction';
+import type {StartTableCompactionParams} from '../../utils/tableCompaction';
 
 import {api} from './api';
 
@@ -32,17 +29,6 @@ function validateOperationListResponse(data: TOperationList): TOperationList {
 
 function getNextPageToken(data: TOperationList) {
     return data.next_page_token && data.next_page_token !== '0' ? data.next_page_token : undefined;
-}
-
-function isQueryRunningInBackgroundResponse(response: unknown) {
-    return Boolean(
-        response &&
-            typeof response === 'object' &&
-            'status' in response &&
-            response.status === 'SUCCESS' &&
-            'message' in response &&
-            response.message === 'Query is running in background',
-    );
 }
 
 export const operationsApi = api.injectEndpoints({
@@ -77,10 +63,7 @@ export const operationsApi = api.injectEndpoints({
             },
             providesTags: (_result, _error, arg) => ['All', {type: 'OperationList', id: arg.kind}],
         }),
-        startTableCompaction: build.mutation<
-            StartTableCompactionResult,
-            StartTableCompactionParams
-        >({
+        startTableCompaction: build.mutation<void, StartTableCompactionParams>({
             queryFn: async ({database, path, cascade, parallel, executeAndForget}, {signal}) => {
                 try {
                     const response = await window.api.viewer.sendQuery(
@@ -100,11 +83,7 @@ export const operationsApi = api.injectEndpoints({
                         return {error: response.error};
                     }
 
-                    const runningInBackground = Boolean(
-                        executeAndForget && isQueryRunningInBackgroundResponse(response),
-                    );
-
-                    return {data: {runningInBackground}};
+                    return {data: undefined};
                 } catch (error) {
                     return {error};
                 }
