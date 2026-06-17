@@ -35,8 +35,14 @@ function getMetricBytesDecimalPlaces(
         return convertedValue % 1 === 0 ? 0 : bytesDecimalPlaces;
     }
 
-    if (size === 'kb' || size === 'mb') {
+    if (size === 'kb') {
         return convertedValue % 1 === 0 ? 0 : 1;
+    }
+
+    if (size === 'mb' && convertedValue < 10) {
+        return convertedValue % 1 === 0 ? 0 : 1;
+    } else if (size === 'mb') {
+        return 0;
     }
 
     if (size === 'gb') {
