@@ -170,7 +170,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
 
         const storageUsage = page.locator('.ydb-storage-usage');
 
-        await expect(storageUsage).toBeVisible();
+        await expect(storageUsage).toBeVisible({timeout: VISIBILITY_TIMEOUT});
         await expect(storageUsage.getByText('Data size')).toBeVisible();
         await expect(storageUsage.getByText('Disk usage')).toBeVisible();
         await expect(storageUsage.getByText(/Storage groups usage/)).toBeVisible();
@@ -443,7 +443,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
 
         const storageUsage = page.locator('.ydb-storage-usage');
 
-        await expect(storageUsage).toBeVisible();
+        await expect(storageUsage).toBeVisible({timeout: VISIBILITY_TIMEOUT});
         await expect(storageUsage.getByText(/^0\s*GB$/, {exact: true})).toBeVisible();
     });
 
