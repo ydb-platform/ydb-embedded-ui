@@ -4,6 +4,7 @@ import {backend, nodesPage} from '../../utils/constants';
 import {ClusterPage} from '../cluster/ClusterPage';
 import {ClusterNodesTable, ClusterStorageTable} from '../paginatedTable/paginatedTable';
 import {StoragePage} from '../storage/StoragePage';
+import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
 
 import {
     mockCapabilities,
@@ -109,7 +110,7 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
 
         // Bridge piles section should be visible
-        expect(await clusterPage.isBridgeSectionVisible()).toBe(true);
+        await expect(clusterPage.bridgeSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
 
         // Should show pile cards
         expect(await clusterPage.getPileCardsCount()).toBe(3);
