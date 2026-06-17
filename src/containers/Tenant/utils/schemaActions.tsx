@@ -6,7 +6,10 @@ import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
 import type {SnippetParams} from '../../../components/ConnectToDB/types';
 import type {AppDispatch} from '../../../store';
-import {setQueryTabContent} from '../../../store/reducers/query/query';
+import {
+    applyExternalQueryToActiveTab,
+    setQueryTabContent,
+} from '../../../store/reducers/query/query';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_PAGES_IDS,
@@ -16,7 +19,6 @@ import {setDiagnosticsTab, setQueryTab} from '../../../store/reducers/tenant/ten
 import type {TenantPage} from '../../../store/reducers/tenant/types';
 import type {IQueryResult} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
-import {insertSnippetToEditor} from '../../../utils/monaco/insertSnippet';
 import {transformPath} from '../ObjectSummary/transformPath';
 import type {SchemaData} from '../Schema/SchemaViewer/types';
 import i18n from '../i18n';
@@ -135,7 +137,13 @@ const bindActions = (
                     }),
                 );
             } else {
-                insertSnippetToEditor(snippet);
+                dispatch(
+                    applyExternalQueryToActiveTab({
+                        title: templateName ?? '',
+                        input: '',
+                        pendingSnippet: snippet,
+                    }),
+                );
             }
         };
         if (getConfirmation) {

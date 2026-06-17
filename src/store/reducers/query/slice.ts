@@ -415,10 +415,28 @@ const slice = createSlice({
         },
         applyExternalQueryToActiveTab: (
             state,
-            action: PayloadAction<{title: string; input: string; savedQueryName?: string}>,
+            action: PayloadAction<{
+                title: string;
+                input: string;
+                pendingSnippet?: string;
+                savedQueryName?: string;
+            }>,
         ) => {
             const activeTab = getActiveTab(state);
             if (!activeTab) {
+                const tabId = uuidv4();
+                state.tabsById[tabId] = createDefaultTabState({
+                    tabId,
+                    title: action.payload.title,
+                    input: action.payload.input,
+                    pendingSnippet: action.payload.pendingSnippet,
+                    savedQueryName: action.payload.savedQueryName,
+                });
+                state.tabsOrder.push(tabId);
+                state.activeTabId = tabId;
+
+                persistTabsStateToSessionStorage(state);
+                persistDirtyStateToSessionStorage(state);
                 return;
             }
 
@@ -426,6 +444,7 @@ const slice = createSlice({
                 tab: activeTab,
                 title: action.payload.title,
                 input: action.payload.input,
+                pendingSnippet: action.payload.pendingSnippet,
                 savedQueryName: action.payload.savedQueryName,
             });
 
