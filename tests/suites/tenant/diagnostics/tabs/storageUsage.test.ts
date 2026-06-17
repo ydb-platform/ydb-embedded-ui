@@ -494,8 +494,10 @@ test.describe('Diagnostics Storage usage tab', async () => {
             diagnosticsTab: 'storageUsage',
         });
 
-        const responseError = page.locator('.ydb-storage-usage .ydb-response-error');
-        await expect(responseError).toBeVisible();
+        const storageUsage = page.locator('.ydb-storage-usage');
+        const responseError = storageUsage.locator('.ydb-response-error');
+
+        await expect(responseError).toBeVisible({timeout: VISIBILITY_TIMEOUT});
         await expect(page.locator('.ydb-storage-usage-sections__section')).toHaveCount(0);
         await expect(page.locator('.ydb-storage-usage-table')).toHaveCount(0);
     });
