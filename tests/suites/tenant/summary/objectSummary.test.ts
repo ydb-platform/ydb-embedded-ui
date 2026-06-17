@@ -9,6 +9,7 @@ import {
     dsVslotsSchema,
     dsVslotsTableName,
 } from '../../../utils/constants';
+import {setupMonitoringGenericErrorMock} from '../../errorDisplay/errorDisplayMocks';
 import {TenantPage} from '../TenantPage';
 import {QueryEditor} from '../queryEditor/models/QueryEditor';
 
@@ -189,6 +190,57 @@ test.describe('Object Summary', async () => {
             await page.waitForTimeout(500);
         }
         expect(clipboardContent).toBe('.sys/ds_vslots');
+    });
+
+    test('Monitoring action opens monitoring tab with new navigation', async ({page}) => {
+        await page.addInitScript(() => {
+            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
+            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
+        });
+        await page.route(`${backend}/viewer/json/whoami*`, async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    UserSID: 'test-user',
+                    UserID: 'test-user-id',
+                    AuthType: 'Login',
+                    IsViewerAllowed: true,
+                    IsMonitoringAllowed: true,
+                }),
+            });
+        });
+        await page.route(`${backend}/viewer/capabilities*`, async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    Database: database,
+                    Capabilities: {},
+                }),
+            });
+        });
+        await setupMonitoringGenericErrorMock(page);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: database,
+            database,
+            databasePage: 'query',
+        });
+
+        const objectSummary = new ObjectSummary(page);
+        await objectSummary.clickActionMenuItem('local', 'Monitoring');
+
+        await tenantPage.isDiagnosticsVisible();
+
+        await expect
+            .poll(() => new URL(page.url()).searchParams.get('databasePage'))
+            .toBe('database');
+        await expect
+            .poll(() => new URL(page.url()).searchParams.get('diagnosticsTab'))
+            .toBe('monitoring');
+        await expect(page.locator('a[data-tab="monitoring"]')).toBeVisible();
     });
 
     test('Create directory in local node', async ({page}) => {
