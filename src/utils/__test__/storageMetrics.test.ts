@@ -3,6 +3,7 @@ import {
     formatMetricBytes,
     formatMetricPercent,
     getConsistentMetricBytesSize,
+    getConvertedMetricBytesDecimalPlaces,
 } from '../storageMetrics';
 
 describe('storageMetrics', () => {
@@ -21,6 +22,14 @@ describe('storageMetrics', () => {
         expect(formatMetricBytes(123.4, 'b', {bytesDecimalPlaces: 0})).toBe(
             `123${UNBREAKABLE_GAP}B`,
         );
+    });
+
+    test('getConvertedMetricBytesDecimalPlaces returns precision for metric byte formatting', () => {
+        expect(getConvertedMetricBytesDecimalPlaces('tb', 0.521)).toBe(2);
+        expect(getConvertedMetricBytesDecimalPlaces('tb', 3.45)).toBe(2);
+        expect(getConvertedMetricBytesDecimalPlaces('tb', 6)).toBe(2);
+        expect(getConvertedMetricBytesDecimalPlaces('gb', 1.2)).toBe(1);
+        expect(getConvertedMetricBytesDecimalPlaces('gb', 1)).toBe(0);
     });
 
     test('formatMetricBytes keeps default precision when coarse approximate rounding is disabled', () => {

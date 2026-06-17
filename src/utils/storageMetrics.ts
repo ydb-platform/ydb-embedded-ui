@@ -18,7 +18,7 @@ function getCoarseApproximateMetricBytesDecimalPlaces(size: BytesSizes, converte
     return 0;
 }
 
-function getMetricBytesDecimalPlaces(
+export function getConvertedMetricBytesDecimalPlaces(
     size: BytesSizes,
     convertedValue: number,
     {
@@ -84,7 +84,11 @@ export function formatMetricBytes(
 
     const resolvedSize = size ?? getBytesSizeUnit(numericValue);
     const convertedValue = numericValue / sizes[resolvedSize].value;
-    const decimalPlaces = getMetricBytesDecimalPlaces(resolvedSize, convertedValue, options);
+    const decimalPlaces = getConvertedMetricBytesDecimalPlaces(
+        resolvedSize,
+        convertedValue,
+        options,
+    );
     const rounded = Number(convertedValue.toFixed(decimalPlaces));
     const formatted = formatNumber(rounded);
 

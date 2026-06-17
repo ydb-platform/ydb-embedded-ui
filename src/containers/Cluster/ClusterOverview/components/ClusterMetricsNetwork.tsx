@@ -1,7 +1,7 @@
 import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMetrics';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
-import {formatBytes} from '../../../../utils/bytesParsers';
 import {useSetting} from '../../../../utils/hooks/useSetting';
+import {formatNetworkMetric} from '../../../../utils/metrics/formatMetricLegend';
 import i18n from '../../i18n';
 import type {ClusterMetricsBaseProps} from '../shared';
 import {calculateBaseDiagramValues} from '../utils';
@@ -11,10 +11,6 @@ import {ClusterMetricsCardContent} from './ClusterMetricsCard';
 interface ClusterMetricsNetworkProps extends ClusterMetricsBaseProps {
     percentsValue: number;
     throughput?: string;
-}
-
-function formatStorageLegend(value?: string) {
-    return formatBytes({value, withSpeedLabel: true});
 }
 
 export function ClusterMetricsNetwork({
@@ -32,7 +28,7 @@ export function ClusterMetricsNetwork({
         ...rest,
     });
 
-    const legend = formatStorageLegend(throughput);
+    const legend = formatNetworkMetric(throughput);
 
     return (
         <ClusterMetricsCardContent
