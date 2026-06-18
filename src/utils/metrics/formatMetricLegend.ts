@@ -8,6 +8,7 @@ import {
 import {
     getConsistentMetricBytesSize,
     getConvertedMetricBytesDecimalPlaces,
+    getMetricBytesDisplaySize,
 } from '../storageMetrics';
 
 import i18n from './i18n';
@@ -41,7 +42,7 @@ export function formatStorageLegend({value, capacity}: MetricFormatParams): stri
 
 export function formatNetworkMetric(value?: string | number) {
     const numericValue = Number(value);
-    const size = getBytesSizeUnit(numericValue);
+    const size = getMetricBytesDisplaySize(numericValue);
 
     return formatBytes({
         value,

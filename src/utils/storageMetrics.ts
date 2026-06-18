@@ -1,5 +1,5 @@
 import type {BytesSizes} from './bytesParsers';
-import {getBytesSizeUnit, sizes} from './bytesParsers';
+import {bytesSizes, getBytesSizeUnit, sizes} from './bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from './constants';
 import {formatNumber, formatPercent} from './dataFormatters/dataFormatters';
 
@@ -8,6 +8,14 @@ export interface FormatMetricBytesOptions {
     bytesDecimalPlaces?: 0 | 1;
     coarseApproximateRounding?: boolean;
     gbDecimalPlacesBelowOne?: 1 | 2;
+}
+
+const NEXT_SIZE_ROLLOVER_VALUE = 1000;
+
+function getNextMetricBytesSize(size: BytesSizes) {
+    const currentSizeIndex = bytesSizes.indexOf(size);
+
+    return bytesSizes[currentSizeIndex + 1];
 }
 
 function getCoarseApproximateMetricBytesDecimalPlaces(size: BytesSizes, convertedValue: number) {
@@ -57,7 +65,39 @@ export function getConvertedMetricBytesDecimalPlaces(
     return 1;
 }
 
-export function getConsistentMetricBytesSize(values: Array<string | number | undefined>) {
+function getFormattedMetricBytesValue(
+    numericValue: number,
+    size: BytesSizes,
+    options: FormatMetricBytesOptions,
+) {
+    const convertedValue = numericValue / sizes[size].value;
+    const decimalPlaces = getConvertedMetricBytesDecimalPlaces(size, convertedValue, options);
+
+    return Number(convertedValue.toFixed(decimalPlaces));
+}
+
+export function getMetricBytesDisplaySize(
+    numericValue: number,
+    options: FormatMetricBytesOptions = {},
+) {
+    let resolvedSize = getBytesSizeUnit(numericValue);
+
+    while (true) {
+        const nextSize = getNextMetricBytesSize(resolvedSize);
+        const rounded = getFormattedMetricBytesValue(numericValue, resolvedSize, options);
+
+        if (!nextSize || Math.abs(rounded) < NEXT_SIZE_ROLLOVER_VALUE) {
+            return resolvedSize;
+        }
+
+        resolvedSize = nextSize;
+    }
+}
+
+export function getConsistentMetricBytesSize(
+    values: Array<string | number | undefined>,
+    options: FormatMetricBytesOptions = {},
+) {
     const maxValue = values.reduce<number>((currentMaxValue, value) => {
         const numericValue = Number(value);
 
@@ -68,7 +108,7 @@ export function getConsistentMetricBytesSize(values: Array<string | number | und
         return Math.max(currentMaxValue, numericValue);
     }, 0);
 
-    return getBytesSizeUnit(maxValue);
+    return getMetricBytesDisplaySize(maxValue, options);
 }
 
 export function formatMetricBytes(
@@ -82,14 +122,9 @@ export function formatMetricBytes(
         return EMPTY_DATA_PLACEHOLDER;
     }
 
-    const resolvedSize = size ?? getBytesSizeUnit(numericValue);
-    const convertedValue = numericValue / sizes[resolvedSize].value;
-    const decimalPlaces = getConvertedMetricBytesDecimalPlaces(
-        resolvedSize,
-        convertedValue,
-        options,
-    );
-    const rounded = Number(convertedValue.toFixed(decimalPlaces));
+    const resolvedSize = size ?? getMetricBytesDisplaySize(numericValue, options);
+    const rounded = getFormattedMetricBytesValue(numericValue, resolvedSize, options);
+
     const formatted = formatNumber(rounded);
 
     return formatted

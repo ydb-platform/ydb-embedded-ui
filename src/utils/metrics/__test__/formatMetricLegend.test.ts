@@ -50,8 +50,10 @@ describe('formatMetricLegend', () => {
     test('formatNetworkMetric uses metric byte precision', () => {
         expect(formatNetworkMetric(189_000)).toBe(`189${UNBREAKABLE_GAP}KB/s`);
         expect(formatNetworkMetric(521_000_000)).toBe(`521${UNBREAKABLE_GAP}MB/s`);
+        expect(formatNetworkMetric(999_600_000)).toBe(`1${UNBREAKABLE_GAP}GB/s`);
         expect(formatNetworkMetric(1_230_000_000)).toBe(`1.2${UNBREAKABLE_GAP}GB/s`);
         expect(formatNetworkMetric(521_000_000_000)).toBe(`521${UNBREAKABLE_GAP}GB/s`);
+        expect(formatNetworkMetric(999_960_000_000)).toBe(`1${UNBREAKABLE_GAP}TB/s`);
         expect(formatNetworkMetric(3_450_000_000_000)).toBe(`3.45${UNBREAKABLE_GAP}TB/s`);
         expect(formatNetworkMetric(undefined)).toBe('');
     });

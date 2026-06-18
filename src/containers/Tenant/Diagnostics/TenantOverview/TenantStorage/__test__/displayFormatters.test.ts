@@ -9,6 +9,7 @@ import {
     getTenantStorageLegendValueFormatter,
     getTenantStorageSegmentValueFormatters,
     getTenantStorageSummaryMetricUnit,
+    getTenantStorageTableMetricUnit,
 } from '../displayFormatters';
 import type {TenantStorageSegment} from '../utils';
 import {TENANT_STORAGE_SEGMENT_KEYS, getTenantStorageSegmentDisplayValue} from '../utils';
@@ -70,6 +71,7 @@ describe('TenantStorage display formatters', () => {
         expect(getTenantStorageSummaryMetricUnit([600_000_000, 250_000_000, 900_000_000])).toBe(
             'mb',
         );
+        expect(getTenantStorageSummaryMetricUnit([999_600_000, 250_000_000])).toBe('gb');
         expect(getTenantStorageSummaryMetricUnit([500_000, undefined])).toBe('mb');
     });
 
@@ -93,10 +95,20 @@ describe('TenantStorage display formatters', () => {
 
     test('formats top usage table metrics adaptively', () => {
         expect(formatTenantStorageTableMetric(35_600_000_000)).toBe(withUnit('35.6', 'GB'));
+        expect(formatTenantStorageTableMetric(999_500_000)).toBe(withUnit('1', 'GB'));
         expect(formatTenantStorageTableMetric(10_000_000)).toBe(withUnit('10', 'MB'));
         expect(formatTenantStorageTableMetric(500_000)).toBe(withUnit('500', 'KB'));
         expect(formatTenantStorageTableMetric(0)).toBe(withUnit('0', 'B'));
+        expect(formatTenantStorageTableMetric(null)).toBe(EMPTY_DATA_PLACEHOLDER);
         expect(formatTenantStorageTableMetric(undefined)).toBe(EMPTY_DATA_PLACEHOLDER);
+    });
+
+    test('formats top table metrics in a shared display unit', () => {
+        const size = getTenantStorageTableMetricUnit([999_500_000, 500_000_000]);
+
+        expect(size).toBe('gb');
+        expect(formatTenantStorageTableMetric(999_500_000, size)).toBe(withUnit('1', 'GB'));
+        expect(formatTenantStorageTableMetric(500_000_000, size)).toBe(withUnit('0.5', 'GB'));
     });
 
     test('caps top usage table overhead above 500x', () => {
@@ -126,6 +138,16 @@ describe('TenantStorage display formatters', () => {
 
         expect(formatValue(600_000_000_000)).toBe(withUnit('0.6', 'TB'));
         expect(formatValue(40_000_000_000_000)).toBe(withUnit('40', 'TB'));
+    });
+
+    test('selects segment legend units by rounded display value boundaries', () => {
+        const formatters = getTenantStorageSegmentValueFormatters([500_000_000, 999_600_000]);
+
+        expect(formatters.formatLegendValue(999_600_000)).toBe(withUnit('1', 'GB'));
+        expect(formatters.formatLegendValue(500_000_000)).toBe(withUnit('0.5', 'GB'));
+        expect(formatters.formatTooltipValue(999_600_000)).toBe(
+            withUnit(['1', '000'].join(UNBREAKABLE_GAP), 'MB'),
+        );
     });
 
     test('uses adaptive legend units at mixed-unit threshold', () => {
