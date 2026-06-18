@@ -12,7 +12,7 @@ import {TENANT_OVERVIEW_TABLES_SETTINGS} from '../../../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 
-import {formatTenantStorageTableMetric, getTenantStorageTableMetricUnit} from './displayFormatters';
+import {formatTenantStorageTableMetric} from './displayFormatters';
 
 interface TopTablesProps {
     database: string;
@@ -20,12 +20,12 @@ interface TopTablesProps {
 
 const TOP_TABLES_COLUMNS_WIDTH_LS_KEY = 'topTablesTableColumnsWidth';
 
-function getColumns(size: ReturnType<typeof getTenantStorageTableMetricUnit>) {
+function getColumns() {
     const columns: Column<KeyValueRow>[] = [
         {
             name: 'Size',
             width: 100,
-            render: ({row}) => formatTenantStorageTableMetric(row.Size, size),
+            render: ({row}) => formatTenantStorageTableMetric(row.Size),
             align: DataTable.RIGHT,
         },
         {
@@ -52,8 +52,7 @@ export function TopTables({database}: TopTablesProps) {
     const loading = isFetching && currentData === undefined;
 
     const data = currentData?.resultSets?.[0]?.result || [];
-    const size = getTenantStorageTableMetricUnit(data.map((row) => row.Size));
-    const columns = React.useMemo(() => getColumns(size), [size]);
+    const columns = React.useMemo(() => getColumns(), []);
 
     return (
         <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>

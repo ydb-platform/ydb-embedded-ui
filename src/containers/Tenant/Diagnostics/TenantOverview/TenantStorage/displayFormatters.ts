@@ -124,15 +124,8 @@ export function getTenantStorageLegendValueFormatter(values: Array<string | numb
     return getTenantStorageSegmentValueFormatters(values).formatLegendValue;
 }
 
-export function formatTenantStorageTableMetric(value?: string | number | null, size?: BytesSizes) {
-    return formatByteMetric(value ?? undefined, size);
-}
-
-export function getTenantStorageTableMetricUnit(values: Array<string | number | null | undefined>) {
-    return getConsistentMetricBytesSize(
-        values.map((value) => value ?? undefined),
-        TENANT_STORAGE_FORMAT_OPTIONS,
-    );
+export function formatTenantStorageTableMetric(value?: string | number | null) {
+    return formatByteMetric(value ?? undefined);
 }
 
 export function formatOverheadValue(value?: number) {

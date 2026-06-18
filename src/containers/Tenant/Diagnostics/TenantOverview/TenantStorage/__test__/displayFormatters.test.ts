@@ -9,7 +9,6 @@ import {
     getTenantStorageLegendValueFormatter,
     getTenantStorageSegmentValueFormatters,
     getTenantStorageSummaryMetricUnit,
-    getTenantStorageTableMetricUnit,
 } from '../displayFormatters';
 import type {TenantStorageSegment} from '../utils';
 import {TENANT_STORAGE_SEGMENT_KEYS, getTenantStorageSegmentDisplayValue} from '../utils';
@@ -103,12 +102,14 @@ describe('TenantStorage display formatters', () => {
         expect(formatTenantStorageTableMetric(undefined)).toBe(EMPTY_DATA_PLACEHOLDER);
     });
 
-    test('formats top table metrics in a shared display unit', () => {
-        const size = getTenantStorageTableMetricUnit([999_500_000, 500_000_000]);
+    test('formats top table rows independently without a shared unit', () => {
+        const values = [999_500_000, 500_000_000, 10_000_000];
 
-        expect(size).toBe('gb');
-        expect(formatTenantStorageTableMetric(999_500_000, size)).toBe(withUnit('1', 'GB'));
-        expect(formatTenantStorageTableMetric(500_000_000, size)).toBe(withUnit('0.5', 'GB'));
+        expect(values.map((value) => formatTenantStorageTableMetric(value))).toEqual([
+            withUnit('1', 'GB'),
+            withUnit('500', 'MB'),
+            withUnit('10', 'MB'),
+        ]);
     });
 
     test('caps top usage table overhead above 500x', () => {
