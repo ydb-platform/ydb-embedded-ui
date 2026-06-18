@@ -44,6 +44,10 @@
         background-color: var(--code-background-color);
     }
 
+    &__schematize-error {
+        margin-bottom: var(--g-spacing-3);
+    }
+
     &__string-message {
         overflow: hidden;
 

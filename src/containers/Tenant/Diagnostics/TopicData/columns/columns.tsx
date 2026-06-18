@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {TriangleExclamation} from '@gravity-ui/icons';
+import {CircleExclamationFill, TriangleExclamation} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {TextProps} from '@gravity-ui/uikit';
 import {ActionTooltip, Icon, Popover, Text} from '@gravity-ui/uikit';
@@ -14,7 +14,7 @@ import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/
 import {TOPIC_MESSAGE_SIZE_LIMIT} from '../../../../../store/reducers/topic';
 import type {TopicMessageEnhanced} from '../../../../../types/api/topic';
 import {cn} from '../../../../../utils/cn';
-import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
+import {EMPTY_DATA_PLACEHOLDER, YDB_POPOVER_CLASS_NAME} from '../../../../../utils/constants';
 import {formatBytes, formatTimestamp} from '../../../../../utils/dataFormatters/dataFormatters';
 import {isModifiedClickEvent} from '../../../../../utils/events';
 import {formatToMs} from '../../../../../utils/timeParsers';
@@ -113,8 +113,12 @@ export const messageColumn: Column<TopicMessageEnhanced> = {
     name: TOPIC_DATA_COLUMNS_IDS.MESSAGE,
     header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.MESSAGE],
     align: DataTable.LEFT,
-    render: ({row: {Message, OriginalSize}}) => (
-        <TopicDataMessage message={Message} size={OriginalSize} />
+    render: ({row: {Message, OriginalSize, SchematizeError}}) => (
+        <TopicDataMessage
+            message={Message}
+            size={OriginalSize}
+            messageSchematizeError={SchematizeError}
+        />
     ),
     width: 500,
 };
@@ -323,38 +327,81 @@ export function TopicDataTsDiff({
 }
 
 interface TopicDataMessageProps {
-    message?: string;
+    message?: string | object;
     size?: number;
+    messageSchematizeError?: string;
 }
 
-export function TopicDataMessage({message, size}: TopicDataMessageProps) {
-    if (isNil(message)) {
-        return EMPTY_DATA_PLACEHOLDER;
+interface SchematizeErrorIconProps {
+    error?: string;
+}
+
+export function SchematizeErrorIcon({error}: SchematizeErrorIconProps) {
+    if (!error) {
+        return null;
     }
-    let encryptedMessage;
-    let invalid = false;
-    try {
-        encryptedMessage = atob(message);
-    } catch {
-        encryptedMessage = i18n('description_failed-decode');
-        invalid = true;
+
+    return (
+        <Popover className={YDB_POPOVER_CLASS_NAME} content={error}>
+            <Text color="danger" className={b('schematize-error-icon')}>
+                <Icon data={CircleExclamationFill} />
+            </Text>
+        </Popover>
+    );
+}
+
+export function TopicDataMessage({message, size, messageSchematizeError}: TopicDataMessageProps) {
+    const errorIcon = <SchematizeErrorIcon error={messageSchematizeError} />;
+
+    if (isNil(message)) {
+        return messageSchematizeError ? (
+            <span className={b('message-wrapper')}>
+                {errorIcon}
+                {EMPTY_DATA_PLACEHOLDER}
+            </span>
+        ) : (
+            EMPTY_DATA_PLACEHOLDER
+        );
+    }
+
+    // When a topic has an associated schema, the backend returns the message
+    // already schematized as an object/array, otherwise it's a base64 string.
+    // Always render a string so rendering an object doesn't throw React error #31.
+    let messageToRender: string;
+    if (typeof message === 'object') {
+        try {
+            messageToRender = JSON.stringify(message);
+        } catch (e) {
+            console.warn(e);
+            messageToRender = String(message);
+        }
+    } else {
+        messageToRender = message;
+        try {
+            messageToRender = atob(message);
+        } catch (e) {
+            console.warn(e);
+        }
     }
 
     const truncated = safeParseNumber(size) > TOPIC_MESSAGE_SIZE_LIMIT;
+    let title = messageToRender;
+    if (truncated) {
+        title += ` ${i18n('description_truncated')}`;
+    }
     return (
-        <Text
-            variant="body-2"
-            color={invalid ? 'secondary' : 'primary'}
-            className={b('message', {invalid})}
-        >
-            {encryptedMessage}
-            {truncated && (
-                <Text color="secondary" className={b('truncated')}>
-                    {' '}
-                    {i18n('description_truncated')}
-                </Text>
-            )}
-        </Text>
+        <span className={b('message-wrapper')}>
+            {errorIcon}
+            <Text variant="body-2" className={b('message')} title={title}>
+                {messageToRender}
+                {truncated && (
+                    <Text color="secondary" className={b('truncated')}>
+                        {' '}
+                        {i18n('description_truncated')}
+                    </Text>
+                )}
+            </Text>
+        </span>
     );
 }
 

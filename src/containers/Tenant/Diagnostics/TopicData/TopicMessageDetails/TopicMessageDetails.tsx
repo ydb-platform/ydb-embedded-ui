@@ -24,27 +24,36 @@ import './TopicMessageDetails.scss';
 interface TopicMessageDetailsProps {
     database: string;
     path: string;
+    clusterName?: string;
+    useMeta?: boolean;
 }
 
-export function TopicMessageDetails({database, path}: TopicMessageDetailsProps) {
+export function TopicMessageDetails({
+    database,
+    path,
+    clusterName,
+    useMeta,
+}: TopicMessageDetailsProps) {
     const {selectedPartition, activeOffset} = useTopicDataQueryParams();
 
     const queryParams = React.useMemo(() => {
         if (isNil(selectedPartition) || isNil(activeOffset)) {
             return skipToken;
         }
-        const params: TopicDataRequest = {
+        const params: TopicDataRequest & {clusterName?: string; useMeta?: boolean} = {
             database,
             path,
+            clusterName,
             partition: selectedPartition,
             limit: 1,
             message_size_limit: MESSAGE_SIZE_LIMIT,
+            useMeta,
         };
         const parsedOffset = safeParseNumber(activeOffset);
         params.offset = parsedOffset;
         params.last_offset = parsedOffset + 1;
         return params;
-    }, [selectedPartition, activeOffset, database, path]);
+    }, [selectedPartition, activeOffset, database, path, clusterName, useMeta]);
 
     const {currentData, error, isFetching} = topicApi.useGetTopicDataQuery(queryParams);
 
@@ -54,7 +63,16 @@ export function TopicMessageDetails({database, path}: TopicMessageDetailsProps) 
         if (!messageDetails) {
             return null;
         }
-        return <TopicMessageGeneralInfo messageData={messageDetails} />;
+        return (
+            <TopicMessageGeneralInfo
+                messageData={messageDetails}
+                schemaInfo={{
+                    ProtoMessageName: currentData?.ProtoMessageName,
+                    Protoseq: currentData?.Protoseq,
+                    SchemaPath: currentData?.SchemaPath,
+                }}
+            />
+        );
     };
 
     const renderMessageMeta = () => {
@@ -78,6 +96,8 @@ export function TopicMessageDetails({database, path}: TopicMessageDetailsProps) 
                 message={message}
                 offset={messageDetails.Offset}
                 size={messageDetails.OriginalSize}
+                generalSchematizeError={currentData?.SchematizeError}
+                messageSchematizeError={messageDetails.SchematizeError}
             />
         );
     };

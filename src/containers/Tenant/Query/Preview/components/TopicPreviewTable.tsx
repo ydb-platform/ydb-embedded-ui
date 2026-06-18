@@ -39,8 +39,12 @@ const columns: Column<TopicMessage>[] = [
     {
         name: TOPIC_DATA_COLUMNS_IDS.MESSAGE,
         header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.MESSAGE],
-        render: ({row: {Message, OriginalSize}}) => (
-            <TopicDataMessage message={Message} size={OriginalSize} />
+        render: ({row: {Message, OriginalSize, SchematizeError}}) => (
+            <TopicDataMessage
+                message={Message}
+                size={OriginalSize}
+                messageSchematizeError={SchematizeError}
+            />
         ),
         width: 500,
         sortable: false,

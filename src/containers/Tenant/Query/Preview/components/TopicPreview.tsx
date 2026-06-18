@@ -4,10 +4,12 @@ import {Flex, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
+import {useSchemaTopicDataAvailable} from '../../../../../store/reducers/capabilities/hooks';
 import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster';
 import {partitionsApi} from '../../../../../store/reducers/partitions/partitions';
 import {topicApi} from '../../../../../store/reducers/topic';
 import type {TopicDataRequest} from '../../../../../types/api/topic';
+import {useClusterNameFromQuery} from '../../../../../utils/hooks/useDatabaseFromQuery';
 import {safeParseNumber} from '../../../../../utils/utils';
 import i18n from '../i18n';
 import {b} from '../shared';
@@ -20,6 +22,8 @@ const TOPIC_PREVIEW_LIMIT = 100;
 
 export function TopicPreview({database, path, databaseFullPath}: PreviewContainerProps) {
     const useMetaProxy = useClusterWithProxy();
+    const schemaTopicDataAvailable = useSchemaTopicDataAvailable();
+    const clusterName = useClusterNameFromQuery();
     const {
         data: partitions,
         isLoading: partitionsLoading,
@@ -35,17 +39,19 @@ export function TopicPreview({database, path, databaseFullPath}: PreviewContaine
         if (!firstPartition || isNil(firstPartitionId)) {
             return skipToken;
         }
-        const params: TopicDataRequest = {
+        const params: TopicDataRequest & {clusterName?: string; useMeta?: boolean} = {
             database,
             path,
+            clusterName,
             partition: String(firstPartitionId),
             limit: TOPIC_PREVIEW_LIMIT,
             offset: safeParseNumber(firstPartition.endOffset) - TOPIC_PREVIEW_LIMIT,
             message_size_limit: 100,
+            useMeta: schemaTopicDataAvailable,
         };
 
         return params;
-    }, [database, path, firstPartition]);
+    }, [database, path, clusterName, firstPartition, schemaTopicDataAvailable]);
 
     const {currentData, error, isFetching} = topicApi.useGetTopicDataQuery(queryParams);
 

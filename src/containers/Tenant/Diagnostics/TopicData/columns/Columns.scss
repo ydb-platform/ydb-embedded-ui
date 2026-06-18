@@ -21,6 +21,17 @@
     &__truncated {
         font-style: italic;
     }
+    &__message-wrapper {
+        display: inline;
+    }
+    &__schematize-error-icon {
+        display: inline-flex;
+
+        margin-right: var(--g-spacing-1);
+
+        cursor: pointer;
+        vertical-align: text-top;
+    }
     &__help {
         white-space: pre-wrap;
     }

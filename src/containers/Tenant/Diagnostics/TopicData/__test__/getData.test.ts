@@ -1,6 +1,9 @@
 import type {TopicDataResponse, TopicMessage} from '../../../../../types/api/topic';
+import createToast from '../../../../../utils/createToast';
 import {generateTopicDataGetter, prepareResponse} from '../getData';
 import {TOPIC_DATA_FETCH_LIMIT} from '../utils/constants';
+
+jest.mock('../../../../../utils/createToast', () => jest.fn());
 
 describe('prepareResponse', () => {
     test('should handle case with some notLoaded messages', () => {
@@ -244,6 +247,7 @@ describe('generateTopicDataGetter', () => {
         partition: '0',
         database: '/Root',
         path: '/Root/topic',
+        clusterName: 'cluster-a',
         isEmpty: false,
     };
 
@@ -255,6 +259,9 @@ describe('generateTopicDataGetter', () => {
         (window as any).api = {
             viewer: {
                 getTopicData: jest.fn().mockResolvedValue(response),
+            },
+            meta: {
+                getSchemaTopicData: jest.fn().mockResolvedValue(response),
             },
         };
     }
@@ -416,5 +423,65 @@ describe('generateTopicDataGetter', () => {
         });
 
         expect(result).toEqual({data: [], total: 0, found: 0});
+    });
+    test('uses schema topic data handler when it is available', async () => {
+        mockApi(makeResponse('0', '100'));
+
+        const getter = generateTopicDataGetter({
+            setBoundOffsets: jest.fn(),
+            baseOffset: 0,
+        });
+
+        await getter({
+            limit: 30,
+            offset: 0,
+            columnsIds: [],
+            filters: {...baseFilters, useMeta: true},
+        });
+
+        expect(window.api.meta?.getSchemaTopicData).toHaveBeenCalledWith(
+            expect.objectContaining({
+                clusterName: 'cluster-a',
+                database: '/Root',
+                path: '/Root/topic',
+            }),
+        );
+        expect(window.api.viewer.getTopicData).not.toHaveBeenCalled();
+    });
+
+    test('uses viewer topic data handler when schema topic data handler is not available', async () => {
+        mockApi(makeResponse('0', '100'));
+
+        const getter = generateTopicDataGetter({
+            setBoundOffsets: jest.fn(),
+            baseOffset: 0,
+        });
+
+        await getter({limit: 30, offset: 0, columnsIds: [], filters: baseFilters});
+
+        expect(window.api.viewer.getTopicData).toHaveBeenCalled();
+        expect(window.api.meta?.getSchemaTopicData).not.toHaveBeenCalled();
+    });
+
+    test('shows toast when response contains schematization error', async () => {
+        mockApi({...makeResponse('0', '100'), SchematizeError: 'Schema registry error'});
+
+        const getter = generateTopicDataGetter({
+            setBoundOffsets: jest.fn(),
+            baseOffset: 0,
+        });
+
+        await getter({
+            limit: 30,
+            offset: 0,
+            columnsIds: [],
+            filters: {...baseFilters, useMeta: true},
+        });
+
+        expect(createToast).toHaveBeenCalledWith({
+            name: 'topicDataSchematizeError',
+            theme: 'danger',
+            title: 'Schema registry error',
+        });
     });
 });

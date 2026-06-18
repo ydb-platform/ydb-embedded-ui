@@ -7,6 +7,7 @@ import type {
     TopicDataResponse,
     TopicMessageEnhanced,
 } from '../../../../types/api/topic';
+import createToast from '../../../../utils/createToast';
 import {safeParseNumber} from '../../../../utils/utils';
 
 import {TOPIC_DATA_FETCH_LIMIT} from './utils/constants';
@@ -71,7 +72,14 @@ export const generateTopicDataGetter = ({
             return emptyData;
         }
 
-        const {partition, isEmpty, currentPage: _currentPage, ...rest} = filters;
+        const {
+            partition,
+            isEmpty,
+            currentPage: _currentPage,
+            clusterName,
+            useMeta,
+            ...rest
+        } = filters;
 
         if (isNil(partition) || partition === '' || isEmpty) {
             return emptyData;
@@ -88,7 +96,18 @@ export const generateTopicDataGetter = ({
         };
         queryParams.offset = normalizedOffset;
 
-        const response = await window.api.viewer.getTopicData(queryParams);
+        const response =
+            useMeta && window.api.meta
+                ? await window.api.meta.getSchemaTopicData({...queryParams, clusterName})
+                : await window.api.viewer.getTopicData(queryParams);
+
+        if (response.SchematizeError) {
+            createToast({
+                name: 'topicDataSchematizeError',
+                theme: 'danger',
+                title: response.SchematizeError,
+            });
+        }
 
         const {start, end, messages} = prepareResponse(response, normalizedOffset);
 

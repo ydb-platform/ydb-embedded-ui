@@ -46,6 +46,14 @@ const useGetFeatureVersion = (feature: Capability) => {
     return useTypedSelector((state) => selectCapabilityVersion(state, feature, database) || 0);
 };
 
+export const useGetMetaFeatureVersion = (feature: MetaCapability) => {
+    return useTypedSelector((state) => selectMetaCapabilityVersion(state, feature) || 0);
+};
+
+export const useSchemaTopicDataAvailable = () => {
+    return useGetMetaFeatureVersion('/meta/schema_topic_data') >= 1;
+};
+
 export const useCreateDirectoryFeatureAvailable = () => {
     return useGetFeatureVersion('/scheme/directory') > 0;
 };
@@ -140,8 +148,15 @@ export const useEditAccessAvailable = () => {
     return useGetFeatureVersion('/viewer/acl') >= 2 && !uiFactory.hideGrantAccess;
 };
 
-export const useTopicDataAvailable = () => {
+export const useViewerTopicDataAvailable = () => {
     return useGetFeatureVersion('/viewer/topic_data') >= 1;
+};
+
+export const useTopicDataAvailable = () => {
+    const schemaTopicDataAvailable = useSchemaTopicDataAvailable();
+    const viewerTopicDataAvailable = useViewerTopicDataAvailable();
+
+    return schemaTopicDataAvailable || viewerTopicDataAvailable;
 };
 
 const useGetSecuritySetting = (feature: SecuritySetting) => {
@@ -181,10 +196,6 @@ export function useMetaCapabilitiesLoaded() {
     // That means no new features are available
     return Boolean(data || error);
 }
-
-export const useGetMetaFeatureVersion = (feature: MetaCapability) => {
-    return useTypedSelector((state) => selectMetaCapabilityVersion(state, feature) || 0);
-};
 
 export const useMetaEnvironmentsAvailable = () => {
     return Boolean(uiFactory.databasesEnvironmentsConfig);

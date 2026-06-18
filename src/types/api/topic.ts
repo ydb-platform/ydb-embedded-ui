@@ -206,6 +206,26 @@ export interface TopicDataResponse {
      * Whether the response was truncated due to size limits
      */
     Truncated?: boolean;
+
+    /**
+     * Error produced while trying to schematize the response messages
+     */
+    SchematizeError?: string;
+
+    /**
+     * Proto message name used to schematize the response messages
+     */
+    ProtoMessageName?: string;
+
+    /**
+     * Proto sequence number used to schematize the response messages
+     */
+    Protoseq?: string | number;
+
+    /**
+     * Schema path used to schematize the response messages
+     */
+    SchemaPath?: string;
 }
 
 export interface TopicMessage {
@@ -241,6 +261,11 @@ export interface TopicMessage {
      * Message content
      */
     Message?: string;
+
+    /**
+     * Error produced while trying to schematize this message
+     */
+    SchematizeError?: string;
 
     /**
      * uint32

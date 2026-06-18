@@ -10,6 +10,11 @@ import {api} from './api';
 
 export const TOPIC_MESSAGE_SIZE_LIMIT = 100;
 
+interface TopicDataQueryRequest extends TopicDataRequest {
+    clusterName?: string;
+    useMeta?: boolean;
+}
+
 export const topicApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTopic: build.query({
@@ -41,12 +46,19 @@ export const topicApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
         getTopicData: build.query({
-            queryFn: async (params: TopicDataRequest) => {
+            queryFn: async ({clusterName, useMeta, ...params}: TopicDataQueryRequest) => {
                 try {
-                    const data = await window.api.viewer.getTopicData({
+                    const requestParams = {
                         message_size_limit: TOPIC_MESSAGE_SIZE_LIMIT,
                         ...params,
-                    });
+                    };
+                    const data =
+                        useMeta && window.api.meta
+                            ? await window.api.meta.getSchemaTopicData({
+                                  ...requestParams,
+                                  clusterName,
+                              })
+                            : await window.api.viewer.getTopicData(requestParams);
                     return {data};
                 } catch (error) {
                     return {error};

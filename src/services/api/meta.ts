@@ -7,6 +7,7 @@ import type {
     MetaClusters,
     MetaTenants,
 } from '../../types/api/meta';
+import type {TopicDataRequest, TopicDataResponse} from '../../types/api/topic';
 import type {TUserToken} from '../../types/api/whoami';
 import {parseMetaTenants} from '../parsers/parseMetaTenants';
 
@@ -99,6 +100,20 @@ export class MetaAPI extends BaseMetaAPI {
             this.getPath('/meta/cluster_health'),
             {cluster_name: clusterName},
             {concurrentId, requestConfig: {signal}},
+        );
+    }
+
+    getSchemaTopicData(
+        {clusterName, ...params}: TopicDataRequest & {clusterName?: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<TopicDataResponse>(
+            this.getPath('/meta/schema_topic_data', clusterName),
+            {cluster_name: clusterName, ...params},
+            {
+                concurrentId,
+                requestConfig: {signal},
+            },
         );
     }
 }

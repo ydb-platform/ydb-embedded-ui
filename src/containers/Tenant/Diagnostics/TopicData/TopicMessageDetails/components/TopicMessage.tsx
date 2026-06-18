@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ArrowDownToLine} from '@gravity-ui/icons';
-import {ActionTooltip, Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {ActionTooltip, Alert, Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {JsonViewer} from '../../../../../../components/JsonViewer/JsonViewer';
 import ShortyString from '../../../../../../components/ShortyString/ShortyString';
@@ -20,36 +20,46 @@ interface TopicMessageProps {
     message: string;
     offset?: string | number;
     size?: number;
+    generalSchematizeError?: string;
+    messageSchematizeError?: string;
 }
 
-export function TopicMessage({offset, size, message}: TopicMessageProps) {
+export function TopicMessage({
+    offset,
+    size,
+    message,
+    generalSchematizeError,
+    messageSchematizeError,
+}: TopicMessageProps) {
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const sectionScrollRef = React.useRef<HTMLDivElement>(null);
 
     const {preparedMessage, decodedMessage, isJson} = React.useMemo(() => {
         let preparedMessage = message;
         let decodedMessage = message;
-        try {
-            const binary = atob(message);
-            const bytes = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++) {
-                bytes[i] = binary.charCodeAt(i);
+        if (typeof decodedMessage === 'string') {
+            try {
+                const binary = atob(message);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                }
+                decodedMessage = utf8Decoder.decode(bytes);
+            } catch (e) {
+                console.warn(e);
             }
-            decodedMessage = utf8Decoder.decode(bytes);
-        } catch (e) {
-            console.warn(e);
-        }
 
-        try {
-            const jsonMessage = JSON.parse(decodedMessage);
-            if (jsonMessage && typeof jsonMessage === 'object') {
-                preparedMessage = jsonMessage;
-            } else {
+            try {
+                const jsonMessage = JSON.parse(decodedMessage);
+                if (jsonMessage && typeof jsonMessage === 'object') {
+                    preparedMessage = jsonMessage;
+                } else {
+                    preparedMessage = decodedMessage;
+                }
+            } catch (e) {
                 preparedMessage = decodedMessage;
+                console.warn(e);
             }
-        } catch (e) {
-            preparedMessage = decodedMessage;
-            console.warn(e);
         }
 
         let isJson = false;
@@ -109,6 +119,21 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
             className={b('message')}
             scrollContainerRef={sectionScrollRef}
         >
+            {generalSchematizeError && (
+                <Alert
+                    className={b('schematize-error')}
+                    theme="danger"
+                    message={generalSchematizeError}
+                />
+            )}
+            {messageSchematizeError && (
+                <Alert
+                    className={b('schematize-error')}
+                    theme="danger"
+                    message={messageSchematizeError}
+                    view="outlined"
+                />
+            )}
             {messageContent}
         </TopicDataSection>
     );
