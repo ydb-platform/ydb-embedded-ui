@@ -14,6 +14,8 @@ import {
 } from '../../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
+import {useSchemaTopicDataAvailable} from '../../../../store/reducers/capabilities/hooks';
+import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../../../utils/illustrations';
 import {renderPaginatedTableErrorMessage} from '../../../../utils/renderPaginatedTableErrorMessage';
@@ -55,6 +57,8 @@ const columns = getAllColumns();
 
 export function TopicData({scrollContainerRef, path, database, databaseFullPath}: TopicDataProps) {
     const NoSearchResultsImage = getIllustration('NoSearchResults');
+    const schemaTopicDataAvailable = useSchemaTopicDataAvailable();
+    const clusterName = useClusterNameFromQuery();
 
     const [controlsKey, setControlsKey] = React.useState(0);
     const [startOffset, setStartOffset] = React.useState<number>();
@@ -166,11 +170,21 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
         () => ({
             path,
             database,
+            clusterName,
             partition: selectedPartition ?? '',
             isEmpty: emptyData,
             currentPage,
+            useMeta: schemaTopicDataAvailable,
         }),
-        [path, database, selectedPartition, emptyData, currentPage],
+        [
+            path,
+            database,
+            clusterName,
+            selectedPartition,
+            emptyData,
+            currentPage,
+            schemaTopicDataAvailable,
+        ],
     );
 
     const getTopicData = React.useMemo(
@@ -240,10 +254,15 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
     const renderDrawerContent = React.useCallback(() => {
         return (
             <Fullscreen>
-                <TopicMessageDetails database={database} path={path} />
+                <TopicMessageDetails
+                    database={database}
+                    path={path}
+                    clusterName={clusterName}
+                    useMeta={schemaTopicDataAvailable}
+                />
             </Fullscreen>
         );
-    }, [database, path]);
+    }, [clusterName, database, path, schemaTopicDataAvailable]);
 
     const handlePaginationUpdate = React.useCallback(
         (page: number) => {

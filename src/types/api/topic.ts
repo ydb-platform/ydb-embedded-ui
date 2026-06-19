@@ -206,6 +206,26 @@ export interface TopicDataResponse {
      * Whether the response was truncated due to size limits
      */
     Truncated?: boolean;
+
+    /**
+     * Error produced while trying to schematize the response messages
+     */
+    SchematizeError?: string;
+
+    /**
+     * Proto message name used to schematize the response messages
+     */
+    ProtoMessageName?: string;
+
+    /**
+     * Proto sequence number used to schematize the response messages
+     */
+    Protoseq?: string | number;
+
+    /**
+     * Schema path used to schematize the response messages
+     */
+    SchemaPath?: string;
 }
 
 export interface TopicMessage {
@@ -238,9 +258,19 @@ export interface TopicMessage {
     TimestampDiff?: string;
 
     /**
-     * Message content
+     * Message content.
+     *
+     * Usually a base64-encoded string. When the topic has an associated schema,
+     * the new handler returns the message already schematized as a JSON value
+     * (object/array/primitive), so consumers must narrow before using
+     * string-only APIs like `atob`.
      */
-    Message?: string;
+    Message?: string | unknown;
+
+    /**
+     * Error produced while trying to schematize this message
+     */
+    SchematizeError?: string;
 
     /**
      * uint32
@@ -286,6 +316,14 @@ export interface TopicMessage {
 export interface TopicMessageEnhanced extends TopicMessage {
     removed?: boolean;
     notLoaded?: boolean;
+    /**
+     * Whether the message value is already schematized (a parsed JSON value,
+     * including string primitives) and therefore must NOT be base64-decoded.
+     * Derived from the response schema context (`SchemaPath` present and no
+     * `SchematizeError`), since a raw string value alone is ambiguous between a
+     * schematized primitive and a legacy base64 payload.
+     */
+    isSchematized?: boolean;
 }
 
 export interface TopicMessageMetadataItem {

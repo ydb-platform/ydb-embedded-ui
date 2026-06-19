@@ -26,8 +26,10 @@ export interface TopicDataFilters {
     partition?: string;
     database: string;
     path: string;
+    clusterName?: string;
     isEmpty: boolean;
     currentPage?: number;
+    useMeta?: boolean;
 }
 
 export const TopicDataFilterValues = {

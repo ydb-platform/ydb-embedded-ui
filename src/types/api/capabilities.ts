@@ -58,4 +58,5 @@ export type MetaCapability =
     | '/meta/login'
     | '/meta/whoami'
     | '/meta/databases'
-    | '/meta/environments';
+    | '/meta/environments'
+    | '/meta/schema_topic_data';

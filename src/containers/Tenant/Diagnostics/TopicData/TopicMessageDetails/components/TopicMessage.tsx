@@ -1,7 +1,8 @@
 import React from 'react';
 
 import {ArrowDownToLine} from '@gravity-ui/icons';
-import {ActionTooltip, Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {ActionTooltip, Alert, Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {JsonViewer} from '../../../../../../components/JsonViewer/JsonViewer';
 import ShortyString from '../../../../../../components/ShortyString/ShortyString';
@@ -17,39 +18,68 @@ const UNIPIKA_MAX_SIZE = 1_000_000;
 const utf8Decoder = new TextDecoder('utf-8');
 
 interface TopicMessageProps {
-    message: string;
+    message: string | unknown;
     offset?: string | number;
     size?: number;
+    generalSchematizeError?: string;
+    messageSchematizeError?: string;
+    /**
+     * When true the message value is already schematized (including string
+     * primitives) and must be rendered as-is without base64 decoding.
+     */
+    isSchematized?: boolean;
 }
 
-export function TopicMessage({offset, size, message}: TopicMessageProps) {
+export function TopicMessage({
+    offset,
+    size,
+    message,
+    generalSchematizeError,
+    messageSchematizeError,
+    isSchematized,
+}: TopicMessageProps) {
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const sectionScrollRef = React.useRef<HTMLDivElement>(null);
 
-    const {preparedMessage, decodedMessage, isJson} = React.useMemo(() => {
-        let preparedMessage = message;
-        let decodedMessage = message;
-        try {
-            const binary = atob(message);
-            const bytes = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++) {
-                bytes[i] = binary.charCodeAt(i);
-            }
-            decodedMessage = utf8Decoder.decode(bytes);
-        } catch (e) {
-            console.warn(e);
-        }
+    // The message may be absent while a schematization error is still present
+    // (error-only rows). In that case we render the alerts but no content/toolbar.
+    const hasMessage = !isNil(message);
 
-        try {
-            const jsonMessage = JSON.parse(decodedMessage);
-            if (jsonMessage && typeof jsonMessage === 'object') {
-                preparedMessage = jsonMessage;
-            } else {
-                preparedMessage = decodedMessage;
+    const {preparedMessage, decodedMessage, isJson} = React.useMemo(() => {
+        // A schematized value is already a parsed JSON value (object/array or a
+        // primitive such as a string) and must be used as-is. Only legacy,
+        // non-schematized string values are base64-encoded and need decoding.
+        // A raw string value alone is ambiguous, so we rely on the
+        // `isSchematized` signal derived from the response schema context rather
+        // than guessing from the type.
+        let preparedMessage: string | unknown = message;
+        // decodedMessage is always a string, suitable for download/clipboard.
+        let decodedMessage: string =
+            typeof message === 'string' ? message : JSON.stringify(message, null, 2);
+
+        if (typeof message === 'string' && !isSchematized) {
+            try {
+                const binary = atob(message);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                }
+                decodedMessage = utf8Decoder.decode(bytes);
+            } catch (e) {
+                console.warn(e);
             }
-        } catch (e) {
-            preparedMessage = decodedMessage;
-            console.warn(e);
+
+            try {
+                const jsonMessage = JSON.parse(decodedMessage);
+                if (jsonMessage && typeof jsonMessage === 'object') {
+                    preparedMessage = jsonMessage;
+                } else {
+                    preparedMessage = decodedMessage;
+                }
+            } catch (e) {
+                preparedMessage = decodedMessage;
+                console.warn(e);
+            }
         }
 
         let isJson = false;
@@ -60,23 +90,41 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
         }
 
         return {preparedMessage, decodedMessage, isJson};
-    }, [message, size]);
+    }, [message, size, isSchematized]);
 
-    const messageContent = isJson ? (
-        <JsonViewer
-            // key is used to reset JsonViewer state to collapsed due to performance issues on close fullscreen mode if nodes quantity is big enough https://github.com/ydb-platform/ydb-embedded-ui/issues/2265
-            key={String(isFullscreen)}
-            collapsedInitially
-            value={preparedMessage}
-            toolbarClassName={b('json-viewer-toolbar')}
-            scrollContainerRef={sectionScrollRef}
-        />
-    ) : (
-        <div className={b('string-message')}>
-            {/* key is used to reset string's state when toggle fullscreen: otherwise if very long string is expanded, it may be performance issues on open fullscreen mode https://github.com/ydb-platform/ydb-embedded-ui/issues/2265  */}
-            <ShortyString key={String(isFullscreen)} value={preparedMessage} limit={2000} />
-        </div>
-    );
+    const renderMessageContent = () => {
+        if (!hasMessage) {
+            return null;
+        }
+
+        if (isJson) {
+            return (
+                <JsonViewer
+                    // key is used to reset JsonViewer state to collapsed due to performance issues on close fullscreen mode if nodes quantity is big enough https://github.com/ydb-platform/ydb-embedded-ui/issues/2265
+                    key={String(isFullscreen)}
+                    collapsedInitially
+                    value={preparedMessage}
+                    toolbarClassName={b('json-viewer-toolbar')}
+                    scrollContainerRef={sectionScrollRef}
+                />
+            );
+        }
+
+        return (
+            <div className={b('string-message')}>
+                {/* key is used to reset string's state when toggle fullscreen: otherwise if very long string is expanded, it may be performance issues on open fullscreen mode https://github.com/ydb-platform/ydb-embedded-ui/issues/2265  */}
+                <ShortyString
+                    key={String(isFullscreen)}
+                    value={
+                        typeof preparedMessage === 'string'
+                            ? preparedMessage
+                            : JSON.stringify(preparedMessage)
+                    }
+                    limit={2000}
+                />
+            </div>
+        );
+    };
 
     const renderToolbar = () => {
         return (
@@ -105,11 +153,26 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
     return (
         <TopicDataSection
             title={<MessageTitle truncated={truncated} />}
-            renderToolbar={renderToolbar}
+            renderToolbar={hasMessage ? renderToolbar : undefined}
             className={b('message')}
             scrollContainerRef={sectionScrollRef}
         >
-            {messageContent}
+            {generalSchematizeError && (
+                <Alert
+                    className={b('schematize-error')}
+                    theme="danger"
+                    message={generalSchematizeError}
+                />
+            )}
+            {messageSchematizeError && (
+                <Alert
+                    className={b('schematize-error')}
+                    theme="danger"
+                    message={messageSchematizeError}
+                    view="outlined"
+                />
+            )}
+            {renderMessageContent()}
         </TopicDataSection>
     );
 }

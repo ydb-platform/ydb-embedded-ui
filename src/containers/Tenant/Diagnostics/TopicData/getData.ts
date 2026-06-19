@@ -7,6 +7,7 @@ import type {
     TopicDataResponse,
     TopicMessageEnhanced,
 } from '../../../../types/api/topic';
+import createToast from '../../../../utils/createToast';
 import {safeParseNumber} from '../../../../utils/utils';
 
 import {TOPIC_DATA_FETCH_LIMIT} from './utils/constants';
@@ -29,6 +30,14 @@ export function prepareResponse(response: TopicDataResponse, offset: number) {
 
     const normalizedMessages: TopicMessageEnhanced[] = [];
 
+    // A topic has an associated schema when the response carries schema context
+    // (`SchemaPath`). In that case messages are returned already schematized as
+    // JSON values (objects/arrays/primitives, including strings) and must not be
+    // base64-decoded. Without a schema the new handler returns exactly the
+    // legacy shape (base64), so a raw string value alone cannot disambiguate the
+    // two cases — we rely on this response-level signal instead.
+    const responseSchematized = Boolean(response.SchemaPath) && !response.SchematizeError;
+
     const limit = Math.min(TOPIC_DATA_FETCH_LIMIT, Math.max(end - offset, 0));
     let i = 0;
     let j = 0;
@@ -44,7 +53,15 @@ export function prepareResponse(response: TopicDataResponse, offset: number) {
             !isNil(currentMessage?.Offset) &&
             String(currentMessage.Offset) === String(currentOffset)
         ) {
-            normalizedMessages.push(currentMessage);
+            // A per-message schematization error means this particular message
+            // stayed in its legacy base64 form even when a schema is present.
+            // Only attach the flag when the message is actually schematized so
+            // legacy messages keep their original shape.
+            if (responseSchematized && !currentMessage.SchematizeError) {
+                normalizedMessages.push({...currentMessage, isSchematized: true});
+            } else {
+                normalizedMessages.push(currentMessage);
+            }
             i++;
         } else {
             normalizedMessages.push({
@@ -71,7 +88,14 @@ export const generateTopicDataGetter = ({
             return emptyData;
         }
 
-        const {partition, isEmpty, currentPage: _currentPage, ...rest} = filters;
+        const {
+            partition,
+            isEmpty,
+            currentPage: _currentPage,
+            clusterName,
+            useMeta,
+            ...rest
+        } = filters;
 
         if (isNil(partition) || partition === '' || isEmpty) {
             return emptyData;
@@ -88,7 +112,18 @@ export const generateTopicDataGetter = ({
         };
         queryParams.offset = normalizedOffset;
 
-        const response = await window.api.viewer.getTopicData(queryParams);
+        const response =
+            useMeta && window.api.meta
+                ? await window.api.meta.getSchemaTopicData({...queryParams, clusterName})
+                : await window.api.viewer.getTopicData(queryParams);
+
+        if (response.SchematizeError) {
+            createToast({
+                name: 'topicDataSchematizeError',
+                theme: 'danger',
+                title: response.SchematizeError,
+            });
+        }
 
         const {start, end, messages} = prepareResponse(response, normalizedOffset);
 
