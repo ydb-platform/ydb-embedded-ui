@@ -17,8 +17,10 @@ interface UsageTabCardProps {
     value: number;
     limit: number;
     legendFormatter: (params: {value: number; capacity: number}) => string;
-    // Overrides the threshold above which the doughnut turns "danger" (red).
-    // Pass Infinity to keep warning (yellow) but never colorize as danger on overflow.
+    // Fill percentage above which the doughnut turns "danger" (red).
+    // Defaults to the shared danger threshold. Set to Infinity to disable the
+    // "danger" status entirely so the doughnut never turns red at any fill level
+    // (it can still turn "warning"/yellow once the warning threshold is passed).
     dangerThreshold?: number;
 }
 
