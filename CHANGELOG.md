@@ -1,5 +1,12 @@
 # Changelog
 
+## [16.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v16.2.0...v16.3.0) (2026-06-19)
+
+
+### Features
+
+* **TopicData:** support new meta handler for data ([#4026](https://github.com/ydb-platform/ydb-embedded-ui/issues/4026)) ([7e2effd](https://github.com/ydb-platform/ydb-embedded-ui/commit/7e2effd07954e5703089d285dff8afec66713c16))
+
 ## [16.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v16.1.0...v16.2.0) (2026-06-16)
 
 
