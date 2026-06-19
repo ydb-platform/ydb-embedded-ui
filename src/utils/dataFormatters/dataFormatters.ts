@@ -165,7 +165,6 @@ export function formatNumericValues(
     size?: Digits,
     delimiter?: string,
     withValueLabel?: boolean,
-    precision?: FormatValuesPrecision,
 ) {
     return formatValues<Digits>(
         formatNumberWithDigits,
@@ -175,7 +174,6 @@ export function formatNumericValues(
         size,
         delimiter,
         withValueLabel,
-        precision,
     );
 }
 
