@@ -316,6 +316,14 @@ export interface TopicMessage {
 export interface TopicMessageEnhanced extends TopicMessage {
     removed?: boolean;
     notLoaded?: boolean;
+    /**
+     * Whether the message value is already schematized (a parsed JSON value,
+     * including string primitives) and therefore must NOT be base64-decoded.
+     * Derived from the response schema context (`SchemaPath` present and no
+     * `SchematizeError`), since a raw string value alone is ambiguous between a
+     * schematized primitive and a legacy base64 payload.
+     */
+    isSchematized?: boolean;
 }
 
 export interface TopicMessageMetadataItem {

@@ -90,6 +90,13 @@ export function TopicMessageDetails({
         const generalSchematizeError = currentData?.SchematizeError;
         const messageSchematizeError = messageDetails?.SchematizeError;
 
+        // A message is schematized (a parsed JSON value, including string
+        // primitives) when the response carries schema context (`SchemaPath`)
+        // and neither the response nor the message reported a schematization
+        // error. Such values must be rendered as-is, without base64 decoding.
+        const isSchematized =
+            Boolean(currentData?.SchemaPath) && !generalSchematizeError && !messageSchematizeError;
+
         // Render the section whenever there is a message OR a schematization
         // error to report. Use isNil instead of a broad falsy check so valid
         // falsy schematized values (0, false, '') are not dropped.
@@ -103,6 +110,7 @@ export function TopicMessageDetails({
                 size={messageDetails?.OriginalSize}
                 generalSchematizeError={generalSchematizeError}
                 messageSchematizeError={messageSchematizeError}
+                isSchematized={isSchematized}
             />
         );
     };

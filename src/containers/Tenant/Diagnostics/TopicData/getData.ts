@@ -30,6 +30,14 @@ export function prepareResponse(response: TopicDataResponse, offset: number) {
 
     const normalizedMessages: TopicMessageEnhanced[] = [];
 
+    // A topic has an associated schema when the response carries schema context
+    // (`SchemaPath`). In that case messages are returned already schematized as
+    // JSON values (objects/arrays/primitives, including strings) and must not be
+    // base64-decoded. Without a schema the new handler returns exactly the
+    // legacy shape (base64), so a raw string value alone cannot disambiguate the
+    // two cases — we rely on this response-level signal instead.
+    const responseSchematized = Boolean(response.SchemaPath) && !response.SchematizeError;
+
     const limit = Math.min(TOPIC_DATA_FETCH_LIMIT, Math.max(end - offset, 0));
     let i = 0;
     let j = 0;
@@ -45,7 +53,12 @@ export function prepareResponse(response: TopicDataResponse, offset: number) {
             !isNil(currentMessage?.Offset) &&
             String(currentMessage.Offset) === String(currentOffset)
         ) {
-            normalizedMessages.push(currentMessage);
+            // A per-message schematization error means this particular message
+            // stayed in its legacy base64 form even when a schema is present.
+            normalizedMessages.push({
+                ...currentMessage,
+                isSchematized: responseSchematized && !currentMessage.SchematizeError,
+            });
             i++;
         } else {
             normalizedMessages.push({

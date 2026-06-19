@@ -113,11 +113,12 @@ export const messageColumn: Column<TopicMessageEnhanced> = {
     name: TOPIC_DATA_COLUMNS_IDS.MESSAGE,
     header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.MESSAGE],
     align: DataTable.LEFT,
-    render: ({row: {Message, OriginalSize, SchematizeError}}) => (
+    render: ({row: {Message, OriginalSize, SchematizeError, isSchematized}}) => (
         <TopicDataMessage
             message={Message}
             size={OriginalSize}
             messageSchematizeError={SchematizeError}
+            isSchematized={isSchematized}
         />
     ),
     width: 500,
@@ -330,6 +331,11 @@ interface TopicDataMessageProps {
     message?: string | unknown;
     size?: number;
     messageSchematizeError?: string;
+    /**
+     * When true the message value is already schematized (including string
+     * primitives) and must be rendered as-is without base64 decoding.
+     */
+    isSchematized?: boolean;
 }
 
 interface SchematizeErrorIconProps {
@@ -350,7 +356,12 @@ export function SchematizeErrorIcon({error}: SchematizeErrorIconProps) {
     );
 }
 
-export function TopicDataMessage({message, size, messageSchematizeError}: TopicDataMessageProps) {
+export function TopicDataMessage({
+    message,
+    size,
+    messageSchematizeError,
+    isSchematized,
+}: TopicDataMessageProps) {
     const errorIcon = <SchematizeErrorIcon error={messageSchematizeError} />;
 
     if (isNil(message)) {
@@ -364,19 +375,25 @@ export function TopicDataMessage({message, size, messageSchematizeError}: TopicD
         );
     }
 
-    // When a topic has an associated schema, the backend returns the message
-    // already schematized as a JSON value (object/array), otherwise it's a
-    // base64 string
+    // A schematized value is already a parsed JSON value (object/array or a
+    // primitive such as a string) and must be rendered as-is. Only legacy,
+    // non-schematized string values are base64-encoded and need decoding. A raw
+    // string value alone is ambiguous, so we rely on the `isSchematized` signal
+    // derived from the response schema context rather than guessing from the type.
     let messageToRender: string;
     let invalid = false;
     if (typeof message === 'string') {
-        messageToRender = message;
-        try {
-            messageToRender = atob(message);
-        } catch (e) {
-            console.warn(e);
-            messageToRender = i18n('description_failed-decode');
-            invalid = true;
+        if (isSchematized) {
+            messageToRender = message;
+        } else {
+            messageToRender = message;
+            try {
+                messageToRender = atob(message);
+            } catch (e) {
+                console.warn(e);
+                messageToRender = i18n('description_failed-decode');
+                invalid = true;
+            }
         }
     } else {
         try {

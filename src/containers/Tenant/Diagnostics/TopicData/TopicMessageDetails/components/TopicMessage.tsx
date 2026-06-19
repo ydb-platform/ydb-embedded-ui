@@ -23,6 +23,11 @@ interface TopicMessageProps {
     size?: number;
     generalSchematizeError?: string;
     messageSchematizeError?: string;
+    /**
+     * When true the message value is already schematized (including string
+     * primitives) and must be rendered as-is without base64 decoding.
+     */
+    isSchematized?: boolean;
 }
 
 export function TopicMessage({
@@ -31,6 +36,7 @@ export function TopicMessage({
     message,
     generalSchematizeError,
     messageSchematizeError,
+    isSchematized,
 }: TopicMessageProps) {
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const sectionScrollRef = React.useRef<HTMLDivElement>(null);
@@ -40,15 +46,18 @@ export function TopicMessage({
     const hasMessage = !isNil(message);
 
     const {preparedMessage, decodedMessage, isJson} = React.useMemo(() => {
-        // When a topic has an associated schema, the backend returns the message
-        // already schematized as a JSON value (object/array). Otherwise it is a
-        // base64 string that we decode and try to parse as JSON.
+        // A schematized value is already a parsed JSON value (object/array or a
+        // primitive such as a string) and must be used as-is. Only legacy,
+        // non-schematized string values are base64-encoded and need decoding.
+        // A raw string value alone is ambiguous, so we rely on the
+        // `isSchematized` signal derived from the response schema context rather
+        // than guessing from the type.
         let preparedMessage: string | unknown = message;
         // decodedMessage is always a string, suitable for download/clipboard.
         let decodedMessage: string =
             typeof message === 'string' ? message : JSON.stringify(message, null, 2);
 
-        if (typeof message === 'string') {
+        if (typeof message === 'string' && !isSchematized) {
             try {
                 const binary = atob(message);
                 const bytes = new Uint8Array(binary.length);
@@ -81,7 +90,7 @@ export function TopicMessage({
         }
 
         return {preparedMessage, decodedMessage, isJson};
-    }, [message, size]);
+    }, [message, size, isSchematized]);
 
     const renderMessageContent = () => {
         if (!hasMessage) {
