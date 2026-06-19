@@ -43,6 +43,37 @@ interface CompactTableActionProps {
     executeQueryAndForgetAvailable?: boolean;
 }
 
+type CompactionStartResult =
+    | {status: 'success'}
+    | {status: 'error'; error: unknown}
+    | {status: 'timeout'};
+
+// Races the compaction request against a timeout so the dialog does not block on a
+// long-running query. The request only resolves successfully if the operation actually
+// started; if it fails to start, the request rejects and we surface the error. Reaching
+// the timeout without an error is therefore treated as a successful start. Note: an error
+// arriving after the timeout cannot be shown, since by then the dialog is already closed.
+function waitForCompactionStartOrTimeout(
+    promise: Promise<void>,
+    timeoutMs: number,
+): Promise<CompactionStartResult> {
+    return new Promise((resolve) => {
+        const timeoutId = window.setTimeout(() => {
+            resolve({status: 'timeout'});
+        }, timeoutMs);
+
+        promise
+            .then(() => {
+                window.clearTimeout(timeoutId);
+                resolve({status: 'success'});
+            })
+            .catch((error: unknown) => {
+                window.clearTimeout(timeoutId);
+                resolve({status: 'error', error});
+            });
+    });
+}
+
 function showCompactionToast(content: string) {
     createToast({
         name: 'startTableCompaction',
@@ -284,8 +315,6 @@ function CompactTableDialog({
             setRequestErrorMessage('');
             setIsSubmitting(true);
 
-            let timeoutId: number | undefined;
-
             try {
                 reachMetricaGoal('startCompaction');
                 const applyPromise = onApply({
@@ -299,17 +328,10 @@ function CompactTableDialog({
                 } else {
                     // Compaction query is long-running, so do not block the dialog on it.
                     // Treat reaching the response timeout without an error as a success.
-                    const result = await Promise.race([
-                        applyPromise
-                            .then(() => ({status: 'success'}) as const)
-                            .catch((error) => ({status: 'error' as const, error})),
-                        new Promise<{status: 'timeout'}>((resolve) => {
-                            timeoutId = window.setTimeout(
-                                () => resolve({status: 'timeout'}),
-                                START_COMPACTION_RESPONSE_TIMEOUT,
-                            );
-                        }),
-                    ]);
+                    const result = await waitForCompactionStartOrTimeout(
+                        applyPromise,
+                        START_COMPACTION_RESPONSE_TIMEOUT,
+                    );
 
                     if (result.status === 'error') {
                         setRequestErrorMessage(prepareErrorMessage(result.error));
@@ -323,9 +345,6 @@ function CompactTableDialog({
             } catch (error) {
                 setRequestErrorMessage(prepareErrorMessage(error));
             } finally {
-                if (timeoutId !== undefined) {
-                    window.clearTimeout(timeoutId);
-                }
                 setIsSubmitting(false);
             }
         },
