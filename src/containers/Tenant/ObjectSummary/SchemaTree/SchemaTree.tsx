@@ -41,6 +41,7 @@ import {
 } from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 import type {DropdownItem, TreeNodeMeta} from '../../utils/types';
+import {useNavigationV2Enabled} from '../../utils/useNavigationV2Enabled';
 import {CreateDirectoryDialog} from '../CreateDirectoryDialog/CreateDirectoryDialog';
 import {useDispatchTreeKey, useTreeKey} from '../UpdateTreeContext';
 import {isDomain, transformPath} from '../transformPath';
@@ -78,6 +79,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const isTopicPreviewAvailable = useTopicDataAvailable();
 
     const {handleTenantPageChange} = useTenantPage();
+    const isV2NavigationEnabled = useNavigationV2Enabled();
 
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
     const [parentPath, setParentPath] = React.useState('');
@@ -222,6 +224,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 schemaData: actionsSchemaData,
                 isSchemaDataLoading: isActionsDataFetching,
                 hasMonitoring,
+                isV2NavigationEnabled,
                 streamingQueryData: streamingSysData,
                 showCreateTableData: getStringifiedData(showCreateTableData),
                 isShowCreateTableLoading: isShowCreateTableFetching,
@@ -242,6 +245,7 @@ export function SchemaTree(props: SchemaTreeProps) {
         isMultiTabEnabled,
         actionsSchemaData,
         isActionsDataFetching,
+        isV2NavigationEnabled,
         streamingSysData,
         showCreateTableData,
         isShowCreateTableFetching,

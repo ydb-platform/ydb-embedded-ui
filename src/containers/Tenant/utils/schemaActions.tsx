@@ -21,6 +21,7 @@ import {transformPath} from '../ObjectSummary/transformPath';
 import type {SchemaData} from '../Schema/SchemaViewer/types';
 import i18n from '../i18n';
 
+import {getTenantPageForDiagnosticsTab} from './diagnosticsNavigation';
 import type {TemplateFn} from './schemaQueryTemplates';
 import {
     addFulltextIndex,
@@ -80,6 +81,7 @@ interface ActionsAdditionalParams {
     schemaData?: SchemaData[];
     isSchemaDataLoading?: boolean;
     hasMonitoring?: boolean;
+    isV2NavigationEnabled?: boolean;
     streamingQueryData?: IQueryResult;
     showCreateTableData?: string;
     isStreamingQueryTextLoading?: boolean;
@@ -161,7 +163,12 @@ const bindActions = (
             showCompactionDialog?.(params.path);
         },
         openMonitoring: () => {
-            setTenantPage(TENANT_PAGES_IDS.diagnostics);
+            setTenantPage(
+                getTenantPageForDiagnosticsTab(
+                    TENANT_DIAGNOSTICS_TABS_IDS.monitoring,
+                    Boolean(additionalEffects.isV2NavigationEnabled),
+                ),
+            );
             dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
             setActivePath(params.path);
         },

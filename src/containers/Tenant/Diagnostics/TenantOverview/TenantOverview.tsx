@@ -16,7 +16,6 @@ import {
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_METRICS_TABS_IDS,
-    TENANT_PAGES_IDS,
 } from '../../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab, tenantApi} from '../../../../store/reducers/tenant/tenant';
 import type {TenantMetricsTab} from '../../../../store/reducers/tenant/types';
@@ -34,6 +33,7 @@ import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQu
 import {useDatabasesV2} from '../../../../utils/hooks/useDatabasesV2';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
 import {useTenantPage} from '../../TenantNavigation/useTenantNavigation';
+import {getTenantPageForDiagnosticsTab} from '../../utils/diagnosticsNavigation';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 import {useNavigationV2Enabled} from '../../utils/useNavigationV2Enabled';
 
@@ -340,7 +340,12 @@ export function TenantOverview({
     );
 
     const handleOpenMonitoring = () => {
-        handleTenantPageChange(TENANT_PAGES_IDS.diagnostics);
+        handleTenantPageChange(
+            getTenantPageForDiagnosticsTab(
+                TENANT_DIAGNOSTICS_TABS_IDS.monitoring,
+                isV2NavigationEnabled,
+            ),
+        );
         dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
     };
 
