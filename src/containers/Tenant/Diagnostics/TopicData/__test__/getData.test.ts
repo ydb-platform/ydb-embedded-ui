@@ -240,6 +240,80 @@ describe('prepareResponse', () => {
         expect(result.messages[3]).toEqual({Offset: 3, notLoaded: true});
         expect(result.messages[9]).toEqual({Offset: 9, notLoaded: true});
     });
+
+    test('does not mark messages as schematized without schema context (legacy base64 path)', () => {
+        const response: TopicDataResponse = {
+            StartOffset: '0',
+            EndOffset: '2',
+            Messages: [
+                {Offset: '0', Message: 'aGVsbG8='},
+                {Offset: '1', Message: 'd29ybGQ='},
+            ] as TopicMessage[],
+        };
+
+        const result = prepareResponse(response, 0);
+
+        // No SchemaPath → legacy shape, messages must stay untouched (no flag)
+        expect(result.messages[0]).toEqual({Offset: '0', Message: 'aGVsbG8='});
+        expect(result.messages[1]).toEqual({Offset: '1', Message: 'd29ybGQ='});
+    });
+
+    test('marks messages as schematized when response carries SchemaPath and no error', () => {
+        const response: TopicDataResponse = {
+            StartOffset: '0',
+            EndOffset: '2',
+            SchemaPath: '/Root/schema',
+            Messages: [
+                {Offset: '0', Message: 'hello'},
+                {Offset: '1', Message: {foo: 'bar'}},
+            ] as TopicMessage[],
+        };
+
+        const result = prepareResponse(response, 0);
+
+        expect(result.messages[0]).toEqual({Offset: '0', Message: 'hello', isSchematized: true});
+        expect(result.messages[1]).toEqual({
+            Offset: '1',
+            Message: {foo: 'bar'},
+            isSchematized: true,
+        });
+    });
+
+    test('does not mark a message as schematized when it has a per-message SchematizeError', () => {
+        const response: TopicDataResponse = {
+            StartOffset: '0',
+            EndOffset: '2',
+            SchemaPath: '/Root/schema',
+            Messages: [
+                {Offset: '0', Message: 'hello'},
+                {Offset: '1', Message: 'aGVsbG8=', SchematizeError: 'bad message'},
+            ] as TopicMessage[],
+        };
+
+        const result = prepareResponse(response, 0);
+
+        expect(result.messages[0]).toEqual({Offset: '0', Message: 'hello', isSchematized: true});
+        // This message failed schematization → stays legacy base64, no flag
+        expect(result.messages[1]).toEqual({
+            Offset: '1',
+            Message: 'aGVsbG8=',
+            SchematizeError: 'bad message',
+        });
+    });
+
+    test('does not mark messages as schematized when the whole response failed schematization', () => {
+        const response: TopicDataResponse = {
+            StartOffset: '0',
+            EndOffset: '1',
+            SchemaPath: '/Root/schema',
+            SchematizeError: 'schema registry error',
+            Messages: [{Offset: '0', Message: 'aGVsbG8='}] as TopicMessage[],
+        };
+
+        const result = prepareResponse(response, 0);
+
+        expect(result.messages[0]).toEqual({Offset: '0', Message: 'aGVsbG8='});
+    });
 });
 
 describe('generateTopicDataGetter', () => {

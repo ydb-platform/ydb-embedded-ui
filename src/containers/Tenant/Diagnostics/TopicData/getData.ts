@@ -55,10 +55,13 @@ export function prepareResponse(response: TopicDataResponse, offset: number) {
         ) {
             // A per-message schematization error means this particular message
             // stayed in its legacy base64 form even when a schema is present.
-            normalizedMessages.push({
-                ...currentMessage,
-                isSchematized: responseSchematized && !currentMessage.SchematizeError,
-            });
+            // Only attach the flag when the message is actually schematized so
+            // legacy messages keep their original shape.
+            if (responseSchematized && !currentMessage.SchematizeError) {
+                normalizedMessages.push({...currentMessage, isSchematized: true});
+            } else {
+                normalizedMessages.push(currentMessage);
+            }
             i++;
         } else {
             normalizedMessages.push({
