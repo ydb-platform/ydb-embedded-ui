@@ -67,6 +67,13 @@ export function TopicPreview({database, path, databaseFullPath}: PreviewContaine
         };
     }, [firstPartition]);
 
+    // A topic has an associated schema when the response carries schema context
+    // (`SchemaPath`). In that case messages are returned already schematized as
+    // JSON values (objects/arrays/primitives, including strings) and must not be
+    // base64-decoded. A failed schematization (`SchematizeError`) falls back to
+    // the legacy base64 shape.
+    const isResponseSchematized = Boolean(currentData?.SchemaPath) && !currentData?.SchematizeError;
+
     const renderResult = React.useCallback(() => {
         return (
             <Flex direction="column">
@@ -83,11 +90,14 @@ export function TopicPreview({database, path, databaseFullPath}: PreviewContaine
                     )}
                 </Flex>
                 {currentData && (
-                    <TopicPreviewTable messages={currentData.Messages?.toReversed() ?? []} />
+                    <TopicPreviewTable
+                        messages={currentData.Messages?.toReversed() ?? []}
+                        isSchematized={isResponseSchematized}
+                    />
                 )}
             </Flex>
         );
-    }, [offsetsRange, firstPartition, currentData]);
+    }, [offsetsRange, firstPartition, currentData, isResponseSchematized]);
 
     const offsetsQuantity =
         safeParseNumber(currentData?.EndOffset) - safeParseNumber(currentData?.StartOffset);
