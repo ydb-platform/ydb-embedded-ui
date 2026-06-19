@@ -53,11 +53,6 @@ jest.mock('../../YDBDefinitionList/YDBDefinitionList', () => ({
     YDBDefinitionList: ({footer}: {footer?: React.ReactNode}) => <div>{footer}</div>,
 }));
 
-const VDiskPopupWithClose = VDiskPopup as unknown as (props: {
-    data: PreparedVDisk;
-    onClose?: VoidFunction;
-}) => JSX.Element;
-
 describe('VDiskPopup', () => {
     test('closes the host popup after successful VDisk eviction', () => {
         const onClose = jest.fn();
@@ -73,7 +68,7 @@ describe('VDiskPopup', () => {
             },
         } as PreparedVDisk;
 
-        render(<VDiskPopupWithClose data={vDisk} onClose={onClose} />);
+        render(<VDiskPopup data={vDisk} onClose={onClose} />);
 
         fireEvent.click(screen.getByRole('button', {name: 'Evict VDisk'}));
 
