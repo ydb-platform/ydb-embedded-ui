@@ -8,10 +8,11 @@ import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/L
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {topTablesApi} from '../../../../../store/reducers/tenantOverview/executeTopTables/executeTopTables';
 import type {KeyValueRow} from '../../../../../types/api/query';
-import {formatBytes, getBytesSizeUnit} from '../../../../../utils/bytesParsers';
 import {TENANT_OVERVIEW_TABLES_SETTINGS} from '../../../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
+
+import {formatTenantStorageTableMetric} from './displayFormatters';
 
 interface TopTablesProps {
     database: string;
@@ -19,12 +20,12 @@ interface TopTablesProps {
 
 const TOP_TABLES_COLUMNS_WIDTH_LS_KEY = 'topTablesTableColumnsWidth';
 
-function getColumns(size: ReturnType<typeof getBytesSizeUnit>) {
+function getColumns() {
     const columns: Column<KeyValueRow>[] = [
         {
             name: 'Size',
             width: 100,
-            render: ({row}) => formatBytes({value: Number(row.Size), size, precision: 1}),
+            render: ({row}) => formatTenantStorageTableMetric(row.Size),
             align: DataTable.RIGHT,
         },
         {
@@ -51,8 +52,7 @@ export function TopTables({database}: TopTablesProps) {
     const loading = isFetching && currentData === undefined;
 
     const data = currentData?.resultSets?.[0]?.result || [];
-    const size = getBytesSizeUnit(data?.length ? Number(data[0].Size) : 0);
-    const columns = React.useMemo(() => getColumns(size), [size]);
+    const columns = React.useMemo(() => getColumns(), []);
 
     return (
         <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>

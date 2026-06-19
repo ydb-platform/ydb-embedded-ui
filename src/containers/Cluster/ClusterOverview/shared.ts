@@ -6,7 +6,6 @@ export interface ClusterMetricsBaseProps {
     warningThreshold?: number;
     dangerThreshold?: number;
     collapsed?: boolean;
-    percentPrecision?: number;
 }
 
 export interface ClusterMetricsCommonProps extends ClusterMetricsBaseProps {

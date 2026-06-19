@@ -1,9 +1,13 @@
 import type {BytesSizes} from '../../../../../utils/bytesParsers';
-import {getBytesSizeUnit, sizes} from '../../../../../utils/bytesParsers';
+import {sizes} from '../../../../../utils/bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatNumber, formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
 import type {FormatMetricBytesOptions} from '../../../../../utils/storageMetrics';
-import {formatMetricBytes} from '../../../../../utils/storageMetrics';
+import {
+    formatMetricBytes,
+    getConsistentMetricBytesSize,
+    getMetricBytesDisplaySize,
+} from '../../../../../utils/storageMetrics';
 import {parseOptionalNonNegativeNumber} from '../../../../../utils/utils';
 
 import i18n from './i18n';
@@ -41,13 +45,9 @@ function normalizeTenantStorageSummaryMetricUnit(unit: BytesSizes): TenantStorag
 export function getTenantStorageSummaryMetricUnit(
     values: Array<string | number | undefined>,
 ): TenantStorageSummaryMetricUnit {
-    const maxValue = values.reduce<number>((currentMax, value) => {
-        const numericValue = parseOptionalNonNegativeNumber(value);
-
-        return numericValue === undefined ? currentMax : Math.max(currentMax, numericValue);
-    }, 0);
-
-    return normalizeTenantStorageSummaryMetricUnit(getBytesSizeUnit(maxValue));
+    return normalizeTenantStorageSummaryMetricUnit(
+        getConsistentMetricBytesSize(values, TENANT_STORAGE_FORMAT_OPTIONS),
+    );
 }
 
 export function formatTenantStorageSummaryMetric(
@@ -93,7 +93,9 @@ export function getTenantStorageSegmentValueFormatters(values: Array<string | nu
     const maxValue = Math.max(...numericValues);
     const shouldUseMixedUnits =
         numericValues.length === 0 || maxValue / minValue >= MIXED_UNIT_RATIO_THRESHOLD;
-    const commonSize = shouldUseMixedUnits ? undefined : getBytesSizeUnit(maxValue);
+    const commonSize = shouldUseMixedUnits
+        ? undefined
+        : getMetricBytesDisplaySize(maxValue, TENANT_STORAGE_FORMAT_OPTIONS);
     const getLegendSize = (value?: string | number) => {
         const numericValue = parseOptionalNonNegativeNumber(value);
 
@@ -101,7 +103,7 @@ export function getTenantStorageSegmentValueFormatters(values: Array<string | nu
             return undefined;
         }
 
-        return commonSize ?? getBytesSizeUnit(numericValue);
+        return commonSize ?? getMetricBytesDisplaySize(numericValue, TENANT_STORAGE_FORMAT_OPTIONS);
     };
 
     return {
@@ -122,8 +124,8 @@ export function getTenantStorageLegendValueFormatter(values: Array<string | numb
     return getTenantStorageSegmentValueFormatters(values).formatLegendValue;
 }
 
-export function formatTenantStorageTableMetric(value?: string | number) {
-    return formatTenantStorageAdaptiveMetric(value);
+export function formatTenantStorageTableMetric(value?: string | number | null) {
+    return formatByteMetric(value ?? undefined);
 }
 
 export function formatOverheadValue(value?: number) {

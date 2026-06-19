@@ -25,7 +25,7 @@ const GROUPED_USER_DATA_SUMMARY_CARD_QA = 'tenant-storage-grouped-user-data-summ
 const GROUPED_PHYSICAL_SUMMARY_CARD_QA = 'tenant-storage-grouped-physical-summary-card';
 const STORAGE_SCREENSHOT_THEMES = ['light', 'dark'] as const;
 const STORAGE_SCREENSHOT_VIEWPORT = {width: 1600, height: 1000};
-const EXACT_COLUMN_TABLE_TOOLTIP_REGEXP = /2\s244\.6\sMB/;
+const EXACT_COLUMN_TABLE_TOOLTIP_REGEXP = /2\s245\sMB/;
 const NO_DATA_TEXT = 'No data';
 const QUOTA_MISSING_TITLE = 'No quota? This is wrong.';
 const QUOTA_MISSING_DESCRIPTION =
@@ -632,7 +632,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
                 physicalSummary
                     .locator(LEGEND_ITEM_SELECTOR)
                     .filter({hasText: 'System'})
-                    .getByText('245.6 MB', {exact: true}),
+                    .getByText('246 MB', {exact: true}),
             ).toBeVisible();
             await expect(
                 physicalSummary

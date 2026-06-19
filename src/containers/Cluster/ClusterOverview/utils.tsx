@@ -21,12 +21,15 @@ function calculateFillWidth(value: number, capacity: number) {
     return (value / capacity) * 100;
 }
 
+function getOverviewMetricPercentPrecision(fillWidth: number) {
+    return fillWidth > 0 && fillWidth < 1 ? 1 : 0;
+}
+
 export function calculateBaseDiagramValues({
     colorizeProgress = true,
     warningThreshold,
     dangerThreshold,
     fillWidth,
-    percentPrecision,
 }: ClusterMetricsBaseProps & {fillWidth: number}) {
     const normalizedFillWidth = Math.max(fillWidth, 0.5);
     const status = calculateProgressStatus({
@@ -36,7 +39,7 @@ export function calculateBaseDiagramValues({
         colorizeProgress,
     });
 
-    const percents = formatPercent(fillWidth / 100, percentPrecision);
+    const percents = formatPercent(fillWidth / 100, getOverviewMetricPercentPrecision(fillWidth));
 
     return {status, percents, fill: normalizedFillWidth};
 }

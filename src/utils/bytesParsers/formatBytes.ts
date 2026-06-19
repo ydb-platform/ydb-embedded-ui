@@ -33,6 +33,7 @@ export const sizes = {
 } as const;
 
 export type BytesSizes = keyof typeof sizes;
+export const bytesSizes = Object.keys(sizes) as BytesSizes[];
 
 export const getBytesSizeUnit = (value: number) => {
     let size: BytesSizes = 'b';

@@ -1,7 +1,7 @@
 import {Link} from 'react-router-dom';
 
-import {formatBytes} from '../../../../../../utils/bytesParsers/formatBytes';
 import {cn} from '../../../../../../utils/cn';
+import {formatNetworkMetric} from '../../../../../../utils/metrics/formatMetricLegend';
 import {UtilizationTabCard} from '../../TabCard/UtilizationTabCard';
 import i18n from '../../i18n';
 
@@ -18,7 +18,7 @@ interface NetworkTabProps {
 
 export function NetworkTab({to, active, networkUtilization, networkThroughput}: NetworkTabProps) {
     const fillPercent = networkUtilization * 100;
-    const legendText = formatBytes({value: networkThroughput, withSpeedLabel: true});
+    const legendText = formatNetworkMetric(networkThroughput);
 
     return (
         <div className={b('link-container', {active})}>

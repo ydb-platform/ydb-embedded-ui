@@ -7,6 +7,7 @@ import {HOUR_IN_SECONDS, UNBREAKABLE_GAP} from '../constants';
 import {configuredNumeral} from '../numeral';
 import {isNumeric} from '../utils';
 
+import type {FormatValuesPrecision} from './common';
 import {formatValues} from './common';
 import {formatNumberWithDigits, getNumberSizeUnit} from './formatNumber';
 import type {Digits} from './formatNumber';
@@ -144,6 +145,7 @@ export function formatStorageValues(
     size?: BytesSizes,
     delimiter?: string,
     withValueLabel?: boolean,
+    precision?: FormatValuesPrecision,
 ) {
     return formatValues<BytesSizes>(
         formatBytesCustom,
@@ -153,6 +155,7 @@ export function formatStorageValues(
         size,
         delimiter,
         withValueLabel,
+        precision,
     );
 }
 

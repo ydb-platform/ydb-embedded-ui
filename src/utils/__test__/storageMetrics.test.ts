@@ -3,6 +3,8 @@ import {
     formatMetricBytes,
     formatMetricPercent,
     getConsistentMetricBytesSize,
+    getConvertedMetricBytesDecimalPlaces,
+    getMetricBytesDisplaySize,
 } from '../storageMetrics';
 
 describe('storageMetrics', () => {
@@ -10,8 +12,29 @@ describe('storageMetrics', () => {
         expect(getConsistentMetricBytesSize([521_000_000, 1_230_000_000, 410_000_000])).toBe('gb');
     });
 
+    test('getConsistentMetricBytesSize accounts for rounded display unit boundaries', () => {
+        expect(getConsistentMetricBytesSize([200_000_000, 999_600_000])).toBe('gb');
+        expect(getConsistentMetricBytesSize([200_000_000_000, 999_960_000_000])).toBe('tb');
+    });
+
+    test('getMetricBytesDisplaySize accounts for rounded display unit boundaries', () => {
+        expect(getMetricBytesDisplaySize(999_600_000)).toBe('gb');
+        expect(getMetricBytesDisplaySize(999_960_000_000)).toBe('tb');
+    });
+
     test('formatMetricBytes keeps related values in the provided shared unit', () => {
         expect(formatMetricBytes(521_000_000, 'gb')).toBe(`0.52${UNBREAKABLE_GAP}GB`);
+    });
+
+    test('formatMetricBytes rolls automatic size over when rounded value reaches the next unit', () => {
+        expect(formatMetricBytes(999_600_000)).toBe(`1${UNBREAKABLE_GAP}GB`);
+        expect(formatMetricBytes(999_960_000_000)).toBe(`1${UNBREAKABLE_GAP}TB`);
+    });
+
+    test('formatMetricBytes keeps explicit shared size at the requested unit boundary', () => {
+        expect(formatMetricBytes(999_600_000, 'mb')).toBe(
+            `1${UNBREAKABLE_GAP}000${UNBREAKABLE_GAP}MB`,
+        );
     });
 
     test('formatMetricBytes supports custom precision for shared unit formatting', () => {
@@ -21,6 +44,14 @@ describe('storageMetrics', () => {
         expect(formatMetricBytes(123.4, 'b', {bytesDecimalPlaces: 0})).toBe(
             `123${UNBREAKABLE_GAP}B`,
         );
+    });
+
+    test('getConvertedMetricBytesDecimalPlaces returns precision for metric byte formatting', () => {
+        expect(getConvertedMetricBytesDecimalPlaces('tb', 0.521)).toBe(2);
+        expect(getConvertedMetricBytesDecimalPlaces('tb', 3.45)).toBe(2);
+        expect(getConvertedMetricBytesDecimalPlaces('tb', 6)).toBe(2);
+        expect(getConvertedMetricBytesDecimalPlaces('gb', 1.2)).toBe(1);
+        expect(getConvertedMetricBytesDecimalPlaces('gb', 1)).toBe(0);
     });
 
     test('formatMetricBytes keeps default precision when coarse approximate rounding is disabled', () => {

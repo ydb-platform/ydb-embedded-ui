@@ -13,6 +13,11 @@ export type FormatValuesArgs<T> = Omit<FormatToSizeArgs<T>, 'value'> & {
     delimiter?: string;
 };
 
+export interface FormatValuesPrecision {
+    total?: number;
+    value?: number;
+}
+
 export function formatValues<T>(
     formatter: (args: FormatValuesArgs<T>) => string,
     sizeGetter: (value: number) => T,
@@ -21,15 +26,16 @@ export function formatValues<T>(
     size?: T,
     delimiter?: string,
     withValueLabel = false,
+    precision?: FormatValuesPrecision,
 ) {
     let calculatedSize = sizeGetter(Number(value));
     let valueWithSizeLabel = true;
-    let valuePrecision = 0;
+    let valuePrecision = precision?.value ?? 0;
 
     if (isNumeric(total)) {
         calculatedSize = sizeGetter(Number(total));
         valueWithSizeLabel = withValueLabel;
-        valuePrecision = 1;
+        valuePrecision = precision?.value ?? 1;
     }
 
     const formattedValue = formatter({
@@ -42,6 +48,7 @@ export function formatValues<T>(
     const formattedTotal = formatter({
         value: total,
         size: size || calculatedSize,
+        precision: precision?.total,
         delimiter,
     });
 
