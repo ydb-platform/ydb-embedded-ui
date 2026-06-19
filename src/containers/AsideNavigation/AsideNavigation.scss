@@ -1,4 +1,14 @@
 .kv-navigation {
+    &__content {
+        position: relative;
+
+        display: flex;
+        overflow: auto;
+        flex-direction: column;
+
+        height: 100%;
+    }
+
     &__internal-user {
         display: flex;
         justify-content: space-between;

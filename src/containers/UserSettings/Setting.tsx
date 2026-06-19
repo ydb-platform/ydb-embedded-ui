@@ -29,6 +29,7 @@ export interface SettingProps {
 
 export const Setting = ({
     type = 'switch',
+    title,
     settingKey,
     options,
     defaultValue,
@@ -47,7 +48,12 @@ export const Setting = ({
     switch (type) {
         case 'switch': {
             return (
-                <Switch checked={Boolean(displayedValue)} onUpdate={onUpdate} disabled={disabled} />
+                <Switch
+                    checked={Boolean(displayedValue)}
+                    onUpdate={onUpdate}
+                    disabled={disabled}
+                    controlProps={{'aria-label': title}}
+                />
             );
         }
 
@@ -61,6 +67,7 @@ export const Setting = ({
                     value={String(displayedValue)}
                     onUpdate={onUpdate}
                     disabled={disabled}
+                    aria-label={title}
                 >
                     {options.map(({value, content}) => {
                         return (

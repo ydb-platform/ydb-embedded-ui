@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type {MakeItemParams, MenuItem} from '@gravity-ui/navigation';
+import type {AsideHeaderItem, MakeItemParams} from '@gravity-ui/navigation';
 import {Alert, Popover} from '@gravity-ui/uikit';
 import {useRouteMatch} from 'react-router-dom';
 
@@ -82,7 +82,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
             // span2: wrapper with additional background and animation
             // span3: styling-only wrapper for active/hover colors.
             //   The actual interactive element is the <a> produced by makeItem
-            //   (because we pass `link` on the MenuItem), so we don't wrap it in
+            //   (because we pass `href` on the AsideHeaderItem), so we don't wrap it in
             //   another <a>/button — that would create nested interactive content.
             return (
                 <span className={b('nav-item-wrapper')}>
@@ -96,7 +96,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
         };
 
         return tenantNavigationItems.map((item) => {
-            // makeItem renders the inner element as <a href={item.link}> when `link`
+            // makeItem renders the inner element as <a href={item.href}> when `href`
             // is set, which gives us real link semantics for free (hover preview,
             // cmd+click → open in new tab, copy link address, right-click menu).
             // The onItemClick handler still fires on every primary click and lets us
@@ -104,7 +104,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
             // For modifier/middle-clicks we bail out so the browser handles the
             // anchor natively without our SPA handler also switching the current page.
             const handleItemClick = (
-                _menuItem: MenuItem,
+                _menuItem: AsideHeaderItem,
                 _collapsed: boolean,
                 event: React.MouseEvent<HTMLElement>,
             ) => {
@@ -115,12 +115,12 @@ export function Navigation({children, userSettings}: NavigationProps) {
                 item.onForward();
             };
 
-            const navigationItem: MenuItem = {
+            const navigationItem: AsideHeaderItem = {
                 id: item.id,
                 title: item.title,
                 icon: item.icon,
                 current: item.current,
-                link: item.path,
+                href: item.path,
                 onItemClick: handleItemClick,
                 tooltipText: item.title,
                 itemWrapper: (params, makeItem, options) => {

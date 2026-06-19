@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
 
 import {PageModel} from '../../models/PageModel';
-import {database} from '../../utils/constants';
+import {backend, database} from '../../utils/constants';
 import {toggleExperiment} from '../../utils/toggleExperiment';
 import {TenantPage} from '../tenant/TenantPage';
 
@@ -10,7 +10,7 @@ import {Sidebar} from './Sidebar';
 test.describe('Test Sidebar', async () => {
     test.beforeEach(async ({page}) => {
         const basePage = new PageModel(page);
-        const response = await basePage.goto();
+        const response = await basePage.goto({backend});
         expect(response?.ok()).toBe(true);
     });
 
@@ -115,6 +115,7 @@ test.describe('Test Sidebar', async () => {
         const pageQueryParams = {
             schema: database,
             database,
+            backend,
             tenantPage: 'query',
         };
 
@@ -183,5 +184,73 @@ test.describe('Test Sidebar', async () => {
         await sidebar.clickExperimentsSection();
         const finalState = await sidebar.isExperimentEnabled(experimentTitle);
         expect(finalState).toBe(false);
+    });
+
+    test('Tenant V2 navigation item uses SPA navigation on regular click', async ({page}) => {
+        await page.addInitScript(() => {
+            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
+            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: database,
+            database,
+            backend,
+            databasePage: 'query',
+        });
+
+        const diagnosticsLink = page
+            .getByTestId('aside-navigation')
+            .locator('a[href*="databasePage=diagnostics"]')
+            .first();
+        await expect(diagnosticsLink).toBeVisible();
+        await expect(diagnosticsLink).toHaveAttribute('href', /databasePage=diagnostics/);
+
+        await diagnosticsLink.click();
+        await expect(page).toHaveURL(/databasePage=diagnostics/);
+        await tenantPage.isDiagnosticsVisible();
+    });
+
+    test('Tenant V2 navigation href keeps browser-native modified-click behavior', async ({
+        page,
+        context,
+        browserName,
+    }) => {
+        test.skip(
+            browserName !== 'chromium',
+            'Middle-click popup behavior is asserted in Chromium',
+        );
+
+        await page.addInitScript(() => {
+            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
+            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: database,
+            database,
+            backend,
+            databasePage: 'query',
+        });
+
+        const diagnosticsLink = page
+            .getByTestId('aside-navigation')
+            .locator('a[href*="databasePage=diagnostics"]')
+            .first();
+        await expect(diagnosticsLink).toBeVisible();
+
+        const currentUrl = page.url();
+        const newPagePromise = context.waitForEvent('page');
+        await diagnosticsLink.click({
+            modifiers: [process.platform === 'darwin' ? 'Meta' : 'Control'],
+        });
+        const newPage = await newPagePromise;
+
+        await expect.poll(() => newPage.url()).toContain('databasePage=diagnostics');
+        expect(page.url()).toBe(currentUrl);
+
+        await newPage.close();
     });
 });

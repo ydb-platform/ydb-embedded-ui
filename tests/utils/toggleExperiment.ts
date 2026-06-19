@@ -18,7 +18,6 @@ export const toggleExperiment = async (page: Page, state: 'on' | 'off', title: s
     }
 
     if (await sidebar.isDrawerVisible()) {
-        await sidebar.clickSettings();
-        await page.waitForTimeout(500); // Wait for animation
+        await sidebar.closeDrawer();
     }
 };
