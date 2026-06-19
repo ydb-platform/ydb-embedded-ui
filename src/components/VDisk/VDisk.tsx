@@ -62,7 +62,7 @@ export const VDisk = ({
             showPopup={showPopup}
             onShowPopup={onShowPopup}
             onHidePopup={onHidePopup}
-            renderPopupContent={() => <VDiskPopup data={data} />}
+            renderPopupContent={({onClose}) => <VDiskPopup data={data} onClose={onClose} />}
             offset={popupOffset}
             delayClose={delayClose}
             delayOpen={delayOpen}

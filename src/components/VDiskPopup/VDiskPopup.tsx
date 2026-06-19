@@ -428,9 +428,10 @@ const prepareHeaderLabels = (data: PreparedVDisk): YDBDefinitionListHeaderLabel[
 
 interface VDiskPopupProps {
     data: PreparedVDisk | UnavailableDonor;
+    onClose?: VoidFunction;
 }
 
-export const VDiskPopup = ({data}: VDiskPopupProps) => {
+export const VDiskPopup = ({data, onClose}: VDiskPopupProps) => {
     const dispatch = useTypedDispatch();
     const isFullData = isFullVDiskData(data);
     const isViewerUser = useIsViewerUser();
@@ -459,7 +460,8 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
                 },
             ]),
         );
-    }, [dispatch, data, isFullData]);
+        onClose?.();
+    }, [dispatch, data, isFullData, onClose]);
 
     const vdiskHeaderLabels: YDBDefinitionListHeaderLabel[] = React.useMemo(
         () => (isFullData ? prepareHeaderLabels(data) : []),

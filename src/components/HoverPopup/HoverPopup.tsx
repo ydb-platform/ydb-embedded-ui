@@ -10,7 +10,7 @@ const DEBOUNCE_TIMEOUT = 100;
 
 type HoverPopupProps = {
     children: React.ReactNode;
-    renderPopupContent: () => React.ReactNode;
+    renderPopupContent: (controls: {onClose: VoidFunction}) => React.ReactNode;
     showPopup?: boolean;
     anchorRef?: React.RefObject<HTMLElement>;
     onShowPopup?: VoidFunction;
@@ -42,8 +42,8 @@ export const HoverPopup = ({
     const reportedOpenRef = React.useRef(false);
 
     const reportOpen = React.useCallback(
-        (nextOpen: boolean) => {
-            if (reportedOpenRef.current === nextOpen) {
+        (nextOpen: boolean, force = false) => {
+            if (!force && reportedOpenRef.current === nextOpen) {
                 return;
             }
 
@@ -80,6 +80,15 @@ export const HoverPopup = ({
         [delayClose, reportOpen, hidePopup],
     );
 
+    const closePopup = React.useCallback(() => {
+        debouncedHandleShowPopup.cancel();
+        debouncedHandleHidePopup.cancel();
+        setIsPopupVisible(false);
+        setIsPopupContentHovered(false);
+        setIsFocused(false);
+        reportOpen(false, true);
+    }, [debouncedHandleHidePopup, debouncedHandleShowPopup, reportOpen]);
+
     const onMouseEnter = () => {
         debouncedHandleHidePopup.cancel();
         debouncedHandleShowPopup();
@@ -111,11 +120,8 @@ export const HoverPopup = ({
     }, []);
 
     const onPopupEscapeKeyDown = React.useCallback(() => {
-        setIsFocused(false);
-        setIsPopupContentHovered(false);
-        hidePopup();
-        reportOpen(false);
-    }, [hidePopup, reportOpen]);
+        closePopup();
+    }, [closePopup]);
 
     const internalOpen = isPopupVisible || isPopupContentHovered || isFocused;
     const open = internalOpen || showPopup;
@@ -150,7 +156,9 @@ export const HoverPopup = ({
                         onMouseLeave={onPopupMouseLeave}
                         onBlur={onPopupBlur}
                     >
-                        <div className={YDB_POPOVER_CLASS_NAME}>{renderPopupContent()}</div>
+                        <div className={YDB_POPOVER_CLASS_NAME}>
+                            {renderPopupContent({onClose: closePopup})}
+                        </div>
                     </div>
                 </Popup>
             ) : null}
