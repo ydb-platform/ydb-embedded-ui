@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ArrowDownToLine} from '@gravity-ui/icons';
 import {ActionTooltip, Alert, Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {JsonViewer} from '../../../../../../components/JsonViewer/JsonViewer';
 import ShortyString from '../../../../../../components/ShortyString/ShortyString';
@@ -33,6 +34,10 @@ export function TopicMessage({
 }: TopicMessageProps) {
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const sectionScrollRef = React.useRef<HTMLDivElement>(null);
+
+    // The message may be absent while a schematization error is still present
+    // (error-only rows). In that case we render the alerts but no content/toolbar.
+    const hasMessage = !isNil(message);
 
     const {preparedMessage, decodedMessage, isJson} = React.useMemo(() => {
         // When a topic has an associated schema, the backend returns the message
@@ -78,29 +83,39 @@ export function TopicMessage({
         return {preparedMessage, decodedMessage, isJson};
     }, [message, size]);
 
-    const messageContent = isJson ? (
-        <JsonViewer
-            // key is used to reset JsonViewer state to collapsed due to performance issues on close fullscreen mode if nodes quantity is big enough https://github.com/ydb-platform/ydb-embedded-ui/issues/2265
-            key={String(isFullscreen)}
-            collapsedInitially
-            value={preparedMessage}
-            toolbarClassName={b('json-viewer-toolbar')}
-            scrollContainerRef={sectionScrollRef}
-        />
-    ) : (
-        <div className={b('string-message')}>
-            {/* key is used to reset string's state when toggle fullscreen: otherwise if very long string is expanded, it may be performance issues on open fullscreen mode https://github.com/ydb-platform/ydb-embedded-ui/issues/2265  */}
-            <ShortyString
-                key={String(isFullscreen)}
-                value={
-                    typeof preparedMessage === 'string'
-                        ? preparedMessage
-                        : JSON.stringify(preparedMessage)
-                }
-                limit={2000}
-            />
-        </div>
-    );
+    const renderMessageContent = () => {
+        if (!hasMessage) {
+            return null;
+        }
+
+        if (isJson) {
+            return (
+                <JsonViewer
+                    // key is used to reset JsonViewer state to collapsed due to performance issues on close fullscreen mode if nodes quantity is big enough https://github.com/ydb-platform/ydb-embedded-ui/issues/2265
+                    key={String(isFullscreen)}
+                    collapsedInitially
+                    value={preparedMessage}
+                    toolbarClassName={b('json-viewer-toolbar')}
+                    scrollContainerRef={sectionScrollRef}
+                />
+            );
+        }
+
+        return (
+            <div className={b('string-message')}>
+                {/* key is used to reset string's state when toggle fullscreen: otherwise if very long string is expanded, it may be performance issues on open fullscreen mode https://github.com/ydb-platform/ydb-embedded-ui/issues/2265  */}
+                <ShortyString
+                    key={String(isFullscreen)}
+                    value={
+                        typeof preparedMessage === 'string'
+                            ? preparedMessage
+                            : JSON.stringify(preparedMessage)
+                    }
+                    limit={2000}
+                />
+            </div>
+        );
+    };
 
     const renderToolbar = () => {
         return (
@@ -129,7 +144,7 @@ export function TopicMessage({
     return (
         <TopicDataSection
             title={<MessageTitle truncated={truncated} />}
-            renderToolbar={renderToolbar}
+            renderToolbar={hasMessage ? renderToolbar : undefined}
             className={b('message')}
             scrollContainerRef={sectionScrollRef}
         >
@@ -148,7 +163,7 @@ export function TopicMessage({
                     view="outlined"
                 />
             )}
-            {messageContent}
+            {renderMessageContent()}
         </TopicDataSection>
     );
 }

@@ -87,17 +87,22 @@ export function TopicMessageDetails({
 
     const renderMessage = () => {
         const message = messageDetails?.Message;
+        const generalSchematizeError = currentData?.SchematizeError;
+        const messageSchematizeError = messageDetails?.SchematizeError;
 
-        if (!message) {
+        // Render the section whenever there is a message OR a schematization
+        // error to report. Use isNil instead of a broad falsy check so valid
+        // falsy schematized values (0, false, '') are not dropped.
+        if (isNil(message) && !generalSchematizeError && !messageSchematizeError) {
             return null;
         }
         return (
             <TopicMessage
                 message={message}
-                offset={messageDetails.Offset}
-                size={messageDetails.OriginalSize}
-                generalSchematizeError={currentData?.SchematizeError}
-                messageSchematizeError={messageDetails.SchematizeError}
+                offset={messageDetails?.Offset}
+                size={messageDetails?.OriginalSize}
+                generalSchematizeError={generalSchematizeError}
+                messageSchematizeError={messageSchematizeError}
             />
         );
     };
