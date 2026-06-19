@@ -17,6 +17,9 @@ interface UsageTabCardProps {
     value: number;
     limit: number;
     legendFormatter: (params: {value: number; capacity: number}) => string;
+    // Overrides the threshold above which the doughnut turns "danger" (red).
+    // Pass Infinity to keep warning (yellow) but never colorize as danger on overflow.
+    dangerThreshold?: number;
 }
 
 function UsageCardContainer({active, children}: {active?: boolean; children: React.ReactNode}) {
@@ -40,10 +43,17 @@ export function UsageTabCard({
     helpText,
     legendFormatter,
     active,
+    dangerThreshold,
 }: UsageTabCardProps) {
     const diagram = React.useMemo(
-        () => getDiagramValues({value, capacity: limit, legendFormatter}),
-        [value, limit, legendFormatter],
+        () =>
+            getDiagramValues({
+                value,
+                capacity: limit,
+                legendFormatter,
+                dangerThreshold,
+            }),
+        [value, limit, legendFormatter, dangerThreshold],
     );
 
     const {status, percents, legend, fill} = diagram;

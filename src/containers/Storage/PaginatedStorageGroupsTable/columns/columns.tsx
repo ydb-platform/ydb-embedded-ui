@@ -134,7 +134,7 @@ const usageColumn: StorageGroupsColumn = {
         return isNil(row.Usage) ? (
             EMPTY_DATA_PLACEHOLDER
         ) : (
-            <UsageLabel value={Math.floor(row.Usage)} theme={getUsageSeverity(row.Usage)} />
+            <UsageLabel value={Math.floor(row.Usage)} theme="normal" />
         );
     },
     align: DataTable.LEFT,

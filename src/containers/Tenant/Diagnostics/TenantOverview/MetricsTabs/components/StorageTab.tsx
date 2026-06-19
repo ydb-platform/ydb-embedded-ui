@@ -57,6 +57,9 @@ export function StorageTab({
                         legendFormatter={formatStorageLegend}
                         active={active}
                         helpText={i18n('context_storage-description')}
+                        // Keep the doughnut at warning (yellow) on overflow,
+                        // but never colorize it as danger (red).
+                        dangerThreshold={Infinity}
                     />
                 )}
             </Link>
