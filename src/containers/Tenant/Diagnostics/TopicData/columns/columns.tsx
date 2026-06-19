@@ -327,7 +327,7 @@ export function TopicDataTsDiff({
 }
 
 interface TopicDataMessageProps {
-    message?: string | object;
+    message?: string | unknown;
     size?: number;
     messageSchematizeError?: string;
 }
@@ -365,22 +365,25 @@ export function TopicDataMessage({message, size, messageSchematizeError}: TopicD
     }
 
     // When a topic has an associated schema, the backend returns the message
-    // already schematized as an object/array, otherwise it's a base64 string.
-    // Always render a string so rendering an object doesn't throw React error #31.
+    // already schematized as a JSON value (object/array), otherwise it's a
+    // base64 string
     let messageToRender: string;
-    if (typeof message === 'object') {
-        try {
-            messageToRender = JSON.stringify(message);
-        } catch (e) {
-            console.warn(e);
-            messageToRender = String(message);
-        }
-    } else {
+    let invalid = false;
+    if (typeof message === 'string') {
         messageToRender = message;
         try {
             messageToRender = atob(message);
         } catch (e) {
             console.warn(e);
+            messageToRender = i18n('description_failed-decode');
+            invalid = true;
+        }
+    } else {
+        try {
+            messageToRender = JSON.stringify(message);
+        } catch (e) {
+            console.warn(e);
+            messageToRender = String(message);
         }
     }
 
@@ -392,7 +395,12 @@ export function TopicDataMessage({message, size, messageSchematizeError}: TopicD
     return (
         <span className={b('message-wrapper')}>
             {errorIcon}
-            <Text variant="body-2" className={b('message')} title={title}>
+            <Text
+                variant="body-2"
+                color={invalid ? 'secondary' : 'primary'}
+                className={b('message', {invalid})}
+                title={title}
+            >
                 {messageToRender}
                 {truncated && (
                     <Text color="secondary" className={b('truncated')}>

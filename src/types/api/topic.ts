@@ -258,9 +258,14 @@ export interface TopicMessage {
     TimestampDiff?: string;
 
     /**
-     * Message content
+     * Message content.
+     *
+     * Usually a base64-encoded string. When the topic has an associated schema,
+     * the new handler returns the message already schematized as a JSON value
+     * (object/array/primitive), so consumers must narrow before using
+     * string-only APIs like `atob`.
      */
-    Message?: string;
+    Message?: string | unknown;
 
     /**
      * Error produced while trying to schematize this message

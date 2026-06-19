@@ -4,6 +4,7 @@ import {isNil} from 'lodash';
 import type {TopicMessage} from '../../../../../../types/api/topic';
 import type {ValueOf} from '../../../../../../types/common';
 import {formatTimestamp} from '../../../../../../utils/dataFormatters/dataFormatters';
+import i18n from '../../i18n';
 import {TOPIC_DATA_COLUMNS_IDS} from '../../utils/types';
 import {b} from '../shared';
 
@@ -47,9 +48,9 @@ const dataGroups: MessageInfoField[][] = [
 ];
 
 const schemaInfoFields: {name: keyof SchemaInfo; header: string}[] = [
-    {name: 'ProtoMessageName', header: 'ProtoMessageName'},
-    {name: 'Protoseq', header: 'Protoseq'},
-    {name: 'SchemaPath', header: 'SchemaPath'},
+    {name: 'ProtoMessageName', header: i18n('label_proto-message-name')},
+    {name: 'Protoseq', header: i18n('label_protoseq')},
+    {name: 'SchemaPath', header: i18n('label_schema-path')},
 ];
 
 interface TopicMessageGeneralInfoProps {

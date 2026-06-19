@@ -17,7 +17,7 @@ const UNIPIKA_MAX_SIZE = 1_000_000;
 const utf8Decoder = new TextDecoder('utf-8');
 
 interface TopicMessageProps {
-    message: string;
+    message: string | unknown;
     offset?: string | number;
     size?: number;
     generalSchematizeError?: string;
@@ -35,9 +35,15 @@ export function TopicMessage({
     const sectionScrollRef = React.useRef<HTMLDivElement>(null);
 
     const {preparedMessage, decodedMessage, isJson} = React.useMemo(() => {
-        let preparedMessage = message;
-        let decodedMessage = message;
-        if (typeof decodedMessage === 'string') {
+        // When a topic has an associated schema, the backend returns the message
+        // already schematized as a JSON value (object/array). Otherwise it is a
+        // base64 string that we decode and try to parse as JSON.
+        let preparedMessage: string | unknown = message;
+        // decodedMessage is always a string, suitable for download/clipboard.
+        let decodedMessage: string =
+            typeof message === 'string' ? message : JSON.stringify(message, null, 2);
+
+        if (typeof message === 'string') {
             try {
                 const binary = atob(message);
                 const bytes = new Uint8Array(binary.length);
@@ -84,7 +90,15 @@ export function TopicMessage({
     ) : (
         <div className={b('string-message')}>
             {/* key is used to reset string's state when toggle fullscreen: otherwise if very long string is expanded, it may be performance issues on open fullscreen mode https://github.com/ydb-platform/ydb-embedded-ui/issues/2265  */}
-            <ShortyString key={String(isFullscreen)} value={preparedMessage} limit={2000} />
+            <ShortyString
+                key={String(isFullscreen)}
+                value={
+                    typeof preparedMessage === 'string'
+                        ? preparedMessage
+                        : JSON.stringify(preparedMessage)
+                }
+                limit={2000}
+            />
         </div>
     );
 
