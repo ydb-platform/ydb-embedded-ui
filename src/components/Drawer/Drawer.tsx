@@ -82,24 +82,9 @@ const DrawerPaneContentWrapper = ({
         return drawerWidth || DEFAULT_DRAWER_WIDTH;
     }, [containerWidth, isPercentageWidth, drawerWidth]);
 
-    const drawerOverlayStyle = React.useMemo<React.CSSProperties>(
-        () =>
-            containerWidth > 0
-                ? {
-                      position: 'absolute',
-                      top: 0,
-                      bottom: 0,
-                      left: 0,
-                      right: 'auto',
-                      width: containerWidth,
-                      overflow: 'hidden',
-                  }
-                : {
-                      position: 'absolute',
-                      overflow: 'hidden',
-                  },
-        [containerWidth],
-    );
+    const drawerOverlayStyle = React.useMemo<React.CSSProperties | undefined>(() => {
+        return containerWidth > 0 ? {width: containerWidth} : undefined;
+    }, [containerWidth]);
 
     React.useEffect(() => {
         if (!detectClickOutside || !isVisible) {

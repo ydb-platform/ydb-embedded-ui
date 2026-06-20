@@ -151,7 +151,7 @@ export class Sidebar {
     }
 
     async isDrawerVisible() {
-        return (await this.getSettingsRoot().isVisible()) || (await this.drawer.isVisible());
+        return this.getSettingsRoot().isVisible();
     }
 
     async getDrawerMenuItems(): Promise<string[]> {
@@ -189,7 +189,7 @@ export class Sidebar {
     }
 
     async closeDrawer(): Promise<void> {
-        await this.drawer.page().keyboard.press('Escape');
+        await this.page.keyboard.press('Escape');
         await this.getSettingsRoot().waitFor({state: 'hidden'});
     }
 
