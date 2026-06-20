@@ -55,9 +55,11 @@ export const UserSettings = ({settings: userSettings}: UserSettingsProps) => {
                                                     {...rest}
                                                 >
                                                     <Setting {...setting} />
-                                                    <Text color="secondary" as="div">
-                                                        {description}
-                                                    </Text>
+                                                    {description ? (
+                                                        <Text color="secondary" as="div">
+                                                            {description}
+                                                        </Text>
+                                                    ) : null}
                                                 </Settings.Item>
                                             );
                                         })}

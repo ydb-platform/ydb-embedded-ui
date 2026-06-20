@@ -110,7 +110,7 @@ test.describe('Test Sidebar', async () => {
         await sidebar.clickAccount();
     });
 
-    test('Pressing Ctrl+K in editor page opens hotkeys panel', async ({page}) => {
+    test('Pressing hotkeys shortcut in editor page opens hotkeys panel', async ({page}) => {
         // Open editor page
         const pageQueryParams = {
             schema: database,
@@ -129,9 +129,7 @@ test.describe('Test Sidebar', async () => {
         // Initially hotkeys panel should not be visible
         await expect(sidebar.isHotkeysPanelVisible()).resolves.toBe(false);
 
-        // Press Ctrl+K to open hotkeys panel
-        await page.keyboard.press('Control+k');
-        await page.waitForTimeout(1000); // Wait for animation
+        await sidebar.openHotkeysPanelWithShortcut();
 
         // Check if hotkeys panel is visible and has the title
         await expect(sidebar.isHotkeysPanelVisible()).resolves.toBe(true);

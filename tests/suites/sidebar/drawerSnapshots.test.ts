@@ -52,19 +52,6 @@ async function gotoClusterDatabases(page: Page) {
     expect(response?.ok()).toBe(true);
 }
 
-async function openHotkeysWithShortcut(page: Page, hotkeysPanel: Locator) {
-    await page.keyboard.press('Control+k');
-
-    try {
-        await hotkeysPanel.waitFor({state: 'visible', timeout: 1000});
-        return;
-    } catch {
-        await page.keyboard.press('Meta+k');
-    }
-
-    await hotkeysPanel.waitFor({state: 'visible'});
-}
-
 test.describe('Drawer visual snapshots', () => {
     test.skip(
         ({browserName}) => browserName !== 'chromium' || process.platform !== 'darwin',
@@ -128,7 +115,7 @@ test.describe('Drawer visual snapshots', () => {
         const sidebar = new Sidebar(page);
         const hotkeysPanel = sidebar.getHotkeysPanelRoot();
 
-        await openHotkeysWithShortcut(page, hotkeysPanel);
+        await sidebar.openHotkeysPanelWithShortcut();
         await expect(hotkeysPanel).toHaveScreenshot('drawer-hotkeys-from-shortcut.png');
     });
 

@@ -112,6 +112,19 @@ export class Sidebar {
         return panelTitle.isVisible();
     }
 
+    async openHotkeysPanelWithShortcut() {
+        await this.page.keyboard.press('Control+k');
+
+        try {
+            await this.hotkeysPanel.waitFor({state: 'visible', timeout: 1000});
+            return;
+        } catch {
+            await this.page.keyboard.press('Meta+k');
+        }
+
+        await this.hotkeysPanel.waitFor({state: 'visible'});
+    }
+
     async hasDocumentationInPopup() {
         const documentationElement = this.popupContent.locator('text=View documentation');
         return documentationElement.isVisible();
