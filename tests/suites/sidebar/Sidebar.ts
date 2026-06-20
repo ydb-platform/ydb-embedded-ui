@@ -8,6 +8,10 @@ const hotkeysPanelSelector =
 const drawerSelector = '.gn-drawer, .g-drawer[data-floating-ui-status="open"], .g-drawer';
 const experimentsPageId = '/experimentsPage';
 
+function escapeRegExp(value: string) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export class Sidebar {
     private page: Page;
     private sidebarContainer: Locator;
@@ -162,7 +166,7 @@ export class Sidebar {
     }
 
     async toggleExperimentByTitle(title: string) {
-        const switchControl = this.getSettingsSwitch(title);
+        const switchControl = this.getSettingsSwitchClickTarget(title);
 
         await switchControl.click();
     }
@@ -206,7 +210,11 @@ export class Sidebar {
         await this.getSettingsRoot().waitFor({state: 'visible'});
 
         const radioGroup = await this.getAclSyntaxRadioGroup();
-        await radioGroup.getByText(syntax, {exact: true}).click();
+        const option = radioGroup
+            .locator('.g-segmented-radio-group__option')
+            .filter({hasText: new RegExp(`^\\s*${escapeRegExp(syntax)}\\s*$`)})
+            .first();
+        await option.click();
         // Small delay to ensure the setting is saved
         await this.drawer.page().waitForTimeout(100);
     }
@@ -256,6 +264,12 @@ export class Sidebar {
 
     private getSettingsSwitch(title: string): Locator {
         return this.getSettingsRoot().getByRole('switch', {name: title});
+    }
+
+    private getSettingsSwitchClickTarget(title: string): Locator {
+        return this.getSettingsSwitch(title).locator(
+            'xpath=ancestor::label[contains(concat(" ", normalize-space(@class), " "), " g-control-label ")][1]',
+        );
     }
 
     private getSettingsMenuItem(id: string): Locator {
