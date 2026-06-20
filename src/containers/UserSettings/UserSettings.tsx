@@ -1,8 +1,14 @@
 import {Settings} from '@gravity-ui/navigation';
 import {Text} from '@gravity-ui/uikit';
 
+import {cn} from '../../utils/cn';
+
 import {Setting} from './Setting';
 import type {YDBEmbeddedUISettings} from './settings';
+
+import './UserSettings.scss';
+
+const b = cn('ydb-user-settings');
 
 interface UserSettingsProps {
     settings: YDBEmbeddedUISettings;
@@ -10,7 +16,7 @@ interface UserSettingsProps {
 
 export const UserSettings = ({settings: userSettings}: UserSettingsProps) => {
     return (
-        <div data-qa="user-settings" style={{height: '100%'}}>
+        <div data-qa="user-settings" className={b()}>
             <Settings>
                 {userSettings.map((page) => {
                     const {id, title, icon, sections = [], hideTitle} = page;
@@ -23,7 +29,7 @@ export const UserSettings = ({settings: userSettings}: UserSettingsProps) => {
 
                                 return (
                                     <Settings.Section
-                                        key={id}
+                                        key={section.id}
                                         title={sectionTitle}
                                         hideTitle={hideTitle}
                                     >

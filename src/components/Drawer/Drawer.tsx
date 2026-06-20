@@ -71,7 +71,6 @@ const DrawerPaneContentWrapper = ({
     }, [containerWidth, defaultWidth, isPercentageWidth, savedWidthString]);
 
     const drawerWidth = userDrawerWidth ?? derivedDrawerWidth;
-    const shouldHandleOutsideClick = detectClickOutside;
 
     // Calculate drawer width based on container width percentage if specified
     const calculatedWidth = React.useMemo(() => {
@@ -103,7 +102,7 @@ const DrawerPaneContentWrapper = ({
     );
 
     React.useEffect(() => {
-        if (!shouldHandleOutsideClick || !isVisible) {
+        if (!detectClickOutside || !isVisible) {
             return undefined;
         }
 
@@ -126,7 +125,7 @@ const DrawerPaneContentWrapper = ({
             window.clearTimeout(listenerTimeoutId);
             document.removeEventListener('click', handleClickOutside);
         };
-    }, [isVisible, onClose, shouldHandleOutsideClick]);
+    }, [isVisible, onClose, detectClickOutside]);
 
     const saveWidthDebounced = React.useMemo(() => {
         return debounce((value: string) => setSavedWidthString(value), SAVE_DEBOUNCE_MS);

@@ -2,7 +2,7 @@ import type {Locator, Page} from '@playwright/test';
 import {expect, test} from '@playwright/test';
 
 import {PageModel} from '../../models/PageModel';
-import {databasesPage} from '../../utils/constants';
+import {backend, databasesPage} from '../../utils/constants';
 import {TenantPage} from '../tenant/TenantPage';
 import {Diagnostics} from '../tenant/diagnostics/Diagnostics';
 import {setupTopQueriesMock} from '../tenant/diagnostics/mocks';
@@ -47,7 +47,7 @@ async function expectSettingsGeometry(settingsRoot: Locator) {
 
 async function gotoClusterDatabases(page: Page) {
     const clusterPage = new PageModel(page, databasesPage);
-    const response = await clusterPage.goto({databasePage: 'query'});
+    const response = await clusterPage.goto({backend, databasePage: 'query'});
 
     expect(response?.ok()).toBe(true);
 }
@@ -120,6 +120,7 @@ test.describe('Drawer visual snapshots', () => {
         await tenantPage.goto({
             schema: VISUAL_DATABASE,
             database: VISUAL_DATABASE,
+            backend,
             tenantPage: 'query',
             databasePage: 'query',
         });
@@ -136,6 +137,7 @@ test.describe('Drawer visual snapshots', () => {
         await tenantPage.goto({
             schema: VISUAL_DATABASE,
             database: VISUAL_DATABASE,
+            backend,
             tenantPage: 'diagnostics',
             databasePage: 'diagnostics',
             diagnosticsTab: 'access',
@@ -156,6 +158,7 @@ test.describe('Drawer visual snapshots', () => {
         await tenantPage.goto({
             schema: VISUAL_DATABASE,
             database: VISUAL_DATABASE,
+            backend,
             tenantPage: 'diagnostics',
             databasePage: 'diagnostics',
             diagnosticsTab: 'topQueries',
