@@ -71,7 +71,7 @@ const DrawerPaneContentWrapper = ({
     }, [containerWidth, defaultWidth, isPercentageWidth, savedWidthString]);
 
     const drawerWidth = userDrawerWidth ?? derivedDrawerWidth;
-    const shouldHandleOutsideClick = detectClickOutside && hideVeil;
+    const shouldHandleOutsideClick = detectClickOutside;
 
     // Calculate drawer width based on container width percentage if specified
     const calculatedWidth = React.useMemo(() => {
@@ -117,8 +117,13 @@ const DrawerPaneContentWrapper = ({
             }
         };
 
-        document.addEventListener('click', handleClickOutside);
+        // Attach after the opening click finishes so the same trusted event cannot close the drawer.
+        const listenerTimeoutId = window.setTimeout(() => {
+            document.addEventListener('click', handleClickOutside);
+        });
+
         return () => {
+            window.clearTimeout(listenerTimeoutId);
             document.removeEventListener('click', handleClickOutside);
         };
     }, [isVisible, onClose, shouldHandleOutsideClick]);
@@ -182,8 +187,8 @@ const DrawerPaneContentWrapper = ({
             size={calculatedWidth}
             onResizeEnd={handleResizeDrawer}
             disableBodyScrollLock
-            disableOutsideClick={hideVeil && !detectClickOutside}
-            floatingRef={shouldHandleOutsideClick ? drawerRef : undefined}
+            disableOutsideClick={detectClickOutside}
+            floatingRef={detectClickOutside ? drawerRef : undefined}
         >
             <div className={b('click-handler')} onClickCapture={handleClickInsideDrawer}>
                 {children}

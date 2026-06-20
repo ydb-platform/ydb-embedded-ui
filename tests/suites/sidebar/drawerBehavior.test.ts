@@ -13,8 +13,20 @@ const HEALTHCHECK_DRAWER_SELECTOR = '.ydb-healthcheck';
 const QUERY_DETAILS_DRAWER_SELECTOR = '.ydb-query-details';
 const HISTORY_QUERY_TEXT = 'SELECT 123 AS drawer_history_preview;';
 
-async function clickOutsideDrawer(page: Page) {
+async function clickOutsideDrawerInContent(page: Page) {
     await page.mouse.click(100, 100);
+}
+
+async function clickOutsideDrawerInAside(page: Page) {
+    await page.getByTestId('aside-navigation').click({position: {x: 20, y: 100}});
+}
+
+async function clickDiagnosticsTableRowAtStart(page: Page, row: number) {
+    const rowElement = page
+        .locator('.object-general .ydb-resizeable-data-table tr.data-table__row')
+        .nth(row - 1);
+
+    await rowElement.click({position: {x: 20, y: 10}});
 }
 
 async function expectRightDrawerAlignedToAppContent(page: Page, drawerRoot: Locator) {
@@ -202,7 +214,7 @@ test.describe('Drawer behavior', () => {
         await grantAccessDrawer.locator('input[name="subjectInput"]').click();
         await expect(grantAccessDrawer).toBeVisible();
 
-        await clickOutsideDrawer(page);
+        await clickOutsideDrawerInAside(page);
         await expect(grantAccessDrawer).toBeHidden();
     });
 
@@ -249,7 +261,7 @@ test.describe('Drawer behavior', () => {
 
         await healthcheckCard.getByRole('button', {name: 'Review issues'}).click();
         await expect(healthcheckDrawer).toBeVisible();
-        await clickOutsideDrawer(page);
+        await clickOutsideDrawerInAside(page);
         await expect(healthcheckDrawer).toBeHidden();
         await expect(page).not.toHaveURL(/showHealthcheck=true/);
     });
@@ -290,7 +302,7 @@ test.describe('Drawer behavior', () => {
         await queryHistoryDrawer.click();
         await expect(queryHistoryDrawer).toBeVisible();
 
-        await clickOutsideDrawer(page);
+        await clickOutsideDrawerInContent(page);
         await expect(queryHistoryDrawer).toBeHidden();
         await expect
             .poll(() => tenantPage.queryEditor.historyQueries.isRowActive(HISTORY_QUERY_TEXT))
@@ -347,6 +359,11 @@ test.describe('Drawer behavior', () => {
         await queryDetailsDrawer.click();
         await expect(queryDetailsDrawer).toBeVisible();
 
+        await clickDiagnosticsTableRowAtStart(page, 2);
+        await expect(queryDetailsDrawer).toBeVisible();
+        await expect.poll(() => diagnostics.isRowActive(1)).toBe(false);
+        await expect.poll(() => diagnostics.isRowActive(2)).toBe(true);
+
         await expect(diagnostics.isCopyLinkButtonVisible()).resolves.toBe(true);
         await diagnostics.clickCopyLinkButton();
         const copiedUrl = await page.evaluate(() => navigator.clipboard.readText());
@@ -366,7 +383,7 @@ test.describe('Drawer behavior', () => {
 
         await diagnostics.table.clickRow(1);
         await expect(queryDetailsDrawer).toBeVisible();
-        await clickOutsideDrawer(page);
+        await clickOutsideDrawerInContent(page);
         await expect(queryDetailsDrawer).toBeHidden();
         await expect.poll(() => diagnostics.isRowActive(1)).toBe(false);
     });
