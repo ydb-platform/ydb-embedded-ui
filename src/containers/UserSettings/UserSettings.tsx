@@ -50,7 +50,7 @@ export const UserSettings = ({settings: userSettings}: UserSettingsProps) => {
                                             } = setting;
                                             return (
                                                 <Settings.Item
-                                                    key={setting.title}
+                                                    key={setting.settingKey}
                                                     align="top"
                                                     {...rest}
                                                 >
