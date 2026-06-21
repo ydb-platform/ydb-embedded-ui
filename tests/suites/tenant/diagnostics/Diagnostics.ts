@@ -525,6 +525,13 @@ export class Diagnostics {
         return rowElementClass?.includes('kv-top-queries__row_active') || false;
     }
 
+    async waitForActiveRow(): Promise<void> {
+        await this.dataTable
+            .locator('tr.data-table__row.kv-top-queries__row_active')
+            .first()
+            .waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+    }
+
     async isOwnerCardVisible(timeout = OWNER_CARD_VISIBILITY_TIMEOUT): Promise<boolean> {
         try {
             await this.ownerCard.waitFor({state: 'visible', timeout});
