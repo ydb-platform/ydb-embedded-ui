@@ -101,10 +101,11 @@ const DrawerPaneContentWrapper = ({
             }
         };
 
-        // Attach after the opening click finishes so the same trusted event cannot close the drawer.
+        // Keep the document listener in the bubble phase so row clicks may stop propagation
+        // and switch drawer content without closing it. Attach it after the opening click.
         const listenerTimeoutId = window.setTimeout(() => {
             document.addEventListener('click', handleClickOutside);
-        });
+        }, 0);
 
         return () => {
             window.clearTimeout(listenerTimeoutId);
