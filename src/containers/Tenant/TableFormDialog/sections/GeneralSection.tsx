@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type {SelectOption} from '@gravity-ui/uikit';
-import {Select, Text, TextInput} from '@gravity-ui/uikit';
+import {HelpMark, Select, TextInput} from '@gravity-ui/uikit';
 import {Controller, useFormContext, useWatch} from 'react-hook-form';
 
 import {cn} from '../../../../utils/cn';
@@ -13,7 +13,6 @@ const b = cn('ydb-table-form-dialog');
 
 interface GeneralSectionProps {
     mode: FormMode;
-    insidePath?: string;
     nameInputRef?: React.Ref<HTMLInputElement>;
 }
 
@@ -22,7 +21,7 @@ const tableTypeInfo: Record<TableType, string> = {
     column: i18n('label_info-table-type_column'),
 };
 
-export function GeneralSection({mode, insidePath, nameInputRef}: GeneralSectionProps) {
+export function GeneralSection({mode, nameInputRef}: GeneralSectionProps) {
     const {control, formState} = useFormContext<FormValues>();
     const type = useWatch({control, name: 'type'});
 
@@ -37,17 +36,12 @@ export function GeneralSection({mode, insidePath, nameInputRef}: GeneralSectionP
     const nameError = formState.errors.name?.message;
     const nameDisabled = mode === 'update' && type === 'column';
     const typeDisabled = mode === 'update';
+    const tableTypeHelpText = mode === 'create' && type ? tableTypeInfo[type] : undefined;
+    const nameHelpText = nameDisabled ? undefined : i18n('context_field-name');
 
     return (
-        <FormSection title={i18n('label_section-general')}>
-            {insidePath ? (
-                <FormRow title={i18n('field_inside')}>
-                    <Text as="div" className={b('fixed-value')}>
-                        {`${insidePath}/`}
-                    </Text>
-                </FormRow>
-            ) : null}
-            <FormRow title={i18n('field_name')} required htmlFor="table-form-name">
+        <FormSection>
+            <FormRow title={i18n('field_name')} note={nameHelpText} htmlFor="table-form-name">
                 <Controller
                     control={control}
                     name="name"
@@ -68,25 +62,31 @@ export function GeneralSection({mode, insidePath, nameInputRef}: GeneralSectionP
                 />
             </FormRow>
             <FormRow title={i18n('field_type')}>
-                <div className={b('control-stack')}>
+                <div className={b('type-select-row')}>
                     <Controller
                         control={control}
                         name="type"
                         render={({field}) => (
                             <Select
+                                className={b('type-select-control')}
                                 value={field.value ? [field.value] : []}
                                 options={typeOptions}
                                 onUpdate={([value]) => field.onChange(value)}
                                 disabled={typeDisabled}
                                 width="max"
-                                className={b('control')}
                             />
                         )}
                     />
-                    {mode === 'create' && type && tableTypeInfo[type] ? (
-                        <Text as="div" color="secondary" className={b('table-type-info')}>
-                            {tableTypeInfo[type]}
-                        </Text>
+                    {tableTypeHelpText ? (
+                        <HelpMark
+                            className={b('help-mark')}
+                            popoverProps={{
+                                placement: ['bottom', 'right'],
+                                className: b('help-mark-popup'),
+                            }}
+                        >
+                            {tableTypeHelpText}
+                        </HelpMark>
                     ) : null}
                 </div>
             </FormRow>

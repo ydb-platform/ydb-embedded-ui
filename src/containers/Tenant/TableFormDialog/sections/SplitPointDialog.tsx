@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Checkbox, Dialog, HelpMark, Label, TextArea, TextInput} from '@gravity-ui/uikit';
+import {Checkbox, Dialog, Label, Popover, TextArea, TextInput} from '@gravity-ui/uikit';
 
 import type {ColumnValueField} from '../../../../store/reducers/table/types';
 import {cn} from '../../../../utils/cn';
@@ -78,7 +78,7 @@ function SplitPointValueControl({
                 value={row.value}
                 onUpdate={(value) => onChange(row.id, value)}
                 onBlur={() => onBlur(row.id)}
-                minRows={1}
+                minRows={2}
                 validationState={invalid ? 'invalid' : undefined}
                 errorMessage={errorMessage}
             />
@@ -147,7 +147,13 @@ export function SplitPointDialog({state, onClose, onSubmit}: SplitPointDialogPro
     const primaryKeyNames = state.columns.map((column) => column.name).join(', ');
 
     return (
-        <Dialog open={state.open} onClose={onClose} size="s" disableHeightTransition>
+        <Dialog
+            open={state.open}
+            onClose={onClose}
+            size="s"
+            className={b('split-point-dialog')}
+            disableHeightTransition
+        >
             <Dialog.Header caption={i18n('title_split-point')} />
             <Dialog.Body className={b('split-point-body')}>
                 {primaryKeyNames ? (
@@ -166,27 +172,33 @@ export function SplitPointDialog({state, onClose, onSubmit}: SplitPointDialogPro
                         const showDefinedToggle = !isColumnValueMustBeDefined(row.column);
                         const invalid = Boolean(touched[row.id]) && isRowInvalid(row);
                         const errorMessage = invalid ? i18n('error_value-invalid') : undefined;
+                        const typeText = `(${type})`;
+                        const typeLabel = typeDescription ? (
+                            <Popover
+                                content={typeDescription}
+                                placement="top"
+                                hasArrow
+                                className={b('split-point-type-popover')}
+                            >
+                                <span className={b('split-point-type')}>{typeText}</span>
+                            </Popover>
+                        ) : (
+                            <span className={b('split-point-type')}>{typeText}</span>
+                        );
 
                         return (
                             <div key={row.id} className={b('split-point-dialog-row')}>
                                 <div className={b('split-point-meta')}>
                                     <div className={b('split-point-label')}>
                                         <span>{row.column.name}</span>
-                                        <span className={b('split-point-type')}>({type})</span>
-                                        {typeDescription ? (
-                                            <HelpMark
-                                                className={b('help-mark')}
-                                                popoverProps={{
-                                                    placement: ['bottom', 'right'],
-                                                    className: b('help-mark-popup'),
-                                                }}
-                                            >
-                                                {typeDescription}
-                                            </HelpMark>
-                                        ) : null}
+                                        {typeLabel}
                                         {row.column.notNull ? (
-                                            <Label theme="unknown" className={b('not-null-label')}>
-                                                NOT NULL
+                                            <Label
+                                                theme="unknown"
+                                                size="xs"
+                                                className={b('not-null-label')}
+                                            >
+                                                {i18n('label_non-null')}
                                             </Label>
                                         ) : null}
                                     </div>
@@ -196,22 +208,23 @@ export function SplitPointDialog({state, onClose, onSubmit}: SplitPointDialogPro
                                         <div className={b('split-point-toggle')}>
                                             <Checkbox
                                                 checked={row.isDefined}
+                                                title={i18n('action_set-value')}
                                                 onUpdate={(checked) =>
                                                     handleToggleDefined(row.id, checked)
                                                 }
-                                            >
-                                                {i18n('action_set-value')}
-                                            </Checkbox>
+                                            />
                                         </div>
                                     ) : null}
-                                    <SplitPointValueControl
-                                        row={row}
-                                        invalid={invalid}
-                                        errorMessage={errorMessage}
-                                        isStringType={isStringType}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                    />
+                                    <div className={b('split-point-value')}>
+                                        <SplitPointValueControl
+                                            row={row}
+                                            invalid={invalid}
+                                            errorMessage={errorMessage}
+                                            isStringType={isStringType}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         );

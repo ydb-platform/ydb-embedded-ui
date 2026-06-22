@@ -119,6 +119,47 @@ describe('table utils', () => {
         expect(query).toContain('SET KEY_BLOOM_FILTER ENABLED');
     });
 
+    test('buildUpdateTableQuery can combine reset, update and rename actions in one statement', () => {
+        const query = buildUpdateTableQuery({
+            tableName: '/Root/orders',
+            columns: [{name: 'status', type: 'Utf8', notNull: false}],
+            deletedColumns: [{name: 'legacy', type: 'Int32', notNull: false}],
+            settings: {
+                keyBloomFilter: true,
+            },
+            resetItems: ['TTL'],
+            renameTo: '/Root/archive/orders',
+        });
+
+        expect(query.match(/ALTER TABLE/g)).toHaveLength(1);
+        expect(query).toContain('ALTER TABLE `/Root/orders`');
+        expect(query).toContain('RESET (TTL)');
+        expect(query).toContain('DROP COLUMN `legacy`');
+        expect(query).toContain('ADD COLUMN `status` Utf8');
+        expect(query).toContain('SET KEY_BLOOM_FILTER ENABLED');
+        expect(query).toContain('RENAME TO `/Root/archive/orders`');
+    });
+
+    test('buildUpdateTableQuery supports reset-only updates', () => {
+        const query = buildUpdateTableQuery({
+            tableName: 'orders',
+            resetItems: ['TTL'],
+        });
+
+        expect(query.replace(/\s+/g, ' ').trim()).toBe('ALTER TABLE orders RESET (TTL);');
+    });
+
+    test('buildUpdateTableQuery supports rename-only updates', () => {
+        const query = buildUpdateTableQuery({
+            tableName: '/Root/orders',
+            renameTo: '/Root/archive/orders',
+        });
+
+        expect(query.replace(/\s+/g, ' ').trim()).toBe(
+            'ALTER TABLE `/Root/orders` RENAME TO `/Root/archive/orders`;',
+        );
+    });
+
     test('getUpdateTableSettings returns only dirty settings', () => {
         const result = getUpdateTableSettings(
             {

@@ -118,11 +118,7 @@ export function TTLSection({originalInfo}: TTLSectionProps) {
             </FormRow>
             {enabled ? (
                 <React.Fragment>
-                    <FormRow
-                        title={i18n('field_ttl-column')}
-                        note={i18n('tooltip_ttl-column')}
-                        required
-                    >
+                    <FormRow title={i18n('field_ttl-column')} note={i18n('tooltip_ttl-column')}>
                         <Controller
                             control={control}
                             name="settings.ttl.column"
@@ -143,11 +139,7 @@ export function TTLSection({originalInfo}: TTLSectionProps) {
                         />
                     </FormRow>
                     {isEpochMode ? (
-                        <FormRow
-                            title={i18n('field_ttl-unit')}
-                            note={i18n('tooltip_ttl-unit')}
-                            required
-                        >
+                        <FormRow title={i18n('field_ttl-unit')} note={i18n('tooltip_ttl-unit')}>
                             <Controller
                                 control={control}
                                 name="settings.ttl.epochMode"
@@ -168,11 +160,7 @@ export function TTLSection({originalInfo}: TTLSectionProps) {
                             />
                         </FormRow>
                     ) : null}
-                    <FormRow
-                        title={i18n('field_ttl-lifetime')}
-                        note={i18n('tooltip_ttl-lifetime')}
-                        required
-                    >
+                    <FormRow title={i18n('field_ttl-lifetime')} note={i18n('tooltip_ttl-lifetime')}>
                         <div className={b('ttl-lifetime')}>
                             <Controller
                                 control={control}

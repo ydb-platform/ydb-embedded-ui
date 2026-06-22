@@ -2,7 +2,7 @@
 import {createSelector} from '@reduxjs/toolkit';
 
 import type {IProtobufTimeObject} from '../../../types/api/common';
-import type {DescribeTopicResult, TopicDataRequest} from '../../../types/api/topic';
+import type {TopicDataRequest} from '../../../types/api/topic';
 import {convertBytesObjectToSpeed} from '../../../utils/bytesParsers';
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query';
 import {parseLag, parseTimestampToIdleTime} from '../../../utils/timeParsers';
@@ -19,7 +19,6 @@ interface TopicDataQueryRequest extends TopicDataRequest {
     useMeta?: boolean;
 }
 
-const DEFAULT_RETENTION_PERIOD_SECONDS = 4 * 60 * 60;
 const DEFAULT_WRITE_QUOTA_BYTES = 1024 * 1024;
 
 export const topicApi = api.injectEndpoints({
@@ -232,21 +231,6 @@ function parseDurationToSeconds(duration?: string | IProtobufTimeObject): number
     return undefined;
 }
 
-function getTopicRetentionFormValues(topicData: DescribeTopicResult) {
-    const parsedRetentionStorageMb = parseInt(topicData.retention_storage_mb ?? '0', 10);
-    const retentionPeriodSeconds = parseDurationToSeconds(topicData.retention_period);
-    const retentionStorageMb = Number.isFinite(parsedRetentionStorageMb)
-        ? parsedRetentionStorageMb
-        : 0;
-    const hasStorageRetention = retentionStorageMb > 0;
-
-    return {
-        retentionPeriodSeconds: retentionPeriodSeconds ?? DEFAULT_RETENTION_PERIOD_SECONDS,
-        storageLimitMb: retentionStorageMb,
-        retentionType: hasStorageRetention ? 'size' : 'time',
-    } as const;
-}
-
 export const selectTopicFormValues = createSelector(
     (state: RootState) => state,
     (
@@ -287,7 +271,6 @@ export const selectTopicFormValues = createSelector(
         const partitionCountLimit = Number.isFinite(parsedPartitionCountLimit)
             ? parsedPartitionCountLimit
             : undefined;
-        const retentionValues = getTopicRetentionFormValues(topicData);
         const autoPartitioningSettings =
             topicData.partitioning_settings?.auto_partitioning_settings;
         const autoPartitioningStrategy = String(
@@ -303,7 +286,6 @@ export const selectTopicFormValues = createSelector(
             shards: minActivePartitions,
             partitionCountLimit,
             writeQuotaBytes,
-            ...retentionValues,
             autoPartitioning: {
                 enabled: autoPartitioningEnabled,
                 mode: autoPartitioningStrategy,

@@ -3,19 +3,20 @@ import React from 'react';
 import {Key, Plus, TrashBin} from '@gravity-ui/icons';
 import {
     Button,
-    Checkbox,
     Disclosure,
+    HelpMark,
     Icon,
     SegmentedRadioGroup,
+    Switch,
     Text,
     TextInput,
 } from '@gravity-ui/uikit';
 import {Controller, useFormContext, useWatch} from 'react-hook-form';
 
-import {RangeInputPicker} from '../../../../components/RangeInputPicker';
 import type {ColumnValueField} from '../../../../store/reducers/table/types';
 import {prepareColumnValue} from '../../../../store/reducers/table/utils';
 import {cn} from '../../../../utils/cn';
+import {RangeInputPicker} from '../components/RangeInputPicker';
 import {FormFieldError, FormRow, FormSection} from '../components/layout';
 import {MAX_PARTITION_SIZE_MB, MIN_PARTITION_SIZE_MB} from '../constants';
 import i18n from '../i18n';
@@ -123,6 +124,24 @@ export function SettingsSection({mode}: SettingsSectionProps) {
         [getValues, setValue],
     );
 
+    const handleAutoPartitionBySizeUpdate = React.useCallback(
+        (enabled: boolean, onChange: (value: boolean) => void) => {
+            if (enabled) {
+                const currentSize = getValues('settings.autoPartitionBySizeMb');
+
+                if (typeof currentSize !== 'number' || Number.isNaN(currentSize)) {
+                    setValue('settings.autoPartitionBySizeMb', MAX_PARTITION_SIZE_MB, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                    });
+                }
+            }
+
+            onChange(enabled);
+        },
+        [getValues, setValue],
+    );
+
     return (
         <React.Fragment>
             {mode === 'create' ? (
@@ -174,55 +193,80 @@ export function SettingsSection({mode}: SettingsSectionProps) {
                         </FormRow>
                     ) : null}
                     {partitionsType === PartitionsType.Explicit ? (
-                        <FormRow
-                            title={i18n('field_explicit-partitions')}
-                            note={i18n('tooltip_explicit-partitions')}
-                        >
-                            <div className={b('split-points')}>
-                                {splitPoints.map((row, index) => {
-                                    const display = row
-                                        .map((column) => prepareColumnValue(column, column.value))
-                                        .join(', ');
-                                    return (
-                                        <div
-                                            key={`split-${index}`}
-                                            className={b('split-point-row')}
-                                        >
-                                            <TextInput
-                                                className={b('control')}
-                                                value={display ? `(${display})` : ''}
-                                                placeholder={splitPointPlaceholder}
-                                                controlProps={{readOnly: true}}
-                                            />
-                                            <Button
-                                                view="outlined"
-                                                onClick={() => openSplitDialog(index)}
-                                                title={i18n('title_split-point')}
+                        <div className={b('split-points-field')}>
+                            <div className={b('split-points-header')}>
+                                <Text
+                                    as="span"
+                                    variant="body-1"
+                                    className={b('split-points-title')}
+                                >
+                                    {i18n('field_explicit-partitions')}
+                                </Text>
+                                <HelpMark
+                                    className={b('help-mark')}
+                                    popoverProps={{
+                                        placement: ['bottom', 'right'],
+                                        className: b('help-mark-popup'),
+                                    }}
+                                >
+                                    {i18n('tooltip_explicit-partitions')}
+                                </HelpMark>
+                            </div>
+                            <div className={b('split-points-content')}>
+                                <div className={b('split-points')}>
+                                    {splitPoints.map((row, index) => {
+                                        const display = row
+                                            .map((column) =>
+                                                prepareColumnValue(column, column.value),
+                                            )
+                                            .join(', ');
+                                        return (
+                                            <div
+                                                key={`split-${index}`}
+                                                className={b('split-point-row')}
                                             >
-                                                <Icon data={Key} size={16} />
-                                            </Button>
-                                            <Text color="secondary">{`#${index + 1}`}</Text>
-                                            {splitPoints.length > 1 ? (
-                                                <Button
-                                                    view="flat"
-                                                    onClick={() => removeSplit(index)}
-                                                    title={i18n('action_delete')}
+                                                <Text
+                                                    as="span"
+                                                    color="secondary"
+                                                    className={b('split-point-index')}
                                                 >
-                                                    <Icon data={TrashBin} size={16} />
+                                                    {`${index + 1}.`}
+                                                </Text>
+                                                <Button
+                                                    view="outlined"
+                                                    onClick={() => openSplitDialog(index)}
+                                                    title={i18n('title_split-point')}
+                                                >
+                                                    <Icon data={Key} size={16} />
                                                 </Button>
-                                            ) : null}
-                                        </div>
-                                    );
-                                })}
-                                <FormFieldError message={partitionsAtKeysError} />
-                                <div>
-                                    <Button onClick={appendSplit}>
-                                        <Icon data={Plus} size={16} />
-                                        {i18n('button_add-split-point')}
-                                    </Button>
+                                                <TextInput
+                                                    className={b('split-point-display')}
+                                                    value={display ? `(${display})` : ''}
+                                                    placeholder={splitPointPlaceholder}
+                                                    controlProps={{readOnly: true}}
+                                                />
+                                                {splitPoints.length > 1 ? (
+                                                    <Button
+                                                        view="flat"
+                                                        onClick={() => removeSplit(index)}
+                                                        title={i18n('action_delete')}
+                                                    >
+                                                        <Icon data={TrashBin} size={16} />
+                                                    </Button>
+                                                ) : null}
+                                            </div>
+                                        );
+                                    })}
+                                    <FormFieldError message={partitionsAtKeysError} />
+                                    <div>
+                                        <Button onClick={appendSplit}>
+                                            <Icon data={Plus} size={16} />
+                                            {i18n('button_add-split-point')}
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                        </FormRow>
+                        </div>
                     ) : null}
                 </FormSection>
             ) : null}
@@ -240,9 +284,12 @@ export function SettingsSection({mode}: SettingsSectionProps) {
                         name="settings.autoPartitionBySize"
                         render={({field}) => (
                             <div className={b('checkbox-control')}>
-                                <Checkbox checked={Boolean(field.value)} onUpdate={field.onChange}>
-                                    {i18n('label_enable')}
-                                </Checkbox>
+                                <Switch
+                                    checked={Boolean(field.value)}
+                                    onUpdate={(value) => {
+                                        handleAutoPartitionBySizeUpdate(value, field.onChange);
+                                    }}
+                                />
                             </div>
                         )}
                     />
@@ -256,9 +303,7 @@ export function SettingsSection({mode}: SettingsSectionProps) {
                         name="settings.autoPartitionByLoad"
                         render={({field}) => (
                             <div className={b('checkbox-control')}>
-                                <Checkbox checked={Boolean(field.value)} onUpdate={field.onChange}>
-                                    {i18n('label_enable')}
-                                </Checkbox>
+                                <Switch checked={Boolean(field.value)} onUpdate={field.onChange} />
                             </div>
                         )}
                     />
@@ -366,12 +411,10 @@ export function SettingsSection({mode}: SettingsSectionProps) {
                                 name="settings.keyBloomFilter"
                                 render={({field}) => (
                                     <div className={b('checkbox-control')}>
-                                        <Checkbox
+                                        <Switch
                                             checked={Boolean(field.value)}
                                             onUpdate={field.onChange}
-                                        >
-                                            {i18n('label_enable')}
-                                        </Checkbox>
+                                        />
                                     </div>
                                 )}
                             />

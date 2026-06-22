@@ -1,4 +1,14 @@
-import {CirclePlus, Code, Copy, GearPlay, Pencil, PlugConnection} from '@gravity-ui/icons';
+import {
+    BarsUnaligned,
+    CirclePlus,
+    Code,
+    Copy,
+    Folder,
+    GearPlay,
+    LayoutHeaderCellsLarge,
+    Pencil,
+    PlugConnection,
+} from '@gravity-ui/icons';
 import {Flex, Icon, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import {v4 as uuidv4} from 'uuid';
@@ -425,39 +435,47 @@ export const getActions =
 
         const createDirectoryItem = actions.createDirectory
             ? {
-                  text: i18n('actions.createDirectory'),
+                  text: i18n('entity-name_directory'),
                   action: actions.createDirectory,
-                  iconStart: <CirclePlus />,
+                  iconStart: <Folder />,
               }
             : undefined;
         const createTableItem = actions.createTableDialog
             ? {
-                  text: stripEllipsis(i18n('actions.createTable')),
+                  text: i18n('entity-name_table'),
                   action: actions.createTableDialog,
-                  iconStart: <CirclePlus />,
+                  iconStart: <LayoutHeaderCellsLarge />,
               }
             : undefined;
         const createTopicItem = actions.createTopicDialog
             ? {
-                  text: stripEllipsis(i18n('actions.createTopic')),
+                  text: i18n('entity-name_topic'),
                   action: actions.createTopicDialog,
-                  iconStart: <CirclePlus />,
+                  iconStart: <BarsUnaligned />,
               }
             : undefined;
         const createDialogItems: typeof createEntitiesSet = [];
-        if (createDirectoryItem) {
-            createDialogItems.push(createDirectoryItem);
-        }
         if (createTableItem) {
             createDialogItems.push(createTableItem);
+        }
+        if (createDirectoryItem) {
+            createDialogItems.push(createDirectoryItem);
         }
         if (createTopicItem) {
             createDialogItems.push(createTopicItem);
         }
 
-        if (createDialogItems.length) {
-            DB_SET.splice(1, 0, createDialogItems);
-            DIR_SET.splice(1, 0, createDialogItems);
+        const createMenuItem = createDialogItems.length
+            ? {
+                  text: i18n('actions.createMenu'),
+                  iconStart: <CirclePlus />,
+                  items: createDialogItems,
+              }
+            : undefined;
+
+        if (createMenuItem) {
+            DB_SET.splice(1, 0, [createMenuItem]);
+            DIR_SET.splice(1, 0, [createMenuItem]);
         }
 
         const showCreateTableItem = getActionWithLoader({

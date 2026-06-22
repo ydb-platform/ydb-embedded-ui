@@ -2,13 +2,13 @@ import React from 'react';
 
 import {Slider, TextInput} from '@gravity-ui/uikit';
 
-import {cn} from '../../utils/cn';
+import {cn} from '../../../../utils/cn';
 
 import './RangeInputPicker.scss';
 
 const b = cn('ydb-range-input-picker');
 
-export interface RangeInputPickerProps {
+interface RangeInputPickerProps {
     value?: number;
     min: number;
     max: number;

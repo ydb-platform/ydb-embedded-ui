@@ -18,7 +18,6 @@ import type {TEvDescribeSchemeResult} from '../../../types/api/schema/schema';
 import {cn} from '../../../utils/cn';
 import createToast from '../../../utils/createToast';
 import {prepareCommonErrorMessage} from '../../../utils/errors';
-import {transformPath} from '../ObjectSummary/transformPath';
 
 import {
     TABLE_FORM_DIALOG,
@@ -225,27 +224,23 @@ function TableForm({
         <FormProvider {...methods}>
             <form onSubmit={handleFormSubmit} className={b('form')}>
                 <Dialog.Body className={b('body')}>
-                    <GeneralSection
-                        mode={mode}
-                        insidePath={
-                            mode === 'create'
-                                ? transformPath(parentPath ?? databaseFullPath, databaseFullPath)
-                                : undefined
-                        }
-                        nameInputRef={nameInputRef}
-                    />
-                    <YdbColumnsSection
-                        mode={mode}
-                        types={columnTypes}
-                        pkTypes={pkTypes}
-                        keyNullable={keyNullable}
-                        originalInfo={originalInfo}
-                        onRequestTtlColumnDeletion={handleTtlColumnDeletionRequest}
-                    />
-                    {showIndexes ? <YdbIndexesSection /> : null}
-                    <TTLSection originalInfo={originalInfo} />
-                    {showSettings ? <SettingsSection mode={mode} /> : null}
-                    {showPartitioning ? <PartitioningSection pkTypes={pkTypes} /> : null}
+                    <div className={b('scroll-container')}>
+                        <div className={b('scroll-content')}>
+                            <GeneralSection mode={mode} nameInputRef={nameInputRef} />
+                            <YdbColumnsSection
+                                mode={mode}
+                                types={columnTypes}
+                                pkTypes={pkTypes}
+                                keyNullable={keyNullable}
+                                originalInfo={originalInfo}
+                                onRequestTtlColumnDeletion={handleTtlColumnDeletionRequest}
+                            />
+                            {showIndexes ? <YdbIndexesSection /> : null}
+                            <TTLSection originalInfo={originalInfo} />
+                            {showSettings ? <SettingsSection mode={mode} /> : null}
+                            {showPartitioning ? <PartitioningSection pkTypes={pkTypes} /> : null}
+                        </div>
+                    </div>
                 </Dialog.Body>
                 <Dialog.Footer
                     textButtonApply={

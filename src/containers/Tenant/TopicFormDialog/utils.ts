@@ -2,8 +2,6 @@ import type {TopicFormValues} from '../../../store/reducers/topic/utils';
 import {AutoPartitioningStrategy} from '../../../store/reducers/topic/utils';
 import {UNBREAKABLE_GAP} from '../../../utils/constants';
 
-import i18n from './i18n';
-
 export const TOPIC_FORM_DIALOG = 'topic-form-dialog';
 
 const KILOBYTE = 1024;
@@ -12,9 +10,6 @@ const MEGABYTE = KILOBYTE * 1024;
 export const DEFAULT_TOPIC_FORM_VALUES: TopicFormValues = {
     shards: 1,
     writeQuotaBytes: 1024 * 1024,
-    retentionPeriodSeconds: 4 * 60 * 60,
-    storageLimitMb: 50 * 1024,
-    retentionType: 'time',
     autoPartitioning: {
         enabled: false,
         mode: AutoPartitioningStrategy.ScaleUp,
@@ -35,10 +30,6 @@ export function parseNumberInput(value: string): number {
 
 export function formatNumberInput(value: number | undefined): string {
     return typeof value === 'number' && !Number.isNaN(value) ? value.toString() : '';
-}
-
-export function fromMbToGb(value: number) {
-    return value / 1024;
 }
 
 export function formatBandwidthBytes(value: number | undefined) {
@@ -71,33 +62,6 @@ export function formatWriteQuotaSelectValue(value: number | undefined) {
     }
 
     return `${value}${UNBREAKABLE_GAP}byte/s`;
-}
-
-export function formatRetentionPeriodSelectValue(value: number | undefined) {
-    if (typeof value !== 'number' || Number.isNaN(value)) {
-        return '';
-    }
-
-    const day = 24 * 60 * 60;
-    const hour = 60 * 60;
-    const minute = 60;
-
-    if (value >= day && value % day === 0) {
-        const days = value / day;
-        return `${days} ${i18n(days === 1 ? 'value_day' : 'value_days')}`;
-    }
-
-    if (value >= hour && value % hour === 0) {
-        const hours = value / hour;
-        return `${hours} ${i18n(hours === 1 ? 'value_hour' : 'value_hours')}`;
-    }
-
-    if (value >= minute && value % minute === 0) {
-        const minutes = value / minute;
-        return `${minutes} ${i18n(minutes === 1 ? 'value_minute' : 'value_minutes')}`;
-    }
-
-    return `${value} ${i18n(value === 1 ? 'value_second' : 'value_seconds')}`;
 }
 
 function normalizePath(path: string) {
@@ -161,20 +125,12 @@ export function getUpdateTopicInitialValues({
     topicPath: string;
 }): TopicFormValues {
     const topicPathData = splitTopicPath(topicPath, databaseFullPath);
-    const hasStorageRetention =
-        typeof formData.storageLimitMb === 'number' &&
-        !Number.isNaN(formData.storageLimitMb) &&
-        formData.storageLimitMb > 0;
 
     return {
         ...DEFAULT_TOPIC_FORM_VALUES,
         ...formData,
         path: topicPathData.path,
         name: topicPathData.name || formData.name,
-        retentionType: hasStorageRetention ? 'size' : 'time',
-        storageLimitMb: hasStorageRetention
-            ? formData.storageLimitMb
-            : DEFAULT_TOPIC_FORM_VALUES.storageLimitMb,
         autoPartitioning: {
             ...DEFAULT_TOPIC_FORM_VALUES.autoPartitioning,
             ...formData.autoPartitioning,

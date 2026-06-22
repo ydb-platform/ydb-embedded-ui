@@ -6,10 +6,6 @@ import {cn} from '../../../../utils/cn';
 
 const b = cn('ydb-table-form-dialog');
 
-export function RequiredMark() {
-    return <span className={b('required')}> *</span>;
-}
-
 export function FormSection({
     title,
     note,
@@ -45,33 +41,25 @@ export function FormSection({
 export function FormRow({
     title,
     note,
-    required,
     htmlFor,
     children,
 }: {
     title?: string;
     note?: string;
-    required?: boolean;
     htmlFor?: string;
     children: React.ReactNode;
 }) {
-    const labelTitle = title ? (
-        <React.Fragment>
-            <span>{title}</span>
-            {required ? <RequiredMark /> : null}
-        </React.Fragment>
-    ) : null;
     let labelTitleNode: React.ReactNode = null;
 
     if (title) {
         if (htmlFor) {
             labelTitleNode = (
                 <label className={b('label-title')} htmlFor={htmlFor}>
-                    {labelTitle}
+                    {title}
                 </label>
             );
         } else {
-            labelTitleNode = <span className={b('label-title')}>{labelTitle}</span>;
+            labelTitleNode = <span className={b('label-title')}>{title}</span>;
         }
     }
 

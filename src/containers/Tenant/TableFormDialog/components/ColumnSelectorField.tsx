@@ -23,7 +23,7 @@ const getColumnId = (item: Column) => item.name;
 
 const filterColumnItem = (filter: string) => (item: Column) => {
     const lower = filter.toLowerCase();
-    return item.name.toLowerCase().includes(lower) || item.type.toLowerCase().includes(lower);
+    return item.name.toLowerCase().includes(lower);
 };
 
 interface ItemSelectorProps {
@@ -74,12 +74,7 @@ function ItemSelector({items, value, onUpdate}: ItemSelectorProps) {
     const renderAvailableItem = React.useCallback(
         (item: Column, isActive: boolean) => (
             <div className={b('selector-item')}>
-                <span className={b('selector-item-text')}>
-                    {item.name}
-                    {item.type ? (
-                        <span className={b('selector-item-type')}> ({item.type})</span>
-                    ) : null}
-                </span>
+                <span className={b('selector-item-text')}>{item.name}</span>
                 <Button
                     view="flat-secondary"
                     size="s"
@@ -99,12 +94,7 @@ function ItemSelector({items, value, onUpdate}: ItemSelectorProps) {
     const renderSelectedItem = React.useCallback(
         (item: Column, isActive: boolean) => (
             <div className={b('selector-item')}>
-                <span className={b('selector-item-text')}>
-                    {item.name}
-                    {item.type ? (
-                        <span className={b('selector-item-type')}> ({item.type})</span>
-                    ) : null}
-                </span>
+                <span className={b('selector-item-text')}>{item.name}</span>
                 <Button
                     view="flat-secondary"
                     size="s"
@@ -140,7 +130,9 @@ function ItemSelector({items, value, onUpdate}: ItemSelectorProps) {
             </div>
             <div className={b('panel')}>
                 <div className={b('panel-header')}>
-                    <span className={b('panel-title')}>{i18n('label_selected')}</span>
+                    <span className={b('panel-title')}>
+                        {i18n('label_selected-count', {count: selectedItems.length})}
+                    </span>
                     <Button view="flat-secondary" size="s" onClick={handleClear}>
                         {i18n('action_clear')}
                     </Button>

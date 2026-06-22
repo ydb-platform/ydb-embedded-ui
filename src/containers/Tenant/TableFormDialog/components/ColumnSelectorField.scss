@@ -126,6 +126,8 @@
 
     &__panel-title {
         font-weight: var(--g-text-accent-font-weight);
+
+        color: var(--g-color-text-primary);
     }
 
     &__selector-item {
@@ -147,10 +149,6 @@
 
             white-space: nowrap;
             text-overflow: ellipsis;
-        }
-
-        &-type {
-            color: var(--g-color-text-secondary);
         }
 
         &-action {

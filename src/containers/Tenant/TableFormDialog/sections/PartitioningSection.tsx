@@ -30,7 +30,7 @@ export function PartitioningSection({pkTypes}: PartitioningSectionProps) {
 
     return (
         <FormSection title={i18n('label_partitioning')}>
-            <FormRow title={i18n('field_partition-key')} required>
+            <FormRow title={i18n('field_partition-key')}>
                 <Controller
                     control={control}
                     name="partitionKey"
@@ -48,7 +48,7 @@ export function PartitioningSection({pkTypes}: PartitioningSectionProps) {
                     )}
                 />
             </FormRow>
-            <FormRow title={i18n('field_partition-count')} required>
+            <FormRow title={i18n('field_partition-count')}>
                 <Controller
                     control={control}
                     name="partitionCount"

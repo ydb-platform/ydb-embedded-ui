@@ -349,6 +349,8 @@ function buildTemplate(
         deletedColumns,
         columnsHash,
         settings,
+        resetItems,
+        renameTo,
     }: BuildTemplateOptions,
 ) {
     return template
@@ -368,9 +370,11 @@ function buildTemplate(
             return (
                 pad +
                 [
+                    ...(resetItems ?? []).map((item) => `RESET (${item})`),
                     buildDropColumns(deletedColumns, pad),
                     buildAddColumns(columns, pad),
                     buildSettingsUpdateItems(settings, pad),
+                    renameTo ? `RENAME TO ${prepareEntityName(renameTo)}` : '',
                 ]
                     .filter(Boolean)
                     .join(`,${pad}`) +
@@ -623,12 +627,4 @@ export function prepareYdbCreateQueryColumns(columns: ColumnField[]): Column[] {
         defaultValue: column.withDefaultValue ? column.defaultValue : undefined,
         autoincrement: column.autoincrement,
     }));
-}
-
-export function buildResetQuery(table: string, value: string) {
-    return `ALTER TABLE ${prepareEntityName(table)} RESET (${value});`;
-}
-
-export function buildRenameQuery(table: string, value: string) {
-    return `ALTER TABLE ${prepareEntityName(table)} RENAME TO ${prepareEntityName(value)};`;
 }

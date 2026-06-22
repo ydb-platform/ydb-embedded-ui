@@ -160,7 +160,6 @@ export interface TTLSettings {
     status: 'enabled' | 'disabled';
     column?: string;
     columnWithEpochMode?: boolean;
-    expire?: number;
     lifetime?: number;
     unit?: 'seconds' | 'minutes' | 'hours' | 'days';
     epochMode?: string;
@@ -198,6 +197,8 @@ export interface BuildTemplateOptions {
     deletedColumns?: Column[];
     columnsHash?: string[];
     settings?: Partial<TableSettings>;
+    resetItems?: string[];
+    renameTo?: string;
 }
 
 export interface TableFormValues {

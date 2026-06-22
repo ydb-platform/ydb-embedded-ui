@@ -6,6 +6,7 @@ import type {TEvDescribeSchemeResult} from '../../../types/api/schema/schema';
 import {EPathType} from '../../../types/api/schema/schema';
 import type {TColumnDescription} from '../../../types/api/schema/shared';
 
+import {MAX_PARTITION_SIZE_MB} from './constants';
 import i18n from './i18n';
 import type {Column, ColumnField, FormValues, OriginalTableInfo, TableType} from './types';
 import {PartitionsType} from './types';
@@ -94,7 +95,7 @@ export function getCreateInitialValues(initialType: TableType = 'row'): FormValu
             partitionsAtKeys: [],
             autoPartitionBySize: true,
             autoPartitionByLoad: false,
-            autoPartitionBySizeMb: 2048,
+            autoPartitionBySizeMb: MAX_PARTITION_SIZE_MB,
             keyBloomFilter: false,
             ttl: {status: 'disabled'},
         },

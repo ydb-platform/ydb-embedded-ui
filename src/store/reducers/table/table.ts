@@ -7,8 +7,6 @@ import type {BuildTemplateOptions, TableFormValues} from './types';
 import {
     buildCreateColumnTableQuery,
     buildCreateTableQuery,
-    buildRenameQuery,
-    buildResetQuery,
     buildUpdateTableQuery,
     getTablePathInfoForUpdate,
     hasUpdateTableSettings,
@@ -116,18 +114,17 @@ export const tableApi = api.injectEndpoints({
                         pathDesc?.Table?.TTLSettings?.Enabled ??
                             pathDesc?.ColumnTableDescription?.TtlSettings?.Enabled,
                     );
-
-                    const queries: string[] = [];
-
-                    if (updateSettings?.ttl?.status === 'disabled' && originalHadTtl) {
-                        queries.push(buildResetQuery(tablePath, 'TTL'));
-                    }
+                    const shouldResetTtl =
+                        updateSettings?.ttl?.status === 'disabled' && originalHadTtl;
+                    const shouldRename = Boolean(originalName && name !== originalName);
 
                     const updateOptions: BuildTemplateOptions = {
                         tableName: tablePath,
                         columns,
                         deletedColumns,
                         settings: updateSettings,
+                        resetItems: shouldResetTtl ? ['TTL'] : undefined,
+                        renameTo: shouldRename ? updatedTablePath : undefined,
                     };
 
                     const hasUpdateActions =
@@ -135,20 +132,12 @@ export const tableApi = api.injectEndpoints({
                         columns.length > 0 ||
                         hasUpdateTableSettings(updateSettings);
 
-                    if (hasUpdateActions) {
-                        queries.push(buildUpdateTableQuery(updateOptions));
-                    }
-
-                    if (originalName && name !== originalName) {
-                        queries.push(buildRenameQuery(tablePath, updatedTablePath));
-                    }
-
-                    if (queries.length === 0) {
+                    if (!shouldResetTtl && !hasUpdateActions && !shouldRename) {
                         return {data: undefined};
                     }
 
                     const response = await window.api.viewer.sendQuery({
-                        query: queries.join('\n'),
+                        query: buildUpdateTableQuery(updateOptions),
                         database,
                         action: 'execute-query',
                     });

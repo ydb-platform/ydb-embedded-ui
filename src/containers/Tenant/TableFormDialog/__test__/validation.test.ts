@@ -31,7 +31,7 @@ describe('TableFormDialog validation', () => {
                 partitionsAtKeys: [],
                 autoPartitionBySize: true,
                 autoPartitionByLoad: false,
-                autoPartitionBySizeMb: 2048,
+                autoPartitionBySizeMb: 2000,
                 keyBloomFilter: false,
                 ttl: {status: 'disabled'},
             },
@@ -63,12 +63,40 @@ describe('TableFormDialog validation', () => {
         expect(getIssuePaths(result)).toEqual(expect.arrayContaining(['name', 'columns']));
     });
 
+    test('create mode accepts slash-separated table names for column tables', () => {
+        const schema = buildTableValidationSchema({mode: 'create'});
+
+        const result = schema.safeParse(
+            createValues({
+                name: 'dir.v1/table-name_2',
+                type: 'column',
+                partitionKey: ['id'],
+                partitionCount: 64,
+            }),
+        );
+
+        expect(result.success).toBe(true);
+    });
+
     test('update mode accepts slash-separated names for row-table moves', () => {
         const schema = buildTableValidationSchema({mode: 'update'});
 
         const result = schema.safeParse(createValues({name: 'archive/orders'}));
 
         expect(result.success).toBe(true);
+    });
+
+    test('rejects table names with path segments longer than 255 characters', () => {
+        const schema = buildTableValidationSchema({mode: 'create'});
+
+        const result = schema.safeParse(
+            createValues({
+                name: `${'a'.repeat(256)}/table`,
+            }),
+        );
+
+        expect(result.success).toBe(false);
+        expect(getIssuePaths(result)).toContain('name');
     });
 
     test('secondary indexes cannot reference deleted columns', () => {

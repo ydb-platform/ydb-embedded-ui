@@ -60,9 +60,6 @@ describe('topic selectors', () => {
             shards: 3,
             partitionCountLimit: undefined,
             writeQuotaBytes: 262144,
-            retentionPeriodSeconds: 3600,
-            storageLimitMb: 0,
-            retentionType: 'time',
             autoPartitioning: {
                 enabled: true,
                 mode: AutoPartitioningStrategy.ScaleUp,
@@ -70,6 +67,37 @@ describe('topic selectors', () => {
                 maxPartitions: 8,
                 stabilizationWindow: 120,
                 upUtilization: 75,
+            },
+        });
+    });
+
+    test('selectTopicFormValues ignores backend retention fields for legacy topics', async () => {
+        const result = await seedTopicResult({
+            self: {name: 'topic-legacy'},
+            retention_period: {seconds: '86400'},
+            retention_storage_mb: '2048',
+            partition_write_speed_bytes_per_second: '1048576',
+            partitioning_settings: {
+                min_active_partitions: '2',
+                partition_count_limit: '5',
+                auto_partitioning_settings: {
+                    strategy: AutoPartitioningStrategy.Disabled,
+                },
+            },
+        } as unknown as DescribeTopicResult);
+
+        expect(result).toEqual({
+            name: 'topic-legacy',
+            shards: 2,
+            partitionCountLimit: 5,
+            writeQuotaBytes: 1048576,
+            autoPartitioning: {
+                enabled: false,
+                mode: AutoPartitioningStrategy.Disabled,
+                minPartitions: 2,
+                maxPartitions: 5,
+                stabilizationWindow: undefined,
+                upUtilization: undefined,
             },
         });
     });
@@ -94,9 +122,6 @@ describe('topic selectors', () => {
             shards: 1,
             partitionCountLimit: undefined,
             writeQuotaBytes: 1024 * 1024,
-            retentionPeriodSeconds: 4 * 60 * 60,
-            storageLimitMb: 0,
-            retentionType: 'time',
             autoPartitioning: {
                 enabled: false,
                 mode: AutoPartitioningStrategy.Unspecified,

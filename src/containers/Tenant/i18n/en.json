@@ -31,6 +31,7 @@
   "actions.dropIndex": "Drop index",
   "actions.openPreview": "Open preview",
   "actions.openMonitoring": "Monitoring",
+  "actions.createMenu": "Create...",
   "actions.createTable": "Create table...",
   "actions.createExternalTable": "Create external table...",
   "actions.createTopic": "Create topic...",

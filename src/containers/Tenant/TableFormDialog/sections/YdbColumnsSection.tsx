@@ -432,6 +432,7 @@ function EditableColumnRow({
                             options={typeOptions}
                             filterable={typeOptions.length > 9}
                             width="max"
+                            popupClassName={b('columns-type-popup')}
                             onUpdate={([value]) => {
                                 field.onChange(value);
                                 onTypeChange(value);

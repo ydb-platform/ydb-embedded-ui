@@ -12,10 +12,6 @@ export interface TopicFormValues {
     shards: number;
     partitionCountLimit?: number;
     writeQuotaBytes: number;
-    retentionPeriodSeconds: number;
-    storageLimitMb: number;
-    retentionType: 'size' | 'time';
-    preserveRawRetentionSettings?: boolean;
     preservePartitionCountLimit?: boolean;
     autoPartitioning: {
         enabled: boolean;
@@ -34,8 +30,6 @@ const AUTO_PARTITIONING_STRATEGY_TO_YQL: Record<AutoPartitioningStrategy, string
     [AutoPartitioningStrategy.ScaleUp]: 'scale_up',
     [AutoPartitioningStrategy.ScaleUpAndDown]: 'scale_up_and_down',
 };
-
-const SIZE_RETENTION_PERIOD_SECONDS = 24 * 7 * 60 * 60;
 
 const NAME_REGEX = /^[a-z_][a-z0-9_]*$/i;
 
@@ -69,10 +63,6 @@ function buildTopicSettings(
     const {
         shards,
         writeQuotaBytes,
-        retentionPeriodSeconds,
-        storageLimitMb,
-        retentionType,
-        preserveRawRetentionSettings,
         partitionCountLimit,
         preservePartitionCountLimit,
         autoPartitioning,
@@ -95,18 +85,6 @@ function buildTopicSettings(
             : shards;
         settings.push(`PARTITION_COUNT_LIMIT = ${effectivePartitionCountLimit ?? shards}`);
     }
-
-    let effectiveRetentionPeriodSeconds = retentionPeriodSeconds;
-    if (!preserveRawRetentionSettings && retentionType !== 'time') {
-        effectiveRetentionPeriodSeconds = SIZE_RETENTION_PERIOD_SECONDS;
-    }
-    settings.push(`RETENTION_PERIOD = Interval('PT${effectiveRetentionPeriodSeconds}S')`);
-
-    let effectiveStorageMb = storageLimitMb;
-    if (!preserveRawRetentionSettings && retentionType === 'time') {
-        effectiveStorageMb = 0;
-    }
-    settings.push(`RETENTION_STORAGE_MB = ${effectiveStorageMb}`);
 
     settings.push(`PARTITION_WRITE_SPEED_BYTES_PER_SECOND = ${writeQuotaBytes}`);
 

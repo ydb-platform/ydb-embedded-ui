@@ -1,10 +1,10 @@
 import {z} from 'zod';
 
+import {isValidEntityPath, isValidEntityPathSegment} from '../utils/pathSegmentValidation';
+
 import {
     COLUMN_NAME_REG_EXP,
     ENTITY_NAME_REG_EXP,
-    ENTITY_PATH_REG_EXP,
-    ENTITY_RENAME_PATH_REG_EXP,
     MAX_COLUMN_PARTITION_COUNT,
     MAX_PARTITIONS_COUNT,
     MAX_PARTITION_SIZE_MB,
@@ -47,17 +47,19 @@ function validateName(data: FormValues, ctx: z.RefinementCtx, mode: FormMode) {
         addIssue(ctx, ['name'], i18n('error_required'));
         return;
     }
-    const namePattern =
-        mode === 'create'
-            ? ENTITY_PATH_REG_EXP
-            : data.type === 'row'
-              ? ENTITY_RENAME_PATH_REG_EXP
-              : ENTITY_NAME_REG_EXP;
-    if (!namePattern.test(data.name)) {
+
+    const hasPathSegments = mode === 'create' || data.type === 'row';
+    const isValidName = hasPathSegments
+        ? isValidEntityPath(data.name, {
+              allowLeadingSlash: mode === 'update' && data.type === 'row',
+          })
+        : isValidEntityPathSegment(data.name);
+
+    if (!isValidName) {
         addIssue(
             ctx,
             ['name'],
-            mode === 'create' ? i18n('error_name-path-pattern') : i18n('error_name-pattern'),
+            hasPathSegments ? i18n('error_name-path-pattern') : i18n('error_name-segment-pattern'),
         );
     }
 }

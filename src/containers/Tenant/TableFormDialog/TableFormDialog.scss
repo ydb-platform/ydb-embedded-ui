@@ -1,18 +1,51 @@
 .ydb-table-form-dialog {
-    &__modal {
-        overscroll-behavior: none;
-    }
+    max-height: 90vh;
 
     &__body {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+
+        min-height: 0;
         padding-top: var(--g-spacing-5);
+        padding-bottom: 0;
     }
 
     &__form {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+
         width: 100%;
+        min-height: 0;
+    }
+
+    &__scroll-container {
+        overflow: hidden auto;
+        overscroll-behavior: none;
+        flex: 1 1 auto;
+
+        min-height: 0;
+        margin-inline: calc(-1 * var(--_--side-padding));
+        padding-inline: var(--_--side-padding);
+
+        background:
+            linear-gradient(var(--g-color-base-modal), var(--g-color-base-modal)) bottom / 100% 5px
+                no-repeat local,
+            linear-gradient(var(--g-color-line-generic), var(--g-color-line-generic)) bottom / 100%
+                1px no-repeat scroll;
+        background-color: var(--g-color-base-modal);
+    }
+
+    &__scroll-content {
+        padding-bottom: var(--g-spacing-2);
     }
 
     &__section + &__section {
         margin-top: var(--g-spacing-6);
+        padding-top: var(--g-spacing-6);
+
+        border-top: 1px solid var(--g-color-line-generic);
     }
 
     &__section-title {
@@ -42,6 +75,8 @@
         padding-top: 7px;
 
         font-weight: 500;
+
+        color: var(--g-color-text-secondary);
     }
 
     &__label-title {
@@ -54,10 +89,6 @@
 
     &__help-mark-popup {
         max-width: 300px;
-    }
-
-    &__required {
-        color: var(--g-color-text-danger);
     }
 
     &__field-error {
@@ -84,8 +115,16 @@
         gap: var(--g-spacing-2);
     }
 
-    &__table-type-info {
-        max-width: 320px;
+    &__type-select-row {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-2);
+    }
+
+    &__type-select-control,
+    &__type-select-control.g-select {
+        width: 320px;
+        max-width: 100%;
     }
 
     &__special-columns {
@@ -109,14 +148,12 @@
     &__columns-head {
         display: grid;
         align-items: center;
-        grid-template-columns:
-            minmax(160px, 1.2fr) minmax(140px, 0.8fr) 105px 145px minmax(160px, 1.2fr)
-            28px;
-        gap: var(--g-spacing-3);
+        grid-template-columns: 180px 180px 100px 100px 170px 28px;
+        gap: var(--g-spacing-4);
 
         font-weight: 500;
 
-        color: var(--g-color-text-secondary);
+        color: var(--g-color-text-primary);
     }
 
     &__columns-head-cell {
@@ -129,18 +166,14 @@
 
     &__columns-table_update &__columns-head,
     &__columns-table_update &__columns-row {
-        grid-template-columns:
-            minmax(160px, 1.2fr) minmax(140px, 0.8fr) 145px minmax(160px, 1.2fr)
-            28px;
+        grid-template-columns: 205px 180px 180px 180px 28px;
     }
 
     &__columns-row {
         display: grid;
         align-items: start;
-        grid-template-columns:
-            minmax(160px, 1.2fr) minmax(140px, 0.8fr) 105px 145px minmax(160px, 1.2fr)
-            28px;
-        gap: var(--g-spacing-3);
+        grid-template-columns: 180px 180px 100px 100px 170px 28px;
+        gap: var(--g-spacing-4);
     }
 
     &__columns-row_readonly {
@@ -272,10 +305,61 @@
         gap: var(--g-spacing-2);
     }
 
+    &__split-points-field {
+        display: flex;
+        flex-direction: column;
+        gap: var(--g-spacing-3);
+
+        margin-top: var(--g-spacing-4);
+    }
+
+    &__split-points-header {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
+    }
+
+    &__split-points-title {
+        font-weight: 500;
+    }
+
+    &__split-points-content {
+        width: 420px;
+        max-width: 100%;
+    }
+
     &__split-point-row {
         display: flex;
         align-items: center;
         gap: var(--g-spacing-2);
+    }
+
+    &__split-point-index {
+        flex: 0 0 auto;
+
+        min-width: 20px;
+    }
+
+    &__split-point-display,
+    &__split-point-display.g-text-input {
+        flex: 1 1 auto;
+
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    &__split-point-dialog {
+        --split-point-dialog-min-width: 460px;
+        --split-point-dialog-max-width: 720px;
+        --split-point-column-gap: var(--g-spacing-10);
+        --split-point-inner-gap: var(--g-spacing-3);
+        --split-point-input-min-width: 248px;
+
+        box-sizing: border-box;
+        width: fit-content;
+        min-width: min(var(--split-point-dialog-min-width), calc(100vw - var(--g-spacing-8)));
+        max-width: min(var(--split-point-dialog-max-width), calc(100vw - var(--g-spacing-8)));
     }
 
     &__split-point-body {
@@ -293,26 +377,37 @@
     }
 
     &__split-point-fields {
-        display: flex;
-        flex-direction: column;
-        gap: var(--g-spacing-3);
+        display: grid;
+        align-items: start;
+        grid-template-columns:
+            fit-content(
+                calc(
+                    var(--split-point-dialog-max-width) - var(--split-point-input-min-width) - var(
+                            --split-point-column-gap
+                        )
+                )
+            )
+            minmax(var(--split-point-input-min-width), 1fr);
+        gap: var(--g-spacing-3) var(--split-point-column-gap);
+
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
     }
 
     &__split-point-dialog-row {
-        display: grid;
-        align-items: start;
-        grid-template-columns: minmax(0, 160px) minmax(0, 1fr);
-        gap: var(--g-spacing-4);
+        display: contents;
     }
 
     &__split-point-meta {
-        padding-top: 7px;
+        min-width: 0;
+        padding-top: 5px;
     }
 
     &__split-point-control {
         display: flex;
-        flex-direction: column;
-        gap: var(--g-spacing-2);
+        align-items: flex-start;
+        gap: var(--split-point-inner-gap);
 
         width: 100%;
         min-width: 0;
@@ -320,9 +415,17 @@
 
     &__split-point-toggle {
         display: flex;
+        flex: 0 0 auto;
+        justify-content: flex-start;
         align-items: center;
 
         min-height: 28px;
+    }
+
+    &__split-point-value {
+        flex: 1 1 auto;
+
+        min-width: 0;
     }
 
     &__split-point-input,
@@ -339,16 +442,27 @@
         align-items: center;
         gap: var(--g-spacing-1);
 
+        min-width: 0;
+        overflow-wrap: anywhere;
+
         font-weight: 500;
     }
 
     &__split-point-type {
         font-weight: 400;
+        cursor: help;
 
         color: var(--g-color-text-secondary);
     }
 
+    &__split-point-type-popover {
+        max-width: 300px;
+        padding: var(--g-spacing-3);
+    }
+
     &__not-null-label {
+        margin-inline-start: var(--g-spacing-1);
+
         cursor: default;
         user-select: none;
     }
@@ -381,6 +495,10 @@
         align-items: center;
 
         min-height: 28px;
+    }
+
+    &__columns-type-popup.g-select-popup {
+        max-height: 350px;
     }
 
     &__input-suffix {
