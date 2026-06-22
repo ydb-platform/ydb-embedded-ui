@@ -18,7 +18,7 @@ import {RunningQueryDialog} from './models/RunningQueryDialog';
 import {SaveChangesDialog} from './models/SaveChangesDialog';
 import {SaveQueryDialog} from './models/SaveQueryDialog';
 
-async function gotoDiagnosticsWithMultiTabMode(tenantPage: TenantPage) {
+async function gotoDiagnosticsWithQueryEditorMode(tenantPage: TenantPage, mode: QueryEditorMode) {
     await tenantPage.page.addInitScript(
         ({nextMode}) => {
             if (nextMode) {
@@ -27,21 +27,22 @@ async function gotoDiagnosticsWithMultiTabMode(tenantPage: TenantPage) {
                 delete window.e2eQueryEditorMode;
             }
         },
-        {nextMode: QueryEditorMode.MultiTab},
+        {nextMode: mode},
     );
 
     await tenantPage.goto({
         schema: dsVslotsSchema,
         database,
-        tenantPage: 'diagnostics',
+        databasePage: 'diagnostics',
     });
 }
 
-async function expectSelectQueryTemplateLoaded(queryEditor: QueryEditor) {
-    const expectedTablePath = dsVslotsSchema.replace(`${database}/`, '');
+async function gotoDiagnosticsWithMultiTabMode(tenantPage: TenantPage) {
+    await gotoDiagnosticsWithQueryEditorMode(tenantPage, QueryEditorMode.MultiTab);
+}
 
-    await expect(queryEditor.editorTabs.isVisible()).resolves.toBe(true);
-    await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('Select query');
+async function expectSelectQueryTemplateContentLoaded(queryEditor: QueryEditor) {
+    const expectedTablePath = dsVslotsSchema.replace(`${database}/`, '');
 
     await expect
         .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
@@ -50,6 +51,12 @@ async function expectSelectQueryTemplateLoaded(queryEditor: QueryEditor) {
     const editorContent = await queryEditor.getEditorContent();
     expect(editorContent).toContain('SELECT');
     expect(editorContent).toContain('LIMIT');
+}
+
+async function expectSelectQueryTemplateLoaded(queryEditor: QueryEditor) {
+    await expect(queryEditor.editorTabs.isVisible()).resolves.toBe(true);
+    await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('Select query');
+    await expectSelectQueryTemplateContentLoaded(queryEditor);
 }
 
 test.describe('Editor tabs', () => {
@@ -775,6 +782,47 @@ test.describe('Editor tabs', () => {
 });
 
 test.describe('Editor tabs from diagnostics', () => {
+    test('Select query template fills single-tab editor on cold start from diagnostics', async ({
+        page,
+    }) => {
+        const tenantPage = new TenantPage(page);
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        await gotoDiagnosticsWithQueryEditorMode(tenantPage, QueryEditorMode.SingleTab);
+        await expect(tenantPage.isDiagnosticsVisible()).resolves.toBe(true);
+
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+
+        await expectSelectQueryTemplateContentLoaded(queryEditor);
+    });
+
+    test('Select query template fills single-tab editor after restoring zero-tabs state', async ({
+        page,
+    }) => {
+        const tenantPage = new TenantPage(page);
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        await tenantPage.gotoQueryEditor({
+            schema: database,
+            database,
+            mode: QueryEditorMode.MultiTab,
+        });
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Close tab');
+        await expect(queryEditor.isZeroTabsStateVisible()).resolves.toBe(true);
+
+        await gotoDiagnosticsWithQueryEditorMode(tenantPage, QueryEditorMode.SingleTab);
+        await expect(tenantPage.isDiagnosticsVisible()).resolves.toBe(true);
+
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+
+        await expect(queryEditor.editorTabs.isHidden()).resolves.toBe(true);
+        await expect(queryEditor.isZeroTabsStateHidden()).resolves.toBe(true);
+        await expectSelectQueryTemplateContentLoaded(queryEditor);
+    });
+
     test('Select query template fills editor on cold start from diagnostics', async ({page}) => {
         const tenantPage = new TenantPage(page);
         const objectSummary = new ObjectSummary(page);

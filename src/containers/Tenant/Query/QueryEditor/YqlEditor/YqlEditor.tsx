@@ -169,7 +169,7 @@ export function YqlEditor({
     }, [isMultiTabQueryEditorEnabled, tabsOrder]);
 
     React.useEffect(() => {
-        if (!isMultiTabQueryEditorEnabled || !activeTabId || !pendingSnippet || !isEditorMounted) {
+        if (!activeTabId || !pendingSnippet || !isEditorMounted) {
             if (!pendingSnippet) {
                 appliedPendingSnippetRef.current = null;
             }
@@ -182,13 +182,7 @@ export function YqlEditor({
         }
 
         applyPendingSnippet(editor, activeTabId, pendingSnippet);
-    }, [
-        activeTabId,
-        applyPendingSnippet,
-        isEditorMounted,
-        pendingSnippet,
-        isMultiTabQueryEditorEnabled,
-    ]);
+    }, [activeTabId, applyPendingSnippet, isEditorMounted, pendingSnippet]);
 
     const [lastUsedQueryAction] = useSetting<QueryAction>(SETTING_KEYS.LAST_USED_QUERY_ACTION);
 
