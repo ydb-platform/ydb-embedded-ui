@@ -1,5 +1,17 @@
 # Changelog
 
+## [16.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v16.3.0...v16.4.0) (2026-06-22)
+
+
+### Features
+
+* implement increasing precision for values ([#4021](https://github.com/ydb-platform/ydb-embedded-ui/issues/4021)) ([410ab82](https://github.com/ydb-platform/ydb-embedded-ui/commit/410ab8256cb833b8ea9b62d3a4567c70f8dc7973))
+
+
+### Bug Fixes
+
+* open monitoring tab in new navigation ([#4018](https://github.com/ydb-platform/ydb-embedded-ui/issues/4018)) ([5b6e5ec](https://github.com/ydb-platform/ydb-embedded-ui/commit/5b6e5ec398b75e91896c294512718afccc54a88f))
+
 ## [16.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v16.2.0...v16.3.0) (2026-06-19)
 
 
