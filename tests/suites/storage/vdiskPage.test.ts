@@ -268,6 +268,51 @@ test.describe('Storage disk popup snapshots', () => {
         await expect(popup).toHaveScreenshot('vdisk-popup-actions.png');
     });
 
+    test('closes VDisk popup after successful eviction', async ({page}) => {
+        let evictRequestCount = 0;
+
+        await page.route('**/vdisk/evict*', async (route) => {
+            evictRequestCount++;
+
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({result: true}),
+            });
+        });
+
+        await page.setViewportSize({width: 1500, height: 1000});
+        await setupVDiskPageMocks(page);
+        await page.goto(VDISK_PAGE_PATH);
+
+        const storageTable = new ClusterStorageTable(page);
+        await storageTable.waitForTableToLoad();
+        await storageTable.waitForTableData();
+
+        const vDisk = page
+            .locator('.ydb-storage-vdisks__wrapper .storage-disk-progress-bar')
+            .first();
+        await expect(vDisk).toBeVisible();
+        await vDisk.hover();
+
+        const popup = await waitForDiskPopup(page, 'Go to VDisk');
+        await popup.getByRole('button', {name: 'Evict VDisk'}).click();
+
+        const dialog = page.locator('.g-dialog').filter({hasText: 'Evict VDisk?'});
+        await expect(dialog).toBeVisible();
+
+        await Promise.all([
+            page.waitForResponse(
+                (response) => response.url().includes('/vdisk/evict') && response.ok(),
+            ),
+            dialog.getByRole('button', {name: 'Evict', exact: true}).click(),
+        ]);
+
+        expect(evictRequestCount).toBe(1);
+        await expect(dialog).toBeHidden();
+        await expect(popup).toBeHidden();
+    });
+
     test('renders redesigned PDisk popup actions', async ({page}) => {
         await page.setViewportSize({width: 1500, height: 1000});
         await setupVDiskPageMocks(page);
