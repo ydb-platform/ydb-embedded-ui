@@ -252,10 +252,11 @@ const buildSettingsCreateItems = (settings?: Partial<TableSettings>) => {
     return items;
 };
 
-const buildSettingsUpdateItems = (settings?: Partial<TableSettings>, pad = ' ') =>
-    buildSettingsCreateItems(settings)
-        .map((item) => `SET ${item.replace(/ = /g, ' ')}`)
-        .join(`,${pad}`);
+const buildSettingsUpdateItems = (settings?: Partial<TableSettings>, pad = ' ') => {
+    const items = buildSettingsCreateItems(settings);
+
+    return items.length > 0 ? `SET (${items.join(`,${pad}`)})` : '';
+};
 
 const buildAddColumns = (columns: Column[] = [], pad = ' ') =>
     columns

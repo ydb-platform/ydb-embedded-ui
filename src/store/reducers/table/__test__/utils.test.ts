@@ -116,7 +116,7 @@ describe('table utils', () => {
         expect(query).toContain('ALTER TABLE orders');
         expect(query).toContain('DROP COLUMN `legacy`');
         expect(query).toContain('ADD COLUMN `status` Utf8');
-        expect(query).toContain('SET KEY_BLOOM_FILTER ENABLED');
+        expect(query).toContain('SET (KEY_BLOOM_FILTER = ENABLED)');
     });
 
     test('buildUpdateTableQuery can combine reset, update and rename actions in one statement', () => {
@@ -136,7 +136,7 @@ describe('table utils', () => {
         expect(query).toContain('RESET (TTL)');
         expect(query).toContain('DROP COLUMN `legacy`');
         expect(query).toContain('ADD COLUMN `status` Utf8');
-        expect(query).toContain('SET KEY_BLOOM_FILTER ENABLED');
+        expect(query).toContain('SET (KEY_BLOOM_FILTER = ENABLED)');
         expect(query).toContain('RENAME TO `/Root/archive/orders`');
     });
 

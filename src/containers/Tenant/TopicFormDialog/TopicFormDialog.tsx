@@ -50,6 +50,7 @@ import './TopicFormDialog.scss';
 const b = cn('ydb-topic-form-dialog');
 
 type TopicFormMode = 'create' | 'update';
+type DialogSuccessHandler = (path: string) => void;
 
 interface CommonDialogProps {
     mode: TopicFormMode;
@@ -57,16 +58,17 @@ interface CommonDialogProps {
     databaseFullPath: string;
     parentPath?: string;
     topicPath?: string;
-    onSuccess?: (path: string) => void;
+    onSuccess?: DialogSuccessHandler;
 }
 
 interface TopicFormDialogNiceModalProps extends CommonDialogProps {
     onClose?: () => void;
 }
 
-interface TopicFormDialogProps extends CommonDialogProps {
+interface TopicFormDialogProps extends Omit<CommonDialogProps, 'onSuccess'> {
     open: boolean;
     onClose: () => void;
+    onSuccess: DialogSuccessHandler;
 }
 
 interface TopicFormProps {
@@ -75,7 +77,7 @@ interface TopicFormProps {
     databaseFullPath: string;
     initialValues: TopicFormValues;
     onClose: () => void;
-    onSuccess?: (path: string) => void;
+    onSuccess: DialogSuccessHandler;
     nameInputRef?: React.Ref<HTMLInputElement>;
 }
 
@@ -411,7 +413,7 @@ function TopicForm({
                 theme: 'success',
                 autoHiding: 5000,
             });
-            onSuccess?.(buildFullTopicPath(preparedData, databaseFullPath));
+            onSuccess(buildFullTopicPath(preparedData, databaseFullPath));
         } catch (error) {
             createToast({
                 name: `topic-${mode}-error`,

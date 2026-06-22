@@ -83,6 +83,16 @@ function validateColumns(data: FormValues, ctx: z.RefinementCtx, mode: FormMode)
     }
 }
 
+function validatePrimaryKey(data: FormValues, ctx: z.RefinementCtx, mode: FormMode) {
+    if (mode !== 'create' || data.columns.length === 0) {
+        return;
+    }
+
+    if (!data.columns.some((column) => Boolean(column.key))) {
+        addIssue(ctx, ['columns'], i18n('error_primary-key-required'));
+    }
+}
+
 function validateSecondaryIndexes(
     data: FormValues,
     ctx: z.RefinementCtx,
@@ -272,6 +282,7 @@ export function buildTableValidationSchema({
         const data = raw as FormValues;
         validateName(data, ctx, mode);
         validateColumns(data, ctx, mode);
+        validatePrimaryKey(data, ctx, mode);
         validateSecondaryIndexes(data, ctx, originalInfo);
         validatePartitioning(data, ctx, mode);
         validateSettings(data, ctx, mode, originalInfo);

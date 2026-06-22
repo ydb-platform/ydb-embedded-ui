@@ -31,6 +31,7 @@
   "error_partitions-count": "Value must be between 1 and 35000",
   "error_partition-count-range": "Value must be between 1 and 1000",
   "error_columns-empty": "Columns are empty",
+  "error_primary-key-required": "At least one primary key column is required",
   "error_indexes-key": "Incorrect set of columns in the key",
   "error_partitions-at-keys-invalid": "Invalid split points",
   "error_value-invalid": "Incorrect value in field",

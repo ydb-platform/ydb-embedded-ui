@@ -63,6 +63,19 @@ describe('TableFormDialog validation', () => {
         expect(getIssuePaths(result)).toEqual(expect.arrayContaining(['name', 'columns']));
     });
 
+    test('create mode requires at least one primary key column', () => {
+        const schema = buildTableValidationSchema({mode: 'create'});
+
+        const result = schema.safeParse(
+            createValues({
+                columns: [createColumn({key: false})],
+            }),
+        );
+
+        expect(result.success).toBe(false);
+        expect(getIssuePaths(result)).toContain('columns');
+    });
+
     test('create mode accepts slash-separated table names for column tables', () => {
         const schema = buildTableValidationSchema({mode: 'create'});
 
