@@ -264,6 +264,22 @@ export class ObjectSummary {
         await this.clickActionsMenuItem(menuItemText);
     }
 
+    async clickActionSubMenuItem(
+        treeItemText: string,
+        parentMenuText: string,
+        childMenuText: string,
+    ): Promise<void> {
+        await this.clickActionsButton(treeItemText);
+        await this.clickActionsSubMenuItem(parentMenuText, childMenuText);
+    }
+
+    async clickActionsSubMenuItem(
+        parentMenuText: string,
+        childMenuText: string,
+    ): Promise<void> {
+        await this.actionsMenu.clickSubMenuItem(parentMenuText, childMenuText);
+    }
+
     async clickRefreshButton(): Promise<void> {
         await this.refreshButton.click();
     }

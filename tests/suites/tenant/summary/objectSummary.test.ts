@@ -258,7 +258,7 @@ test.describe('Object Summary', async () => {
         const directoryName = `test_dir_${Date.now()}`;
 
         // Open actions menu and click Create directory
-        await objectSummary.clickActionMenuItem('local', RowTableAction.CreateDirectory);
+        await objectSummary.clickActionSubMenuItem('local', 'Create...', 'Directory');
         await expect(objectSummary.isCreateDirectoryModalVisible()).resolves.toBe(true);
 
         // Create directory
