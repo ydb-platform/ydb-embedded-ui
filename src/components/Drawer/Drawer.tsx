@@ -1,14 +1,12 @@
 import React from 'react';
 
 import {Xmark} from '@gravity-ui/icons';
-import {DrawerItem, Drawer as GravityDrawer} from '@gravity-ui/navigation';
-import {ActionTooltip, Button, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Flex, Drawer as GravityDrawer, Icon, Text} from '@gravity-ui/uikit';
 import {debounce} from 'lodash';
 
 import {cn} from '../../utils/cn';
 import {useSetting} from '../../utils/hooks/useSetting';
 import {CopyLinkButton} from '../CopyLinkButton/CopyLinkButton';
-import {Portal} from '../Portal/Portal';
 
 import {useDrawerContext} from './DrawerContext';
 import {
@@ -73,6 +71,7 @@ const DrawerPaneContentWrapper = ({
     }, [containerWidth, defaultWidth, isPercentageWidth, savedWidthString]);
 
     const drawerWidth = userDrawerWidth ?? derivedDrawerWidth;
+
     // Calculate drawer width based on container width percentage if specified
     const calculatedWidth = React.useMemo(() => {
         if (isPercentageWidth && containerWidth > 0) {
@@ -83,27 +82,33 @@ const DrawerPaneContentWrapper = ({
         return drawerWidth || DEFAULT_DRAWER_WIDTH;
     }, [containerWidth, isPercentageWidth, drawerWidth]);
 
+    const drawerOverlayStyle = React.useMemo<React.CSSProperties | undefined>(() => {
+        return containerWidth > 0 ? {width: containerWidth} : undefined;
+    }, [containerWidth]);
+
     React.useEffect(() => {
-        if (!detectClickOutside) {
+        if (!detectClickOutside || !isVisible) {
             return undefined;
         }
 
         const handleClickOutside = (event: DrawerEvent) => {
-            //skip if event is captured inside drawer or not triggered by user
             if (event._capturedInsideDrawer || !event.isTrusted) {
                 return;
             }
-            if (
-                isVisible &&
-                drawerRef.current &&
-                !drawerRef.current.contains(event.target as Node)
-            ) {
+
+            if (drawerRef.current && !drawerRef.current.contains(event.target as Node)) {
                 onClose();
             }
         };
 
-        document.addEventListener('click', handleClickOutside);
+        // Keep the document listener in the bubble phase so row clicks may stop propagation
+        // and switch drawer content without closing it. Attach it after the opening click.
+        const listenerTimeoutId = window.setTimeout(() => {
+            document.addEventListener('click', handleClickOutside);
+        }, 0);
+
         return () => {
+            window.clearTimeout(listenerTimeoutId);
             document.removeEventListener('click', handleClickOutside);
         };
     }, [isVisible, onClose, detectClickOutside]);
@@ -118,16 +123,28 @@ const DrawerPaneContentWrapper = ({
         };
     }, [saveWidthDebounced]);
 
-    const handleResizeDrawer = (width: number) => {
-        const normalized = normalizeDrawerWidthFromResize({
-            resizedWidthPx: width,
-            isPercentageWidth,
-            containerWidth,
-        });
+    const handleResizeDrawer = React.useCallback(
+        (width: number) => {
+            const normalized = normalizeDrawerWidthFromResize({
+                resizedWidthPx: width,
+                isPercentageWidth,
+                containerWidth,
+            });
 
-        setUserDrawerWidth(normalized.drawerWidth);
-        saveWidthDebounced(normalized.savedWidthString);
-    };
+            setUserDrawerWidth(normalized.drawerWidth);
+            saveWidthDebounced(normalized.savedWidthString);
+        },
+        [containerWidth, isPercentageWidth, saveWidthDebounced],
+    );
+
+    const handleOpenChange = React.useCallback(
+        (open: boolean) => {
+            if (!open) {
+                onClose();
+            }
+        },
+        [onClose],
+    );
 
     const handleClickInsideDrawer = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         const nativeEvent = event.nativeEvent as DrawerEvent;
@@ -140,30 +157,28 @@ const DrawerPaneContentWrapper = ({
     }
 
     return (
-        <Portal container={itemContainer}>
-            <GravityDrawer
-                onEscape={onClose}
-                onVeilClick={onClose}
-                hideVeil={hideVeil}
-                className={b('container', className)}
-            >
-                <DrawerItem
-                    id={drawerId}
-                    visible={isVisible}
-                    resizable
-                    maxResizeWidth={containerWidth}
-                    width={calculatedWidth}
-                    onResize={handleResizeDrawer}
-                    direction={direction}
-                    className={b('item')}
-                    ref={detectClickOutside ? drawerRef : undefined}
-                >
-                    <div className={b('click-handler')} onClickCapture={handleClickInsideDrawer}>
-                        {children}
-                    </div>
-                </DrawerItem>
-            </GravityDrawer>
-        </Portal>
+        <GravityDrawer
+            qa={drawerId}
+            open={isVisible}
+            onOpenChange={handleOpenChange}
+            placement={direction}
+            hideVeil={hideVeil}
+            className={b('container', className)}
+            contentClassName={b('item')}
+            style={drawerOverlayStyle}
+            container={itemContainer}
+            resizable
+            maxSize={containerWidth || undefined}
+            size={calculatedWidth}
+            onResizeEnd={handleResizeDrawer}
+            disableBodyScrollLock
+            disableOutsideClick={detectClickOutside}
+            floatingRef={detectClickOutside ? drawerRef : undefined}
+        >
+            <div className={b('click-handler')} onClickCapture={handleClickInsideDrawer}>
+                {children}
+            </div>
+        </GravityDrawer>
     );
 };
 
@@ -207,11 +222,17 @@ export const DrawerWrapper = ({
     headerClassName,
     hideVeil,
 }: DrawerPaneProps) => {
+    const onCloseDrawerRef = React.useRef(onCloseDrawer);
+
+    React.useEffect(() => {
+        onCloseDrawerRef.current = onCloseDrawer;
+    }, [onCloseDrawer]);
+
     React.useEffect(() => {
         return () => {
-            onCloseDrawer();
+            onCloseDrawerRef.current();
         };
-    }, [onCloseDrawer]);
+    }, []);
 
     const renderDrawerHeader = () => {
         const controls = [];

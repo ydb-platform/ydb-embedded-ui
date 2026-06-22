@@ -81,10 +81,11 @@ export const HotkeysPanelWrapper = ({
 
     return (
         <UIKitHotkeysPanel
-            visible={visible}
+            open={visible}
             hotkeys={hotkeyGroups}
             className={b('hotkeys-panel')}
             drawerItemClassName={b('hotkeys-drawer')}
+            drawerProps={{qa: 'hotkeys-panel'}}
             title={
                 <div className={b('hotkeys-panel-title')}>
                     {i18n('hotkeys.title')}

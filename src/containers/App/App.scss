@@ -104,20 +104,6 @@ body,
     color: var(--g-color-text-secondary);
 }
 
-.gn-aside-header__pane-container {
-    height: 100%;
-}
-
-.gn-aside-header__content {
-    position: relative;
-
-    display: flex;
-    overflow: auto;
-    flex-direction: column;
-
-    height: 100%;
-}
-
 .loader {
     @include mixins.loader();
 }

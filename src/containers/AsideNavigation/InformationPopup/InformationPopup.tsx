@@ -15,7 +15,7 @@ export interface InformationPopupProps {
 
 export function InformationPopup({onKeyboardShortcutsClick}: InformationPopupProps) {
     return (
-        <div className={b('content', {})}>
+        <div className={b('content', {})} data-qa="information-popup">
             <div className={b('docs')}>
                 <Text variant="subheader-3" color="primary" className={b('title')}>
                     Documentation
@@ -50,6 +50,7 @@ export function InformationPopup({onKeyboardShortcutsClick}: InformationPopupPro
                 <Flex
                     justifyContent="space-between"
                     className={b('shortcuts-item')}
+                    qa="information-popup-hotkeys"
                     onClick={onKeyboardShortcutsClick}
                 >
                     <Flex alignItems="center">

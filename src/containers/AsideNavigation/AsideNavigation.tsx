@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {CircleQuestion, Gear, Person} from '@gravity-ui/icons';
-import type {MenuItem} from '@gravity-ui/navigation';
+import type {AsideHeaderItem} from '@gravity-ui/navigation';
 import {AsideHeader, FooterItem} from '@gravity-ui/navigation';
 import type {IconData} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
@@ -42,18 +42,25 @@ function UserDropdown({isCompact, popupAnchor, user, children}: YdbUserDropdownP
     return (
         <FooterItem
             compact={isCompact}
-            item={{
-                id: 'user-popup',
-                title: user?.login ? user.login : i18n('navigation-item.account'),
-                current: isUserDropdownVisible,
-                icon: iconData,
-                onItemClick: () => setIsUserDropdownVisible((v) => !v),
-            }}
+            id="user-popup"
+            title={user?.login ? user.login : i18n('navigation-item.account')}
+            current={isUserDropdownVisible}
+            icon={iconData}
+            qa="aside-user"
+            onItemClick={() => setIsUserDropdownVisible((v) => !v)}
             enableTooltip={!isUserDropdownVisible}
-            popupAnchor={popupAnchor}
+            popupRef={popupAnchor}
             popupVisible={isUserDropdownVisible}
-            onClosePopup={() => setIsUserDropdownVisible(false)}
-            renderPopupContent={() => <div className={b('ydb-user-wrapper')}>{children}</div>}
+            onOpenChangePopup={(open) => {
+                if (!open) {
+                    setIsUserDropdownVisible(false);
+                }
+            }}
+            renderPopupContent={() => (
+                <div className={b('ydb-user-wrapper')} data-qa="aside-user-popup">
+                    {children}
+                </div>
+            )}
         />
     );
 }
@@ -61,7 +68,7 @@ function UserDropdown({isCompact, popupAnchor, user, children}: YdbUserDropdownP
 export interface AsideNavigationProps {
     settings: JSX.Element;
     ydbInternalUser: JSX.Element;
-    menuItems?: MenuItem[];
+    menuItems?: AsideHeaderItem[];
     content: React.ReactNode;
     user?: {login: string; icon?: IconData};
     renderFooterItems?: (
@@ -114,52 +121,70 @@ export function AsideNavigation(props: AsideNavigationProps) {
         return <InformationPopup onKeyboardShortcutsClick={openHotkeysPanel} />;
     };
 
+    const renderContent = React.useCallback(() => {
+        return <div className={b('content')}>{props.content}</div>;
+    }, [props.content]);
+
+    const renderLogo = React.useCallback((node: React.ReactNode) => {
+        if (!React.isValidElement(node)) {
+            return node;
+        }
+
+        return React.cloneElement(node as React.ReactElement<{'data-qa'?: string}>, {
+            'data-qa': 'aside-logo',
+        });
+    }, []);
+
     return (
         <React.Fragment>
             <AsideHeader
+                qa="aside-navigation"
                 logo={{
                     text: 'YDB',
                     icon: ydbLogoIcon,
                     onClick: () => history.push('/'),
+                    wrapper: renderLogo,
                 }}
                 menuItems={props.menuItems}
                 compact={compact}
                 onChangeCompact={setIsCompact}
                 multipleTooltip={true}
                 className={b(null, props.className)}
-                renderContent={() => props.content}
+                renderContent={renderContent}
                 renderFooter={({compact: footerCompact, asideRef}) => {
                     const defaultFooterItems = [
                         <FooterItem
                             key="information"
                             compact={footerCompact}
-                            item={{
-                                id: 'information',
-                                title: i18n('navigation-item.information'),
-                                icon: CircleQuestion,
-                                current: informationPopupVisible,
-                                onItemClick: toggleInformationPopup,
-                            }}
+                            id="information"
+                            title={i18n('navigation-item.information')}
+                            icon={CircleQuestion}
+                            current={informationPopupVisible}
+                            qa="aside-information"
+                            onItemClick={toggleInformationPopup}
                             enableTooltip={!informationPopupVisible}
                             popupVisible={informationPopupVisible}
-                            onClosePopup={closeInformationPopup}
+                            onOpenChangePopup={(open) => {
+                                if (!open) {
+                                    closeInformationPopup();
+                                }
+                            }}
                             renderPopupContent={renderInformationPopup}
                         />,
 
                         <FooterItem
                             key="user-settings"
-                            item={{
-                                id: 'user-settings',
-                                title: i18n('navigation-item.settings'),
-                                icon: Gear,
-                                current: visiblePanel === Panel.UserSettings,
-                                onItemClick: () => {
-                                    setVisiblePanel(
-                                        visiblePanel === Panel.UserSettings
-                                            ? undefined
-                                            : Panel.UserSettings,
-                                    );
-                                },
+                            id="user-settings"
+                            title={i18n('navigation-item.settings')}
+                            icon={Gear}
+                            current={visiblePanel === Panel.UserSettings}
+                            qa="aside-settings"
+                            onItemClick={() => {
+                                setVisiblePanel(
+                                    visiblePanel === Panel.UserSettings
+                                        ? undefined
+                                        : Panel.UserSettings,
+                                );
                             }}
                             compact={footerCompact}
                         />,
@@ -188,18 +213,19 @@ export function AsideNavigation(props: AsideNavigationProps) {
                 panelItems={[
                     {
                         id: 'user-settings',
-                        visible: visiblePanel === Panel.UserSettings,
-                        content: props.settings,
+                        open: visiblePanel === Panel.UserSettings,
+                        size: 'auto',
+                        children: props.settings,
                     },
                     {
                         id: 'information',
-                        visible: visiblePanel === Panel.Information,
+                        open: visiblePanel === Panel.Information,
                     },
                     {
                         id: 'hotkeys',
-                        visible: visiblePanel === Panel.Hotkeys,
+                        open: visiblePanel === Panel.Hotkeys,
                         keepMounted: true,
-                        content: renderHotkeysPanel(),
+                        children: renderHotkeysPanel(),
                     },
                 ]}
                 onClosePanel={closePanel}

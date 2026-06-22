@@ -47,6 +47,13 @@ export class QueriesHistoryTable {
         await row.click();
     }
 
+    async isRowActive(query: string) {
+        const row = await this.getQueryRow(query);
+        const className = await row.getAttribute('class');
+
+        return Boolean(className?.includes('ydb-queries-history__table-row_active'));
+    }
+
     async getQueryText(index: number) {
         const row = this.table.locator('.ydb-queries-history__table-row').nth(index);
         return row.locator('.ydb-syntax-highlighter').innerText();

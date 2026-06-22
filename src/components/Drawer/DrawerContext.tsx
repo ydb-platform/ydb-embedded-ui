@@ -35,7 +35,12 @@ export const DrawerContextProvider = ({children, className}: DrawerContextProvid
 
         const updateWidth = () => {
             if (containerRef.current) {
-                setContainerWidth(containerRef.current.clientWidth);
+                const containerRect = containerRef.current.getBoundingClientRect();
+                const visibleLeft = Math.max(containerRect.left, 0);
+                const visibleRight = Math.min(containerRect.right, window.innerWidth);
+                const visibleWidth = Math.max(0, visibleRight - visibleLeft);
+
+                setContainerWidth(visibleWidth || containerRef.current.clientWidth);
             }
         };
 
@@ -47,9 +52,7 @@ export const DrawerContextProvider = ({children, className}: DrawerContextProvid
         resizeObserver.observe(containerRef.current);
 
         return () => {
-            if (containerRef.current) {
-                resizeObserver.disconnect();
-            }
+            resizeObserver.disconnect();
         };
     }, []);
 

@@ -75,17 +75,13 @@ export class SettingsDialog {
     }
 
     async changeQueryMode(mode: (typeof QUERY_MODES)[keyof typeof QUERY_MODES]) {
-        await this.queryModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.queryModeSelect.click();
-        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.openSelect(this.queryModeSelect);
         await this.page.locator(`.ydb-query-settings-select__item_type_${mode}`).click();
         await this.page.waitForTimeout(1000);
     }
 
     async getResourcePoolOptions() {
-        await this.resourcePoolSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.resourcePoolSelect.click();
-        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.openSelect(this.resourcePoolSelect);
         try {
             const items = this.selectPopup.locator('.ydb-query-settings-select__item-title');
             const count = await items.count();
@@ -105,9 +101,7 @@ export class SettingsDialog {
     }
 
     async changeResourcePool(label: string) {
-        await this.resourcePoolSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.resourcePoolSelect.click();
-        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.openSelect(this.resourcePoolSelect);
         const optionTitle = this.selectPopup.locator('.ydb-query-settings-select__item-title', {
             hasText: label,
         });
@@ -129,17 +123,13 @@ export class SettingsDialog {
     }
 
     async changeTransactionMode(level: (typeof TRANSACTION_MODES)[keyof typeof TRANSACTION_MODES]) {
-        await this.transactionModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.transactionModeSelect.click();
-        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.openSelect(this.transactionModeSelect);
         await this.page.locator(`.ydb-query-settings-select__item_type_${level}`).click();
         await this.page.waitForTimeout(1000);
     }
 
     async changeStatsLevel(mode: (typeof STATISTICS_MODES)[keyof typeof STATISTICS_MODES]) {
-        await this.statisticsModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.statisticsModeSelect.click();
-        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.openSelect(this.statisticsModeSelect);
         await this.page.locator(`.ydb-query-settings-select__item_type_${mode}`).click();
         await this.page.waitForTimeout(1000);
     }
@@ -207,8 +197,9 @@ export class SettingsDialog {
     }
 
     async clickTimeoutSwitch() {
-        await this.timeoutSwitch.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.timeoutSwitch.click();
+        const clickTarget = this.getTimeoutSwitchClickTarget();
+        await clickTarget.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await clickTarget.click();
         await this.page.waitForTimeout(500);
     }
 
@@ -262,9 +253,7 @@ export class SettingsDialog {
     }
 
     async isStatisticsOptionDisabled(mode: StatisticsMode) {
-        await this.statisticsModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.statisticsModeSelect.click();
-        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.openSelect(this.statisticsModeSelect);
         try {
             const option = this.selectPopup.locator(
                 `.ydb-query-settings-select__item_type_${mode}`,
@@ -280,5 +269,17 @@ export class SettingsDialog {
     async hoverStatisticsSelect() {
         await this.statisticsModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.statisticsModeSelect.hover();
+    }
+
+    private async openSelect(selectWrapper: Locator) {
+        await selectWrapper.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        const selectControl = selectWrapper.locator('.g-select-control').first();
+        await selectControl.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await selectControl.click();
+        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+    }
+
+    private getTimeoutSwitchClickTarget() {
+        return this.timeoutSwitch.locator('.g-control-label__text').first();
     }
 }
