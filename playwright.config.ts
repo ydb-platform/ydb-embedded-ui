@@ -3,6 +3,21 @@ import {devices} from '@playwright/test';
 
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL;
 
+function getCiWorkers() {
+    const workers = process.env.PLAYWRIGHT_WORKERS;
+
+    if (!workers) {
+        return 2;
+    }
+
+    const parsedWorkers = Number(workers);
+    if (!Number.isInteger(parsedWorkers) || parsedWorkers < 1) {
+        throw new Error(`PLAYWRIGHT_WORKERS must be a positive integer, got "${workers}"`);
+    }
+
+    return parsedWorkers;
+}
+
 const config: PlaywrightTestConfig = {
     globalSetup: './tests/playwrightSetup.ts',
     testDir: './tests/suites',
@@ -21,7 +36,7 @@ const config: PlaywrightTestConfig = {
               ['json', {outputFile: './playwright-artifacts/test-results.json'}],
           ],
     retries: process.env.CI ? 2 : 0,
-    workers: process.env.CI ? 2 : undefined,
+    workers: process.env.CI ? getCiWorkers() : undefined,
     // If there is no url provided, playwright starts webServer with the app in dev mode
     webServer: baseUrl
         ? undefined
