@@ -273,10 +273,7 @@ export class ObjectSummary {
         await this.clickActionsSubMenuItem(parentMenuText, childMenuText);
     }
 
-    async clickActionsSubMenuItem(
-        parentMenuText: string,
-        childMenuText: string,
-    ): Promise<void> {
+    async clickActionsSubMenuItem(parentMenuText: string, childMenuText: string): Promise<void> {
         await this.actionsMenu.clickSubMenuItem(parentMenuText, childMenuText);
     }
 
