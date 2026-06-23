@@ -22,7 +22,7 @@ const uiFactoryBase: UIFactory = {
         getHealthckechViewTitles,
         getHealthcheckViewsOrder,
     },
-    hasAccess: true,
+    hasAccess: () => true,
     useDatabaseId: false,
     settingsBackend: undefined,
     enableMultiTabQueryEditor: false,

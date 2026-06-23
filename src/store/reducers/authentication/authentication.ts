@@ -12,6 +12,7 @@ const initialState: AuthenticationState = {
     user: undefined,
     id: undefined,
     metaUser: undefined,
+    whoamiData: undefined,
 };
 
 export const slice = createSlice({
@@ -25,6 +26,7 @@ export const slice = createSlice({
 
             if (!isAuthenticated) {
                 state.user = undefined;
+                state.whoamiData = undefined;
             }
         },
         setUser: (state, action: PayloadAction<TUserToken>) => {
@@ -33,6 +35,7 @@ export const slice = createSlice({
 
             state.user = AuthType === 'Login' ? UserSID : undefined;
             state.id = UserID;
+            state.whoamiData = action.payload;
 
             // If ydb version supports this feature,
             // There should be explicit flag in whoami response
@@ -47,13 +50,19 @@ export const slice = createSlice({
         selectIsViewerUser: (state) => state.isViewerUser,
         selectUser: (state) => state.user,
         selectMetaUser: (state) => state.metaUser ?? state.id,
+        selectWhoamiData: (state) => state.whoamiData,
     },
 });
 
 export default slice.reducer;
 export const {setIsAuthenticated, setUser} = slice.actions;
-export const {selectIsUserAllowedToMakeChanges, selectIsViewerUser, selectUser, selectMetaUser} =
-    slice.selectors;
+export const {
+    selectIsUserAllowedToMakeChanges,
+    selectIsViewerUser,
+    selectUser,
+    selectMetaUser,
+    selectWhoamiData,
+} = slice.selectors;
 
 export const authenticationApi = api.injectEndpoints({
     endpoints: (build) => ({
