@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {selectuserPermissions} from '../../../store/reducers/authentication/authentication';
 import {
     useCapabilitiesLoaded,
     useConfigAvailable,
@@ -13,8 +12,7 @@ import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import {useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {EPathSubType, EPathType} from '../../../types/api/schema';
 import {uiFactory} from '../../../uiFactory/uiFactory';
-import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {useTypedSelector} from '../../../utils/hooks/useTypedSelector';
+import {useIsViewerUser, useUserPermissions} from '../../../utils/hooks/useWhoami';
 import {canShowTenantMonitoringTab} from '../../../utils/monitoringVisibility';
 import {isDatabaseEntityType} from '../utils/schema';
 
@@ -53,7 +51,7 @@ export function useDiagnosticsPages({
     const hasStorageUsage = newStorageViewEnabled && hasStorageUsageCapabilities;
     const hasTopicData = useTopicDataAvailable();
     const isViewerUser = useIsViewerUser();
-    const userPermissions = useTypedSelector(selectuserPermissions);
+    const userPermissions = useUserPermissions();
 
     return React.useMemo(() => {
         return getPagesByType(type, subType, {
