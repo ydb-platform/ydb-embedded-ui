@@ -214,7 +214,7 @@ FROM ${path}
 -- WHERE SystemMetadata('partition_id') = 42
 -- AND SystemMetadata('write_time') > CurrentUtcTimestamp() - Interval('PT60S')
 -- AND SystemMetadata('offset') > 100
-LIMIT 10;`;
+LIMIT \${1:10};`;
 };
 
 export const showCreateTableTemplate = (params?: SchemaQueryParams) => {
