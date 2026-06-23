@@ -43,7 +43,7 @@ jobs:
         env:
           CI: 'true'
           PLAYWRIGHT_NPM_CACHE_DIR: ${{ github.workspace }}/.npm-cache
-          PWTEST_SHARD_WEIGHTS: 168:104:86:111:59:56:39:54:43
+          PWTEST_SHARD_WEIGHTS: 143:117:100:100:68:62:42:45:43
 
       - name: Upload blob report
         if: always()
