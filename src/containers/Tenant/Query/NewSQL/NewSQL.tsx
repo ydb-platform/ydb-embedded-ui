@@ -23,11 +23,30 @@ export function NewSQL() {
     const dispatch = useTypedDispatch();
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
 
+    const [shouldReturnFocus, setShouldReturnFocus] = React.useState(true);
+
     const insertTemplate = React.useCallback((input: string) => {
         insertSnippetToEditor(input);
     }, []);
 
-    const onTemplateClick = useChangeInputWithConfirmation(insertTemplate, isMultiTabEnabled);
+    const insertTemplateWithConfirmation = useChangeInputWithConfirmation(
+        insertTemplate,
+        isMultiTabEnabled,
+    );
+
+    const onTemplateClick = React.useCallback(
+        (input: string) => {
+            setShouldReturnFocus(false);
+            return insertTemplateWithConfirmation(input);
+        },
+        [insertTemplateWithConfirmation],
+    );
+
+    const handleOpenToggle = React.useCallback((open: boolean) => {
+        if (open) {
+            setShouldReturnFocus(true);
+        }
+    }, []);
 
     const actions = bindActions(dispatch, onTemplateClick, isMultiTabEnabled);
 
@@ -227,11 +246,8 @@ export function NewSQL() {
                     </Button.Icon>
                 </Button>
             )}
-            // returnFocus: false prevents the dropdown from restoring focus to its switcher
-            // button when it closes. The default async focus restoration races with the
-            // editor.focus() call triggered after inserting a query template and intermittently
-            // steals focus back from the editor.
-            popupProps={{placement: 'top', returnFocus: false}}
+            onOpenToggle={handleOpenToggle}
+            popupProps={{placement: 'top', returnFocus: shouldReturnFocus}}
         />
     );
 }
