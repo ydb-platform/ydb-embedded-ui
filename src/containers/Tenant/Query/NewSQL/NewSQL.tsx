@@ -227,7 +227,11 @@ export function NewSQL() {
                     </Button.Icon>
                 </Button>
             )}
-            popupProps={{placement: 'top'}}
+            // returnFocus: false prevents the dropdown from restoring focus to its switcher
+            // button when it closes. The default async focus restoration races with the
+            // editor.focus() call triggered after inserting a query template and intermittently
+            // steals focus back from the editor.
+            popupProps={{placement: 'top', returnFocus: false}}
         />
     );
 }
