@@ -12,6 +12,7 @@ import type {PreparedTenant} from '../store/reducers/tenants/types';
 import type {ClusterLink, DatabaseLink} from '../types/additionalProps';
 import type {MetaBaseClusterInfo} from '../types/api/meta';
 import type {ETenantType} from '../types/api/tenant';
+import type {TUserToken} from '../types/api/whoami';
 import type {GetLogsLink} from '../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../utils/monitoring';
 
@@ -56,7 +57,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;
         getHealthcheckViewsOrder: GetHealthcheckViewsOrder<H>;
     };
-    hasAccess?: boolean;
+    hasAccess: HasAccess;
     hideGrantAccess?: boolean;
 
     hasDeveloperUi?: boolean;
@@ -106,7 +107,10 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     developerUiFirstPathSegment?: string;
 }
 
-export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;
+export type HandleCreateDB = (params: {
+    clusterName: string;
+    domainRoot?: string;
+}) => Promise<boolean>;
 
 export type HandleEditDB = (params: {
     clusterName: string;
@@ -131,6 +135,18 @@ export type GetDatabaseLinks = (params: {
 }) => DatabaseLink[];
 
 export type GetClusterLinks = (params: {clusterInfo: ClusterInfo}) => ClusterLink[];
+
+/**
+ * Determines whether the Access tab should be shown.
+ * Receives the user's permission flags so the visibility can depend on user rights.
+ * `userPermissions` is `undefined` while the whoami request is still loading or unavailable.
+ */
+export type HasAccess = (params: {
+    userPermissions?: Pick<
+        TUserToken,
+        'IsAdministrationAllowed' | 'IsDatabaseAllowed' | 'IsMonitoringAllowed' | 'IsViewerAllowed'
+    >;
+}) => boolean;
 
 export type IsDetailedStorageViewAvailable = (params: {clusterInfo: ClusterInfo}) => boolean;
 

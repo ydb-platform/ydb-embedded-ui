@@ -16,6 +16,7 @@ import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSet
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
+import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {
     filterTenantsByDomain,
@@ -133,6 +134,8 @@ export const TenantsTable = ({
 
     const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
 
+    const {domain: domainRoot} = useClusterBaseInfo();
+
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
 
@@ -163,7 +166,10 @@ export const TenantsTable = ({
 
         if (buttonAvailable && !loading) {
             return (
-                <Button view="action" onClick={() => uiFactory.onCreateDB?.({clusterName})}>
+                <Button
+                    view="action"
+                    onClick={() => uiFactory.onCreateDB?.({clusterName, domainRoot})}
+                >
                     <Icon data={CirclePlus} />
                     {i18n('create-database')}
                 </Button>
