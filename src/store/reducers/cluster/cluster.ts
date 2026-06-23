@@ -141,9 +141,13 @@ export function useClusterBaseInfo() {
     const clusterNameFromQuery = useClusterNameFromQuery();
     const isViewerUser = useIsViewerUser();
 
-    const {currentData} = clusterApi.useGetClusterBaseInfoQuery(clusterNameFromQuery || skipToken, {
-        skip: !isViewerUser,
-    });
+    const shouldFetchClusterBaseInfo = Boolean(clusterNameFromQuery && isViewerUser);
+    const {currentData, isSuccess, isError} = clusterApi.useGetClusterBaseInfoQuery(
+        clusterNameFromQuery || skipToken,
+        {
+            skip: !isViewerUser,
+        },
+    );
 
     const {solomon: monitoring, name, title, ...data} = currentData || {};
 
@@ -153,6 +157,10 @@ export function useClusterBaseInfo() {
     // Title: YDB DEV VLA02
     const clusterName = name ?? clusterNameFromQuery ?? undefined;
     const clusterTitle = title || clusterName;
+
+    // Whether the request settled (or is not needed). Until then `settings` is
+    // not yet known and any decision that depends on it must be deferred.
+    const isResolved = !shouldFetchClusterBaseInfo || isSuccess || isError;
 
     return {
         ...data,
@@ -168,6 +176,8 @@ export function useClusterBaseInfo() {
 
         settings: parseSettingsField(data.settings),
         links: parseLinksField(data.links),
+
+        isResolved,
     };
 }
 
@@ -176,7 +186,22 @@ export function useClusterWithProxy() {
     return settings?.use_meta_proxy !== false;
 }
 
-export type ClusterInfo = ReturnType<typeof useClusterBaseInfo>;
+/**
+ * Reports whether the cluster base info (and therefore the `use_meta_proxy`
+ * setting) is known. While the request is in flight `useClusterWithProxy()`
+ * optimistically returns `true`, so any decision that switches backends
+ * (e.g. meta vs viewer for topic data) must be deferred until this resolves.
+ * When the query is skipped (single-cluster mode / non-viewer user) settings
+ * are not applicable and considered resolved — defaults apply.
+ */
+export function useClusterProxySettingResolved() {
+    const {isResolved} = useClusterBaseInfo();
+    return isResolved;
+}
+
+type ClusterBaseInfo = ReturnType<typeof useClusterBaseInfo>;
+
+export type ClusterInfo = Omit<ClusterBaseInfo, 'isResolved'>;
 
 const createClusterInfoSelector = createSelector(
     (clusterName?: string) => clusterName,

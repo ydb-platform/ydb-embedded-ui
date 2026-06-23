@@ -15,7 +15,10 @@ import {
 import {PaginatedTableWithLayout} from '../../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
 import {useSchemaTopicDataAvailable} from '../../../../store/reducers/capabilities/hooks';
-import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
+import {
+    useClusterProxySettingResolved,
+    useClusterWithProxy,
+} from '../../../../store/reducers/cluster/cluster';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../../../utils/illustrations';
@@ -64,6 +67,11 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
     // proxied (e.g. behind OIDC), fall back to the viewer handler.
     const useMetaProxy = useClusterWithProxy();
     const useMeta = schemaTopicDataAvailable && useMetaProxy;
+    // `useClusterWithProxy()` optimistically returns `true` while the cluster
+    // base info is loading, so the meta-vs-viewer decision must wait until the
+    // `use_meta_proxy` setting is actually known. Otherwise the first request
+    // on a non-proxied (OIDC) cluster could wrongly hit the meta handler.
+    const proxySettingResolved = useClusterProxySettingResolved();
     const clusterName = useClusterNameFromQuery();
 
     const [controlsKey, setControlsKey] = React.useState(0);
@@ -270,6 +278,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
     );
 
     return (
+        proxySettingResolved &&
         !isNil(baseOffset) &&
         !isNil(endOffset) && (
             <DrawerWrapper
