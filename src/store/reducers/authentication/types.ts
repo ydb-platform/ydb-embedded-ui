@@ -10,5 +10,5 @@ export interface AuthenticationState {
 
     metaUser: string | undefined;
 
-    whoamiData: TUserToken | undefined;
+    userPermissions: TUserToken | undefined;
 }

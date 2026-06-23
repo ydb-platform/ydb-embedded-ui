@@ -13,6 +13,7 @@ import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../store/reducers/tenant/con
 import {useTenantBaseInfo} from '../../../../store/reducers/tenant/tenant';
 import {EPathType} from '../../../../types/api/schema';
 import {useIsViewerUser} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useTypedSelector} from '../../../../utils/hooks/useTypedSelector';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
 import {useDiagnosticsPages} from '../useDiagnosticsPages';
 
@@ -46,6 +47,10 @@ jest.mock('../../../../utils/monitoringVisibility', () => ({
     canShowTenantMonitoringTab: jest.fn(),
 }));
 
+jest.mock('../../../../utils/hooks/useTypedSelector', () => ({
+    useTypedSelector: jest.fn(),
+}));
+
 describe('useDiagnosticsPages', () => {
     beforeEach(() => {
         (useCapabilitiesLoaded as jest.Mock).mockReturnValue(true);
@@ -61,6 +66,7 @@ describe('useDiagnosticsPages', () => {
         });
         (useIsViewerUser as jest.Mock).mockReturnValue(true);
         (canShowTenantMonitoringTab as jest.Mock).mockReturnValue(true);
+        (useTypedSelector as jest.Mock).mockReturnValue([]);
     });
 
     test('hides storage usage tab when storage stats capability is unavailable', () => {

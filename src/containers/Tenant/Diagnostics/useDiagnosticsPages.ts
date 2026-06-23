@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {selectWhoamiData} from '../../../store/reducers/authentication/authentication';
+import {selectuserPermissions} from '../../../store/reducers/authentication/authentication';
 import {
     useCapabilitiesLoaded,
     useConfigAvailable,
@@ -53,7 +53,7 @@ export function useDiagnosticsPages({
     const hasStorageUsage = newStorageViewEnabled && hasStorageUsageCapabilities;
     const hasTopicData = useTopicDataAvailable();
     const isViewerUser = useIsViewerUser();
-    const whoami = useTypedSelector(selectWhoamiData);
+    const userPermissions = useTypedSelector(selectuserPermissions);
 
     return React.useMemo(() => {
         return getPagesByType(type, subType, {
@@ -62,7 +62,7 @@ export function useDiagnosticsPages({
             hasStorageUsage,
             hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
             hasConfigs: isViewerUser && hasConfigs,
-            hasAccess: uiFactory.hasAccess({whoami}),
+            hasAccess: uiFactory.hasAccess({userPermissions}),
             hasMonitoring: canShowTenantMonitoringTab(controlPlane, clusterMonitoring),
             databaseType,
             databasePagesDisplay,
@@ -79,6 +79,6 @@ export function useDiagnosticsPages({
         clusterMonitoring,
         databaseType,
         databasePagesDisplay,
-        whoami,
+        userPermissions,
     ]);
 }

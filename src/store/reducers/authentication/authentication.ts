@@ -12,7 +12,7 @@ const initialState: AuthenticationState = {
     user: undefined,
     id: undefined,
     metaUser: undefined,
-    whoamiData: undefined,
+    userPermissions: undefined,
 };
 
 export const slice = createSlice({
@@ -26,16 +26,28 @@ export const slice = createSlice({
 
             if (!isAuthenticated) {
                 state.user = undefined;
-                state.whoamiData = undefined;
+                state.userPermissions = undefined;
             }
         },
         setUser: (state, action: PayloadAction<TUserToken>) => {
-            const {UserSID, UserID, AuthType, IsMonitoringAllowed, IsViewerAllowed} =
-                action.payload;
+            const {
+                UserSID,
+                UserID,
+                AuthType,
+                IsDatabaseAllowed,
+                IsViewerAllowed,
+                IsMonitoringAllowed,
+                IsAdministrationAllowed,
+            } = action.payload;
 
             state.user = AuthType === 'Login' ? UserSID : undefined;
             state.id = UserID;
-            state.whoamiData = action.payload;
+            state.userPermissions = {
+                IsDatabaseAllowed,
+                IsViewerAllowed,
+                IsMonitoringAllowed,
+                IsAdministrationAllowed,
+            };
 
             // If ydb version supports this feature,
             // There should be explicit flag in whoami response
@@ -50,7 +62,7 @@ export const slice = createSlice({
         selectIsViewerUser: (state) => state.isViewerUser,
         selectUser: (state) => state.user,
         selectMetaUser: (state) => state.metaUser ?? state.id,
-        selectWhoamiData: (state) => state.whoamiData,
+        selectuserPermissions: (state) => state.userPermissions,
     },
 });
 
@@ -61,7 +73,7 @@ export const {
     selectIsViewerUser,
     selectUser,
     selectMetaUser,
-    selectWhoamiData,
+    selectuserPermissions,
 } = slice.selectors;
 
 export const authenticationApi = api.injectEndpoints({

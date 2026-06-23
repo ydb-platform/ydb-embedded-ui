@@ -141,7 +141,12 @@ export type GetClusterLinks = (params: {clusterInfo: ClusterInfo}) => ClusterLin
  * Receives the whoami response (identity + permission flags) so the visibility can depend on user rights.
  * `whoami` is `undefined` while the whoami request is still loading or unavailable.
  */
-export type HasAccess = (params: {whoami?: TUserToken}) => boolean;
+export type HasAccess = (params: {
+    userPermissions?: Pick<
+        TUserToken,
+        'IsAdministrationAllowed' | 'IsDatabaseAllowed' | 'IsMonitoringAllowed' | 'IsViewerAllowed'
+    >;
+}) => boolean;
 
 export type IsDetailedStorageViewAvailable = (params: {clusterInfo: ClusterInfo}) => boolean;
 
