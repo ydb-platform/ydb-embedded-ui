@@ -138,8 +138,8 @@ export type GetClusterLinks = (params: {clusterInfo: ClusterInfo}) => ClusterLin
 
 /**
  * Determines whether the Access tab should be shown.
- * Receives the whoami response (identity + permission flags) so the visibility can depend on user rights.
- * `whoami` is `undefined` while the whoami request is still loading or unavailable.
+ * Receives the user's permission flags so the visibility can depend on user rights.
+ * `userPermissions` is `undefined` while the whoami request is still loading or unavailable.
  */
 export type HasAccess = (params: {
     userPermissions?: Pick<
