@@ -122,6 +122,10 @@ test.describe('Query Templates', () => {
 
         await queryEditor.setQuery('SELECT 1;');
         const initialTabId = await queryEditor.editorTabs.getActiveTabId();
+        if (!initialTabId) {
+            throw new Error('Expected an active editor tab');
+        }
+
         const initialTabCount = await queryEditor.editorTabs.getTabCount();
 
         // Try to switch to Select query
@@ -137,7 +141,7 @@ test.describe('Query Templates', () => {
         const nextTabId = await queryEditor.editorTabs.getActiveTabId();
         expect(nextTabId).not.toBe(initialTabId);
 
-        await queryEditor.editorTabs.selectTabById(initialTabId!);
+        await queryEditor.editorTabs.selectTabById(initialTabId);
         await expect.poll(() => queryEditor.getEditorContent(), {timeout: 5000}).toBe('SELECT 1;');
     });
 
@@ -202,7 +206,8 @@ test.describe('Query Templates', () => {
             .toContain("SystemMetadata('write_time')");
 
         const editorContent = await queryEditor.getEditorContent();
-        expect(editorContent).toContain('FROM ${1:<my_topic>}');
+        expect(editorContent).toContain('FROM <my_topic>');
+        expect(editorContent).toContain('LIMIT 10;');
     });
 
     test('New SQL topics menu hides topic select template when SQL I/O feature is disabled', async ({

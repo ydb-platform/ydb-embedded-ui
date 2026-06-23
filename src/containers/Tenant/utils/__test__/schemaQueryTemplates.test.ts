@@ -65,13 +65,14 @@ FROM \`my-topic\`
 -- WHERE SystemMetadata('partition_id') = 42
 -- AND SystemMetadata('write_time') > CurrentUtcTimestamp() - Interval('PT60S')
 -- AND SystemMetadata('offset') > 100
-LIMIT 10;`);
+LIMIT \${1:10};`);
         });
 
         test('uses a placeholder topic path without selected topic', () => {
             const template = selectTopicQueryTemplate();
 
             expect(template).toContain('FROM ${1:<my_topic>}');
+            expect(template).toContain('LIMIT ${2:10};');
         });
     });
 });

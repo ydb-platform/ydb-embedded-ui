@@ -201,6 +201,7 @@ export const selectTopicQueryTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
         : '${1:<my_topic>}';
+    const limit = params?.relativePath ? '${1:10}' : '${2:10}';
 
     return `SELECT
     Data,
@@ -214,7 +215,7 @@ FROM ${path}
 -- WHERE SystemMetadata('partition_id') = 42
 -- AND SystemMetadata('write_time') > CurrentUtcTimestamp() - Interval('PT60S')
 -- AND SystemMetadata('offset') > 100
-LIMIT \${1:10};`;
+LIMIT ${limit};`;
 };
 
 export const showCreateTableTemplate = (params?: SchemaQueryParams) => {
