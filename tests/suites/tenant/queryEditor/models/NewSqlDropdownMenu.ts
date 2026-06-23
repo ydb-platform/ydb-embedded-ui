@@ -55,6 +55,13 @@ export class NewSqlDropdownMenu {
         await templateItem.click();
     }
 
+    async isTemplateVisible(
+        template: AsyncReplicationTemplates | TablesTemplates | TopicTemplates,
+    ) {
+        const templateItem = this.subMenu.getByRole('menuitem').filter({hasText: template});
+        return templateItem.isVisible();
+    }
+
     async isMenuVisible() {
         await this.menu.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;

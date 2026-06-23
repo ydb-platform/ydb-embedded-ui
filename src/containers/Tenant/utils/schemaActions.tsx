@@ -89,6 +89,7 @@ interface ActionsAdditionalParams {
     showCreateTableData?: string;
     isStreamingQueryTextLoading?: boolean;
     isShowCreateTableLoading?: boolean;
+    topicsSqlIoOperationsEnabled?: boolean;
 }
 
 interface BindActionParams {
@@ -473,7 +474,9 @@ export const getActions =
         const TOPIC_SET: ActionsSet = [
             [copyItem],
             [
-                {text: i18n('actions.selectQuery'), action: actions.selectTopicQuery},
+                ...(additionalEffects.topicsSqlIoOperationsEnabled
+                    ? [{text: i18n('actions.selectQuery'), action: actions.selectTopicQuery}]
+                    : []),
                 {text: i18n('actions.alterTopic'), action: actions.alterTopic},
                 {text: i18n('actions.dropTopic'), action: actions.dropTopic},
             ],

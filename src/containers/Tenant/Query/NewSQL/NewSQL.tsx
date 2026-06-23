@@ -13,6 +13,7 @@ import {
 
 import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {useTypedDispatch} from '../../../../utils/hooks';
+import {useTopicsSqlIoOperationsFeature} from '../../../../utils/hooks/useTopicsSqlIoOperationsFeature';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {insertSnippetToEditor} from '../../../../utils/monaco/insertSnippet';
 import {bindActions} from '../../utils/newSQLQueryActions';
@@ -22,6 +23,7 @@ import i18n from './i18n';
 export function NewSQL() {
     const dispatch = useTypedDispatch();
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
+    const {topicsSqlIoOperationsEnabled} = useTopicsSqlIoOperationsFeature();
 
     const insertTemplate = React.useCallback((input: string) => {
         insertSnippetToEditor(input);
@@ -110,10 +112,14 @@ export function NewSQL() {
                     text: i18n('action.create-topic'),
                     action: actions.createTopic,
                 },
-                {
-                    text: i18n('action.select-topic'),
-                    action: actions.selectTopicQuery,
-                },
+                ...(topicsSqlIoOperationsEnabled
+                    ? [
+                          {
+                              text: i18n('action.select-topic'),
+                              action: actions.selectTopicQuery,
+                          },
+                      ]
+                    : []),
                 {
                     text: i18n('action.alter-topic'),
                     action: actions.alterTopic,
