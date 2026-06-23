@@ -88,6 +88,9 @@ export const authenticationApi = api.injectEndpoints({
                     return {error};
                 }
             },
+            // Drop the cached whoami so consumers (e.g. the persistent account menu)
+            // stop showing the previous user's identity after logout.
+            invalidatesTags: (_, error) => (error ? [] : ['UserData']),
         }),
     }),
     overrideExisting: 'throw',
