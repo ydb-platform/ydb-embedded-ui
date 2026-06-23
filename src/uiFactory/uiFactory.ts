@@ -40,9 +40,16 @@ type UIFactoryOverrides<H extends string, T extends string> = Omit<
 export function configureUIFactory<H extends string, T extends string = string>(
     overrides: UIFactoryOverrides<H, T>,
 ) {
-    const {healthcheck, ...restOverrides} = overrides;
+    const {healthcheck, hasAccess, ...restOverrides} = overrides;
 
     Object.assign(uiFactoryBase, restOverrides);
+
+    // Only override hasAccess when an actual function is provided.
+    // Forwarding an optional config field could pass `undefined` here,
+    // which would overwrite the default and crash on the next hasAccess(...) call.
+    if (typeof hasAccess === 'function') {
+        uiFactoryBase.hasAccess = hasAccess;
+    }
     if (healthcheck) {
         const merged = {...uiFactoryBase.healthcheck, ...healthcheck};
 
