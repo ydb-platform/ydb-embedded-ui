@@ -21,6 +21,10 @@ export enum TablesTemplates {
     CreateRowTable = 'Create row table',
 }
 
+export enum TopicTemplates {
+    Select = 'Select from a topic',
+}
+
 export class NewSqlDropdownMenu {
     private dropdownButton: Locator;
     private menu: Locator;
@@ -45,7 +49,7 @@ export class NewSqlDropdownMenu {
         await categoryItem.hover();
     }
 
-    async selectTemplate(template: AsyncReplicationTemplates | TablesTemplates) {
+    async selectTemplate(template: AsyncReplicationTemplates | TablesTemplates | TopicTemplates) {
         const templateItem = this.subMenu.getByRole('menuitem').filter({hasText: template});
         await templateItem.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await templateItem.click();

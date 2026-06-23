@@ -4,13 +4,14 @@ import {database} from '../../../utils/constants';
 import {QueryEditorMode, TenantPage} from '../TenantPage';
 import {SavedQueriesTable} from '../savedQueries/models/SavedQueriesTable';
 import {ObjectSummary} from '../summary/ObjectSummary';
-import {RowTableAction} from '../summary/types';
+import {RowTableAction, TopicAction} from '../summary/types';
 
 import {
     AsyncReplicationTemplates,
     NewSqlDropdownMenu,
     TablesTemplates,
     TemplateCategory,
+    TopicTemplates,
 } from './models/NewSqlDropdownMenu';
 import {QueryEditor, QueryTabs} from './models/QueryEditor';
 import {SaveQueryDialog} from './models/SaveQueryDialog';
@@ -160,6 +161,40 @@ test.describe('Query Templates', () => {
 
         expect(queryEditor.editorTextArea).not.toBeEmpty();
     });
+
+    test('New SQL topics menu inserts topic select template', async ({page}) => {
+        const newSqlDropdown = new NewSqlDropdownMenu(page);
+        const queryEditor = new QueryEditor(page);
+
+        await newSqlDropdown.clickNewSqlButton();
+        await newSqlDropdown.hoverCategory(TemplateCategory.Topics);
+        await newSqlDropdown.selectTemplate(TopicTemplates.Select);
+
+        await expect
+            .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
+            .toContain("SystemMetadata('write_time')");
+
+        const editorContent = await queryEditor.getEditorContent();
+        expect(editorContent).toContain('FROM ${1:<my_topic>}');
+    });
+
+    test('Topic context menu inserts topic select template for selected topic', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        const topicName = await queryEditor.createNewFakeTopic();
+        await objectSummary.clickRefreshButton();
+
+        await objectSummary.clickActionMenuItem(topicName, TopicAction.SelectQuery);
+
+        await expect
+            .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
+            .toContain(`FROM \`${topicName}\``);
+
+        const editorContent = await queryEditor.getEditorContent();
+        expect(editorContent).toContain("SystemMetadata('offset')");
+    });
+
     test('Switching between untouched schema templates reuses the current template tab', async ({
         page,
     }) => {
