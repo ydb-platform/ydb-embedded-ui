@@ -16,8 +16,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        shardTotal: [10]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        shardTotal: [8]
 
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +43,7 @@ jobs:
         env:
           CI: 'true'
           PLAYWRIGHT_NPM_CACHE_DIR: ${{ github.workspace }}/.npm-cache
+          PWTEST_SHARD_WEIGHTS: 174:143:113:81:73:39:45:52
 
       - name: Upload blob report
         if: always()
