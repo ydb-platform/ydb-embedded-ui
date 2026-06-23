@@ -26,6 +26,7 @@ DEFAULT_INTERNAL_BACKEND="http://${YDB_CONTAINER_NAME}:8765"
 INTERNAL_BROWSER_BACKEND="http://localhost:8765"
 PLAYWRIGHT_BACKEND="${EXTERNAL_BACKEND:-$INTERNAL_BROWSER_BACKEND}"
 PLAYWRIGHT_BASE_URL_VALUE="${PLAYWRIGHT_BASE_URL:-}"
+PLAYWRIGHT_NPM_CACHE_DIR_VALUE="${PLAYWRIGHT_NPM_CACHE_DIR:-}"
 DEFAULT_YDB_ALLOW_ORIGIN="http://localhost:3000"
 YDB_ALLOW_ORIGIN="${PLAYWRIGHT_YDB_ALLOW_ORIGIN:-$DEFAULT_YDB_ALLOW_ORIGIN}"
 YDB_PLATFORM="${PLAYWRIGHT_YDB_PLATFORM:-}"
@@ -55,6 +56,17 @@ NODE
 )
 fi
 
+DOCKER_NPM_CACHE_ARGS=()
+DOCKER_NPM_CACHE_ENV_ARGS=()
+NPM_CI_COMMAND="npm ci"
+
+if [ -n "$PLAYWRIGHT_NPM_CACHE_DIR_VALUE" ]; then
+  mkdir -p "$PLAYWRIGHT_NPM_CACHE_DIR_VALUE"
+  DOCKER_NPM_CACHE_ARGS=(-v "${PLAYWRIGHT_NPM_CACHE_DIR_VALUE}:/npm-cache")
+  DOCKER_NPM_CACHE_ENV_ARGS=(-e NPM_CONFIG_CACHE="/npm-cache")
+  NPM_CI_COMMAND="npm ci --prefer-offline"
+fi
+
 cleanup() {
   if [ "$YDB_CONTAINER_STARTED" -eq 1 ]; then
     echo "Cleaning up YDB backend container ${YDB_CONTAINER_NAME}"
@@ -76,6 +88,15 @@ print_ydb_diagnostics() {
   docker logs --tail 50 "$YDB_CONTAINER_NAME" 2>&1 || true
   echo "--- YDB inspect state ---"
   docker inspect "$YDB_CONTAINER_NAME" --format 'status={{.State.Status}} running={{.State.Running}} health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}} exit={{.State.ExitCode}} error={{.State.Error}}' 2>/dev/null || true
+}
+
+print_elapsed() {
+  local label="$1"
+  local started_at="$2"
+  local finished_at
+
+  finished_at="$(date +%s)"
+  echo "${label} completed in $((finished_at - started_at))s"
 }
 
 wait_for_ydb() {
@@ -107,6 +128,15 @@ wait_for_ydb() {
 PLAYWRIGHT_COMMAND=$(cat <<'SCRIPT'
 set -euo pipefail
 
+print_elapsed() {
+  local label="$1"
+  local started_at="$2"
+  local finished_at
+
+  finished_at="$(date +%s)"
+  echo "${label} completed in $((finished_at - started_at))s"
+}
+
 if [ -n "${PLAYWRIGHT_YDB_PROXY_TARGET:-}" ]; then
   echo "Forwarding localhost:8765 to ${PLAYWRIGHT_YDB_PROXY_TARGET}"
   node <<'NODE' &
@@ -124,8 +154,10 @@ server.listen(8765, '127.0.0.1');
 NODE
 fi
 
-echo "Running npm ci"
-npm ci
+echo "Running ${NPM_CI_COMMAND}"
+npm_ci_started_at="$(date +%s)"
+${NPM_CI_COMMAND}
+print_elapsed "npm install" "$npm_ci_started_at"
 
 echo "Running Playwright tests"
 npx playwright test --config=playwright.config.ts "$@"
@@ -135,6 +167,9 @@ SCRIPT
 echo "Using Playwright Docker image: ${DOCKER_IMAGE}"
 echo "Using YDB Docker image: ${YDB_IMAGE}"
 echo "Docker network: ${NETWORK_NAME}"
+if [ -n "$PLAYWRIGHT_NPM_CACHE_DIR_VALUE" ]; then
+  echo "Using npm cache directory: ${PLAYWRIGHT_NPM_CACHE_DIR_VALUE}"
+fi
 
 if [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
   echo "Starting YDB backend container: ${YDB_IMAGE}"
@@ -170,6 +205,7 @@ else
 fi
 
 echo "Installing dependencies and running Playwright tests in Docker"
+playwright_docker_started_at="$(date +%s)"
 set +e
 if [ -n "$PLAYWRIGHT_PLATFORM" ] && [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
   echo "Requested Playwright platform: ${PLAYWRIGHT_PLATFORM}"
@@ -179,6 +215,7 @@ if [ -n "$PLAYWRIGHT_PLATFORM" ] && [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
     --add-host host.docker.internal:host-gateway \
     -v "${PROJECT_DIR}:/work" \
     -v "ydb-embedded-ui-node-modules:/work/node_modules" \
+    "${DOCKER_NPM_CACHE_ARGS[@]}" \
     -w /work \
     -e CI="${CI:-}" \
     -e PLAYWRIGHT_VIDEO="${PLAYWRIGHT_VIDEO:-}" \
@@ -186,6 +223,8 @@ if [ -n "$PLAYWRIGHT_PLATFORM" ] && [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
     -e PLAYWRIGHT_BASE_URL="${PLAYWRIGHT_BASE_URL_VALUE}" \
     -e PLAYWRIGHT_OUTPUT_DIR="${PLAYWRIGHT_OUTPUT_DIR}" \
     -e PLAYWRIGHT_YDB_PROXY_TARGET="${YDB_PROXY_TARGET}" \
+    -e NPM_CI_COMMAND="${NPM_CI_COMMAND}" \
+    "${DOCKER_NPM_CACHE_ENV_ARGS[@]}" \
     "${DOCKER_IMAGE}" \
     /bin/bash -c "$PLAYWRIGHT_COMMAND" -- "$@"
 elif [ -n "$PLAYWRIGHT_PLATFORM" ]; then
@@ -195,6 +234,7 @@ elif [ -n "$PLAYWRIGHT_PLATFORM" ]; then
     --add-host host.docker.internal:host-gateway \
     -v "${PROJECT_DIR}:/work" \
     -v "ydb-embedded-ui-node-modules:/work/node_modules" \
+    "${DOCKER_NPM_CACHE_ARGS[@]}" \
     -w /work \
     -e CI="${CI:-}" \
     -e PLAYWRIGHT_VIDEO="${PLAYWRIGHT_VIDEO:-}" \
@@ -202,6 +242,8 @@ elif [ -n "$PLAYWRIGHT_PLATFORM" ]; then
     -e PLAYWRIGHT_BASE_URL="${PLAYWRIGHT_BASE_URL_VALUE}" \
     -e PLAYWRIGHT_OUTPUT_DIR="${PLAYWRIGHT_OUTPUT_DIR}" \
     -e PLAYWRIGHT_YDB_PROXY_TARGET="${YDB_PROXY_TARGET}" \
+    -e NPM_CI_COMMAND="${NPM_CI_COMMAND}" \
+    "${DOCKER_NPM_CACHE_ENV_ARGS[@]}" \
     "${DOCKER_IMAGE}" \
     /bin/bash -c "$PLAYWRIGHT_COMMAND" -- "$@"
 elif [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
@@ -210,6 +252,7 @@ elif [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
     --add-host host.docker.internal:host-gateway \
     -v "${PROJECT_DIR}:/work" \
     -v "ydb-embedded-ui-node-modules:/work/node_modules" \
+    "${DOCKER_NPM_CACHE_ARGS[@]}" \
     -w /work \
     -e CI="${CI:-}" \
     -e PLAYWRIGHT_VIDEO="${PLAYWRIGHT_VIDEO:-}" \
@@ -217,6 +260,8 @@ elif [ "$START_INTERNAL_BACKEND" -eq 1 ]; then
     -e PLAYWRIGHT_BASE_URL="${PLAYWRIGHT_BASE_URL_VALUE}" \
     -e PLAYWRIGHT_OUTPUT_DIR="${PLAYWRIGHT_OUTPUT_DIR}" \
     -e PLAYWRIGHT_YDB_PROXY_TARGET="${YDB_PROXY_TARGET}" \
+    -e NPM_CI_COMMAND="${NPM_CI_COMMAND}" \
+    "${DOCKER_NPM_CACHE_ENV_ARGS[@]}" \
     "${DOCKER_IMAGE}" \
     /bin/bash -c "$PLAYWRIGHT_COMMAND" -- "$@"
 else
@@ -224,6 +269,7 @@ else
     --add-host host.docker.internal:host-gateway \
     -v "${PROJECT_DIR}:/work" \
     -v "ydb-embedded-ui-node-modules:/work/node_modules" \
+    "${DOCKER_NPM_CACHE_ARGS[@]}" \
     -w /work \
     -e CI="${CI:-}" \
     -e PLAYWRIGHT_VIDEO="${PLAYWRIGHT_VIDEO:-}" \
@@ -231,11 +277,14 @@ else
     -e PLAYWRIGHT_BASE_URL="${PLAYWRIGHT_BASE_URL_VALUE}" \
     -e PLAYWRIGHT_OUTPUT_DIR="${PLAYWRIGHT_OUTPUT_DIR}" \
     -e PLAYWRIGHT_YDB_PROXY_TARGET="${YDB_PROXY_TARGET}" \
+    -e NPM_CI_COMMAND="${NPM_CI_COMMAND}" \
+    "${DOCKER_NPM_CACHE_ENV_ARGS[@]}" \
     "${DOCKER_IMAGE}" \
     /bin/bash -c "$PLAYWRIGHT_COMMAND" -- "$@"
 fi
 TEST_EXIT_CODE=$?
 set -e
+print_elapsed "Dockerized Playwright run" "$playwright_docker_started_at"
 
 if [ -n "$SHOULD_SHOW_REPORT" ]; then
   if [ ! -d "$REPORT_DIR" ]; then
