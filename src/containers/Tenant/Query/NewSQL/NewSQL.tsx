@@ -26,6 +26,7 @@ export function NewSQL() {
     const [shouldReturnFocus, setShouldReturnFocus] = React.useState(true);
 
     const insertTemplate = React.useCallback((input: string) => {
+        setShouldReturnFocus(false);
         insertSnippetToEditor(input);
     }, []);
 
@@ -36,7 +37,6 @@ export function NewSQL() {
 
     const onTemplateClick = React.useCallback(
         (input: string) => {
-            setShouldReturnFocus(false);
             return insertTemplateWithConfirmation(input);
         },
         [insertTemplateWithConfirmation],
