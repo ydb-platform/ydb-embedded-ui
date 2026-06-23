@@ -23,6 +23,9 @@ const TOPIC_PREVIEW_LIMIT = 100;
 export function TopicPreview({database, path, databaseFullPath}: PreviewContainerProps) {
     const useMetaProxy = useClusterWithProxy();
     const schemaTopicDataAvailable = useSchemaTopicDataAvailable();
+    // Use the meta handler only when meta is reachable (proxied by the cluster).
+    // When meta is not proxied (e.g. behind OIDC), fall back to the viewer handler.
+    const useMeta = schemaTopicDataAvailable && useMetaProxy;
     const clusterName = useClusterNameFromQuery();
     const {
         data: partitions,
@@ -47,11 +50,11 @@ export function TopicPreview({database, path, databaseFullPath}: PreviewContaine
             limit: TOPIC_PREVIEW_LIMIT,
             offset: safeParseNumber(firstPartition.endOffset) - TOPIC_PREVIEW_LIMIT,
             message_size_limit: 100,
-            useMeta: schemaTopicDataAvailable,
+            useMeta,
         };
 
         return params;
-    }, [database, path, clusterName, firstPartition, schemaTopicDataAvailable]);
+    }, [database, path, clusterName, firstPartition, useMeta]);
 
     const {currentData, error, isFetching} = topicApi.useGetTopicDataQuery(queryParams);
 
