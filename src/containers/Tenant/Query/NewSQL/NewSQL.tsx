@@ -111,6 +111,10 @@ export function NewSQL() {
                     action: actions.createTopic,
                 },
                 {
+                    text: i18n('action.select-topic'),
+                    action: actions.selectTopicQuery,
+                },
+                {
                     text: i18n('action.alter-topic'),
                     action: actions.alterTopic,
                 },
