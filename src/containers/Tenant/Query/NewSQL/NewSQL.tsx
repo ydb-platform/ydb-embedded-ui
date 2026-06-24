@@ -23,11 +23,30 @@ export function NewSQL() {
     const dispatch = useTypedDispatch();
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
 
+    const [shouldReturnFocus, setShouldReturnFocus] = React.useState(true);
+
     const insertTemplate = React.useCallback((input: string) => {
+        setShouldReturnFocus(false);
         insertSnippetToEditor(input);
     }, []);
 
-    const onTemplateClick = useChangeInputWithConfirmation(insertTemplate, isMultiTabEnabled);
+    const insertTemplateWithConfirmation = useChangeInputWithConfirmation(
+        insertTemplate,
+        isMultiTabEnabled,
+    );
+
+    const onTemplateClick = React.useCallback(
+        (input: string) => {
+            return insertTemplateWithConfirmation(input);
+        },
+        [insertTemplateWithConfirmation],
+    );
+
+    const handleOpenToggle = React.useCallback((open: boolean) => {
+        if (open) {
+            setShouldReturnFocus(true);
+        }
+    }, []);
 
     const actions = bindActions(dispatch, onTemplateClick, isMultiTabEnabled);
 
@@ -227,7 +246,8 @@ export function NewSQL() {
                     </Button.Icon>
                 </Button>
             )}
-            popupProps={{placement: 'top'}}
+            onOpenToggle={handleOpenToggle}
+            popupProps={{placement: 'top', returnFocus: shouldReturnFocus}}
         />
     );
 }
