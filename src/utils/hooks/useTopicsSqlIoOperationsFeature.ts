@@ -17,14 +17,20 @@ export function useTopicsSqlIoOperationsFeature(
     const featureFlagsAvailable = useFeatureFlagsAvailable();
     const selectedDatabase = database ?? databaseFromQuery;
 
-    const {currentData: featureFlags, isFetching: isFeatureFlagsLoading} =
+    const {topicsSqlIoOperationsEnabled, isFetching: isFeatureFlagsLoading} =
         configsApi.useGetFeatureFlagsQuery(
             {database: selectedDatabase},
-            {skip: !featureFlagsAvailable || !enabled},
+            {
+                skip: !featureFlagsAvailable || !enabled,
+                selectFromResult: ({currentData, isFetching}) => ({
+                    topicsSqlIoOperationsEnabled: isTopicsSqlIoOperationsEnabled(currentData),
+                    isFetching,
+                }),
+            },
         );
 
     return {
-        topicsSqlIoOperationsEnabled: isTopicsSqlIoOperationsEnabled(featureFlags),
+        topicsSqlIoOperationsEnabled,
         isFeatureFlagsLoading,
     };
 }
