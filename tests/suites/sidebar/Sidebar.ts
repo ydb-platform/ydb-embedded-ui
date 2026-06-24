@@ -82,6 +82,7 @@ export class Sidebar {
 
     async clickInformation() {
         await this.informationButton.click();
+        await this.popupContent.waitFor({state: 'visible'});
     }
 
     async isPopupVisible() {
@@ -93,14 +94,9 @@ export class Sidebar {
     }
 
     async clickHotkeysButton() {
-        await this.hotkeysButton.waitFor({state: 'visible'});
-        const box = await this.hotkeysButton.boundingBox();
-
-        if (!box) {
-            throw new Error('Keyboard shortcuts button is not visible');
-        }
-
-        await this.page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+        await this.popupContent.waitFor({state: 'visible'});
+        await this.hotkeysButton.click();
+        await this.hotkeysPanel.waitFor({state: 'visible'});
     }
 
     async isHotkeysPanelVisible() {
