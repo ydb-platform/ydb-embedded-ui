@@ -213,13 +213,7 @@ test.describe('Test Sidebar', async () => {
     test('Tenant V2 navigation href keeps browser-native modified-click behavior', async ({
         page,
         context,
-        browserName,
     }) => {
-        test.skip(
-            browserName !== 'chromium',
-            'Middle-click popup behavior is asserted in Chromium',
-        );
-
         await page.addInitScript(() => {
             localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
             localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
