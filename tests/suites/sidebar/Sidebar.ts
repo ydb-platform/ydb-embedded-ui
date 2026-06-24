@@ -1,5 +1,7 @@
 import type {Locator, Page} from '@playwright/test';
 
+import {retryAction} from '../../utils/retryAction';
+
 const defaultFooterItemsSelector =
     '[data-qa="aside-information"], [data-qa="aside-settings"], [data-qa="aside-user"]';
 const settingsMenuItemSelector = '[data-id]';
@@ -94,9 +96,18 @@ export class Sidebar {
     }
 
     async clickHotkeysButton() {
-        await this.popupContent.waitFor({state: 'visible'});
-        await this.hotkeysButton.click();
-        await this.hotkeysPanel.waitFor({state: 'visible'});
+        await retryAction(
+            async () => {
+                await this.popupContent.waitFor({state: 'visible'});
+                await this.hotkeysButton.waitFor({state: 'visible'});
+                await this.hotkeysButton.evaluate((element) => {
+                    (element as HTMLElement).click();
+                });
+                await this.hotkeysPanel.waitFor({state: 'visible', timeout: 2000});
+            },
+            3,
+            300,
+        );
     }
 
     async isHotkeysPanelVisible() {
