@@ -1,5 +1,13 @@
 # Changelog
 
+## [17.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v17.0.0...v17.0.1) (2026-06-24)
+
+
+### Bug Fixes
+
+* content layout ([#4053](https://github.com/ydb-platform/ydb-embedded-ui/issues/4053)) ([5c5185d](https://github.com/ydb-platform/ydb-embedded-ui/commit/5c5185d476f924dd10fdcae039cff27afdcd31f4))
+* **Topics:** use meta only if configured in cluster ([#4051](https://github.com/ydb-platform/ydb-embedded-ui/issues/4051)) ([0bc2197](https://github.com/ydb-platform/ydb-embedded-ui/commit/0bc219760698b503c803d2f92e451870ef8c9cfc))
+
 ## [17.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v16.4.0...v17.0.0) (2026-06-23)
 
 
