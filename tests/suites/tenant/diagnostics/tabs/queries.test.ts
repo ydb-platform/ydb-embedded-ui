@@ -271,6 +271,7 @@ test.describe('Diagnostics Queries tab', async () => {
 
         // Target a row further down that requires scrolling
         const targetRowIndex = 8;
+        const targetRowData = await diagnostics.getRowData(targetRowIndex - 1);
 
         // Click on the target row to open the drawer
         await diagnostics.table.clickRow(targetRowIndex);
@@ -292,6 +293,6 @@ test.describe('Diagnostics Queries tab', async () => {
         await page.waitForTimeout(1000);
 
         // Verify the selected row is highlighted and visible.
-        await diagnostics.waitForActiveRow();
+        await diagnostics.waitForActiveRowData(targetRowData);
     });
 });
