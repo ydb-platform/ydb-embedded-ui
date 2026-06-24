@@ -16,8 +16,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-        shardTotal: [9]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        shardTotal: [8]
 
     steps:
       - uses: actions/checkout@v4
@@ -30,20 +30,10 @@ jobs:
         with:
           node-version: 24
 
-      - name: Restore npm cache for Dockerized Playwright
-        id: playwright-docker-npm-cache
-        uses: actions/cache/restore@v4
-        continue-on-error: true
-        with:
-          path: .npm-cache
-          key: ${{ runner.os }}-playwright-docker-npm-${{ hashFiles('package-lock.json') }}
-
       - name: Run Playwright tests
         run: bash scripts/playwright-docker.sh --shard=${{ matrix.shard }}/${{ matrix.shardTotal }}
         env:
           CI: 'true'
-          PLAYWRIGHT_NPM_CACHE_DIR: ${{ github.workspace }}/.npm-cache
-          PWTEST_SHARD_WEIGHTS: 143:117:100:100:68:62:42:45:43
 
       - name: Upload blob report
         if: always()
@@ -52,14 +42,6 @@ jobs:
           name: blob-report-${{ matrix.shard }}
           path: blob-report
           retention-days: 1
-
-      - name: Save npm cache for Dockerized Playwright
-        if: always() && matrix.shard == 1 && steps.playwright-docker-npm-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        continue-on-error: true
-        with:
-          path: .npm-cache
-          key: ${{ runner.os }}-playwright-docker-npm-${{ hashFiles('package-lock.json') }}
 
   merge_reports:
     name: Merge Playwright Reports

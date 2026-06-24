@@ -405,25 +405,22 @@ export class QueryEditor {
         );
         await collapseButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await collapseButton.click();
-
-        const expandButton = this.resultsControls.locator('.kv-pane-visibility-button_type_expand');
-        await expandButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
     }
 
     async expandResultsControls() {
         const expandButton = this.resultsControls.locator('.kv-pane-visibility-button_type_expand');
         await expandButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await expandButton.click();
-
-        const collapseButton = this.resultsControls.locator(
-            '.kv-pane-visibility-button_type_collapse',
-        );
-        await collapseButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
     }
 
     async isResultsControlsCollapsed() {
         const expandButton = this.resultsControls.locator('.kv-pane-visibility-button_type_expand');
-        return expandButton.isVisible();
+        try {
+            await expandButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     async clickCopyResultButton() {

@@ -8,7 +8,6 @@
 # testing
 /coverage
 playwright-artifacts
-.npm-cache/
 
 # ai-workflow
 plans/
