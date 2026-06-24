@@ -2,14 +2,13 @@ import type {Locator, Page} from '@playwright/test';
 import {expect, test} from '@playwright/test';
 
 import {PageModel} from '../../models/PageModel';
-import {backend, databasesPage} from '../../utils/constants';
+import {backend, database, databasesPage} from '../../utils/constants';
 import {TenantPage} from '../tenant/TenantPage';
 import {Diagnostics} from '../tenant/diagnostics/Diagnostics';
 import {setupTopQueriesMock} from '../tenant/diagnostics/mocks';
 
 import {Sidebar} from './Sidebar';
 
-const VISUAL_DATABASE = '/dev02/home/shared';
 const SETTINGS_DRAWER_X = 56;
 const SETTINGS_DRAWER_WIDTH = 834;
 const GEOMETRY_TOLERANCE = 2;
@@ -53,11 +52,6 @@ async function gotoClusterDatabases(page: Page) {
 }
 
 test.describe('Drawer visual snapshots', () => {
-    test.skip(
-        ({browserName}) => browserName !== 'chromium' || process.platform !== 'darwin',
-        'Drawer visual baselines in this PR are maintained for Chromium on macOS only',
-    );
-
     test('settings drawer matches baseline', async ({page}) => {
         await gotoClusterDatabases(page);
 
@@ -105,8 +99,8 @@ test.describe('Drawer visual snapshots', () => {
     test('hotkeys drawer from shortcut on query page matches baseline', async ({page}) => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto({
-            schema: VISUAL_DATABASE,
-            database: VISUAL_DATABASE,
+            schema: database,
+            database,
             backend,
             tenantPage: 'query',
             databasePage: 'query',
@@ -122,8 +116,8 @@ test.describe('Drawer visual snapshots', () => {
     test('grant access drawer matches baseline', async ({page}) => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto({
-            schema: VISUAL_DATABASE,
-            database: VISUAL_DATABASE,
+            schema: database,
+            database,
             backend,
             tenantPage: 'diagnostics',
             databasePage: 'diagnostics',
@@ -143,8 +137,8 @@ test.describe('Drawer visual snapshots', () => {
 
         const tenantPage = new TenantPage(page);
         await tenantPage.goto({
-            schema: VISUAL_DATABASE,
-            database: VISUAL_DATABASE,
+            schema: database,
+            database,
             backend,
             tenantPage: 'diagnostics',
             databasePage: 'diagnostics',
