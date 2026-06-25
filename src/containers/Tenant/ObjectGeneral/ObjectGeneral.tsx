@@ -1,8 +1,10 @@
 import {useThemeValue} from '@gravity-ui/uikit';
 
+import {PageError} from '../../../components/Errors/PageError/PageError';
 import {TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import type {EPathSubType, EPathType} from '../../../types/api/schema';
+import {uiFactory} from '../../../uiFactory/uiFactory';
 import {cn} from '../../../utils/cn';
 import Diagnostics from '../Diagnostics/Diagnostics';
 import {Query} from '../Query/Query';
@@ -19,9 +21,15 @@ interface ObjectGeneralProps {
     additionalTenantProps?: AdditionalTenantsProps;
     type: EPathType | undefined;
     subType: EPathSubType | undefined;
+    diagnosticsAccessError?: unknown;
 }
 
-function ObjectGeneral({type, subType, additionalTenantProps}: ObjectGeneralProps) {
+function ObjectGeneral({
+    type,
+    subType,
+    additionalTenantProps,
+    diagnosticsAccessError,
+}: ObjectGeneralProps) {
     const theme = useThemeValue();
     const isV2Enabled = useNavigationV2Enabled();
     const {path, database, databaseFullPath} = useCurrentSchema();
@@ -36,6 +44,16 @@ function ObjectGeneral({type, subType, additionalTenantProps}: ObjectGeneralProp
             case TENANT_PAGES_IDS.database:
             case TENANT_PAGES_IDS.diagnostics:
             default: {
+                if (diagnosticsAccessError) {
+                    return (
+                        <PageError
+                            error={diagnosticsAccessError}
+                            {...uiFactory.clusterOrDatabaseAccessError}
+                            size="l"
+                            illustrationSize="m"
+                        />
+                    );
+                }
                 return (
                     <Diagnostics
                         path={path}
