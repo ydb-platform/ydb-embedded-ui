@@ -11,6 +11,12 @@ import {OperationsTable} from './tabs/OperationsModel';
 
 const OWNER_CARD_VISIBILITY_TIMEOUT = VISIBILITY_TIMEOUT * 2;
 
+async function getRowCellsText(row: Locator): Promise<string[]> {
+    const cells = row.locator('td');
+    const cellTexts = await cells.allTextContents();
+    return cellTexts.map((text) => text.replace(/\s+/g, ' ').trim());
+}
+
 export enum DiagnosticsTab {
     Info = 'overview',
     Database = 'database',
@@ -397,8 +403,7 @@ export class Diagnostics {
 
     async getRowData(rowIndex: number): Promise<string[]> {
         const row = this.dataTable.locator(`tbody tr:nth-child(${rowIndex + 1})`);
-        const cells = row.locator('td');
-        return await cells.allTextContents();
+        return getRowCellsText(row);
     }
 
     async clickRefreshButton(): Promise<void> {
@@ -523,6 +528,25 @@ export class Diagnostics {
         const rowElement = this.dataTable.locator(`tr.data-table__row:nth-child(${rowIndex})`);
         const rowElementClass = await rowElement.getAttribute('class');
         return rowElementClass?.includes('kv-top-queries__row_active') || false;
+    }
+
+    async waitForActiveRowData(expectedRowData: string[]): Promise<void> {
+        const activeRow = this.dataTable
+            .locator('tr.data-table__row.kv-top-queries__row_active')
+            .first();
+
+        await retryAction(async () => {
+            await activeRow.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+            const activeRowData = await getRowCellsText(activeRow);
+
+            if (JSON.stringify(activeRowData) !== JSON.stringify(expectedRowData)) {
+                throw new Error(
+                    `Active row data ${JSON.stringify(
+                        activeRowData,
+                    )} did not match expected ${JSON.stringify(expectedRowData)}`,
+                );
+            }
+        });
     }
 
     async isOwnerCardVisible(timeout = OWNER_CARD_VISIBILITY_TIMEOUT): Promise<boolean> {

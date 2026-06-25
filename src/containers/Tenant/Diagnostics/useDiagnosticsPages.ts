@@ -12,7 +12,7 @@ import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import {useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {EPathSubType, EPathType} from '../../../types/api/schema';
 import {uiFactory} from '../../../uiFactory/uiFactory';
-import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useIsViewerUser, useUserPermissions} from '../../../utils/hooks/useWhoami';
 import {canShowTenantMonitoringTab} from '../../../utils/monitoringVisibility';
 import {isDatabaseEntityType} from '../utils/schema';
 
@@ -51,6 +51,7 @@ export function useDiagnosticsPages({
     const hasStorageUsage = newStorageViewEnabled && hasStorageUsageCapabilities;
     const hasTopicData = useTopicDataAvailable();
     const isViewerUser = useIsViewerUser();
+    const userPermissions = useUserPermissions();
 
     return React.useMemo(() => {
         return getPagesByType(type, subType, {
@@ -59,7 +60,7 @@ export function useDiagnosticsPages({
             hasStorageUsage,
             hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
             hasConfigs: isViewerUser && hasConfigs,
-            hasAccess: uiFactory.hasAccess,
+            hasAccess: uiFactory.hasAccess({userPermissions}),
             hasMonitoring: canShowTenantMonitoringTab(controlPlane, clusterMonitoring),
             databaseType,
             databasePagesDisplay,
@@ -76,5 +77,6 @@ export function useDiagnosticsPages({
         clusterMonitoring,
         databaseType,
         databasePagesDisplay,
+        userPermissions,
     ]);
 }

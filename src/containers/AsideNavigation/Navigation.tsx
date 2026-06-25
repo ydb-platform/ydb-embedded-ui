@@ -6,13 +6,13 @@ import {useRouteMatch} from 'react-router-dom';
 
 import {useComponent} from '../../components/ComponentsProvider/ComponentsProvider';
 import routes from '../../routes';
-import {selectUser} from '../../store/reducers/authentication/authentication';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {useSetting} from '../../store/reducers/settings/useSetting';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {isModifiedClickEvent} from '../../utils/events';
-import {useDelayed, useTypedSelector} from '../../utils/hooks';
+import {useDelayed} from '../../utils/hooks';
+import {useUser} from '../../utils/hooks/useWhoami';
 import {useTenantNavigation} from '../Tenant/TenantNavigation/useTenantNavigation';
 import {useNavigationV2Enabled} from '../Tenant/utils/useNavigationV2Enabled';
 import {UserSettings} from '../UserSettings/UserSettings';
@@ -44,7 +44,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
         isLoading: isNotificationSettingLoading,
     } = useSetting(SETTING_KEYS.IS_V2_NAVIGATION_ALERT_SEEN);
 
-    const ydbUser = useTypedSelector(selectUser);
+    const ydbUser = useUser();
 
     const shouldShowV2NavNotifications = !uiFactory.hideNewFeaturesNotifications?.navigationV2;
 

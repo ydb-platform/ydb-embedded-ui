@@ -60,10 +60,12 @@
         width: 100%;
     }
 
-    &__compaction-label {
+    &__compaction-label-wrapper {
         width: 100%;
         max-width: 150px;
+    }
 
+    &__compaction-label {
         color: var(--g-color-text-secondary);
 
         @include mixins.body-1-typography();

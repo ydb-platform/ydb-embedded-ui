@@ -494,9 +494,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isResultsControlsCollapsed()).resolves.toBe(false);
     });
 
-    test('Copy result button copies to clipboard', async ({page, browserName}) => {
-        // Skip this test in Safari due to clipboard permission issues
-        test.skip(browserName === 'webkit', 'Clipboard API not fully supported in Safari');
+    test('Copy result button copies to clipboard', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         const query = 'SELECT 42 as answer;';
 

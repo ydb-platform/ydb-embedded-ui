@@ -7,6 +7,7 @@ import {
     Button,
     Dialog,
     Flex,
+    HelpMark,
     Icon,
     Popover,
     Switch,
@@ -17,6 +18,7 @@ import {
 import type {TOperation} from '../../../../../../types/api/operations';
 import {CompactState} from '../../../../../../types/api/operations';
 import {cn} from '../../../../../../utils/cn';
+import createToast from '../../../../../../utils/createToast';
 import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
 import {
     getCompactionProgress,
@@ -31,11 +33,54 @@ import './CompactTableAction.scss';
 const b = cn('ydb-diagnostics-table-info');
 const DEFAULT_PARALLEL_SHARDS = '1';
 const COMPACT_TABLE_DIALOG = 'compact-table-dialog';
+const START_COMPACTION_RESPONSE_TIMEOUT = 1000;
 
 interface CompactTableActionProps {
     runningCompaction?: TOperation;
     isFetching: boolean;
     onApply: (value: {cascade: boolean; parallel?: number}) => Promise<void>;
+    onRefreshCompactions?: () => void;
+    executeQueryAndForgetAvailable?: boolean;
+}
+
+type CompactionStartResult =
+    | {status: 'success'}
+    | {status: 'error'; error: unknown}
+    | {status: 'timeout'};
+
+// Races the compaction request against a timeout so the dialog does not block on a
+// long-running query. The request only resolves successfully if the operation actually
+// started; if it fails to start, the request rejects and we surface the error. Reaching
+// the timeout without an error is therefore treated as a successful start. Note: an error
+// arriving after the timeout cannot be shown, since by then the dialog is already closed.
+function waitForCompactionStartOrTimeout(
+    promise: Promise<void>,
+    timeoutMs: number,
+): Promise<CompactionStartResult> {
+    return new Promise((resolve) => {
+        const timeoutId = window.setTimeout(() => {
+            resolve({status: 'timeout'});
+        }, timeoutMs);
+
+        promise
+            .then(() => {
+                window.clearTimeout(timeoutId);
+                resolve({status: 'success'});
+            })
+            .catch((error: unknown) => {
+                window.clearTimeout(timeoutId);
+                resolve({status: 'error', error});
+            });
+    });
+}
+
+function showCompactionToast(content: string) {
+    createToast({
+        name: 'startTableCompaction',
+        content,
+        autoHiding: 3000,
+        isClosable: true,
+    });
 }
 
 function parseParallel(value: string) {
@@ -163,14 +208,18 @@ export function CompactTableAction({
     runningCompaction,
     isFetching,
     onApply,
+    onRefreshCompactions,
+    executeQueryAndForgetAvailable,
 }: CompactTableActionProps) {
     const handleOpenDialog = React.useCallback(() => {
         reachMetricaGoal('openCompactionDialog');
         openCompactTableDialog({
             onApply,
+            onRefreshCompactions,
             hasRunningCompaction: Boolean(runningCompaction),
+            executeQueryAndForgetAvailable,
         });
-    }, [onApply, runningCompaction]);
+    }, [executeQueryAndForgetAvailable, onApply, onRefreshCompactions, runningCompaction]);
 
     const button = (
         <Button
@@ -200,7 +249,9 @@ export function CompactTableAction({
 
 interface CompactTableDialogProps {
     onApply: (value: {cascade: boolean; parallel?: number}) => Promise<void>;
+    onRefreshCompactions?: () => void;
     hasRunningCompaction: boolean;
+    executeQueryAndForgetAvailable?: boolean;
 }
 
 interface CompactTableDialogNiceModalProps extends CompactTableDialogProps {
@@ -212,7 +263,9 @@ function CompactTableDialog({
     open,
     onClose,
     onApply,
+    onRefreshCompactions,
     hasRunningCompaction,
+    executeQueryAndForgetAvailable,
 }: CompactTableDialogNiceModalProps) {
     const [cascade, setCascade] = React.useState(true);
     const [parallel, setParallel] = React.useState(DEFAULT_PARALLEL_SHARDS);
@@ -264,10 +317,30 @@ function CompactTableDialog({
 
             try {
                 reachMetricaGoal('startCompaction');
-                await onApply({
+                const applyPromise = onApply({
                     cascade,
                     parallel: parsedParallel,
                 });
+
+                if (executeQueryAndForgetAvailable) {
+                    // Backend returns immediately once compaction is scheduled in the background
+                    await applyPromise;
+                } else {
+                    // Compaction query is long-running, so do not block the dialog on it.
+                    // Treat reaching the response timeout without an error as a success.
+                    const result = await waitForCompactionStartOrTimeout(
+                        applyPromise,
+                        START_COMPACTION_RESPONSE_TIMEOUT,
+                    );
+
+                    if (result.status === 'error') {
+                        setRequestErrorMessage(prepareErrorMessage(result.error));
+                        return;
+                    }
+                }
+
+                showCompactionToast(i18n('toast_compaction-started'));
+                onRefreshCompactions?.();
                 handleClose();
             } catch (error) {
                 setRequestErrorMessage(prepareErrorMessage(error));
@@ -275,7 +348,15 @@ function CompactTableDialog({
                 setIsSubmitting(false);
             }
         },
-        [cascade, handleClose, onApply, parallel, submitDisabled],
+        [
+            cascade,
+            executeQueryAndForgetAvailable,
+            handleClose,
+            onApply,
+            onRefreshCompactions,
+            parallel,
+            submitDisabled,
+        ],
     );
 
     return (
@@ -287,12 +368,19 @@ function CompactTableDialog({
                 <Dialog.Body className={b('compaction-dialog-body')}>
                     <Flex direction="column" gap="4" alignItems="flex-start">
                         <Flex className={b('compaction-dialog-row')} gap="3" alignItems="center">
-                            <label
-                                htmlFor="tableCompactionCascade"
-                                className={b('compaction-label')}
+                            <Flex
+                                className={b('compaction-label-wrapper')}
+                                gap="1"
+                                alignItems="center"
                             >
-                                {i18n('field_cascade')}
-                            </label>
+                                <label
+                                    htmlFor="tableCompactionCascade"
+                                    className={b('compaction-label')}
+                                >
+                                    {i18n('field_cascade')}
+                                </label>
+                                <HelpMark iconSize="s">{i18n('help_cascade')}</HelpMark>
+                            </Flex>
                             <Switch
                                 id="tableCompactionCascade"
                                 checked={cascade}
@@ -300,12 +388,19 @@ function CompactTableDialog({
                             />
                         </Flex>
                         <Flex className={b('compaction-dialog-row')} gap="3" alignItems="center">
-                            <label
-                                htmlFor="tableCompactionParallel"
-                                className={b('compaction-label')}
+                            <Flex
+                                className={b('compaction-label-wrapper')}
+                                gap="1"
+                                alignItems="center"
                             >
-                                {i18n('field_parallel-shards')}
-                            </label>
+                                <label
+                                    htmlFor="tableCompactionParallel"
+                                    className={b('compaction-label')}
+                                >
+                                    {i18n('field_parallel-shards')}
+                                </label>
+                                <HelpMark iconSize="s">{i18n('help_parallel-shards')}</HelpMark>
+                            </Flex>
                             <TextInput
                                 id="tableCompactionParallel"
                                 type="number"
@@ -354,10 +449,7 @@ export const CompactTableDialogNiceModal = NiceModal.create((props: CompactTable
     return (
         <CompactTableDialog
             {...props}
-            onApply={async (value) => {
-                await props.onApply(value);
-                handleClose();
-            }}
+            onApply={props.onApply}
             onClose={handleClose}
             open={modal.visible}
         />

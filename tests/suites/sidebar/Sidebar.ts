@@ -1,5 +1,7 @@
 import type {Locator, Page} from '@playwright/test';
 
+import {retryAction} from '../../utils/retryAction';
+
 const defaultFooterItemsSelector =
     '[data-qa="aside-information"], [data-qa="aside-settings"], [data-qa="aside-user"]';
 const settingsMenuItemSelector = '[data-id]';
@@ -82,6 +84,7 @@ export class Sidebar {
 
     async clickInformation() {
         await this.informationButton.click();
+        await this.popupContent.waitFor({state: 'visible'});
     }
 
     async isPopupVisible() {
@@ -93,14 +96,18 @@ export class Sidebar {
     }
 
     async clickHotkeysButton() {
-        await this.hotkeysButton.waitFor({state: 'visible'});
-        const box = await this.hotkeysButton.boundingBox();
-
-        if (!box) {
-            throw new Error('Keyboard shortcuts button is not visible');
-        }
-
-        await this.page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+        await retryAction(
+            async () => {
+                await this.popupContent.waitFor({state: 'visible'});
+                await this.hotkeysButton.waitFor({state: 'visible'});
+                await this.hotkeysButton.evaluate((element) => {
+                    (element as HTMLElement).click();
+                });
+                await this.hotkeysPanel.waitFor({state: 'visible', timeout: 2000});
+            },
+            3,
+            300,
+        );
     }
 
     async isHotkeysPanelVisible() {

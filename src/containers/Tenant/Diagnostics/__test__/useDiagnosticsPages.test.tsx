@@ -12,7 +12,7 @@ import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {useTenantBaseInfo} from '../../../../store/reducers/tenant/tenant';
 import {EPathType} from '../../../../types/api/schema';
-import {useIsViewerUser} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useIsViewerUser, useUserPermissions} from '../../../../utils/hooks/useWhoami';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
 import {useDiagnosticsPages} from '../useDiagnosticsPages';
 
@@ -38,8 +38,9 @@ jest.mock('../../../../store/reducers/tenant/tenant', () => {
     };
 });
 
-jest.mock('../../../../utils/hooks/useIsUserAllowedToMakeChanges', () => ({
+jest.mock('../../../../utils/hooks/useWhoami', () => ({
     useIsViewerUser: jest.fn(),
+    useUserPermissions: jest.fn(),
 }));
 
 jest.mock('../../../../utils/monitoringVisibility', () => ({
@@ -61,6 +62,7 @@ describe('useDiagnosticsPages', () => {
         });
         (useIsViewerUser as jest.Mock).mockReturnValue(true);
         (canShowTenantMonitoringTab as jest.Mock).mockReturnValue(true);
+        (useUserPermissions as jest.Mock).mockReturnValue(undefined);
     });
 
     test('hides storage usage tab when storage stats capability is unavailable', () => {

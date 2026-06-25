@@ -3,10 +3,12 @@ import {isQueryErrorResponse, parseQueryAPIResponse} from '../../utils/query';
 
 import {api} from './api';
 
+type PreviewQueryAction = Exclude<ExecuteActions, 'execute-query-and-forget'>;
+
 interface SendQueryParams {
     query?: string;
     database?: string;
-    action?: ExecuteActions;
+    action?: PreviewQueryAction;
     limitRows?: number;
     base64?: boolean;
 }

@@ -9,9 +9,6 @@ import type {AuthenticationState} from './types';
 
 const initialState: AuthenticationState = {
     isAuthenticated: true,
-    user: undefined,
-    id: undefined,
-    metaUser: undefined,
 };
 
 export const slice = createSlice({
@@ -19,41 +16,17 @@ export const slice = createSlice({
     initialState,
     reducers: {
         setIsAuthenticated: (state, action: PayloadAction<boolean>) => {
-            const isAuthenticated = action.payload;
-
-            state.isAuthenticated = isAuthenticated;
-
-            if (!isAuthenticated) {
-                state.user = undefined;
-            }
-        },
-        setUser: (state, action: PayloadAction<TUserToken>) => {
-            const {UserSID, UserID, AuthType, IsMonitoringAllowed, IsViewerAllowed} =
-                action.payload;
-
-            state.user = AuthType === 'Login' ? UserSID : undefined;
-            state.id = UserID;
-
-            // If ydb version supports this feature,
-            // There should be explicit flag in whoami response
-            // Otherwise every user is allowed to make changes
-            // Anyway there will be guards on backend
-            state.isUserAllowedToMakeChanges = IsMonitoringAllowed !== false;
-            state.isViewerUser = IsViewerAllowed;
+            state.isAuthenticated = action.payload;
         },
     },
     selectors: {
-        selectIsUserAllowedToMakeChanges: (state) => state.isUserAllowedToMakeChanges,
-        selectIsViewerUser: (state) => state.isViewerUser,
-        selectUser: (state) => state.user,
-        selectMetaUser: (state) => state.metaUser ?? state.id,
+        selectIsAuthenticated: (state) => state.isAuthenticated,
     },
 });
 
 export default slice.reducer;
-export const {setIsAuthenticated, setUser} = slice.actions;
-export const {selectIsUserAllowedToMakeChanges, selectIsViewerUser, selectUser, selectMetaUser} =
-    slice.selectors;
+export const {setIsAuthenticated} = slice.actions;
+export const {selectIsAuthenticated} = slice.selectors;
 
 export const authenticationApi = api.injectEndpoints({
     endpoints: (build) => ({
@@ -69,7 +42,6 @@ export const authenticationApi = api.injectEndpoints({
                     } else {
                         data = await window.api.viewer.whoami({database});
                     }
-                    dispatch(setUser(data));
                     return {data};
                 } catch (error) {
                     if (isAxiosResponse(error) && error.status === 401 && !error.data?.authUrl) {
@@ -116,6 +88,9 @@ export const authenticationApi = api.injectEndpoints({
                     return {error};
                 }
             },
+            // Drop the cached whoami so consumers (e.g. the persistent account menu)
+            // stop showing the previous user's identity after logout.
+            invalidatesTags: (_, error) => (error ? [] : ['UserData']),
         }),
     }),
     overrideExisting: 'throw',

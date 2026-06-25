@@ -1,5 +1,30 @@
 # Changelog
 
+## [17.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v17.0.0...v17.0.1) (2026-06-24)
+
+
+### Bug Fixes
+
+* content layout ([#4053](https://github.com/ydb-platform/ydb-embedded-ui/issues/4053)) ([5c5185d](https://github.com/ydb-platform/ydb-embedded-ui/commit/5c5185d476f924dd10fdcae039cff27afdcd31f4))
+* **Topics:** use meta only if configured in cluster ([#4051](https://github.com/ydb-platform/ydb-embedded-ui/issues/4051)) ([0bc2197](https://github.com/ydb-platform/ydb-embedded-ui/commit/0bc219760698b503c803d2f92e451870ef8c9cfc))
+
+## [17.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v16.4.0...v17.0.0) (2026-06-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **uiFactory:** change types for hasAccess and onCreateDB ([#4048](https://github.com/ydb-platform/ydb-embedded-ui/issues/4048))
+
+### Features
+
+* **uiFactory:** change types for hasAccess and onCreateDB ([#4048](https://github.com/ydb-platform/ydb-embedded-ui/issues/4048)) ([27c17e4](https://github.com/ydb-platform/ydb-embedded-ui/commit/27c17e4592737beb82d39f83b67d7943471ccb99))
+
+
+### Bug Fixes
+
+* preserve query templates in single-tab editor ([#4011](https://github.com/ydb-platform/ydb-embedded-ui/issues/4011)) ([cd51557](https://github.com/ydb-platform/ydb-embedded-ui/commit/cd51557a264e578912731d28bfb59c5f6baeecce))
+* vdisk info popup does not close automatically after evict ([#4030](https://github.com/ydb-platform/ydb-embedded-ui/issues/4030)) ([e5b0c01](https://github.com/ydb-platform/ydb-embedded-ui/commit/e5b0c017712f8cf93fa717cea7837bba42ca0b39))
+
 ## [16.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v16.3.0...v16.4.0) (2026-06-22)
 
 

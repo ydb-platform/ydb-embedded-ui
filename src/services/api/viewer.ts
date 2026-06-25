@@ -207,16 +207,22 @@ export class ViewerAPI extends BaseYdbAPI {
         {path, database, timeout}: {path: SchemaPathParam; database: string; timeout?: number},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
+        const schemaPath = this.getSchemaPath(path);
+
         return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
                 database,
-                path: this.getSchemaPath(path),
+                path: schemaPath,
                 enums: true,
                 partition_stats: false,
                 subs: 0,
             },
-            {concurrentId: concurrentId || `getDescribe|${path}`, requestConfig: {signal}, timeout},
+            {
+                concurrentId: concurrentId || `getDescribe|${database}|${schemaPath}`,
+                requestConfig: {signal},
+                timeout,
+            },
         );
     }
 
