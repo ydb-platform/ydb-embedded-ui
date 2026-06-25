@@ -6,12 +6,17 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {useAnalyzeOperationAvailable} from '../../store/reducers/capabilities/hooks';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
 
 import {OperationsControls} from './OperationsControls';
 import {getColumns} from './columns';
-import {OPERATIONS_SELECTED_COLUMNS_KEY} from './constants';
+import {
+    ANALYZE_OPERATION_KIND,
+    OPERATIONS_SELECTED_COLUMNS_KEY,
+    OPERATION_KINDS,
+} from './constants';
 import i18n from './i18n';
 import {b} from './shared';
 import {useOperationsInfiniteQuery} from './useOperationsInfiniteQuery';
@@ -23,8 +28,22 @@ interface OperationsProps {
 }
 
 export function Operations({database, scrollContainerRef}: OperationsProps) {
-    const {kind, searchValue, pageSize, handleKindChange, handleSearchChange} =
-        useOperationsQueryParams();
+    const {
+        kind: queryKind,
+        searchValue,
+        pageSize,
+        handleKindChange,
+        handleSearchChange,
+    } = useOperationsQueryParams();
+    const analyzeOperationAvailable = useAnalyzeOperationAvailable();
+
+    const operationKinds = React.useMemo(() => {
+        return analyzeOperationAvailable
+            ? [...OPERATION_KINDS, ANALYZE_OPERATION_KIND]
+            : OPERATION_KINDS;
+    }, [analyzeOperationAvailable]);
+
+    const kind = queryKind === 'analyze' && !analyzeOperationAvailable ? 'buildindex' : queryKind;
 
     const {operations, isLoading, isLoadingMore, error} = useOperationsInfiniteQuery({
         database,
@@ -63,6 +82,7 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
                     <TableWithControlsLayout.Controls>
                         <OperationsControls
                             kind={kind}
+                            operationKinds={operationKinds}
                             searchValue={searchValue}
                             handleKindChange={handleKindChange}
                             handleSearchChange={handleSearchChange}

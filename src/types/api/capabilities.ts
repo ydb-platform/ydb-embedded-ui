@@ -5,6 +5,7 @@ export interface CapabilitiesResponse {
     Capabilities: Record<Partial<Capability>, number>;
     Settings?: {
         Security?: Record<Partial<SecuritySetting>, boolean>;
+        Features?: Record<Partial<FeatureSetting>, boolean>;
         Database?: {
             GraphShardExists?: boolean;
         };
@@ -31,6 +32,8 @@ export type Capability =
     | '/viewer/topic_data';
 
 export type SecuritySetting = 'UseLoginProvider' | 'DomainLoginOnly';
+
+export type FeatureSetting = 'EnableAnalyzeLongRunningOperation';
 
 export interface MetaCapabilitiesResponse {
     Capabilities: Record<Partial<MetaCapability>, number>;
