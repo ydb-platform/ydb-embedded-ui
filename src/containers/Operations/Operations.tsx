@@ -76,41 +76,44 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
 
     return (
         <React.Fragment>
-            {error ? <ResponseError error={error} /> : null}
-            {error && hasNoData && !isLoading ? null : (
-                <TableWithControlsLayout>
-                    <TableWithControlsLayout.Controls>
-                        <OperationsControls
-                            kind={kind}
-                            operationKinds={operationKinds}
-                            searchValue={searchValue}
-                            handleKindChange={handleKindChange}
-                            handleSearchChange={handleSearchChange}
-                        />
-                    </TableWithControlsLayout.Controls>
-                    <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
-                        {!hasNoData || isLoading ? (
-                            <ResizeableDataTable
-                                columns={getColumns({database, kind})}
-                                columnsWidthLSKey={OPERATIONS_SELECTED_COLUMNS_KEY}
-                                data={operations}
-                                settings={settings}
-                                emptyDataMessage={i18n('title_empty')}
-                            />
-                        ) : (
-                            <div>{i18n('title_empty')}</div>
-                        )}
-                        {isLoadingMore && (
-                            <TableSkeleton
-                                showHeader={false}
-                                rows={3}
-                                delay={0}
-                                className={b('loading-more')}
-                            />
-                        )}
-                    </TableWithControlsLayout.Table>
-                </TableWithControlsLayout>
-            )}
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    <OperationsControls
+                        kind={kind}
+                        operationKinds={operationKinds}
+                        searchValue={searchValue}
+                        handleKindChange={handleKindChange}
+                        handleSearchChange={handleSearchChange}
+                    />
+                </TableWithControlsLayout.Controls>
+                <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
+                    {error ? (
+                        <ResponseError error={error} />
+                    ) : (
+                        <React.Fragment>
+                            {!hasNoData || isLoading ? (
+                                <ResizeableDataTable
+                                    columns={getColumns({database, kind})}
+                                    columnsWidthLSKey={OPERATIONS_SELECTED_COLUMNS_KEY}
+                                    data={operations}
+                                    settings={settings}
+                                    emptyDataMessage={i18n('title_empty')}
+                                />
+                            ) : (
+                                <div>{i18n('title_empty')}</div>
+                            )}
+                            {isLoadingMore && (
+                                <TableSkeleton
+                                    showHeader={false}
+                                    rows={3}
+                                    delay={0}
+                                    className={b('loading-more')}
+                                />
+                            )}
+                        </React.Fragment>
+                    )}
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
         </React.Fragment>
     );
 }
