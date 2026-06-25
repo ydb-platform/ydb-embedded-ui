@@ -1,20 +1,27 @@
+import React from 'react';
+
 import {CircleExclamationFill, TriangleExclamation} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {TextProps} from '@gravity-ui/uikit';
 import {ActionTooltip, Icon, Popover, Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
+import {Link} from 'react-router-dom';
 
 import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus';
 import {MultilineTableHeader} from '../../../../../components/MultilineTableHeader/MultilineTableHeader';
 import type {Column} from '../../../../../components/PaginatedTable';
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {TOPIC_MESSAGE_SIZE_LIMIT} from '../../../../../store/reducers/topic';
 import type {TopicMessageEnhanced} from '../../../../../types/api/topic';
 import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER, YDB_POPOVER_CLASS_NAME} from '../../../../../utils/constants';
 import {formatBytes, formatTimestamp} from '../../../../../utils/dataFormatters/dataFormatters';
+import {isModifiedClickEvent} from '../../../../../utils/events';
 import {formatToMs} from '../../../../../utils/timeParsers';
 import {safeParseNumber} from '../../../../../utils/utils';
+import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
 import i18n from '../i18n';
+import {useTopicDataQueryParams} from '../useTopicDataQueryParams';
 import {TOPIC_DATA_COLUMNS_TITLES, codecNumberToName} from '../utils/constants';
 import type {TopicDataColumnId} from '../utils/types';
 import {TOPIC_DATA_COLUMNS_IDS} from '../utils/types';
@@ -243,6 +250,9 @@ interface PartitionIdProps {
 }
 
 function Offset({offset, removed, notLoaded}: PartitionIdProps) {
+    const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
+    const {handleActiveOffsetChange} = useTopicDataQueryParams();
+
     if (isNil(offset)) {
         return EMPTY_DATA_PLACEHOLDER;
     }
@@ -257,9 +267,28 @@ function Offset({offset, removed, notLoaded}: PartitionIdProps) {
         );
     }
 
+    const offsetLink = getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.topicData, {
+        activeOffset: String(offset),
+    });
+
+    const handleClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
+        // Let the browser handle modified clicks (new tab/window) natively
+        if (isModifiedClickEvent(e)) {
+            e.stopPropagation();
+            return;
+        }
+        // if allow to navigate link, the table will be rerendered
+        e.stopPropagation();
+        e.preventDefault();
+
+        handleActiveOffsetChange(String(offset));
+    };
+
     return (
-        <span className={b('offset')}>
-            <Text variant="body-2">{offset}</Text>
+        <Link to={offsetLink} onClick={handleClick} className={b('offset', {link: true})}>
+            <Text variant="body-2" color="info">
+                {offset}
+            </Text>
             {notLoaded && (
                 <Popover
                     content={
@@ -272,7 +301,7 @@ function Offset({offset, removed, notLoaded}: PartitionIdProps) {
                     </Text>
                 </Popover>
             )}
-        </span>
+        </Link>
     );
 }
 interface TopicDataTsDiffProps {
