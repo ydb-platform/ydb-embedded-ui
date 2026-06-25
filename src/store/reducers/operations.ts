@@ -64,7 +64,7 @@ export const operationsApi = api.injectEndpoints({
             providesTags: (_result, _error, arg) => ['All', {type: 'OperationList', id: arg.kind}],
         }),
         startTableCompaction: build.mutation<void, StartTableCompactionParams>({
-            queryFn: async ({database, path, cascade, parallel}, {signal}) => {
+            queryFn: async ({database, path, cascade, parallel, executeAndForget}, {signal}) => {
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
@@ -73,7 +73,7 @@ export const operationsApi = api.injectEndpoints({
                                 parallel,
                             }),
                             database,
-                            action: 'execute-query',
+                            action: executeAndForget ? 'execute-query-and-forget' : 'execute-query',
                             internal_call: true,
                         },
                         {signal},

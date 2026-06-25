@@ -2,7 +2,7 @@ import React from 'react';
 
 import {operationsApi} from '../../../../../../store/reducers/operations';
 import type {TOperation} from '../../../../../../types/api/operations';
-import {useAutoRefreshInterval} from '../../../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch} from '../../../../../../utils/hooks';
 import {
     TABLE_COMPACTION_OPERATION_PAGE_SIZE,
     findRunningTableCompactionOperation,
@@ -12,6 +12,7 @@ interface UseTableCompactionResult {
     operations: TOperation[] | undefined;
     runningCompaction: TOperation | undefined;
     isFetching: boolean;
+    refresh: () => void;
 }
 
 /**
@@ -28,6 +29,7 @@ export function useTableCompaction(
     enabled: boolean,
 ): UseTableCompactionResult {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const dispatch = useTypedDispatch();
 
     const {
         currentData: compactionData,
@@ -59,9 +61,14 @@ export function useTableCompaction(
         [operations, path],
     );
 
+    const refresh = React.useCallback(() => {
+        dispatch(operationsApi.util.invalidateTags([{type: 'OperationList', id: 'compaction'}]));
+    }, [dispatch]);
+
     return {
         operations,
         runningCompaction,
         isFetching,
+        refresh,
     };
 }
