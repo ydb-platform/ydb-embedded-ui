@@ -29,6 +29,7 @@ import {setDiagnosticsTab, setQueryTab} from '../../../store/reducers/tenant/ten
 import type {TenantPage} from '../../../store/reducers/tenant/types';
 import type {IQueryResult} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
+import {b} from '../ObjectSummary/shared';
 import {transformPath} from '../ObjectSummary/transformPath';
 import type {SchemaData} from '../Schema/SchemaViewer/types';
 import i18n from '../i18n';
@@ -328,6 +329,19 @@ interface ActionConfig {
     iconStart?: React.ReactNode;
 }
 
+function renderMenuItemText(title: string, description?: string) {
+    if (!description) {
+        return title;
+    }
+
+    return (
+        <div className={b('context-menu-item-content')}>
+            <div className={b('context-menu-item-title')}>{title}</div>
+            <div className={b('context-menu-item-description')}>{description}</div>
+        </div>
+    );
+}
+
 const getActionWithLoader = ({text, action, isLoading, disabled, iconStart}: ActionConfig) => ({
     text: (
         <Flex justifyContent="space-between" alignItems="center">
@@ -377,19 +391,41 @@ export const getActions =
         };
 
         const createEntitiesSet = [
-            {text: i18n('actions.createTable'), action: actions.createTable},
-            {text: i18n('actions.createColumnTable'), action: actions.createColumnTable},
+            {
+                text: i18n('actions.createTable'),
+                action: actions.createTable,
+                iconStart: <Icon data={Code} />,
+            },
+            {
+                text: i18n('actions.createColumnTable'),
+                action: actions.createColumnTable,
+                iconStart: <Icon data={Code} />,
+            },
             {
                 text: i18n('actions.createAsyncReplication'),
                 action: actions.createAsyncReplication,
+                iconStart: <Icon data={Code} />,
             },
             {
                 text: i18n('actions.createTransfer'),
                 action: actions.createTransfer,
+                iconStart: <Icon data={Code} />,
             },
-            {text: i18n('actions.createTopic'), action: actions.createTopic},
-            {text: i18n('actions.createView'), action: actions.createView},
-            {text: i18n('actions.createStreamingQuery'), action: actions.createStreamingQuery},
+            {
+                text: i18n('actions.createTopic'),
+                action: actions.createTopic,
+                iconStart: <Icon data={Code} />,
+            },
+            {
+                text: i18n('actions.createView'),
+                action: actions.createView,
+                iconStart: <Icon data={Code} />,
+            },
+            {
+                text: i18n('actions.createStreamingQuery'),
+                action: actions.createStreamingQuery,
+                iconStart: <Icon data={Code} />,
+            },
         ];
 
         const manageColumnsItem = {text: i18n('actions.manageColumns'), action: actions.alterTable};
@@ -467,8 +503,18 @@ export const getActions =
 
         const createMenuItem = createDialogItems.length
             ? {
-                  text: i18n('actions.createMenu'),
-                  iconStart: <CirclePlus />,
+                  text: renderMenuItemText(
+                      i18n('actions.createMenu'),
+                      i18n('actions.createMenuDescription'),
+                  ),
+                  iconStart: (
+                      <Icon
+                          data={CirclePlus}
+                          className={b('context-menu-item-icon-with-description')}
+                      />
+                  ),
+                  className: b('context-menu-item', {'with-description': true}),
+                  contentClassName: b('context-menu-item-content-wrapper'),
                   items: createDialogItems,
               }
             : undefined;

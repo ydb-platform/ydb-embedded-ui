@@ -57,6 +57,37 @@
         padding: 23px 12px 17px 20px;
     }
 
+    &__context-menu-item-content-wrapper {
+        padding: var(--g-spacing-half) 0;
+    }
+
+    &__context-menu-item-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__context-menu-item-title {
+        line-height: 20px;
+    }
+
+    &__context-menu-item-description {
+        line-height: 18px;
+
+        color: var(--g-color-text-secondary);
+    }
+
+    &__context-menu-item_with-description {
+        align-items: flex-start;
+
+        .g-menu__item-icon-end {
+            margin-top: calc(var(--g-spacing-2));
+        }
+    }
+
+    &__context-menu-item-icon-with-description {
+        margin-top: calc(var(--g-spacing-1));
+    }
+
     &__sticky-top {
         z-index: 5;
         @include mixins.sticky-top();

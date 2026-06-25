@@ -2,7 +2,16 @@ import React from 'react';
 
 import {ArrowUturnCcwLeft, Plus, TrashBin} from '@gravity-ui/icons';
 import type {SelectOption} from '@gravity-ui/uikit';
-import {Button, Checkbox, HelpMark, Icon, Select, Text, TextInput} from '@gravity-ui/uikit';
+import {
+    Button,
+    Checkbox,
+    HelpMark,
+    Icon,
+    Popover,
+    Select,
+    Text,
+    TextInput,
+} from '@gravity-ui/uikit';
 import {Controller, useFieldArray, useFormContext, useWatch} from 'react-hook-form';
 
 import {cn} from '../../../../utils/cn';
@@ -24,7 +33,6 @@ interface YdbColumnsSectionProps {
     pkTypes: Set<string>;
     keyNullable: boolean;
     originalInfo?: OriginalTableInfo;
-    onRequestTtlColumnDeletion: (onConfirm: () => void) => void;
 }
 
 export function YdbColumnsSection({
@@ -33,9 +41,8 @@ export function YdbColumnsSection({
     pkTypes,
     keyNullable,
     originalInfo,
-    onRequestTtlColumnDeletion,
 }: YdbColumnsSectionProps) {
-    const {control, setValue, getValues, formState} = useFormContext<FormValues>();
+    const {control, setValue, formState} = useFormContext<FormValues>();
     const {fields, append, remove} = useFieldArray({control, name: 'columns'});
     const {
         fields: deletedFields,
@@ -115,28 +122,9 @@ export function YdbColumnsSection({
 
     const handleDeleteOriginalColumn = React.useCallback(
         (column: Column) => {
-            const ttlColumnName = getValues('settings.ttl.column');
-            const isTtlColumn =
-                getValues('settings.ttl.status') === 'enabled' && ttlColumnName === column.name;
-            const doDelete = () => appendDeleted(column);
-
-            if (isTtlColumn) {
-                onRequestTtlColumnDeletion(() => {
-                    setValue('settings.ttl.status', 'disabled', {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                    });
-                    setValue('settings.ttl.column', undefined, {
-                        shouldDirty: true,
-                        shouldValidate: false,
-                    });
-                    doDelete();
-                });
-            } else {
-                doDelete();
-            }
+            appendDeleted(column);
         },
-        [appendDeleted, getValues, onRequestTtlColumnDeletion, setValue],
+        [appendDeleted],
     );
 
     const showHeader =
@@ -144,6 +132,18 @@ export function YdbColumnsSection({
         primaryOriginalColumns.length > 0 ||
         nonPrimaryOriginalColumns.length > 0;
 
+    const currentTtlColumn = originalInfo?.ttlColumn;
+    const indexedColumns = React.useMemo(() => {
+        const columns = new Set<string>();
+
+        originalInfo?.indexes.forEach((index) => {
+            index.columns.forEach((column) => {
+                columns.add(column);
+            });
+        });
+
+        return columns;
+    }, [originalInfo?.indexes]);
     const primaryKeyColumnNames = primaryOriginalColumns.map((column) => column.name);
     const partitionKeyColumnNames = originalInfo?.partitionKey ?? [];
 
@@ -212,6 +212,11 @@ export function YdbColumnsSection({
                                     key={`existing-${column.name}`}
                                     column={column}
                                     isDeleting={isDeleting}
+                                    deleteDisabledMessage={getDeleteDisabledMessage({
+                                        columnName: column.name,
+                                        currentTtlColumn,
+                                        indexedColumns,
+                                    })}
                                     onDelete={() => handleDeleteOriginalColumn(column)}
                                     onUndo={() => removeDeleted(deletedIndex)}
                                 />
@@ -247,6 +252,46 @@ export function YdbColumnsSection({
             </div>
         </FormSection>
     );
+}
+
+function ActionButtonWithPopover({
+    content,
+    children,
+}: {
+    content?: string;
+    children: React.ReactElement;
+}) {
+    if (!content) {
+        return children;
+    }
+
+    return (
+        <Popover content={content} placement="top" hasArrow className={b('ttl-delete-popover')}>
+            <span className={b('columns-action-popover-target')}>{children}</span>
+        </Popover>
+    );
+}
+
+function getDeleteDisabledMessage({
+    columnName,
+    currentTtlColumn,
+    indexedColumns,
+}: {
+    columnName: string;
+    currentTtlColumn?: string;
+    indexedColumns: Set<string>;
+}) {
+    const messages: string[] = [];
+
+    if (currentTtlColumn === columnName) {
+        messages.push(i18n('tooltip_ttl-delete-disabled'));
+    }
+
+    if (indexedColumns.has(columnName)) {
+        messages.push(i18n('tooltip_index-delete-disabled'));
+    }
+
+    return messages.join(' ');
 }
 
 function SpecialColumnLabel({label, columns}: {label: string; columns: string[]}) {
@@ -289,11 +334,13 @@ function PrimaryColumnRow({column}: {column: Column}) {
 function NonPrimaryColumnRow({
     column,
     isDeleting,
+    deleteDisabledMessage,
     onDelete,
     onUndo,
 }: {
     column: Column;
     isDeleting: boolean;
+    deleteDisabledMessage?: string;
     onDelete: () => void;
     onUndo: () => void;
 }) {
@@ -311,9 +358,17 @@ function NonPrimaryColumnRow({
                         <Icon data={ArrowUturnCcwLeft} size={16} />
                     </Button>
                 ) : (
-                    <Button view="flat" size="m" onClick={onDelete} title={i18n('action_delete')}>
-                        <Icon data={TrashBin} size={16} />
-                    </Button>
+                    <ActionButtonWithPopover content={deleteDisabledMessage}>
+                        <Button
+                            view="flat"
+                            size="m"
+                            onClick={onDelete}
+                            disabled={Boolean(deleteDisabledMessage)}
+                            title={deleteDisabledMessage ?? i18n('action_delete')}
+                        >
+                            <Icon data={TrashBin} size={16} />
+                        </Button>
+                    </ActionButtonWithPopover>
                 )}
             </div>
         </div>
@@ -343,17 +398,33 @@ function EditableColumnRow({
     onAutoincrementChange,
     onRemove,
 }: EditableColumnRowProps) {
-    const {control, formState, trigger} = useFormContext<FormValues>();
+    const {control, clearErrors, formState, setValue, trigger} = useFormContext<FormValues>();
     const column = useWatch({control, name: `columns.${index}`});
+    const defaultValueFieldName = `columns.${index}.defaultValue` as const;
     const revalidateColumns = React.useCallback(() => {
         trigger('columns').catch(() => undefined);
     }, [trigger]);
+    const handleDefaultValueUpdate = React.useCallback(
+        (value: string) => {
+            setValue(defaultValueFieldName, value, {
+                shouldDirty: true,
+                shouldValidate: false,
+            });
+            clearErrors(defaultValueFieldName);
+        },
+        [clearErrors, defaultValueFieldName, setValue],
+    );
 
     const columnErrors = formState.errors.columns?.[index] as
-        | {name?: {message?: string}; type?: {message?: string}}
+        | {
+              name?: {message?: string};
+              type?: {message?: string};
+              defaultValue?: {message?: string};
+          }
         | undefined;
     const nameError = columnErrors?.name?.message;
     const typeError = columnErrors?.type?.message;
+    const defaultValueError = columnErrors?.defaultValue?.message;
     const notNullDisabledMessage = getNotNullDisabledMessage(column, keyNullable);
     const autoincrementDisabledMessage = getAutoincrementDisabledMessage(column);
     const keyDisabled = !pkTypes.has(column.type);
@@ -362,50 +433,66 @@ function EditableColumnRow({
     if (mode === 'create') {
         if (column.key) {
             defaultValueControl = (
-                <Controller
-                    control={control}
-                    name={`columns.${index}.autoincrement`}
-                    render={({field}) => (
-                        <Checkbox
-                            size="l"
-                            checked={Boolean(field.value)}
-                            disabled={Boolean(autoincrementDisabledMessage)}
-                            title={autoincrementDisabledMessage}
-                            onUpdate={(value) => {
-                                field.onChange(value);
-                                onAutoincrementChange(value);
-                            }}
-                        >
-                            <Text variant="body-1">{i18n('label_autoincrement')}</Text>
-                        </Checkbox>
-                    )}
-                />
-            );
-        } else {
-            defaultValueControl = (
-                <div className={b('default-row')}>
+                <div className={b('checkbox-control')}>
                     <Controller
                         control={control}
-                        name={`columns.${index}.withDefaultValue`}
+                        name={`columns.${index}.autoincrement`}
                         render={({field}) => (
                             <Checkbox
                                 size="l"
                                 checked={Boolean(field.value)}
-                                onUpdate={field.onChange}
-                            />
+                                disabled={Boolean(autoincrementDisabledMessage)}
+                                title={autoincrementDisabledMessage}
+                                onUpdate={(value) => {
+                                    field.onChange(value);
+                                    onAutoincrementChange(value);
+                                }}
+                            >
+                                <Text variant="body-1">{i18n('label_autoincrement')}</Text>
+                            </Checkbox>
                         )}
                     />
-                    <Controller
-                        control={control}
-                        name={`columns.${index}.defaultValue`}
-                        render={({field}) => (
-                            <TextInput
-                                value={field.value === undefined ? '' : String(field.value)}
-                                onUpdate={field.onChange}
-                                disabled={!column.withDefaultValue}
-                            />
-                        )}
-                    />
+                </div>
+            );
+        } else {
+            defaultValueControl = (
+                <div className={b('default-row')}>
+                    <div className={b('default-value-toggle')}>
+                        <Controller
+                            control={control}
+                            name={`columns.${index}.withDefaultValue`}
+                            render={({field}) => (
+                                <Checkbox
+                                    size="l"
+                                    checked={Boolean(field.value)}
+                                    onUpdate={field.onChange}
+                                />
+                            )}
+                        />
+                    </div>
+                    <div className={b('default-value-input')}>
+                        <Controller
+                            control={control}
+                            name={`columns.${index}.defaultValue`}
+                            render={({field}) => (
+                                <TextInput
+                                    value={field.value === undefined ? '' : String(field.value)}
+                                    onUpdate={handleDefaultValueUpdate}
+                                    onBlur={() => {
+                                        field.onBlur();
+                                        trigger(defaultValueFieldName).catch(() => undefined);
+                                    }}
+                                    disabled={!column.withDefaultValue}
+                                    validationState={defaultValueError ? 'invalid' : undefined}
+                                />
+                            )}
+                        />
+                    </div>
+                    {defaultValueError ? (
+                        <div className={b('default-value-error')}>
+                            <FormFieldError message={defaultValueError} />
+                        </div>
+                    ) : null}
                 </div>
             );
         }

@@ -50,4 +50,22 @@ describe('topic utils', () => {
         expect(query).not.toContain('AUTO_PARTITIONING_STRATEGY =');
         expect(query).not.toContain('MAX_ACTIVE_PARTITIONS =');
     });
+
+    test('buildAlterTopicQuery omits partition limit when preserved value is missing', () => {
+        const query = buildAlterTopicQuery({
+            name: 'topic',
+            shards: 3,
+            writeQuotaBytes: 1024 * 1024,
+            preservePartitionCountLimit: true,
+            autoPartitioning: {
+                enabled: false,
+                mode: AutoPartitioningStrategy.Disabled,
+            },
+        });
+
+        expect(query).toContain('ALTER TOPIC topic SET (');
+        expect(query).toContain('MIN_ACTIVE_PARTITIONS = 3');
+        expect(query).toContain('PARTITION_WRITE_SPEED_BYTES_PER_SECOND = 1048576');
+        expect(query).not.toContain('PARTITION_COUNT_LIMIT =');
+    });
 });

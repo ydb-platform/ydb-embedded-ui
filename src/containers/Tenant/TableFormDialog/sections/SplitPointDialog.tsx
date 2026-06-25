@@ -257,7 +257,7 @@ export function buildSplitPointEntries(
                 defaultValue: column.defaultValue,
             },
             id: stored?.id ?? generateColumnId(),
-            isDefined: isColumnValueMustBeDefined(column),
+            isDefined: stored?.isDefined ?? isColumnValueMustBeDefined(column),
             value:
                 stored?.value === null || stored?.value === undefined ? '' : String(stored.value),
         };

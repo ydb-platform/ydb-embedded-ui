@@ -12,11 +12,14 @@ import {
 } from '../utils';
 
 describe('table utils', () => {
-    test('prepareColumnValue handles nulls, params, escaped strings, dates and uuid values', () => {
+    test('prepareColumnValue handles nulls, params, escaped strings, json documents, dates and uuid values', () => {
         expect(prepareColumnValue({type: 'Utf8'} as never, null)).toBe('null');
         expect(prepareColumnValue({type: 'Int64'} as never, '$value')).toBe('$value');
         expect(prepareColumnValue({type: 'Utf8'} as never, 'line\n"quoted"')).toBe(
             '"line\\u000a\\"quoted\\""',
+        );
+        expect(prepareColumnValue({type: 'JsonDocument'} as never, '{"a":1}')).toBe(
+            'JsonDocument("{\\"a\\":1}")',
         );
         expect(
             prepareColumnValue({type: 'Timestamp'} as never, '2025-01-01T00:00:00.000001Z'),
@@ -48,6 +51,12 @@ describe('table utils', () => {
                     notNull: false,
                     defaultValue: '{"hello":"world"}',
                 },
+                {
+                    name: 'template',
+                    type: 'Utf8',
+                    notNull: false,
+                    defaultValue: '$schema',
+                },
             ],
             secondaryIndexes: [{name: 'by_payload', key: ['payload']}],
             settings: {
@@ -66,6 +75,7 @@ describe('table utils', () => {
         expect(query).toContain('CREATE TABLE `folder/orders`');
         expect(query).toContain('`id` BigSerial NOT NULL');
         expect(query).toContain('DEFAULT "{\\"hello\\":\\"world\\"}"');
+        expect(query).toContain('DEFAULT "$schema"');
         expect(query).toContain('INDEX `by_payload` GLOBAL ON (`payload`)');
         expect(query).toContain('PRIMARY KEY (`id`)');
         expect(query).toContain('AUTO_PARTITIONING_PARTITION_SIZE_MB = 2048');

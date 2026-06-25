@@ -201,7 +201,6 @@
 
     &__columns-cell_key,
     &__columns-cell_not-null,
-    &__columns-cell_default,
     &__columns-cell_action {
         display: flex;
         align-items: center;
@@ -209,8 +208,24 @@
         min-height: 28px;
     }
 
+    &__columns-cell_default {
+        display: flex;
+        align-items: flex-start;
+
+        min-height: 28px;
+    }
+
     &__columns-cell_action {
         justify-content: center;
+    }
+
+    &__columns-action-popover-target {
+        display: inline-flex;
+    }
+
+    &__ttl-delete-popover {
+        max-width: 280px;
+        padding: var(--g-spacing-3);
     }
 
     &__columns-separator {
@@ -221,9 +236,36 @@
     }
 
     &__default-row {
+        display: grid;
+        align-items: center;
+        grid-template-columns: max-content minmax(0, 1fr);
+        gap: var(--g-spacing-1) var(--g-spacing-2);
+
+        width: 100%;
+        min-width: 0;
+    }
+
+    &__default-value-toggle {
         display: flex;
         align-items: center;
-        gap: var(--g-spacing-2);
+        grid-column: 1;
+
+        min-height: 28px;
+    }
+
+    &__default-value-input {
+        grid-column: 2;
+
+        min-width: 0;
+    }
+
+    &__default-value-input .g-text-input {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    &__default-value-error {
+        grid-column: 2;
     }
 
     &__indexes-table {

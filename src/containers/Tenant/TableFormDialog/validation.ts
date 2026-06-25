@@ -2,6 +2,7 @@ import {z} from 'zod';
 
 import {isValidEntityPath, isValidEntityPathSegment} from '../utils/pathSegmentValidation';
 
+import {isValueForTypeValid} from './columnValueValidation';
 import {
     COLUMN_NAME_REG_EXP,
     ENTITY_NAME_REG_EXP,
@@ -83,6 +84,65 @@ function validateColumns(data: FormValues, ctx: z.RefinementCtx, mode: FormMode)
     }
 }
 
+function isDefaultValueValid(value: string, type: string) {
+    return isValueForTypeValid(value, type);
+}
+
+function validateColumnDefaults(data: FormValues, ctx: z.RefinementCtx, mode: FormMode) {
+    if (mode !== 'create') {
+        return;
+    }
+
+    data.columns.forEach((column, index) => {
+        if (!column.withDefaultValue || !column.type) {
+            return;
+        }
+
+        const value = column.defaultValue === undefined ? '' : String(column.defaultValue);
+
+        if (!isDefaultValueValid(value, column.type)) {
+            addIssue(ctx, ['columns', index, 'defaultValue'], i18n('error_value-invalid'));
+        }
+    });
+}
+
+function validateDuplicateColumns(
+    data: FormValues,
+    ctx: z.RefinementCtx,
+    originalInfo?: OriginalTableInfo,
+) {
+    const existingColumns = new Set(originalInfo?.columns.map(({name}) => name) ?? []);
+
+    data.deletedColumns.forEach(({name}) => existingColumns.delete(name));
+
+    const duplicatedIndexes = new Set<number>();
+    const newColumnsByName = new Map<string, number[]>();
+
+    data.columns.forEach(({name}, index) => {
+        if (!name) {
+            return;
+        }
+
+        if (existingColumns.has(name)) {
+            duplicatedIndexes.add(index);
+        }
+
+        const indexes = newColumnsByName.get(name);
+        if (indexes) {
+            indexes.push(index);
+            duplicatedIndexes.add(index);
+            indexes.forEach((duplicateIndex) => duplicatedIndexes.add(duplicateIndex));
+            return;
+        }
+
+        newColumnsByName.set(name, [index]);
+    });
+
+    duplicatedIndexes.forEach((index) => {
+        addIssue(ctx, ['columns', index, 'name'], i18n('error_column-name-duplicate'));
+    });
+}
+
 function validatePrimaryKey(data: FormValues, ctx: z.RefinementCtx, mode: FormMode) {
     if (mode !== 'create' || data.columns.length === 0) {
         return;
@@ -119,6 +179,14 @@ function validateSecondaryIndexes(
             addIssue(ctx, ['secondaryIndexes', i, 'key'], i18n('error_indexes-key'));
         }
     });
+
+    const originalIndexedColumns = new Set(
+        originalInfo?.indexes.flatMap((index) => index.columns) ?? [],
+    );
+
+    if (data.deletedColumns.some((column) => originalIndexedColumns.has(column.name))) {
+        addIssue(ctx, ['columns'], i18n('error_indexes-delete-column'));
+    }
 }
 
 function validatePartitioning(data: FormValues, ctx: z.RefinementCtx, mode: FormMode) {
@@ -282,6 +350,8 @@ export function buildTableValidationSchema({
         const data = raw as FormValues;
         validateName(data, ctx, mode);
         validateColumns(data, ctx, mode);
+        validateColumnDefaults(data, ctx, mode);
+        validateDuplicateColumns(data, ctx, originalInfo);
         validatePrimaryKey(data, ctx, mode);
         validateSecondaryIndexes(data, ctx, originalInfo);
         validatePartitioning(data, ctx, mode);

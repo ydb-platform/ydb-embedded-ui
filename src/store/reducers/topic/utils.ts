@@ -80,10 +80,13 @@ function buildTopicSettings(
             settings.push(`MAX_ACTIVE_PARTITIONS = ${autoPartitioning.maxPartitions}`);
         }
     } else {
-        const effectivePartitionCountLimit = preservePartitionCountLimit
-            ? partitionCountLimit
-            : shards;
-        settings.push(`PARTITION_COUNT_LIMIT = ${effectivePartitionCountLimit ?? shards}`);
+        if (preservePartitionCountLimit) {
+            if (partitionCountLimit !== undefined) {
+                settings.push(`PARTITION_COUNT_LIMIT = ${partitionCountLimit}`);
+            }
+        } else {
+            settings.push(`PARTITION_COUNT_LIMIT = ${shards}`);
+        }
     }
 
     settings.push(`PARTITION_WRITE_SPEED_BYTES_PER_SECOND = ${writeQuotaBytes}`);
