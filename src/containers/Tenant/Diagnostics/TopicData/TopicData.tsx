@@ -19,6 +19,8 @@ import {
     useClusterProxySettingResolved,
     useClusterWithProxy,
 } from '../../../../store/reducers/cluster/cluster';
+import type {TopicMessageEnhanced} from '../../../../types/api/topic';
+import {isModifiedClickEvent} from '../../../../utils/events';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../../../utils/illustrations';
@@ -203,6 +205,36 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
         [pageStartOffset, setBoundOffsets, usePagination],
     );
 
+    const isTopicDataRowClickable = React.useCallback((row: TopicMessageEnhanced) => {
+        return !row.removed && !isNil(row.Offset);
+    }, []);
+
+    const handleTopicDataRowClick = React.useCallback(
+        (row: TopicMessageEnhanced, event: React.MouseEvent<HTMLTableRowElement>) => {
+            event.stopPropagation();
+
+            if (isModifiedClickEvent(event) || !isTopicDataRowClickable(row)) {
+                return;
+            }
+
+            handleActiveOffsetChange(String(row.Offset));
+        },
+        [handleActiveOffsetChange, isTopicDataRowClickable],
+    );
+
+    const getTopicDataRowClassName = React.useCallback(
+        (row: TopicMessageEnhanced) => {
+            return b('row', {
+                active: Boolean(
+                    safeParseNumber(row.Offset) === selectedOffset ||
+                        String(row.Offset) === activeOffset,
+                ),
+                removed: row.removed,
+            });
+        },
+        [activeOffset, isTopicDataRowClickable, selectedOffset],
+    );
+
     const closeDrawer = React.useCallback(() => {
         handleActiveOffsetChange(undefined);
     }, [handleActiveOffsetChange]);
@@ -319,15 +351,8 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                             tableName={PAGINATED_TABLE_IDS.TOPIC_DATA}
                             rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
                             keepCache={false}
-                            getRowClassName={(row) => {
-                                return b('row', {
-                                    active: Boolean(
-                                        safeParseNumber(row.Offset) === selectedOffset ||
-                                            String(row.Offset) === activeOffset,
-                                    ),
-                                    removed: row.removed,
-                                });
-                            }}
+                            getRowClassName={getTopicDataRowClassName}
+                            onRowClick={handleTopicDataRowClick}
                         />
                     }
                     tableWrapperProps={{

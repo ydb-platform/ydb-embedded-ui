@@ -70,3 +70,4 @@ export type RenderEmptyDataMessage = () => React.ReactNode;
 export type RenderErrorMessage = (error: IResponseError) => React.ReactNode;
 
 export type GetRowClassName<T> = (row: T) => string;
+export type OnRowClick<T> = (row: T, event: React.MouseEvent<HTMLTableRowElement>) => void;

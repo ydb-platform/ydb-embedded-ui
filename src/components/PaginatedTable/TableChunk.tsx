@@ -15,6 +15,7 @@ import type {
     Column,
     FetchData,
     GetRowClassName,
+    OnRowClick,
     PaginatedTableData,
     RenderEmptyDataMessage,
     RenderErrorMessage,
@@ -38,6 +39,7 @@ interface TableChunkProps<T, F> {
 
     fetchData: FetchData<T, F>;
     getRowClassName?: GetRowClassName<T>;
+    onRowClick?: OnRowClick<T>;
     renderErrorMessage?: RenderErrorMessage;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     onDataFetched: (data?: PaginatedTableData<T>) => void;
@@ -57,6 +59,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     filters,
     sortParams,
     getRowClassName,
+    onRowClick,
     renderErrorMessage,
     renderEmptyDataMessage,
     onDataFetched,
@@ -159,6 +162,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
                 columns={columns}
                 height={rowHeight}
                 getRowClassName={getRowClassName}
+                onRowClick={onRowClick}
             />
         ));
     };

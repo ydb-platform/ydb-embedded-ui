@@ -7,6 +7,7 @@ import type {
     Column,
     FetchData,
     GetRowClassName,
+    OnRowClick,
     PaginatedTableData,
     RenderEmptyDataMessage,
     RenderErrorMessage,
@@ -26,6 +27,7 @@ export interface TableChunksRendererProps<T, F> {
     tableName: PaginatedTableId;
     sortParams?: SortParams;
     getRowClassName?: GetRowClassName<T>;
+    onRowClick?: OnRowClick<T>;
     renderErrorMessage?: RenderErrorMessage;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     onDataFetched: (data?: PaginatedTableData<T>) => void;
@@ -45,6 +47,7 @@ export const TableChunksRenderer = <T, F>({
     tableName,
     sortParams,
     getRowClassName,
+    onRowClick,
     renderErrorMessage,
     renderEmptyDataMessage,
     onDataFetched,
@@ -123,6 +126,7 @@ export const TableChunksRenderer = <T, F>({
                     tableName={tableName}
                     sortParams={sortParams}
                     getRowClassName={getRowClassName}
+                    onRowClick={onRowClick}
                     renderErrorMessage={renderErrorMessage}
                     renderEmptyDataMessage={renderEmptyDataMessage}
                     onDataFetched={onDataFetched}
@@ -142,6 +146,7 @@ export const TableChunksRenderer = <T, F>({
             keepCache,
             lastChunkSize,
             onDataFetched,
+            onRowClick,
             renderEmptyDataMessage,
             renderErrorMessage,
             rowHeight,
