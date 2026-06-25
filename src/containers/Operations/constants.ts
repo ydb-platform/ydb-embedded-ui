@@ -42,6 +42,7 @@ export const OPERATION_KINDS: {value: OperationKind; content: string}[] = [
     {value: 'import/nfs', content: i18n('kind_import_nfs')},
     {value: 'ss/backgrounds', content: i18n('kind_ssBackgrounds')},
     {value: 'buildindex', content: i18n('kind_buildIndex')},
+    {value: 'analyze', content: i18n('kind_analyze')},
     {value: 'compaction', content: i18n('kind_compaction')},
     {value: 'incbackup', content: i18n('kind_incbackup')},
     {value: 'restore', content: i18n('kind_restore')},

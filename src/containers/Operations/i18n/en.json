@@ -10,6 +10,7 @@
   "kind_import_s3": "Import/S3",
   "kind_import_nfs": "Import/NFS",
   "kind_buildIndex": "Build Index",
+  "kind_analyze": "Analyze",
   "kind_compaction": "Compaction",
   "kind_incbackup": "Incremental Backup",
   "kind_restore": "Restore",

@@ -13,6 +13,7 @@ const operationKindSchema = z
         'import/s3',
         'import/nfs',
         'buildindex',
+        'analyze',
         'compaction',
         'incbackup',
         'restore',
