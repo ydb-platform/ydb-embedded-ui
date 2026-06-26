@@ -23,6 +23,26 @@ export function getManagePartitioningInitialValues(
     };
 }
 
+/**
+ * Extracts the maximum allowed split size (in bytes) from the database config.
+ *
+ * Reads `ImmediateControlsConfig.SchemeShardControls.ForceShardSplitDataSize`
+ * (forces shards to split when reaching the given data size). Falls back to
+ * the default 2 GiB when the field is missing or invalid.
+ */
+export function getMaxSplitSizeBytes(config?: Record<string, any>): number {
+    const forceShardSplitDataSize =
+        config?.ImmediateControlsConfig?.SchemeShardControls?.ForceShardSplitDataSize;
+
+    const parsed = Number(forceShardSplitDataSize);
+
+    if (Number.isFinite(parsed) && parsed > 0) {
+        return parsed;
+    }
+
+    return DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES;
+}
+
 export const splitUnitSchema = z.custom<BytesSizes>((value) => {
     return typeof value === 'string' && value in sizes;
 }, i18n('error_invalid-unit'));

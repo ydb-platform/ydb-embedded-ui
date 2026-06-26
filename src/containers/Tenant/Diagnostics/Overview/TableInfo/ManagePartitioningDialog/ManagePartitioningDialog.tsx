@@ -5,15 +5,17 @@ import type {DialogFooterProps} from '@gravity-ui/uikit';
 import {Dialog, Flex, Switch, Text, TextInput} from '@gravity-ui/uikit';
 import {Controller} from 'react-hook-form';
 
+import {configsApi} from '../../../../../../store/reducers/configs';
+import {formatBytes} from '../../../../../../utils/bytesParsers';
 import {cn} from '../../../../../../utils/cn';
 import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
-import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 
 import {SplitUnitSelect} from './SplitUnitSelect';
-import {DEFAULT_MAX_SPLIT_SIZE_GB, MANAGE_PARTITIONING_DIALOG, UNIT_OPTIONS} from './constants';
+import {MANAGE_PARTITIONING_DIALOG, UNIT_OPTIONS} from './constants';
 import i18n from './i18n';
 import type {ManagePartitioningFormOutput, ManagePartitioningFormState} from './types';
 import {useManagePartitioningForm} from './useManagePartitionForm';
+import {getMaxSplitSizeBytes} from './utils';
 
 import './ManagePartitioningDialog.scss';
 
@@ -21,7 +23,8 @@ const b = cn(MANAGE_PARTITIONING_DIALOG);
 
 interface CommonDialogProps {
     initialValue?: ManagePartitioningFormState;
-    onApply?: (value: ManagePartitioningFormOutput) => void | Promise<void>;
+    database?: string;
+    onApply?: (value: ManagePartitioningFormState) => void | Promise<void>;
 }
 
 interface ManagePartitioningDialogNiceModalProps extends CommonDialogProps, DialogFooterProps {
@@ -38,10 +41,28 @@ function ManagePartitioningDialog({
     open,
     renderButtons,
     initialValue,
+    database,
     onApply,
 }: ManagePartitioningDialogProps) {
     const [apiError, setApiError] = React.useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+    const {currentData: config} = configsApi.useGetConfigQuery({database});
+
+    // Maximum split size is taken from the database config field
+    // ImmediateControlsConfig.SchemeShardControls.ForceShardSplitDataSize
+    // (falls back to the default 2 GiB when it is not present).
+    const maxSplitSizeBytes = React.useMemo(() => getMaxSplitSizeBytes(config?.current), [config]);
+
+    const maxSplitSizeGb = React.useMemo(
+        () =>
+            formatBytes({
+                value: maxSplitSizeBytes,
+                size: 'gb',
+                withSizeLabel: false,
+            }),
+        [maxSplitSizeBytes],
+    );
 
     const {
         control,
@@ -50,7 +71,7 @@ function ManagePartitioningDialog({
         formState: {errors, isValid},
     } = useManagePartitioningForm({
         initialValue,
-        maxSplitSizeBytes: DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
+        maxSplitSizeBytes,
     });
 
     const handleApply = handleSubmit(async (data) => {
@@ -115,7 +136,7 @@ function ManagePartitioningDialog({
 
                             <Text variant="body-1" className={b('hint')}>
                                 {i18n('context_split-size-maximum', {
-                                    maxGb: DEFAULT_MAX_SPLIT_SIZE_GB,
+                                    maxGb: maxSplitSizeGb,
                                 })}
                             </Text>
                         </Flex>

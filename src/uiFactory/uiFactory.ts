@@ -25,6 +25,7 @@ const uiFactoryBase: UIFactory = {
     hasAccess: () => true,
     useDatabaseId: false,
     settingsBackend: undefined,
+    docs: undefined,
     enableMultiTabQueryEditor: false,
     hasDeveloperUi: true,
     isDetailedStorageViewAvailable: () => true,
