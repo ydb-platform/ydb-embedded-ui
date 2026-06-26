@@ -277,12 +277,11 @@ function Offset({offset, removed, notLoaded}: PartitionIdProps) {
             e.stopPropagation();
             return;
         }
-        //if allow to navigate link, the table will be rerendered
+        // if allow to navigate link, the table will be rerendered
         e.stopPropagation();
         e.preventDefault();
-        const stringOffset = String(offset);
 
-        handleActiveOffsetChange(stringOffset);
+        handleActiveOffsetChange(String(offset));
     };
 
     return (
