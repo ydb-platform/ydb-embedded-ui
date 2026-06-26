@@ -82,8 +82,11 @@ const DrawerPaneContentWrapper = ({
         return drawerWidth || DEFAULT_DRAWER_WIDTH;
     }, [containerWidth, isPercentageWidth, drawerWidth]);
 
-    const drawerOverlayStyle = React.useMemo<React.CSSProperties | undefined>(() => {
-        return containerWidth > 0 ? {width: containerWidth} : undefined;
+    const drawerOverlayStyle = React.useMemo<React.CSSProperties>(() => {
+        return {
+            overflow: 'hidden',
+            ...(containerWidth > 0 ? {width: containerWidth} : {}),
+        };
     }, [containerWidth]);
 
     React.useEffect(() => {
