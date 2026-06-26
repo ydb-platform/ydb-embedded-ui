@@ -182,7 +182,12 @@ const useGetFeatureSetting = (feature: FeatureSetting) => {
 };
 
 export const useAnalyzeOperationAvailable = () => {
-    return Boolean(useGetFeatureSetting('EnableAnalyzeLongRunningOperation'));
+    const operationListVersion = useGetFeatureVersion('/operation/list');
+    const analyzeLongRunningOperationEnabled = useGetFeatureSetting(
+        'EnableAnalyzeLongRunningOperation',
+    );
+
+    return operationListVersion >= 2 && Boolean(analyzeLongRunningOperationEnabled);
 };
 
 export const useGraphShardExists = () => {

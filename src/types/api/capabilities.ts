@@ -29,7 +29,8 @@ export type Capability =
     | '/viewer/nodes'
     | '/viewer/peers'
     | '/viewer/acl'
-    | '/viewer/topic_data';
+    | '/viewer/topic_data'
+    | '/operation/list';
 
 export type SecuritySetting = 'UseLoginProvider' | 'DomainLoginOnly';
 
