@@ -207,6 +207,28 @@ describe('TableFormDialog validation', () => {
         expect(getIssuePaths(result)).toContain('secondaryIndexes.0.key');
     });
 
+    test('rejects duplicate secondary index names before submit', () => {
+        const schema = buildTableValidationSchema({mode: 'create'});
+
+        const result = schema.safeParse(
+            createValues({
+                columns: [
+                    createColumn(),
+                    createColumn({_id: 'second', name: 'status', key: false, type: 'Utf8'}),
+                ],
+                secondaryIndexes: [
+                    {name: 'by_status', key: ['status']},
+                    {name: 'by_status', key: ['id']},
+                ],
+            }),
+        );
+
+        expect(result.success).toBe(false);
+        expect(getIssuePaths(result)).toEqual(
+            expect.arrayContaining(['secondaryIndexes.0.name', 'secondaryIndexes.1.name']),
+        );
+    });
+
     test('existing secondary index columns cannot be deleted', () => {
         const originalInfo: OriginalTableInfo = {
             name: 'orders',

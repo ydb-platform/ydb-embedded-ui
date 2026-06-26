@@ -166,18 +166,37 @@ function validateSecondaryIndexes(
         ...data.columns.map(({name}) => name),
     ]);
     data.deletedColumns.forEach((column) => allColumns.delete(column.name));
+    const duplicatedIndexes = new Set<number>();
+    const indexNames = new Map<string, number[]>();
 
     data.secondaryIndexes.forEach((index, i) => {
-        if (!index.name) {
+        if (index.name) {
+            if (ENTITY_NAME_REG_EXP.test(index.name)) {
+                const indexes = indexNames.get(index.name);
+
+                if (indexes) {
+                    indexes.push(i);
+                    duplicatedIndexes.add(i);
+                    indexes.forEach((duplicateIndex) => duplicatedIndexes.add(duplicateIndex));
+                } else {
+                    indexNames.set(index.name, [i]);
+                }
+            } else {
+                addIssue(ctx, ['secondaryIndexes', i, 'name'], i18n('error_name-pattern'));
+            }
+        } else {
             addIssue(ctx, ['secondaryIndexes', i, 'name'], i18n('error_required'));
-        } else if (!ENTITY_NAME_REG_EXP.test(index.name)) {
-            addIssue(ctx, ['secondaryIndexes', i, 'name'], i18n('error_name-pattern'));
         }
+
         if (!index.key || index.key.length === 0) {
             addIssue(ctx, ['secondaryIndexes', i, 'key'], i18n('error_required'));
         } else if (!index.key.every((column: string) => allColumns.has(column))) {
             addIssue(ctx, ['secondaryIndexes', i, 'key'], i18n('error_indexes-key'));
         }
+    });
+
+    duplicatedIndexes.forEach((index) => {
+        addIssue(ctx, ['secondaryIndexes', index, 'name'], i18n('error_index-name-duplicate'));
     });
 
     const originalIndexedColumns = new Set(
