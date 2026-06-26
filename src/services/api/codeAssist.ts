@@ -127,4 +127,20 @@ export class CodeAssistAPI extends BaseYdbAPI {
             },
         );
     }
+
+    protected shouldUseCsrfTokenForRequest(method?: string, url?: string) {
+        if (!super.shouldUseCsrfTokenForRequest(method, url)) {
+            return false;
+        }
+
+        if (!url || !CODE_ASSISTANT_BACKEND) {
+            return true;
+        }
+
+        try {
+            return new URL(url, window.location.origin).origin === window.location.origin;
+        } catch {
+            return true;
+        }
+    }
 }

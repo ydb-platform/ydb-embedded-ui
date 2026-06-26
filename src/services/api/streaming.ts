@@ -20,7 +20,7 @@ import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
 import {EXTRACTABLE_RESPONSE_HEADERS} from '../../utils/errors/extractErrorDetails';
 import {isRedirectToAuth} from '../../utils/response';
 
-import {BaseYdbAPI} from './base';
+import {BaseYdbAPI, CSRF_TOKEN_HEADER_NAME} from './base';
 import {readPartText} from './streamingPartReader';
 import {isNeedResetResponse, processNeedReset} from './utils/needReset';
 
@@ -66,12 +66,6 @@ export interface StreamQueryOptions {
 }
 
 export class StreamingAPI extends BaseYdbAPI {
-    private csrfToken?: string;
-
-    setCSRFToken = (token: string) => {
-        this.csrfToken = token;
-    };
-
     async streamQuery<Action extends Actions>(
         params: StreamQueryParams<Action>,
         options: StreamQueryOptions,
@@ -89,8 +83,9 @@ export class StreamingAPI extends BaseYdbAPI {
             'Content-Type': 'application/json',
         });
 
-        if (this.csrfToken) {
-            headers.set('X-CSRF-Token', this.csrfToken);
+        const csrfToken = this.getCsrfToken();
+        if (csrfToken) {
+            headers.set(CSRF_TOKEN_HEADER_NAME, csrfToken);
         }
 
         if (params.tracingLevel) {
