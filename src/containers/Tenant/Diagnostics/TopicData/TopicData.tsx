@@ -211,12 +211,11 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
 
     const handleTopicDataRowClick = React.useCallback(
         (row: TopicMessageEnhanced, event: React.MouseEvent<HTMLTableRowElement>) => {
-            event.stopPropagation();
-
             if (isModifiedClickEvent(event) || !isTopicDataRowClickable(row)) {
                 return;
             }
 
+            event.stopPropagation();
             handleActiveOffsetChange(String(row.Offset));
         },
         [handleActiveOffsetChange, isTopicDataRowClickable],
