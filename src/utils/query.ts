@@ -333,7 +333,7 @@ export const tracingLevelSchema = z.nativeEnum(TRACING_LEVELS);
 const emptyStringToUndefined = (value: unknown) => (value === '' ? undefined : value);
 
 // timeout = null is for timeout switched off state
-// timeout = '' is for modes with disabled timeout override
+// Raw form timeout = '' is normalized to undefined before validation
 export const querySettingsValidationSchema = z.object({
     timeout: z.preprocess(
         emptyStringToUndefined,

@@ -6,7 +6,7 @@ import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 
 import {DEFAULT_MANAGE_PARTITIONING_VALUE} from './constants';
 import i18n from './i18n';
-import type {ManagePartitioningFormOutput, ManagePartitioningFormState} from './types';
+import type {ManagePartitioningFormState} from './types';
 
 export function splitToPartitionSizeMb(splitSize: number, splitUnit: BytesSizes) {
     const bytes = convertToBytes(splitSize, splitUnit);
@@ -43,7 +43,7 @@ const requiredPositiveInt = (requiredMessage: string) =>
 
 export const managePartitioningSchema = (
     maxSplitSizeBytes = DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
-): z.ZodType<ManagePartitioningFormOutput, ManagePartitioningFormState> =>
+) =>
     z
         .object({
             splitSize: requiredPositiveNumber(i18n('error_required')),
