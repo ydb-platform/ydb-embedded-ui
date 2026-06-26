@@ -10,6 +10,11 @@ import {VISIBILITY_TIMEOUT} from '../constants';
 import {OperationsTable} from './tabs/OperationsModel';
 
 const OWNER_CARD_VISIBILITY_TIMEOUT = VISIBILITY_TIMEOUT * 2;
+const METRIC_TABS_SELECTOR = '.tenant-metrics-tabs';
+const METRIC_TAB_SELECTOR = '.tenant-metrics-tabs__link-container';
+const METRIC_TAB_TITLE_SELECTOR = '[data-qa="tenant-metric-tab-title"]';
+const METRIC_TAB_VALUE_SELECTOR = '[data-qa="tenant-metric-tab-value"]';
+const METRIC_TAB_DESCRIPTION_SELECTOR = '[data-qa="tenant-metric-tab-description"]';
 
 export enum DiagnosticsTab {
     Info = 'overview',
@@ -315,9 +320,11 @@ export class Diagnostics {
     private primaryKeys: Locator;
     private refreshButton: Locator;
     private autoRefreshSelect: Locator;
+    private metricTabs: Locator;
     private cpuCard: Locator;
     private storageCard: Locator;
     private memoryCard: Locator;
+    private networkCard: Locator;
     private healthcheckCard: Locator;
     private tableRadioButton: Locator;
     private fixedHeightQueryElements: Locator;
@@ -347,9 +354,11 @@ export class Diagnostics {
         this.copyLinkButton = page.locator('.ydb-copy-link-button__icon');
 
         // Info tab cards
-        this.cpuCard = page.locator('.tenant-metrics-tabs__link-container:has-text("CPU")');
-        this.storageCard = page.locator('.tenant-metrics-tabs__link-container:has-text("Storage")');
-        this.memoryCard = page.locator('.tenant-metrics-tabs__link-container:has-text("Memory")');
+        this.metricTabs = page.locator(METRIC_TABS_SELECTOR);
+        this.cpuCard = this.getMetricTab('CPU');
+        this.storageCard = this.getMetricTab('Storage');
+        this.memoryCard = this.getMetricTab('Memory');
+        this.networkCard = this.getMetricTab('Network');
         this.healthcheckCard = page.locator('.ydb-healthcheck-preview');
         this.ownerCard = page.locator('.ydb-access-rights__owner-card');
         this.changeOwnerButton = page.locator('.ydb-access-rights__owner-card button');
@@ -411,48 +420,80 @@ export class Diagnostics {
         await optionLocator.click();
     }
 
-    async areInfoCardsVisible() {
+    getMetricTabs(): Locator {
+        return this.metricTabs;
+    }
+
+    getMetricTab(title: string): Locator {
+        return this.metricTabs.locator(METRIC_TAB_SELECTOR).filter({
+            has: this.page.locator(`${METRIC_TAB_TITLE_SELECTOR}:text-is("${title}")`),
+        });
+    }
+
+    getMetricTabStatusIcon(title: string): Locator {
+        return this.getMetricTab(title).locator('.ydb-status-icon__status-icon');
+    }
+
+    async areInfoCardsVisible({includeNetwork = false}: {includeNetwork?: boolean} = {}) {
         await this.cpuCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.storageCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.memoryCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        if (includeNetwork) {
+            await this.networkCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        }
+
         return true;
     }
 
-    async getResourceUtilization() {
-        // Get aggregated metrics from the new TabCard structure
-        const cpuPercentage = await this.cpuCard
-            .locator('.ydb-doughnut-metrics__value')
-            .textContent();
-        const cpuUsage = await this.cpuCard.locator('.g-text_variant_subheader-2').textContent();
+    async areServerlessInfoCardsVisible() {
+        await this.getMetricTab('CPU Load').waitFor({
+            state: 'visible',
+            timeout: VISIBILITY_TIMEOUT,
+        });
+        await this.storageCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.memoryCard.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        await this.networkCard.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
 
-        const storagePercentage = await this.storageCard
-            .locator('.ydb-doughnut-metrics__value')
-            .textContent();
-        const storageUsage = await this.storageCard
-            .locator('.g-text_variant_subheader-2')
-            .textContent();
+    async getResourceUtilization({includeNetwork = false}: {includeNetwork?: boolean} = {}) {
+        const getMetricCardData = async (card: Locator) => {
+            const title = await card.locator(METRIC_TAB_TITLE_SELECTOR).textContent();
+            const percentage = await card.locator(METRIC_TAB_VALUE_SELECTOR).textContent();
+            const description = await card.locator(METRIC_TAB_DESCRIPTION_SELECTOR).textContent();
 
-        const memoryPercentage = await this.memoryCard
-            .locator('.ydb-doughnut-metrics__value')
-            .textContent();
-        const memoryUsage = await this.memoryCard
-            .locator('.g-text_variant_subheader-2')
-            .textContent();
-
-        return {
-            cpu: {
-                percentage: cpuPercentage?.trim() || '',
-                usage: cpuUsage?.trim() || '',
-            },
-            storage: {
-                percentage: storagePercentage?.trim() || '',
-                usage: storageUsage?.trim() || '',
-            },
-            memory: {
-                percentage: memoryPercentage?.trim() || '',
-                usage: memoryUsage?.trim() || '',
-            },
+            return {
+                title: title?.trim() || '',
+                percentage: percentage?.trim() || '',
+                description: description?.trim() || '',
+            };
         };
+
+        const utilization = {
+            cpu: await getMetricCardData(this.cpuCard),
+            storage: await getMetricCardData(this.storageCard),
+            memory: await getMetricCardData(this.memoryCard),
+        };
+
+        if (includeNetwork) {
+            return {
+                ...utilization,
+                network: await getMetricCardData(this.networkCard),
+            };
+        }
+
+        return utilization;
+    }
+
+    async getMetricTabsWidth() {
+        const box = await this.metricTabs.boundingBox();
+
+        if (!box) {
+            throw new Error('Metric tabs are not visible');
+        }
+
+        return Math.round(box.width);
     }
 
     async getHealthcheckStatus() {

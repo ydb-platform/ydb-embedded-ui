@@ -1,5 +1,7 @@
+import {EFlag} from '../../../../../../types/api/enums';
 import {EType} from '../../../../../../types/api/tenant';
 import {selectStorageStatsForMetricCard} from '../MetricsTabs';
+import {getMetricTabPresentation, getUsageMetricTabPresentation} from '../metricTabPresentation';
 
 describe('selectStorageStatsForMetricCard', () => {
     test('keeps prod legacy fallback to database storage when tablet storage has no limit', () => {
@@ -81,5 +83,19 @@ describe('selectStorageStatsForMetricCard', () => {
                 isServerless: true,
             }),
         ).toBe(tabletStorageStats);
+    });
+});
+
+describe('metric tab presentation', () => {
+    test('shows N/A when percent cannot be calculated', () => {
+        expect(getMetricTabPresentation({usagePercent: NaN})).toEqual({
+            percentText: 'N/A',
+            status: EFlag.Grey,
+        });
+
+        expect(getUsageMetricTabPresentation({value: 10, limit: 0})).toEqual({
+            percentText: 'N/A',
+            status: EFlag.Grey,
+        });
     });
 });
