@@ -83,7 +83,7 @@ export class StreamingAPI extends BaseYdbAPI {
             'Content-Type': 'application/json',
         });
 
-        const csrfToken = this.csrfTokenGetter();
+        const csrfToken = this.getCsrfToken();
         if (csrfToken) {
             headers.set(CSRF_TOKEN_HEADER_NAME, csrfToken);
         }
