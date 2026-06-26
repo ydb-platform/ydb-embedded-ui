@@ -1,20 +1,20 @@
 import type {UpdateTablePartitioningParams} from '../../../../../types/store/partitioning';
 
-import type {ManagePartitioningFormState} from './ManagePartitioningDialog/types';
+import type {ManagePartitioningFormOutput} from './ManagePartitioningDialog/types';
 import {splitToPartitionSizeMb} from './ManagePartitioningDialog/utils';
 
 export function prepareUpdatePartitioningRequest(
-    value: ManagePartitioningFormState,
+    value: ManagePartitioningFormOutput,
     database: string,
     path: string,
 ): UpdateTablePartitioningParams {
-    const {partitionSizeMb} = splitToPartitionSizeMb(Number(value.splitSize), value.splitUnit);
+    const {partitionSizeMb} = splitToPartitionSizeMb(value.splitSize, value.splitUnit);
 
     return {
         value: {
             partitionSizeMb,
-            minPartitions: Number(value.minimum),
-            maxPartitions: Number(value.maximum),
+            minPartitions: value.minimum,
+            maxPartitions: value.maximum,
             splitByLoad: value.loadEnabled,
         },
         database,

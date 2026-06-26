@@ -212,7 +212,7 @@ export const STORAGE_GROUPS_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_GROUPS_GR
 export const storageGroupsGroupByParamSchema = z
     .custom<
         GroupsGroupByField | undefined
-    >((value) => STORAGE_GROUPS_GROUP_BY_PARAMS.includes(value))
+    >((value) => STORAGE_GROUPS_GROUP_BY_PARAMS.some((param) => param === value))
     .catch(undefined);
 
 // Although columns ids mostly similar to backend fields, there might be some difference

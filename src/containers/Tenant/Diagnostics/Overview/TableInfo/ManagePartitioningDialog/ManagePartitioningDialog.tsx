@@ -12,7 +12,7 @@ import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 import {SplitUnitSelect} from './SplitUnitSelect';
 import {DEFAULT_MAX_SPLIT_SIZE_GB, MANAGE_PARTITIONING_DIALOG, UNIT_OPTIONS} from './constants';
 import i18n from './i18n';
-import type {ManagePartitioningFormState} from './types';
+import type {ManagePartitioningFormOutput, ManagePartitioningFormState} from './types';
 import {useManagePartitioningForm} from './useManagePartitionForm';
 
 import './ManagePartitioningDialog.scss';
@@ -21,7 +21,7 @@ const b = cn(MANAGE_PARTITIONING_DIALOG);
 
 interface CommonDialogProps {
     initialValue?: ManagePartitioningFormState;
-    onApply?: (value: ManagePartitioningFormState) => void | Promise<void>;
+    onApply?: (value: ManagePartitioningFormOutput) => void | Promise<void>;
 }
 
 interface ManagePartitioningDialogNiceModalProps extends CommonDialogProps, DialogFooterProps {
@@ -46,7 +46,6 @@ function ManagePartitioningDialog({
     const {
         control,
         handleSubmit,
-        trigger,
         formState: {errors, isValid},
     } = useManagePartitioningForm({
         initialValue,
@@ -101,10 +100,7 @@ function ManagePartitioningDialog({
                                                     <SplitUnitSelect
                                                         value={unitField.value}
                                                         options={UNIT_OPTIONS}
-                                                        onChange={(nextUnit) => {
-                                                            unitField.onChange(nextUnit);
-                                                            trigger('splitSize');
-                                                        }}
+                                                        onChange={unitField.onChange}
                                                     />
                                                 )}
                                             />
@@ -153,10 +149,7 @@ function ManagePartitioningDialog({
                                         id="minimum"
                                         type="number"
                                         value={field.value}
-                                        onUpdate={(next) => {
-                                            field.onChange(next);
-                                            trigger('maximum'); // revalidate dependent field to clear stale error
-                                        }}
+                                        onUpdate={field.onChange}
                                         className={b('input')}
                                         errorMessage={errors.minimum?.message}
                                         validationState={errors.minimum ? 'invalid' : undefined}
@@ -178,10 +171,7 @@ function ManagePartitioningDialog({
                                         id="maximum"
                                         type="number"
                                         value={field.value}
-                                        onUpdate={(next) => {
-                                            field.onChange(next);
-                                            trigger('minimum'); // revalidate dependent field to clear stale error
-                                        }}
+                                        onUpdate={field.onChange}
                                         className={b('input')}
                                         errorMessage={errors.maximum?.message}
                                         validationState={errors.maximum ? 'invalid' : undefined}
@@ -245,9 +235,9 @@ NiceModal.register(MANAGE_PARTITIONING_DIALOG, ManagePartitioningDialogNiceModal
 
 export function openManagePartitioningDialog(
     props?: Omit<ManagePartitioningDialogNiceModalProps, 'id'>,
-): Promise<ManagePartitioningFormState | null> {
+): Promise<ManagePartitioningFormOutput | null> {
     return NiceModal.show(MANAGE_PARTITIONING_DIALOG, {
         id: MANAGE_PARTITIONING_DIALOG,
         ...props,
-    }) as Promise<ManagePartitioningFormState | null>;
+    }) as Promise<ManagePartitioningFormOutput | null>;
 }

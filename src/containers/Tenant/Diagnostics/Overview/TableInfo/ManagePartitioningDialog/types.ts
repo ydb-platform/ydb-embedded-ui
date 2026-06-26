@@ -8,3 +8,11 @@ export interface ManagePartitioningFormState {
     minimum: string;
     maximum: string;
 }
+
+export interface ManagePartitioningFormOutput {
+    splitSize: number;
+    splitUnit: BytesSizes;
+    loadEnabled: boolean;
+    minimum: number;
+    maximum: number;
+}

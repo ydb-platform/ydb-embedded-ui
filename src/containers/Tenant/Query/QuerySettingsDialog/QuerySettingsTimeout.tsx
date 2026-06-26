@@ -13,8 +13,8 @@ const b = cn('ydb-query-settings-timeout');
 
 interface QuerySettingsTimeoutProps {
     id?: string;
-    value: number | null | undefined;
-    onChange: (value: number | undefined) => void;
+    value: string | number | null | undefined;
+    onChange: (value: string) => void;
     onToggle: (enabled: boolean) => void;
     validationState?: 'invalid';
     errorMessage?: string;
@@ -32,8 +32,7 @@ export function QuerySettingsTimeout({
 }: QuerySettingsTimeoutProps) {
     const handleValueChange = React.useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
-            const newValue = event.target.value ? Number(event.target.value) : undefined;
-            onChange(newValue);
+            onChange(event.target.value);
         },
         [onChange],
     );

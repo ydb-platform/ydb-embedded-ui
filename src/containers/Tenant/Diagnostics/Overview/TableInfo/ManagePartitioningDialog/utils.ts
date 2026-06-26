@@ -2,12 +2,11 @@ import {z} from 'zod';
 
 import type {BytesSizes} from '../../../../../../utils/bytesParsers';
 import {convertToBytes, sizes} from '../../../../../../utils/bytesParsers';
-import {preprocessEmptyStringToUndefined} from '../../../../../../utils/zod/zodParsers';
 import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 
 import {DEFAULT_MANAGE_PARTITIONING_VALUE} from './constants';
 import i18n from './i18n';
-import type {ManagePartitioningFormState} from './types';
+import type {ManagePartitioningFormOutput, ManagePartitioningFormState} from './types';
 
 export function splitToPartitionSizeMb(splitSize: number, splitUnit: BytesSizes) {
     const bytes = convertToBytes(splitSize, splitUnit);
@@ -25,35 +24,26 @@ export function getManagePartitioningInitialValues(
 }
 
 export const splitUnitSchema = z.custom<BytesSizes>((value) => {
-    return value in sizes;
+    return typeof value === 'string' && value in sizes;
 }, i18n('error_invalid-unit'));
+
+const requiredStringValue = (requiredMessage: string) => z.string().min(1, requiredMessage);
 
 // Required positive number (> 0)
 const requiredPositiveNumber = (requiredMessage: string) =>
-    preprocessEmptyStringToUndefined(
-        z.coerce
-            .number({
-                required_error: requiredMessage,
-                invalid_type_error: requiredMessage,
-            })
-            .gt(0),
+    requiredStringValue(requiredMessage).pipe(
+        z.coerce.number<string>({error: requiredMessage}).gt(0),
     );
 
 // Required positive integer (> 0)
 const requiredPositiveInt = (requiredMessage: string) =>
-    preprocessEmptyStringToUndefined(
-        z.coerce
-            .number({
-                required_error: requiredMessage,
-                invalid_type_error: requiredMessage,
-            })
-            .int()
-            .gt(0),
+    requiredStringValue(requiredMessage).pipe(
+        z.coerce.number<string>({error: requiredMessage}).int().gt(0),
     );
 
 export const managePartitioningSchema = (
     maxSplitSizeBytes = DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
-) =>
+): z.ZodType<ManagePartitioningFormOutput, ManagePartitioningFormState> =>
     z
         .object({
             splitSize: requiredPositiveNumber(i18n('error_required')),

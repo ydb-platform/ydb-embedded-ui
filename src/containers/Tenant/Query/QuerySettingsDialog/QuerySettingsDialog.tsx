@@ -3,6 +3,7 @@ import React from 'react';
 import {Button, Dialog, Flex, TextArea, TextInput, Tooltip} from '@gravity-ui/uikit';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Controller, useForm} from 'react-hook-form';
+import type {z} from 'zod';
 
 import {
     useSnapshotReadWriteAvailable,
@@ -83,6 +84,8 @@ interface QuerySettingsFormProps {
     onClose: () => void;
 }
 
+type QuerySettingsFormInput = z.input<typeof querySettingsValidationSchema>;
+
 function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsFormProps) {
     const {
         control,
@@ -90,7 +93,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         setValue,
         watch,
         formState: {errors},
-    } = useForm<QuerySettings>({
+    } = useForm<QuerySettingsFormInput, unknown, QuerySettings>({
         defaultValues: initialValues,
         resolver: zodResolver(querySettingsValidationSchema),
     });
@@ -373,7 +376,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                         render={({field}) => (
                             <QuerySettingsTimeout
                                 id="timeout"
-                                value={typeof field.value === 'string' ? undefined : field.value}
+                                value={field.value as string | number | null | undefined}
                                 onChange={field.onChange}
                                 onToggle={(enabled) => field.onChange(enabled ? '' : null)}
                                 validationState={errors.timeout ? 'invalid' : undefined}

@@ -20,7 +20,6 @@ import type {
 } from '../types/store/query';
 
 import {isAxiosResponse, isNetworkError} from './response';
-import {preprocessEmptyStringToUndefined} from './zod/zodParsers';
 
 export const TRANSACTION_MODES = {
     serializable: 'serializable-read-write',
@@ -319,6 +318,7 @@ export const DEFAULT_QUERY_SETTINGS = {
     transactionMode: TRANSACTION_MODES.implicit,
     timeout: null,
     limitRows: 10000,
+    outputChunkMaxSize: undefined,
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.off,
     pragmas: defaultPragma,
@@ -330,16 +330,22 @@ export const transactionModeSchema = z.nativeEnum(TRANSACTION_MODES);
 export const statisticsModeSchema = z.nativeEnum(STATISTICS_MODES);
 export const tracingLevelSchema = z.nativeEnum(TRACING_LEVELS);
 
+const emptyStringToUndefined = (value: unknown) => (value === '' ? undefined : value);
+
 // timeout = null is for timeout switched off state
+// timeout = '' is for modes with disabled timeout override
 export const querySettingsValidationSchema = z.object({
-    timeout: preprocessEmptyStringToUndefined(
-        z.coerce.number().positive().max(MAX_QUERY_TIMEOUT_SECONDS).or(z.undefined()).or(z.null()),
-    ).or(z.literal('')),
-    limitRows: preprocessEmptyStringToUndefined(
-        z.coerce.number().gt(0).lte(100_000).or(z.undefined()),
+    timeout: z.preprocess(
+        emptyStringToUndefined,
+        z.coerce.number<string | number>().positive().max(MAX_QUERY_TIMEOUT_SECONDS).nullish(),
     ),
-    outputChunkMaxSize: preprocessEmptyStringToUndefined(
-        z.coerce.number().int().positive().or(z.undefined()),
+    limitRows: z.preprocess(
+        emptyStringToUndefined,
+        z.coerce.number<string | number>().gt(0).lte(100_000).optional(),
+    ),
+    outputChunkMaxSize: z.preprocess(
+        emptyStringToUndefined,
+        z.coerce.number<string | number>().int().positive().optional(),
     ),
     queryMode: queryModeSchema,
     transactionMode: transactionModeSchema,
@@ -351,21 +357,28 @@ export const querySettingsValidationSchema = z.object({
 
 export const querySettingsRestoreSchema = z
     .object({
-        timeout: preprocessEmptyStringToUndefined(
-            z.coerce
-                .number()
-                .positive()
-                .transform((v) => Math.min(v, MAX_QUERY_TIMEOUT_SECONDS))
-                .or(z.null())
-                .optional()
-                .catch(DEFAULT_QUERY_SETTINGS.timeout),
-        ),
-        limitRows: preprocessEmptyStringToUndefined(
-            z.coerce.number().gt(0).lte(100_000).optional().catch(DEFAULT_QUERY_SETTINGS.limitRows),
-        ),
-        outputChunkMaxSize: preprocessEmptyStringToUndefined(
-            z.coerce.number().int().positive().optional(),
-        ),
+        timeout: z
+            .preprocess(
+                emptyStringToUndefined,
+                z.coerce
+                    .number<string | number>()
+                    .positive()
+                    .transform((v) => Math.min(v, MAX_QUERY_TIMEOUT_SECONDS))
+                    .nullish(),
+            )
+            .catch(DEFAULT_QUERY_SETTINGS.timeout),
+        limitRows: z
+            .preprocess(
+                emptyStringToUndefined,
+                z.coerce.number<string | number>().gt(0).lte(100_000).optional(),
+            )
+            .catch(DEFAULT_QUERY_SETTINGS.limitRows),
+        outputChunkMaxSize: z
+            .preprocess(
+                emptyStringToUndefined,
+                z.coerce.number<string | number>().int().positive().optional(),
+            )
+            .catch(DEFAULT_QUERY_SETTINGS.outputChunkMaxSize),
         queryMode: queryModeSchema.catch(DEFAULT_QUERY_SETTINGS.queryMode),
         transactionMode: transactionModeSchema.catch(DEFAULT_QUERY_SETTINGS.transactionMode),
         statisticsMode: statisticsModeSchema.catch(DEFAULT_QUERY_SETTINGS.statisticsMode),
