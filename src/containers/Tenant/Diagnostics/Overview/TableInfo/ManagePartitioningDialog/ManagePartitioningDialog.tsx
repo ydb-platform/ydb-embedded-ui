@@ -46,6 +46,7 @@ function ManagePartitioningDialog({
     const {
         control,
         handleSubmit,
+        trigger,
         formState: {errors, isValid},
     } = useManagePartitioningForm({
         initialValue,
@@ -100,7 +101,10 @@ function ManagePartitioningDialog({
                                                     <SplitUnitSelect
                                                         value={unitField.value}
                                                         options={UNIT_OPTIONS}
-                                                        onChange={unitField.onChange}
+                                                        onChange={(nextUnit) => {
+                                                            unitField.onChange(nextUnit);
+                                                            trigger('splitSize');
+                                                        }}
                                                     />
                                                 )}
                                             />
@@ -149,7 +153,10 @@ function ManagePartitioningDialog({
                                         id="minimum"
                                         type="number"
                                         value={field.value}
-                                        onUpdate={field.onChange}
+                                        onUpdate={(next) => {
+                                            field.onChange(next);
+                                            trigger('maximum');
+                                        }}
                                         className={b('input')}
                                         errorMessage={errors.minimum?.message}
                                         validationState={errors.minimum ? 'invalid' : undefined}
@@ -171,7 +178,10 @@ function ManagePartitioningDialog({
                                         id="maximum"
                                         type="number"
                                         value={field.value}
-                                        onUpdate={field.onChange}
+                                        onUpdate={(next) => {
+                                            field.onChange(next);
+                                            trigger('minimum');
+                                        }}
                                         className={b('input')}
                                         errorMessage={errors.maximum?.message}
                                         validationState={errors.maximum ? 'invalid' : undefined}
