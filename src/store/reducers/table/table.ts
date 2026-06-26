@@ -55,7 +55,7 @@ export const tableApi = api.injectEndpoints({
 
                     const options: BuildTemplateOptions = {
                         tableName: name,
-                        columns: prepareYdbCreateQueryColumns(columns),
+                        columns: prepareYdbCreateQueryColumns(columns, type),
                         ...(type === 'row' && {secondaryIndexes}),
                         ...(type === 'column' && {columnsHash: partitionKey}),
                         settings:

@@ -17,7 +17,7 @@ import {Controller, useFieldArray, useFormContext, useWatch} from 'react-hook-fo
 import {cn} from '../../../../utils/cn';
 import {FormFieldError, FormSection} from '../components/layout';
 import i18n from '../i18n';
-import type {Column, FormMode, FormValues, OriginalTableInfo} from '../types';
+import type {Column, FormMode, FormValues, OriginalTableInfo, TableType} from '../types';
 import {
     generateColumnId,
     getAutoincrementDisabledMessage,
@@ -29,6 +29,7 @@ const b = cn('ydb-table-form-dialog');
 
 interface YdbColumnsSectionProps {
     mode: FormMode;
+    tableType: TableType;
     types: string[];
     pkTypes: Set<string>;
     keyNullable: boolean;
@@ -37,6 +38,7 @@ interface YdbColumnsSectionProps {
 
 export function YdbColumnsSection({
     mode,
+    tableType,
     types,
     pkTypes,
     keyNullable,
@@ -146,6 +148,7 @@ export function YdbColumnsSection({
     }, [originalInfo?.indexes]);
     const primaryKeyColumnNames = primaryOriginalColumns.map((column) => column.name);
     const partitionKeyColumnNames = originalInfo?.partitionKey ?? [];
+    const showDefaultColumn = tableType === 'row';
 
     return (
         <FormSection title={i18n('label_columns')}>
@@ -163,7 +166,12 @@ export function YdbColumnsSection({
                     ) : null}
                 </div>
             ) : null}
-            <div className={b('columns-table', {update: mode === 'update'})}>
+            <div
+                className={b('columns-table', {
+                    update: mode === 'update',
+                    'no-default': !showDefaultColumn,
+                })}
+            >
                 {showHeader ? (
                     <React.Fragment>
                         <div className={b('columns-head')}>
@@ -184,7 +192,11 @@ export function YdbColumnsSection({
                                 </div>
                             ) : null}
                             <div className={b('columns-head-cell')}>{i18n('column_not-null')}</div>
-                            <div className={b('columns-head-cell')}>{i18n('column_default')}</div>
+                            {showDefaultColumn ? (
+                                <div className={b('columns-head-cell')}>
+                                    {i18n('column_default')}
+                                </div>
+                            ) : null}
                             <div />
                         </div>
                         <hr className={b('columns-separator')} />
@@ -194,7 +206,11 @@ export function YdbColumnsSection({
                 {mode === 'update' && primaryOriginalColumns.length > 0 ? (
                     <React.Fragment>
                         {primaryOriginalColumns.map((column) => (
-                            <PrimaryColumnRow key={`pk-${column.name}`} column={column} />
+                            <PrimaryColumnRow
+                                key={`pk-${column.name}`}
+                                column={column}
+                                showDefaultColumn={showDefaultColumn}
+                            />
                         ))}
                         <hr className={b('columns-separator')} />
                     </React.Fragment>
@@ -207,10 +223,12 @@ export function YdbColumnsSection({
                                 (deleted) => deleted.name === column.name,
                             );
                             const isDeleting = deletedIndex >= 0;
+
                             return (
                                 <NonPrimaryColumnRow
                                     key={`existing-${column.name}`}
                                     column={column}
+                                    showDefaultColumn={showDefaultColumn}
                                     isDeleting={isDeleting}
                                     deleteDisabledMessage={getDeleteDisabledMessage({
                                         columnName: column.name,
@@ -231,6 +249,7 @@ export function YdbColumnsSection({
                         key={field.id}
                         index={index}
                         mode={mode}
+                        showDefaultColumn={showDefaultColumn}
                         typeOptions={typeOptions}
                         pkTypes={pkTypes}
                         keyNullable={keyNullable}
@@ -317,7 +336,13 @@ function formatDefaultValue(column: Column) {
     return String(column.defaultValue);
 }
 
-function PrimaryColumnRow({column}: {column: Column}) {
+function PrimaryColumnRow({
+    column,
+    showDefaultColumn,
+}: {
+    column: Column;
+    showDefaultColumn: boolean;
+}) {
     return (
         <div className={b('columns-row', {readonly: true})}>
             <div className={b('columns-cell', {name: true})}>{column.name}</div>
@@ -325,7 +350,11 @@ function PrimaryColumnRow({column}: {column: Column}) {
             <div className={b('columns-cell', {'not-null': true})}>
                 {column.notNull ? i18n('value_yes') : i18n('value_no')}
             </div>
-            <div className={b('columns-cell', {default: true})}>{formatDefaultValue(column)}</div>
+            {showDefaultColumn ? (
+                <div className={b('columns-cell', {default: true})}>
+                    {formatDefaultValue(column)}
+                </div>
+            ) : null}
             <div />
         </div>
     );
@@ -333,12 +362,14 @@ function PrimaryColumnRow({column}: {column: Column}) {
 
 function NonPrimaryColumnRow({
     column,
+    showDefaultColumn,
     isDeleting,
     deleteDisabledMessage,
     onDelete,
     onUndo,
 }: {
     column: Column;
+    showDefaultColumn: boolean;
     isDeleting: boolean;
     deleteDisabledMessage?: string;
     onDelete: () => void;
@@ -351,7 +382,11 @@ function NonPrimaryColumnRow({
             <div className={b('columns-cell', {'not-null': true})}>
                 {column.notNull ? i18n('value_yes') : i18n('value_no')}
             </div>
-            <div className={b('columns-cell', {default: true})}>{formatDefaultValue(column)}</div>
+            {showDefaultColumn ? (
+                <div className={b('columns-cell', {default: true})}>
+                    {formatDefaultValue(column)}
+                </div>
+            ) : null}
             <div className={b('columns-cell', {action: true})}>
                 {isDeleting ? (
                     <Button view="flat" size="m" onClick={onUndo} title={i18n('action_undo')}>
@@ -378,6 +413,7 @@ function NonPrimaryColumnRow({
 interface EditableColumnRowProps {
     index: number;
     mode: FormMode;
+    showDefaultColumn: boolean;
     typeOptions: SelectOption[];
     pkTypes: Set<string>;
     keyNullable: boolean;
@@ -390,6 +426,7 @@ interface EditableColumnRowProps {
 function EditableColumnRow({
     index,
     mode,
+    showDefaultColumn,
     typeOptions,
     pkTypes,
     keyNullable,
@@ -430,7 +467,7 @@ function EditableColumnRow({
     const keyDisabled = !pkTypes.has(column.type);
     let defaultValueControl: React.ReactNode = null;
 
-    if (mode === 'create') {
+    if (mode === 'create' && showDefaultColumn) {
         if (column.key) {
             defaultValueControl = (
                 <div className={b('checkbox-control')}>
@@ -573,7 +610,9 @@ function EditableColumnRow({
                     />
                 ) : null}
             </div>
-            <div className={b('columns-cell', {default: true})}>{defaultValueControl}</div>
+            {showDefaultColumn ? (
+                <div className={b('columns-cell', {default: true})}>{defaultValueControl}</div>
+            ) : null}
             <div className={b('columns-cell', {action: true})}>
                 <Button
                     view="flat"

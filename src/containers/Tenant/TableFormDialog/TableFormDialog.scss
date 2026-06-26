@@ -140,6 +140,7 @@
     }
 
     &__columns-table {
+        --columns-table-separator-width: calc(758px + 5 * var(--g-spacing-4));
         display: flex;
         flex-direction: column;
         gap: var(--g-spacing-3);
@@ -167,6 +168,28 @@
     &__columns-table_update &__columns-head,
     &__columns-table_update &__columns-row {
         grid-template-columns: 205px 180px 180px 180px 28px;
+    }
+
+    &__columns-table_update {
+        --columns-table-separator-width: calc(773px + 4 * var(--g-spacing-4));
+    }
+
+    &__columns-table_no-default &__columns-head,
+    &__columns-table_no-default &__columns-row {
+        grid-template-columns: 180px 180px 100px 100px 28px;
+    }
+
+    &__columns-table_no-default {
+        --columns-table-separator-width: calc(588px + 4 * var(--g-spacing-4));
+    }
+
+    #{&}__columns-table_update#{&}__columns-table_no-default #{&}__columns-head,
+    #{&}__columns-table_update#{&}__columns-table_no-default #{&}__columns-row {
+        grid-template-columns: 205px 180px 180px 28px;
+    }
+
+    #{&}__columns-table_update#{&}__columns-table_no-default {
+        --columns-table-separator-width: calc(593px + 3 * var(--g-spacing-4));
     }
 
     &__columns-row {
@@ -229,6 +252,10 @@
     }
 
     &__columns-separator {
+        align-self: flex-start;
+
+        width: var(--columns-table-separator-width);
+        max-width: 100%;
         margin: 0;
 
         border: none;
@@ -522,7 +549,7 @@
     }
 
     &__disclosure {
-        margin-top: var(--g-spacing-2);
+        margin-top: var(--g-spacing-4);
 
         .g-disclosure__trigger {
             display: inline-flex;

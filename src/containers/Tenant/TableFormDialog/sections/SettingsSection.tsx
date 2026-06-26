@@ -308,9 +308,6 @@ export function SettingsSection({mode}: SettingsSectionProps) {
                         )}
                     />
                 </FormRow>
-            </FormSection>
-
-            <FormSection>
                 <Disclosure
                     summary={
                         <Text as="span" variant="subheader-2">

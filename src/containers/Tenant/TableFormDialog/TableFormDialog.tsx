@@ -296,6 +296,7 @@ function TableForm({
                             <GeneralSection mode={mode} nameInputRef={nameInputRef} />
                             <YdbColumnsSection
                                 mode={mode}
+                                tableType={type}
                                 types={columnTypes}
                                 pkTypes={pkTypes}
                                 keyNullable={keyNullable}

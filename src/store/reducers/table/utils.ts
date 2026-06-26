@@ -649,16 +649,19 @@ export function buildUpdateTableQuery(options: BuildTemplateOptions) {
     return buildTemplate(UPDATE_TABLE_QUERY_TEMPLATE, options);
 }
 
-export function prepareYdbCreateQueryColumns(columns: ColumnField[]): Column[] {
+export function prepareYdbCreateQueryColumns(
+    columns: ColumnField[],
+    tableType: TableFormValues['type'] = 'row',
+): Column[] {
     return columns.map((column) => ({
         name: column.name,
         type: column.type,
         key: column.key,
         notNull: column.notNull,
         defaultValue:
-            column.withDefaultValue && !column.key && !column.autoincrement
+            tableType === 'row' && column.withDefaultValue && !column.key && !column.autoincrement
                 ? column.defaultValue
                 : undefined,
-        autoincrement: column.autoincrement,
+        autoincrement: tableType === 'row' ? column.autoincrement : undefined,
     }));
 }
