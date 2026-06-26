@@ -1,5 +1,6 @@
 import AxiosWrapper from '@gravity-ui/axios-wrapper';
 import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
+import type {InternalAxiosRequestConfig} from 'axios';
 import axiosRetry from 'axios-retry';
 
 import {backend as BACKEND, clusterName} from '../../store';
@@ -18,10 +19,41 @@ export type AxiosOptions = {
     timeout?: number;
 };
 
+export type CsrfTokenGetter = () => string | undefined;
+
+const CSRF_PROTECTED_METHODS = new Set(['post', 'put', 'delete', 'patch']);
+
+export const CSRF_TOKEN_HEADER_NAME = 'X-CSRF-Token';
+
+export function getCsrfTokenFromCookie(
+    cookieString = typeof document === 'undefined' ? '' : document.cookie,
+) {
+    return cookieString.match(/(?:^|;\s*)csrf_token=([^;]*)/)?.[1] ?? '';
+}
+
+export function isMutatingRequestMethod(method?: string) {
+    return method ? CSRF_PROTECTED_METHODS.has(method.toLowerCase()) : false;
+}
+
+function setAxiosRequestHeader(
+    headers: InternalAxiosRequestConfig['headers'],
+    headerName: string,
+    headerValue: string,
+) {
+    if (typeof headers.set === 'function') {
+        headers.set(headerName, headerValue);
+        return;
+    }
+
+    const mutableHeaders = headers as Record<string, string>;
+    mutableHeaders[headerName] = headerValue;
+}
+
 export interface BaseAPIParams {
     singleClusterMode: undefined | boolean;
     proxyMeta: undefined | boolean;
     useRelativePath: undefined | boolean;
+    csrfTokenGetter: CsrfTokenGetter;
 }
 
 interface XhrLikeRequest {
@@ -183,12 +215,14 @@ export class BaseYdbAPI extends AxiosWrapper {
 
     singleClusterMode: BaseAPIParams['singleClusterMode'];
     useRelativePath: BaseAPIParams['useRelativePath'];
+    protected csrfTokenGetter: CsrfTokenGetter;
 
     constructor(axiosOptions: AxiosWrapperOptions, baseApiParams: BaseAPIParams) {
         super(axiosOptions);
 
         this.singleClusterMode = baseApiParams.singleClusterMode;
         this.useRelativePath = baseApiParams.useRelativePath;
+        this.csrfTokenGetter = baseApiParams.csrfTokenGetter;
 
         axiosRetry(this._axios, {
             retries: this.DEFAULT_RETRIES_COUNT,
@@ -197,11 +231,19 @@ export class BaseYdbAPI extends AxiosWrapper {
 
         // Make possible manually enable tracing for all requests
         // For development purposes
-        this._axios.interceptors.request.use(function (config) {
+        this._axios.interceptors.request.use((config) => {
             const enableTracing = readSettingValueFromLS(DEV_ENABLE_TRACING_FOR_ALL_REQUESTS);
 
             if (enableTracing) {
-                config.headers['X-Want-Trace'] = 1;
+                setAxiosRequestHeader(config.headers, 'X-Want-Trace', '1');
+            }
+
+            // Do not rely on AxiosWrapper.setCSRFToken here: it snapshots the token into defaults
+            // and does not cover PATCH requests. The backend may set csrf_token only after
+            // an earlier monitoring response, so read it right before every mutating request.
+            const csrfToken = this.csrfTokenGetter();
+            if (csrfToken && this.shouldUseCsrfTokenForRequest(config.method)) {
+                setAxiosRequestHeader(config.headers, CSRF_TOKEN_HEADER_NAME, csrfToken);
             }
 
             return config;
@@ -256,5 +298,9 @@ export class BaseYdbAPI extends AxiosWrapper {
 
     prepareArrayRequestParam(arr: (string | number)[]) {
         return arr.join(',');
+    }
+
+    protected shouldUseCsrfTokenForRequest(method?: string) {
+        return isMutatingRequestMethod(method);
     }
 }
