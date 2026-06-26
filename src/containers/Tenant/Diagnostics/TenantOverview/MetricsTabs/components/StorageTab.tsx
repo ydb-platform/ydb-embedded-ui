@@ -57,6 +57,12 @@ export function StorageTab({
                         legendFormatter={formatStorageLegend}
                         active={active}
                         helpText={i18n('context_storage-description')}
+                        // Never show the "danger" (red) status for the storage
+                        // doughnut, regardless of usage. The doughnut stays
+                        // "warning" (yellow) above the warning threshold and
+                        // never turns red, even at high usage below 100%
+                        // (e.g. 91-99%) or on overflow above 100%.
+                        dangerThreshold={Infinity}
                     />
                 )}
             </Link>
