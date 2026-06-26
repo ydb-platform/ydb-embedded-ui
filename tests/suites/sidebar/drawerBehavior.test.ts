@@ -117,6 +117,23 @@ async function expectDrawerContextInsideViewport(drawerRoot: Locator) {
         .toBeLessThanOrEqual(1);
 }
 
+async function expectDrawerOverlayOverflowHidden(drawerOverlay: Locator) {
+    await expect(drawerOverlay).toBeVisible();
+    await expect
+        .poll(
+            () =>
+                drawerOverlay.evaluate((element) => {
+                    const styles = window.getComputedStyle(element);
+
+                    return `${styles.overflowX}/${styles.overflowY}`;
+                }),
+            {
+                message: 'Drawer overlay should clip animated panel overflow',
+            },
+        )
+        .toBe('hidden/hidden');
+}
+
 async function expectRightDrawerResizable(page: Page, drawerRoot: Locator) {
     const beforeBox = await drawerRoot.boundingBox();
     if (!beforeBox) {
@@ -339,6 +356,7 @@ test.describe('Drawer behavior', () => {
         await expect(diagnostics.table.isVisible()).resolves.toBe(true);
         await diagnostics.table.clickRow(1);
 
+        const queryDetailsDrawerOverlay = page.getByTestId('query-details');
         const queryDetailsDrawer = page
             .getByTestId('query-details')
             .locator(QUERY_DETAILS_DRAWER_SELECTOR)
@@ -348,6 +366,7 @@ test.describe('Drawer behavior', () => {
             .locator('.g-drawer__item, .ydb-drawer__item')
             .first();
         await expect(queryDetailsDrawer).toBeVisible();
+        await expectDrawerOverlayOverflowHidden(queryDetailsDrawerOverlay);
         await expectRightDrawerAlignedToAppContent(page, queryDetailsDrawerPanel);
         await expectDrawerInsideContextBounds(queryDetailsDrawerPanel);
         await expectDrawerContextInsideViewport(queryDetailsDrawerPanel);
