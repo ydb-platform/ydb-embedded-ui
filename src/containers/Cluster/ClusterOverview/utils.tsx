@@ -1,4 +1,5 @@
 import {formatPercent} from '../../../utils/dataFormatters/dataFormatters';
+import {getMetricPercentPrecision} from '../../../utils/metrics';
 import {calculateProgressStatus} from '../../../utils/progress';
 
 import type {ClusterMetricsBaseProps, ClusterMetricsCommonProps} from './shared';
@@ -21,10 +22,6 @@ function calculateFillWidth(value: number, capacity: number) {
     return (value / capacity) * 100;
 }
 
-function getOverviewMetricPercentPrecision(fillWidth: number) {
-    return fillWidth > 0 && fillWidth < 1 ? 1 : 0;
-}
-
 export function calculateBaseDiagramValues({
     colorizeProgress = true,
     warningThreshold,
@@ -39,7 +36,7 @@ export function calculateBaseDiagramValues({
         colorizeProgress,
     });
 
-    const percents = formatPercent(fillWidth / 100, getOverviewMetricPercentPrecision(fillWidth));
+    const percents = formatPercent(fillWidth / 100, getMetricPercentPrecision(fillWidth));
 
     return {status, percents, fill: normalizedFillWidth};
 }

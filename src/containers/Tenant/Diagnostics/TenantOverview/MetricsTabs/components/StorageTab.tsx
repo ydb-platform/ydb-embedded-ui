@@ -1,7 +1,6 @@
 import {Link} from 'react-router-dom';
 
 import {cn} from '../../../../../../utils/cn';
-import {formatStorageLegend} from '../../../../../../utils/metrics/formatMetricLegend';
 import {ServerlessTabCard} from '../../TabCard/ServerlessTabCard';
 import {UsageTabCard} from '../../TabCard/UsageTabCard';
 import i18n from '../../i18n';
@@ -18,45 +17,25 @@ interface StorageTabProps {
     storageGroupsCount?: number;
 }
 
-export function StorageTab({
-    to,
-    active,
-    isServerless,
-    storage,
-    storageGroupsCount,
-}: StorageTabProps) {
-    const text =
-        storageGroupsCount === undefined || isServerless
-            ? i18n('cards.storage-label')
-            : i18n('context_storage-groups', {count: storageGroupsCount});
+export function StorageTab({to, active, isServerless, storage}: StorageTabProps) {
     return (
         <div className={b('link-container', {active})}>
             <Link to={to} className={b('link')}>
                 {isServerless ? (
                     <ServerlessTabCard
-                        text={text}
+                        title={i18n('metric-tab.storage-title')}
                         active={active}
+                        description={i18n('metric-tab.storage-serverless-description')}
                         helpText={i18n('context_storage-description')}
-                        subtitle={
-                            storage.totalLimit
-                                ? i18n('context_serverless-storage-subtitle', {
-                                      groups: String(storageGroupsCount ?? 0),
-                                      legend: formatStorageLegend({
-                                          value: storage.totalUsed,
-                                          capacity: storage.totalLimit,
-                                      }),
-                                  })
-                                : undefined
-                        }
                     />
                 ) : (
                     <UsageTabCard
-                        text={text}
+                        title={i18n('metric-tab.storage-title')}
                         value={storage.totalUsed}
                         limit={storage.totalLimit}
-                        legendFormatter={formatStorageLegend}
                         active={active}
-                        helpText={i18n('context_storage-description')}
+                        description={i18n('metric-tab.storage-description')}
+                        capDangerAtWarning
                     />
                 )}
             </Link>

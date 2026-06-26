@@ -160,7 +160,7 @@ export function MetricsTabs({
         }
 
         if (isServerless) {
-            return <PlaceholderTab />;
+            return null;
         }
 
         return (
@@ -174,7 +174,7 @@ export function MetricsTabs({
     };
 
     return (
-        <Flex className={b({serverless: Boolean(isServerless)})} alignItems="center">
+        <Flex className={b({serverless: Boolean(isServerless)})} alignItems="start">
             <CpuTab
                 to={tabLinks[TENANT_METRICS_TABS_IDS.cpu]}
                 active={activeTab === TENANT_METRICS_TABS_IDS.cpu}
@@ -195,9 +195,7 @@ export function MetricsTabs({
                 }}
                 storageGroupsCount={storageGroupsCount}
             />
-            {isServerless ? (
-                <PlaceholderTab />
-            ) : (
+            {isServerless ? null : (
                 <MemoryTab
                     to={tabLinks[TENANT_METRICS_TABS_IDS.memory]}
                     active={activeTab === TENANT_METRICS_TABS_IDS.memory}
@@ -208,6 +206,7 @@ export function MetricsTabs({
                 />
             )}
             {renderNetworkTab()}
+            <PlaceholderTab />
         </Flex>
     );
 }
