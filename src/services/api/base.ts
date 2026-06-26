@@ -242,7 +242,7 @@ export class BaseYdbAPI extends AxiosWrapper {
             // and does not cover PATCH requests. The backend may set csrf_token only after
             // an earlier monitoring response, so read it right before every mutating request.
             const csrfToken = this.getCsrfToken();
-            if (csrfToken && this.shouldUseCsrfTokenForRequest(config.method)) {
+            if (csrfToken && this.shouldUseCsrfTokenForRequest(config.method, config.url)) {
                 setAxiosRequestHeader(config.headers, CSRF_TOKEN_HEADER_NAME, csrfToken);
             }
 
@@ -308,7 +308,7 @@ export class BaseYdbAPI extends AxiosWrapper {
         );
     }
 
-    protected shouldUseCsrfTokenForRequest(method?: string) {
+    protected shouldUseCsrfTokenForRequest(method?: string, _url?: string) {
         return isMutatingRequestMethod(method);
     }
 }
