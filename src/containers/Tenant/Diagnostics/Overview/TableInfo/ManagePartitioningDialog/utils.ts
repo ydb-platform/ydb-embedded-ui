@@ -30,14 +30,33 @@ export function getManagePartitioningInitialValues(
  * (forces shards to split when reaching the given data size). Falls back to
  * the default 2 GiB when the field is missing or invalid.
  */
-export function getMaxSplitSizeBytes(config?: Record<string, any>): number {
-    const forceShardSplitDataSize =
-        config?.ImmediateControlsConfig?.SchemeShardControls?.ForceShardSplitDataSize;
+function getNestedRecord(
+    source: Record<string, unknown> | undefined,
+    key: string,
+): Record<string, unknown> | undefined {
+    const value = source?.[key];
 
-    const parsed = Number(forceShardSplitDataSize);
+    if (typeof value === 'object' && value !== null) {
+        return value as Record<string, unknown>;
+    }
 
-    if (Number.isFinite(parsed) && parsed > 0) {
-        return parsed;
+    return undefined;
+}
+
+export function getMaxSplitSizeBytes(config?: Record<string, unknown>): number {
+    const immediateControlsConfig = getNestedRecord(config, 'ImmediateControlsConfig');
+    const schemeShardControls = getNestedRecord(immediateControlsConfig, 'SchemeShardControls');
+    const forceShardSplitDataSize = schemeShardControls?.ForceShardSplitDataSize;
+
+    if (
+        typeof forceShardSplitDataSize === 'number' ||
+        typeof forceShardSplitDataSize === 'string'
+    ) {
+        const parsed = Number(forceShardSplitDataSize);
+
+        if (Number.isFinite(parsed) && parsed > 0) {
+            return parsed;
+        }
     }
 
     return DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES;

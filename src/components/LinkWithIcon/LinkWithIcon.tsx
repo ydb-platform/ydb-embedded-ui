@@ -45,7 +45,7 @@ export const LinkWithIcon = ({
     );
 
     const link = external ? (
-        <Link href={url} target="_blank" className={b(null, className)}>
+        <Link href={url} target="_blank" rel="noopener noreferrer" className={b(null, className)}>
             {linkContent}
         </Link>
     ) : (
