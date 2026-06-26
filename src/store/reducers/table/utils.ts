@@ -655,7 +655,10 @@ export function prepareYdbCreateQueryColumns(columns: ColumnField[]): Column[] {
         type: column.type,
         key: column.key,
         notNull: column.notNull,
-        defaultValue: column.withDefaultValue ? column.defaultValue : undefined,
+        defaultValue:
+            column.withDefaultValue && !column.key && !column.autoincrement
+                ? column.defaultValue
+                : undefined,
         autoincrement: column.autoincrement,
     }));
 }

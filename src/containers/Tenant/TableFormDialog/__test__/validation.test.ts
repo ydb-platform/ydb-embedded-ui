@@ -146,6 +146,24 @@ describe('TableFormDialog validation', () => {
         expect(result.success).toBe(true);
     });
 
+    test('create mode ignores hidden default values for key autoincrement columns', () => {
+        const schema = buildTableValidationSchema({mode: 'create'});
+
+        const result = schema.safeParse(
+            createValues({
+                columns: [
+                    createColumn({
+                        withDefaultValue: true,
+                        autoincrement: true,
+                        defaultValue: 'not-a-number',
+                    }),
+                ],
+            }),
+        );
+
+        expect(result.success).toBe(true);
+    });
+
     test('create mode accepts slash-separated table names for column tables', () => {
         const schema = buildTableValidationSchema({mode: 'create'});
 

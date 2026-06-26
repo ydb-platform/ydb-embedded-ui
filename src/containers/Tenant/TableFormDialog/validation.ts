@@ -94,7 +94,7 @@ function validateColumnDefaults(data: FormValues, ctx: z.RefinementCtx, mode: Fo
     }
 
     data.columns.forEach((column, index) => {
-        if (!column.withDefaultValue || !column.type) {
+        if (!column.withDefaultValue || column.key || column.autoincrement || !column.type) {
             return;
         }
 

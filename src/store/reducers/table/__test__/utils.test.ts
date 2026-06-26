@@ -9,6 +9,7 @@ import {
     getUpdateTableSettings,
     prepareColumnValue,
     prepareFormValues,
+    prepareYdbCreateQueryColumns,
 } from '../utils';
 
 describe('table utils', () => {
@@ -81,6 +82,49 @@ describe('table utils', () => {
         expect(query).toContain('AUTO_PARTITIONING_PARTITION_SIZE_MB = 2048');
         expect(query).toContain('KEY_BLOOM_FILTER = ENABLED');
         expect(query).toContain('TTL = Interval("P1DT1H") ON `createdAt`');
+    });
+
+    test('prepareYdbCreateQueryColumns ignores hidden defaults for key and autoincrement columns', () => {
+        expect(
+            prepareYdbCreateQueryColumns([
+                {
+                    _id: 'column-1',
+                    name: 'id',
+                    type: 'Int64',
+                    key: true,
+                    notNull: true,
+                    autoincrement: true,
+                    withDefaultValue: true,
+                    defaultValue: '42',
+                },
+                {
+                    _id: 'column-2',
+                    name: 'status',
+                    type: 'Utf8',
+                    key: false,
+                    notNull: false,
+                    withDefaultValue: true,
+                    defaultValue: 'ready',
+                },
+            ]),
+        ).toEqual([
+            {
+                name: 'id',
+                type: 'Int64',
+                key: true,
+                notNull: true,
+                autoincrement: true,
+                defaultValue: undefined,
+            },
+            {
+                name: 'status',
+                type: 'Utf8',
+                key: false,
+                notNull: false,
+                autoincrement: undefined,
+                defaultValue: 'ready',
+            },
+        ]);
     });
 
     test('buildCreateColumnTableQuery includes hash partitioning and TTL epoch mode', () => {
