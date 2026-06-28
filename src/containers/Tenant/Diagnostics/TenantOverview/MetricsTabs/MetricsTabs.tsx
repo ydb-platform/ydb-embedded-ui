@@ -65,7 +65,6 @@ interface MetricsTabsProps {
     blobStorageStats?: TenantStorageStats[];
     tabletStorageStats?: TenantStorageStats[];
     networkUtilization?: number;
-    networkThroughput?: number;
     storageGroupsCount?: number;
     controlPlaneNodesCount?: number;
     coresTotal?: number;
@@ -80,7 +79,6 @@ export function MetricsTabs({
     blobStorageStats,
     tabletStorageStats,
     networkUtilization,
-    networkThroughput,
     storageGroupsCount,
     controlPlaneNodesCount,
     coresTotal,
@@ -149,11 +147,7 @@ export function MetricsTabs({
             return null;
         }
 
-        const canShow =
-            networkUtilization !== undefined &&
-            networkThroughput !== undefined &&
-            isFinite(networkUtilization) &&
-            isFinite(networkThroughput);
+        const canShow = networkUtilization !== undefined && isFinite(networkUtilization);
 
         if (!canShow) {
             return null;
@@ -168,7 +162,6 @@ export function MetricsTabs({
                 to={tabLinks[TENANT_METRICS_TABS_IDS.network]}
                 active={activeTab === TENANT_METRICS_TABS_IDS.network}
                 networkUtilization={networkUtilization}
-                networkThroughput={networkThroughput}
             />
         );
     };

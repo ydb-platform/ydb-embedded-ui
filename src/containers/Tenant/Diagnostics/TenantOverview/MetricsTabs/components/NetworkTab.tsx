@@ -12,7 +12,6 @@ interface NetworkTabProps {
     to: string;
     active: boolean;
     networkUtilization: number;
-    networkThroughput: number;
 }
 
 export function NetworkTab({to, active, networkUtilization}: NetworkTabProps) {
