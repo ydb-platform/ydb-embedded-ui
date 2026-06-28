@@ -430,38 +430,41 @@ export class Diagnostics {
         });
     }
 
-    getMetricTabStatusIcon(title: string): Locator {
-        return this.getMetricTab(title).locator('.ydb-status-icon__status-icon');
-    }
-
     async areInfoCardsVisible({includeNetwork = false}: {includeNetwork?: boolean} = {}) {
-        await this.cpuCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.storageCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.memoryCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        const cards = [this.cpuCard, this.storageCard, this.memoryCard];
 
         if (includeNetwork) {
-            await this.networkCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+            cards.push(this.networkCard);
         }
+
+        await Promise.all(
+            cards.map((card) => card.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT})),
+        );
 
         return true;
     }
 
     async areServerlessInfoCardsVisible() {
-        await this.getMetricTab('CPU Load').waitFor({
-            state: 'visible',
-            timeout: VISIBILITY_TIMEOUT,
-        });
-        await this.storageCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.memoryCard.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
-        await this.networkCard.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        await Promise.all([
+            this.getMetricTab('CPU Load').waitFor({
+                state: 'visible',
+                timeout: VISIBILITY_TIMEOUT,
+            }),
+            this.storageCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT}),
+            this.memoryCard.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT}),
+            this.networkCard.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT}),
+        ]);
+
         return true;
     }
 
     async getResourceUtilization({includeNetwork = false}: {includeNetwork?: boolean} = {}) {
         const getMetricCardData = async (card: Locator) => {
-            const title = await card.locator(METRIC_TAB_TITLE_SELECTOR).textContent();
-            const percentage = await card.locator(METRIC_TAB_VALUE_SELECTOR).textContent();
-            const description = await card.locator(METRIC_TAB_DESCRIPTION_SELECTOR).textContent();
+            const [title, percentage, description] = await Promise.all([
+                card.locator(METRIC_TAB_TITLE_SELECTOR).textContent(),
+                card.locator(METRIC_TAB_VALUE_SELECTOR).textContent(),
+                card.locator(METRIC_TAB_DESCRIPTION_SELECTOR).textContent(),
+            ]);
 
             return {
                 title: title?.trim() || '',
@@ -470,20 +473,33 @@ export class Diagnostics {
             };
         };
 
-        const utilization = {
-            cpu: await getMetricCardData(this.cpuCard),
-            storage: await getMetricCardData(this.storageCard),
-            memory: await getMetricCardData(this.memoryCard),
-        };
-
         if (includeNetwork) {
+            const [cpu, storage, memory, network] = await Promise.all([
+                getMetricCardData(this.cpuCard),
+                getMetricCardData(this.storageCard),
+                getMetricCardData(this.memoryCard),
+                getMetricCardData(this.networkCard),
+            ]);
+
             return {
-                ...utilization,
-                network: await getMetricCardData(this.networkCard),
+                cpu,
+                storage,
+                memory,
+                network,
             };
         }
 
-        return utilization;
+        const [cpu, storage, memory] = await Promise.all([
+            getMetricCardData(this.cpuCard),
+            getMetricCardData(this.storageCard),
+            getMetricCardData(this.memoryCard),
+        ]);
+
+        return {
+            cpu,
+            storage,
+            memory,
+        };
     }
 
     async getMetricTabsWidth() {

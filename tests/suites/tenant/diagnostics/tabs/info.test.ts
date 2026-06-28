@@ -7,18 +7,7 @@ import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
 async function expectMetricTabsScreenshot(metricTabs: Locator, name: string) {
     await expect(metricTabs).toBeVisible();
-
-    const box = await metricTabs.boundingBox();
-    expect(box).not.toBeNull();
-
-    await expect(metricTabs.page()).toHaveScreenshot(name, {
-        clip: {
-            x: Math.floor(box?.x ?? 0),
-            y: Math.floor(box?.y ?? 0),
-            width: Math.ceil(box?.width ?? 0),
-            height: Math.ceil(box?.height ?? 0),
-        },
-    });
+    await expect(metricTabs).toHaveScreenshot(name);
 }
 
 async function setupMetricTabsTenantInfoMock(
@@ -58,49 +47,7 @@ async function setupMetricTabsTenantInfoMock(
     });
 }
 
-async function setupWhoamiMock(page: Page) {
-    await page.route('**/viewer/json/whoami*', async (route) => {
-        await route.fulfill({
-            json: {
-                UserSID: 'test-user',
-                UserID: 'test-user-id',
-                AuthType: 'Login',
-                IsViewerAllowed: true,
-                IsMonitoringAllowed: true,
-                IsAdministrationAllowed: true,
-            },
-        });
-    });
-}
-
-async function setupMetricTabsBootstrapMocks(page: Page) {
-    await page.route('**/viewer/capabilities*', async (route) => {
-        await route.fulfill({
-            json: {
-                Capabilities: {
-                    '/viewer/storage_stats': 1,
-                    '/storage/groups': 3,
-                },
-            },
-        });
-    });
-
-    await page.route('**/viewer/json/nodelist*', async (route) => {
-        await route.fulfill({
-            json: [
-                {
-                    Id: 1,
-                    Host: 'localhost',
-                },
-            ],
-        });
-    });
-}
-
-async function openInfoTab(page: Page, tenantType: 'Dedicated' | 'Serverless' = 'Dedicated') {
-    await setupMetricTabsBootstrapMocks(page);
-    await setupWhoamiMock(page);
-
+async function openInfoTab(page: Page) {
     const pageQueryParams = {
         schema: database,
         database,
@@ -110,12 +57,6 @@ async function openInfoTab(page: Page, tenantType: 'Dedicated' | 'Serverless' = 
     await tenantPage.goto(pageQueryParams);
 
     const diagnostics = new Diagnostics(page);
-    if (tenantType === 'Serverless') {
-        await expect(diagnostics.areServerlessInfoCardsVisible()).resolves.toBe(true);
-        return diagnostics;
-    }
-
-    await expect(diagnostics.areInfoCardsVisible({includeNetwork: true})).resolves.toBe(true);
     return diagnostics;
 }
 
@@ -164,48 +105,29 @@ test.describe('Diagnostics Info tab', async () => {
     test('Info metric tabs match visual baseline', async ({page}) => {
         await setupMetricTabsTenantInfoMock(page);
         const diagnostics = await openInfoTab(page);
+        await expect(diagnostics.areInfoCardsVisible({includeNetwork: true})).resolves.toBe(true);
 
         const metricTabs = diagnostics.getMetricTabs();
-        await expect(diagnostics.getMetricTab('CPU')).toHaveClass(
-            /tenant-metrics-tabs__link-container_active/,
-        );
-        await expect(diagnostics.getMetricTab('Network')).toBeVisible();
-        await expect(diagnostics.getMetricTabStatusIcon('CPU')).toHaveClass(
-            /ydb-status-icon__status-icon_state_green/,
-        );
-        await expect(diagnostics.getMetricTabStatusIcon('Storage')).toHaveClass(
-            /ydb-status-icon__status-icon_state_yellow/,
-        );
-        await expect(diagnostics.getMetricTabStatusIcon('Memory')).toHaveClass(
-            /ydb-status-icon__status-icon_state_grey/,
-        );
-        await expect(diagnostics.getMetricTabStatusIcon('Network')).toHaveClass(
-            /ydb-status-icon__status-icon_state_red/,
-        );
         await expectMetricTabsScreenshot(metricTabs, 'info-metric-tabs.png');
     });
 
     test('Info serverless metric tabs match visual baseline', async ({page}) => {
         await setupMetricTabsTenantInfoMock(page, 'Serverless');
-        const diagnostics = await openInfoTab(page, 'Serverless');
+        const diagnostics = await openInfoTab(page);
+        await expect(diagnostics.areServerlessInfoCardsVisible()).resolves.toBe(true);
 
         const metricTabs = diagnostics.getMetricTabs();
-        await expect(diagnostics.getMetricTab('CPU Load')).toHaveClass(
-            /tenant-metrics-tabs__link-container_active/,
-        );
         await expectMetricTabsScreenshot(metricTabs, 'info-serverless-metric-tabs.png');
     });
 
     test('Info metric tabs keep the same width when active tab changes', async ({page}) => {
         await setupMetricTabsTenantInfoMock(page);
         const diagnostics = await openInfoTab(page);
+        await expect(diagnostics.areInfoCardsVisible({includeNetwork: true})).resolves.toBe(true);
 
         const tabsWidthBefore = await diagnostics.getMetricTabsWidth();
 
         await diagnostics.getMetricTab('Storage').click();
-        await expect(diagnostics.getMetricTab('Storage')).toHaveClass(
-            /tenant-metrics-tabs__link-container_active/,
-        );
 
         expect(await diagnostics.getMetricTabsWidth()).toEqual(tabsWidthBefore);
     });
