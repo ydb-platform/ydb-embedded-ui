@@ -14,26 +14,18 @@ const ProgressStatusToEFlag: Record<ProgressStatus, EFlag> = {
 
 interface MetricTabPresentationParams {
     usagePercent: number;
-    capDangerAtWarning?: boolean;
+    dangerThreshold?: number;
 }
 
 interface UsageMetricTabPresentationParams {
     value: number;
     limit: number;
-    capDangerAtWarning?: boolean;
+    dangerThreshold?: number;
 }
 
 export interface MetricTabPresentation {
     percentText: string;
     status: EFlag;
-}
-
-function normalizeStatus(status: EFlag, capDangerAtWarning?: boolean) {
-    if (capDangerAtWarning && status === EFlag.Red) {
-        return EFlag.Yellow;
-    }
-
-    return status;
 }
 
 function calculateUsagePercent(value: number, limit: number) {
@@ -46,7 +38,7 @@ function calculateUsagePercent(value: number, limit: number) {
 
 export function getMetricTabPresentation({
     usagePercent,
-    capDangerAtWarning,
+    dangerThreshold,
 }: MetricTabPresentationParams): MetricTabPresentation {
     if (!Number.isFinite(usagePercent)) {
         return {
@@ -58,21 +50,22 @@ export function getMetricTabPresentation({
     const progressStatus = calculateProgressStatus({
         fillWidth: usagePercent,
         colorizeProgress: true,
+        dangerThreshold,
     });
 
     return {
         percentText: formatPercent(usagePercent / 100, getMetricPercentPrecision(usagePercent)),
-        status: normalizeStatus(ProgressStatusToEFlag[progressStatus], capDangerAtWarning),
+        status: ProgressStatusToEFlag[progressStatus],
     };
 }
 
 export function getUsageMetricTabPresentation({
     value,
     limit,
-    capDangerAtWarning,
+    dangerThreshold,
 }: UsageMetricTabPresentationParams): MetricTabPresentation {
     return getMetricTabPresentation({
         usagePercent: calculateUsagePercent(value, limit),
-        capDangerAtWarning,
+        dangerThreshold,
     });
 }

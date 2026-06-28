@@ -10,7 +10,11 @@ interface UsageTabCardProps {
     description: string;
     value: number;
     limit: number;
-    capDangerAtWarning?: boolean;
+    // Fill percentage above which the metric tab turns "danger" (red).
+    // Defaults to the shared danger threshold. Set to Infinity to disable the
+    // "danger" status entirely so the tab never turns red at any fill level
+    // (it can still turn "warning"/yellow once the warning threshold is passed).
+    dangerThreshold?: number;
 }
 
 export function UsageTabCard({
@@ -19,11 +23,11 @@ export function UsageTabCard({
     limit,
     description,
     active,
-    capDangerAtWarning,
+    dangerThreshold,
 }: UsageTabCardProps) {
     const {status, percentText} = React.useMemo(
-        () => getUsageMetricTabPresentation({value, limit, capDangerAtWarning}),
-        [capDangerAtWarning, limit, value],
+        () => getUsageMetricTabPresentation({value, limit, dangerThreshold}),
+        [dangerThreshold, limit, value],
     );
 
     return (

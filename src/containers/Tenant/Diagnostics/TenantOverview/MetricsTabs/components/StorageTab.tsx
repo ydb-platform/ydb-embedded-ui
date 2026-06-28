@@ -35,7 +35,12 @@ export function StorageTab({to, active, isServerless, storage}: StorageTabProps)
                         limit={storage.totalLimit}
                         active={active}
                         description={i18n('metric-tab.storage-description')}
-                        capDangerAtWarning
+                        // Never show the "danger" (red) status for storage,
+                        // regardless of usage. The metric tab stays "warning"
+                        // (yellow) above the warning threshold and never turns
+                        // red, even at high usage below 100% (e.g. 91-99%) or
+                        // on overflow above 100%.
+                        dangerThreshold={Infinity}
                     />
                 )}
             </Link>
