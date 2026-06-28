@@ -1,6 +1,7 @@
 import type {Locator, Page} from '@playwright/test';
 import {expect, test} from '@playwright/test';
 
+import {getClipboardContent} from '../../utils/clipboard';
 import {backend, database} from '../../utils/constants';
 import {TenantPage} from '../tenant/TenantPage';
 import {Diagnostics} from '../tenant/diagnostics/Diagnostics';
@@ -114,6 +115,23 @@ async function expectDrawerContextInsideViewport(drawerRoot: Locator) {
             },
         )
         .toBeLessThanOrEqual(1);
+}
+
+async function expectDrawerOverlayOverflowHidden(drawerOverlay: Locator) {
+    await expect(drawerOverlay).toBeVisible();
+    await expect
+        .poll(
+            () =>
+                drawerOverlay.evaluate((element) => {
+                    const styles = window.getComputedStyle(element);
+
+                    return `${styles.overflowX}/${styles.overflowY}`;
+                }),
+            {
+                message: 'Drawer overlay should clip animated panel overflow',
+            },
+        )
+        .toBe('hidden/hidden');
 }
 
 async function expectRightDrawerResizable(page: Page, drawerRoot: Locator) {
@@ -320,11 +338,8 @@ test.describe('Drawer behavior', () => {
     test('top query details drawer controls copy link, close, and clean selected-row state', async ({
         page,
         context,
-        browserName,
     }) => {
-        test.skip(browserName === 'webkit', 'Clipboard assertions are covered in Chromium');
-
-        await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+        await context.grantPermissions(['clipboard-read']);
         await setupTopQueriesMock(page);
 
         const tenantPage = new TenantPage(page);
@@ -341,6 +356,7 @@ test.describe('Drawer behavior', () => {
         await expect(diagnostics.table.isVisible()).resolves.toBe(true);
         await diagnostics.table.clickRow(1);
 
+        const queryDetailsDrawerOverlay = page.getByTestId('query-details');
         const queryDetailsDrawer = page
             .getByTestId('query-details')
             .locator(QUERY_DETAILS_DRAWER_SELECTOR)
@@ -350,6 +366,7 @@ test.describe('Drawer behavior', () => {
             .locator('.g-drawer__item, .ydb-drawer__item')
             .first();
         await expect(queryDetailsDrawer).toBeVisible();
+        await expectDrawerOverlayOverflowHidden(queryDetailsDrawerOverlay);
         await expectRightDrawerAlignedToAppContent(page, queryDetailsDrawerPanel);
         await expectDrawerInsideContextBounds(queryDetailsDrawerPanel);
         await expectDrawerContextInsideViewport(queryDetailsDrawerPanel);
@@ -366,7 +383,7 @@ test.describe('Drawer behavior', () => {
 
         await expect(diagnostics.isCopyLinkButtonVisible()).resolves.toBe(true);
         await diagnostics.clickCopyLinkButton();
-        const copiedUrl = await page.evaluate(() => navigator.clipboard.readText());
+        const copiedUrl = await getClipboardContent(page);
         expect(copiedUrl).toContain('selectedRow=');
 
         await page.goto(copiedUrl);

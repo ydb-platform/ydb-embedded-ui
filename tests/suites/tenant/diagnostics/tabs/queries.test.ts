@@ -2,6 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {prepareQueryWithPragmas} from '../../../../../src/store/reducers/query/utils';
 import {defaultPragma} from '../../../../../src/utils/query';
+import {getClipboardContent} from '../../../../utils/clipboard';
 import {database} from '../../../../utils/constants';
 import {NavigationTabs, TenantPage} from '../../TenantPage';
 import {longRunningQuery, longRunningStreamQuery} from '../../constants';
@@ -245,10 +246,7 @@ test.describe('Diagnostics Queries tab', async () => {
     test('Scroll to row, get shareable link, navigate to URL and verify row is scrolled into view', async ({
         page,
         context,
-        browserName,
     }) => {
-        // Skip this test in Safari due to clipboard permission issues
-        test.skip(browserName === 'webkit', 'Clipboard API not fully supported in Safari');
         // Grant clipboard permissions
         await context.grantPermissions(['clipboard-read']);
 
@@ -273,6 +271,7 @@ test.describe('Diagnostics Queries tab', async () => {
 
         // Target a row further down that requires scrolling
         const targetRowIndex = 8;
+        const targetRowData = await diagnostics.getRowData(targetRowIndex - 1);
 
         // Click on the target row to open the drawer
         await diagnostics.table.clickRow(targetRowIndex);
@@ -285,7 +284,7 @@ test.describe('Diagnostics Queries tab', async () => {
         await diagnostics.clickCopyLinkButton();
 
         // Get the copied URL from clipboard
-        const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+        const clipboardText = await getClipboardContent(page);
         expect(clipboardText).toBeTruthy();
         expect(clipboardText).toContain('/database');
 
@@ -293,12 +292,7 @@ test.describe('Diagnostics Queries tab', async () => {
         await page.goto(clipboardText);
         await page.waitForTimeout(1000);
 
-        const firstVisibleRowIndex = 4;
-        // Verify the row is highlighted/selected (if applicable)
-        await page.waitForTimeout(1000);
-
-        const hasActiveClass = await diagnostics.isRowActive(firstVisibleRowIndex);
-
-        expect(hasActiveClass).toBe(true);
+        // Verify the selected row is highlighted and visible.
+        await diagnostics.waitForActiveRowData(targetRowData);
     });
 });

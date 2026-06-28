@@ -5,7 +5,10 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
 import {useSchemaTopicDataAvailable} from '../../../../../store/reducers/capabilities/hooks';
-import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster';
+import {
+    useClusterProxySettingResolved,
+    useClusterWithProxy,
+} from '../../../../../store/reducers/cluster/cluster';
 import {partitionsApi} from '../../../../../store/reducers/partitions/partitions';
 import {topicApi} from '../../../../../store/reducers/topic';
 import type {TopicDataRequest} from '../../../../../types/api/topic';
@@ -23,6 +26,13 @@ const TOPIC_PREVIEW_LIMIT = 100;
 export function TopicPreview({database, path, databaseFullPath}: PreviewContainerProps) {
     const useMetaProxy = useClusterWithProxy();
     const schemaTopicDataAvailable = useSchemaTopicDataAvailable();
+    // Use the meta handler only when meta is reachable (proxied by the cluster).
+    // When meta is not proxied (e.g. behind OIDC), fall back to the viewer handler.
+    const useMeta = schemaTopicDataAvailable && useMetaProxy;
+    // `useClusterWithProxy()` optimistically returns `true` while the cluster
+    // base info is loading. Defer the request until the `use_meta_proxy` setting
+    // is known so a non-proxied (OIDC) cluster never hits the meta handler first.
+    const proxySettingResolved = useClusterProxySettingResolved();
     const clusterName = useClusterNameFromQuery();
     const {
         data: partitions,
@@ -36,7 +46,7 @@ export function TopicPreview({database, path, databaseFullPath}: PreviewContaine
 
     const queryParams = React.useMemo(() => {
         const firstPartitionId = firstPartition?.partitionId;
-        if (!firstPartition || isNil(firstPartitionId)) {
+        if (!firstPartition || isNil(firstPartitionId) || !proxySettingResolved) {
             return skipToken;
         }
         const params: TopicDataRequest & {clusterName?: string; useMeta?: boolean} = {
@@ -47,11 +57,11 @@ export function TopicPreview({database, path, databaseFullPath}: PreviewContaine
             limit: TOPIC_PREVIEW_LIMIT,
             offset: safeParseNumber(firstPartition.endOffset) - TOPIC_PREVIEW_LIMIT,
             message_size_limit: 100,
-            useMeta: schemaTopicDataAvailable,
+            useMeta,
         };
 
         return params;
-    }, [database, path, clusterName, firstPartition, schemaTopicDataAvailable]);
+    }, [database, path, clusterName, firstPartition, useMeta, proxySettingResolved]);
 
     const {currentData, error, isFetching} = topicApi.useGetTopicDataQuery(queryParams);
 

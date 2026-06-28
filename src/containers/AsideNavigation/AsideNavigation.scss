@@ -1,4 +1,11 @@
 .kv-navigation {
+    .extended-cluster {
+        flex: 1 1 0;
+
+        min-width: 0;
+        min-height: 0;
+    }
+
     &__content {
         position: relative;
 

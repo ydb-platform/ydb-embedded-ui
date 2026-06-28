@@ -4,6 +4,8 @@ import type {AxiosRequestConfig} from 'axios';
 import {codeAssistBackend} from '../../store';
 
 import {AuthAPI} from './auth';
+import type {CsrfTokenGetter} from './base';
+import {getCsrfTokenFromCookie} from './base';
 import {CodeAssistAPI} from './codeAssist';
 import {MetaAPI} from './meta';
 import {MetaSettingsAPI} from './metaSettings';
@@ -27,7 +29,7 @@ interface YdbEmbeddedAPIProps {
     // this setting allows to use schema object path relative to database in api requests
     useRelativePath: undefined | boolean;
     useMetaSettings: undefined | boolean;
-    csrfTokenGetter: undefined | (() => string | undefined);
+    csrfTokenGetter: undefined | CsrfTokenGetter;
     defaults: undefined | AxiosRequestConfig;
 }
 
@@ -51,7 +53,7 @@ export class YdbEmbeddedAPI {
         withCredentials = false,
         singleClusterMode = true,
         proxyMeta = false,
-        csrfTokenGetter = () => undefined,
+        csrfTokenGetter = getCsrfTokenFromCookie,
         defaults = {},
         useRelativePath = false,
         useMetaSettings = false,
@@ -66,7 +68,7 @@ export class YdbEmbeddedAPI {
                 },
             },
         };
-        const baseApiParams = {singleClusterMode, proxyMeta, useRelativePath};
+        const baseApiParams = {singleClusterMode, proxyMeta, useRelativePath, csrfTokenGetter};
 
         this.auth = new AuthAPI(axiosParams, baseApiParams);
         if (webVersion) {
@@ -88,21 +90,5 @@ export class YdbEmbeddedAPI {
         this.tablets = new TabletsAPI(axiosParams, baseApiParams);
         this.vdisk = new VDiskAPI(axiosParams, baseApiParams);
         this.viewer = new ViewerAPI(axiosParams, baseApiParams);
-
-        const token = csrfTokenGetter();
-        if (token) {
-            this.auth.setCSRFToken(token);
-            this.meta?.setCSRFToken(token);
-            this.metaSettings?.setCSRFToken(token);
-            this.codeAssist?.setCSRFToken(token);
-            this.operation.setCSRFToken(token);
-            this.pdisk.setCSRFToken(token);
-            this.scheme.setCSRFToken(token);
-            this.storage.setCSRFToken(token);
-            this.streaming.setCSRFToken(token);
-            this.tablets.setCSRFToken(token);
-            this.vdisk.setCSRFToken(token);
-            this.viewer.setCSRFToken(token);
-        }
     }
 }

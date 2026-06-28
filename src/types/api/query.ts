@@ -228,6 +228,7 @@ export type ExecuteActions =
     | 'execute-script'
     | 'execute-data'
     | 'execute-query'
+    | 'execute-query-and-forget'
     | undefined;
 
 export type ExplainActions =
@@ -304,12 +305,20 @@ export type ExecuteScriptResponse = {
     result?: SchemaResult;
 };
 
+export type ExecuteQueryAndForgetResponse = {
+    version?: number;
+    status?: string;
+    message?: string;
+};
+
 export type GenericExecuteResponse<Action extends ExecuteActions> = Action extends
     | 'execute-scan'
     | 'execute-data'
     | 'execute-query'
     ? ExecuteQueryResponse
-    : ExecuteScriptResponse;
+    : Action extends 'execute-query-and-forget'
+      ? ExecuteQueryAndForgetResponse
+      : ExecuteScriptResponse;
 
 export type CancelResponse = {
     stats?: TKqpStatsQuery;
@@ -329,6 +338,7 @@ export interface SendQueryParams<Action extends Actions> {
     internal_call?: boolean;
     base64?: boolean;
     resource_pool?: string;
+    'forget-after'?: number;
 }
 
 export interface StreamQueryParams<Action extends Actions> extends SendQueryParams<Action> {

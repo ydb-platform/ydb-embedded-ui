@@ -17,9 +17,8 @@ test.describe('Copy query result', () => {
         await tenantPage.goto(pageQueryParams);
     });
 
-    test('Copy button copies result to clipboard', async ({page, context, browserName}) => {
-        test.skip(browserName === 'webkit', 'Clipboard API not fully supported in Safari');
-        await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    test('Copy button copies result to clipboard', async ({page, context}) => {
+        await context.grantPermissions(['clipboard-read']);
 
         const queryEditor = new QueryEditor(page);
 

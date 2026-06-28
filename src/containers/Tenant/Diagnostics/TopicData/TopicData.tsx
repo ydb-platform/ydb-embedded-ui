@@ -15,6 +15,12 @@ import {
 import {PaginatedTableWithLayout} from '../../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
 import {useSchemaTopicDataAvailable} from '../../../../store/reducers/capabilities/hooks';
+import {
+    useClusterProxySettingResolved,
+    useClusterWithProxy,
+} from '../../../../store/reducers/cluster/cluster';
+import type {TopicMessageEnhanced} from '../../../../types/api/topic';
+import {isModifiedClickEvent} from '../../../../utils/events';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../../../utils/illustrations';
@@ -58,6 +64,16 @@ const columns = getAllColumns();
 export function TopicData({scrollContainerRef, path, database, databaseFullPath}: TopicDataProps) {
     const NoSearchResultsImage = getIllustration('NoSearchResults');
     const schemaTopicDataAvailable = useSchemaTopicDataAvailable();
+    // Topic data can be served by meta only when meta is reachable, i.e. the cluster
+    // proxies requests through it (`use_meta_proxy !== false`). When meta is not
+    // proxied (e.g. behind OIDC), fall back to the viewer handler.
+    const useMetaProxy = useClusterWithProxy();
+    const useMeta = schemaTopicDataAvailable && useMetaProxy;
+    // `useClusterWithProxy()` optimistically returns `true` while the cluster
+    // base info is loading, so the meta-vs-viewer decision must wait until the
+    // `use_meta_proxy` setting is actually known. Otherwise the first request
+    // on a non-proxied (OIDC) cluster could wrongly hit the meta handler.
+    const proxySettingResolved = useClusterProxySettingResolved();
     const clusterName = useClusterNameFromQuery();
 
     const [controlsKey, setControlsKey] = React.useState(0);
@@ -174,17 +190,9 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
             partition: selectedPartition ?? '',
             isEmpty: emptyData,
             currentPage,
-            useMeta: schemaTopicDataAvailable,
+            useMeta,
         }),
-        [
-            path,
-            database,
-            clusterName,
-            selectedPartition,
-            emptyData,
-            currentPage,
-            schemaTopicDataAvailable,
-        ],
+        [path, database, clusterName, selectedPartition, emptyData, currentPage, useMeta],
     );
 
     const getTopicData = React.useMemo(
@@ -195,6 +203,35 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                 maxEntities: usePagination ? TOPIC_DATA_DEFAULT_PAGE_SIZE : undefined,
             }),
         [pageStartOffset, setBoundOffsets, usePagination],
+    );
+
+    const isTopicDataRowClickable = React.useCallback((row: TopicMessageEnhanced) => {
+        return !row.removed && !isNil(row.Offset);
+    }, []);
+
+    const handleTopicDataRowClick = React.useCallback(
+        (row: TopicMessageEnhanced, event: React.MouseEvent<HTMLTableRowElement>) => {
+            if (isModifiedClickEvent(event) || !isTopicDataRowClickable(row)) {
+                return;
+            }
+
+            event.stopPropagation();
+            handleActiveOffsetChange(String(row.Offset));
+        },
+        [handleActiveOffsetChange, isTopicDataRowClickable],
+    );
+
+    const getTopicDataRowClassName = React.useCallback(
+        (row: TopicMessageEnhanced) => {
+            return b('row', {
+                active: Boolean(
+                    safeParseNumber(row.Offset) === selectedOffset ||
+                        String(row.Offset) === activeOffset,
+                ),
+                removed: row.removed,
+            });
+        },
+        [activeOffset, isTopicDataRowClickable, selectedOffset],
     );
 
     const closeDrawer = React.useCallback(() => {
@@ -258,11 +295,11 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                     database={database}
                     path={path}
                     clusterName={clusterName}
-                    useMeta={schemaTopicDataAvailable}
+                    useMeta={useMeta}
                 />
             </Fullscreen>
         );
-    }, [clusterName, database, path, schemaTopicDataAvailable]);
+    }, [clusterName, database, path, useMeta]);
 
     const handlePaginationUpdate = React.useCallback(
         (page: number) => {
@@ -272,6 +309,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
     );
 
     return (
+        proxySettingResolved &&
         !isNil(baseOffset) &&
         !isNil(endOffset) && (
             <DrawerWrapper
@@ -312,15 +350,8 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                             tableName={PAGINATED_TABLE_IDS.TOPIC_DATA}
                             rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
                             keepCache={false}
-                            getRowClassName={(row) => {
-                                return b('row', {
-                                    active: Boolean(
-                                        safeParseNumber(row.Offset) === selectedOffset ||
-                                            String(row.Offset) === activeOffset,
-                                    ),
-                                    removed: row.removed,
-                                });
-                            }}
+                            getRowClassName={getTopicDataRowClassName}
+                            onRowClick={handleTopicDataRowClick}
                         />
                     }
                     tableWrapperProps={{

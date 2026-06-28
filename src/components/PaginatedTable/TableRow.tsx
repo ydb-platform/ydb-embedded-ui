@@ -2,7 +2,7 @@ import {Skeleton} from '@gravity-ui/uikit';
 
 import {DEFAULT_ALIGN, DEFAULT_RESIZEABLE} from './constants';
 import {b} from './shared';
-import type {AlignType, Column, GetRowClassName} from './types';
+import type {AlignType, Column, GetRowClassName, OnRowClick} from './types';
 import {typedMemo} from './utils';
 
 interface TableCellProps {
@@ -73,13 +73,33 @@ interface TableRowProps<T> {
     row: T;
     height: number;
     getRowClassName?: GetRowClassName<T>;
+    onRowClick?: OnRowClick<T>;
 }
 
-export const TableRow = <T,>({row, columns, getRowClassName, height}: TableRowProps<T>) => {
+export const TableRow = <T,>({
+    row,
+    columns,
+    getRowClassName,
+    height,
+    onRowClick,
+}: TableRowProps<T>) => {
     const additionalClassName = getRowClassName?.(row);
+    const rowClickable = typeof onRowClick === 'function';
+
+    const handleClick: React.MouseEventHandler<HTMLTableRowElement> = (event) => {
+        if (!rowClickable || event.defaultPrevented) {
+            return;
+        }
+
+        onRowClick?.(row, event);
+    };
 
     return (
-        <tr className={b('row', additionalClassName)} style={{height}}>
+        <tr
+            className={b('row', {clickable: rowClickable}, additionalClassName)}
+            style={{height}}
+            onClick={rowClickable ? handleClick : undefined}
+        >
             {columns.map((column) => {
                 const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
 

@@ -1,5 +1,28 @@
 # Changelog
 
+## [17.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v17.0.1...v17.1.0) (2026-06-26)
+
+
+### Features
+
+* support csrf from cookie ([#4063](https://github.com/ydb-platform/ydb-embedded-ui/issues/4063)) ([bae97a1](https://github.com/ydb-platform/ydb-embedded-ui/commit/bae97a17b4dbb13aca197d39cd779fd239fbf994))
+* support execute-query-and-forget for compaction ([#3999](https://github.com/ydb-platform/ydb-embedded-ui/issues/3999)) ([82e2aaa](https://github.com/ydb-platform/ydb-embedded-ui/commit/82e2aaa87073fa294a974579b492cee1cc7e5112))
+
+
+### Bug Fixes
+
+* **NewSQL:** return focus to editor ([#4050](https://github.com/ydb-platform/ydb-embedded-ui/issues/4050)) ([33c0d08](https://github.com/ydb-platform/ydb-embedded-ui/commit/33c0d08f60c66372be951f42beb480920cb3672a))
+* **StorageTab:** remove danger threshold ([#4033](https://github.com/ydb-platform/ydb-embedded-ui/issues/4033)) ([d873226](https://github.com/ydb-platform/ydb-embedded-ui/commit/d8732267c6af6023289b11f9a129b42c73ce6ffd))
+* **Tenant:** do not block schema tree ([#4059](https://github.com/ydb-platform/ydb-embedded-ui/issues/4059)) ([e09ba6e](https://github.com/ydb-platform/ydb-embedded-ui/commit/e09ba6e01929b3445f7d2fc902ebb5bd2adbe45d))
+
+## [17.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v17.0.0...v17.0.1) (2026-06-24)
+
+
+### Bug Fixes
+
+* content layout ([#4053](https://github.com/ydb-platform/ydb-embedded-ui/issues/4053)) ([5c5185d](https://github.com/ydb-platform/ydb-embedded-ui/commit/5c5185d476f924dd10fdcae039cff27afdcd31f4))
+* **Topics:** use meta only if configured in cluster ([#4051](https://github.com/ydb-platform/ydb-embedded-ui/issues/4051)) ([0bc2197](https://github.com/ydb-platform/ydb-embedded-ui/commit/0bc219760698b503c803d2f92e451870ef8c9cfc))
+
 ## [17.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v16.4.0...v17.0.0) (2026-06-23)
 
 

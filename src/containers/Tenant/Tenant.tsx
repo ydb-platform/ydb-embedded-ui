@@ -204,8 +204,11 @@ function TreePagesContent({
         selectSchemaObjectData(state, path, database, databaseName, useMetaProxy),
     );
 
-    const showBlockingError = isAccessError(error);
-    const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
+    const accessError = isAccessError(error) ? error : undefined;
+    const showBlockingDescribeError = Boolean(accessError && path === databaseName);
+    const describeErrorProps = showBlockingDescribeError
+        ? uiFactory.clusterOrDatabaseAccessError
+        : undefined;
 
     // Use preloaded data if there is no current item data yet
     const currentPathType =
@@ -218,8 +221,8 @@ function TreePagesContent({
     return (
         <LoaderWrapper loading={initialLoading}>
             <PageError
-                error={showBlockingError ? error : undefined}
-                {...errorProps}
+                error={showBlockingDescribeError ? error : undefined}
+                {...describeErrorProps}
                 size="l"
                 illustrationSize="m"
             >
@@ -242,6 +245,7 @@ function TreePagesContent({
                             additionalTenantProps={additionalTenantProps}
                             type={currentPathType}
                             subType={currentPathSubType}
+                            diagnosticsAccessError={accessError}
                         />
                     </div>
                 </SplitPane>
