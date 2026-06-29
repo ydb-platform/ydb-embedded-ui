@@ -1,5 +1,18 @@
 # Changelog
 
+## [17.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v17.1.0...v17.2.0) (2026-06-26)
+
+
+### Features
+
+* **PaginatedTable:** support row click ([#4060](https://github.com/ydb-platform/ydb-embedded-ui/issues/4060)) ([69225e2](https://github.com/ydb-platform/ydb-embedded-ui/commit/69225e23147639ded557e1191b0570bf15e9effb))
+
+
+### Bug Fixes
+
+* hide drawer overlay overflow ([#4070](https://github.com/ydb-platform/ydb-embedded-ui/issues/4070)) ([720cd77](https://github.com/ydb-platform/ydb-embedded-ui/commit/720cd77bababdc84b14a46c930c3aee8d4a01597))
+* query temlates with secrets ([#4069](https://github.com/ydb-platform/ydb-embedded-ui/issues/4069)) ([3be4413](https://github.com/ydb-platform/ydb-embedded-ui/commit/3be44137b495d7f01f731a2c06fe3c05cf39c9de))
+
 ## [17.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v17.0.1...v17.1.0) (2026-06-26)
 
 
