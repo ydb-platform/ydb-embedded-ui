@@ -37,6 +37,10 @@ export interface MetricAggregates {
     status: ProgressStatus;
 }
 
+export function getMetricPercentPrecision(usagePercent: number) {
+    return usagePercent > 0 && usagePercent < 1 ? 1 : 0;
+}
+
 /**
  * Generic function to create DiagnosticsCardMetric array and determine status
  */

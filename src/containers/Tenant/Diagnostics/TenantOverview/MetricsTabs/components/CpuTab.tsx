@@ -1,7 +1,6 @@
 import {Link} from 'react-router-dom';
 
 import {cn} from '../../../../../../utils/cn';
-import {formatCoresLegend} from '../../../../../../utils/metrics/formatMetricLegend';
 import {ServerlessTabCard} from '../../TabCard/ServerlessTabCard';
 import {UsageTabCard} from '../../TabCard/UsageTabCard';
 import i18n from '../../i18n';
@@ -15,32 +14,26 @@ interface CpuTabProps {
     active: boolean;
     isServerless: boolean;
     cpu: {totalUsed: number; totalLimit: number};
-    controlPlaneNodesCount?: number;
 }
 
-export function CpuTab({to, active, isServerless, cpu, controlPlaneNodesCount}: CpuTabProps) {
-    const dedicatedDatabaseUsageText = !controlPlaneNodesCount
-        ? i18n('context_cpu-load')
-        : i18n('context_cpu-nodes-count', {count: controlPlaneNodesCount});
-
+export function CpuTab({to, active, isServerless, cpu}: CpuTabProps) {
     return (
         <div className={b('link-container', {active})}>
             <Link to={to} className={b('link')}>
                 {isServerless ? (
                     <ServerlessTabCard
-                        text={i18n('context_cpu-load')}
+                        title={i18n('title_cpu-load')}
                         active={active}
+                        description={i18n('context_serverless-autoscaled')}
                         helpText={i18n('context_cpu-description')}
-                        subtitle={i18n('context_serverless-autoscaled')}
                     />
                 ) : (
                     <UsageTabCard
-                        text={dedicatedDatabaseUsageText}
+                        title={i18n('title_cpu')}
                         value={cpu.totalUsed}
                         limit={cpu.totalLimit}
-                        legendFormatter={formatCoresLegend}
                         active={active}
-                        helpText={i18n('context_cpu-description')}
+                        description={i18n('context_cpu-tab-description')}
                     />
                 )}
             </Link>

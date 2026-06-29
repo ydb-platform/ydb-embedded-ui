@@ -65,9 +65,6 @@ interface MetricsTabsProps {
     blobStorageStats?: TenantStorageStats[];
     tabletStorageStats?: TenantStorageStats[];
     networkUtilization?: number;
-    networkThroughput?: number;
-    storageGroupsCount?: number;
-    controlPlaneNodesCount?: number;
     coresTotal?: number;
     databaseType?: ETenantType;
     activeTab: TenantMetricsTab;
@@ -80,9 +77,6 @@ export function MetricsTabs({
     blobStorageStats,
     tabletStorageStats,
     networkUtilization,
-    networkThroughput,
-    storageGroupsCount,
-    controlPlaneNodesCount,
     coresTotal,
     databaseType,
     activeTab,
@@ -149,18 +143,14 @@ export function MetricsTabs({
             return null;
         }
 
-        const canShow =
-            networkUtilization !== undefined &&
-            networkThroughput !== undefined &&
-            isFinite(networkUtilization) &&
-            isFinite(networkThroughput);
+        const canShow = networkUtilization !== undefined && isFinite(networkUtilization);
 
         if (!canShow) {
             return null;
         }
 
         if (isServerless) {
-            return <PlaceholderTab />;
+            return null;
         }
 
         return (
@@ -168,13 +158,12 @@ export function MetricsTabs({
                 to={tabLinks[TENANT_METRICS_TABS_IDS.network]}
                 active={activeTab === TENANT_METRICS_TABS_IDS.network}
                 networkUtilization={networkUtilization}
-                networkThroughput={networkThroughput}
             />
         );
     };
 
     return (
-        <Flex className={b({serverless: Boolean(isServerless)})} alignItems="center">
+        <Flex className={b({serverless: Boolean(isServerless)})} alignItems="start">
             <CpuTab
                 to={tabLinks[TENANT_METRICS_TABS_IDS.cpu]}
                 active={activeTab === TENANT_METRICS_TABS_IDS.cpu}
@@ -183,7 +172,6 @@ export function MetricsTabs({
                     totalUsed: cpuMetrics.totalUsed,
                     totalLimit: coresTotal && coresTotal > 0 ? coresTotal : cpuMetrics.totalLimit,
                 }}
-                controlPlaneNodesCount={controlPlaneNodesCount}
             />
             <StorageTab
                 to={tabLinks[TENANT_METRICS_TABS_IDS.storage]}
@@ -193,11 +181,8 @@ export function MetricsTabs({
                     totalUsed: storageMetrics.totalUsed,
                     totalLimit: storageMetrics.totalLimit,
                 }}
-                storageGroupsCount={storageGroupsCount}
             />
-            {isServerless ? (
-                <PlaceholderTab />
-            ) : (
+            {isServerless ? null : (
                 <MemoryTab
                     to={tabLinks[TENANT_METRICS_TABS_IDS.memory]}
                     active={activeTab === TENANT_METRICS_TABS_IDS.memory}
@@ -208,6 +193,7 @@ export function MetricsTabs({
                 />
             )}
             {renderNetworkTab()}
+            <PlaceholderTab />
         </Flex>
     );
 }

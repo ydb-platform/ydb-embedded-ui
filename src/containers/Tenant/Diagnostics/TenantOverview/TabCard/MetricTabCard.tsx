@@ -1,19 +1,22 @@
-import {Card, Flex, HelpMark, Text} from '@gravity-ui/uikit';
+import {Card, Flex, Text} from '@gravity-ui/uikit';
 
+import {StatusIcon} from '../../../../../components/StatusIcon/StatusIcon';
+import type {EFlag} from '../../../../../types/api/enums';
 import {cn} from '../../../../../utils/cn';
 
 import './TabCard.scss';
 
 const b = cn('tenant-tab-card');
 
-interface ServerlessTabCardProps {
+interface MetricTabCardProps {
     title: string;
-    active?: boolean;
+    status: EFlag;
+    value: string;
     description: string;
-    helpText?: string;
+    active?: boolean;
 }
 
-export function ServerlessTabCard({title, active, description, helpText}: ServerlessTabCardProps) {
+export function MetricTabCard({title, status, value, description, active}: MetricTabCardProps) {
     return (
         <Card className={b({active})} type="container" view={active ? 'outlined' : 'filled'}>
             <Flex direction="column" gap={0.5}>
@@ -21,11 +24,12 @@ export function ServerlessTabCard({title, active, description, helpText}: Server
                     <Text variant="subheader-2" data-qa="tenant-metric-tab-title">
                         {title}
                     </Text>
-                    {helpText ? (
-                        <HelpMark iconSize="s" popoverProps={{placement: 'right'}}>
-                            {helpText}
-                        </HelpMark>
-                    ) : null}
+                    <Flex alignItems="center" gap={1}>
+                        <Text variant="body-1" color="secondary" data-qa="tenant-metric-tab-value">
+                            {value}
+                        </Text>
+                        <StatusIcon status={status} mode="icons" size="s" />
+                    </Flex>
                 </Flex>
                 <Text
                     variant="caption-2"
