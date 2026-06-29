@@ -39,9 +39,7 @@ export class ObjectSummary {
         this.primaryKeys = page.locator('.schema-viewer__keys_type_primary');
         this.actionsMenu = new ActionsMenu(page.locator('.g-popup.g-popup_open'));
         this.createDirectoryModal = page.locator('.g-modal.g-modal_open');
-        this.createDirectoryInput = page.locator(
-            '.g-text-input__control[placeholder="Relative path"]',
-        );
+        this.createDirectoryInput = page.locator('.g-text-input__control[placeholder="Name"]');
         this.createDirectoryButton = page.locator('button.g-button_view_action:has-text("Create")');
         this.refreshButton = page.locator('.ydb-object-summary__refresh-button');
 
