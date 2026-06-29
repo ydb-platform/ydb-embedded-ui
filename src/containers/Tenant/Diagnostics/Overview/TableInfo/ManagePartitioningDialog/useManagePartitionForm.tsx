@@ -3,7 +3,7 @@ import React from 'react';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 
-import type {ManagePartitioningFormState} from './types';
+import type {ManagePartitioningFormOutput, ManagePartitioningFormState} from './types';
 import {getManagePartitioningInitialValues, managePartitioningSchema} from './utils';
 
 export function useManagePartitioningForm(params: {
@@ -17,7 +17,7 @@ export function useManagePartitioningForm(params: {
         [maxSplitSizeBytes],
     );
 
-    const form = useForm<ManagePartitioningFormState>({
+    const form = useForm<ManagePartitioningFormState, unknown, ManagePartitioningFormOutput>({
         defaultValues: getManagePartitioningInitialValues(initialValue),
         resolver: zodResolver(schema),
         mode: 'onChange',

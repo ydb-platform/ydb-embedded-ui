@@ -12,7 +12,7 @@ import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 import {SplitUnitSelect} from './SplitUnitSelect';
 import {DEFAULT_MAX_SPLIT_SIZE_GB, MANAGE_PARTITIONING_DIALOG, UNIT_OPTIONS} from './constants';
 import i18n from './i18n';
-import type {ManagePartitioningFormState} from './types';
+import type {ManagePartitioningFormOutput, ManagePartitioningFormState} from './types';
 import {useManagePartitioningForm} from './useManagePartitionForm';
 
 import './ManagePartitioningDialog.scss';
@@ -21,7 +21,7 @@ const b = cn(MANAGE_PARTITIONING_DIALOG);
 
 interface CommonDialogProps {
     initialValue?: ManagePartitioningFormState;
-    onApply?: (value: ManagePartitioningFormState) => void | Promise<void>;
+    onApply?: (value: ManagePartitioningFormOutput) => void | Promise<void>;
 }
 
 interface ManagePartitioningDialogNiceModalProps extends CommonDialogProps, DialogFooterProps {
@@ -155,7 +155,7 @@ function ManagePartitioningDialog({
                                         value={field.value}
                                         onUpdate={(next) => {
                                             field.onChange(next);
-                                            trigger('maximum'); // revalidate dependent field to clear stale error
+                                            trigger('maximum');
                                         }}
                                         className={b('input')}
                                         errorMessage={errors.minimum?.message}
@@ -180,7 +180,7 @@ function ManagePartitioningDialog({
                                         value={field.value}
                                         onUpdate={(next) => {
                                             field.onChange(next);
-                                            trigger('minimum'); // revalidate dependent field to clear stale error
+                                            trigger('minimum');
                                         }}
                                         className={b('input')}
                                         errorMessage={errors.maximum?.message}
@@ -245,9 +245,9 @@ NiceModal.register(MANAGE_PARTITIONING_DIALOG, ManagePartitioningDialogNiceModal
 
 export function openManagePartitioningDialog(
     props?: Omit<ManagePartitioningDialogNiceModalProps, 'id'>,
-): Promise<ManagePartitioningFormState | null> {
+): Promise<ManagePartitioningFormOutput | null> {
     return NiceModal.show(MANAGE_PARTITIONING_DIALOG, {
         id: MANAGE_PARTITIONING_DIALOG,
         ...props,
-    }) as Promise<ManagePartitioningFormState | null>;
+    }) as Promise<ManagePartitioningFormOutput | null>;
 }

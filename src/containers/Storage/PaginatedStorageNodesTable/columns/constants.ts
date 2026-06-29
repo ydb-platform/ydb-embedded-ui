@@ -45,5 +45,7 @@ export const STORAGE_NODES_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_NODES_GROU
 );
 
 export const storageNodesGroupByParamSchema = z
-    .custom<NodesGroupByField | undefined>((value) => STORAGE_NODES_GROUP_BY_PARAMS.includes(value))
+    .custom<
+        NodesGroupByField | undefined
+    >((value) => STORAGE_NODES_GROUP_BY_PARAMS.some((param) => param === value))
     .catch(undefined);

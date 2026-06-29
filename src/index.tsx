@@ -5,8 +5,11 @@ import {ErrorBoundary} from './lib';
 import reportWebVitals from './reportWebVitals';
 import {history, store} from './store/defaultStore';
 import {configureUIFactory} from './uiFactory/uiFactory';
+import {configureZod} from './utils/zod/configureZod';
 
 import './styles/index.scss';
+
+configureZod();
 
 const E2E_UI_OVERRIDES_ENABLED = process.env.REACT_APP_E2E_UI_OVERRIDES === 'true';
 

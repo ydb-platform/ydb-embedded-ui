@@ -144,7 +144,7 @@ test.describe('Test Query Settings', async () => {
 
         await expect(queryEditor.settingsDialog.isLimitRowsError()).resolves.toBe(true);
         await expect(queryEditor.settingsDialog.getLimitRowsErrorMessage()).resolves.toBe(
-            'Number must be less than or equal to 100000',
+            'Too big: expected number to be <=100000',
         );
     });
 
@@ -157,7 +157,7 @@ test.describe('Test Query Settings', async () => {
 
         await expect(queryEditor.settingsDialog.isLimitRowsError()).resolves.toBe(true);
         await expect(queryEditor.settingsDialog.getLimitRowsErrorMessage()).resolves.toBe(
-            'Number must be greater than 0',
+            'Too small: expected number to be >0',
         );
     });
 

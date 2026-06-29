@@ -37,3 +37,4 @@ export type {GetMonitoringLink, GetMonitoringClusterLink} from './utils/monitori
 export type {GetReportProblemUrl, IllustrationComponent, IllustrationName} from './uiFactory/types';
 
 export {configureUIFactory} from './uiFactory/uiFactory';
+export {configureZod} from './utils/zod/configureZod';
