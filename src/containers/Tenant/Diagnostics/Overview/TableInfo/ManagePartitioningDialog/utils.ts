@@ -2,6 +2,7 @@ import {z} from 'zod';
 
 import type {BytesSizes} from '../../../../../../utils/bytesParsers';
 import {convertToBytes, sizes} from '../../../../../../utils/bytesParsers';
+import {GIGABYTE} from '../../../../../../utils/constants';
 import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 
 import {DEFAULT_MANAGE_PARTITIONING_VALUE} from './constants';
@@ -60,6 +61,25 @@ export function getMaxSplitSizeBytes(config?: Record<string, unknown>): number {
     }
 
     return DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES;
+}
+
+const MAX_SPLIT_SIZE_GB_PRECISION = 1;
+
+/**
+ * Returns the maximum split size in GB for display in the hint.
+ *
+ * The value is floored (not rounded) to {@link MAX_SPLIT_SIZE_GB_PRECISION}
+ * decimals so that converting it back to bytes never exceeds
+ * `maxSplitSizeBytes`. This keeps the displayed maximum consistent with the
+ * exact byte limit used by validation: e.g. for a 2.5 GiB limit
+ * (2 684 354 560 bytes ≈ 2.684 GB) the hint shows `2.6`, which passes
+ * validation, instead of the rounded `3` that the validator rejects.
+ */
+export function getMaxSplitSizeGb(maxSplitSizeBytes: number): string {
+    const factor = 10 ** MAX_SPLIT_SIZE_GB_PRECISION;
+    const flooredGb = Math.floor((maxSplitSizeBytes / GIGABYTE) * factor) / factor;
+
+    return String(flooredGb);
 }
 
 export const splitUnitSchema = z.custom<BytesSizes>((value) => {

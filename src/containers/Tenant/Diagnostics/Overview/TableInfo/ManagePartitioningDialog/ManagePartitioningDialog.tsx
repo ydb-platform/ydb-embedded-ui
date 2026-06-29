@@ -7,8 +7,8 @@ import {Controller} from 'react-hook-form';
 
 import {Loader} from '../../../../../../components/Loader';
 import {configsApi} from '../../../../../../store/reducers/configs';
-import {formatBytes} from '../../../../../../utils/bytesParsers';
 import {cn} from '../../../../../../utils/cn';
+import {formatNumber} from '../../../../../../utils/dataFormatters/dataFormatters';
 import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
 
 import {SplitUnitSelect} from './SplitUnitSelect';
@@ -16,7 +16,7 @@ import {MANAGE_PARTITIONING_DIALOG, UNIT_OPTIONS} from './constants';
 import i18n from './i18n';
 import type {ManagePartitioningFormOutput, ManagePartitioningFormState} from './types';
 import {useManagePartitioningForm} from './useManagePartitionForm';
-import {getMaxSplitSizeBytes} from './utils';
+import {getMaxSplitSizeBytes, getMaxSplitSizeGb} from './utils';
 
 import './ManagePartitioningDialog.scss';
 
@@ -25,7 +25,9 @@ const b = cn(MANAGE_PARTITIONING_DIALOG);
 interface CommonDialogProps {
     initialValue?: ManagePartitioningFormState;
     database?: string;
-    onApply?: (value: ManagePartitioningFormState) => void | Promise<void>;
+    // The form output is produced after Zod coercion, so numeric fields are
+    // numbers (ManagePartitioningFormOutput), not the raw string form state.
+    onApply?: (value: ManagePartitioningFormOutput) => void | Promise<void>;
 }
 
 interface ManagePartitioningDialogNiceModalProps extends CommonDialogProps, DialogFooterProps {
@@ -40,7 +42,7 @@ interface ManagePartitioningDialogProps extends CommonDialogProps, DialogFooterP
 interface ManagePartitioningDialogFormProps extends DialogFooterProps {
     onClose: () => void;
     initialValue?: ManagePartitioningFormState;
-    onApply?: (value: ManagePartitioningFormState) => void | Promise<void>;
+    onApply?: (value: ManagePartitioningFormOutput) => void | Promise<void>;
     maxSplitSizeBytes: number;
 }
 
@@ -58,13 +60,11 @@ function ManagePartitioningDialogForm({
     const [apiError, setApiError] = React.useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = React.useState(false);
 
+    // The displayed maximum is floored to match the exact byte limit used by
+    // validation. Rounding here could show a value that, when converted back to
+    // bytes, exceeds `maxSplitSizeBytes` and gets rejected by the validator.
     const maxSplitSizeGb = React.useMemo(
-        () =>
-            formatBytes({
-                value: maxSplitSizeBytes,
-                size: 'gb',
-                withSizeLabel: false,
-            }),
+        () => getMaxSplitSizeGb(maxSplitSizeBytes),
         [maxSplitSizeBytes],
     );
 
@@ -133,7 +133,13 @@ function ManagePartitioningDialogForm({
                             )}
                         />
 
-                        <Text variant="body-1" className={b('hint')}>
+                        <Text
+                            variant="body-1"
+                            className={b('hint')}
+                            title={i18n('context_split-size-maximum-bytes', {
+                                bytes: formatNumber(maxSplitSizeBytes),
+                            })}
+                        >
                             {i18n('context_split-size-maximum', {
                                 maxGb: maxSplitSizeGb,
                             })}
