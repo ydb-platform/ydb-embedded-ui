@@ -413,7 +413,7 @@ function validateSettings(
 export function buildTableValidationSchema({
     mode,
     originalInfo,
-}: SchemaContext): z.ZodType<FormValues> {
+}: SchemaContext): z.ZodType<FormValues, FormValues> {
     return baseSchema.superRefine((raw, ctx) => {
         const data = raw as FormValues;
         validateName(data, ctx, mode);
@@ -424,5 +424,5 @@ export function buildTableValidationSchema({
         validateSecondaryIndexes(data, ctx, originalInfo);
         validatePartitioning(data, ctx, mode);
         validateSettings(data, ctx, mode, originalInfo);
-    }) as z.ZodType<FormValues>;
+    }) as z.ZodType<FormValues, FormValues>;
 }

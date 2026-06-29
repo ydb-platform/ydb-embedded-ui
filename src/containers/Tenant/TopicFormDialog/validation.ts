@@ -7,6 +7,12 @@ import i18n from './i18n';
 
 const MIN_ONE_MESSAGE = i18n('error_min-number', {count: 1});
 const MAX_HUNDRED_MESSAGE = i18n('error_max-number', {count: 100});
+const REQUIRED_MESSAGE = i18n('error_required');
+const NUMBER_MESSAGE = i18n('error_number');
+
+const getRequiredNumberError = (issue: {input?: unknown}) => {
+    return issue.input === undefined ? REQUIRED_MESSAGE : NUMBER_MESSAGE;
+};
 
 const addIssue = (ctx: z.RefinementCtx, path: Array<string | number>, message: string) => {
     ctx.addIssue({
@@ -21,8 +27,7 @@ const requiredNumber = (schema?: z.ZodNumber) =>
         (val) => (typeof val === 'number' && Number.isNaN(val) ? undefined : val),
         schema ??
             z.number({
-                required_error: i18n('error_required'),
-                invalid_type_error: i18n('error_number'),
+                error: getRequiredNumberError,
             }),
     );
 
@@ -32,14 +37,14 @@ const optionalNumber = (schema?: z.ZodNumber) =>
         (
             schema ??
             z.number({
-                invalid_type_error: i18n('error_number'),
+                error: NUMBER_MESSAGE,
             })
         ).optional(),
     );
 
 const topicNameSchema = z
-    .string({required_error: i18n('error_required'), invalid_type_error: i18n('error_required')})
-    .min(1, i18n('error_required'))
+    .string({error: REQUIRED_MESSAGE})
+    .min(1, REQUIRED_MESSAGE)
     .superRefine((value, ctx) => {
         if (!isValidEntityPath(value)) {
             addIssue(ctx, [], i18n('error_name-regex'));
@@ -67,26 +72,23 @@ export function getTopicFormValidationSchema(minPartitions: number) {
             shards: requiredNumber(
                 z
                     .number({
-                        required_error: i18n('error_required'),
-                        invalid_type_error: i18n('error_number'),
+                        error: getRequiredNumberError,
                     })
                     .min(1, MIN_ONE_MESSAGE),
             ),
             writeQuotaBytes: requiredNumber(),
             autoPartitioning: z.object({
                 enabled: z.boolean(),
-                mode: z.string().min(1, i18n('error_required')),
+                mode: z.string({error: REQUIRED_MESSAGE}).min(1, REQUIRED_MESSAGE),
                 minPartitions: optionalNumber(
-                    z.number({invalid_type_error: i18n('error_number')}).min(1, MIN_ONE_MESSAGE),
+                    z.number({error: NUMBER_MESSAGE}).min(1, MIN_ONE_MESSAGE),
                 ),
                 maxPartitions: optionalNumber(
-                    z.number({invalid_type_error: i18n('error_number')}).min(1, MIN_ONE_MESSAGE),
+                    z.number({error: NUMBER_MESSAGE}).min(1, MIN_ONE_MESSAGE),
                 ),
                 stabilizationWindow: optionalNumber(),
                 upUtilization: optionalNumber(
-                    z
-                        .number({invalid_type_error: i18n('error_number')})
-                        .max(100, MAX_HUNDRED_MESSAGE),
+                    z.number({error: NUMBER_MESSAGE}).max(100, MAX_HUNDRED_MESSAGE),
                 ),
             }),
         })
@@ -128,5 +130,5 @@ export function getTopicFormValidationSchema(minPartitions: number) {
             validateRequiredNumber(ctx, stabilizationPath, autoPartitioning.stabilizationWindow);
 
             validateRequiredNumber(ctx, upUtilizationPath, autoPartitioning.upUtilization);
-        }) as z.ZodType<TopicFormValues>;
+        }) as z.ZodType<TopicFormValues, TopicFormValues>;
 }
