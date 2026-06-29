@@ -34,6 +34,7 @@
   "error_minimum-greater-maximum": "Minimum must not be greater than maximum",
   "error_partition-size": "Value must be between 10 and 2000 MB",
   "error_partitions-count": "Value must be between 1 and 35000",
+  "error_uniform-partitions-first-key-type": "Uniform partitions require the first primary key column to have type Uint32 or Uint64",
   "error_partition-count-range": "Value must be between 1 and 1000",
   "error_columns-empty": "Columns are empty",
   "error_indexes-delete-column": "Columns used by existing secondary indexes cannot be deleted.",

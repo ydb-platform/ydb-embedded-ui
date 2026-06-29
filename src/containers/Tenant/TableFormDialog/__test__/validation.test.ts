@@ -336,6 +336,40 @@ describe('TableFormDialog validation', () => {
         expect(getIssuePaths(result)).toContain('settings.partitionsAtKeys');
     });
 
+    test('uniform partitions require Uint32 or Uint64 as the first primary key column', () => {
+        const schema = buildTableValidationSchema({mode: 'create'});
+
+        const result = schema.safeParse(
+            createValues({
+                settings: {
+                    partitionsType: PartitionsType.Uniform,
+                    uniformPartitions: 4,
+                    ttl: {status: 'disabled'},
+                },
+            }),
+        );
+
+        expect(result.success).toBe(false);
+        expect(getIssuePaths(result)).toContain('settings.uniformPartitions');
+    });
+
+    test('uniform partitions accept Uint64 as the first primary key column', () => {
+        const schema = buildTableValidationSchema({mode: 'create'});
+
+        const result = schema.safeParse(
+            createValues({
+                columns: [createColumn({type: 'Uint64'})],
+                settings: {
+                    partitionsType: PartitionsType.Uniform,
+                    uniformPartitions: 4,
+                    ttl: {status: 'disabled'},
+                },
+            }),
+        );
+
+        expect(result.success).toBe(true);
+    });
+
     test('ttl validation requires column and lifetime when ttl is enabled', () => {
         const schema = buildTableValidationSchema({mode: 'create'});
 

@@ -439,7 +439,7 @@ function EditableColumnRow({
     const column = useWatch({control, name: `columns.${index}`});
     const defaultValueFieldName = `columns.${index}.defaultValue` as const;
     const revalidateColumns = React.useCallback(() => {
-        trigger('columns').catch(() => undefined);
+        trigger(['columns', 'settings']).catch(() => undefined);
     }, [trigger]);
     const handleDefaultValueUpdate = React.useCallback(
         (value: string) => {

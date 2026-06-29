@@ -18,6 +18,8 @@ import type {FormMode, FormValues, OriginalTableInfo} from './types';
 import {PartitionsType} from './types';
 import {getAvailableTtlColumns, isValidTtlNumType} from './utils';
 
+const UNIFORM_PARTITION_KEY_TYPES = new Set(['Uint32', 'Uint64']);
+
 const addIssue = (ctx: z.RefinementCtx, path: Array<string | number>, message: string) => {
     ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -344,10 +346,18 @@ function validateRowSettings(
     if (mode === 'create') {
         if (settings.partitionsType === PartitionsType.Uniform) {
             const value = Number(settings.uniformPartitions);
+            const firstKeyColumn = data.columns.find((column) => Boolean(column.key));
+
             if (settings.uniformPartitions === undefined || Number.isNaN(value)) {
                 addIssue(ctx, ['settings', 'uniformPartitions'], i18n('error_required'));
             } else if (value < MIN_PARTITIONS_COUNT || value > MAX_PARTITIONS_COUNT) {
                 addIssue(ctx, ['settings', 'uniformPartitions'], i18n('error_partitions-count'));
+            } else if (!firstKeyColumn || !UNIFORM_PARTITION_KEY_TYPES.has(firstKeyColumn.type)) {
+                addIssue(
+                    ctx,
+                    ['settings', 'uniformPartitions'],
+                    i18n('error_uniform-partitions-first-key-type'),
+                );
             }
         }
 
