@@ -18,6 +18,7 @@
   "metric-tab.storage-serverless-description": "Top Tables By Size",
   "metric-tab.memory-description": "Total consumed by DB processes",
   "metric-tab.network-description": "Average outgoing bandwidth",
+  "metric-tab.unavailable-percent": "N/A",
   "context_cpu-load": "CPU load",
   "context_cpu-nodes-count": [
     "CPU: {{count}} node",

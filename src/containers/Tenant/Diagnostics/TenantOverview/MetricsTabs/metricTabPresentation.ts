@@ -3,8 +3,7 @@ import {formatPercent} from '../../../../../utils/dataFormatters/dataFormatters'
 import {getMetricPercentPrecision} from '../../../../../utils/metrics';
 import {calculateProgressStatus} from '../../../../../utils/progress';
 import type {ProgressStatus} from '../../../../../utils/progress';
-
-const UNAVAILABLE_PERCENT_TEXT = 'N/A';
+import i18n from '../i18n';
 
 const ProgressStatusToEFlag: Record<ProgressStatus, EFlag> = {
     good: EFlag.Green,
@@ -42,7 +41,7 @@ export function getMetricTabPresentation({
 }: MetricTabPresentationParams): MetricTabPresentation {
     if (!Number.isFinite(usagePercent)) {
         return {
-            percentText: UNAVAILABLE_PERCENT_TEXT,
+            percentText: i18n('metric-tab.unavailable-percent'),
             status: EFlag.Grey,
         };
     }
