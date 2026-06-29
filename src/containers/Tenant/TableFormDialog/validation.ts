@@ -16,6 +16,7 @@ import {
 import i18n from './i18n';
 import type {FormMode, FormValues, OriginalTableInfo} from './types';
 import {PartitionsType} from './types';
+import {getAvailableTtlColumns, isValidTtlNumType} from './utils';
 
 const addIssue = (ctx: z.RefinementCtx, path: Array<string | number>, message: string) => {
     ctx.addIssue({
@@ -225,15 +226,25 @@ function validatePartitioning(data: FormValues, ctx: z.RefinementCtx, mode: Form
     }
 }
 
-function validateTtl(data: FormValues, ctx: z.RefinementCtx) {
+function validateTtl(data: FormValues, ctx: z.RefinementCtx, originalInfo?: OriginalTableInfo) {
     const ttl = data.settings?.ttl;
     if (!ttl || ttl.status === 'disabled') {
         return;
     }
+
+    const selectedTtlColumn = getAvailableTtlColumns(
+        originalInfo?.columns,
+        data.columns,
+        data.deletedColumns,
+    ).find(({name}) => name === ttl.column);
+
     if (!ttl.column) {
         addIssue(ctx, ['settings', 'ttl', 'column'], i18n('error_required'));
     }
-    if (ttl.columnWithEpochMode && !ttl.epochMode) {
+    if (ttl.column && !selectedTtlColumn) {
+        addIssue(ctx, ['settings', 'ttl', 'column'], i18n('error_ttl-column-invalid'));
+    }
+    if (selectedTtlColumn && isValidTtlNumType(selectedTtlColumn.type) && !ttl.epochMode) {
         addIssue(ctx, ['settings', 'ttl', 'epochMode'], i18n('error_required'));
     }
     if (ttl.lifetime === undefined || ttl.lifetime === null || Number.isNaN(ttl.lifetime)) {
@@ -352,13 +363,13 @@ function validateSettings(
     }
 
     if (data.type !== 'row') {
-        validateTtl(data, ctx);
+        validateTtl(data, ctx, originalInfo);
         return;
     }
 
     validateRowSettings(data, ctx, mode, originalInfo);
 
-    validateTtl(data, ctx);
+    validateTtl(data, ctx, originalInfo);
 }
 
 export function buildTableValidationSchema({

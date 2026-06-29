@@ -12,8 +12,8 @@ import {
     acceptIntegerInput,
     epochModeOptions,
     formatOptionalIntegerInput,
+    getAvailableTtlColumns,
     isValidTtlNumType,
-    isValidTtlType,
     lifetimeUnitOptions,
     parseOptionalIntegerInput,
     ttlStatusOptions,
@@ -47,11 +47,7 @@ export function TTLSection({originalInfo}: TTLSectionProps) {
     const isEpochMode = Boolean(columnWithEpochMode);
 
     const ttlColumns = React.useMemo(() => {
-        const deletedNames = new Set(deletedColumns.map(({name}) => name));
-        const combined = [...(originalInfo?.columns ?? []), ...formColumns];
-        return combined.filter(
-            ({name, type}) => name && isValidTtlType(type) && !deletedNames.has(name),
-        );
+        return getAvailableTtlColumns(originalInfo?.columns, formColumns, deletedColumns);
     }, [originalInfo, formColumns, deletedColumns]);
 
     const columnOptions = React.useMemo<SelectOption[]>(
@@ -82,6 +78,8 @@ export function TTLSection({originalInfo}: TTLSectionProps) {
 
         const matchedType = ttlColumns.find(({name}) => name === column)?.type;
         if (!matchedType) {
+            setValue('settings.ttl.columnWithEpochMode', false, {shouldValidate: false});
+            setValue('settings.ttl.epochMode', undefined, {shouldValidate: false});
             return;
         }
 

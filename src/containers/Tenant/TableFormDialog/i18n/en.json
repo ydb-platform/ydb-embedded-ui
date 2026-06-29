@@ -37,6 +37,7 @@
   "error_indexes-delete-column": "Columns used by existing secondary indexes cannot be deleted.",
   "error_primary-key-required": "At least one primary key column is required",
   "error_indexes-key": "Incorrect set of columns in the key",
+  "error_ttl-column-invalid": "Select an existing column with a supported TTL type",
   "error_partitions-at-keys-invalid": "Invalid split points",
   "error_value-invalid": "Incorrect value in field",
 

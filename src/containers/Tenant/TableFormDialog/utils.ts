@@ -41,6 +41,18 @@ export function isValidTtlNumType(type: string | undefined) {
     return Boolean(type && TTL_NUM_TYPES.has(type));
 }
 
+export function getAvailableTtlColumns(
+    originalColumns: Column[] = [],
+    formColumns: Array<Pick<Column, 'name' | 'type'>> = [],
+    deletedColumns: Array<Pick<Column, 'name'>> = [],
+) {
+    const deletedNames = new Set(deletedColumns.map(({name}) => name));
+
+    return [...originalColumns, ...formColumns].filter(
+        ({name, type}) => name && isValidTtlType(type) && !deletedNames.has(name),
+    );
+}
+
 export const epochModeOptions: SelectOption[] = [
     {value: 'seconds', content: i18n('value_epoch-seconds')},
     {value: 'milliseconds', content: i18n('value_epoch-milliseconds')},
