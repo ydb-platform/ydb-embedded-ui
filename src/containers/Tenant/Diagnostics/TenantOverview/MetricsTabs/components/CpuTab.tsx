@@ -14,7 +14,6 @@ interface CpuTabProps {
     active: boolean;
     isServerless: boolean;
     cpu: {totalUsed: number; totalLimit: number};
-    controlPlaneNodesCount?: number;
 }
 
 export function CpuTab({to, active, isServerless, cpu}: CpuTabProps) {

@@ -96,10 +96,6 @@ function getActiveMetricsTab(isServerless: boolean, metricsTab: TenantMetricsTab
     return metricsTab;
 }
 
-function getStorageGroupsCount(storageGroups?: string) {
-    return storageGroups ? Number(storageGroups) : undefined;
-}
-
 function TenantName({
     databaseStatus,
     name,
@@ -289,7 +285,7 @@ export function TenantOverview({
     );
 
     const tenantLoading = isTenantLoading(isFetching, tenant, error);
-    const {Name, Type, Overall, ControlPlane, CoresTotal} = tenant || {};
+    const {Name, Type, Overall, CoresTotal} = tenant || {};
     const isServerless = Type === 'Serverless';
 
     // Use healthcheck self_check_result as the database status color when available;
@@ -305,8 +301,6 @@ export function TenantOverview({
     );
     const databaseStatus = getDatabaseStatus(Overall, healthcheckData?.self_check_result);
     const activeMetricsTab = getActiveMetricsTab(isServerless, metricsTab);
-
-    const controlPlaneNodesCount = ControlPlane?.scale_policy?.fixed_scale?.size;
 
     const tenantType = mapDatabaseTypeToDBName(Type);
 
@@ -378,8 +372,6 @@ export function TenantOverview({
                             blobStorageStats={blobStorageStats}
                             tabletStorageStats={tabletStorageStats}
                             networkUtilization={networkUtilization}
-                            storageGroupsCount={getStorageGroupsCount(tenant?.StorageGroups)}
-                            controlPlaneNodesCount={controlPlaneNodesCount}
                             coresTotal={CoresTotal}
                             databaseType={Type}
                             activeTab={activeMetricsTab}

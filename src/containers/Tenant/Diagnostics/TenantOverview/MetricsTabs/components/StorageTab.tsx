@@ -14,7 +14,6 @@ interface StorageTabProps {
     active: boolean;
     isServerless: boolean;
     storage: {totalUsed: number; totalLimit: number};
-    storageGroupsCount?: number;
 }
 
 export function StorageTab({to, active, isServerless, storage}: StorageTabProps) {

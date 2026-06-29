@@ -65,8 +65,6 @@ interface MetricsTabsProps {
     blobStorageStats?: TenantStorageStats[];
     tabletStorageStats?: TenantStorageStats[];
     networkUtilization?: number;
-    storageGroupsCount?: number;
-    controlPlaneNodesCount?: number;
     coresTotal?: number;
     databaseType?: ETenantType;
     activeTab: TenantMetricsTab;
@@ -79,8 +77,6 @@ export function MetricsTabs({
     blobStorageStats,
     tabletStorageStats,
     networkUtilization,
-    storageGroupsCount,
-    controlPlaneNodesCount,
     coresTotal,
     databaseType,
     activeTab,
@@ -176,7 +172,6 @@ export function MetricsTabs({
                     totalUsed: cpuMetrics.totalUsed,
                     totalLimit: coresTotal && coresTotal > 0 ? coresTotal : cpuMetrics.totalLimit,
                 }}
-                controlPlaneNodesCount={controlPlaneNodesCount}
             />
             <StorageTab
                 to={tabLinks[TENANT_METRICS_TABS_IDS.storage]}
@@ -186,7 +181,6 @@ export function MetricsTabs({
                     totalUsed: storageMetrics.totalUsed,
                     totalLimit: storageMetrics.totalLimit,
                 }}
-                storageGroupsCount={storageGroupsCount}
             />
             {isServerless ? null : (
                 <MemoryTab
