@@ -1,8 +1,8 @@
-# i18n Key Naming Ruleset for Cursor IDE
+# i18n Key Naming Ruleset
 
 ## Overview
 
-This document provides a comprehensive ruleset for naming internationalization (i18n) keys and keysets in Cursor IDE projects. Following these conventions ensures consistency, maintainability, and clarity in multilingual applications.
+This document provides a comprehensive ruleset for naming internationalization (i18n) keys and keysets in this project. Following these conventions ensures consistency, maintainability, and clarity in multilingual applications.
 
 ## 1. Keyset Naming Rules
 

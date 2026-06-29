@@ -22,18 +22,18 @@ export function StorageTab({to, active, isServerless, storage}: StorageTabProps)
             <Link to={to} className={b('link')}>
                 {isServerless ? (
                     <ServerlessTabCard
-                        title={i18n('metric-tab.storage-title')}
+                        title={i18n('title_storage')}
                         active={active}
-                        description={i18n('metric-tab.storage-serverless-description')}
+                        description={i18n('context_storage-serverless-tab-description')}
                         helpText={i18n('context_storage-description')}
                     />
                 ) : (
                     <UsageTabCard
-                        title={i18n('metric-tab.storage-title')}
+                        title={i18n('title_storage')}
                         value={storage.totalUsed}
                         limit={storage.totalLimit}
                         active={active}
-                        description={i18n('metric-tab.storage-description')}
+                        description={i18n('context_storage-tab-description')}
                         // Never show the "danger" (red) status for storage,
                         // regardless of usage. The metric tab stays "warning"
                         // (yellow) above the warning threshold and never turns

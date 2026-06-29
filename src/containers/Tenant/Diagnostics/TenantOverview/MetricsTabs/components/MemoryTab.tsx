@@ -19,11 +19,11 @@ export function MemoryTab({to, active, memory}: MemoryTabProps) {
         <div className={b('link-container', {active})}>
             <Link to={to} className={b('link')}>
                 <UsageTabCard
-                    title={i18n('metric-tab.memory-title')}
+                    title={i18n('title_memory')}
                     value={memory.totalUsed}
                     limit={memory.totalLimit}
                     active={active}
-                    description={i18n('metric-tab.memory-description')}
+                    description={i18n('context_memory-tab-description')}
                 />
             </Link>
         </div>

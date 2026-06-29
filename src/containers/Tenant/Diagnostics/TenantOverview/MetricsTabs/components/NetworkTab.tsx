@@ -21,10 +21,10 @@ export function NetworkTab({to, active, networkUtilization}: NetworkTabProps) {
         <div className={b('link-container', {active})}>
             <Link to={to} className={b('link')}>
                 <UtilizationTabCard
-                    title={i18n('metric-tab.network-title')}
+                    title={i18n('title_network')}
                     fillPercent={fillPercent}
                     active={active}
-                    description={i18n('metric-tab.network-description')}
+                    description={i18n('context_network-tab-description')}
                 />
             </Link>
         </div>

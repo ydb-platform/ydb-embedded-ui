@@ -41,7 +41,7 @@ export function getMetricTabPresentation({
 }: MetricTabPresentationParams): MetricTabPresentation {
     if (!Number.isFinite(usagePercent)) {
         return {
-            percentText: i18n('metric-tab.unavailable-percent'),
+            percentText: i18n('value_unavailable-percent'),
             status: EFlag.Grey,
         };
     }

@@ -22,18 +22,18 @@ export function CpuTab({to, active, isServerless, cpu}: CpuTabProps) {
             <Link to={to} className={b('link')}>
                 {isServerless ? (
                     <ServerlessTabCard
-                        title={i18n('metric-tab.cpu-serverless-title')}
+                        title={i18n('title_cpu-load')}
                         active={active}
                         description={i18n('context_serverless-autoscaled')}
                         helpText={i18n('context_cpu-description')}
                     />
                 ) : (
                     <UsageTabCard
-                        title={i18n('metric-tab.cpu-title')}
+                        title={i18n('title_cpu')}
                         value={cpu.totalUsed}
                         limit={cpu.totalLimit}
                         active={active}
-                        description={i18n('metric-tab.cpu-description')}
+                        description={i18n('context_cpu-tab-description')}
                     />
                 )}
             </Link>
