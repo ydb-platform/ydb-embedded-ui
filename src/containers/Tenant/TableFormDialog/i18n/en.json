@@ -30,6 +30,8 @@
   "error_column-name-pattern": "Only word characters, underscores and dashes are allowed",
   "error_column-name-duplicate": "Column names must be unique",
   "error_index-name-duplicate": "Index names must be unique",
+  "error_maximum-less-minimum": "Maximum must not be less than minimum",
+  "error_minimum-greater-maximum": "Minimum must not be greater than maximum",
   "error_partition-size": "Value must be between 10 and 2000 MB",
   "error_partitions-count": "Value must be between 1 and 35000",
   "error_partition-count-range": "Value must be between 1 and 1000",

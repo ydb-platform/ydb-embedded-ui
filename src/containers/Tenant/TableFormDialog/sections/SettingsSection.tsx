@@ -43,11 +43,19 @@ interface SettingsSectionProps {
 }
 
 export function SettingsSection({mode}: SettingsSectionProps) {
-    const {control, setValue, getValues, formState} = useFormContext<FormValues>();
+    const {control, setValue, getValues, trigger, formState} = useFormContext<FormValues>();
 
     const partitionsType = useWatch({control, name: 'settings.partitionsType'});
     const autoPartitionBySize = useWatch({control, name: 'settings.autoPartitionBySize'});
     const autoPartitionByLoad = useWatch({control, name: 'settings.autoPartitionByLoad'});
+    const autoPartitionMinPartitions = useWatch({
+        control,
+        name: 'settings.autoPartitionMinPartitions',
+    });
+    const autoPartitionMaxPartitions = useWatch({
+        control,
+        name: 'settings.autoPartitionMaxPartitions',
+    });
 
     const minMaxDisabled = !autoPartitionBySize && !autoPartitionByLoad;
 
@@ -141,6 +149,13 @@ export function SettingsSection({mode}: SettingsSectionProps) {
         },
         [getValues, setValue],
     );
+
+    React.useEffect(() => {
+        trigger([
+            'settings.autoPartitionMinPartitions',
+            'settings.autoPartitionMaxPartitions',
+        ]).catch(() => undefined);
+    }, [autoPartitionMaxPartitions, autoPartitionMinPartitions, trigger]);
 
     return (
         <React.Fragment>

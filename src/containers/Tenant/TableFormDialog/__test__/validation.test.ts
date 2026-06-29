@@ -418,4 +418,46 @@ describe('TableFormDialog validation', () => {
         expect(getIssuePaths(result)).toContain('settings.ttl.column');
         expect(getIssuePaths(result)).not.toContain('settings.ttl.epochMode');
     });
+
+    test('rejects inverted auto-partition min and max values before submit', () => {
+        const schema = buildTableValidationSchema({mode: 'create'});
+
+        const result = schema.safeParse(
+            createValues({
+                settings: {
+                    partitionsType: PartitionsType.None,
+                    autoPartitionBySize: true,
+                    autoPartitionByLoad: false,
+                    autoPartitionMinPartitions: 100,
+                    autoPartitionMaxPartitions: 10,
+                    ttl: {status: 'disabled'},
+                },
+            }),
+        );
+
+        expect(result.success).toBe(false);
+        expect(getIssuePaths(result)).toEqual(
+            expect.arrayContaining([
+                'settings.autoPartitionMinPartitions',
+                'settings.autoPartitionMaxPartitions',
+            ]),
+        );
+
+        if (result.success) {
+            return;
+        }
+
+        expect(result.error.issues).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    path: ['settings', 'autoPartitionMinPartitions'],
+                    message: 'Minimum must not be greater than maximum',
+                }),
+                expect.objectContaining({
+                    path: ['settings', 'autoPartitionMaxPartitions'],
+                    message: 'Maximum must not be less than minimum',
+                }),
+            ]),
+        );
+    });
 });

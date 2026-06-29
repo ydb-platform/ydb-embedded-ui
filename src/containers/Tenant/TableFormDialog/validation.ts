@@ -304,6 +304,32 @@ function validateOptionalPartitionsCount(
     }
 }
 
+function validateAutoPartitionRange(data: FormValues, ctx: z.RefinementCtx) {
+    const {autoPartitionMinPartitions, autoPartitionMaxPartitions} = data.settings;
+
+    if (
+        typeof autoPartitionMinPartitions !== 'number' ||
+        Number.isNaN(autoPartitionMinPartitions) ||
+        typeof autoPartitionMaxPartitions !== 'number' ||
+        Number.isNaN(autoPartitionMaxPartitions)
+    ) {
+        return;
+    }
+
+    if (autoPartitionMinPartitions > autoPartitionMaxPartitions) {
+        addIssue(
+            ctx,
+            ['settings', 'autoPartitionMinPartitions'],
+            i18n('error_minimum-greater-maximum'),
+        );
+        addIssue(
+            ctx,
+            ['settings', 'autoPartitionMaxPartitions'],
+            i18n('error_maximum-less-minimum'),
+        );
+    }
+}
+
 function validateRowSettings(
     data: FormValues,
     ctx: z.RefinementCtx,
@@ -349,6 +375,8 @@ function validateRowSettings(
         settings.autoPartitionMaxPartitions,
         originalInfo?.hasMaxPartitions,
     );
+
+    validateAutoPartitionRange(data, ctx);
 }
 
 function validateSettings(
