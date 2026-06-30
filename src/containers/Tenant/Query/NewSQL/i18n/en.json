@@ -23,6 +23,7 @@
   "menu.transfer": "Transfer",
   "menu.users": "Users",
   "action.create-topic": "Create Topic",
+  "action.select-topic": "Select from a topic",
   "action.drop-topic": "Drop Topic",
   "action.alter-topic": "Alter Topic",
   "action.create-cdc-stream": "Create changefeed",

@@ -197,6 +197,27 @@ FROM ${path}
 ${filters}LIMIT \${5:10};`;
 };
 
+export const selectTopicQueryTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_topic>}';
+    const limit = params?.relativePath ? '${1:10}' : '${2:10}';
+
+    return `SELECT
+    Data,
+    SystemMetadata('create_time') as create_time,
+    SystemMetadata('write_time') as write_time,
+    SystemMetadata('partition_id') as partition_id,
+    SystemMetadata('offset') as offset,
+    SystemMetadata('message_group_id') as message_group_id,
+    SystemMetadata('seq_no') as seq_no
+FROM ${path}
+-- WHERE SystemMetadata('partition_id') = 42
+-- AND SystemMetadata('write_time') > CurrentUtcTimestamp() - Interval('PT60S')
+-- AND SystemMetadata('offset') > 100
+LIMIT ${limit};`;
+};
+
 export const showCreateTableTemplate = (params?: SchemaQueryParams) => {
     if (params?.showCreateTableData) {
         return params.showCreateTableData;

@@ -1,4 +1,9 @@
-import {addMinMaxIndex, disableTTLTemplate, enableTTLTemplate} from '../schemaQueryTemplates';
+import {
+    addMinMaxIndex,
+    disableTTLTemplate,
+    enableTTLTemplate,
+    selectTopicQueryTemplate,
+} from '../schemaQueryTemplates';
 
 describe('schemaQueryTemplates', () => {
     describe('enableTTLTemplate', () => {
@@ -38,6 +43,36 @@ describe('schemaQueryTemplates', () => {
 ADD INDEX \${2:my_min_max_index}
 LOCAL USING min_max
 ON (\${3:column_name});`);
+        });
+    });
+
+    describe('selectTopicQueryTemplate', () => {
+        test('selects topic data and metadata for the selected topic', () => {
+            const template = selectTopicQueryTemplate({
+                path: '/local/my-topic',
+                relativePath: 'my-topic',
+            });
+
+            expect(template).toBe(`SELECT
+    Data,
+    SystemMetadata('create_time') as create_time,
+    SystemMetadata('write_time') as write_time,
+    SystemMetadata('partition_id') as partition_id,
+    SystemMetadata('offset') as offset,
+    SystemMetadata('message_group_id') as message_group_id,
+    SystemMetadata('seq_no') as seq_no
+FROM \`my-topic\`
+-- WHERE SystemMetadata('partition_id') = 42
+-- AND SystemMetadata('write_time') > CurrentUtcTimestamp() - Interval('PT60S')
+-- AND SystemMetadata('offset') > 100
+LIMIT \${1:10};`);
+        });
+
+        test('uses a placeholder topic path without selected topic', () => {
+            const template = selectTopicQueryTemplate();
+
+            expect(template).toContain('FROM ${1:<my_topic>}');
+            expect(template).toContain('LIMIT ${2:10};');
         });
     });
 });

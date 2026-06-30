@@ -1,22 +1,50 @@
 import {expect, test} from '@playwright/test';
+import type {Page} from '@playwright/test';
 
-import {database} from '../../../utils/constants';
+import {TOPICS_SQL_IO_OPERATIONS_FEATURE_FLAG} from '../../../../src/utils/topicsSqlIoOperations';
+import {backend, database} from '../../../utils/constants';
 import {QueryEditorMode, TenantPage} from '../TenantPage';
 import {SavedQueriesTable} from '../savedQueries/models/SavedQueriesTable';
 import {ObjectSummary} from '../summary/ObjectSummary';
-import {RowTableAction} from '../summary/types';
+import {RowTableAction, TopicAction} from '../summary/types';
 
 import {
     AsyncReplicationTemplates,
     NewSqlDropdownMenu,
     TablesTemplates,
     TemplateCategory,
+    TopicTemplates,
 } from './models/NewSqlDropdownMenu';
 import {QueryEditor, QueryTabs} from './models/QueryEditor';
 import {SaveQueryDialog} from './models/SaveQueryDialog';
 
+async function mockTopicsSqlIoOperationsFeature(page: Page, enabled: boolean) {
+    await page.route(`${backend}/viewer/feature_flags*`, async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                Databases: [
+                    {
+                        Name: database,
+                        FeatureFlags: [
+                            {
+                                Name: TOPICS_SQL_IO_OPERATIONS_FEATURE_FLAG,
+                                Current: enabled,
+                                Default: false,
+                            },
+                        ],
+                    },
+                ],
+            }),
+        });
+    });
+}
+
 test.describe('Query Templates', () => {
     test.beforeEach(async ({page}) => {
+        await mockTopicsSqlIoOperationsFeature(page, true);
+
         const tenantPage = new TenantPage(page);
         await tenantPage.gotoQueryEditor({
             schema: database,
@@ -94,6 +122,10 @@ test.describe('Query Templates', () => {
 
         await queryEditor.setQuery('SELECT 1;');
         const initialTabId = await queryEditor.editorTabs.getActiveTabId();
+        if (!initialTabId) {
+            throw new Error('Expected an active editor tab');
+        }
+
         const initialTabCount = await queryEditor.editorTabs.getTabCount();
 
         // Try to switch to Select query
@@ -109,7 +141,7 @@ test.describe('Query Templates', () => {
         const nextTabId = await queryEditor.editorTabs.getActiveTabId();
         expect(nextTabId).not.toBe(initialTabId);
 
-        await queryEditor.editorTabs.selectTabById(initialTabId!);
+        await queryEditor.editorTabs.selectTabById(initialTabId);
         await expect.poll(() => queryEditor.getEditorContent(), {timeout: 5000}).toBe('SELECT 1;');
     });
 
@@ -160,6 +192,93 @@ test.describe('Query Templates', () => {
 
         expect(queryEditor.editorTextArea).not.toBeEmpty();
     });
+
+    test('New SQL topics menu inserts topic select template', async ({page}) => {
+        const newSqlDropdown = new NewSqlDropdownMenu(page);
+        const queryEditor = new QueryEditor(page);
+
+        await newSqlDropdown.clickNewSqlButton();
+        await newSqlDropdown.hoverCategory(TemplateCategory.Topics);
+        await newSqlDropdown.selectTemplate(TopicTemplates.Select);
+
+        await expect
+            .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
+            .toContain("SystemMetadata('write_time')");
+
+        const editorContent = await queryEditor.getEditorContent();
+        expect(editorContent).toContain('FROM <my_topic>');
+        expect(editorContent).toContain('LIMIT 10;');
+    });
+
+    test('New SQL topics menu hides topic select template when SQL I/O feature is disabled', async ({
+        page,
+    }) => {
+        await page.unroute(`${backend}/viewer/feature_flags*`);
+        await mockTopicsSqlIoOperationsFeature(page, false);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.gotoQueryEditor({
+            schema: database,
+            database,
+            mode: QueryEditorMode.MultiTab,
+        });
+
+        const newSqlDropdown = new NewSqlDropdownMenu(page);
+
+        await newSqlDropdown.clickNewSqlButton();
+        await newSqlDropdown.hoverCategory(TemplateCategory.Topics);
+
+        await expect
+            .poll(() => newSqlDropdown.isTemplateVisible(TopicTemplates.Select), {timeout: 5000})
+            .toBe(false);
+    });
+
+    test('Topic context menu inserts topic select template for selected topic', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        const topicName = await queryEditor.createNewFakeTopic();
+        await objectSummary.clickRefreshButton();
+
+        await objectSummary.clickActionMenuItem(topicName, TopicAction.SelectQuery);
+
+        await expect
+            .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
+            .toContain(`FROM \`${topicName}\``);
+
+        const editorContent = await queryEditor.getEditorContent();
+        expect(editorContent).toContain("SystemMetadata('offset')");
+    });
+
+    test('Topic context menu hides select query when SQL I/O feature is disabled', async ({
+        page,
+    }) => {
+        await page.unroute(`${backend}/viewer/feature_flags*`);
+        await mockTopicsSqlIoOperationsFeature(page, false);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.gotoQueryEditor({
+            schema: database,
+            database,
+            mode: QueryEditorMode.MultiTab,
+        });
+
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        const topicName = await queryEditor.createNewFakeTopic();
+        await objectSummary.clickRefreshButton();
+
+        await objectSummary.clickActionsButton(topicName);
+
+        await expect
+            .poll(() => objectSummary.getActionsMenuItems(), {timeout: 5000})
+            .toContain(RowTableAction.CopyPath);
+
+        const menuItems = await objectSummary.getActionsMenuItems();
+        expect(menuItems).not.toContain(TopicAction.SelectQuery);
+    });
+
     test('Switching between untouched schema templates reuses the current template tab', async ({
         page,
     }) => {
