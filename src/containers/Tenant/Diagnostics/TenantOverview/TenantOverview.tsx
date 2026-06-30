@@ -45,6 +45,8 @@ import {TenantNetwork} from './TenantNetwork/TenantNetwork';
 import {TenantStorageMode} from './TenantStorage/TenantStorageMode';
 import type {TenantStorageMetrics} from './TenantStorage/types';
 import i18n from './i18n';
+import {getTenantOverviewMetrics} from './metricOverview';
+import type {MetricPageSummaries} from './metricOverview';
 import {b} from './utils';
 
 import MoniumIcon from '../../../../assets/icons/monium.svg';
@@ -202,6 +204,7 @@ function renderMetricsTabContent({
     database,
     databaseFullPath,
     databaseType,
+    metricPageSummaries,
     memoryLimit,
     memoryStats,
     memoryUsed,
@@ -213,6 +216,7 @@ function renderMetricsTabContent({
     database: string;
     databaseFullPath: string;
     databaseType?: ETenantType;
+    metricPageSummaries: MetricPageSummaries;
     memoryLimit?: string;
     memoryStats?: TMemoryStats;
     memoryUsed?: string;
@@ -226,6 +230,7 @@ function renderMetricsTabContent({
                     database={database}
                     databaseType={databaseType}
                     databaseFullPath={databaseFullPath}
+                    metricSummary={metricPageSummaries.cpu}
                 />
             );
         }
@@ -248,11 +253,14 @@ function renderMetricsTabContent({
                     memoryUsed={memoryUsed}
                     memoryLimit={memoryLimit}
                     memoryStats={memoryStats}
+                    metricSummary={metricPageSummaries.memory}
                 />
             );
         }
         case TENANT_METRICS_TABS_IDS.network: {
-            return <TenantNetwork database={database} />;
+            return (
+                <TenantNetwork database={database} metricSummary={metricPageSummaries.network} />
+            );
         }
         default: {
             return null;
@@ -316,6 +324,7 @@ export function TenantOverview({
         blobStorageStats,
         tabletStorageStats,
         networkUtilization,
+        networkThroughput,
     } = calculateTenantMetrics(tenant);
 
     const storageMetrics = {
@@ -324,6 +333,32 @@ export function TenantOverview({
         tabletStorageUsed: tabletStorage,
         tabletStorageLimit,
     };
+
+    const metricOverview = React.useMemo(() => {
+        return getTenantOverviewMetrics({
+            blobStorageStats,
+            coresTotal: CoresTotal,
+            hasTenant: Boolean(tenant),
+            isServerless,
+            memoryStats,
+            networkThroughput,
+            networkUtilization,
+            poolsStats,
+            storageMetricStats,
+            tabletStorageStats,
+        });
+    }, [
+        blobStorageStats,
+        CoresTotal,
+        isServerless,
+        memoryStats,
+        networkThroughput,
+        networkUtilization,
+        poolsStats,
+        storageMetricStats,
+        tabletStorageStats,
+        tenant,
+    ]);
 
     const links = getInfoTabLinks(additionalTenantProps, Name, Type);
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();
@@ -366,13 +401,7 @@ export function TenantOverview({
                         })}
                         <QueriesActivityBar database={database} />
                         <MetricsTabs
-                            poolsCpuStats={poolsStats}
-                            memoryStats={memoryStats}
-                            storageMetricStats={storageMetricStats}
-                            blobStorageStats={blobStorageStats}
-                            tabletStorageStats={tabletStorageStats}
-                            networkUtilization={networkUtilization}
-                            coresTotal={CoresTotal}
+                            metrics={metricOverview.tabs}
                             databaseType={Type}
                             activeTab={activeMetricsTab}
                         />
@@ -385,6 +414,7 @@ export function TenantOverview({
                         database,
                         databaseFullPath,
                         databaseType: Type,
+                        metricPageSummaries: metricOverview.summaries,
                         memoryLimit: tenant?.MemoryLimit,
                         memoryStats: tenant?.MemoryStats,
                         memoryUsed: tenant?.MemoryUsed,

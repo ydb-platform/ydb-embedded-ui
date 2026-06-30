@@ -7,6 +7,8 @@ import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/
 import type {ETenantType} from '../../../../../types/api/tenant';
 import {useTypedDispatch} from '../../../../../utils/hooks';
 import {useDiagnosticsPageLinkGetter} from '../../../Diagnostics/DiagnosticsPages';
+import {MetricPageSummary} from '../MetricPageSummary/MetricPageSummary';
+import type {MetricPageSummaryData} from '../MetricPageSummary/MetricPageSummary';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
@@ -21,9 +23,15 @@ interface TenantCpuProps {
     database: string;
     databaseFullPath: string;
     databaseType?: ETenantType;
+    metricSummary?: MetricPageSummaryData;
 }
 
-export function TenantCpu({database, databaseType, databaseFullPath}: TenantCpuProps) {
+export function TenantCpu({
+    database,
+    databaseType,
+    databaseFullPath,
+    metricSummary,
+}: TenantCpuProps) {
     const dispatch = useTypedDispatch();
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 
@@ -35,6 +43,9 @@ export function TenantCpu({database, databaseType, databaseFullPath}: TenantCpuP
 
     return (
         <Flex direction="column" gap={4}>
+            {metricSummary ? (
+                <MetricPageSummary dataQa="tenant-page-metric-summary-cpu" {...metricSummary} />
+            ) : null}
             {!isServerless && (
                 <React.Fragment>
                     <TenantDashboard database={database} charts={cpuDashboardConfig} />

@@ -5,6 +5,8 @@ import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/
 import {cn} from '../../../../../utils/cn';
 import {useSetting} from '../../../../../utils/hooks';
 import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
+import {MetricPageSummary} from '../MetricPageSummary/MetricPageSummary';
+import type {MetricPageSummaryData} from '../MetricPageSummary/MetricPageSummary';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
@@ -19,9 +21,10 @@ const b = cn('tenant-network');
 
 interface TenantNetworkProps {
     database: string;
+    metricSummary?: MetricPageSummaryData;
 }
 
-export function TenantNetwork({database}: TenantNetworkProps) {
+export function TenantNetwork({database, metricSummary}: TenantNetworkProps) {
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
     const [networkTableEnabled] = useSetting(SETTING_KEYS.ENABLE_NETWORK_TABLE);
 
@@ -33,6 +36,9 @@ export function TenantNetwork({database}: TenantNetworkProps) {
 
     return (
         <Flex direction="column" gap={4} className={b()}>
+            {metricSummary ? (
+                <MetricPageSummary dataQa="tenant-page-metric-summary-network" {...metricSummary} />
+            ) : null}
             <TenantDashboard database={database} charts={networkDashboardConfig} />
             <StatsWrapper title={i18n('title_nodes-by-ping')} allEntitiesLink={allNodesLink}>
                 <TopNodesByPing database={database} />

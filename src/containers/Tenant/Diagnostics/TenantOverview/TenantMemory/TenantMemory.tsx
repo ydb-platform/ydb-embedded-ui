@@ -5,6 +5,8 @@ import type {TMemoryStats} from '../../../../../types/api/nodes';
 import {cn} from '../../../../../utils/cn';
 import {formatStorageValuesToGb} from '../../../../../utils/dataFormatters/dataFormatters';
 import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
+import {MetricPageSummary} from '../MetricPageSummary/MetricPageSummary';
+import type {MetricPageSummaryData} from '../MetricPageSummary/MetricPageSummary';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
@@ -20,11 +22,18 @@ interface TenantMemoryProps {
     memoryStats?: TMemoryStats;
     memoryUsed?: string;
     memoryLimit?: string;
+    metricSummary?: MetricPageSummaryData;
 }
 
 const b = cn('tenant-memory');
 
-export function TenantMemory({database, memoryStats, memoryUsed, memoryLimit}: TenantMemoryProps) {
+export function TenantMemory({
+    database,
+    memoryStats,
+    memoryUsed,
+    memoryLimit,
+    metricSummary,
+}: TenantMemoryProps) {
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
     const renderMemoryDetails = () => {
         if (memoryStats) {
@@ -58,6 +67,13 @@ export function TenantMemory({database, memoryStats, memoryUsed, memoryLimit}: T
 
     return (
         <div className={b()}>
+            {metricSummary ? (
+                <MetricPageSummary
+                    className={b('metric-summary')}
+                    dataQa="tenant-page-metric-summary-memory"
+                    {...metricSummary}
+                />
+            ) : null}
             <TenantDashboard database={database} charts={memoryDashboardConfig} />
             {renderMemoryDetails()}
 

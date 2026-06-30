@@ -1,9 +1,10 @@
 import {Link} from 'react-router-dom';
 
 import {cn} from '../../../../../../utils/cn';
+import {MetricTabCard} from '../../TabCard/MetricTabCard';
 import {ServerlessTabCard} from '../../TabCard/ServerlessTabCard';
-import {UsageTabCard} from '../../TabCard/UsageTabCard';
 import i18n from '../../i18n';
+import type {MetricTabPresentation} from '../../metricPresentation';
 
 import '../MetricsTabs.scss';
 
@@ -13,7 +14,7 @@ interface CpuTabProps {
     to: string;
     active: boolean;
     isServerless: boolean;
-    cpu: {totalUsed: number; totalLimit: number};
+    cpu: MetricTabPresentation;
 }
 
 export function CpuTab({to, active, isServerless, cpu}: CpuTabProps) {
@@ -28,10 +29,10 @@ export function CpuTab({to, active, isServerless, cpu}: CpuTabProps) {
                         helpText={i18n('context_cpu-description')}
                     />
                 ) : (
-                    <UsageTabCard
+                    <MetricTabCard
                         title={i18n('title_cpu')}
-                        value={cpu.totalUsed}
-                        limit={cpu.totalLimit}
+                        status={cpu.status}
+                        value={cpu.percentText}
                         active={active}
                         description={i18n('context_cpu-tab-description')}
                     />
