@@ -10,9 +10,7 @@ export interface TopicFormValues {
     path?: string;
     name?: string;
     shards: number;
-    partitionCountLimit?: number;
     writeQuotaBytes: number;
-    preservePartitionCountLimit?: boolean;
     autoPartitioning: {
         enabled: boolean;
         mode: string;
@@ -60,13 +58,7 @@ function buildTopicSettings(
         includeDisabledAutoPartitioningStrategy = true,
     }: {includeDisabledAutoPartitioningStrategy?: boolean} = {},
 ): string[] {
-    const {
-        shards,
-        writeQuotaBytes,
-        partitionCountLimit,
-        preservePartitionCountLimit,
-        autoPartitioning,
-    } = formData;
+    const {shards, writeQuotaBytes, autoPartitioning} = formData;
 
     const settings: string[] = [];
 
@@ -78,14 +70,6 @@ function buildTopicSettings(
     if (autoPartitioning.enabled) {
         if (autoPartitioning.maxPartitions !== undefined) {
             settings.push(`MAX_ACTIVE_PARTITIONS = ${autoPartitioning.maxPartitions}`);
-        }
-    } else {
-        if (preservePartitionCountLimit) {
-            if (partitionCountLimit !== undefined) {
-                settings.push(`PARTITION_COUNT_LIMIT = ${partitionCountLimit}`);
-            }
-        } else {
-            settings.push(`PARTITION_COUNT_LIMIT = ${shards}`);
         }
     }
 

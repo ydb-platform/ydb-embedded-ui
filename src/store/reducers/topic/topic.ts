@@ -251,13 +251,7 @@ export const selectTopicFormValues = createSelector(
             10,
         );
         const maxActivePartitions = parseInt(
-            topicData.partitioning_settings?.max_active_partitions ??
-                topicData.partitioning_settings?.partition_count_limit ??
-                '0',
-            10,
-        );
-        const parsedPartitionCountLimit = parseInt(
-            topicData.partitioning_settings?.partition_count_limit ?? '',
+            topicData.partitioning_settings?.max_active_partitions ?? '0',
             10,
         );
         const parsedWriteQuotaBytes = parseInt(
@@ -268,9 +262,6 @@ export const selectTopicFormValues = createSelector(
         const writeQuotaBytes = Number.isFinite(parsedWriteQuotaBytes)
             ? parsedWriteQuotaBytes
             : DEFAULT_WRITE_QUOTA_BYTES;
-        const partitionCountLimit = Number.isFinite(parsedPartitionCountLimit)
-            ? parsedPartitionCountLimit
-            : undefined;
         const autoPartitioningSettings =
             topicData.partitioning_settings?.auto_partitioning_settings;
         const autoPartitioningStrategy = String(
@@ -284,7 +275,6 @@ export const selectTopicFormValues = createSelector(
         return {
             name: topicData.self?.name,
             shards: minActivePartitions,
-            partitionCountLimit,
             writeQuotaBytes,
             autoPartitioning: {
                 enabled: autoPartitioningEnabled,

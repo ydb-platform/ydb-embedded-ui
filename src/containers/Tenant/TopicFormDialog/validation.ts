@@ -121,9 +121,9 @@ export function getTopicFormValidationSchema(minPartitions: number) {
                 if (
                     minValue !== undefined &&
                     autoPartitioning.maxPartitions !== undefined &&
-                    autoPartitioning.maxPartitions <= minValue
+                    autoPartitioning.maxPartitions < minValue
                 ) {
-                    addIssue(ctx, maxPath, i18n('error_more-than-number', {count: minValue}));
+                    addIssue(ctx, maxPath, i18n('error_min-number', {count: minValue}));
                 }
             }
 

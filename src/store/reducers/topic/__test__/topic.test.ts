@@ -58,7 +58,6 @@ describe('topic selectors', () => {
         expect(result).toEqual({
             name: 'topic-a',
             shards: 3,
-            partitionCountLimit: undefined,
             writeQuotaBytes: 262144,
             autoPartitioning: {
                 enabled: true,
@@ -71,7 +70,7 @@ describe('topic selectors', () => {
         });
     });
 
-    test('selectTopicFormValues ignores backend retention fields for legacy topics', async () => {
+    test('selectTopicFormValues keeps fixed-partition topics on YDB defaults', async () => {
         const result = await seedTopicResult({
             self: {name: 'topic-legacy'},
             retention_period: {seconds: '86400'},
@@ -79,7 +78,6 @@ describe('topic selectors', () => {
             partition_write_speed_bytes_per_second: '1048576',
             partitioning_settings: {
                 min_active_partitions: '2',
-                partition_count_limit: '5',
                 auto_partitioning_settings: {
                     strategy: AutoPartitioningStrategy.Disabled,
                 },
@@ -89,13 +87,12 @@ describe('topic selectors', () => {
         expect(result).toEqual({
             name: 'topic-legacy',
             shards: 2,
-            partitionCountLimit: 5,
             writeQuotaBytes: 1048576,
             autoPartitioning: {
                 enabled: false,
                 mode: AutoPartitioningStrategy.Disabled,
                 minPartitions: 2,
-                maxPartitions: 5,
+                maxPartitions: undefined,
                 stabilizationWindow: undefined,
                 upUtilization: undefined,
             },
@@ -110,7 +107,7 @@ describe('topic selectors', () => {
             partition_write_speed_bytes_per_second: 'broken',
             partitioning_settings: {
                 min_active_partitions: '1',
-                partition_count_limit: 'oops',
+                max_active_partitions: 'oops',
                 auto_partitioning_settings: {
                     strategy: AutoPartitioningStrategy.Unspecified,
                 },
@@ -120,7 +117,6 @@ describe('topic selectors', () => {
         expect(result).toEqual({
             name: 'topic-b',
             shards: 1,
-            partitionCountLimit: undefined,
             writeQuotaBytes: 1024 * 1024,
             autoPartitioning: {
                 enabled: false,

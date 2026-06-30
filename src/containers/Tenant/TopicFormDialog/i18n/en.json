@@ -28,7 +28,7 @@
   "context_auto-partitioning-stabilization-window": "The period of time after a load change when the number of partitions will change",
   "context_auto-partitioning-up-utilization": "The threshold at which the number of partitions increases",
 
-  "confirm_auto-partitioning-message": "The Kafka protocol does not support topic autopartitioning. If you enable autopartitioning, you will not be able to work with the topics you create using the Kafka protocol. You can not disabling autopartitioning for a specific topic.",
+  "confirm_auto-partitioning-message": "The Kafka protocol does not support topic autopartitioning. If you enable autopartitioning, you will not be able to work with the topics you create using the Kafka protocol. You cannot disable autopartitioning for a specific topic.",
 
   "value_auto-partitioning-scale-up": "Scale up",
   "value_auto-partitioning-paused": "Paused",

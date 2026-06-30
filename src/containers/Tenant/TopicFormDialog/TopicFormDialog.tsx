@@ -322,7 +322,7 @@ function TopicForm({
         setValue,
         trigger,
         watch,
-        formState: {dirtyFields, errors},
+        formState: {errors},
     } = useForm<TopicFormValues>({
         defaultValues: initialValues,
         resolver: zodResolver(validationSchema),
@@ -387,17 +387,7 @@ function TopicForm({
     }, [autoPartitioningEnabled, maxPartitions, minPartitions, shards, writeQuotaBytes]);
 
     const handleTopicSubmit = handleSubmit(async (data) => {
-        const preservePartitionCountLimit =
-            mode === 'update' &&
-            !data.autoPartitioning.enabled &&
-            !dirtyFields.shards &&
-            !dirtyFields.autoPartitioning?.enabled;
-
-        const preparedData = {
-            ...data,
-            partitionCountLimit: initialValues.partitionCountLimit,
-            ...(preservePartitionCountLimit ? {preservePartitionCountLimit} : {}),
-        };
+        const preparedData = data;
 
         try {
             if (mode === 'create') {
@@ -755,11 +745,11 @@ function TopicForm({
                                                         if (
                                                             value !== undefined &&
                                                             maxPartitions !== undefined &&
-                                                            maxPartitions <= value
+                                                            maxPartitions < value
                                                         ) {
                                                             setValue(
                                                                 'autoPartitioning.maxPartitions',
-                                                                value + 1,
+                                                                value,
                                                             );
                                                         }
                                                         trigger('autoPartitioning.maxPartitions');

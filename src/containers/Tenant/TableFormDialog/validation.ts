@@ -263,7 +263,8 @@ function validatePartitionsAtKeys(data: FormValues, ctx: z.RefinementCtx) {
     if (!partitionsAtKeys || partitionsAtKeys.length === 0) {
         return;
     }
-    const pkColumnCount = data.columns.filter(({key}) => Boolean(key)).length;
+    const pkColumns = data.columns.filter(({key}) => Boolean(key));
+    const pkColumnCount = pkColumns.length;
 
     const allHaveLengthOne = partitionsAtKeys.every(
         (point: Array<{value: string | null}>) =>
@@ -274,6 +275,27 @@ function validatePartitionsAtKeys(data: FormValues, ctx: z.RefinementCtx) {
             point.length === pkColumnCount && point.every((p) => Boolean(p.value)),
     );
     if (!allHaveLengthOne && !allHaveLengthPk) {
+        addIssue(ctx, ['settings', 'partitionsAtKeys'], i18n('error_partitions-at-keys-invalid'));
+        return;
+    }
+
+    const matchesCurrentPrimaryKey = partitionsAtKeys.every((point) => {
+        const currentColumns = point.length === 1 ? pkColumns.slice(0, 1) : pkColumns;
+
+        return point.every((column, index) => {
+            const currentColumn = currentColumns[index];
+
+            return (
+                Boolean(currentColumn) &&
+                Boolean(column.value) &&
+                column.name === currentColumn.name &&
+                column.type === currentColumn.type &&
+                isValueForTypeValid(String(column.value), currentColumn.type)
+            );
+        });
+    });
+
+    if (!matchesCurrentPrimaryKey) {
         addIssue(ctx, ['settings', 'partitionsAtKeys'], i18n('error_partitions-at-keys-invalid'));
     }
 }

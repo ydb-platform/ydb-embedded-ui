@@ -57,7 +57,27 @@ describe('TopicFormDialog validation', () => {
         expect(getIssuePaths(result)).toContain('name');
     });
 
-    test('validates auto-partitioning bounds and required fields', () => {
+    test('allows equal auto-partitioning bounds', () => {
+        const schema = getTopicFormValidationSchema(3);
+
+        const result = schema.safeParse(
+            createValidValues({
+                shards: 3,
+                autoPartitioning: {
+                    enabled: true,
+                    mode: AutoPartitioningStrategy.ScaleUp,
+                    minPartitions: 3,
+                    maxPartitions: 3,
+                    stabilizationWindow: 300,
+                    upUtilization: 90,
+                },
+            }),
+        );
+
+        expect(result.success).toBe(true);
+    });
+
+    test('validates auto-partitioning minimum and required fields', () => {
         const schema = getTopicFormValidationSchema(3);
 
         const result = schema.safeParse(
@@ -79,7 +99,6 @@ describe('TopicFormDialog validation', () => {
             expect.arrayContaining([
                 'shards',
                 'autoPartitioning.minPartitions',
-                'autoPartitioning.maxPartitions',
                 'autoPartitioning.stabilizationWindow',
                 'autoPartitioning.upUtilization',
             ]),

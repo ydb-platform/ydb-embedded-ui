@@ -336,6 +336,36 @@ describe('TableFormDialog validation', () => {
         expect(getIssuePaths(result)).toContain('settings.partitionsAtKeys');
     });
 
+    test('explicit partition split points must match current primary key columns', () => {
+        const schema = buildTableValidationSchema({mode: 'create'});
+
+        const result = schema.safeParse(
+            createValues({
+                columns: [createColumn({type: 'Utf8'})],
+                settings: {
+                    partitionsType: PartitionsType.Explicit,
+                    partitionsAtKeys: [
+                        [
+                            {
+                                id: 'split-point-id',
+                                name: 'id',
+                                type: 'Int64',
+                                key: true,
+                                notNull: true,
+                                isDefined: true,
+                                value: '42',
+                            } as never,
+                        ],
+                    ],
+                    ttl: {status: 'disabled'},
+                },
+            }),
+        );
+
+        expect(result.success).toBe(false);
+        expect(getIssuePaths(result)).toContain('settings.partitionsAtKeys');
+    });
+
     test('uniform partitions require Uint32 or Uint64 as the first primary key column', () => {
         const schema = buildTableValidationSchema({mode: 'create'});
 
