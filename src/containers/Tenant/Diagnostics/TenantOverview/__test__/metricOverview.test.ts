@@ -1,5 +1,6 @@
 import {EFlag} from '../../../../../types/api/enums';
 import {EType} from '../../../../../types/api/tenant';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {getTenantOverviewMetrics, selectStorageStatsForMetricCard} from '../metricOverview';
 
 describe('selectStorageStatsForMetricCard', () => {
@@ -142,6 +143,26 @@ describe('getTenantOverviewMetrics', () => {
             percentText: '42%',
             progressTheme: 'success',
             progressValue: 42,
+            valueText: undefined,
+        });
+    });
+
+    test('omits memory summary value text when memory limit is missing', () => {
+        const metrics = getTenantOverviewMetrics({
+            hasTenant: true,
+            isServerless: false,
+            poolsStats: [{name: 'System', used: 5, limit: 100}],
+            memoryStats: [{used: 536_870_912, limit: undefined}],
+            storageMetricStats: [{used: 900, limit: 1_000}],
+        });
+
+        expect(metrics.tabs.memory).toEqual({
+            percentText: 'N/A',
+            status: EFlag.Grey,
+        });
+        expect(metrics.summaries.memory?.presentation).toEqual({
+            percentText: EMPTY_DATA_PLACEHOLDER,
+            progressValue: 0,
             valueText: undefined,
         });
     });

@@ -161,6 +161,13 @@ export function getTenantOverviewMetrics({
     }
 
     const networkSummary = getNetworkMetricSummary({networkThroughput, networkUtilization});
+    const memoryValueText =
+        memoryMetrics.totalLimit > 0
+            ? formatStorageLegend({
+                  value: memoryMetrics.totalUsed,
+                  capacity: memoryMetrics.totalLimit,
+              })
+            : undefined;
 
     return {
         summaries: {
@@ -178,10 +185,7 @@ export function getTenantOverviewMetrics({
                 description: i18n('context_memory-description'),
                 presentation: getMetricPageSummaryPresentation({
                     usagePercent: memoryUsagePercent,
-                    valueText: formatStorageLegend({
-                        value: memoryMetrics.totalUsed,
-                        capacity: memoryMetrics.totalLimit,
-                    }),
+                    valueText: memoryValueText,
                 }),
             },
             network: networkSummary,
