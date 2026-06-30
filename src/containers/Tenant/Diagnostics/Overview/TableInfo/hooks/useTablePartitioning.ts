@@ -35,6 +35,7 @@ export function useTablePartitioning(
         reachMetricaGoal('openManagePartitioning');
         openManagePartitioningDialog({
             initialValue: managePartitioningDialogConfig,
+            database,
             onApply: async (value) => {
                 reachMetricaGoal('applyManagePartitioning');
                 await updatePartitioning(

@@ -6,6 +6,10 @@
         padding-bottom: 0;
     }
 
+    &__loader {
+        min-height: 200px;
+    }
+
     &__row {
         width: 100%;
     }

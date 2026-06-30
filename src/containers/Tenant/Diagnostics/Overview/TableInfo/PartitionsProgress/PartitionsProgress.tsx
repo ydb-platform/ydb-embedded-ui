@@ -1,8 +1,12 @@
-import {Flex, Popover, Text} from '@gravity-ui/uikit';
+import React from 'react';
+
+import {Flex, HelpMark, Popover, Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
+import {LinkWithIcon} from '../../../../../../components/LinkWithIcon/LinkWithIcon';
 import {cn} from '../../../../../../utils/cn';
 import {formatNumber} from '../../../../../../utils/dataFormatters/dataFormatters';
+import {getDocsLink} from '../../../../../../utils/docs';
 
 import {getPartitionsTooltip} from './helpers';
 import i18n from './i18n';
@@ -75,15 +79,26 @@ export const PartitionsProgress = ({
         isAboveMax: isAboveMax,
     });
 
+    const [isHelpHovered, setIsHelpHovered] = React.useState(false);
+
+    const docsLink = getDocsLink('autoPartitioningMaxPartitionsCount');
+
     const minLabel = formatNumber(min);
-    const maxLabel = isNil(max) ? i18n('value_no-limit') : formatNumber(max);
+    const hasNoLimit = isNil(max);
+    const maxLabel = hasNoLimit ? i18n('value_default') : formatNumber(max);
     const currentLabel = formatNumber(partitionsCount);
 
     const hasAdditionalSegments = isBelowMin || isAboveMax;
     const withMinFill = !hasAdditionalSegments;
 
     return (
-        <Popover hasArrow placement="top" content={tooltip} className={b('segment-touched')}>
+        <Popover
+            hasArrow
+            placement="top"
+            content={tooltip}
+            className={b('segment-touched')}
+            disabled={isHelpHovered}
+        >
             <Flex alignItems="center" gap="0.5" className={b(null, className)}>
                 {isBelowMin && (
                     <Flex
@@ -118,9 +133,27 @@ export const PartitionsProgress = ({
                         <Text variant="body-2" color="secondary">
                             {minLabel}
                         </Text>
-                        <Text variant="body-2" color="secondary">
-                            {maxLabel}
-                        </Text>
+                        <Flex alignItems="center" gap="1">
+                            <Text variant="body-2" color="secondary">
+                                {maxLabel}
+                            </Text>
+                            {hasNoLimit ? (
+                                <HelpMark
+                                    onMouseEnter={() => setIsHelpHovered(true)}
+                                    onMouseLeave={() => setIsHelpHovered(false)}
+                                >
+                                    <Flex direction="column" gap="2">
+                                        {i18n('context_no-limit')}
+                                        {docsLink ? (
+                                            <LinkWithIcon
+                                                url={docsLink}
+                                                title={i18n('action_learn-more')}
+                                            />
+                                        ) : null}
+                                    </Flex>
+                                </HelpMark>
+                            ) : null}
+                        </Flex>
                     </Flex>
                 </Flex>
 
