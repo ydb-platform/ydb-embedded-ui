@@ -50,6 +50,12 @@ function getPercentText(usagePercent: number) {
     return formatPercent(usagePercent / 100, getMetricPercentPrecision(usagePercent));
 }
 
+function getProgressValue(usagePercent: number) {
+    const clampedValue = Math.min(Math.max(usagePercent, 0), 100);
+
+    return Number(clampedValue.toFixed(getMetricPercentPrecision(clampedValue)));
+}
+
 export function getMetricTabPresentation({
     dangerThreshold,
     usagePercent,
@@ -97,7 +103,7 @@ export function getMetricPageSummaryPresentation({
     return {
         percentText: getPercentText(usagePercent),
         progressTheme: ProgressStatusToTheme[progressStatus],
-        progressValue: Math.min(Math.max(usagePercent, 0), 100),
+        progressValue: getProgressValue(usagePercent),
         valueText,
     };
 }

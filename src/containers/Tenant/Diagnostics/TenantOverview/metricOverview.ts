@@ -98,12 +98,7 @@ function getNetworkMetricSummary({
 }: Pick<GetTenantOverviewMetricsParams, 'networkThroughput' | 'networkUtilization'>):
     | MetricPageSummaryData
     | undefined {
-    if (
-        networkThroughput === undefined ||
-        !Number.isFinite(networkThroughput) ||
-        networkUtilization === undefined ||
-        !Number.isFinite(networkUtilization)
-    ) {
+    if (networkUtilization === undefined || !Number.isFinite(networkUtilization)) {
         return undefined;
     }
 
