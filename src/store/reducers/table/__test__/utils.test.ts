@@ -16,6 +16,7 @@ describe('table utils', () => {
     test('prepareColumnValue handles nulls, params, escaped strings, json documents, dates and uuid values', () => {
         expect(prepareColumnValue({type: 'Utf8'} as never, null)).toBe('null');
         expect(prepareColumnValue({type: 'Int64'} as never, '$value')).toBe('$value');
+        expect(prepareColumnValue({type: 'Utf8'} as never, '$value')).toBe('"$value"');
         expect(prepareColumnValue({type: 'Utf8'} as never, 'line\n"quoted"')).toBe(
             '"line\\u000a\\"quoted\\""',
         );
@@ -82,6 +83,38 @@ describe('table utils', () => {
         expect(query).toContain('AUTO_PARTITIONING_PARTITION_SIZE_MB = 2048');
         expect(query).toContain('KEY_BLOOM_FILTER = ENABLED');
         expect(query).toContain('TTL = Interval("P1DT1H") ON `createdAt`');
+    });
+
+    test('buildCreateTableQuery quotes explicit split-point strings that start with dollar signs', () => {
+        const query = buildCreateTableQuery({
+            tableName: 'folder/orders',
+            columns: [
+                {
+                    name: 'tenant',
+                    type: 'Utf8',
+                    key: true,
+                    notNull: true,
+                },
+            ],
+            settings: {
+                partitionsType: PartitionsType.Explicit,
+                partitionsAtKeys: [
+                    [
+                        {
+                            id: 'split-point-1',
+                            name: 'tenant',
+                            type: 'Utf8',
+                            key: true,
+                            notNull: true,
+                            isDefined: true,
+                            value: '$tenant',
+                        },
+                    ],
+                ],
+            },
+        });
+
+        expect(query).toContain('PARTITION_AT_KEYS = (("$tenant"))');
     });
 
     test('prepareYdbCreateQueryColumns ignores hidden defaults for key and autoincrement columns', () => {

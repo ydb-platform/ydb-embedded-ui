@@ -94,10 +94,6 @@ export function prepareColumnValue(column: Column, value: string | null) {
         return 'null';
     }
 
-    if (value.startsWith('$')) {
-        return value;
-    }
-
     switch (column.type) {
         case 'String':
         case 'Utf8':
@@ -106,6 +102,15 @@ export function prepareColumnValue(column: Column, value: string | null) {
         }
         case 'JsonDocument':
             return `JsonDocument(${prepareStringLiteralValue(value)})`;
+        default:
+            break;
+    }
+
+    if (value.startsWith('$')) {
+        return value;
+    }
+
+    switch (column.type) {
         case 'Date':
         case 'Date32':
         case 'Datetime':
