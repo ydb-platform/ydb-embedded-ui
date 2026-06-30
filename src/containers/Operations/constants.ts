@@ -46,3 +46,8 @@ export const OPERATION_KINDS: {value: OperationKind; content: string}[] = [
     {value: 'incbackup', content: i18n('kind_incbackup')},
     {value: 'restore', content: i18n('kind_restore')},
 ];
+
+export const ANALYZE_OPERATION_KIND: {value: OperationKind; content: string} = {
+    value: 'analyze',
+    content: i18n('kind_analyze'),
+};

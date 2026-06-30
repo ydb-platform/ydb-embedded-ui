@@ -1,6 +1,11 @@
 import {createSelector} from '@reduxjs/toolkit';
 
-import type {Capability, MetaCapability, SecuritySetting} from '../../../types/api/capabilities';
+import type {
+    Capability,
+    FeatureSetting,
+    MetaCapability,
+    SecuritySetting,
+} from '../../../types/api/capabilities';
 import {serializeReduxError} from '../../../utils/errors/serializeReduxError';
 import type {AppDispatch, RootState} from '../../defaultStore';
 
@@ -64,6 +69,14 @@ export const selectSecuritySetting = createSelector(
     (_state: RootState, _setting: SecuritySetting, database?: string) => database,
     (state, setting, database) =>
         selectDatabaseCapabilities(state, database).data?.Settings?.Security?.[setting],
+);
+
+export const selectFeatureSetting = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, setting: FeatureSetting) => setting,
+    (_state: RootState, _setting: FeatureSetting, database?: string) => database,
+    (state, setting, database) =>
+        selectDatabaseCapabilities(state, database).data?.Settings?.Features?.[setting],
 );
 
 export const selectGraphShardExists = createSelector(
