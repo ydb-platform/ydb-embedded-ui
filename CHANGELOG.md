@@ -1,5 +1,18 @@
 # Changelog
 
+## [18.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v17.2.0...v18.0.0) (2026-06-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* update zod and add configuration ([#4062](https://github.com/ydb-platform/ydb-embedded-ui/issues/4062))
+
+### Features
+
+* improve visual affordance of horizontal tabs ([#4065](https://github.com/ydb-platform/ydb-embedded-ui/issues/4065)) ([55b0409](https://github.com/ydb-platform/ydb-embedded-ui/commit/55b04094a01d9cb2e093c1a88fc140b46dd68211))
+* partitioning settings improvements ([#4067](https://github.com/ydb-platform/ydb-embedded-ui/issues/4067)) ([838e82e](https://github.com/ydb-platform/ydb-embedded-ui/commit/838e82e6f28f8e9d9cd6cd85a4d9517556756f0d))
+* update zod and add configuration ([#4062](https://github.com/ydb-platform/ydb-embedded-ui/issues/4062)) ([5103c45](https://github.com/ydb-platform/ydb-embedded-ui/commit/5103c45f0cc3c23175a742e25368f9afa5c06ddf))
+
 ## [17.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v17.1.0...v17.2.0) (2026-06-26)
 
 
