@@ -28,10 +28,6 @@ export function MetricPageSummary({
 }: MetricPageSummaryProps) {
     const {percentText, progressTheme, progressValue, valueText} = presentation;
     const hasValueText = valueText !== undefined;
-    const progressStyle = {
-        '--metric-page-summary-progress-value': progressValue,
-        '--metric-page-summary-progress-fill': `${progressValue}%`,
-    } as React.CSSProperties;
 
     return (
         <div className={b(null, className)} data-qa={dataQa}>
@@ -64,7 +60,11 @@ export function MetricPageSummary({
                         full: progressValue >= 100,
                     })}
                     data-qa="tenant-page-metric-summary-progress"
-                    style={progressStyle}
+                    style={
+                        {
+                            '--metric-page-summary-progress-fill': `${progressValue}%`,
+                        } as React.CSSProperties
+                    }
                 >
                     <div className={b('progress-fill')} />
                     <div className={b('progress-rest')} />

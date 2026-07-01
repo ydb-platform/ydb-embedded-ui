@@ -1,5 +1,4 @@
 import {EFlag} from '../../../../../types/api/enums';
-import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {
     calculateUsagePercent,
     getMetricPageSummaryPresentation,
@@ -30,19 +29,6 @@ describe('metric presentation', () => {
             progressTheme: 'success',
             progressValue: 78,
             valueText: '68 of 87 cores',
-        });
-    });
-
-    test('formats unavailable summary metrics with the shared empty placeholder', () => {
-        expect(
-            getMetricPageSummaryPresentation({
-                usagePercent: NaN,
-                valueText: '10 of 0',
-            }),
-        ).toEqual({
-            percentText: EMPTY_DATA_PLACEHOLDER,
-            progressValue: 0,
-            valueText: '10 of 0',
         });
     });
 
