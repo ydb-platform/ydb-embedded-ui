@@ -161,6 +161,13 @@ export function getTenantOverviewMetrics({
     }
 
     const networkSummary = getNetworkMetricSummary({networkThroughput, networkUtilization});
+    const cpuValueText =
+        cpuLimit > 0
+            ? formatCoresLegend({
+                  value: cpuMetrics.totalUsed,
+                  capacity: cpuLimit,
+              })
+            : undefined;
     const memoryValueText =
         memoryMetrics.totalLimit > 0
             ? formatStorageLegend({
@@ -175,10 +182,7 @@ export function getTenantOverviewMetrics({
                 description: i18n('context_cpu-description'),
                 presentation: getMetricPageSummaryPresentation({
                     usagePercent: cpuUsagePercent,
-                    valueText: formatCoresLegend({
-                        value: cpuMetrics.totalUsed,
-                        capacity: cpuLimit,
-                    }),
+                    valueText: cpuValueText,
                 }),
             },
             memory: {

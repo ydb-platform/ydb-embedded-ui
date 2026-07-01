@@ -167,6 +167,26 @@ describe('getTenantOverviewMetrics', () => {
         });
     });
 
+    test('omits cpu summary value text when cpu limit is missing', () => {
+        const metrics = getTenantOverviewMetrics({
+            hasTenant: true,
+            isServerless: false,
+            poolsStats: [{name: 'System', used: 5, limit: undefined}],
+            memoryStats: [{used: 50, limit: 100}],
+            storageMetricStats: [{used: 900, limit: 1_000}],
+        });
+
+        expect(metrics.tabs.cpu).toEqual({
+            percentText: 'N/A',
+            status: EFlag.Grey,
+        });
+        expect(metrics.summaries.cpu?.presentation).toEqual({
+            percentText: EMPTY_DATA_PLACEHOLDER,
+            progressValue: 0,
+            valueText: undefined,
+        });
+    });
+
     test('omits page summaries for serverless but keeps tab metrics', () => {
         const metrics = getTenantOverviewMetrics({
             hasTenant: true,
