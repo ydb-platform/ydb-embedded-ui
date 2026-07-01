@@ -1,3 +1,4 @@
+import {MAX_PARTITION_SIZE_MB} from '../constants';
 import type {Column, FormValues, OriginalTableInfo} from '../types';
 import {PartitionsType} from '../types';
 import {buildTableValidationSchema} from '../validation';
@@ -31,7 +32,7 @@ describe('TableFormDialog validation', () => {
                 partitionsAtKeys: [],
                 autoPartitionBySize: true,
                 autoPartitionByLoad: false,
-                autoPartitionBySizeMb: 2000,
+                autoPartitionBySizeMb: MAX_PARTITION_SIZE_MB,
                 keyBloomFilter: false,
                 ttl: {status: 'disabled'},
             },

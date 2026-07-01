@@ -6,7 +6,7 @@ export const ENTITY_RENAME_PATH_REG_EXP = /^\/?[a-zA-Z0-9._-]+(\/[a-zA-Z0-9._-]+
 export const COLUMN_NAME_REG_EXP = /^\w[\w_-]*$/;
 
 export const MIN_PARTITION_SIZE_MB = 10;
-export const MAX_PARTITION_SIZE_MB = 2000;
+export const MAX_PARTITION_SIZE_MB = 2048;
 
 export const MIN_PARTITIONS_COUNT = 1;
 export const MAX_PARTITIONS_COUNT = 35000;
