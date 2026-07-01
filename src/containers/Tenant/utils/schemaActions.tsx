@@ -1,4 +1,14 @@
-import {CirclePlus, Code, Copy, GearPlay, PlugConnection} from '@gravity-ui/icons';
+import {
+    BarsUnaligned,
+    CirclePlus,
+    Code,
+    Copy,
+    Folder,
+    GearPlay,
+    LayoutHeaderCellsLarge,
+    Pencil,
+    PlugConnection,
+} from '@gravity-ui/icons';
 import {Flex, Icon, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import {v4 as uuidv4} from 'uuid';
@@ -19,6 +29,7 @@ import {setDiagnosticsTab, setQueryTab} from '../../../store/reducers/tenant/ten
 import type {TenantPage} from '../../../store/reducers/tenant/types';
 import type {IQueryResult} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
+import {b} from '../ObjectSummary/shared';
 import {transformPath} from '../ObjectSummary/transformPath';
 import type {SchemaData} from '../Schema/SchemaViewer/types';
 import i18n from '../i18n';
@@ -75,6 +86,10 @@ interface ActionsAdditionalParams {
     setTenantPage: (page: TenantPage) => void;
     isMultiTabEnabled?: boolean;
     showCreateDirectoryDialog?: (path: string) => void;
+    showCreateTableDialog?: (path: string) => void;
+    showCreateTopicDialog?: (path: string) => void;
+    showUpdateTableDialog?: (path: string) => void;
+    showUpdateTopicDialog?: (path: string) => void;
     getConfirmation?: () => Promise<boolean>;
     getConnectToDBDialog?: (params: SnippetParams) => Promise<boolean>;
     showCompactionDialog?: (path: string) => void;
@@ -108,6 +123,10 @@ const bindActions = (
         setTenantPage,
         isMultiTabEnabled,
         showCreateDirectoryDialog,
+        showCreateTableDialog,
+        showCreateTopicDialog,
+        showUpdateTableDialog,
+        showUpdateTopicDialog,
         getConfirmation,
         getConnectToDBDialog,
         showCompactionDialog,
@@ -166,6 +185,16 @@ const bindActions = (
                   showCreateDirectoryDialog(params.path);
               }
             : undefined,
+        createTableDialog: showCreateTableDialog
+            ? () => {
+                  showCreateTableDialog(params.path);
+              }
+            : undefined,
+        createTopicDialog: showCreateTopicDialog
+            ? () => {
+                  showCreateTopicDialog(params.path);
+              }
+            : undefined,
         getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.database}),
         openCompactionDialog: () => {
             showCompactionDialog?.(params.path);
@@ -181,6 +210,7 @@ const bindActions = (
             setActivePath(params.path);
         },
         createTable: inputQuery(createTableTemplate, stripEllipsis(i18n('actions.createTable'))),
+        updateTable: () => showUpdateTableDialog?.(params.path),
         createColumnTable: inputQuery(
             createColumnTableTemplate,
             stripEllipsis(i18n('actions.createColumnTable')),
@@ -237,6 +267,7 @@ const bindActions = (
             stripEllipsis(i18n('actions.selectQuery')),
         ),
         createTopic: inputQuery(createTopicTemplate, stripEllipsis(i18n('actions.createTopic'))),
+        updateTopic: () => showUpdateTopicDialog?.(params.path),
         alterTopic: inputQuery(alterTopicTemplate, stripEllipsis(i18n('actions.alterTopic'))),
         dropTopic: inputQuery(dropTopicTemplate, stripEllipsis(i18n('actions.dropTopic'))),
         createView: inputQuery(createViewTemplate, stripEllipsis(i18n('actions.createView'))),
@@ -298,6 +329,19 @@ interface ActionConfig {
     iconStart?: React.ReactNode;
 }
 
+function renderMenuItemText(title: string, description?: string) {
+    if (!description) {
+        return title;
+    }
+
+    return (
+        <div className={b('context-menu-item-content')}>
+            <div className={b('context-menu-item-title')}>{title}</div>
+            <div className={b('context-menu-item-description')}>{description}</div>
+        </div>
+    );
+}
+
 const getActionWithLoader = ({text, action, isLoading, disabled, iconStart}: ActionConfig) => ({
     text: (
         <Flex justifyContent="space-between" alignItems="center">
@@ -347,19 +391,41 @@ export const getActions =
         };
 
         const createEntitiesSet = [
-            {text: i18n('actions.createTable'), action: actions.createTable},
-            {text: i18n('actions.createColumnTable'), action: actions.createColumnTable},
+            {
+                text: i18n('actions.createTable'),
+                action: actions.createTable,
+                iconStart: <Icon data={Code} />,
+            },
+            {
+                text: i18n('actions.createColumnTable'),
+                action: actions.createColumnTable,
+                iconStart: <Icon data={Code} />,
+            },
             {
                 text: i18n('actions.createAsyncReplication'),
                 action: actions.createAsyncReplication,
+                iconStart: <Icon data={Code} />,
             },
             {
                 text: i18n('actions.createTransfer'),
                 action: actions.createTransfer,
+                iconStart: <Icon data={Code} />,
             },
-            {text: i18n('actions.createTopic'), action: actions.createTopic},
-            {text: i18n('actions.createView'), action: actions.createView},
-            {text: i18n('actions.createStreamingQuery'), action: actions.createStreamingQuery},
+            {
+                text: i18n('actions.createTopic'),
+                action: actions.createTopic,
+                iconStart: <Icon data={Code} />,
+            },
+            {
+                text: i18n('actions.createView'),
+                action: actions.createView,
+                iconStart: <Icon data={Code} />,
+            },
+            {
+                text: i18n('actions.createStreamingQuery'),
+                action: actions.createStreamingQuery,
+                iconStart: <Icon data={Code} />,
+            },
         ];
 
         const manageColumnsItem = {text: i18n('actions.manageColumns'), action: actions.alterTable};
@@ -403,15 +469,59 @@ export const getActions =
             DB_SET = [[copyItem, connectToDBItem, monitoringItem], createEntitiesSet];
         }
 
-        if (actions.createDirectory) {
-            const createDirectoryItem = {
-                text: i18n('actions.createDirectory'),
-                action: actions.createDirectory,
-                iconStart: <CirclePlus />,
-            };
+        const createDirectoryItem = actions.createDirectory
+            ? {
+                  text: i18n('entity-name_directory'),
+                  action: actions.createDirectory,
+                  iconStart: <Folder />,
+              }
+            : undefined;
+        const createTableItem = actions.createTableDialog
+            ? {
+                  text: i18n('entity-name_table'),
+                  action: actions.createTableDialog,
+                  iconStart: <LayoutHeaderCellsLarge />,
+              }
+            : undefined;
+        const createTopicItem = actions.createTopicDialog
+            ? {
+                  text: i18n('entity-name_topic'),
+                  action: actions.createTopicDialog,
+                  iconStart: <BarsUnaligned />,
+              }
+            : undefined;
+        const createDialogItems: typeof createEntitiesSet = [];
+        if (createTableItem) {
+            createDialogItems.push(createTableItem);
+        }
+        if (createDirectoryItem) {
+            createDialogItems.push(createDirectoryItem);
+        }
+        if (createTopicItem) {
+            createDialogItems.push(createTopicItem);
+        }
 
-            DB_SET.splice(1, 0, [createDirectoryItem]);
-            DIR_SET.splice(1, 0, [createDirectoryItem]);
+        const createMenuItem = createDialogItems.length
+            ? {
+                  text: renderMenuItemText(
+                      i18n('actions.createMenu'),
+                      i18n('actions.createMenuDescription'),
+                  ),
+                  iconStart: (
+                      <Icon
+                          data={CirclePlus}
+                          className={b('context-menu-item-icon-with-description')}
+                      />
+                  ),
+                  className: b('context-menu-item', {'with-description': true}),
+                  contentClassName: b('context-menu-item-content-wrapper'),
+                  items: createDialogItems,
+              }
+            : undefined;
+
+        if (createMenuItem) {
+            DB_SET.splice(1, 0, [createMenuItem]);
+            DIR_SET.splice(1, 0, [createMenuItem]);
         }
 
         const showCreateTableItem = getActionWithLoader({
@@ -428,8 +538,21 @@ export const getActions =
             disabled: additionalEffects.hasRunningCompaction?.(path),
         });
 
+        const updateTableItem = {
+            text: i18n('actions.updateTable'),
+            action: actions.updateTable,
+            iconStart: <Pencil />,
+        };
+
+        const updateTopicItem = {
+            text: i18n('actions.updateTopic'),
+            action: actions.updateTopic,
+            iconStart: <Pencil />,
+        };
+
         const ROW_TABLE_SET: ActionsSet = [
             [copyItem],
+            [updateTableItem],
             [
                 alterRowTableGroupItem,
                 {text: i18n('actions.dropTable'), action: actions.dropTable},
@@ -455,6 +578,7 @@ export const getActions =
         ];
         const COLUMN_TABLE_SET: ActionsSet = [
             [copyItem],
+            [updateTableItem],
             [
                 alterColumnTableGroupItem,
                 {text: i18n('actions.dropTable'), action: actions.dropTable},
@@ -467,6 +591,7 @@ export const getActions =
 
         const TOPIC_SET: ActionsSet = [
             [copyItem],
+            [updateTopicItem],
             [
                 {text: i18n('actions.alterTopic'), action: actions.alterTopic},
                 {text: i18n('actions.dropTopic'), action: actions.dropTopic},

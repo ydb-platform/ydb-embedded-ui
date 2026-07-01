@@ -6,8 +6,11 @@ import {RowTableAction} from './types';
 
 export class ActionsMenu {
     private menu: Locator;
+    private subMenu: Locator;
+
     constructor(menu: Locator) {
         this.menu = menu;
+        this.subMenu = menu.page().locator('.g-dropdown-menu__sub-menu');
     }
 
     async isVisible(): Promise<boolean> {
@@ -27,6 +30,18 @@ export class ActionsMenu {
     async clickItem(itemText: string): Promise<void> {
         const menuItem = this.menu.locator(`.g-menu__item-content:has-text("${itemText}")`);
         await menuItem.click();
+    }
+
+    async hoverItem(itemText: string): Promise<void> {
+        const menuItem = this.menu.locator(`.g-menu__item:has-text("${itemText}")`);
+        await menuItem.hover();
+    }
+
+    async clickSubMenuItem(parentText: string, childText: string): Promise<void> {
+        await this.hoverItem(parentText);
+        const childItem = this.subMenu.locator(`.g-menu__item-content:has-text("${childText}")`);
+        await childItem.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await childItem.click();
     }
 
     async isItemSelected(itemText: string): Promise<boolean> {

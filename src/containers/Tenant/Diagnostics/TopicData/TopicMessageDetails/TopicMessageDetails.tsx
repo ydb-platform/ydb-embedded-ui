@@ -5,7 +5,7 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
 import {LoaderWrapper} from '../../../../../components/LoaderWrapper/LoaderWrapper';
-import {topicApi} from '../../../../../store/reducers/topic';
+import {topicApi} from '../../../../../store/reducers/topic/topic';
 import type {TopicDataRequest} from '../../../../../types/api/topic';
 import {isResponseError} from '../../../../../utils/response';
 import {safeParseNumber} from '../../../../../utils/utils';

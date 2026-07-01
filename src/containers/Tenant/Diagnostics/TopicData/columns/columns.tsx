@@ -11,7 +11,7 @@ import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus'
 import {MultilineTableHeader} from '../../../../../components/MultilineTableHeader/MultilineTableHeader';
 import type {Column} from '../../../../../components/PaginatedTable';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {TOPIC_MESSAGE_SIZE_LIMIT} from '../../../../../store/reducers/topic';
+import {TOPIC_MESSAGE_SIZE_LIMIT} from '../../../../../store/reducers/topic/topic';
 import type {TopicMessageEnhanced} from '../../../../../types/api/topic';
 import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER, YDB_POPOVER_CLASS_NAME} from '../../../../../utils/constants';

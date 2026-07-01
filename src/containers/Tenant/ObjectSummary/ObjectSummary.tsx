@@ -55,7 +55,6 @@ import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 import {ObjectTree} from './ObjectTree';
 import {SchemaActions} from './SchemaActions';
 import {RefreshTreeButton} from './SchemaTree/RefreshTreeButton';
-import {TreeKeyProvider} from './UpdateTreeContext';
 import i18n from './i18n';
 import {b} from './shared';
 import {isDomain, transformPath} from './transformPath';
@@ -476,51 +475,49 @@ export function ObjectSummary({
 
     const renderContent = () => {
         return (
-            <TreeKeyProvider>
-                <div className={b()}>
-                    <div className={b({hidden: isCollapsed})}>
-                        <SplitPane
-                            direction="vertical"
-                            defaultSizePaneKey={DEFAULT_SIZE_TENANT_SUMMARY_KEY}
-                            onSplitStartDragAdditional={onSplitStartDragAdditional}
-                            triggerCollapse={commonInfoVisibilityState.triggerCollapse}
-                            triggerExpand={commonInfoVisibilityState.triggerExpand}
-                            minSize={[200, 52]}
-                            collapsedSizes={[100, 0]}
-                        >
-                            <ObjectTree
-                                database={database}
-                                path={path}
-                                databaseFullPath={databaseFullPath}
-                            />
-                            <div className={b('info')}>
-                                <div className={b('sticky-top')}>
-                                    <div className={b('info-header')}>
-                                        <div className={b('info-title')}>
-                                            {renderEntityTypeBadge()}
-                                            <div className={b('path-name')}>{relativePath}</div>
-                                        </div>
-                                        <div className={b('info-controls')}>
-                                            {renderCommonInfoControls()}
-                                        </div>
-                                    </div>
-                                    {renderTabs()}
-                                </div>
-                                <div className={b('overview-wrapper')}>{renderTabContent()}</div>
-                            </div>
-                        </SplitPane>
-                    </div>
-                    <Flex className={b('actions')} gap={0.5}>
-                        {!isCollapsed && <RefreshTreeButton />}
-                        <PaneVisibilityToggleButtons
-                            onCollapse={onCollapseSummary}
-                            onExpand={onExpandSummary}
-                            isCollapsed={isCollapsed}
-                            initialDirection="left"
+            <div className={b()}>
+                <div className={b({hidden: isCollapsed})}>
+                    <SplitPane
+                        direction="vertical"
+                        defaultSizePaneKey={DEFAULT_SIZE_TENANT_SUMMARY_KEY}
+                        onSplitStartDragAdditional={onSplitStartDragAdditional}
+                        triggerCollapse={commonInfoVisibilityState.triggerCollapse}
+                        triggerExpand={commonInfoVisibilityState.triggerExpand}
+                        minSize={[200, 52]}
+                        collapsedSizes={[100, 0]}
+                    >
+                        <ObjectTree
+                            database={database}
+                            path={path}
+                            databaseFullPath={databaseFullPath}
                         />
-                    </Flex>
+                        <div className={b('info')}>
+                            <div className={b('sticky-top')}>
+                                <div className={b('info-header')}>
+                                    <div className={b('info-title')}>
+                                        {renderEntityTypeBadge()}
+                                        <div className={b('path-name')}>{relativePath}</div>
+                                    </div>
+                                    <div className={b('info-controls')}>
+                                        {renderCommonInfoControls()}
+                                    </div>
+                                </div>
+                                {renderTabs()}
+                            </div>
+                            <div className={b('overview-wrapper')}>{renderTabContent()}</div>
+                        </div>
+                    </SplitPane>
                 </div>
-            </TreeKeyProvider>
+                <Flex className={b('actions')} gap={0.5}>
+                    {!isCollapsed && <RefreshTreeButton />}
+                    <PaneVisibilityToggleButtons
+                        onCollapse={onCollapseSummary}
+                        onExpand={onExpandSummary}
+                        isCollapsed={isCollapsed}
+                        initialDirection="left"
+                    />
+                </Flex>
+            </div>
         );
     };
 

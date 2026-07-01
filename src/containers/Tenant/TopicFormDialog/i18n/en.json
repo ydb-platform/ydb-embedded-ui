@@ -1,0 +1,58 @@
+{
+  "action_cancel": "Cancel",
+  "action_create": "Create",
+  "action_update": "Update",
+
+  "title_topic-create": "Create topic",
+  "title_topic-edit": "Edit topic",
+  "title_topic-parameters": "Parameters",
+  "title_auto-partitioning-settings": "Advanced settings",
+
+  "field_name": "Name",
+  "field_shard-write-quota": "Shard throughput",
+  "field_auto-partitioning": "Autopartitioning",
+  "field_shards": "Shards",
+  "field_auto-partitioning-mode": "Autopartitioning mode",
+  "field_auto-partitioning-stabilization-window": "Stabilization period",
+  "field_auto-partitioning-up-utilization": "Upper utilization limit",
+
+  "context_field-name": "Use slash-separated path segments. Each segment may contain Latin letters (A-Z, a-z), numbers (0-9), and special characters: ., -, _. Maximum segment length is 255 characters.",
+  "context_shards-write-quota": "The maximum allowed write speed per partition. [Read more](https://ydb.tech/docs/en/concepts/datamodel/topic#partitioning) about partition throughput",
+  "context_throughput-info": "Total throughput: up to {{speed}} (calculated using the formula: partition throughput * number of partitions)",
+  "context_throughput-info-range": "Total throughput: from {{from}} to {{to}} (calculated using the formula: partition throughput * number of partitions)",
+  "context_auto-partitioning": "Dynamic scaling of the topic depending on the write speed. [Documentation](https://ydb.tech/docs/en/concepts/datamodel/topic#autopartitioning)",
+  "context_auto-partitioning-mode-disabled": "Autopartitioning cannot be disabled",
+  "context_shards": "Number of [partitions](https://ydb.tech/docs/en/concepts/datamodel/topic#partitioning) in the topic",
+  "context_shards-info": "The number of shards cannot be reduced",
+  "context_auto-partitioning-mode": "Autopartitioning mode for the topic. [Read more](https://ydb.tech/docs/en/concepts/datamodel/topic#autopartitioning_strategies) ",
+  "context_auto-partitioning-stabilization-window": "The period of time after a load change when the number of partitions will change",
+  "context_auto-partitioning-up-utilization": "The threshold at which the number of partitions increases",
+
+  "confirm_auto-partitioning-message": "The Kafka protocol does not support topic autopartitioning. If you enable autopartitioning, you will not be able to work with the topics you create using the Kafka protocol. You cannot disable autopartitioning for a specific topic.",
+
+  "value_auto-partitioning-scale-up": "Scale up",
+  "value_auto-partitioning-paused": "Paused",
+  "value_min": "Minimum",
+  "value_max": "Maximum",
+  "value_seconds": "seconds",
+  "value_rows": "rows",
+
+  "alert_create-success": "Topic created",
+  "alert_create-error": "Failed to create topic",
+  "alert_update-success": "Topic updated",
+  "alert_update-error": "Failed to update topic",
+
+  "error_load-topic": "Unable to load topic settings",
+  "error_topic-path-required": "Topic path is not specified",
+  "error_required": "Required field",
+  "error_number": "Value must be a number",
+  "error_int": "Value must be an integer",
+  "error_lowercase": "Value must be lowercase",
+  "error_name-regex": "Use slash-separated path segments. Each segment may contain Latin letters (A-Z, a-z), numbers (0-9), and special characters: ., -, _. Maximum segment length is 255 characters.",
+  "error_min-length": "Value can't be shorter than {{count}} characters",
+  "error_max-length": "Value can't be longer than {{count}} characters",
+  "error_min-number": "Value must be an integer no less than {{count}}",
+  "error_max-number": "Value must not be greater than {{count}}",
+  "error_less-than-number": "This value must be an integer less than {{count}}",
+  "error_more-than-number": "This value must be an integer greater than {{count}}"
+}
