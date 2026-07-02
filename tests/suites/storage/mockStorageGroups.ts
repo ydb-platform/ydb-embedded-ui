@@ -1,7 +1,7 @@
-import {ECapacityAlert, EFlag} from '../../../types/api/enums';
-import {TPDiskState} from '../../../types/api/pdisk';
-import type {StorageGroupsResponse, TStorageVDisk} from '../../../types/api/storage';
-import {EVDiskState} from '../../../types/api/vdisk';
+import {ECapacityAlert, EFlag} from '../../../src/types/api/enums';
+import {TPDiskState} from '../../../src/types/api/pdisk';
+import type {StorageGroupsResponse, TStorageVDisk} from '../../../src/types/api/storage';
+import {EVDiskState} from '../../../src/types/api/vdisk';
 
 const MOCK_GROUP_ID = 9000000000;
 const MOCK_GROUP_GENERATION = 1;

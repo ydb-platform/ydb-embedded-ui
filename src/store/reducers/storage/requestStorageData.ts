@@ -1,7 +1,7 @@
+import {createMockStorageGroupsResponse} from '../../../../tests/suites/storage/mockStorageGroups';
 import type {AxiosOptions} from '../../../services/api/base';
 import type {GroupsRequestParams, StorageRequestParams} from '../../../types/api/storage';
 
-import {createMockStorageGroupsResponse} from './mockStorageGroups';
 import {prepareGroupsResponse, prepareStorageResponse} from './utils';
 
 export async function requestStorageData(
