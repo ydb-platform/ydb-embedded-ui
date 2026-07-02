@@ -238,7 +238,7 @@ export function createStorageGroupsWithStates() {
         }),
     ];
 
-    // N/A state - undefined VDiskState (Grey with N/A text)
+    // N/D state - undefined VDiskState (Grey with N/D text)
     const naStateVDisk = createMockVDisk({
         index: 5,
         vDiskState: VDISK_STATES.OK,

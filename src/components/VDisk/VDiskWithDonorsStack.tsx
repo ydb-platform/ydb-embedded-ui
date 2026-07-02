@@ -19,6 +19,7 @@ interface VDiskWithDonorsStackProps extends Omit<VDiskProps, 'withOpaqueBackgrou
 
 const diskInStackPlacement: PopupPlacement = ['left', 'right'];
 const diskInStackPopupOffset = {mainAxis: 7, crossAxis: 0};
+const EMPTY_DONORS: PreparedVDisk[] = [];
 
 export function VDiskWithDonorsStack({
     data,
@@ -34,7 +35,8 @@ export function VDiskWithDonorsStack({
     highlighted: _highlighted,
     ...restProps
 }: VDiskWithDonorsStackProps) {
-    const donors = data?.Donors;
+    const donors = data?.Donors ?? EMPTY_DONORS;
+    const shouldRenderDonorStack = Boolean(data?.VDiskState && donors.length);
 
     const stackId = data?.StringifiedId;
     const isHighlighted = Boolean(stackId && highlightedVDisk === stackId);
@@ -86,39 +88,38 @@ export function VDiskWithDonorsStack({
         withOpaqueBackground: true,
     };
 
-    const mainDiskPlacement = donors?.length ? diskInStackPlacement : undefined;
+    const mainDiskPlacement = shouldRenderDonorStack ? diskInStackPlacement : undefined;
 
-    const content =
-        donors && donors.length > 0 ? (
-            <Stack className={stackClassName} compact={compact} expanded={highlightedVDiskInStack}>
+    const content = shouldRenderDonorStack ? (
+        <Stack className={stackClassName} compact={compact} expanded={highlightedVDiskInStack}>
+            <VDisk
+                placement={mainDiskPlacement}
+                data={data}
+                popupOffset={highlightedVDiskInStack ? diskInStackPopupOffset : undefined}
+                {...mainVDiskProps}
+                withOpaqueBackground
+            />
+            {donors.map((donor, index) => (
                 <VDisk
-                    placement={mainDiskPlacement}
-                    data={data}
-                    popupOffset={highlightedVDiskInStack ? diskInStackPopupOffset : undefined}
-                    {...mainVDiskProps}
-                    withOpaqueBackground
+                    key={`${index}-${donor.StringifiedId}`}
+                    data={donor}
+                    placement={diskInStackPlacement}
+                    highlighted={donor.StringifiedId === internalHighlightedVDisk}
+                    onShowPopup={() => {
+                        if (donor.StringifiedId) {
+                            setInternalHighlightedVDisk?.(donor.StringifiedId);
+                        }
+                    }}
+                    onHidePopup={() => {
+                        setInternalHighlightedVDisk(undefined);
+                    }}
+                    {...donorVDiskProps}
                 />
-                {donors.map((donor, index) => (
-                    <VDisk
-                        key={`${index}-${donor.StringifiedId}`}
-                        data={donor}
-                        placement={diskInStackPlacement}
-                        highlighted={donor.StringifiedId === internalHighlightedVDisk}
-                        onShowPopup={() => {
-                            if (donor.StringifiedId) {
-                                setInternalHighlightedVDisk?.(donor.StringifiedId);
-                            }
-                        }}
-                        onHidePopup={() => {
-                            setInternalHighlightedVDisk(undefined);
-                        }}
-                        {...donorVDiskProps}
-                    />
-                ))}
-            </Stack>
-        ) : (
-            <VDisk data={data} withIcon={withIcon} {...mainVDiskProps} />
-        );
+            ))}
+        </Stack>
+    ) : (
+        <VDisk data={data} withIcon={withIcon} {...mainVDiskProps} />
+    );
 
     return <div className={className}>{content}</div>;
 }

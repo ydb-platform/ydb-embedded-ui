@@ -1,6 +1,7 @@
 import {
     CircleCheckFill,
     CircleExclamationFill,
+    CircleQuestionFill,
     CircleXmarkFill,
     ClockFill,
     Dots9,
@@ -18,6 +19,7 @@ import {
     DISPLAYED_DISK_ERROR_ICON,
     DONOR_ICON,
     FRONT_QUEUES_SEVERITY,
+    NOT_AVAILABLE_SEVERITY,
     SPACE_SEVERITY,
 } from './constants';
 import type {PreparedVDisk} from './types';
@@ -156,6 +158,10 @@ export function calculateSpaceIcon(
         return 'B';
     }
 
+    if (severity === NOT_AVAILABLE_SEVERITY) {
+        return CircleQuestionFill;
+    }
+
     return undefined;
 }
 
@@ -189,6 +195,10 @@ export function calculateFrontQueuesIcon(
         return Dots9;
     }
 
+    if (severity === NOT_AVAILABLE_SEVERITY) {
+        return CircleQuestionFill;
+    }
+
     // OK status and replication - no icon
     return undefined;
 }
@@ -199,7 +209,10 @@ export function calculateFrontQueuesIcon(
  */
 function getCompactionRankIconWithColor(flag: EFlag | undefined): IconWithColor | undefined {
     if (!flag) {
-        return undefined;
+        return {
+            icon: CircleQuestionFill,
+            color: 'rgba(162, 162, 162, 1)',
+        };
     }
 
     switch (flag) {
@@ -238,7 +251,8 @@ function getCompactionRankIconWithColor(flag: EFlag | undefined): IconWithColor 
  * - Green: CircleCheckFill (text-positive)
  * - Yellow: TriangleExclamationFill (text-warning)
  * - Orange: CircleExclamationFill (text-danger)
- * - Red: CircleXmarkFill (base-danger-heavy)
+ * - Red: CircleXmarkFill (text-primary)
+ * - Missing: CircleQuestionFill (rgba(162, 162, 162, 1))
  */
 export function calculateCompactionIcon(
     vDisk: PreparedVDisk,
@@ -252,17 +266,12 @@ export function calculateCompactionIcon(
     const freshFlag = vDisk.SatisfactionRank?.FreshRank?.Flag;
     const levelFlag = vDisk.SatisfactionRank?.LevelRank?.Flag;
 
-    // If no data, no icon
-    if (!freshFlag && !levelFlag) {
-        return undefined;
-    }
-
-    // If both are green, no icon
+    // If both ranks are green, no icon
     if (freshFlag === EFlag.Green && levelFlag === EFlag.Green) {
         return undefined;
     }
 
-    // At least one is not green - show both icons with their respective colors
+    // At least one rank is missing or not green - show both icons with their respective colors
     const freshIconWithColor = getCompactionRankIconWithColor(freshFlag);
     const levelIconWithColor = getCompactionRankIconWithColor(levelFlag);
 

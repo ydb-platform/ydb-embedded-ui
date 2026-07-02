@@ -50,10 +50,12 @@
 
     &_expert-mode {
         &#{$block}_grey {
-            --entity-state-background-color: var(--g-color-base-neutral-medium);
+            --entity-state-background-color: var(--g-color-base-neutral-light);
+            --entity-state-border-color: var(--g-color-line-generic);
+            --entity-state-icon-color: rgba(162, 162, 162, 1);
 
             &#{$block}_highlighted {
-                --entity-state-background-color: var(--g-color-base-neutral-medium-hover);
+                --entity-state-background-color: var(--g-color-base-neutral-light-hover);
             }
         }
     }
@@ -105,10 +107,15 @@
 
         &#{$block}_spacelightyellow {
             --entity-state-background-color: var(--ydb-space-light-yellow-bg);
-            --entity-state-border-color: var(--ydb-space-light-yellow-text);
+            --entity-state-border-color: var(
+                --ydb-space-light-yellow-border,
+                var(--ydb-space-light-yellow-text)
+            );
+            --entity-state-stripe-color: var(--ydb-space-light-yellow-stripe);
             --ydb-progress-bar-font-color: var(--ydb-space-light-yellow-text);
             &#{$block}_highlighted {
                 --entity-state-background-color: var(--ydb-space-light-yellow-bg-hover);
+                --entity-state-stripe-color: var(--ydb-space-light-yellow-stripe-hover);
             }
         }
 
@@ -186,6 +193,10 @@
         --entity-state-stripe-color: var(--g-color-base-neutral-light);
         --entity-state-stripe-border-color: var(--entity-state-border-color);
 
+        &#{$block}_highlighted {
+            --entity-state-stripe-color: var(--entity-state-background-color);
+        }
+
         &#{$block}_green {
             --entity-state-border-color: var(--g-color-line-positive);
             --entity-state-icon-color: var(--g-color-text-positive);
@@ -228,7 +239,7 @@
         overflow: hidden;
         // Inset shadow = border overlay without shrinking the striped fill
         border: none;
-
+        background-color: var(--entity-state-stripe-background-color, transparent);
         background-image: repeating-linear-gradient(
             135deg,
             var(--entity-state-stripe-color, var(--entity-state-background-color)) 0,
@@ -237,15 +248,15 @@
             var(--entity-state-stripe-color2, transparent) var(--stripe-width),
             var(--entity-state-stripe-color2, transparent) var(--stripe-step)
         );
-        box-shadow: 0 0 0 $border-width var(--entity-state-shadow-color) inset;
-        border: 1px solid var(--entity-state-stripe-border-color);
+        box-shadow: 0 0 0 $border-width
+            var(--entity-state-stripe-border-color, var(--entity-state-shadow-color)) inset;
 
-        // Black striped: use neutral-light background in dark theme
-        &#{$block}_spaceblack {
-            --entity-state-background-color: var(--ydb-space-black-bg-stripped);
-        }
-        &#{$block}_spaceblack#{$block}_highlighted {
-            --entity-state-background-color: var(--ydb-space-black-bg-stripped-hover);
+        &#{$block}_solidred {
+            --entity-state-stripe-color: var(--g-color-text-dark-hint);
+            --entity-state-stripe-color2: transparent;
+            --entity-state-icon-color: var(--g-color-text-brand-contrast);
+            background-color: var(--entity-state-background-color);
+            box-shadow: none;
         }
     }
 

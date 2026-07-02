@@ -45,7 +45,7 @@ export function calculateStateSeverity(vDisk: PreparedVDisk): DisplaySeverity {
  */
 export function calculateSpaceSeverity(vDisk: PreparedVDisk): DisplaySeverity {
     // In Space mode, CapacityAlert is the primary indicator
-    // If CapacityAlert is not available, show N/A (NOT_AVAILABLE_SEVERITY)
+    // If CapacityAlert is not available, show N/D (NOT_AVAILABLE_SEVERITY)
     if (!vDisk.CapacityAlert || !isCapacityAlert(vDisk.CapacityAlert)) {
         return NOT_AVAILABLE_SEVERITY;
     }
@@ -80,7 +80,7 @@ export function calculateSpaceSeverity(vDisk: PreparedVDisk): DisplaySeverity {
  * Calculate severity based only on front queues
  * Used in FrontQueues grouping mode
  * Maps FrontQueues flag to detailed severity levels:
- * - Grey -> N/A (NOT_AVAILABLE_SEVERITY)
+ * - Grey -> N/D (NOT_AVAILABLE_SEVERITY)
  * - Green -> OK (FRONT_QUEUES_SEVERITY.OK)
  * - Blue -> ??? (treated as Green/OK)
  * - Yellow -> Notice (FRONT_QUEUES_SEVERITY.NOTICE)
@@ -127,7 +127,7 @@ export function calculateCompactionSeverity(vDisk: PreparedVDisk): DisplaySeveri
     const freshFlag = vDisk.SatisfactionRank?.FreshRank?.Flag;
     const levelFlag = vDisk.SatisfactionRank?.LevelRank?.Flag;
 
-    // If no data available, return N/A
+    // If no data available, return N/D
     if (!freshFlag && !levelFlag) {
         return NOT_AVAILABLE_SEVERITY;
     }

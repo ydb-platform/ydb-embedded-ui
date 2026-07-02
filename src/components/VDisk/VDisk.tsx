@@ -67,16 +67,23 @@ export const VDisk = ({
     );
 
     // Check if disk is replicating (not replicated yet) and should show stripes
+    const hasVDiskData = Boolean(data.VDiskState);
     let isReplicating: boolean;
     if (!modeModifier || modeModifier === 'mode-state') {
         isReplicating = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
     } else {
         // Space mode and other expert modes: show stripes for any Replicated=false disk
-        isReplicating = data.Replicated === false;
+        isReplicating = hasVDiskData && data.Replicated === false;
     }
 
     // In expert mode, don't show disk allocation (filled bar)
     const diskAllocatedPercent = modeModifier ? undefined : data.AllocatedPercent;
+    const shouldShowNoDataPlaceholder = !(
+        icon &&
+        (modeModifier === 'mode-space' ||
+            modeModifier === 'mode-frontqueues' ||
+            modeModifier === 'mode-compaction')
+    );
 
     return (
         <HoverPopup
@@ -110,7 +117,9 @@ export const VDisk = ({
                         icon={icon}
                         modeModifier={modeModifier}
                         highlighted={highlighted}
-                        noDataPlaceholder={i18n('context_no-data')}
+                        noDataPlaceholder={
+                            shouldShowNoDataPlaceholder ? i18n('context_no-data') : undefined
+                        }
                         isLegendInactive={isLegendInactive}
                     />
                 </InternalLink>

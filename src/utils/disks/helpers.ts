@@ -96,7 +96,7 @@ export function getDisplaySeverityColor(severity: number | undefined): DiskColor
     }
 
     // FrontQueues mode severities (16-19) map to colors
-    // Grey -> N/A, Green -> OK, Yellow -> Notice, Red -> Warning, SolidRed -> Impaired
+    // Grey -> N/D, Green -> OK, Yellow -> Notice, Red -> Warning, SolidRed -> Impaired
     if (severity === FRONT_QUEUES_SEVERITY.OK) {
         return EFlag.Green;
     }

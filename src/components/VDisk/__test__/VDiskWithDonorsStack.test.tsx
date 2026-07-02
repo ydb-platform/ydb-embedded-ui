@@ -1,5 +1,6 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 
+import {EVDiskState} from '../../../types/api/vdisk';
 import type {VDiskProps} from '../VDisk';
 import {VDiskWithDonorsStack} from '../VDiskWithDonorsStack';
 
@@ -53,6 +54,7 @@ describe('VDiskWithDonorsStack', () => {
                 data={{
                     StringifiedId: 'main',
                     NodeId: 1,
+                    VDiskState: EVDiskState.OK,
                     Donors: [{StringifiedId: 'donor-1', NodeId: 2}],
                 }}
             />,
@@ -70,12 +72,30 @@ describe('VDiskWithDonorsStack', () => {
         });
     });
 
+    test('does not render donor stack for no data vdisk', () => {
+        const {container} = render(
+            <VDiskWithDonorsStack
+                data={{
+                    StringifiedId: 'main',
+                    NodeId: 1,
+                    Replicated: false,
+                    Donors: [{StringifiedId: 'donor-1', NodeId: 2}],
+                }}
+            />,
+        );
+
+        expect(container.querySelector('.ydb-stack')).not.toBeInTheDocument();
+        expect(screen.getAllByTestId('mock-vdisk')).toHaveLength(1);
+        expect(screen.getByText('main')).toBeVisible();
+    });
+
     test('renders several donors in the original order', () => {
         const {container} = render(
             <VDiskWithDonorsStack
                 data={{
                     StringifiedId: 'main',
                     NodeId: 1,
+                    VDiskState: EVDiskState.OK,
                     Donors: [
                         {StringifiedId: 'donor-1', NodeId: 2},
                         {StringifiedId: 'donor-2', NodeId: 3},
@@ -99,6 +119,7 @@ describe('VDiskWithDonorsStack', () => {
                 data={{
                     StringifiedId: 'main',
                     NodeId: 1,
+                    VDiskState: EVDiskState.OK,
                     Donors: [{StringifiedId: 'donor-1', NodeId: 2}],
                 }}
             />,
@@ -113,6 +134,7 @@ describe('VDiskWithDonorsStack', () => {
                 data={{
                     StringifiedId: 'main',
                     NodeId: 1,
+                    VDiskState: EVDiskState.OK,
                     Donors: [{StringifiedId: 'donor-1', NodeId: 2}],
                 }}
             />,
@@ -135,6 +157,7 @@ describe('VDiskWithDonorsStack', () => {
                 data={{
                     StringifiedId: 'main',
                     NodeId: 1,
+                    VDiskState: EVDiskState.OK,
                     Donors: [
                         {StringifiedId: 'donor-1', NodeId: 2},
                         {StringifiedId: 'donor-2', NodeId: 3},
@@ -164,6 +187,7 @@ describe('VDiskWithDonorsStack', () => {
                 data={{
                     StringifiedId: 'main',
                     NodeId: 1,
+                    VDiskState: EVDiskState.OK,
                     Donors: [
                         {StringifiedId: 'donor-1', NodeId: 2},
                         {StringifiedId: 'donor-2', NodeId: 3},
