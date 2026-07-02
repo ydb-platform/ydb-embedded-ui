@@ -23,7 +23,7 @@ import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useSetting, useTypedDispatch} from '../../utils/hooks';
-import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useWhoami} from '../../utils/hooks/useWhoami';
 import {isAccessError} from '../../utils/response';
 import {Clusters} from '../Clusters/Clusters';
 import {GetMetaUser} from '../GetUserWrapper/GetUserWrapper';
@@ -46,7 +46,9 @@ export function HomePage() {
     const tabFromPath = useHomePageTab();
 
     const metaEnvironmentsAvailable = useMetaEnvironmentsAvailable();
-    const isViewerUser = useIsViewerUser();
+    const {currentData: whoamiData, error: whoamiError} = useWhoami();
+    const isViewerUser = whoamiData?.IsViewerAllowed;
+    const isViewerUserResolved = Boolean(whoamiData || whoamiError);
 
     const [savedHomePageTab, saveHomePageTab] = useSetting<HomePageTab>(SETTING_KEYS.HOME_PAGE_TAB);
 
@@ -69,12 +71,18 @@ export function HomePage() {
         if (!metaEnvironmentsAvailable) {
             return 'clusters';
         }
-        if (!isViewerUser) {
+        if (isViewerUserResolved && !isViewerUser) {
             return 'databases';
         }
 
         return homePageTabSchema.catch(savedHomePageTab).parse(tabFromPath);
-    }, [isViewerUser, tabFromPath, savedHomePageTab, metaEnvironmentsAvailable]);
+    }, [
+        isViewerUser,
+        isViewerUserResolved,
+        tabFromPath,
+        savedHomePageTab,
+        metaEnvironmentsAvailable,
+    ]);
 
     const isResolvedDatabasesHomePage = isDatabasesHomePageTab(homePageTab);
 
