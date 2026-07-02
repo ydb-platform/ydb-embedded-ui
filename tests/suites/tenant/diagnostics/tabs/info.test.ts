@@ -161,8 +161,6 @@ test.describe('Diagnostics Info tab', async () => {
     });
 
     test('Info metric page summaries match snapshots', async ({page}) => {
-        test.setTimeout(60_000);
-
         await page.setViewportSize(METRIC_SUMMARY_SCREENSHOT_VIEWPORT);
         await setupMetricTabsTenantInfoMock(page);
         const diagnostics = await openInfoTab(page);
