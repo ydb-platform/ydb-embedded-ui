@@ -50,6 +50,22 @@ async function setupMetricTabsTenantInfoMock(
     });
 }
 
+async function setupTenantInfoWithoutMetricsMock(page: Page) {
+    await page.route('**/viewer/json/tenantinfo?*', async (route) => {
+        await route.fulfill({
+            json: {
+                TenantInfo: [
+                    {
+                        Name: database,
+                        Type: 'Dedicated',
+                        Overall: 'Green',
+                    },
+                ],
+            },
+        });
+    });
+}
+
 async function openInfoTab(page: Page) {
     const pageQueryParams = {
         schema: database,
@@ -112,6 +128,15 @@ test.describe('Diagnostics Info tab', async () => {
 
         const metricTabs = diagnostics.getMetricTabs();
         await expectMetricTabsScreenshot(metricTabs, 'info-metric-tabs.png');
+    });
+
+    test('Info metric tabs match visual baseline without tenant metrics', async ({page}) => {
+        await setupTenantInfoWithoutMetricsMock(page);
+        const diagnostics = await openInfoTab(page);
+        await expect(diagnostics.areInfoCardsVisible()).resolves.toBe(true);
+
+        const metricTabs = diagnostics.getMetricTabs();
+        await expectMetricTabsScreenshot(metricTabs, 'info-empty-tenant-metric-tabs.png');
     });
 
     test('Info serverless metric tabs match visual baseline', async ({page}) => {
