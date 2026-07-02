@@ -31,7 +31,7 @@ import {TenantsTable} from '../Tenants/TenantsTable';
 
 import i18n from './i18n';
 import {useDatabasesPageEnvironment} from './useDatabasesPageEnvironment';
-import {useHomePageTab} from './useHomePageTab';
+import {useHomePageTab, useIsDatabasesHomePage} from './useHomePageTab';
 
 import './HomePage.scss';
 
@@ -44,6 +44,7 @@ export function HomePage() {
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
     const tabFromPath = useHomePageTab();
+    const isDatabasesHomePage = useIsDatabasesHomePage();
 
     const metaEnvironmentsAvailable = useMetaEnvironmentsAvailable();
     const isViewerUser = useIsViewerUser();
@@ -262,7 +263,10 @@ export function HomePage() {
         >
             <LoaderWrapper loading={environmentsLoading}>
                 {renderHelmet()}
-                <GetMetaUser>
+                <GetMetaUser
+                    blockContentWhileLoading={!isDatabasesHomePage}
+                    displayWhoamiError={!isDatabasesHomePage}
+                >
                     <DrawerContextProvider className={b('drawer-context')}>
                         <Flex direction="column" className={b()} ref={scrollContainerRef}>
                             {renderTabs()}

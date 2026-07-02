@@ -13,14 +13,17 @@ import {
     useDatabaseFromQuery,
 } from '../../../utils/hooks/useDatabaseFromQuery';
 import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {useHomePageTab} from '../../HomePage/useHomePageTab';
+import {
+    useHomePageTab,
+    useIsClustersHomePage,
+    useIsDatabasesHomePage,
+} from '../../HomePage/useHomePageTab';
 import {useNavigationV2Enabled} from '../../Tenant/utils/useNavigationV2Enabled';
 
 export function useHeaderPageContext() {
     const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
-    const isViewerUser = useIsViewerUser();
     const databasesPageAvailable = useMetaEnvironmentsAvailable();
     const isV2NavigationEnabled = useNavigationV2Enabled();
 
@@ -39,8 +42,9 @@ export function useHeaderPageContext() {
     const isDatabasePage = checkIsTenantPage(location.pathname);
     const isClusterPage = checkIsClusterPage(location.pathname);
     const isHomePage = checkIsHomePage(location.pathname);
-    const isDatabasesHomePage = isHomePage && homePageTabFromPath === 'databases';
-    const isClustersHomePage = isHomePage && homePageTabFromPath === 'clusters';
+    const isDatabasesHomePage = useIsDatabasesHomePage();
+    const isClustersHomePage = useIsClustersHomePage();
+    const isViewerUser = useIsViewerUser();
 
     return {
         metaCapabilitiesLoaded,
