@@ -31,7 +31,7 @@ import {TenantsTable} from '../Tenants/TenantsTable';
 
 import i18n from './i18n';
 import {useDatabasesPageEnvironment} from './useDatabasesPageEnvironment';
-import {useHomePageTab} from './useHomePageTab';
+import {isDatabasesHomePageTab, useHomePageTab} from './useHomePageTab';
 
 import './HomePage.scss';
 
@@ -76,7 +76,7 @@ export function HomePage() {
         return homePageTabSchema.catch(savedHomePageTab).parse(tabFromPath);
     }, [isViewerUser, tabFromPath, savedHomePageTab, metaEnvironmentsAvailable]);
 
-    const isResolvedDatabasesHomePage = homePageTab === 'databases';
+    const isResolvedDatabasesHomePage = isDatabasesHomePageTab(homePageTab);
 
     const initialPageTitle =
         homePageTab === 'clusters' ? i18n('page-title_clusters') : i18n('page-title_databases');

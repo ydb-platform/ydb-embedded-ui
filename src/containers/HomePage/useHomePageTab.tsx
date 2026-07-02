@@ -11,10 +11,18 @@ export function useHomePageTab() {
     return match?.params.activeTab as HomePageTab;
 }
 
+export function isDatabasesHomePageTab(homePageTab?: HomePageTab) {
+    return homePageTab === 'databases';
+}
+
+export function isClustersHomePageTab(homePageTab?: HomePageTab) {
+    return homePageTab === 'clusters';
+}
+
 export function useIsDatabasesHomePage() {
-    return useHomePageTab() === 'databases';
+    return isDatabasesHomePageTab(useHomePageTab());
 }
 
 export function useIsClustersHomePage() {
-    return useHomePageTab() === 'clusters';
+    return isClustersHomePageTab(useHomePageTab());
 }

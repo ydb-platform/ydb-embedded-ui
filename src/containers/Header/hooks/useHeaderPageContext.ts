@@ -14,9 +14,9 @@ import {
 } from '../../../utils/hooks/useDatabaseFromQuery';
 import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {
+    isClustersHomePageTab,
+    isDatabasesHomePageTab,
     useHomePageTab,
-    useIsClustersHomePage,
-    useIsDatabasesHomePage,
 } from '../../HomePage/useHomePageTab';
 import {useNavigationV2Enabled} from '../../Tenant/utils/useNavigationV2Enabled';
 
@@ -42,8 +42,8 @@ export function useHeaderPageContext() {
     const isDatabasePage = checkIsTenantPage(location.pathname);
     const isClusterPage = checkIsClusterPage(location.pathname);
     const isHomePage = checkIsHomePage(location.pathname);
-    const isDatabasesHomePage = useIsDatabasesHomePage();
-    const isClustersHomePage = useIsClustersHomePage();
+    const isDatabasesHomePage = isDatabasesHomePageTab(homePageTabFromPath);
+    const isClustersHomePage = isClustersHomePageTab(homePageTabFromPath);
     const isViewerUser = useIsViewerUser();
 
     return {
