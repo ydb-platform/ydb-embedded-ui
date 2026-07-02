@@ -72,7 +72,7 @@
 
     &__progress-fill,
     &__progress-rest {
-        min-width: 10px;
+        min-width: 8px;
 
         border-radius: var(--g-border-radius-xs);
     }
@@ -91,6 +91,10 @@
     }
 
     &__progress_full &__progress-rest {
+        display: none;
+    }
+
+    &__progress_empty &__progress-fill {
         display: none;
     }
 }

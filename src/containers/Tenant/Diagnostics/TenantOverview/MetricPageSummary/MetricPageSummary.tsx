@@ -58,6 +58,7 @@ export function MetricPageSummary({
                     className={b('progress', {
                         theme: progressTheme,
                         full: progressValue >= 100,
+                        empty: progressValue <= 0,
                     })}
                     data-qa="tenant-page-metric-summary-progress"
                     style={
