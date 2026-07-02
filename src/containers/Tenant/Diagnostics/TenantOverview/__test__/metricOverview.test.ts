@@ -95,7 +95,7 @@ describe('getTenantOverviewMetrics', () => {
         expect(metrics.summaries.network?.presentation.percentText).toBe('96%');
     });
 
-    test('omits network metrics when throughput is missing', () => {
+    test('keeps network metrics when throughput is missing', () => {
         const metrics = getTenantOverviewMetrics({
             isServerless: false,
             poolsStats: [{name: 'System', used: 5, limit: 100}],
@@ -104,8 +104,16 @@ describe('getTenantOverviewMetrics', () => {
             networkUtilization: 0.42,
         });
 
-        expect(metrics.tabs.network).toBeUndefined();
-        expect(metrics.summaries.network).toBeUndefined();
+        expect(metrics.tabs.network).toEqual({
+            percentText: '42%',
+            status: EFlag.Green,
+        });
+        expect(metrics.summaries.network?.presentation).toEqual({
+            percentText: '42%',
+            progressTheme: 'success',
+            progressValue: 42,
+            valueText: undefined,
+        });
     });
 
     test('omits memory summary value text when memory limit is missing', () => {

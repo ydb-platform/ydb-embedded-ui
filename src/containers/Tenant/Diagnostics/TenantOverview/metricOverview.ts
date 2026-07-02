@@ -74,35 +74,40 @@ export function selectStorageStatsForMetricCard({
     return blobStorageStats || tabletStorageStats || [];
 }
 
-type NetworkMetricParams = Pick<
+type NetworkUtilizationMetricParams = Pick<GetTenantOverviewMetricsParams, 'networkUtilization'>;
+type NetworkMetricSummaryParams = Pick<
     GetTenantOverviewMetricsParams,
     'networkThroughput' | 'networkUtilization'
 >;
 
-interface AvailableNetworkMetricParams {
-    networkThroughput: number;
-    networkUtilization: number;
+function hasNetworkUtilizationData<T extends NetworkUtilizationMetricParams>(
+    params: T,
+): params is T & {networkUtilization: number} {
+    return params.networkUtilization !== undefined && Number.isFinite(params.networkUtilization);
 }
 
-function hasNetworkMetricData(params: NetworkMetricParams): params is AvailableNetworkMetricParams {
-    return (
-        params.networkUtilization !== undefined &&
-        params.networkThroughput !== undefined &&
-        Number.isFinite(params.networkUtilization) &&
-        Number.isFinite(params.networkThroughput)
-    );
-}
-
-function getNetworkMetricData(params: NetworkMetricParams): MetricTabPresentation | undefined {
-    if (!hasNetworkMetricData(params)) {
+function getNetworkMetricData(
+    params: NetworkUtilizationMetricParams,
+): MetricTabPresentation | undefined {
+    if (!hasNetworkUtilizationData(params)) {
         return undefined;
     }
 
     return getMetricTabPresentation({usagePercent: params.networkUtilization * 100});
 }
 
-function getNetworkMetricSummary(params: NetworkMetricParams): MetricPageSummaryData | undefined {
-    if (!hasNetworkMetricData(params)) {
+function getNetworkThroughputText(networkThroughput?: number) {
+    if (networkThroughput === undefined || !Number.isFinite(networkThroughput)) {
+        return undefined;
+    }
+
+    return formatNetworkMetric(networkThroughput) || undefined;
+}
+
+function getNetworkMetricSummary(
+    params: NetworkMetricSummaryParams,
+): MetricPageSummaryData | undefined {
+    if (!hasNetworkUtilizationData(params)) {
         return undefined;
     }
 
@@ -110,7 +115,7 @@ function getNetworkMetricSummary(params: NetworkMetricParams): MetricPageSummary
         description: i18n('context_network-description'),
         presentation: getMetricPageSummaryPresentation({
             usagePercent: params.networkUtilization * 100,
-            valueText: formatNetworkMetric(params.networkThroughput) || undefined,
+            valueText: getNetworkThroughputText(params.networkThroughput),
         }),
     };
 }
@@ -152,7 +157,7 @@ export function getTenantOverviewMetrics({
     const tabs: MetricTabsData = {
         cpu: getMetricTabPresentation({usagePercent: cpuUsagePercent}),
         memory: getMetricTabPresentation({usagePercent: memoryUsagePercent}),
-        network: getNetworkMetricData({networkThroughput, networkUtilization}),
+        network: getNetworkMetricData({networkUtilization}),
         // Never show the "danger" (red) status for storage, regardless of usage.
         // Keep the status "warning" (yellow) above the warning threshold and
         // never switch to red, including when usage grows into high values
@@ -163,7 +168,6 @@ export function getTenantOverviewMetrics({
         }),
     };
 
-    const networkSummary = getNetworkMetricSummary({networkThroughput, networkUtilization});
     const cpuValueText =
         cpuLimit > 0
             ? formatCoresLegend({
@@ -195,7 +199,7 @@ export function getTenantOverviewMetrics({
                     valueText: memoryValueText,
                 }),
             },
-            network: networkSummary,
+            network: getNetworkMetricSummary({networkThroughput, networkUtilization}),
         },
         tabs,
     };
