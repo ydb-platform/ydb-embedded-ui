@@ -31,7 +31,7 @@ import {TenantsTable} from '../Tenants/TenantsTable';
 
 import i18n from './i18n';
 import {useDatabasesPageEnvironment} from './useDatabasesPageEnvironment';
-import {useHomePageTab, useIsDatabasesHomePage} from './useHomePageTab';
+import {useHomePageTab} from './useHomePageTab';
 
 import './HomePage.scss';
 
@@ -44,7 +44,6 @@ export function HomePage() {
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
     const tabFromPath = useHomePageTab();
-    const isDatabasesHomePage = useIsDatabasesHomePage();
 
     const metaEnvironmentsAvailable = useMetaEnvironmentsAvailable();
     const isViewerUser = useIsViewerUser();
@@ -76,6 +75,8 @@ export function HomePage() {
 
         return homePageTabSchema.catch(savedHomePageTab).parse(tabFromPath);
     }, [isViewerUser, tabFromPath, savedHomePageTab, metaEnvironmentsAvailable]);
+
+    const isResolvedDatabasesHomePage = homePageTab === 'databases';
 
     const initialPageTitle =
         homePageTab === 'clusters' ? i18n('page-title_clusters') : i18n('page-title_databases');
@@ -264,8 +265,8 @@ export function HomePage() {
             <LoaderWrapper loading={environmentsLoading}>
                 {renderHelmet()}
                 <GetMetaUser
-                    blockContentWhileLoading={!isDatabasesHomePage}
-                    displayWhoamiError={!isDatabasesHomePage}
+                    blockContentWhileLoading={!isResolvedDatabasesHomePage}
+                    displayWhoamiError={!isResolvedDatabasesHomePage}
                 >
                     <DrawerContextProvider className={b('drawer-context')}>
                         <Flex direction="column" className={b()} ref={scrollContainerRef}>
