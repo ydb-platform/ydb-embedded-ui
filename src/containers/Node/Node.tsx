@@ -91,10 +91,10 @@ export function Node() {
         if (isDiskPagesAvailable) {
             skippedTabs.push('structure');
         }
-        if (!hasThreads) {
+        if (!isViewerUser || !hasThreads) {
             skippedTabs.push('threads');
         }
-        if (!isPeersHandlerAvailable) {
+        if (!isViewerUser || !isPeersHandlerAvailable) {
             skippedTabs.push('network');
         }
         let actualNodeTabs = NODE_TABS;
@@ -115,6 +115,7 @@ export function Node() {
         activeTabId,
         hasThreads,
         configsAvailable,
+        isViewerUser,
         pageLoading,
     ]);
 
