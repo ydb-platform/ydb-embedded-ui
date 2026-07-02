@@ -1,0 +1,432 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - link "Cluster" [ref=e46] [cursor=pointer]:
+            - link "Cluster" [ref=e47]:
+              - /url: /cluster
+              - generic [ref=e48]:
+                - img [ref=e49]
+                - text: Cluster
+          - generic [ref=e51]: /
+        - listitem [ref=e52]:
+          - link "local" [disabled] [ref=e53]:
+            - generic [ref=e55]:
+              - img [ref=e56]
+              - text: local
+      - generic [ref=e58]:
+        - button "Connect" [ref=e59] [cursor=pointer]:
+          - img [ref=e62]:
+            - img [ref=e63]
+          - generic [ref=e65]: Connect
+        - link "Developer UI" [ref=e66] [cursor=pointer]:
+          - /url: http://localhost:8765/internal
+          - img [ref=e69]:
+            - img [ref=e70]
+          - generic [ref=e72]: Developer UI
+    - main [ref=e73]:
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - generic [ref=e81]: Navigation
+              - generic [ref=e85]:
+                - generic [ref=e88] [cursor=pointer]:
+                  - button [ref=e89]
+                  - generic [ref=e91]:
+                    - img [ref=e93]
+                    - generic [ref=e95]: /local
+                - generic [ref=e98] [cursor=pointer]:
+                  - button [ref=e99]
+                  - generic [ref=e101]:
+                    - img [ref=e103]
+                    - generic [ref=e105]: .metadata
+                - generic [ref=e108] [cursor=pointer]:
+                  - button [ref=e109]
+                  - generic [ref=e111]:
+                    - img [ref=e113]
+                    - generic [ref=e115]: .sys
+                - generic [ref=e120] [cursor=pointer]:
+                  - img [ref=e122]
+                  - generic [ref=e124]: .sys_health
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - generic [ref=e128]:
+                  - generic [ref=e129]:
+                    - generic [ref=e130]: domain
+                    - generic [ref=e131]: /local
+                  - generic [ref=e132]:
+                    - button "Copy" [ref=e133] [cursor=pointer]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                    - button [ref=e134] [cursor=pointer]:
+                      - img [ref=e137]:
+                        - img [ref=e138]
+                - tablist [ref=e142]:
+                  - tab "Overview" [selected] [ref=e143] [cursor=pointer]:
+                    - link "Overview" [ref=e146]:
+                      - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics&summaryTab=overview
+              - generic [ref=e147]:
+                - generic [ref=e148]: Directory
+                - generic [ref=e149]:
+                  - generic [ref=e150]:
+                    - term [ref=e151]:
+                      - generic [ref=e152]: Type
+                    - definition [ref=e154]:
+                      - generic [ref=e155]: Domain
+                  - generic [ref=e156]:
+                    - term [ref=e157]:
+                      - generic [ref=e158]: Id
+                    - definition [ref=e160]:
+                      - generic [ref=e161]: "1"
+                  - generic [ref=e162]:
+                    - term [ref=e163]:
+                      - generic [ref=e164]: Version
+                    - definition [ref=e166]:
+                      - generic [ref=e167]: "47"
+                  - generic [ref=e168]:
+                    - term [ref=e169]:
+                      - generic [ref=e170]: Created
+                    - definition [ref=e172]:
+                      - generic [ref=e173]: 2026-06-26 15:30
+          - generic [ref=e174]:
+            - button [ref=e175] [cursor=pointer]:
+              - img [ref=e178]:
+                - img [ref=e179]
+            - button [ref=e181] [cursor=pointer]:
+              - img [ref=e184]:
+                - img [ref=e185]
+        - generic [ref=e189]:
+          - radiogroup [ref=e191]:
+            - generic [ref=e192] [cursor=pointer]:
+              - radio "Query" [ref=e193]
+              - generic [ref=e195]:
+                - img [ref=e196]:
+                  - img [ref=e197]
+                - generic [ref=e199]: Query
+            - generic [ref=e200]:
+              - radio "Diagnostics" [checked] [ref=e201]
+              - generic [ref=e203]:
+                - img [ref=e204]:
+                  - img [ref=e205]
+                - generic [ref=e209]: Diagnostics
+          - generic [ref=e210]:
+            - generic [ref=e212]:
+              - tablist [ref=e213]:
+                - tab "Info" [selected] [ref=e214] [cursor=pointer]:
+                  - link "Info" [ref=e217]:
+                    - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                - tab "Queries" [ref=e218] [cursor=pointer]:
+                  - link "Queries" [ref=e221]:
+                    - /url: /database?diagnosticsTab=topQueries&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                - tab "Top shards" [ref=e222] [cursor=pointer]:
+                  - link "Top shards" [ref=e225]:
+                    - /url: /database?diagnosticsTab=topShards&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                - tab "Nodes" [ref=e226] [cursor=pointer]:
+                  - link "Nodes" [ref=e229]:
+                    - /url: /database?diagnosticsTab=nodes&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                - tab "Tablets" [ref=e230] [cursor=pointer]:
+                  - link "Tablets" [ref=e233]:
+                    - /url: /database?diagnosticsTab=tablets&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                - tab "Storage" [ref=e234] [cursor=pointer]:
+                  - link "Storage" [ref=e237]:
+                    - /url: /database?diagnosticsTab=storage&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                - tab "Network" [ref=e238] [cursor=pointer]:
+                  - link "Network" [ref=e241]:
+                    - /url: /database?diagnosticsTab=network&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                - tab "Describe" [ref=e242] [cursor=pointer]:
+                  - link "Describe" [ref=e245]:
+                    - /url: /database?diagnosticsTab=describe&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                - tab "Configs" [ref=e246] [cursor=pointer]:
+                  - link "Configs" [ref=e249]:
+                    - /url: /database?diagnosticsTab=configs&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                - tab "Access" [ref=e250] [cursor=pointer]:
+                  - link "Access" [ref=e253]:
+                    - /url: /database?diagnosticsTab=access&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                - tab "Operations" [ref=e254] [cursor=pointer]:
+                  - link "Operations" [ref=e257]:
+                    - /url: /database?diagnosticsTab=operations&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+              - generic [ref=e258]:
+                - button "Refresh" [ref=e259] [cursor=pointer]:
+                  - img [ref=e262]
+                - group [ref=e265] [cursor=pointer]:
+                  - combobox [ref=e266]:
+                    - generic [ref=e267]: None
+                  - img [ref=e268]:
+                    - img [ref=e269]
+            - generic [ref=e274]:
+              - generic [ref=e275]:
+                - generic [ref=e276]: Cluster Root
+                - generic [ref=e281]:
+                  - generic "/local" [ref=e282]
+                  - button "Copy" [ref=e284] [cursor=pointer]:
+                    - generic:
+                      - generic:
+                        - img:
+                          - img
+                - generic [ref=e285]:
+                  - generic [ref=e287]:
+                    - img [ref=e288]:
+                      - img [ref=e289]
+                    - generic [ref=e294]:
+                      - generic [ref=e295]: Some issues, but still working. There is 1 issue.
+                      - button "Review issues" [active] [ref=e296] [cursor=pointer]:
+                        - generic [ref=e297]: Review issues
+                  - generic [ref=e300]:
+                    - generic [ref=e302]: Queries Activity
+                    - generic [ref=e303]:
+                      - generic [ref=e304]:
+                        - img [ref=e306]:
+                          - img [ref=e307]
+                        - generic [ref=e309]:
+                          - generic [ref=e310]: Running Queries
+                          - generic [ref=e311]:
+                            - generic [ref=e312]: ":"
+                            - generic [ref=e313]: "0"
+                      - generic [ref=e314]:
+                        - img [ref=e316]:
+                          - img [ref=e317]
+                        - generic [ref=e319]:
+                          - generic [ref=e320]: Applications
+                          - generic [ref=e321]:
+                            - generic [ref=e322]: ":"
+                            - generic [ref=e323]: "0"
+                      - generic [ref=e324]:
+                        - img [ref=e326]:
+                          - img [ref=e327]
+                        - generic [ref=e329]:
+                          - generic [ref=e330]: Users
+                          - generic [ref=e331]:
+                            - generic [ref=e332]: ":"
+                            - generic [ref=e333]: "0"
+                  - generic [ref=e334]:
+                    - link "0.1% 0 of 8 cores CPU load" [ref=e336]:
+                      - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics&metricsTab=cpu
+                      - generic [ref=e339]:
+                        - generic [ref=e340]:
+                          - img [ref=e341]
+                          - generic [ref=e345]: 0.1%
+                        - generic [ref=e346]:
+                          - generic [ref=e348]: 0 of 8 cores
+                          - generic [ref=e349]:
+                            - generic [ref=e350]: CPU load
+                            - button [ref=e351] [cursor=pointer]:
+                              - img [ref=e352]:
+                                - img [ref=e353]
+                    - 'link "0% 0 of 8.6 GB Storage: 2 groups" [ref=e356]':
+                      - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics&metricsTab=storage
+                      - generic [ref=e359] [cursor=pointer]:
+                        - generic [ref=e360]:
+                          - img [ref=e361]
+                          - generic [ref=e365]: 0%
+                        - generic [ref=e366]:
+                          - generic [ref=e368]: 0 of 8.6 GB
+                          - generic [ref=e369]:
+                            - generic [ref=e370]: "Storage: 2 groups"
+                            - button [ref=e371]:
+                              - img [ref=e372]:
+                                - img [ref=e373]
+                    - link "3% 0.47 of 16.8 GB Memory used" [ref=e376]:
+                      - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics&metricsTab=memory
+                      - generic [ref=e379] [cursor=pointer]:
+                        - generic [ref=e380]:
+                          - img [ref=e381]
+                          - generic [ref=e385]: 3%
+                        - generic [ref=e386]:
+                          - generic [ref=e388]: 0.47 of 16.8 GB
+                          - generic [ref=e389]:
+                            - generic [ref=e390]: Memory used
+                            - button [ref=e391]:
+                              - img [ref=e392]:
+                                - img [ref=e393]
+              - generic [ref=e396]:
+                - generic [ref=e397]:
+                  - generic [ref=e398]:
+                    - generic [ref=e400]: Top nodes by load
+                    - link "See all" [ref=e401] [cursor=pointer]:
+                      - /url: /database?diagnosticsTab=nodes&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                      - generic [ref=e402]:
+                        - generic [ref=e403]: See all
+                        - img [ref=e404]:
+                          - img [ref=e405]
+                  - generic [ref=e409]:
+                    - table [ref=e412]:
+                      - rowgroup [ref=e413]:
+                        - 'row "Load # Host Version" [ref=e414]':
+                          - columnheader "Load" [ref=e415]:
+                            - generic [ref=e416]: Load
+                          - columnheader "#" [ref=e417]:
+                            - generic [ref=e418]: "#"
+                          - columnheader "Host" [ref=e419]:
+                            - generic [ref=e420]: Host
+                          - columnheader "Version" [ref=e421]:
+                            - generic [ref=e422]: Version
+                    - table [ref=e425]:
+                      - rowgroup [ref=e426]:
+                        - 'row "Load # Host Version" [ref=e427]':
+                          - columnheader "Load" [ref=e428]:
+                            - generic [ref=e429]: Load
+                          - columnheader "#" [ref=e430]:
+                            - generic [ref=e431]: "#"
+                          - columnheader "Host" [ref=e432]:
+                            - generic [ref=e433]: Host
+                          - columnheader "Version" [ref=e434]:
+                            - generic [ref=e435]: Version
+                      - rowgroup [ref=e436]:
+                        - row "192% 1 localhost Copy main.fd48b77" [ref=e437]:
+                          - cell "192%" [ref=e438]:
+                            - generic [ref=e441]: 192%
+                          - cell "1" [ref=e442]
+                          - cell "localhost Copy" [ref=e443]:
+                            - generic [ref=e446]:
+                              - generic "localhost" [ref=e447]:
+                                - link "localhost" [ref=e448] [cursor=pointer]:
+                                  - /url: /node/1/storage
+                              - generic:
+                                - button [ref=e449] [cursor=pointer]:
+                                  - img [ref=e452]:
+                                    - img [ref=e453]
+                                - button "Copy" [ref=e455] [cursor=pointer]:
+                                  - generic:
+                                    - generic:
+                                      - img:
+                                        - img
+                          - cell "main.fd48b77" [ref=e456]:
+                            - generic [ref=e458] [cursor=pointer]: main.fd48b77
+                - generic [ref=e459]:
+                  - generic [ref=e460]:
+                    - generic [ref=e462]: Top nodes by pools usage
+                    - link "See all" [ref=e463] [cursor=pointer]:
+                      - /url: /database?diagnosticsTab=nodes&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                      - generic [ref=e464]:
+                        - generic [ref=e465]: See all
+                        - img [ref=e466]:
+                          - img [ref=e467]
+                  - generic [ref=e471]:
+                    - table [ref=e474]:
+                      - rowgroup [ref=e475]:
+                        - 'row "Pools # Host" [ref=e476]':
+                          - columnheader "Pools" [ref=e477]:
+                            - generic [ref=e478]: Pools
+                          - columnheader "#" [ref=e479]:
+                            - generic [ref=e480]: "#"
+                          - columnheader "Host" [ref=e481]:
+                            - generic [ref=e482]: Host
+                    - table [ref=e485]:
+                      - rowgroup [ref=e486]:
+                        - 'row "Pools # Host" [ref=e487]':
+                          - columnheader "Pools" [ref=e488]:
+                            - generic [ref=e489]: Pools
+                          - columnheader "#" [ref=e490]:
+                            - generic [ref=e491]: "#"
+                          - columnheader "Host" [ref=e492]:
+                            - generic [ref=e493]: Host
+                      - rowgroup [ref=e494]:
+                        - row "1 localhost Copy" [ref=e495]:
+                          - cell [ref=e496]
+                          - cell "1" [ref=e508]
+                          - cell "localhost Copy" [ref=e509]:
+                            - generic [ref=e512]:
+                              - generic "localhost" [ref=e513]:
+                                - link "localhost" [ref=e514] [cursor=pointer]:
+                                  - /url: /node/1/storage
+                              - generic:
+                                - button [ref=e515] [cursor=pointer]:
+                                  - img [ref=e518]:
+                                    - img [ref=e519]
+                                - button "Copy" [ref=e521] [cursor=pointer]:
+                                  - generic:
+                                    - generic:
+                                      - img:
+                                        - img
+                - generic [ref=e522]:
+                  - generic [ref=e523]:
+                    - generic [ref=e525]: Top shards by CPU usage
+                    - link "See all" [ref=e526] [cursor=pointer]:
+                      - /url: /database?diagnosticsTab=topShards&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                      - generic [ref=e527]:
+                        - generic [ref=e528]: See all
+                        - img [ref=e529]:
+                          - img [ref=e530]
+                  - generic [ref=e534]:
+                    - table [ref=e537]:
+                      - rowgroup [ref=e538]:
+                        - row "TabletId Path CPUCores" [ref=e539]:
+                          - columnheader "TabletId" [ref=e540]:
+                            - generic [ref=e541]: TabletId
+                          - columnheader "Path" [ref=e542]:
+                            - generic [ref=e543]: Path
+                          - columnheader "CPUCores" [ref=e544]:
+                            - generic [ref=e545]: CPUCores
+                    - table [ref=e548]:
+                      - rowgroup [ref=e549]:
+                        - row "TabletId Path CPUCores" [ref=e550]:
+                          - columnheader "TabletId" [ref=e551]:
+                            - generic [ref=e552]: TabletId
+                          - columnheader "Path" [ref=e553]:
+                            - generic [ref=e554]: Path
+                          - columnheader "CPUCores" [ref=e555]:
+                            - generic [ref=e556]: CPUCores
+                      - rowgroup [ref=e557]:
+                        - row "No data" [ref=e558]:
+                          - cell "No data" [ref=e559]
+                - generic [ref=e560]:
+                  - generic [ref=e561]:
+                    - generic [ref=e563]: Top queries by CPU usage
+                    - link "See all" [ref=e564] [cursor=pointer]:
+                      - /url: /database?diagnosticsTab=topQueries&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                      - generic [ref=e565]:
+                        - generic [ref=e566]: See all
+                        - img [ref=e567]:
+                          - img [ref=e568]
+                  - generic [ref=e572]:
+                    - table [ref=e575]:
+                      - rowgroup [ref=e576]:
+                        - row "Query Hash Query text CPU Time" [ref=e577]:
+                          - columnheader "Query Hash" [ref=e578]:
+                            - generic [ref=e579]: Query Hash
+                          - columnheader "Query text" [ref=e580]:
+                            - generic [ref=e581]: Query text
+                          - columnheader "CPU Time" [ref=e582]:
+                            - generic [ref=e583]: CPU Time
+                    - table [ref=e586]:
+                      - rowgroup [ref=e587]:
+                        - row "Query Hash Query text CPU Time" [ref=e588]:
+                          - columnheader "Query Hash" [ref=e589]:
+                            - generic [ref=e590]: Query Hash
+                          - columnheader "Query text" [ref=e591]:
+                            - generic [ref=e592]: Query text
+                          - columnheader "CPU Time" [ref=e593]:
+                            - generic [ref=e594]: CPU Time
+                      - rowgroup [ref=e595]:
+                        - row "No data" [ref=e596]:
+                          - cell "No data" [ref=e597]
+```

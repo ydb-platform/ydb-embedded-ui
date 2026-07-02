@@ -1,0 +1,498 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+      - button [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+      - button [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+    - button [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - link [ref=e46] [cursor=pointer]:
+            - link [ref=e47]:
+              - /url: /cluster
+              - generic [ref=e48]:
+                - img [ref=e49]
+                - text: Cluster
+          - generic [ref=e51]: /
+        - listitem [ref=e52]:
+          - link [disabled] [ref=e53]:
+            - generic [ref=e55]:
+              - img [ref=e56]
+              - text: local
+      - generic [ref=e58]:
+        - button [ref=e59] [cursor=pointer]:
+          - img [ref=e62]:
+            - img [ref=e63]
+          - generic [ref=e65]: Connect
+        - link [ref=e66] [cursor=pointer]:
+          - /url: http://localhost:8765/internal
+          - img [ref=e69]:
+            - img [ref=e70]
+          - generic [ref=e72]: Developer UI
+    - main [ref=e73]:
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - generic [ref=e81]: Navigation
+              - generic [ref=e85]:
+                - generic [ref=e88] [cursor=pointer]:
+                  - button [ref=e89]
+                  - generic [ref=e91]:
+                    - img [ref=e93]
+                    - generic [ref=e95]: /local
+                - generic [ref=e98] [cursor=pointer]:
+                  - button [ref=e99]
+                  - generic [ref=e101]:
+                    - img [ref=e103]
+                    - generic [ref=e105]: .metadata
+                - generic [ref=e108] [cursor=pointer]:
+                  - button [ref=e109]
+                  - generic [ref=e111]:
+                    - img [ref=e113]
+                    - generic [ref=e115]: .sys
+                - generic [ref=e120] [cursor=pointer]:
+                  - img [ref=e122]
+                  - generic [ref=e124]: .sys_health
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - generic [ref=e128]:
+                  - generic [ref=e129]:
+                    - generic [ref=e130]: domain
+                    - generic [ref=e131]: /local
+                  - generic [ref=e132]:
+                    - button [ref=e133] [cursor=pointer]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                    - button [ref=e134] [cursor=pointer]:
+                      - img [ref=e137]:
+                        - img [ref=e138]
+                - tablist [ref=e142]:
+                  - tab [selected] [ref=e143] [cursor=pointer]:
+                    - link [ref=e146]:
+                      - /url: /database?diagnosticsTab=topQueries&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics&summaryTab=overview
+                      - text: Overview
+              - generic [ref=e147]:
+                - generic [ref=e148]: Directory
+                - generic [ref=e149]:
+                  - generic [ref=e150]:
+                    - term [ref=e151]:
+                      - generic [ref=e152]: Type
+                    - definition [ref=e154]:
+                      - generic [ref=e155]: Domain
+                  - generic [ref=e156]:
+                    - term [ref=e157]:
+                      - generic [ref=e158]: Id
+                    - definition [ref=e160]:
+                      - generic [ref=e161]: "1"
+                  - generic [ref=e162]:
+                    - term [ref=e163]:
+                      - generic [ref=e164]: Version
+                    - definition [ref=e166]:
+                      - generic [ref=e167]: "57"
+                  - generic [ref=e168]:
+                    - term [ref=e169]:
+                      - generic [ref=e170]: Created
+                    - definition [ref=e172]:
+                      - generic [ref=e173]: 2026-06-30 10:54
+          - generic [ref=e174]:
+            - button [ref=e175] [cursor=pointer]:
+              - img [ref=e178]:
+                - img [ref=e179]
+            - button [ref=e181] [cursor=pointer]:
+              - img [ref=e184]:
+                - img [ref=e185]
+        - generic [ref=e189]:
+          - radiogroup [ref=e191]:
+            - generic [ref=e192] [cursor=pointer]:
+              - radio [ref=e193]
+              - generic [ref=e195]:
+                - img [ref=e196]:
+                  - img [ref=e197]
+                - generic [ref=e199]: Query
+            - generic [ref=e200]:
+              - radio [checked] [ref=e201]
+              - generic [ref=e203]:
+                - img [ref=e204]:
+                  - img [ref=e205]
+                - generic [ref=e209]: Diagnostics
+          - generic [ref=e210]:
+            - generic [ref=e212]:
+              - tablist [ref=e213]:
+                - tab [ref=e214] [cursor=pointer]:
+                  - link [ref=e217]:
+                    - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                    - text: Info
+                - tab [selected] [ref=e218] [cursor=pointer]:
+                  - link [ref=e221]:
+                    - /url: /database?diagnosticsTab=topQueries&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                    - text: Queries
+                - tab [ref=e222] [cursor=pointer]:
+                  - link [ref=e225]:
+                    - /url: /database?diagnosticsTab=topShards&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                    - text: Top shards
+                - tab [ref=e226] [cursor=pointer]:
+                  - link [ref=e229]:
+                    - /url: /database?diagnosticsTab=nodes&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                    - text: Nodes
+                - tab [ref=e230] [cursor=pointer]:
+                  - link [ref=e233]:
+                    - /url: /database?diagnosticsTab=tablets&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                    - text: Tablets
+                - tab [ref=e234] [cursor=pointer]:
+                  - link [ref=e237]:
+                    - /url: /database?diagnosticsTab=storage&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                    - text: Storage
+                - tab [ref=e238] [cursor=pointer]:
+                  - link [ref=e241]:
+                    - /url: /database?diagnosticsTab=network&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                    - text: Network
+                - tab [ref=e242] [cursor=pointer]:
+                  - link [ref=e245]:
+                    - /url: /database?diagnosticsTab=describe&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                    - text: Describe
+                - tab [ref=e246] [cursor=pointer]:
+                  - link [ref=e249]:
+                    - /url: /database?diagnosticsTab=configs&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                    - text: Configs
+                - tab [ref=e250] [cursor=pointer]:
+                  - link [ref=e253]:
+                    - /url: /database?diagnosticsTab=access&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                    - text: Access
+                - tab [ref=e254] [cursor=pointer]:
+                  - link [ref=e257]:
+                    - /url: /database?diagnosticsTab=operations&schema=%2Flocal&database=%2Flocal&backend=http%3A%2F%2Flocalhost%3A8765&databasePage=diagnostics
+                    - text: Operations
+              - generic [ref=e258]:
+                - button [ref=e259] [cursor=pointer]:
+                  - img [ref=e262]
+                - group [ref=e265] [cursor=pointer]:
+                  - combobox [ref=e266]:
+                    - generic [ref=e267]: None
+                  - img [ref=e268]:
+                    - img [ref=e269]
+            - generic [ref=e271]:
+              - generic [ref=e273]:
+                - generic [ref=e274]:
+                  - generic [ref=e275]:
+                    - radiogroup [ref=e276]:
+                      - generic [ref=e277]:
+                        - radio [checked] [ref=e278]
+                        - generic [ref=e279]: Top
+                      - generic [ref=e280] [cursor=pointer]:
+                        - radio [ref=e281]
+                        - generic [ref=e282]: Running
+                    - group [ref=e284] [cursor=pointer]:
+                      - combobox [ref=e285]:
+                        - generic [ref=e286]: Per hour
+                      - img [ref=e287]:
+                        - img [ref=e288]
+                    - generic [ref=e293]:
+                      - combobox [ref=e294] [cursor=pointer]: Last 6 hours
+                      - button [ref=e296] [cursor=pointer]:
+                        - img [ref=e299]:
+                          - img [ref=e300]
+                    - textbox [ref=e304]:
+                      - /placeholder: Search by query text or userSID...
+                  - button [ref=e307] [cursor=pointer]:
+                    - img [ref=e310]:
+                      - img [ref=e311]
+                    - generic [ref=e314]: 9/9
+                - generic [ref=e317]:
+                  - table [ref=e320]:
+                    - rowgroup [ref=e321]:
+                      - row [ref=e322]:
+                        - columnheader [ref=e323] [cursor=pointer]:
+                          - generic [ref=e324]:
+                            - text: CPU Time
+                            - img [ref=e326]
+                        - columnheader [ref=e328]:
+                          - generic [ref=e329]: Query text
+                        - columnheader [ref=e330]:
+                          - generic [ref=e331]: Query Hash
+                        - columnheader [ref=e332] [cursor=pointer]:
+                          - generic [ref=e333]:
+                            - text: Duration
+                            - img [ref=e335]
+                        - columnheader [ref=e337] [cursor=pointer]:
+                          - generic [ref=e338]:
+                            - text: Read Bytes
+                            - img [ref=e340]
+                        - columnheader [ref=e342] [cursor=pointer]:
+                          - generic [ref=e343]:
+                            - text: Request Units
+                            - img [ref=e345]
+                        - columnheader [ref=e347]:
+                          - generic [ref=e348]: End time
+                        - columnheader [ref=e349]:
+                          - generic [ref=e350]: Read Rows
+                        - columnheader [ref=e351]:
+                          - generic [ref=e352]: User
+                  - table [ref=e357]:
+                    - img [ref=e359] [cursor=pointer]
+                    - img [ref=e362] [cursor=pointer]
+                    - img [ref=e365] [cursor=pointer]
+                    - img [ref=e368] [cursor=pointer]
+                    - rowgroup [ref=e370]:
+                      - row [ref=e371] [cursor=pointer]:
+                        - cell [ref=e372]: 1 ms
+                        - cell [ref=e373]:
+                          - generic [ref=e376]:
+                            - button [ref=e377]:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                            - code [ref=e380]:
+                              - generic [ref=e381]: "SELECT * FROM `//dev02/home/xenoxeno/db1/.metadata/initialization/migrations`;"
+                        - cell [ref=e382]: FDCE9285
+                        - cell [ref=e383]: 1 ms
+                        - cell [ref=e384]: "100"
+                        - cell [ref=e385]: "1"
+                        - cell [ref=e386]: 2025-06-06 12:00
+                        - cell [ref=e387]: "1"
+                        - cell [ref=e388]:
+                          - generic [ref=e389]: user@system
+                      - row [ref=e390] [cursor=pointer]:
+                        - cell [ref=e391]: 2 ms
+                        - cell [ref=e392]:
+                          - generic [ref=e395]:
+                            - button [ref=e396]:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                            - code [ref=e399]:
+                              - generic [ref=e400]: "SELECT * FROM `//dev02/home/xenoxeno/db1/.metadata/secrets/values`;"
+                        - cell [ref=e401]: D7B043A6
+                        - cell [ref=e402]: 3 ms
+                        - cell [ref=e403]: "200"
+                        - cell [ref=e404]: "3"
+                        - cell [ref=e405]: 2025-06-06 11:56
+                        - cell [ref=e406]: "11"
+                        - cell [ref=e407]:
+                          - generic [ref=e408]: admin@system
+                      - row [ref=e409] [cursor=pointer]:
+                        - cell [ref=e410]: 3 ms
+                        - cell [ref=e411]:
+                          - generic [ref=e414]:
+                            - button [ref=e415]:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                            - code [ref=e418]:
+                              - generic [ref=e419]: "--!syntax_v1"
+                              - generic [ref=e420]: DECLARE $c0_0 AS Uint64;
+                              - generic [ref=e421]: DECLARE $c0_1 AS String;
+                        - cell [ref=e423]: 38EC716A
+                        - cell [ref=e424]: 4 ms
+                        - cell [ref=e425]: "300"
+                        - cell [ref=e426]: "5"
+                        - cell [ref=e427]: 2025-06-06 11:52
+                        - cell [ref=e428]: "21"
+                        - cell [ref=e429]:
+                          - generic [ref=e430]: service@system
+                      - row [ref=e431] [cursor=pointer]:
+                        - cell [ref=e432]: 4 ms
+                        - cell [ref=e433]:
+                          - generic [ref=e436]:
+                            - button [ref=e437]:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                            - code [ref=e440]:
+                              - generic [ref=e441]: "SELECT * FROM `ydb/MasterClusterExt.db`;"
+                              - generic [ref=e442]: "SELECT version_str, color_class FROM `ydb/MasterClusterVersions.db`;"
+                        - cell [ref=e443]: 1993954F
+                        - cell [ref=e444]: 6 ms
+                        - cell [ref=e445]: "400"
+                        - cell [ref=e446]: "7"
+                        - cell [ref=e447]: 2025-06-06 11:48
+                        - cell [ref=e448]: "31"
+                        - cell [ref=e449]:
+                          - generic [ref=e450]: metadata@system
+                      - row [ref=e451] [cursor=pointer]:
+                        - cell [ref=e452]: 5 ms
+                        - cell [ref=e453]:
+                          - generic [ref=e456]:
+                            - button [ref=e457]:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                            - code [ref=e460]:
+                              - generic [ref=e461]: DECLARE $name AS Utf8;
+                              - generic [ref=e462]: "SELECT * FROM `ydb/MasterClusterExt.db` WHERE name=$name"
+                        - cell [ref=e463]: "50814755"
+                        - cell [ref=e464]: 7 ms
+                        - cell [ref=e465]: "500"
+                        - cell [ref=e466]: "9"
+                        - cell [ref=e467]: 2025-06-06 11:44
+                        - cell [ref=e468]: "41"
+                        - cell [ref=e469]:
+                          - generic [ref=e470]: test@system
+                      - row [ref=e471] [cursor=pointer]:
+                        - cell [ref=e472]: 6 ms
+                        - cell [ref=e473]:
+                          - generic [ref=e476]:
+                            - button [ref=e477]:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                            - code [ref=e480]:
+                              - generic [ref=e481]: "SELECT COUNT(*) FROM `big_kv_test` WHERE id > 1000;"
+                        - cell [ref=e482]: 133792FF
+                        - cell [ref=e483]: 9 ms
+                        - cell [ref=e484]: "600"
+                        - cell [ref=e485]: "11"
+                        - cell [ref=e486]: 2025-06-06 11:40
+                        - cell [ref=e487]: "51"
+                        - cell [ref=e488]:
+                          - generic [ref=e489]: user@system
+                      - row [ref=e490] [cursor=pointer]:
+                        - cell [ref=e491]: 7 ms
+                        - cell [ref=e492]:
+                          - generic [ref=e495]:
+                            - button [ref=e496]:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                            - code [ref=e499]:
+                              - generic [ref=e500]: "UPDATE `boring_table` SET value = 'updated' WHERE key = 'test';"
+                        - cell [ref=e501]: 51D823C7
+                        - cell [ref=e502]: 10 ms
+                        - cell [ref=e503]: "700"
+                        - cell [ref=e504]: "13"
+                        - cell [ref=e505]: 2025-06-06 11:36
+                        - cell [ref=e506]: "61"
+                        - cell [ref=e507]:
+                          - generic [ref=e508]: admin@system
+                      - row [ref=e509] [cursor=pointer]:
+                        - cell [ref=e510]: 8 ms
+                        - cell [ref=e511]:
+                          - generic [ref=e514]:
+                            - button [ref=e515]:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                            - code [ref=e518]:
+                              - generic [ref=e519]: "SELECT a.*, b.* FROM `cities` a JOIN `boring_table2` b ON a.id = b.city_id;"
+                        - cell [ref=e520]: D46E015D
+                        - cell [ref=e521]: 12 ms
+                        - cell [ref=e522]: "800"
+                        - cell [ref=e523]: "15"
+                        - cell [ref=e524]: 2025-06-06 11:32
+                        - cell [ref=e525]: "71"
+                        - cell [ref=e526]:
+                          - generic [ref=e527]: service@system
+                      - row [ref=e528] [cursor=pointer]:
+                        - cell [ref=e529]: 9 ms
+                        - cell [ref=e530]:
+                          - generic [ref=e533]:
+                            - button [ref=e534]:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                            - code [ref=e537]:
+                              - generic [ref=e538]: "INSERT INTO `my_column_table` (id, name, timestamp) VALUES (8, 'test_8', CurrentUtcTimestamp());"
+                        - cell [ref=e539]: 432B663D
+                        - cell [ref=e540]: 13 ms
+                        - cell [ref=e541]: "900"
+                        - cell [ref=e542]: "17"
+                        - cell [ref=e543]: 2025-06-06 11:28
+                        - cell [ref=e544]: "81"
+                        - cell [ref=e545]:
+                          - generic [ref=e546]: metadata@system
+              - generic:
+                - generic:
+                  - generic:
+                    - button
+                    - button "Close"
+                    - dialog [active] [ref=e547]:
+                      - generic [ref=e551]:
+                        - generic [ref=e552]:
+                          - generic [ref=e553]: Query
+                          - generic [ref=e554]:
+                            - button [ref=e555] [cursor=pointer]:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                            - button [ref=e556] [cursor=pointer]:
+                              - img [ref=e559]:
+                                - img [ref=e560]
+                        - generic [ref=e563]:
+                          - generic [ref=e565]:
+                            - generic [ref=e566]:
+                              - term [ref=e567]:
+                                - generic [ref=e568]: Query Hash
+                              - definition [ref=e570]: D7B043A6
+                            - generic [ref=e571]:
+                              - term [ref=e572]:
+                                - generic [ref=e573]: CPU Time
+                              - definition [ref=e575]: 2 ms
+                            - generic [ref=e576]:
+                              - term [ref=e577]:
+                                - generic [ref=e578]: Duration
+                              - definition [ref=e580]: 3 ms
+                            - generic [ref=e581]:
+                              - term [ref=e582]:
+                                - generic [ref=e583]: Read Bytes
+                              - definition [ref=e585]: "200"
+                            - generic [ref=e586]:
+                              - term [ref=e587]:
+                                - generic [ref=e588]: Request Units
+                              - definition [ref=e590]: "3"
+                            - generic [ref=e591]:
+                              - term [ref=e592]:
+                                - generic [ref=e593]: End time
+                              - definition [ref=e595]: 2025-06-06 11:56
+                            - generic [ref=e596]:
+                              - term [ref=e597]:
+                                - generic [ref=e598]: Read Rows
+                              - definition [ref=e600]: "11"
+                            - generic [ref=e601]:
+                              - term [ref=e602]:
+                                - generic [ref=e603]: User
+                              - definition [ref=e605]: admin@system
+                          - generic [ref=e606]:
+                            - generic [ref=e607]:
+                              - generic [ref=e608]: Query Text
+                              - button "Open in Editor" [ref=e609] [cursor=pointer]:
+                                - img [ref=e612]:
+                                  - img [ref=e613]
+                                - generic [ref=e615]: Open in Editor
+                            - generic [ref=e616]:
+                              - button "Copy" [ref=e617] [cursor=pointer]:
+                                - generic:
+                                  - generic:
+                                    - img:
+                                      - img
+                              - code [ref=e620]:
+                                - generic [ref=e621]: "SELECT * FROM `//dev02/home/xenoxeno/db1/.metadata/secrets/values`;"
+                    - button "Close"
+                    - button
+```

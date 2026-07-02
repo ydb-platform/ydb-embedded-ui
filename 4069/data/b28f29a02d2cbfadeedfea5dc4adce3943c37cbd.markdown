@@ -1,0 +1,41 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list
+      - generic [ref=e44]:
+        - button "Connect" [ref=e45] [cursor=pointer]:
+          - img [ref=e48]:
+            - img [ref=e49]
+          - generic [ref=e51]: Connect
+        - link "Developer UI" [ref=e52] [cursor=pointer]:
+          - /url: http://localhost:8765/internal
+          - img [ref=e55]:
+            - img [ref=e56]
+          - generic [ref=e58]: Developer UI
+    - main [ref=e59]
+```

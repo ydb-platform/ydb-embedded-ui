@@ -1,0 +1,436 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e41]:
+    - banner [ref=e42]:
+      - list [ref=e43]:
+        - listitem [ref=e44]:
+          - link "Cluster" [ref=e45] [cursor=pointer]:
+            - link "Cluster" [ref=e46]:
+              - /url: /cluster
+              - generic [ref=e47]:
+                - img [ref=e48]
+                - text: Cluster
+          - generic [ref=e50]: /
+        - listitem [ref=e51]:
+          - link "Database" [ref=e52] [cursor=pointer]:
+            - link "Database" [ref=e53]:
+              - /url: /database?database=%2Flocal
+              - generic [ref=e54]:
+                - img [ref=e55]
+                - text: Database
+          - generic [ref=e57]: /
+        - listitem [ref=e58]:
+          - link "Storage Group" [ref=e59] [cursor=pointer]:
+            - generic [ref=e61]: Storage Group
+          - generic [ref=e62]: /
+        - listitem [ref=e63]:
+          - link "VDisk 2181038080-1-0-0-0" [disabled] [ref=e64]:
+            - generic [ref=e66]: VDisk 2181038080-1-0-0-0
+      - link "Developer UI" [ref=e68] [cursor=pointer]:
+        - /url: http://localhost:8765/internal
+        - img [ref=e71]:
+          - img [ref=e72]
+        - generic [ref=e74]: Developer UI
+    - main [ref=e75]:
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e78]: "FQDN: storage-node-07.ydb · Node: 42 · Storage · KLG · PDisk: 1000 · ROT"
+          - generic [ref=e79]:
+            - button "Refresh" [ref=e80] [cursor=pointer]:
+              - img [ref=e83]
+            - group [ref=e86] [cursor=pointer]:
+              - combobox [ref=e87]:
+                - generic [ref=e88]: None
+              - img [ref=e89]:
+                - img [ref=e90]
+        - generic [ref=e93]:
+          - generic [ref=e94]: VDisk
+          - text: 2181038080-1-0-0-0
+        - button "Evict VDisk" [ref=e98] [cursor=pointer]:
+          - img [ref=e101]:
+            - img [ref=e102]
+          - generic [ref=e104]: Evict VDisk
+        - generic [ref=e105]:
+          - generic [ref=e107]:
+            - generic [ref=e108]:
+              - term [ref=e109]:
+                - generic [ref=e110]: Storage Pool Name
+              - definition [ref=e112]: dynamic_storage_pool:1
+            - generic [ref=e113]:
+              - term [ref=e114]:
+                - generic [ref=e115]: VDisk State
+              - definition [ref=e117]: OK
+            - generic [ref=e118]:
+              - term [ref=e119]:
+                - generic [ref=e120]: Size
+              - definition [ref=e122]: 10 / 196 GB
+            - generic [ref=e123]:
+              - term [ref=e124]:
+                - generic [ref=e125]: Usage
+              - definition [ref=e127]: 5%
+            - generic [ref=e128]:
+              - term [ref=e129]:
+                - generic [ref=e130]: Disk Space
+              - definition [ref=e132]
+            - generic [ref=e134]:
+              - term [ref=e135]:
+                - generic [ref=e136]: Front Queues
+              - definition [ref=e138]
+            - generic [ref=e140]:
+              - term [ref=e141]:
+                - generic [ref=e142]: Fresh Rank Satisfaction
+              - definition [ref=e144]
+            - generic [ref=e146]:
+              - term [ref=e147]:
+                - generic [ref=e148]: Level Rank Satisfaction
+              - definition [ref=e150]
+          - generic [ref=e153]:
+            - generic [ref=e154]:
+              - term [ref=e155]:
+                - generic [ref=e156]: Replicated
+              - definition [ref=e158]: "No"
+            - generic [ref=e159]:
+              - term [ref=e160]:
+                - generic [ref=e161]: VDisk Slot Id
+              - definition [ref=e163]: "1001"
+            - generic [ref=e164]:
+              - term [ref=e165]:
+                - generic [ref=e166]: PDisk Id
+              - definition [ref=e168]:
+                - link "1000" [ref=e169] [cursor=pointer]:
+                  - /url: /pDisk?nodeId=42&pDiskId=1000
+            - generic [ref=e170]:
+              - term [ref=e171]:
+                - generic [ref=e172]: Donors
+              - definition [ref=e174]:
+                - generic [ref=e175]:
+                  - link "2181038080-1-0-1-0" [ref=e176] [cursor=pointer]:
+                    - /url: /vDisk?nodeId=42&vDiskId=2181038080-1-0-1-0&database=%2Flocal
+                  - link "2181038080-1-0-1-1" [ref=e177] [cursor=pointer]:
+                    - /url: /vDisk?nodeId=42&vDiskId=2181038080-1-0-1-1&database=%2Flocal
+            - generic [ref=e178]:
+              - term [ref=e179]:
+                - generic [ref=e180]: Links
+              - definition [ref=e182]:
+                - link "Developer UI" [ref=e184] [cursor=pointer]:
+                  - /url: http://localhost:8765/node/42/actors/vdisks/vdisk000001000_000001001
+                  - text: Developer UI
+                  - img [ref=e185]
+        - generic [ref=e187]:
+          - generic [ref=e189]: Storage details
+          - generic [ref=e190]:
+            - generic [ref=e191]:
+              - generic [ref=e192]:
+                - generic [ref=e193]: 10 GB
+                - generic [ref=e194]: Used
+              - generic [ref=e195]:
+                - generic [ref=e196]: 196 GB
+                - generic [ref=e197]: Total
+              - generic [ref=e198]:
+                - generic [ref=e199]: 186 GB
+                - generic [ref=e200]: Free
+              - separator [ref=e201]
+              - generic [ref=e202]:
+                - generic [ref=e203]: 5%
+                - generic [ref=e204]: Usage
+            - generic [ref=e205]:
+              - generic [ref=e206]:
+                - generic [ref=e207]:
+                  - generic [ref=e210] [cursor=pointer]: KLG
+                  - generic [ref=e211]: Datacenter
+                - generic [ref=e212]:
+                  - generic [ref=e213]:
+                    - generic [ref=e216] [cursor=pointer]: Rack-A-12
+                    - button "Copy" [ref=e217] [cursor=pointer]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                  - generic [ref=e218]: Rack
+                - generic [ref=e219]:
+                  - generic [ref=e220]:
+                    - generic [ref=e223] [cursor=pointer]: storage-node-07.ydb
+                    - button "Copy" [ref=e224] [cursor=pointer]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                  - generic [ref=e225]: Node
+                - generic [ref=e226]:
+                  - generic [ref=e227]:
+                    - generic [ref=e230] [cursor=pointer]: "1000"
+                    - button "Copy" [ref=e231] [cursor=pointer]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                  - generic [ref=e232]: PDisk ID
+              - link "Go to PDisk" [ref=e233] [cursor=pointer]:
+                - /url: /pDisk?nodeId=42&pDiskId=1000
+                - generic [ref=e234]: Go to PDisk
+        - tablist [ref=e236]:
+          - tab "Storage" [selected] [ref=e237] [cursor=pointer]:
+            - link "Storage" [ref=e240]:
+              - /url: /vDisk?activeTab=storage&nodeId=42&vDiskId=2181038080-1-0-0-0&database=%2Flocal
+          - tab "Tablets" [ref=e241] [cursor=pointer]:
+            - link "Tablets" [ref=e244]:
+              - /url: /vDisk?activeTab=tablets&nodeId=42&vDiskId=2181038080-1-0-0-0&database=%2Flocal
+        - generic [ref=e245]:
+          - generic [ref=e246]:
+            - generic [ref=e249]:
+              - textbox "Group ID, Pool name" [active] [ref=e252]
+              - radiogroup [ref=e253]:
+                - generic [ref=e254]:
+                  - radio "Groups" [checked] [ref=e255]
+                  - generic [ref=e256]: Groups
+                - generic [ref=e257] [cursor=pointer]:
+                  - radio "Nodes" [ref=e258]
+                  - generic [ref=e259]: Nodes
+              - generic [ref=e260]: "Group by:"
+              - group [ref=e262] [cursor=pointer]:
+                - combobox [ref=e263]:
+                  - generic [ref=e264]: "-"
+                - img [ref=e265]:
+                  - img [ref=e266]
+              - generic [ref=e270]: "Groups: 2"
+            - button "5/21" [ref=e273] [cursor=pointer]:
+              - img [ref=e276]:
+                - img [ref=e277]
+              - generic [ref=e280]: 5/21
+          - table [ref=e283]:
+            - rowgroup [ref=e284]:
+              - row "Group ID Pool Name Erasure Used VDisks" [ref=e285]:
+                - columnheader "Group ID" [ref=e286]:
+                  - generic [ref=e287] [cursor=pointer]:
+                    - generic [ref=e289]: Group ID
+                    - img [ref=e291]
+                - columnheader "Pool Name" [ref=e293]:
+                  - generic [ref=e294] [cursor=pointer]:
+                    - generic [ref=e296]: Pool Name
+                    - img [ref=e298]
+                - columnheader "Erasure" [ref=e300]:
+                  - generic [ref=e301] [cursor=pointer]:
+                    - generic [ref=e303]: Erasure
+                    - img [ref=e305]
+                - columnheader "Used" [ref=e307]:
+                  - generic [ref=e308] [cursor=pointer]:
+                    - generic [ref=e310]: Used
+                    - img [ref=e312]
+                - columnheader "VDisks" [ref=e314]:
+                  - generic [ref=e317]: VDisks
+            - rowgroup [ref=e318]:
+              - row "9000000000 Copy mock-vdisk-states block-4-2 34 GB 10 20 30 40 50 60 70 80 90 100" [ref=e319]:
+                - cell "9000000000 Copy" [ref=e320]:
+                  - generic [ref=e322]:
+                    - generic "9000000000" [ref=e323]:
+                      - link "9000000000" [ref=e324] [cursor=pointer]:
+                        - /url: /storageGroup?groupId=9000000000&database=%2Flocal
+                    - button "Copy" [ref=e325] [cursor=pointer]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                - cell "mock-vdisk-states" [ref=e326]:
+                  - generic [ref=e328] [cursor=pointer]: mock-vdisk-states
+                - cell "block-4-2" [ref=e329]
+                - cell "34 GB" [ref=e330]
+                - cell "10 20 30 40 50 60 70 80 90 100" [ref=e331]:
+                  - generic [ref=e332]:
+                    - link "10" [ref=e336] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e337]:
+                        - img [ref=e338]:
+                          - img [ref=e339]
+                        - generic [ref=e342]: 10%
+                    - link "20" [ref=e346] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e347]:
+                        - img [ref=e348]:
+                          - img [ref=e349]
+                        - generic [ref=e352]: 20%
+                    - link "30" [ref=e356] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e357]:
+                        - img [ref=e358]:
+                          - img [ref=e359]
+                        - generic [ref=e362]: 30%
+                    - link "40" [ref=e366] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e367]:
+                        - img [ref=e368]:
+                          - img [ref=e369]
+                        - generic [ref=e372]: 40%
+                    - link "50" [ref=e376] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e377]:
+                        - img [ref=e378]:
+                          - img [ref=e379]
+                        - generic [ref=e382]: 50%
+                    - link "60" [ref=e386] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e387]:
+                        - img [ref=e388]:
+                          - img [ref=e389]
+                        - generic [ref=e392]: 60%
+                    - link "70" [ref=e396] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e397]:
+                        - img [ref=e398]:
+                          - img [ref=e399]
+                        - generic [ref=e402]: 70%
+                    - link "80" [ref=e406] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e407]:
+                        - img [ref=e408]:
+                          - img [ref=e409]
+                        - generic [ref=e412]: 80%
+                    - link "90" [ref=e416] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e417]:
+                        - generic [ref=e419]: 90%
+                    - link "100" [ref=e423] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e424]:
+                        - generic [ref=e426]: 100%
+              - row "9000000001 Copy mock-replicating-disks block-4-2 34 GB 10 170 20 180 30 190 40 200 50 210 60 220 70 70 80 90" [ref=e427]:
+                - cell "9000000001 Copy" [ref=e428]:
+                  - generic [ref=e430]:
+                    - generic "9000000001" [ref=e431]:
+                      - link "9000000001" [ref=e432] [cursor=pointer]:
+                        - /url: /storageGroup?groupId=9000000001&database=%2Flocal
+                    - button "Copy" [ref=e433] [cursor=pointer]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                - cell "mock-replicating-disks" [ref=e434]:
+                  - generic [ref=e436] [cursor=pointer]: mock-replicating-disks
+                - cell "block-4-2" [ref=e437]
+                - cell "34 GB" [ref=e438]
+                - cell "10 170 20 180 30 190 40 200 50 210 60 220 70 70 80 90" [ref=e439]:
+                  - generic [ref=e440]:
+                    - generic [ref=e442]:
+                      - link "10" [ref=e446] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000001-1-0-0-0&database=%2Flocal
+                        - meter "Disk allocated space" [ref=e447]:
+                          - img [ref=e448]:
+                            - img [ref=e449]
+                          - generic [ref=e452]: 10%
+                      - link "170" [ref=e456] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7016&vDiskId=9000000001-1-0-0-100&database=%2Flocal
+                        - meter "Disk allocated space" [ref=e457]:
+                          - img [ref=e458]:
+                            - img [ref=e459]
+                          - generic [ref=e462]: 170%
+                    - generic [ref=e464]:
+                      - link "20" [ref=e468] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-1&database=%2Flocal
+                        - meter "Disk allocated space" [ref=e469]:
+                          - img [ref=e470]:
+                            - img [ref=e471]
+                          - generic [ref=e474]: 20%
+                      - link "180" [ref=e478] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7017&vDiskId=9000000001-1-0-0-101&database=%2Flocal
+                        - meter "Disk allocated space" [ref=e479]:
+                          - img [ref=e480]:
+                            - img [ref=e481]
+                          - generic [ref=e484]: 180%
+                    - generic [ref=e486]:
+                      - link "30" [ref=e490] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000001-1-0-0-2&database=%2Flocal
+                        - meter "Disk allocated space" [ref=e491]:
+                          - img [ref=e492]:
+                            - img [ref=e493]
+                          - generic [ref=e496]: 30%
+                      - link "190" [ref=e500] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7018&vDiskId=9000000001-1-0-0-102&database=%2Flocal
+                        - meter "Disk allocated space" [ref=e501]:
+                          - img [ref=e502]:
+                            - img [ref=e503]
+                          - generic [ref=e506]: 190%
+                    - generic [ref=e508]:
+                      - link "40" [ref=e512] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000001-1-0-0-3&database=%2Flocal
+                        - meter "Disk allocated space" [ref=e513]:
+                          - img [ref=e514]:
+                            - img [ref=e515]
+                          - generic [ref=e518]: 40%
+                      - link "200" [ref=e522] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7019&vDiskId=9000000001-1-0-0-103&database=%2Flocal
+                        - meter "Disk allocated space" [ref=e523]:
+                          - img [ref=e524]:
+                            - img [ref=e525]
+                          - generic [ref=e528]: 200%
+                    - generic [ref=e530]:
+                      - link "50" [ref=e534] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000001-1-0-0-4&database=%2Flocal
+                        - meter "Disk allocated space" [ref=e535]:
+                          - img [ref=e536]:
+                            - img [ref=e537]
+                          - generic [ref=e540]: 50%
+                      - link "210" [ref=e544] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7020&vDiskId=9000000001-1-0-0-104&database=%2Flocal
+                        - meter "Disk allocated space" [ref=e545]:
+                          - img [ref=e546]:
+                            - img [ref=e547]
+                          - generic [ref=e550]: 210%
+                    - generic [ref=e552]:
+                      - link "60" [ref=e556] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000001-1-0-0-5&database=%2Flocal
+                        - meter "Disk allocated space" [ref=e557]:
+                          - img [ref=e558]:
+                            - img [ref=e559]
+                          - generic [ref=e562]: 60%
+                      - link "220" [ref=e566] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7021&vDiskId=9000000001-1-0-0-105&database=%2Flocal
+                        - meter "Disk allocated space" [ref=e567]:
+                          - img [ref=e568]:
+                            - img [ref=e569]
+                          - generic [ref=e572]: 220%
+                    - link "70" [ref=e576] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7006&vDiskId=9000000001-1-0-0-6&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e577]:
+                        - img [ref=e578]:
+                          - img [ref=e579]
+                        - generic [ref=e582]: 70%
+                    - link "70" [ref=e586] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7006&vDiskId=9000000001-1-0-0-6&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e587]:
+                        - img [ref=e588]:
+                          - img [ref=e589]
+                        - generic [ref=e592]: 70%
+                    - link "80" [ref=e596] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7007&vDiskId=9000000001-1-0-0-7&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e597]:
+                        - img [ref=e598]:
+                          - img [ref=e599]
+                        - generic [ref=e602]: 80%
+                    - link "90" [ref=e606] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=7008&vDiskId=9000000001-1-0-0-8&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e607]:
+                        - generic [ref=e609]: 90%
+```
