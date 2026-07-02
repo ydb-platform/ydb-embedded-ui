@@ -21,14 +21,12 @@ import type {MetricTabPresentation} from './metricPresentation';
 
 interface SelectStorageStatsForMetricCardParams {
     blobStorageStats?: TenantStorageStats[];
-    isServerless: boolean;
     tabletStorageStats?: TenantStorageStats[];
 }
 
 interface GetTenantOverviewMetricsParams {
     blobStorageStats?: TenantStorageStats[];
     coresTotal?: number;
-    hasTenant: boolean;
     isServerless: boolean;
     memoryStats?: TenantMetricStats[];
     networkThroughput?: number;
@@ -39,10 +37,12 @@ interface GetTenantOverviewMetricsParams {
 }
 
 export interface MetricTabsData {
-    cpu: MetricTabPresentation;
-    memory: MetricTabPresentation;
+    // CPU, memory and storage are omitted only for Serverless. Dedicated databases
+    // keep these metrics even when data is missing and display them as N/A.
+    cpu?: MetricTabPresentation;
+    memory?: MetricTabPresentation;
     network?: MetricTabPresentation;
-    storage: MetricTabPresentation;
+    storage?: MetricTabPresentation;
 }
 
 export interface MetricPageSummaries {
@@ -59,12 +59,7 @@ export interface TenantOverviewMetrics {
 export function selectStorageStatsForMetricCard({
     blobStorageStats,
     tabletStorageStats,
-    isServerless,
 }: SelectStorageStatsForMetricCardParams) {
-    if (isServerless) {
-        return tabletStorageStats || blobStorageStats || [];
-    }
-
     const hasLimit = (stats?: TenantStorageStats[]) =>
         Boolean(stats?.some((item) => Number(item.limit) > 0));
 
@@ -79,34 +74,43 @@ export function selectStorageStatsForMetricCard({
     return blobStorageStats || tabletStorageStats || [];
 }
 
-function getNetworkMetricData({
-    isServerless,
-    networkUtilization,
-}: Pick<GetTenantOverviewMetricsParams, 'isServerless' | 'networkUtilization'>):
-    | MetricTabPresentation
-    | undefined {
-    if (isServerless || networkUtilization === undefined || !Number.isFinite(networkUtilization)) {
+type NetworkMetricParams = Pick<
+    GetTenantOverviewMetricsParams,
+    'networkThroughput' | 'networkUtilization'
+>;
+
+interface AvailableNetworkMetricParams {
+    networkThroughput: number;
+    networkUtilization: number;
+}
+
+function hasNetworkMetricData(params: NetworkMetricParams): params is AvailableNetworkMetricParams {
+    return (
+        params.networkUtilization !== undefined &&
+        params.networkThroughput !== undefined &&
+        Number.isFinite(params.networkUtilization) &&
+        Number.isFinite(params.networkThroughput)
+    );
+}
+
+function getNetworkMetricData(params: NetworkMetricParams): MetricTabPresentation | undefined {
+    if (!hasNetworkMetricData(params)) {
         return undefined;
     }
 
-    return getMetricTabPresentation({usagePercent: networkUtilization * 100});
+    return getMetricTabPresentation({usagePercent: params.networkUtilization * 100});
 }
 
-function getNetworkMetricSummary({
-    networkThroughput,
-    networkUtilization,
-}: Pick<GetTenantOverviewMetricsParams, 'networkThroughput' | 'networkUtilization'>):
-    | MetricPageSummaryData
-    | undefined {
-    if (networkUtilization === undefined || !Number.isFinite(networkUtilization)) {
+function getNetworkMetricSummary(params: NetworkMetricParams): MetricPageSummaryData | undefined {
+    if (!hasNetworkMetricData(params)) {
         return undefined;
     }
 
     return {
         description: i18n('context_network-description'),
         presentation: getMetricPageSummaryPresentation({
-            usagePercent: networkUtilization * 100,
-            valueText: formatNetworkMetric(networkThroughput) || undefined,
+            usagePercent: params.networkUtilization * 100,
+            valueText: formatNetworkMetric(params.networkThroughput) || undefined,
         }),
     };
 }
@@ -114,7 +118,6 @@ function getNetworkMetricSummary({
 export function getTenantOverviewMetrics({
     blobStorageStats,
     coresTotal,
-    hasTenant,
     isServerless,
     memoryStats,
     networkThroughput,
@@ -123,20 +126,24 @@ export function getTenantOverviewMetrics({
     storageMetricStats,
     tabletStorageStats,
 }: GetTenantOverviewMetricsParams): TenantOverviewMetrics {
+    if (isServerless) {
+        return {summaries: {}, tabs: {}};
+    }
+
     const cpuPools = (poolsStats || []).filter((pool) => pool.name !== 'IO');
     const cpuMetrics = calculateMetricAggregates(cpuPools);
     const cpuLimit = coresTotal && coresTotal > 0 ? coresTotal : cpuMetrics.totalLimit;
-    const memoryMetrics = calculateMetricAggregates(memoryStats);
     const storageStats =
         storageMetricStats ??
-        selectStorageStatsForMetricCard({blobStorageStats, tabletStorageStats, isServerless});
+        selectStorageStatsForMetricCard({blobStorageStats, tabletStorageStats});
     const storageMetrics = calculateMetricAggregates(storageStats);
-    const network = getNetworkMetricData({isServerless, networkUtilization});
     const cpuUsagePercent = calculateUsagePercent(cpuMetrics.totalUsed, cpuLimit);
+    const memoryMetrics = calculateMetricAggregates(memoryStats);
     const memoryUsagePercent = calculateUsagePercent(
         memoryMetrics.totalUsed,
         memoryMetrics.totalLimit,
     );
+
     const storageUsagePercent = calculateUsagePercent(
         storageMetrics.totalUsed,
         storageMetrics.totalLimit,
@@ -145,7 +152,7 @@ export function getTenantOverviewMetrics({
     const tabs: MetricTabsData = {
         cpu: getMetricTabPresentation({usagePercent: cpuUsagePercent}),
         memory: getMetricTabPresentation({usagePercent: memoryUsagePercent}),
-        network,
+        network: getNetworkMetricData({networkThroughput, networkUtilization}),
         // Never show the "danger" (red) status for storage, regardless of usage.
         // Keep the status "warning" (yellow) above the warning threshold and
         // never switch to red, including when usage grows into high values
@@ -155,10 +162,6 @@ export function getTenantOverviewMetrics({
             dangerThreshold: Infinity,
         }),
     };
-
-    if (!hasTenant || isServerless) {
-        return {summaries: {}, tabs};
-    }
 
     const networkSummary = getNetworkMetricSummary({networkThroughput, networkUtilization});
     const cpuValueText =

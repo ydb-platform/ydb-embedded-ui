@@ -13,30 +13,37 @@ const b = cn('tenant-metrics-tabs');
 interface StorageTabProps {
     to: string;
     active: boolean;
-    isServerless: boolean;
-    storage: MetricTabPresentation;
+    storage?: MetricTabPresentation;
 }
 
-export function StorageTab({to, active, isServerless, storage}: StorageTabProps) {
-    return (
-        <div className={b('link-container', {active})}>
-            <Link to={to} className={b('link')}>
-                {isServerless ? (
+export function StorageTab({to, active, storage}: StorageTabProps) {
+    // getTenantOverviewMetrics omits storage only for Serverless; dedicated empty data
+    // is passed as an N/A metric presentation.
+    if (!storage) {
+        return (
+            <div className={b('link-container', {active})}>
+                <Link to={to} className={b('link')}>
                     <ServerlessTabCard
                         title={i18n('title_storage')}
                         active={active}
                         description={i18n('context_storage-serverless-tab-description')}
                         helpText={i18n('context_storage-description')}
                     />
-                ) : (
-                    <MetricTabCard
-                        title={i18n('title_storage')}
-                        status={storage.status}
-                        value={storage.percentText}
-                        active={active}
-                        description={i18n('context_storage-tab-description')}
-                    />
-                )}
+                </Link>
+            </div>
+        );
+    }
+
+    return (
+        <div className={b('link-container', {active})}>
+            <Link to={to} className={b('link')}>
+                <MetricTabCard
+                    title={i18n('title_storage')}
+                    status={storage.status}
+                    value={storage.percentText}
+                    active={active}
+                    description={i18n('context_storage-tab-description')}
+                />
             </Link>
         </div>
     );

@@ -338,7 +338,6 @@ export function TenantOverview({
         return getTenantOverviewMetrics({
             blobStorageStats,
             coresTotal: CoresTotal,
-            hasTenant: Boolean(tenant),
             isServerless,
             memoryStats,
             networkThroughput,
@@ -357,7 +356,6 @@ export function TenantOverview({
         poolsStats,
         storageMetricStats,
         tabletStorageStats,
-        tenant,
     ]);
 
     const links = getInfoTabLinks(additionalTenantProps, Name, Type);

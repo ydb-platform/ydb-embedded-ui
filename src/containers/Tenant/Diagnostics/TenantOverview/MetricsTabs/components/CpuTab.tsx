@@ -13,30 +13,37 @@ const b = cn('tenant-metrics-tabs');
 interface CpuTabProps {
     to: string;
     active: boolean;
-    isServerless: boolean;
-    cpu: MetricTabPresentation;
+    cpu?: MetricTabPresentation;
 }
 
-export function CpuTab({to, active, isServerless, cpu}: CpuTabProps) {
-    return (
-        <div className={b('link-container', {active})}>
-            <Link to={to} className={b('link')}>
-                {isServerless ? (
+export function CpuTab({to, active, cpu}: CpuTabProps) {
+    // getTenantOverviewMetrics omits CPU only for Serverless; dedicated empty data
+    // is passed as an N/A metric presentation.
+    if (!cpu) {
+        return (
+            <div className={b('link-container', {active})}>
+                <Link to={to} className={b('link')}>
                     <ServerlessTabCard
                         title={i18n('title_cpu-load')}
                         active={active}
                         description={i18n('context_serverless-autoscaled')}
                         helpText={i18n('context_cpu-description')}
                     />
-                ) : (
-                    <MetricTabCard
-                        title={i18n('title_cpu')}
-                        status={cpu.status}
-                        value={cpu.percentText}
-                        active={active}
-                        description={i18n('context_cpu-tab-description')}
-                    />
-                )}
+                </Link>
+            </div>
+        );
+    }
+
+    return (
+        <div className={b('link-container', {active})}>
+            <Link to={to} className={b('link')}>
+                <MetricTabCard
+                    title={i18n('title_cpu')}
+                    status={cpu.status}
+                    value={cpu.percentText}
+                    active={active}
+                    description={i18n('context_cpu-tab-description')}
+                />
             </Link>
         </div>
     );

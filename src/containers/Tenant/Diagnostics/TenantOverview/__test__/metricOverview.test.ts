@@ -26,7 +26,6 @@ describe('selectStorageStatsForMetricCard', () => {
             selectStorageStatsForMetricCard({
                 blobStorageStats,
                 tabletStorageStats,
-                isServerless: false,
             }),
         ).toBe(blobStorageStats);
     });
@@ -53,34 +52,6 @@ describe('selectStorageStatsForMetricCard', () => {
             selectStorageStatsForMetricCard({
                 blobStorageStats,
                 tabletStorageStats,
-                isServerless: false,
-            }),
-        ).toBe(tabletStorageStats);
-    });
-
-    test('keeps serverless legacy priority for tablet storage', () => {
-        const blobStorageStats = [
-            {
-                name: EType.SSD,
-                used: 500,
-                limit: 1_000,
-                usage: 50,
-            },
-        ];
-        const tabletStorageStats = [
-            {
-                name: EType.SSD,
-                used: 100,
-                limit: undefined,
-                usage: undefined,
-            },
-        ];
-
-        expect(
-            selectStorageStatsForMetricCard({
-                blobStorageStats,
-                tabletStorageStats,
-                isServerless: true,
             }),
         ).toBe(tabletStorageStats);
     });
@@ -89,7 +60,6 @@ describe('selectStorageStatsForMetricCard', () => {
 describe('getTenantOverviewMetrics', () => {
     test('builds tab metrics and page summaries from the same aggregates', () => {
         const metrics = getTenantOverviewMetrics({
-            hasTenant: true,
             isServerless: false,
             coresTotal: 100,
             poolsStats: [
@@ -125,9 +95,8 @@ describe('getTenantOverviewMetrics', () => {
         expect(metrics.summaries.network?.presentation.percentText).toBe('96%');
     });
 
-    test('keeps network summary when throughput is missing', () => {
+    test('omits network metrics when throughput is missing', () => {
         const metrics = getTenantOverviewMetrics({
-            hasTenant: true,
             isServerless: false,
             poolsStats: [{name: 'System', used: 5, limit: 100}],
             memoryStats: [{used: 50, limit: 100}],
@@ -135,21 +104,12 @@ describe('getTenantOverviewMetrics', () => {
             networkUtilization: 0.42,
         });
 
-        expect(metrics.tabs.network).toEqual({
-            percentText: '42%',
-            status: EFlag.Green,
-        });
-        expect(metrics.summaries.network?.presentation).toEqual({
-            percentText: '42%',
-            progressTheme: 'success',
-            progressValue: 42,
-            valueText: undefined,
-        });
+        expect(metrics.tabs.network).toBeUndefined();
+        expect(metrics.summaries.network).toBeUndefined();
     });
 
     test('omits memory summary value text when memory limit is missing', () => {
         const metrics = getTenantOverviewMetrics({
-            hasTenant: true,
             isServerless: false,
             poolsStats: [{name: 'System', used: 5, limit: 100}],
             memoryStats: [{used: 536_870_912, limit: undefined}],
@@ -169,7 +129,6 @@ describe('getTenantOverviewMetrics', () => {
 
     test('omits cpu summary value text when cpu limit is missing', () => {
         const metrics = getTenantOverviewMetrics({
-            hasTenant: true,
             isServerless: false,
             poolsStats: [{name: 'System', used: 5, limit: undefined}],
             memoryStats: [{used: 50, limit: 100}],
@@ -187,9 +146,39 @@ describe('getTenantOverviewMetrics', () => {
         });
     });
 
-    test('omits page summaries for serverless but keeps tab metrics', () => {
+    test('keeps page summaries in empty state when metric data is missing', () => {
         const metrics = getTenantOverviewMetrics({
-            hasTenant: true,
+            isServerless: false,
+        });
+
+        expect(metrics.tabs.cpu).toEqual({
+            percentText: 'N/A',
+            status: EFlag.Grey,
+        });
+        expect(metrics.tabs.memory).toEqual({
+            percentText: 'N/A',
+            status: EFlag.Grey,
+        });
+        expect(metrics.tabs.storage).toEqual({
+            percentText: 'N/A',
+            status: EFlag.Grey,
+        });
+        expect(metrics.tabs.network).toBeUndefined();
+        expect(metrics.summaries.cpu?.presentation).toEqual({
+            percentText: EMPTY_DATA_PLACEHOLDER,
+            progressValue: 0,
+            valueText: undefined,
+        });
+        expect(metrics.summaries.memory?.presentation).toEqual({
+            percentText: EMPTY_DATA_PLACEHOLDER,
+            progressValue: 0,
+            valueText: undefined,
+        });
+        expect(metrics.summaries.network).toBeUndefined();
+    });
+
+    test('omits metric data for serverless', () => {
+        const metrics = getTenantOverviewMetrics({
             isServerless: true,
             poolsStats: [{name: 'System', used: 5, limit: 100}],
             memoryStats: [{used: 50, limit: 100}],
@@ -199,15 +188,7 @@ describe('getTenantOverviewMetrics', () => {
             networkThroughput: 1_048_576,
         });
 
-        expect(metrics.tabs.cpu).toEqual({
-            percentText: '5%',
-            status: EFlag.Green,
-        });
-        expect(metrics.tabs.storage).toEqual({
-            percentText: 'N/A',
-            status: EFlag.Grey,
-        });
-        expect(metrics.tabs.network).toBeUndefined();
+        expect(metrics.tabs).toEqual({});
         expect(metrics.summaries).toEqual({});
     });
 });

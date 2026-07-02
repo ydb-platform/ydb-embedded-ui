@@ -74,27 +74,33 @@ export function MetricsTabs({
         );
     };
 
+    const renderMemoryTab = () => {
+        if (!memory) {
+            return null;
+        }
+
+        return (
+            <MemoryTab
+                to={tabLinks[TENANT_METRICS_TABS_IDS.memory]}
+                active={activeTab === TENANT_METRICS_TABS_IDS.memory}
+                memory={memory}
+            />
+        );
+    };
+
     return (
         <Flex className={b({serverless: Boolean(isServerless)})} alignItems="start">
             <CpuTab
                 to={tabLinks[TENANT_METRICS_TABS_IDS.cpu]}
                 active={activeTab === TENANT_METRICS_TABS_IDS.cpu}
-                isServerless={Boolean(isServerless)}
                 cpu={cpu}
             />
             <StorageTab
                 to={tabLinks[TENANT_METRICS_TABS_IDS.storage]}
                 active={activeTab === TENANT_METRICS_TABS_IDS.storage}
-                isServerless={Boolean(isServerless)}
                 storage={storage}
             />
-            {isServerless ? null : (
-                <MemoryTab
-                    to={tabLinks[TENANT_METRICS_TABS_IDS.memory]}
-                    active={activeTab === TENANT_METRICS_TABS_IDS.memory}
-                    memory={memory}
-                />
-            )}
+            {renderMemoryTab()}
             {renderNetworkTab()}
             <PlaceholderTab />
         </Flex>
