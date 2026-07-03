@@ -18,9 +18,6 @@ import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     DISPLAYED_DISK_ERROR_ICON,
     DONOR_ICON,
-    FRONT_QUEUES_SEVERITY,
-    NOT_AVAILABLE_SEVERITY,
-    SPACE_SEVERITY,
 } from './constants';
 import type {PreparedVDisk} from './types';
 
@@ -31,7 +28,6 @@ export interface IconWithColor {
 
 export type IconCalculator = (
     vDisk: PreparedVDisk,
-    severity: number,
     isDonor?: boolean,
 ) => IconData | IconWithColor[] | string | undefined;
 
@@ -40,15 +36,14 @@ export type IconCalculator = (
  * This matches current behavior
  */
 export function calculateDefaultIcon(
-    _vDisk: PreparedVDisk,
-    severity: number,
+    vDisk: PreparedVDisk,
     isDonor?: boolean,
 ): IconData | undefined {
     if (isDonor) {
         return DONOR_ICON;
     }
 
-    const isError = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red;
+    const isError = vDisk.Severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red;
     if (isError) {
         return DISPLAYED_DISK_ERROR_ICON;
     }
@@ -60,11 +55,7 @@ export function calculateDefaultIcon(
  * State-based icon logic - show specific icons for different states
  * Matches Figma specifications for State mode
  */
-export function calculateStateIcon(
-    vDisk: PreparedVDisk,
-    _severity: number,
-    isDonor?: boolean,
-): IconData | undefined {
+export function calculateStateIcon(vDisk: PreparedVDisk, isDonor?: boolean): IconData | undefined {
     if (isDonor) {
         return DONOR_ICON;
     }
@@ -94,72 +85,37 @@ export function calculateStateIcon(
  * Space-based icon logic - show text labels for capacityAlert levels
  * Returns text labels (e.g., "G", "C", "LY") instead of icons
  */
-// eslint-disable-next-line complexity
 export function calculateSpaceIcon(
     vDisk: PreparedVDisk,
-    severity: number,
     isDonor?: boolean,
 ): IconData | string | undefined {
     if (isDonor) {
         return DONOR_ICON;
     }
 
-    // Map severity to text label based on capacityAlert
-    if (vDisk.CapacityAlert && isCapacityAlert(vDisk.CapacityAlert)) {
-        const alert = vDisk.CapacityAlert as ECapacityAlert;
-        switch (alert) {
-            case ECapacityAlert.GREEN:
-                return 'G';
-            case ECapacityAlert.CYAN:
-                return 'C';
-            case ECapacityAlert.LIGHTYELLOW:
-                return 'LY';
-            case ECapacityAlert.YELLOW:
-                return 'Y';
-            case ECapacityAlert.LIGHTORANGE:
-                return 'LO';
-            case ECapacityAlert.PREORANGE:
-                return 'PO';
-            case ECapacityAlert.ORANGE:
-                return 'O';
-            case ECapacityAlert.RED:
-                return 'R';
-            case ECapacityAlert.BLACK:
-                return 'B';
-        }
-    }
-
-    // Fallback: map severity to text label
-    if (severity === SPACE_SEVERITY.GREEN) {
-        return 'G';
-    }
-    if (severity === SPACE_SEVERITY.CYAN) {
-        return 'C';
-    }
-    if (severity === SPACE_SEVERITY.LIGHT_YELLOW) {
-        return 'LY';
-    }
-    if (severity === SPACE_SEVERITY.YELLOW) {
-        return 'Y';
-    }
-    if (severity === SPACE_SEVERITY.LIGHT_ORANGE) {
-        return 'LO';
-    }
-    if (severity === SPACE_SEVERITY.PRE_ORANGE) {
-        return 'PO';
-    }
-    if (severity === SPACE_SEVERITY.ORANGE) {
-        return 'O';
-    }
-    if (severity === SPACE_SEVERITY.RED) {
-        return 'R';
-    }
-    if (severity === SPACE_SEVERITY.BLACK) {
-        return 'B';
-    }
-
-    if (severity === NOT_AVAILABLE_SEVERITY) {
+    if (!vDisk.CapacityAlert || !isCapacityAlert(vDisk.CapacityAlert)) {
         return CircleQuestionFill;
+    }
+
+    switch (vDisk.CapacityAlert) {
+        case ECapacityAlert.GREEN:
+            return 'G';
+        case ECapacityAlert.CYAN:
+            return 'C';
+        case ECapacityAlert.LIGHTYELLOW:
+            return 'LY';
+        case ECapacityAlert.YELLOW:
+            return 'Y';
+        case ECapacityAlert.LIGHTORANGE:
+            return 'LO';
+        case ECapacityAlert.PREORANGE:
+            return 'PO';
+        case ECapacityAlert.ORANGE:
+            return 'O';
+        case ECapacityAlert.RED:
+            return 'R';
+        case ECapacityAlert.BLACK:
+            return 'B';
     }
 
     return undefined;
@@ -174,33 +130,27 @@ export function calculateSpaceIcon(
  * - Impaired (Red): Dots9 icon
  */
 export function calculateFrontQueuesIcon(
-    _vDisk: PreparedVDisk,
-    severity: number,
+    vDisk: PreparedVDisk,
     isDonor?: boolean,
 ): IconData | undefined {
     if (isDonor) {
         return DONOR_ICON;
     }
 
-    // Map severity to icon based on FrontQueues status
-    if (severity === FRONT_QUEUES_SEVERITY.NOTICE) {
-        return Ellipsis;
+    switch (vDisk.FrontQueues) {
+        case EFlag.Green:
+        case EFlag.Blue:
+            return undefined;
+        case EFlag.Yellow:
+            return Ellipsis;
+        case EFlag.Orange:
+            return GripHorizontal;
+        case EFlag.Red:
+            return Dots9;
+        case EFlag.Grey:
+        default:
+            return CircleQuestionFill;
     }
-
-    if (severity === FRONT_QUEUES_SEVERITY.WARNING) {
-        return GripHorizontal;
-    }
-
-    if (severity === FRONT_QUEUES_SEVERITY.IMPAIRED) {
-        return Dots9;
-    }
-
-    if (severity === NOT_AVAILABLE_SEVERITY) {
-        return CircleQuestionFill;
-    }
-
-    // OK status and replication - no icon
-    return undefined;
 }
 
 /**
@@ -256,7 +206,6 @@ function getCompactionRankIconWithColor(flag: EFlag | undefined): IconWithColor 
  */
 export function calculateCompactionIcon(
     vDisk: PreparedVDisk,
-    _severity: number,
     isDonor?: boolean,
 ): IconData | IconWithColor[] | undefined {
     if (isDonor) {
@@ -292,10 +241,6 @@ export function calculateCompactionIcon(
  * For now, uses default icon logic
  * TODO: Implement advanced "All" mode icon logic
  */
-export function calculateAllIcon(
-    vDisk: PreparedVDisk,
-    severity: number,
-    isDonor?: boolean,
-): IconData | undefined {
-    return calculateDefaultIcon(vDisk, severity, isDonor);
+export function calculateAllIcon(vDisk: PreparedVDisk, isDonor?: boolean): IconData | undefined {
+    return calculateDefaultIcon(vDisk, isDonor);
 }

@@ -76,7 +76,7 @@ export function useDiskDisplayState(
             severity = severityCalculator(vDisk);
 
             const iconCalculator = getIconCalculator(vdisksGroupBy);
-            icon = iconCalculator(vDisk, severity, isDonor);
+            icon = iconCalculator(vDisk, isDonor);
 
             modeModifier = getModeModifier(vdisksGroupBy);
 
