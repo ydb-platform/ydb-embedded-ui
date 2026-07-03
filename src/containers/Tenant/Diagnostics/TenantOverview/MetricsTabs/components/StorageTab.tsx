@@ -19,31 +19,25 @@ interface StorageTabProps {
 export function StorageTab({to, active, storage}: StorageTabProps) {
     // getTenantOverviewMetrics omits storage only for Serverless; dedicated empty data
     // is passed as an N/A metric presentation.
-    if (!storage) {
-        return (
-            <div className={b('link-container', {active})}>
-                <Link to={to} className={b('link')}>
+    return (
+        <div className={b('link-container', {active})}>
+            <Link to={to} className={b('link')}>
+                {storage ? (
+                    <MetricTabCard
+                        title={i18n('title_storage')}
+                        status={storage.status}
+                        value={storage.percentText}
+                        active={active}
+                        description={i18n('context_storage-tab-description')}
+                    />
+                ) : (
                     <ServerlessTabCard
                         title={i18n('title_storage')}
                         active={active}
                         description={i18n('context_storage-serverless-tab-description')}
                         helpText={i18n('context_storage-description')}
                     />
-                </Link>
-            </div>
-        );
-    }
-
-    return (
-        <div className={b('link-container', {active})}>
-            <Link to={to} className={b('link')}>
-                <MetricTabCard
-                    title={i18n('title_storage')}
-                    status={storage.status}
-                    value={storage.percentText}
-                    active={active}
-                    description={i18n('context_storage-tab-description')}
-                />
+                )}
             </Link>
         </div>
     );
