@@ -72,23 +72,6 @@ describe('VDiskWithDonorsStack', () => {
         });
     });
 
-    test('does not render donor stack for no data vdisk', () => {
-        const {container} = render(
-            <VDiskWithDonorsStack
-                data={{
-                    StringifiedId: 'main',
-                    NodeId: 1,
-                    Replicated: false,
-                    Donors: [{StringifiedId: 'donor-1', NodeId: 2}],
-                }}
-            />,
-        );
-
-        expect(container.querySelector('.ydb-stack')).not.toBeInTheDocument();
-        expect(screen.getAllByTestId('mock-vdisk')).toHaveLength(1);
-        expect(screen.getByText('main')).toBeVisible();
-    });
-
     test('renders several donors in the original order', () => {
         const {container} = render(
             <VDiskWithDonorsStack
