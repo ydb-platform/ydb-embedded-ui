@@ -58,12 +58,13 @@ export function Node() {
     const activeTabIdFromQuery = match?.params.activeTab;
 
     const [{database: tenantNameFromQuery}] = useQueryParams(nodePageQueryParams);
+    const database = tenantNameFromQuery?.toString();
 
     const activeTabId = nodePageTabSchema.parse(activeTabIdFromQuery);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const params = nodeId ? {nodeId, database: tenantNameFromQuery?.toString()} : skipToken;
+    const params = nodeId ? {nodeId, database} : skipToken;
     const {
         currentData: node,
         isLoading,
@@ -91,7 +92,7 @@ export function Node() {
         if (isDiskPagesAvailable) {
             skippedTabs.push('structure');
         }
-        if (!isViewerUser || !hasThreads) {
+        if ((!database && !isViewerUser) || !hasThreads) {
             skippedTabs.push('threads');
         }
         if (!isViewerUser || !isPeersHandlerAvailable) {
@@ -116,10 +117,9 @@ export function Node() {
         hasThreads,
         configsAvailable,
         isViewerUser,
+        database,
         pageLoading,
     ]);
-
-    const database = tenantNameFromQuery?.toString();
 
     const databaseName = node?.Tenants?.[0];
 
@@ -304,6 +304,7 @@ function NodePageContent({
                 return (
                     <Threads
                         nodeId={nodeId}
+                        database={database}
                         scrollContainerRef={parentContainer}
                         className={b('treads')}
                     />
