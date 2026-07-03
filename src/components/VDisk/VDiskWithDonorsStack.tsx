@@ -36,7 +36,7 @@ export function VDiskWithDonorsStack({
     ...restProps
 }: VDiskWithDonorsStackProps) {
     const donors = data?.Donors ?? EMPTY_DONORS;
-    const shouldRenderDonorStack = Boolean(data?.VDiskState && donors.length);
+    const shouldRenderDonorStack = donors.length > 0;
 
     const stackId = data?.StringifiedId;
     const isHighlighted = Boolean(stackId && highlightedVDisk === stackId);
