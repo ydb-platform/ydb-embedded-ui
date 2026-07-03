@@ -1,13 +1,13 @@
 import {ECapacityAlert, isCapacityAlert} from '../../../../types/api/enums';
 import {loadFromSessionStorage, saveToSessionStorage} from '../../../../utils';
 
-const STORAGE_KEY = 'ydb-space-legend-inactive';
+export const SPACE_LEGEND_STORAGE_KEY = 'ydb-space-legend-inactive';
 
 // By default, GREEN and CYAN are inactive (deselected)
 const defaultInactive = new Set([ECapacityAlert.GREEN, ECapacityAlert.CYAN]);
 
 function loadInactiveItems(): Set<ECapacityAlert> {
-    const stored = loadFromSessionStorage(STORAGE_KEY);
+    const stored = loadFromSessionStorage(SPACE_LEGEND_STORAGE_KEY);
 
     if (Array.isArray(stored)) {
         const normalizedStored = new Set<ECapacityAlert>();
@@ -20,7 +20,7 @@ function loadInactiveItems(): Set<ECapacityAlert> {
     }
 
     // First time - save default
-    saveToSessionStorage(STORAGE_KEY, Array.from(defaultInactive));
+    saveToSessionStorage(SPACE_LEGEND_STORAGE_KEY, Array.from(defaultInactive));
 
     return defaultInactive;
 }

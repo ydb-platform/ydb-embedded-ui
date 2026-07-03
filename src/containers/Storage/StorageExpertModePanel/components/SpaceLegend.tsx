@@ -9,7 +9,7 @@ import {saveToSessionStorage} from '../../../../utils';
 import {b} from '../constants';
 import i18n from '../i18n';
 
-import {getSpaceLegendSelection} from './getSpaceLegendSelection';
+import {SPACE_LEGEND_STORAGE_KEY, getSpaceLegendSelection} from './getSpaceLegendSelection';
 
 import './SpaceLegend.scss';
 
@@ -23,8 +23,6 @@ interface SpaceLegendItem {
     theme?: LabelProps['theme'];
     customClass?: string;
 }
-
-const STORAGE_KEY = 'ydb-space-legend-inactive';
 
 const legendItems: SpaceLegendItem[] = [
     {id: ECapacityAlert.GREEN, text: i18n('space_green'), customClass: b('label', {green: true})},
@@ -71,7 +69,7 @@ export function SpaceLegend({className}: SpaceLegendProps) {
             } else {
                 next.add(id);
             }
-            saveToSessionStorage(STORAGE_KEY, Array.from(next));
+            saveToSessionStorage(SPACE_LEGEND_STORAGE_KEY, Array.from(next));
             // Dispatch custom event to notify other components
             window.dispatchEvent(new CustomEvent('spaceLegendChange'));
             return next;

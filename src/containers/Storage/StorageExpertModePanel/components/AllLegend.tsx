@@ -3,5 +3,5 @@ interface AllLegendProps {
 }
 
 export function AllLegend({className}: AllLegendProps) {
-    return <div className={className}>AllLegend</div>;
+    return <div className={className}></div>;
 }

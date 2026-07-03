@@ -7,7 +7,7 @@ import {VDisksGroupBy} from '../../containers/Storage/StorageExpertModePanel/con
 import type {VDisksGroupByValue} from '../../containers/Storage/StorageExpertModePanel/constants';
 import {
     useIsStorageExpertMode,
-    useStorageQueryParams,
+    useVDisksGroupByParam,
 } from '../../containers/Storage/useStorageQueryParams';
 import type {ECapacityAlert} from '../../types/api/enums';
 
@@ -50,7 +50,7 @@ function getModeModifier(groupBy: VDisksGroupByValue): string | undefined {
  * Returns severity for coloring, appropriate icon, and CSS mode modifier for visual variants
  * @param vDisk - VDisk data
  * @param isDonor - Whether this is a donor VDisk
- * @param enableExpertMode - Override to enable/disable expert mode regardless of global setting
+ * @param enableExpertMode - Enables expert-mode rendering for callers that opt in
  * @returns Object with severity, icon, and modeModifier
  */
 export function useDiskDisplayState(
@@ -59,7 +59,7 @@ export function useDiskDisplayState(
     enableExpertMode?: boolean,
 ): DiskDisplayState {
     const isExpertMode = useIsStorageExpertMode();
-    const {vdisksGroupBy} = useStorageQueryParams();
+    const vdisksGroupBy = useVDisksGroupByParam();
     const inactiveLegendItems = useSpaceLegendSelection();
 
     return React.useMemo(() => {
@@ -68,7 +68,7 @@ export function useDiskDisplayState(
         let modeModifier: string | undefined;
         let isLegendInactive = false;
 
-        const shouldUseExpertMode = (enableExpertMode ?? true) && isExpertMode;
+        const shouldUseExpertMode = Boolean(enableExpertMode && isExpertMode);
 
         if (shouldUseExpertMode) {
             // Expert mode: use dynamic calculation based on groupBy

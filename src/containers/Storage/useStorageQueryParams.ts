@@ -211,6 +211,19 @@ export function useIsStorageExpertMode() {
     );
 }
 
+export function useVDisksGroupByParam() {
+    const [queryVDisksGroupBy] = useQueryParam('vdisksGroupBy', StringParam);
+    const [savedVDisksGroupBy] = useSetting<VDisksGroupByValue>(
+        SETTING_KEYS.STORAGE_VDISKS_GROUP_BY,
+        VDisksGroupBy.State,
+    );
+
+    return React.useMemo(
+        () => vdisksGroupBySchema.parse(queryVDisksGroupBy ?? savedVDisksGroupBy),
+        [queryVDisksGroupBy, savedVDisksGroupBy],
+    );
+}
+
 export function useSaveVDisksGroupBy() {
     const [queryVDisksGroupBy, setQueryVDisksGroupBy] = useQueryParam('vdisksGroupBy', StringParam);
     const [savedVDisksGroupBy] = useSetting<VDisksGroupByValue>(

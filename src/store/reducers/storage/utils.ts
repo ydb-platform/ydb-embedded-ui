@@ -60,7 +60,7 @@ function getGroupDiskSpaceStatus(group: TStorageGroupInfo | TGroupsStorageGroupI
 
     // Calculate max severity from VDisks and convert back to EFlag
     const maxSeverity = Math.max(...VDisks.map((disk) => getColorSeverity(disk.DiskSpace)));
-    // getDisplaySeverityColor returns DiskColor, but for basic severities (0-5) it's always EFlag
+    // getDataSeverityColor returns EFlag for basic severities (0-5).
     // We cast it since we know VDisk.DiskSpace is always EFlag
     return getDataSeverityColor(maxSeverity);
 }

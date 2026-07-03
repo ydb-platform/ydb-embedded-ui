@@ -34,12 +34,6 @@ export function Disks({vDisks = [], viewContext, erasure, withIcon}: DisksProps)
         theme: {spaceBaseSize},
     } = useLayoutContext();
 
-    // Now you can use _isStorageExpertMode and _vdisksGroupBy
-    // Example: conditional rendering or logic based on these values
-    // if (_isStorageExpertMode && _vdisksGroupBy) {
-    //     // Apply expert mode logic with grouping
-    // }
-
     if (!vDisks.length) {
         return null;
     }
