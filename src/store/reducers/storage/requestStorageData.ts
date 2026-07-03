@@ -1,4 +1,3 @@
-import {createMockStorageGroupsResponse} from '../../../../tests/suites/storage/mockStorageGroups';
 import type {AxiosOptions} from '../../../services/api/base';
 import type {GroupsRequestParams, StorageRequestParams} from '../../../types/api/storage';
 
@@ -13,7 +12,8 @@ export async function requestStorageData(
     options?: AxiosOptions,
 ) {
     if (shouldUseGroupsHandler && version !== 'v1') {
-        return prepareGroupsResponse(createMockStorageGroupsResponse());
+        const result = await window.api.storage.getStorageGroups({...params}, options);
+        return prepareGroupsResponse(result);
     } else {
         const result = await window.api.viewer.getStorageInfo({version, ...params}, options);
         return prepareStorageResponse(result);
