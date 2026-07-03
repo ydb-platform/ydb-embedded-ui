@@ -85,9 +85,7 @@
     }
 
     &_mode-space {
-        --entity-state-stripe-color2: var(--g-color-base-background);
-
-        &:not(#{$block}_legend-inactive) {
+        &:not(#{$block}_legend-inactive):not(#{$block}_darkgrey) {
             --entity-state-stripe-border-color: var(--entity-state-border-color);
         }
 
@@ -168,7 +166,7 @@
     }
 
     &_mode-frontqueues {
-        &:not(#{$block}_solidred) {
+        &:not(#{$block}_solidred):not(#{$block}_darkgrey) {
             --entity-state-stripe-color2: var(--g-color-base-background);
             --entity-state-stripe-border-color: var(--entity-state-border-color);
         }
@@ -190,11 +188,14 @@
 
     &_mode-compaction {
         --entity-state-background-color: transparent;
-        --entity-state-stripe-color: var(--g-color-base-neutral-light);
-        --entity-state-stripe-border-color: var(--entity-state-border-color);
 
-        &#{$block}_highlighted {
-            --entity-state-stripe-color: var(--entity-state-background-color);
+        &:not(#{$block}_darkgrey) {
+            --entity-state-stripe-color: var(--g-color-base-neutral-light);
+            --entity-state-stripe-border-color: var(--entity-state-border-color);
+
+            &#{$block}_highlighted {
+                --entity-state-stripe-color: var(--entity-state-background-color);
+            }
         }
 
         &#{$block}_green {
