@@ -145,6 +145,7 @@ function getNetworkMetric(networkUtilization?: number): TenantOverviewMetric | u
         return undefined;
     }
 
+    // Network comes as raw utilization; convert it to percent for tab and summary views.
     const diagramValues = calculateBaseDiagramValues({
         fillWidth: networkUtilization * 100,
     });
@@ -171,13 +172,18 @@ export function getTenantOverviewMetrics({
         return {};
     }
 
+    // Sum CPU usage from all pools except the IO pool.
     const cpuPools = (poolsStats || []).filter((pool) => pool.name !== 'IO');
     const cpuMetrics = calculateMetricAggregates(cpuPools);
     const cpuLimit = coresTotal && coresTotal > 0 ? coresTotal : cpuMetrics.totalLimit;
+
+    // Calculate storage metrics using explicit metric stats when available.
     const storageStats =
         storageMetricStats ??
         selectStorageStatsForMetricCard({blobStorageStats, tabletStorageStats});
     const storageMetrics = calculateMetricAggregates(storageStats);
+
+    // Calculate memory metrics using utility.
     const memoryMetrics = calculateMetricAggregates(memoryStats);
 
     return {
