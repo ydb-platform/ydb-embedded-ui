@@ -23,7 +23,6 @@ export interface DiagramValuesFallback {
 
 interface DiagramValuesState {
     fill: number;
-    isPercentAvailable: boolean;
     safeFillWidth: number;
 }
 
@@ -96,7 +95,6 @@ export function calculateBaseDiagramValues({
         percents,
         fill: normalizedFillWidth,
         safeFillWidth,
-        isPercentAvailable,
     };
 
     if (!isPercentAvailable && fallback) {
