@@ -5,13 +5,14 @@ import {Flex} from '@gravity-ui/uikit';
 import {setTopQueriesFilters} from '../../../../../store/reducers/executeTopQueries/executeTopQueries';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {ETenantType} from '../../../../../types/api/tenant';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {useTypedDispatch} from '../../../../../utils/hooks';
 import {useDiagnosticsPageLinkGetter} from '../../../Diagnostics/DiagnosticsPages';
 import {MetricPageSummary} from '../MetricPageSummary/MetricPageSummary';
-import type {MetricPageSummaryData} from '../MetricPageSummary/MetricPageSummary';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
+import type {TenantOverviewUsageMetric} from '../metricOverview';
 
 import {TopNodesByCpu} from './TopNodesByCpu';
 import {TopNodesByLoad} from './TopNodesByLoad';
@@ -23,15 +24,10 @@ interface TenantCpuProps {
     database: string;
     databaseFullPath: string;
     databaseType?: ETenantType;
-    metricSummary?: MetricPageSummaryData;
+    metric?: TenantOverviewUsageMetric;
 }
 
-export function TenantCpu({
-    database,
-    databaseType,
-    databaseFullPath,
-    metricSummary,
-}: TenantCpuProps) {
+export function TenantCpu({database, databaseType, databaseFullPath, metric}: TenantCpuProps) {
     const dispatch = useTypedDispatch();
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 
@@ -43,8 +39,15 @@ export function TenantCpu({
 
     return (
         <Flex direction="column" gap={4}>
-            {metricSummary ? (
-                <MetricPageSummary dataQa="tenant-page-metric-summary-cpu" {...metricSummary} />
+            {metric ? (
+                <MetricPageSummary
+                    dataQa="tenant-page-metric-summary-cpu"
+                    description={i18n('context_cpu-description')}
+                    percentText={metric.percentText ?? EMPTY_DATA_PLACEHOLDER}
+                    progressTheme={metric.progressTheme}
+                    progressValue={metric.progressValue}
+                    legend={metric.legend}
+                />
             ) : null}
             {!isServerless && (
                 <React.Fragment>

@@ -1,6 +1,5 @@
 import {EFlag} from '../../../../../types/api/enums';
 import {EType} from '../../../../../types/api/tenant';
-import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {getTenantOverviewMetrics, selectStorageStatsForMetricCard} from '../metricOverview';
 
 describe('selectStorageStatsForMetricCard', () => {
@@ -58,7 +57,7 @@ describe('selectStorageStatsForMetricCard', () => {
 });
 
 describe('getTenantOverviewMetrics', () => {
-    test('builds tab metrics and page summaries from the same aggregates', () => {
+    test('builds metric data from the same aggregates', () => {
         const metrics = getTenantOverviewMetrics({
             isServerless: false,
             coresTotal: 100,
@@ -67,32 +66,43 @@ describe('getTenantOverviewMetrics', () => {
                 {name: 'User', used: 2.3, limit: 100},
                 {name: 'IO', used: 90, limit: 100},
             ],
-            memoryStats: [{used: 536_870_912, limit: 1_073_741_824}],
+            memoryStats: [{used: 1_000_000_000, limit: 2_000_000_000}],
             storageMetricStats: [{used: 900, limit: 1_000}],
             networkUtilization: 0.96,
-            networkThroughput: 1_048_576,
         });
 
-        expect(metrics.tabs.cpu).toEqual({
+        expect(metrics.cpu).toMatchObject({
             percentText: '7%',
+            progressTheme: 'success',
+            progressValue: 7,
             status: EFlag.Green,
+            value: 7.3,
+            capacity: 100,
+            legend: '7 of 100 cores',
         });
-        expect(metrics.tabs.memory).toEqual({
+        expect(metrics.memory).toMatchObject({
             percentText: '50%',
+            progressTheme: 'success',
+            progressValue: 50,
             status: EFlag.Green,
+            value: 1_000_000_000,
+            capacity: 2_000_000_000,
+            legend: '1 of 2\nGB',
         });
-        expect(metrics.tabs.storage).toEqual({
+        expect(metrics.storage).toMatchObject({
             percentText: '90%',
+            progressTheme: 'warning',
+            progressValue: 90,
             status: EFlag.Yellow,
+            value: 900,
+            capacity: 1_000,
         });
-        expect(metrics.tabs.network).toEqual({
+        expect(metrics.network).toMatchObject({
             percentText: '96%',
+            progressTheme: 'danger',
+            progressValue: 96,
             status: EFlag.Red,
         });
-
-        expect(metrics.summaries.cpu?.presentation.percentText).toBe('7%');
-        expect(metrics.summaries.memory?.presentation.percentText).toBe('50%');
-        expect(metrics.summaries.network?.presentation.percentText).toBe('96%');
     });
 
     test('keeps network metrics when throughput is missing', () => {
@@ -104,19 +114,50 @@ describe('getTenantOverviewMetrics', () => {
             networkUtilization: 0.42,
         });
 
-        expect(metrics.tabs.network).toEqual({
-            percentText: '42%',
-            status: EFlag.Green,
-        });
-        expect(metrics.summaries.network?.presentation).toEqual({
+        expect(metrics.network).toMatchObject({
             percentText: '42%',
             progressTheme: 'success',
             progressValue: 42,
-            valueText: undefined,
+            status: EFlag.Green,
         });
     });
 
-    test('omits memory summary value text when memory limit is missing', () => {
+    test('keeps zero percent as available metric data', () => {
+        const metrics = getTenantOverviewMetrics({
+            isServerless: false,
+            poolsStats: [{name: 'System', used: 0, limit: 100}],
+            memoryStats: [{used: 0, limit: 100}],
+            storageMetricStats: [{used: 0, limit: 100}],
+            networkUtilization: 0,
+        });
+
+        expect(metrics.cpu).toMatchObject({
+            percentText: '0%',
+            progressTheme: 'success',
+            progressValue: 0,
+            status: EFlag.Green,
+        });
+        expect(metrics.memory).toMatchObject({
+            percentText: '0%',
+            progressTheme: 'success',
+            progressValue: 0,
+            status: EFlag.Green,
+        });
+        expect(metrics.storage).toMatchObject({
+            percentText: '0%',
+            progressTheme: 'success',
+            progressValue: 0,
+            status: EFlag.Green,
+        });
+        expect(metrics.network).toMatchObject({
+            percentText: '0%',
+            progressTheme: 'success',
+            progressValue: 0,
+            status: EFlag.Green,
+        });
+    });
+
+    test('marks memory percent unavailable when memory limit is missing', () => {
         const metrics = getTenantOverviewMetrics({
             isServerless: false,
             poolsStats: [{name: 'System', used: 5, limit: 100}],
@@ -124,18 +165,18 @@ describe('getTenantOverviewMetrics', () => {
             storageMetricStats: [{used: 900, limit: 1_000}],
         });
 
-        expect(metrics.tabs.memory).toEqual({
-            percentText: 'N/A',
-            status: EFlag.Grey,
-        });
-        expect(metrics.summaries.memory?.presentation).toEqual({
-            percentText: EMPTY_DATA_PLACEHOLDER,
+        expect(metrics.memory).toMatchObject({
+            percentText: undefined,
+            progressTheme: undefined,
             progressValue: 0,
-            valueText: undefined,
+            status: EFlag.Grey,
+            value: 536_870_912,
+            capacity: 0,
+            legend: undefined,
         });
     });
 
-    test('omits cpu summary value text when cpu limit is missing', () => {
+    test('marks cpu percent unavailable when cpu limit is missing', () => {
         const metrics = getTenantOverviewMetrics({
             isServerless: false,
             poolsStats: [{name: 'System', used: 5, limit: undefined}],
@@ -143,46 +184,38 @@ describe('getTenantOverviewMetrics', () => {
             storageMetricStats: [{used: 900, limit: 1_000}],
         });
 
-        expect(metrics.tabs.cpu).toEqual({
-            percentText: 'N/A',
-            status: EFlag.Grey,
-        });
-        expect(metrics.summaries.cpu?.presentation).toEqual({
-            percentText: EMPTY_DATA_PLACEHOLDER,
+        expect(metrics.cpu).toMatchObject({
+            percentText: undefined,
+            progressTheme: undefined,
             progressValue: 0,
-            valueText: undefined,
+            status: EFlag.Grey,
+            value: 5,
+            capacity: 0,
+            legend: undefined,
         });
     });
 
-    test('keeps page summaries in empty state when metric data is missing', () => {
+    test('keeps dedicated metrics in empty state when metric data is missing', () => {
         const metrics = getTenantOverviewMetrics({
             isServerless: false,
         });
 
-        expect(metrics.tabs.cpu).toEqual({
-            percentText: 'N/A',
-            status: EFlag.Grey,
-        });
-        expect(metrics.tabs.memory).toEqual({
-            percentText: 'N/A',
-            status: EFlag.Grey,
-        });
-        expect(metrics.tabs.storage).toEqual({
-            percentText: 'N/A',
-            status: EFlag.Grey,
-        });
-        expect(metrics.tabs.network).toBeUndefined();
-        expect(metrics.summaries.cpu?.presentation).toEqual({
-            percentText: EMPTY_DATA_PLACEHOLDER,
+        expect(metrics.cpu).toMatchObject({
+            percentText: undefined,
             progressValue: 0,
-            valueText: undefined,
+            status: EFlag.Grey,
         });
-        expect(metrics.summaries.memory?.presentation).toEqual({
-            percentText: EMPTY_DATA_PLACEHOLDER,
+        expect(metrics.memory).toMatchObject({
+            percentText: undefined,
             progressValue: 0,
-            valueText: undefined,
+            status: EFlag.Grey,
         });
-        expect(metrics.summaries.network).toBeUndefined();
+        expect(metrics.storage).toMatchObject({
+            percentText: undefined,
+            progressValue: 0,
+            status: EFlag.Grey,
+        });
+        expect(metrics.network).toBeUndefined();
     });
 
     test('omits metric data for serverless', () => {
@@ -193,10 +226,8 @@ describe('getTenantOverviewMetrics', () => {
             tabletStorageStats: [{used: 100, limit: undefined}],
             blobStorageStats: [{used: 500, limit: 1_000}],
             networkUtilization: 0.96,
-            networkThroughput: 1_048_576,
         });
 
-        expect(metrics.tabs).toEqual({});
-        expect(metrics.summaries).toEqual({});
+        expect(metrics).toEqual({});
     });
 });

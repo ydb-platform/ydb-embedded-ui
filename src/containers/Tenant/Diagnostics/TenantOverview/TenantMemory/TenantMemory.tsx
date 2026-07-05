@@ -3,13 +3,14 @@ import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {TMemoryStats} from '../../../../../types/api/nodes';
 import {cn} from '../../../../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatStorageValuesToGb} from '../../../../../utils/dataFormatters/dataFormatters';
 import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
 import {MetricPageSummary} from '../MetricPageSummary/MetricPageSummary';
-import type {MetricPageSummaryData} from '../MetricPageSummary/MetricPageSummary';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
+import type {TenantOverviewUsageMetric} from '../metricOverview';
 
 import {MemoryDetailsSection} from './MemoryDetailsSection';
 import {TopNodesByMemory} from './TopNodesByMemory';
@@ -22,7 +23,7 @@ interface TenantMemoryProps {
     memoryStats?: TMemoryStats;
     memoryUsed?: string;
     memoryLimit?: string;
-    metricSummary?: MetricPageSummaryData;
+    metric?: TenantOverviewUsageMetric;
 }
 
 const b = cn('tenant-memory');
@@ -32,7 +33,7 @@ export function TenantMemory({
     memoryStats,
     memoryUsed,
     memoryLimit,
-    metricSummary,
+    metric,
 }: TenantMemoryProps) {
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
     const renderMemoryDetails = () => {
@@ -67,11 +68,15 @@ export function TenantMemory({
 
     return (
         <div className={b()}>
-            {metricSummary ? (
+            {metric ? (
                 <MetricPageSummary
                     className={b('metric-summary')}
                     dataQa="tenant-page-metric-summary-memory"
-                    {...metricSummary}
+                    description={i18n('context_memory-description')}
+                    percentText={metric.percentText ?? EMPTY_DATA_PLACEHOLDER}
+                    progressTheme={metric.progressTheme}
+                    progressValue={metric.progressValue}
+                    legend={metric.legend}
                 />
             ) : null}
             <TenantDashboard database={database} charts={memoryDashboardConfig} />

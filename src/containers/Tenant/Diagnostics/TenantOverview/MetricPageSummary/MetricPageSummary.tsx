@@ -4,30 +4,33 @@ import {Divider, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../../utils/cn';
 import i18n from '../i18n';
-import type {MetricPageSummaryPresentation} from '../metricPresentation';
 
 import './MetricPageSummary.scss';
 
 const b = cn('ydb-tenant-metric-page-summary');
 
-export interface MetricPageSummaryData {
-    description: string;
-    presentation: MetricPageSummaryPresentation;
-}
+type MetricPageSummaryProgressTheme = 'success' | 'warning' | 'danger';
 
-interface MetricPageSummaryProps extends MetricPageSummaryData {
-    dataQa: string;
+interface MetricPageSummaryProps {
     className?: string;
+    dataQa: string;
+    description: string;
+    legend?: string;
+    percentText: string;
+    progressTheme?: MetricPageSummaryProgressTheme;
+    progressValue: number;
 }
 
 export function MetricPageSummary({
     className,
     dataQa,
     description,
-    presentation,
+    legend,
+    percentText,
+    progressTheme,
+    progressValue,
 }: MetricPageSummaryProps) {
-    const {percentText, progressTheme, progressValue, valueText} = presentation;
-    const hasValueText = valueText !== undefined;
+    const hasLegend = legend !== undefined;
 
     return (
         <div className={b(null, className)} data-qa={dataQa}>
@@ -44,11 +47,11 @@ export function MetricPageSummary({
                         <Text color="secondary" data-qa="tenant-page-metric-summary-percent">
                             {i18n('context_metric-summary-used', {value: percentText})}
                         </Text>
-                        {hasValueText && (
+                        {hasLegend && (
                             <React.Fragment>
                                 <Divider className={b('divider')} orientation="vertical" />
                                 <Text color="secondary" data-qa="tenant-page-metric-summary-value">
-                                    {valueText}
+                                    {legend}
                                 </Text>
                             </React.Fragment>
                         )}

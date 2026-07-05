@@ -46,7 +46,7 @@ import {TenantStorageMode} from './TenantStorage/TenantStorageMode';
 import type {TenantStorageMetrics} from './TenantStorage/types';
 import i18n from './i18n';
 import {getTenantOverviewMetrics} from './metricOverview';
-import type {MetricPageSummaries} from './metricOverview';
+import type {TenantOverviewMetrics} from './metricOverview';
 import {b} from './utils';
 
 import MoniumIcon from '../../../../assets/icons/monium.svg';
@@ -204,10 +204,11 @@ function renderMetricsTabContent({
     database,
     databaseFullPath,
     databaseType,
-    metricPageSummaries,
+    metrics,
     memoryLimit,
     memoryStats,
     memoryUsed,
+    networkThroughput,
     storageMetrics,
     tabletStorageStats,
 }: {
@@ -216,10 +217,11 @@ function renderMetricsTabContent({
     database: string;
     databaseFullPath: string;
     databaseType?: ETenantType;
-    metricPageSummaries: MetricPageSummaries;
+    metrics: TenantOverviewMetrics;
     memoryLimit?: string;
     memoryStats?: TMemoryStats;
     memoryUsed?: string;
+    networkThroughput?: number;
     storageMetrics: TenantStorageMetrics;
     tabletStorageStats?: TenantStorageStats[];
 }) {
@@ -230,7 +232,7 @@ function renderMetricsTabContent({
                     database={database}
                     databaseType={databaseType}
                     databaseFullPath={databaseFullPath}
-                    metricSummary={metricPageSummaries.cpu}
+                    metric={metrics.cpu}
                 />
             );
         }
@@ -253,13 +255,17 @@ function renderMetricsTabContent({
                     memoryUsed={memoryUsed}
                     memoryLimit={memoryLimit}
                     memoryStats={memoryStats}
-                    metricSummary={metricPageSummaries.memory}
+                    metric={metrics.memory}
                 />
             );
         }
         case TENANT_METRICS_TABS_IDS.network: {
             return (
-                <TenantNetwork database={database} metricSummary={metricPageSummaries.network} />
+                <TenantNetwork
+                    database={database}
+                    metric={metrics.network}
+                    networkThroughput={networkThroughput}
+                />
             );
         }
         default: {
@@ -340,7 +346,6 @@ export function TenantOverview({
             coresTotal: CoresTotal,
             isServerless,
             memoryStats,
-            networkThroughput,
             networkUtilization,
             poolsStats,
             storageMetricStats,
@@ -351,7 +356,6 @@ export function TenantOverview({
         CoresTotal,
         isServerless,
         memoryStats,
-        networkThroughput,
         networkUtilization,
         poolsStats,
         storageMetricStats,
@@ -399,8 +403,8 @@ export function TenantOverview({
                         })}
                         <QueriesActivityBar database={database} />
                         <MetricsTabs
-                            metrics={metricOverview.tabs}
-                            databaseType={Type}
+                            metrics={metricOverview}
+                            isServerless={isServerless}
                             activeTab={activeMetricsTab}
                         />
                     </Flex>
@@ -412,10 +416,11 @@ export function TenantOverview({
                         database,
                         databaseFullPath,
                         databaseType: Type,
-                        metricPageSummaries: metricOverview.summaries,
+                        metrics: metricOverview,
                         memoryLimit: tenant?.MemoryLimit,
                         memoryStats: tenant?.MemoryStats,
                         memoryUsed: tenant?.MemoryUsed,
+                        networkThroughput,
                         storageMetrics,
                         tabletStorageStats,
                     })}

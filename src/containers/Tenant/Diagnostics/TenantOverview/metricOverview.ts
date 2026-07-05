@@ -3,21 +3,18 @@ import type {
     TenantPoolsStats,
     TenantStorageStats,
 } from '../../../../store/reducers/tenants/utils';
-import {calculateMetricAggregates} from '../../../../utils/metrics';
+import {EFlag} from '../../../../types/api/enums';
+import {calculateMetricAggregates, getMetricPercentPrecision} from '../../../../utils/metrics';
+import {formatCoresLegend, formatStorageLegend} from '../../../../utils/metrics/formatMetricLegend';
+import type {MetricFormatParams} from '../../../../utils/metrics/formatMetricLegend';
 import {
-    formatCoresLegend,
-    formatNetworkMetric,
-    formatStorageLegend,
-} from '../../../../utils/metrics/formatMetricLegend';
-
-import type {MetricPageSummaryData} from './MetricPageSummary/MetricPageSummary';
-import i18n from './i18n';
-import {
-    calculateUsagePercent,
-    getMetricPageSummaryPresentation,
-    getMetricTabPresentation,
-} from './metricPresentation';
-import type {MetricTabPresentation} from './metricPresentation';
+    calculateBaseDiagramValues,
+    getDiagramValues,
+} from '../../../../utils/metrics/getDiagramValues';
+import type {
+    DiagramValuesFallback,
+    DiagramValuesStatus,
+} from '../../../../utils/metrics/getDiagramValues';
 
 interface SelectStorageStatsForMetricCardParams {
     blobStorageStats?: TenantStorageStats[];
@@ -29,32 +26,51 @@ interface GetTenantOverviewMetricsParams {
     coresTotal?: number;
     isServerless: boolean;
     memoryStats?: TenantMetricStats[];
-    networkThroughput?: number;
     networkUtilization?: number;
     poolsStats?: TenantPoolsStats[];
     storageMetricStats?: TenantStorageStats[];
     tabletStorageStats?: TenantStorageStats[];
 }
 
-export interface MetricTabsData {
-    // CPU, memory and storage are omitted only for Serverless. Dedicated databases
-    // keep these metrics even when data is missing and display them as N/A.
-    cpu?: MetricTabPresentation;
-    memory?: MetricTabPresentation;
-    network?: MetricTabPresentation;
-    storage?: MetricTabPresentation;
+export type MetricProgressTheme = 'success' | 'warning' | 'danger';
+
+export interface TenantOverviewMetric {
+    percentText?: string;
+    progressTheme?: MetricProgressTheme;
+    progressValue: number;
+    status: EFlag;
 }
 
-export interface MetricPageSummaries {
-    cpu?: MetricPageSummaryData;
-    memory?: MetricPageSummaryData;
-    network?: MetricPageSummaryData;
+export interface TenantOverviewUsageMetric extends TenantOverviewMetric {
+    capacity: number;
+    legend?: string;
+    value: number;
 }
 
 export interface TenantOverviewMetrics {
-    summaries: MetricPageSummaries;
-    tabs: MetricTabsData;
+    cpu?: TenantOverviewUsageMetric;
+    memory?: TenantOverviewUsageMetric;
+    network?: TenantOverviewMetric;
+    storage?: TenantOverviewUsageMetric;
 }
+
+const DiagramStatusToEFlag: Record<DiagramValuesStatus, EFlag> = {
+    good: EFlag.Green,
+    warning: EFlag.Yellow,
+    danger: EFlag.Red,
+    unavailable: EFlag.Grey,
+};
+
+const DiagramStatusToTheme: Partial<Record<DiagramValuesStatus, MetricProgressTheme>> = {
+    good: 'success',
+    warning: 'warning',
+    danger: 'danger',
+};
+
+const UNAVAILABLE_METRIC_FALLBACK: DiagramValuesFallback = {
+    percents: undefined,
+    status: 'unavailable',
+};
 
 export function selectStorageStatsForMetricCard({
     blobStorageStats,
@@ -74,49 +90,70 @@ export function selectStorageStatsForMetricCard({
     return blobStorageStats || tabletStorageStats || [];
 }
 
-type NetworkUtilizationMetricParams = Pick<GetTenantOverviewMetricsParams, 'networkUtilization'>;
-type NetworkMetricSummaryParams = Pick<
-    GetTenantOverviewMetricsParams,
-    'networkThroughput' | 'networkUtilization'
->;
+function getProgressValue(usagePercent: number) {
+    const clampedValue = Math.min(Math.max(usagePercent, 0), 100);
 
-function hasNetworkUtilizationData<T extends NetworkUtilizationMetricParams>(
-    params: T,
-): params is T & {networkUtilization: number} {
-    return params.networkUtilization !== undefined && Number.isFinite(params.networkUtilization);
+    return Number(clampedValue.toFixed(getMetricPercentPrecision(clampedValue)));
 }
 
-function getNetworkMetricData(
-    params: NetworkUtilizationMetricParams,
-): MetricTabPresentation | undefined {
-    if (!hasNetworkUtilizationData(params)) {
-        return undefined;
-    }
+function createSafeLegendFormatter(formatter: (params: MetricFormatParams) => string) {
+    return ({value, capacity}: MetricFormatParams) => {
+        if (!Number.isFinite(value) || !Number.isFinite(capacity) || capacity <= 0) {
+            return undefined;
+        }
 
-    return getMetricTabPresentation({usagePercent: params.networkUtilization * 100});
+        return formatter({value, capacity});
+    };
 }
 
-function getNetworkThroughputText(networkThroughput?: number) {
-    if (networkThroughput === undefined || !Number.isFinite(networkThroughput)) {
-        return undefined;
-    }
+const formatCpuLegend = createSafeLegendFormatter(formatCoresLegend);
+const formatMemoryLegend = createSafeLegendFormatter(formatStorageLegend);
 
-    return formatNetworkMetric(networkThroughput) || undefined;
-}
-
-function getNetworkMetricSummary(
-    params: NetworkMetricSummaryParams,
-): MetricPageSummaryData | undefined {
-    if (!hasNetworkUtilizationData(params)) {
-        return undefined;
-    }
+function getMetricPresentation({
+    dangerThreshold,
+    legendFormatter,
+    value,
+    capacity,
+}: {
+    dangerThreshold?: number;
+    legendFormatter?: (params: MetricFormatParams) => string | undefined;
+    value: number;
+    capacity: number;
+}): TenantOverviewUsageMetric {
+    const diagramValues = getDiagramValues({
+        value,
+        capacity,
+        dangerThreshold,
+        fallback: UNAVAILABLE_METRIC_FALLBACK,
+        legendFormatter,
+    });
+    const {legend} = diagramValues;
 
     return {
-        description: i18n('context_network-description'),
-        presentation: getMetricPageSummaryPresentation({
-            usagePercent: params.networkUtilization * 100,
-            valueText: getNetworkThroughputText(params.networkThroughput),
-        }),
+        percentText: diagramValues.percents,
+        progressValue: getProgressValue(diagramValues.safeFillWidth),
+        progressTheme: DiagramStatusToTheme[diagramValues.status],
+        status: DiagramStatusToEFlag[diagramValues.status],
+        legend,
+        value,
+        capacity,
+    };
+}
+
+function getNetworkMetric(networkUtilization?: number): TenantOverviewMetric | undefined {
+    if (networkUtilization === undefined || !Number.isFinite(networkUtilization)) {
+        return undefined;
+    }
+
+    const diagramValues = calculateBaseDiagramValues({
+        fillWidth: networkUtilization * 100,
+    });
+
+    return {
+        percentText: diagramValues.percents,
+        progressValue: getProgressValue(diagramValues.safeFillWidth),
+        progressTheme: DiagramStatusToTheme[diagramValues.status],
+        status: DiagramStatusToEFlag[diagramValues.status],
     };
 }
 
@@ -125,14 +162,13 @@ export function getTenantOverviewMetrics({
     coresTotal,
     isServerless,
     memoryStats,
-    networkThroughput,
     networkUtilization,
     poolsStats,
     storageMetricStats,
     tabletStorageStats,
 }: GetTenantOverviewMetricsParams): TenantOverviewMetrics {
     if (isServerless) {
-        return {summaries: {}, tabs: {}};
+        return {};
     }
 
     const cpuPools = (poolsStats || []).filter((pool) => pool.name !== 'IO');
@@ -142,65 +178,28 @@ export function getTenantOverviewMetrics({
         storageMetricStats ??
         selectStorageStatsForMetricCard({blobStorageStats, tabletStorageStats});
     const storageMetrics = calculateMetricAggregates(storageStats);
-    const cpuUsagePercent = calculateUsagePercent(cpuMetrics.totalUsed, cpuLimit);
     const memoryMetrics = calculateMetricAggregates(memoryStats);
-    const memoryUsagePercent = calculateUsagePercent(
-        memoryMetrics.totalUsed,
-        memoryMetrics.totalLimit,
-    );
 
-    const storageUsagePercent = calculateUsagePercent(
-        storageMetrics.totalUsed,
-        storageMetrics.totalLimit,
-    );
-
-    const tabs: MetricTabsData = {
-        cpu: getMetricTabPresentation({usagePercent: cpuUsagePercent}),
-        memory: getMetricTabPresentation({usagePercent: memoryUsagePercent}),
-        network: getNetworkMetricData({networkUtilization}),
+    return {
+        cpu: getMetricPresentation({
+            value: cpuMetrics.totalUsed,
+            capacity: cpuLimit,
+            legendFormatter: formatCpuLegend,
+        }),
+        memory: getMetricPresentation({
+            value: memoryMetrics.totalUsed,
+            capacity: memoryMetrics.totalLimit,
+            legendFormatter: formatMemoryLegend,
+        }),
+        network: getNetworkMetric(networkUtilization),
         // Never show the "danger" (red) status for storage, regardless of usage.
         // Keep the status "warning" (yellow) above the warning threshold and
         // never switch to red, including when usage grows into high values
         // (for example, 91-99%) or goes above 100%.
-        storage: getMetricTabPresentation({
-            usagePercent: storageUsagePercent,
+        storage: getMetricPresentation({
+            value: storageMetrics.totalUsed,
+            capacity: storageMetrics.totalLimit,
             dangerThreshold: Infinity,
         }),
-    };
-
-    const cpuValueText =
-        cpuLimit > 0
-            ? formatCoresLegend({
-                  value: cpuMetrics.totalUsed,
-                  capacity: cpuLimit,
-              })
-            : undefined;
-    const memoryValueText =
-        memoryMetrics.totalLimit > 0
-            ? formatStorageLegend({
-                  value: memoryMetrics.totalUsed,
-                  capacity: memoryMetrics.totalLimit,
-              })
-            : undefined;
-
-    return {
-        summaries: {
-            cpu: {
-                description: i18n('context_cpu-description'),
-                presentation: getMetricPageSummaryPresentation({
-                    usagePercent: cpuUsagePercent,
-                    valueText: cpuValueText,
-                }),
-            },
-            memory: {
-                description: i18n('context_memory-description'),
-                presentation: getMetricPageSummaryPresentation({
-                    usagePercent: memoryUsagePercent,
-                    valueText: memoryValueText,
-                }),
-            },
-            network: getNetworkMetricSummary({networkThroughput, networkUtilization}),
-        },
-        tabs,
     };
 }
