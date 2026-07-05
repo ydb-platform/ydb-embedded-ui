@@ -1,17 +1,50 @@
 .ydb-segmented-progress {
+    --ydb-segmented-progress-height: 10px;
+    --ydb-segmented-progress-section-min-width: 10px;
+    --ydb-segmented-progress-empty-color: var(--g-color-sfx-shadow);
+    --ydb-segmented-progress-empty-opacity: 1;
+    --ydb-segmented-progress-used-color: var(--g-color-base-info-heavy);
+
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: var(--g-spacing-1);
+
     width: 100%;
-    height: 10px;
+    height: var(--ydb-segmented-progress-height);
+
+    &_theme_neutral {
+        --ydb-segmented-progress-used-color: var(--g-color-line-generic);
+    }
+
+    &_theme_success {
+        --ydb-segmented-progress-used-color: var(--g-color-text-positive);
+    }
+
+    &_theme_warning {
+        --ydb-segmented-progress-used-color: var(--g-color-line-warning);
+    }
+
+    &_theme_danger {
+        --ydb-segmented-progress-used-color: var(--g-color-text-danger);
+    }
 
     &__section {
-        min-width: 10px;
+        min-width: var(--ydb-segmented-progress-section-min-width);
         height: 100%;
 
         border-radius: var(--g-border-radius-xs);
-        background-color: var(--g-color-sfx-shadow);
+        background-color: var(--ydb-segmented-progress-empty-color);
     }
+
+    &__section:not(&__section_used) {
+        opacity: var(--ydb-segmented-progress-empty-opacity);
+    }
+
     &__section_used {
-        background-color: var(--g-color-base-info-heavy);
+        background-color: var(--ydb-segmented-progress-used-color);
     }
+
     &__label {
         margin-left: auto;
     }

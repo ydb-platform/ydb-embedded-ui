@@ -2,6 +2,7 @@ import React from 'react';
 
 import {Divider, Text} from '@gravity-ui/uikit';
 
+import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
 import {cn} from '../../../../../utils/cn';
 import i18n from '../i18n';
 
@@ -57,22 +58,15 @@ export function MetricPageSummary({
                         )}
                     </div>
                 </div>
-                <div
-                    className={b('progress', {
-                        theme: progressTheme,
-                        full: progressValue >= 100,
-                        empty: progressValue <= 0,
-                    })}
-                    data-qa="tenant-page-metric-summary-progress"
-                    style={
-                        {
-                            '--metric-page-summary-progress-fill': `${progressValue}%`,
-                        } as React.CSSProperties
-                    }
-                >
-                    <div className={b('progress-fill')} />
-                    <div className={b('progress-rest')} />
-                </div>
+                <SegmentedProgress
+                    className={b('progress')}
+                    dataQa="tenant-page-metric-summary-progress"
+                    value={progressValue}
+                    total={100}
+                    theme={progressTheme ?? 'neutral'}
+                    hideLabels
+                    ariaLabel={description}
+                />
             </div>
         </div>
     );
