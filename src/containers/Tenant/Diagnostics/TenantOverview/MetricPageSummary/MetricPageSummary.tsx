@@ -10,7 +10,7 @@ import './MetricPageSummary.scss';
 
 const b = cn('ydb-tenant-metric-page-summary');
 
-type MetricPageSummaryProgressTheme = 'success' | 'warning' | 'danger';
+type MetricPageSummaryProgressTheme = 'neutral' | 'success' | 'warning' | 'danger';
 
 interface MetricPageSummaryProps {
     className?: string;
@@ -18,7 +18,7 @@ interface MetricPageSummaryProps {
     description: string;
     legend?: string;
     percentText: string;
-    progressTheme?: MetricPageSummaryProgressTheme;
+    progressTheme: MetricPageSummaryProgressTheme;
     progressValue: number;
 }
 
@@ -63,7 +63,7 @@ export function MetricPageSummary({
                     dataQa="tenant-page-metric-summary-progress"
                     value={progressValue}
                     total={100}
-                    theme={progressTheme ?? 'neutral'}
+                    theme={progressTheme}
                     hideLabels
                     ariaLabel={description}
                 />

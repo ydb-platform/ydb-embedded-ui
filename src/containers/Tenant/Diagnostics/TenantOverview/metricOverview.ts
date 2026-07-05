@@ -32,11 +32,11 @@ interface GetTenantOverviewMetricsParams {
     tabletStorageStats?: TenantStorageStats[];
 }
 
-export type MetricProgressTheme = 'success' | 'warning' | 'danger';
+export type MetricProgressTheme = 'neutral' | 'success' | 'warning' | 'danger';
 
 export interface TenantOverviewMetric {
     percentText?: string;
-    progressTheme?: MetricProgressTheme;
+    progressTheme: MetricProgressTheme;
     progressValue: number;
     status: EFlag;
 }
@@ -61,10 +61,11 @@ const DiagramStatusToEFlag: Record<DiagramValuesStatus, EFlag> = {
     unavailable: EFlag.Grey,
 };
 
-const DiagramStatusToTheme: Partial<Record<DiagramValuesStatus, MetricProgressTheme>> = {
+const DiagramStatusToTheme: Record<DiagramValuesStatus, MetricProgressTheme> = {
     good: 'success',
     warning: 'warning',
     danger: 'danger',
+    unavailable: 'neutral',
 };
 
 const UNAVAILABLE_METRIC_FALLBACK: DiagramValuesFallback = {

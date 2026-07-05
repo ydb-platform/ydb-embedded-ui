@@ -167,7 +167,7 @@ describe('getTenantOverviewMetrics', () => {
 
         expect(metrics.memory).toMatchObject({
             percentText: undefined,
-            progressTheme: undefined,
+            progressTheme: 'neutral',
             progressValue: 0,
             status: EFlag.Grey,
             value: 536_870_912,
@@ -186,7 +186,7 @@ describe('getTenantOverviewMetrics', () => {
 
         expect(metrics.cpu).toMatchObject({
             percentText: undefined,
-            progressTheme: undefined,
+            progressTheme: 'neutral',
             progressValue: 0,
             status: EFlag.Grey,
             value: 5,
@@ -202,16 +202,19 @@ describe('getTenantOverviewMetrics', () => {
 
         expect(metrics.cpu).toMatchObject({
             percentText: undefined,
+            progressTheme: 'neutral',
             progressValue: 0,
             status: EFlag.Grey,
         });
         expect(metrics.memory).toMatchObject({
             percentText: undefined,
+            progressTheme: 'neutral',
             progressValue: 0,
             status: EFlag.Grey,
         });
         expect(metrics.storage).toMatchObject({
             percentText: undefined,
+            progressTheme: 'neutral',
             progressValue: 0,
             status: EFlag.Grey,
         });
