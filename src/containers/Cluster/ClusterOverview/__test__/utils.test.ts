@@ -1,4 +1,7 @@
-import {calculateBaseDiagramValues, getDiagramValues} from '../utils';
+import {
+    calculateBaseDiagramValues,
+    getDiagramValues,
+} from '../../../../utils/metrics/getDiagramValues';
 
 describe('ClusterOverview utils', () => {
     test('formats metric percentages with one decimal only below one percent', () => {
