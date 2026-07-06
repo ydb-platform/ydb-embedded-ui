@@ -4,13 +4,13 @@ import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 
 import {TopGroups} from './TopGroups';
 import {TopTables} from './TopTables';
+import {formatTenantStorageProgressMetric} from './displayFormatters';
 import i18n from './i18n';
 import {storageDashboardConfig} from './storageDashboardConfig';
 import type {TenantStorageProps} from './types';
@@ -33,7 +33,7 @@ export function TenantStorage({database, metrics, databaseType}: TenantStoragePr
                 <ProgressWrapper
                     value={tabletStorageUsed}
                     capacity={tabletStorageLimit}
-                    formatValues={formatStorageValues}
+                    formatValues={formatTenantStorageProgressMetric}
                     withCapacityUsage
                 />
             ),
@@ -49,7 +49,7 @@ export function TenantStorage({database, metrics, databaseType}: TenantStoragePr
                 <ProgressWrapper
                     value={blobStorageUsed}
                     capacity={blobStorageLimit}
-                    formatValues={formatStorageValues}
+                    formatValues={formatTenantStorageProgressMetric}
                     withCapacityUsage
                 />
             ),

@@ -3,6 +3,7 @@ import {
     formatSummaryPercent,
     formatTenantStorageAdaptiveMetric,
     formatTenantStorageApproximateMetric,
+    formatTenantStorageProgressMetric,
     formatTenantStorageSummaryMetric,
     formatTenantStorageTableMetric,
     formatTenantStorageTableOverhead,
@@ -90,6 +91,21 @@ describe('TenantStorage display formatters', () => {
         expect(formatTenantStorageAdaptiveMetric(236_000_000_000)).toBe(withUnit('236', 'GB'));
         expect(formatTenantStorageAdaptiveMetric(1_200_000_000)).toBe(withUnit('1.2', 'GB'));
         expect(formatTenantStorageAdaptiveMetric(500_000_000)).toBe(withUnit('500', 'MB'));
+    });
+
+    test('formats storage details progress values with metric byte precision', () => {
+        expect(formatTenantStorageProgressMetric(2_350_000_000_000, 3 * TB)).toEqual([
+            '2.35',
+            withUnit('3', 'TB'),
+        ]);
+        expect(formatTenantStorageProgressMetric(8_400_000_000_000, 36 * TB)).toEqual([
+            '8.4',
+            withUnit('36', 'TB'),
+        ]);
+        expect(formatTenantStorageProgressMetric(521_000_000, 999_600_000)).toEqual([
+            '0.52',
+            withUnit('1', 'GB'),
+        ]);
     });
 
     test('formats top usage table metrics adaptively', () => {

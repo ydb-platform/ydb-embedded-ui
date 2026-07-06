@@ -1,7 +1,12 @@
 import type {BytesSizes} from '../../../../../utils/bytesParsers';
 import {sizes} from '../../../../../utils/bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
-import {formatNumber, formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
+import {
+    formatNumber,
+    formatPercent,
+    formatStorageValues,
+} from '../../../../../utils/dataFormatters/dataFormatters';
+import {getFormatBytesPrecision} from '../../../../../utils/metrics/formatMetricLegend';
 import type {FormatMetricBytesOptions} from '../../../../../utils/storageMetrics';
 import {
     formatMetricBytes,
@@ -77,6 +82,21 @@ export function formatTenantStorageApproximateMetric(
 
 export function formatTenantStorageAdaptiveMetric(value?: string | number) {
     return formatByteMetric(value);
+}
+
+export function formatTenantStorageProgressMetric(value?: number, capacity?: number) {
+    const numericCapacity = Number(capacity);
+
+    if (!Number.isFinite(numericCapacity) || numericCapacity <= 0) {
+        return [formatByteMetric(value), undefined];
+    }
+
+    const size = getConsistentMetricBytesSize([value, capacity], TENANT_STORAGE_FORMAT_OPTIONS);
+
+    return formatStorageValues(value, capacity, size, undefined, false, {
+        value: getFormatBytesPrecision(Number(value), size),
+        total: getFormatBytesPrecision(numericCapacity, size),
+    });
 }
 
 function getLowerByteUnit(size: BytesSizes) {

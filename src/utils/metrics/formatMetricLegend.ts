@@ -18,7 +18,7 @@ export interface MetricFormatParams {
     capacity: number;
 }
 
-function getFormatBytesPrecision(value: number, size: BytesSizes) {
+export function getFormatBytesPrecision(value: number, size: BytesSizes) {
     const convertedValue = Number(value) / sizes[size].value;
     const decimalPlaces = getConvertedMetricBytesDecimalPlaces(size, convertedValue);
     const absoluteConvertedValue = Math.abs(convertedValue);
