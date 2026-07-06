@@ -55,16 +55,16 @@ ON (\${3:column_name});`);
 
             expect(template).toBe(`SELECT
     Data,
-    SystemMetadata('create_time') as create_time,
-    SystemMetadata('write_time') as write_time,
-    SystemMetadata('partition_id') as partition_id,
-    SystemMetadata('offset') as offset,
-    SystemMetadata('message_group_id') as message_group_id,
-    SystemMetadata('seq_no') as seq_no
+    __ydb_create_time as create_time,
+    __ydb_write_time as write_time,
+    __ydb_partition_id as partition_id,
+    __ydb_offset as offset,
+    __ydb_message_group_id as message_group_id,
+    __ydb_seq_no as seq_no
 FROM \`my-topic\`
--- WHERE SystemMetadata('partition_id') = 42
--- AND SystemMetadata('write_time') > CurrentUtcTimestamp() - Interval('PT60S')
--- AND SystemMetadata('offset') > 100
+-- WHERE __ydb_partition_id = 42
+-- AND __ydb_write_time > CurrentUtcTimestamp() - Interval('PT60S')
+-- AND __ydb_offset > 100
 LIMIT \${1:10};`);
         });
 

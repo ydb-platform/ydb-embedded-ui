@@ -203,7 +203,7 @@ test.describe('Query Templates', () => {
 
         await expect
             .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
-            .toContain("SystemMetadata('write_time')");
+            .toContain('__ydb_write_time');
 
         const editorContent = await queryEditor.getEditorContent();
         expect(editorContent).toContain('FROM <my_topic>');
@@ -247,7 +247,7 @@ test.describe('Query Templates', () => {
             .toContain(`FROM \`${topicName}\``);
 
         const editorContent = await queryEditor.getEditorContent();
-        expect(editorContent).toContain("SystemMetadata('offset')");
+        expect(editorContent).toContain('__ydb_offset');
     });
 
     test('Topic context menu hides select query when SQL I/O feature is disabled', async ({
