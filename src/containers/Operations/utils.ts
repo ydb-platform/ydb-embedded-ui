@@ -19,6 +19,12 @@ interface ResolveOperationQueryStateParams {
     capabilitiesLoaded: boolean;
 }
 
+interface ResolveOperationsRenderStateParams {
+    hasData: boolean;
+    hasError: boolean;
+    isLoading: boolean;
+}
+
 export function resolveOperationQueryState({
     queryKind,
     analyzeOperationAvailable,
@@ -33,6 +39,19 @@ export function resolveOperationQueryState({
     return {
         kind,
         skipQuery: shouldWaitForAnalyzeCapability,
+    };
+}
+
+export function resolveOperationsRenderState({
+    hasData,
+    hasError,
+    isLoading,
+}: ResolveOperationsRenderStateParams) {
+    return {
+        showEmpty: !hasError && !hasData && !isLoading,
+        showErrorBelowTable: hasError && hasData,
+        showFullError: hasError && !hasData,
+        showTable: hasData || (!hasError && isLoading),
     };
 }
 

@@ -24,7 +24,7 @@ import i18n from './i18n';
 import {b} from './shared';
 import {useOperationsInfiniteQuery} from './useOperationsInfiniteQuery';
 import {useOperationsQueryParams} from './useOperationsQueryParams';
-import {resolveOperationQueryState} from './utils';
+import {resolveOperationQueryState, resolveOperationsRenderState} from './utils';
 
 interface OperationsProps {
     database: string;
@@ -83,6 +83,13 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
     }
 
     const hasNoData = operations.length === 0;
+    const {showEmpty, showErrorBelowTable, showFullError, showTable} = resolveOperationsRenderState(
+        {
+            hasData: !hasNoData,
+            hasError: Boolean(error),
+            isLoading,
+        },
+    );
 
     return (
         <React.Fragment>
@@ -97,31 +104,26 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
                     />
                 </TableWithControlsLayout.Controls>
                 <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
-                    {error ? (
-                        <ResponseError error={error} />
-                    ) : (
-                        <React.Fragment>
-                            {!hasNoData || isLoading ? (
-                                <ResizeableDataTable
-                                    columns={getColumns({database, kind})}
-                                    columnsWidthLSKey={OPERATIONS_SELECTED_COLUMNS_KEY}
-                                    data={operations}
-                                    settings={settings}
-                                    emptyDataMessage={i18n('title_empty')}
-                                />
-                            ) : (
-                                <div>{i18n('title_empty')}</div>
-                            )}
-                            {isLoadingMore && (
-                                <TableSkeleton
-                                    showHeader={false}
-                                    rows={3}
-                                    delay={0}
-                                    className={b('loading-more')}
-                                />
-                            )}
-                        </React.Fragment>
+                    {showFullError ? <ResponseError error={error} /> : null}
+                    {showTable ? (
+                        <ResizeableDataTable
+                            columns={getColumns({database, kind})}
+                            columnsWidthLSKey={OPERATIONS_SELECTED_COLUMNS_KEY}
+                            data={operations}
+                            settings={settings}
+                            emptyDataMessage={i18n('title_empty')}
+                        />
+                    ) : null}
+                    {showEmpty ? <div>{i18n('title_empty')}</div> : null}
+                    {isLoadingMore && (
+                        <TableSkeleton
+                            showHeader={false}
+                            rows={3}
+                            delay={0}
+                            className={b('loading-more')}
+                        />
                     )}
+                    {showErrorBelowTable ? <ResponseError error={error} /> : null}
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
         </React.Fragment>
