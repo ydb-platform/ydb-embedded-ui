@@ -91,7 +91,7 @@ export function formatTenantStorageProgressMetric(value?: number, capacity?: num
         return [formatByteMetric(value)];
     }
 
-    const size = getConsistentMetricBytesSize([value, capacity], TENANT_STORAGE_FORMAT_OPTIONS);
+    const size = getConsistentMetricBytesSize([value, capacity]);
 
     return formatStorageValues(value, capacity, size, undefined, false, {
         value: getFormatBytesPrecision(Number(value), size),

@@ -107,6 +107,10 @@ describe('TenantStorage display formatters', () => {
             '0.52',
             withUnit('1', 'GB'),
         ]);
+        expect(formatTenantStorageProgressMetric(500, 999.6)).toEqual([
+            '500',
+            withUnit('999.6', 'B'),
+        ]);
     });
 
     test('formats storage details progress text without non-finite capacity', () => {
