@@ -1,3 +1,4 @@
+import {formatProgressText} from '../../../../../../components/ProgressWrapper/progressUtils';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from '../../../../../../utils/constants';
 import {
     formatSummaryPercent,
@@ -106,6 +107,24 @@ describe('TenantStorage display formatters', () => {
             '0.52',
             withUnit('1', 'GB'),
         ]);
+    });
+
+    test('formats storage details progress text without non-finite capacity', () => {
+        const value = withUnit('2.35', 'TB');
+
+        const [nanValueText, nanCapacityText] = formatTenantStorageProgressMetric(
+            2_350_000_000_000,
+            Number.NaN,
+        );
+        const [infiniteValueText, infiniteCapacityText] = formatTenantStorageProgressMetric(
+            2_350_000_000_000,
+            Number.POSITIVE_INFINITY,
+        );
+
+        expect(formatProgressText(nanValueText, nanCapacityText, Number.NaN)).toBe(value);
+        expect(
+            formatProgressText(infiniteValueText, infiniteCapacityText, Number.POSITIVE_INFINITY),
+        ).toBe(value);
     });
 
     test('formats top usage table metrics adaptively', () => {
