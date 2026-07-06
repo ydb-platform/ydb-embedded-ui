@@ -6,10 +6,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {
-    useAnalyzeOperationAvailable,
-    useCapabilitiesLoaded,
-} from '../../store/reducers/capabilities/hooks';
+import {useAnalyzeOperationAvailable} from '../../store/reducers/capabilities/hooks';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
 
@@ -24,7 +21,7 @@ import i18n from './i18n';
 import {b} from './shared';
 import {useOperationsInfiniteQuery} from './useOperationsInfiniteQuery';
 import {useOperationsQueryParams} from './useOperationsQueryParams';
-import {resolveOperationQueryState, resolveOperationsRenderState} from './utils';
+import {resolveOperationsRenderState} from './utils';
 
 interface OperationsProps {
     database: string;
@@ -40,26 +37,20 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
         handleSearchChange,
     } = useOperationsQueryParams();
     const analyzeOperationAvailable = useAnalyzeOperationAvailable();
-    const capabilitiesLoaded = useCapabilitiesLoaded();
 
     const operationKinds = React.useMemo(() => {
-        return analyzeOperationAvailable || (queryKind === 'analyze' && !capabilitiesLoaded)
+        return analyzeOperationAvailable
             ? [...OPERATION_KINDS, ANALYZE_OPERATION_KIND]
             : OPERATION_KINDS;
-    }, [analyzeOperationAvailable, capabilitiesLoaded, queryKind]);
+    }, [analyzeOperationAvailable]);
 
-    const {kind, skipQuery} = resolveOperationQueryState({
-        queryKind,
-        analyzeOperationAvailable,
-        capabilitiesLoaded,
-    });
+    const kind = queryKind === 'analyze' && !analyzeOperationAvailable ? 'buildindex' : queryKind;
 
     const {operations, isLoading, isLoadingMore, error} = useOperationsInfiniteQuery({
         database,
         kind,
         pageSize,
         searchValue,
-        skip: skipQuery,
         scrollContainerRef,
     });
 
