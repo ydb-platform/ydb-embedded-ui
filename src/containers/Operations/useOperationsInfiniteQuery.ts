@@ -10,6 +10,7 @@ interface UseOperationsInfiniteQueryProps {
     kind: OperationKind;
     pageSize?: number;
     searchValue: string;
+    skip?: boolean;
     scrollContainerRef?: React.RefObject<HTMLElement>;
 }
 
@@ -20,14 +21,18 @@ export function useOperationsInfiniteQuery({
     kind,
     pageSize = DEFAULT_PAGE_SIZE,
     searchValue,
+    skip = false,
     scrollContainerRef,
 }: UseOperationsInfiniteQueryProps) {
     const {data, error, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage} =
-        operationsApi.useGetOperationListInfiniteQuery({
-            database,
-            kind,
-            page_size: pageSize,
-        });
+        operationsApi.useGetOperationListInfiniteQuery(
+            {
+                database,
+                kind,
+                page_size: pageSize,
+            },
+            {skip},
+        );
 
     // Flatten all pages into a single array of operations
     const allOperations = React.useMemo(() => {
@@ -117,7 +122,7 @@ export function useOperationsInfiniteQuery({
 
     return {
         operations: filteredOperations,
-        isLoading,
+        isLoading: skip || isLoading,
         isLoadingMore: isFetchingNextPage,
         error,
     };

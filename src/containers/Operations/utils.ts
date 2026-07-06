@@ -7,10 +7,34 @@ import type {
     ImportFromS3Metadata,
     IncrementalBackupMetadata,
     IndexBuildMetadata,
+    OperationKind,
     RestoreMetadata,
     TOperation,
 } from '../../types/api/operations';
 import {OPERATION_METADATA_TYPE_URLS} from '../../types/api/operations';
+
+interface ResolveOperationQueryStateParams {
+    queryKind: OperationKind;
+    analyzeOperationAvailable: boolean;
+    capabilitiesLoaded: boolean;
+}
+
+export function resolveOperationQueryState({
+    queryKind,
+    analyzeOperationAvailable,
+    capabilitiesLoaded,
+}: ResolveOperationQueryStateParams) {
+    const shouldWaitForAnalyzeCapability = queryKind === 'analyze' && !capabilitiesLoaded;
+    const kind =
+        queryKind === 'analyze' && capabilitiesLoaded && !analyzeOperationAvailable
+            ? 'buildindex'
+            : queryKind;
+
+    return {
+        kind,
+        skipQuery: shouldWaitForAnalyzeCapability,
+    };
+}
 
 // Type guards for operation metadata kinds
 export function isIndexBuildMetadata(
