@@ -1,9 +1,68 @@
 import {expect, test} from '@playwright/test';
+import type {Page} from '@playwright/test';
 
 import {backend} from '../../utils/constants';
 import {NodePage} from '../nodes/NodePage';
 import {NodesPage} from '../nodes/NodesPage';
 import {ClusterNodesTable} from '../paginatedTable/paginatedTable';
+
+const THREADS_TEST_DATABASE = '/Root/db';
+const TEST_THREAD_POOL = [
+    {
+        Name: 'TestPool',
+        Threads: 4,
+    },
+];
+
+async function setupNodePageUserMock(
+    page: Page,
+    {
+        isDatabaseAllowed = true,
+        isViewerAllowed = true,
+    }: {isDatabaseAllowed?: boolean; isViewerAllowed?: boolean} = {},
+) {
+    await page.route(`**/viewer/json/whoami*`, async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                UserSID: 'node-page-user',
+                UserID: 'node-page-user',
+                AuthType: 'Login',
+                IsDatabaseAllowed: isDatabaseAllowed,
+                IsViewerAllowed: isViewerAllowed,
+            }),
+        });
+    });
+}
+
+async function setupNodePageSysinfoMock(
+    page: Page,
+    {
+        threads,
+        onRequest,
+    }: {threads?: typeof TEST_THREAD_POOL; onRequest?: (requestUrl: string) => void} = {},
+) {
+    await page.route(`**/viewer/json/sysinfo?*`, async (route) => {
+        onRequest?.(route.request().url());
+
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                SystemStateInfo: [
+                    {
+                        Host: 'localhost',
+                        NodeId: 1,
+                        SystemState: 'Green',
+                        Version: 'test-version',
+                        ...(threads === undefined ? {} : {Threads: threads}),
+                    },
+                ],
+            }),
+        });
+    });
+}
 
 test.describe('Test Nodes page', async () => {
     test('Nodes page is OK', async ({page}) => {
@@ -189,25 +248,42 @@ test.describe('Test Nodes Paginated Table', async () => {
 });
 
 test.describe('Test Node Page Threads Tab', async () => {
-    test('Threads tab is hidden when node has no thread data', async ({page}) => {
-        // Mock the node API to return no thread data
-        await page.route(`**/viewer/json/sysinfo?*`, async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    SystemStateInfo: [
-                        {
-                            Host: 'localhost',
-                            NodeId: 1,
-                            SystemState: 'Green',
-                            Version: 'test-version',
-                        },
-                    ],
-                    // No Threads property
-                }),
-            });
+    test('Threads tab is visible for database-only user and sysinfo keeps database param', async ({
+        page,
+    }) => {
+        const sysinfoRequestUrls: string[] = [];
+
+        await setupNodePageUserMock(page, {isDatabaseAllowed: true, isViewerAllowed: false});
+        await setupNodePageSysinfoMock(page, {
+            threads: TEST_THREAD_POOL,
+            onRequest: (requestUrl) => sysinfoRequestUrls.push(requestUrl),
         });
+
+        const nodePage = new NodePage(page, '1');
+        await nodePage.goto({database: THREADS_TEST_DATABASE});
+        await nodePage.waitForNodePageLoad();
+
+        const tabNames = await nodePage.getAllTabNames();
+        expect(tabNames).toContain('Threads');
+        expect(tabNames).not.toContain('Network');
+        expect(tabNames).not.toContain('Configs');
+
+        await nodePage.clickThreadsTab();
+        await page.waitForURL(/\/node\/\d+\/threads/);
+        await expect(page.getByText('TestPool')).toBeVisible();
+
+        expect(sysinfoRequestUrls.length).toBeGreaterThan(0);
+        expect(
+            sysinfoRequestUrls.every(
+                (requestUrl) =>
+                    new URL(requestUrl).searchParams.get('database') === THREADS_TEST_DATABASE,
+            ),
+        ).toBe(true);
+    });
+
+    test('Threads tab is hidden when node has no thread data', async ({page}) => {
+        await setupNodePageUserMock(page);
+        await setupNodePageSysinfoMock(page);
 
         // Navigate directly to node page
         const nodePage = new NodePage(page, '1');
@@ -221,29 +297,8 @@ test.describe('Test Node Page Threads Tab', async () => {
     });
 
     test('Threads tab is visible when node has thread data', async ({page}) => {
-        // Mock the node API to return thread data
-        await page.route(`**/viewer/json/sysinfo?*`, async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    SystemStateInfo: [
-                        {
-                            Host: 'localhost',
-                            NodeId: 1,
-                            SystemState: 'Green',
-                            Version: 'test-version',
-                            Threads: [
-                                {
-                                    Name: 'TestPool',
-                                    Threads: 4,
-                                },
-                            ],
-                        },
-                    ],
-                }),
-            });
-        });
+        await setupNodePageUserMock(page);
+        await setupNodePageSysinfoMock(page, {threads: TEST_THREAD_POOL});
 
         // Navigate directly to node page
         const nodePage = new NodePage(page, '1');
@@ -265,24 +320,8 @@ test.describe('Test Node Page Threads Tab', async () => {
     });
 
     test('Threads tab is hidden when node has empty thread array', async ({page}) => {
-        // Mock the node API to return empty thread data
-        await page.route(`**/viewer/json/sysinfo?*`, async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    SystemStateInfo: [
-                        {
-                            Host: 'localhost',
-                            NodeId: 1,
-                            SystemState: 'Green',
-                            Version: 'test-version',
-                        },
-                    ],
-                    Threads: [], // Empty array
-                }),
-            });
-        });
+        await setupNodePageUserMock(page);
+        await setupNodePageSysinfoMock(page, {threads: []});
 
         // Navigate directly to node page
         const nodePage = new NodePage(page, '1');
