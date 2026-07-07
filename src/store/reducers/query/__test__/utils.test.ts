@@ -1,11 +1,18 @@
+import {QUERY_ACTIONS, STATISTICS_MODES} from '../../../../utils/query';
 import {
     getActionAndSyntaxFromQueryMode,
+    getEffectiveQueryDataForAction,
+    getEffectiveQuerySettingsForAction,
     getUniqueTabTitle,
     isQueryTabsDirtyPersistedState,
     isQueryTabsPersistedState,
 } from '../utils';
 
 describe('getActionAndSyntaxFromQueryMode', () => {
+    test('defines frontend-only explain analyze action', () => {
+        expect(QUERY_ACTIONS.explainAnalyze).toBe('explain-analyze');
+    });
+
     test('Correctly prepares execute action', () => {
         const {action, syntax} = getActionAndSyntaxFromQueryMode('execute', 'script');
         expect(action).toBe('execute-script');
@@ -15,6 +22,84 @@ describe('getActionAndSyntaxFromQueryMode', () => {
         const {action, syntax} = getActionAndSyntaxFromQueryMode('explain', 'script');
         expect(action).toBe('explain-script');
         expect(syntax).toBe('yql_v1');
+    });
+    test.each([
+        ['query', 'execute-query', 'yql_v1'],
+        ['script', 'execute-script', 'yql_v1'],
+        ['scan', 'execute-scan', 'yql_v1'],
+        ['data', 'execute-data', 'yql_v1'],
+    ] as const)(
+        'maps explain analyze in %s mode to execute-shaped backend action',
+        (mode, action, syntax) => {
+            const result = getActionAndSyntaxFromQueryMode(QUERY_ACTIONS.explainAnalyze, mode);
+
+            expect(result.action).toBe(action);
+            expect(result.syntax).toBe(syntax);
+        },
+    );
+});
+
+describe('getEffectiveQueryDataForAction', () => {
+    const data = {
+        stats: {DurationUs: '10'},
+        resultSets: [
+            {
+                columns: [{name: 'value', type: 'Int32'}],
+                result: [{value: 1}],
+            },
+        ],
+    };
+
+    test('keeps regular execute data unchanged', () => {
+        expect(getEffectiveQueryDataForAction(QUERY_ACTIONS.execute, data)).toBe(data);
+    });
+
+    test('hides result sets for explain analyze without mutating source data', () => {
+        const result = getEffectiveQueryDataForAction(QUERY_ACTIONS.explainAnalyze, data);
+
+        expect(result).toEqual({
+            stats: {DurationUs: '10'},
+            resultSets: undefined,
+        });
+        expect(data.resultSets).toHaveLength(1);
+    });
+});
+
+describe('getEffectiveQuerySettingsForAction', () => {
+    test('keeps regular execute settings unchanged', () => {
+        const querySettings = {
+            queryMode: 'query' as const,
+            limitRows: 100,
+            statisticsMode: STATISTICS_MODES.profile,
+        };
+
+        expect(getEffectiveQuerySettingsForAction(QUERY_ACTIONS.execute, querySettings)).toBe(
+            querySettings,
+        );
+    });
+
+    test('overrides explain analyze request settings without mutating source settings', () => {
+        const querySettings = {
+            queryMode: 'query' as const,
+            limitRows: 100,
+            statisticsMode: STATISTICS_MODES.none,
+        };
+
+        const result = getEffectiveQuerySettingsForAction(
+            QUERY_ACTIONS.explainAnalyze,
+            querySettings,
+        );
+
+        expect(result).toEqual({
+            queryMode: 'query',
+            limitRows: 1,
+            statisticsMode: STATISTICS_MODES.full,
+        });
+        expect(querySettings).toEqual({
+            queryMode: 'query',
+            limitRows: 100,
+            statisticsMode: STATISTICS_MODES.none,
+        });
     });
 });
 
