@@ -76,6 +76,12 @@ describe('TenantStorage display formatters', () => {
         expect(getTenantStorageSummaryMetricUnit([500_000, undefined])).toBe('mb');
     });
 
+    test('selects adaptive summary units when values differ by mixed-unit threshold', () => {
+        expect(getTenantStorageSummaryMetricUnit([1_000_000, 36 * TB])).toBeUndefined();
+        expect(formatTenantStorageSummaryMetric(1_000_000)).toBe(withUnit('1', 'MB'));
+        expect(formatTenantStorageSummaryMetric(36 * TB)).toBe(withUnit('36', 'TB'));
+    });
+
     test('keeps summary values in the requested unit', () => {
         expect(formatTenantStorageSummaryMetric(600_000_000_000, 'tb')).toBe(withUnit('0.6', 'TB'));
     });
@@ -110,6 +116,13 @@ describe('TenantStorage display formatters', () => {
         expect(formatTenantStorageProgressMetric(500, 999.6)).toEqual([
             '500',
             withUnit('999.6', 'B'),
+        ]);
+    });
+
+    test('formats storage details progress values with mixed units when values differ by threshold', () => {
+        expect(formatTenantStorageProgressMetric(1_000_000, 36 * TB)).toEqual([
+            withUnit('1', 'MB'),
+            withUnit('36', 'TB'),
         ]);
     });
 

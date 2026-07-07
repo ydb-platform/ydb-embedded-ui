@@ -8,13 +8,22 @@ describe('formatMetricLegend', () => {
                 value: 521_000_000_000,
                 capacity: 6_000_000_000_000,
             }),
-        ).toBe('0.52 of 6\nTB');
+        ).toBe(`0.52 of 6${UNBREAKABLE_GAP}TB`);
         expect(
             formatStorageLegend({
                 value: 3_450_000_000_000,
                 capacity: 6_000_000_000_000,
             }),
-        ).toBe('3.45 of 6\nTB');
+        ).toBe(`3.45 of 6${UNBREAKABLE_GAP}TB`);
+    });
+
+    test('formatStorageLegend uses mixed units when values differ by threshold', () => {
+        expect(
+            formatStorageLegend({
+                value: 1_000_000,
+                capacity: 36_000_000_000_000,
+            }),
+        ).toBe(`1${UNBREAKABLE_GAP}MB of 36${UNBREAKABLE_GAP}TB`);
     });
 
     test('formatStorageLegend does not add trailing zeros to integer values', () => {
@@ -23,19 +32,19 @@ describe('formatMetricLegend', () => {
                 value: 1_000_000_000,
                 capacity: 2_000_000_000,
             }),
-        ).toBe('1 of 2\nGB');
+        ).toBe(`1 of 2${UNBREAKABLE_GAP}GB`);
         expect(
             formatStorageLegend({
                 value: 10_000_000,
                 capacity: 20_000_000,
             }),
-        ).toBe('10 of 20\nMB');
+        ).toBe(`10 of 20${UNBREAKABLE_GAP}MB`);
         expect(
             formatStorageLegend({
                 value: 3_000_000_000_000,
                 capacity: 6_000_000_000_000,
             }),
-        ).toBe('3 of 6\nTB');
+        ).toBe(`3 of 6${UNBREAKABLE_GAP}TB`);
     });
 
     test('formatStorageLegend keeps value label when capacity is invalid', () => {
@@ -44,7 +53,7 @@ describe('formatMetricLegend', () => {
                 value: 2_000,
                 capacity: Number.NaN,
             }),
-        ).toBe('2\nKB of ');
+        ).toBe(`2${UNBREAKABLE_GAP}KB of `);
     });
 
     test('formatNetworkMetric uses metric byte precision', () => {

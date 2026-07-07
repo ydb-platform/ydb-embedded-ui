@@ -1,5 +1,6 @@
 import {EFlag} from '../../../../../types/api/enums';
 import {EType} from '../../../../../types/api/tenant';
+import {UNBREAKABLE_GAP} from '../../../../../utils/constants';
 import {getTenantOverviewMetrics, selectStorageStatsForMetricCard} from '../metricOverview';
 
 describe('selectStorageStatsForMetricCard', () => {
@@ -87,7 +88,7 @@ describe('getTenantOverviewMetrics', () => {
             status: EFlag.Green,
             value: 1_000_000_000,
             capacity: 2_000_000_000,
-            legend: '1 of 2\nGB',
+            legend: `1 of 2${UNBREAKABLE_GAP}GB`,
         });
         expect(metrics.storage).toMatchObject({
             percentText: '90%',

@@ -590,6 +590,41 @@ test.describe('Tenant Overview storage metrics tab', () => {
         );
     });
 
+    test('screenshots user data summary values in adaptive units at mixed threshold', async ({
+        page,
+    }) => {
+        await setupStorageScreenshotViewport(page);
+        await enableNewStorageView(page, 'light');
+        await setupWhoami(page);
+        await setupCapabilities(page, 1);
+        await setupTenantInfo(page, 'Dedicated', {
+            databaseQuotas: {
+                data_size_soft_quota: '36000000000000',
+            },
+            tablesStorage: [
+                {
+                    Type: 'SSD',
+                    Size: '1000000',
+                    Limit: '36000000000000',
+                    SoftQuota: '36000000000000',
+                },
+            ],
+        });
+        await setupPartitionStatsQuery(page);
+        await setupStorageStats(page);
+        await setupDescribe(page, {
+            tablesDataSize: '1000000',
+        });
+
+        const storageView = await openTenantStorageMetricsTab(page);
+        const userDataSummary = storageView.getByTestId(USER_DATA_SUMMARY_CARD_QA);
+
+        await expect(userDataSummary).toBeVisible();
+        await expect(userDataSummary).toHaveScreenshot(
+            'tenant-overview-storage-user-data-mixed-units.png',
+        );
+    });
+
     for (const theme of STORAGE_SCREENSHOT_THEMES) {
         test(`renders the new storage layout in ${theme} theme`, async ({page}) => {
             await setupStorageScreenshotViewport(page);

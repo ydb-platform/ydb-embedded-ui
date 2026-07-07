@@ -106,6 +106,23 @@ test.describe('VDisk page storage details', () => {
         await page.setViewportSize({width: 560, height: 1000});
         await expect(storageDetails).toHaveScreenshot('vdisk-storage-details-narrow.png');
     });
+
+    test('renders storage details metrics in adaptive units when values differ by threshold', async ({
+        page,
+    }) => {
+        await page.setViewportSize({width: 1500, height: 1000});
+        await enableNewStorageView(page);
+        await setupVDiskPageMocks(page, {
+            allocatedSize: '1000000',
+            availableSize: '35999999990000',
+        });
+        await page.goto(VDISK_PAGE_PATH);
+
+        const storageMetrics = page.locator('.ydb-vdisk-storage-details__card_metrics');
+
+        await expect(storageMetrics).toBeVisible();
+        await expect(storageMetrics).toHaveScreenshot('vdisk-storage-details-mixed-units.png');
+    });
 });
 
 test.describe('VDisk page storage tab', () => {

@@ -6,8 +6,9 @@ import {
     formatStorageValues,
 } from '../dataFormatters/dataFormatters';
 import {
-    getConsistentMetricBytesSize,
+    formatMetricBytes,
     getConvertedMetricBytesDecimalPlaces,
+    getMetricBytesCommonSize,
     getMetricBytesDisplaySize,
 } from '../storageMetrics';
 
@@ -31,8 +32,18 @@ export function getFormatBytesPrecision(value: number, size: BytesSizes) {
 }
 
 export function formatStorageLegend({value, capacity}: MetricFormatParams): string {
-    const size = getConsistentMetricBytesSize([value, capacity]);
-    const formatted = formatStorageValues(value, capacity, size, '\n', false, {
+    const size = getMetricBytesCommonSize([value, capacity]);
+
+    if (size === undefined) {
+        const valueSize = getMetricBytesDisplaySize(value);
+        const capacitySize = getMetricBytesDisplaySize(capacity);
+        const formattedValue = formatMetricBytes(value, valueSize);
+        const formattedCapacity = formatMetricBytes(capacity, capacitySize);
+
+        return `${formattedValue} ${i18n('context_of')} ${formattedCapacity}`;
+    }
+
+    const formatted = formatStorageValues(value, capacity, size, undefined, false, {
         value: getFormatBytesPrecision(value, size),
         total: getFormatBytesPrecision(capacity, size),
     });
