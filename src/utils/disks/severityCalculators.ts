@@ -132,6 +132,11 @@ export function calculateCompactionSeverity(vDisk: PreparedVDisk): DisplaySeveri
         return NOT_AVAILABLE_SEVERITY;
     }
 
+    // Grey is an explicit no-data flag from the backend, not a healthy compaction rank.
+    if (freshFlag === EFlag.Grey || levelFlag === EFlag.Grey) {
+        return NOT_AVAILABLE_SEVERITY;
+    }
+
     // Determine worst severity between Fresh and Level
     const freshSeverity = freshFlag
         ? DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[freshFlag]

@@ -60,9 +60,9 @@ export function StorageExpertModePanel({className}: StorageExpertModePanelProps)
                     <SegmentedRadioGroup.Option value={VDisksGroupBy.Compaction}>
                         {i18n('value_compaction')}
                     </SegmentedRadioGroup.Option>
-                    <SegmentedRadioGroup.Option value={VDisksGroupBy.All}>
+                    {/* <SegmentedRadioGroup.Option value={VDisksGroupBy.All}>
                         {i18n('value_all')}
-                    </SegmentedRadioGroup.Option>
+                    </SegmentedRadioGroup.Option> */}
                 </SegmentedRadioGroup>
                 {renderLegend(vdisksGroupBy)}
             </Flex>

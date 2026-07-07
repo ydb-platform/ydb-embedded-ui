@@ -158,7 +158,7 @@ export function calculateFrontQueuesIcon(
  * Maps EFlag to corresponding icon and color from CompactionLegend
  */
 function getCompactionRankIconWithColor(flag: EFlag | undefined): IconWithColor | undefined {
-    if (!flag) {
+    if (!flag || flag === EFlag.Grey) {
         return {
             icon: CircleQuestionFill,
             color: 'rgba(162, 162, 162, 1)',

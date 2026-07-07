@@ -1,16 +1,11 @@
 import {z} from 'zod';
 
 import {cn} from '../../../utils/cn';
+import {VDisksGroupBy} from '../../../utils/disks/groupBy';
+import type {VDisksGroupByValue} from '../../../utils/disks/groupBy';
 
-export const VDisksGroupBy = {
-    State: 'State',
-    Space: 'Space',
-    FrontQueues: 'FrontQueues',
-    Compaction: 'Compaction',
-    All: 'All',
-} as const;
-
-export type VDisksGroupByValue = (typeof VDisksGroupBy)[keyof typeof VDisksGroupBy];
+export {VDisksGroupBy};
+export type {VDisksGroupByValue};
 
 export const vdisksGroupBySchema = z.nativeEnum(VDisksGroupBy).catch(VDisksGroupBy.State);
 

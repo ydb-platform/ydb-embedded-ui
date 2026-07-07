@@ -1,5 +1,5 @@
 import {ECapacityAlert, isCapacityAlert} from '../../../../types/api/enums';
-import {loadFromSessionStorage, saveToSessionStorage} from '../../../../utils';
+import {loadFromSessionStorage} from '../../../../utils';
 
 export const SPACE_LEGEND_STORAGE_KEY = 'ydb-space-legend-inactive';
 
@@ -19,10 +19,7 @@ function loadInactiveItems(): Set<ECapacityAlert> {
         return normalizedStored;
     }
 
-    // First time - save default
-    saveToSessionStorage(SPACE_LEGEND_STORAGE_KEY, Array.from(defaultInactive));
-
-    return defaultInactive;
+    return new Set(defaultInactive);
 }
 
 /**

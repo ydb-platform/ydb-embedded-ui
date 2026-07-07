@@ -48,4 +48,32 @@ describe('disk icon calculators', () => {
             {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
         ]);
     });
+
+    test('returns question icons when both Compaction ranks are grey', () => {
+        expect(
+            calculateCompactionIcon({
+                SatisfactionRank: {
+                    FreshRank: {Flag: EFlag.Grey},
+                    LevelRank: {Flag: EFlag.Grey},
+                },
+            }),
+        ).toEqual([
+            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
+            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
+        ]);
+    });
+
+    test('returns question and ok icons when one Compaction rank is grey and another is green', () => {
+        expect(
+            calculateCompactionIcon({
+                SatisfactionRank: {
+                    FreshRank: {Flag: EFlag.Grey},
+                    LevelRank: {Flag: EFlag.Green},
+                },
+            }),
+        ).toEqual([
+            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
+            {icon: CircleCheckFill, color: 'var(--g-color-text-positive)'},
+        ]);
+    });
 });

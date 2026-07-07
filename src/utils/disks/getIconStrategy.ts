@@ -1,6 +1,5 @@
-import type {VDisksGroupByValue} from '../../containers/Storage/StorageExpertModePanel/constants';
-import {VDisksGroupBy} from '../../containers/Storage/StorageExpertModePanel/constants';
-
+import {VDisksGroupBy} from './groupBy';
+import type {VDisksGroupByValue} from './groupBy';
 import type {IconCalculator} from './iconCalculators';
 import {
     calculateAllIcon,

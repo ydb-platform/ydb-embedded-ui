@@ -1,10 +1,13 @@
+import React from 'react';
+
 import type {PopupPlacement, PopupProps} from '@gravity-ui/uikit';
 
 import {useVDiskPagePath} from '../../routes';
 import {cn} from '../../utils/cn';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../utils/disks/constants';
+import type {DiskDisplayStateGetter} from '../../utils/disks/displayState';
+import {getDefaultDiskDisplayState} from '../../utils/disks/displayState';
 import type {PreparedVDisk} from '../../utils/disks/types';
-import {useDiskDisplayState} from '../../utils/disks/useDiskDisplayState';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {InternalLink} from '../InternalLink';
@@ -33,8 +36,7 @@ export interface VDiskProps {
     placement?: PopupPlacement;
     popupOffset?: PopupProps['offset'];
     withOpaqueBackground?: boolean;
-    /** Enable expert mode display state (modifiers, icons, etc.) */
-    withExpertMode?: boolean;
+    getDisplayState?: DiskDisplayStateGetter;
 }
 
 export const VDisk = ({
@@ -52,18 +54,16 @@ export const VDisk = ({
     placement = ['top', 'bottom', 'left', 'right'],
     popupOffset = DEFAULT_POPUP_OFFSET,
     withOpaqueBackground,
-    withExpertMode: enableExpertMode,
+    getDisplayState,
 }: VDiskProps) => {
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
 
     const isDonor = data.DonorMode;
 
-    // Get severity, icon and mode modifier based on expert mode settings
-    const {severity, icon, modeModifier, isLegendInactive} = useDiskDisplayState(
-        data,
-        isDonor,
-        enableExpertMode,
+    const {severity, icon, modeModifier, isLegendInactive} = React.useMemo(
+        () => (getDisplayState ?? getDefaultDiskDisplayState)(data, isDonor),
+        [data, getDisplayState, isDonor],
     );
 
     // Check if disk is replicating (not replicated yet) and should show stripes
