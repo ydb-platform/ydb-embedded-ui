@@ -35,6 +35,7 @@ export function useStorageGroupsSelectedColumns({
     const bridgeModeEnabled = useBridgeModeEnabled();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
     const isStorageExpertMode = useIsStorageExpertMode();
+    const isVDisksPDisksColumnAvailable = Boolean(isUserAllowedToMakeChanges);
 
     const skippedColumnIds = React.useMemo(() => {
         const skipped: StorageGroupsColumnId[] = [];
@@ -59,10 +60,6 @@ export function useStorageGroupsSelectedColumns({
             }
         }
 
-        const isVDisksPDisksColumnAvailable = !skipped.includes(
-            STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
-        );
-
         if (isStorageExpertMode && isVDisksPDisksColumnAvailable) {
             skipped.push(STORAGE_GROUPS_COLUMNS_IDS.VDisks);
         }
@@ -72,6 +69,7 @@ export function useStorageGroupsSelectedColumns({
         bridgeModeEnabled,
         blobMetricsEnabled,
         isUserAllowedToMakeChanges,
+        isVDisksPDisksColumnAvailable,
         isStorageExpertMode,
         isViewerUser,
     ]);
@@ -83,16 +81,22 @@ export function useStorageGroupsSelectedColumns({
     }, [viewContext, skippedColumnIds]);
 
     const requiredColumns = React.useMemo(() => {
+        const required = [...REQUIRED_STORAGE_GROUPS_COLUMNS];
+
         if (visibleEntities === VISIBLE_ENTITIES.missing) {
-            return [...REQUIRED_STORAGE_GROUPS_COLUMNS, STORAGE_GROUPS_COLUMNS_IDS.Degraded];
+            required.push(STORAGE_GROUPS_COLUMNS_IDS.Degraded);
         }
 
         if (visibleEntities === VISIBLE_ENTITIES.space) {
-            return [...REQUIRED_STORAGE_GROUPS_COLUMNS, STORAGE_GROUPS_COLUMNS_IDS.DiskSpace];
+            required.push(STORAGE_GROUPS_COLUMNS_IDS.DiskSpace);
         }
 
-        return REQUIRED_STORAGE_GROUPS_COLUMNS;
-    }, [visibleEntities]);
+        if (isStorageExpertMode && isVDisksPDisksColumnAvailable) {
+            required.push(STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks);
+        }
+
+        return required;
+    }, [isStorageExpertMode, isVDisksPDisksColumnAvailable, visibleEntities]);
 
     const defaultColumns = React.useMemo(() => {
         const defaultStorageGroupsColumns = isStorageExpertMode

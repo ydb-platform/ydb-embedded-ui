@@ -63,7 +63,7 @@ describe('useStorageGroupsSelectedColumns', () => {
         ]);
     });
 
-    test('hides VDisks column but does not force VDisks with PDisks for configured columns in expert mode', () => {
+    test('forces VDisks with PDisks when saved columns enable expert mode with regular VDisks', () => {
         useIsStorageExpertMode.mockReturnValue(true);
 
         const {result} = renderHook(() =>
@@ -80,11 +80,11 @@ describe('useStorageGroupsSelectedColumns', () => {
 
         expect(vDisksPDisksColumn).toEqual(
             expect.objectContaining({
-                selected: false,
-                required: false,
+                selected: true,
+                required: true,
             }),
         );
-        expect(result.current.columnsToShow.map(({name}) => name)).not.toContain(
+        expect(result.current.columnsToShow.map(({name}) => name)).toContain(
             STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
         );
         expect(result.current.columnsToShow.map(({name}) => name)).not.toContain(
