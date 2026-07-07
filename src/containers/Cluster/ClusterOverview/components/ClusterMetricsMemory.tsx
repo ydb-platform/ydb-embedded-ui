@@ -1,8 +1,8 @@
 import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMetrics';
 import {formatStorageLegend} from '../../../../utils/metrics/formatMetricLegend';
+import {getDiagramValues} from '../../../../utils/metrics/getDiagramValues';
 import i18n from '../../i18n';
 import type {ClusterMetricsCommonProps} from '../shared';
-import {getDiagramValues} from '../utils';
 
 import {ClusterMetricsCardContent} from './ClusterMetricsCard';
 
