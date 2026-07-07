@@ -13,6 +13,30 @@
         gap: 12px;
     }
 
+    &__explain-group {
+        display: flex;
+        gap: 2px;
+
+        .ydb-query-editor-button__explain-button.g-button_pin_round-brick::before,
+        .ydb-query-editor-button__explain-button.g-button_pin_round-brick::after,
+        .ydb-query-editor-button__stop-button.g-button_pin_round-brick::before,
+        .ydb-query-editor-button__stop-button.g-button_pin_round-brick::after {
+            border-start-end-radius: 4px;
+            border-end-end-radius: 4px;
+        }
+    }
+
+    &__explain-analyze-button {
+        width: 28px;
+        padding: 0;
+
+        &.g-button_pin_brick-round::before,
+        &.g-button_pin_brick-round::after {
+            border-start-start-radius: 4px;
+            border-end-start-radius: 4px;
+        }
+    }
+
     &__mode-selector {
         $b: &;
 

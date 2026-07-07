@@ -21,7 +21,13 @@ import {
     setStreamSession,
 } from './slice';
 import type {QueryStats} from './types';
-import {getActionAndSyntaxFromQueryMode, prepareQueryWithPragmas} from './utils';
+import {
+    getActionAndSyntaxFromQueryMode,
+    getEffectiveQueryDataForAction,
+    getEffectiveQuerySettingsForAction,
+    isExecutionQueryAction,
+    prepareQueryWithPragmas,
+} from './utils';
 
 function getTracingLevelParam(
     querySettings: Partial<QuerySettings>,
@@ -308,12 +314,17 @@ export const queryApi = api.injectEndpoints({
                     }),
                 );
 
-                const {action, syntax} = getActionAndSyntaxFromQueryMode(
+                const effectiveQuerySettings = getEffectiveQuerySettingsForAction(
                     actionType,
-                    querySettings?.queryMode,
+                    querySettings,
                 );
 
-                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
+                const {action, syntax} = getActionAndSyntaxFromQueryMode(
+                    actionType,
+                    effectiveQuerySettings?.queryMode,
+                );
+
+                const finalQuery = prepareQueryWithPragmas(query, effectiveQuerySettings.pragmas);
 
                 try {
                     const response = await window.api.viewer.sendQuery(
@@ -322,25 +333,29 @@ export const queryApi = api.injectEndpoints({
                             database,
                             action,
                             syntax,
-                            stats: querySettings.statisticsMode,
-                            tracingLevel: getTracingLevelParam(querySettings, enableTracingLevel),
-                            limit_rows: getLimitRowsParam(querySettings.limitRows),
-                            transaction_mode: getTransactionModeParam(
-                                querySettings.transactionMode,
+                            stats: effectiveQuerySettings.statisticsMode,
+                            tracingLevel: getTracingLevelParam(
+                                effectiveQuerySettings,
+                                enableTracingLevel,
                             ),
-                            timeout: getTimeoutMsParam(querySettings.timeout),
+                            limit_rows: getLimitRowsParam(effectiveQuerySettings.limitRows),
+                            transaction_mode: getTransactionModeParam(
+                                effectiveQuerySettings.transactionMode,
+                            ),
+                            timeout: getTimeoutMsParam(effectiveQuerySettings.timeout),
                             query_id: queryId,
                             base64,
-                            resource_pool: getResourcePoolParam(querySettings.resourcePool),
+                            resource_pool: getResourcePoolParam(
+                                effectiveQuerySettings.resourcePool,
+                            ),
                         },
                         {signal},
                     );
 
                     if (isQueryErrorResponse(response)) {
-                        const queryStats: QueryStats =
-                            actionType === 'execute'
-                                ? createExecuteQueryStats({}, startTime, 'failed')
-                                : {};
+                        const queryStats: QueryStats = isExecutionQueryAction(actionType)
+                            ? createExecuteQueryStats({}, startTime, 'failed')
+                            : {};
 
                         dispatch(
                             setQueryResult({
@@ -367,13 +382,13 @@ export const queryApi = api.injectEndpoints({
                         };
                     }
 
-                    const data = prepareQueryData(response);
-                    data.traceId = response?._meta?.traceId;
+                    const preparedData = prepareQueryData(response);
+                    preparedData.traceId = response?._meta?.traceId;
+                    const data = getEffectiveQueryDataForAction(actionType, preparedData);
 
-                    const queryStats: QueryStats =
-                        actionType === 'execute'
-                            ? createExecuteQueryStats(data, startTime, 'completed')
-                            : {};
+                    const queryStats: QueryStats = isExecutionQueryAction(actionType)
+                        ? createExecuteQueryStats(data, startTime, 'completed')
+                        : {};
 
                     dispatch(
                         setQueryResult({
@@ -393,14 +408,9 @@ export const queryApi = api.injectEndpoints({
                     const state = getState() as RootState;
                     const currentTabResult = state.query.tabsById[tabId]?.result;
 
-                    const queryStats: QueryStats =
-                        actionType === 'execute'
-                            ? createExecuteQueryStats(
-                                  currentTabResult?.data ?? {},
-                                  startTime,
-                                  'failed',
-                              )
-                            : {};
+                    const queryStats: QueryStats = isExecutionQueryAction(actionType)
+                        ? createExecuteQueryStats(currentTabResult?.data ?? {}, startTime, 'failed')
+                        : {};
 
                     const err = {
                         error,

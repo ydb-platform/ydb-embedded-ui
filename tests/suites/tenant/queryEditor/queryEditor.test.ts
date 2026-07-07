@@ -87,6 +87,27 @@ test.describe('Test Query Editor', async () => {
         await expect(explainAST).toBeVisible({timeout: VISIBILITY_TIMEOUT});
     });
 
+    test('Explain Analyze executes query and shows plan tabs without result tab', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.explainAnalyze(testQuery, QUERY_MODES.query);
+
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(queryEditor.isResultTabVisible(ResultTabNames.Schema)).resolves.toBe(true);
+        await expect(queryEditor.isResultTabVisible(ResultTabNames.ExplainPlan)).resolves.toBe(
+            true,
+        );
+        await expect(queryEditor.isResultTabVisible(ResultTabNames.Stats)).resolves.toBe(true);
+        await expect(queryEditor.isResultTabVisible(ResultTabNames.Result, 1000)).resolves.toBe(
+            false,
+        );
+
+        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
+        await expect(explainSchema).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+        await expect(queryEditor.hasStatsJsonViewer()).resolves.toBe(true);
+    });
+
     test('Error is displayed for invalid query for run', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
@@ -127,16 +148,30 @@ test.describe('Test Query Editor', async () => {
         await expect(errorMessage).toContain('Column references are not allowed without FROM');
     });
 
+    test('Error is displayed for invalid query for explain analyze', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        const invalidQuery = 'Select d';
+        await queryEditor.setQuery(invalidQuery);
+        await queryEditor.clickExplainAnalyzeButton();
+
+        await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
+        const errorMessage = await queryEditor.getErrorMessage();
+        await expect(errorMessage).toContain('Column references are not allowed without FROM');
+    });
+
     test('Run and Explain buttons are disabled when query is empty', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await expect(queryEditor.isRunButtonEnabled()).resolves.toBe(false);
         await expect(queryEditor.isExplainButtonEnabled()).resolves.toBe(false);
+        await expect(queryEditor.isExplainAnalyzeButtonEnabled()).resolves.toBe(false);
 
         await queryEditor.setQuery(testQuery);
 
         await expect(queryEditor.isRunButtonEnabled()).resolves.toBe(true);
         await expect(queryEditor.isExplainButtonEnabled()).resolves.toBe(true);
+        await expect(queryEditor.isExplainAnalyzeButtonEnabled()).resolves.toBe(true);
     });
 
     test('Stop button and elapsed time label appear when query is running', async ({page}) => {

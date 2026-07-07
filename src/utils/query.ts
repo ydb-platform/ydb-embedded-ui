@@ -79,6 +79,7 @@ export const TRACING_LEVELS_TITLES: Record<TracingLevel, string> = {
 export const QUERY_ACTIONS = {
     execute: 'execute',
     explain: 'explain',
+    explainAnalyze: 'explain-analyze',
 } as const;
 
 export const QUERY_MODES = {

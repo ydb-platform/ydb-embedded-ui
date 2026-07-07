@@ -19,6 +19,7 @@ export enum ExplainResultType {
 export enum ButtonNames {
     Run = 'Run',
     Explain = 'Explain',
+    ExplainAnalyze = 'Explain Analyze',
     Cancel = 'Cancel',
     Save = 'Save',
     Edit = 'Edit query',
@@ -59,6 +60,7 @@ export class QueryEditor {
     private zeroTabsState: Locator;
     private runButton: Locator;
     private explainButton: Locator;
+    private explainAnalyzeButton: Locator;
     private stopButton: Locator;
     private stopBanner: Locator;
     private saveButton: Locator;
@@ -80,7 +82,13 @@ export class QueryEditor {
         this.runButton = this.selector.getByRole('button', {name: ButtonNames.Run});
         this.stopButton = this.selector.getByRole('button', {name: ButtonNames.Stop});
         this.stopBanner = this.selector.locator('.ydb-query-stopped-banner');
-        this.explainButton = this.selector.getByRole('button', {name: ButtonNames.Explain});
+        this.explainButton = this.selector.getByRole('button', {
+            name: ButtonNames.Explain,
+            exact: true,
+        });
+        this.explainAnalyzeButton = this.selector.getByRole('button', {
+            name: ButtonNames.ExplainAnalyze,
+        });
         this.saveButton = this.selector.getByRole('button', {name: ButtonNames.Save});
         this.editButton = this.selector.getByRole('button', {name: ButtonNames.Edit, exact: true});
         this.dropdownMenu = page.locator('.g-dropdown-menu__menu');
@@ -122,6 +130,14 @@ export class QueryEditor {
         await this.clickExplainButton();
     }
 
+    async explainAnalyze(query: string, mode: keyof typeof QUERY_MODES) {
+        await this.clickGearButton();
+        await this.settingsDialog.changeQueryMode(mode);
+        await this.settingsDialog.clickButton(ButtonNames.Save);
+        await this.setQuery(query);
+        await this.clickExplainAnalyzeButton();
+    }
+
     async createNewFakeTable() {
         const tableName = `a_test_table_${Date.now()}`;
         await this.run(
@@ -151,6 +167,17 @@ export class QueryEditor {
     async clickExplainButton() {
         await this.explainButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.explainButton.click();
+    }
+
+    async clickExplainAnalyzeButton() {
+        await this.explainAnalyzeButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.explainAnalyzeButton.click();
+
+        const menuItem = this.dropdownMenu
+            .getByRole('menuitem')
+            .filter({hasText: ButtonNames.ExplainAnalyze});
+        await menuItem.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await menuItem.click();
     }
 
     async focusHotkeysTarget() {
@@ -435,6 +462,20 @@ export class QueryEditor {
 
     async isExplainButtonEnabled() {
         return this.explainButton.isEnabled({timeout: VISIBILITY_TIMEOUT});
+    }
+
+    async isExplainAnalyzeButtonEnabled() {
+        return this.explainAnalyzeButton.isEnabled({timeout: VISIBILITY_TIMEOUT});
+    }
+
+    async isResultTabVisible(tabName: ResultTabNames, timeout = VISIBILITY_TIMEOUT) {
+        const tab = this.radioButton.getByLabel(tabName);
+        try {
+            await tab.waitFor({state: 'visible', timeout});
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     async isBannerVisible() {

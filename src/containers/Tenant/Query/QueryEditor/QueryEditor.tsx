@@ -327,67 +327,157 @@ export default function QueryEditor({
         }
     }, [hasTabs, showPreview, isResultLoaded]);
 
+    const prepareExecuteQueryAction = useEventHandler(
+        ({
+            text,
+            actionType,
+            saveToHistory,
+        }: {
+            text: string;
+            actionType: QueryAction;
+            saveToHistory: boolean;
+        }) => {
+            if (!activeTabId) {
+                return undefined;
+            }
+
+            runSetStoppableTimeout();
+            setLastUsedQueryAction(actionType);
+            dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: text}));
+            if (!isEqual(lastQueryExecutionSettings, querySettings)) {
+                resetBanner();
+                setLastQueryExecutionSettings(querySettings);
+            }
+
+            dispatch(setShowPreview(false));
+
+            let historyQueryId = historyCurrentQueryId ?? uuidv4();
+            const queryId = uuidv4();
+
+            const startTime = Date.now();
+
+            if (saveToHistory) {
+                const currentQuery = historyCurrentQueryId
+                    ? historyQueries.find((q) => q.queryId === historyCurrentQueryId)
+                    : null;
+                const lastQuery = historyQueries.at(-1);
+                if (text === lastQuery?.queryText && !lastQuery.operationId) {
+                    // Don't add the same query as the previous one to the query history,
+                    // unless it has server-stored results (operationId) — then save every launch.
+                    historyQueryId = lastQuery.queryId;
+                    // Keep history navigation anchored to the entry we are updating
+                    if (historyCurrentQueryId !== lastQuery.queryId) {
+                        dispatch(setHistoryCurrentQueryId(lastQuery.queryId));
+                    }
+                } else if (text !== currentQuery?.queryText || currentQuery?.operationId) {
+                    // Queries with results stored on the server (operationId) get a separate history
+                    // entry per launch, unless they match the most recent history item (handled above).
+                    historyQueryId = queryId;
+                    saveQueryToHistory(text, queryId, startTime);
+                }
+                dispatch(setIsDirty(false));
+            }
+
+            // Only reset pane to default size if it's currently collapsed.
+            // If the user has manually resized the pane, respect their layout.
+            if (resultVisibilityState.collapsed) {
+                dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+            }
+
+            // Abort previous query if there was any
+            queryExecutionManagerInstance.abortQuery(activeTabId);
+
+            return {
+                tabId: activeTabId,
+                queryId,
+                historyQueryId,
+                startTime,
+            };
+        },
+    );
+
+    const runNonStreamingQueryAction = useEventHandler(
+        ({
+            text,
+            actionType,
+            tabId,
+            queryId,
+            historyQueryId,
+            startTime,
+        }: {
+            text: string;
+            actionType: QueryAction;
+            tabId: string;
+            queryId: string;
+            historyQueryId: string;
+            startTime: number;
+        }) => {
+            reachMetricaGoal('runQuery', {actionType, ...querySettings});
+            const query = sendQuery({
+                tabId,
+                actionType,
+                startTime,
+                query: text,
+                database,
+                querySettings,
+                enableTracingLevel,
+                queryId,
+                historyQueryId,
+                base64: encodeTextWithBase64,
+            });
+
+            query
+                .unwrap()
+                .then((data) => {
+                    // save in history failed query only if it has operationId. It means that query is saved in server side and its results may be retrieved.
+                    if (data?.historyQueryId) {
+                        updateQueryInHistory(
+                            data.historyQueryId,
+                            data?.queryStats,
+                            undefined,
+                            data.queryId,
+                        );
+                    }
+                })
+                .catch((error) => {
+                    if (error?.extra?.historyQueryId) {
+                        updateQueryInHistory(
+                            error.extra.historyQueryId,
+                            error.extra.queryStats,
+                            error.extra.operationId,
+                            error.extra.queryId,
+                        );
+                    } else {
+                        // Do not add query stats for failed query
+                        console.error('Failed to update query history:', error);
+                    }
+                });
+
+            queryExecutionManagerInstance.registerQuery(tabId, query);
+        },
+    );
+
     const handleSendExecuteClick = useEventHandler((text: string, partial?: boolean) => {
-        if (!activeTabId) {
+        const execution = prepareExecuteQueryAction({
+            text,
+            actionType: QUERY_ACTIONS.execute,
+            saveToHistory: !partial,
+        });
+        if (!execution) {
             return;
         }
 
-        runSetStoppableTimeout();
-        setLastUsedQueryAction(QUERY_ACTIONS.execute);
-        dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: text}));
-        if (!isEqual(lastQueryExecutionSettings, querySettings)) {
-            resetBanner();
-            setLastQueryExecutionSettings(querySettings);
-        }
-
-        dispatch(setShowPreview(false));
-
-        let historyQueryId = historyCurrentQueryId ?? uuidv4();
-        const newQueryId = uuidv4();
-
-        const startTime = Date.now();
-
-        // Don't save partial queries in history
-        if (!partial) {
-            const currentQuery = historyCurrentQueryId
-                ? historyQueries.find((q) => q.queryId === historyCurrentQueryId)
-                : null;
-            const lastQuery = historyQueries.at(-1);
-            if (text === lastQuery?.queryText && !lastQuery.operationId) {
-                // Don't add the same query as the previous one to the query history,
-                // unless it has server-stored results (operationId) — then save every launch.
-                historyQueryId = lastQuery.queryId;
-                // Keep history navigation anchored to the entry we are updating
-                if (historyCurrentQueryId !== lastQuery.queryId) {
-                    dispatch(setHistoryCurrentQueryId(lastQuery.queryId));
-                }
-            } else if (text !== currentQuery?.queryText || currentQuery?.operationId) {
-                // Queries with results stored on the server (operationId) get a separate history
-                // entry per launch, unless they match the most recent history item (handled above).
-                historyQueryId = newQueryId;
-                saveQueryToHistory(text, newQueryId, startTime);
-            }
-            dispatch(setIsDirty(false));
-        }
-
-        // Only reset pane to default size if it's currently collapsed.
-        // If the user has manually resized the pane, respect their layout.
-        if (resultVisibilityState.collapsed) {
-            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
-        }
-
-        // Abort previous query if there was any
-        queryExecutionManagerInstance.abortQuery(activeTabId);
+        const {tabId, queryId, historyQueryId, startTime} = execution;
 
         if (isStreamingEnabled) {
             reachMetricaGoal('runQuery', {
-                actionType: 'execute',
+                actionType: QUERY_ACTIONS.execute,
                 isStreaming: true,
                 ...querySettings,
             });
             const query = streamQuery({
-                tabId: activeTabId,
-                actionType: 'execute',
+                tabId,
+                actionType: QUERY_ACTIONS.execute,
                 startTime,
                 query: text,
                 database,
@@ -430,50 +520,16 @@ export default function QueryEditor({
                     }
                 });
 
-            queryExecutionManagerInstance.registerQuery(activeTabId, query);
+            queryExecutionManagerInstance.registerQuery(tabId, query);
         } else {
-            reachMetricaGoal('runQuery', {actionType: 'execute', ...querySettings});
-            const query = sendQuery({
-                tabId: activeTabId,
-                actionType: 'execute',
+            runNonStreamingQueryAction({
+                text,
+                actionType: QUERY_ACTIONS.execute,
+                tabId,
+                queryId,
+                historyQueryId,
                 startTime,
-                query: text,
-                database,
-                querySettings,
-                enableTracingLevel,
-                queryId: newQueryId,
-                historyQueryId: historyQueryId,
-                base64: encodeTextWithBase64,
             });
-
-            query
-                .unwrap()
-                .then((data) => {
-                    // save in history failed query only if it has operationId. It means that query is saved in server side and its results may be retrieved.
-                    if (data?.historyQueryId) {
-                        updateQueryInHistory(
-                            data.historyQueryId,
-                            data?.queryStats,
-                            undefined,
-                            data.queryId,
-                        );
-                    }
-                })
-                .catch((error) => {
-                    if (error?.extra?.historyQueryId) {
-                        updateQueryInHistory(
-                            error.extra.historyQueryId,
-                            error.extra.queryStats,
-                            error.extra.operationId,
-                            error.extra.queryId,
-                        );
-                    } else {
-                        // Do not add query stats for failed query
-                        console.error('Failed to update query history:', error);
-                    }
-                });
-
-            queryExecutionManagerInstance.registerQuery(activeTabId, query);
         }
     });
 
@@ -523,6 +579,23 @@ export default function QueryEditor({
         }
     });
 
+    const handleGetExplainAnalyzeQueryClick = useEventHandler((text: string) => {
+        const execution = prepareExecuteQueryAction({
+            text,
+            actionType: QUERY_ACTIONS.explainAnalyze,
+            saveToHistory: true,
+        });
+        if (!execution) {
+            return;
+        }
+
+        runNonStreamingQueryAction({
+            text,
+            actionType: QUERY_ACTIONS.explainAnalyze,
+            ...execution,
+        });
+    });
+
     const onCollapseResultHandler = () => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
     };
@@ -542,6 +615,7 @@ export default function QueryEditor({
                 isLoading={Boolean(result?.isLoading)}
                 isStoppable={isStoppable}
                 handleGetExplainQueryClick={handleGetExplainQueryClick}
+                handleGetExplainAnalyzeQueryClick={handleGetExplainAnalyzeQueryClick}
                 highlightedAction={lastUsedQueryAction}
                 database={database}
                 queryId={result?.queryId}
@@ -581,6 +655,9 @@ export default function QueryEditor({
                                     theme={theme}
                                     handleSendExecuteClick={handleSendExecuteClick}
                                     handleGetExplainQueryClick={handleGetExplainQueryClick}
+                                    handleGetExplainAnalyzeQueryClick={
+                                        handleGetExplainAnalyzeQueryClick
+                                    }
                                     historyQueries={historyQueries}
                                     goToPreviousQuery={goToPreviousQuery}
                                     goToNextQuery={goToNextQuery}
