@@ -32,6 +32,7 @@ import i18n from '../i18n';
 import {
     STORAGE_GROUPS_COLUMNS_IDS,
     STORAGE_GROUPS_COLUMNS_TITLES,
+    STORAGE_GROUPS_DISKS_COLUMN_TITLES,
     isSortableStorageGroupsColumn,
 } from './constants';
 import type {GetStorageColumnsData, StorageColumnsGetter, StorageGroupsColumn} from './types';
@@ -265,8 +266,6 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
 };
 
 const getDisksColumnHeader = () => {
-    const [vDisksTitle, pDisksTitle] = STORAGE_GROUPS_COLUMNS_TITLES.VDisksPDisks.split(' ');
-
     return (
         <div
             className={b('disks-column-header')}
@@ -276,8 +275,8 @@ const getDisksColumnHeader = () => {
                 } as React.CSSProperties
             }
         >
-            <span>{vDisksTitle}</span>
-            <span>{pDisksTitle}</span>
+            <span>{STORAGE_GROUPS_DISKS_COLUMN_TITLES.VDisks}</span>
+            <span>{STORAGE_GROUPS_DISKS_COLUMN_TITLES.PDisks}</span>
         </div>
     );
 };

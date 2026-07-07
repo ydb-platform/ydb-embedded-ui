@@ -78,6 +78,7 @@ describe('useStorageGroupsSelectedColumns', () => {
             expect.objectContaining({
                 selected: false,
                 required: false,
+                title: 'VDisks with PDisks',
             }),
         );
         expect(result.current.columnsToShow.map(({name}) => name)).toEqual([

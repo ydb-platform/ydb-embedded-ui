@@ -144,6 +144,15 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
     },
 } as const satisfies Record<StorageGroupsColumnId, string>;
 
+export const STORAGE_GROUPS_DISKS_COLUMN_TITLES = {
+    get VDisks() {
+        return i18n('vdisks');
+    },
+    get PDisks() {
+        return i18n('pdisks');
+    },
+};
+
 const STORAGE_GROUPS_COLUMNS_GROUP_BY_TITLES = {
     get GroupId() {
         return i18n('group-id');
