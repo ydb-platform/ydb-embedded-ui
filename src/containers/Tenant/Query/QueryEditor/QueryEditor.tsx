@@ -537,63 +537,56 @@ export default function QueryEditor({
         dispatch(setQueryAction('settings'));
     };
 
+    const runExplainQueryAction = useEventHandler(
+        ({text, actionType}: {text: string; actionType: QueryAction}) => {
+            if (!activeTabId) {
+                return;
+            }
+
+            runSetStoppableTimeout();
+            setLastUsedQueryAction(actionType);
+            dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: text}));
+            if (!isEqual(lastQueryExecutionSettings, querySettings)) {
+                resetBanner();
+                setLastQueryExecutionSettings(querySettings);
+            }
+
+            const queryId = uuidv4();
+
+            reachMetricaGoal('runQuery', {actionType, ...querySettings});
+
+            const startTime = Date.now();
+
+            const query = sendQuery({
+                tabId: activeTabId,
+                actionType,
+                startTime,
+                query: text,
+                database,
+                querySettings,
+                enableTracingLevel,
+                queryId,
+                base64: encodeTextWithBase64,
+            });
+
+            queryExecutionManagerInstance.registerQuery(activeTabId, query);
+
+            dispatch(setShowPreview(false));
+
+            // Only reset pane to default size if it's currently collapsed.
+            // If the user has manually resized the pane, respect their layout.
+            if (resultVisibilityState.collapsed) {
+                dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+            }
+        },
+    );
+
     const handleGetExplainQueryClick = useEventHandler((text: string) => {
-        if (!activeTabId) {
-            return;
-        }
-
-        runSetStoppableTimeout();
-        setLastUsedQueryAction(QUERY_ACTIONS.explain);
-        dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: text}));
-        if (!isEqual(lastQueryExecutionSettings, querySettings)) {
-            resetBanner();
-            setLastQueryExecutionSettings(querySettings);
-        }
-
-        const queryId = uuidv4();
-
-        reachMetricaGoal('runQuery', {actionType: 'explain', ...querySettings});
-
-        const startTime = Date.now();
-
-        const query = sendQuery({
-            tabId: activeTabId,
-            actionType: 'explain',
-            startTime,
-            query: text,
-            database,
-            querySettings,
-            enableTracingLevel,
-            queryId,
-            base64: encodeTextWithBase64,
-        });
-
-        queryExecutionManagerInstance.registerQuery(activeTabId, query);
-
-        dispatch(setShowPreview(false));
-
-        // Only reset pane to default size if it's currently collapsed.
-        // If the user has manually resized the pane, respect their layout.
-        if (resultVisibilityState.collapsed) {
-            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
-        }
+        runExplainQueryAction({text, actionType: QUERY_ACTIONS.explain});
     });
 
     const handleGetExplainAnalyzeQueryClick = useEventHandler((text: string) => {
-        const execution = prepareExecuteQueryAction({
-            text,
-            actionType: QUERY_ACTIONS.explainAnalyze,
-            saveToHistory: true,
-        });
-        if (!execution) {
-            return;
-        }
-
-        runNonStreamingQueryAction({
-            text,
-            actionType: QUERY_ACTIONS.explainAnalyze,
-            ...execution,
-        });
+        runExplainQueryAction({text, actionType: QUERY_ACTIONS.explainAnalyze});
     });
 
     const onCollapseResultHandler = () => {

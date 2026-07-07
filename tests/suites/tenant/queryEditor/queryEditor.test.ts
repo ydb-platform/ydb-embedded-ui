@@ -87,7 +87,7 @@ test.describe('Test Query Editor', async () => {
         await expect(explainAST).toBeVisible({timeout: VISIBILITY_TIMEOUT});
     });
 
-    test('Explain Analyze executes query and shows plan tabs without result tab', async ({
+    test('Explain Analyze runs full-stats explanation and shows plan tabs without result tab', async ({
         page,
     }) => {
         const queryEditor = new QueryEditor(page);

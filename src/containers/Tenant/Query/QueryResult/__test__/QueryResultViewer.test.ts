@@ -1,5 +1,10 @@
 import {QUERY_ACTIONS} from '../../../../../utils/query';
-import {RESULT_OPTIONS_IDS, getDefaultResultSection, getResultSections} from '../constants';
+import {
+    RESULT_OPTIONS_IDS,
+    getDefaultResultSection,
+    getResultSections,
+    isExecutionResultType,
+} from '../constants';
 
 describe('QueryResultViewer result sections', () => {
     test('keeps execute result sections unchanged', () => {
@@ -34,5 +39,6 @@ describe('QueryResultViewer result sections', () => {
         expect(getDefaultResultSection(QUERY_ACTIONS.explainAnalyze)).toBe(
             RESULT_OPTIONS_IDS.schema,
         );
+        expect(isExecutionResultType(QUERY_ACTIONS.explainAnalyze)).toBe(false);
     });
 });

@@ -34,7 +34,7 @@ const EXPLAIN_ANALYZE_SECTIONS: SectionID[] = [
 ];
 
 export function isExecutionResultType(resultType: QueryAction) {
-    return resultType === QUERY_ACTIONS.execute || resultType === QUERY_ACTIONS.explainAnalyze;
+    return resultType === QUERY_ACTIONS.execute;
 }
 
 export function getResultSections(resultType: QueryAction): SectionID[] {
