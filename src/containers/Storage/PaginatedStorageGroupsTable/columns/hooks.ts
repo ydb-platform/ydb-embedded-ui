@@ -60,19 +60,8 @@ export function useStorageGroupsSelectedColumns({
             }
         }
 
-        if (isStorageExpertMode && isVDisksPDisksColumnAvailable) {
-            skipped.push(STORAGE_GROUPS_COLUMNS_IDS.VDisks);
-        }
-
         return skipped;
-    }, [
-        bridgeModeEnabled,
-        blobMetricsEnabled,
-        isUserAllowedToMakeChanges,
-        isVDisksPDisksColumnAvailable,
-        isStorageExpertMode,
-        isViewerUser,
-    ]);
+    }, [bridgeModeEnabled, blobMetricsEnabled, isUserAllowedToMakeChanges, isViewerUser]);
 
     const columns = React.useMemo(() => {
         const allColumns = getStorageGroupsColumns({viewContext});
@@ -91,12 +80,8 @@ export function useStorageGroupsSelectedColumns({
             required.push(STORAGE_GROUPS_COLUMNS_IDS.DiskSpace);
         }
 
-        if (isStorageExpertMode && isVDisksPDisksColumnAvailable) {
-            required.push(STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks);
-        }
-
         return required;
-    }, [isStorageExpertMode, isVDisksPDisksColumnAvailable, visibleEntities]);
+    }, [visibleEntities]);
 
     const defaultColumns = React.useMemo(() => {
         const defaultStorageGroupsColumns = isStorageExpertMode
@@ -111,11 +96,34 @@ export function useStorageGroupsSelectedColumns({
             : [...defaultStorageGroupsColumns, STORAGE_GROUPS_COLUMNS_IDS.PileName];
     }, [bridgeModeEnabled, isStorageExpertMode]);
 
-    return useSelectedColumns(
+    const selectedColumns = useSelectedColumns(
         columns,
         STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY,
         STORAGE_GROUPS_COLUMNS_TITLES,
         defaultColumns,
         requiredColumns,
     );
+
+    const shouldUseExpertDisksColumn =
+        isStorageExpertMode &&
+        isVDisksPDisksColumnAvailable &&
+        selectedColumns.columnsToShow.some(
+            ({name}) => name === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+        );
+
+    return React.useMemo(() => {
+        if (!shouldUseExpertDisksColumn) {
+            return selectedColumns;
+        }
+
+        return {
+            ...selectedColumns,
+            columnsToShow: selectedColumns.columnsToShow.filter(
+                ({name}) => name !== STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+            ),
+            columnsToSelect: selectedColumns.columnsToSelect.filter(
+                ({id}) => id !== STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+            ),
+        };
+    }, [selectedColumns, shouldUseExpertDisksColumn]);
 }

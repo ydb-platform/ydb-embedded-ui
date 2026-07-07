@@ -63,8 +63,45 @@ describe('useStorageGroupsSelectedColumns', () => {
         ]);
     });
 
-    test('forces VDisks with PDisks when saved columns enable expert mode with regular VDisks', () => {
+    test('keeps VDisks when saved columns do not select VDisks with PDisks in expert mode', () => {
         useIsStorageExpertMode.mockReturnValue(true);
+
+        const {result} = renderHook(() =>
+            useStorageGroupsSelectedColumns({visibleEntities: 'all'}),
+        );
+
+        const vDisksPDisksColumn = result.current.columnsToSelect.find(
+            ({id}) => id === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+        );
+
+        expect(vDisksPDisksColumn).toEqual(
+            expect.objectContaining({
+                selected: false,
+                required: false,
+            }),
+        );
+        expect(result.current.columnsToShow.map(({name}) => name)).toEqual([
+            STORAGE_GROUPS_COLUMNS_IDS.GroupId,
+            STORAGE_GROUPS_COLUMNS_IDS.PoolName,
+            STORAGE_GROUPS_COLUMNS_IDS.Erasure,
+            STORAGE_GROUPS_COLUMNS_IDS.Used,
+            STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+        ]);
+    });
+
+    test('replaces VDisks when saved columns select VDisks with PDisks in expert mode', () => {
+        useIsStorageExpertMode.mockReturnValue(true);
+        useSetting.mockReturnValue([
+            [
+                {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.PoolName, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.Erasure, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.Used, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.VDisks, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks, selected: true},
+            ],
+            setSavedColumns,
+        ]);
 
         const {result} = renderHook(() =>
             useStorageGroupsSelectedColumns({visibleEntities: 'all'}),
@@ -73,23 +110,13 @@ describe('useStorageGroupsSelectedColumns', () => {
         expect(
             result.current.columnsToSelect.some(({id}) => id === STORAGE_GROUPS_COLUMNS_IDS.VDisks),
         ).toBe(false);
-
-        const vDisksPDisksColumn = result.current.columnsToSelect.find(
-            ({id}) => id === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
-        );
-
-        expect(vDisksPDisksColumn).toEqual(
-            expect.objectContaining({
-                selected: true,
-                required: true,
-            }),
-        );
-        expect(result.current.columnsToShow.map(({name}) => name)).toContain(
+        expect(result.current.columnsToShow.map(({name}) => name)).toEqual([
+            STORAGE_GROUPS_COLUMNS_IDS.GroupId,
+            STORAGE_GROUPS_COLUMNS_IDS.PoolName,
+            STORAGE_GROUPS_COLUMNS_IDS.Erasure,
+            STORAGE_GROUPS_COLUMNS_IDS.Used,
             STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
-        );
-        expect(result.current.columnsToShow.map(({name}) => name)).not.toContain(
-            STORAGE_GROUPS_COLUMNS_IDS.VDisks,
-        );
+        ]);
     });
 
     test('adds VDisks with PDisks to defaults when columns are not configured in expert mode', () => {
