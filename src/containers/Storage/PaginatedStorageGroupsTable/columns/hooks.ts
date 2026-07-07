@@ -59,7 +59,11 @@ export function useStorageGroupsSelectedColumns({
             }
         }
 
-        if (isStorageExpertMode) {
+        const isVDisksPDisksColumnAvailable = !skipped.includes(
+            STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+        );
+
+        if (isStorageExpertMode && isVDisksPDisksColumnAvailable) {
             skipped.push(STORAGE_GROUPS_COLUMNS_IDS.VDisks);
         }
 

@@ -95,6 +95,8 @@ export function StorageGroupsControls({
     };
 
     const displayTypeSelector = withTypeSelector && isUserAllowedToMakeChanges;
+    const canUseStorageExpertMode =
+        storageExpertModeSettingEnabled && Boolean(isUserAllowedToMakeChanges);
 
     return (
         <Flex direction="column" gap={2} width="100%">
@@ -135,7 +137,7 @@ export function StorageGroupsControls({
                     total={entitiesCountTotal}
                     current={entitiesCountCurrent}
                 />
-                {storageExpertModeSettingEnabled ? (
+                {canUseStorageExpertMode ? (
                     <Button
                         selected={isStorageExpertMode}
                         onClick={() => handleStorageExpertModeChange(!isStorageExpertMode)}
@@ -145,7 +147,9 @@ export function StorageGroupsControls({
                     </Button>
                 ) : null}
             </Flex>
-            {isStorageExpertMode && isVDisksPDisksColumnVisible ? <StorageExpertModePanel /> : null}
+            {canUseStorageExpertMode && isStorageExpertMode && isVDisksPDisksColumnVisible ? (
+                <StorageExpertModePanel />
+            ) : null}
         </Flex>
     );
 }

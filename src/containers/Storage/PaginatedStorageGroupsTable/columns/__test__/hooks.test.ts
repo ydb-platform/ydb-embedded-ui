@@ -30,6 +30,15 @@ const {useIsUserAllowedToMakeChanges, useIsViewerUser} = jest.requireMock(
 const {useSetting} = jest.requireMock('../../../../../utils/hooks/useSetting');
 const {useIsStorageExpertMode} = jest.requireMock('../../../useStorageQueryParams');
 
+if (!Array.prototype.toSorted) {
+    // eslint-disable-next-line no-extend-native
+    Object.defineProperty(Array.prototype, 'toSorted', {
+        value<T>(this: T[], compareFn?: (a: T, b: T) => number) {
+            return [...this].sort(compareFn);
+        },
+    });
+}
+
 describe('useStorageGroupsSelectedColumns', () => {
     const setSavedColumns = jest.fn();
 
@@ -99,6 +108,23 @@ describe('useStorageGroupsSelectedColumns', () => {
         );
         expect(result.current.columnsToShow.map(({name}) => name)).not.toContain(
             STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+        );
+    });
+
+    test('keeps VDisks column in expert mode when VDisks with PDisks is unavailable', () => {
+        useIsStorageExpertMode.mockReturnValue(true);
+        useIsUserAllowedToMakeChanges.mockReturnValue(false);
+        useIsViewerUser.mockReturnValue(true);
+
+        const {result} = renderHook(() =>
+            useStorageGroupsSelectedColumns({visibleEntities: 'all'}),
+        );
+
+        expect(result.current.columnsToShow.map(({name}) => name)).toContain(
+            STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+        );
+        expect(result.current.columnsToShow.map(({name}) => name)).not.toContain(
+            STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
         );
     });
 });
