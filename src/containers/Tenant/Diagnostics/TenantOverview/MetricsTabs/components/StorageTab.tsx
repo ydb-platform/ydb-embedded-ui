@@ -1,9 +1,10 @@
 import {Link} from 'react-router-dom';
 
 import {cn} from '../../../../../../utils/cn';
+import {MetricTabCard} from '../../TabCard/MetricTabCard';
 import {ServerlessTabCard} from '../../TabCard/ServerlessTabCard';
-import {UsageTabCard} from '../../TabCard/UsageTabCard';
 import i18n from '../../i18n';
+import type {TenantOverviewMetric} from '../../metricOverview';
 
 import '../MetricsTabs.scss';
 
@@ -13,14 +14,14 @@ interface StorageTabProps {
     to: string;
     active: boolean;
     isServerless: boolean;
-    storage: {totalUsed: number; totalLimit: number};
+    storage?: TenantOverviewMetric;
 }
 
 export function StorageTab({to, active, isServerless, storage}: StorageTabProps) {
     return (
         <div className={b('link-container', {active})}>
             <Link to={to} className={b('link')}>
-                {isServerless ? (
+                {isServerless || !storage ? (
                     <ServerlessTabCard
                         title={i18n('title_storage')}
                         active={active}
@@ -28,18 +29,12 @@ export function StorageTab({to, active, isServerless, storage}: StorageTabProps)
                         helpText={i18n('context_storage-description')}
                     />
                 ) : (
-                    <UsageTabCard
+                    <MetricTabCard
                         title={i18n('title_storage')}
-                        value={storage.totalUsed}
-                        limit={storage.totalLimit}
+                        status={storage.status}
+                        value={storage.percentText ?? i18n('value_unavailable-percent')}
                         active={active}
                         description={i18n('context_storage-tab-description')}
-                        // Never show the "danger" (red) status for storage,
-                        // regardless of usage. The metric tab stays "warning"
-                        // (yellow) above the warning threshold and never turns
-                        // red, even at high usage below 100% (e.g. 91-99%) or
-                        // on overflow above 100%.
-                        dangerThreshold={Infinity}
                     />
                 )}
             </Link>

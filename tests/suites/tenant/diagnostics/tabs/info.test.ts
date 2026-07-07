@@ -5,6 +5,8 @@ import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
+const METRIC_SUMMARY_SCREENSHOT_VIEWPORT = {width: 1600, height: 1000};
+
 async function expectMetricTabsScreenshot(metricTabs: Locator, name: string) {
     await expect(metricTabs).toBeVisible();
     await expect(metricTabs).toHaveScreenshot(name);
@@ -29,6 +31,7 @@ async function setupMetricTabsTenantInfoMock(
                             {Name: 'IO', Usage: 0.9, Threads: 100},
                         ],
                         MemoryUsed: '536870912',
+                        MemoryLimit: '1073741824',
                         DatabaseQuotas: {
                             data_size_soft_quota: '1000000000',
                         },
@@ -40,6 +43,22 @@ async function setupMetricTabsTenantInfoMock(
                         ],
                         NetworkUtilization: 0.96,
                         NetworkWriteThroughput: '1048576',
+                    },
+                ],
+            },
+        });
+    });
+}
+
+async function setupTenantInfoWithoutMetricsMock(page: Page) {
+    await page.route('**/viewer/json/tenantinfo?*', async (route) => {
+        await route.fulfill({
+            json: {
+                TenantInfo: [
+                    {
+                        Name: database,
+                        Type: 'Dedicated',
+                        Overall: 'Green',
                     },
                 ],
             },
@@ -111,6 +130,15 @@ test.describe('Diagnostics Info tab', async () => {
         await expectMetricTabsScreenshot(metricTabs, 'info-metric-tabs.png');
     });
 
+    test('Info metric tabs match visual baseline without tenant metrics', async ({page}) => {
+        await setupTenantInfoWithoutMetricsMock(page);
+        const diagnostics = await openInfoTab(page);
+        await expect(diagnostics.areInfoCardsVisible()).resolves.toBe(true);
+
+        const metricTabs = diagnostics.getMetricTabs();
+        await expectMetricTabsScreenshot(metricTabs, 'info-empty-tenant-metric-tabs.png');
+    });
+
     test('Info serverless metric tabs match visual baseline', async ({page}) => {
         await setupMetricTabsTenantInfoMock(page, 'Serverless');
         const diagnostics = await openInfoTab(page);
@@ -130,6 +158,26 @@ test.describe('Diagnostics Info tab', async () => {
         await diagnostics.getMetricTab('Storage').click();
 
         expect(await diagnostics.getMetricTabsWidth()).toEqual(tabsWidthBefore);
+    });
+
+    test('Info metric page summaries match snapshots', async ({page}) => {
+        await page.setViewportSize(METRIC_SUMMARY_SCREENSHOT_VIEWPORT);
+        await setupMetricTabsTenantInfoMock(page);
+        const diagnostics = await openInfoTab(page);
+
+        const cpuSummary = diagnostics.getMetricPageSummary('cpu');
+        await expect(cpuSummary).toBeVisible();
+        await expect(cpuSummary).toHaveScreenshot('tenant-info-metric-summary-cpu.png');
+
+        await diagnostics.clickMetricTab('Memory');
+        const memorySummary = diagnostics.getMetricPageSummary('memory');
+        await expect(memorySummary).toBeVisible();
+        await expect(memorySummary).toHaveScreenshot('tenant-info-metric-summary-memory.png');
+
+        await diagnostics.clickMetricTab('Network');
+        const networkSummary = diagnostics.getMetricPageSummary('network');
+        await expect(networkSummary).toBeVisible();
+        await expect(networkSummary).toHaveScreenshot('tenant-info-metric-summary-network.png');
     });
 
     test('Info tab shows healthcheck status when there are issues', async ({page}) => {

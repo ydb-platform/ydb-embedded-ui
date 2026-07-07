@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {Flex} from '@gravity-ui/uikit';
 import {useLocation} from 'react-router-dom';
 
@@ -7,17 +5,10 @@ import {getTenantPath, parseQuery} from '../../../../../routes';
 import {SETTING_KEYS} from '../../../../../store/reducers/settings/constants';
 import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {TenantMetricsTab} from '../../../../../store/reducers/tenant/types';
-import type {
-    TenantMetricStats,
-    TenantPoolsStats,
-    TenantStorageStats,
-} from '../../../../../store/reducers/tenants/utils';
-import type {ETenantType} from '../../../../../types/api/tenant';
 import {cn} from '../../../../../utils/cn';
 import {useSetting} from '../../../../../utils/hooks';
-import {calculateMetricAggregates} from '../../../../../utils/metrics';
-// no direct legend formatters needed here – handled in subcomponents
 import {TenantTabsGroups} from '../../../TenantPages';
+import type {TenantOverviewMetrics} from '../metricOverview';
 
 import {CpuTab} from './components/CpuTab';
 import {MemoryTab} from './components/MemoryTab';
@@ -29,57 +20,16 @@ import './MetricsTabs.scss';
 
 const b = cn('tenant-metrics-tabs');
 
-interface SelectStorageStatsForMetricCardParams {
-    blobStorageStats?: TenantStorageStats[];
-    tabletStorageStats?: TenantStorageStats[];
-    isServerless: boolean;
-}
-
-export function selectStorageStatsForMetricCard({
-    blobStorageStats,
-    tabletStorageStats,
-    isServerless,
-}: SelectStorageStatsForMetricCardParams) {
-    if (isServerless) {
-        return tabletStorageStats || blobStorageStats || [];
-    }
-
-    const hasLimit = (stats?: TenantStorageStats[]) =>
-        Boolean(stats?.some((item) => Number(item.limit) > 0));
-
-    if (hasLimit(tabletStorageStats)) {
-        return tabletStorageStats || [];
-    }
-
-    if (hasLimit(blobStorageStats)) {
-        return blobStorageStats || [];
-    }
-
-    return blobStorageStats || tabletStorageStats || [];
-}
-
 interface MetricsTabsProps {
-    poolsCpuStats?: TenantPoolsStats[];
-    memoryStats?: TenantMetricStats[];
-    storageMetricStats?: TenantStorageStats[];
-    blobStorageStats?: TenantStorageStats[];
-    tabletStorageStats?: TenantStorageStats[];
-    networkUtilization?: number;
-    coresTotal?: number;
-    databaseType?: ETenantType;
     activeTab: TenantMetricsTab;
+    isServerless: boolean;
+    metrics: TenantOverviewMetrics;
 }
 
 export function MetricsTabs({
-    poolsCpuStats,
-    memoryStats,
-    storageMetricStats,
-    blobStorageStats,
-    tabletStorageStats,
-    networkUtilization,
-    coresTotal,
-    databaseType,
     activeTab,
+    isServerless,
+    metrics: {network, cpu, storage, memory},
 }: MetricsTabsProps) {
     const location = useLocation();
     const queryParams = parseQuery(location);
@@ -103,53 +53,12 @@ export function MetricsTabs({
         }),
     };
 
-    // Sum CPU usage from all pools except the IO pool
-    const cpuPools = React.useMemo(
-        () => (poolsCpuStats || []).filter((pool) => pool.name !== 'IO'),
-        [poolsCpuStats],
-    );
-    const cpuMetrics = React.useMemo(() => calculateMetricAggregates(cpuPools), [cpuPools]);
-    const isServerless = databaseType === 'Serverless';
-
-    // Calculate storage metrics using utility
-    const storageStats = React.useMemo(
-        () =>
-            storageMetricStats ??
-            selectStorageStatsForMetricCard({
-                blobStorageStats,
-                tabletStorageStats,
-                isServerless,
-            }),
-        [blobStorageStats, isServerless, storageMetricStats, tabletStorageStats],
-    );
-    const storageMetrics = React.useMemo(
-        () => calculateMetricAggregates(storageStats),
-        [storageStats],
-    );
-
-    // Calculate memory metrics using utility
-    const memoryMetrics = React.useMemo(
-        () => calculateMetricAggregates(memoryStats),
-        [memoryStats],
-    );
-
-    // Pass raw network values; DedicatedMetricsTabs computes percent and legend
     const [showNetworkUtilization] = useSetting<boolean>(SETTING_KEYS.SHOW_NETWORK_UTILIZATION);
 
     // card variant is handled within subcomponents
 
     const renderNetworkTab = () => {
-        if (!showNetworkUtilization) {
-            return null;
-        }
-
-        const canShow = networkUtilization !== undefined && isFinite(networkUtilization);
-
-        if (!canShow) {
-            return null;
-        }
-
-        if (isServerless) {
+        if (isServerless || !showNetworkUtilization || !network) {
             return null;
         }
 
@@ -157,41 +66,40 @@ export function MetricsTabs({
             <NetworkTab
                 to={tabLinks[TENANT_METRICS_TABS_IDS.network]}
                 active={activeTab === TENANT_METRICS_TABS_IDS.network}
-                networkUtilization={networkUtilization}
+                network={network}
+            />
+        );
+    };
+
+    const renderMemoryTab = () => {
+        if (isServerless || !memory) {
+            return null;
+        }
+
+        return (
+            <MemoryTab
+                to={tabLinks[TENANT_METRICS_TABS_IDS.memory]}
+                active={activeTab === TENANT_METRICS_TABS_IDS.memory}
+                memory={memory}
             />
         );
     };
 
     return (
-        <Flex className={b({serverless: Boolean(isServerless)})} alignItems="start">
+        <Flex className={b({serverless: isServerless})} alignItems="start">
             <CpuTab
                 to={tabLinks[TENANT_METRICS_TABS_IDS.cpu]}
                 active={activeTab === TENANT_METRICS_TABS_IDS.cpu}
-                isServerless={Boolean(isServerless)}
-                cpu={{
-                    totalUsed: cpuMetrics.totalUsed,
-                    totalLimit: coresTotal && coresTotal > 0 ? coresTotal : cpuMetrics.totalLimit,
-                }}
+                cpu={cpu}
+                isServerless={isServerless}
             />
             <StorageTab
                 to={tabLinks[TENANT_METRICS_TABS_IDS.storage]}
                 active={activeTab === TENANT_METRICS_TABS_IDS.storage}
-                isServerless={Boolean(isServerless)}
-                storage={{
-                    totalUsed: storageMetrics.totalUsed,
-                    totalLimit: storageMetrics.totalLimit,
-                }}
+                storage={storage}
+                isServerless={isServerless}
             />
-            {isServerless ? null : (
-                <MemoryTab
-                    to={tabLinks[TENANT_METRICS_TABS_IDS.memory]}
-                    active={activeTab === TENANT_METRICS_TABS_IDS.memory}
-                    memory={{
-                        totalUsed: memoryMetrics.totalUsed,
-                        totalLimit: memoryMetrics.totalLimit,
-                    }}
-                />
-            )}
+            {renderMemoryTab()}
             {renderNetworkTab()}
             <PlaceholderTab />
         </Flex>

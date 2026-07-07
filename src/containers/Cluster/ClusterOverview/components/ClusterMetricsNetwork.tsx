@@ -2,9 +2,9 @@ import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMe
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import {useSetting} from '../../../../utils/hooks/useSetting';
 import {formatNetworkMetric} from '../../../../utils/metrics/formatMetricLegend';
+import {calculateBaseDiagramValues} from '../../../../utils/metrics/getDiagramValues';
 import i18n from '../../i18n';
 import type {ClusterMetricsBaseProps} from '../shared';
-import {calculateBaseDiagramValues} from '../utils';
 
 import {ClusterMetricsCardContent} from './ClusterMetricsCard';
 
