@@ -344,6 +344,7 @@ export type OperationKind =
     | 'export/yt'
     | 'export/nfs'
     | 'buildindex'
+    | 'analyze'
     | 'compaction'
     | 'incbackup'
     | 'restore'
