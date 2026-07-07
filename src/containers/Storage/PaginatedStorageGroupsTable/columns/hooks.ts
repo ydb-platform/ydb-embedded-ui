@@ -110,20 +110,31 @@ export function useStorageGroupsSelectedColumns({
         selectedColumns.columnsToShow.some(
             ({name}) => name === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
         );
+    const shouldHideVDisksSelectorOption =
+        isStorageExpertMode &&
+        isVDisksPDisksColumnAvailable &&
+        (!selectedColumns.columnsToShow.some(
+            ({name}) => name === STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+        ) ||
+            shouldUseExpertDisksColumn);
 
     return React.useMemo(() => {
-        if (!shouldUseExpertDisksColumn) {
+        if (!shouldUseExpertDisksColumn && !shouldHideVDisksSelectorOption) {
             return selectedColumns;
         }
 
         return {
             ...selectedColumns,
-            columnsToShow: selectedColumns.columnsToShow.filter(
-                ({name}) => name !== STORAGE_GROUPS_COLUMNS_IDS.VDisks,
-            ),
-            columnsToSelect: selectedColumns.columnsToSelect.filter(
-                ({id}) => id !== STORAGE_GROUPS_COLUMNS_IDS.VDisks,
-            ),
+            columnsToShow: shouldUseExpertDisksColumn
+                ? selectedColumns.columnsToShow.filter(
+                      ({name}) => name !== STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+                  )
+                : selectedColumns.columnsToShow,
+            columnsToSelect: shouldHideVDisksSelectorOption
+                ? selectedColumns.columnsToSelect.filter(
+                      ({id}) => id !== STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+                  )
+                : selectedColumns.columnsToSelect,
         };
-    }, [selectedColumns, shouldUseExpertDisksColumn]);
+    }, [selectedColumns, shouldHideVDisksSelectorOption, shouldUseExpertDisksColumn]);
 }

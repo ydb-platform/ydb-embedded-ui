@@ -120,6 +120,35 @@ describe('useStorageGroupsSelectedColumns', () => {
         ]);
     });
 
+    test('hides VDisks selector option when regular VDisks is disabled in expert mode', () => {
+        useIsStorageExpertMode.mockReturnValue(true);
+        useSetting.mockReturnValue([
+            [
+                {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.PoolName, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.Erasure, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.Used, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.VDisks, selected: false},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks, selected: false},
+            ],
+            setSavedColumns,
+        ]);
+
+        const {result} = renderHook(() =>
+            useStorageGroupsSelectedColumns({visibleEntities: 'all'}),
+        );
+
+        expect(
+            result.current.columnsToSelect.some(({id}) => id === STORAGE_GROUPS_COLUMNS_IDS.VDisks),
+        ).toBe(false);
+        expect(result.current.columnsToShow.map(({name}) => name)).not.toContain(
+            STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+        );
+        expect(result.current.columnsToShow.map(({name}) => name)).not.toContain(
+            STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+        );
+    });
+
     test('adds VDisks with PDisks to defaults when columns are not configured in expert mode', () => {
         useIsStorageExpertMode.mockReturnValue(true);
         useSetting.mockImplementation((_key: string, defaultValue: unknown) => [
