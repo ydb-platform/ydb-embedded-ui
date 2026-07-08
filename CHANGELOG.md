@@ -1,5 +1,29 @@
 # Changelog
 
+## [18.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v17.2.0...v18.0.0) (2026-07-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* update zod and add configuration ([#4062](https://github.com/ydb-platform/ydb-embedded-ui/issues/4062))
+
+### Features
+
+* add new background operation type ([#4061](https://github.com/ydb-platform/ydb-embedded-ui/issues/4061)) ([762fc43](https://github.com/ydb-platform/ydb-embedded-ui/commit/762fc43e656a9e47bc739c4fb8a21b17a07104e3))
+* add storage expert mode ([#3950](https://github.com/ydb-platform/ydb-embedded-ui/issues/3950)) ([c3795a1](https://github.com/ydb-platform/ydb-embedded-ui/commit/c3795a1d9b58a21a461c786664d7bb6ad8e1452f))
+* implement views with metrics inside pages on DB Info dashboard ([#4077](https://github.com/ydb-platform/ydb-embedded-ui/issues/4077)) ([77a5f28](https://github.com/ydb-platform/ydb-embedded-ui/commit/77a5f28c4cbc3d798b7e3465e86af250bdcabbf5))
+* improve visual affordance of horizontal tabs ([#4065](https://github.com/ydb-platform/ydb-embedded-ui/issues/4065)) ([55b0409](https://github.com/ydb-platform/ydb-embedded-ui/commit/55b04094a01d9cb2e093c1a88fc140b46dd68211))
+* partitioning settings improvements ([#4067](https://github.com/ydb-platform/ydb-embedded-ui/issues/4067)) ([838e82e](https://github.com/ydb-platform/ydb-embedded-ui/commit/838e82e6f28f8e9d9cd6cd85a4d9517556756f0d))
+* update zod and add configuration ([#4062](https://github.com/ydb-platform/ydb-embedded-ui/issues/4062)) ([5103c45](https://github.com/ydb-platform/ydb-embedded-ui/commit/5103c45f0cc3c23175a742e25368f9afa5c06ddf))
+
+
+### Bug Fixes
+
+* hide restricted node tabs ([#4085](https://github.com/ydb-platform/ydb-embedded-ui/issues/4085)) ([2b4b24c](https://github.com/ydb-platform/ydb-embedded-ui/commit/2b4b24ce66bd29db7845d789b3c773ce4342a779))
+* **HomePage:** not block databases if meta/whoami error ([#4083](https://github.com/ydb-platform/ydb-embedded-ui/issues/4083)) ([df12bfd](https://github.com/ydb-platform/ydb-embedded-ui/commit/df12bfdcdd9ac45d4ffbbaff282769f30e9b250e))
+* improve tenant storage progress precision ([#4092](https://github.com/ydb-platform/ydb-embedded-ui/issues/4092)) ([4459309](https://github.com/ydb-platform/ydb-embedded-ui/commit/44593093efd53aa2abb23324b695ebaaa90cd760))
+* route schema object links in nav v2 ([#4094](https://github.com/ydb-platform/ydb-embedded-ui/issues/4094)) ([ade3ecd](https://github.com/ydb-platform/ydb-embedded-ui/commit/ade3ecd88dd9a1973286f7f76b1755450203c87e))
+
 ## [17.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v17.1.0...v17.2.0) (2026-06-26)
 
 
