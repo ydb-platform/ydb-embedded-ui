@@ -49,6 +49,8 @@
     }
 
     &_expert-mode {
+        --entity-state-compact-background-color: var(--entity-state-background-color);
+
         &#{$block}_grey {
             --entity-state-background-color: var(--g-color-base-neutral-light);
             --entity-state-border-color: var(--g-color-line-generic);
@@ -219,6 +221,10 @@
         height: var(--progress-bar-compact-height);
 
         border-radius: $outer-compact-border-radius;
+        background-color: var(
+            --entity-state-compact-background-color,
+            var(--entity-state-fill-color)
+        );
     }
 
     &_faded {
