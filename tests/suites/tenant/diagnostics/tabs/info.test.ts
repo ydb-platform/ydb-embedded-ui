@@ -12,9 +12,33 @@ async function expectMetricTabsScreenshot(metricTabs: Locator, name: string) {
     await expect(metricTabs).toHaveScreenshot(name);
 }
 
+async function setupMonitoringUserMock(page: Page) {
+    await page.route('**/viewer/json/whoami?*', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                UserSID: 'test-user',
+                UserID: 'test-user-id',
+                AuthType: 'Login',
+                IsViewerAllowed: true,
+                IsMonitoringAllowed: true,
+                IsAdministrationAllowed: true,
+            }),
+        });
+    });
+}
+
 async function setupMetricTabsTenantInfoMock(
     page: Page,
     tenantType: 'Dedicated' | 'Serverless' = 'Dedicated',
+    {
+        memoryLimit = '1073741824',
+        memoryUsed = '536870912',
+    }: {
+        memoryLimit?: string;
+        memoryUsed?: string;
+    } = {},
 ) {
     await page.route('**/viewer/json/tenantinfo?*', async (route) => {
         await route.fulfill({
@@ -30,8 +54,8 @@ async function setupMetricTabsTenantInfoMock(
                             {Name: 'User', Usage: 0.023, Threads: 100},
                             {Name: 'IO', Usage: 0.9, Threads: 100},
                         ],
-                        MemoryUsed: '536870912',
-                        MemoryLimit: '1073741824',
+                        MemoryUsed: memoryUsed,
+                        MemoryLimit: memoryLimit,
                         DatabaseQuotas: {
                             data_size_soft_quota: '1000000000',
                         },
@@ -178,6 +202,26 @@ test.describe('Diagnostics Info tab', async () => {
         const networkSummary = diagnostics.getMetricPageSummary('network');
         await expect(networkSummary).toBeVisible();
         await expect(networkSummary).toHaveScreenshot('tenant-info-metric-summary-network.png');
+    });
+
+    test('Info memory metric summary renders adaptive units when values differ by threshold', async ({
+        page,
+    }) => {
+        await page.setViewportSize(METRIC_SUMMARY_SCREENSHOT_VIEWPORT);
+        await setupMonitoringUserMock(page);
+        await setupMetricTabsTenantInfoMock(page, 'Dedicated', {
+            memoryUsed: '1000000',
+            memoryLimit: '36000000000000',
+        });
+        const diagnostics = await openInfoTab(page);
+
+        await diagnostics.clickMetricTab('Memory');
+        const memorySummary = diagnostics.getMetricPageSummary('memory');
+
+        await expect(memorySummary).toBeVisible();
+        await expect(memorySummary).toHaveScreenshot(
+            'tenant-info-metric-summary-memory-mixed-units.png',
+        );
     });
 
     test('Info tab shows healthcheck status when there are issues', async ({page}) => {

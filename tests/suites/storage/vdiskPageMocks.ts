@@ -23,12 +23,19 @@ export interface SetupVDiskPageMocksOptions {
     host?: string;
     pDiskId?: string;
     withDonors?: boolean;
+    allocatedSize?: string;
+    availableSize?: string;
 }
 
 function createStorageGroupsResponse({
+    allocatedSize = '10000000000',
+    availableSize = '186000000000',
     pDiskId = PDISK_ID,
     withDonors,
-}: Pick<SetupVDiskPageMocksOptions, 'pDiskId' | 'withDonors'> = {}) {
+}: Pick<
+    SetupVDiskPageMocksOptions,
+    'allocatedSize' | 'availableSize' | 'pDiskId' | 'withDonors'
+> = {}) {
     return {
         StorageGroups: [
             {
@@ -45,8 +52,8 @@ function createStorageGroupsResponse({
                         VDiskId: VDISK_ID,
                         NodeId: Number(NODE_ID),
                         VDiskSlotId: 1001,
-                        AllocatedSize: '10000000000',
-                        AvailableSize: '186000000000',
+                        AllocatedSize: allocatedSize,
+                        AvailableSize: availableSize,
                         StoragePoolName: STORAGE_POOL_NAME,
                         DiskSpace: 'Green',
                         FrontQueues: 'Green',
@@ -205,15 +212,22 @@ async function setupNodeInfoMock(
 async function setupStorageGroupsMock(
     page: Page,
     {
+        allocatedSize,
+        availableSize,
         pDiskId = PDISK_ID,
         withDonors,
-    }: Pick<SetupVDiskPageMocksOptions, 'pDiskId' | 'withDonors'> = {},
+    }: Pick<
+        SetupVDiskPageMocksOptions,
+        'allocatedSize' | 'availableSize' | 'pDiskId' | 'withDonors'
+    > = {},
 ) {
     await page.route('**/storage/groups?*', async (route) => {
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify(createStorageGroupsResponse({pDiskId, withDonors})),
+            body: JSON.stringify(
+                createStorageGroupsResponse({allocatedSize, availableSize, pDiskId, withDonors}),
+            ),
         });
     });
 }

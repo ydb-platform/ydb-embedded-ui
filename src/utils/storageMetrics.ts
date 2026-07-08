@@ -11,6 +11,7 @@ export interface FormatMetricBytesOptions {
 }
 
 const NEXT_SIZE_ROLLOVER_VALUE = 1000;
+const MIXED_UNIT_RATIO_THRESHOLD = 100;
 
 function getNextMetricBytesSize(size: BytesSizes) {
     const currentSizeIndex = bytesSizes.indexOf(size);
@@ -109,6 +110,33 @@ export function getConsistentMetricBytesSize(
     }, 0);
 
     return getMetricBytesDisplaySize(maxValue, options);
+}
+
+export function shouldUseMixedMetricBytesUnits(
+    values: Array<string | number | undefined>,
+    ratioThreshold = MIXED_UNIT_RATIO_THRESHOLD,
+) {
+    const positiveValues = values
+        .map((value) => Number(value))
+        .filter((value) => Number.isFinite(value) && value > 0);
+
+    if (positiveValues.length < 2) {
+        return false;
+    }
+
+    const minValue = Math.min(...positiveValues);
+    const maxValue = Math.max(...positiveValues);
+
+    return maxValue / minValue >= ratioThreshold;
+}
+
+export function getMetricBytesCommonSize(
+    values: Array<string | number | undefined>,
+    options: FormatMetricBytesOptions = {},
+) {
+    return shouldUseMixedMetricBytesUnits(values)
+        ? undefined
+        : getConsistentMetricBytesSize(values, options);
 }
 
 export function formatMetricBytes(
