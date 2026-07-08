@@ -86,7 +86,6 @@ export const QUERY_MODES = {
     script: 'script',
     data: 'data',
     query: 'query',
-    pg: 'pg',
 } as const;
 
 export const QUERY_MODES_TITLES: Record<QueryMode, string> = {
@@ -94,12 +93,10 @@ export const QUERY_MODES_TITLES: Record<QueryMode, string> = {
     script: 'YQL Script',
     data: 'Data',
     query: 'YQL - QueryService',
-    pg: 'PostgreSQL',
 } as const;
 
 export const QUERY_SYNTAX = {
     yql: 'yql_v1',
-    pg: 'pg',
 } as const;
 
 // eslint-disable-next-line complexity
