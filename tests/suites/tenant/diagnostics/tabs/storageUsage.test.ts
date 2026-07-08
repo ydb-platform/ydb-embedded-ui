@@ -10,7 +10,6 @@ import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 const MOCK_STORAGE_USAGE_PATH = '/local/storage_usage_table';
 const MOCK_COLUMN_STORAGE_USAGE_PATH = '/local/storage_usage_column_table';
 const MOCK_STORAGE_USAGE_MEDIA_STATS_PATH = '/local/storage_usage_media_stats_table';
-const MOCK_STORAGE_USAGE_MIXED_UNITS_PATH = '/local/storage_usage_mixed_units_table';
 
 interface StorageUsageMockRow {
     GroupId: string;
@@ -317,41 +316,8 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await expect(storageUsage).toHaveScreenshot('storage-usage-single-media.png');
     });
 
-    test('Storage usage summary renders adaptive units when values differ by threshold', async ({
-        page,
-    }) => {
-        await setupStorageUsageAccessMocks(page);
-        await setupStorageUsageMocks({
-            page,
-            path: MOCK_STORAGE_USAGE_MIXED_UNITS_PATH,
-            dataSize: '1000000',
-            storageSize: 36000000000000,
-            rows: [{GroupId: '2181038091', StorageSize: 36000000000000, StorageCount: 1}],
-            groups: [
-                {
-                    GroupId: '2181038091',
-                    Limit: '36000000000000',
-                    MediaType: 'SSD',
-                    ErasureSpecies: 'mirror-3-dc',
-                },
-            ],
-        });
-
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto({
-            schema: MOCK_STORAGE_USAGE_MIXED_UNITS_PATH,
-            database,
-            tenantPage: 'diagnostics',
-            diagnosticsTab: 'storageUsage',
-        });
-
-        const summaryMetrics = page.locator('.ydb-media-section-summary__main');
-
-        await expect(summaryMetrics).toBeVisible({timeout: VISIBILITY_TIMEOUT});
-        await expect(summaryMetrics).toHaveScreenshot('storage-usage-summary-mixed-units.png');
-    });
-
     test('Storage usage renders multiple media sections', async ({page}) => {
+        await setupStorageUsageAccessMocks(page);
         await setupStorageUsageMocks({
             page,
             path: MOCK_STORAGE_USAGE_PATH,
@@ -400,12 +366,12 @@ test.describe('Diagnostics Storage usage tab', async () => {
                 {
                     Kind: 'SSD',
                     StorageSize: 113000000000,
-                    DataSize: 22600000000,
+                    DataSize: 1000000,
                 },
                 {
                     Kind: 'ROT',
                     StorageSize: 387000000000,
-                    DataSize: 77400000000,
+                    DataSize: 1000000000,
                 },
             ],
         });
@@ -422,6 +388,8 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await expect(storageUsage).toBeVisible({timeout: VISIBILITY_TIMEOUT});
         await expect(storageUsage.getByText('SSD', {exact: true}).first()).toBeVisible();
         await expect(storageUsage.getByText('HDD', {exact: true}).first()).toBeVisible();
+        await expect(storageUsage.getByText(/^1\s*MB$/, {exact: true})).toBeVisible();
+        await expect(storageUsage.getByText(/^1\s*GB$/, {exact: true})).toBeVisible();
         await expect(storageUsage).toHaveScreenshot('storage-usage-multi-media.png');
     });
 
