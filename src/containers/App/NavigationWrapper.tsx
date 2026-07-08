@@ -6,11 +6,13 @@ import {
     useDetailedStorageViewAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {Navigation} from '../AsideNavigation/Navigation';
 import {
     applyBlobStorageCapacityMetricsSettingAvailability,
     applyClusterSpecificQueryStreamingSetting,
     applyDetailedStorageViewSettingAvailability,
+    applyStorageExpertModeSettingAvailability,
     getUserSettings,
 } from '../UserSettings/settings';
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
@@ -30,6 +32,7 @@ export function NavigationWrapper({
 
     const blobMetricsAvailable = useBlobStorageCapacityMetricsAvailable();
     const detailedStorageViewAvailable = useDetailedStorageViewAvailable();
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     let finalUserSettings: YDBEmbeddedUISettings;
 
@@ -53,6 +56,11 @@ export function NavigationWrapper({
     finalUserSettings = applyBlobStorageCapacityMetricsSettingAvailability(
         finalUserSettings,
         blobMetricsAvailable,
+    );
+
+    finalUserSettings = applyStorageExpertModeSettingAvailability(
+        finalUserSettings,
+        isUserAllowedToMakeChanges,
     );
 
     return (

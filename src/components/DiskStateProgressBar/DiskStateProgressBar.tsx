@@ -1,11 +1,13 @@
 import React from 'react';
 
+import type {IconData} from '@gravity-ui/uikit';
 import {Flex, Icon} from '@gravity-ui/uikit';
 
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {cn} from '../../utils/cn';
 import {DONOR_COLOR, NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
-import {getSeverityColor, getVDiskStatusIcon} from '../../utils/disks/helpers';
+import {getDisplaySeverityColor, getVDiskStatusIcon} from '../../utils/disks/helpers';
+import type {IconWithColor} from '../../utils/disks/iconCalculators';
 import {useSetting} from '../../utils/hooks';
 import {isNumeric} from '../../utils/utils';
 
@@ -25,8 +27,11 @@ interface DiskStateProgressBarProps {
     className?: string;
     isDonor?: boolean;
     withIcon?: boolean;
+    icon?: IconData | IconWithColor[] | string;
+    modeModifier?: string;
     highlighted?: boolean;
     noDataPlaceholder?: React.ReactNode;
+    isLegendInactive?: boolean;
 }
 
 export function DiskStateProgressBar({
@@ -41,8 +46,11 @@ export function DiskStateProgressBar({
     className,
     isDonor,
     withIcon,
+    icon: providedIcon,
+    modeModifier,
     highlighted,
     noDataPlaceholder,
+    isLegendInactive,
 }: DiskStateProgressBarProps) {
     const [inverted] = useSetting<boolean | undefined>(SETTING_KEYS.INVERTED_DISKS);
 
@@ -54,12 +62,19 @@ export function DiskStateProgressBar({
         inactive,
         striped,
         highlighted,
+        'legend-inactive': isLegendInactive,
     };
+
+    // Add mode modifier if present
+    if (modeModifier) {
+        mods[modeModifier] = true;
+        mods['expert-mode'] = true;
+    }
 
     if (isDonor) {
         mods[DONOR_COLOR.toLocaleLowerCase()] = true;
     } else {
-        const color = getSeverityColor(severity);
+        const color = getDisplaySeverityColor(severity);
         if (color) {
             mods[color.toLocaleLowerCase()] = true;
         }
@@ -107,11 +122,41 @@ export function DiskStateProgressBar({
 
     let iconElement: React.ReactNode = null;
 
-    if (withIcon) {
-        const icon = getVDiskStatusIcon(severity, isDonor);
+    const hideIcon = isLegendInactive && !isDonor;
+
+    if (withIcon && !hideIcon) {
+        // Use provided icon if available, otherwise calculate
+        const icon = providedIcon ?? getVDiskStatusIcon(severity, isDonor);
 
         if (icon) {
-            iconElement = <Icon className={b('icon')} data={icon} size={12} />;
+            // Check if icon is a string (text label for space mode)
+            if (typeof icon === 'string') {
+                iconElement = <div className={b('text-label')}>{icon}</div>;
+            } else if (Array.isArray(icon)) {
+                // Multiple icons with individual colors (e.g., for compaction mode: Fresh + Level)
+                // Icons overlap: 10px + 10px - 3px = 17px total width
+                iconElement = (
+                    <div className={b('icon-group')}>
+                        {icon.map((item, index) => {
+                            // Check if item has color property (IconWithColor)
+                            const iconData = 'icon' in item ? item.icon : item;
+                            const iconColor = 'color' in item ? item.color : undefined;
+
+                            return (
+                                <Icon
+                                    key={index}
+                                    className={b('icon', {overlapped: index > 0})}
+                                    data={iconData}
+                                    size={10}
+                                    style={iconColor ? {color: iconColor} : undefined}
+                                />
+                            );
+                        })}
+                    </div>
+                );
+            } else {
+                iconElement = <Icon className={b('icon')} data={icon} size={12} />;
+            }
         }
     }
 

@@ -5,18 +5,20 @@ import {Flex, useLayoutContext} from '@gravity-ui/uikit';
 import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import type {Erasure} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
+import type {DiskDisplayStateGetter} from '../../../utils/disks/displayState';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {isNumeric} from '../../../utils/utils';
 import {PDisk} from '../PDisk';
 import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
 import type {StorageViewContext} from '../types';
+import {useStorageVDiskDisplayStateGetter} from '../useStorageVDiskDisplayStateGetter';
 import {isVdiskActive, useVDisksWithDCMargins} from '../utils';
 
 import './Disks.scss';
 
 const b = cn('ydb-storage-disks');
 
-const VDISKS_CONTAINER_WIDTH = 316;
+export const VDISKS_CONTAINER_WIDTH = 316;
 
 interface DisksProps {
     vDisks?: PreparedVDisk[];
@@ -27,6 +29,7 @@ interface DisksProps {
 
 export function Disks({vDisks = [], viewContext, erasure, withIcon}: DisksProps) {
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
+    const getVDiskDisplayState = useStorageVDiskDisplayStateGetter();
 
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
 
@@ -53,6 +56,7 @@ export function Disks({vDisks = [], viewContext, erasure, withIcon}: DisksProps)
                         setHighlightedVDisk={setHighlightedVDisk}
                         unavailableVDiskWidth={unavailableVDiskWidth}
                         withIcon={withIcon}
+                        getDisplayState={getVDiskDisplayState}
                     />
                 ))}
             </Flex>
@@ -81,6 +85,7 @@ interface DisksItemProps {
     unavailableVDiskWidth?: number;
     withDCMargin?: boolean;
     withIcon?: boolean;
+    getDisplayState?: DiskDisplayStateGetter;
 }
 
 function VDiskItem({
@@ -90,6 +95,7 @@ function VDiskItem({
     setHighlightedVDisk,
     unavailableVDiskWidth,
     withIcon,
+    getDisplayState,
 }: DisksItemProps) {
     // Do not show PDisk popup for VDisk
     const vDiskToShow = {...vDisk, PDisk: undefined};
@@ -110,6 +116,7 @@ function VDiskItem({
                 highlightedVDisk={highlightedVDisk}
                 setHighlightedVDisk={setHighlightedVDisk}
                 progressBarClassName={b('vdisk-progress-bar')}
+                getDisplayState={getDisplayState}
             />
         </div>
     );

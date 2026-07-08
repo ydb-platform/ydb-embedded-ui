@@ -1,8 +1,12 @@
+import React from 'react';
+
 import type {PopupPlacement, PopupProps} from '@gravity-ui/uikit';
 
 import {useVDiskPagePath} from '../../routes';
 import {cn} from '../../utils/cn';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../utils/disks/constants';
+import type {DiskDisplayStateGetter} from '../../utils/disks/displayState';
+import {getDefaultDiskDisplayState} from '../../utils/disks/displayState';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
@@ -32,6 +36,7 @@ export interface VDiskProps {
     placement?: PopupPlacement;
     popupOffset?: PopupProps['offset'];
     withOpaqueBackground?: boolean;
+    getDisplayState?: DiskDisplayStateGetter;
 }
 
 export const VDisk = ({
@@ -49,13 +54,36 @@ export const VDisk = ({
     placement = ['top', 'bottom', 'left', 'right'],
     popupOffset = DEFAULT_POPUP_OFFSET,
     withOpaqueBackground,
+    getDisplayState,
 }: VDiskProps) => {
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
 
-    const severity = data.Severity;
-    const isReplicatingColor = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
     const isDonor = data.DonorMode;
+
+    const {severity, icon, modeModifier, isLegendInactive} = React.useMemo(
+        () => (getDisplayState ?? getDefaultDiskDisplayState)(data, isDonor),
+        [data, getDisplayState, isDonor],
+    );
+
+    // Check if disk is replicating (not replicated yet) and should show stripes
+    const hasVDiskData = Boolean(data.VDiskState);
+    let isReplicating: boolean;
+    if (!modeModifier || modeModifier === 'mode-state') {
+        isReplicating = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
+    } else {
+        // Space mode and other expert modes: show stripes for any Replicated=false disk
+        isReplicating = hasVDiskData && data.Replicated === false;
+    }
+
+    // In expert mode, don't show disk allocation (filled bar)
+    const diskAllocatedPercent = modeModifier ? undefined : data.AllocatedPercent;
+    const shouldShowNoDataPlaceholder = !(
+        icon &&
+        (modeModifier === 'mode-space' ||
+            modeModifier === 'mode-frontqueues' ||
+            modeModifier === 'mode-compaction')
+    );
 
     return (
         <HoverPopup
@@ -78,16 +106,21 @@ export const VDisk = ({
                     })}
                 >
                     <DiskStateProgressBar
-                        diskAllocatedPercent={data.AllocatedPercent}
+                        diskAllocatedPercent={diskAllocatedPercent}
                         severity={severity}
                         compact={compact}
                         inactive={inactive}
-                        striped={isReplicatingColor || isDonor}
+                        striped={isReplicating || isDonor}
                         isDonor={isDonor}
                         className={progressBarClassName}
                         withIcon={withIcon}
+                        icon={icon}
+                        modeModifier={modeModifier}
                         highlighted={highlighted}
-                        noDataPlaceholder={i18n('context_no-data')}
+                        noDataPlaceholder={
+                            shouldShowNoDataPlaceholder ? i18n('context_no-data') : undefined
+                        }
+                        isLegendInactive={isLegendInactive}
                     />
                 </InternalLink>
             </div>

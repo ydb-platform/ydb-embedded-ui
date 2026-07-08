@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {
-    useCapabilitiesLoaded,
     useConfigAvailable,
     useNewStorageViewEnabled,
     useStorageGroupsHandlerAvailable,
@@ -42,12 +41,10 @@ export function useDiagnosticsPages({
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();
 
     const hasConfigs = useConfigAvailable();
-    const capabilitiesLoaded = useCapabilitiesLoaded();
     const newStorageViewEnabled = useNewStorageViewEnabled();
     const storageGroupsAvailable = useStorageGroupsHandlerAvailable();
     const storageStatsAvailable = useStorageStatsAvailable();
-    const hasStorageUsageCapabilities =
-        !capabilitiesLoaded || (storageGroupsAvailable && storageStatsAvailable);
+    const hasStorageUsageCapabilities = storageGroupsAvailable && storageStatsAvailable;
     const hasStorageUsage = newStorageViewEnabled && hasStorageUsageCapabilities;
     const hasTopicData = useTopicDataAvailable();
     const isViewerUser = useIsViewerUser();

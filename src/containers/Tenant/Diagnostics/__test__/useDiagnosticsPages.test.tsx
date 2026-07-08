@@ -49,6 +49,8 @@ jest.mock('../../../../utils/monitoringVisibility', () => ({
 
 describe('useDiagnosticsPages', () => {
     beforeEach(() => {
+        jest.clearAllMocks();
+
         (useCapabilitiesLoaded as jest.Mock).mockReturnValue(true);
         (useConfigAvailable as jest.Mock).mockReturnValue(true);
         (useNewStorageViewEnabled as jest.Mock).mockReturnValue(true);
@@ -66,6 +68,7 @@ describe('useDiagnosticsPages', () => {
     });
 
     test('hides storage usage tab when storage stats capability is unavailable', () => {
+        (useCapabilitiesLoaded as jest.Mock).mockReturnValue(false);
         (useStorageStatsAvailable as jest.Mock).mockReturnValue(false);
 
         const {result} = renderHook(() =>
