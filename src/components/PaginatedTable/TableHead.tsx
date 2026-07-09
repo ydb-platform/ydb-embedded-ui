@@ -66,8 +66,6 @@ interface TableHeadCellProps<T> {
     defaultSortOrder: SortOrderType;
     onSort?: (columnName: string) => void;
     rowHeight: number;
-    onCellMount?: (element: Element) => void;
-    onCellUnMount?: (element: Element) => void;
     onColumnsResize?: HandleTableColumnsResize;
 }
 
@@ -78,23 +76,9 @@ export const TableHeadCell = <T,>({
     defaultSortOrder,
     onSort,
     rowHeight,
-    onCellMount,
-    onCellUnMount,
     onColumnsResize,
 }: TableHeadCellProps<T>) => {
     const cellWrapperRef = React.useRef<HTMLTableCellElement>(null);
-
-    React.useEffect(() => {
-        const cellWrapper = cellWrapperRef.current;
-        if (cellWrapper) {
-            onCellMount?.(cellWrapper);
-        }
-        return () => {
-            if (cellWrapper) {
-                onCellUnMount?.(cellWrapper);
-            }
-        };
-    }, [onCellMount, onCellUnMount]);
 
     const getCurrentColumnWidth = React.useCallback(() => {
         return cellWrapperRef.current?.getBoundingClientRect().width;
