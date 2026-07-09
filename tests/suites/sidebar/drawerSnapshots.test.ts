@@ -62,7 +62,9 @@ async function dispatchClick(locator: Locator) {
 
 async function clickDiagnosticsTableRowAtStart(page: Page, row: number) {
     const rowElement = page
-        .locator('.object-general .ydb-resizeable-data-table tr.data-table__row')
+        .locator(
+            '.object-general .ydb-resizeable-data-table tr.data-table__row, .kv-tenant-diagnostics .ydb-resizeable-data-table tr.data-table__row',
+        )
         .nth(row - 1);
 
     await dispatchClick(rowElement);
@@ -160,7 +162,7 @@ test.describe('Drawer visual snapshots', () => {
             schema: database,
             database,
             backend,
-            databasePage: 'diagnostics',
+            databasePage: 'database',
             diagnosticsTab: 'topQueries',
         });
 

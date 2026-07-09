@@ -641,7 +641,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         await setupTenantInfo400Mock(page);
 
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({database, databasePage: 'diagnostics', diagnosticsTab: 'overview'});
+        await tenantPage.goto({database, databasePage: 'database', diagnosticsTab: 'database'});
 
         const errorDisplay = new ErrorDisplayModel(page);
         await errorDisplay.waitForResponseError();
@@ -651,6 +651,9 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
             'error-tenant-overview-400.png',
+            {
+                mask: [errorDisplay.getDetailValueLocator('URL')],
+            },
         );
         await page.screenshot({
             path: `${FULL_PAGE_DIR}/full-tenant-overview-400.png`,
@@ -715,7 +718,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'database',
+            databasePage: 'database',
             diagnosticsTab: 'monitoring',
         });
 
@@ -739,6 +742,13 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
             'error-monitoring-generic-json-collapsed.png',
+            {
+                mask: [
+                    errorDisplay.getDetailValueLocator('URL'),
+                    errorDisplay.getDetailValueLocator('Code'),
+                    errorDisplay.getDetailValueLocator('Message'),
+                ],
+            },
         );
 
         expect(await errorDisplay.isResponseBodyTriggerVisible()).toBe(true);
@@ -750,6 +760,13 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
             'error-monitoring-generic-json-expanded.png',
+            {
+                mask: [
+                    errorDisplay.getDetailValueLocator('URL'),
+                    errorDisplay.getDetailValueLocator('Code'),
+                    errorDisplay.getDetailValueLocator('Message'),
+                ],
+            },
         );
         await page.screenshot({
             path: `${FULL_PAGE_DIR}/full-monitoring-generic-json.png`,
