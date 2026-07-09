@@ -14,12 +14,11 @@ import {useHandleVisibilityChange} from './useHandleVisibilityChange';
 export function GetUser({
     children,
     useMeta,
-    blockContentWhileLoading = true,
+    // Allow content on databases home tab to be displayed even when whoami responds with an error
     displayWhoamiError = true,
 }: {
     children: React.ReactNode;
     useMeta?: boolean;
-    blockContentWhileLoading?: boolean;
     displayWhoamiError?: boolean;
 }) {
     const database = useDatabaseFromQuery();
@@ -38,7 +37,7 @@ export function GetUser({
     const errorProps = errorToDisplay ? {...uiFactory.clusterOrDatabaseAccessError} : undefined;
 
     return (
-        <LoaderWrapper loading={blockContentWhileLoading && isFetching} size="l" delay={0}>
+        <LoaderWrapper loading={isFetching} size="l" delay={0}>
             <PageError
                 error={errorToDisplay}
                 {...errorProps}
@@ -54,22 +53,16 @@ export function GetUser({
 
 export function GetMetaUser({
     children,
-    blockContentWhileLoading,
     displayWhoamiError,
 }: {
     children: React.ReactNode;
-    blockContentWhileLoading?: boolean;
     displayWhoamiError?: boolean;
 }) {
     const metaAuth = useMetaAuth();
 
     if (metaAuth) {
         return (
-            <GetUser
-                blockContentWhileLoading={blockContentWhileLoading}
-                displayWhoamiError={displayWhoamiError}
-                useMeta
-            >
+            <GetUser displayWhoamiError={displayWhoamiError} useMeta>
                 {children}
             </GetUser>
         );
