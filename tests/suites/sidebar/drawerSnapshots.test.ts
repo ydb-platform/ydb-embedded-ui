@@ -51,6 +51,23 @@ async function gotoClusterDatabases(page: Page) {
     expect(response?.ok()).toBe(true);
 }
 
+async function dispatchClick(locator: Locator) {
+    await locator.waitFor({state: 'visible'});
+    await locator.evaluate((element) => {
+        element.dispatchEvent(
+            new MouseEvent('click', {bubbles: true, cancelable: true, view: window}),
+        );
+    });
+}
+
+async function clickDiagnosticsTableRowAtStart(page: Page, row: number) {
+    const rowElement = page
+        .locator('.object-general .ydb-resizeable-data-table tr.data-table__row')
+        .nth(row - 1);
+
+    await dispatchClick(rowElement);
+}
+
 test.describe('Drawer visual snapshots', () => {
     test('settings drawer matches baseline', async ({page}) => {
         await gotoClusterDatabases(page);
@@ -133,6 +150,9 @@ test.describe('Drawer visual snapshots', () => {
     });
 
     test('top query details drawer matches baseline', async ({page}) => {
+        await page.addInitScript(() => {
+            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
+        });
         await setupTopQueriesMock(page);
 
         const tenantPage = new TenantPage(page);
@@ -140,14 +160,13 @@ test.describe('Drawer visual snapshots', () => {
             schema: database,
             database,
             backend,
-            tenantPage: 'diagnostics',
             databasePage: 'diagnostics',
             diagnosticsTab: 'topQueries',
         });
 
         const diagnostics = new Diagnostics(page);
         await expect(diagnostics.table.isVisible()).resolves.toBe(true);
-        await diagnostics.table.clickRow(1);
+        await clickDiagnosticsTableRowAtStart(page, 1);
 
         const queryDetailsDrawer = page.locator(QUERY_DETAILS_DRAWER_SELECTOR).first();
         await expect(queryDetailsDrawer).toBeVisible();

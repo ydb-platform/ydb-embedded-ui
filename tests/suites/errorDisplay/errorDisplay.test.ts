@@ -641,7 +641,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         await setupTenantInfo400Mock(page);
 
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({database, tenantPage: 'diagnostics'});
+        await tenantPage.goto({database, databasePage: 'diagnostics', diagnosticsTab: 'overview'});
 
         const errorDisplay = new ErrorDisplayModel(page);
         await errorDisplay.waitForResponseError();
@@ -659,13 +659,17 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
     });
 
     test('Monitoring — gateway JSON error is readable and expandable', async ({page}) => {
+        await page.addInitScript(() => {
+            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
+            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
+        });
         await setupMonitoringGatewayErrorMock(page);
 
         const tenantPage = new TenantPage(page);
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'database',
+            databasePage: 'database',
             diagnosticsTab: 'monitoring',
         });
 
@@ -756,10 +760,19 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
     // --- AccessDenied ---
 
     test('Tenant — 403 describe shows AccessDenied', async ({page}) => {
+        await page.addInitScript(() => {
+            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
+            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
+        });
         await setupDescribe403Mock(page);
 
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'diagnostics'});
+        await tenantPage.goto({
+            schema: database,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
 
         const errorDisplay = new ErrorDisplayModel(page);
         await errorDisplay.waitForAccessDenied();

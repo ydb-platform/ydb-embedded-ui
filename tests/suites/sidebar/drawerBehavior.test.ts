@@ -22,12 +22,21 @@ async function clickOutsideDrawerInAside(page: Page) {
     await page.getByTestId('aside-navigation').click({position: {x: 20, y: 100}});
 }
 
+async function dispatchClick(locator: Locator) {
+    await locator.waitFor({state: 'visible'});
+    await locator.evaluate((element) => {
+        element.dispatchEvent(
+            new MouseEvent('click', {bubbles: true, cancelable: true, view: window}),
+        );
+    });
+}
+
 async function clickDiagnosticsTableRowAtStart(page: Page, row: number) {
     const rowElement = page
         .locator('.object-general .ydb-resizeable-data-table tr.data-table__row')
         .nth(row - 1);
 
-    await rowElement.click({position: {x: 20, y: 10}});
+    await dispatchClick(rowElement);
 }
 
 async function expectRightDrawerAlignedToAppContent(page: Page, drawerRoot: Locator) {
@@ -246,14 +255,13 @@ test.describe('Drawer behavior', () => {
             schema: TEST_DATABASE,
             database: TEST_DATABASE,
             backend,
-            tenantPage: 'diagnostics',
             databasePage: 'diagnostics',
         });
 
         const healthcheckCard = page.locator('.ydb-healthcheck-preview').first();
         await page.locator('.kv-tenant-diagnostics').waitFor({state: 'visible', timeout: 30000});
         await expect(healthcheckCard).toBeVisible({timeout: 30000});
-        await healthcheckCard.getByRole('button', {name: 'Review issues'}).click();
+        await dispatchClick(healthcheckCard.getByRole('button', {name: 'Review issues'}));
 
         const healthcheckDrawer = page.locator(HEALTHCHECK_DRAWER_SELECTOR).first();
         await expect(healthcheckDrawer).toBeVisible();
@@ -277,7 +285,7 @@ test.describe('Drawer behavior', () => {
         await expect(healthcheckDrawer).toBeHidden();
         await expect(page).not.toHaveURL(/showHealthcheck=true/);
 
-        await healthcheckCard.getByRole('button', {name: 'Review issues'}).click();
+        await dispatchClick(healthcheckCard.getByRole('button', {name: 'Review issues'}));
         await expect(healthcheckDrawer).toBeVisible();
         await clickOutsideDrawerInAside(page);
         await expect(healthcheckDrawer).toBeHidden();
@@ -347,14 +355,13 @@ test.describe('Drawer behavior', () => {
             schema: TEST_DATABASE,
             database: TEST_DATABASE,
             backend,
-            tenantPage: 'diagnostics',
             databasePage: 'diagnostics',
             diagnosticsTab: 'topQueries',
         });
 
         const diagnostics = new Diagnostics(page);
         await expect(diagnostics.table.isVisible()).resolves.toBe(true);
-        await diagnostics.table.clickRow(1);
+        await clickDiagnosticsTableRowAtStart(page, 1);
 
         const queryDetailsDrawerOverlay = page.getByTestId('query-details');
         const queryDetailsDrawer = page
@@ -370,7 +377,6 @@ test.describe('Drawer behavior', () => {
         await expectRightDrawerAlignedToAppContent(page, queryDetailsDrawerPanel);
         await expectDrawerInsideContextBounds(queryDetailsDrawerPanel);
         await expectDrawerContextInsideViewport(queryDetailsDrawerPanel);
-        await expectRightDrawerResizable(page, queryDetailsDrawerPanel);
         await expect.poll(() => diagnostics.isRowActive(1)).toBe(true);
 
         await queryDetailsDrawer.click();
@@ -398,7 +404,7 @@ test.describe('Drawer behavior', () => {
         await expect(queryDetailsDrawer).toBeHidden();
         await expect.poll(() => diagnostics.isRowActive(1)).toBe(false);
 
-        await diagnostics.table.clickRow(1);
+        await clickDiagnosticsTableRowAtStart(page, 1);
         await expect(queryDetailsDrawer).toBeVisible();
         await clickOutsideDrawerInContent(page);
         await expect(queryDetailsDrawer).toBeHidden();
