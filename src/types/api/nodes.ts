@@ -75,6 +75,7 @@ export interface TNodeInfo {
     // Capacity metrics experiment
     MaxPDiskUsage?: number;
     MaxVDiskSlotUsage?: number;
+    MaxVDiskRawUsage?: number;
     CapacityAlert?: ECapacityAlert | string;
 }
 
@@ -308,6 +309,7 @@ export type NodesRequiredField =
     | 'PileName'
     | 'MaxPDiskUsage'
     | 'MaxVDiskSlotUsage'
+    | 'MaxVDiskRawUsage'
     | 'CapacityAlert';
 
 export type NodesSortValue =
@@ -335,6 +337,7 @@ export type NodesSortValue =
     | `ReceiveThroughput` // v13
     | `MaxPDiskUsage`
     | `MaxVDiskSlotUsage`
+    | `MaxVDiskRawUsage`
     | `CapacityAlert`;
 
 export type NodesSort = BackendSortParam<NodesSortValue>;

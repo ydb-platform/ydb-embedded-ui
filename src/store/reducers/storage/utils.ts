@@ -230,6 +230,7 @@ const prepareStorageNodeData = (
         VDisks,
         MaxPDiskUsage,
         MaxVDiskSlotUsage,
+        MaxVDiskRawUsage,
         CapacityAlert,
         ...restNodeParams
     } = node;
@@ -265,6 +266,7 @@ const prepareStorageNodeData = (
         MaximumDisksPerNode: maximumDisksPerNode,
         MaxPDiskUsage: normalizeMaxPercent(MaxPDiskUsage),
         MaxVDiskSlotUsage: normalizeMaxPercent(MaxVDiskSlotUsage),
+        MaxVDiskRawUsage: normalizeMaxPercent(MaxVDiskRawUsage),
         CapacityAlert,
     };
 };

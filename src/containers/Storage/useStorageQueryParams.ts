@@ -16,6 +16,42 @@ import {VDisksGroupBy, vdisksGroupBySchema} from './StorageExpertModePanel/const
 import type {VDisksGroupByValue} from './StorageExpertModePanel/constants';
 import {STORAGE_SEARCH_PARAM_BY_TYPE} from './constants';
 
+interface StorageGroupByCleanupParams {
+    blobMetricsEnabled: boolean;
+    storageGroupsGroupBy?: string | null;
+    storageNodesGroupBy?: string | null;
+}
+
+export function getStorageGroupByCleanupPatch({
+    blobMetricsEnabled,
+    storageGroupsGroupBy,
+    storageNodesGroupBy,
+}: StorageGroupByCleanupParams): Record<string, string | undefined> {
+    const patch: Record<string, string | undefined> = {};
+
+    if (blobMetricsEnabled) {
+        if (storageGroupsGroupBy === 'Usage') {
+            patch.storageGroupsGroupBy = undefined;
+        }
+
+        if (storageNodesGroupBy === 'DiskSpaceUsage') {
+            patch.storageNodesGroupBy = undefined;
+        }
+
+        return patch;
+    }
+
+    if (storageGroupsGroupBy === 'CapacityAlert') {
+        patch.storageGroupsGroupBy = undefined;
+    }
+
+    if (storageNodesGroupBy === 'CapacityAlert') {
+        patch.storageNodesGroupBy = undefined;
+    }
+
+    return patch;
+}
+
 export function useStorageQueryParams() {
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
@@ -138,28 +174,11 @@ export function useStorageQueryParams() {
     };
 
     React.useEffect(() => {
-        if (blobMetricsEnabled) {
-            const patch: Record<string, string | undefined> = {};
-
-            if (queryParams.storageGroupsGroupBy === 'Usage') {
-                patch.storageGroupsGroupBy = undefined;
-            }
-
-            if (Object.keys(patch).length > 0) {
-                setQueryParams(patch, 'replaceIn');
-            }
-            return;
-        }
-
-        const patch: Record<string, string | undefined> = {};
-
-        if (queryParams.storageGroupsGroupBy === 'CapacityAlert') {
-            patch.storageGroupsGroupBy = undefined;
-        }
-
-        if (queryParams.storageNodesGroupBy === 'CapacityAlert') {
-            patch.storageNodesGroupBy = undefined;
-        }
+        const patch = getStorageGroupByCleanupPatch({
+            blobMetricsEnabled,
+            storageGroupsGroupBy: queryParams.storageGroupsGroupBy,
+            storageNodesGroupBy: queryParams.storageNodesGroupBy,
+        });
 
         if (Object.keys(patch).length > 0) {
             setQueryParams(patch, 'replaceIn');
