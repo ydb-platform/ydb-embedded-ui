@@ -201,13 +201,10 @@ export const formatPercent = (number?: unknown, precision = 2, options?: {fixed?
 
     const numberValue = Number(number);
 
-    // The input is a fraction (e.g. 0.015), but the output is displayed as percent.
-    // Round in the displayed percent scale first so 0.015 becomes 2%, not 1%.
-    // Convert back to a fraction afterwards because Numeral's '%' format multiplies by 100.
-    const multiplier = 10 ** precision;
-    const roundedPercent =
-        Math.round((numberValue * 100 + Number.EPSILON) * multiplier) / multiplier;
-    const roundedNumber = roundedPercent / 100;
+    // The input is a fraction, while Numeral's '%' format displays it as percent.
+    // Keep two extra fraction digits so percent precision is preserved: 0.0123 -> 1.23%.
+    const multiplier = 10 ** (precision + 2);
+    const roundedNumber = Math.round((numberValue + Number.EPSILON) * multiplier) / multiplier;
 
     const zeros = '0'.repeat(precision);
     const format = options?.fixed ? `0.${zeros}%` : `0.[${zeros}]%`;
