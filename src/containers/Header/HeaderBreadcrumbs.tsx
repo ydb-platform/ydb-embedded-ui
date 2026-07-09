@@ -15,13 +15,13 @@ export function HeaderBreadcrumbs({breadcrumbItems, endContent}: HeaderBreadcrum
     return (
         <Breadcrumbs className={b('breadcrumbs')} endContent={endContent}>
             {breadcrumbItems.map((item, index) => {
-                const {icon, text, link} = item;
+                const {icon, isHome, text, link} = item;
                 const isLast = index === breadcrumbItems.length - 1;
 
                 return (
                     <Breadcrumbs.Item
                         key={index}
-                        className={b('breadcrumbs-item', {active: isLast})}
+                        className={b('breadcrumbs-item', {active: isLast, home: isHome})}
                         disabled={isLast}
                     >
                         <BreadcrumbLink icon={icon} text={text} link={isLast ? undefined : link} />

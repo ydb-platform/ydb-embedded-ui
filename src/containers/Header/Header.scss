@@ -12,6 +12,8 @@
 
     .g-breadcrumbs__item_current {
         height: min-content;
+
+        font-weight: var(--g-text-body-font-weight);
     }
 
     &__breadcrumbs {
@@ -28,6 +30,16 @@
 
         &_active {
             color: var(--g-color-text-primary);
+        }
+
+        &_home {
+            margin-inline-end: var(--g-spacing-1);
+
+            color: var(--g-color-text-primary);
+
+            & + .g-breadcrumbs__divider {
+                display: none;
+            }
         }
     }
 
