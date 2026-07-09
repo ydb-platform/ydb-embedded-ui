@@ -13,7 +13,7 @@ test.describe('Header breadcrumbs', () => {
     test('Database page breadcrumbs match visual baseline', async ({page}) => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
-        await expect(await tenantPage.isDiagnosticsVisible()).toBeTruthy();
+        await tenantPage.isDiagnosticsVisible();
 
         const breadcrumbs = page.locator('.header__breadcrumbs');
         await expect(breadcrumbs).toBeVisible();

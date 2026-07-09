@@ -13,7 +13,7 @@
     .g-breadcrumbs__item_current {
         height: min-content;
 
-        font-weight: var(--g-text-body-font-weight);
+        font-weight: var(--g-text-body-font-weight, inherit);
     }
 
     &__breadcrumbs {
