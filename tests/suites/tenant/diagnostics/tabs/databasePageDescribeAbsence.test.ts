@@ -41,28 +41,29 @@ test.describe('Database page in v2 navigation - no /describe calls', () => {
         // Ensure at least one tab is visible so the test is not vacuously true
         expect(tabCount).toBeGreaterThan(0);
 
-        // Collect all tab hrefs before navigating.
+        // Collect all tab ids/hrefs before navigating.
         // Assert every tab link has an href so no tab is silently skipped.
-        const tabHrefs: string[] = [];
+        const tabIds: string[] = [];
         for (let i = 0; i < tabCount; i++) {
-            const href = await tabLinks.nth(i).getAttribute('href');
+            const tab = tabLinks.nth(i);
+            const href = await tab.getAttribute('href');
+            const tabId = await tab.getAttribute('data-tab');
             expect(
                 href,
                 `Tab ${i} (a[data-tab]) has no href — it would be silently skipped`,
             ).toBeTruthy();
-            if (href) {
-                tabHrefs.push(href);
+            expect(tabId, `Tab ${i} (a[data-tab]) has no data-tab`).toBeTruthy();
+            if (tabId) {
+                tabIds.push(tabId);
             }
         }
 
-        // Navigate to each tab URL directly instead of clicking.
-        // Clicking tabs + waiting for networkidle is unreliable in a live backend
-        // (the app polls continuously, so networkidle never settles), which causes
-        // the test to consume its full timeout on every tab and eventually stall CI.
-        // Direct goto() waits for the page load event which is sufficient to capture
-        // any /describe requests triggered during component mount.
-        for (const href of tabHrefs) {
-            await page.goto(href);
+        // Click tabs as a user would, but wait only for URL/content stabilization.
+        // Waiting for networkidle is unreliable in a live backend because the app polls
+        // continuously; direct page.goto() can race with URL normalization in Safari.
+        for (const tabId of tabIds) {
+            await tabsContainer.locator(`a[data-tab="${tabId}"]`).click();
+            await expect(page).toHaveURL(new RegExp(`diagnosticsTab=${tabId}`));
             await tenantPage.isDiagnosticsVisible();
         }
 

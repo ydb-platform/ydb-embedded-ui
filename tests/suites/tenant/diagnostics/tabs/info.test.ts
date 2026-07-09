@@ -3,7 +3,7 @@ import type {Locator, Page} from '@playwright/test';
 
 import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
-import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
+import {Diagnostics} from '../Diagnostics';
 
 const METRIC_SUMMARY_SCREENSHOT_VIEWPORT = {width: 1600, height: 1000};
 
@@ -373,9 +373,6 @@ test.describe('Diagnostics Info tab', async () => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
-
         // Verify vector index settings are displayed including overlap_clusters
         const infoContent = page.locator('.ydb-diagnostics-table-info');
         await infoContent.waitFor({state: 'visible', timeout: 10000});
@@ -453,9 +450,6 @@ test.describe('Diagnostics Info tab', async () => {
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
-
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
 
         // Verify fulltext index settings are displayed
         const infoContent = page.locator('.ydb-diagnostics-table-info');

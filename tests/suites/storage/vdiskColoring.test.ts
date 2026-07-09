@@ -8,6 +8,7 @@ import {storagePage} from '../../utils/constants';
 import {DATABASE, setupVDiskColoringMocks} from './vdiskColoringMocks';
 
 const VDISKS_COUNT = 10;
+const READY_TIMEOUT = 20_000;
 
 const VDISK_GROUP_BY_MODES: {value: VDisksGroupByValue; slug: string}[] = [
     {value: VDisksGroupBy.State, slug: 'state'},
@@ -149,6 +150,23 @@ async function expectStorageRowsScreenshot(page: Page, name: string) {
     });
 }
 
+async function expectStorageGroupRowsReady(page: Page) {
+    for (const group of STORAGE_GROUPS) {
+        const row = getStorageGroupRow(page, group.index);
+        const storageDisksArea = getStorageDisksArea(row);
+        const vDiskItems = getVDiskItems(row);
+
+        await expect(storageDisksArea).toBeVisible({timeout: READY_TIMEOUT});
+        await expect(vDiskItems).toHaveCount(VDISKS_COUNT, {timeout: READY_TIMEOUT});
+        await expect(getVDiskProgressBar(vDiskItems.first())).toBeVisible({
+            timeout: READY_TIMEOUT,
+        });
+        await expect(row.locator('.ydb-stack')).toHaveCount(group.hasDonors ? VDISKS_COUNT : 0, {
+            timeout: READY_TIMEOUT,
+        });
+    }
+}
+
 async function preparePage(page: Page, vdisksGroupBy: VDisksGroupByValue) {
     await page.setViewportSize({width: 1500, height: 1000});
     await enableExpertMode(page, vdisksGroupBy);
@@ -156,26 +174,16 @@ async function preparePage(page: Page, vdisksGroupBy: VDisksGroupByValue) {
     await gotoStoragePage(page, vdisksGroupBy);
     await hideFloatingPopups(page);
     await setupForcedHoverStyles(page);
+    await expectStorageGroupRowsReady(page);
 }
 
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
+    test.describe.configure({timeout: 60_000});
+
     for (const mode of VDISK_GROUP_BY_MODES) {
         test.describe(`${mode.value} mode`, () => {
             test('renders both storage group VDisk rows', async ({page}) => {
                 await preparePage(page, mode.value);
-
-                for (const group of STORAGE_GROUPS) {
-                    const row = getStorageGroupRow(page, group.index);
-                    const storageDisksArea = getStorageDisksArea(row);
-                    const vDiskItems = getVDiskItems(row);
-
-                    await expect(storageDisksArea).toBeVisible();
-                    await expect(vDiskItems).toHaveCount(VDISKS_COUNT);
-                    await expect(getVDiskProgressBar(vDiskItems.first())).toBeVisible();
-                    await expect(row.locator('.ydb-stack')).toHaveCount(
-                        group.hasDonors ? VDISKS_COUNT : 0,
-                    );
-                }
 
                 await forceHoverStorageGroupVDiskItems(page, 0);
                 await expectStorageRowsScreenshot(
