@@ -116,7 +116,7 @@ test.describe('Test Sidebar', async () => {
             schema: database,
             database,
             backend,
-            tenantPage: 'query',
+            databasePage: 'query',
         };
 
         const tenantPage = new TenantPage(page);

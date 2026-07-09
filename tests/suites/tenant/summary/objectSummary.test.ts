@@ -277,7 +277,7 @@ test.describe('Object Summary', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);

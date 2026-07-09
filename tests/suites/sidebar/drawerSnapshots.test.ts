@@ -121,7 +121,6 @@ test.describe('Drawer visual snapshots', () => {
             schema: database,
             database,
             backend,
-            tenantPage: 'query',
             databasePage: 'query',
         });
 
@@ -138,7 +137,6 @@ test.describe('Drawer visual snapshots', () => {
             schema: database,
             database,
             backend,
-            tenantPage: 'diagnostics',
             databasePage: 'diagnostics',
             diagnosticsTab: 'access',
         });

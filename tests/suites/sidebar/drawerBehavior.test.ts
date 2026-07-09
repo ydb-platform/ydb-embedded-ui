@@ -234,7 +234,6 @@ test.describe('Drawer behavior', () => {
             schema: TEST_DATABASE,
             database: TEST_DATABASE,
             backend,
-            tenantPage: 'diagnostics',
             databasePage: 'diagnostics',
             diagnosticsTab: 'access',
         });
@@ -307,7 +306,6 @@ test.describe('Drawer behavior', () => {
             schema: TEST_DATABASE,
             database: TEST_DATABASE,
             backend,
-            tenantPage: 'query',
             databasePage: 'query',
         });
 

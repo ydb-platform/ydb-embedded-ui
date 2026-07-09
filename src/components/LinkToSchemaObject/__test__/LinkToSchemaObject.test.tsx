@@ -11,7 +11,7 @@ import {LinkToSchemaObject} from '../LinkToSchemaObject';
 
 jest.mock('../../../containers/Tenant/Diagnostics/DiagnosticsPages', () => ({
     useDiagnosticsPageLinkGetter: () => (_tab: string, params?: {schema?: string}) => {
-        return `/tenant?schema=${encodeURIComponent(params?.schema ?? '')}`;
+        return `/database?schema=${encodeURIComponent(params?.schema ?? '')}`;
     },
 }));
 
@@ -79,7 +79,7 @@ describe('LinkToSchemaObject', () => {
 
         expect(screen.getByRole('link', {name: 'Table'})).toHaveAttribute(
             'href',
-            '/tenant?schema=%2FRoot%2FTable',
+            '/database?schema=%2FRoot%2FTable',
         );
     });
 });

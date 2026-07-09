@@ -14,7 +14,7 @@ test.describe('Test Plan to SVG functionality', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         };
 
         const tenantPage = new TenantPage(page);

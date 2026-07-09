@@ -869,7 +869,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         page,
     }) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+        await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
         await toggleExperiment(page, 'off', 'Query Streaming');
         await setupQueryResult500Mock(page);
@@ -906,7 +906,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
     test('Query result — network error shows ResponseError', async ({page}) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+        await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
         await toggleExperiment(page, 'off', 'Query Streaming');
         await setupQueryResultNetworkErrorMock(page);
@@ -937,7 +937,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         page,
     }) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+        await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
         await setupStreamingQuery500Mock(page);
 
@@ -981,7 +981,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         page,
     }) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+        await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
         const cleanup = await setupStreamingQueryMidStreamErrorMock(page);
 
@@ -1022,7 +1022,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         page,
     }) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+        await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
         await setupStreamingQueryNetworkErrorMock(page);
 
@@ -1055,7 +1055,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         page,
     }) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+        await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
         await setupMockStreamingNonJsonChunk(page);
 

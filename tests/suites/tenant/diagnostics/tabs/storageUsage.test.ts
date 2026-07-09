@@ -183,7 +183,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         });
 
         const queryEditor = new QueryEditor(page);
@@ -193,7 +193,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: tablePath,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
         });
 
         const diagnostics = new Diagnostics(page);
@@ -214,7 +214,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         });
 
         const queryEditor = new QueryEditor(page);
@@ -250,7 +250,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: tablePath,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
@@ -306,7 +306,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: MOCK_STORAGE_USAGE_PATH,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
@@ -380,7 +380,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: MOCK_STORAGE_USAGE_PATH,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
@@ -437,7 +437,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: MOCK_STORAGE_USAGE_MEDIA_STATS_PATH,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
@@ -471,7 +471,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: MOCK_STORAGE_USAGE_MEDIA_STATS_PATH,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
@@ -524,7 +524,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: MOCK_STORAGE_USAGE_MEDIA_STATS_PATH,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
@@ -581,7 +581,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: MOCK_COLUMN_STORAGE_USAGE_PATH,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
