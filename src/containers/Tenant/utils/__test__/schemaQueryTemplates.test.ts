@@ -1,4 +1,11 @@
-import {addMinMaxIndex, disableTTLTemplate, enableTTLTemplate} from '../schemaQueryTemplates';
+import {
+    addMinMaxIndex,
+    alterSecretTemplate,
+    createSecretTemplate,
+    disableTTLTemplate,
+    dropSecretTemplate,
+    enableTTLTemplate,
+} from '../schemaQueryTemplates';
 
 describe('schemaQueryTemplates', () => {
     describe('enableTTLTemplate', () => {
@@ -38,6 +45,37 @@ describe('schemaQueryTemplates', () => {
 ADD INDEX \${2:my_min_max_index}
 LOCAL USING min_max
 ON (\${3:column_name});`);
+        });
+    });
+
+    describe('secret templates', () => {
+        test('creates a secret with a string value and inherited permissions', () => {
+            const template = createSecretTemplate();
+
+            expect(template).toBe(`CREATE SECRET \${1:my_secret} WITH (
+    VALUE = '\${2:secret_value}',
+    INHERIT_PERMISSIONS = TRUE
+);`);
+        });
+
+        test('alters the selected secret value', () => {
+            const template = alterSecretTemplate({
+                path: '/local/my_secret',
+                relativePath: 'my_secret',
+            });
+
+            expect(template).toBe(`ALTER SECRET \`my_secret\` WITH (
+    VALUE = '\${1:secret_value}'
+);`);
+        });
+
+        test('drops the selected secret', () => {
+            const template = dropSecretTemplate({
+                path: '/local/my_secret',
+                relativePath: 'my_secret',
+            });
+
+            expect(template).toBe('DROP SECRET `my_secret`;');
         });
     });
 });

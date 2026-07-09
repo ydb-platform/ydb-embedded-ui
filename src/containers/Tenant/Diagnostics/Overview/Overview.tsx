@@ -57,6 +57,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeResourcePool]: undefined,
+            [EPathType.EPathTypeSecret]: undefined,
             [EPathType.EPathTypeTable]: renderTableInfo,
             [EPathType.EPathTypeSysView]: () => <SystemViewInfo data={data} />,
             [EPathType.EPathTypeSubDomain]: undefined,

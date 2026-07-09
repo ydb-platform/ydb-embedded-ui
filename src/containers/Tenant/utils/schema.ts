@@ -45,6 +45,7 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
     [EPathType.EPathTypeReplication]: 'async_replication',
     [EPathType.EPathTypeTransfer]: 'transfer',
     [EPathType.EPathTypeResourcePool]: 'resource_pool',
+    [EPathType.EPathTypeSecret]: 'secret',
 
     [EPathType.EPathTypeStreamingQuery]: 'streaming_query',
 };
@@ -117,6 +118,7 @@ const pathTypeToEntityName: Record<EPathType, string | undefined> = {
     [EPathType.EPathTypeReplication]: i18n('entity-name_async-replication'),
     [EPathType.EPathTypeTransfer]: i18n('entity-name_transfer'),
     [EPathType.EPathTypeResourcePool]: i18n('entity-name_resource-pool'),
+    [EPathType.EPathTypeSecret]: i18n('entity-name_secret'),
 };
 
 export const mapPathTypeToEntityName = (
@@ -172,6 +174,7 @@ const pathTypeToIsTable: Record<EPathType, boolean> = {
     [EPathType.EPathTypeReplication]: false,
     [EPathType.EPathTypeTransfer]: false,
     [EPathType.EPathTypeResourcePool]: false,
+    [EPathType.EPathTypeSecret]: false,
     [EPathType.EPathTypeStreamingQuery]: false,
 };
 
@@ -220,6 +223,7 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
     [EPathType.EPathTypeReplication]: false,
     [EPathType.EPathTypeTransfer]: false,
     [EPathType.EPathTypeResourcePool]: false,
+    [EPathType.EPathTypeSecret]: false,
 };
 
 export const isColumnEntityType = (type?: EPathType) => (type && pathTypeToIsColumn[type]) ?? false;
@@ -250,6 +254,7 @@ const pathTypeToIsDatabase: Record<EPathType, boolean> = {
     [EPathType.EPathTypeReplication]: false,
     [EPathType.EPathTypeTransfer]: false,
     [EPathType.EPathTypeResourcePool]: false,
+    [EPathType.EPathTypeSecret]: false,
 };
 
 export const isDatabaseEntityType = (type?: EPathType) =>
@@ -285,6 +290,7 @@ const pathTypeToChildless: Record<EPathType, boolean> = {
 
     [EPathType.EPathTypeView]: true,
     [EPathType.EPathTypeResourcePool]: true,
+    [EPathType.EPathTypeSecret]: true,
 
     [EPathType.EPathTypeReplication]: true,
     [EPathType.EPathTypeTransfer]: true,

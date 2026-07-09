@@ -74,6 +74,7 @@ export const getSchemaControls =
             database: undefined,
             directory: undefined,
             resource_pool: undefined,
+            secret: undefined,
 
             table: openPreview,
             column_table: openPreview,

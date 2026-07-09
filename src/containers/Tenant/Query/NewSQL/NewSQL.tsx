@@ -5,6 +5,7 @@ import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {Button, DropdownMenu} from '@gravity-ui/uikit';
 import {
     AsyncReplicationIcon,
+    SecretIcon,
     StreamingQueryIcon,
     TableIcon,
     TopicIcon,
@@ -190,6 +191,24 @@ export function NewSQL() {
                 {
                     text: i18n('action.drop-transfer'),
                     action: actions.dropTransfer,
+                },
+            ],
+        },
+        {
+            text: i18n('menu.secrets'),
+            iconStart: <SecretIcon />,
+            items: [
+                {
+                    text: i18n('action.create-secret'),
+                    action: actions.createSecret,
+                },
+                {
+                    text: i18n('action.alter-secret'),
+                    action: actions.alterSecret,
+                },
+                {
+                    text: i18n('action.drop-secret'),
+                    action: actions.dropSecret,
                 },
             ],
         },

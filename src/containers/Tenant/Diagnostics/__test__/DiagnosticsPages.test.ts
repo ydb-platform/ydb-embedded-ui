@@ -42,6 +42,15 @@ describe('DiagnosticsPages', () => {
         );
     });
 
+    test('shows only safe pages for secret objects', () => {
+        const pages = getPagesByType(EPathType.EPathTypeSecret, undefined, BASE_OPTIONS);
+
+        expect(pages.map((page) => page.id)).toEqual([
+            TENANT_DIAGNOSTICS_TABS_IDS.describe,
+            TENANT_DIAGNOSTICS_TABS_IDS.access,
+        ]);
+    });
+
     test('shows backups tab for serverless databases when backups are available', () => {
         const pages = getPagesByType(EPathType.EPathTypeExtSubDomain, undefined, {
             ...BASE_OPTIONS,
