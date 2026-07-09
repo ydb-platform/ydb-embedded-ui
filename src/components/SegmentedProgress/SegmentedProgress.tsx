@@ -42,7 +42,7 @@ export type SegmentedProgressProps =
     | SegmentedProgressByFillPercentProps;
 
 function clampPercent(percent: number) {
-    if (!Number.isFinite(percent) || percent < 0) {
+    if (!Number.isFinite(percent) || percent <= 0) {
         return 0;
     }
     if (percent > 100) {
@@ -52,12 +52,10 @@ function clampPercent(percent: number) {
 }
 
 function defaultNormalizePercent(percent: number) {
-    const clampedPercent = clampPercent(percent);
-
-    if (clampedPercent < 1) {
-        return Math.round(clampedPercent * 10) / 10;
+    if (percent < 1) {
+        return Math.round(percent * 10) / 10;
     }
-    return Math.round(clampedPercent);
+    return Math.round(percent);
 }
 
 function isFillPercentMode(
