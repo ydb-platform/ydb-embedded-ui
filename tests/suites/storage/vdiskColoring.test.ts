@@ -8,7 +8,6 @@ import {storagePage} from '../../utils/constants';
 import {DATABASE, setupVDiskColoringMocks} from './vdiskColoringMocks';
 
 const VDISKS_COUNT = 10;
-const READY_TIMEOUT = 20_000;
 
 const VDISK_GROUP_BY_MODES: {value: VDisksGroupByValue; slug: string}[] = [
     {value: VDisksGroupBy.State, slug: 'state'},
@@ -156,14 +155,10 @@ async function expectStorageGroupRowsReady(page: Page) {
         const storageDisksArea = getStorageDisksArea(row);
         const vDiskItems = getVDiskItems(row);
 
-        await expect(storageDisksArea).toBeVisible({timeout: READY_TIMEOUT});
-        await expect(vDiskItems).toHaveCount(VDISKS_COUNT, {timeout: READY_TIMEOUT});
-        await expect(getVDiskProgressBar(vDiskItems.first())).toBeVisible({
-            timeout: READY_TIMEOUT,
-        });
-        await expect(row.locator('.ydb-stack')).toHaveCount(group.hasDonors ? VDISKS_COUNT : 0, {
-            timeout: READY_TIMEOUT,
-        });
+        await expect(storageDisksArea).toBeVisible();
+        await expect(vDiskItems).toHaveCount(VDISKS_COUNT);
+        await expect(getVDiskProgressBar(vDiskItems.first())).toBeVisible();
+        await expect(row.locator('.ydb-stack')).toHaveCount(group.hasDonors ? VDISKS_COUNT : 0);
     }
 }
 

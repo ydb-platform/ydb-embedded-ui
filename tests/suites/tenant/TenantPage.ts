@@ -76,11 +76,12 @@ export class TenantPage extends PageModel {
             name: navigationTabToLinkName[tabName],
         });
 
-        await asideLink.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await asideLink.evaluate((element: HTMLAnchorElement) => element.click());
-        await this.page.waitForURL((url) => url.searchParams.get('databasePage') === pageName, {
-            timeout: VISIBILITY_TIMEOUT,
-        });
+        await Promise.all([
+            this.page.waitForURL((url) => url.searchParams.get('databasePage') === pageName, {
+                timeout: VISIBILITY_TIMEOUT,
+            }),
+            asideLink.click({timeout: VISIBILITY_TIMEOUT}),
+        ]);
     }
 
     async gotoQueryEditor({

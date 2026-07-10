@@ -280,10 +280,7 @@ export class Sidebar {
     }
 
     private async clickFooterButton(button: Locator): Promise<void> {
-        await button.waitFor({state: 'visible'});
-        await button.evaluate((element) => {
-            (element as HTMLElement).click();
-        });
+        await button.click();
     }
 
     private getSettingsSwitch(title: string): Locator {

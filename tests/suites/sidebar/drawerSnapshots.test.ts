@@ -150,9 +150,6 @@ test.describe('Drawer visual snapshots', () => {
     });
 
     test('top query details drawer matches baseline', async ({page}) => {
-        await page.addInitScript(() => {
-            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
-        });
         await setupTopQueriesMock(page);
 
         const tenantPage = new TenantPage(page);

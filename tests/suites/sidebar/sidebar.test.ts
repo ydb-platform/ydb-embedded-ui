@@ -185,11 +185,6 @@ test.describe('Test Sidebar', async () => {
     });
 
     test('Tenant V2 navigation item uses SPA navigation on regular click', async ({page}) => {
-        await page.addInitScript(() => {
-            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
-            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
-        });
-
         const tenantPage = new TenantPage(page);
         await tenantPage.goto({
             schema: database,
@@ -214,11 +209,6 @@ test.describe('Test Sidebar', async () => {
         page,
         context,
     }) => {
-        await page.addInitScript(() => {
-            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
-            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
-        });
-
         const tenantPage = new TenantPage(page);
         await tenantPage.goto({
             schema: database,

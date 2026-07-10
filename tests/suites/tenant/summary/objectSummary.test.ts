@@ -18,10 +18,6 @@ import {RowTableAction} from './types';
 
 test.describe('Object Summary', async () => {
     test.beforeEach(async ({page}) => {
-        await page.addInitScript(() => {
-            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
-        });
-
         const pageQueryParams = {
             schema: dsVslotsSchema,
             database,
@@ -197,10 +193,6 @@ test.describe('Object Summary', async () => {
     });
 
     test('Monitoring action opens monitoring tab with new navigation', async ({page}) => {
-        await page.addInitScript(() => {
-            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
-            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
-        });
         await page.route(`${backend}/viewer/json/whoami*`, async (route) => {
             await route.fulfill({
                 status: 200,

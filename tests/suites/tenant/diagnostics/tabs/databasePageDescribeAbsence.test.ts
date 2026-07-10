@@ -5,14 +5,6 @@ import {TenantPage} from '../../TenantPage';
 import {VISIBILITY_TIMEOUT} from '../../constants';
 
 test.describe('Database page in v2 navigation - no /describe calls', () => {
-    test.beforeEach(async ({page}) => {
-        await page.addInitScript(() => {
-            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
-            // Dismiss the "Navigation is here now" alert popover so it doesn't block interactions
-            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
-        });
-    });
-
     test('/describe is not called when navigating through Database page tabs', async ({page}) => {
         const describeCalls: string[] = [];
 

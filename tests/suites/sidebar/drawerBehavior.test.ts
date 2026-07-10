@@ -24,16 +24,7 @@ async function clickOutsideDrawerInAside(page: Page) {
 async function openCompactHealthcheckDrawer(page: Page) {
     const healthcheckStatus = page.getByRole('button', {name: 'Degraded: 1 issue'}).first();
 
-    await dispatchClick(healthcheckStatus);
-}
-
-async function dispatchClick(locator: Locator) {
-    await locator.waitFor({state: 'visible'});
-    await locator.evaluate((element) => {
-        element.dispatchEvent(
-            new MouseEvent('click', {bubbles: true, cancelable: true, view: window}),
-        );
-    });
+    await healthcheckStatus.click();
 }
 
 async function clickDiagnosticsTableRowAtStart(page: Page, row: number) {
@@ -43,7 +34,7 @@ async function clickDiagnosticsTableRowAtStart(page: Page, row: number) {
         )
         .nth(row - 1);
 
-    await dispatchClick(rowElement);
+    await rowElement.click({position: {x: 10, y: 10}});
 }
 
 async function expectRightDrawerAlignedToAppContent(page: Page, drawerRoot: Locator) {
