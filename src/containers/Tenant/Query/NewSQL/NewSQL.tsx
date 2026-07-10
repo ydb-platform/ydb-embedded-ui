@@ -13,16 +13,21 @@ import {
 } from 'ydb-ui-components';
 
 import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
-import {useTypedDispatch} from '../../../../utils/hooks';
+import {useSchemaSecretsFeature, useTypedDispatch} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {insertSnippetToEditor} from '../../../../utils/monaco/insertSnippet';
 import {bindActions} from '../../utils/newSQLQueryActions';
 
 import i18n from './i18n';
 
-export function NewSQL() {
+interface NewSQLProps {
+    database: string;
+}
+
+export function NewSQL({database}: NewSQLProps) {
     const dispatch = useTypedDispatch();
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
+    const {schemaSecretsEnabled} = useSchemaSecretsFeature(database);
 
     const [shouldReturnFocus, setShouldReturnFocus] = React.useState(true);
 
@@ -194,24 +199,28 @@ export function NewSQL() {
                 },
             ],
         },
-        {
-            text: i18n('menu.secrets'),
-            iconStart: <SecretIcon />,
-            items: [
-                {
-                    text: i18n('action.create-secret'),
-                    action: actions.createSecret,
-                },
-                {
-                    text: i18n('action.alter-secret'),
-                    action: actions.alterSecret,
-                },
-                {
-                    text: i18n('action.drop-secret'),
-                    action: actions.dropSecret,
-                },
-            ],
-        },
+        ...(schemaSecretsEnabled
+            ? [
+                  {
+                      text: i18n('menu.secrets'),
+                      iconStart: <SecretIcon />,
+                      items: [
+                          {
+                              text: i18n('action.create-secret'),
+                              action: actions.createSecret,
+                          },
+                          {
+                              text: i18n('action.alter-secret'),
+                              action: actions.alterSecret,
+                          },
+                          {
+                              text: i18n('action.drop-secret'),
+                              action: actions.dropSecret,
+                          },
+                      ],
+                  },
+              ]
+            : []),
         {
             text: i18n('menu.capture'),
             iconStart: <TopicIcon />,

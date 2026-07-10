@@ -90,6 +90,7 @@ interface ActionsAdditionalParams {
     showCreateTableData?: string;
     isStreamingQueryTextLoading?: boolean;
     isShowCreateTableLoading?: boolean;
+    schemaSecretsEnabled?: boolean;
 }
 
 interface BindActionParams {
@@ -566,7 +567,7 @@ export const getActions =
 
             directory: DIR_SET,
             resource_pool: JUST_COPY,
-            secret: SECRET_SET,
+            secret: additionalEffects.schemaSecretsEnabled ? SECRET_SET : JUST_COPY,
 
             table: ROW_TABLE_SET,
             column_table: COLUMN_TABLE_SET,
