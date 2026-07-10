@@ -42,10 +42,11 @@ describe('DiagnosticsPages', () => {
         );
     });
 
-    test('shows only safe pages for secret objects', () => {
+    test('shows info, describe and access pages for secret objects', () => {
         const pages = getPagesByType(EPathType.EPathTypeSecret, undefined, BASE_OPTIONS);
 
         expect(pages.map((page) => page.id)).toEqual([
+            TENANT_DIAGNOSTICS_TABS_IDS.overview,
             TENANT_DIAGNOSTICS_TABS_IDS.describe,
             TENANT_DIAGNOSTICS_TABS_IDS.access,
         ]);
