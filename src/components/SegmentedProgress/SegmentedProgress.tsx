@@ -61,7 +61,7 @@ function defaultNormalizePercent(percent: number) {
 function isFillPercentMode(
     props: SegmentedProgressProps,
 ): props is SegmentedProgressByFillPercentProps {
-    return 'fillPercent' in props;
+    return typeof props.fillPercent === 'number';
 }
 
 function getPercentUsed(props: SegmentedProgressProps) {
