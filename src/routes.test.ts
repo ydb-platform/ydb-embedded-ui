@@ -19,7 +19,7 @@ import type {Location} from 'history';
 import {getClustersPath, getPDiskPagePath, getTenantPath, parseQuery} from './routes';
 
 const URL_WITH_NESTED_REFERRER =
-    'https://monitoring.example.test/tenant?currentMetric=RowUpdates&queryTab=newQuery&diagnosticsTab=nodes&summaryTab=overview&metricsTab=memory&selectedConsumer=consumer&clusterName=global&database=database&tenantPage=query&schema=%2Fglobal%2Fdatabase%2Ftable&utm_referrer=https%3A%2F%2Fmonitoring.example.test%2Ftenant%3FcurrentMetric%3DRowUpdates%26queryTab%3DnewQuery%26diagnosticsTab%3Dschema%26summaryTab%3Doverview%26metricsTab%3Dmemory%26selectedConsumer%3Dconsumer%26clusterName%3Dglobal%26database%3Ddatabase%26tenantPage%3Dquery%26schema%3D%252Fglobal%252Fdatabase%252Fnested_table%26utm_referrer%3Dhttps%253A%252F%252Fsso.example.test%252F%26monitoringTab%3Ddiagnostics%26from%3D1771092117420%26to%3D1771178517420%26interval%3D1d&monitoringTab=diagnostics&from=1771092117420&to=1771178517420&interval=1d';
+    'https://monitoring.example.test/database?currentMetric=RowUpdates&queryTab=newQuery&diagnosticsTab=nodes&summaryTab=overview&metricsTab=memory&selectedConsumer=consumer&clusterName=global&database=database&databasePage=query&schema=%2Fglobal%2Fdatabase%2Ftable&utm_referrer=https%3A%2F%2Fmonitoring.example.test%2Fdatabase%3FcurrentMetric%3DRowUpdates%26queryTab%3DnewQuery%26diagnosticsTab%3Dschema%26summaryTab%3Doverview%26metricsTab%3Dmemory%26selectedConsumer%3Dconsumer%26clusterName%3Dglobal%26database%3Ddatabase%26databasePage%3Dquery%26schema%3D%252Fglobal%252Fdatabase%252Fnested_table%26utm_referrer%3Dhttps%253A%252F%252Fsso.example.test%252F%26monitoringTab%3Ddiagnostics%26from%3D1771092117420%26to%3D1771178517420%26interval%3D1d&monitoringTab=diagnostics&from=1771092117420&to=1771178517420&interval=1d';
 
 function getSearchParams(path: string) {
     return new URLSearchParams(path.split('?')[1] ?? '');
@@ -59,7 +59,7 @@ describe('routes', () => {
             expect(path).not.toContain('utm_referrer');
             expect(searchParams.getAll('clusterName')).toEqual(['global']);
             expect(searchParams.getAll('database')).toEqual(['database']);
-            expect(searchParams.getAll('tenantPage')).toEqual(['query']);
+            expect(searchParams.getAll('databasePage')).toEqual(['query']);
             expect(searchParams.getAll('monitoringTab')).toEqual(['diagnostics']);
             expect(searchParams.get('diagnosticsTab')).toBe('schema');
         });

@@ -11,7 +11,7 @@ test.describe('Diagnostics Access tab', async () => {
         const pageQueryParams = {
             schema: '/local',
             database: '/local',
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'access',
         };
         const tenantPage = new TenantPage(page);
@@ -27,7 +27,7 @@ test.describe('Diagnostics Access tab', async () => {
         const pageQueryParams = {
             schema: '/local',
             database: '/local',
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'access',
         };
         const tenantPage = new TenantPage(page);
@@ -51,7 +51,7 @@ test.describe('Diagnostics Access tab', async () => {
         const pageQueryParams = {
             schema: '/local',
             database: '/local',
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'access',
         };
         const tenantPage = new TenantPage(page);
@@ -70,7 +70,7 @@ test.describe('Diagnostics Access tab', async () => {
         const pageQueryParams = {
             schema: '/local',
             database: '/local',
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'access',
         };
         const tenantPage = new TenantPage(page);
@@ -88,7 +88,7 @@ test.describe('Diagnostics Access tab', async () => {
         const pageQueryParams = {
             schema: '/local',
             database: '/local',
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'access',
         };
         const tenantPage = new TenantPage(page);
@@ -131,7 +131,7 @@ test.describe('Diagnostics Access tab', async () => {
         const pageQueryParams = {
             schema: '/local',
             database: '/local',
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'access',
         };
         const tenantPage = new TenantPage(page);
