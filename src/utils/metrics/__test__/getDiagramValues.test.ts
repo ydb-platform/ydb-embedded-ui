@@ -9,17 +9,31 @@ describe('getDiagramValues', () => {
         expect(calculateBaseDiagramValues({fillWidth: 11}).percents).toBe('11%');
     });
 
-    test('keeps safe fill width alongside normalized fill', () => {
+    test('rounds progress value consistently with percent text', () => {
+        expect(calculateBaseDiagramValues({fillWidth: 0.575 * 100})).toMatchObject({
+            percents: '58%',
+            progressValue: 58,
+        });
+    });
+
+    test('clamps progress value without clamping percent text', () => {
+        expect(calculateBaseDiagramValues({fillWidth: 213.5})).toMatchObject({
+            percents: '214%',
+            progressValue: 100,
+        });
+    });
+
+    test('keeps progress value alongside normalized fill', () => {
         expect(getDiagramValues({value: 0, capacity: 100})).toMatchObject({
             fill: 0.5,
             percents: '0%',
-            safeFillWidth: 0,
+            progressValue: 0,
         });
 
         expect(getDiagramValues({value: 10, capacity: 0})).toMatchObject({
             fill: 0.5,
             percents: '0%',
-            safeFillWidth: 0,
+            progressValue: 0,
         });
     });
 
@@ -32,14 +46,14 @@ describe('getDiagramValues', () => {
         expect(getDiagramValues({value: 10, capacity: 0, fallback})).toMatchObject({
             fill: 0.5,
             percents: undefined,
-            safeFillWidth: 0,
+            progressValue: 0,
             status: 'unavailable',
         });
 
         expect(getDiagramValues({value: 10, capacity: 100, fallback})).toMatchObject({
             fill: 10,
             percents: '10%',
-            safeFillWidth: 10,
+            progressValue: 10,
             status: 'good',
         });
     });

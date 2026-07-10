@@ -194,6 +194,18 @@ export const formatNumber = (number?: unknown) => {
     return configuredNumeral(number).format('0,0.[00000]');
 };
 
+/**
+ * Rounds a value to the specified number of decimal places while compensating for
+ * floating-point precision errors.
+ */
+export const roundToDecimalPlaces = (value: number, precision = 0) => {
+    const multiplier = 10 ** precision;
+    const sign = Math.sign(value);
+    const shiftedValue = Math.abs(value) * multiplier;
+
+    return (sign * Math.round(shiftedValue + Number.EPSILON * shiftedValue)) / multiplier;
+};
+
 export const formatPercent = (number?: unknown, precision = 2, options?: {fixed?: boolean}) => {
     if (!isNumeric(number)) {
         return '';
@@ -207,11 +219,7 @@ export const formatPercent = (number?: unknown, precision = 2, options?: {fixed?
 
     // The input is a fraction, while Numeral's '%' format displays it as percent.
     // Keep two extra fraction digits so percent precision is preserved: 0.0123 -> 1.23%.
-    const multiplier = 10 ** (precision + 2);
-    const sign = Math.sign(numberValue);
-    const shiftedNumber = Math.abs(numberValue) * multiplier;
-    const roundedNumber =
-        (sign * Math.round(shiftedNumber + Number.EPSILON * shiftedNumber)) / multiplier;
+    const roundedNumber = roundToDecimalPlaces(numberValue, precision + 2);
 
     const zeros = '0'.repeat(precision);
     const format = options?.fixed ? `0.${zeros}%` : `0.[${zeros}]%`;

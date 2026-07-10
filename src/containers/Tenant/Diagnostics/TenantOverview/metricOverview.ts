@@ -4,7 +4,7 @@ import type {
     TenantStorageStats,
 } from '../../../../store/reducers/tenants/utils';
 import {EFlag} from '../../../../types/api/enums';
-import {calculateMetricAggregates, getMetricPercentPrecision} from '../../../../utils/metrics';
+import {calculateMetricAggregates} from '../../../../utils/metrics';
 import {formatCoresLegend, formatStorageLegend} from '../../../../utils/metrics/formatMetricLegend';
 import type {MetricFormatParams} from '../../../../utils/metrics/formatMetricLegend';
 import {
@@ -91,12 +91,6 @@ export function selectStorageStatsForMetricCard({
     return blobStorageStats || tabletStorageStats || [];
 }
 
-function getProgressValue(usagePercent: number) {
-    const clampedValue = Math.min(Math.max(usagePercent, 0), 100);
-
-    return Number(clampedValue.toFixed(getMetricPercentPrecision(clampedValue)));
-}
-
 function createSafeLegendFormatter(formatter: (params: MetricFormatParams) => string) {
     return ({value, capacity}: MetricFormatParams) => {
         if (!Number.isFinite(value) || !Number.isFinite(capacity) || capacity <= 0) {
@@ -132,7 +126,7 @@ function getMetricPresentation({
 
     return {
         percentText: diagramValues.percents,
-        progressValue: getProgressValue(diagramValues.safeFillWidth),
+        progressValue: diagramValues.progressValue,
         progressTheme: DiagramStatusToTheme[diagramValues.status],
         status: DiagramStatusToEFlag[diagramValues.status],
         legend,
@@ -153,7 +147,7 @@ function getNetworkMetric(networkUtilization?: number): TenantOverviewMetric | u
 
     return {
         percentText: diagramValues.percents,
-        progressValue: getProgressValue(diagramValues.safeFillWidth),
+        progressValue: diagramValues.progressValue,
         progressTheme: DiagramStatusToTheme[diagramValues.status],
         status: DiagramStatusToEFlag[diagramValues.status],
     };
