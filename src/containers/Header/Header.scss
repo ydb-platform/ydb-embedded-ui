@@ -12,11 +12,23 @@
 
     .g-breadcrumbs__item_current {
         height: min-content;
+
+        font-weight: var(--g-text-body-font-weight, inherit);
     }
 
     &__breadcrumbs {
         display: flex;
         flex-grow: 1;
+
+        .g-breadcrumbs__divider {
+            padding: 0 var(--g-spacing-1);
+        }
+
+        &_has-home-item {
+            > .g-breadcrumbs__item:first-child .g-breadcrumbs__divider {
+                display: none;
+            }
+        }
     }
 
     &__breadcrumbs-item {
@@ -27,6 +39,12 @@
         }
 
         &_active {
+            color: var(--g-color-text-primary);
+        }
+
+        &_home {
+            margin-right: 6px;
+
             color: var(--g-color-text-primary);
         }
     }
