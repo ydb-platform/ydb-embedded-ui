@@ -1,5 +1,12 @@
 # Changelog
 
+## [18.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.0.0...v18.0.1) (2026-07-10)
+
+
+### Bug Fixes
+
+* **HomePage:** block databases if meta/whoami error ([#4101](https://github.com/ydb-platform/ydb-embedded-ui/issues/4101)) ([2ddb653](https://github.com/ydb-platform/ydb-embedded-ui/commit/2ddb653b1a474770c57b7c77f46066658c53259a))
+
 ## [18.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v17.2.0...v18.0.0) (2026-07-08)
 
 
