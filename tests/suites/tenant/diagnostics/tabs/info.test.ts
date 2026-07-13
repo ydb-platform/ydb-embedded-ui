@@ -3,7 +3,7 @@ import type {Locator, Page} from '@playwright/test';
 
 import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
-import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
+import {Diagnostics} from '../Diagnostics';
 
 const METRIC_SUMMARY_SCREENSHOT_VIEWPORT = {width: 1600, height: 1000};
 
@@ -94,7 +94,8 @@ async function openInfoTab(page: Page) {
     const pageQueryParams = {
         schema: database,
         database,
-        tenantPage: 'diagnostics',
+        databasePage: 'database',
+        diagnosticsTab: 'database',
     };
     const tenantPage = new TenantPage(page);
     await tenantPage.goto(pageQueryParams);
@@ -108,13 +109,13 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
+            diagnosticsTab: 'database',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
         const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
         await expect(diagnostics.areInfoCardsVisible()).resolves.toBe(true);
     });
 
@@ -122,13 +123,13 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
+            diagnosticsTab: 'database',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
         const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
 
         const utilization = await diagnostics.getResourceUtilization();
 
@@ -251,26 +252,16 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
-
-        // Healthcheck card should be visible when there are issues
-        const status = await diagnostics.getHealthcheckStatus();
-        expect(status).toBeTruthy();
-
-        // Check for degraded status class
-        const isDegraded = await diagnostics.hasHealthcheckStatusClass(
-            'ydb-healthcheck-preview__icon_degraded',
-        );
-        expect(isDegraded).toBe(true);
+        await expect(page.getByRole('button', {name: 'Degraded: 1 issue'})).toBeVisible();
     });
 
-    test('Info tab hides healthcheck status when status is GOOD with no issues', async ({page}) => {
+    test('Info tab shows healthcheck GOOD status with zero issues', async ({page}) => {
         // Mock healthcheck API to return GOOD status with no issues
         await page.route(`**/viewer/json/healthcheck?*`, async (route) => {
             await route.fulfill({
@@ -284,17 +275,13 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
-
-        // Healthcheck card should not be visible when status is GOOD with no issues
-        const healthcheckCard = page.locator('.ydb-healthcheck-preview');
-        await expect(healthcheckCard).toHaveCount(0);
+        await expect(page.getByRole('button', {name: 'Good: 0 issues'})).toBeVisible();
     });
 
     test('Info tab shows healthcheck status when status is GOOD but has issues', async ({page}) => {
@@ -322,23 +309,13 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
-
-        // Healthcheck card should be visible when there are issues, even if status is GOOD
-        const status = await diagnostics.getHealthcheckStatus();
-        expect(status).toBeTruthy();
-
-        // Check for good status class
-        const isGood = await diagnostics.hasHealthcheckStatusClass(
-            'ydb-healthcheck-preview__icon_good',
-        );
-        expect(isGood).toBe(true);
+        await expect(page.getByRole('button', {name: 'Good: 1 issue'})).toBeVisible();
     });
 
     test('Info tab displays overlap_clusters for vector index', async ({page}) => {
@@ -390,13 +367,11 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: mockIndexPath,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
-
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
 
         // Verify vector index settings are displayed including overlap_clusters
         const infoContent = page.locator('.ydb-diagnostics-table-info');
@@ -470,13 +445,11 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: mockIndexPath,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
-
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
 
         // Verify fulltext index settings are displayed
         const infoContent = page.locator('.ydb-diagnostics-table-info');

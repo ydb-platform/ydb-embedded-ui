@@ -432,7 +432,8 @@ async function openTenantStorageMetricsTab(page: Page) {
     await tenantPage.goto({
         schema: database,
         database,
-        tenantPage: 'diagnostics',
+        databasePage: 'database',
+        diagnosticsTab: 'database',
     });
 
     await openStorageMetricsTab(page);
@@ -640,7 +641,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await tenantPage.goto({
                 schema: database,
                 database,
-                tenantPage: 'diagnostics',
+                databasePage: 'database',
+                diagnosticsTab: 'database',
             });
 
             await openStorageMetricsTab(page);
@@ -766,7 +768,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await tenantPage.goto({
                 schema: database,
                 database,
-                tenantPage: 'diagnostics',
+                databasePage: 'database',
+                diagnosticsTab: 'database',
             });
 
             await openStorageMetricsTab(page);
@@ -851,7 +854,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
+            diagnosticsTab: 'database',
         });
 
         await openStorageMetricsTab(page);
@@ -899,7 +903,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
+            diagnosticsTab: 'database',
         });
 
         await openStorageMetricsTab(page);
@@ -926,7 +931,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
+            diagnosticsTab: 'database',
         });
 
         await openStorageMetricsTab(page);
@@ -953,7 +959,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await tenantPage.goto({
                 schema: database,
                 database,
-                tenantPage: 'diagnostics',
+                databasePage: 'database',
+                diagnosticsTab: 'database',
             });
 
             await openStorageMetricsTab(page);
@@ -1001,7 +1008,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
             await tenantPage.goto({
                 schema: database,
                 database,
-                tenantPage: 'diagnostics',
+                databasePage: 'database',
+                diagnosticsTab: 'database',
             });
 
             await openStorageMetricsTab(page);
@@ -1043,7 +1051,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
+            diagnosticsTab: 'database',
         });
 
         await openStorageMetricsTab(page);
@@ -1064,7 +1073,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
+            diagnosticsTab: 'database',
         });
 
         await openStorageMetricsTab(page);

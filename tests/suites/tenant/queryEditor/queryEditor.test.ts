@@ -37,11 +37,11 @@ test.describe('Test Query Editor', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         };
 
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
+        await tenantPage.goto(pageQueryParams, {waitUntil: 'domcontentloaded'});
     });
 
     test.afterEach(async ({page}) => {

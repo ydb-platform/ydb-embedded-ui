@@ -9,7 +9,7 @@ test.describe('Diagnostics Schema tab', async () => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);

@@ -1,5 +1,26 @@
 # Changelog
 
+## [18.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.0.1...v18.1.0) (2026-07-10)
+
+
+### Features
+
+* enable navigation v2 by default ([#4098](https://github.com/ydb-platform/ydb-embedded-ui/issues/4098)) ([228b8cf](https://github.com/ydb-platform/ydb-embedded-ui/commit/228b8cf6580a6ed8e29e27901df3d94795950813))
+
+
+### Bug Fixes
+
+* **HeaderBreadcrumbs:** layout ([#4100](https://github.com/ydb-platform/ydb-embedded-ui/issues/4100)) ([0414ef6](https://github.com/ydb-platform/ydb-embedded-ui/commit/0414ef6b06a41f61b3b38d41272d242643d33325))
+* hide link to pDisk for database users ([#4111](https://github.com/ydb-platform/ydb-embedded-ui/issues/4111)) ([584e747](https://github.com/ydb-platform/ydb-embedded-ui/commit/584e7475211d463549efd1bc4e0dc922e98ac59c))
+* remove PostgreSQL query mode ([#4099](https://github.com/ydb-platform/ydb-embedded-ui/issues/4099)) ([38254a6](https://github.com/ydb-platform/ydb-embedded-ui/commit/38254a6220a36879c3d139ca6a8db355c6658229))
+
+## [18.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.0.0...v18.0.1) (2026-07-10)
+
+
+### Bug Fixes
+
+* **HomePage:** block databases if meta/whoami error ([#4101](https://github.com/ydb-platform/ydb-embedded-ui/issues/4101)) ([2ddb653](https://github.com/ydb-platform/ydb-embedded-ui/commit/2ddb653b1a474770c57b7c77f46066658c53259a))
+
 ## [18.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v17.2.0...v18.0.0) (2026-07-08)
 
 
