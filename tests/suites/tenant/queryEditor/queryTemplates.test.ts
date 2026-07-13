@@ -17,7 +17,7 @@ import {
 import {QueryEditor, QueryTabs} from './models/QueryEditor';
 import {SaveQueryDialog} from './models/SaveQueryDialog';
 
-async function mockTopicsSqlIoOperationsFeature(page: Page, enabled: boolean) {
+async function reopenQueryEditorWithTopicsSqlIoOperationsFeature(page: Page, enabled: boolean) {
     await page.route(`${backend}/viewer/feature_flags*`, async (route) => {
         await route.fulfill({
             status: 200,
@@ -38,12 +38,17 @@ async function mockTopicsSqlIoOperationsFeature(page: Page, enabled: boolean) {
             }),
         });
     });
+
+    const tenantPage = new TenantPage(page);
+    await tenantPage.gotoQueryEditor({
+        schema: database,
+        database,
+        mode: QueryEditorMode.MultiTab,
+    });
 }
 
 test.describe('Query Templates', () => {
     test.beforeEach(async ({page}) => {
-        await mockTopicsSqlIoOperationsFeature(page, true);
-
         const tenantPage = new TenantPage(page);
         await tenantPage.gotoQueryEditor({
             schema: database,
@@ -193,6 +198,8 @@ test.describe('Query Templates', () => {
     });
 
     test('New SQL topics menu inserts topic select template', async ({page}) => {
+        await reopenQueryEditorWithTopicsSqlIoOperationsFeature(page, true);
+
         const newSqlDropdown = new NewSqlDropdownMenu(page);
         const queryEditor = new QueryEditor(page);
 
@@ -212,15 +219,7 @@ test.describe('Query Templates', () => {
     test('New SQL topics menu hides topic select template when SQL I/O feature is disabled', async ({
         page,
     }) => {
-        await page.unroute(`${backend}/viewer/feature_flags*`);
-        await mockTopicsSqlIoOperationsFeature(page, false);
-
-        const tenantPage = new TenantPage(page);
-        await tenantPage.gotoQueryEditor({
-            schema: database,
-            database,
-            mode: QueryEditorMode.MultiTab,
-        });
+        await reopenQueryEditorWithTopicsSqlIoOperationsFeature(page, false);
 
         const newSqlDropdown = new NewSqlDropdownMenu(page);
 
@@ -233,6 +232,8 @@ test.describe('Query Templates', () => {
     });
 
     test('Topic context menu inserts topic select template for selected topic', async ({page}) => {
+        await reopenQueryEditorWithTopicsSqlIoOperationsFeature(page, true);
+
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);
 
@@ -252,15 +253,7 @@ test.describe('Query Templates', () => {
     test('Topic context menu hides select query when SQL I/O feature is disabled', async ({
         page,
     }) => {
-        await page.unroute(`${backend}/viewer/feature_flags*`);
-        await mockTopicsSqlIoOperationsFeature(page, false);
-
-        const tenantPage = new TenantPage(page);
-        await tenantPage.gotoQueryEditor({
-            schema: database,
-            database,
-            mode: QueryEditorMode.MultiTab,
-        });
+        await reopenQueryEditorWithTopicsSqlIoOperationsFeature(page, false);
 
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);
