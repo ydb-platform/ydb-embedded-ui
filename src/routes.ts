@@ -14,7 +14,7 @@ import {backend, basename, clusterName, environment, webVersion} from './store';
 import {uiFactory} from './uiFactory/uiFactory';
 import {normalizePathSlashes} from './utils';
 import {useDatabaseFromQuery} from './utils/hooks/useDatabaseFromQuery';
-import {omitVolatileQueryParams} from './utils/queryParams';
+import {normalizeSingleValueQueryParams, omitVolatileQueryParams} from './utils/queryParams';
 
 export const CLUSTER = 'cluster';
 export const DATABASE = 'database';
@@ -112,7 +112,8 @@ export function createHref(
         extendedParams = {...extendedParams, environment};
     }
 
-    const normalizedQuery = omitVolatileQueryParams(extendedQuery);
+    const queryWithoutVolatileParams = omitVolatileQueryParams(extendedQuery);
+    const normalizedQuery = normalizeSingleValueQueryParams(queryWithoutVolatileParams);
     const queryString = qs.stringify(normalizedQuery, {
         arrayFormat: 'repeat',
         encoder: encodeURIComponent,

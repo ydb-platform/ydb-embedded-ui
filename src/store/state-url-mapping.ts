@@ -11,6 +11,8 @@ import {getMatchingDeclaredPath} from 'redux-location-state/lib/helpers';
 import {parseQuery} from 'redux-location-state/lib/parseQuery';
 import {stateToParams} from 'redux-location-state/lib/stateToParams';
 
+import {normalizeSingleValueQueryParams, omitVolatileQueryParams} from '../utils/queryParams';
+
 import {initialState as initialHeatmapState} from './reducers/heatmap';
 import {initialState as initialTenantState} from './reducers/tenant/tenant';
 
@@ -78,9 +80,11 @@ function mergeLocationToState<S>(state: S, location: Pick<LocationWithQuery, 'qu
     return merge({}, state, location.query);
 }
 
-function restoreUnknownParams(location: Location, prevLocation: Location) {
+export function restoreUnknownParams(location: Location, prevLocation: Location) {
     const {search, ...rest} = location;
-    const params = qs.parse(prevLocation.search.slice(1));
+    const params = normalizeSingleValueQueryParams(
+        omitVolatileQueryParams(qs.parse(prevLocation.search.slice(1))),
+    );
 
     // figure out which path key inside paramSetup matches location.pathname
     const declaredPath = getMatchingDeclaredPath(paramSetup, location);
@@ -95,7 +99,15 @@ function restoreUnknownParams(location: Location, prevLocation: Location) {
         delete params[param];
     });
 
-    const restoredParams = qs.stringify(params, {encoder: encodeURIComponent});
+    const restoredParams = qs.stringify(params, {
+        arrayFormat: 'repeat',
+        encoder: encodeURIComponent,
+    });
+
+    if (!restoredParams) {
+        return {search, ...rest};
+    }
+
     const searchDelimiter = search.startsWith('?') ? '&' : '?';
 
     return {search: `${search}${searchDelimiter}${restoredParams}`, ...rest};
