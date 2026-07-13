@@ -1,14 +1,15 @@
 import type {Location} from 'history';
+import type {ParamSetup} from 'redux-location-state';
 
-jest.mock('../reducers/heatmap', () => ({
-    initialState: {sort: false, heatmap: false, currentMetric: undefined},
-}));
+import {restoreUnknownParams} from '../restoreUnknownParams';
 
-jest.mock('../reducers/tenant/tenant', () => ({
-    initialState: {metricsTab: 'memory'},
-}));
-
-import {restoreUnknownParams} from '../state-url-mapping';
+const PARAM_SETUP: ParamSetup = {
+    global: {},
+    '/database': {
+        queryTab: {stateKey: 'tenant.queryTab'},
+        diagnosticsTab: {stateKey: 'tenant.diagnosticsTab'},
+    },
+};
 
 function createLocation(search: string): Location {
     return {
@@ -25,7 +26,8 @@ function getSearchParams(search: string) {
 }
 
 function restore(search: string, previousSearch: string) {
-    return restoreUnknownParams(createLocation(search), createLocation(previousSearch)).search;
+    return restoreUnknownParams(createLocation(search), createLocation(previousSearch), PARAM_SETUP)
+        .search;
 }
 
 function expectNoIndexedParams(searchParams: URLSearchParams) {
