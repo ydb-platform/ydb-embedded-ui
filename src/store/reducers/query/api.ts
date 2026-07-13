@@ -8,6 +8,7 @@ import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {
     MAX_QUERY_TIMEOUT_SECONDS,
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    isExecutionQueryAction,
     isQueryCancelledError,
     isQueryErrorResponse,
     parseQueryAPIResponse,
@@ -28,7 +29,6 @@ import {
     getActionAndSyntaxFromQueryMode,
     getEffectiveQueryDataForAction,
     getEffectiveQuerySettingsForAction,
-    isExecutionQueryAction,
     prepareQueryWithPragmasMetadata,
 } from './utils';
 

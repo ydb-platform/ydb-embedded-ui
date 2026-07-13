@@ -23,6 +23,7 @@ import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getIllustration} from '../../../../utils/illustrations';
+import {isExecutionQueryAction} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {QueryStoppedBanner} from '../QueryStoppedBanner/QueryStoppedBanner';
@@ -35,12 +36,7 @@ import {QueryResultError} from './components/QueryResultError/QueryResultError';
 import {ResultSetsViewer} from './components/ResultSetsViewer/ResultSetsViewer';
 import {TraceButton} from './components/TraceButton/TraceButton';
 import type {SectionID} from './constants';
-import {
-    RESULT_OPTIONS_IDS,
-    getDefaultResultSection,
-    getResultSections,
-    isExecutionResultType,
-} from './constants';
+import {RESULT_OPTIONS_IDS, getDefaultResultSection, getResultSections} from './constants';
 import i18n from './i18n';
 
 import './QueryResultViewer.scss';
@@ -99,7 +95,7 @@ export function QueryResultViewer({
     const dispatch = useTypedDispatch();
     const selectedTabs = useTypedSelector(selectResultTab);
 
-    const isExecutionResult = isExecutionResultType(resultType);
+    const isExecutionResult = isExecutionQueryAction(resultType);
     const hasResultSection = getResultSections(resultType).includes(RESULT_OPTIONS_IDS.result);
 
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);

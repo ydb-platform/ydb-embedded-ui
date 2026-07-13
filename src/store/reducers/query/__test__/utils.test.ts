@@ -4,7 +4,6 @@ import {
     getEffectiveQueryDataForAction,
     getEffectiveQuerySettingsForAction,
     getUniqueTabTitle,
-    isExecutionQueryAction,
     isQueryTabsDirtyPersistedState,
     isQueryTabsPersistedState,
 } from '../utils';
@@ -25,12 +24,12 @@ describe('getActionAndSyntaxFromQueryMode', () => {
         expect(syntax).toBe('yql_v1');
     });
     test.each([
-        ['query', 'explain-query', 'yql_v1'],
-        ['script', 'explain-script', 'yql_v1'],
-        ['scan', 'explain-scan', 'yql_v1'],
-        ['data', 'explain-data', 'yql_v1'],
+        ['query', 'execute-query', 'yql_v1'],
+        ['script', 'execute-script', 'yql_v1'],
+        ['scan', 'execute-scan', 'yql_v1'],
+        ['data', 'execute-data', 'yql_v1'],
     ] as const)(
-        'maps explain analyze in %s mode to explain-shaped backend action',
+        'maps explain analyze in %s mode to execute-shaped backend action',
         (mode, action, syntax) => {
             const result = getActionAndSyntaxFromQueryMode(QUERY_ACTIONS.explainAnalyze, mode);
 
@@ -101,14 +100,6 @@ describe('getEffectiveQuerySettingsForAction', () => {
             limitRows: 100,
             statisticsMode: STATISTICS_MODES.none,
         });
-    });
-});
-
-describe('isExecutionQueryAction', () => {
-    test('treats explain analyze as explain-mode, not execute-mode', () => {
-        expect(isExecutionQueryAction(QUERY_ACTIONS.execute)).toBe(true);
-        expect(isExecutionQueryAction(QUERY_ACTIONS.explain)).toBe(false);
-        expect(isExecutionQueryAction(QUERY_ACTIONS.explainAnalyze)).toBe(false);
     });
 });
 

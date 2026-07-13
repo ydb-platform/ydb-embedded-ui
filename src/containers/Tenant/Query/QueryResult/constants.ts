@@ -13,42 +13,44 @@ export const RESULT_OPTIONS_IDS = {
 
 export type SectionID = ValueOf<typeof RESULT_OPTIONS_IDS>;
 
-const EXECUTE_SECTIONS: SectionID[] = [
-    RESULT_OPTIONS_IDS.result,
-    RESULT_OPTIONS_IDS.schema,
-    RESULT_OPTIONS_IDS.simplified,
-    RESULT_OPTIONS_IDS.stats,
-];
-
-const EXPLAIN_SECTIONS: SectionID[] = [
-    RESULT_OPTIONS_IDS.schema,
-    RESULT_OPTIONS_IDS.simplified,
-    RESULT_OPTIONS_IDS.json,
-    RESULT_OPTIONS_IDS.ast,
-];
-
-const EXPLAIN_ANALYZE_SECTIONS: SectionID[] = [
-    RESULT_OPTIONS_IDS.schema,
-    RESULT_OPTIONS_IDS.simplified,
-    RESULT_OPTIONS_IDS.stats,
-];
-
-export function isExecutionResultType(resultType: QueryAction) {
-    return resultType === QUERY_ACTIONS.execute;
+interface ResultViewConfig {
+    sections: SectionID[];
+    defaultSection: SectionID;
 }
 
+const RESULT_VIEW_CONFIG: Record<QueryAction, ResultViewConfig> = {
+    [QUERY_ACTIONS.execute]: {
+        sections: [
+            RESULT_OPTIONS_IDS.result,
+            RESULT_OPTIONS_IDS.schema,
+            RESULT_OPTIONS_IDS.simplified,
+            RESULT_OPTIONS_IDS.stats,
+        ],
+        defaultSection: RESULT_OPTIONS_IDS.result,
+    },
+    [QUERY_ACTIONS.explain]: {
+        sections: [
+            RESULT_OPTIONS_IDS.schema,
+            RESULT_OPTIONS_IDS.simplified,
+            RESULT_OPTIONS_IDS.json,
+            RESULT_OPTIONS_IDS.ast,
+        ],
+        defaultSection: RESULT_OPTIONS_IDS.schema,
+    },
+    [QUERY_ACTIONS.explainAnalyze]: {
+        sections: [
+            RESULT_OPTIONS_IDS.schema,
+            RESULT_OPTIONS_IDS.simplified,
+            RESULT_OPTIONS_IDS.stats,
+        ],
+        defaultSection: RESULT_OPTIONS_IDS.schema,
+    },
+};
+
 export function getResultSections(resultType: QueryAction): SectionID[] {
-    if (resultType === QUERY_ACTIONS.execute) {
-        return EXECUTE_SECTIONS;
-    }
-    if (resultType === QUERY_ACTIONS.explainAnalyze) {
-        return EXPLAIN_ANALYZE_SECTIONS;
-    }
-    return EXPLAIN_SECTIONS;
+    return RESULT_VIEW_CONFIG[resultType].sections;
 }
 
 export function getDefaultResultSection(resultType: QueryAction): SectionID {
-    return resultType === QUERY_ACTIONS.execute
-        ? RESULT_OPTIONS_IDS.result
-        : RESULT_OPTIONS_IDS.schema;
+    return RESULT_VIEW_CONFIG[resultType].defaultSection;
 }
