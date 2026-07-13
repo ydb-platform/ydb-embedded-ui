@@ -10,6 +10,7 @@ import {
     useIsViewerUser,
 } from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
+import {useIsStorageExpertMode} from '../../useStorageQueryParams';
 
 import {getStorageGroupsColumns} from './columns';
 import type {StorageGroupsColumnId} from './constants';
@@ -33,6 +34,8 @@ export function useStorageGroupsSelectedColumns({
     const isViewerUser = useIsViewerUser();
     const bridgeModeEnabled = useBridgeModeEnabled();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+    const isStorageExpertMode = useIsStorageExpertMode();
+    const isVDisksPDisksColumnAvailable = Boolean(isUserAllowedToMakeChanges);
 
     const skippedColumnIds = React.useMemo(() => {
         const skipped: StorageGroupsColumnId[] = [];
@@ -67,31 +70,71 @@ export function useStorageGroupsSelectedColumns({
     }, [viewContext, skippedColumnIds]);
 
     const requiredColumns = React.useMemo(() => {
+        const required = [...REQUIRED_STORAGE_GROUPS_COLUMNS];
+
         if (visibleEntities === VISIBLE_ENTITIES.missing) {
-            return [...REQUIRED_STORAGE_GROUPS_COLUMNS, STORAGE_GROUPS_COLUMNS_IDS.Degraded];
+            required.push(STORAGE_GROUPS_COLUMNS_IDS.Degraded);
         }
 
         if (visibleEntities === VISIBLE_ENTITIES.space) {
-            return [...REQUIRED_STORAGE_GROUPS_COLUMNS, STORAGE_GROUPS_COLUMNS_IDS.DiskSpace];
+            required.push(STORAGE_GROUPS_COLUMNS_IDS.DiskSpace);
         }
 
-        return REQUIRED_STORAGE_GROUPS_COLUMNS;
+        return required;
     }, [visibleEntities]);
 
     const defaultColumns = React.useMemo(() => {
-        if (!bridgeModeEnabled) {
-            return DEFAULT_STORAGE_GROUPS_COLUMNS;
-        }
-        return DEFAULT_STORAGE_GROUPS_COLUMNS.includes(STORAGE_GROUPS_COLUMNS_IDS.PileName)
-            ? DEFAULT_STORAGE_GROUPS_COLUMNS
-            : [...DEFAULT_STORAGE_GROUPS_COLUMNS, STORAGE_GROUPS_COLUMNS_IDS.PileName];
-    }, [bridgeModeEnabled]);
+        const defaultStorageGroupsColumns = isStorageExpertMode
+            ? [...DEFAULT_STORAGE_GROUPS_COLUMNS, STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks]
+            : DEFAULT_STORAGE_GROUPS_COLUMNS;
 
-    return useSelectedColumns(
+        if (!bridgeModeEnabled) {
+            return defaultStorageGroupsColumns;
+        }
+        return defaultStorageGroupsColumns.includes(STORAGE_GROUPS_COLUMNS_IDS.PileName)
+            ? defaultStorageGroupsColumns
+            : [...defaultStorageGroupsColumns, STORAGE_GROUPS_COLUMNS_IDS.PileName];
+    }, [bridgeModeEnabled, isStorageExpertMode]);
+
+    const selectedColumns = useSelectedColumns(
         columns,
         STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY,
         STORAGE_GROUPS_COLUMNS_TITLES,
         defaultColumns,
         requiredColumns,
     );
+
+    const shouldUseExpertDisksColumn =
+        isStorageExpertMode &&
+        isVDisksPDisksColumnAvailable &&
+        selectedColumns.columnsToShow.some(
+            ({name}) => name === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+        );
+    const shouldHideVDisksSelectorOption =
+        isStorageExpertMode &&
+        isVDisksPDisksColumnAvailable &&
+        (!selectedColumns.columnsToShow.some(
+            ({name}) => name === STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+        ) ||
+            shouldUseExpertDisksColumn);
+
+    return React.useMemo(() => {
+        if (!shouldUseExpertDisksColumn && !shouldHideVDisksSelectorOption) {
+            return selectedColumns;
+        }
+
+        return {
+            ...selectedColumns,
+            columnsToShow: shouldUseExpertDisksColumn
+                ? selectedColumns.columnsToShow.filter(
+                      ({name}) => name !== STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+                  )
+                : selectedColumns.columnsToShow,
+            columnsToSelect: shouldHideVDisksSelectorOption
+                ? selectedColumns.columnsToSelect.filter(
+                      ({id}) => id !== STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+                  )
+                : selectedColumns.columnsToSelect,
+        };
+    }, [selectedColumns, shouldHideVDisksSelectorOption, shouldUseExpertDisksColumn]);
 }

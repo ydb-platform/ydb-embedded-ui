@@ -105,6 +105,24 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
      * Do not pass `/devui/` or nested paths like `devui/node`.
      */
     developerUiFirstPathSegment?: string;
+
+    /**
+     * Documentation configuration.
+     * When omitted, documentation links are not rendered.
+     */
+    docs?: DocsConfig;
+}
+
+/**
+ * Documentation configuration.
+ * Holds the base path for the documentation and paths to specific articles.
+ */
+export interface DocsConfig {
+    /** Base path (URL) for the documentation. */
+    basePath: string;
+
+    /** Path to the article about the auto partitioning max partitions count setting. */
+    autoPartitioningMaxPartitionsCount?: string;
 }
 
 export type HandleCreateDB = (params: {

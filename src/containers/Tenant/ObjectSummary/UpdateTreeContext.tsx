@@ -33,3 +33,9 @@ export function useDispatchTreeKey() {
     }
     return updateKey;
 }
+
+// Use for components that can render outside the schema tree layout.
+// Strict consumers should keep using useDispatchTreeKey to catch missing providers.
+export function useOptionalDispatchTreeKey() {
+    return React.useContext(TreeKeyDispatchContext);
+}

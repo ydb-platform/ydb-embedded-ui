@@ -4,6 +4,7 @@ import {
     formatMetricPercent,
     getConsistentMetricBytesSize,
     getConvertedMetricBytesDecimalPlaces,
+    getMetricBytesCommonSize,
     getMetricBytesDisplaySize,
 } from '../storageMetrics';
 
@@ -15,6 +16,18 @@ describe('storageMetrics', () => {
     test('getConsistentMetricBytesSize accounts for rounded display unit boundaries', () => {
         expect(getConsistentMetricBytesSize([200_000_000, 999_600_000])).toBe('gb');
         expect(getConsistentMetricBytesSize([200_000_000_000, 999_960_000_000])).toBe('tb');
+    });
+
+    test('getMetricBytesCommonSize keeps a shared unit below mixed-unit threshold', () => {
+        expect(getMetricBytesCommonSize([600_000_000_000, 40_000_000_000_000])).toBe('tb');
+    });
+
+    test('getMetricBytesCommonSize returns no shared unit at mixed-unit threshold', () => {
+        expect(getMetricBytesCommonSize([1_000_000_000, 100_000_000_000])).toBeUndefined();
+    });
+
+    test('getMetricBytesCommonSize ignores zero and invalid values for mixed-unit threshold', () => {
+        expect(getMetricBytesCommonSize([0, Number.NaN, 36_000_000_000_000])).toBe('tb');
     });
 
     test('getMetricBytesDisplaySize accounts for rounded display unit boundaries', () => {

@@ -23,6 +23,7 @@ import {useAppTitle} from '../App/AppTitleContext';
 import Diagnostics from './Diagnostics/Diagnostics';
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 import {ObjectSummary} from './ObjectSummary/ObjectSummary';
+import {TreeKeyProvider} from './ObjectSummary/UpdateTreeContext';
 import {TenantContextProvider} from './TenantContext';
 import {TenantDrawerWrapper} from './TenantDrawerWrappers';
 import {useTenantPage} from './TenantNavigation/useTenantNavigation';
@@ -204,8 +205,11 @@ function TreePagesContent({
         selectSchemaObjectData(state, path, database, databaseName, useMetaProxy),
     );
 
-    const showBlockingError = isAccessError(error);
-    const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
+    const accessError = isAccessError(error) ? error : undefined;
+    const showBlockingDescribeError = Boolean(accessError && path === databaseName);
+    const describeErrorProps = showBlockingDescribeError
+        ? uiFactory.clusterOrDatabaseAccessError
+        : undefined;
 
     // Use preloaded data if there is no current item data yet
     const currentPathType =
@@ -218,33 +222,36 @@ function TreePagesContent({
     return (
         <LoaderWrapper loading={initialLoading}>
             <PageError
-                error={showBlockingError ? error : undefined}
-                {...errorProps}
+                error={showBlockingDescribeError ? error : undefined}
+                {...describeErrorProps}
                 size="l"
                 illustrationSize="m"
             >
-                <SplitPane
-                    defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
-                    defaultSizes={[25, 75]}
-                    triggerCollapse={summaryVisibilityState.triggerCollapse}
-                    triggerExpand={summaryVisibilityState.triggerExpand}
-                    minSize={[36, 200]}
-                    onSplitStartDragAdditional={onSplitStartDragAdditional}
-                >
-                    <ObjectSummary
-                        type={currentPathType}
-                        onCollapseSummary={onCollapseSummaryHandler}
-                        onExpandSummary={onExpandSummaryHandler}
-                        isCollapsed={summaryVisibilityState.collapsed}
-                    />
-                    <div className={b('main')}>
-                        <ObjectGeneral
-                            additionalTenantProps={additionalTenantProps}
+                <TreeKeyProvider>
+                    <SplitPane
+                        defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
+                        defaultSizes={[25, 75]}
+                        triggerCollapse={summaryVisibilityState.triggerCollapse}
+                        triggerExpand={summaryVisibilityState.triggerExpand}
+                        minSize={[36, 200]}
+                        onSplitStartDragAdditional={onSplitStartDragAdditional}
+                    >
+                        <ObjectSummary
                             type={currentPathType}
-                            subType={currentPathSubType}
+                            onCollapseSummary={onCollapseSummaryHandler}
+                            onExpandSummary={onExpandSummaryHandler}
+                            isCollapsed={summaryVisibilityState.collapsed}
                         />
-                    </div>
-                </SplitPane>
+                        <div className={b('main')}>
+                            <ObjectGeneral
+                                additionalTenantProps={additionalTenantProps}
+                                type={currentPathType}
+                                subType={currentPathSubType}
+                                diagnosticsAccessError={accessError}
+                            />
+                        </div>
+                    </SplitPane>
+                </TreeKeyProvider>
             </PageError>
         </LoaderWrapper>
     );

@@ -45,6 +45,8 @@ import {TenantNetwork} from './TenantNetwork/TenantNetwork';
 import {TenantStorageMode} from './TenantStorage/TenantStorageMode';
 import type {TenantStorageMetrics} from './TenantStorage/types';
 import i18n from './i18n';
+import {getTenantOverviewMetrics} from './metricOverview';
+import type {TenantOverviewMetrics} from './metricOverview';
 import {b} from './utils';
 
 import MoniumIcon from '../../../../assets/icons/monium.svg';
@@ -94,10 +96,6 @@ function getActiveMetricsTab(isServerless: boolean, metricsTab: TenantMetricsTab
     }
 
     return metricsTab;
-}
-
-function getStorageGroupsCount(storageGroups?: string) {
-    return storageGroups ? Number(storageGroups) : undefined;
 }
 
 function TenantName({
@@ -206,9 +204,11 @@ function renderMetricsTabContent({
     database,
     databaseFullPath,
     databaseType,
+    metrics,
     memoryLimit,
     memoryStats,
     memoryUsed,
+    networkThroughput,
     storageMetrics,
     tabletStorageStats,
 }: {
@@ -217,9 +217,11 @@ function renderMetricsTabContent({
     database: string;
     databaseFullPath: string;
     databaseType?: ETenantType;
+    metrics: TenantOverviewMetrics;
     memoryLimit?: string;
     memoryStats?: TMemoryStats;
     memoryUsed?: string;
+    networkThroughput?: number;
     storageMetrics: TenantStorageMetrics;
     tabletStorageStats?: TenantStorageStats[];
 }) {
@@ -230,6 +232,7 @@ function renderMetricsTabContent({
                     database={database}
                     databaseType={databaseType}
                     databaseFullPath={databaseFullPath}
+                    metric={metrics.cpu}
                 />
             );
         }
@@ -252,11 +255,18 @@ function renderMetricsTabContent({
                     memoryUsed={memoryUsed}
                     memoryLimit={memoryLimit}
                     memoryStats={memoryStats}
+                    metric={metrics.memory}
                 />
             );
         }
         case TENANT_METRICS_TABS_IDS.network: {
-            return <TenantNetwork database={database} />;
+            return (
+                <TenantNetwork
+                    database={database}
+                    metric={metrics.network}
+                    networkThroughput={networkThroughput}
+                />
+            );
         }
         default: {
             return null;
@@ -289,7 +299,7 @@ export function TenantOverview({
     );
 
     const tenantLoading = isTenantLoading(isFetching, tenant, error);
-    const {Name, Type, Overall, ControlPlane, CoresTotal} = tenant || {};
+    const {Name, Type, Overall, CoresTotal} = tenant || {};
     const isServerless = Type === 'Serverless';
 
     // Use healthcheck self_check_result as the database status color when available;
@@ -305,8 +315,6 @@ export function TenantOverview({
     );
     const databaseStatus = getDatabaseStatus(Overall, healthcheckData?.self_check_result);
     const activeMetricsTab = getActiveMetricsTab(isServerless, metricsTab);
-
-    const controlPlaneNodesCount = ControlPlane?.scale_policy?.fixed_scale?.size;
 
     const tenantType = mapDatabaseTypeToDBName(Type);
 
@@ -331,6 +339,28 @@ export function TenantOverview({
         tabletStorageUsed: tabletStorage,
         tabletStorageLimit,
     };
+
+    const metricOverview = React.useMemo(() => {
+        return getTenantOverviewMetrics({
+            blobStorageStats,
+            coresTotal: CoresTotal,
+            isServerless,
+            memoryStats,
+            networkUtilization,
+            poolsStats,
+            storageMetricStats,
+            tabletStorageStats,
+        });
+    }, [
+        blobStorageStats,
+        CoresTotal,
+        isServerless,
+        memoryStats,
+        networkUtilization,
+        poolsStats,
+        storageMetricStats,
+        tabletStorageStats,
+    ]);
 
     const links = getInfoTabLinks(additionalTenantProps, Name, Type);
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();
@@ -373,17 +403,8 @@ export function TenantOverview({
                         })}
                         <QueriesActivityBar database={database} />
                         <MetricsTabs
-                            poolsCpuStats={poolsStats}
-                            memoryStats={memoryStats}
-                            storageMetricStats={storageMetricStats}
-                            blobStorageStats={blobStorageStats}
-                            tabletStorageStats={tabletStorageStats}
-                            networkUtilization={networkUtilization}
-                            networkThroughput={networkThroughput}
-                            storageGroupsCount={getStorageGroupsCount(tenant?.StorageGroups)}
-                            controlPlaneNodesCount={controlPlaneNodesCount}
-                            coresTotal={CoresTotal}
-                            databaseType={Type}
+                            metrics={metricOverview}
+                            isServerless={isServerless}
                             activeTab={activeMetricsTab}
                         />
                     </Flex>
@@ -395,9 +416,11 @@ export function TenantOverview({
                         database,
                         databaseFullPath,
                         databaseType: Type,
+                        metrics: metricOverview,
                         memoryLimit: tenant?.MemoryLimit,
                         memoryStats: tenant?.MemoryStats,
                         memoryUsed: tenant?.MemoryUsed,
+                        networkThroughput,
                         storageMetrics,
                         tabletStorageStats,
                     })}

@@ -11,6 +11,7 @@ import type {
     FetchData,
     GetRowClassName,
     HandleTableColumnsResize,
+    OnRowClick,
     PaginatedTableData,
     RenderEmptyDataMessage,
     RenderErrorMessage,
@@ -26,6 +27,7 @@ export interface PaginatedTableProps<T, F> {
     tableName: PaginatedTableId;
     columns: Column<T>[];
     getRowClassName?: GetRowClassName<T>;
+    onRowClick?: OnRowClick<T>;
     rowHeight?: number;
     scrollContainerRef: React.RefObject<HTMLElement>;
     onColumnsResize?: HandleTableColumnsResize;
@@ -47,6 +49,7 @@ export const PaginatedTable = <T, F>({
     tableName,
     columns,
     getRowClassName,
+    onRowClick,
     rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
     scrollContainerRef,
     onColumnsResize,
@@ -121,6 +124,7 @@ export const PaginatedTable = <T, F>({
                     tableName={tableName}
                     sortParams={sortParams}
                     getRowClassName={getRowClassName}
+                    onRowClick={onRowClick}
                     renderErrorMessage={renderErrorMessage}
                     renderEmptyDataMessage={renderEmptyDataMessage}
                     onDataFetched={handleDataFetched}

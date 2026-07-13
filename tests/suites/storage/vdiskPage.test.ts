@@ -77,6 +77,8 @@ test.describe('VDisk page storage details', () => {
             rack: LONG_RACK,
             host: LONG_HOST,
             pDiskId: LONG_PDISK_ID,
+            allocatedSize: '1000000',
+            availableSize: '35999999990000',
         });
         await page.goto(VDISK_PAGE_PATH);
 

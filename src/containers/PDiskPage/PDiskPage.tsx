@@ -22,7 +22,7 @@ import {pDiskApi} from '../../store/reducers/pdisk/pdisk';
 import type {EDecommitStatus} from '../../types/api/pdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {getPDiskId, getSeverityColor} from '../../utils/disks/helpers';
+import {getDataSeverityColor, getPDiskId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useAppTitle} from '../App/AppTitleContext';
@@ -170,7 +170,7 @@ export function PDiskPage() {
             <div className={pdiskPageCn('title')}>
                 <EntityPageTitle
                     entityName={pDiskPageKeyset('pdisk')}
-                    status={getSeverityColor(Severity)}
+                    status={getDataSeverityColor(Severity)}
                     id={getPDiskId({nodeId, pDiskId})}
                 />
                 <DecommissionLabel decommission={DecommitStatus} />

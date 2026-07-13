@@ -38,6 +38,10 @@
             background: var(--paginated-table-hover-color);
         }
 
+        &_clickable {
+            cursor: pointer;
+        }
+
         // Elevate row z-index when a Stack inside it is hovered,
         // so expanded donors appear above the next row
         &:has(.ydb-stack:hover),

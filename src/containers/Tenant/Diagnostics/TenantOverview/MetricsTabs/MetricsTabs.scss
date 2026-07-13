@@ -93,12 +93,13 @@
     --tab-border-width: 1px;
     --tab-filler-size: 10px;
     --tab-overlap: -1px;
-    --tab-lift-offset: -6px;
-    --tab-border-compensation: 1px;
     --tab-adjusted-spacing: calc(var(--g-spacing-3) - var(--tab-border-width));
     --z-tab-base: 100;
     --z-tab-active: 110;
     --g-border-radius-xxl: 12px;
+    --metric-tab-card-width: 225px;
+    --metric-tab-card-width-narrow: 210px;
+    --metric-tab-card-height: 70px;
 
     // Fallback for browsers without :has() support
     @supports not selector(:has(*)) {
@@ -111,6 +112,8 @@
     }
 
     &__link {
+        display: block;
+
         text-decoration: none;
 
         color: inherit;
@@ -124,22 +127,13 @@
         position: relative;
         z-index: var(--z-tab-base);
 
-        flex: 1;
+        flex: 0 0 auto;
 
         margin-left: var(--tab-overlap);
         padding: 0 var(--g-spacing-3) var(--g-spacing-3) var(--g-spacing-3);
 
         border-bottom: var(--tab-border-width) solid var(--g-color-line-generic);
         background: var(--g-color-base-background);
-
-        .tenant-tab-card__card-container {
-            border: 1px solid transparent;
-            border-top: none;
-
-            & > div {
-                transform: translateY(1px);
-            }
-        }
 
         &:nth-child(1) {
             z-index: calc(var(--z-tab-base) + 3);
@@ -172,34 +166,31 @@
             padding-right: 0;
             @include tab-edge-filler(right);
         }
-    }
 
-    &__link {
-        display: block;
+        &_placeholder {
+            z-index: 1;
+
+            flex: 1 1 auto;
+
+            pointer-events: none;
+
+            .tenant-metrics-tabs__link {
+                height: var(--metric-tab-card-height);
+            }
+        }
     }
 
     // Active state styling
     &__link-container_active {
         z-index: var(--z-tab-active) !important;
 
+        width: var(--metric-tab-card-width);
+        height: var(--metric-tab-card-height);
         padding: 0;
 
         border-bottom: 0;
-        background: var(--g-color-base-background);
-
-        transform: translateY(var(--tab-lift-offset));
-
-        .tenant-tab-card__card-container {
-            border: none;
-            border-radius: var(--g-border-radius-xs);
-
-            & > div {
-                transform: translateY(0);
-            }
-        }
 
         .tenant-metrics-tabs__link {
-            padding-bottom: var(--tab-border-compensation);
             @include tab-border-base(var(--g-color-line-generic));
         }
     }
@@ -223,14 +214,12 @@
     &__link-container:not(:has(+ &__link-container_active)) {
         padding-right: 0;
     }
-}
 
-.tenant-metrics-tabs_serverless {
-    .tenant-metrics-tabs__link-container_placeholder {
-        pointer-events: none;
+    &_serverless {
+        --metric-tab-card-width: 242px;
+    }
 
-        .tenant-tab-card__card-container {
-            opacity: 0;
-        }
+    @media (max-width: 1200px) {
+        --metric-tab-card-width: var(--metric-tab-card-width-narrow);
     }
 }

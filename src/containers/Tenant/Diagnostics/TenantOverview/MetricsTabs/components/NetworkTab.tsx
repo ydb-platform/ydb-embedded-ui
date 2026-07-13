@@ -1,9 +1,9 @@
 import {Link} from 'react-router-dom';
 
 import {cn} from '../../../../../../utils/cn';
-import {formatNetworkMetric} from '../../../../../../utils/metrics/formatMetricLegend';
-import {UtilizationTabCard} from '../../TabCard/UtilizationTabCard';
+import {MetricTabCard} from '../../TabCard/MetricTabCard';
 import i18n from '../../i18n';
+import type {TenantOverviewMetric} from '../../metricOverview';
 
 import '../MetricsTabs.scss';
 
@@ -12,23 +12,19 @@ const b = cn('tenant-metrics-tabs');
 interface NetworkTabProps {
     to: string;
     active: boolean;
-    networkUtilization: number;
-    networkThroughput: number;
+    network: TenantOverviewMetric;
 }
 
-export function NetworkTab({to, active, networkUtilization, networkThroughput}: NetworkTabProps) {
-    const fillPercent = networkUtilization * 100;
-    const legendText = formatNetworkMetric(networkThroughput);
-
+export function NetworkTab({to, active, network}: NetworkTabProps) {
     return (
         <div className={b('link-container', {active})}>
             <Link to={to} className={b('link')}>
-                <UtilizationTabCard
-                    text={i18n('context_network-usage')}
-                    fillPercent={fillPercent}
-                    legendText={legendText}
+                <MetricTabCard
+                    title={i18n('title_network')}
+                    status={network.status}
+                    value={network.percentText ?? i18n('value_unavailable-percent')}
                     active={active}
-                    helpText={i18n('context_network-description')}
+                    description={i18n('context_network-tab-description')}
                 />
             </Link>
         </div>

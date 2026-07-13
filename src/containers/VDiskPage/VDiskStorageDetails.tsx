@@ -9,7 +9,7 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {
     formatMetricBytes,
     formatMetricPercent,
-    getConsistentMetricBytesSize,
+    getMetricBytesCommonSize,
 } from '../../utils/storageMetrics';
 
 import {vDiskPageKeyset} from './i18n';
@@ -126,7 +126,7 @@ export function VDiskStorageDetails({className, data}: VDiskStorageDetailsProps)
     const total = Number(data?.SizeLimit);
     const usage = Number(data?.AllocatedPercent);
     const free = Number(data?.FreeSize);
-    const metricsSize = getConsistentMetricBytesSize([used, total, free]);
+    const metricsSize = getMetricBytesCommonSize([used, total, free]);
 
     const {NodeDC, NodeRack, NodeHost, NodeId, PDiskId} = data || {};
 

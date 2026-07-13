@@ -4,7 +4,12 @@ jest.mock('../../../store', () => ({
 }));
 
 import {isRedirectToAuth} from '../../../utils/response';
-import {handleBaseApiResponseError, recoverXhrResponseFromNetworkError} from '../base';
+import {
+    getCsrfTokenFromCookie,
+    handleBaseApiResponseError,
+    isMutatingRequestMethod,
+    recoverXhrResponseFromNetworkError,
+} from '../base';
 import * as needResetModule from '../utils/needReset';
 
 interface XhrRequestMockParams {
@@ -59,6 +64,34 @@ function createNetworkError(request?: unknown): NetworkErrorMock {
         request,
     };
 }
+
+describe('getCsrfTokenFromCookie', () => {
+    test('reads csrf_token cookie value', () => {
+        expect(getCsrfTokenFromCookie('other=value; csrf_token=token-123; theme=dark')).toBe(
+            'token-123',
+        );
+    });
+
+    test('returns empty string when csrf_token cookie is missing', () => {
+        expect(getCsrfTokenFromCookie('other=value; theme=dark')).toBe('');
+    });
+
+    test('does not decode cookie value before sending it back to backend', () => {
+        expect(getCsrfTokenFromCookie('csrf_token=token%2Fwith%3Dencoded')).toBe(
+            'token%2Fwith%3Dencoded',
+        );
+    });
+});
+
+describe('isMutatingRequestMethod', () => {
+    test.each(['post', 'POST', 'put', 'delete', 'patch'])('matches %s requests', (method) => {
+        expect(isMutatingRequestMethod(method)).toBe(true);
+    });
+
+    test.each(['get', 'head', 'options', undefined])('does not match %s requests', (method) => {
+        expect(isMutatingRequestMethod(method)).toBe(false);
+    });
+});
 
 describe('recoverXhrResponseFromNetworkError', () => {
     test('restores HTTP response details from recoverable XHR network error', () => {

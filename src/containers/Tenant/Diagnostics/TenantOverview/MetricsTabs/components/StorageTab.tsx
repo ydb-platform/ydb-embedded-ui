@@ -1,10 +1,10 @@
 import {Link} from 'react-router-dom';
 
 import {cn} from '../../../../../../utils/cn';
-import {formatStorageLegend} from '../../../../../../utils/metrics/formatMetricLegend';
+import {MetricTabCard} from '../../TabCard/MetricTabCard';
 import {ServerlessTabCard} from '../../TabCard/ServerlessTabCard';
-import {UsageTabCard} from '../../TabCard/UsageTabCard';
 import i18n from '../../i18n';
+import type {TenantOverviewMetric} from '../../metricOverview';
 
 import '../MetricsTabs.scss';
 
@@ -14,49 +14,27 @@ interface StorageTabProps {
     to: string;
     active: boolean;
     isServerless: boolean;
-    storage: {totalUsed: number; totalLimit: number};
-    storageGroupsCount?: number;
+    storage?: TenantOverviewMetric;
 }
 
-export function StorageTab({
-    to,
-    active,
-    isServerless,
-    storage,
-    storageGroupsCount,
-}: StorageTabProps) {
-    const text =
-        storageGroupsCount === undefined || isServerless
-            ? i18n('cards.storage-label')
-            : i18n('context_storage-groups', {count: storageGroupsCount});
+export function StorageTab({to, active, isServerless, storage}: StorageTabProps) {
     return (
         <div className={b('link-container', {active})}>
             <Link to={to} className={b('link')}>
-                {isServerless ? (
+                {isServerless || !storage ? (
                     <ServerlessTabCard
-                        text={text}
+                        title={i18n('title_storage')}
                         active={active}
+                        description={i18n('context_storage-serverless-tab-description')}
                         helpText={i18n('context_storage-description')}
-                        subtitle={
-                            storage.totalLimit
-                                ? i18n('context_serverless-storage-subtitle', {
-                                      groups: String(storageGroupsCount ?? 0),
-                                      legend: formatStorageLegend({
-                                          value: storage.totalUsed,
-                                          capacity: storage.totalLimit,
-                                      }),
-                                  })
-                                : undefined
-                        }
                     />
                 ) : (
-                    <UsageTabCard
-                        text={text}
-                        value={storage.totalUsed}
-                        limit={storage.totalLimit}
-                        legendFormatter={formatStorageLegend}
+                    <MetricTabCard
+                        title={i18n('title_storage')}
+                        status={storage.status}
+                        value={storage.percentText ?? i18n('value_unavailable-percent')}
                         active={active}
-                        helpText={i18n('context_storage-description')}
+                        description={i18n('context_storage-tab-description')}
                     />
                 )}
             </Link>

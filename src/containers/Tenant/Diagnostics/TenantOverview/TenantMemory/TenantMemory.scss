@@ -1,6 +1,10 @@
 @use '../../../../../styles/mixins.scss';
 
 .tenant-memory {
+    &__metric-summary {
+        margin-bottom: var(--g-spacing-4);
+    }
+
     &__value-text {
         flex-shrink: 0;
 

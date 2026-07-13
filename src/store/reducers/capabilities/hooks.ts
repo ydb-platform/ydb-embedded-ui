@@ -1,4 +1,9 @@
-import type {Capability, MetaCapability, SecuritySetting} from '../../../types/api/capabilities';
+import type {
+    Capability,
+    FeatureSetting,
+    MetaCapability,
+    SecuritySetting,
+} from '../../../types/api/capabilities';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useSetting, useTypedSelector} from '../../../utils/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
@@ -10,6 +15,7 @@ import {
     selectBridgeModeEnabled,
     selectCapabilityVersion,
     selectDatabaseCapabilities,
+    selectFeatureSetting,
     selectGraphShardExists,
     selectMetaCapabilities,
     selectMetaCapabilityVersion,
@@ -167,6 +173,21 @@ const useGetSecuritySetting = (feature: SecuritySetting) => {
     const database = useDatabaseFromQuery();
 
     return useTypedSelector((state) => selectSecuritySetting(state, feature, database));
+};
+
+const useGetFeatureSetting = (feature: FeatureSetting) => {
+    const database = useDatabaseFromQuery();
+
+    return useTypedSelector((state) => selectFeatureSetting(state, feature, database));
+};
+
+export const useAnalyzeOperationAvailable = () => {
+    const operationListVersion = useGetFeatureVersion('/operation/list');
+    const analyzeLongRunningOperationEnabled = useGetFeatureSetting(
+        'EnableAnalyzeLongRunningOperation',
+    );
+
+    return operationListVersion >= 2 && Boolean(analyzeLongRunningOperationEnabled);
 };
 
 export const useGraphShardExists = () => {

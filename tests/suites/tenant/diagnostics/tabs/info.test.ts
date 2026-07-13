@@ -1,8 +1,107 @@
 import {expect, test} from '@playwright/test';
+import type {Locator, Page} from '@playwright/test';
 
 import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
+
+const METRIC_SUMMARY_SCREENSHOT_VIEWPORT = {width: 1600, height: 1000};
+
+async function expectMetricTabsScreenshot(metricTabs: Locator, name: string) {
+    await expect(metricTabs).toBeVisible();
+    await expect(metricTabs).toHaveScreenshot(name);
+}
+
+async function setupMonitoringUserMock(page: Page) {
+    await page.route('**/viewer/json/whoami?*', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                UserSID: 'test-user',
+                UserID: 'test-user-id',
+                AuthType: 'Login',
+                IsViewerAllowed: true,
+                IsMonitoringAllowed: true,
+                IsAdministrationAllowed: true,
+            }),
+        });
+    });
+}
+
+async function setupMetricTabsTenantInfoMock(
+    page: Page,
+    tenantType: 'Dedicated' | 'Serverless' = 'Dedicated',
+    {
+        memoryLimit = '1073741824',
+        memoryUsed = '536870912',
+    }: {
+        memoryLimit?: string;
+        memoryUsed?: string;
+    } = {},
+) {
+    await page.route('**/viewer/json/tenantinfo?*', async (route) => {
+        await route.fulfill({
+            json: {
+                TenantInfo: [
+                    {
+                        Name: database,
+                        Type: tenantType,
+                        Overall: 'Green',
+                        CoresTotal: 100,
+                        PoolStats: [
+                            {Name: 'System', Usage: 0.05, Threads: 100},
+                            {Name: 'User', Usage: 0.023, Threads: 100},
+                            {Name: 'IO', Usage: 0.9, Threads: 100},
+                        ],
+                        MemoryUsed: memoryUsed,
+                        MemoryLimit: memoryLimit,
+                        DatabaseQuotas: {
+                            data_size_soft_quota: '1000000000',
+                        },
+                        TablesStorage: [
+                            {
+                                Type: 'SSD',
+                                Size: '900000000',
+                            },
+                        ],
+                        NetworkUtilization: 0.96,
+                        NetworkWriteThroughput: '1048576',
+                    },
+                ],
+            },
+        });
+    });
+}
+
+async function setupTenantInfoWithoutMetricsMock(page: Page) {
+    await page.route('**/viewer/json/tenantinfo?*', async (route) => {
+        await route.fulfill({
+            json: {
+                TenantInfo: [
+                    {
+                        Name: database,
+                        Type: 'Dedicated',
+                        Overall: 'Green',
+                    },
+                ],
+            },
+        });
+    });
+}
+
+async function openInfoTab(page: Page) {
+    const pageQueryParams = {
+        schema: database,
+        database,
+        tenantPage: 'diagnostics',
+    };
+    const tenantPage = new TenantPage(page);
+    await tenantPage.goto(pageQueryParams);
+
+    const diagnostics = new Diagnostics(page);
+    return diagnostics;
+}
 
 test.describe('Diagnostics Info tab', async () => {
     test('Info tab shows main page elements', async ({page}) => {
@@ -32,13 +131,97 @@ test.describe('Diagnostics Info tab', async () => {
         await diagnostics.clickTab(DiagnosticsTab.Info);
 
         const utilization = await diagnostics.getResourceUtilization();
-        // Test the new aggregated metric structure
+
+        expect(utilization.cpu.title).toBe('CPU');
         expect(utilization.cpu.percentage).toMatch(/\d+(\.\d+)?%/);
-        expect(utilization.cpu.usage).toBeTruthy();
+        expect(utilization.cpu.description).toBe('Load across all actor system pools');
+
+        expect(utilization.storage.title).toBe('Storage');
         expect(utilization.storage.percentage).toMatch(/\d+(\.\d+)?%/);
-        expect(utilization.storage.usage).toBeTruthy();
+        expect(utilization.storage.description).toBe('Total usage including user data');
+
+        expect(utilization.memory.title).toBe('Memory');
         expect(utilization.memory.percentage).toMatch(/\d+(\.\d+)?%/);
-        expect(utilization.memory.usage).toBeTruthy();
+        expect(utilization.memory.description).toBe('Total consumed by DB processes');
+    });
+
+    test('Info metric tabs match visual baseline', async ({page}) => {
+        await setupMetricTabsTenantInfoMock(page);
+        const diagnostics = await openInfoTab(page);
+        await expect(diagnostics.areInfoCardsVisible({includeNetwork: true})).resolves.toBe(true);
+
+        const metricTabs = diagnostics.getMetricTabs();
+        await expectMetricTabsScreenshot(metricTabs, 'info-metric-tabs.png');
+    });
+
+    test('Info metric tabs match visual baseline without tenant metrics', async ({page}) => {
+        await setupTenantInfoWithoutMetricsMock(page);
+        const diagnostics = await openInfoTab(page);
+        await expect(diagnostics.areInfoCardsVisible()).resolves.toBe(true);
+
+        const metricTabs = diagnostics.getMetricTabs();
+        await expectMetricTabsScreenshot(metricTabs, 'info-empty-tenant-metric-tabs.png');
+    });
+
+    test('Info serverless metric tabs match visual baseline', async ({page}) => {
+        await setupMetricTabsTenantInfoMock(page, 'Serverless');
+        const diagnostics = await openInfoTab(page);
+        await expect(diagnostics.areServerlessInfoCardsVisible()).resolves.toBe(true);
+
+        const metricTabs = diagnostics.getMetricTabs();
+        await expectMetricTabsScreenshot(metricTabs, 'info-serverless-metric-tabs.png');
+    });
+
+    test('Info metric tabs keep the same width when active tab changes', async ({page}) => {
+        await setupMetricTabsTenantInfoMock(page);
+        const diagnostics = await openInfoTab(page);
+        await expect(diagnostics.areInfoCardsVisible({includeNetwork: true})).resolves.toBe(true);
+
+        const tabsWidthBefore = await diagnostics.getMetricTabsWidth();
+
+        await diagnostics.getMetricTab('Storage').click();
+
+        expect(await diagnostics.getMetricTabsWidth()).toEqual(tabsWidthBefore);
+    });
+
+    test('Info metric page summaries match snapshots', async ({page}) => {
+        await page.setViewportSize(METRIC_SUMMARY_SCREENSHOT_VIEWPORT);
+        await setupMetricTabsTenantInfoMock(page);
+        const diagnostics = await openInfoTab(page);
+
+        const cpuSummary = diagnostics.getMetricPageSummary('cpu');
+        await expect(cpuSummary).toBeVisible();
+        await expect(cpuSummary).toHaveScreenshot('tenant-info-metric-summary-cpu.png');
+
+        await diagnostics.clickMetricTab('Memory');
+        const memorySummary = diagnostics.getMetricPageSummary('memory');
+        await expect(memorySummary).toBeVisible();
+        await expect(memorySummary).toHaveScreenshot('tenant-info-metric-summary-memory.png');
+
+        await diagnostics.clickMetricTab('Network');
+        const networkSummary = diagnostics.getMetricPageSummary('network');
+        await expect(networkSummary).toBeVisible();
+        await expect(networkSummary).toHaveScreenshot('tenant-info-metric-summary-network.png');
+    });
+
+    test('Info memory metric summary renders adaptive units when values differ by threshold', async ({
+        page,
+    }) => {
+        await page.setViewportSize(METRIC_SUMMARY_SCREENSHOT_VIEWPORT);
+        await setupMonitoringUserMock(page);
+        await setupMetricTabsTenantInfoMock(page, 'Dedicated', {
+            memoryUsed: '1000000',
+            memoryLimit: '36000000000000',
+        });
+        const diagnostics = await openInfoTab(page);
+
+        await diagnostics.clickMetricTab('Memory');
+        const memorySummary = diagnostics.getMetricPageSummary('memory');
+
+        await expect(memorySummary).toBeVisible();
+        await expect(memorySummary).toHaveScreenshot(
+            'tenant-info-metric-summary-memory-mixed-units.png',
+        );
     });
 
     test('Info tab shows healthcheck status when there are issues', async ({page}) => {

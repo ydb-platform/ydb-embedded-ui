@@ -77,22 +77,22 @@ WITH (STORE = COLUMN)`;
 };
 export const createAsyncReplicationTemplate = () => {
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create-async-replication
-CREATE OBJECT secret_name (TYPE SECRET) WITH value="secret_value";
+CREATE SECRET secret_name WITH (value="secret_value");
 
 CREATE ASYNC REPLICATION my_replication
 FOR \${1:<original_table>} AS \${2:replica_table} --[, \`/remote_database/another_table_name\` AS \`another_local_table_name\` ...]
 WITH (
     CONNECTION_STRING="\${3:grpcs://mydb.ydb.tech:2135/?database=/remote_database}",
-    TOKEN_SECRET_NAME = "secret_name"
+    TOKEN_SECRET_PATH = "secret_name"
     -- ENDPOINT="mydb.ydb.tech:2135",
     -- DATABASE=\`/remote_database\`,
     -- USER="user",
-    -- PASSWORD_SECRET_NAME="your_password"
+    -- PASSWORD_SECRET_PATH="password_secret_name"
 );`;
 };
 export const createTransferTemplate = () => {
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create-transfer
-CREATE OBJECT secret_name (TYPE SECRET) WITH value="secret_value";
+CREATE SECRET secret_name WITH (value="secret_value");
 
 \\$l = (\\$x) -> {
     return [
@@ -107,11 +107,11 @@ CREATE TRANSFER my_transfer
 FROM \${1:<original_topic>} TO \${2:<target_table>} USING \\$l
 WITH (
     CONNECTION_STRING="\${3:grpcs://mydb.ydb.tech:2135/?database=/remote_database}",
-    TOKEN_SECRET_NAME = "secret_name"
+    TOKEN_SECRET_PATH = "secret_name"
     -- ENDPOINT="mydb.ydb.tech:2135",
     -- DATABASE=\`/remote_database\`,
     -- USER="user",
-    -- PASSWORD_SECRET_NAME="your_password"
+    -- PASSWORD_SECRET_PATH="password_secret_name"
 );`;
 };
 export const alterTableTemplate = (params?: SchemaQueryParams) => {

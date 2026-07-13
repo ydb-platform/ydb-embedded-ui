@@ -4,7 +4,8 @@
   "title_limits": "Limits",
 
   "field_split-size": "Split Size",
-  "context_split-size-maximum": "{{maxGb}} GB maximum",
+  "context_split-size-maximum": "{{maxGb}} GB maximum",
+  "context_split-size-maximum-bytes": "{{bytes}} bytes",
   "field_load": "Load",
   "field_minimum": "Minimum",
   "field_maximum": "Maximum",

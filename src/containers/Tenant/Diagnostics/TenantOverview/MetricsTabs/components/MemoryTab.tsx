@@ -1,9 +1,9 @@
 import {Link} from 'react-router-dom';
 
 import {cn} from '../../../../../../utils/cn';
-import {formatStorageLegend} from '../../../../../../utils/metrics/formatMetricLegend';
-import {UsageTabCard} from '../../TabCard/UsageTabCard';
+import {MetricTabCard} from '../../TabCard/MetricTabCard';
 import i18n from '../../i18n';
+import type {TenantOverviewMetric} from '../../metricOverview';
 
 import '../MetricsTabs.scss';
 
@@ -12,20 +12,19 @@ const b = cn('tenant-metrics-tabs');
 interface MemoryTabProps {
     to: string;
     active: boolean;
-    memory: {totalUsed: number; totalLimit: number};
+    memory: TenantOverviewMetric;
 }
 
 export function MemoryTab({to, active, memory}: MemoryTabProps) {
     return (
         <div className={b('link-container', {active})}>
             <Link to={to} className={b('link')}>
-                <UsageTabCard
-                    text={i18n('context_memory-used')}
-                    value={memory.totalUsed}
-                    limit={memory.totalLimit}
-                    legendFormatter={formatStorageLegend}
+                <MetricTabCard
+                    title={i18n('title_memory')}
+                    status={memory.status}
+                    value={memory.percentText ?? i18n('value_unavailable-percent')}
                     active={active}
-                    helpText={i18n('context_memory-description')}
+                    description={i18n('context_memory-tab-description')}
                 />
             </Link>
         </div>
