@@ -1,19 +1,51 @@
 import {expect, test} from '@playwright/test';
+import type {Page} from '@playwright/test';
 
-import {database} from '../../../utils/constants';
+import {backend, database} from '../../../utils/constants';
 import {QueryEditorMode, TenantPage} from '../TenantPage';
 import {SavedQueriesTable} from '../savedQueries/models/SavedQueriesTable';
 import {ObjectSummary} from '../summary/ObjectSummary';
-import {RowTableAction} from '../summary/types';
+import {RowTableAction, SecretAction} from '../summary/types';
 
 import {
     AsyncReplicationTemplates,
     NewSqlDropdownMenu,
+    SecretTemplates,
     TablesTemplates,
     TemplateCategory,
 } from './models/NewSqlDropdownMenu';
 import {QueryEditor, QueryTabs} from './models/QueryEditor';
 import {SaveQueryDialog} from './models/SaveQueryDialog';
+
+async function reopenQueryEditorWithSchemaSecretsFeature(page: Page, enabled: boolean) {
+    await page.route(`${backend}/viewer/feature_flags*`, async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                Databases: [
+                    {
+                        Name: database,
+                        FeatureFlags: [
+                            {
+                                Name: 'EnableSchemaSecrets',
+                                Current: enabled,
+                                Default: false,
+                            },
+                        ],
+                    },
+                ],
+            }),
+        });
+    });
+
+    const tenantPage = new TenantPage(page);
+    await tenantPage.gotoQueryEditor({
+        schema: database,
+        database,
+        mode: QueryEditorMode.MultiTab,
+    });
+}
 
 test.describe('Query Templates', () => {
     test.beforeEach(async ({page}) => {
@@ -160,6 +192,82 @@ test.describe('Query Templates', () => {
 
         expect(queryEditor.editorTextArea).not.toBeEmpty();
     });
+
+    test('New SQL secrets menu inserts create secret template', async ({page}) => {
+        await reopenQueryEditorWithSchemaSecretsFeature(page, true);
+
+        const newSqlDropdown = new NewSqlDropdownMenu(page);
+        const queryEditor = new QueryEditor(page);
+
+        await newSqlDropdown.clickNewSqlButton();
+        await newSqlDropdown.hoverCategory(TemplateCategory.Secrets);
+        await newSqlDropdown.selectTemplate(SecretTemplates.Create);
+
+        await expect
+            .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
+            .toContain('CREATE SECRET my_secret');
+
+        const editorContent = await queryEditor.getEditorContent();
+        expect(editorContent).toContain("VALUE = 'secret_value'");
+    });
+
+    test('New SQL secrets menu is hidden when schema secrets feature is disabled', async ({
+        page,
+    }) => {
+        await reopenQueryEditorWithSchemaSecretsFeature(page, false);
+
+        const newSqlDropdown = new NewSqlDropdownMenu(page);
+
+        await newSqlDropdown.clickNewSqlButton();
+
+        await expect
+            .poll(() => newSqlDropdown.isCategoryVisible(TemplateCategory.Secrets), {timeout: 5000})
+            .toBe(false);
+    });
+
+    test('Secret context menu inserts alter secret template for selected secret', async ({
+        page,
+    }) => {
+        await reopenQueryEditorWithSchemaSecretsFeature(page, true);
+
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        const secretName = await queryEditor.createNewFakeSecret();
+        await objectSummary.clickRefreshButton();
+
+        await objectSummary.clickActionMenuItem(secretName, SecretAction.Alter);
+
+        await expect
+            .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
+            .toContain(`ALTER SECRET \`${secretName}\``);
+
+        const editorContent = await queryEditor.getEditorContent();
+        expect(editorContent).toContain("VALUE = 'secret_value'");
+    });
+
+    test('Secret context menu hides alter and drop actions when feature is disabled', async ({
+        page,
+    }) => {
+        await reopenQueryEditorWithSchemaSecretsFeature(page, false);
+
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        const secretName = await queryEditor.createNewFakeSecret();
+        await objectSummary.clickRefreshButton();
+
+        await objectSummary.clickActionsButton(secretName);
+
+        await expect
+            .poll(() => objectSummary.getActionsMenuItems(), {timeout: 5000})
+            .toContain(RowTableAction.CopyPath);
+
+        const menuItems = await objectSummary.getActionsMenuItems();
+        expect(menuItems).not.toContain(SecretAction.Alter);
+        expect(menuItems).not.toContain(SecretAction.Drop);
+    });
+
     test('Switching between untouched schema templates reuses the current template tab', async ({
         page,
     }) => {

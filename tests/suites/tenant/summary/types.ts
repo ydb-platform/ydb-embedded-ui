@@ -10,3 +10,8 @@ export enum RowTableAction {
     CreateChangefeed = 'Create changefeed...',
     CreateDirectory = 'Create directory',
 }
+
+export enum SecretAction {
+    Alter = 'Alter secret...',
+    Drop = 'Drop secret...',
+}
