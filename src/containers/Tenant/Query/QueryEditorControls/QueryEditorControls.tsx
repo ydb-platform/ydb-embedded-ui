@@ -192,6 +192,7 @@ export const QueryEditorControls = ({
             loading={cancelQueryResponse.isLoading}
             error={cancelQueryError}
             onClick={onStopButtonClick}
+            view="action"
         />
     );
 
