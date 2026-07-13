@@ -115,26 +115,17 @@ export class QueryEditor {
     }
 
     async run(query: string, mode: keyof typeof QUERY_MODES) {
-        await this.clickGearButton();
-        await this.settingsDialog.changeQueryMode(mode);
-        await this.settingsDialog.clickButton(ButtonNames.Save);
-        await this.setQuery(query);
+        await this.setQueryModeAndText(query, mode);
         await this.clickRunButton();
     }
 
     async explain(query: string, mode: keyof typeof QUERY_MODES) {
-        await this.clickGearButton();
-        await this.settingsDialog.changeQueryMode(mode);
-        await this.settingsDialog.clickButton(ButtonNames.Save);
-        await this.setQuery(query);
+        await this.setQueryModeAndText(query, mode);
         await this.clickExplainButton();
     }
 
     async explainAnalyze(query: string, mode: keyof typeof QUERY_MODES) {
-        await this.clickGearButton();
-        await this.settingsDialog.changeQueryMode(mode);
-        await this.settingsDialog.clickButton(ButtonNames.Save);
-        await this.setQuery(query);
+        await this.setQueryModeAndText(query, mode);
         await this.clickExplainAnalyzeButton();
     }
 
@@ -568,5 +559,12 @@ export class QueryEditor {
         } catch {
             return false;
         }
+    }
+
+    private async setQueryModeAndText(query: string, mode: keyof typeof QUERY_MODES) {
+        await this.clickGearButton();
+        await this.settingsDialog.changeQueryMode(mode);
+        await this.settingsDialog.clickButton(ButtonNames.Save);
+        await this.setQuery(query);
     }
 }

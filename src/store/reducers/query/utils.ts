@@ -22,12 +22,8 @@ import type {
 const QUERY_ACTION_TO_BACKEND_BASE_ACTION: Record<QueryAction, 'execute' | 'explain'> = {
     [QUERY_ACTIONS.execute]: 'execute',
     [QUERY_ACTIONS.explain]: 'explain',
-    [QUERY_ACTIONS.explainAnalyze]: 'explain',
+    [QUERY_ACTIONS.explainAnalyze]: 'execute',
 };
-
-export function isExecutionQueryAction(actionType: QueryAction) {
-    return actionType === QUERY_ACTIONS.execute;
-}
 
 export function getEffectiveQuerySettingsForAction(
     actionType: QueryAction,

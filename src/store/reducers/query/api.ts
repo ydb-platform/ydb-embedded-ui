@@ -6,6 +6,7 @@ import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {
     MAX_QUERY_TIMEOUT_SECONDS,
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    isExecutionQueryAction,
     isQueryErrorResponse,
     parseQueryAPIResponse,
 } from '../../../utils/query';
@@ -25,7 +26,6 @@ import {
     getActionAndSyntaxFromQueryMode,
     getEffectiveQueryDataForAction,
     getEffectiveQuerySettingsForAction,
-    isExecutionQueryAction,
     prepareQueryWithPragmas,
 } from './utils';
 
