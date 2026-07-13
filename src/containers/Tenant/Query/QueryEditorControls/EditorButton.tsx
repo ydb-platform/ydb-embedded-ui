@@ -1,4 +1,4 @@
-import {Binoculars, CirclePlay, CircleStop, Gear} from '@gravity-ui/icons';
+import {CirclePlay, CircleStop, Gear} from '@gravity-ui/icons';
 import type {ButtonProps} from '@gravity-ui/uikit';
 import {Button, Icon, Tooltip} from '@gravity-ui/uikit';
 
@@ -27,7 +27,6 @@ const Stop = ({error, ...props}: ButtonProps & {error?: boolean}) => (
 
 const Explain = (props: ButtonProps) => (
     <Button {...props} className={b('explain-button')}>
-        <Icon data={Binoculars} size={16} />
         {i18n('action.explain')}
     </Button>
 );

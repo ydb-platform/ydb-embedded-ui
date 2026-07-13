@@ -49,6 +49,7 @@
   "action.stop": "Stop",
   "action.run": "Run",
   "action.explain": "Explain",
+  "action.explain-analyze": "Explain Analyze",
   "action.edit": "Edit",
   "action.expand": "Expand",
   "action.collapse": "Collapse",

@@ -2,6 +2,7 @@ import {createSelector, createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 import {v4 as uuidv4} from 'uuid';
 
+import type {QueryAction} from '../../../types/store/query';
 import {loadFromSessionStorage, saveToSessionStorage} from '../../../utils';
 import {QUERY_EDITOR_CURRENT_QUERY_KEY, QUERY_EDITOR_DIRTY_KEY} from '../../../utils/constants';
 
@@ -549,10 +550,7 @@ const slice = createSlice({
         setHistoryCurrentQueryId: (state, action: PayloadAction<string | undefined>) => {
             state.historyCurrentQueryId = action.payload;
         },
-        setResultTab: (
-            state,
-            action: PayloadAction<{queryType: 'execute' | 'explain'; tabId: string}>,
-        ) => {
+        setResultTab: (state, action: PayloadAction<{queryType: QueryAction; tabId: string}>) => {
             const {queryType, tabId} = action.payload;
             if (!state.selectedResultTab) {
                 state.selectedResultTab = {};

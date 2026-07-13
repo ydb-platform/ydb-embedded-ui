@@ -13,6 +13,34 @@
         gap: 12px;
     }
 
+    &__explain-group {
+        display: flex;
+        gap: 2px;
+
+        .ydb-query-editor-button__explain-button.g-button_pin_round-brick::before,
+        .ydb-query-editor-button__explain-button.g-button_pin_round-brick::after,
+        .ydb-query-editor-button__stop-button.g-button_pin_round-brick::before,
+        .ydb-query-editor-button__stop-button.g-button_pin_round-brick::after {
+            border-start-start-radius: 6px;
+            border-start-end-radius: 3px;
+            border-end-end-radius: 3px;
+            border-end-start-radius: 6px;
+        }
+    }
+
+    &__explain-analyze-button {
+        width: 28px;
+        padding: 0;
+
+        &.g-button_pin_brick-round::before,
+        &.g-button_pin_brick-round::after {
+            border-start-start-radius: 3px;
+            border-start-end-radius: 6px;
+            border-end-end-radius: 6px;
+            border-end-start-radius: 3px;
+        }
+    }
+
     &__mode-selector {
         $b: &;
 

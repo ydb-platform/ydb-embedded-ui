@@ -1,9 +1,8 @@
 @use '../../../../styles/mixins.scss';
 
 .ydb-query-editor-button {
-    &__explain-button,
-    &__stop-button,
-    &__run-button {
+    &__run-button,
+    &__stop-button {
         width: 92px;
     }
 

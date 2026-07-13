@@ -115,10 +115,7 @@ export interface QueryState {
     historyCurrentQueryId?: string;
 
     tenantPath?: string;
-    selectedResultTab?: {
-        execute?: string;
-        explain?: string;
-    };
+    selectedResultTab?: Partial<Record<QueryAction, string>>;
 }
 
 export interface QueryStats {

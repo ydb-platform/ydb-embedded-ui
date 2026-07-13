@@ -13,6 +13,7 @@ import type {
 } from '../types/api/query';
 import type {
     IQueryResult,
+    QueryAction,
     QueryMode,
     StatisticsMode,
     TracingLevel,
@@ -79,7 +80,12 @@ export const TRACING_LEVELS_TITLES: Record<TracingLevel, string> = {
 export const QUERY_ACTIONS = {
     execute: 'execute',
     explain: 'explain',
+    explainAnalyze: 'explain-analyze',
 } as const;
+
+export function isExecutionQueryAction(actionType: QueryAction): boolean {
+    return actionType === QUERY_ACTIONS.execute || actionType === QUERY_ACTIONS.explainAnalyze;
+}
 
 export const QUERY_MODES = {
     scan: 'scan',

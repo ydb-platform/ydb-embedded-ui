@@ -23,6 +23,7 @@ import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getIllustration} from '../../../../utils/illustrations';
+import {isExecutionQueryAction} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {QueryStoppedBanner} from '../QueryStoppedBanner/QueryStoppedBanner';
@@ -34,8 +35,8 @@ import {QueryInfoDropdown} from './components/QueryInfoDropdown/QueryInfoDropdow
 import {QueryResultError} from './components/QueryResultError/QueryResultError';
 import {ResultSetsViewer} from './components/ResultSetsViewer/ResultSetsViewer';
 import {TraceButton} from './components/TraceButton/TraceButton';
-import {RESULT_OPTIONS_IDS} from './constants';
 import type {SectionID} from './constants';
+import {RESULT_OPTIONS_IDS, getDefaultResultSection, getResultSections} from './constants';
 import i18n from './i18n';
 
 import './QueryResultViewer.scss';
@@ -64,9 +65,6 @@ const RESULT_OPTIONS_TITLES: Record<SectionID, string> = {
         return i18n('action.ast');
     },
 };
-
-const EXECUTE_SECTIONS: SectionID[] = ['result', 'schema', 'simplified', 'stats'];
-const EXPLAIN_SECTIONS: SectionID[] = ['schema', 'simplified', 'json', 'ast'];
 
 interface ExecuteResultProps {
     result: QueryResult;
@@ -97,8 +95,8 @@ export function QueryResultViewer({
     const dispatch = useTypedDispatch();
     const selectedTabs = useTypedSelector(selectResultTab);
 
-    const isExecute = resultType === 'execute';
-    const isExplain = resultType === 'explain';
+    const isExecutionResult = isExecutionQueryAction(resultType);
+    const hasResultSection = getResultSections(resultType).includes(RESULT_OPTIONS_IDS.result);
 
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
     const [useShowPlanToSvg] = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
@@ -108,13 +106,13 @@ export function QueryResultViewer({
     const activeSection: SectionID = React.useMemo(() => {
         const savedTab = selectedTabs?.[resultType];
         if (savedTab) {
-            const validSections = isExecute ? EXECUTE_SECTIONS : EXPLAIN_SECTIONS;
+            const validSections = getResultSections(resultType);
             if (validSections.includes(savedTab as SectionID)) {
                 return savedTab as SectionID;
             }
         }
-        return isExecute ? RESULT_OPTIONS_IDS.result : RESULT_OPTIONS_IDS.schema;
-    }, [selectedTabs, resultType, isExecute]);
+        return getDefaultResultSection(resultType);
+    }, [selectedTabs, resultType]);
 
     const {error, isLoading, streamingStatus, data = {}} = result;
     const {preparedPlan, simplifiedPlan, stats, resultSets, ast} = data;
@@ -133,18 +131,13 @@ export function QueryResultViewer({
     };
 
     const radioButtonOptions: ControlGroupOption<SectionID>[] = React.useMemo(() => {
-        let sections: SectionID[] = [];
-        if (isExecute) {
-            sections = EXECUTE_SECTIONS;
-        } else if (isExplain) {
-            sections = EXPLAIN_SECTIONS;
-        }
+        const sections = getResultSections(resultType);
 
         return sections.map((section) => ({
             value: section,
             content: RESULT_OPTIONS_TITLES[section],
         }));
-    }, [isExecute, isExplain]);
+    }, [resultType]);
 
     const hasCopyableData = React.useCallback((): boolean => {
         switch (activeSection) {
@@ -254,7 +247,7 @@ export function QueryResultViewer({
                 }}
                 error={error}
                 database={database}
-                hasPlanToSvg={Boolean(data?.plan && useShowPlanToSvg && isExecute)}
+                hasPlanToSvg={Boolean(data?.plan && useShowPlanToSvg && isExecutionResult)}
             />
         );
     };
@@ -295,7 +288,7 @@ export function QueryResultViewer({
         }
 
         if (error) {
-            if (isExecute || isStopped) {
+            if ((isExecutionResult && hasResultSection) || isStopped) {
                 return renderCommonErrorView(isStopped);
             }
             return <QueryResultError error={error} />;
@@ -329,7 +322,7 @@ export function QueryResultViewer({
                     loading={isLoading}
                     streamingStatus={streamingStatus}
                 />
-                {data?.traceId && isExecute ? <TraceButton traceId={data.traceId} /> : null}
+                {data?.traceId && isExecutionResult ? <TraceButton traceId={data.traceId} /> : null}
             </div>
         );
     };
