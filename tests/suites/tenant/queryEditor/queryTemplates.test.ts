@@ -1,7 +1,6 @@
 import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
-import {TOPICS_SQL_IO_OPERATIONS_FEATURE_FLAG} from '../../../../src/utils/topicsSqlIoOperations';
 import {backend, database} from '../../../utils/constants';
 import {QueryEditorMode, TenantPage} from '../TenantPage';
 import {SavedQueriesTable} from '../savedQueries/models/SavedQueriesTable';
@@ -29,7 +28,7 @@ async function mockTopicsSqlIoOperationsFeature(page: Page, enabled: boolean) {
                         Name: database,
                         FeatureFlags: [
                             {
-                                Name: TOPICS_SQL_IO_OPERATIONS_FEATURE_FLAG,
+                                Name: 'EnableTopicsSqlIoOperations',
                                 Current: enabled,
                                 Default: false,
                             },

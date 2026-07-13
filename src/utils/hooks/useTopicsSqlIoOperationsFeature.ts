@@ -1,6 +1,8 @@
 import {useFeatureFlagsAvailable} from '../../store/reducers/capabilities/hooks';
 import {configsApi} from '../../store/reducers/configs';
-import {isTopicsSqlIoOperationsEnabled} from '../topicsSqlIoOperations';
+import {isFeatureFlagEnabled} from '../featureFlags';
+
+const TOPICS_SQL_IO_OPERATIONS_FEATURE_FLAG = 'EnableTopicsSqlIoOperations';
 
 interface UseTopicsSqlIoOperationsFeatureResult {
     topicsSqlIoOperationsEnabled: boolean;
@@ -19,7 +21,10 @@ export function useTopicsSqlIoOperationsFeature(
             {
                 skip: !featureFlagsAvailable || !enabled,
                 selectFromResult: ({currentData, isFetching}) => ({
-                    topicsSqlIoOperationsEnabled: isTopicsSqlIoOperationsEnabled(currentData),
+                    topicsSqlIoOperationsEnabled: isFeatureFlagEnabled(
+                        currentData,
+                        TOPICS_SQL_IO_OPERATIONS_FEATURE_FLAG,
+                    ),
                     isFetching,
                 }),
             },
