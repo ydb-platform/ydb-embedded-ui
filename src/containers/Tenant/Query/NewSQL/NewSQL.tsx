@@ -20,10 +20,14 @@ import {bindActions} from '../../utils/newSQLQueryActions';
 
 import i18n from './i18n';
 
-export function NewSQL() {
+interface NewSQLProps {
+    database: string;
+}
+
+export function NewSQL({database}: NewSQLProps) {
     const dispatch = useTypedDispatch();
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
-    const {topicsSqlIoOperationsEnabled} = useTopicsSqlIoOperationsFeature();
+    const {topicsSqlIoOperationsEnabled} = useTopicsSqlIoOperationsFeature(database);
 
     const [shouldReturnFocus, setShouldReturnFocus] = React.useState(true);
 
