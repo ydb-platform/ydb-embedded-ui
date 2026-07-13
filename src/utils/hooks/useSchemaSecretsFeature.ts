@@ -15,11 +15,23 @@ export function useSchemaSecretsFeature(
 ): UseSchemaSecretsFeatureResult {
     const featureFlagsAvailable = useFeatureFlagsAvailable();
 
-    const {currentData: featureFlags, isFetching: isFeatureFlagsLoading} =
-        configsApi.useGetFeatureFlagsQuery({database}, {skip: !featureFlagsAvailable || !enabled});
+    const {schemaSecretsEnabled, isFetching: isFeatureFlagsLoading} =
+        configsApi.useGetFeatureFlagsQuery(
+            {database},
+            {
+                skip: !featureFlagsAvailable || !enabled,
+                selectFromResult: ({currentData, isFetching}) => ({
+                    schemaSecretsEnabled: isFeatureFlagEnabled(
+                        currentData,
+                        SCHEMA_SECRETS_FEATURE_FLAG,
+                    ),
+                    isFetching,
+                }),
+            },
+        );
 
     return {
-        schemaSecretsEnabled: isFeatureFlagEnabled(featureFlags, SCHEMA_SECRETS_FEATURE_FLAG),
+        schemaSecretsEnabled,
         isFeatureFlagsLoading,
     };
 }
