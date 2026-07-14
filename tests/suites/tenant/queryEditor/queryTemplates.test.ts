@@ -18,7 +18,13 @@ import {
 import {QueryEditor, QueryTabs} from './models/QueryEditor';
 import {SaveQueryDialog} from './models/SaveQueryDialog';
 
-async function reopenQueryEditorWithSchemaSecretsFeature(page: Page, enabled: boolean) {
+type QueryEditorFeatureFlag = 'EnableSchemaSecrets' | 'EnableTopicsSqlIoOperations';
+
+async function reopenQueryEditorWithFeatureFlag(
+    page: Page,
+    featureFlag: QueryEditorFeatureFlag,
+    enabled: boolean,
+) {
     await page.route(`${backend}/viewer/feature_flags*`, async (route) => {
         await route.fulfill({
             status: 200,
@@ -29,44 +35,7 @@ async function reopenQueryEditorWithSchemaSecretsFeature(page: Page, enabled: bo
                         Name: database,
                         FeatureFlags: [
                             {
-                                Name: 'EnableSchemaSecrets',
-                                Current: enabled,
-                                Default: false,
-                            },
-                        ],
-                    },
-                ],
-            }),
-        });
-    });
-
-    const tenantPage = new TenantPage(page);
-    const [featureFlagsResponse] = await Promise.all([
-        page.waitForResponse(
-            (response) =>
-                response.url().startsWith(`${backend}/viewer/feature_flags`) && response.ok(),
-        ),
-        tenantPage.gotoQueryEditor({
-            schema: database,
-            database,
-            mode: QueryEditorMode.MultiTab,
-        }),
-    ]);
-    await featureFlagsResponse.finished();
-}
-
-async function reopenQueryEditorWithTopicsSqlIoOperationsFeature(page: Page, enabled: boolean) {
-    await page.route(`${backend}/viewer/feature_flags*`, async (route) => {
-        await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({
-                Databases: [
-                    {
-                        Name: database,
-                        FeatureFlags: [
-                            {
-                                Name: 'EnableTopicsSqlIoOperations',
+                                Name: featureFlag,
                                 Current: enabled,
                                 Default: false,
                             },
@@ -243,7 +212,7 @@ test.describe('Query Templates', () => {
     });
 
     test('New SQL secrets menu inserts create secret template', async ({page}) => {
-        await reopenQueryEditorWithSchemaSecretsFeature(page, true);
+        await reopenQueryEditorWithFeatureFlag(page, 'EnableSchemaSecrets', true);
 
         const newSqlDropdown = new NewSqlDropdownMenu(page);
         const queryEditor = new QueryEditor(page);
@@ -263,7 +232,7 @@ test.describe('Query Templates', () => {
     test('New SQL secrets menu is hidden when schema secrets feature is disabled', async ({
         page,
     }) => {
-        await reopenQueryEditorWithSchemaSecretsFeature(page, false);
+        await reopenQueryEditorWithFeatureFlag(page, 'EnableSchemaSecrets', false);
 
         const newSqlDropdown = new NewSqlDropdownMenu(page);
 
@@ -277,7 +246,7 @@ test.describe('Query Templates', () => {
     test('Secret context menu inserts alter secret template for selected secret', async ({
         page,
     }) => {
-        await reopenQueryEditorWithSchemaSecretsFeature(page, true);
+        await reopenQueryEditorWithFeatureFlag(page, 'EnableSchemaSecrets', true);
 
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);
@@ -301,7 +270,7 @@ test.describe('Query Templates', () => {
         const queryEditor = new QueryEditor(page);
         const secretName = await queryEditor.createNewFakeSecret();
 
-        await reopenQueryEditorWithSchemaSecretsFeature(page, false);
+        await reopenQueryEditorWithFeatureFlag(page, 'EnableSchemaSecrets', false);
 
         const objectSummary = new ObjectSummary(page);
         await objectSummary.clickRefreshButton();
@@ -318,7 +287,7 @@ test.describe('Query Templates', () => {
     });
 
     test('New SQL topics menu inserts topic select template', async ({page}) => {
-        await reopenQueryEditorWithTopicsSqlIoOperationsFeature(page, true);
+        await reopenQueryEditorWithFeatureFlag(page, 'EnableTopicsSqlIoOperations', true);
 
         const newSqlDropdown = new NewSqlDropdownMenu(page);
         const queryEditor = new QueryEditor(page);
@@ -339,7 +308,7 @@ test.describe('Query Templates', () => {
     test('New SQL topics menu hides topic select template when SQL I/O feature is disabled', async ({
         page,
     }) => {
-        await reopenQueryEditorWithTopicsSqlIoOperationsFeature(page, false);
+        await reopenQueryEditorWithFeatureFlag(page, 'EnableTopicsSqlIoOperations', false);
 
         const newSqlDropdown = new NewSqlDropdownMenu(page);
 
@@ -352,7 +321,7 @@ test.describe('Query Templates', () => {
     });
 
     test('Topic context menu inserts topic select template for selected topic', async ({page}) => {
-        await reopenQueryEditorWithTopicsSqlIoOperationsFeature(page, true);
+        await reopenQueryEditorWithFeatureFlag(page, 'EnableTopicsSqlIoOperations', true);
 
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);
@@ -373,7 +342,7 @@ test.describe('Query Templates', () => {
     test('Topic context menu hides select query when SQL I/O feature is disabled', async ({
         page,
     }) => {
-        await reopenQueryEditorWithTopicsSqlIoOperationsFeature(page, false);
+        await reopenQueryEditorWithFeatureFlag(page, 'EnableTopicsSqlIoOperations', false);
 
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);
