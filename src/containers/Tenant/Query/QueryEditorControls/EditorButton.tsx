@@ -1,4 +1,4 @@
-import {Binoculars, CirclePlay, CircleStop, Gear} from '@gravity-ui/icons';
+import {Binoculars, Gear, PlayFill, StopFill} from '@gravity-ui/icons';
 import type {ButtonProps} from '@gravity-ui/uikit';
 import {Button, Icon, Tooltip} from '@gravity-ui/uikit';
 
@@ -13,14 +13,14 @@ const b = cn('ydb-query-editor-button');
 
 const Run = (props: ButtonProps) => (
     <Button {...props} className={b('run-button')}>
-        <Icon data={CirclePlay} size={16} />
+        <Icon data={PlayFill} size={16} />
         {i18n('action.run')}
     </Button>
 );
 
 const Stop = ({error, ...props}: ButtonProps & {error?: boolean}) => (
     <Button {...props} className={b('stop-button', {error})}>
-        <Icon data={CircleStop} size={16} />
+        <Icon data={StopFill} size={16} />
         {i18n('action.stop')}
     </Button>
 );

@@ -387,6 +387,13 @@ export class QueryEditor {
         return true;
     }
 
+    async isStopButtonActionView() {
+        await this.stopButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.stopButton.evaluate((button) =>
+            button.classList.contains('g-button_view_action'),
+        );
+    }
+
     async isStopButtonHidden() {
         await this.stopButton.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
