@@ -1,4 +1,9 @@
-import {addMinMaxIndex, disableTTLTemplate, enableTTLTemplate} from '../schemaQueryTemplates';
+import {
+    addMinMaxIndex,
+    disableTTLTemplate,
+    enableTTLTemplate,
+    selectTopicQueryTemplate,
+} from '../schemaQueryTemplates';
 
 describe('schemaQueryTemplates', () => {
     describe('enableTTLTemplate', () => {
@@ -38,6 +43,36 @@ describe('schemaQueryTemplates', () => {
 ADD INDEX \${2:my_min_max_index}
 LOCAL USING min_max
 ON (\${3:column_name});`);
+        });
+    });
+
+    describe('selectTopicQueryTemplate', () => {
+        test('selects topic data and metadata for the selected topic', () => {
+            const template = selectTopicQueryTemplate({
+                path: '/local/my-topic',
+                relativePath: 'my-topic',
+            });
+
+            expect(template).toBe(`SELECT
+    Data,
+    __ydb_create_time as create_time,
+    __ydb_write_time as write_time,
+    __ydb_partition_id as partition_id,
+    __ydb_offset as offset,
+    __ydb_message_group_id as message_group_id,
+    __ydb_seq_no as seq_no
+FROM \`my-topic\`
+-- WHERE __ydb_partition_id = 42
+-- AND __ydb_write_time > CurrentUtcTimestamp() - Interval('PT60S')
+-- AND __ydb_offset > 100
+LIMIT \${1:10};`);
+        });
+
+        test('uses a placeholder topic path without selected topic', () => {
+            const template = selectTopicQueryTemplate();
+
+            expect(template).toContain('FROM ${1:<my_topic>}');
+            expect(template).toContain('LIMIT ${2:10};');
         });
     });
 });

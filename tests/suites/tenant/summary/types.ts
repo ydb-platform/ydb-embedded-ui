@@ -10,3 +10,7 @@ export enum RowTableAction {
     CreateChangefeed = 'Create changefeed...',
     CreateDirectory = 'Create directory',
 }
+
+export enum TopicAction {
+    SelectQuery = 'Select query...',
+}

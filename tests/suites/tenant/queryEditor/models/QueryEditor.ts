@@ -133,6 +133,14 @@ export class QueryEditor {
         return tableName;
     }
 
+    async createNewFakeTopic() {
+        const topicName = `a_test_topic_${Date.now()}`;
+        await this.run(`CREATE TOPIC \`${topicName}\`;`, 'query');
+        await this.waitForStatus('Completed');
+
+        return topicName;
+    }
+
     async gearButtonText() {
         await this.gearButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return this.gearButton.innerText();
