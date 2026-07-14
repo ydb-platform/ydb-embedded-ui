@@ -25,6 +25,7 @@ import {valueIsDefined} from '../../../../utils';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useCompactionFeature} from '../../../../utils/hooks/useCompactionFeature';
+import {useSchemaSecretsFeature} from '../../../../utils/hooks/useSchemaSecretsFeature';
 import {useTopicsSqlIoOperationsFeature} from '../../../../utils/hooks/useTopicsSqlIoOperationsFeature';
 import {getConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
@@ -92,6 +93,7 @@ export function SchemaTree(props: SchemaTreeProps) {
 
     // Compaction feature flag check
     const {compactionEnabled} = useCompactionFeature(database);
+    const {schemaSecretsEnabled} = useSchemaSecretsFeature(database);
     const {topicsSqlIoOperationsEnabled} = useTopicsSqlIoOperationsFeature(database);
 
     // Use table compaction hook to track all running compactions only while table actions are open
@@ -241,6 +243,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 showCreateTableData: getStringifiedData(showCreateTableData),
                 isShowCreateTableLoading: isShowCreateTableFetching,
                 isStreamingQueryTextLoading: isStreamingInfoFetching,
+                schemaSecretsEnabled,
                 topicsSqlIoOperationsEnabled,
             },
             databaseFullPath,
@@ -269,6 +272,7 @@ export function SchemaTree(props: SchemaTreeProps) {
         handleOpenCompactionDialog,
         hasRunningCompaction,
         isCompactionFetching,
+        schemaSecretsEnabled,
         topicsSqlIoOperationsEnabled,
     ]);
 

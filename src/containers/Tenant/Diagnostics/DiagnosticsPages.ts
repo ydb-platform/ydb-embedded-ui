@@ -231,6 +231,7 @@ const EXTERNAL_TABLE_PAGES = [overview, schema, describe, access];
 const VIEW_PAGES = [overview, schema, describe, access];
 
 const STREAMING_QUERY_PAGES = [overview, describe, access];
+const SECRET_PAGES = [overview, describe, access];
 
 // verbose mapping to guarantee correct tabs for new path types
 // TS will error when a new type is added but not mapped here
@@ -262,6 +263,7 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
     [EPathType.EPathTypeReplication]: ASYNC_REPLICATION_PAGES,
     [EPathType.EPathTypeTransfer]: TRANSFER_PAGES,
     [EPathType.EPathTypeResourcePool]: DIR_PAGES,
+    [EPathType.EPathTypeSecret]: SECRET_PAGES,
 };
 const pathSubTypeToPages: Record<EPathSubType, Page[] | undefined> = {
     [EPathSubType.EPathSubTypeStreamImpl]: CDC_STREAM_IMPL_PAGES,

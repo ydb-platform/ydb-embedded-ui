@@ -75,6 +75,19 @@ CREATE TABLE ${tableName} (
 PARTITION BY HASH(id)
 WITH (STORE = COLUMN)`;
 };
+
+export const createSecretTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}/my_secret\``
+        : '${1:my_secret}';
+    const valuePlaceholder = params?.relativePath ? '${1:secret_value}' : '${2:secret_value}';
+
+    return `CREATE SECRET ${path} WITH (
+    VALUE = '${valuePlaceholder}',
+    INHERIT_PERMISSIONS = TRUE
+);`;
+};
+
 export const createAsyncReplicationTemplate = () => {
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create-async-replication
 CREATE SECRET secret_name WITH (value="secret_value");
@@ -353,6 +366,25 @@ export const dropTransferTemplate = (params?: SchemaQueryParams) => {
         ? `\`${normalizeParameter(params.relativePath)}\``
         : '${1:<my_transfer>}';
     return `DROP TRANSFER ${path};`;
+};
+
+export const alterSecretTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_secret>}';
+    const valuePlaceholder = params?.relativePath ? '${1:secret_value}' : '${2:secret_value}';
+
+    return `ALTER SECRET ${path} WITH (
+    VALUE = '${valuePlaceholder}'
+);`;
+};
+
+export const dropSecretTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_secret>}';
+
+    return `DROP SECRET ${path};`;
 };
 
 export const alterAsyncReplicationTemplate = (params?: SchemaQueryParams) => {

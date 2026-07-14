@@ -31,6 +31,7 @@ import {
     addTableIndex,
     addVectorIndex,
     alterAsyncReplicationTemplate,
+    alterSecretTemplate,
     alterStreamingQuerySettingsTemplate,
     alterStreamingQueryText,
     alterTableTemplate,
@@ -48,6 +49,7 @@ import {
     disableTTLTemplate,
     dropAsyncReplicationTemplate,
     dropExternalTableTemplate,
+    dropSecretTemplate,
     dropStreamingQueryTemplate,
     dropTableIndex,
     dropTableTemplate,
@@ -89,6 +91,7 @@ interface ActionsAdditionalParams {
     showCreateTableData?: string;
     isStreamingQueryTextLoading?: boolean;
     isShowCreateTableLoading?: boolean;
+    schemaSecretsEnabled?: boolean;
     topicsSqlIoOperationsEnabled?: boolean;
 }
 
@@ -208,6 +211,8 @@ const bindActions = (
             stripEllipsis(i18n('actions.alterTransfer')),
         ),
         dropTransfer: inputQuery(dropTransferTemplate, stripEllipsis(i18n('actions.dropTransfer'))),
+        alterSecret: inputQuery(alterSecretTemplate, stripEllipsis(i18n('actions.alterSecret'))),
+        dropSecret: inputQuery(dropSecretTemplate, stripEllipsis(i18n('actions.dropSecret'))),
         alterTable: inputQuery(alterTableTemplate, stripEllipsis(i18n('actions.alterTable'))),
         dropTable: inputQuery(dropTableTemplate, stripEllipsis(i18n('actions.dropTable'))),
         manageAutoPartitioning: inputQuery(
@@ -525,6 +530,14 @@ export const getActions =
             ],
         ];
 
+        const SECRET_SET: ActionsSet = [
+            [copyItem],
+            [
+                {text: i18n('actions.alterSecret'), action: actions.alterSecret},
+                {text: i18n('actions.dropSecret'), action: actions.dropSecret},
+            ],
+        ];
+
         const INDEX_SET: ActionsSet = [
             [copyItem, {text: i18n('actions.dropIndex'), action: actions.dropIndex}],
         ];
@@ -563,6 +576,7 @@ export const getActions =
 
             directory: DIR_SET,
             resource_pool: JUST_COPY,
+            secret: additionalEffects.schemaSecretsEnabled ? SECRET_SET : JUST_COPY,
 
             table: ROW_TABLE_SET,
             column_table: COLUMN_TABLE_SET,
