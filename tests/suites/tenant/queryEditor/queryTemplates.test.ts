@@ -228,8 +228,6 @@ test.describe('Query Templates', () => {
     test('Secret context menu inserts alter secret template for selected secret', async ({
         page,
     }) => {
-        await reopenQueryEditorWithSchemaSecretsFeature(page, true);
-
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);
 
@@ -249,12 +247,12 @@ test.describe('Query Templates', () => {
     test('Secret context menu hides alter and drop actions when feature is disabled', async ({
         page,
     }) => {
+        const queryEditor = new QueryEditor(page);
+        const secretName = await queryEditor.createNewFakeSecret();
+
         await reopenQueryEditorWithSchemaSecretsFeature(page, false);
 
         const objectSummary = new ObjectSummary(page);
-        const queryEditor = new QueryEditor(page);
-
-        const secretName = await queryEditor.createNewFakeSecret();
         await objectSummary.clickRefreshButton();
 
         await objectSummary.clickActionsButton(secretName);
