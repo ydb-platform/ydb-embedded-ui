@@ -353,7 +353,7 @@ export class Diagnostics {
         this.refreshButton = page.locator('button[aria-label="Refresh"]');
         this.autoRefreshSelect = page.locator('.g-select');
         this.metricTabs = page.locator(METRIC_TABS_SELECTOR);
-        this.table = new Table(page.locator('.object-general'));
+        this.table = new Table(page.locator('.object-general, .kv-tenant-diagnostics'));
         this.tableRadioButton = page.locator(
             '.ydb-table-with-controls-layout__controls .g-segmented-radio-group',
         );
@@ -590,7 +590,11 @@ export class Diagnostics {
     }
 
     async isRowActive(rowIndex: number): Promise<boolean> {
-        const rowElement = this.dataTable.locator(`tr.data-table__row:nth-child(${rowIndex})`);
+        const rowElement = this.page
+            .locator(
+                '.kv-top-queries__row, .kv-running-queries__row, .ydb-query-history__row, tr.data-table__row',
+            )
+            .nth(rowIndex - 1);
         const rowElementClass = await rowElement.getAttribute('class');
         return rowElementClass?.includes('kv-top-queries__row_active') || false;
     }

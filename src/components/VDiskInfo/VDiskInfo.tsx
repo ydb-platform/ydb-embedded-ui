@@ -13,6 +13,7 @@ import {
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getDataSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
+import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
 import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
@@ -45,6 +46,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     wrap,
 }: VDiskInfoProps<T>) {
     const hasDeveloperUi = useHasDeveloperUi();
+    const isViewerUser = useIsViewerUser();
 
     const getVDiskPagePath = useVDiskPagePath();
 
@@ -174,7 +176,8 @@ export function VDiskInfo<T extends PreparedVDisk>({
         rightColumn.push({name: vDiskInfoKeyset('slot-id'), content: VDiskSlotId});
     }
     if (!isNil(PDiskId)) {
-        const pDiskPath = isNil(NodeId) ? undefined : getPDiskPagePath(PDiskId, NodeId);
+        const pDiskPath =
+            isViewerUser && !isNil(NodeId) ? getPDiskPagePath(PDiskId, NodeId) : undefined;
 
         const content = pDiskPath ? <InternalLink to={pDiskPath}>{PDiskId}</InternalLink> : PDiskId;
 

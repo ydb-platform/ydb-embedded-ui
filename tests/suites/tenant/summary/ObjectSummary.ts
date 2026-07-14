@@ -32,7 +32,7 @@ export class ObjectSummary {
     constructor(page: Page) {
         this.page = page;
         this.tree = page.locator('.ydb-object-summary__tree');
-        this.treeRows = page.locator('.ydb-tree-view');
+        this.treeRows = this.tree.locator('.ydb-tree-view__item');
         this.treeLoaders = page.locator('.ydb-navigation-tree-view-loader');
         this.tabs = page.locator('.ydb-object-summary__tabs');
         this.schemaViewer = page.locator('.schema-viewer');
