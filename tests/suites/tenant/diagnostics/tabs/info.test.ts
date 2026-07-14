@@ -189,6 +189,7 @@ test.describe('Diagnostics Info tab', async () => {
         await page.setViewportSize(METRIC_SUMMARY_SCREENSHOT_VIEWPORT);
         await setupMetricTabsTenantInfoMock(page);
         const diagnostics = await openInfoTab(page);
+        await expect(diagnostics.areInfoCardsVisible({includeNetwork: true})).resolves.toBe(true);
 
         const cpuSummary = diagnostics.getMetricPageSummary('cpu');
         await expect(cpuSummary).toBeVisible();
