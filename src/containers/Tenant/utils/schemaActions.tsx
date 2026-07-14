@@ -60,6 +60,7 @@ import {
     manageAutoPartitioningTemplate,
     manageReadReplicasTemplate,
     selectQueryTemplate,
+    selectTopicQueryTemplate,
     showCreateTableTemplate,
     upsertQueryTemplate,
 } from './schemaQueryTemplates';
@@ -91,6 +92,7 @@ interface ActionsAdditionalParams {
     isStreamingQueryTextLoading?: boolean;
     isShowCreateTableLoading?: boolean;
     schemaSecretsEnabled?: boolean;
+    topicsSqlIoOperationsEnabled?: boolean;
 }
 
 interface BindActionParams {
@@ -224,6 +226,10 @@ const bindActions = (
         enableTTL: inputQuery(enableTTLTemplate, stripEllipsis(i18n('actions.enableTTL'))),
         disableTTL: inputQuery(disableTTLTemplate, stripEllipsis(i18n('actions.disableTTL'))),
         selectQuery: inputQuery(selectQueryTemplate, stripEllipsis(i18n('actions.selectQuery'))),
+        selectTopicQuery: inputQuery(
+            selectTopicQueryTemplate,
+            stripEllipsis(i18n('actions.selectQuery')),
+        ),
         showCreateTable: inputQuery(
             showCreateTableTemplate,
             stripEllipsis(i18n('actions.showCreateTable')),
@@ -473,6 +479,9 @@ export const getActions =
         const TOPIC_SET: ActionsSet = [
             [copyItem],
             [
+                ...(additionalEffects.topicsSqlIoOperationsEnabled
+                    ? [{text: i18n('actions.selectQuery'), action: actions.selectTopicQuery}]
+                    : []),
                 {text: i18n('actions.alterTopic'), action: actions.alterTopic},
                 {text: i18n('actions.dropTopic'), action: actions.dropTopic},
             ],

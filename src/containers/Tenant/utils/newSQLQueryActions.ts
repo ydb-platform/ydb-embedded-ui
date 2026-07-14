@@ -42,6 +42,7 @@ import {
     grantPrivilegeTemplate,
     revokePrivilegeTemplate,
     selectQueryTemplate,
+    selectTopicQueryTemplate,
     showCreateTableTemplate,
     updateTableTemplate,
     upsertQueryTemplate,
@@ -99,6 +100,7 @@ export const bindActions = (
         dropSecret: inputQuery(dropSecretTemplate, i18n('action.drop-secret')),
         alterTable: inputQuery(alterTableTemplate, i18n('action.alter-table')),
         selectQuery: inputQuery(selectQueryTemplate, i18n('action.select-rows')),
+        selectTopicQuery: inputQuery(selectTopicQueryTemplate, i18n('action.select-topic')),
         upsertQuery: inputQuery(upsertQueryTemplate, i18n('action.upsert-to-table')),
         createExternalTable: inputQuery(
             createExternalTableTemplate,

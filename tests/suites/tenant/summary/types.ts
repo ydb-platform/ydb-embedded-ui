@@ -15,3 +15,7 @@ export enum SecretAction {
     Alter = 'Alter secret...',
     Drop = 'Drop secret...',
 }
+
+export enum TopicAction {
+    SelectQuery = 'Select query...',
+}

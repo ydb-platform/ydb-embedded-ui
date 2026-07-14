@@ -210,6 +210,27 @@ FROM ${path}
 ${filters}LIMIT \${5:10};`;
 };
 
+export const selectTopicQueryTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_topic>}';
+    const limit = params?.relativePath ? '${1:10}' : '${2:10}';
+
+    return `SELECT
+    Data,
+    __ydb_create_time as create_time,
+    __ydb_write_time as write_time,
+    __ydb_partition_id as partition_id,
+    __ydb_offset as offset,
+    __ydb_message_group_id as message_group_id,
+    __ydb_seq_no as seq_no
+FROM ${path}
+-- WHERE __ydb_partition_id = 42
+-- AND __ydb_write_time > CurrentUtcTimestamp() - Interval('PT60S')
+-- AND __ydb_offset > 100
+LIMIT ${limit};`;
+};
+
 export const showCreateTableTemplate = (params?: SchemaQueryParams) => {
     if (params?.showCreateTableData) {
         return params.showCreateTableData;

@@ -13,7 +13,9 @@ import {
 } from 'ydb-ui-components';
 
 import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
-import {useSchemaSecretsFeature, useTypedDispatch} from '../../../../utils/hooks';
+import {useTypedDispatch} from '../../../../utils/hooks';
+import {useSchemaSecretsFeature} from '../../../../utils/hooks/useSchemaSecretsFeature';
+import {useTopicsSqlIoOperationsFeature} from '../../../../utils/hooks/useTopicsSqlIoOperationsFeature';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {insertSnippetToEditor} from '../../../../utils/monaco/insertSnippet';
 import {bindActions} from '../../utils/newSQLQueryActions';
@@ -27,6 +29,7 @@ interface NewSQLProps {
 export function NewSQL({database}: NewSQLProps) {
     const dispatch = useTypedDispatch();
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
+    const {topicsSqlIoOperationsEnabled} = useTopicsSqlIoOperationsFeature(database);
     const {schemaSecretsEnabled} = useSchemaSecretsFeature(database);
 
     const [shouldReturnFocus, setShouldReturnFocus] = React.useState(true);
@@ -135,6 +138,14 @@ export function NewSQL({database}: NewSQLProps) {
                     text: i18n('action.create-topic'),
                     action: actions.createTopic,
                 },
+                ...(topicsSqlIoOperationsEnabled
+                    ? [
+                          {
+                              text: i18n('action.select-topic'),
+                              action: actions.selectTopicQuery,
+                          },
+                      ]
+                    : []),
                 {
                     text: i18n('action.alter-topic'),
                     action: actions.alterTopic,
