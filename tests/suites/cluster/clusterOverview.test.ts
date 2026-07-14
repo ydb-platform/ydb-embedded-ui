@@ -48,7 +48,7 @@ async function setupNodesListMock(page: Page) {
     });
 }
 
-async function mockClusterOverviewWithMixedUnits(page: Page) {
+async function mockClusterOverviewWithMixedUnits(page: Page, networkUtilization = 0.42) {
     await page.route('**/viewer/json/cluster**', async (route) => {
         await route.fulfill({
             json: {
@@ -67,7 +67,7 @@ async function mockClusterOverviewWithMixedUnits(page: Page) {
                 },
                 MemoryUsed: '1000000',
                 MemoryTotal: '36000000000000',
-                NetworkUtilization: 0.42,
+                NetworkUtilization: networkUtilization,
                 NetworkWriteThroughput: '512000000',
             },
         });
@@ -93,5 +93,25 @@ test.describe('Cluster Overview', () => {
         await expect(dashboard.getByText('1 GB of 2 TB')).toBeVisible();
         await expect(dashboard.getByText('1 MB of 36 TB')).toHaveCount(2);
         await expect(overview).toHaveScreenshot('cluster-overview-mixed-units.png');
+    });
+
+    test('collapsed metric card uses the displayed rounded percentage', async ({page}) => {
+        await setupMonitoringUserMock(page);
+        await setupClusterDashboardCapabilitiesMock(page);
+        await setupNodesListMock(page);
+        await mockClusterOverviewWithMixedUnits(page, 0.575);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto({}, {waitUntil: 'domcontentloaded'});
+
+        const overview = page.locator('.ydb-cluster-dashboard__overview-wrapper');
+        await expect(overview.getByText('58%', {exact: true})).toBeVisible({
+            timeout: VISIBILITY_TIMEOUT,
+        });
+        await overview.getByRole('button', {name: 'Overview'}).click();
+
+        await expect(overview.getByText('Network : 58%', {exact: true})).toBeVisible({
+            timeout: VISIBILITY_TIMEOUT,
+        });
     });
 });

@@ -1,4 +1,3 @@
-import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMetrics';
 import {normalizeMediaType} from '../../../../utils/disks/normalizeMediaType';
 import {formatStorageLegend} from '../../../../utils/metrics/formatMetricLegend';
 import {getDiagramValues} from '../../../../utils/metrics/getDiagramValues';
@@ -18,7 +17,7 @@ export function ClusterMetricsStorage({
     collapsed,
     ...rest
 }: ClusterMetricsStorageProps) {
-    const {status, percents, legend, fill} = getDiagramValues({
+    const {status, percents, legend, progressValue} = getDiagramValues({
         value,
         capacity,
         legendFormatter: formatStorageLegend,
@@ -34,7 +33,8 @@ export function ClusterMetricsStorage({
     return (
         <ClusterMetricsCardContent
             status={status}
-            fillWidth={fill}
+            fillWidth={Math.max(progressValue, 0.5)}
+            percents={percents}
             title={title}
             collapsed={collapsed}
             legend={{
@@ -44,8 +44,6 @@ export function ClusterMetricsStorage({
                     ? i18n('context_storage-by-type-description')
                     : i18n('context_storage-total-description'),
             }}
-        >
-            <DoughnutMetrics.Value>{percents}</DoughnutMetrics.Value>
-        </ClusterMetricsCardContent>
+        />
     );
 }

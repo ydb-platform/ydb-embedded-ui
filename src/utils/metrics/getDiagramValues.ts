@@ -21,18 +21,15 @@ export interface DiagramValuesFallback {
     status: DiagramValuesStatus;
 }
 
-interface DiagramValuesState {
-    fill: number;
-    progressValue: number;
-}
-
-export interface DiagramValues extends DiagramValuesState {
+export interface DiagramValues {
     percents: string;
+    progressValue: number;
     status: ProgressStatus;
 }
 
-export interface DiagramValuesWithFallback extends DiagramValuesState {
+export interface DiagramValuesWithFallback {
     percents?: string | undefined;
+    progressValue: number;
     status: DiagramValuesStatus;
 }
 
@@ -80,12 +77,8 @@ export function calculateBaseDiagramValues({
 }): DiagramValues | DiagramValuesWithFallback {
     const isPercentAvailable = Number.isFinite(fillWidth);
     const safeFillWidth = isPercentAvailable ? fillWidth : 0;
-    const normalizedFillWidth = Math.max(safeFillWidth, 0.5);
-    const clampedFillWidth = Math.min(Math.max(safeFillWidth, 0), 100);
-    const progressValue = roundToDecimalPlaces(
-        clampedFillWidth,
-        getMetricPercentPrecision(clampedFillWidth),
-    );
+    const percentPrecision = getMetricPercentPrecision(safeFillWidth);
+    const progressValue = roundToDecimalPlaces(Math.max(safeFillWidth, 0), percentPrecision);
     const status = calculateProgressStatus({
         fillWidth: safeFillWidth,
         warningThreshold,
@@ -93,12 +86,11 @@ export function calculateBaseDiagramValues({
         colorizeProgress,
     });
 
-    const percents = formatPercent(safeFillWidth / 100, getMetricPercentPrecision(safeFillWidth));
+    const percents = formatPercent(safeFillWidth / 100, percentPrecision);
 
     const values = {
         status,
         percents,
-        fill: normalizedFillWidth,
         progressValue,
     };
 
