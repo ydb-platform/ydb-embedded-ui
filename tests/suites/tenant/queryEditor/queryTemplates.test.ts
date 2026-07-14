@@ -40,11 +40,18 @@ async function reopenQueryEditorWithTopicsSqlIoOperationsFeature(page: Page, ena
     });
 
     const tenantPage = new TenantPage(page);
-    await tenantPage.gotoQueryEditor({
-        schema: database,
-        database,
-        mode: QueryEditorMode.MultiTab,
-    });
+    const [featureFlagsResponse] = await Promise.all([
+        page.waitForResponse(
+            (response) =>
+                response.url().startsWith(`${backend}/viewer/feature_flags`) && response.ok(),
+        ),
+        tenantPage.gotoQueryEditor({
+            schema: database,
+            database,
+            mode: QueryEditorMode.MultiTab,
+        }),
+    ]);
+    await featureFlagsResponse.finished();
 }
 
 test.describe('Query Templates', () => {
