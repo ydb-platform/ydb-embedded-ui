@@ -1,4 +1,4 @@
-import {formatPercent} from '../dataFormatters/dataFormatters';
+import {formatPercent, roundToDecimalPlaces} from '../dataFormatters/dataFormatters';
 import {getMetricPercentPrecision} from '../metrics';
 import {calculateProgressStatus} from '../progress';
 import type {ProgressStatus} from '../progress';
@@ -21,18 +21,15 @@ export interface DiagramValuesFallback {
     status: DiagramValuesStatus;
 }
 
-interface DiagramValuesState {
-    fill: number;
-    safeFillWidth: number;
-}
-
-export interface DiagramValues extends DiagramValuesState {
+export interface DiagramValues {
     percents: string;
+    progressValue: number;
     status: ProgressStatus;
 }
 
-export interface DiagramValuesWithFallback extends DiagramValuesState {
+export interface DiagramValuesWithFallback {
     percents?: string | undefined;
+    progressValue: number;
     status: DiagramValuesStatus;
 }
 
@@ -80,7 +77,8 @@ export function calculateBaseDiagramValues({
 }): DiagramValues | DiagramValuesWithFallback {
     const isPercentAvailable = Number.isFinite(fillWidth);
     const safeFillWidth = isPercentAvailable ? fillWidth : 0;
-    const normalizedFillWidth = Math.max(safeFillWidth, 0.5);
+    const percentPrecision = getMetricPercentPrecision(safeFillWidth);
+    const progressValue = roundToDecimalPlaces(Math.max(safeFillWidth, 0), percentPrecision);
     const status = calculateProgressStatus({
         fillWidth: safeFillWidth,
         warningThreshold,
@@ -88,13 +86,12 @@ export function calculateBaseDiagramValues({
         colorizeProgress,
     });
 
-    const percents = formatPercent(safeFillWidth / 100, getMetricPercentPrecision(safeFillWidth));
+    const percents = formatPercent(safeFillWidth / 100, percentPrecision);
 
     const values = {
         status,
         percents,
-        fill: normalizedFillWidth,
-        safeFillWidth,
+        progressValue,
     };
 
     if (!isPercentAvailable && fallback) {

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {Divider, Text} from '@gravity-ui/uikit';
+import identity from 'lodash/identity';
 
 import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
 import {cn} from '../../../../../utils/cn';
@@ -61,8 +62,8 @@ export function MetricPageSummary({
                 <SegmentedProgress
                     className={b('progress')}
                     dataQa="tenant-page-metric-summary-progress"
-                    value={progressValue}
-                    total={100}
+                    fillPercent={progressValue}
+                    normalizePercent={identity}
                     theme={progressTheme}
                     hideLabels
                     ariaLabel={description}

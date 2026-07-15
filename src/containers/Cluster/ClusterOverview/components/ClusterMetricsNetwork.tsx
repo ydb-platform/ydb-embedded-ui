@@ -1,4 +1,3 @@
-import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMetrics';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import {useSetting} from '../../../../utils/hooks/useSetting';
 import {formatNetworkMetric} from '../../../../utils/metrics/formatMetricLegend';
@@ -23,7 +22,7 @@ export function ClusterMetricsNetwork({
     if (!showNetworkUtilization) {
         return null;
     }
-    const {status, percents, fill} = calculateBaseDiagramValues({
+    const {status, percents, progressValue} = calculateBaseDiagramValues({
         fillWidth: percentsValue * 100,
         ...rest,
     });
@@ -33,7 +32,8 @@ export function ClusterMetricsNetwork({
     return (
         <ClusterMetricsCardContent
             status={status}
-            fillWidth={fill}
+            fillWidth={Math.max(progressValue, 0.5)}
+            percents={percents}
             title={i18n('title_network')}
             collapsed={collapsed}
             legend={{
@@ -41,8 +41,6 @@ export function ClusterMetricsNetwork({
                 secondary: i18n('context_network'),
                 note: i18n('context_network-description'),
             }}
-        >
-            <DoughnutMetrics.Value>{percents}</DoughnutMetrics.Value>
-        </ClusterMetricsCardContent>
+        />
     );
 }

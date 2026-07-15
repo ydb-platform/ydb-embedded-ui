@@ -123,6 +123,18 @@ describe('getTenantOverviewMetrics', () => {
         });
     });
 
+    test('rounds network percent text and progress value consistently', () => {
+        const metrics = getTenantOverviewMetrics({
+            isServerless: false,
+            networkUtilization: 0.575,
+        });
+
+        expect(metrics.network).toMatchObject({
+            percentText: '58%',
+            progressValue: 58,
+        });
+    });
+
     test('keeps zero percent as available metric data', () => {
         const metrics = getTenantOverviewMetrics({
             isServerless: false,

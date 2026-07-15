@@ -1,4 +1,3 @@
-import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMetrics';
 import {formatStorageLegend} from '../../../../utils/metrics/formatMetricLegend';
 import {getDiagramValues} from '../../../../utils/metrics/getDiagramValues';
 import i18n from '../../i18n';
@@ -14,7 +13,7 @@ export function ClusterMetricsMemory({
     collapsed,
     ...rest
 }: ClusterMetricsMemoryProps) {
-    const {status, percents, legend, fill} = getDiagramValues({
+    const {status, percents, legend, progressValue} = getDiagramValues({
         value,
         capacity,
         legendFormatter: formatStorageLegend,
@@ -24,7 +23,8 @@ export function ClusterMetricsMemory({
     return (
         <ClusterMetricsCardContent
             status={status}
-            fillWidth={fill}
+            fillWidth={Math.max(progressValue, 0.5)}
+            percents={percents}
             title={i18n('title_memory')}
             collapsed={collapsed}
             legend={{
@@ -32,8 +32,6 @@ export function ClusterMetricsMemory({
                 secondary: i18n('context_memory'),
                 note: i18n('context_memory-description'),
             }}
-        >
-            <DoughnutMetrics.Value>{percents}</DoughnutMetrics.Value>
-        </ClusterMetricsCardContent>
+        />
     );
 }

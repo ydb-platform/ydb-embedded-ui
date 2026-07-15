@@ -1,4 +1,3 @@
-import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMetrics';
 import {formatCoresLegend} from '../../../../utils/metrics/formatMetricLegend';
 import {getDiagramValues} from '../../../../utils/metrics/getDiagramValues';
 import i18n from '../../i18n';
@@ -14,7 +13,7 @@ export function ClusterMetricsCores({
     capacity,
     ...rest
 }: ClusterMetricsCoresProps) {
-    const {status, percents, legend, fill} = getDiagramValues({
+    const {status, percents, legend, progressValue} = getDiagramValues({
         value,
         capacity,
         legendFormatter: formatCoresLegend,
@@ -25,15 +24,14 @@ export function ClusterMetricsCores({
         <ClusterMetricsCardContent
             collapsed={collapsed}
             status={status}
-            fillWidth={fill}
+            fillWidth={Math.max(progressValue, 0.5)}
+            percents={percents}
             title={i18n('title_cpu')}
             legend={{
                 main: legend,
                 secondary: i18n('context_cpu'),
                 note: i18n('context_cpu-description'),
             }}
-        >
-            <DoughnutMetrics.Value>{percents}</DoughnutMetrics.Value>
-        </ClusterMetricsCardContent>
+        />
     );
 }

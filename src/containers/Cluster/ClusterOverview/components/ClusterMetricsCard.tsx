@@ -15,9 +15,10 @@ const ProgressStatusToEFlag: Record<ProgressStatus, EFlag> = {
     danger: EFlag.Red,
 };
 
-interface ClusterMetricsDougnutCardProps extends ClusterMetricsCommonCardProps {
+interface ClusterMetricsDougnutCardProps extends Omit<ClusterMetricsCommonCardProps, 'children'> {
     status: ProgressStatus;
     fillWidth: number;
+    percents: string;
     legend: {main?: string; secondary?: string; note?: React.ReactNode};
 }
 
@@ -42,7 +43,7 @@ export function ClusterMetricsCard({
 
 export function ClusterMetricsCardContent({
     title,
-    children,
+    percents,
     legend,
     collapsed,
     ...rest
@@ -50,18 +51,19 @@ export function ClusterMetricsCardContent({
     const {main: mainLegend, secondary: secondaryLegend, note: legendNote} = legend;
 
     if (collapsed) {
-        const {status, fillWidth} = rest;
-        const normalizedFillWidth = fillWidth.toFixed(fillWidth > 0 ? 0 : 1);
+        const {status} = rest;
 
         return (
             <EntityStatus.Label withStatusName={false} status={ProgressStatusToEFlag[status]}>
-                {`${title} : ${normalizedFillWidth}%`}
+                {`${title} : ${percents}`}
             </EntityStatus.Label>
         );
     }
     return (
         <ClusterMetricsCard>
-            <DoughnutMetrics {...rest}>{children}</DoughnutMetrics>
+            <DoughnutMetrics {...rest}>
+                <DoughnutMetrics.Value>{percents}</DoughnutMetrics.Value>
+            </DoughnutMetrics>
             <div className={b('legend-wrapper')}>
                 {mainLegend && <DoughnutMetrics.Legend>{mainLegend}</DoughnutMetrics.Legend>}
                 {secondaryLegend && (
