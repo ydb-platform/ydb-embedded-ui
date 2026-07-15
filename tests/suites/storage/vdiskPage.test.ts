@@ -108,6 +108,24 @@ test.describe('VDisk page storage details', () => {
         await page.setViewportSize({width: 560, height: 1000});
         await expect(storageDetails).toHaveScreenshot('vdisk-storage-details-narrow.png');
     });
+
+    test('hides PDisk navigation for database-scoped users', async ({page}) => {
+        await enableNewStorageView(page);
+        await setupVDiskPageMocks(page, {isViewerAllowed: false});
+        await page.goto(VDISK_PAGE_PATH);
+
+        const storageDetails = page.locator('.ydb-vdisk-storage-details');
+        const vDiskInfo = page.locator('.ydb-vdisk-page__info');
+
+        await expect(vDiskInfo.getByText(PDISK_ID, {exact: true})).toBeVisible();
+        await expect(vDiskInfo.getByRole('link', {name: PDISK_ID})).toHaveCount(0);
+        await expect(storageDetails).toBeVisible();
+        await expect(storageDetails.getByRole('link', {name: 'Go to PDisk'})).toHaveCount(0);
+        await expect(storageDetails.getByText(PDISK_ID, {exact: true})).toBeVisible();
+        await expect(
+            storageDetails.locator('.ydb-vdisk-storage-details__value-row button'),
+        ).toHaveCount(3);
+    });
 });
 
 test.describe('VDisk page storage tab', () => {

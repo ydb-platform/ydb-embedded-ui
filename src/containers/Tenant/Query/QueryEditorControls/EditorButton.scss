@@ -1,13 +1,25 @@
 @use '../../../../styles/mixins.scss';
 
 .ydb-query-editor-button {
-    &__explain-button,
-    &__stop-button,
-    &__run-button {
+    &__explain-button {
         width: 92px;
     }
 
+    &__run-button,
     &__stop-button {
+        width: 76px;
+    }
+
+    &__stop-button {
+        .g-root_theme_dark &,
+        .g-root_theme_dark-hc & {
+            --g-button-text-color: var(--g-color-text-dark-primary);
+            --g-button-text-color-hover: var(--g-color-text-dark-primary);
+            --g-button-background-color: var(--g-color-base-light);
+            --g-button-background-color-hover: var(--g-color-base-light-hover);
+            --g-button-focus-outline-color: var(--g-color-line-light);
+        }
+
         &_error {
             @include mixins.query-buttons-animations();
         }

@@ -10,6 +10,11 @@ import {configureZod} from './utils/zod/configureZod';
 import './styles/index.scss';
 
 configureZod();
+configureUIFactory({
+    hideNewFeaturesNotifications: {
+        navigationV2: true,
+    },
+});
 
 const E2E_UI_OVERRIDES_ENABLED = process.env.REACT_APP_E2E_UI_OVERRIDES === 'true';
 

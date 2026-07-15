@@ -22,6 +22,7 @@ export interface SetupVDiskPageMocksOptions {
     rack?: string;
     host?: string;
     pDiskId?: string;
+    isViewerAllowed?: boolean;
     withDonors?: boolean;
     allocatedSize?: string;
     availableSize?: string;
@@ -149,7 +150,7 @@ function createStorageGroupsResponse({
     };
 }
 
-async function setupMonitoringUserMock(page: Page) {
+async function setupMonitoringUserMock(page: Page, isViewerAllowed = true) {
     await page.route('**/viewer/json/whoami*', async (route) => {
         await route.fulfill({
             status: 200,
@@ -157,7 +158,7 @@ async function setupMonitoringUserMock(page: Page) {
             body: JSON.stringify({
                 UserID: 'e2e-storage-popup-user',
                 IsMonitoringAllowed: true,
-                IsViewerAllowed: true,
+                IsViewerAllowed: isViewerAllowed,
             }),
         });
     });
@@ -295,7 +296,7 @@ export async function setupPDiskInfoMock(page: Page) {
 }
 
 export async function setupVDiskPageMocks(page: Page, options: SetupVDiskPageMocksOptions = {}) {
-    await setupMonitoringUserMock(page);
+    await setupMonitoringUserMock(page, options.isViewerAllowed);
     await setupCapabilitiesMock(page);
     await setupNodeInfoMock(page, options);
     await setupStorageGroupsMock(page, options);

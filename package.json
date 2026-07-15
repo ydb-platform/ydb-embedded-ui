@@ -1,6 +1,6 @@
 {
   "name": "ydb-embedded-ui",
-  "version": "18.0.0",
+  "version": "18.1.0",
   "files": [
     "dist"
   ],
@@ -64,7 +64,7 @@
     "use-query-params": "^2.2.1",
     "uuid": "^10.0.0",
     "web-vitals": "^1.1.2",
-    "ydb-ui-components": "^6.0.0",
+    "ydb-ui-components": "^6.1.0",
     "zod": "^4.4.3"
   },
   "scripts": {

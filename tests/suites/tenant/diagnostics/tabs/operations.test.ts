@@ -21,7 +21,7 @@ test.describe('Operations Tab - Infinite Query', () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
         };
 
         const tenantPageInstance = new TenantPage(page);
@@ -64,7 +64,7 @@ test.describe('Operations Tab - Infinite Query', () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
         };
 
         const tenantPageInstance = new TenantPage(page);
@@ -113,7 +113,7 @@ test.describe('Operations Tab - Infinite Query', () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
         };
 
         const tenantPageInstance = new TenantPage(page);
@@ -142,7 +142,7 @@ test.describe('Operations Tab - Infinite Query', () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
         };
 
         const tenantPageInstance = new TenantPage(page);
@@ -169,7 +169,7 @@ test.describe('Operations Tab - Infinite Query', () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
         };
 
         const tenantPageInstance = new TenantPage(page);
@@ -196,7 +196,7 @@ test.describe('Operations Tab - Infinite Query', () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
         };
 
         const tenantPageInstance = new TenantPage(page);
@@ -232,7 +232,7 @@ test.describe('Operations Tab - Infinite Query', () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
         };
 
         const tenantPageInstance = new TenantPage(page);
@@ -287,7 +287,7 @@ test.describe('Operations Tab - Infinite Query', () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
         };
 
         const tenantPageInstance = new TenantPage(page);

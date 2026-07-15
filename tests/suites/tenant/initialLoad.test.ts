@@ -7,7 +7,7 @@ import {TenantPage} from './TenantPage';
 const pageQueryParams = {
     schema: database,
     database,
-    tenantPage: 'diagnostics',
+    databasePage: 'diagnostics',
 };
 
 test.describe('Tenant initial load', () => {

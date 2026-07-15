@@ -21,10 +21,10 @@ test.describe('Object Summary', async () => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         };
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
+        await tenantPage.goto(pageQueryParams, {waitUntil: 'domcontentloaded'});
     });
 
     test('Open Preview icon appears on hover for "dv_slots" tree item', async ({page}) => {
@@ -193,10 +193,6 @@ test.describe('Object Summary', async () => {
     });
 
     test('Monitoring action opens monitoring tab with new navigation', async ({page}) => {
-        await page.addInitScript(() => {
-            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
-            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
-        });
         await page.route(`${backend}/viewer/json/whoami*`, async (route) => {
             await route.fulfill({
                 status: 200,
@@ -247,10 +243,10 @@ test.describe('Object Summary', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         };
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
+        await tenantPage.goto(pageQueryParams, {waitUntil: 'domcontentloaded'});
 
         const objectSummary = new ObjectSummary(page);
         await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
@@ -273,7 +269,7 @@ test.describe('Object Summary', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);

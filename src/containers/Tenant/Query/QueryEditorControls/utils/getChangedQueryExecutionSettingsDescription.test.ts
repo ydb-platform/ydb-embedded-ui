@@ -29,7 +29,7 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
     test('should return the description for changed settings', () => {
         const currentSettings: QuerySettings = {
             ...DEFAULT_QUERY_SETTINGS,
-            queryMode: QUERY_MODES.pg,
+            queryMode: QUERY_MODES.scan,
             timeout: 63,
             limitRows: 100,
         };
@@ -42,7 +42,7 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
         expect(result).toEqual({
             [QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title]:
                 QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options.find(
-                    (option) => option.value === QUERY_MODES.pg,
+                    (option) => option.value === QUERY_MODES.scan,
                 )?.content,
             [QUERY_SETTINGS_FIELD_SETTINGS.timeout.title]: '63',
             [QUERY_SETTINGS_FIELD_SETTINGS.limitRows.title]: '100',

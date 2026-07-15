@@ -6,6 +6,7 @@ export enum TemplateCategory {
     Tables = 'Tables',
     Topics = 'Topics',
     AsyncReplication = 'Async replication',
+    Secrets = 'Secrets',
     CDC = 'Change data capture',
     Users = 'Users',
 }
@@ -19,6 +20,16 @@ export enum AsyncReplicationTemplates {
 export enum TablesTemplates {
     UpdateTable = 'Update table',
     CreateRowTable = 'Create row table',
+}
+
+export enum SecretTemplates {
+    Create = 'Create secret',
+    Alter = 'Alter secret',
+    Drop = 'Drop secret',
+}
+
+export enum TopicTemplates {
+    Select = 'Select from a topic',
 }
 
 export class NewSqlDropdownMenu {
@@ -45,10 +56,24 @@ export class NewSqlDropdownMenu {
         await categoryItem.hover();
     }
 
-    async selectTemplate(template: AsyncReplicationTemplates | TablesTemplates) {
+    async selectTemplate(
+        template: AsyncReplicationTemplates | TablesTemplates | SecretTemplates | TopicTemplates,
+    ) {
         const templateItem = this.subMenu.getByRole('menuitem').filter({hasText: template});
         await templateItem.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await templateItem.click();
+    }
+
+    async isCategoryVisible(category: TemplateCategory) {
+        const categoryItem = this.menu.getByRole('menuitem').filter({hasText: category});
+        return categoryItem.isVisible();
+    }
+
+    async isTemplateVisible(
+        template: AsyncReplicationTemplates | TablesTemplates | SecretTemplates | TopicTemplates,
+    ) {
+        const templateItem = this.subMenu.getByRole('menuitem').filter({hasText: template});
+        return templateItem.isVisible();
     }
 
     async isMenuVisible() {

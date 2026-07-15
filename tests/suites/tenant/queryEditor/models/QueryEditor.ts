@@ -133,6 +133,25 @@ export class QueryEditor {
         return tableName;
     }
 
+    async createNewFakeSecret() {
+        const secretName = `a_test_secret_${Date.now()}`;
+        await this.run(
+            `CREATE SECRET \`${secretName}\` WITH (VALUE = 'test_secret_value');`,
+            'query',
+        );
+        await this.waitForStatus('Completed');
+
+        return secretName;
+    }
+
+    async createNewFakeTopic() {
+        const topicName = `a_test_topic_${Date.now()}`;
+        await this.run(`CREATE TOPIC \`${topicName}\`;`, 'query');
+        await this.waitForStatus('Completed');
+
+        return topicName;
+    }
+
     async gearButtonText() {
         await this.gearButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return this.gearButton.innerText();
@@ -377,6 +396,13 @@ export class QueryEditor {
     async isStopButtonVisible() {
         await this.stopButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;
+    }
+
+    async isStopButtonActionView() {
+        await this.stopButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.stopButton.evaluate((button) =>
+            button.classList.contains('g-button_view_action'),
+        );
     }
 
     async isStopButtonHidden() {
