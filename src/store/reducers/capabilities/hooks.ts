@@ -243,7 +243,7 @@ export const useBlobStorageCapacityMetricsAvailable = () => {
 
 export const useBlobStorageCapacityMetricsEnabled = () => {
     const available = useBlobStorageCapacityMetricsAvailable();
-    const [enabled] = useSetting(SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS, true);
+    const [enabled] = useSetting(SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS, false);
 
     return enabled && available;
 };

@@ -1,5 +1,14 @@
 import React from 'react';
 
+import type {SortParams} from './types';
+
+export function isSortColumnAvailable(
+    sortParams: SortParams | undefined,
+    columns: Array<{name: string}>,
+) {
+    return !sortParams?.columnId || columns.some((column) => column.name === sortParams.columnId);
+}
+
 // invoke passed function at most once per animation frame
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function rafThrottle<Fn extends (...args: any[]) => any>(fn: Fn) {

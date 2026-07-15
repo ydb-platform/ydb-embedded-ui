@@ -32,6 +32,7 @@ const STORAGE_NODES_GROUP_BY_PARAMS = [
 export const CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS: NodesColumnId[] = [
     'MaxPDiskUsage',
     'MaxVDiskSlotUsage',
+    'MaxVDiskRawUsage',
     'CapacityAlert',
 ];
 
@@ -43,6 +44,16 @@ export const STORAGE_NODES_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_NODES_GROU
         };
     },
 );
+
+export function getStorageNodesGroupByOptions(blobMetricsEnabled: boolean): SelectOption[] {
+    const skippedValues: NodesGroupByField[] = blobMetricsEnabled
+        ? ['DiskSpaceUsage']
+        : ['CapacityAlert'];
+
+    return STORAGE_NODES_GROUP_BY_OPTIONS.filter(
+        (option) => !skippedValues.includes(option.value as NodesGroupByField),
+    );
+}
 
 export const storageNodesGroupByParamSchema = z
     .custom<
