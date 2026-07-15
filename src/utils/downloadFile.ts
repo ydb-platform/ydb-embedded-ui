@@ -7,7 +7,7 @@ export function downloadFile(url: string, filename: string) {
     document.body.removeChild(link);
 }
 
-export const createAndDownloadFile = (data: string, fileName: string, type?: string) => {
+export const createAndDownloadFile = (data: BlobPart, fileName: string, type?: string) => {
     const blob = new Blob([data], {
         type,
     });
