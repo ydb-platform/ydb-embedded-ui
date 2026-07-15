@@ -1,5 +1,21 @@
 # Changelog
 
+## [18.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.1.0...v18.2.0) (2026-07-15)
+
+
+### Features
+
+* add select to a topic context menu ([#4047](https://github.com/ydb-platform/ydb-embedded-ui/issues/4047)) ([b8126df](https://github.com/ydb-platform/ydb-embedded-ui/commit/b8126df37026b0c1ea9e944e8b9ca38f5bab0506))
+* support secret schema objects ([#4109](https://github.com/ydb-platform/ydb-embedded-ui/issues/4109)) ([05b178f](https://github.com/ydb-platform/ydb-embedded-ui/commit/05b178fd629af983b03b0c94719ae9c22e8cb1c6))
+
+
+### Bug Fixes
+
+* metric progress precision ([#4104](https://github.com/ydb-platform/ydb-embedded-ui/issues/4104)) ([a29c584](https://github.com/ydb-platform/ydb-embedded-ui/commit/a29c584cdbb057aa5b8e175a62fac8d4e18bd0ca))
+* **query-editor:** redesign stop button ([#4115](https://github.com/ydb-platform/ydb-embedded-ui/issues/4115)) ([81a3cde](https://github.com/ydb-platform/ydb-embedded-ui/commit/81a3cde0ca705eb6fc0a2aa0c88c4d3bf9cd78f6))
+* **storage:** finish BS capacity metrics MVP for Storage/Nodes ([#4107](https://github.com/ydb-platform/ydb-embedded-ui/issues/4107)) ([ac0dcb8](https://github.com/ydb-platform/ydb-embedded-ui/commit/ac0dcb882e1e54a43dc5f7abccc7df67d87e2a06))
+* **tests:** replace removed pg_class fixture ([#4116](https://github.com/ydb-platform/ydb-embedded-ui/issues/4116)) ([6fbc75f](https://github.com/ydb-platform/ydb-embedded-ui/commit/6fbc75fc5eed2c8cf21e729bf3ad0608c8d36347))
+
 ## [18.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.0.1...v18.1.0) (2026-07-10)
 
 
