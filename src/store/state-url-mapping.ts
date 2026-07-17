@@ -1,18 +1,15 @@
 import type {Action, Reducer, UnknownAction} from '@reduxjs/toolkit';
 import type {History, Location} from 'history';
-import each from 'lodash/each';
-import keys from 'lodash/keys';
 import merge from 'lodash/merge';
-import qs from 'qs';
 import type {LocationWithQuery, ParamSetup} from 'redux-location-state';
 import {createReduxLocationActions} from 'redux-location-state';
 import {LOCATION_POP, LOCATION_PUSH} from 'redux-location-state/lib/constants';
-import {getMatchingDeclaredPath} from 'redux-location-state/lib/helpers';
 import {parseQuery} from 'redux-location-state/lib/parseQuery';
 import {stateToParams} from 'redux-location-state/lib/stateToParams';
 
 import {initialState as initialHeatmapState} from './reducers/heatmap';
 import {initialState as initialTenantState} from './reducers/tenant/tenant';
+import {restoreUnknownParams} from './restoreUnknownParams';
 
 const databasePageParams = {
     sort: {
@@ -78,29 +75,6 @@ function mergeLocationToState<S>(state: S, location: Pick<LocationWithQuery, 'qu
     return merge({}, state, location.query);
 }
 
-function restoreUnknownParams(location: Location, prevLocation: Location) {
-    const {search, ...rest} = location;
-    const params = qs.parse(prevLocation.search.slice(1));
-
-    // figure out which path key inside paramSetup matches location.pathname
-    const declaredPath = getMatchingDeclaredPath(paramSetup, location);
-    const entries = declaredPath && paramSetup[declaredPath as keyof typeof paramSetup];
-
-    // remove params which are mapped for this page
-    each(keys(entries), (param) => {
-        delete params[param];
-    });
-    // and globally
-    each(keys(paramSetup.global || {}), (param) => {
-        delete params[param];
-    });
-
-    const restoredParams = qs.stringify(params, {encoder: encodeURIComponent});
-    const searchDelimiter = search.startsWith('?') ? '&' : '?';
-
-    return {search: `${search}${searchDelimiter}${restoredParams}`, ...rest};
-}
-
 let prevSearchStringFromState = '';
 
 // Keep intact params that are not present in paramSetup
@@ -120,7 +94,7 @@ function overwriteLocationHandling<S>(
         prevSearchStringFromState = location.search;
 
         if (searchRe.test(prevLocation.search)) {
-            location = restoreUnknownParams(location, prevLocation);
+            location = restoreUnknownParams(location, prevLocation, setupObject);
         }
 
         return {...nextLocation, location};
