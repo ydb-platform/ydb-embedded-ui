@@ -108,6 +108,7 @@ export function prepareSchemaObjectInfoItems({
             {
                 name: dbInfoKeyset('title_version'),
                 content: isPresent(pathVersion) ? pathVersion : EMPTY_DATA_PLACEHOLDER,
+                copyText: isPresent(pathVersion) ? pathVersion : undefined,
             },
         );
     }
