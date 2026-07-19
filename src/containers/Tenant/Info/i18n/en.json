@@ -1,8 +1,4 @@
 {
-  "created": "Created",
-
-  "external-objects.source-type": "Source Type",
-  "external-objects.data-source": "Data Source",
   "external-objects.location": "Location",
   "external-objects.auth-method": "Auth Method",
   "external-objects.auth-method.none": "None",
@@ -11,10 +7,7 @@
   "external-objects.auth-method.token": "Token",
   "external-objects.auth-method.basic": "Basic",
   "external-objects.auth-method.mdb-basic": "MDB Basic",
-
   "view.query-text": "Query Text",
-
-  "field_system-view-type": "System view type",
-
+  "view.query-text-title": "Query text",
   "no-entity-data": "No {{entityName}} data"
 }

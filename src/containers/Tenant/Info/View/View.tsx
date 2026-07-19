@@ -1,22 +1,9 @@
-import {YDBSyntaxHighlighter} from '../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
-import type {YDBDefinitionListItem} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
-import {YDBDefinitionList} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {CodeBlock} from '../../../../components/CodeBlock/CodeBlock';
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {getEntityName} from '../../utils';
 import i18n from '../i18n';
 import {renderNoEntityDataError} from '../utils';
-
-const prepareViewItems = (data: TEvDescribeSchemeResult): YDBDefinitionListItem[] => {
-    const queryText = data.PathDescription?.ViewDescription?.QueryText;
-
-    return [
-        {
-            name: i18n('view.query-text'),
-            copyText: queryText,
-            content: queryText ? <YDBSyntaxHighlighter language="yql" text={queryText} /> : null,
-        },
-    ];
-};
 
 interface ViewInfoProps {
     data?: TEvDescribeSchemeResult;
@@ -29,7 +16,16 @@ export function ViewInfo({data}: ViewInfoProps) {
         return renderNoEntityDataError(entityName);
     }
 
-    const items = prepareViewItems(data);
+    const queryText = data.PathDescription?.ViewDescription?.QueryText;
 
-    return <YDBDefinitionList title={entityName} items={items} />;
+    return (
+        <CodeBlock
+            title={i18n('view.query-text-title')}
+            language="yql"
+            text={queryText || EMPTY_DATA_PLACEHOLDER}
+            withClipboardButton={
+                queryText ? {alwaysVisible: true, withLabel: false, size: 'm'} : undefined
+            }
+        />
+    );
 }
