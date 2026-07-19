@@ -13,7 +13,7 @@ import {setupMonitoringGenericErrorMock} from '../../errorDisplay/errorDisplayMo
 import {TenantPage} from '../TenantPage';
 import {QueryEditor} from '../queryEditor/models/QueryEditor';
 
-import {ObjectSummary, ObjectSummaryTab} from './ObjectSummary';
+import {ObjectSummary} from './ObjectSummary';
 import {RowTableAction} from './types';
 
 test.describe('Object Summary', async () => {
@@ -25,6 +25,25 @@ test.describe('Object Summary', async () => {
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams, {waitUntil: 'domcontentloaded'});
+    });
+
+    test('Navigation v2 renders only the tree in Object Summary', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        const summaryActions = page.locator('.ydb-object-summary__actions');
+        const infoControls = page.locator('.ydb-object-summary__info-controls');
+
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+        await expect(page.locator('.ydb-object-summary__info')).toHaveCount(0);
+        await expect(page.locator('.ydb-object-summary__overview-wrapper')).toHaveCount(0);
+        await expect(infoControls.locator('.kv-pane-visibility-button_type_collapse')).toHaveCount(
+            0,
+        );
+        await expect(infoControls.locator('.kv-pane-visibility-button_type_expand')).toHaveCount(0);
+        await expect(summaryActions).toBeVisible();
+        await expect(summaryActions.locator('.ydb-object-summary__refresh-button')).toBeVisible();
+        await expect(
+            summaryActions.locator('.kv-pane-visibility-button_type_collapse'),
+        ).toBeVisible();
     });
 
     test('Open Preview icon appears on hover for "dv_slots" tree item', async ({page}) => {
@@ -58,17 +77,17 @@ test.describe('Object Summary', async () => {
         await expect(queryEditor.resultTable.isPreviewVisible()).resolves.toBe(true);
     });
 
-    test('Primary keys header is visible in Schema tab', async ({page}) => {
+    test('Legacy navigation renders only the tree for schema objects', async ({page}) => {
+        await page.evaluate(() => {
+            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(false));
+        });
+        await page.reload({waitUntil: 'domcontentloaded'});
+
         const objectSummary = new ObjectSummary(page);
 
-        await objectSummary.clickTab(ObjectSummaryTab.Schema);
-        await expect(objectSummary.isSchemaViewerVisible()).resolves.toBe(true);
-
-        await expect(objectSummary.getPrimaryKeys()).resolves.toEqual([
-            'NodeId',
-            'PDiskId',
-            'VSlotId',
-        ]);
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+        await expect(page.locator('.ydb-object-summary__info')).toHaveCount(0);
+        await expect(page.locator('.ydb-object-summary__overview-wrapper')).toHaveCount(0);
     });
 
     test('Actions dropdown menu opens and contains expected items', async ({page}) => {
@@ -295,9 +314,24 @@ test.describe('Object Summary', async () => {
         await expect(treeItemAfterRefresh).toBeVisible();
     });
 
-    test('Info panel collapse and expand functionality', async ({page}) => {
+    test('Info panel collapse and expand functionality in legacy navigation', async ({page}) => {
+        await page.evaluate(() => {
+            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(false));
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(
+            {
+                schema: database,
+                database,
+                databasePage: 'query',
+            },
+            {waitUntil: 'domcontentloaded'},
+        );
+
         const objectSummary = new ObjectSummary(page);
         await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+        await expect(page.locator('.ydb-object-summary__info')).toBeVisible();
 
         // Test info panel collapse/expand
         await objectSummary.collapseInfoPanel();
