@@ -1,6 +1,13 @@
 {
   "title_index-settings": "Index Settings",
 
+  "description_subtype_global": "A synchronous index is updated simultaneously with the indexed table and provides strict consistency.",
+  "description_subtype_global-async": "An asynchronous index receives table changes in the background and provides eventual consistency.",
+  "description_subtype_global-unique": "A unique secondary index enforces uniqueness for the indexed columns and is updated synchronously.",
+  "description_subtype_fulltext": "A full-text index enables text search by words, phrases, and, with n-grams, substrings.",
+  "description_subtype_fulltext-plain": "A plain full-text index stores only the inverted index and supports filtering without relevance ranking.",
+  "description_subtype_fulltext-relevance": "A relevance full-text index stores term frequency statistics required for relevance ranking.",
+  "description_subtype_vector": "A vector index enables vector search using distance or similarity functions.",
   "field_clusters": "Clusters",
   "field_overlap_clusters": "Overlap Clusters",
   "field_levels": "Levels",

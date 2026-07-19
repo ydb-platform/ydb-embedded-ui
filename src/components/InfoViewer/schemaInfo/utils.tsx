@@ -1,4 +1,6 @@
+import objectSummaryKeyset from '../../../containers/Tenant/ObjectSummary/i18n';
 import type {TIndexDescription} from '../../../types/api/schema';
+import {EIndexType} from '../../../types/api/schema';
 import type {
     TFulltextIndexAnalyzers,
     TFulltextIndexSettings,
@@ -6,32 +8,43 @@ import type {
     TVectorIndexSettings,
 } from '../../../types/api/schema/tableIndex';
 import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
+import {SchemaObjectTypeLabel} from '../../SchemaObjectTypeLabel/SchemaObjectTypeLabel';
+import type {YDBDefinitionListItem} from '../../YDBDefinitionList/YDBDefinitionList';
 import type {InfoViewerItem} from '../InfoViewer';
 import {formatTableIndexItem} from '../formatters';
 import {createInfoFormatter} from '../utils';
 
 import i18n from './i18n';
 
-const DISPLAYED_FIELDS_KEYS = [
-    'Type',
+const INDEX_DETAILS_FIELDS_KEYS = [
     'State',
     'DataSize',
     'KeyColumnNames',
     'DataColumnNames',
 ] as const;
-type DisplayedIndexField = (typeof DISPLAYED_FIELDS_KEYS)[number];
+type IndexDetailsField = (typeof INDEX_DETAILS_FIELDS_KEYS)[number];
 
-export function getDisplayedIndexFields(): ReadonlySet<DisplayedIndexField> {
-    return new Set<DisplayedIndexField>(DISPLAYED_FIELDS_KEYS);
-}
+const INDEX_TYPE_DESCRIPTIONS: Record<EIndexType, string | undefined> = {
+    [EIndexType.EIndexTypeInvalid]: undefined,
+    [EIndexType.EIndexTypeGlobal]: i18n('description_subtype_global'),
+    [EIndexType.EIndexTypeGlobalAsync]: i18n('description_subtype_global-async'),
+    [EIndexType.EIndexTypeGlobalUnique]: i18n('description_subtype_global-unique'),
+    [EIndexType.EIndexTypeGlobalVectorKmeansTree]: i18n('description_subtype_vector'),
+    [EIndexType.EIndexTypeGlobalFulltext]: i18n('description_subtype_fulltext'),
+    [EIndexType.EIndexTypeGlobalFulltextPlain]: i18n('description_subtype_fulltext-plain'),
+    [EIndexType.EIndexTypeGlobalFulltextRelevance]: i18n('description_subtype_fulltext-relevance'),
+};
 
-export function buildIndexInfo(tableIndex?: TIndexDescription): InfoViewerItem[] {
+function buildIndexInfoForFields(
+    tableIndex: TIndexDescription | undefined,
+    fields: readonly IndexDetailsField[],
+): InfoViewerItem[] {
     const info: InfoViewerItem[] = [];
     if (!tableIndex) {
         return info;
     }
 
-    getDisplayedIndexFields().forEach((key) => {
+    fields.forEach((key) => {
         const value = tableIndex[key];
         if (value !== undefined) {
             info.push(formatTableIndexItem(key, value));
@@ -39,6 +52,37 @@ export function buildIndexInfo(tableIndex?: TIndexDescription): InfoViewerItem[]
     });
 
     return info;
+}
+
+function toDefinitionListItem({label, value}: InfoViewerItem): YDBDefinitionListItem {
+    return {
+        name: String(label),
+        content: value,
+    };
+}
+
+export function buildTableIndexOverviewInfo(tableIndex?: TIndexDescription) {
+    const type = tableIndex?.Type;
+    const itemsAfterType: YDBDefinitionListItem[] = [];
+
+    if (type !== undefined) {
+        const typeItem = formatTableIndexItem('Type', type);
+        itemsAfterType.push({
+            name: objectSummaryKeyset('field_subtype'),
+            content: (
+                <SchemaObjectTypeLabel
+                    value={typeItem.value}
+                    description={INDEX_TYPE_DESCRIPTIONS[type]}
+                />
+            ),
+        });
+    }
+
+    const additionalItems = buildIndexInfoForFields(tableIndex, INDEX_DETAILS_FIELDS_KEYS).map(
+        toDefinitionListItem,
+    );
+
+    return {itemsAfterType, additionalItems};
 }
 
 /* eslint-disable camelcase */

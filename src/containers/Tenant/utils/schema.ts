@@ -133,8 +133,11 @@ const indexTypeToEntityName: Record<EIndexType, string | undefined> = {
     [EIndexType.EIndexTypeInvalid]: undefined,
     [EIndexType.EIndexTypeGlobal]: i18n('entity-name_secondary-index'),
     [EIndexType.EIndexTypeGlobalAsync]: i18n('entity-name_secondary-index'),
+    [EIndexType.EIndexTypeGlobalUnique]: i18n('entity-name_secondary-index'),
     [EIndexType.EIndexTypeGlobalVectorKmeansTree]: i18n('entity-name_vector-index'),
     [EIndexType.EIndexTypeGlobalFulltext]: i18n('entity-name_fulltext-index'),
+    [EIndexType.EIndexTypeGlobalFulltextPlain]: i18n('entity-name_fulltext-index'),
+    [EIndexType.EIndexTypeGlobalFulltextRelevance]: i18n('entity-name_fulltext-index'),
 };
 
 export const mapIndexTypeToEntityName = (type?: EIndexType) => type && indexTypeToEntityName[type];

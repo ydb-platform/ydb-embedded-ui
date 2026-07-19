@@ -35,8 +35,11 @@ export enum EIndexType {
     EIndexTypeInvalid = 'EIndexTypeInvalid',
     EIndexTypeGlobal = 'EIndexTypeGlobal',
     EIndexTypeGlobalAsync = 'EIndexTypeGlobalAsync',
+    EIndexTypeGlobalUnique = 'EIndexTypeGlobalUnique',
     EIndexTypeGlobalVectorKmeansTree = 'EIndexTypeGlobalVectorKmeansTree',
     EIndexTypeGlobalFulltext = 'EIndexTypeGlobalFulltext',
+    EIndexTypeGlobalFulltextPlain = 'EIndexTypeGlobalFulltextPlain',
+    EIndexTypeGlobalFulltextRelevance = 'EIndexTypeGlobalFulltextRelevance',
 }
 
 export enum EIndexState {
