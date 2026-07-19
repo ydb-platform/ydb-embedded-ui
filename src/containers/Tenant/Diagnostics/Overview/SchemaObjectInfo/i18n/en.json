@@ -1,0 +1,19 @@
+{
+  "description_directory": "A directory organizes schema objects within the hierarchical database namespace.",
+  "description_resource-pool": "A resource pool defines CPU, memory, concurrency, and queue limits for its queries.",
+  "description_secret": "A secret stores credentials for external-system authentication, and its value cannot be read back.",
+  "description_table": "A row-oriented table stores related data as rows and columns and is optimized for transactional workloads.",
+  "description_system-view": "A system view exposes service information about the current database state under the .sys path.",
+  "description_table-index": "A secondary index is a separate global structure that accelerates queries on non-key columns.",
+  "description_table-store": "A table store is a container for column-oriented tables.",
+  "description_column-table": "A column-oriented table stores each column separately and is optimized for analytical workloads.",
+  "description_changefeed": "A changefeed captures table row changes and writes change records to a topic for further processing.",
+  "description_topic": "A topic stores unstructured messages and delivers them to independent subscribers.",
+  "description_external-table": "An external table describes the schema and placement of data stored in an external source.",
+  "description_external-data-source": "An external data source stores the connection parameters required to access an external system.",
+  "description_view": "A view is a table-shaped result defined by a query and contains no data of its own.",
+  "description_replication": "An asynchronous replication instance stores the settings used to replicate data to a target database.",
+  "description_transfer": "A transfer asynchronously reads messages from a topic and writes transformed data to a table.",
+  "description_streaming-query": "A streaming query continuously processes unbounded data instead of finishing after a single result.",
+  "description_system-view-type": "This value identifies which database service information the system view exposes."
+}

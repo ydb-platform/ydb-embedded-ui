@@ -2,6 +2,7 @@ import {InfoViewer} from '../../../../../components/InfoViewer';
 import {EPathSubType} from '../../../../../types/api/schema';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {getEntityName} from '../../../utils';
+import tableInfoKeyset from '../TableInfo/i18n';
 import {TopicStats} from '../TopicStats';
 import {prepareTopicSchemaInfo} from '../utils';
 
@@ -31,7 +32,10 @@ export const TopicInfo = ({data, path, database, databaseFullPath}: TopicInfoPro
 
     return (
         <div>
-            <InfoViewer title={entityName} info={prepareTopicSchemaInfo(data)} />
+            <InfoViewer
+                title={tableInfoKeyset('title_partitioning')}
+                info={prepareTopicSchemaInfo(data)}
+            />
             {renderStats()}
         </div>
     );

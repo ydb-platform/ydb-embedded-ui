@@ -7,9 +7,6 @@ import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {EPathType} from '../../../../types/api/schema';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
-import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
-import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
-import {SystemViewInfo} from '../../Info/SystemView/SystemView';
 import {ViewInfo} from '../../Info/View/View';
 import {isDomain} from '../../ObjectSummary/transformPath';
 import {useNavigationV2Enabled} from '../../utils/useNavigationV2Enabled';
@@ -18,6 +15,7 @@ import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
 import {DatabaseInfo} from './DatabaseInfo/DatabaseInfo';
 import {DefaultEntityInfo} from './DefaultEntityInfo';
+import {SchemaObjectInfoContainer} from './SchemaObjectInfo/SchemaObjectInfoContainer';
 import {StreamingQueryInfo} from './StreamingQueryInfo';
 import {TableInfo} from './TableInfo';
 import {TopicInfo} from './TopicInfo';
@@ -38,8 +36,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
 
     const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
         {path, database, databaseFullPath, useMetaProxy},
-        //overview is not supported for streaming query, data request is inside StreamingQueryInfo
-        {pollingInterval: autoRefreshInterval, skip: type === EPathType.EPathTypeStreamingQuery},
+        {pollingInterval: autoRefreshInterval},
     );
 
     const loading = isFetching && currentData === undefined;
@@ -59,7 +56,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
             [EPathType.EPathTypeResourcePool]: undefined,
             [EPathType.EPathTypeSecret]: undefined,
             [EPathType.EPathTypeTable]: renderTableInfo,
-            [EPathType.EPathTypeSysView]: () => <SystemViewInfo data={data} />,
+            [EPathType.EPathTypeSysView]: undefined,
             [EPathType.EPathTypeSubDomain]: undefined,
             [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={data} />,
             [EPathType.EPathTypeExtSubDomain]: undefined,
@@ -81,8 +78,8 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
                     database={database}
                 />
             ),
-            [EPathType.EPathTypeExternalTable]: () => <ExternalTableInfo data={data} />,
-            [EPathType.EPathTypeExternalDataSource]: () => <ExternalDataSourceInfo data={data} />,
+            [EPathType.EPathTypeExternalTable]: undefined,
+            [EPathType.EPathTypeExternalDataSource]: undefined,
             [EPathType.EPathTypeView]: () => <ViewInfo data={data} />,
             [EPathType.EPathTypeReplication]: () => <AsyncReplicationInfo data={data} />,
             [EPathType.EPathTypeTransfer]: () => (
@@ -107,7 +104,26 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
             return <DatabaseInfo data={data} path={path} />;
         }
 
-        return (type && pathTypeToComponent[type]?.()) || <DefaultEntityInfo data={data} />;
+        if (!type || type === EPathType.EPathTypeInvalid) {
+            return <DefaultEntityInfo data={data} />;
+        }
+
+        const content = pathTypeToComponent[type]?.();
+
+        const commonInfo = (
+            <SchemaObjectInfoContainer data={currentData ?? undefined} type={type} path={path} />
+        );
+
+        if (!content) {
+            return commonInfo;
+        }
+
+        return (
+            <React.Fragment>
+                {commonInfo}
+                {content}
+            </React.Fragment>
+        );
     };
 
     if (loading) {

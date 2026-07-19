@@ -8,7 +8,6 @@ import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDB
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {streamingQueriesApi} from '../../../../../store/reducers/streamingQuery/streamingQuery';
 import type {ErrorResponse} from '../../../../../types/api/query';
-import {EPathType} from '../../../../../types/api/schema';
 import type {IQueryResult} from '../../../../../types/store/query';
 import {
     getStringifiedData,
@@ -17,7 +16,6 @@ import {
 } from '../../../../../utils/dataFormatters/dataFormatters';
 import {isErrorResponse} from '../../../../../utils/query';
 import {ResultIssuesModal} from '../../../Query/Issues/Issues';
-import {getEntityName} from '../../../utils';
 
 import i18n from './i18n';
 
@@ -27,8 +25,6 @@ interface StreamingQueryProps {
 }
 
 export function StreamingQueryInfo({database, path}: StreamingQueryProps) {
-    const entityName = getEntityName({Self: {PathType: EPathType.EPathTypeStreamingQuery}});
-
     const {data: sysData, isFetching} = streamingQueriesApi.useGetStreamingQueryInfoQuery(
         {database, path},
         {skip: !database || !path},
@@ -38,7 +34,7 @@ export function StreamingQueryInfo({database, path}: StreamingQueryProps) {
 
     return (
         <LoaderWrapper loading={isFetching}>
-            <YDBDefinitionList title={entityName} items={items} />
+            <YDBDefinitionList items={items} />
         </LoaderWrapper>
     );
 }

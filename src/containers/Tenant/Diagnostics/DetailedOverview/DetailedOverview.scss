@@ -1,4 +1,7 @@
 .kv-detailed-overview {
+    --g-definition-list-item-gap: var(--g-spacing-3);
+    --ydb-info-viewer-title-margin: 0 0 10px;
+
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -13,5 +16,9 @@
 
     .g-definition-list__copy-container {
         align-items: baseline;
+    }
+
+    .info-viewer {
+        --ydb-info-viewer-items-gap: var(--g-spacing-2);
     }
 }

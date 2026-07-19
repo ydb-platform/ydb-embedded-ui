@@ -1,8 +1,28 @@
 @use '../../../../../styles/mixins.scss';
 
 .ydb-overview-topic-stats {
+    $column-width: 310px;
+
+    margin-top: var(--g-spacing-5);
+
     &__title {
         @include mixins.info-viewer-title();
+    }
+
+    &__content {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: var(--g-spacing-9);
+    }
+
+    &__info,
+    &__bytes-written {
+        width: $column-width;
+
+        .info-viewer__label {
+            min-width: 180px;
+        }
     }
 
     .ydb-loader {
@@ -13,26 +33,7 @@
         align-items: flex-start;
     }
 
-    .speed-multimeter {
-        margin-top: -5px;
-
-        &__content {
-            justify-content: flex-start;
-        }
-    }
-
-    &__info {
-        .info-viewer__label-text_multiline {
-            max-width: 150px;
-        }
-    }
-
-    &__bytes-written {
-        margin-top: 7px;
-        padding-left: 20px;
-
-        .info-viewer__label {
-            min-width: 180px;
-        }
+    .info-viewer__label-text_multiline {
+        max-width: 150px;
     }
 }

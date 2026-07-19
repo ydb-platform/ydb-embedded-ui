@@ -57,7 +57,7 @@ import {SchemaActions} from './SchemaActions';
 import {RefreshTreeButton} from './SchemaTree/RefreshTreeButton';
 import i18n from './i18n';
 import {b} from './shared';
-import {isDomain, transformPath} from './transformPath';
+import {getPathTypeName, isDomain, transformPath} from './transformPath';
 
 import './ObjectSummary.scss';
 
@@ -83,6 +83,7 @@ export function ObjectSummary({
         false,
     );
     const isV2Navigation = useNavigationV2Enabled();
+    const showLegacyDatabaseInfo = !isV2Navigation && path === databaseFullPath;
 
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(
         paneVisibilityToggleReducer,
@@ -168,9 +169,7 @@ export function ObjectSummary({
             note?: DefinitionListItemProps['note'];
         }[] = [];
 
-        const normalizedType = isDomain(path, PathType)
-            ? 'Domain'
-            : PathType?.replace(/^EPathType/, '');
+        const normalizedType = getPathTypeName(path, PathType);
 
         overview.push({name: i18n('field_type'), content: normalizedType});
 
@@ -478,36 +477,46 @@ export function ObjectSummary({
         return (
             <div className={b()}>
                 <div className={b({hidden: isCollapsed})}>
-                    <SplitPane
-                        direction="vertical"
-                        defaultSizePaneKey={DEFAULT_SIZE_TENANT_SUMMARY_KEY}
-                        onSplitStartDragAdditional={onSplitStartDragAdditional}
-                        triggerCollapse={commonInfoVisibilityState.triggerCollapse}
-                        triggerExpand={commonInfoVisibilityState.triggerExpand}
-                        minSize={[200, 52]}
-                        collapsedSizes={[100, 0]}
-                    >
-                        <ObjectTree
-                            database={database}
-                            path={path}
-                            databaseFullPath={databaseFullPath}
-                        />
-                        <div className={b('info')}>
-                            <div className={b('sticky-top')}>
-                                <div className={b('info-header')}>
-                                    <div className={b('info-title')}>
-                                        {renderEntityTypeBadge()}
-                                        <div className={b('path-name')}>{relativePath}</div>
+                    {showLegacyDatabaseInfo ? (
+                        <SplitPane
+                            direction="vertical"
+                            defaultSizePaneKey={DEFAULT_SIZE_TENANT_SUMMARY_KEY}
+                            onSplitStartDragAdditional={onSplitStartDragAdditional}
+                            triggerCollapse={commonInfoVisibilityState.triggerCollapse}
+                            triggerExpand={commonInfoVisibilityState.triggerExpand}
+                            minSize={[200, 52]}
+                            collapsedSizes={[100, 0]}
+                        >
+                            <ObjectTree
+                                database={database}
+                                path={path}
+                                databaseFullPath={databaseFullPath}
+                            />
+                            <div className={b('info')}>
+                                <div className={b('sticky-top')}>
+                                    <div className={b('info-header')}>
+                                        <div className={b('info-title')}>
+                                            {renderEntityTypeBadge()}
+                                            <div className={b('path-name')}>{relativePath}</div>
+                                        </div>
+                                        <div className={b('info-controls')}>
+                                            {renderCommonInfoControls()}
+                                        </div>
                                     </div>
-                                    <div className={b('info-controls')}>
-                                        {renderCommonInfoControls()}
-                                    </div>
+                                    {renderTabs()}
                                 </div>
-                                {renderTabs()}
+                                <div className={b('overview-wrapper')}>{renderTabContent()}</div>
                             </div>
-                            <div className={b('overview-wrapper')}>{renderTabContent()}</div>
+                        </SplitPane>
+                    ) : (
+                        <div className={b('tree-only')}>
+                            <ObjectTree
+                                database={database}
+                                path={path}
+                                databaseFullPath={databaseFullPath}
+                            />
                         </div>
-                    </SplitPane>
+                    )}
                 </div>
                 <Flex className={b('actions')} gap={0.5}>
                     {!isCollapsed && <RefreshTreeButton />}

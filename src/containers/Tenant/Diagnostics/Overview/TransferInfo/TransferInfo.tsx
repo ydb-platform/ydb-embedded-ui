@@ -40,7 +40,7 @@ export function TransferInfo({path, database, data, databaseFullPath}: TransferP
 
     return (
         <Flex direction="column" gap="4">
-            <YDBDefinitionList title={entityName} items={transferItems} />
+            <YDBDefinitionList items={transferItems} />
         </Flex>
     );
 }

@@ -3,7 +3,6 @@ import {EPathType} from '../../../../../../types/api/schema';
 import type {TEvDescribeSchemeResult} from '../../../../../../types/api/schema';
 import type {ManagePartitioningFormState} from '../ManagePartitioningDialog/types';
 
-import {prepareColumnTableGeneralInfo} from './prepareColumnTableInfo';
 import {
     prepareGeneralMetrics,
     prepareGeneralStats,
@@ -36,7 +35,7 @@ export interface PreparedTableInfo {
 
 /**
  * Prepares all table information for display.
- * Handles different table types: Table, ColumnTable, and ColumnStore.
+ * Prepares row-table-specific information and statistics shared by all table types.
  * @param data - Schema description result from YDB API
  * @param type - Path type (Table, ColumnTable, ColumnStore)
  * @returns Prepared table information organized by sections
@@ -59,7 +58,6 @@ export function prepareTableInfo(
         TableStats = {},
         TabletMetrics = {},
         Table: {PartitionConfig = {}, TTLSettings} = {},
-        ColumnTableDescription = {},
     } = PathDescription;
 
     let generalInfoLeft: YDBDefinitionListItem[] = [];
@@ -67,33 +65,21 @@ export function prepareTableInfo(
     let partitionProgressConfig: PartitionProgressConfig | undefined;
     let managePartitioningDialogConfig: ManagePartitioningFormState | undefined;
 
-    // Prepare type-specific information
-    switch (type) {
-        case EPathType.EPathTypeTable: {
-            partitionProgressConfig = preparePartitionProgressConfig(
-                PartitionConfig,
-                TablePartitions,
-            );
+    if (type === EPathType.EPathTypeTable) {
+        partitionProgressConfig = preparePartitionProgressConfig(PartitionConfig, TablePartitions);
 
-            managePartitioningDialogConfig = prepareManagePartitioningDialogConfig(
-                PartitionConfig,
-                partitionProgressConfig,
-            );
+        managePartitioningDialogConfig = prepareManagePartitioningDialogConfig(
+            PartitionConfig,
+            partitionProgressConfig,
+        );
 
-            const {left, right} = prepareRowTableGeneralInfo(
-                PartitionConfig,
-                partitionProgressConfig,
-                TTLSettings,
-            );
-            generalInfoLeft = left;
-            generalInfoRight = right;
-
-            break;
-        }
-        case EPathType.EPathTypeColumnTable: {
-            generalInfoLeft = prepareColumnTableGeneralInfo(ColumnTableDescription);
-            break;
-        }
+        const {left, right} = prepareRowTableGeneralInfo(
+            PartitionConfig,
+            partitionProgressConfig,
+            TTLSettings,
+        );
+        generalInfoLeft = left;
+        generalInfoRight = right;
     }
 
     // Prepare common information (shared across all table types)
