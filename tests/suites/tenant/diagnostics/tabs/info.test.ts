@@ -338,6 +338,9 @@ test.describe('Diagnostics Info tab', async () => {
                             Self: {
                                 Name: 'my_vector_index',
                                 PathType: 'EPathTypeTableIndex',
+                                PathId: '42',
+                                PathVersion: '7',
+                                CreateStep: '1710000000000',
                             },
                             TableIndex: {
                                 Name: 'my_vector_index',
@@ -375,7 +378,7 @@ test.describe('Diagnostics Info tab', async () => {
         await tenantPage.goto(pageQueryParams);
 
         // Verify vector index settings are displayed including overlap_clusters
-        const infoContent = page.locator('.ydb-diagnostics-table-info');
+        const infoContent = page.locator('.kv-detailed-overview');
         await infoContent.waitFor({state: 'visible', timeout: 10000});
 
         // Check Index Settings section contains Overlap Clusters
@@ -411,6 +414,9 @@ test.describe('Diagnostics Info tab', async () => {
                             Self: {
                                 Name: 'my_fulltext_index',
                                 PathType: 'EPathTypeTableIndex',
+                                PathId: '42',
+                                PathVersion: '7',
+                                CreateStep: '1710000000000',
                             },
                             TableIndex: {
                                 Name: 'my_fulltext_index',
@@ -453,7 +459,7 @@ test.describe('Diagnostics Info tab', async () => {
         await tenantPage.goto(pageQueryParams);
 
         // Verify fulltext index settings are displayed
-        const infoContent = page.locator('.ydb-diagnostics-table-info');
+        const infoContent = page.locator('.kv-detailed-overview');
         await infoContent.waitFor({state: 'visible', timeout: 10000});
 
         // Check Index Settings section contains fulltext-specific fields
