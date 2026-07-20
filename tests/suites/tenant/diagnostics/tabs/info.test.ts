@@ -12,7 +12,7 @@ async function expectMetricTabsScreenshot(metricTabs: Locator, name: string) {
     await expect(metricTabs).toHaveScreenshot(name);
 }
 
-async function setupMonitoringUserMock(page: Page) {
+async function setupMonitoringUserMock(page: Page, isAdministrationAllowed = true) {
     await page.route('**/viewer/json/whoami?*', async (route) => {
         await route.fulfill({
             status: 200,
@@ -23,7 +23,7 @@ async function setupMonitoringUserMock(page: Page) {
                 AuthType: 'Login',
                 IsViewerAllowed: true,
                 IsMonitoringAllowed: true,
-                IsAdministrationAllowed: true,
+                IsAdministrationAllowed: isAdministrationAllowed,
             }),
         });
     });
@@ -321,6 +321,7 @@ test.describe('Diagnostics Info tab', async () => {
 
     test('Info tab displays overlap_clusters for vector index', async ({page}) => {
         const mockIndexPath = '/local/test_table/my_vector_index';
+        await setupMonitoringUserMock(page, false);
 
         // Mock describe API to return a vector index with overlap_clusters
         await page.route(`**/viewer/json/describe?*`, async (route) => {
@@ -380,6 +381,8 @@ test.describe('Diagnostics Info tab', async () => {
         // Verify vector index settings are displayed including overlap_clusters
         const infoContent = page.locator('.kv-detailed-overview');
         await infoContent.waitFor({state: 'visible', timeout: 10000});
+        await expect(infoContent.getByText('42', {exact: true})).toBeVisible();
+        await expect(infoContent.getByText('7', {exact: true})).toBeVisible();
 
         // Check Index Settings section contains Overlap Clusters
         const indexSettings = infoContent.locator('.info-viewer');
