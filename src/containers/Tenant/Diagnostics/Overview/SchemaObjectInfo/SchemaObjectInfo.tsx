@@ -4,7 +4,6 @@ import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitio
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
-import {useUserPermissions} from '../../../../../utils/hooks/useWhoami';
 
 import {prepareSchemaObjectInfoItems} from './prepareSchemaObjectInfo';
 
@@ -27,9 +26,6 @@ export function SchemaObjectInfo({
     itemsAfterType,
     additionalItems,
 }: SchemaObjectInfoProps) {
-    const permissions = useUserPermissions();
-    const isAdministrator = permissions?.IsAdministrationAllowed === true;
-
     const items = React.useMemo(
         () =>
             prepareSchemaObjectInfoItems({
@@ -38,9 +34,8 @@ export function SchemaObjectInfo({
                 path,
                 itemsAfterType,
                 additionalItems,
-                isAdministrator,
             }),
-        [additionalItems, data, fallbackType, isAdministrator, itemsAfterType, path],
+        [additionalItems, data, fallbackType, itemsAfterType, path],
     );
 
     return (

@@ -39,7 +39,6 @@ interface PrepareSchemaObjectInfoItemsParams {
     path: string;
     itemsAfterType?: YDBDefinitionListItem[];
     additionalItems?: YDBDefinitionListItem[];
-    isAdministrator: boolean;
 }
 
 function isPresent(value: string | number | undefined): value is string | number {
@@ -82,7 +81,6 @@ export function prepareSchemaObjectInfoItems({
     path,
     itemsAfterType = [],
     additionalItems = [],
-    isAdministrator,
 }: PrepareSchemaObjectInfoItemsParams): YDBDefinitionListItem[] {
     const self = data?.PathDescription?.Self;
     const pathId = self?.PathId ?? data?.PathId;
@@ -98,22 +96,17 @@ export function prepareSchemaObjectInfoItems({
         ...itemsAfterType,
     ];
 
-    if (isAdministrator) {
-        items.push(
-            {
-                name: dbInfoKeyset('title_id'),
-                content: isPresent(pathId) ? pathId : EMPTY_DATA_PLACEHOLDER,
-                copyText: isPresent(pathId) ? pathId : undefined,
-            },
-            {
-                name: dbInfoKeyset('title_version'),
-                content: isPresent(pathVersion) ? pathVersion : EMPTY_DATA_PLACEHOLDER,
-                copyText: isPresent(pathVersion) ? pathVersion : undefined,
-            },
-        );
-    }
-
     items.push(
+        {
+            name: dbInfoKeyset('title_id'),
+            content: isPresent(pathId) ? pathId : EMPTY_DATA_PLACEHOLDER,
+            copyText: isPresent(pathId) ? pathId : undefined,
+        },
+        {
+            name: dbInfoKeyset('title_version'),
+            content: isPresent(pathVersion) ? pathVersion : EMPTY_DATA_PLACEHOLDER,
+            copyText: isPresent(pathVersion) ? pathVersion : undefined,
+        },
         {
             name: dbInfoKeyset('title_created'),
             content: created,
