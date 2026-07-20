@@ -17,6 +17,8 @@
   "summary.data-size": "Data size",
   "summary.row-count": "Row count",
   "summary.partitions": "Partitions count",
+  "summary.partitioning": "Partitioning",
+  "summary.system-view-type": "System view type",
   "summary.paths": "Paths",
   "summary.shards": "Shards",
   "summary.state": "State",

@@ -13,6 +13,7 @@ const pathSubTypeToNodeType: Record<EPathSubType, NavigationTreeNodeType | undef
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: 'index_table',
     [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: 'index_table',
     [EPathSubType.EPathSubTypeFulltextIndexImplTable]: 'index_table',
+    [EPathSubType.EPathSubTypeLocalMinMaxIndex]: undefined,
 
     [EPathSubType.EPathSubTypeStreamImpl]: undefined,
     [EPathSubType.EPathSubTypeEmpty]: undefined,
@@ -88,6 +89,7 @@ const pathSubTypeToEntityName: Record<EPathSubType, string | undefined> = {
         'entity-name_vector-index-table',
     ),
     [EPathSubType.EPathSubTypeFulltextIndexImplTable]: i18n('entity-name_fulltext-index-table'),
+    [EPathSubType.EPathSubTypeLocalMinMaxIndex]: undefined,
 
     [EPathSubType.EPathSubTypeStreamImpl]: undefined,
     [EPathSubType.EPathSubTypeEmpty]: undefined,
@@ -138,6 +140,7 @@ const indexTypeToEntityName: Record<EIndexType, string | undefined> = {
     [EIndexType.EIndexTypeGlobalFulltext]: i18n('entity-name_fulltext-index'),
     [EIndexType.EIndexTypeGlobalFulltextPlain]: i18n('entity-name_fulltext-index'),
     [EIndexType.EIndexTypeGlobalFulltextRelevance]: i18n('entity-name_fulltext-index'),
+    [EIndexType.EIndexTypeLocalMinMax]: i18n('entity-name_secondary-index'),
 };
 
 export const mapIndexTypeToEntityName = (type?: EIndexType) => type && indexTypeToEntityName[type];
@@ -184,21 +187,6 @@ const pathTypeToIsTable: Record<EPathType, boolean> = {
 //if add entity with tableType, make sure that Schema is available in Diagnostics section
 export const isTableType = (pathType?: EPathType) =>
     (pathType && pathTypeToIsTable[pathType]) ?? false;
-
-// ====================
-
-const pathSubTypeToIsIndexImpl: Record<EPathSubType, boolean> = {
-    [EPathSubType.EPathSubTypeSyncIndexImplTable]: true,
-    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: true,
-    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: true,
-    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: true,
-
-    [EPathSubType.EPathSubTypeStreamImpl]: false,
-    [EPathSubType.EPathSubTypeEmpty]: false,
-};
-
-export const isIndexTableType = (subType?: EPathSubType) =>
-    (subType && pathSubTypeToIsIndexImpl[subType]) ?? false;
 
 // ====================
 
@@ -280,6 +268,7 @@ const pathSubTypeToChildless: Record<EPathSubType, boolean> = {
     [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: true,
     [EPathSubType.EPathSubTypeFulltextIndexImplTable]: true,
     [EPathSubType.EPathSubTypeStreamImpl]: true,
+    [EPathSubType.EPathSubTypeLocalMinMaxIndex]: true,
 
     [EPathSubType.EPathSubTypeEmpty]: false,
 };

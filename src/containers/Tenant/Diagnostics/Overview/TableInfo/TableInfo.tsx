@@ -9,6 +9,7 @@ import {EPathType} from '../../../../../types/api/schema';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 import {useCompactionFeature} from '../../../../../utils/hooks/useCompactionFeature';
+import tenantKeyset from '../../../i18n';
 
 import {
     CompactTableAction,
@@ -117,7 +118,7 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                     alignItems="center"
                     gap="2"
                 >
-                    <div className={b('title')}>{i18n('title_partitioning')}</div>
+                    <div className={b('title')}>{tenantKeyset('summary.partitioning')}</div>
                     <Flex gap="2" alignItems="center">
                         {managePartitioningDialogConfig && (
                             <ActionTooltip title={i18n('action_manage-partition-config')}>

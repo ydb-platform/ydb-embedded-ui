@@ -5,7 +5,6 @@ import {EPathType} from '../../../../../types/api/schema';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatDateTime} from '../../../../../utils/dataFormatters/dataFormatters';
 import {getPathTypeName, isDomain} from '../../../ObjectSummary/transformPath';
-import {dbInfoKeyset} from '../DatabaseInfo/i18n';
 
 import {schemaObjectInfoKeyset} from './i18n';
 
@@ -16,9 +15,9 @@ const PATH_TYPE_DESCRIPTIONS: Record<EPathType, string | undefined> = {
     [EPathType.EPathTypeSecret]: schemaObjectInfoKeyset('description_secret'),
     [EPathType.EPathTypeTable]: schemaObjectInfoKeyset('description_table'),
     [EPathType.EPathTypeSysView]: schemaObjectInfoKeyset('description_system-view'),
-    [EPathType.EPathTypeSubDomain]: dbInfoKeyset('description_sub-domain'),
+    [EPathType.EPathTypeSubDomain]: schemaObjectInfoKeyset('description_sub-domain'),
     [EPathType.EPathTypeTableIndex]: schemaObjectInfoKeyset('description_table-index'),
-    [EPathType.EPathTypeExtSubDomain]: dbInfoKeyset('description_sub-domain'),
+    [EPathType.EPathTypeExtSubDomain]: schemaObjectInfoKeyset('description_sub-domain'),
     [EPathType.EPathTypeColumnStore]: schemaObjectInfoKeyset('description_table-store'),
     [EPathType.EPathTypeColumnTable]: schemaObjectInfoKeyset('description_column-table'),
     [EPathType.EPathTypeCdcStream]: schemaObjectInfoKeyset('description_changefeed'),
@@ -58,14 +57,14 @@ function prepareTypeLabel({
     let value = getPathTypeName(path, pathType);
     let description: string | undefined;
     if (isDomainDatabase) {
-        value = dbInfoKeyset('title_domain');
-        description = dbInfoKeyset('description_domain');
+        value = schemaObjectInfoKeyset('value_domain');
+        description = schemaObjectInfoKeyset('description_domain');
     } else if (
         pathType === EPathType.EPathTypeSubDomain ||
         pathType === EPathType.EPathTypeExtSubDomain
     ) {
-        value = dbInfoKeyset('title_sub-domain');
-        description = dbInfoKeyset('description_sub-domain');
+        value = schemaObjectInfoKeyset('value_sub-domain');
+        description = schemaObjectInfoKeyset('description_sub-domain');
     } else if (pathType) {
         description = PATH_TYPE_DESCRIPTIONS[pathType];
     }
@@ -90,7 +89,7 @@ export function prepareSchemaObjectInfoItems({
 
     const items: YDBDefinitionListItem[] = [
         {
-            name: dbInfoKeyset('title_type'),
+            name: schemaObjectInfoKeyset('field_type'),
             content: prepareTypeLabel({data, fallbackType, path}),
         },
         ...itemsAfterType,
@@ -98,21 +97,21 @@ export function prepareSchemaObjectInfoItems({
 
     items.push(
         {
-            name: dbInfoKeyset('title_id'),
+            name: schemaObjectInfoKeyset('field_id'),
             content: isPresent(pathId) ? pathId : EMPTY_DATA_PLACEHOLDER,
             copyText: isPresent(pathId) ? pathId : undefined,
         },
         {
-            name: dbInfoKeyset('title_version'),
+            name: schemaObjectInfoKeyset('field_version'),
             content: isPresent(pathVersion) ? pathVersion : EMPTY_DATA_PLACEHOLDER,
             copyText: isPresent(pathVersion) ? pathVersion : undefined,
         },
         {
-            name: dbInfoKeyset('title_created'),
+            name: schemaObjectInfoKeyset('field_created'),
             content: created,
         },
         {
-            name: dbInfoKeyset('title_path'),
+            name: schemaObjectInfoKeyset('field_full-path'),
             content: isPresent(fullPath) ? fullPath : EMPTY_DATA_PLACEHOLDER,
             copyText: isPresent(fullPath) ? fullPath : undefined,
         },

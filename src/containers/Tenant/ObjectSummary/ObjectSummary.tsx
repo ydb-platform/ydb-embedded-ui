@@ -42,6 +42,7 @@ import {useCurrentSchema} from '../TenantContext';
 import {useTenantPage} from '../TenantNavigation/useTenantNavigation';
 import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPages';
 import {ROW_COUNT_NOTE} from '../constants';
+import tenantKeyset from '../i18n';
 import {useTenantQueryParams} from '../useTenantQueryParams';
 import {getSummaryControls} from '../utils/controls';
 import {
@@ -175,7 +176,7 @@ export function ObjectSummary({
 
         if (PathSubType !== EPathSubType.EPathSubTypeEmpty) {
             overview.push({
-                name: i18n('field_subtype'),
+                name: tenantKeyset('summary.subtype'),
                 content: PathSubType?.replace(/^EPathSubType/, ''),
             });
         }
@@ -256,7 +257,7 @@ export function ObjectSummary({
             ],
             [EPathType.EPathTypeSysView]: () => [
                 {
-                    name: i18n('field_system-view-type'),
+                    name: tenantKeyset('summary.system-view-type'),
                     content: prepareSystemViewType(PathDescription?.SysViewDescription?.Type),
                 },
             ],
@@ -317,9 +318,9 @@ export function ObjectSummary({
                 const dataSourceName = DataSourcePath?.match(/([^/]*)\/*$/)?.[1] || '';
 
                 return [
-                    {name: i18n('field_source-type'), content: SourceType},
+                    {name: tenantKeyset('summary.source-type'), content: SourceType},
                     {
-                        name: i18n('field_data-source'),
+                        name: tenantKeyset('summary.data-source'),
                         content: DataSourcePath && (
                             <span title={DataSourcePath}>
                                 <LinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
@@ -330,7 +331,7 @@ export function ObjectSummary({
             },
             [EPathType.EPathTypeExternalDataSource]: () => [
                 {
-                    name: i18n('field_source-type'),
+                    name: tenantKeyset('summary.source-type'),
                     content: PathDescription?.ExternalDataSourceDescription?.SourceType,
                 },
             ],

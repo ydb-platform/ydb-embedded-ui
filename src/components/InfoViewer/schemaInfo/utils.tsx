@@ -1,4 +1,4 @@
-import objectSummaryKeyset from '../../../containers/Tenant/ObjectSummary/i18n';
+import tenantKeyset from '../../../containers/Tenant/i18n';
 import type {TIndexDescription} from '../../../types/api/schema';
 import {EIndexType} from '../../../types/api/schema';
 import type {
@@ -33,6 +33,7 @@ const INDEX_TYPE_DESCRIPTIONS: Record<EIndexType, string | undefined> = {
     [EIndexType.EIndexTypeGlobalFulltext]: i18n('description_subtype_fulltext'),
     [EIndexType.EIndexTypeGlobalFulltextPlain]: i18n('description_subtype_fulltext-plain'),
     [EIndexType.EIndexTypeGlobalFulltextRelevance]: i18n('description_subtype_fulltext-relevance'),
+    [EIndexType.EIndexTypeLocalMinMax]: i18n('description_subtype_local-min-max'),
 };
 
 function buildIndexInfoForFields(
@@ -68,7 +69,7 @@ export function buildTableIndexOverviewInfo(tableIndex?: TIndexDescription) {
     if (type !== undefined) {
         const typeItem = formatTableIndexItem('Type', type);
         itemsAfterType.push({
-            name: objectSummaryKeyset('field_subtype'),
+            name: tenantKeyset('summary.subtype'),
             content: (
                 <SchemaObjectTypeLabel
                     value={typeItem.value}

@@ -40,6 +40,7 @@ export enum EIndexType {
     EIndexTypeGlobalFulltext = 'EIndexTypeGlobalFulltext',
     EIndexTypeGlobalFulltextPlain = 'EIndexTypeGlobalFulltextPlain',
     EIndexTypeGlobalFulltextRelevance = 'EIndexTypeGlobalFulltextRelevance',
+    EIndexTypeLocalMinMax = 'EIndexTypeLocalMinMax',
 }
 
 export enum EIndexState {

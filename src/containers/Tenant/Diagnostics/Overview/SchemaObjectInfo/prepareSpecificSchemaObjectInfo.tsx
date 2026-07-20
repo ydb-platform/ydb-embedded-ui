@@ -4,29 +4,28 @@ import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitio
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {prepareSystemViewType} from '../../../../../utils/schema';
-import tenantInfoKeyset from '../../../Info/i18n';
-import objectSummaryKeyset from '../../../ObjectSummary/i18n';
+import tenantKeyset from '../../../i18n';
 
 import {schemaObjectInfoKeyset} from './i18n';
 
 function getAuthMethodValue(data: TEvDescribeSchemeResult) {
     const {Auth} = data.PathDescription?.ExternalDataSourceDescription || {};
     if (Auth?.ServiceAccount) {
-        return tenantInfoKeyset('external-objects.auth-method.service-account');
+        return schemaObjectInfoKeyset('value_auth-method-service-account');
     }
     if (Auth?.Aws) {
-        return tenantInfoKeyset('external-objects.auth-method.aws');
+        return schemaObjectInfoKeyset('value_auth-method-aws');
     }
     if (Auth?.Token) {
-        return tenantInfoKeyset('external-objects.auth-method.token');
+        return schemaObjectInfoKeyset('value_auth-method-token');
     }
     if (Auth?.Basic) {
-        return tenantInfoKeyset('external-objects.auth-method.basic');
+        return schemaObjectInfoKeyset('value_auth-method-basic');
     }
     if (Auth?.MdbBasic) {
-        return tenantInfoKeyset('external-objects.auth-method.mdb-basic');
+        return schemaObjectInfoKeyset('value_auth-method-mdb-basic');
     }
-    return tenantInfoKeyset('external-objects.auth-method.none');
+    return schemaObjectInfoKeyset('value_auth-method-none');
 }
 
 export function prepareExternalDataSourceInfo(
@@ -36,16 +35,16 @@ export function prepareExternalDataSourceInfo(
 
     return [
         {
-            name: objectSummaryKeyset('field_source-type'),
+            name: tenantKeyset('summary.source-type'),
             content: SourceType,
         },
         {
-            name: tenantInfoKeyset('external-objects.location'),
+            name: schemaObjectInfoKeyset('field_location'),
             content: Location,
             copyText: Location,
         },
         {
-            name: tenantInfoKeyset('external-objects.auth-method'),
+            name: schemaObjectInfoKeyset('field_auth-method'),
             content: getAuthMethodValue(data),
         },
     ];
@@ -61,11 +60,11 @@ export function prepareExternalTableInfo(
 
     return [
         {
-            name: objectSummaryKeyset('field_source-type'),
+            name: tenantKeyset('summary.source-type'),
             content: SourceType,
         },
         {
-            name: objectSummaryKeyset('field_data-source'),
+            name: tenantKeyset('summary.data-source'),
             content: DataSourcePath && (
                 <span title={DataSourcePath}>
                     <LinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
@@ -73,7 +72,7 @@ export function prepareExternalTableInfo(
             ),
         },
         {
-            name: tenantInfoKeyset('external-objects.location'),
+            name: schemaObjectInfoKeyset('field_location'),
             content: Location,
             copyText: Location,
         },
@@ -91,7 +90,7 @@ export function prepareSystemViewTypeItems(
 
     return [
         {
-            name: objectSummaryKeyset('field_system-view-type'),
+            name: tenantKeyset('summary.system-view-type'),
             content: (
                 <SchemaObjectTypeLabel
                     value={formatSystemViewType(type) ?? EMPTY_DATA_PLACEHOLDER}
