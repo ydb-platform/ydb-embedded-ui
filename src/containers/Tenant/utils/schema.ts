@@ -140,6 +140,8 @@ const indexTypeToEntityName: Record<EIndexType, string | undefined> = {
     [EIndexType.EIndexTypeGlobalFulltext]: i18n('entity-name_fulltext-index'),
     [EIndexType.EIndexTypeGlobalFulltextPlain]: i18n('entity-name_fulltext-index'),
     [EIndexType.EIndexTypeGlobalFulltextRelevance]: i18n('entity-name_fulltext-index'),
+    [EIndexType.EIndexTypeLocalBloomFilter]: i18n('entity-name_secondary-index'),
+    [EIndexType.EIndexTypeLocalBloomNgramFilter]: i18n('entity-name_secondary-index'),
     [EIndexType.EIndexTypeLocalMinMax]: i18n('entity-name_secondary-index'),
 };
 

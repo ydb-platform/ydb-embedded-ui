@@ -33,6 +33,10 @@ const INDEX_TYPE_DESCRIPTIONS: Record<EIndexType, string | undefined> = {
     [EIndexType.EIndexTypeGlobalFulltext]: i18n('description_subtype_fulltext'),
     [EIndexType.EIndexTypeGlobalFulltextPlain]: i18n('description_subtype_fulltext-plain'),
     [EIndexType.EIndexTypeGlobalFulltextRelevance]: i18n('description_subtype_fulltext-relevance'),
+    [EIndexType.EIndexTypeLocalBloomFilter]: i18n('description_subtype_local-bloom-filter'),
+    [EIndexType.EIndexTypeLocalBloomNgramFilter]: i18n(
+        'description_subtype_local-bloom-ngram-filter',
+    ),
     [EIndexType.EIndexTypeLocalMinMax]: i18n('description_subtype_local-min-max'),
 };
 

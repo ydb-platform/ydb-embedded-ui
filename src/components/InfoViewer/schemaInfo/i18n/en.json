@@ -8,6 +8,8 @@
   "description_subtype_fulltext-plain": "Plain full-text index stores only the inverted index and supports filtering without relevance ranking.",
   "description_subtype_fulltext-relevance": "Relevance full-text index stores term frequency statistics required for relevance ranking.",
   "description_subtype_vector": "Vector index enables vector search using distance or similarity functions.",
+  "description_subtype_local-bloom-filter": "Local bloom_filter index skips data fragments that cannot contain an exact value for equality and IN predicates.",
+  "description_subtype_local-bloom-ngram-filter": "Local bloom_ngram_filter index skips data fragments that cannot contain a substring for LIKE predicates.",
   "description_subtype_local-min-max": "Local min_max index stores minimum and maximum values for each chunk (portion) of a column table, allowing chunks that cannot match query filters to be skipped.",
   "field_clusters": "Clusters",
   "field_overlap_clusters": "Overlap Clusters",

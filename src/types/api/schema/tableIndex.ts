@@ -40,6 +40,8 @@ export enum EIndexType {
     EIndexTypeGlobalFulltext = 'EIndexTypeGlobalFulltext',
     EIndexTypeGlobalFulltextPlain = 'EIndexTypeGlobalFulltextPlain',
     EIndexTypeGlobalFulltextRelevance = 'EIndexTypeGlobalFulltextRelevance',
+    EIndexTypeLocalBloomFilter = 'EIndexTypeLocalBloomFilter',
+    EIndexTypeLocalBloomNgramFilter = 'EIndexTypeLocalBloomNgramFilter',
     EIndexTypeLocalMinMax = 'EIndexTypeLocalMinMax',
 }
 
