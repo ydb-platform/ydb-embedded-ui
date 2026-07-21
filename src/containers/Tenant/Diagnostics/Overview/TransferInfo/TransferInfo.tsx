@@ -1,6 +1,6 @@
 import {Flex, Label, Text} from '@gravity-ui/uikit';
 
-import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
+import {QueryTextPreview} from '../../../../../components/QueryTextPreview/QueryTextPreview';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster';
@@ -36,11 +36,14 @@ export function TransferInfo({path, database, data, databaseFullPath}: TransferP
         {path, database, databaseFullPath, useMetaProxy},
         {},
     );
-    const transferItems = prepareTransferItems(data, replicationData);
+    const {items, transformLambda} = prepareTransferItems(data, replicationData);
 
     return (
         <Flex direction="column" gap="4">
-            <YDBDefinitionList items={transferItems} />
+            <YDBDefinitionList items={items} />
+            {transformLambda ? (
+                <QueryTextPreview title={i18n('transformLambda.label')} text={transformLambda} />
+            ) : null}
         </Flex>
     );
 }
@@ -134,13 +137,5 @@ function prepareTransferItems(
         content: <Text variant="code-inline-2">{dstPath}</Text>,
     });
 
-    info.push({
-        name: i18n('transformLambda.label'),
-        copyText: transformLambda,
-        content: transformLambda ? (
-            <YDBSyntaxHighlighter language="yql" text={transformLambda} />
-        ) : null,
-    });
-
-    return info;
+    return {items: info, transformLambda};
 }

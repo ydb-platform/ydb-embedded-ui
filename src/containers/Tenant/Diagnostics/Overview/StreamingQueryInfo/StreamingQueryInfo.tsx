@@ -1,9 +1,9 @@
 import React from 'react';
 
-import {Label} from '@gravity-ui/uikit';
+import {Flex, Label} from '@gravity-ui/uikit';
 
 import {LoaderWrapper} from '../../../../../components/LoaderWrapper/LoaderWrapper';
-import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
+import {QueryTextPreview} from '../../../../../components/QueryTextPreview/QueryTextPreview';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {streamingQueriesApi} from '../../../../../store/reducers/streamingQuery/streamingQuery';
@@ -30,11 +30,16 @@ export function StreamingQueryInfo({database, path}: StreamingQueryProps) {
         {skip: !database || !path},
     );
 
-    const items = prepareStreamingQueryItems(sysData);
+    const {items, queryText} = prepareStreamingQueryItems(sysData);
 
     return (
         <LoaderWrapper loading={isFetching}>
-            <YDBDefinitionList items={items} />
+            <Flex direction="column" gap="4">
+                <YDBDefinitionList items={items} />
+                {queryText ? (
+                    <QueryTextPreview title={i18n('field_query-text')} text={queryText} />
+                ) : null}
+            </Flex>
         </LoaderWrapper>
     );
 }
@@ -61,9 +66,9 @@ function StateLabel({state}: {state?: string}) {
     return <Label theme={theme}>{state}</Label>;
 }
 
-function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListItem[] {
+function prepareStreamingQueryItems(sysData?: IQueryResult) {
     if (!sysData) {
-        return [];
+        return {items: [], queryText: undefined};
     }
 
     const info: YDBDefinitionListItem[] = [];
@@ -90,15 +95,7 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
         });
     }
 
-    info.push({
-        name: i18n('field_query-text'),
-        copyText: normalizedQueryText,
-        content: normalizedQueryText ? (
-            <YDBSyntaxHighlighter language="yql" text={normalizedQueryText} />
-        ) : null,
-    });
-
-    return info;
+    return {items: info, queryText: normalizedQueryText};
 }
 
 function parseErrorData(raw: unknown): ErrorResponse | string | undefined {
