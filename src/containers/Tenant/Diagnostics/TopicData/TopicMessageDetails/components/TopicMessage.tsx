@@ -139,6 +139,7 @@ export function TopicMessage({
                 <ActionTooltip title={i18n('label_download')}>
                     <Button
                         view="flat-secondary"
+                        aria-label={i18n('label_download')}
                         onClick={(e) => {
                             e.stopPropagation();
                             createAndDownloadFile(
