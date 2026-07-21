@@ -1,4 +1,4 @@
-import {QueryTextPreview} from '../../../../components/QueryTextPreview/QueryTextPreview';
+import {YQLCodePreview} from '../../../../components/YQLCodePreview/YQLCodePreview';
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {getEntityName} from '../../utils';
@@ -19,7 +19,7 @@ export function ViewInfo({data}: ViewInfoProps) {
     const queryText = data.PathDescription?.ViewDescription?.QueryText;
 
     return (
-        <QueryTextPreview
+        <YQLCodePreview
             title={i18n('view.query-text-title')}
             text={queryText || EMPTY_DATA_PLACEHOLDER}
         />

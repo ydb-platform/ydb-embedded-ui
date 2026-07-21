@@ -22,7 +22,6 @@ const INDEX_DETAILS_FIELDS_KEYS = [
     'KeyColumnNames',
     'DataColumnNames',
 ] as const;
-type IndexDetailsField = (typeof INDEX_DETAILS_FIELDS_KEYS)[number];
 
 const INDEX_TYPE_DESCRIPTIONS: Record<EIndexType, string | undefined> = {
     [EIndexType.EIndexTypeInvalid]: undefined,
@@ -40,16 +39,13 @@ const INDEX_TYPE_DESCRIPTIONS: Record<EIndexType, string | undefined> = {
     [EIndexType.EIndexTypeLocalMinMax]: i18n('description_subtype_local-min-max'),
 };
 
-function buildIndexInfoForFields(
-    tableIndex: TIndexDescription | undefined,
-    fields: readonly IndexDetailsField[],
-): InfoViewerItem[] {
+function buildIndexInfo(tableIndex?: TIndexDescription): InfoViewerItem[] {
     const info: InfoViewerItem[] = [];
     if (!tableIndex) {
         return info;
     }
 
-    fields.forEach((key) => {
+    INDEX_DETAILS_FIELDS_KEYS.forEach((key) => {
         const value = tableIndex[key];
         if (value !== undefined) {
             info.push(formatTableIndexItem(key, value));
@@ -57,13 +53,6 @@ function buildIndexInfoForFields(
     });
 
     return info;
-}
-
-function toDefinitionListItem({label, value}: InfoViewerItem): YDBDefinitionListItem {
-    return {
-        name: String(label),
-        content: value,
-    };
 }
 
 export function buildTableIndexOverviewInfo(tableIndex?: TIndexDescription) {
@@ -83,9 +72,10 @@ export function buildTableIndexOverviewInfo(tableIndex?: TIndexDescription) {
         });
     }
 
-    const additionalItems = buildIndexInfoForFields(tableIndex, INDEX_DETAILS_FIELDS_KEYS).map(
-        toDefinitionListItem,
-    );
+    const additionalItems = buildIndexInfo(tableIndex).map(({label, value}) => ({
+        name: String(label),
+        content: value,
+    }));
 
     return {itemsAfterType, additionalItems};
 }

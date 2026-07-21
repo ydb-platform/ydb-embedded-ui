@@ -1,8 +1,8 @@
 import {Flex, Label, Text} from '@gravity-ui/uikit';
 
-import {QueryTextPreview} from '../../../../../components/QueryTextPreview/QueryTextPreview';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {YQLCodePreview} from '../../../../../components/YQLCodePreview/YQLCodePreview';
 import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster';
 import {replicationApi} from '../../../../../store/reducers/replication';
 import type {DescribeReplicationResult} from '../../../../../types/api/replication';
@@ -42,7 +42,7 @@ export function TransferInfo({path, database, data, databaseFullPath}: TransferP
         <Flex direction="column" gap="4">
             <YDBDefinitionList items={items} />
             {transformLambda ? (
-                <QueryTextPreview title={i18n('transformLambda.label')} text={transformLambda} />
+                <YQLCodePreview title={i18n('transformLambda.label')} text={transformLambda} />
             ) : null}
         </Flex>
     );

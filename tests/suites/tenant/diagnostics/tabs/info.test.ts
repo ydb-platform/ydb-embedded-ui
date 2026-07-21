@@ -476,4 +476,59 @@ test.describe('Diagnostics Info tab', async () => {
         // Visual snapshot of fulltext index info with all settings
         await expect(infoContent).toHaveScreenshot('fulltext-index-info-settings.png');
     });
+
+    test('View Info includes YQL code preview', async ({page}) => {
+        const mockViewPath = '/local/test_view';
+
+        await setupMonitoringUserMock(page, false);
+        await page.route('**/viewer/json/describe?*', async (route) => {
+            const url = new URL(route.request().url());
+
+            if (url.searchParams.get('path') !== mockViewPath) {
+                await route.continue();
+                return;
+            }
+
+            await route.fulfill({
+                json: {
+                    Status: 'StatusSuccess',
+                    Path: mockViewPath,
+                    PathDescription: {
+                        Self: {
+                            Name: 'test_view',
+                            PathType: 'EPathTypeView',
+                            PathId: '42',
+                            PathVersion: '7',
+                            CreateStep: '1710000000000',
+                        },
+                        ViewDescription: {
+                            QueryText: [
+                                'SELECT',
+                                '    series_id,',
+                                '    title,',
+                                '    release_date',
+                                'FROM series',
+                                'WHERE release_date >= Date("2020-01-01");',
+                            ].join('\n'),
+                        },
+                    },
+                },
+            });
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockViewPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        const yqlCodePreview = infoContent.locator('.ydb-yql-code-preview');
+
+        await expect(yqlCodePreview).toBeVisible();
+        await expect(yqlCodePreview.locator('.shiki')).toBeVisible();
+        await expect(infoContent).toHaveScreenshot('view-info-yql-code-preview.png');
+    });
 });

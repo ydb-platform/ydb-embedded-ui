@@ -3,18 +3,18 @@ import React from 'react';
 import {cn} from '../../utils/cn';
 import {YDBSyntaxHighlighter} from '../SyntaxHighlighter/YDBSyntaxHighlighter';
 
-import './QueryTextPreview.scss';
+import './YQLCodePreview.scss';
 
-const b = cn('ydb-query-text-preview');
+const b = cn('ydb-yql-code-preview');
 
-interface QueryTextPreviewProps {
+interface YQLCodePreviewProps {
     text: string;
     title: React.ReactNode;
     actions?: React.ReactNode;
     className?: string;
 }
 
-export function QueryTextPreview({text, title, actions, className}: QueryTextPreviewProps) {
+export function YQLCodePreview({text, title, actions, className}: YQLCodePreviewProps) {
     return (
         <div className={b(null, className)}>
             <div className={b('header')}>

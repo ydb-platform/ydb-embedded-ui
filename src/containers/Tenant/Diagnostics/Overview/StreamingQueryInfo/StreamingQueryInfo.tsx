@@ -3,9 +3,9 @@ import React from 'react';
 import {Flex, Label} from '@gravity-ui/uikit';
 
 import {LoaderWrapper} from '../../../../../components/LoaderWrapper/LoaderWrapper';
-import {QueryTextPreview} from '../../../../../components/QueryTextPreview/QueryTextPreview';
-import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {YQLCodePreview} from '../../../../../components/YQLCodePreview/YQLCodePreview';
 import {streamingQueriesApi} from '../../../../../store/reducers/streamingQuery/streamingQuery';
 import type {ErrorResponse} from '../../../../../types/api/query';
 import type {IQueryResult} from '../../../../../types/store/query';
@@ -37,7 +37,7 @@ export function StreamingQueryInfo({database, path}: StreamingQueryProps) {
             <Flex direction="column" gap="4">
                 <YDBDefinitionList items={items} />
                 {queryText ? (
-                    <QueryTextPreview title={i18n('field_query-text')} text={queryText} />
+                    <YQLCodePreview title={i18n('field_query-text')} text={queryText} />
                 ) : null}
             </Flex>
         </LoaderWrapper>
