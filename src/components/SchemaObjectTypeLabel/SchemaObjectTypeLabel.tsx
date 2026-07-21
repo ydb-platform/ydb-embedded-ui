@@ -1,9 +1,8 @@
 import React from 'react';
 
-import {Flex, HelpMark, Label} from '@gravity-ui/uikit';
-
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {LabelWithHelpMark} from '../LabelWithHelpMark/LabelWithHelpMark';
 
 import './SchemaObjectTypeLabel.scss';
 
@@ -16,19 +15,15 @@ interface SchemaObjectTypeLabelProps {
 
 export function SchemaObjectTypeLabel({value, description}: SchemaObjectTypeLabelProps) {
     return (
-        <Label theme="normal">
-            <Flex gap="1" alignItems="center" wrap="nowrap">
-                {value ?? EMPTY_DATA_PLACEHOLDER}
-                {description ? (
-                    <HelpMark
-                        className={b('help-mark')}
-                        iconSize="s"
-                        popoverProps={{placement: ['right', 'bottom']}}
-                    >
-                        <div className={b('description')}>{description}</div>
-                    </HelpMark>
-                ) : null}
-            </Flex>
-        </Label>
+        <LabelWithHelpMark
+            theme="normal"
+            help={description ? <div className={b('description')}>{description}</div> : undefined}
+            helpMarkProps={{
+                className: b('help-mark'),
+                popoverProps: {placement: ['right', 'bottom']},
+            }}
+        >
+            {value ?? EMPTY_DATA_PLACEHOLDER}
+        </LabelWithHelpMark>
     );
 }
