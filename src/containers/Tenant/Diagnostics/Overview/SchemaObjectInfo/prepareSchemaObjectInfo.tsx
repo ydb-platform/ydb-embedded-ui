@@ -5,6 +5,7 @@ import {EPathType} from '../../../../../types/api/schema';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatDateTime} from '../../../../../utils/dataFormatters/dataFormatters';
 import {getPathTypeName, isDomain} from '../../../ObjectSummary/transformPath';
+import tenantKeyset from '../../../i18n';
 
 import {schemaObjectInfoKeyset} from './i18n';
 
@@ -84,7 +85,7 @@ export function prepareSchemaObjectInfoItems({
     const self = data?.PathDescription?.Self;
     const pathId = self?.PathId ?? data?.PathId;
     const pathVersion = self?.PathVersion;
-    const created = formatDateTime(self?.CreateStep, {defaultValue: EMPTY_DATA_PLACEHOLDER});
+    const createStep = self?.CreateStep;
     const fullPath = data?.Path ?? path;
 
     const items: YDBDefinitionListItem[] = [
@@ -106,10 +107,16 @@ export function prepareSchemaObjectInfoItems({
             content: isPresent(pathVersion) ? pathVersion : EMPTY_DATA_PLACEHOLDER,
             copyText: isPresent(pathVersion) ? pathVersion : undefined,
         },
-        {
-            name: schemaObjectInfoKeyset('field_created'),
-            content: created,
-        },
+    );
+
+    if (Number(createStep)) {
+        items.push({
+            name: tenantKeyset('summary.created'),
+            content: formatDateTime(createStep),
+        });
+    }
+
+    items.push(
         {
             name: schemaObjectInfoKeyset('field_full-path'),
             content: isPresent(fullPath) ? fullPath : EMPTY_DATA_PLACEHOLDER,
