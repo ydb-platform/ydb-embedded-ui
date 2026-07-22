@@ -1,8 +1,4 @@
 {
-  "field_type": "Type",
-  "field_id": "ID",
-  "field_version": "Version",
-  "field_created": "Created",
   "field_full-path": "Full Path",
   "field_location": "Location",
   "field_auth-method": "Auth Method",

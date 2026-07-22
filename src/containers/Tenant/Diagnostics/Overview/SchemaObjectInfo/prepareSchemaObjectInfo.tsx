@@ -90,7 +90,7 @@ export function prepareSchemaObjectInfoItems({
 
     const items: YDBDefinitionListItem[] = [
         {
-            name: schemaObjectInfoKeyset('field_type'),
+            name: tenantKeyset('summary.type'),
             content: prepareTypeLabel({data, fallbackType, path}),
         },
         ...itemsAfterType,
@@ -98,12 +98,12 @@ export function prepareSchemaObjectInfoItems({
 
     items.push(
         {
-            name: schemaObjectInfoKeyset('field_id'),
+            name: tenantKeyset('summary.id'),
             content: isPresent(pathId) ? pathId : EMPTY_DATA_PLACEHOLDER,
             copyText: isPresent(pathId) ? pathId : undefined,
         },
         {
-            name: schemaObjectInfoKeyset('field_version'),
+            name: tenantKeyset('summary.version'),
             content: isPresent(pathVersion) ? pathVersion : EMPTY_DATA_PLACEHOLDER,
             copyText: isPresent(pathVersion) ? pathVersion : undefined,
         },

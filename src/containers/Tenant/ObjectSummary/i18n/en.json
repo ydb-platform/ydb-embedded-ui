@@ -1,18 +1,5 @@
 {
   "title_navigation": "Navigation",
   "action_copySchemaPath": "Copy schema path",
-  "action_openInDiagnostics": "Open in Diagnostics",
-  "field_type": "Type",
-  "field_id": "Id",
-  "field_version": "Version",
-  "field_created": "Created",
-  "field_data-size": "Data size",
-  "field_row-count": "Row count",
-  "field_partitions": "Partitions count",
-  "field_paths": "Paths",
-  "field_shards": "Shards",
-  "field_state": "State",
-  "field_mode": "Mode",
-  "field_format": "Format",
-  "field_retention": "Retention"
+  "action_openInDiagnostics": "Open in Diagnostics"
 }
