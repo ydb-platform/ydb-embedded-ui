@@ -23,6 +23,7 @@ export const useSelectedColumns = <T extends {name: string}>(
     columnsTitles: Record<string, string>,
     defaultColumnsIds: string[],
     requiredColumnsIds?: string[],
+    stickyColumnsIds: string[] | undefined = requiredColumnsIds,
 ) => {
     const [savedColumns, setSavedColumns] = useSetting<unknown[]>(storageKey, defaultColumnsIds);
 
@@ -78,6 +79,7 @@ export const useSelectedColumns = <T extends {name: string}>(
             (TableColumnSetupItem & {column: T; originalIndex: number})[]
         >((acc, {id, selected}, index) => {
             const isRequired = requiredColumnsIds?.includes(id);
+            const isSticky = isRequired && stickyColumnsIds?.includes(id);
             const column = columns.find((c) => c.name === id);
             if (column) {
                 acc.push({
@@ -85,26 +87,26 @@ export const useSelectedColumns = <T extends {name: string}>(
                     title: columnsTitles[id],
                     selected: Boolean(selected) || Boolean(isRequired),
                     required: isRequired,
-                    sticky: isRequired ? 'start' : undefined,
+                    sticky: isSticky ? 'start' : undefined,
                     column,
                     originalIndex: index,
                 });
             }
             return acc;
         }, []);
-        //required columns should be first to properly render columns settings
-        //preserve original order for non-required columns
+        // Sticky columns should be first to properly render columns settings.
+        // Preserve the original order for all other columns, including non-sticky required ones.
         const sorted = preparedColumns.toSorted((a, b) => {
-            const aReq = Number(Boolean(a.required));
-            const bReq = Number(Boolean(b.required));
-            if (aReq !== bReq) {
-                return bReq - aReq;
+            const aSticky = Number(Boolean(a.sticky));
+            const bSticky = Number(Boolean(b.sticky));
+            if (aSticky !== bSticky) {
+                return bSticky - aSticky;
             }
             return a.originalIndex - b.originalIndex;
         });
         // Remove originalIndex from the public return value
         return sorted.map(({originalIndex: _, ...item}) => item);
-    }, [columns, columnsTitles, requiredColumnsIds, orderedColumns]);
+    }, [columns, columnsTitles, requiredColumnsIds, stickyColumnsIds, orderedColumns]);
 
     const columnsToShow = React.useMemo(() => {
         return columnsToSelect.filter((c) => c.selected).map((c) => c.column);
