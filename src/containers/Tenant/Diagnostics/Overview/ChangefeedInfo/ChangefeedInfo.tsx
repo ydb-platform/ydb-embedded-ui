@@ -2,7 +2,6 @@ import {formatObject} from '../../../../../components/InfoViewer';
 import {formatCdcStreamItem} from '../../../../../components/InfoViewer/formatters';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
-import {getEntityName} from '../../../utils';
 import {TopicStats} from '../TopicStats';
 
 export function prepareChangefeedInfo(
@@ -31,10 +30,8 @@ interface ChangefeedProps {
 
 /** Displays overview for CDCStream EPathType */
 export const ChangefeedInfo = ({path, database, data, databaseFullPath}: ChangefeedProps) => {
-    const entityName = getEntityName(data?.PathDescription);
-
     if (!data) {
-        return <div className="error">No {entityName} data</div>;
+        return null;
     }
 
     return <TopicStats path={path} databaseFullPath={databaseFullPath} database={database} />;

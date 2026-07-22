@@ -7,7 +7,6 @@ import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster
 import {replicationApi} from '../../../../../store/reducers/replication';
 import type {DescribeReplicationResult} from '../../../../../types/api/replication';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
-import {getEntityName} from '../../../utils';
 
 import {Credentials} from './Credentials';
 import i18n from './i18n';
@@ -21,15 +20,10 @@ interface TransferProps {
 
 /** Displays overview for Transfer EPathType */
 export function TransferInfo({path, database, data, databaseFullPath}: TransferProps) {
-    const entityName = getEntityName(data?.PathDescription);
     const useMetaProxy = useClusterWithProxy();
 
     if (!data) {
-        return (
-            <div className="error">
-                {i18n('noData')} {entityName}
-            </div>
-        );
+        return null;
     }
 
     const {data: replicationData} = replicationApi.useGetReplicationQuery(

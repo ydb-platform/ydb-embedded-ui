@@ -3,7 +3,6 @@ import {Text} from '@gravity-ui/uikit';
 import {AsyncReplicationState} from '../../../../../components/AsyncReplicationState';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
-import {getEntityName} from '../../../utils';
 import {AsyncReplicationPaths} from '../AsyncReplicationPaths';
 
 import {Credentials} from './Credentials';
@@ -15,14 +14,8 @@ interface AsyncReplicationProps {
 
 /** Displays overview for Replication EPathType */
 export function AsyncReplicationInfo({data}: AsyncReplicationProps) {
-    const entityName = getEntityName(data?.PathDescription);
-
     if (!data) {
-        return (
-            <div className="error">
-                {i18n('noData')} {entityName}
-            </div>
-        );
+        return null;
     }
 
     return <AsyncReplicationPaths config={data.PathDescription?.ReplicationDescription?.Config} />;
