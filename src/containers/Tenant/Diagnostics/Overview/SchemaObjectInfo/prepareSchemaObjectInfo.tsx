@@ -83,10 +83,10 @@ export function prepareSchemaObjectInfoItems({
     additionalItems = [],
 }: PrepareSchemaObjectInfoItemsParams): YDBDefinitionListItem[] {
     const self = data?.PathDescription?.Self;
-    const pathId = self?.PathId ?? data?.PathId;
+    const pathId = isPresent(self?.PathId) ? self.PathId : data?.PathId;
     const pathVersion = self?.PathVersion;
     const createStep = self?.CreateStep;
-    const fullPath = data?.Path ?? path;
+    const fullPath = isPresent(data?.Path) ? data.Path : path;
 
     const items: YDBDefinitionListItem[] = [
         {
