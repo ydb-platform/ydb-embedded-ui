@@ -45,7 +45,7 @@ export function TopicMessage({
     // (error-only rows). In that case we render the alerts but no content/toolbar.
     const hasMessage = !isNil(message);
 
-    const {preparedMessage, decodedMessage, isJson} = React.useMemo(() => {
+    const {preparedMessage, decodedMessage, isJson, rawBytes} = React.useMemo(() => {
         // A schematized value is already a parsed JSON value (object/array or a
         // primitive such as a string) and must be used as-is. Only legacy,
         // non-schematized string values are base64-encoded and need decoding.
@@ -53,9 +53,15 @@ export function TopicMessage({
         // `isSchematized` signal derived from the response schema context rather
         // than guessing from the type.
         let preparedMessage: string | unknown = message;
-        // decodedMessage is always a string, suitable for download/clipboard.
+        // decodedMessage is always a string, suitable for preview/clipboard. It is
+        // a best-effort UTF-8 rendering and MUST NOT be used for downloading the
+        // message, since non-UTF-8 binary payloads get lossily mangled (invalid
+        // byte sequences become U+FFFD) - use `rawBytes` for that instead.
         let decodedMessage: string =
             typeof message === 'string' ? message : JSON.stringify(message, null, 2);
+        // Raw decoded bytes of a non-schematized base64 message, exactly as sent
+        // by the backend - the only safe source for downloading binary messages.
+        let rawBytes: Uint8Array | undefined;
 
         if (typeof message === 'string' && !isSchematized) {
             try {
@@ -64,6 +70,7 @@ export function TopicMessage({
                 for (let i = 0; i < binary.length; i++) {
                     bytes[i] = binary.charCodeAt(i);
                 }
+                rawBytes = bytes;
                 decodedMessage = utf8Decoder.decode(bytes);
             } catch (e) {
                 console.warn(e);
@@ -89,7 +96,7 @@ export function TopicMessage({
             preparedMessage = JSON.stringify(preparedMessage, null, 2);
         }
 
-        return {preparedMessage, decodedMessage, isJson};
+        return {preparedMessage, decodedMessage, isJson, rawBytes};
     }, [message, size, isSchematized]);
 
     const renderMessageContent = () => {
@@ -132,10 +139,11 @@ export function TopicMessage({
                 <ActionTooltip title={i18n('label_download')}>
                     <Button
                         view="flat-secondary"
+                        aria-label={i18n('label_download')}
                         onClick={(e) => {
                             e.stopPropagation();
                             createAndDownloadFile(
-                                decodedMessage,
+                                rawBytes ?? decodedMessage,
                                 `topic-message-${offset ?? 'unknown-offset'}`,
                             );
                         }}
