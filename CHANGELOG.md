@@ -1,5 +1,15 @@
 # Changelog
 
+## [18.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.2.0...v18.2.1) (2026-07-23)
+
+
+### Bug Fixes
+
+* load schema for system view queries ([#4143](https://github.com/ydb-platform/ydb-embedded-ui/issues/4143)) ([fe802af](https://github.com/ydb-platform/ydb-embedded-ui/commit/fe802aff5ce0a4802c6bbcfabcb63e19424568ec))
+* preserve raw bytes when downloading topic messages ([#4130](https://github.com/ydb-platform/ydb-embedded-ui/issues/4130)) ([3ad3ce9](https://github.com/ydb-platform/ydb-embedded-ui/commit/3ad3ce9b303274015d26b555a1ebfeb71de2a2ef))
+* skip pr description updates for fork pull requests ([#4133](https://github.com/ydb-platform/ydb-embedded-ui/issues/4133)) ([14700dd](https://github.com/ydb-platform/ydb-embedded-ui/commit/14700ddc622884b05b0c205a44f252f65110cf61))
+* vDisksPDisks is required in expert mode ([#4148](https://github.com/ydb-platform/ydb-embedded-ui/issues/4148)) ([25b5ed1](https://github.com/ydb-platform/ydb-embedded-ui/commit/25b5ed1a25ac318b5e124ddb4bcafff6ec7f1850))
+
 ## [18.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.1.0...v18.2.0) (2026-07-15)
 
 
