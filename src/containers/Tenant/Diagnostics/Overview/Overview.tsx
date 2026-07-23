@@ -130,6 +130,10 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
         return <Loader size="m" />;
     }
 
+    if (error && !currentData && type === EPathType.EPathTypeStreamingQuery) {
+        return renderContent();
+    }
+
     return (
         <React.Fragment>
             {error ? <ResponseError error={error} /> : null}

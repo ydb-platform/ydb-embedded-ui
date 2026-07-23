@@ -477,6 +477,87 @@ test.describe('Diagnostics Info tab', async () => {
         await expect(infoContent).toHaveScreenshot('fulltext-index-info-settings.png');
     });
 
+    test('Streaming Query Info remains available when describe fails', async ({page}) => {
+        test.slow();
+
+        const mockStreamingQueryPath = '/local/test_streaming_query';
+
+        await page.route('**/viewer/json/describe?*', async (route) => {
+            const url = new URL(route.request().url());
+            const path = url.searchParams.get('path');
+            const subs = url.searchParams.get('subs');
+
+            if (path === mockStreamingQueryPath && subs === '0') {
+                await route.fulfill({
+                    status: 500,
+                    contentType: 'application/json',
+                    json: {error: 'Streaming Query describe is not supported'},
+                });
+                return;
+            }
+
+            if (path === database && subs === '1') {
+                await route.fulfill({
+                    json: {
+                        Path: database,
+                        PathDescription: {
+                            Self: {
+                                Name: 'local',
+                                PathType: 'EPathTypeSubDomain',
+                            },
+                            Children: [
+                                {
+                                    Name: 'test_streaming_query',
+                                    PathType: 'EPathTypeStreamingQuery',
+                                },
+                            ],
+                        },
+                    },
+                });
+                return;
+            }
+
+            await route.continue();
+        });
+
+        await page.route('**/viewer/json/query?*', async (route) => {
+            await route.fulfill({
+                json: {
+                    version: 8,
+                    result: [
+                        {
+                            rows: [['RUNNING', '{}', 'SELECT 1;']],
+                            columns: [
+                                {name: 'State', type: 'Utf8?'},
+                                {name: 'Error', type: 'Utf8?'},
+                                {name: 'Text', type: 'Utf8?'},
+                            ],
+                        },
+                    ],
+                },
+            });
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockStreamingQueryPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        await expect(infoContent.getByText('RUNNING')).toBeVisible();
+        await expect(infoContent.locator('.ydb-yql-code-preview .shiki')).toBeVisible();
+        const infoContentBox = await infoContent.boundingBox();
+        if (!infoContentBox) {
+            throw new Error('Cannot take Streaming Query Info screenshot');
+        }
+        await expect(page).toHaveScreenshot('streaming-query-info-describe-fallback.png', {
+            clip: infoContentBox,
+        });
+    });
+
     test('View Info includes YQL code preview', async ({page}) => {
         const mockViewPath = '/local/test_view';
 
