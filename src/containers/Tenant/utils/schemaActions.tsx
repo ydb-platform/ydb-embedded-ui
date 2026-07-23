@@ -84,7 +84,9 @@ interface ActionsAdditionalParams {
     hasRunningCompaction?: (path: string) => boolean;
     isCompactionLoading?: boolean;
     schemaData?: SchemaData[];
+    schemaDataPath?: string;
     isSchemaDataLoading?: boolean;
+    isSchemaDataError?: boolean;
     hasMonitoring?: boolean;
     isV2NavigationEnabled?: boolean;
     streamingQueryData?: IQueryResult;
@@ -103,6 +105,19 @@ interface BindActionParams {
     relativePath: string;
 }
 
+function getSchemaDataForAction(
+    schemaData: SchemaData[] | undefined,
+    schemaDataPath: string | undefined,
+    actionPath: string,
+    isSchemaDataError: boolean,
+) {
+    if (isSchemaDataError || schemaDataPath !== actionPath) {
+        return undefined;
+    }
+
+    return schemaData;
+}
+
 const bindActions = (
     params: BindActionParams,
     dispatch: AppDispatch,
@@ -116,10 +131,15 @@ const bindActions = (
         getConfirmation,
         getConnectToDBDialog,
         showCompactionDialog,
-        schemaData,
         streamingQueryData,
         showCreateTableData,
     } = additionalEffects;
+    const schemaData = getSchemaDataForAction(
+        additionalEffects.schemaData,
+        additionalEffects.schemaDataPath,
+        params.path,
+        Boolean(additionalEffects.isSchemaDataError),
+    );
 
     const inputQuery = (tmpl: TemplateFn, templateName?: string) => () => {
         const snippet = tmpl({
@@ -511,7 +531,13 @@ export const getActions =
 
         const SYSTEM_VIEW_SET: ActionsSet = [
             [copyItem],
-            [{text: i18n('actions.selectQuery'), action: actions.selectQuery}],
+            [
+                getActionWithLoader({
+                    text: i18n('actions.selectQuery'),
+                    action: actions.selectQuery,
+                    isLoading: additionalEffects.isSchemaDataLoading,
+                }),
+            ],
         ];
 
         const ASYNC_REPLICATION_SET: ActionsSet = [
