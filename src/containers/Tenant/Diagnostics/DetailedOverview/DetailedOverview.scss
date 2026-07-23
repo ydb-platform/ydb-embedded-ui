@@ -4,14 +4,17 @@
 
     display: flex;
     flex-direction: column;
-    gap: 20px;
 
     width: 100%;
     min-height: 100%;
     padding-bottom: var(--g-spacing-5);
 
-    .g-definition-list__copy-container {
-        align-items: baseline;
+    > :not(:first-child) {
+        margin-top: var(--g-spacing-5);
+    }
+
+    > .ydb-schema-object-info + .ydb-definition-list {
+        margin-top: var(--g-spacing-3);
     }
 
     .info-viewer {

@@ -1,5 +1,8 @@
-import {Flex, Label, Text} from '@gravity-ui/uikit';
+import React from 'react';
 
+import {Label, Text} from '@gravity-ui/uikit';
+
+import {Loader} from '../../../../../components/Loader';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YQLCodePreview} from '../../../../../components/YQLCodePreview/YQLCodePreview';
@@ -7,9 +10,12 @@ import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster
 import {replicationApi} from '../../../../../store/reducers/replication';
 import type {DescribeReplicationResult} from '../../../../../types/api/replication';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
+import {cn} from '../../../../../utils/cn';
 
 import {Credentials} from './Credentials';
 import i18n from './i18n';
+
+import './TransferInfo.scss';
 
 interface TransferProps {
     path: string;
@@ -17,6 +23,8 @@ interface TransferProps {
     databaseFullPath: string;
     data?: TEvDescribeSchemeResult;
 }
+
+const b = cn('ydb-transfer-info');
 
 /** Displays overview for Transfer EPathType */
 export function TransferInfo({path, database, data, databaseFullPath}: TransferProps) {
@@ -26,19 +34,25 @@ export function TransferInfo({path, database, data, databaseFullPath}: TransferP
         return null;
     }
 
-    const {data: replicationData} = replicationApi.useGetReplicationQuery(
+    const {data: replicationData, isFetching} = replicationApi.useGetReplicationQuery(
         {path, database, databaseFullPath, useMetaProxy},
         {},
     );
+    const loading = isFetching && replicationData === undefined;
+
+    if (loading) {
+        return <Loader size="s" className={b('loader')} />;
+    }
+
     const {items, transformLambda} = prepareTransferItems(data, replicationData);
 
     return (
-        <Flex direction="column" gap="4">
+        <React.Fragment>
             <YDBDefinitionList items={items} />
             {transformLambda ? (
                 <YQLCodePreview title={i18n('transformLambda.label')} text={transformLambda} />
             ) : null}
-        </Flex>
+        </React.Fragment>
     );
 }
 

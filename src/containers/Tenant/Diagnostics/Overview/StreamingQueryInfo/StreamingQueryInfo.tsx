@@ -1,14 +1,15 @@
 import React from 'react';
 
-import {Flex, Label} from '@gravity-ui/uikit';
+import {Label} from '@gravity-ui/uikit';
 
-import {LoaderWrapper} from '../../../../../components/LoaderWrapper/LoaderWrapper';
+import {Loader} from '../../../../../components/Loader';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YQLCodePreview} from '../../../../../components/YQLCodePreview/YQLCodePreview';
 import {streamingQueriesApi} from '../../../../../store/reducers/streamingQuery/streamingQuery';
 import type {ErrorResponse} from '../../../../../types/api/query';
 import type {IQueryResult} from '../../../../../types/store/query';
+import {cn} from '../../../../../utils/cn';
 import {
     getStringifiedData,
     stripIndentByFirstLine,
@@ -19,28 +20,35 @@ import {ResultIssuesModal} from '../../../Query/Issues/Issues';
 
 import i18n from './i18n';
 
+import './StreamingQueryInfo.scss';
+
 interface StreamingQueryProps {
     database: string;
     path: string;
 }
+
+const b = cn('ydb-streaming-query-info');
 
 export function StreamingQueryInfo({database, path}: StreamingQueryProps) {
     const {data: sysData, isFetching} = streamingQueriesApi.useGetStreamingQueryInfoQuery(
         {database, path},
         {skip: !database || !path},
     );
+    const loading = isFetching && sysData === undefined;
+
+    if (loading) {
+        return <Loader size="s" className={b('loader')} />;
+    }
 
     const {items, queryText} = prepareStreamingQueryItems(sysData);
 
     return (
-        <LoaderWrapper loading={isFetching}>
-            <Flex direction="column" gap="4">
-                <YDBDefinitionList items={items} />
-                {queryText ? (
-                    <YQLCodePreview title={i18n('field_query-text')} text={queryText} />
-                ) : null}
-            </Flex>
-        </LoaderWrapper>
+        <React.Fragment>
+            <YDBDefinitionList items={items} />
+            {queryText ? (
+                <YQLCodePreview title={i18n('field_query-text')} text={queryText} />
+            ) : null}
+        </React.Fragment>
     );
 }
 
