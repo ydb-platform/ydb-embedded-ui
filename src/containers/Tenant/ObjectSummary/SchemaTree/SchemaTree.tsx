@@ -68,7 +68,12 @@ export function SchemaTree(props: SchemaTreeProps) {
     const isDirty = useTypedSelector(selectIsDirty);
     const [
         getTableSchemaDataQuery,
-        {currentData: actionsSchemaData, isFetching: isActionsDataFetching},
+        {
+            currentData: actionsSchemaData,
+            isFetching: isActionsDataFetching,
+            isError: isActionsDataError,
+            originalArgs: actionsSchemaArgs,
+        },
     ] = tableSchemaDataApi.useLazyGetTableSchemaDataQuery();
     const [
         getStreamingQueryInfo,
@@ -236,7 +241,9 @@ export function SchemaTree(props: SchemaTreeProps) {
                 hasRunningCompaction: compactionEnabled ? hasRunningCompaction : undefined,
                 isCompactionLoading: isCompactionFetching,
                 schemaData: actionsSchemaData,
+                schemaDataPath: actionsSchemaArgs?.path,
                 isSchemaDataLoading: isActionsDataFetching,
+                isSchemaDataError: isActionsDataError,
                 hasMonitoring,
                 isV2NavigationEnabled,
                 streamingQueryData: streamingSysData,
@@ -260,7 +267,9 @@ export function SchemaTree(props: SchemaTreeProps) {
         isDirty,
         isMultiTabEnabled,
         actionsSchemaData,
+        actionsSchemaArgs?.path,
         isActionsDataFetching,
+        isActionsDataError,
         isV2NavigationEnabled,
         streamingSysData,
         showCreateTableData,

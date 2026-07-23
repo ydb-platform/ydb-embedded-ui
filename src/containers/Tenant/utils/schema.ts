@@ -52,6 +52,7 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
 
 export const nodeTableTypeToPathType: Partial<Record<NavigationTreeNodeType, EPathType>> = {
     table: EPathType.EPathTypeTable,
+    system_table: EPathType.EPathTypeSysView,
     index: EPathType.EPathTypeTableIndex,
     column_table: EPathType.EPathTypeColumnTable,
     external_table: EPathType.EPathTypeExternalTable,

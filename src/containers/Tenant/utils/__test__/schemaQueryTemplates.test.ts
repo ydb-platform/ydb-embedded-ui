@@ -5,6 +5,7 @@ import {
     disableTTLTemplate,
     dropSecretTemplate,
     enableTTLTemplate,
+    selectQueryTemplate,
     selectTopicQueryTemplate,
 } from '../schemaQueryTemplates';
 
@@ -107,6 +108,24 @@ LIMIT \${1:10};`);
 
             expect(template).toContain('FROM ${1:<my_topic>}');
             expect(template).toContain('LIMIT ${2:10};');
+        });
+    });
+
+    describe('selectQueryTemplate', () => {
+        test('uses columns loaded for the selected system view', () => {
+            expect(
+                selectQueryTemplate({
+                    path: '/local/.sys/view',
+                    relativePath: '.sys/view',
+                    schemaData: [{name: 'system_column'}],
+                }),
+            ).toContain('SELECT `system_column`\nFROM `.sys/view`');
+        });
+
+        test('uses the snippet placeholder when schema data is unavailable', () => {
+            expect(
+                selectQueryTemplate({path: '/local/.sys/view', relativePath: '.sys/view'}),
+            ).toContain('SELECT ${1:*}\nFROM `.sys/view`');
         });
     });
 });
