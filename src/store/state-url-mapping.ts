@@ -11,6 +11,8 @@ import {getMatchingDeclaredPath} from 'redux-location-state/lib/helpers';
 import {parseQuery} from 'redux-location-state/lib/parseQuery';
 import {stateToParams} from 'redux-location-state/lib/stateToParams';
 
+import {canonicalizeDatabaseQueryString} from '../utils/queryParams';
+
 import {initialState as initialHeatmapState} from './reducers/heatmap';
 import {initialState as initialTenantState} from './reducers/tenant/tenant';
 
@@ -78,13 +80,20 @@ function mergeLocationToState<S>(state: S, location: Pick<LocationWithQuery, 'qu
     return merge({}, state, location.query);
 }
 
-function restoreUnknownParams(location: Location, prevLocation: Location) {
+export function restoreUnknownParams(location: Location, prevLocation: Location) {
     const {search, ...rest} = location;
-    const params = qs.parse(prevLocation.search.slice(1));
 
     // figure out which path key inside paramSetup matches location.pathname
     const declaredPath = getMatchingDeclaredPath(paramSetup, location);
     const entries = declaredPath && paramSetup[declaredPath as keyof typeof paramSetup];
+
+    // Canonicalize corrupted (repeated or indexed) params of already visited database
+    // pages before they are carried over to the next location
+    const prevSearch =
+        entries === databasePageParams
+            ? canonicalizeDatabaseQueryString(prevLocation.search)
+            : prevLocation.search;
+    const params = qs.parse(prevSearch.replace(/^\?/, ''));
 
     // remove params which are mapped for this page
     each(keys(entries), (param) => {
@@ -95,10 +104,16 @@ function restoreUnknownParams(location: Location, prevLocation: Location) {
         delete params[param];
     });
 
-    const restoredParams = qs.stringify(params, {encoder: encodeURIComponent});
+    const restoredParams = qs.stringify(params, {
+        encoder: encodeURIComponent,
+        arrayFormat: 'repeat',
+    });
     const searchDelimiter = search.startsWith('?') ? '&' : '?';
 
-    return {search: `${search}${searchDelimiter}${restoredParams}`, ...rest};
+    return {
+        search: restoredParams ? `${search}${searchDelimiter}${restoredParams}` : search,
+        ...rest,
+    };
 }
 
 let prevSearchStringFromState = '';

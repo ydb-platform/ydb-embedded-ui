@@ -1,5 +1,7 @@
 import type {Location} from 'history';
 
+import {canonicalizeDatabaseQueryString} from '../../utils/queryParams';
+
 type LegacyRedirectLocation = Pick<Location, 'pathname' | 'search' | 'hash'>;
 
 function makeRedirectLocation(location: LegacyRedirectLocation, pathname: string) {
@@ -18,8 +20,11 @@ export function getLegacyClusterTenantsRedirect(location: LegacyRedirectLocation
 }
 
 export function getLegacyTenantRedirect(location: LegacyRedirectLocation) {
-    return makeRedirectLocation(
-        location,
-        location.pathname.replace(/\/tenant(\/|$)/, '/database$1'),
-    );
+    return {
+        ...makeRedirectLocation(
+            location,
+            location.pathname.replace(/\/tenant(\/|$)/, '/database$1'),
+        ),
+        search: canonicalizeDatabaseQueryString(location.search),
+    };
 }
