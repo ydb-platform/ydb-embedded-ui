@@ -50,21 +50,20 @@ describe('restoreUnknownParams', () => {
             'tenantPage',
             'databasePage',
             'schema',
+            'monitoringTab',
+            'from',
+            'to',
+            'interval',
         ]);
         expect(params.getAll('clusterName')).toEqual(['global']);
         expect(params.getAll('database')).toEqual(['db']);
         expect(params.getAll('tenantPage')).toEqual(['diagnostics']);
         expect(params.getAll('databasePage')).toEqual(['query']);
         expect(params.getAll('schema')).toEqual(['/db/table']);
-        expect(params.getAll('monitoringTab')).toEqual([]);
-        expect(params.get('monitoringTab[0]')).toBe('overview');
-        expect(params.get('monitoringTab[21]')).toBe('diagnostics');
-        expect(params.get('from[0]')).toBe('1');
-        expect(params.get('from[21]')).toBe('2');
-        expect(params.get('to[0]')).toBe('3');
-        expect(params.get('to[21]')).toBe('4');
-        expect(params.get('interval[0]')).toBe('1h');
-        expect(params.get('interval[21]')).toBe('1d');
+        expect(params.getAll('monitoringTab')).toEqual(['diagnostics']);
+        expect(params.getAll('from')).toEqual(['2']);
+        expect(params.getAll('to')).toEqual(['4']);
+        expect(params.getAll('interval')).toEqual(['1d']);
         expect(params.getAll('currentMetric')).toEqual(['CPU']);
         expect(params.has('utm_referrer')).toBe(false);
     });

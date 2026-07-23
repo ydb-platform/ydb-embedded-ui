@@ -66,6 +66,11 @@ const DATABASE_SINGLE_VALUE_PARAMS: ReadonlySet<string> = new Set([
     'topSort',
     'runningSort',
     'showPreview',
+    // Monitoring dashboard parameters declared by embedding applications
+    'monitoringTab',
+    'from',
+    'to',
+    'interval',
 ]);
 
 function getQueryParamBaseName(name: string) {

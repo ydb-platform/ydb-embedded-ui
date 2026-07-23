@@ -64,6 +64,11 @@ describe('canonicalizeDatabaseQueryString', () => {
             'topSort',
             'runningSort',
             'showPreview',
+            // Monitoring dashboard parameters declared by embedding applications
+            'monitoringTab',
+            'from',
+            'to',
+            'interval',
         ];
         const search = scalarParams
             .flatMap((param) => [`${param}=stale`, `${param}%5B999%5D=fresh`])

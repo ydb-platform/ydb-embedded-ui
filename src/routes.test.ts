@@ -99,7 +99,8 @@ describe('routes', () => {
             const location = new URL(
                 'https://monitoring.example.test/database?withProblems=0&withProblems=1' +
                     '&topSort%5B0%5D=old&topSort%5B99%5D=new' +
-                    '&runningSort=old&runningSort%5Bnested%5D=new',
+                    '&runningSort=old&runningSort%5Bnested%5D=new' +
+                    '&from%5B0%5D=1&from%5B21%5D=2',
             );
             const path = getTenantPath({...parseQuery({search: location.search} as Location)});
             const params = getSearchParams(path);
@@ -107,6 +108,7 @@ describe('routes', () => {
             expect(params.getAll('withProblems')).toEqual(['1']);
             expect(params.getAll('topSort')).toEqual(['new']);
             expect(params.getAll('runningSort')).toEqual(['new']);
+            expect(params.getAll('from')).toEqual(['2']);
         });
 
         test('should keep an unknown multi-value param in repeat format', () => {
