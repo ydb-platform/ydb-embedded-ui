@@ -14,7 +14,7 @@ import {backend, basename, clusterName, environment, webVersion} from './store';
 import {uiFactory} from './uiFactory/uiFactory';
 import {normalizePathSlashes} from './utils';
 import {useDatabaseFromQuery} from './utils/hooks/useDatabaseFromQuery';
-import {omitVolatileQueryParams} from './utils/queryParams';
+import {canonicalizeDatabaseQueryString, omitVolatileQueryParams} from './utils/queryParams';
 
 export const CLUSTER = 'cluster';
 export const DATABASE = 'database';
@@ -186,7 +186,12 @@ export const getClusterPath = (
 };
 
 export const getTenantPath = (query: TenantQuery, options?: CreateHrefOptions) => {
-    return createHref(routes.tenant, undefined, query, options);
+    const href = createHref(routes.tenant, undefined, query, options);
+    const searchIndex = href.indexOf('?');
+    if (searchIndex === -1) {
+        return href;
+    }
+    return href.slice(0, searchIndex) + canonicalizeDatabaseQueryString(href.slice(searchIndex));
 };
 
 export const homePageTabSchema = z.enum(['clusters', 'databases']);

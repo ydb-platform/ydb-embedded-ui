@@ -59,5 +59,19 @@ describe('legacyRedirects', () => {
                 hash: '',
             });
         });
+
+        test('canonicalizes database query params while redirecting', () => {
+            expect(
+                getLegacyTenantRedirect({
+                    pathname: '/tenant',
+                    search: '?database=stale&database%5B99%5D=%2Flocal&utm_referrer=redirect',
+                    hash: '',
+                }),
+            ).toEqual({
+                pathname: '/database',
+                search: '?database=%2Flocal',
+                hash: '',
+            });
+        });
     });
 });
