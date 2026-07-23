@@ -63,7 +63,31 @@ describe('useStorageGroupsSelectedColumns', () => {
         ]);
     });
 
-    test('keeps VDisks when saved columns do not select VDisks with PDisks in expert mode', () => {
+    test('keeps VDisks and leaves VDisks with PDisks optional outside expert mode', () => {
+        const {result} = renderHook(() =>
+            useStorageGroupsSelectedColumns({visibleEntities: 'all'}),
+        );
+
+        expect(
+            result.current.columnsToSelect.find(
+                ({id}) => id === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+            ),
+        ).toEqual(
+            expect.objectContaining({
+                selected: false,
+                required: false,
+                sticky: undefined,
+            }),
+        );
+        expect(result.current.columnsToShow.map(({name}) => name)).toContain(
+            STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+        );
+        expect(result.current.columnsToShow.map(({name}) => name)).not.toContain(
+            STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+        );
+    });
+
+    test('requires VDisks with PDisks and removes VDisks in expert mode', () => {
         useIsStorageExpertMode.mockReturnValue(true);
 
         const {result} = renderHook(() =>
@@ -76,17 +100,21 @@ describe('useStorageGroupsSelectedColumns', () => {
 
         expect(vDisksPDisksColumn).toEqual(
             expect.objectContaining({
-                selected: false,
-                required: false,
+                selected: true,
+                required: true,
+                sticky: undefined,
                 title: 'VDisks with PDisks',
             }),
         );
+        expect(
+            result.current.columnsToSelect.some(({id}) => id === STORAGE_GROUPS_COLUMNS_IDS.VDisks),
+        ).toBe(false);
         expect(result.current.columnsToShow.map(({name}) => name)).toEqual([
             STORAGE_GROUPS_COLUMNS_IDS.GroupId,
             STORAGE_GROUPS_COLUMNS_IDS.PoolName,
             STORAGE_GROUPS_COLUMNS_IDS.Erasure,
             STORAGE_GROUPS_COLUMNS_IDS.Used,
-            STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+            STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
         ]);
     });
 
@@ -111,6 +139,17 @@ describe('useStorageGroupsSelectedColumns', () => {
         expect(
             result.current.columnsToSelect.some(({id}) => id === STORAGE_GROUPS_COLUMNS_IDS.VDisks),
         ).toBe(false);
+        expect(
+            result.current.columnsToSelect.find(
+                ({id}) => id === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+            ),
+        ).toEqual(
+            expect.objectContaining({
+                selected: true,
+                required: true,
+                sticky: undefined,
+            }),
+        );
         expect(result.current.columnsToShow.map(({name}) => name)).toEqual([
             STORAGE_GROUPS_COLUMNS_IDS.GroupId,
             STORAGE_GROUPS_COLUMNS_IDS.PoolName,
@@ -120,7 +159,7 @@ describe('useStorageGroupsSelectedColumns', () => {
         ]);
     });
 
-    test('hides VDisks selector option when regular VDisks is disabled in expert mode', () => {
+    test('requires VDisks with PDisks when both disks columns were disabled', () => {
         useIsStorageExpertMode.mockReturnValue(true);
         useSetting.mockReturnValue([
             [
@@ -144,8 +183,19 @@ describe('useStorageGroupsSelectedColumns', () => {
         expect(result.current.columnsToShow.map(({name}) => name)).not.toContain(
             STORAGE_GROUPS_COLUMNS_IDS.VDisks,
         );
-        expect(result.current.columnsToShow.map(({name}) => name)).not.toContain(
+        expect(result.current.columnsToShow.map(({name}) => name)).toContain(
             STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+        );
+        expect(
+            result.current.columnsToSelect.find(
+                ({id}) => id === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+            ),
+        ).toEqual(
+            expect.objectContaining({
+                selected: true,
+                required: true,
+                sticky: undefined,
+            }),
         );
     });
 

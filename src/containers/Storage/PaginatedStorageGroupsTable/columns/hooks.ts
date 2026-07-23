@@ -69,19 +69,25 @@ export function useStorageGroupsSelectedColumns({
         return allColumns.filter((column) => !skippedColumnIds.some((id) => id === column.name));
     }, [viewContext, skippedColumnIds]);
 
-    const requiredColumns = React.useMemo(() => {
-        const required = [...REQUIRED_STORAGE_GROUPS_COLUMNS];
+    const stickyColumns = React.useMemo(() => {
+        const sticky = [...REQUIRED_STORAGE_GROUPS_COLUMNS];
 
         if (visibleEntities === VISIBLE_ENTITIES.missing) {
-            required.push(STORAGE_GROUPS_COLUMNS_IDS.Degraded);
+            sticky.push(STORAGE_GROUPS_COLUMNS_IDS.Degraded);
         }
 
         if (visibleEntities === VISIBLE_ENTITIES.space) {
-            required.push(STORAGE_GROUPS_COLUMNS_IDS.DiskSpace);
+            sticky.push(STORAGE_GROUPS_COLUMNS_IDS.DiskSpace);
         }
 
-        return required;
+        return sticky;
     }, [visibleEntities]);
+
+    const requiredColumns = React.useMemo(() => {
+        return isStorageExpertMode && isVDisksPDisksColumnAvailable
+            ? [...stickyColumns, STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks]
+            : stickyColumns;
+    }, [isStorageExpertMode, isVDisksPDisksColumnAvailable, stickyColumns]);
 
     const defaultColumns = React.useMemo(() => {
         const defaultStorageGroupsColumns = isStorageExpertMode
@@ -102,6 +108,7 @@ export function useStorageGroupsSelectedColumns({
         STORAGE_GROUPS_COLUMNS_TITLES,
         defaultColumns,
         requiredColumns,
+        stickyColumns,
     );
 
     const shouldUseExpertDisksColumn =
