@@ -1,10 +1,11 @@
-import {screen} from '@testing-library/react';
+import {screen, within} from '@testing-library/react';
 import {Router} from 'react-router-dom';
 import {QueryParamProvider} from 'use-query-params';
 import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 
 import {configureStore} from '../../../store';
 import {ECapacityAlert, EFlag} from '../../../types/api/enums';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {renderWithStore} from '../../../utils/tests/providers';
 import {VDiskPopup} from '../VDiskPopup';
@@ -21,6 +22,7 @@ const {useBlobStorageCapacityMetricsEnabled} = jest.requireMock(
 const capacityMetricsData: PreparedVDisk = {
     VDiskId: {},
     AllocatedSize: 1_000_000_000,
+    AvailableSize: 1_000_000_000,
     SizeLimit: 2_000_000_000,
     AllocatedPercent: 50,
     DiskSpace: EFlag.Green,
@@ -45,6 +47,16 @@ function renderVDiskPopup(data: PreparedVDisk) {
     );
 }
 
+function getDefinitionListRow(label: string) {
+    const row = screen.getByText(label).closest('.g-definition-list__item');
+
+    if (!(row instanceof HTMLElement)) {
+        throw new Error(`Definition-list row was not found for ${label}`);
+    }
+
+    return row;
+}
+
 describe('VDiskPopup', () => {
     beforeEach(() => {
         useBlobStorageCapacityMetricsEnabled.mockReturnValue(false);
@@ -55,6 +67,7 @@ describe('VDiskPopup', () => {
 
         renderVDiskPopup(capacityMetricsData);
 
+        expect(screen.queryByText('Space', {exact: true})).not.toBeInTheDocument();
         expect(screen.queryByText('Allocated', {exact: true})).not.toBeInTheDocument();
         expect(screen.queryByText('Available', {exact: true})).not.toBeInTheDocument();
         expect(screen.getByText('Size')).toBeVisible();
@@ -65,5 +78,29 @@ describe('VDiskPopup', () => {
         expect(screen.getByText('Group Size In Units')).toBeVisible();
         expect(screen.getByText('Capacity Alert')).toBeVisible();
         expect(screen.getByText('LIGHT_YELLOW')).toBeVisible();
+    });
+
+    test('keeps legacy space and allocation rows when explicit VDisk capacity metrics are disabled', () => {
+        renderVDiskPopup(capacityMetricsData);
+
+        expect(screen.getByText('Space')).toBeVisible();
+        expect(screen.getByText('Allocated')).toBeVisible();
+        expect(screen.getByText('Available')).toBeVisible();
+        expect(screen.queryByText('Size', {exact: true})).not.toBeInTheDocument();
+        expect(screen.queryByText('VDisk Slot Usage')).not.toBeInTheDocument();
+        expect(screen.queryByText('Group Size In Units')).not.toBeInTheDocument();
+        expect(screen.queryByText('Capacity Alert')).not.toBeInTheDocument();
+    });
+
+    test('keeps compact explicit VDisk capacity rows visible when metric fields are absent', () => {
+        useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
+
+        renderVDiskPopup({VDiskId: {}});
+
+        for (const label of ['Size', 'VDisk Slot Usage', 'Group Size In Units', 'Capacity Alert']) {
+            expect(
+                within(getDefinitionListRow(label)).getByText(EMPTY_DATA_PLACEHOLDER),
+            ).toBeVisible();
+        }
     });
 });
