@@ -20,7 +20,7 @@ import {
     setStreamQueryResponse,
     setStreamSession,
 } from './slice';
-import type {QueryStats} from './types';
+import type {QuerySourcePosition, QueryStats} from './types';
 import {getActionAndSyntaxFromQueryMode, prepareQueryWithPragmas} from './utils';
 
 function getTracingLevelParam(
@@ -98,6 +98,7 @@ interface SendQueryParams extends QueryRequestParams {
     actionType?: QueryAction;
     queryId: string;
     startTime: number;
+    sourcePosition?: QuerySourcePosition;
     historyQueryId?: string;
     querySettings?: Partial<QuerySettings>;
     // flag whether to send new tracing header or not
@@ -133,6 +134,7 @@ export const queryApi = api.injectEndpoints({
                     enableTracingLevel,
                     base64,
                     historyQueryId,
+                    sourcePosition,
                 },
                 {signal, dispatch, getState},
             ) => {
@@ -145,6 +147,7 @@ export const queryApi = api.injectEndpoints({
                             isLoading: true,
                             startTime,
                             streamingStatus: 'preparing',
+                            sourcePosition,
                         },
                     }),
                 );
@@ -293,6 +296,7 @@ export const queryApi = api.injectEndpoints({
                     queryId,
                     base64,
                     historyQueryId,
+                    sourcePosition,
                 },
                 {signal, dispatch, getState},
             ) => {
@@ -304,6 +308,7 @@ export const queryApi = api.injectEndpoints({
                             queryId,
                             isLoading: true,
                             startTime,
+                            sourcePosition,
                         },
                     }),
                 );
@@ -352,6 +357,7 @@ export const queryApi = api.injectEndpoints({
                                     queryId,
                                     startTime,
                                     endTime: Date.now(),
+                                    sourcePosition,
                                 },
                             }),
                         );
@@ -385,6 +391,7 @@ export const queryApi = api.injectEndpoints({
                                 queryId,
                                 startTime,
                                 endTime: Date.now(),
+                                sourcePosition,
                             },
                         }),
                     );
