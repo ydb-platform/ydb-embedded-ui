@@ -333,7 +333,7 @@ export default function QueryEditor({
             return;
         }
 
-        const {text, source} = execution;
+        const {text, source, range} = execution;
 
         runSetStoppableTimeout();
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
@@ -398,6 +398,9 @@ export default function QueryEditor({
                 enableTracingLevel,
                 base64: encodeTextWithBase64,
                 historyQueryId,
+                sourcePosition: range
+                    ? {lineNumber: range.startLineNumber, column: range.startColumn}
+                    : undefined,
             });
             query
                 .unwrap()
@@ -447,6 +450,9 @@ export default function QueryEditor({
                 queryId: newQueryId,
                 historyQueryId: historyQueryId,
                 base64: encodeTextWithBase64,
+                sourcePosition: range
+                    ? {lineNumber: range.startLineNumber, column: range.startColumn}
+                    : undefined,
             });
 
             query

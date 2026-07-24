@@ -1,21 +1,32 @@
 import {ResponseError} from '../../../../../../components/Errors/ResponseError/ResponseError';
+import type {QuerySourcePosition} from '../../../../../../store/reducers/query/types';
 import {cn} from '../../../../../../utils/cn';
 import {parseQueryError} from '../../../../../../utils/query';
 import {ResultIssues} from '../../../Issues/Issues';
+import {offsetErrorResponsePositions} from '../../../Issues/helpers';
 import {isQueryCancelledError} from '../../../utils/isQueryCancelledError';
 
 import './QueryResultError.scss';
 
 const b = cn('ydb-query-result-error');
 
-export function QueryResultError({error}: {error: unknown}) {
+interface QueryResultErrorProps {
+    error: unknown;
+    sourcePosition?: QuerySourcePosition;
+}
+
+export function QueryResultError({error, sourcePosition}: QueryResultErrorProps) {
     // "Stopped" message is displayed in QueryExecutionStatus
     // There is no need to display "Query is cancelled" message too
     if (isQueryCancelledError(error)) {
         return null;
     }
 
-    const parsedError = parseQueryError(error);
+    const rawParsedError = parseQueryError(error);
+    const parsedError =
+        sourcePosition && rawParsedError !== null && typeof rawParsedError === 'object'
+            ? offsetErrorResponsePositions(rawParsedError, sourcePosition)
+            : rawParsedError;
 
     // Query-specific errors with issues (e.g. syntax errors) — show ResultIssues
     if (typeof parsedError === 'object') {

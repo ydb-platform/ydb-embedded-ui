@@ -265,6 +265,16 @@ export class QueryEditor {
         );
     }
 
+    async clickFirstIssuePosition() {
+        const resultArea = this.getResultAreaLocator();
+        await resultArea.getByRole('button', {name: 'Show details'}).first().click();
+        await resultArea.locator('.kv-issue__place-text').first().click();
+    }
+
+    async getCursorPosition() {
+        return this.editorTextArea.evaluate(() => window.ydbEditor?.getPosition());
+    }
+
     async getHighlightedStatement() {
         return this.editorTextArea.evaluate(() => {
             const model = window.ydbEditor?.getModel();

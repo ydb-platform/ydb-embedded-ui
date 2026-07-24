@@ -4,6 +4,7 @@ import type {Settings} from '@gravity-ui/react-data-table';
 import {Flex, Tab, TabList, TabProvider, Text} from '@gravity-ui/uikit';
 
 import {QueryResultTable} from '../../../../../../components/QueryResultTable';
+import type {QuerySourcePosition} from '../../../../../../store/reducers/query/types';
 import type {ParsedResultSet} from '../../../../../../types/store/query';
 import {cn} from '../../../../../../utils/cn';
 import {QueryResultError} from '../QueryResultError/QueryResultError';
@@ -16,6 +17,7 @@ interface ResultSetsViewerProps {
     resultSets?: ParsedResultSet[];
     selectedResultSet: number;
     error?: unknown;
+    sourcePosition?: QuerySourcePosition;
     tableSettings?: Partial<Settings>;
     setSelectedResultSet: (resultSet: number) => void;
 }
@@ -77,7 +79,9 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
 
     return (
         <div className={b('result-wrapper')}>
-            {props.error ? <QueryResultError error={error} /> : null}
+            {props.error ? (
+                <QueryResultError error={error} sourcePosition={props.sourcePosition} />
+            ) : null}
             {renderResults()}
             {currentResult ? (
                 <div className={b('result')} ref={scrollRef}>
