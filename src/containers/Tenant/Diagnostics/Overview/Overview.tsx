@@ -39,7 +39,9 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
         {pollingInterval: autoRefreshInterval},
     );
 
-    const loading = isFetching && currentData === undefined;
+    const isStreamingQuery = type === EPathType.EPathTypeStreamingQuery;
+    const loading =
+        isFetching && currentData === undefined && (!isStreamingQuery || error === undefined);
 
     const renderContent = () => {
         const data = currentData ?? undefined;
@@ -130,7 +132,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
         return <Loader size="m" />;
     }
 
-    if (error && !currentData && type === EPathType.EPathTypeStreamingQuery) {
+    if (error && !currentData && isStreamingQuery) {
         return renderContent();
     }
 
