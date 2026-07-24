@@ -3,11 +3,7 @@ import type {Dialog, Page} from '@playwright/test';
 const HOTKEY_PROCESSING_DELAY = 1000;
 
 async function getModifierKey(page: Page) {
-    const isMac = await page.evaluate(() => {
-        const nav = navigator as Navigator & {userAgentData?: {platform?: string}};
-        const platform = nav.userAgentData?.platform || navigator.platform || '';
-        return platform.toUpperCase().includes('MAC');
-    });
+    const isMac = await page.evaluate(() => navigator.userAgent.includes('Macintosh'));
     const browserName = page.context().browser()?.browserType().name() ?? 'chromium';
 
     return {
