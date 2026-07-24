@@ -18,6 +18,8 @@ export const LONG_HOST = 'storage-node-1273683y-1273683y-1273683y.ydb';
 export const LONG_PDISK_ID = '1000-1012';
 
 export interface SetupVDiskPageMocksOptions {
+    capacityMetricsAvailable?: boolean;
+    withCapacityMetrics?: boolean;
     datacenter?: string;
     rack?: string;
     host?: string;
@@ -28,14 +30,71 @@ export interface SetupVDiskPageMocksOptions {
     availableSize?: string;
 }
 
+const vDiskCapacityFields = {
+    GroupSizeInUnits: 2,
+    VDiskSlotUsage: 82.25,
+    VDiskRawUsage: 64.5,
+    CapacityAlert: 'LIGHT_YELLOW',
+};
+
+const pDiskCapacityFields = {
+    SlotSizeInUnits: 4,
+    PDiskUsage: 70.5,
+    PDiskCapacityAlert: 'ORANGE',
+};
+
+function createVDiskWhiteboardData(withCapacityMetrics = false) {
+    return {
+        VDiskId: {
+            GroupID: Number(GROUP_ID),
+            GroupGeneration: 1,
+            Ring: 0,
+            Domain: 0,
+            VDisk: 0,
+        },
+        NodeId: Number(NODE_ID),
+        PDiskId: Number(PDISK_ID),
+        VDiskSlotId: 1001,
+        AllocatedSize: '10000000000',
+        AvailableSize: '186000000000',
+        StoragePoolName: STORAGE_POOL_NAME,
+        DiskSpace: 'Green',
+        FrontQueues: 'Green',
+        ...(withCapacityMetrics ? vDiskCapacityFields : {}),
+    };
+}
+
+function createPDiskWhiteboardData(withCapacityMetrics = false) {
+    return {
+        PDiskId: Number(PDISK_ID),
+        NodeId: Number(NODE_ID),
+        Path: '/dev/pdisk0',
+        Guid: '123456789',
+        Category: '1',
+        AvailableSize: '180000000000',
+        TotalSize: '200000000000',
+        State: 'Normal',
+        Device: 'Green',
+        Realtime: 'Green',
+        SystemSize: '1000000000',
+        LogUsedSize: '1000000000',
+        LogTotalSize: '5000000000',
+        EnforcedDynamicSlotSize: '20000000000',
+        ExpectedSlotCount: 4,
+        NumActiveSlots: 2,
+        ...(withCapacityMetrics ? pDiskCapacityFields : {}),
+    };
+}
+
 function createStorageGroupsResponse({
     allocatedSize = '10000000000',
     availableSize = '186000000000',
     pDiskId = PDISK_ID,
     withDonors,
+    withCapacityMetrics,
 }: Pick<
     SetupVDiskPageMocksOptions,
-    'allocatedSize' | 'availableSize' | 'pDiskId' | 'withDonors'
+    'allocatedSize' | 'availableSize' | 'pDiskId' | 'withDonors' | 'withCapacityMetrics'
 > = {}) {
     return {
         StorageGroups: [
@@ -48,6 +107,18 @@ function createStorageGroupsResponse({
                 Limit: '196000000000',
                 Available: '186000000000',
                 State: 'ok',
+                GroupGeneration: '1',
+                Encryption: false,
+                AllocationUnits: '1',
+                ...(withCapacityMetrics
+                    ? {
+                          GroupSizeInUnits: vDiskCapacityFields.GroupSizeInUnits,
+                          MaxPDiskUsage: pDiskCapacityFields.PDiskUsage,
+                          MaxVDiskSlotUsage: vDiskCapacityFields.VDiskSlotUsage,
+                          MaxVDiskRawUsage: vDiskCapacityFields.VDiskRawUsage,
+                          CapacityAlert: vDiskCapacityFields.CapacityAlert,
+                      }
+                    : {}),
                 VDisks: [
                     {
                         VDiskId: VDISK_ID,
@@ -58,6 +129,9 @@ function createStorageGroupsResponse({
                         StoragePoolName: STORAGE_POOL_NAME,
                         DiskSpace: 'Green',
                         FrontQueues: 'Green',
+                        ...(withCapacityMetrics
+                            ? {Whiteboard: createVDiskWhiteboardData(true)}
+                            : {}),
                         ...(withDonors ? {VDiskState: 'OK', Replicated: false} : {}),
                         SatisfactionRank: {
                             FreshRank: {
@@ -70,6 +144,9 @@ function createStorageGroupsResponse({
                         PDisk: {
                             PDiskId: `${NODE_ID}-${pDiskId}`,
                             Type: 'ROT',
+                            ...(withCapacityMetrics
+                                ? {Whiteboard: createPDiskWhiteboardData(true)}
+                                : {}),
                         },
                         Donors: withDonors
                             ? [
@@ -164,7 +241,7 @@ async function setupMonitoringUserMock(page: Page, isViewerAllowed = true) {
     });
 }
 
-async function setupCapabilitiesMock(page: Page) {
+async function setupCapabilitiesMock(page: Page, capacityMetricsAvailable = true) {
     await page.route('**/viewer/capabilities*', async (route) => {
         await route.fulfill({
             status: 200,
@@ -172,8 +249,8 @@ async function setupCapabilitiesMock(page: Page) {
             body: JSON.stringify({
                 Database: DATABASE,
                 Capabilities: {
-                    '/storage/groups': 10,
-                    '/viewer/nodes': 20,
+                    '/storage/groups': capacityMetricsAvailable ? 10 : 9,
+                    '/viewer/nodes': capacityMetricsAvailable ? 20 : 19,
                     '/pdisk/info': 10,
                     '/vdisk/blobindexstat': 2,
                 },
@@ -239,9 +316,10 @@ async function setupStorageGroupsMock(
         availableSize,
         pDiskId = PDISK_ID,
         withDonors,
+        withCapacityMetrics,
     }: Pick<
         SetupVDiskPageMocksOptions,
-        'allocatedSize' | 'availableSize' | 'pDiskId' | 'withDonors'
+        'allocatedSize' | 'availableSize' | 'pDiskId' | 'withDonors' | 'withCapacityMetrics'
     > = {},
 ) {
     await page.route('**/storage/groups?*', async (route) => {
@@ -249,55 +327,63 @@ async function setupStorageGroupsMock(
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify(
-                createStorageGroupsResponse({allocatedSize, availableSize, pDiskId, withDonors}),
+                createStorageGroupsResponse({
+                    allocatedSize,
+                    availableSize,
+                    pDiskId,
+                    withDonors,
+                    withCapacityMetrics,
+                }),
             ),
         });
     });
 }
 
-export async function setupPDiskInfoMock(page: Page) {
+async function setupStorageNodesMock(page: Page, withCapacityMetrics = false) {
+    await page.route('**/viewer/json/nodes?*', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                TotalNodes: '1',
+                FoundNodes: '1',
+                Nodes: [
+                    {
+                        NodeId: Number(NODE_ID),
+                        SystemState: {
+                            NodeId: Number(NODE_ID),
+                            Host: 'storage-node-07.ydb',
+                            Roles: ['Storage'],
+                        },
+                        PDisks: [createPDiskWhiteboardData(withCapacityMetrics)],
+                        VDisks: [createVDiskWhiteboardData(withCapacityMetrics)],
+                        ...(withCapacityMetrics
+                            ? {
+                                  MaxPDiskUsage: pDiskCapacityFields.PDiskUsage,
+                                  MaxVDiskSlotUsage: vDiskCapacityFields.VDiskSlotUsage,
+                                  MaxVDiskRawUsage: vDiskCapacityFields.VDiskRawUsage,
+                                  CapacityAlert: vDiskCapacityFields.CapacityAlert,
+                              }
+                            : {}),
+                    },
+                ],
+            }),
+        });
+    });
+}
+
+export async function setupPDiskInfoMock(
+    page: Page,
+    {withCapacityMetrics = false}: Pick<SetupVDiskPageMocksOptions, 'withCapacityMetrics'> = {},
+) {
     await page.route('**/pdisk/info*', async (route) => {
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({
                 Whiteboard: {
-                    PDisk: {
-                        PDiskId: Number(PDISK_ID),
-                        NodeId: Number(NODE_ID),
-                        Path: '/dev/pdisk0',
-                        Guid: '123456789',
-                        Category: '1',
-                        AvailableSize: '180000000000',
-                        TotalSize: '200000000000',
-                        State: 'Normal',
-                        Device: 'Green',
-                        Realtime: 'Green',
-                        SystemSize: '1000000000',
-                        LogUsedSize: '1000000000',
-                        LogTotalSize: '5000000000',
-                        EnforcedDynamicSlotSize: '20000000000',
-                        ExpectedSlotCount: 4,
-                        NumActiveSlots: 2,
-                    },
-                    VDisks: [
-                        {
-                            VDiskId: {
-                                GroupID: Number(GROUP_ID),
-                                GroupGeneration: 1,
-                                Ring: 0,
-                                Domain: 0,
-                                VDisk: 0,
-                            },
-                            NodeId: Number(NODE_ID),
-                            PDiskId: Number(PDISK_ID),
-                            AllocatedSize: '10000000000',
-                            AvailableSize: '10000000000',
-                            DiskSpace: 'Green',
-                            FrontQueues: 'Green',
-                            StoragePoolName: STORAGE_POOL_NAME,
-                        },
-                    ],
+                    PDisk: createPDiskWhiteboardData(withCapacityMetrics),
+                    VDisks: [createVDiskWhiteboardData(withCapacityMetrics)],
                 },
                 BSC: {
                     PDisk: {
@@ -319,7 +405,8 @@ export async function setupPDiskInfoMock(page: Page) {
 
 export async function setupVDiskPageMocks(page: Page, options: SetupVDiskPageMocksOptions = {}) {
     await setupMonitoringUserMock(page, options.isViewerAllowed);
-    await setupCapabilitiesMock(page);
+    await setupCapabilitiesMock(page, options.capacityMetricsAvailable);
     await setupNodeInfoMock(page, options);
     await setupStorageGroupsMock(page, options);
+    await setupStorageNodesMock(page, options.withCapacityMetrics);
 }

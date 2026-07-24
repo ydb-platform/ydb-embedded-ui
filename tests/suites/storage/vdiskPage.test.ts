@@ -1,6 +1,7 @@
 import type {Locator, Page} from '@playwright/test';
 import {expect, test} from '@playwright/test';
 
+import {EMPTY_DATA_PLACEHOLDER} from '../../../src/utils/constants';
 import {ClusterStorageTable} from '../paginatedTable/paginatedTable';
 
 import {
@@ -24,6 +25,29 @@ const VDISK_TABLETS_WITH_STORAGE_STATE_PAGE_PATH = `${VDISK_TABLETS_PAGE_PATH}&g
 async function enableNewStorageView(page: Page) {
     await page.addInitScript(() => {
         localStorage.setItem('enableNewStorageView', JSON.stringify(true));
+    });
+}
+
+async function enableBlobStorageCapacityMetrics(page: Page) {
+    await page.addInitScript(() => {
+        localStorage.setItem('blobStorageCapacityMetrics', JSON.stringify(true));
+    });
+}
+
+async function enableStorageNodesCapacityColumns(page: Page) {
+    await page.addInitScript(() => {
+        localStorage.setItem(
+            'storageNodesSelectedColumns',
+            JSON.stringify([
+                {id: 'NodeId', selected: true},
+                {id: 'PDisks', selected: true},
+                {id: 'MaxPDiskUsage', selected: true},
+                {id: 'MaxVDiskSlotUsage', selected: true},
+                {id: 'MaxVDiskRawUsage', selected: true},
+                {id: 'CapacityAlert', selected: true},
+                {id: 'DiskSpaceUsage', selected: true},
+            ]),
+        );
     });
 }
 
@@ -151,6 +175,28 @@ test.describe('VDisk page tabs', () => {
         }
     });
 });
+
+function getInfoRow(container: Locator, label: string) {
+    return container.locator('.info-viewer__row').filter({hasText: label});
+}
+
+function getDefinitionListRow(container: Locator, label: string) {
+    return container.locator('.g-definition-list__item').filter({hasText: label});
+}
+
+async function expectInfoRowPlaceholder(container: Locator, label: string) {
+    const row = getInfoRow(container, label);
+
+    await expect(row).toBeVisible();
+    await expect(row.getByText(EMPTY_DATA_PLACEHOLDER, {exact: true})).toBeVisible();
+}
+
+async function expectDefinitionListRowPlaceholder(container: Locator, label: string) {
+    const row = getDefinitionListRow(container, label);
+
+    await expect(row).toBeVisible();
+    await expect(row.getByText(EMPTY_DATA_PLACEHOLDER, {exact: true})).toBeVisible();
+}
 
 test.describe('VDisk page storage details', () => {
     test('does not render storage details when experiment is disabled', async ({page}) => {
@@ -443,5 +489,225 @@ test.describe('Storage disk popup snapshots', () => {
         await expect(popup.getByRole('link', {name: 'Go to PDisk'})).toBeVisible();
 
         await expect(popup).toHaveScreenshot('pdisk-popup-actions.png');
+    });
+});
+
+test.describe('Blob storage capacity metrics integration', () => {
+    test.describe.configure({timeout: 60_000});
+
+    test('keeps legacy rows when the setting is disabled or the backend is unsupported', async ({
+        page,
+    }) => {
+        for (const scenario of [
+            {capacityMetricsAvailable: true, enableSetting: false},
+            {capacityMetricsAvailable: false, enableSetting: true},
+        ]) {
+            if (scenario.enableSetting) {
+                await enableBlobStorageCapacityMetrics(page);
+            }
+            await setupVDiskPageMocks(page, {
+                capacityMetricsAvailable: scenario.capacityMetricsAvailable,
+                withCapacityMetrics: true,
+            });
+            await setupPDiskInfoMock(page, {withCapacityMetrics: true});
+
+            await page.goto(VDISK_PAGE_PATH);
+
+            const vDiskInfo = page.locator('.ydb-vdisk-page__info');
+            await expect(vDiskInfo.getByText('Usage', {exact: true})).toBeVisible();
+            await expect(vDiskInfo.getByText('Disk Space', {exact: true})).toBeVisible();
+            await expect(vDiskInfo.getByText('VDisk Slot Usage', {exact: true})).toHaveCount(0);
+
+            await page.goto(`/pDisk?nodeId=${NODE_ID}&pDiskId=${PDISK_ID}`);
+
+            const pDiskInfo = page.locator('.ydb-pdisk-page__info');
+            await expect(pDiskInfo.getByText('Usage', {exact: true})).toBeVisible();
+            await expect(pDiskInfo.getByText('PDisk Usage', {exact: true})).toHaveCount(0);
+
+            await page.goto(`/storageGroup?database=/local&groupId=${GROUP_ID}`);
+
+            const groupInfo = page.locator('.ydb-storage-group-page__info');
+            await expect(groupInfo.getByText('Usage', {exact: true})).toBeVisible();
+            await expect(groupInfo.getByText('Disk Space', {exact: true})).toBeVisible();
+            await expect(groupInfo.getByText('VDisk Slot Usage', {exact: true})).toHaveCount(0);
+        }
+    });
+
+    test('shows the same explicit metrics across pages and Groups and Nodes popups', async ({
+        page,
+    }) => {
+        await enableBlobStorageCapacityMetrics(page);
+        await enableStorageDisksColumn(page);
+        await enableStorageNodesCapacityColumns(page);
+        await setupVDiskPageMocks(page, {withCapacityMetrics: true});
+        await setupPDiskInfoMock(page, {withCapacityMetrics: true});
+
+        await page.goto(VDISK_PAGE_PATH);
+
+        const storageTable = new ClusterStorageTable(page);
+        await storageTable.waitForTableToLoad();
+        await storageTable.waitForTableData();
+
+        const vDiskInfo = page.locator('.ydb-vdisk-page__info');
+        for (const label of [
+            'Size',
+            'VDisk Slot Usage',
+            'VDisk Raw Usage',
+            'Group Size In Units',
+            'Capacity Alert',
+        ]) {
+            await expect(vDiskInfo.getByText(label, {exact: true})).toBeVisible();
+        }
+        const vDiskSizeText = await getInfoRow(vDiskInfo, 'Size').innerText();
+        const vDiskSlotUsageText = await getInfoRow(vDiskInfo, 'VDisk Slot Usage').innerText();
+
+        const groupsVDisk = page
+            .locator('.ydb-storage-vdisks__wrapper .storage-disk-progress-bar')
+            .first();
+        await groupsVDisk.hover();
+        const groupsVDiskPopup = await waitForDiskPopup(page, 'Go to VDisk');
+        await expect(getDefinitionListRow(groupsVDiskPopup, 'Size')).toHaveText(vDiskSizeText);
+        await expect(getDefinitionListRow(groupsVDiskPopup, 'VDisk Slot Usage')).toHaveText(
+            vDiskSlotUsageText,
+        );
+
+        const groupsPDisk = page.locator('.ydb-storage-disks__pdisk-progress-bar').first();
+        await groupsPDisk.hover();
+        const groupsPDiskPopup = await waitForDiskPopup(page, 'Go to PDisk');
+        for (const label of ['Space', 'Slots', 'Slot Size In Units', 'Capacity Alert']) {
+            await expect(groupsPDiskPopup.getByText(label, {exact: true})).toBeVisible();
+        }
+        const pDiskSpaceText = await getDefinitionListRow(groupsPDiskPopup, 'Space').innerText();
+        const pDiskSlotSizeText = await getDefinitionListRow(
+            groupsPDiskPopup,
+            'Slot Size In Units',
+        ).innerText();
+
+        await page.goto(`/pDisk?nodeId=${NODE_ID}&pDiskId=${PDISK_ID}`);
+
+        const pDiskInfo = page.locator('.ydb-pdisk-page__info');
+        await expect(pDiskInfo.getByText('PDisk Usage', {exact: true})).toBeVisible();
+        await expect(pDiskInfo.getByText('Slot Size In Units', {exact: true})).toBeVisible();
+
+        const vDiskOnPDiskPage = page
+            .locator('.ydb-pdisk-space-distribution__slot-wrapper a')
+            .first();
+        await expect(vDiskOnPDiskPage).toBeVisible();
+        await vDiskOnPDiskPage.click();
+        await expect(page).toHaveURL(/\/vDisk\?/);
+
+        const nestedVDiskInfo = page.locator('.ydb-vdisk-page__info');
+        await expect(getInfoRow(nestedVDiskInfo, 'Size')).toHaveText(vDiskSizeText);
+        await expect(getInfoRow(nestedVDiskInfo, 'VDisk Slot Usage')).toHaveText(
+            vDiskSlotUsageText,
+        );
+
+        await page.goto(`/storageGroup?database=/local&groupId=${GROUP_ID}`);
+
+        const groupInfo = page.locator('.ydb-storage-group-page__info');
+        for (const label of [
+            'Group Generation',
+            'Erasure Species',
+            'Media Type',
+            'Group Size In Units',
+            'VDisk Slot Usage',
+            'VDisk Raw Usage',
+            'Capacity Alert',
+        ]) {
+            await expect(groupInfo.getByText(label, {exact: true})).toBeVisible();
+        }
+        await expect(groupInfo.getByText('Usage', {exact: true})).toHaveCount(0);
+        await expect(groupInfo.getByText('Disk Space', {exact: true})).toHaveCount(0);
+
+        await page.goto(VDISK_PAGE_PATH.replace('type=groups', 'type=nodes'));
+
+        await storageTable.waitForTableToLoad();
+        await storageTable.waitForTableData();
+        await expect(page.getByText('VDisk Raw Usage', {exact: true})).toBeVisible();
+        await expect(page.getByText('Disk Usage', {exact: true})).toHaveCount(0);
+
+        const nodesVDisk = page
+            .locator('.ydb-paginated-table__row')
+            .first()
+            .locator('.pdisk-storage__vdisks .storage-disk-progress-bar')
+            .first();
+        await nodesVDisk.hover();
+        const nodesVDiskPopup = await waitForDiskPopup(page, 'Go to VDisk');
+        await expect(getDefinitionListRow(nodesVDiskPopup, 'Size')).toHaveText(vDiskSizeText);
+        await expect(getDefinitionListRow(nodesVDiskPopup, 'VDisk Slot Usage')).toHaveText(
+            vDiskSlotUsageText,
+        );
+
+        const nodesPDisk = page
+            .locator('.ydb-paginated-table__row')
+            .first()
+            .locator('.pdisk-storage__content .storage-disk-progress-bar')
+            .first();
+        await nodesPDisk.hover();
+        const nodesPDiskPopup = await waitForDiskPopup(page, 'Go to PDisk');
+        await expect(getDefinitionListRow(nodesPDiskPopup, 'Space')).toHaveText(pDiskSpaceText);
+        await expect(getDefinitionListRow(nodesPDiskPopup, 'Slot Size In Units')).toHaveText(
+            pDiskSlotSizeText,
+        );
+    });
+
+    test('shows row-scoped placeholders when optional capacity fields are absent', async ({
+        page,
+    }) => {
+        await enableBlobStorageCapacityMetrics(page);
+        await enableStorageDisksColumn(page);
+        await setupVDiskPageMocks(page);
+        await setupPDiskInfoMock(page);
+
+        await page.goto(VDISK_PAGE_PATH);
+
+        const storageTable = new ClusterStorageTable(page);
+        await storageTable.waitForTableToLoad();
+        await storageTable.waitForTableData();
+
+        const vDiskInfo = page.locator('.ydb-vdisk-page__info');
+        for (const label of [
+            'VDisk Slot Usage',
+            'VDisk Raw Usage',
+            'Group Size In Units',
+            'Capacity Alert',
+        ]) {
+            await expectInfoRowPlaceholder(vDiskInfo, label);
+        }
+
+        const groupsVDisk = page
+            .locator('.ydb-storage-vdisks__wrapper .storage-disk-progress-bar')
+            .first();
+        await groupsVDisk.hover();
+        const vDiskPopup = await waitForDiskPopup(page, 'Go to VDisk');
+        for (const label of ['VDisk Slot Usage', 'Group Size In Units', 'Capacity Alert']) {
+            await expectDefinitionListRowPlaceholder(vDiskPopup, label);
+        }
+
+        const groupsPDisk = page.locator('.ydb-storage-disks__pdisk-progress-bar').first();
+        await groupsPDisk.hover();
+        const pDiskPopup = await waitForDiskPopup(page, 'Go to PDisk');
+        for (const label of ['Slot Size In Units', 'Capacity Alert']) {
+            await expectDefinitionListRowPlaceholder(pDiskPopup, label);
+        }
+
+        await page.goto(`/pDisk?nodeId=${NODE_ID}&pDiskId=${PDISK_ID}`);
+
+        const pDiskInfo = page.locator('.ydb-pdisk-page__info');
+        for (const label of ['PDisk Usage', 'Slot Size In Units']) {
+            await expectInfoRowPlaceholder(pDiskInfo, label);
+        }
+
+        await page.goto(`/storageGroup?database=/local&groupId=${GROUP_ID}`);
+
+        const groupInfo = page.locator('.ydb-storage-group-page__info');
+        for (const label of [
+            'Group Size In Units',
+            'VDisk Slot Usage',
+            'VDisk Raw Usage',
+            'Capacity Alert',
+        ]) {
+            await expectInfoRowPlaceholder(groupInfo, label);
+        }
     });
 });
