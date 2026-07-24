@@ -5,6 +5,10 @@ import {VDisksGroupBy} from '../../../src/containers/Storage/StorageExpertModePa
 import type {VDisksGroupByValue} from '../../../src/containers/Storage/StorageExpertModePanel/constants';
 import {storagePage} from '../../utils/constants';
 
+import {
+    MISSING_FRONT_QUEUES_VDISK_INDEX,
+    MISSING_WHITEBOARD_VDISK_INDEX,
+} from './mockStorageGroups';
 import {DATABASE, setupVDiskColoringMocks} from './vdiskColoringMocks';
 
 const VDISKS_COUNT = 10;
@@ -174,6 +178,24 @@ async function preparePage(page: Page, vdisksGroupBy: VDisksGroupByValue) {
 
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 60_000});
+
+    test('distinguishes missing Whiteboard data from missing FrontQueues', async ({page}) => {
+        await preparePage(page, VDisksGroupBy.FrontQueues);
+
+        const vDiskItems = getVDiskItems(getStorageGroupRow(page, 0));
+        const noWhiteboardVDisk = getVDiskProgressBar(
+            vDiskItems.nth(MISSING_WHITEBOARD_VDISK_INDEX),
+        );
+        const noFrontQueuesVDisk = getVDiskProgressBar(
+            vDiskItems.nth(MISSING_FRONT_QUEUES_VDISK_INDEX),
+        );
+
+        await expect(noWhiteboardVDisk).toHaveText('N/D');
+        await expect(noWhiteboardVDisk.locator('.storage-disk-progress-bar__icon')).toHaveCount(0);
+
+        await expect(noFrontQueuesVDisk).not.toContainText('N/D');
+        await expect(noFrontQueuesVDisk.locator('.storage-disk-progress-bar__icon')).toHaveCount(1);
+    });
 
     for (const mode of VDISK_GROUP_BY_MODES) {
         test.describe(`${mode.value} mode`, () => {

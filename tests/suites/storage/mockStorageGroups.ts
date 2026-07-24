@@ -11,6 +11,9 @@ const MOCK_NODE_ID_BASE = 7000;
 const MOCK_PDISK_ID_BASE = 100;
 const MOCK_VDISK_SLOT_ID_BASE = 200;
 
+export const MISSING_WHITEBOARD_VDISK_INDEX = 0;
+export const MISSING_FRONT_QUEUES_VDISK_INDEX = 1;
+
 function createMockPDisk(index: number, state = TPDiskState.Normal): TStorageVDisk['PDisk'] {
     return {
         PDiskId: `${MOCK_NODE_ID_BASE + index}-${MOCK_PDISK_ID_BASE + index}`,
@@ -240,6 +243,10 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             satisfactionRank: config.satisfactionRank,
         }),
     );
+
+    // Keep explicit no-data and partial-data cases visible during local VDisk coloring checks.
+    delete firstGroupVDisks[MISSING_WHITEBOARD_VDISK_INDEX].Whiteboard;
+    delete firstGroupVDisks[MISSING_FRONT_QUEUES_VDISK_INDEX].Whiteboard?.FrontQueues;
 
     // Second group - with replication (same disks but replicating)
     const replicatingGroupId = MOCK_GROUP_ID + 1;
