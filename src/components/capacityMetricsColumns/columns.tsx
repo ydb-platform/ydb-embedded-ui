@@ -7,7 +7,7 @@ import {getCapacityAlertTheme} from '../../utils/capacityAlerts';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNormalizedMetricPercent} from '../../utils/storageMetrics';
 import type {Column} from '../../utils/tableUtils/types';
-import {isNumeric} from '../../utils/utils';
+import {isNumeric, parseOptionalNonNegativeNumber} from '../../utils/utils';
 import {TitleWithHelpMark} from '../TitleWithHelpmark/TitleWithHelpmark';
 
 import {
@@ -111,9 +111,11 @@ export function getNormalizedOccupancyColumn<
         ),
         width: 200,
         render: ({row}) => {
-            return isNumeric(row.MaxNormalizedOccupancy)
-                ? Number(row.MaxNormalizedOccupancy).toFixed(2)
-                : EMPTY_DATA_PLACEHOLDER;
+            const normalizedOccupancy = parseOptionalNonNegativeNumber(row.MaxNormalizedOccupancy);
+
+            return normalizedOccupancy === undefined
+                ? EMPTY_DATA_PLACEHOLDER
+                : normalizedOccupancy.toFixed(2);
         },
         align: DataTable.RIGHT,
     };

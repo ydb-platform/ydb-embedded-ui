@@ -1,8 +1,9 @@
 import React from 'react';
 
-import {render} from '@testing-library/react';
+import {render, screen, within} from '@testing-library/react';
 
 import type {PreparedStorageGroup} from '../../../store/reducers/storage/types';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import {
     getCapacityAlertColumn,
     getNormalizedOccupancyColumn,
@@ -42,5 +43,27 @@ describe('capacityMetricsColumns', () => {
         );
 
         expect(document.querySelectorAll('.g-help-mark')).toHaveLength(5);
+    });
+
+    test('renders invalid normalized occupancy as missing while preserving zero', () => {
+        const column = getNormalizedOccupancyColumn<{
+            MaxNormalizedOccupancy?: number;
+        }>();
+
+        render(
+            <React.Fragment>
+                <div data-testid="negative-value">
+                    {column.render({row: {MaxNormalizedOccupancy: -1}})}
+                </div>
+                <div data-testid="zero-value">
+                    {column.render({row: {MaxNormalizedOccupancy: 0}})}
+                </div>
+            </React.Fragment>,
+        );
+
+        expect(
+            within(screen.getByTestId('negative-value')).getByText(EMPTY_DATA_PLACEHOLDER),
+        ).toBeVisible();
+        expect(within(screen.getByTestId('zero-value')).getByText('0.00')).toBeVisible();
     });
 });
