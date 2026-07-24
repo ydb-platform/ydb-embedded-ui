@@ -9,8 +9,7 @@ import {EPathType} from '../../../../../types/api/schema';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 import {useCompactionFeature} from '../../../../../utils/hooks/useCompactionFeature';
-import {EntityTitle} from '../../../EntityTitle/EntityTitle';
-import {isRowTableType} from '../../../utils/schema';
+import tenantKeyset from '../../../i18n';
 
 import {
     CompactTableAction,
@@ -33,18 +32,6 @@ interface TableInfoProps {
     database: string;
     path: string;
 }
-
-const TableInfoHeader = ({data}: {data?: TEvDescribeSchemeResult}) => {
-    const actualType = data?.PathDescription?.Self?.PathType;
-    const isRowTable = isRowTableType(actualType);
-    const title: React.ReactNode = isRowTable ? (
-        i18n('title_partitioning')
-    ) : (
-        <EntityTitle data={data?.PathDescription} />
-    );
-
-    return <div className={b('title')}>{title}</div>;
-};
 
 export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const isRowTable = type === EPathType.EPathTypeTable;
@@ -124,39 +111,41 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                     isCancelling={isCancellingOperation}
                 />
             )}
-            <Flex
-                className={b('header')}
-                justifyContent="space-between"
-                alignItems="center"
-                gap="2"
-            >
-                <TableInfoHeader data={data} />
-                <Flex gap="2" alignItems="center">
-                    {managePartitioningDialogConfig && (
-                        <ActionTooltip title={i18n('action_manage-partition-config')}>
-                            <Button
-                                view="normal"
-                                size="s"
-                                onClick={handleOpenManagePartitioning}
-                                aria-label={i18n('action_manage-partition-config')}
-                            >
-                                <Icon data={Gear} size={16} />
-                                {i18n('action_manage-partitioning')}
-                            </Button>
-                        </ActionTooltip>
-                    )}
-                    {compactionEnabledForTable && (
-                        <CompactTableAction
-                            key={`${database}/${path}`}
-                            runningCompaction={runningCompaction}
-                            isFetching={isCompactionFetching}
-                            onApply={handleStartCompaction}
-                            onRefreshCompactions={refreshCompactions}
-                            executeQueryAndForgetAvailable={executeQueryAndForgetAvailable}
-                        />
-                    )}
+            {isRowTable && (
+                <Flex
+                    className={b('header')}
+                    justifyContent="space-between"
+                    alignItems="center"
+                    gap="2"
+                >
+                    <div className={b('title')}>{tenantKeyset('summary.partitioning')}</div>
+                    <Flex gap="2" alignItems="center">
+                        {managePartitioningDialogConfig && (
+                            <ActionTooltip title={i18n('action_manage-partition-config')}>
+                                <Button
+                                    view="normal"
+                                    size="s"
+                                    onClick={handleOpenManagePartitioning}
+                                    aria-label={i18n('action_manage-partition-config')}
+                                >
+                                    <Icon data={Gear} size={16} />
+                                    {i18n('action_manage-partitioning')}
+                                </Button>
+                            </ActionTooltip>
+                        )}
+                        {compactionEnabledForTable && (
+                            <CompactTableAction
+                                key={`${database}/${path}`}
+                                runningCompaction={runningCompaction}
+                                isFetching={isCompactionFetching}
+                                onApply={handleStartCompaction}
+                                onRefreshCompactions={refreshCompactions}
+                                executeQueryAndForgetAvailable={executeQueryAndForgetAvailable}
+                            />
+                        )}
+                    </Flex>
                 </Flex>
-            </Flex>
+            )}
             {partitionProgressConfig && (
                 <div className={b('progress-bar')}>
                     <PartitionsProgress
@@ -166,14 +155,16 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                     />
                 </div>
             )}
-            <div className={b('row', {'general-info': true})}>
-                <div className={b('col')}>
-                    <TableInfoSection items={generalInfoLeft} className={b('info-block')} />
+            {(generalInfoLeft.length > 0 || generalInfoRight.length > 0) && (
+                <div className={b('row', {'general-info': true})}>
+                    <div className={b('col')}>
+                        <TableInfoSection items={generalInfoLeft} className={b('info-block')} />
+                    </div>
+                    <div className={b('col')}>
+                        <TableInfoSection items={generalInfoRight} className={b('info-block')} />
+                    </div>
                 </div>
-                <div className={b('col')}>
-                    <TableInfoSection items={generalInfoRight} className={b('info-block')} />
-                </div>
-            </div>
+            )}
 
             <div className={b('row')}>
                 <div className={b('col')}>

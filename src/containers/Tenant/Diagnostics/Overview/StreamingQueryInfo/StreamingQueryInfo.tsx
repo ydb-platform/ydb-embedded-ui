@@ -2,14 +2,14 @@ import React from 'react';
 
 import {Label} from '@gravity-ui/uikit';
 
-import {LoaderWrapper} from '../../../../../components/LoaderWrapper/LoaderWrapper';
-import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
-import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {Loader} from '../../../../../components/Loader';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {YQLCodePreview} from '../../../../../components/YQLCodePreview/YQLCodePreview';
 import {streamingQueriesApi} from '../../../../../store/reducers/streamingQuery/streamingQuery';
 import type {ErrorResponse} from '../../../../../types/api/query';
-import {EPathType} from '../../../../../types/api/schema';
 import type {IQueryResult} from '../../../../../types/store/query';
+import {cn} from '../../../../../utils/cn';
 import {
     getStringifiedData,
     stripIndentByFirstLine,
@@ -17,29 +17,38 @@ import {
 } from '../../../../../utils/dataFormatters/dataFormatters';
 import {isErrorResponse} from '../../../../../utils/query';
 import {ResultIssuesModal} from '../../../Query/Issues/Issues';
-import {getEntityName} from '../../../utils';
 
 import i18n from './i18n';
+
+import './StreamingQueryInfo.scss';
 
 interface StreamingQueryProps {
     database: string;
     path: string;
 }
 
-export function StreamingQueryInfo({database, path}: StreamingQueryProps) {
-    const entityName = getEntityName({Self: {PathType: EPathType.EPathTypeStreamingQuery}});
+const b = cn('ydb-streaming-query-info');
 
+export function StreamingQueryInfo({database, path}: StreamingQueryProps) {
     const {data: sysData, isFetching} = streamingQueriesApi.useGetStreamingQueryInfoQuery(
         {database, path},
         {skip: !database || !path},
     );
+    const loading = isFetching && sysData === undefined;
 
-    const items = prepareStreamingQueryItems(sysData);
+    if (loading) {
+        return <Loader size="s" className={b('loader')} />;
+    }
+
+    const {items, queryText} = prepareStreamingQueryItems(sysData);
 
     return (
-        <LoaderWrapper loading={isFetching}>
-            <YDBDefinitionList title={entityName} items={items} />
-        </LoaderWrapper>
+        <React.Fragment>
+            <YDBDefinitionList items={items} />
+            {queryText ? (
+                <YQLCodePreview title={i18n('field_query-text')} text={queryText} />
+            ) : null}
+        </React.Fragment>
     );
 }
 
@@ -65,9 +74,9 @@ function StateLabel({state}: {state?: string}) {
     return <Label theme={theme}>{state}</Label>;
 }
 
-function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListItem[] {
+function prepareStreamingQueryItems(sysData?: IQueryResult) {
     if (!sysData) {
-        return [];
+        return {items: [], queryText: undefined};
     }
 
     const info: YDBDefinitionListItem[] = [];
@@ -94,15 +103,7 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
         });
     }
 
-    info.push({
-        name: i18n('field_query-text'),
-        copyText: normalizedQueryText,
-        content: normalizedQueryText ? (
-            <YDBSyntaxHighlighter language="yql" text={normalizedQueryText} />
-        ) : null,
-    });
-
-    return info;
+    return {items: info, queryText: normalizedQueryText};
 }
 
 function parseErrorData(raw: unknown): ErrorResponse | string | undefined {

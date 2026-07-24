@@ -1,35 +1,23 @@
-import {YDBSyntaxHighlighter} from '../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
-import type {YDBDefinitionListItem} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
-import {YDBDefinitionList} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {YQLCodePreview} from '../../../../components/YQLCodePreview/YQLCodePreview';
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
-import {getEntityName} from '../../utils';
-import i18n from '../i18n';
-import {renderNoEntityDataError} from '../utils';
-
-const prepareViewItems = (data: TEvDescribeSchemeResult): YDBDefinitionListItem[] => {
-    const queryText = data.PathDescription?.ViewDescription?.QueryText;
-
-    return [
-        {
-            name: i18n('view.query-text'),
-            copyText: queryText,
-            content: queryText ? <YDBSyntaxHighlighter language="yql" text={queryText} /> : null,
-        },
-    ];
-};
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
+import tenantKeyset from '../../i18n';
 
 interface ViewInfoProps {
     data?: TEvDescribeSchemeResult;
 }
 
 export function ViewInfo({data}: ViewInfoProps) {
-    const entityName = getEntityName(data?.PathDescription);
-
     if (!data) {
-        return renderNoEntityDataError(entityName);
+        return null;
     }
 
-    const items = prepareViewItems(data);
+    const queryText = data.PathDescription?.ViewDescription?.QueryText;
 
-    return <YDBDefinitionList title={entityName} items={items} />;
+    return (
+        <YQLCodePreview
+            title={tenantKeyset('title_query-text')}
+            text={queryText || EMPTY_DATA_PLACEHOLDER}
+        />
+    );
 }

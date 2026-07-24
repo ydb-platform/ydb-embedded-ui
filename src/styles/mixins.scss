@@ -99,7 +99,7 @@
 }
 
 @mixin info-viewer-title {
-    margin: 15px 0 10px;
+    margin: var(--ydb-info-viewer-title-margin, 15px 0 10px);
 
     font-weight: 600;
     @include body-2-typography();

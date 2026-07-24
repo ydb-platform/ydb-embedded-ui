@@ -12,7 +12,7 @@ async function expectMetricTabsScreenshot(metricTabs: Locator, name: string) {
     await expect(metricTabs).toHaveScreenshot(name);
 }
 
-async function setupMonitoringUserMock(page: Page) {
+async function setupMonitoringUserMock(page: Page, isAdministrationAllowed = true) {
     await page.route('**/viewer/json/whoami?*', async (route) => {
         await route.fulfill({
             status: 200,
@@ -23,8 +23,37 @@ async function setupMonitoringUserMock(page: Page) {
                 AuthType: 'Login',
                 IsViewerAllowed: true,
                 IsMonitoringAllowed: true,
-                IsAdministrationAllowed: true,
+                IsAdministrationAllowed: isAdministrationAllowed,
             }),
+        });
+    });
+}
+
+async function setupDirectoryInfoMock(
+    page: Page,
+    path: string,
+    metadata: {PathId?: string; PathVersion?: string} = {},
+) {
+    await page.route('**/viewer/json/describe?*', async (route) => {
+        const url = new URL(route.request().url());
+
+        if (url.searchParams.get('path') !== path) {
+            await route.continue();
+            return;
+        }
+
+        await route.fulfill({
+            json: {
+                Status: 'StatusSuccess',
+                Path: path,
+                PathDescription: {
+                    Self: {
+                        Name: 'test_directory',
+                        PathType: 'EPathTypeDir',
+                        ...metadata,
+                    },
+                },
+            },
         });
     });
 }
@@ -321,6 +350,7 @@ test.describe('Diagnostics Info tab', async () => {
 
     test('Info tab displays overlap_clusters for vector index', async ({page}) => {
         const mockIndexPath = '/local/test_table/my_vector_index';
+        await setupMonitoringUserMock(page, false);
 
         // Mock describe API to return a vector index with overlap_clusters
         await page.route(`**/viewer/json/describe?*`, async (route) => {
@@ -338,6 +368,9 @@ test.describe('Diagnostics Info tab', async () => {
                             Self: {
                                 Name: 'my_vector_index',
                                 PathType: 'EPathTypeTableIndex',
+                                PathId: '42',
+                                PathVersion: '7',
+                                CreateStep: '1710000000000',
                             },
                             TableIndex: {
                                 Name: 'my_vector_index',
@@ -375,8 +408,10 @@ test.describe('Diagnostics Info tab', async () => {
         await tenantPage.goto(pageQueryParams);
 
         // Verify vector index settings are displayed including overlap_clusters
-        const infoContent = page.locator('.ydb-diagnostics-table-info');
+        const infoContent = page.locator('.kv-detailed-overview');
         await infoContent.waitFor({state: 'visible', timeout: 10000});
+        await expect(infoContent.getByText('ID', {exact: true})).toHaveCount(0);
+        await expect(infoContent.getByText('Version', {exact: true})).toHaveCount(0);
 
         // Check Index Settings section contains Overlap Clusters
         const indexSettings = infoContent.locator('.info-viewer');
@@ -411,6 +446,9 @@ test.describe('Diagnostics Info tab', async () => {
                             Self: {
                                 Name: 'my_fulltext_index',
                                 PathType: 'EPathTypeTableIndex',
+                                PathId: '42',
+                                PathVersion: '7',
+                                CreateStep: '1710000000000',
                             },
                             TableIndex: {
                                 Name: 'my_fulltext_index',
@@ -453,7 +491,7 @@ test.describe('Diagnostics Info tab', async () => {
         await tenantPage.goto(pageQueryParams);
 
         // Verify fulltext index settings are displayed
-        const infoContent = page.locator('.ydb-diagnostics-table-info');
+        const infoContent = page.locator('.kv-detailed-overview');
         await infoContent.waitFor({state: 'visible', timeout: 10000});
 
         // Check Index Settings section contains fulltext-specific fields
@@ -466,5 +504,181 @@ test.describe('Diagnostics Info tab', async () => {
 
         // Visual snapshot of fulltext index info with all settings
         await expect(infoContent).toHaveScreenshot('fulltext-index-info-settings.png');
+    });
+
+    test('Info tab omits undefined schema metadata', async ({page}) => {
+        const mockDirectoryPath = '/local/test_directory';
+        await setupDirectoryInfoMock(page, mockDirectoryPath);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockDirectoryPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        await expect(infoContent).toBeVisible();
+        await expect(infoContent.getByText('ID', {exact: true})).toHaveCount(0);
+        await expect(infoContent.getByText('Version', {exact: true})).toHaveCount(0);
+    });
+
+    test('Info tab displays schema metadata for administrators', async ({page}) => {
+        const mockDirectoryPath = '/local/test_directory';
+        await setupMonitoringUserMock(page);
+        await setupDirectoryInfoMock(page, mockDirectoryPath, {
+            PathId: '42',
+            PathVersion: '7',
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockDirectoryPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        await expect(infoContent).toBeVisible();
+        await expect(infoContent.getByText('42', {exact: true})).toBeVisible();
+        await expect(infoContent.getByText('7', {exact: true})).toBeVisible();
+    });
+
+    test('Streaming Query Info remains available when describe fails', async ({page}) => {
+        test.slow();
+
+        const mockStreamingQueryPath = '/local/test_streaming_query';
+
+        await page.route('**/viewer/json/describe?*', async (route) => {
+            const url = new URL(route.request().url());
+            const path = url.searchParams.get('path');
+            const subs = url.searchParams.get('subs');
+
+            if (path === mockStreamingQueryPath && subs === '0') {
+                await route.fulfill({
+                    status: 500,
+                    contentType: 'application/json',
+                    json: {error: 'Streaming Query describe is not supported'},
+                });
+                return;
+            }
+
+            if (path === database && subs === '1') {
+                await route.fulfill({
+                    json: {
+                        Path: database,
+                        PathDescription: {
+                            Self: {
+                                Name: 'local',
+                                PathType: 'EPathTypeSubDomain',
+                            },
+                            Children: [
+                                {
+                                    Name: 'test_streaming_query',
+                                    PathType: 'EPathTypeStreamingQuery',
+                                },
+                            ],
+                        },
+                    },
+                });
+                return;
+            }
+
+            await route.continue();
+        });
+
+        await page.route('**/viewer/json/query?*', async (route) => {
+            await route.fulfill({
+                json: {
+                    version: 8,
+                    result: [
+                        {
+                            rows: [['RUNNING', '{}', 'SELECT 1;']],
+                            columns: [
+                                {name: 'State', type: 'Utf8?'},
+                                {name: 'Error', type: 'Utf8?'},
+                                {name: 'Text', type: 'Utf8?'},
+                            ],
+                        },
+                    ],
+                },
+            });
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockStreamingQueryPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        await expect(infoContent.getByText('RUNNING')).toBeVisible();
+        await expect(infoContent.locator('.ydb-yql-code-preview .shiki')).toBeVisible();
+        const infoContentBox = await infoContent.boundingBox();
+        if (!infoContentBox) {
+            throw new Error('Cannot take Streaming Query Info screenshot');
+        }
+        await expect(page).toHaveScreenshot('streaming-query-info-describe-fallback.png', {
+            clip: infoContentBox,
+        });
+    });
+
+    test('View Info includes YQL code preview', async ({page}) => {
+        const mockViewPath = '/local/test_view';
+
+        await setupMonitoringUserMock(page, false);
+        await page.route('**/viewer/json/describe?*', async (route) => {
+            const url = new URL(route.request().url());
+
+            if (url.searchParams.get('path') !== mockViewPath) {
+                await route.continue();
+                return;
+            }
+
+            await route.fulfill({
+                json: {
+                    Status: 'StatusSuccess',
+                    Path: mockViewPath,
+                    PathDescription: {
+                        Self: {
+                            Name: 'test_view',
+                            PathType: 'EPathTypeView',
+                            PathId: '42',
+                            PathVersion: '7',
+                            CreateStep: '1710000000000',
+                        },
+                        ViewDescription: {
+                            QueryText: [
+                                'SELECT',
+                                '    series_id,',
+                                '    title,',
+                                '    release_date',
+                                'FROM series',
+                                'WHERE release_date >= Date("2020-01-01");',
+                            ].join('\n'),
+                        },
+                    },
+                },
+            });
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockViewPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        const yqlCodePreview = infoContent.locator('.ydb-yql-code-preview');
+
+        await expect(yqlCodePreview).toBeVisible();
+        await expect(yqlCodePreview.locator('.shiki')).toBeVisible();
+        await expect(infoContent).toHaveScreenshot('view-info-yql-code-preview.png');
     });
 });

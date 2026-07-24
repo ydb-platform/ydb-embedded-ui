@@ -1,17 +1,23 @@
 .kv-detailed-overview {
+    --g-definition-list-item-gap: var(--g-spacing-3);
+    --ydb-info-viewer-title-margin: 0 0 10px;
+
     display: flex;
     flex-direction: column;
-    gap: 20px;
 
     width: 100%;
-    height: 100%;
+    min-height: 100%;
+    padding-bottom: var(--g-spacing-5);
 
-    // Delete padding for all query text on Diagnostics -> Info tab
-    pre {
-        padding: 0;
+    > :not(:first-child) {
+        margin-top: var(--g-spacing-5);
     }
 
-    .g-definition-list__copy-container {
-        align-items: baseline;
+    > .ydb-schema-object-info + .ydb-definition-list {
+        margin-top: var(--g-spacing-3);
+    }
+
+    .info-viewer {
+        --ydb-info-viewer-items-gap: var(--g-spacing-2);
     }
 }

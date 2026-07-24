@@ -1,10 +1,8 @@
-import {Flex, Text} from '@gravity-ui/uikit';
+import {Text} from '@gravity-ui/uikit';
 
 import {AsyncReplicationState} from '../../../../../components/AsyncReplicationState';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
-import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
-import {getEntityName} from '../../../utils';
 import {AsyncReplicationPaths} from '../AsyncReplicationPaths';
 
 import {Credentials} from './Credentials';
@@ -16,27 +14,14 @@ interface AsyncReplicationProps {
 
 /** Displays overview for Replication EPathType */
 export function AsyncReplicationInfo({data}: AsyncReplicationProps) {
-    const entityName = getEntityName(data?.PathDescription);
-
     if (!data) {
-        return (
-            <div className="error">
-                {i18n('noData')} {entityName}
-            </div>
-        );
+        return null;
     }
 
-    const replicationItems = prepareReplicationItems(data);
-
-    return (
-        <Flex direction="column" gap="4">
-            <YDBDefinitionList title={entityName} items={replicationItems} />
-            <AsyncReplicationPaths config={data.PathDescription?.ReplicationDescription?.Config} />
-        </Flex>
-    );
+    return <AsyncReplicationPaths config={data.PathDescription?.ReplicationDescription?.Config} />;
 }
 
-function prepareReplicationItems(data: TEvDescribeSchemeResult) {
+export function prepareReplicationItems(data: TEvDescribeSchemeResult): YDBDefinitionListItem[] {
     const replicationDescription = data.PathDescription?.ReplicationDescription || {};
     const state = replicationDescription.State;
     const srcConnectionParams = replicationDescription.Config?.SrcConnectionParams || {};

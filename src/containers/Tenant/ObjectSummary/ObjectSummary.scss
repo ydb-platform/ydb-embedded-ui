@@ -45,6 +45,21 @@
         flex-direction: column;
     }
 
+    &__tree-only {
+        display: flex;
+        overflow: hidden;
+        flex-grow: 1;
+        flex-direction: column;
+
+        min-height: 0;
+
+        > * {
+            flex: 1 1 auto;
+
+            min-height: 0;
+        }
+    }
+
     &__tree {
         overflow-y: scroll;
         flex: 1 1 auto;

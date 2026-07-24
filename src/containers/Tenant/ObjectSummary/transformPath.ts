@@ -26,3 +26,7 @@ export function isDomain(path: string, type?: EPathType) {
     }
     return path.split('/').length === 2 && path.startsWith('/');
 }
+
+export function getPathTypeName(path: string, type?: EPathType) {
+    return isDomain(path, type) ? 'Domain' : type?.replace(/^EPathType/, '');
+}

@@ -1,12 +1,9 @@
-import React from 'react';
-
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import type {InfoViewerItem} from '../../../../../components/InfoViewer';
 import {InfoViewer} from '../../../../../components/InfoViewer';
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
 import {Loader} from '../../../../../components/Loader';
-import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster';
 import {selectPreparedTopicStats, topicApi} from '../../../../../store/reducers/topic';
 import type {IPreparedTopicStats} from '../../../../../types/store/topic';
@@ -45,10 +42,6 @@ const prepareTopicInfo = (data: IPreparedTopicStats): Array<InfoViewerItem> => {
                 />
             ),
             value: formatDurationToShortTimeFormat(data.partitionsWriteLag),
-        },
-        {
-            label: 'Average write speed',
-            value: <SpeedMultiMeter data={data.writeSpeed} withValue={false} />,
         },
     ];
 };
@@ -105,17 +98,18 @@ export const TopicStats = ({path, database, databaseFullPath}: TopicStatsProps) 
 
     return (
         <div className={b()}>
-            <div className={b('title')}>Stats</div>
             {errorContent}
             {data ? (
-                <React.Fragment>
+                <div className={b('content')}>
                     <div className={b('info')}>
+                        <div className={b('title')}>{i18n('title_stats')}</div>
                         <InfoViewer info={prepareTopicInfo(data)} multilineLabels />
                     </div>
                     <div className={b('bytes-written')}>
+                        <div className={b('title')}>{i18n('title_average-write-speed')}</div>
                         <InfoViewer info={prepareBytesWrittenInfo(data)} />
                     </div>
-                </React.Fragment>
+                </div>
             ) : null}
         </div>
     );

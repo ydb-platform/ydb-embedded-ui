@@ -42,6 +42,7 @@ import {useCurrentSchema} from '../TenantContext';
 import {useTenantPage} from '../TenantNavigation/useTenantNavigation';
 import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPages';
 import {ROW_COUNT_NOTE} from '../constants';
+import tenantKeyset from '../i18n';
 import {useTenantQueryParams} from '../useTenantQueryParams';
 import {getSummaryControls} from '../utils/controls';
 import {
@@ -57,7 +58,7 @@ import {SchemaActions} from './SchemaActions';
 import {RefreshTreeButton} from './SchemaTree/RefreshTreeButton';
 import i18n from './i18n';
 import {b} from './shared';
-import {isDomain, transformPath} from './transformPath';
+import {getPathTypeName, isDomain, transformPath} from './transformPath';
 
 import './ObjectSummary.scss';
 
@@ -83,6 +84,7 @@ export function ObjectSummary({
         false,
     );
     const isV2Navigation = useNavigationV2Enabled();
+    const showLegacyDatabaseInfo = !isV2Navigation && path === databaseFullPath;
 
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(
         paneVisibilityToggleReducer,
@@ -168,26 +170,24 @@ export function ObjectSummary({
             note?: DefinitionListItemProps['note'];
         }[] = [];
 
-        const normalizedType = isDomain(path, PathType)
-            ? 'Domain'
-            : PathType?.replace(/^EPathType/, '');
+        const normalizedType = getPathTypeName(path, PathType);
 
-        overview.push({name: i18n('field_type'), content: normalizedType});
+        overview.push({name: tenantKeyset('summary.type'), content: normalizedType});
 
         if (PathSubType !== EPathSubType.EPathSubTypeEmpty) {
             overview.push({
-                name: i18n('field_subtype'),
+                name: tenantKeyset('summary.subtype'),
                 content: PathSubType?.replace(/^EPathSubType/, ''),
             });
         }
 
-        overview.push({name: i18n('field_id'), content: PathId});
+        overview.push({name: tenantKeyset('summary.id'), content: PathId});
 
-        overview.push({name: i18n('field_version'), content: PathVersion});
+        overview.push({name: tenantKeyset('summary.version'), content: PathVersion});
 
         if (Number(CreateStep)) {
             overview.push({
-                name: i18n('field_created'),
+                name: tenantKeyset('summary.created'),
                 content: formatDateTime(CreateStep),
             });
         }
@@ -199,11 +199,11 @@ export function ObjectSummary({
 
             overview.push(
                 {
-                    name: i18n('field_data-size'),
+                    name: tenantKeyset('summary.data-size'),
                     content: toFormattedSize(DataSize),
                 },
                 {
-                    name: i18n('field_row-count'),
+                    name: tenantKeyset('summary.row-count'),
                     content: formatNumber(RowCount),
                     note: ROW_COUNT_NOTE,
                 },
@@ -226,11 +226,11 @@ export function ObjectSummary({
 
             return [
                 {
-                    name: i18n('field_paths'),
+                    name: tenantKeyset('summary.paths'),
                     content: paths,
                 },
                 {
-                    name: i18n('field_shards'),
+                    name: tenantKeyset('summary.shards'),
                     content: shards,
                 },
             ];
@@ -251,13 +251,13 @@ export function ObjectSummary({
             [EPathType.EPathTypeSecret]: undefined,
             [EPathType.EPathTypeTable]: () => [
                 {
-                    name: i18n('field_partitions'),
+                    name: tenantKeyset('summary.partitions'),
                     content: PathDescription?.TablePartitions?.length,
                 },
             ],
             [EPathType.EPathTypeSysView]: () => [
                 {
-                    name: i18n('field_system-view-type'),
+                    name: tenantKeyset('summary.system-view-type'),
                     content: prepareSystemViewType(PathDescription?.SysViewDescription?.Type),
                 },
             ],
@@ -266,13 +266,13 @@ export function ObjectSummary({
             [EPathType.EPathTypeExtSubDomain]: isV2Navigation ? undefined : getDatabaseOverview,
             [EPathType.EPathTypeColumnStore]: () => [
                 {
-                    name: i18n('field_partitions'),
+                    name: tenantKeyset('summary.partitions'),
                     content: PathDescription?.ColumnStoreDescription?.ColumnShards?.length,
                 },
             ],
             [EPathType.EPathTypeColumnTable]: () => [
                 {
-                    name: i18n('field_partitions'),
+                    name: tenantKeyset('summary.partitions'),
                     content:
                         PathDescription?.ColumnTableDescription?.Sharding?.ColumnShards?.length,
                 },
@@ -282,11 +282,11 @@ export function ObjectSummary({
 
                 return [
                     {
-                        name: i18n('field_mode'),
+                        name: tenantKeyset('summary.mode'),
                         content: Mode?.replace(/^ECdcStreamMode/, ''),
                     },
                     {
-                        name: i18n('field_format'),
+                        name: tenantKeyset('summary.format'),
                         content: Format?.replace(/^ECdcStreamFormat/, ''),
                     },
                 ];
@@ -297,11 +297,11 @@ export function ObjectSummary({
 
                 return [
                     {
-                        name: i18n('field_partitions'),
+                        name: tenantKeyset('summary.partitions'),
                         content: pqGroup?.Partitions?.length,
                     },
                     {
-                        name: i18n('field_retention'),
+                        name: tenantKeyset('summary.retention'),
                         content: value && formatSecondsToHours(value),
                     },
                 ];
@@ -318,9 +318,9 @@ export function ObjectSummary({
                 const dataSourceName = DataSourcePath?.match(/([^/]*)\/*$/)?.[1] || '';
 
                 return [
-                    {name: i18n('field_source-type'), content: SourceType},
+                    {name: tenantKeyset('summary.source-type'), content: SourceType},
                     {
-                        name: i18n('field_data-source'),
+                        name: tenantKeyset('summary.data-source'),
                         content: DataSourcePath && (
                             <span title={DataSourcePath}>
                                 <LinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
@@ -331,7 +331,7 @@ export function ObjectSummary({
             },
             [EPathType.EPathTypeExternalDataSource]: () => [
                 {
-                    name: i18n('field_source-type'),
+                    name: tenantKeyset('summary.source-type'),
                     content: PathDescription?.ExternalDataSourceDescription?.SourceType,
                 },
             ],
@@ -345,7 +345,7 @@ export function ObjectSummary({
 
                 return [
                     {
-                        name: i18n('field_state'),
+                        name: tenantKeyset('summary.state'),
                         content: <AsyncReplicationState state={state} />,
                     },
                 ];
@@ -359,7 +359,7 @@ export function ObjectSummary({
 
                 return [
                     {
-                        name: i18n('field_state'),
+                        name: tenantKeyset('summary.state'),
                         content: <AsyncReplicationState state={state} />,
                     },
                 ];
@@ -478,36 +478,46 @@ export function ObjectSummary({
         return (
             <div className={b()}>
                 <div className={b({hidden: isCollapsed})}>
-                    <SplitPane
-                        direction="vertical"
-                        defaultSizePaneKey={DEFAULT_SIZE_TENANT_SUMMARY_KEY}
-                        onSplitStartDragAdditional={onSplitStartDragAdditional}
-                        triggerCollapse={commonInfoVisibilityState.triggerCollapse}
-                        triggerExpand={commonInfoVisibilityState.triggerExpand}
-                        minSize={[200, 52]}
-                        collapsedSizes={[100, 0]}
-                    >
-                        <ObjectTree
-                            database={database}
-                            path={path}
-                            databaseFullPath={databaseFullPath}
-                        />
-                        <div className={b('info')}>
-                            <div className={b('sticky-top')}>
-                                <div className={b('info-header')}>
-                                    <div className={b('info-title')}>
-                                        {renderEntityTypeBadge()}
-                                        <div className={b('path-name')}>{relativePath}</div>
+                    {showLegacyDatabaseInfo ? (
+                        <SplitPane
+                            direction="vertical"
+                            defaultSizePaneKey={DEFAULT_SIZE_TENANT_SUMMARY_KEY}
+                            onSplitStartDragAdditional={onSplitStartDragAdditional}
+                            triggerCollapse={commonInfoVisibilityState.triggerCollapse}
+                            triggerExpand={commonInfoVisibilityState.triggerExpand}
+                            minSize={[200, 52]}
+                            collapsedSizes={[100, 0]}
+                        >
+                            <ObjectTree
+                                database={database}
+                                path={path}
+                                databaseFullPath={databaseFullPath}
+                            />
+                            <div className={b('info')}>
+                                <div className={b('sticky-top')}>
+                                    <div className={b('info-header')}>
+                                        <div className={b('info-title')}>
+                                            {renderEntityTypeBadge()}
+                                            <div className={b('path-name')}>{relativePath}</div>
+                                        </div>
+                                        <div className={b('info-controls')}>
+                                            {renderCommonInfoControls()}
+                                        </div>
                                     </div>
-                                    <div className={b('info-controls')}>
-                                        {renderCommonInfoControls()}
-                                    </div>
+                                    {renderTabs()}
                                 </div>
-                                {renderTabs()}
+                                <div className={b('overview-wrapper')}>{renderTabContent()}</div>
                             </div>
-                            <div className={b('overview-wrapper')}>{renderTabContent()}</div>
+                        </SplitPane>
+                    ) : (
+                        <div className={b('tree-only')}>
+                            <ObjectTree
+                                database={database}
+                                path={path}
+                                databaseFullPath={databaseFullPath}
+                            />
                         </div>
-                    </SplitPane>
+                    )}
                 </div>
                 <Flex className={b('actions')} gap={0.5}>
                     {!isCollapsed && <RefreshTreeButton />}

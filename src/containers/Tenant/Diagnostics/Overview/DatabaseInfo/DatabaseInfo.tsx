@@ -1,14 +1,12 @@
 import React from 'react';
 
-import {Alert, Card, Flex, HelpMark, Label, Text} from '@gravity-ui/uikit';
+import {Alert, Card, Flex, Text} from '@gravity-ui/uikit';
 
 import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
-import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
-import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
-import {formatDateTime, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
-import {isDomain} from '../../../ObjectSummary/transformPath';
+import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
+import {SchemaObjectInfo} from '../SchemaObjectInfo';
 
 import {dbInfoKeyset} from './i18n';
 
@@ -22,16 +20,12 @@ interface DBInfoProps {
 }
 
 export function DatabaseInfo({data, path}: DBInfoProps) {
-    const items = React.useMemo(() => {
-        return prepareDatabaseInfo({data, path});
-    }, [data, path]);
-
     const {PathsInside, PathsLimit, ShardsInside, ShardsLimit} =
         data?.PathDescription?.DomainDescription ?? {};
 
     return (
         <Flex direction={'column'} className={b('wrapper')}>
-            <YDBDefinitionList items={items} />
+            <SchemaObjectInfo data={data} path={path} />
             <Text as="div" variant="subheader-2" className={b('title')}>
                 {dbInfoKeyset('title_limits-and-usage')}
             </Text>
@@ -50,67 +44,6 @@ export function DatabaseInfo({data, path}: DBInfoProps) {
                 />
             </Flex>
         </Flex>
-    );
-}
-
-function prepareDatabaseInfo({data, path}: DBInfoProps): YDBDefinitionListItem[] {
-    const items: YDBDefinitionListItem[] = [];
-
-    const {Path, PathId} = data || {};
-    const {PathVersion, CreateStep} = data?.PathDescription?.Self || {};
-
-    const created = formatDateTime(CreateStep);
-
-    items.push(
-        {
-            name: dbInfoKeyset('title_type'),
-            content: <TypeLabel data={data} path={path} />,
-        },
-        {
-            name: dbInfoKeyset('title_id'),
-            content: PathId,
-            copyText: PathId,
-        },
-        {
-            name: dbInfoKeyset('title_version'),
-            content: PathVersion,
-            copyText: PathVersion,
-        },
-    );
-
-    if (Number(CreateStep)) {
-        items.push({
-            name: dbInfoKeyset('title_created'),
-            content: created,
-            copyText: created,
-        });
-    }
-
-    items.push({
-        name: dbInfoKeyset('title_path'),
-        content: Path,
-        copyText: Path,
-    });
-
-    return items;
-}
-
-function TypeLabel({data, path}: DBInfoProps) {
-    const isDomainDB = isDomain(path, data?.PathDescription?.Self?.PathType);
-    const dbType = isDomainDB ? dbInfoKeyset('title_domain') : dbInfoKeyset('title_sub-domain');
-    const dbTypeNote = isDomainDB
-        ? dbInfoKeyset('description_domain')
-        : dbInfoKeyset('description_sub-domain');
-
-    return (
-        <Label theme={'normal'}>
-            <Flex gap="2" wrap="nowrap">
-                {dbType}
-                <HelpMark popoverProps={{placement: ['right', 'bottom']}}>
-                    <Flex className={b('note')}>{dbTypeNote}</Flex>
-                </HelpMark>
-            </Flex>
-        </Label>
     );
 }
 
