@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {
     useCapabilitiesLoaded,
@@ -19,30 +21,42 @@ import {
 import type {StorageGroupsColumn} from '../../../../Storage/PaginatedStorageGroupsTable/columns/types';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 
-function getColumns(): [StorageGroupsColumn[], GroupsRequiredField[]] {
-    const preparedColumns = getStorageTopGroupsColumns();
+export interface TopGroupsTableConfig {
+    columns: StorageGroupsColumn[];
+    fieldsRequired: GroupsRequiredField[];
+    sort: '-Usage' | '-MaxVDiskSlotUsage';
+}
 
-    const columnsIds = preparedColumns.map((column) => column.name);
-    const dataFieldsRequired = getRequiredDataFields(columnsIds, GROUPS_COLUMNS_TO_DATA_FIELDS);
+export function getTopGroupsTableConfig(capacityMetricsEnabled: boolean): TopGroupsTableConfig {
+    const columns = getStorageTopGroupsColumns(capacityMetricsEnabled);
+    const columnsIds = columns.map(({name}) => name);
 
-    return [preparedColumns, dataFieldsRequired];
+    return {
+        columns,
+        fieldsRequired: getRequiredDataFields(columnsIds, GROUPS_COLUMNS_TO_DATA_FIELDS),
+        sort: capacityMetricsEnabled ? '-MaxVDiskSlotUsage' : '-Usage',
+    };
 }
 
 interface TopGroupsProps {
     tenant?: string;
+    capacityMetricsEnabled: boolean;
 }
 
-export function TopGroups({tenant}: TopGroupsProps) {
+export function TopGroups({tenant, capacityMetricsEnabled}: TopGroupsProps) {
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const [columns, fieldsRequired] = getColumns();
+    const {columns, fieldsRequired, sort} = React.useMemo(
+        () => getTopGroupsTableConfig(capacityMetricsEnabled),
+        [capacityMetricsEnabled],
+    );
 
     const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(
         {
             database: tenant,
-            sort: '-Usage',
+            sort,
             with: 'all',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
             shouldUseGroupsHandler: groupsHandlerAvailable,

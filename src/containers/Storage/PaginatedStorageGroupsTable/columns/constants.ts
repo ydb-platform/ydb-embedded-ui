@@ -32,6 +32,7 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
     Write: 'Write',
     Latency: 'Latency',
     AllocationUnits: 'AllocationUnits',
+    GroupSizeInUnits: 'GroupSizeInUnits',
     VDisks: 'VDisks',
     VDisksPDisks: 'VDisksPDisks',
     Degraded: 'Degraded',
@@ -114,6 +115,9 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
     },
     get AllocationUnits() {
         return i18n('allocation-units');
+    },
+    get GroupSizeInUnits() {
+        return i18n('group-size-in-units');
     },
     get VDisks() {
         return i18n('vdisks');
@@ -242,13 +246,14 @@ export const GROUPS_COLUMNS_TO_DATA_FIELDS: Record<StorageGroupsColumnId, Groups
     Write: ['Write'],
     Latency: ['Latency'],
     AllocationUnits: ['AllocationUnits'],
+    GroupSizeInUnits: ['GroupSizeInUnits'],
     // Read and Write fields make backend to return Whiteboard data
     VDisks: ['VDisk', 'PDisk', 'Read', 'Write'],
     VDisksPDisks: ['VDisk', 'PDisk', 'Read', 'Write'],
     Degraded: ['MissingDisks'],
     State: ['State'],
     MaxPDiskUsage: ['MaxPDiskUsage'],
-    MaxVDiskSlotUsage: ['MaxVDiskSlotUsage'],
+    MaxVDiskSlotUsage: ['MaxVDiskSlotUsage', 'CapacityAlert'],
     MaxVDiskRawUsage: ['MaxVDiskRawUsage'],
     MaxNormalizedOccupancy: ['MaxNormalizedOccupancy'],
     CapacityAlert: ['CapacityAlert'],
@@ -272,6 +277,7 @@ const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
     Write: 'Write',
     Latency: 'Latency',
     AllocationUnits: 'AllocationUnits',
+    GroupSizeInUnits: undefined,
     VDisks: undefined,
     VDisksPDisks: undefined,
     Degraded: 'Degraded',
