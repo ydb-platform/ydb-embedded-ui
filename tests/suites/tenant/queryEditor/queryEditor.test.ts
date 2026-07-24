@@ -475,10 +475,7 @@ test.describe('Test Query Editor', async () => {
 
         await queryEditor.queryTabs.selectTab(QueryTabs.History);
         await queryEditor.historyQueries.isVisible();
-        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toContain('SELECT 2;');
-        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.not.toContain(
-            'SELECT 1;',
-        );
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe('SELECT 2;');
     });
 
     test('Running selected query via context menu executes only selected part', async ({page}) => {
