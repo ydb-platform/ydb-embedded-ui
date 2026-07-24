@@ -48,7 +48,9 @@ export function ErrorBoundaryFallback({error}: ErrorBoundaryFallbackProps) {
     const [diagnosticsData, setDiagnosticsData] = React.useState<DiagnosticsData | undefined>();
 
     React.useEffect(() => {
-        collectDiagnosticsData(error).then((data) => {
+        const database = new URLSearchParams(window.location.search).get('database') ?? undefined;
+
+        collectDiagnosticsData(error, database).then((data) => {
             setDiagnosticsData(data);
         });
     }, [error]);
