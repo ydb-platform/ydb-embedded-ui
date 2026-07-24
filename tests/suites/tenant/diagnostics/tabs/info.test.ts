@@ -377,6 +377,7 @@ test.describe('Diagnostics Info tab', async () => {
                                 Type: 'EIndexTypeGlobalVectorKmeansTree',
                                 State: 'EIndexStateReady',
                                 KeyColumnNames: ['embedding'],
+                                DataColumnNames: [],
                                 VectorIndexKmeansTreeDescription: {
                                     Settings: {
                                         clusters: 128,
@@ -412,6 +413,9 @@ test.describe('Diagnostics Info tab', async () => {
         await infoContent.waitFor({state: 'visible', timeout: 10000});
         await expect(infoContent.getByText('ID', {exact: true})).toHaveCount(0);
         await expect(infoContent.getByText('Version', {exact: true})).toHaveCount(0);
+        await expect(infoContent.getByText('Columns', {exact: true})).toBeVisible();
+        await expect(infoContent.getByText('embedding', {exact: true})).toBeVisible();
+        await expect(infoContent.getByText('Includes', {exact: true})).toHaveCount(0);
 
         // Check Index Settings section contains Overlap Clusters
         const indexSettings = infoContent.locator('.info-viewer');

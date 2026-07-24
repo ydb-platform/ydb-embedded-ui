@@ -132,5 +132,5 @@ export function prepareSchemaObjectInfoItems({
         ...additionalItems,
     );
 
-    return items.filter(({content}) => content !== undefined);
+    return items.filter(({content}) => content !== undefined && content !== null && content !== '');
 }
