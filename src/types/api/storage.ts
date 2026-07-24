@@ -148,6 +148,8 @@ export interface TGroupsStorageGroupInfo {
     ErasureSpecies?: Erasure;
     /** uint64 */
     AllocationUnits?: string;
+    /** uint32; group slot weight in allocation units. */
+    GroupSizeInUnits?: number;
     /**
      * Could be one of:
      * ok - group is okay
@@ -326,6 +328,7 @@ export type GroupsRequiredField =
     | 'DiskSpaceUsage'
     | 'Encryption'
     | 'AllocationUnits'
+    | 'GroupSizeInUnits'
     | 'Read'
     | 'Write'
     | 'PDisk'

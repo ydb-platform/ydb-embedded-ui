@@ -1,7 +1,48 @@
+import {ECapacityAlert} from '../../../../types/api/enums';
 import type {TStoragePDisk, TStorageVDisk} from '../../../../types/api/storage';
+import type {TPDiskStateInfo} from '../../../../types/api/pdisk';
+import type {TVDiskStateInfo} from '../../../../types/api/vdisk';
 import {prepareGroupsPDisk, prepareGroupsVDisk} from '../prepareGroupsDisks';
 
+const vDiskWithCapacityMetrics = {
+    VDiskId: {
+        GroupID: 0,
+        GroupGeneration: 0,
+        Ring: 0,
+        Domain: 0,
+        VDisk: 0,
+    },
+    GroupSizeInUnits: 0,
+    VDiskSlotUsage: 82.25,
+    VDiskRawUsage: 64.5,
+    NormalizedOccupancy: 1.12,
+    CapacityAlert: ECapacityAlert.LIGHTYELLOW,
+} satisfies TVDiskStateInfo;
+
+const pDiskWithCapacityMetrics = {
+    SlotSizeInUnits: 0,
+    PDiskUsage: 70.5,
+    PDiskCapacityAlert: ECapacityAlert.ORANGE,
+} satisfies TPDiskStateInfo;
+
 describe('prepareGroupsVDisk', () => {
+    test('Should preserve nested Whiteboard capacity metrics including zero values', () => {
+        const preparedData = prepareGroupsVDisk({
+            Whiteboard: vDiskWithCapacityMetrics,
+            PDisk: {Whiteboard: pDiskWithCapacityMetrics},
+        });
+
+        expect(preparedData).toEqual(expect.objectContaining(vDiskWithCapacityMetrics));
+        expect(preparedData.PDisk).toEqual(expect.objectContaining(pDiskWithCapacityMetrics));
+    });
+
+    test('Should omit absent nested Whiteboard capacity metrics', () => {
+        const preparedData = prepareGroupsVDisk({Whiteboard: {}, PDisk: {Whiteboard: {}}});
+
+        expect(preparedData).not.toHaveProperty('VDiskSlotUsage');
+        expect(preparedData.PDisk).not.toHaveProperty('PDiskUsage');
+    });
+
     test('Should correctly parse data', () => {
         const vDiksDataWithoutPDisk = {
             VDiskId: '2181038134-22-0-0-0',
