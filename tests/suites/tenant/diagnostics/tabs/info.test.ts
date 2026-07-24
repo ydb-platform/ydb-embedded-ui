@@ -410,8 +410,8 @@ test.describe('Diagnostics Info tab', async () => {
         // Verify vector index settings are displayed including overlap_clusters
         const infoContent = page.locator('.kv-detailed-overview');
         await infoContent.waitFor({state: 'visible', timeout: 10000});
-        await expect(infoContent.getByText('42', {exact: true})).toBeVisible();
-        await expect(infoContent.getByText('7', {exact: true})).toBeVisible();
+        await expect(infoContent.getByText('ID', {exact: true})).toHaveCount(0);
+        await expect(infoContent.getByText('Version', {exact: true})).toHaveCount(0);
 
         // Check Index Settings section contains Overlap Clusters
         const indexSettings = infoContent.locator('.info-viewer');
@@ -522,6 +522,28 @@ test.describe('Diagnostics Info tab', async () => {
         await expect(infoContent).toBeVisible();
         await expect(infoContent.getByText('ID', {exact: true})).toHaveCount(0);
         await expect(infoContent.getByText('Version', {exact: true})).toHaveCount(0);
+    });
+
+    test('Info tab displays schema metadata for administrators', async ({page}) => {
+        const mockDirectoryPath = '/local/test_directory';
+        await setupMonitoringUserMock(page);
+        await setupDirectoryInfoMock(page, mockDirectoryPath, {
+            PathId: '42',
+            PathVersion: '7',
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockDirectoryPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        await expect(infoContent).toBeVisible();
+        await expect(infoContent.getByText('42', {exact: true})).toBeVisible();
+        await expect(infoContent.getByText('7', {exact: true})).toBeVisible();
     });
 
     test('Streaming Query Info remains available when describe fails', async ({page}) => {
