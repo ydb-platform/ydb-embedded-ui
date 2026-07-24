@@ -72,6 +72,7 @@ import {YqlEditor} from './YqlEditor/YqlEditor';
 import {useEditorTabsGlobalHotkeys} from './hooks/useEditorTabsGlobalHotkeys';
 import {useQueryPageLeaveGuard} from './hooks/useQueryPageLeaveGuard';
 import {useQueryTabsActions} from './hooks/useQueryTabsActions';
+import type {QueryExecution} from './types';
 import {queryExecutionManagerInstance} from './utils/queryExecutionManager';
 
 import './QueryEditor.scss';
@@ -327,10 +328,12 @@ export default function QueryEditor({
         }
     }, [hasTabs, showPreview, isResultLoaded]);
 
-    const handleSendExecuteClick = useEventHandler((text: string, partial?: boolean) => {
+    const handleSendExecuteClick = useEventHandler((execution: QueryExecution) => {
         if (!activeTabId) {
             return;
         }
+
+        const {text, source, range} = execution;
 
         runSetStoppableTimeout();
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
@@ -347,26 +350,26 @@ export default function QueryEditor({
 
         const startTime = Date.now();
 
-        // Don't save partial queries in history
-        if (!partial) {
-            const currentQuery = historyCurrentQueryId
-                ? historyQueries.find((q) => q.queryId === historyCurrentQueryId)
-                : null;
-            const lastQuery = historyQueries.at(-1);
-            if (text === lastQuery?.queryText && !lastQuery.operationId) {
-                // Don't add the same query as the previous one to the query history,
-                // unless it has server-stored results (operationId) — then save every launch.
-                historyQueryId = lastQuery.queryId;
-                // Keep history navigation anchored to the entry we are updating
-                if (historyCurrentQueryId !== lastQuery.queryId) {
-                    dispatch(setHistoryCurrentQueryId(lastQuery.queryId));
-                }
-            } else if (text !== currentQuery?.queryText || currentQuery?.operationId) {
-                // Queries with results stored on the server (operationId) get a separate history
-                // entry per launch, unless they match the most recent history item (handled above).
-                historyQueryId = newQueryId;
-                saveQueryToHistory(text, newQueryId, startTime);
+        const currentQuery = historyCurrentQueryId
+            ? historyQueries.find((q) => q.queryId === historyCurrentQueryId)
+            : null;
+        const lastQuery = historyQueries.at(-1);
+        if (text === lastQuery?.queryText && !lastQuery.operationId) {
+            // Don't add the same query as the previous one to the query history,
+            // unless it has server-stored results (operationId) — then save every launch.
+            historyQueryId = lastQuery.queryId;
+            // Keep history navigation anchored to the entry we are updating
+            if (historyCurrentQueryId !== lastQuery.queryId) {
+                dispatch(setHistoryCurrentQueryId(lastQuery.queryId));
             }
+        } else if (text !== currentQuery?.queryText || currentQuery?.operationId) {
+            // Queries with results stored on the server (operationId) get a separate history
+            // entry per launch, unless they match the most recent history item (handled above).
+            historyQueryId = newQueryId;
+            saveQueryToHistory(text, newQueryId, startTime);
+        }
+
+        if (source === 'editor') {
             dispatch(setIsDirty(false));
         }
 
@@ -395,6 +398,9 @@ export default function QueryEditor({
                 enableTracingLevel,
                 base64: encodeTextWithBase64,
                 historyQueryId,
+                sourcePosition: range
+                    ? {lineNumber: range.startLineNumber, column: range.startColumn}
+                    : undefined,
             });
             query
                 .unwrap()
@@ -444,6 +450,9 @@ export default function QueryEditor({
                 queryId: newQueryId,
                 historyQueryId: historyQueryId,
                 base64: encodeTextWithBase64,
+                sourcePosition: range
+                    ? {lineNumber: range.startLineNumber, column: range.startColumn}
+                    : undefined,
             });
 
             query
@@ -475,6 +484,10 @@ export default function QueryEditor({
 
             queryExecutionManagerInstance.registerQuery(activeTabId, query);
         }
+    });
+
+    const handleRunEditorClick = useEventHandler((text: string) => {
+        handleSendExecuteClick({text, source: 'editor'});
     });
 
     const handleSettingsClick = () => {
@@ -537,7 +550,7 @@ export default function QueryEditor({
     const renderControls = () => {
         return (
             <QueryEditorControls
-                handleSendExecuteClick={handleSendExecuteClick}
+                handleSendExecuteClick={handleRunEditorClick}
                 onSettingsButtonClick={handleSettingsClick}
                 isLoading={Boolean(result?.isLoading)}
                 isStoppable={isStoppable}

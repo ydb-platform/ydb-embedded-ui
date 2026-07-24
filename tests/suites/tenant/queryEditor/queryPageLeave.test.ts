@@ -6,7 +6,10 @@ import {
     cleanupMockStreamingFetch,
     setupMockStreamingFetch,
 } from '../../../utils/mockStreamingFetch';
-import {waitForBeforeUnloadDialog} from '../../../utils/queryHotkeys';
+import {
+    executeSelectedQueryWithKeybinding,
+    waitForBeforeUnloadDialog,
+} from '../../../utils/queryHotkeys';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {QueryEditorMode, TenantPage} from '../TenantPage';
 import {longRunningStreamQuery} from '../constants';
@@ -137,6 +140,21 @@ test.describe('Query page leave', () => {
         await expect
             .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
             .toBe('SELECT 1 AS single_tab_history_match;');
+    });
+
+    test('Current-statement execution keeps a changed editor dirty', async ({page}) => {
+        const tenantPage = await openMultiTabQueryEditor(page);
+        const {queryEditor} = tenantPage;
+        await queryEditor.setQuery('SELECT 1;\n\nSELECT 2;');
+        await queryEditor.setCursor(3, 3);
+        await executeSelectedQueryWithKeybinding(page);
+        await queryEditor.waitForStatus('Completed');
+
+        const {dialog, triggerPromise} = await waitForBeforeUnloadDialog(page, () =>
+            page.reload({timeout: 5000}),
+        );
+        await dialog.dismiss();
+        await triggerPromise;
     });
 
     test('Reload shows beforeunload when a non-active tab is running', async ({page}) => {

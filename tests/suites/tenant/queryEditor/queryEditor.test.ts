@@ -448,6 +448,47 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.getResultTitleCount()).resolves.toBe('1');
     });
 
+    test('Selected-query hotkey executes the highlighted statement without a selection', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;\n\nSELECT 2;');
+        await queryEditor.setCursor(3, 3);
+
+        await expect(queryEditor.getSelectedText()).resolves.toBe('');
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 2;');
+        await executeSelectedQueryWithKeybinding(page);
+
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
+        await expect(queryEditor.resultTable.getCellValue(1, 2)).resolves.toContain('2');
+    });
+
+    test('Fragment error navigation uses the original editor position', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;\n\nSELECT missing_column;');
+        await queryEditor.setCursor(3, 8);
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
+
+        await queryEditor.clickFirstIssuePosition();
+        await expect.poll(() => queryEditor.getCursorPosition()).toMatchObject({lineNumber: 3});
+    });
+
+    test('Current-statement execution stores only the executed statement in History', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;\n\nSELECT 2;');
+        await queryEditor.setCursor(3, 3);
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe('SELECT 2;');
+    });
+
     test('Running selected query via context menu executes only selected part', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         const multiQuery = 'SELECT 1;\nSELECT 2;';

@@ -255,6 +255,48 @@ export class QueryEditor {
         await this.editorTextArea.focus();
     }
 
+    async setCursor(lineNumber: number, column: number) {
+        await this.editorTextArea.evaluate(
+            (_, position) => {
+                window.ydbEditor?.setPosition(position);
+                window.ydbEditor?.focus();
+            },
+            {lineNumber, column},
+        );
+    }
+
+    async clickFirstIssuePosition() {
+        const resultArea = this.getResultAreaLocator();
+        await resultArea.getByRole('button', {name: 'Show details'}).first().click();
+        await resultArea.locator('.kv-issue__place-text').first().click();
+    }
+
+    async getCursorPosition() {
+        return this.editorTextArea.evaluate(() => window.ydbEditor?.getPosition());
+    }
+
+    async getHighlightedStatement() {
+        return this.editorTextArea.evaluate(() => {
+            const model = window.ydbEditor?.getModel();
+            const decoration = model
+                ?.getAllDecorations()
+                .find(
+                    ({options}: {options: {className?: string}}) =>
+                        options.className === 'ydb-current-query-highlight',
+                );
+            return decoration && model ? model.getValueInRange(decoration.range) : undefined;
+        });
+    }
+
+    async getSelectedText() {
+        return this.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            const model = editor?.getModel();
+            const selection = editor?.getSelection();
+            return editor && model && selection ? model.getValueInRange(selection) : '';
+        });
+    }
+
     async getEditorContent(): Promise<string> {
         await this.waitForEditorReady();
         await this.page.waitForFunction(() => Boolean(window.ydbEditor), null, {
