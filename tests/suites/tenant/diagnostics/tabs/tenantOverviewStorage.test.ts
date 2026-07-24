@@ -1002,9 +1002,21 @@ test.describe('Tenant Overview storage metrics tab', () => {
 
         await openStorageMetricsTab(page);
 
-        await expect(page.getByText('Top groups by VDisk Slot Usage', {exact: true})).toBeVisible();
-        await expect(page.getByText('VDisk Slot Usage', {exact: true})).toBeVisible();
-        await expect(page.getByText('Group Size In Units', {exact: true})).toBeVisible();
+        const topGroupsByVDiskSlotUsage = page
+            .locator('.ydb-stats-wrapper')
+            .filter({has: page.getByText('Top groups by VDisk Slot Usage', {exact: true})});
+        const topGroupsTable = topGroupsByVDiskSlotUsage
+            .locator('table')
+            .filter({has: page.locator('tbody')});
+
+        await expect(topGroupsByVDiskSlotUsage).toHaveCount(1);
+        await expect(topGroupsTable).toHaveCount(1);
+        await expect(
+            topGroupsTable.getByRole('columnheader', {name: 'VDisk Slot Usage', exact: true}),
+        ).toBeVisible();
+        await expect(
+            topGroupsTable.getByRole('columnheader', {name: 'Group Size In Units', exact: true}),
+        ).toBeVisible();
 
         expect(storageGroupsRequestUrl).toBeDefined();
         expect(storageGroupsRequestUrl?.searchParams.get('sort')).toBe('-MaxVDiskSlotUsage');

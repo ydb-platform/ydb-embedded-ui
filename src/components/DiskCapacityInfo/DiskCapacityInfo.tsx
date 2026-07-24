@@ -31,7 +31,7 @@ export interface DiskCapacityInfoItem {
     note?: string;
 }
 
-export function CapacityAlertValue({value}: {value?: string}) {
+function CapacityAlertValue({value}: {value?: string}) {
     if (!value) {
         return <React.Fragment>{EMPTY_DATA_PLACEHOLDER}</React.Fragment>;
     }
