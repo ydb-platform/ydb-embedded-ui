@@ -464,6 +464,23 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.getCellValue(1, 2)).resolves.toContain('2');
     });
 
+    test('Current-statement execution stores only the executed statement in History', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;\n\nSELECT 2;');
+        await queryEditor.setCursor(3, 3);
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toContain('SELECT 2;');
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.not.toContain(
+            'SELECT 1;',
+        );
+    });
+
     test('Running selected query via context menu executes only selected part', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         const multiQuery = 'SELECT 1;\nSELECT 2;';
