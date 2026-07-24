@@ -5,7 +5,6 @@ import QRCode from 'qrcode';
 import {ErrorBoundary as ErrorBoundaryBase} from 'react-error-boundary';
 
 import {cn} from '../../utils/cn';
-import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {getIllustration} from '../../utils/illustrations';
 import {registerError} from '../../utils/registerError';
 import {useComponent} from '../ComponentsProvider/ComponentsProvider';
@@ -47,13 +46,14 @@ interface ErrorBoundaryFallbackProps {
 }
 export function ErrorBoundaryFallback({error}: ErrorBoundaryFallbackProps) {
     const [diagnosticsData, setDiagnosticsData] = React.useState<DiagnosticsData | undefined>();
-    const database = useDatabaseFromQuery();
 
     React.useEffect(() => {
+        const database = new URLSearchParams(window.location.search).get('database') ?? undefined;
+
         collectDiagnosticsData(error, database).then((data) => {
             setDiagnosticsData(data);
         });
-    }, [database, error]);
+    }, [error]);
 
     const InternalErrorImage = getIllustration('InternalError');
 
