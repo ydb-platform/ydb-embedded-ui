@@ -1,0 +1,271 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - img [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+      - list [ref=e21]:
+        - generic [ref=e22]:
+          - listitem [ref=e23]:
+            - link "Database" [ref=e28] [cursor=pointer]:
+              - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=database
+              - img [ref=e31]:
+                - img [ref=e32]
+              - generic "Database":
+                - generic: Database
+          - listitem [ref=e34]:
+            - link "Diagnostics" [ref=e39] [cursor=pointer]:
+              - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+              - img [ref=e42]:
+                - img [ref=e43]
+              - generic "Diagnostics":
+                - generic: Diagnostics
+          - listitem [ref=e45]:
+            - link "SQL Editor" [ref=e50] [cursor=pointer]:
+              - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query
+              - img [ref=e53]:
+                - img [ref=e54]
+              - generic "SQL Editor":
+                - generic: SQL Editor
+      - generic [ref=e56]:
+        - button "Information" [ref=e57] [cursor=pointer]:
+          - img [ref=e60]:
+            - img [ref=e61]
+          - generic "Information":
+            - generic: Information
+        - button "Settings" [ref=e63] [cursor=pointer]:
+          - img [ref=e66]:
+            - img [ref=e67]
+          - generic "Settings":
+            - generic: Settings
+        - button "Account" [ref=e69] [cursor=pointer]:
+          - img [ref=e72]:
+            - img [ref=e73]
+          - generic "Account":
+            - generic: Account
+      - button "Expand" [ref=e75] [cursor=pointer]:
+        - img [ref=e76]:
+          - img [ref=e77]
+    - generic [ref=e80]:
+      - banner [ref=e81]:
+        - list [ref=e82]:
+          - listitem [ref=e83]:
+            - link "Cluster" [ref=e84] [cursor=pointer]:
+              - link "Cluster" [ref=e85]:
+                - /url: /cluster
+                - generic [ref=e86]: Cluster
+            - generic [ref=e87]: /
+          - listitem [ref=e88]:
+            - link "local" [disabled] [ref=e89]:
+              - generic [ref=e91]: local
+          - listitem [ref=e92]:
+            - generic [ref=e93]:
+              - generic [ref=e94]:
+                - button "Copy path" [ref=e95] [cursor=pointer]:
+                  - generic:
+                    - generic:
+                      - img:
+                        - img
+                - button [ref=e96] [cursor=pointer]:
+                  - img [ref=e99]:
+                    - img [ref=e100]
+              - generic [ref=e103] [cursor=pointer]:
+                - img [ref=e105]:
+                  - img [ref=e106]
+                - 'button "Good: 1 issue" [ref=e108]':
+                  - generic [ref=e111]:
+                    - text: "Good: 1 issue"
+                    - img [ref=e112]:
+                      - img [ref=e113]
+        - generic [ref=e115]:
+          - link "Developer UI" [ref=e116] [cursor=pointer]:
+            - /url: http://localhost:8765/internal
+            - img [ref=e119]:
+              - img [ref=e120]
+            - generic [ref=e122]: Developer UI
+          - button [ref=e125] [cursor=pointer]:
+            - img [ref=e128]:
+              - img [ref=e129]
+      - main [ref=e131]:
+        - generic [ref=e134]:
+          - generic [ref=e135]:
+            - generic [ref=e137]:
+              - generic [ref=e138]:
+                - generic [ref=e139]: Navigation
+                - generic [ref=e143]:
+                  - generic [ref=e146] [cursor=pointer]:
+                    - button [ref=e147]
+                    - generic [ref=e149]:
+                      - img [ref=e151]
+                      - generic [ref=e153]: /local
+                  - generic [ref=e156] [cursor=pointer]:
+                    - button [ref=e157]
+                    - generic [ref=e159]:
+                      - img [ref=e161]
+                      - generic [ref=e163]: .metadata
+                  - generic [ref=e166] [cursor=pointer]:
+                    - button [ref=e167]
+                    - generic [ref=e169]:
+                      - img [ref=e171]
+                      - generic [ref=e173]: .sys
+                  - generic [ref=e178] [cursor=pointer]:
+                    - img [ref=e180]
+                    - generic [ref=e182]: .sys_health
+              - generic [ref=e184]:
+                - generic [ref=e185]:
+                  - generic [ref=e186]:
+                    - generic [ref=e187]:
+                      - generic [ref=e188]: domain
+                      - generic [ref=e189]: /local
+                    - generic [ref=e190]:
+                      - button "Copy" [ref=e191] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                      - button [ref=e192] [cursor=pointer]:
+                        - img [ref=e195]:
+                          - img [ref=e196]
+                  - tablist [ref=e200]:
+                    - tab "Overview" [selected] [ref=e201] [cursor=pointer]:
+                      - link "Overview" [ref=e204]:
+                        - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query&summaryTab=overview
+                - generic [ref=e205]:
+                  - generic [ref=e206]: Directory
+                  - generic [ref=e207]:
+                    - generic [ref=e208]:
+                      - term [ref=e209]:
+                        - generic [ref=e210]: Type
+                      - definition [ref=e212]:
+                        - generic [ref=e213]: Domain
+                    - generic [ref=e214]:
+                      - term [ref=e215]:
+                        - generic [ref=e216]: Id
+                      - definition [ref=e218]:
+                        - generic [ref=e219]: "1"
+                    - generic [ref=e220]:
+                      - term [ref=e221]:
+                        - generic [ref=e222]: Version
+                      - definition [ref=e224]:
+                        - generic [ref=e225]: "39"
+                    - generic [ref=e226]:
+                      - term [ref=e227]:
+                        - generic [ref=e228]: Created
+                      - definition [ref=e230]:
+                        - generic [ref=e231]: 2026-07-23 10:52
+            - generic [ref=e232]:
+              - button [ref=e233] [cursor=pointer]:
+                - img [ref=e236]:
+                  - img [ref=e237]
+              - button [ref=e239] [cursor=pointer]:
+                - img [ref=e242]:
+                  - img [ref=e243]
+          - generic [ref=e248]:
+            - tablist [ref=e250]:
+              - tab "Editor" [selected] [ref=e251] [cursor=pointer]:
+                - link "Editor" [ref=e254]:
+                  - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query&queryTab=newQuery
+              - tab "History" [ref=e255] [cursor=pointer]:
+                - link "History" [ref=e258]:
+                  - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query&queryTab=history
+              - tab "Saved" [ref=e259] [cursor=pointer]:
+                - link "Saved" [ref=e262]:
+                  - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query&queryTab=saved
+            - generic [ref=e265]:
+              - generic [ref=e266]:
+                - generic [ref=e267]:
+                  - tablist [ref=e268]:
+                    - tab "Create row table" [selected] [ref=e269] [cursor=pointer]:
+                      - generic [ref=e273]: Create row table
+                  - button "New editor tab" [ref=e275] [cursor=pointer]:
+                    - img [ref=e278]:
+                      - img [ref=e279]
+                - code [ref=e284]:
+                  - generic [ref=e285]:
+                    - generic [ref=e287]:
+                      - generic [ref=e289]: "1"
+                      - generic [ref=e290]:
+                        - generic [ref=e292] [cursor=pointer]: 
+                        - generic [ref=e293]: "2"
+                      - generic [ref=e295]: "3"
+                      - generic [ref=e297]: "4"
+                      - generic [ref=e299]: "5"
+                      - generic [ref=e301]: "6"
+                      - generic [ref=e303]: "7"
+                      - generic [ref=e305]: "8"
+                      - generic [ref=e307]: "9"
+                      - generic [ref=e309]: "10"
+                      - generic [ref=e311]: "11"
+                      - generic [ref=e313]: "12"
+                    - generic [ref=e314]:
+                      - img [ref=e319]
+                      - generic [ref=e340]:
+                        - generic [ref=e342]: "-- docs: https://ydb.tech/en/docs/yql/reference/syntax/create_table"
+                        - generic [ref=e344]: CREATE TABLE my_row_table (
+                        - generic [ref=e346]: category_id Uint64 NOT NULL,
+                        - generic [ref=e348]: id Uint64,
+                        - generic [ref=e350]: expire_at Datetime,
+                        - generic [ref=e352]: updated_on Datetime,
+                        - generic [ref=e354]: name Text,
+                        - generic [ref=e356]: "`binary-payload` Bytes,"
+                        - generic [ref=e358]: attributes JsonDocument,
+                        - generic [ref=e360]: "-- uncomment to add a secondary index"
+                        - generic [ref=e362]: "-- INDEX idx_row_table_id GLOBAL SYNC ON ( id ) COVER ( name, attributes ), -- Secondary indexes docs https://ydb.tech/en/docs/yql/reference/syntax/create_table#secondary_index"
+                        - generic [ref=e364]: PRIMARY KEY (category_id, id)
+                    - textbox "Editor content" [ref=e366]: "-- docs: https://ydb.tech/en/docs/yql/reference/syntax/create_table CREATE TABLE my_row_table ( category_id Uint64 NOT NULL, id Uint64, expire_at Datetime, updated_on Datetime, name Text, `binary-payload` Bytes, attributes JsonDocument, -- uncomment to add a secondary index"
+                - generic [ref=e367]:
+                  - generic [ref=e368]:
+                    - button "Stop" [ref=e369] [cursor=pointer]:
+                      - img [ref=e372]:
+                        - img [ref=e373]
+                      - generic [ref=e375]: Stop
+                    - button "Explain" [disabled]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                      - generic: Explain
+                    - button [disabled]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                  - generic [ref=e376]:
+                    - button "New query" [ref=e378] [cursor=pointer]:
+                      - img [ref=e381]
+                      - generic [ref=e383]: New query
+                    - button "Save query" [ref=e384] [cursor=pointer]:
+                      - generic [ref=e385]: Save query
+              - generic [ref=e388]:
+                - generic [ref=e389]:
+                  - radiogroup [ref=e390]:
+                    - generic [ref=e391]:
+                      - radio "Result" [checked] [ref=e392]
+                      - generic [ref=e393]: Result
+                    - generic [ref=e394] [cursor=pointer]:
+                      - radio "Computation Graph" [ref=e395]
+                      - generic [ref=e396]: Computation Graph
+                    - generic [ref=e397] [cursor=pointer]:
+                      - radio "Explain" [ref=e398]
+                      - generic [ref=e399]: Explain
+                    - generic [ref=e400] [cursor=pointer]:
+                      - radio "Stats" [ref=e401]
+                      - generic [ref=e402]: Stats
+                  - generic [ref=e407]:
+                    - generic [ref=e408]: Running
+                    - generic [ref=e409]:
+                      - generic [ref=e410]: ":"
+                      - generic [ref=e411]: 00:01.112
+                - generic [ref=e412]:
+                  - button [ref=e413] [cursor=pointer]:
+                    - img [ref=e416]:
+                      - img [ref=e417]
+                  - button [ref=e419] [cursor=pointer]:
+                    - img [ref=e422]:
+                      - img [ref=e423]
+  - generic [ref=e430]:
+    - alert
+    - alert
+```

@@ -1,0 +1,250 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - img [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+      - generic [ref=e18]:
+        - button [ref=e19] [cursor=pointer]:
+          - img [ref=e22]:
+            - img [ref=e23]
+        - button [ref=e25] [cursor=pointer]:
+          - img [ref=e28]:
+            - img [ref=e29]
+        - button [ref=e31] [cursor=pointer]:
+          - img [ref=e34]:
+            - img [ref=e35]
+      - button [ref=e37] [cursor=pointer]:
+        - img [ref=e38]:
+          - img [ref=e39]
+    - generic [ref=e42]:
+      - banner [ref=e43]:
+        - list [ref=e44]:
+          - listitem [ref=e45]:
+            - link [disabled] [ref=e46]:
+              - generic [ref=e48]: Cluster
+        - link [ref=e50] [cursor=pointer]:
+          - /url: http://localhost:8765/internal
+          - img [ref=e53]:
+            - img [ref=e54]
+          - generic [ref=e56]: Developer UI
+      - main [ref=e57]:
+        - generic [ref=e59]:
+          - generic [ref=e61]:
+            - text: LOCAL
+            - generic [ref=e62] [cursor=pointer]:
+              - img [ref=e64]:
+                - img [ref=e65]
+              - button [ref=e67]:
+                - generic [ref=e70]: Good
+          - generic [ref=e71]:
+            - button [ref=e72] [cursor=pointer]:
+              - img [ref=e75]
+            - group [ref=e78] [cursor=pointer]:
+              - combobox [ref=e79]:
+                - generic [ref=e80]: None
+              - img [ref=e81]:
+                - img [ref=e82]
+          - generic [ref=e85]:
+            - button [expanded] [ref=e86] [cursor=pointer]:
+              - img [ref=e88]:
+                - img [ref=e89]
+              - generic [ref=e92]:
+                - img [ref=e93]:
+                  - img [ref=e94]
+                - generic [ref=e96]: Overview
+            - region [ref=e97]:
+              - generic [ref=e98]:
+                - generic [ref=e99]:
+                  - generic [ref=e100]:
+                    - generic [ref=e101]:
+                      - img [ref=e102]
+                      - generic [ref=e106]: 0.2%
+                    - generic [ref=e107]:
+                      - generic [ref=e109]: 0 of 8 cores
+                      - generic [ref=e110]:
+                        - generic [ref=e111]: CPU load
+                        - button [ref=e112] [cursor=pointer]:
+                          - img [ref=e113]:
+                            - img [ref=e114]
+                  - generic [ref=e116]:
+                    - generic [ref=e117]:
+                      - img [ref=e118]
+                      - generic [ref=e122]: 0.2%
+                    - generic [ref=e123]:
+                      - generic [ref=e125]: 161 MB of 68.7 GB
+                      - generic [ref=e126]:
+                        - generic [ref=e127]: Storage HDD
+                        - button [ref=e128] [cursor=pointer]:
+                          - img [ref=e129]:
+                            - img [ref=e130]
+                  - generic [ref=e132]:
+                    - generic [ref=e133]:
+                      - img [ref=e134]
+                      - generic [ref=e138]: 3%
+                    - generic [ref=e139]:
+                      - generic [ref=e141]: 0.47 of 16.8 GB
+                      - generic [ref=e142]:
+                        - generic [ref=e143]: Memory used
+                        - button [ref=e144] [cursor=pointer]:
+                          - img [ref=e145]:
+                            - img [ref=e146]
+                - generic [ref=e150]:
+                  - generic [ref=e151]: Allocated Storage Groups
+                  - generic [ref=e154]:
+                    - generic [ref=e155]:
+                      - generic [ref=e156]: HDD
+                      - generic [ref=e157]:
+                        - generic [ref=e160]: "Available : 13 groups"
+                        - generic [ref=e161]: "Allocated : 2 of 15 groups"
+                    - generic [ref=e162]:
+                      - progressbar [ref=e163]
+                      - generic [ref=e166]:
+                        - generic [ref=e167]: none
+                        - generic [ref=e168]: 13%
+          - tablist [ref=e170]:
+            - tab [selected] [ref=e171] [cursor=pointer]:
+              - link [ref=e174]:
+                - /url: /cluster/databases?backend=http%3A%2F%2Flocalhost%3A8765
+                - text: Databases
+            - tab [ref=e175] [cursor=pointer]:
+              - link [ref=e178]:
+                - /url: /cluster/nodes?backend=http%3A%2F%2Flocalhost%3A8765
+                - text: Nodes
+            - tab [ref=e179] [cursor=pointer]:
+              - link [ref=e182]:
+                - /url: /cluster/storage?backend=http%3A%2F%2Flocalhost%3A8765
+                - text: Storage
+            - tab [ref=e183] [cursor=pointer]:
+              - link [ref=e186]:
+                - /url: /cluster/network?backend=http%3A%2F%2Flocalhost%3A8765
+                - text: Network
+            - tab [ref=e187] [cursor=pointer]:
+              - link [ref=e190]:
+                - /url: /cluster/tablets?backend=http%3A%2F%2Flocalhost%3A8765
+                - text: Tablets
+            - tab [ref=e191] [cursor=pointer]:
+              - link [ref=e194]:
+                - /url: /cluster/versions?backend=http%3A%2F%2Flocalhost%3A8765
+                - text: Versions
+            - tab [ref=e195] [cursor=pointer]:
+              - link [ref=e198]:
+                - /url: /cluster/configs?backend=http%3A%2F%2Flocalhost%3A8765
+                - text: Configs
+          - generic [ref=e201]:
+            - generic [ref=e202]:
+              - generic [ref=e203]:
+                - textbox [active] [ref=e206]:
+                  - /placeholder: Database name
+                - radiogroup [ref=e207]:
+                  - generic [ref=e208]:
+                    - radio [checked] [ref=e209]
+                    - generic [ref=e210]: All
+                  - generic [ref=e211] [cursor=pointer]:
+                    - radio [ref=e212]
+                    - generic [ref=e213]: With problems
+                - generic [ref=e216]: "Databases: 1"
+              - button [ref=e220] [cursor=pointer]:
+                - img [ref=e223]:
+                  - img [ref=e224]
+                - generic [ref=e227]: 10/10
+            - generic [ref=e230]:
+              - table [ref=e233]:
+                - rowgroup [ref=e234]:
+                  - row [ref=e235]:
+                    - columnheader [ref=e236]:
+                      - generic [ref=e237]: Database
+                    - columnheader [ref=e238]:
+                      - generic [ref=e239]: Type
+                    - columnheader [ref=e240]:
+                      - generic [ref=e241]: State
+                    - columnheader [ref=e242]:
+                      - generic [ref=e243]: CPU
+                    - columnheader [ref=e244]:
+                      - generic [ref=e245]: Memory
+                    - columnheader [ref=e246]:
+                      - generic [ref=e247]: Storage
+                    - columnheader [ref=e248]:
+                      - generic [ref=e249]: Network
+                    - columnheader [ref=e250]:
+                      - generic [ref=e251]: Nodes
+                    - columnheader [ref=e252]:
+                      - generic [ref=e253]: Groups
+                    - columnheader [ref=e254]:
+                      - generic [ref=e255]: Pools
+              - table [ref=e260]:
+                - rowgroup [ref=e261]:
+                  - row [ref=e262]:
+                    - cell [ref=e263]:
+                      - generic [ref=e264]:
+                        - generic [ref=e265]:
+                          - link [ref=e267] [cursor=pointer]:
+                            - /url: /database?database=%2Flocal
+                            - text: local
+                          - generic [ref=e268]:
+                            - generic [ref=e269]:
+                              - img [ref=e271]:
+                                - img [ref=e272]
+                              - generic [ref=e276]: Good
+                            - button [ref=e278] [cursor=pointer]:
+                              - img [ref=e281]:
+                                - img [ref=e282]
+                        - generic [ref=e284]:
+                          - generic [ref=e285]: /local
+                          - button [ref=e286] [cursor=pointer]:
+                            - generic:
+                              - generic:
+                                - img:
+                                  - img
+                    - cell [ref=e287]: Domain
+                    - cell [ref=e288]:
+                      - generic [ref=e291]: Running
+                    - cell [ref=e292]: "0.019"
+                    - cell [ref=e293]: 0 GB
+                    - cell [ref=e294]: —
+                    - cell [ref=e295]: —
+                    - cell [ref=e296]: "1"
+                    - cell [ref=e297]: "2"
+                    - cell [ref=e298]
+  - generic [ref=e310]:
+    - button [ref=e311]
+    - button [ref=e312]: Close
+    - dialog [ref=e313]
+    - button [ref=e314]: Close
+    - button [ref=e315]
+  - generic [ref=e316]:
+    - button [ref=e317]
+    - button "Close" [ref=e318]
+    - dialog [ref=e319]:
+      - heading "Keyboard shortcuts Ctrl + K" [level=2] [ref=e320]:
+        - generic [ref=e321]:
+          - text: Keyboard shortcuts
+          - generic [ref=e322]: Ctrl + K
+      - textbox [ref=e325]
+      - list [ref=e327]:
+        - generic [ref=e328]:
+          - listitem [ref=e329]:
+            - heading "Query Editor" [level=3] [ref=e331]:
+              - generic [ref=e332]: Query Editor
+          - listitem [ref=e333]:
+            - paragraph [ref=e335]:
+              - generic [ref=e336]: Execute query
+              - generic [ref=e337]: Ctrl + Enter
+          - listitem [ref=e338]:
+            - paragraph [ref=e340]:
+              - generic [ref=e341]: Execute selected query
+              - generic [ref=e342]: Ctrl + Shift + Enter
+          - listitem [ref=e343]:
+            - paragraph [ref=e345]:
+              - generic [ref=e346]: Save query
+              - generic [ref=e347]: Ctrl + S
+          - listitem [ref=e348]:
+            - paragraph [ref=e350]:
+              - generic [ref=e351]: Save selected query
+              - generic [ref=e352]: Ctrl + Shift + S
+    - button "Close" [ref=e353]
+    - button [ref=e354]
+  - generic [ref=e357]: Information
+```

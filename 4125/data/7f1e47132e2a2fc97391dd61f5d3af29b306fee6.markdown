@@ -1,0 +1,218 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - link "Cluster" [disabled] [ref=e46]:
+            - generic [ref=e48]: Cluster
+      - link "Developer UI" [ref=e50] [cursor=pointer]:
+        - /url: http://localhost:8765/internal
+        - img [ref=e53]:
+          - img [ref=e54]
+        - generic [ref=e56]: Developer UI
+    - main [ref=e57]:
+      - generic [ref=e59]:
+        - generic [ref=e61]:
+          - text: LOCAL
+          - generic [ref=e62] [cursor=pointer]:
+            - img [ref=e64]:
+              - img [ref=e65]
+            - button "Good" [ref=e67]:
+              - generic [ref=e70]: Good
+        - generic [ref=e71]:
+          - button "Refresh" [ref=e72] [cursor=pointer]:
+            - img [ref=e75]
+          - group [ref=e78] [cursor=pointer]:
+            - combobox [ref=e79]:
+              - generic [ref=e80]: None
+            - img [ref=e81]:
+              - img [ref=e82]
+        - tablist [ref=e85]:
+          - tab "Databases" [ref=e86] [cursor=pointer]:
+            - link "Databases" [ref=e89]:
+              - /url: /cluster/databases
+          - tab "Nodes" [ref=e90] [cursor=pointer]:
+            - link "Nodes" [ref=e93]:
+              - /url: /cluster/nodes
+          - tab "Storage" [selected] [ref=e94] [cursor=pointer]:
+            - link "Storage" [ref=e97]:
+              - /url: /cluster/storage
+          - tab "Network" [ref=e98] [cursor=pointer]:
+            - link "Network" [ref=e101]:
+              - /url: /cluster/network
+          - tab "Tablets" [ref=e102] [cursor=pointer]:
+            - link "Tablets" [ref=e105]:
+              - /url: /cluster/tablets
+          - tab "Versions" [ref=e106] [cursor=pointer]:
+            - link "Versions" [ref=e109]:
+              - /url: /cluster/versions
+        - generic [ref=e111]:
+          - generic [ref=e112]:
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - textbox "Group ID, Pool name" [active] [ref=e118]
+                - radiogroup [ref=e119]:
+                  - generic [ref=e120]:
+                    - radio "Groups" [checked] [ref=e121]
+                    - generic [ref=e122]: Groups
+                  - generic [ref=e123] [cursor=pointer]:
+                    - radio "Nodes" [ref=e124]
+                    - generic [ref=e125]: Nodes
+                - generic [ref=e126]: "Group by:"
+                - group [ref=e128] [cursor=pointer]:
+                  - combobox [ref=e129]:
+                    - generic [ref=e130]: "-"
+                  - img [ref=e131]:
+                    - img [ref=e132]
+                - generic [ref=e136]: "Groups: ..."
+                - button "Expert mode" [pressed] [ref=e137] [cursor=pointer]:
+                  - img [ref=e140]:
+                    - img [ref=e141]
+                  - generic [ref=e143]: Expert mode
+              - generic [ref=e145]:
+                - generic [ref=e146]: "VDisks:"
+                - radiogroup [ref=e147]:
+                  - generic [ref=e148]:
+                    - radio "State" [checked] [ref=e149]
+                    - generic [ref=e150]: State
+                  - generic [ref=e151] [cursor=pointer]:
+                    - radio "Space" [ref=e152]
+                    - generic [ref=e153]: Space
+                  - generic [ref=e154] [cursor=pointer]:
+                    - radio "Front queues" [ref=e155]
+                    - generic [ref=e156]: Front queues
+                  - generic [ref=e157] [cursor=pointer]:
+                    - radio "Compaction" [ref=e158]
+                    - generic [ref=e159]: Compaction
+                - generic [ref=e160]:
+                  - generic [ref=e161]:
+                    - generic [ref=e164]: Ok
+                    - generic [ref=e167]: Replication
+                    - generic [ref=e168]:
+                      - img [ref=e170]:
+                        - img [ref=e171]
+                      - generic [ref=e174]: Initial
+                    - generic [ref=e175]:
+                      - img [ref=e177]:
+                        - img [ref=e178]
+                      - generic [ref=e181]: PDisk Error
+                    - generic [ref=e182]:
+                      - img [ref=e184]:
+                        - img [ref=e185]
+                      - generic [ref=e188]: Error
+                    - generic [ref=e191]: N/D
+                  - generic [ref=e192]: No statistics available
+            - button "5/20" [ref=e195] [cursor=pointer]:
+              - img [ref=e198]:
+                - img [ref=e199]
+              - generic [ref=e202]: 5/20
+          - table [ref=e205]:
+            - rowgroup [ref=e206]:
+              - row "Group ID Pool Name Erasure Used VDisks PDisks" [ref=e207]:
+                - columnheader "Group ID" [ref=e208]:
+                  - generic [ref=e209] [cursor=pointer]:
+                    - generic [ref=e211]: Group ID
+                    - img [ref=e213]
+                - columnheader "Pool Name" [ref=e215]:
+                  - generic [ref=e216] [cursor=pointer]:
+                    - generic [ref=e218]: Pool Name
+                    - img [ref=e220]
+                - columnheader "Erasure" [ref=e222]:
+                  - generic [ref=e223] [cursor=pointer]:
+                    - generic [ref=e225]: Erasure
+                    - img [ref=e227]
+                - columnheader "Used" [ref=e229]:
+                  - generic [ref=e230] [cursor=pointer]:
+                    - generic [ref=e232]: Used
+                    - img [ref=e234]
+                - columnheader "VDisks PDisks" [ref=e236]:
+                  - generic [ref=e240]:
+                    - generic [ref=e241]: VDisks
+                    - generic [ref=e242]: PDisks
+            - rowgroup [ref=e243]:
+              - row [ref=e244]:
+                - cell [ref=e245]
+                - cell [ref=e247]
+                - cell [ref=e249]
+                - cell [ref=e251]
+                - cell [ref=e253]
+              - row [ref=e255]:
+                - cell [ref=e256]
+                - cell [ref=e258]
+                - cell [ref=e260]
+                - cell [ref=e262]
+                - cell [ref=e264]
+              - row [ref=e266]:
+                - cell [ref=e267]
+                - cell [ref=e269]
+                - cell [ref=e271]
+                - cell [ref=e273]
+                - cell [ref=e275]
+              - row [ref=e277]:
+                - cell [ref=e278]
+                - cell [ref=e280]
+                - cell [ref=e282]
+                - cell [ref=e284]
+                - cell [ref=e286]
+              - row [ref=e288]:
+                - cell [ref=e289]
+                - cell [ref=e291]
+                - cell [ref=e293]
+                - cell [ref=e295]
+                - cell [ref=e297]
+              - row [ref=e299]:
+                - cell [ref=e300]
+                - cell [ref=e302]
+                - cell [ref=e304]
+                - cell [ref=e306]
+                - cell [ref=e308]
+              - row [ref=e310]:
+                - cell [ref=e311]
+                - cell [ref=e313]
+                - cell [ref=e315]
+                - cell [ref=e317]
+                - cell [ref=e319]
+              - row [ref=e321]:
+                - cell [ref=e322]
+                - cell [ref=e324]
+                - cell [ref=e326]
+                - cell [ref=e328]
+                - cell [ref=e330]
+              - row [ref=e332]:
+                - cell [ref=e333]
+                - cell [ref=e335]
+                - cell [ref=e337]
+                - cell [ref=e339]
+                - cell [ref=e341]
+              - row [ref=e343]:
+                - cell [ref=e344]
+                - cell [ref=e346]
+                - cell [ref=e348]
+                - cell [ref=e350]
+                - cell [ref=e352]
+```
