@@ -19,6 +19,7 @@ export const LONG_PDISK_ID = '1000-1012';
 
 export interface SetupVDiskPageMocksOptions {
     capacityMetricsAvailable?: boolean;
+    capacityVersions?: {storageGroups: number; viewerNodes: number};
     withCapacityMetrics?: boolean;
     datacenter?: string;
     rack?: string;
@@ -106,6 +107,7 @@ function createStorageGroupsResponse({
                 Used: '10000000000',
                 Limit: '196000000000',
                 Available: '186000000000',
+                Usage: 5.1,
                 State: 'ok',
                 GroupGeneration: '1',
                 Encryption: false,
@@ -241,7 +243,19 @@ async function setupMonitoringUserMock(page: Page, isViewerAllowed = true) {
     });
 }
 
-async function setupCapabilitiesMock(page: Page, capacityMetricsAvailable = true) {
+async function setupCapabilitiesMock(
+    page: Page,
+    {
+        capacityMetricsAvailable = true,
+        capacityVersions,
+    }: Pick<SetupVDiskPageMocksOptions, 'capacityMetricsAvailable' | 'capacityVersions'> = {},
+) {
+    const versions =
+        capacityVersions ??
+        (capacityMetricsAvailable
+            ? {storageGroups: 10, viewerNodes: 20}
+            : {storageGroups: 9, viewerNodes: 19});
+
     await page.route('**/viewer/capabilities*', async (route) => {
         await route.fulfill({
             status: 200,
@@ -249,8 +263,8 @@ async function setupCapabilitiesMock(page: Page, capacityMetricsAvailable = true
             body: JSON.stringify({
                 Database: DATABASE,
                 Capabilities: {
-                    '/storage/groups': capacityMetricsAvailable ? 10 : 9,
-                    '/viewer/nodes': capacityMetricsAvailable ? 20 : 19,
+                    '/storage/groups': versions.storageGroups,
+                    '/viewer/nodes': versions.viewerNodes,
                     '/pdisk/info': 10,
                     '/vdisk/blobindexstat': 2,
                 },
@@ -405,7 +419,7 @@ export async function setupPDiskInfoMock(
 
 export async function setupVDiskPageMocks(page: Page, options: SetupVDiskPageMocksOptions = {}) {
     await setupMonitoringUserMock(page, options.isViewerAllowed);
-    await setupCapabilitiesMock(page, options.capacityMetricsAvailable);
+    await setupCapabilitiesMock(page, options);
     await setupNodeInfoMock(page, options);
     await setupStorageGroupsMock(page, options);
     await setupStorageNodesMock(page, options.withCapacityMetrics);
