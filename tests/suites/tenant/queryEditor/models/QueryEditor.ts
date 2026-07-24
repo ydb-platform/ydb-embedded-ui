@@ -278,6 +278,15 @@ export class QueryEditor {
         });
     }
 
+    async getSelectedText() {
+        return this.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            const model = editor?.getModel();
+            const selection = editor?.getSelection();
+            return editor && model && selection ? model.getValueInRange(selection) : '';
+        });
+    }
+
     async getEditorContent(): Promise<string> {
         await this.waitForEditorReady();
         await this.page.waitForFunction(() => Boolean(window.ydbEditor), null, {

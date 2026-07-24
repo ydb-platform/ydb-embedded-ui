@@ -455,12 +455,13 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.setQuery('SELECT 1;\n\nSELECT 2;');
         await queryEditor.setCursor(3, 3);
 
+        await expect(queryEditor.getSelectedText()).resolves.toBe('');
         await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 2;');
         await executeSelectedQueryWithKeybinding(page);
 
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
-        await expect(queryEditor.resultTable.getCellValue(1, 1)).resolves.toContain('2');
+        await expect(queryEditor.resultTable.getCellValue(1, 2)).resolves.toContain('2');
     });
 
     test('Running selected query via context menu executes only selected part', async ({page}) => {
