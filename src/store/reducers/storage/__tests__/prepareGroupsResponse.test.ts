@@ -69,6 +69,14 @@ describe('prepareGroupsResponse', () => {
                     MaxVDiskSlotUsage: ' ' as unknown as number,
                     MaxVDiskRawUsage: -1,
                 },
+                {
+                    GroupId: '2',
+                    Used: '0',
+                    Limit: '1',
+                    Read: '0',
+                    Write: '0',
+                    MaxPDiskUsage: null as unknown as number,
+                },
             ],
         } satisfies StorageGroupsResponse;
 
@@ -77,6 +85,11 @@ describe('prepareGroupsResponse', () => {
                 MaxPDiskUsage: undefined,
                 MaxVDiskSlotUsage: undefined,
                 MaxVDiskRawUsage: undefined,
+            }),
+        );
+        expect(prepareGroupsResponse(response).groups?.[1]).toEqual(
+            expect.objectContaining({
+                MaxPDiskUsage: undefined,
             }),
         );
     });

@@ -4,8 +4,8 @@ import {prepareStorageNodesResponse} from '../utils';
 describe('prepareStorageNodesResponse', () => {
     test('Should preserve zero and keep invalid aggregate capacity metrics absent', () => {
         const response = {
-            TotalNodes: '2',
-            FoundNodes: '2',
+            TotalNodes: '3',
+            FoundNodes: '3',
             Nodes: [
                 {
                     NodeId: 1,
@@ -20,6 +20,11 @@ describe('prepareStorageNodesResponse', () => {
                     MaxPDiskUsage: '' as unknown as number,
                     MaxVDiskSlotUsage: ' ' as unknown as number,
                     MaxVDiskRawUsage: Number.NaN,
+                },
+                {
+                    NodeId: 3,
+                    SystemState: {},
+                    MaxPDiskUsage: null as unknown as number,
                 },
             ],
         } satisfies TNodesInfo;
@@ -36,6 +41,11 @@ describe('prepareStorageNodesResponse', () => {
                 MaxPDiskUsage: undefined,
                 MaxVDiskSlotUsage: undefined,
                 MaxVDiskRawUsage: undefined,
+            }),
+        );
+        expect(prepareStorageNodesResponse(response).nodes?.[2]).toEqual(
+            expect.objectContaining({
+                MaxPDiskUsage: undefined,
             }),
         );
     });

@@ -36,6 +36,10 @@ import type {
 // Normalizes "Max*" capacity metrics that come from API as a percentage in the 0..100 range.
 // Important: `0` is a valid value and must be preserved (do not treat it as falsy).
 const normalizeMaxPercent = (value: number | string | null | undefined): number | undefined => {
+    if (value === null) {
+        return undefined;
+    }
+
     const num = parseOptionalNonNegativeNumber(value);
 
     return num === undefined ? undefined : num / 100;
