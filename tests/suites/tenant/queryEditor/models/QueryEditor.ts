@@ -255,6 +255,29 @@ export class QueryEditor {
         await this.editorTextArea.focus();
     }
 
+    async setCursor(lineNumber: number, column: number) {
+        await this.editorTextArea.evaluate(
+            (_, position) => {
+                window.ydbEditor?.setPosition(position);
+                window.ydbEditor?.focus();
+            },
+            {lineNumber, column},
+        );
+    }
+
+    async getHighlightedStatement() {
+        return this.editorTextArea.evaluate(() => {
+            const model = window.ydbEditor?.getModel();
+            const decoration = model
+                ?.getAllDecorations()
+                .find(
+                    ({options}: {options: {className?: string}}) =>
+                        options.className === 'ydb-current-query-highlight',
+                );
+            return decoration && model ? model.getValueInRange(decoration.range) : undefined;
+        });
+    }
+
     async getEditorContent(): Promise<string> {
         await this.waitForEditorReady();
         await this.page.waitForFunction(() => Boolean(window.ydbEditor), null, {

@@ -448,6 +448,21 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.getResultTitleCount()).resolves.toBe('1');
     });
 
+    test('Selected-query hotkey executes the highlighted statement without a selection', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;\n\nSELECT 2;');
+        await queryEditor.setCursor(3, 3);
+
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 2;');
+        await executeSelectedQueryWithKeybinding(page);
+
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
+        await expect(queryEditor.resultTable.getCellValue(1, 1)).resolves.toContain('2');
+    });
+
     test('Running selected query via context menu executes only selected part', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         const multiQuery = 'SELECT 1;\nSELECT 2;';
