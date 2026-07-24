@@ -83,8 +83,11 @@ export function prepareSchemaObjectInfoItems({
     additionalItems = [],
 }: PrepareSchemaObjectInfoItemsParams): YDBDefinitionListItem[] {
     const self = data?.PathDescription?.Self;
-    const pathId = isPresent(self?.PathId) ? self.PathId : data?.PathId;
-    const pathVersion = self?.PathVersion;
+    let pathId = self?.PathId;
+    if (!isPresent(pathId)) {
+        pathId = isPresent(data?.PathId) ? data.PathId : undefined;
+    }
+    const pathVersion = isPresent(self?.PathVersion) ? self.PathVersion : undefined;
     const createStep = self?.CreateStep;
     const fullPath = isPresent(data?.Path) ? data.Path : path;
 
@@ -99,13 +102,13 @@ export function prepareSchemaObjectInfoItems({
     items.push(
         {
             name: tenantKeyset('summary.id'),
-            content: isPresent(pathId) ? pathId : EMPTY_DATA_PLACEHOLDER,
-            copyText: isPresent(pathId) ? pathId : undefined,
+            content: pathId,
+            copyText: pathId,
         },
         {
             name: tenantKeyset('summary.version'),
-            content: isPresent(pathVersion) ? pathVersion : EMPTY_DATA_PLACEHOLDER,
-            copyText: isPresent(pathVersion) ? pathVersion : undefined,
+            content: pathVersion,
+            copyText: pathVersion,
         },
     );
 
@@ -125,5 +128,5 @@ export function prepareSchemaObjectInfoItems({
         ...additionalItems,
     );
 
-    return items;
+    return items.filter(({content}) => content !== undefined);
 }

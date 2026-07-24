@@ -29,6 +29,35 @@ async function setupMonitoringUserMock(page: Page, isAdministrationAllowed = tru
     });
 }
 
+async function setupDirectoryInfoMock(
+    page: Page,
+    path: string,
+    metadata: {PathId?: string; PathVersion?: string} = {},
+) {
+    await page.route('**/viewer/json/describe?*', async (route) => {
+        const url = new URL(route.request().url());
+
+        if (url.searchParams.get('path') !== path) {
+            await route.continue();
+            return;
+        }
+
+        await route.fulfill({
+            json: {
+                Status: 'StatusSuccess',
+                Path: path,
+                PathDescription: {
+                    Self: {
+                        Name: 'test_directory',
+                        PathType: 'EPathTypeDir',
+                        ...metadata,
+                    },
+                },
+            },
+        });
+    });
+}
+
 async function setupMetricTabsTenantInfoMock(
     page: Page,
     tenantType: 'Dedicated' | 'Serverless' = 'Dedicated',
@@ -475,6 +504,24 @@ test.describe('Diagnostics Info tab', async () => {
 
         // Visual snapshot of fulltext index info with all settings
         await expect(infoContent).toHaveScreenshot('fulltext-index-info-settings.png');
+    });
+
+    test('Info tab omits undefined schema metadata', async ({page}) => {
+        const mockDirectoryPath = '/local/test_directory';
+        await setupDirectoryInfoMock(page, mockDirectoryPath);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockDirectoryPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        await expect(infoContent).toBeVisible();
+        await expect(infoContent.getByText('ID', {exact: true})).toHaveCount(0);
+        await expect(infoContent.getByText('Version', {exact: true})).toHaveCount(0);
     });
 
     test('Streaming Query Info remains available when describe fails', async ({page}) => {
