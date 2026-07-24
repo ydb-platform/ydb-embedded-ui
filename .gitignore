@@ -11,6 +11,7 @@ playwright-artifacts
 
 # ai-workflow
 plans/
+.worktrees/
 
 # production
 /build
