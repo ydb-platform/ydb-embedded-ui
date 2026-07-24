@@ -2,8 +2,12 @@ import type {Dialog, Page} from '@playwright/test';
 
 const HOTKEY_PROCESSING_DELAY = 1000;
 
-function getModifierKey(page: Page) {
-    const isMac = process.platform === 'darwin';
+async function getModifierKey(page: Page) {
+    const isMac = await page.evaluate(() => {
+        const nav = navigator as Navigator & {userAgentData?: {platform?: string}};
+        const platform = nav.userAgentData?.platform || navigator.platform || '';
+        return platform.toUpperCase().includes('MAC');
+    });
     const browserName = page.context().browser()?.browserType().name() ?? 'chromium';
 
     return {
@@ -14,7 +18,7 @@ function getModifierKey(page: Page) {
 }
 
 export async function executeQueryWithKeybinding(page: Page) {
-    const {isMac, browserName, modifierKey} = getModifierKey(page);
+    const {isMac, browserName, modifierKey} = await getModifierKey(page);
 
     if (browserName !== 'webkit' || isMac) {
         await page.keyboard.down(modifierKey);
@@ -28,7 +32,7 @@ export async function executeQueryWithKeybinding(page: Page) {
 }
 
 export async function executeSelectedQueryWithKeybinding(page: Page) {
-    const {isMac, browserName, modifierKey} = getModifierKey(page);
+    const {isMac, browserName, modifierKey} = await getModifierKey(page);
 
     if (browserName !== 'webkit' || isMac) {
         await page.keyboard.down(modifierKey);
