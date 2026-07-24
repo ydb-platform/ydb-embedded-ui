@@ -494,8 +494,11 @@ export const VDiskPopup = ({data, onClose}: VDiskPopupProps) => {
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
     const nodeData = isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId);
     const pdiskInfo = React.useMemo(
-        () => isFullData && data.PDisk && preparePDiskData(data.PDisk, nodeData),
-        [data, nodeData, isFullData],
+        () =>
+            isFullData &&
+            data.PDisk &&
+            preparePDiskData(data.PDisk, nodeData, capacityMetricsEnabled),
+        [data, nodeData, isFullData, capacityMetricsEnabled],
     );
     const pdiskHeaderLabels = React.useMemo(
         () => (isFullData && data.PDisk ? preparePDiskHeaderLabels(data.PDisk) : []),

@@ -6,7 +6,7 @@ import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 import {configureStore} from '../../../store';
 import {ECapacityAlert, EFlag} from '../../../types/api/enums';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
-import type {PreparedVDisk} from '../../../utils/disks/types';
+import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import {renderWithStore} from '../../../utils/tests/providers';
 import {VDiskPopup} from '../VDiskPopup';
 
@@ -32,9 +32,22 @@ const capacityMetricsData: PreparedVDisk = {
     CapacityAlert: ECapacityAlert.LIGHTYELLOW,
 };
 
-function renderVDiskPopup(data: PreparedVDisk) {
+const pDisk: PreparedPDisk = {
+    AllocatedSize: 20_000_000_000,
+    TotalSize: 100_000_000_000,
+    AllocatedPercent: 20,
+    NumActiveSlots: 0,
+    ExpectedSlotCount: 4,
+    SlotSizeInUnits: 2,
+    PDiskUsage: 70.5,
+    PDiskCapacityAlert: ECapacityAlert.ORANGE,
+};
+
+function renderVDiskPopup(data: PreparedVDisk, isViewerAllowed = false) {
     const storeConfiguration = configureStore({
-        api: {viewer: {whoami: jest.fn().mockResolvedValue({IsViewerAllowed: false})}} as never,
+        api: {
+            viewer: {whoami: jest.fn().mockResolvedValue({IsViewerAllowed: isViewerAllowed})},
+        } as never,
     });
 
     renderWithStore(
@@ -102,5 +115,30 @@ describe('VDiskPopup', () => {
                 within(getDefinitionListRow(label)).getByText(EMPTY_DATA_PLACEHOLDER),
             ).toBeVisible();
         }
+    });
+
+    test('renders the same explicit PDisk capacity rows in the nested PDisk section', async () => {
+        useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
+
+        renderVDiskPopup({...capacityMetricsData, PDisk: pDisk}, true);
+
+        const pdiskTitle = await screen.findByText('PDisk');
+        const pdiskSection = pdiskTitle.closest('.ydb-definition-list');
+
+        if (!(pdiskSection instanceof HTMLElement)) {
+            throw new Error('Nested PDisk definition list was not found');
+        }
+
+        expect(within(pdiskSection).getByText('Space')).toBeVisible();
+        expect(within(pdiskSection).getByText('20 / 100 GB')).toBeVisible();
+        expect(within(pdiskSection).getByText('Slots')).toBeVisible();
+        expect(within(pdiskSection).getByText('0 / 4')).toBeVisible();
+        expect(within(pdiskSection).getByText('Slot Size In Units')).toBeVisible();
+        expect(within(pdiskSection).getByText('2')).toBeVisible();
+        expect(within(pdiskSection).getByText('Capacity Alert')).toBeVisible();
+        expect(within(pdiskSection).getByText('ORANGE')).toBeVisible();
+        expect(
+            within(pdiskSection).queryByText('Available', {exact: true}),
+        ).not.toBeInTheDocument();
     });
 });
