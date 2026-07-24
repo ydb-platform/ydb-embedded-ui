@@ -8,7 +8,6 @@ import {getIconCalculator} from '../../utils/disks/getIconStrategy';
 import {getSeverityCalculator} from '../../utils/disks/getSeverityStrategy';
 import type {VDisksGroupByValue} from '../../utils/disks/groupBy';
 import {VDisksGroupBy} from '../../utils/disks/groupBy';
-import {isFullVDiskData} from '../../utils/disks/helpers';
 
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
 import {useIsStorageExpertMode, useVDisksGroupByParam} from './useStorageQueryParams';
@@ -42,7 +41,7 @@ export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
 
             const modeModifier = getModeModifier(vdisksGroupBy);
 
-            if (!isFullVDiskData(vDisk)) {
+            if (!vDisk.VDiskId) {
                 return {
                     severity: NOT_AVAILABLE_SEVERITY,
                     icon: undefined,

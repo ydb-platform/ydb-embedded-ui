@@ -24,7 +24,7 @@ import type {DiskColor, PreparedVDisk} from './types';
 export function isFullVDiskData(
     disk: PreparedVDisk | TVDiskStateInfo | TVSlotId,
 ): disk is PreparedVDisk | TVDiskStateInfo {
-    return 'VDiskId' in disk && Boolean(disk.VDiskId);
+    return 'VDiskId' in disk;
 }
 
 const getSpaceFlag = generateEvaluator([EFlag.Green, EFlag.Yellow, EFlag.Red]);
