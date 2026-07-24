@@ -1,7 +1,7 @@
 import {isNil} from 'lodash';
 
 import type {FetchData} from '../../../../components/PaginatedTable';
-import {TOPIC_MESSAGE_SIZE_LIMIT} from '../../../../store/reducers/topic';
+import {TOPIC_MESSAGE_SIZE_LIMIT} from '../../../../store/reducers/topic/topic';
 import type {
     TopicDataRequest,
     TopicDataResponse,

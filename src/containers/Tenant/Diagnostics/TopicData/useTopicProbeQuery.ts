@@ -3,7 +3,7 @@ import React from 'react';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
-import {topicApi} from '../../../../store/reducers/topic';
+import {topicApi} from '../../../../store/reducers/topic/topic';
 import type {TopicDataRequest, TopicDataResponse} from '../../../../types/api/topic';
 import {safeParseNumber} from '../../../../utils/utils';
 
