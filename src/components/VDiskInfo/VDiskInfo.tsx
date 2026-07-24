@@ -4,6 +4,7 @@ import {Flex} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {getPDiskPagePath, useVDiskPagePath} from '../../routes';
+import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
 import {
@@ -15,6 +16,10 @@ import {getDataSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
+import {
+    getVDiskCapacityInfoItems,
+    toDefinitionListItems,
+} from '../DiskCapacityInfo/DiskCapacityInfo';
 import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
@@ -47,14 +52,11 @@ export function VDiskInfo<T extends PreparedVDisk>({
 }: VDiskInfoProps<T>) {
     const hasDeveloperUi = useHasDeveloperUi();
     const isViewerUser = useIsViewerUser();
+    const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
     const getVDiskPagePath = useVDiskPagePath();
 
     const {
-        AllocatedSize,
-        SizeLimit,
-        AllocatedPercent,
-        DiskSpace,
         FrontQueues,
         Guid,
         Replicated,
@@ -78,68 +80,127 @@ export function VDiskInfo<T extends PreparedVDisk>({
     } = data || {};
 
     const leftColumn: YDBDefinitionListItem[] = [];
-
-    if (!isNil(StoragePoolName)) {
-        leftColumn.push({name: vDiskInfoKeyset('pool-name'), content: StoragePoolName});
-    }
-    if (!isNil(VDiskState)) {
-        leftColumn.push({
-            name: vDiskInfoKeyset('state-status'),
-            content: VDiskState,
-        });
-    }
-
-    if (Number(AllocatedSize) >= 0 && Number(SizeLimit) >= 0) {
-        leftColumn.push({
-            name: vDiskInfoKeyset('size'),
-            content: formatStorageValuesToGb(Number(AllocatedSize), Number(SizeLimit)).join(' / '),
-        });
-    }
-    if (!isNaN(Number(AllocatedPercent))) {
-        leftColumn.push({
-            name: vDiskInfoKeyset('usage'),
-            content: `${AllocatedPercent}%`,
-        });
-    }
-
-    if (!isNil(DiskSpace)) {
-        leftColumn.push({
-            name: vDiskInfoKeyset('space-status'),
-            content: <StatusIcon status={DiskSpace} />,
-        });
-    }
-    if (!isNil(FrontQueues)) {
-        leftColumn.push({
-            name: vDiskInfoKeyset('front-queues'),
-            content: <StatusIcon status={FrontQueues} />,
-        });
-    }
-    if (!isNil(SatisfactionRank?.FreshRank?.Flag)) {
-        leftColumn.push({
-            name: vDiskInfoKeyset('fresh-rank-satisfaction'),
-            content: <StatusIcon status={SatisfactionRank?.FreshRank?.Flag} />,
-        });
-    }
-    if (!isNil(SatisfactionRank?.LevelRank?.Flag)) {
-        leftColumn.push({
-            name: vDiskInfoKeyset('level-rank-satisfaction'),
-            content: <StatusIcon status={SatisfactionRank?.LevelRank?.Flag} />,
-        });
-    }
-    if (!isNil(ReadThroughput)) {
-        leftColumn.push({
-            name: vDiskInfoKeyset('read-throughput'),
-            content: bytesToSpeed(ReadThroughput),
-        });
-    }
-    if (!isNil(WriteThroughput)) {
-        leftColumn.push({
-            name: vDiskInfoKeyset('write-throughput'),
-            content: bytesToSpeed(WriteThroughput),
-        });
-    }
-
     const rightColumn: YDBDefinitionListItem[] = [];
+    const linksColumn = capacityMetricsEnabled ? leftColumn : rightColumn;
+
+    if (capacityMetricsEnabled) {
+        if (!isNil(StoragePoolName)) {
+            leftColumn.push({name: vDiskInfoKeyset('pool-name'), content: StoragePoolName});
+        }
+        if (!isNil(VDiskSlotId)) {
+            leftColumn.push({name: vDiskInfoKeyset('slot-id'), content: VDiskSlotId});
+        }
+        if (!isNil(Kind)) {
+            leftColumn.push({name: vDiskInfoKeyset('kind'), content: Kind});
+        }
+
+        const capacityItems = getVDiskCapacityInfoItems(data, {withRawUsage: true});
+        const groupSizeItem = capacityItems.find(({id}) => id === 'group-size-in-units');
+        const runtimeCapacityItems = capacityItems.filter(({id}) => id !== 'group-size-in-units');
+
+        if (groupSizeItem) {
+            leftColumn.push(...toDefinitionListItems([groupSizeItem]));
+        }
+        if (!isNil(Guid)) {
+            leftColumn.push({name: vDiskInfoKeyset('guid'), content: Guid});
+        }
+        if (!isNil(IncarnationGuid)) {
+            leftColumn.push({name: vDiskInfoKeyset('incarnation-guid'), content: IncarnationGuid});
+        }
+        if (!isNil(InstanceGuid)) {
+            leftColumn.push({name: vDiskInfoKeyset('instance-guid'), content: InstanceGuid});
+        }
+        if (!isNil(PDiskId)) {
+            const pDiskPath =
+                isViewerUser && !isNil(NodeId) ? getPDiskPagePath(PDiskId, NodeId) : undefined;
+
+            const content = pDiskPath ? (
+                <InternalLink to={pDiskPath}>{PDiskId}</InternalLink>
+            ) : (
+                PDiskId
+            );
+
+            leftColumn.push({
+                name: vDiskInfoKeyset('label_pdisk-id'),
+                content,
+            });
+        }
+
+        if (!isNil(VDiskState)) {
+            rightColumn.push({
+                name: vDiskInfoKeyset('state-status'),
+                content: VDiskState,
+            });
+        }
+        rightColumn.push(...toDefinitionListItems(runtimeCapacityItems));
+    } else {
+        const {AllocatedSize, SizeLimit, AllocatedPercent, DiskSpace} = data || {};
+
+        if (!isNil(StoragePoolName)) {
+            leftColumn.push({name: vDiskInfoKeyset('pool-name'), content: StoragePoolName});
+        }
+        if (!isNil(VDiskState)) {
+            leftColumn.push({
+                name: vDiskInfoKeyset('state-status'),
+                content: VDiskState,
+            });
+        }
+
+        if (Number(AllocatedSize) >= 0 && Number(SizeLimit) >= 0) {
+            leftColumn.push({
+                name: vDiskInfoKeyset('size'),
+                content: formatStorageValuesToGb(Number(AllocatedSize), Number(SizeLimit)).join(
+                    ' / ',
+                ),
+            });
+        }
+        if (!isNaN(Number(AllocatedPercent))) {
+            leftColumn.push({
+                name: vDiskInfoKeyset('usage'),
+                content: `${AllocatedPercent}%`,
+            });
+        }
+
+        if (!isNil(DiskSpace)) {
+            leftColumn.push({
+                name: vDiskInfoKeyset('space-status'),
+                content: <StatusIcon status={DiskSpace} />,
+            });
+        }
+    }
+
+    if (!capacityMetricsEnabled) {
+        if (!isNil(FrontQueues)) {
+            leftColumn.push({
+                name: vDiskInfoKeyset('front-queues'),
+                content: <StatusIcon status={FrontQueues} />,
+            });
+        }
+        if (!isNil(SatisfactionRank?.FreshRank?.Flag)) {
+            leftColumn.push({
+                name: vDiskInfoKeyset('fresh-rank-satisfaction'),
+                content: <StatusIcon status={SatisfactionRank?.FreshRank?.Flag} />,
+            });
+        }
+        if (!isNil(SatisfactionRank?.LevelRank?.Flag)) {
+            leftColumn.push({
+                name: vDiskInfoKeyset('level-rank-satisfaction'),
+                content: <StatusIcon status={SatisfactionRank?.LevelRank?.Flag} />,
+            });
+        }
+        if (!isNil(ReadThroughput)) {
+            leftColumn.push({
+                name: vDiskInfoKeyset('read-throughput'),
+                content: bytesToSpeed(ReadThroughput),
+            });
+        }
+        if (!isNil(WriteThroughput)) {
+            leftColumn.push({
+                name: vDiskInfoKeyset('write-throughput'),
+                content: bytesToSpeed(WriteThroughput),
+            });
+        }
+    }
 
     if (!isNil(Replicated)) {
         rightColumn.push({
@@ -172,10 +233,10 @@ export function VDiskInfo<T extends PreparedVDisk>({
             }
         }
     }
-    if (!isNil(VDiskSlotId)) {
+    if (!capacityMetricsEnabled && !isNil(VDiskSlotId)) {
         rightColumn.push({name: vDiskInfoKeyset('slot-id'), content: VDiskSlotId});
     }
-    if (!isNil(PDiskId)) {
+    if (!capacityMetricsEnabled && !isNil(PDiskId)) {
         const pDiskPath =
             isViewerUser && !isNil(NodeId) ? getPDiskPagePath(PDiskId, NodeId) : undefined;
 
@@ -187,19 +248,19 @@ export function VDiskInfo<T extends PreparedVDisk>({
         });
     }
 
-    if (!isNil(Kind)) {
+    if (!capacityMetricsEnabled && !isNil(Kind)) {
         rightColumn.push({name: vDiskInfoKeyset('kind'), content: Kind});
     }
-    if (!isNil(Guid)) {
+    if (!capacityMetricsEnabled && !isNil(Guid)) {
         rightColumn.push({name: vDiskInfoKeyset('guid'), content: Guid});
     }
-    if (!isNil(IncarnationGuid)) {
+    if (!capacityMetricsEnabled && !isNil(IncarnationGuid)) {
         rightColumn.push({name: vDiskInfoKeyset('incarnation-guid'), content: IncarnationGuid});
     }
-    if (!isNil(InstanceGuid)) {
+    if (!capacityMetricsEnabled && !isNil(InstanceGuid)) {
         rightColumn.push({name: vDiskInfoKeyset('instance-guid'), content: InstanceGuid});
     }
-    if (!isNil(HasUnreadableBlobs)) {
+    if (!capacityMetricsEnabled && !isNil(HasUnreadableBlobs)) {
         rightColumn.push({
             name: vDiskInfoKeyset('has-unreadable-blobs'),
             content: HasUnreadableBlobs ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
@@ -252,6 +313,44 @@ export function VDiskInfo<T extends PreparedVDisk>({
             });
         }
     }
+    if (capacityMetricsEnabled) {
+        if (!isNil(FrontQueues)) {
+            rightColumn.push({
+                name: vDiskInfoKeyset('front-queues'),
+                content: <StatusIcon status={FrontQueues} />,
+            });
+        }
+        if (!isNil(SatisfactionRank?.FreshRank?.Flag)) {
+            rightColumn.push({
+                name: vDiskInfoKeyset('fresh-rank-satisfaction'),
+                content: <StatusIcon status={SatisfactionRank?.FreshRank?.Flag} />,
+            });
+        }
+        if (!isNil(SatisfactionRank?.LevelRank?.Flag)) {
+            rightColumn.push({
+                name: vDiskInfoKeyset('level-rank-satisfaction'),
+                content: <StatusIcon status={SatisfactionRank?.LevelRank?.Flag} />,
+            });
+        }
+        if (!isNil(HasUnreadableBlobs)) {
+            rightColumn.push({
+                name: vDiskInfoKeyset('has-unreadable-blobs'),
+                content: HasUnreadableBlobs ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
+            });
+        }
+        if (!isNil(ReadThroughput)) {
+            rightColumn.push({
+                name: vDiskInfoKeyset('read-throughput'),
+                content: bytesToSpeed(ReadThroughput),
+            });
+        }
+        if (!isNil(WriteThroughput)) {
+            rightColumn.push({
+                name: vDiskInfoKeyset('write-throughput'),
+                content: bytesToSpeed(WriteThroughput),
+            });
+        }
+    }
     const links: React.ReactNode[] = [];
     const vDiskPagePath = getVDiskPagePath({
         nodeId: NodeId,
@@ -285,7 +384,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     }
 
     if (links.length) {
-        rightColumn.push({
+        linksColumn.push({
             name: vDiskInfoKeyset('links'),
             content: (
                 <Flex wrap="wrap" gap={2}>

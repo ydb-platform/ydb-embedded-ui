@@ -6,6 +6,7 @@ import {isNil} from 'lodash';
 
 import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
+import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import type {TVDiskID} from '../../types/api/vdisk';
@@ -26,6 +27,10 @@ import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
+import {
+    getVDiskCapacityInfoItems,
+    toDefinitionListItems,
+} from '../DiskCapacityInfo/DiskCapacityInfo';
 import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/EvictVDiskButton';
 import {InternalLink} from '../InternalLink';
 import {InternalLinkButton} from '../InternalLinkButton';
@@ -136,12 +141,15 @@ const VDiskLink = ({nodeId, stringifiedId, getVDiskLinkFn}: VDiskLinkProps) => {
 };
 
 // eslint-disable-next-line complexity
-const prepareVDiskData = (
+export const prepareVDiskData = (
     data: PreparedVDisk,
-    getVDiskLinkFn?: (data: {
-        nodeId: string | number | undefined;
-        vDiskId: string | undefined;
-    }) => string | undefined,
+    getVDiskLinkFn:
+        | ((data: {
+              nodeId: string | number | undefined;
+              vDiskId: string | undefined;
+          }) => string | undefined)
+        | undefined,
+    capacityMetricsEnabled = false,
 ) => {
     const {
         VDiskState,
@@ -232,7 +240,11 @@ const prepareVDiskData = (
         });
     }
 
-    if (DiskSpace) {
+    if (capacityMetricsEnabled) {
+        vdiskData.push(
+            ...toDefinitionListItems(getVDiskCapacityInfoItems(data, {withRawUsage: false})),
+        );
+    } else if (DiskSpace) {
         vdiskData.push({
             name: vDiskPopupKeyset('label_space'),
             content: <StatusIcon mode="icons" status={DiskSpace} />,
@@ -273,14 +285,14 @@ const prepareVDiskData = (
         vdiskData.push({name: vDiskPopupKeyset('label_unsync-vdisks'), content: UnsyncedVDisks});
     }
 
-    if (Number(AllocatedSize)) {
+    if (!capacityMetricsEnabled && Number(AllocatedSize)) {
         vdiskData.push({
             name: vDiskPopupKeyset('label_allocated'),
             content: bytesToGB(AllocatedSize),
         });
     }
 
-    if (Number(AvailableSize)) {
+    if (!capacityMetricsEnabled && Number(AvailableSize)) {
         vdiskData.push({
             name: vDiskPopupKeyset('label_available'),
             content: bytesToGB(AvailableSize),
@@ -435,6 +447,7 @@ export const VDiskPopup = ({data, onClose}: VDiskPopupProps) => {
     const dispatch = useTypedDispatch();
     const isFullData = isFullVDiskData(data);
     const isViewerUser = useIsViewerUser();
+    const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
     const hasDeveloperUi = useHasDeveloperUi();
     const getVDiskLink = useVDiskPagePath();
@@ -443,8 +456,10 @@ export const VDiskPopup = ({data, onClose}: VDiskPopupProps) => {
 
     const vdiskInfo = React.useMemo(
         () =>
-            isFullData ? prepareVDiskData(data, getVDiskLink) : prepareUnavailableVDiskData(data),
-        [data, isFullData, getVDiskLink],
+            isFullData
+                ? prepareVDiskData(data, getVDiskLink, capacityMetricsEnabled)
+                : prepareUnavailableVDiskData(data),
+        [data, isFullData, getVDiskLink, capacityMetricsEnabled],
     );
 
     const handleAfterEvictVDisk = React.useCallback(() => {
