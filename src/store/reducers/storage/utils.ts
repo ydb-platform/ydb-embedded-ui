@@ -1,5 +1,3 @@
-import {isNil} from 'lodash';
-
 import type {EFlag} from '../../../types/api/enums';
 import type {TNodeInfo, TNodesInfo} from '../../../types/api/nodes';
 import {TPDiskState} from '../../../types/api/pdisk';
@@ -25,6 +23,7 @@ import {
 import {prepareNodeSystemState} from '../../../utils/nodes';
 import {getUsage} from '../../../utils/storage';
 import {parseUsToMs} from '../../../utils/timeParsers';
+import {parseOptionalNonNegativeNumber} from '../../../utils/utils';
 
 import {prepareGroupsVDisk} from './prepareGroupsDisks';
 import type {
@@ -37,16 +36,9 @@ import type {
 // Normalizes "Max*" capacity metrics that come from API as a percentage in the 0..100 range.
 // Important: `0` is a valid value and must be preserved (do not treat it as falsy).
 const normalizeMaxPercent = (value: number | string | null | undefined): number | undefined => {
-    if (isNil(value)) {
-        return undefined;
-    }
+    const num = parseOptionalNonNegativeNumber(value);
 
-    const num = Number(value);
-    if (Number.isNaN(num)) {
-        return undefined;
-    }
-
-    return num / 100;
+    return num === undefined ? undefined : num / 100;
 };
 
 // ==== Prepare groups ====
