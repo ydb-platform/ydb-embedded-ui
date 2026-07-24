@@ -72,6 +72,7 @@ import {YqlEditor} from './YqlEditor/YqlEditor';
 import {useEditorTabsGlobalHotkeys} from './hooks/useEditorTabsGlobalHotkeys';
 import {useQueryPageLeaveGuard} from './hooks/useQueryPageLeaveGuard';
 import {useQueryTabsActions} from './hooks/useQueryTabsActions';
+import type {QueryExecution} from './types';
 import {queryExecutionManagerInstance} from './utils/queryExecutionManager';
 
 import './QueryEditor.scss';
@@ -327,10 +328,13 @@ export default function QueryEditor({
         }
     }, [hasTabs, showPreview, isResultLoaded]);
 
-    const handleSendExecuteClick = useEventHandler((text: string, partial?: boolean) => {
+    const handleSendExecuteClick = useEventHandler((execution: QueryExecution) => {
         if (!activeTabId) {
             return;
         }
+
+        const {text, source} = execution;
+        const partial = source !== 'editor';
 
         runSetStoppableTimeout();
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
@@ -477,6 +481,10 @@ export default function QueryEditor({
         }
     });
 
+    const handleRunEditorClick = useEventHandler((text: string) => {
+        handleSendExecuteClick({text, source: 'editor'});
+    });
+
     const handleSettingsClick = () => {
         dispatch(setQueryAction('settings'));
     };
@@ -537,7 +545,7 @@ export default function QueryEditor({
     const renderControls = () => {
         return (
             <QueryEditorControls
-                handleSendExecuteClick={handleSendExecuteClick}
+                handleSendExecuteClick={handleRunEditorClick}
                 onSettingsButtonClick={handleSettingsClick}
                 isLoading={Boolean(result?.isLoading)}
                 isStoppable={isStoppable}
