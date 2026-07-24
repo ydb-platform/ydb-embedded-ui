@@ -15,7 +15,7 @@ export function prepareWhiteboardVDiskData(
     vDiskState: TVDiskStateInfo | TVSlotId = {},
 ): PreparedVDisk {
     if (!isFullVDiskData(vDiskState)) {
-        const {NodeId, PDiskId, VSlotId} = vDiskState;
+        const {NodeId, PDiskId, VSlotId, ...restVDiskFields} = vDiskState;
 
         const vDiskId =
             !isNil(VSlotId) && !isNil(PDiskId) && !isNil(NodeId)
@@ -29,6 +29,7 @@ export function prepareWhiteboardVDiskData(
         const StringifiedId = stringifyVdiskId(vDiskId);
 
         return {
+            ...restVDiskFields,
             StringifiedId,
             NodeId,
             PDiskId,

@@ -9,13 +9,6 @@ import {
 } from '../prepareDisks';
 
 const vDiskWithCapacityMetrics = {
-    VDiskId: {
-        GroupID: 0,
-        GroupGeneration: 0,
-        Ring: 0,
-        Domain: 0,
-        VDisk: 0,
-    },
     GroupSizeInUnits: 0,
     VDiskSlotUsage: 82.25,
     VDiskRawUsage: 64.5,
