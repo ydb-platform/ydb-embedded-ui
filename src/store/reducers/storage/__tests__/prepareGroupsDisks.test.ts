@@ -1,6 +1,6 @@
 import {ECapacityAlert} from '../../../../types/api/enums';
-import type {TStoragePDisk, TStorageVDisk} from '../../../../types/api/storage';
 import type {TPDiskStateInfo} from '../../../../types/api/pdisk';
+import type {TStoragePDisk, TStorageVDisk} from '../../../../types/api/storage';
 import type {TVDiskStateInfo} from '../../../../types/api/vdisk';
 import {prepareGroupsPDisk, prepareGroupsVDisk} from '../prepareGroupsDisks';
 
