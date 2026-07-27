@@ -2,8 +2,8 @@ import {prepareErrorMessage} from '../../utils/prepareErrorMessage';
 
 import packageJson from '../../../package.json';
 
-export async function collectDiagnosticsData(error: Error) {
-    return await getBackendVersion().then((backendVersion) => {
+export async function collectDiagnosticsData(error: Error, database?: string) {
+    return await getBackendVersion(database).then((backendVersion) => {
         return {
             location: window.location.href,
             userAgent: navigator.userAgent,
@@ -19,12 +19,12 @@ export async function collectDiagnosticsData(error: Error) {
 
 export type DiagnosticsData = Awaited<ReturnType<typeof collectDiagnosticsData>>;
 
-async function getBackendVersion() {
+async function getBackendVersion(database?: string) {
     try {
         // node_id=. returns data about node that fullfills request
         // normally this request should be fast (200-300ms with good connection)
         // timeout=1000 in order not to wait too much in case everything is broken
-        const data = await window.api.viewer.getNodeInfo({nodeId: '.'}, {timeout: 1000});
+        const data = await window.api.viewer.getNodeInfo({nodeId: '.', database}, {timeout: 1000});
         return data?.SystemStateInfo?.[0]?.Version;
     } catch (error) {
         return {error: prepareErrorMessage(error)};
