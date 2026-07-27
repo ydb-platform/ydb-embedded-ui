@@ -73,7 +73,7 @@ export class StreamingAPI extends BaseYdbAPI {
         const base64 = params.base64;
 
         const queryParams = qs.stringify(
-            {timeout: params.timeout, base64, schema: 'multipart'},
+            {database: params.database, timeout: params.timeout, base64, schema: 'multipart'},
             {encoder: encodeURIComponent},
         );
 
