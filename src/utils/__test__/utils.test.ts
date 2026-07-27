@@ -8,6 +8,7 @@ describe('parseOptionalNonNegativeNumber', () => {
 
     test('returns undefined for invalid or negative values', () => {
         expect(parseOptionalNonNegativeNumber(undefined)).toBeUndefined();
+        expect(parseOptionalNonNegativeNumber(null)).toBeUndefined();
         expect(parseOptionalNonNegativeNumber('abc')).toBeUndefined();
         expect(parseOptionalNonNegativeNumber(-1)).toBeUndefined();
         expect(parseOptionalNonNegativeNumber(Infinity)).toBeUndefined();

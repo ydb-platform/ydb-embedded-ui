@@ -107,6 +107,7 @@ describe('storageMetrics', () => {
 
     test('formatMetricPercent returns placeholder for invalid values', () => {
         expect(formatMetricPercent(undefined)).toBe(EMPTY_DATA_PLACEHOLDER);
+        expect(formatMetricPercent(null)).toBe(EMPTY_DATA_PLACEHOLDER);
         expect(formatMetricPercent('')).toBe(EMPTY_DATA_PLACEHOLDER);
     });
 
@@ -118,6 +119,12 @@ describe('storageMetrics', () => {
 
     test('formatStorageMetricPair returns placeholder when either value is missing or invalid', () => {
         expect(formatStorageMetricPair(undefined, 2_000_000_000)).toBe(EMPTY_DATA_PLACEHOLDER);
+        expect(formatStorageMetricPair(null as unknown as number, 2_000_000_000)).toBe(
+            EMPTY_DATA_PLACEHOLDER,
+        );
+        expect(formatStorageMetricPair(1_000_000_000, null as unknown as number)).toBe(
+            EMPTY_DATA_PLACEHOLDER,
+        );
         expect(formatStorageMetricPair(Number.NaN, 2_000_000_000)).toBe(EMPTY_DATA_PLACEHOLDER);
     });
 
@@ -127,14 +134,23 @@ describe('storageMetrics', () => {
 
     test('formatNormalizedMetricPercent returns placeholder for missing values', () => {
         expect(formatNormalizedMetricPercent(undefined)).toBe(EMPTY_DATA_PLACEHOLDER);
+        expect(formatNormalizedMetricPercent(null as unknown as number)).toBe(
+            EMPTY_DATA_PLACEHOLDER,
+        );
     });
 
     test('formatMetricCount preserves zero and rejects empty values', () => {
         expect(formatMetricCount(0)).toBe('0');
+        expect(formatMetricCount(null)).toBe(EMPTY_DATA_PLACEHOLDER);
         expect(formatMetricCount('')).toBe(EMPTY_DATA_PLACEHOLDER);
     });
 
     test('formatMetricCountPair preserves a zero count', () => {
         expect(formatMetricCountPair(0, 4)).toBe('0 / 4');
+    });
+
+    test('formatMetricCountPair returns placeholder when either count is null', () => {
+        expect(formatMetricCountPair(null, 4)).toBe(EMPTY_DATA_PLACEHOLDER);
+        expect(formatMetricCountPair(0, null)).toBe(EMPTY_DATA_PLACEHOLDER);
     });
 });
