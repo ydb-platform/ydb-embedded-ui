@@ -1,0 +1,9 @@
+.ydb-schema-object-type-label {
+    &__help-mark {
+        color: var(--g-color-text-misc-heavy);
+    }
+
+    &__description {
+        max-width: 360px;
+    }
+}

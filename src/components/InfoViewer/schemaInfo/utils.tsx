@@ -1,4 +1,6 @@
+import tenantKeyset from '../../../containers/Tenant/i18n';
 import type {TIndexDescription} from '../../../types/api/schema';
+import {EIndexType} from '../../../types/api/schema';
 import type {
     TFulltextIndexAnalyzers,
     TFulltextIndexSettings,
@@ -6,32 +8,44 @@ import type {
     TVectorIndexSettings,
 } from '../../../types/api/schema/tableIndex';
 import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
+import {SchemaObjectTypeLabel} from '../../SchemaObjectTypeLabel/SchemaObjectTypeLabel';
+import type {YDBDefinitionListItem} from '../../YDBDefinitionList/YDBDefinitionList';
 import type {InfoViewerItem} from '../InfoViewer';
 import {formatTableIndexItem} from '../formatters';
 import {createInfoFormatter} from '../utils';
 
 import i18n from './i18n';
 
-const DISPLAYED_FIELDS_KEYS = [
-    'Type',
+const INDEX_DETAILS_FIELDS_KEYS = [
     'State',
     'DataSize',
     'KeyColumnNames',
     'DataColumnNames',
 ] as const;
-type DisplayedIndexField = (typeof DISPLAYED_FIELDS_KEYS)[number];
 
-export function getDisplayedIndexFields(): ReadonlySet<DisplayedIndexField> {
-    return new Set<DisplayedIndexField>(DISPLAYED_FIELDS_KEYS);
-}
+const INDEX_TYPE_DESCRIPTIONS: Record<EIndexType, string | undefined> = {
+    [EIndexType.EIndexTypeInvalid]: undefined,
+    [EIndexType.EIndexTypeGlobal]: i18n('description_subtype_global'),
+    [EIndexType.EIndexTypeGlobalAsync]: i18n('description_subtype_global-async'),
+    [EIndexType.EIndexTypeGlobalUnique]: i18n('description_subtype_global-unique'),
+    [EIndexType.EIndexTypeGlobalVectorKmeansTree]: i18n('description_subtype_vector'),
+    [EIndexType.EIndexTypeGlobalFulltext]: i18n('description_subtype_fulltext'),
+    [EIndexType.EIndexTypeGlobalFulltextPlain]: i18n('description_subtype_fulltext-plain'),
+    [EIndexType.EIndexTypeGlobalFulltextRelevance]: i18n('description_subtype_fulltext-relevance'),
+    [EIndexType.EIndexTypeLocalBloomFilter]: i18n('description_subtype_local-bloom-filter'),
+    [EIndexType.EIndexTypeLocalBloomNgramFilter]: i18n(
+        'description_subtype_local-bloom-ngram-filter',
+    ),
+    [EIndexType.EIndexTypeLocalMinMax]: i18n('description_subtype_local-min-max'),
+};
 
-export function buildIndexInfo(tableIndex?: TIndexDescription): InfoViewerItem[] {
+function buildIndexInfo(tableIndex?: TIndexDescription): InfoViewerItem[] {
     const info: InfoViewerItem[] = [];
     if (!tableIndex) {
         return info;
     }
 
-    getDisplayedIndexFields().forEach((key) => {
+    INDEX_DETAILS_FIELDS_KEYS.forEach((key) => {
         const value = tableIndex[key];
         if (value !== undefined) {
             info.push(formatTableIndexItem(key, value));
@@ -39,6 +53,31 @@ export function buildIndexInfo(tableIndex?: TIndexDescription): InfoViewerItem[]
     });
 
     return info;
+}
+
+export function buildTableIndexOverviewInfo(tableIndex?: TIndexDescription) {
+    const type = tableIndex?.Type;
+    const itemsAfterType: YDBDefinitionListItem[] = [];
+
+    if (type !== undefined) {
+        const typeItem = formatTableIndexItem('Type', type);
+        itemsAfterType.push({
+            name: tenantKeyset('summary.subtype'),
+            content: (
+                <SchemaObjectTypeLabel
+                    value={typeItem.value}
+                    description={INDEX_TYPE_DESCRIPTIONS[type]}
+                />
+            ),
+        });
+    }
+
+    const additionalItems = buildIndexInfo(tableIndex).map(({label, value}) => ({
+        name: String(label),
+        content: value,
+    }));
+
+    return {itemsAfterType, additionalItems};
 }
 
 /* eslint-disable camelcase */

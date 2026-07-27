@@ -1,35 +1,24 @@
-import type {InfoViewerItem} from '../../../../../components/InfoViewer';
-import {InfoViewer, formatObject} from '../../../../../components/InfoViewer';
-import {
-    formatCdcStreamItem,
-    formatCommonItem,
-} from '../../../../../components/InfoViewer/formatters';
+import {formatObject} from '../../../../../components/InfoViewer';
+import {formatCdcStreamItem} from '../../../../../components/InfoViewer/formatters';
+import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
-import {getEntityName} from '../../../utils';
 import {TopicStats} from '../TopicStats';
 
-const prepareChangefeedInfo = (changefeedData?: TEvDescribeSchemeResult): Array<InfoViewerItem> => {
+export function prepareChangefeedInfo(
+    changefeedData?: TEvDescribeSchemeResult,
+): YDBDefinitionListItem[] {
     if (!changefeedData) {
         return [];
     }
 
-    const streamDescription = changefeedData?.PathDescription?.CdcStreamDescription;
-
+    const streamDescription = changefeedData.PathDescription?.CdcStreamDescription;
     const {Mode, Format} = streamDescription || {};
 
-    const changefeedInfo = formatObject(formatCdcStreamItem, {
-        Mode,
-        Format,
-    });
-
-    const createStep = changefeedData?.PathDescription?.Self?.CreateStep;
-
-    if (Number(createStep)) {
-        changefeedInfo.unshift(formatCommonItem('CreateStep', createStep));
-    }
-
-    return changefeedInfo;
-};
+    return formatObject(formatCdcStreamItem, {Mode, Format}).map(({label, value}) => ({
+        name: String(label),
+        content: value,
+    }));
+}
 
 interface ChangefeedProps {
     path: string;
@@ -41,16 +30,9 @@ interface ChangefeedProps {
 
 /** Displays overview for CDCStream EPathType */
 export const ChangefeedInfo = ({path, database, data, databaseFullPath}: ChangefeedProps) => {
-    const entityName = getEntityName(data?.PathDescription);
-
     if (!data) {
-        return <div className="error">No {entityName} data</div>;
+        return null;
     }
 
-    return (
-        <div>
-            <InfoViewer title={entityName} info={prepareChangefeedInfo(data)} />
-            <TopicStats path={path} databaseFullPath={databaseFullPath} database={database} />
-        </div>
-    );
+    return <TopicStats path={path} databaseFullPath={databaseFullPath} database={database} />;
 };

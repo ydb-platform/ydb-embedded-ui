@@ -6,11 +6,7 @@ import type {TEvDescribeSchemeResult} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
 
 import i18n from './i18n';
-import {
-    buildFulltextIndexSettingsInfo,
-    buildIndexInfo,
-    buildVectorIndexSettingsInfo,
-} from './utils';
+import {buildFulltextIndexSettingsInfo, buildVectorIndexSettingsInfo} from './utils';
 
 const b = cn('ydb-diagnostics-table-info');
 
@@ -26,7 +22,6 @@ export const TableIndexInfo = ({data}: TableIndexInfoProps) => {
     }
 
     const TableIndex = data.PathDescription?.TableIndex;
-    const info: Array<InfoViewerItem> = buildIndexInfo(TableIndex);
 
     let settings: Array<InfoViewerItem> = [];
     if (TableIndex?.Type === EIndexType.EIndexTypeGlobalVectorKmeansTree) {
@@ -34,25 +29,25 @@ export const TableIndexInfo = ({data}: TableIndexInfoProps) => {
             TableIndex?.VectorIndexKmeansTreeDescription?.Settings,
         );
     }
-    if (TableIndex?.Type === EIndexType.EIndexTypeGlobalFulltext) {
+    if (
+        TableIndex?.Type === EIndexType.EIndexTypeGlobalFulltext ||
+        TableIndex?.Type === EIndexType.EIndexTypeGlobalFulltextPlain ||
+        TableIndex?.Type === EIndexType.EIndexTypeGlobalFulltextRelevance
+    ) {
         settings = buildFulltextIndexSettingsInfo(TableIndex?.FulltextIndexDescription?.Settings);
+    }
+
+    if (!settings.length) {
+        return null;
     }
 
     return (
         <div className={b()}>
             <InfoViewer
-                info={info}
-                title={entityName}
+                info={settings}
+                title={i18n('title_index-settings')}
                 className={b('info-block')}
-                renderEmptyState={() => <div className={b('title')}>{entityName}</div>}
             />
-            {settings && settings.length ? (
-                <InfoViewer
-                    info={settings}
-                    title={i18n('title_index-settings')}
-                    className={b('info-block')}
-                />
-            ) : null}
         </div>
     );
 };
