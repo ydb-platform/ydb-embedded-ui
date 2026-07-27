@@ -99,6 +99,18 @@ export function ObjectSummary({
     const {summaryTab = TENANT_SUMMARY_TABS_IDS.overview} = useTypedSelector(
         (state) => state.tenant,
     );
+    const tabsItems = React.useMemo(() => {
+        const availableTabs = isTableType(type)
+            ? [...TENANT_INFO_TABS, ...TENANT_SCHEMA_TAB]
+            : TENANT_INFO_TABS;
+
+        if (showLegacyDatabaseInfo) {
+            return availableTabs;
+        }
+
+        return availableTabs.filter(({id}) => id !== TENANT_SUMMARY_TABS_IDS.overview);
+    }, [showLegacyDatabaseInfo, type]);
+    const showInfoPanel = tabsItems.length > 0;
 
     const {handleTenantPageChange} = useTenantPage();
 
@@ -117,17 +129,14 @@ export function ObjectSummary({
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
     React.useEffect(() => {
-        const isTable = isTableType(type);
+        const isSummaryTabAvailable = tabsItems.some(({id}) => id === summaryTab);
 
-        if (type && !isTable && !TENANT_INFO_TABS.find((el) => el.id === summaryTab)) {
-            dispatch(setSummaryTab(TENANT_SUMMARY_TABS_IDS.overview));
+        if (!isSummaryTabAvailable && tabsItems[0]) {
+            dispatch(setSummaryTab(tabsItems[0].id));
         }
-    }, [dispatch, type, summaryTab]);
+    }, [dispatch, summaryTab, tabsItems]);
 
     const renderTabs = () => {
-        const isTable = isTableType(type);
-        const tabsItems = isTable ? [...TENANT_INFO_TABS, ...TENANT_SCHEMA_TAB] : TENANT_INFO_TABS;
-
         return (
             <div className={b('tabs')}>
                 <Flex
@@ -406,8 +415,11 @@ export function ObjectSummary({
                     />
                 );
             }
+            case TENANT_SUMMARY_TABS_IDS.overview: {
+                return showLegacyDatabaseInfo ? renderObjectOverview() : null;
+            }
             default: {
-                return renderObjectOverview();
+                return null;
             }
         }
     };
@@ -478,7 +490,7 @@ export function ObjectSummary({
         return (
             <div className={b()}>
                 <div className={b({hidden: isCollapsed})}>
-                    {showLegacyDatabaseInfo ? (
+                    {showInfoPanel ? (
                         <SplitPane
                             direction="vertical"
                             defaultSizePaneKey={DEFAULT_SIZE_TENANT_SUMMARY_KEY}
