@@ -1,5 +1,12 @@
 # Changelog
 
+## [18.3.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.3.0...v18.3.1) (2026-07-27)
+
+
+### Bug Fixes
+
+* **storage:** preserve node search fields with grouping ([#4155](https://github.com/ydb-platform/ydb-embedded-ui/issues/4155)) ([8b74cd3](https://github.com/ydb-platform/ydb-embedded-ui/commit/8b74cd3938c66c09fb67e5d4c004d34ef9688f4d))
+
 ## [18.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.2.0...v18.3.0) (2026-07-27)
 
 
