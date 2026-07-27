@@ -347,9 +347,10 @@ export class Diagnostics {
         this.operations = new OperationsTable(page);
         this.tabs = page.locator('.ydb-database-diagnostics-tabs__tabs');
         this.tableControls = page.locator('.ydb-table-with-controls-layout__controls');
-        this.schemaViewer = page.locator('.schema-viewer');
+        const diagnosticsPage = page.locator('.kv-tenant-diagnostics__page-wrapper');
+        this.schemaViewer = diagnosticsPage.locator('.schema-viewer');
         this.dataTable = page.locator('.data-table__table');
-        this.primaryKeys = page.locator('.schema-viewer__keys_type_primary');
+        this.primaryKeys = diagnosticsPage.locator('.schema-viewer__keys_type_primary');
         this.refreshButton = page.locator('button[aria-label="Refresh"]');
         this.autoRefreshSelect = page.locator('.g-select');
         this.metricTabs = page.locator(METRIC_TABS_SELECTOR);
