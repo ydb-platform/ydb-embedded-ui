@@ -4,7 +4,7 @@ import {Flex, Icon, Label, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 import {Helmet} from 'react-helmet-async';
-import {Redirect} from 'react-router-dom';
+import {Redirect, useLocation} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
@@ -65,6 +65,7 @@ const vDiskTabSchema = z.nativeEnum(VDISK_TABS_IDS).catch(VDISK_TABS_IDS.storage
 export function VDiskPage() {
     const dispatch = useTypedDispatch();
     const getVDiskPagePath = useVDiskPagePath();
+    const location = useLocation();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -135,16 +136,16 @@ export function VDiskPage() {
     const {GroupID} = resolvedVDiskId || {};
 
     const vDiskId = vDiskData?.StringifiedId || (loading ? undefined : vDiskIdParam);
-    const redirectPath =
-        vDiskTab === requestedVDiskTab
-            ? undefined
-            : getVDiskPagePath(
-                  {
-                      nodeId: nodeId?.toString(),
-                      vDiskId: vDiskId?.toString(),
-                  },
-                  {activeTab: vDiskTab},
-              );
+    const redirectLocation = React.useMemo(() => {
+        if (vDiskTab === requestedVDiskTab) {
+            return undefined;
+        }
+
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.set('activeTab', vDiskTab);
+
+        return {...location, search: searchParams.toString()};
+    }, [location, requestedVDiskTab, vDiskTab]);
 
     const {appTitle} = useAppTitle();
 
@@ -338,8 +339,8 @@ export function VDiskPage() {
         );
     };
 
-    if (redirectPath) {
-        return <Redirect to={redirectPath} />;
+    if (redirectLocation) {
+        return <Redirect to={redirectLocation} />;
     }
 
     return (
