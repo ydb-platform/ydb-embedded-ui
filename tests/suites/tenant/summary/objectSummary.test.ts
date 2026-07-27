@@ -50,6 +50,23 @@ test.describe('Object Summary', async () => {
         ).toBeVisible();
     });
 
+    test('Keeps navigation tree mounted when selected object has no tabs', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        const tree = page.locator('.ydb-object-summary__tree');
+
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+        await tree.evaluate((element) => {
+            element.setAttribute('data-mount-marker', 'initial-tree');
+        });
+
+        const rootItem = await objectSummary.getTreeItem('local');
+        await rootItem.click();
+
+        await expect.poll(() => new URL(page.url()).searchParams.get('schema')).toBe(database);
+        await expect(page.locator('.ydb-object-summary__tabs')).toHaveCount(0);
+        await expect(tree).toHaveAttribute('data-mount-marker', 'initial-tree');
+    });
+
     test('Open Preview icon appears on hover for "dv_slots" tree item', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
         await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
