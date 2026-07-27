@@ -49,6 +49,7 @@ async function gotoClusterDatabases(page: Page) {
     const response = await clusterPage.goto({backend, databasePage: 'query'});
 
     expect(response?.ok()).toBe(true);
+    await expect(page.locator('.ydb-cluster')).toBeVisible();
 }
 
 async function dispatchClick(locator: Locator) {
