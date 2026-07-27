@@ -1,9 +1,10 @@
 import React from 'react';
 
 import {ArrowChevronRight, Ban, CircleCheck, CirclePause, LinkSlash} from '@gravity-ui/icons';
-import {Flex, HelpMark, Icon, Label, Text} from '@gravity-ui/uikit';
+import {Flex, Icon, Text} from '@gravity-ui/uikit';
 import type {LabelProps} from '@gravity-ui/uikit';
 
+import {LabelWithHelpMark} from '../../../../components/LabelWithHelpMark/LabelWithHelpMark';
 import type {TBridgePile} from '../../../../types/api/cluster';
 import {BridgePileGroupStatus, BridgePileState} from '../../../../types/api/cluster';
 import {cn} from '../../../../utils/cn';
@@ -258,28 +259,23 @@ const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCard
         const showStateHelp = Boolean(help);
 
         return (
-            <Label
+            <LabelWithHelpMark
                 theme={theme}
                 size="xs"
                 icon={icon}
                 className={b('state-label', {'with-help': showStateHelp})}
+                contentGap={2}
+                help={help}
+                helpMarkProps={{
+                    className: b('state-help'),
+                    popoverProps: {
+                        placement: ['top', 'bottom'],
+                        className: b('state-help-popover'),
+                    },
+                }}
             >
-                <Flex alignItems="center" gap={2} wrap="nowrap">
-                    {label}
-                    {showStateHelp ? (
-                        <HelpMark
-                            iconSize="s"
-                            className={b('state-help')}
-                            popoverProps={{
-                                placement: ['top', 'bottom'],
-                                className: b('state-help-popover'),
-                            }}
-                        >
-                            {help}
-                        </HelpMark>
-                    ) : null}
-                </Flex>
-            </Label>
+                {label}
+            </LabelWithHelpMark>
         );
     }, [pile.State]);
 

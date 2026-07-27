@@ -1,4 +1,6 @@
 {
+  "title_stats": "Stats",
+  "title_average-write-speed": "Average write speed",
   "writeLagPopover": "Write lag, maximum among all topic partitions",
   "writeIdleTimePopover": "Write idle time, maximum among all topic partitions"
 }

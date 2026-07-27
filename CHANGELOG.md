@@ -1,5 +1,28 @@
 # Changelog
 
+## [18.3.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.3.0...v18.3.1) (2026-07-27)
+
+
+### Bug Fixes
+
+* **storage:** preserve node search fields with grouping ([#4155](https://github.com/ydb-platform/ydb-embedded-ui/issues/4155)) ([8b74cd3](https://github.com/ydb-platform/ydb-embedded-ui/commit/8b74cd3938c66c09fb67e5d4c004d34ef9688f4d))
+
+## [18.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.2.0...v18.3.0) (2026-07-27)
+
+
+### Features
+
+* implement new "Info" tabs for all object types in the database tree ([#4136](https://github.com/ydb-platform/ydb-embedded-ui/issues/4136)) ([9d7ce19](https://github.com/ydb-platform/ydb-embedded-ui/commit/9d7ce1968b66b715f881ffcf306709960585d6aa))
+
+
+### Bug Fixes
+
+* load schema for system view queries ([#4143](https://github.com/ydb-platform/ydb-embedded-ui/issues/4143)) ([fe802af](https://github.com/ydb-platform/ydb-embedded-ui/commit/fe802aff5ce0a4802c6bbcfabcb63e19424568ec))
+* pass database to error diagnostics ([#4157](https://github.com/ydb-platform/ydb-embedded-ui/issues/4157)) ([5c06999](https://github.com/ydb-platform/ydb-embedded-ui/commit/5c0699949001c8594d7c378da0e6582983d46864))
+* preserve raw bytes when downloading topic messages ([#4130](https://github.com/ydb-platform/ydb-embedded-ui/issues/4130)) ([3ad3ce9](https://github.com/ydb-platform/ydb-embedded-ui/commit/3ad3ce9b303274015d26b555a1ebfeb71de2a2ef))
+* skip pr description updates for fork pull requests ([#4133](https://github.com/ydb-platform/ydb-embedded-ui/issues/4133)) ([14700dd](https://github.com/ydb-platform/ydb-embedded-ui/commit/14700ddc622884b05b0c205a44f252f65110cf61))
+* vDisksPDisks is required in expert mode ([#4148](https://github.com/ydb-platform/ydb-embedded-ui/issues/4148)) ([25b5ed1](https://github.com/ydb-platform/ydb-embedded-ui/commit/25b5ed1a25ac318b5e124ddb4bcafff6ec7f1850))
+
 ## [18.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.1.0...v18.2.0) (2026-07-15)
 
 
