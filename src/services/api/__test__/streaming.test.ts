@@ -40,7 +40,7 @@ function createFetchResponseMock() {
     } as unknown as Response;
 }
 
-describe('StreamingAPI CSRF header', () => {
+describe('StreamingAPI requests', () => {
     const originalFetch = global.fetch;
 
     afterEach(() => {
@@ -88,5 +88,30 @@ describe('StreamingAPI CSRF header', () => {
 
         expect(headers).toBeInstanceOf(Headers);
         expect((headers as Headers).get(CSRF_TOKEN_HEADER_NAME)).toBe('cookie-token');
+    });
+
+    test('sends database in both URL parameters and body for streaming queries', async () => {
+        const api = createStreamingApi();
+        const fetchMock = jest.fn<Promise<Response>, [string, RequestInit]>(async () =>
+            Promise.resolve(createFetchResponseMock()),
+        );
+        global.fetch = fetchMock as typeof fetch;
+
+        await api.streamQuery(
+            {
+                database: '/Root/test',
+                base64: false,
+            },
+            createStreamQueryOptions(),
+        );
+
+        const [url, request] = fetchMock.mock.calls[0];
+
+        expect(new URL(url, 'http://localhost').searchParams.get('database')).toBe('/Root/test');
+        expect(JSON.parse(request.body as string)).toEqual(
+            expect.objectContaining({
+                database: '/Root/test',
+            }),
+        );
     });
 });
