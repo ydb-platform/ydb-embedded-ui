@@ -14,8 +14,11 @@ import {
     STORAGE_POOL_NAME,
     VDISK_PAGE_PATH,
     setupPDiskInfoMock,
+    setupVDiskBlobIndexStatMock,
     setupVDiskPageMocks,
 } from './vdiskPageMocks';
+
+const VDISK_TABLETS_PAGE_PATH = VDISK_PAGE_PATH.replace('activeTab=storage', 'activeTab=tablets');
 
 async function enableNewStorageView(page: Page) {
     await page.addInitScript(() => {
@@ -59,6 +62,53 @@ async function expectDeveloperUILink(popup: Locator, expectedPath: string) {
 
     await expect(developerUILink).toBeVisible();
 }
+
+test.describe('VDisk page tabs', () => {
+    test('shows Tablets tab and loads its content for viewer users', async ({page}) => {
+        const blobIndexStatRequests: string[] = [];
+
+        await setupVDiskPageMocks(page);
+        await setupVDiskBlobIndexStatMock(page, (requestUrl) => {
+            blobIndexStatRequests.push(requestUrl);
+        });
+
+        await page.goto(VDISK_TABLETS_PAGE_PATH);
+
+        const tabs = page.locator('.ydb-vdisk-page__tabs');
+        await expect(tabs.getByText('Storage', {exact: true})).toBeVisible();
+        await expect(tabs.getByText('Tablets', {exact: true})).toBeVisible();
+        await expect(page.locator('.ydb-vdisk-page__tablets-content')).toBeVisible();
+        await expect.poll(() => blobIndexStatRequests.length).toBeGreaterThan(0);
+    });
+
+    test('hides Tablets tab for database-scoped users', async ({page}) => {
+        await setupVDiskPageMocks(page, {isViewerAllowed: false});
+
+        await page.goto(VDISK_PAGE_PATH);
+
+        const tabs = page.locator('.ydb-vdisk-page__tabs');
+        await expect(tabs.getByText('Storage', {exact: true})).toBeVisible();
+        await expect(tabs.getByText('Tablets', {exact: true})).toHaveCount(0);
+    });
+
+    test('redirects restricted Tablets URLs without requesting tablet data', async ({page}) => {
+        const blobIndexStatRequests: string[] = [];
+
+        await setupVDiskPageMocks(page, {isViewerAllowed: false});
+        await setupVDiskBlobIndexStatMock(page, (requestUrl) => {
+            blobIndexStatRequests.push(requestUrl);
+        });
+
+        await page.goto(VDISK_TABLETS_PAGE_PATH);
+
+        const tabs = page.locator('.ydb-vdisk-page__tabs');
+        await expect(tabs.getByText('Storage', {exact: true})).toBeVisible();
+        await expect(page.locator('.ydb-vdisk-page__tablets-content')).toHaveCount(0);
+        await expect(page.locator('.ydb-paginated-table__table')).toBeVisible();
+        await expect.poll(() => new URL(page.url()).searchParams.get('activeTab')).toBe('storage');
+        expect(blobIndexStatRequests).toHaveLength(0);
+    });
+});
 
 test.describe('VDisk page storage details', () => {
     test('does not render storage details when experiment is disabled', async ({page}) => {

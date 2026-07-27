@@ -4,6 +4,7 @@ import {Flex, Icon, Label, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 import {Helmet} from 'react-helmet-async';
+import {useHistory} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
@@ -27,6 +28,7 @@ import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {VDISK_LABEL_CONFIG} from '../../utils/disks/constants';
 import {getDataSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
@@ -62,6 +64,7 @@ const vDiskTabSchema = z.nativeEnum(VDISK_TABS_IDS).catch(VDISK_TABS_IDS.storage
 
 export function VDiskPage() {
     const dispatch = useTypedDispatch();
+    const history = useHistory();
     const getVDiskPagePath = useVDiskPagePath();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
@@ -74,7 +77,17 @@ export function VDiskPage() {
     });
     const database = databaseParam ?? undefined;
 
-    const vDiskTab = vDiskTabSchema.parse(activeTab);
+    const requestedVDiskTab = vDiskTabSchema.parse(activeTab);
+    const isViewerUser = useIsViewerUser();
+    const {vDiskTab, vDiskTabs} = React.useMemo(() => {
+        const availableTabs = isViewerUser
+            ? VDISK_PAGE_TABS
+            : VDISK_PAGE_TABS.filter(({id}) => id !== VDISK_TABS_IDS.tablets);
+        const availableActiveTab =
+            availableTabs.find(({id}) => id === requestedVDiskTab)?.id ?? VDISK_TABS_IDS.storage;
+
+        return {vDiskTab: availableActiveTab, vDiskTabs: availableTabs};
+    }, [isViewerUser, requestedVDiskTab]);
     const newStorageViewEnabled = useNewStorageViewEnabled();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -123,6 +136,24 @@ export function VDiskPage() {
     const {GroupID} = resolvedVDiskId || {};
 
     const vDiskId = vDiskData?.StringifiedId || (loading ? undefined : vDiskIdParam);
+
+    React.useEffect(() => {
+        if (vDiskTab === requestedVDiskTab) {
+            return;
+        }
+
+        const path = getVDiskPagePath(
+            {
+                nodeId: nodeId?.toString(),
+                vDiskId: vDiskId?.toString(),
+            },
+            {activeTab: vDiskTab},
+        );
+
+        if (path) {
+            history.replace(path);
+        }
+    }, [getVDiskPagePath, history, nodeId, requestedVDiskTab, vDiskId, vDiskTab]);
 
     const {appTitle} = useAppTitle();
 
@@ -233,7 +264,7 @@ export function VDiskPage() {
             <div className={vDiskPageCn('tabs')}>
                 <TabProvider value={vDiskTab}>
                     <TabList size="l">
-                        {VDISK_PAGE_TABS.map(({id, title}) => {
+                        {vDiskTabs.map(({id, title}) => {
                             const path = getVDiskPagePath(
                                 {
                                     nodeId: nodeId?.toString(),
