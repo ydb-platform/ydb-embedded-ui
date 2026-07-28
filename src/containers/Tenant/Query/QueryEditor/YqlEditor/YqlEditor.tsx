@@ -356,16 +356,20 @@ export function YqlEditor({
             );
         };
 
+        const clearCurrentStatementDecoration = () => {
+            if (decoratedRange) {
+                currentStatementDecoration.clear();
+            }
+            decoratedModel = null;
+            decoratedRange = undefined;
+        };
+
         const updateCurrentStatement = () => {
             const model = editor.getModel();
             const position = editor.getPosition();
             if (!model || !position) {
                 currentStatement = undefined;
-                if (decoratedRange) {
-                    currentStatementDecoration.clear();
-                    decoratedModel = null;
-                    decoratedRange = undefined;
-                }
+                clearCurrentStatementDecoration();
                 canSendQueryFragment.set(hasSingleManualSelection());
                 return;
             }
@@ -377,11 +381,7 @@ export function YqlEditor({
             );
             if (!statement) {
                 currentStatement = undefined;
-                if (decoratedRange) {
-                    currentStatementDecoration.clear();
-                    decoratedModel = null;
-                    decoratedRange = undefined;
-                }
+                clearCurrentStatementDecoration();
                 canSendQueryFragment.set(hasSingleManualSelection());
                 return;
             }
@@ -395,6 +395,11 @@ export function YqlEditor({
                 endColumn: end.column,
             };
             currentStatement = {...statement, range};
+            if (statementPositions.length <= 1) {
+                clearCurrentStatementDecoration();
+                canSendQueryFragment.set(true);
+                return;
+            }
             if (
                 decoratedModel !== model ||
                 !decoratedRange ||

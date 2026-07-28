@@ -485,11 +485,46 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.getCellValue(1, 2)).resolves.toContain('2');
     });
 
+    test('Single executable statement is not highlighted but remains executable', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('-- leading comment\n\nSELECT 7;\n\n-- trailing comment');
+        await queryEditor.setCursor(3, 3);
+
+        await expect(queryEditor.getSelectedText()).resolves.toBe('');
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
+        await executeSelectedQueryWithKeybinding(page);
+
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(queryEditor.resultTable.getCellValue(1, 2)).resolves.toContain('7');
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe('SELECT 7;');
+    });
+
+    test('Current-statement decoration follows statement-count transitions', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.setCursor(1, 3);
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
+
+        await queryEditor.setQuery('SELECT 1;\n\nSELECT 2;');
+        await queryEditor.setCursor(3, 3);
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 2;');
+
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.setCursor(1, 3);
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
+    });
+
     test('Current-statement highlight remains immediately after a terminating semicolon', async ({
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.setQuery('SELECT 1; ');
+        await queryEditor.setQuery('SELECT 1; \nSELECT 2;');
         await queryEditor.setCursor(1, 10);
 
         await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
@@ -499,7 +534,7 @@ test.describe('Test Query Editor', async () => {
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.setQuery('SELECT 1; ');
+        await queryEditor.setQuery('SELECT 1; \nSELECT 2;');
         await queryEditor.setCursor(1, 11);
 
         await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
@@ -507,7 +542,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Current-statement highlight uses the subtle decoration style', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.setQuery('SELECT 1;\nSELECT 2;');
         await queryEditor.setCursor(1, 3);
         await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
 
@@ -624,7 +659,7 @@ test.describe('Test Query Editor', async () => {
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.setQuery('SELECT 1;\nSELECT 2;');
         await queryEditor.setCursor(1, 3);
         await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
 
