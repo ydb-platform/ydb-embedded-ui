@@ -27,23 +27,44 @@ test.describe('Object Summary', async () => {
         await tenantPage.goto(pageQueryParams, {waitUntil: 'domcontentloaded'});
     });
 
-    test('Navigation v2 renders only the tree in Object Summary', async ({page}) => {
+    test('Navigation v2 renders only the Schema tab for table objects', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
         const summaryActions = page.locator('.ydb-object-summary__actions');
         const infoControls = page.locator('.ydb-object-summary__info-controls');
 
         await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
-        await expect(page.locator('.ydb-object-summary__info')).toHaveCount(0);
-        await expect(page.locator('.ydb-object-summary__overview-wrapper')).toHaveCount(0);
-        await expect(infoControls.locator('.kv-pane-visibility-button_type_collapse')).toHaveCount(
-            0,
-        );
-        await expect(infoControls.locator('.kv-pane-visibility-button_type_expand')).toHaveCount(0);
+        await expect(page.locator('.ydb-object-summary__info')).toBeVisible();
+        await expect(page.locator('button[data-tab="overview"]')).toHaveCount(0);
+        await expect(page.locator('button[data-tab="schema"]')).toBeVisible();
+        await expect(objectSummary.isSchemaViewerVisible()).resolves.toBe(true);
+        await expect(
+            infoControls.locator('.kv-pane-visibility-button_type_collapse'),
+        ).toBeVisible();
+        await expect(
+            infoControls.locator('.kv-pane-visibility-button_type_expand'),
+        ).not.toBeVisible();
         await expect(summaryActions).toBeVisible();
         await expect(summaryActions.locator('.ydb-object-summary__refresh-button')).toBeVisible();
         await expect(
             summaryActions.locator('.kv-pane-visibility-button_type_collapse'),
         ).toBeVisible();
+    });
+
+    test('Keeps navigation tree mounted when selected object has no tabs', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        const tree = page.locator('.ydb-object-summary__tree');
+
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+        await tree.evaluate((element) => {
+            element.setAttribute('data-mount-marker', 'initial-tree');
+        });
+
+        const rootItem = await objectSummary.getTreeItem('local');
+        await rootItem.click();
+
+        await expect.poll(() => new URL(page.url()).searchParams.get('schema')).toBe(database);
+        await expect(page.locator('.ydb-object-summary__tabs')).toHaveCount(0);
+        await expect(tree).toHaveAttribute('data-mount-marker', 'initial-tree');
     });
 
     test('Open Preview icon appears on hover for "dv_slots" tree item', async ({page}) => {
@@ -77,7 +98,7 @@ test.describe('Object Summary', async () => {
         await expect(queryEditor.resultTable.isPreviewVisible()).resolves.toBe(true);
     });
 
-    test('Legacy navigation renders only the tree for schema objects', async ({page}) => {
+    test('Legacy navigation renders only the Schema tab for table objects', async ({page}) => {
         await page.evaluate(() => {
             localStorage.setItem('enableTenantNavigationV2', JSON.stringify(false));
         });
@@ -86,8 +107,10 @@ test.describe('Object Summary', async () => {
         const objectSummary = new ObjectSummary(page);
 
         await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
-        await expect(page.locator('.ydb-object-summary__info')).toHaveCount(0);
-        await expect(page.locator('.ydb-object-summary__overview-wrapper')).toHaveCount(0);
+        await expect(page.locator('.ydb-object-summary__info')).toBeVisible();
+        await expect(page.locator('button[data-tab="overview"]')).toHaveCount(0);
+        await expect(page.locator('button[data-tab="schema"]')).toBeVisible();
+        await expect(objectSummary.isSchemaViewerVisible()).resolves.toBe(true);
     });
 
     test('Actions dropdown menu opens and contains expected items', async ({page}) => {
@@ -332,6 +355,8 @@ test.describe('Object Summary', async () => {
         const objectSummary = new ObjectSummary(page);
         await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
         await expect(page.locator('.ydb-object-summary__info')).toBeVisible();
+        await expect(page.locator('button[data-tab="overview"]')).toBeVisible();
+        await expect(page.locator('button[data-tab="schema"]')).toHaveCount(0);
 
         // Test info panel collapse/expand
         await objectSummary.collapseInfoPanel();
