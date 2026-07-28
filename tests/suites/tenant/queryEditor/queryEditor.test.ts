@@ -221,7 +221,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
-    test('Stopped non-streaming selection updates its exact History entry', async ({page}) => {
+    test('Stopped non-streaming selection does not create a History entry', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await queryEditor.setQuery(longRunningQuery);
@@ -233,8 +233,7 @@ test.describe('Test Query Editor', async () => {
 
         await queryEditor.queryTabs.selectTab(QueryTabs.History);
         await queryEditor.historyQueries.isVisible();
-        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe(longRunningQuery);
-        await expect(queryEditor.historyQueries.getQueryStatus(0)).resolves.toBe('Stopped');
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(0);
     });
 
     test('Streaming query shows some results and banner when stop button is clicked', async ({
@@ -466,7 +465,11 @@ test.describe('Test Query Editor', async () => {
 
         await queryEditor.queryTabs.selectTab(QueryTabs.History);
         await queryEditor.historyQueries.isVisible();
-        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe('SELECT 1');
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(1);
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toContain(
+            'SELECT 1 + 2;',
+        );
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toContain('SELECT 20;');
     });
 
     test('Selected-query hotkey executes the highlighted statement without a selection', async ({
@@ -501,7 +504,7 @@ test.describe('Test Query Editor', async () => {
 
         await queryEditor.queryTabs.selectTab(QueryTabs.History);
         await queryEditor.historyQueries.isVisible();
-        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe('SELECT 7;');
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(0);
     });
 
     test('Selected-query action is unavailable for multiple Monaco selections', async ({page}) => {
@@ -668,9 +671,7 @@ test.describe('Test Query Editor', async () => {
             .toEqual({lineNumber: 3, column: 5});
     });
 
-    test('Current-statement execution stores only the executed statement in History', async ({
-        page,
-    }) => {
+    test('Current-statement execution does not create a History entry', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery('SELECT 1;\n\nSELECT 2;');
         await queryEditor.setCursor(3, 3);
@@ -679,10 +680,10 @@ test.describe('Test Query Editor', async () => {
 
         await queryEditor.queryTabs.selectTab(QueryTabs.History);
         await queryEditor.historyQueries.isVisible();
-        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe('SELECT 2;');
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(0);
     });
 
-    test('Fragment executions after History navigation create new latest entries', async ({
+    test('Fragment executions after History navigation do not change existing entries', async ({
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
@@ -705,23 +706,23 @@ test.describe('Test Query Editor', async () => {
 
         await queryEditor.queryTabs.selectTab(QueryTabs.History);
         await queryEditor.historyQueries.isVisible();
-        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(3);
-        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe(firstQuery);
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(2);
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe(secondQuery);
+        await expect(queryEditor.historyQueries.getQueryStatus(0)).resolves.toBe('Completed');
 
         await queryEditor.historyQueries.selectQuery(secondQuery);
         await expect.poll(() => queryEditor.getEditorContent()).toBe(secondQuery);
-        await queryEditor.selectText(1, 1, 1, secondQuery.length + 1);
+        const failingFragment = 'SELECT missing_column;';
+        await queryEditor.setQuery(failingFragment);
+        await queryEditor.selectText(1, 1, 1, failingFragment.length + 1);
         await executeSelectedQueryWithKeybinding(page);
-        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
-
-        // Consecutive execution of the identical latest fragment remains de-duplicated.
-        await executeSelectedQueryWithKeybinding(page);
-        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
 
         await queryEditor.queryTabs.selectTab(QueryTabs.History);
         await queryEditor.historyQueries.isVisible();
-        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(4);
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(2);
         await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe(secondQuery);
+        await expect(queryEditor.historyQueries.getQueryStatus(0)).resolves.toBe('Completed');
     });
 
     test('Cursor movement within one statement avoids full-text reads and decoration writes', async ({

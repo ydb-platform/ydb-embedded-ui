@@ -201,7 +201,7 @@ export function YqlEditor({
         if (lastUsedQueryAction === QUERY_ACTIONS.explain) {
             handleGetExplainQueryClick(input);
         } else {
-            handleSendExecuteClick({text: input, source: 'editor'});
+            handleSendExecuteClick({text: input});
         }
     });
 
@@ -473,7 +473,6 @@ export function YqlEditor({
                 if (!selection.isEmpty()) {
                     handleSendExecuteClick({
                         text: model.getValueInRange(selection),
-                        source: 'selection',
                         range: selection,
                     });
                     return;
@@ -482,7 +481,6 @@ export function YqlEditor({
                 if (currentStatement) {
                     handleSendExecuteClick({
                         text: currentStatement.text,
-                        source: 'current-statement',
                         range: currentStatement.range,
                     });
                 }

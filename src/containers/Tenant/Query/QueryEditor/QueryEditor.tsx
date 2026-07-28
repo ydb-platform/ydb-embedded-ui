@@ -334,7 +334,8 @@ export default function QueryEditor({
             return;
         }
 
-        const {text, source, range} = execution;
+        const {text, range} = execution;
+        const isFragment = Boolean(range);
 
         runSetStoppableTimeout();
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
@@ -346,32 +347,32 @@ export default function QueryEditor({
 
         dispatch(setShowPreview(false));
 
-        let historyQueryId = historyCurrentQueryId ?? uuidv4();
+        let historyQueryId: string | undefined;
         const newQueryId = uuidv4();
 
         const startTime = Date.now();
 
-        const currentQuery = historyCurrentQueryId
-            ? historyQueries.find((q) => q.queryId === historyCurrentQueryId)
-            : null;
-        const lastQuery = historyQueries.at(-1);
-        if (text === lastQuery?.queryText && !lastQuery.operationId) {
-            // Don't add the same query as the previous one to the query history,
-            // unless it has server-stored results (operationId) — then save every launch.
-            historyQueryId = lastQuery.queryId;
-            // Keep history navigation anchored to the entry we are updating
-            if (historyCurrentQueryId !== lastQuery.queryId) {
-                dispatch(setHistoryCurrentQueryId(lastQuery.queryId));
+        if (!isFragment) {
+            historyQueryId = historyCurrentQueryId ?? uuidv4();
+
+            const currentQuery = historyCurrentQueryId
+                ? historyQueries.find((q) => q.queryId === historyCurrentQueryId)
+                : null;
+            const lastQuery = historyQueries.at(-1);
+            if (text === lastQuery?.queryText && !lastQuery.operationId) {
+                // Don't add the same query as the previous one to the query history,
+                // unless it has server-stored results (operationId) — then save every launch.
+                historyQueryId = lastQuery.queryId;
+                // Keep history navigation anchored to the entry we are updating
+                if (historyCurrentQueryId !== lastQuery.queryId) {
+                    dispatch(setHistoryCurrentQueryId(lastQuery.queryId));
+                }
+            } else if (text !== currentQuery?.queryText || currentQuery?.operationId) {
+                // Queries with results stored on the server (operationId) get a separate history
+                // entry per launch, unless they match the most recent history item (handled above).
+                historyQueryId = newQueryId;
+                saveQueryToHistory(text, newQueryId, startTime);
             }
-        } else if (
-            source !== 'editor' ||
-            text !== currentQuery?.queryText ||
-            currentQuery?.operationId
-        ) {
-            // Queries with results stored on the server (operationId) get a separate history
-            // entry per launch, unless they match the most recent history item (handled above).
-            historyQueryId = newQueryId;
-            saveQueryToHistory(text, newQueryId, startTime);
         }
 
         const updateStoppedQueryInHistory = (error: unknown) => {
@@ -393,6 +394,10 @@ export default function QueryEditor({
                     ? extra.historyQueryId
                     : historyQueryId;
 
+            if (!stoppedHistoryQueryId) {
+                return;
+            }
+
             updateQueryInHistory(stoppedHistoryQueryId, {
                 startTime,
                 durationUs: (Date.now() - startTime) * 1000,
@@ -401,7 +406,7 @@ export default function QueryEditor({
             });
         };
 
-        if (source === 'editor') {
+        if (!isFragment) {
             dispatch(setIsDirty(false));
         }
 
@@ -519,7 +524,7 @@ export default function QueryEditor({
     });
 
     const handleRunEditorClick = useEventHandler((text: string) => {
-        handleSendExecuteClick({text, source: 'editor'});
+        handleSendExecuteClick({text});
     });
 
     const handleSettingsClick = () => {

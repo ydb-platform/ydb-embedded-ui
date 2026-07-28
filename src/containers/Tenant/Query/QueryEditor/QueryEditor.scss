@@ -68,6 +68,10 @@
         background-color: var(--g-color-base-background);
 
         &_top {
+            // Monaco mounts context views inside the editor, so the top pane must stay above
+            // the results pane for menus and other widgets to overflow the split boundary.
+            z-index: 3;
+
             padding: 0 16px;
 
             border-bottom: 1px solid var(--g-color-line-generic);
