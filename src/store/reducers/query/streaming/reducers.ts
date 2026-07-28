@@ -12,11 +12,11 @@ import type {QueryState} from '../types';
 
 export const setStreamSession = (
     state: QueryState,
-    action: PayloadAction<{tabId: string; chunk: SessionChunk}>,
+    action: PayloadAction<{tabId: string; executionId: string; chunk: SessionChunk}>,
 ) => {
-    const {tabId, chunk} = action.payload;
+    const {tabId, executionId, chunk} = action.payload;
     const tab = state.tabsById[tabId];
-    if (!tab?.result) {
+    if (!tab?.result || tab.result.executionId !== executionId) {
         return;
     }
 
@@ -30,11 +30,11 @@ export const setStreamSession = (
 
 export const setStreamQueryResponse = (
     state: QueryState,
-    action: PayloadAction<{tabId: string; chunk: QueryResponseChunk}>,
+    action: PayloadAction<{tabId: string; executionId: string; chunk: QueryResponseChunk}>,
 ) => {
-    const {tabId, chunk} = action.payload;
+    const {tabId, executionId, chunk} = action.payload;
     const tab = state.tabsById[tabId];
-    if (!tab?.result) {
+    if (!tab?.result || tab.result.executionId !== executionId) {
         return;
     }
 
@@ -70,11 +70,11 @@ const getEmptyResultSet = () => {
 
 export const addStreamingChunks = (
     state: QueryState,
-    action: PayloadAction<{tabId: string; chunks: StreamDataChunk[]}>,
+    action: PayloadAction<{tabId: string; executionId: string; chunks: StreamDataChunk[]}>,
 ) => {
-    const {tabId, chunks} = action.payload;
+    const {tabId, executionId, chunks} = action.payload;
     const tab = state.tabsById[tabId];
-    if (!tab?.result) {
+    if (!tab?.result || tab.result.executionId !== executionId) {
         return;
     }
 

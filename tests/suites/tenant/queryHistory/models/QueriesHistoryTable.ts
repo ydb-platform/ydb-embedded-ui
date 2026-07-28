@@ -59,6 +59,15 @@ export class QueriesHistoryTable {
         return row.locator('.ydb-syntax-highlighter').innerText();
     }
 
+    async getQueryStatus(index: number) {
+        const row = this.table.locator('.ydb-queries-history__table-row').nth(index);
+        return row.locator('.g-label__content').innerText();
+    }
+
+    async getQueryCount() {
+        return this.table.locator('.ydb-queries-history__table-row').count();
+    }
+
     async isVisible() {
         await this.container.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;

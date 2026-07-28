@@ -343,8 +343,11 @@ export function YqlEditor({
             'canSendQueryFragment',
             false,
         );
-        let statementPositions = extractYqlStatements(editor.getValue());
+        let activeModelText = '';
+        let statementPositions: ReturnType<typeof extractYqlStatements> = [];
         let currentStatement: (CurrentYqlStatement & {range: Monaco.IRange}) | undefined;
+        let decoratedModel: Monaco.editor.ITextModel | null = null;
+        let decoratedRange: Monaco.IRange | undefined;
 
         const hasSingleManualSelection = () => {
             const selection = editor.getSelection();
@@ -358,19 +361,27 @@ export function YqlEditor({
             const position = editor.getPosition();
             if (!model || !position) {
                 currentStatement = undefined;
-                currentStatementDecoration.clear();
+                if (decoratedRange) {
+                    currentStatementDecoration.clear();
+                    decoratedModel = null;
+                    decoratedRange = undefined;
+                }
                 canSendQueryFragment.set(hasSingleManualSelection());
                 return;
             }
 
             const statement = findYqlStatementAtOffset(
-                model.getValue(),
+                activeModelText,
                 model.getOffsetAt(position),
                 statementPositions,
             );
             if (!statement) {
                 currentStatement = undefined;
-                currentStatementDecoration.clear();
+                if (decoratedRange) {
+                    currentStatementDecoration.clear();
+                    decoratedModel = null;
+                    decoratedRange = undefined;
+                }
                 canSendQueryFragment.set(hasSingleManualSelection());
                 return;
             }
@@ -384,22 +395,34 @@ export function YqlEditor({
                 endColumn: end.column,
             };
             currentStatement = {...statement, range};
-            currentStatementDecoration.set([
-                {
-                    range,
-                    options: {
-                        className: 'ydb-current-query-highlight',
-                        shouldFillLineOnLineBreak: true,
-                        stickiness:
-                            monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+            if (
+                decoratedModel !== model ||
+                !decoratedRange ||
+                decoratedRange.startLineNumber !== range.startLineNumber ||
+                decoratedRange.startColumn !== range.startColumn ||
+                decoratedRange.endLineNumber !== range.endLineNumber ||
+                decoratedRange.endColumn !== range.endColumn
+            ) {
+                currentStatementDecoration.set([
+                    {
+                        range,
+                        options: {
+                            className: 'ydb-current-query-highlight',
+                            shouldFillLineOnLineBreak: true,
+                            stickiness:
+                                monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+                        },
                     },
-                },
-            ]);
+                ]);
+                decoratedModel = model;
+                decoratedRange = range;
+            }
             canSendQueryFragment.set(true);
         };
 
         const recalculateStatements = () => {
-            statementPositions = extractYqlStatements(editor.getValue());
+            activeModelText = editor.getValue();
+            statementPositions = extractYqlStatements(activeModelText);
             updateCurrentStatement();
         };
 

@@ -67,6 +67,7 @@ export interface QuerySourcePosition {
 }
 
 export interface QueryResult {
+    executionId: string;
     type: QueryAction;
     data?: PreparedQueryData;
     error?: unknown;

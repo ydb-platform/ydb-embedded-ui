@@ -9,11 +9,49 @@ import type {
 import {
     DEFAULT_QUERY_SETTINGS,
     MAX_QUERY_TIMEOUT_SECONDS,
+    isQueryCancelledError,
     parseQueryAPIResponse,
     parseQueryExplainPlan,
     querySettingsRestoreSchema,
     querySettingsValidationSchema,
 } from './query';
+
+describe('isQueryCancelledError', () => {
+    test('recognizes fetch and RTK abort errors', () => {
+        expect(isQueryCancelledError({name: 'AbortError'})).toBe(true);
+        expect(isQueryCancelledError({error: {name: 'AbortError'}})).toBe(true);
+    });
+
+    test('recognizes direct and RTK-wrapped backend cancellation responses', () => {
+        const cancellationResponse = {
+            error: {severity: 1, message: 'Query was cancelled'},
+            issues: [{severity: 1, message: 'Query was cancelled'}],
+            status: 'CANCELLED',
+        };
+
+        expect(isQueryCancelledError(cancellationResponse)).toBe(true);
+        expect(isQueryCancelledError({error: cancellationResponse, extra: {}})).toBe(true);
+    });
+
+    test('does not treat other backend failures as cancellation', () => {
+        expect(
+            isQueryCancelledError({
+                error: {severity: 1, message: 'Query failed'},
+                issues: [{severity: 1, message: 'Query failed'}],
+                status: 'GENERIC_ERROR',
+            }),
+        ).toBe(false);
+    });
+
+    test('handles cyclic RTK-shaped error wrappers', () => {
+        const firstWrapper: {error?: unknown} = {};
+        const secondWrapper: {data?: unknown} = {};
+        firstWrapper.error = secondWrapper;
+        secondWrapper.data = firstWrapper;
+
+        expect(isQueryCancelledError(firstWrapper)).toBe(false);
+    });
+});
 
 describe('API utils', () => {
     describe('json/viewer/query', () => {

@@ -320,6 +320,41 @@ export class QueryEditor {
         });
     }
 
+    async getCurrentStatementUpdateMetricsAfterCursorMove() {
+        return this.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            const model = editor?.getModel();
+            if (!editor || !model) {
+                throw new Error('Expected active Monaco editor model');
+            }
+
+            const originalGetValue = model.getValue.bind(model);
+            const originalChangeDecorations = editor.changeDecorations.bind(editor);
+            let fullTextReads = 0;
+            let currentStatementDecorationWrites = 0;
+
+            model.getValue = (...args: Parameters<typeof originalGetValue>) => {
+                fullTextReads += 1;
+                return originalGetValue(...args);
+            };
+            editor.changeDecorations = (
+                callback: Parameters<typeof originalChangeDecorations>[0],
+            ) => {
+                currentStatementDecorationWrites += 1;
+                return originalChangeDecorations(callback);
+            };
+
+            try {
+                editor.setPosition({lineNumber: 1, column: 4});
+            } finally {
+                model.getValue = originalGetValue;
+                editor.changeDecorations = originalChangeDecorations;
+            }
+
+            return {fullTextReads, currentStatementDecorationWrites};
+        });
+    }
+
     async getEditorContent(): Promise<string> {
         await this.waitForEditorReady();
         await this.page.waitForFunction(() => Boolean(window.ydbEditor), null, {

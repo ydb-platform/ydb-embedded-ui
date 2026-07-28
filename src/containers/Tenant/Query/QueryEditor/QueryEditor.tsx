@@ -48,6 +48,7 @@ import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQuer
 import {
     DEFAULT_QUERY_SETTINGS,
     QUERY_ACTIONS,
+    isQueryCancelledError,
     isStreamingSupportedForMode,
 } from '../../../../utils/query';
 import {reachMetricaGoal} from '../../../../utils/yaMetrica';
@@ -362,12 +363,43 @@ export default function QueryEditor({
             if (historyCurrentQueryId !== lastQuery.queryId) {
                 dispatch(setHistoryCurrentQueryId(lastQuery.queryId));
             }
-        } else if (text !== currentQuery?.queryText || currentQuery?.operationId) {
+        } else if (
+            source !== 'editor' ||
+            text !== currentQuery?.queryText ||
+            currentQuery?.operationId
+        ) {
             // Queries with results stored on the server (operationId) get a separate history
             // entry per launch, unless they match the most recent history item (handled above).
             historyQueryId = newQueryId;
             saveQueryToHistory(text, newQueryId, startTime);
         }
+
+        const updateStoppedQueryInHistory = (error: unknown) => {
+            const extra =
+                error && typeof error === 'object' && 'extra' in error ? error.extra : undefined;
+            const queryStats =
+                extra &&
+                typeof extra === 'object' &&
+                'queryStats' in extra &&
+                extra.queryStats &&
+                typeof extra.queryStats === 'object'
+                    ? extra.queryStats
+                    : undefined;
+            const stoppedHistoryQueryId =
+                extra &&
+                typeof extra === 'object' &&
+                'historyQueryId' in extra &&
+                typeof extra.historyQueryId === 'string'
+                    ? extra.historyQueryId
+                    : historyQueryId;
+
+            updateQueryInHistory(stoppedHistoryQueryId, {
+                startTime,
+                durationUs: (Date.now() - startTime) * 1000,
+                ...queryStats,
+                status: 'stopped',
+            });
+        };
 
         if (source === 'editor') {
             dispatch(setIsDirty(false));
@@ -415,12 +447,8 @@ export default function QueryEditor({
                     }
                 })
                 .catch((error) => {
-                    if (error?.name === 'AbortError') {
-                        updateQueryInHistory(historyQueryId, {
-                            startTime,
-                            durationUs: (Date.now() - startTime) * 1000,
-                            status: 'stopped',
-                        });
+                    if (isQueryCancelledError(error)) {
+                        updateStoppedQueryInHistory(error);
                         return;
                     }
                     if (error?.extra?.historyQueryId) {
@@ -469,6 +497,10 @@ export default function QueryEditor({
                     }
                 })
                 .catch((error) => {
+                    if (isQueryCancelledError(error)) {
+                        updateStoppedQueryInHistory(error);
+                        return;
+                    }
                     if (error?.extra?.historyQueryId) {
                         updateQueryInHistory(
                             error.extra.historyQueryId,

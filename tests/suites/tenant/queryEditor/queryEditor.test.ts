@@ -221,6 +221,22 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
+    test('Stopped non-streaming selection updates its exact History entry', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.selectText(1, 1, 1, longRunningQuery.length + 1);
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+        await queryEditor.clickStopButton();
+        await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe(longRunningQuery);
+        await expect(queryEditor.historyQueries.getQueryStatus(0)).resolves.toBe('Stopped');
+    });
+
     test('Streaming query shows some results and banner when stop button is clicked', async ({
         page,
     }) => {
@@ -424,7 +440,7 @@ test.describe('Test Query Editor', async () => {
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
-        const multiQuery = 'SELECT 1;\nSELECT 2;';
+        const multiQuery = 'SELECT 1 + 2;\nSELECT 20;';
 
         // First verify running the entire query produces two results
         await queryEditor.setQuery(multiQuery);
@@ -446,6 +462,11 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
         await expect(queryEditor.resultTable.getResultTitleCount()).resolves.toBe('1');
+        await expect(queryEditor.resultTable.getCellValue(1, 2)).resolves.toBe('1');
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe('SELECT 1');
     });
 
     test('Selected-query hotkey executes the highlighted statement without a selection', async ({
@@ -526,9 +547,51 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe('SELECT 2;');
     });
 
+    test('Fragment executions after History navigation create new latest entries', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        const firstQuery = 'SELECT 11;';
+        const secondQuery = 'SELECT 22;';
+
+        await queryEditor.setQuery(firstQuery);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await queryEditor.setQuery(secondQuery);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.selectQuery(firstQuery);
+        await expect.poll(() => queryEditor.getEditorContent()).toBe(firstQuery);
+        await queryEditor.setCursor(1, 3);
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(3);
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe(firstQuery);
+
+        await queryEditor.historyQueries.selectQuery(secondQuery);
+        await expect.poll(() => queryEditor.getEditorContent()).toBe(secondQuery);
+        await queryEditor.selectText(1, 1, 1, secondQuery.length + 1);
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+        // Consecutive execution of the identical latest fragment remains de-duplicated.
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(4);
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe(secondQuery);
+    });
+
     test('Running selected query via context menu executes only selected part', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        const multiQuery = 'SELECT 1;\nSELECT 2;';
+        const multiQuery = 'SELECT 1 + 2;\nSELECT 20;';
 
         // First verify running the entire query produces two results with tabs
         await queryEditor.setQuery(multiQuery);
@@ -550,6 +613,27 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
         await expect(queryEditor.resultTable.getResultTitleCount()).resolves.toBe('1');
+        await expect(queryEditor.resultTable.getCellValue(1, 2)).resolves.toBe('1');
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe('SELECT 1');
+    });
+
+    test('Cursor movement within one statement avoids full-text reads and decoration writes', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.setCursor(1, 3);
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
+
+        await expect(
+            queryEditor.getCurrentStatementUpdateMetricsAfterCursorMove(),
+        ).resolves.toEqual({
+            fullTextReads: 0,
+            currentStatementDecorationWrites: 0,
+        });
     });
 
     test('Results controls collapse and expand functionality', async ({page}) => {

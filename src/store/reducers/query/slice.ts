@@ -291,10 +291,20 @@ const slice = createSlice({
         },
         setQueryResult: (
             state,
-            action: PayloadAction<{tabId: string; result: QueryResult | undefined}>,
+            action: PayloadAction<{
+                tabId: string;
+                result: QueryResult | undefined;
+                executionId?: string;
+            }>,
         ) => {
             const tab = state.tabsById[action.payload.tabId];
             if (!tab) {
+                return;
+            }
+            if (
+                action.payload.executionId &&
+                tab.result?.executionId !== action.payload.executionId
+            ) {
                 return;
             }
 
