@@ -506,17 +506,58 @@ test.describe('Test Query Editor', async () => {
 
     test('Current-statement decoration follows statement-count transitions', async ({page}) => {
         const queryEditor = new QueryEditor(page);
+        const firstStatement = 'SELECT 1;';
+        const secondStatement = 'SELECT 2;';
 
-        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.setQuery(firstStatement);
         await queryEditor.setCursor(1, 3);
-        await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
 
-        await queryEditor.setQuery('SELECT 1;\n\nSELECT 2;');
-        await queryEditor.setCursor(3, 3);
-        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 2;');
+        await queryEditor.editorTextArea.evaluate(
+            (_, query) => {
+                const editor = window.ydbEditor;
+                const model = editor?.getModel();
+                if (!editor || !model) {
+                    throw new Error('Expected active Monaco editor model');
+                }
 
-        await queryEditor.setQuery('SELECT 1;');
-        await queryEditor.setCursor(1, 3);
+                const endPosition = model.getPositionAt(model.getValueLength());
+                editor.executeEdits('test', [
+                    {
+                        range: {
+                            startLineNumber: endPosition.lineNumber,
+                            startColumn: endPosition.column,
+                            endLineNumber: endPosition.lineNumber,
+                            endColumn: endPosition.column,
+                        },
+                        text: `\n${query.secondStatement}`,
+                    },
+                ]);
+            },
+            {secondStatement},
+        );
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe(firstStatement);
+
+        await queryEditor.editorTextArea.evaluate(
+            (_, query) => {
+                const editor = window.ydbEditor;
+                if (!editor) {
+                    throw new Error('Expected active Monaco editor');
+                }
+
+                editor.executeEdits('test', [
+                    {
+                        range: {
+                            startLineNumber: 1,
+                            startColumn: query.firstStatement.length + 1,
+                            endLineNumber: 2,
+                            endColumn: query.secondStatement.length + 1,
+                        },
+                        text: '',
+                    },
+                ]);
+            },
+            {firstStatement, secondStatement},
+        );
         await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
     });
 
