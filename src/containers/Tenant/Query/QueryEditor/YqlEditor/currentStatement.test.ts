@@ -1,6 +1,17 @@
 import {extractYqlStatements, findYqlStatementAtOffset} from './currentStatement';
 
 describe('current YQL statement', () => {
+    test.each([
+        ['; SELECT 1;', ['SELECT 1;']],
+        ['SELECT 1;;; SELECT 2;', ['SELECT 1;', 'SELECT 2;']],
+    ])('filters empty separator statements from %s', (query, expectedStatements) => {
+        const statements = extractYqlStatements(query);
+
+        expect(
+            statements.map(({startIndex, endIndex}) => query.slice(startIndex, endIndex)),
+        ).toEqual(expectedStatements);
+    });
+
     test('finds each statement and excludes whitespace between statements', () => {
         const query = 'SELECT 1;\n\nSELECT 2;';
         const statements = extractYqlStatements(query);

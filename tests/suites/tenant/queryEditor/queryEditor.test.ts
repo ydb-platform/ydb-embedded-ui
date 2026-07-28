@@ -489,7 +489,7 @@ test.describe('Test Query Editor', async () => {
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.setQuery('-- leading comment\n\nSELECT 7;\n\n-- trailing comment');
+        await queryEditor.setQuery('; -- leading comment\n\nSELECT 7;\n\n-- trailing comment');
         await queryEditor.setCursor(3, 3);
 
         await expect(queryEditor.getSelectedText()).resolves.toBe('');
@@ -502,6 +502,40 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.queryTabs.selectTab(QueryTabs.History);
         await queryEditor.historyQueries.isVisible();
         await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe('SELECT 7;');
+    });
+
+    test('Selected-query action is unavailable for multiple Monaco selections', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;\nSELECT 2;');
+
+        const actionState = await queryEditor.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            if (!editor) {
+                throw new Error('Expected active Monaco editor');
+            }
+
+            editor.setSelections([
+                {
+                    selectionStartLineNumber: 1,
+                    selectionStartColumn: 1,
+                    positionLineNumber: 1,
+                    positionColumn: 7,
+                },
+                {
+                    selectionStartLineNumber: 2,
+                    selectionStartColumn: 1,
+                    positionLineNumber: 2,
+                    positionColumn: 7,
+                },
+            ]);
+
+            return {
+                selectionCount: editor.getSelections()?.length,
+                isSupported: editor.getAction('sendSelectedQuery')?.isSupported(),
+            };
+        });
+
+        expect(actionState).toEqual({selectionCount: 2, isSupported: false});
     });
 
     test('Current-statement decoration follows statement-count transitions', async ({page}) => {

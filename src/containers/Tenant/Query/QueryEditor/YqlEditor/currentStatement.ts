@@ -9,7 +9,10 @@ export interface CurrentYqlStatement extends YqlStatementPosition {
 }
 
 export function extractYqlStatements(query: string): YqlStatementPosition[] {
-    return extractYqlStatementPositionsFromQuery(query).statementPositions;
+    return extractYqlStatementPositionsFromQuery(query).statementPositions.filter(
+        ({startIndex, endIndex}) =>
+            startIndex < endIndex && Boolean(query.slice(startIndex, endIndex).trim()),
+    );
 }
 
 export function findYqlStatementAtOffset(

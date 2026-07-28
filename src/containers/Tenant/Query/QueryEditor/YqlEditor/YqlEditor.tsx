@@ -349,10 +349,15 @@ export function YqlEditor({
         let decoratedModel: Monaco.editor.ITextModel | null = null;
         let decoratedRange: Monaco.IRange | undefined;
 
-        const hasSingleManualSelection = () => {
-            const selection = editor.getSelection();
-            return Boolean(
-                selection && !selection.isEmpty() && (editor.getSelections()?.length ?? 0) === 1,
+        const getOnlySelection = (currentEditor: Monaco.editor.ICodeEditor) => {
+            const selections = currentEditor.getSelections();
+            return selections?.length === 1 ? selections[0] : undefined;
+        };
+
+        const updateSendQueryFragmentAvailability = () => {
+            const selection = getOnlySelection(editor);
+            canSendQueryFragment.set(
+                Boolean(selection && (!selection.isEmpty() || currentStatement)),
             );
         };
 
@@ -370,7 +375,7 @@ export function YqlEditor({
             if (!model || !position) {
                 currentStatement = undefined;
                 clearCurrentStatementDecoration();
-                canSendQueryFragment.set(hasSingleManualSelection());
+                updateSendQueryFragmentAvailability();
                 return;
             }
 
@@ -382,7 +387,7 @@ export function YqlEditor({
             if (!statement) {
                 currentStatement = undefined;
                 clearCurrentStatementDecoration();
-                canSendQueryFragment.set(hasSingleManualSelection());
+                updateSendQueryFragmentAvailability();
                 return;
             }
 
@@ -397,7 +402,7 @@ export function YqlEditor({
             currentStatement = {...statement, range};
             if (statementPositions.length <= 1) {
                 clearCurrentStatementDecoration();
-                canSendQueryFragment.set(true);
+                updateSendQueryFragmentAvailability();
                 return;
             }
             if (
@@ -422,7 +427,7 @@ export function YqlEditor({
                 decoratedModel = model;
                 decoratedRange = range;
             }
-            canSendQueryFragment.set(true);
+            updateSendQueryFragmentAvailability();
         };
 
         const recalculateStatements = () => {
@@ -454,12 +459,12 @@ export function YqlEditor({
             contextMenuOrder: 1,
             run: (currentEditor) => {
                 const model = currentEditor.getModel();
-                const selection = currentEditor.getSelection();
+                const selection = getOnlySelection(currentEditor);
                 if (!model || !selection) {
                     return;
                 }
 
-                if (!selection.isEmpty() && (currentEditor.getSelections()?.length ?? 0) === 1) {
+                if (!selection.isEmpty()) {
                     handleSendExecuteClick({
                         text: model.getValueInRange(selection),
                         source: 'selection',
