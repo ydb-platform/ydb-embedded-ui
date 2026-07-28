@@ -294,9 +294,16 @@ export class QueryEditor {
 
         return highlight.evaluate((element) => {
             const style = window.getComputedStyle(element);
+            const colorProbe = element.ownerDocument.createElement('span');
+            colorProbe.style.color = style.getPropertyValue('--g-color-private-blue-50').trim();
+            element.append(colorProbe);
+
+            const expectedBackgroundColor = window.getComputedStyle(colorProbe).color;
+            colorProbe.remove();
+
             return {
                 backgroundColor: style.backgroundColor,
-                expectedBackgroundColor: style.getPropertyValue('--g-color-private-blue-50').trim(),
+                expectedBackgroundColor,
                 borderBottomWidth: style.borderBottomWidth,
                 boxShadow: style.boxShadow,
                 textDecorationLine: style.textDecorationLine,
