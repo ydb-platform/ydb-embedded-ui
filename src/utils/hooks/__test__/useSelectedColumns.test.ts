@@ -180,6 +180,52 @@ describe('useSelectedColumns', () => {
         expect(columnsToSelect[1].required).toBe(true); // col4
     });
 
+    test('required non-sticky column preserves its saved position', () => {
+        const setSavedColumns = jest.fn();
+        useSetting.mockReturnValue([
+            [
+                {id: 'col2', selected: true},
+                {id: 'col4', selected: false},
+                {id: 'col1', selected: true},
+                {id: 'col3', selected: false},
+                {id: 'col5', selected: false},
+            ],
+            setSavedColumns,
+        ]);
+
+        const requiredColumnsIds = ['col1', 'col4'];
+        const stickyColumnsIds = ['col1'];
+
+        const {result} = renderHook(() =>
+            useSelectedColumns(
+                columns,
+                'test-key',
+                columnsTitles,
+                defaultColumnsIds,
+                requiredColumnsIds,
+                stickyColumnsIds,
+            ),
+        );
+
+        const {columnsToSelect} = result.current;
+
+        expect(columnsToSelect.map((column) => column.id)).toEqual([
+            'col1',
+            'col2',
+            'col4',
+            'col3',
+            'col5',
+        ]);
+        expect(columnsToSelect[2]).toEqual(
+            expect.objectContaining({
+                id: 'col4',
+                required: true,
+                selected: true,
+                sticky: undefined,
+            }),
+        );
+    });
+
     test('columnsToShow contains only selected columns in saved order', () => {
         const setSavedColumns = jest.fn();
         // User has custom order: col3, col1, col2 (col3 and col1 selected)

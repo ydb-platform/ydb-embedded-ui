@@ -10,20 +10,21 @@ import i18n from './i18n';
 
 interface ThreadsProps {
     nodeId: string;
+    database?: string;
     className?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
 }
 
 const THREADS_COLUMNS_WIDTH_LS_KEY = 'threadsTableColumnsWidth';
 
-export function Threads({nodeId, className, scrollContainerRef}: ThreadsProps) {
+export function Threads({nodeId, database, className, scrollContainerRef}: ThreadsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {
         currentData: nodeData,
         isLoading,
         error,
-    } = nodeApi.useGetNodeInfoQuery({nodeId}, {pollingInterval: autoRefreshInterval});
+    } = nodeApi.useGetNodeInfoQuery({nodeId, database}, {pollingInterval: autoRefreshInterval});
 
     const data = nodeData?.Threads || [];
 

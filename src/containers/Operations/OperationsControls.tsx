@@ -5,7 +5,6 @@ import {Select} from '@gravity-ui/uikit';
 import {Search} from '../../components/Search';
 import type {OperationKind} from '../../types/api/operations';
 
-import {OPERATION_KINDS} from './constants';
 import i18n from './i18n';
 import {b} from './shared';
 
@@ -13,6 +12,7 @@ import './Operations.scss';
 
 interface OperationsControlsProps {
     kind: OperationKind;
+    operationKinds: {value: OperationKind; content: string}[];
     searchValue: string;
     handleKindChange: (kind: OperationKind) => void;
     handleSearchChange: (value: string) => void;
@@ -20,6 +20,7 @@ interface OperationsControlsProps {
 
 export function OperationsControls({
     kind,
+    operationKinds,
     searchValue,
     handleKindChange,
     handleSearchChange,
@@ -35,7 +36,7 @@ export function OperationsControls({
             <Select
                 value={[kind]}
                 width={150}
-                options={OPERATION_KINDS}
+                options={operationKinds}
                 onUpdate={(value) => handleKindChange(value[0] as OperationKind)}
             />
         </React.Fragment>

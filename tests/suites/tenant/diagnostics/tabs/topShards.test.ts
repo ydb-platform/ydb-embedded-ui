@@ -16,7 +16,7 @@ test.describe('Diagnostics TopShards tab', async () => {
         const queryEditorParams = {
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         };
 
         const tenantPage = new TenantPage(page);
@@ -32,7 +32,7 @@ test.describe('Diagnostics TopShards tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'topShards',
         };
         const tenantPage = new TenantPage(page);
@@ -48,7 +48,7 @@ test.describe('Diagnostics TopShards tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'topShards',
         };
         const tenantPage = new TenantPage(page);
@@ -67,7 +67,7 @@ test.describe('Diagnostics TopShards tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'topShards',
         };
         const tenantPage = new TenantPage(page);
@@ -87,7 +87,7 @@ test.describe('Diagnostics TopShards tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'topShards',
         };
         const tenantPage = new TenantPage(page);
@@ -114,7 +114,7 @@ test.describe('Diagnostics TopShards tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'topShards',
         };
         const tenantPage = new TenantPage(page);
@@ -138,7 +138,7 @@ test.describe('Diagnostics TopShards tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'topShards',
         };
         const tenantPage = new TenantPage(page);

@@ -6,10 +6,11 @@ import {getPDiskPagePath} from '../../routes';
 import type {VDiskData} from '../../store/reducers/vdisk/types';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {
     formatMetricBytes,
     formatMetricPercent,
-    getConsistentMetricBytesSize,
+    getMetricBytesCommonSize,
 } from '../../utils/storageMetrics';
 
 import {vDiskPageKeyset} from './i18n';
@@ -122,16 +123,18 @@ function CopyableDetailItem({title, value}: CopyableDetailItemProps) {
 }
 
 export function VDiskStorageDetails({className, data}: VDiskStorageDetailsProps) {
+    const isViewerUser = useIsViewerUser();
+
     const used = Number(data?.AllocatedSize);
     const total = Number(data?.SizeLimit);
     const usage = Number(data?.AllocatedPercent);
     const free = Number(data?.FreeSize);
-    const metricsSize = getConsistentMetricBytesSize([used, total, free]);
+    const metricsSize = getMetricBytesCommonSize([used, total, free]);
 
     const {NodeDC, NodeRack, NodeHost, NodeId, PDiskId} = data || {};
 
     const pDiskPath =
-        NodeId !== undefined && PDiskId !== undefined
+        isViewerUser && NodeId !== undefined && PDiskId !== undefined
             ? getPDiskPagePath(PDiskId, NodeId, undefined, {withBasename: true})
             : undefined;
 

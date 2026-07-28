@@ -20,6 +20,34 @@ test.describe('Test Sidebar', async () => {
         await expect(sidebar.isSidebarVisible()).resolves.toBe(true);
     });
 
+    test('App content is a bounded vertical scroll container', async ({page}) => {
+        const navigationContent = page.locator('.kv-navigation__content');
+        const appMain = page.locator('.app__main').first();
+
+        await expect(navigationContent).toHaveCSS('overflow-y', 'hidden');
+        await expect(appMain).toHaveCSS('overscroll-behavior-y', 'contain');
+
+        await appMain.evaluate((element) => {
+            const spacer = document.createElement('div');
+            spacer.style.cssText = 'height: 200vh; flex: none;';
+            element.appendChild(spacer);
+        });
+
+        const dimensions = await appMain.evaluate((element) => ({
+            clientHeight: element.clientHeight,
+            scrollHeight: element.scrollHeight,
+        }));
+
+        expect(dimensions.clientHeight).toBeGreaterThan(0);
+        expect(dimensions.scrollHeight).toBeGreaterThan(dimensions.clientHeight);
+        await appMain.evaluate((element) => {
+            element.scrollTo({top: 200});
+        });
+        await expect
+            .poll(() => appMain.evaluate((element) => element.scrollTop))
+            .toBeGreaterThan(0);
+    });
+
     test('Logo button is visible and clickable', async ({page}) => {
         const sidebar = new Sidebar(page);
         await sidebar.waitForSidebarToLoad();
@@ -116,7 +144,7 @@ test.describe('Test Sidebar', async () => {
             schema: database,
             database,
             backend,
-            tenantPage: 'query',
+            databasePage: 'query',
         };
 
         const tenantPage = new TenantPage(page);
@@ -185,11 +213,6 @@ test.describe('Test Sidebar', async () => {
     });
 
     test('Tenant V2 navigation item uses SPA navigation on regular click', async ({page}) => {
-        await page.addInitScript(() => {
-            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
-            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
-        });
-
         const tenantPage = new TenantPage(page);
         await tenantPage.goto({
             schema: database,
@@ -214,11 +237,6 @@ test.describe('Test Sidebar', async () => {
         page,
         context,
     }) => {
-        await page.addInitScript(() => {
-            localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
-            localStorage.setItem('isV2NavigationAlertSeen', JSON.stringify(true));
-        });
-
         const tenantPage = new TenantPage(page);
         await tenantPage.goto({
             schema: database,

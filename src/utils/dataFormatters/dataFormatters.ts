@@ -194,22 +194,32 @@ export const formatNumber = (number?: unknown) => {
     return configuredNumeral(number).format('0,0.[00000]');
 };
 
+/**
+ * Rounds a value to the specified number of decimal places while compensating for
+ * floating-point precision errors.
+ */
+export const roundToDecimalPlaces = (value: number, precision = 0) => {
+    const multiplier = 10 ** precision;
+    const sign = Math.sign(value);
+    const shiftedValue = Math.abs(value) * multiplier;
+
+    return (sign * Math.round(shiftedValue + Number.EPSILON * shiftedValue)) / multiplier;
+};
+
 export const formatPercent = (number?: unknown, precision = 2, options?: {fixed?: boolean}) => {
     if (!isNumeric(number)) {
         return '';
     }
 
-    // Round precision for very low numbers (e.g. 2e-27 from backend)
-    // Pass as number, not string, to avoid locale decimal separator issues
-
-    // The input is a fraction (e.g. 0.0123), but the output is displayed as percent.
-    // Numeral's '%' format multiplies the value by 100.
-    // If we round the fraction to `precision` too early, we lose digits that must be visible in the percent view.
-    // Example: 0.0123 -> toFixed(2) => 0.01 -> percent => 1% (wrong), expected 1.23%.
-    // Therefore we pre-round the fraction with +2 extra decimal digits: fraction decimals = percent decimals + 2
-
     const numberValue = Number(number);
-    const roundedNumber = Number(numberValue.toFixed(precision + 2));
+
+    if (!Number.isFinite(numberValue)) {
+        return '';
+    }
+
+    // The input is a fraction, while Numeral's '%' format displays it as percent.
+    // Keep two extra fraction digits so percent precision is preserved: 0.0123 -> 1.23%.
+    const roundedNumber = roundToDecimalPlaces(numberValue, precision + 2);
 
     const zeros = '0'.repeat(precision);
     const format = options?.fixed ? `0.${zeros}%` : `0.[${zeros}]%`;

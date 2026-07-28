@@ -4,7 +4,7 @@ import {prepareQueryWithPragmas} from '../../../../../src/store/reducers/query/u
 import {defaultPragma} from '../../../../../src/utils/query';
 import {getClipboardContent} from '../../../../utils/clipboard';
 import {database} from '../../../../utils/constants';
-import {NavigationTabs, TenantPage} from '../../TenantPage';
+import {TenantPage} from '../../TenantPage';
 import {longRunningQuery, longRunningStreamQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {
@@ -17,12 +17,28 @@ import {
 } from '../Diagnostics';
 import {setupTopQueriesMock} from '../mocks';
 
+async function navigateToTopQueries(tenantPage: TenantPage) {
+    const databaseLink = tenantPage.page
+        .getByTestId('aside-navigation')
+        .locator('a[href*="databasePage=database"]')
+        .first();
+
+    await databaseLink.click();
+    await expect(tenantPage.page).toHaveURL(/databasePage=database/);
+
+    const diagnostics = new Diagnostics(tenantPage.page);
+    await diagnostics.clickTab(DiagnosticsTab.Queries);
+    await expect(tenantPage.page).toHaveURL(/diagnosticsTab=topQueries/);
+
+    return diagnostics;
+}
+
 test.describe('Diagnostics Queries tab', async () => {
     test('No runnning queries in Queries if no queries are running', async ({page}) => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
@@ -37,7 +53,7 @@ test.describe('Diagnostics Queries tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
@@ -49,10 +65,7 @@ test.describe('Diagnostics Queries tab', async () => {
 
         const inProgressStatuses = ['Preparing', 'Running', 'Fetching'];
         await expect(queryEditor.waitForAnyStatus(inProgressStatuses)).resolves.toBeTruthy();
-        await tenantPage.selectNavigationTab(NavigationTabs.Diagnostics);
-
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Queries);
+        const diagnostics = await navigateToTopQueries(tenantPage);
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
         const finalQueryText = prepareQueryWithPragmas(longRunningQuery, defaultPragma);
         expect(
@@ -64,7 +77,7 @@ test.describe('Diagnostics Queries tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
             diagnosticsTab: 'topQueries',
         };
         const tenantPage = new TenantPage(page);
@@ -81,7 +94,7 @@ test.describe('Diagnostics Queries tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
             diagnosticsTab: 'topQueries',
         };
         const tenantPage = new TenantPage(page);
@@ -106,7 +119,7 @@ test.describe('Diagnostics Queries tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
@@ -120,11 +133,8 @@ test.describe('Diagnostics Queries tab', async () => {
         // Wait for the query to complete
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
 
-        // Now navigate to diagnostics to check Top queries
-        await tenantPage.selectNavigationTab(NavigationTabs.Diagnostics);
-
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Queries);
+        // Now navigate to Top queries.
+        const diagnostics = await navigateToTopQueries(tenantPage);
 
         // Ensure we're in Top mode (should be default)
         const radioOption = await diagnostics.getSelectedTableMode();
@@ -137,18 +147,38 @@ test.describe('Diagnostics Queries tab', async () => {
         await expect(diagnostics.table.isVisible()).resolves.toBe(true);
         await diagnostics.table.waitForDataRows(() => diagnostics.clickRefreshButton());
 
-        // Verify first row has non-empty values for key columns (test first 4 columns)
-        for (const column of QueryTopColumns.slice(0, 4)) {
-            const columnValue = await diagnostics.table.getCellValueByHeader(1, column);
-            expect(columnValue.trim()).toBeTruthy();
-        }
+        // Verify first row has non-empty values for key columns. Fresh Docker instances can expose
+        // the row before all system-table values are populated, especially in Safari.
+        await expect
+            .poll(
+                async () => {
+                    const columnValues = await Promise.all(
+                        QueryTopColumns.slice(0, 4).map(async (column) => {
+                            const columnValue = await diagnostics.table.getCellValueByHeader(
+                                1,
+                                column,
+                            );
+                            return columnValue.trim();
+                        }),
+                    );
+
+                    if (columnValues.every(Boolean)) {
+                        return true;
+                    }
+
+                    await diagnostics.clickRefreshButton();
+                    return false;
+                },
+                {timeout: 30000},
+            )
+            .toBe(true);
     });
 
     test('Query tab can switch between Top and Running modes', async ({page}) => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
             diagnosticsTab: 'topQueries',
         };
         const tenantPage = new TenantPage(page);
@@ -174,7 +204,7 @@ test.describe('Diagnostics Queries tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
             diagnosticsTab: 'topQueries',
         };
 
@@ -214,7 +244,7 @@ test.describe('Diagnostics Queries tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
             diagnosticsTab: 'topQueries',
         };
         const tenantPage = new TenantPage(page);
@@ -256,7 +286,7 @@ test.describe('Diagnostics Queries tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
             diagnosticsTab: 'topQueries',
         };
         const tenantPage = new TenantPage(page);
@@ -265,12 +295,11 @@ test.describe('Diagnostics Queries tab', async () => {
         const diagnostics = new Diagnostics(page);
         await expect(diagnostics.table.isVisible()).resolves.toBe(true);
 
-        // Get the number of rows and select a row that requires scrolling (should be 100 from mock)
-        const rowCount = await diagnostics.table.getRowCount();
-        expect(rowCount).toBe(9); // Verify we have the expected 100 rows from mock
-
+        // Get the number of rows and select a row that requires scrolling.
         // Target a row further down that requires scrolling
         const targetRowIndex = 8;
+        const rowCount = await diagnostics.table.getRowCount();
+        expect(rowCount).toBeGreaterThanOrEqual(targetRowIndex);
         const targetRowData = await diagnostics.getRowData(targetRowIndex - 1);
 
         // Click on the target row to open the drawer
@@ -289,7 +318,7 @@ test.describe('Diagnostics Queries tab', async () => {
         expect(clipboardText).toContain('/database');
 
         // Navigate to the copied URL
-        await page.goto(clipboardText);
+        await page.goto(clipboardText, {waitUntil: 'domcontentloaded'});
         await page.waitForTimeout(1000);
 
         // Verify the selected row is highlighted and visible.

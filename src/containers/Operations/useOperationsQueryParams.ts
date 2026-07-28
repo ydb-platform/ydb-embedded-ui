@@ -1,6 +1,9 @@
+import React from 'react';
+
 import {NumberParam, StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
+import {useAnalyzeOperationAvailable} from '../../store/reducers/capabilities/hooks';
 import type {OperationKind} from '../../types/api/operations';
 
 const operationKindSchema = z
@@ -13,6 +16,7 @@ const operationKindSchema = z
         'import/s3',
         'import/nfs',
         'buildindex',
+        'analyze',
         'compaction',
         'incbackup',
         'restore',
@@ -20,6 +24,7 @@ const operationKindSchema = z
     .catch('buildindex');
 
 export function useOperationsQueryParams() {
+    const analyzeOperationAvailable = useAnalyzeOperationAvailable();
     const [queryParams, setQueryParams] = useQueryParams({
         kind: StringParam,
         search: StringParam,
@@ -27,29 +32,49 @@ export function useOperationsQueryParams() {
         pageToken: StringParam,
     });
 
-    const kind = operationKindSchema.parse(queryParams.kind) as OperationKind;
+    const queryKind = operationKindSchema.parse(queryParams.kind) as OperationKind;
+    const kind = queryKind === 'analyze' && !analyzeOperationAvailable ? 'buildindex' : queryKind;
     const searchValue = queryParams.search ?? '';
     const pageSize = queryParams.pageSize ?? undefined;
     const pageToken = queryParams.pageToken ?? undefined;
 
-    const handleKindChange = (value: OperationKind) => {
-        setQueryParams({kind: value}, 'replaceIn');
-    };
+    React.useEffect(() => {
+        if (queryKind !== kind) {
+            setQueryParams({kind}, 'replaceIn');
+        }
+    }, [kind, queryKind, setQueryParams]);
 
-    const handleSearchChange = (value: string) => {
-        setQueryParams({search: value || undefined}, 'replaceIn');
-    };
+    const handleKindChange = React.useCallback(
+        (value: OperationKind) => {
+            setQueryParams({kind: value}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
 
-    const handlePageSizeChange = (value: number) => {
-        setQueryParams({pageSize: value}, 'replaceIn');
-    };
+    const handleSearchChange = React.useCallback(
+        (value: string) => {
+            setQueryParams({search: value || undefined}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
 
-    const handlePageTokenChange = (value: string | undefined) => {
-        setQueryParams({pageToken: value}, 'replaceIn');
-    };
+    const handlePageSizeChange = React.useCallback(
+        (value: number) => {
+            setQueryParams({pageSize: value}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+
+    const handlePageTokenChange = React.useCallback(
+        (value: string | undefined) => {
+            setQueryParams({pageToken: value}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
 
     return {
         kind,
+        analyzeOperationAvailable,
         searchValue,
         pageSize,
         pageToken,

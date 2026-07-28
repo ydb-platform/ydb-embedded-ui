@@ -101,6 +101,8 @@
     &:hover,
     &:focus-within,
     &_expanded {
+        z-index: calc(var(--ydb-stack-base-z-index) + 10);
+
         #{$block}__background {
             visibility: visible;
 

@@ -60,5 +60,8 @@
   "settings.enableBlobStorageCapacityMetrics.title": "Blob storage capacity metrics",
 
   "settings.enableTenantNavigationV2.title": "New database navigation",
-  "settings.enableTenantNavigationV2.description": "Puts navigation buttons in the left panel and spreads database tabs between database and diagnostics pages."
+  "settings.enableTenantNavigationV2.description": "Puts navigation buttons in the left panel and spreads database tabs between database and diagnostics pages.",
+
+  "settings.enableStorageExpertMode.title": "Enable storage expert mode",
+  "settings.enableStorageExpertMode.description": "Show \"Expert mode\" button on the Storage groups tab for advanced storage analysis."
 }

@@ -38,6 +38,7 @@
   "context_memory-description": "Memory usage is the total memory consumed by all processes in the database",
   "context_storage-description": "Storage usage shows how much data is stored in the database including user data and indexes",
   "context_network-description": "Network throughput is the average outgoing bandwidth usage across all nodes in the database",
+  "context_metric-summary-used": "used {{value}}",
   "charts.queries-per-second": "Queries per second",
   "charts.queries-latency": "Queries latencies {{percentile}}",
   "charts.cpu-usage": "CPU usage by pool",

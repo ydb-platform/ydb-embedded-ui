@@ -75,6 +75,19 @@ CREATE TABLE ${tableName} (
 PARTITION BY HASH(id)
 WITH (STORE = COLUMN)`;
 };
+
+export const createSecretTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}/my_secret\``
+        : '${1:my_secret}';
+    const valuePlaceholder = params?.relativePath ? '${1:secret_value}' : '${2:secret_value}';
+
+    return `CREATE SECRET ${path} WITH (
+    VALUE = '${valuePlaceholder}',
+    INHERIT_PERMISSIONS = TRUE
+);`;
+};
+
 export const createAsyncReplicationTemplate = () => {
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create-async-replication
 CREATE SECRET secret_name WITH (value="secret_value");
@@ -195,6 +208,27 @@ export const selectQueryTemplate = (params?: SchemaQueryParams) => {
     return `SELECT ${columns}
 FROM ${path}
 ${filters}LIMIT \${5:10};`;
+};
+
+export const selectTopicQueryTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_topic>}';
+    const limit = params?.relativePath ? '${1:10}' : '${2:10}';
+
+    return `SELECT
+    Data,
+    __ydb_create_time as create_time,
+    __ydb_write_time as write_time,
+    __ydb_partition_id as partition_id,
+    __ydb_offset as offset,
+    __ydb_message_group_id as message_group_id,
+    __ydb_seq_no as seq_no
+FROM ${path}
+-- WHERE __ydb_partition_id = 42
+-- AND __ydb_write_time > CurrentUtcTimestamp() - Interval('PT60S')
+-- AND __ydb_offset > 100
+LIMIT ${limit};`;
 };
 
 export const showCreateTableTemplate = (params?: SchemaQueryParams) => {
@@ -332,6 +366,25 @@ export const dropTransferTemplate = (params?: SchemaQueryParams) => {
         ? `\`${normalizeParameter(params.relativePath)}\``
         : '${1:<my_transfer>}';
     return `DROP TRANSFER ${path};`;
+};
+
+export const alterSecretTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_secret>}';
+    const valuePlaceholder = params?.relativePath ? '${1:secret_value}' : '${2:secret_value}';
+
+    return `ALTER SECRET ${path} WITH (
+    VALUE = '${valuePlaceholder}'
+);`;
+};
+
+export const dropSecretTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_secret>}';
+
+    return `DROP SECRET ${path};`;
 };
 
 export const alterAsyncReplicationTemplate = (params?: SchemaQueryParams) => {

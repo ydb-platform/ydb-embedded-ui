@@ -43,6 +43,7 @@ export interface RawBreadcrumbItem {
     text?: string;
     link?: string;
     icon?: JSX.Element;
+    isHome?: boolean;
 }
 
 interface GetBreadcrumbs<T, U = AnyRecord> {
@@ -93,9 +94,9 @@ const getHomePageBreadcrumbs: GetBreadcrumbs<HomePageBreadcrumbsOptions> = (opti
         if (homePageTab === 'clusters') {
             // icon is not rendered properly without text
             // Add UNBREAKABLE_GAP as workaround for proper icon placement
-            return [{text: UNBREAKABLE_GAP, link: clustersPath, icon}];
+            return [{text: UNBREAKABLE_GAP, link: clustersPath, icon, isHome: true}];
         } else {
-            return [{text: UNBREAKABLE_GAP, link: databasesPath, icon}];
+            return [{text: UNBREAKABLE_GAP, link: databasesPath, icon, isHome: true}];
         }
     } else {
         return [{text: clustersTitle, link: clustersPath}];

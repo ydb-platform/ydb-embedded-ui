@@ -33,6 +33,7 @@ export function StorageGroupsComponent({
                 <StorageGroupsControlsWithTableState
                     withTypeSelector
                     withGroupBySelect={storageGroupsHandlerHasGrouping}
+                    columns={columnsToShow}
                 />
             }
             extraControls={

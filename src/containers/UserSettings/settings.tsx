@@ -144,6 +144,12 @@ export const enableTenantNavigationV2Setting: SettingProps = {
     description: i18n('settings.enableTenantNavigationV2.description'),
 };
 
+export const enableStorageExpertModeSetting: SettingProps = {
+    settingKey: SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
+    title: i18n('settings.enableStorageExpertMode.title'),
+    description: i18n('settings.enableStorageExpertMode.description'),
+};
+
 export function applyClusterSpecificQueryStreamingSetting(
     settings: YDBEmbeddedUISettings,
     clusterName?: string,
@@ -225,6 +231,17 @@ export function applyBlobStorageCapacityMetricsSettingAvailability(
     return hideExperimentSetting(settings, SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS);
 }
 
+export function applyStorageExpertModeSettingAvailability(
+    settings: YDBEmbeddedUISettings,
+    available?: boolean,
+): YDBEmbeddedUISettings {
+    if (available) {
+        return settings;
+    }
+
+    return hideExperimentSetting(settings, SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE);
+}
+
 export const showNetworkUtilizationSetting: SettingProps = {
     settingKey: SETTING_KEYS.SHOW_NETWORK_UTILIZATION,
     title: i18n('settings.showNetworkUtilization.title'),
@@ -291,6 +308,7 @@ export const experimentsSection: SettingsSection = {
         enableBlobStorageCapacityMetricsSetting,
         enableTenantNavigationV2Setting,
         enableNewStorageViewSetting,
+        enableStorageExpertModeSetting,
     ],
 };
 

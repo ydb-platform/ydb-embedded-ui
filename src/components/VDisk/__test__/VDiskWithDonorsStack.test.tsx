@@ -1,5 +1,6 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 
+import {EVDiskState} from '../../../types/api/vdisk';
 import type {VDiskProps} from '../VDisk';
 import {VDiskWithDonorsStack} from '../VDiskWithDonorsStack';
 
@@ -53,6 +54,7 @@ describe('VDiskWithDonorsStack', () => {
                 data={{
                     StringifiedId: 'main',
                     NodeId: 1,
+                    VDiskState: EVDiskState.OK,
                     Donors: [{StringifiedId: 'donor-1', NodeId: 2}],
                 }}
             />,
@@ -76,6 +78,7 @@ describe('VDiskWithDonorsStack', () => {
                 data={{
                     StringifiedId: 'main',
                     NodeId: 1,
+                    VDiskState: EVDiskState.OK,
                     Donors: [
                         {StringifiedId: 'donor-1', NodeId: 2},
                         {StringifiedId: 'donor-2', NodeId: 3},
@@ -99,6 +102,7 @@ describe('VDiskWithDonorsStack', () => {
                 data={{
                     StringifiedId: 'main',
                     NodeId: 1,
+                    VDiskState: EVDiskState.OK,
                     Donors: [{StringifiedId: 'donor-1', NodeId: 2}],
                 }}
             />,
@@ -113,6 +117,7 @@ describe('VDiskWithDonorsStack', () => {
                 data={{
                     StringifiedId: 'main',
                     NodeId: 1,
+                    VDiskState: EVDiskState.OK,
                     Donors: [{StringifiedId: 'donor-1', NodeId: 2}],
                 }}
             />,
@@ -135,6 +140,7 @@ describe('VDiskWithDonorsStack', () => {
                 data={{
                     StringifiedId: 'main',
                     NodeId: 1,
+                    VDiskState: EVDiskState.OK,
                     Donors: [
                         {StringifiedId: 'donor-1', NodeId: 2},
                         {StringifiedId: 'donor-2', NodeId: 3},
@@ -164,6 +170,7 @@ describe('VDiskWithDonorsStack', () => {
                 data={{
                     StringifiedId: 'main',
                     NodeId: 1,
+                    VDiskState: EVDiskState.OK,
                     Donors: [
                         {StringifiedId: 'donor-1', NodeId: 2},
                         {StringifiedId: 'donor-2', NodeId: 3},

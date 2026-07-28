@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {StringParam, useQueryParam, useQueryParams} from 'use-query-params';
+import {BooleanParam, StringParam, useQueryParam, useQueryParams} from 'use-query-params';
 
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
@@ -12,7 +12,45 @@ import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../util
 
 import {storageGroupsGroupByParamSchema} from './PaginatedStorageGroupsTable/columns/constants';
 import {storageNodesGroupByParamSchema} from './PaginatedStorageNodesTable/columns/constants';
+import {VDisksGroupBy, vdisksGroupBySchema} from './StorageExpertModePanel/constants';
+import type {VDisksGroupByValue} from './StorageExpertModePanel/constants';
 import {STORAGE_SEARCH_PARAM_BY_TYPE} from './constants';
+
+interface StorageGroupByCleanupParams {
+    blobMetricsEnabled: boolean;
+    storageGroupsGroupBy?: string | null;
+    storageNodesGroupBy?: string | null;
+}
+
+export function getStorageGroupByCleanupPatch({
+    blobMetricsEnabled,
+    storageGroupsGroupBy,
+    storageNodesGroupBy,
+}: StorageGroupByCleanupParams): Record<string, string | undefined> {
+    const patch: Record<string, string | undefined> = {};
+
+    if (blobMetricsEnabled) {
+        if (storageGroupsGroupBy === 'Usage') {
+            patch.storageGroupsGroupBy = undefined;
+        }
+
+        if (storageNodesGroupBy === 'DiskSpaceUsage') {
+            patch.storageNodesGroupBy = undefined;
+        }
+
+        return patch;
+    }
+
+    if (storageGroupsGroupBy === 'CapacityAlert') {
+        patch.storageGroupsGroupBy = undefined;
+    }
+
+    if (storageNodesGroupBy === 'CapacityAlert') {
+        patch.storageNodesGroupBy = undefined;
+    }
+
+    return patch;
+}
 
 export function useStorageQueryParams() {
     const [queryParams, setQueryParams] = useQueryParams({
@@ -24,16 +62,18 @@ export function useStorageQueryParams() {
         uptimeFilter: StringParam,
         storageNodesGroupBy: StringParam,
         storageGroupsGroupBy: StringParam,
+        storageExpertMode: BooleanParam,
+        vdisksGroupBy: StringParam,
     });
 
-    const [_savedStorageType, setSavedStorageType] = useSetting<StorageType>(
+    const [savedStorageType, setSavedStorageType] = useSetting<StorageType>(
         SETTING_KEYS.STORAGE_TYPE,
         STORAGE_TYPES.groups,
     );
 
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
-    const storageType = storageTypeSchema.parse(queryParams.type);
+    const storageType = storageTypeSchema.parse(queryParams.type ?? savedStorageType);
 
     const visibleEntities = visibleEntitiesSchema.parse(queryParams.visible);
     const groupsSearchValue = queryParams.groupsSearch ?? '';
@@ -45,6 +85,21 @@ export function useStorageQueryParams() {
     );
     const storageNodesGroupByParam = storageNodesGroupByParamSchema.parse(
         queryParams.storageNodesGroupBy,
+    );
+
+    const [savedStorageExpertMode, setSavedStorageExpertMode] = useSetting<boolean>(
+        SETTING_KEYS.STORAGE_EXPERT_MODE,
+    );
+
+    const storageExpertMode = Boolean(queryParams.storageExpertMode ?? savedStorageExpertMode);
+
+    const [savedVDisksGroupBy, setSavedVDisksGroupBy] = useSetting<VDisksGroupByValue>(
+        SETTING_KEYS.STORAGE_VDISKS_GROUP_BY,
+        VDisksGroupBy.State,
+    );
+
+    const vdisksGroupBy = vdisksGroupBySchema.parse(
+        queryParams.vdisksGroupBy ?? savedVDisksGroupBy,
     );
 
     React.useEffect(() => {
@@ -93,6 +148,22 @@ export function useStorageQueryParams() {
         [setQueryParams],
     );
 
+    const handleStorageExpertModeChange = React.useCallback(
+        (value: boolean) => {
+            setQueryParams({storageExpertMode: value ? true : undefined}, 'replaceIn');
+            setSavedStorageExpertMode(value);
+        },
+        [setQueryParams, setSavedStorageExpertMode],
+    );
+
+    const handleVDisksGroupByChange = React.useCallback(
+        (value: VDisksGroupByValue) => {
+            setQueryParams({vdisksGroupBy: value}, 'replaceIn');
+            setSavedVDisksGroupBy(value);
+        },
+        [setQueryParams, setSavedVDisksGroupBy],
+    );
+
     const handleShowAllGroups = () => {
         handleVisibleEntitiesChange('all');
     };
@@ -103,28 +174,11 @@ export function useStorageQueryParams() {
     };
 
     React.useEffect(() => {
-        if (blobMetricsEnabled) {
-            const patch: Record<string, string | undefined> = {};
-
-            if (queryParams.storageGroupsGroupBy === 'Usage') {
-                patch.storageGroupsGroupBy = undefined;
-            }
-
-            if (Object.keys(patch).length > 0) {
-                setQueryParams(patch, 'replaceIn');
-            }
-            return;
-        }
-
-        const patch: Record<string, string | undefined> = {};
-
-        if (queryParams.storageGroupsGroupBy === 'CapacityAlert') {
-            patch.storageGroupsGroupBy = undefined;
-        }
-
-        if (queryParams.storageNodesGroupBy === 'CapacityAlert') {
-            patch.storageNodesGroupBy = undefined;
-        }
+        const patch = getStorageGroupByCleanupPatch({
+            blobMetricsEnabled,
+            storageGroupsGroupBy: queryParams.storageGroupsGroupBy,
+            storageNodesGroupBy: queryParams.storageNodesGroupBy,
+        });
 
         if (Object.keys(patch).length > 0) {
             setQueryParams(patch, 'replaceIn');
@@ -144,6 +198,8 @@ export function useStorageQueryParams() {
         nodesUptimeFilter,
         storageGroupsGroupByParam,
         storageNodesGroupByParam,
+        storageExpertMode,
+        vdisksGroupBy,
 
         handleTextFilterGroupsChange,
         handleTextFilterNodesChange,
@@ -153,10 +209,76 @@ export function useStorageQueryParams() {
 
         handleStorageGroupsGroupByParamChange,
         handleStorageNodesGroupByParamChange,
+        handleStorageExpertModeChange,
+        handleVDisksGroupByChange,
 
         handleShowAllGroups,
         handleShowAllNodes,
     };
+}
+
+export function useIsStorageExpertMode() {
+    const [storageExpertModeSettingEnabled] = useSetting<boolean>(
+        SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
+    );
+    const [storageExpertModeQueryParam] = useQueryParam('storageExpertMode', BooleanParam);
+    const [savedStorageExpertMode] = useSetting<boolean>(SETTING_KEYS.STORAGE_EXPERT_MODE);
+
+    return (
+        Boolean(storageExpertModeSettingEnabled) &&
+        Boolean(storageExpertModeQueryParam ?? savedStorageExpertMode)
+    );
+}
+
+export function useVDisksGroupByParam() {
+    const [queryVDisksGroupBy] = useQueryParam('vdisksGroupBy', StringParam);
+    const [savedVDisksGroupBy] = useSetting<VDisksGroupByValue>(
+        SETTING_KEYS.STORAGE_VDISKS_GROUP_BY,
+        VDisksGroupBy.State,
+    );
+
+    return React.useMemo(
+        () => vdisksGroupBySchema.parse(queryVDisksGroupBy ?? savedVDisksGroupBy),
+        [queryVDisksGroupBy, savedVDisksGroupBy],
+    );
+}
+
+export function useSaveVDisksGroupBy() {
+    const [queryVDisksGroupBy, setQueryVDisksGroupBy] = useQueryParam('vdisksGroupBy', StringParam);
+    const [savedVDisksGroupBy] = useSetting<VDisksGroupByValue>(
+        SETTING_KEYS.STORAGE_VDISKS_GROUP_BY,
+        VDisksGroupBy.State,
+    );
+
+    const normalizedVDisksGroupBy = React.useMemo(
+        () => vdisksGroupBySchema.parse(queryVDisksGroupBy ?? savedVDisksGroupBy),
+        [queryVDisksGroupBy, savedVDisksGroupBy],
+    );
+
+    React.useEffect(() => {
+        if (normalizedVDisksGroupBy !== queryVDisksGroupBy) {
+            setQueryVDisksGroupBy(normalizedVDisksGroupBy, 'replaceIn');
+        }
+    }, [normalizedVDisksGroupBy, queryVDisksGroupBy, setQueryVDisksGroupBy]);
+}
+
+export function useSaveStorageExpertMode() {
+    const [queryStorageExpertMode, setQueryStorageExpertMode] = useQueryParam(
+        'storageExpertMode',
+        BooleanParam,
+    );
+    const [savedStorageExpertMode] = useSetting<boolean>(SETTING_KEYS.STORAGE_EXPERT_MODE);
+
+    const normalizedStorageExpertMode = React.useMemo(
+        () => Boolean(queryStorageExpertMode ?? savedStorageExpertMode),
+        [queryStorageExpertMode, savedStorageExpertMode],
+    );
+
+    React.useEffect(() => {
+        if (normalizedStorageExpertMode !== Boolean(queryStorageExpertMode)) {
+            setQueryStorageExpertMode(normalizedStorageExpertMode ? true : undefined, 'replaceIn');
+        }
+    }, [normalizedStorageExpertMode, queryStorageExpertMode, setQueryStorageExpertMode]);
 }
 
 export function useSaveStorageType() {

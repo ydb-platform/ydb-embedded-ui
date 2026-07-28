@@ -22,12 +22,9 @@ export function getActionAndSyntaxFromQueryMode(
     queryMode: QueryMode = 'query',
 ) {
     let action: Actions = baseAction;
-    let syntax: QuerySyntax = 'yql_v1';
+    const syntax: QuerySyntax = 'yql_v1';
 
-    if (queryMode === 'pg') {
-        action = `${baseAction}-query`;
-        syntax = 'pg';
-    } else if (queryMode) {
+    if (queryMode) {
         action = `${baseAction}-${queryMode}`;
     }
 

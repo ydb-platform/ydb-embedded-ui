@@ -23,7 +23,7 @@ test.describe('Query History', () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         };
 
         tenantPage = new TenantPage(page);
@@ -285,7 +285,11 @@ test.describe('Query History', () => {
         expect(nextTabId).not.toBe(modifiedTabId);
         await expect.poll(() => queryEditor.getEditorContent(), {timeout: 5000}).toBe(historyQuery);
 
-        await queryEditor.editorTabs.selectTabById(modifiedTabId!);
+        if (!modifiedTabId) {
+            throw new Error('Modified tab id should be available before selecting history query');
+        }
+
+        await queryEditor.editorTabs.selectTabById(modifiedTabId);
         await expect
             .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
             .toBe(modifiedQuery);

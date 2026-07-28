@@ -15,6 +15,7 @@ type AdditionalQueryParams = {
     name?: string;
     clusterName?: string;
     backend?: string;
+    schema?: string;
     selectedPartition?: string;
     activeOffset?: string;
     metricsTab?: string;

@@ -8,13 +8,18 @@ import {stringifyVdiskId} from '../dataFormatters/dataFormatters';
 import {generateEvaluator} from '../generateEvaluator';
 
 import {
+    COMPACTION_SEVERITY,
+    DATA_SEVERITY,
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     DISK_NUMERIC_SEVERITY_TO_STATE_COLOR,
     DISPLAYED_DISK_ERROR_ICON,
     DONOR_ICON,
+    FRONT_QUEUES_SEVERITY,
     NOT_AVAILABLE_SEVERITY_COLOR,
+    SOLID_RED_SEVERITY,
+    SPACE_SEVERITY,
 } from './constants';
-import type {PreparedVDisk} from './types';
+import type {DiskColor, PreparedVDisk} from './types';
 
 export function isFullVDiskData(
     disk: PreparedVDisk | TVDiskStateInfo | TVSlotId,
@@ -25,19 +30,104 @@ export function isFullVDiskData(
 const getSpaceFlag = generateEvaluator([EFlag.Green, EFlag.Yellow, EFlag.Red]);
 
 export const getSpaceSeverity = (allocatedPercent?: number) => {
-    return isNil(allocatedPercent) ? 0 : getColorSeverity(getSpaceFlag(allocatedPercent));
+    return isNil(allocatedPercent)
+        ? DATA_SEVERITY.GREY
+        : getColorSeverity(getSpaceFlag(allocatedPercent));
 };
 
-export function getSeverityColor(severity: number | undefined) {
+/**
+ * Convert data severity (0-5) to EFlag color.
+ * Used for PreparedVDisk.Severity and PreparedPDisk.Severity in Default mode.
+ * Returns only basic EFlag colors (Grey, Green, Blue, Yellow, Orange, Red).
+ * @param severity - Basic severity level (0-5), or any number (will be clamped to 0-5 range)
+ * @returns EFlag color for visualization
+ */
+export function getDataSeverityColor(severity: number | undefined): EFlag {
+    if (severity === undefined || severity < 0 || severity > DATA_SEVERITY.RED) {
+        return EFlag.Grey;
+    }
+    return (DISK_NUMERIC_SEVERITY_TO_STATE_COLOR[severity] || EFlag.Grey) as EFlag;
+}
+
+/**
+ * Convert display severity (0-22) to disk color.
+ * Used for dynamic coloring in Expert Mode based on grouping strategy.
+ * Handles extended severity ranges for State, Space, FrontQueues, and Compaction modes.
+ * @param severity - Extended severity level (0-22), or any number
+ * @returns Disk color for visualization
+ */
+export function getDisplaySeverityColor(severity: number | undefined): DiskColor {
     if (severity === undefined) {
         return NOT_AVAILABLE_SEVERITY_COLOR;
     }
 
+    // Special case: SOLID_RED_SEVERITY maps to 'solidred' CSS class
+    if (severity === SOLID_RED_SEVERITY) {
+        return 'SolidRed';
+    }
+
+    // Space mode severities (7-15) map to specific space color classes
+    if (severity === SPACE_SEVERITY.GREEN) {
+        return EFlag.Green;
+    }
+    if (severity === SPACE_SEVERITY.CYAN) {
+        return 'SpaceCyan';
+    }
+    if (severity === SPACE_SEVERITY.LIGHT_YELLOW) {
+        return 'SpaceLightYellow';
+    }
+    if (severity === SPACE_SEVERITY.YELLOW) {
+        return EFlag.Yellow;
+    }
+    if (severity === SPACE_SEVERITY.LIGHT_ORANGE) {
+        return 'SpaceLightOrange';
+    }
+    if (severity === SPACE_SEVERITY.PRE_ORANGE) {
+        return 'SpacePreOrange';
+    }
+    if (severity === SPACE_SEVERITY.ORANGE) {
+        return 'SpaceOrange';
+    }
+    if (severity === SPACE_SEVERITY.RED) {
+        return EFlag.Red;
+    }
+    if (severity === SPACE_SEVERITY.BLACK) {
+        return 'SpaceBlack';
+    }
+
+    // FrontQueues mode severities (16-19) map to colors
+    // Grey -> N/D, Green -> OK, Yellow -> Notice, Red -> Warning, SolidRed -> Impaired
+    if (severity === FRONT_QUEUES_SEVERITY.OK) {
+        return EFlag.Green;
+    }
+    if (severity === FRONT_QUEUES_SEVERITY.NOTICE) {
+        return EFlag.Yellow;
+    }
+    if (severity === FRONT_QUEUES_SEVERITY.WARNING) {
+        return EFlag.Red;
+    }
+    if (severity === FRONT_QUEUES_SEVERITY.IMPAIRED) {
+        return 'SolidRed';
+    }
+
+    // Compaction mode severities (20-22) map to colors
+    // Green -> OK, Yellow -> Notice, Red -> Warning
+    if (severity === COMPACTION_SEVERITY.OK) {
+        return EFlag.Green;
+    }
+    if (severity === COMPACTION_SEVERITY.NOTICE) {
+        return EFlag.Yellow;
+    }
+    if (severity === COMPACTION_SEVERITY.WARNING) {
+        return EFlag.Red;
+    }
+
+    // Fallback to basic colors for 0-5
     return DISK_NUMERIC_SEVERITY_TO_STATE_COLOR[severity] || NOT_AVAILABLE_SEVERITY_COLOR;
 }
 
 export function getColorSeverity(color?: EFlag) {
-    return color ? DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[color] : 0;
+    return color ? DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[color] : DATA_SEVERITY.GREY;
 }
 
 export function getPDiskId({

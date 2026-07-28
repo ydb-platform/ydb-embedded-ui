@@ -42,6 +42,7 @@ import {
     addTableIndex,
     addVectorIndex,
     alterAsyncReplicationTemplate,
+    alterSecretTemplate,
     alterStreamingQuerySettingsTemplate,
     alterStreamingQueryText,
     alterTableTemplate,
@@ -59,6 +60,7 @@ import {
     disableTTLTemplate,
     dropAsyncReplicationTemplate,
     dropExternalTableTemplate,
+    dropSecretTemplate,
     dropStreamingQueryTemplate,
     dropTableIndex,
     dropTableTemplate,
@@ -69,6 +71,7 @@ import {
     manageAutoPartitioningTemplate,
     manageReadReplicasTemplate,
     selectQueryTemplate,
+    selectTopicQueryTemplate,
     showCreateTableTemplate,
     upsertQueryTemplate,
 } from './schemaQueryTemplates';
@@ -96,13 +99,17 @@ interface ActionsAdditionalParams {
     hasRunningCompaction?: (path: string) => boolean;
     isCompactionLoading?: boolean;
     schemaData?: SchemaData[];
+    schemaDataPath?: string;
     isSchemaDataLoading?: boolean;
+    isSchemaDataError?: boolean;
     hasMonitoring?: boolean;
     isV2NavigationEnabled?: boolean;
     streamingQueryData?: IQueryResult;
     showCreateTableData?: string;
     isStreamingQueryTextLoading?: boolean;
     isShowCreateTableLoading?: boolean;
+    schemaSecretsEnabled?: boolean;
+    topicsSqlIoOperationsEnabled?: boolean;
 }
 
 interface BindActionParams {
@@ -111,6 +118,19 @@ interface BindActionParams {
     path: string;
     databaseFullPath: string;
     relativePath: string;
+}
+
+function getSchemaDataForAction(
+    schemaData: SchemaData[] | undefined,
+    schemaDataPath: string | undefined,
+    actionPath: string,
+    isSchemaDataError: boolean,
+) {
+    if (isSchemaDataError || schemaDataPath !== actionPath) {
+        return undefined;
+    }
+
+    return schemaData;
 }
 
 const bindActions = (
@@ -130,10 +150,15 @@ const bindActions = (
         getConfirmation,
         getConnectToDBDialog,
         showCompactionDialog,
-        schemaData,
         streamingQueryData,
         showCreateTableData,
     } = additionalEffects;
+    const schemaData = getSchemaDataForAction(
+        additionalEffects.schemaData,
+        additionalEffects.schemaDataPath,
+        params.path,
+        Boolean(additionalEffects.isSchemaDataError),
+    );
 
     const inputQuery = (tmpl: TemplateFn, templateName?: string) => () => {
         const snippet = tmpl({
@@ -236,6 +261,8 @@ const bindActions = (
             stripEllipsis(i18n('actions.alterTransfer')),
         ),
         dropTransfer: inputQuery(dropTransferTemplate, stripEllipsis(i18n('actions.dropTransfer'))),
+        alterSecret: inputQuery(alterSecretTemplate, stripEllipsis(i18n('actions.alterSecret'))),
+        dropSecret: inputQuery(dropSecretTemplate, stripEllipsis(i18n('actions.dropSecret'))),
         alterTable: inputQuery(alterTableTemplate, stripEllipsis(i18n('actions.alterTable'))),
         dropTable: inputQuery(dropTableTemplate, stripEllipsis(i18n('actions.dropTable'))),
         manageAutoPartitioning: inputQuery(
@@ -249,6 +276,10 @@ const bindActions = (
         enableTTL: inputQuery(enableTTLTemplate, stripEllipsis(i18n('actions.enableTTL'))),
         disableTTL: inputQuery(disableTTLTemplate, stripEllipsis(i18n('actions.disableTTL'))),
         selectQuery: inputQuery(selectQueryTemplate, stripEllipsis(i18n('actions.selectQuery'))),
+        selectTopicQuery: inputQuery(
+            selectTopicQueryTemplate,
+            stripEllipsis(i18n('actions.selectQuery')),
+        ),
         showCreateTable: inputQuery(
             showCreateTableTemplate,
             stripEllipsis(i18n('actions.showCreateTable')),
@@ -593,6 +624,9 @@ export const getActions =
             [copyItem],
             [updateTopicItem],
             [
+                ...(additionalEffects.topicsSqlIoOperationsEnabled
+                    ? [{text: i18n('actions.selectQuery'), action: actions.selectTopicQuery}]
+                    : []),
                 {text: i18n('actions.alterTopic'), action: actions.alterTopic},
                 {text: i18n('actions.dropTopic'), action: actions.dropTopic},
             ],
@@ -622,7 +656,13 @@ export const getActions =
 
         const SYSTEM_VIEW_SET: ActionsSet = [
             [copyItem],
-            [{text: i18n('actions.selectQuery'), action: actions.selectQuery}],
+            [
+                getActionWithLoader({
+                    text: i18n('actions.selectQuery'),
+                    action: actions.selectQuery,
+                    isLoading: additionalEffects.isSchemaDataLoading,
+                }),
+            ],
         ];
 
         const ASYNC_REPLICATION_SET: ActionsSet = [
@@ -638,6 +678,14 @@ export const getActions =
             [
                 {text: i18n('actions.alterTransfer'), action: actions.alterTransfer},
                 {text: i18n('actions.dropTransfer'), action: actions.dropTransfer},
+            ],
+        ];
+
+        const SECRET_SET: ActionsSet = [
+            [copyItem],
+            [
+                {text: i18n('actions.alterSecret'), action: actions.alterSecret},
+                {text: i18n('actions.dropSecret'), action: actions.dropSecret},
             ],
         ];
 
@@ -679,6 +727,7 @@ export const getActions =
 
             directory: DIR_SET,
             resource_pool: JUST_COPY,
+            secret: additionalEffects.schemaSecretsEnabled ? SECRET_SET : JUST_COPY,
 
             table: ROW_TABLE_SET,
             column_table: COLUMN_TABLE_SET,

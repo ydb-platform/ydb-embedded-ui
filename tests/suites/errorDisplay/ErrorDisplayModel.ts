@@ -64,6 +64,13 @@ export class ErrorDisplayModel extends BaseModel {
         return this.responseError;
     }
 
+    getDetailValueLocator(label: string): Locator {
+        return this.fieldsDefinitionList
+            .locator('.g-definition-list__item')
+            .filter({has: this.page.locator('dt').filter({hasText: label})})
+            .locator('dd');
+    }
+
     async getResponseErrorText(): Promise<string> {
         return this.responseError.innerText();
     }

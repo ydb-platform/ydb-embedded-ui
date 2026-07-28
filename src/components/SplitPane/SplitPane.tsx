@@ -15,10 +15,12 @@ interface SplitPaneProps {
     children: React.ReactNode;
     defaultSizePaneKey: string;
     direction?: SplitProps['direction'];
+    sizes?: SplitProps['sizes'];
     defaultSizes?: SplitProps['sizes'];
     initialSizes?: SplitProps['sizes'];
     collapsedSizes?: SplitProps['sizes'];
     minSize?: number[];
+    gutterSize?: SplitProps['gutterSize'];
     triggerCollapse?: boolean;
     triggerExpand?: boolean;
     onSplitStartDragAdditional?: VoidFunction;
@@ -29,6 +31,11 @@ const minSizeDefaultInner = [0, 100];
 const sizesDefaultInner = [50, 50];
 const SAVE_DEBOUNCE_MS = 200;
 
+const getGutterStyle: NonNullable<SplitProps['gutterStyle']> = (dimension, gutterSize) => ({
+    [dimension]: `${gutterSize}px`,
+    display: gutterSize === 0 ? 'none' : '',
+});
+
 function SplitPane(props: SplitPaneProps) {
     const [innerSizes, setInnerSizes] = React.useState<number[]>();
     const {
@@ -37,6 +44,8 @@ function SplitPane(props: SplitPaneProps) {
         triggerExpand,
         defaultSizes: defaultSizesProp,
         initialSizes,
+        sizes: sizesProp,
+        gutterSize = 8,
     } = props;
     const [savedSizesString, setSavedSizesString] = useSetting<string | undefined>(
         props.defaultSizePaneKey,
@@ -117,11 +126,12 @@ function SplitPane(props: SplitPaneProps) {
         <React.Fragment>
             <SplitPaneLib
                 direction={props.direction || 'horizontal'}
-                sizes={innerSizes || defaultSizePane}
+                sizes={sizesProp ?? innerSizes ?? defaultSizePane}
                 minSize={props.minSize || [0, 0]}
                 onDrag={onDragHandler}
                 className={b(null, props.direction || 'horizontal')}
-                gutterSize={8}
+                gutterSize={gutterSize}
+                gutterStyle={getGutterStyle}
                 onDragStart={onDragStartHandler}
                 expandToMin
             >

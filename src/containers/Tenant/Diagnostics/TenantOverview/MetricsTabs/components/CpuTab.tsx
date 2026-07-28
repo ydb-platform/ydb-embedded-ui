@@ -1,9 +1,10 @@
 import {Link} from 'react-router-dom';
 
 import {cn} from '../../../../../../utils/cn';
+import {MetricTabCard} from '../../TabCard/MetricTabCard';
 import {ServerlessTabCard} from '../../TabCard/ServerlessTabCard';
-import {UsageTabCard} from '../../TabCard/UsageTabCard';
 import i18n from '../../i18n';
+import type {TenantOverviewMetric} from '../../metricOverview';
 
 import '../MetricsTabs.scss';
 
@@ -12,15 +13,15 @@ const b = cn('tenant-metrics-tabs');
 interface CpuTabProps {
     to: string;
     active: boolean;
+    cpu?: TenantOverviewMetric;
     isServerless: boolean;
-    cpu: {totalUsed: number; totalLimit: number};
 }
 
-export function CpuTab({to, active, isServerless, cpu}: CpuTabProps) {
+export function CpuTab({to, active, cpu, isServerless}: CpuTabProps) {
     return (
         <div className={b('link-container', {active})}>
             <Link to={to} className={b('link')}>
-                {isServerless ? (
+                {isServerless || !cpu ? (
                     <ServerlessTabCard
                         title={i18n('title_cpu-load')}
                         active={active}
@@ -28,10 +29,10 @@ export function CpuTab({to, active, isServerless, cpu}: CpuTabProps) {
                         helpText={i18n('context_cpu-description')}
                     />
                 ) : (
-                    <UsageTabCard
+                    <MetricTabCard
                         title={i18n('title_cpu')}
-                        value={cpu.totalUsed}
-                        limit={cpu.totalLimit}
+                        status={cpu.status}
+                        value={cpu.percentText ?? i18n('value_unavailable-percent')}
                         active={active}
                         description={i18n('context_cpu-tab-description')}
                     />

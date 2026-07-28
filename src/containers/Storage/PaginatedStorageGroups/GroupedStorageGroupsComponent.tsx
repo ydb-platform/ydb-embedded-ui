@@ -172,6 +172,7 @@ export function GroupedStorageGroupsComponent({
                 <StorageGroupsControls
                     withTypeSelector
                     withGroupBySelect
+                    columns={columnsToShow}
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}

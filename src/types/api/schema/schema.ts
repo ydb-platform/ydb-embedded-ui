@@ -301,6 +301,7 @@ export enum EPathType {
     EPathTypeReplication = 'EPathTypeReplication',
     EPathTypeTransfer = 'EPathTypeTransfer',
     EPathTypeResourcePool = 'EPathTypeResourcePool',
+    EPathTypeSecret = 'EPathTypeSecret',
 
     EPathTypeStreamingQuery = 'EPathTypeStreamingQuery',
 }
@@ -312,6 +313,7 @@ export enum EPathSubType {
     EPathSubTypeStreamImpl = 'EPathSubTypeStreamImpl',
     EPathSubTypeVectorKmeansTreeIndexImplTable = 'EPathSubTypeVectorKmeansTreeIndexImplTable',
     EPathSubTypeFulltextIndexImplTable = 'EPathSubTypeFulltextIndexImplTable',
+    EPathSubTypeLocalMinMaxIndex = 'EPathSubTypeLocalMinMaxIndex',
 }
 
 enum EPathState {

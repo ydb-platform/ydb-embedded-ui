@@ -25,7 +25,7 @@ import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {cn} from '../../utils/cn';
 import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {VDISK_LABEL_CONFIG} from '../../utils/disks/constants';
-import {getSeverityColor} from '../../utils/disks/helpers';
+import {getDataSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
@@ -181,7 +181,7 @@ export function VDiskPage() {
                 <EntityPageTitle
                     className={vDiskPageCn('title')}
                     entityName={vDiskPageKeyset('vdisk')}
-                    status={getSeverityColor(Severity)}
+                    status={getDataSeverityColor(Severity)}
                     id={vDiskId}
                     metaInfo={renderTitleMeta()}
                 />

@@ -12,6 +12,25 @@ import type {
 } from '../../types/api/operations';
 import {OPERATION_METADATA_TYPE_URLS} from '../../types/api/operations';
 
+interface ResolveOperationsRenderStateParams {
+    hasData: boolean;
+    hasError: boolean;
+    isLoading: boolean;
+}
+
+export function resolveOperationsRenderState({
+    hasData,
+    hasError,
+    isLoading,
+}: ResolveOperationsRenderStateParams) {
+    return {
+        showEmpty: !hasError && !hasData && !isLoading,
+        showErrorBelowTable: hasError && hasData,
+        showFullError: hasError && !hasData,
+        showTable: hasData || (!hasError && isLoading),
+    };
+}
+
 // Type guards for operation metadata kinds
 export function isIndexBuildMetadata(
     metadata: TOperation['metadata'],

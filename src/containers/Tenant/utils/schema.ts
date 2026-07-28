@@ -13,6 +13,7 @@ const pathSubTypeToNodeType: Record<EPathSubType, NavigationTreeNodeType | undef
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: 'index_table',
     [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: 'index_table',
     [EPathSubType.EPathSubTypeFulltextIndexImplTable]: 'index_table',
+    [EPathSubType.EPathSubTypeLocalMinMaxIndex]: undefined,
 
     [EPathSubType.EPathSubTypeStreamImpl]: undefined,
     [EPathSubType.EPathSubTypeEmpty]: undefined,
@@ -45,12 +46,14 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
     [EPathType.EPathTypeReplication]: 'async_replication',
     [EPathType.EPathTypeTransfer]: 'transfer',
     [EPathType.EPathTypeResourcePool]: 'resource_pool',
+    [EPathType.EPathTypeSecret]: 'secret',
 
     [EPathType.EPathTypeStreamingQuery]: 'streaming_query',
 };
 
 export const nodeTableTypeToPathType: Partial<Record<NavigationTreeNodeType, EPathType>> = {
     table: EPathType.EPathTypeTable,
+    system_table: EPathType.EPathTypeSysView,
     index: EPathType.EPathTypeTableIndex,
     column_table: EPathType.EPathTypeColumnTable,
     external_table: EPathType.EPathTypeExternalTable,
@@ -87,6 +90,7 @@ const pathSubTypeToEntityName: Record<EPathSubType, string | undefined> = {
         'entity-name_vector-index-table',
     ),
     [EPathSubType.EPathSubTypeFulltextIndexImplTable]: i18n('entity-name_fulltext-index-table'),
+    [EPathSubType.EPathSubTypeLocalMinMaxIndex]: undefined,
 
     [EPathSubType.EPathSubTypeStreamImpl]: undefined,
     [EPathSubType.EPathSubTypeEmpty]: undefined,
@@ -117,6 +121,7 @@ const pathTypeToEntityName: Record<EPathType, string | undefined> = {
     [EPathType.EPathTypeReplication]: i18n('entity-name_async-replication'),
     [EPathType.EPathTypeTransfer]: i18n('entity-name_transfer'),
     [EPathType.EPathTypeResourcePool]: i18n('entity-name_resource-pool'),
+    [EPathType.EPathTypeSecret]: i18n('entity-name_secret'),
 };
 
 export const mapPathTypeToEntityName = (
@@ -131,8 +136,14 @@ const indexTypeToEntityName: Record<EIndexType, string | undefined> = {
     [EIndexType.EIndexTypeInvalid]: undefined,
     [EIndexType.EIndexTypeGlobal]: i18n('entity-name_secondary-index'),
     [EIndexType.EIndexTypeGlobalAsync]: i18n('entity-name_secondary-index'),
+    [EIndexType.EIndexTypeGlobalUnique]: i18n('entity-name_secondary-index'),
     [EIndexType.EIndexTypeGlobalVectorKmeansTree]: i18n('entity-name_vector-index'),
     [EIndexType.EIndexTypeGlobalFulltext]: i18n('entity-name_fulltext-index'),
+    [EIndexType.EIndexTypeGlobalFulltextPlain]: i18n('entity-name_fulltext-index'),
+    [EIndexType.EIndexTypeGlobalFulltextRelevance]: i18n('entity-name_fulltext-index'),
+    [EIndexType.EIndexTypeLocalBloomFilter]: i18n('entity-name_secondary-index'),
+    [EIndexType.EIndexTypeLocalBloomNgramFilter]: i18n('entity-name_secondary-index'),
+    [EIndexType.EIndexTypeLocalMinMax]: i18n('entity-name_secondary-index'),
 };
 
 export const mapIndexTypeToEntityName = (type?: EIndexType) => type && indexTypeToEntityName[type];
@@ -172,27 +183,13 @@ const pathTypeToIsTable: Record<EPathType, boolean> = {
     [EPathType.EPathTypeReplication]: false,
     [EPathType.EPathTypeTransfer]: false,
     [EPathType.EPathTypeResourcePool]: false,
+    [EPathType.EPathTypeSecret]: false,
     [EPathType.EPathTypeStreamingQuery]: false,
 };
 
 //if add entity with tableType, make sure that Schema is available in Diagnostics section
 export const isTableType = (pathType?: EPathType) =>
     (pathType && pathTypeToIsTable[pathType]) ?? false;
-
-// ====================
-
-const pathSubTypeToIsIndexImpl: Record<EPathSubType, boolean> = {
-    [EPathSubType.EPathSubTypeSyncIndexImplTable]: true,
-    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: true,
-    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: true,
-    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: true,
-
-    [EPathSubType.EPathSubTypeStreamImpl]: false,
-    [EPathSubType.EPathSubTypeEmpty]: false,
-};
-
-export const isIndexTableType = (subType?: EPathSubType) =>
-    (subType && pathSubTypeToIsIndexImpl[subType]) ?? false;
 
 // ====================
 
@@ -220,6 +217,7 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
     [EPathType.EPathTypeReplication]: false,
     [EPathType.EPathTypeTransfer]: false,
     [EPathType.EPathTypeResourcePool]: false,
+    [EPathType.EPathTypeSecret]: false,
 };
 
 export const isColumnEntityType = (type?: EPathType) => (type && pathTypeToIsColumn[type]) ?? false;
@@ -250,6 +248,7 @@ const pathTypeToIsDatabase: Record<EPathType, boolean> = {
     [EPathType.EPathTypeReplication]: false,
     [EPathType.EPathTypeTransfer]: false,
     [EPathType.EPathTypeResourcePool]: false,
+    [EPathType.EPathTypeSecret]: false,
 };
 
 export const isDatabaseEntityType = (type?: EPathType) =>
@@ -272,6 +271,7 @@ const pathSubTypeToChildless: Record<EPathSubType, boolean> = {
     [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: true,
     [EPathSubType.EPathSubTypeFulltextIndexImplTable]: true,
     [EPathSubType.EPathSubTypeStreamImpl]: true,
+    [EPathSubType.EPathSubTypeLocalMinMaxIndex]: true,
 
     [EPathSubType.EPathSubTypeEmpty]: false,
 };
@@ -285,6 +285,7 @@ const pathTypeToChildless: Record<EPathType, boolean> = {
 
     [EPathType.EPathTypeView]: true,
     [EPathType.EPathTypeResourcePool]: true,
+    [EPathType.EPathTypeSecret]: true,
 
     [EPathType.EPathTypeReplication]: true,
     [EPathType.EPathTypeTransfer]: true,

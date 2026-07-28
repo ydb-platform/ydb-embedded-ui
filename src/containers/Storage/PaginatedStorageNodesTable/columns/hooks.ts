@@ -41,6 +41,10 @@ export function useStorageNodesSelectedColumns({
             skipped.push(...CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS);
         }
 
+        if (blobMetricsEnabled) {
+            skipped.push(NODES_COLUMNS_IDS.DiskSpaceUsage);
+        }
+
         return skipped;
     }, [bridgeModeEnabled, blobMetricsEnabled]);
 

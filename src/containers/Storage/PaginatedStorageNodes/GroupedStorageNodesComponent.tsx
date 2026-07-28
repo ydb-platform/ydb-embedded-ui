@@ -3,11 +3,13 @@ import React from 'react';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
+import {NODES_COLUMNS_TO_DATA_FIELDS} from '../../../components/nodesColumns/constants';
 import {storageApi} from '../../../store/reducers/storage/storage';
-import type {NodesGroupByField} from '../../../types/api/nodes';
+import type {NodesGroupByField, NodesRequiredField} from '../../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
+import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageNodesTable} from '../PaginatedStorageNodesTable/PaginatedStorageNodesTable';
 import {TableGroup} from '../TableGroup/TableGroup';
@@ -19,6 +21,8 @@ import {useStorageColumnsSettings} from '../utils';
 
 import {StorageNodesControls} from './StorageNodesControls';
 import {useStorageNodesColumnsToSelect} from './useStorageNodesColumnsToSelect';
+
+const NODE_SEARCH_FIELDS_REQUIRED = new Set<NodesRequiredField>(['Host', 'NodeName']);
 
 interface StorageNodeGroupProps {
     name: string;
@@ -108,6 +112,15 @@ export function GroupedStorageNodesComponent({
         columnsSettings,
     });
 
+    const searchFieldsRequired = React.useMemo(() => {
+        const activeFieldsRequired = getRequiredDataFields(
+            columnsToShow.map(({name}) => name),
+            NODES_COLUMNS_TO_DATA_FIELDS,
+        );
+
+        return activeFieldsRequired.filter((field) => NODE_SEARCH_FIELDS_REQUIRED.has(field));
+    }, [columnsToShow]);
+
     const {currentData, isFetching, error} = storageApi.useGetStorageNodesInfoQuery(
         {
             database,
@@ -116,6 +129,7 @@ export function GroupedStorageNodesComponent({
             node_id: nodeId,
             group_id: groupId,
             group: storageNodesGroupByParam,
+            fieldsRequired: nodesSearchValue.trim() ? searchFieldsRequired : undefined,
         },
         {
             pollingInterval: autoRefreshInterval,

@@ -16,6 +16,16 @@ export enum NavigationTabs {
     Diagnostics = 'Diagnostics',
 }
 
+const navigationTabToPage: Record<NavigationTabs, string> = {
+    [NavigationTabs.Query]: 'query',
+    [NavigationTabs.Diagnostics]: 'diagnostics',
+};
+
+const navigationTabToLinkName: Record<NavigationTabs, string> = {
+    [NavigationTabs.Query]: 'SQL Editor',
+    [NavigationTabs.Diagnostics]: 'Diagnostics',
+};
+
 export enum QueryEditorMode {
     SingleTab = 'single-tab',
     MultiTab = 'multi-tab',
@@ -27,8 +37,7 @@ export class TenantPage extends PageModel {
     savedQueriesTable: SavedQueriesTable;
     unsavedChangesModal: UnsavedChangesModal;
 
-    private navigation: Locator;
-    private radioGroup: Locator;
+    private asideNavigation: Locator;
     private diagnosticsContainer: Locator;
     private emptyState: Locator;
     private emptyStateTitle: Locator;
@@ -36,8 +45,7 @@ export class TenantPage extends PageModel {
     constructor(page: Page) {
         super(page, databasePage);
 
-        this.navigation = page.locator('.ydb-tenant-navigation');
-        this.radioGroup = this.navigation.locator('.g-segmented-radio-group');
+        this.asideNavigation = page.getByTestId('aside-navigation');
         this.diagnosticsContainer = page.locator('.kv-tenant-diagnostics');
         this.emptyState = page.locator('.empty-state');
         this.emptyStateTitle = this.emptyState.locator('.empty-state__title');
@@ -63,9 +71,17 @@ export class TenantPage extends PageModel {
     }
 
     async selectNavigationTab(tabName: NavigationTabs) {
-        const tabInput = this.radioGroup.locator(`input[value="${tabName.toLowerCase()}"]`);
-        await tabInput.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await tabInput.click();
+        const pageName = navigationTabToPage[tabName];
+        const asideLink = this.asideNavigation.getByRole('link', {
+            name: navigationTabToLinkName[tabName],
+        });
+
+        await Promise.all([
+            this.page.waitForURL((url) => url.searchParams.get('databasePage') === pageName, {
+                timeout: VISIBILITY_TIMEOUT,
+            }),
+            asideLink.click({timeout: VISIBILITY_TIMEOUT}),
+        ]);
     }
 
     async gotoQueryEditor({

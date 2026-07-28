@@ -39,6 +39,7 @@ export const NODES_COLUMNS_IDS = {
     PileName: 'PileName',
     PDiskUsage: CAPACITY_METRICS_COLUMN_IDS.MaxPDiskUsage,
     VDiskSlotUsage: CAPACITY_METRICS_COLUMN_IDS.MaxVDiskSlotUsage,
+    VDiskRawUsage: CAPACITY_METRICS_COLUMN_IDS.MaxVDiskRawUsage,
     CapacityAlert: CAPACITY_METRICS_COLUMN_IDS.CapacityAlert,
 } as const;
 
@@ -147,6 +148,9 @@ export const NODES_COLUMNS_TITLES = {
     get MaxVDiskSlotUsage() {
         return CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage;
     },
+    get MaxVDiskRawUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage;
+    },
     get CapacityAlert() {
         return CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert;
     },
@@ -242,6 +246,7 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     PileName: ['PileName'],
     MaxPDiskUsage: ['MaxPDiskUsage'],
     MaxVDiskSlotUsage: ['MaxVDiskSlotUsage'],
+    MaxVDiskRawUsage: ['MaxVDiskRawUsage'],
     CapacityAlert: ['CapacityAlert'],
 };
 
@@ -275,6 +280,7 @@ const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undef
     PileName: undefined,
     MaxPDiskUsage: 'MaxPDiskUsage',
     MaxVDiskSlotUsage: 'MaxVDiskSlotUsage',
+    MaxVDiskRawUsage: 'MaxVDiskRawUsage',
     CapacityAlert: 'CapacityAlert',
 };
 

@@ -10,10 +10,11 @@
         position: relative;
 
         display: flex;
-        overflow: auto;
+        overflow: hidden;
         flex-direction: column;
 
-        height: 100%;
+        height: calc(100vh - var(--gn-top-alert-height, 0px));
+        min-height: 0;
     }
 
     &__internal-user {

@@ -16,6 +16,7 @@ import type {
     RenderEmptyDataMessage,
     RenderErrorMessage,
 } from './types';
+import {isSortColumnAvailable} from './utils';
 
 import './PaginatedTable.scss';
 
@@ -65,6 +66,7 @@ export const PaginatedTable = <T, F>({
         usePaginatedTableState();
 
     const {sortParams, foundEntities} = tableState;
+    const activeSortParams = isSortColumnAvailable(sortParams, columns) ? sortParams : undefined;
 
     const tableRef = React.useRef<HTMLDivElement>(null);
 
@@ -122,7 +124,7 @@ export const PaginatedTable = <T, F>({
                     fetchData={fetchData}
                     filters={filters}
                     tableName={tableName}
-                    sortParams={sortParams}
+                    sortParams={activeSortParams}
                     getRowClassName={getRowClassName}
                     onRowClick={onRowClick}
                     renderErrorMessage={renderErrorMessage}

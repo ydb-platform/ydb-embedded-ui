@@ -9,7 +9,8 @@ test.describe('Diagnostics Storage tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
+            diagnosticsTab: 'storage',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);

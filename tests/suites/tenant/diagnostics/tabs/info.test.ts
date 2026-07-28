@@ -3,16 +3,71 @@ import type {Locator, Page} from '@playwright/test';
 
 import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
-import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
+import {Diagnostics} from '../Diagnostics';
+
+const METRIC_SUMMARY_SCREENSHOT_VIEWPORT = {width: 1600, height: 1000};
 
 async function expectMetricTabsScreenshot(metricTabs: Locator, name: string) {
     await expect(metricTabs).toBeVisible();
     await expect(metricTabs).toHaveScreenshot(name);
 }
 
+async function setupMonitoringUserMock(page: Page, isAdministrationAllowed = true) {
+    await page.route('**/viewer/json/whoami?*', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                UserSID: 'test-user',
+                UserID: 'test-user-id',
+                AuthType: 'Login',
+                IsViewerAllowed: true,
+                IsMonitoringAllowed: true,
+                IsAdministrationAllowed: isAdministrationAllowed,
+            }),
+        });
+    });
+}
+
+async function setupDirectoryInfoMock(
+    page: Page,
+    path: string,
+    metadata: {PathId?: string; PathVersion?: string} = {},
+) {
+    await page.route('**/viewer/json/describe?*', async (route) => {
+        const url = new URL(route.request().url());
+
+        if (url.searchParams.get('path') !== path) {
+            await route.continue();
+            return;
+        }
+
+        await route.fulfill({
+            json: {
+                Status: 'StatusSuccess',
+                Path: path,
+                PathDescription: {
+                    Self: {
+                        Name: 'test_directory',
+                        PathType: 'EPathTypeDir',
+                        ...metadata,
+                    },
+                },
+            },
+        });
+    });
+}
+
 async function setupMetricTabsTenantInfoMock(
     page: Page,
     tenantType: 'Dedicated' | 'Serverless' = 'Dedicated',
+    {
+        memoryLimit = '1073741824',
+        memoryUsed = '536870912',
+    }: {
+        memoryLimit?: string;
+        memoryUsed?: string;
+    } = {},
 ) {
     await page.route('**/viewer/json/tenantinfo?*', async (route) => {
         await route.fulfill({
@@ -28,7 +83,8 @@ async function setupMetricTabsTenantInfoMock(
                             {Name: 'User', Usage: 0.023, Threads: 100},
                             {Name: 'IO', Usage: 0.9, Threads: 100},
                         ],
-                        MemoryUsed: '536870912',
+                        MemoryUsed: memoryUsed,
+                        MemoryLimit: memoryLimit,
                         DatabaseQuotas: {
                             data_size_soft_quota: '1000000000',
                         },
@@ -47,11 +103,28 @@ async function setupMetricTabsTenantInfoMock(
     });
 }
 
+async function setupTenantInfoWithoutMetricsMock(page: Page) {
+    await page.route('**/viewer/json/tenantinfo?*', async (route) => {
+        await route.fulfill({
+            json: {
+                TenantInfo: [
+                    {
+                        Name: database,
+                        Type: 'Dedicated',
+                        Overall: 'Green',
+                    },
+                ],
+            },
+        });
+    });
+}
+
 async function openInfoTab(page: Page) {
     const pageQueryParams = {
         schema: database,
         database,
-        tenantPage: 'diagnostics',
+        databasePage: 'database',
+        diagnosticsTab: 'database',
     };
     const tenantPage = new TenantPage(page);
     await tenantPage.goto(pageQueryParams);
@@ -65,13 +138,13 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
+            diagnosticsTab: 'database',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
         const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
         await expect(diagnostics.areInfoCardsVisible()).resolves.toBe(true);
     });
 
@@ -79,13 +152,13 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'database',
+            diagnosticsTab: 'database',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
         const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
 
         const utilization = await diagnostics.getResourceUtilization();
 
@@ -111,6 +184,15 @@ test.describe('Diagnostics Info tab', async () => {
         await expectMetricTabsScreenshot(metricTabs, 'info-metric-tabs.png');
     });
 
+    test('Info metric tabs match visual baseline without tenant metrics', async ({page}) => {
+        await setupTenantInfoWithoutMetricsMock(page);
+        const diagnostics = await openInfoTab(page);
+        await expect(diagnostics.areInfoCardsVisible()).resolves.toBe(true);
+
+        const metricTabs = diagnostics.getMetricTabs();
+        await expectMetricTabsScreenshot(metricTabs, 'info-empty-tenant-metric-tabs.png');
+    });
+
     test('Info serverless metric tabs match visual baseline', async ({page}) => {
         await setupMetricTabsTenantInfoMock(page, 'Serverless');
         const diagnostics = await openInfoTab(page);
@@ -130,6 +212,47 @@ test.describe('Diagnostics Info tab', async () => {
         await diagnostics.getMetricTab('Storage').click();
 
         expect(await diagnostics.getMetricTabsWidth()).toEqual(tabsWidthBefore);
+    });
+
+    test('Info metric page summaries match snapshots', async ({page}) => {
+        await page.setViewportSize(METRIC_SUMMARY_SCREENSHOT_VIEWPORT);
+        await setupMetricTabsTenantInfoMock(page);
+        const diagnostics = await openInfoTab(page);
+        await expect(diagnostics.areInfoCardsVisible({includeNetwork: true})).resolves.toBe(true);
+
+        const cpuSummary = diagnostics.getMetricPageSummary('cpu');
+        await expect(cpuSummary).toBeVisible();
+        await expect(cpuSummary).toHaveScreenshot('tenant-info-metric-summary-cpu.png');
+
+        await diagnostics.clickMetricTab('Memory');
+        const memorySummary = diagnostics.getMetricPageSummary('memory');
+        await expect(memorySummary).toBeVisible();
+        await expect(memorySummary).toHaveScreenshot('tenant-info-metric-summary-memory.png');
+
+        await diagnostics.clickMetricTab('Network');
+        const networkSummary = diagnostics.getMetricPageSummary('network');
+        await expect(networkSummary).toBeVisible();
+        await expect(networkSummary).toHaveScreenshot('tenant-info-metric-summary-network.png');
+    });
+
+    test('Info memory metric summary renders adaptive units when values differ by threshold', async ({
+        page,
+    }) => {
+        await page.setViewportSize(METRIC_SUMMARY_SCREENSHOT_VIEWPORT);
+        await setupMonitoringUserMock(page);
+        await setupMetricTabsTenantInfoMock(page, 'Dedicated', {
+            memoryUsed: '1000000',
+            memoryLimit: '36000000000000',
+        });
+        const diagnostics = await openInfoTab(page);
+
+        await diagnostics.clickMetricTab('Memory');
+        const memorySummary = diagnostics.getMetricPageSummary('memory');
+
+        await expect(memorySummary).toBeVisible();
+        await expect(memorySummary).toHaveScreenshot(
+            'tenant-info-metric-summary-memory-mixed-units.png',
+        );
     });
 
     test('Info tab shows healthcheck status when there are issues', async ({page}) => {
@@ -159,26 +282,16 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
-
-        // Healthcheck card should be visible when there are issues
-        const status = await diagnostics.getHealthcheckStatus();
-        expect(status).toBeTruthy();
-
-        // Check for degraded status class
-        const isDegraded = await diagnostics.hasHealthcheckStatusClass(
-            'ydb-healthcheck-preview__icon_degraded',
-        );
-        expect(isDegraded).toBe(true);
+        await expect(page.getByRole('button', {name: 'Degraded: 1 issue'})).toBeVisible();
     });
 
-    test('Info tab hides healthcheck status when status is GOOD with no issues', async ({page}) => {
+    test('Info tab shows healthcheck GOOD status with zero issues', async ({page}) => {
         // Mock healthcheck API to return GOOD status with no issues
         await page.route(`**/viewer/json/healthcheck?*`, async (route) => {
             await route.fulfill({
@@ -192,17 +305,13 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
-
-        // Healthcheck card should not be visible when status is GOOD with no issues
-        const healthcheckCard = page.locator('.ydb-healthcheck-preview');
-        await expect(healthcheckCard).toHaveCount(0);
+        await expect(page.getByRole('button', {name: 'Good: 0 issues'})).toBeVisible();
     });
 
     test('Info tab shows healthcheck status when status is GOOD but has issues', async ({page}) => {
@@ -230,27 +339,18 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
-
-        // Healthcheck card should be visible when there are issues, even if status is GOOD
-        const status = await diagnostics.getHealthcheckStatus();
-        expect(status).toBeTruthy();
-
-        // Check for good status class
-        const isGood = await diagnostics.hasHealthcheckStatusClass(
-            'ydb-healthcheck-preview__icon_good',
-        );
-        expect(isGood).toBe(true);
+        await expect(page.getByRole('button', {name: 'Good: 1 issue'})).toBeVisible();
     });
 
     test('Info tab displays overlap_clusters for vector index', async ({page}) => {
         const mockIndexPath = '/local/test_table/my_vector_index';
+        await setupMonitoringUserMock(page, false);
 
         // Mock describe API to return a vector index with overlap_clusters
         await page.route(`**/viewer/json/describe?*`, async (route) => {
@@ -268,12 +368,16 @@ test.describe('Diagnostics Info tab', async () => {
                             Self: {
                                 Name: 'my_vector_index',
                                 PathType: 'EPathTypeTableIndex',
+                                PathId: '42',
+                                PathVersion: '7',
+                                CreateStep: '1710000000000',
                             },
                             TableIndex: {
                                 Name: 'my_vector_index',
                                 Type: 'EIndexTypeGlobalVectorKmeansTree',
                                 State: 'EIndexStateReady',
                                 KeyColumnNames: ['embedding'],
+                                DataColumnNames: [],
                                 VectorIndexKmeansTreeDescription: {
                                     Settings: {
                                         clusters: 128,
@@ -298,17 +402,20 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: mockIndexPath,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
-
         // Verify vector index settings are displayed including overlap_clusters
-        const infoContent = page.locator('.ydb-diagnostics-table-info');
+        const infoContent = page.locator('.kv-detailed-overview');
         await infoContent.waitFor({state: 'visible', timeout: 10000});
+        await expect(infoContent.getByText('ID', {exact: true})).toHaveCount(0);
+        await expect(infoContent.getByText('Version', {exact: true})).toHaveCount(0);
+        await expect(infoContent.getByText('Columns', {exact: true})).toBeVisible();
+        await expect(infoContent.getByText('embedding', {exact: true})).toBeVisible();
+        await expect(infoContent.getByText('Includes', {exact: true})).toHaveCount(0);
 
         // Check Index Settings section contains Overlap Clusters
         const indexSettings = infoContent.locator('.info-viewer');
@@ -343,6 +450,9 @@ test.describe('Diagnostics Info tab', async () => {
                             Self: {
                                 Name: 'my_fulltext_index',
                                 PathType: 'EPathTypeTableIndex',
+                                PathId: '42',
+                                PathVersion: '7',
+                                CreateStep: '1710000000000',
                             },
                             TableIndex: {
                                 Name: 'my_fulltext_index',
@@ -378,16 +488,14 @@ test.describe('Diagnostics Info tab', async () => {
         const pageQueryParams = {
             schema: mockIndexPath,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Info);
-
         // Verify fulltext index settings are displayed
-        const infoContent = page.locator('.ydb-diagnostics-table-info');
+        const infoContent = page.locator('.kv-detailed-overview');
         await infoContent.waitFor({state: 'visible', timeout: 10000});
 
         // Check Index Settings section contains fulltext-specific fields
@@ -400,5 +508,181 @@ test.describe('Diagnostics Info tab', async () => {
 
         // Visual snapshot of fulltext index info with all settings
         await expect(infoContent).toHaveScreenshot('fulltext-index-info-settings.png');
+    });
+
+    test('Info tab omits undefined schema metadata', async ({page}) => {
+        const mockDirectoryPath = '/local/test_directory';
+        await setupDirectoryInfoMock(page, mockDirectoryPath);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockDirectoryPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        await expect(infoContent).toBeVisible();
+        await expect(infoContent.getByText('ID', {exact: true})).toHaveCount(0);
+        await expect(infoContent.getByText('Version', {exact: true})).toHaveCount(0);
+    });
+
+    test('Info tab displays schema metadata for administrators', async ({page}) => {
+        const mockDirectoryPath = '/local/test_directory';
+        await setupMonitoringUserMock(page);
+        await setupDirectoryInfoMock(page, mockDirectoryPath, {
+            PathId: '42',
+            PathVersion: '7',
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockDirectoryPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        await expect(infoContent).toBeVisible();
+        await expect(infoContent.getByText('42', {exact: true})).toBeVisible();
+        await expect(infoContent.getByText('7', {exact: true})).toBeVisible();
+    });
+
+    test('Streaming Query Info remains available when describe fails', async ({page}) => {
+        test.slow();
+
+        const mockStreamingQueryPath = '/local/test_streaming_query';
+
+        await page.route('**/viewer/json/describe?*', async (route) => {
+            const url = new URL(route.request().url());
+            const path = url.searchParams.get('path');
+            const subs = url.searchParams.get('subs');
+
+            if (path === mockStreamingQueryPath && subs === '0') {
+                await route.fulfill({
+                    status: 500,
+                    contentType: 'application/json',
+                    json: {error: 'Streaming Query describe is not supported'},
+                });
+                return;
+            }
+
+            if (path === database && subs === '1') {
+                await route.fulfill({
+                    json: {
+                        Path: database,
+                        PathDescription: {
+                            Self: {
+                                Name: 'local',
+                                PathType: 'EPathTypeSubDomain',
+                            },
+                            Children: [
+                                {
+                                    Name: 'test_streaming_query',
+                                    PathType: 'EPathTypeStreamingQuery',
+                                },
+                            ],
+                        },
+                    },
+                });
+                return;
+            }
+
+            await route.continue();
+        });
+
+        await page.route('**/viewer/json/query?*', async (route) => {
+            await route.fulfill({
+                json: {
+                    version: 8,
+                    result: [
+                        {
+                            rows: [['RUNNING', '{}', 'SELECT 1;']],
+                            columns: [
+                                {name: 'State', type: 'Utf8?'},
+                                {name: 'Error', type: 'Utf8?'},
+                                {name: 'Text', type: 'Utf8?'},
+                            ],
+                        },
+                    ],
+                },
+            });
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockStreamingQueryPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        await expect(infoContent.getByText('RUNNING')).toBeVisible();
+        await expect(infoContent.locator('.ydb-yql-code-preview .shiki')).toBeVisible();
+        const infoContentBox = await infoContent.boundingBox();
+        if (!infoContentBox) {
+            throw new Error('Cannot take Streaming Query Info screenshot');
+        }
+        await expect(page).toHaveScreenshot('streaming-query-info-describe-fallback.png', {
+            clip: infoContentBox,
+        });
+    });
+
+    test('View Info includes YQL code preview', async ({page}) => {
+        const mockViewPath = '/local/test_view';
+
+        await setupMonitoringUserMock(page, false);
+        await page.route('**/viewer/json/describe?*', async (route) => {
+            const url = new URL(route.request().url());
+
+            if (url.searchParams.get('path') !== mockViewPath) {
+                await route.continue();
+                return;
+            }
+
+            await route.fulfill({
+                json: {
+                    Status: 'StatusSuccess',
+                    Path: mockViewPath,
+                    PathDescription: {
+                        Self: {
+                            Name: 'test_view',
+                            PathType: 'EPathTypeView',
+                            PathId: '42',
+                            PathVersion: '7',
+                            CreateStep: '1710000000000',
+                        },
+                        ViewDescription: {
+                            QueryText: [
+                                'SELECT',
+                                '    series_id,',
+                                '    title,',
+                                '    release_date',
+                                'FROM series',
+                                'WHERE release_date >= Date("2020-01-01");',
+                            ].join('\n'),
+                        },
+                    },
+                },
+            });
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockViewPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        const yqlCodePreview = infoContent.locator('.ydb-yql-code-preview');
+
+        await expect(yqlCodePreview).toBeVisible();
+        await expect(yqlCodePreview.locator('.shiki')).toBeVisible();
+        await expect(infoContent).toHaveScreenshot('view-info-yql-code-preview.png');
     });
 });

@@ -12,3 +12,5 @@ export * from './useAclSyntax';
 export * from './useScrollPosition';
 export * from './useResourcePools';
 export * from './useCompactionFeature';
+export * from './useSchemaSecretsFeature';
+export * from './useTopicsSqlIoOperationsFeature';

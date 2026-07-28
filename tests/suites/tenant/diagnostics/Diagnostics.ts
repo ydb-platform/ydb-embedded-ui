@@ -347,12 +347,14 @@ export class Diagnostics {
         this.operations = new OperationsTable(page);
         this.tabs = page.locator('.ydb-database-diagnostics-tabs__tabs');
         this.tableControls = page.locator('.ydb-table-with-controls-layout__controls');
-        this.schemaViewer = page.locator('.schema-viewer');
+        const diagnosticsPage = page.locator('.kv-tenant-diagnostics__page-wrapper');
+        this.schemaViewer = diagnosticsPage.locator('.schema-viewer');
         this.dataTable = page.locator('.data-table__table');
-        this.primaryKeys = page.locator('.schema-viewer__keys_type_primary');
+        this.primaryKeys = diagnosticsPage.locator('.schema-viewer__keys_type_primary');
         this.refreshButton = page.locator('button[aria-label="Refresh"]');
         this.autoRefreshSelect = page.locator('.g-select');
-        this.table = new Table(page.locator('.object-general'));
+        this.metricTabs = page.locator(METRIC_TABS_SELECTOR);
+        this.table = new Table(page.locator('.object-general, .kv-tenant-diagnostics'));
         this.tableRadioButton = page.locator(
             '.ydb-table-with-controls-layout__controls .g-segmented-radio-group',
         );
@@ -360,7 +362,6 @@ export class Diagnostics {
         this.copyLinkButton = page.locator('.ydb-copy-link-button__icon');
 
         // Info tab cards
-        this.metricTabs = page.locator(METRIC_TABS_SELECTOR);
         this.cpuCard = this.getMetricTab('CPU');
         this.storageCard = this.getMetricTab('Storage');
         this.memoryCard = this.getMetricTab('Memory');
@@ -433,6 +434,14 @@ export class Diagnostics {
         return this.metricTabs.locator(METRIC_TAB_SELECTOR).filter({
             has: this.page.locator(`${METRIC_TAB_TITLE_SELECTOR}:text-is("${title}")`),
         });
+    }
+
+    async clickMetricTab(title: string): Promise<void> {
+        await this.getMetricTab(title).click();
+    }
+
+    getMetricPageSummary(metric: string): Locator {
+        return this.page.locator(`[data-qa="tenant-page-metric-summary-${metric}"]`);
     }
 
     async areInfoCardsVisible({includeNetwork = false}: {includeNetwork?: boolean} = {}) {
@@ -582,7 +591,11 @@ export class Diagnostics {
     }
 
     async isRowActive(rowIndex: number): Promise<boolean> {
-        const rowElement = this.dataTable.locator(`tr.data-table__row:nth-child(${rowIndex})`);
+        const rowElement = this.page
+            .locator(
+                '.kv-top-queries__row, .kv-running-queries__row, .ydb-query-history__row, tr.data-table__row',
+            )
+            .nth(rowIndex - 1);
         const rowElementClass = await rowElement.getAttribute('class');
         return rowElementClass?.includes('kv-top-queries__row_active') || false;
     }

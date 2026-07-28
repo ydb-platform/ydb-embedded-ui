@@ -3,13 +3,10 @@ import {Flex, HelpMark, Text} from '@gravity-ui/uikit';
 import type {StorageUsageSection} from '../../../../store/reducers/storageUsage/StorageUsage';
 import {cn} from '../../../../utils/cn';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
+import {getMetricBytesCommonSize} from '../../../../utils/storageMetrics';
 import i18n from '../i18n';
 
-import {
-    formatMetricBytes,
-    formatOverhead,
-    getConsistentMetricBytesSize,
-} from './storageUsageFormatters';
+import {formatMetricBytes, formatOverhead} from './storageUsageFormatters';
 
 import './MediaSectionSummary.scss';
 
@@ -42,7 +39,7 @@ function MetricCard({title, value, note}: MetricCardProps) {
 }
 
 export function MediaSectionSummary({section}: MediaSectionSummaryProps) {
-    const metricBytesSize = getConsistentMetricBytesSize([section.dataSize, section.diskUsage]);
+    const metricBytesSize = getMetricBytesCommonSize([section.dataSize, section.diskUsage]);
 
     return (
         <div className={b('cards')}>

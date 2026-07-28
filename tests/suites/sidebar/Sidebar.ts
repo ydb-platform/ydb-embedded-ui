@@ -40,9 +40,9 @@ export class Sidebar {
         this.hotkeysPanel = page.locator(hotkeysPanelSelector).first();
         this.drawerMenu = page.getByTestId('user-settings');
 
-        this.informationButton = this.getFooterButton('aside-information', 'Information');
-        this.settingsButton = this.getFooterButton('aside-settings', 'Settings');
-        this.accountButton = this.getFooterButton('aside-user', 'Account');
+        this.informationButton = this.getFooterButton('aside-information');
+        this.settingsButton = this.getFooterButton('aside-settings');
+        this.accountButton = this.getFooterButton('aside-user');
 
         this.collapseButton = this.sidebarContainer.getByRole('button', {
             name: /^(Collapse|Expand)$/,
@@ -78,12 +78,12 @@ export class Sidebar {
     }
 
     async clickSettings() {
-        await this.settingsButton.click();
+        await this.clickFooterButton(this.settingsButton);
         await this.getSettingsRoot().waitFor({state: 'visible'});
     }
 
     async clickInformation() {
-        await this.informationButton.click();
+        await this.clickFooterButton(this.informationButton);
         await this.popupContent.waitFor({state: 'visible'});
     }
 
@@ -138,7 +138,7 @@ export class Sidebar {
     }
 
     async clickAccount() {
-        await this.accountButton.click();
+        await this.clickFooterButton(this.accountButton);
     }
 
     async toggleCollapse() {
@@ -275,11 +275,12 @@ export class Sidebar {
         return this.page.getByTestId('aside-user-popup');
     }
 
-    private getFooterButton(qa: string, title: string): Locator {
-        return this.page
-            .getByTestId(qa)
-            .or(this.page.getByRole('button', {name: title}))
-            .first();
+    private getFooterButton(qa: string): Locator {
+        return this.page.getByTestId(qa);
+    }
+
+    private async clickFooterButton(button: Locator): Promise<void> {
+        await button.click();
     }
 
     private getSettingsSwitch(title: string): Locator {

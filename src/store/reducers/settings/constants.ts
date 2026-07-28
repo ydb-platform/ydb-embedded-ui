@@ -45,6 +45,9 @@ export const SETTING_KEYS = {
     ENABLE_BLOB_STORAGE_CAPACITY_METRICS: 'blobStorageCapacityMetrics',
     ENABLE_TENANT_NAVIGATION_V2: 'enableTenantNavigationV2',
     IS_V2_NAVIGATION_ALERT_SEEN: 'isV2NavigationAlertSeen',
+    ENABLE_STORAGE_EXPERT_MODE: 'enableStorageExpertMode',
+    STORAGE_EXPERT_MODE: 'storageExpertMode',
+    STORAGE_VDISKS_GROUP_BY: 'storageVDisksGroupBy',
 } as const;
 
 export type SettingKey = ValueOf<typeof SETTING_KEYS>;
@@ -84,9 +87,12 @@ export const DEFAULT_USER_SETTINGS = {
     [SETTING_KEYS.QUERY_EXECUTION_SETTINGS]: DEFAULT_QUERY_SETTINGS,
     [SETTING_KEYS.ACL_SYNTAX]: AclSyntax.YdbShort,
     [SETTING_KEYS.STORAGE_TYPE]: STORAGE_TYPES.groups,
-    [SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS]: true,
-    [SETTING_KEYS.ENABLE_TENANT_NAVIGATION_V2]: false,
+    [SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS]: false,
+    [SETTING_KEYS.ENABLE_TENANT_NAVIGATION_V2]: true,
     [SETTING_KEYS.IS_V2_NAVIGATION_ALERT_SEEN]: false,
+    [SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE]: false,
+    [SETTING_KEYS.STORAGE_EXPERT_MODE]: false,
+    [SETTING_KEYS.STORAGE_VDISKS_GROUP_BY]: 'State',
 } as const satisfies Record<SettingKey, unknown>;
 
 export const SETTINGS_OPTIONS: Record<string, SettingOptions | undefined> = {

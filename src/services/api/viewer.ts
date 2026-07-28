@@ -448,7 +448,7 @@ export class ViewerAPI extends BaseYdbAPI {
         return this.post<QueryAPIResponse<Action> | ErrorResponse | null>(
             this.getPath('/viewer/json/query'),
             {...params, base64},
-            {schema: 'multi', base64, timeout: params.timeout},
+            {database: params.database, schema: 'multi', base64, timeout: params.timeout},
             {
                 concurrentId,
                 timeout: params.timeout,
@@ -680,7 +680,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 partition_id: partitionId,
                 offset,
             },
-            {},
+            {database},
             {concurrentId, requestConfig: {signal}},
         );
     }

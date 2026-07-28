@@ -42,6 +42,7 @@ export interface PreparedStorageNode
 
     MaxPDiskUsage?: number;
     MaxVDiskSlotUsage?: number;
+    MaxVDiskRawUsage?: number;
     CapacityAlert?: ECapacityAlert | string;
 }
 

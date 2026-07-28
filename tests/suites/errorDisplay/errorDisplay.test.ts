@@ -641,7 +641,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         await setupTenantInfo400Mock(page);
 
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({database, tenantPage: 'diagnostics'});
+        await tenantPage.goto({database, databasePage: 'database', diagnosticsTab: 'database'});
 
         const errorDisplay = new ErrorDisplayModel(page);
         await errorDisplay.waitForResponseError();
@@ -651,6 +651,9 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
             'error-tenant-overview-400.png',
+            {
+                mask: [errorDisplay.getDetailValueLocator('URL')],
+            },
         );
         await page.screenshot({
             path: `${FULL_PAGE_DIR}/full-tenant-overview-400.png`,
@@ -665,7 +668,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'database',
+            databasePage: 'database',
             diagnosticsTab: 'monitoring',
         });
 
@@ -711,7 +714,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'database',
+            databasePage: 'database',
             diagnosticsTab: 'monitoring',
         });
 
@@ -735,6 +738,13 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
             'error-monitoring-generic-json-collapsed.png',
+            {
+                mask: [
+                    errorDisplay.getDetailValueLocator('URL'),
+                    errorDisplay.getDetailValueLocator('Code'),
+                    errorDisplay.getDetailValueLocator('Message'),
+                ],
+            },
         );
 
         expect(await errorDisplay.isResponseBodyTriggerVisible()).toBe(true);
@@ -746,6 +756,13 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
             'error-monitoring-generic-json-expanded.png',
+            {
+                mask: [
+                    errorDisplay.getDetailValueLocator('URL'),
+                    errorDisplay.getDetailValueLocator('Code'),
+                    errorDisplay.getDetailValueLocator('Message'),
+                ],
+            },
         );
         await page.screenshot({
             path: `${FULL_PAGE_DIR}/full-monitoring-generic-json.png`,
@@ -759,7 +776,12 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         await setupDescribe403Mock(page);
 
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'diagnostics'});
+        await tenantPage.goto({
+            schema: database,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
 
         const errorDisplay = new ErrorDisplayModel(page);
         await errorDisplay.waitForAccessDenied();
@@ -839,7 +861,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         page,
     }) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+        await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
         await toggleExperiment(page, 'off', 'Query Streaming');
         await setupQueryResult500Mock(page);
@@ -876,7 +898,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
     test('Query result — network error shows ResponseError', async ({page}) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+        await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
         await toggleExperiment(page, 'off', 'Query Streaming');
         await setupQueryResultNetworkErrorMock(page);
@@ -907,7 +929,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         page,
     }) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+        await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
         await setupStreamingQuery500Mock(page);
 
@@ -951,7 +973,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         page,
     }) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+        await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
         const cleanup = await setupStreamingQueryMidStreamErrorMock(page);
 
@@ -992,7 +1014,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         page,
     }) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+        await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
         await setupStreamingQueryNetworkErrorMock(page);
 
@@ -1025,7 +1047,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         page,
     }) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+        await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
         await setupMockStreamingNonJsonChunk(page);
 

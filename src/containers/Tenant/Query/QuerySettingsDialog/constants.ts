@@ -68,11 +68,6 @@ const QUERY_MODE_SELECT_OPTIONS = [
         content: QUERY_MODES_TITLES[QUERY_MODES.data],
         text: i18n('method-description.data'),
     },
-    {
-        value: QUERY_MODES.pg,
-        content: QUERY_MODES_TITLES[QUERY_MODES.pg],
-        text: i18n('method-description.pg'),
-    },
 ];
 
 const STATISTICS_MODE_SELECT_OPTIONS = [

@@ -34,7 +34,7 @@ export function formatProgressText(
     capacityText: string | number | undefined,
     numericCapacity: number,
 ): string {
-    if (numericCapacity <= 0) {
+    if (!Number.isFinite(numericCapacity) || numericCapacity <= 0) {
         return String(valueText);
     }
     return i18n('context_capacity-usage', {value: valueText, capacity: capacityText});

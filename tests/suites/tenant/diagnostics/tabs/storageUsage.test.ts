@@ -31,6 +31,37 @@ interface StorageUsageMockMedia {
     DataSize?: number;
 }
 
+async function setupStorageUsageAccessMocks(page: Page) {
+    await page.route('**/viewer/json/whoami?*', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                UserSID: 'test-user',
+                UserID: 'test-user-id',
+                AuthType: 'Login',
+                IsViewerAllowed: true,
+                IsMonitoringAllowed: true,
+                IsAdministrationAllowed: true,
+            }),
+        });
+    });
+
+    await page.route('**/viewer/capabilities*', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                Database: database,
+                Capabilities: {
+                    '/storage/groups': 10,
+                    '/viewer/storage_stats': 1,
+                },
+            }),
+        });
+    });
+}
+
 async function setupStorageUsageMocks({
     page,
     path,
@@ -152,7 +183,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         });
 
         const queryEditor = new QueryEditor(page);
@@ -162,7 +193,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: tablePath,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
         });
 
         const diagnostics = new Diagnostics(page);
@@ -183,7 +214,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: database,
             database,
-            tenantPage: 'query',
+            databasePage: 'query',
         });
 
         const queryEditor = new QueryEditor(page);
@@ -219,7 +250,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: tablePath,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
@@ -275,7 +306,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: MOCK_STORAGE_USAGE_PATH,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
@@ -286,6 +317,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
     });
 
     test('Storage usage renders multiple media sections', async ({page}) => {
+        await setupStorageUsageAccessMocks(page);
         await setupStorageUsageMocks({
             page,
             path: MOCK_STORAGE_USAGE_PATH,
@@ -334,12 +366,12 @@ test.describe('Diagnostics Storage usage tab', async () => {
                 {
                     Kind: 'SSD',
                     StorageSize: 113000000000,
-                    DataSize: 22600000000,
+                    DataSize: 1000000,
                 },
                 {
                     Kind: 'ROT',
                     StorageSize: 387000000000,
-                    DataSize: 77400000000,
+                    DataSize: 1000000000,
                 },
             ],
         });
@@ -348,7 +380,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: MOCK_STORAGE_USAGE_PATH,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
@@ -356,6 +388,8 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await expect(storageUsage).toBeVisible({timeout: VISIBILITY_TIMEOUT});
         await expect(storageUsage.getByText('SSD', {exact: true}).first()).toBeVisible();
         await expect(storageUsage.getByText('HDD', {exact: true}).first()).toBeVisible();
+        await expect(storageUsage.getByText(/^1\s*MB$/, {exact: true})).toBeVisible();
+        await expect(storageUsage.getByText(/^1\s*GB$/, {exact: true})).toBeVisible();
         await expect(storageUsage).toHaveScreenshot('storage-usage-multi-media.png');
     });
 
@@ -403,7 +437,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: MOCK_STORAGE_USAGE_MEDIA_STATS_PATH,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
@@ -437,7 +471,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: MOCK_STORAGE_USAGE_MEDIA_STATS_PATH,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
@@ -490,7 +524,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: MOCK_STORAGE_USAGE_MEDIA_STATS_PATH,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 
@@ -547,7 +581,7 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await tenantPage.goto({
             schema: MOCK_COLUMN_STORAGE_USAGE_PATH,
             database,
-            tenantPage: 'diagnostics',
+            databasePage: 'diagnostics',
             diagnosticsTab: 'storageUsage',
         });
 

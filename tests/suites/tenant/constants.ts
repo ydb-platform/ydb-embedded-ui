@@ -4,7 +4,8 @@
 export const simpleQuery = 'SELECT 1;';
 export const VISIBILITY_TIMEOUT = 10 * 1000;
 export const longTableSelect = (limit?: number) =>
-    'SELECT * FROM `.sys/pg_class`' + (limit ? ` LIMIT ${limit};` : ';');
+    'SELECT x FROM AS_TABLE(AsList(AsStruct(ListFromRange(1, 10) AS x))) FLATTEN BY x' +
+    (limit ? ` LIMIT ${limit};` : ';');
 
 // 400 is pretty enough
 export const longRunningQuery = new Array(400).fill(simpleQuery).join('');

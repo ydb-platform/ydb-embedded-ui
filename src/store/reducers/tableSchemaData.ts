@@ -29,12 +29,15 @@ export const tableSchemaDataApi = api.injectEndpoints({
                 try {
                     if (isViewType(type)) {
                         const response = await dispatch(
-                            viewSchemaApi.endpoints.getViewSchema.initiate({
-                                database,
-                                path,
-                                databaseFullPath,
-                                timeout: TABLE_SCHEMA_TIMEOUT,
-                            }),
+                            viewSchemaApi.endpoints.getViewSchema.initiate(
+                                {
+                                    database,
+                                    path,
+                                    databaseFullPath,
+                                    timeout: TABLE_SCHEMA_TIMEOUT,
+                                },
+                                {subscribe: false},
+                            ),
                         );
 
                         if (isQueryErrorResponse(response)) {
@@ -46,13 +49,16 @@ export const tableSchemaDataApi = api.injectEndpoints({
                     }
 
                     const schemaData = await dispatch(
-                        overviewApi.endpoints.getOverview.initiate({
-                            path,
-                            database,
-                            timeout: TABLE_SCHEMA_TIMEOUT,
-                            databaseFullPath,
-                            useMetaProxy,
-                        }),
+                        overviewApi.endpoints.getOverview.initiate(
+                            {
+                                path,
+                                database,
+                                timeout: TABLE_SCHEMA_TIMEOUT,
+                                databaseFullPath,
+                                useMetaProxy,
+                            },
+                            {subscribe: false},
+                        ),
                     );
                     const result = prepareSchemaData(type, schemaData.data);
 
