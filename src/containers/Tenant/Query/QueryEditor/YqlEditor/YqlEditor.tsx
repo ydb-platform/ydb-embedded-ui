@@ -438,7 +438,13 @@ export function YqlEditor({
 
         const currentStatementDisposables = [
             editor.onDidChangeModel(recalculateStatements),
-            editor.onDidChangeModelContent(recalculateStatements),
+            editor.onDidChangeModelContent((event) => {
+                if (event.isFlush) {
+                    decoratedModel = null;
+                    decoratedRange = undefined;
+                }
+                recalculateStatements();
+            }),
             editor.onDidChangeCursorPosition(updateCurrentStatement),
             editor.onDidChangeCursorSelection(updateCurrentStatement),
         ];

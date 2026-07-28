@@ -507,6 +507,8 @@ test.describe('Test Query Editor', async () => {
     test('Selected-query action is unavailable for multiple Monaco selections', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery('SELECT 1;\nSELECT 2;');
+        await queryEditor.setCursor(2, 3);
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 2;');
 
         const actionState = await queryEditor.editorTextArea.evaluate(() => {
             const editor = window.ydbEditor;
@@ -593,6 +595,29 @@ test.describe('Test Query Editor', async () => {
             {firstStatement, secondStatement},
         );
         await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
+    });
+
+    test('Current-statement decoration is restored after a same-model text flush', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        const initialQuery = 'SELECT 1;\nSELECT 2;';
+        const replacementQuery = 'SELECT 3;\nSELECT 4;';
+
+        await queryEditor.setQuery(initialQuery);
+        await queryEditor.setCursor(1, 3);
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
+
+        await queryEditor.editorTextArea.evaluate((_, query) => {
+            const editor = window.ydbEditor;
+            if (!editor) {
+                throw new Error('Expected active Monaco editor');
+            }
+
+            editor.setValue(query);
+        }, replacementQuery);
+
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 3;');
     });
 
     test('Current-statement highlight remains immediately after a terminating semicolon', async ({
