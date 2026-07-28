@@ -1,5 +1,14 @@
 # Changelog
 
+## [18.3.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.3.1...v18.3.2) (2026-07-28)
+
+
+### Bug Fixes
+
+* app layout to prevent scroll issues ([#4166](https://github.com/ydb-platform/ydb-embedded-ui/issues/4166)) ([7b689aa](https://github.com/ydb-platform/ydb-embedded-ui/commit/7b689aa8411a9f245da1a0f5ec71120d95c94e0f))
+* restore object summary schema panel ([#4172](https://github.com/ydb-platform/ydb-embedded-ui/issues/4172)) ([7fe7f39](https://github.com/ydb-platform/ydb-embedded-ui/commit/7fe7f39cea2e5faf275bf4657c995323cc300355))
+* send database query param for post requests ([#4168](https://github.com/ydb-platform/ydb-embedded-ui/issues/4168)) ([4ee8923](https://github.com/ydb-platform/ydb-embedded-ui/commit/4ee8923c73058bb419ea2499db5dddb98e67a29f))
+
 ## [18.3.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.3.0...v18.3.1) (2026-07-27)
 
 
