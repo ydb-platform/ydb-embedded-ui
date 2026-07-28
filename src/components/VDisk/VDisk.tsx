@@ -61,7 +61,7 @@ export const VDisk = ({
 
     const isDonor = data.DonorMode;
 
-    const {severity, icon, modeModifier, isLegendInactive} = React.useMemo(
+    const {severity, icon, modeModifier, isLegendInactive, showNoDataPlaceholder} = React.useMemo(
         () => (getDisplayState ?? getDefaultDiskDisplayState)(data, isDonor),
         [data, getDisplayState, isDonor],
     );
@@ -78,12 +78,14 @@ export const VDisk = ({
 
     // In expert mode, don't show disk allocation (filled bar)
     const diskAllocatedPercent = modeModifier ? undefined : data.AllocatedPercent;
-    const shouldShowNoDataPlaceholder = !(
-        icon &&
-        (modeModifier === 'mode-space' ||
-            modeModifier === 'mode-frontqueues' ||
-            modeModifier === 'mode-compaction')
-    );
+    const shouldShowNoDataPlaceholder =
+        showNoDataPlaceholder !== false &&
+        !(
+            icon &&
+            (modeModifier === 'mode-space' ||
+                modeModifier === 'mode-frontqueues' ||
+                modeModifier === 'mode-compaction')
+        );
 
     return (
         <HoverPopup

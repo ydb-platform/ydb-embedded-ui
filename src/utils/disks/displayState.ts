@@ -9,6 +9,7 @@ export interface DiskDisplayState {
     icon: IconData | IconWithColor[] | string | undefined;
     modeModifier: string | undefined;
     isLegendInactive?: boolean;
+    showNoDataPlaceholder?: boolean;
 }
 
 export type DiskDisplayStateGetter = (vDisk: PreparedVDisk, isDonor?: boolean) => DiskDisplayState;

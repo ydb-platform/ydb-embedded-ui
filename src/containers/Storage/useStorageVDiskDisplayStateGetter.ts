@@ -47,6 +47,7 @@ export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
                     icon: undefined,
                     modeModifier,
                     isLegendInactive: false,
+                    showNoDataPlaceholder: true,
                 };
             }
 
@@ -63,6 +64,7 @@ export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
                 icon: iconCalculator(vDisk, isDonor),
                 modeModifier,
                 isLegendInactive,
+                showNoDataPlaceholder: false,
             };
         },
         [inactiveLegendItems, isExpertMode, vdisksGroupBy],
