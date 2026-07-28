@@ -288,6 +288,22 @@ export class QueryEditor {
         });
     }
 
+    async getCurrentStatementHighlightStyle() {
+        const highlight = this.page.locator('.ydb-current-query-highlight').first();
+        await highlight.waitFor({state: 'visible'});
+
+        return highlight.evaluate((element) => {
+            const style = window.getComputedStyle(element);
+            return {
+                backgroundColor: style.backgroundColor,
+                expectedBackgroundColor: style.getPropertyValue('--g-color-private-blue-50').trim(),
+                borderBottomWidth: style.borderBottomWidth,
+                boxShadow: style.boxShadow,
+                textDecorationLine: style.textDecorationLine,
+            };
+        });
+    }
+
     async getSelectedText() {
         return this.editorTextArea.evaluate(() => {
             const editor = window.ydbEditor;

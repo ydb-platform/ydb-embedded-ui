@@ -69,8 +69,22 @@ describe('current YQL statement', () => {
         ).toBeUndefined();
     });
 
-    test('treats the statement end as exclusive', () => {
+    test('includes the exact end of a semicolon-terminated statement', () => {
         const query = 'SELECT 1;';
+        const statements = extractYqlStatements(query);
+
+        expect(findYqlStatementAtOffset(query, query.length, statements)?.text).toBe('SELECT 1;');
+    });
+
+    test('does not skip whitespace after the terminating semicolon', () => {
+        const query = 'SELECT 1; ';
+        const statements = extractYqlStatements(query);
+
+        expect(findYqlStatementAtOffset(query, query.length, statements)).toBeUndefined();
+    });
+
+    test('keeps an unterminated statement end exclusive', () => {
+        const query = 'SELECT 1';
         const statements = extractYqlStatements(query);
 
         expect(findYqlStatementAtOffset(query, query.length, statements)).toBeUndefined();

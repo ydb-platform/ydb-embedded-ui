@@ -464,6 +464,39 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.getCellValue(1, 2)).resolves.toContain('2');
     });
 
+    test('Current-statement highlight remains immediately after a terminating semicolon', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1; ');
+        await queryEditor.setCursor(1, 10);
+
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
+    });
+
+    test('Current-statement highlight excludes whitespace after a terminating semicolon', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1; ');
+        await queryEditor.setCursor(1, 11);
+
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
+    });
+
+    test('Current-statement highlight uses the subtle decoration style', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.setCursor(1, 3);
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
+
+        const style = await queryEditor.getCurrentStatementHighlightStyle();
+        expect(style.backgroundColor).toBe(style.expectedBackgroundColor);
+        expect(style.borderBottomWidth).toBe('0px');
+        expect(style.boxShadow).toBe('none');
+        expect(style.textDecorationLine).toBe('none');
+    });
+
     test('Fragment error navigation uses the original editor position', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery('SELECT 1;\n\n    SELECT missing_column;\n\nSELECT 2;');
