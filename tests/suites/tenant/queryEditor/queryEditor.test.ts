@@ -466,13 +466,17 @@ test.describe('Test Query Editor', async () => {
 
     test('Fragment error navigation uses the original editor position', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.setQuery('SELECT 1;\n\nSELECT missing_column;');
-        await queryEditor.setCursor(3, 8);
+        await queryEditor.setQuery('SELECT 1;\n\n    SELECT missing_column;\n\nSELECT 2;');
+        await queryEditor.setCursor(3, 12);
         await executeSelectedQueryWithKeybinding(page);
         await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
 
+        await queryEditor.setCursor(5, 1);
+        await expect(queryEditor.getCursorPosition()).resolves.toEqual({lineNumber: 5, column: 1});
         await queryEditor.clickFirstIssuePosition();
-        await expect.poll(() => queryEditor.getCursorPosition()).toMatchObject({lineNumber: 3});
+        await expect
+            .poll(() => queryEditor.getCursorPosition())
+            .toEqual({lineNumber: 3, column: 5});
     });
 
     test('Current-statement execution stores only the executed statement in History', async ({

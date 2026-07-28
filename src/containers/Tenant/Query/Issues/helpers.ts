@@ -51,11 +51,12 @@ function offsetPosition(position: IssueMessage['position'], sourcePosition: Quer
     }
 
     const row = Number(position.row);
+    const fragmentRow = row - (sourcePosition.preparedQueryPrefixLineCount ?? 0);
     return {
         ...position,
-        row: row + sourcePosition.lineNumber - 1,
+        row: fragmentRow + sourcePosition.lineNumber - 1,
         column:
-            row === 1 && isNumeric(position.column)
+            fragmentRow === 1 && isNumeric(position.column)
                 ? Number(position.column) + sourcePosition.column - 1
                 : position.column,
     };
@@ -69,9 +70,9 @@ function offsetIssuePositions(
         ...issue,
         position: offsetPosition(issue.position, sourcePosition),
         end_position: offsetPosition(issue.end_position, sourcePosition),
-        issues: issue.issues?.map((nestedIssue) =>
-            offsetIssuePositions(nestedIssue, sourcePosition),
-        ),
+        issues: Array.isArray(issue.issues)
+            ? issue.issues.map((nestedIssue) => offsetIssuePositions(nestedIssue, sourcePosition))
+            : issue.issues,
     };
 }
 
@@ -82,6 +83,9 @@ export function offsetErrorResponsePositions(
     return {
         ...error,
         error: error.error ? offsetIssuePositions(error.error, sourcePosition) : undefined,
-        issues: error.issues?.map((issue) => offsetIssuePositions(issue, sourcePosition)),
+        issues:
+            error.issues === null
+                ? null
+                : error.issues?.map((issue) => offsetIssuePositions(issue, sourcePosition)),
     };
 }

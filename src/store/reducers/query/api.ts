@@ -21,7 +21,7 @@ import {
     setStreamSession,
 } from './slice';
 import type {QuerySourcePosition, QueryStats} from './types';
-import {getActionAndSyntaxFromQueryMode, prepareQueryWithPragmas} from './utils';
+import {getActionAndSyntaxFromQueryMode, prepareQueryWithPragmasMetadata} from './utils';
 
 function getTracingLevelParam(
     querySettings: Partial<QuerySettings>,
@@ -138,6 +138,12 @@ export const queryApi = api.injectEndpoints({
                 },
                 {signal, dispatch, getState},
             ) => {
+                const {query: finalQuery, preparedQueryPrefixLineCount} =
+                    prepareQueryWithPragmasMetadata(query, querySettings.pragmas);
+                const resultSourcePosition = sourcePosition
+                    ? {...sourcePosition, preparedQueryPrefixLineCount}
+                    : undefined;
+
                 dispatch(
                     setQueryResult({
                         tabId,
@@ -147,7 +153,7 @@ export const queryApi = api.injectEndpoints({
                             isLoading: true,
                             startTime,
                             streamingStatus: 'preparing',
-                            sourcePosition,
+                            sourcePosition: resultSourcePosition,
                         },
                     }),
                 );
@@ -156,8 +162,6 @@ export const queryApi = api.injectEndpoints({
                     'execute',
                     querySettings?.queryMode,
                 );
-
-                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
 
                 try {
                     let streamDataChunkBatch: StreamDataChunk[] = [];
@@ -300,6 +304,12 @@ export const queryApi = api.injectEndpoints({
                 },
                 {signal, dispatch, getState},
             ) => {
+                const {query: finalQuery, preparedQueryPrefixLineCount} =
+                    prepareQueryWithPragmasMetadata(query, querySettings.pragmas);
+                const resultSourcePosition = sourcePosition
+                    ? {...sourcePosition, preparedQueryPrefixLineCount}
+                    : undefined;
+
                 dispatch(
                     setQueryResult({
                         tabId,
@@ -308,7 +318,7 @@ export const queryApi = api.injectEndpoints({
                             queryId,
                             isLoading: true,
                             startTime,
-                            sourcePosition,
+                            sourcePosition: resultSourcePosition,
                         },
                     }),
                 );
@@ -317,8 +327,6 @@ export const queryApi = api.injectEndpoints({
                     actionType,
                     querySettings?.queryMode,
                 );
-
-                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
 
                 try {
                     const response = await window.api.viewer.sendQuery(
@@ -357,7 +365,7 @@ export const queryApi = api.injectEndpoints({
                                     queryId,
                                     startTime,
                                     endTime: Date.now(),
-                                    sourcePosition,
+                                    sourcePosition: resultSourcePosition,
                                 },
                             }),
                         );
@@ -391,7 +399,7 @@ export const queryApi = api.injectEndpoints({
                                 queryId,
                                 startTime,
                                 endTime: Date.now(),
-                                sourcePosition,
+                                sourcePosition: resultSourcePosition,
                             },
                         }),
                     );

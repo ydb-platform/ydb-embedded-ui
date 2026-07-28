@@ -63,6 +63,7 @@ export type StreamingStatus = 'preparing' | 'running' | 'fetching';
 export interface QuerySourcePosition {
     lineNumber: number;
     column: number;
+    preparedQueryPrefixLineCount?: number;
 }
 
 export interface QueryResult {
