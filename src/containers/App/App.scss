@@ -115,6 +115,10 @@ body,
 
     &__main {
         overflow: auto;
+        overscroll-behavior-y: contain;
+
+        min-height: 0;
+
         @include mixins.flex-container();
     }
 }
