@@ -31,6 +31,11 @@ const minSizeDefaultInner = [0, 100];
 const sizesDefaultInner = [50, 50];
 const SAVE_DEBOUNCE_MS = 200;
 
+const getGutterStyle: NonNullable<SplitProps['gutterStyle']> = (dimension, gutterSize) => ({
+    [dimension]: `${gutterSize}px`,
+    display: gutterSize === 0 ? 'none' : '',
+});
+
 function SplitPane(props: SplitPaneProps) {
     const [innerSizes, setInnerSizes] = React.useState<number[]>();
     const {
@@ -126,6 +131,7 @@ function SplitPane(props: SplitPaneProps) {
                 onDrag={onDragHandler}
                 className={b(null, props.direction || 'horizontal')}
                 gutterSize={gutterSize}
+                gutterStyle={getGutterStyle}
                 onDragStart={onDragStartHandler}
                 expandToMin
             >
