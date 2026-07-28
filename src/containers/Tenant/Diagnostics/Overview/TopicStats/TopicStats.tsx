@@ -5,7 +5,7 @@ import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
 import {Loader} from '../../../../../components/Loader';
 import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster';
-import {selectPreparedTopicStats, topicApi} from '../../../../../store/reducers/topic';
+import {selectPreparedTopicStats, topicApi} from '../../../../../store/reducers/topic/topic';
 import type {IPreparedTopicStats} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
 import {formatBps, formatBytes} from '../../../../../utils/dataFormatters/dataFormatters';

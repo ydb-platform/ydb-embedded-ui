@@ -1,14 +1,65 @@
 .ydb-schema-create-directory-dialog {
     &__label {
-        display: flex;
-        flex-direction: column;
+        display: block;
 
-        margin-bottom: 8px;
+        margin-bottom: 16px;
+
+        .g-breadcrumbs__link_is-disabled {
+            color: inherit;
+        }
     }
-    &__description {
-        color: var(--g-color-text-secondary);
+
+    &__breadcrumbs {
+        display: flex;
+        flex-wrap: wrap;
+        row-gap: 4px;
+
+        max-width: 100%;
+
+        .g-breadcrumbs__item {
+            align-items: flex-start;
+
+            min-width: 0;
+            max-width: 100%;
+            height: auto;
+
+            white-space: normal;
+        }
+
+        .g-breadcrumbs__link {
+            display: inline-flex;
+            align-items: flex-start;
+
+            max-width: 100%;
+            height: auto;
+
+            line-height: inherit;
+            white-space: normal;
+        }
     }
-    &__input-wrapper {
-        min-height: 48px;
+
+    &__breadcrumb-content {
+        display: inline-flex;
+        align-items: flex-start;
+        gap: 6px;
+
+        min-width: 0;
+        max-width: 100%;
+
+        > span {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+    }
+
+    &__breadcrumb-icon {
+        flex: 0 0 auto;
+
+        opacity: 0.3;
+        color: var(--g-color-text-primary);
+    }
+
+    &__directory-path {
+        font-weight: 600;
     }
 }

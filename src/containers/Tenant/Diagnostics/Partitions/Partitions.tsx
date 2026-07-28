@@ -9,7 +9,7 @@ import {TableWithControlsLayout} from '../../../../components/TableWithControlsL
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
-import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
+import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic/topic';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';

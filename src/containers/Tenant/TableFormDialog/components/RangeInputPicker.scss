@@ -1,0 +1,22 @@
+.ydb-range-input-picker {
+    width: 100%;
+
+    &__input {
+        width: 100%;
+    }
+
+    &__slider {
+        position: relative;
+        z-index: 1;
+
+        margin-top: calc(-1 * var(--g-spacing-2));
+
+        .g-slider__top {
+            display: none;
+        }
+
+        .g-base-slider__rail {
+            visibility: hidden;
+        }
+    }
+}

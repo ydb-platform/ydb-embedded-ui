@@ -10,7 +10,7 @@ import {
     useClusterWithProxy,
 } from '../../../../../store/reducers/cluster/cluster';
 import {partitionsApi} from '../../../../../store/reducers/partitions/partitions';
-import {topicApi} from '../../../../../store/reducers/topic';
+import {topicApi} from '../../../../../store/reducers/topic/topic';
 import type {TopicDataRequest} from '../../../../../types/api/topic';
 import {useClusterNameFromQuery} from '../../../../../utils/hooks/useDatabaseFromQuery';
 import {safeParseNumber} from '../../../../../utils/utils';

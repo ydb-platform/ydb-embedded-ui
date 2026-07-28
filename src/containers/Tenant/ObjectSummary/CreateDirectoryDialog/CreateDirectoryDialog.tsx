@@ -1,6 +1,7 @@
 import React from 'react';
 
-import {Dialog, TextInput} from '@gravity-ui/uikit';
+import {DatabaseFill, FolderFill} from '@gravity-ui/icons';
+import {Breadcrumbs, Dialog, TextInput} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
@@ -48,6 +49,14 @@ export function CreateDirectoryDialog({
     const [create, response] = schemaApi.useCreateDirectoryMutation();
     const inputRef = React.useRef<HTMLInputElement>(null);
 
+    const normalizedDatabasePath = databaseFullPath.replace(/^\/+|\/+$/g, '');
+    const normalizedParentPath = parentPath.replace(/^\/+|\/+$/g, '');
+    const relativeParentPath = transformPath(parentPath, databaseFullPath).replace(
+        /^\/+|\/+$/g,
+        '',
+    );
+    const isDatabaseRoot = normalizedParentPath === normalizedDatabasePath;
+
     const resetErrors = () => {
         setValidationError('');
         response.reset();
@@ -80,43 +89,54 @@ export function CreateDirectoryDialog({
             });
     };
 
-    const relativeParentPath = transformPath(parentPath, databaseFullPath);
-
     return (
         <Dialog open={open} onClose={handleClose} size="s" initialFocus={inputRef}>
             <Dialog.Header caption={i18n('schema.tree.dialog.header')} />
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    const validationError = validateRelativePath(relativePath);
-                    setValidationError(validationError);
-                    if (!validationError) {
+                    const nextValidationError = validateRelativePath(relativePath);
+                    setValidationError(nextValidationError);
+                    if (!nextValidationError) {
                         handleSubmit();
                     }
                 }}
             >
                 <Dialog.Body>
-                    <label htmlFor={relativePathInputId} className={b('label')}>
-                        <span className={b('description')}>
-                            {i18n('schema.tree.dialog.description')}
-                        </span>
-                        {`${relativeParentPath}/`}
-                    </label>
-                    <div className={b('input-wrapper')}>
-                        <TextInput
-                            controlRef={inputRef}
-                            placeholder={i18n('schema.tree.dialog.placeholder')}
-                            value={relativePath}
-                            onUpdate={handleUpdate}
-                            autoFocus
-                            hasClear
-                            autoComplete={false}
-                            disabled={response.isLoading}
-                            validationState={validationError ? 'invalid' : undefined}
-                            id={relativePathInputId}
-                            errorMessage={validationError}
-                        />
+                    <div className={b('label')}>
+                        <Breadcrumbs className={b('breadcrumbs')}>
+                            <Breadcrumbs.Item disabled>
+                                <span className={b('breadcrumb-content')}>
+                                    <DatabaseFill className={b('breadcrumb-icon')} />
+                                    <span>{normalizedDatabasePath}</span>
+                                </span>
+                            </Breadcrumbs.Item>
+                            {!isDatabaseRoot && (
+                                <Breadcrumbs.Item disabled>
+                                    <span className={b('breadcrumb-content')}>
+                                        <FolderFill className={b('breadcrumb-icon')} />
+                                        <span className={b('directory-path')}>
+                                            {relativeParentPath}
+                                        </span>
+                                    </span>
+                                </Breadcrumbs.Item>
+                            )}
+                        </Breadcrumbs>
                     </div>
+                    <TextInput
+                        controlRef={inputRef}
+                        placeholder={i18n('schema.tree.dialog.placeholder')}
+                        aria-label={i18n('schema.tree.dialog.placeholder')}
+                        value={relativePath}
+                        onUpdate={handleUpdate}
+                        autoFocus
+                        hasClear
+                        autoComplete={false}
+                        disabled={response.isLoading}
+                        validationState={validationError ? 'invalid' : undefined}
+                        id={relativePathInputId}
+                        errorMessage={validationError}
+                    />
                     {response.isError && (
                         <ResponseError
                             error={response.error}
