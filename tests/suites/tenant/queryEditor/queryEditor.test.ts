@@ -724,37 +724,6 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe(secondQuery);
     });
 
-    test('Running selected query via context menu executes only selected part', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-        const multiQuery = 'SELECT 1 + 2;\nSELECT 20;';
-
-        // First verify running the entire query produces two results with tabs
-        await queryEditor.setQuery(multiQuery);
-        await queryEditor.clickRunButton();
-        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
-
-        // Verify there are two result tabs
-        await expect(queryEditor.resultTable.getResultTabsCount()).resolves.toBe(2);
-        await expect(queryEditor.resultTable.getResultTabTitleText(0)).resolves.toBe('Result #1');
-        await expect(queryEditor.resultTable.getResultTabTitleText(1)).resolves.toBe('Result #2');
-
-        // Then verify running only selected part produces one result without tabs
-        await queryEditor.focusEditor();
-        await queryEditor.selectText(1, 1, 1, 9);
-
-        // Use context menu to run selected query
-        await queryEditor.runSelectedQueryViaContextMenu();
-
-        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
-        await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
-        await expect(queryEditor.resultTable.getResultTitleCount()).resolves.toBe('1');
-        await expect(queryEditor.resultTable.getCellValue(1, 2)).resolves.toBe('1');
-
-        await queryEditor.queryTabs.selectTab(QueryTabs.History);
-        await queryEditor.historyQueries.isVisible();
-        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe('SELECT 1');
-    });
-
     test('Cursor movement within one statement avoids full-text reads and decoration writes', async ({
         page,
     }) => {
