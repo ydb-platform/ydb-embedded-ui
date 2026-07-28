@@ -1,9 +1,11 @@
 import React from 'react';
 
 import {CircleQuestionFill} from '@gravity-ui/icons';
-import {render, screen} from '@testing-library/react';
+import {render, renderHook, screen} from '@testing-library/react';
 
+import {useStorageVDiskDisplayStateGetter} from '../../../containers/Storage/useStorageVDiskDisplayStateGetter';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../../utils/disks/constants';
+import {VDisksGroupBy} from '../../../utils/disks/groupBy';
 import {VDisk} from '../VDisk';
 
 const mockUseIsStorageExpertMode = jest.fn();
@@ -68,6 +70,15 @@ describe('VDisk', () => {
         expect(mockUseSpaceLegendSelection).not.toHaveBeenCalled();
     });
 
+    test('keeps N/D fallback in default mode', () => {
+        render(<VDisk data={{}} />);
+
+        expect(screen.getByTestId('disk-progress')).toHaveAttribute(
+            'data-no-data-placeholder',
+            'N/D',
+        );
+    });
+
     test('does not mark no data vdisk as replicating in expert modes', () => {
         render(
             <VDisk
@@ -91,6 +102,7 @@ describe('VDisk', () => {
                     severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
                     icon: undefined,
                     modeModifier: 'mode-state',
+                    showNoDataPlaceholder: true,
                 })}
             />,
         );
@@ -99,6 +111,31 @@ describe('VDisk', () => {
             'data-no-data-placeholder',
             'N/D',
         );
+    });
+
+    test('does not use N/D when only State data is unavailable in expert mode', () => {
+        render(
+            <VDisk
+                data={{
+                    VDiskId: {
+                        GroupID: 1,
+                        GroupGeneration: 1,
+                        Ring: 0,
+                        Domain: 0,
+                        VDisk: 0,
+                    },
+                }}
+                getDisplayState={() => ({
+                    severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
+                    icon: undefined,
+                    modeModifier: 'mode-state',
+                    showNoDataPlaceholder: false,
+                })}
+            />,
+        );
+
+        expect(screen.getByTestId('disk-progress')).not.toHaveAttribute('data-no-data-placeholder');
+        expect(screen.getByTestId('disk-progress')).toHaveAttribute('data-has-icon', 'false');
     });
 
     test.each(['mode-space', 'mode-frontqueues', 'mode-compaction'])(
@@ -121,4 +158,44 @@ describe('VDisk', () => {
             );
         },
     );
+});
+
+describe('useStorageVDiskDisplayStateGetter', () => {
+    beforeEach(() => {
+        mockUseIsStorageExpertMode.mockReturnValue(true);
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.State);
+        mockUseSpaceLegendSelection.mockReturnValue(new Set());
+    });
+
+    test('does not request N/D when only State is unavailable in expert mode', () => {
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(
+            result.current({
+                VDiskId: {
+                    GroupID: 1,
+                    GroupGeneration: 1,
+                    Ring: 0,
+                    Domain: 0,
+                    VDisk: 0,
+                },
+            }),
+        ).toMatchObject({
+            severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
+            icon: undefined,
+            modeModifier: 'mode-state',
+            showNoDataPlaceholder: false,
+        });
+    });
+
+    test('requests N/D when Whiteboard VDiskId is unavailable in expert mode', () => {
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(result.current({})).toMatchObject({
+            severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
+            icon: undefined,
+            modeModifier: 'mode-state',
+            showNoDataPlaceholder: true,
+        });
+    });
 });

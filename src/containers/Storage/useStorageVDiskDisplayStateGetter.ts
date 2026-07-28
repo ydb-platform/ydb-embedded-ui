@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {isCapacityAlert} from '../../types/api/enums';
+import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
 import type {DiskDisplayStateGetter} from '../../utils/disks/displayState';
 import {getDefaultDiskDisplayState} from '../../utils/disks/displayState';
 import {getIconCalculator} from '../../utils/disks/getIconStrategy';
@@ -38,9 +39,20 @@ export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
                 return getDefaultDiskDisplayState(vDisk);
             }
 
+            const modeModifier = getModeModifier(vdisksGroupBy);
+
+            if (!vDisk.VDiskId) {
+                return {
+                    severity: NOT_AVAILABLE_SEVERITY,
+                    icon: undefined,
+                    modeModifier,
+                    isLegendInactive: false,
+                    showNoDataPlaceholder: true,
+                };
+            }
+
             const severityCalculator = getSeverityCalculator(vdisksGroupBy);
             const iconCalculator = getIconCalculator(vdisksGroupBy);
-            const modeModifier = getModeModifier(vdisksGroupBy);
 
             const isLegendInactive =
                 vdisksGroupBy === VDisksGroupBy.Space &&
@@ -52,6 +64,7 @@ export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
                 icon: iconCalculator(vDisk, isDonor),
                 modeModifier,
                 isLegendInactive,
+                showNoDataPlaceholder: false,
             };
         },
         [inactiveLegendItems, isExpertMode, vdisksGroupBy],
