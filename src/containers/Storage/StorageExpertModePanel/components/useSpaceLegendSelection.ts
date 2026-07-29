@@ -2,7 +2,7 @@ import React from 'react';
 
 import type {ECapacityAlert} from '../../../../types/api/enums';
 
-import {getSpaceLegendSelection} from './getSpaceLegendSelection';
+import {SPACE_LEGEND_CHANGE_EVENT, getSpaceLegendSelection} from './getSpaceLegendSelection';
 
 /**
  * Hook to get the set of inactive (deselected) legend items for Space mode
@@ -17,9 +17,9 @@ export function useSpaceLegendSelection(): Set<ECapacityAlert> {
             setSelection(getSpaceLegendSelection());
         };
 
-        window.addEventListener('spaceLegendChange', handleLegendChange);
+        window.addEventListener(SPACE_LEGEND_CHANGE_EVENT, handleLegendChange);
         return () => {
-            window.removeEventListener('spaceLegendChange', handleLegendChange);
+            window.removeEventListener(SPACE_LEGEND_CHANGE_EVENT, handleLegendChange);
         };
     }, []);
 
