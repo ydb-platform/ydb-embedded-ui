@@ -139,7 +139,7 @@ export const ClusterInfo = ({
     return (
         <Flex gap={4} direction="column" className={b()}>
             {error ? <ResponseError error={error} className={b('error')} /> : null}
-            <div className={b('sections', {'no-details': noDetails})}>
+            <div className={b('sections', {'no-details': !loading && noDetails})}>
                 {renderDetailSection()}
                 {renderStorageGroupsSection()}
                 {renderBridgePilesSection()}
