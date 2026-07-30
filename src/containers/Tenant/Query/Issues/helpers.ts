@@ -51,7 +51,12 @@ function offsetPosition(position: IssueMessage['position'], sourcePosition: Quer
     }
 
     const row = Number(position.row);
-    const fragmentRow = row - (sourcePosition.preparedQueryPrefixLineCount ?? 0);
+    const preparedQueryPrefixLineCount = sourcePosition.preparedQueryPrefixLineCount ?? 0;
+    if (row <= preparedQueryPrefixLineCount) {
+        return position;
+    }
+
+    const fragmentRow = row - preparedQueryPrefixLineCount;
     return {
         ...position,
         row: fragmentRow + sourcePosition.lineNumber - 1,

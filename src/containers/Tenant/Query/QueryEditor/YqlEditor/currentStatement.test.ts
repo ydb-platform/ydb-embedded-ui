@@ -34,13 +34,33 @@ describe('current YQL statement', () => {
         ).toEqual(['SELECT "a;b";', 'SELECT 2;']);
     });
 
-    test('splits compound constructs at each real semicolon', () => {
-        const query = 'DEFINE ACTION $a() AS SELECT 1; SELECT 2; END DEFINE;';
+    test.each([
+        [
+            'anonymous action',
+            'SELECT 0;\nDO BEGIN\n    SELECT 1;\n    SELECT 2;\nEND DO;\nSELECT 3;',
+            ['SELECT 0;', 'DO BEGIN\n    SELECT 1;\n    SELECT 2;\nEND DO;', 'SELECT 3;'],
+        ],
+        [
+            'action definition',
+            'DEFINE ACTION $a() AS DO BEGIN SELECT 1; SELECT 2; END DO; END DEFINE;\nDO $a();',
+            ['DEFINE ACTION $a() AS DO BEGIN SELECT 1; SELECT 2; END DO; END DEFINE;', 'DO $a();'],
+        ],
+        [
+            'subquery definition',
+            'DEFINE SUBQUERY $s() AS SELECT 1; SELECT 2; END DEFINE;\nSELECT 3;',
+            ['DEFINE SUBQUERY $s() AS SELECT 1; SELECT 2; END DEFINE;', 'SELECT 3;'],
+        ],
+        [
+            'streaming query body',
+            'CREATE STREAMING QUERY q AS DO BEGIN INSERT INTO sink SELECT * FROM source; END DO;',
+            ['CREATE STREAMING QUERY q AS DO BEGIN INSERT INTO sink SELECT * FROM source; END DO;'],
+        ],
+    ])('keeps each %s intact', (_name, query, expectedStatements) => {
         const statements = extractYqlStatements(query);
 
         expect(
             statements.map(({startIndex, endIndex}) => query.slice(startIndex, endIndex)),
-        ).toEqual(['DEFINE ACTION $a() AS SELECT 1;', 'SELECT 2;', 'END DEFINE;']);
+        ).toEqual(expectedStatements);
     });
 
     test('extracts a large flat script without recursive parsing', () => {

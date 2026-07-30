@@ -80,4 +80,24 @@ describe('offsetErrorResponsePositions', () => {
         expect(result.error?.position).toBe(position);
         expect(error.error.position).toBe(position);
     });
+
+    test('preserves positions reported inside the prepared query prefix', () => {
+        const error = {
+            error: {
+                position: {row: 1, column: 4},
+                end_position: {row: 2, column: 1},
+                issues: [{position: {row: 2, column: 3}}],
+            },
+        };
+
+        const result = offsetErrorResponsePositions(error, {
+            lineNumber: 1,
+            column: 1,
+            preparedQueryPrefixLineCount: 2,
+        });
+
+        expect(result.error?.position).toEqual({row: 1, column: 4});
+        expect(result.error?.end_position).toEqual({row: 2, column: 1});
+        expect(result.error?.issues?.[0]?.position).toEqual({row: 2, column: 3});
+    });
 });

@@ -362,9 +362,7 @@ export function YqlEditor({
         };
 
         const clearCurrentStatementDecoration = () => {
-            if (decoratedRange) {
-                currentStatementDecoration.clear();
-            }
+            currentStatementDecoration.clear();
             decoratedModel = null;
             decoratedRange = undefined;
         };

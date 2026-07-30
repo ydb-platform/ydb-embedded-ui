@@ -606,6 +606,7 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         const initialQuery = 'SELECT 1;\nSELECT 2;';
         const replacementQuery = 'SELECT 3;\nSELECT 4;';
+        const singleStatementQuery = 'SELECT 5;';
 
         await queryEditor.setQuery(initialQuery);
         await queryEditor.setCursor(1, 3);
@@ -621,6 +622,17 @@ test.describe('Test Query Editor', async () => {
         }, replacementQuery);
 
         await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 3;');
+
+        await queryEditor.editorTextArea.evaluate((_, query) => {
+            const editor = window.ydbEditor;
+            if (!editor) {
+                throw new Error('Expected active Monaco editor');
+            }
+
+            editor.setValue(query);
+        }, singleStatementQuery);
+
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
     });
 
     test('Current-statement highlight remains immediately after a terminating semicolon', async ({
