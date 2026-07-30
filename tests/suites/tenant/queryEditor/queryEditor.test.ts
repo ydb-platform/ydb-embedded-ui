@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import type {Page} from '@playwright/test';
+import type {Page, Request} from '@playwright/test';
 
 import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {getClipboardContent} from '../../../utils/clipboard';
@@ -74,8 +74,32 @@ async function setupPendingNonStreamingQueryMock(page: Page) {
     };
 }
 
+type ViewerQueryRequestBody = {
+    action?: string;
+    query_id?: string;
+    stats?: string;
+};
+
+function getViewerQueryRequestBody(request: Request): ViewerQueryRequestBody | undefined {
+    if (!request.url().includes('/viewer/json/query') || request.method() !== 'POST') {
+        return undefined;
+    }
+
+    try {
+        return request.postDataJSON() as ViewerQueryRequestBody;
+    } catch {
+        return undefined;
+    }
+}
+
+function isExplainAnalyzeRequest(request: Request) {
+    const body = getViewerQueryRequestBody(request);
+    return body?.action === 'execute-query' && body.stats === 'full';
+}
+
 test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
+    const queryActionScreenshotThemes = ['light', 'dark'] as const;
 
     test.beforeEach(async ({page}) => {
         const tenantPage = new TenantPage(page);
@@ -94,6 +118,15 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.run(testQuery, QUERY_MODES.script);
 
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
+        await expect(queryEditor.isQueryActionButtonHighlighted(ButtonNames.Run)).resolves.toBe(
+            true,
+        );
+        await expect(queryEditor.isQueryActionButtonHighlighted(ButtonNames.Explain)).resolves.toBe(
+            false,
+        );
+        await expect(
+            queryEditor.isQueryActionButtonHighlighted(ButtonNames.ExplainAnalyze),
+        ).resolves.toBe(false);
     });
 
     test('Run button executes Scan', async ({page}) => {
@@ -112,6 +145,15 @@ test.describe('Test Query Editor', async () => {
 
         const explainJSON = await queryEditor.getExplainResult(ExplainResultType.JSON);
         await expect(explainJSON).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+        await expect(queryEditor.isQueryActionButtonHighlighted(ButtonNames.Run)).resolves.toBe(
+            false,
+        );
+        await expect(queryEditor.isQueryActionButtonHighlighted(ButtonNames.Explain)).resolves.toBe(
+            true,
+        );
+        await expect(
+            queryEditor.isQueryActionButtonHighlighted(ButtonNames.ExplainAnalyze),
+        ).resolves.toBe(false);
     });
 
     test('Explain button executes Scan explanation', async ({page}) => {
@@ -147,6 +189,15 @@ test.describe('Test Query Editor', async () => {
         const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
         await expect(explainSchema).toBeVisible({timeout: VISIBILITY_TIMEOUT});
         await expect(queryEditor.hasStatsJsonViewer()).resolves.toBe(true);
+        await expect(queryEditor.isQueryActionButtonHighlighted(ButtonNames.Run)).resolves.toBe(
+            false,
+        );
+        await expect(queryEditor.isQueryActionButtonHighlighted(ButtonNames.Explain)).resolves.toBe(
+            false,
+        );
+        await expect(
+            queryEditor.isQueryActionButtonHighlighted(ButtonNames.ExplainAnalyze),
+        ).resolves.toBe(true);
     });
 
     test('Error is displayed for invalid query for run', async ({page}) => {
@@ -201,7 +252,9 @@ test.describe('Test Query Editor', async () => {
         await expect(errorMessage).toContain('Column references are not allowed without FROM');
     });
 
-    test('Run and Explain buttons are disabled when query is empty', async ({page}) => {
+    test('Run, Explain, and Explain Analyze buttons are disabled when query is empty', async ({
+        page,
+    }) => {
         const queryEditor = new QueryEditor(page);
 
         await expect(queryEditor.isRunButtonEnabled()).resolves.toBe(false);
@@ -214,6 +267,33 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isExplainButtonEnabled()).resolves.toBe(true);
         await expect(queryEditor.isExplainAnalyzeButtonEnabled()).resolves.toBe(true);
     });
+
+    for (const theme of queryActionScreenshotThemes) {
+        test(`renders three query actions in ${theme} theme`, async ({page}) => {
+            await page.evaluate((themeName) => {
+                localStorage.setItem('theme', themeName);
+            }, theme);
+            await page.reload({waitUntil: 'domcontentloaded'});
+
+            const queryEditor = new QueryEditor(page);
+            await queryEditor.setQuery(testQuery);
+
+            await expect(queryEditor.getQueryActionsLocator()).toBeVisible();
+            await expect(queryEditor.getQueryActionButton(ButtonNames.Run)).toBeVisible();
+            await expect(queryEditor.getQueryActionButton(ButtonNames.Explain)).toBeVisible();
+            await expect(
+                queryEditor.getQueryActionButton(ButtonNames.ExplainAnalyze),
+            ).toBeVisible();
+            await expect(queryEditor.getExplainAnalyzeButtonText()).resolves.toBe(
+                ButtonNames.ExplainAnalyze,
+            );
+            await expect(queryEditor.hasExplainActionDropdown()).resolves.toBe(false);
+            await expect(queryEditor.getQueryActionsGap()).resolves.toBe('12px');
+            await expect(queryEditor.getQueryActionsLocator()).toHaveScreenshot(
+                `query-actions-${theme}.png`,
+            );
+        });
+    }
 
     test('Stop button has distinct view when query is running', async ({page}) => {
         const queryEditor = new QueryEditor(page);
@@ -387,6 +467,48 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
         await queryEditor.clickStopButton();
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
+    });
+
+    test('Stop cancels Explain Analyze on the server when streaming is enabled', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+        await queryEditor.setQuery(longRunningQuery);
+
+        const explainAnalyzeRequest = page.waitForRequest(isExplainAnalyzeRequest);
+        const cancelRequest = page.waitForRequest(
+            (request) => getViewerQueryRequestBody(request)?.action === 'cancel-query',
+            {timeout: VISIBILITY_TIMEOUT},
+        );
+
+        await queryEditor.clickExplainAnalyzeButton();
+        await explainAnalyzeRequest;
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+        await queryEditor.clickStopButton();
+
+        const cancelRequestBody = getViewerQueryRequestBody(await cancelRequest);
+        expect(cancelRequestBody?.query_id).toBeTruthy();
+    });
+
+    test('repeated Explain Analyze hotkey aborts the previous request', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery(longRunningQuery);
+
+        const firstRequestPromise = page.waitForRequest(isExplainAnalyzeRequest);
+        await queryEditor.clickExplainAnalyzeButton();
+        const firstRequest = await firstRequestPromise;
+
+        const firstRequestFailed = page.waitForEvent('requestfailed', {
+            predicate: (request) => request === firstRequest,
+            timeout: VISIBILITY_TIMEOUT,
+        });
+        const secondRequest = page.waitForRequest(
+            (request) => request !== firstRequest && isExplainAnalyzeRequest(request),
+        );
+
+        await queryEditor.runQueryViaEditorAction();
+
+        await secondRequest;
+        await firstRequestFailed;
     });
 
     test('Stop button appears when query is started via hotkey', async ({page}) => {

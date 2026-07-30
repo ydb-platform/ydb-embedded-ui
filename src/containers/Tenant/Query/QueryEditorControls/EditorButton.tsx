@@ -31,6 +31,12 @@ const Explain = (props: ButtonProps) => (
     </Button>
 );
 
+const ExplainAnalyze = (props: ButtonProps) => (
+    <Button {...props} className={b('explain-analyze-button')}>
+        {i18n('action.explain-analyze')}
+    </Button>
+);
+
 interface SettingsButtonProps {
     onClick: () => void;
     isLoading: boolean;
@@ -75,5 +81,6 @@ export const EditorButton = {
     Run,
     Stop,
     Explain,
+    ExplainAnalyze,
     Settings,
 };

@@ -1,9 +1,5 @@
 import React from 'react';
 
-import {ChevronDown} from '@gravity-ui/icons';
-import type {ButtonPin, DropdownMenuItem, DropdownMenuProps} from '@gravity-ui/uikit';
-import {Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
-
 import {cancelQueryApi} from '../../../../store/reducers/cancelQuery';
 import {selectActiveTabId, selectUserInput} from '../../../../store/reducers/query/query';
 import type {QueryAction} from '../../../../types/store/query';
@@ -30,7 +26,7 @@ interface QueryEditorControlsProps {
     highlightedAction: QueryAction;
     queryId?: string;
     database: string;
-    isStreamingEnabled?: boolean;
+    isCurrentQueryStreaming?: boolean;
 
     handleGetExplainQueryClick: (text: string) => void;
     handleGetExplainAnalyzeQueryClick: (text: string) => void;
@@ -41,15 +37,20 @@ interface QueryEditorControlsProps {
 const STOP_AUTO_HIDE_TIMEOUT = 5000;
 
 interface ActionButtonProps {
-    type: 'run' | 'explain';
+    type: 'run' | 'explain' | 'explainAnalyze';
     isHighlighted: boolean;
     isLoading: boolean;
     isStoppable: boolean;
     controlsDisabled: boolean;
-    pin?: ButtonPin;
     onActionClick: () => void;
-    renderStopButton: (props?: {pin?: ButtonPin}) => React.ReactNode;
+    renderStopButton: () => React.ReactNode;
 }
+
+const actionButtonComponents = {
+    run: EditorButton.Run,
+    explain: EditorButton.Explain,
+    explainAnalyze: EditorButton.ExplainAnalyze,
+};
 
 const ActionButton = ({
     type,
@@ -57,22 +58,20 @@ const ActionButton = ({
     isLoading,
     isStoppable,
     controlsDisabled,
-    pin,
     onActionClick,
     renderStopButton,
 }: ActionButtonProps) => {
     if (isStoppable && isLoading && isHighlighted) {
-        return renderStopButton({pin});
+        return renderStopButton();
     }
 
-    const ButtonComponent = type === 'run' ? EditorButton.Run : EditorButton.Explain;
+    const ButtonComponent = actionButtonComponents[type];
 
     return (
         <ButtonComponent
             onClick={onActionClick}
             disabled={controlsDisabled}
             loading={isLoading}
-            pin={pin}
             view={isHighlighted ? 'action' : undefined}
         />
     );
@@ -87,7 +86,7 @@ export const QueryEditorControls = ({
     highlightedAction,
     queryId,
     database,
-    isStreamingEnabled,
+    isCurrentQueryStreaming,
 
     handleSendExecuteClick,
     onSettingsButtonClick,
@@ -103,7 +102,7 @@ export const QueryEditorControls = ({
     const onStopButtonClick = React.useCallback(async () => {
         reachMetricaGoal('stopQuery');
         try {
-            if (isStreamingEnabled) {
+            if (isCurrentQueryStreaming) {
                 if (!activeTabId) {
                     return;
                 }
@@ -129,7 +128,7 @@ export const QueryEditorControls = ({
                 setCancelQueryError(false);
             }, CANCEL_ERROR_ANIMATION_DURATION);
         }
-    }, [isStreamingEnabled, queryId, sendCancelQuery, database, activeTabId]);
+    }, [isCurrentQueryStreaming, queryId, sendCancelQuery, database, activeTabId]);
 
     const isRunHighlighted = highlightedAction === QUERY_ACTIONS.execute;
     const isExplainHighlighted = highlightedAction === QUERY_ACTIONS.explain;
@@ -157,38 +156,8 @@ export const QueryEditorControls = ({
 
     const controlsDisabled = disabled || !input;
 
-    const explainAnalyzeMenuItems = React.useMemo<DropdownMenuItem[]>(
-        () => [
-            {
-                text: i18n('action.explain-analyze'),
-                action: onExplainAnalyzeButtonClick,
-            },
-        ],
-        [onExplainAnalyzeButtonClick],
-    );
-
-    const renderExplainAnalyzeSwitcher = React.useCallback<
-        NonNullable<DropdownMenuProps<unknown>['renderSwitcher']>
-    >(
-        (props) => (
-            <Button
-                {...props}
-                className={b('explain-analyze-button')}
-                disabled={controlsDisabled}
-                loading={isLoading}
-                pin="brick-round"
-                view={isExplainAnalyzeHighlighted ? 'action' : undefined}
-                aria-label={i18n('action.explain-analyze')}
-            >
-                <Icon data={ChevronDown} size={16} />
-            </Button>
-        ),
-        [controlsDisabled, isExplainAnalyzeHighlighted, isLoading],
-    );
-
-    const renderStopButton = (props?: {pin?: ButtonPin}) => (
+    const renderStopButton = () => (
         <EditorButton.Stop
-            {...props}
             loading={cancelQueryResponse.isLoading}
             error={cancelQueryError}
             onClick={onStopButtonClick}
@@ -207,23 +176,24 @@ export const QueryEditorControls = ({
                     onActionClick={onRunButtonClick}
                     renderStopButton={renderStopButton}
                 />
-                <div className={b('explain-group')}>
-                    <ActionButton
-                        type="explain"
-                        isHighlighted={isExplainHighlighted || isExplainAnalyzeHighlighted}
-                        isLoading={isLoading}
-                        isStoppable={isStoppable}
-                        controlsDisabled={controlsDisabled}
-                        pin="round-brick"
-                        onActionClick={onExplainButtonClick}
-                        renderStopButton={renderStopButton}
-                    />
-                    <DropdownMenu
-                        items={explainAnalyzeMenuItems}
-                        renderSwitcher={renderExplainAnalyzeSwitcher}
-                        popupProps={{placement: 'bottom-start'}}
-                    />
-                </div>
+                <ActionButton
+                    type="explain"
+                    isHighlighted={isExplainHighlighted}
+                    isLoading={isLoading}
+                    isStoppable={isStoppable}
+                    controlsDisabled={controlsDisabled}
+                    onActionClick={onExplainButtonClick}
+                    renderStopButton={renderStopButton}
+                />
+                <ActionButton
+                    type="explainAnalyze"
+                    isHighlighted={isExplainAnalyzeHighlighted}
+                    isLoading={isLoading}
+                    isStoppable={isStoppable}
+                    controlsDisabled={controlsDisabled}
+                    onActionClick={onExplainAnalyzeButtonClick}
+                    renderStopButton={renderStopButton}
+                />
                 <EditorButton.Settings onClick={onSettingsButtonClick} isLoading={isLoading} />
             </div>
             <div className={b('right')}>

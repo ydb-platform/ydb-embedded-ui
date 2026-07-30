@@ -1,16 +1,9 @@
 @use '../../../../styles/mixins.scss';
 
 .ydb-query-editor-button {
-    &__explain-button {
-        width: 92px;
-    }
-
-    &__run-button,
     &__stop-button {
         width: 76px;
-    }
 
-    &__stop-button {
         .g-root_theme_dark &,
         .g-root_theme_dark-hc & {
             --g-button-text-color: var(--g-color-text-dark-primary);
