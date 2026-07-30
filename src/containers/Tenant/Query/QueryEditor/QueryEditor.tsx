@@ -479,7 +479,6 @@ export default function QueryEditor({
             query
                 .unwrap()
                 .then((data) => {
-                    // save in history failed query only if it has operationId. It means that query is saved in server side and its results may be retrieved.
                     if (data?.historyQueryId) {
                         updateQueryInHistory(
                             data.historyQueryId,

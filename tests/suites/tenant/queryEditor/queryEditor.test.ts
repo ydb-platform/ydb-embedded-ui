@@ -76,6 +76,7 @@ async function setupPendingNonStreamingQueryMock(page: Page) {
 
 type ViewerQueryRequestBody = {
     action?: string;
+    query?: string;
     query_id?: string;
     stats?: string;
 };
@@ -509,6 +510,80 @@ test.describe('Test Query Editor', async () => {
 
         await secondRequest;
         await firstRequestFailed;
+    });
+
+    test('repeating non-streaming Run marks its history entry as stopped', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        const queryMarker = '-- abort history regression';
+        const query = `${longRunningQuery}\n${queryMarker}`;
+        let resolveRunRequestCaptured: (() => void) | undefined;
+        let releaseRunRequest: (() => void) | undefined;
+        const runRequestCaptured = new Promise<void>((resolve) => {
+            resolveRunRequestCaptured = resolve;
+        });
+        const runRequestRelease = new Promise<void>((resolve) => {
+            releaseRunRequest = resolve;
+        });
+        let runRequestIsHeld = false;
+
+        await page.route('**/viewer/json/query**', async (route) => {
+            const requestBody = getViewerQueryRequestBody(route.request());
+            if (
+                requestBody?.action?.startsWith('execute-') &&
+                requestBody.query?.includes(queryMarker)
+            ) {
+                if (!runRequestIsHeld) {
+                    runRequestIsHeld = true;
+                    resolveRunRequestCaptured?.();
+                }
+                await runRequestRelease;
+
+                try {
+                    await route.continue();
+                } catch {
+                    // The first Run is intentionally aborted by the repeated editor action.
+                }
+                return;
+            }
+
+            await route.continue();
+        });
+
+        await toggleExperiment(page, 'off', 'Query Streaming');
+        await queryEditor.setQuery(query);
+        await queryEditor.clickRunButton();
+        await runRequestCaptured;
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+
+        await queryEditor.runQueryViaEditorAction();
+
+        try {
+            await expect
+                .poll(
+                    () =>
+                        page.evaluate((marker) => {
+                            const history = JSON.parse(
+                                localStorage.getItem('queries_history') ?? '[]',
+                            ) as Array<{
+                                durationUs?: number;
+                                queryText?: string;
+                                status?: string;
+                            }>;
+                            const entry = history
+                                .toReversed()
+                                .find((item) => item.queryText?.includes(marker));
+
+                            return {
+                                hasDuration: Boolean(entry?.durationUs && entry.durationUs > 0),
+                                status: entry?.status,
+                            };
+                        }, queryMarker),
+                    {timeout: VISIBILITY_TIMEOUT},
+                )
+                .toEqual({hasDuration: true, status: 'stopped'});
+        } finally {
+            releaseRunRequest?.();
+        }
     });
 
     test('Stop button appears when query is started via hotkey', async ({page}) => {
