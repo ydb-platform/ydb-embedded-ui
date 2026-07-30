@@ -113,21 +113,22 @@ Run tests. If `PLAYWRIGHT_BASE_URL` is provided, tests run on this url, otherwis
 npm run test:e2e
 ```
 
-Run tests in Playwright Docker.
+Run tests in Playwright Docker against a separately started backend. `PLAYWRIGHT_APP_BACKEND` is required; loopback URLs are forwarded from the Playwright container to the host automatically.
 
 ```
-npm run test:e2e:docker
+docker run --rm -d -p 8765:8765 ghcr.io/ydb-platform/local-ydb:nightly
+PLAYWRIGHT_APP_BACKEND=http://localhost:8765 npm run test:e2e:docker
 ```
 
 Run tests in Playwright Docker and then serve the generated HTML report locally at `http://127.0.0.1:9323`. You can override host and port with `PLAYWRIGHT_HTML_HOST` and `PLAYWRIGHT_HTML_PORT`.
 
 ```
-npm run test:e2e:docker:report
+PLAYWRIGHT_APP_BACKEND=http://localhost:8765 npm run test:e2e:docker:report
 ```
 
 ### CI
 
-E2E tests are run in CI in `e2e_tests` job. Tests run on Playwright `webServer` (it is started with `npm run dev`), and the Docker test flow uses `ghcr.io/ydb-platform/local-ydb:nightly` as backend.
+E2E tests are run in CI in the `e2e_tests` job. Each shard starts `ghcr.io/ydb-platform/local-ydb:nightly` in root topology through `setup-local-ydb`, then passes the action monitoring URL to the Playwright Docker flow.
 
 ## Making a production bundle.
 

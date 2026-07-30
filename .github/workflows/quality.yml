@@ -30,10 +30,20 @@ jobs:
         with:
           node-version: 24
 
+      - name: Start local YDB
+        id: ydb
+        uses: astandrik/setup-local-ydb@9cfad02e180c11e744ae816897da313f633a924c
+        with:
+          version: nightly
+          topology: root
+          auth: 'false'
+          cleanup: 'true'
+
       - name: Run Playwright tests
         run: bash scripts/playwright-docker.sh --shard=${{ matrix.shard }}/${{ matrix.shardTotal }}
         env:
           CI: 'true'
+          PLAYWRIGHT_APP_BACKEND: ${{ steps.ydb.outputs.monitoring-url }}
 
       - name: Upload blob report
         if: always()
