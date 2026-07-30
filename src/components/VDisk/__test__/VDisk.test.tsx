@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {CircleQuestionFill, Ellipsis} from '@gravity-ui/icons';
+import {CircleCheckFill, CircleQuestionFill, CircleXmarkFill, Ellipsis} from '@gravity-ui/icons';
 import {render, renderHook, screen} from '@testing-library/react';
 
 import {useStorageVDiskDisplayStateGetter} from '../../../containers/Storage/useStorageVDiskDisplayStateGetter';
@@ -204,6 +204,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
         });
         expect(displayState).not.toHaveProperty('capacityAlertIndicator');
         expect(displayState).not.toHaveProperty('frontQueuesIndicator');
+        expect(displayState).not.toHaveProperty('compactionIndicator');
     });
 
     test('uses a dedicated mode-all modifier for Expert Mode All', () => {
@@ -298,6 +299,50 @@ describe('useStorageVDiskDisplayStateGetter', () => {
         ).toHaveProperty('frontQueuesIndicator', CircleQuestionFill);
     });
 
+    test('exposes Compaction rank indicators in Expert Mode All', () => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(
+            result.current({
+                VDiskId: {
+                    GroupID: 1,
+                    GroupGeneration: 1,
+                    Ring: 0,
+                    Domain: 0,
+                    VDisk: 0,
+                },
+                SatisfactionRank: {
+                    FreshRank: {Flag: EFlag.Green},
+                    LevelRank: {Flag: EFlag.Red},
+                },
+            }),
+        ).toHaveProperty('compactionIndicator', [
+            {icon: CircleCheckFill, color: 'var(--g-color-text-positive)'},
+            {icon: CircleXmarkFill, color: 'var(--g-color-text-primary)'},
+        ]);
+    });
+
+    test('uses question icons when Compaction data is unavailable in Expert Mode All', () => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(
+            result.current({
+                VDiskId: {
+                    GroupID: 1,
+                    GroupGeneration: 1,
+                    Ring: 0,
+                    Domain: 0,
+                    VDisk: 0,
+                },
+            }),
+        ).toHaveProperty('compactionIndicator', [
+            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
+            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
+        ]);
+    });
+
     test('does not expose an inactive Capacity Alert indicator in Expert Mode All', () => {
         mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
         mockUseSpaceLegendSelection.mockReturnValue(new Set([ECapacityAlert.LIGHTYELLOW]));
@@ -330,9 +375,14 @@ describe('useStorageVDiskDisplayStateGetter', () => {
             },
             CapacityAlert: ECapacityAlert.LIGHTYELLOW,
             FrontQueues: EFlag.Yellow,
+            SatisfactionRank: {
+                FreshRank: {Flag: EFlag.Green},
+                LevelRank: {Flag: EFlag.Red},
+            },
         });
 
         expect(displayState).not.toHaveProperty('capacityAlertIndicator');
         expect(displayState).not.toHaveProperty('frontQueuesIndicator');
+        expect(displayState).not.toHaveProperty('compactionIndicator');
     });
 });

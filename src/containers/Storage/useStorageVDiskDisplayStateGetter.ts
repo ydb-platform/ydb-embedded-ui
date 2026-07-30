@@ -8,7 +8,11 @@ import {getIconCalculator} from '../../utils/disks/getIconStrategy';
 import {getSeverityCalculator} from '../../utils/disks/getSeverityStrategy';
 import type {VDisksGroupByValue} from '../../utils/disks/groupBy';
 import {VDisksGroupBy} from '../../utils/disks/groupBy';
-import {calculateFrontQueuesIcon, calculateSpaceIcon} from '../../utils/disks/iconCalculators';
+import {
+    calculateCompactionIcon,
+    calculateFrontQueuesIcon,
+    calculateSpaceIcon,
+} from '../../utils/disks/iconCalculators';
 
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
 import {useIsStorageExpertMode, useVDisksGroupByParam} from './useStorageQueryParams';
@@ -66,12 +70,19 @@ export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
             const frontQueuesIndicator = showAllModeIndicators
                 ? calculateFrontQueuesIcon(vDisk, isDonor)
                 : undefined;
+            const calculatedCompactionIndicator = showAllModeIndicators
+                ? calculateCompactionIcon(vDisk, isDonor)
+                : undefined;
+            const compactionIndicator = Array.isArray(calculatedCompactionIndicator)
+                ? calculatedCompactionIndicator
+                : undefined;
 
             return {
                 severity: severityCalculator(vDisk),
                 icon: iconCalculator(vDisk, isDonor),
                 ...(capacityAlertIndicator ? {capacityAlertIndicator} : {}),
                 ...(frontQueuesIndicator ? {frontQueuesIndicator} : {}),
+                ...(compactionIndicator ? {compactionIndicator} : {}),
                 modeModifier,
                 isLegendInactive: vdisksGroupBy === VDisksGroupBy.Space && isCapacityAlertInactive,
                 showNoDataPlaceholder: false,

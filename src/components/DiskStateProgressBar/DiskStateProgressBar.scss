@@ -387,11 +387,10 @@
         display: grid;
         align-items: center;
         grid-template-columns: 16px 12px 17px;
-        column-gap: 6px;
+        column-gap: var(--g-spacing-1);
 
         box-sizing: border-box;
-        margin: -$border-width;
-        padding-inline: 4px;
+        padding-inline: var(--g-spacing-1);
 
         pointer-events: none;
 
@@ -405,8 +404,6 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-
-        width: 16px;
     }
 
     &__all-mode-capacity-alert-indicator-icon {
@@ -418,9 +415,13 @@
         justify-content: center;
         align-items: center;
 
-        width: 12px;
-
         color: var(--g-color-text-primary);
+    }
+
+    &__all-mode-compaction-indicator-slot {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
     }
 
     &__title {

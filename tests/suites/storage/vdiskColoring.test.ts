@@ -18,7 +18,7 @@ const INITIAL_VDISK_INDEX = 5;
 const RECOVERY_ERROR_VDISK_INDEX = 8;
 const PDISK_ERROR_VDISK_INDEX = 9;
 const TRANSPARENT_BACKGROUND = 'rgba(0, 0, 0, 0)';
-const MISSING_CAPACITY_INDICATOR_COLOR = 'rgb(162, 162, 162)';
+const MISSING_INDICATOR_COLOR = 'rgb(162, 162, 162)';
 const INITIAL_ICON_COLOR_TOKEN = '--g-color-base-warning-heavy';
 const PDISK_ERROR_ICON_COLOR_TOKEN = '--g-color-base-danger-heavy';
 const RECOVERY_ERROR_ICON_COLOR_TOKEN = '--g-color-text-primary';
@@ -42,6 +42,8 @@ const ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR =
     '.storage-disk-progress-bar__all-mode-capacity-alert-indicator-slot';
 const ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR =
     '.storage-disk-progress-bar__all-mode-front-queues-indicator-slot';
+const ALL_MODE_COMPACTION_SLOT_SELECTOR =
+    '.storage-disk-progress-bar__all-mode-compaction-indicator-slot';
 
 async function enableExpertMode(page: Page, vdisksGroupBy: VDisksGroupByValue) {
     await page.addInitScript((groupByValue) => {
@@ -337,6 +339,10 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 ordinaryItems.nth(MISSING_FRONT_QUEUES_VDISK_INDEX),
             ).locator(ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR);
             const initialFrontQueuesSlot = initial.locator(ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR);
+            const initialCompactionSlot = initial.locator(ALL_MODE_COMPACTION_SLOT_SELECTOR);
+            const missingCompactionSlot = missingCapacityAlert.locator(
+                ALL_MODE_COMPACTION_SLOT_SELECTOR,
+            );
 
             await expect(stateOnlyOk).toHaveClass(/storage-disk-progress-bar_mode-all/);
             await expect(stateOnlyOk).toHaveClass(/storage-disk-progress-bar_green/);
@@ -388,10 +394,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(missingCapacityAlertSlot).toHaveCSS('width', '16px');
             const missingCapacityAlertIcon = missingCapacityAlertSlot.locator('.g-icon');
             await expect(missingCapacityAlertIcon).toBeVisible();
-            await expect(missingCapacityAlertIcon).toHaveCSS(
-                'color',
-                MISSING_CAPACITY_INDICATOR_COLOR,
-            );
+            await expect(missingCapacityAlertIcon).toHaveCSS('color', MISSING_INDICATOR_COLOR);
 
             await expect(frontQueuesYellowSlot).toHaveCount(1);
             await expect(frontQueuesYellowSlot).toHaveCSS('width', '12px');
@@ -417,6 +420,60 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
 
             await expect(initialFrontQueuesSlot).toHaveCount(1);
             await expect(initialFrontQueuesSlot).toBeEmpty();
+
+            await expect(initialCompactionSlot).toHaveCount(1);
+            await expect(initialCompactionSlot).toHaveCSS('width', '17px');
+            const initialCompactionIcons = initialCompactionSlot.locator('.g-icon');
+            await expect(initialCompactionIcons).toHaveCount(2);
+            const expectedPositiveColor = await resolveThemeColor(page, '--g-color-text-positive');
+            await expect(initialCompactionIcons.nth(0)).toHaveCSS('color', expectedPositiveColor);
+            await expect(initialCompactionIcons.nth(1)).toHaveCSS('color', expectedTextColor);
+
+            const [initialCompactionSlotBox, initialCompactionIconBoxes] = await Promise.all([
+                initialCompactionSlot.boundingBox(),
+                initialCompactionIcons.evaluateAll((icons) =>
+                    icons.map((icon) => {
+                        const box = icon.getBoundingClientRect();
+
+                        return {
+                            height: box.height,
+                            left: box.left,
+                            right: box.right,
+                            width: box.width,
+                        };
+                    }),
+                ),
+            ]);
+
+            if (!initialCompactionSlotBox) {
+                throw new Error('Cannot compare All-mode VDisk and Compaction slot boxes');
+            }
+
+            expect(initialCompactionSlotBox.x - initialBox.x).toBeCloseTo(44, 5);
+            expect(initialCompactionIconBoxes).toHaveLength(2);
+            initialCompactionIconBoxes.forEach((box) => {
+                expect(box.width).toBeCloseTo(10, 5);
+                expect(box.height).toBeCloseTo(10, 5);
+            });
+            expect(
+                initialCompactionIconBoxes[1].left - initialCompactionIconBoxes[0].left,
+            ).toBeCloseTo(7, 5);
+            expect(
+                initialCompactionIconBoxes[1].right - initialCompactionIconBoxes[0].left,
+            ).toBeCloseTo(17, 5);
+
+            await expect(missingCompactionSlot).toHaveCount(1);
+            await expect(missingCompactionSlot).toHaveCSS('width', '17px');
+            const missingCompactionIcons = missingCompactionSlot.locator('.g-icon');
+            await expect(missingCompactionIcons).toHaveCount(2);
+            await Promise.all(
+                [0, 1].map((index) =>
+                    expect(missingCompactionIcons.nth(index)).toHaveCSS(
+                        'color',
+                        MISSING_INDICATOR_COLOR,
+                    ),
+                ),
+            );
 
             const replicatingItems = getVDiskItems(getStorageGroupRow(page, 1));
             const healthyReplicating = getVDiskProgressBar(replicatingItems.nth(0));
@@ -567,6 +624,12 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(noWhiteboardFrontQueuesSlot).toHaveCount(1);
             await expect(noWhiteboardFrontQueuesSlot).toBeEmpty();
             await expect(noWhiteboardFrontQueuesSlot.locator('.g-icon')).toHaveCount(0);
+            const noWhiteboardCompactionSlot = noWhiteboardVDisk.locator(
+                ALL_MODE_COMPACTION_SLOT_SELECTOR,
+            );
+            await expect(noWhiteboardCompactionSlot).toHaveCount(1);
+            await expect(noWhiteboardCompactionSlot).toBeEmpty();
+            await expect(noWhiteboardCompactionSlot.locator('.g-icon')).toHaveCount(0);
 
             await forceHoverStorageGroupVDiskItems(page, 0);
 

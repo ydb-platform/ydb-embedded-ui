@@ -29,6 +29,22 @@ function renderCapacityAlertIndicator(indicator?: IconData | string) {
     );
 }
 
+function renderIconGroup(icons: IconWithColor[]) {
+    return (
+        <div className={b('icon-group')}>
+            {icons.map(({icon, color}, index) => (
+                <Icon
+                    key={index}
+                    className={b('icon', {overlapped: index > 0})}
+                    data={icon}
+                    size={10}
+                    style={color ? {color} : undefined}
+                />
+            ))}
+        </div>
+    );
+}
+
 interface DiskStateProgressBarProps {
     diskAllocatedPercent?: number;
     hideAllocatedPercentLabel?: boolean;
@@ -45,6 +61,7 @@ interface DiskStateProgressBarProps {
     icon?: IconData | IconWithColor[] | string;
     capacityAlertIndicator?: IconData | string;
     frontQueuesIndicator?: IconData;
+    compactionIndicator?: IconWithColor[];
     modeModifier?: string;
     highlighted?: boolean;
     noDataPlaceholder?: React.ReactNode;
@@ -69,6 +86,7 @@ export function DiskStateProgressBar({
     icon: providedIcon,
     capacityAlertIndicator,
     frontQueuesIndicator,
+    compactionIndicator,
     modeModifier,
     highlighted,
     noDataPlaceholder,
@@ -162,27 +180,7 @@ export function DiskStateProgressBar({
             if (typeof icon === 'string') {
                 iconElement = <div className={b('text-label')}>{icon}</div>;
             } else if (Array.isArray(icon)) {
-                // Multiple icons with individual colors (e.g., for compaction mode: Fresh + Level)
-                // Icons overlap: 10px + 10px - 3px = 17px total width
-                iconElement = (
-                    <div className={b('icon-group')}>
-                        {icon.map((item, index) => {
-                            // Check if item has color property (IconWithColor)
-                            const iconData = 'icon' in item ? item.icon : item;
-                            const iconColor = 'color' in item ? item.color : undefined;
-
-                            return (
-                                <Icon
-                                    key={index}
-                                    className={b('icon', {overlapped: index > 0})}
-                                    data={iconData}
-                                    size={10}
-                                    style={iconColor ? {color: iconColor} : undefined}
-                                />
-                            );
-                        })}
-                    </div>
-                );
+                iconElement = renderIconGroup(icon);
             } else {
                 iconElement = (
                     <Icon
@@ -226,6 +224,9 @@ export function DiskStateProgressBar({
                     <span className={b('all-mode-front-queues-indicator-slot')}>
                         {frontQueuesIndicator && <Icon data={frontQueuesIndicator} size={12} />}
                     </span>
+                    <div className={b('all-mode-compaction-indicator-slot')}>
+                        {compactionIndicator && renderIconGroup(compactionIndicator)}
+                    </div>
                 </div>
             )}
         </Flex>
