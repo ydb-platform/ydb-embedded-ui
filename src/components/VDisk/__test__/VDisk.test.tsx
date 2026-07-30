@@ -4,6 +4,7 @@ import {CircleQuestionFill} from '@gravity-ui/icons';
 import {render, renderHook, screen} from '@testing-library/react';
 
 import {useStorageVDiskDisplayStateGetter} from '../../../containers/Storage/useStorageVDiskDisplayStateGetter';
+import {EVDiskState} from '../../../types/api/vdisk';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../../utils/disks/constants';
 import {VDisksGroupBy} from '../../../utils/disks/groupBy';
 import {VDisk} from '../VDisk';
@@ -196,6 +197,28 @@ describe('useStorageVDiskDisplayStateGetter', () => {
             icon: undefined,
             modeModifier: 'mode-state',
             showNoDataPlaceholder: true,
+        });
+    });
+
+    test('uses a dedicated mode-all modifier for Expert Mode All', () => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(
+            result.current({
+                VDiskId: {
+                    GroupID: 1,
+                    GroupGeneration: 1,
+                    Ring: 0,
+                    Domain: 0,
+                    VDisk: 0,
+                },
+                VDiskState: EVDiskState.OK,
+            }),
+        ).toMatchObject({
+            severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
+            modeModifier: 'mode-all',
+            showNoDataPlaceholder: false,
         });
     });
 });

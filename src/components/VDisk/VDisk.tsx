@@ -66,18 +66,20 @@ export const VDisk = ({
         [data, getDisplayState, isDonor],
     );
 
+    const isAllMode = modeModifier === 'mode-all';
+
     // Check if disk is replicating (not replicated yet) and should show stripes
     const hasVDiskData = Boolean(data.VDiskState);
     let isReplicating: boolean;
-    if (!modeModifier || modeModifier === 'mode-state') {
+    if (!modeModifier || modeModifier === 'mode-state' || isAllMode) {
         isReplicating = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
     } else {
         // Space mode and other expert modes: show stripes for any Replicated=false disk
         isReplicating = hasVDiskData && data.Replicated === false;
     }
 
-    // In expert mode, don't show disk allocation (filled bar)
-    const diskAllocatedPercent = modeModifier ? undefined : data.AllocatedPercent;
+    // Only the default and All modes show disk allocation (filled bar)
+    const diskAllocatedPercent = !modeModifier || isAllMode ? data.AllocatedPercent : undefined;
     const shouldShowNoDataPlaceholder =
         showNoDataPlaceholder !== false &&
         !(
@@ -86,6 +88,8 @@ export const VDisk = ({
                 modeModifier === 'mode-frontqueues' ||
                 modeModifier === 'mode-compaction')
         );
+    const shouldPrioritizeNoDataPlaceholder = isAllMode && showNoDataPlaceholder === true;
+    const shouldOverlapIconAtTopLeft = isAllMode && !isDonor && Boolean(withIcon) && Boolean(icon);
 
     return (
         <HoverPopup
@@ -109,6 +113,7 @@ export const VDisk = ({
                 >
                     <DiskStateProgressBar
                         diskAllocatedPercent={diskAllocatedPercent}
+                        hideAllocatedPercentLabel={isAllMode}
                         severity={severity}
                         compact={compact}
                         inactive={inactive}
@@ -122,6 +127,8 @@ export const VDisk = ({
                         noDataPlaceholder={
                             shouldShowNoDataPlaceholder ? i18n('context_no-data') : undefined
                         }
+                        prioritizeNoDataPlaceholder={shouldPrioritizeNoDataPlaceholder}
+                        overlapIconAtTopLeft={shouldOverlapIconAtTopLeft}
                         isLegendInactive={isLegendInactive}
                     />
                 </InternalLink>

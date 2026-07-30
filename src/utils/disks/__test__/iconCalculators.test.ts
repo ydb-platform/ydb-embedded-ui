@@ -1,7 +1,16 @@
-import {CircleCheckFill, CircleQuestionFill, TriangleExclamationFill} from '@gravity-ui/icons';
-
-import {EFlag} from '../../../types/api/enums';
 import {
+    CircleCheckFill,
+    CircleExclamationFill,
+    CircleQuestionFill,
+    CircleXmarkFill,
+    ClockFill,
+    TriangleExclamationFill,
+} from '@gravity-ui/icons';
+
+import {ECapacityAlert, EFlag} from '../../../types/api/enums';
+import {EVDiskState} from '../../../types/api/vdisk';
+import {
+    calculateAllIcon,
     calculateCompactionIcon,
     calculateFrontQueuesIcon,
     calculateSpaceIcon,
@@ -75,5 +84,28 @@ describe('disk icon calculators', () => {
             {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
             {icon: CircleCheckFill, color: 'var(--g-color-text-positive)'},
         ]);
+    });
+
+    test.each([
+        {state: EVDiskState.Initial, expected: ClockFill},
+        {state: EVDiskState.SyncGuidRecovery, expected: ClockFill},
+        {state: EVDiskState.PDiskError, expected: CircleExclamationFill},
+        {state: EVDiskState.LocalRecoveryError, expected: CircleXmarkFill},
+        {state: EVDiskState.SyncGuidRecoveryError, expected: CircleXmarkFill},
+    ])('uses VDiskState icon in All for $state', ({state, expected}) => {
+        expect(calculateAllIcon({VDiskState: state})).toBe(expected);
+    });
+
+    test('does not add an icon to a healthy All VDisk', () => {
+        expect(calculateAllIcon({VDiskState: EVDiskState.OK})).toBeUndefined();
+    });
+
+    test('does not use a CapacityAlert abbreviation icon in All', () => {
+        expect(
+            calculateAllIcon({
+                VDiskState: EVDiskState.OK,
+                CapacityAlert: ECapacityAlert.LIGHTYELLOW,
+            }),
+        ).toBeUndefined();
     });
 });

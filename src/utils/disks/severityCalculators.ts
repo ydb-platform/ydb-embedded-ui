@@ -159,11 +159,8 @@ export function calculateCompactionSeverity(vDisk: PreparedVDisk): DisplaySeveri
 }
 
 /**
- * Calculate combined severity for "All" grouping mode
- * This is a complex mode that will show multiple indicators simultaneously
- * Uses the pre-calculated Severity field which combines all factors
- * TODO: Implement advanced "All" mode visualization
+ * Calculate severity for "All" grouping mode using VDiskState semantics.
  */
 export function calculateAllSeverity(vDisk: PreparedVDisk): DisplaySeverity {
-    return (vDisk.Severity ?? NOT_AVAILABLE_SEVERITY) as DisplaySeverity;
+    return calculateStateSeverity(vDisk);
 }

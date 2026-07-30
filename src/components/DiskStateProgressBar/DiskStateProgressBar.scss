@@ -66,6 +66,10 @@
         border: none;
     }
 
+    &_overlap-icon-at-top-left {
+        overflow: visible;
+    }
+
     // State mode: specific visual variants
     &_mode-state {
         // OK state
@@ -83,6 +87,87 @@
         &#{$block}_red {
             --entity-state-background-color: var(--g-color-base-danger-medium);
             --entity-state-border-color: var(--g-color-base-danger-heavy);
+        }
+    }
+
+    &_mode-all {
+        &#{$block}_green {
+            --entity-state-background-color: transparent;
+            --entity-state-border-color: var(--g-color-line-positive);
+            --entity-state-fill-color: var(--g-color-base-positive-light);
+
+            &#{$block}_highlighted {
+                --entity-state-border-color: var(--g-color-line-positive);
+                --entity-state-background-color: var(--entity-state-fill-color);
+            }
+        }
+
+        &#{$block}_yellow {
+            --entity-state-background-color: transparent;
+            --entity-state-border-color: var(--g-color-line-warning);
+            --entity-state-icon-color: var(--g-color-base-warning-heavy);
+            --entity-state-fill-color: var(--g-color-base-warning-light);
+
+            &#{$block}_highlighted {
+                --entity-state-border-color: var(--g-color-line-warning);
+                --entity-state-icon-color: var(--g-color-base-warning-heavy);
+                --entity-state-background-color: var(--entity-state-fill-color);
+            }
+        }
+
+        &#{$block}_red {
+            --entity-state-background-color: transparent;
+            --entity-state-border-color: var(--g-color-line-danger);
+            --entity-state-icon-color: var(--g-color-base-danger-heavy);
+            --entity-state-fill-color: var(--g-color-base-danger-light);
+
+            &#{$block}_highlighted {
+                --entity-state-border-color: var(--g-color-line-danger);
+                --entity-state-icon-color: var(--g-color-base-danger-heavy);
+                --entity-state-background-color: var(--entity-state-fill-color);
+            }
+        }
+
+        &#{$block}_solidred {
+            --entity-state-background-color: var(--g-color-base-danger-medium);
+            --entity-state-fill-color: var(--g-color-base-danger-heavy);
+            --entity-state-border-color: var(--g-color-base-danger-heavy);
+            --entity-state-icon-color: var(--g-color-text-primary);
+
+            &#{$block}_highlighted {
+                --entity-state-background-color: var(--g-color-base-danger-medium-hover);
+                --entity-state-fill-color: var(--g-color-base-danger-heavy-hover);
+                --entity-state-border-color: var(--g-color-base-danger-heavy-hover);
+            }
+        }
+
+        &#{$block}_grey {
+            --entity-state-background-color: var(--g-color-base-neutral-medium);
+            --entity-state-border-color: none;
+            --entity-state-fill-color: var(--g-color-base-neutral-medium);
+
+            border: none;
+
+            &#{$block}_highlighted {
+                --entity-state-background-color: var(--g-color-base-neutral-medium-hover);
+                --entity-state-border-color: none;
+                --entity-state-fill-color: var(--g-color-base-neutral-medium-hover);
+
+                border: none;
+            }
+        }
+
+        #{$block}__fill-bar {
+            border-radius: calc(var(--disk-border-radius, var(--g-border-radius-m)) - 1px) 0 0
+                calc(var(--disk-border-radius, var(--g-border-radius-m)) - 1px);
+        }
+
+        #{$block}__icon_overlap-top-left {
+            background-image: radial-gradient(
+                circle,
+                var(--g-color-base-background) 0 calc(50% - 1px),
+                transparent calc(50% - 1px)
+            );
         }
     }
 
@@ -344,6 +429,15 @@
         margin-left: calc(var(--g-spacing-1) - $border-width);
 
         color: var(--entity-state-icon-color, var(--entity-state-border-color));
+
+        &_overlap-top-left {
+            position: absolute;
+            z-index: 3;
+            top: -6px;
+            left: -4px;
+
+            margin-left: 0;
+        }
     }
 
     &__text-label {

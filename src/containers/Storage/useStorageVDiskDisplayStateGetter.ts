@@ -23,6 +23,7 @@ function getModeModifier(groupBy: VDisksGroupByValue): string | undefined {
         case VDisksGroupBy.Compaction:
             return 'mode-compaction';
         case VDisksGroupBy.All:
+            return 'mode-all';
         default:
             return undefined;
     }

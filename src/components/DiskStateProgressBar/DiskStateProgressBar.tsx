@@ -17,6 +17,7 @@ const b = cn('storage-disk-progress-bar');
 
 interface DiskStateProgressBarProps {
     diskAllocatedPercent?: number;
+    hideAllocatedPercentLabel?: boolean;
     severity?: number;
     compact?: boolean;
     faded?: boolean;
@@ -31,11 +32,14 @@ interface DiskStateProgressBarProps {
     modeModifier?: string;
     highlighted?: boolean;
     noDataPlaceholder?: React.ReactNode;
+    prioritizeNoDataPlaceholder?: boolean;
+    overlapIconAtTopLeft?: boolean;
     isLegendInactive?: boolean;
 }
 
 export function DiskStateProgressBar({
     diskAllocatedPercent = -1,
+    hideAllocatedPercentLabel,
     severity,
     compact,
     faded,
@@ -50,6 +54,8 @@ export function DiskStateProgressBar({
     modeModifier,
     highlighted,
     noDataPlaceholder,
+    prioritizeNoDataPlaceholder,
+    overlapIconAtTopLeft,
     isLegendInactive,
 }: DiskStateProgressBarProps) {
     const [inverted] = useSetting<boolean | undefined>(SETTING_KEYS.INVERTED_DISKS);
@@ -63,6 +69,7 @@ export function DiskStateProgressBar({
         striped,
         highlighted,
         'legend-inactive': isLegendInactive,
+        'overlap-icon-at-top-left': overlapIconAtTopLeft,
     };
 
     // Add mode modifier if present
@@ -105,11 +112,15 @@ export function DiskStateProgressBar({
             return content;
         }
 
-        if (!compact && hasAllocatedPercent) {
+        if (!compact && hasAllocatedPercent && !hideAllocatedPercentLabel) {
             return <div className={b('title')}>{`${Math.floor(diskAllocatedPercent)}%`}</div>;
         }
 
-        if (!compact && !hasAllocatedPercent && noDataPlaceholder) {
+        if (
+            !compact &&
+            (!hasAllocatedPercent || prioritizeNoDataPlaceholder) &&
+            noDataPlaceholder
+        ) {
             return <div className={b('title', {text: true})}>{noDataPlaceholder}</div>;
         }
 
@@ -155,7 +166,13 @@ export function DiskStateProgressBar({
                     </div>
                 );
             } else {
-                iconElement = <Icon className={b('icon')} data={icon} size={12} />;
+                iconElement = (
+                    <Icon
+                        className={b('icon', {'overlap-top-left': overlapIconAtTopLeft})}
+                        data={icon}
+                        size={12}
+                    />
+                );
             }
         }
     }

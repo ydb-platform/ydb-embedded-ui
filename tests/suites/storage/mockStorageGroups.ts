@@ -77,7 +77,10 @@ function createMockVDisk({
     const nodeId = MOCK_NODE_ID_BASE + index;
     const pDiskId = MOCK_PDISK_ID_BASE + index;
     const vDiskSlotId = MOCK_VDISK_SLOT_ID_BASE + index;
-    const allocatedSize = MOCK_ALLOCATED_SIZE_BASE * (index + 1);
+    const allocatedSize =
+        state === EVDiskState.PDiskError
+            ? 3 * MOCK_ALLOCATED_SIZE_BASE
+            : MOCK_ALLOCATED_SIZE_BASE * (index + 1);
     const availableSize = MOCK_SLOT_SIZE - allocatedSize;
 
     return {

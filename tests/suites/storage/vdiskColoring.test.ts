@@ -12,6 +12,14 @@ import {
 import {DATABASE, setupVDiskColoringMocks} from './vdiskColoringMocks';
 
 const VDISKS_COUNT = 10;
+const STATE_ONLY_OK_VDISK_INDEX = 4;
+const INITIAL_VDISK_INDEX = 5;
+const RECOVERY_ERROR_VDISK_INDEX = 8;
+const PDISK_ERROR_VDISK_INDEX = 9;
+const TRANSPARENT_BACKGROUND = 'rgba(0, 0, 0, 0)';
+const INITIAL_ICON_COLOR_TOKEN = '--g-color-base-warning-heavy';
+const PDISK_ERROR_ICON_COLOR_TOKEN = '--g-color-base-danger-heavy';
+const RECOVERY_ERROR_ICON_COLOR_TOKEN = '--g-color-text-primary';
 
 const VDISK_GROUP_BY_MODES: {value: VDisksGroupByValue; slug: string}[] = [
     {value: VDisksGroupBy.State, slug: 'state'},
@@ -55,13 +63,7 @@ async function gotoStoragePage(page: Page, vdisksGroupBy: VDisksGroupByValue) {
     url.searchParams.set('storageExpertMode', 'true');
     url.searchParams.set('vdisksGroupBy', vdisksGroupBy);
 
-    const [storageGroupsResponse] = await Promise.all([
-        page.waitForResponse(
-            (response) => response.url().includes('/storage/groups') && response.ok(),
-        ),
-        page.goto(`${url.pathname}${url.search}`),
-    ]);
-    await storageGroupsResponse.finished();
+    await page.goto(`${url.pathname}${url.search}`);
 }
 
 async function hideFloatingPopups(page: Page) {
@@ -103,6 +105,83 @@ function getVDiskItems(row: Locator) {
 
 function getVDiskProgressBar(item: Locator) {
     return item.locator('.storage-disk-progress-bar').first();
+}
+
+function getVDiskFillBar(progressBar: Locator) {
+    return progressBar.locator('.storage-disk-progress-bar__fill-bar');
+}
+
+async function expectAllocationFill(progressBar: Locator, allocatedPercent: number) {
+    const fillBar = getVDiskFillBar(progressBar);
+
+    await expect(progressBar).toHaveAttribute('aria-valuenow', String(allocatedPercent));
+    await expect(fillBar).toHaveCount(1);
+}
+
+async function expectTransparentBackgroundWithFill(progressBar: Locator) {
+    await expect(getVDiskFillBar(progressBar)).toHaveCount(1);
+    await expect(progressBar).toHaveCSS('background-color', TRANSPARENT_BACKGROUND);
+}
+
+async function resolveThemeColor(page: Page, colorToken: string) {
+    return page.locator('body').evaluate((element, token) => {
+        const tokenDefinition = getComputedStyle(element).getPropertyValue(token).trim();
+        if (!tokenDefinition) {
+            throw new Error(`Theme color token ${token} is not defined`);
+        }
+
+        const probe = document.createElement('span');
+        probe.style.setProperty('background-color', `var(${token})`);
+        probe.style.setProperty('position', 'absolute');
+        probe.style.setProperty('visibility', 'hidden');
+        element.appendChild(probe);
+
+        const color = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+
+        return color;
+    }, colorToken);
+}
+
+async function expectStatusIconMatchesReference(
+    page: Page,
+    progressBar: Locator,
+    expectedColorToken: string,
+    checkOverlap = false,
+) {
+    const icon = progressBar.locator('.storage-disk-progress-bar__icon');
+
+    await expect(icon).toBeVisible();
+
+    const [expectedColor, expectedBackgroundColor, actualColors] = await Promise.all([
+        resolveThemeColor(page, expectedColorToken),
+        resolveThemeColor(page, '--g-color-base-background'),
+        icon.evaluate((element) => {
+            return {
+                actualBackgroundColor: getComputedStyle(element).backgroundColor,
+                actualBackgroundImage: getComputedStyle(element).backgroundImage,
+                actualColor: getComputedStyle(element).color,
+            };
+        }),
+    ]);
+
+    expect(actualColors.actualColor).toBe(expectedColor);
+    expect(actualColors.actualBackgroundColor).toBe(TRANSPARENT_BACKGROUND);
+    expect(actualColors.actualBackgroundImage).toContain(expectedBackgroundColor);
+
+    if (checkOverlap) {
+        const progressBarBox = await progressBar.boundingBox();
+        const iconBox = await icon.boundingBox();
+
+        if (!progressBarBox || !iconBox) {
+            throw new Error('Cannot compare VDisk progress bar and status icon bounding boxes');
+        }
+
+        expect(iconBox.x).toBeLessThan(progressBarBox.x);
+        expect(iconBox.y).toBeLessThan(progressBarBox.y);
+        expect(iconBox.x + iconBox.width).toBeGreaterThan(progressBarBox.x);
+        expect(iconBox.y + iconBox.height).toBeGreaterThan(progressBarBox.y);
+    }
 }
 
 async function clearForcedHover(page: Page) {
@@ -200,6 +279,184 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
 
         await expect(noFrontQueuesVDisk).not.toContainText('N/D');
         await expect(noFrontQueuesVDisk.locator('.storage-disk-progress-bar__icon')).toHaveCount(1);
+    });
+
+    test.describe('All mode', () => {
+        test('uses State visuals, keeps fill without labels, and preserves replication', async ({
+            page,
+        }) => {
+            await preparePage(page, VDisksGroupBy.All);
+
+            const ordinaryItems = getVDiskItems(getStorageGroupRow(page, 0));
+            const stateOnlyOk = getVDiskProgressBar(ordinaryItems.nth(STATE_ONLY_OK_VDISK_INDEX));
+            const initial = getVDiskProgressBar(ordinaryItems.nth(INITIAL_VDISK_INDEX));
+
+            await expect(stateOnlyOk).toHaveClass(/storage-disk-progress-bar_mode-all/);
+            await expect(stateOnlyOk).toHaveClass(/storage-disk-progress-bar_green/);
+            await expect(stateOnlyOk).toHaveAttribute('aria-valuenow', '50');
+            await expect(stateOnlyOk.locator('.storage-disk-progress-bar__fill-bar')).toHaveCount(
+                1,
+            );
+            await expect(stateOnlyOk).not.toContainText(/\d+%/);
+
+            await expect(initial).toHaveClass(/storage-disk-progress-bar_yellow/);
+            await expect(initial).not.toContainText(/\d+%/);
+            await expect(initial).not.toContainText('LY');
+
+            const replicatingItems = getVDiskItems(getStorageGroupRow(page, 1));
+            const healthyReplicating = getVDiskProgressBar(replicatingItems.nth(0));
+            const initialUnreplicated = getVDiskProgressBar(
+                replicatingItems.nth(INITIAL_VDISK_INDEX),
+            );
+
+            await expect(healthyReplicating).toHaveClass(/storage-disk-progress-bar_blue/);
+            await expect(healthyReplicating).toHaveClass(/storage-disk-progress-bar_striped/);
+            await expect(healthyReplicating).toHaveCSS(
+                'background-image',
+                /repeating-linear-gradient/,
+            );
+            await expect(
+                healthyReplicating.locator('.storage-disk-progress-bar__icon'),
+            ).toHaveCount(0);
+            await expect(healthyReplicating).not.toContainText('G');
+            await expect(initialUnreplicated).toHaveClass(/storage-disk-progress-bar_yellow/);
+            await expect(initialUnreplicated).not.toHaveClass(/storage-disk-progress-bar_striped/);
+        });
+
+        test('uses State normal and hover colors while preserving allocation fills', async ({
+            page,
+        }) => {
+            await preparePage(page, VDisksGroupBy.All);
+
+            const ordinaryItems = getVDiskItems(getStorageGroupRow(page, 0));
+            const stateOnlyOk = getVDiskProgressBar(ordinaryItems.nth(STATE_ONLY_OK_VDISK_INDEX));
+            const initial = getVDiskProgressBar(ordinaryItems.nth(INITIAL_VDISK_INDEX));
+            const pDiskError = getVDiskProgressBar(ordinaryItems.nth(PDISK_ERROR_VDISK_INDEX));
+            const recoveryError = getVDiskProgressBar(
+                ordinaryItems.nth(RECOVERY_ERROR_VDISK_INDEX),
+            );
+            const recoveryErrorFill = getVDiskFillBar(recoveryError);
+            const ordinaryStateBars = [stateOnlyOk, initial, pDiskError];
+            const normalFillColors = await Promise.all(
+                ordinaryStateBars.map((progressBar) =>
+                    getVDiskFillBar(progressBar).evaluate(
+                        (element) => getComputedStyle(element).backgroundColor,
+                    ),
+                ),
+            );
+            const [dangerHeavyHover, dangerMediumHover] = await Promise.all([
+                resolveThemeColor(page, '--g-color-base-danger-heavy-hover'),
+                resolveThemeColor(page, '--g-color-base-danger-medium-hover'),
+            ]);
+
+            await Promise.all(
+                ordinaryStateBars.map((progressBar) =>
+                    expectTransparentBackgroundWithFill(progressBar),
+                ),
+            );
+
+            const pDiskAllocation = Number(await pDiskError.getAttribute('aria-valuenow'));
+            expect(pDiskAllocation).toBeGreaterThan(0);
+            expect(pDiskAllocation).toBeLessThan(100);
+
+            await expect(recoveryError).not.toHaveCSS('background-color', TRANSPARENT_BACKGROUND);
+            await expect(recoveryErrorFill).toHaveCount(1);
+
+            const recoveryErrorBackground = await recoveryError.evaluate(
+                (element) => getComputedStyle(element).backgroundColor,
+            );
+            const recoveryErrorFillColor = await recoveryErrorFill.evaluate(
+                (element) => getComputedStyle(element).backgroundColor,
+            );
+
+            expect(recoveryErrorFillColor).not.toBe(recoveryErrorBackground);
+
+            await forceHoverStorageGroupVDiskItems(page, 0);
+
+            await Promise.all(
+                ordinaryStateBars.map(async (progressBar, index) => {
+                    const fillBar = getVDiskFillBar(progressBar);
+
+                    await expect(fillBar).toHaveCSS('background-color', normalFillColors[index]);
+                    await expect(progressBar).toHaveCSS(
+                        'background-color',
+                        normalFillColors[index],
+                    );
+                }),
+            );
+
+            await expect(getVDiskFillBar(recoveryError)).toHaveCSS(
+                'background-color',
+                dangerHeavyHover,
+            );
+            await expect(recoveryError).toHaveCSS('border-color', dangerHeavyHover);
+            await expect(recoveryError).toHaveCSS('background-color', dangerMediumHover);
+        });
+
+        test('keeps a partial Initial fill rounded at the lower-left corner', async ({page}) => {
+            await preparePage(page, VDisksGroupBy.All);
+
+            const initial = getVDiskProgressBar(
+                getVDiskItems(getStorageGroupRow(page, 0)).nth(INITIAL_VDISK_INDEX),
+            );
+            const initialFill = getVDiskFillBar(initial);
+
+            const bottomLeftRadius = await initialFill.evaluate(
+                (element) => getComputedStyle(element).borderBottomLeftRadius,
+            );
+
+            expect(Number.parseFloat(bottomLeftRadius)).toBeGreaterThan(0);
+        });
+
+        test('renders missing Whiteboard data on a filled no-data background', async ({page}) => {
+            await preparePage(page, VDisksGroupBy.All);
+
+            const noWhiteboardVDisk = getVDiskProgressBar(
+                getVDiskItems(getStorageGroupRow(page, 0)).nth(MISSING_WHITEBOARD_VDISK_INDEX),
+            );
+            const [normalColor, highlightedColor] = await Promise.all([
+                resolveThemeColor(page, '--g-color-base-neutral-medium'),
+                resolveThemeColor(page, '--g-color-base-neutral-medium-hover'),
+            ]);
+
+            await expectAllocationFill(noWhiteboardVDisk, 10);
+            await expect(noWhiteboardVDisk).toHaveClass(/storage-disk-progress-bar_grey/);
+            await expect(noWhiteboardVDisk).toContainText('N/D');
+            await expect(noWhiteboardVDisk).toHaveCSS('background-color', normalColor);
+            await expect(getVDiskFillBar(noWhiteboardVDisk)).toHaveCSS(
+                'background-color',
+                normalColor,
+            );
+            await expect(noWhiteboardVDisk).toHaveCSS('border-style', 'none');
+
+            await forceHoverStorageGroupVDiskItems(page, 0);
+
+            await expect(noWhiteboardVDisk).toHaveCSS('background-color', highlightedColor);
+            await expect(getVDiskFillBar(noWhiteboardVDisk)).toHaveCSS(
+                'background-color',
+                highlightedColor,
+            );
+            await expect(noWhiteboardVDisk).toHaveCSS('border-style', 'none');
+        });
+
+        test('overlaps State status icons with the top-left bar corner', async ({page}) => {
+            await preparePage(page, VDisksGroupBy.All);
+
+            const ordinaryItems = getVDiskItems(getStorageGroupRow(page, 0));
+            const initial = getVDiskProgressBar(ordinaryItems.nth(INITIAL_VDISK_INDEX));
+            const pDiskError = getVDiskProgressBar(ordinaryItems.nth(PDISK_ERROR_VDISK_INDEX));
+            const recoveryError = getVDiskProgressBar(
+                ordinaryItems.nth(RECOVERY_ERROR_VDISK_INDEX),
+            );
+
+            await expectStatusIconMatchesReference(page, initial, INITIAL_ICON_COLOR_TOKEN, true);
+            await expectStatusIconMatchesReference(page, pDiskError, PDISK_ERROR_ICON_COLOR_TOKEN);
+            await expectStatusIconMatchesReference(
+                page,
+                recoveryError,
+                RECOVERY_ERROR_ICON_COLOR_TOKEN,
+            );
+        });
     });
 
     for (const mode of VDISK_GROUP_BY_MODES) {
