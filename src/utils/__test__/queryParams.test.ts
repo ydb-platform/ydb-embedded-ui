@@ -1,4 +1,9 @@
-import {canonicalizeDatabaseQueryString} from '../queryParams';
+import {createBrowserHistory} from 'history';
+
+import {
+    canonicalizeDatabaseQueryString,
+    installDatabaseQueryCanonicalization,
+} from '../queryParams';
 
 describe('canonicalizeDatabaseQueryString', () => {
     test('keeps only the last repeated database scalar value', () => {
@@ -26,6 +31,7 @@ describe('canonicalizeDatabaseQueryString', () => {
     // The list intentionally duplicates the source set: adding or removing a known
     // single-value parameter must be an explicit, review-visible decision.
     test('canonicalizes every known database scalar parameter', () => {
+        const numericParams = new Set(['selectedOffset', 'startTimestamp', 'activeOffset']);
         const scalarParams = [
             'backend',
             'clusterName',
@@ -80,6 +86,9 @@ describe('canonicalizeDatabaseQueryString', () => {
                         )}`,
                     ];
                 }
+                if (numericParams.has(param)) {
+                    return [`${param}=1`, `${param}%5B999%5D=2`];
+                }
                 return [`${param}=stale`, `${param}%5B999%5D=fresh`];
             })
             .join('&');
@@ -91,6 +100,8 @@ describe('canonicalizeDatabaseQueryString', () => {
                 expect(JSON.parse(decodeURIComponent(result.get(param) ?? ''))).toEqual({
                     queryHash: 'fresh',
                 });
+            } else if (numericParams.has(param)) {
+                expect(result.getAll(param)).toEqual(['2']);
             } else {
                 expect(result.getAll(param)).toEqual(['fresh']);
             }
@@ -124,6 +135,23 @@ describe('canonicalizeDatabaseQueryString', () => {
         expect(canonicalizeDatabaseQueryString('?selectedRow=not-json')).toBe('');
     });
 
+    test.each(['selectedOffset', 'startTimestamp', 'activeOffset'])(
+        'keeps the last valid numeric %s value',
+        (param) => {
+            expect(canonicalizeDatabaseQueryString(`?${param}=42&${param}%5B99%5D=oops`)).toBe(
+                `?${param}=42`,
+            );
+        },
+    );
+
+    test('drops numeric params when they have no valid value', () => {
+        expect(
+            canonicalizeDatabaseQueryString(
+                '?selectedOffset=oops&startTimestamp%5B0%5D=Infinity&activeOffset=',
+            ),
+        ).toBe('');
+    });
+
     test('is idempotent and preserves an empty winning scalar value', () => {
         const first = canonicalizeDatabaseQueryString(
             '?database=%2Flocal&database%5B999%5D=&tag=one&tag=two',
@@ -138,5 +166,64 @@ describe('canonicalizeDatabaseQueryString', () => {
         expect(canonicalizeDatabaseQueryString('utm_referrer=volatile')).toBe('');
         expect(canonicalizeDatabaseQueryString('database=%2Flocal')).toBe('database=%2Flocal');
         expect(canonicalizeDatabaseQueryString('')).toBe('');
+    });
+});
+
+describe('installDatabaseQueryCanonicalization', () => {
+    test('keeps the active history and every listener on the canonical database location', () => {
+        window.history.replaceState(null, '', '/monitoring/cluster');
+        const history = createBrowserHistory({basename: '/monitoring'});
+        installDatabaseQueryCanonicalization(history);
+        const receivedSearches: string[] = [];
+        const firstUnlisten = history.listen((location) => {
+            receivedSearches.push(location.search);
+        });
+        const secondUnlisten = history.listen((location) => {
+            receivedSearches.push(location.search);
+        });
+
+        history.push({
+            pathname: '/database',
+            search: '?database%5B21%5D=old&database=%2Fprod',
+            hash: '#details',
+            state: {preserved: true},
+        });
+
+        expect(receivedSearches).toEqual(['?database=%2Fprod', '?database=%2Fprod']);
+        expect(history.location).toMatchObject({
+            pathname: '/database',
+            search: '?database=%2Fprod',
+            hash: '#details',
+            state: {preserved: true},
+        });
+        expect(window.location.search).toBe('?database=%2Fprod');
+        expect(window.location.pathname).toBe('/monitoring/database');
+        expect(window.location.hash).toBe('#details');
+        expect(window.history.state.state).toEqual({preserved: true});
+
+        firstUnlisten();
+        secondUnlisten();
+    });
+
+    test('leaves another route unchanged', () => {
+        window.history.replaceState(null, '', '/cluster');
+        const history = createBrowserHistory();
+        installDatabaseQueryCanonicalization(history);
+        const listener = jest.fn();
+        const unlisten = history.listen(listener);
+
+        history.push('/cluster?database=old&database=new');
+
+        expect(listener).toHaveBeenCalledWith(
+            expect.objectContaining({
+                pathname: '/cluster',
+                search: '?database=old&database=new',
+            }),
+            'PUSH',
+        );
+        expect(history.location.search).toBe('?database=old&database=new');
+        expect(window.location.search).toBe('?database=old&database=new');
+
+        unlisten();
     });
 });

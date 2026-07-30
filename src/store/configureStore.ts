@@ -6,6 +6,7 @@ import {isNil} from 'lodash';
 import {listenForHistoryChange} from 'redux-location-state';
 
 import {YdbEmbeddedAPI} from '../services/api';
+import {installDatabaseQueryCanonicalization} from '../utils/queryParams';
 import {parseJson} from '../utils/utils';
 
 import {getUrlData} from './getUrlData';
@@ -96,6 +97,7 @@ export function configureStore({
         allowedEnvironments: environments,
     });
     const history = createBrowserHistory({basename});
+    installDatabaseQueryCanonicalization(history);
 
     history.listen(() => {
         getUrlDataAndSetParams({

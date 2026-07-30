@@ -146,6 +146,17 @@ describe('restoreUnknownParams', () => {
         expect(getSearchParams(result.search).getAll('selectedRow')).toEqual([validSelectedRow]);
     });
 
+    test('restores the last valid numeric topic data value', () => {
+        const result = restoreUnknownParams(
+            createLocation('?diagnosticsTab=topQueries'),
+            createLocation(
+                '?diagnosticsTab=topicData&selectedOffset=42&selectedOffset%5B99%5D=oops',
+            ),
+        );
+
+        expect(getSearchParams(result.search).getAll('selectedOffset')).toEqual(['42']);
+    });
+
     test('does not canonicalize params on another route', () => {
         const result = restoreUnknownParams(
             createLocation('', '/cluster'),

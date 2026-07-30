@@ -1,8 +1,16 @@
+import type {History} from 'history';
+
 const VOLATILE_QUERY_PARAMS = ['utm_referrer'] as const;
 
 type VolatileQueryParam = (typeof VOLATILE_QUERY_PARAMS)[number];
 
 const VOLATILE_QUERY_PARAM_SET: ReadonlySet<string> = new Set(VOLATILE_QUERY_PARAMS);
+
+const DATABASE_NUMBER_VALUE_PARAMS: ReadonlySet<string> = new Set([
+    'selectedOffset',
+    'startTimestamp',
+    'activeOffset',
+]);
 
 export function omitVolatileQueryParams<T extends Record<string, unknown>>(
     query: T,
@@ -95,7 +103,13 @@ function isValidSelectedRow(value: string) {
 }
 
 function isValidDatabaseScalarValue(name: string, value: string) {
-    return name !== 'selectedRow' || isValidSelectedRow(value);
+    if (name === 'selectedRow') {
+        return isValidSelectedRow(value);
+    }
+    if (DATABASE_NUMBER_VALUE_PARAMS.has(name)) {
+        return value.trim() !== '' && Number.isFinite(Number(value));
+    }
+    return true;
 }
 
 export function isDatabasePathname(pathname?: string) {
@@ -158,4 +172,37 @@ export function canonicalizeCurrentDatabaseUrl() {
         '',
         `${window.location.pathname}${canonicalSearch}${window.location.hash}`,
     );
+}
+
+export function installDatabaseQueryCanonicalization(targetHistory: History) {
+    const history = targetHistory;
+    const listen = history.listen.bind(history);
+
+    // history v4 snapshots listener arguments. Calling history.replace() from one
+    // listener would still deliver the stale location to the remaining listeners,
+    // so canonicalize the argument at the shared listen boundary instead.
+    history.listen = (listener) =>
+        listen((location, action) => {
+            if (!isDatabasePathname(location.pathname)) {
+                listener(location, action);
+                return;
+            }
+
+            const canonicalSearch = canonicalizeDatabaseQueryString(location.search);
+            if (canonicalSearch === location.search) {
+                listener(location, action);
+                return;
+            }
+
+            const canonicalLocation = {...location, search: canonicalSearch};
+            if (history.location === location) {
+                window.history.replaceState(
+                    window.history.state,
+                    '',
+                    history.createHref(canonicalLocation),
+                );
+                history.location = canonicalLocation;
+            }
+            listener(canonicalLocation, action);
+        });
 }
