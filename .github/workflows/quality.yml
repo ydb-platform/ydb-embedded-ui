@@ -32,7 +32,7 @@ jobs:
 
       - name: Start local YDB
         id: ydb
-        uses: astandrik/setup-local-ydb@101cacef6f72c74b9f203310867d1e9767cdae2b
+        uses: astandrik/setup-local-ydb@v1.1.0
         with:
           version: nightly
           topology: root
