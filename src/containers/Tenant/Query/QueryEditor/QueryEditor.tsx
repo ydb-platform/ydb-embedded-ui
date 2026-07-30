@@ -75,6 +75,7 @@ import {useQueryPageLeaveGuard} from './hooks/useQueryPageLeaveGuard';
 import {useQueryTabsActions} from './hooks/useQueryTabsActions';
 import type {QueryExecution} from './types';
 import {queryExecutionManagerInstance} from './utils/queryExecutionManager';
+import {reachExplainQueryMetricaGoals} from './utils/reachExplainQueryMetricaGoals';
 
 import './QueryEditor.scss';
 
@@ -607,7 +608,8 @@ export default function QueryEditor({
 
             const {tabId, queryId, startTime} = execution;
 
-            reachMetricaGoal('runQuery', {actionType, ...querySettings});
+            const metricaParams = {actionType, ...querySettings};
+            reachExplainQueryMetricaGoals(actionType, metricaParams);
 
             const query = sendQuery({
                 tabId,
