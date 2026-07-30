@@ -93,7 +93,7 @@ export function calculateSpaceIcon(
         return DONOR_ICON;
     }
 
-    if (!vDisk.CapacityAlert || !isCapacityAlert(vDisk.CapacityAlert)) {
+    if (!isCapacityAlert(vDisk.CapacityAlert)) {
         return CircleQuestionFill;
     }
 
@@ -116,9 +116,9 @@ export function calculateSpaceIcon(
             return 'R';
         case ECapacityAlert.BLACK:
             return 'B';
+        default:
+            return CircleQuestionFill;
     }
-
-    return undefined;
 }
 
 /**

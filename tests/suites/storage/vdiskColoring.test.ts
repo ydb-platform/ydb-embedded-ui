@@ -17,6 +17,7 @@ const INITIAL_VDISK_INDEX = 5;
 const RECOVERY_ERROR_VDISK_INDEX = 8;
 const PDISK_ERROR_VDISK_INDEX = 9;
 const TRANSPARENT_BACKGROUND = 'rgba(0, 0, 0, 0)';
+const MISSING_CAPACITY_INDICATOR_COLOR = 'rgb(162, 162, 162)';
 const INITIAL_ICON_COLOR_TOKEN = '--g-color-base-warning-heavy';
 const PDISK_ERROR_ICON_COLOR_TOKEN = '--g-color-base-danger-heavy';
 const RECOVERY_ERROR_ICON_COLOR_TOKEN = '--g-color-text-primary';
@@ -36,6 +37,8 @@ const STORAGE_GROUPS = [
 const FORCED_HOVER_ROW_CLASS = 'ydb-paginated-table__row_forced-hover';
 const FORCED_HOVERED_DISK_CLASS = 'storage-disk-progress-bar_highlighted';
 const FORCED_EXPANDED_STACK_CLASS = 'ydb-stack_expanded';
+const ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR =
+    '.storage-disk-progress-bar__all-mode-capacity-alert-indicator-slot';
 
 async function enableExpertMode(page: Page, vdisksGroupBy: VDisksGroupByValue) {
     await page.addInitScript((groupByValue) => {
@@ -141,6 +144,30 @@ async function resolveThemeColor(page: Page, colorToken: string) {
 
         return color;
     }, colorToken);
+}
+
+async function resolveCaption2Typography(page: Page) {
+    return page.locator('body').evaluate((element) => {
+        const probe = document.createElement('span');
+        probe.style.setProperty('position', 'absolute');
+        probe.style.setProperty('visibility', 'hidden');
+        probe.style.setProperty('font-family', 'var(--g-text-caption-font-family)');
+        probe.style.setProperty('font-size', 'var(--g-text-caption-2-font-size)');
+        probe.style.setProperty('font-weight', 'var(--g-text-caption-font-weight)');
+        probe.style.setProperty('line-height', 'var(--g-text-caption-2-line-height)');
+        element.appendChild(probe);
+
+        const styles = getComputedStyle(probe);
+        const typography = {
+            fontFamily: styles.fontFamily,
+            fontSize: styles.fontSize,
+            fontWeight: styles.fontWeight,
+            lineHeight: styles.lineHeight,
+        };
+        probe.remove();
+
+        return typography;
+    });
 }
 
 async function expectStatusIconMatchesReference(
@@ -290,6 +317,13 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             const ordinaryItems = getVDiskItems(getStorageGroupRow(page, 0));
             const stateOnlyOk = getVDiskProgressBar(ordinaryItems.nth(STATE_ONLY_OK_VDISK_INDEX));
             const initial = getVDiskProgressBar(ordinaryItems.nth(INITIAL_VDISK_INDEX));
+            const missingCapacityAlert = getVDiskProgressBar(
+                ordinaryItems.nth(PDISK_ERROR_VDISK_INDEX),
+            );
+            const initialCapacityAlertSlot = initial.locator(ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR);
+            const missingCapacityAlertSlot = missingCapacityAlert.locator(
+                ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR,
+            );
 
             await expect(stateOnlyOk).toHaveClass(/storage-disk-progress-bar_mode-all/);
             await expect(stateOnlyOk).toHaveClass(/storage-disk-progress-bar_green/);
@@ -301,10 +335,56 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
 
             await expect(initial).toHaveClass(/storage-disk-progress-bar_yellow/);
             await expect(initial).not.toContainText(/\d+%/);
-            await expect(initial).not.toContainText('LY');
+            await expect(initialCapacityAlertSlot).toHaveCount(1);
+            await expect(initialCapacityAlertSlot).toHaveCSS('width', '16px');
+            await expect(initialCapacityAlertSlot).toHaveText('LY');
+
+            const [expectedCaption2, expectedTextColor, actualTypography] = await Promise.all([
+                resolveCaption2Typography(page),
+                resolveThemeColor(page, '--g-color-text-primary'),
+                initialCapacityAlertSlot.evaluate((element) => {
+                    const styles = getComputedStyle(element);
+
+                    return {
+                        color: styles.color,
+                        fontFamily: styles.fontFamily,
+                        fontSize: styles.fontSize,
+                        fontWeight: styles.fontWeight,
+                        lineHeight: styles.lineHeight,
+                    };
+                }),
+            ]);
+
+            expect(actualTypography).toEqual({
+                ...expectedCaption2,
+                color: expectedTextColor,
+            });
+
+            const [initialBox, initialSlotBox] = await Promise.all([
+                initial.boundingBox(),
+                initialCapacityAlertSlot.boundingBox(),
+            ]);
+
+            if (!initialBox || !initialSlotBox) {
+                throw new Error('Cannot compare All-mode VDisk and Capacity Alert slot boxes');
+            }
+
+            expect(initialSlotBox.x - initialBox.x).toBeCloseTo(4, 5);
+
+            await expect(missingCapacityAlertSlot).toHaveCount(1);
+            await expect(missingCapacityAlertSlot).toHaveCSS('width', '16px');
+            const missingCapacityAlertIcon = missingCapacityAlertSlot.locator('.g-icon');
+            await expect(missingCapacityAlertIcon).toBeVisible();
+            await expect(missingCapacityAlertIcon).toHaveCSS(
+                'color',
+                MISSING_CAPACITY_INDICATOR_COLOR,
+            );
 
             const replicatingItems = getVDiskItems(getStorageGroupRow(page, 1));
             const healthyReplicating = getVDiskProgressBar(replicatingItems.nth(0));
+            const healthyCapacityAlertSlot = healthyReplicating.locator(
+                ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR,
+            );
             const initialUnreplicated = getVDiskProgressBar(
                 replicatingItems.nth(INITIAL_VDISK_INDEX),
             );
@@ -318,7 +398,9 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(
                 healthyReplicating.locator('.storage-disk-progress-bar__icon'),
             ).toHaveCount(0);
-            await expect(healthyReplicating).not.toContainText('G');
+            await expect(healthyCapacityAlertSlot).toHaveCount(1);
+            await expect(healthyCapacityAlertSlot).toHaveCSS('width', '16px');
+            await expect(healthyCapacityAlertSlot).toBeEmpty();
             await expect(initialUnreplicated).toHaveClass(/storage-disk-progress-bar_yellow/);
             await expect(initialUnreplicated).not.toHaveClass(/storage-disk-progress-bar_striped/);
         });
@@ -337,39 +419,43 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             );
             const recoveryErrorFill = getVDiskFillBar(recoveryError);
             const ordinaryStateBars = [stateOnlyOk, initial, pDiskError];
-            const normalFillColors = await Promise.all(
-                ordinaryStateBars.map((progressBar) =>
-                    getVDiskFillBar(progressBar).evaluate(
-                        (element) => getComputedStyle(element).backgroundColor,
-                    ),
-                ),
-            );
-            const [dangerHeavyHover, dangerMediumHover] = await Promise.all([
+            const [
+                positiveLight,
+                warningLight,
+                dangerLight,
+                dangerHeavy,
+                dangerMedium,
+                dangerHeavyHover,
+                dangerMediumHover,
+            ] = await Promise.all([
+                resolveThemeColor(page, '--g-color-base-positive-light'),
+                resolveThemeColor(page, '--g-color-base-warning-light'),
+                resolveThemeColor(page, '--g-color-base-danger-light'),
+                resolveThemeColor(page, '--g-color-base-danger-heavy'),
+                resolveThemeColor(page, '--g-color-base-danger-medium'),
                 resolveThemeColor(page, '--g-color-base-danger-heavy-hover'),
                 resolveThemeColor(page, '--g-color-base-danger-medium-hover'),
             ]);
+            const ordinaryNormalFillColors = [positiveLight, warningLight, dangerLight];
 
             await Promise.all(
-                ordinaryStateBars.map((progressBar) =>
-                    expectTransparentBackgroundWithFill(progressBar),
-                ),
+                ordinaryStateBars.map(async (progressBar, index) => {
+                    await expectTransparentBackgroundWithFill(progressBar);
+                    await expect(getVDiskFillBar(progressBar)).toHaveCSS(
+                        'background-color',
+                        ordinaryNormalFillColors[index],
+                    );
+                }),
             );
 
             const pDiskAllocation = Number(await pDiskError.getAttribute('aria-valuenow'));
             expect(pDiskAllocation).toBeGreaterThan(0);
             expect(pDiskAllocation).toBeLessThan(100);
 
-            await expect(recoveryError).not.toHaveCSS('background-color', TRANSPARENT_BACKGROUND);
             await expect(recoveryErrorFill).toHaveCount(1);
-
-            const recoveryErrorBackground = await recoveryError.evaluate(
-                (element) => getComputedStyle(element).backgroundColor,
-            );
-            const recoveryErrorFillColor = await recoveryErrorFill.evaluate(
-                (element) => getComputedStyle(element).backgroundColor,
-            );
-
-            expect(recoveryErrorFillColor).not.toBe(recoveryErrorBackground);
+            await expect(recoveryErrorFill).toHaveCSS('background-color', dangerHeavy);
+            await expect(recoveryError).toHaveCSS('border-color', dangerHeavy);
+            await expect(recoveryError).toHaveCSS('background-color', dangerMedium);
 
             await forceHoverStorageGroupVDiskItems(page, 0);
 
@@ -377,10 +463,13 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 ordinaryStateBars.map(async (progressBar, index) => {
                     const fillBar = getVDiskFillBar(progressBar);
 
-                    await expect(fillBar).toHaveCSS('background-color', normalFillColors[index]);
+                    await expect(fillBar).toHaveCSS(
+                        'background-color',
+                        ordinaryNormalFillColors[index],
+                    );
                     await expect(progressBar).toHaveCSS(
                         'background-color',
-                        normalFillColors[index],
+                        ordinaryNormalFillColors[index],
                     );
                 }),
             );
@@ -428,6 +517,12 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 normalColor,
             );
             await expect(noWhiteboardVDisk).toHaveCSS('border-style', 'none');
+            const noWhiteboardCapacityAlertSlot = noWhiteboardVDisk.locator(
+                ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR,
+            );
+            await expect(noWhiteboardCapacityAlertSlot).toHaveCount(1);
+            await expect(noWhiteboardCapacityAlertSlot).toBeEmpty();
+            await expect(noWhiteboardCapacityAlertSlot.locator('.g-icon')).toHaveCount(0);
 
             await forceHoverStorageGroupVDiskItems(page, 0);
 

@@ -61,7 +61,14 @@ export const VDisk = ({
 
     const isDonor = data.DonorMode;
 
-    const {severity, icon, modeModifier, isLegendInactive, showNoDataPlaceholder} = React.useMemo(
+    const {
+        severity,
+        icon,
+        capacityAlertIndicator,
+        modeModifier,
+        isLegendInactive,
+        showNoDataPlaceholder,
+    } = React.useMemo(
         () => (getDisplayState ?? getDefaultDiskDisplayState)(data, isDonor),
         [data, getDisplayState, isDonor],
     );
@@ -122,6 +129,7 @@ export const VDisk = ({
                         className={progressBarClassName}
                         withIcon={withIcon}
                         icon={icon}
+                        capacityAlertIndicator={capacityAlertIndicator}
                         modeModifier={modeModifier}
                         highlighted={highlighted}
                         noDataPlaceholder={

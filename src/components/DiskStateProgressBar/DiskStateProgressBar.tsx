@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type {IconData} from '@gravity-ui/uikit';
-import {Flex, Icon} from '@gravity-ui/uikit';
+import {Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {cn} from '../../utils/cn';
@@ -14,6 +14,20 @@ import {isNumeric} from '../../utils/utils';
 import './DiskStateProgressBar.scss';
 
 const b = cn('storage-disk-progress-bar');
+
+function renderCapacityAlertIndicator(indicator?: IconData | string) {
+    if (!indicator) {
+        return null;
+    }
+
+    if (typeof indicator === 'string') {
+        return indicator;
+    }
+
+    return (
+        <Icon className={b('all-mode-capacity-alert-indicator-icon')} data={indicator} size={12} />
+    );
+}
 
 interface DiskStateProgressBarProps {
     diskAllocatedPercent?: number;
@@ -29,6 +43,7 @@ interface DiskStateProgressBarProps {
     isDonor?: boolean;
     withIcon?: boolean;
     icon?: IconData | IconWithColor[] | string;
+    capacityAlertIndicator?: IconData | string;
     modeModifier?: string;
     highlighted?: boolean;
     noDataPlaceholder?: React.ReactNode;
@@ -51,6 +66,7 @@ export function DiskStateProgressBar({
     isDonor,
     withIcon,
     icon: providedIcon,
+    capacityAlertIndicator,
     modeModifier,
     highlighted,
     noDataPlaceholder,
@@ -179,6 +195,7 @@ export function DiskStateProgressBar({
 
     const hasIcon = Boolean(iconElement);
     const justifyContent = hasIcon ? 'space-between' : 'flex-end';
+    const showAllModeIndicators = !compact && modeModifier === 'mode-all';
 
     return (
         <Flex
@@ -194,6 +211,18 @@ export function DiskStateProgressBar({
             {iconElement}
             {renderAllocatedPercent()}
             {renderContent()}
+            {showAllModeIndicators && (
+                <div className={b('all-mode-indicators')}>
+                    <Text
+                        as="span"
+                        variant="caption-2"
+                        color="primary"
+                        className={b('all-mode-capacity-alert-indicator-slot')}
+                    >
+                        {renderCapacityAlertIndicator(capacityAlertIndicator)}
+                    </Text>
+                </div>
+            )}
         </Flex>
     );
 }

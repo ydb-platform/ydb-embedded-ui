@@ -8,6 +8,7 @@ import {getIconCalculator} from '../../utils/disks/getIconStrategy';
 import {getSeverityCalculator} from '../../utils/disks/getSeverityStrategy';
 import type {VDisksGroupByValue} from '../../utils/disks/groupBy';
 import {VDisksGroupBy} from '../../utils/disks/groupBy';
+import {calculateSpaceIcon} from '../../utils/disks/iconCalculators';
 
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
 import {useIsStorageExpertMode, useVDisksGroupByParam} from './useStorageQueryParams';
@@ -54,17 +55,20 @@ export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
 
             const severityCalculator = getSeverityCalculator(vdisksGroupBy);
             const iconCalculator = getIconCalculator(vdisksGroupBy);
-
-            const isLegendInactive =
-                vdisksGroupBy === VDisksGroupBy.Space &&
+            const isCapacityAlertInactive =
                 isCapacityAlert(vDisk.CapacityAlert) &&
                 inactiveLegendItems.has(vDisk.CapacityAlert);
+            let capacityAlertIndicator;
+            if (vdisksGroupBy === VDisksGroupBy.All && !isDonor && !isCapacityAlertInactive) {
+                capacityAlertIndicator = calculateSpaceIcon(vDisk, isDonor);
+            }
 
             return {
                 severity: severityCalculator(vDisk),
                 icon: iconCalculator(vDisk, isDonor),
+                ...(capacityAlertIndicator ? {capacityAlertIndicator} : {}),
                 modeModifier,
-                isLegendInactive,
+                isLegendInactive: vdisksGroupBy === VDisksGroupBy.Space && isCapacityAlertInactive,
                 showNoDataPlaceholder: false,
             };
         },

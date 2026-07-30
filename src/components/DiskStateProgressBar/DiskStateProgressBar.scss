@@ -379,6 +379,40 @@
         }
     }
 
+    &__all-mode-indicators {
+        position: absolute;
+        z-index: 2;
+        inset: 0;
+
+        display: grid;
+        align-items: center;
+        grid-template-columns: 16px 12px 17px;
+        column-gap: 6px;
+
+        box-sizing: border-box;
+        margin: -$border-width;
+        padding-inline: 4px;
+
+        pointer-events: none;
+
+        #{$block}_grey &,
+        #{$block}_striped & {
+            margin: 0;
+        }
+    }
+
+    &__all-mode-capacity-alert-indicator-slot {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+
+        width: 16px;
+    }
+
+    &__all-mode-capacity-alert-indicator-icon {
+        color: rgba(162, 162, 162, 1);
+    }
+
     &__title {
         position: relative;
         z-index: 2;

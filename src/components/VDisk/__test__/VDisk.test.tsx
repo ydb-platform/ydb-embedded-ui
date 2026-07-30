@@ -4,6 +4,7 @@ import {CircleQuestionFill} from '@gravity-ui/icons';
 import {render, renderHook, screen} from '@testing-library/react';
 
 import {useStorageVDiskDisplayStateGetter} from '../../../containers/Storage/useStorageVDiskDisplayStateGetter';
+import {ECapacityAlert} from '../../../types/api/enums';
 import {EVDiskState} from '../../../types/api/vdisk';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../../utils/disks/constants';
 import {VDisksGroupBy} from '../../../utils/disks/groupBy';
@@ -189,15 +190,19 @@ describe('useStorageVDiskDisplayStateGetter', () => {
         });
     });
 
-    test('requests N/D when Whiteboard VDiskId is unavailable in expert mode', () => {
+    test('requests N/D without a Capacity Alert indicator when Whiteboard is unavailable', () => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
         const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
 
-        expect(result.current({})).toMatchObject({
+        const displayState = result.current({});
+
+        expect(displayState).toMatchObject({
             severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
             icon: undefined,
-            modeModifier: 'mode-state',
+            modeModifier: 'mode-all',
             showNoDataPlaceholder: true,
         });
+        expect(displayState).not.toHaveProperty('capacityAlertIndicator');
     });
 
     test('uses a dedicated mode-all modifier for Expert Mode All', () => {
@@ -220,5 +225,76 @@ describe('useStorageVDiskDisplayStateGetter', () => {
             modeModifier: 'mode-all',
             showNoDataPlaceholder: false,
         });
+    });
+
+    test('exposes an active Capacity Alert indicator in Expert Mode All', () => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(
+            result.current({
+                VDiskId: {
+                    GroupID: 1,
+                    GroupGeneration: 1,
+                    Ring: 0,
+                    Domain: 0,
+                    VDisk: 0,
+                },
+                CapacityAlert: ECapacityAlert.LIGHTYELLOW,
+            }),
+        ).toHaveProperty('capacityAlertIndicator', 'LY');
+    });
+
+    test('uses a question icon when Capacity Alert data is unavailable in Expert Mode All', () => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(
+            result.current({
+                VDiskId: {
+                    GroupID: 1,
+                    GroupGeneration: 1,
+                    Ring: 0,
+                    Domain: 0,
+                    VDisk: 0,
+                },
+            }),
+        ).toHaveProperty('capacityAlertIndicator', CircleQuestionFill);
+    });
+
+    test('does not expose an inactive Capacity Alert indicator in Expert Mode All', () => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
+        mockUseSpaceLegendSelection.mockReturnValue(new Set([ECapacityAlert.LIGHTYELLOW]));
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(
+            result.current({
+                VDiskId: {
+                    GroupID: 1,
+                    GroupGeneration: 1,
+                    Ring: 0,
+                    Domain: 0,
+                    VDisk: 0,
+                },
+                CapacityAlert: ECapacityAlert.LIGHTYELLOW,
+            }),
+        ).not.toHaveProperty('capacityAlertIndicator');
+    });
+
+    test('does not expose a Capacity Alert indicator outside Expert Mode All', () => {
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(
+            result.current({
+                VDiskId: {
+                    GroupID: 1,
+                    GroupGeneration: 1,
+                    Ring: 0,
+                    Domain: 0,
+                    VDisk: 0,
+                },
+                CapacityAlert: ECapacityAlert.LIGHTYELLOW,
+            }),
+        ).not.toHaveProperty('capacityAlertIndicator');
     });
 });
