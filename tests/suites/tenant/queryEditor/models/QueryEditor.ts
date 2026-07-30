@@ -395,6 +395,7 @@ export class QueryEditor {
     }
 
     async clickGearButton() {
+        await this.waitForEditorReady();
         await this.gearButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.gearButton.click();
     }

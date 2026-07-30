@@ -34,14 +34,11 @@ test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
 
     test.beforeEach(async ({page}) => {
-        const pageQueryParams = {
+        const tenantPage = new TenantPage(page);
+        await tenantPage.gotoQueryEditor({
             schema: database,
             database,
-            databasePage: 'query',
-        };
-
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams, {waitUntil: 'domcontentloaded'});
+        });
     });
 
     test.afterEach(async ({page}) => {
@@ -141,8 +138,10 @@ test.describe('Test Query Editor', async () => {
 
     test('Stop button has distinct view when query is running', async ({page}) => {
         const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+        await setupMockStreamingFetch(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(simpleQuery);
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
@@ -305,8 +304,10 @@ test.describe('Test Query Editor', async () => {
 
     test('Stop button appears when query is started via hotkey', async ({page}) => {
         const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+        await setupMockStreamingFetch(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(simpleQuery);
         await queryEditor.focusEditor();
         await executeQueryWithKeybinding(page);
 
@@ -330,8 +331,10 @@ test.describe('Test Query Editor', async () => {
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+        await setupMockStreamingFetch(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(simpleQuery);
         await queryEditor.clickRunButton();
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
 
