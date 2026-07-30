@@ -42,9 +42,18 @@ function applyE2EMonitoringOverride() {
     });
 }
 
+function applyE2EStorageGroupsOverride() {
+    if (!E2E_UI_OVERRIDES_ENABLED) {
+        return;
+    }
+
+    configureUIFactory({maxVDisksInStorageGroup: 10});
+}
+
 async function render() {
     applyE2EQueryEditorModeOverride();
     applyE2EMonitoringOverride();
+    applyE2EStorageGroupsOverride();
 
     let App;
     if (

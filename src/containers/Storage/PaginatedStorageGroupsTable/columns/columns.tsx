@@ -24,7 +24,8 @@ import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../../../utils/generateEvaluator';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
-import {Disks, VDISKS_CONTAINER_WIDTH} from '../../Disks/Disks';
+import {Disks} from '../../Disks/Disks';
+import {VDISKS_CONTAINER_WIDTH, getAllVDisksContainerWidth} from '../../Disks/constants';
 import {VDisks} from '../../VDisks/VDisks';
 import {getDegradedSeverity} from '../../utils';
 import i18n from '../i18n';
@@ -40,6 +41,8 @@ import type {GetStorageColumnsData, StorageColumnsGetter, StorageGroupsColumn} f
 import './StorageGroupsColumns.scss';
 
 const b = cn('ydb-storage-groups-columns');
+
+const DISKS_COLUMN_WIDTH = 800;
 
 const poolNameColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.PoolName,
@@ -265,13 +268,13 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
     };
 };
 
-const getDisksColumnHeader = () => {
+const getDisksColumnHeader = (vDisksContainerWidth: number) => {
     return (
         <div
             className={b('disks-column-header')}
             style={
                 {
-                    '--storage-groups-vdisks-width': `${VDISKS_CONTAINER_WIDTH}px`,
+                    '--storage-groups-vdisks-width': `${vDisksContainerWidth}px`,
                 } as React.CSSProperties
             }
         >
@@ -282,9 +285,13 @@ const getDisksColumnHeader = () => {
 };
 
 const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
+    const vDisksContainerWidth = data?.isAllVDisksLayout
+        ? getAllVDisksContainerWidth()
+        : VDISKS_CONTAINER_WIDTH;
+
     return {
         name: STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
-        header: getDisksColumnHeader(),
+        header: getDisksColumnHeader(vDisksContainerWidth),
         className: b('disks-column'),
         render: ({row}) => (
             <Disks
@@ -292,10 +299,11 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
                 viewContext={data?.viewContext}
                 erasure={row.ErasureSpecies}
                 withIcon
+                isAllVDisksLayout={data?.isAllVDisksLayout}
             />
         ),
         align: DataTable.LEFT,
-        width: 800,
+        width: DISKS_COLUMN_WIDTH + vDisksContainerWidth - VDISKS_CONTAINER_WIDTH,
         resizeable: false,
         sortable: false,
     };

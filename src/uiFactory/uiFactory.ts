@@ -29,6 +29,7 @@ const uiFactoryBase: UIFactory = {
     enableMultiTabQueryEditor: false,
     hasDeveloperUi: true,
     isDetailedStorageViewAvailable: () => true,
+    maxVDisksInStorageGroup: 9,
 };
 
 type UIFactoryOverrides<H extends string, T extends string> = Omit<
@@ -41,7 +42,7 @@ type UIFactoryOverrides<H extends string, T extends string> = Omit<
 export function configureUIFactory<H extends string, T extends string = string>(
     overrides: UIFactoryOverrides<H, T>,
 ) {
-    const {healthcheck, hasAccess, ...restOverrides} = overrides;
+    const {healthcheck, hasAccess, maxVDisksInStorageGroup, ...restOverrides} = overrides;
 
     Object.assign(uiFactoryBase, restOverrides);
 
@@ -50,6 +51,14 @@ export function configureUIFactory<H extends string, T extends string = string>(
     // which would overwrite the default and crash on the next hasAccess(...) call.
     if (typeof hasAccess === 'function') {
         uiFactoryBase.hasAccess = hasAccess;
+    }
+    if (maxVDisksInStorageGroup !== undefined) {
+        if (!Number.isInteger(maxVDisksInStorageGroup) || maxVDisksInStorageGroup <= 0) {
+            throw new Error(
+                'UIFactory misconfiguration: `maxVDisksInStorageGroup` must be a positive integer.',
+            );
+        }
+        uiFactoryBase.maxVDisksInStorageGroup = maxVDisksInStorageGroup;
     }
     if (healthcheck) {
         const merged = {...uiFactoryBase.healthcheck, ...healthcheck};

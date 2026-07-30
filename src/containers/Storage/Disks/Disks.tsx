@@ -7,27 +7,34 @@ import type {Erasure} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
 import type {DiskDisplayStateGetter} from '../../../utils/disks/displayState';
 import type {PreparedVDisk} from '../../../utils/disks/types';
-import {isNumeric} from '../../../utils/utils';
 import {PDisk} from '../PDisk';
 import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
 import type {StorageViewContext} from '../types';
 import {useStorageVDiskDisplayStateGetter} from '../useStorageVDiskDisplayStateGetter';
 import {isVdiskActive, useVDisksWithDCMargins} from '../utils';
 
+import {calculateCompactVDiskWidths} from './calculateCompactVDiskWidths';
+import {ALL_VDISK_WIDTH, VDISKS_CONTAINER_WIDTH, getAllVDisksContainerWidth} from './constants';
+
 import './Disks.scss';
 
 const b = cn('ydb-storage-disks');
-
-export const VDISKS_CONTAINER_WIDTH = 316;
 
 interface DisksProps {
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
     erasure?: Erasure;
     withIcon?: boolean;
+    isAllVDisksLayout?: boolean;
 }
 
-export function Disks({vDisks = [], viewContext, erasure, withIcon}: DisksProps) {
+export function Disks({
+    vDisks = [],
+    viewContext,
+    erasure,
+    withIcon,
+    isAllVDisksLayout,
+}: DisksProps) {
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
     const getVDiskDisplayState = useStorageVDiskDisplayStateGetter();
 
@@ -36,17 +43,22 @@ export function Disks({vDisks = [], viewContext, erasure, withIcon}: DisksProps)
     const {
         theme: {spaceBaseSize},
     } = useLayoutContext();
+    const compactVDiskWidths = React.useMemo(
+        () => calculateCompactVDiskWidths(vDisks, spaceBaseSize),
+        [spaceBaseSize, vDisks],
+    );
 
     if (!vDisks.length) {
         return null;
     }
 
-    const unavailableVDiskWidth =
-        (VDISKS_CONTAINER_WIDTH - spaceBaseSize * (vDisks.length - 1)) / vDisks.length;
+    const vDisksContainerWidth = isAllVDisksLayout
+        ? getAllVDisksContainerWidth()
+        : VDISKS_CONTAINER_WIDTH;
 
     return (
         <div className={b(null)}>
-            <Flex direction={'row'} gap={1} grow style={{width: VDISKS_CONTAINER_WIDTH}}>
+            <Flex direction="row" gap={1} grow style={{width: vDisksContainerWidth}}>
                 {vDisks?.map((vDisk, index) => (
                     <VDiskItem
                         key={vDisk.StringifiedId || index}
@@ -54,9 +66,10 @@ export function Disks({vDisks = [], viewContext, erasure, withIcon}: DisksProps)
                         inactive={!isVdiskActive(vDisk, viewContext)}
                         highlightedVDisk={highlightedVDisk}
                         setHighlightedVDisk={setHighlightedVDisk}
-                        unavailableVDiskWidth={unavailableVDiskWidth}
+                        compactVDiskWidth={compactVDiskWidths[index]}
                         withIcon={withIcon}
                         getDisplayState={getVDiskDisplayState}
+                        isAllVDisksLayout={isAllVDisksLayout}
                     />
                 ))}
             </Flex>
@@ -82,10 +95,11 @@ interface DisksItemProps {
     inactive?: boolean;
     highlightedVDisk?: string;
     setHighlightedVDisk?: (id?: string) => void;
-    unavailableVDiskWidth?: number;
+    compactVDiskWidth?: number;
     withDCMargin?: boolean;
     withIcon?: boolean;
     getDisplayState?: DiskDisplayStateGetter;
+    isAllVDisksLayout?: boolean;
 }
 
 function VDiskItem({
@@ -93,22 +107,30 @@ function VDiskItem({
     highlightedVDisk,
     inactive,
     setHighlightedVDisk,
-    unavailableVDiskWidth,
+    compactVDiskWidth,
     withIcon,
     getDisplayState,
+    isAllVDisksLayout,
 }: DisksItemProps) {
     // Do not show PDisk popup for VDisk
     const vDiskToShow = {...vDisk, PDisk: undefined};
 
-    // show vdisks without AllocatedSize as having average width (#1433)
-    const minWidth = isNumeric(vDiskToShow.AllocatedSize) ? undefined : unavailableVDiskWidth;
-    const flexGrow = Number(vDiskToShow.AllocatedSize) || 1;
+    const style: React.CSSProperties = isAllVDisksLayout
+        ? {width: ALL_VDISK_WIDTH, flexBasis: ALL_VDISK_WIDTH}
+        : {width: compactVDiskWidth, flexBasis: compactVDiskWidth};
 
     return (
-        <div style={{flexGrow, minWidth}} className={b('vdisk-item')}>
+        <div style={style} className={b('vdisk-item', {all: isAllVDisksLayout})}>
+            {isAllVDisksLayout ? (
+                <div
+                    aria-hidden
+                    className={b('vdisk-size-indicator')}
+                    style={{width: compactVDiskWidth}}
+                />
+            ) : null}
             <VDiskWithDonorsStack
                 data={vDiskToShow}
-                compact
+                compact={!isAllVDisksLayout}
                 withIcon={withIcon}
                 inactive={inactive}
                 delayOpen={DISKS_POPUP_DEBOUNCE_TIMEOUT}

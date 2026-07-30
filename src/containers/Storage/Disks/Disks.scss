@@ -19,8 +19,27 @@
         flex-shrink: 0;
 
         min-width: 24px;
+
+        &_all {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            width: 65px;
+            min-width: 65px;
+        }
+    }
+    &__vdisk-size-indicator {
+        flex: none;
+        align-self: center;
+
+        height: 2px;
+
+        border-radius: var(--g-border-radius-xs);
+        background: var(--g-color-base-generic-medium);
     }
     &__vdisk-progress-bar {
+        --progress-bar-full-height: 20px;
         --progress-bar-compact-height: 20px;
     }
 
