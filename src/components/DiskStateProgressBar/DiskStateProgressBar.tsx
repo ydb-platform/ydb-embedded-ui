@@ -44,6 +44,7 @@ interface DiskStateProgressBarProps {
     withIcon?: boolean;
     icon?: IconData | IconWithColor[] | string;
     capacityAlertIndicator?: IconData | string;
+    frontQueuesIndicator?: IconData;
     modeModifier?: string;
     highlighted?: boolean;
     noDataPlaceholder?: React.ReactNode;
@@ -67,6 +68,7 @@ export function DiskStateProgressBar({
     withIcon,
     icon: providedIcon,
     capacityAlertIndicator,
+    frontQueuesIndicator,
     modeModifier,
     highlighted,
     noDataPlaceholder,
@@ -221,6 +223,9 @@ export function DiskStateProgressBar({
                     >
                         {renderCapacityAlertIndicator(capacityAlertIndicator)}
                     </Text>
+                    <span className={b('all-mode-front-queues-indicator-slot')}>
+                        {frontQueuesIndicator && <Icon data={frontQueuesIndicator} size={12} />}
+                    </span>
                 </div>
             )}
         </Flex>

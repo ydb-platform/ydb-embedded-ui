@@ -8,7 +8,7 @@ import {getIconCalculator} from '../../utils/disks/getIconStrategy';
 import {getSeverityCalculator} from '../../utils/disks/getSeverityStrategy';
 import type {VDisksGroupByValue} from '../../utils/disks/groupBy';
 import {VDisksGroupBy} from '../../utils/disks/groupBy';
-import {calculateSpaceIcon} from '../../utils/disks/iconCalculators';
+import {calculateFrontQueuesIcon, calculateSpaceIcon} from '../../utils/disks/iconCalculators';
 
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
 import {useIsStorageExpertMode, useVDisksGroupByParam} from './useStorageQueryParams';
@@ -58,15 +58,20 @@ export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
             const isCapacityAlertInactive =
                 isCapacityAlert(vDisk.CapacityAlert) &&
                 inactiveLegendItems.has(vDisk.CapacityAlert);
-            let capacityAlertIndicator;
-            if (vdisksGroupBy === VDisksGroupBy.All && !isDonor && !isCapacityAlertInactive) {
-                capacityAlertIndicator = calculateSpaceIcon(vDisk, isDonor);
-            }
+            const showAllModeIndicators = vdisksGroupBy === VDisksGroupBy.All && !isDonor;
+            const capacityAlertIndicator =
+                showAllModeIndicators && !isCapacityAlertInactive
+                    ? calculateSpaceIcon(vDisk, isDonor)
+                    : undefined;
+            const frontQueuesIndicator = showAllModeIndicators
+                ? calculateFrontQueuesIcon(vDisk, isDonor)
+                : undefined;
 
             return {
                 severity: severityCalculator(vDisk),
                 icon: iconCalculator(vDisk, isDonor),
                 ...(capacityAlertIndicator ? {capacityAlertIndicator} : {}),
+                ...(frontQueuesIndicator ? {frontQueuesIndicator} : {}),
                 modeModifier,
                 isLegendInactive: vdisksGroupBy === VDisksGroupBy.Space && isCapacityAlertInactive,
                 showNoDataPlaceholder: false,

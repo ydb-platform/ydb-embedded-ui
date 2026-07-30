@@ -12,6 +12,7 @@ import {
 import {DATABASE, setupVDiskColoringMocks} from './vdiskColoringMocks';
 
 const VDISKS_COUNT = 10;
+const FRONT_QUEUES_YELLOW_VDISK_INDEX = 2;
 const STATE_ONLY_OK_VDISK_INDEX = 4;
 const INITIAL_VDISK_INDEX = 5;
 const RECOVERY_ERROR_VDISK_INDEX = 8;
@@ -39,6 +40,8 @@ const FORCED_HOVERED_DISK_CLASS = 'storage-disk-progress-bar_highlighted';
 const FORCED_EXPANDED_STACK_CLASS = 'ydb-stack_expanded';
 const ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR =
     '.storage-disk-progress-bar__all-mode-capacity-alert-indicator-slot';
+const ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR =
+    '.storage-disk-progress-bar__all-mode-front-queues-indicator-slot';
 
 async function enableExpertMode(page: Page, vdisksGroupBy: VDisksGroupByValue) {
     await page.addInitScript((groupByValue) => {
@@ -324,6 +327,16 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             const missingCapacityAlertSlot = missingCapacityAlert.locator(
                 ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR,
             );
+            const frontQueuesYellow = getVDiskProgressBar(
+                ordinaryItems.nth(FRONT_QUEUES_YELLOW_VDISK_INDEX),
+            );
+            const frontQueuesYellowSlot = frontQueuesYellow.locator(
+                ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR,
+            );
+            const missingFrontQueuesSlot = getVDiskProgressBar(
+                ordinaryItems.nth(MISSING_FRONT_QUEUES_VDISK_INDEX),
+            ).locator(ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR);
+            const initialFrontQueuesSlot = initial.locator(ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR);
 
             await expect(stateOnlyOk).toHaveClass(/storage-disk-progress-bar_mode-all/);
             await expect(stateOnlyOk).toHaveClass(/storage-disk-progress-bar_green/);
@@ -379,6 +392,31 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 'color',
                 MISSING_CAPACITY_INDICATOR_COLOR,
             );
+
+            await expect(frontQueuesYellowSlot).toHaveCount(1);
+            await expect(frontQueuesYellowSlot).toHaveCSS('width', '12px');
+            const frontQueuesYellowIcon = frontQueuesYellowSlot.locator('.g-icon');
+            await expect(frontQueuesYellowIcon).toBeVisible();
+            await expect(frontQueuesYellowIcon).toHaveCSS('color', expectedTextColor);
+
+            const [frontQueuesYellowBox, frontQueuesYellowSlotBox] = await Promise.all([
+                frontQueuesYellow.boundingBox(),
+                frontQueuesYellowSlot.boundingBox(),
+            ]);
+
+            if (!frontQueuesYellowBox || !frontQueuesYellowSlotBox) {
+                throw new Error('Cannot compare All-mode VDisk and FrontQueues slot boxes');
+            }
+
+            expect(frontQueuesYellowSlotBox.x - frontQueuesYellowBox.x).toBeCloseTo(26, 5);
+
+            await expect(missingFrontQueuesSlot).toHaveCount(1);
+            const missingFrontQueuesIcon = missingFrontQueuesSlot.locator('.g-icon');
+            await expect(missingFrontQueuesIcon).toBeVisible();
+            await expect(missingFrontQueuesIcon).toHaveCSS('color', expectedTextColor);
+
+            await expect(initialFrontQueuesSlot).toHaveCount(1);
+            await expect(initialFrontQueuesSlot).toBeEmpty();
 
             const replicatingItems = getVDiskItems(getStorageGroupRow(page, 1));
             const healthyReplicating = getVDiskProgressBar(replicatingItems.nth(0));
@@ -523,6 +561,12 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(noWhiteboardCapacityAlertSlot).toHaveCount(1);
             await expect(noWhiteboardCapacityAlertSlot).toBeEmpty();
             await expect(noWhiteboardCapacityAlertSlot.locator('.g-icon')).toHaveCount(0);
+            const noWhiteboardFrontQueuesSlot = noWhiteboardVDisk.locator(
+                ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR,
+            );
+            await expect(noWhiteboardFrontQueuesSlot).toHaveCount(1);
+            await expect(noWhiteboardFrontQueuesSlot).toBeEmpty();
+            await expect(noWhiteboardFrontQueuesSlot.locator('.g-icon')).toHaveCount(0);
 
             await forceHoverStorageGroupVDiskItems(page, 0);
 

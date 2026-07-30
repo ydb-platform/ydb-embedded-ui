@@ -8,6 +8,7 @@ export interface DiskDisplayState {
     severity: DisplaySeverity;
     icon: IconData | IconWithColor[] | string | undefined;
     capacityAlertIndicator?: IconData | string;
+    frontQueuesIndicator?: IconData;
     modeModifier: string | undefined;
     isLegendInactive?: boolean;
     showNoDataPlaceholder?: boolean;

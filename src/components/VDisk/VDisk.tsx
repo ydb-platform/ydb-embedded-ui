@@ -65,6 +65,7 @@ export const VDisk = ({
         severity,
         icon,
         capacityAlertIndicator,
+        frontQueuesIndicator,
         modeModifier,
         isLegendInactive,
         showNoDataPlaceholder,
@@ -130,6 +131,7 @@ export const VDisk = ({
                         withIcon={withIcon}
                         icon={icon}
                         capacityAlertIndicator={capacityAlertIndicator}
+                        frontQueuesIndicator={frontQueuesIndicator}
                         modeModifier={modeModifier}
                         highlighted={highlighted}
                         noDataPlaceholder={

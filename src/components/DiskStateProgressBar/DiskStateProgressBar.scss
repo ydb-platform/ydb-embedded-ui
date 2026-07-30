@@ -413,6 +413,16 @@
         color: rgba(162, 162, 162, 1);
     }
 
+    &__all-mode-front-queues-indicator-slot {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+
+        width: 12px;
+
+        color: var(--g-color-text-primary);
+    }
+
     &__title {
         position: relative;
         z-index: 2;

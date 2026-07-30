@@ -1,10 +1,10 @@
 import React from 'react';
 
-import {CircleQuestionFill} from '@gravity-ui/icons';
+import {CircleQuestionFill, Ellipsis} from '@gravity-ui/icons';
 import {render, renderHook, screen} from '@testing-library/react';
 
 import {useStorageVDiskDisplayStateGetter} from '../../../containers/Storage/useStorageVDiskDisplayStateGetter';
-import {ECapacityAlert} from '../../../types/api/enums';
+import {ECapacityAlert, EFlag} from '../../../types/api/enums';
 import {EVDiskState} from '../../../types/api/vdisk';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../../utils/disks/constants';
 import {VDisksGroupBy} from '../../../utils/disks/groupBy';
@@ -203,6 +203,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
             showNoDataPlaceholder: true,
         });
         expect(displayState).not.toHaveProperty('capacityAlertIndicator');
+        expect(displayState).not.toHaveProperty('frontQueuesIndicator');
     });
 
     test('uses a dedicated mode-all modifier for Expert Mode All', () => {
@@ -262,6 +263,41 @@ describe('useStorageVDiskDisplayStateGetter', () => {
         ).toHaveProperty('capacityAlertIndicator', CircleQuestionFill);
     });
 
+    test('exposes a FrontQueues warning indicator in Expert Mode All', () => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(
+            result.current({
+                VDiskId: {
+                    GroupID: 1,
+                    GroupGeneration: 1,
+                    Ring: 0,
+                    Domain: 0,
+                    VDisk: 0,
+                },
+                FrontQueues: EFlag.Yellow,
+            }),
+        ).toHaveProperty('frontQueuesIndicator', Ellipsis);
+    });
+
+    test('uses a question icon when FrontQueues data is unavailable in Expert Mode All', () => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(
+            result.current({
+                VDiskId: {
+                    GroupID: 1,
+                    GroupGeneration: 1,
+                    Ring: 0,
+                    Domain: 0,
+                    VDisk: 0,
+                },
+            }),
+        ).toHaveProperty('frontQueuesIndicator', CircleQuestionFill);
+    });
+
     test('does not expose an inactive Capacity Alert indicator in Expert Mode All', () => {
         mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
         mockUseSpaceLegendSelection.mockReturnValue(new Set([ECapacityAlert.LIGHTYELLOW]));
@@ -281,20 +317,22 @@ describe('useStorageVDiskDisplayStateGetter', () => {
         ).not.toHaveProperty('capacityAlertIndicator');
     });
 
-    test('does not expose a Capacity Alert indicator outside Expert Mode All', () => {
+    test('does not expose All-mode indicators outside Expert Mode All', () => {
         const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
 
-        expect(
-            result.current({
-                VDiskId: {
-                    GroupID: 1,
-                    GroupGeneration: 1,
-                    Ring: 0,
-                    Domain: 0,
-                    VDisk: 0,
-                },
-                CapacityAlert: ECapacityAlert.LIGHTYELLOW,
-            }),
-        ).not.toHaveProperty('capacityAlertIndicator');
+        const displayState = result.current({
+            VDiskId: {
+                GroupID: 1,
+                GroupGeneration: 1,
+                Ring: 0,
+                Domain: 0,
+                VDisk: 0,
+            },
+            CapacityAlert: ECapacityAlert.LIGHTYELLOW,
+            FrontQueues: EFlag.Yellow,
+        });
+
+        expect(displayState).not.toHaveProperty('capacityAlertIndicator');
+        expect(displayState).not.toHaveProperty('frontQueuesIndicator');
     });
 });
