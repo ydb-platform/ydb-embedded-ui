@@ -1,6 +1,5 @@
 import type {Action, Reducer, UnknownAction} from '@reduxjs/toolkit';
 import type {History, Location} from 'history';
-import each from 'lodash/each';
 import keys from 'lodash/keys';
 import merge from 'lodash/merge';
 import qs from 'qs';
@@ -93,21 +92,21 @@ export function restoreUnknownParams(location: Location, prevLocation: Location)
         entries === databasePageParams
             ? canonicalizeDatabaseQueryString(prevLocation.search)
             : prevLocation.search;
-    const params = qs.parse(prevSearch.replace(/^\?/, ''));
+    const paramsToOmit = [...keys(entries), ...keys(paramSetup.global || {})];
 
-    // remove params which are mapped for this page
-    each(keys(entries), (param) => {
-        delete params[param];
-    });
-    // and globally
-    each(keys(paramSetup.global || {}), (param) => {
-        delete params[param];
-    });
-
-    const restoredParams = qs.stringify(params, {
-        encoder: encodeURIComponent,
-        arrayFormat: 'repeat',
-    });
+    let restoredParams: string;
+    if (entries === databasePageParams) {
+        const params = new URLSearchParams(prevSearch);
+        paramsToOmit.forEach((param) => params.delete(param));
+        restoredParams = params.toString();
+    } else {
+        const params = qs.parse(prevSearch.replace(/^\?/, ''));
+        paramsToOmit.forEach((param) => delete params[param]);
+        restoredParams = qs.stringify(params, {
+            encoder: encodeURIComponent,
+            arrayFormat: 'repeat',
+        });
+    }
     const searchDelimiter = search.startsWith('?') ? '&' : '?';
 
     return {

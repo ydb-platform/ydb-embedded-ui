@@ -88,6 +88,17 @@ describe('restoreUnknownParams', () => {
         expectNoBracketAliases(result.search, ['currentMetric']);
     });
 
+    test('preserves indexed names of unknown params', () => {
+        const result = restoreUnknownParams(
+            createLocation('?currentMetric=RowUpdates'),
+            createLocation('?currentMetric=Old&external%5B0%5D=first&external%5B1%5D=second'),
+        );
+
+        expect(result.search).toBe(
+            '?currentMetric=RowUpdates&external%5B0%5D=first&external%5B1%5D=second',
+        );
+    });
+
     test('canonicalizes untouched known database scalar params', () => {
         const result = restoreUnknownParams(
             createLocation('?currentMetric=RowUpdates'),
