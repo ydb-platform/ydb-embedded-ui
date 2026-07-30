@@ -16,7 +16,14 @@ jest.mock('./utils/hooks/useDatabaseFromQuery', () => ({
 
 import type {Location} from 'history';
 
-import {createHref, getClustersPath, getPDiskPagePath, getTenantPath, parseQuery} from './routes';
+import {
+    createExternalUILink,
+    createHref,
+    getClustersPath,
+    getPDiskPagePath,
+    getTenantPath,
+    parseQuery,
+} from './routes';
 
 const URL_WITH_NESTED_REFERRER =
     'https://monitoring.example.test/database?currentMetric=RowUpdates&queryTab=newQuery&diagnosticsTab=nodes&summaryTab=overview&metricsTab=memory&selectedConsumer=consumer&clusterName=global&database=database&databasePage=query&schema=%2Fglobal%2Fdatabase%2Ftable&utm_referrer=https%3A%2F%2Fmonitoring.example.test%2Fdatabase%3FcurrentMetric%3DRowUpdates%26queryTab%3DnewQuery%26diagnosticsTab%3Dschema%26summaryTab%3Doverview%26metricsTab%3Dmemory%26selectedConsumer%3Dconsumer%26clusterName%3Dglobal%26database%3Ddatabase%26databasePage%3Dquery%26schema%3D%252Fglobal%252Fdatabase%252Fnested_table%26utm_referrer%3Dhttps%253A%252F%252Fsso.example.test%252F%26monitoringTab%3Ddiagnostics%26from%3D1771092117420%26to%3D1771178517420%26interval%3D1d&monitoringTab=diagnostics&from=1771092117420&to=1771178517420&interval=1d';
@@ -118,6 +125,37 @@ describe('routes', () => {
 
             expect(params.getAll('tag')).toEqual(['one', 'two']);
             expect(path).not.toContain('%5B');
+        });
+    });
+
+    describe('createExternalUILink', () => {
+        afterEach(() => {
+            window.history.replaceState(null, '', '/');
+        });
+
+        test('should canonicalize known database scalars on the database route', () => {
+            window.history.replaceState(null, '', '/monitoring/database');
+            const query = parseQuery({
+                search:
+                    '?database=stale&database=fresh' +
+                    '&monitoringTab=overview&monitoringTab=diagnostics' +
+                    '&tag=one&tag=two',
+            } as Location);
+            const path = createExternalUILink({...query, schema: '/fresh/table'});
+            const params = getSearchParams(path);
+
+            expect(path.startsWith('/monitoring/database?')).toBe(true);
+            expect(params.getAll('database')).toEqual(['fresh']);
+            expect(params.getAll('monitoringTab')).toEqual(['diagnostics']);
+            expect(params.getAll('schema')).toEqual(['/fresh/table']);
+            expect(params.getAll('tag')).toEqual(['one', 'two']);
+        });
+
+        test('should not canonicalize database scalars on another route', () => {
+            window.history.replaceState(null, '', '/monitoring/cluster');
+            const path = createExternalUILink({database: ['old', 'new']});
+
+            expect(getSearchParams(path).getAll('database')).toEqual(['old', 'new']);
         });
     });
 

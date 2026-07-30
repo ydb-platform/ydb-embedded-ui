@@ -132,11 +132,23 @@ export function createHref(
     return `${domain}${compiledRoute}`;
 }
 
+function canonicalizeDatabaseHref(href: string) {
+    const searchIndex = href.indexOf('?');
+    if (searchIndex === -1) {
+        return href;
+    }
+    return href.slice(0, searchIndex) + canonicalizeDatabaseQueryString(href.slice(searchIndex));
+}
+
 // embedded version could be located in some folder (e.g. host/some_folder/app_router_path)
 // window.location has the full pathname, while location from router ignores path to project
 // this navigation assumes page reloading
-export const createExternalUILink = (query = {}) =>
-    createHref(window.location.pathname, undefined, query);
+export const createExternalUILink = (query = {}) => {
+    const href = createHref(window.location.pathname, undefined, query);
+    const pathname = window.location.pathname.replace(/\/+$/, '');
+
+    return pathname.endsWith(`/${DATABASE}`) ? canonicalizeDatabaseHref(href) : href;
+};
 
 export function getLocationObjectFromHref(href: string) {
     const {pathname, search, hash} = new URL(href, 'http://localhost');
@@ -186,12 +198,7 @@ export const getClusterPath = (
 };
 
 export const getTenantPath = (query: TenantQuery, options?: CreateHrefOptions) => {
-    const href = createHref(routes.tenant, undefined, query, options);
-    const searchIndex = href.indexOf('?');
-    if (searchIndex === -1) {
-        return href;
-    }
-    return href.slice(0, searchIndex) + canonicalizeDatabaseQueryString(href.slice(searchIndex));
+    return canonicalizeDatabaseHref(createHref(routes.tenant, undefined, query, options));
 };
 
 export const homePageTabSchema = z.enum(['clusters', 'databases']);

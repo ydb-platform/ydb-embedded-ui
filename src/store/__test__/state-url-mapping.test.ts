@@ -99,6 +99,20 @@ describe('restoreUnknownParams', () => {
         );
     });
 
+    test('preserves indexed names of unknown params on another route', () => {
+        const result = restoreUnknownParams(
+            createLocation('', '/cluster'),
+            createLocation(
+                '?external%5B0%5D=first&external%5B1%5D=second&utm_referrer=keep',
+                '/cluster',
+            ),
+        );
+
+        expect(result.search).toBe(
+            '?external%5B0%5D=first&external%5B1%5D=second&utm_referrer=keep',
+        );
+    });
+
     test('canonicalizes untouched known database scalar params', () => {
         const result = restoreUnknownParams(
             createLocation('?currentMetric=RowUpdates'),
