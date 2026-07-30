@@ -56,7 +56,7 @@ export class QueriesHistoryTable {
 
     async getQueryText(index: number) {
         const row = this.table.locator('.ydb-queries-history__table-row').nth(index);
-        return row.locator('.ydb-syntax-highlighter').innerText();
+        return (await row.locator('.ydb-syntax-highlighter').textContent()) ?? '';
     }
 
     async getQueryStatus(index: number) {

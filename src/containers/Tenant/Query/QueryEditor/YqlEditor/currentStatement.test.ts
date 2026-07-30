@@ -34,6 +34,24 @@ describe('current YQL statement', () => {
         ).toEqual(['SELECT "a;b";', 'SELECT 2;']);
     });
 
+    test('splits compound constructs at each real semicolon', () => {
+        const query = 'DEFINE ACTION $a() AS SELECT 1; SELECT 2; END DEFINE;';
+        const statements = extractYqlStatements(query);
+
+        expect(
+            statements.map(({startIndex, endIndex}) => query.slice(startIndex, endIndex)),
+        ).toEqual(['DEFINE ACTION $a() AS SELECT 1;', 'SELECT 2;', 'END DEFINE;']);
+    });
+
+    test('extracts a large flat script without recursive parsing', () => {
+        const query = new Array(400).fill('SELECT 1;').join('');
+        const statements = extractYqlStatements(query);
+
+        expect(statements).toHaveLength(400);
+        expect(query.slice(statements[0].startIndex, statements[0].endIndex)).toBe('SELECT 1;');
+        expect(query.slice(statements[399].startIndex, statements[399].endIndex)).toBe('SELECT 1;');
+    });
+
     test('distinguishes statements on the same line', () => {
         const query = 'SELECT 1; SELECT 2;';
         const statements = extractYqlStatements(query);
