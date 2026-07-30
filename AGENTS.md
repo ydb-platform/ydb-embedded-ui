@@ -74,9 +74,9 @@ npm run test:e2e:install                     # Install Playwright browsers/deps
 npm run test:e2e                             # Run Playwright E2E tests
 npm run test:e2e -- --project=chromium       # Run a specific Playwright project
 npm run test:e2e:update-snapshots            # Update E2E snapshots (local browsers)
-npm run test:e2e:docker                      # Run E2E tests in Docker
-npm run test:e2e:docker:report               # Run Docker E2E and serve HTML report
-npm run test:e2e:docker:update-snapshots     # Update E2E snapshots in Docker
+npm run test:e2e:docker                      # Run E2E tests in Docker; requires PLAYWRIGHT_APP_BACKEND
+npm run test:e2e:docker:report               # Run Docker E2E and serve HTML report; requires a backend
+npm run test:e2e:docker:update-snapshots     # Update Docker E2E snapshots; requires a backend
 npm run test:e2e:local                       # Run E2E against local dev server
 ```
 
@@ -246,7 +246,7 @@ The following checks run on every PR and merge group (`ci.yml`):
 
 Additional quality checks (`quality.yml`) — run on PRs and pushes to main:
 
-- Playwright E2E tests via `bash scripts/playwright-docker.sh --shard=N/8` (against a `local-ydb:nightly` Docker service, sharded across 8 parallel runners)
+- Playwright E2E tests via `bash scripts/playwright-docker.sh --shard=N/8`, sharded across 8 parallel runners; each shard starts `local-ydb:nightly` in root topology through `setup-local-ydb` and passes its monitoring URL to the Docker test flow
 - Playwright report merge via `npx playwright merge-reports --config=merge.config.ts ./all-blob-reports`
 - Bundle size comparison via `npm run build` on the current branch and `main` (PRs only)
 - Test report deployment to GitHub Pages
@@ -312,9 +312,8 @@ import * as React from 'react';
 - Test artifacts are stored in `./playwright-artifacts/` directory
 - Environment variables for E2E tests:
   - `PLAYWRIGHT_BASE_URL` - Override test URL
-  - `PLAYWRIGHT_APP_BACKEND` - Specify backend for tests
-  - `PLAYWRIGHT_YDB_IMAGE` - Override the Docker YDB image used by `scripts/playwright-docker.sh`
-  - `PLAYWRIGHT_YDB_PLATFORM` / `PLAYWRIGHT_PLATFORM` - Set Docker platforms when emulation is required
+  - `PLAYWRIGHT_APP_BACKEND` - Specify the backend for tests; required by `scripts/playwright-docker.sh`, which does not start YDB itself
+  - `PLAYWRIGHT_PLATFORM` - Set the Playwright Docker platform when emulation is required
   - `PLAYWRIGHT_HTML_HOST` / `PLAYWRIGHT_HTML_PORT` - Override the local HTML report server for `npm run test:e2e:docker:report`
 
 ### Routing
