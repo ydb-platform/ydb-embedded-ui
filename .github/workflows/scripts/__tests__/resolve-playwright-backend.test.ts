@@ -23,6 +23,13 @@ describe('resolvePlaywrightBackend', () => {
         });
     });
 
+    test('routes an IPv6 loopback port through fixed container localhost', () => {
+        expect(resolvePlaywrightBackend('http://[::1]:43123/viewer?database=%2Flocal')).toEqual({
+            backendUrl: 'http://localhost:8765/viewer?database=%2Flocal',
+            proxyTargetUrl: 'http://host.docker.internal:43123',
+        });
+    });
+
     test('preserves a loopback URL path and query for the browser backend', () => {
         expect(resolvePlaywrightBackend('http://localhost:43123/viewer?database=%2Flocal')).toEqual(
             {
@@ -44,5 +51,14 @@ describe('resolvePlaywrightBackend', () => {
             backendUrl: 'https://ydb.example.test:9443/base',
             proxyTargetUrl: undefined,
         });
+    });
+
+    test.each([
+        'http://user:password@localhost:8765/viewer',
+        'https://user@ydb.example.test:9443/base',
+    ])('rejects backend credentials: %s', (backend) => {
+        expect(() => resolvePlaywrightBackend(backend)).toThrow(
+            'PLAYWRIGHT_APP_BACKEND must not contain credentials',
+        );
     });
 });

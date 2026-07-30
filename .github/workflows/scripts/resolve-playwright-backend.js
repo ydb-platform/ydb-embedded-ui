@@ -17,6 +17,10 @@ function resolvePlaywrightBackend(value) {
         throw new Error('PLAYWRIGHT_APP_BACKEND must be an absolute HTTP URL');
     }
 
+    if (url.username || url.password) {
+        throw new Error('PLAYWRIGHT_APP_BACKEND must not contain credentials');
+    }
+
     if (!LOOPBACK_HOSTNAMES.has(url.hostname)) {
         return {
             backendUrl: backend,
@@ -24,7 +28,7 @@ function resolvePlaywrightBackend(value) {
         };
     }
 
-    const backendSuffix = url.href.slice(url.origin.length);
+    const backendSuffix = `${url.pathname}${url.search}${url.hash}`;
     const targetPort = url.port || (url.protocol === 'https:' ? '443' : '80');
 
     return {
