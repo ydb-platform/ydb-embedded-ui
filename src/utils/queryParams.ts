@@ -78,10 +78,34 @@ function getQueryParamBaseName(name: string) {
     return bracketIndex === -1 ? name : name.slice(0, bracketIndex);
 }
 
+function isValidSelectedRow(value: string) {
+    try {
+        const parsed: unknown = JSON.parse(decodeURIComponent(value));
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+            return false;
+        }
+
+        const selectedRow = parsed as Record<string, unknown>;
+        return ['rank', 'intervalEnd', 'endTime', 'queryHash'].every(
+            (name) => selectedRow[name] === undefined || typeof selectedRow[name] === 'string',
+        );
+    } catch {
+        return false;
+    }
+}
+
+function isValidDatabaseScalarValue(name: string, value: string) {
+    return name !== 'selectedRow' || isValidSelectedRow(value);
+}
+
+export function isDatabasePathname(pathname?: string) {
+    return Boolean(pathname?.replace(/\/+$/, '').endsWith('/database'));
+}
+
 /**
  * Canonicalizes a `/database` query string: drops volatile parameters, collapses
- * repeated or indexed (`param[0]`) occurrences of known single-value parameters
- * to their last value, and preserves unknown (potentially multi-valued) parameters
+ * repeated or indexed (`param[0]`) occurrences of known single-value parameters to
+ * their last valid value, and preserves unknown (potentially multi-valued) parameters
  * unchanged. Applying it repeatedly does not change the result.
  */
 export function canonicalizeDatabaseQueryString(search: string) {
@@ -89,12 +113,15 @@ export function canonicalizeDatabaseQueryString(search: string) {
     const entries = Array.from(new URLSearchParams(search).entries());
     const lastIndexes = new Map<string, number>();
 
-    entries.forEach(([name], index) => {
+    entries.forEach(([name, value], index) => {
         const baseName = getQueryParamBaseName(name);
         if (VOLATILE_QUERY_PARAM_SET.has(baseName)) {
             return;
         }
-        if (DATABASE_SINGLE_VALUE_PARAMS.has(baseName)) {
+        if (
+            DATABASE_SINGLE_VALUE_PARAMS.has(baseName) &&
+            isValidDatabaseScalarValue(baseName, value)
+        ) {
             lastIndexes.set(baseName, index);
         }
     });
@@ -114,4 +141,21 @@ export function canonicalizeDatabaseQueryString(search: string) {
 
     const canonicalSearch = canonicalParams.toString();
     return hasQueryPrefix && canonicalSearch ? `?${canonicalSearch}` : canonicalSearch;
+}
+
+export function canonicalizeCurrentDatabaseUrl() {
+    if (!isDatabasePathname(window.location.pathname)) {
+        return;
+    }
+
+    const canonicalSearch = canonicalizeDatabaseQueryString(window.location.search);
+    if (canonicalSearch === window.location.search) {
+        return;
+    }
+
+    window.history.replaceState(
+        window.history.state,
+        '',
+        `${window.location.pathname}${canonicalSearch}${window.location.hash}`,
+    );
 }

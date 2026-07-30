@@ -14,7 +14,11 @@ import {backend, basename, clusterName, environment, webVersion} from './store';
 import {uiFactory} from './uiFactory/uiFactory';
 import {normalizePathSlashes} from './utils';
 import {useDatabaseFromQuery} from './utils/hooks/useDatabaseFromQuery';
-import {canonicalizeDatabaseQueryString, omitVolatileQueryParams} from './utils/queryParams';
+import {
+    canonicalizeDatabaseQueryString,
+    isDatabasePathname,
+    omitVolatileQueryParams,
+} from './utils/queryParams';
 
 export const CLUSTER = 'cluster';
 export const DATABASE = 'database';
@@ -47,7 +51,11 @@ const routes = {
 export default routes;
 
 export const parseQuery = (location: Location) => {
-    return qs.parse(location.search, {
+    const search = isDatabasePathname(location.pathname)
+        ? canonicalizeDatabaseQueryString(location.search)
+        : location.search;
+
+    return qs.parse(search, {
         ignoreQueryPrefix: true,
     });
 };
@@ -145,9 +153,8 @@ function canonicalizeDatabaseHref(href: string) {
 // this navigation assumes page reloading
 export const createExternalUILink = (query = {}) => {
     const href = createHref(window.location.pathname, undefined, query);
-    const pathname = window.location.pathname.replace(/\/+$/, '');
 
-    return pathname.endsWith(`/${DATABASE}`) ? canonicalizeDatabaseHref(href) : href;
+    return isDatabasePathname(window.location.pathname) ? canonicalizeDatabaseHref(href) : href;
 };
 
 export function getLocationObjectFromHref(href: string) {

@@ -71,13 +71,29 @@ describe('canonicalizeDatabaseQueryString', () => {
             'interval',
         ];
         const search = scalarParams
-            .flatMap((param) => [`${param}=stale`, `${param}%5B999%5D=fresh`])
+            .flatMap((param) => {
+                if (param === 'selectedRow') {
+                    return [
+                        `${param}=${encodeURIComponent(JSON.stringify({queryHash: 'stale'}))}`,
+                        `${param}%5B999%5D=${encodeURIComponent(
+                            JSON.stringify({queryHash: 'fresh'}),
+                        )}`,
+                    ];
+                }
+                return [`${param}=stale`, `${param}%5B999%5D=fresh`];
+            })
             .join('&');
 
         const result = new URLSearchParams(canonicalizeDatabaseQueryString(`?${search}`));
 
         scalarParams.forEach((param) => {
-            expect(result.getAll(param)).toEqual(['fresh']);
+            if (param === 'selectedRow') {
+                expect(JSON.parse(decodeURIComponent(result.get(param) ?? ''))).toEqual({
+                    queryHash: 'fresh',
+                });
+            } else {
+                expect(result.getAll(param)).toEqual(['fresh']);
+            }
         });
     });
 
@@ -87,6 +103,25 @@ describe('canonicalizeDatabaseQueryString', () => {
                 '?tag=one&tag=two&external%5B0%5D=first&external%5B99%5D=last',
             ),
         ).toBe('?tag=one&tag=two&external%5B0%5D=first&external%5B99%5D=last');
+    });
+
+    test('keeps the last valid selectedRow value', () => {
+        const validSelectedRow = encodeURIComponent(
+            JSON.stringify({rank: '1', queryHash: 'valid'}),
+        );
+        const searchParams = new URLSearchParams();
+        searchParams.append('selectedRow', validSelectedRow);
+        searchParams.append('selectedRow', 'not-json');
+
+        const result = new URLSearchParams(
+            canonicalizeDatabaseQueryString(`?${searchParams.toString()}`),
+        );
+
+        expect(result.getAll('selectedRow')).toEqual([validSelectedRow]);
+    });
+
+    test('drops selectedRow when it has no valid value', () => {
+        expect(canonicalizeDatabaseQueryString('?selectedRow=not-json')).toBe('');
     });
 
     test('is idempotent and preserves an empty winning scalar value', () => {

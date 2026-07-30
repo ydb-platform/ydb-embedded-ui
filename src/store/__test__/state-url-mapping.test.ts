@@ -129,6 +129,23 @@ describe('restoreUnknownParams', () => {
         expect(params.getAll('runningSort')).toEqual(['new']);
     });
 
+    test('restores the last valid selectedRow value', () => {
+        const validSelectedRow = encodeURIComponent(
+            JSON.stringify({rank: '1', queryHash: 'valid'}),
+        );
+        const previousSearch = new URLSearchParams();
+        previousSearch.append('diagnosticsTab', 'overview');
+        previousSearch.append('selectedRow', validSelectedRow);
+        previousSearch.append('selectedRow[99]', 'not-json');
+
+        const result = restoreUnknownParams(
+            createLocation('?diagnosticsTab=topQueries'),
+            createLocation(`?${previousSearch.toString()}`),
+        );
+
+        expect(getSearchParams(result.search).getAll('selectedRow')).toEqual([validSelectedRow]);
+    });
+
     test('does not canonicalize params on another route', () => {
         const result = restoreUnknownParams(
             createLocation('', '/cluster'),

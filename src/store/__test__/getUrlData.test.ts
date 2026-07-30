@@ -42,6 +42,37 @@ describe('getUrlData', () => {
                 clusterName: 'my_cluster',
             });
         });
+        test('should canonicalize database params before reading them', () => {
+            window.history.pushState(
+                {preserved: true},
+                '',
+                '/monitoring/database?clusterName=stale&clusterName=fresh' +
+                    '&database=old&database=%2Ffresh#details',
+            );
+
+            const result = getUrlData({singleClusterMode: false, customBackend: undefined});
+
+            expect(result).toEqual({
+                basename: '/monitoring',
+                backend: undefined,
+                clusterName: 'fresh',
+            });
+            expect(window.location.search).toBe('?clusterName=fresh&database=%2Ffresh');
+            expect(window.location.hash).toBe('#details');
+            expect(window.history.state).toEqual({preserved: true});
+        });
+        test('should not canonicalize params outside the database route', () => {
+            window.history.pushState(
+                {},
+                '',
+                '/monitoring/cluster?clusterName=stale&clusterName=fresh',
+            );
+
+            const result = getUrlData({singleClusterMode: false, customBackend: undefined});
+
+            expect(result.clusterName).toBe('stale');
+            expect(window.location.search).toBe('?clusterName=stale&clusterName=fresh');
+        });
         test('should extract environment from first segment', () => {
             window.history.pushState(
                 {},

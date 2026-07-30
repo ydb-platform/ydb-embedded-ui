@@ -118,6 +118,16 @@ describe('routes', () => {
             expect(params.getAll('from')).toEqual(['2']);
         });
 
+        test('should canonicalize mixed indexed and plain scalars before parsing', () => {
+            const query = parseQuery({
+                pathname: '/database',
+                search: '?database%5B21%5D=old&database=%2Fprod',
+            } as Location);
+            const path = getTenantPath(query);
+
+            expect(getSearchParams(path).getAll('database')).toEqual(['/prod']);
+        });
+
         test('should keep an unknown multi-value param in repeat format', () => {
             const query = parseQuery({search: '?tag=one&tag=two'} as Location);
             const path = getTenantPath(query);
@@ -136,8 +146,9 @@ describe('routes', () => {
         test('should canonicalize known database scalars on the database route', () => {
             window.history.replaceState(null, '', '/monitoring/database');
             const query = parseQuery({
+                pathname: '/database',
                 search:
-                    '?database=stale&database=fresh' +
+                    '?database%5B21%5D=old&database=%2Fprod' +
                     '&monitoringTab=overview&monitoringTab=diagnostics' +
                     '&tag=one&tag=two',
             } as Location);
@@ -145,7 +156,7 @@ describe('routes', () => {
             const params = getSearchParams(path);
 
             expect(path.startsWith('/monitoring/database?')).toBe(true);
-            expect(params.getAll('database')).toEqual(['fresh']);
+            expect(params.getAll('database')).toEqual(['/prod']);
             expect(params.getAll('monitoringTab')).toEqual(['diagnostics']);
             expect(params.getAll('schema')).toEqual(['/fresh/table']);
             expect(params.getAll('tag')).toEqual(['one', 'two']);
@@ -168,6 +179,15 @@ describe('routes', () => {
             const path = createHref('/cluster', undefined, {database: ['old', 'new']});
 
             expect(getSearchParams(path).getAll('database')).toEqual(['old', 'new']);
+        });
+
+        test('should not canonicalize raw query params before parsing another route', () => {
+            const query = parseQuery({
+                pathname: '/cluster',
+                search: '?database=old&database=new',
+            } as Location);
+
+            expect(query.database).toEqual(['old', 'new']);
         });
     });
 });

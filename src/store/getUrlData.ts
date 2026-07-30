@@ -1,4 +1,5 @@
 import {normalizePathSlashes} from '../utils';
+import {canonicalizeCurrentDatabaseUrl} from '../utils/queryParams';
 
 export const getUrlData = ({
     singleClusterMode,
@@ -9,6 +10,9 @@ export const getUrlData = ({
     customBackend?: string;
     allowedEnvironments?: string[];
 }) => {
+    // Fix legacy database URLs before startup consumers read the first repeated value.
+    canonicalizeCurrentDatabaseUrl();
+
     // UI could be located in "monitoring" or "ui" folders
     // my-host:8765/some/path/monitoring/react-router-path or my-host:8765/some/path/ui/react-router-path
     const parsedPrefix = window.location.pathname.match(/.*(?=\/(monitoring|ui)\/)/) || [];
