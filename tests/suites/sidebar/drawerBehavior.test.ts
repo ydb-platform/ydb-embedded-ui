@@ -248,12 +248,15 @@ test.describe('Drawer behavior', () => {
         await mockHealthcheckWithIssue(page);
 
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({
-            schema: TEST_DATABASE,
-            database: TEST_DATABASE,
-            backend,
-            databasePage: 'diagnostics',
-        });
+        await tenantPage.goto(
+            {
+                schema: TEST_DATABASE,
+                database: TEST_DATABASE,
+                backend,
+                databasePage: 'diagnostics',
+            },
+            {waitUntil: 'commit'},
+        );
 
         await page.locator('.kv-tenant-diagnostics').waitFor({state: 'visible', timeout: 30000});
         await openCompactHealthcheckDrawer(page);
@@ -268,6 +271,7 @@ test.describe('Drawer behavior', () => {
         await expectDrawerInsideContextBounds(healthcheckDrawerPanel);
         await expectDrawerContextInsideViewport(healthcheckDrawerPanel);
         await expectRightDrawerResizable(page, healthcheckDrawerPanel);
+        await expect(healthcheckDrawer).toBeVisible();
 
         await healthcheckDrawer.click();
         await expect(healthcheckDrawer).toBeVisible();

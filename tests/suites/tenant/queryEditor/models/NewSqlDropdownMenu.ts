@@ -51,7 +51,7 @@ export class NewSqlDropdownMenu {
     }
 
     async hoverCategory(category: TemplateCategory) {
-        const categoryItem = this.menu.getByRole('menuitem').filter({hasText: category});
+        const categoryItem = this.menu.getByRole('menuitem', {name: category, exact: true});
         await categoryItem.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await categoryItem.hover();
     }
@@ -59,20 +59,20 @@ export class NewSqlDropdownMenu {
     async selectTemplate(
         template: AsyncReplicationTemplates | TablesTemplates | SecretTemplates | TopicTemplates,
     ) {
-        const templateItem = this.subMenu.getByRole('menuitem').filter({hasText: template});
+        const templateItem = this.subMenu.getByRole('menuitem', {name: template, exact: true});
         await templateItem.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await templateItem.click();
     }
 
     async isCategoryVisible(category: TemplateCategory) {
-        const categoryItem = this.menu.getByRole('menuitem').filter({hasText: category});
+        const categoryItem = this.menu.getByRole('menuitem', {name: category, exact: true});
         return categoryItem.isVisible();
     }
 
     async isTemplateVisible(
         template: AsyncReplicationTemplates | TablesTemplates | SecretTemplates | TopicTemplates,
     ) {
-        const templateItem = this.subMenu.getByRole('menuitem').filter({hasText: template});
+        const templateItem = this.subMenu.getByRole('menuitem', {name: template, exact: true});
         return templateItem.isVisible();
     }
 

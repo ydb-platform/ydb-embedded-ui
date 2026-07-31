@@ -46,14 +46,11 @@ test.describe('Test Query Settings', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
 
     test.beforeEach(async ({page}) => {
-        const pageQueryParams = {
+        const tenantPage = new TenantPage(page);
+        await tenantPage.gotoQueryEditor({
             schema: database,
             database,
-            databasePage: 'query',
-        };
-
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
+        });
     });
 
     test('Settings dialog opens on Gear click and closes on Cancel', async ({page}) => {

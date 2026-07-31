@@ -16,14 +16,11 @@ test.describe('Test Query Execution Status', async () => {
     const testQuery = 'SELECT 1;'; // Simple query that will generate a plan
 
     test.beforeEach(async ({page}) => {
-        const pageQueryParams = {
+        const tenantPage = new TenantPage(page);
+        await tenantPage.gotoQueryEditor({
             schema: database,
             database,
-            databasePage: 'query',
-        };
-
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
+        });
     });
 
     test.afterEach(async ({page}) => {

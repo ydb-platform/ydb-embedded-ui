@@ -291,7 +291,7 @@ test.describe('Operations Tab - Infinite Query', () => {
         };
 
         const tenantPageInstance = new TenantPage(page);
-        await tenantPageInstance.goto(pageQueryParams);
+        await tenantPageInstance.goto(pageQueryParams, {waitUntil: 'commit'});
 
         const diagnostics = new Diagnostics(page);
         await diagnostics.clickTab(DiagnosticsTab.Operations);
@@ -299,9 +299,6 @@ test.describe('Operations Tab - Infinite Query', () => {
         // Wait for initial data
         await diagnostics.operations.waitForTableVisible();
         await diagnostics.operations.waitForDataLoad();
-
-        // Wait a bit for the table to stabilize after initial load
-        await page.waitForTimeout(2000);
 
         // Get initial row count (should be around 20)
         const initialRowCount = await diagnostics.operations.getRowCount();
@@ -311,7 +308,7 @@ test.describe('Operations Tab - Infinite Query', () => {
         // Keep scrolling until all operations are loaded
         let previousRowCount = initialRowCount;
         let currentRowCount = initialRowCount;
-        const maxScrollAttempts = 10; // Safety limit to prevent infinite loop
+        const maxScrollAttempts = 4; // Initial page plus three additional mocked pages
         let scrollAttempts = 0;
 
         // Keep track of whether we're still loading more data
@@ -320,15 +317,6 @@ test.describe('Operations Tab - Infinite Query', () => {
         while (hasMoreData && scrollAttempts < maxScrollAttempts) {
             // Scroll to bottom
             await diagnostics.operations.scrollToBottom();
-
-            // Wait for potential loading
-            await page.waitForTimeout(1000);
-
-            // Check if loading more is visible and wait for it to complete
-            const isLoadingVisible = await diagnostics.operations.isLoadingMoreVisible();
-            if (isLoadingVisible) {
-                await diagnostics.operations.waitForLoadingMoreToDisappear();
-            }
 
             // Wait for row count to change or timeout
             try {

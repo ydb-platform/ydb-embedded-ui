@@ -180,21 +180,23 @@ test.describe('Diagnostics Storage usage tab', async () => {
 
     test('Storage usage tab is available for row tables and renders the page', async ({page}) => {
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({
+        await tenantPage.gotoQueryEditor({
             schema: database,
             database,
-            databasePage: 'query',
         });
 
         const queryEditor = new QueryEditor(page);
         const tableName = await queryEditor.createNewFakeTable();
         const tablePath = `/local/${tableName}`;
 
-        await tenantPage.goto({
-            schema: tablePath,
-            database,
-            databasePage: 'diagnostics',
-        });
+        await tenantPage.goto(
+            {
+                schema: tablePath,
+                database,
+                databasePage: 'diagnostics',
+            },
+            {waitUntil: 'commit'},
+        );
 
         const diagnostics = new Diagnostics(page);
         await diagnostics.clickTab(DiagnosticsTab.StorageUsage);
