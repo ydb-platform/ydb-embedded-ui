@@ -32,6 +32,10 @@ export interface SetupVDiskPageMocksOptions {
     whiteboardAllocatedSize?: string;
     whiteboardAvailableSize?: string;
     whiteboardSlotSize?: string;
+    pDiskBscAvailableSize?: string;
+    pDiskBscTotalSize?: string;
+    pDiskWhiteboardAvailableSize?: string;
+    pDiskWhiteboardTotalSize?: string;
 }
 
 const vDiskCapacityFields = {
@@ -78,7 +82,12 @@ function createPDiskWhiteboardData(
     withCapacityMetrics = false,
     {
         whiteboardSlotSize = '20000000000',
-    }: Pick<SetupVDiskPageMocksOptions, 'whiteboardSlotSize'> = {},
+        pDiskWhiteboardAvailableSize = '180000000000',
+        pDiskWhiteboardTotalSize = '200000000000',
+    }: Pick<
+        SetupVDiskPageMocksOptions,
+        'whiteboardSlotSize' | 'pDiskWhiteboardAvailableSize' | 'pDiskWhiteboardTotalSize'
+    > = {},
 ) {
     return {
         PDiskId: Number(PDISK_ID),
@@ -86,8 +95,8 @@ function createPDiskWhiteboardData(
         Path: '/dev/pdisk0',
         Guid: '123456789',
         Category: '1',
-        AvailableSize: '180000000000',
-        TotalSize: '200000000000',
+        AvailableSize: pDiskWhiteboardAvailableSize,
+        TotalSize: pDiskWhiteboardTotalSize,
         State: 'Normal',
         Device: 'Green',
         Realtime: 'Green',
@@ -110,6 +119,10 @@ function createStorageGroupsResponse({
     whiteboardAllocatedSize,
     whiteboardAvailableSize,
     whiteboardSlotSize,
+    pDiskBscAvailableSize,
+    pDiskBscTotalSize,
+    pDiskWhiteboardAvailableSize,
+    pDiskWhiteboardTotalSize,
 }: Pick<
     SetupVDiskPageMocksOptions,
     | 'allocatedSize'
@@ -120,6 +133,10 @@ function createStorageGroupsResponse({
     | 'whiteboardAllocatedSize'
     | 'whiteboardAvailableSize'
     | 'whiteboardSlotSize'
+    | 'pDiskBscAvailableSize'
+    | 'pDiskBscTotalSize'
+    | 'pDiskWhiteboardAvailableSize'
+    | 'pDiskWhiteboardTotalSize'
 > = {}) {
     return {
         StorageGroups: [
@@ -175,10 +192,18 @@ function createStorageGroupsResponse({
                         PDisk: {
                             PDiskId: `${NODE_ID}-${pDiskId}`,
                             Type: 'ROT',
+                            ...(pDiskBscAvailableSize === undefined
+                                ? {}
+                                : {AvailableSize: pDiskBscAvailableSize}),
+                            ...(pDiskBscTotalSize === undefined
+                                ? {}
+                                : {TotalSize: pDiskBscTotalSize}),
                             ...(withCapacityMetrics
                                 ? {
                                       Whiteboard: createPDiskWhiteboardData(true, {
                                           whiteboardSlotSize,
+                                          pDiskWhiteboardAvailableSize,
+                                          pDiskWhiteboardTotalSize,
                                       }),
                                   }
                                 : {}),
@@ -367,6 +392,10 @@ async function setupStorageGroupsMock(
         whiteboardAllocatedSize,
         whiteboardAvailableSize,
         whiteboardSlotSize,
+        pDiskBscAvailableSize,
+        pDiskBscTotalSize,
+        pDiskWhiteboardAvailableSize,
+        pDiskWhiteboardTotalSize,
     }: Pick<
         SetupVDiskPageMocksOptions,
         | 'allocatedSize'
@@ -377,6 +406,10 @@ async function setupStorageGroupsMock(
         | 'whiteboardAllocatedSize'
         | 'whiteboardAvailableSize'
         | 'whiteboardSlotSize'
+        | 'pDiskBscAvailableSize'
+        | 'pDiskBscTotalSize'
+        | 'pDiskWhiteboardAvailableSize'
+        | 'pDiskWhiteboardTotalSize'
     > = {},
 ) {
     await page.route('**/storage/groups?*', async (route) => {
@@ -393,6 +426,10 @@ async function setupStorageGroupsMock(
                     whiteboardAllocatedSize,
                     whiteboardAvailableSize,
                     whiteboardSlotSize,
+                    pDiskBscAvailableSize,
+                    pDiskBscTotalSize,
+                    pDiskWhiteboardAvailableSize,
+                    pDiskWhiteboardTotalSize,
                 }),
             ),
         });
@@ -406,12 +443,16 @@ async function setupStorageNodesMock(
         whiteboardAllocatedSize,
         whiteboardAvailableSize,
         whiteboardSlotSize,
+        pDiskWhiteboardAvailableSize,
+        pDiskWhiteboardTotalSize,
     }: Pick<
         SetupVDiskPageMocksOptions,
         | 'withCapacityMetrics'
         | 'whiteboardAllocatedSize'
         | 'whiteboardAvailableSize'
         | 'whiteboardSlotSize'
+        | 'pDiskWhiteboardAvailableSize'
+        | 'pDiskWhiteboardTotalSize'
     > = {},
 ) {
     await page.route('**/viewer/json/nodes?*', async (route) => {
@@ -432,6 +473,8 @@ async function setupStorageNodesMock(
                         PDisks: [
                             createPDiskWhiteboardData(withCapacityMetrics, {
                                 whiteboardSlotSize,
+                                pDiskWhiteboardAvailableSize,
+                                pDiskWhiteboardTotalSize,
                             }),
                         ],
                         VDisks: [
@@ -462,12 +505,20 @@ export async function setupPDiskInfoMock(
         whiteboardAllocatedSize,
         whiteboardAvailableSize,
         whiteboardSlotSize = '20000000000',
+        pDiskBscAvailableSize = '180000000000',
+        pDiskBscTotalSize = '200000000000',
+        pDiskWhiteboardAvailableSize,
+        pDiskWhiteboardTotalSize,
     }: Pick<
         SetupVDiskPageMocksOptions,
         | 'withCapacityMetrics'
         | 'whiteboardAllocatedSize'
         | 'whiteboardAvailableSize'
         | 'whiteboardSlotSize'
+        | 'pDiskBscAvailableSize'
+        | 'pDiskBscTotalSize'
+        | 'pDiskWhiteboardAvailableSize'
+        | 'pDiskWhiteboardTotalSize'
     > = {},
 ) {
     await page.route('**/pdisk/info*', async (route) => {
@@ -478,6 +529,8 @@ export async function setupPDiskInfoMock(
                 Whiteboard: {
                     PDisk: createPDiskWhiteboardData(withCapacityMetrics, {
                         whiteboardSlotSize,
+                        pDiskWhiteboardAvailableSize,
+                        pDiskWhiteboardTotalSize,
                     }),
                     VDisks: [
                         createVDiskWhiteboardData(withCapacityMetrics, {
@@ -491,8 +544,8 @@ export async function setupPDiskInfoMock(
                         Type: 'ROT',
                         Path: '/dev/pdisk0',
                         Guid: '123456789',
-                        AvailableSize: '180000000000',
-                        TotalSize: '200000000000',
+                        AvailableSize: pDiskBscAvailableSize,
+                        TotalSize: pDiskBscTotalSize,
                         StatusV2: 'ACTIVE',
                         EnforcedDynamicSlotSize: whiteboardSlotSize,
                         ExpectedSlotCount: 4,

@@ -591,8 +591,13 @@ test.describe('Blob storage capacity metrics integration', () => {
             whiteboardAllocatedSize: '1000000000',
             whiteboardAvailableSize: '21000000000',
             whiteboardSlotSize: '22000000000',
+            pDiskBscAvailableSize: '3000000000',
+            pDiskBscTotalSize: '4000000000',
+            pDiskWhiteboardAvailableSize: '21000000000',
+            pDiskWhiteboardTotalSize: '22000000000',
         };
         const expectedVDiskSize = /1 \/ 22\s*GB/;
+        const expectedPDiskSpace = /1 \/ 22\s*GB/;
         const expectedVDiskSlotUsage = '82.3%';
         await setupVDiskPageMocks(page, capacityFixture);
         await setupPDiskInfoMock(page, capacityFixture);
@@ -637,7 +642,9 @@ test.describe('Blob storage capacity metrics integration', () => {
         for (const label of ['Space', 'Slots', 'Slot Size In Units', 'Capacity Alert']) {
             await expect(getDefinitionListRow(groupsPDiskInfo, label)).toBeVisible();
         }
-        const pDiskSpaceText = await getDefinitionListValue(groupsPDiskInfo, 'Space').innerText();
+        await expect(getDefinitionListValue(groupsPDiskInfo, 'Space')).toHaveText(
+            expectedPDiskSpace,
+        );
         const pDiskSlotSizeText = await getDefinitionListValue(
             groupsPDiskInfo,
             'Slot Size In Units',
@@ -648,6 +655,9 @@ test.describe('Blob storage capacity metrics integration', () => {
         const pDiskInfo = page.locator('.ydb-pdisk-page__info');
         await expect(pDiskInfo.getByText('PDisk Usage', {exact: true})).toBeVisible();
         await expect(pDiskInfo.getByText('Slot Size In Units', {exact: true})).toBeVisible();
+        await expect(
+            getInfoViewerRow(pDiskInfo, 'Space').locator('.info-viewer__value'),
+        ).toHaveText(expectedPDiskSpace);
 
         const vDiskOnPDiskPage = page
             .locator('.ydb-pdisk-space-distribution__slot-wrapper a')
@@ -715,7 +725,9 @@ test.describe('Blob storage capacity metrics integration', () => {
         await nodesPDisk.hover();
         const nodesPDiskPopup = await waitForDiskPopup(page, 'Go to PDisk');
         const nodesPDiskInfo = await getFirstTitledDefinitionList(nodesPDiskPopup, 'PDisk');
-        await expect(getDefinitionListValue(nodesPDiskInfo, 'Space')).toHaveText(pDiskSpaceText);
+        await expect(getDefinitionListValue(nodesPDiskInfo, 'Space')).toHaveText(
+            expectedPDiskSpace,
+        );
         await expect(getDefinitionListValue(nodesPDiskInfo, 'Slot Size In Units')).toHaveText(
             pDiskSlotSizeText,
         );

@@ -77,6 +77,10 @@ export type PreparedPDisk = Omit<
         TotalSize?: number;
         AllocatedSize?: number;
         AllocatedPercent?: number;
+        WhiteboardSize?: {
+            AllocatedSize?: number;
+            TotalSize?: number;
+        };
 
         SlotSize?: string;
     };

@@ -106,6 +106,22 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
         TotalSize: mergedPDiskData.TotalSize,
     });
 
+    const whiteboardAvailableSize = parseOptionalNonNegativeNumber(whiteboardPDisk?.AvailableSize);
+    const whiteboardTotalSize = parseOptionalNonNegativeNumber(whiteboardPDisk?.TotalSize);
+    const whiteboardSizeFields =
+        whiteboardPDisk === undefined
+            ? undefined
+            : preparePDiskSizeFields({
+                  AvailableSize: whiteboardAvailableSize,
+                  TotalSize: whiteboardTotalSize,
+              });
+    const WhiteboardSize = whiteboardSizeFields
+        ? {
+              AllocatedSize: whiteboardSizeFields.AllocatedSize,
+              TotalSize: whiteboardSizeFields.TotalSize,
+          }
+        : undefined;
+
     const Type =
         (bscPDisk.Type?.toUpperCase() as PDiskType) ?? getPDiskType(whiteboardPDisk?.Category);
 
@@ -123,6 +139,7 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
         AllocatedSize,
         AvailableSize,
         TotalSize,
+        ...(WhiteboardSize ? {WhiteboardSize} : {}),
         Type,
         Severity,
         SlotSize,

@@ -14,7 +14,7 @@ const vDiskWithCapacityMetrics = {
     GroupSizeInUnits: 0,
     VDiskSlotUsage: 82.25,
     VDiskRawUsage: 64.5,
-    NormalizedOccupancy: 1.12,
+    NormalizedOccupancy: 0.92,
     CapacityAlert: ECapacityAlert.LIGHTYELLOW,
 } satisfies TVDiskStateInfo;
 
@@ -50,7 +50,7 @@ describe('prepareGroupsResponse', () => {
                 GroupSizeInUnits: 0,
                 VDiskSlotUsage: 82.25,
                 VDiskRawUsage: 64.5,
-                NormalizedOccupancy: 1.12,
+                NormalizedOccupancy: 0.92,
                 CapacityAlert: ECapacityAlert.LIGHTYELLOW,
             }),
         );

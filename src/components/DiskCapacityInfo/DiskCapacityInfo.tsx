@@ -89,11 +89,12 @@ export function getPDiskCapacityInfoItems(
     data: PreparedPDisk | undefined,
     {withUsage, withCapacityAlert}: {withUsage: boolean; withCapacityAlert: boolean},
 ): DiskCapacityInfoItem[] {
+    const sizeData = data?.WhiteboardSize ?? data;
     const items: DiskCapacityInfoItem[] = [
         {
             id: 'space',
             title: i18n('field_space'),
-            value: formatStorageMetricPair(data?.AllocatedSize, data?.TotalSize),
+            value: formatStorageMetricPair(sizeData?.AllocatedSize, sizeData?.TotalSize),
         },
     ];
 

@@ -148,6 +148,53 @@ describe('DiskCapacityInfo builders', () => {
         ]);
     });
 
+    test('uses the Whiteboard PDisk size instead of the legacy BSC size', () => {
+        const [spaceItem] = getPDiskCapacityInfoItems(
+            {
+                AllocatedSize: 1_000_000_000,
+                TotalSize: 4_000_000_000,
+                WhiteboardSize: {
+                    AllocatedSize: 1_000_000_000,
+                    TotalSize: 22_000_000_000,
+                },
+            },
+            {withUsage: true, withCapacityAlert: true},
+        );
+
+        expect(spaceItem.value).toBe(`1 / 22${UNBREAKABLE_GAP}GB`);
+    });
+
+    test('preserves zero in the Whiteboard PDisk size', () => {
+        const [spaceItem] = getPDiskCapacityInfoItems(
+            {
+                AllocatedSize: 1_000_000_000,
+                TotalSize: 4_000_000_000,
+                WhiteboardSize: {
+                    AllocatedSize: 0,
+                    TotalSize: 22_000_000_000,
+                },
+            },
+            {withUsage: true, withCapacityAlert: true},
+        );
+
+        expect(spaceItem.value).toBe(`0 / 22${UNBREAKABLE_GAP}GB`);
+    });
+
+    test('does not mix a partial Whiteboard PDisk size with the legacy BSC size', () => {
+        const [spaceItem] = getPDiskCapacityInfoItems(
+            {
+                AllocatedSize: 1_000_000_000,
+                TotalSize: 4_000_000_000,
+                WhiteboardSize: {
+                    AllocatedSize: 1_000_000_000,
+                },
+            },
+            {withUsage: true, withCapacityAlert: true},
+        );
+
+        expect(spaceItem.value).toBe(EMPTY_DATA_PLACEHOLDER);
+    });
+
     test('formats normalized storage-group scalar values without rendering a component', () => {
         const items = getStorageGroupCapacityInfoItems({
             Degraded: 0,

@@ -15,7 +15,7 @@ const vDiskWithCapacityMetrics = {
     GroupSizeInUnits: 0,
     VDiskSlotUsage: 82.25,
     VDiskRawUsage: 64.5,
-    NormalizedOccupancy: 1.12,
+    NormalizedOccupancy: 0.92,
     CapacityAlert: ECapacityAlert.LIGHTYELLOW,
 } satisfies TVDiskStateInfo;
 
@@ -383,6 +383,28 @@ describe('prepareGroupsVDisk', () => {
 });
 
 describe('prepareGroupsPDisk', () => {
+    test('Should preserve the BSC size and prepare a separate Whiteboard size', () => {
+        const preparedData = prepareGroupsPDisk({
+            AvailableSize: '3000000000',
+            TotalSize: '4000000000',
+            Whiteboard: {
+                AvailableSize: '21000000000',
+                TotalSize: '22000000000',
+            },
+        });
+
+        expect(preparedData).toEqual(
+            expect.objectContaining({
+                AllocatedSize: 1_000_000_000,
+                TotalSize: 4_000_000_000,
+                WhiteboardSize: {
+                    AllocatedSize: 1_000_000_000,
+                    TotalSize: 22_000_000_000,
+                },
+            }),
+        );
+    });
+
     test('Should correctly parse data', () => {
         const pDiskData = {
             PDiskId: '224-1001',
@@ -444,6 +466,10 @@ describe('prepareGroupsPDisk', () => {
             TotalSize: 6400161873920,
             AllocatedPercent: 12,
             AllocatedSize: 786306170880,
+            WhiteboardSize: {
+                AllocatedSize: 786306170880,
+                TotalSize: 6400161873920,
+            },
             Severity: 1,
 
             SystemSize: '817889280',
@@ -554,6 +580,10 @@ describe('prepareGroupsPDisk', () => {
             TotalSize: 6400161873920,
             AllocatedPercent: 12,
             AllocatedSize: 786306170880,
+            WhiteboardSize: {
+                AllocatedSize: 786306170880,
+                TotalSize: 6400161873920,
+            },
             Severity: 1,
 
             SystemSize: '817889280',
