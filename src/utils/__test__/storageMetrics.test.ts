@@ -105,6 +105,10 @@ describe('storageMetrics', () => {
         expect(formatMetricPercent(64.2)).toBe('64.2%');
     });
 
+    test('formatMetricPercent does not clamp usage values above 100', () => {
+        expect(formatMetricPercent(123.4)).toBe('123.4%');
+    });
+
     test('formatMetricPercent returns placeholder for invalid values', () => {
         expect(formatMetricPercent(undefined)).toBe(EMPTY_DATA_PLACEHOLDER);
         expect(formatMetricPercent(null)).toBe(EMPTY_DATA_PLACEHOLDER);

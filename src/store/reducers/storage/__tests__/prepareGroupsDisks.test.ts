@@ -43,6 +43,53 @@ describe('prepareGroupsVDisk', () => {
         expect(preparedData.PDisk).not.toHaveProperty('PDiskUsage');
     });
 
+    test('Should preserve the BSC size and prepare a separate Whiteboard size', () => {
+        const preparedData = prepareGroupsVDisk({
+            AllocatedSize: '1000000000',
+            AvailableSize: '3000000000',
+            Whiteboard: {
+                AllocatedSize: '1000000000',
+                AvailableSize: '21000000000',
+            },
+            PDisk: {
+                Whiteboard: {
+                    EnforcedDynamicSlotSize: '22000000000',
+                },
+            },
+        });
+
+        expect(preparedData).toEqual(
+            expect.objectContaining({
+                AllocatedSize: 1_000_000_000,
+                SizeLimit: 4_000_000_000,
+                WhiteboardSize: {
+                    AllocatedSize: 1_000_000_000,
+                    SizeLimit: 22_000_000_000,
+                },
+            }),
+        );
+    });
+
+    test('Should keep the legacy size fallback for a donor without nested Whiteboard data', () => {
+        const preparedData = prepareGroupsVDisk({
+            Donors: [
+                {
+                    AllocatedSize: '1000000000',
+                    AvailableSize: '3000000000',
+                },
+            ],
+        });
+
+        expect(preparedData.Donors?.[0]).toEqual(
+            expect.objectContaining({
+                AllocatedSize: 1_000_000_000,
+                SizeLimit: 4_000_000_000,
+                DonorMode: true,
+            }),
+        );
+        expect(preparedData.Donors?.[0]).not.toHaveProperty('WhiteboardSize');
+    });
+
     test('Should correctly parse data', () => {
         const vDiksDataWithoutPDisk = {
             VDiskId: '2181038134-22-0-0-0',
@@ -135,6 +182,10 @@ describe('prepareGroupsVDisk', () => {
             SizeLimit: 265405071360,
             FreeSize: 234461593600,
             AllocatedPercent: 11,
+            WhiteboardSize: {
+                AllocatedSize: 30943477760,
+                SizeLimit: 265405071360,
+            },
 
             Donors: undefined,
 
@@ -286,6 +337,10 @@ describe('prepareGroupsVDisk', () => {
             SizeLimit: 265405071360,
             FreeSize: 234461593600,
             AllocatedPercent: 11,
+            WhiteboardSize: {
+                AllocatedSize: 30943477760,
+                SizeLimit: 265405071360,
+            },
 
             Donors: undefined,
 

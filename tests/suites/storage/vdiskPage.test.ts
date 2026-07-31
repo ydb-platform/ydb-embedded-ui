@@ -578,14 +578,24 @@ test.describe('Blob storage capacity metrics integration', () => {
         });
     }
 
-    test('shows the same explicit metrics across pages and Groups and Nodes popups', async ({
+    test('shows the same explicit metrics across pages and Groups, Nodes, and PDisk popups', async ({
         page,
     }) => {
         await enableBlobStorageCapacityMetrics(page);
         await enableStorageDisksColumn(page);
         await enableStorageNodesCapacityColumns(page);
-        await setupVDiskPageMocks(page, {withCapacityMetrics: true});
-        await setupPDiskInfoMock(page, {withCapacityMetrics: true});
+        const capacityFixture = {
+            withCapacityMetrics: true,
+            allocatedSize: '1000000000',
+            availableSize: '3000000000',
+            whiteboardAllocatedSize: '1000000000',
+            whiteboardAvailableSize: '21000000000',
+            whiteboardSlotSize: '22000000000',
+        };
+        const expectedVDiskSize = /1 \/ 22\s*GB/;
+        const expectedVDiskSlotUsage = '82.3%';
+        await setupVDiskPageMocks(page, capacityFixture);
+        await setupPDiskInfoMock(page, capacityFixture);
 
         await page.goto(VDISK_PAGE_PATH);
 
@@ -603,11 +613,10 @@ test.describe('Blob storage capacity metrics integration', () => {
         ]) {
             await expect(vDiskInfo.getByText(label, {exact: true})).toBeVisible();
         }
-        const vDiskSizeText = await getDefinitionListValue(vDiskInfo, 'Size').innerText();
-        const vDiskSlotUsageText = await getDefinitionListValue(
-            vDiskInfo,
-            'VDisk Slot Usage',
-        ).innerText();
+        await expect(getDefinitionListValue(vDiskInfo, 'Size')).toHaveText(expectedVDiskSize);
+        await expect(getDefinitionListValue(vDiskInfo, 'VDisk Slot Usage')).toHaveText(
+            expectedVDiskSlotUsage,
+        );
 
         const groupsVDisk = page
             .locator('.ydb-storage-vdisks__wrapper .storage-disk-progress-bar')
@@ -615,9 +624,9 @@ test.describe('Blob storage capacity metrics integration', () => {
         await groupsVDisk.hover();
         const groupsVDiskPopup = await waitForDiskPopup(page, 'Go to VDisk');
         const groupsVDiskInfo = await getFirstTitledDefinitionList(groupsVDiskPopup, 'VDisk');
-        await expect(getDefinitionListValue(groupsVDiskInfo, 'Size')).toHaveText(vDiskSizeText);
+        await expect(getDefinitionListValue(groupsVDiskInfo, 'Size')).toHaveText(expectedVDiskSize);
         await expect(getDefinitionListValue(groupsVDiskInfo, 'VDisk Slot Usage')).toHaveText(
-            vDiskSlotUsageText,
+            expectedVDiskSlotUsage,
         );
         await closeDiskPopup(page, groupsVDiskPopup);
 
@@ -644,14 +653,20 @@ test.describe('Blob storage capacity metrics integration', () => {
             .locator('.ydb-pdisk-space-distribution__slot-wrapper a')
             .first();
         await expect(vDiskOnPDiskPage).toBeVisible();
-        await vDiskOnPDiskPage.click();
-        await expect(page).toHaveURL(/\/vDisk\?/);
-
-        const nestedVDiskInfo = page.locator('.ydb-vdisk-page__info');
-        await expect(getDefinitionListValue(nestedVDiskInfo, 'Size')).toHaveText(vDiskSizeText);
-        await expect(getDefinitionListValue(nestedVDiskInfo, 'VDisk Slot Usage')).toHaveText(
-            vDiskSlotUsageText,
+        await vDiskOnPDiskPage.hover();
+        const nestedVDiskPopup = page
+            .locator('.ydb-pdisk-space-distribution__vdisk-popup')
+            .filter({visible: true})
+            .last();
+        await expect(nestedVDiskPopup).toBeVisible();
+        await getFirstTitledDefinitionList(nestedVDiskPopup, 'VDisk');
+        await expect(getDefinitionListValue(nestedVDiskPopup, 'Size')).toHaveText(
+            expectedVDiskSize,
         );
+        await expect(getDefinitionListValue(nestedVDiskPopup, 'VDisk Slot Usage')).toHaveText(
+            expectedVDiskSlotUsage,
+        );
+        await closeDiskPopup(page, nestedVDiskPopup);
 
         await page.goto(`/storageGroup?database=/local&groupId=${GROUP_ID}`);
 
@@ -686,9 +701,9 @@ test.describe('Blob storage capacity metrics integration', () => {
         await nodesVDisk.hover();
         const nodesVDiskPopup = await waitForDiskPopup(page, 'Go to VDisk');
         const nodesVDiskInfo = await getFirstTitledDefinitionList(nodesVDiskPopup, 'VDisk');
-        await expect(getDefinitionListValue(nodesVDiskInfo, 'Size')).toHaveText(vDiskSizeText);
+        await expect(getDefinitionListValue(nodesVDiskInfo, 'Size')).toHaveText(expectedVDiskSize);
         await expect(getDefinitionListValue(nodesVDiskInfo, 'VDisk Slot Usage')).toHaveText(
-            vDiskSlotUsageText,
+            expectedVDiskSlotUsage,
         );
         await closeDiskPopup(page, nodesVDiskPopup);
 

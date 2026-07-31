@@ -6,6 +6,7 @@ import {getPDiskType} from '../../../utils/disks/getPDiskType';
 import {getPDiskId} from '../../../utils/disks/helpers';
 import {preparePDiskSizeFields, prepareVDiskSizeFields} from '../../../utils/disks/prepareDisks';
 import type {PDiskType, PreparedVDisk} from '../../../utils/disks/types';
+import {parseOptionalNonNegativeNumber} from '../../../utils/utils';
 
 export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
     const {Whiteboard: whiteboardVDisk = {}, PDisk, ...bscVDisk} = data;
@@ -30,11 +31,34 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
         SlotSize: PDisk?.SlotSize,
     });
 
+    const whiteboardAllocatedSize = parseOptionalNonNegativeNumber(whiteboardVDisk.AllocatedSize);
+    const whiteboardAvailableSize = parseOptionalNonNegativeNumber(whiteboardVDisk.AvailableSize);
+    const whiteboardSlotSize = parseOptionalNonNegativeNumber(
+        PDisk?.Whiteboard?.EnforcedDynamicSlotSize,
+    );
+    const whiteboardSizeFields = data.Whiteboard
+        ? prepareVDiskSizeFields({
+              AvailableSize: whiteboardAvailableSize,
+              AllocatedSize: whiteboardAllocatedSize,
+              SlotSize: whiteboardSlotSize,
+          })
+        : undefined;
+    const WhiteboardSize = whiteboardSizeFields
+        ? {
+              AllocatedSize:
+                  whiteboardAllocatedSize === undefined
+                      ? undefined
+                      : whiteboardSizeFields.AllocatedSize,
+              SizeLimit:
+                  whiteboardAvailableSize === undefined && whiteboardSlotSize === undefined
+                      ? undefined
+                      : whiteboardSizeFields.SizeLimit,
+          }
+        : undefined;
+
     const preparedDonors = bscVDisk.Donors?.map((donor) => {
-        const preparedDonor = prepareGroupsVDisk({
-            ...donor,
-            Whiteboard: {...donor.Whiteboard, DonorMode: true},
-        });
+        const preparedDonor = prepareGroupsVDisk(donor);
+        preparedDonor.DonorMode = true;
 
         // Set Recipient reference on the donor pointing back to this VDisk
         preparedDonor.Recipient = {
@@ -48,6 +72,7 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
     return {
         ...mergedVDiskData,
         ...vDiskSizeFields,
+        ...(WhiteboardSize ? {WhiteboardSize} : {}),
         PDisk: preparedPDisk,
         Donors: preparedDonors,
         PDiskId,

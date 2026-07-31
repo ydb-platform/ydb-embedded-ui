@@ -62,6 +62,53 @@ describe('DiskCapacityInfo', () => {
         expect(screen.getAllByText(EMPTY_DATA_PLACEHOLDER)).toHaveLength(5);
     });
 
+    test('uses the Whiteboard VDisk size instead of the legacy BSC size', () => {
+        const [sizeItem] = getVDiskCapacityInfoItems(
+            {
+                AllocatedSize: 1_000_000_000,
+                SizeLimit: 4_000_000_000,
+                WhiteboardSize: {
+                    AllocatedSize: 1_000_000_000,
+                    SizeLimit: 22_000_000_000,
+                },
+            },
+            {withRawUsage: false},
+        );
+
+        expect(sizeItem.value).toBe(`1 / 22${UNBREAKABLE_GAP}GB`);
+    });
+
+    test('preserves zero in the Whiteboard VDisk size', () => {
+        const [sizeItem] = getVDiskCapacityInfoItems(
+            {
+                AllocatedSize: 1_000_000_000,
+                SizeLimit: 4_000_000_000,
+                WhiteboardSize: {
+                    AllocatedSize: 0,
+                    SizeLimit: 22_000_000_000,
+                },
+            },
+            {withRawUsage: false},
+        );
+
+        expect(sizeItem.value).toBe(`0 / 22${UNBREAKABLE_GAP}GB`);
+    });
+
+    test('does not mix a partial Whiteboard VDisk size with the legacy BSC size', () => {
+        const [sizeItem] = getVDiskCapacityInfoItems(
+            {
+                AllocatedSize: 1_000_000_000,
+                SizeLimit: 4_000_000_000,
+                WhiteboardSize: {
+                    AllocatedSize: 1_000_000_000,
+                },
+            },
+            {withRawUsage: false},
+        );
+
+        expect(sizeItem.value).toBe(EMPTY_DATA_PLACEHOLDER);
+    });
+
     test('renders PDisk capacity values and notes through the InfoViewer adapter', () => {
         const {container} = render(
             <InfoViewer

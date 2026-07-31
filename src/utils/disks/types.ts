@@ -97,6 +97,10 @@ export interface PreparedVDisk
     AllocatedPercent?: number;
     SizeLimit?: number;
     FreeSize?: number;
+    WhiteboardSize?: {
+        AllocatedSize?: number;
+        SizeLimit?: number;
+    };
 
     Donors?: PreparedVDisk[];
 

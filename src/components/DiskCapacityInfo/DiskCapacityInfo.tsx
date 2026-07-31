@@ -44,11 +44,12 @@ export function getVDiskCapacityInfoItems(
     data: PreparedVDisk | undefined,
     {withRawUsage}: {withRawUsage: boolean},
 ): DiskCapacityInfoItem[] {
+    const sizeData = data?.WhiteboardSize ?? data;
     const items: DiskCapacityInfoItem[] = [
         {
             id: 'size',
             title: i18n('field_size'),
-            value: formatStorageMetricPair(data?.AllocatedSize, data?.SizeLimit),
+            value: formatStorageMetricPair(sizeData?.AllocatedSize, sizeData?.SizeLimit),
         },
         {
             id: 'vdisk-slot-usage',
