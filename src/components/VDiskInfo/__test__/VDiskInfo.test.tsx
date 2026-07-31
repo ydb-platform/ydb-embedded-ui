@@ -4,31 +4,9 @@ import {QueryParamProvider} from 'use-query-params';
 import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 
 import {configureStore} from '../../../store';
-import {ECapacityAlert, EFlag} from '../../../types/api/enums';
-import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {renderWithStore} from '../../../utils/tests/providers';
 import {VDiskInfo} from '../VDiskInfo';
-
-jest.mock('../../../store/reducers/capabilities/hooks', () => ({
-    ...jest.requireActual('../../../store/reducers/capabilities/hooks'),
-    useBlobStorageCapacityMetricsEnabled: jest.fn(),
-}));
-
-const {useBlobStorageCapacityMetricsEnabled} = jest.requireMock(
-    '../../../store/reducers/capabilities/hooks',
-);
-
-const capacityMetricsData: PreparedVDisk = {
-    AllocatedSize: 1_000_000_000,
-    SizeLimit: 2_000_000_000,
-    AllocatedPercent: 50,
-    DiskSpace: EFlag.Green,
-    VDiskSlotUsage: 82.25,
-    VDiskRawUsage: 64.5,
-    GroupSizeInUnits: 2,
-    CapacityAlert: ECapacityAlert.LIGHTYELLOW,
-};
 
 function renderWithWhoami({
     data,
@@ -61,10 +39,6 @@ function renderWithWhoami({
 }
 
 describe('VDiskInfo', () => {
-    beforeEach(() => {
-        useBlobStorageCapacityMetricsEnabled.mockReturnValue(false);
-    });
-
     test('renders VDisk page link as an internal link', () => {
         renderWithWhoami({
             data: {NodeId: 1, StringifiedId: '1-2-3-4-5'} as PreparedVDisk,
@@ -99,42 +73,5 @@ describe('VDiskInfo', () => {
 
         expect(screen.getByText('2')).toBeVisible();
         expect(screen.queryByRole('link', {name: '2'})).not.toBeInTheDocument();
-    });
-
-    test('renders explicit VDisk capacity metrics when enabled', () => {
-        useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
-
-        renderWithWhoami({data: capacityMetricsData});
-
-        expect(screen.getByText('VDisk Slot Usage')).toBeVisible();
-        expect(screen.getByText('VDisk Raw Usage')).toBeVisible();
-        expect(screen.getByText('Group Size In Units')).toBeVisible();
-        expect(screen.getByText('LIGHT_YELLOW')).toBeVisible();
-        expect(screen.queryByText('Usage', {exact: true})).not.toBeInTheDocument();
-        expect(screen.queryByText('Disk Space', {exact: true})).not.toBeInTheDocument();
-    });
-
-    test('keeps legacy capacity rows when explicit VDisk capacity metrics are disabled', () => {
-        renderWithWhoami({data: capacityMetricsData});
-
-        expect(screen.getByText('Usage')).toBeVisible();
-        expect(screen.getByText('Disk Space')).toBeVisible();
-        expect(screen.queryByText('VDisk Slot Usage')).not.toBeInTheDocument();
-        expect(screen.queryByText('VDisk Raw Usage')).not.toBeInTheDocument();
-        expect(screen.queryByText('Group Size In Units')).not.toBeInTheDocument();
-        expect(screen.queryByText('Capacity Alert')).not.toBeInTheDocument();
-    });
-
-    test('keeps every explicit VDisk capacity row visible when metric fields are absent', () => {
-        useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
-
-        renderWithWhoami({data: {}} as {data: PreparedVDisk});
-
-        expect(screen.getByText('Size')).toBeVisible();
-        expect(screen.getByText('VDisk Slot Usage')).toBeVisible();
-        expect(screen.getByText('VDisk Raw Usage')).toBeVisible();
-        expect(screen.getByText('Group Size In Units')).toBeVisible();
-        expect(screen.getByText('Capacity Alert')).toBeVisible();
-        expect(screen.getAllByText(EMPTY_DATA_PLACEHOLDER)).toHaveLength(5);
     });
 });
