@@ -116,12 +116,33 @@ describe('prepareWhiteboardVDiskData', () => {
             SizeLimit: 197520261120,
             FreeSize: 188523479040,
             AllocatedPercent: 4,
+            WhiteboardSize: {
+                AllocatedSize: 8996782080,
+                SizeLimit: 197520261120,
+            },
         };
 
         const preparedData = prepareWhiteboardVDiskData(data);
 
         expect(preparedData).toEqual(expectedResult);
     });
+
+    test('Should preserve missing Whiteboard size values instead of converting null to zero', () => {
+        const data = {
+            VDiskId: {},
+            AllocatedSize: null,
+            AvailableSize: null,
+            PDisk: {
+                EnforcedDynamicSlotSize: null,
+            },
+        } as unknown as TVDiskStateInfo;
+
+        expect(prepareWhiteboardVDiskData(data).WhiteboardSize).toEqual({
+            AllocatedSize: undefined,
+            SizeLimit: undefined,
+        });
+    });
+
     test('Should parse unavailable donors', () => {
         const data = {
             NodeId: 1,
@@ -195,6 +216,10 @@ describe('prepareWhiteboardPDiskData', () => {
             TotalSize: 3199556648960,
             AllocatedSize: 91577384960,
             AllocatedPercent: 2,
+            WhiteboardSize: {
+                AllocatedSize: 91577384960,
+                TotalSize: 3199556648960,
+            },
 
             ExpectedSlotCount: 16,
             NumActiveSlots: 10,
@@ -208,6 +233,18 @@ describe('prepareWhiteboardPDiskData', () => {
         const preparedData = prepareWhiteboardPDiskData(data);
 
         expect(preparedData).toEqual(expectedResult);
+    });
+
+    test('Should preserve missing Whiteboard size values instead of converting null to zero', () => {
+        const data = {
+            AvailableSize: null,
+            TotalSize: null,
+        } as unknown as TPDiskStateInfo;
+
+        expect(prepareWhiteboardPDiskData(data).WhiteboardSize).toEqual({
+            AllocatedSize: undefined,
+            TotalSize: undefined,
+        });
     });
 });
 

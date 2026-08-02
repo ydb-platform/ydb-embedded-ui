@@ -125,6 +125,24 @@ export function useStorageGroupsSelectedColumns({
         ) ||
             shouldUseExpertDisksColumn);
 
+    const hiddenLegacyColumns = React.useMemo(() => {
+        if (!blobMetricsEnabled) {
+            return [];
+        }
+
+        return selectedColumns.columnsToSelect.filter(({id}) =>
+            STORAGE_GROUPS_LEGACY_CAPACITY_COLUMN_IDS.some((columnId) => columnId === id),
+        );
+    }, [blobMetricsEnabled, selectedColumns.columnsToSelect]);
+    const setColumns: typeof selectedColumns.setColumns = React.useCallback(
+        (value) => {
+            selectedColumns.setColumns(
+                blobMetricsEnabled ? [...value, ...hiddenLegacyColumns] : value,
+            );
+        },
+        [blobMetricsEnabled, hiddenLegacyColumns, selectedColumns],
+    );
+
     return React.useMemo(() => {
         const columnsToShow = selectedColumns.columnsToShow.filter(({name}) => {
             if (
@@ -151,10 +169,12 @@ export function useStorageGroupsSelectedColumns({
             ...selectedColumns,
             columnsToShow,
             columnsToSelect,
+            setColumns,
         };
     }, [
         blobMetricsEnabled,
         selectedColumns,
+        setColumns,
         shouldHideVDisksSelectorOption,
         shouldUseExpertDisksColumn,
     ]);

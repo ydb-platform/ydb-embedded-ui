@@ -123,6 +123,42 @@ describe('preparePDiskDataResponse', () => {
             15,
         );
     });
+
+    test('Should preserve missing Whiteboard size instead of falling back to BSC size', () => {
+        const data = {
+            BSC: {
+                PDisk: {
+                    AvailableSize: '75',
+                    TotalSize: '100',
+                },
+            },
+            Whiteboard: {
+                PDisk: {
+                    AvailableSize: null,
+                    TotalSize: null,
+                },
+            },
+        } as unknown as TPDiskInfoResponse;
+
+        expect(preparePDiskDataResponse([data, {}]).WhiteboardSize).toEqual({
+            AllocatedSize: undefined,
+            TotalSize: undefined,
+        });
+    });
+
+    test('Should omit the Whiteboard size marker when only BSC size is present', () => {
+        const data: TPDiskInfoResponse = {
+            BSC: {
+                PDisk: {
+                    AvailableSize: '75',
+                    TotalSize: '100',
+                },
+            },
+        };
+
+        expect(preparePDiskDataResponse([data, {}])).not.toHaveProperty('WhiteboardSize');
+    });
+
     test('Should correctly calculate empty slots size if EnforcedDynamicSlotSize is provided', () => {
         const preparedData = preparePDiskDataResponse([rawData, {}]);
 

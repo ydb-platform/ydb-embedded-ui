@@ -23,10 +23,13 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
     const {PDisk: WhiteboardPDiskData = {}, VDisks: WhiteboardVDisksData = []} = Whiteboard;
     const {PDisk: BSCPDiskData = {}} = BSC;
 
-    const preparedPDisk = prepareWhiteboardPDiskData({
-        ...BSCPDiskData,
-        ...WhiteboardPDiskData,
-    });
+    const preparedPDisk = prepareWhiteboardPDiskData(
+        {
+            ...BSCPDiskData,
+            ...WhiteboardPDiskData,
+        },
+        Whiteboard.PDisk ?? null,
+    );
 
     const NodeId = preparedPDisk.NodeId ?? preparedNode.NodeId;
 
