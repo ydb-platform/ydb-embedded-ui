@@ -3,6 +3,7 @@ import {expect, test} from '@playwright/test';
 
 import {EMPTY_DATA_PLACEHOLDER} from '../../../src/utils/emptyDataPlaceholder';
 import {ClusterStorageTable} from '../paginatedTable/paginatedTable';
+import {Sidebar} from '../sidebar/Sidebar';
 
 import {
     GROUP_ID,
@@ -793,7 +794,6 @@ test.describe('Blob storage capacity metrics integration', () => {
     });
 
     test('removes enabled Groups legacy columns and legacy group-by state', async ({page}) => {
-        await enableBlobStorageCapacityMetrics(page);
         await enableStorageGroupsLegacyCapacityColumns(page);
         await setupVDiskPageMocks(page, {withCapacityMetrics: true});
 
@@ -801,10 +801,20 @@ test.describe('Blob storage capacity metrics integration', () => {
 
         const storageTable = new ClusterStorageTable(page);
         await storageTable.waitForTableToLoad();
-        await storageTable.waitForTableData();
+
+        const groupBySelect = page.getByTestId('storage-groups-group-by');
+        await expect(groupBySelect).toHaveText('Disk usage');
+
+        const sidebar = new Sidebar(page);
+        await sidebar.clickSettings();
+        await sidebar.clickExperimentsSection();
+        await sidebar.toggleExperimentByTitle('Blob storage capacity metrics');
+        await sidebar.closeDrawer();
+
         await expect
             .poll(() => new URL(page.url()).searchParams.get('storageGroupsGroupBy'))
             .toBeNull();
+        await storageTable.waitForTableData();
 
         const table = page.locator('.ydb-paginated-table__table');
         for (const legacyHeader of ['Usage', 'Disk Usage', 'Space']) {
@@ -822,11 +832,23 @@ test.describe('Blob storage capacity metrics integration', () => {
         await expect(columnSetup.locator('[data-list-item="MaxVDiskSlotUsage"]')).toBeVisible();
         await storageTable.getControls().closeColumnSetup();
 
-        await page.getByTestId('storage-groups-group-by').click();
+        await expect(groupBySelect).toHaveText('-');
+        await groupBySelect.click();
         const groupByOptions = page.locator('.g-select-list');
         await expect(groupByOptions.getByText('Usage', {exact: true})).toHaveCount(0);
         await expect(groupByOptions.getByText('Disk Usage', {exact: true})).toHaveCount(0);
         await expect(groupByOptions.getByText('Capacity Alert', {exact: true})).toBeVisible();
+
+        await page.keyboard.press('Escape');
+        await sidebar.clickSettings();
+        await sidebar.clickExperimentsSection();
+        await sidebar.toggleExperimentByTitle('Blob storage capacity metrics');
+        await sidebar.closeDrawer();
+
+        await expect
+            .poll(() => new URL(page.url()).searchParams.get('storageGroupsGroupBy'))
+            .toBeNull();
+        await expect(groupBySelect).toHaveText('-');
     });
 
     test('shows row-scoped placeholders when optional capacity fields are absent', async ({
