@@ -339,6 +339,38 @@ describe('useStorageGroupsSelectedColumns', () => {
         );
     });
 
+    test('preserves hidden capacity selections when saving legacy columns', () => {
+        useSetting.mockReturnValue([
+            [
+                {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage, selected: false},
+            ],
+            setSavedColumns,
+        ]);
+
+        const {result} = renderHook(() =>
+            useStorageGroupsSelectedColumns({visibleEntities: 'all'}),
+        );
+
+        expect(result.current.columnsToSelect.map(({id}) => id)).not.toEqual(
+            expect.arrayContaining([
+                STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage,
+                STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage,
+            ]),
+        );
+
+        result.current.setColumns(result.current.columnsToSelect);
+
+        expect(setSavedColumns).toHaveBeenCalledWith(
+            expect.arrayContaining([
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage, selected: false},
+            ]),
+        );
+    });
+
     test('does not restore Space as a sticky column in the space view when enabled', () => {
         useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
 

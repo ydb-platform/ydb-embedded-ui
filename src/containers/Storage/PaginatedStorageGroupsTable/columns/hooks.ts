@@ -48,10 +48,6 @@ export function useStorageGroupsSelectedColumns({
             skipped.push(STORAGE_GROUPS_COLUMNS_IDS.PileName);
         }
 
-        if (!blobMetricsEnabled) {
-            skipped.push(...CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS);
-        }
-
         if (!isUserAllowedToMakeChanges) {
             skipped.push(...MONITORING_USER_COLUMNS_IDS);
 
@@ -61,7 +57,7 @@ export function useStorageGroupsSelectedColumns({
         }
 
         return skipped;
-    }, [bridgeModeEnabled, blobMetricsEnabled, isUserAllowedToMakeChanges, isViewerUser]);
+    }, [bridgeModeEnabled, isUserAllowedToMakeChanges, isViewerUser]);
 
     const columns = React.useMemo(() => {
         const allColumns = getStorageGroupsColumns({viewContext, isAllVDisksLayout});
@@ -76,12 +72,12 @@ export function useStorageGroupsSelectedColumns({
             sticky.push(STORAGE_GROUPS_COLUMNS_IDS.Degraded);
         }
 
-        if (visibleEntities === VISIBLE_ENTITIES.space) {
+        if (visibleEntities === VISIBLE_ENTITIES.space && !blobMetricsEnabled) {
             sticky.push(STORAGE_GROUPS_COLUMNS_IDS.DiskSpace);
         }
 
         return sticky;
-    }, [visibleEntities]);
+    }, [blobMetricsEnabled, visibleEntities]);
 
     const requiredColumns = React.useMemo(() => {
         return isStorageExpertMode && isVDisksPDisksColumnAvailable
@@ -125,40 +121,31 @@ export function useStorageGroupsSelectedColumns({
         ) ||
             shouldUseExpertDisksColumn);
 
-    const hiddenLegacyColumns = React.useMemo(() => {
-        if (!blobMetricsEnabled) {
-            return [];
-        }
-
+    const hiddenCapacityColumnIds = blobMetricsEnabled
+        ? STORAGE_GROUPS_LEGACY_CAPACITY_COLUMN_IDS
+        : CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS;
+    const hiddenCapacityColumns = React.useMemo(() => {
         return selectedColumns.columnsToSelect.filter(({id}) =>
-            STORAGE_GROUPS_LEGACY_CAPACITY_COLUMN_IDS.some((columnId) => columnId === id),
+            hiddenCapacityColumnIds.some((columnId) => columnId === id),
         );
-    }, [blobMetricsEnabled, selectedColumns.columnsToSelect]);
+    }, [hiddenCapacityColumnIds, selectedColumns.columnsToSelect]);
     const setColumns: typeof selectedColumns.setColumns = React.useCallback(
         (value) => {
-            selectedColumns.setColumns(
-                blobMetricsEnabled ? [...value, ...hiddenLegacyColumns] : value,
-            );
+            selectedColumns.setColumns([...value, ...hiddenCapacityColumns]);
         },
-        [blobMetricsEnabled, hiddenLegacyColumns, selectedColumns],
+        [hiddenCapacityColumns, selectedColumns],
     );
 
     return React.useMemo(() => {
         const columnsToShow = selectedColumns.columnsToShow.filter(({name}) => {
-            if (
-                blobMetricsEnabled &&
-                STORAGE_GROUPS_LEGACY_CAPACITY_COLUMN_IDS.some((columnId) => columnId === name)
-            ) {
+            if (hiddenCapacityColumnIds.some((columnId) => columnId === name)) {
                 return false;
             }
 
             return !shouldUseExpertDisksColumn || name !== STORAGE_GROUPS_COLUMNS_IDS.VDisks;
         });
         const columnsToSelect = selectedColumns.columnsToSelect.filter(({id}) => {
-            if (
-                blobMetricsEnabled &&
-                STORAGE_GROUPS_LEGACY_CAPACITY_COLUMN_IDS.some((columnId) => columnId === id)
-            ) {
+            if (hiddenCapacityColumnIds.some((columnId) => columnId === id)) {
                 return false;
             }
 
@@ -172,7 +159,7 @@ export function useStorageGroupsSelectedColumns({
             setColumns,
         };
     }, [
-        blobMetricsEnabled,
+        hiddenCapacityColumnIds,
         selectedColumns,
         setColumns,
         shouldHideVDisksSelectorOption,
