@@ -245,7 +245,7 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     PDisks: ['PDisks'],
     PileName: ['PileName'],
     MaxPDiskUsage: ['MaxPDiskUsage'],
-    MaxVDiskSlotUsage: ['MaxVDiskSlotUsage'],
+    MaxVDiskSlotUsage: ['MaxVDiskSlotUsage', 'CapacityAlert'],
     MaxVDiskRawUsage: ['MaxVDiskRawUsage'],
     CapacityAlert: ['CapacityAlert'],
 };
