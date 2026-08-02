@@ -69,6 +69,17 @@ export const CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS: StorageGroupsColumnId[]
     'CapacityAlert',
 ];
 
+export const STORAGE_GROUPS_LEGACY_CAPACITY_COLUMN_IDS: StorageGroupsColumnId[] = [
+    'Usage',
+    'DiskSpaceUsage',
+    'DiskSpace',
+];
+
+export const STORAGE_GROUPS_LEGACY_CAPACITY_GROUP_BY_FIELDS = [
+    'Usage',
+    'DiskSpaceUsage',
+] as const satisfies GroupsGroupByField[];
+
 export const REQUIRED_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = ['GroupId'];
 
 // This code is running when module is initialized and correct language may not be set yet
@@ -221,6 +232,29 @@ export const STORAGE_GROUPS_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_GROUPS_GR
         };
     },
 );
+
+export function getStorageGroupsGroupByOptions(
+    blobMetricsEnabled: boolean,
+    bridgeModeEnabled: boolean,
+) {
+    const skippedValues = new Set<string>();
+
+    if (!bridgeModeEnabled) {
+        skippedValues.add('PileName');
+    }
+
+    if (blobMetricsEnabled) {
+        STORAGE_GROUPS_LEGACY_CAPACITY_GROUP_BY_FIELDS.forEach((field) => {
+            skippedValues.add(field);
+        });
+    } else {
+        skippedValues.add('CapacityAlert');
+    }
+
+    return STORAGE_GROUPS_GROUP_BY_OPTIONS.filter(
+        (option) => !skippedValues.has(String(option.value)),
+    );
+}
 
 export const storageGroupsGroupByParamSchema = z
     .custom<

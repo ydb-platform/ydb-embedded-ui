@@ -22,6 +22,7 @@ import {
     REQUIRED_STORAGE_GROUPS_COLUMNS,
     STORAGE_GROUPS_COLUMNS_IDS,
     STORAGE_GROUPS_COLUMNS_TITLES,
+    STORAGE_GROUPS_LEGACY_CAPACITY_COLUMN_IDS,
     STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY,
     VIEWER_USER_COLUMNS_IDS,
 } from './constants';
@@ -49,10 +50,6 @@ export function useStorageGroupsSelectedColumns({
 
         if (!blobMetricsEnabled) {
             skipped.push(...CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS);
-        }
-
-        if (blobMetricsEnabled) {
-            skipped.push(STORAGE_GROUPS_COLUMNS_IDS.Usage);
         }
 
         if (!isUserAllowedToMakeChanges) {
@@ -129,22 +126,36 @@ export function useStorageGroupsSelectedColumns({
             shouldUseExpertDisksColumn);
 
     return React.useMemo(() => {
-        if (!shouldUseExpertDisksColumn && !shouldHideVDisksSelectorOption) {
-            return selectedColumns;
-        }
+        const columnsToShow = selectedColumns.columnsToShow.filter(({name}) => {
+            if (
+                blobMetricsEnabled &&
+                STORAGE_GROUPS_LEGACY_CAPACITY_COLUMN_IDS.some((columnId) => columnId === name)
+            ) {
+                return false;
+            }
+
+            return !shouldUseExpertDisksColumn || name !== STORAGE_GROUPS_COLUMNS_IDS.VDisks;
+        });
+        const columnsToSelect = selectedColumns.columnsToSelect.filter(({id}) => {
+            if (
+                blobMetricsEnabled &&
+                STORAGE_GROUPS_LEGACY_CAPACITY_COLUMN_IDS.some((columnId) => columnId === id)
+            ) {
+                return false;
+            }
+
+            return !shouldHideVDisksSelectorOption || id !== STORAGE_GROUPS_COLUMNS_IDS.VDisks;
+        });
 
         return {
             ...selectedColumns,
-            columnsToShow: shouldUseExpertDisksColumn
-                ? selectedColumns.columnsToShow.filter(
-                      ({name}) => name !== STORAGE_GROUPS_COLUMNS_IDS.VDisks,
-                  )
-                : selectedColumns.columnsToShow,
-            columnsToSelect: shouldHideVDisksSelectorOption
-                ? selectedColumns.columnsToSelect.filter(
-                      ({id}) => id !== STORAGE_GROUPS_COLUMNS_IDS.VDisks,
-                  )
-                : selectedColumns.columnsToSelect,
+            columnsToShow,
+            columnsToSelect,
         };
-    }, [selectedColumns, shouldHideVDisksSelectorOption, shouldUseExpertDisksColumn]);
+    }, [
+        blobMetricsEnabled,
+        selectedColumns,
+        shouldHideVDisksSelectorOption,
+        shouldUseExpertDisksColumn,
+    ]);
 }

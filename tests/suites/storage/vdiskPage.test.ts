@@ -51,6 +51,33 @@ async function enableStorageNodesCapacityColumns(page: Page) {
     });
 }
 
+async function enableStorageNodesVDiskSlotUsageOnly(page: Page) {
+    await page.addInitScript(() => {
+        localStorage.setItem(
+            'storageNodesSelectedColumns',
+            JSON.stringify([
+                {id: 'NodeId', selected: true},
+                {id: 'MaxVDiskSlotUsage', selected: true},
+            ]),
+        );
+    });
+}
+
+async function enableStorageGroupsLegacyCapacityColumns(page: Page) {
+    await page.addInitScript(() => {
+        localStorage.setItem(
+            'storageGroupsSelectedColumns',
+            JSON.stringify([
+                {id: 'GroupId', selected: true},
+                {id: 'Usage', selected: true},
+                {id: 'DiskSpaceUsage', selected: true},
+                {id: 'DiskSpace', selected: true},
+                {id: 'MaxVDiskSlotUsage', selected: true},
+            ]),
+        );
+    });
+}
+
 async function enableStorageDisksColumn(page: Page) {
     await page.addInitScript(() => {
         localStorage.setItem(
@@ -731,6 +758,75 @@ test.describe('Blob storage capacity metrics integration', () => {
         await expect(getDefinitionListValue(nodesPDiskInfo, 'Slot Size In Units')).toHaveText(
             pDiskSlotSizeText,
         );
+    });
+
+    test('requests Capacity Alert for slot-only Nodes coloring', async ({page}) => {
+        await enableBlobStorageCapacityMetrics(page);
+        await enableStorageNodesVDiskSlotUsageOnly(page);
+        await setupVDiskPageMocks(page, {withCapacityMetrics: true});
+
+        const nodesRequestPromise = page.waitForRequest((request) => {
+            const url = new URL(request.url());
+            return (
+                url.pathname.endsWith('/viewer/json/nodes') &&
+                Boolean(url.searchParams.get('fields_required')?.includes('MaxVDiskSlotUsage'))
+            );
+        });
+
+        await page.goto(VDISK_PAGE_PATH.replace('type=groups', 'type=nodes'));
+
+        const nodesRequest = await nodesRequestPromise;
+        expect(new URL(nodesRequest.url()).searchParams.get('fields_required')).toBe(
+            'CapacityAlert,MaxVDiskSlotUsage,NodeId',
+        );
+
+        const storageTable = new ClusterStorageTable(page);
+        await storageTable.waitForTableToLoad();
+        await storageTable.waitForTableData();
+
+        const table = page.locator('.ydb-paginated-table__table');
+        await expect(table.getByText('VDisk Slot Usage', {exact: true})).toBeVisible();
+        await expect(table.getByText('Capacity Alert', {exact: true})).toHaveCount(0);
+        await expect(
+            table.locator('.g-label_theme_warning').getByText('82.25%', {exact: true}),
+        ).toBeVisible();
+    });
+
+    test('removes enabled Groups legacy columns and legacy group-by state', async ({page}) => {
+        await enableBlobStorageCapacityMetrics(page);
+        await enableStorageGroupsLegacyCapacityColumns(page);
+        await setupVDiskPageMocks(page, {withCapacityMetrics: true});
+
+        await page.goto(`${VDISK_PAGE_PATH}&storageGroupsGroupBy=DiskSpaceUsage`);
+
+        const storageTable = new ClusterStorageTable(page);
+        await storageTable.waitForTableToLoad();
+        await storageTable.waitForTableData();
+        await expect
+            .poll(() => new URL(page.url()).searchParams.get('storageGroupsGroupBy'))
+            .toBeNull();
+
+        const table = page.locator('.ydb-paginated-table__table');
+        for (const legacyHeader of ['Usage', 'Disk Usage', 'Space']) {
+            await expect(table.getByText(legacyHeader, {exact: true})).toHaveCount(0);
+        }
+        await expect(table.getByText('VDisk Slot Usage', {exact: true})).toBeVisible();
+
+        await storageTable.getControls().openColumnSetup();
+        const columnSetup = page.locator('.g-popup.g-tree-select__popup');
+        for (const legacyColumnId of ['Usage', 'DiskSpaceUsage', 'DiskSpace']) {
+            await expect(columnSetup.locator(`[data-list-item="${legacyColumnId}"]`)).toHaveCount(
+                0,
+            );
+        }
+        await expect(columnSetup.locator('[data-list-item="MaxVDiskSlotUsage"]')).toBeVisible();
+        await storageTable.getControls().closeColumnSetup();
+
+        await page.getByTestId('storage-groups-group-by').click();
+        const groupByOptions = page.locator('.g-select-list');
+        await expect(groupByOptions.getByText('Usage', {exact: true})).toHaveCount(0);
+        await expect(groupByOptions.getByText('Disk Usage', {exact: true})).toHaveCount(0);
+        await expect(groupByOptions.getByText('Capacity Alert', {exact: true})).toBeVisible();
     });
 
     test('shows row-scoped placeholders when optional capacity fields are absent', async ({

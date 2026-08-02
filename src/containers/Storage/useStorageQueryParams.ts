@@ -14,7 +14,10 @@ import {useSetting} from '../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
-import {storageGroupsGroupByParamSchema} from './PaginatedStorageGroupsTable/columns/constants';
+import {
+    STORAGE_GROUPS_LEGACY_CAPACITY_GROUP_BY_FIELDS,
+    storageGroupsGroupByParamSchema,
+} from './PaginatedStorageGroupsTable/columns/constants';
 import {storageNodesGroupByParamSchema} from './PaginatedStorageNodesTable/columns/constants';
 import {VDisksGroupBy, vdisksGroupBySchema} from './StorageExpertModePanel/constants';
 import type {VDisksGroupByValue} from './StorageExpertModePanel/constants';
@@ -34,7 +37,11 @@ export function getStorageGroupByCleanupPatch({
     const patch: Record<string, string | undefined> = {};
 
     if (blobMetricsEnabled) {
-        if (storageGroupsGroupBy === 'Usage') {
+        if (
+            STORAGE_GROUPS_LEGACY_CAPACITY_GROUP_BY_FIELDS.some(
+                (field) => field === storageGroupsGroupBy,
+            )
+        ) {
             patch.storageGroupsGroupBy = undefined;
         }
 
