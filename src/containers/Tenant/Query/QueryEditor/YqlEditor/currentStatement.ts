@@ -113,13 +113,18 @@ export function findYqlStatementAtOffset(
     cursorOffset: number,
     statementPositions: YqlStatementPosition[] = extractYqlStatements(query),
 ): CurrentYqlStatement | undefined {
-    const statement = statementPositions.find(({startIndex, endIndex}) => {
-        const isInsideStatement = cursorOffset >= startIndex && cursorOffset < endIndex;
-        const isImmediatelyAfterTerminatingSemicolon =
-            cursorOffset === endIndex && query[endIndex - 1] === ';';
+    const statementStartingAtCursor = statementPositions.find(
+        ({startIndex}) => startIndex === cursorOffset,
+    );
+    const statement =
+        statementStartingAtCursor ??
+        statementPositions.find(({startIndex, endIndex}) => {
+            const isInsideStatement = cursorOffset >= startIndex && cursorOffset < endIndex;
+            const isImmediatelyAfterTerminatingSemicolon =
+                cursorOffset === endIndex && query[endIndex - 1] === ';';
 
-        return isInsideStatement || isImmediatelyAfterTerminatingSemicolon;
-    });
+            return isInsideStatement || isImmediatelyAfterTerminatingSemicolon;
+        });
 
     if (!statement) {
         return undefined;

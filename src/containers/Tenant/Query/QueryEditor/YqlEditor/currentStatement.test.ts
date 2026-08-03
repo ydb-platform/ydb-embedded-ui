@@ -114,6 +114,15 @@ SET USING $l;`,
         );
     });
 
+    test('prefers a statement starting at an adjacent statement boundary', () => {
+        const query = 'SELECT 1;SELECT 2;';
+        const statements = extractYqlStatements(query);
+
+        expect(findYqlStatementAtOffset(query, query.indexOf('SELECT 2'), statements)?.text).toBe(
+            'SELECT 2;',
+        );
+    });
+
     test('uses JavaScript offsets correctly with Unicode', () => {
         const query = 'SELECT "😀;";\nSELECT 2;';
         const statements = extractYqlStatements(query);
