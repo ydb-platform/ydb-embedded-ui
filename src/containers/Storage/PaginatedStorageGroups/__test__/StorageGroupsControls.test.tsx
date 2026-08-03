@@ -24,6 +24,7 @@ jest.mock('../../../../components/Search/Search', () => ({
 }));
 
 jest.mock('../../../../store/reducers/capabilities/hooks', () => ({
+    useBlobStorageCapacityMetricsAvailable: jest.fn(),
     useBlobStorageCapacityMetricsEnabled: jest.fn(),
     useBridgeModeEnabled: jest.fn(),
 }));
@@ -55,9 +56,11 @@ jest.mock('../../useStorageQueryParams', () => ({
     useStorageQueryParams: jest.fn(),
 }));
 
-const {useBlobStorageCapacityMetricsEnabled, useBridgeModeEnabled} = jest.requireMock(
-    '../../../../store/reducers/capabilities/hooks',
-);
+const {
+    useBlobStorageCapacityMetricsAvailable,
+    useBlobStorageCapacityMetricsEnabled,
+    useBridgeModeEnabled,
+} = jest.requireMock('../../../../store/reducers/capabilities/hooks');
 const {useSetting} = jest.requireMock('../../../../utils/hooks');
 const {useIsUserAllowedToMakeChanges} = jest.requireMock(
     '../../../../utils/hooks/useIsUserAllowedToMakeChanges',
@@ -74,6 +77,7 @@ describe('StorageGroupsControls', () => {
 
         useBridgeModeEnabled.mockReturnValue(false);
         useBlobStorageCapacityMetricsEnabled.mockReturnValue(false);
+        useBlobStorageCapacityMetricsAvailable.mockReturnValue(true);
         useSetting.mockImplementation((key: string) => [
             key === SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
             jest.fn(),
@@ -121,5 +125,23 @@ describe('StorageGroupsControls', () => {
         );
 
         expect(screen.getByRole('button', {name: 'controls_expert-mode'})).toBeInTheDocument();
+    });
+
+    test('hides active expert mode controls when the capability is unavailable', () => {
+        useBlobStorageCapacityMetricsAvailable.mockReturnValue(false);
+        useIsStorageExpertMode.mockReturnValue(true);
+
+        render(
+            <StorageGroupsControls
+                columns={[{name: STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks} as StorageGroupsColumn]}
+                entitiesCountCurrent={0}
+                entitiesLoading={false}
+            />,
+        );
+
+        expect(
+            screen.queryByRole('button', {name: 'controls_expert-mode'}),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByText('storage expert panel')).not.toBeInTheDocument();
     });
 });

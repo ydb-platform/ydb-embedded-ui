@@ -7,6 +7,7 @@ import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
 import {Search} from '../../../components/Search/Search';
 import {
+    useBlobStorageCapacityMetricsAvailable,
     useBlobStorageCapacityMetricsEnabled,
     useBridgeModeEnabled,
 } from '../../../store/reducers/capabilities/hooks';
@@ -63,6 +64,7 @@ export function StorageGroupsControls({
         SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
     );
     const isStorageExpertMode = useIsStorageExpertMode();
+    const storageExpertModeAvailable = useBlobStorageCapacityMetricsAvailable();
     const bridgeModeEnabled = useBridgeModeEnabled();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
@@ -96,7 +98,9 @@ export function StorageGroupsControls({
 
     const displayTypeSelector = withTypeSelector && isUserAllowedToMakeChanges;
     const canUseStorageExpertMode =
-        storageExpertModeSettingEnabled && Boolean(isUserAllowedToMakeChanges);
+        storageExpertModeAvailable &&
+        storageExpertModeSettingEnabled &&
+        Boolean(isUserAllowedToMakeChanges);
 
     return (
         <Flex direction="column" gap={2} width="100%">

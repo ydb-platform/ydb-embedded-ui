@@ -29,6 +29,7 @@ const VDISK_GROUP_BY_MODES: {value: VDisksGroupByValue; slug: string}[] = [
     {value: VDisksGroupBy.Space, slug: 'space'},
     {value: VDisksGroupBy.FrontQueues, slug: 'frontqueues'},
     {value: VDisksGroupBy.Compaction, slug: 'compaction'},
+    {value: VDisksGroupBy.All, slug: 'all'},
 ];
 
 const STORAGE_GROUPS = [

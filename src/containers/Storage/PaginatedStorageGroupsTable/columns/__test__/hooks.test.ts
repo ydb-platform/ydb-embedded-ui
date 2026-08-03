@@ -1,6 +1,8 @@
 import {renderHook} from '@testing-library/react';
 
 import {VDisksGroupBy} from '../../../../../utils/disks/groupBy';
+import type {VDisksGroupByValue} from '../../../../../utils/disks/groupBy';
+import {VDISKS_CONTAINER_WIDTH, getAllVDisksContainerWidth} from '../../../Disks/constants';
 import {STORAGE_GROUPS_COLUMNS_IDS} from '../constants';
 import {useStorageGroupsSelectedColumns} from '../hooks';
 
@@ -124,29 +126,35 @@ describe('useStorageGroupsSelectedColumns', () => {
         ]);
     });
 
-    test.each([
-        {isExpertMode: false, vdisksGroupBy: VDisksGroupBy.State, expectedWidth: 800},
-        {isExpertMode: false, vdisksGroupBy: VDisksGroupBy.All, expectedWidth: 800},
-        {isExpertMode: true, vdisksGroupBy: VDisksGroupBy.State, expectedWidth: 800},
-        {isExpertMode: true, vdisksGroupBy: VDisksGroupBy.All, expectedWidth: 1104},
-    ])(
-        'uses $expectedWidth px for Expert=$isExpertMode and groupBy=$vdisksGroupBy',
-        ({isExpertMode, vdisksGroupBy, expectedWidth}) => {
+    test('expands VDisks with PDisks only for Expert All mode', () => {
+        const getDisksColumnWidth = (isExpertMode: boolean, vdisksGroupBy: VDisksGroupByValue) => {
             useIsStorageExpertMode.mockReturnValue(isExpertMode);
             useVDisksGroupByParam.mockReturnValue(vdisksGroupBy);
             useSetting.mockReturnValue([getSavedColumns(true), setSavedColumns]);
 
-            const {result} = renderHook(() =>
+            const {result, unmount} = renderHook(() =>
                 useStorageGroupsSelectedColumns({visibleEntities: 'all'}),
             );
+            const width = result.current.columnsToShow.find(
+                ({name}) => name === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+            )?.width;
 
-            expect(
-                result.current.columnsToShow.find(
-                    ({name}) => name === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
-                )?.width,
-            ).toBe(expectedWidth);
-        },
-    );
+            unmount();
+
+            return width;
+        };
+
+        const ordinaryWidth = getDisksColumnWidth(false, VDisksGroupBy.State);
+        if (ordinaryWidth === undefined) {
+            throw new Error('VDisks with PDisks column must have a width');
+        }
+
+        expect(getDisksColumnWidth(false, VDisksGroupBy.All)).toBe(ordinaryWidth);
+        expect(getDisksColumnWidth(true, VDisksGroupBy.State)).toBe(ordinaryWidth);
+        expect(getDisksColumnWidth(true, VDisksGroupBy.All)).toBe(
+            ordinaryWidth + getAllVDisksContainerWidth() - VDISKS_CONTAINER_WIDTH,
+        );
+    });
 
     test('replaces VDisks when saved columns select VDisks with PDisks in expert mode', () => {
         useIsStorageExpertMode.mockReturnValue(true);

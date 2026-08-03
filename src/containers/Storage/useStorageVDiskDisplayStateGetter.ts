@@ -95,7 +95,9 @@ export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
                 ...(capacityAlertIndicator ? {capacityAlertIndicator} : {}),
                 ...(frontQueuesIndicator ? {frontQueuesIndicator} : {}),
                 ...(compactionIndicator ? {compactionIndicator} : {}),
-                allModeHasIssues: !isAllModeHealthy(vDisk),
+                ...(vdisksGroupBy === VDisksGroupBy.All
+                    ? {allModeHasIssues: !isAllModeHealthy(vDisk)}
+                    : {}),
                 modeModifier,
                 isLegendInactive: vdisksGroupBy === VDisksGroupBy.Space && isCapacityAlertInactive,
                 showNoDataPlaceholder: false,

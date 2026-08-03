@@ -93,11 +93,12 @@
     &_mode-all {
         &#{$block}_green {
             --entity-state-background-color: transparent;
-            --entity-state-border-color: var(--g-color-line-positive);
+            --entity-state-border-color: var(--g-color-base-positive-medium);
             --entity-state-fill-color: var(--g-color-base-positive-light);
 
             &#{$block}_all-mode-has-issues {
                 --entity-state-fill-color: var(--g-color-base-positive-medium);
+                --entity-state-border-color: var(--g-color-line-positive);
             }
 
             &#{$block}_highlighted {

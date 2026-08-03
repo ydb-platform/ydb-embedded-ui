@@ -2,7 +2,10 @@ import React from 'react';
 
 import {BooleanParam, StringParam, useQueryParam, useQueryParams} from 'use-query-params';
 
-import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
+import {
+    useBlobStorageCapacityMetricsAvailable,
+    useBlobStorageCapacityMetricsEnabled,
+} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
@@ -218,6 +221,7 @@ export function useStorageQueryParams() {
 }
 
 export function useIsStorageExpertMode() {
+    const storageExpertModeAvailable = useBlobStorageCapacityMetricsAvailable();
     const [storageExpertModeSettingEnabled] = useSetting<boolean>(
         SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
     );
@@ -225,6 +229,7 @@ export function useIsStorageExpertMode() {
     const [savedStorageExpertMode] = useSetting<boolean>(SETTING_KEYS.STORAGE_EXPERT_MODE);
 
     return (
+        storageExpertModeAvailable &&
         Boolean(storageExpertModeSettingEnabled) &&
         Boolean(storageExpertModeQueryParam ?? savedStorageExpertMode)
     );
