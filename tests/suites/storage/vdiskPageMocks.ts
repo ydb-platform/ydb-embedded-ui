@@ -175,6 +175,28 @@ async function setupCapabilitiesMock(page: Page) {
                     '/storage/groups': 10,
                     '/viewer/nodes': 20,
                     '/pdisk/info': 10,
+                    '/vdisk/blobindexstat': 2,
+                },
+            }),
+        });
+    });
+}
+
+export async function setupVDiskBlobIndexStatMock(
+    page: Page,
+    onRequest?: (requestUrl: string) => void,
+) {
+    await page.route('**/vdisk/blobindexstat*', async (route) => {
+        onRequest?.(route.request().url());
+
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                status: 'ok',
+                stat: {
+                    tablets: [],
+                    channels: [],
                 },
             }),
         });
