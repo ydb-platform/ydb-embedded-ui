@@ -317,8 +317,10 @@ test.describe('Test Query Editor', async () => {
 
     test('Query started via hotkey is terminated when stop button is clicked', async ({page}) => {
         const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+        await setupMockStreamingFetch(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(simpleQuery);
         await queryEditor.focusEditor();
         await executeQueryWithKeybinding(page);
 
