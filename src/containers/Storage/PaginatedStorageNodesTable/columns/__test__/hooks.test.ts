@@ -85,4 +85,31 @@ describe('useStorageNodesSelectedColumns', () => {
             NODES_COLUMNS_IDS.DiskSpaceUsage,
         );
     });
+
+    test('preserves hidden legacy selection when saving enabled capacity columns', () => {
+        useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
+
+        const {result} = renderHook(() => useStorageNodesSelectedColumns({visibleEntities: 'all'}));
+
+        result.current.setColumns(result.current.columnsToSelect);
+
+        expect(setSavedColumns).toHaveBeenCalledWith(
+            expect.arrayContaining([{id: NODES_COLUMNS_IDS.DiskSpaceUsage, selected: true}]),
+        );
+    });
+
+    test('preserves hidden capacity selections when saving legacy columns', () => {
+        const {result} = renderHook(() => useStorageNodesSelectedColumns({visibleEntities: 'all'}));
+
+        result.current.setColumns(result.current.columnsToSelect);
+
+        expect(setSavedColumns).toHaveBeenCalledWith(
+            expect.arrayContaining([
+                {id: NODES_COLUMNS_IDS.PDiskUsage, selected: true},
+                {id: NODES_COLUMNS_IDS.VDiskSlotUsage, selected: true},
+                {id: NODES_COLUMNS_IDS.VDiskRawUsage, selected: true},
+                {id: NODES_COLUMNS_IDS.CapacityAlert, selected: true},
+            ]),
+        );
+    });
 });
