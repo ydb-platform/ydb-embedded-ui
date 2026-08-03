@@ -3,7 +3,7 @@ import React from 'react';
 import {useHistory, useLocation} from 'react-router-dom';
 import {v4 as uuidv4} from 'uuid';
 
-import {getTenantPath, parseQuery} from '../../../../routes';
+import {getLocationObjectFromHref, getTenantPath, parseQuery} from '../../../../routes';
 import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {
     applyExternalQueryToActiveTab,
@@ -60,12 +60,17 @@ export function useOpenExternalQueryInEditor() {
             dispatch(setIsDirty(false));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
 
-            if (queryParams[TENANT_PAGE] !== TENANT_PAGES_IDS.query) {
-                const queryPath = getTenantPath({
-                    ...queryParams,
-                    [TENANT_PAGE]: TENANT_PAGES_IDS.query,
-                    [TenantTabsGroups.queryTab]: TENANT_QUERY_TABS_ID.newQuery,
-                });
+            const queryPath = getTenantPath({
+                ...queryParams,
+                [TENANT_PAGE]: TENANT_PAGES_IDS.query,
+                [TenantTabsGroups.queryTab]: TENANT_QUERY_TABS_ID.newQuery,
+            });
+            const queryPathname = getLocationObjectFromHref(queryPath).pathname;
+            const isQueryEditorLocation =
+                history.location.pathname === queryPathname &&
+                queryParams[TENANT_PAGE] === TENANT_PAGES_IDS.query;
+
+            if (!isQueryEditorLocation) {
                 history.push(queryPath);
             }
 

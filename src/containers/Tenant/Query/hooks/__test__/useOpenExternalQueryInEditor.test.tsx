@@ -80,7 +80,7 @@ describe('useOpenExternalQueryInEditor', () => {
     test('does not push a duplicate history entry when already on the Query page', async () => {
         const {history, result} = renderOpenExternalQueryHook({
             isMultiTabEnabled: true,
-            initialLocation: '/tenant?database=%2FRoot%2Fdb&databasePage=query&queryTab=saved',
+            initialLocation: '/database?database=%2FRoot%2Fdb&databasePage=query&queryTab=saved',
         });
         const push = jest.spyOn(history, 'push');
 
@@ -110,6 +110,21 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(history.location.pathname).toBe('/home');
         expect(history.location.search).toBe('');
         expect(onAfterOpen).not.toHaveBeenCalled();
+    });
+
+    test('navigates from a non-database route with retained Query page params', async () => {
+        const {history, result} = renderOpenExternalQueryHook({
+            isMultiTabEnabled: true,
+            initialLocation: '/cluster?database=%2FRoot%2Fdb&databasePage=query',
+        });
+
+        await act(async () => {
+            await result.current({title: 'Select query', input: 'SELECT 1;'});
+        });
+
+        expect(history.location.pathname).toBe('/database');
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('query');
+        expect(getSearchParam(history.location.search, 'queryTab')).toBe('newQuery');
     });
 
     test('keeps a dirty single-tab query when replacement is cancelled', async () => {
