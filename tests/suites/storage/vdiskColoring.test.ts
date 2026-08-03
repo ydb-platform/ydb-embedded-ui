@@ -183,7 +183,7 @@ async function expectStatusIconMatchesReference(
     expectedColorToken: string,
     checkOverlap = false,
 ) {
-    const icon = progressBar.locator('.storage-disk-progress-bar__icon');
+    const icon = progressBar.locator('.storage-disk-progress-bar__icon_overlap-top-left');
 
     await expect(icon).toBeVisible();
 
@@ -413,7 +413,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 throw new Error('Cannot compare All-mode VDisk and FrontQueues slot boxes');
             }
 
-            expect(frontQueuesYellowSlotBox.x - frontQueuesYellowBox.x).toBeCloseTo(26, 5);
+            expect(frontQueuesYellowSlotBox.x - frontQueuesYellowBox.x).toBeCloseTo(24, 5);
 
             await expect(missingFrontQueuesSlot).toHaveCount(1);
             const missingFrontQueuesIcon = missingFrontQueuesSlot.locator('.g-icon');
@@ -451,7 +451,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 throw new Error('Cannot compare All-mode VDisk and Compaction slot boxes');
             }
 
-            expect(initialCompactionSlotBox.x - initialBox.x).toBeCloseTo(44, 5);
+            expect(initialCompactionSlotBox.x - initialBox.x).toBeCloseTo(40, 5);
             expect(initialCompactionIconBoxes).toHaveLength(2);
             initialCompactionIconBoxes.forEach((box) => {
                 expect(box.width).toBeCloseTo(10, 5);

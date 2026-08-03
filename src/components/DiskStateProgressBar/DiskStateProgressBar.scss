@@ -395,13 +395,13 @@
         column-gap: var(--g-spacing-1);
 
         box-sizing: border-box;
-        padding-inline: var(--g-spacing-1);
+        padding-inline: calc(var(--g-spacing-1) - $border-width);
 
         pointer-events: none;
 
         #{$block}_grey &,
         #{$block}_striped & {
-            margin: 0;
+            padding-inline: var(--g-spacing-1);
         }
     }
 
