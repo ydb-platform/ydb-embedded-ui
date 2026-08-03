@@ -117,8 +117,11 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
               });
     const WhiteboardSize = whiteboardSizeFields
         ? {
-              AllocatedSize: whiteboardSizeFields.AllocatedSize,
-              TotalSize: whiteboardSizeFields.TotalSize,
+              AllocatedSize:
+                  whiteboardAvailableSize === undefined || whiteboardTotalSize === undefined
+                      ? undefined
+                      : whiteboardSizeFields.AllocatedSize,
+              TotalSize: whiteboardTotalSize,
           }
         : undefined;
 

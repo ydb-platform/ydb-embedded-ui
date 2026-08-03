@@ -405,6 +405,28 @@ describe('prepareGroupsPDisk', () => {
         );
     });
 
+    test.each([
+        ['absent', undefined],
+        ['null', null],
+    ] as const)(
+        'Should preserve %s Whiteboard available size as undefined',
+        (_caseName, AvailableSize) => {
+            const preparedData = prepareGroupsPDisk({
+                AvailableSize: '3000000000',
+                TotalSize: '4000000000',
+                Whiteboard: {
+                    AvailableSize,
+                    TotalSize: '22000000000',
+                },
+            } as unknown as TStoragePDisk);
+
+            expect(preparedData.WhiteboardSize).toEqual({
+                AllocatedSize: undefined,
+                TotalSize: 22_000_000_000,
+            });
+        },
+    );
+
     test('Should correctly parse data', () => {
         const pDiskData = {
             PDiskId: '224-1001',
