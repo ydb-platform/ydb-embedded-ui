@@ -63,6 +63,36 @@ describe('current YQL statement', () => {
         ).toEqual(expectedStatements);
     });
 
+    test('keeps a lambda definition separate from the following statement', () => {
+        const query = `$l = ($x) -> {
+    return [
+        <|
+            offset:$x._offset,
+            message:$x._data
+        |>
+    ];
+};
+
+ALTER TRANSFER transfer
+SET USING $l;`;
+        const statements = extractYqlStatements(query);
+
+        expect(
+            statements.map(({startIndex, endIndex}) => query.slice(startIndex, endIndex)),
+        ).toEqual([
+            `$l = ($x) -> {
+    return [
+        <|
+            offset:$x._offset,
+            message:$x._data
+        |>
+    ];
+};`,
+            `ALTER TRANSFER transfer
+SET USING $l;`,
+        ]);
+    });
+
     test('extracts a large flat script without recursive parsing', () => {
         const query = new Array(400).fill('SELECT 1;').join('');
         const statements = extractYqlStatements(query);

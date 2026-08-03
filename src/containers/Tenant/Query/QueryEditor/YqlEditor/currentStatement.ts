@@ -7,9 +7,11 @@ const BEGIN_TOKEN = 'BEGIN';
 const DEFINE_TOKEN = 'DEFINE';
 const DO_TOKEN = 'DO';
 const END_TOKEN = 'END';
+const LBRACE_CURLY_TOKEN = 'LBRACE_CURLY';
+const RBRACE_CURLY_TOKEN = 'RBRACE_CURLY';
 const SUBQUERY_TOKEN = 'SUBQUERY';
 
-type CompoundEndToken = typeof DEFINE_TOKEN | typeof DO_TOKEN;
+type CompoundEndToken = typeof DEFINE_TOKEN | typeof DO_TOKEN | typeof RBRACE_CURLY_TOKEN;
 
 export interface YqlStatementPosition {
     startIndex: number;
@@ -65,8 +67,12 @@ export function extractYqlStatements(query: string): YqlStatementPosition[] {
         const {ruleName} = token;
         const tokenEndIndex = getTokenEndIndex(token);
         const currentCompoundEndToken = compoundEndTokens[compoundEndTokens.length - 1];
-        if (previousTokenRuleName === END_TOKEN && ruleName === currentCompoundEndToken) {
+        if (ruleName === RBRACE_CURLY_TOKEN && currentCompoundEndToken === RBRACE_CURLY_TOKEN) {
             compoundEndTokens.pop();
+        } else if (previousTokenRuleName === END_TOKEN && ruleName === currentCompoundEndToken) {
+            compoundEndTokens.pop();
+        } else if (ruleName === LBRACE_CURLY_TOKEN) {
+            compoundEndTokens.push(RBRACE_CURLY_TOKEN);
         } else if (previousTokenRuleName === DO_TOKEN && ruleName === BEGIN_TOKEN) {
             compoundEndTokens.push(DO_TOKEN);
         } else if (
