@@ -47,7 +47,7 @@ function applyE2EStorageGroupsOverride() {
         return;
     }
 
-    configureUIFactory({maxVDisksInStorageGroup: 10});
+    configureUIFactory({maxVDisksInStorageGroup: 11});
 }
 
 async function render() {

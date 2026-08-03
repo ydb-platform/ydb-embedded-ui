@@ -10,6 +10,7 @@ export interface DiskDisplayState {
     capacityAlertIndicator?: IconData | string;
     frontQueuesIndicator?: IconData;
     compactionIndicator?: IconWithColor[];
+    allModeHasIssues?: boolean;
     modeModifier: string | undefined;
     isLegendInactive?: boolean;
     showNoDataPlaceholder?: boolean;

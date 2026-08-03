@@ -96,6 +96,10 @@
             --entity-state-border-color: var(--g-color-line-positive);
             --entity-state-fill-color: var(--g-color-base-positive-light);
 
+            &#{$block}_all-mode-has-issues {
+                --entity-state-fill-color: var(--g-color-base-positive-medium);
+            }
+
             &#{$block}_highlighted {
                 --entity-state-border-color: var(--g-color-line-positive);
                 --entity-state-background-color: var(--entity-state-fill-color);

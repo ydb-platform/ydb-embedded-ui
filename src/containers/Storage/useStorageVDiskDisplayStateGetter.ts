@@ -1,6 +1,7 @@
 import React from 'react';
 
-import {isCapacityAlert} from '../../types/api/enums';
+import {ECapacityAlert, EFlag, isCapacityAlert} from '../../types/api/enums';
+import {EVDiskState} from '../../types/api/vdisk';
 import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
 import type {DiskDisplayStateGetter} from '../../utils/disks/displayState';
 import {getDefaultDiskDisplayState} from '../../utils/disks/displayState';
@@ -13,6 +14,7 @@ import {
     calculateFrontQueuesIcon,
     calculateSpaceIcon,
 } from '../../utils/disks/iconCalculators';
+import type {PreparedVDisk} from '../../utils/disks/types';
 
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
 import {useIsStorageExpertMode, useVDisksGroupByParam} from './useStorageQueryParams';
@@ -32,6 +34,16 @@ function getModeModifier(groupBy: VDisksGroupByValue): string | undefined {
         default:
             return undefined;
     }
+}
+
+function isAllModeHealthy(vDisk: PreparedVDisk) {
+    return (
+        vDisk.VDiskState === EVDiskState.OK &&
+        vDisk.CapacityAlert === ECapacityAlert.GREEN &&
+        vDisk.FrontQueues === EFlag.Green &&
+        vDisk.SatisfactionRank?.FreshRank?.Flag === EFlag.Green &&
+        vDisk.SatisfactionRank?.LevelRank?.Flag === EFlag.Green
+    );
 }
 
 export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
@@ -83,6 +95,7 @@ export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
                 ...(capacityAlertIndicator ? {capacityAlertIndicator} : {}),
                 ...(frontQueuesIndicator ? {frontQueuesIndicator} : {}),
                 ...(compactionIndicator ? {compactionIndicator} : {}),
+                allModeHasIssues: !isAllModeHealthy(vDisk),
                 modeModifier,
                 isLegendInactive: vdisksGroupBy === VDisksGroupBy.Space && isCapacityAlertInactive,
                 showNoDataPlaceholder: false,

@@ -163,6 +163,23 @@ describe('VDisk', () => {
 });
 
 describe('useStorageVDiskDisplayStateGetter', () => {
+    const ALL_GREEN_VDISK = {
+        VDiskId: {
+            GroupID: 1,
+            GroupGeneration: 1,
+            Ring: 0,
+            Domain: 0,
+            VDisk: 0,
+        },
+        VDiskState: EVDiskState.OK,
+        CapacityAlert: ECapacityAlert.GREEN,
+        FrontQueues: EFlag.Green,
+        SatisfactionRank: {
+            FreshRank: {Flag: EFlag.Green},
+            LevelRank: {Flag: EFlag.Green},
+        },
+    };
+
     beforeEach(() => {
         mockUseIsStorageExpertMode.mockReturnValue(true);
         mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.State);
@@ -205,6 +222,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
         expect(displayState).not.toHaveProperty('capacityAlertIndicator');
         expect(displayState).not.toHaveProperty('frontQueuesIndicator');
         expect(displayState).not.toHaveProperty('compactionIndicator');
+        expect(displayState).not.toHaveProperty('allModeHasIssues');
     });
 
     test('uses a dedicated mode-all modifier for Expert Mode All', () => {
@@ -227,6 +245,54 @@ describe('useStorageVDiskDisplayStateGetter', () => {
             modeModifier: 'mode-all',
             showNoDataPlaceholder: false,
         });
+    });
+
+    test('keeps an all-green VDisk healthy regardless of inactive legend selectors', () => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
+        mockUseSpaceLegendSelection.mockReturnValue(new Set([ECapacityAlert.GREEN]));
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(result.current(ALL_GREEN_VDISK)).toHaveProperty('allModeHasIssues', false);
+    });
+
+    test.each([
+        {metric: 'State', override: {VDiskState: EVDiskState.Initial}},
+        {
+            metric: 'CapacityAlert',
+            override: {CapacityAlert: ECapacityAlert.LIGHTYELLOW},
+        },
+        {metric: 'FrontQueues', override: {FrontQueues: EFlag.Yellow}},
+        {
+            metric: 'Fresh Compaction rank',
+            override: {
+                SatisfactionRank: {
+                    FreshRank: {Flag: EFlag.Yellow},
+                    LevelRank: {Flag: EFlag.Green},
+                },
+            },
+        },
+        {
+            metric: 'Level Compaction rank',
+            override: {
+                SatisfactionRank: {
+                    FreshRank: {Flag: EFlag.Green},
+                    LevelRank: {Flag: EFlag.Red},
+                },
+            },
+        },
+    ])('marks a VDisk with non-green $metric data as having issues', ({override}) => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
+        mockUseSpaceLegendSelection.mockReturnValue(
+            new Set([ECapacityAlert.GREEN, ECapacityAlert.LIGHTYELLOW]),
+        );
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(
+            result.current({
+                ...ALL_GREEN_VDISK,
+                ...override,
+            }),
+        ).toHaveProperty('allModeHasIssues', true);
     });
 
     test('exposes an active Capacity Alert indicator in Expert Mode All', () => {
@@ -384,5 +450,6 @@ describe('useStorageVDiskDisplayStateGetter', () => {
         expect(displayState).not.toHaveProperty('capacityAlertIndicator');
         expect(displayState).not.toHaveProperty('frontQueuesIndicator');
         expect(displayState).not.toHaveProperty('compactionIndicator');
+        expect(displayState).not.toHaveProperty('allModeHasIssues');
     });
 });

@@ -62,6 +62,7 @@ interface DiskStateProgressBarProps {
     capacityAlertIndicator?: IconData | string;
     frontQueuesIndicator?: IconData;
     compactionIndicator?: IconWithColor[];
+    allModeHasIssues?: boolean;
     modeModifier?: string;
     highlighted?: boolean;
     noDataPlaceholder?: React.ReactNode;
@@ -87,6 +88,7 @@ export function DiskStateProgressBar({
     capacityAlertIndicator,
     frontQueuesIndicator,
     compactionIndicator,
+    allModeHasIssues,
     modeModifier,
     highlighted,
     noDataPlaceholder,
@@ -104,6 +106,7 @@ export function DiskStateProgressBar({
         inactive,
         striped,
         highlighted,
+        'all-mode-has-issues': modeModifier === 'mode-all' && allModeHasIssues,
         'legend-inactive': isLegendInactive,
         'overlap-icon-at-top-left': overlapIconAtTopLeft,
     };

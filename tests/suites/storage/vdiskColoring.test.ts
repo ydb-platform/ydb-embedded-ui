@@ -6,12 +6,13 @@ import type {VDisksGroupByValue} from '../../../src/containers/Storage/StorageEx
 import {storagePage} from '../../utils/constants';
 
 import {
+    ALL_GREEN_VDISK_INDEX,
     MISSING_FRONT_QUEUES_VDISK_INDEX,
     MISSING_WHITEBOARD_VDISK_INDEX,
 } from './mockStorageGroups';
 import {DATABASE, setupVDiskColoringMocks} from './vdiskColoringMocks';
 
-const VDISKS_COUNT = 10;
+const VDISKS_COUNT = 11;
 const FRONT_QUEUES_YELLOW_VDISK_INDEX = 2;
 const STATE_ONLY_OK_VDISK_INDEX = 4;
 const INITIAL_VDISK_INDEX = 5;
@@ -507,14 +508,16 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
 
             const ordinaryItems = getVDiskItems(getStorageGroupRow(page, 0));
             const stateOnlyOk = getVDiskProgressBar(ordinaryItems.nth(STATE_ONLY_OK_VDISK_INDEX));
+            const allGreen = getVDiskProgressBar(ordinaryItems.nth(ALL_GREEN_VDISK_INDEX));
             const initial = getVDiskProgressBar(ordinaryItems.nth(INITIAL_VDISK_INDEX));
             const pDiskError = getVDiskProgressBar(ordinaryItems.nth(PDISK_ERROR_VDISK_INDEX));
             const recoveryError = getVDiskProgressBar(
                 ordinaryItems.nth(RECOVERY_ERROR_VDISK_INDEX),
             );
             const recoveryErrorFill = getVDiskFillBar(recoveryError);
-            const ordinaryStateBars = [stateOnlyOk, initial, pDiskError];
+            const ordinaryStateBars = [stateOnlyOk, allGreen, initial, pDiskError];
             const [
+                positiveMedium,
                 positiveLight,
                 warningLight,
                 dangerLight,
@@ -523,6 +526,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 dangerHeavyHover,
                 dangerMediumHover,
             ] = await Promise.all([
+                resolveThemeColor(page, '--g-color-base-positive-medium'),
                 resolveThemeColor(page, '--g-color-base-positive-light'),
                 resolveThemeColor(page, '--g-color-base-warning-light'),
                 resolveThemeColor(page, '--g-color-base-danger-light'),
@@ -531,7 +535,16 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 resolveThemeColor(page, '--g-color-base-danger-heavy-hover'),
                 resolveThemeColor(page, '--g-color-base-danger-medium-hover'),
             ]);
-            const ordinaryNormalFillColors = [positiveLight, warningLight, dangerLight];
+            const ordinaryNormalFillColors = [
+                positiveMedium,
+                positiveLight,
+                warningLight,
+                dangerLight,
+            ];
+
+            await expect(stateOnlyOk).toHaveClass(/storage-disk-progress-bar_all-mode-has-issues/);
+            await expect(allGreen).toHaveClass(/storage-disk-progress-bar_green/);
+            await expect(allGreen).not.toHaveClass(/storage-disk-progress-bar_all-mode-has-issues/);
 
             await Promise.all(
                 ordinaryStateBars.map(async (progressBar, index) => {
