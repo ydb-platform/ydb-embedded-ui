@@ -1,9 +1,9 @@
-jest.mock('./utils/zod/configureZod', () => ({
+jest.mock('../utils/zod/configureZod', () => ({
     configureZod: jest.fn(),
 }));
 
-import {getQueryTextTabTitle, useOpenExternalQueryInEditor} from './lib';
-import type {ExternalQueryToOpen} from './lib';
+import {getQueryTextTabTitle, useOpenExternalQueryInEditor} from '../lib';
+import type {ExternalQueryToOpen} from '../lib';
 
 describe('public library exports', () => {
     test('exports the query editor opening API', () => {
