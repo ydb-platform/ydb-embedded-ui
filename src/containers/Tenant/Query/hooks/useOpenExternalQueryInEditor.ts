@@ -32,6 +32,9 @@ export function useOpenExternalQueryInEditor() {
     const history = useHistory();
     const location = useLocation();
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
+    const queryParams = React.useMemo(() => parseQuery(location), [location]);
+    const hasDatabase =
+        typeof queryParams.database === 'string' && Boolean(queryParams.database.trim());
 
     const openExternalQueryInEditor = React.useCallback(
         ({title, input, savedQueryName, onAfterOpen}: ExternalQueryToOpen) => {
@@ -57,18 +60,32 @@ export function useOpenExternalQueryInEditor() {
             dispatch(setIsDirty(false));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
 
-            const queryParams = parseQuery(location);
-            const queryPath = getTenantPath({
-                ...queryParams,
-                [TENANT_PAGE]: TENANT_PAGES_IDS.query,
-                [TenantTabsGroups.queryTab]: TENANT_QUERY_TABS_ID.newQuery,
-            });
-            history.push(queryPath);
+            if (queryParams[TENANT_PAGE] !== TENANT_PAGES_IDS.query) {
+                const queryPath = getTenantPath({
+                    ...queryParams,
+                    [TENANT_PAGE]: TENANT_PAGES_IDS.query,
+                    [TenantTabsGroups.queryTab]: TENANT_QUERY_TABS_ID.newQuery,
+                });
+                history.push(queryPath);
+            }
 
             onAfterOpen?.();
         },
-        [dispatch, history, isMultiTabEnabled, location],
+        [dispatch, history, isMultiTabEnabled, queryParams],
     );
 
-    return useChangeInputWithConfirmation(openExternalQueryInEditor, isMultiTabEnabled);
+    const openExternalQueryInEditorWithConfirmation = useChangeInputWithConfirmation(
+        openExternalQueryInEditor,
+        isMultiTabEnabled,
+    );
+
+    return React.useCallback(
+        (query: ExternalQueryToOpen) => {
+            if (!hasDatabase) {
+                return undefined;
+            }
+            return openExternalQueryInEditorWithConfirmation(query);
+        },
+        [hasDatabase, openExternalQueryInEditorWithConfirmation],
+    );
 }
