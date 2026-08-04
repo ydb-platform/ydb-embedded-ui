@@ -37,15 +37,19 @@ function renderOpenExternalQueryHook({
     runningInput,
     isStreaming = false,
     initialLocation = '/tenant?database=%2FRoot%2Fdb&databasePage=diagnostics',
+    environments,
+    singleClusterMode,
 }: {
     isMultiTabEnabled?: boolean;
     dirtyInput?: string;
     runningInput?: string;
     isStreaming?: boolean;
     initialLocation?: string;
+    environments?: string[];
+    singleClusterMode?: boolean;
 } = {}) {
     configureUIFactory({enableMultiTabQueryEditor: isMultiTabEnabled});
-    const {history, store} = configureStore();
+    const {history, store} = configureStore({environments, singleClusterMode});
     window.api = {viewer: {sendQuery}} as unknown as YdbEmbeddedAPI;
     history.push(initialLocation);
     const activeTabId = selectActiveTabId(store.getState());
@@ -93,6 +97,7 @@ function renderOpenExternalQueryHook({
         activeTabId,
         history,
         store,
+        wrapper,
         ...renderHook(() => useOpenExternalQueryInEditor(), {wrapper}),
     };
 }
@@ -209,6 +214,23 @@ describe('useOpenExternalQueryInEditor', () => {
         const {history, result} = renderOpenExternalQueryHook({
             isMultiTabEnabled: true,
             initialLocation: '/cloud-prod/node/1?database=%2FRoot%2Fdb&databasePage=query',
+        });
+
+        await act(async () => {
+            await result.current({title: 'Select query', input: 'SELECT 1;'});
+        });
+
+        expect(history.location.pathname).toBe('/cloud-prod/database');
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('query');
+        expect(getSearchParam(history.location.search, 'queryTab')).toBe('newQuery');
+    });
+
+    test('preserves the configured environment when navigating from an extension route', async () => {
+        const {history, result} = renderOpenExternalQueryHook({
+            environments: ['cloud-prod'],
+            isMultiTabEnabled: true,
+            singleClusterMode: false,
+            initialLocation: '/cloud-prod/custom?database=%2FRoot%2Fdb',
         });
 
         await act(async () => {
@@ -415,6 +437,52 @@ describe('useOpenExternalQueryInEditor', () => {
                 onAfterOpen: firstAfterOpen,
             });
             result.current({
+                title: 'Second replacement',
+                input: 'SELECT second;',
+                onAfterOpen: secondAfterOpen,
+            });
+        });
+
+        await waitFor(() => {
+            expect(showModal).toHaveBeenCalledTimes(2);
+        });
+        await act(async () => {
+            runningConfirmation.resolve(true);
+            await runningConfirmation.promise;
+        });
+
+        await waitFor(() => {
+            expect(selectUserInput(store.getState())).toBe('SELECT second;');
+        });
+        expect(sendQuery).toHaveBeenCalledTimes(1);
+        expect(abort).toHaveBeenCalledTimes(1);
+        expect(firstAfterOpen).not.toHaveBeenCalled();
+        expect(secondAfterOpen).toHaveBeenCalledTimes(1);
+    });
+
+    test('coordinates concurrent requests across hook instances', async () => {
+        const firstAfterOpen = jest.fn();
+        const secondAfterOpen = jest.fn();
+        const {
+            activeTabId,
+            result: firstResult,
+            store,
+            wrapper,
+        } = renderOpenExternalQueryHook({
+            runningInput: 'SELECT running;',
+        });
+        const {result: secondResult} = renderHook(() => useOpenExternalQueryInEditor(), {wrapper});
+        const abort = registerRunningQuery(activeTabId);
+        const runningConfirmation = createDeferred<boolean>();
+        showModal.mockReturnValue(runningConfirmation.promise as never);
+
+        act(() => {
+            firstResult.current({
+                title: 'First replacement',
+                input: 'SELECT first;',
+                onAfterOpen: firstAfterOpen,
+            });
+            secondResult.current({
                 title: 'Second replacement',
                 input: 'SELECT second;',
                 onAfterOpen: secondAfterOpen,

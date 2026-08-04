@@ -1,9 +1,11 @@
 import React from 'react';
 
+import type {History} from 'history';
 import {useHistory, useLocation, useRouteMatch} from 'react-router-dom';
 import {v4 as uuidv4} from 'uuid';
 
 import routes, {createHref, getLocationObjectFromHref, parseQuery} from '../../../../routes';
+import {environment as configuredEnvironment} from '../../../../store';
 import {cancelQueryApi} from '../../../../store/reducers/cancelQuery';
 import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {
@@ -61,6 +63,22 @@ interface ExternalQueryOpenRequest {
     confirmedExecution?: QueryExecutionIdentity;
 }
 
+interface ExternalQueryRequestCoordinator {
+    requestEpoch: number;
+}
+
+const externalQueryRequestCoordinators = new WeakMap<History, ExternalQueryRequestCoordinator>();
+
+function getExternalQueryRequestCoordinator(history: History) {
+    let coordinator = externalQueryRequestCoordinators.get(history);
+    if (!coordinator) {
+        coordinator = {requestEpoch: 0};
+        externalQueryRequestCoordinators.set(history, coordinator);
+    }
+
+    return coordinator;
+}
+
 function getDatabaseFromQueryParams(queryParams: ReturnType<typeof parseQuery>) {
     const databaseParam = queryParams.database || queryParams.name;
     return typeof databaseParam === 'string' && databaseParam.trim() ? databaseParam : undefined;
@@ -115,7 +133,7 @@ export function useOpenExternalQueryInEditor() {
         path: ROUTE_PATHS,
         exact: true,
     });
-    const routeEnvironment = currentRouteMatch?.params.environment;
+    const routeEnvironment = currentRouteMatch?.params.environment ?? configuredEnvironment;
     const [sendCancelQuery] = cancelQueryApi.useCancelQueryMutation();
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
     const activeTabId = useTypedSelector(selectActiveTabId);
@@ -124,7 +142,10 @@ export function useOpenExternalQueryInEditor() {
     const result = useTypedSelector(selectResult);
     const queryParams = React.useMemo(() => parseQuery(location), [location]);
     const database = getDatabaseFromQueryParams(queryParams);
-    const requestEpoch = React.useRef(0);
+    const requestCoordinator = React.useMemo(
+        () => getExternalQueryRequestCoordinator(history),
+        [history],
+    );
     const latestLocation = React.useRef(history.location);
     React.useEffect(() => {
         return history.listen((nextLocation, action) => {
@@ -134,10 +155,10 @@ export function useOpenExternalQueryInEditor() {
                 action !== 'REPLACE' ||
                 !isLegacyDatabaseNormalization(previousLocation, nextLocation)
             ) {
-                requestEpoch.current += 1;
+                requestCoordinator.requestEpoch += 1;
             }
         });
-    }, [history]);
+    }, [history, requestCoordinator]);
     const latestEditorState = React.useRef({
         activeTabId,
         input: currentInput,
@@ -221,10 +242,10 @@ export function useOpenExternalQueryInEditor() {
             const currentQueryParams = parseQuery(history.location);
             return (
                 getDatabaseFromQueryParams(currentQueryParams) === destination.database &&
-                requestEpoch.current === destination.requestEpoch
+                requestCoordinator.requestEpoch === destination.requestEpoch
             );
         },
-        [history],
+        [history, requestCoordinator],
     );
 
     const isRequestContextCurrent = React.useCallback(
@@ -355,7 +376,7 @@ export function useOpenExternalQueryInEditor() {
                 return;
             }
 
-            requestEpoch.current += 1;
+            requestCoordinator.requestEpoch += 1;
             const currentIsQueryRunning = Boolean(latestEditorState.current.result?.isLoading);
             const confirmedExecution =
                 !isMultiTabEnabled && currentIsQueryRunning
@@ -369,7 +390,7 @@ export function useOpenExternalQueryInEditor() {
                 query,
                 destination: {
                     database,
-                    requestEpoch: requestEpoch.current,
+                    requestEpoch: requestCoordinator.requestEpoch,
                 },
                 confirmedExecution,
             };
@@ -385,6 +406,6 @@ export function useOpenExternalQueryInEditor() {
 
             latestOpenExternalQueryInEditorWithConfirmation.current(request);
         },
-        [database, getCurrentRunningExecutionIdentity, isMultiTabEnabled],
+        [database, getCurrentRunningExecutionIdentity, isMultiTabEnabled, requestCoordinator],
     );
 }
