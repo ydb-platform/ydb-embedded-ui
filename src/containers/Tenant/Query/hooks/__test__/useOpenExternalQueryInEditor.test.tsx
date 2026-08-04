@@ -47,15 +47,17 @@ function renderOpenExternalQueryHook({
         store.dispatch(changeUserInput({input: runningInput}));
         store.dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: runningInput}));
         store.dispatch(setIsDirty(false));
+        const runningResult = {
+            executionId: 'running-execution',
+            type: 'execute' as const,
+            queryId: 'running-query',
+            isLoading: true,
+            startTime: 1,
+        };
         store.dispatch(
             setQueryResult({
                 tabId: activeTabId,
-                result: {
-                    type: 'execute',
-                    queryId: 'running-query',
-                    isLoading: true,
-                    startTime: 1,
-                },
+                result: runningResult,
             }),
         );
     }
