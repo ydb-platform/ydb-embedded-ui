@@ -49,8 +49,8 @@ interface ExternalQueryOpenRequest {
     query: ExternalQueryToOpen;
     destination: ExternalQueryDestination;
     confirmedExecution?: {
-        activeTabId: string | undefined;
-        queryId: string;
+        activeTabId: string;
+        startTime: number;
     };
 }
 
@@ -71,7 +71,6 @@ export function useOpenExternalQueryInEditor() {
     const currentInput = useTypedSelector(selectUserInput);
     const isCurrentTabDirty = useTypedSelector(selectIsDirty);
     const result = useTypedSelector(selectResult);
-    const isQueryRunning = Boolean(result?.isLoading);
     const queryParams = React.useMemo(() => parseQuery(location), [location]);
     const database = getDatabaseFromQueryParams(queryParams);
     const latestEditorState = React.useRef({
@@ -86,6 +85,22 @@ export function useOpenExternalQueryInEditor() {
         isDirty: isCurrentTabDirty,
         result,
     };
+    const getCurrentExecutionIdentity = React.useCallback(() => {
+        const currentEditorState = latestEditorState.current;
+        if (!currentEditorState.activeTabId || currentEditorState.result?.startTime === undefined) {
+            return undefined;
+        }
+
+        return {
+            activeTabId: currentEditorState.activeTabId,
+            startTime: currentEditorState.result.startTime,
+        };
+    }, []);
+    const getCurrentRunningExecutionIdentity = React.useCallback(() => {
+        return latestEditorState.current.result?.isLoading
+            ? getCurrentExecutionIdentity()
+            : undefined;
+    }, [getCurrentExecutionIdentity]);
 
     const openExternalQueryInEditor = React.useCallback(
         ({title, input, savedQueryName, onAfterOpen}: ExternalQueryToOpen) => {
@@ -158,14 +173,18 @@ export function useOpenExternalQueryInEditor() {
                 return true;
             }
 
-            const currentEditorState = latestEditorState.current;
+            const currentExecution = getCurrentExecutionIdentity();
             return (
-                currentEditorState.activeTabId === confirmedExecution.activeTabId &&
-                currentEditorState.result?.queryId === confirmedExecution.queryId
+                currentExecution?.activeTabId === confirmedExecution.activeTabId &&
+                currentExecution.startTime === confirmedExecution.startTime
             );
         },
-        [isDestinationCurrent],
+        [getCurrentExecutionIdentity, isDestinationCurrent],
     );
+
+    const latestOpenExternalQueryInEditorWithConfirmation = React.useRef<
+        (request: ExternalQueryOpenRequest) => void
+    >(() => undefined);
 
     const stopRunningQueryAndOpen = React.useCallback(
         async (request: ExternalQueryOpenRequest) => {
@@ -174,19 +193,39 @@ export function useOpenExternalQueryInEditor() {
                 return;
             }
 
-            if (!isMultiTabEnabled && isQueryRunning && activeTabId) {
-                if (result?.streamingStatus) {
-                    queryExecutionManagerInstance.abortQuery(activeTabId);
+            const runningExecution = !isMultiTabEnabled
+                ? getCurrentRunningExecutionIdentity()
+                : undefined;
+            if (runningExecution && !request.confirmedExecution) {
+                const confirmed = await getRunningQueryConfirmation();
+                const confirmedRequest = {
+                    ...request,
+                    confirmedExecution: runningExecution,
+                };
+                if (!confirmed || !isRequestContextCurrent(confirmedRequest)) {
+                    return;
+                }
+
+                latestOpenExternalQueryInEditorWithConfirmation.current(confirmedRequest);
+                return;
+            }
+
+            if (runningExecution) {
+                const editorStateBeforeStop = latestEditorState.current;
+                const runningResult = editorStateBeforeStop.result;
+                if (runningResult?.streamingStatus) {
+                    queryExecutionManagerInstance.abortQuery(runningExecution.activeTabId);
                 } else {
-                    const executionDatabase =
-                        queryExecutionManagerInstance.getQueryDatabase(activeTabId);
-                    if (!executionDatabase || !result?.queryId) {
+                    const executionDatabase = queryExecutionManagerInstance.getQueryDatabase(
+                        runningExecution.activeTabId,
+                    );
+                    if (!executionDatabase || !runningResult?.queryId) {
                         return;
                     }
 
                     try {
                         await sendCancelQuery({
-                            queryId: result.queryId,
+                            queryId: runningResult.queryId,
                             database: executionDatabase,
                         }).unwrap();
                     } catch {
@@ -202,17 +241,17 @@ export function useOpenExternalQueryInEditor() {
 
                     const currentEditorState = latestEditorState.current;
                     if (
-                        currentEditorState.activeTabId !== activeTabId ||
-                        currentEditorState.result?.queryId !== result.queryId
+                        currentEditorState.activeTabId !== runningExecution.activeTabId ||
+                        currentEditorState.result?.startTime !== runningExecution.startTime
                     ) {
                         return;
                     }
 
-                    queryExecutionManagerInstance.abortQuery(activeTabId);
+                    queryExecutionManagerInstance.abortQuery(runningExecution.activeTabId);
 
                     if (
-                        currentEditorState.input !== currentInput ||
-                        currentEditorState.isDirty !== isCurrentTabDirty
+                        currentEditorState.input !== editorStateBeforeStop.input ||
+                        currentEditorState.isDirty !== editorStateBeforeStop.isDirty
                     ) {
                         return;
                     }
@@ -226,15 +265,10 @@ export function useOpenExternalQueryInEditor() {
             openExternalQueryInEditor(query);
         },
         [
-            activeTabId,
-            currentInput,
-            isCurrentTabDirty,
+            getCurrentRunningExecutionIdentity,
             isMultiTabEnabled,
-            isQueryRunning,
             isRequestContextCurrent,
             openExternalQueryInEditor,
-            result?.queryId,
-            result?.streamingStatus,
             sendCancelQuery,
         ],
     );
@@ -249,15 +283,21 @@ export function useOpenExternalQueryInEditor() {
         stopLatestRunningQueryAndOpen,
         isMultiTabEnabled,
     );
-    const latestOpenExternalQueryInEditorWithConfirmation = React.useRef(
-        openExternalQueryInEditorWithConfirmation,
-    );
     latestOpenExternalQueryInEditorWithConfirmation.current =
         openExternalQueryInEditorWithConfirmation;
 
     return React.useCallback(
         (query: ExternalQueryToOpen) => {
             if (!database) {
+                return;
+            }
+
+            const currentIsQueryRunning = Boolean(latestEditorState.current.result?.isLoading);
+            const confirmedExecution =
+                !isMultiTabEnabled && currentIsQueryRunning
+                    ? getCurrentRunningExecutionIdentity()
+                    : undefined;
+            if (!isMultiTabEnabled && currentIsQueryRunning && !confirmedExecution) {
                 return;
             }
 
@@ -269,13 +309,10 @@ export function useOpenExternalQueryInEditor() {
                     search: history.location.search,
                     hash: history.location.hash,
                 },
-                confirmedExecution:
-                    !isMultiTabEnabled && isQueryRunning && result
-                        ? {activeTabId, queryId: result.queryId}
-                        : undefined,
+                confirmedExecution,
             };
 
-            if (!isMultiTabEnabled && isQueryRunning) {
+            if (!isMultiTabEnabled && currentIsQueryRunning) {
                 getRunningQueryConfirmation().then((confirmed) => {
                     if (confirmed) {
                         latestOpenExternalQueryInEditorWithConfirmation.current(request);
@@ -286,6 +323,6 @@ export function useOpenExternalQueryInEditor() {
 
             latestOpenExternalQueryInEditorWithConfirmation.current(request);
         },
-        [activeTabId, database, history, isMultiTabEnabled, isQueryRunning, result],
+        [database, getCurrentRunningExecutionIdentity, history, isMultiTabEnabled],
     );
 }

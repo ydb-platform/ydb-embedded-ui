@@ -287,6 +287,62 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(onAfterOpen).toHaveBeenCalledTimes(1);
     });
 
+    test('confirms a query started during dirty-query confirmation before stopping it', async () => {
+        const onAfterOpen = jest.fn();
+        const {activeTabId, history, result, store} = renderOpenExternalQueryHook({
+            dirtyInput: 'SELECT unsaved;',
+        });
+        const dirtyConfirmation = createDeferred<boolean>();
+        showModal
+            .mockReturnValueOnce(dirtyConfirmation.promise as never)
+            .mockResolvedValueOnce(false as never);
+
+        act(() => {
+            result.current({
+                title: 'Replacement',
+                input: 'SELECT replacement;',
+                onAfterOpen,
+            });
+        });
+
+        await waitFor(() => {
+            expect(showModal).toHaveBeenCalledWith(UNSAVED_CHANGES_DIALOG, {
+                id: UNSAVED_CHANGES_DIALOG,
+            });
+        });
+        const runningQuery = 'SELECT started while confirming;';
+        const abort = registerRunningQuery(activeTabId);
+        const runningResult = {
+            executionId: 'late-execution',
+            type: 'execute' as const,
+            queryId: 'late-query',
+            isLoading: true,
+            startTime: 2,
+        };
+        await act(async () => {
+            store.dispatch(changeUserInput({input: runningQuery}));
+            store.dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: runningQuery}));
+            store.dispatch(setIsDirty(false));
+            store.dispatch(setQueryResult({tabId: activeTabId, result: runningResult}));
+        });
+        await act(async () => {
+            dirtyConfirmation.resolve(true);
+            await dirtyConfirmation.promise;
+        });
+
+        await waitFor(() => {
+            expect(showModal).toHaveBeenNthCalledWith(2, RUNNING_QUERY_DIALOG, {
+                id: RUNNING_QUERY_DIALOG,
+            });
+        });
+        expect(sendQuery).not.toHaveBeenCalled();
+        expect(abort).not.toHaveBeenCalled();
+        expect(selectUserInput(store.getState())).toBe(runningQuery);
+        expect(selectResult(store.getState())?.queryId).toBe('late-query');
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('diagnostics');
+        expect(onAfterOpen).not.toHaveBeenCalled();
+    });
+
     test('keeps a running single-tab query when stopping it is cancelled', async () => {
         const onAfterOpen = jest.fn();
         const {activeTabId, history, result, store} = renderOpenExternalQueryHook({
@@ -451,6 +507,56 @@ describe('useOpenExternalQueryInEditor', () => {
 
         expect(sendQuery).not.toHaveBeenCalled();
         expect(abort).toHaveBeenCalledTimes(1);
+        expect(selectUserInput(store.getState())).toBe('SELECT replacement;');
+        expect(selectResult(store.getState())).toBeUndefined();
+    });
+
+    test('stops the same streaming execution after its server query ID arrives', async () => {
+        const {activeTabId, result, store} = renderOpenExternalQueryHook({
+            runningInput: 'SELECT streaming;',
+            isStreaming: true,
+        });
+        const preparingResult = {
+            executionId: 'streaming-execution',
+            type: 'execute' as const,
+            queryId: '',
+            isLoading: true,
+            startTime: 1,
+            streamingStatus: 'preparing' as const,
+        };
+        await act(async () => {
+            store.dispatch(setQueryResult({tabId: activeTabId, result: preparingResult}));
+        });
+        const abort = registerRunningQuery(activeTabId);
+        const runningConfirmation = createDeferred<boolean>();
+        showModal.mockReturnValueOnce(runningConfirmation.promise as never);
+
+        act(() => {
+            result.current({title: 'Replacement', input: 'SELECT replacement;'});
+        });
+
+        await waitFor(() => {
+            expect(showModal).toHaveBeenCalledWith(RUNNING_QUERY_DIALOG, {
+                id: RUNNING_QUERY_DIALOG,
+            });
+        });
+        const runningResult = {
+            ...preparingResult,
+            queryId: 'server-query-id',
+            streamingStatus: 'running' as const,
+        };
+        await act(async () => {
+            store.dispatch(setQueryResult({tabId: activeTabId, result: runningResult}));
+        });
+        await act(async () => {
+            runningConfirmation.resolve(true);
+            await runningConfirmation.promise;
+        });
+
+        await waitFor(() => {
+            expect(abort).toHaveBeenCalledTimes(1);
+        });
+        expect(sendQuery).not.toHaveBeenCalled();
         expect(selectUserInput(store.getState())).toBe('SELECT replacement;');
         expect(selectResult(store.getState())).toBeUndefined();
     });
