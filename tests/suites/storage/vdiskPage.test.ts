@@ -780,6 +780,21 @@ test.describe('Blob storage capacity metrics integration', () => {
         }
         await expect(groupInfo.getByText('Usage', {exact: true})).toHaveCount(0);
         await expect(groupInfo.getByText('Disk Space', {exact: true})).toHaveCount(0);
+        const groupInfoColumns = groupInfo.locator(':scope > .info-viewer');
+        await expect(groupInfoColumns).toHaveCount(2);
+        const configurationInfo = groupInfoColumns.nth(0);
+        const runtimeInfo = groupInfoColumns.nth(1);
+        await expect(
+            configurationInfo.getByText('Group Size In Units', {exact: true}),
+        ).toBeVisible();
+        await expect(configurationInfo.getByText('Units', {exact: true})).toHaveCount(0);
+        await expect(runtimeInfo.getByText('Units', {exact: true})).toBeVisible();
+
+        const runtimeLabels = await runtimeInfo
+            .locator('.info-viewer__label-text')
+            .allTextContents();
+        expect(runtimeLabels.indexOf('Units')).toBe(runtimeLabels.indexOf('Available Space') + 1);
+        expect(runtimeLabels.indexOf('VDisk Slot Usage')).toBe(runtimeLabels.indexOf('Units') + 1);
 
         await page.goto(VDISK_PAGE_PATH.replace('type=groups', 'type=nodes'));
 

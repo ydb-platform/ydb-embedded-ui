@@ -79,12 +79,6 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
                 value: Encryption ? storageGroupInfoKeyset('yes') : storageGroupInfoKeyset('no'),
             });
         }
-        if (valueIsDefined(AllocationUnits)) {
-            configurationInfo.push({
-                label: storageGroupInfoKeyset('allocation-units'),
-                value: AllocationUnits,
-            });
-        }
         configurationInfo.push({
             label: diskCapacityInfoKeyset('field_group-size-in-units'),
             value: formatMetricCount(GroupSizeInUnits),
@@ -120,6 +114,12 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
             runtimeInfo.push({
                 label: storageGroupInfoKeyset('available'),
                 value: formatStorageValuesToGb(Number(Available)),
+            });
+        }
+        if (valueIsDefined(AllocationUnits)) {
+            runtimeInfo.push({
+                label: storageGroupInfoKeyset('allocation-units'),
+                value: AllocationUnits,
             });
         }
         runtimeInfo.push(...toInfoViewerItems(getStorageGroupCapacityInfoItems(data)));
