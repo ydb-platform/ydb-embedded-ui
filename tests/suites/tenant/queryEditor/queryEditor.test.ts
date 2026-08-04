@@ -1,8 +1,9 @@
 import {expect, test} from '@playwright/test';
+import type {Page} from '@playwright/test';
 
 import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {getClipboardContent} from '../../../utils/clipboard';
-import {database} from '../../../utils/constants';
+import {backend, database} from '../../../utils/constants';
 import {
     cleanupMockStreamingFetch,
     setupMockStreamingFetch,
@@ -29,6 +30,49 @@ import {
     QueryTabs,
     ResultTabNames,
 } from './models/QueryEditor';
+
+async function setupPendingNonStreamingQueryMock(page: Page) {
+    let markStarted!: VoidFunction;
+    const started = new Promise<void>((resolve) => {
+        markStarted = resolve;
+    });
+    let finishQuery!: VoidFunction;
+    const queryFinished = new Promise<void>((resolve) => {
+        finishQuery = resolve;
+    });
+    const queryRoute = `${backend}/viewer/json/query?*`;
+
+    await page.route(queryRoute, async (route) => {
+        const body = route.request().postDataJSON() as {action?: string};
+
+        if (body.action === 'cancel-query') {
+            await route.fulfill({json: {version: 8, result: []}});
+            finishQuery();
+            return;
+        }
+
+        markStarted();
+        await queryFinished;
+        await route
+            .fulfill({
+                json: {
+                    error: {severity: 1, message: 'Query was cancelled'},
+                    issues: [],
+                },
+            })
+            .catch(() => undefined);
+    });
+
+    return {
+        async waitUntilStarted() {
+            await started;
+        },
+        async cleanup() {
+            finishQuery();
+            await page.unroute(queryRoute);
+        },
+    };
+}
 
 test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
@@ -222,17 +266,25 @@ test.describe('Test Query Editor', async () => {
 
     test('Stopped non-streaming selection does not create a History entry', async ({page}) => {
         const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'off', 'Query Streaming');
+        const pendingQuery = await setupPendingNonStreamingQueryMock(page);
+        const query = 'SELECT 1;\nSELECT 2;';
 
-        await queryEditor.setQuery(longRunningQuery);
-        await queryEditor.selectText(1, 1, 1, longRunningQuery.length + 1);
-        await executeSelectedQueryWithKeybinding(page);
-        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
-        await queryEditor.clickStopButton();
-        await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
+        try {
+            await queryEditor.setQuery(query);
+            await queryEditor.selectText(1, 1, 1, 'SELECT 1;'.length + 1);
+            await executeSelectedQueryWithKeybinding(page);
+            await pendingQuery.waitUntilStarted();
+            await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+            await queryEditor.clickStopButton();
+            await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
 
-        await queryEditor.queryTabs.selectTab(QueryTabs.History);
-        await queryEditor.historyQueries.isVisible();
-        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(0);
+            await queryEditor.queryTabs.selectTab(QueryTabs.History);
+            await queryEditor.historyQueries.isVisible();
+            await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(0);
+        } finally {
+            await pendingQuery.cleanup();
+        }
     });
 
     test('Streaming query shows some results and banner when stop button is clicked', async ({
