@@ -2,6 +2,7 @@ import React from 'react';
 
 import {CircleCheckFill, CircleQuestionFill, CircleXmarkFill, Ellipsis} from '@gravity-ui/icons';
 import {render, renderHook, screen} from '@testing-library/react';
+import {MemoryRouter} from 'react-router-dom';
 
 import {useStorageVDiskDisplayStateGetter} from '../../../containers/Storage/useStorageVDiskDisplayStateGetter';
 import {ECapacityAlert, EFlag} from '../../../types/api/enums';
@@ -34,10 +35,6 @@ jest.mock('../../HoverPopup/HoverPopup', () => ({
     HoverPopup: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
 }));
 
-jest.mock('../../InternalLink', () => ({
-    InternalLink: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
-}));
-
 jest.mock('../../DiskStateProgressBar/DiskStateProgressBar', () => ({
     DiskStateProgressBar: ({
         icon,
@@ -57,6 +54,14 @@ jest.mock('../../DiskStateProgressBar/DiskStateProgressBar', () => ({
     ),
 }));
 
+function renderVDisk(props: React.ComponentProps<typeof VDisk>) {
+    return render(
+        <MemoryRouter>
+            <VDisk {...props} />
+        </MemoryRouter>,
+    );
+}
+
 describe('VDisk', () => {
     beforeEach(() => {
         mockUseIsStorageExpertMode.mockReset();
@@ -65,7 +70,7 @@ describe('VDisk', () => {
     });
 
     test('does not subscribe to Storage state in default mode', () => {
-        render(<VDisk data={{}} />);
+        renderVDisk({data: {}});
 
         expect(mockUseIsStorageExpertMode).not.toHaveBeenCalled();
         expect(mockUseVDisksGroupByParam).not.toHaveBeenCalled();
@@ -73,7 +78,7 @@ describe('VDisk', () => {
     });
 
     test('keeps N/D fallback in default mode', () => {
-        render(<VDisk data={{}} />);
+        renderVDisk({data: {}});
 
         expect(screen.getByTestId('disk-progress')).toHaveAttribute(
             'data-no-data-placeholder',
@@ -82,32 +87,28 @@ describe('VDisk', () => {
     });
 
     test('does not mark no data vdisk as replicating in expert modes', () => {
-        render(
-            <VDisk
-                data={{Replicated: false}}
-                getDisplayState={() => ({
-                    severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
-                    icon: undefined,
-                    modeModifier: 'mode-space',
-                })}
-            />,
-        );
+        renderVDisk({
+            data: {Replicated: false},
+            getDisplayState: () => ({
+                severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
+                icon: undefined,
+                modeModifier: 'mode-space',
+            }),
+        });
 
         expect(screen.getByTestId('disk-progress')).toHaveAttribute('data-striped', 'false');
     });
 
     test('uses N/D as no data placeholder', () => {
-        render(
-            <VDisk
-                data={{}}
-                getDisplayState={() => ({
-                    severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
-                    icon: undefined,
-                    modeModifier: 'mode-state',
-                    showNoDataPlaceholder: true,
-                })}
-            />,
-        );
+        renderVDisk({
+            data: {},
+            getDisplayState: () => ({
+                severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
+                icon: undefined,
+                modeModifier: 'mode-state',
+                showNoDataPlaceholder: true,
+            }),
+        });
 
         expect(screen.getByTestId('disk-progress')).toHaveAttribute(
             'data-no-data-placeholder',
@@ -116,25 +117,23 @@ describe('VDisk', () => {
     });
 
     test('does not use N/D when only State data is unavailable in expert mode', () => {
-        render(
-            <VDisk
-                data={{
-                    VDiskId: {
-                        GroupID: 1,
-                        GroupGeneration: 1,
-                        Ring: 0,
-                        Domain: 0,
-                        VDisk: 0,
-                    },
-                }}
-                getDisplayState={() => ({
-                    severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
-                    icon: undefined,
-                    modeModifier: 'mode-state',
-                    showNoDataPlaceholder: false,
-                })}
-            />,
-        );
+        renderVDisk({
+            data: {
+                VDiskId: {
+                    GroupID: 1,
+                    GroupGeneration: 1,
+                    Ring: 0,
+                    Domain: 0,
+                    VDisk: 0,
+                },
+            },
+            getDisplayState: () => ({
+                severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
+                icon: undefined,
+                modeModifier: 'mode-state',
+                showNoDataPlaceholder: false,
+            }),
+        });
 
         expect(screen.getByTestId('disk-progress')).not.toHaveAttribute('data-no-data-placeholder');
         expect(screen.getByTestId('disk-progress')).toHaveAttribute('data-has-icon', 'false');
@@ -143,16 +142,14 @@ describe('VDisk', () => {
     test.each(['mode-space', 'mode-frontqueues', 'mode-compaction'])(
         'does not pass no data placeholder when %s renders status icon',
         (modeModifier) => {
-            render(
-                <VDisk
-                    data={{}}
-                    getDisplayState={() => ({
-                        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
-                        icon: CircleQuestionFill,
-                        modeModifier,
-                    })}
-                />,
-            );
+            renderVDisk({
+                data: {},
+                getDisplayState: () => ({
+                    severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
+                    icon: CircleQuestionFill,
+                    modeModifier,
+                }),
+            });
 
             expect(screen.getByTestId('disk-progress')).toHaveAttribute('data-has-icon', 'true');
             expect(screen.getByTestId('disk-progress')).not.toHaveAttribute(
@@ -160,6 +157,62 @@ describe('VDisk', () => {
             );
         },
     );
+
+    test('exposes healthy All-mode statuses in the link accessible name', () => {
+        renderVDisk({
+            data: {
+                StringifiedId: '1-1-0-0-0',
+                VDiskState: EVDiskState.OK,
+                CapacityAlert: ECapacityAlert.GREEN,
+                FrontQueues: EFlag.Green,
+                SatisfactionRank: {
+                    FreshRank: {Flag: EFlag.Green},
+                    LevelRank: {Flag: EFlag.Green},
+                },
+                AllocatedPercent: 50,
+            },
+            getDisplayState: () => ({
+                severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
+                icon: undefined,
+                modeModifier: 'mode-all',
+                allModeHasIssues: false,
+            }),
+        });
+
+        expect(
+            screen.getByRole('link', {
+                name: 'VDisk 1-1-0-0-0. Health: healthy. State: OK. Capacity alert: GREEN. Front queues: Green. Fresh compaction: Green. Level compaction: Green. Allocated: 50%.',
+            }),
+        ).toBeInTheDocument();
+    });
+
+    test('exposes All-mode issues and raw statuses in the link accessible name', () => {
+        renderVDisk({
+            data: {
+                StringifiedId: '2-1-0-0-1',
+                VDiskState: EVDiskState.Initial,
+                CapacityAlert: ECapacityAlert.LIGHTYELLOW,
+                FrontQueues: EFlag.Yellow,
+                SatisfactionRank: {
+                    FreshRank: {Flag: EFlag.Orange},
+                    LevelRank: {Flag: EFlag.Red},
+                },
+                AllocatedPercent: 75,
+            },
+            getDisplayState: () => ({
+                severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
+                icon: undefined,
+                modeModifier: 'mode-all',
+                allModeHasIssues: true,
+            }),
+        });
+
+        expect(
+            screen.getByRole('link', {
+                name: 'VDisk 2-1-0-0-1. Health: issues detected. State: Initial. Capacity alert: LIGHT_YELLOW. Front queues: Yellow. Fresh compaction: Orange. Level compaction: Red. Allocated: 75%.',
+            }),
+        ).toBeInTheDocument();
+    });
 });
 
 describe('useStorageVDiskDisplayStateGetter', () => {

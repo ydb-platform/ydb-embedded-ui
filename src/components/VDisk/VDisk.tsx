@@ -21,6 +21,39 @@ const b = cn('ydb-vdisk-component');
 
 const DEFAULT_POPUP_OFFSET: PopupProps['offset'] = {mainAxis: 2, crossAxis: 0};
 
+function getAccessibleName(
+    data: PreparedVDisk,
+    hasIssues: boolean | undefined,
+    isAllMode: boolean,
+) {
+    if (!isAllMode) {
+        return undefined;
+    }
+
+    const noData = i18n('context_no-data');
+    const health =
+        hasIssues === undefined
+            ? noData
+            : i18n(
+                  hasIssues ? 'context_all-mode-health-issues' : 'context_all-mode-health-healthy',
+              );
+    const allocatedPercent =
+        Number.isFinite(data.AllocatedPercent) && Number(data.AllocatedPercent) >= 0
+            ? `${data.AllocatedPercent}%`
+            : noData;
+
+    return i18n('context_all-mode-accessible-name', {
+        vdiskId: data.StringifiedId || noData,
+        health,
+        state: data.VDiskState || noData,
+        capacityAlert: data.CapacityAlert || noData,
+        frontQueues: data.FrontQueues || noData,
+        freshCompaction: data.SatisfactionRank?.FreshRank?.Flag || noData,
+        levelCompaction: data.SatisfactionRank?.LevelRank?.Flag || noData,
+        allocatedPercent,
+    });
+}
+
 export interface VDiskProps {
     data?: PreparedVDisk;
     compact?: boolean;
@@ -77,6 +110,7 @@ export const VDisk = ({
     );
 
     const isAllMode = modeModifier === 'mode-all';
+    const accessibleName = getAccessibleName(data, allModeHasIssues, isAllMode);
 
     // Check if disk is replicating (not replicated yet) and should show stripes
     const hasVDiskData = Boolean(data.VDiskState);
@@ -116,6 +150,7 @@ export const VDisk = ({
             <div className={b()}>
                 <InternalLink
                     to={vDiskPath}
+                    aria-label={accessibleName}
                     className={b('content', {
                         compact,
                         'with-opaque-background': withOpaqueBackground,

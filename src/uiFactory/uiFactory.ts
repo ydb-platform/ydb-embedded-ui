@@ -13,7 +13,11 @@ import {
 
 import type {UIFactory} from './types';
 
-const uiFactoryBase: UIFactory = {
+type ResolvedUIFactory = Omit<UIFactory, 'maxVDisksInStorageGroup'> & {
+    maxVDisksInStorageGroup: number;
+};
+
+const uiFactoryBase: ResolvedUIFactory = {
     getMonitoringLink: getMonitoringLinkDefault,
     getMonitoringClusterLink: getMonitoringClusterLinkDefault,
     healthcheck: {

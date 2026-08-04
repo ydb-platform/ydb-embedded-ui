@@ -74,7 +74,13 @@ async function gotoStoragePage(page: Page, vdisksGroupBy: VDisksGroupByValue) {
     url.searchParams.set('storageExpertMode', 'true');
     url.searchParams.set('vdisksGroupBy', vdisksGroupBy);
 
-    await page.goto(`${url.pathname}${url.search}`);
+    const [storageGroupsResponse] = await Promise.all([
+        page.waitForResponse(
+            (response) => response.url().includes('/storage/groups') && response.ok(),
+        ),
+        page.goto(`${url.pathname}${url.search}`),
+    ]);
+    await storageGroupsResponse.finished();
 }
 
 async function hideFloatingPopups(page: Page) {
