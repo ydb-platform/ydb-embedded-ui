@@ -100,9 +100,7 @@ const requiredPositiveInt = (requiredMessage: string) =>
         z.coerce.number<string>({error: requiredMessage}).int().gt(0),
     );
 
-export const managePartitioningSchema = (
-    maxSplitSizeBytes = DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
-) =>
+export const managePartitioningSchema = (maxSplitSizeBytes?: number) =>
     z
         .object({
             splitSize: requiredPositiveNumber(i18n('error_required')),
@@ -116,7 +114,7 @@ export const managePartitioningSchema = (
         .superRefine((data, ctx) => {
             const {bytes, partitionSizeMb} = splitToPartitionSizeMb(data.splitSize, data.splitUnit);
 
-            if (bytes > maxSplitSizeBytes) {
+            if (maxSplitSizeBytes !== undefined && bytes > maxSplitSizeBytes) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     path: ['splitSize'],

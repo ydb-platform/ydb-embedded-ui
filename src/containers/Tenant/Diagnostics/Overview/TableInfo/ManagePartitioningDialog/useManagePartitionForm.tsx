@@ -8,7 +8,7 @@ import {getManagePartitioningInitialValues, managePartitioningSchema} from './ut
 
 export function useManagePartitioningForm(params: {
     initialValue?: ManagePartitioningFormState;
-    maxSplitSizeBytes: number;
+    maxSplitSizeBytes?: number;
 }) {
     const {initialValue, maxSplitSizeBytes} = params;
 
