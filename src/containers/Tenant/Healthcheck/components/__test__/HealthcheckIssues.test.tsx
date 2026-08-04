@@ -4,6 +4,8 @@ import {Router} from 'react-router-dom';
 import {QueryParamProvider} from 'use-query-params';
 import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 
+import {ComponentsProvider} from '../../../../../components/ComponentsProvider/ComponentsProvider';
+import {componentsRegistry} from '../../../../../components/ComponentsProvider/componentsRegistry';
 import type {IssuesTree} from '../../../../../store/reducers/healthcheckInfo/types';
 import {Issues} from '../HealthcheckIssues';
 
@@ -26,11 +28,13 @@ describe('HealthcheckIssues', () => {
         ];
 
         render(
-            <Router history={history}>
-                <QueryParamProvider adapter={ReactRouter5Adapter}>
-                    <Issues issues={issues} />
-                </QueryParamProvider>
-            </Router>,
+            <ComponentsProvider registry={componentsRegistry}>
+                <Router history={history}>
+                    <QueryParamProvider adapter={ReactRouter5Adapter}>
+                        <Issues issues={issues} />
+                    </QueryParamProvider>
+                </Router>
+            </ComponentsProvider>,
         );
 
         expect(screen.getByRole('button', {name: /Compute issue/})).toBeVisible();

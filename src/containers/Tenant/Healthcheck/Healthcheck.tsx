@@ -2,6 +2,10 @@ import React from 'react';
 
 import {Flex, Icon} from '@gravity-ui/uikit';
 
+import {
+    useComponent,
+    useHasComponent,
+} from '../../../components/ComponentsProvider/ComponentsProvider';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Fullscreen} from '../../../components/Fullscreen/Fullscreen';
 import {HealthcheckStatus} from '../../../components/HealthcheckStatus/HealthcheckStatus';
@@ -20,6 +24,7 @@ import {HealthcheckRefresh} from './components/HealthcheckRefresh';
 import {HealthcheckView} from './components/HealthcheckView';
 import i18n from './i18n';
 import {b} from './shared';
+import type {HealthcheckAssistantSnapshot, HealthcheckAssistantTarget} from './types';
 import {useClusterHealthcheck, useHealthcheck} from './useHealthcheck';
 import {countHealthcheckIssuesByCategory} from './utils';
 
@@ -28,8 +33,18 @@ import cryCatIcon from '../../../assets/icons/cry-cat.svg';
 import './Healthcheck.scss';
 
 type HealthcheckDetailsProps =
-    | {database: string; clusterName?: string; databaseType?: ETenantType}
-    | {clusterName: string; database?: undefined; databaseType?: undefined};
+    | {
+          database: string;
+          clusterName?: string;
+          databaseType?: ETenantType;
+          scope?: 'cluster' | 'database';
+      }
+    | {
+          clusterName: string;
+          database?: undefined;
+          databaseType?: undefined;
+          scope?: 'cluster';
+      };
 
 export function Healthcheck(props: HealthcheckDetailsProps) {
     if (props.database !== undefined) {
@@ -41,6 +56,7 @@ export function Healthcheck(props: HealthcheckDetailsProps) {
                     database={props.database}
                     clusterName={props.clusterName}
                     databaseType={props.databaseType}
+                    scope={props.scope}
                 />
             </HealthcheckContext.Provider>
         );
@@ -57,47 +73,97 @@ function DatabaseHealthcheckInner({
     database,
     clusterName,
     databaseType,
+    scope = 'database',
 }: {
     database: string;
     clusterName?: string;
     databaseType?: ETenantType;
+    scope?: 'cluster' | 'database';
 }) {
     const healthcheck = useHealthcheck(database, {clusterName, databaseType});
-    return <HealthcheckContent healthcheck={healthcheck} />;
+    return <HealthcheckContent healthcheck={healthcheck} target={{scope, request: {database}}} />;
 }
 
 function ClusterHealthcheckInner({clusterName}: {clusterName: string}) {
     const healthcheck = useClusterHealthcheck(clusterName);
-    return <HealthcheckContent healthcheck={healthcheck} />;
+    return (
+        <HealthcheckContent
+            healthcheck={healthcheck}
+            target={{scope: 'cluster', request: {clusterName}}}
+        />
+    );
 }
 
 interface HealthcheckResult {
     leavesIssues: IssuesTree[];
+    issues: HealthcheckAssistantSnapshot['issues'];
     loading: boolean;
+    successful: boolean;
     error?: unknown;
     refetch: () => void;
     selfCheckResult: SelfCheckResult;
     fulfilledTimeStamp?: number;
 }
 
-function HealthcheckContent({healthcheck}: {healthcheck: HealthcheckResult}) {
+function HealthcheckContent({
+    healthcheck,
+    target,
+}: {
+    healthcheck: HealthcheckResult;
+    target: HealthcheckAssistantTarget;
+}) {
     const SuccessImage = getIllustration('SuccessOperation');
+    const HealthcheckAssistantAction = useComponent('HealthcheckAssistantAction');
+    const hasHealthcheckAssistantAction = useHasComponent('HealthcheckAssistantAction');
+    const healthcheckContext = React.useContext(HealthcheckContext);
 
     const fullscreen = useTypedSelector((state) => state.fullscreen);
-    const {loading, error, selfCheckResult, fulfilledTimeStamp, leavesIssues, refetch} =
-        healthcheck;
+    const {
+        loading,
+        successful,
+        error,
+        selfCheckResult,
+        fulfilledTimeStamp,
+        leavesIssues,
+        issues,
+        refetch,
+    } = healthcheck;
+    const snapshot = React.useMemo<HealthcheckAssistantSnapshot>(
+        () => ({
+            selfCheckResult,
+            issues,
+            fulfilledAt: fulfilledTimeStamp,
+        }),
+        [fulfilledTimeStamp, issues, selfCheckResult],
+    );
 
     const issuesCount = React.useMemo(
         () => countHealthcheckIssuesByCategory(leavesIssues),
         [leavesIssues],
     );
+    const showDiagnostics = hasHealthcheckAssistantAction && successful && issues.length > 0;
+    const assistant = hasHealthcheckAssistantAction ? {target, snapshot} : undefined;
 
     const renderControls = () => {
         return (
             <Flex direction="column" gap={3} className={b('controls', {fullscreen})}>
                 <Flex justifyContent="space-between" gap={2}>
                     <HealthcheckStatus status={selfCheckResult} />
-                    <HealthcheckRefresh lastFullfiled={fulfilledTimeStamp} refresh={refetch} />
+                    {showDiagnostics ? (
+                        <Flex gap={2} alignItems="center">
+                            <HealthcheckAssistantAction
+                                action="diagnostics"
+                                target={target}
+                                snapshot={snapshot}
+                            />
+                            <HealthcheckRefresh
+                                lastFullfiled={fulfilledTimeStamp}
+                                refresh={refetch}
+                            />
+                        </Flex>
+                    ) : (
+                        <HealthcheckRefresh lastFullfiled={fulfilledTimeStamp} refresh={refetch} />
+                    )}
                 </Flex>
                 <HealthcheckView issuesCount={issuesCount} />
                 <HealthcheckFilter />
@@ -139,10 +205,12 @@ function HealthcheckContent({healthcheck}: {healthcheck: HealthcheckResult}) {
     };
 
     return (
-        <Fullscreen>
-            <Flex className={b()} grow={1}>
-                {renderContent()}
-            </Flex>
-        </Fullscreen>
+        <HealthcheckContext.Provider value={{...healthcheckContext, assistant}}>
+            <Fullscreen>
+                <Flex className={b()} grow={1}>
+                    {renderContent()}
+                </Flex>
+            </Fullscreen>
+        </HealthcheckContext.Provider>
     );
 }

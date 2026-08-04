@@ -23,3 +23,11 @@ export function useComponent<T extends Parameters<ComponentsRegistry['get']>[0]>
     }
     return store.get(id);
 }
+
+export function useHasComponent<T extends Parameters<ComponentsRegistry['has']>[0]>(id: T) {
+    const store = React.useContext(componentsStoreContext);
+    if (store === undefined) {
+        throw new Error('useHasComponent must be used within ComponentsProvider');
+    }
+    return store.has(id);
+}
