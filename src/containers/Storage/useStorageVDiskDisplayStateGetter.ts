@@ -40,7 +40,7 @@ function isAllModeHealthy(vDisk: PreparedVDisk) {
     return (
         vDisk.VDiskState === EVDiskState.OK &&
         vDisk.CapacityAlert === ECapacityAlert.GREEN &&
-        vDisk.FrontQueues === EFlag.Green &&
+        (vDisk.FrontQueues === EFlag.Green || vDisk.FrontQueues === EFlag.Blue) &&
         vDisk.SatisfactionRank?.FreshRank?.Flag === EFlag.Green &&
         vDisk.SatisfactionRank?.LevelRank?.Flag === EFlag.Green
     );

@@ -255,6 +255,16 @@ describe('useStorageVDiskDisplayStateGetter', () => {
         expect(result.current(ALL_GREEN_VDISK)).toHaveProperty('allModeHasIssues', false);
     });
 
+    test('treats Blue FrontQueues as healthy in Expert Mode All', () => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(result.current({...ALL_GREEN_VDISK, FrontQueues: EFlag.Blue})).toHaveProperty(
+            'allModeHasIssues',
+            false,
+        );
+    });
+
     test.each([
         {metric: 'State', override: {VDiskState: EVDiskState.Initial}},
         {
