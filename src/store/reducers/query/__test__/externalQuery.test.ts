@@ -18,6 +18,7 @@ describe('external query actions', () => {
                     updatedAt: 1,
                     lastExecutedQueryText: 'SELECT 1;',
                     result: {
+                        executionId: 'execution-1',
                         type: 'execute',
                         queryId: 'query-1',
                         isLoading: false,

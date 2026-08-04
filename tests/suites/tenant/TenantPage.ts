@@ -104,11 +104,17 @@ export class TenantPage extends PageModel {
             {nextMode: mode},
         );
 
-        return this.goto({
-            schema,
-            database,
-            databasePage: 'query',
-        });
+        const response = await this.goto(
+            {
+                schema,
+                database,
+                databasePage: 'query',
+            },
+            {waitUntil: 'commit'},
+        );
+        await this.queryEditor.waitForEditorReady();
+
+        return response;
     }
 
     async saveQuery(queryText: string, name?: string): Promise<string> {

@@ -48,6 +48,7 @@ import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQuer
 import {
     DEFAULT_QUERY_SETTINGS,
     QUERY_ACTIONS,
+    isQueryCancelledError,
     isStreamingSupportedForMode,
 } from '../../../../utils/query';
 import {reachMetricaGoal} from '../../../../utils/yaMetrica';
@@ -72,6 +73,7 @@ import {YqlEditor} from './YqlEditor/YqlEditor';
 import {useEditorTabsGlobalHotkeys} from './hooks/useEditorTabsGlobalHotkeys';
 import {useQueryPageLeaveGuard} from './hooks/useQueryPageLeaveGuard';
 import {useQueryTabsActions} from './hooks/useQueryTabsActions';
+import type {QueryExecution} from './types';
 import {queryExecutionManagerInstance} from './utils/queryExecutionManager';
 
 import './QueryEditor.scss';
@@ -327,10 +329,13 @@ export default function QueryEditor({
         }
     }, [hasTabs, showPreview, isResultLoaded]);
 
-    const handleSendExecuteClick = useEventHandler((text: string, partial?: boolean) => {
+    const handleSendExecuteClick = useEventHandler((execution: QueryExecution) => {
         if (!activeTabId) {
             return;
         }
+
+        const {text, range} = execution;
+        const isFragment = Boolean(range);
 
         runSetStoppableTimeout();
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
@@ -342,13 +347,14 @@ export default function QueryEditor({
 
         dispatch(setShowPreview(false));
 
-        let historyQueryId = historyCurrentQueryId ?? uuidv4();
+        let historyQueryId: string | undefined;
         const newQueryId = uuidv4();
 
         const startTime = Date.now();
 
-        // Don't save partial queries in history
-        if (!partial) {
+        if (!isFragment) {
+            historyQueryId = historyCurrentQueryId ?? uuidv4();
+
             const currentQuery = historyCurrentQueryId
                 ? historyQueries.find((q) => q.queryId === historyCurrentQueryId)
                 : null;
@@ -367,6 +373,40 @@ export default function QueryEditor({
                 historyQueryId = newQueryId;
                 saveQueryToHistory(text, newQueryId, startTime);
             }
+        }
+
+        const updateStoppedQueryInHistory = (error: unknown) => {
+            const extra =
+                error && typeof error === 'object' && 'extra' in error ? error.extra : undefined;
+            const queryStats =
+                extra &&
+                typeof extra === 'object' &&
+                'queryStats' in extra &&
+                extra.queryStats &&
+                typeof extra.queryStats === 'object'
+                    ? extra.queryStats
+                    : undefined;
+            const stoppedHistoryQueryId =
+                extra &&
+                typeof extra === 'object' &&
+                'historyQueryId' in extra &&
+                typeof extra.historyQueryId === 'string'
+                    ? extra.historyQueryId
+                    : historyQueryId;
+
+            if (!stoppedHistoryQueryId) {
+                return;
+            }
+
+            updateQueryInHistory(stoppedHistoryQueryId, {
+                startTime,
+                durationUs: (Date.now() - startTime) * 1000,
+                ...queryStats,
+                status: 'stopped',
+            });
+        };
+
+        if (!isFragment) {
             dispatch(setIsDirty(false));
         }
 
@@ -395,6 +435,9 @@ export default function QueryEditor({
                 enableTracingLevel,
                 base64: encodeTextWithBase64,
                 historyQueryId,
+                sourcePosition: range
+                    ? {lineNumber: range.startLineNumber, column: range.startColumn}
+                    : undefined,
             });
             query
                 .unwrap()
@@ -409,12 +452,8 @@ export default function QueryEditor({
                     }
                 })
                 .catch((error) => {
-                    if (error?.name === 'AbortError') {
-                        updateQueryInHistory(historyQueryId, {
-                            startTime,
-                            durationUs: (Date.now() - startTime) * 1000,
-                            status: 'stopped',
-                        });
+                    if (isQueryCancelledError(error)) {
+                        updateStoppedQueryInHistory(error);
                         return;
                     }
                     if (error?.extra?.historyQueryId) {
@@ -444,6 +483,9 @@ export default function QueryEditor({
                 queryId: newQueryId,
                 historyQueryId: historyQueryId,
                 base64: encodeTextWithBase64,
+                sourcePosition: range
+                    ? {lineNumber: range.startLineNumber, column: range.startColumn}
+                    : undefined,
             });
 
             query
@@ -460,6 +502,10 @@ export default function QueryEditor({
                     }
                 })
                 .catch((error) => {
+                    if (isQueryCancelledError(error)) {
+                        updateStoppedQueryInHistory(error);
+                        return;
+                    }
                     if (error?.extra?.historyQueryId) {
                         updateQueryInHistory(
                             error.extra.historyQueryId,
@@ -475,6 +521,10 @@ export default function QueryEditor({
 
             queryExecutionManagerInstance.registerQuery(activeTabId, query);
         }
+    });
+
+    const handleRunEditorClick = useEventHandler((text: string) => {
+        handleSendExecuteClick({text});
     });
 
     const handleSettingsClick = () => {
@@ -537,7 +587,7 @@ export default function QueryEditor({
     const renderControls = () => {
         return (
             <QueryEditorControls
-                handleSendExecuteClick={handleSendExecuteClick}
+                handleSendExecuteClick={handleRunEditorClick}
                 onSettingsButtonClick={handleSettingsClick}
                 isLoading={Boolean(result?.isLoading)}
                 isStoppable={isStoppable}

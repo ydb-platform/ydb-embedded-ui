@@ -94,16 +94,31 @@ export function isErrorChunk(content: unknown): content is ErrorResponse {
     );
 }
 
-export const prepareQueryWithPragmas = (query: string, pragmas?: string): string => {
+interface PreparedQueryWithPragmasMetadata {
+    query: string;
+    preparedQueryPrefixLineCount: number;
+}
+
+export const prepareQueryWithPragmasMetadata = (
+    query: string,
+    pragmas?: string,
+): PreparedQueryWithPragmasMetadata => {
     if (!pragmas || !pragmas.trim()) {
-        return query;
+        return {query, preparedQueryPrefixLineCount: 0};
     }
 
     // Add pragmas at the beginning with proper line separation
     const trimmedPragmas = pragmas.trim();
     const separator = trimmedPragmas.endsWith(';') ? '\n\n' : ';\n\n';
 
-    return `${trimmedPragmas}${separator}${query}`;
+    return {
+        query: `${trimmedPragmas}${separator}${query}`,
+        preparedQueryPrefixLineCount: trimmedPragmas.split('\n').length + 1,
+    };
+};
+
+export const prepareQueryWithPragmas = (query: string, pragmas?: string): string => {
+    return prepareQueryWithPragmasMetadata(query, pragmas).query;
 };
 
 type UnknownRecord = Record<string, unknown>;

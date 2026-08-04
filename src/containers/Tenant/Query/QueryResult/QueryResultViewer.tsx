@@ -290,6 +290,7 @@ export function QueryResultViewer({
                     selectedResultSet={selectedResultSet}
                     tableSettings={tableSettings}
                     setSelectedResultSet={setSelectedResultSet}
+                    sourcePosition={result.sourcePosition}
                 />
             );
         }
@@ -298,7 +299,7 @@ export function QueryResultViewer({
             if (isExecute || isStopped) {
                 return renderCommonErrorView(isStopped);
             }
-            return <QueryResultError error={error} />;
+            return <QueryResultError error={error} sourcePosition={result.sourcePosition} />;
         }
 
         return (

@@ -1,4 +1,4 @@
-import {prepareQueryWithPragmas} from '../utils';
+import {prepareQueryWithPragmas, prepareQueryWithPragmasMetadata} from '../utils';
 
 describe('prepareQueryWithPragmas', () => {
     test('Should prepend pragmas correctly', () => {
@@ -27,4 +27,33 @@ describe('prepareQueryWithPragmas', () => {
 
         expect(expectedResult).toBe('PRAGMA OrderedColumns;\n\nSELECT * FROM table;');
     });
+
+    test.each([
+        {
+            name: 'no pragma',
+            pragmas: undefined,
+            expectedQuery: 'SELECT 1;',
+            expectedPrefixLineCount: 0,
+        },
+        {
+            name: 'single-line pragma',
+            pragmas: 'PRAGMA OrderedColumns;',
+            expectedQuery: 'PRAGMA OrderedColumns;\n\nSELECT 1;',
+            expectedPrefixLineCount: 2,
+        },
+        {
+            name: 'multi-line pragma',
+            pragmas: 'PRAGMA OrderedColumns;\nPRAGMA AnsiOptionalAS;',
+            expectedQuery: 'PRAGMA OrderedColumns;\nPRAGMA AnsiOptionalAS;\n\nSELECT 1;',
+            expectedPrefixLineCount: 3,
+        },
+    ])(
+        'returns prepared-query metadata for $name',
+        ({pragmas, expectedQuery, expectedPrefixLineCount}) => {
+            expect(prepareQueryWithPragmasMetadata('SELECT 1;', pragmas)).toEqual({
+                query: expectedQuery,
+                preparedQueryPrefixLineCount: expectedPrefixLineCount,
+            });
+        },
+    );
 });

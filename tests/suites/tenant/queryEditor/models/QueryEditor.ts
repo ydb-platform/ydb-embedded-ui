@@ -255,6 +255,106 @@ export class QueryEditor {
         await this.editorTextArea.focus();
     }
 
+    async setCursor(lineNumber: number, column: number) {
+        await this.editorTextArea.evaluate(
+            (_, position) => {
+                window.ydbEditor?.setPosition(position);
+                window.ydbEditor?.focus();
+            },
+            {lineNumber, column},
+        );
+    }
+
+    async clickFirstIssuePosition() {
+        const resultArea = this.getResultAreaLocator();
+        await resultArea.getByRole('button', {name: 'Show details'}).first().click();
+        await resultArea.locator('.kv-issue__place-text').first().click();
+    }
+
+    async getCursorPosition() {
+        return this.editorTextArea.evaluate(() => window.ydbEditor?.getPosition());
+    }
+
+    async getHighlightedStatement() {
+        return this.editorTextArea.evaluate(() => {
+            const model = window.ydbEditor?.getModel();
+            const decoration = model
+                ?.getAllDecorations()
+                .find(
+                    ({options}: {options: {className?: string}}) =>
+                        options.className === 'ydb-current-query-highlight',
+                );
+            return decoration && model ? model.getValueInRange(decoration.range) : undefined;
+        });
+    }
+
+    async getCurrentStatementHighlightStyle() {
+        const highlight = this.page.locator('.ydb-current-query-highlight').first();
+        await highlight.waitFor({state: 'visible'});
+
+        return highlight.evaluate((element) => {
+            const style = window.getComputedStyle(element);
+            const colorProbe = element.ownerDocument.createElement('span');
+            colorProbe.style.color = style.getPropertyValue('--g-color-private-blue-50').trim();
+            element.append(colorProbe);
+
+            const expectedBackgroundColor = window.getComputedStyle(colorProbe).color;
+            colorProbe.remove();
+
+            return {
+                backgroundColor: style.backgroundColor,
+                expectedBackgroundColor,
+                borderBottomWidth: style.borderBottomWidth,
+                boxShadow: style.boxShadow,
+                textDecorationLine: style.textDecorationLine,
+            };
+        });
+    }
+
+    async getSelectedText() {
+        return this.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            const model = editor?.getModel();
+            const selection = editor?.getSelection();
+            return editor && model && selection ? model.getValueInRange(selection) : '';
+        });
+    }
+
+    async getCurrentStatementUpdateMetricsAfterCursorMove() {
+        return this.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            const model = editor?.getModel();
+            if (!editor || !model) {
+                throw new Error('Expected active Monaco editor model');
+            }
+
+            const originalGetValue = model.getValue.bind(model);
+            const originalChangeDecorations = editor.changeDecorations.bind(editor);
+            let fullTextReads = 0;
+            let currentStatementDecorationWrites = 0;
+
+            model.getValue = (...args: Parameters<typeof originalGetValue>) => {
+                fullTextReads += 1;
+                return originalGetValue(...args);
+            };
+            editor.changeDecorations = (
+                callback: Parameters<typeof originalChangeDecorations>[0],
+            ) => {
+                currentStatementDecorationWrites += 1;
+                return originalChangeDecorations(callback);
+            };
+
+            try {
+                editor.setPosition({lineNumber: 1, column: 4});
+            } finally {
+                model.getValue = originalGetValue;
+                editor.changeDecorations = originalChangeDecorations;
+            }
+
+            return {fullTextReads, currentStatementDecorationWrites};
+        });
+    }
+
     async getEditorContent(): Promise<string> {
         await this.waitForEditorReady();
         await this.page.waitForFunction(() => Boolean(window.ydbEditor), null, {
@@ -290,21 +390,12 @@ export class QueryEditor {
         await this.editorTextArea.press(key);
     }
 
-    async runSelectedQueryViaContextMenu() {
-        await this.editorTextArea.evaluate(() => {
-            const editor = window.ydbEditor;
-            if (editor) {
-                // Trigger the sendSelectedQuery action directly
-                editor.trigger('contextMenu', 'sendSelectedQuery', null);
-            }
-        });
-    }
-
     async closeSettingsDialog() {
         await this.settingsDialog.clickButton(ButtonNames.Cancel);
     }
 
     async clickGearButton() {
+        await this.waitForEditorReady();
         await this.gearButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.gearButton.click();
     }

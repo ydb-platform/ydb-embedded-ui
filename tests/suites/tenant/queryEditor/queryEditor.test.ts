@@ -1,8 +1,9 @@
 import {expect, test} from '@playwright/test';
+import type {Page} from '@playwright/test';
 
 import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {getClipboardContent} from '../../../utils/clipboard';
-import {database} from '../../../utils/constants';
+import {backend, database} from '../../../utils/constants';
 import {
     cleanupMockStreamingFetch,
     setupMockStreamingFetch,
@@ -30,18 +31,58 @@ import {
     ResultTabNames,
 } from './models/QueryEditor';
 
+async function setupPendingNonStreamingQueryMock(page: Page) {
+    let markStarted!: VoidFunction;
+    const started = new Promise<void>((resolve) => {
+        markStarted = resolve;
+    });
+    let finishQuery!: VoidFunction;
+    const queryFinished = new Promise<void>((resolve) => {
+        finishQuery = resolve;
+    });
+    const queryRoute = `${backend}/viewer/json/query?*`;
+
+    await page.route(queryRoute, async (route) => {
+        const body = route.request().postDataJSON() as {action?: string};
+
+        if (body.action === 'cancel-query') {
+            await route.fulfill({json: {version: 8, result: []}});
+            finishQuery();
+            return;
+        }
+
+        markStarted();
+        await queryFinished;
+        await route
+            .fulfill({
+                json: {
+                    error: {severity: 1, message: 'Query was cancelled'},
+                    issues: [],
+                },
+            })
+            .catch(() => undefined);
+    });
+
+    return {
+        async waitUntilStarted() {
+            await started;
+        },
+        async cleanup() {
+            finishQuery();
+            await page.unroute(queryRoute);
+        },
+    };
+}
+
 test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
 
     test.beforeEach(async ({page}) => {
-        const pageQueryParams = {
+        const tenantPage = new TenantPage(page);
+        await tenantPage.gotoQueryEditor({
             schema: database,
             database,
-            databasePage: 'query',
-        };
-
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams, {waitUntil: 'domcontentloaded'});
+        });
     });
 
     test.afterEach(async ({page}) => {
@@ -141,8 +182,10 @@ test.describe('Test Query Editor', async () => {
 
     test('Stop button has distinct view when query is running', async ({page}) => {
         const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+        await setupMockStreamingFetch(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(simpleQuery);
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
@@ -221,6 +264,29 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
+    test('Stopped non-streaming selection does not create a History entry', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'off', 'Query Streaming');
+        const pendingQuery = await setupPendingNonStreamingQueryMock(page);
+        const query = 'SELECT 1;\nSELECT 2;';
+
+        try {
+            await queryEditor.setQuery(query);
+            await queryEditor.selectText(1, 1, 1, 'SELECT 1;'.length + 1);
+            await executeSelectedQueryWithKeybinding(page);
+            await pendingQuery.waitUntilStarted();
+            await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+            await queryEditor.clickStopButton();
+            await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
+
+            await queryEditor.queryTabs.selectTab(QueryTabs.History);
+            await queryEditor.historyQueries.isVisible();
+            await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(0);
+        } finally {
+            await pendingQuery.cleanup();
+        }
+    });
+
     test('Streaming query shows some results and banner when stop button is clicked', async ({
         page,
     }) => {
@@ -290,8 +356,10 @@ test.describe('Test Query Editor', async () => {
 
     test('Stop button appears when query is started via hotkey', async ({page}) => {
         const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+        await setupMockStreamingFetch(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(simpleQuery);
         await queryEditor.focusEditor();
         await executeQueryWithKeybinding(page);
 
@@ -301,8 +369,10 @@ test.describe('Test Query Editor', async () => {
 
     test('Query started via hotkey is terminated when stop button is clicked', async ({page}) => {
         const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+        await setupMockStreamingFetch(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(simpleQuery);
         await queryEditor.focusEditor();
         await executeQueryWithKeybinding(page);
 
@@ -315,8 +385,10 @@ test.describe('Test Query Editor', async () => {
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+        await setupMockStreamingFetch(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(simpleQuery);
         await queryEditor.clickRunButton();
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
 
@@ -424,7 +496,7 @@ test.describe('Test Query Editor', async () => {
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
-        const multiQuery = 'SELECT 1;\nSELECT 2;';
+        const multiQuery = 'SELECT 1 + 2;\nSELECT 20;';
 
         // First verify running the entire query produces two results
         await queryEditor.setQuery(multiQuery);
@@ -446,32 +518,334 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
         await expect(queryEditor.resultTable.getResultTitleCount()).resolves.toBe('1');
+        await expect(queryEditor.resultTable.getCellValue(1, 2)).resolves.toBe('1');
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(1);
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toContain(
+            'SELECT 1 + 2;',
+        );
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toContain('SELECT 20;');
     });
 
-    test('Running selected query via context menu executes only selected part', async ({page}) => {
+    test('Selected-query hotkey executes the highlighted statement without a selection', async ({
+        page,
+    }) => {
         const queryEditor = new QueryEditor(page);
-        const multiQuery = 'SELECT 1;\nSELECT 2;';
+        await queryEditor.setQuery('SELECT 1;\n\nSELECT 2;');
+        await queryEditor.setCursor(3, 3);
 
-        // First verify running the entire query produces two results with tabs
-        await queryEditor.setQuery(multiQuery);
-        await queryEditor.clickRunButton();
-        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
-
-        // Verify there are two result tabs
-        await expect(queryEditor.resultTable.getResultTabsCount()).resolves.toBe(2);
-        await expect(queryEditor.resultTable.getResultTabTitleText(0)).resolves.toBe('Result #1');
-        await expect(queryEditor.resultTable.getResultTabTitleText(1)).resolves.toBe('Result #2');
-
-        // Then verify running only selected part produces one result without tabs
-        await queryEditor.focusEditor();
-        await queryEditor.selectText(1, 1, 1, 9);
-
-        // Use context menu to run selected query
-        await queryEditor.runSelectedQueryViaContextMenu();
+        await expect(queryEditor.getSelectedText()).resolves.toBe('');
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 2;');
+        await executeSelectedQueryWithKeybinding(page);
 
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
-        await expect(queryEditor.resultTable.getResultTitleCount()).resolves.toBe('1');
+        await expect(queryEditor.resultTable.getCellValue(1, 2)).resolves.toContain('2');
+    });
+
+    test('Single executable statement is not highlighted but remains executable', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('; -- leading comment\n\nSELECT 7;\n\n-- trailing comment');
+        await queryEditor.setCursor(3, 3);
+
+        await expect(queryEditor.getSelectedText()).resolves.toBe('');
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
+        await executeSelectedQueryWithKeybinding(page);
+
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(queryEditor.resultTable.getCellValue(1, 2)).resolves.toContain('7');
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(0);
+    });
+
+    test('Selected-query action is unavailable for multiple Monaco selections', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;\nSELECT 2;');
+        await queryEditor.setCursor(2, 3);
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 2;');
+
+        const actionState = await queryEditor.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            if (!editor) {
+                throw new Error('Expected active Monaco editor');
+            }
+
+            editor.setSelections([
+                {
+                    selectionStartLineNumber: 1,
+                    selectionStartColumn: 1,
+                    positionLineNumber: 1,
+                    positionColumn: 7,
+                },
+                {
+                    selectionStartLineNumber: 2,
+                    selectionStartColumn: 1,
+                    positionLineNumber: 2,
+                    positionColumn: 7,
+                },
+            ]);
+
+            return {
+                selectionCount: editor.getSelections()?.length,
+                isSupported: editor.getAction('sendSelectedQuery')?.isSupported(),
+            };
+        });
+
+        expect(actionState).toEqual({selectionCount: 2, isSupported: false});
+    });
+
+    test('Current-statement decoration follows statement-count transitions', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        const firstStatement = 'SELECT 1;';
+        const secondStatement = 'SELECT 2;';
+
+        await queryEditor.setQuery(firstStatement);
+        await queryEditor.setCursor(1, 3);
+
+        await queryEditor.editorTextArea.evaluate(
+            (_, query) => {
+                const editor = window.ydbEditor;
+                const model = editor?.getModel();
+                if (!editor || !model) {
+                    throw new Error('Expected active Monaco editor model');
+                }
+
+                const endPosition = model.getPositionAt(model.getValueLength());
+                editor.executeEdits('test', [
+                    {
+                        range: {
+                            startLineNumber: endPosition.lineNumber,
+                            startColumn: endPosition.column,
+                            endLineNumber: endPosition.lineNumber,
+                            endColumn: endPosition.column,
+                        },
+                        text: `\n${query.secondStatement}`,
+                    },
+                ]);
+            },
+            {secondStatement},
+        );
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe(firstStatement);
+
+        await queryEditor.editorTextArea.evaluate(
+            (_, query) => {
+                const editor = window.ydbEditor;
+                if (!editor) {
+                    throw new Error('Expected active Monaco editor');
+                }
+
+                editor.executeEdits('test', [
+                    {
+                        range: {
+                            startLineNumber: 1,
+                            startColumn: query.firstStatement.length + 1,
+                            endLineNumber: 2,
+                            endColumn: query.secondStatement.length + 1,
+                        },
+                        text: '',
+                    },
+                ]);
+            },
+            {firstStatement, secondStatement},
+        );
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
+    });
+
+    test('Current-statement decoration is restored after a same-model text flush', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        const initialQuery = 'SELECT 1;\nSELECT 2;';
+        const replacementQuery = 'SELECT 3;\nSELECT 4;';
+        const singleStatementQuery = 'SELECT 5;';
+
+        await queryEditor.setQuery(initialQuery);
+        await queryEditor.setCursor(1, 3);
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
+
+        await queryEditor.editorTextArea.evaluate((_, query) => {
+            const editor = window.ydbEditor;
+            if (!editor) {
+                throw new Error('Expected active Monaco editor');
+            }
+
+            editor.setValue(query);
+        }, replacementQuery);
+
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 3;');
+
+        await queryEditor.editorTextArea.evaluate((_, query) => {
+            const editor = window.ydbEditor;
+            if (!editor) {
+                throw new Error('Expected active Monaco editor');
+            }
+
+            editor.setValue(query);
+        }, singleStatementQuery);
+
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
+    });
+
+    test('Current-statement highlight remains immediately after a terminating semicolon', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1; \nSELECT 2;');
+        await queryEditor.setCursor(1, 10);
+
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
+    });
+
+    test('Current-statement highlight excludes whitespace after a terminating semicolon', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1; \nSELECT 2;');
+        await queryEditor.setCursor(1, 11);
+
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBeUndefined();
+    });
+
+    test('Current-statement highlight uses the subtle decoration style', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;\nSELECT 2;');
+        await queryEditor.setCursor(1, 3);
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
+
+        const style = await queryEditor.getCurrentStatementHighlightStyle();
+        expect(style.backgroundColor).toBe(style.expectedBackgroundColor);
+        expect(style.borderBottomWidth).toBe('0px');
+        expect(style.boxShadow).toBe('none');
+        expect(style.textDecorationLine).toBe('none');
+    });
+
+    test('Fragment error navigation uses the original editor position', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;\n\n    SELECT missing_column;\n\nSELECT 2;');
+        await queryEditor.setCursor(3, 12);
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
+
+        await queryEditor.setCursor(5, 1);
+        await expect(queryEditor.getCursorPosition()).resolves.toEqual({lineNumber: 5, column: 1});
+        await queryEditor.clickFirstIssuePosition();
+        await expect
+            .poll(() => queryEditor.getCursorPosition())
+            .toEqual({lineNumber: 3, column: 5});
+    });
+
+    test('Query Settings pragma errors do not navigate the editor', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'off', 'Query Streaming');
+
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changePragmas('PRAGMA InvalidPragma;');
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+        await page.route(`${backend}/viewer/json/query?*`, async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    error: {message: 'Invalid pragma'},
+                    issues: [
+                        {
+                            message: 'Unknown pragma',
+                            position: {row: 1, column: 4},
+                        },
+                    ],
+                }),
+            });
+        });
+
+        const query = 'SELECT 1;\n\nSELECT 2;';
+        await queryEditor.setQuery(query);
+        await queryEditor.selectText(3, 1, 3, 'SELECT 2;'.length + 1);
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
+
+        await queryEditor.setCursor(3, 3);
+        await expect(queryEditor.getCursorPosition()).resolves.toEqual({lineNumber: 3, column: 3});
+        await queryEditor.clickFirstIssuePosition();
+        await expect
+            .poll(() => queryEditor.getCursorPosition())
+            .toEqual({lineNumber: 3, column: 3});
+    });
+
+    test('Current-statement execution does not create a History entry', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;\n\nSELECT 2;');
+        await queryEditor.setCursor(3, 3);
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(0);
+    });
+
+    test('Fragment executions after History navigation do not change existing entries', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        const firstQuery = 'SELECT 11;';
+        const secondQuery = 'SELECT 22;';
+
+        await queryEditor.setQuery(firstQuery);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await queryEditor.setQuery(secondQuery);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.selectQuery(firstQuery);
+        await expect.poll(() => queryEditor.getEditorContent()).toBe(firstQuery);
+        await queryEditor.setCursor(1, 3);
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(2);
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe(secondQuery);
+        await expect(queryEditor.historyQueries.getQueryStatus(0)).resolves.toBe('Completed');
+
+        await queryEditor.historyQueries.selectQuery(secondQuery);
+        await expect.poll(() => queryEditor.getEditorContent()).toBe(secondQuery);
+        const failingFragment = 'SELECT missing_column;';
+        await queryEditor.setQuery(failingFragment);
+        await queryEditor.selectText(1, 1, 1, failingFragment.length + 1);
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+        await expect(queryEditor.historyQueries.getQueryCount()).resolves.toBe(2);
+        await expect(queryEditor.historyQueries.getQueryText(0)).resolves.toBe(secondQuery);
+        await expect(queryEditor.historyQueries.getQueryStatus(0)).resolves.toBe('Completed');
+    });
+
+    test('Cursor movement within one statement avoids full-text reads and decoration writes', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;\nSELECT 2;');
+        await queryEditor.setCursor(1, 3);
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
+
+        await expect(
+            queryEditor.getCurrentStatementUpdateMetricsAfterCursorMove(),
+        ).resolves.toEqual({
+            fullTextReads: 0,
+            currentStatementDecorationWrites: 0,
+        });
     });
 
     test('Results controls collapse and expand functionality', async ({page}) => {

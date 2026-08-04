@@ -19,7 +19,7 @@ import type {
     TransactionMode,
 } from '../types/store/query';
 
-import {isAxiosResponse, isNetworkError} from './response';
+import {isAbortError, isAxiosResponse, isNetworkError, isResponseError} from './response';
 
 export const TRANSACTION_MODES = {
     serializable: 'serializable-read-write',
@@ -298,6 +298,41 @@ export const parseQueryError = (error: unknown): ErrorResponse | string | undefi
 
     return undefined;
 };
+
+function isQueryCancelledErrorInternal(error: unknown, seen: WeakSet<object>): boolean {
+    if (isAbortError(error)) {
+        return true;
+    }
+
+    if (isResponseError(error) && error.isCancelled) {
+        return true;
+    }
+
+    const parsedError = parseQueryError(error);
+    if (isQueryErrorResponse(parsedError) && parsedError.error?.message === 'Query was cancelled') {
+        return true;
+    }
+
+    if (error && typeof error === 'object') {
+        if (seen.has(error)) {
+            return false;
+        }
+        seen.add(error);
+
+        if ('error' in error && isQueryCancelledErrorInternal(error.error, seen)) {
+            return true;
+        }
+        if ('data' in error && isQueryCancelledErrorInternal(error.data, seen)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+export function isQueryCancelledError(error: unknown): boolean {
+    return isQueryCancelledErrorInternal(error, new WeakSet());
+}
 
 export const defaultPragma = 'PRAGMA OrderedColumns;';
 

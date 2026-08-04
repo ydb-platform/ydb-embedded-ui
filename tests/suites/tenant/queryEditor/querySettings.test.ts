@@ -46,14 +46,13 @@ test.describe('Test Query Settings', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
 
     test.beforeEach(async ({page}) => {
-        const pageQueryParams = {
-            schema: database,
-            database,
-            databasePage: 'query',
-        };
+        await setupResourcePoolMock(page);
 
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
+        await tenantPage.gotoQueryEditor({
+            schema: database,
+            database,
+        });
     });
 
     test('Settings dialog opens on Gear click and closes on Cancel', async ({page}) => {
@@ -459,8 +458,6 @@ test.describe('Test Query Settings', async () => {
     });
 
     test('Resource pool dropdown is populated from system view', async ({page}) => {
-        await setupResourcePoolMock(page, ['default', 'olap']);
-
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
@@ -472,8 +469,6 @@ test.describe('Test Query Settings', async () => {
     });
 
     test('Resource pool selection is persisted between dialog opens', async ({page}) => {
-        await setupResourcePoolMock(page, ['default', 'olap']);
-
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
