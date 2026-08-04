@@ -246,6 +246,28 @@ function getDefinitionListValue(container: Locator, label: string) {
     return getDefinitionListRow(container, label).locator('.g-definition-list__definition');
 }
 
+async function expectDefinitionListLabelOnOneLine(container: Locator, label: string) {
+    const termWrapper = getDefinitionListRow(container, label).locator(
+        '.g-definition-list__term-wrapper',
+    );
+
+    const textLineCount = await termWrapper.evaluate((element) => {
+        const textNode = Array.from(element.childNodes).find(
+            (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
+        );
+
+        if (!textNode) {
+            return 0;
+        }
+
+        const range = document.createRange();
+        range.selectNodeContents(textNode);
+        return range.getClientRects().length;
+    });
+
+    expect(textLineCount).toBe(1);
+}
+
 async function expectInfoViewerRowPlaceholder(container: Locator, label: string) {
     const row = getInfoViewerRow(container, label);
 
@@ -627,6 +649,7 @@ test.describe('Blob storage capacity metrics integration', () => {
         const expectedVDiskSize = /1 \/ 22\s*GB/;
         const expectedPDiskSpace = /1 \/ 22\s*GB/;
         const expectedVDiskSlotUsage = '82.3%';
+        const expectedPDiskUsage = '70.5%';
         await setupVDiskPageMocks(page, capacityFixture);
         await setupPDiskInfoMock(page, capacityFixture);
 
@@ -661,18 +684,50 @@ test.describe('Blob storage capacity metrics integration', () => {
         await expect(getDefinitionListValue(groupsVDiskInfo, 'VDisk Slot Usage')).toHaveText(
             expectedVDiskSlotUsage,
         );
+        for (const label of ['VDisk Slot Usage', 'Capacity Alert']) {
+            await expectDefinitionListLabelOnOneLine(groupsVDiskInfo, label);
+        }
+        const nestedPDiskInfo = groupsVDiskPopup.locator('.ydb-definition-list').nth(1);
+        await expect(
+            nestedPDiskInfo
+                .locator('.ydb-definition-list__header')
+                .locator('xpath=.//*[normalize-space(text()[1])="PDisk"]'),
+        ).toBeVisible();
+        await expect(getDefinitionListValue(nestedPDiskInfo, 'PDisk Usage')).toHaveText(
+            expectedPDiskUsage,
+        );
+        for (const label of ['PDisk Usage', 'Slot Size In Units', 'Capacity Alert']) {
+            await expectDefinitionListLabelOnOneLine(nestedPDiskInfo, label);
+        }
         await closeDiskPopup(page, groupsVDiskPopup);
 
         const groupsPDisk = page.locator('.ydb-storage-disks__pdisk-progress-bar').first();
         await groupsPDisk.hover();
         const groupsPDiskPopup = await waitForDiskPopup(page, 'Go to PDisk');
         const groupsPDiskInfo = await getFirstTitledDefinitionList(groupsPDiskPopup, 'PDisk');
-        for (const label of ['Space', 'Slots', 'Slot Size In Units', 'Capacity Alert']) {
+        for (const label of [
+            'Space',
+            'PDisk Usage',
+            'Slots',
+            'Slot Size In Units',
+            'Capacity Alert',
+        ]) {
             await expect(getDefinitionListRow(groupsPDiskInfo, label)).toBeVisible();
         }
         await expect(getDefinitionListValue(groupsPDiskInfo, 'Space')).toHaveText(
             expectedPDiskSpace,
         );
+        await expect(getDefinitionListValue(groupsPDiskInfo, 'PDisk Usage')).toHaveText(
+            expectedPDiskUsage,
+        );
+        for (const label of ['PDisk Usage', 'Slot Size In Units', 'Capacity Alert']) {
+            await expectDefinitionListLabelOnOneLine(groupsPDiskInfo, label);
+        }
+        await expect(
+            getDefinitionListRow(groupsPDiskInfo, 'PDisk Usage').locator(
+                '.g-definition-list__term-container',
+            ),
+        ).toHaveCSS('max-width', '220px');
         const pDiskSlotSizeText = await getDefinitionListValue(
             groupsPDiskInfo,
             'Slot Size In Units',
@@ -682,6 +737,9 @@ test.describe('Blob storage capacity metrics integration', () => {
 
         const pDiskInfo = page.locator('.ydb-pdisk-page__info');
         await expect(pDiskInfo.getByText('PDisk Usage', {exact: true})).toBeVisible();
+        await expect(
+            getInfoViewerRow(pDiskInfo, 'PDisk Usage').locator('.info-viewer__value'),
+        ).toHaveText(expectedPDiskUsage);
         await expect(pDiskInfo.getByText('Slot Size In Units', {exact: true})).toBeVisible();
         await expect(
             getInfoViewerRow(pDiskInfo, 'Space').locator('.info-viewer__value'),
@@ -743,6 +801,9 @@ test.describe('Blob storage capacity metrics integration', () => {
         await expect(getDefinitionListValue(nodesVDiskInfo, 'VDisk Slot Usage')).toHaveText(
             expectedVDiskSlotUsage,
         );
+        for (const label of ['VDisk Slot Usage', 'Capacity Alert']) {
+            await expectDefinitionListLabelOnOneLine(nodesVDiskInfo, label);
+        }
         await closeDiskPopup(page, nodesVDiskPopup);
 
         const nodesPDisk = page
@@ -756,9 +817,15 @@ test.describe('Blob storage capacity metrics integration', () => {
         await expect(getDefinitionListValue(nodesPDiskInfo, 'Space')).toHaveText(
             expectedPDiskSpace,
         );
+        await expect(getDefinitionListValue(nodesPDiskInfo, 'PDisk Usage')).toHaveText(
+            expectedPDiskUsage,
+        );
         await expect(getDefinitionListValue(nodesPDiskInfo, 'Slot Size In Units')).toHaveText(
             pDiskSlotSizeText,
         );
+        for (const label of ['PDisk Usage', 'Slot Size In Units', 'Capacity Alert']) {
+            await expectDefinitionListLabelOnOneLine(nodesPDiskInfo, label);
+        }
     });
 
     test('requests Capacity Alert for slot-only Nodes coloring', async ({page}) => {
@@ -890,7 +957,7 @@ test.describe('Blob storage capacity metrics integration', () => {
         await groupsPDisk.hover();
         const pDiskPopup = await waitForDiskPopup(page, 'Go to PDisk');
         const pDiskPopupInfo = await getFirstTitledDefinitionList(pDiskPopup, 'PDisk');
-        for (const label of ['Slot Size In Units', 'Capacity Alert']) {
+        for (const label of ['PDisk Usage', 'Slot Size In Units', 'Capacity Alert']) {
             await expectDefinitionListRowPlaceholder(pDiskPopupInfo, label);
         }
 

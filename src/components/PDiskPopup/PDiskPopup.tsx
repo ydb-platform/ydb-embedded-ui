@@ -72,7 +72,7 @@ export const preparePDiskData = (
         pdiskData.push(
             ...toDefinitionListItems(
                 getPDiskCapacityInfoItems(data, {
-                    withUsage: false,
+                    withUsage: true,
                     withCapacityAlert: true,
                 }),
             ),
@@ -200,7 +200,7 @@ export const PDiskPopup = ({data}: PDiskPopupProps) => {
             items={info}
             headerLabels={headerLabels}
             footer={footer}
-            nameMaxWidth={100}
+            nameMaxWidth={capacityMetricsEnabled ? 220 : 100}
         />
     );
 };

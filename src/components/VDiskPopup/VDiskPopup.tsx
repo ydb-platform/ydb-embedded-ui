@@ -512,6 +512,7 @@ export const VDiskPopup = ({data, onClose}: VDiskPopupProps) => {
 
     const vdiskId = isFullData ? data.StringifiedId : undefined;
     const pdiskId = isFullData ? data.PDisk?.StringifiedId : undefined;
+    const nameMaxWidth = isFullData && capacityMetricsEnabled ? 220 : 100;
 
     return (
         <div className={b()}>
@@ -521,7 +522,7 @@ export const VDiskPopup = ({data, onClose}: VDiskPopupProps) => {
                 titleSuffix={{title: vdiskId ?? EMPTY_DATA_PLACEHOLDER, copyText: vdiskId}}
                 items={vdiskInfo}
                 headerLabels={vdiskHeaderLabels}
-                nameMaxWidth={100}
+                nameMaxWidth={nameMaxWidth}
                 footer={vdiskFooter}
             />
             {pdiskInfo && isViewerUser && (
@@ -534,7 +535,7 @@ export const VDiskPopup = ({data, onClose}: VDiskPopupProps) => {
                         items={pdiskInfo}
                         headerLabels={pdiskHeaderLabels}
                         footer={pdiskFooter}
-                        nameMaxWidth={100}
+                        nameMaxWidth={nameMaxWidth}
                     />
                 </React.Fragment>
             )}
