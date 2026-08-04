@@ -329,6 +329,7 @@ export function getStorageTopGroupsColumns(capacityMetricsEnabled = false): Stor
         typeColumn,
         erasureColumn,
         getVDiskSlotUsageColumn<PreparedStorageGroup>(),
+        getCapacityAlertColumn<PreparedStorageGroup>(),
         groupSizeInUnitsColumn,
         usedColumn,
         limitColumn,

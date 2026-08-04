@@ -1017,10 +1017,28 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await expect(
             topGroupsTable.getByRole('columnheader', {name: 'Group Size In Units', exact: true}),
         ).toBeVisible();
+        const headerTexts = (await topGroupsTable.getByRole('columnheader').allTextContents()).map(
+            (text) => text.replace(/\s+/g, ' ').trim(),
+        );
+        expect(headerTexts).toEqual([
+            'Group ID',
+            'Type',
+            'Erasure',
+            'VDisk Slot Usage',
+            'Capacity Alert',
+            'Group Size In Units',
+            'Used',
+            'Limit',
+        ]);
         const topGroupsDataRows = topGroupsTable.locator('tbody tr.data-table__row');
 
         await expect(topGroupsDataRows).toHaveCount(1);
-        await expect(topGroupsDataRows.first().getByText('82.25%', {exact: true})).toBeVisible();
+        await expect(
+            topGroupsDataRows.first().locator('.g-label_theme_danger').getByText('82.25%', {
+                exact: true,
+            }),
+        ).toBeVisible();
+        await expect(topGroupsDataRows.first().getByText('ORANGE', {exact: true})).toBeVisible();
         await expect(topGroupsDataRows.first().getByText('2', {exact: true})).toBeVisible();
 
         expect(storageGroupsRequestUrl).toBeDefined();

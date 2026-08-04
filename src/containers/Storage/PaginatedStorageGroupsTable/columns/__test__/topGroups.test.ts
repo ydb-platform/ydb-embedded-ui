@@ -48,9 +48,12 @@ describe('Top Groups capacity metrics', () => {
             'MediaType',
             'Erasure',
             'MaxVDiskSlotUsage',
+            'CapacityAlert',
             'GroupSizeInUnits',
             'Used',
             'Limit',
         ]);
+        const fieldsRequired = getTopGroupsTableConfig(true).fieldsRequired;
+        expect(new Set(fieldsRequired).size).toBe(fieldsRequired.length);
     });
 });
