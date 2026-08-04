@@ -2,5 +2,7 @@
   "context_no-data": "N/D",
   "context_all-mode-health-healthy": "healthy",
   "context_all-mode-health-issues": "issues detected",
-  "context_all-mode-accessible-name": "VDisk {{vdiskId}}. Health: {{health}}. State: {{state}}. Capacity alert: {{capacityAlert}}. Front queues: {{frontQueues}}. Fresh compaction: {{freshCompaction}}. Level compaction: {{levelCompaction}}. Allocated: {{allocatedPercent}}."
+  "context_all-mode-replication-complete": "complete",
+  "context_all-mode-replication-in-progress": "in progress",
+  "context_all-mode-accessible-name": "VDisk {{vdiskId}}. Health: {{health}}. State: {{state}}. Replication: {{replication}}. Capacity alert: {{capacityAlert}}. Front queues: {{frontQueues}}. Fresh compaction: {{freshCompaction}}. Level compaction: {{levelCompaction}}. Allocated: {{allocatedPercent}}."
 }

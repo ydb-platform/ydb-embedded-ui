@@ -163,6 +163,7 @@ describe('VDisk', () => {
             data: {
                 StringifiedId: '1-1-0-0-0',
                 VDiskState: EVDiskState.OK,
+                Replicated: true,
                 CapacityAlert: ECapacityAlert.GREEN,
                 FrontQueues: EFlag.Green,
                 SatisfactionRank: {
@@ -181,7 +182,7 @@ describe('VDisk', () => {
 
         expect(
             screen.getByRole('link', {
-                name: 'VDisk 1-1-0-0-0. Health: healthy. State: OK. Capacity alert: GREEN. Front queues: Green. Fresh compaction: Green. Level compaction: Green. Allocated: 50%.',
+                name: 'VDisk 1-1-0-0-0. Health: healthy. State: OK. Replication: complete. Capacity alert: GREEN. Front queues: Green. Fresh compaction: Green. Level compaction: Green. Allocated: 50%.',
             }),
         ).toBeInTheDocument();
     });
@@ -209,9 +210,26 @@ describe('VDisk', () => {
 
         expect(
             screen.getByRole('link', {
-                name: 'VDisk 2-1-0-0-1. Health: issues detected. State: Initial. Capacity alert: LIGHT_YELLOW. Front queues: Yellow. Fresh compaction: Orange. Level compaction: Red. Allocated: 75%.',
+                name: 'VDisk 2-1-0-0-1. Health: issues detected. State: Initial. Replication: N/D. Capacity alert: LIGHT_YELLOW. Front queues: Yellow. Fresh compaction: Orange. Level compaction: Red. Allocated: 75%.',
             }),
         ).toBeInTheDocument();
+    });
+
+    test('exposes active replication in the All-mode link accessible name', () => {
+        renderVDisk({
+            data: {
+                StringifiedId: '3-1-0-0-2',
+                Replicated: false,
+            },
+            getDisplayState: () => ({
+                severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue,
+                icon: undefined,
+                modeModifier: 'mode-all',
+                allModeHasIssues: false,
+            }),
+        });
+
+        expect(screen.getByRole('link', {name: /Replication: in progress/})).toBeInTheDocument();
     });
 });
 

@@ -41,11 +41,20 @@ function getAccessibleName(
         Number.isFinite(data.AllocatedPercent) && Number(data.AllocatedPercent) >= 0
             ? `${data.AllocatedPercent}%`
             : noData;
+    const replication =
+        data.Replicated === undefined
+            ? noData
+            : i18n(
+                  data.Replicated
+                      ? 'context_all-mode-replication-complete'
+                      : 'context_all-mode-replication-in-progress',
+              );
 
     return i18n('context_all-mode-accessible-name', {
         vdiskId: data.StringifiedId || noData,
         health,
         state: data.VDiskState || noData,
+        replication,
         capacityAlert: data.CapacityAlert || noData,
         frontQueues: data.FrontQueues || noData,
         freshCompaction: data.SatisfactionRank?.FreshRank?.Flag || noData,
