@@ -9,6 +9,7 @@ import {
     ALL_GREEN_VDISK_INDEX,
     MISSING_FRONT_QUEUES_VDISK_INDEX,
     MISSING_WHITEBOARD_VDISK_INDEX,
+    createMockStorageGroupsResponse,
 } from './mockStorageGroups';
 import {DATABASE, setupVDiskColoringMocks} from './vdiskColoringMocks';
 
@@ -316,6 +317,43 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
     });
 
     test.describe('All mode', () => {
+        test('clamps allocation markers to their fixed VDisk cells', async ({page}) => {
+            const response = createMockStorageGroupsResponse();
+            const storageGroup = response.StorageGroups?.[0];
+
+            if (!storageGroup) {
+                throw new Error('Cannot prepare a single-VDisk storage group');
+            }
+
+            storageGroup.VDisks = storageGroup.VDisks?.slice(0, 1);
+            response.TotalGroups = 1;
+            response.FoundGroups = 1;
+            response.StorageGroups = [storageGroup];
+
+            await page.setViewportSize({width: 1500, height: 1000});
+            await enableExpertMode(page, VDisksGroupBy.All);
+            await setupVDiskColoringMocks(page, response);
+            await gotoStoragePage(page, VDisksGroupBy.All);
+
+            const vDiskItem = getVDiskItems(getStorageGroupRow(page, 0)).first();
+            const allocationMarker = vDiskItem.locator('.ydb-storage-disks__vdisk-size-indicator');
+
+            await expect(vDiskItem).toBeVisible();
+            await expect(allocationMarker).toBeVisible();
+
+            const [vDiskItemBox, allocationMarkerBox] = await Promise.all([
+                vDiskItem.boundingBox(),
+                allocationMarker.boundingBox(),
+            ]);
+
+            if (!vDiskItemBox || !allocationMarkerBox) {
+                throw new Error('Cannot compare All-mode VDisk and allocation marker boxes');
+            }
+
+            expect(vDiskItemBox.width).toBe(65);
+            expect(allocationMarkerBox.width).toBeLessThanOrEqual(65);
+        });
+
         test('uses State visuals, keeps fill without labels, and preserves replication', async ({
             page,
         }) => {
