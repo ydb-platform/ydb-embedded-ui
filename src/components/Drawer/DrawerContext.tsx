@@ -55,7 +55,6 @@ export const DrawerContextProvider = ({
     const containerRef = React.useRef<HTMLDivElement>(null);
     const itemContainerRef = React.useRef<HTMLDivElement>(null);
     const rightInset = normalizeRightInset(controlledRightInset ?? internalRightInset);
-    const containerWidth = Math.max(0, measuredContainerWidth - rightInset);
     const rightInsetRef = React.useRef(rightInset);
     rightInsetRef.current = rightInset;
 
@@ -105,13 +104,13 @@ export const DrawerContextProvider = ({
     // Memoize the context value to prevent unnecessary re-renders
     const value = React.useMemo(
         () => ({
-            containerWidth,
+            containerWidth: measuredContainerWidth,
             setContainerWidth,
             itemContainerRef,
             rightInset,
             setRightInset,
         }),
-        [containerWidth, rightInset, setRightInset],
+        [measuredContainerWidth, rightInset, setRightInset],
     );
     const itemContainerStyle = React.useMemo<React.CSSProperties | undefined>(() => {
         if (rightInset === 0) {

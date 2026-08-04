@@ -58,6 +58,7 @@ const DrawerPaneContentWrapper = ({
 
     const drawerRef = React.useRef<HTMLDivElement>(null);
     const {containerWidth, itemContainerRef, rightInset} = useDrawerContext();
+    const availableWidth = Math.max(0, containerWidth - rightInset);
 
     const derivedDrawerWidth = React.useMemo(() => {
         return normalizeDrawerWidthFromSavedString({
@@ -70,24 +71,25 @@ const DrawerPaneContentWrapper = ({
         });
     }, [containerWidth, defaultWidth, isPercentageWidth, savedWidthString]);
 
-    const drawerWidth = userDrawerWidth ?? derivedDrawerWidth;
+    const requestedDrawerWidth = userDrawerWidth ?? derivedDrawerWidth;
 
     // Calculate drawer width based on container width percentage if specified
-    const calculatedWidth = React.useMemo(() => {
+    const requestedWidth = React.useMemo(() => {
         if (isPercentageWidth && containerWidth > 0) {
             return Math.round(
-                (containerWidth * (drawerWidth || DEFAULT_DRAWER_WIDTH_PERCENTS)) / 100,
+                (containerWidth * (requestedDrawerWidth || DEFAULT_DRAWER_WIDTH_PERCENTS)) / 100,
             );
         }
-        return drawerWidth || DEFAULT_DRAWER_WIDTH;
-    }, [containerWidth, isPercentageWidth, drawerWidth]);
+        return requestedDrawerWidth || DEFAULT_DRAWER_WIDTH;
+    }, [containerWidth, isPercentageWidth, requestedDrawerWidth]);
+    const calculatedWidth = Math.min(requestedWidth, availableWidth);
 
     const drawerOverlayStyle = React.useMemo<React.CSSProperties>(() => {
         return {
             overflow: 'hidden',
-            ...(containerWidth > 0 ? {width: containerWidth} : {}),
+            width: availableWidth,
         };
-    }, [containerWidth]);
+    }, [availableWidth]);
 
     React.useEffect(() => {
         if (!detectClickOutside || !isVisible) {
@@ -175,7 +177,7 @@ const DrawerPaneContentWrapper = ({
             style={drawerOverlayStyle}
             container={itemContainer}
             resizable
-            maxSize={containerWidth || undefined}
+            maxSize={availableWidth}
             size={calculatedWidth}
             onResizeEnd={handleResizeDrawer}
             disableBodyScrollLock
