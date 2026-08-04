@@ -505,6 +505,45 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(onAfterOpen).not.toHaveBeenCalled();
     });
 
+    test('does not open after leaving the database during running-query confirmation', async () => {
+        const onAfterOpen = jest.fn();
+        const {activeTabId, history, result, store} = renderOpenExternalQueryHook({
+            runningInput: 'SELECT running;',
+        });
+        const abort = registerRunningQuery(activeTabId);
+        const runningConfirmation = createDeferred<boolean>();
+        showModal.mockReturnValueOnce(runningConfirmation.promise as never);
+
+        act(() => {
+            result.current({
+                title: 'Replacement',
+                input: 'SELECT replacement;',
+                onAfterOpen,
+            });
+        });
+
+        await waitFor(() => {
+            expect(showModal).toHaveBeenCalledWith(RUNNING_QUERY_DIALOG, {
+                id: RUNNING_QUERY_DIALOG,
+            });
+        });
+        await act(async () => {
+            history.push('/home');
+            store.dispatch(setQueryResult({tabId: activeTabId, result: undefined}));
+        });
+        await act(async () => {
+            runningConfirmation.resolve(true);
+            await runningConfirmation.promise;
+        });
+
+        expect(sendQuery).not.toHaveBeenCalled();
+        expect(abort).not.toHaveBeenCalled();
+        expect(selectUserInput(store.getState())).toBe('SELECT running;');
+        expect(history.location.pathname).toBe('/home');
+        expect(history.location.search).toBe('');
+        expect(onAfterOpen).not.toHaveBeenCalled();
+    });
+
     test('does not overwrite edits made while server cancellation is pending', async () => {
         const onAfterOpen = jest.fn();
         const {activeTabId, history, result, store} = renderOpenExternalQueryHook({
