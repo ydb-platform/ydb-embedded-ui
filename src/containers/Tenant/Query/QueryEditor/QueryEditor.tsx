@@ -607,8 +607,7 @@ export default function QueryEditor({
 
             const {tabId, queryId, startTime} = execution;
 
-            const metricaParams = {actionType, ...querySettings};
-            reachExplainQueryMetricaGoals(actionType, metricaParams);
+            reachExplainQueryMetricaGoals(actionType, querySettings);
 
             const query = sendQuery({
                 tabId,

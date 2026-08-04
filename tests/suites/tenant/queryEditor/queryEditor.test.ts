@@ -290,9 +290,23 @@ test.describe('Test Query Editor', async () => {
             );
             await expect(queryEditor.hasExplainActionDropdown()).resolves.toBe(false);
             await expect(queryEditor.getQueryActionsGap()).resolves.toBe('12px');
-            await expect(queryEditor.getQueryActionsLocator()).toHaveScreenshot(
-                `query-actions-${theme}.png`,
-            );
+
+            const queryActionsBoundingBox = await queryEditor
+                .getQueryActionsLocator()
+                .boundingBox();
+            if (!queryActionsBoundingBox) {
+                throw new Error('Query actions bounding box is unavailable');
+            }
+
+            // Locator screenshots round fractional bounds outwards and can gain an empty top row.
+            await expect(page).toHaveScreenshot(`query-actions-${theme}.png`, {
+                clip: {
+                    x: Math.ceil(queryActionsBoundingBox.x),
+                    y: Math.ceil(queryActionsBoundingBox.y),
+                    width: Math.ceil(queryActionsBoundingBox.width),
+                    height: Math.round(queryActionsBoundingBox.height),
+                },
+            });
         });
     }
 

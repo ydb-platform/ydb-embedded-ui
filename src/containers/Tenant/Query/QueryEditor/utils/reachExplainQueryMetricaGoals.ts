@@ -5,9 +5,14 @@ import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 type MetricaParams = NonNullable<Parameters<typeof reachMetricaGoal>[1]>;
 
 export function reachExplainQueryMetricaGoals(actionType: QueryAction, params: MetricaParams) {
-    reachMetricaGoal('runQuery', params);
+    const metricaParams = {
+        ...params,
+        actionType: actionType === QUERY_ACTIONS.explainAnalyze ? 'explainAnalyze' : actionType,
+    };
+
+    reachMetricaGoal('runQuery', metricaParams);
 
     if (actionType === QUERY_ACTIONS.explainAnalyze) {
-        reachMetricaGoal('explainAnalyzeQuery', params);
+        reachMetricaGoal('explainAnalyzeQuery', metricaParams);
     }
 }
