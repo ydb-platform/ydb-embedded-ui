@@ -203,7 +203,7 @@ function Authentication({closable = false}: AuthenticationProps) {
                     size="l"
                     disabled={Boolean(!login || loginError || passwordError)}
                     loading={isLoading}
-                    className={b('button-sign-in')}
+                    className={b('button-sign-in', undefined, 'brand-button')}
                 >
                     Sign in
                 </Button>

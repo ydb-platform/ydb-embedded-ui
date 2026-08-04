@@ -168,6 +168,7 @@ export const TenantsTable = ({
             return (
                 <Button
                     view="action"
+                    className="brand-button"
                     onClick={() => uiFactory.onCreateDB?.({clusterName, domainRoot})}
                 >
                     <Icon data={CirclePlus} />
