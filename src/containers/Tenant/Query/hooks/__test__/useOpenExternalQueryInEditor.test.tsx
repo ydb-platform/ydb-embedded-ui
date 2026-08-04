@@ -166,6 +166,24 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(getSearchParam(history.location.search, 'queryTab')).toBe('newQuery');
     });
 
+    test('preserves the environment prefix when already on the Query page', async () => {
+        const {history, result} = renderOpenExternalQueryHook({
+            isMultiTabEnabled: true,
+            initialLocation:
+                '/cloud-prod/database?database=%2FRoot%2Fdb&databasePage=query&queryTab=saved',
+        });
+        const push = jest.spyOn(history, 'push');
+
+        await act(async () => {
+            await result.current({title: 'Select query', input: 'SELECT 1;'});
+        });
+
+        expect(push).not.toHaveBeenCalled();
+        expect(history.location.pathname).toBe('/cloud-prod/database');
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('query');
+        expect(getSearchParam(history.location.search, 'queryTab')).toBe('newQuery');
+    });
+
     test('does not change query state or navigate without a selected database', async () => {
         const onAfterOpen = jest.fn();
         const {history, result, store} = renderOpenExternalQueryHook({
@@ -501,6 +519,61 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(abort).not.toHaveBeenCalled();
         expect(selectUserInput(store.getState())).toBe('SELECT edited while confirming;');
         expect(selectResult(store.getState())?.isLoading).toBe(true);
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('diagnostics');
+        expect(onAfterOpen).not.toHaveBeenCalled();
+    });
+
+    test('does not stop a different query started during running-query confirmation', async () => {
+        const onAfterOpen = jest.fn();
+        const {activeTabId, history, result, store} = renderOpenExternalQueryHook({
+            runningInput: 'SELECT first;',
+        });
+        registerRunningQuery(activeTabId);
+        const runningConfirmation = createDeferred<boolean>();
+        showModal.mockReturnValueOnce(runningConfirmation.promise as never);
+
+        act(() => {
+            result.current({
+                title: 'Replacement',
+                input: 'SELECT replacement;',
+                onAfterOpen,
+            });
+        });
+
+        await waitFor(() => {
+            expect(showModal).toHaveBeenCalledWith(RUNNING_QUERY_DIALOG, {
+                id: RUNNING_QUERY_DIALOG,
+            });
+        });
+        const nextQuery = 'SELECT second;';
+        const nextQueryAbort = registerRunningQuery(activeTabId);
+        const nextResult = {
+            executionId: 'next-execution',
+            type: 'execute' as const,
+            queryId: 'next-query',
+            isLoading: true,
+            startTime: 2,
+        };
+        await act(async () => {
+            store.dispatch(changeUserInput({input: nextQuery}));
+            store.dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: nextQuery}));
+            store.dispatch(setIsDirty(false));
+            store.dispatch(
+                setQueryResult({
+                    tabId: activeTabId,
+                    result: nextResult,
+                }),
+            );
+        });
+        await act(async () => {
+            runningConfirmation.resolve(true);
+            await runningConfirmation.promise;
+        });
+
+        expect(sendQuery).not.toHaveBeenCalled();
+        expect(nextQueryAbort).not.toHaveBeenCalled();
+        expect(selectUserInput(store.getState())).toBe(nextQuery);
+        expect(selectResult(store.getState())?.queryId).toBe('next-query');
         expect(getSearchParam(history.location.search, 'databasePage')).toBe('diagnostics');
         expect(onAfterOpen).not.toHaveBeenCalled();
     });

@@ -1,9 +1,9 @@
 import React from 'react';
 
-import {useHistory, useLocation} from 'react-router-dom';
+import {useHistory, useLocation, useRouteMatch} from 'react-router-dom';
 import {v4 as uuidv4} from 'uuid';
 
-import {getLocationObjectFromHref, getTenantPath, parseQuery} from '../../../../routes';
+import routes, {createHref, getLocationObjectFromHref, parseQuery} from '../../../../routes';
 import {cancelQueryApi} from '../../../../store/reducers/cancelQuery';
 import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {
@@ -48,6 +48,10 @@ interface ExternalQueryDestination {
 interface ExternalQueryOpenRequest {
     query: ExternalQueryToOpen;
     destination: ExternalQueryDestination;
+    confirmedExecution?: {
+        activeTabId: string | undefined;
+        queryId: string;
+    };
 }
 
 function getDatabaseFromQueryParams(queryParams: ReturnType<typeof parseQuery>) {
@@ -59,6 +63,8 @@ export function useOpenExternalQueryInEditor() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
     const location = useLocation();
+    const tenantRouteMatch = useRouteMatch<{environment?: string}>(routes.tenant);
+    const routeEnvironment = tenantRouteMatch?.params.environment;
     const [sendCancelQuery] = cancelQueryApi.useCancelQueryMutation();
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
     const activeTabId = useTypedSelector(selectActiveTabId);
@@ -105,13 +111,17 @@ export function useOpenExternalQueryInEditor() {
             dispatch(setIsDirty(false));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
 
-            const queryPath = getTenantPath({
-                ...queryParams,
-                database,
-                name: undefined,
-                [TENANT_PAGE]: TENANT_PAGES_IDS.query,
-                [TenantTabsGroups.queryTab]: TENANT_QUERY_TABS_ID.newQuery,
-            });
+            const queryPath = createHref(
+                routes.tenant,
+                {environment: routeEnvironment},
+                {
+                    ...queryParams,
+                    database,
+                    name: undefined,
+                    [TENANT_PAGE]: TENANT_PAGES_IDS.query,
+                    [TenantTabsGroups.queryTab]: TENANT_QUERY_TABS_ID.newQuery,
+                },
+            );
             const queryPathname = getLocationObjectFromHref(queryPath).pathname;
             const isQueryEditorLocation =
                 history.location.pathname === queryPathname &&
@@ -123,7 +133,7 @@ export function useOpenExternalQueryInEditor() {
 
             onAfterOpen?.();
         },
-        [database, dispatch, history, isMultiTabEnabled, queryParams],
+        [database, dispatch, history, isMultiTabEnabled, queryParams, routeEnvironment],
     );
 
     const isDestinationCurrent = React.useCallback(
@@ -139,9 +149,28 @@ export function useOpenExternalQueryInEditor() {
         [history],
     );
 
-    const stopRunningQueryAndOpen = React.useCallback(
-        async ({query, destination}: ExternalQueryOpenRequest) => {
+    const isRequestContextCurrent = React.useCallback(
+        ({destination, confirmedExecution}: ExternalQueryOpenRequest) => {
             if (!isDestinationCurrent(destination)) {
+                return false;
+            }
+            if (!confirmedExecution) {
+                return true;
+            }
+
+            const currentEditorState = latestEditorState.current;
+            return (
+                currentEditorState.activeTabId === confirmedExecution.activeTabId &&
+                currentEditorState.result?.queryId === confirmedExecution.queryId
+            );
+        },
+        [isDestinationCurrent],
+    );
+
+    const stopRunningQueryAndOpen = React.useCallback(
+        async (request: ExternalQueryOpenRequest) => {
+            const {query} = request;
+            if (!isRequestContextCurrent(request)) {
                 return;
             }
 
@@ -190,7 +219,7 @@ export function useOpenExternalQueryInEditor() {
                 }
             }
 
-            if (!isDestinationCurrent(destination)) {
+            if (!isRequestContextCurrent(request)) {
                 return;
             }
 
@@ -200,9 +229,9 @@ export function useOpenExternalQueryInEditor() {
             activeTabId,
             currentInput,
             isCurrentTabDirty,
-            isDestinationCurrent,
             isMultiTabEnabled,
             isQueryRunning,
+            isRequestContextCurrent,
             openExternalQueryInEditor,
             result?.queryId,
             result?.streamingStatus,
@@ -240,6 +269,10 @@ export function useOpenExternalQueryInEditor() {
                     search: history.location.search,
                     hash: history.location.hash,
                 },
+                confirmedExecution:
+                    !isMultiTabEnabled && isQueryRunning && result
+                        ? {activeTabId, queryId: result.queryId}
+                        : undefined,
             };
 
             if (!isMultiTabEnabled && isQueryRunning) {
@@ -253,6 +286,6 @@ export function useOpenExternalQueryInEditor() {
 
             latestOpenExternalQueryInEditorWithConfirmation.current(request);
         },
-        [database, history, isMultiTabEnabled, isQueryRunning],
+        [activeTabId, database, history, isMultiTabEnabled, isQueryRunning, result],
     );
 }
