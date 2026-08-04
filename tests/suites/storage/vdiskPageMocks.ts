@@ -18,7 +18,6 @@ export const LONG_HOST = 'storage-node-1273683y-1273683y-1273683y.ydb';
 export const LONG_PDISK_ID = '1000-1012';
 
 export interface SetupVDiskPageMocksOptions {
-    capacityMetricsAvailable?: boolean;
     capacityVersions?: {storageGroups: number; viewerNodes: number};
     withCapacityMetrics?: boolean;
     datacenter?: string;
@@ -303,16 +302,9 @@ async function setupMonitoringUserMock(page: Page, isViewerAllowed = true) {
 
 async function setupCapabilitiesMock(
     page: Page,
-    {
-        capacityMetricsAvailable = true,
-        capacityVersions,
-    }: Pick<SetupVDiskPageMocksOptions, 'capacityMetricsAvailable' | 'capacityVersions'> = {},
+    {capacityVersions}: Pick<SetupVDiskPageMocksOptions, 'capacityVersions'> = {},
 ) {
-    const versions =
-        capacityVersions ??
-        (capacityMetricsAvailable
-            ? {storageGroups: 10, viewerNodes: 20}
-            : {storageGroups: 9, viewerNodes: 19});
+    const versions = capacityVersions ?? {storageGroups: 10, viewerNodes: 20};
 
     await page.route('**/viewer/capabilities*', async (route) => {
         await route.fulfill({

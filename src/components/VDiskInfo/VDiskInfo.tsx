@@ -16,10 +16,6 @@ import {getDataSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
-import {
-    getVDiskCapacityInfoItems,
-    toDefinitionListItems,
-} from '../DiskCapacityInfo/DiskCapacityInfo';
 import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
@@ -27,6 +23,7 @@ import {StatusIcon} from '../StatusIcon/StatusIcon';
 import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
+import {getVDiskCapacityColumns} from './getVDiskCapacityColumns';
 import {vDiskInfoKeyset} from './i18n';
 
 import './VDiskInfo.scss';
@@ -79,61 +76,14 @@ export function VDiskInfo<T extends PreparedVDisk>({
         Recipient,
     } = data || {};
 
-    const leftColumn: YDBDefinitionListItem[] = [];
-    const rightColumn: YDBDefinitionListItem[] = [];
+    const capacityColumns = capacityMetricsEnabled
+        ? getVDiskCapacityColumns({data, isViewerUser})
+        : undefined;
+    const leftColumn: YDBDefinitionListItem[] = capacityColumns?.leftColumn ?? [];
+    const rightColumn: YDBDefinitionListItem[] = capacityColumns?.rightColumn ?? [];
     const linksColumn = capacityMetricsEnabled ? leftColumn : rightColumn;
 
-    if (capacityMetricsEnabled) {
-        if (!isNil(StoragePoolName)) {
-            leftColumn.push({name: vDiskInfoKeyset('pool-name'), content: StoragePoolName});
-        }
-        if (!isNil(VDiskSlotId)) {
-            leftColumn.push({name: vDiskInfoKeyset('slot-id'), content: VDiskSlotId});
-        }
-        if (!isNil(Kind)) {
-            leftColumn.push({name: vDiskInfoKeyset('kind'), content: Kind});
-        }
-
-        const capacityItems = getVDiskCapacityInfoItems(data, {withRawUsage: true});
-        const groupSizeItem = capacityItems.find(({id}) => id === 'group-size-in-units');
-        const runtimeCapacityItems = capacityItems.filter(({id}) => id !== 'group-size-in-units');
-
-        if (groupSizeItem) {
-            leftColumn.push(...toDefinitionListItems([groupSizeItem]));
-        }
-        if (!isNil(Guid)) {
-            leftColumn.push({name: vDiskInfoKeyset('guid'), content: Guid});
-        }
-        if (!isNil(IncarnationGuid)) {
-            leftColumn.push({name: vDiskInfoKeyset('incarnation-guid'), content: IncarnationGuid});
-        }
-        if (!isNil(InstanceGuid)) {
-            leftColumn.push({name: vDiskInfoKeyset('instance-guid'), content: InstanceGuid});
-        }
-        if (!isNil(PDiskId)) {
-            const pDiskPath =
-                isViewerUser && !isNil(NodeId) ? getPDiskPagePath(PDiskId, NodeId) : undefined;
-
-            const content = pDiskPath ? (
-                <InternalLink to={pDiskPath}>{PDiskId}</InternalLink>
-            ) : (
-                PDiskId
-            );
-
-            leftColumn.push({
-                name: vDiskInfoKeyset('label_pdisk-id'),
-                content,
-            });
-        }
-
-        if (!isNil(VDiskState)) {
-            rightColumn.push({
-                name: vDiskInfoKeyset('state-status'),
-                content: VDiskState,
-            });
-        }
-        rightColumn.push(...toDefinitionListItems(runtimeCapacityItems));
-    } else {
+    if (!capacityMetricsEnabled) {
         const {AllocatedSize, SizeLimit, AllocatedPercent, DiskSpace} = data || {};
 
         if (!isNil(StoragePoolName)) {

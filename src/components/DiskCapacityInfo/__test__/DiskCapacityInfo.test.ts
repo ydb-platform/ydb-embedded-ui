@@ -1,3 +1,7 @@
+import React from 'react';
+
+import {Label} from '@gravity-ui/uikit';
+
 import {ECapacityAlert, EFlag} from '../../../types/api/enums';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from '../../../utils/constants';
 import {
@@ -70,6 +74,84 @@ describe('DiskCapacityInfo builders', () => {
             EMPTY_DATA_PLACEHOLDER,
             EMPTY_DATA_PLACEHOLDER,
         ]);
+    });
+
+    test.each([
+        ['missing', undefined],
+        ['null', null],
+        ['empty', ''],
+        ['whitespace-only', '   '],
+    ])('renders %s VDisk capacity alerts as the empty-data placeholder', (_caseName, value) => {
+        const items = getVDiskCapacityInfoItems(
+            {CapacityAlert: value as unknown as string},
+            {withRawUsage: false},
+        );
+
+        expect(items.find(({id}) => id === 'capacity-alert')?.value).toBe(EMPTY_DATA_PLACEHOLDER);
+    });
+
+    test.each([
+        [
+            'VDisk',
+            () =>
+                getVDiskCapacityInfoItems(
+                    {CapacityAlert: ECapacityAlert.LIGHTYELLOW},
+                    {withRawUsage: false},
+                ),
+        ],
+        [
+            'PDisk',
+            () =>
+                getPDiskCapacityInfoItems(
+                    {PDiskCapacityAlert: ECapacityAlert.LIGHTYELLOW},
+                    {withUsage: false, withCapacityAlert: true},
+                ),
+        ],
+        [
+            'storage group',
+            () =>
+                getStorageGroupCapacityInfoItems({
+                    Degraded: 0,
+                    Read: 0,
+                    Write: 0,
+                    Used: 0,
+                    Limit: 0,
+                    DiskSpace: EFlag.Green,
+                    CapacityAlert: ECapacityAlert.LIGHTYELLOW,
+                }),
+        ],
+    ])('renders a known %s capacity alert with its severity theme', (_surface, buildItems) => {
+        const value = buildItems().find(({id}) => id === 'capacity-alert')?.value;
+
+        expect(React.isValidElement(value)).toBe(true);
+        expect(value).toEqual(
+            expect.objectContaining({
+                type: Label,
+                props: expect.objectContaining({
+                    children: ECapacityAlert.LIGHTYELLOW,
+                    theme: 'warning',
+                }),
+            }),
+        );
+    });
+
+    test('renders an unknown capacity alert with the neutral theme', () => {
+        const items = getVDiskCapacityInfoItems(
+            {CapacityAlert: 'FUTURE_ALERT'},
+            {withRawUsage: false},
+        );
+        const value = items.find(({id}) => id === 'capacity-alert')?.value;
+
+        expect(React.isValidElement(value)).toBe(true);
+        expect(value).toEqual(
+            expect.objectContaining({
+                type: Label,
+                props: expect.objectContaining({
+                    children: 'FUTURE_ALERT',
+                    theme: 'normal',
+                }),
+            }),
+        );
     });
 
     test('uses the Whiteboard VDisk size instead of the legacy BSC size', () => {

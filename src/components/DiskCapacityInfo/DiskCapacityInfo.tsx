@@ -4,7 +4,7 @@ import {Label} from '@gravity-ui/uikit';
 
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
 import {isCapacityAlert} from '../../types/api/enums';
-import {getCapacityAlertTheme} from '../../utils/capacityAlerts';
+import {getCapacityAlertTheme, normalizeCapacityAlert} from '../../utils/capacityAlerts';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {PreparedPDisk, PreparedVDisk} from '../../utils/disks/types';
 import {
@@ -31,13 +31,15 @@ export interface DiskCapacityInfoItem {
     note?: string;
 }
 
-function CapacityAlertValue({value}: {value?: string}) {
-    if (!value) {
-        return <React.Fragment>{EMPTY_DATA_PLACEHOLDER}</React.Fragment>;
+function getCapacityAlertValue(value: unknown): React.ReactNode {
+    const capacityAlert = normalizeCapacityAlert(value);
+
+    if (!capacityAlert) {
+        return EMPTY_DATA_PLACEHOLDER;
     }
 
-    const theme = isCapacityAlert(value) ? getCapacityAlertTheme(value) : 'normal';
-    return <Label theme={theme}>{value}</Label>;
+    const theme = isCapacityAlert(capacityAlert) ? getCapacityAlertTheme(capacityAlert) : 'normal';
+    return <Label theme={theme}>{capacityAlert}</Label>;
 }
 
 export function getVDiskCapacityInfoItems(
@@ -77,7 +79,7 @@ export function getVDiskCapacityInfoItems(
         {
             id: 'capacity-alert',
             title: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
-            value: <CapacityAlertValue value={data?.CapacityAlert} />,
+            value: getCapacityAlertValue(data?.CapacityAlert),
             note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
         },
     );
@@ -124,7 +126,7 @@ export function getPDiskCapacityInfoItems(
         items.push({
             id: 'capacity-alert',
             title: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
-            value: <CapacityAlertValue value={data?.PDiskCapacityAlert} />,
+            value: getCapacityAlertValue(data?.PDiskCapacityAlert),
             note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
         });
     }
@@ -151,7 +153,7 @@ export function getStorageGroupCapacityInfoItems(
         {
             id: 'capacity-alert',
             title: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
-            value: <CapacityAlertValue value={data?.CapacityAlert} />,
+            value: getCapacityAlertValue(data?.CapacityAlert),
             note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
         },
     ];

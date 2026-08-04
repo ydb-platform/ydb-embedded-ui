@@ -10,7 +10,10 @@ import {
     useIsUserAllowedToMakeChanges,
     useIsViewerUser,
 } from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
+import {
+    mergeColumnsPreservingHiddenPositions,
+    useSelectedColumns,
+} from '../../../../utils/hooks/useSelectedColumns';
 import {useIsStorageExpertMode, useVDisksGroupByParam} from '../../useStorageQueryParams';
 
 import {getStorageGroupsColumns} from './columns';
@@ -124,16 +127,17 @@ export function useStorageGroupsSelectedColumns({
     const hiddenCapacityColumnIds = blobMetricsEnabled
         ? STORAGE_GROUPS_LEGACY_CAPACITY_COLUMN_IDS
         : CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS;
-    const hiddenCapacityColumns = React.useMemo(() => {
-        return selectedColumns.columnsToSelect.filter(({id}) =>
-            hiddenCapacityColumnIds.some((columnId) => columnId === id),
-        );
-    }, [hiddenCapacityColumnIds, selectedColumns.columnsToSelect]);
     const setColumns: typeof selectedColumns.setColumns = React.useCallback(
         (value) => {
-            selectedColumns.setColumns([...value, ...hiddenCapacityColumns]);
+            selectedColumns.setColumns(
+                mergeColumnsPreservingHiddenPositions(
+                    value,
+                    selectedColumns.columnsToSelect,
+                    hiddenCapacityColumnIds,
+                ),
+            );
         },
-        [hiddenCapacityColumns, selectedColumns],
+        [hiddenCapacityColumnIds, selectedColumns],
     );
 
     return React.useMemo(() => {

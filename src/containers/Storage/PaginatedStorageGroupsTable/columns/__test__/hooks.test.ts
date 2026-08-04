@@ -317,9 +317,11 @@ describe('useStorageGroupsSelectedColumns', () => {
             [
                 {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
                 {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.PoolName, selected: true},
                 {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage, selected: true},
-                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace, selected: false},
                 {id: STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace, selected: false},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage, selected: true},
             ],
             setSavedColumns,
         ]);
@@ -330,22 +332,43 @@ describe('useStorageGroupsSelectedColumns', () => {
 
         result.current.setColumns(result.current.columnsToSelect);
 
-        expect(setSavedColumns).toHaveBeenCalledWith(
-            expect.arrayContaining([
-                {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
-                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage, selected: true},
-                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace, selected: false},
-            ]),
-        );
+        const trackedIds: string[] = [
+            STORAGE_GROUPS_COLUMNS_IDS.GroupId,
+            STORAGE_GROUPS_COLUMNS_IDS.Usage,
+            STORAGE_GROUPS_COLUMNS_IDS.PoolName,
+            STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.DiskSpace,
+            STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage,
+        ];
+        const savedColumns = setSavedColumns.mock.calls[0][0] as Array<{
+            id: string;
+            selected: boolean;
+        }>;
+
+        expect(savedColumns.filter(({id}) => trackedIds.includes(id))).toEqual([
+            {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.PoolName, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace, selected: false},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage, selected: true},
+        ]);
     });
 
     test('preserves hidden capacity selections when saving legacy columns', () => {
         useSetting.mockReturnValue([
             [
                 {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
-                {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
                 {id: STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
                 {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage, selected: false},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskRawUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace, selected: false},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxNormalizedOccupancy, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.CapacityAlert, selected: false},
             ],
             setSavedColumns,
         ]);
@@ -363,12 +386,33 @@ describe('useStorageGroupsSelectedColumns', () => {
 
         result.current.setColumns(result.current.columnsToSelect);
 
-        expect(setSavedColumns).toHaveBeenCalledWith(
-            expect.arrayContaining([
-                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage, selected: true},
-                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage, selected: false},
-            ]),
-        );
+        const trackedIds: string[] = [
+            STORAGE_GROUPS_COLUMNS_IDS.GroupId,
+            STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.Usage,
+            STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskRawUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.DiskSpace,
+            STORAGE_GROUPS_COLUMNS_IDS.MaxNormalizedOccupancy,
+            STORAGE_GROUPS_COLUMNS_IDS.CapacityAlert,
+        ];
+        const savedColumns = setSavedColumns.mock.calls[0][0] as Array<{
+            id: string;
+            selected: boolean;
+        }>;
+
+        expect(savedColumns.filter(({id}) => trackedIds.includes(id))).toEqual([
+            {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage, selected: false},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskRawUsage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace, selected: false},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.MaxNormalizedOccupancy, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.CapacityAlert, selected: false},
+        ]);
     });
 
     test('does not restore Space as a sticky column in the space view when enabled', () => {

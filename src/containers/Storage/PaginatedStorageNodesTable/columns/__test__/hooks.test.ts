@@ -88,28 +88,79 @@ describe('useStorageNodesSelectedColumns', () => {
 
     test('preserves hidden legacy selection when saving enabled capacity columns', () => {
         useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
+        useSetting.mockReturnValue([
+            [
+                {id: NODES_COLUMNS_IDS.NodeId, selected: true},
+                {id: NODES_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+                {id: NODES_COLUMNS_IDS.PDisks, selected: true},
+                {id: NODES_COLUMNS_IDS.PDiskUsage, selected: true},
+            ],
+            setSavedColumns,
+        ]);
 
         const {result} = renderHook(() => useStorageNodesSelectedColumns({visibleEntities: 'all'}));
 
         result.current.setColumns(result.current.columnsToSelect);
 
-        expect(setSavedColumns).toHaveBeenCalledWith(
-            expect.arrayContaining([{id: NODES_COLUMNS_IDS.DiskSpaceUsage, selected: true}]),
-        );
+        const trackedIds: string[] = [
+            NODES_COLUMNS_IDS.NodeId,
+            NODES_COLUMNS_IDS.DiskSpaceUsage,
+            NODES_COLUMNS_IDS.PDisks,
+            NODES_COLUMNS_IDS.PDiskUsage,
+        ];
+        const savedColumns = setSavedColumns.mock.calls[0][0] as Array<{
+            id: string;
+            selected: boolean;
+        }>;
+
+        expect(savedColumns.filter(({id}) => trackedIds.includes(id))).toEqual([
+            {id: NODES_COLUMNS_IDS.NodeId, selected: true},
+            {id: NODES_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+            {id: NODES_COLUMNS_IDS.PDisks, selected: true},
+            {id: NODES_COLUMNS_IDS.PDiskUsage, selected: true},
+        ]);
     });
 
     test('preserves hidden capacity selections when saving legacy columns', () => {
+        useSetting.mockReturnValue([
+            [
+                {id: NODES_COLUMNS_IDS.NodeId, selected: true},
+                {id: NODES_COLUMNS_IDS.PDiskUsage, selected: true},
+                {id: NODES_COLUMNS_IDS.PDisks, selected: true},
+                {id: NODES_COLUMNS_IDS.VDiskSlotUsage, selected: true},
+                {id: NODES_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+                {id: NODES_COLUMNS_IDS.VDiskRawUsage, selected: true},
+                {id: NODES_COLUMNS_IDS.CapacityAlert, selected: true},
+            ],
+            setSavedColumns,
+        ]);
+
         const {result} = renderHook(() => useStorageNodesSelectedColumns({visibleEntities: 'all'}));
 
         result.current.setColumns(result.current.columnsToSelect);
 
-        expect(setSavedColumns).toHaveBeenCalledWith(
-            expect.arrayContaining([
-                {id: NODES_COLUMNS_IDS.PDiskUsage, selected: true},
-                {id: NODES_COLUMNS_IDS.VDiskSlotUsage, selected: true},
-                {id: NODES_COLUMNS_IDS.VDiskRawUsage, selected: true},
-                {id: NODES_COLUMNS_IDS.CapacityAlert, selected: true},
-            ]),
-        );
+        const trackedIds: string[] = [
+            NODES_COLUMNS_IDS.NodeId,
+            NODES_COLUMNS_IDS.PDiskUsage,
+            NODES_COLUMNS_IDS.PDisks,
+            NODES_COLUMNS_IDS.VDiskSlotUsage,
+            NODES_COLUMNS_IDS.DiskSpaceUsage,
+            NODES_COLUMNS_IDS.VDiskRawUsage,
+            NODES_COLUMNS_IDS.CapacityAlert,
+        ];
+        const savedColumns = setSavedColumns.mock.calls[0][0] as Array<{
+            id: string;
+            selected: boolean;
+        }>;
+
+        expect(savedColumns.filter(({id}) => trackedIds.includes(id))).toEqual([
+            {id: NODES_COLUMNS_IDS.NodeId, selected: true},
+            {id: NODES_COLUMNS_IDS.PDiskUsage, selected: true},
+            {id: NODES_COLUMNS_IDS.PDisks, selected: true},
+            {id: NODES_COLUMNS_IDS.VDiskSlotUsage, selected: true},
+            {id: NODES_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+            {id: NODES_COLUMNS_IDS.VDiskRawUsage, selected: true},
+            {id: NODES_COLUMNS_IDS.CapacityAlert, selected: true},
+        ]);
     });
 });

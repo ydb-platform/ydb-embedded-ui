@@ -3,7 +3,7 @@ import type {LabelProps} from '@gravity-ui/uikit';
 import {Label} from '@gravity-ui/uikit';
 
 import {isCapacityAlert} from '../../types/api/enums';
-import {getCapacityAlertTheme} from '../../utils/capacityAlerts';
+import {getCapacityAlertTheme, normalizeCapacityAlert} from '../../utils/capacityAlerts';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNormalizedMetricPercent} from '../../utils/storageMetrics';
 import type {Column} from '../../utils/tableUtils/types';
@@ -71,11 +71,7 @@ export function getCapacityAlertColumn<T extends {CapacityAlert?: string}>(): Co
         ),
         width: 150,
         render: ({row}) => {
-            if (typeof row.CapacityAlert !== 'string' || !row.CapacityAlert) {
-                return EMPTY_DATA_PLACEHOLDER;
-            }
-
-            return row.CapacityAlert;
+            return normalizeCapacityAlert(row.CapacityAlert) ?? EMPTY_DATA_PLACEHOLDER;
         },
         align: DataTable.CENTER,
     };

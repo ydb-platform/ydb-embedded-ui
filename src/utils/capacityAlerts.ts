@@ -14,6 +14,10 @@ const SEVERITY_TO_THEME: Record<DataSeverity, LabelProps['theme']> = {
     5: 'danger', // DATA_SEVERITY.RED
 };
 
+export function normalizeCapacityAlert(value: unknown): string | undefined {
+    return typeof value === 'string' && value.trim() ? value : undefined;
+}
+
 export function getCapacityAlertSeverity(capacityAlert?: ECapacityAlert): DataSeverity {
     switch (capacityAlert) {
         case 'GREEN':
