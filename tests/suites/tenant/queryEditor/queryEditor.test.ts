@@ -740,6 +740,44 @@ test.describe('Test Query Editor', async () => {
             .toEqual({lineNumber: 3, column: 5});
     });
 
+    test('Query Settings pragma errors do not navigate the editor', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'off', 'Query Streaming');
+
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changePragmas('PRAGMA InvalidPragma;');
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+        await page.route(`${backend}/viewer/json/query?*`, async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    error: {message: 'Invalid pragma'},
+                    issues: [
+                        {
+                            message: 'Unknown pragma',
+                            position: {row: 1, column: 4},
+                        },
+                    ],
+                }),
+            });
+        });
+
+        const query = 'SELECT 1;\n\nSELECT 2;';
+        await queryEditor.setQuery(query);
+        await queryEditor.selectText(3, 1, 3, 'SELECT 2;'.length + 1);
+        await executeSelectedQueryWithKeybinding(page);
+        await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
+
+        await queryEditor.setCursor(3, 3);
+        await expect(queryEditor.getCursorPosition()).resolves.toEqual({lineNumber: 3, column: 3});
+        await queryEditor.clickFirstIssuePosition();
+        await expect
+            .poll(() => queryEditor.getCursorPosition())
+            .toEqual({lineNumber: 3, column: 3});
+    });
+
     test('Current-statement execution does not create a History entry', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery('SELECT 1;\n\nSELECT 2;');

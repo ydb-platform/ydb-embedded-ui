@@ -2,6 +2,8 @@ import type {QuerySourcePosition} from '../../../../store/reducers/query/types';
 import type {ErrorResponse, IssueMessage} from '../../../../types/api/query';
 import {isNumeric} from '../../../../utils/utils';
 
+export const QUERY_SETTINGS_PRAGMAS_SOURCE = 'query-settings-pragmas';
+
 export function hasRootIssues(issues?: IssueMessage[]): issues is IssueMessage[] {
     return Array.isArray(issues) && issues.length > 0;
 }
@@ -53,7 +55,7 @@ function offsetPosition(position: IssueMessage['position'], sourcePosition: Quer
     const row = Number(position.row);
     const preparedQueryPrefixLineCount = sourcePosition.preparedQueryPrefixLineCount ?? 0;
     if (row <= preparedQueryPrefixLineCount) {
-        return position;
+        return {...position, file: QUERY_SETTINGS_PRAGMAS_SOURCE};
     }
 
     const fragmentRow = row - preparedQueryPrefixLineCount;
