@@ -19,11 +19,18 @@ jest.mock('../../../utils/hooks', () => ({
     useSetting: jest.fn(),
 }));
 
+jest.mock('../../../utils/hooks/useIsUserAllowedToMakeChanges', () => ({
+    useIsUserAllowedToMakeChanges: jest.fn(),
+}));
+
 const {useQueryParam} = jest.requireMock('use-query-params');
 const {useBlobStorageCapacityMetricsAvailable} = jest.requireMock(
     '../../../store/reducers/capabilities/hooks',
 );
 const {useSetting} = jest.requireMock('../../../utils/hooks');
+const {useIsUserAllowedToMakeChanges} = jest.requireMock(
+    '../../../utils/hooks/useIsUserAllowedToMakeChanges',
+);
 
 describe('getStorageGroupByCleanupPatch', () => {
     test('clears legacy group-by values when blob metrics are enabled', () => {
@@ -81,6 +88,7 @@ describe('useIsStorageExpertMode', () => {
             key === SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE ||
                 key === SETTING_KEYS.STORAGE_EXPERT_MODE,
         ]);
+        useIsUserAllowedToMakeChanges.mockReturnValue(true);
     });
 
     test.each([
@@ -96,4 +104,21 @@ describe('useIsStorageExpertMode', () => {
             expect(result.current).toBe(expected);
         },
     );
+
+    test.each([
+        {source: 'query parameter', queryValue: true, savedValue: false},
+        {source: 'saved setting', queryValue: undefined, savedValue: true},
+    ])('returns false for unauthorized users with $source state', ({queryValue, savedValue}) => {
+        useBlobStorageCapacityMetricsAvailable.mockReturnValue(true);
+        useQueryParam.mockReturnValue([queryValue]);
+        useSetting.mockImplementation((key: string) => [
+            key === SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE ||
+                (key === SETTING_KEYS.STORAGE_EXPERT_MODE && savedValue),
+        ]);
+        useIsUserAllowedToMakeChanges.mockReturnValue(false);
+
+        const {result} = renderHook(() => useIsStorageExpertMode());
+
+        expect(result.current).toBe(false);
+    });
 });

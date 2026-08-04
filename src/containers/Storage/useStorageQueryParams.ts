@@ -11,6 +11,7 @@ import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
 import {storageTypeSchema, visibleEntitiesSchema} from '../../store/reducers/storage/types';
 import {useSetting} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
 import {storageGroupsGroupByParamSchema} from './PaginatedStorageGroupsTable/columns/constants';
@@ -222,6 +223,7 @@ export function useStorageQueryParams() {
 
 export function useIsStorageExpertMode() {
     const storageExpertModeAvailable = useBlobStorageCapacityMetricsAvailable();
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const [storageExpertModeSettingEnabled] = useSetting<boolean>(
         SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
     );
@@ -230,6 +232,7 @@ export function useIsStorageExpertMode() {
 
     return (
         storageExpertModeAvailable &&
+        Boolean(isUserAllowedToMakeChanges) &&
         Boolean(storageExpertModeSettingEnabled) &&
         Boolean(storageExpertModeQueryParam ?? savedStorageExpertMode)
     );
