@@ -80,7 +80,7 @@ export function ClusterDrawerHealthcheck({children, database}: ClusterDrawerHeal
     }, [handleShowHealthcheckChange, handleIssuesFilterChange, handleHealthcheckViewChange]);
 
     const renderDrawerContent = React.useCallback(() => {
-        return <Healthcheck database={database} />;
+        return <Healthcheck database={database} scope="cluster" />;
     }, [database]);
 
     return (

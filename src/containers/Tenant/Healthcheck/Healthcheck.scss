@@ -44,7 +44,9 @@
         }
     }
     &__disclosure-trigger {
-        width: 100%;
+        flex: 1 1 auto;
+
+        min-width: 0;
         @include mixins.button-reset();
 
         &:focus-visible {
@@ -63,6 +65,9 @@
         &:hover {
             background-color: var(--g-color-base-generic-ultralight);
         }
+    }
+    &__issue-action {
+        flex: 0 0 auto;
     }
     &__issue-status {
         text-align: start;
