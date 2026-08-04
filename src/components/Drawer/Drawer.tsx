@@ -57,6 +57,7 @@ const DrawerPaneContentWrapper = ({
     const [userDrawerWidth, setUserDrawerWidth] = React.useState<number | undefined>(undefined);
 
     const drawerRef = React.useRef<HTMLDivElement>(null);
+    const pointerDownStartedInsideDrawerRef = React.useRef(false);
     const {containerWidth, itemContainerRef} = useDrawerContext();
 
     const derivedDrawerWidth = React.useMemo(() => {
@@ -94,8 +95,17 @@ const DrawerPaneContentWrapper = ({
             return undefined;
         }
 
+        const handlePointerDown = (event: PointerEvent) => {
+            pointerDownStartedInsideDrawerRef.current = Boolean(
+                drawerRef.current?.contains(event.target as Node),
+            );
+        };
+
         const handleClickOutside = (event: DrawerEvent) => {
-            if (event._capturedInsideDrawer || !event.isTrusted) {
+            const pointerDownStartedInsideDrawer = pointerDownStartedInsideDrawerRef.current;
+            pointerDownStartedInsideDrawerRef.current = false;
+
+            if (event._capturedInsideDrawer || pointerDownStartedInsideDrawer || !event.isTrusted) {
                 return;
             }
 
@@ -104,7 +114,9 @@ const DrawerPaneContentWrapper = ({
             }
         };
 
-        // Keep the document listener in the bubble phase so row clicks may stop propagation
+        document.addEventListener('pointerdown', handlePointerDown, true);
+
+        // Keep the click listener in the bubble phase so row clicks may stop propagation
         // and switch drawer content without closing it. Attach it after the opening click.
         const listenerTimeoutId = window.setTimeout(() => {
             document.addEventListener('click', handleClickOutside);
@@ -112,6 +124,7 @@ const DrawerPaneContentWrapper = ({
 
         return () => {
             window.clearTimeout(listenerTimeoutId);
+            document.removeEventListener('pointerdown', handlePointerDown, true);
             document.removeEventListener('click', handleClickOutside);
         };
     }, [isVisible, onClose, detectClickOutside]);
