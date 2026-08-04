@@ -1,6 +1,6 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 
-import {ResultIssues} from './Issues';
+import {ResultIssues} from '../Issues';
 
 describe('ResultIssues', () => {
     beforeEach(() => {
