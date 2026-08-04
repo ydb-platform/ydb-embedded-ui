@@ -36,6 +36,7 @@ function renderDialog(getConfig: jest.Mock) {
     );
 
     act(() => {
+        // The promise resolves after a user action; these tests only verify the initial render.
         openManagePartitioningDialog({database: '/local'});
     });
 }

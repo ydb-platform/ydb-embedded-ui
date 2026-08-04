@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 import {managePartitioningSchema} from '../utils';
 
 const VALID_VALUES = {
@@ -22,7 +23,7 @@ describe('managePartitioningSchema', () => {
                 expect.arrayContaining([
                     expect.objectContaining({
                         path: ['splitSize'],
-                        message: 'Value must not be greater than maximum',
+                        message: i18n('error_value-greater-maximum'),
                     }),
                 ]),
             );
