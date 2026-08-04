@@ -3,7 +3,7 @@ import React from 'react';
 import NiceModal from '@ebay/nice-modal-react';
 
 import {useTypedSelector} from '..';
-import {selectIsDirty} from '../../../store/reducers/query/query';
+import {selectIsDirty, selectUserInput} from '../../../store/reducers/query/query';
 
 import {UNSAVED_CHANGES_DIALOG} from './UnsavedChangesDialog';
 
@@ -27,12 +27,13 @@ export function useChangeInputWithConfirmation<T>(
     callback: (args: T) => void,
     skipConfirmation?: boolean,
 ) {
+    const userInput = useTypedSelector(selectUserInput);
     const isDirty = useTypedSelector(selectIsDirty);
     const callbackWithConfirmation = React.useMemo(
         () => changeInputWithConfirmation<T>(callback),
         [callback],
     );
-    if (skipConfirmation || !isDirty) {
+    if (skipConfirmation || !userInput || !isDirty) {
         return callback;
     }
     return callbackWithConfirmation;

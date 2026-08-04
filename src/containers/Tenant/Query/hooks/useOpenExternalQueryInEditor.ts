@@ -24,7 +24,7 @@ import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import createToast from '../../../../utils/createToast';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getRunningQueryConfirmation} from '../../../../utils/hooks/withConfirmation/RunningQueryDialog';
-import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
+import {changeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {TenantTabsGroups} from '../../TenantPages';
 import {queryExecutionManagerInstance} from '../QueryEditor/utils/queryExecutionManager';
 import i18n from '../i18n';
@@ -278,11 +278,14 @@ export function useOpenExternalQueryInEditor() {
     const stopLatestRunningQueryAndOpen = React.useCallback((request: ExternalQueryOpenRequest) => {
         latestStopRunningQueryAndOpen.current(request);
     }, []);
-
-    const openExternalQueryInEditorWithConfirmation = useChangeInputWithConfirmation(
-        stopLatestRunningQueryAndOpen,
-        isMultiTabEnabled,
+    const stopLatestRunningQueryAndOpenWithConfirmation = React.useMemo(
+        () => changeInputWithConfirmation(stopLatestRunningQueryAndOpen),
+        [stopLatestRunningQueryAndOpen],
     );
+    const openExternalQueryInEditorWithConfirmation =
+        isMultiTabEnabled || !isCurrentTabDirty
+            ? stopLatestRunningQueryAndOpen
+            : stopLatestRunningQueryAndOpenWithConfirmation;
     latestOpenExternalQueryInEditorWithConfirmation.current =
         openExternalQueryInEditorWithConfirmation;
 
