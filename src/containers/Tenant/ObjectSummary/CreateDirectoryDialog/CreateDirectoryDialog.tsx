@@ -149,7 +149,7 @@ export function CreateDirectoryDialog({
                     textButtonApply={i18n('schema.tree.dialog.buttonApply')}
                     textButtonCancel={i18n('schema.tree.dialog.buttonCancel')}
                     onClickButtonCancel={handleClose}
-                    propsButtonApply={{type: 'submit'}}
+                    propsButtonApply={{type: 'submit', className: 'brand-button'}}
                 />
             </form>
         </Dialog>

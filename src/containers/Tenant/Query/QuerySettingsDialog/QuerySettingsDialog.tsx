@@ -393,6 +393,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                 onClickButtonCancel={onClose}
                 propsButtonApply={{
                     type: 'submit',
+                    className: 'brand-button',
                 }}
                 renderButtons={(buttonApply, buttonCancel) => (
                     <div className={b('buttons-container')}>

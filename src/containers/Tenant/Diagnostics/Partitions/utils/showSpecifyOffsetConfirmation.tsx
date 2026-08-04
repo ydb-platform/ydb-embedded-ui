@@ -109,7 +109,11 @@ function SpecifyOffsetDialog({
             <Dialog.Footer
                 loading={isLoading}
                 onClickButtonApply={handleConfirm}
-                propsButtonApply={{view: 'action', disabled: !offsetValue}}
+                propsButtonApply={{
+                    view: 'action',
+                    className: 'brand-button',
+                    disabled: !offsetValue,
+                }}
                 textButtonApply={i18n('action_move-offset')}
                 textButtonCancel={i18n('action_cancel')}
                 onClickButtonCancel={onClose}

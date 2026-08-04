@@ -26,6 +26,7 @@ export function showMoveOffsetConfirmation({
         ),
         textButtonApply: i18n('action_move-offset'),
         buttonApplyView: 'action',
+        propsButtonApply: {className: 'brand-button'},
         onConfirm,
         confirmOnEnter: true,
     });

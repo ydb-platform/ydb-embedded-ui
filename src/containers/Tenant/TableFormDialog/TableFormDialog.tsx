@@ -319,6 +319,7 @@ function TableForm({
                     propsButtonApply={{
                         type: 'submit',
                         view: 'action',
+                        className: 'brand-button',
                         disabled: isSubmitting,
                     }}
                 />

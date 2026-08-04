@@ -430,6 +430,7 @@ function CompactTableDialog({
                     loading={isSubmitting}
                     propsButtonApply={{
                         type: 'submit',
+                        className: 'brand-button',
                         disabled: submitDisabled,
                     }}
                 />

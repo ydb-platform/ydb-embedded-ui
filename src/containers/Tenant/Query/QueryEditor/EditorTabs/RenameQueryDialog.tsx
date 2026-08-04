@@ -91,6 +91,7 @@ function RenameQueryDialog({
                 textButtonCancel={i18n('editor-tabs.rename-query-dialog.cancel')}
                 onClickButtonApply={handleApply}
                 onClickButtonCancel={handleClose}
+                propsButtonApply={{className: 'brand-button'}}
             />
         </Dialog>
     );

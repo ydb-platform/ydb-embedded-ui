@@ -235,7 +235,7 @@ export function ColumnSelectorField({
                     <Button view="flat" onClick={handleCancel}>
                         {i18n('action_cancel')}
                     </Button>
-                    <Button view="action" onClick={handleApply}>
+                    <Button view="action" className="brand-button" onClick={handleApply}>
                         {i18n('action_apply')}
                     </Button>
                 </div>

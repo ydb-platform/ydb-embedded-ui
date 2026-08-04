@@ -53,6 +53,7 @@ const DeleteDialog = ({visible, queryName, onCancelClick, onConfirmClick}: Delet
                 textButtonCancel={i18n('delete-dialog.cancel')}
                 onClickButtonCancel={onCancelClick}
                 onClickButtonApply={onConfirmClick}
+                propsButtonApply={{className: 'brand-button'}}
             />
         </Dialog>
     );

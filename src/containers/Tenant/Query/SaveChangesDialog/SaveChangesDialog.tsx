@@ -109,7 +109,7 @@ function SaveChangesDialog({
                     propsButtonCancel={{view: 'flat'}}
                     onClickButtonCancel={onCancel}
                     textButtonApply={i18n('action.save')}
-                    propsButtonApply={{type: 'submit'}}
+                    propsButtonApply={{type: 'submit', className: 'brand-button'}}
                 >
                     <Button
                         view="outlined"

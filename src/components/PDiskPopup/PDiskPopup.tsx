@@ -139,7 +139,12 @@ export const buildPDiskFooter = (
                     hideEndIcon
                 />
             )}
-            <InternalLinkButton href={pDiskPagePath} view="action" size="m">
+            <InternalLinkButton
+                href={pDiskPagePath}
+                view="action"
+                size="m"
+                className="brand-button"
+            >
                 {pDiskPopupKeyset('action_go-to-pdisk')}
             </InternalLinkButton>
         </Flex>

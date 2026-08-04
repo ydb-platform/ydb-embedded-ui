@@ -236,6 +236,7 @@ export function SplitPointDialog({state, onClose, onSubmit}: SplitPointDialogPro
                 textButtonCancel={i18n('action_cancel')}
                 onClickButtonApply={handleSubmit}
                 onClickButtonCancel={onClose}
+                propsButtonApply={{className: 'brand-button'}}
             />
         </Dialog>
     );

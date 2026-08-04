@@ -140,6 +140,7 @@ function ChangeOwnerDialog({
                 onClickButtonCancel={onClose}
                 propsButtonApply={{
                     loading: updateOwnerResponse.isLoading,
+                    className: 'brand-button',
                     disabled: !newOwner.length,
                 }}
             />

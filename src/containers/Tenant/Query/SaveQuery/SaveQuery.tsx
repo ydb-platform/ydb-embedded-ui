@@ -254,6 +254,7 @@ function SaveQueryDialog({
                     onClickButtonCancel={onCloseWithoutSave}
                     propsButtonApply={{
                         type: 'submit',
+                        className: 'brand-button',
                     }}
                 />
             </form>

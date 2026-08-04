@@ -231,6 +231,7 @@ function ManagePartitioningDialogForm({
                 renderButtons={renderButtons}
                 propsButtonApply={{
                     type: 'submit',
+                    className: 'brand-button',
                     disabled: isSubmitting || !isValid,
                 }}
             />
@@ -275,6 +276,7 @@ function ManagePartitioningDialog({
                         propsButtonApply={{
                             // The form is not mounted yet (waiting for the config-derived limit),
                             // so Apply stays disabled until the real form takes over.
+                            className: 'brand-button',
                             disabled: true,
                         }}
                     />

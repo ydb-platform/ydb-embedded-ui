@@ -45,7 +45,7 @@ export function Footer({onCancel, onSave, onDiscard, loading, error, disabled}: 
                     onClick={onSave}
                     view="action"
                     size="l"
-                    className={block('footer-button')}
+                    className={block('footer-button', undefined, 'brand-button')}
                     loading={loading}
                     disabled={disabled}
                 >

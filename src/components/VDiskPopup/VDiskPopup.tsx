@@ -366,7 +366,12 @@ const buildVDiskFooter = (
             {(vDiskPagePath || resolvedVDiskId) && (
                 <Flex wrap="wrap" gap={2}>
                     {vDiskPagePath && (
-                        <InternalLinkButton href={vDiskPagePath} view="action" size="m">
+                        <InternalLinkButton
+                            href={vDiskPagePath}
+                            view="action"
+                            size="m"
+                            className="brand-button"
+                        >
                             {vDiskPopupKeyset('action_go-to-vdisk')}
                         </InternalLinkButton>
                     )}

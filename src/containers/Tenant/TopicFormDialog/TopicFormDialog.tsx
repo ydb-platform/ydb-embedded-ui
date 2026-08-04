@@ -773,7 +773,11 @@ function TopicForm({
                 textButtonCancel={i18n('action_cancel')}
                 onClickButtonCancel={onClose}
                 loading={isSubmitting}
-                propsButtonApply={{type: 'submit', view: 'action'}}
+                propsButtonApply={{
+                    type: 'submit',
+                    view: 'action',
+                    className: 'brand-button',
+                }}
             />
         </form>
     );

@@ -26,7 +26,7 @@ const Stop = ({error, ...props}: ButtonProps & {error?: boolean}) => (
 );
 
 const Explain = (props: ButtonProps) => (
-    <Button {...props} className={b('explain-button')}>
+    <Button {...props} className={b('explain-button', undefined, 'brand-button')}>
         <Icon data={Binoculars} size={16} />
         {i18n('action.explain')}
     </Button>
