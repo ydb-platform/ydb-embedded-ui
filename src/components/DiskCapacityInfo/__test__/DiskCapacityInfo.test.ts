@@ -33,7 +33,13 @@ describe('DiskCapacityInfo builders', () => {
             {
                 id: 'vdisk-slot-usage',
                 title: 'VDisk Slot Usage',
-                value: '82.3%',
+                value: expect.objectContaining({
+                    type: Label,
+                    props: expect.objectContaining({
+                        children: '82.3%',
+                        theme: 'warning',
+                    }),
+                }),
             },
             {
                 id: 'vdisk-raw-usage',
@@ -120,38 +126,52 @@ describe('DiskCapacityInfo builders', () => {
                     CapacityAlert: ECapacityAlert.LIGHTYELLOW,
                 }),
         ],
-    ])('renders a known %s capacity alert with its severity theme', (_surface, buildItems) => {
+    ])('renders a known %s capacity alert as plain text', (_surface, buildItems) => {
         const value = buildItems().find(({id}) => id === 'capacity-alert')?.value;
 
-        expect(React.isValidElement(value)).toBe(true);
-        expect(value).toEqual(
-            expect.objectContaining({
-                type: Label,
-                props: expect.objectContaining({
-                    children: ECapacityAlert.LIGHTYELLOW,
-                    theme: 'warning',
-                }),
-            }),
-        );
+        expect(value).toBe(ECapacityAlert.LIGHTYELLOW);
     });
 
-    test('renders an unknown capacity alert with the neutral theme', () => {
+    test('renders an unknown capacity alert as plain text', () => {
         const items = getVDiskCapacityInfoItems(
             {CapacityAlert: 'FUTURE_ALERT'},
             {withRawUsage: false},
         );
         const value = items.find(({id}) => id === 'capacity-alert')?.value;
 
-        expect(React.isValidElement(value)).toBe(true);
+        expect(value).toBe('FUTURE_ALERT');
+    });
+
+    test('uses a neutral theme when VDisk Slot Usage has no recognized alert', () => {
+        const items = getVDiskCapacityInfoItems(
+            {
+                VDiskSlotUsage: 82.25,
+                CapacityAlert: 'FUTURE_ALERT',
+            },
+            {withRawUsage: false},
+        );
+        const value = items.find(({id}) => id === 'vdisk-slot-usage')?.value;
+
         expect(value).toEqual(
             expect.objectContaining({
                 type: Label,
                 props: expect.objectContaining({
-                    children: 'FUTURE_ALERT',
+                    children: '82.3%',
                     theme: 'normal',
                 }),
             }),
         );
+    });
+
+    test('keeps missing VDisk Slot Usage as the plain placeholder', () => {
+        const items = getVDiskCapacityInfoItems(
+            {CapacityAlert: ECapacityAlert.LIGHTYELLOW},
+            {withRawUsage: false},
+        );
+        const value = items.find(({id}) => id === 'vdisk-slot-usage')?.value;
+
+        expect(React.isValidElement(value)).toBe(false);
+        expect(value).toBe(EMPTY_DATA_PLACEHOLDER);
     });
 
     test('uses the Whiteboard VDisk size instead of the legacy BSC size', () => {
@@ -295,6 +315,15 @@ describe('DiskCapacityInfo builders', () => {
             'vdisk-raw-usage',
             'capacity-alert',
         ]);
-        expect(items.slice(0, 2).map(({value}) => value)).toEqual(['82.25%', '0.00%']);
+        expect(items.find(({id}) => id === 'vdisk-slot-usage')?.value).toEqual(
+            expect.objectContaining({
+                type: Label,
+                props: expect.objectContaining({
+                    children: '82.25%',
+                    theme: 'normal',
+                }),
+            }),
+        );
+        expect(items.find(({id}) => id === 'vdisk-raw-usage')?.value).toBe('0.00%');
     });
 });

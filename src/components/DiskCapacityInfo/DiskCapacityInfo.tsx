@@ -32,14 +32,18 @@ export interface DiskCapacityInfoItem {
 }
 
 function getCapacityAlertValue(value: unknown): React.ReactNode {
-    const capacityAlert = normalizeCapacityAlert(value);
+    return normalizeCapacityAlert(value) ?? EMPTY_DATA_PLACEHOLDER;
+}
 
-    if (!capacityAlert) {
-        return EMPTY_DATA_PLACEHOLDER;
+function getAlertAwareUsageValue(value: string, capacityAlertValue: unknown): React.ReactNode {
+    if (value === EMPTY_DATA_PLACEHOLDER) {
+        return value;
     }
 
+    const capacityAlert = normalizeCapacityAlert(capacityAlertValue);
     const theme = isCapacityAlert(capacityAlert) ? getCapacityAlertTheme(capacityAlert) : 'normal';
-    return <Label theme={theme}>{capacityAlert}</Label>;
+
+    return <Label theme={theme}>{value}</Label>;
 }
 
 export function getVDiskCapacityInfoItems(
@@ -56,7 +60,10 @@ export function getVDiskCapacityInfoItems(
         {
             id: 'vdisk-slot-usage',
             title: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
-            value: formatMetricPercent(data?.VDiskSlotUsage),
+            value: getAlertAwareUsageValue(
+                formatMetricPercent(data?.VDiskSlotUsage),
+                data?.CapacityAlert,
+            ),
             note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
         },
     ];
@@ -141,7 +148,10 @@ export function getStorageGroupCapacityInfoItems(
         {
             id: 'vdisk-slot-usage',
             title: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
-            value: formatNormalizedMetricPercent(data?.MaxVDiskSlotUsage),
+            value: getAlertAwareUsageValue(
+                formatNormalizedMetricPercent(data?.MaxVDiskSlotUsage),
+                data?.CapacityAlert,
+            ),
             note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
         },
         {
