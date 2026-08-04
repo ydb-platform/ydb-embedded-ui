@@ -106,6 +106,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
                         <Button
                             qa="open-in-editor-button"
                             view="action"
+                            className="brand-button"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 openInEditor(row);

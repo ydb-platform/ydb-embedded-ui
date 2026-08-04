@@ -203,7 +203,7 @@ export function EditorTabItem({
         >
             <Flex className={b('tab')} alignItems="center" gap={1}>
                 <TabExecutionStatusIndicator status={executionStatus} />
-                <Text variant="caption-2" className={b('tab-title')}>
+                <Text variant="caption-2" className={b('tab-title', {dirty: isDirty})}>
                     {title}
                 </Text>
                 <Flex className={b('tab-additional', {dirty: isDirty})} alignItems="center" gap={0}>

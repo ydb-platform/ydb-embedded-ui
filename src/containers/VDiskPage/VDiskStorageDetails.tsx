@@ -180,7 +180,7 @@ export function VDiskStorageDetails({className, data}: VDiskStorageDetailsProps)
                         />
                     </div>
                     {pDiskPath ? (
-                        <Button href={pDiskPath} view="action" size="m">
+                        <Button href={pDiskPath} view="action" size="m" className="brand-button">
                             {vDiskPageKeyset('action_go-to-pdisk')}
                         </Button>
                     ) : null}

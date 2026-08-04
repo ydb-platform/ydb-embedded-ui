@@ -53,6 +53,7 @@ export function AccessRights() {
                     {editable && (
                         <Button
                             view="action"
+                            className="brand-button"
                             onClick={() => {
                                 handleShowGrantAccessChange(true);
                             }}

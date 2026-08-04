@@ -15,10 +15,13 @@
         --code-background-color: var(--multitab-code-background-color);
 
         /* stylelint-disable declaration-no-important */
-        .monaco-editor,
+        .monaco-editor {
+            background-color: var(--code-background-color) !important;
+        }
+
         .monaco-editor .margin,
         .monaco-editor-background {
-            background-color: var(--code-background-color) !important;
+            background-color: transparent !important;
         }
 
         .monaco-editor,

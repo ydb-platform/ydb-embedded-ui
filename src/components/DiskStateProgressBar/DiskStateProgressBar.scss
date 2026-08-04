@@ -39,7 +39,7 @@
         --entity-state-border-color: var(--g-color-base-danger-heavy);
         --entity-state-background-color: var(--g-color-base-danger-heavy);
         --entity-state-fill-color: var(--g-color-base-danger-heavy);
-        --entity-state-icon-color: var(--g-color-text-brand-contrast);
+        --entity-state-icon-color: var(--g-color-text-light-primary);
         --entity-state-stripe-color: var(--g-color-text-dark-hint);
 
         &#{$block}_highlighted {
@@ -261,7 +261,7 @@
         &#{$block}_solidred {
             --entity-state-stripe-color: var(--g-color-text-dark-hint);
             --entity-state-stripe-color2: transparent;
-            --entity-state-icon-color: var(--g-color-text-brand-contrast);
+            --entity-state-icon-color: var(--g-color-text-light-primary);
             background-color: var(--entity-state-background-color);
             box-shadow: none;
         }

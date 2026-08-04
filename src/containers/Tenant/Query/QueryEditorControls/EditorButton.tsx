@@ -12,7 +12,7 @@ import './EditorButton.scss';
 const b = cn('ydb-query-editor-button');
 
 const Run = (props: ButtonProps) => (
-    <Button {...props} className={b('run-button')}>
+    <Button {...props} className={b('run-button', undefined, 'brand-button')}>
         <Icon data={PlayFill} size={16} />
         {i18n('action.run')}
     </Button>
