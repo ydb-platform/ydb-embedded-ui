@@ -3,7 +3,7 @@ import React from 'react';
 import {getTopology, getYdbPlanNodeShape} from '@gravity-ui/paranoid';
 import type {Data, GraphNode, Options, Shapes} from '@gravity-ui/paranoid';
 
-import {prepareGraphOptions} from './colors';
+import {getGraphColorsFromElement, prepareGraphOptions} from './colors';
 
 interface GraphProps<T> {
     data: Data<T>;
@@ -28,7 +28,13 @@ export function Graph<T>(props: GraphProps<T>) {
         graphRoot.style.setProperty('width', '100vw');
         graphRoot.style.setProperty('height', '100vh');
 
-        const topology = getTopology(graphRoot.id, data, prepareGraphOptions(opts), shapes);
+        const graphColors = getGraphColorsFromElement(graphRoot);
+        const topology = getTopology(
+            graphRoot.id,
+            data,
+            prepareGraphOptions(opts, graphColors),
+            shapes,
+        );
         topology.render();
         graphRoot.style.setProperty('width', '100%');
         graphRoot.style.setProperty('height', '100%');

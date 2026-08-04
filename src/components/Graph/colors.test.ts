@@ -1,4 +1,9 @@
-import {getGraphColors, normalizeCssColor, prepareGraphOptions} from './colors';
+import {
+    getGraphColors,
+    getGraphColorsFromElement,
+    normalizeCssColor,
+    prepareGraphOptions,
+} from './colors';
 
 describe('normalizeCssColor', () => {
     test('converts modern rgb syntax to a format compatible with paranoid', () => {
@@ -20,6 +25,24 @@ describe('getGraphColors', () => {
 
         expect(colors.buttonBorderColor).toBe('rgba(35, 29, 52, 0.15)');
         expect(colors.getCommonColor('base-positive-heavy')).toBe('rgba(82, 130, 255, 0.4)');
+    });
+});
+
+describe('getGraphColorsFromElement', () => {
+    test('reads CSS variables from the supplied graph element instead of the body', () => {
+        document.body.style.setProperty('--g-color-text-positive', 'rgb(255 0 0)');
+        const graphRoot = document.createElement('div');
+        graphRoot.style.setProperty('--g-color-text-positive', 'rgb(0 128 0)');
+        document.body.append(graphRoot);
+
+        try {
+            const colors = getGraphColorsFromElement(graphRoot);
+
+            expect(colors.success).toBe('rgb(0, 128, 0)');
+        } finally {
+            graphRoot.remove();
+            document.body.style.removeProperty('--g-color-text-positive');
+        }
     });
 });
 

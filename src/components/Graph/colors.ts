@@ -56,6 +56,11 @@ export function getGraphColors(
     };
 }
 
+export function getGraphColorsFromElement(element: Element): GraphColors {
+    const styles = getComputedStyle(element);
+    return getGraphColors((name) => styles.getPropertyValue(name));
+}
+
 export function prepareGraphOptions(
     options?: Options,
     graphColors: GraphColors = getGraphColors(),
