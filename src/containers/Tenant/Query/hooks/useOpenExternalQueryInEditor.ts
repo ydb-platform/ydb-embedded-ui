@@ -30,6 +30,7 @@ import {queryExecutionManagerInstance} from '../QueryEditor/utils/queryExecution
 import i18n from '../i18n';
 
 const STOP_QUERY_ERROR_AUTO_HIDE_TIMEOUT = 5000;
+const ROUTE_PATHS = Object.values(routes);
 
 export interface ExternalQueryToOpen {
     title: string;
@@ -40,18 +41,24 @@ export interface ExternalQueryToOpen {
 
 interface ExternalQueryDestination {
     database: string;
+    requestEpoch: number;
+}
+
+interface QueryLocation {
+    hash: string;
     pathname: string;
     search: string;
-    hash: string;
+}
+
+interface QueryExecutionIdentity {
+    activeTabId: string;
+    startTime: number;
 }
 
 interface ExternalQueryOpenRequest {
     query: ExternalQueryToOpen;
     destination: ExternalQueryDestination;
-    confirmedExecution?: {
-        activeTabId: string;
-        startTime: number;
-    };
+    confirmedExecution?: QueryExecutionIdentity;
 }
 
 function getDatabaseFromQueryParams(queryParams: ReturnType<typeof parseQuery>) {
@@ -59,12 +66,56 @@ function getDatabaseFromQueryParams(queryParams: ReturnType<typeof parseQuery>) 
     return typeof databaseParam === 'string' && databaseParam.trim() ? databaseParam : undefined;
 }
 
+function isSameExecution(
+    currentExecution: QueryExecutionIdentity | undefined,
+    expectedExecution: QueryExecutionIdentity,
+) {
+    return (
+        currentExecution?.activeTabId === expectedExecution.activeTabId &&
+        currentExecution.startTime === expectedExecution.startTime
+    );
+}
+
+function isLegacyDatabaseNormalization(
+    previousLocation: QueryLocation,
+    nextLocation: QueryLocation,
+) {
+    if (
+        previousLocation.pathname !== nextLocation.pathname ||
+        previousLocation.hash !== nextLocation.hash
+    ) {
+        return false;
+    }
+
+    const previousParams = new URLSearchParams(previousLocation.search);
+    const nextParams = new URLSearchParams(nextLocation.search);
+    const legacyDatabase = previousParams.get('name');
+    if (
+        !legacyDatabase ||
+        previousParams.has('database') ||
+        nextParams.has('name') ||
+        nextParams.get('database') !== legacyDatabase
+    ) {
+        return false;
+    }
+
+    previousParams.delete('name');
+    previousParams.set('database', legacyDatabase);
+    previousParams.sort();
+    nextParams.sort();
+
+    return previousParams.toString() === nextParams.toString();
+}
+
 export function useOpenExternalQueryInEditor() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
     const location = useLocation();
-    const tenantRouteMatch = useRouteMatch<{environment?: string}>(routes.tenant);
-    const routeEnvironment = tenantRouteMatch?.params.environment;
+    const currentRouteMatch = useRouteMatch<{environment?: string}>({
+        path: ROUTE_PATHS,
+        exact: true,
+    });
+    const routeEnvironment = currentRouteMatch?.params.environment;
     const [sendCancelQuery] = cancelQueryApi.useCancelQueryMutation();
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
     const activeTabId = useTypedSelector(selectActiveTabId);
@@ -73,6 +124,20 @@ export function useOpenExternalQueryInEditor() {
     const result = useTypedSelector(selectResult);
     const queryParams = React.useMemo(() => parseQuery(location), [location]);
     const database = getDatabaseFromQueryParams(queryParams);
+    const requestEpoch = React.useRef(0);
+    const latestLocation = React.useRef(history.location);
+    React.useEffect(() => {
+        return history.listen((nextLocation, action) => {
+            const previousLocation = latestLocation.current;
+            latestLocation.current = nextLocation;
+            if (
+                action !== 'REPLACE' ||
+                !isLegacyDatabaseNormalization(previousLocation, nextLocation)
+            ) {
+                requestEpoch.current += 1;
+            }
+        });
+    }, [history]);
     const latestEditorState = React.useRef({
         activeTabId,
         input: currentInput,
@@ -156,9 +221,7 @@ export function useOpenExternalQueryInEditor() {
             const currentQueryParams = parseQuery(history.location);
             return (
                 getDatabaseFromQueryParams(currentQueryParams) === destination.database &&
-                history.location.pathname === destination.pathname &&
-                history.location.search === destination.search &&
-                history.location.hash === destination.hash
+                requestEpoch.current === destination.requestEpoch
             );
         },
         [history],
@@ -173,11 +236,7 @@ export function useOpenExternalQueryInEditor() {
                 return true;
             }
 
-            const currentExecution = getCurrentExecutionIdentity();
-            return (
-                currentExecution?.activeTabId === confirmedExecution.activeTabId &&
-                currentExecution.startTime === confirmedExecution.startTime
-            );
+            return isSameExecution(getCurrentExecutionIdentity(), confirmedExecution);
         },
         [getCurrentExecutionIdentity, isDestinationCurrent],
     );
@@ -229,21 +288,21 @@ export function useOpenExternalQueryInEditor() {
                             database: executionDatabase,
                         }).unwrap();
                     } catch {
-                        createToast({
-                            name: 'stop-error',
-                            title: '',
-                            content: i18n('toaster.stop-error'),
-                            theme: 'danger',
-                            autoHiding: STOP_QUERY_ERROR_AUTO_HIDE_TIMEOUT,
-                        });
-                        return;
+                        const currentRunningExecution = getCurrentRunningExecutionIdentity();
+                        if (isSameExecution(currentRunningExecution, runningExecution)) {
+                            createToast({
+                                name: 'stop-error',
+                                title: '',
+                                content: i18n('toaster.stop-error'),
+                                theme: 'danger',
+                                autoHiding: STOP_QUERY_ERROR_AUTO_HIDE_TIMEOUT,
+                            });
+                            return;
+                        }
                     }
 
                     const currentEditorState = latestEditorState.current;
-                    if (
-                        currentEditorState.activeTabId !== runningExecution.activeTabId ||
-                        currentEditorState.result?.startTime !== runningExecution.startTime
-                    ) {
+                    if (!isSameExecution(getCurrentExecutionIdentity(), runningExecution)) {
                         return;
                     }
 
@@ -265,6 +324,7 @@ export function useOpenExternalQueryInEditor() {
             openExternalQueryInEditor(query);
         },
         [
+            getCurrentExecutionIdentity,
             getCurrentRunningExecutionIdentity,
             isMultiTabEnabled,
             isRequestContextCurrent,
@@ -295,6 +355,7 @@ export function useOpenExternalQueryInEditor() {
                 return;
             }
 
+            requestEpoch.current += 1;
             const currentIsQueryRunning = Boolean(latestEditorState.current.result?.isLoading);
             const confirmedExecution =
                 !isMultiTabEnabled && currentIsQueryRunning
@@ -308,9 +369,7 @@ export function useOpenExternalQueryInEditor() {
                 query,
                 destination: {
                     database,
-                    pathname: history.location.pathname,
-                    search: history.location.search,
-                    hash: history.location.hash,
+                    requestEpoch: requestEpoch.current,
                 },
                 confirmedExecution,
             };
@@ -326,6 +385,6 @@ export function useOpenExternalQueryInEditor() {
 
             latestOpenExternalQueryInEditorWithConfirmation.current(request);
         },
-        [database, getCurrentRunningExecutionIdentity, history, isMultiTabEnabled],
+        [database, getCurrentRunningExecutionIdentity, isMultiTabEnabled],
     );
 }

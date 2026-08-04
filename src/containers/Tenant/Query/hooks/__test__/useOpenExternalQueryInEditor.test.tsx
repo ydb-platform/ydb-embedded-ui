@@ -110,10 +110,12 @@ function getSearchParam(search: string, name: string) {
 
 function createDeferred<T>() {
     let resolvePromise: (value: T) => void = () => undefined;
-    const promise = new Promise<T>((resolve) => {
+    let rejectPromise: (reason?: unknown) => void = () => undefined;
+    const promise = new Promise<T>((resolve, reject) => {
         resolvePromise = resolve;
+        rejectPromise = reject;
     });
-    return {promise, resolve: resolvePromise};
+    return {promise, reject: rejectPromise, resolve: resolvePromise};
 }
 
 describe('useOpenExternalQueryInEditor', () => {
@@ -203,17 +205,17 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(onAfterOpen).not.toHaveBeenCalled();
     });
 
-    test('navigates from a non-database route with retained Query page params', async () => {
+    test('preserves the environment when navigating from a non-database route', async () => {
         const {history, result} = renderOpenExternalQueryHook({
             isMultiTabEnabled: true,
-            initialLocation: '/cluster?database=%2FRoot%2Fdb&databasePage=query',
+            initialLocation: '/cloud-prod/node/1?database=%2FRoot%2Fdb&databasePage=query',
         });
 
         await act(async () => {
             await result.current({title: 'Select query', input: 'SELECT 1;'});
         });
 
-        expect(history.location.pathname).toBe('/database');
+        expect(history.location.pathname).toBe('/cloud-prod/database');
         expect(getSearchParam(history.location.search, 'databasePage')).toBe('query');
         expect(getSearchParam(history.location.search, 'queryTab')).toBe('newQuery');
     });
@@ -233,6 +235,37 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(getSearchParam(history.location.search, 'name')).toBeNull();
         expect(getSearchParam(history.location.search, 'databasePage')).toBe('query');
         expect(getSearchParam(history.location.search, 'queryTab')).toBe('newQuery');
+    });
+
+    test('continues after equivalent legacy database URL normalization', async () => {
+        const {history, result, store} = renderOpenExternalQueryHook({
+            dirtyInput: 'SELECT unsaved;',
+            initialLocation: '/database?name=%2FRoot%2Fdb&databasePage=diagnostics',
+        });
+        const dirtyConfirmation = createDeferred<boolean>();
+        showModal.mockReturnValueOnce(dirtyConfirmation.promise as never);
+
+        act(() => {
+            result.current({title: 'Replacement', input: 'SELECT replacement;'});
+        });
+
+        await waitFor(() => {
+            expect(showModal).toHaveBeenCalledWith(UNSAVED_CHANGES_DIALOG, {
+                id: UNSAVED_CHANGES_DIALOG,
+            });
+        });
+        await act(async () => {
+            history.replace('/database?database=%2FRoot%2Fdb&databasePage=diagnostics');
+        });
+        await act(async () => {
+            dirtyConfirmation.resolve(true);
+            await dirtyConfirmation.promise;
+        });
+
+        expect(selectUserInput(store.getState())).toBe('SELECT replacement;');
+        expect(getSearchParam(history.location.search, 'database')).toBe('/Root/db');
+        expect(getSearchParam(history.location.search, 'name')).toBeNull();
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('query');
     });
 
     test('keeps a dirty single-tab query when replacement is cancelled', async () => {
@@ -365,6 +398,46 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(onAfterOpen).not.toHaveBeenCalled();
     });
 
+    test('opens only the latest request after a shared running-query confirmation', async () => {
+        const firstAfterOpen = jest.fn();
+        const secondAfterOpen = jest.fn();
+        const {activeTabId, result, store} = renderOpenExternalQueryHook({
+            runningInput: 'SELECT running;',
+        });
+        const abort = registerRunningQuery(activeTabId);
+        const runningConfirmation = createDeferred<boolean>();
+        showModal.mockReturnValue(runningConfirmation.promise as never);
+
+        act(() => {
+            result.current({
+                title: 'First replacement',
+                input: 'SELECT first;',
+                onAfterOpen: firstAfterOpen,
+            });
+            result.current({
+                title: 'Second replacement',
+                input: 'SELECT second;',
+                onAfterOpen: secondAfterOpen,
+            });
+        });
+
+        await waitFor(() => {
+            expect(showModal).toHaveBeenCalledTimes(2);
+        });
+        await act(async () => {
+            runningConfirmation.resolve(true);
+            await runningConfirmation.promise;
+        });
+
+        await waitFor(() => {
+            expect(selectUserInput(store.getState())).toBe('SELECT second;');
+        });
+        expect(sendQuery).toHaveBeenCalledTimes(1);
+        expect(abort).toHaveBeenCalledTimes(1);
+        expect(firstAfterOpen).not.toHaveBeenCalled();
+        expect(secondAfterOpen).toHaveBeenCalledTimes(1);
+    });
+
     test('cancels a non-streaming query on the server before replacing it', async () => {
         const {activeTabId, result, store} = renderOpenExternalQueryHook({
             runningInput: 'SELECT running;',
@@ -491,6 +564,51 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(createToast).toHaveBeenCalledWith(
             expect.objectContaining({name: 'stop-error', theme: 'danger'}),
         );
+    });
+
+    test('opens after the query finishes while server cancellation rejects', async () => {
+        const onAfterOpen = jest.fn();
+        const {activeTabId, result, store} = renderOpenExternalQueryHook({
+            runningInput: 'SELECT running;',
+        });
+        registerRunningQuery(activeTabId);
+        const cancelResponse = createDeferred<{}>();
+        sendQuery.mockReturnValue(cancelResponse.promise);
+        showModal.mockResolvedValue(true as never);
+
+        act(() => {
+            result.current({
+                title: 'Replacement',
+                input: 'SELECT replacement;',
+                onAfterOpen,
+            });
+        });
+
+        await waitFor(() => {
+            expect(sendQuery).toHaveBeenCalledTimes(1);
+        });
+        await act(async () => {
+            store.dispatch(
+                setQueryResult({
+                    tabId: activeTabId,
+                    result: {
+                        executionId: 'running-execution',
+                        type: 'execute',
+                        queryId: 'running-query',
+                        isLoading: false,
+                        startTime: 1,
+                    },
+                }),
+            );
+            cancelResponse.reject(new Error('Query already finished'));
+            await cancelResponse.promise.catch(() => undefined);
+        });
+
+        await waitFor(() => {
+            expect(selectUserInput(store.getState())).toBe('SELECT replacement;');
+        });
+        expect(createToast).not.toHaveBeenCalled();
+        expect(onAfterOpen).toHaveBeenCalledTimes(1);
     });
 
     test('stops a streaming query locally before replacing it', async () => {
@@ -684,7 +802,7 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(onAfterOpen).not.toHaveBeenCalled();
     });
 
-    test('does not open after leaving the database during running-query confirmation', async () => {
+    test('does not resume after leaving and returning during running-query confirmation', async () => {
         const onAfterOpen = jest.fn();
         const {activeTabId, history, result, store} = renderOpenExternalQueryHook({
             runningInput: 'SELECT running;',
@@ -708,7 +826,7 @@ describe('useOpenExternalQueryInEditor', () => {
         });
         await act(async () => {
             history.push('/home');
-            store.dispatch(setQueryResult({tabId: activeTabId, result: undefined}));
+            history.push('/tenant?database=%2FRoot%2Fdb&databasePage=diagnostics');
         });
         await act(async () => {
             runningConfirmation.resolve(true);
@@ -718,8 +836,8 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(sendQuery).not.toHaveBeenCalled();
         expect(abort).not.toHaveBeenCalled();
         expect(selectUserInput(store.getState())).toBe('SELECT running;');
-        expect(history.location.pathname).toBe('/home');
-        expect(history.location.search).toBe('');
+        expect(history.location.pathname).toBe('/tenant');
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('diagnostics');
         expect(onAfterOpen).not.toHaveBeenCalled();
     });
 
