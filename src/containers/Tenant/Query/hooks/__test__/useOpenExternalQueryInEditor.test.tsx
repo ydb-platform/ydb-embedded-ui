@@ -95,6 +95,14 @@ function getSearchParam(search: string, name: string) {
     return new URLSearchParams(search).get(name);
 }
 
+function createDeferred<T>() {
+    let resolvePromise: (value: T) => void = () => undefined;
+    const promise = new Promise<T>((resolve) => {
+        resolvePromise = resolve;
+    });
+    return {promise, resolve: resolvePromise};
+}
+
 describe('useOpenExternalQueryInEditor', () => {
     const showModal = jest.spyOn(NiceModal, 'show');
 
@@ -171,6 +179,23 @@ describe('useOpenExternalQueryInEditor', () => {
         });
 
         expect(history.location.pathname).toBe('/database');
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('query');
+        expect(getSearchParam(history.location.search, 'queryTab')).toBe('newQuery');
+    });
+
+    test('opens from a legacy database name parameter before URL migration', async () => {
+        const {history, result, store} = renderOpenExternalQueryHook({
+            isMultiTabEnabled: true,
+            initialLocation: '/database?name=%2FRoot%2Fdb&databasePage=diagnostics',
+        });
+
+        await act(async () => {
+            await result.current({title: 'Select query', input: 'SELECT 1;'});
+        });
+
+        expect(selectUserInput(store.getState())).toBe('SELECT 1;');
+        expect(getSearchParam(history.location.search, 'database')).toBe('/Root/db');
+        expect(getSearchParam(history.location.search, 'name')).toBeNull();
         expect(getSearchParam(history.location.search, 'databasePage')).toBe('query');
         expect(getSearchParam(history.location.search, 'queryTab')).toBe('newQuery');
     });
@@ -289,6 +314,46 @@ describe('useOpenExternalQueryInEditor', () => {
         });
         expect(abort).not.toHaveBeenCalled();
         expect(selectUserInput(store.getState())).toBe('SELECT edited while running;');
+        expect(selectResult(store.getState())?.isLoading).toBe(true);
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('diagnostics');
+        expect(onAfterOpen).not.toHaveBeenCalled();
+    });
+
+    test('rechecks dirty state after confirming a running query', async () => {
+        const onAfterOpen = jest.fn();
+        const {activeTabId, history, result, store} = renderOpenExternalQueryHook({
+            runningInput: 'SELECT running;',
+        });
+        const abort = registerRunningQuery(activeTabId);
+        const runningConfirmation = createDeferred<boolean>();
+        showModal
+            .mockReturnValueOnce(runningConfirmation.promise as never)
+            .mockResolvedValueOnce(false as never);
+
+        act(() => {
+            result.current({
+                title: 'Replacement',
+                input: 'SELECT replacement;',
+                onAfterOpen,
+            });
+        });
+
+        await act(async () => {
+            store.dispatch(changeUserInput({input: 'SELECT edited while confirming;'}));
+        });
+        await act(async () => {
+            runningConfirmation.resolve(true);
+            await runningConfirmation.promise;
+        });
+
+        expect(showModal).toHaveBeenNthCalledWith(1, RUNNING_QUERY_DIALOG, {
+            id: RUNNING_QUERY_DIALOG,
+        });
+        expect(showModal).toHaveBeenNthCalledWith(2, UNSAVED_CHANGES_DIALOG, {
+            id: UNSAVED_CHANGES_DIALOG,
+        });
+        expect(abort).not.toHaveBeenCalled();
+        expect(selectUserInput(store.getState())).toBe('SELECT edited while confirming;');
         expect(selectResult(store.getState())?.isLoading).toBe(true);
         expect(getSearchParam(history.location.search, 'databasePage')).toBe('diagnostics');
         expect(onAfterOpen).not.toHaveBeenCalled();

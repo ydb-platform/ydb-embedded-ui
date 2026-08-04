@@ -40,8 +40,10 @@ export function useOpenExternalQueryInEditor() {
     const result = useTypedSelector(selectResult);
     const isQueryRunning = Boolean(result?.isLoading);
     const queryParams = React.useMemo(() => parseQuery(location), [location]);
-    const hasDatabase =
-        typeof queryParams.database === 'string' && Boolean(queryParams.database.trim());
+    const databaseParam = queryParams.database || queryParams.name;
+    const database =
+        typeof databaseParam === 'string' && databaseParam.trim() ? databaseParam : undefined;
+    const hasDatabase = Boolean(database);
 
     const openExternalQueryInEditor = React.useCallback(
         ({title, input, savedQueryName, onAfterOpen}: ExternalQueryToOpen) => {
@@ -72,6 +74,8 @@ export function useOpenExternalQueryInEditor() {
 
             const queryPath = getTenantPath({
                 ...queryParams,
+                database,
+                name: undefined,
                 [TENANT_PAGE]: TENANT_PAGES_IDS.query,
                 [TenantTabsGroups.queryTab]: TENANT_QUERY_TABS_ID.newQuery,
             });
@@ -86,31 +90,36 @@ export function useOpenExternalQueryInEditor() {
 
             onAfterOpen?.();
         },
-        [activeTabId, dispatch, history, isMultiTabEnabled, isQueryRunning, queryParams],
+        [activeTabId, database, dispatch, history, isMultiTabEnabled, isQueryRunning, queryParams],
     );
 
     const openExternalQueryInEditorWithConfirmation = useChangeInputWithConfirmation(
         openExternalQueryInEditor,
         isMultiTabEnabled,
     );
+    const latestOpenExternalQueryInEditorWithConfirmation = React.useRef(
+        openExternalQueryInEditorWithConfirmation,
+    );
+    latestOpenExternalQueryInEditorWithConfirmation.current =
+        openExternalQueryInEditorWithConfirmation;
 
     return React.useCallback(
         (query: ExternalQueryToOpen) => {
             if (!hasDatabase) {
-                return undefined;
+                return;
             }
 
             if (!isMultiTabEnabled && isQueryRunning) {
                 getRunningQueryConfirmation().then((confirmed) => {
                     if (confirmed) {
-                        openExternalQueryInEditorWithConfirmation(query);
+                        latestOpenExternalQueryInEditorWithConfirmation.current(query);
                     }
                 });
-                return undefined;
+                return;
             }
 
-            return openExternalQueryInEditorWithConfirmation(query);
+            latestOpenExternalQueryInEditorWithConfirmation.current(query);
         },
-        [hasDatabase, isMultiTabEnabled, isQueryRunning, openExternalQueryInEditorWithConfirmation],
+        [hasDatabase, isMultiTabEnabled, isQueryRunning],
     );
 }
