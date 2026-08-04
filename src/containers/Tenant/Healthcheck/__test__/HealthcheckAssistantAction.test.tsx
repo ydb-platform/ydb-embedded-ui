@@ -136,6 +136,16 @@ describe('HealthcheckAssistantAction', () => {
         const statusRow = screen.getByTestId('healthcheck-status').parentElement;
         expect(screen.getByRole('button', {name: 'Refresh'}).parentElement).toBe(statusRow);
         expect(container.querySelector('.ydb-healthcheck__issue-action')).not.toBeInTheDocument();
+
+        const issueTrigger = screen.getByRole('button', {name: /Disk is unavailable/});
+        const issueSummary = container.querySelector<HTMLElement>(
+            '.ydb-healthcheck__issue-summary',
+        );
+        expect(issueTrigger).toContainElement(issueSummary);
+        expect(issueTrigger).toHaveAttribute('aria-expanded', 'false');
+
+        fireEvent.click(issueSummary as HTMLElement);
+        expect(issueTrigger).toHaveAttribute('aria-expanded', 'true');
     });
 
     test.each([

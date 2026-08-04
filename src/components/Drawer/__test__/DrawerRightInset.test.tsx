@@ -6,6 +6,7 @@ import {DrawerWrapper} from '../Drawer';
 import {DrawerContextProvider, isClickInRightInset, useDrawerContext} from '../DrawerContext';
 
 const mockSaveWidth = jest.fn();
+let mockSavedWidth = '600';
 let mockDrawerProps: {
     maxSize?: number;
     onResizeEnd?: (width: number) => void;
@@ -14,7 +15,7 @@ let mockDrawerProps: {
 };
 
 jest.mock('../../../utils/hooks/useSetting', () => ({
-    useSetting: () => ['600', mockSaveWidth],
+    useSetting: () => [mockSavedWidth, mockSaveWidth],
 }));
 jest.mock('@gravity-ui/uikit', () => {
     const actual = jest.requireActual('@gravity-ui/uikit');
@@ -63,7 +64,15 @@ function ContextProbe() {
     );
 }
 
-function DrawerHarness({showController = true, inset = 320}) {
+function DrawerHarness({
+    showController = true,
+    inset = 320,
+    isPercentageWidth = false,
+}: {
+    showController?: boolean;
+    inset?: number;
+    isPercentageWidth?: boolean;
+}) {
     return (
         <DrawerContextProvider>
             {showController ? <InsetController inset={inset} /> : null}
@@ -73,6 +82,7 @@ function DrawerHarness({showController = true, inset = 320}) {
                 onCloseDrawer={jest.fn()}
                 renderDrawerContent={() => <div>Healthcheck drawer</div>}
                 storageKey="healthcheck-width"
+                isPercentageWidth={isPercentageWidth}
             >
                 <main>Page</main>
             </DrawerWrapper>
@@ -85,6 +95,7 @@ describe('drawer right inset', () => {
 
     beforeEach(() => {
         containerWidth = 1_000;
+        mockSavedWidth = '600';
         mockDrawerProps = {};
         mockSaveWidth.mockClear();
         ResizeObserverMock.instances = [];
@@ -114,7 +125,7 @@ describe('drawer right inset', () => {
         const {rerender} = render(<DrawerHarness />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('context-probe')).toHaveTextContent('680:320');
+            expect(screen.getByTestId('context-probe')).toHaveTextContent('1000:320');
         });
         expect(mockDrawerProps.maxSize).toBe(680);
         expect(mockDrawerProps.style).toEqual({overflow: 'hidden', width: 680});
@@ -135,7 +146,7 @@ describe('drawer right inset', () => {
         const {unmount} = render(<DrawerHarness inset={250} />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('context-probe')).toHaveTextContent('750:250');
+            expect(screen.getByTestId('context-probe')).toHaveTextContent('1000:250');
         });
 
         containerWidth = 900;
@@ -143,14 +154,14 @@ describe('drawer right inset', () => {
             ResizeObserverMock.instances[0].callback([], ResizeObserverMock.instances[0]);
         });
 
-        expect(screen.getByTestId('context-probe')).toHaveTextContent('650:250');
+        expect(screen.getByTestId('context-probe')).toHaveTextContent('900:250');
         expect(mockDrawerProps.maxSize).toBe(650);
 
         unmount();
         expect(ResizeObserverMock.instances[0].disconnect).toHaveBeenCalledTimes(1);
     });
 
-    it('converts a resize against available width and persists only the user resize', async () => {
+    it('converts a pixel resize against the full width and persists only the user resize', async () => {
         jest.useFakeTimers();
         render(<DrawerHarness inset={250} />);
 
@@ -168,6 +179,65 @@ describe('drawer right inset', () => {
         });
         expect(mockSaveWidth).toHaveBeenCalledWith('500');
         jest.useRealTimers();
+    });
+
+    it('keeps a fitting percentage width independent and clamps only while it collides', async () => {
+        mockSavedWidth = '60';
+        const {rerender} = render(<DrawerHarness inset={320} isPercentageWidth />);
+
+        await waitFor(() => {
+            expect(mockDrawerProps.maxSize).toBe(680);
+        });
+        expect(mockDrawerProps.size).toBe(600);
+        expect(mockSaveWidth).not.toHaveBeenCalled();
+
+        rerender(<DrawerHarness inset={500} isPercentageWidth />);
+
+        await waitFor(() => {
+            expect(mockDrawerProps.maxSize).toBe(500);
+        });
+        expect(mockDrawerProps.size).toBe(500);
+        expect(mockSaveWidth).not.toHaveBeenCalled();
+
+        rerender(<DrawerHarness showController={false} isPercentageWidth />);
+
+        await waitFor(() => {
+            expect(mockDrawerProps.maxSize).toBe(1_000);
+        });
+        expect(mockDrawerProps.size).toBe(600);
+        expect(mockSaveWidth).not.toHaveBeenCalled();
+    });
+
+    it('persists a percentage resize against the full width without jumping on release', async () => {
+        jest.useFakeTimers();
+        mockSavedWidth = '60';
+        const {rerender} = render(<DrawerHarness inset={320} isPercentageWidth />);
+
+        expect(mockDrawerProps.maxSize).toBe(680);
+
+        act(() => {
+            mockDrawerProps.onResizeEnd?.(500);
+        });
+        expect(mockDrawerProps.size).toBe(500);
+
+        act(() => {
+            jest.advanceTimersByTime(200);
+        });
+        expect(mockSaveWidth).toHaveBeenCalledWith('50');
+
+        rerender(<DrawerHarness showController={false} isPercentageWidth />);
+        expect(mockDrawerProps.size).toBe(500);
+        jest.useRealTimers();
+    });
+
+    it('passes an explicit zero width constraint when the inset consumes the container', async () => {
+        render(<DrawerHarness inset={1_000} />);
+
+        await waitFor(() => {
+            expect(mockDrawerProps.maxSize).toBe(0);
+        });
+        expect(mockDrawerProps.size).toBe(0);
+        expect(mockDrawerProps.style).toEqual({overflow: 'hidden', width: 0});
     });
 
     it('identifies clicks in the adjacent right inset', () => {

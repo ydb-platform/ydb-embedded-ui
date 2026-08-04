@@ -43,49 +43,100 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
         <Flex className={b('issue-wrapper')}>
             <Disclosure className={b('issue-content')} defaultExpanded={expanded}>
                 <Disclosure.Summary>
-                    {(props) => (
-                        <Flex
-                            wrap="nowrap"
-                            gap={2}
-                            alignItems="center"
-                            className={b('issue-summary')}
-                        >
-                            <button
-                                aria-controls={props.ariaControls}
-                                aria-expanded={props.expanded}
-                                className={b('disclosure-trigger')}
-                                data-qa={props.qa}
-                                disabled={props.disabled}
-                                id={props.id}
-                                onClick={props.onClick}
-                                onKeyDown={props.onKeyDown}
-                            >
-                                <Flex
-                                    wrap="nowrap"
-                                    gap={2}
-                                    justifyContent="space-between"
-                                    alignItems="center"
+                    {(props) => {
+                        if (!assistant) {
+                            return (
+                                <button
+                                    aria-controls={props.ariaControls}
+                                    aria-expanded={props.expanded}
+                                    className={b('disclosure-trigger')}
+                                    data-qa={props.qa}
+                                    disabled={props.disabled}
+                                    id={props.id}
+                                    onClick={props.onClick}
+                                    onKeyDown={props.onKeyDown}
                                 >
-                                    <Flex direction="column" gap={1} alignSelf="center">
-                                        <Text variant="subheader-2">{issue.message}</Text>
+                                    <Flex
+                                        wrap="nowrap"
+                                        gap={2}
+                                        justifyContent="space-between"
+                                        className={b('issue-summary')}
+                                    >
+                                        <Flex direction="column" gap={1} alignSelf="center">
+                                            <Text variant="subheader-2">{issue.message}</Text>
 
-                                        {issue.status && (
-                                            <div className={b('issue-status')}>
-                                                <EntityStatus.Label
-                                                    size="s"
-                                                    status={hcStatusToColorFlag[issue.status]}
-                                                />
-                                            </div>
-                                        )}
+                                            {issue.status && (
+                                                <div className={b('issue-status')}>
+                                                    <EntityStatus.Label
+                                                        size="s"
+                                                        status={hcStatusToColorFlag[issue.status]}
+                                                    />
+                                                </div>
+                                            )}
+                                        </Flex>
+                                        <Flex
+                                            wrap="nowrap"
+                                            gap={2}
+                                            alignItems="center"
+                                            height="max-content"
+                                        >
+                                            <Divider
+                                                className={b('issue-divider')}
+                                                orientation="vertical"
+                                            />
+                                            <ArrowToggle
+                                                direction={props.expanded ? 'top' : 'bottom'}
+                                            />
+                                        </Flex>
                                     </Flex>
-                                    <Divider
-                                        className={b('issue-divider')}
-                                        orientation="vertical"
-                                    />
-                                    <ArrowToggle direction={props.expanded ? 'top' : 'bottom'} />
-                                </Flex>
-                            </button>
-                            {assistant ? (
+                                </button>
+                            );
+                        }
+
+                        return (
+                            <Flex
+                                wrap="nowrap"
+                                gap={2}
+                                alignItems="center"
+                                className={b('issue-summary')}
+                            >
+                                <button
+                                    aria-controls={props.ariaControls}
+                                    aria-expanded={props.expanded}
+                                    className={b('disclosure-trigger', {'with-action': true})}
+                                    data-qa={props.qa}
+                                    disabled={props.disabled}
+                                    id={props.id}
+                                    onClick={props.onClick}
+                                    onKeyDown={props.onKeyDown}
+                                >
+                                    <Flex
+                                        wrap="nowrap"
+                                        gap={2}
+                                        justifyContent="space-between"
+                                        alignItems="center"
+                                    >
+                                        <Flex direction="column" gap={1} alignSelf="center">
+                                            <Text variant="subheader-2">{issue.message}</Text>
+
+                                            {issue.status && (
+                                                <div className={b('issue-status')}>
+                                                    <EntityStatus.Label
+                                                        size="s"
+                                                        status={hcStatusToColorFlag[issue.status]}
+                                                    />
+                                                </div>
+                                            )}
+                                        </Flex>
+                                        <Divider
+                                            className={b('issue-divider')}
+                                            orientation="vertical"
+                                        />
+                                        <ArrowToggle
+                                            direction={props.expanded ? 'top' : 'bottom'}
+                                        />
+                                    </Flex>
+                                </button>
                                 <div
                                     className={b('issue-action')}
                                     onClick={(event) => event.stopPropagation()}
@@ -97,9 +148,9 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                                         issue={rawIssue}
                                     />
                                 </div>
-                            ) : null}
-                        </Flex>
-                    )}
+                            </Flex>
+                        );
+                    }}
                 </Disclosure.Summary>
                 <div className={b('animation-container')}>
                     <Flex className={b('issue-details')} direction="column" gap={3} grow={1}>
