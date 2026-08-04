@@ -97,10 +97,10 @@ function renderOpenExternalQueryHook({
     };
 }
 
-function registerRunningQuery(tabId: string) {
+function registerRunningQuery(tabId: string, database = '/Root/db') {
     const abort = jest.fn();
     const query = Object.assign(new Promise<never>(() => undefined), {abort});
-    queryExecutionManagerInstance.registerQuery(tabId, query);
+    queryExecutionManagerInstance.registerQuery(tabId, query, database);
     return abort;
 }
 
@@ -323,6 +323,73 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(abort).toHaveBeenCalledTimes(1);
         expect(selectUserInput(store.getState())).toBe('SELECT replacement;');
         expect(selectResult(store.getState())).toBeUndefined();
+    });
+
+    test('cancels a non-streaming query against its originating database', async () => {
+        const {activeTabId, history, result, store} = renderOpenExternalQueryHook({
+            runningInput: 'SELECT running;',
+        });
+        const abort = registerRunningQuery(activeTabId, '/Root/db');
+        showModal.mockResolvedValue(true as never);
+
+        await act(async () => {
+            history.push('/database?database=%2FRoot%2Fother&databasePage=diagnostics');
+        });
+        await act(async () => {
+            await result.current({title: 'Replacement', input: 'SELECT replacement;'});
+        });
+
+        await waitFor(() => {
+            expect(abort).toHaveBeenCalledTimes(1);
+        });
+        expect(sendQuery).toHaveBeenCalledWith(
+            {
+                action: 'cancel-query',
+                database: '/Root/db',
+                internal_call: true,
+                query_id: 'running-query',
+            },
+            {signal: expect.any(AbortSignal)},
+        );
+        expect(selectUserInput(store.getState())).toBe('SELECT replacement;');
+        expect(getSearchParam(history.location.search, 'database')).toBe('/Root/other');
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('query');
+    });
+
+    test('does not open against a stale route after server cancellation', async () => {
+        const onAfterOpen = jest.fn();
+        const {activeTabId, history, result, store} = renderOpenExternalQueryHook({
+            runningInput: 'SELECT running;',
+        });
+        const abort = registerRunningQuery(activeTabId);
+        const cancelResponse = createDeferred<{}>();
+        sendQuery.mockReturnValue(cancelResponse.promise);
+        showModal.mockResolvedValue(true as never);
+
+        act(() => {
+            result.current({
+                title: 'Replacement',
+                input: 'SELECT replacement;',
+                onAfterOpen,
+            });
+        });
+
+        await waitFor(() => {
+            expect(sendQuery).toHaveBeenCalledTimes(1);
+        });
+        await act(async () => {
+            history.push('/database?database=%2FRoot%2Fother&databasePage=diagnostics');
+        });
+        await act(async () => {
+            cancelResponse.resolve({});
+            await cancelResponse.promise;
+        });
+
+        expect(abort).toHaveBeenCalledTimes(1);
+        expect(selectUserInput(store.getState())).toBe('SELECT running;');
+        expect(getSearchParam(history.location.search, 'database')).toBe('/Root/other');
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('diagnostics');
+        expect(onAfterOpen).not.toHaveBeenCalled();
     });
 
     test('keeps a non-streaming query when server cancellation fails', async () => {

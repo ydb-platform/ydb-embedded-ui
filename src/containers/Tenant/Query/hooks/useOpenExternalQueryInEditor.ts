@@ -114,16 +114,27 @@ export function useOpenExternalQueryInEditor() {
 
     const stopRunningQueryAndOpen = React.useCallback(
         async (query: ExternalQueryToOpen) => {
+            const openingLocation = {
+                pathname: history.location.pathname,
+                search: history.location.search,
+                hash: history.location.hash,
+            };
+
             if (!isMultiTabEnabled && isQueryRunning && activeTabId) {
                 if (result?.streamingStatus) {
                     queryExecutionManagerInstance.abortQuery(activeTabId);
                 } else {
-                    if (!database || !result?.queryId) {
+                    const executionDatabase =
+                        queryExecutionManagerInstance.getQueryDatabase(activeTabId);
+                    if (!database || !executionDatabase || !result?.queryId) {
                         return;
                     }
 
                     try {
-                        await sendCancelQuery({queryId: result.queryId, database}).unwrap();
+                        await sendCancelQuery({
+                            queryId: result.queryId,
+                            database: executionDatabase,
+                        }).unwrap();
                     } catch {
                         createToast({
                             name: 'stop-error',
@@ -154,12 +165,21 @@ export function useOpenExternalQueryInEditor() {
                 }
             }
 
+            if (
+                history.location.pathname !== openingLocation.pathname ||
+                history.location.search !== openingLocation.search ||
+                history.location.hash !== openingLocation.hash
+            ) {
+                return;
+            }
+
             openExternalQueryInEditor(query);
         },
         [
             activeTabId,
             currentInput,
             database,
+            history,
             isCurrentTabDirty,
             isMultiTabEnabled,
             isQueryRunning,
