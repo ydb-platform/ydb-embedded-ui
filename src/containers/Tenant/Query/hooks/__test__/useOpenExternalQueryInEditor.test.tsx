@@ -1,10 +1,11 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
-import {act, renderHook} from '@testing-library/react';
+import {act, renderHook, waitFor} from '@testing-library/react';
 import {Provider} from 'react-redux';
 import {Router} from 'react-router-dom';
 
+import type {YdbEmbeddedAPI} from '../../../../../services/api';
 import {configureStore} from '../../../../../store';
 import {
     changeUserInput,
@@ -19,24 +20,33 @@ import {
     setQueryResult,
 } from '../../../../../store/reducers/query/query';
 import {configureUIFactory} from '../../../../../uiFactory/uiFactory';
+import createToast from '../../../../../utils/createToast';
 import {RUNNING_QUERY_DIALOG} from '../../../../../utils/hooks/withConfirmation/RunningQueryDialog';
 import {UNSAVED_CHANGES_DIALOG} from '../../../../../utils/hooks/withConfirmation/UnsavedChangesDialog';
 import {queryExecutionManagerInstance} from '../../QueryEditor/utils/queryExecutionManager';
 import {useOpenExternalQueryInEditor} from '../useOpenExternalQueryInEditor';
 
+jest.mock('../../../../../utils/createToast');
+
+const originalApi = window.api;
+const sendQuery = jest.fn();
+
 function renderOpenExternalQueryHook({
     isMultiTabEnabled = false,
     dirtyInput,
     runningInput,
+    isStreaming = false,
     initialLocation = '/tenant?database=%2FRoot%2Fdb&databasePage=diagnostics',
 }: {
     isMultiTabEnabled?: boolean;
     dirtyInput?: string;
     runningInput?: string;
+    isStreaming?: boolean;
     initialLocation?: string;
 } = {}) {
     configureUIFactory({enableMultiTabQueryEditor: isMultiTabEnabled});
     const {history, store} = configureStore();
+    window.api = {viewer: {sendQuery}} as unknown as YdbEmbeddedAPI;
     history.push(initialLocation);
     const activeTabId = selectActiveTabId(store.getState());
     if (!activeTabId) {
@@ -47,13 +57,16 @@ function renderOpenExternalQueryHook({
         store.dispatch(changeUserInput({input: runningInput}));
         store.dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: runningInput}));
         store.dispatch(setIsDirty(false));
-        const runningResult = {
+        const runningResultBase = {
             executionId: 'running-execution',
             type: 'execute' as const,
             queryId: 'running-query',
             isLoading: true,
             startTime: 1,
         };
+        const runningResult = isStreaming
+            ? {...runningResultBase, streamingStatus: 'running' as const}
+            : runningResultBase;
         store.dispatch(
             setQueryResult({
                 tabId: activeTabId,
@@ -109,6 +122,9 @@ describe('useOpenExternalQueryInEditor', () => {
     beforeEach(() => {
         sessionStorage.clear();
         localStorage.clear();
+        sendQuery.mockReset();
+        sendQuery.mockResolvedValue({});
+        jest.mocked(createToast).mockClear();
         showModal.mockReset();
     });
 
@@ -117,6 +133,7 @@ describe('useOpenExternalQueryInEditor', () => {
     });
 
     afterAll(() => {
+        window.api = originalApi;
         showModal.mockRestore();
         configureUIFactory({enableMultiTabQueryEditor: false});
     });
@@ -274,7 +291,7 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(onAfterOpen).not.toHaveBeenCalled();
     });
 
-    test('stops a running single-tab query before replacing it', async () => {
+    test('cancels a non-streaming query on the server before replacing it', async () => {
         const {activeTabId, result, store} = renderOpenExternalQueryHook({
             runningInput: 'SELECT running;',
         });
@@ -285,9 +302,69 @@ describe('useOpenExternalQueryInEditor', () => {
             await result.current({title: 'Replacement', input: 'SELECT replacement;'});
         });
 
+        await waitFor(() => {
+            expect(abort).toHaveBeenCalledTimes(1);
+        });
         expect(showModal).toHaveBeenCalledWith(RUNNING_QUERY_DIALOG, {
             id: RUNNING_QUERY_DIALOG,
         });
+        expect(sendQuery).toHaveBeenCalledWith(
+            {
+                action: 'cancel-query',
+                database: '/Root/db',
+                internal_call: true,
+                query_id: 'running-query',
+            },
+            {signal: expect.any(AbortSignal)},
+        );
+        expect(sendQuery.mock.invocationCallOrder[0]).toBeLessThan(
+            abort.mock.invocationCallOrder[0],
+        );
+        expect(abort).toHaveBeenCalledTimes(1);
+        expect(selectUserInput(store.getState())).toBe('SELECT replacement;');
+        expect(selectResult(store.getState())).toBeUndefined();
+    });
+
+    test('keeps a non-streaming query when server cancellation fails', async () => {
+        const onAfterOpen = jest.fn();
+        const {activeTabId, history, result, store} = renderOpenExternalQueryHook({
+            runningInput: 'SELECT running;',
+        });
+        const abort = registerRunningQuery(activeTabId);
+        sendQuery.mockRejectedValue(new Error('Unable to cancel query'));
+        showModal.mockResolvedValue(true as never);
+
+        await act(async () => {
+            await result.current({title: 'Replacement', input: 'SELECT replacement;', onAfterOpen});
+        });
+
+        await waitFor(() => {
+            expect(sendQuery).toHaveBeenCalledTimes(1);
+        });
+        expect(sendQuery).toHaveBeenCalledTimes(1);
+        expect(abort).not.toHaveBeenCalled();
+        expect(selectUserInput(store.getState())).toBe('SELECT running;');
+        expect(selectResult(store.getState())?.isLoading).toBe(true);
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('diagnostics');
+        expect(onAfterOpen).not.toHaveBeenCalled();
+        expect(createToast).toHaveBeenCalledWith(
+            expect.objectContaining({name: 'stop-error', theme: 'danger'}),
+        );
+    });
+
+    test('stops a streaming query locally before replacing it', async () => {
+        const {activeTabId, result, store} = renderOpenExternalQueryHook({
+            runningInput: 'SELECT running;',
+            isStreaming: true,
+        });
+        const abort = registerRunningQuery(activeTabId);
+        showModal.mockResolvedValue(true as never);
+
+        await act(async () => {
+            await result.current({title: 'Replacement', input: 'SELECT replacement;'});
+        });
+
+        expect(sendQuery).not.toHaveBeenCalled();
         expect(abort).toHaveBeenCalledTimes(1);
         expect(selectUserInput(store.getState())).toBe('SELECT replacement;');
         expect(selectResult(store.getState())).toBeUndefined();
@@ -312,6 +389,7 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(showModal).toHaveBeenNthCalledWith(2, UNSAVED_CHANGES_DIALOG, {
             id: UNSAVED_CHANGES_DIALOG,
         });
+        expect(sendQuery).not.toHaveBeenCalled();
         expect(abort).not.toHaveBeenCalled();
         expect(selectUserInput(store.getState())).toBe('SELECT edited while running;');
         expect(selectResult(store.getState())?.isLoading).toBe(true);
@@ -352,9 +430,46 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(showModal).toHaveBeenNthCalledWith(2, UNSAVED_CHANGES_DIALOG, {
             id: UNSAVED_CHANGES_DIALOG,
         });
+        expect(sendQuery).not.toHaveBeenCalled();
         expect(abort).not.toHaveBeenCalled();
         expect(selectUserInput(store.getState())).toBe('SELECT edited while confirming;');
         expect(selectResult(store.getState())?.isLoading).toBe(true);
+        expect(getSearchParam(history.location.search, 'databasePage')).toBe('diagnostics');
+        expect(onAfterOpen).not.toHaveBeenCalled();
+    });
+
+    test('does not overwrite edits made while server cancellation is pending', async () => {
+        const onAfterOpen = jest.fn();
+        const {activeTabId, history, result, store} = renderOpenExternalQueryHook({
+            runningInput: 'SELECT running;',
+        });
+        const abort = registerRunningQuery(activeTabId);
+        const cancelResponse = createDeferred<{}>();
+        sendQuery.mockReturnValue(cancelResponse.promise);
+        showModal.mockResolvedValue(true as never);
+
+        act(() => {
+            result.current({
+                title: 'Replacement',
+                input: 'SELECT replacement;',
+                onAfterOpen,
+            });
+        });
+
+        await waitFor(() => {
+            expect(sendQuery).toHaveBeenCalledTimes(1);
+        });
+        await act(async () => {
+            store.dispatch(changeUserInput({input: 'SELECT edited while stopping;'}));
+        });
+        await act(async () => {
+            cancelResponse.resolve({});
+            await cancelResponse.promise;
+        });
+
+        expect(abort).toHaveBeenCalledTimes(1);
+        expect(selectUserInput(store.getState())).toBe('SELECT edited while stopping;');
+        expect(selectIsDirty(store.getState())).toBe(true);
         expect(getSearchParam(history.location.search, 'databasePage')).toBe('diagnostics');
         expect(onAfterOpen).not.toHaveBeenCalled();
     });
