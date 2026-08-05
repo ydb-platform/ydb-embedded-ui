@@ -18,6 +18,19 @@ $block: '.ydb-storage-expert-mode-panel';
         color: var(--g-color-text-brand-contrast);
         background-color: var(--g-color-base-danger-heavy);
     }
+
+    &__capacity-alert-option {
+        width: 100%;
+    }
+
+    &__capacity-alert-option-abbreviation {
+        width: 40px;
+        margin-inline-start: auto;
+
+        .g-label__text {
+            justify-content: center;
+        }
+    }
 }
 
 // When the expert-mode panel is rendered inside the table layout, grow the

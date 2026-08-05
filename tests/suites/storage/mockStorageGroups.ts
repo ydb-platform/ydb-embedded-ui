@@ -13,6 +13,7 @@ const MOCK_VDISK_SLOT_ID_BASE = 200;
 
 export const MISSING_WHITEBOARD_VDISK_INDEX = 0;
 export const MISSING_FRONT_QUEUES_VDISK_INDEX = 1;
+export const ALL_GREEN_VDISK_INDEX = 10;
 
 function createMockPDisk(index: number, state = TPDiskState.Normal): TStorageVDisk['PDisk'] {
     return {
@@ -58,6 +59,7 @@ function createMockVDisk({
     donorMode = false,
     pDiskState = TPDiskState.Normal,
     satisfactionRank,
+    allocatedSizeMultiplier,
 }: {
     index: number;
     groupId?: number;
@@ -73,11 +75,15 @@ function createMockVDisk({
         FreshRank?: {RankPercent: number; Flag: EFlag};
         LevelRank?: {RankPercent: number; Flag: EFlag};
     };
+    allocatedSizeMultiplier?: number;
 }): TStorageVDisk {
     const nodeId = MOCK_NODE_ID_BASE + index;
     const pDiskId = MOCK_PDISK_ID_BASE + index;
     const vDiskSlotId = MOCK_VDISK_SLOT_ID_BASE + index;
-    const allocatedSize = MOCK_ALLOCATED_SIZE_BASE * (index + 1);
+    const allocatedSize =
+        state === EVDiskState.PDiskError
+            ? 3 * MOCK_ALLOCATED_SIZE_BASE
+            : MOCK_ALLOCATED_SIZE_BASE * (allocatedSizeMultiplier ?? index + 1);
     const availableSize = MOCK_SLOT_SIZE - allocatedSize;
 
     return {
@@ -129,7 +135,7 @@ function createMockVDisk({
 }
 
 export function createMockStorageGroupsResponse(): StorageGroupsResponse {
-    // Define 10 VDisks with different combinations of State, CapacityAlert, FrontQueues, and SatisfactionRank
+    // Define 11 VDisks with different combinations of State, CapacityAlert, FrontQueues, and SatisfactionRank
     // Covers all 6 EVDiskState values, various ECapacityAlert values, and multiple Fresh/Level Rank combinations
     const vDiskConfigs = [
         {
@@ -229,6 +235,16 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             diskSpace: EFlag.Red,
             satisfactionRank: undefined, // No data for this disk
         },
+        {
+            state: EVDiskState.OK,
+            capacityAlert: ECapacityAlert.GREEN,
+            frontQueues: EFlag.Green,
+            diskSpace: EFlag.Green,
+            satisfactionRank: {
+                FreshRank: {RankPercent: 40, Flag: EFlag.Green},
+                LevelRank: {RankPercent: 35, Flag: EFlag.Green},
+            },
+        },
     ];
 
     // First group - without replication
@@ -241,6 +257,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             diskSpace: config.diskSpace,
             replicated: true,
             satisfactionRank: config.satisfactionRank,
+            allocatedSizeMultiplier: index === ALL_GREEN_VDISK_INDEX ? 5 : undefined,
         }),
     );
 
@@ -264,6 +281,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             diskSpace: config.diskSpace,
             replicated: false,
             satisfactionRank: config.satisfactionRank,
+            allocatedSizeMultiplier: index === ALL_GREEN_VDISK_INDEX ? 5 : undefined,
         });
 
         const donorVDisk = createMockVDisk({
@@ -277,6 +295,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             replicated: false,
             donorMode: true,
             satisfactionRank: config.satisfactionRank,
+            allocatedSizeMultiplier: index === ALL_GREEN_VDISK_INDEX ? 5 : undefined,
         });
 
         // Update VDiskId for donor

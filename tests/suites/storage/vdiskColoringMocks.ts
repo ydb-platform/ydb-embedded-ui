@@ -1,5 +1,7 @@
 import type {Page} from '@playwright/test';
 
+import type {StorageGroupsResponse} from '../../../src/types/api/storage';
+
 import {createMockStorageGroupsResponse} from './mockStorageGroups';
 
 export const DATABASE = '/Root';
@@ -56,7 +58,10 @@ async function setupNodeInfoMock(page: Page) {
     });
 }
 
-export async function setupVDiskColoringMocks(page: Page) {
+export async function setupVDiskColoringMocks(
+    page: Page,
+    storageGroupsResponse: StorageGroupsResponse = createMockStorageGroupsResponse(),
+) {
     await setupMonitoringUserMock(page);
     await setupCapabilitiesMock(page);
     await setupNodeInfoMock(page);
@@ -65,7 +70,7 @@ export async function setupVDiskColoringMocks(page: Page) {
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify(createMockStorageGroupsResponse()),
+            body: JSON.stringify(storageGroupsResponse),
         });
     });
 }

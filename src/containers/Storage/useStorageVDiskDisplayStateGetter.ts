@@ -1,6 +1,7 @@
 import React from 'react';
 
-import {isCapacityAlert} from '../../types/api/enums';
+import {ECapacityAlert, EFlag, isCapacityAlert} from '../../types/api/enums';
+import {EVDiskState} from '../../types/api/vdisk';
 import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
 import type {DiskDisplayStateGetter} from '../../utils/disks/displayState';
 import {getDefaultDiskDisplayState} from '../../utils/disks/displayState';
@@ -8,6 +9,12 @@ import {getIconCalculator} from '../../utils/disks/getIconStrategy';
 import {getSeverityCalculator} from '../../utils/disks/getSeverityStrategy';
 import type {VDisksGroupByValue} from '../../utils/disks/groupBy';
 import {VDisksGroupBy} from '../../utils/disks/groupBy';
+import {
+    calculateCompactionIcon,
+    calculateFrontQueuesIcon,
+    calculateSpaceIcon,
+} from '../../utils/disks/iconCalculators';
+import type {PreparedVDisk} from '../../utils/disks/types';
 
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
 import {useIsStorageExpertMode, useVDisksGroupByParam} from './useStorageQueryParams';
@@ -23,9 +30,20 @@ function getModeModifier(groupBy: VDisksGroupByValue): string | undefined {
         case VDisksGroupBy.Compaction:
             return 'mode-compaction';
         case VDisksGroupBy.All:
+            return 'mode-all';
         default:
             return undefined;
     }
+}
+
+function isAllModeHealthy(vDisk: PreparedVDisk) {
+    return (
+        vDisk.VDiskState === EVDiskState.OK &&
+        vDisk.CapacityAlert === ECapacityAlert.GREEN &&
+        vDisk.FrontQueues === EFlag.Green &&
+        vDisk.SatisfactionRank?.FreshRank?.Flag === EFlag.Green &&
+        vDisk.SatisfactionRank?.LevelRank?.Flag === EFlag.Green
+    );
 }
 
 export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
@@ -53,17 +71,35 @@ export function useStorageVDiskDisplayStateGetter(): DiskDisplayStateGetter {
 
             const severityCalculator = getSeverityCalculator(vdisksGroupBy);
             const iconCalculator = getIconCalculator(vdisksGroupBy);
-
-            const isLegendInactive =
-                vdisksGroupBy === VDisksGroupBy.Space &&
+            const isCapacityAlertInactive =
                 isCapacityAlert(vDisk.CapacityAlert) &&
                 inactiveLegendItems.has(vDisk.CapacityAlert);
+            const showAllModeIndicators = vdisksGroupBy === VDisksGroupBy.All && !isDonor;
+            const capacityAlertIndicator =
+                showAllModeIndicators && !isCapacityAlertInactive
+                    ? calculateSpaceIcon(vDisk, isDonor)
+                    : undefined;
+            const frontQueuesIndicator = showAllModeIndicators
+                ? calculateFrontQueuesIcon(vDisk, isDonor)
+                : undefined;
+            const calculatedCompactionIndicator = showAllModeIndicators
+                ? calculateCompactionIcon(vDisk, isDonor)
+                : undefined;
+            const compactionIndicator = Array.isArray(calculatedCompactionIndicator)
+                ? calculatedCompactionIndicator
+                : undefined;
 
             return {
                 severity: severityCalculator(vDisk),
                 icon: iconCalculator(vDisk, isDonor),
+                ...(capacityAlertIndicator ? {capacityAlertIndicator} : {}),
+                ...(frontQueuesIndicator ? {frontQueuesIndicator} : {}),
+                ...(compactionIndicator ? {compactionIndicator} : {}),
+                ...(vdisksGroupBy === VDisksGroupBy.All
+                    ? {allModeHasIssues: !isAllModeHealthy(vDisk)}
+                    : {}),
                 modeModifier,
-                isLegendInactive,
+                isLegendInactive: vdisksGroupBy === VDisksGroupBy.Space && isCapacityAlertInactive,
                 showNoDataPlaceholder: false,
             };
         },
