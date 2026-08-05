@@ -1,6 +1,6 @@
 import {Gear, PlayFill, StopFill} from '@gravity-ui/icons';
 import type {ButtonProps} from '@gravity-ui/uikit';
-import {Button, Icon, Tooltip} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Icon, Tooltip} from '@gravity-ui/uikit';
 
 import QuerySettingsDescription from '../../../../components/QuerySettingsDescription/QuerySettingsDescription';
 import {cn} from '../../../../utils/cn';
@@ -43,9 +43,14 @@ const Explain = (props: ButtonProps) => (
 );
 
 const ExplainAnalyze = (props: ButtonProps) => (
-    <Button {...props} className={b('explain-analyze-button')}>
-        {i18n('action.explain-analyze')}
-    </Button>
+    <ActionTooltip
+        title={i18n('explain-analyze.tooltip.title')}
+        description={i18n('explain-analyze.tooltip.description')}
+    >
+        <Button {...props} className={b('explain-analyze-button')}>
+            {i18n('action.explain-analyze')}
+        </Button>
+    </ActionTooltip>
 );
 
 interface SettingsButtonProps {

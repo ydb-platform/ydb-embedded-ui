@@ -50,6 +50,8 @@
   "action.run": "Run",
   "action.explain": "Explain",
   "action.explain-analyze": "Explain Analyze",
+  "explain-analyze.tooltip.title": "The query will be executed",
+  "explain-analyze.tooltip.description": "Any changes will be applied to the database. Query results are ignored.",
   "action.edit": "Edit",
   "action.expand": "Expand",
   "action.collapse": "Collapse",
