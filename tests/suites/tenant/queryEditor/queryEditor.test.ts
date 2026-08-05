@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import type {Page, Request} from '@playwright/test';
+import type {Locator, Page, Request} from '@playwright/test';
 
 import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {getClipboardContent} from '../../../utils/clipboard';
@@ -98,6 +98,14 @@ function isExplainAnalyzeRequest(request: Request) {
     return body?.action === 'execute-query' && body.stats === 'full';
 }
 
+function getLocatorWidth(locator: Locator) {
+    return locator.evaluate((element) => element.getBoundingClientRect().width);
+}
+
+async function expectLocatorWidth(locator: Locator, expectedWidth: number) {
+    await expect.poll(() => getLocatorWidth(locator)).toBe(expectedWidth);
+}
+
 test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
     const queryActionScreenshotThemes = ['light', 'dark'] as const;
@@ -178,6 +186,9 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.explainAnalyze(testQuery, QUERY_MODES.query);
 
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(
+            queryEditor.paneWrapper.isTabSelected(ResultTabNames.ExplainPlan),
+        ).resolves.toBe(true);
         await expect(queryEditor.isResultTabVisible(ResultTabNames.Schema)).resolves.toBe(true);
         await expect(queryEditor.isResultTabVisible(ResultTabNames.ExplainPlan)).resolves.toBe(
             true,
@@ -186,6 +197,18 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isResultTabVisible(ResultTabNames.Result, 1000)).resolves.toBe(
             false,
         );
+
+        await queryEditor.paneWrapper.selectTab(ResultTabNames.Stats);
+        await expect(queryEditor.paneWrapper.isTabSelected(ResultTabNames.Stats)).resolves.toBe(
+            true,
+        );
+
+        const repeatedExplainAnalyzeRequest = page.waitForRequest(isExplainAnalyzeRequest);
+        await queryEditor.clickExplainAnalyzeButton();
+        await repeatedExplainAnalyzeRequest;
+        await expect(
+            queryEditor.paneWrapper.isTabSelected(ResultTabNames.ExplainPlan),
+        ).resolves.toBe(true);
 
         const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
         await expect(explainSchema).toBeVisible({timeout: VISIBILITY_TIMEOUT});
@@ -316,9 +339,18 @@ test.describe('Test Query Editor', async () => {
         await setupMockStreamingFetch(page);
 
         await queryEditor.setQuery(simpleQuery);
+        const runButton = queryEditor.getQueryActionButton(ButtonNames.Run);
+        await expectLocatorWidth(runButton, 76);
+        const runButtonWidth = await getLocatorWidth(runButton);
+        const queryActionsWidth = await getLocatorWidth(queryEditor.getQueryActionsLocator());
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+        const stopButton = queryEditor
+            .getQueryActionsLocator()
+            .getByRole('button', {name: ButtonNames.Stop});
+        await expectLocatorWidth(stopButton, runButtonWidth);
+        await expectLocatorWidth(queryEditor.getQueryActionsLocator(), queryActionsWidth);
         await expect(queryEditor.isStopButtonActionView()).resolves.toBe(false);
         await expect(queryEditor.isElapsedTimeVisible()).resolves.toBe(true);
     });
@@ -488,6 +520,10 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
         await queryEditor.setQuery(longRunningQuery);
+        const explainAnalyzeButton = queryEditor.getQueryActionButton(ButtonNames.ExplainAnalyze);
+        await expectLocatorWidth(explainAnalyzeButton, 111);
+        const explainAnalyzeButtonWidth = await getLocatorWidth(explainAnalyzeButton);
+        const queryActionsWidth = await getLocatorWidth(queryEditor.getQueryActionsLocator());
 
         const explainAnalyzeRequest = page.waitForRequest(isExplainAnalyzeRequest);
         const cancelRequest = page.waitForRequest(
@@ -498,6 +534,14 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.clickExplainAnalyzeButton();
         await explainAnalyzeRequest;
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+        const stopButton = queryEditor
+            .getQueryActionsLocator()
+            .getByRole('button', {name: ButtonNames.Stop});
+        await expect(stopButton).toHaveClass(
+            /ydb-query-editor-button__stop-button_explain-analyze/,
+        );
+        await expectLocatorWidth(stopButton, explainAnalyzeButtonWidth);
+        await expectLocatorWidth(queryEditor.getQueryActionsLocator(), queryActionsWidth);
         await queryEditor.clickStopButton();
 
         const cancelRequestBody = getViewerQueryRequestBody(await cancelRequest);

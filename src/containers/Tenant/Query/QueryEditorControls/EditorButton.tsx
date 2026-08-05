@@ -18,8 +18,19 @@ const Run = (props: ButtonProps) => (
     </Button>
 );
 
-const Stop = ({error, ...props}: ButtonProps & {error?: boolean}) => (
-    <Button {...props} className={b('stop-button', {error})}>
+type StopButtonProps = ButtonProps & {
+    error?: boolean;
+    replacedAction?: 'run' | 'explain' | 'explainAnalyze';
+};
+
+const Stop = ({error, replacedAction, ...props}: StopButtonProps) => (
+    <Button
+        {...props}
+        className={b('stop-button', {
+            error,
+            'explain-analyze': replacedAction === 'explainAnalyze',
+        })}
+    >
         <Icon data={StopFill} size={16} />
         {i18n('action.stop')}
     </Button>

@@ -43,7 +43,7 @@ const RESULT_VIEW_CONFIG: Record<QueryAction, ResultViewConfig> = {
             RESULT_OPTIONS_IDS.simplified,
             RESULT_OPTIONS_IDS.stats,
         ],
-        defaultSection: RESULT_OPTIONS_IDS.schema,
+        defaultSection: RESULT_OPTIONS_IDS.simplified,
     },
 };
 

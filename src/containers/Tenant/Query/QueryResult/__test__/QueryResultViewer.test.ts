@@ -32,7 +32,7 @@ describe('QueryResultViewer result sections', () => {
             RESULT_OPTIONS_IDS.result,
         );
         expect(getDefaultResultSection(QUERY_ACTIONS.explainAnalyze)).toBe(
-            RESULT_OPTIONS_IDS.schema,
+            RESULT_OPTIONS_IDS.simplified,
         );
     });
 });

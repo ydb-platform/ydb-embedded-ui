@@ -36,14 +36,16 @@ interface QueryEditorControlsProps {
 
 const STOP_AUTO_HIDE_TIMEOUT = 5000;
 
+type ActionButtonType = 'run' | 'explain' | 'explainAnalyze';
+
 interface ActionButtonProps {
-    type: 'run' | 'explain' | 'explainAnalyze';
+    type: ActionButtonType;
     isHighlighted: boolean;
     isLoading: boolean;
     isStoppable: boolean;
     controlsDisabled: boolean;
     onActionClick: () => void;
-    renderStopButton: () => React.ReactNode;
+    renderStopButton: (type: ActionButtonType) => React.ReactNode;
 }
 
 const actionButtonComponents = {
@@ -61,19 +63,28 @@ const ActionButton = ({
     onActionClick,
     renderStopButton,
 }: ActionButtonProps) => {
-    if (isStoppable && isLoading && isHighlighted) {
-        return renderStopButton();
-    }
-
     const ButtonComponent = actionButtonComponents[type];
+    const button =
+        isStoppable && isLoading && isHighlighted ? (
+            renderStopButton(type)
+        ) : (
+            <ButtonComponent
+                onClick={onActionClick}
+                disabled={controlsDisabled}
+                loading={isLoading}
+                view={isHighlighted ? 'action' : undefined}
+            />
+        );
 
     return (
-        <ButtonComponent
-            onClick={onActionClick}
-            disabled={controlsDisabled}
-            loading={isLoading}
-            view={isHighlighted ? 'action' : undefined}
-        />
+        <div
+            className={b('action-button', {
+                run: type === 'run',
+                'explain-analyze': type === 'explainAnalyze',
+            })}
+        >
+            {button}
+        </div>
     );
 };
 
@@ -156,10 +167,11 @@ export const QueryEditorControls = ({
 
     const controlsDisabled = disabled || !input;
 
-    const renderStopButton = () => (
+    const renderStopButton = (replacedAction: ActionButtonType) => (
         <EditorButton.Stop
             loading={cancelQueryResponse.isLoading}
             error={cancelQueryError}
+            replacedAction={replacedAction}
             onClick={onStopButtonClick}
         />
     );

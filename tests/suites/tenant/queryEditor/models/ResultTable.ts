@@ -18,6 +18,12 @@ export class PaneWrapper {
         await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await tab.click();
     }
+
+    async isTabSelected(tabName: ResultTabNames) {
+        const tab = this.radioButton.getByLabel(tabName);
+        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return tab.isChecked();
+    }
 }
 
 export class ResultTable {

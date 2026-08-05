@@ -24,6 +24,7 @@ import {
     setHistoryCurrentQueryId,
     setIsDirty,
     setLastExecutedQueryText,
+    setResultTab,
     setTenantPath,
 } from '../../../../store/reducers/query/query';
 import type {QueryResult} from '../../../../store/reducers/query/types';
@@ -61,6 +62,7 @@ import {
 import {PreviewContainer} from '../Preview/Preview';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
 import {QueryResultViewer} from '../QueryResult/QueryResultViewer';
+import {RESULT_OPTIONS_IDS} from '../QueryResult/constants';
 import {QuerySettingsDialog} from '../QuerySettingsDialog/QuerySettingsDialog';
 import {SAVE_QUERY_DIALOG, useSaveQueryWithTabSync} from '../SaveQuery/SaveQuery';
 import {getTabTitleForSave} from '../utils/queryTabTitles';
@@ -606,6 +608,15 @@ export default function QueryEditor({
             }
 
             const {tabId, queryId, startTime} = execution;
+
+            if (actionType === QUERY_ACTIONS.explainAnalyze) {
+                dispatch(
+                    setResultTab({
+                        queryType: QUERY_ACTIONS.explainAnalyze,
+                        tabId: RESULT_OPTIONS_IDS.simplified,
+                    }),
+                );
+            }
 
             reachExplainQueryMetricaGoals(actionType, querySettings);
 
