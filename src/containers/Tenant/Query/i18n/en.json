@@ -49,6 +49,9 @@
   "action.stop": "Stop",
   "action.run": "Run",
   "action.explain": "Explain",
+  "action.explain-analyze": "Explain Analyze",
+  "explain-analyze.tooltip.title": "The query will be executed",
+  "explain-analyze.tooltip.description": "Any changes will be applied to the database. Query results are ignored.",
   "action.edit": "Edit",
   "action.expand": "Expand",
   "action.collapse": "Collapse",
@@ -81,7 +84,7 @@
 
   "filter.text.placeholder": "Search by query text...",
 
-  "gear.tooltip": "Query execution settings have been changed for ",
+  "gear.tooltip": "Query execution settings have been changed",
   "banner.query-settings.message": "Query was executed with modified settings: ",
   "banner.query-stopped.message": "Data is not up to date because the request was not completed.",
   "banner.query-stopped.never-show": "Never show again",

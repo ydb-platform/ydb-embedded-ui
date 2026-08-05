@@ -1,16 +1,29 @@
 @use '../../../../styles/mixins.scss';
 
 .ydb-query-editor-button {
-    &__explain-button {
-        width: 92px;
+    &__run-button {
+        width: 76px;
+        min-width: 76px;
+        max-width: 76px;
     }
 
-    &__run-button,
+    &__explain-analyze-button {
+        width: 111px;
+        min-width: 111px;
+        max-width: 111px;
+    }
+
     &__stop-button {
         width: 76px;
-    }
+        min-width: 76px;
+        max-width: 76px;
 
-    &__stop-button {
+        &_explain-analyze {
+            width: 111px;
+            min-width: 111px;
+            max-width: 111px;
+        }
+
         .g-root_theme_dark &,
         .g-root_theme_dark-hc & {
             --g-button-text-color: var(--g-color-text-dark-primary);

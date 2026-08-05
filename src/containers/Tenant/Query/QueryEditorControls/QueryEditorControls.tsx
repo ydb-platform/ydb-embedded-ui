@@ -6,6 +6,7 @@ import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import createToast from '../../../../utils/createToast';
 import {useTypedSelector} from '../../../../utils/hooks';
+import {QUERY_ACTIONS} from '../../../../utils/query';
 import {reachMetricaGoal} from '../../../../utils/yaMetrica';
 import {NewSQL} from '../NewSQL/NewSQL';
 import {queryExecutionManagerInstance} from '../QueryEditor/utils/queryExecutionManager';
@@ -25,24 +26,33 @@ interface QueryEditorControlsProps {
     highlightedAction: QueryAction;
     queryId?: string;
     database: string;
-    isStreamingEnabled?: boolean;
+    isCurrentQueryStreaming?: boolean;
 
     handleGetExplainQueryClick: (text: string) => void;
+    handleGetExplainAnalyzeQueryClick: (text: string) => void;
     handleSendExecuteClick: (text: string) => void;
     onSettingsButtonClick: () => void;
 }
 
 const STOP_AUTO_HIDE_TIMEOUT = 5000;
 
+type ActionButtonType = 'run' | 'explain' | 'explainAnalyze';
+
 interface ActionButtonProps {
-    type: 'run' | 'explain';
+    type: ActionButtonType;
     isHighlighted: boolean;
     isLoading: boolean;
     isStoppable: boolean;
     controlsDisabled: boolean;
     onActionClick: () => void;
-    renderStopButton: () => React.ReactNode;
+    renderStopButton: (type: ActionButtonType) => React.ReactNode;
 }
+
+const actionButtonComponents = {
+    run: EditorButton.Run,
+    explain: EditorButton.Explain,
+    explainAnalyze: EditorButton.ExplainAnalyze,
+};
 
 const ActionButton = ({
     type,
@@ -53,19 +63,28 @@ const ActionButton = ({
     onActionClick,
     renderStopButton,
 }: ActionButtonProps) => {
-    if (isStoppable && isLoading && isHighlighted) {
-        return renderStopButton();
-    }
-
-    const ButtonComponent = type === 'run' ? EditorButton.Run : EditorButton.Explain;
+    const ButtonComponent = actionButtonComponents[type];
+    const button =
+        isStoppable && isLoading && isHighlighted ? (
+            renderStopButton(type)
+        ) : (
+            <ButtonComponent
+                onClick={onActionClick}
+                disabled={controlsDisabled}
+                loading={isLoading}
+                view={isHighlighted ? 'action' : undefined}
+            />
+        );
 
     return (
-        <ButtonComponent
-            onClick={onActionClick}
-            disabled={controlsDisabled}
-            loading={isLoading}
-            view={isHighlighted ? 'action' : undefined}
-        />
+        <div
+            className={b('action-button', {
+                run: type === 'run',
+                'explain-analyze': type === 'explainAnalyze',
+            })}
+        >
+            {button}
+        </div>
     );
 };
 
@@ -78,11 +97,12 @@ export const QueryEditorControls = ({
     highlightedAction,
     queryId,
     database,
-    isStreamingEnabled,
+    isCurrentQueryStreaming,
 
     handleSendExecuteClick,
     onSettingsButtonClick,
     handleGetExplainQueryClick,
+    handleGetExplainAnalyzeQueryClick,
 }: QueryEditorControlsProps) => {
     const input = useTypedSelector(selectUserInput);
     const activeTabId = useTypedSelector(selectActiveTabId);
@@ -93,7 +113,7 @@ export const QueryEditorControls = ({
     const onStopButtonClick = React.useCallback(async () => {
         reachMetricaGoal('stopQuery');
         try {
-            if (isStreamingEnabled) {
+            if (isCurrentQueryStreaming) {
                 if (!activeTabId) {
                     return;
                 }
@@ -119,10 +139,11 @@ export const QueryEditorControls = ({
                 setCancelQueryError(false);
             }, CANCEL_ERROR_ANIMATION_DURATION);
         }
-    }, [isStreamingEnabled, queryId, sendCancelQuery, database, activeTabId]);
+    }, [isCurrentQueryStreaming, queryId, sendCancelQuery, database, activeTabId]);
 
-    const isRunHighlighted = highlightedAction === 'execute';
-    const isExplainHighlighted = highlightedAction === 'explain';
+    const isRunHighlighted = highlightedAction === QUERY_ACTIONS.execute;
+    const isExplainHighlighted = highlightedAction === QUERY_ACTIONS.explain;
+    const isExplainAnalyzeHighlighted = highlightedAction === QUERY_ACTIONS.explainAnalyze;
 
     const onRunButtonClick = React.useCallback(() => {
         handleSendExecuteClick(input);
@@ -131,6 +152,10 @@ export const QueryEditorControls = ({
     const onExplainButtonClick = React.useCallback(() => {
         handleGetExplainQueryClick(input);
     }, [handleGetExplainQueryClick, input]);
+
+    const onExplainAnalyzeButtonClick = React.useCallback(() => {
+        handleGetExplainAnalyzeQueryClick(input);
+    }, [handleGetExplainAnalyzeQueryClick, input]);
 
     React.useEffect(() => {
         return () => {
@@ -142,10 +167,11 @@ export const QueryEditorControls = ({
 
     const controlsDisabled = disabled || !input;
 
-    const renderStopButton = () => (
+    const renderStopButton = (replacedAction: ActionButtonType) => (
         <EditorButton.Stop
             loading={cancelQueryResponse.isLoading}
             error={cancelQueryError}
+            replacedAction={replacedAction}
             onClick={onStopButtonClick}
         />
     );
@@ -169,6 +195,15 @@ export const QueryEditorControls = ({
                     isStoppable={isStoppable}
                     controlsDisabled={controlsDisabled}
                     onActionClick={onExplainButtonClick}
+                    renderStopButton={renderStopButton}
+                />
+                <ActionButton
+                    type="explainAnalyze"
+                    isHighlighted={isExplainAnalyzeHighlighted}
+                    isLoading={isLoading}
+                    isStoppable={isStoppable}
+                    controlsDisabled={controlsDisabled}
+                    onActionClick={onExplainAnalyzeButtonClick}
                     renderStopButton={renderStopButton}
                 />
                 <EditorButton.Settings onClick={onSettingsButtonClick} isLoading={isLoading} />

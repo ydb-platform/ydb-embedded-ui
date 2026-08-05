@@ -189,6 +189,7 @@ export type RenderNodeTooltipActions = (props: {data?: PreparedStorageNode}) => 
 
 export interface UiMetricaGoals {
     runQuery?: string;
+    explainAnalyzeQuery?: string;
     stopQuery?: string;
     openManagePartitioning?: string;
     applyManagePartitioning?: string;

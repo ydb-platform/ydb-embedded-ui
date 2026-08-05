@@ -45,6 +45,17 @@ describe('QueryResultViewer tab persistence integration', () => {
         });
     });
 
+    test('should save and retrieve tab selection for explain analyze queries', () => {
+        const state = queryReducer(
+            initialState,
+            setResultTab({queryType: 'explain-analyze', tabId: 'stats'}),
+        );
+
+        expect(state.selectedResultTab).toEqual({
+            'explain-analyze': 'stats',
+        });
+    });
+
     test('should maintain separate preferences for different query types', () => {
         let state = initialState;
 
@@ -66,6 +77,14 @@ describe('QueryResultViewer tab persistence integration', () => {
         expect(state.selectedResultTab).toEqual({
             explain: 'ast',
             execute: 'stats',
+        });
+
+        // Set explain analyze tab - should not override execute or explain
+        state = queryReducer(state, setResultTab({queryType: 'explain-analyze', tabId: 'stats'}));
+        expect(state.selectedResultTab).toEqual({
+            explain: 'ast',
+            execute: 'stats',
+            'explain-analyze': 'stats',
         });
     });
 

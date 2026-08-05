@@ -278,7 +278,7 @@ export function NewSQL({database}: NewSQLProps) {
         <DropdownMenu
             items={items}
             renderSwitcher={(props) => (
-                <Button {...props}>
+                <Button {...props} qa="new-sql-dropdown-switcher">
                     {i18n('button.new-sql')}
                     <Button.Icon>
                         <ChevronDown />

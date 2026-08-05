@@ -8,6 +8,7 @@ import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {
     MAX_QUERY_TIMEOUT_SECONDS,
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    isExecutionQueryAction,
     isQueryCancelledError,
     isQueryErrorResponse,
     parseQueryAPIResponse,
@@ -24,7 +25,12 @@ import {
     setStreamSession,
 } from './slice';
 import type {QuerySourcePosition, QueryStats} from './types';
-import {getActionAndSyntaxFromQueryMode, prepareQueryWithPragmasMetadata} from './utils';
+import {
+    getActionAndSyntaxFromQueryMode,
+    getEffectiveQueryDataForAction,
+    getEffectiveQuerySettingsForAction,
+    prepareQueryWithPragmasMetadata,
+} from './utils';
 
 function getTracingLevelParam(
     querySettings: Partial<QuerySettings>,
@@ -344,8 +350,12 @@ export const queryApi = api.injectEndpoints({
                 {signal, dispatch, getState},
             ) => {
                 const executionId = uuidv4();
+                const effectiveQuerySettings = getEffectiveQuerySettingsForAction(
+                    actionType,
+                    querySettings,
+                );
                 const {query: finalQuery, preparedQueryPrefixLineCount} =
-                    prepareQueryWithPragmasMetadata(query, querySettings.pragmas);
+                    prepareQueryWithPragmasMetadata(query, effectiveQuerySettings.pragmas);
                 const resultSourcePosition = sourcePosition
                     ? {...sourcePosition, preparedQueryPrefixLineCount}
                     : undefined;
@@ -366,9 +376,8 @@ export const queryApi = api.injectEndpoints({
 
                 const {action, syntax} = getActionAndSyntaxFromQueryMode(
                     actionType,
-                    querySettings?.queryMode,
+                    effectiveQuerySettings?.queryMode,
                 );
-
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
@@ -376,26 +385,30 @@ export const queryApi = api.injectEndpoints({
                             database,
                             action,
                             syntax,
-                            stats: querySettings.statisticsMode,
-                            tracingLevel: getTracingLevelParam(querySettings, enableTracingLevel),
-                            limit_rows: getLimitRowsParam(querySettings.limitRows),
-                            transaction_mode: getTransactionModeParam(
-                                querySettings.transactionMode,
+                            stats: effectiveQuerySettings.statisticsMode,
+                            tracingLevel: getTracingLevelParam(
+                                effectiveQuerySettings,
+                                enableTracingLevel,
                             ),
-                            timeout: getTimeoutMsParam(querySettings.timeout),
+                            limit_rows: getLimitRowsParam(effectiveQuerySettings.limitRows),
+                            transaction_mode: getTransactionModeParam(
+                                effectiveQuerySettings.transactionMode,
+                            ),
+                            timeout: getTimeoutMsParam(effectiveQuerySettings.timeout),
                             query_id: queryId,
                             base64,
-                            resource_pool: getResourcePoolParam(querySettings.resourcePool),
+                            resource_pool: getResourcePoolParam(
+                                effectiveQuerySettings.resourcePool,
+                            ),
                         },
                         {signal},
                     );
 
                     if (isQueryErrorResponse(response)) {
                         const status = isQueryCancelledError(response) ? 'stopped' : 'failed';
-                        const queryStats: QueryStats =
-                            actionType === 'execute'
-                                ? createExecuteQueryStats({}, startTime, status)
-                                : {};
+                        const queryStats: QueryStats = isExecutionQueryAction(actionType)
+                            ? createExecuteQueryStats({}, startTime, status)
+                            : {};
 
                         dispatch(
                             setQueryResult({
@@ -425,13 +438,13 @@ export const queryApi = api.injectEndpoints({
                         };
                     }
 
-                    const data = prepareQueryData(response);
-                    data.traceId = response?._meta?.traceId;
+                    const preparedData = prepareQueryData(response);
+                    preparedData.traceId = response?._meta?.traceId;
+                    const data = getEffectiveQueryDataForAction(actionType, preparedData);
 
-                    const queryStats: QueryStats =
-                        actionType === 'execute'
-                            ? createExecuteQueryStats(data, startTime, 'completed')
-                            : {};
+                    const queryStats: QueryStats = isExecutionQueryAction(actionType)
+                        ? createExecuteQueryStats(data, startTime, 'completed')
+                        : {};
 
                     dispatch(
                         setQueryResult({
@@ -456,14 +469,13 @@ export const queryApi = api.injectEndpoints({
                     const isCurrentExecution = currentTabResult?.executionId === executionId;
                     const status = isQueryCancelledError(error) ? 'stopped' : 'failed';
 
-                    const queryStats: QueryStats =
-                        actionType === 'execute'
-                            ? createExecuteQueryStats(
-                                  isCurrentExecution ? (currentTabResult.data ?? {}) : {},
-                                  startTime,
-                                  status,
-                              )
-                            : {};
+                    const queryStats: QueryStats = isExecutionQueryAction(actionType)
+                        ? createExecuteQueryStats(
+                              isCurrentExecution ? (currentTabResult.data ?? {}) : {},
+                              startTime,
+                              status,
+                          )
+                        : {};
 
                     const err = {
                         error,

@@ -67,6 +67,7 @@ interface YqlEditorProps {
     theme: string;
     handleGetExplainQueryClick: (text: string) => void;
     handleSendExecuteClick: (execution: QueryExecution) => void;
+    handleGetExplainAnalyzeQueryClick: (text: string) => void;
     historyQueries: QueryInHistory[];
     goToPreviousQuery: () => void;
     goToNextQuery: () => void;
@@ -78,6 +79,7 @@ export function YqlEditor({
     theme,
     handleSendExecuteClick,
     handleGetExplainQueryClick,
+    handleGetExplainAnalyzeQueryClick,
     historyQueries,
     goToPreviousQuery,
     goToNextQuery,
@@ -200,6 +202,8 @@ export function YqlEditor({
     const handleSendQuery = useEventHandler(() => {
         if (lastUsedQueryAction === QUERY_ACTIONS.explain) {
             handleGetExplainQueryClick(input);
+        } else if (lastUsedQueryAction === QUERY_ACTIONS.explainAnalyze) {
+            handleGetExplainAnalyzeQueryClick(input);
         } else {
             handleSendExecuteClick({text: input});
         }

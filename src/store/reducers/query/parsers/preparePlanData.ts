@@ -63,7 +63,14 @@ export function preparePlanData(
     if (planFromStats) {
         try {
             const planWithStats = JSON.parse(planFromStats);
-            return {...preparePlan(planWithStats), pristine: planWithStats};
+            return {
+                ...preparePlan(planWithStats),
+                pristine: planWithStats,
+                simplifiedPlan: {
+                    plan: prepareSimplifiedPlan([planWithStats]),
+                    pristine: planWithStats,
+                },
+            };
         } catch {
             return {};
         }
