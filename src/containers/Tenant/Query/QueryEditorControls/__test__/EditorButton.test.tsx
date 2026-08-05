@@ -1,5 +1,5 @@
 import {ThemeProvider} from '@gravity-ui/uikit';
-import {act, render, screen} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import {EditorButton} from '../EditorButton';
@@ -23,9 +23,6 @@ describe('EditorButton.ExplainAnalyze', () => {
         );
 
         await user.hover(screen.getByRole('button', {name: 'Explain Analyze'}));
-        await act(async () => {
-            jest.advanceTimersByTime(500);
-        });
 
         expect(screen.getByText('The query will be executed')).toBeVisible();
         expect(
