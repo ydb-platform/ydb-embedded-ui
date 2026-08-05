@@ -29,3 +29,21 @@ export const CAPACITY_METRICS_COLUMN_TITLES = {
         return i18n('field_capacity-alert');
     },
 } as const satisfies Record<CapacityMetricsColumnId, string>;
+
+export const CAPACITY_METRICS_HELP_TEXT = {
+    get MaxPDiskUsage() {
+        return i18n('context_pdisk-usage');
+    },
+    get MaxVDiskSlotUsage() {
+        return i18n('context_vdisk-slot-usage');
+    },
+    get MaxVDiskRawUsage() {
+        return i18n('context_vdisk-raw-usage');
+    },
+    get MaxNormalizedOccupancy() {
+        return i18n('context_normalized-occupancy');
+    },
+    get CapacityAlert() {
+        return i18n('context_capacity-alert');
+    },
+} as const satisfies Record<CapacityMetricsColumnId, string>;

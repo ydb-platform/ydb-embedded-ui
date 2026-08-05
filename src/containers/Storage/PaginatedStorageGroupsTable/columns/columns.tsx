@@ -22,6 +22,7 @@ import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER, YDB_POPOVER_CLASS_NAME} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../../../utils/generateEvaluator';
+import {formatMetricCount} from '../../../../utils/storageMetrics';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
@@ -248,6 +249,15 @@ const allocationUnitsColumn: StorageGroupsColumn = {
     align: DataTable.RIGHT,
 };
 
+const groupSizeInUnitsColumn: StorageGroupsColumn = {
+    name: STORAGE_GROUPS_COLUMNS_IDS.GroupSizeInUnits,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.GroupSizeInUnits,
+    width: 160,
+    render: ({row}) => formatMetricCount(row.GroupSizeInUnits),
+    align: DataTable.RIGHT,
+    sortable: false,
+};
+
 const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
     return {
         name: STORAGE_GROUPS_COLUMNS_IDS.VDisks,
@@ -309,9 +319,22 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
     };
 };
 
-export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
-    return [groupIdColumn, typeColumn, erasureColumn, usageColumn, usedColumn, limitColumn];
-};
+export function getStorageTopGroupsColumns(capacityMetricsEnabled = false): StorageGroupsColumn[] {
+    if (!capacityMetricsEnabled) {
+        return [groupIdColumn, typeColumn, erasureColumn, usageColumn, usedColumn, limitColumn];
+    }
+
+    return [
+        groupIdColumn,
+        typeColumn,
+        erasureColumn,
+        getVDiskSlotUsageColumn<PreparedStorageGroup>(),
+        getCapacityAlertColumn<PreparedStorageGroup>(),
+        groupSizeInUnitsColumn,
+        usedColumn,
+        limitColumn,
+    ];
+}
 
 export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
     const columns = [

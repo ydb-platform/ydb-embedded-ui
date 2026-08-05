@@ -6,6 +6,7 @@ import {getPDiskType} from '../../../utils/disks/getPDiskType';
 import {getPDiskId} from '../../../utils/disks/helpers';
 import {preparePDiskSizeFields, prepareVDiskSizeFields} from '../../../utils/disks/prepareDisks';
 import type {PDiskType, PreparedVDisk} from '../../../utils/disks/types';
+import {parseOptionalNonNegativeNumber} from '../../../utils/utils';
 
 export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
     const {Whiteboard: whiteboardVDisk = {}, PDisk, ...bscVDisk} = data;
@@ -30,11 +31,34 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
         SlotSize: PDisk?.SlotSize,
     });
 
+    const whiteboardAllocatedSize = parseOptionalNonNegativeNumber(whiteboardVDisk.AllocatedSize);
+    const whiteboardAvailableSize = parseOptionalNonNegativeNumber(whiteboardVDisk.AvailableSize);
+    const whiteboardSlotSize = parseOptionalNonNegativeNumber(
+        PDisk?.Whiteboard?.EnforcedDynamicSlotSize,
+    );
+    const whiteboardSizeFields = data.Whiteboard
+        ? prepareVDiskSizeFields({
+              AvailableSize: whiteboardAvailableSize,
+              AllocatedSize: whiteboardAllocatedSize,
+              SlotSize: whiteboardSlotSize,
+          })
+        : undefined;
+    const WhiteboardSize = whiteboardSizeFields
+        ? {
+              AllocatedSize:
+                  whiteboardAllocatedSize === undefined
+                      ? undefined
+                      : whiteboardSizeFields.AllocatedSize,
+              SizeLimit:
+                  whiteboardAvailableSize === undefined && whiteboardSlotSize === undefined
+                      ? undefined
+                      : whiteboardSizeFields.SizeLimit,
+          }
+        : undefined;
+
     const preparedDonors = bscVDisk.Donors?.map((donor) => {
-        const preparedDonor = prepareGroupsVDisk({
-            ...donor,
-            Whiteboard: {...donor.Whiteboard, DonorMode: true},
-        });
+        const preparedDonor = prepareGroupsVDisk(donor);
+        preparedDonor.DonorMode = true;
 
         // Set Recipient reference on the donor pointing back to this VDisk
         preparedDonor.Recipient = {
@@ -48,6 +72,7 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
     return {
         ...mergedVDiskData,
         ...vDiskSizeFields,
+        ...(WhiteboardSize ? {WhiteboardSize} : {}),
         PDisk: preparedPDisk,
         Donors: preparedDonors,
         PDiskId,
@@ -81,6 +106,25 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
         TotalSize: mergedPDiskData.TotalSize,
     });
 
+    const whiteboardAvailableSize = parseOptionalNonNegativeNumber(whiteboardPDisk?.AvailableSize);
+    const whiteboardTotalSize = parseOptionalNonNegativeNumber(whiteboardPDisk?.TotalSize);
+    const whiteboardSizeFields =
+        whiteboardPDisk === undefined
+            ? undefined
+            : preparePDiskSizeFields({
+                  AvailableSize: whiteboardAvailableSize,
+                  TotalSize: whiteboardTotalSize,
+              });
+    const WhiteboardSize = whiteboardSizeFields
+        ? {
+              AllocatedSize:
+                  whiteboardAvailableSize === undefined || whiteboardTotalSize === undefined
+                      ? undefined
+                      : whiteboardSizeFields.AllocatedSize,
+              TotalSize: whiteboardTotalSize,
+          }
+        : undefined;
+
     const Type =
         (bscPDisk.Type?.toUpperCase() as PDiskType) ?? getPDiskType(whiteboardPDisk?.Category);
 
@@ -98,6 +142,7 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
         AllocatedSize,
         AvailableSize,
         TotalSize,
+        ...(WhiteboardSize ? {WhiteboardSize} : {}),
         Type,
         Severity,
         SlotSize,

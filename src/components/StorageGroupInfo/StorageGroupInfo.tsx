@@ -1,10 +1,18 @@
 import {Flex} from '@gravity-ui/uikit';
 
+import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
 import {valueIsDefined} from '../../utils';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {formatMetricCount} from '../../utils/storageMetrics';
 import {formatToMs} from '../../utils/timeParsers';
 import {bytesToSpeed} from '../../utils/utils';
+import {
+    getStorageGroupCapacityInfoItems,
+    toInfoViewerItems,
+} from '../DiskCapacityInfo/DiskCapacityInfo';
+import diskCapacityInfoKeyset from '../DiskCapacityInfo/i18n';
+import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
@@ -18,6 +26,8 @@ interface StorageGroupInfoProps extends Omit<InfoViewerProps, 'info'> {
 
 // eslint-disable-next-line complexity
 export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageGroupInfoProps) {
+    const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+
     const {
         Encryption,
         Overall,
@@ -38,7 +48,125 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
         LatencyPutTabletLogMs,
         LatencyPutUserDataMs,
         LatencyGetFastMs,
+        GroupSizeInUnits,
     } = data || {};
+
+    if (capacityMetricsEnabled) {
+        const configurationInfo: InfoViewerItem[] = [];
+        const runtimeInfo: InfoViewerItem[] = [];
+
+        if (valueIsDefined(GroupGeneration)) {
+            configurationInfo.push({
+                label: storageGroupInfoKeyset('group-generation'),
+                value: GroupGeneration,
+            });
+        }
+        if (valueIsDefined(ErasureSpecies)) {
+            configurationInfo.push({
+                label: storageGroupInfoKeyset('erasure-species'),
+                value: ErasureSpecies,
+            });
+        }
+        if (valueIsDefined(MediaType)) {
+            configurationInfo.push({
+                label: storageGroupInfoKeyset('media-type'),
+                value: MediaType,
+            });
+        }
+        if (valueIsDefined(Encryption)) {
+            configurationInfo.push({
+                label: storageGroupInfoKeyset('encryption'),
+                value: Encryption ? storageGroupInfoKeyset('yes') : storageGroupInfoKeyset('no'),
+            });
+        }
+        configurationInfo.push({
+            label: diskCapacityInfoKeyset('field_group-size-in-units'),
+            value: formatMetricCount(GroupSizeInUnits),
+        });
+
+        if (valueIsDefined(Overall)) {
+            runtimeInfo.push({
+                label: storageGroupInfoKeyset('overall'),
+                value: <StatusIcon status={Overall} />,
+            });
+        }
+        if (valueIsDefined(State)) {
+            runtimeInfo.push({label: storageGroupInfoKeyset('state'), value: State});
+        }
+        if (valueIsDefined(MissingDisks)) {
+            runtimeInfo.push({
+                label: storageGroupInfoKeyset('missing-disks'),
+                value: MissingDisks,
+            });
+        }
+        if (valueIsDefined(Used) && valueIsDefined(Limit)) {
+            const usedNum = Number(Used);
+            const limitNum = Number(Limit);
+            const hasSpaceData = Number.isFinite(usedNum) && Number.isFinite(limitNum);
+            runtimeInfo.push({
+                label: storageGroupInfoKeyset('used-space'),
+                value: hasSpaceData
+                    ? formatStorageValuesToGb(usedNum, limitNum).join(' / ')
+                    : storageGroupInfoKeyset('no-data'),
+            });
+        }
+        if (valueIsDefined(Available)) {
+            runtimeInfo.push({
+                label: storageGroupInfoKeyset('available'),
+                value: formatStorageValuesToGb(Number(Available)),
+            });
+        }
+        if (valueIsDefined(AllocationUnits)) {
+            runtimeInfo.push({
+                label: storageGroupInfoKeyset('allocation-units'),
+                value: AllocationUnits,
+            });
+        }
+        runtimeInfo.push(...toInfoViewerItems(getStorageGroupCapacityInfoItems(data)));
+        if (valueIsDefined(Latency)) {
+            runtimeInfo.push({
+                label: storageGroupInfoKeyset('latency'),
+                value: <StatusIcon status={Latency} />,
+            });
+        }
+        if (valueIsDefined(LatencyPutTabletLogMs)) {
+            runtimeInfo.push({
+                label: storageGroupInfoKeyset('latency-put-tablet-log'),
+                value: formatToMs(LatencyPutTabletLogMs),
+            });
+        }
+        if (valueIsDefined(LatencyPutUserDataMs)) {
+            runtimeInfo.push({
+                label: storageGroupInfoKeyset('latency-put-user-data'),
+                value: formatToMs(LatencyPutUserDataMs),
+            });
+        }
+        if (valueIsDefined(LatencyGetFastMs)) {
+            runtimeInfo.push({
+                label: storageGroupInfoKeyset('latency-get-fast'),
+                value: formatToMs(LatencyGetFastMs),
+            });
+        }
+        if (valueIsDefined(Read)) {
+            runtimeInfo.push({
+                label: storageGroupInfoKeyset('read-throughput'),
+                value: bytesToSpeed(Number(Read)),
+            });
+        }
+        if (valueIsDefined(Write)) {
+            runtimeInfo.push({
+                label: storageGroupInfoKeyset('write-throughput'),
+                value: bytesToSpeed(Number(Write)),
+            });
+        }
+
+        return (
+            <Flex className={className} gap={2} direction="row" wrap>
+                <InfoViewer info={configurationInfo} {...infoViewerProps} />
+                <InfoViewer info={runtimeInfo} {...infoViewerProps} />
+            </Flex>
+        );
+    }
 
     const storageGroupInfoFirstColumn = [];
 

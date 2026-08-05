@@ -1,3 +1,4 @@
+import {ECapacityAlert} from '../../../types/api/enums';
 import type {TPDiskStateInfo} from '../../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../../types/api/vdisk';
 import {
@@ -7,7 +8,29 @@ import {
     prepareWhiteboardVDiskData,
 } from '../prepareDisks';
 
+const vDiskWithCapacityMetrics = {
+    GroupSizeInUnits: 0,
+    VDiskSlotUsage: 82.25,
+    VDiskRawUsage: 64.5,
+    NormalizedOccupancy: 0.92,
+    CapacityAlert: ECapacityAlert.LIGHTYELLOW,
+} satisfies TVDiskStateInfo;
+
+const pDiskWithCapacityMetrics = {
+    SlotSizeInUnits: 0,
+    PDiskUsage: 70.5,
+    PDiskCapacityAlert: ECapacityAlert.ORANGE,
+} satisfies TPDiskStateInfo;
+
 describe('prepareWhiteboardVDiskData', () => {
+    test('Should preserve capacity metrics and omit absent metrics', () => {
+        expect(prepareWhiteboardVDiskData(vDiskWithCapacityMetrics)).toEqual(
+            expect.objectContaining(vDiskWithCapacityMetrics),
+        );
+
+        expect(prepareWhiteboardVDiskData({})).not.toHaveProperty('VDiskSlotUsage');
+    });
+
     test('Should correctly parse data', () => {
         const data = {
             VDiskId: {
@@ -93,12 +116,33 @@ describe('prepareWhiteboardVDiskData', () => {
             SizeLimit: 197520261120,
             FreeSize: 188523479040,
             AllocatedPercent: 4,
+            WhiteboardSize: {
+                AllocatedSize: 8996782080,
+                SizeLimit: 197520261120,
+            },
         };
 
         const preparedData = prepareWhiteboardVDiskData(data);
 
         expect(preparedData).toEqual(expectedResult);
     });
+
+    test('Should preserve missing Whiteboard size values instead of converting null to zero', () => {
+        const data = {
+            VDiskId: {},
+            AllocatedSize: null,
+            AvailableSize: null,
+            PDisk: {
+                EnforcedDynamicSlotSize: null,
+            },
+        } as unknown as TVDiskStateInfo;
+
+        expect(prepareWhiteboardVDiskData(data).WhiteboardSize).toEqual({
+            AllocatedSize: undefined,
+            SizeLimit: undefined,
+        });
+    });
+
     test('Should parse unavailable donors', () => {
         const data = {
             NodeId: 1,
@@ -120,6 +164,14 @@ describe('prepareWhiteboardVDiskData', () => {
 });
 
 describe('prepareWhiteboardPDiskData', () => {
+    test('Should preserve capacity metrics and omit absent metrics', () => {
+        expect(prepareWhiteboardPDiskData(pDiskWithCapacityMetrics)).toEqual(
+            expect.objectContaining(pDiskWithCapacityMetrics),
+        );
+
+        expect(prepareWhiteboardPDiskData({})).not.toHaveProperty('PDiskUsage');
+    });
+
     test('Should correctly parse data', () => {
         const data = {
             PDiskId: 1,
@@ -164,6 +216,10 @@ describe('prepareWhiteboardPDiskData', () => {
             TotalSize: 3199556648960,
             AllocatedSize: 91577384960,
             AllocatedPercent: 2,
+            WhiteboardSize: {
+                AllocatedSize: 91577384960,
+                TotalSize: 3199556648960,
+            },
 
             ExpectedSlotCount: 16,
             NumActiveSlots: 10,
@@ -177,6 +233,18 @@ describe('prepareWhiteboardPDiskData', () => {
         const preparedData = prepareWhiteboardPDiskData(data);
 
         expect(preparedData).toEqual(expectedResult);
+    });
+
+    test('Should preserve missing Whiteboard size values instead of converting null to zero', () => {
+        const data = {
+            AvailableSize: null,
+            TotalSize: null,
+        } as unknown as TPDiskStateInfo;
+
+        expect(prepareWhiteboardPDiskData(data).WhiteboardSize).toEqual({
+            AllocatedSize: undefined,
+            TotalSize: undefined,
+        });
     });
 });
 

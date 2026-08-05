@@ -1,10 +1,12 @@
 import {Flex} from '@gravity-ui/uikit';
 
+import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import {valueIsDefined} from '../../utils';
 import {formatBytes} from '../../utils/bytesParsers';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
+import {getPDiskCapacityInfoItems, toInfoViewerItems} from '../DiskCapacityInfo/DiskCapacityInfo';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
@@ -19,6 +21,7 @@ interface GetPDiskInfoOptions<T extends PreparedPDisk> {
     nodeId?: number | string | null;
     withPDiskPageLink?: boolean;
     hasDeveloperUi?: boolean;
+    capacityMetricsEnabled?: boolean;
 }
 
 // eslint-disable-next-line complexity
@@ -27,6 +30,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
     nodeId,
     withPDiskPageLink,
     hasDeveloperUi,
+    capacityMetricsEnabled,
 }: GetPDiskInfoOptions<T>) {
     const {
         PDiskId,
@@ -96,6 +100,71 @@ function getPDiskInfo<T extends PreparedPDisk>({
         });
     }
 
+    const additionalInfo: InfoViewerItem[] = [];
+
+    const shouldDisplayLinks =
+        (withPDiskPageLink || hasDeveloperUi) && valueIsDefined(PDiskId) && valueIsDefined(nodeId);
+
+    if (shouldDisplayLinks) {
+        const pDiskInternalViewerPath = createPDiskDeveloperUILink({
+            nodeId,
+            pDiskId: PDiskId,
+        });
+
+        additionalInfo.push({
+            label: pDiskInfoKeyset('links'),
+            value: (
+                <Flex wrap="wrap" gap={2}>
+                    {withPDiskPageLink && <PDiskPageLink pDiskId={PDiskId} nodeId={nodeId} />}
+                    {hasDeveloperUi && (
+                        <LinkWithIcon
+                            title={pDiskInfoKeyset('developer-ui')}
+                            url={pDiskInternalViewerPath}
+                        />
+                    )}
+                </Flex>
+            ),
+        });
+    }
+
+    if (capacityMetricsEnabled) {
+        const configurationInfo = [...generalInfo];
+        const runtimeInfo = [...statusInfo];
+        const capacityItems = getPDiskCapacityInfoItems(pDisk, {
+            withUsage: true,
+            withCapacityAlert: false,
+        });
+        const slotSizeItem = capacityItems.find(({id}) => id === 'slot-size-in-units');
+        const runtimeCapacityItems = capacityItems.filter(({id}) => id !== 'slot-size-in-units');
+
+        if (slotSizeItem) {
+            configurationInfo.push(...toInfoViewerItems([slotSizeItem]));
+        }
+        configurationInfo.push(...additionalInfo);
+        runtimeInfo.push(...toInfoViewerItems(runtimeCapacityItems));
+
+        if (valueIsDefined(LogUsedSize) && valueIsDefined(LogTotalSize)) {
+            runtimeInfo.push({
+                label: pDiskInfoKeyset('log-size'),
+                value: (
+                    <ProgressViewer
+                        value={LogUsedSize}
+                        capacity={LogTotalSize}
+                        formatValues={formatStorageValuesToGb}
+                    />
+                ),
+            });
+        }
+        if (valueIsDefined(SystemSize)) {
+            runtimeInfo.push({
+                label: pDiskInfoKeyset('system-size'),
+                value: formatBytes({value: SystemSize}),
+            });
+        }
+
+        return [configurationInfo, runtimeInfo];
+    }
+
     const spaceInfo: InfoViewerItem[] = [];
 
     const hasSpaceData =
@@ -137,33 +206,6 @@ function getPDiskInfo<T extends PreparedPDisk>({
         });
     }
 
-    const additionalInfo: InfoViewerItem[] = [];
-
-    const shouldDisplayLinks =
-        (withPDiskPageLink || hasDeveloperUi) && valueIsDefined(PDiskId) && valueIsDefined(nodeId);
-
-    if (shouldDisplayLinks) {
-        const pDiskInternalViewerPath = createPDiskDeveloperUILink({
-            nodeId,
-            pDiskId: PDiskId,
-        });
-
-        additionalInfo.push({
-            label: pDiskInfoKeyset('links'),
-            value: (
-                <Flex wrap="wrap" gap={2}>
-                    {withPDiskPageLink && <PDiskPageLink pDiskId={PDiskId} nodeId={nodeId} />}
-                    {hasDeveloperUi && (
-                        <LinkWithIcon
-                            title={pDiskInfoKeyset('developer-ui')}
-                            url={pDiskInternalViewerPath}
-                        />
-                    )}
-                </Flex>
-            ),
-        });
-    }
-
     return [generalInfo, statusInfo, spaceInfo, additionalInfo];
 }
 
@@ -178,13 +220,32 @@ export function PDiskInfo<T extends PreparedPDisk>({
     className,
 }: PDiskInfoProps<T>) {
     const hasDeveloperUi = useHasDeveloperUi();
+    const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
-    const [generalInfo, statusInfo, spaceInfo, additionalInfo] = getPDiskInfo({
+    const infoGroups = getPDiskInfo({
         pDisk,
         nodeId,
         withPDiskPageLink,
         hasDeveloperUi,
+        capacityMetricsEnabled,
     });
+
+    if (capacityMetricsEnabled) {
+        const [configurationInfo, runtimeInfo] = infoGroups;
+
+        return (
+            <Flex className={className} gap={2} direction="row" wrap>
+                <Flex direction="column" gap={2} width={500}>
+                    <InfoViewer info={configurationInfo} renderEmptyState={() => null} />
+                </Flex>
+                <Flex direction="column" gap={2} width={500}>
+                    <InfoViewer info={runtimeInfo} renderEmptyState={() => null} />
+                </Flex>
+            </Flex>
+        );
+    }
+
+    const [generalInfo, statusInfo, spaceInfo, additionalInfo] = infoGroups;
 
     return (
         <Flex className={className} gap={2} direction="row" wrap>

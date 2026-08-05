@@ -40,7 +40,7 @@ describe('getStorageGroupByCleanupPatch', () => {
                 storageGroupsGroupBy: 'Usage',
                 storageNodesGroupBy: 'DiskSpaceUsage',
             }),
-        ).toEqual({
+        ).toStrictEqual({
             storageGroupsGroupBy: undefined,
             storageNodesGroupBy: undefined,
         });
@@ -53,7 +53,16 @@ describe('getStorageGroupByCleanupPatch', () => {
                 storageGroupsGroupBy: 'CapacityAlert',
                 storageNodesGroupBy: 'CapacityAlert',
             }),
-        ).toEqual({});
+        ).toStrictEqual({});
+    });
+
+    test('clears legacy disk usage group-by for groups when blob metrics are enabled', () => {
+        expect(
+            getStorageGroupByCleanupPatch({
+                blobMetricsEnabled: true,
+                storageGroupsGroupBy: 'DiskSpaceUsage',
+            }),
+        ).toStrictEqual({storageGroupsGroupBy: undefined});
     });
 
     test('clears capacity alert group-by values when blob metrics are disabled', () => {
@@ -63,7 +72,7 @@ describe('getStorageGroupByCleanupPatch', () => {
                 storageGroupsGroupBy: 'CapacityAlert',
                 storageNodesGroupBy: 'CapacityAlert',
             }),
-        ).toEqual({
+        ).toStrictEqual({
             storageGroupsGroupBy: undefined,
             storageNodesGroupBy: undefined,
         });
@@ -75,7 +84,7 @@ describe('getStorageGroupByCleanupPatch', () => {
                 blobMetricsEnabled: false,
                 storageNodesGroupBy: 'DiskSpaceUsage',
             }),
-        ).toEqual({});
+        ).toStrictEqual({});
     });
 });
 

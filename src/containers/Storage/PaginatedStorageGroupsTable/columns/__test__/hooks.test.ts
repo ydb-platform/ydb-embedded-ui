@@ -272,4 +272,189 @@ describe('useStorageGroupsSelectedColumns', () => {
             STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
         );
     });
+
+    test('hides selected legacy capacity columns without rewriting the saved setting when enabled', () => {
+        useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
+        useSetting.mockReturnValue([
+            [
+                {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage, selected: true},
+            ],
+            setSavedColumns,
+        ]);
+
+        const {result} = renderHook(() =>
+            useStorageGroupsSelectedColumns({visibleEntities: 'all'}),
+        );
+        const legacyColumnIds: string[] = [
+            STORAGE_GROUPS_COLUMNS_IDS.Usage,
+            STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.DiskSpace,
+        ];
+
+        expect(
+            result.current.columnsToSelect
+                .map(({id}) => id)
+                .filter((id) => legacyColumnIds.includes(id)),
+        ).toEqual([]);
+        expect(
+            result.current.columnsToShow
+                .map(({name}) => name)
+                .filter((id) => legacyColumnIds.includes(id)),
+        ).toEqual([]);
+        expect(result.current.columnsToShow.map(({name}) => name)).toContain(
+            STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage,
+        );
+        expect(setSavedColumns).not.toHaveBeenCalled();
+    });
+
+    test('preserves hidden legacy selections when saving enabled capacity columns', () => {
+        useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
+        useSetting.mockReturnValue([
+            [
+                {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.PoolName, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace, selected: false},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage, selected: true},
+            ],
+            setSavedColumns,
+        ]);
+
+        const {result} = renderHook(() =>
+            useStorageGroupsSelectedColumns({visibleEntities: 'all'}),
+        );
+
+        result.current.setColumns(result.current.columnsToSelect);
+
+        const trackedIds: string[] = [
+            STORAGE_GROUPS_COLUMNS_IDS.GroupId,
+            STORAGE_GROUPS_COLUMNS_IDS.Usage,
+            STORAGE_GROUPS_COLUMNS_IDS.PoolName,
+            STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.DiskSpace,
+            STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage,
+        ];
+        const savedColumns = setSavedColumns.mock.calls[0][0] as Array<{
+            id: string;
+            selected: boolean;
+        }>;
+
+        expect(savedColumns.filter(({id}) => trackedIds.includes(id))).toEqual([
+            {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.PoolName, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace, selected: false},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage, selected: true},
+        ]);
+    });
+
+    test('preserves hidden capacity selections when saving legacy columns', () => {
+        useSetting.mockReturnValue([
+            [
+                {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage, selected: false},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskRawUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace, selected: false},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.MaxNormalizedOccupancy, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.CapacityAlert, selected: false},
+            ],
+            setSavedColumns,
+        ]);
+
+        const {result} = renderHook(() =>
+            useStorageGroupsSelectedColumns({visibleEntities: 'all'}),
+        );
+
+        expect(result.current.columnsToSelect.map(({id}) => id)).not.toEqual(
+            expect.arrayContaining([
+                STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage,
+                STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage,
+            ]),
+        );
+
+        result.current.setColumns(result.current.columnsToSelect);
+
+        const trackedIds: string[] = [
+            STORAGE_GROUPS_COLUMNS_IDS.GroupId,
+            STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.Usage,
+            STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskRawUsage,
+            STORAGE_GROUPS_COLUMNS_IDS.DiskSpace,
+            STORAGE_GROUPS_COLUMNS_IDS.MaxNormalizedOccupancy,
+            STORAGE_GROUPS_COLUMNS_IDS.CapacityAlert,
+        ];
+        const savedColumns = setSavedColumns.mock.calls[0][0] as Array<{
+            id: string;
+            selected: boolean;
+        }>;
+
+        expect(savedColumns.filter(({id}) => trackedIds.includes(id))).toEqual([
+            {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.MaxPDiskUsage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskSlotUsage, selected: false},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.MaxVDiskRawUsage, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace, selected: false},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.MaxNormalizedOccupancy, selected: true},
+            {id: STORAGE_GROUPS_COLUMNS_IDS.CapacityAlert, selected: false},
+        ]);
+    });
+
+    test('does not restore Space as a sticky column in the space view when enabled', () => {
+        useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
+
+        const {result} = renderHook(() =>
+            useStorageGroupsSelectedColumns({visibleEntities: 'space'}),
+        );
+
+        expect(
+            result.current.columnsToSelect.some(
+                ({id}) => id === STORAGE_GROUPS_COLUMNS_IDS.DiskSpace,
+            ),
+        ).toBe(false);
+        expect(
+            result.current.columnsToShow.some(
+                ({name}) => name === STORAGE_GROUPS_COLUMNS_IDS.DiskSpace,
+            ),
+        ).toBe(false);
+    });
+
+    test('keeps selected legacy capacity columns when the experiment is disabled or unsupported', () => {
+        useSetting.mockReturnValue([
+            [
+                {id: STORAGE_GROUPS_COLUMNS_IDS.GroupId, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.Usage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage, selected: true},
+                {id: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace, selected: true},
+            ],
+            setSavedColumns,
+        ]);
+
+        const {result} = renderHook(() =>
+            useStorageGroupsSelectedColumns({visibleEntities: 'all'}),
+        );
+
+        expect(result.current.columnsToShow.map(({name}) => name)).toEqual(
+            expect.arrayContaining([
+                STORAGE_GROUPS_COLUMNS_IDS.Usage,
+                STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage,
+                STORAGE_GROUPS_COLUMNS_IDS.DiskSpace,
+            ]),
+        );
+    });
 });

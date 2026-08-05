@@ -1,4 +1,4 @@
-import type {EFlag} from './enums';
+import type {ECapacityAlert, EFlag} from './enums';
 import type {TVDiskStateInfo, TVSlotEntry} from './vdisk';
 
 /**
@@ -49,6 +49,11 @@ export interface TPDiskStateInfo {
     EnforcedDynamicSlotSize?: string;
     ExpectedSlotCount?: number;
     NumActiveSlots?: number;
+    /** uint32; slot size in allocation units. */
+    SlotSizeInUnits?: number;
+    /** float; percent in the 0..100 scale. */
+    PDiskUsage?: number;
+    PDiskCapacityAlert?: ECapacityAlert | string;
 }
 
 export enum TPDiskState {

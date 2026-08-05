@@ -5,6 +5,7 @@ import {Flex, Label} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {getPDiskPagePath} from '../../routes';
+import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
@@ -15,6 +16,10 @@ import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {bytesToGB, isNumeric} from '../../utils/utils';
+import {
+    getPDiskCapacityInfoItems,
+    toDefinitionListItems,
+} from '../DiskCapacityInfo/DiskCapacityInfo';
 import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
@@ -28,7 +33,11 @@ import {pDiskPopupKeyset} from './i18n';
 
 const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
-export const preparePDiskData = (data: PreparedPDisk, nodeData?: {Host?: string; DC?: string}) => {
+export const preparePDiskData = (
+    data: PreparedPDisk,
+    nodeData?: {Host?: string; DC?: string},
+    capacityMetricsEnabled = false,
+) => {
     const {AvailableSize, TotalSize, NodeId, Path, Realtime, Type, Device} = data;
 
     const pdiskData: YDBDefinitionListItem[] = [
@@ -59,7 +68,16 @@ export const preparePDiskData = (data: PreparedPDisk, nodeData?: {Host?: string;
         pdiskData.push({name: pDiskPopupKeyset('label_path'), content: Path, copyText: Path});
     }
 
-    if (isNumeric(TotalSize) && isNumeric(AvailableSize)) {
+    if (capacityMetricsEnabled) {
+        pdiskData.push(
+            ...toDefinitionListItems(
+                getPDiskCapacityInfoItems(data, {
+                    withUsage: true,
+                    withCapacityAlert: true,
+                }),
+            ),
+        );
+    } else if (isNumeric(TotalSize) && isNumeric(AvailableSize)) {
         pdiskData.push({
             name: pDiskPopupKeyset('label_available'),
             content: `${bytesToGB(AvailableSize)} ${pDiskPopupKeyset('value_of')} ${bytesToGB(TotalSize)}`,
@@ -153,10 +171,14 @@ interface PDiskPopupProps {
 export const PDiskPopup = ({data}: PDiskPopupProps) => {
     const database = useDatabaseFromQuery();
     const hasDeveloperUi = useHasDeveloperUi();
+    const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
     const nodeData = isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId);
 
-    const info = React.useMemo(() => preparePDiskData(data, nodeData), [data, nodeData]);
+    const info = React.useMemo(
+        () => preparePDiskData(data, nodeData, capacityMetricsEnabled),
+        [data, nodeData, capacityMetricsEnabled],
+    );
 
     const headerLabels = React.useMemo<YDBDefinitionListHeaderLabel[]>(
         () => preparePDiskHeaderLabels(data),
@@ -178,7 +200,7 @@ export const PDiskPopup = ({data}: PDiskPopupProps) => {
             items={info}
             headerLabels={headerLabels}
             footer={footer}
-            nameMaxWidth={100}
+            nameMaxWidth={capacityMetricsEnabled ? 220 : 100}
         />
     );
 };
