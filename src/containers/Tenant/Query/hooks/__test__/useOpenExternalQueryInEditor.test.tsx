@@ -33,12 +33,13 @@ const replacement = {title: 'Replacement', input: 'SELECT replacement;'};
 const databaseParam = 'database=%2FRoot%2Fdb';
 const canonicalRoute = `/tenant?${databaseParam}&databasePage=diagnostics`;
 // prettier-ignore
-const routeCases: Array<[string, string, string, string?]> = [
-    ['canonical tenant route', canonicalRoute, '/database', undefined],
-    ['already on Query without a duplicate push', `/database?${databaseParam}&databasePage=query&queryTab=saved`, '/database', 'no-push'],
-    ['environment route', `/cloud-prod/node/1?${databaseParam}&databasePage=query`, '/cloud-prod/database', undefined],
-    ['extension route', `/cloud-prod/custom?${databaseParam}`, '/cloud-prod/database', 'extension'],
-    ['legacy name normalization', '/database?name=%2FRoot%2Fdb&databasePage=diagnostics', '/database', 'normalize'],
+const routeCases: Array<[string, string, string, string?, string?]> = [
+    ['canonical tenant route', canonicalRoute, '/database', undefined, undefined],
+    ['already on Query without a duplicate push', `/database?${databaseParam}&databasePage=query&queryTab=saved`, '/database', 'no-push', undefined],
+    ['environment route', `/cloud-prod/node/1?${databaseParam}&databasePage=query`, '/cloud-prod/database', undefined, undefined],
+    ['extension route', `/cloud-prod/custom?${databaseParam}`, '/cloud-prod/database', 'extension', undefined],
+    ['legacy name normalization', '/database?name=%2FRoot%2Fdb&databasePage=diagnostics', '/database', undefined, `/database?${databaseParam}&databasePage=diagnostics`],
+    ['legacy tenant page normalization', `/database?${databaseParam}&tenantPage=diagnostics`, '/database', undefined, `/database?${databaseParam}&databasePage=diagnostics`],
 ];
 type TestStore = ReturnType<typeof configureStore>['store'];
 // prettier-ignore
@@ -161,27 +162,22 @@ describe('useOpenExternalQueryInEditor', () => {
     });
     test.each(routeCases)(
         'opens on the Query route from %s',
-        async (_name, initialLocation, expectedPath, mode) => {
-            const normalizeLegacy = mode === 'normalize';
+        async (_name, initialLocation, expectedPath, mode, normalizedLocation) => {
             const hook = renderOpenExternalQueryHook({
-                dirtyInput: normalizeLegacy ? 'SELECT unsaved;' : undefined,
+                dirtyInput: normalizedLocation ? 'SELECT unsaved;' : undefined,
                 environments: mode === 'extension' ? ['cloud-prod'] : undefined,
                 initialLocation,
-                isMultiTabEnabled: !normalizeLegacy,
+                isMultiTabEnabled: !normalizedLocation,
                 singleClusterMode: mode === 'extension' ? false : undefined,
             });
             const push = jest.spyOn(hook.history, 'push');
             const onAfterOpen = jest.fn();
-            if (normalizeLegacy) {
+            if (normalizedLocation) {
                 const confirmation = createDeferred<boolean>();
                 showModal.mockReturnValueOnce(confirmation.promise as never);
                 act(() => openQuery(hook.result, replacement.input, onAfterOpen));
                 await waitFor(() => expect(showModal).toHaveBeenCalled());
-                act(() =>
-                    hook.history.replace(
-                        '/database?database=%2FRoot%2Fdb&databasePage=diagnostics',
-                    ),
-                );
+                act(() => hook.history.replace(normalizedLocation));
                 await resolveDeferred(confirmation, true);
             } else {
                 await act(async () => openQuery(hook.result, replacement.input, onAfterOpen));

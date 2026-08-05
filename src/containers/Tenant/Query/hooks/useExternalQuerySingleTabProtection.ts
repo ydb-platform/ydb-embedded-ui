@@ -81,10 +81,7 @@ function isSameExecution(
     );
 }
 
-function isLegacyDatabaseNormalization(
-    previousLocation: QueryLocation,
-    nextLocation: QueryLocation,
-) {
+function isLegacyQueryNormalization(previousLocation: QueryLocation, nextLocation: QueryLocation) {
     if (
         previousLocation.pathname !== nextLocation.pathname ||
         previousLocation.hash !== nextLocation.hash
@@ -95,17 +92,26 @@ function isLegacyDatabaseNormalization(
     const previousParams = new URLSearchParams(previousLocation.search);
     const nextParams = new URLSearchParams(nextLocation.search);
     const legacyDatabase = previousParams.get('name');
-    if (
-        !legacyDatabase ||
-        previousParams.has('database') ||
-        nextParams.has('name') ||
-        nextParams.get('database') !== legacyDatabase
-    ) {
+    let normalizesDatabase = false;
+    if (legacyDatabase && !previousParams.has('database')) {
+        normalizesDatabase = true;
+        previousParams.delete('name');
+        previousParams.set('database', legacyDatabase);
+    }
+
+    const legacyTenantPage = previousParams.get('tenantPage');
+    const normalizesTenantPage = legacyTenantPage !== null;
+    if (normalizesTenantPage) {
+        previousParams.delete('tenantPage');
+        if (!previousParams.has('databasePage')) {
+            previousParams.set('databasePage', legacyTenantPage);
+        }
+    }
+
+    if (!normalizesDatabase && !normalizesTenantPage) {
         return false;
     }
 
-    previousParams.delete('name');
-    previousParams.set('database', legacyDatabase);
     previousParams.sort();
     nextParams.sort();
 
@@ -124,7 +130,7 @@ export function useExternalQueryRequestRegistration(history: History) {
             latestLocation.current = nextLocation;
             if (
                 action !== 'REPLACE' ||
-                !isLegacyDatabaseNormalization(previousLocation, nextLocation)
+                !isLegacyQueryNormalization(previousLocation, nextLocation)
             ) {
                 requestCoordinator.requestEpoch += 1;
             }
