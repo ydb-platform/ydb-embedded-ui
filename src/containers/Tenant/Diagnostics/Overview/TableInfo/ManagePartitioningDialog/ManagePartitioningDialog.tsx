@@ -43,13 +43,12 @@ interface ManagePartitioningDialogFormProps extends DialogFooterProps {
     onClose: () => void;
     initialValue?: ManagePartitioningFormState;
     onApply?: (value: ManagePartitioningFormOutput) => void | Promise<void>;
-    maxSplitSizeBytes: number;
+    maxSplitSizeBytes?: number;
 }
 
-// The form is created only after the config-derived `maxSplitSizeBytes` is known.
-// This guarantees react-hook-form initializes (and computes `isValid`) against the
-// correct schema, so Apply is not left disabled on clusters with a larger
-// ForceShardSplitDataSize when the current split size exceeds the 2 GiB fallback.
+// The form is created only after the config request resolves and the limit is
+// either known or unavailable. This guarantees react-hook-form initializes (and
+// computes `isValid`) against the correct schema.
 function ManagePartitioningDialogForm({
     onClose,
     renderButtons,
@@ -60,11 +59,10 @@ function ManagePartitioningDialogForm({
     const [apiError, setApiError] = React.useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-    // The displayed maximum is floored to match the exact byte limit used by
-    // validation. Rounding here could show a value that, when converted back to
-    // bytes, exceeds `maxSplitSizeBytes` and gets rejected by the validator.
+    // When available, the displayed maximum is floored to match the exact byte
+    // limit used by validation. Rounding could show a value that gets rejected.
     const maxSplitSizeGb = React.useMemo(
-        () => getMaxSplitSizeGb(maxSplitSizeBytes),
+        () => (maxSplitSizeBytes === undefined ? undefined : getMaxSplitSizeGb(maxSplitSizeBytes)),
         [maxSplitSizeBytes],
     );
 
@@ -133,17 +131,19 @@ function ManagePartitioningDialogForm({
                             )}
                         />
 
-                        <Text
-                            variant="body-1"
-                            className={b('hint')}
-                            title={i18n('context_split-size-maximum-bytes', {
-                                bytes: formatNumber(maxSplitSizeBytes),
-                            })}
-                        >
-                            {i18n('context_split-size-maximum', {
-                                maxGb: maxSplitSizeGb,
-                            })}
-                        </Text>
+                        {typeof maxSplitSizeBytes === 'number' ? (
+                            <Text
+                                variant="body-1"
+                                className={b('hint')}
+                                title={i18n('context_split-size-maximum-bytes', {
+                                    bytes: formatNumber(maxSplitSizeBytes),
+                                })}
+                            >
+                                {i18n('context_split-size-maximum', {
+                                    maxGb: maxSplitSizeGb,
+                                })}
+                            </Text>
+                        ) : null}
                     </Flex>
 
                     <Flex className={b('row')} gap="3" alignItems="center">
@@ -246,12 +246,16 @@ function ManagePartitioningDialog({
     database,
     onApply,
 }: ManagePartitioningDialogProps) {
-    const {currentData: config, isLoading} = configsApi.useGetConfigQuery({database});
+    const {currentData: config, isLoading, isError} = configsApi.useGetConfigQuery({database});
 
     // Maximum split size is taken from the database config field
     // ImmediateControlsConfig.SchemeShardControls.ForceShardSplitDataSize
-    // (falls back to the default 2 GiB when it is not present).
-    const maxSplitSizeBytes = React.useMemo(() => getMaxSplitSizeBytes(config?.current), [config]);
+    // (falls back to the default 2 GiB when it is not present). If the config
+    // request fails, the limit is unknown and must not be enforced in the UI.
+    const maxSplitSizeBytes = React.useMemo(
+        () => (isError ? undefined : getMaxSplitSizeBytes(config?.current)),
+        [config, isError],
+    );
 
     return (
         <Dialog size="s" onClose={onClose} open={open}>
