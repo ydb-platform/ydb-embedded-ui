@@ -550,24 +550,31 @@ test.describe('Test Query Editor', async () => {
 
     test('repeated Explain Analyze hotkey aborts the previous request', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.setQuery(longRunningQuery);
+        const pendingQuery = await setupPendingNonStreamingQueryMock(page);
 
-        const firstRequestPromise = page.waitForRequest(isExplainAnalyzeRequest);
-        await queryEditor.clickExplainAnalyzeButton();
-        const firstRequest = await firstRequestPromise;
+        try {
+            await queryEditor.setQuery(simpleQuery);
 
-        const firstRequestFailed = page.waitForEvent('requestfailed', {
-            predicate: (request) => request === firstRequest,
-            timeout: VISIBILITY_TIMEOUT,
-        });
-        const secondRequest = page.waitForRequest(
-            (request) => request !== firstRequest && isExplainAnalyzeRequest(request),
-        );
+            const firstRequestPromise = page.waitForRequest(isExplainAnalyzeRequest);
+            await queryEditor.clickExplainAnalyzeButton();
+            const firstRequest = await firstRequestPromise;
+            await pendingQuery.waitUntilStarted();
 
-        await queryEditor.runQueryViaEditorAction();
+            const firstRequestFailed = page.waitForEvent('requestfailed', {
+                predicate: (request) => request === firstRequest,
+                timeout: VISIBILITY_TIMEOUT,
+            });
+            const secondRequest = page.waitForRequest(
+                (request) => request !== firstRequest && isExplainAnalyzeRequest(request),
+            );
 
-        await secondRequest;
-        await firstRequestFailed;
+            await queryEditor.runQueryViaEditorAction();
+
+            await secondRequest;
+            await firstRequestFailed;
+        } finally {
+            await pendingQuery.cleanup();
+        }
     });
 
     test('repeating non-streaming Run marks its history entry as stopped', async ({page}) => {
