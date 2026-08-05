@@ -1,6 +1,6 @@
 import {Gear, PlayFill, StopFill} from '@gravity-ui/icons';
 import type {ButtonProps} from '@gravity-ui/uikit';
-import {ActionTooltip, Button, Icon, Tooltip} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Icon} from '@gravity-ui/uikit';
 
 import QuerySettingsDescription from '../../../../components/QuerySettingsDescription/QuerySettingsDescription';
 import {cn} from '../../../../utils/cn';
@@ -67,11 +67,12 @@ const Settings = ({onClick, isLoading}: SettingsButtonProps) => {
             : null;
 
     return (
-        <Tooltip
+        <ActionTooltip
             disabled={changedCurrentSettings.length === 0}
-            content={
+            title={i18n('gear.tooltip')}
+            description={
                 <QuerySettingsDescription
-                    prefix={i18n('gear.tooltip')}
+                    prefix=""
                     querySettings={changedCurrentSettingsDescriptions}
                 />
             }
@@ -89,7 +90,7 @@ const Settings = ({onClick, isLoading}: SettingsButtonProps) => {
                     <div className={b('changed-settings')}>({changedCurrentSettings.length})</div>
                 ) : null}
             </Button>
-        </Tooltip>
+        </ActionTooltip>
     );
 };
 
