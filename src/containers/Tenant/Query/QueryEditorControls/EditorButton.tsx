@@ -47,6 +47,7 @@ const ExplainAnalyze = (props: ButtonProps) => (
         title={i18n('explain-analyze.tooltip.title')}
         description={i18n('explain-analyze.tooltip.description')}
         openDelay={0}
+        placement={['top-start']}
     >
         <Button {...props} className={b('explain-analyze-button')}>
             {i18n('action.explain-analyze')}
