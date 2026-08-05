@@ -22,6 +22,7 @@ import {TenantTabsGroups} from '../../TenantPages';
 
 import {
     getDatabaseFromQueryParams,
+    useExternalQueryRequestRegistration,
     useExternalQuerySingleTabProtection,
 } from './useExternalQuerySingleTabProtection';
 
@@ -46,6 +47,7 @@ export function useOpenExternalQueryInEditor() {
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
     const queryParams = React.useMemo(() => parseQuery(location), [location]);
     const database = getDatabaseFromQueryParams(queryParams);
+    const registerExternalQueryRequest = useExternalQueryRequestRegistration(history);
 
     const openExternalQueryInEditor = React.useCallback(
         ({title, input, savedQueryName, onAfterOpen}: ExternalQueryToOpen) => {
@@ -108,6 +110,7 @@ export function useOpenExternalQueryInEditor() {
                 return;
             }
 
+            registerExternalQueryRequest();
             if (isMultiTabEnabled) {
                 openExternalQueryInEditor(query);
             } else {
@@ -119,6 +122,7 @@ export function useOpenExternalQueryInEditor() {
             isMultiTabEnabled,
             openExternalQueryInEditor,
             openExternalQueryWithSingleTabProtection,
+            registerExternalQueryRequest,
         ],
     );
 }

@@ -112,17 +112,7 @@ function isLegacyDatabaseNormalization(
     return previousParams.toString() === nextParams.toString();
 }
 
-export function useExternalQuerySingleTabProtection({
-    database,
-    history,
-    isMultiTabEnabled,
-    openExternalQueryInEditor,
-}: ExternalQuerySingleTabProtectionOptions) {
-    const [sendCancelQuery] = cancelQueryApi.useCancelQueryMutation();
-    const activeTabId = useTypedSelector(selectActiveTabId);
-    const currentInput = useTypedSelector(selectUserInput);
-    const isCurrentTabDirty = useTypedSelector(selectIsDirty);
-    const result = useTypedSelector(selectResult);
+export function useExternalQueryRequestRegistration(history: History) {
     const requestCoordinator = React.useMemo(
         () => getExternalQueryRequestCoordinator(history),
         [history],
@@ -140,6 +130,27 @@ export function useExternalQuerySingleTabProtection({
             }
         });
     }, [history, requestCoordinator]);
+
+    return React.useCallback(() => {
+        requestCoordinator.requestEpoch += 1;
+    }, [requestCoordinator]);
+}
+
+export function useExternalQuerySingleTabProtection({
+    database,
+    history,
+    isMultiTabEnabled,
+    openExternalQueryInEditor,
+}: ExternalQuerySingleTabProtectionOptions) {
+    const [sendCancelQuery] = cancelQueryApi.useCancelQueryMutation();
+    const activeTabId = useTypedSelector(selectActiveTabId);
+    const currentInput = useTypedSelector(selectUserInput);
+    const isCurrentTabDirty = useTypedSelector(selectIsDirty);
+    const result = useTypedSelector(selectResult);
+    const requestCoordinator = React.useMemo(
+        () => getExternalQueryRequestCoordinator(history),
+        [history],
+    );
 
     const latestOptions = React.useRef({isMultiTabEnabled, openExternalQueryInEditor});
     latestOptions.current = {isMultiTabEnabled, openExternalQueryInEditor};
@@ -301,7 +312,6 @@ export function useExternalQuerySingleTabProtection({
 
     return React.useCallback(
         (query: ExternalQueryToOpen) => {
-            requestCoordinator.requestEpoch += 1;
             const currentIsQueryRunning = Boolean(latestEditorState.current.result?.isLoading);
             const currentIsMultiTabEnabled = latestOptions.current.isMultiTabEnabled;
             const confirmedExecution =

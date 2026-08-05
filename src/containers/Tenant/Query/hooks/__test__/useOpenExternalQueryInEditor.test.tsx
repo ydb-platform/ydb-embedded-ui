@@ -30,87 +30,51 @@ jest.mock('../../../../../utils/createToast');
 const originalApi = window.api;
 const sendQuery = jest.fn();
 const replacement = {title: 'Replacement', input: 'SELECT replacement;'};
-const staleInputs: Record<string, string> = {
-    'editor edit': 'SELECT edited while stopping;',
-    'execution replacement': 'SELECT second;',
-    'route round-trip': 'SELECT running;',
-};
 const databaseParam = 'database=%2FRoot%2Fdb';
 const canonicalRoute = `/tenant?${databaseParam}&databasePage=diagnostics`;
+// prettier-ignore
 const routeCases: Array<[string, string, string, string?]> = [
     ['canonical tenant route', canonicalRoute, '/database', undefined],
-    [
-        'already on Query without a duplicate push',
-        `/database?${databaseParam}&databasePage=query&queryTab=saved`,
-        '/database',
-        'no-push',
-    ],
-    [
-        'environment route',
-        `/cloud-prod/node/1?${databaseParam}&databasePage=query`,
-        '/cloud-prod/database',
-        undefined,
-    ],
+    ['already on Query without a duplicate push', `/database?${databaseParam}&databasePage=query&queryTab=saved`, '/database', 'no-push'],
+    ['environment route', `/cloud-prod/node/1?${databaseParam}&databasePage=query`, '/cloud-prod/database', undefined],
     ['extension route', `/cloud-prod/custom?${databaseParam}`, '/cloud-prod/database', 'extension'],
-    [
-        'legacy name normalization',
-        '/database?name=%2FRoot%2Fdb&databasePage=diagnostics',
-        '/database',
-        'normalize',
-    ],
+    ['legacy name normalization', '/database?name=%2FRoot%2Fdb&databasePage=diagnostics', '/database', 'normalize'],
 ];
 type TestStore = ReturnType<typeof configureStore>['store'];
-function setExecution(
-    store: TestStore,
-    tabId: string,
-    {
+// prettier-ignore
+type ExecutionOptions = {input: string; queryId?: string; startTime?: number; isLoading?: boolean; streamingStatus?: 'preparing' | 'running'};
+function setExecution(store: TestStore, tabId: string, options: ExecutionOptions) {
+    const {
         input,
         queryId = 'running-query',
         startTime = 1,
         isLoading = true,
         streamingStatus,
-    }: {
-        input: string;
-        queryId?: string;
-        startTime?: number;
-        isLoading?: boolean;
-        streamingStatus?: 'preparing' | 'running';
-    },
-) {
+    } = options;
     store.dispatch(changeUserInput({input}));
     store.dispatch(setLastExecutedQueryText({tabId, queryText: input}));
     store.dispatch(setIsDirty(false));
-    store.dispatch(
-        setQueryResult({
-            tabId,
-            result: {
-                executionId: `execution-${startTime}`,
-                type: 'execute',
-                queryId,
-                isLoading,
-                startTime,
-                ...(streamingStatus ? {streamingStatus} : {}),
-            },
-        }),
-    );
+    // prettier-ignore
+    store.dispatch(setQueryResult({tabId, result: {
+        executionId: `execution-${startTime}`, type: 'execute', queryId, isLoading, startTime,
+        ...(streamingStatus ? {streamingStatus} : {}),
+    }}));
 }
-function renderOpenExternalQueryHook({
-    isMultiTabEnabled = false,
-    dirtyInput,
-    runningInput,
-    isStreaming = false,
-    initialLocation = '/tenant?database=%2FRoot%2Fdb&databasePage=diagnostics',
-    environments,
-    singleClusterMode,
-}: {
-    isMultiTabEnabled?: boolean;
-    dirtyInput?: string;
-    runningInput?: string;
-    isStreaming?: boolean;
-    initialLocation?: string;
-    environments?: string[];
-    singleClusterMode?: boolean;
-} = {}) {
+function updateExecution(store: TestStore, tabId: string, options: ExecutionOptions) {
+    act(() => setExecution(store, tabId, options));
+}
+// prettier-ignore
+type HookOptions = {isMultiTabEnabled?: boolean; dirtyInput?: string; runningInput?: string; isStreaming?: boolean; initialLocation?: string; environments?: string[]; singleClusterMode?: boolean};
+function renderOpenExternalQueryHook(options: HookOptions = {}) {
+    const {
+        isMultiTabEnabled = false,
+        dirtyInput,
+        runningInput,
+        isStreaming = false,
+        initialLocation = canonicalRoute,
+        environments,
+        singleClusterMode,
+    } = options;
     configureUIFactory({enableMultiTabQueryEditor: isMultiTabEnabled});
     const {history, store} = configureStore({environments, singleClusterMode});
     window.api = {viewer: {sendQuery}} as unknown as YdbEmbeddedAPI;
@@ -163,6 +127,22 @@ function createDeferred<T>() {
     });
     return {promise, reject: rejectPromise, resolve: resolvePromise};
 }
+function openQuery(
+    result: {current: ReturnType<typeof useOpenExternalQueryInEditor>},
+    input = replacement.input,
+    onAfterOpen?: () => void,
+) {
+    result.current({title: 'Replacement', input, onAfterOpen});
+}
+async function resolveDeferred<T>(deferred: ReturnType<typeof createDeferred<T>>, value: T) {
+    await act(async () => {
+        deferred.resolve(value);
+        await deferred.promise;
+    });
+}
+function editQuery(store: TestStore, input: string) {
+    act(() => store.dispatch(changeUserInput({input})));
+}
 describe('useOpenExternalQueryInEditor', () => {
     const showModal = jest.spyOn(NiceModal, 'show');
     beforeEach(() => {
@@ -173,9 +153,7 @@ describe('useOpenExternalQueryInEditor', () => {
         jest.mocked(createToast).mockClear();
         showModal.mockReset();
     });
-    afterEach(() => {
-        queryExecutionManagerInstance.abortAll();
-    });
+    afterEach(() => queryExecutionManagerInstance.abortAll());
     afterAll(() => {
         window.api = originalApi;
         showModal.mockRestore();
@@ -197,17 +175,16 @@ describe('useOpenExternalQueryInEditor', () => {
             if (normalizeLegacy) {
                 const confirmation = createDeferred<boolean>();
                 showModal.mockReturnValueOnce(confirmation.promise as never);
-                act(() => hook.result.current({...replacement, onAfterOpen}));
+                act(() => openQuery(hook.result, replacement.input, onAfterOpen));
                 await waitFor(() => expect(showModal).toHaveBeenCalled());
-                await act(async () => {
+                act(() =>
                     hook.history.replace(
                         '/database?database=%2FRoot%2Fdb&databasePage=diagnostics',
-                    );
-                    confirmation.resolve(true);
-                    await confirmation.promise;
-                });
+                    ),
+                );
+                await resolveDeferred(confirmation, true);
             } else {
-                await act(async () => hook.result.current({...replacement, onAfterOpen}));
+                await act(async () => openQuery(hook.result, replacement.input, onAfterOpen));
             }
             expect(hook.history.location.pathname).toBe(expectedPath);
             expect(getSearchParam(hook.history.location.search, 'database')).toBe('/Root/db');
@@ -227,7 +204,7 @@ describe('useOpenExternalQueryInEditor', () => {
             dirtyInput: 'SELECT unsaved;',
             initialLocation: '/home',
         });
-        await act(async () => result.current({...replacement, onAfterOpen}));
+        await act(async () => openQuery(result, replacement.input, onAfterOpen));
         expect(showModal).not.toHaveBeenCalled();
         expect(selectUserInput(store.getState())).toBe('SELECT unsaved;');
         expect(selectIsDirty(store.getState())).toBe(true);
@@ -244,7 +221,7 @@ describe('useOpenExternalQueryInEditor', () => {
             const onAfterOpen = jest.fn();
             const {history, result, store} = renderOpenExternalQueryHook({dirtyInput});
             showModal.mockResolvedValue(confirmed as never);
-            await act(async () => result.current({...replacement, onAfterOpen}));
+            await act(async () => openQuery(result, replacement.input, onAfterOpen));
             expect(showModal).toHaveBeenCalledWith(UNSAVED_CHANGES_DIALOG, {
                 id: UNSAVED_CHANGES_DIALOG,
             });
@@ -263,21 +240,16 @@ describe('useOpenExternalQueryInEditor', () => {
         showModal
             .mockReturnValueOnce(dirtyConfirmation.promise as never)
             .mockResolvedValueOnce(false as never);
-        act(() => result.current({...replacement, onAfterOpen}));
+        act(() => openQuery(result, replacement.input, onAfterOpen));
         await waitFor(() => expect(showModal).toHaveBeenCalledTimes(1));
         const runningInput = 'SELECT started while confirming;';
         const abort = registerRunningQuery(activeTabId);
-        await act(async () => {
-            setExecution(store, activeTabId, {
-                input: runningInput,
-                queryId: 'late-query',
-                startTime: 2,
-            });
+        updateExecution(store, activeTabId, {
+            input: runningInput,
+            queryId: 'late-query',
+            startTime: 2,
         });
-        await act(async () => {
-            dirtyConfirmation.resolve(true);
-            await dirtyConfirmation.promise;
-        });
+        await resolveDeferred(dirtyConfirmation, true);
         await waitFor(() =>
             expect(showModal).toHaveBeenNthCalledWith(2, RUNNING_QUERY_DIALOG, {
                 id: RUNNING_QUERY_DIALOG,
@@ -289,33 +261,56 @@ describe('useOpenExternalQueryInEditor', () => {
         expect(onAfterOpen).not.toHaveBeenCalled();
     });
     test.each([
-        ['cancel preserves the query', false],
-        ['accept cancels the originating database before opening', true],
-    ])('handles running confirmation: %s', async (_name, confirmed) => {
+        ['cancel preserves the query', 'cancel'],
+        ['accept cancels the originating database before opening', 'accept'],
+        ['dirty running query rejects later dirty confirmation', 'dirty'],
+        ['edit during running confirmation rejects dirty confirmation', 'edit'],
+    ])('handles running confirmation: %s', async (_name, mode) => {
         const onAfterOpen = jest.fn();
-        const hook = renderOpenExternalQueryHook({runningInput: 'SELECT running;'});
-        const abort = registerRunningQuery(hook.activeTabId);
-        showModal.mockResolvedValue(confirmed as never);
-        if (confirmed) {
-            await act(async () => {
-                hook.history.push('/database?database=%2FRoot%2Fother&databasePage=diagnostics');
-            });
+        const dirtyInput = mode === 'dirty' ? 'SELECT edited while running;' : undefined;
+        const hook = renderOpenExternalQueryHook({
+            dirtyInput,
+            runningInput: 'SELECT running;',
+        });
+        const executionDatabase = mode === 'accept' ? '/Root/origin' : '/Root/db';
+        const abort = registerRunningQuery(hook.activeTabId, executionDatabase);
+        const runningConfirmation = createDeferred<boolean>();
+        if (mode === 'edit') {
+            showModal
+                .mockReturnValueOnce(runningConfirmation.promise as never)
+                .mockResolvedValueOnce(false as never);
+            act(() => openQuery(hook.result, replacement.input, onAfterOpen));
+            await waitFor(() => expect(showModal).toHaveBeenCalledTimes(1));
+            editQuery(hook.store, 'SELECT edited while confirming;');
+            await resolveDeferred(runningConfirmation, true);
+        } else {
+            showModal
+                .mockResolvedValueOnce((mode !== 'cancel') as never)
+                .mockResolvedValueOnce(false as never);
+            await act(async () => openQuery(hook.result, replacement.input, onAfterOpen));
         }
-        await act(async () => hook.result.current({...replacement, onAfterOpen}));
         expect(showModal).toHaveBeenCalledWith(RUNNING_QUERY_DIALOG, {
             id: RUNNING_QUERY_DIALOG,
         });
-        expect(abort).toHaveBeenCalledTimes(confirmed ? 1 : 0);
-        expect(sendQuery).toHaveBeenCalledTimes(confirmed ? 1 : 0);
+        const shouldCancel = mode === 'accept';
+        expect(abort).toHaveBeenCalledTimes(shouldCancel ? 1 : 0);
+        expect(sendQuery).toHaveBeenCalledTimes(shouldCancel ? 1 : 0);
+        const expectedInput =
+            dirtyInput ?? (mode === 'edit' ? 'SELECT edited while confirming;' : 'SELECT running;');
         expect(selectUserInput(hook.store.getState())).toBe(
-            confirmed ? replacement.input : 'SELECT running;',
+            shouldCancel ? replacement.input : expectedInput,
         );
-        expect(onAfterOpen).toHaveBeenCalledTimes(confirmed ? 1 : 0);
-        if (confirmed) {
+        expect(onAfterOpen).toHaveBeenCalledTimes(shouldCancel ? 1 : 0);
+        if (mode === 'dirty' || mode === 'edit') {
+            expect(showModal).toHaveBeenNthCalledWith(2, UNSAVED_CHANGES_DIALOG, {
+                id: UNSAVED_CHANGES_DIALOG,
+            });
+        }
+        if (shouldCancel) {
             expect(sendQuery).toHaveBeenCalledWith(
                 {
                     action: 'cancel-query',
-                    database: '/Root/db',
+                    database: executionDatabase,
                     internal_call: true,
                     query_id: 'running-query',
                 },
@@ -326,7 +321,6 @@ describe('useOpenExternalQueryInEditor', () => {
             );
         }
     });
-
     test.each([
         ['same execution shows a toast and stays open', false],
         ['finished execution opens without a toast', true],
@@ -339,11 +333,11 @@ describe('useOpenExternalQueryInEditor', () => {
         const cancellation = createDeferred<{}>();
         sendQuery.mockReturnValue(cancellation.promise);
         showModal.mockResolvedValue(true as never);
-        act(() => result.current({...replacement, onAfterOpen}));
+        act(() => openQuery(result, replacement.input, onAfterOpen));
         await waitFor(() => expect(sendQuery).toHaveBeenCalledTimes(1));
         await act(async () => {
             if (finishExecution) {
-                setExecution(store, activeTabId, {
+                updateExecution(store, activeTabId, {
                     input: 'SELECT running;',
                     isLoading: false,
                 });
@@ -371,111 +365,119 @@ describe('useOpenExternalQueryInEditor', () => {
         const abort = registerRunningQuery(activeTabId);
         const confirmation = createDeferred<boolean>();
         if (queryIdArrives) {
-            await act(async () => {
-                setExecution(store, activeTabId, {
-                    input: 'SELECT streaming;',
-                    queryId: '',
-                    streamingStatus: 'preparing',
-                });
+            updateExecution(store, activeTabId, {
+                input: 'SELECT streaming;',
+                queryId: '',
+                streamingStatus: 'preparing',
             });
             showModal.mockReturnValueOnce(confirmation.promise as never);
         } else {
             showModal.mockResolvedValue(true as never);
         }
-        act(() => result.current(replacement));
+        act(() => openQuery(result));
         if (queryIdArrives) {
             await waitFor(() => expect(showModal).toHaveBeenCalledTimes(1));
-            await act(async () => {
-                setExecution(store, activeTabId, {
-                    input: 'SELECT streaming;',
-                    queryId: 'server-query-id',
-                    streamingStatus: 'running',
-                });
-                confirmation.resolve(true);
-                await confirmation.promise;
+            updateExecution(store, activeTabId, {
+                input: 'SELECT streaming;',
+                queryId: 'server-query-id',
+                streamingStatus: 'running',
             });
+            await resolveDeferred(confirmation, true);
         }
         await waitFor(() => expect(abort).toHaveBeenCalledTimes(1));
         expect(sendQuery).not.toHaveBeenCalled();
         expect(selectUserInput(store.getState())).toBe(replacement.input);
     });
-    test.each(['route round-trip', 'execution replacement', 'editor edit'])(
-        'rejects a stale continuation after %s',
-        async (staleCause) => {
-            const onAfterOpen = jest.fn();
-            const hook = renderOpenExternalQueryHook({runningInput: 'SELECT running;'});
-            const abort = registerRunningQuery(hook.activeTabId);
-            const continuation = createDeferred<boolean | {}>();
-            if (staleCause === 'editor edit') {
-                showModal.mockResolvedValue(true as never);
-                sendQuery.mockReturnValue(continuation.promise);
-            } else {
-                showModal.mockReturnValueOnce(continuation.promise as never);
-            }
-            act(() => hook.result.current({...replacement, onAfterOpen}));
-            await waitFor(() => expect(showModal).toHaveBeenCalledTimes(1));
-            if (staleCause === 'editor edit') {
-                await waitFor(() => expect(sendQuery).toHaveBeenCalledTimes(1));
-                await act(async () => {
-                    hook.store.dispatch(changeUserInput({input: 'SELECT edited while stopping;'}));
-                });
-            } else if (staleCause === 'route round-trip') {
-                await act(async () => {
-                    hook.history.push('/home');
-                    hook.history.push('/tenant?database=%2FRoot%2Fdb&databasePage=diagnostics');
-                });
-            } else {
-                const nextInput = 'SELECT second;';
-                registerRunningQuery(hook.activeTabId);
-                await act(async () => {
-                    setExecution(hook.store, hook.activeTabId, {
-                        input: nextInput,
-                        queryId: 'next-query',
-                        startTime: 2,
-                    });
-                });
-            }
-            await act(async () => {
-                continuation.resolve(staleCause === 'editor edit' ? {} : true);
-                await continuation.promise;
+    test.each([
+        ['route round-trip', 'SELECT running;'],
+        ['execution replacement', 'SELECT second;'],
+        ['editor edit', 'SELECT edited while stopping;'],
+        ['route during cancellation', 'SELECT running;'],
+    ])('rejects a stale continuation after %s', async (staleCause, expectedInput) => {
+        const onAfterOpen = jest.fn();
+        const hook = renderOpenExternalQueryHook({runningInput: 'SELECT running;'});
+        const abort = registerRunningQuery(hook.activeTabId);
+        const continuation = createDeferred<boolean | {}>();
+        const cancellationPending =
+            staleCause === 'editor edit' || staleCause === 'route during cancellation';
+        if (cancellationPending) {
+            showModal.mockResolvedValue(true as never);
+            sendQuery.mockReturnValue(continuation.promise);
+        } else {
+            showModal.mockReturnValueOnce(continuation.promise as never);
+        }
+        act(() => openQuery(hook.result, replacement.input, onAfterOpen));
+        await waitFor(() => expect(showModal).toHaveBeenCalledTimes(1));
+        if (cancellationPending) {
+            await waitFor(() => expect(sendQuery).toHaveBeenCalledTimes(1));
+        }
+        if (staleCause === 'editor edit') {
+            editQuery(hook.store, expectedInput);
+        } else if (staleCause === 'route during cancellation') {
+            act(() =>
+                hook.history.push('/database?database=%2FRoot%2Fother&databasePage=diagnostics'),
+            );
+        } else if (staleCause === 'route round-trip') {
+            act(() => {
+                hook.history.push('/home');
+                hook.history.push('/tenant?database=%2FRoot%2Fdb&databasePage=diagnostics');
             });
-            expect(selectUserInput(hook.store.getState())).toBe(staleInputs[staleCause]);
-            expect(abort).toHaveBeenCalledTimes(staleCause === 'editor edit' ? 1 : 0);
-            expect(onAfterOpen).not.toHaveBeenCalled();
+        } else {
+            const nextInput = 'SELECT second;';
+            registerRunningQuery(hook.activeTabId);
+            updateExecution(hook.store, hook.activeTabId, {
+                input: nextInput,
+                queryId: 'next-query',
+                startTime: 2,
+            });
+        }
+        await resolveDeferred(continuation, cancellationPending ? {} : true);
+        expect(selectUserInput(hook.store.getState())).toBe(expectedInput);
+        expect(abort).toHaveBeenCalledTimes(cancellationPending ? 1 : 0);
+        expect(onAfterOpen).not.toHaveBeenCalled();
+    });
+    test.each(['hook instances', 'mode switch'])(
+        'lets the latest request win across %s',
+        async (scenario) => {
+            const switchesMode = scenario === 'mode switch';
+            const firstAfterOpen = jest.fn();
+            const secondAfterOpen = jest.fn();
+            const hook = renderOpenExternalQueryHook({
+                dirtyInput: switchesMode ? 'SELECT dirty;' : undefined,
+                initialLocation: switchesMode
+                    ? '/database?database=%2FRoot%2Fdb&databasePage=query&queryTab=newQuery'
+                    : undefined,
+                runningInput: switchesMode ? undefined : 'SELECT running;',
+            });
+            const secondResult = switchesMode
+                ? hook.result
+                : renderHook(() => useOpenExternalQueryInEditor(), {wrapper: hook.wrapper}).result;
+            const abort = switchesMode ? undefined : registerRunningQuery(hook.activeTabId);
+            const confirmation = createDeferred<boolean>();
+            showModal.mockReturnValue(confirmation.promise as never);
+            act(() => openQuery(hook.result, 'SELECT first;', firstAfterOpen));
+            await waitFor(() => expect(showModal).toHaveBeenCalledTimes(1));
+            if (switchesMode) {
+                configureUIFactory({enableMultiTabQueryEditor: true});
+                hook.rerender();
+            }
+            act(() => openQuery(secondResult, 'SELECT second;', secondAfterOpen));
+            if (!switchesMode) {
+                await waitFor(() => expect(showModal).toHaveBeenCalledTimes(2));
+            }
+            await resolveDeferred(confirmation, true);
+            await waitFor(() =>
+                expect(selectUserInput(hook.store.getState())).toBe('SELECT second;'),
+            );
+            expect(firstAfterOpen).not.toHaveBeenCalled();
+            expect(secondAfterOpen).toHaveBeenCalledTimes(1);
+            if (switchesMode) {
+                expect(selectTabsOrder(hook.store.getState())).toHaveLength(2);
+            } else {
+                expect(abort).toHaveBeenCalledTimes(1);
+            }
         },
     );
-    test('lets the latest request win across separate hook instances', async () => {
-        const firstAfterOpen = jest.fn();
-        const secondAfterOpen = jest.fn();
-        const hook = renderOpenExternalQueryHook({runningInput: 'SELECT running;'});
-        const secondHook = renderHook(() => useOpenExternalQueryInEditor(), {
-            wrapper: hook.wrapper,
-        });
-        const abort = registerRunningQuery(hook.activeTabId);
-        const confirmation = createDeferred<boolean>();
-        showModal.mockReturnValue(confirmation.promise as never);
-        act(() => {
-            hook.result.current({
-                title: 'First replacement',
-                input: 'SELECT first;',
-                onAfterOpen: firstAfterOpen,
-            });
-            secondHook.result.current({
-                title: 'Second replacement',
-                input: 'SELECT second;',
-                onAfterOpen: secondAfterOpen,
-            });
-        });
-        await waitFor(() => expect(showModal).toHaveBeenCalledTimes(2));
-        await act(async () => {
-            confirmation.resolve(true);
-            await confirmation.promise;
-        });
-        await waitFor(() => expect(selectUserInput(hook.store.getState())).toBe('SELECT second;'));
-        expect(abort).toHaveBeenCalledTimes(1);
-        expect(firstAfterOpen).not.toHaveBeenCalled();
-        expect(secondAfterOpen).toHaveBeenCalledTimes(1);
-    });
     test('opens a new tab in multi-tab mode without stopping the running tab', async () => {
         const onAfterOpen = jest.fn();
         const {activeTabId, result, store} = renderOpenExternalQueryHook({
