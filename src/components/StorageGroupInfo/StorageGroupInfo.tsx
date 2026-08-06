@@ -4,6 +4,7 @@ import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabil
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
 import {valueIsDefined} from '../../utils';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {getDocsLink} from '../../utils/docs';
 import {formatMetricCount} from '../../utils/storageMetrics';
 import {formatToMs} from '../../utils/timeParsers';
 import {bytesToSpeed} from '../../utils/utils';
@@ -16,6 +17,7 @@ import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
+import {TitleWithHelpMark} from '../TitleWithHelpmark/TitleWithHelpmark';
 
 import {storageGroupInfoKeyset} from './i18n';
 
@@ -50,6 +52,15 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
         LatencyGetFastMs,
         GroupSizeInUnits,
     } = data || {};
+
+    const distributedStorageChannelDocsLink = getDocsLink('distributedStorageChannel');
+    const allocationUnitsLabel = (
+        <TitleWithHelpMark
+            header={storageGroupInfoKeyset('allocation-units')}
+            note={storageGroupInfoKeyset('context_allocation-units')}
+            docsLink={distributedStorageChannelDocsLink}
+        />
+    );
 
     if (capacityMetricsEnabled) {
         const configurationInfo: InfoViewerItem[] = [];
@@ -118,7 +129,7 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
         }
         if (valueIsDefined(AllocationUnits)) {
             runtimeInfo.push({
-                label: storageGroupInfoKeyset('allocation-units'),
+                label: allocationUnitsLabel,
                 value: AllocationUnits,
             });
         }
@@ -267,7 +278,7 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
     }
     if (valueIsDefined(AllocationUnits)) {
         storageGroupInfoSecondColumn.push({
-            label: storageGroupInfoKeyset('allocation-units'),
+            label: allocationUnitsLabel,
             value: AllocationUnits,
         });
     }
