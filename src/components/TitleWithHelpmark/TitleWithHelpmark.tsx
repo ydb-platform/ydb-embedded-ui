@@ -1,15 +1,27 @@
-import {Flex, HelpMark} from '@gravity-ui/uikit';
+import React from 'react';
+
+import {Flex} from '@gravity-ui/uikit';
+
+import {HelpMarkWithDocs} from '../HelpMarkWithDocs/HelpMarkWithDocs';
 
 interface TitleWithHelpMarkProps {
     header: string;
-    note: string;
+    note: React.ReactNode;
+    docsLink?: string;
+    docsLinkTitle?: string;
 }
 
-export function TitleWithHelpMark({header, note}: TitleWithHelpMarkProps) {
+export function TitleWithHelpMark({header, note, docsLink, docsLinkTitle}: TitleWithHelpMarkProps) {
     return (
         <Flex gap={1} alignItems="center">
             {header}
-            <HelpMark popoverProps={{placement: ['right', 'left']}}>{note}</HelpMark>
+            <HelpMarkWithDocs
+                docsLink={docsLink}
+                docsLinkTitle={docsLinkTitle}
+                popoverProps={{placement: ['right', 'left']}}
+            >
+                {note}
+            </HelpMarkWithDocs>
         </Flex>
     );
 }

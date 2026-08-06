@@ -126,6 +126,9 @@ export interface DocsConfig {
 
     /** Path to the article about the auto partitioning max partitions count setting. */
     autoPartitioningMaxPartitionsCount?: string;
+
+    /** Path to the distributed storage channel glossary entry. */
+    distributedStorageChannel?: string;
 }
 
 export type HandleCreateDB = (params: {

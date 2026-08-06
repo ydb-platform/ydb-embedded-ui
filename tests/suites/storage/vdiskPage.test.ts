@@ -788,13 +788,25 @@ test.describe('Blob storage capacity metrics integration', () => {
             configurationInfo.getByText('Group Size In Units', {exact: true}),
         ).toBeVisible();
         await expect(configurationInfo.getByText('Units', {exact: true})).toHaveCount(0);
-        await expect(runtimeInfo.getByText('Units', {exact: true})).toBeVisible();
+        const allocationUnitsLabel = runtimeInfo.getByText('Allocation Units', {exact: true});
+        await expect(allocationUnitsLabel).toBeVisible();
+        await allocationUnitsLabel.getByRole('button').hover();
+        await expect(
+            page.getByText(
+                'The number of channels used by tablets to write data to the storage group.',
+                {exact: true},
+            ),
+        ).toBeVisible();
 
         const runtimeLabels = await runtimeInfo
             .locator('.info-viewer__label-text')
             .allTextContents();
-        expect(runtimeLabels.indexOf('Units')).toBe(runtimeLabels.indexOf('Available Space') + 1);
-        expect(runtimeLabels.indexOf('VDisk Slot Usage')).toBe(runtimeLabels.indexOf('Units') + 1);
+        expect(runtimeLabels.indexOf('Allocation Units')).toBe(
+            runtimeLabels.indexOf('Available Space') + 1,
+        );
+        expect(runtimeLabels.indexOf('VDisk Slot Usage')).toBe(
+            runtimeLabels.indexOf('Allocation Units') + 1,
+        );
 
         await page.goto(VDISK_PAGE_PATH.replace('type=groups', 'type=nodes'));
 
