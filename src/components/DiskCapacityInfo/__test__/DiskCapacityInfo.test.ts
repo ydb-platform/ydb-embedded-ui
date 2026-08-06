@@ -60,7 +60,7 @@ describe('DiskCapacityInfo builders', () => {
             'capacity-alert',
         ]);
         expect(items.find(({id}) => id === 'vdisk-slot-usage')?.note).toBe(
-            'VDisk allocated chunks relative to its slot hard limit at the yellow-move threshold.',
+            'Percentage of VDisk space used relative to the first low-space warning. Can exceed 100%.',
         );
     });
 

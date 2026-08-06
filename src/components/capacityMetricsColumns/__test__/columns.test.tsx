@@ -17,32 +17,32 @@ function getHeaderProps(header: React.ReactNode) {
 }
 
 describe('capacityMetricsColumns', () => {
-    test('wires exact denominator help into every capacity column header', () => {
+    test('wires exact help text into every capacity column header', () => {
         const columns = [
             {
                 column: getPDiskUsageColumn(),
                 header: 'PDisk Usage',
-                note: 'Occupied shared-quota chunks divided by chunks available to all VDisks on the PDisk.',
+                note: 'Share of PDisk space used by VDisks. System and log reserves are not included.',
             },
             {
                 column: getVDiskSlotUsageColumn(),
                 header: 'VDisk Slot Usage',
-                note: 'VDisk allocated chunks relative to its slot hard limit at the yellow-move threshold.',
+                note: 'Percentage of VDisk space used relative to the first low-space warning. Can exceed 100%.',
             },
             {
                 column: getVDiskRawUsageColumn(),
                 header: 'VDisk Raw Usage',
-                note: 'VDisk allocated chunks relative to its raw fair-part quota.',
+                note: 'Percentage of VDisk space used relative to its fair share on the PDisk. Can exceed 100%.',
             },
             {
                 column: getNormalizedOccupancyColumn(),
                 header: 'Normalized Occupancy',
-                note: 'Internal nonlinear occupancy in the 0..1 range; this value is not a percentage.',
+                note: 'Internal score used for gently handling low-space cases.',
             },
             {
                 column: getCapacityAlertColumn(),
                 header: 'Capacity Alert',
-                note: 'Backend capacity alert enum, not a percentage derived in the UI.',
+                note: 'Named status used for gently handling low-space cases.',
             },
         ];
 
