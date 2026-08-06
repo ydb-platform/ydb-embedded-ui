@@ -1,9 +1,11 @@
 import {Link} from 'react-router-dom';
 
+import {TENANT_METRICS_TABS_IDS} from '../../../../../../store/reducers/tenant/constants';
 import {cn} from '../../../../../../utils/cn';
 import {MetricTabCard} from '../../TabCard/MetricTabCard';
 import i18n from '../../i18n';
 import type {TenantOverviewMetric} from '../../metricOverview';
+import {getMetricTabHelpText} from '../getMetricTabHelpText';
 
 import '../MetricsTabs.scss';
 
@@ -25,6 +27,7 @@ export function MemoryTab({to, active, memory}: MemoryTabProps) {
                     value={memory.percentText ?? i18n('value_unavailable-percent')}
                     active={active}
                     description={i18n('context_memory-tab-description')}
+                    helpText={getMetricTabHelpText(TENANT_METRICS_TABS_IDS.memory, memory.status)}
                 />
             </Link>
         </div>

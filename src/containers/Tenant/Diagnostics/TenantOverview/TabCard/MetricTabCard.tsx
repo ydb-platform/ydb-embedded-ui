@@ -1,4 +1,6 @@
-import {Card, Flex, Text} from '@gravity-ui/uikit';
+import React from 'react';
+
+import {Card, Flex, Popover, Text} from '@gravity-ui/uikit';
 
 import {StatusIcon} from '../../../../../components/StatusIcon/StatusIcon';
 import type {EFlag} from '../../../../../types/api/enums';
@@ -13,10 +15,23 @@ interface MetricTabCardProps {
     status: EFlag;
     value: string;
     description: string;
+    helpText?: string;
     active?: boolean;
 }
 
-export function MetricTabCard({title, status, value, description, active}: MetricTabCardProps) {
+function handleHelpMarkClick(event: React.MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+}
+
+export function MetricTabCard({
+    title,
+    status,
+    value,
+    description,
+    helpText,
+    active,
+}: MetricTabCardProps) {
     return (
         <Card className={b({active})} type="container" view={active ? 'outlined' : 'filled'}>
             <Flex direction="column" gap={0.5}>
@@ -28,7 +43,26 @@ export function MetricTabCard({title, status, value, description, active}: Metri
                         <Text variant="body-1" color="secondary" data-qa="tenant-metric-tab-value">
                             {value}
                         </Text>
-                        <StatusIcon status={status} mode="icons" size="s" />
+                        {helpText ? (
+                            <Popover
+                                content={
+                                    <div className={b('status-help-mark-popover')}>{helpText}</div>
+                                }
+                                hasArrow
+                                placement={['top', 'bottom']}
+                            >
+                                <button
+                                    type="button"
+                                    className={b('status-help-mark')}
+                                    aria-label={helpText}
+                                    onClick={handleHelpMarkClick}
+                                >
+                                    <StatusIcon status={status} mode="icons" size="s" />
+                                </button>
+                            </Popover>
+                        ) : (
+                            <StatusIcon status={status} mode="icons" size="s" />
+                        )}
                     </Flex>
                 </Flex>
                 <Text
