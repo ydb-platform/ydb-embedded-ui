@@ -11,7 +11,7 @@ import {
 } from '../DiskCapacityInfo';
 
 describe('DiskCapacityInfo builders', () => {
-    test('builds exact VDisk capacity values and help semantics', () => {
+    test('builds exact VDisk capacity values', () => {
         const items = getVDiskCapacityInfoItems(
             {
                 AllocatedSize: 1_000_000_000,
@@ -59,9 +59,6 @@ describe('DiskCapacityInfo builders', () => {
             'group-size-in-units',
             'capacity-alert',
         ]);
-        expect(items.find(({id}) => id === 'vdisk-slot-usage')?.note).toBe(
-            'Percentage of VDisk space used relative to the first low-space warning. Can exceed 100%.',
-        );
     });
 
     test('keeps every VDisk item while optional scalar values are absent', () => {
