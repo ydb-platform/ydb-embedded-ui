@@ -25,6 +25,12 @@ test('keeps allocated storage groups in backend order without aggregation', () =
     ]);
 });
 
+test('trims allocated storage group kinds', () => {
+    expect(getAllocatedStorageGroups([resource({Kind: '  ssdmirror  ', Count: 20})])).toEqual([
+        {kind: 'ssdmirror', count: 20},
+    ]);
+});
+
 test('ignores allocated resources with invalid group values', () => {
     expect(
         getAllocatedStorageGroups([

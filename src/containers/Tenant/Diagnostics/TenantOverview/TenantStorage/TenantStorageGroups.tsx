@@ -17,17 +17,13 @@ export function getAllocatedStorageGroups(
     allocatedResources?: TTenantResource[],
 ): AllocatedStorageGroup[] {
     return (allocatedResources ?? []).flatMap(({Count, Kind, Type}) => {
-        if (
-            Type !== 'storage' ||
-            typeof Kind !== 'string' ||
-            Kind.trim() === '' ||
-            !Number.isFinite(Count) ||
-            Count < 0
-        ) {
+        const kind = typeof Kind === 'string' ? Kind.trim() : '';
+
+        if (Type !== 'storage' || kind === '' || !Number.isFinite(Count) || Count < 0) {
             return [];
         }
 
-        return [{kind: Kind, count: Count}];
+        return [{kind, count: Count}];
     });
 }
 
