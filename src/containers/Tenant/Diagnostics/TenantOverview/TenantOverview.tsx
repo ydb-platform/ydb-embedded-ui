@@ -25,7 +25,7 @@ import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import type {EFlag} from '../../../../types/api/enums';
 import type {SelfCheckResult} from '../../../../types/api/healthcheck';
 import type {TMemoryStats} from '../../../../types/api/nodes';
-import type {ETenantType, TTenant} from '../../../../types/api/tenant';
+import type {ETenantType, TTenant, TTenantResource} from '../../../../types/api/tenant';
 import {getInfoTabLinks} from '../../../../utils/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
@@ -200,6 +200,7 @@ function renderOverviewHead({
 
 function renderMetricsTabContent({
     activeMetricsTab,
+    allocatedResources,
     blobStorageStats,
     database,
     databaseFullPath,
@@ -213,6 +214,7 @@ function renderMetricsTabContent({
     tabletStorageStats,
 }: {
     activeMetricsTab: TenantMetricsTab;
+    allocatedResources?: TTenantResource[];
     blobStorageStats?: TenantStorageStats[];
     database: string;
     databaseFullPath: string;
@@ -239,6 +241,7 @@ function renderMetricsTabContent({
         case TENANT_METRICS_TABS_IDS.storage: {
             return (
                 <TenantStorageMode
+                    allocatedResources={allocatedResources}
                     database={database}
                     databaseFullPath={databaseFullPath}
                     metrics={storageMetrics}
@@ -412,6 +415,7 @@ export function TenantOverview({
                 <div className={b('tab-content')}>
                     {renderMetricsTabContent({
                         activeMetricsTab,
+                        allocatedResources: tenant?.Resources?.Allocated,
                         blobStorageStats,
                         database,
                         databaseFullPath,

@@ -1,5 +1,5 @@
 import type {TenantStorageStats} from '../../../../../store/reducers/tenants/utils';
-import type {ETenantType} from '../../../../../types/api/tenant';
+import type {ETenantType, TTenantResource} from '../../../../../types/api/tenant';
 
 export interface TenantStorageMetrics {
     blobStorageUsed?: number;
@@ -9,6 +9,7 @@ export interface TenantStorageMetrics {
 }
 
 export interface TenantStorageProps {
+    allocatedResources?: TTenantResource[];
     database: string;
     databaseFullPath: string;
     metrics: TenantStorageMetrics;

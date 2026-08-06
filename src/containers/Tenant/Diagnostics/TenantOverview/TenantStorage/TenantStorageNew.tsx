@@ -8,6 +8,7 @@ import {EStorageStatsProblem} from '../../../../../types/api/storage';
 import {cn} from '../../../../../utils/cn';
 import {useIsViewerUser} from '../../../../../utils/hooks/useIsUserAllowedToMakeChanges';
 
+import {TenantStorageGroups} from './TenantStorageGroups';
 import {
     TenantStorageGroupedMediaSectionsView,
     TenantStorageMediaSectionView,
@@ -84,6 +85,7 @@ function TenantStorageSummarySkeleton({showPhysicalDiskUsage}: TenantStorageSumm
 }
 
 export function TenantStorageNew({
+    allocatedResources,
     database,
     databaseFullPath,
     metrics,
@@ -150,6 +152,7 @@ export function TenantStorageNew({
                     )}
                 </div>
             </div>
+            <TenantStorageGroups allocatedResources={allocatedResources} />
             <TenantStorageTopUsageTable
                 loading={false}
                 error={topRowsError}
