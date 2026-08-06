@@ -4,8 +4,6 @@ import {Flex, Icon, Label, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 import {Helmet} from 'react-helmet-async';
-import {StringParam, useQueryParams} from 'use-query-params';
-import {z} from 'zod';
 
 import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
 import {ResponseError} from '../../components/Errors/ResponseError';
@@ -33,32 +31,11 @@ import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {VDiskStorageDetails} from './VDiskStorageDetails';
 import {VDiskTablets} from './VDiskTablets';
 import {vDiskPageKeyset} from './i18n';
+import {useVDiskQueryParams} from './useVDiskQueryParams';
 
 import './VDiskPage.scss';
 
 const vDiskPageCn = cn('ydb-vdisk-page');
-
-const VDISK_TABS_IDS = {
-    storage: 'storage',
-    tablets: 'tablets',
-} as const;
-
-const VDISK_PAGE_TABS = [
-    {
-        id: VDISK_TABS_IDS.storage,
-        get title() {
-            return vDiskPageKeyset('storage');
-        },
-    },
-    {
-        id: VDISK_TABS_IDS.tablets,
-        get title() {
-            return vDiskPageKeyset('tablets');
-        },
-    },
-];
-
-const vDiskTabSchema = z.nativeEnum(VDISK_TABS_IDS).catch(VDISK_TABS_IDS.storage);
 
 export function VDiskPage() {
     const dispatch = useTypedDispatch();
@@ -66,15 +43,7 @@ export function VDiskPage() {
 
     const containerRef = React.useRef<HTMLDivElement>(null);
 
-    const [{nodeId, vDiskId: vDiskIdParam, activeTab, database: databaseParam}] = useQueryParams({
-        nodeId: StringParam,
-        vDiskId: StringParam,
-        activeTab: StringParam,
-        database: StringParam,
-    });
-    const database = databaseParam ?? undefined;
-
-    const vDiskTab = vDiskTabSchema.parse(activeTab);
+    const {nodeId, vDiskId: vDiskIdParam, database, vDiskTab, vDiskTabs} = useVDiskQueryParams();
     const newStorageViewEnabled = useNewStorageViewEnabled();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -123,7 +92,6 @@ export function VDiskPage() {
     const {GroupID} = resolvedVDiskId || {};
 
     const vDiskId = vDiskData?.StringifiedId || (loading ? undefined : vDiskIdParam);
-
     const {appTitle} = useAppTitle();
 
     const renderHelmet = () => {
@@ -233,7 +201,7 @@ export function VDiskPage() {
             <div className={vDiskPageCn('tabs')}>
                 <TabProvider value={vDiskTab}>
                     <TabList size="l">
-                        {VDISK_PAGE_TABS.map(({id, title}) => {
+                        {vDiskTabs.map(({id, title}) => {
                             const path = getVDiskPagePath(
                                 {
                                     nodeId: nodeId?.toString(),

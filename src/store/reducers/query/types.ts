@@ -60,7 +60,14 @@ export interface PreparedQueryData extends IQueryResult {
 
 export type StreamingStatus = 'preparing' | 'running' | 'fetching';
 
+export interface QuerySourcePosition {
+    lineNumber: number;
+    column: number;
+    preparedQueryPrefixLineCount?: number;
+}
+
 export interface QueryResult {
+    executionId: string;
     type: QueryAction;
     data?: PreparedQueryData;
     error?: unknown;
@@ -70,6 +77,7 @@ export interface QueryResult {
     endTime?: number;
     isLoading: boolean;
     streamingStatus?: StreamingStatus;
+    sourcePosition?: QuerySourcePosition;
 }
 
 export interface QueryTabState {
@@ -115,10 +123,7 @@ export interface QueryState {
     historyCurrentQueryId?: string;
 
     tenantPath?: string;
-    selectedResultTab?: {
-        execute?: string;
-        explain?: string;
-    };
+    selectedResultTab?: Partial<Record<QueryAction, string>>;
 }
 
 export interface QueryStats {

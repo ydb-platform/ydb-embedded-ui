@@ -1,5 +1,8 @@
+import type {QuerySourcePosition} from '../../../../store/reducers/query/types';
 import type {ErrorResponse, IssueMessage} from '../../../../types/api/query';
 import {isNumeric} from '../../../../utils/utils';
+
+export const QUERY_SETTINGS_PRAGMAS_SOURCE = 'query-settings-pragmas';
 
 export function hasRootIssues(issues?: IssueMessage[]): issues is IssueMessage[] {
     return Array.isArray(issues) && issues.length > 0;
@@ -42,4 +45,54 @@ export function getMostSevere(issues?: IssueMessage[] | null) {
         const severity = issue.severity ?? 10;
         return Math.min(result, severity);
     }, 10);
+}
+
+function offsetPosition(position: IssueMessage['position'], sourcePosition: QuerySourcePosition) {
+    if (!position || !isNumeric(position.row)) {
+        return position;
+    }
+
+    const row = Number(position.row);
+    const preparedQueryPrefixLineCount = sourcePosition.preparedQueryPrefixLineCount ?? 0;
+    if (row <= preparedQueryPrefixLineCount) {
+        return {...position, file: QUERY_SETTINGS_PRAGMAS_SOURCE};
+    }
+
+    const fragmentRow = row - preparedQueryPrefixLineCount;
+    return {
+        ...position,
+        row: fragmentRow + sourcePosition.lineNumber - 1,
+        column:
+            fragmentRow === 1 && isNumeric(position.column)
+                ? Number(position.column) + sourcePosition.column - 1
+                : position.column,
+    };
+}
+
+function offsetIssuePositions(
+    issue: IssueMessage,
+    sourcePosition: QuerySourcePosition,
+): IssueMessage {
+    return {
+        ...issue,
+        position: offsetPosition(issue.position, sourcePosition),
+        end_position: offsetPosition(issue.end_position, sourcePosition),
+        issues: Array.isArray(issue.issues)
+            ? issue.issues.map((nestedIssue) => offsetIssuePositions(nestedIssue, sourcePosition))
+            : issue.issues,
+    };
+}
+
+export function offsetErrorResponsePositions(
+    error: ErrorResponse,
+    sourcePosition: QuerySourcePosition,
+): ErrorResponse {
+    return {
+        ...error,
+        error: error.error ? offsetIssuePositions(error.error, sourcePosition) : undefined,
+        issues:
+            error.issues === null
+                ? null
+                : error.issues?.map((issue) => offsetIssuePositions(issue, sourcePosition)),
+    };
 }

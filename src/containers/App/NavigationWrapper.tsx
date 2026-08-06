@@ -60,7 +60,7 @@ export function NavigationWrapper({
 
     finalUserSettings = applyStorageExpertModeSettingAvailability(
         finalUserSettings,
-        isUserAllowedToMakeChanges,
+        blobMetricsAvailable && Boolean(isUserAllowedToMakeChanges),
     );
 
     return (

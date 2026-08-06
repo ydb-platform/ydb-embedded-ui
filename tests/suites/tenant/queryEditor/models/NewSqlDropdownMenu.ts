@@ -38,9 +38,7 @@ export class NewSqlDropdownMenu {
     private subMenu: Locator;
 
     constructor(page: Page) {
-        this.dropdownButton = page.locator(
-            '.ydb-query-editor-controls .g-dropdown-menu__switcher-wrapper button',
-        );
+        this.dropdownButton = page.getByTestId('new-sql-dropdown-switcher');
         this.menu = page.locator('.g-dropdown-menu__menu');
         this.subMenu = page.locator('.g-dropdown-menu__sub-menu');
     }
@@ -51,7 +49,7 @@ export class NewSqlDropdownMenu {
     }
 
     async hoverCategory(category: TemplateCategory) {
-        const categoryItem = this.menu.getByRole('menuitem').filter({hasText: category});
+        const categoryItem = this.menu.getByRole('menuitem', {name: category, exact: true});
         await categoryItem.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await categoryItem.hover();
     }
@@ -59,20 +57,20 @@ export class NewSqlDropdownMenu {
     async selectTemplate(
         template: AsyncReplicationTemplates | TablesTemplates | SecretTemplates | TopicTemplates,
     ) {
-        const templateItem = this.subMenu.getByRole('menuitem').filter({hasText: template});
+        const templateItem = this.subMenu.getByRole('menuitem', {name: template, exact: true});
         await templateItem.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await templateItem.click();
     }
 
     async isCategoryVisible(category: TemplateCategory) {
-        const categoryItem = this.menu.getByRole('menuitem').filter({hasText: category});
+        const categoryItem = this.menu.getByRole('menuitem', {name: category, exact: true});
         return categoryItem.isVisible();
     }
 
     async isTemplateVisible(
         template: AsyncReplicationTemplates | TablesTemplates | SecretTemplates | TopicTemplates,
     ) {
-        const templateItem = this.subMenu.getByRole('menuitem').filter({hasText: template});
+        const templateItem = this.subMenu.getByRole('menuitem', {name: template, exact: true});
         return templateItem.isVisible();
     }
 

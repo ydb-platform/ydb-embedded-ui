@@ -3,5 +3,10 @@
   "field_vdisk-slot-usage": "VDisk Slot Usage",
   "field_vdisk-raw-usage": "VDisk Raw Usage",
   "field_normalized-occupancy": "Normalized Occupancy",
-  "field_capacity-alert": "Capacity Alert"
+  "field_capacity-alert": "Capacity Alert",
+  "context_pdisk-usage": "Occupied shared-quota chunks divided by chunks available to all VDisks on the PDisk.",
+  "context_vdisk-slot-usage": "VDisk allocated chunks relative to its slot hard limit at the yellow-move threshold.",
+  "context_vdisk-raw-usage": "VDisk allocated chunks relative to its raw fair-part quota.",
+  "context_normalized-occupancy": "Internal nonlinear occupancy in the 0..1 range; this value is not a percentage.",
+  "context_capacity-alert": "Backend capacity alert enum, not a percentage derived in the UI."
 }

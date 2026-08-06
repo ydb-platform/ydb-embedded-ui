@@ -1,6 +1,6 @@
-import {Binoculars, Gear, PlayFill, StopFill} from '@gravity-ui/icons';
+import {Gear, PlayFill, StopFill} from '@gravity-ui/icons';
 import type {ButtonProps} from '@gravity-ui/uikit';
-import {Button, Icon, Tooltip} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Icon} from '@gravity-ui/uikit';
 
 import QuerySettingsDescription from '../../../../components/QuerySettingsDescription/QuerySettingsDescription';
 import {cn} from '../../../../utils/cn';
@@ -18,8 +18,19 @@ const Run = (props: ButtonProps) => (
     </Button>
 );
 
-const Stop = ({error, ...props}: ButtonProps & {error?: boolean}) => (
-    <Button {...props} className={b('stop-button', {error})}>
+type StopButtonProps = ButtonProps & {
+    error?: boolean;
+    replacedAction?: 'run' | 'explain' | 'explainAnalyze';
+};
+
+const Stop = ({error, replacedAction, ...props}: StopButtonProps) => (
+    <Button
+        {...props}
+        className={b('stop-button', {
+            error,
+            'explain-analyze': replacedAction === 'explainAnalyze',
+        })}
+    >
         <Icon data={StopFill} size={16} />
         {i18n('action.stop')}
     </Button>
@@ -27,9 +38,21 @@ const Stop = ({error, ...props}: ButtonProps & {error?: boolean}) => (
 
 const Explain = (props: ButtonProps) => (
     <Button {...props} className={b('explain-button', undefined, 'brand-button')}>
-        <Icon data={Binoculars} size={16} />
         {i18n('action.explain')}
     </Button>
+);
+
+const ExplainAnalyze = (props: ButtonProps) => (
+    <ActionTooltip
+        title={i18n('explain-analyze.tooltip.title')}
+        description={i18n('explain-analyze.tooltip.description')}
+        openDelay={0}
+        placement={['top-start']}
+    >
+        <Button {...props} className={b('explain-analyze-button', undefined, 'brand-button')}>
+            {i18n('action.explain-analyze')}
+        </Button>
+    </ActionTooltip>
 );
 
 interface SettingsButtonProps {
@@ -46,11 +69,12 @@ const Settings = ({onClick, isLoading}: SettingsButtonProps) => {
             : null;
 
     return (
-        <Tooltip
+        <ActionTooltip
             disabled={changedCurrentSettings.length === 0}
-            content={
+            title={i18n('gear.tooltip')}
+            description={
                 <QuerySettingsDescription
-                    prefix={i18n('gear.tooltip')}
+                    prefix=""
                     querySettings={changedCurrentSettingsDescriptions}
                 />
             }
@@ -68,7 +92,7 @@ const Settings = ({onClick, isLoading}: SettingsButtonProps) => {
                     <div className={b('changed-settings')}>({changedCurrentSettings.length})</div>
                 ) : null}
             </Button>
-        </Tooltip>
+        </ActionTooltip>
     );
 };
 
@@ -76,5 +100,6 @@ export const EditorButton = {
     Run,
     Stop,
     Explain,
+    ExplainAnalyze,
     Settings,
 };

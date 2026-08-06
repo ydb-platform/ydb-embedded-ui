@@ -3,6 +3,7 @@ import {Flex} from '@gravity-ui/uikit';
 import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
+import {useBlobStorageCapacityMetricsEnabled} from '../../../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
@@ -20,6 +21,10 @@ export type {TenantStorageMetrics} from './types';
 export function TenantStorage({database, metrics, databaseType}: TenantStorageProps) {
     const {blobStorageUsed, tabletStorageUsed, blobStorageLimit, tabletStorageLimit} = metrics;
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
+    const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+    const topGroupsTitle = capacityMetricsEnabled
+        ? i18n('title_top-groups-by-vdisk-slot-usage')
+        : i18n('title_top-groups-by-usage');
 
     const info = [
         {
@@ -77,10 +82,10 @@ export function TenantStorage({database, metrics, databaseType}: TenantStoragePr
                 <TopTables database={database} />
             </StatsWrapper>
             <StatsWrapper
-                title={i18n('title_top-groups-by-usage')}
+                title={topGroupsTitle}
                 allEntitiesLink={getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.storage)}
             >
-                <TopGroups tenant={database} />
+                <TopGroups tenant={database} capacityMetricsEnabled={capacityMetricsEnabled} />
             </StatsWrapper>
         </Flex>
     );

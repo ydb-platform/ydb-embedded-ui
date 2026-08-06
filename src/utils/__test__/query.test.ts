@@ -1,4 +1,17 @@
-import {isErrorResponse, isQueryErrorResponse} from '../query';
+import {
+    QUERY_ACTIONS,
+    isErrorResponse,
+    isExecutionQueryAction,
+    isQueryErrorResponse,
+} from '../query';
+
+describe('isExecutionQueryAction', () => {
+    test('classifies actions that execute backend queries', () => {
+        expect(isExecutionQueryAction(QUERY_ACTIONS.execute)).toBe(true);
+        expect(isExecutionQueryAction(QUERY_ACTIONS.explain)).toBe(false);
+        expect(isExecutionQueryAction(QUERY_ACTIONS.explainAnalyze)).toBe(true);
+    });
+});
 
 describe('isQueryErrorResponse', () => {
     test('should return true for object with error and issues', () => {

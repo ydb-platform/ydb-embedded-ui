@@ -10,7 +10,10 @@ import {
     useBridgeModeEnabled,
 } from '../../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
-import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
+import {
+    mergeColumnsPreservingHiddenPositions,
+    useSelectedColumns,
+} from '../../../../utils/hooks/useSelectedColumns';
 
 import {getStorageNodesColumns} from './columns';
 import {
@@ -20,6 +23,8 @@ import {
     STORAGE_NODES_SELECTED_COLUMNS_LS_KEY,
 } from './constants';
 import type {GetStorageNodesColumnsParams} from './types';
+
+const LEGACY_CAPACITY_COLUMN_IDS: NodesColumnId[] = [NODES_COLUMNS_IDS.DiskSpaceUsage];
 
 export function useStorageNodesSelectedColumns({
     visibleEntities,
@@ -37,16 +42,8 @@ export function useStorageNodesSelectedColumns({
             skipped.push(NODES_COLUMNS_IDS.PileName);
         }
 
-        if (!blobMetricsEnabled) {
-            skipped.push(...CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS);
-        }
-
-        if (blobMetricsEnabled) {
-            skipped.push(NODES_COLUMNS_IDS.DiskSpaceUsage);
-        }
-
         return skipped;
-    }, [bridgeModeEnabled, blobMetricsEnabled]);
+    }, [bridgeModeEnabled]);
 
     const columns = React.useMemo(() => {
         const allColumns = getStorageNodesColumns({database, viewContext, columnsSettings});
@@ -70,11 +67,40 @@ export function useStorageNodesSelectedColumns({
             : [...DEFAULT_STORAGE_NODES_COLUMNS, NODES_COLUMNS_IDS.PileName];
     }, [bridgeModeEnabled]);
 
-    return useSelectedColumns(
+    const selectedColumns = useSelectedColumns(
         columns,
         STORAGE_NODES_SELECTED_COLUMNS_LS_KEY,
         NODES_COLUMNS_TITLES,
         defaultColumns,
         requiredColumns,
     );
+
+    const hiddenCapacityColumnIds = blobMetricsEnabled
+        ? LEGACY_CAPACITY_COLUMN_IDS
+        : CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS;
+    const setColumns: typeof selectedColumns.setColumns = React.useCallback(
+        (value) => {
+            selectedColumns.setColumns(
+                mergeColumnsPreservingHiddenPositions(
+                    value,
+                    selectedColumns.columnsToSelect,
+                    hiddenCapacityColumnIds,
+                ),
+            );
+        },
+        [hiddenCapacityColumnIds, selectedColumns],
+    );
+
+    return React.useMemo(() => {
+        return {
+            ...selectedColumns,
+            columnsToShow: selectedColumns.columnsToShow.filter(
+                ({name}) => !hiddenCapacityColumnIds.some((columnId) => columnId === name),
+            ),
+            columnsToSelect: selectedColumns.columnsToSelect.filter(
+                ({id}) => !hiddenCapacityColumnIds.some((columnId) => columnId === id),
+            ),
+            setColumns,
+        };
+    }, [hiddenCapacityColumnIds, selectedColumns, setColumns]);
 }

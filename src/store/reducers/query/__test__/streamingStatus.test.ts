@@ -11,6 +11,8 @@ import queryReducer, {
 } from '../query';
 import type {QueryState} from '../types';
 
+const EXECUTION_ID = 'execution-a';
+
 function createStateWithStreamingResult(): QueryState {
     return {
         activeTabId: 'tab-1',
@@ -24,6 +26,7 @@ function createStateWithStreamingResult(): QueryState {
                 createdAt: 0,
                 updatedAt: 0,
                 result: {
+                    executionId: EXECUTION_ID,
                     type: 'execute',
                     queryId: '',
                     isLoading: true,
@@ -36,7 +39,80 @@ function createStateWithStreamingResult(): QueryState {
     };
 }
 
+function setResultExecutionId(state: QueryState, executionId: string) {
+    const result = state.tabsById['tab-1'].result;
+    if (!result) {
+        throw new Error('Expected streaming query result');
+    }
+    result.executionId = executionId;
+}
+
 describe('Streaming query status transitions', () => {
+    test('stale session chunk should not mutate a newer execution result', () => {
+        const initialState = createStateWithStreamingResult();
+        setResultExecutionId(initialState, 'execution-b');
+
+        const state = queryReducer(
+            initialState,
+            setStreamSession({
+                tabId: 'tab-1',
+                executionId: 'execution-a',
+                chunk: {
+                    meta: {
+                        event: 'SessionCreated',
+                        node_id: 1,
+                        query_id: 'stale-query-id',
+                        session_id: 'stale-session-id',
+                    },
+                },
+            }),
+        );
+
+        expect(state).toBe(initialState);
+    });
+
+    test('stale data chunk should not mutate a newer execution result', () => {
+        const initialState = createStateWithStreamingResult();
+        setResultExecutionId(initialState, 'execution-b');
+
+        const state = queryReducer(
+            initialState,
+            addStreamingChunks({
+                tabId: 'tab-1',
+                executionId: 'execution-a',
+                chunks: [
+                    {
+                        meta: {event: 'StreamData', seq_no: 0, result_index: 0},
+                        result: {
+                            columns: [{name: 'id', type: 'Uint64'}],
+                            rows: [['stale-value']],
+                        },
+                    },
+                ],
+            }),
+        );
+
+        expect(state).toBe(initialState);
+    });
+
+    test('stale response chunk should not finalize a newer execution result', () => {
+        const initialState = createStateWithStreamingResult();
+        setResultExecutionId(initialState, 'execution-b');
+
+        const state = queryReducer(
+            initialState,
+            setStreamQueryResponse({
+                tabId: 'tab-1',
+                executionId: 'execution-a',
+                chunk: {
+                    meta: {event: 'QueryResponse', version: '1', type: 'query'},
+                },
+            }),
+        );
+
+        expect(state).toBe(initialState);
+    });
+
     test('initial streaming query should have status "preparing"', () => {
         const initialState: QueryState = {
             activeTabId: 'tab-1',
@@ -59,6 +135,7 @@ describe('Streaming query status transitions', () => {
             setQueryResult({
                 tabId: 'tab-1',
                 result: {
+                    executionId: EXECUTION_ID,
                     type: 'execute',
                     queryId: '',
                     isLoading: true,
@@ -86,7 +163,7 @@ describe('Streaming query status transitions', () => {
 
         const state = queryReducer(
             initialState,
-            setStreamSession({tabId: 'tab-1', chunk: sessionChunk}),
+            setStreamSession({tabId: 'tab-1', executionId: EXECUTION_ID, chunk: sessionChunk}),
         );
 
         expect(state.tabsById['tab-1'].result?.streamingStatus).toBe('running');
@@ -110,7 +187,10 @@ describe('Streaming query status transitions', () => {
             },
         ];
 
-        const state = queryReducer(initialState, addStreamingChunks({tabId: 'tab-1', chunks}));
+        const state = queryReducer(
+            initialState,
+            addStreamingChunks({tabId: 'tab-1', executionId: EXECUTION_ID, chunks}),
+        );
 
         expect(state.tabsById['tab-1'].result?.streamingStatus).toBe('fetching');
         expect(state.tabsById['tab-1'].result?.isLoading).toBe(true);
@@ -126,7 +206,11 @@ describe('Streaming query status transitions', () => {
 
         const state = queryReducer(
             initialState,
-            setStreamQueryResponse({tabId: 'tab-1', chunk: responseChunk}),
+            setStreamQueryResponse({
+                tabId: 'tab-1',
+                executionId: EXECUTION_ID,
+                chunk: responseChunk,
+            }),
         );
 
         expect(state.tabsById['tab-1'].result?.streamingStatus).toBeUndefined();
@@ -156,6 +240,7 @@ describe('Streaming query status transitions', () => {
             setQueryResult({
                 tabId: 'tab-1',
                 result: {
+                    executionId: EXECUTION_ID,
                     type: 'execute',
                     queryId: '',
                     isLoading: true,
@@ -171,6 +256,7 @@ describe('Streaming query status transitions', () => {
             state,
             setStreamSession({
                 tabId: 'tab-1',
+                executionId: EXECUTION_ID,
                 chunk: {
                     meta: {
                         event: 'SessionCreated',
@@ -188,6 +274,7 @@ describe('Streaming query status transitions', () => {
             state,
             addStreamingChunks({
                 tabId: 'tab-1',
+                executionId: EXECUTION_ID,
                 chunks: [
                     {
                         meta: {event: 'StreamData', seq_no: 0, result_index: 0},
@@ -206,6 +293,7 @@ describe('Streaming query status transitions', () => {
             state,
             setStreamQueryResponse({
                 tabId: 'tab-1',
+                executionId: EXECUTION_ID,
                 chunk: {
                     meta: {event: 'QueryResponse', version: '1', type: 'query'},
                 },
@@ -237,6 +325,7 @@ describe('Streaming query status transitions', () => {
             setQueryResult({
                 tabId: 'tab-1',
                 result: {
+                    executionId: EXECUTION_ID,
                     type: 'execute',
                     queryId: 'regular-query',
                     isLoading: true,
@@ -259,7 +348,11 @@ describe('Streaming query status transitions', () => {
         };
         let state = queryReducer(
             initialState,
-            setStreamQueryResponse({tabId: 'tab-1', chunk: responseChunk}),
+            setStreamQueryResponse({
+                tabId: 'tab-1',
+                executionId: EXECUTION_ID,
+                chunk: responseChunk,
+            }),
         );
         expect(state.tabsById['tab-1'].result?.streamingStatus).toBeUndefined();
         expect(state.tabsById['tab-1'].result?.isLoading).toBe(false);
@@ -271,7 +364,10 @@ describe('Streaming query status transitions', () => {
                 result: {rows: [['late-value']]},
             },
         ];
-        state = queryReducer(state, addStreamingChunks({tabId: 'tab-1', chunks}));
+        state = queryReducer(
+            state,
+            addStreamingChunks({tabId: 'tab-1', executionId: EXECUTION_ID, chunks}),
+        );
 
         expect(state.tabsById['tab-1'].result?.streamingStatus).toBeUndefined();
         expect(state.tabsById['tab-1'].result?.isLoading).toBe(false);
@@ -305,7 +401,7 @@ describe('Streaming query status transitions', () => {
 
         const state = queryReducer(
             initialState,
-            setStreamSession({tabId: 'tab-1', chunk: sessionChunk}),
+            setStreamSession({tabId: 'tab-1', executionId: EXECUTION_ID, chunk: sessionChunk}),
         );
 
         expect(state.tabsById['tab-1'].result).toBeUndefined();

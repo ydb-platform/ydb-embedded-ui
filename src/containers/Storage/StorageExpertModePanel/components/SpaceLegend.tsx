@@ -5,11 +5,10 @@ import type {LabelProps} from '@gravity-ui/uikit';
 import {Flex, Icon, Label, Text} from '@gravity-ui/uikit';
 
 import {ECapacityAlert} from '../../../../types/api/enums';
-import {saveToSessionStorage} from '../../../../utils';
 import {b} from '../constants';
 import i18n from '../i18n';
 
-import {SPACE_LEGEND_STORAGE_KEY, getSpaceLegendSelection} from './getSpaceLegendSelection';
+import {getSpaceLegendSelection, saveSpaceLegendSelection} from './getSpaceLegendSelection';
 
 import './SpaceLegend.scss';
 
@@ -69,9 +68,7 @@ export function SpaceLegend({className}: SpaceLegendProps) {
             } else {
                 next.add(id);
             }
-            saveToSessionStorage(SPACE_LEGEND_STORAGE_KEY, Array.from(next));
-            // Dispatch custom event to notify other components
-            window.dispatchEvent(new CustomEvent('spaceLegendChange'));
+            saveSpaceLegendSelection(next);
             return next;
         });
     }, []);

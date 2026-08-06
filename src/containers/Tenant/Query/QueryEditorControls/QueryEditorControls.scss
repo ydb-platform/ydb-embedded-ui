@@ -13,6 +13,25 @@
         gap: 12px;
     }
 
+    &__action-button {
+        display: flex;
+        flex: none;
+
+        &_run {
+            width: 76px;
+        }
+
+        &_explain-analyze {
+            width: 111px;
+        }
+
+        > .g-button {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+        }
+    }
+
     &__mode-selector {
         $b: &;
 

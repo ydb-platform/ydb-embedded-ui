@@ -46,14 +46,13 @@ test.describe('Test Query Settings', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
 
     test.beforeEach(async ({page}) => {
-        const pageQueryParams = {
-            schema: database,
-            database,
-            databasePage: 'query',
-        };
+        await setupResourcePoolMock(page);
 
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
+        await tenantPage.gotoQueryEditor({
+            schema: database,
+            database,
+        });
     });
 
     test('Settings dialog opens on Gear click and closes on Cancel', async ({page}) => {
@@ -77,6 +76,24 @@ test.describe('Test Query Settings', async () => {
             const text = await queryEditor.gearButtonText();
             expect(text).toContain('(1)');
         }).toPass({timeout: VISIBILITY_TIMEOUT});
+    });
+
+    test('Gear uses the same ActionTooltip style as Explain Analyze', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.clickGearButton();
+
+        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.hoverGearButton();
+
+        const settingsActionTooltip = page
+            .locator('.g-action-tooltip')
+            .filter({hasText: 'Query execution settings have been changed'});
+
+        await expect(settingsActionTooltip).toBeVisible();
+        await expect(
+            settingsActionTooltip.getByText('Query type: Scan', {exact: true}),
+        ).toBeVisible();
     });
 
     test('Banner appears after executing script with changed settings', async ({page}) => {
@@ -459,8 +476,6 @@ test.describe('Test Query Settings', async () => {
     });
 
     test('Resource pool dropdown is populated from system view', async ({page}) => {
-        await setupResourcePoolMock(page, ['default', 'olap']);
-
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
@@ -472,8 +487,6 @@ test.describe('Test Query Settings', async () => {
     });
 
     test('Resource pool selection is persisted between dialog opens', async ({page}) => {
-        await setupResourcePoolMock(page, ['default', 'olap']);
-
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 

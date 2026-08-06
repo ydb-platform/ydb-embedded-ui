@@ -17,6 +17,33 @@ function parseSavedColumn(saved: unknown): OrderedColumn | undefined {
     return undefined;
 }
 
+export function mergeColumnsPreservingHiddenPositions<T extends {id: string}>(
+    visibleColumns: T[],
+    allColumns: T[],
+    hiddenColumnIds: readonly string[],
+): T[] {
+    const hiddenColumnIdSet = new Set(hiddenColumnIds);
+    const visibleColumnIdSet = new Set(visibleColumns.map(({id}) => id));
+    const mergedColumns = [...visibleColumns];
+    let visibleColumnsBefore = 0;
+    let insertedHiddenColumns = 0;
+
+    for (const column of allColumns) {
+        if (hiddenColumnIdSet.has(column.id)) {
+            const insertionIndex = Math.min(
+                visibleColumnsBefore + insertedHiddenColumns,
+                mergedColumns.length,
+            );
+            mergedColumns.splice(insertionIndex, 0, column);
+            insertedHiddenColumns += 1;
+        } else if (visibleColumnIdSet.has(column.id)) {
+            visibleColumnsBefore += 1;
+        }
+    }
+
+    return mergedColumns;
+}
+
 export const useSelectedColumns = <T extends {name: string}>(
     columns: T[],
     storageKey: string,

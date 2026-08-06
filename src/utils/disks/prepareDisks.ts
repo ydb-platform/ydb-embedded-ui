@@ -3,7 +3,7 @@ import {isNil} from 'lodash';
 import type {TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import {stringifyVdiskId} from '../dataFormatters/dataFormatters';
-import {isNumeric} from '../utils';
+import {isNumeric, parseOptionalNonNegativeNumber} from '../utils';
 
 import {calculatePDiskSeverity} from './calculatePDiskSeverity';
 import {calculateVDiskSeverity} from './calculateVDiskSeverity';
@@ -15,7 +15,7 @@ export function prepareWhiteboardVDiskData(
     vDiskState: TVDiskStateInfo | TVSlotId = {},
 ): PreparedVDisk {
     if (!isFullVDiskData(vDiskState)) {
-        const {NodeId, PDiskId, VSlotId} = vDiskState;
+        const {NodeId, PDiskId, VSlotId, ...restVDiskFields} = vDiskState;
 
         const vDiskId =
             !isNil(VSlotId) && !isNil(PDiskId) && !isNil(NodeId)
@@ -29,6 +29,7 @@ export function prepareWhiteboardVDiskData(
         const StringifiedId = stringifyVdiskId(vDiskId);
 
         return {
+            ...restVDiskFields,
             StringifiedId,
             NodeId,
             PDiskId,
@@ -58,6 +59,11 @@ export function prepareWhiteboardVDiskData(
     const vDiskSizeFields = prepareVDiskSizeFields({
         AvailableSize: AvailableSize,
         AllocatedSize: AllocatedSize,
+        SlotSize: PDisk?.EnforcedDynamicSlotSize,
+    });
+    const WhiteboardSize = prepareWhiteboardVDiskSizeFields({
+        AvailableSize,
+        AllocatedSize,
         SlotSize: PDisk?.EnforcedDynamicSlotSize,
     });
 
@@ -91,6 +97,7 @@ export function prepareWhiteboardVDiskData(
     return {
         ...restVDiskFields,
         ...vDiskSizeFields,
+        WhiteboardSize,
 
         VDiskId,
         NodeId,
@@ -103,7 +110,10 @@ export function prepareWhiteboardVDiskData(
     };
 }
 
-export function prepareWhiteboardPDiskData(pdiskState: TPDiskStateInfo = {}): PreparedPDisk {
+export function prepareWhiteboardPDiskData(
+    pdiskState: TPDiskStateInfo = {},
+    whiteboardSizeSource: Pick<TPDiskStateInfo, 'AvailableSize' | 'TotalSize'> | null = pdiskState,
+): PreparedPDisk {
     const {
         AvailableSize,
         TotalSize,
@@ -123,6 +133,9 @@ export function prepareWhiteboardPDiskData(pdiskState: TPDiskStateInfo = {}): Pr
         AvailableSize,
         TotalSize,
     });
+    const WhiteboardSize = whiteboardSizeSource
+        ? prepareWhiteboardPDiskSizeFields(whiteboardSizeSource)
+        : undefined;
 
     const Severity = calculatePDiskSeverity({
         State,
@@ -132,6 +145,7 @@ export function prepareWhiteboardPDiskData(pdiskState: TPDiskStateInfo = {}): Pr
     return {
         ...restPDiskFields,
         ...pdiskPreparedSizeFields,
+        ...(WhiteboardSize ? {WhiteboardSize} : {}),
         PDiskId,
         NodeId,
         StringifiedId,
@@ -140,6 +154,53 @@ export function prepareWhiteboardPDiskData(pdiskState: TPDiskStateInfo = {}): Pr
         State,
         Severity,
         SlotSize: EnforcedDynamicSlotSize,
+    };
+}
+
+function prepareWhiteboardVDiskSizeFields({
+    AvailableSize,
+    AllocatedSize,
+    SlotSize,
+}: {
+    AvailableSize: unknown;
+    AllocatedSize: unknown;
+    SlotSize: unknown;
+}) {
+    const allocatedSize = parseOptionalNonNegativeNumber(AllocatedSize);
+    const availableSize = parseOptionalNonNegativeNumber(AvailableSize);
+    const slotSize = parseOptionalNonNegativeNumber(SlotSize);
+    const preparedSizeFields = prepareVDiskSizeFields({
+        AvailableSize: availableSize,
+        AllocatedSize: allocatedSize,
+        SlotSize: slotSize,
+    });
+
+    return {
+        AllocatedSize: allocatedSize === undefined ? undefined : preparedSizeFields.AllocatedSize,
+        SizeLimit:
+            availableSize === undefined && slotSize === undefined
+                ? undefined
+                : preparedSizeFields.SizeLimit,
+    };
+}
+
+function prepareWhiteboardPDiskSizeFields({
+    AvailableSize,
+    TotalSize,
+}: Pick<TPDiskStateInfo, 'AvailableSize' | 'TotalSize'>) {
+    const availableSize = parseOptionalNonNegativeNumber(AvailableSize);
+    const totalSize = parseOptionalNonNegativeNumber(TotalSize);
+    const preparedSizeFields = preparePDiskSizeFields({
+        AvailableSize: availableSize,
+        TotalSize: totalSize,
+    });
+
+    return {
+        AllocatedSize:
+            availableSize === undefined || totalSize === undefined
+                ? undefined
+                : preparedSizeFields.AllocatedSize,
+        TotalSize: totalSize,
     };
 }
 

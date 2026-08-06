@@ -111,7 +111,10 @@ export function parseOptionalNonNegativeNumber(
     value: unknown,
     {emptyStringAsUndefined = true}: ParseOptionalNonNegativeNumberOptions = {},
 ) {
-    if (emptyStringAsUndefined && typeof value === 'string' && value.trim() === '') {
+    if (
+        value === null ||
+        (emptyStringAsUndefined && typeof value === 'string' && value.trim() === '')
+    ) {
         return undefined;
     }
 

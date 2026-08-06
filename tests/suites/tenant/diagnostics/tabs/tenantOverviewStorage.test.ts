@@ -45,11 +45,21 @@ async function enableNewStorageView(page: Page, theme?: StorageScreenshotTheme) 
     }
 }
 
+async function enableBlobStorageCapacityMetrics(page: Page) {
+    await page.addInitScript(() => {
+        localStorage.setItem('blobStorageCapacityMetrics', JSON.stringify(true));
+    });
+}
+
 async function setupStorageScreenshotViewport(page: Page) {
     await page.setViewportSize(STORAGE_SCREENSHOT_VIEWPORT);
 }
 
-async function setupCapabilities(page: Page, storageStatsVersion: number) {
+async function setupCapabilities(
+    page: Page,
+    storageStatsVersion: number,
+    capacityVersions?: {storageGroups: number; viewerNodes: number},
+) {
     await page.route('**/viewer/capabilities*', async (route) => {
         await route.fulfill({
             status: 200,
@@ -58,6 +68,12 @@ async function setupCapabilities(page: Page, storageStatsVersion: number) {
                 Database: database,
                 Capabilities: {
                     '/viewer/storage_stats': storageStatsVersion,
+                    ...(capacityVersions
+                        ? {
+                              '/storage/groups': capacityVersions.storageGroups,
+                              '/viewer/nodes': capacityVersions.viewerNodes,
+                          }
+                        : {}),
                 },
             }),
         });
@@ -940,6 +956,96 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await expect(page.locator(STORAGE_VIEW_SELECTOR)).toHaveCount(0);
         await expect(page.getByText('Storage Details', {exact: true})).toBeVisible();
         await expect(page.getByText('Top tables by size', {exact: true})).toBeVisible();
+    });
+
+    test('uses capacity sorting and columns in the legacy Database Overview storage mode', async ({
+        page,
+    }) => {
+        let storageGroupsRequestUrl: URL | undefined;
+
+        await enableBlobStorageCapacityMetrics(page);
+        await setupWhoami(page);
+        await setupCapabilities(page, 1, {storageGroups: 10, viewerNodes: 20});
+        await setupTenantInfo(page, 'Dedicated');
+        await setupPartitionStatsQuery(page);
+        await page.route('**/storage/groups?*', async (route) => {
+            storageGroupsRequestUrl = new URL(route.request().url());
+
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    StorageGroups: [
+                        {
+                            GroupId: '1',
+                            MediaType: 'SSD',
+                            Encryption: false,
+                            ErasureSpecies: 'mirror-3-dc',
+                            MaxVDiskSlotUsage: 82.25,
+                            CapacityAlert: 'ORANGE',
+                            GroupSizeInUnits: 2,
+                            Used: '10000000000',
+                            Limit: '200000000000',
+                        },
+                    ],
+                }),
+            });
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: database,
+            database,
+            databasePage: 'database',
+            diagnosticsTab: 'database',
+        });
+
+        await openStorageMetricsTab(page);
+
+        const topGroupsByVDiskSlotUsage = page
+            .locator('.ydb-stats-wrapper')
+            .filter({has: page.getByText('Top groups by VDisk Slot Usage', {exact: true})});
+        const topGroupsTable = topGroupsByVDiskSlotUsage
+            .locator('table')
+            .filter({has: page.locator('tbody')});
+
+        await expect(topGroupsByVDiskSlotUsage).toHaveCount(1);
+        await expect(topGroupsTable).toHaveCount(1);
+        await expect(
+            topGroupsTable.getByRole('columnheader', {name: 'VDisk Slot Usage', exact: true}),
+        ).toBeVisible();
+        await expect(
+            topGroupsTable.getByRole('columnheader', {name: 'Group Size In Units', exact: true}),
+        ).toBeVisible();
+        const headerTexts = (await topGroupsTable.getByRole('columnheader').allTextContents()).map(
+            (text) => text.replace(/\s+/g, ' ').trim(),
+        );
+        expect(headerTexts).toEqual([
+            'Group ID',
+            'Type',
+            'Erasure',
+            'VDisk Slot Usage',
+            'Capacity Alert',
+            'Group Size In Units',
+            'Used',
+            'Limit',
+        ]);
+        const topGroupsDataRows = topGroupsTable.locator('tbody tr.data-table__row');
+
+        await expect(topGroupsDataRows).toHaveCount(1);
+        await expect(
+            topGroupsDataRows.first().locator('.g-label_theme_danger').getByText('82.25%', {
+                exact: true,
+            }),
+        ).toBeVisible();
+        await expect(topGroupsDataRows.first().getByText('ORANGE', {exact: true})).toBeVisible();
+        await expect(topGroupsDataRows.first().getByText('2', {exact: true})).toBeVisible();
+
+        expect(storageGroupsRequestUrl).toBeDefined();
+        expect(storageGroupsRequestUrl?.searchParams.get('sort')).toBe('-MaxVDiskSlotUsage');
+        expect(storageGroupsRequestUrl?.searchParams.get('fields_required')?.split(',')).toEqual(
+            expect.arrayContaining(['MaxVDiskSlotUsage', 'CapacityAlert', 'GroupSizeInUnits']),
+        );
     });
 
     for (const theme of STORAGE_SCREENSHOT_THEMES) {

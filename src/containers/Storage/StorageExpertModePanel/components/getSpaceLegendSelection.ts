@@ -1,7 +1,8 @@
 import {ECapacityAlert, isCapacityAlert} from '../../../../types/api/enums';
-import {loadFromSessionStorage} from '../../../../utils';
+import {loadFromSessionStorage, saveToSessionStorage} from '../../../../utils';
 
 export const SPACE_LEGEND_STORAGE_KEY = 'ydb-space-legend-inactive';
+export const SPACE_LEGEND_CHANGE_EVENT = 'spaceLegendChange';
 
 // By default, GREEN and CYAN are inactive (deselected)
 const defaultInactive = new Set([ECapacityAlert.GREEN, ECapacityAlert.CYAN]);
@@ -28,4 +29,9 @@ function loadInactiveItems(): Set<ECapacityAlert> {
  */
 export function getSpaceLegendSelection(): Set<ECapacityAlert> {
     return loadInactiveItems();
+}
+
+export function saveSpaceLegendSelection(selection: Set<ECapacityAlert>): void {
+    saveToSessionStorage(SPACE_LEGEND_STORAGE_KEY, Array.from(selection));
+    window.dispatchEvent(new CustomEvent(SPACE_LEGEND_CHANGE_EVENT));
 }

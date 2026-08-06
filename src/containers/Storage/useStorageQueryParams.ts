@@ -2,15 +2,22 @@ import React from 'react';
 
 import {BooleanParam, StringParam, useQueryParam, useQueryParams} from 'use-query-params';
 
-import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
+import {
+    useBlobStorageCapacityMetricsAvailable,
+    useBlobStorageCapacityMetricsEnabled,
+} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
 import {storageTypeSchema, visibleEntitiesSchema} from '../../store/reducers/storage/types';
 import {useSetting} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
-import {storageGroupsGroupByParamSchema} from './PaginatedStorageGroupsTable/columns/constants';
+import {
+    STORAGE_GROUPS_LEGACY_CAPACITY_GROUP_BY_FIELDS,
+    storageGroupsGroupByParamSchema,
+} from './PaginatedStorageGroupsTable/columns/constants';
 import {storageNodesGroupByParamSchema} from './PaginatedStorageNodesTable/columns/constants';
 import {VDisksGroupBy, vdisksGroupBySchema} from './StorageExpertModePanel/constants';
 import type {VDisksGroupByValue} from './StorageExpertModePanel/constants';
@@ -30,7 +37,11 @@ export function getStorageGroupByCleanupPatch({
     const patch: Record<string, string | undefined> = {};
 
     if (blobMetricsEnabled) {
-        if (storageGroupsGroupBy === 'Usage') {
+        if (
+            STORAGE_GROUPS_LEGACY_CAPACITY_GROUP_BY_FIELDS.some(
+                (field) => field === storageGroupsGroupBy,
+            )
+        ) {
             patch.storageGroupsGroupBy = undefined;
         }
 
@@ -218,6 +229,8 @@ export function useStorageQueryParams() {
 }
 
 export function useIsStorageExpertMode() {
+    const storageExpertModeAvailable = useBlobStorageCapacityMetricsAvailable();
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const [storageExpertModeSettingEnabled] = useSetting<boolean>(
         SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
     );
@@ -225,6 +238,8 @@ export function useIsStorageExpertMode() {
     const [savedStorageExpertMode] = useSetting<boolean>(SETTING_KEYS.STORAGE_EXPERT_MODE);
 
     return (
+        storageExpertModeAvailable &&
+        Boolean(isUserAllowedToMakeChanges) &&
         Boolean(storageExpertModeSettingEnabled) &&
         Boolean(storageExpertModeQueryParam ?? savedStorageExpertMode)
     );

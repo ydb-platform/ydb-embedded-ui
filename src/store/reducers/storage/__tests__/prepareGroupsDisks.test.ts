@@ -1,7 +1,95 @@
+import {ECapacityAlert} from '../../../../types/api/enums';
+import type {TPDiskStateInfo} from '../../../../types/api/pdisk';
 import type {TStoragePDisk, TStorageVDisk} from '../../../../types/api/storage';
+import type {TVDiskStateInfo} from '../../../../types/api/vdisk';
 import {prepareGroupsPDisk, prepareGroupsVDisk} from '../prepareGroupsDisks';
 
+const vDiskWithCapacityMetrics = {
+    VDiskId: {
+        GroupID: 0,
+        GroupGeneration: 0,
+        Ring: 0,
+        Domain: 0,
+        VDisk: 0,
+    },
+    GroupSizeInUnits: 0,
+    VDiskSlotUsage: 82.25,
+    VDiskRawUsage: 64.5,
+    NormalizedOccupancy: 0.92,
+    CapacityAlert: ECapacityAlert.LIGHTYELLOW,
+} satisfies TVDiskStateInfo;
+
+const pDiskWithCapacityMetrics = {
+    SlotSizeInUnits: 0,
+    PDiskUsage: 70.5,
+    PDiskCapacityAlert: ECapacityAlert.ORANGE,
+} satisfies TPDiskStateInfo;
+
 describe('prepareGroupsVDisk', () => {
+    test('Should preserve nested Whiteboard capacity metrics including zero values', () => {
+        const preparedData = prepareGroupsVDisk({
+            Whiteboard: vDiskWithCapacityMetrics,
+            PDisk: {Whiteboard: pDiskWithCapacityMetrics},
+        });
+
+        expect(preparedData).toEqual(expect.objectContaining(vDiskWithCapacityMetrics));
+        expect(preparedData.PDisk).toEqual(expect.objectContaining(pDiskWithCapacityMetrics));
+    });
+
+    test('Should omit absent nested Whiteboard capacity metrics', () => {
+        const preparedData = prepareGroupsVDisk({Whiteboard: {}, PDisk: {Whiteboard: {}}});
+
+        expect(preparedData).not.toHaveProperty('VDiskSlotUsage');
+        expect(preparedData.PDisk).not.toHaveProperty('PDiskUsage');
+    });
+
+    test('Should preserve the BSC size and prepare a separate Whiteboard size', () => {
+        const preparedData = prepareGroupsVDisk({
+            AllocatedSize: '1000000000',
+            AvailableSize: '3000000000',
+            Whiteboard: {
+                AllocatedSize: '1000000000',
+                AvailableSize: '21000000000',
+            },
+            PDisk: {
+                Whiteboard: {
+                    EnforcedDynamicSlotSize: '22000000000',
+                },
+            },
+        });
+
+        expect(preparedData).toEqual(
+            expect.objectContaining({
+                AllocatedSize: 1_000_000_000,
+                SizeLimit: 4_000_000_000,
+                WhiteboardSize: {
+                    AllocatedSize: 1_000_000_000,
+                    SizeLimit: 22_000_000_000,
+                },
+            }),
+        );
+    });
+
+    test('Should keep the legacy size fallback for a donor without nested Whiteboard data', () => {
+        const preparedData = prepareGroupsVDisk({
+            Donors: [
+                {
+                    AllocatedSize: '1000000000',
+                    AvailableSize: '3000000000',
+                },
+            ],
+        });
+
+        expect(preparedData.Donors?.[0]).toEqual(
+            expect.objectContaining({
+                AllocatedSize: 1_000_000_000,
+                SizeLimit: 4_000_000_000,
+                DonorMode: true,
+            }),
+        );
+        expect(preparedData.Donors?.[0]).not.toHaveProperty('WhiteboardSize');
+    });
+
     test('Should correctly parse data', () => {
         const vDiksDataWithoutPDisk = {
             VDiskId: '2181038134-22-0-0-0',
@@ -94,6 +182,10 @@ describe('prepareGroupsVDisk', () => {
             SizeLimit: 265405071360,
             FreeSize: 234461593600,
             AllocatedPercent: 11,
+            WhiteboardSize: {
+                AllocatedSize: 30943477760,
+                SizeLimit: 265405071360,
+            },
 
             Donors: undefined,
 
@@ -245,6 +337,10 @@ describe('prepareGroupsVDisk', () => {
             SizeLimit: 265405071360,
             FreeSize: 234461593600,
             AllocatedPercent: 11,
+            WhiteboardSize: {
+                AllocatedSize: 30943477760,
+                SizeLimit: 265405071360,
+            },
 
             Donors: undefined,
 
@@ -287,6 +383,50 @@ describe('prepareGroupsVDisk', () => {
 });
 
 describe('prepareGroupsPDisk', () => {
+    test('Should preserve the BSC size and prepare a separate Whiteboard size', () => {
+        const preparedData = prepareGroupsPDisk({
+            AvailableSize: '3000000000',
+            TotalSize: '4000000000',
+            Whiteboard: {
+                AvailableSize: '21000000000',
+                TotalSize: '22000000000',
+            },
+        });
+
+        expect(preparedData).toEqual(
+            expect.objectContaining({
+                AllocatedSize: 1_000_000_000,
+                TotalSize: 4_000_000_000,
+                WhiteboardSize: {
+                    AllocatedSize: 1_000_000_000,
+                    TotalSize: 22_000_000_000,
+                },
+            }),
+        );
+    });
+
+    test.each([
+        ['absent', undefined],
+        ['null', null],
+    ] as const)(
+        'Should preserve %s Whiteboard available size as undefined',
+        (_caseName, AvailableSize) => {
+            const preparedData = prepareGroupsPDisk({
+                AvailableSize: '3000000000',
+                TotalSize: '4000000000',
+                Whiteboard: {
+                    AvailableSize,
+                    TotalSize: '22000000000',
+                },
+            } as unknown as TStoragePDisk);
+
+            expect(preparedData.WhiteboardSize).toEqual({
+                AllocatedSize: undefined,
+                TotalSize: 22_000_000_000,
+            });
+        },
+    );
+
     test('Should correctly parse data', () => {
         const pDiskData = {
             PDiskId: '224-1001',
@@ -348,6 +488,10 @@ describe('prepareGroupsPDisk', () => {
             TotalSize: 6400161873920,
             AllocatedPercent: 12,
             AllocatedSize: 786306170880,
+            WhiteboardSize: {
+                AllocatedSize: 786306170880,
+                TotalSize: 6400161873920,
+            },
             Severity: 1,
 
             SystemSize: '817889280',
@@ -458,6 +602,10 @@ describe('prepareGroupsPDisk', () => {
             TotalSize: 6400161873920,
             AllocatedPercent: 12,
             AllocatedSize: 786306170880,
+            WhiteboardSize: {
+                AllocatedSize: 786306170880,
+                TotalSize: 6400161873920,
+            },
             Severity: 1,
 
             SystemSize: '817889280',

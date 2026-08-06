@@ -6,6 +6,7 @@ export type StorageGroupsColumn = Column<PreparedStorageGroup>;
 
 export interface GetStorageColumnsData {
     viewContext?: StorageViewContext;
+    isAllVDisksLayout?: boolean;
 }
 
 export interface GetStorageGroupsColumnsParams {

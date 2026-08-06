@@ -18,6 +18,8 @@ export const LONG_HOST = 'storage-node-1273683y-1273683y-1273683y.ydb';
 export const LONG_PDISK_ID = '1000-1012';
 
 export interface SetupVDiskPageMocksOptions {
+    capacityVersions?: {storageGroups: number; viewerNodes: number};
+    withCapacityMetrics?: boolean;
     datacenter?: string;
     rack?: string;
     host?: string;
@@ -26,6 +28,85 @@ export interface SetupVDiskPageMocksOptions {
     withDonors?: boolean;
     allocatedSize?: string;
     availableSize?: string;
+    whiteboardAllocatedSize?: string;
+    whiteboardAvailableSize?: string;
+    whiteboardSlotSize?: string;
+    pDiskBscAvailableSize?: string;
+    pDiskBscTotalSize?: string;
+    pDiskWhiteboardAvailableSize?: string;
+    pDiskWhiteboardTotalSize?: string;
+}
+
+const vDiskCapacityFields = {
+    GroupSizeInUnits: 2,
+    VDiskSlotUsage: 82.25,
+    VDiskRawUsage: 64.5,
+    CapacityAlert: 'LIGHT_YELLOW',
+};
+
+const pDiskCapacityFields = {
+    SlotSizeInUnits: 4,
+    PDiskUsage: 70.5,
+    PDiskCapacityAlert: 'ORANGE',
+};
+
+function createVDiskWhiteboardData(
+    withCapacityMetrics = false,
+    {
+        whiteboardAllocatedSize = '10000000000',
+        whiteboardAvailableSize = '186000000000',
+    }: Pick<SetupVDiskPageMocksOptions, 'whiteboardAllocatedSize' | 'whiteboardAvailableSize'> = {},
+) {
+    return {
+        VDiskId: {
+            GroupID: Number(GROUP_ID),
+            GroupGeneration: 1,
+            Ring: 0,
+            Domain: 0,
+            VDisk: 0,
+        },
+        NodeId: Number(NODE_ID),
+        PDiskId: Number(PDISK_ID),
+        VDiskSlotId: 1001,
+        AllocatedSize: whiteboardAllocatedSize,
+        AvailableSize: whiteboardAvailableSize,
+        StoragePoolName: STORAGE_POOL_NAME,
+        DiskSpace: 'Green',
+        FrontQueues: 'Green',
+        ...(withCapacityMetrics ? vDiskCapacityFields : {}),
+    };
+}
+
+function createPDiskWhiteboardData(
+    withCapacityMetrics = false,
+    {
+        whiteboardSlotSize = '20000000000',
+        pDiskWhiteboardAvailableSize = '180000000000',
+        pDiskWhiteboardTotalSize = '200000000000',
+    }: Pick<
+        SetupVDiskPageMocksOptions,
+        'whiteboardSlotSize' | 'pDiskWhiteboardAvailableSize' | 'pDiskWhiteboardTotalSize'
+    > = {},
+) {
+    return {
+        PDiskId: Number(PDISK_ID),
+        NodeId: Number(NODE_ID),
+        Path: '/dev/pdisk0',
+        Guid: '123456789',
+        Category: '1',
+        AvailableSize: pDiskWhiteboardAvailableSize,
+        TotalSize: pDiskWhiteboardTotalSize,
+        State: 'Normal',
+        Device: 'Green',
+        Realtime: 'Green',
+        SystemSize: '1000000000',
+        LogUsedSize: '1000000000',
+        LogTotalSize: '5000000000',
+        EnforcedDynamicSlotSize: whiteboardSlotSize,
+        ExpectedSlotCount: 4,
+        NumActiveSlots: 2,
+        ...(withCapacityMetrics ? pDiskCapacityFields : {}),
+    };
 }
 
 function createStorageGroupsResponse({
@@ -33,9 +114,28 @@ function createStorageGroupsResponse({
     availableSize = '186000000000',
     pDiskId = PDISK_ID,
     withDonors,
+    withCapacityMetrics,
+    whiteboardAllocatedSize,
+    whiteboardAvailableSize,
+    whiteboardSlotSize,
+    pDiskBscAvailableSize,
+    pDiskBscTotalSize,
+    pDiskWhiteboardAvailableSize,
+    pDiskWhiteboardTotalSize,
 }: Pick<
     SetupVDiskPageMocksOptions,
-    'allocatedSize' | 'availableSize' | 'pDiskId' | 'withDonors'
+    | 'allocatedSize'
+    | 'availableSize'
+    | 'pDiskId'
+    | 'withDonors'
+    | 'withCapacityMetrics'
+    | 'whiteboardAllocatedSize'
+    | 'whiteboardAvailableSize'
+    | 'whiteboardSlotSize'
+    | 'pDiskBscAvailableSize'
+    | 'pDiskBscTotalSize'
+    | 'pDiskWhiteboardAvailableSize'
+    | 'pDiskWhiteboardTotalSize'
 > = {}) {
     return {
         StorageGroups: [
@@ -47,7 +147,20 @@ function createStorageGroupsResponse({
                 Used: '10000000000',
                 Limit: '196000000000',
                 Available: '186000000000',
+                Usage: 5.1,
                 State: 'ok',
+                GroupGeneration: '1',
+                Encryption: false,
+                AllocationUnits: '1',
+                ...(withCapacityMetrics
+                    ? {
+                          GroupSizeInUnits: vDiskCapacityFields.GroupSizeInUnits,
+                          MaxPDiskUsage: pDiskCapacityFields.PDiskUsage,
+                          MaxVDiskSlotUsage: vDiskCapacityFields.VDiskSlotUsage,
+                          MaxVDiskRawUsage: vDiskCapacityFields.VDiskRawUsage,
+                          CapacityAlert: vDiskCapacityFields.CapacityAlert,
+                      }
+                    : {}),
                 VDisks: [
                     {
                         VDiskId: VDISK_ID,
@@ -58,6 +171,14 @@ function createStorageGroupsResponse({
                         StoragePoolName: STORAGE_POOL_NAME,
                         DiskSpace: 'Green',
                         FrontQueues: 'Green',
+                        ...(withCapacityMetrics
+                            ? {
+                                  Whiteboard: createVDiskWhiteboardData(true, {
+                                      whiteboardAllocatedSize,
+                                      whiteboardAvailableSize,
+                                  }),
+                              }
+                            : {}),
                         ...(withDonors ? {VDiskState: 'OK', Replicated: false} : {}),
                         SatisfactionRank: {
                             FreshRank: {
@@ -70,6 +191,21 @@ function createStorageGroupsResponse({
                         PDisk: {
                             PDiskId: `${NODE_ID}-${pDiskId}`,
                             Type: 'ROT',
+                            ...(pDiskBscAvailableSize === undefined
+                                ? {}
+                                : {AvailableSize: pDiskBscAvailableSize}),
+                            ...(pDiskBscTotalSize === undefined
+                                ? {}
+                                : {TotalSize: pDiskBscTotalSize}),
+                            ...(withCapacityMetrics
+                                ? {
+                                      Whiteboard: createPDiskWhiteboardData(true, {
+                                          whiteboardSlotSize,
+                                          pDiskWhiteboardAvailableSize,
+                                          pDiskWhiteboardTotalSize,
+                                      }),
+                                  }
+                                : {}),
                         },
                         Donors: withDonors
                             ? [
@@ -164,7 +300,12 @@ async function setupMonitoringUserMock(page: Page, isViewerAllowed = true) {
     });
 }
 
-async function setupCapabilitiesMock(page: Page) {
+async function setupCapabilitiesMock(
+    page: Page,
+    {capacityVersions}: Pick<SetupVDiskPageMocksOptions, 'capacityVersions'> = {},
+) {
+    const versions = capacityVersions ?? {storageGroups: 10, viewerNodes: 20};
+
     await page.route('**/viewer/capabilities*', async (route) => {
         await route.fulfill({
             status: 200,
@@ -172,9 +313,31 @@ async function setupCapabilitiesMock(page: Page) {
             body: JSON.stringify({
                 Database: DATABASE,
                 Capabilities: {
-                    '/storage/groups': 10,
-                    '/viewer/nodes': 20,
+                    '/storage/groups': versions.storageGroups,
+                    '/viewer/nodes': versions.viewerNodes,
                     '/pdisk/info': 10,
+                    '/vdisk/blobindexstat': 2,
+                },
+            }),
+        });
+    });
+}
+
+export async function setupVDiskBlobIndexStatMock(
+    page: Page,
+    onRequest?: (requestUrl: string) => void,
+) {
+    await page.route('**/vdisk/blobindexstat*', async (route) => {
+        onRequest?.(route.request().url());
+
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                status: 'ok',
+                stat: {
+                    tablets: [],
+                    channels: [],
                 },
             }),
         });
@@ -217,9 +380,28 @@ async function setupStorageGroupsMock(
         availableSize,
         pDiskId = PDISK_ID,
         withDonors,
+        withCapacityMetrics,
+        whiteboardAllocatedSize,
+        whiteboardAvailableSize,
+        whiteboardSlotSize,
+        pDiskBscAvailableSize,
+        pDiskBscTotalSize,
+        pDiskWhiteboardAvailableSize,
+        pDiskWhiteboardTotalSize,
     }: Pick<
         SetupVDiskPageMocksOptions,
-        'allocatedSize' | 'availableSize' | 'pDiskId' | 'withDonors'
+        | 'allocatedSize'
+        | 'availableSize'
+        | 'pDiskId'
+        | 'withDonors'
+        | 'withCapacityMetrics'
+        | 'whiteboardAllocatedSize'
+        | 'whiteboardAvailableSize'
+        | 'whiteboardSlotSize'
+        | 'pDiskBscAvailableSize'
+        | 'pDiskBscTotalSize'
+        | 'pDiskWhiteboardAvailableSize'
+        | 'pDiskWhiteboardTotalSize'
     > = {},
 ) {
     await page.route('**/storage/groups?*', async (route) => {
@@ -227,54 +409,126 @@ async function setupStorageGroupsMock(
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify(
-                createStorageGroupsResponse({allocatedSize, availableSize, pDiskId, withDonors}),
+                createStorageGroupsResponse({
+                    allocatedSize,
+                    availableSize,
+                    pDiskId,
+                    withDonors,
+                    withCapacityMetrics,
+                    whiteboardAllocatedSize,
+                    whiteboardAvailableSize,
+                    whiteboardSlotSize,
+                    pDiskBscAvailableSize,
+                    pDiskBscTotalSize,
+                    pDiskWhiteboardAvailableSize,
+                    pDiskWhiteboardTotalSize,
+                }),
             ),
         });
     });
 }
 
-export async function setupPDiskInfoMock(page: Page) {
+async function setupStorageNodesMock(
+    page: Page,
+    {
+        withCapacityMetrics = false,
+        whiteboardAllocatedSize,
+        whiteboardAvailableSize,
+        whiteboardSlotSize,
+        pDiskWhiteboardAvailableSize,
+        pDiskWhiteboardTotalSize,
+    }: Pick<
+        SetupVDiskPageMocksOptions,
+        | 'withCapacityMetrics'
+        | 'whiteboardAllocatedSize'
+        | 'whiteboardAvailableSize'
+        | 'whiteboardSlotSize'
+        | 'pDiskWhiteboardAvailableSize'
+        | 'pDiskWhiteboardTotalSize'
+    > = {},
+) {
+    await page.route('**/viewer/json/nodes?*', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                TotalNodes: '1',
+                FoundNodes: '1',
+                Nodes: [
+                    {
+                        NodeId: Number(NODE_ID),
+                        SystemState: {
+                            NodeId: Number(NODE_ID),
+                            Host: 'storage-node-07.ydb',
+                            Roles: ['Storage'],
+                        },
+                        PDisks: [
+                            createPDiskWhiteboardData(withCapacityMetrics, {
+                                whiteboardSlotSize,
+                                pDiskWhiteboardAvailableSize,
+                                pDiskWhiteboardTotalSize,
+                            }),
+                        ],
+                        VDisks: [
+                            createVDiskWhiteboardData(withCapacityMetrics, {
+                                whiteboardAllocatedSize,
+                                whiteboardAvailableSize,
+                            }),
+                        ],
+                        ...(withCapacityMetrics
+                            ? {
+                                  MaxPDiskUsage: pDiskCapacityFields.PDiskUsage,
+                                  MaxVDiskSlotUsage: vDiskCapacityFields.VDiskSlotUsage,
+                                  MaxVDiskRawUsage: vDiskCapacityFields.VDiskRawUsage,
+                                  CapacityAlert: vDiskCapacityFields.CapacityAlert,
+                              }
+                            : {}),
+                    },
+                ],
+            }),
+        });
+    });
+}
+
+export async function setupPDiskInfoMock(
+    page: Page,
+    {
+        withCapacityMetrics = false,
+        whiteboardAllocatedSize,
+        whiteboardAvailableSize,
+        whiteboardSlotSize = '20000000000',
+        pDiskBscAvailableSize = '180000000000',
+        pDiskBscTotalSize = '200000000000',
+        pDiskWhiteboardAvailableSize,
+        pDiskWhiteboardTotalSize,
+    }: Pick<
+        SetupVDiskPageMocksOptions,
+        | 'withCapacityMetrics'
+        | 'whiteboardAllocatedSize'
+        | 'whiteboardAvailableSize'
+        | 'whiteboardSlotSize'
+        | 'pDiskBscAvailableSize'
+        | 'pDiskBscTotalSize'
+        | 'pDiskWhiteboardAvailableSize'
+        | 'pDiskWhiteboardTotalSize'
+    > = {},
+) {
     await page.route('**/pdisk/info*', async (route) => {
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({
                 Whiteboard: {
-                    PDisk: {
-                        PDiskId: Number(PDISK_ID),
-                        NodeId: Number(NODE_ID),
-                        Path: '/dev/pdisk0',
-                        Guid: '123456789',
-                        Category: '1',
-                        AvailableSize: '180000000000',
-                        TotalSize: '200000000000',
-                        State: 'Normal',
-                        Device: 'Green',
-                        Realtime: 'Green',
-                        SystemSize: '1000000000',
-                        LogUsedSize: '1000000000',
-                        LogTotalSize: '5000000000',
-                        EnforcedDynamicSlotSize: '20000000000',
-                        ExpectedSlotCount: 4,
-                        NumActiveSlots: 2,
-                    },
+                    PDisk: createPDiskWhiteboardData(withCapacityMetrics, {
+                        whiteboardSlotSize,
+                        pDiskWhiteboardAvailableSize,
+                        pDiskWhiteboardTotalSize,
+                    }),
                     VDisks: [
-                        {
-                            VDiskId: {
-                                GroupID: Number(GROUP_ID),
-                                GroupGeneration: 1,
-                                Ring: 0,
-                                Domain: 0,
-                                VDisk: 0,
-                            },
-                            NodeId: Number(NODE_ID),
-                            PDiskId: Number(PDISK_ID),
-                            AllocatedSize: '10000000000',
-                            AvailableSize: '10000000000',
-                            DiskSpace: 'Green',
-                            FrontQueues: 'Green',
-                            StoragePoolName: STORAGE_POOL_NAME,
-                        },
+                        createVDiskWhiteboardData(withCapacityMetrics, {
+                            whiteboardAllocatedSize,
+                            whiteboardAvailableSize,
+                        }),
                     ],
                 },
                 BSC: {
@@ -282,10 +536,10 @@ export async function setupPDiskInfoMock(page: Page) {
                         Type: 'ROT',
                         Path: '/dev/pdisk0',
                         Guid: '123456789',
-                        AvailableSize: '180000000000',
-                        TotalSize: '200000000000',
+                        AvailableSize: pDiskBscAvailableSize,
+                        TotalSize: pDiskBscTotalSize,
                         StatusV2: 'ACTIVE',
-                        EnforcedDynamicSlotSize: '20000000000',
+                        EnforcedDynamicSlotSize: whiteboardSlotSize,
                         ExpectedSlotCount: 4,
                         NumActiveSlots: 2,
                     },
@@ -297,7 +551,8 @@ export async function setupPDiskInfoMock(page: Page) {
 
 export async function setupVDiskPageMocks(page: Page, options: SetupVDiskPageMocksOptions = {}) {
     await setupMonitoringUserMock(page, options.isViewerAllowed);
-    await setupCapabilitiesMock(page);
+    await setupCapabilitiesMock(page, options);
     await setupNodeInfoMock(page, options);
     await setupStorageGroupsMock(page, options);
+    await setupStorageNodesMock(page, options);
 }

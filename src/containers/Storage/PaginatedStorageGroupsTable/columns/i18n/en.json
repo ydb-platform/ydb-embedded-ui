@@ -17,6 +17,7 @@
   "write": "Write",
   "latency": "Latency",
   "allocation-units": "Allocation Units",
+  "group-size-in-units": "Group Size In Units",
   "vdisks": "VDisks",
   "pdisks": "PDisks",
   "vdisks-pdisks": "VDisks with PDisks"

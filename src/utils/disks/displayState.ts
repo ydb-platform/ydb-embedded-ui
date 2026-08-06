@@ -7,6 +7,10 @@ import type {DisplaySeverity, PreparedVDisk} from './types';
 export interface DiskDisplayState {
     severity: DisplaySeverity;
     icon: IconData | IconWithColor[] | string | undefined;
+    capacityAlertIndicator?: IconData | string;
+    frontQueuesIndicator?: IconData;
+    compactionIndicator?: IconWithColor[];
+    allModeHasIssues?: boolean;
     modeModifier: string | undefined;
     isLegendInactive?: boolean;
     showNoDataPlaceholder?: boolean;

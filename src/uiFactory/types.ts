@@ -93,6 +93,9 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
 
     isDetailedStorageViewAvailable?: IsDetailedStorageViewAvailable;
 
+    /** Maximum number of disks in a storage group. */
+    maxVDisksInStorageGroup?: number;
+
     illustrations?: Partial<Record<IllustrationName, IllustrationComponent>>;
 
     hideNewFeaturesNotifications?: {
@@ -186,6 +189,7 @@ export type RenderNodeTooltipActions = (props: {data?: PreparedStorageNode}) => 
 
 export interface UiMetricaGoals {
     runQuery?: string;
+    explainAnalyzeQuery?: string;
     stopQuery?: string;
     openManagePartitioning?: string;
     applyManagePartitioning?: string;

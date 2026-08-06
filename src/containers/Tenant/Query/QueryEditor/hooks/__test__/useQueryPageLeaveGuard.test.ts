@@ -31,7 +31,12 @@ describe('getQueryPageLeaveState', () => {
         const tabsById = {
             first: createTabState('first'),
             second: createTabState('second', {
-                result: {type: 'execute', queryId: 'query-2', isLoading: true},
+                result: {
+                    executionId: 'execution-2',
+                    type: 'execute',
+                    queryId: 'query-2',
+                    isLoading: true,
+                },
             }),
             third: createTabState('third'),
         };
@@ -47,10 +52,20 @@ describe('getQueryPageLeaveState', () => {
     test('prefers the first running tab when multiple tabs are running', () => {
         const tabsById = {
             first: createTabState('first', {
-                result: {type: 'execute', queryId: 'query-1', isLoading: true},
+                result: {
+                    executionId: 'execution-1',
+                    type: 'execute',
+                    queryId: 'query-1',
+                    isLoading: true,
+                },
             }),
             second: createTabState('second', {
-                result: {type: 'execute', queryId: 'query-2', isLoading: true},
+                result: {
+                    executionId: 'execution-2',
+                    type: 'execute',
+                    queryId: 'query-2',
+                    isLoading: true,
+                },
             }),
         };
 
@@ -137,7 +152,12 @@ describe('useQueryPageLeaveGuard', () => {
         const tabsOrder = ['first', 'second'];
         const tabsById = {
             first: createTabState('first', {
-                result: {type: 'execute', queryId: 'query-1', isLoading: true},
+                result: {
+                    executionId: 'execution-1',
+                    type: 'execute',
+                    queryId: 'query-1',
+                    isLoading: true,
+                },
             }),
             second: createTabState('second'),
         };

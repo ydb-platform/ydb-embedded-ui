@@ -7,6 +7,7 @@ import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
 import {Search} from '../../../components/Search/Search';
 import {
+    useBlobStorageCapacityMetricsAvailable,
     useBlobStorageCapacityMetricsEnabled,
     useBridgeModeEnabled,
 } from '../../../store/reducers/capabilities/hooks';
@@ -15,7 +16,7 @@ import {useSetting} from '../../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {
     STORAGE_GROUPS_COLUMNS_IDS,
-    STORAGE_GROUPS_GROUP_BY_OPTIONS,
+    getStorageGroupsGroupByOptions,
 } from '../PaginatedStorageGroupsTable/columns/constants';
 import type {StorageGroupsColumn} from '../PaginatedStorageGroupsTable/columns/types';
 import {StorageExpertModePanel} from '../StorageExpertModePanel/StorageExpertModePanel';
@@ -63,6 +64,7 @@ export function StorageGroupsControls({
         SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
     );
     const isStorageExpertMode = useIsStorageExpertMode();
+    const storageExpertModeAvailable = useBlobStorageCapacityMetricsAvailable();
     const bridgeModeEnabled = useBridgeModeEnabled();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
@@ -71,23 +73,7 @@ export function StorageGroupsControls({
     }, [columns]);
 
     const groupByOptions = React.useMemo(() => {
-        const skippedValues: string[] = [];
-
-        if (!bridgeModeEnabled) {
-            skippedValues.push('PileName');
-        }
-
-        if (!blobMetricsEnabled) {
-            skippedValues.push('CapacityAlert');
-        }
-
-        if (blobMetricsEnabled) {
-            skippedValues.push('Usage');
-        }
-
-        return STORAGE_GROUPS_GROUP_BY_OPTIONS.filter(
-            (option) => !skippedValues.includes(option.value),
-        );
+        return getStorageGroupsGroupByOptions(blobMetricsEnabled, bridgeModeEnabled);
     }, [bridgeModeEnabled, blobMetricsEnabled]);
 
     const handleGroupBySelectUpdate = (value: string[]) => {
@@ -96,7 +82,9 @@ export function StorageGroupsControls({
 
     const displayTypeSelector = withTypeSelector && isUserAllowedToMakeChanges;
     const canUseStorageExpertMode =
-        storageExpertModeSettingEnabled && Boolean(isUserAllowedToMakeChanges);
+        storageExpertModeAvailable &&
+        storageExpertModeSettingEnabled &&
+        Boolean(isUserAllowedToMakeChanges);
 
     return (
         <Flex direction="column" gap={2} width="100%">
@@ -121,6 +109,7 @@ export function StorageGroupsControls({
                         <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>
                         <Select
                             hasClear
+                            qa="storage-groups-group-by"
                             placeholder={'-'}
                             width={150}
                             defaultValue={

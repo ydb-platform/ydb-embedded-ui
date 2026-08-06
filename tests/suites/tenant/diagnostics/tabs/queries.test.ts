@@ -1,11 +1,9 @@
-import {expect, test} from '@playwright/test';
+import {expect, request as playwrightRequest, test} from '@playwright/test';
 
-import {prepareQueryWithPragmas} from '../../../../../src/store/reducers/query/utils';
-import {defaultPragma} from '../../../../../src/utils/query';
 import {getClipboardContent} from '../../../../utils/clipboard';
-import {database} from '../../../../utils/constants';
+import {backend, database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
-import {longRunningQuery, longRunningStreamQuery} from '../../constants';
+import {longRunningStreamQuery, simpleQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {
     Diagnostics,
@@ -53,24 +51,74 @@ test.describe('Diagnostics Queries tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            databasePage: 'query',
+            databasePage: 'database',
+            diagnosticsTab: 'topQueries',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        const queryEditor = new QueryEditor(page);
-
-        await queryEditor.setQuery(longRunningQuery);
-        await queryEditor.clickRunButton();
-
-        const inProgressStatuses = ['Preparing', 'Running', 'Fetching'];
-        await expect(queryEditor.waitForAnyStatus(inProgressStatuses)).resolves.toBeTruthy();
-        const diagnostics = await navigateToTopQueries(tenantPage);
+        const diagnostics = new Diagnostics(page);
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
-        const finalQueryText = prepareQueryWithPragmas(longRunningQuery, defaultPragma);
-        expect(
-            await diagnostics.table.waitForCellValueByHeader(1, 'Query text', finalQueryText),
-        ).toBe(true);
+
+        const runningQueryMarker = `e2e-running-query-${test.info().project.name}-${Date.now()}`;
+        const runningQuery = `-- ${runningQueryMarker}\n${new Array(400)
+            .fill(simpleQuery)
+            .join('\n')}`;
+        const storageState = await page.context().storageState();
+        const queryRequestContext = await playwrightRequest.newContext({storageState});
+        const csrfToken = (await page.context().cookies(backend)).find(
+            ({name}) => name === 'csrf_token',
+        )?.value;
+        let runningQueryRequestError: unknown;
+        const runningQueryRequest = queryRequestContext
+            .post(`${backend}/viewer/query`, {
+                params: {database, schema: 'multipart'},
+                headers: {
+                    Accept: 'multipart/form-data',
+                    ...(csrfToken ? {'X-CSRF-Token': csrfToken} : {}),
+                },
+                data: {
+                    query: runningQuery,
+                    database,
+                    action: 'execute-query',
+                    syntax: 'yql_v1',
+                    schema: 'multipart',
+                },
+            })
+            .then(async (response) => {
+                if (!response.ok()) {
+                    throw new Error(
+                        `Running query request failed with ${response.status()}: ${await response.text()}`,
+                    );
+                }
+            })
+            .catch((error: unknown) => {
+                runningQueryRequestError = error;
+            });
+
+        try {
+            await expect
+                .poll(
+                    async () => {
+                        if (runningQueryRequestError) {
+                            throw runningQueryRequestError;
+                        }
+
+                        await diagnostics.clickRefreshButton();
+                        const queryTexts = await page
+                            .locator('.ydb-fixed-height-query')
+                            .allInnerTexts();
+                        return queryTexts.some((queryText) =>
+                            queryText.includes(runningQueryMarker),
+                        );
+                    },
+                    {timeout: 10_000},
+                )
+                .toBe(true);
+        } finally {
+            await queryRequestContext.dispose();
+            await runningQueryRequest;
+        }
     });
 
     test('Query tab defaults to Top mode', async ({page}) => {

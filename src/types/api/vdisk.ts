@@ -14,6 +14,14 @@ export interface TVDiskStateInfo {
     PDiskId?: number;
     PDisk?: TPDiskStateInfo;
     VDiskSlotId?: number;
+    /** uint32; VDisk slot weight in allocation units. */
+    GroupSizeInUnits?: number;
+    /** float; percent in the 0..100 scale. */
+    VDiskSlotUsage?: number;
+    /** float; percent in the 0..100 scale. */
+    VDiskRawUsage?: number;
+    /** float; backend normalized occupancy value. */
+    NormalizedOccupancy?: number;
     /** uint64 */
     Guid?: string;
     /** uint64 */

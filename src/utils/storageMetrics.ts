@@ -1,7 +1,12 @@
 import type {BytesSizes} from './bytesParsers';
 import {bytesSizes, getBytesSizeUnit, sizes} from './bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from './constants';
-import {formatNumber, formatPercent} from './dataFormatters/dataFormatters';
+import {
+    formatNumber,
+    formatPercent,
+    formatStorageValuesToGb,
+} from './dataFormatters/dataFormatters';
+import {parseOptionalNonNegativeNumber} from './utils';
 
 export interface FormatMetricBytesOptions {
     allowNegative?: boolean;
@@ -160,14 +165,56 @@ export function formatMetricBytes(
         : EMPTY_DATA_PLACEHOLDER;
 }
 
-export function formatMetricPercent(value?: number) {
-    const numericValue = Number(value);
+export function formatMetricPercent(value?: unknown) {
+    const numericValue = parseOptionalNonNegativeNumber(value);
 
-    if (!Number.isFinite(numericValue) || numericValue < 0) {
+    if (numericValue === undefined) {
         return EMPTY_DATA_PLACEHOLDER;
     }
 
     const precision = Number.isInteger(numericValue) ? 0 : 1;
 
-    return formatPercent(numericValue / 100, precision);
+    return formatPercent(numericValue / 100, precision) || EMPTY_DATA_PLACEHOLDER;
+}
+
+export function formatStorageMetricPair(value?: string | number, capacity?: string | number) {
+    const parsedValue = parseOptionalNonNegativeNumber(value);
+    const parsedCapacity = parseOptionalNonNegativeNumber(capacity);
+
+    if (parsedValue === undefined || parsedCapacity === undefined) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+
+    return formatStorageValuesToGb(parsedValue, parsedCapacity).join(' / ');
+}
+
+export function formatNormalizedMetricPercent(value?: number) {
+    const parsedValue = parseOptionalNonNegativeNumber(value);
+
+    if (parsedValue === undefined) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+
+    return formatPercent(parsedValue, 2, {fixed: true}) || EMPTY_DATA_PLACEHOLDER;
+}
+
+export function formatMetricCount(value?: unknown) {
+    const parsedValue = parseOptionalNonNegativeNumber(value);
+
+    if (parsedValue === undefined) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+
+    return formatNumber(parsedValue) || EMPTY_DATA_PLACEHOLDER;
+}
+
+export function formatMetricCountPair(value?: unknown, capacity?: unknown) {
+    const formattedValue = formatMetricCount(value);
+    const formattedCapacity = formatMetricCount(capacity);
+
+    if (formattedValue === EMPTY_DATA_PLACEHOLDER || formattedCapacity === EMPTY_DATA_PLACEHOLDER) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+
+    return `${formattedValue} / ${formattedCapacity}`;
 }

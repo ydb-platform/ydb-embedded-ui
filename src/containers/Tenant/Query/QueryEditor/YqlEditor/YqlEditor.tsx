@@ -35,8 +35,11 @@ import {RENAME_QUERY_DIALOG} from '../EditorTabs/RenameQueryDialog';
 import {useCodeAssistHelpers} from '../hooks/useCodeAssistHelpers';
 import {useEditorOptions} from '../hooks/useEditorOptions';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
+import type {QueryExecution} from '../types';
 import {TabsManager} from '../utils/tabsManager';
 
+import type {CurrentYqlStatement} from './currentStatement';
+import {extractYqlStatements, findYqlStatementAtOffset} from './currentStatement';
 import {getKeyBindings} from './keybindings';
 
 const CONTEXT_MENU_GROUP_ID = 'navigation';
@@ -63,7 +66,8 @@ interface YqlEditorProps {
     changeUserInput: (arg: {input: string}) => void;
     theme: string;
     handleGetExplainQueryClick: (text: string) => void;
-    handleSendExecuteClick: (text: string, partial?: boolean) => void;
+    handleSendExecuteClick: (execution: QueryExecution) => void;
+    handleGetExplainAnalyzeQueryClick: (text: string) => void;
     historyQueries: QueryInHistory[];
     goToPreviousQuery: () => void;
     goToNextQuery: () => void;
@@ -75,6 +79,7 @@ export function YqlEditor({
     theme,
     handleSendExecuteClick,
     handleGetExplainQueryClick,
+    handleGetExplainAnalyzeQueryClick,
     historyQueries,
     goToPreviousQuery,
     goToNextQuery,
@@ -109,6 +114,7 @@ export function YqlEditor({
     const monacoRef = React.useRef<typeof Monaco | null>(null);
     const tabsManagerRef = React.useRef(new TabsManager());
     const appliedPendingSnippetRef = React.useRef<PendingSnippetKey | null>(null);
+    const currentStatementCleanupRef = React.useRef<VoidFunction>();
     const [isEditorMounted, setIsEditorMounted] = React.useState(false);
 
     const isMultiTabQueryEditorEnabled = useMultiTabQueryEditorEnabled();
@@ -196,8 +202,10 @@ export function YqlEditor({
     const handleSendQuery = useEventHandler(() => {
         if (lastUsedQueryAction === QUERY_ACTIONS.explain) {
             handleGetExplainQueryClick(input);
+        } else if (lastUsedQueryAction === QUERY_ACTIONS.explainAnalyze) {
+            handleGetExplainAnalyzeQueryClick(input);
         } else {
-            handleSendExecuteClick(input);
+            handleSendExecuteClick({text: input});
         }
     });
 
@@ -259,6 +267,8 @@ export function YqlEditor({
     });
 
     const editorWillUnmount = () => {
+        currentStatementCleanupRef.current?.();
+        currentStatementCleanupRef.current = undefined;
         window.ydbEditor = undefined;
         tabsManagerRef.current.disposeAll();
         editorRef.current = null;
@@ -332,32 +342,149 @@ export function YqlEditor({
             run: () => handleSendQuery(),
         });
 
-        const canSendSelectedText = editor.createContextKey<boolean>('canSendSelectedText', false);
-        editor.onDidChangeCursorSelection(({selection, secondarySelections}) => {
-            const notEmpty =
-                selection.selectionStartLineNumber !== selection.positionLineNumber ||
-                selection.selectionStartColumn !== selection.positionColumn;
-            const hasMultipleSelections = secondarySelections.length > 0;
-            canSendSelectedText.set(notEmpty && !hasMultipleSelections);
-        });
+        const currentStatementDecoration = editor.createDecorationsCollection();
+        const canSendQueryFragment = editor.createContextKey<boolean>(
+            'canSendQueryFragment',
+            false,
+        );
+        let activeModelText = '';
+        let statementPositions: ReturnType<typeof extractYqlStatements> = [];
+        let currentStatement: (CurrentYqlStatement & {range: Monaco.IRange}) | undefined;
+        let decoratedModel: Monaco.editor.ITextModel | null = null;
+        let decoratedRange: Monaco.IRange | undefined;
+
+        const getOnlySelection = (currentEditor: Monaco.editor.ICodeEditor) => {
+            const selections = currentEditor.getSelections();
+            return selections?.length === 1 ? selections[0] : undefined;
+        };
+
+        const updateSendQueryFragmentAvailability = () => {
+            const selection = getOnlySelection(editor);
+            canSendQueryFragment.set(
+                Boolean(selection && (!selection.isEmpty() || currentStatement)),
+            );
+        };
+
+        const clearCurrentStatementDecoration = () => {
+            currentStatementDecoration.clear();
+            decoratedModel = null;
+            decoratedRange = undefined;
+        };
+
+        const updateCurrentStatement = () => {
+            const model = editor.getModel();
+            const position = editor.getPosition();
+            if (!model || !position) {
+                currentStatement = undefined;
+                clearCurrentStatementDecoration();
+                updateSendQueryFragmentAvailability();
+                return;
+            }
+
+            const statement = findYqlStatementAtOffset(
+                activeModelText,
+                model.getOffsetAt(position),
+                statementPositions,
+            );
+            if (!statement) {
+                currentStatement = undefined;
+                clearCurrentStatementDecoration();
+                updateSendQueryFragmentAvailability();
+                return;
+            }
+
+            const start = model.getPositionAt(statement.startIndex);
+            const end = model.getPositionAt(statement.endIndex);
+            const range: Monaco.IRange = {
+                startLineNumber: start.lineNumber,
+                startColumn: start.column,
+                endLineNumber: end.lineNumber,
+                endColumn: end.column,
+            };
+            currentStatement = {...statement, range};
+            if (statementPositions.length <= 1) {
+                clearCurrentStatementDecoration();
+                updateSendQueryFragmentAvailability();
+                return;
+            }
+            if (
+                decoratedModel !== model ||
+                !decoratedRange ||
+                decoratedRange.startLineNumber !== range.startLineNumber ||
+                decoratedRange.startColumn !== range.startColumn ||
+                decoratedRange.endLineNumber !== range.endLineNumber ||
+                decoratedRange.endColumn !== range.endColumn
+            ) {
+                currentStatementDecoration.set([
+                    {
+                        range,
+                        options: {
+                            className: 'ydb-current-query-highlight',
+                            shouldFillLineOnLineBreak: true,
+                            stickiness:
+                                monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+                        },
+                    },
+                ]);
+                decoratedModel = model;
+                decoratedRange = range;
+            }
+            updateSendQueryFragmentAvailability();
+        };
+
+        const recalculateStatements = () => {
+            activeModelText = editor.getValue();
+            statementPositions = extractYqlStatements(activeModelText);
+            updateCurrentStatement();
+        };
+
+        const currentStatementDisposables = [
+            editor.onDidChangeModel(recalculateStatements),
+            editor.onDidChangeModelContent((event) => {
+                if (event.isFlush) {
+                    decoratedModel = null;
+                    decoratedRange = undefined;
+                }
+                recalculateStatements();
+            }),
+            editor.onDidChangeCursorPosition(updateCurrentStatement),
+            editor.onDidChangeCursorSelection(updateCurrentStatement),
+        ];
+
+        recalculateStatements();
+        currentStatementCleanupRef.current = () => {
+            currentStatementDisposables.forEach((disposable) => disposable.dispose());
+            canSendQueryFragment.reset();
+            currentStatementDecoration.clear();
+        };
+
         editor.addAction({
             id: 'sendSelectedQuery',
             label: i18n('action.send-selected-query'),
             keybindings: [keybindings.sendSelectedQuery],
-            precondition: 'canSendSelectedText',
+            precondition: 'canSendQueryFragment',
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 1,
-            run: (e) => {
-                const selection = e.getSelection();
-                const model = e.getModel();
-                if (selection && model) {
-                    const text = model.getValueInRange({
-                        startLineNumber: selection.getSelectionStart().lineNumber,
-                        startColumn: selection.getSelectionStart().column,
-                        endLineNumber: selection.getPosition().lineNumber,
-                        endColumn: selection.getPosition().column,
+            run: (currentEditor) => {
+                const model = currentEditor.getModel();
+                const selection = getOnlySelection(currentEditor);
+                if (!model || !selection) {
+                    return;
+                }
+
+                if (!selection.isEmpty()) {
+                    handleSendExecuteClick({
+                        text: model.getValueInRange(selection),
+                        range: selection,
                     });
-                    handleSendExecuteClick(text, true);
+                    return;
+                }
+
+                if (currentStatement) {
+                    handleSendExecuteClick({
+                        text: currentStatement.text,
+                        range: currentStatement.range,
+                    });
                 }
             },
         });

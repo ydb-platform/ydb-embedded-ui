@@ -95,6 +95,7 @@ export interface PreparedStorageGroup {
     MaximumSize?: string;
 
     AllocationUnits?: string | number;
+    GroupSizeInUnits?: number;
     State?: string;
     MissingDisks?: string | number;
     Available?: string;

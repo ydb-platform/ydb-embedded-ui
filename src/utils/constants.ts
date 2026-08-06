@@ -3,6 +3,8 @@ import type {Settings} from '@gravity-ui/react-data-table';
 
 import {EType} from '../types/api/tablet';
 
+export {EMPTY_DATA_PLACEHOLDER} from './emptyDataPlaceholder';
+
 // by agreement, display all byte values in decimal scale
 // values in data are always in bytes, never in higher units,
 // therefore there is no issue arbitrary converting them in UI
@@ -68,7 +70,6 @@ export const SECTION_IDS = {
 
 export const TENANT_OVERVIEW_TABLES_LIMIT = 3;
 
-export const EMPTY_DATA_PLACEHOLDER = '—';
 export const UNBREAKABLE_GAP = '\u00A0';
 
 export const QUERY_TECHNICAL_MARK = '/*UI-QUERY-EXCLUDE*/';

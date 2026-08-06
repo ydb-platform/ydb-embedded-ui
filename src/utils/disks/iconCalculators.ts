@@ -93,7 +93,7 @@ export function calculateSpaceIcon(
         return DONOR_ICON;
     }
 
-    if (!vDisk.CapacityAlert || !isCapacityAlert(vDisk.CapacityAlert)) {
+    if (!isCapacityAlert(vDisk.CapacityAlert)) {
         return CircleQuestionFill;
     }
 
@@ -116,9 +116,9 @@ export function calculateSpaceIcon(
             return 'R';
         case ECapacityAlert.BLACK:
             return 'B';
+        default:
+            return CircleQuestionFill;
     }
-
-    return undefined;
 }
 
 /**
@@ -237,10 +237,8 @@ export function calculateCompactionIcon(
 }
 
 /**
- * All mode - complex mode showing multiple indicators
- * For now, uses default icon logic
- * TODO: Implement advanced "All" mode icon logic
+ * Calculate the All mode icon using VDiskState semantics.
  */
 export function calculateAllIcon(vDisk: PreparedVDisk, isDonor?: boolean): IconData | undefined {
-    return calculateDefaultIcon(vDisk, isDonor);
+    return calculateStateIcon(vDisk, isDonor);
 }

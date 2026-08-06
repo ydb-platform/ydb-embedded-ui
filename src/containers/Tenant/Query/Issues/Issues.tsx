@@ -15,7 +15,13 @@ import {cn} from '../../../../utils/cn';
 import {isNumeric} from '../../../../utils/utils';
 
 import {IssuesDialog} from './IssuesDialog';
-import {getIssuePosition, getMostSevere, hasRootIssues, normalizeRoots} from './helpers';
+import {
+    QUERY_SETTINGS_PRAGMAS_SOURCE,
+    getIssuePosition,
+    getMostSevere,
+    hasRootIssues,
+    normalizeRoots,
+} from './helpers';
 import i18n from './i18n';
 import type {SEVERITY} from './models';
 import {getSeverity} from './models';
@@ -254,7 +260,8 @@ function IssueText({issue}: IssueTextProps) {
     };
 
     const {row, column} = issue.position ?? {};
-    const isIssueClickable = isNumeric(row) && ydbEditor;
+    const isIssueClickable =
+        isNumeric(row) && issue.position?.file !== QUERY_SETTINGS_PRAGMAS_SOURCE && ydbEditor;
     if (!isIssueClickable) {
         return getIssue();
     }
