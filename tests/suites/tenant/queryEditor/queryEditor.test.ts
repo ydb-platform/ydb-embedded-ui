@@ -339,19 +339,23 @@ test.describe('Test Query Editor', async () => {
 
     test('Stop button works for Explain mode', async ({page}) => {
         const queryEditor = new QueryEditor(page);
+        const pendingQuery = await setupPendingNonStreamingQueryMock(page);
 
-        // Test for Execute mode
-        await queryEditor.setQuery(longRunningQuery);
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.data);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        try {
+            await queryEditor.setQuery(longRunningQuery);
+            await queryEditor.clickGearButton();
+            await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.data);
+            await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
-        // Test for Explain mode
-        await queryEditor.clickExplainButton();
+            await queryEditor.clickExplainButton();
+            await pendingQuery.waitUntilStarted();
 
-        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
-        await queryEditor.clickStopButton();
-        await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
+            await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+            await queryEditor.clickStopButton();
+            await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
+        } finally {
+            await pendingQuery.cleanup();
+        }
     });
 
     test('Stop button appears when query is started via hotkey', async ({page}) => {
@@ -845,6 +849,21 @@ test.describe('Test Query Editor', async () => {
         ).resolves.toEqual({
             fullTextReads: 0,
             currentStatementDecorationWrites: 0,
+        });
+    });
+
+    test('Current-statement indexing is deferred after text changes', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery('SELECT 1;\nSELECT 2;');
+        await queryEditor.setCursor(1, 3);
+        await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
+
+        await expect(
+            queryEditor.getCurrentStatementUpdateMetricsDuringTextChange(),
+        ).resolves.toEqual({
+            // react-monaco-editor and the page-leave guard each read the controlled value.
+            // Current-statement indexing must not add another synchronous full-text read.
+            fullTextReads: 2,
         });
     });
 

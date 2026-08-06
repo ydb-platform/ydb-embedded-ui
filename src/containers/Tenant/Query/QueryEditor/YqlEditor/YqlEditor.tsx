@@ -2,6 +2,7 @@ import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
 import {createMonacoGhostInstance} from '@ydb-platform/monaco-ghost';
+import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
 
@@ -47,6 +48,7 @@ const AUTOCOMPLETE_OPEN_PARENTHESIS = '(';
 const AUTOCOMPLETE_CLOSE_PARENTHESIS = ')';
 const TRIGGER_SUGGEST_ACTION_ID = 'editor.action.triggerSuggest';
 const TRIGGER_SUGGEST_SOURCE = 'ydb-parenthesis-autocomplete';
+const CURRENT_STATEMENT_RECALCULATION_DELAY = 150;
 
 type SnippetController = {insert: (snippet: string) => void};
 type PendingSnippetKey = {tabId: string; snippet: string};
@@ -286,6 +288,8 @@ export function YqlEditor({
         };
     }, [isCodeAssistEnabled, monacoGhostConfig, monacoGhostInstance, prepareUserQueriesCache]);
     const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
+        currentStatementCleanupRef.current?.();
+        currentStatementCleanupRef.current = undefined;
         window.ydbEditor = editor;
         editorRef.current = editor;
         monacoRef.current = monaco;
@@ -348,6 +352,14 @@ export function YqlEditor({
         let currentStatement: (CurrentYqlStatement & {range: Monaco.IRange}) | undefined;
         let decoratedModel: Monaco.editor.ITextModel | null = null;
         let decoratedRange: Monaco.IRange | undefined;
+        let isStatementIndexStale = true;
+        const statementIndexCache = new WeakMap<
+            Monaco.editor.ITextModel,
+            {
+                versionId: number;
+                positions: ReturnType<typeof extractYqlStatements>;
+            }
+        >();
 
         const getOnlySelection = (currentEditor: Monaco.editor.ICodeEditor) => {
             const selections = currentEditor.getSelections();
@@ -356,8 +368,13 @@ export function YqlEditor({
 
         const updateSendQueryFragmentAvailability = () => {
             const selection = getOnlySelection(editor);
+            const hasStaleModelText = Boolean(
+                isStatementIndexStale && editor.getModel()?.getValueLength(),
+            );
             canSendQueryFragment.set(
-                Boolean(selection && (!selection.isEmpty() || currentStatement)),
+                Boolean(
+                    selection && (!selection.isEmpty() || currentStatement || hasStaleModelText),
+                ),
             );
         };
 
@@ -429,26 +446,84 @@ export function YqlEditor({
         };
 
         const recalculateStatements = () => {
-            activeModelText = editor.getValue();
-            statementPositions = extractYqlStatements(activeModelText);
+            const model = editor.getModel();
+            if (!model) {
+                activeModelText = '';
+                statementPositions = [];
+                currentStatement = undefined;
+                isStatementIndexStale = false;
+                clearCurrentStatementDecoration();
+                updateSendQueryFragmentAvailability();
+                return;
+            }
+
+            const versionId = model.getVersionId();
+            const cachedStatementIndex = statementIndexCache.get(model);
+            if (cachedStatementIndex?.versionId === versionId) {
+                activeModelText = model.getValue();
+                statementPositions = cachedStatementIndex.positions;
+            } else {
+                activeModelText = editor.getValue();
+                statementPositions = extractYqlStatements(activeModelText);
+                statementIndexCache.set(model, {
+                    versionId,
+                    positions: statementPositions,
+                });
+            }
+            isStatementIndexStale = false;
             updateCurrentStatement();
         };
 
+        const recalculateStatementsDebounced = debounce(
+            recalculateStatements,
+            CURRENT_STATEMENT_RECALCULATION_DELAY,
+        );
+
+        const invalidateStatementIndex = () => {
+            const model = editor.getModel();
+            if (model) {
+                statementIndexCache.delete(model);
+            }
+            activeModelText = '';
+            statementPositions = [];
+            currentStatement = undefined;
+            isStatementIndexStale = true;
+            clearCurrentStatementDecoration();
+            updateSendQueryFragmentAvailability();
+            recalculateStatementsDebounced();
+        };
+
+        const restoreOrRecalculateStatementIndex = () => {
+            recalculateStatementsDebounced.cancel();
+            const model = editor.getModel();
+            const cachedStatementIndex = model && statementIndexCache.get(model);
+            if (model && cachedStatementIndex?.versionId === model.getVersionId()) {
+                activeModelText = model.getValue();
+                statementPositions = cachedStatementIndex.positions;
+                currentStatement = undefined;
+                isStatementIndexStale = false;
+                updateCurrentStatement();
+                return;
+            }
+            invalidateStatementIndex();
+        };
+
         const currentStatementDisposables = [
-            editor.onDidChangeModel(recalculateStatements),
+            editor.onDidChangeModel(restoreOrRecalculateStatementIndex),
             editor.onDidChangeModelContent((event) => {
                 if (event.isFlush) {
                     decoratedModel = null;
                     decoratedRange = undefined;
                 }
-                recalculateStatements();
+                invalidateStatementIndex();
             }),
             editor.onDidChangeCursorPosition(updateCurrentStatement),
             editor.onDidChangeCursorSelection(updateCurrentStatement),
         ];
 
-        recalculateStatements();
+        restoreOrRecalculateStatementIndex();
         currentStatementCleanupRef.current = () => {
+            recalculateStatementsDebounced.cancel();
             currentStatementDisposables.forEach((disposable) => disposable.dispose());
             canSendQueryFragment.reset();
             currentStatementDecoration.clear();
@@ -474,6 +549,11 @@ export function YqlEditor({
                         range: selection,
                     });
                     return;
+                }
+
+                if (isStatementIndexStale) {
+                    recalculateStatementsDebounced.cancel();
+                    recalculateStatements();
                 }
 
                 if (currentStatement) {

@@ -1,4 +1,17 @@
+import * as yqlAutocomplete from '@gravity-ui/websql-autocomplete/yql';
+
 import {extractYqlStatements, findYqlStatementAtOffset} from './currentStatement';
+
+jest.mock('@gravity-ui/websql-autocomplete/yql', () => {
+    const actual = jest.requireActual<typeof yqlAutocomplete>(
+        '@gravity-ui/websql-autocomplete/yql',
+    );
+
+    return {
+        ...actual,
+        tokenizeYqlQuery: jest.fn(actual.tokenizeYqlQuery),
+    };
+});
 
 describe('current YQL statement', () => {
     test.each([
@@ -93,13 +106,29 @@ SET USING $l;`,
         ]);
     });
 
-    test('extracts a large flat script without recursive parsing', () => {
+    test('extracts a large flat script without the YQL tokenizer', () => {
+        const tokenizeYqlQueryMock = jest.mocked(yqlAutocomplete.tokenizeYqlQuery);
+        tokenizeYqlQueryMock.mockClear();
         const query = new Array(400).fill('SELECT 1;').join('');
         const statements = extractYqlStatements(query);
 
         expect(statements).toHaveLength(400);
         expect(query.slice(statements[0].startIndex, statements[0].endIndex)).toBe('SELECT 1;');
         expect(query.slice(statements[399].startIndex, statements[399].endIndex)).toBe('SELECT 1;');
+        expect(tokenizeYqlQueryMock).not.toHaveBeenCalled();
+    });
+
+    test('uses the YQL tokenizer for unsupported lexer characters', () => {
+        const tokenizeYqlQueryMock = jest.mocked(yqlAutocomplete.tokenizeYqlQuery);
+        tokenizeYqlQueryMock.mockClear();
+        const query = '# SELECT 1;';
+
+        const statements = extractYqlStatements(query);
+
+        expect(
+            statements.map(({startIndex, endIndex}) => query.slice(startIndex, endIndex)),
+        ).toEqual(['SELECT 1;']);
+        expect(tokenizeYqlQueryMock).toHaveBeenCalledTimes(1);
     });
 
     test('distinguishes statements on the same line', () => {
