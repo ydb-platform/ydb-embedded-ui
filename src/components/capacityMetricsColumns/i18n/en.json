@@ -4,6 +4,7 @@
   "field_vdisk-raw-usage": "VDisk Raw Usage",
   "field_normalized-occupancy": "Normalized Occupancy",
   "field_capacity-alert": "Capacity Alert",
+  "value_implicit-unit-count": "1 (implicit)",
   "context_pdisk-usage": "Share of PDisk space used by VDisks. System and log reserves are not included.",
   "context_vdisk-slot-usage": "Percentage of VDisk space used relative to the first low-space warning. Can exceed 100%.",
   "context_vdisk-raw-usage": "Percentage of VDisk space used relative to its fair share on the PDisk. Can exceed 100%.",

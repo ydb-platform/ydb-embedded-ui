@@ -1097,6 +1097,16 @@ test.describe('Tenant Overview storage metrics tab', () => {
                             Used: '10000000000',
                             Limit: '200000000000',
                         },
+                        {
+                            GroupId: '2',
+                            MediaType: 'SSD',
+                            Encryption: false,
+                            ErasureSpecies: 'mirror-3-dc',
+                            MaxVDiskSlotUsage: 40,
+                            CapacityAlert: 'GREEN',
+                            Used: '5000000000',
+                            Limit: '200000000000',
+                        },
                     ],
                 }),
             });
@@ -1142,7 +1152,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
         ]);
         const topGroupsDataRows = topGroupsTable.locator('tbody tr.data-table__row');
 
-        await expect(topGroupsDataRows).toHaveCount(1);
+        await expect(topGroupsDataRows).toHaveCount(2);
         await expect(
             topGroupsDataRows.first().locator('.g-label_theme_danger').getByText('82.25%', {
                 exact: true,
@@ -1150,6 +1160,9 @@ test.describe('Tenant Overview storage metrics tab', () => {
         ).toBeVisible();
         await expect(topGroupsDataRows.first().getByText('ORANGE', {exact: true})).toBeVisible();
         await expect(topGroupsDataRows.first().getByText('2', {exact: true})).toBeVisible();
+        await expect(
+            topGroupsDataRows.nth(1).getByText('1 (implicit)', {exact: true}),
+        ).toBeVisible();
 
         expect(storageGroupsRequestUrl).toBeDefined();
         expect(storageGroupsRequestUrl?.searchParams.get('sort')).toBe('-MaxVDiskSlotUsage');

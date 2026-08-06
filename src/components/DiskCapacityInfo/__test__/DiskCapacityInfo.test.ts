@@ -49,7 +49,7 @@ describe('DiskCapacityInfo builders', () => {
             {
                 id: 'group-size-in-units',
                 title: 'Group Size In Units',
-                value: '0',
+                value: '1 (implicit)',
             },
         ]);
         expect(items.map(({id}) => id)).toEqual([
@@ -75,7 +75,7 @@ describe('DiskCapacityInfo builders', () => {
             EMPTY_DATA_PLACEHOLDER,
             EMPTY_DATA_PLACEHOLDER,
             EMPTY_DATA_PLACEHOLDER,
-            EMPTY_DATA_PLACEHOLDER,
+            '1 (implicit)',
         ]);
     });
 
@@ -245,6 +245,17 @@ describe('DiskCapacityInfo builders', () => {
             '0 / 4',
             '2',
         ]);
+    });
+
+    test('keeps missing PDisk metrics empty while using the implicit slot unit default', () => {
+        const items = getPDiskCapacityInfoItems(undefined, {
+            withUsage: true,
+            withCapacityAlert: true,
+        });
+
+        expect(items.find(({id}) => id === 'pdisk-usage')?.value).toBe(EMPTY_DATA_PLACEHOLDER);
+        expect(items.find(({id}) => id === 'slot-size-in-units')?.value).toBe('1 (implicit)');
+        expect(items.find(({id}) => id === 'capacity-alert')?.value).toBe(EMPTY_DATA_PLACEHOLDER);
     });
 
     test('uses the Whiteboard PDisk size instead of the legacy BSC size', () => {
