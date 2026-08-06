@@ -5,6 +5,7 @@ import {Flex, Label} from '@gravity-ui/uikit';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TTenantResource} from '../../../../../types/api/tenant';
+import {parseOptionalNonNegativeNumber} from '../../../../../utils/utils';
 
 import i18n from './i18n';
 
@@ -29,10 +30,12 @@ export function getAllocatedStorageGroups(
 
 export function getStorageGroupsDefinitionItem(
     allocatedResources?: TTenantResource[],
+    storageGroupsTotal?: string,
 ): YDBDefinitionListItem | undefined {
     const storageGroups = getAllocatedStorageGroups(allocatedResources);
+    const total = parseOptionalNonNegativeNumber(storageGroupsTotal);
 
-    if (storageGroups.length === 0) {
+    if (storageGroups.length === 0 && total === undefined) {
         return undefined;
     }
 
@@ -41,11 +44,17 @@ export function getStorageGroupsDefinitionItem(
         note: i18n('context_storage-groups-description'),
         content: (
             <Flex direction="column" alignItems="flex-start" gap={1}>
-                {storageGroups.map(({count, kind}, index) => (
-                    <Label key={`${kind}-${index}`} theme="normal">
-                        {i18n('value_storage-groups-count', {count, kind})}
+                {storageGroups.length > 0 ? (
+                    storageGroups.map(({count, kind}, index) => (
+                        <Label key={`${kind}-${index}`} theme="normal">
+                            {i18n('value_storage-groups-count', {count, kind})}
+                        </Label>
+                    ))
+                ) : (
+                    <Label theme="normal">
+                        {i18n('value_storage-groups-total', {count: total})}
                     </Label>
-                ))}
+                )}
             </Flex>
         ),
     };
@@ -53,14 +62,18 @@ export function getStorageGroupsDefinitionItem(
 
 interface TenantStorageGroupsProps {
     allocatedResources?: TTenantResource[];
+    storageGroupsTotal?: string;
 }
 
-export function TenantStorageGroups({allocatedResources}: TenantStorageGroupsProps) {
+export function TenantStorageGroups({
+    allocatedResources,
+    storageGroupsTotal,
+}: TenantStorageGroupsProps) {
     const items = React.useMemo(() => {
-        const item = getStorageGroupsDefinitionItem(allocatedResources);
+        const item = getStorageGroupsDefinitionItem(allocatedResources, storageGroupsTotal);
 
         return item ? [item] : [];
-    }, [allocatedResources]);
+    }, [allocatedResources, storageGroupsTotal]);
 
     if (items.length === 0) {
         return null;

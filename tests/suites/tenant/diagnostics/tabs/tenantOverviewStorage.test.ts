@@ -105,6 +105,7 @@ async function setupTenantInfo(
         databaseStorage,
         resources,
         storageAllocatedLimit = '201000000000000',
+        storageGroups = '2',
         tablesStorage,
     }: {
         databaseQuotas?: {
@@ -120,6 +121,7 @@ async function setupTenantInfo(
             Allocated?: Array<{Count: number; Type: string; Kind: string}>;
         };
         storageAllocatedLimit?: string;
+        storageGroups?: string;
         tablesStorage?: Array<{
             Type: string;
             Size: string;
@@ -141,7 +143,7 @@ async function setupTenantInfo(
                         Overall: 'Green',
                         StorageAllocatedSize: '26400000000000',
                         StorageAllocatedLimit: storageAllocatedLimit,
-                        StorageGroups: '2',
+                        StorageGroups: storageGroups,
                         Resources: resources,
                         DatabaseQuotas: databaseQuotas,
                         TablesStorage: tablesStorage ?? [
@@ -987,6 +989,30 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await expect(
             page.getByText('Groups allocated across storage pools', {exact: true}),
         ).toBeVisible();
+    });
+
+    test('shows total storage groups when allocated resources are absent', async ({page}) => {
+        await setupWhoami(page);
+        await setupCapabilities(page, 1);
+        await setupTenantInfo(page, 'Dedicated', {storageGroups: '4'});
+        await setupPartitionStatsQuery(page);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: database,
+            database,
+            databasePage: 'database',
+            diagnosticsTab: 'database',
+        });
+
+        await openStorageMetricsTab(page);
+
+        const storageGroups = page
+            .locator('.ydb-tenant-storage__details.ydb-definition-list')
+            .filter({hasText: 'Storage Groups'});
+
+        await expect(storageGroups).toBeVisible();
+        await expect(storageGroups.getByText('4 storage groups', {exact: true})).toBeVisible();
     });
 
     test('shows allocated storage groups in new storage layout', async ({page}) => {

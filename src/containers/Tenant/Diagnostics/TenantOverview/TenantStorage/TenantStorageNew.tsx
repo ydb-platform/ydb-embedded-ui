@@ -90,6 +90,7 @@ export function TenantStorageNew({
     databaseFullPath,
     metrics,
     blobStorageStats,
+    storageGroupsTotal,
     tabletStorageStats,
 }: TenantStorageProps) {
     const {currentData, data, error, isFetching} = useTenantStorageNewData({
@@ -152,7 +153,10 @@ export function TenantStorageNew({
                     )}
                 </div>
             </div>
-            <TenantStorageGroups allocatedResources={allocatedResources} />
+            <TenantStorageGroups
+                allocatedResources={allocatedResources}
+                storageGroupsTotal={storageGroupsTotal}
+            />
             <TenantStorageTopUsageTable
                 loading={false}
                 error={topRowsError}

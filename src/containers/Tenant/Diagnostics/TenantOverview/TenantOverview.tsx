@@ -211,6 +211,7 @@ function renderMetricsTabContent({
     memoryUsed,
     networkThroughput,
     storageMetrics,
+    storageGroupsTotal,
     tabletStorageStats,
 }: {
     activeMetricsTab: TenantMetricsTab;
@@ -225,6 +226,7 @@ function renderMetricsTabContent({
     memoryUsed?: string;
     networkThroughput?: number;
     storageMetrics: TenantStorageMetrics;
+    storageGroupsTotal?: string;
     tabletStorageStats?: TenantStorageStats[];
 }) {
     switch (activeMetricsTab) {
@@ -248,6 +250,7 @@ function renderMetricsTabContent({
                     blobStorageStats={blobStorageStats}
                     tabletStorageStats={tabletStorageStats}
                     databaseType={databaseType}
+                    storageGroupsTotal={storageGroupsTotal}
                 />
             );
         }
@@ -426,6 +429,7 @@ export function TenantOverview({
                         memoryUsed: tenant?.MemoryUsed,
                         networkThroughput,
                         storageMetrics,
+                        storageGroupsTotal: tenant?.StorageGroups,
                         tabletStorageStats,
                     })}
                 </div>

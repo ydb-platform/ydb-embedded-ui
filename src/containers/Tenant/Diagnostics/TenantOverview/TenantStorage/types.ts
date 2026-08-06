@@ -13,6 +13,7 @@ export interface TenantStorageProps {
     database: string;
     databaseFullPath: string;
     metrics: TenantStorageMetrics;
+    storageGroupsTotal?: string;
     blobStorageStats?: TenantStorageStats[];
     tabletStorageStats?: TenantStorageStats[];
     databaseType?: ETenantType;

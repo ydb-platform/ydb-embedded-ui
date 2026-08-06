@@ -15,6 +15,12 @@
     "{{kind}}: {{count}} groups",
     "{{kind}}: {{count}} groups"
   ],
+  "value_storage-groups-total": [
+    "{{count}} storage group",
+    "{{count}} storage groups",
+    "{{count}} storage groups",
+    "{{count}} storage groups"
+  ],
   "title_user-data": "User data",
   "context_user-data-by-type": "Data usage by type",
   "context_user-data-tooltip": "Logical user data volume by object type (row tables, column tables, topics, etc.). Does not include system overhead, replication, or physical storage size.",

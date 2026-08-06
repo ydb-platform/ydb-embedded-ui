@@ -29,6 +29,7 @@ export function TenantStorage({
     database,
     metrics,
     databaseType,
+    storageGroupsTotal,
 }: TenantStorageProps) {
     const {blobStorageUsed, tabletStorageUsed, blobStorageLimit, tabletStorageLimit} = metrics;
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
@@ -38,7 +39,10 @@ export function TenantStorage({
         : i18n('title_top-groups-by-usage');
 
     const items = React.useMemo<YDBDefinitionListItem[]>(() => {
-        const storageGroupsDefinitionItem = getStorageGroupsDefinitionItem(allocatedResources);
+        const storageGroupsDefinitionItem = getStorageGroupsDefinitionItem(
+            allocatedResources,
+            storageGroupsTotal,
+        );
 
         return [
             {
@@ -71,6 +75,7 @@ export function TenantStorage({
         allocatedResources,
         blobStorageLimit,
         blobStorageUsed,
+        storageGroupsTotal,
         tabletStorageLimit,
         tabletStorageUsed,
     ]);
@@ -78,7 +83,10 @@ export function TenantStorage({
     if (databaseType === 'Serverless') {
         return (
             <Flex direction="column" gap={4}>
-                <TenantStorageGroups allocatedResources={allocatedResources} />
+                <TenantStorageGroups
+                    allocatedResources={allocatedResources}
+                    storageGroupsTotal={storageGroupsTotal}
+                />
                 <StatsWrapper
                     title={i18n('title_top-tables-by-size')}
                     allEntitiesLink={getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.storage)}
