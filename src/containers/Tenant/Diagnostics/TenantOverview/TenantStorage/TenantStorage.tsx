@@ -12,7 +12,7 @@ import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 
-import {getStorageGroupsDefinitionItem} from './TenantStorageGroups';
+import {TenantStorageGroups, getStorageGroupsDefinitionItem} from './TenantStorageGroups';
 import {TopGroups} from './TopGroups';
 import {TopTables} from './TopTables';
 import {formatTenantStorageProgressMetric} from './displayFormatters';
@@ -78,6 +78,7 @@ export function TenantStorage({
     if (databaseType === 'Serverless') {
         return (
             <Flex direction="column" gap={4}>
+                <TenantStorageGroups allocatedResources={allocatedResources} />
                 <StatsWrapper
                     title={i18n('title_top-tables-by-size')}
                     allEntitiesLink={getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.storage)}

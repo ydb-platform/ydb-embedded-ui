@@ -1252,11 +1252,21 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await expect(page.getByText('Top tables by size', {exact: true})).toBeVisible();
     });
 
-    test('keeps legacy serverless storage layout when experiment is enabled', async ({page}) => {
+    test('shows allocated storage groups in legacy serverless storage layout when experiment is enabled', async ({
+        page,
+    }) => {
         await enableNewStorageView(page);
         await setupWhoami(page);
         await setupCapabilities(page, 1);
-        await setupTenantInfo(page, 'Serverless');
+        await setupTenantInfo(page, 'Serverless', {
+            resources: {
+                Allocated: [
+                    {Count: 20, Type: 'storage', Kind: 'ssdmirror'},
+                    {Count: 174, Type: 'storage', Kind: 'ssd'},
+                    {Count: 4, Type: 'compute', Kind: 'cpu'},
+                ],
+            },
+        });
         await setupPartitionStatsQuery(page);
 
         const tenantPage = new TenantPage(page);
@@ -1270,6 +1280,10 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await openStorageMetricsTab(page);
 
         await expect(page.locator(STORAGE_VIEW_SELECTOR)).toHaveCount(0);
+        const storageGroups = page.getByTestId('tenant-storage-groups');
+        await expect(storageGroups.getByText('ssdmirror: 20 groups', {exact: true})).toBeVisible();
+        await expect(storageGroups.getByText('ssd: 174 groups', {exact: true})).toBeVisible();
+        await expect(storageGroups.getByText('cpu: 4 groups', {exact: true})).toHaveCount(0);
         await expect(page.getByText('Top tables by size', {exact: true})).toBeVisible();
     });
 });
