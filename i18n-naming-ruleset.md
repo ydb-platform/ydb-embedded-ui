@@ -22,7 +22,7 @@ Keysets are divided into 4 categories:
 - **MAY**: Create a dedicated component keyset with one or more keys
 - **MUST NOT**: Merge a component keyset into a broader section keyset solely because it contains only a few keys
 - **MUST NOT**: Split a single section, page, or popup into multiple non-component keysets
-- **MUST NOT**: Start reusable component keysets with `component.` - use the section name instead
+- **MUST NOT**: Start component-specific keysets with `component.` - use the section name instead
 
 ## 2. Key Naming Rules
 
