@@ -1063,7 +1063,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await openStorageMetricsTab(page);
 
         await expect(page.locator(STORAGE_VIEW_SELECTOR)).toHaveCount(0);
-        await expect(page.getByText('Storage Groups', {exact: true})).toHaveCount(0);
+        await expect(page.getByText('2 storage groups', {exact: true})).toBeVisible();
         await expect(page.getByText('Storage Details', {exact: true})).toHaveCount(0);
         await expect(page.getByText('Top tables by size', {exact: true})).toBeVisible();
     });
