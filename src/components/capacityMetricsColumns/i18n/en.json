@@ -8,5 +8,7 @@
   "context_vdisk-slot-usage": "Percentage of VDisk space used relative to the first low-space warning. Can exceed 100%.",
   "context_vdisk-raw-usage": "Percentage of VDisk space used relative to its fair share on the PDisk. Can exceed 100%.",
   "context_normalized-occupancy": "Internal score used for gently handling low-space cases.",
-  "context_capacity-alert": "Named status used for gently handling low-space cases."
+  "context_capacity-alert": "Named status used for gently handling low-space cases.",
+  "context_group-size-in-units": "Relative capacity of this group (1 = single, 2 = double, …). Affects VDisk space quota on the PDisk.",
+  "context_slot-size-in-units": "Relative size of this PDisk in the cluster (1 = single, 2 = double, …). Same units as Group Size In Units."
 }

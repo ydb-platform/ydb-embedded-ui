@@ -18,6 +18,7 @@ import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 import {TitleWithHelpMark} from '../TitleWithHelpmark/TitleWithHelpmark';
+import {CAPACITY_CONFIGURATION_HELP_TEXT} from '../capacityMetricsColumns/constants';
 
 import {storageGroupInfoKeyset} from './i18n';
 
@@ -91,7 +92,12 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
             });
         }
         configurationInfo.push({
-            label: diskCapacityInfoKeyset('field_group-size-in-units'),
+            label: (
+                <TitleWithHelpMark
+                    header={diskCapacityInfoKeyset('field_group-size-in-units')}
+                    note={CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits}
+                />
+            ),
             value: formatMetricCount(GroupSizeInUnits),
         });
 
