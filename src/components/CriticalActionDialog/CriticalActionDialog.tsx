@@ -120,7 +120,7 @@ export function CriticalActionDialog<T>({
                                 : undefined
                         }
                         textButtonCancel={criticalActionDialogKeyset('button-close')}
-                        propsButtonApply={{className: 'brand-button'}}
+                        propsButtonApply={{view: 'normal'}}
                         onClickButtonApply={() => onApply(true)}
                         onClickButtonCancel={onClose}
                     />
