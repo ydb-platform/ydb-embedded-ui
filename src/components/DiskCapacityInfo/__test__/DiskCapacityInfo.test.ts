@@ -5,12 +5,51 @@ import {Label} from '@gravity-ui/uikit';
 import {ECapacityAlert, EFlag} from '../../../types/api/enums';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from '../../../utils/constants';
 import {
+    CAPACITY_CONFIGURATION_HELP_TEXT,
+    CAPACITY_METRICS_HELP_TEXT,
+} from '../../capacityMetricsColumns/constants';
+import {
     getPDiskCapacityInfoItems,
     getStorageGroupCapacityInfoItems,
     getVDiskCapacityInfoItems,
 } from '../DiskCapacityInfo';
 
 describe('DiskCapacityInfo builders', () => {
+    test('maps capacity detail item IDs to the shared help texts', () => {
+        const getNotesById = (items: ReturnType<typeof getVDiskCapacityInfoItems>) =>
+            Object.fromEntries(items.map(({id, note}) => [id, note]));
+
+        expect(getNotesById(getVDiskCapacityInfoItems(undefined, {withRawUsage: true}))).toEqual(
+            expect.objectContaining({
+                'vdisk-slot-usage': CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
+                'vdisk-raw-usage': CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
+                'group-size-in-units': CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits,
+                'capacity-alert': CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+            }),
+        );
+        expect(
+            getNotesById(
+                getPDiskCapacityInfoItems(undefined, {
+                    withUsage: true,
+                    withCapacityAlert: true,
+                }),
+            ),
+        ).toEqual(
+            expect.objectContaining({
+                'pdisk-usage': CAPACITY_METRICS_HELP_TEXT.MaxPDiskUsage,
+                'slot-size-in-units': CAPACITY_CONFIGURATION_HELP_TEXT.SlotSizeInUnits,
+                'capacity-alert': CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+            }),
+        );
+        expect(getNotesById(getStorageGroupCapacityInfoItems(undefined))).toEqual(
+            expect.objectContaining({
+                'vdisk-slot-usage': CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
+                'vdisk-raw-usage': CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
+                'capacity-alert': CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+            }),
+        );
+    });
+
     test('builds exact VDisk capacity values', () => {
         const items = getVDiskCapacityInfoItems(
             {

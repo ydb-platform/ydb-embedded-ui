@@ -1132,10 +1132,10 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await expect(topGroupsByVDiskSlotUsage).toHaveCount(1);
         await expect(topGroupsTable).toHaveCount(1);
         await expect(
-            topGroupsTable.getByRole('columnheader', {name: 'VDisk Slot Usage', exact: true}),
+            topGroupsTable.getByRole('button', {name: 'VDisk Slot Usage', exact: true}),
         ).toBeVisible();
         await expect(
-            topGroupsTable.getByRole('columnheader', {name: 'Group Size In Units', exact: true}),
+            topGroupsTable.getByRole('button', {name: 'Group Size In Units', exact: true}),
         ).toBeVisible();
         const headerTexts = (await topGroupsTable.getByRole('columnheader').allTextContents()).map(
             (text) => text.replace(/\s+/g, ' ').trim(),
