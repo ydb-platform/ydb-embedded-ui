@@ -1,6 +1,6 @@
 import {useTabletPagePath} from '../../routes';
 import {cn} from '../../utils/cn';
-import {EntityStatus} from '../EntityStatus/EntityStatus';
+import {EntityName} from '../EntityName/EntityName';
 
 import './TabletNameWrapper.scss';
 
@@ -16,13 +16,5 @@ export function TabletNameWrapper({tabletId, followerId}: TabletNameWrapperProps
     const tabletPath = getTabletPagePath(tabletId, {followerId: followerId?.toString()});
     const tabletName = `${tabletId}${followerId ? `.${followerId}` : ''}`;
 
-    return (
-        <EntityStatus
-            name={tabletName}
-            path={tabletPath}
-            hasClipboardButton
-            showStatus={false}
-            className={b()}
-        />
-    );
+    return <EntityName name={tabletName} path={tabletPath} hasClipboardButton className={b()} />;
 }

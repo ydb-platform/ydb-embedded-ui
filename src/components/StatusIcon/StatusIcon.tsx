@@ -10,6 +10,7 @@ import {Icon} from '@gravity-ui/uikit';
 
 import {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
+import {StatusColor} from '../StatusColor/StatusColor';
 
 import './StatusIcon.scss';
 
@@ -51,5 +52,5 @@ export function StatusIcon({
         );
     }
 
-    return <div className={b('status-color', modifiers, className)} />;
+    return <StatusColor className={className} size={size} status={status} />;
 }

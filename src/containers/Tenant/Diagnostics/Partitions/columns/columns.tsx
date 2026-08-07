@@ -1,7 +1,7 @@
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 
-import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus';
+import {EntityName} from '../../../../../components/EntityName/EntityName';
 import {MultilineTableHeader} from '../../../../../components/MultilineTableHeader/MultilineTableHeader';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 import {getDefaultNodePath} from '../../../../../routes';
@@ -187,7 +187,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         width: 150,
         render: ({row}) =>
             row.readSessionId ? (
-                <EntityStatus name={row.readSessionId} showStatus={false} hasClipboardButton />
+                <EntityName name={row.readSessionId} hasClipboardButton />
             ) : (
                 EMPTY_DATA_PLACEHOLDER
             ),
@@ -203,7 +203,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         width: 150,
         render: ({row}) =>
             row.readerName ? (
-                <EntityStatus name={row.readerName} showStatus={false} hasClipboardButton />
+                <EntityName name={row.readerName} hasClipboardButton />
             ) : (
                 EMPTY_DATA_PLACEHOLDER
             ),
@@ -248,14 +248,7 @@ interface NodeProps {
 }
 
 function Node({host, id}: NodeProps) {
-    return (
-        <EntityStatus
-            name={host}
-            path={getDefaultNodePath({id})}
-            showStatus={false}
-            hasClipboardButton
-        />
-    );
+    return <EntityName name={host} path={getDefaultNodePath({id})} hasClipboardButton />;
 }
 
 // Topics without consumers have partitions data with no data corresponding to consumers
@@ -275,7 +268,7 @@ function PartitionId({id}: PartitionIdProps) {
     const topicDataAvailable = useTopicDataAvailable();
 
     return (
-        <EntityStatus
+        <EntityName
             name={id}
             path={
                 topicDataAvailable
@@ -284,7 +277,6 @@ function PartitionId({id}: PartitionIdProps) {
                       })
                     : undefined
             }
-            showStatus={false}
         />
     );
 }

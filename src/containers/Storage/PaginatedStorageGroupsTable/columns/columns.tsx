@@ -6,7 +6,7 @@ import {Flex, Icon, Label, Popover} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPopover';
-import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {EntityName} from '../../../../components/EntityName/EntityName';
 import {StatusIcon} from '../../../../components/StatusIcon/StatusIcon';
 import {TitleWithHelpMark} from '../../../../components/TitleWithHelpmark/TitleWithHelpmark';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
@@ -378,12 +378,5 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
 
 function GroupId({id}: {id: string | number}) {
     const getStorageGroupPath = useStorageGroupPath();
-    return (
-        <EntityStatus
-            name={String(id)}
-            path={getStorageGroupPath(id)}
-            hasClipboardButton
-            showStatus={false}
-        />
-    );
+    return <EntityName name={String(id)} path={getStorageGroupPath(id)} hasClipboardButton />;
 }

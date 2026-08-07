@@ -3,7 +3,7 @@ import React from 'react';
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 
-import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {EntityName} from '../../../../components/EntityName/EntityName';
 import {InternalLink} from '../../../../components/InternalLink/InternalLink';
 import {NodeId} from '../../../../components/NodeId/NodeId';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
@@ -58,7 +58,7 @@ const getColumns: (props: {tabletId: string}) => Column<ITabletPreparedHistoryIt
             if (!row.fqdn) {
                 return EMPTY_DATA_PLACEHOLDER;
             }
-            return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
+            return <EntityName name={row.fqdn} hasClipboardButton />;
         },
     },
 ];

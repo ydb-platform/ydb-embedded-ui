@@ -3,7 +3,7 @@ import React from 'react';
 import DataTable from '@gravity-ui/react-data-table';
 import {Button, Flex, HelpMark, Label, Progress, Text} from '@gravity-ui/uikit';
 
-import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {EntityName} from '../../../../components/EntityName/EntityName';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import type {StorageUsageGroupRow} from '../../../../store/reducers/storageUsage/StorageUsage';
 import {cn} from '../../../../utils/cn';
@@ -85,12 +85,11 @@ function StorageGroupCell({
     return (
         <Flex direction="column">
             <Flex alignItems="center" gap="2">
-                <EntityStatus
+                <EntityName
                     name={groupId}
                     path={getStorageGroupPath(groupId)}
                     renderName={renderStorageGroupName}
                     hasClipboardButton
-                    showStatus={false}
                 />
                 {hasMultipleMediaTypes && mediaType ? (
                     <Label theme="unknown" size="xs" className={b('media-chip')}>

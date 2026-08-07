@@ -3,7 +3,7 @@ import React from 'react';
 import {Flex} from '@gravity-ui/uikit';
 
 import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMetrics';
-import {EntityStatus} from '../../../../components/EntityStatusNew/EntityStatus';
+import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {Skeleton} from '../../../../components/Skeleton/Skeleton';
 import {EFlag} from '../../../../types/api/enums';
 import type {ProgressStatus} from '../../../../utils/progress';

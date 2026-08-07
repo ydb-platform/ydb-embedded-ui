@@ -1,138 +1,14 @@
-@use '../../styles/mixins.scss';
-
-.entity-status {
-    --button-width: 24px;
-    --entity-status-height: 20px;
-
-    position: relative;
-
-    display: inline-flex;
-    align-items: center;
-
-    max-width: 100%;
-    height: var(--entity-status-height);
-
-    @include mixins.body-2-typography();
-
-    &__icon {
-        margin-right: var(--g-spacing-2);
+.ydb-entity-status {
+    &__note {
+        color: inherit;
     }
 
-    &__info-icon,
-    &__clipboard-button {
-        // Default button height is 20px. When focused it has 24px height because of outline
-        // Negative offset is needed to prevent button to have bigger size when focused
-        --g-button-focus-outline-offset: -2px;
-        --g-button-focus-outline-width: 2px;
-
-        opacity: 0;
-        color: var(--g-color-text-secondary);
-
-        &_visible,
-        &:focus-visible,
-        &:hover,
-        .entity-status__wrapper:focus-within &,
-        .data-table__row:hover &,
-        .ydb-paginated-table__row:hover & {
-            opacity: 1;
-        }
-
-        &:focus-visible,
-        .entity-status__wrapper:focus-within {
-            background-color: var(--g-color-base-float);
-        }
-        &:hover {
-            color: var(--g-color-text-primary);
-        }
+    &_orange.g-label {
+        color: var(--g-color-private-orange-500);
+        background-color: var(--g-color-private-orange-100);
     }
 
-    &__wrapper {
-        position: relative;
-
-        overflow: hidden;
-
-        height: var(--entity-status-height);
-
-        &_with-clipboard-button {
-            padding-right: var(--button-width);
-        }
-
-        &_with-info-button {
-            padding-right: var(--button-width);
-        }
-
-        &_with-clipboard-button {
-            &.entity-status__wrapper_with-info-button {
-                padding-right: calc(2 * var(--button-width));
-            }
-        }
-    }
-
-    &__controls-wrapper {
-        position: absolute;
-        top: 0;
-        right: 0;
-
-        display: flex;
-        align-items: center;
-        gap: var(--g-spacing-1);
-
-        width: 0;
-
-        &_visible,
-        &:focus-within {
-            width: min-content;
-
-            background-color: var(--g-color-base-background);
-        }
-
-        .data-table__row:hover &,
-        .ydb-paginated-table__row:hover & {
-            width: min-content;
-
-            background-color: var(--ydb-data-table-color-hover);
-        }
-    }
-
-    &__wrapper_with-clipboard-button &__link {
-        width: calc(100% + var(--button-width));
-    }
-
-    &__wrapper_with-info-button &__link {
-        width: calc(100% + var(--button-width));
-    }
-
-    &__wrapper_with-clipboard-button {
-        &.entity-status__wrapper_with-info-button .entity-status__link {
-            width: calc(100% + 2 * var(--button-width));
-        }
-    }
-
-    &__link {
-        display: inline-block;
-        overflow: hidden;
-
-        width: 100%;
-
-        white-space: nowrap;
-        text-overflow: ellipsis;
-
-        & a:focus-visible {
-            outline-width: 2px;
-            outline-offset: -2px;
-        }
-    }
-
-    &__link_with-path {
-        color: var(--g-color-text-link);
-    }
-
-    &__link_with-left-trim {
-        text-align: end;
-        direction: rtl;
-
-        .entity-status__name {
-            unicode-bidi: plaintext;
-        }
+    &_clickable.g-label {
+        cursor: pointer;
     }
 }

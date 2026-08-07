@@ -8,7 +8,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {EntitiesCount} from '../../components/EntitiesCount';
-import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
+import {EntityName} from '../../components/EntityName/EntityName';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {NodeId} from '../../components/NodeId/NodeId';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
@@ -107,7 +107,7 @@ function getColumns({
                     if (!row.fqdn) {
                         return EMPTY_DATA_PLACEHOLDER;
                     }
-                    return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
+                    return <EntityName name={row.fqdn} hasClipboardButton />;
                 },
             },
         );

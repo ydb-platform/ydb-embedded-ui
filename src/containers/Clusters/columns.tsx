@@ -12,7 +12,7 @@ import {
 
 import type {DropdownMenuItemWithDescription} from '../../components/DropdownMenu';
 import {DropdownMenu} from '../../components/DropdownMenu';
-import {EntityStatus} from '../../components/EntityStatusNew/EntityStatus';
+import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {VersionsBar} from '../../components/VersionsBar/VersionsBar';
 import type {PreparedCluster} from '../../store/reducers/clusters/types';
 import type {ClusterLink} from '../../types/additionalProps';
