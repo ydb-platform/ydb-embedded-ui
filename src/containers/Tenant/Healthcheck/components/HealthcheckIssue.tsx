@@ -44,17 +44,23 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
             <Disclosure className={b('issue-content')} defaultExpanded={expanded}>
                 <Disclosure.Summary>
                     {(props) => {
+                        const {
+                            ariaControls,
+                            expanded: isExpanded,
+                            qa,
+                            className: disclosureClassName,
+                            ...buttonProps
+                        } = props;
+
                         if (!assistant) {
                             return (
                                 <button
-                                    aria-controls={props.ariaControls}
-                                    aria-expanded={props.expanded}
-                                    className={b('disclosure-trigger')}
-                                    data-qa={props.qa}
-                                    disabled={props.disabled}
-                                    id={props.id}
-                                    onClick={props.onClick}
-                                    onKeyDown={props.onKeyDown}
+                                    {...buttonProps}
+                                    type="button"
+                                    aria-controls={ariaControls}
+                                    aria-expanded={isExpanded}
+                                    className={b('disclosure-trigger', disclosureClassName)}
+                                    data-qa={qa}
                                 >
                                     <Flex
                                         wrap="nowrap"
@@ -85,7 +91,7 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                                                 orientation="vertical"
                                             />
                                             <ArrowToggle
-                                                direction={props.expanded ? 'top' : 'bottom'}
+                                                direction={isExpanded ? 'top' : 'bottom'}
                                             />
                                         </Flex>
                                     </Flex>
@@ -101,14 +107,16 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                                 className={b('issue-summary')}
                             >
                                 <button
-                                    aria-controls={props.ariaControls}
-                                    aria-expanded={props.expanded}
-                                    className={b('disclosure-trigger', {'with-action': true})}
-                                    data-qa={props.qa}
-                                    disabled={props.disabled}
-                                    id={props.id}
-                                    onClick={props.onClick}
-                                    onKeyDown={props.onKeyDown}
+                                    {...buttonProps}
+                                    type="button"
+                                    aria-controls={ariaControls}
+                                    aria-expanded={isExpanded}
+                                    className={b(
+                                        'disclosure-trigger',
+                                        {'with-action': true},
+                                        disclosureClassName,
+                                    )}
+                                    data-qa={qa}
                                 >
                                     <Flex
                                         wrap="nowrap"
@@ -132,9 +140,7 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                                             className={b('issue-divider')}
                                             orientation="vertical"
                                         />
-                                        <ArrowToggle
-                                            direction={props.expanded ? 'top' : 'bottom'}
-                                        />
+                                        <ArrowToggle direction={isExpanded ? 'top' : 'bottom'} />
                                     </Flex>
                                 </button>
                                 <div

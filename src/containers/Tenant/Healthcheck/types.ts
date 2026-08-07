@@ -1,9 +1,8 @@
 import type {IssueLog, SelfCheckResult} from '../../../types/api/healthcheck';
 
-export type HealthcheckAssistantTarget = {
-    scope: 'cluster' | 'database';
-    request: {clusterName: string} | {database: string};
-};
+export type HealthcheckAssistantTarget =
+    | {scope: 'database'; request: {database: string}}
+    | {scope: 'cluster'; request: {clusterName: string} | {database: string}};
 
 export type HealthcheckAssistantSnapshot = {
     selfCheckResult: SelfCheckResult;

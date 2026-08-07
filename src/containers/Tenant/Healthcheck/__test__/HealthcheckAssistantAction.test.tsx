@@ -8,7 +8,7 @@ import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types'
 import {SelfCheckResult, StatusFlag} from '../../../../types/api/healthcheck';
 import type {IssueLog} from '../../../../types/api/healthcheck';
 import {Healthcheck} from '../Healthcheck';
-import type {HealthcheckAssistantActionProps} from '../types';
+import type {HealthcheckAssistantActionProps, HealthcheckAssistantTarget} from '../types';
 import {useClusterHealthcheck, useHealthcheck} from '../useHealthcheck';
 
 jest.mock('../../../../components/ComponentsProvider/componentsRegistry', () => {
@@ -18,10 +18,7 @@ jest.mock('../../../../components/ComponentsProvider/componentsRegistry', () => 
             components.set(id, component);
         }),
         get: jest.fn((id) => components.get(id)),
-        has: jest.fn((id) => {
-            const component = components.get(id);
-            return component && component.name !== 'EmptyPlaceholder';
-        }),
+        has: jest.fn(() => false),
     };
     return {componentsRegistry: registry};
 });
@@ -101,6 +98,7 @@ function renderHealthcheck(
         | {clusterName: string; scope?: 'cluster'},
 ) {
     componentsRegistry.set('HealthcheckAssistantAction', AssistantAction);
+    jest.mocked(componentsRegistry.has).mockReturnValue(true);
 
     return render(
         <ComponentsProvider registry={componentsRegistry}>
@@ -116,9 +114,7 @@ describe('HealthcheckAssistantAction', () => {
     });
 
     afterEach(() => {
-        componentsRegistry.set('HealthcheckAssistantAction', function EmptyPlaceholder() {
-            return null;
-        });
+        jest.mocked(componentsRegistry.has).mockReturnValue(false);
         jest.clearAllMocks();
     });
 
@@ -126,6 +122,7 @@ describe('HealthcheckAssistantAction', () => {
         componentsRegistry.set('HealthcheckAssistantAction', function EmptyPlaceholder() {
             return null;
         });
+        jest.mocked(componentsRegistry.has).mockReturnValue(false);
 
         const {container} = render(
             <ComponentsProvider registry={componentsRegistry}>
@@ -142,6 +139,7 @@ describe('HealthcheckAssistantAction', () => {
             '.ydb-healthcheck__issue-summary',
         );
         expect(issueTrigger).toContainElement(issueSummary);
+        expect(issueTrigger).toHaveAttribute('type', 'button');
         expect(issueTrigger).toHaveAttribute('aria-expanded', 'false');
 
         fireEvent.click(issueSummary as HTMLElement);
@@ -173,6 +171,7 @@ describe('HealthcheckAssistantAction', () => {
             receivedProps.push(actionProps);
             return null;
         });
+        jest.mocked(componentsRegistry.has).mockReturnValue(true);
 
         render(
             <ComponentsProvider registry={componentsRegistry}>
@@ -199,6 +198,17 @@ describe('HealthcheckAssistantAction', () => {
             },
             issue: rawIssue,
         });
+    });
+
+    it('rejects a cluster request for database scope at the public type boundary', () => {
+        const clusterRequest = {clusterName: 'production-cluster'};
+        // @ts-expect-error database scope requires a database request
+        const invalidTarget: HealthcheckAssistantTarget = {
+            scope: 'database',
+            request: clusterRequest,
+        };
+
+        expect(invalidTarget.request).toBe(clusterRequest);
     });
 
     test.each([
@@ -256,6 +266,7 @@ describe('HealthcheckAssistantAction', () => {
         const issueSummary = issueTrigger.closest('.ydb-healthcheck__issue-summary');
 
         expect(issueSummary).toContainElement(fixAction);
+        expect(issueTrigger).toHaveAttribute('type', 'button');
         expect(issueTrigger).toHaveAttribute('aria-expanded', 'false');
 
         fireEvent.click(fixAction);
