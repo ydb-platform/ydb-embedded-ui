@@ -5,7 +5,6 @@ import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
 import {valueIsDefined} from '../../utils';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {getDocsLink} from '../../utils/docs';
-import {formatMetricCount} from '../../utils/storageMetrics';
 import {formatToMs} from '../../utils/timeParsers';
 import {bytesToSpeed} from '../../utils/utils';
 import {
@@ -18,6 +17,8 @@ import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 import {TitleWithHelpMark} from '../TitleWithHelpmark/TitleWithHelpmark';
+import {CAPACITY_CONFIGURATION_HELP_TEXT} from '../capacityMetricsColumns/constants';
+import {formatCapacityUnitCount} from '../capacityMetricsColumns/formatters';
 
 import {storageGroupInfoKeyset} from './i18n';
 
@@ -91,8 +92,13 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
             });
         }
         configurationInfo.push({
-            label: diskCapacityInfoKeyset('field_group-size-in-units'),
-            value: formatMetricCount(GroupSizeInUnits),
+            label: (
+                <TitleWithHelpMark
+                    header={diskCapacityInfoKeyset('field_group-size-in-units')}
+                    note={CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits}
+                />
+            ),
+            value: formatCapacityUnitCount(GroupSizeInUnits),
         });
 
         if (valueIsDefined(Overall)) {

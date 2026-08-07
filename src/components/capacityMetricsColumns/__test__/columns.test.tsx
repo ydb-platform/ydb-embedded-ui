@@ -1,6 +1,5 @@
-import React from 'react';
-
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
+import {TitleWithHelpMark} from '../../TitleWithHelpmark/TitleWithHelpmark';
 import {
     getCapacityAlertColumn,
     getNormalizedOccupancyColumn,
@@ -8,47 +7,47 @@ import {
     getVDiskRawUsageColumn,
     getVDiskSlotUsageColumn,
 } from '../columns';
-
-type HeaderProps = {header: string; note: string};
-
-function getHeaderProps(header: React.ReactNode) {
-    expect(React.isValidElement(header)).toBe(true);
-    return (header as React.ReactElement<HeaderProps>).props;
-}
+import {CAPACITY_METRICS_COLUMN_TITLES, CAPACITY_METRICS_HELP_TEXT} from '../constants';
 
 describe('capacityMetricsColumns', () => {
-    test('wires exact denominator help into every capacity column header', () => {
-        const columns = [
-            {
-                column: getPDiskUsageColumn(),
-                header: 'PDisk Usage',
-                note: 'Occupied shared-quota chunks divided by chunks available to all VDisks on the PDisk.',
-            },
-            {
-                column: getVDiskSlotUsageColumn(),
-                header: 'VDisk Slot Usage',
-                note: 'VDisk allocated chunks relative to its slot hard limit at the yellow-move threshold.',
-            },
-            {
-                column: getVDiskRawUsageColumn(),
-                header: 'VDisk Raw Usage',
-                note: 'VDisk allocated chunks relative to its raw fair-part quota.',
-            },
-            {
-                column: getNormalizedOccupancyColumn(),
-                header: 'Normalized Occupancy',
-                note: 'Internal nonlinear occupancy in the 0..1 range; this value is not a percentage.',
-            },
-            {
-                column: getCapacityAlertColumn(),
-                header: 'Capacity Alert',
-                note: 'Backend capacity alert enum, not a percentage derived in the UI.',
-            },
-        ];
-
-        for (const {column, header, note} of columns) {
-            expect(getHeaderProps(column.header)).toEqual({header, note});
-        }
+    test.each([
+        [
+            'PDisk Usage',
+            getPDiskUsageColumn(),
+            CAPACITY_METRICS_COLUMN_TITLES.MaxPDiskUsage,
+            CAPACITY_METRICS_HELP_TEXT.MaxPDiskUsage,
+        ],
+        [
+            'VDisk Slot Usage',
+            getVDiskSlotUsageColumn(),
+            CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
+            CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
+        ],
+        [
+            'VDisk Raw Usage',
+            getVDiskRawUsageColumn(),
+            CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage,
+            CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
+        ],
+        [
+            'Normalized Occupancy',
+            getNormalizedOccupancyColumn(),
+            CAPACITY_METRICS_COLUMN_TITLES.MaxNormalizedOccupancy,
+            CAPACITY_METRICS_HELP_TEXT.MaxNormalizedOccupancy,
+        ],
+        [
+            'Capacity Alert',
+            getCapacityAlertColumn(),
+            CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
+            CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+        ],
+    ])('maps the %s column title to its shared help text', (_name, column, header, note) => {
+        expect(column.header).toEqual(
+            expect.objectContaining({
+                type: TitleWithHelpMark,
+                props: expect.objectContaining({header, note}),
+            }),
+        );
     });
 
     test.each([

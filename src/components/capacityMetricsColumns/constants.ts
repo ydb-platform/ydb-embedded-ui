@@ -47,3 +47,12 @@ export const CAPACITY_METRICS_HELP_TEXT = {
         return i18n('context_capacity-alert');
     },
 } as const satisfies Record<CapacityMetricsColumnId, string>;
+
+export const CAPACITY_CONFIGURATION_HELP_TEXT = {
+    get GroupSizeInUnits() {
+        return i18n('context_group-size-in-units');
+    },
+    get SlotSizeInUnits() {
+        return i18n('context_slot-size-in-units');
+    },
+} as const;

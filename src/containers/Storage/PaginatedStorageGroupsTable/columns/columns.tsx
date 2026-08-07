@@ -8,6 +8,7 @@ import {isNil} from 'lodash';
 import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {StatusIcon} from '../../../../components/StatusIcon/StatusIcon';
+import {TitleWithHelpMark} from '../../../../components/TitleWithHelpmark/TitleWithHelpmark';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 import {
     getCapacityAlertColumn,
@@ -16,13 +17,14 @@ import {
     getVDiskRawUsageColumn,
     getVDiskSlotUsageColumn,
 } from '../../../../components/capacityMetricsColumns/columns';
+import {CAPACITY_CONFIGURATION_HELP_TEXT} from '../../../../components/capacityMetricsColumns/constants';
+import {formatCapacityUnitCount} from '../../../../components/capacityMetricsColumns/formatters';
 import {useStorageGroupPath} from '../../../../routes';
 import type {PreparedStorageGroup} from '../../../../store/reducers/storage/types';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER, YDB_POPOVER_CLASS_NAME} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../../../utils/generateEvaluator';
-import {formatMetricCount} from '../../../../utils/storageMetrics';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
@@ -251,9 +253,14 @@ const allocationUnitsColumn: StorageGroupsColumn = {
 
 const groupSizeInUnitsColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.GroupSizeInUnits,
-    header: STORAGE_GROUPS_COLUMNS_TITLES.GroupSizeInUnits,
+    header: (
+        <TitleWithHelpMark
+            header={STORAGE_GROUPS_COLUMNS_TITLES.GroupSizeInUnits}
+            note={CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits}
+        />
+    ),
     width: 160,
-    render: ({row}) => formatMetricCount(row.GroupSizeInUnits),
+    render: ({row}) => formatCapacityUnitCount(row.GroupSizeInUnits),
     align: DataTable.RIGHT,
     sortable: false,
 };
