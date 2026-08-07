@@ -16,6 +16,7 @@ export function TitleWithHelpMark({header, note, docsLink, docsLinkTitle}: Title
         <Flex gap={1} alignItems="center">
             {header}
             <HelpMarkWithDocs
+                aria-label={header}
                 docsLink={docsLink}
                 docsLinkTitle={docsLinkTitle}
                 popoverProps={{placement: ['right', 'left']}}

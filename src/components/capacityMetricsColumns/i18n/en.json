@@ -4,9 +4,12 @@
   "field_vdisk-raw-usage": "VDisk Raw Usage",
   "field_normalized-occupancy": "Normalized Occupancy",
   "field_capacity-alert": "Capacity Alert",
-  "context_pdisk-usage": "Occupied shared-quota chunks divided by chunks available to all VDisks on the PDisk.",
-  "context_vdisk-slot-usage": "VDisk allocated chunks relative to its slot hard limit at the yellow-move threshold.",
-  "context_vdisk-raw-usage": "VDisk allocated chunks relative to its raw fair-part quota.",
-  "context_normalized-occupancy": "Internal nonlinear occupancy in the 0..1 range; this value is not a percentage.",
-  "context_capacity-alert": "Backend capacity alert enum, not a percentage derived in the UI."
+  "value_implicit-unit-count": "1 (implicit)",
+  "context_pdisk-usage": "Share of PDisk space used by VDisks. System and log reserves are not included.",
+  "context_vdisk-slot-usage": "Percentage of VDisk space used relative to the first low-space warning. Can exceed 100%.",
+  "context_vdisk-raw-usage": "Percentage of VDisk space used relative to its fair share on the PDisk. Can exceed 100%.",
+  "context_normalized-occupancy": "Internal score used for gently handling low-space cases.",
+  "context_capacity-alert": "Named status used for gently handling low-space cases.",
+  "context_group-size-in-units": "Relative capacity of this group (1 = single, 2 = double, …). Affects VDisk space quota on the PDisk.",
+  "context_slot-size-in-units": "Relative size of this PDisk in the cluster (1 = single, 2 = double, …). Same units as Group Size In Units."
 }
