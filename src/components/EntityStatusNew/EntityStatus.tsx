@@ -16,7 +16,7 @@ const b = cn('ydb-entity-status-new');
 
 const EFlagToLabelTheme: Record<EFlag, LabelProps['theme']> = {
     [EFlag.Red]: 'danger',
-    [EFlag.Blue]: 'info',
+    [EFlag.Blue]: 'success',
     [EFlag.Green]: 'success',
     [EFlag.Grey]: 'unknown',
     [EFlag.Orange]: 'danger',
