@@ -21,3 +21,17 @@ export function countHealthcheckIssuesByCategory<H extends string = CommonIssueC
 
     return result;
 }
+
+export function resolveHealthcheckView<H extends string>(
+    currentView: string | null | undefined,
+    issuesCount: Record<H | 'unknown', number>,
+    sortOrder: readonly H[],
+): H | 'unknown' | undefined {
+    const availableViews: readonly (H | 'unknown')[] =
+        issuesCount.unknown > 0 ? [...sortOrder, 'unknown'] : sortOrder;
+
+    return (
+        availableViews.find((view) => view === currentView) ??
+        availableViews.find((view) => issuesCount[view] > 0)
+    );
+}

@@ -1,12 +1,4 @@
-import {
-    CircleCheckFill,
-    CircleInfoFill,
-    CircleQuestionFill,
-    CircleXmarkFill,
-    TriangleExclamationFill,
-} from '@gravity-ui/icons';
 import {Flex, Text} from '@gravity-ui/uikit';
-import type {IconData} from '@gravity-ui/uikit';
 
 import {SelfCheckResult} from '../../types/api/healthcheck';
 
@@ -26,17 +18,9 @@ export const ROW_COUNT_NOTE = {
 };
 
 export const HEALTHCHECK_RESULT_TO_TEXT: Record<SelfCheckResult, string> = {
-    [SelfCheckResult.UNSPECIFIED]: '',
+    [SelfCheckResult.UNSPECIFIED]: i18n('description_unknown'),
     [SelfCheckResult.GOOD]: i18n('description_ok'),
     [SelfCheckResult.DEGRADED]: i18n('description_degraded'),
     [SelfCheckResult.MAINTENANCE_REQUIRED]: i18n('description_maintenance'),
     [SelfCheckResult.EMERGENCY]: i18n('description_emergency'),
-};
-
-export const HEALTHCHECK_RESULT_TO_ICON: Record<SelfCheckResult, IconData> = {
-    [SelfCheckResult.UNSPECIFIED]: CircleQuestionFill,
-    [SelfCheckResult.GOOD]: CircleCheckFill,
-    [SelfCheckResult.DEGRADED]: CircleInfoFill,
-    [SelfCheckResult.MAINTENANCE_REQUIRED]: CircleXmarkFill,
-    [SelfCheckResult.EMERGENCY]: TriangleExclamationFill,
 };
