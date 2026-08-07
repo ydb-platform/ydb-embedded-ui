@@ -1,5 +1,28 @@
 # Changelog
 
+## [18.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.3.2...v18.4.0) (2026-08-07)
+
+
+### Features
+
+* add explain analyze query action ([#4096](https://github.com/ydb-platform/ydb-embedded-ui/issues/4096)) ([1f24bef](https://github.com/ydb-platform/ydb-embedded-ui/commit/1f24befb8af9eeea5ff308ec9e3ebaf472b853b6))
+* add topic and table forms ([#3909](https://github.com/ydb-platform/ydb-embedded-ui/issues/3909)) ([7477f07](https://github.com/ydb-platform/ydb-embedded-ui/commit/7477f07453bd4b9aa86f56195b9b137f0f9d33a8))
+* **QueryEditor:** current query under cursor ([#4162](https://github.com/ydb-platform/ydb-embedded-ui/issues/4162)) ([d3f2c00](https://github.com/ydb-platform/ydb-embedded-ui/commit/d3f2c00d05c116b36f802f56178eb6fa06d3172f))
+* show allocated storage groups ([#4206](https://github.com/ydb-platform/ydb-embedded-ui/issues/4206)) ([9c7a69e](https://github.com/ydb-platform/ydb-embedded-ui/commit/9c7a69e7ba52b4d2e1545aa41634d7ed2d7750a8))
+* **storage:** add blob storage capacity metrics ([#4167](https://github.com/ydb-platform/ydb-embedded-ui/issues/4167)) ([2881245](https://github.com/ydb-platform/ydb-embedded-ui/commit/2881245013c4a63ad7c6a30c1dec0ee85075b6be))
+* **storage:** explain allocation units ([#4207](https://github.com/ydb-platform/ydb-embedded-ui/issues/4207)) ([514ebd8](https://github.com/ydb-platform/ydb-embedded-ui/commit/514ebd8aaf372d9dda01cfcd7ac0dd286d59732f))
+* **Storage:** slice All for expert mode ([#4188](https://github.com/ydb-platform/ydb-embedded-ui/issues/4188)) ([5a18191](https://github.com/ydb-platform/ydb-embedded-ui/commit/5a181911c1c73d3b862e3316c203ebf705f9e445))
+
+
+### Bug Fixes
+
+* **ClusterInfo:** layout ([#4174](https://github.com/ydb-platform/ydb-embedded-ui/issues/4174)) ([d1da032](https://github.com/ydb-platform/ydb-embedded-ui/commit/d1da032f9931eb6be4cd2d54620e578140177073))
+* optimize current statement indexing ([#4205](https://github.com/ydb-platform/ydb-embedded-ui/issues/4205)) ([6607241](https://github.com/ydb-platform/ydb-embedded-ui/commit/6607241b03bf43f8e402aa58e5a52aa31e9d5a4d))
+* remove split size limit when config is unavailable ([#4196](https://github.com/ydb-platform/ydb-embedded-ui/issues/4196)) ([40c6963](https://github.com/ydb-platform/ydb-embedded-ui/commit/40c69638da964ecdfc4a5de7a1759ed4fd6bee32))
+* restrict vdisk tablets tab access ([#4170](https://github.com/ydb-platform/ydb-embedded-ui/issues/4170)) ([2b2635c](https://github.com/ydb-platform/ydb-embedded-ui/commit/2b2635c645c86e55307d4a2a2882ac9d923f2d51))
+* show N/D if VDiskId is unavailable ([#4161](https://github.com/ydb-platform/ydb-embedded-ui/issues/4161)) ([64b9746](https://github.com/ydb-platform/ydb-embedded-ui/commit/64b9746399536040966549065e7afef682a93366))
+* **storage:** update capacity metric help text ([#4208](https://github.com/ydb-platform/ydb-embedded-ui/issues/4208)) ([8d2b7a0](https://github.com/ydb-platform/ydb-embedded-ui/commit/8d2b7a0b469dcbc5c57100045cd06184a97ddfc3))
+
 ## [18.3.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.3.1...v18.3.2) (2026-07-28)
 
 
