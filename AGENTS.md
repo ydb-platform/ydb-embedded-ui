@@ -372,7 +372,7 @@ Uses BEM naming convention with `cn()` utility from `utils/cn` (wraps `@bem-reac
 
 See `i18n-naming-ruleset.md` in the repo root for all i18n conventions (naming and usage).
 
-The i18n system uses `@gravity-ui/i18n`. Each component with user-facing strings has an `i18n/` subdirectory containing:
+The i18n system uses `@gravity-ui/i18n`. A component with user-facing strings may define its own keyset in an `i18n/` subdirectory. A component keyset may contain one or several keys; do not merge it into a broader section keyset solely because it is small. The directory contains:
 
 - `en.json` — English translations
 - `index.ts` — Registers the keyset using `registerKeysets()` from `src/utils/i18n`

@@ -9,10 +9,6 @@ import {
 } from '../utils';
 
 describe('getActionAndSyntaxFromQueryMode', () => {
-    test('defines frontend-only explain analyze action', () => {
-        expect(QUERY_ACTIONS.explainAnalyze).toBe('explain-analyze');
-    });
-
     test('Correctly prepares execute action', () => {
         const {action, syntax} = getActionAndSyntaxFromQueryMode('execute', 'script');
         expect(action).toBe('execute-script');

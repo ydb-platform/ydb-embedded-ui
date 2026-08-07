@@ -5,13 +5,52 @@ import {Label} from '@gravity-ui/uikit';
 import {ECapacityAlert, EFlag} from '../../../types/api/enums';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from '../../../utils/constants';
 import {
+    CAPACITY_CONFIGURATION_HELP_TEXT,
+    CAPACITY_METRICS_HELP_TEXT,
+} from '../../capacityMetricsColumns/constants';
+import {
     getPDiskCapacityInfoItems,
     getStorageGroupCapacityInfoItems,
     getVDiskCapacityInfoItems,
 } from '../DiskCapacityInfo';
 
 describe('DiskCapacityInfo builders', () => {
-    test('builds exact VDisk capacity values and help semantics', () => {
+    test('maps capacity detail item IDs to the shared help texts', () => {
+        const getNotesById = (items: ReturnType<typeof getVDiskCapacityInfoItems>) =>
+            Object.fromEntries(items.map(({id, note}) => [id, note]));
+
+        expect(getNotesById(getVDiskCapacityInfoItems(undefined, {withRawUsage: true}))).toEqual(
+            expect.objectContaining({
+                'vdisk-slot-usage': CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
+                'vdisk-raw-usage': CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
+                'group-size-in-units': CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits,
+                'capacity-alert': CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+            }),
+        );
+        expect(
+            getNotesById(
+                getPDiskCapacityInfoItems(undefined, {
+                    withUsage: true,
+                    withCapacityAlert: true,
+                }),
+            ),
+        ).toEqual(
+            expect.objectContaining({
+                'pdisk-usage': CAPACITY_METRICS_HELP_TEXT.MaxPDiskUsage,
+                'slot-size-in-units': CAPACITY_CONFIGURATION_HELP_TEXT.SlotSizeInUnits,
+                'capacity-alert': CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+            }),
+        );
+        expect(getNotesById(getStorageGroupCapacityInfoItems(undefined))).toEqual(
+            expect.objectContaining({
+                'vdisk-slot-usage': CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
+                'vdisk-raw-usage': CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
+                'capacity-alert': CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+            }),
+        );
+    });
+
+    test('builds exact VDisk capacity values', () => {
         const items = getVDiskCapacityInfoItems(
             {
                 AllocatedSize: 1_000_000_000,
@@ -49,7 +88,7 @@ describe('DiskCapacityInfo builders', () => {
             {
                 id: 'group-size-in-units',
                 title: 'Group Size In Units',
-                value: '0',
+                value: '1 (implicit)',
             },
         ]);
         expect(items.map(({id}) => id)).toEqual([
@@ -59,9 +98,6 @@ describe('DiskCapacityInfo builders', () => {
             'group-size-in-units',
             'capacity-alert',
         ]);
-        expect(items.find(({id}) => id === 'vdisk-slot-usage')?.note).toBe(
-            'VDisk allocated chunks relative to its slot hard limit at the yellow-move threshold.',
-        );
     });
 
     test('keeps every VDisk item while optional scalar values are absent', () => {
@@ -78,7 +114,7 @@ describe('DiskCapacityInfo builders', () => {
             EMPTY_DATA_PLACEHOLDER,
             EMPTY_DATA_PLACEHOLDER,
             EMPTY_DATA_PLACEHOLDER,
-            EMPTY_DATA_PLACEHOLDER,
+            '1 (implicit)',
         ]);
     });
 
@@ -248,6 +284,17 @@ describe('DiskCapacityInfo builders', () => {
             '0 / 4',
             '2',
         ]);
+    });
+
+    test('keeps missing PDisk metrics empty while using the implicit slot unit default', () => {
+        const items = getPDiskCapacityInfoItems(undefined, {
+            withUsage: true,
+            withCapacityAlert: true,
+        });
+
+        expect(items.find(({id}) => id === 'pdisk-usage')?.value).toBe(EMPTY_DATA_PLACEHOLDER);
+        expect(items.find(({id}) => id === 'slot-size-in-units')?.value).toBe('1 (implicit)');
+        expect(items.find(({id}) => id === 'capacity-alert')?.value).toBe(EMPTY_DATA_PLACEHOLDER);
     });
 
     test('uses the Whiteboard PDisk size instead of the legacy BSC size', () => {

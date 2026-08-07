@@ -1,6 +1,5 @@
 {
   "title_tablet-storage-usage": "Tablet storage usage",
-  "title_storage-details": "Storage Details",
   "title_top-tables-by-size": "Top tables by size",
   "title_top-groups-by-usage": "Top groups by usage",
   "title_top-groups-by-vdisk-slot-usage": "Top groups by VDisk Slot Usage",
@@ -8,6 +7,20 @@
   "context_tablet-storage-description": "Size of user data and indexes stored in schema objects (tables, topics, etc.)",
   "title_database-storage": "Database storage",
   "context_database-storage-description": "Size of data stored in distributed storage with all overheads for redundancy",
+  "title_storage-groups": "Storage Groups",
+  "context_storage-groups-description": "Groups allocated across storage pools",
+  "value_storage-groups-count": [
+    "{{kind}}: {{count}} group",
+    "{{kind}}: {{count}} groups",
+    "{{kind}}: {{count}} groups",
+    "{{kind}}: {{count}} groups"
+  ],
+  "value_storage-groups-total": [
+    "{{count}} storage group",
+    "{{count}} storage groups",
+    "{{count}} storage groups",
+    "{{count}} storage groups"
+  ],
   "title_user-data": "User data",
   "context_user-data-by-type": "Data usage by type",
   "context_user-data-tooltip": "Logical user data volume by object type (row tables, column tables, topics, etc.). Does not include system overhead, replication, or physical storage size.",

@@ -8,7 +8,6 @@ import {getCapacityAlertTheme, normalizeCapacityAlert} from '../../utils/capacit
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {PreparedPDisk, PreparedVDisk} from '../../utils/disks/types';
 import {
-    formatMetricCount,
     formatMetricCountPair,
     formatMetricPercent,
     formatNormalizedMetricPercent,
@@ -18,9 +17,11 @@ import type {InfoViewerItem} from '../InfoViewer';
 import {TitleWithHelpMark} from '../TitleWithHelpmark/TitleWithHelpmark';
 import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
 import {
+    CAPACITY_CONFIGURATION_HELP_TEXT,
     CAPACITY_METRICS_COLUMN_TITLES,
     CAPACITY_METRICS_HELP_TEXT,
 } from '../capacityMetricsColumns/constants';
+import {formatCapacityUnitCount} from '../capacityMetricsColumns/formatters';
 
 import i18n from './i18n';
 
@@ -81,7 +82,8 @@ export function getVDiskCapacityInfoItems(
         {
             id: 'group-size-in-units',
             title: i18n('field_group-size-in-units'),
-            value: formatMetricCount(data?.GroupSizeInUnits),
+            value: formatCapacityUnitCount(data?.GroupSizeInUnits),
+            note: CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits,
         },
         {
             id: 'capacity-alert',
@@ -125,7 +127,8 @@ export function getPDiskCapacityInfoItems(
         {
             id: 'slot-size-in-units',
             title: i18n('field_slot-size-in-units'),
-            value: formatMetricCount(data?.SlotSizeInUnits),
+            value: formatCapacityUnitCount(data?.SlotSizeInUnits),
+            note: CAPACITY_CONFIGURATION_HELP_TEXT.SlotSizeInUnits,
         },
     );
 

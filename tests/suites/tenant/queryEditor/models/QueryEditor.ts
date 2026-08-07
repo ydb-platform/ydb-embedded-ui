@@ -372,6 +372,43 @@ export class QueryEditor {
         });
     }
 
+    async getCurrentStatementUpdateMetricsDuringTextChange() {
+        return this.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            const model = editor?.getModel();
+            if (!editor || !model) {
+                throw new Error('Expected active Monaco editor model');
+            }
+
+            const originalGetValue = editor.getValue.bind(editor);
+            let fullTextReads = 0;
+
+            editor.getValue = (...args: Parameters<typeof originalGetValue>) => {
+                fullTextReads += 1;
+                return originalGetValue(...args);
+            };
+
+            try {
+                const endPosition = model.getPositionAt(model.getValueLength());
+                editor.executeEdits('test', [
+                    {
+                        range: {
+                            startLineNumber: endPosition.lineNumber,
+                            startColumn: endPosition.column,
+                            endLineNumber: endPosition.lineNumber,
+                            endColumn: endPosition.column,
+                        },
+                        text: ' ',
+                    },
+                ]);
+            } finally {
+                editor.getValue = originalGetValue;
+            }
+
+            return {fullTextReads};
+        });
+    }
+
     async getEditorContent(): Promise<string> {
         await this.waitForEditorReady();
         await this.page.waitForFunction(() => Boolean(window.ydbEditor), null, {
