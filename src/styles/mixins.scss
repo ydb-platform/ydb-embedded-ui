@@ -1,5 +1,14 @@
 @forward '@gravity-ui/uikit/styles/mixins.scss';
 
+@mixin danger-heavy-label() {
+    color: var(--g-color-text-brand-contrast);
+    background-color: var(--g-color-base-danger-heavy);
+
+    &:hover {
+        background-color: var(--g-color-base-danger-heavy-hover) !important;
+    }
+}
+
 @mixin container() {
     max-width: 1170px;
     margin: 0 auto;

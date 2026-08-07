@@ -6,6 +6,7 @@ import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {useTenantQueryParams} from '../../useTenantQueryParams';
 import {HealthcheckViewTitles, b} from '../shared';
 import type {countHealthcheckIssuesByCategory} from '../utils';
+import {resolveHealthcheckView} from '../utils';
 
 interface HealthcheckViewProps {
     issuesCount: ReturnType<typeof countHealthcheckIssuesByCategory>;
@@ -28,15 +29,17 @@ export function HealthcheckView({
         [issuesCount, sortOrder],
     );
 
+    const activeView = React.useMemo(
+        () => resolveHealthcheckView(view, issuesCount, sortOrder),
+        [view, issuesCount, sortOrder],
+    );
+
     React.useEffect(() => {
-        if (view && normalizedSortOrder.includes(view as ExtendedSortOrder)) {
+        if (view === activeView) {
             return;
         }
-        const firstIssueTypeWithIssues = normalizedSortOrder.find(
-            (issueType) => issuesCount[issueType] > 0,
-        );
-        handleHealthcheckViewChange(firstIssueTypeWithIssues);
-    }, [view, handleHealthcheckViewChange, issuesCount, normalizedSortOrder]);
+        handleHealthcheckViewChange(activeView);
+    }, [view, activeView, handleHealthcheckViewChange]);
 
     const renderCount = (category: ExtendedSortOrder) => {
         return <Text color="secondary">{issuesCount[category] ?? 0}</Text>;
@@ -54,7 +57,7 @@ export function HealthcheckView({
 
     return (
         <SegmentedRadioGroup
-            value={view ?? normalizedSortOrder[0]}
+            value={activeView ?? normalizedSortOrder[0]}
             onUpdate={(newView) => {
                 handleHealthcheckViewChange(newView);
                 handleIssuesFilterChange('');
