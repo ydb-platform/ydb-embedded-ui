@@ -9,7 +9,6 @@ import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/Re
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
-import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {
     selectSavedQueriesFilter,
     setSavedQueriesFilter,
@@ -17,7 +16,6 @@ import {
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {useOpenExternalQueryInEditor} from '../hooks/useOpenExternalQueryInEditor';
 import i18n from '../i18n';
@@ -64,7 +62,6 @@ export const SavedQueries = () => {
     const {filteredSavedQueries, deleteSavedQuery} = useSavedQueries();
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
-    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
     const openExternalQueryInEditor = useOpenExternalQueryInEditor();
 
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = React.useState(false);
@@ -85,7 +82,7 @@ export const SavedQueries = () => {
         setQueryNameToDelete('');
     };
 
-    const applyQueryClick = React.useCallback(
+    const onQueryClick = React.useCallback(
         ({queryText, queryName}: {queryText: string; queryName: string}) => {
             openExternalQueryInEditor({
                 title: queryName,
@@ -95,8 +92,6 @@ export const SavedQueries = () => {
         },
         [openExternalQueryInEditor],
     );
-
-    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick, isMultiTabEnabled);
 
     const onDeleteQueryClick = (queryName: string) => {
         return (event: React.MouseEvent) => {

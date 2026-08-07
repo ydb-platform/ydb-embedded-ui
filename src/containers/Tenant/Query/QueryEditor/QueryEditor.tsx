@@ -508,7 +508,7 @@ export default function QueryEditor({
                     }
                 });
 
-            queryExecutionManagerInstance.registerQuery(tabId, query);
+            queryExecutionManagerInstance.registerQuery(tabId, query, database);
         },
     );
 
@@ -575,7 +575,7 @@ export default function QueryEditor({
                     }
                 });
 
-            queryExecutionManagerInstance.registerQuery(tabId, query);
+            queryExecutionManagerInstance.registerQuery(tabId, query, database);
         } else {
             runNonStreamingQueryAction({
                 execution: queryExecution,
@@ -632,7 +632,7 @@ export default function QueryEditor({
                 base64: encodeTextWithBase64,
             });
 
-            queryExecutionManagerInstance.registerQuery(tabId, query);
+            queryExecutionManagerInstance.registerQuery(tabId, query, database);
         },
     );
 

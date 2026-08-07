@@ -30,12 +30,17 @@ export const getUrlData = ({
     if (!singleClusterMode) {
         // Multi-cluster version
         // Cluster and backend are determined by url params
-        // Extract environment from the first path segment if it's in allowedEnvironments list
+        // Extract environment from the first full path segment or the first route segment after basename
+        // if it's in allowedEnvironments list
         // e.g., /cloud-preprod/api/meta3/proxy/cluster/pre-prod_global/monitoring/cluster -> environment: 'cloud-preprod'
+        // e.g., /monitoring/cloud-prod/cluster -> environment: 'cloud-prod'
         // e.g., /cloud-prod/cluster -> environment: 'cloud-prod'
         // Environment is only extracted if allowedEnvironments list is provided
-        const firstSegment = window.location.pathname.split('/').filter(Boolean)[0];
-        const environment = allowedEnvironments?.includes(firstSegment) ? firstSegment : undefined;
+        const pathSegments = window.location.pathname.split('/').filter(Boolean);
+        const basenameSegmentsCount = basename.split('/').filter(Boolean).length;
+        const environment = [pathSegments[0], pathSegments[basenameSegmentsCount]].find(
+            (segment) => segment && allowedEnvironments?.includes(segment),
+        );
 
         return {
             basename,
