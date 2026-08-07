@@ -63,12 +63,12 @@ export function MetricTabCard({
     return (
         <Card className={b({active})} type="container" view={active ? 'outlined' : 'filled'}>
             <Flex direction="column" gap={0.5}>
-                <Flex alignItems="center" gap={1}>
+                <Flex alignItems="baseline" gap={1}>
                     <Text variant="subheader-2" data-qa="tenant-metric-tab-title">
                         {title}
                     </Text>
                     <Flex alignItems="center" gap={1}>
-                        <Text variant="body-1" color="secondary" data-qa="tenant-metric-tab-value">
+                        <Text variant="body-2" color="secondary" data-qa="tenant-metric-tab-value">
                             {value}
                         </Text>
                         {statusHelpMark}
