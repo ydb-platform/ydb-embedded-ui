@@ -1,14 +1,14 @@
 .ydb-pool-bar {
     position: relative;
 
-    width: 6px;
-    height: 20px;
-    margin-right: 2px;
+    width: 8px;
+    height: 24px;
+    margin-right: var(--g-spacing-1);
 
     cursor: pointer;
 
     border: 1px solid;
-    border-radius: 1px;
+    border-radius: var(--g-border-radius-xs);
 
     &__popup-content {
         width: 170px;
@@ -20,13 +20,13 @@
     }
 
     &_type_normal {
-        border-color: var(--ydb-color-status-green);
+        border-color: var(--g-color-base-positive-heavy);
     }
     &_type_warning {
-        border-color: var(--ydb-color-status-yellow);
+        border-color: var(--g-color-base-warning-heavy);
     }
     &_type_danger {
-        border-color: var(--ydb-color-status-red);
+        border-color: var(--g-color-base-danger-heavy);
     }
 
     &__value {
@@ -37,13 +37,13 @@
         min-height: 1px;
 
         &_type_normal {
-            background-color: var(--ydb-color-status-green);
+            background-color: var(--g-color-base-positive-medium);
         }
         &_type_warning {
-            background-color: var(--ydb-color-status-yellow);
+            background-color: var(--g-color-base-warning-medium);
         }
         &_type_danger {
-            background-color: var(--ydb-color-status-red);
+            background-color: var(--g-color-base-danger-medium);
         }
     }
 }

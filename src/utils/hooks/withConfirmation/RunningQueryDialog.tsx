@@ -3,6 +3,8 @@ import React from 'react';
 import NiceModal from '@ebay/nice-modal-react';
 import {Dialog} from '@gravity-ui/uikit';
 
+import {BRAND_BUTTON_CLASS} from '../../constants';
+
 import i18n from './i18n';
 
 export const RUNNING_QUERY_DIALOG = 'running-query-dialog';
@@ -20,7 +22,7 @@ function RunningQueryDialog({open, onStopAndClose, onCancel}: RunningQueryDialog
             <Dialog.Body>{i18n('context_query-will-be-stopped')}</Dialog.Body>
             <Dialog.Footer
                 textButtonApply={i18n('action_stop-and-close')}
-                propsButtonApply={{view: 'action'}}
+                propsButtonApply={{view: 'action', className: BRAND_BUTTON_CLASS}}
                 onClickButtonApply={onStopAndClose}
                 textButtonCancel={i18n('action_cancel')}
                 onClickButtonCancel={onCancel}

@@ -4,6 +4,7 @@ import {ActionTooltip, Button, Icon} from '@gravity-ui/uikit';
 
 import QuerySettingsDescription from '../../../../components/QuerySettingsDescription/QuerySettingsDescription';
 import {cn} from '../../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import i18n from '../i18n';
 
@@ -12,7 +13,7 @@ import './EditorButton.scss';
 const b = cn('ydb-query-editor-button');
 
 const Run = (props: ButtonProps) => (
-    <Button {...props} className={b('run-button')}>
+    <Button {...props} className={b('run-button', undefined, BRAND_BUTTON_CLASS)}>
         <Icon data={PlayFill} size={16} />
         {i18n('action.run')}
     </Button>
@@ -37,7 +38,7 @@ const Stop = ({error, replacedAction, ...props}: StopButtonProps) => (
 );
 
 const Explain = (props: ButtonProps) => (
-    <Button {...props} className={b('explain-button')}>
+    <Button {...props} className={b('explain-button', undefined, BRAND_BUTTON_CLASS)}>
         {i18n('action.explain')}
     </Button>
 );
@@ -49,7 +50,7 @@ const ExplainAnalyze = (props: ButtonProps) => (
         openDelay={0}
         placement={['top-start']}
     >
-        <Button {...props} className={b('explain-analyze-button')}>
+        <Button {...props} className={b('explain-analyze-button', undefined, BRAND_BUTTON_CLASS)}>
             {i18n('action.explain-analyze')}
         </Button>
     </ActionTooltip>

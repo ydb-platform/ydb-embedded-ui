@@ -27,6 +27,7 @@ import {selectTopicFormValues, topicApi} from '../../../store/reducers/topic/top
 import type {TopicFormValues} from '../../../store/reducers/topic/utils';
 import {AutoPartitioningStrategy} from '../../../store/reducers/topic/utils';
 import {cn} from '../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../utils/constants';
 import createToast from '../../../utils/createToast';
 import {prepareCommonErrorMessage} from '../../../utils/errors';
 import {useTypedSelector} from '../../../utils/hooks';
@@ -773,7 +774,11 @@ function TopicForm({
                 textButtonCancel={i18n('action_cancel')}
                 onClickButtonCancel={onClose}
                 loading={isSubmitting}
-                propsButtonApply={{type: 'submit', view: 'action'}}
+                propsButtonApply={{
+                    type: 'submit',
+                    view: 'action',
+                    className: BRAND_BUTTON_CLASS,
+                }}
             />
         </form>
     );

@@ -7,6 +7,7 @@ import {useTypedSelector} from '..';
 import {SaveQueryButton} from '../../../containers/Tenant/Query/SaveQuery/SaveQuery';
 import {selectUserInput} from '../../../store/reducers/query/query';
 import {cn} from '../../cn';
+import {BRAND_BUTTON_CLASS} from '../../constants';
 
 import i18n from './i18n';
 
@@ -33,7 +34,12 @@ function SaveQueryButtonInDialog({onSuccess, onCancel}: SaveQueryButtonInDialogP
     );
 
     return (
-        <SaveQueryButton view="action" size="l" dialogProps={dialogProps}>
+        <SaveQueryButton
+            view="action"
+            size="l"
+            className={BRAND_BUTTON_CLASS}
+            dialogProps={dialogProps}
+        >
             {i18n('action_save-changes')}
         </SaveQueryButton>
     );

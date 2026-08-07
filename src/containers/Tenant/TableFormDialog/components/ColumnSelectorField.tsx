@@ -4,6 +4,7 @@ import {ChevronDown, Xmark} from '@gravity-ui/icons';
 import {Button, Icon, Label, List, Popup} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import i18n from '../i18n';
 import type {Column} from '../types';
 
@@ -235,7 +236,7 @@ export function ColumnSelectorField({
                     <Button view="flat" onClick={handleCancel}>
                         {i18n('action_cancel')}
                     </Button>
-                    <Button view="action" onClick={handleApply}>
+                    <Button view="action" className={BRAND_BUTTON_CLASS} onClick={handleApply}>
                         {i18n('action_apply')}
                     </Button>
                 </div>

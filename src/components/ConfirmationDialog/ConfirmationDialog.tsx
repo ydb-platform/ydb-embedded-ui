@@ -52,6 +52,7 @@ function ConfirmationDialog({
     className,
     disableOutsideClick = true,
     renderButtons,
+    propsButtonApply,
     open,
     confirmOnEnter,
 }: ConfirmationDialogProps) {
@@ -68,7 +69,7 @@ function ConfirmationDialog({
             <Dialog.Body>{children ?? body ?? message}</Dialog.Body>
             <Dialog.Footer
                 onClickButtonApply={onConfirm}
-                propsButtonApply={{view: buttonApplyView}}
+                propsButtonApply={{...propsButtonApply, view: buttonApplyView}}
                 textButtonApply={textButtonApply}
                 textButtonCancel={textButtonCancel ?? confirmationDialogKeyset('action_cancel')}
                 onClickButtonCancel={onClose}
