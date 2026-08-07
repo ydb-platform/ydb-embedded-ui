@@ -40,6 +40,8 @@ const routeCases: Array<[string, string, string, string?, string?]> = [
     ['extension route', `/cloud-prod/custom?${databaseParam}`, '/cloud-prod/database', 'extension', undefined],
     ['legacy name normalization', '/database?name=%2FRoot%2Fdb&databasePage=diagnostics', '/database', undefined, `/database?${databaseParam}&databasePage=diagnostics`],
     ['legacy tenant page normalization', `/database?${databaseParam}&tenantPage=diagnostics`, '/database', undefined, `/database?${databaseParam}&databasePage=diagnostics`],
+    ['missing page fallback normalization', `/database?${databaseParam}`, '/database', undefined, `/database?${databaseParam}&databasePage=diagnostics`],
+    ['invalid page fallback normalization', `/database?${databaseParam}&databasePage=invalid`, '/database', undefined, `/database?${databaseParam}&databasePage=diagnostics`],
 ];
 type TestStore = ReturnType<typeof configureStore>['store'];
 // prettier-ignore

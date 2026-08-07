@@ -10,6 +10,8 @@ import {
     selectResult,
     selectUserInput,
 } from '../../../../store/reducers/query/query';
+import {TENANT_PAGE} from '../../../../store/reducers/tenant/constants';
+import {tenantPageSchema} from '../../../../store/reducers/tenant/types';
 import createToast from '../../../../utils/createToast';
 import {useTypedSelector} from '../../../../utils/hooks';
 import {getRunningQueryConfirmation} from '../../../../utils/hooks/withConfirmation/RunningQueryDialog';
@@ -81,7 +83,10 @@ function isSameExecution(
     );
 }
 
-function isLegacyQueryNormalization(previousLocation: QueryLocation, nextLocation: QueryLocation) {
+function isEquivalentQueryNormalization(
+    previousLocation: QueryLocation,
+    nextLocation: QueryLocation,
+) {
     if (
         previousLocation.pathname !== nextLocation.pathname ||
         previousLocation.hash !== nextLocation.hash
@@ -108,7 +113,14 @@ function isLegacyQueryNormalization(previousLocation: QueryLocation, nextLocatio
         }
     }
 
-    if (!normalizesDatabase && !normalizesTenantPage) {
+    const previousTenantPage = tenantPageSchema.safeParse(previousParams.get(TENANT_PAGE));
+    const nextTenantPage = tenantPageSchema.safeParse(nextParams.get(TENANT_PAGE));
+    const normalizesFallbackTenantPage = !previousTenantPage.success && nextTenantPage.success;
+    if (normalizesFallbackTenantPage) {
+        previousParams.set(TENANT_PAGE, nextTenantPage.data);
+    }
+
+    if (!normalizesDatabase && !normalizesTenantPage && !normalizesFallbackTenantPage) {
         return false;
     }
 
@@ -130,7 +142,7 @@ export function useExternalQueryRequestRegistration(history: History) {
             latestLocation.current = nextLocation;
             if (
                 action !== 'REPLACE' ||
-                !isLegacyQueryNormalization(previousLocation, nextLocation)
+                !isEquivalentQueryNormalization(previousLocation, nextLocation)
             ) {
                 requestCoordinator.requestEpoch += 1;
             }
