@@ -1,10 +1,10 @@
 import {
-    CircleCheckFill,
-    CircleExclamationFill,
-    CircleInfoFill,
-    CircleQuestionFill,
-    CircleXmarkFill,
-    TriangleExclamationFill,
+    ArrowsRotateRight,
+    CircleCheck,
+    CircleXmark,
+    Flame,
+    Ghost,
+    TriangleExclamation,
 } from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
 
@@ -16,12 +16,12 @@ import './StatusIcon.scss';
 const b = cn('ydb-status-icon');
 
 const icons = {
-    [EFlag.Grey]: CircleQuestionFill,
-    [EFlag.Green]: CircleCheckFill,
-    [EFlag.Blue]: CircleInfoFill,
-    [EFlag.Yellow]: TriangleExclamationFill,
-    [EFlag.Orange]: CircleExclamationFill,
-    [EFlag.Red]: CircleXmarkFill,
+    [EFlag.Grey]: Ghost,
+    [EFlag.Green]: CircleCheck,
+    [EFlag.Blue]: ArrowsRotateRight,
+    [EFlag.Yellow]: TriangleExclamation,
+    [EFlag.Orange]: Flame,
+    [EFlag.Red]: CircleXmark,
 };
 
 export type StatusIconMode = 'color' | 'icons';
