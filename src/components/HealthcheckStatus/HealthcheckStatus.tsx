@@ -1,69 +1,31 @@
-import {
-    CircleCheck,
-    CircleExclamation,
-    CircleInfo,
-    PlugConnection,
-    TriangleExclamation,
-} from '@gravity-ui/icons';
 import type {LabelProps} from '@gravity-ui/uikit';
 import {Icon, Label} from '@gravity-ui/uikit';
 
-import {SelfCheckResult} from '../../types/api/healthcheck';
+import type {SelfCheckResult} from '../../types/api/healthcheck';
+import {cn} from '../../utils/cn';
 
-import i18n from './i18n';
+import {SELF_CHECK_RESULT_CONFIG} from './config';
 
-const SelfCheckResultToLabelTheme: Record<SelfCheckResult, LabelProps['theme']> = {
-    [SelfCheckResult.GOOD]: 'success',
-    [SelfCheckResult.DEGRADED]: 'warning',
-    [SelfCheckResult.MAINTENANCE_REQUIRED]: 'danger',
-    [SelfCheckResult.EMERGENCY]: 'danger',
-    [SelfCheckResult.UNSPECIFIED]: 'normal',
-};
+import './HealthcheckStatus.scss';
 
-const SelfCheckResultToIcon: Record<
-    SelfCheckResult,
-    (props: React.SVGProps<SVGSVGElement>) => React.JSX.Element
-> = {
-    [SelfCheckResult.GOOD]: CircleCheck,
-    [SelfCheckResult.DEGRADED]: CircleInfo,
-    [SelfCheckResult.MAINTENANCE_REQUIRED]: TriangleExclamation,
-    [SelfCheckResult.EMERGENCY]: CircleExclamation,
-    [SelfCheckResult.UNSPECIFIED]: PlugConnection,
-};
-
-const SelfCheckResultToText: Record<SelfCheckResult, string> = {
-    get [SelfCheckResult.GOOD]() {
-        return i18n('title_good');
-    },
-    get [SelfCheckResult.DEGRADED]() {
-        return i18n('title_degraded');
-    },
-    get [SelfCheckResult.MAINTENANCE_REQUIRED]() {
-        return i18n('title_maintenance');
-    },
-    get [SelfCheckResult.EMERGENCY]() {
-        return i18n('title_emergency');
-    },
-    get [SelfCheckResult.UNSPECIFIED]() {
-        return i18n('title_unspecified');
-    },
-};
+const b = cn('ydb-healthcheck-status');
 
 interface HealthcheckStatusProps {
     status: SelfCheckResult;
     size?: LabelProps['size'];
 }
 
-export function HealthcheckStatus({status, size = 'm'}: HealthcheckStatusProps) {
-    const theme = SelfCheckResultToLabelTheme[status];
+export function HealthcheckStatus({status, size = 's'}: HealthcheckStatusProps) {
+    const config = SELF_CHECK_RESULT_CONFIG[status];
 
     return (
         <Label
-            theme={theme}
-            icon={<Icon size={14} data={SelfCheckResultToIcon[status]} />}
+            theme={config.labelTheme}
+            icon={<Icon size={14} data={config.icon} />}
             size={size}
+            className={b({emergency: config.emergency})}
         >
-            {SelfCheckResultToText[status]}
+            {config.title}
         </Label>
     );
 }

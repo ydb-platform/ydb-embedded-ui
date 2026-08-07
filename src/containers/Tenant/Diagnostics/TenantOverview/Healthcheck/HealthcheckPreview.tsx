@@ -1,13 +1,13 @@
 import {ChevronRight} from '@gravity-ui/icons';
-import type {AlertProps} from '@gravity-ui/uikit';
-import {Alert, Button, Flex, Icon, Label, Skeleton} from '@gravity-ui/uikit';
+import {ActionTooltip, Alert, Button, Flex, Icon, Label, Skeleton} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
+import {SELF_CHECK_RESULT_CONFIG} from '../../../../../components/HealthcheckStatus/config';
 import {healthcheckApi} from '../../../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import {cn} from '../../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
-import {HEALTHCHECK_RESULT_TO_ICON, HEALTHCHECK_RESULT_TO_TEXT} from '../../../constants';
+import {HEALTHCHECK_RESULT_TO_TEXT} from '../../../constants';
 import {useTenantQueryParams} from '../../../useTenantQueryParams';
 
 import i18n from './i18n';
@@ -20,14 +20,6 @@ interface HealthcheckPreviewProps {
     database: string;
     compact?: boolean;
 }
-
-const checkResultToAlertTheme: Record<SelfCheckResult, AlertProps['theme']> = {
-    [SelfCheckResult.UNSPECIFIED]: 'normal',
-    [SelfCheckResult.GOOD]: 'success',
-    [SelfCheckResult.DEGRADED]: 'info',
-    [SelfCheckResult.MAINTENANCE_REQUIRED]: 'warning',
-    [SelfCheckResult.EMERGENCY]: 'danger',
-};
 
 export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     const {database} = props;
@@ -49,6 +41,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     const loading = isFetching && data === undefined;
 
     const selfCheckResult: SelfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
+    const statusConfig = SELF_CHECK_RESULT_CONFIG[selfCheckResult];
 
     const modifier = selfCheckResult.toLowerCase();
 
@@ -69,29 +62,28 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
             return null;
         }
 
-        const rawStatus =
-            selfCheckResult.charAt(0).toUpperCase() + selfCheckResult.slice(1).toLowerCase();
-        const preparedStatus = rawStatus.replaceAll('_', ' ');
-
         return (
-            <Label
-                theme={checkResultToAlertTheme[selfCheckResult]}
-                icon={
-                    <Icon
-                        size={12}
-                        data={HEALTHCHECK_RESULT_TO_ICON[selfCheckResult]}
-                        className={b('icon', {[modifier]: true})}
-                    />
-                }
-                onClick={() => {
-                    handleShowHealthcheckChange(true);
-                }}
-            >
-                <Flex alignItems={'center'} gap={1}>
-                    {preparedStatus}: {i18n('issues-count', {count: issuesCount})}
-                    <Icon data={ChevronRight} size={12} />
-                </Flex>
-            </Label>
+            <ActionTooltip title={HEALTHCHECK_RESULT_TO_TEXT[selfCheckResult]}>
+                <Label
+                    className={b('compact-status', {emergency: statusConfig.emergency})}
+                    theme={statusConfig.labelTheme}
+                    icon={
+                        <Icon
+                            size={12}
+                            data={statusConfig.icon}
+                            className={b('icon', {[modifier]: true})}
+                        />
+                    }
+                    onClick={() => {
+                        handleShowHealthcheckChange(true);
+                    }}
+                >
+                    <Flex alignItems={'center'} gap={1}>
+                        {statusConfig.title}: {i18n('issues-count', {count: issuesCount})}
+                        <Icon data={ChevronRight} size={12} />
+                    </Flex>
+                </Label>
+            </ActionTooltip>
         );
     }
 
@@ -126,13 +118,13 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     return (
         <Alert
             className={b()}
-            theme={checkResultToAlertTheme[selfCheckResult]}
+            theme={statusConfig.alertTheme}
             view={error ? 'outlined' : 'filled'}
             message={renderAlertMessage()}
             icon={
                 <Icon
                     size={18}
-                    data={HEALTHCHECK_RESULT_TO_ICON[selfCheckResult]}
+                    data={statusConfig.icon}
                     className={b('icon', {[modifier]: true})}
                 />
             }

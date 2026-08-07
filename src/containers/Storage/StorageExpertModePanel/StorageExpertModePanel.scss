@@ -1,4 +1,5 @@
 @use './components/SpaceLegend.scss';
+@use '../../../styles/mixins';
 
 $block: '.ydb-storage-expert-mode-panel';
 
@@ -15,8 +16,7 @@ $block: '.ydb-storage-expert-mode-panel';
     }
 
     &__label-danger-heavy {
-        color: var(--g-color-text-brand-contrast);
-        background-color: var(--g-color-base-danger-heavy);
+        @include mixins.danger-heavy-label();
     }
 
     &__capacity-alert-option {

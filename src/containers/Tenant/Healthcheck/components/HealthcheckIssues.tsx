@@ -4,9 +4,11 @@ import {Flex} from '@gravity-ui/uikit';
 
 import {EmptyState} from '../../../../components/EmptyState';
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {getIllustration} from '../../../../utils/illustrations';
 import {useTenantQueryParams} from '../../useTenantQueryParams';
 import i18n from '../i18n';
+import {countHealthcheckIssuesByCategory, resolveHealthcheckView} from '../utils';
 
 import {HealthcheckIssue} from './HealthcheckIssue';
 
@@ -18,6 +20,15 @@ export function Issues({issues}: IssuesProps) {
     const SuccessImage = getIllustration('SuccessOperation');
 
     const {view, issuesFilter} = useTenantQueryParams();
+
+    const activeView = React.useMemo(() => {
+        const issuesCount = countHealthcheckIssuesByCategory(issues);
+        return resolveHealthcheckView(
+            view,
+            issuesCount,
+            uiFactory.healthcheck.getHealthcheckViewsOrder(),
+        );
+    }, [issues, view]);
 
     const filteredIssues = React.useMemo(() => {
         const normalizedFilter = issuesFilter?.toLowerCase().trim();
@@ -39,8 +50,9 @@ export function Issues({issues}: IssuesProps) {
     }, [issues, issuesFilter]);
 
     const filteredIssuesCurrentView = React.useMemo(
-        () => (view ? filteredIssues.filter((issue) => issue.categoryForUI === view) : []),
-        [filteredIssues, view],
+        () =>
+            activeView ? filteredIssues.filter((issue) => issue.categoryForUI === activeView) : [],
+        [activeView, filteredIssues],
     );
 
     if (filteredIssuesCurrentView.length === 0) {

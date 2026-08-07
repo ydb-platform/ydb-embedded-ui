@@ -1,14 +1,11 @@
+@use '../../styles/mixins';
+
 .ydb-entity-status-new {
     &__note {
         color: inherit;
     }
 
-    &_orange.g-label {
-        color: var(--g-color-private-orange-500);
-        background-color: var(--g-color-private-orange-100);
-    }
-
-    &_clickable.g-label {
-        cursor: pointer;
+    &_critical {
+        @include mixins.danger-heavy-label();
     }
 }
