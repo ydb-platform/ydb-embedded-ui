@@ -370,6 +370,7 @@ test.describe('VDisk page storage tab', () => {
     });
 
     test('renders storage table in VDisk context', async ({page}) => {
+        await enableStorageDisksColumn(page);
         await setupVDiskPageMocks(page);
         await page.goto(VDISK_PAGE_PATH);
 
@@ -401,6 +402,20 @@ test.describe('VDisk page storage tab', () => {
 
         await expect(activeDisks).toHaveCount(1);
         await expect(inactiveDisks).toHaveCount(2);
+
+        const pDisksColumn = page
+            .locator('.ydb-paginated-table__row')
+            .first()
+            .locator('.ydb-storage-disks__pdisks-wrapper');
+        const activePDisks = pDisksColumn.locator(
+            '.ydb-storage-disks__pdisk-progress-bar:not(.storage-disk-progress-bar_inactive)',
+        );
+        const inactivePDisks = pDisksColumn.locator(
+            '.ydb-storage-disks__pdisk-progress-bar.storage-disk-progress-bar_inactive',
+        );
+
+        await expect(activePDisks).toHaveCount(2);
+        await expect(inactivePDisks).toHaveCount(1);
     });
 
     test('expands vDisk stack on hover', async ({page}) => {
