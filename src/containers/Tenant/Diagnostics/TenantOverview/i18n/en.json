@@ -18,7 +18,7 @@
   "context_storage-serverless-tab-description": "Top Tables By Size",
   "context_memory-tab-description": "Total consumed by DB processes",
   "context_network-tab-description": "Average outgoing bandwidth",
-  "context_cpu-status-normal": "CPU load is within normal limits across all actor system pools",
+  "context_cpu-status-normal": "CPU load is within normal limits across all actor system pools except IO",
   "context_cpu-status-warning": "CPU usage has exceeded the warning threshold. High load across actor system pools may affect performance.",
   "context_cpu-status-critical": "CPU usage has exceeded the critical threshold. System performance is at risk due to high load across actor system pools.",
   "context_storage-status-normal": "Storage usage is within normal limits (total usage including user data)",
