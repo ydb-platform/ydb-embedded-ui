@@ -4,6 +4,7 @@ import {cn} from '../../../utils/cn';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import {PDisk} from '../PDisk/';
 import type {StorageViewContext} from '../types';
+import {isPdiskActive} from '../utils';
 
 import './PDisks.scss';
 
@@ -36,6 +37,7 @@ export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDis
                     <div className={b('pdisks-item')} key={id}>
                         <PDisk
                             data={pDisk}
+                            inactive={!isPdiskActive(pDisk, viewContext)}
                             vDisks={relatedVDisks}
                             viewContext={viewContext}
                             width={pDiskWidth}

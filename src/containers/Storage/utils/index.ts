@@ -5,7 +5,7 @@ import {isNil} from 'lodash';
 import {selectNodesMap} from '../../../store/reducers/nodesList';
 import type {PreparedStorageGroup} from '../../../store/reducers/storage/types';
 import type {Erasure} from '../../../types/api/storage';
-import type {PreparedVDisk} from '../../../utils/disks/types';
+import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
 import {useTypedSelector} from '../../../utils/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
@@ -48,6 +48,26 @@ export function isVdiskActive(vDisk: PreparedVDisk, viewContext?: StorageViewCon
     }
 
     return isActive;
+}
+
+export function isPdiskActive(pDisk: PreparedPDisk, viewContext?: StorageViewContext) {
+    if (
+        !isNil(pDisk.NodeId) &&
+        viewContext?.nodeId &&
+        String(pDisk.NodeId) !== viewContext.nodeId
+    ) {
+        return false;
+    }
+
+    if (
+        !isNil(pDisk.PDiskId) &&
+        viewContext?.pDiskId &&
+        String(pDisk.PDiskId) !== viewContext.pDiskId
+    ) {
+        return false;
+    }
+
+    return true;
 }
 
 const DEFAULT_ENTITIES_COUNT = 10;

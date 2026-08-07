@@ -32,6 +32,7 @@ interface PDiskProps {
     delayOpen?: number;
     delayClose?: number;
     withIcon?: boolean;
+    inactive?: boolean;
     highlighted?: boolean;
     highlightedDisk?: string;
     setHighlightedDisk?: (id?: string) => void;
@@ -50,6 +51,7 @@ export const PDisk = ({
     delayOpen = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     delayClose = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     withIcon,
+    inactive,
     highlighted,
     highlightedDisk,
     setHighlightedDisk,
@@ -123,6 +125,7 @@ export const PDisk = ({
                         diskAllocatedPercent={data.AllocatedPercent}
                         severity={data.Severity}
                         className={progressBarClassName}
+                        inactive={inactive}
                         highlighted={highlighted}
                         noDataPlaceholder={i18n('no-data')}
                     />
