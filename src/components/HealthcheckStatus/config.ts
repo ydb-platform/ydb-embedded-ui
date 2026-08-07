@@ -11,7 +11,6 @@ interface SelfCheckResultConfig {
     icon: IconData;
     labelTheme: NonNullable<LabelProps['theme']>;
     title: string;
-    tooltip: string;
 }
 
 export const SELF_CHECK_RESULT_CONFIG: Record<SelfCheckResult, SelfCheckResultConfig> = {
@@ -23,9 +22,6 @@ export const SELF_CHECK_RESULT_CONFIG: Record<SelfCheckResult, SelfCheckResultCo
         get title() {
             return i18n('title_unspecified');
         },
-        get tooltip() {
-            return i18n('context_unspecified');
-        },
     },
     [SelfCheckResult.GOOD]: {
         alertTheme: 'success',
@@ -34,9 +30,6 @@ export const SELF_CHECK_RESULT_CONFIG: Record<SelfCheckResult, SelfCheckResultCo
         labelTheme: 'success',
         get title() {
             return i18n('title_good');
-        },
-        get tooltip() {
-            return i18n('context_good');
         },
     },
     [SelfCheckResult.DEGRADED]: {
@@ -47,9 +40,6 @@ export const SELF_CHECK_RESULT_CONFIG: Record<SelfCheckResult, SelfCheckResultCo
         get title() {
             return i18n('title_degraded');
         },
-        get tooltip() {
-            return i18n('context_degraded');
-        },
     },
     [SelfCheckResult.MAINTENANCE_REQUIRED]: {
         alertTheme: 'danger',
@@ -59,9 +49,6 @@ export const SELF_CHECK_RESULT_CONFIG: Record<SelfCheckResult, SelfCheckResultCo
         get title() {
             return i18n('title_maintenance');
         },
-        get tooltip() {
-            return i18n('context_maintenance');
-        },
     },
     [SelfCheckResult.EMERGENCY]: {
         alertTheme: 'danger',
@@ -70,9 +57,6 @@ export const SELF_CHECK_RESULT_CONFIG: Record<SelfCheckResult, SelfCheckResultCo
         labelTheme: 'danger',
         get title() {
             return i18n('title_emergency');
-        },
-        get tooltip() {
-            return i18n('context_emergency');
         },
     },
 };
