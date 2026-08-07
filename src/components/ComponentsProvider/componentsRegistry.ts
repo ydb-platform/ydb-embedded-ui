@@ -21,8 +21,8 @@ const componentsRegistryInner = new Registry()
     .register('AsideNavigation', AsideNavigation)
     .register('ErrorBoundary', ErrorBoundaryInner)
     .register('ShardsTable', ShardsTable)
-    .register('ChatPanel', EmptyChatPanel)
-    .register('HealthcheckAssistantAction', EmptyHealthcheckAssistantAction);
+    .registerPlaceholder('ChatPanel', EmptyChatPanel)
+    .registerPlaceholder('HealthcheckAssistantAction', EmptyHealthcheckAssistantAction);
 
 export type ComponentsRegistry = ComponentsRegistryTemplate<typeof componentsRegistryInner>;
 
