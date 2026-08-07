@@ -30,7 +30,11 @@ import {State} from '../../types/api/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {
+    BRAND_BUTTON_CLASS,
+    DEFAULT_TABLE_SETTINGS,
+    EMPTY_DATA_PLACEHOLDER,
+} from '../../utils/constants';
 import {
     formatCPU,
     formatNumber,
@@ -168,7 +172,7 @@ export const TenantsTable = ({
             return (
                 <Button
                     view="action"
-                    className="brand-button"
+                    className={BRAND_BUTTON_CLASS}
                     onClick={() => uiFactory.onCreateDB?.({clusterName, domainRoot})}
                 >
                     <Icon data={CirclePlus} />

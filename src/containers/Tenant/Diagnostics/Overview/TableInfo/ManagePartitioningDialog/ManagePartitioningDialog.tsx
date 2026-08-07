@@ -8,6 +8,7 @@ import {Controller} from 'react-hook-form';
 import {Loader} from '../../../../../../components/Loader';
 import {configsApi} from '../../../../../../store/reducers/configs';
 import {cn} from '../../../../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../../../../utils/constants';
 import {formatNumber} from '../../../../../../utils/dataFormatters/dataFormatters';
 import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
 
@@ -231,7 +232,7 @@ function ManagePartitioningDialogForm({
                 renderButtons={renderButtons}
                 propsButtonApply={{
                     type: 'submit',
-                    className: 'brand-button',
+                    className: BRAND_BUTTON_CLASS,
                     disabled: isSubmitting || !isValid,
                 }}
             />
@@ -280,7 +281,7 @@ function ManagePartitioningDialog({
                         propsButtonApply={{
                             // The form is not mounted yet (waiting for the config-derived limit),
                             // so Apply stays disabled until the real form takes over.
-                            className: 'brand-button',
+                            className: BRAND_BUTTON_CLASS,
                             disabled: true,
                         }}
                     />

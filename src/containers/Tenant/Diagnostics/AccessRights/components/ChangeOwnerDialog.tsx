@@ -4,6 +4,7 @@ import NiceModal from '@ebay/nice-modal-react';
 import {Dialog, Text, TextInput} from '@gravity-ui/uikit';
 
 import {schemaAclApi} from '../../../../../store/reducers/schemaAcl/schemaAcl';
+import {BRAND_BUTTON_CLASS} from '../../../../../utils/constants';
 import createToast from '../../../../../utils/createToast';
 import {useAclSyntax} from '../../../../../utils/hooks';
 import {prepareErrorMessage} from '../../../../../utils/prepareErrorMessage';
@@ -140,7 +141,7 @@ function ChangeOwnerDialog({
                 onClickButtonCancel={onClose}
                 propsButtonApply={{
                     loading: updateOwnerResponse.isLoading,
-                    className: 'brand-button',
+                    className: BRAND_BUTTON_CLASS,
                     disabled: !newOwner.length,
                 }}
             />

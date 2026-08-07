@@ -7,6 +7,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {cn} from '../../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import i18n from '../../i18n';
 import {transformPath} from '../transformPath';
 
@@ -149,7 +150,7 @@ export function CreateDirectoryDialog({
                     textButtonApply={i18n('schema.tree.dialog.buttonApply')}
                     textButtonCancel={i18n('schema.tree.dialog.buttonCancel')}
                     onClickButtonCancel={handleClose}
-                    propsButtonApply={{type: 'submit', className: 'brand-button'}}
+                    propsButtonApply={{type: 'submit', className: BRAND_BUTTON_CLASS}}
                 />
             </form>
         </Dialog>

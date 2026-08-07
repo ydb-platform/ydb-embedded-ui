@@ -12,7 +12,7 @@ import {EFlag} from '../../types/api/enums';
 import type {TVDiskID} from '../../types/api/vdisk';
 import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
-import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatDurationSeconds, parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculateVDiskSeverity';
@@ -382,7 +382,7 @@ const buildVDiskFooter = (
                             href={vDiskPagePath}
                             view="action"
                             size="m"
-                            className="brand-button"
+                            className={BRAND_BUTTON_CLASS}
                         >
                             {vDiskPopupKeyset('action_go-to-vdisk')}
                         </InternalLinkButton>

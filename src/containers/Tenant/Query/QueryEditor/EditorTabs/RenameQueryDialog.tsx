@@ -4,6 +4,7 @@ import NiceModal from '@ebay/nice-modal-react';
 import {Dialog, TextInput} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../../../utils/constants';
 import i18n from '../../i18n';
 import {getQueryNameValidationError} from '../../utils/QueryNameValidation';
 
@@ -91,7 +92,7 @@ function RenameQueryDialog({
                 textButtonCancel={i18n('editor-tabs.rename-query-dialog.cancel')}
                 onClickButtonApply={handleApply}
                 onClickButtonCancel={handleClose}
-                propsButtonApply={{className: 'brand-button'}}
+                propsButtonApply={{className: BRAND_BUTTON_CLASS}}
             />
         </Dialog>
     );

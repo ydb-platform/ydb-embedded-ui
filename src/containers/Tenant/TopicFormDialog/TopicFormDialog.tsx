@@ -27,6 +27,7 @@ import {selectTopicFormValues, topicApi} from '../../../store/reducers/topic/top
 import type {TopicFormValues} from '../../../store/reducers/topic/utils';
 import {AutoPartitioningStrategy} from '../../../store/reducers/topic/utils';
 import {cn} from '../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../utils/constants';
 import createToast from '../../../utils/createToast';
 import {prepareCommonErrorMessage} from '../../../utils/errors';
 import {useTypedSelector} from '../../../utils/hooks';
@@ -776,7 +777,7 @@ function TopicForm({
                 propsButtonApply={{
                     type: 'submit',
                     view: 'action',
-                    className: 'brand-button',
+                    className: BRAND_BUTTON_CLASS,
                 }}
             />
         </form>

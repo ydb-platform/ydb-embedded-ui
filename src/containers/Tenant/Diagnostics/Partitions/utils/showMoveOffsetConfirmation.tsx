@@ -2,6 +2,7 @@ import * as NiceModal from '@ebay/nice-modal-react';
 import {Alert, Flex} from '@gravity-ui/uikit';
 
 import {CONFIRMATION_DIALOG} from '../../../../../components/ConfirmationDialog/ConfirmationDialog';
+import {BRAND_BUTTON_CLASS} from '../../../../../utils/constants';
 import i18n from '../i18n';
 
 interface ShowMoveOffsetConfirmationParams {
@@ -26,7 +27,7 @@ export function showMoveOffsetConfirmation({
         ),
         textButtonApply: i18n('action_move-offset'),
         buttonApplyView: 'action',
-        propsButtonApply: {className: 'brand-button'},
+        propsButtonApply: {className: BRAND_BUTTON_CLASS},
         onConfirm,
         confirmOnEnter: true,
     });

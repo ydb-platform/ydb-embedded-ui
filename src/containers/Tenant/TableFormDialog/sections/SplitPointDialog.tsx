@@ -4,6 +4,7 @@ import {Checkbox, Dialog, Label, Popover, TextArea, TextInput} from '@gravity-ui
 
 import type {ColumnValueField} from '../../../../store/reducers/table/types';
 import {cn} from '../../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {isValueForTypeValid} from '../columnValueValidation';
 import {SPLIT_POINT_STRING_TYPES} from '../constants';
 import i18n from '../i18n';
@@ -236,7 +237,7 @@ export function SplitPointDialog({state, onClose, onSubmit}: SplitPointDialogPro
                 textButtonCancel={i18n('action_cancel')}
                 onClickButtonApply={handleSubmit}
                 onClickButtonCancel={onClose}
-                propsButtonApply={{className: 'brand-button'}}
+                propsButtonApply={{className: BRAND_BUTTON_CLASS}}
             />
         </Dialog>
     );

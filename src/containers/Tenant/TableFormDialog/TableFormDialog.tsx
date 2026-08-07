@@ -16,6 +16,7 @@ import {
 } from '../../../store/reducers/table/utils';
 import type {TEvDescribeSchemeResult} from '../../../types/api/schema/schema';
 import {cn} from '../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../utils/constants';
 import createToast from '../../../utils/createToast';
 import {prepareCommonErrorMessage} from '../../../utils/errors';
 
@@ -319,7 +320,7 @@ function TableForm({
                     propsButtonApply={{
                         type: 'submit',
                         view: 'action',
-                        className: 'brand-button',
+                        className: BRAND_BUTTON_CLASS,
                         disabled: isSubmitting,
                     }}
                 />

@@ -16,6 +16,7 @@ import {
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {
     useQueryExecutionSettings,
     useQueryStreamingSetting,
@@ -393,7 +394,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                 onClickButtonCancel={onClose}
                 propsButtonApply={{
                     type: 'submit',
-                    className: 'brand-button',
+                    className: BRAND_BUTTON_CLASS,
                 }}
                 renderButtons={(buttonApply, buttonCancel) => (
                     <div className={b('buttons-container')}>

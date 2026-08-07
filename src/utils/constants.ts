@@ -127,4 +127,5 @@ export enum AclSyntax {
     Yql = 'yql',
 }
 
+export const BRAND_BUTTON_CLASS = 'brand-button';
 export const YDB_POPOVER_CLASS_NAME = 'ydb-popover';

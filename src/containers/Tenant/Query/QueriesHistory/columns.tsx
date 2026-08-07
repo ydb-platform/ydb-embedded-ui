@@ -10,7 +10,7 @@ import {YDBSyntaxHighlighter} from '../../../../components/SyntaxHighlighter/YDB
 import type {YDBDefinitionListItem} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
 import {valueIsDefined} from '../../../../utils';
-import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
+import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatDateTime, formatDurationMs} from '../../../../utils/dataFormatters/dataFormatters';
 import {parseUsToMs} from '../../../../utils/timeParsers';
 import i18n from '../i18n';
@@ -106,7 +106,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
                         <Button
                             qa="open-in-editor-button"
                             view="action"
-                            className="brand-button"
+                            className={BRAND_BUTTON_CLASS}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 openInEditor(row);

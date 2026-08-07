@@ -18,6 +18,7 @@ import {
 import type {TOperation} from '../../../../../../types/api/operations';
 import {CompactState} from '../../../../../../types/api/operations';
 import {cn} from '../../../../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../../../../utils/constants';
 import createToast from '../../../../../../utils/createToast';
 import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
 import {
@@ -430,7 +431,7 @@ function CompactTableDialog({
                     loading={isSubmitting}
                     propsButtonApply={{
                         type: 'submit',
-                        className: 'brand-button',
+                        className: BRAND_BUTTON_CLASS,
                         disabled: submitDisabled,
                     }}
                 />

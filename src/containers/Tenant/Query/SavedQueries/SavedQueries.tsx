@@ -16,6 +16,7 @@ import {
 } from '../../../../store/reducers/queryActions/queryActions';
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
@@ -53,7 +54,7 @@ const DeleteDialog = ({visible, queryName, onCancelClick, onConfirmClick}: Delet
                 textButtonCancel={i18n('delete-dialog.cancel')}
                 onClickButtonCancel={onCancelClick}
                 onClickButtonApply={onConfirmClick}
-                propsButtonApply={{className: 'brand-button'}}
+                propsButtonApply={{className: BRAND_BUTTON_CLASS}}
             />
         </Dialog>
     );

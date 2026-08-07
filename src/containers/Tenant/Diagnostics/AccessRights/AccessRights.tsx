@@ -8,6 +8,7 @@ import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper'
 import {useEditAccessAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {schemaAclApi} from '../../../../store/reducers/schemaAcl/schemaAcl';
+import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {useAclSyntax, useAutoRefreshInterval} from '../../../../utils/hooks';
 import {useCurrentSchema} from '../../TenantContext';
 import {useTenantQueryParams} from '../../useTenantQueryParams';
@@ -53,7 +54,7 @@ export function AccessRights() {
                     {editable && (
                         <Button
                             view="action"
-                            className="brand-button"
+                            className={BRAND_BUTTON_CLASS}
                             onClick={() => {
                                 handleShowGrantAccessChange(true);
                             }}

@@ -5,7 +5,7 @@ import {ClipboardButton} from '../../components/ClipboardButton/ClipboardButton'
 import {getPDiskPagePath} from '../../routes';
 import type {VDiskData} from '../../store/reducers/vdisk/types';
 import {cn} from '../../utils/cn';
-import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {
     formatMetricBytes,
@@ -180,7 +180,12 @@ export function VDiskStorageDetails({className, data}: VDiskStorageDetailsProps)
                         />
                     </div>
                     {pDiskPath ? (
-                        <Button href={pDiskPath} view="action" size="m" className="brand-button">
+                        <Button
+                            href={pDiskPath}
+                            view="action"
+                            size="m"
+                            className={BRAND_BUTTON_CLASS}
+                        >
                             {vDiskPageKeyset('action_go-to-pdisk')}
                         </Button>
                     ) : null}

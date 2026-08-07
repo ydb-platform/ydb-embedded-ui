@@ -8,7 +8,7 @@ import {getPDiskPagePath} from '../../routes';
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
-import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculatePDiskSeverity';
 import {NUMERIC_SEVERITY_TO_LABEL_VIEW} from '../../utils/disks/constants';
@@ -161,7 +161,7 @@ export const buildPDiskFooter = (
                 href={pDiskPagePath}
                 view="action"
                 size="m"
-                className="brand-button"
+                className={BRAND_BUTTON_CLASS}
             >
                 {pDiskPopupKeyset('action_go-to-pdisk')}
             </InternalLinkButton>

@@ -3,12 +3,12 @@
 
     width: 8px;
     height: 24px;
-    margin-right: 4px;
+    margin-right: var(--g-spacing-1);
 
     cursor: pointer;
 
     border: 1px solid;
-    border-radius: 2px;
+    border-radius: var(--g-border-radius-xs);
 
     &__popup-content {
         width: 170px;
