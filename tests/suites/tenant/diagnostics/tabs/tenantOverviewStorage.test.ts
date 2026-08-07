@@ -103,7 +103,9 @@ async function setupTenantInfo(
     {
         databaseQuotas,
         databaseStorage,
+        resources,
         storageAllocatedLimit = '201000000000000',
+        storageGroups = '2',
         tablesStorage,
     }: {
         databaseQuotas?: {
@@ -115,7 +117,11 @@ async function setupTenantInfo(
             }>;
         };
         databaseStorage?: Array<{Type: string; Size: string; Limit?: string}>;
+        resources?: {
+            Allocated?: Array<{Count: number; Type: string; Kind: string}>;
+        };
         storageAllocatedLimit?: string;
+        storageGroups?: string;
         tablesStorage?: Array<{
             Type: string;
             Size: string;
@@ -137,7 +143,8 @@ async function setupTenantInfo(
                         Overall: 'Green',
                         StorageAllocatedSize: '26400000000000',
                         StorageAllocatedLimit: storageAllocatedLimit,
-                        StorageGroups: '2',
+                        StorageGroups: storageGroups,
+                        Resources: resources,
                         DatabaseQuotas: databaseQuotas,
                         TablesStorage: tablesStorage ?? [
                             {
@@ -937,6 +944,108 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await expect(ssdQuotaMetric.getByText('306 GB', {exact: true})).toBeVisible();
     });
 
+    test('shows allocated storage groups in legacy storage layout', async ({page}) => {
+        await setupWhoami(page);
+        await setupCapabilities(page, 1);
+        await setupTenantInfo(page, 'Dedicated', {
+            resources: {
+                Allocated: [
+                    {Count: 20, Type: 'storage', Kind: 'ssdmirror'},
+                    {Count: 174, Type: 'storage', Kind: 'ssd'},
+                    {Count: 1, Type: 'storage', Kind: 'rot'},
+                    {Count: 4, Type: 'compute', Kind: 'cpu'},
+                ],
+            },
+        });
+        await setupPartitionStatsQuery(page);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: database,
+            database,
+            databasePage: 'database',
+            diagnosticsTab: 'database',
+        });
+
+        await openStorageMetricsTab(page);
+
+        const storageGroups = page
+            .locator('.ydb-tenant-storage__details.ydb-definition-list')
+            .filter({hasText: 'Storage Groups'});
+
+        await expect(storageGroups).toBeVisible();
+        await expect(storageGroups.getByText('ssdmirror: 20 groups', {exact: true})).toBeVisible();
+        await expect(storageGroups.getByText('ssd: 174 groups', {exact: true})).toBeVisible();
+        await expect(storageGroups.getByText('rot: 1 group', {exact: true})).toBeVisible();
+        await expect(storageGroups.getByText('cpu: 4 groups', {exact: true})).toHaveCount(0);
+        await expect(page.getByText('Storage Details', {exact: true})).toHaveCount(0);
+
+        await storageGroups
+            .getByRole('term')
+            .filter({hasText: 'Storage Groups'})
+            .getByLabel('Note')
+            .hover();
+
+        await expect(
+            page.getByText('Groups allocated across storage pools', {exact: true}),
+        ).toBeVisible();
+    });
+
+    test('shows total storage groups when allocated resources are absent', async ({page}) => {
+        await setupWhoami(page);
+        await setupCapabilities(page, 1);
+        await setupTenantInfo(page, 'Dedicated', {storageGroups: '4'});
+        await setupPartitionStatsQuery(page);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: database,
+            database,
+            databasePage: 'database',
+            diagnosticsTab: 'database',
+        });
+
+        await openStorageMetricsTab(page);
+
+        const storageGroups = page
+            .locator('.ydb-tenant-storage__details.ydb-definition-list')
+            .filter({hasText: 'Storage Groups'});
+
+        await expect(storageGroups).toBeVisible();
+        await expect(storageGroups.getByText('4 storage groups', {exact: true})).toBeVisible();
+    });
+
+    test('shows allocated storage groups in new storage layout', async ({page}) => {
+        await enableNewStorageView(page);
+        await setupWhoami(page);
+        await setupCapabilities(page, 1);
+        await setupTenantInfo(page, 'Dedicated', {
+            resources: {
+                Allocated: [
+                    {Count: 20, Type: 'storage', Kind: 'ssdmirror'},
+                    {Count: 174, Type: 'storage', Kind: 'ssd'},
+                    {Count: 1, Type: 'storage', Kind: 'rot'},
+                    {Count: 4, Type: 'compute', Kind: 'cpu'},
+                ],
+            },
+        });
+        await setupPartitionStatsQuery(page);
+        await setupStorageStats(page);
+        await setupDescribe(page);
+
+        const storageView = await openTenantStorageMetricsTab(page);
+        const storageGroups = storageView.getByTestId('tenant-storage-groups');
+
+        await expect(storageGroups.getByText('ssdmirror: 20 groups', {exact: true})).toBeVisible();
+        await expect(storageGroups.getByText('ssd: 174 groups', {exact: true})).toBeVisible();
+        await expect(storageGroups.getByText('rot: 1 group', {exact: true})).toBeVisible();
+        await expect(
+            storageView.locator(
+                '[data-qa="tenant-storage-groups"] + .ydb-tenant-storage-top-usage-table',
+            ),
+        ).toHaveCount(1);
+    });
+
     test('keeps legacy dedicated storage layout when experiment is disabled', async ({page}) => {
         await setupWhoami(page);
         await setupCapabilities(page, 1);
@@ -954,7 +1063,8 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await openStorageMetricsTab(page);
 
         await expect(page.locator(STORAGE_VIEW_SELECTOR)).toHaveCount(0);
-        await expect(page.getByText('Storage Details', {exact: true})).toBeVisible();
+        await expect(page.getByText('2 storage groups', {exact: true})).toBeVisible();
+        await expect(page.getByText('Storage Details', {exact: true})).toHaveCount(0);
         await expect(page.getByText('Top tables by size', {exact: true})).toBeVisible();
     });
 
@@ -987,6 +1097,16 @@ test.describe('Tenant Overview storage metrics tab', () => {
                             Used: '10000000000',
                             Limit: '200000000000',
                         },
+                        {
+                            GroupId: '2',
+                            MediaType: 'SSD',
+                            Encryption: false,
+                            ErasureSpecies: 'mirror-3-dc',
+                            MaxVDiskSlotUsage: 40,
+                            CapacityAlert: 'GREEN',
+                            Used: '5000000000',
+                            Limit: '200000000000',
+                        },
                     ],
                 }),
             });
@@ -1012,10 +1132,10 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await expect(topGroupsByVDiskSlotUsage).toHaveCount(1);
         await expect(topGroupsTable).toHaveCount(1);
         await expect(
-            topGroupsTable.getByRole('columnheader', {name: 'VDisk Slot Usage', exact: true}),
+            topGroupsTable.getByRole('button', {name: 'VDisk Slot Usage', exact: true}),
         ).toBeVisible();
         await expect(
-            topGroupsTable.getByRole('columnheader', {name: 'Group Size In Units', exact: true}),
+            topGroupsTable.getByRole('button', {name: 'Group Size In Units', exact: true}),
         ).toBeVisible();
         const headerTexts = (await topGroupsTable.getByRole('columnheader').allTextContents()).map(
             (text) => text.replace(/\s+/g, ' ').trim(),
@@ -1032,7 +1152,7 @@ test.describe('Tenant Overview storage metrics tab', () => {
         ]);
         const topGroupsDataRows = topGroupsTable.locator('tbody tr.data-table__row');
 
-        await expect(topGroupsDataRows).toHaveCount(1);
+        await expect(topGroupsDataRows).toHaveCount(2);
         await expect(
             topGroupsDataRows.first().locator('.g-label_theme_danger').getByText('82.25%', {
                 exact: true,
@@ -1040,6 +1160,9 @@ test.describe('Tenant Overview storage metrics tab', () => {
         ).toBeVisible();
         await expect(topGroupsDataRows.first().getByText('ORANGE', {exact: true})).toBeVisible();
         await expect(topGroupsDataRows.first().getByText('2', {exact: true})).toBeVisible();
+        await expect(
+            topGroupsDataRows.nth(1).getByText('1 (implicit)', {exact: true}),
+        ).toBeVisible();
 
         expect(storageGroupsRequestUrl).toBeDefined();
         expect(storageGroupsRequestUrl?.searchParams.get('sort')).toBe('-MaxVDiskSlotUsage');
@@ -1164,15 +1287,25 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await openStorageMetricsTab(page);
 
         await expect(page.locator(STORAGE_VIEW_SELECTOR)).toHaveCount(0);
-        await expect(page.getByText('Storage Details', {exact: true})).toBeVisible();
+        await expect(page.getByText('Storage Details', {exact: true})).toHaveCount(0);
         await expect(page.getByText('Top tables by size', {exact: true})).toBeVisible();
     });
 
-    test('keeps legacy serverless storage layout when experiment is enabled', async ({page}) => {
+    test('shows allocated storage groups in legacy serverless storage layout when experiment is enabled', async ({
+        page,
+    }) => {
         await enableNewStorageView(page);
         await setupWhoami(page);
         await setupCapabilities(page, 1);
-        await setupTenantInfo(page, 'Serverless');
+        await setupTenantInfo(page, 'Serverless', {
+            resources: {
+                Allocated: [
+                    {Count: 20, Type: 'storage', Kind: 'ssdmirror'},
+                    {Count: 174, Type: 'storage', Kind: 'ssd'},
+                    {Count: 4, Type: 'compute', Kind: 'cpu'},
+                ],
+            },
+        });
         await setupPartitionStatsQuery(page);
 
         const tenantPage = new TenantPage(page);
@@ -1186,6 +1319,10 @@ test.describe('Tenant Overview storage metrics tab', () => {
         await openStorageMetricsTab(page);
 
         await expect(page.locator(STORAGE_VIEW_SELECTOR)).toHaveCount(0);
+        const storageGroups = page.getByTestId('tenant-storage-groups');
+        await expect(storageGroups.getByText('ssdmirror: 20 groups', {exact: true})).toBeVisible();
+        await expect(storageGroups.getByText('ssd: 174 groups', {exact: true})).toBeVisible();
+        await expect(storageGroups.getByText('cpu: 4 groups', {exact: true})).toHaveCount(0);
         await expect(page.getByText('Top tables by size', {exact: true})).toBeVisible();
     });
 });

@@ -42,6 +42,7 @@ interface YDBDefinitionListProps extends Omit<DefinitionListProps, 'children' | 
     compact?: boolean;
     nameMaxWidth?: DefinitionListProps['nameMaxWidth'] | 'auto';
     wrapperClassName?: string;
+    dataQa?: string;
 }
 
 /** DefinitionList with predefined styles and layout */
@@ -58,6 +59,7 @@ export function YDBDefinitionList({
     nameMaxWidth = 220,
     className,
     wrapperClassName,
+    dataQa,
     ...restProps
 }: YDBDefinitionListProps) {
     const hasHeader = Boolean(title || titleSuffix || (headerLabels && headerLabels.length));
@@ -160,7 +162,7 @@ export function YDBDefinitionList({
     };
 
     return (
-        <Flex gap={3} direction="column" className={b({compact}, wrapperClassName)}>
+        <Flex gap={3} direction="column" className={b({compact}, wrapperClassName)} qa={dataQa}>
             {renderHeader()}
             {renderContent()}
             {renderFooter()}

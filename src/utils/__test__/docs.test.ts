@@ -72,4 +72,17 @@ describe('getDocsLink', () => {
             'https://ydb.tech/docs/ru/concepts/datamodel/table?version=v25.4#auto_partitioning_max_partitions_count',
         );
     });
+
+    it('should build the distributed storage channel link', () => {
+        configureUIFactory({
+            docs: {
+                basePath: 'https://ydb.tech',
+                distributedStorageChannel: '/docs/concepts/glossary#channel',
+            },
+        });
+
+        expect(getDocsLink('distributedStorageChannel')).toBe(
+            'https://ydb.tech/docs/concepts/glossary#channel',
+        );
+    });
 });

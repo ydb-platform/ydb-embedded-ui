@@ -19,6 +19,7 @@ export enum ExplainResultType {
 export enum ButtonNames {
     Run = 'Run',
     Explain = 'Explain',
+    ExplainAnalyze = 'Explain Analyze',
     Cancel = 'Cancel',
     Save = 'Save',
     Edit = 'Edit query',
@@ -43,6 +44,8 @@ export enum QueryTabs {
     Saved = 'Saved',
 }
 
+type QueryActionButtonName = ButtonNames.Run | ButtonNames.Explain | ButtonNames.ExplainAnalyze;
+
 export class QueryEditor {
     settingsDialog: SettingsDialog;
     editorTabs: EditorTabsBar;
@@ -59,6 +62,8 @@ export class QueryEditor {
     private zeroTabsState: Locator;
     private runButton: Locator;
     private explainButton: Locator;
+    private explainAnalyzeButton: Locator;
+    private queryActions: Locator;
     private stopButton: Locator;
     private stopBanner: Locator;
     private saveButton: Locator;
@@ -80,7 +85,15 @@ export class QueryEditor {
         this.runButton = this.selector.getByRole('button', {name: ButtonNames.Run});
         this.stopButton = this.selector.getByRole('button', {name: ButtonNames.Stop});
         this.stopBanner = this.selector.locator('.ydb-query-stopped-banner');
-        this.explainButton = this.selector.getByRole('button', {name: ButtonNames.Explain});
+        this.explainButton = this.selector.getByRole('button', {
+            name: ButtonNames.Explain,
+            exact: true,
+        });
+        this.explainAnalyzeButton = this.selector.getByRole('button', {
+            name: ButtonNames.ExplainAnalyze,
+            exact: true,
+        });
+        this.queryActions = this.selector.locator('.ydb-query-editor-controls__left');
         this.saveButton = this.selector.getByRole('button', {name: ButtonNames.Save});
         this.editButton = this.selector.getByRole('button', {name: ButtonNames.Edit, exact: true});
         this.dropdownMenu = page.locator('.g-dropdown-menu__menu');
@@ -107,19 +120,18 @@ export class QueryEditor {
     }
 
     async run(query: string, mode: keyof typeof QUERY_MODES) {
-        await this.clickGearButton();
-        await this.settingsDialog.changeQueryMode(mode);
-        await this.settingsDialog.clickButton(ButtonNames.Save);
-        await this.setQuery(query);
+        await this.setQueryModeAndText(query, mode);
         await this.clickRunButton();
     }
 
     async explain(query: string, mode: keyof typeof QUERY_MODES) {
-        await this.clickGearButton();
-        await this.settingsDialog.changeQueryMode(mode);
-        await this.settingsDialog.clickButton(ButtonNames.Save);
-        await this.setQuery(query);
+        await this.setQueryModeAndText(query, mode);
         await this.clickExplainButton();
+    }
+
+    async explainAnalyze(query: string, mode: keyof typeof QUERY_MODES) {
+        await this.setQueryModeAndText(query, mode);
+        await this.clickExplainAnalyzeButton();
     }
 
     async createNewFakeTable() {
@@ -170,6 +182,11 @@ export class QueryEditor {
     async clickExplainButton() {
         await this.explainButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.explainButton.click();
+    }
+
+    async clickExplainAnalyzeButton() {
+        await this.explainAnalyzeButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.explainAnalyzeButton.click();
     }
 
     async focusHotkeysTarget() {
@@ -355,6 +372,43 @@ export class QueryEditor {
         });
     }
 
+    async getCurrentStatementUpdateMetricsDuringTextChange() {
+        return this.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            const model = editor?.getModel();
+            if (!editor || !model) {
+                throw new Error('Expected active Monaco editor model');
+            }
+
+            const originalGetValue = editor.getValue.bind(editor);
+            let fullTextReads = 0;
+
+            editor.getValue = (...args: Parameters<typeof originalGetValue>) => {
+                fullTextReads += 1;
+                return originalGetValue(...args);
+            };
+
+            try {
+                const endPosition = model.getPositionAt(model.getValueLength());
+                editor.executeEdits('test', [
+                    {
+                        range: {
+                            startLineNumber: endPosition.lineNumber,
+                            startColumn: endPosition.column,
+                            endLineNumber: endPosition.lineNumber,
+                            endColumn: endPosition.column,
+                        },
+                        text: ' ',
+                    },
+                ]);
+            } finally {
+                editor.getValue = originalGetValue;
+            }
+
+            return {fullTextReads};
+        });
+    }
+
     async getEditorContent(): Promise<string> {
         await this.waitForEditorReady();
         await this.page.waitForFunction(() => Boolean(window.ydbEditor), null, {
@@ -388,6 +442,12 @@ export class QueryEditor {
 
     async pressKeys(key: string) {
         await this.editorTextArea.press(key);
+    }
+
+    async runQueryViaEditorAction() {
+        await this.editorTextArea.evaluate(() => {
+            window.ydbEditor?.trigger('test', 'sendQuery', null);
+        });
     }
 
     async closeSettingsDialog() {
@@ -554,6 +614,55 @@ export class QueryEditor {
         return this.explainButton.isEnabled({timeout: VISIBILITY_TIMEOUT});
     }
 
+    async isExplainAnalyzeButtonEnabled() {
+        return this.explainAnalyzeButton.isEnabled({timeout: VISIBILITY_TIMEOUT});
+    }
+
+    getQueryActionsLocator() {
+        return this.queryActions;
+    }
+
+    getQueryActionButton(buttonName: QueryActionButtonName) {
+        if (buttonName === ButtonNames.Run) {
+            return this.runButton;
+        }
+        if (buttonName === ButtonNames.Explain) {
+            return this.explainButton;
+        }
+        return this.explainAnalyzeButton;
+    }
+
+    async getQueryActionsGap() {
+        return this.queryActions.evaluate((controls) => getComputedStyle(controls).gap);
+    }
+
+    async getExplainAnalyzeButtonText() {
+        return this.explainAnalyzeButton.innerText().then((text) => text.trim());
+    }
+
+    async hasExplainActionDropdown() {
+        return this.selector
+            .locator('.ydb-query-editor-controls__explain-group')
+            .count()
+            .then((count) => count > 0);
+    }
+
+    async isQueryActionButtonHighlighted(buttonName: QueryActionButtonName) {
+        const button = this.getQueryActionButton(buttonName);
+        await button.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return button.evaluate((element) => element.classList.contains('g-button_view_action'));
+    }
+
+    async isResultTabVisible(tabName: ResultTabNames, timeout = VISIBILITY_TIMEOUT) {
+        const tab = this.radioButton.getByLabel(tabName);
+        try {
+            await tab.waitFor({state: 'visible', timeout});
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     async isBannerVisible() {
         await this.banner.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;
@@ -644,5 +753,12 @@ export class QueryEditor {
         } catch {
             return false;
         }
+    }
+
+    private async setQueryModeAndText(query: string, mode: keyof typeof QUERY_MODES) {
+        await this.clickGearButton();
+        await this.settingsDialog.changeQueryMode(mode);
+        await this.settingsDialog.clickButton(ButtonNames.Save);
+        await this.setQuery(query);
     }
 }

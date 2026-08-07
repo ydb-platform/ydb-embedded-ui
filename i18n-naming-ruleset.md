@@ -13,15 +13,16 @@ Keysets are divided into 4 categories:
 1. **System-wide** - Used across many sections (e.g., `common`, `common.units`, `common.operations`)
 2. **Section-wide** - Common within a section (e.g., `billing.common`)
 3. **Page-specific** - Specific to section pages (e.g., `billing.account`)
-4. **Reusable components** - For shared components (e.g., `logs.events`)
+4. **Component-specific** - Owned by an individual component, reusable or not (e.g., `logs.events`)
 
 ### 1.2 Keyset Naming Conventions
 
 - **MUST**: Write context description for each keyset
 - **MUST**: Keep keysets concise (prefer `billing.budgets` over `billing.account.budgets`)
-- **MUST NOT**: Create keysets with only a few keys - merge with existing section keysets
-- **MUST NOT**: Create multiple keysets for sections/popups within the same area
-- **MUST NOT**: Start reusable component keysets with `component.` - use the section name instead
+- **MAY**: Create a dedicated component keyset with one or more keys
+- **MUST NOT**: Merge a component keyset into a broader section keyset solely because it contains only a few keys
+- **MUST NOT**: Split a single section, page, or popup into multiple non-component keysets
+- **MUST NOT**: Start component-specific keysets with `component.` - use the section name instead
 
 ## 2. Key Naming Rules
 
@@ -111,7 +112,7 @@ This includes:
 
 ### 5.2 DON'Ts
 
-- ❌ Don't create overly granular keysets
+- ❌ Don't create keysets without a clear component, page, section, or shared scope
 - ❌ Don't duplicate keys across keysets
 - ❌ Don't use technical jargon in user-facing keys
 - ❌ Don't include implementation details in key names

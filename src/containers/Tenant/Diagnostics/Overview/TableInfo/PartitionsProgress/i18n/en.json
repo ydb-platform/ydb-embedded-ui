@@ -7,7 +7,5 @@
   "value_partition-many": "partitions",
 
   "value_default": "Default",
-  "context_no-limit": "The number of partitions may exceed the limit when splitting by size",
-
-  "action_learn-more": "Learn more"
+  "context_no-limit": "The number of partitions may exceed the limit when splitting by size"
 }

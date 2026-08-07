@@ -126,6 +126,9 @@ export interface DocsConfig {
 
     /** Path to the article about the auto partitioning max partitions count setting. */
     autoPartitioningMaxPartitionsCount?: string;
+
+    /** Path to the distributed storage channel glossary entry. */
+    distributedStorageChannel?: string;
 }
 
 export type HandleCreateDB = (params: {
@@ -189,6 +192,7 @@ export type RenderNodeTooltipActions = (props: {data?: PreparedStorageNode}) => 
 
 export interface UiMetricaGoals {
     runQuery?: string;
+    explainAnalyzeQuery?: string;
     stopQuery?: string;
     openManagePartitioning?: string;
     applyManagePartitioning?: string;

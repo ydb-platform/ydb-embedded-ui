@@ -78,6 +78,24 @@ test.describe('Test Query Settings', async () => {
         }).toPass({timeout: VISIBILITY_TIMEOUT});
     });
 
+    test('Gear uses the same ActionTooltip style as Explain Analyze', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.clickGearButton();
+
+        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.hoverGearButton();
+
+        const settingsActionTooltip = page
+            .locator('.g-action-tooltip')
+            .filter({hasText: 'Query execution settings have been changed'});
+
+        await expect(settingsActionTooltip).toBeVisible();
+        await expect(
+            settingsActionTooltip.getByText('Query type: Scan', {exact: true}),
+        ).toBeVisible();
+    });
+
     test('Banner appears after executing script with changed settings', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 

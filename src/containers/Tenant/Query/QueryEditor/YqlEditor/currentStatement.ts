@@ -11,6 +11,11 @@ const LBRACE_CURLY_TOKEN = 'LBRACE_CURLY';
 const RBRACE_CURLY_TOKEN = 'RBRACE_CURLY';
 const SUBQUERY_TOKEN = 'SUBQUERY';
 
+const SIMPLE_STATEMENT_UNSAFE_CHARACTER = /[^A-Za-z0-9_$=\s!<>+\-*/%;&|^~?.,:()[\]]/u;
+const SIMPLE_STATEMENT_UNSAFE_SEQUENCE = /--|\/\*|\*\//u;
+const COMPOUND_STATEMENT_KEYWORD = /\b(?:ACTION|BEGIN|DEFINE|DO|END|SUBQUERY)\b/iu;
+const WHITESPACE_CHARACTER = /\s/u;
+
 type CompoundEndToken = typeof DEFINE_TOKEN | typeof DO_TOKEN | typeof RBRACE_CURLY_TOKEN;
 
 export interface YqlStatementPosition {
@@ -45,7 +50,56 @@ function normalizeStatementPositions(
     }));
 }
 
-export function extractYqlStatements(query: string): YqlStatementPosition[] {
+function canExtractStatementsWithoutTokenizer(query: string): boolean {
+    return (
+        !SIMPLE_STATEMENT_UNSAFE_CHARACTER.test(query) &&
+        !SIMPLE_STATEMENT_UNSAFE_SEQUENCE.test(query) &&
+        !COMPOUND_STATEMENT_KEYWORD.test(query)
+    );
+}
+
+function skipWhitespace(query: string, startIndex: number, endIndex: number): number {
+    let index = startIndex;
+    while (index < endIndex && WHITESPACE_CHARACTER.test(query[index])) {
+        index += 1;
+    }
+    return index;
+}
+
+function trimTrailingWhitespace(query: string, startIndex: number, endIndex: number): number {
+    let index = endIndex;
+    while (index > startIndex && WHITESPACE_CHARACTER.test(query[index - 1])) {
+        index -= 1;
+    }
+    return index;
+}
+
+function extractSimpleStatements(query: string): YqlStatementPosition[] {
+    const positions: YqlStatementPosition[] = [];
+    let segmentStartIndex = 0;
+
+    for (let index = 0; index < query.length; index += 1) {
+        if (query[index] !== ';') {
+            continue;
+        }
+
+        const statementStartIndex = skipWhitespace(query, segmentStartIndex, index);
+        if (statementStartIndex < index) {
+            positions.push({startIndex: statementStartIndex, endIndex: index + 1});
+        }
+        segmentStartIndex = index + 1;
+    }
+
+    const statementStartIndex = skipWhitespace(query, segmentStartIndex, query.length);
+    const statementEndIndex = trimTrailingWhitespace(query, statementStartIndex, query.length);
+    if (statementStartIndex < statementEndIndex) {
+        positions.push({startIndex: statementStartIndex, endIndex: statementEndIndex});
+    }
+
+    return positions;
+}
+
+function extractTokenizedStatements(query: string): YqlStatementPosition[] {
     let tokens: ReturnType<typeof tokenizeYqlQuery>['tokens'];
     try {
         ({tokens} = tokenizeYqlQuery(query));
@@ -106,6 +160,12 @@ export function extractYqlStatements(query: string): YqlStatementPosition[] {
     }
 
     return normalizeStatementPositions(query, positions);
+}
+
+export function extractYqlStatements(query: string): YqlStatementPosition[] {
+    return canExtractStatementsWithoutTokenizer(query)
+        ? extractSimpleStatements(query)
+        : extractTokenizedStatements(query);
 }
 
 export function findYqlStatementAtOffset(

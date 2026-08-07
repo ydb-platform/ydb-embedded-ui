@@ -1,7 +1,7 @@
 import {v4 as uuidv4} from 'uuid';
 
 import type {Actions, ErrorResponse} from '../../../types/api/query';
-import type {QueryAction, QueryMode, QuerySyntax} from '../../../types/store/query';
+import type {QueryAction, QueryMode, QuerySettings, QuerySyntax} from '../../../types/store/query';
 import type {
     QueryResponseChunk,
     SessionChunk,
@@ -9,23 +9,61 @@ import type {
     StreamingChunk,
 } from '../../../types/store/streaming';
 import {valueIsDefined} from '../../../utils';
+import {QUERY_ACTIONS, STATISTICS_MODES} from '../../../utils/query';
 
 import type {
+    PreparedQueryData,
     QueryExecutionStatusType,
     QueryInHistory,
     QueryTabState,
     RawQueryInHistory,
 } from './types';
 
+const QUERY_ACTION_TO_BACKEND_BASE_ACTION: Record<QueryAction, 'execute' | 'explain'> = {
+    [QUERY_ACTIONS.execute]: 'execute',
+    [QUERY_ACTIONS.explain]: 'explain',
+    [QUERY_ACTIONS.explainAnalyze]: 'execute',
+};
+
+export function getEffectiveQuerySettingsForAction(
+    actionType: QueryAction,
+    querySettings: Partial<QuerySettings>,
+): Partial<QuerySettings> {
+    if (actionType !== QUERY_ACTIONS.explainAnalyze) {
+        return querySettings;
+    }
+
+    return {
+        ...querySettings,
+        statisticsMode: STATISTICS_MODES.full,
+    };
+}
+
+export function getEffectiveQueryDataForAction(
+    actionType: QueryAction,
+    data: PreparedQueryData,
+): PreparedQueryData {
+    if (actionType !== QUERY_ACTIONS.explainAnalyze) {
+        return data;
+    }
+
+    return {
+        ...data,
+        resultSets: undefined,
+    };
+}
+
 export function getActionAndSyntaxFromQueryMode(
-    baseAction: QueryAction = 'execute',
+    baseAction: QueryAction = QUERY_ACTIONS.execute,
     queryMode: QueryMode = 'query',
 ) {
-    let action: Actions = baseAction;
+    const backendBaseAction = QUERY_ACTION_TO_BACKEND_BASE_ACTION[baseAction];
+
+    let action: Actions = backendBaseAction;
     const syntax: QuerySyntax = 'yql_v1';
 
     if (queryMode) {
-        action = `${baseAction}-${queryMode}`;
+        action = `${backendBaseAction}-${queryMode}`;
     }
 
     return {action, syntax};

@@ -1,9 +1,9 @@
 import React from 'react';
 
-import {Flex, HelpMark, Popover, Text} from '@gravity-ui/uikit';
+import {Flex, Popover, Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
-import {LinkWithIcon} from '../../../../../../components/LinkWithIcon/LinkWithIcon';
+import {HelpMarkWithDocs} from '../../../../../../components/HelpMarkWithDocs/HelpMarkWithDocs';
 import {cn} from '../../../../../../utils/cn';
 import {formatNumber} from '../../../../../../utils/dataFormatters/dataFormatters';
 import {getDocsLink} from '../../../../../../utils/docs';
@@ -138,20 +138,13 @@ export const PartitionsProgress = ({
                                 {maxLabel}
                             </Text>
                             {hasNoLimit ? (
-                                <HelpMark
+                                <HelpMarkWithDocs
+                                    docsLink={docsLink}
                                     onMouseEnter={() => setIsHelpHovered(true)}
                                     onMouseLeave={() => setIsHelpHovered(false)}
                                 >
-                                    <Flex direction="column" gap="2">
-                                        {i18n('context_no-limit')}
-                                        {docsLink ? (
-                                            <LinkWithIcon
-                                                url={docsLink}
-                                                title={i18n('action_learn-more')}
-                                            />
-                                        ) : null}
-                                    </Flex>
-                                </HelpMark>
+                                    {i18n('context_no-limit')}
+                                </HelpMarkWithDocs>
                             ) : null}
                         </Flex>
                     </Flex>

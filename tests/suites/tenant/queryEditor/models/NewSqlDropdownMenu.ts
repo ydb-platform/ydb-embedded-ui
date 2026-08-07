@@ -38,9 +38,7 @@ export class NewSqlDropdownMenu {
     private subMenu: Locator;
 
     constructor(page: Page) {
-        this.dropdownButton = page.locator(
-            '.ydb-query-editor-controls .g-dropdown-menu__switcher-wrapper button',
-        );
+        this.dropdownButton = page.getByTestId('new-sql-dropdown-switcher');
         this.menu = page.locator('.g-dropdown-menu__menu');
         this.subMenu = page.locator('.g-dropdown-menu__sub-menu');
     }
