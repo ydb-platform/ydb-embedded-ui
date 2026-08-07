@@ -1,12 +1,7 @@
 {
   "title_good": "Good",
-  "context_good": "System is ok",
   "title_unspecified": "Unspecified",
-  "context_unspecified": "Status is unknown",
   "title_degraded": "Degraded",
-  "context_degraded": "May require attention",
   "title_maintenance": "Maintenance required",
-  "context_maintenance": "Degraded state, maintenance required",
-  "title_emergency": "Critical failure",
-  "context_emergency": "Major outage or severe performance issue. Immediate investigation and action are required."
+  "title_emergency": "Critical failure"
 }

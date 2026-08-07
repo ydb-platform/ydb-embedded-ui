@@ -1,5 +1,5 @@
 import {ChevronRight} from '@gravity-ui/icons';
-import {Alert, Button, Flex, Icon, Label, Skeleton} from '@gravity-ui/uikit';
+import {ActionTooltip, Alert, Button, Flex, Icon, Label, Skeleton} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {SELF_CHECK_RESULT_CONFIG} from '../../../../../components/HealthcheckStatus/config';
@@ -63,25 +63,27 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
         }
 
         return (
-            <Label
-                className={b('compact-status', {emergency: statusConfig.emergency})}
-                theme={statusConfig.labelTheme}
-                icon={
-                    <Icon
-                        size={12}
-                        data={statusConfig.icon}
-                        className={b('icon', {[modifier]: true})}
-                    />
-                }
-                onClick={() => {
-                    handleShowHealthcheckChange(true);
-                }}
-            >
-                <Flex alignItems={'center'} gap={1}>
-                    {statusConfig.title}: {i18n('issues-count', {count: issuesCount})}
-                    <Icon data={ChevronRight} size={12} />
-                </Flex>
-            </Label>
+            <ActionTooltip title={HEALTHCHECK_RESULT_TO_TEXT[selfCheckResult]}>
+                <Label
+                    className={b('compact-status', {emergency: statusConfig.emergency})}
+                    theme={statusConfig.labelTheme}
+                    icon={
+                        <Icon
+                            size={12}
+                            data={statusConfig.icon}
+                            className={b('icon', {[modifier]: true})}
+                        />
+                    }
+                    onClick={() => {
+                        handleShowHealthcheckChange(true);
+                    }}
+                >
+                    <Flex alignItems={'center'} gap={1}>
+                        {statusConfig.title}: {i18n('issues-count', {count: issuesCount})}
+                        <Icon data={ChevronRight} size={12} />
+                    </Flex>
+                </Label>
+            </ActionTooltip>
         );
     }
 
