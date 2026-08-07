@@ -24,6 +24,10 @@ function handleHelpMarkClick(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
 }
 
+function handleHelpMarkPopoverClick(event: React.MouseEvent<HTMLDivElement>) {
+    event.stopPropagation();
+}
+
 export function MetricTabCard({
     title,
     status,
@@ -32,6 +36,30 @@ export function MetricTabCard({
     helpText,
     active,
 }: MetricTabCardProps) {
+    const statusIcon = <StatusIcon status={status} mode="icons" size="s" />;
+    const statusHelpMark = helpText ? (
+        <Popover
+            content={
+                <div className={b('status-help-mark-popover')} onClick={handleHelpMarkPopoverClick}>
+                    {helpText}
+                </div>
+            }
+            hasArrow
+            placement={['top', 'bottom']}
+        >
+            <button
+                type="button"
+                className={b('status-help-mark')}
+                aria-label={helpText}
+                onClick={handleHelpMarkClick}
+            >
+                {statusIcon}
+            </button>
+        </Popover>
+    ) : (
+        statusIcon
+    );
+
     return (
         <Card className={b({active})} type="container" view={active ? 'outlined' : 'filled'}>
             <Flex direction="column" gap={0.5}>
@@ -43,26 +71,7 @@ export function MetricTabCard({
                         <Text variant="body-1" color="secondary" data-qa="tenant-metric-tab-value">
                             {value}
                         </Text>
-                        {helpText ? (
-                            <Popover
-                                content={
-                                    <div className={b('status-help-mark-popover')}>{helpText}</div>
-                                }
-                                hasArrow
-                                placement={['top', 'bottom']}
-                            >
-                                <button
-                                    type="button"
-                                    className={b('status-help-mark')}
-                                    aria-label={helpText}
-                                    onClick={handleHelpMarkClick}
-                                >
-                                    <StatusIcon status={status} mode="icons" size="s" />
-                                </button>
-                            </Popover>
-                        ) : (
-                            <StatusIcon status={status} mode="icons" size="s" />
-                        )}
+                        {statusHelpMark}
                     </Flex>
                 </Flex>
                 <Text
