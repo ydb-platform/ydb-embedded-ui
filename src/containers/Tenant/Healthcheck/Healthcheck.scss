@@ -47,6 +47,13 @@
         width: 100%;
         @include mixins.button-reset();
 
+        &_with-action {
+            flex: 1 1 auto;
+
+            width: auto;
+            min-width: 0;
+        }
+
         &:focus-visible {
             border-radius: var(--g-border-radius-s);
             outline: 2px solid var(--g-color-line-focus);
@@ -63,6 +70,9 @@
         &:hover {
             background-color: var(--g-color-base-generic-ultralight);
         }
+    }
+    &__issue-action {
+        flex: 0 0 auto;
     }
     &__issue-status {
         text-align: start;
