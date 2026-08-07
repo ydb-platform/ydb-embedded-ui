@@ -1,26 +1,26 @@
 .ydb-status-icon {
-    &__status-icon {
-        &_state_grey {
-            color: var(--ydb-color-status-grey);
-        }
+    &__status-color {
         &_state_green {
-            color: var(--ydb-color-status-green);
-        }
-        &_state_blue {
-            color: var(--ydb-color-status-blue);
+            background-color: var(--ydb-color-status-green);
         }
         &_state_yellow {
-            color: var(--ydb-color-status-yellow);
+            background-color: var(--ydb-color-status-yellow);
         }
-        &_state_orange {
-            color: var(--ydb-color-status-red);
+        &_state_blue {
+            background-color: var(--ydb-color-status-blue);
         }
         &_state_red {
-            color: var(--ydb-color-status-red);
+            background-color: var(--ydb-color-status-red);
+        }
+        &_state_grey {
+            background-color: var(--ydb-color-status-grey);
+        }
+        &_state_orange {
+            background-color: var(--ydb-color-status-red);
         }
     }
 
-    &__status-icon {
+    &__status-color {
         display: inline-flex;
         flex-shrink: 0;
 

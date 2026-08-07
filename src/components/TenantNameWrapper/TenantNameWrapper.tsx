@@ -19,7 +19,7 @@ import {canShowTenantMonitoring} from '../../utils/monitoringVisibility';
 import {getConnectToDBDialog} from '../ConnectToDB/ConnectToDBDialog';
 import type {DropdownMenuItemWithDescription} from '../DropdownMenu';
 import {DropdownMenu} from '../DropdownMenu';
-import {EntityStatus} from '../EntityStatusNew/EntityStatus';
+import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {InternalLink} from '../InternalLink/InternalLink';
 
 import i18n from './i18n';

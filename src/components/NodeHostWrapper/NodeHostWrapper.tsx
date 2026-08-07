@@ -2,10 +2,14 @@ import {getDefaultNodePath} from '../../routes';
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {NodeAddress} from '../../types/additionalProps';
 import type {TNodeInfo, TSystemStateInfo} from '../../types/api/nodes';
+import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {checkIsStorageNode, isUnavailableNode} from '../../utils/nodes';
-import {EntityStatus} from '../EntityStatus/EntityStatus';
+import {EntityName} from '../EntityName/EntityName';
+import {StatusColor} from '../StatusColor/StatusColor';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
+
+const b = cn('entity-status');
 
 export type NodeHostData = NodeAddress &
     Pick<TNodeInfo, 'ConnectStatus'> &
@@ -48,11 +52,11 @@ export const NodeHostWrapper = ({
         : undefined;
 
     return (
-        <EntityStatus
+        <EntityName
             name={node.Host}
-            status={status}
             path={nodePath}
             hasClipboardButton
+            leadingContent={<StatusColor className={b('icon')} status={status} />}
             infoPopoverContent={
                 isNodeAvailable ? <NodeEndpointsTooltipContent data={node} /> : null
             }
