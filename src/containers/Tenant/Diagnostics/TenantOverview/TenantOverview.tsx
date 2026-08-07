@@ -2,11 +2,12 @@ import React from 'react';
 
 import {Button, Flex, Icon} from '@gravity-ui/uikit';
 
-import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {EntityName} from '../../../../components/EntityName/EntityName';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
 import {ServerlessDBLabel} from '../../../../components/ServerlessDBLabel/ServerlessDBLabel';
+import {StatusColor} from '../../../../components/StatusColor/StatusColor';
 import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {healthcheckApi} from '../../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {
@@ -27,6 +28,7 @@ import type {SelfCheckResult} from '../../../../types/api/healthcheck';
 import type {TMemoryStats} from '../../../../types/api/nodes';
 import type {ETenantType, TTenant, TTenantResource} from '../../../../types/api/tenant';
 import {getInfoTabLinks} from '../../../../utils/additionalProps';
+import {cn} from '../../../../utils/cn';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
@@ -52,6 +54,8 @@ import {b} from './utils';
 import MoniumIcon from '../../../../assets/icons/monium.svg';
 
 import './TenantOverview.scss';
+
+const entityStatus = cn('entity-status');
 
 interface TenantOverviewProps {
     database: string;
@@ -111,12 +115,14 @@ function TenantName({
 }) {
     return (
         <Flex alignItems="center" style={{overflow: 'hidden'}}>
-            <EntityStatus
-                status={databaseStatus}
+            <EntityName
                 name={name || TENANT_DEFAULT_TITLE}
                 withLeftTrim
                 hasClipboardButton={hasTenant}
                 clipboardButtonAlwaysVisible
+                leadingContent={
+                    <StatusColor className={entityStatus('icon')} status={databaseStatus} />
+                }
             />
             {isServerless ? <ServerlessDBLabel className={b('serverless-tag')} /> : null}
         </Flex>
