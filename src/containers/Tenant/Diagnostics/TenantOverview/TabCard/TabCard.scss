@@ -33,9 +33,7 @@
         cursor: default !important;
     }
 
-    &__status-help-mark {
-        position: relative;
-
+    &__help-mark {
         display: inline-flex;
         flex-shrink: 0;
         justify-content: center;
@@ -43,23 +41,19 @@
 
         width: 16px;
         height: 16px;
-        padding: 0;
 
         line-height: 0;
         cursor: pointer;
 
-        color: inherit;
-        border: none;
-        outline: none;
-        background: none;
+        &_serverless {
+            width: 14px;
+            height: 14px;
 
-        &:focus-visible {
-            border-radius: 50%;
-            outline: 2px solid var(--g-color-line-focus);
+            color: var(--g-color-text-hint);
         }
     }
 
-    &__status-help-mark-popover {
+    &__help-mark-popover {
         max-width: 300px;
         padding: var(--g-spacing-3);
     }

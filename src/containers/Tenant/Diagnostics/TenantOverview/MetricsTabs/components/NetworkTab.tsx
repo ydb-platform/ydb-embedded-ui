@@ -1,15 +1,20 @@
 import {Link} from 'react-router-dom';
 
-import {TENANT_METRICS_TABS_IDS} from '../../../../../../store/reducers/tenant/constants';
+import {EFlag} from '../../../../../../types/api/enums';
 import {cn} from '../../../../../../utils/cn';
 import {MetricTabCard} from '../../TabCard/MetricTabCard';
 import i18n from '../../i18n';
 import type {TenantOverviewMetric} from '../../metricOverview';
-import {getMetricTabHelpText} from '../getMetricTabHelpText';
 
 import '../MetricsTabs.scss';
 
 const b = cn('tenant-metrics-tabs');
+const helpTextKeys: Partial<Record<EFlag, Parameters<typeof i18n>[0]>> = {
+    [EFlag.Grey]: 'context_metric-status-unavailable',
+    [EFlag.Green]: 'context_network-status-normal',
+    [EFlag.Yellow]: 'context_network-status-warning',
+    [EFlag.Red]: 'context_network-status-critical',
+};
 
 interface NetworkTabProps {
     to: string;
@@ -18,6 +23,8 @@ interface NetworkTabProps {
 }
 
 export function NetworkTab({to, active, network}: NetworkTabProps) {
+    const helpTextKey = helpTextKeys[network.status];
+
     return (
         <div className={b('link-container', {active})}>
             <Link to={to} className={b('link')}>
@@ -27,7 +34,7 @@ export function NetworkTab({to, active, network}: NetworkTabProps) {
                     value={network.percentText ?? i18n('value_unavailable-percent')}
                     active={active}
                     description={i18n('context_network-tab-description')}
-                    helpText={getMetricTabHelpText(TENANT_METRICS_TABS_IDS.network, network.status)}
+                    helpText={helpTextKey ? i18n(helpTextKey) : undefined}
                 />
             </Link>
         </div>

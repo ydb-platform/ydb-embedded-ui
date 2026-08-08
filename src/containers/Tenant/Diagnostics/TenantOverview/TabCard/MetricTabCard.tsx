@@ -19,11 +19,6 @@ interface MetricTabCardProps {
     active?: boolean;
 }
 
-function handleHelpMarkClick(event: React.MouseEvent<HTMLButtonElement>) {
-    event.preventDefault();
-    event.stopPropagation();
-}
-
 function handleHelpMarkPopoverClick(event: React.MouseEvent<HTMLDivElement>) {
     event.stopPropagation();
 }
@@ -40,21 +35,14 @@ export function MetricTabCard({
     const statusHelpMark = helpText ? (
         <Popover
             content={
-                <div className={b('status-help-mark-popover')} onClick={handleHelpMarkPopoverClick}>
+                <div className={b('help-mark-popover')} onClick={handleHelpMarkPopoverClick}>
                     {helpText}
                 </div>
             }
             hasArrow
             placement={['top', 'bottom']}
         >
-            <button
-                type="button"
-                className={b('status-help-mark')}
-                aria-label={helpText}
-                onClick={handleHelpMarkClick}
-            >
-                {statusIcon}
-            </button>
+            <span className={b('help-mark')}>{statusIcon}</span>
         </Popover>
     ) : (
         statusIcon
