@@ -28,7 +28,6 @@ import type {SelfCheckResult} from '../../../../types/api/healthcheck';
 import type {TMemoryStats} from '../../../../types/api/nodes';
 import type {ETenantType, TTenant, TTenantResource} from '../../../../types/api/tenant';
 import {getInfoTabLinks} from '../../../../utils/additionalProps';
-import {cn} from '../../../../utils/cn';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
@@ -54,8 +53,6 @@ import {b} from './utils';
 import MoniumIcon from '../../../../assets/icons/monium.svg';
 
 import './TenantOverview.scss';
-
-const entityStatus = cn('entity-status');
 
 interface TenantOverviewProps {
     database: string;
@@ -120,9 +117,7 @@ function TenantName({
                 withLeftTrim
                 hasClipboardButton={hasTenant}
                 clipboardButtonAlwaysVisible
-                leadingContent={
-                    <StatusColor className={entityStatus('icon')} status={databaseStatus} />
-                }
+                leadingContent={<StatusColor status={databaseStatus} />}
             />
             {isServerless ? <ServerlessDBLabel className={b('serverless-tag')} /> : null}
         </Flex>

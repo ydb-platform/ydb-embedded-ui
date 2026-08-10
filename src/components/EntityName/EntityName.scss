@@ -1,8 +1,8 @@
 @use '../../styles/mixins.scss';
 
-.entity-status {
+.ydb-entity-name {
     --button-width: 24px;
-    --entity-status-height: 20px;
+    --entity-name-height: 20px;
 
     position: relative;
 
@@ -10,11 +10,13 @@
     align-items: center;
 
     max-width: 100%;
-    height: var(--entity-status-height);
+    height: var(--entity-name-height);
 
     @include mixins.body-2-typography();
 
-    &__icon {
+    &__leading-content {
+        display: inline-flex;
+
         margin-right: var(--g-spacing-2);
     }
 
@@ -31,14 +33,14 @@
         &_visible,
         &:focus-visible,
         &:hover,
-        .entity-status__wrapper:focus-within &,
+        .ydb-entity-name__wrapper:focus-within &,
         .data-table__row:hover &,
         .ydb-paginated-table__row:hover & {
             opacity: 1;
         }
 
         &:focus-visible,
-        .entity-status__wrapper:focus-within {
+        .ydb-entity-name__wrapper:focus-within {
             background-color: var(--g-color-base-float);
         }
         &:hover {
@@ -51,7 +53,7 @@
 
         overflow: hidden;
 
-        height: var(--entity-status-height);
+        height: var(--entity-name-height);
 
         &_with-clipboard-button {
             padding-right: var(--button-width);
@@ -62,7 +64,7 @@
         }
 
         &_with-clipboard-button {
-            &.entity-status__wrapper_with-info-button {
+            &.ydb-entity-name__wrapper_with-info-button {
                 padding-right: calc(2 * var(--button-width));
             }
         }
@@ -103,7 +105,7 @@
     }
 
     &__wrapper_with-clipboard-button {
-        &.entity-status__wrapper_with-info-button .entity-status__link {
+        &.ydb-entity-name__wrapper_with-info-button .ydb-entity-name__link {
             width: calc(100% + 2 * var(--button-width));
         }
     }
@@ -131,7 +133,7 @@
         text-align: end;
         direction: rtl;
 
-        .entity-status__name {
+        .ydb-entity-name__name {
             unicode-bidi: plaintext;
         }
     }

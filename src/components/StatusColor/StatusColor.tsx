@@ -3,7 +3,7 @@ import {cn} from '../../utils/cn';
 
 import './StatusColor.scss';
 
-const b = cn('ydb-status-icon');
+const b = cn('ydb-status-color');
 
 export type StatusColorSize = 'xs' | 's' | 'm' | 'l';
 
@@ -16,5 +16,5 @@ interface StatusColorProps {
 export function StatusColor({status = EFlag.Grey, size = 's', className}: StatusColorProps) {
     const modifiers = {state: status.toLowerCase(), size};
 
-    return <div className={b('status-color', modifiers, className)} />;
+    return <div className={b(modifiers, className)} />;
 }

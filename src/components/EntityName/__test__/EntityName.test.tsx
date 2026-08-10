@@ -14,6 +14,21 @@ afterEach(() => {
 });
 
 describe('EntityName', () => {
+    test('uses its own BEM block', () => {
+        const {container} = render(<EntityName name="node-1.example.net" />);
+
+        expect(container.firstElementChild).toHaveClass('ydb-entity-name');
+        expect(container.firstElementChild).not.toHaveClass('entity-status');
+    });
+
+    test('owns the leading content layout', () => {
+        render(<EntityName name="node-1.example.net" leadingContent={<span>Status</span>} />);
+
+        expect(screen.getByText('Status').parentElement).toHaveClass(
+            'ydb-entity-name__leading-content',
+        );
+    });
+
     test('renders a copyable name without status markup', async () => {
         const writeText = jest.fn().mockResolvedValue(undefined);
         Object.defineProperty(navigator, 'clipboard', {
@@ -24,7 +39,7 @@ describe('EntityName', () => {
         const {container} = render(<EntityName name="node-1.example.net" hasClipboardButton />);
 
         expect(screen.getByText('node-1.example.net')).toBeVisible();
-        expect(container.querySelector('.ydb-status-icon__status-color')).toBeNull();
+        expect(container.querySelector('.ydb-status-color')).toBeNull();
         expect(container.querySelector('.ydb-status-icon__status-icon')).toBeNull();
         fireEvent.click(screen.getByRole('button', {name: /copy/i}));
         await waitFor(() => expect(writeText).toHaveBeenCalledWith('node-1.example.net'));

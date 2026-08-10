@@ -9,7 +9,7 @@ import {InternalLink} from '../InternalLink/InternalLink';
 
 import './EntityName.scss';
 
-const b = cn('entity-status');
+const b = cn('ydb-entity-name');
 
 export interface EntityNameProps {
     name?: string;
@@ -63,7 +63,7 @@ export function EntityName({
 
     return (
         <div className={b(null, className)}>
-            {leadingContent}
+            {leadingContent ? <div className={b('leading-content')}>{leadingContent}</div> : null}
             {(path || name) && (
                 <div
                     className={b('wrapper', {
