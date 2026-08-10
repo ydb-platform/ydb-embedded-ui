@@ -537,12 +537,24 @@ test.describe('Diagnostics Info tab', async () => {
         });
 
         const tenantPage = new TenantPage(page);
-        await tenantPage.goto({
-            schema: mockDirectoryPath,
-            database,
-            databasePage: 'diagnostics',
-            diagnosticsTab: 'overview',
-        });
+        const [directoryDescriptionResponse] = await Promise.all([
+            page.waitForResponse((response) => {
+                const url = new URL(response.url());
+
+                return (
+                    url.pathname.endsWith('/viewer/json/describe') &&
+                    url.searchParams.get('path') === mockDirectoryPath &&
+                    response.ok()
+                );
+            }),
+            tenantPage.goto({
+                schema: mockDirectoryPath,
+                database,
+                databasePage: 'diagnostics',
+                diagnosticsTab: 'overview',
+            }),
+        ]);
+        await directoryDescriptionResponse.finished();
 
         const infoContent = page.locator('.kv-detailed-overview');
         await expect(infoContent).toBeVisible();
