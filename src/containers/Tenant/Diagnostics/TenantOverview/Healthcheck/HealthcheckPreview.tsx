@@ -7,6 +7,7 @@ import {healthcheckApi} from '../../../../../store/reducers/healthcheckInfo/heal
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import {cn} from '../../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
+import {isEnumMember} from '../../../../../utils/typecheckers';
 import {HEALTHCHECK_RESULT_TO_TEXT} from '../../../constants';
 import {useTenantQueryParams} from '../../../useTenantQueryParams';
 
@@ -40,7 +41,10 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
 
     const loading = isFetching && data === undefined;
 
-    const selfCheckResult: SelfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
+    const apiSelfCheckResult = data?.self_check_result;
+    const selfCheckResult = isEnumMember(SelfCheckResult, apiSelfCheckResult)
+        ? apiSelfCheckResult
+        : SelfCheckResult.UNSPECIFIED;
     const statusConfig = SELF_CHECK_RESULT_CONFIG[selfCheckResult];
 
     const modifier = selfCheckResult.toLowerCase();
