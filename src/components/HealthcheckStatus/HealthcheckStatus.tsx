@@ -1,7 +1,7 @@
 import type {LabelProps} from '@gravity-ui/uikit';
 import {Icon, Label} from '@gravity-ui/uikit';
 
-import type {SelfCheckResult} from '../../types/api/healthcheck';
+import {SelfCheckResult} from '../../types/api/healthcheck';
 import {cn} from '../../utils/cn';
 
 import {SELF_CHECK_RESULT_CONFIG} from './config';
@@ -16,7 +16,8 @@ interface HealthcheckStatusProps {
 }
 
 export function HealthcheckStatus({status, size = 's'}: HealthcheckStatusProps) {
-    const config = SELF_CHECK_RESULT_CONFIG[status];
+    const config =
+        SELF_CHECK_RESULT_CONFIG[status] ?? SELF_CHECK_RESULT_CONFIG[SelfCheckResult.UNSPECIFIED];
 
     return (
         <Label
