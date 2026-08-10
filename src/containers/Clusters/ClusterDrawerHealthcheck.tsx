@@ -53,13 +53,13 @@ export function ClusterDrawerHealthcheck({
             renderDrawerContent={renderDrawerContent}
             drawerId="cluster-healthcheck-details"
             storageKey="cluster-healthcheck-details-drawer-width"
-            title={`${tenantI18n('label_healthcheck-dashboard')}${
+            title={`${tenantI18n('title_healthcheck-dashboard')}${
                 clusterName ? `: ${clusterName}` : ''
             }`}
             status={healthcheckStatus}
             healthcheckData={healthcheckData}
             downloadFilePrefix={`${clusterName}-cluster-healthcheck`}
-            downloadTooltip={tenantI18n('label_download')}
+            downloadTooltip={tenantI18n('action_download-healthcheck')}
             isDownloadDisabled={!healthcheckData}
         >
             {children}

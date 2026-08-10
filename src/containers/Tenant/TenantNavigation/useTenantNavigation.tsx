@@ -28,10 +28,10 @@ const mapPageToIcon: Partial<Record<TenantPage, IconData>> = {
 
 const mapPageToTitle: Partial<Record<TenantPage, string>> = {
     get query() {
-        return i18n('pages.query');
+        return i18n('title_query');
     },
     get diagnostics() {
-        return i18n('pages.diagnostics');
+        return i18n('title_diagnostics');
     },
 };
 
@@ -43,13 +43,13 @@ const mapPageToIcon2: Record<TenantPage, IconData> = {
 
 const mapPageToTitle2: Record<TenantPage, string> = {
     get database() {
-        return i18n('pages.database');
+        return i18n('title_database');
     },
     get diagnostics() {
-        return i18n('pages.diagnostics');
+        return i18n('title_diagnostics');
     },
     get query() {
-        return i18n('pages.editor');
+        return i18n('title_sql-editor');
     },
 };
 

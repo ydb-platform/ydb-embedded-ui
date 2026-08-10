@@ -35,7 +35,7 @@ export function prepareExternalDataSourceInfo(
 
     return [
         {
-            name: tenantKeyset('summary.source-type'),
+            name: tenantKeyset('field_source-type'),
             content: SourceType,
         },
         {
@@ -60,11 +60,11 @@ export function prepareExternalTableInfo(
 
     return [
         {
-            name: tenantKeyset('summary.source-type'),
+            name: tenantKeyset('field_source-type'),
             content: SourceType,
         },
         {
-            name: tenantKeyset('summary.data-source'),
+            name: tenantKeyset('field_data-source'),
             content: DataSourcePath && (
                 <span title={DataSourcePath}>
                     <LinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
@@ -90,7 +90,7 @@ export function prepareSystemViewTypeItems(
 
     return [
         {
-            name: tenantKeyset('summary.system-view-type'),
+            name: tenantKeyset('field_system-view-type'),
             content: (
                 <SchemaObjectTypeLabel
                     value={formatSystemViewType(type) ?? EMPTY_DATA_PLACEHOLDER}

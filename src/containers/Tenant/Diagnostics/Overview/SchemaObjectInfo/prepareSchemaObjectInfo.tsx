@@ -95,7 +95,7 @@ export function prepareSchemaObjectInfoItems({
 
     const items: YDBDefinitionListItem[] = [
         {
-            name: tenantKeyset('summary.type'),
+            name: tenantKeyset('field_type'),
             content: prepareTypeLabel({data, fallbackType, path}),
         },
         ...itemsAfterType,
@@ -104,12 +104,12 @@ export function prepareSchemaObjectInfoItems({
     if (showAdministrativeFields) {
         items.push(
             {
-                name: tenantKeyset('summary.id'),
+                name: tenantKeyset('field_id'),
                 content: pathId,
                 copyText: pathId,
             },
             {
-                name: tenantKeyset('summary.version'),
+                name: tenantKeyset('field_version'),
                 content: pathVersion,
                 copyText: pathVersion,
             },
@@ -118,7 +118,7 @@ export function prepareSchemaObjectInfoItems({
 
     if (Number(createStep)) {
         items.push({
-            name: tenantKeyset('summary.created'),
+            name: tenantKeyset('field_created'),
             content: formatDateTime(createStep),
         });
     }

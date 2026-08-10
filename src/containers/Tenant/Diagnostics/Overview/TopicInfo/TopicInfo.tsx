@@ -30,7 +30,7 @@ export const TopicInfo = ({data, path, database, databaseFullPath}: TopicInfoPro
     return (
         <div>
             <InfoViewer
-                title={tenantKeyset('summary.partitioning')}
+                title={tenantKeyset('title_partitioning')}
                 info={prepareTopicSchemaInfo(data)}
             />
             {renderStats()}

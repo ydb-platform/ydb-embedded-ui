@@ -28,10 +28,10 @@ interface CreateDirectoryDialogProps {
 
 function validateRelativePath(value: string) {
     if (!value) {
-        return i18n('schema.tree.dialog.empty');
+        return i18n('alert_empty-path');
     }
     if (/\s/.test(value)) {
-        return i18n('schema.tree.dialog.whitespace');
+        return i18n('alert_whitespace-not-allowed');
     }
     return '';
 }
@@ -92,7 +92,7 @@ export function CreateDirectoryDialog({
 
     return (
         <Dialog open={open} onClose={handleClose} size="s" initialFocus={inputRef}>
-            <Dialog.Header caption={i18n('schema.tree.dialog.header')} />
+            <Dialog.Header caption={i18n('title_create-directory')} />
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
@@ -126,8 +126,8 @@ export function CreateDirectoryDialog({
                     </div>
                     <TextInput
                         controlRef={inputRef}
-                        placeholder={i18n('schema.tree.dialog.placeholder')}
-                        aria-label={i18n('schema.tree.dialog.placeholder')}
+                        placeholder={i18n('field_directory-name')}
+                        aria-label={i18n('field_directory-name')}
                         value={relativePath}
                         onUpdate={handleUpdate}
                         autoFocus
@@ -141,14 +141,14 @@ export function CreateDirectoryDialog({
                     {response.isError && (
                         <ResponseError
                             error={response.error}
-                            defaultMessage={i18n('schema.tree.dialog.invalid')}
+                            defaultMessage={i18n('alert_invalid-path')}
                         />
                     )}
                 </Dialog.Body>
                 <Dialog.Footer
                     loading={response.isLoading}
-                    textButtonApply={i18n('schema.tree.dialog.buttonApply')}
-                    textButtonCancel={i18n('schema.tree.dialog.buttonCancel')}
+                    textButtonApply={i18n('action_create')}
+                    textButtonCancel={i18n('action_cancel')}
                     onClickButtonCancel={handleClose}
                     propsButtonApply={{type: 'submit', className: BRAND_BUTTON_CLASS}}
                 />

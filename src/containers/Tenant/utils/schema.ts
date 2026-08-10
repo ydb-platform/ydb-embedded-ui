@@ -84,12 +84,10 @@ export const mapPathTypeToNavigationTreeType = (
 // ====================
 
 const pathSubTypeToEntityName: Record<EPathSubType, string | undefined> = {
-    [EPathSubType.EPathSubTypeSyncIndexImplTable]: i18n('entity-name_secondary-index-table'),
-    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: i18n('entity-name_secondary-index-table'),
-    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: i18n(
-        'entity-name_vector-index-table',
-    ),
-    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: i18n('entity-name_fulltext-index-table'),
+    [EPathSubType.EPathSubTypeSyncIndexImplTable]: i18n('value_secondary-index-table'),
+    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: i18n('value_secondary-index-table'),
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: i18n('value_vector-index-table'),
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: i18n('value_fulltext-index-table'),
     [EPathSubType.EPathSubTypeLocalMinMaxIndex]: undefined,
 
     [EPathSubType.EPathSubTypeStreamImpl]: undefined,
@@ -99,29 +97,29 @@ const pathSubTypeToEntityName: Record<EPathSubType, string | undefined> = {
 const pathTypeToEntityName: Record<EPathType, string | undefined> = {
     [EPathType.EPathTypeInvalid]: undefined,
 
-    [EPathType.EPathTypeSubDomain]: i18n('entity-name_database'),
-    [EPathType.EPathTypeExtSubDomain]: i18n('entity-name_database'),
+    [EPathType.EPathTypeSubDomain]: i18n('value_database'),
+    [EPathType.EPathTypeExtSubDomain]: i18n('value_database'),
 
-    [EPathType.EPathTypeDir]: i18n('entity-name_directory'),
-    [EPathType.EPathTypeTable]: i18n('entity-name_table'),
-    [EPathType.EPathTypeSysView]: i18n('entity-name_system-view'),
-    [EPathType.EPathTypeTableIndex]: i18n('entity-name_secondary-index'),
-    [EPathType.EPathTypeColumnStore]: i18n('entity-name_tablestore'),
-    [EPathType.EPathTypeColumnTable]: i18n('entity-name_column-oriented-table'),
-    [EPathType.EPathTypeCdcStream]: i18n('entity-name_changefeed'),
-    [EPathType.EPathTypePersQueueGroup]: i18n('entity-name_topic'),
+    [EPathType.EPathTypeDir]: i18n('value_directory'),
+    [EPathType.EPathTypeTable]: i18n('value_table'),
+    [EPathType.EPathTypeSysView]: i18n('value_system-view'),
+    [EPathType.EPathTypeTableIndex]: i18n('value_secondary-index'),
+    [EPathType.EPathTypeColumnStore]: i18n('value_tablestore'),
+    [EPathType.EPathTypeColumnTable]: i18n('value_column-oriented-table'),
+    [EPathType.EPathTypeCdcStream]: i18n('value_changefeed'),
+    [EPathType.EPathTypePersQueueGroup]: i18n('value_topic'),
 
-    [EPathType.EPathTypeExternalDataSource]: i18n('entity-name_external-data-source'),
-    [EPathType.EPathTypeExternalTable]: i18n('entity-name_external-table'),
+    [EPathType.EPathTypeExternalDataSource]: i18n('value_external-data-source'),
+    [EPathType.EPathTypeExternalTable]: i18n('value_external-table'),
 
-    [EPathType.EPathTypeStreamingQuery]: i18n('entity-name_streaming_query'),
+    [EPathType.EPathTypeStreamingQuery]: i18n('value_streaming-query'),
 
-    [EPathType.EPathTypeView]: i18n('entity-name_view'),
+    [EPathType.EPathTypeView]: i18n('value_view'),
 
-    [EPathType.EPathTypeReplication]: i18n('entity-name_async-replication'),
-    [EPathType.EPathTypeTransfer]: i18n('entity-name_transfer'),
-    [EPathType.EPathTypeResourcePool]: i18n('entity-name_resource-pool'),
-    [EPathType.EPathTypeSecret]: i18n('entity-name_secret'),
+    [EPathType.EPathTypeReplication]: i18n('value_async-replication'),
+    [EPathType.EPathTypeTransfer]: i18n('value_transfer'),
+    [EPathType.EPathTypeResourcePool]: i18n('value_resource-pool'),
+    [EPathType.EPathTypeSecret]: i18n('value_secret'),
 };
 
 export const mapPathTypeToEntityName = (
@@ -134,16 +132,16 @@ export const mapPathTypeToEntityName = (
 
 const indexTypeToEntityName: Record<EIndexType, string | undefined> = {
     [EIndexType.EIndexTypeInvalid]: undefined,
-    [EIndexType.EIndexTypeGlobal]: i18n('entity-name_secondary-index'),
-    [EIndexType.EIndexTypeGlobalAsync]: i18n('entity-name_secondary-index'),
-    [EIndexType.EIndexTypeGlobalUnique]: i18n('entity-name_secondary-index'),
-    [EIndexType.EIndexTypeGlobalVectorKmeansTree]: i18n('entity-name_vector-index'),
-    [EIndexType.EIndexTypeGlobalFulltext]: i18n('entity-name_fulltext-index'),
-    [EIndexType.EIndexTypeGlobalFulltextPlain]: i18n('entity-name_fulltext-index'),
-    [EIndexType.EIndexTypeGlobalFulltextRelevance]: i18n('entity-name_fulltext-index'),
-    [EIndexType.EIndexTypeLocalBloomFilter]: i18n('entity-name_secondary-index'),
-    [EIndexType.EIndexTypeLocalBloomNgramFilter]: i18n('entity-name_secondary-index'),
-    [EIndexType.EIndexTypeLocalMinMax]: i18n('entity-name_secondary-index'),
+    [EIndexType.EIndexTypeGlobal]: i18n('value_secondary-index'),
+    [EIndexType.EIndexTypeGlobalAsync]: i18n('value_secondary-index'),
+    [EIndexType.EIndexTypeGlobalUnique]: i18n('value_secondary-index'),
+    [EIndexType.EIndexTypeGlobalVectorKmeansTree]: i18n('value_vector-index'),
+    [EIndexType.EIndexTypeGlobalFulltext]: i18n('value_fulltext-index'),
+    [EIndexType.EIndexTypeGlobalFulltextPlain]: i18n('value_fulltext-index'),
+    [EIndexType.EIndexTypeGlobalFulltextRelevance]: i18n('value_fulltext-index'),
+    [EIndexType.EIndexTypeLocalBloomFilter]: i18n('value_secondary-index'),
+    [EIndexType.EIndexTypeLocalBloomNgramFilter]: i18n('value_secondary-index'),
+    [EIndexType.EIndexTypeLocalMinMax]: i18n('value_secondary-index'),
 };
 
 export const mapIndexTypeToEntityName = (type?: EIndexType) => type && indexTypeToEntityName[type];

@@ -48,11 +48,11 @@ export function TenantDrawerHealthcheck({children}: TenantDrawerWrapperProps) {
             renderDrawerContent={renderDrawerContent}
             drawerId="tenant-healthcheck-details"
             storageKey="tenant-healthcheck-details-drawer-width"
-            title={i18n('label_healthcheck-dashboard')}
+            title={i18n('title_healthcheck-dashboard')}
             status={healthcheckStatus}
             healthcheckData={healthcheckData}
             downloadFilePrefix={`${database}-healthcheck`}
-            downloadTooltip={i18n('label_download')}
+            downloadTooltip={i18n('action_download-healthcheck')}
         >
             {children}
         </HealthcheckDrawer>

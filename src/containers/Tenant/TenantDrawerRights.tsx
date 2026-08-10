@@ -52,8 +52,8 @@ export function TenantDrawerRights({children}: TenantDrawerWrapperProps) {
 function DrawerTitle() {
     return (
         <Flex direction="column">
-            <Text variant="subheader-2">{i18n('label_grant-access')}</Text>
-            <Text color="secondary">{i18n('context_grant-access')}</Text>
+            <Text variant="subheader-2">{i18n('title_grant-access')}</Text>
+            <Text color="secondary">{i18n('context_granular-rights-groups')}</Text>
         </Flex>
     );
 }

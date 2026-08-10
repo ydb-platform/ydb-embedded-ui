@@ -84,7 +84,7 @@ export function Tenant({additionalTenantProps}: TenantProps) {
     const {tenantPage} = useTenantPage();
     const showDatabaseDiagnostics = isV2Enabled && tenantPage === TENANT_PAGES_IDS.database;
 
-    const title = path || i18n('page.title');
+    const title = path || i18n('title_database');
     const {appTitle} = useAppTitle();
 
     const renderContent = () => {
