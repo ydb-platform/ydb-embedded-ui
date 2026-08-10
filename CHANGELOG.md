@@ -1,5 +1,15 @@
 # Changelog
 
+## [18.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.4.0...v18.5.0) (2026-08-10)
+
+
+### Features
+
+* add status helpmarks to database metric tabs ([#4212](https://github.com/ydb-platform/ydb-embedded-ui/issues/4212)) ([a8994c9](https://github.com/ydb-platform/ydb-embedded-ui/commit/a8994c9a45b7dc27ac0d2ca4120ba96585ec686c))
+* **Healthcheck:** improve colors and refactor ([#4216](https://github.com/ydb-platform/ydb-embedded-ui/issues/4216)) ([e83fccf](https://github.com/ydb-platform/ydb-embedded-ui/commit/e83fccf01e72adfe43e784c741c2a0d7d0ed3993))
+* implement new Infra styles for yandex-team ([#4197](https://github.com/ydb-platform/ydb-embedded-ui/issues/4197)) ([d2f3ac1](https://github.com/ydb-platform/ydb-embedded-ui/commit/d2f3ac1840f796d7063a39b741b0bcef6127374e))
+* **PDisk:** highlight pdisks for current object ([#4215](https://github.com/ydb-platform/ydb-embedded-ui/issues/4215)) ([7e87e5a](https://github.com/ydb-platform/ydb-embedded-ui/commit/7e87e5afeb4ade670544551c3217b97f6f195088))
+
 ## [18.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.3.2...v18.4.0) (2026-08-07)
 
 
