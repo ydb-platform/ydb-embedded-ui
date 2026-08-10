@@ -148,21 +148,29 @@ function HealthcheckContent({
         return (
             <Flex direction="column" gap={3} className={b('controls', {fullscreen})}>
                 <Flex justifyContent="space-between" gap={2}>
-                    <HealthcheckStatus status={selfCheckResult} />
                     {showDiagnostics ? (
-                        <Flex gap={2} alignItems="center">
-                            <HealthcheckAssistantAction
-                                action="diagnostics"
-                                target={target}
-                                snapshot={snapshot}
-                            />
+                        <React.Fragment>
+                            <Flex gap={2} alignItems="center">
+                                <HealthcheckStatus status={selfCheckResult} />
+                                <HealthcheckAssistantAction
+                                    action="diagnostics"
+                                    target={target}
+                                    snapshot={snapshot}
+                                />
+                            </Flex>
                             <HealthcheckRefresh
                                 lastFullfiled={fulfilledTimeStamp}
                                 refresh={refetch}
                             />
-                        </Flex>
+                        </React.Fragment>
                     ) : (
-                        <HealthcheckRefresh lastFullfiled={fulfilledTimeStamp} refresh={refetch} />
+                        <React.Fragment>
+                            <HealthcheckStatus status={selfCheckResult} />
+                            <HealthcheckRefresh
+                                lastFullfiled={fulfilledTimeStamp}
+                                refresh={refetch}
+                            />
+                        </React.Fragment>
                     )}
                 </Flex>
                 <HealthcheckView issuesCount={issuesCount} />

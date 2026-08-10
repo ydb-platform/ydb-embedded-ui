@@ -7,6 +7,7 @@ import {EntityStatus} from '../../../../components/EntityStatusNew/EntityStatus'
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
 import {hcStatusToColorFlag} from '../../../../store/reducers/healthcheckInfo/utils';
 import {useHealthcheckContext} from '../HealthcheckContext';
+import i18n from '../i18n';
 import {b} from '../shared';
 
 import {IssueDetails} from './HealthcheckIssueDetails/HealthcheckIssueDetails';
@@ -99,50 +100,35 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                             );
                         }
 
-                        return (
-                            <Flex
-                                wrap="nowrap"
-                                gap={2}
-                                alignItems="center"
-                                className={b('issue-summary')}
-                            >
-                                <button
-                                    {...buttonProps}
-                                    type="button"
-                                    aria-controls={ariaControls}
-                                    aria-expanded={isExpanded}
-                                    className={b(
-                                        'disclosure-trigger',
-                                        {'with-action': true},
-                                        disclosureClassName,
-                                    )}
-                                    data-qa={qa}
-                                >
-                                    <Flex
-                                        wrap="nowrap"
-                                        gap={2}
-                                        justifyContent="space-between"
-                                        alignItems="center"
-                                    >
-                                        <Flex direction="column" gap={1} alignSelf="center">
-                                            <Text variant="subheader-2">{issue.message}</Text>
+                        const {id, onClick, onKeyDown, disabled} = buttonProps;
 
-                                            {issue.status && (
-                                                <div className={b('issue-status')}>
-                                                    <EntityStatus.Label
-                                                        size="s"
-                                                        status={hcStatusToColorFlag[issue.status]}
-                                                    />
-                                                </div>
-                                            )}
-                                        </Flex>
-                                        <Divider
-                                            className={b('issue-divider')}
-                                            orientation="vertical"
-                                        />
-                                        <ArrowToggle direction={isExpanded ? 'top' : 'bottom'} />
-                                    </Flex>
-                                </button>
+                        return (
+                            <div
+                                className={b(
+                                    'issue-summary',
+                                    {'with-assistant': true},
+                                    disclosureClassName,
+                                )}
+                                onClick={disabled ? undefined : onClick}
+                            >
+                                <Flex
+                                    id={id}
+                                    direction="column"
+                                    gap={1}
+                                    alignSelf="center"
+                                    className={b('issue-message')}
+                                >
+                                    <Text variant="subheader-2">{issue.message}</Text>
+
+                                    {issue.status && (
+                                        <div className={b('issue-status')}>
+                                            <EntityStatus.Label
+                                                size="s"
+                                                status={hcStatusToColorFlag[issue.status]}
+                                            />
+                                        </div>
+                                    )}
+                                </Flex>
                                 <div
                                     className={b('issue-action')}
                                     onClick={(event) => event.stopPropagation()}
@@ -154,7 +140,28 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                                         issue={rawIssue}
                                     />
                                 </div>
-                            </Flex>
+                                <Divider className={b('issue-divider')} orientation="vertical" />
+                                <button
+                                    type="button"
+                                    aria-controls={ariaControls}
+                                    aria-expanded={isExpanded}
+                                    aria-label={
+                                        isExpanded
+                                            ? i18n('action_collapse-issue-details')
+                                            : i18n('action_expand-issue-details')
+                                    }
+                                    className={b('issue-chevron')}
+                                    data-qa={qa}
+                                    disabled={disabled}
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        onClick(event);
+                                    }}
+                                    onKeyDown={onKeyDown}
+                                >
+                                    <ArrowToggle direction={isExpanded ? 'top' : 'bottom'} />
+                                </button>
+                            </div>
                         );
                     }}
                 </Disclosure.Summary>

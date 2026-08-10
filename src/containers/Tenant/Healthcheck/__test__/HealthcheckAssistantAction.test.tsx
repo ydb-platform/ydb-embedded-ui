@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {fireEvent, render, screen, within} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 
 import {ComponentsProvider} from '../../../../components/ComponentsProvider/ComponentsProvider';
 import {componentsRegistry} from '../../../../components/ComponentsProvider/componentsRegistry';
@@ -139,6 +139,7 @@ describe('HealthcheckAssistantAction', () => {
             '.ydb-healthcheck__issue-summary',
         );
         expect(issueTrigger).toContainElement(issueSummary);
+        expect(issueSummary).not.toHaveClass('ydb-healthcheck__issue-summary_with-assistant');
         expect(issueTrigger).toHaveAttribute('type', 'button');
         expect(issueTrigger).toHaveAttribute('aria-expanded', 'false');
 
@@ -245,34 +246,76 @@ describe('HealthcheckAssistantAction', () => {
         expect(screen.queryByRole('button', {name: 'Diagnostics'})).not.toBeInTheDocument();
     });
 
-    it('renders diagnostics in the status and refresh row only for a successful issue snapshot', () => {
+    it('groups Status and Diagnostics separately from Refresh for a successful issue snapshot', () => {
         renderHealthcheck({database: '/Root/database'});
 
-        const statusRow = screen.getByTestId('healthcheck-status').parentElement;
-        expect(statusRow).toBeInTheDocument();
-        expect(within(statusRow as HTMLElement).getByRole('button', {name: 'Diagnostics'})).toBe(
-            screen.getByTestId('diagnostics-action'),
-        );
-        expect(
-            within(statusRow as HTMLElement).getByRole('button', {name: 'Refresh'}),
-        ).toBeVisible();
+        const status = screen.getByTestId('healthcheck-status');
+        const diagnostics = screen.getByTestId('diagnostics-action');
+        const refresh = screen.getByRole('button', {name: 'Refresh'});
+        const statusAndDiagnostics = status.parentElement;
+
+        expect(statusAndDiagnostics).toContainElement(diagnostics);
+        expect(statusAndDiagnostics).not.toContainElement(refresh);
+        expect(statusAndDiagnostics?.parentElement).toContainElement(refresh);
     });
 
-    it('renders Fix in the issue action area without toggling issue expansion', () => {
+    it('keeps the assistant issue controls in direct DOM order', () => {
+        const {container} = renderHealthcheck({database: '/Root/database'});
+
+        const issueSummary = container.querySelector<HTMLElement>(
+            '.ydb-healthcheck__issue-summary',
+        );
+        const fixAction = screen.getByRole('button', {name: 'Fix'});
+        const children = Array.from(issueSummary?.children ?? []);
+
+        expect(issueSummary).toHaveClass('ydb-healthcheck__issue-summary_with-assistant');
+        expect(children).toHaveLength(4);
+        expect(children[0]).toHaveClass('ydb-healthcheck__issue-message');
+        expect(children[0]).toContainElement(
+            container.querySelector('.ydb-healthcheck__issue-status'),
+        );
+        expect(children[1]).toContainElement(fixAction);
+        expect(children[2]).toHaveClass('ydb-healthcheck__issue-divider');
+        expect(children[3]).toHaveClass('ydb-healthcheck__issue-chevron');
+    });
+
+    it('keeps Fix from toggling the assistant issue disclosure', () => {
         renderHealthcheck({database: '/Root/database'});
 
-        const issueTrigger = screen.getByRole('button', {name: /Disk is unavailable/});
+        const chevron = screen.getByRole('button', {name: 'Expand issue details'});
         const fixAction = screen.getByRole('button', {name: 'Fix'});
-        const issueSummary = issueTrigger.closest('.ydb-healthcheck__issue-summary');
 
-        expect(issueSummary).toContainElement(fixAction);
-        expect(issueTrigger).toHaveAttribute('type', 'button');
-        expect(issueTrigger).toHaveAttribute('aria-expanded', 'false');
+        expect(chevron).toHaveAttribute('aria-expanded', 'false');
 
         fireEvent.click(fixAction);
-        expect(issueTrigger).toHaveAttribute('aria-expanded', 'false');
+        expect(chevron).toHaveAttribute('aria-expanded', 'false');
+    });
 
-        fireEvent.click(issueTrigger);
-        expect(issueTrigger).toHaveAttribute('aria-expanded', 'true');
+    it.each([
+        {name: 'row', selector: '.ydb-healthcheck__issue-summary'},
+        {name: 'message', selector: '.ydb-healthcheck__issue-message'},
+        {name: 'divider', selector: '.ydb-healthcheck__issue-divider'},
+    ])('toggles the assistant issue disclosure once when clicking the $name', ({selector}) => {
+        const {container} = renderHealthcheck({database: '/Root/database'});
+
+        const chevron = screen.getByRole('button', {name: 'Expand issue details'});
+        const target = container.querySelector<HTMLElement>(selector);
+
+        expect(chevron).toHaveAttribute('aria-expanded', 'false');
+
+        fireEvent.click(target as HTMLElement);
+        expect(chevron).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('toggles the assistant issue disclosure once when clicking the chevron', () => {
+        renderHealthcheck({database: '/Root/database'});
+
+        const chevron = screen.getByRole('button', {name: 'Expand issue details'});
+
+        fireEvent.click(chevron);
+        expect(screen.getByRole('button', {name: 'Collapse issue details'})).toHaveAttribute(
+            'aria-expanded',
+            'true',
+        );
     });
 });

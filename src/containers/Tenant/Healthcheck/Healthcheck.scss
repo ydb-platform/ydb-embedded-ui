@@ -47,13 +47,6 @@
         width: 100%;
         @include mixins.button-reset();
 
-        &_with-action {
-            flex: 1 1 auto;
-
-            width: auto;
-            min-width: 0;
-        }
-
         &:focus-visible {
             border-radius: var(--g-border-radius-s);
             outline: 2px solid var(--g-color-line-focus);
@@ -71,8 +64,33 @@
             background-color: var(--g-color-base-generic-ultralight);
         }
     }
+    &__issue-summary_with-assistant {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: var(--g-spacing-2);
+    }
     &__issue-action {
         flex: 0 0 auto;
+    }
+    &__issue-message {
+        flex: 1 1 auto;
+
+        min-width: 0;
+    }
+    &__issue-chevron {
+        display: flex;
+        flex: 0 0 auto;
+
+        padding: var(--g-spacing-1);
+
+        @include mixins.button-reset();
+
+        &:focus-visible {
+            border-radius: var(--g-border-radius-s);
+            outline: 2px solid var(--g-color-line-focus);
+            outline-offset: -2px;
+        }
     }
     &__issue-status {
         text-align: start;
