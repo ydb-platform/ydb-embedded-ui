@@ -3,7 +3,7 @@ import {Label} from '@gravity-ui/uikit';
 import type {YDBDefinitionListItem} from '../../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TPartitionConfig, TTTLSettings} from '../../../../../../types/api/schema';
 import {formatBytes} from '../../../../../../utils/bytesParsers';
-import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES, READ_REPLICAS_MODE} from '../constants';
+import {READ_REPLICAS_MODE} from '../constants';
 import i18n from '../i18n';
 
 import {prepareTTL} from './prepareTTL';
@@ -35,8 +35,21 @@ export function prepareRowTableGeneralInfo(
         <Label theme="unknown">{i18n('value_disabled')}</Label>
     );
 
-    // For splitting by size: it always will be split by 2 GB if user doesn't set anything else
-    const splitSizeBytes = PartitioningPolicy.SizeToSplit ?? DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES;
+    // SizeToSplit is unset (or 0) when splitting by size is disabled — it is not
+    // a "use the 2 GB default" signal, see FillPartitioningSettings on the server.
+    const splitBySizeEnabled = Boolean(
+        PartitioningPolicy.SizeToSplit && Number(PartitioningPolicy.SizeToSplit) > 0,
+    );
+
+    const partitioningBySize = splitBySizeEnabled ? (
+        <Label>
+            {i18n('value_partitioning-by-size-enabled', {
+                size: formatBytes({value: Number(PartitioningPolicy.SizeToSplit)}),
+            })}
+        </Label>
+    ) : (
+        <Label theme="unknown">{i18n('value_disabled')}</Label>
+    );
 
     left.push(
         {
@@ -45,7 +58,7 @@ export function prepareRowTableGeneralInfo(
         },
         {
             name: i18n('field_partitioning-by-size'),
-            content: <Label>{formatBytes({value: splitSizeBytes})}</Label>,
+            content: partitioningBySize,
         },
         {name: i18n('field_partitioning-by-load'), content: partitioningByLoad},
     );
