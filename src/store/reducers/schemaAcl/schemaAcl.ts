@@ -4,6 +4,8 @@ import type {AccessRightsUpdateRequest} from '../../../types/api/acl';
 import type {RootState} from '../../index';
 import {api} from '../api';
 
+import {getSubjectExplicitAces} from './utils';
+
 export const schemaAclApi = api.injectEndpoints({
     endpoints: (build) => ({
         getSchemaAcl: build.query({
@@ -155,6 +157,22 @@ const selectAccessRights = createSelector(
         useMetaProxy?: boolean,
     ) => createGetSchemaAclSelector(path, database, databaseFullPath, dialect, useMetaProxy),
     (state, selectGetSchemaAcl) => selectGetSchemaAcl(state).data,
+);
+
+export const selectSubjectExplicitAces = createSelector(
+    [
+        (_state: RootState, subject: string | undefined) => subject,
+        (
+            state: RootState,
+            _subject: string | undefined,
+            path: string,
+            database: string,
+            databaseFullPath: string,
+            dialect: string,
+            useMetaProxy?: boolean,
+        ) => selectAccessRights(state, path, database, databaseFullPath, dialect, useMetaProxy),
+    ],
+    (subject, data) => getSubjectExplicitAces(data?.acl, subject),
 );
 
 const selectRightsMap = createSelector(

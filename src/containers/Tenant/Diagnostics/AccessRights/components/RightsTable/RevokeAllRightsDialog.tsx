@@ -7,8 +7,9 @@ import {SubjectWithAvatar} from '../../../../../../components/SubjectWithAvatar/
 import {useClusterWithProxy} from '../../../../../../store/reducers/cluster/cluster';
 import {
     schemaAclApi,
-    selectSubjectExplicitRights,
+    selectSubjectExplicitAces,
 } from '../../../../../../store/reducers/schemaAcl/schemaAcl';
+import {prepareRevokeAllRightsRequest} from '../../../../../../store/reducers/schemaAcl/utils';
 import createToast from '../../../../../../utils/createToast';
 import {useAclSyntax, useTypedSelector} from '../../../../../../utils/hooks';
 import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
@@ -80,8 +81,8 @@ function RevokeAllRightsDialog({
 }: RevokeAllRightsDialogProps) {
     const useMetaProxy = useClusterWithProxy();
     const dialect = useAclSyntax();
-    const subjectExplicitRights = useTypedSelector((state) =>
-        selectSubjectExplicitRights(
+    const subjectExplicitAces = useTypedSelector((state) =>
+        selectSubjectExplicitAces(
             state,
             subject,
             path,
@@ -101,15 +102,7 @@ function RevokeAllRightsDialog({
             database,
             databaseFullPath,
             dialect,
-            rights: {
-                RemoveAccess: [
-                    {
-                        Subject: subject,
-                        AccessRights: Array.from(subjectExplicitRights),
-                        AccessType: 'Allow',
-                    },
-                ],
-            },
+            rights: prepareRevokeAllRightsRequest(subjectExplicitAces),
         })
             .unwrap()
             .then(() => {

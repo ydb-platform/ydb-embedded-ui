@@ -8,9 +8,10 @@ import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {
     schemaAclApi,
     selectAvailablePermissions,
+    selectSubjectExplicitAces,
     selectSubjectInheritedRights,
 } from '../../../store/reducers/schemaAcl/schemaAcl';
-import type {AccessRightsUpdateRequest} from '../../../types/api/acl';
+import {prepareAccessRightsUpdateRequest} from '../../../store/reducers/schemaAcl/utils';
 import createToast from '../../../utils/createToast';
 import {useAclSyntax, useTypedSelector} from '../../../utils/hooks';
 import {prepareErrorMessage} from '../../../utils/prepareErrorMessage';
@@ -42,6 +43,17 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
     const dialect = useAclSyntax();
     const {currentRightsMap, setExplicitRightsChanges, rightsToGrant, rightsToRevoke, hasChanges} =
         useRights({aclSubject: aclSubject ?? undefined, path, database, databaseFullPath});
+    const subjectExplicitAces = useTypedSelector((state) =>
+        selectSubjectExplicitAces(
+            state,
+            aclSubject ?? undefined,
+            path,
+            database,
+            databaseFullPath,
+            dialect,
+            useMetaProxy,
+        ),
+    );
     const {isFetching: aclIsFetching} = schemaAclApi.useGetSchemaAclQuery(
         {
             path,
@@ -84,21 +96,12 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
             return;
         }
 
-        const newRights: AccessRightsUpdateRequest = {};
-        if (rightsToGrant.length) {
-            newRights.AddAccess = subjects.map((subj) => ({
-                AccessRights: rightsToGrant,
-                Subject: subj,
-                AccessType: 'Allow',
-            }));
-        }
-        if (rightsToRevoke.length) {
-            newRights.RemoveAccess = subjects.map((subj) => ({
-                AccessRights: rightsToRevoke,
-                Subject: subj,
-                AccessType: 'Allow',
-            }));
-        }
+        const newRights = prepareAccessRightsUpdateRequest({
+            subjects,
+            rightsToGrant,
+            rightsToRevoke,
+            subjectExplicitAces,
+        });
         updateRights({
             path,
             database,
@@ -127,6 +130,7 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
         rightsToGrant,
         aclSubject,
         rightsToRevoke,
+        subjectExplicitAces,
         newSubjects,
         handleCloseDrawer,
         databaseFullPath,
