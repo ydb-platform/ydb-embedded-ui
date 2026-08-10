@@ -62,7 +62,7 @@ export function buildTableIndexOverviewInfo(tableIndex?: TIndexDescription) {
     if (type !== undefined) {
         const typeItem = formatTableIndexItem('Type', type);
         itemsAfterType.push({
-            name: tenantKeyset('summary.subtype'),
+            name: tenantKeyset('field_subtype'),
             content: (
                 <SchemaObjectTypeLabel
                     value={typeItem.value}

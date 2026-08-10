@@ -234,115 +234,115 @@ const bindActions = (
             dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
             setActivePath(params.path);
         },
-        createTable: inputQuery(createTableTemplate, stripEllipsis(i18n('actions.createTable'))),
+        createTable: inputQuery(createTableTemplate, stripEllipsis(i18n('action_create-table'))),
         updateTable: () => showUpdateTableDialog?.(params.path),
         createColumnTable: inputQuery(
             createColumnTableTemplate,
-            stripEllipsis(i18n('actions.createColumnTable')),
+            stripEllipsis(i18n('action_create-column-table')),
         ),
         createAsyncReplication: inputQuery(
             createAsyncReplicationTemplate,
-            stripEllipsis(i18n('actions.createAsyncReplication')),
+            stripEllipsis(i18n('action_create-async-replication')),
         ),
         alterAsyncReplication: inputQuery(
             alterAsyncReplicationTemplate,
-            stripEllipsis(i18n('actions.alterReplication')),
+            stripEllipsis(i18n('action_alter-async-replication')),
         ),
         dropAsyncReplication: inputQuery(
             dropAsyncReplicationTemplate,
-            stripEllipsis(i18n('actions.dropReplication')),
+            stripEllipsis(i18n('action_drop-async-replication')),
         ),
         createTransfer: inputQuery(
             createTransferTemplate,
-            stripEllipsis(i18n('actions.createTransfer')),
+            stripEllipsis(i18n('action_create-transfer')),
         ),
         alterTransfer: inputQuery(
             alterTransferTemplate,
-            stripEllipsis(i18n('actions.alterTransfer')),
+            stripEllipsis(i18n('action_alter-transfer')),
         ),
-        dropTransfer: inputQuery(dropTransferTemplate, stripEllipsis(i18n('actions.dropTransfer'))),
-        alterSecret: inputQuery(alterSecretTemplate, stripEllipsis(i18n('actions.alterSecret'))),
-        dropSecret: inputQuery(dropSecretTemplate, stripEllipsis(i18n('actions.dropSecret'))),
-        alterTable: inputQuery(alterTableTemplate, stripEllipsis(i18n('actions.alterTable'))),
-        dropTable: inputQuery(dropTableTemplate, stripEllipsis(i18n('actions.dropTable'))),
+        dropTransfer: inputQuery(dropTransferTemplate, stripEllipsis(i18n('action_drop-transfer'))),
+        alterSecret: inputQuery(alterSecretTemplate, stripEllipsis(i18n('action_alter-secret'))),
+        dropSecret: inputQuery(dropSecretTemplate, stripEllipsis(i18n('action_drop-secret'))),
+        alterTable: inputQuery(alterTableTemplate, stripEllipsis(i18n('action_alter-table'))),
+        dropTable: inputQuery(dropTableTemplate, stripEllipsis(i18n('action_drop-table'))),
         manageAutoPartitioning: inputQuery(
             manageAutoPartitioningTemplate,
-            stripEllipsis(i18n('actions.manageAutoPartitioning')),
+            stripEllipsis(i18n('action_manage-auto-partitioning')),
         ),
         manageReadReplicas: inputQuery(
             manageReadReplicasTemplate,
-            stripEllipsis(i18n('actions.manageReadReplicas')),
+            stripEllipsis(i18n('action_add-read-only-replicas')),
         ),
-        enableTTL: inputQuery(enableTTLTemplate, stripEllipsis(i18n('actions.enableTTL'))),
-        disableTTL: inputQuery(disableTTLTemplate, stripEllipsis(i18n('actions.disableTTL'))),
-        selectQuery: inputQuery(selectQueryTemplate, stripEllipsis(i18n('actions.selectQuery'))),
+        enableTTL: inputQuery(enableTTLTemplate, stripEllipsis(i18n('action_enable-ttl'))),
+        disableTTL: inputQuery(disableTTLTemplate, stripEllipsis(i18n('action_disable-ttl'))),
+        selectQuery: inputQuery(selectQueryTemplate, stripEllipsis(i18n('action_select-query'))),
         selectTopicQuery: inputQuery(
             selectTopicQueryTemplate,
-            stripEllipsis(i18n('actions.selectQuery')),
+            stripEllipsis(i18n('action_select-query')),
         ),
         showCreateTable: inputQuery(
             showCreateTableTemplate,
-            stripEllipsis(i18n('actions.showCreateTable')),
+            stripEllipsis(i18n('action_show-create-sql')),
         ),
-        upsertQuery: inputQuery(upsertQueryTemplate, stripEllipsis(i18n('actions.upsertQuery'))),
+        upsertQuery: inputQuery(upsertQueryTemplate, stripEllipsis(i18n('action_upsert-query'))),
         createExternalTable: inputQuery(
             createExternalTableTemplate,
-            stripEllipsis(i18n('actions.createExternalTable')),
+            stripEllipsis(i18n('action_create-external-table')),
         ),
         dropExternalTable: inputQuery(
             dropExternalTableTemplate,
-            stripEllipsis(i18n('actions.dropTable')),
+            stripEllipsis(i18n('action_drop-table')),
         ),
         selectQueryFromExternalTable: inputQuery(
             selectQueryTemplate,
-            stripEllipsis(i18n('actions.selectQuery')),
+            stripEllipsis(i18n('action_select-query')),
         ),
-        createTopic: inputQuery(createTopicTemplate, stripEllipsis(i18n('actions.createTopic'))),
+        createTopic: inputQuery(createTopicTemplate, stripEllipsis(i18n('action_create-topic'))),
         updateTopic: () => showUpdateTopicDialog?.(params.path),
-        alterTopic: inputQuery(alterTopicTemplate, stripEllipsis(i18n('actions.alterTopic'))),
-        dropTopic: inputQuery(dropTopicTemplate, stripEllipsis(i18n('actions.dropTopic'))),
-        createView: inputQuery(createViewTemplate, stripEllipsis(i18n('actions.createView'))),
-        dropView: inputQuery(dropViewTemplate, stripEllipsis(i18n('actions.dropView'))),
+        alterTopic: inputQuery(alterTopicTemplate, stripEllipsis(i18n('action_alter-topic'))),
+        dropTopic: inputQuery(dropTopicTemplate, stripEllipsis(i18n('action_drop-topic'))),
+        createView: inputQuery(createViewTemplate, stripEllipsis(i18n('action_create-view'))),
+        dropView: inputQuery(dropViewTemplate, stripEllipsis(i18n('action_drop-view'))),
         createStreamingQuery: inputQuery(
             createStreamingQueryTemplate,
-            stripEllipsis(i18n('actions.createStreamingQuery')),
+            stripEllipsis(i18n('action_create-streaming-query')),
         ),
         addFulltextIndex: inputQuery(
             addFulltextIndex,
-            stripEllipsis(i18n('actions.addFulltextIndex')),
+            stripEllipsis(i18n('action_add-fulltext-index')),
         ),
         alterStreamingQuerySettings: inputQuery(
             alterStreamingQuerySettingsTemplate,
-            stripEllipsis(i18n('actions.alterStreamingQuerySettings')),
+            stripEllipsis(i18n('action_alter-streaming-query-settings')),
         ),
         alterStreamingQueryText: inputQuery(
             alterStreamingQueryText,
-            stripEllipsis(i18n('actions.alterStreamingQueryText')),
+            stripEllipsis(i18n('action_alter-streaming-query-text')),
         ),
         dropStreamingQuery: inputQuery(
             dropStreamingQueryTemplate,
-            stripEllipsis(i18n('actions.dropStreamingQuery')),
+            stripEllipsis(i18n('action_drop-streaming-query')),
         ),
-        dropIndex: inputQuery(dropTableIndex, i18n('actions.dropIndex')),
-        addMinMaxIndex: inputQuery(addMinMaxIndex, stripEllipsis(i18n('actions.addMinMaxIndex'))),
-        addVectorIndex: inputQuery(addVectorIndex, stripEllipsis(i18n('actions.addVectorIndex'))),
-        addTableIndex: inputQuery(addTableIndex, stripEllipsis(i18n('actions.addTableIndex'))),
+        dropIndex: inputQuery(dropTableIndex, i18n('action_drop-index')),
+        addMinMaxIndex: inputQuery(addMinMaxIndex, stripEllipsis(i18n('action_add-min-max-index'))),
+        addVectorIndex: inputQuery(addVectorIndex, stripEllipsis(i18n('action_add-vector-index'))),
+        addTableIndex: inputQuery(addTableIndex, stripEllipsis(i18n('action_add-index'))),
         createCdcStream: inputQuery(
             createCdcStreamTemplate,
-            stripEllipsis(i18n('actions.createCdcStream')),
+            stripEllipsis(i18n('action_create-changefeed')),
         ),
         copyPath: () => {
             try {
                 copy(params.relativePath);
                 createToast({
                     name: 'Copied',
-                    title: i18n('actions.copied'),
+                    title: i18n('alert_copy-path-success'),
                     theme: 'success',
                 });
             } catch {
                 createToast({
                     name: 'Not copied',
-                    title: i18n('actions.notCopied'),
+                    title: i18n('alert_copy-path-error'),
                     theme: 'danger',
                 });
             }
@@ -406,79 +406,79 @@ export const getActions =
             additionalEffects,
         );
         const copyItem: ActionsSet[0] = {
-            text: i18n('actions.copyPath'),
+            text: i18n('action_copy-path'),
             action: actions.copyPath,
             iconStart: <Copy />,
         };
         const connectToDBItem = {
-            text: i18n('actions.connectToDB'),
+            text: i18n('action_connect-to-db'),
             action: actions.getConnectToDBDialog,
             iconStart: <PlugConnection />,
         };
         const monitoringItem = {
-            text: i18n('actions.openMonitoring'),
+            text: i18n('action_open-monitoring'),
             action: actions.openMonitoring,
             iconStart: <Icon data={MoniumIcon} />,
         };
 
         const createEntitiesSet = [
             {
-                text: i18n('actions.createTable'),
+                text: i18n('action_create-table'),
                 action: actions.createTable,
                 iconStart: <Icon data={Code} />,
             },
             {
-                text: i18n('actions.createColumnTable'),
+                text: i18n('action_create-column-table'),
                 action: actions.createColumnTable,
                 iconStart: <Icon data={Code} />,
             },
             {
-                text: i18n('actions.createAsyncReplication'),
+                text: i18n('action_create-async-replication'),
                 action: actions.createAsyncReplication,
                 iconStart: <Icon data={Code} />,
             },
             {
-                text: i18n('actions.createTransfer'),
+                text: i18n('action_create-transfer'),
                 action: actions.createTransfer,
                 iconStart: <Icon data={Code} />,
             },
             {
-                text: i18n('actions.createTopic'),
+                text: i18n('action_create-topic'),
                 action: actions.createTopic,
                 iconStart: <Icon data={Code} />,
             },
             {
-                text: i18n('actions.createView'),
+                text: i18n('action_create-view'),
                 action: actions.createView,
                 iconStart: <Icon data={Code} />,
             },
             {
-                text: i18n('actions.createStreamingQuery'),
+                text: i18n('action_create-streaming-query'),
                 action: actions.createStreamingQuery,
                 iconStart: <Icon data={Code} />,
             },
         ];
 
-        const manageColumnsItem = {text: i18n('actions.manageColumns'), action: actions.alterTable};
+        const manageColumnsItem = {text: i18n('action_manage-columns'), action: actions.alterTable};
         const manageAutoPartitioningItem = {
-            text: i18n('actions.manageAutoPartitioning'),
+            text: i18n('action_manage-auto-partitioning'),
             action: actions.manageAutoPartitioning,
         };
         const manageReadReplicasItem = {
-            text: i18n('actions.manageReadReplicas'),
+            text: i18n('action_add-read-only-replicas'),
             action: actions.manageReadReplicas,
         };
         const enableTTLItem = {
-            text: i18n('actions.enableTTL'),
+            text: i18n('action_enable-ttl'),
             action: actions.enableTTL,
         };
         const disableTTLItem = {
-            text: i18n('actions.disableTTL'),
+            text: i18n('action_disable-ttl'),
             action: actions.disableTTL,
         };
 
         const alterRowTableGroupItem = {
-            text: i18n('actions.alterTable'),
+            text: i18n('action_alter-table'),
             items: [
                 manageColumnsItem,
                 manageAutoPartitioningItem,
@@ -488,7 +488,7 @@ export const getActions =
             ],
         };
         const alterColumnTableGroupItem = {
-            text: i18n('actions.alterTable'),
+            text: i18n('action_alter-table'),
             items: [manageColumnsItem, manageAutoPartitioningItem, enableTTLItem],
         };
 
@@ -502,21 +502,21 @@ export const getActions =
 
         const createDirectoryItem = actions.createDirectory
             ? {
-                  text: i18n('entity-name_directory'),
+                  text: i18n('value_directory'),
                   action: actions.createDirectory,
                   iconStart: <Folder />,
               }
             : undefined;
         const createTableItem = actions.createTableDialog
             ? {
-                  text: i18n('entity-name_table'),
+                  text: i18n('value_table'),
                   action: actions.createTableDialog,
                   iconStart: <LayoutHeaderCellsLarge />,
               }
             : undefined;
         const createTopicItem = actions.createTopicDialog
             ? {
-                  text: i18n('entity-name_topic'),
+                  text: i18n('value_topic'),
                   action: actions.createTopicDialog,
                   iconStart: <BarsUnaligned />,
               }
@@ -535,8 +535,8 @@ export const getActions =
         const createMenuItem = createDialogItems.length
             ? {
                   text: renderMenuItemText(
-                      i18n('actions.createMenu'),
-                      i18n('actions.createMenuDescription'),
+                      i18n('action_create-entity'),
+                      i18n('context_create-entity-through-form'),
                   ),
                   iconStart: (
                       <Icon
@@ -556,13 +556,13 @@ export const getActions =
         }
 
         const showCreateTableItem = getActionWithLoader({
-            text: i18n('actions.showCreateTable'),
+            text: i18n('action_show-create-sql'),
             action: actions.showCreateTable,
             isLoading: additionalEffects.isShowCreateTableLoading,
             iconStart: <Code />,
         });
         const compactionItem = getActionWithLoader({
-            text: i18n('actions.compaction'),
+            text: i18n('action_compaction'),
             action: actions.openCompactionDialog,
             iconStart: <Icon data={GearPlay} />,
             isLoading: additionalEffects.isCompactionLoading,
@@ -570,13 +570,13 @@ export const getActions =
         });
 
         const updateTableItem = {
-            text: i18n('actions.updateTable'),
+            text: i18n('action_edit-table'),
             action: actions.updateTable,
             iconStart: <Pencil />,
         };
 
         const updateTopicItem = {
-            text: i18n('actions.updateTopic'),
+            text: i18n('action_edit-topic'),
             action: actions.updateTopic,
             iconStart: <Pencil />,
         };
@@ -586,21 +586,21 @@ export const getActions =
             [updateTableItem],
             [
                 alterRowTableGroupItem,
-                {text: i18n('actions.dropTable'), action: actions.dropTable},
+                {text: i18n('action_drop-table'), action: actions.dropTable},
                 getActionWithLoader({
-                    text: i18n('actions.selectQuery'),
+                    text: i18n('action_select-query'),
                     action: actions.selectQuery,
                     isLoading: additionalEffects.isSchemaDataLoading,
                 }),
                 getActionWithLoader({
-                    text: i18n('actions.upsertQuery'),
+                    text: i18n('action_upsert-query'),
                     action: actions.upsertQuery,
                     isLoading: additionalEffects.isSchemaDataLoading,
                 }),
-                {text: i18n('actions.addTableIndex'), action: actions.addTableIndex},
-                {text: i18n('actions.addVectorIndex'), action: actions.addVectorIndex},
-                {text: i18n('actions.addFulltextIndex'), action: actions.addFulltextIndex},
-                {text: i18n('actions.createCdcStream'), action: actions.createCdcStream},
+                {text: i18n('action_add-index'), action: actions.addTableIndex},
+                {text: i18n('action_add-vector-index'), action: actions.addVectorIndex},
+                {text: i18n('action_add-fulltext-index'), action: actions.addFulltextIndex},
+                {text: i18n('action_create-changefeed'), action: actions.createCdcStream},
             ],
             [
                 ...(additionalEffects.showCompactionDialog ? [compactionItem] : []),
@@ -612,10 +612,10 @@ export const getActions =
             [updateTableItem],
             [
                 alterColumnTableGroupItem,
-                {text: i18n('actions.dropTable'), action: actions.dropTable},
-                {text: i18n('actions.selectQuery'), action: actions.selectQuery},
-                {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
-                {text: i18n('actions.addMinMaxIndex'), action: actions.addMinMaxIndex},
+                {text: i18n('action_drop-table'), action: actions.dropTable},
+                {text: i18n('action_select-query'), action: actions.selectQuery},
+                {text: i18n('action_upsert-query'), action: actions.upsertQuery},
+                {text: i18n('action_add-min-max-index'), action: actions.addMinMaxIndex},
             ],
             [showCreateTableItem],
         ];
@@ -625,10 +625,10 @@ export const getActions =
             [updateTopicItem],
             [
                 ...(additionalEffects.topicsSqlIoOperationsEnabled
-                    ? [{text: i18n('actions.selectQuery'), action: actions.selectTopicQuery}]
+                    ? [{text: i18n('action_select-query'), action: actions.selectTopicQuery}]
                     : []),
-                {text: i18n('actions.alterTopic'), action: actions.alterTopic},
-                {text: i18n('actions.dropTopic'), action: actions.dropTopic},
+                {text: i18n('action_alter-topic'), action: actions.alterTopic},
+                {text: i18n('action_drop-topic'), action: actions.dropTopic},
             ],
         ];
 
@@ -636,29 +636,29 @@ export const getActions =
             [copyItem],
             [
                 {
-                    text: i18n('actions.selectQuery'),
+                    text: i18n('action_select-query'),
                     action: actions.selectQueryFromExternalTable,
                 },
             ],
-            [{text: i18n('actions.dropTable'), action: actions.dropExternalTable}],
+            [{text: i18n('action_drop-table'), action: actions.dropExternalTable}],
         ];
 
         const EXTERNAL_DATA_SOURCE_SET = [
             [copyItem],
-            [{text: i18n('actions.createExternalTable'), action: actions.createExternalTable}],
+            [{text: i18n('action_create-external-table'), action: actions.createExternalTable}],
         ];
 
         const VIEW_SET = [
             [copyItem],
-            [{text: i18n('actions.selectQuery'), action: actions.selectQuery}],
-            [{text: i18n('actions.dropView'), action: actions.dropView}],
+            [{text: i18n('action_select-query'), action: actions.selectQuery}],
+            [{text: i18n('action_drop-view'), action: actions.dropView}],
         ];
 
         const SYSTEM_VIEW_SET: ActionsSet = [
             [copyItem],
             [
                 getActionWithLoader({
-                    text: i18n('actions.selectQuery'),
+                    text: i18n('action_select-query'),
                     action: actions.selectQuery,
                     isLoading: additionalEffects.isSchemaDataLoading,
                 }),
@@ -668,44 +668,47 @@ export const getActions =
         const ASYNC_REPLICATION_SET: ActionsSet = [
             [copyItem],
             [
-                {text: i18n('actions.alterReplication'), action: actions.alterAsyncReplication},
-                {text: i18n('actions.dropReplication'), action: actions.dropAsyncReplication},
+                {
+                    text: i18n('action_alter-async-replication'),
+                    action: actions.alterAsyncReplication,
+                },
+                {text: i18n('action_drop-async-replication'), action: actions.dropAsyncReplication},
             ],
         ];
 
         const TRANSFER_SET: ActionsSet = [
             [copyItem],
             [
-                {text: i18n('actions.alterTransfer'), action: actions.alterTransfer},
-                {text: i18n('actions.dropTransfer'), action: actions.dropTransfer},
+                {text: i18n('action_alter-transfer'), action: actions.alterTransfer},
+                {text: i18n('action_drop-transfer'), action: actions.dropTransfer},
             ],
         ];
 
         const SECRET_SET: ActionsSet = [
             [copyItem],
             [
-                {text: i18n('actions.alterSecret'), action: actions.alterSecret},
-                {text: i18n('actions.dropSecret'), action: actions.dropSecret},
+                {text: i18n('action_alter-secret'), action: actions.alterSecret},
+                {text: i18n('action_drop-secret'), action: actions.dropSecret},
             ],
         ];
 
         const INDEX_SET: ActionsSet = [
-            [copyItem, {text: i18n('actions.dropIndex'), action: actions.dropIndex}],
+            [copyItem, {text: i18n('action_drop-index'), action: actions.dropIndex}],
         ];
 
         const STREAMING_QUERY_SET: ActionsSet = [
             [copyItem],
             [
                 {
-                    text: i18n('actions.alterStreamingQueryText'),
+                    text: i18n('action_alter-streaming-query-text'),
                     action: actions.alterStreamingQueryText,
                 },
                 {
-                    text: i18n('actions.alterStreamingQuerySettings'),
+                    text: i18n('action_alter-streaming-query-settings'),
                     action: actions.alterStreamingQuerySettings,
                 },
                 {
-                    text: i18n('actions.dropStreamingQuery'),
+                    text: i18n('action_drop-streaming-query'),
                     action: actions.dropStreamingQuery,
                 },
             ],

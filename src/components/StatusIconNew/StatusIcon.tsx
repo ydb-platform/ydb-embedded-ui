@@ -1,9 +1,10 @@
 import {
-    CircleCheckFill,
-    CircleExclamationFill,
-    CircleInfo,
-    PlugConnection,
-    TriangleExclamationFill,
+    ArrowsRotateRight,
+    CircleCheck,
+    CircleExclamation,
+    Flame,
+    Ghost,
+    TriangleExclamation,
 } from '@gravity-ui/icons';
 import type {IconData, IconProps} from '@gravity-ui/uikit';
 import {Icon} from '@gravity-ui/uikit';
@@ -11,12 +12,12 @@ import {Icon} from '@gravity-ui/uikit';
 import {EFlag} from '../../types/api/enums';
 
 const EFlagToIcon: Record<EFlag, IconData> = {
-    [EFlag.Blue]: CircleInfo,
-    [EFlag.Yellow]: CircleExclamationFill,
-    [EFlag.Orange]: TriangleExclamationFill,
-    [EFlag.Red]: CircleExclamationFill,
-    [EFlag.Green]: CircleCheckFill,
-    [EFlag.Grey]: PlugConnection,
+    [EFlag.Blue]: ArrowsRotateRight,
+    [EFlag.Yellow]: TriangleExclamation,
+    [EFlag.Orange]: Flame,
+    [EFlag.Red]: CircleExclamation,
+    [EFlag.Green]: CircleCheck,
+    [EFlag.Grey]: Ghost,
 };
 
 interface StatusIconProps extends Omit<IconProps, 'data'> {

@@ -1,19 +1,12 @@
 import React from 'react';
 
-import {ArrowDownToLine} from '@gravity-ui/icons';
-import {ActionTooltip, Button, Flex, Icon, Text} from '@gravity-ui/uikit';
-
-import {DrawerWrapper} from '../../components/Drawer';
-import {EnableFullscreenButton} from '../../components/EnableFullscreenButton/EnableFullscreenButton';
 import {
     selectAllClusterHealthcheckInfo,
     selectClusterCheckStatus,
 } from '../../store/reducers/healthcheckInfo/healthcheckInfo';
-import type {SelfCheckResult} from '../../types/api/healthcheck';
-import {createAndDownloadJsonFile} from '../../utils/downloadFile';
 import {useTypedSelector} from '../../utils/hooks';
 import {Healthcheck} from '../Tenant/Healthcheck/Healthcheck';
-import {HEALTHCHECK_RESULT_TO_TEXT} from '../Tenant/constants';
+import {HealthcheckDrawer} from '../Tenant/Healthcheck/components/HealthcheckDrawer';
 import tenantI18n from '../Tenant/i18n';
 import {useTenantQueryParams} from '../Tenant/useTenantQueryParams';
 
@@ -54,64 +47,22 @@ export function ClusterDrawerHealthcheck({
     }, [clusterName]);
 
     return (
-        <DrawerWrapper
+        <HealthcheckDrawer
             isDrawerVisible={isVisible && Boolean(clusterName)}
             onCloseDrawer={handleCloseDrawer}
             renderDrawerContent={renderDrawerContent}
             drawerId="cluster-healthcheck-details"
             storageKey="cluster-healthcheck-details-drawer-width"
-            detectClickOutside
-            hideVeil={false}
-            isPercentageWidth
-            drawerControls={[
-                {
-                    type: 'custom',
-                    key: 'download',
-                    node: (
-                        <ActionTooltip title={tenantI18n('label_download')}>
-                            <Button
-                                view="flat"
-                                disabled={!healthcheckData}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    createAndDownloadJsonFile(
-                                        healthcheckData,
-                                        `${clusterName}-cluster-healthcheck-${new Date().getTime()}`,
-                                    );
-                                }}
-                            >
-                                <Icon data={ArrowDownToLine} />
-                            </Button>
-                        </ActionTooltip>
-                    ),
-                },
-                {
-                    type: 'custom',
-                    node: <EnableFullscreenButton view="flat" />,
-                    key: 'fullscreen',
-                },
-                {type: 'close'},
-            ]}
-            title={<DrawerTitle clusterName={clusterName} status={healthcheckStatus} />}
+            title={`${tenantI18n('title_healthcheck-dashboard')}${
+                clusterName ? `: ${clusterName}` : ''
+            }`}
+            status={healthcheckStatus}
+            healthcheckData={healthcheckData}
+            downloadFilePrefix={`${clusterName}-cluster-healthcheck`}
+            downloadTooltip={tenantI18n('action_download-healthcheck')}
+            isDownloadDisabled={!healthcheckData}
         >
             {children}
-        </DrawerWrapper>
-    );
-}
-
-interface DrawerTitleProps {
-    clusterName?: string;
-    status?: SelfCheckResult;
-}
-
-function DrawerTitle({clusterName, status}: DrawerTitleProps) {
-    return (
-        <Flex direction="column">
-            <Text variant="subheader-2">
-                {tenantI18n('label_healthcheck-dashboard')}
-                {clusterName ? `: ${clusterName}` : ''}
-            </Text>
-            <Text color="secondary">{status && HEALTHCHECK_RESULT_TO_TEXT[status]}</Text>
-        </Flex>
+        </HealthcheckDrawer>
     );
 }

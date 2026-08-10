@@ -1,0 +1,7 @@
+@use '../../styles/mixins';
+
+.ydb-healthcheck-status {
+    &_emergency {
+        @include mixins.danger-heavy-label();
+    }
+}

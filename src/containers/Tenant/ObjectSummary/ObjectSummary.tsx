@@ -185,22 +185,22 @@ export function ObjectSummary({
 
         const normalizedType = getPathTypeName(path, PathType);
 
-        overview.push({name: tenantKeyset('summary.type'), content: normalizedType});
+        overview.push({name: tenantKeyset('field_type'), content: normalizedType});
 
         if (PathSubType !== EPathSubType.EPathSubTypeEmpty) {
             overview.push({
-                name: tenantKeyset('summary.subtype'),
+                name: tenantKeyset('field_subtype'),
                 content: PathSubType?.replace(/^EPathSubType/, ''),
             });
         }
 
-        overview.push({name: tenantKeyset('summary.id'), content: PathId});
+        overview.push({name: tenantKeyset('field_id'), content: PathId});
 
-        overview.push({name: tenantKeyset('summary.version'), content: PathVersion});
+        overview.push({name: tenantKeyset('field_version'), content: PathVersion});
 
         if (Number(CreateStep)) {
             overview.push({
-                name: tenantKeyset('summary.created'),
+                name: tenantKeyset('field_created'),
                 content: formatDateTime(CreateStep),
             });
         }
@@ -212,11 +212,11 @@ export function ObjectSummary({
 
             overview.push(
                 {
-                    name: tenantKeyset('summary.data-size'),
+                    name: tenantKeyset('field_data-size'),
                     content: toFormattedSize(DataSize),
                 },
                 {
-                    name: tenantKeyset('summary.row-count'),
+                    name: tenantKeyset('field_row-count'),
                     content: formatNumber(RowCount),
                     note: ROW_COUNT_NOTE,
                 },
@@ -239,11 +239,11 @@ export function ObjectSummary({
 
             return [
                 {
-                    name: tenantKeyset('summary.paths'),
+                    name: tenantKeyset('field_paths'),
                     content: paths,
                 },
                 {
-                    name: tenantKeyset('summary.shards'),
+                    name: tenantKeyset('field_shards'),
                     content: shards,
                 },
             ];
@@ -264,13 +264,13 @@ export function ObjectSummary({
             [EPathType.EPathTypeSecret]: undefined,
             [EPathType.EPathTypeTable]: () => [
                 {
-                    name: tenantKeyset('summary.partitions'),
+                    name: tenantKeyset('field_partitions-count'),
                     content: PathDescription?.TablePartitions?.length,
                 },
             ],
             [EPathType.EPathTypeSysView]: () => [
                 {
-                    name: tenantKeyset('summary.system-view-type'),
+                    name: tenantKeyset('field_system-view-type'),
                     content: prepareSystemViewType(PathDescription?.SysViewDescription?.Type),
                 },
             ],
@@ -279,13 +279,13 @@ export function ObjectSummary({
             [EPathType.EPathTypeExtSubDomain]: isV2Navigation ? undefined : getDatabaseOverview,
             [EPathType.EPathTypeColumnStore]: () => [
                 {
-                    name: tenantKeyset('summary.partitions'),
+                    name: tenantKeyset('field_partitions-count'),
                     content: PathDescription?.ColumnStoreDescription?.ColumnShards?.length,
                 },
             ],
             [EPathType.EPathTypeColumnTable]: () => [
                 {
-                    name: tenantKeyset('summary.partitions'),
+                    name: tenantKeyset('field_partitions-count'),
                     content:
                         PathDescription?.ColumnTableDescription?.Sharding?.ColumnShards?.length,
                 },
@@ -295,11 +295,11 @@ export function ObjectSummary({
 
                 return [
                     {
-                        name: tenantKeyset('summary.mode'),
+                        name: tenantKeyset('field_mode'),
                         content: Mode?.replace(/^ECdcStreamMode/, ''),
                     },
                     {
-                        name: tenantKeyset('summary.format'),
+                        name: tenantKeyset('field_format'),
                         content: Format?.replace(/^ECdcStreamFormat/, ''),
                     },
                 ];
@@ -310,11 +310,11 @@ export function ObjectSummary({
 
                 return [
                     {
-                        name: tenantKeyset('summary.partitions'),
+                        name: tenantKeyset('field_partitions-count'),
                         content: pqGroup?.Partitions?.length,
                     },
                     {
-                        name: tenantKeyset('summary.retention'),
+                        name: tenantKeyset('field_retention'),
                         content: value && formatSecondsToHours(value),
                     },
                 ];
@@ -331,9 +331,9 @@ export function ObjectSummary({
                 const dataSourceName = DataSourcePath?.match(/([^/]*)\/*$/)?.[1] || '';
 
                 return [
-                    {name: tenantKeyset('summary.source-type'), content: SourceType},
+                    {name: tenantKeyset('field_source-type'), content: SourceType},
                     {
-                        name: tenantKeyset('summary.data-source'),
+                        name: tenantKeyset('field_data-source'),
                         content: DataSourcePath && (
                             <span title={DataSourcePath}>
                                 <LinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
@@ -344,7 +344,7 @@ export function ObjectSummary({
             },
             [EPathType.EPathTypeExternalDataSource]: () => [
                 {
-                    name: tenantKeyset('summary.source-type'),
+                    name: tenantKeyset('field_source-type'),
                     content: PathDescription?.ExternalDataSourceDescription?.SourceType,
                 },
             ],
@@ -358,7 +358,7 @@ export function ObjectSummary({
 
                 return [
                     {
-                        name: tenantKeyset('summary.state'),
+                        name: tenantKeyset('field_state'),
                         content: <AsyncReplicationState state={state} />,
                     },
                 ];
@@ -372,7 +372,7 @@ export function ObjectSummary({
 
                 return [
                     {
-                        name: tenantKeyset('summary.state'),
+                        name: tenantKeyset('field_state'),
                         content: <AsyncReplicationState state={state} />,
                     },
                 ];

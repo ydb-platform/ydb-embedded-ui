@@ -1,3 +1,5 @@
+@use '../../../../../styles/mixins';
+
 .ydb-healthcheck-preview {
     $block: &;
     border-radius: var(--g-border-radius-s);
@@ -11,6 +13,14 @@
         height: 30px;
     }
 
+    &__compact-status_emergency {
+        @include mixins.danger-heavy-label();
+
+        #{$block}__icon_emergency {
+            color: inherit;
+        }
+    }
+
     &__icon {
         display: flex;
 
@@ -21,7 +31,7 @@
             color: var(--g-color-text-positive);
         }
         &_degraded {
-            color: var(--g-color-text-info);
+            color: var(--g-color-text-warning-heavy);
         }
         &_emergency {
             color: var(--g-color-text-danger);
@@ -30,7 +40,7 @@
             color: var(--g-color-text-misc);
         }
         &_maintenance_required {
-            color: var(--g-color-text-warning-heavy);
+            color: var(--g-color-text-danger);
         }
     }
 }

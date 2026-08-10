@@ -14,7 +14,7 @@ export function EntityTitle({data}: EntityTitleProps) {
     if (isReadOnlyTable(data)) {
         return (
             <Flex gap={1} wrap={'nowrap'}>
-                {entityName} <Label>{i18n('label.read-only')}</Label>
+                {entityName} <Label>{i18n('value_read-only')}</Label>
             </Flex>
         );
     }

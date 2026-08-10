@@ -118,7 +118,7 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                     alignItems="center"
                     gap="2"
                 >
-                    <div className={b('title')}>{tenantKeyset('summary.partitioning')}</div>
+                    <div className={b('title')}>{tenantKeyset('title_partitioning')}</div>
                     <Flex gap="2" alignItems="center">
                         {managePartitioningDialogConfig && (
                             <ActionTooltip title={i18n('action_manage-partition-config')}>

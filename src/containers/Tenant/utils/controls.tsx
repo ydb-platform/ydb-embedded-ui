@@ -46,7 +46,7 @@ const getPreviewControl = (options: ReturnType<typeof bindActions>, size?: Butto
         <Button
             view="flat-secondary"
             onClick={options.openPreview}
-            title={i18n('actions.openPreview')}
+            title={i18n('action_open-preview')}
             size={size || 's'}
         >
             <Icon data={EyeIcon} />
