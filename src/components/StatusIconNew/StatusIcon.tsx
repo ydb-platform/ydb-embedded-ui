@@ -1,7 +1,7 @@
 import {
     ArrowsRotateRight,
     CircleCheck,
-    CircleXmark,
+    CircleExclamation,
     Flame,
     Ghost,
     TriangleExclamation,
@@ -15,7 +15,7 @@ const EFlagToIcon: Record<EFlag, IconData> = {
     [EFlag.Blue]: ArrowsRotateRight,
     [EFlag.Yellow]: TriangleExclamation,
     [EFlag.Orange]: Flame,
-    [EFlag.Red]: CircleXmark,
+    [EFlag.Red]: CircleExclamation,
     [EFlag.Green]: CircleCheck,
     [EFlag.Grey]: Ghost,
 };

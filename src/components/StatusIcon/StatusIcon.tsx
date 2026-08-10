@@ -1,7 +1,7 @@
 import {
     ArrowsRotateRight,
     CircleCheck,
-    CircleXmark,
+    CircleExclamation,
     Flame,
     Ghost,
     TriangleExclamation,
@@ -21,7 +21,7 @@ const icons = {
     [EFlag.Blue]: ArrowsRotateRight,
     [EFlag.Yellow]: TriangleExclamation,
     [EFlag.Orange]: Flame,
-    [EFlag.Red]: CircleXmark,
+    [EFlag.Red]: CircleExclamation,
 };
 
 export type StatusIconMode = 'color' | 'icons';

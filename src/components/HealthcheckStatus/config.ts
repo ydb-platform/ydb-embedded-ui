@@ -1,4 +1,4 @@
-import {CircleCheck, CircleXmark, Flame, Ghost, TriangleExclamation} from '@gravity-ui/icons';
+import {CircleCheck, CircleExclamation, Flame, Ghost, TriangleExclamation} from '@gravity-ui/icons';
 import type {AlertProps, IconData, LabelProps} from '@gravity-ui/uikit';
 
 import {SelfCheckResult} from '../../types/api/healthcheck';
@@ -53,7 +53,7 @@ export const SELF_CHECK_RESULT_CONFIG: Record<SelfCheckResult, SelfCheckResultCo
     [SelfCheckResult.EMERGENCY]: {
         alertTheme: 'danger',
         emergency: true,
-        icon: CircleXmark,
+        icon: CircleExclamation,
         labelTheme: 'danger',
         get title() {
             return i18n('title_emergency');
