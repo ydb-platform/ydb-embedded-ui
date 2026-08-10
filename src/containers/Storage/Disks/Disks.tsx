@@ -11,7 +11,7 @@ import {PDisk} from '../PDisk';
 import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
 import type {StorageViewContext} from '../types';
 import {useStorageVDiskDisplayStateGetter} from '../useStorageVDiskDisplayStateGetter';
-import {isVdiskActive, useVDisksWithDCMargins} from '../utils';
+import {isPdiskActive, isVdiskActive, useVDisksWithDCMargins} from '../utils';
 
 import {calculateCompactVDiskWidths} from './calculateCompactVDiskWidths';
 import {ALL_VDISK_WIDTH, VDISKS_CONTAINER_WIDTH, getAllVDisksContainerWidth} from './constants';
@@ -79,6 +79,7 @@ export function Disks({
                     <PDiskItem
                         key={vDisk?.PDisk?.StringifiedId || index}
                         vDisk={vDisk}
+                        viewContext={viewContext}
                         highlightedVDisk={highlightedVDisk}
                         setHighlightedVDisk={setHighlightedVDisk}
                         withDCMargin={vDisksWithDCMargins.includes(index)}
@@ -92,6 +93,7 @@ export function Disks({
 
 interface DisksItemProps {
     vDisk: PreparedVDisk;
+    viewContext?: StorageViewContext;
     inactive?: boolean;
     highlightedVDisk?: string;
     setHighlightedVDisk?: (id?: string) => void;
@@ -146,6 +148,7 @@ function VDiskItem({
 
 function PDiskItem({
     vDisk,
+    viewContext,
     highlightedVDisk,
     setHighlightedVDisk,
     withDCMargin,
@@ -164,6 +167,7 @@ function PDiskItem({
             className={b('pdisk-item', {['with-dc-margin']: withDCMargin})}
             progressBarClassName={b('pdisk-progress-bar')}
             data={vDisk.PDisk}
+            inactive={!isPdiskActive(vDisk.PDisk, viewContext)}
             showPopup={isHighlighted}
             delayOpen={DISKS_POPUP_DEBOUNCE_TIMEOUT}
             delayClose={DISKS_POPUP_DEBOUNCE_TIMEOUT}
