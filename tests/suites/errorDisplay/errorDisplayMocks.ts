@@ -454,6 +454,43 @@ export async function setupTenantInfoEmptyMock(page: Page) {
     });
 }
 
+export async function setupTenantInfoEmptyRefreshMock(page: Page) {
+    await mockRoute(page, '**/viewer/capabilities*', {
+        status: 200,
+        body: JSON.stringify({
+            Capabilities: {},
+            Settings: {},
+        }),
+    });
+
+    await mockRoute(page, '**/viewer/json/whoami*', {
+        status: 200,
+        body: JSON.stringify({
+            UserSID: 'test-user',
+            UserID: 'test-user-id',
+            AuthType: 'Login',
+            IsViewerAllowed: true,
+            IsMonitoringAllowed: true,
+            IsAdministrationAllowed: true,
+        }),
+    });
+
+    let tenantInfoRequestCount = 0;
+    await page.route('**/viewer/json/tenantinfo?*', async (route: Route) => {
+        tenantInfoRequestCount += 1;
+        const tenantInfo =
+            tenantInfoRequestCount === 1
+                ? [{Name: '/local', Id: '/local', Type: 'Dedicated', Overall: 'Green'}]
+                : [];
+
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({TenantInfo: tenantInfo}),
+        });
+    });
+}
+
 async function setupMonitoringTenantMocks(page: Page) {
     await mockRoute(page, ROUTES.tenantInfo, {
         status: 200,

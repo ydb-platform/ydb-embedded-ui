@@ -29,6 +29,7 @@ import {
     setupTablet400JsonCodeOnlyMock,
     setupTenantInfo400Mock,
     setupTenantInfoEmptyMock,
+    setupTenantInfoEmptyRefreshMock,
     setupVDisk429WithIssuesMock,
     setupWhoami401NeedResetMock,
     setupWhoami500Mock,
@@ -675,6 +676,27 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
             'Database information is not available',
         );
         await expect(page.locator('.tenant-overview')).toHaveCount(0);
+        await expect(page.locator('.ydb-error-boundary')).toHaveCount(0);
+    });
+
+    test('TenantOverview — empty refresh keeps the last valid overview', async ({page}) => {
+        await setupTenantInfoEmptyRefreshMock(page);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({database, databasePage: 'database', diagnosticsTab: 'database'});
+
+        const tenantOverview = page.locator('.tenant-overview');
+        await expect(tenantOverview).toBeVisible();
+
+        await page.locator('.auto-refresh-control').getByRole('button', {name: 'Refresh'}).click();
+
+        const errorDisplay = new ErrorDisplayModel(page);
+        await errorDisplay.waitForResponseError();
+
+        expect(await errorDisplay.getResponseErrorText()).toContain(
+            'Database information is not available',
+        );
+        await expect(tenantOverview).toBeVisible();
         await expect(page.locator('.ydb-error-boundary')).toHaveCount(0);
     });
 

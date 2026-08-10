@@ -49,6 +49,41 @@ describe('tenantApi.getTenantInfo', () => {
         });
     });
 
+    test('retains the last valid tenant when an empty refetch is rejected', async () => {
+        const tenant: TTenant = {
+            Id: '/local/database',
+            Name: '/local/database',
+            Type: 'Dedicated',
+        };
+        window.api = {
+            viewer: {
+                getTenantInfo: jest
+                    .fn()
+                    .mockResolvedValueOnce({TenantInfo: [tenant]})
+                    .mockResolvedValueOnce({TenantInfo: []}),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+
+        await store.dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate(queryArgs, {subscribe: false}),
+        );
+        await store.dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate(queryArgs, {
+                subscribe: false,
+                forceRefetch: true,
+            }),
+        );
+
+        expect(tenantApi.endpoints.getTenantInfo.select(queryArgs)(store.getState())).toMatchObject(
+            {
+                status: 'rejected',
+                error: {code: 'EMPTY_TENANT_INFO'},
+                data: expect.objectContaining({Id: tenant.Id, Name: tenant.Name}),
+            },
+        );
+    });
+
     test('selects an exact database match when it is not the first item', async () => {
         const firstTenant: TTenant = {Id: '/local/first', Name: '/local/first'};
         const matchingTenant: TTenant = {Id: '/local/database', Name: '/local/database'};
