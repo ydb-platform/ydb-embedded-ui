@@ -42,7 +42,9 @@ export function MetricTabCard({
             hasArrow
             placement={['top', 'bottom']}
         >
-            <span className={b('help-mark')}>{statusIcon}</span>
+            <Flex as="span" inline>
+                {statusIcon}
+            </Flex>
         </Popover>
     ) : (
         statusIcon

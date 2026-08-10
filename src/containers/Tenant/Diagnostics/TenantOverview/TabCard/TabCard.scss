@@ -33,26 +33,6 @@
         cursor: default !important;
     }
 
-    &__help-mark {
-        display: inline-flex;
-        flex-shrink: 0;
-        justify-content: center;
-        align-items: center;
-
-        width: 16px;
-        height: 16px;
-
-        line-height: 0;
-        cursor: pointer;
-
-        &_serverless {
-            width: 14px;
-            height: 14px;
-
-            color: var(--g-color-text-hint);
-        }
-    }
-
     &__help-mark-popover {
         max-width: 300px;
         padding: var(--g-spacing-3);

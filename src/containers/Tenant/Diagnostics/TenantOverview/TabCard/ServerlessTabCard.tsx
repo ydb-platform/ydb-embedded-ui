@@ -31,9 +31,9 @@ export function ServerlessTabCard({title, active, description, helpText}: Server
             hasArrow
             placement={['top', 'bottom']}
         >
-            <span className={b('help-mark', {serverless: true})}>
-                <Icon data={CircleQuestion} size={14} />
-            </span>
+            <Flex as="span" inline>
+                <Icon data={CircleQuestion} size={14} color="hint" />
+            </Flex>
         </Popover>
     ) : null;
 
