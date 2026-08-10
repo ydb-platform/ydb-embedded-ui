@@ -1,4 +1,6 @@
-import {Card, Flex, Text} from '@gravity-ui/uikit';
+import React from 'react';
+
+import {Card, Flex, Popover, Text} from '@gravity-ui/uikit';
 
 import {StatusIcon} from '../../../../../components/StatusIcon/StatusIcon';
 import type {EFlag} from '../../../../../types/api/enums';
@@ -13,22 +15,53 @@ interface MetricTabCardProps {
     status: EFlag;
     value: string;
     description: string;
+    helpText?: string;
     active?: boolean;
 }
 
-export function MetricTabCard({title, status, value, description, active}: MetricTabCardProps) {
+function handleHelpMarkPopoverClick(event: React.MouseEvent<HTMLDivElement>) {
+    event.stopPropagation();
+}
+
+export function MetricTabCard({
+    title,
+    status,
+    value,
+    description,
+    helpText,
+    active,
+}: MetricTabCardProps) {
+    const statusIcon = <StatusIcon status={status} mode="icons" size="s" />;
+    const statusHelpMark = helpText ? (
+        <Popover
+            content={
+                <div className={b('help-mark-popover')} onClick={handleHelpMarkPopoverClick}>
+                    {helpText}
+                </div>
+            }
+            hasArrow
+            placement={['top', 'bottom']}
+        >
+            <Flex as="span" inline>
+                {statusIcon}
+            </Flex>
+        </Popover>
+    ) : (
+        statusIcon
+    );
+
     return (
         <Card className={b({active})} type="container" view={active ? 'outlined' : 'filled'}>
             <Flex direction="column" gap={0.5}>
-                <Flex alignItems="center" gap={1}>
+                <Flex alignItems="baseline" gap={1}>
                     <Text variant="subheader-2" data-qa="tenant-metric-tab-title">
                         {title}
                     </Text>
                     <Flex alignItems="center" gap={1}>
-                        <Text variant="body-1" color="secondary" data-qa="tenant-metric-tab-value">
+                        <Text variant="body-2" color="secondary" data-qa="tenant-metric-tab-value">
                             {value}
                         </Text>
-                        <StatusIcon status={status} mode="icons" size="s" />
+                        {statusHelpMark}
                     </Flex>
                 </Flex>
                 <Text

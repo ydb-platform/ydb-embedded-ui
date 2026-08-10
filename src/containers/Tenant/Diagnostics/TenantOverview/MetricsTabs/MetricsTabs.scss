@@ -76,6 +76,7 @@
 
 @mixin tab-edge-filler($side) {
     &.tenant-metrics-tabs__link-container_active::after {
+        z-index: -1;
         @include pseudo-active-filler($side);
     }
 

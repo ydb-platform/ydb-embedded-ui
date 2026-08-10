@@ -1,10 +1,17 @@
-import {Card, Flex, HelpMark, Text} from '@gravity-ui/uikit';
+import React from 'react';
+
+import {CircleQuestion} from '@gravity-ui/icons';
+import {Card, Flex, Icon, Popover, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../../utils/cn';
 
 import './TabCard.scss';
 
 const b = cn('tenant-tab-card');
+
+function handleHelpMarkPopoverClick(event: React.MouseEvent<HTMLDivElement>) {
+    event.stopPropagation();
+}
 
 interface ServerlessTabCardProps {
     title: string;
@@ -14,6 +21,22 @@ interface ServerlessTabCardProps {
 }
 
 export function ServerlessTabCard({title, active, description, helpText}: ServerlessTabCardProps) {
+    const helpMark = helpText ? (
+        <Popover
+            content={
+                <div className={b('help-mark-popover')} onClick={handleHelpMarkPopoverClick}>
+                    {helpText}
+                </div>
+            }
+            hasArrow
+            placement={['top', 'bottom']}
+        >
+            <Flex as="span" inline>
+                <Icon data={CircleQuestion} size={14} color="hint" />
+            </Flex>
+        </Popover>
+    ) : null;
+
     return (
         <Card className={b({active})} type="container" view={active ? 'outlined' : 'filled'}>
             <Flex direction="column" gap={0.5}>
@@ -21,11 +44,7 @@ export function ServerlessTabCard({title, active, description, helpText}: Server
                     <Text variant="subheader-2" data-qa="tenant-metric-tab-title">
                         {title}
                     </Text>
-                    {helpText ? (
-                        <HelpMark iconSize="s" popoverProps={{placement: 'right'}}>
-                            {helpText}
-                        </HelpMark>
-                    ) : null}
+                    {helpMark}
                 </Flex>
                 <Text
                     variant="caption-2"
