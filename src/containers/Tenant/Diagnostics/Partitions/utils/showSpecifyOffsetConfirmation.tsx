@@ -6,6 +6,7 @@ import {Alert, Dialog, Flex, TextInput} from '@gravity-ui/uikit';
 import {partitionsApi} from '../../../../../store/reducers/partitions/partitions';
 import type {CommitOffsetParams} from '../../../../../store/reducers/partitions/types';
 import {cn} from '../../../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../../../utils/constants';
 import createToast from '../../../../../utils/createToast';
 import {prepareCommonErrorMessage} from '../../../../../utils/errors';
 import i18n from '../i18n';
@@ -109,7 +110,11 @@ function SpecifyOffsetDialog({
             <Dialog.Footer
                 loading={isLoading}
                 onClickButtonApply={handleConfirm}
-                propsButtonApply={{view: 'action', disabled: !offsetValue}}
+                propsButtonApply={{
+                    view: 'action',
+                    className: BRAND_BUTTON_CLASS,
+                    disabled: !offsetValue,
+                }}
                 textButtonApply={i18n('action_move-offset')}
                 textButtonCancel={i18n('action_cancel')}
                 onClickButtonCancel={onClose}

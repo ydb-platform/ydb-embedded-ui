@@ -5,6 +5,7 @@ import {Button, Dialog, TextInput} from '@gravity-ui/uikit';
 
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {getQueryNameValidationError} from '../utils/QueryNameValidation';
 
 import i18n from './i18n';
@@ -109,7 +110,7 @@ function SaveChangesDialog({
                     propsButtonCancel={{view: 'flat'}}
                     onClickButtonCancel={onCancel}
                     textButtonApply={i18n('action.save')}
-                    propsButtonApply={{type: 'submit'}}
+                    propsButtonApply={{type: 'submit', className: BRAND_BUTTON_CLASS}}
                 >
                     <Button
                         view="outlined"

@@ -15,6 +15,7 @@ import {
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getTabTitleForSave} from '../utils/queryTabTitles';
 import {useSavedQueries} from '../utils/useSavedQueries';
@@ -254,6 +255,7 @@ function SaveQueryDialog({
                     onClickButtonCancel={onCloseWithoutSave}
                     propsButtonApply={{
                         type: 'submit',
+                        className: BRAND_BUTTON_CLASS,
                     }}
                 />
             </form>

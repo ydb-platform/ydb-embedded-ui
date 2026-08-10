@@ -68,6 +68,30 @@
         text-overflow: ellipsis;
     }
 
+    &__tab-title_dirty {
+        --tab-title-covered-width: calc(
+            6px + var(--g-spacing-2) + var(--g-spacing-2) - var(--g-spacing-4)
+        );
+    }
+
+    &__tab-title_dirty,
+    &__tab-root:hover &__tab-title,
+    &__tab-root_menuOpen &__tab-title {
+        --tab-title-mask-fade-width: 16px;
+
+        // The mask changes only the title alpha; the tab background is painted once by tab-root.
+        mask-image: linear-gradient(
+            to right,
+            #000 calc(100% - var(--tab-title-covered-width) - var(--tab-title-mask-fade-width)),
+            transparent calc(100% - var(--tab-title-covered-width))
+        );
+    }
+
+    &__tab-root:hover &__tab-title,
+    &__tab-root_menuOpen &__tab-title {
+        --tab-title-covered-width: calc(40px + var(--g-spacing-1) - var(--g-spacing-4));
+    }
+
     &__tab-additional {
         position: absolute;
         top: 0;
@@ -80,79 +104,15 @@
         padding-right: 0;
 
         pointer-events: none;
-
-        background-color: var(--multitab-tab-inactive-background-color);
-
-        &::before {
-            position: absolute;
-            top: 0;
-            right: 100%;
-            bottom: 0;
-
-            display: none;
-
-            width: 16px;
-
-            content: '';
-
-            background: linear-gradient(
-                to right,
-                transparent,
-                var(--multitab-tab-inactive-background-color)
-            );
-        }
     }
 
     &__tab-additional_dirty {
         padding-right: var(--g-spacing-2);
-
-        &::before {
-            display: block;
-        }
-    }
-
-    &__tab-root.g-tab_active &__tab-additional_dirty {
-        background-color: var(--multitab-tab-active-background-color);
-
-        &::before {
-            background: linear-gradient(
-                to right,
-                transparent,
-                var(--multitab-tab-active-background-color)
-            );
-        }
     }
 
     &__tab-root:hover &__tab-additional,
     &__tab-root_menuOpen &__tab-additional {
         padding-right: var(--g-spacing-1);
-
-        background-color: var(--multitab-tab-inactive-hover-background-color);
-    }
-
-    &__tab-root:hover &__tab-additional::before,
-    &__tab-root_menuOpen &__tab-additional::before {
-        display: block;
-
-        background: linear-gradient(
-            to right,
-            transparent,
-            var(--multitab-tab-inactive-hover-background-color)
-        );
-    }
-
-    &__tab-root.g-tab_active:hover &__tab-additional,
-    &__tab-root_menuOpen.g-tab_active &__tab-additional {
-        background-color: var(--multitab-tab-active-background-color);
-    }
-
-    &__tab-root.g-tab_active:hover &__tab-additional::before,
-    &__tab-root_menuOpen.g-tab_active &__tab-additional::before {
-        background: linear-gradient(
-            to right,
-            transparent,
-            var(--multitab-tab-active-background-color)
-        );
     }
 
     &__tab-root:hover &__tab-action,

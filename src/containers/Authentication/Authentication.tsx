@@ -9,6 +9,7 @@ import {basename} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {useLoginWithDatabase} from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../utils/constants';
 import {prepareCommonErrorMessage} from '../../utils/errors';
 import {useMetaAuth} from '../../utils/hooks/useMetaAuth';
 
@@ -203,7 +204,7 @@ function Authentication({closable = false}: AuthenticationProps) {
                     size="l"
                     disabled={Boolean(!login || loginError || passwordError)}
                     loading={isLoading}
-                    className={b('button-sign-in')}
+                    className={b('button-sign-in', undefined, BRAND_BUTTON_CLASS)}
                 >
                     Sign in
                 </Button>

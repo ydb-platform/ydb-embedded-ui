@@ -1,6 +1,7 @@
 import {TriangleExclamationFill} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Flex, Icon, Label} from '@gravity-ui/uikit';
 
+import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import i18n from '../i18n';
 import {block} from '../shared';
 
@@ -45,7 +46,7 @@ export function Footer({onCancel, onSave, onDiscard, loading, error, disabled}: 
                     onClick={onSave}
                     view="action"
                     size="l"
-                    className={block('footer-button')}
+                    className={block('footer-button', undefined, BRAND_BUTTON_CLASS)}
                     loading={loading}
                     disabled={disabled}
                 >
