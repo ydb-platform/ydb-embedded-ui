@@ -45,7 +45,7 @@ import './StorageGroupsColumns.scss';
 
 const b = cn('ydb-storage-groups-columns');
 
-const DISKS_COLUMN_WIDTH = 800;
+const DISKS_COLUMN_WIDTH = 825;
 
 const poolNameColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.PoolName,
