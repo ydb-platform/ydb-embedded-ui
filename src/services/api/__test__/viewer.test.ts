@@ -34,7 +34,7 @@ function createViewerApi(config: AxiosRequestConfig) {
     return new ViewerAPI(
         {config},
         {
-            singleClusterMode: true,
+            singleClusterMode: false,
             proxyMeta: false,
             useRelativePath: false,
             csrfTokenGetter: () => undefined,
