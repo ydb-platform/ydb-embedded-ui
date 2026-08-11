@@ -4,6 +4,7 @@ import NiceModal from '@ebay/nice-modal-react';
 import {Dialog, Flex, Text} from '@gravity-ui/uikit';
 
 import {SubjectWithAvatar} from '../../../../../../components/SubjectWithAvatar/SubjectWithAvatar';
+import {useNonDefaultAclInheritanceRevocationAvailable} from '../../../../../../store/reducers/capabilities/hooks';
 import {useClusterWithProxy} from '../../../../../../store/reducers/cluster/cluster';
 import {
     schemaAclApi,
@@ -80,6 +81,8 @@ function RevokeAllRightsDialog({
     subject,
 }: RevokeAllRightsDialogProps) {
     const useMetaProxy = useClusterWithProxy();
+    const supportsNonDefaultInheritanceRevocation =
+        useNonDefaultAclInheritanceRevocationAvailable();
     const dialect = useAclSyntax();
     const subjectExplicitAces = useTypedSelector((state) =>
         selectSubjectExplicitAces(
@@ -102,7 +105,10 @@ function RevokeAllRightsDialog({
             database,
             databaseFullPath,
             dialect,
-            rights: prepareRevokeAllRightsRequest(subjectExplicitAces),
+            rights: prepareRevokeAllRightsRequest(
+                subjectExplicitAces,
+                supportsNonDefaultInheritanceRevocation,
+            ),
         })
             .unwrap()
             .then(() => {

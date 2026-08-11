@@ -155,6 +155,71 @@ describe('prepareAccessRightsUpdateRequest', () => {
         });
     });
 
+    test('preserves Deny access type in a legacy revoke', () => {
+        expect(
+            prepareAccessRightsUpdateRequest({
+                subjects: ['alice'],
+                rightsToGrant: [],
+                rightsToRevoke: ['select_row'],
+                subjectExplicitAces: [
+                    {
+                        Subject: 'alice',
+                        AccessType: 'Deny',
+                        AccessRights: ['select_row', 'update_row'],
+                        InheritanceType: ['none'],
+                    },
+                ],
+                supportsNonDefaultInheritanceRevocation: false,
+            }),
+        ).toEqual({
+            RemoveAccess: [
+                {
+                    Subject: 'alice',
+                    AccessType: 'Deny',
+                    AccessRights: ['select_row'],
+                },
+            ],
+        });
+    });
+
+    test('keeps legacy revokes from separate Allow and Deny ACEs distinct', () => {
+        expect(
+            prepareAccessRightsUpdateRequest({
+                subjects: ['alice'],
+                rightsToGrant: [],
+                rightsToRevoke: ['select_row', 'update_row'],
+                subjectExplicitAces: [
+                    {
+                        Subject: 'alice',
+                        AccessType: 'Allow',
+                        AccessRights: ['select_row'],
+                        InheritanceType: ['none'],
+                    },
+                    {
+                        Subject: 'alice',
+                        AccessType: 'Deny',
+                        AccessRights: ['update_row'],
+                        InheritanceType: ['only'],
+                    },
+                ],
+                supportsNonDefaultInheritanceRevocation: false,
+            }),
+        ).toEqual({
+            RemoveAccess: [
+                {
+                    Subject: 'alice',
+                    AccessType: 'Allow',
+                    AccessRights: ['select_row'],
+                },
+                {
+                    Subject: 'alice',
+                    AccessType: 'Deny',
+                    AccessRights: ['update_row'],
+                },
+            ],
+        });
+    });
+
     test('uses exact revoke for default ACEs and legacy revoke for non-default ACEs in one request', () => {
         const defaultAce: TACE = {
             Subject: 'alice',
@@ -313,7 +378,7 @@ describe('prepareRevokeAllRightsRequest', () => {
             },
         ];
 
-        expect(prepareRevokeAllRightsRequest(subjectExplicitAces)).toEqual({
+        expect(prepareRevokeAllRightsRequest(subjectExplicitAces, true)).toEqual({
             RemoveAccess: [
                 {
                     Subject: 'alice',
@@ -331,8 +396,44 @@ describe('prepareRevokeAllRightsRequest', () => {
         });
     });
 
+    test('uses exact default revoke and legacy non-default revoke together on ACL v2', () => {
+        expect(
+            prepareRevokeAllRightsRequest(
+                [
+                    {
+                        Subject: 'alice',
+                        AccessType: 'Allow',
+                        AccessRights: ['select_row', 'update_row'],
+                        InheritanceType: ['inherit'],
+                    },
+                    {
+                        Subject: 'alice',
+                        AccessType: 'Deny',
+                        AccessRules: ['full'],
+                        InheritanceType: ['none'],
+                    },
+                ],
+                false,
+            ),
+        ).toEqual({
+            RemoveAccess: [
+                {
+                    Subject: 'alice',
+                    AccessType: 'Allow',
+                    AccessRights: ['select_row', 'update_row'],
+                    InheritanceType: ['inherit'],
+                },
+                {
+                    Subject: 'alice',
+                    AccessType: 'Deny',
+                    AccessRights: ['full'],
+                },
+            ],
+        });
+    });
+
     test('omits RemoveAccess when the subject has no ACEs', () => {
-        expect(prepareRevokeAllRightsRequest([])).toEqual({});
+        expect(prepareRevokeAllRightsRequest([], false)).toEqual({});
     });
 });
 

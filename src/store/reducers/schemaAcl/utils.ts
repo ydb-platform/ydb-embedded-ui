@@ -34,6 +34,14 @@ function prepareAceForUpdate(ace: TACE, accessRights = getAceRights(ace)) {
     return update;
 }
 
+function prepareAceForLegacyUpdate(ace: TACE, accessRights = getAceRights(ace)) {
+    return {
+        Subject: ace.Subject,
+        AccessType: ace.AccessType,
+        AccessRights: accessRights,
+    };
+}
+
 function hasDefaultInheritanceType(ace: TACE) {
     if (ace.InheritanceType === undefined) {
         return true;
@@ -69,7 +77,6 @@ export function prepareAccessRightsUpdateRequest({
 
     const removeAccess: AccessRightsUpdate[] = [];
     const rightsToRevokeSet = new Set(rightsToRevoke);
-    const legacyRightsBySubject = new Map<string, Set<string>>();
 
     subjectExplicitAces.forEach((ace) => {
         const aceRights = getAceRights(ace);
@@ -79,9 +86,7 @@ export function prepareAccessRightsUpdateRequest({
         }
 
         if (!supportsNonDefaultInheritanceRevocation && !hasDefaultInheritanceType(ace)) {
-            const legacyRights = legacyRightsBySubject.get(ace.Subject) ?? new Set<string>();
-            revokedAceRights.forEach((right) => legacyRights.add(right));
-            legacyRightsBySubject.set(ace.Subject, legacyRights);
+            removeAccess.push(prepareAceForLegacyUpdate(ace, revokedAceRights));
             return;
         }
 
@@ -93,14 +98,6 @@ export function prepareAccessRightsUpdateRequest({
         });
     });
 
-    legacyRightsBySubject.forEach((legacyRights, subject) => {
-        removeAccess.push({
-            Subject: subject,
-            AccessType: 'Allow',
-            AccessRights: Array.from(legacyRights),
-        });
-    });
-
     return {
         ...(addAccess.length ? {AddAccess: addAccess} : {}),
         ...(removeAccess.length ? {RemoveAccess: removeAccess} : {}),
@@ -109,10 +106,17 @@ export function prepareAccessRightsUpdateRequest({
 
 export function prepareRevokeAllRightsRequest(
     subjectExplicitAces: TACE[],
+    supportsNonDefaultInheritanceRevocation: boolean,
 ): AccessRightsUpdateRequest {
     if (!subjectExplicitAces.length) {
         return {};
     }
 
-    return {RemoveAccess: subjectExplicitAces.map((ace) => prepareAceForUpdate(ace))};
+    return {
+        RemoveAccess: subjectExplicitAces.map((ace) =>
+            supportsNonDefaultInheritanceRevocation || hasDefaultInheritanceType(ace)
+                ? prepareAceForUpdate(ace)
+                : prepareAceForLegacyUpdate(ace),
+        ),
+    };
 }
