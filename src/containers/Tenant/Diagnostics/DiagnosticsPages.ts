@@ -5,6 +5,7 @@ import {useLocation} from 'react-router-dom';
 
 import {getTenantPath, parseQuery} from '../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_PAGE} from '../../../store/reducers/tenant/constants';
+import {tenantPageSchema} from '../../../store/reducers/tenant/types';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
@@ -167,6 +168,8 @@ const databasePageById = {
     [TENANT_DIAGNOSTICS_TABS_IDS.database]: database,
     [TENANT_DIAGNOSTICS_TABS_IDS.monitoring]: monitoring,
     [TENANT_DIAGNOSTICS_TABS_IDS.topQueries]: topQueries,
+    [TENANT_DIAGNOSTICS_TABS_IDS.nodes]: nodes,
+    [TENANT_DIAGNOSTICS_TABS_IDS.tablets]: tablets,
     [TENANT_DIAGNOSTICS_TABS_IDS.storage]: storage,
     [TENANT_DIAGNOSTICS_TABS_IDS.network]: network,
     [TENANT_DIAGNOSTICS_TABS_IDS.configs]: configs,
@@ -176,7 +179,7 @@ const databasePageById = {
 
 const DB_PAGES = V2_DATABASE_PAGE_DIAGNOSTICS_TABS.map((id) => databasePageById[id]);
 
-const DIAGNOSTICS_DB_PAGES = [overview, topShards, nodes, tablets, describe, access];
+const DIAGNOSTICS_DB_PAGES = [overview, topShards, tablets, describe, access];
 
 const ALL_SERVERLESS_DB_PAGES = [
     overview,
@@ -191,7 +194,15 @@ const ALL_SERVERLESS_DB_PAGES = [
     backups,
 ];
 
-const SERVERLESS_DB_PAGES = [database, monitoring, topQueries, configs, operations, backups];
+const SERVERLESS_DB_PAGES = [
+    database,
+    monitoring,
+    topQueries,
+    tablets,
+    configs,
+    operations,
+    backups,
+];
 
 const DIAGNOSTICS_SERVERLESS_DB_PAGES = [overview, topShards, tablets, describe, access];
 
@@ -307,6 +318,9 @@ function applyFilters(pages: Page[], options: GetPagesOptions = {}) {
 
     const removals: TenantDiagnosticsTab[] = [];
 
+    if (options.databasePagesDisplay === 'diagnostics') {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.nodes);
+    }
     if (!options.hasTopicData) {
         removals.push(TENANT_DIAGNOSTICS_TABS_IDS.topicData);
     }
@@ -359,7 +373,11 @@ export const useDiagnosticsPageLinkGetter = () => {
                 // tab does not exist (and gets silently replaced by the first tab).
                 // Spread after `params` so callers cannot accidentally override the
                 // page/tab the helper is responsible for.
-                [TENANT_PAGE]: getTenantPageForDiagnosticsTab(tab, isV2Enabled),
+                [TENANT_PAGE]: getTenantPageForDiagnosticsTab(
+                    tab,
+                    isV2Enabled,
+                    tenantPageSchema.safeParse(queryParams[TENANT_PAGE]).data,
+                ),
                 [TenantTabsGroups.diagnosticsTab]: tab,
             });
         },
