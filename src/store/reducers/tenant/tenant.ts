@@ -99,17 +99,22 @@ export const tenantApi = api.injectEndpoints({
     overrideExisting: 'throw',
 });
 
-export function useTenantBaseInfo(database: string) {
+export function useTenantBaseInfo(
+    database: string,
+    clusterNameOverride?: string,
+    {skip = false}: {skip?: boolean} = {},
+) {
     const clusterNameFromQuery = useClusterNameFromQuery();
+    const clusterName = clusterNameOverride ?? clusterNameFromQuery;
     const isMetaDatabasesAvailable = useDatabasesV2();
 
     const {currentData, isLoading, isError, error} = tenantApi.useGetTenantInfoQuery(
         {
             database,
-            clusterName: clusterNameFromQuery,
+            clusterName,
             isMetaDatabasesAvailable,
         },
-        {skip: !database},
+        {skip: skip || !database},
     );
 
     const {ControlPlane, Name, Id, Type} = currentData || {};

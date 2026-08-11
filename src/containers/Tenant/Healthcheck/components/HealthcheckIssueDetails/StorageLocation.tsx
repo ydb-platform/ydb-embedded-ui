@@ -99,8 +99,8 @@ function GroupInfo({location}: StorageSectionProps) {
 }
 
 function VDiskInfo({location}: StorageSectionProps) {
-    const getVDiskPagePath = useVDiskPagePath();
-    const {clusterName} = useHealthcheckContext();
+    const {clusterName, database} = useHealthcheckContext();
+    const getVDiskPagePath = useVDiskPagePath(database);
     const {node, pool} = location ?? {};
     const {group} = pool ?? {};
     const {vdisk} = group ?? {};
@@ -140,7 +140,7 @@ function VDiskInfo({location}: StorageSectionProps) {
     );
 }
 function PDiskInfo({location}: StorageSectionProps) {
-    const {clusterName} = useHealthcheckContext();
+    const {clusterName, database} = useHealthcheckContext();
     const {pool} = location ?? {};
     const {group} = pool ?? {};
     const {vdisk} = group ?? {};
@@ -166,7 +166,12 @@ function PDiskInfo({location}: StorageSectionProps) {
                     {
                         value:
                             nodeId && pdiskId ? (
-                                <InternalLink to={getPDiskPagePath(pdiskId, nodeId, {clusterName})}>
+                                <InternalLink
+                                    to={getPDiskPagePath(pdiskId, nodeId, {
+                                        clusterName,
+                                        database,
+                                    })}
+                                >
                                     {disk.id}
                                 </InternalLink>
                             ) : (

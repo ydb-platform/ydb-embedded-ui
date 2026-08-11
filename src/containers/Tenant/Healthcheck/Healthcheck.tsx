@@ -8,6 +8,7 @@ import {HealthcheckStatus} from '../../../components/HealthcheckStatus/Healthche
 import {Loader} from '../../../components/Loader';
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
 import {SelfCheckResult} from '../../../types/api/healthcheck';
+import type {ETenantType} from '../../../types/api/tenant';
 import {useTypedSelector} from '../../../utils/hooks';
 import {getIllustration} from '../../../utils/illustrations';
 import {HEALTHCHECK_RESULT_TO_TEXT} from '../constants';
@@ -27,22 +28,41 @@ import cryCatIcon from '../../../assets/icons/cry-cat.svg';
 import './Healthcheck.scss';
 
 type HealthcheckDetailsProps =
-    | {database: string; clusterName?: undefined}
-    | {clusterName: string; database?: undefined};
+    | {database: string; clusterName?: string; databaseType?: ETenantType}
+    | {clusterName: string; database?: undefined; databaseType?: undefined};
 
-export function Healthcheck({database, clusterName}: HealthcheckDetailsProps) {
-    if (clusterName) {
+export function Healthcheck(props: HealthcheckDetailsProps) {
+    if (props.database !== undefined) {
         return (
-            <HealthcheckContext.Provider value={{clusterName}}>
-                <ClusterHealthcheckInner clusterName={clusterName} />
+            <HealthcheckContext.Provider
+                value={{database: props.database, clusterName: props.clusterName}}
+            >
+                <DatabaseHealthcheckInner
+                    database={props.database}
+                    clusterName={props.clusterName}
+                    databaseType={props.databaseType}
+                />
             </HealthcheckContext.Provider>
         );
     }
-    return <DatabaseHealthcheckInner database={database as string} />;
+
+    return (
+        <HealthcheckContext.Provider value={{clusterName: props.clusterName}}>
+            <ClusterHealthcheckInner clusterName={props.clusterName} />
+        </HealthcheckContext.Provider>
+    );
 }
 
-function DatabaseHealthcheckInner({database}: {database: string}) {
-    const healthcheck = useHealthcheck(database);
+function DatabaseHealthcheckInner({
+    database,
+    clusterName,
+    databaseType,
+}: {
+    database: string;
+    clusterName?: string;
+    databaseType?: ETenantType;
+}) {
+    const healthcheck = useHealthcheck(database, {clusterName, databaseType});
     return <HealthcheckContent healthcheck={healthcheck} />;
 }
 

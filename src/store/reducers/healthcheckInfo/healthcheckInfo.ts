@@ -6,16 +6,22 @@ import {api} from '../api';
 
 import {getLeavesFromTree, linkStateStorageSummaries} from './utils';
 
+type DatabaseHealthcheckQuery = {
+    database: string;
+    maxLevel?: number;
+    clusterName?: string;
+};
+
 export const healthcheckApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getHealthcheckInfo: builder.query({
             queryFn: async (
-                {database, maxLevel}: {database: string; maxLevel?: number},
+                {database, maxLevel, clusterName}: DatabaseHealthcheckQuery,
                 {signal},
             ) => {
                 try {
                     const data = await window.api.viewer.getHealthcheckInfo(
-                        {database, maxLevel},
+                        {database, maxLevel, clusterName},
                         {signal},
                     );
                     return {
@@ -72,18 +78,22 @@ const getRoots = (data: IssueLog[]): IssueLog[] => {
 
 const createGetHealthcheckInfoSelector = createSelector(
     (database: string) => database,
-    (database) => healthcheckApi.endpoints.getHealthcheckInfo.select({database}),
+    (_database: string, clusterName?: string) => clusterName,
+    (database, clusterName) =>
+        healthcheckApi.endpoints.getHealthcheckInfo.select({database, clusterName}),
 );
 
 export const selectCheckStatus = createSelector(
     (state: RootState) => state,
-    (_state: RootState, database: string) => createGetHealthcheckInfoSelector(database),
+    (_state: RootState, database: string, clusterName?: string) =>
+        createGetHealthcheckInfoSelector(database, clusterName),
     (state: RootState, selectGetPost) => selectGetPost(state).data?.self_check_result,
 );
 
 const getIssuesLog = createSelector(
     (state: RootState) => state,
-    (_state: RootState, database: string) => createGetHealthcheckInfoSelector(database),
+    (_state: RootState, database: string, clusterName?: string) =>
+        createGetHealthcheckInfoSelector(database, clusterName),
     (state: RootState, selectGetPost) =>
         linkStateStorageSummaries(selectGetPost(state).data?.issue_log || []),
 );
@@ -99,7 +109,8 @@ export const selectLeavesIssues = createSelector(
 
 export const selectAllHealthcheckInfo = createSelector(
     (state: RootState) => state,
-    (_state: RootState, database: string) => createGetHealthcheckInfoSelector(database),
+    (_state: RootState, database: string, clusterName?: string) =>
+        createGetHealthcheckInfoSelector(database, clusterName),
     (state: RootState, selectGetPost) => selectGetPost(state).data,
 );
 

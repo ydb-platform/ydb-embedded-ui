@@ -13,8 +13,9 @@ interface NodeInfoProps {
 }
 
 export function NodeInfo({node, title}: NodeInfoProps) {
-    const {database} = useTenantQueryParams();
-    const {clusterName} = useHealthcheckContext();
+    const {database: databaseFromQuery} = useTenantQueryParams();
+    const {clusterName, database: databaseFromContext} = useHealthcheckContext();
+    const database = databaseFromContext ?? databaseFromQuery;
     if (!node) {
         return null;
     }

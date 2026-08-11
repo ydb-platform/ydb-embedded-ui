@@ -34,6 +34,7 @@ interface TenantNameWrapperProps {
     clusterName?: string;
     additionalTenantsProps?: AdditionalTenantsProps;
     externalLink?: boolean;
+    onStatusClick?: (tenant: PreparedTenant) => void;
 }
 
 export function TenantNameWrapper({
@@ -41,6 +42,7 @@ export function TenantNameWrapper({
     clusterName,
     additionalTenantsProps,
     externalLink,
+    onStatusClick,
 }: TenantNameWrapperProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const emMetaAvailable = useEmMetaAvailable();
@@ -72,11 +74,12 @@ export function TenantNameWrapper({
     );
 
     const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
+    const database = useDatabaseId ? tenant.Id : tenant.Name;
 
     const dbUrl = getTenantPath(
         {
             clusterName: tenant.Cluster,
-            database: useDatabaseId ? tenant.Id : tenant.Name,
+            database,
             backend,
         },
         {withBasename: isExternalLink},
@@ -186,9 +189,23 @@ export function TenantNameWrapper({
         );
     }, [isExternalLink, dbUrl, dbName]);
 
+    const handleStatusClick = React.useCallback(
+        (event: React.MouseEvent<HTMLElement>) => {
+            event.stopPropagation();
+            onStatusClick?.(tenant);
+        },
+        [onStatusClick, tenant],
+    );
+
     const renderStatus = React.useCallback(() => {
-        return <EntityStatus.Label status={dbStatus ?? EFlag.Grey} size="xs" />;
-    }, [dbStatus]);
+        return (
+            <EntityStatus.Label
+                status={dbStatus ?? EFlag.Grey}
+                size="xs"
+                onClick={onStatusClick && tenant.Name ? handleStatusClick : undefined}
+            />
+        );
+    }, [dbStatus, handleStatusClick, onStatusClick, tenant.Name]);
 
     const renderPath = React.useCallback(() => {
         if (!dbPath) {
