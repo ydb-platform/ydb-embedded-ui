@@ -11,7 +11,15 @@ import {HealthcheckDrawer} from '../Tenant/Healthcheck/components/HealthcheckDra
 import tenantI18n from '../Tenant/i18n';
 import {useTenantQueryParams} from '../Tenant/useTenantQueryParams';
 
-export type DatabaseStatusClickHandler = (tenant: PreparedTenant) => void;
+export type DatabaseStatusClickHandler = (
+    tenant: PreparedTenant,
+    database: string | undefined,
+) => void;
+
+interface SelectedDatabase {
+    tenant: PreparedTenant;
+    database: string;
+}
 
 interface DatabaseDrawerHealthcheckProps {
     children: (onStatusClick: DatabaseStatusClickHandler) => React.ReactNode;
@@ -19,10 +27,12 @@ interface DatabaseDrawerHealthcheckProps {
 }
 
 export function DatabaseDrawerHealthcheck({children, clusterName}: DatabaseDrawerHealthcheckProps) {
-    const [selectedTenant, setSelectedTenant] = React.useState<PreparedTenant>();
+    const [selectedDatabase, setSelectedDatabase] = React.useState<SelectedDatabase>();
     const {handleIssuesFilterChange, handleHealthcheckViewChange} = useTenantQueryParams();
 
-    const database = selectedTenant?.Name ?? '';
+    const selectedTenant = selectedDatabase?.tenant;
+    const database = selectedDatabase?.database ?? '';
+    const databaseName = selectedTenant?.Name ?? '';
     const selectedClusterName = clusterName ?? selectedTenant?.Cluster;
     const databaseType = selectedTenant?.Type;
 
@@ -33,14 +43,17 @@ export function DatabaseDrawerHealthcheck({children, clusterName}: DatabaseDrawe
         selectAllHealthcheckInfo(state, database, selectedClusterName),
     );
 
-    const handleStatusClick = React.useCallback((tenant: PreparedTenant) => {
-        if (tenant.Name) {
-            setSelectedTenant(tenant);
-        }
-    }, []);
+    const handleStatusClick = React.useCallback(
+        (tenant: PreparedTenant, selectedDatabaseValue: string | undefined) => {
+            if (selectedDatabaseValue && tenant.Type !== 'Serverless') {
+                setSelectedDatabase({tenant, database: selectedDatabaseValue});
+            }
+        },
+        [],
+    );
 
     const handleCloseDrawer = React.useCallback(() => {
-        setSelectedTenant(undefined);
+        setSelectedDatabase(undefined);
         handleIssuesFilterChange(undefined);
         handleHealthcheckViewChange(undefined);
     }, [handleHealthcheckViewChange, handleIssuesFilterChange]);
@@ -59,7 +72,9 @@ export function DatabaseDrawerHealthcheck({children, clusterName}: DatabaseDrawe
         );
     }, [database, databaseType, selectedClusterName]);
 
-    const title = `${tenantI18n('title_healthcheck-dashboard')}${database ? `: ${database}` : ''}`;
+    const title = `${tenantI18n('title_healthcheck-dashboard')}${
+        databaseName ? `: ${databaseName}` : ''
+    }`;
 
     return (
         <HealthcheckDrawer
@@ -71,7 +86,7 @@ export function DatabaseDrawerHealthcheck({children, clusterName}: DatabaseDrawe
             title={title}
             status={healthcheckStatus}
             healthcheckData={healthcheckData}
-            downloadFilePrefix={`${database}-healthcheck`}
+            downloadFilePrefix={`${databaseName || database}-healthcheck`}
             downloadTooltip={tenantI18n('action_download-healthcheck')}
             isDownloadDisabled={!healthcheckData}
         >

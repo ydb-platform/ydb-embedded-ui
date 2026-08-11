@@ -34,7 +34,7 @@ interface TenantNameWrapperProps {
     clusterName?: string;
     additionalTenantsProps?: AdditionalTenantsProps;
     externalLink?: boolean;
-    onStatusClick?: (tenant: PreparedTenant) => void;
+    onStatusClick?: (tenant: PreparedTenant, database: string | undefined) => void;
 }
 
 export function TenantNameWrapper({
@@ -192,9 +192,9 @@ export function TenantNameWrapper({
     const handleStatusClick = React.useCallback(
         (event: React.MouseEvent<HTMLElement>) => {
             event.stopPropagation();
-            onStatusClick?.(tenant);
+            onStatusClick?.(tenant, database);
         },
-        [onStatusClick, tenant],
+        [database, onStatusClick, tenant],
     );
 
     const renderStatus = React.useCallback(() => {
@@ -202,10 +202,14 @@ export function TenantNameWrapper({
             <EntityStatus.Label
                 status={dbStatus ?? EFlag.Grey}
                 size="xs"
-                onClick={onStatusClick && tenant.Name ? handleStatusClick : undefined}
+                onClick={
+                    onStatusClick && database && tenant.Type !== 'Serverless'
+                        ? handleStatusClick
+                        : undefined
+                }
             />
         );
-    }, [dbStatus, handleStatusClick, onStatusClick, tenant.Name]);
+    }, [database, dbStatus, handleStatusClick, onStatusClick, tenant.Type]);
 
     const renderPath = React.useCallback(() => {
         if (!dbPath) {
