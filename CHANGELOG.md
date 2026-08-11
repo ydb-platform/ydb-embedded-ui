@@ -1,5 +1,18 @@
 # Changelog
 
+## [18.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.5.0...v18.6.0) (2026-08-11)
+
+
+### Features
+
+* add safe external query editor opening API ([#4191](https://github.com/ydb-platform/ydb-embedded-ui/issues/4191)) ([5295776](https://github.com/ydb-platform/ydb-embedded-ui/commit/5295776496bfe59087aaa5b0c1419f4cad47fd85))
+* **Database:** show healthcheck in list ([#4225](https://github.com/ydb-platform/ydb-embedded-ui/issues/4225)) ([d39b5b5](https://github.com/ydb-platform/ydb-embedded-ui/commit/d39b5b580fef49e83b06af65f2c3e319eba81b71))
+
+
+### Bug Fixes
+
+* **TenantOverview:** handle empty tenant info response ([#4222](https://github.com/ydb-platform/ydb-embedded-ui/issues/4222)) ([29b910e](https://github.com/ydb-platform/ydb-embedded-ui/commit/29b910e59fcf644d08ecea1529082ba85c24e815))
+
 ## [18.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.4.0...v18.5.0) (2026-08-10)
 
 
