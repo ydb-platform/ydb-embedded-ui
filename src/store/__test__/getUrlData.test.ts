@@ -80,6 +80,21 @@ describe('getUrlData', () => {
                 environment: 'cloud-preprod',
             });
         });
+        test('should extract environment after monitoring basename', () => {
+            window.history.pushState({}, '', '/monitoring/cloud-prod/custom?database=%2FRoot%2Fdb');
+
+            const result = getUrlData({
+                singleClusterMode: false,
+                customBackend: undefined,
+                allowedEnvironments: ['cloud-prod', 'cloud-preprod'],
+            });
+            expect(result).toEqual({
+                basename: '/monitoring',
+                backend: undefined,
+                clusterName: undefined,
+                environment: 'cloud-prod',
+            });
+        });
         test('should not extract environment if not in allowed list', () => {
             window.history.pushState({}, '', '/cluster/tenants?clusterName=my_cluster');
 

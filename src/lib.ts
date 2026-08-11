@@ -5,6 +5,8 @@ export {
     ErrorBoundaryFallback,
 } from './components/ErrorBoundary/ErrorBoundary';
 export {AsideNavigation} from './containers/AsideNavigation/AsideNavigation';
+export {useOpenExternalQueryInEditor} from './containers/Tenant/Query/hooks/useOpenExternalQueryInEditor';
+export {getQueryTextTabTitle} from './containers/Tenant/Query/utils/queryTabTitles';
 
 export {configureStore, rootReducer} from './store';
 export {default as appRoutes} from './routes';
@@ -33,6 +35,7 @@ export type {
 } from './containers/UserSettings/settings';
 export type {SettingProps, SettingsInfoFieldProps} from './containers/UserSettings/Setting';
 export type {AsideNavigationProps} from './containers/AsideNavigation/AsideNavigation';
+export type {ExternalQueryToOpen} from './containers/Tenant/Query/hooks/useOpenExternalQueryInEditor';
 export type {GetMonitoringLink, GetMonitoringClusterLink} from './utils/monitoring';
 export type {GetReportProblemUrl, IllustrationComponent, IllustrationName} from './uiFactory/types';
 

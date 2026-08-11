@@ -3,31 +3,40 @@ type AbortablePromiseLike = PromiseLike<unknown> & {
     finally: (onFinally?: (() => void) | null) => PromiseLike<unknown>;
 };
 
+interface ActiveQuery {
+    database: string;
+    query: AbortablePromiseLike;
+}
+
 class QueryExecutionManager {
-    private readonly queries = new Map<string, {abort: VoidFunction}>();
+    private readonly queries = new Map<string, ActiveQuery>();
 
-    registerQuery(tabId: string, query: AbortablePromiseLike) {
-        this.queries.set(tabId, query);
+    registerQuery(tabId: string, query: AbortablePromiseLike, database: string) {
+        const activeQuery = {database, query};
+        this.queries.set(tabId, activeQuery);
 
-        const queryRef = query;
         query.finally(() => {
-            if (this.queries.get(tabId) === queryRef) {
+            if (this.queries.get(tabId) === activeQuery) {
                 this.queries.delete(tabId);
             }
         });
     }
 
+    getQueryDatabase(tabId: string) {
+        return this.queries.get(tabId)?.database;
+    }
+
     abortQuery(tabId: string) {
-        const query = this.queries.get(tabId);
-        if (query) {
-            query.abort();
+        const activeQuery = this.queries.get(tabId);
+        if (activeQuery) {
+            activeQuery.query.abort();
             this.queries.delete(tabId);
         }
     }
 
     abortAll() {
-        for (const query of this.queries.values()) {
-            query.abort();
+        for (const activeQuery of this.queries.values()) {
+            activeQuery.query.abort();
         }
         this.queries.clear();
     }
