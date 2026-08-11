@@ -10,6 +10,7 @@ import type {DisplaySeverity} from '../../utils/disks/types';
 
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
 import {PDisksGroupBy} from './StorageExpertModePanel/constants';
+import i18n from './StorageExpertModePanel/i18n';
 import {useIsStorageExpertMode, usePDisksGroupByParam} from './useStorageQueryParams';
 
 export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
@@ -35,7 +36,7 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
                     severity: calculateSpaceSeverity({CapacityAlert: capacityAlert}),
                     icon:
                         pDisk.State === undefined
-                            ? 'N/D'
+                            ? i18n('value_no-data')
                             : calculateSpaceIcon({CapacityAlert: capacityAlert}),
                     modeModifier: 'mode-space',
                     isLegendInactive:
