@@ -436,7 +436,10 @@ const TenantsTableContent = ({
 
 export function TenantsTable(props: TenantsTableProps) {
     return (
-        <DatabaseDrawerHealthcheck clusterName={props.clusterName}>
+        <DatabaseDrawerHealthcheck
+            key={`${props.clusterName ?? ''}:${props.environmentName ?? ''}`}
+            clusterName={props.clusterName}
+        >
             {(onStatusClick) => <TenantsTableContent {...props} onStatusClick={onStatusClick} />}
         </DatabaseDrawerHealthcheck>
     );
