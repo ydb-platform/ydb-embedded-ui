@@ -221,8 +221,9 @@ export const tabletPageQueryParams = {
 
 type TabletPageQuery = QueryParamsTypeFromQueryObject<typeof tabletPageQueryParams>;
 
-export function useVDiskPagePath() {
-    const database = useDatabaseFromQuery();
+export function useVDiskPagePath(databaseOverride?: string) {
+    const databaseFromQuery = useDatabaseFromQuery();
+    const database = databaseOverride ?? databaseFromQuery;
 
     return React.useCallback(
         (
@@ -252,8 +253,9 @@ export function useStorageGroupPath() {
     );
 }
 
-export function useTabletPagePath() {
-    const database = useDatabaseFromQuery();
+export function useTabletPagePath(databaseOverride?: string) {
+    const databaseFromQuery = useDatabaseFromQuery();
+    const database = databaseOverride ?? databaseFromQuery;
 
     return React.useCallback(
         (tabletId: string | number, query: TabletPageQuery = {}) => {

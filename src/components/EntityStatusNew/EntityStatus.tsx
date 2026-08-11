@@ -51,7 +51,7 @@ interface EntityStatusLabelProps {
     withStatusName?: boolean;
     size?: LabelProps['size'];
     iconSize?: number;
-    onClick?: () => void;
+    onClick?: LabelProps['onClick'];
 }
 
 function EntityStatusLabel({

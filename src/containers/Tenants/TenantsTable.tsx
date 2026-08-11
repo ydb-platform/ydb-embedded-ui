@@ -45,6 +45,8 @@ import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
 import {isNumeric} from '../../utils/utils';
 
+import type {DatabaseStatusClickHandler} from './DatabaseDrawerHealthcheck';
+import {DatabaseDrawerHealthcheck} from './DatabaseDrawerHealthcheck';
 import {
     DATABASES_COLUMNS_IDS,
     DATABASES_COLUMNS_TITLES,
@@ -114,7 +116,11 @@ interface TenantsTableProps {
     showPoolsColumn?: boolean;
 }
 
-export const TenantsTable = ({
+interface TenantsTableContentProps extends TenantsTableProps {
+    onStatusClick: DatabaseStatusClickHandler;
+}
+
+const TenantsTableContent = ({
     clusterName,
     environmentName,
     isMetaDatabasesAvailable,
@@ -123,7 +129,8 @@ export const TenantsTable = ({
     showDomainDatabase,
     showWithProblemsFilter,
     showPoolsColumn,
-}: TenantsTableProps) => {
+    onStatusClick,
+}: TenantsTableContentProps) => {
     const SuccessImage = getIllustration('SuccessOperation');
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -217,6 +224,7 @@ export const TenantsTable = ({
                         clusterName={clusterName}
                         additionalTenantsProps={additionalTenantsProps}
                         externalLink={Boolean(environmentName)}
+                        onStatusClick={onStatusClick}
                     />
                 ),
                 width: 440,
@@ -357,6 +365,7 @@ export const TenantsTable = ({
         additionalTenantsProps,
         environmentName,
         handleSearchChange,
+        onStatusClick,
         showNetworkUtilization,
         showPoolsColumn,
     ]);
@@ -424,3 +433,14 @@ export const TenantsTable = ({
         </div>
     );
 };
+
+export function TenantsTable(props: TenantsTableProps) {
+    return (
+        <DatabaseDrawerHealthcheck
+            key={`${props.clusterName ?? ''}:${props.environmentName ?? ''}`}
+            clusterName={props.clusterName}
+        >
+            {(onStatusClick) => <TenantsTableContent {...props} onStatusClick={onStatusClick} />}
+        </DatabaseDrawerHealthcheck>
+    );
+}

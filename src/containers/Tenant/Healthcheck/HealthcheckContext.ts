@@ -7,6 +7,8 @@ export interface HealthcheckContextValue {
      * so links point to the correct cluster.
      */
     clusterName?: string;
+    /** Database to inject into generated links when healthcheck is opened outside its page. */
+    database?: string;
 }
 
 export const HealthcheckContext = React.createContext<HealthcheckContextValue>({});

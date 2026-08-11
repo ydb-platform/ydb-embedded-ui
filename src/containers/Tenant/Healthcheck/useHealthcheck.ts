@@ -6,6 +6,7 @@ import {
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
 import {useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import {SelfCheckResult} from '../../../types/api/healthcheck';
+import type {ETenantType} from '../../../types/api/tenant';
 import {useTypedSelector} from '../../../utils/hooks';
 
 interface HealthcheckParams {
@@ -19,9 +20,16 @@ interface HealthcheckParams {
 
 export const useHealthcheck = (
     database: string,
-    {autorefresh}: {autorefresh?: number} = {},
+    {
+        autorefresh,
+        clusterName,
+        databaseType,
+    }: {autorefresh?: number; clusterName?: string; databaseType?: ETenantType} = {},
 ): HealthcheckParams => {
-    const {databaseType} = useTenantBaseInfo(database);
+    const {databaseType: databaseTypeFromLookup} = useTenantBaseInfo(database, clusterName, {
+        skip: databaseType !== undefined,
+    });
+    const resolvedDatabaseType = databaseType ?? databaseTypeFromLookup;
     const {
         currentData: data,
         isFetching,
@@ -29,15 +37,17 @@ export const useHealthcheck = (
         refetch,
         fulfilledTimeStamp,
     } = healthcheckApi.useGetHealthcheckInfoQuery(
-        {database},
+        {database, clusterName},
         {
             pollingInterval: autorefresh,
-            skip: databaseType === 'Serverless',
+            skip: resolvedDatabaseType === 'Serverless',
         },
     );
 
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
-    const leavesIssues = useTypedSelector((state) => selectLeavesIssues(state, database));
+    const leavesIssues = useTypedSelector((state) =>
+        selectLeavesIssues(state, database, clusterName),
+    );
 
     return {
         loading: data === undefined && isFetching,

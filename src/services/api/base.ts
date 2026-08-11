@@ -272,12 +272,20 @@ export class BaseYdbAPI extends AxiosWrapper {
         this._axios.interceptors.response.use(null, handleBaseApiResponseError);
     }
 
-    getPath(path: string) {
-        if (clusterName && !this.singleClusterMode && !BACKEND) {
-            return prepareBackendWithMetaProxy({clusterName}) + path;
+    getPath(path: string, clusterNameOverride?: string) {
+        let resolvedPath: string;
+
+        const noCluster = this.singleClusterMode || BACKEND;
+
+        const resolvedClusterName = noCluster ? undefined : clusterNameOverride || clusterName;
+
+        if (resolvedClusterName) {
+            resolvedPath = prepareBackendWithMetaProxy({clusterName: resolvedClusterName}) + path;
+        } else {
+            resolvedPath = `${BACKEND ?? ''}${path}`;
         }
 
-        return `${BACKEND ?? ''}${path}`;
+        return resolvedPath;
     }
 
     getSchemaPath(params?: SchemaPathParam) {

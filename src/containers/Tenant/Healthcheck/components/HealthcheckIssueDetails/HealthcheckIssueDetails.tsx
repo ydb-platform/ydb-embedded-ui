@@ -19,8 +19,8 @@ interface HealthcheckIssueDetailsProps {
 }
 
 export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
-    const getTabletPagePath = useTabletPagePath();
-    const {clusterName} = useHealthcheckContext();
+    const {clusterName, database} = useHealthcheckContext();
+    const getTabletPagePath = useTabletPagePath(database);
 
     const {detailsFields, hiddenStorageFields, hiddenComputeFields} = React.useMemo(() => {
         const hiddenStorageFields: LocationFieldStorage[] = [];

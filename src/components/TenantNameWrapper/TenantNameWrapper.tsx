@@ -34,6 +34,7 @@ interface TenantNameWrapperProps {
     clusterName?: string;
     additionalTenantsProps?: AdditionalTenantsProps;
     externalLink?: boolean;
+    onStatusClick?: (tenant: PreparedTenant, database: string | undefined) => void;
 }
 
 export function TenantNameWrapper({
@@ -41,6 +42,7 @@ export function TenantNameWrapper({
     clusterName,
     additionalTenantsProps,
     externalLink,
+    onStatusClick,
 }: TenantNameWrapperProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const emMetaAvailable = useEmMetaAvailable();
@@ -51,6 +53,7 @@ export function TenantNameWrapper({
 
     const backend = getTenantBackend(tenant, additionalTenantsProps);
     const isExternalLink = externalLink || Boolean(backend);
+    const useMetaProxy = uiFactory.useMetaProxy && settings?.use_meta_proxy !== false;
 
     const legacyLinks = React.useMemo(
         () => getDatabaseLinks(additionalTenantsProps, tenant?.Name, tenant?.Type),
@@ -72,11 +75,12 @@ export function TenantNameWrapper({
     );
 
     const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
+    const database = useDatabaseId ? tenant.Id : tenant.Name;
 
     const dbUrl = getTenantPath(
         {
             clusterName: tenant.Cluster,
-            database: useDatabaseId ? tenant.Id : tenant.Name,
+            database,
             backend,
         },
         {withBasename: isExternalLink},
@@ -186,9 +190,27 @@ export function TenantNameWrapper({
         );
     }, [isExternalLink, dbUrl, dbName]);
 
+    const handleStatusClick = React.useCallback(
+        (event: React.MouseEvent<HTMLElement>) => {
+            event.stopPropagation();
+            onStatusClick?.(tenant, database);
+        },
+        [database, onStatusClick, tenant],
+    );
+
     const renderStatus = React.useCallback(() => {
-        return <EntityStatus.Label status={dbStatus ?? EFlag.Grey} size="xs" />;
-    }, [dbStatus]);
+        return (
+            <EntityStatus.Label
+                status={dbStatus ?? EFlag.Grey}
+                size="xs"
+                onClick={
+                    onStatusClick && database && useMetaProxy && tenant.Type !== 'Serverless'
+                        ? handleStatusClick
+                        : undefined
+                }
+            />
+        );
+    }, [database, dbStatus, handleStatusClick, onStatusClick, tenant.Type, useMetaProxy]);
 
     const renderPath = React.useCallback(() => {
         if (!dbPath) {

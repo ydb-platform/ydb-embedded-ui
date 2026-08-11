@@ -76,8 +76,8 @@ interface ComputeSectionProps {
 }
 
 function TabletInfo({location}: ComputeSectionProps) {
-    const getTabletPagePath = useTabletPagePath();
-    const {clusterName} = useHealthcheckContext();
+    const {clusterName, database} = useHealthcheckContext();
+    const getTabletPagePath = useTabletPagePath(database);
     const {tablet} = location ?? {};
 
     if (!tablet) {
