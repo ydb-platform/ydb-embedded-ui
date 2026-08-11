@@ -240,18 +240,23 @@ describe('drawer right inset', () => {
         expect(mockDrawerProps.style).toEqual({overflow: 'hidden', width: 0});
     });
 
-    it('identifies clicks in the adjacent right inset', () => {
+    it('identifies only clicks inside the adjacent right inset', () => {
+        const providerContainer = document.createElement('div');
         const itemContainer = document.createElement('div');
-        jest.spyOn(itemContainer, 'getBoundingClientRect').mockReturnValue({
-            bottom: 800,
-            height: 800,
-            left: 0,
-            right: 700,
-            top: 0,
-            width: 700,
-            x: 0,
-            y: 0,
-            toJSON: () => ({}),
+        providerContainer.appendChild(itemContainer);
+        Object.defineProperty(itemContainer, 'getBoundingClientRect', {
+            configurable: true,
+            value: jest.fn().mockReturnValue({
+                bottom: 800,
+                height: 800,
+                left: 0,
+                right: 700,
+                top: 0,
+                width: 700,
+                x: 0,
+                y: 0,
+                toJSON: () => ({}),
+            }),
         });
 
         expect(
@@ -259,6 +264,9 @@ describe('drawer right inset', () => {
         ).toBe(true);
         expect(
             isClickInRightInset(new MouseEvent('click', {clientX: 650}), itemContainer, 300),
+        ).toBe(false);
+        expect(
+            isClickInRightInset(new MouseEvent('click', {clientX: 1_050}), itemContainer, 300),
         ).toBe(false);
         expect(isClickInRightInset(new MouseEvent('click', {clientX: 750}), itemContainer, 0)).toBe(
             false,

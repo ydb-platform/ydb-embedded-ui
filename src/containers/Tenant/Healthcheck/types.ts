@@ -1,7 +1,7 @@
 import type {IssueLog, SelfCheckResult} from '../../../types/api/healthcheck';
 
 export type HealthcheckAssistantTarget =
-    | {scope: 'database'; request: {database: string}}
+    | {scope: 'database'; request: {database: string; clusterName?: string}}
     | {scope: 'cluster'; request: {clusterName: string} | {database: string}};
 
 export type HealthcheckAssistantSnapshot = {

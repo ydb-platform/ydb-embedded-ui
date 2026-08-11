@@ -41,7 +41,14 @@ export function isClickInRightInset(
     if (rightInset <= 0 || !itemContainer) {
         return false;
     }
-    return event.clientX >= itemContainer.getBoundingClientRect().right;
+    const providerContainer = itemContainer.parentElement;
+    if (!providerContainer) {
+        return false;
+    }
+
+    const itemRight = itemContainer.getBoundingClientRect().right;
+    const providerRight = providerContainer.getBoundingClientRect().right;
+    return event.clientX >= itemRight && event.clientX <= providerRight;
 }
 
 export const DrawerContextProvider = ({

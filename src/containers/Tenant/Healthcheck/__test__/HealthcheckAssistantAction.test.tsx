@@ -94,7 +94,7 @@ function AssistantAction(props: HealthcheckAssistantActionProps) {
 
 function renderHealthcheck(
     props:
-        | {database: string; scope?: 'cluster' | 'database'}
+        | {database: string; clusterName?: string; scope?: 'cluster' | 'database'}
         | {clusterName: string; scope?: 'cluster'},
 ) {
     componentsRegistry.set('HealthcheckAssistantAction', AssistantAction);
@@ -152,6 +152,14 @@ describe('HealthcheckAssistantAction', () => {
             name: 'database target',
             props: {database: '/Root/database'},
             expectedTarget: {scope: 'database', request: {database: '/Root/database'}},
+        },
+        {
+            name: 'database target selected from a cluster',
+            props: {database: '/Root/database', clusterName: 'production-cluster'},
+            expectedTarget: {
+                scope: 'database',
+                request: {database: '/Root/database', clusterName: 'production-cluster'},
+            },
         },
         {
             name: 'cluster target with a database request',

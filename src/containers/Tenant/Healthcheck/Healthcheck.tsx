@@ -81,7 +81,15 @@ function DatabaseHealthcheckInner({
     scope?: 'cluster' | 'database';
 }) {
     const healthcheck = useHealthcheck(database, {clusterName, databaseType});
-    return <HealthcheckContent healthcheck={healthcheck} target={{scope, request: {database}}} />;
+    const target: HealthcheckAssistantTarget =
+        scope === 'database'
+            ? {
+                  scope,
+                  request: clusterName === undefined ? {database} : {database, clusterName},
+              }
+            : {scope, request: {database}};
+
+    return <HealthcheckContent healthcheck={healthcheck} target={target} />;
 }
 
 function ClusterHealthcheckInner({clusterName}: {clusterName: string}) {
