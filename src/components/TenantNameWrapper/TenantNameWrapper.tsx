@@ -53,6 +53,7 @@ export function TenantNameWrapper({
 
     const backend = getTenantBackend(tenant, additionalTenantsProps);
     const isExternalLink = externalLink || Boolean(backend);
+    const useMetaProxy = uiFactory.useMetaProxy && settings?.use_meta_proxy !== false;
 
     const legacyLinks = React.useMemo(
         () => getDatabaseLinks(additionalTenantsProps, tenant?.Name, tenant?.Type),
@@ -203,13 +204,13 @@ export function TenantNameWrapper({
                 status={dbStatus ?? EFlag.Grey}
                 size="xs"
                 onClick={
-                    onStatusClick && database && tenant.Type !== 'Serverless'
+                    onStatusClick && database && useMetaProxy && tenant.Type !== 'Serverless'
                         ? handleStatusClick
                         : undefined
                 }
             />
         );
-    }, [database, dbStatus, handleStatusClick, onStatusClick, tenant.Type]);
+    }, [database, dbStatus, handleStatusClick, onStatusClick, tenant.Type, useMetaProxy]);
 
     const renderPath = React.useCallback(() => {
         if (!dbPath) {
