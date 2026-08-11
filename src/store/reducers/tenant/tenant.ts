@@ -81,9 +81,10 @@ export const tenantApi = api.injectEndpoints({
                     const data =
                         databases.find(
                             (tenant) => tenant.Name === database || tenant.Id === database,
-                        ) ??
-                        databases[0] ??
-                        null;
+                        ) ?? databases[0];
+                    if (!data) {
+                        return {error: {code: 'EMPTY_TENANT_INFO'}};
+                    }
                     return {data};
                 } catch (error) {
                     return {error};

@@ -1,5 +1,6 @@
 {
   "action_open-monitoring": "Monitoring",
+  "alert_database-information-not-available": "Database information is not available",
   "top-nodes.empty-data": "No such nodes",
   "title_top-nodes-load": "Top nodes by load",
   "title_top-nodes-pool": "Top nodes by pools usage",

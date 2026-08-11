@@ -123,8 +123,8 @@ function TenantName({
     );
 }
 
-function renderTenantError(error: unknown) {
-    return error ? <ResponseError error={error} /> : null;
+function renderTenantError(error: unknown, defaultMessage: string) {
+    return error ? <ResponseError error={error} defaultMessage={defaultMessage} /> : null;
 }
 
 function renderHealthcheckPreview({
@@ -337,7 +337,7 @@ export function TenantOverview({
         tabletStorageStats,
         networkUtilization,
         networkThroughput,
-    } = calculateTenantMetrics(tenant);
+    } = tenant ? calculateTenantMetrics(tenant) : calculateTenantMetrics();
 
     const storageMetrics = {
         blobStorageUsed: blobStorage,
@@ -387,53 +387,55 @@ export function TenantOverview({
 
     return (
         <LoaderWrapper loading={tenantLoading}>
-            {renderTenantError(error)}
-            <div className={b()}>
-                <div className={b('info')}>
-                    {renderOverviewHead({
-                        databaseStatus,
-                        handleOpenMonitoring,
-                        hasTenant: Boolean(tenant),
-                        isServerless,
-                        isV2NavigationEnabled,
-                        links,
-                        monitoringTabAvailable,
-                        name: Name,
-                        tenantType,
-                    })}
-                    <Flex direction="column" gap={4}>
-                        {renderHealthcheckPreview({
-                            database,
+            {renderTenantError(error, i18n('alert_database-information-not-available'))}
+            {tenant ? (
+                <div className={b()}>
+                    <div className={b('info')}>
+                        {renderOverviewHead({
+                            databaseStatus,
+                            handleOpenMonitoring,
+                            hasTenant: Boolean(tenant),
                             isServerless,
                             isV2NavigationEnabled,
+                            links,
+                            monitoringTabAvailable,
+                            name: Name,
+                            tenantType,
                         })}
-                        <QueriesActivityBar database={database} />
-                        <MetricsTabs
-                            metrics={metricOverview}
-                            isServerless={isServerless}
-                            activeTab={activeMetricsTab}
-                        />
-                    </Flex>
+                        <Flex direction="column" gap={4}>
+                            {renderHealthcheckPreview({
+                                database,
+                                isServerless,
+                                isV2NavigationEnabled,
+                            })}
+                            <QueriesActivityBar database={database} />
+                            <MetricsTabs
+                                metrics={metricOverview}
+                                isServerless={isServerless}
+                                activeTab={activeMetricsTab}
+                            />
+                        </Flex>
+                    </div>
+                    <div className={b('tab-content')}>
+                        {renderMetricsTabContent({
+                            activeMetricsTab,
+                            allocatedResources: tenant?.Resources?.Allocated,
+                            blobStorageStats,
+                            database,
+                            databaseFullPath,
+                            databaseType: Type,
+                            metrics: metricOverview,
+                            memoryLimit: tenant?.MemoryLimit,
+                            memoryStats: tenant?.MemoryStats,
+                            memoryUsed: tenant?.MemoryUsed,
+                            networkThroughput,
+                            storageMetrics,
+                            storageGroupsTotal: tenant?.StorageGroups,
+                            tabletStorageStats,
+                        })}
+                    </div>
                 </div>
-                <div className={b('tab-content')}>
-                    {renderMetricsTabContent({
-                        activeMetricsTab,
-                        allocatedResources: tenant?.Resources?.Allocated,
-                        blobStorageStats,
-                        database,
-                        databaseFullPath,
-                        databaseType: Type,
-                        metrics: metricOverview,
-                        memoryLimit: tenant?.MemoryLimit,
-                        memoryStats: tenant?.MemoryStats,
-                        memoryUsed: tenant?.MemoryUsed,
-                        networkThroughput,
-                        storageMetrics,
-                        storageGroupsTotal: tenant?.StorageGroups,
-                        tabletStorageStats,
-                    })}
-                </div>
-            </div>
+            ) : null}
         </LoaderWrapper>
     );
 }
