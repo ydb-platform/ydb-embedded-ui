@@ -5,8 +5,8 @@ const workflowsDirectory = path.resolve(__dirname, '..', '..');
 
 const pullRequestConcurrencyBlock = [
     'concurrency:',
-    '  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}-${{ github.run_attempt }}',
-    "  cancel-in-progress: ${{ github.event_name == 'pull_request' }}",
+    "  group: ${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.run_attempt == '1' && github.event.pull_request.number) || github.run_id }}",
+    "  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.run_attempt == '1' }}",
 ].join('\n');
 
 function readWorkflow(name: string) {
@@ -16,7 +16,7 @@ function readWorkflow(name: string) {
 describe.each(['quality.yml', 'ci.yml', 'pr-title.yml'])(
     '%s pull request concurrency',
     (workflowName) => {
-        test('cancels only superseded initial runs of the same pull request and workflow', () => {
+        test('groups and cancels only initial pull request attempts by pull request', () => {
             expect(readWorkflow(workflowName)).toContain(`${pullRequestConcurrencyBlock}\n\njobs:`);
         });
     },
