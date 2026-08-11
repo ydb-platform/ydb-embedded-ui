@@ -106,9 +106,12 @@ test.describe('Test Nodes Paginated Table', async () => {
         await paginatedTable.waitForTableData();
 
         const initialRowCount = await paginatedTable.getRowCount();
+        const filteredResponse = page.waitForResponse(
+            (response) => response.url().includes('/viewer/json/nodes?') && response.ok(),
+        );
         await paginatedTable.getControls().search('localhost');
-
-        await page.waitForTimeout(1000); // Wait for the table to update
+        await filteredResponse;
+        await paginatedTable.waitForTableData();
 
         const filteredRowCount = await paginatedTable.getRowCount();
         expect(filteredRowCount).toBeLessThanOrEqual(initialRowCount);
@@ -131,6 +134,16 @@ test.describe('Test Nodes Paginated Table', async () => {
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
+
+        await expect
+            .poll(async () => {
+                const [count, rowCount] = await Promise.all([
+                    paginatedTable.getControls().getCount(),
+                    paginatedTable.getRowCount(),
+                ]);
+                return count === rowCount;
+            })
+            .toBe(true);
 
         const nodeCount = await paginatedTable.getControls().getCount();
         const rowCount = await paginatedTable.getRowCount();

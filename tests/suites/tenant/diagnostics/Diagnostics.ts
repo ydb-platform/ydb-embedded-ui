@@ -1,3 +1,4 @@
+import {expect} from '@playwright/test';
 import type {Locator, Page} from '@playwright/test';
 
 import {retryAction} from '../../../utils/retryAction';
@@ -660,8 +661,6 @@ export class Diagnostics {
         // Click the Apply button
         const applyButton = dialog.locator('button:has-text("Apply")');
 
-        // Wait for the button to be enabled
-        await this.page.waitForTimeout(500);
         // Wait for the button to become enabled
         await this.page.waitForSelector('.g-dialog button:has-text("Apply"):not([disabled])', {
             timeout: VISIBILITY_TIMEOUT,
@@ -670,7 +669,9 @@ export class Diagnostics {
 
         // Wait for the dialog to close and changes to be applied
         await dialog.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
-        await this.page.waitForTimeout(500);
+        await expect(this.ownerCard.locator('.ydb-subject-with-avatar__subject')).toHaveText(
+            newOwnerName,
+        );
     }
 
     async clickGrantAccessButton(): Promise<void> {
@@ -757,8 +758,6 @@ export class Diagnostics {
             .locator('tbody tr')
             .first()
             .waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        // Additional small delay to ensure data is fully loaded
-        await this.page.waitForTimeout(500);
     }
 
     async getPermissionLabelsInGrantDialog(): Promise<string[]> {

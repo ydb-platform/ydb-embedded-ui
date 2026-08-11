@@ -2,6 +2,12 @@ import type {PlaywrightTestConfig} from '@playwright/test';
 import {devices} from '@playwright/test';
 
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL;
+const videoMode = process.env.PLAYWRIGHT_VIDEO as
+    | 'on'
+    | 'off'
+    | 'retain-on-failure'
+    | 'on-first-retry'
+    | undefined;
 
 const config: PlaywrightTestConfig = {
     globalSetup: './tests/playwrightSetup.ts',
@@ -42,10 +48,8 @@ const config: PlaywrightTestConfig = {
         baseURL: baseUrl || 'http://localhost:3000/',
         testIdAttribute: 'data-qa',
         trace: 'on-first-retry',
-        // Record video only on failure by default, can be overridden via PLAYWRIGHT_VIDEO env var
-        video:
-            (process.env.PLAYWRIGHT_VIDEO as 'on' | 'off' | 'retain-on-failure' | undefined) ||
-            'retain-on-failure',
+        // Avoid recording successful first attempts in CI; keep PLAYWRIGHT_VIDEO as an explicit override.
+        video: videoMode || (process.env.CI ? 'on-first-retry' : 'retain-on-failure'),
         screenshot: 'only-on-failure',
     },
     projects: [

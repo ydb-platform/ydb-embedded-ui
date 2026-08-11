@@ -1,3 +1,4 @@
+import {expect} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
 import {Sidebar} from '../suites/sidebar/Sidebar';
@@ -7,7 +8,6 @@ export const toggleExperiment = async (page: Page, state: 'on' | 'off', title: s
     await sidebar.waitForSidebarToLoad();
     if (!(await sidebar.isDrawerVisible())) {
         await sidebar.clickSettings();
-        await page.waitForTimeout(500); // Wait for animation
     }
     await sidebar.clickExperimentsSection();
     const currentState = await sidebar.isExperimentEnabled(title);
@@ -15,6 +15,7 @@ export const toggleExperiment = async (page: Page, state: 'on' | 'off', title: s
 
     if (currentState !== desiredState) {
         await sidebar.toggleExperimentByTitle(title);
+        await expect.poll(() => sidebar.isExperimentEnabled(title)).toBe(desiredState);
     }
 
     if (await sidebar.isDrawerVisible()) {
