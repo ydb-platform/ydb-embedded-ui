@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {CircleQuestionFill} from '@gravity-ui/icons';
 import type {IconData} from '@gravity-ui/uikit';
 import {Flex, Icon, Text} from '@gravity-ui/uikit';
 
@@ -43,6 +44,14 @@ function renderIconGroup(icons: IconWithColor[]) {
             ))}
         </div>
     );
+}
+
+function containsQuestionIcon(icon?: IconData | IconWithColor[] | string) {
+    if (Array.isArray(icon)) {
+        return icon.some(({icon: itemIcon}) => itemIcon === CircleQuestionFill);
+    }
+
+    return icon === CircleQuestionFill;
 }
 
 interface DiskStateProgressBarProps {
@@ -109,6 +118,7 @@ export function DiskStateProgressBar({
         'all-mode-has-issues': modeModifier === 'mode-all' && allModeHasIssues,
         'legend-inactive': isLegendInactive,
         'overlap-icon-at-top-left': overlapIconAtTopLeft,
+        'question-icon': Boolean(withIcon) && containsQuestionIcon(providedIcon),
     };
 
     // Add mode modifier if present
@@ -127,6 +137,7 @@ export function DiskStateProgressBar({
     }
 
     const hasAllocatedPercent = isNumeric(diskAllocatedPercent) && diskAllocatedPercent >= 0;
+    const hideLegendContent = isLegendInactive && !isDonor;
 
     const renderAllocatedPercent = () => {
         if (compact) {
@@ -147,6 +158,10 @@ export function DiskStateProgressBar({
     };
 
     const renderContent = () => {
+        if (hideLegendContent) {
+            return null;
+        }
+
         if (content) {
             return content;
         }
@@ -172,9 +187,7 @@ export function DiskStateProgressBar({
 
     let iconElement: React.ReactNode = null;
 
-    const hideIcon = isLegendInactive && !isDonor;
-
-    if (withIcon && !hideIcon) {
+    if (withIcon && !hideLegendContent) {
         // Use provided icon if available, otherwise calculate
         const icon = providedIcon ?? getVDiskStatusIcon(severity, isDonor);
 

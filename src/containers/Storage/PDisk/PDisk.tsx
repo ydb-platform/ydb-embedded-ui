@@ -65,6 +65,8 @@ export const PDisk = ({
     const anchorRef = React.useRef<HTMLDivElement>(null);
     const displayState = React.useMemo(() => getDisplayState?.(data), [data, getDisplayState]);
     const isStateMode = displayState?.modeModifier === 'mode-state';
+    const isSpaceMode = displayState?.modeModifier === 'mode-space';
+    const isFixedWidthMode = isStateMode || isSpaceMode;
     const shouldShowNoDataPlaceholder =
         !isStateMode ||
         (displayState.showNoDataPlaceholder && displayState.severity === NOT_AVAILABLE_SEVERITY);
@@ -120,7 +122,7 @@ export const PDisk = ({
         <div
             className={b(null, className)}
             ref={anchorRef}
-            style={{width: isStateMode ? 55 : width}}
+            style={{width: isFixedWidthMode ? 55 : width}}
         >
             {renderVDisks()}
             <HoverPopup

@@ -57,11 +57,14 @@ function getPDisksGroupByLabel(pdisksGroupBy: Exclude<PDisksGroupByValue, 'State
 }
 
 function renderPDiskLegend(pdisksGroupBy: PDisksGroupByValue) {
-    if (pdisksGroupBy === PDisksGroupBy.State) {
-        return <PDiskStateLegend />;
+    switch (pdisksGroupBy) {
+        case PDisksGroupBy.State:
+            return <PDiskStateLegend />;
+        case PDisksGroupBy.Space:
+            return <SpaceLegend selectionScope="pdisks" />;
+        default:
+            return <div>{getPDisksGroupByLabel(pdisksGroupBy)}</div>;
     }
-
-    return <div>{getPDisksGroupByLabel(pdisksGroupBy)}</div>;
 }
 
 export function StorageExpertModePanel({className}: StorageExpertModePanelProps) {

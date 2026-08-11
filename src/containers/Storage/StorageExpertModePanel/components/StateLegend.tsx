@@ -1,4 +1,4 @@
-import {CircleExclamation, CircleXmarkFill, ClockFill} from '@gravity-ui/icons';
+import {CircleExclamationFill, CircleXmarkFill, ClockFill} from '@gravity-ui/icons';
 import type {IconData, LabelProps} from '@gravity-ui/uikit';
 import {Flex, Icon, Label, Text} from '@gravity-ui/uikit';
 
@@ -22,7 +22,7 @@ const legendItems: StateLegendItem[] = [
     {text: i18n('value_ok'), theme: 'success'},
     {text: i18n('value_replication'), theme: 'info'},
     {text: i18n('value_initial'), theme: 'warning', icon: ClockFill},
-    {text: i18n('value_pdisk-error'), theme: 'danger', icon: CircleExclamation},
+    {text: i18n('value_pdisk-error'), theme: 'danger', icon: CircleExclamationFill},
     {
         text: i18n('value_error'),
         theme: 'danger',

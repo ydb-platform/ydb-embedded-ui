@@ -1,4 +1,4 @@
-import {CircleExclamationFill, CircleStop, CircleXmarkFill, ClockFill} from '@gravity-ui/icons';
+import {CircleExclamationFill, CircleStopFill, CircleXmarkFill, ClockFill} from '@gravity-ui/icons';
 
 import type {TPDiskState} from '../../types/api/pdisk';
 
@@ -47,7 +47,7 @@ const PDISK_STATE_DISPLAY_STATE: Record<TPDiskState, PDiskStateDisplayState> = {
     },
     Stopped: {
         severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
-        icon: CircleStop,
+        icon: CircleStopFill,
     },
     InitialFormatReadError: {
         severity: SOLID_RED_SEVERITY,
