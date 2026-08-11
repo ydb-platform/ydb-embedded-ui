@@ -1,15 +1,15 @@
-import {CircleExclamation, CircleXmarkFill, ClockFill} from '@gravity-ui/icons';
+import {CircleExclamation, CircleStop, CircleXmarkFill, ClockFill} from '@gravity-ui/icons';
 import type {IconData, LabelProps} from '@gravity-ui/uikit';
 import {Flex, Icon, Label, Text} from '@gravity-ui/uikit';
 
 import {b} from '../constants';
 import i18n from '../i18n';
 
-interface StateLegendProps {
+interface PDiskStateLegendProps {
     className?: string;
 }
 
-interface StateLegendItem {
+interface PDiskStateLegendItem {
     text: string;
     theme: LabelProps['theme'];
     icon?: IconData;
@@ -18,11 +18,11 @@ interface StateLegendItem {
 
 const iconSize = 12;
 
-const legendItems: StateLegendItem[] = [
+const legendItems: PDiskStateLegendItem[] = [
     {text: i18n('value_ok'), theme: 'success'},
-    {text: i18n('value_replication'), theme: 'info'},
     {text: i18n('value_initial'), theme: 'warning', icon: ClockFill},
-    {text: i18n('value_pdisk-error'), theme: 'danger', icon: CircleExclamation},
+    {text: i18n('value_attention'), theme: 'danger', icon: CircleExclamation},
+    {text: i18n('value_stopped'), theme: 'danger', icon: CircleStop},
     {
         text: i18n('value_error'),
         theme: 'danger',
@@ -32,7 +32,7 @@ const legendItems: StateLegendItem[] = [
     {text: i18n('value_no-data'), theme: 'unknown'},
 ];
 
-export function StateLegend({className}: StateLegendProps) {
+export function PDiskStateLegend({className}: PDiskStateLegendProps) {
     return (
         <Flex className={className} gap={3} alignItems="center" wrap="wrap">
             <Flex gap={2} alignItems="center" wrap="wrap">

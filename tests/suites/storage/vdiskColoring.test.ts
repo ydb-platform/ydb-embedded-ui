@@ -3,6 +3,7 @@ import {expect, test} from '@playwright/test';
 
 import {VDisksGroupBy} from '../../../src/containers/Storage/StorageExpertModePanel/constants';
 import type {VDisksGroupByValue} from '../../../src/containers/Storage/StorageExpertModePanel/constants';
+import {TPDiskState} from '../../../src/types/api/pdisk';
 import {storagePage} from '../../utils/constants';
 
 import {
@@ -122,6 +123,26 @@ function getVDiskItems(row: Locator) {
 
 function getVDiskProgressBar(item: Locator) {
     return item.locator('.storage-disk-progress-bar').first();
+}
+
+function getPDiskItems(row: Locator) {
+    return getStorageDisksArea(row).locator('.ydb-storage-disks__pdisk-item');
+}
+
+function getPDiskProgressBar(item: Locator) {
+    return item.locator('.storage-disk-progress-bar').first();
+}
+
+async function getIconSvgMarkup(icon: Locator) {
+    return icon.evaluate((element) => {
+        const svg = element instanceof SVGElement ? element : element.querySelector('svg');
+
+        if (!svg) {
+            throw new Error('Expected an SVG icon');
+        }
+
+        return svg.innerHTML;
+    });
 }
 
 function getVDiskFillBar(progressBar: Locator) {
@@ -303,6 +324,154 @@ async function preparePage(page: Page, vdisksGroupBy: VDisksGroupByValue) {
 
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 60_000});
+
+    test('renders the PDisk State legend and preserves the Maintenance placeholder', async ({
+        page,
+    }) => {
+        await preparePage(page, VDisksGroupBy.State);
+
+        const pDiskSelector = page.getByTestId('storage-pdisks-expert-mode');
+        const legend = page.getByTestId('storage-pdisks-expert-mode-legend');
+        const legendLabels = legend.locator('.g-label');
+        const vDiskLegendLabels = page
+            .locator('.ydb-storage-expert-mode-panel')
+            .locator(':scope > .g-flex')
+            .first()
+            .locator('.g-label');
+
+        await expect(pDiskSelector).toBeVisible();
+        await expect(legendLabels).toHaveText([
+            'Ok',
+            'Initial',
+            'Attention',
+            'Stopped',
+            'Error',
+            'N/D',
+        ]);
+        await expect(legendLabels.nth(0)).toHaveClass(/g-label_theme_success/);
+        await expect(legendLabels.nth(1)).toHaveClass(/g-label_theme_warning/);
+        await expect(legendLabels.nth(2)).toHaveClass(/g-label_theme_danger/);
+        await expect(legendLabels.nth(3)).toHaveClass(/g-label_theme_danger/);
+        await expect(legendLabels.nth(4)).toHaveClass(/g-label_theme_danger/);
+        await expect(legendLabels.nth(4)).toHaveClass(
+            /ydb-storage-expert-mode-panel__label-danger-heavy/,
+        );
+        await expect(legendLabels.nth(5)).toHaveClass(/g-label_theme_unknown/);
+        await expect(legendLabels.nth(0).locator('svg')).toHaveCount(0);
+        await expect(legendLabels.nth(1).locator('svg').first()).toBeVisible();
+        await expect(legendLabels.nth(2).locator('svg').first()).toBeVisible();
+        await expect(legendLabels.nth(3).locator('svg').first()).toBeVisible();
+        await expect(legendLabels.nth(4).locator('svg').first()).toBeVisible();
+        await expect(legendLabels.nth(5).locator('svg')).toHaveCount(0);
+        await expect(legend).toContainText('No statistics available');
+
+        const matchingLegendIconIndexes = [
+            {pDisk: 1, vDisk: 2},
+            {pDisk: 2, vDisk: 3},
+            {pDisk: 4, vDisk: 4},
+        ] as const;
+
+        for (const {pDisk, vDisk} of matchingLegendIconIndexes) {
+            expect(await getIconSvgMarkup(legendLabels.nth(pDisk))).toBe(
+                await getIconSvgMarkup(vDiskLegendLabels.nth(vDisk)),
+            );
+        }
+
+        await pDiskSelector.getByRole('radio', {name: 'Maintenance'}).check();
+
+        await expect(legend).toHaveText('Maintenance');
+        await expect(legend.locator('.g-label')).toHaveCount(0);
+        await expect(page).toHaveURL(/pdisksGroupBy=Maintenance/);
+    });
+
+    test('renders storage group PDisks by State without allocation fill', async ({page}) => {
+        const response = createMockStorageGroupsResponse();
+        const vDisks = response.StorageGroups?.[0]?.VDisks;
+
+        if (!vDisks) {
+            throw new Error('Cannot prepare storage group PDisk State fixtures');
+        }
+
+        const pDiskStates = [
+            undefined,
+            TPDiskState.Normal,
+            TPDiskState.Initial,
+            TPDiskState.OpenFileError,
+            TPDiskState.Stopped,
+            TPDiskState.ChunkQuotaError,
+        ] as const;
+        const pDiskIndexes = [0, 4, 5, 6, 7, 8] as const;
+
+        pDiskIndexes.forEach((pDiskIndex, index) => {
+            if (vDisks[pDiskIndex].PDisk?.Whiteboard) {
+                vDisks[pDiskIndex].PDisk.Whiteboard.State = pDiskStates[index];
+            }
+        });
+
+        await page.setViewportSize({width: 1500, height: 1000});
+        await enableExpertMode(page, VDisksGroupBy.State);
+        await setupVDiskColoringMocks(page, response);
+        await gotoStoragePage(page, VDisksGroupBy.State);
+        await hideFloatingPopups(page);
+        await expectStorageGroupRowsReady(page);
+
+        const pDiskItems = getPDiskItems(getStorageGroupRow(page, 0));
+        const vDiskItems = getVDiskItems(getStorageGroupRow(page, 0));
+        const pDiskLegendLabels = page
+            .getByTestId('storage-pdisks-expert-mode-legend')
+            .locator('.g-label');
+        const cases = [
+            {pDiskIndex: 0, vDiskIndex: 0, color: 'grey', iconReference: undefined},
+            {pDiskIndex: 4, vDiskIndex: 4, color: 'green', iconReference: undefined},
+            {pDiskIndex: 5, vDiskIndex: 5, color: 'yellow', iconReference: 'vdisk'},
+            {pDiskIndex: 6, vDiskIndex: 9, color: 'red', iconReference: 'vdisk'},
+            {pDiskIndex: 7, vDiskIndex: 9, color: 'red', iconReference: 'stopped-legend'},
+            {pDiskIndex: 8, vDiskIndex: 8, color: 'solidred', iconReference: 'vdisk'},
+        ] as const;
+
+        for (const {pDiskIndex, vDiskIndex, color, iconReference} of cases) {
+            const pDiskItem = pDiskItems.nth(pDiskIndex);
+            const progressBar = getPDiskProgressBar(pDiskItem);
+            const vDiskProgressBar = getVDiskProgressBar(vDiskItems.nth(vDiskIndex));
+            const icon = progressBar.locator('.storage-disk-progress-bar__icon');
+
+            await expect(progressBar).toHaveClass(/storage-disk-progress-bar_mode-state/);
+            await expect(progressBar).toHaveClass(new RegExp(`storage-disk-progress-bar_${color}`));
+            await expect(progressBar.locator('.storage-disk-progress-bar__fill-bar')).toHaveCount(
+                0,
+            );
+            await expect(progressBar).not.toHaveAttribute('aria-valuenow', /.+/);
+            expect((await pDiskItem.boundingBox())?.width).toBe(55);
+
+            if (iconReference === undefined) {
+                await expect(icon).toHaveCount(0);
+            } else {
+                await expect(icon).toBeVisible();
+                const expectedIcon =
+                    iconReference === 'vdisk'
+                        ? vDiskProgressBar.locator('.storage-disk-progress-bar__icon')
+                        : pDiskLegendLabels.nth(3);
+
+                expect(await getIconSvgMarkup(icon)).toBe(await getIconSvgMarkup(expectedIcon));
+            }
+
+            const [pDiskStyles, vDiskStyles] = await Promise.all(
+                [progressBar, vDiskProgressBar].map((bar) =>
+                    bar.evaluate((element) => {
+                        const styles = getComputedStyle(element);
+
+                        return {
+                            backgroundColor: styles.backgroundColor,
+                            borderColor: styles.borderColor,
+                            iconColor: styles.getPropertyValue('--entity-state-icon-color').trim(),
+                        };
+                    }),
+                ),
+            );
+
+            expect(pDiskStyles).toEqual(vDiskStyles);
+        }
+    });
 
     test('distinguishes missing Whiteboard data from missing FrontQueues', async ({page}) => {
         await preparePage(page, VDisksGroupBy.FrontQueues);

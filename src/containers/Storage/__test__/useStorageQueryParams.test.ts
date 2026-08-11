@@ -1,7 +1,11 @@
 import {renderHook} from '@testing-library/react';
 
 import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
-import {getStorageGroupByCleanupPatch, useIsStorageExpertMode} from '../useStorageQueryParams';
+import {
+    getStorageGroupByCleanupPatch,
+    useIsStorageExpertMode,
+    useStorageQueryParams,
+} from '../useStorageQueryParams';
 
 jest.mock('use-query-params', () => ({
     BooleanParam: {},
@@ -23,8 +27,11 @@ jest.mock('../../../utils/hooks/useIsUserAllowedToMakeChanges', () => ({
     useIsUserAllowedToMakeChanges: jest.fn(),
 }));
 
-const {useQueryParam} = jest.requireMock('use-query-params');
+const {useQueryParam, useQueryParams} = jest.requireMock('use-query-params');
 const {useBlobStorageCapacityMetricsAvailable} = jest.requireMock(
+    '../../../store/reducers/capabilities/hooks',
+);
+const {useBlobStorageCapacityMetricsEnabled} = jest.requireMock(
     '../../../store/reducers/capabilities/hooks',
 );
 const {useSetting} = jest.requireMock('../../../utils/hooks');
@@ -85,6 +92,43 @@ describe('getStorageGroupByCleanupPatch', () => {
                 storageNodesGroupBy: 'DiskSpaceUsage',
             }),
         ).toStrictEqual({});
+    });
+});
+
+describe('PDisk expert mode query params', () => {
+    test('normalizes an invalid PDisk mode to State', () => {
+        const constants = jest.requireActual('../StorageExpertModePanel/constants');
+
+        expect(constants.pdisksGroupBySchema?.parse('Unknown')).toBe('State');
+    });
+
+    test('reads and persists the selected PDisk mode', () => {
+        const setQueryParams = jest.fn();
+        const setSavedPDisksGroupBy = jest.fn();
+
+        useQueryParams.mockReturnValue([{pdisksGroupBy: 'Space'}, setQueryParams]);
+        useSetting.mockImplementation((key: string) => {
+            if (key === 'storagePDisksGroupBy') {
+                return ['State', setSavedPDisksGroupBy];
+            }
+
+            return [undefined, jest.fn()];
+        });
+        useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
+
+        const {result} = renderHook(() => useStorageQueryParams());
+        const pDiskState = result.current as unknown as {
+            pdisksGroupBy?: string;
+            handlePDisksGroupByChange?: (value: string) => void;
+        };
+
+        expect(pDiskState.pdisksGroupBy).toBe('Space');
+        expect(pDiskState.handlePDisksGroupByChange).toBeDefined();
+
+        pDiskState.handlePDisksGroupByChange?.('Device');
+
+        expect(setQueryParams).toHaveBeenCalledWith({pdisksGroupBy: 'Device'}, 'replaceIn');
+        expect(setSavedPDisksGroupBy).toHaveBeenCalledWith('Device');
     });
 });
 

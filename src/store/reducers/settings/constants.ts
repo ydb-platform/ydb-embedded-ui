@@ -48,6 +48,7 @@ export const SETTING_KEYS = {
     ENABLE_STORAGE_EXPERT_MODE: 'enableStorageExpertMode',
     STORAGE_EXPERT_MODE: 'storageExpertMode',
     STORAGE_VDISKS_GROUP_BY: 'storageVDisksGroupBy',
+    STORAGE_PDISKS_GROUP_BY: 'storagePDisksGroupBy',
 } as const;
 
 export type SettingKey = ValueOf<typeof SETTING_KEYS>;
@@ -93,6 +94,7 @@ export const DEFAULT_USER_SETTINGS = {
     [SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE]: false,
     [SETTING_KEYS.STORAGE_EXPERT_MODE]: false,
     [SETTING_KEYS.STORAGE_VDISKS_GROUP_BY]: 'State',
+    [SETTING_KEYS.STORAGE_PDISKS_GROUP_BY]: 'State',
 } as const satisfies Record<SettingKey, unknown>;
 
 export const SETTINGS_OPTIONS: Record<string, SettingOptions | undefined> = {

@@ -5,11 +5,15 @@ import {Flex, useLayoutContext} from '@gravity-ui/uikit';
 import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import type {Erasure} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
-import type {DiskDisplayStateGetter} from '../../../utils/disks/displayState';
+import type {
+    DiskDisplayStateGetter,
+    PDiskDisplayStateGetter,
+} from '../../../utils/disks/displayState';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {PDisk} from '../PDisk';
 import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
 import type {StorageViewContext} from '../types';
+import {useStoragePDiskDisplayStateGetter} from '../useStoragePDiskDisplayStateGetter';
 import {useStorageVDiskDisplayStateGetter} from '../useStorageVDiskDisplayStateGetter';
 import {isPdiskActive, isVdiskActive, useVDisksWithDCMargins} from '../utils';
 
@@ -37,6 +41,7 @@ export function Disks({
 }: DisksProps) {
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
     const getVDiskDisplayState = useStorageVDiskDisplayStateGetter();
+    const getPDiskDisplayState = useStoragePDiskDisplayStateGetter();
 
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
 
@@ -84,6 +89,7 @@ export function Disks({
                         setHighlightedVDisk={setHighlightedVDisk}
                         withDCMargin={vDisksWithDCMargins.includes(index)}
                         withIcon={withIcon}
+                        getDisplayState={getPDiskDisplayState}
                     />
                 ))}
             </div>
@@ -153,7 +159,8 @@ function PDiskItem({
     setHighlightedVDisk,
     withDCMargin,
     withIcon,
-}: DisksItemProps) {
+    getDisplayState,
+}: DisksItemProps & {getDisplayState?: PDiskDisplayStateGetter}) {
     const vDiskId = vDisk.StringifiedId;
 
     const isHighlighted = highlightedVDisk === vDiskId;
@@ -175,6 +182,7 @@ function PDiskItem({
             onHidePopup={() => setHighlightedVDisk?.(undefined)}
             withIcon={withIcon}
             highlighted={isHighlighted}
+            getDisplayState={getDisplayState}
         />
     );
 }

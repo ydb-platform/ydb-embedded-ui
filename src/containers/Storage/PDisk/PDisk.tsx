@@ -9,6 +9,8 @@ import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 import {VDisk} from '../../../components/VDisk/VDisk';
 import {getPDiskPagePath} from '../../../routes';
 import {cn} from '../../../utils/cn';
+import {NOT_AVAILABLE_SEVERITY} from '../../../utils/disks/constants';
+import type {PDiskDisplayStateGetter} from '../../../utils/disks/displayState';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import i18n from '../i18n';
 import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
@@ -36,6 +38,7 @@ interface PDiskProps {
     highlighted?: boolean;
     highlightedDisk?: string;
     setHighlightedDisk?: (id?: string) => void;
+    getDisplayState?: PDiskDisplayStateGetter;
 }
 
 export const PDisk = ({
@@ -55,10 +58,17 @@ export const PDisk = ({
     highlighted,
     highlightedDisk,
     setHighlightedDisk,
+    getDisplayState,
 }: PDiskProps) => {
     const {NodeId, PDiskId} = data;
     const pDiskIdsDefined = !isNil(NodeId) && !isNil(PDiskId);
     const anchorRef = React.useRef<HTMLDivElement>(null);
+    const displayState = React.useMemo(() => getDisplayState?.(data), [data, getDisplayState]);
+    const isStateMode = displayState?.modeModifier === 'mode-state';
+    const shouldShowNoDataPlaceholder =
+        !isStateMode ||
+        (displayState.showNoDataPlaceholder && displayState.severity === NOT_AVAILABLE_SEVERITY);
+    const noDataPlaceholder = shouldShowNoDataPlaceholder ? i18n('no-data') : undefined;
 
     const renderVDisks = () => {
         if (!vDisks?.length) {
@@ -107,7 +117,11 @@ export const PDisk = ({
     }
 
     return (
-        <div className={b(null, className)} ref={anchorRef} style={{width}}>
+        <div
+            className={b(null, className)}
+            ref={anchorRef}
+            style={{width: isStateMode ? 55 : width}}
+        >
             {renderVDisks()}
             <HoverPopup
                 showPopup={showPopup}
@@ -122,12 +136,15 @@ export const PDisk = ({
                 <InternalLink to={pDiskPath} className={b('content')}>
                     <DiskStateProgressBar
                         withIcon={withIcon}
-                        diskAllocatedPercent={data.AllocatedPercent}
-                        severity={data.Severity}
+                        diskAllocatedPercent={isStateMode ? undefined : data.AllocatedPercent}
+                        severity={displayState?.severity ?? data.Severity}
+                        icon={displayState?.icon}
+                        modeModifier={displayState?.modeModifier}
                         className={progressBarClassName}
                         inactive={inactive}
                         highlighted={highlighted}
-                        noDataPlaceholder={i18n('no-data')}
+                        isLegendInactive={displayState?.isLegendInactive}
+                        noDataPlaceholder={noDataPlaceholder}
                     />
                 </InternalLink>
             </HoverPopup>

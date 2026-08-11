@@ -2,7 +2,7 @@ import type {IconData} from '@gravity-ui/uikit';
 
 import {DATA_SEVERITY} from './constants';
 import type {IconWithColor} from './iconCalculators';
-import type {DisplaySeverity, PreparedVDisk} from './types';
+import type {DisplaySeverity, PreparedPDisk, PreparedVDisk} from './types';
 
 export interface DiskDisplayState {
     severity: DisplaySeverity;
@@ -17,6 +17,8 @@ export interface DiskDisplayState {
 }
 
 export type DiskDisplayStateGetter = (vDisk: PreparedVDisk, isDonor?: boolean) => DiskDisplayState;
+
+export type PDiskDisplayStateGetter = (pDisk: PreparedPDisk) => DiskDisplayState;
 
 export function getDefaultDiskDisplayState(vDisk: PreparedVDisk): DiskDisplayState {
     return {
