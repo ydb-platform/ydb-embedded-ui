@@ -1,3 +1,4 @@
+import {expect} from '@playwright/test';
 import type {Locator, Page} from '@playwright/test';
 
 import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
@@ -194,16 +195,15 @@ export class PaginatedTable {
             undefined,
             {timeout},
         );
-
-        await this.page.waitForTimeout(1000);
     }
 
     async sortByColumn(columnName: string) {
+        const previousValues = await this.getColumnValues(columnName);
         const columnHeader = this.tableSelector.locator(
             `.ydb-paginated-table__head-cell:has-text("${columnName}")`,
         );
         await columnHeader.click();
-        await this.page.waitForTimeout(1000);
+        await expect.poll(() => this.getColumnValues(columnName)).not.toEqual(previousValues);
         await this.waitForTableData();
     }
 

@@ -71,7 +71,6 @@ test.describe('Test Sidebar', async () => {
 
         // Click settings button
         await sidebar.clickSettings();
-        await page.waitForTimeout(500); // Wait for animation
 
         // Drawer should become visible
         await expect(sidebar.isDrawerVisible()).resolves.toBe(true);
@@ -91,11 +90,9 @@ test.describe('Test Sidebar', async () => {
     test('Information popup contains documentation and keyboard shortcuts', async ({page}) => {
         const sidebar = new Sidebar(page);
         await sidebar.waitForSidebarToLoad();
-        await page.waitForTimeout(1000); // Wait for page to load fully
 
         // Click the Information button to open the popup
         await sidebar.clickInformation();
-        await page.waitForTimeout(700); // Wait for animation
 
         // Check if the popup is visible
         await expect(sidebar.isPopupVisible()).resolves.toBe(true);
@@ -112,11 +109,9 @@ test.describe('Test Sidebar', async () => {
     }) => {
         const sidebar = new Sidebar(page);
         await sidebar.waitForSidebarToLoad();
-        await page.waitForTimeout(1000); // Wait for page to load fully
 
         // Click the Information button to open the popup
         await sidebar.clickInformation();
-        await page.waitForTimeout(700); // Wait for animation
 
         // Check if the popup is visible
         await expect(sidebar.isPopupVisible()).resolves.toBe(true);
@@ -124,7 +119,6 @@ test.describe('Test Sidebar', async () => {
         // Check if hotkeys button is visible and click it
         await expect(sidebar.hasHotkeysButtonInPopup()).resolves.toBe(true);
         await sidebar.clickHotkeysButton();
-        await page.waitForTimeout(500); // Wait for animation
 
         // Check if hotkeys panel is visible and has the title
         await expect(sidebar.isHotkeysPanelVisible()).resolves.toBe(true);
@@ -149,7 +143,6 @@ test.describe('Test Sidebar', async () => {
 
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
-        await page.waitForTimeout(1000); // Wait for page to load fully
 
         // Create sidebar instance to check for hotkeys panel
         const sidebar = new Sidebar(page);
@@ -173,13 +166,11 @@ test.describe('Test Sidebar', async () => {
 
         // Expand
         await sidebar.toggleCollapse();
-        await page.waitForTimeout(500); // Wait for animation
-        await expect(sidebar.isCollapsed()).resolves.toBe(false);
+        await expect.poll(() => sidebar.isCollapsed()).toBe(false);
 
         // Collapse
         await sidebar.toggleCollapse();
-        await page.waitForTimeout(500); // Wait for animation
-        await expect(sidebar.isCollapsed()).resolves.toBe(true);
+        await expect.poll(() => sidebar.isCollapsed()).toBe(true);
     });
 
     test('Footer items are visible', async ({page}) => {
@@ -193,20 +184,17 @@ test.describe('Test Sidebar', async () => {
     test('Can toggle experiments in settings', async ({page}) => {
         const sidebar = new Sidebar(page);
         await sidebar.clickSettings();
-        await page.waitForTimeout(500); // Wait for animation
         await sidebar.clickExperimentsSection();
         const experimentTitle = await sidebar.getFirstExperimentTitle();
 
         await toggleExperiment(page, 'on', experimentTitle);
         await sidebar.clickSettings();
-        await page.waitForTimeout(500); // Wait for animation
         await sidebar.clickExperimentsSection();
         const newState = await sidebar.isExperimentEnabled(experimentTitle);
         expect(newState).toBe(true);
 
         await toggleExperiment(page, 'off', experimentTitle);
         await sidebar.clickSettings();
-        await page.waitForTimeout(500); // Wait for animation
         await sidebar.clickExperimentsSection();
         const finalState = await sidebar.isExperimentEnabled(experimentTitle);
         expect(finalState).toBe(false);

@@ -27,7 +27,7 @@ test.describe('Copy query result', () => {
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
 
         await queryEditor.clickCopyResultButton();
-        await page.waitForTimeout(500);
+        await expect.poll(() => getClipboardContent(page)).toContain('col1');
 
         const clipboardText = await getClipboardContent(page);
         expect(clipboardText).toContain('col1');

@@ -116,7 +116,8 @@ export class Sidebar {
 
     async hasHotkeysPanelTitle() {
         const panelTitle = this.hotkeysPanel.locator('.kv-navigation__hotkeys-panel-title');
-        return panelTitle.isVisible();
+        await panelTitle.waitFor({state: 'visible'});
+        return true;
     }
 
     async openHotkeysPanelWithShortcut() {

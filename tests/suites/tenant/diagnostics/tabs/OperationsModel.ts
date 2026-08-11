@@ -51,8 +51,6 @@ export class OperationsTable extends BaseModel {
             },
             {timeout: VISIBILITY_TIMEOUT},
         );
-        // Additional wait for stability
-        await this.page.waitForTimeout(500);
     }
 
     async getRowCount(): Promise<number> {

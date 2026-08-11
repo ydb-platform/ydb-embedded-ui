@@ -64,7 +64,12 @@ test.describe('Test Storage Paginated Table', async () => {
         const initialRowCount = await paginatedTable.getRowCount();
         await paginatedTable.search('static');
 
-        await page.waitForTimeout(1000); // Wait for the table to update
+        await expect
+            .poll(async () => {
+                const values = await paginatedTable.getColumnValues('Pool Name');
+                return values.length > 0 && values.every((value) => value.includes('static'));
+            })
+            .toBe(true);
 
         const filteredRowCount = await paginatedTable.getRowCount();
         expect(filteredRowCount).toBeLessThanOrEqual(initialRowCount);
@@ -79,7 +84,7 @@ test.describe('Test Storage Paginated Table', async () => {
         const initialRowCount = await paginatedTable.getRowCount();
         await paginatedTable.getControls().selectRadioOption(0, 'Nodes');
 
-        await page.waitForTimeout(1000); // Wait for the table to update
+        await expect.poll(() => paginatedTable.getRowCount()).not.toBe(initialRowCount);
 
         const nodesRowCount = await paginatedTable.getRowCount();
         expect(nodesRowCount).not.toEqual(initialRowCount);
@@ -90,6 +95,16 @@ test.describe('Test Storage Paginated Table', async () => {
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
+
+        await expect
+            .poll(async () => {
+                const [count, rowCount] = await Promise.all([
+                    paginatedTable.getCount(),
+                    paginatedTable.getRowCount(),
+                ]);
+                return count === rowCount;
+            })
+            .toBe(true);
 
         const nodeCount = await paginatedTable.getCount();
         const rowCount = await paginatedTable.getRowCount();

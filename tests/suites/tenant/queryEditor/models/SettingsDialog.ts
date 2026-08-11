@@ -1,3 +1,4 @@
+import {expect} from '@playwright/test';
 import type {Locator, Page} from '@playwright/test';
 
 import type {StatisticsMode} from '../../../../../src/types/store/query';
@@ -79,7 +80,7 @@ export class SettingsDialog {
     async changeQueryMode(mode: (typeof QUERY_MODES)[keyof typeof QUERY_MODES]) {
         await this.openSelect(this.queryModeSelect);
         await this.page.locator(`.ydb-query-settings-select__item_type_${mode}`).click();
-        await this.page.waitForTimeout(1000);
+        await this.selectPopup.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
     }
 
     async getResourcePoolOptions() {
@@ -108,7 +109,7 @@ export class SettingsDialog {
             hasText: label,
         });
         await optionTitle.first().click();
-        await this.page.waitForTimeout(1000);
+        await this.selectPopup.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
     }
 
     async getResourcePoolValue() {
@@ -127,13 +128,13 @@ export class SettingsDialog {
     async changeTransactionMode(level: (typeof TRANSACTION_MODES)[keyof typeof TRANSACTION_MODES]) {
         await this.openSelect(this.transactionModeSelect);
         await this.page.locator(`.ydb-query-settings-select__item_type_${level}`).click();
-        await this.page.waitForTimeout(1000);
+        await this.selectPopup.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
     }
 
     async changeStatsLevel(mode: (typeof STATISTICS_MODES)[keyof typeof STATISTICS_MODES]) {
         await this.openSelect(this.statisticsModeSelect);
         await this.page.locator(`.ydb-query-settings-select__item_type_${mode}`).click();
-        await this.page.waitForTimeout(1000);
+        await this.selectPopup.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
     }
 
     async getStatsLevel() {
@@ -146,12 +147,12 @@ export class SettingsDialog {
 
     async changeLimitRows(limitRows: number) {
         await this.limitRowsInput.fill(limitRows.toString());
-        await this.page.waitForTimeout(1000);
+        await expect(this.limitRowsInput).toHaveValue(limitRows.toString());
     }
 
     async clearLimitRows() {
         await this.limitRowsInput.clear();
-        await this.page.waitForTimeout(1000);
+        await expect(this.limitRowsInput).toHaveValue('');
     }
 
     async getLimitRowsValue() {
@@ -160,7 +161,7 @@ export class SettingsDialog {
 
     async changeOutputChunkMaxSize(size: number) {
         await this.outputChunkMaxSizeInput.fill(size.toString());
-        await this.page.waitForTimeout(1000);
+        await expect(this.outputChunkMaxSizeInput).toHaveValue(size.toString());
     }
 
     async changePragmas(pragmas: string) {
@@ -204,9 +205,11 @@ export class SettingsDialog {
 
     async clickTimeoutSwitch() {
         const clickTarget = this.getTimeoutSwitchClickTarget();
+        const input = this.timeoutSwitch.locator('input[type="checkbox"]');
+        const wasChecked = await input.isChecked();
         await clickTarget.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await clickTarget.click();
-        await this.page.waitForTimeout(500);
+        await expect(input).toBeChecked({checked: !wasChecked});
     }
 
     async isTimeoutSwitchChecked() {
@@ -234,13 +237,13 @@ export class SettingsDialog {
     async changeTimeout(value: number) {
         const input = this.timeoutInput.locator('input');
         await input.fill(value.toString());
-        await this.page.waitForTimeout(500);
+        await expect(input).toHaveValue(value.toString());
     }
 
     async clearTimeout() {
         const input = this.timeoutInput.locator('input');
         await input.clear();
-        await this.page.waitForTimeout(500);
+        await expect(input).toHaveValue('');
     }
 
     async getTimeoutValue() {
