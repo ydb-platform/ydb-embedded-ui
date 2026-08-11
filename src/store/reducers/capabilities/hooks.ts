@@ -158,6 +158,12 @@ export const useEditAccessAvailable = () => {
     return useGetFeatureVersion('/viewer/acl') >= 2 && !uiFactory.hideGrantAccess;
 };
 
+const ACL_NON_DEFAULT_INHERITANCE_REVOCATION_VERSION = 3;
+
+export const useNonDefaultAclInheritanceRevocationAvailable = () => {
+    return useGetFeatureVersion('/viewer/acl') >= ACL_NON_DEFAULT_INHERITANCE_REVOCATION_VERSION;
+};
+
 export const useViewerTopicDataAvailable = () => {
     return useGetFeatureVersion('/viewer/topic_data') >= 1;
 };

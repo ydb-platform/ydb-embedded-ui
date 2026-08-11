@@ -4,6 +4,7 @@ import {Flex} from '@gravity-ui/uikit';
 
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
 import {SubjectWithAvatar} from '../../../components/SubjectWithAvatar/SubjectWithAvatar';
+import {useNonDefaultAclInheritanceRevocationAvailable} from '../../../store/reducers/capabilities/hooks';
 import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {
     schemaAclApi,
@@ -40,6 +41,8 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
 
     const {path, database, databaseFullPath} = useCurrentSchema();
     const useMetaProxy = useClusterWithProxy();
+    const supportsNonDefaultInheritanceRevocation =
+        useNonDefaultAclInheritanceRevocationAvailable();
     const dialect = useAclSyntax();
     const {currentRightsMap, setExplicitRightsChanges, rightsToGrant, rightsToRevoke, hasChanges} =
         useRights({aclSubject: aclSubject ?? undefined, path, database, databaseFullPath});
@@ -101,6 +104,7 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
             rightsToGrant,
             rightsToRevoke,
             subjectExplicitAces,
+            supportsNonDefaultInheritanceRevocation,
         });
         updateRights({
             path,
@@ -131,6 +135,7 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
         aclSubject,
         rightsToRevoke,
         subjectExplicitAces,
+        supportsNonDefaultInheritanceRevocation,
         newSubjects,
         handleCloseDrawer,
         databaseFullPath,

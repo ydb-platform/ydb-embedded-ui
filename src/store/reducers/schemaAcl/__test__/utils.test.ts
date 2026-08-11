@@ -13,6 +13,7 @@ describe('prepareAccessRightsUpdateRequest', () => {
                 rightsToGrant: ['select_row', 'update_row'],
                 rightsToRevoke: [],
                 subjectExplicitAces: [],
+                supportsNonDefaultInheritanceRevocation: false,
             }),
         ).toEqual({
             AddAccess: [
@@ -54,6 +55,7 @@ describe('prepareAccessRightsUpdateRequest', () => {
                 rightsToGrant: [],
                 rightsToRevoke: ['select_row'],
                 subjectExplicitAces: [groupedAce],
+                supportsNonDefaultInheritanceRevocation: true,
             }),
         ).toEqual({
             AddAccess: [
@@ -65,6 +67,135 @@ describe('prepareAccessRightsUpdateRequest', () => {
                 },
             ],
             RemoveAccess: [groupedAce],
+        });
+    });
+
+    test('replaces a grouped default-inheritance ACE when exact non-default revocation is unavailable', () => {
+        const groupedAce: TACE = {
+            Subject: 'alice',
+            AccessType: 'Allow',
+            AccessRights: ['select_row', 'update_row'],
+            InheritanceType: ['inherit'],
+        };
+
+        expect(
+            prepareAccessRightsUpdateRequest({
+                subjects: ['alice'],
+                rightsToGrant: [],
+                rightsToRevoke: ['select_row'],
+                subjectExplicitAces: [groupedAce],
+                supportsNonDefaultInheritanceRevocation: false,
+            }),
+        ).toEqual({
+            AddAccess: [
+                {
+                    Subject: 'alice',
+                    AccessType: 'Allow',
+                    AccessRights: ['update_row'],
+                    InheritanceType: ['inherit'],
+                },
+            ],
+            RemoveAccess: [groupedAce],
+        });
+    });
+
+    test('treats object and container as default inheritance regardless of case', () => {
+        const groupedAce: TACE = {
+            Subject: 'alice',
+            AccessType: 'Allow',
+            AccessRights: ['select_row', 'update_row'],
+            InheritanceType: ['OBJECT', 'CONTAINER'],
+        };
+
+        expect(
+            prepareAccessRightsUpdateRequest({
+                subjects: ['alice'],
+                rightsToGrant: [],
+                rightsToRevoke: ['select_row'],
+                subjectExplicitAces: [groupedAce],
+                supportsNonDefaultInheritanceRevocation: false,
+            }),
+        ).toEqual({
+            AddAccess: [
+                {
+                    Subject: 'alice',
+                    AccessType: 'Allow',
+                    AccessRights: ['update_row'],
+                    InheritanceType: ['OBJECT', 'CONTAINER'],
+                },
+            ],
+            RemoveAccess: [groupedAce],
+        });
+    });
+
+    test('uses legacy revoke without restoring ACE remainder when exact revocation is unavailable', () => {
+        expect(
+            prepareAccessRightsUpdateRequest({
+                subjects: ['alice'],
+                rightsToGrant: [],
+                rightsToRevoke: ['select_row'],
+                subjectExplicitAces: [
+                    {
+                        Subject: 'alice',
+                        AccessType: 'Allow',
+                        AccessRights: ['select_row', 'update_row'],
+                        InheritanceType: ['none'],
+                    },
+                ],
+                supportsNonDefaultInheritanceRevocation: false,
+            }),
+        ).toEqual({
+            RemoveAccess: [
+                {
+                    Subject: 'alice',
+                    AccessType: 'Allow',
+                    AccessRights: ['select_row'],
+                },
+            ],
+        });
+    });
+
+    test('uses exact revoke for default ACEs and legacy revoke for non-default ACEs in one request', () => {
+        const defaultAce: TACE = {
+            Subject: 'alice',
+            AccessType: 'Allow',
+            AccessRights: ['select_row', 'update_row'],
+            InheritanceType: ['inherit'],
+        };
+
+        expect(
+            prepareAccessRightsUpdateRequest({
+                subjects: ['alice'],
+                rightsToGrant: [],
+                rightsToRevoke: ['select_row'],
+                subjectExplicitAces: [
+                    defaultAce,
+                    {
+                        Subject: 'alice',
+                        AccessType: 'Allow',
+                        AccessRights: ['select_row', 'erase_row'],
+                        InheritanceType: ['none'],
+                    },
+                ],
+                supportsNonDefaultInheritanceRevocation: false,
+            }),
+        ).toEqual({
+            AddAccess: [
+                {
+                    Subject: 'alice',
+                    AccessType: 'Allow',
+                    AccessRights: ['update_row'],
+                    InheritanceType: ['inherit'],
+                },
+            ],
+            RemoveAccess: [
+                defaultAce,
+                {
+                    Subject: 'alice',
+                    AccessType: 'Allow',
+                    AccessRights: ['select_row'],
+                },
+            ],
         });
     });
 
@@ -89,6 +220,7 @@ describe('prepareAccessRightsUpdateRequest', () => {
                 rightsToGrant: [],
                 rightsToRevoke: ['select_row'],
                 subjectExplicitAces,
+                supportsNonDefaultInheritanceRevocation: true,
             }),
         ).toEqual({
             AddAccess: [
@@ -129,6 +261,7 @@ describe('prepareAccessRightsUpdateRequest', () => {
                         InheritanceType: ['none'],
                     },
                 ],
+                supportsNonDefaultInheritanceRevocation: true,
             }),
         ).toEqual({
             AddAccess: [
@@ -157,6 +290,7 @@ describe('prepareAccessRightsUpdateRequest', () => {
                 rightsToGrant: [],
                 rightsToRevoke: [],
                 subjectExplicitAces: [],
+                supportsNonDefaultInheritanceRevocation: false,
             }),
         ).toEqual({});
     });
