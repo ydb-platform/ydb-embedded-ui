@@ -72,6 +72,7 @@ export const DrawerContextProvider = ({
                     ? nextRightInset(rightInsetRef.current)
                     : nextRightInset,
             );
+            rightInsetRef.current = nextValue;
             if (controlledRightInset === undefined) {
                 setInternalRightInset(nextValue);
             }
