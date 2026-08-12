@@ -61,7 +61,7 @@ jobs:
 
   merge_reports:
     name: Merge Playwright Reports
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [e2e_tests]
     runs-on: ubuntu-latest
     steps:
@@ -163,7 +163,7 @@ jobs:
   update_pr:
     name: Update PR Description
     needs: [merge_reports, bundle_size]
-    if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    if: ${{ !cancelled() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

@@ -22,6 +22,31 @@ describe.each(['quality.yml', 'ci.yml', 'pr-title.yml'])(
     },
 );
 
+describe('Quality downstream cancellation', () => {
+    const workflow = readWorkflow('quality.yml');
+
+    test('does not merge reports after workflow cancellation', () => {
+        expect(workflow).toContain(
+            [
+                '  merge_reports:',
+                '    name: Merge Playwright Reports',
+                '    if: ${{ !cancelled() }}',
+            ].join('\n'),
+        );
+    });
+
+    test('does not update the pull request after workflow cancellation', () => {
+        expect(workflow).toContain(
+            [
+                '  update_pr:',
+                '    name: Update PR Description',
+                '    needs: [merge_reports, bundle_size]',
+                "    if: ${{ !cancelled() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}",
+            ].join('\n'),
+        );
+    });
+});
+
 describe('Deploy Playwright Report concurrency', () => {
     const workflow = readWorkflow('deploy-playwright-report.yml');
 
