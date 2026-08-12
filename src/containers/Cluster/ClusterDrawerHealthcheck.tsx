@@ -68,9 +68,13 @@ export function ClusterDrawerHealthcheck({
         handleHealthcheckViewChange,
     } = useClusterHealthcheckQueryParams();
 
-    const healthcheckStatus = useTypedSelector((state) => selectCheckStatus(state, database));
+    const healthcheckStatus = useTypedSelector((state) =>
+        selectCheckStatus(state, database, clusterName),
+    );
 
-    const healthcheckData = useTypedSelector((state) => selectAllHealthcheckInfo(state, database));
+    const healthcheckData = useTypedSelector((state) =>
+        selectAllHealthcheckInfo(state, database, clusterName),
+    );
 
     const handleCloseDrawer = React.useCallback(() => {
         handleShowHealthcheckChange(false);
