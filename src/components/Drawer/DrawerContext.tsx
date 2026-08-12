@@ -34,7 +34,7 @@ function normalizeRightInset(rightInset: number) {
 }
 
 export function isClickInRightInset(
-    event: Pick<MouseEvent, 'clientX'>,
+    event: Pick<MouseEvent, 'clientX' | 'clientY'>,
     itemContainer: HTMLElement | null,
     rightInset: number,
 ) {
@@ -47,8 +47,13 @@ export function isClickInRightInset(
     }
 
     const itemRight = itemContainer.getBoundingClientRect().right;
-    const providerRight = providerContainer.getBoundingClientRect().right;
-    return event.clientX >= itemRight && event.clientX <= providerRight;
+    const providerRect = providerContainer.getBoundingClientRect();
+    return (
+        event.clientX >= itemRight &&
+        event.clientX <= providerRect.right &&
+        event.clientY >= providerRect.top &&
+        event.clientY <= providerRect.bottom
+    );
 }
 
 export const DrawerContextProvider = ({
