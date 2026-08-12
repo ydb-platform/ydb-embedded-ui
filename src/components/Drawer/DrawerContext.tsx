@@ -2,6 +2,8 @@ import React from 'react';
 
 import {cn} from '../../utils/cn';
 
+import {getVisibleRightInset} from './DrawerWidthUtils';
+
 import './Drawer.scss';
 
 const b = cn('ydb-drawer');
@@ -14,12 +16,17 @@ export interface DrawerContextType {
     setRightInset: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const DrawerContext = React.createContext<DrawerContextType>({
+interface DrawerInternalContextType extends DrawerContextType {
+    visibleRightInset: number;
+}
+
+const DrawerContext = React.createContext<DrawerInternalContextType>({
     containerWidth: 0,
     itemContainerRef: null,
     rightInset: 0,
     setContainerWidth: () => {},
     setRightInset: () => {},
+    visibleRightInset: 0,
 });
 
 interface DrawerContextProviderProps {
@@ -63,6 +70,7 @@ export const DrawerContextProvider = ({
     onRightInsetChange,
 }: DrawerContextProviderProps) => {
     const [measuredContainerWidth, setContainerWidth] = React.useState(0);
+    const [rightViewportOverflow, setRightViewportOverflow] = React.useState(0);
     const [internalRightInset, setInternalRightInset] = React.useState(0);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const itemContainerRef = React.useRef<HTMLDivElement>(null);
@@ -97,8 +105,10 @@ export const DrawerContextProvider = ({
                 const visibleLeft = Math.max(containerRect.left, 0);
                 const visibleRight = Math.min(containerRect.right, window.innerWidth);
                 const visibleWidth = Math.max(0, visibleRight - visibleLeft);
+                const nextRightViewportOverflow = Math.max(0, containerRect.right - visibleRight);
 
                 setContainerWidth(visibleWidth || containerRef.current.clientWidth);
+                setRightViewportOverflow(nextRightViewportOverflow);
             }
         };
 
@@ -108,11 +118,15 @@ export const DrawerContextProvider = ({
         // Update width on resize
         const resizeObserver = new ResizeObserver(updateWidth);
         resizeObserver.observe(containerRef.current);
+        window.addEventListener('resize', updateWidth);
 
         return () => {
             resizeObserver.disconnect();
+            window.removeEventListener('resize', updateWidth);
         };
     }, []);
+
+    const visibleRightInset = getVisibleRightInset({rightInset, rightViewportOverflow});
 
     // Memoize the context value to prevent unnecessary re-renders
     const value = React.useMemo(
@@ -122,8 +136,9 @@ export const DrawerContextProvider = ({
             itemContainerRef,
             rightInset,
             setRightInset,
+            visibleRightInset,
         }),
-        [measuredContainerWidth, rightInset, setRightInset],
+        [measuredContainerWidth, rightInset, setRightInset, visibleRightInset],
     );
     const itemContainerStyle = React.useMemo<React.CSSProperties | undefined>(() => {
         if (rightInset === 0) {
@@ -150,7 +165,7 @@ export const DrawerContextProvider = ({
     );
 };
 
-export const useDrawerContext = (): DrawerContextType => {
+const useDrawerContextValue = () => {
     const context = React.useContext(DrawerContext);
 
     if (context === undefined) {
@@ -159,3 +174,7 @@ export const useDrawerContext = (): DrawerContextType => {
 
     return context;
 };
+
+export const useDrawerContext = (): DrawerContextType => useDrawerContextValue();
+
+export const useDrawerContextInternal = (): DrawerInternalContextType => useDrawerContextValue();

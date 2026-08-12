@@ -8,7 +8,7 @@ import {cn} from '../../utils/cn';
 import {useSetting} from '../../utils/hooks/useSetting';
 import {CopyLinkButton} from '../CopyLinkButton/CopyLinkButton';
 
-import {isClickInRightInset, useDrawerContext} from './DrawerContext';
+import {isClickInRightInset, useDrawerContextInternal} from './DrawerContext';
 import {
     normalizeDrawerWidthFromResize,
     normalizeDrawerWidthFromSavedString,
@@ -57,8 +57,9 @@ const DrawerPaneContentWrapper = ({
     const [userDrawerWidth, setUserDrawerWidth] = React.useState<number | undefined>(undefined);
 
     const drawerRef = React.useRef<HTMLDivElement>(null);
-    const {containerWidth, itemContainerRef, rightInset} = useDrawerContext();
-    const availableWidth = Math.max(0, containerWidth - rightInset);
+    const {containerWidth, itemContainerRef, rightInset, visibleRightInset} =
+        useDrawerContextInternal();
+    const availableWidth = Math.max(0, containerWidth - visibleRightInset);
 
     const derivedDrawerWidth = React.useMemo(() => {
         return normalizeDrawerWidthFromSavedString({
