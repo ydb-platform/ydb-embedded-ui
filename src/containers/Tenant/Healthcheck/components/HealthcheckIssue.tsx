@@ -9,6 +9,7 @@ import {hcStatusToColorFlag} from '../../../../store/reducers/healthcheckInfo/ut
 import {useHealthcheckContext} from '../HealthcheckContext';
 import i18n from '../i18n';
 import {b} from '../shared';
+import type {HealthcheckAssistantActionProps} from '../types';
 
 import {IssueDetails} from './HealthcheckIssueDetails/HealthcheckIssueDetails';
 import {HealthcheckIssueTabs} from './HealthcheckIssueTabs';
@@ -18,8 +19,13 @@ interface HealthcheckIssueProps {
     expanded?: boolean;
 }
 
-export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
+function RegisteredHealthcheckAssistantAction(props: HealthcheckAssistantActionProps) {
     const HealthcheckAssistantAction = useComponent('HealthcheckAssistantAction');
+
+    return <HealthcheckAssistantAction {...props} />;
+}
+
+export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
     const {assistant} = useHealthcheckContext();
     const [selectedTab, setSelectedTab] = React.useState(issue.id);
     const parents = React.useMemo(() => {
@@ -133,7 +139,7 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                                     className={b('issue-action')}
                                     onClick={(event) => event.stopPropagation()}
                                 >
-                                    <HealthcheckAssistantAction
+                                    <RegisteredHealthcheckAssistantAction
                                         action="fix"
                                         target={assistant.target}
                                         snapshot={assistant.snapshot}
