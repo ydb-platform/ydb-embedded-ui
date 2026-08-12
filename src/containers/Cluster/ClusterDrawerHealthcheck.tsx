@@ -15,6 +15,7 @@ import i18n from './i18n';
 interface ClusterDrawerHealthcheckProps {
     children: React.ReactNode;
     database: string;
+    clusterName?: string;
 }
 
 export function useClusterHealthcheckQueryParams() {
@@ -55,7 +56,11 @@ export function useClusterHealthcheckQueryParams() {
     };
 }
 
-export function ClusterDrawerHealthcheck({children, database}: ClusterDrawerHealthcheckProps) {
+export function ClusterDrawerHealthcheck({
+    children,
+    database,
+    clusterName,
+}: ClusterDrawerHealthcheckProps) {
     const {
         handleShowHealthcheckChange,
         showHealthcheck,
@@ -74,8 +79,8 @@ export function ClusterDrawerHealthcheck({children, database}: ClusterDrawerHeal
     }, [handleShowHealthcheckChange, handleIssuesFilterChange, handleHealthcheckViewChange]);
 
     const renderDrawerContent = React.useCallback(() => {
-        return <Healthcheck database={database} scope="cluster" />;
-    }, [database]);
+        return <Healthcheck database={database} clusterName={clusterName} scope="cluster" />;
+    }, [clusterName, database]);
 
     return (
         <HealthcheckDrawer

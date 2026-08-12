@@ -26,7 +26,11 @@ import i18n from './i18n';
 import {b} from './shared';
 import type {HealthcheckAssistantSnapshot, HealthcheckAssistantTarget} from './types';
 import {useClusterHealthcheck, useHealthcheck} from './useHealthcheck';
-import {countHealthcheckIssuesByCategory} from './utils';
+import {
+    countHealthcheckIssuesByCategory,
+    getDatabaseHealthcheckAssistantTarget,
+    getHealthcheckAssistantContext,
+} from './utils';
 
 import cryCatIcon from '../../../assets/icons/cry-cat.svg';
 
@@ -81,13 +85,7 @@ function DatabaseHealthcheckInner({
     scope?: 'cluster' | 'database';
 }) {
     const healthcheck = useHealthcheck(database, {clusterName, databaseType});
-    const target: HealthcheckAssistantTarget =
-        scope === 'database'
-            ? {
-                  scope,
-                  request: clusterName === undefined ? {database} : {database, clusterName},
-              }
-            : {scope, request: {database}};
+    const target = getDatabaseHealthcheckAssistantTarget({database, clusterName, scope});
 
     return <HealthcheckContent healthcheck={healthcheck} target={target} />;
 }
@@ -150,7 +148,12 @@ function HealthcheckContent({
         [leavesIssues],
     );
     const showDiagnostics = hasHealthcheckAssistantAction && successful && issues.length > 0;
-    const assistant = hasHealthcheckAssistantAction ? {target, snapshot} : undefined;
+    const assistant = getHealthcheckAssistantContext({
+        hasAction: hasHealthcheckAssistantAction,
+        successful,
+        target,
+        snapshot,
+    });
 
     const renderControls = () => {
         return (
