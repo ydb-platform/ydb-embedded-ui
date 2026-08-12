@@ -10,6 +10,10 @@ on:
   merge_group:
     types: [checks_requested]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.run_attempt == '1' && github.event.pull_request.number) || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.run_attempt == '1' }}
+
 jobs:
   verify_title:
     name: Verify Title
