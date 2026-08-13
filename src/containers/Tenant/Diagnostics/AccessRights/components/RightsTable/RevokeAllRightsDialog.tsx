@@ -4,11 +4,13 @@ import NiceModal from '@ebay/nice-modal-react';
 import {Dialog, Flex, Text} from '@gravity-ui/uikit';
 
 import {SubjectWithAvatar} from '../../../../../../components/SubjectWithAvatar/SubjectWithAvatar';
+import {useNonDefaultAclInheritanceRevocationAvailable} from '../../../../../../store/reducers/capabilities/hooks';
 import {useClusterWithProxy} from '../../../../../../store/reducers/cluster/cluster';
 import {
     schemaAclApi,
-    selectSubjectExplicitRights,
+    selectSubjectExplicitAllowAces,
 } from '../../../../../../store/reducers/schemaAcl/schemaAcl';
+import {prepareRevokeAllRightsRequest} from '../../../../../../store/reducers/schemaAcl/utils';
 import createToast from '../../../../../../utils/createToast';
 import {useAclSyntax, useTypedSelector} from '../../../../../../utils/hooks';
 import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
@@ -79,9 +81,11 @@ function RevokeAllRightsDialog({
     subject,
 }: RevokeAllRightsDialogProps) {
     const useMetaProxy = useClusterWithProxy();
+    const supportsNonDefaultInheritanceRevocation =
+        useNonDefaultAclInheritanceRevocationAvailable();
     const dialect = useAclSyntax();
-    const subjectExplicitRights = useTypedSelector((state) =>
-        selectSubjectExplicitRights(
+    const subjectExplicitAces = useTypedSelector((state) =>
+        selectSubjectExplicitAllowAces(
             state,
             subject,
             path,
@@ -101,15 +105,10 @@ function RevokeAllRightsDialog({
             database,
             databaseFullPath,
             dialect,
-            rights: {
-                RemoveAccess: [
-                    {
-                        Subject: subject,
-                        AccessRights: Array.from(subjectExplicitRights),
-                        AccessType: 'Allow',
-                    },
-                ],
-            },
+            rights: prepareRevokeAllRightsRequest(
+                subjectExplicitAces,
+                supportsNonDefaultInheritanceRevocation,
+            ),
         })
             .unwrap()
             .then(() => {

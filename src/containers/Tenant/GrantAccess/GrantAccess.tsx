@@ -4,13 +4,15 @@ import {Flex} from '@gravity-ui/uikit';
 
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
 import {SubjectWithAvatar} from '../../../components/SubjectWithAvatar/SubjectWithAvatar';
+import {useNonDefaultAclInheritanceRevocationAvailable} from '../../../store/reducers/capabilities/hooks';
 import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {
     schemaAclApi,
     selectAvailablePermissions,
+    selectSubjectExplicitAllowAces,
     selectSubjectInheritedRights,
 } from '../../../store/reducers/schemaAcl/schemaAcl';
-import type {AccessRightsUpdateRequest} from '../../../types/api/acl';
+import {prepareAccessRightsUpdateRequest} from '../../../store/reducers/schemaAcl/utils';
 import createToast from '../../../utils/createToast';
 import {useAclSyntax, useTypedSelector} from '../../../utils/hooks';
 import {prepareErrorMessage} from '../../../utils/prepareErrorMessage';
@@ -39,9 +41,22 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
 
     const {path, database, databaseFullPath} = useCurrentSchema();
     const useMetaProxy = useClusterWithProxy();
+    const supportsNonDefaultInheritanceRevocation =
+        useNonDefaultAclInheritanceRevocationAvailable();
     const dialect = useAclSyntax();
     const {currentRightsMap, setExplicitRightsChanges, rightsToGrant, rightsToRevoke, hasChanges} =
         useRights({aclSubject: aclSubject ?? undefined, path, database, databaseFullPath});
+    const subjectExplicitAces = useTypedSelector((state) =>
+        selectSubjectExplicitAllowAces(
+            state,
+            aclSubject ?? undefined,
+            path,
+            database,
+            databaseFullPath,
+            dialect,
+            useMetaProxy,
+        ),
+    );
     const {isFetching: aclIsFetching} = schemaAclApi.useGetSchemaAclQuery(
         {
             path,
@@ -84,21 +99,13 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
             return;
         }
 
-        const newRights: AccessRightsUpdateRequest = {};
-        if (rightsToGrant.length) {
-            newRights.AddAccess = subjects.map((subj) => ({
-                AccessRights: rightsToGrant,
-                Subject: subj,
-                AccessType: 'Allow',
-            }));
-        }
-        if (rightsToRevoke.length) {
-            newRights.RemoveAccess = subjects.map((subj) => ({
-                AccessRights: rightsToRevoke,
-                Subject: subj,
-                AccessType: 'Allow',
-            }));
-        }
+        const newRights = prepareAccessRightsUpdateRequest({
+            subjects,
+            rightsToGrant,
+            rightsToRevoke,
+            subjectExplicitAces,
+            supportsNonDefaultInheritanceRevocation,
+        });
         updateRights({
             path,
             database,
@@ -127,6 +134,8 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
         rightsToGrant,
         aclSubject,
         rightsToRevoke,
+        subjectExplicitAces,
+        supportsNonDefaultInheritanceRevocation,
         newSubjects,
         handleCloseDrawer,
         databaseFullPath,
