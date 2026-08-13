@@ -74,6 +74,16 @@
             &#{$block}_highlighted {
                 --entity-state-background-color: var(--g-color-base-neutral-light-hover);
             }
+
+            &#{$block}_mode-compaction {
+                --entity-state-background-color: transparent;
+                box-shadow: none;
+
+                &#{$block}_highlighted {
+                    --entity-state-background-color: var(--g-color-base-neutral-light);
+                    --entity-state-stripe-background-color: var(--g-color-base-neutral-light);
+                }
+            }
         }
     }
 

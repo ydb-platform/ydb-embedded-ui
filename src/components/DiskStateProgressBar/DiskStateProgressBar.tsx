@@ -46,9 +46,9 @@ function renderIconGroup(icons: IconWithColor[]) {
     );
 }
 
-function containsQuestionIcon(icon?: IconData | IconWithColor[] | string) {
+function shouldUseLightGreyStyle(icon: IconData | IconWithColor[] | string | undefined) {
     if (Array.isArray(icon)) {
-        return icon.some(({icon: itemIcon}) => itemIcon === CircleQuestionFill);
+        return icon.length > 0 && icon.every(({icon: itemIcon}) => itemIcon === CircleQuestionFill);
     }
 
     return icon === CircleQuestionFill;
@@ -118,7 +118,7 @@ export function DiskStateProgressBar({
         'all-mode-has-issues': modeModifier === 'mode-all' && allModeHasIssues,
         'legend-inactive': isLegendInactive,
         'overlap-icon-at-top-left': overlapIconAtTopLeft,
-        'light-grey': Boolean(withIcon) && containsQuestionIcon(providedIcon),
+        'light-grey': Boolean(withIcon) && shouldUseLightGreyStyle(providedIcon),
     };
 
     // Add mode modifier if present
