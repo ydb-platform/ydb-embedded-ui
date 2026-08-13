@@ -8,12 +8,12 @@ interface PrepareAccessRightsUpdateRequestParams {
     supportsNonDefaultInheritanceRevocation: boolean;
 }
 
-export function getSubjectExplicitAces(acl: TACE[] | undefined, subject: string | undefined) {
+export function getSubjectExplicitAllowAces(acl: TACE[] | undefined, subject: string | undefined) {
     if (!acl || !subject) {
         return [];
     }
 
-    return acl.filter((ace) => ace.Subject === subject);
+    return acl.filter((ace) => ace.Subject === subject && ace.AccessType === 'Allow');
 }
 
 function getAceRights(ace: TACE) {
@@ -79,6 +79,10 @@ export function prepareAccessRightsUpdateRequest({
     const rightsToRevokeSet = new Set(rightsToRevoke);
 
     subjectExplicitAces.forEach((ace) => {
+        if (ace.AccessType !== 'Allow') {
+            return;
+        }
+
         const aceRights = getAceRights(ace);
         const revokedAceRights = aceRights.filter((right) => rightsToRevokeSet.has(right));
         if (!revokedAceRights.length) {
@@ -108,12 +112,13 @@ export function prepareRevokeAllRightsRequest(
     subjectExplicitAces: TACE[],
     supportsNonDefaultInheritanceRevocation: boolean,
 ): AccessRightsUpdateRequest {
-    if (!subjectExplicitAces.length) {
+    const allowAces = subjectExplicitAces.filter((ace) => ace.AccessType === 'Allow');
+    if (!allowAces.length) {
         return {};
     }
 
     return {
-        RemoveAccess: subjectExplicitAces.map((ace) =>
+        RemoveAccess: allowAces.map((ace) =>
             supportsNonDefaultInheritanceRevocation || hasDefaultInheritanceType(ace)
                 ? prepareAceForUpdate(ace)
                 : prepareAceForLegacyUpdate(ace),

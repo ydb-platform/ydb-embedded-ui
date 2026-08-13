@@ -4,7 +4,7 @@ import type {AccessRightsUpdateRequest} from '../../../types/api/acl';
 import type {RootState} from '../../index';
 import {api} from '../api';
 
-import {getSubjectExplicitAces} from './utils';
+import {getSubjectExplicitAllowAces} from './utils';
 
 export const schemaAclApi = api.injectEndpoints({
     endpoints: (build) => ({
@@ -159,7 +159,7 @@ const selectAccessRights = createSelector(
     (state, selectGetSchemaAcl) => selectGetSchemaAcl(state).data,
 );
 
-export const selectSubjectExplicitAces = createSelector(
+export const selectSubjectExplicitAllowAces = createSelector(
     [
         (_state: RootState, subject: string | undefined) => subject,
         (
@@ -172,7 +172,7 @@ export const selectSubjectExplicitAces = createSelector(
             useMetaProxy?: boolean,
         ) => selectAccessRights(state, path, database, databaseFullPath, dialect, useMetaProxy),
     ],
-    (subject, data) => getSubjectExplicitAces(data?.acl, subject),
+    (subject, data) => getSubjectExplicitAllowAces(data?.acl, subject),
 );
 
 const selectRightsMap = createSelector(
@@ -260,14 +260,14 @@ export const selectSubjectExplicitRights = createSelector(
             databaseFullPath: string,
             dialect: string,
             useMetaProxy?: boolean,
-        ) => selectRightsMap(state, path, database, databaseFullPath, dialect, useMetaProxy),
+        ) => selectAccessRights(state, path, database, databaseFullPath, dialect, useMetaProxy),
     ],
-    (subject, rightsMap) => {
-        if (!subject || !rightsMap) {
-            return [];
-        }
-
-        const explicitRights = rightsMap[subject]?.explicit || new Set();
+    (subject, data) => {
+        const explicitRights = new Set<string>();
+        getSubjectExplicitAllowAces(data?.acl, subject).forEach((ace) => {
+            ace.AccessRules?.forEach((right) => explicitRights.add(right));
+            ace.AccessRights?.forEach((right) => explicitRights.add(right));
+        });
 
         return Array.from(explicitRights);
     },

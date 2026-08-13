@@ -8,7 +8,7 @@ import {useNonDefaultAclInheritanceRevocationAvailable} from '../../../../../../
 import {useClusterWithProxy} from '../../../../../../store/reducers/cluster/cluster';
 import {
     schemaAclApi,
-    selectSubjectExplicitAces,
+    selectSubjectExplicitAllowAces,
 } from '../../../../../../store/reducers/schemaAcl/schemaAcl';
 import {prepareRevokeAllRightsRequest} from '../../../../../../store/reducers/schemaAcl/utils';
 import createToast from '../../../../../../utils/createToast';
@@ -85,7 +85,7 @@ function RevokeAllRightsDialog({
         useNonDefaultAclInheritanceRevocationAvailable();
     const dialect = useAclSyntax();
     const subjectExplicitAces = useTypedSelector((state) =>
-        selectSubjectExplicitAces(
+        selectSubjectExplicitAllowAces(
             state,
             subject,
             path,

@@ -1,6 +1,6 @@
 import type {TACE} from '../../../../types/api/acl';
 import {
-    getSubjectExplicitAces,
+    getSubjectExplicitAllowAces,
     prepareAccessRightsUpdateRequest,
     prepareRevokeAllRightsRequest,
 } from '../utils';
@@ -155,7 +155,7 @@ describe('prepareAccessRightsUpdateRequest', () => {
         });
     });
 
-    test('preserves Deny access type in a legacy revoke', () => {
+    test('does not revoke a Deny ACE through the grant flow', () => {
         expect(
             prepareAccessRightsUpdateRequest({
                 subjects: ['alice'],
@@ -171,18 +171,10 @@ describe('prepareAccessRightsUpdateRequest', () => {
                 ],
                 supportsNonDefaultInheritanceRevocation: false,
             }),
-        ).toEqual({
-            RemoveAccess: [
-                {
-                    Subject: 'alice',
-                    AccessType: 'Deny',
-                    AccessRights: ['select_row'],
-                },
-            ],
-        });
+        ).toEqual({});
     });
 
-    test('keeps legacy revokes from separate Allow and Deny ACEs distinct', () => {
+    test('revokes a legacy Allow ACE without touching a Deny ACE', () => {
         expect(
             prepareAccessRightsUpdateRequest({
                 subjects: ['alice'],
@@ -210,11 +202,6 @@ describe('prepareAccessRightsUpdateRequest', () => {
                     Subject: 'alice',
                     AccessType: 'Allow',
                     AccessRights: ['select_row'],
-                },
-                {
-                    Subject: 'alice',
-                    AccessType: 'Deny',
-                    AccessRights: ['update_row'],
                 },
             ],
         });
@@ -264,7 +251,7 @@ describe('prepareAccessRightsUpdateRequest', () => {
         });
     });
 
-    test('removes every ACE containing the revoked right and preserves each remainder', () => {
+    test('updates matching Allow ACEs without touching a Deny ACE', () => {
         const subjectExplicitAces: TACE[] = [
             {
                 Subject: 'alice',
@@ -301,17 +288,11 @@ describe('prepareAccessRightsUpdateRequest', () => {
                     AccessType: 'Allow',
                     AccessRights: ['select_row', 'update_row'],
                 },
-                {
-                    Subject: 'alice',
-                    AccessType: 'Deny',
-                    AccessRights: ['select_row'],
-                    InheritanceType: ['none'],
-                },
             ],
         });
     });
 
-    test('serializes mixed rule and granular rights and restores a Deny remainder', () => {
+    test('does not revoke a Deny ACE when exact inheritance revocation is supported', () => {
         expect(
             prepareAccessRightsUpdateRequest({
                 subjects: ['alice'],
@@ -328,24 +309,7 @@ describe('prepareAccessRightsUpdateRequest', () => {
                 ],
                 supportsNonDefaultInheritanceRevocation: true,
             }),
-        ).toEqual({
-            AddAccess: [
-                {
-                    Subject: 'alice',
-                    AccessType: 'Deny',
-                    AccessRights: ['grant'],
-                    InheritanceType: ['none'],
-                },
-            ],
-            RemoveAccess: [
-                {
-                    Subject: 'alice',
-                    AccessType: 'Deny',
-                    AccessRights: ['select', 'grant'],
-                    InheritanceType: ['none'],
-                },
-            ],
-        });
+        ).toEqual({});
     });
 
     test('omits empty access update arrays', () => {
@@ -362,7 +326,7 @@ describe('prepareAccessRightsUpdateRequest', () => {
 });
 
 describe('prepareRevokeAllRightsRequest', () => {
-    test('removes every original ACE without merging their rights', () => {
+    test('removes every Allow ACE without touching Deny ACEs', () => {
         const subjectExplicitAces: TACE[] = [
             {
                 Subject: 'alice',
@@ -386,12 +350,6 @@ describe('prepareRevokeAllRightsRequest', () => {
                     AccessRights: ['select_row', 'update_row'],
                     InheritanceType: ['inherit'],
                 },
-                {
-                    Subject: 'alice',
-                    AccessType: 'Deny',
-                    AccessRights: ['full'],
-                    InheritanceType: ['none'],
-                },
             ],
         });
     });
@@ -405,6 +363,12 @@ describe('prepareRevokeAllRightsRequest', () => {
                         AccessType: 'Allow',
                         AccessRights: ['select_row', 'update_row'],
                         InheritanceType: ['inherit'],
+                    },
+                    {
+                        Subject: 'alice',
+                        AccessType: 'Allow',
+                        AccessRights: ['erase_row'],
+                        InheritanceType: ['none'],
                     },
                     {
                         Subject: 'alice',
@@ -425,8 +389,8 @@ describe('prepareRevokeAllRightsRequest', () => {
                 },
                 {
                     Subject: 'alice',
-                    AccessType: 'Deny',
-                    AccessRights: ['full'],
+                    AccessType: 'Allow',
+                    AccessRights: ['erase_row'],
                 },
             ],
         });
@@ -437,7 +401,7 @@ describe('prepareRevokeAllRightsRequest', () => {
     });
 });
 
-describe('getSubjectExplicitAces', () => {
+describe('getSubjectExplicitAllowAces', () => {
     test('keeps the original ACE boundaries for the selected subject', () => {
         const aliceAces: TACE[] = [
             {
@@ -457,11 +421,26 @@ describe('getSubjectExplicitAces', () => {
             AccessRights: ['select_row'],
         };
 
-        expect(getSubjectExplicitAces([...aliceAces, bobAce], 'alice')).toEqual(aliceAces);
+        expect(getSubjectExplicitAllowAces([...aliceAces, bobAce], 'alice')).toEqual(aliceAces);
+    });
+
+    test('does not expose Deny ACEs to the grant and revoke flows', () => {
+        const allowAce: TACE = {
+            Subject: 'alice',
+            AccessType: 'Allow',
+            AccessRights: ['select_row'],
+        };
+        const denyAce: TACE = {
+            Subject: 'alice',
+            AccessType: 'Deny',
+            AccessRights: ['select_row'],
+        };
+
+        expect(getSubjectExplicitAllowAces([allowAce, denyAce], 'alice')).toEqual([allowAce]);
     });
 
     test('returns no ACEs when ACL data or subject is absent', () => {
-        expect(getSubjectExplicitAces(undefined, 'alice')).toEqual([]);
-        expect(getSubjectExplicitAces([], undefined)).toEqual([]);
+        expect(getSubjectExplicitAllowAces(undefined, 'alice')).toEqual([]);
+        expect(getSubjectExplicitAllowAces([], undefined)).toEqual([]);
     });
 });

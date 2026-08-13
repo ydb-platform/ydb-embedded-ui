@@ -9,7 +9,7 @@ import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {
     schemaAclApi,
     selectAvailablePermissions,
-    selectSubjectExplicitAces,
+    selectSubjectExplicitAllowAces,
     selectSubjectInheritedRights,
 } from '../../../store/reducers/schemaAcl/schemaAcl';
 import {prepareAccessRightsUpdateRequest} from '../../../store/reducers/schemaAcl/utils';
@@ -47,7 +47,7 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
     const {currentRightsMap, setExplicitRightsChanges, rightsToGrant, rightsToRevoke, hasChanges} =
         useRights({aclSubject: aclSubject ?? undefined, path, database, databaseFullPath});
     const subjectExplicitAces = useTypedSelector((state) =>
-        selectSubjectExplicitAces(
+        selectSubjectExplicitAllowAces(
             state,
             aclSubject ?? undefined,
             path,
