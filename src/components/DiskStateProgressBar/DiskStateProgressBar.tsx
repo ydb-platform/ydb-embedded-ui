@@ -118,7 +118,7 @@ export function DiskStateProgressBar({
         'all-mode-has-issues': modeModifier === 'mode-all' && allModeHasIssues,
         'legend-inactive': isLegendInactive,
         'overlap-icon-at-top-left': overlapIconAtTopLeft,
-        'question-icon': Boolean(withIcon) && containsQuestionIcon(providedIcon),
+        'light-grey': Boolean(withIcon) && containsQuestionIcon(providedIcon),
     };
 
     // Add mode modifier if present

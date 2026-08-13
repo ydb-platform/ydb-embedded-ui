@@ -52,17 +52,24 @@
         --entity-state-compact-background-color: var(--entity-state-background-color);
 
         &#{$block}_grey {
-            --entity-state-background-color: var(--g-color-base-neutral-light);
+            --entity-state-background-color: var(--g-color-base-generic-medium);
             --entity-state-border-color: none;
-            --entity-state-icon-color: rgba(162, 162, 162, 1);
+            --entity-state-fill-color: var(--g-color-base-neutral-medium);
 
             border: none;
 
-            &#{$block}_question-icon {
-                --entity-state-border-color: var(--g-color-line-generic);
-
-                border: $border-width solid var(--entity-state-border-color);
+            &#{$block}_highlighted {
+                --entity-state-background-color: var(--g-color-base-generic-medium-hover);
+                --entity-state-fill-color: var(--g-color-base-neutral-medium-hover);
             }
+        }
+
+        &#{$block}_light-grey {
+            --entity-state-border-color: var(--g-color-line-generic);
+            --entity-state-background-color: var(--g-color-base-neutral-light);
+            --entity-state-icon-color: var(--g-color-text-secondary);
+
+            border: $border-width solid var(--entity-state-border-color);
 
             &#{$block}_highlighted {
                 --entity-state-background-color: var(--g-color-base-neutral-light-hover);
@@ -79,7 +86,8 @@
     }
 
     // State mode: specific visual variants
-    &_mode-state {
+    &_mode-state,
+    &_mode-drive {
         // OK state
         &#{$block}_green {
             --entity-state-border-color: var(--g-color-base-positive-medium);
@@ -281,6 +289,10 @@
                 --entity-state-background-color: var(--ydb-space-no-data-bg-hover);
                 --entity-state-fill-color: var(--ydb-space-no-data-fill-color-hover);
             }
+        }
+
+        &#{$block}_light-grey {
+            --entity-state-icon-color: var(--ydb-progress-bar-font-color);
         }
     }
 

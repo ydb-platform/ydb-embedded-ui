@@ -272,7 +272,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
             }),
         ).toMatchObject({
             severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
-            icon: undefined,
+            icon: CircleQuestionFill,
             modeModifier: 'mode-state',
             showNoDataPlaceholder: false,
         });

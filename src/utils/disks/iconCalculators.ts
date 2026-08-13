@@ -62,6 +62,10 @@ export function calculateStateIcon(vDisk: PreparedVDisk, isDonor?: boolean): Ico
 
     const state = vDisk.VDiskState;
 
+    if (state === undefined) {
+        return CircleQuestionFill;
+    }
+
     // Initial states get Clock icon (Figma: "иконка с часиками")
     if (state === EVDiskState.Initial || state === EVDiskState.SyncGuidRecovery) {
         return ClockFill;

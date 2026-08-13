@@ -60,9 +60,5 @@
         --progress-bar-full-height: 20px;
 
         border-radius: var(--g-border-radius-m);
-
-        &.storage-disk-progress-bar_question-icon {
-            --entity-state-icon-color: var(--ydb-progress-bar-font-color);
-        }
     }
 }

@@ -1,5 +1,5 @@
 import type {EFlag} from '../../types/api/enums';
-import type {TPDiskInfo, TPDiskStateInfo} from '../../types/api/pdisk';
+import type {EDriveStatus, TPDiskInfo, TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import type {ValueOf} from '../../types/common';
 
@@ -83,6 +83,7 @@ export type PreparedPDisk = Omit<
         };
 
         SlotSize?: string;
+        DriveStatus?: EDriveStatus;
     };
 
 export interface VDiskRecipientRef {

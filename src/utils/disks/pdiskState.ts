@@ -1,6 +1,16 @@
-import {CircleExclamationFill, CircleStopFill, CircleXmarkFill, ClockFill} from '@gravity-ui/icons';
+import {
+    CircleExclamation,
+    CircleExclamationFill,
+    CircleQuestionFill,
+    CircleStopFill,
+    CircleXmark,
+    CircleXmarkFill,
+    Clock,
+    ClockFill,
+    TrashBin,
+} from '@gravity-ui/icons';
 
-import type {TPDiskState} from '../../types/api/pdisk';
+import type {EDriveStatus, TPDiskState} from '../../types/api/pdisk';
 
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
@@ -87,6 +97,37 @@ export function getPDiskStateDisplayState(state?: TPDiskState): PDiskStateDispla
     return isPDiskStateDisplayState(state)
         ? PDISK_STATE_DISPLAY_STATE[state]
         : NOT_AVAILABLE_DISPLAY_STATE;
+}
+
+const PDISK_DRIVE_DISPLAY_STATE: Record<EDriveStatus, PDiskStateDisplayState> = {
+    ACTIVE: {
+        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
+        icon: undefined,
+    },
+    INACTIVE: {
+        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
+        icon: Clock,
+    },
+    TO_BE_REMOVED: {
+        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
+        icon: TrashBin,
+    },
+    FAULTY: {
+        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+        icon: CircleExclamation,
+    },
+    BROKEN: {
+        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+        icon: CircleXmark,
+    },
+    UNKNOWN: {
+        severity: NOT_AVAILABLE_SEVERITY,
+        icon: CircleQuestionFill,
+    },
+};
+
+export function getPDiskDriveDisplayState(status?: EDriveStatus): PDiskStateDisplayState {
+    return status === undefined ? NOT_AVAILABLE_DISPLAY_STATE : PDISK_DRIVE_DISPLAY_STATE[status];
 }
 
 function isPDiskStateDisplayState(

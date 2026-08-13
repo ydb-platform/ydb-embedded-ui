@@ -480,7 +480,7 @@ describe('prepareGroupsPDisk', () => {
             State: 'Normal',
             Device: 'Green',
             Realtime: 'Green',
-            Status: 'ACTIVE',
+            DriveStatus: 'ACTIVE',
             DiskSpace: 'Green',
             DecommitStatus: 'DECOMMIT_NONE',
 
@@ -539,7 +539,7 @@ describe('prepareGroupsPDisk', () => {
 
             Severity: 0,
 
-            Status: 'ACTIVE',
+            DriveStatus: 'ACTIVE',
             DiskSpace: 'Green',
             DecommitStatus: 'DECOMMIT_NONE',
 

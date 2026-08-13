@@ -6,6 +6,7 @@ import {
     AllLegend,
     CompactionLegend,
     FrontQueuesLegend,
+    PDiskDriveLegend,
     PDiskStateLegend,
     SpaceLegend,
     StateLegend,
@@ -62,6 +63,8 @@ function renderPDiskLegend(pdisksGroupBy: PDisksGroupByValue) {
             return <PDiskStateLegend />;
         case PDisksGroupBy.Space:
             return <SpaceLegend selectionScope="pdisks" />;
+        case PDisksGroupBy.Drive:
+            return <PDiskDriveLegend />;
         default:
             return <div>{getPDisksGroupByLabel(pdisksGroupBy)}</div>;
     }

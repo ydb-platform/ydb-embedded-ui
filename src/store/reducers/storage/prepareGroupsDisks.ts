@@ -82,7 +82,7 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
 }
 
 export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {}) {
-    const {Whiteboard: whiteboardPDisk, ...bscPDisk} = data;
+    const {Whiteboard: whiteboardPDisk, Status: DriveStatus, ...bscPDisk} = data;
 
     const mergedPDiskData = {
         ...whiteboardPDisk,
@@ -146,5 +146,6 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
         Type,
         Severity,
         SlotSize,
+        DriveStatus,
     };
 }
