@@ -62,6 +62,7 @@
   "front-queues_warning": "Warning",
   "front-queues_impaired": "Impaired",
   "compaction_key": "Fresh / Level Rank Satisfaction:",
+  "device_key": "Device / Realtime:",
   "compaction_ok": "OK",
   "compaction_notice": "Notice",
   "compaction_warning": "Warning",

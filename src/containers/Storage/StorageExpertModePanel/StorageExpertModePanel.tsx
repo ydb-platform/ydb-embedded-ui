@@ -7,6 +7,7 @@ import {
     CompactionLegend,
     FrontQueuesLegend,
     PDiskDecommitLegend,
+    PDiskDeviceLegend,
     PDiskDriveLegend,
     PDiskMaintenanceLegend,
     PDiskStateLegend,
@@ -71,6 +72,8 @@ function renderPDiskLegend(pdisksGroupBy: PDisksGroupByValue) {
             return <PDiskDecommitLegend />;
         case PDisksGroupBy.Maintenance:
             return <PDiskMaintenanceLegend />;
+        case PDisksGroupBy.Device:
+            return <PDiskDeviceLegend />;
         default:
             return <div>{getPDisksGroupByLabel(pdisksGroupBy)}</div>;
     }

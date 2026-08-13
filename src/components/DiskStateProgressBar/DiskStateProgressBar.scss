@@ -75,7 +75,8 @@
                 --entity-state-background-color: var(--g-color-base-neutral-light-hover);
             }
 
-            &#{$block}_mode-compaction {
+            &#{$block}_mode-compaction,
+            &#{$block}_mode-device {
                 --entity-state-background-color: transparent;
                 box-shadow: none;
 
@@ -333,7 +334,8 @@
         }
     }
 
-    &_mode-compaction {
+    &_mode-compaction,
+    &_mode-device {
         --entity-state-background-color: transparent;
 
         &:not(#{$block}_darkgrey) {

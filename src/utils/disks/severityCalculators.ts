@@ -115,47 +115,37 @@ export function calculateFrontQueuesSeverity(vDisk: PreparedVDisk): DisplaySever
 }
 
 /**
- * Calculate severity based on compaction status (Fresh/Level rank satisfaction)
- * Used in Compaction grouping mode
- *
- * Border color is determined by the worst of Fresh or Level rank:
+ * Calculate severity based on two related status flags.
+ * Border color is determined by the worst flag:
  * - Both Green -> Green border (OK)
+ * - Missing or Grey outranks Green -> no-data styling
  * - At least one Yellow -> Yellow border (NOTICE)
  * - At least one Orange or Red -> Red border (WARNING)
  */
+export function calculateFlagPairSeverity(
+    firstFlag: EFlag | undefined,
+    secondFlag: EFlag | undefined,
+): DisplaySeverity {
+    const flags = [firstFlag, secondFlag];
+
+    if (flags.some((flag) => flag === EFlag.Orange || flag === EFlag.Red)) {
+        return COMPACTION_SEVERITY.WARNING;
+    }
+
+    if (flags.includes(EFlag.Yellow)) {
+        return COMPACTION_SEVERITY.NOTICE;
+    }
+
+    return firstFlag === EFlag.Green && secondFlag === EFlag.Green
+        ? COMPACTION_SEVERITY.OK
+        : NOT_AVAILABLE_SEVERITY;
+}
+
 export function calculateCompactionSeverity(vDisk: PreparedVDisk): DisplaySeverity {
-    const freshFlag = vDisk.SatisfactionRank?.FreshRank?.Flag;
-    const levelFlag = vDisk.SatisfactionRank?.LevelRank?.Flag;
-
-    // If no data available, return N/D
-    if (!freshFlag && !levelFlag) {
-        return NOT_AVAILABLE_SEVERITY;
-    }
-
-    // Grey is an explicit no-data flag from the backend, not a healthy compaction rank.
-    if (freshFlag === EFlag.Grey || levelFlag === EFlag.Grey) {
-        return NOT_AVAILABLE_SEVERITY;
-    }
-
-    // Determine worst severity between Fresh and Level
-    const freshSeverity = freshFlag
-        ? DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[freshFlag]
-        : DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green;
-    const levelSeverity = levelFlag
-        ? DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[levelFlag]
-        : DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green;
-
-    const worstSeverity = Math.max(freshSeverity, levelSeverity);
-
-    // Map to compaction severity levels
-    // Orange (4) and Red (5) both map to WARNING (red border)
-    if (worstSeverity >= DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange) {
-        return COMPACTION_SEVERITY.WARNING; // Red border
-    }
-    if (worstSeverity >= DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow) {
-        return COMPACTION_SEVERITY.NOTICE; // Yellow border
-    }
-    return COMPACTION_SEVERITY.OK; // Green border
+    return calculateFlagPairSeverity(
+        vDisk.SatisfactionRank?.FreshRank?.Flag,
+        vDisk.SatisfactionRank?.LevelRank?.Flag,
+    );
 }
 
 /**

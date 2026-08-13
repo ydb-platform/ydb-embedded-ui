@@ -6,14 +6,17 @@ import {isCapacityAlert} from '../../types/api/enums';
 import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
 import type {PDiskDisplayStateGetter} from '../../utils/disks/displayState';
 import {getDefaultPDiskDisplayState} from '../../utils/disks/displayState';
-import {calculateSpaceIcon} from '../../utils/disks/iconCalculators';
+import {calculateFlagPairIcon, calculateSpaceIcon} from '../../utils/disks/iconCalculators';
 import {
     getPDiskDecommitDisplayState,
     getPDiskDriveDisplayState,
     getPDiskMaintenanceDisplayState,
     getPDiskStateDisplayState,
 } from '../../utils/disks/pdiskState';
-import {calculateSpaceSeverity} from '../../utils/disks/severityCalculators';
+import {
+    calculateFlagPairSeverity,
+    calculateSpaceSeverity,
+} from '../../utils/disks/severityCalculators';
 
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
 import {PDisksGroupBy} from './StorageExpertModePanel/constants';
@@ -34,6 +37,8 @@ function getModeModifier(groupBy: PDisksGroupByValue): string | undefined {
             return 'mode-decommit';
         case PDisksGroupBy.Maintenance:
             return 'mode-maintenance';
+        case PDisksGroupBy.Device:
+            return 'mode-device';
         default:
             return undefined;
     }
@@ -124,6 +129,18 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
                         pDisk.MaintenanceStatus === undefined
                             ? CircleQuestionFill
                             : maintenanceDisplayState.icon,
+                    modeModifier,
+                    isLegendInactive: false,
+                    showNoDataPlaceholder: false,
+                    allocatedPercent: undefined,
+                    width: EXPERT_MODE_PDISK_WIDTH,
+                };
+            }
+
+            if (pdisksGroupBy === PDisksGroupBy.Device) {
+                return {
+                    severity: calculateFlagPairSeverity(pDisk.Device, pDisk.Realtime),
+                    icon: calculateFlagPairIcon(pDisk.Device, pDisk.Realtime),
                     modeModifier,
                     isLegendInactive: false,
                     showNoDataPlaceholder: false,

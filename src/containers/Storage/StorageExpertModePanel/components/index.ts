@@ -3,6 +3,7 @@ export {PDiskStateLegend} from './PDiskStateLegend';
 export {PDiskDriveLegend} from './PDiskDriveLegend';
 export {PDiskDecommitLegend} from './PDiskDecommitLegend';
 export {PDiskMaintenanceLegend} from './PDiskMaintenanceLegend';
+export {PDiskDeviceLegend} from './PDiskDeviceLegend';
 export {SpaceLegend} from './SpaceLegend';
 export {FrontQueuesLegend} from './FrontQueuesLegend';
 export {CompactionLegend} from './CompactionLegend';

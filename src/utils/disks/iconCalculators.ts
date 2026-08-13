@@ -158,10 +158,10 @@ export function calculateFrontQueuesIcon(
 }
 
 /**
- * Get icon and color for a single compaction rank (Fresh or Level)
- * Maps EFlag to corresponding icon and color from CompactionLegend
+ * Get icon and color for a single status flag.
+ * Maps EFlag to the corresponding pair-legend icon and color.
  */
-function getCompactionRankIconWithColor(flag: EFlag | undefined): IconWithColor | undefined {
+function getFlagIconWithColor(flag: EFlag | undefined): IconWithColor | undefined {
     if (!flag || flag === EFlag.Grey) {
         return {
             icon: CircleQuestionFill,
@@ -195,6 +195,28 @@ function getCompactionRankIconWithColor(flag: EFlag | undefined): IconWithColor 
     }
 }
 
+export function calculateFlagPairIcon(
+    firstFlag: EFlag | undefined,
+    secondFlag: EFlag | undefined,
+): IconWithColor[] | undefined {
+    if (firstFlag === EFlag.Green && secondFlag === EFlag.Green) {
+        return undefined;
+    }
+
+    const firstIconWithColor = getFlagIconWithColor(firstFlag);
+    const secondIconWithColor = getFlagIconWithColor(secondFlag);
+
+    const icons: IconWithColor[] = [];
+    if (firstIconWithColor) {
+        icons.push(firstIconWithColor);
+    }
+    if (secondIconWithColor) {
+        icons.push(secondIconWithColor);
+    }
+
+    return icons.length > 0 ? icons : undefined;
+}
+
 /**
  * Compaction-based icon logic - shows two icons (Fresh + Level) side by side
  * Each icon has its own color based on its rank
@@ -219,25 +241,7 @@ export function calculateCompactionIcon(
     const freshFlag = vDisk.SatisfactionRank?.FreshRank?.Flag;
     const levelFlag = vDisk.SatisfactionRank?.LevelRank?.Flag;
 
-    // If both ranks are green, no icon
-    if (freshFlag === EFlag.Green && levelFlag === EFlag.Green) {
-        return undefined;
-    }
-
-    // At least one rank is missing or not green - show both icons with their respective colors
-    const freshIconWithColor = getCompactionRankIconWithColor(freshFlag);
-    const levelIconWithColor = getCompactionRankIconWithColor(levelFlag);
-
-    // Return array of icons with colors [Fresh, Level]
-    const icons: IconWithColor[] = [];
-    if (freshIconWithColor) {
-        icons.push(freshIconWithColor);
-    }
-    if (levelIconWithColor) {
-        icons.push(levelIconWithColor);
-    }
-
-    return icons.length > 0 ? icons : undefined;
+    return calculateFlagPairIcon(freshFlag, levelFlag);
 }
 
 /**
