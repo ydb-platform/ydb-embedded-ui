@@ -83,6 +83,19 @@ describe('DiagnosticsPages', () => {
         expect(pages.map((page) => page.id)).toContain(TENANT_DIAGNOSTICS_TABS_IDS.access);
     });
 
+    test.each(['database', 'diagnostics'] as const)(
+        'shows nodes tab for non-serverless databases in %s pages display mode',
+        (databasePagesDisplay) => {
+            const pages = getPagesByType(EPathType.EPathTypeSubDomain, undefined, {
+                ...BASE_OPTIONS,
+                isDatabase: true,
+                databasePagesDisplay,
+            });
+
+            expect(pages.map((page) => page.id)).toContain(TENANT_DIAGNOSTICS_TABS_IDS.nodes);
+        },
+    );
+
     test('hides access tab for serverless databases when access is unavailable', () => {
         const pages = getPagesByType(EPathType.EPathTypeExtSubDomain, undefined, {
             ...BASE_OPTIONS,
