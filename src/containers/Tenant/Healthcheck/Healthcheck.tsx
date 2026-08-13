@@ -6,6 +6,7 @@ import {
     useComponent,
     useHasComponent,
 } from '../../../components/ComponentsProvider/ComponentsProvider';
+import {useDrawerContextInternal} from '../../../components/Drawer/DrawerContext';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Fullscreen} from '../../../components/Fullscreen/Fullscreen';
 import {HealthcheckStatus} from '../../../components/HealthcheckStatus/HealthcheckStatus';
@@ -122,6 +123,7 @@ function HealthcheckContent({
     const HealthcheckAssistantAction = useComponent('HealthcheckAssistantAction');
     const hasHealthcheckAssistantAction = useHasComponent('HealthcheckAssistantAction');
     const healthcheckContext = React.useContext(HealthcheckContext);
+    const {visibleRightInset} = useDrawerContextInternal();
 
     const fullscreen = useTypedSelector((state) => state.fullscreen);
     const {
@@ -225,7 +227,7 @@ function HealthcheckContent({
 
     return (
         <HealthcheckContext.Provider value={{...healthcheckContext, assistant}}>
-            <Fullscreen>
+            <Fullscreen rightInset={visibleRightInset}>
                 <Flex className={b()} grow={1}>
                     {renderContent()}
                 </Flex>

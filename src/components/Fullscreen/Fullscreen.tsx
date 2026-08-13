@@ -19,12 +19,22 @@ const b = cn('ydb-fullscreen');
 interface FullscreenProps {
     children: React.ReactNode;
     className?: string;
+    rightInset?: number;
 }
 
-export function Fullscreen({children, className}: FullscreenProps) {
+export function Fullscreen({children, className, rightInset = 0}: FullscreenProps) {
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useTypedDispatch();
     const fullscreenRootRef = useFullscreenContext();
+    const normalizedRightInset = Number.isFinite(rightInset) ? Math.max(0, rightInset) : 0;
+    const fullscreenStyle = React.useMemo<React.CSSProperties | undefined>(() => {
+        return isFullscreen && normalizedRightInset > 0 ? {right: normalizedRightInset} : undefined;
+    }, [isFullscreen, normalizedRightInset]);
+    const closeButtonStyle = React.useMemo<React.CSSProperties | undefined>(() => {
+        return isFullscreen && normalizedRightInset > 0
+            ? {right: 20 + normalizedRightInset}
+            : undefined;
+    }, [isFullscreen, normalizedRightInset]);
 
     const onDisableFullScreen = React.useCallback(() => {
         dispatch(disableFullscreen());
@@ -76,11 +86,12 @@ export function Fullscreen({children, className}: FullscreenProps) {
     return (
         <div ref={ref} style={{display: 'contents'}}>
             <Portal container={container}>
-                <div className={b({fullscreen: isFullscreen}, className)}>
+                <div className={b({fullscreen: isFullscreen}, className)} style={fullscreenStyle}>
                     <Button
                         onClick={onDisableFullScreen}
                         view="raised"
                         className={b('close-button')}
+                        style={closeButtonStyle}
                     >
                         <Icon data={disableFullscreenIcon} />
                     </Button>
