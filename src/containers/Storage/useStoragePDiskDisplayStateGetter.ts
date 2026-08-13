@@ -10,6 +10,7 @@ import {calculateSpaceIcon} from '../../utils/disks/iconCalculators';
 import {
     getPDiskDecommitDisplayState,
     getPDiskDriveDisplayState,
+    getPDiskMaintenanceDisplayState,
     getPDiskStateDisplayState,
 } from '../../utils/disks/pdiskState';
 import {calculateSpaceSeverity} from '../../utils/disks/severityCalculators';
@@ -31,6 +32,8 @@ function getModeModifier(groupBy: PDisksGroupByValue): string | undefined {
             return 'mode-drive';
         case PDisksGroupBy.Decommit:
             return 'mode-decommit';
+        case PDisksGroupBy.Maintenance:
+            return 'mode-maintenance';
         default:
             return undefined;
     }
@@ -102,6 +105,25 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
                         pDisk.DecommitStatus === undefined
                             ? CircleQuestionFill
                             : decommitDisplayState.icon,
+                    modeModifier,
+                    isLegendInactive: false,
+                    showNoDataPlaceholder: false,
+                    allocatedPercent: undefined,
+                    width: EXPERT_MODE_PDISK_WIDTH,
+                };
+            }
+
+            if (pdisksGroupBy === PDisksGroupBy.Maintenance) {
+                const maintenanceDisplayState = getPDiskMaintenanceDisplayState(
+                    pDisk.MaintenanceStatus,
+                );
+
+                return {
+                    ...maintenanceDisplayState,
+                    icon:
+                        pDisk.MaintenanceStatus === undefined
+                            ? CircleQuestionFill
+                            : maintenanceDisplayState.icon,
                     modeModifier,
                     isLegendInactive: false,
                     showNoDataPlaceholder: false,

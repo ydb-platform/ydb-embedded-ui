@@ -128,6 +128,7 @@ export interface TPDiskInfo {
     /** uint64 */
     Category?: string;
     DecommitStatus?: EDecommitStatus;
+    MaintenanceStatus?: EMaintenanceStatus;
 }
 
 export type EDriveStatus =
@@ -144,6 +145,12 @@ export type EDecommitStatus =
     | 'DECOMMIT_PENDING' // drive is going to be removed soon, but SelfHeal logic would not remove it automatically
     | 'DECOMMIT_IMMINENT' // drive is going to be settled automatically
     | 'DECOMMIT_REJECTED'; // drive is working as usual, but decommitted slots are not placed here
+
+export type EMaintenanceStatus =
+    | 'NOT_SET' // unset status, default value
+    | 'NO_REQUEST' // no active maintenance request
+    | 'LONG_TERM_MAINTENANCE_PLANNED' // VDisks should be moved asynchronously from the PDisk
+    | 'NO_NEW_VDISKS'; // existing VDisks stay, new VDisks must not be allocated
 
 type EPDiskType =
     | 'ROT' // rotational drives (HDD)

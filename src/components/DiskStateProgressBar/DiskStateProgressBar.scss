@@ -98,7 +98,8 @@
     // State mode: specific visual variants
     &_mode-state,
     &_mode-drive,
-    &_mode-decommit {
+    &_mode-decommit,
+    &_mode-maintenance {
         // OK state
         &#{$block}_green {
             --entity-state-border-color: var(--g-color-base-positive-medium);

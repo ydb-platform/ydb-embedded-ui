@@ -325,9 +325,7 @@ async function preparePage(page: Page, vdisksGroupBy: VDisksGroupByValue) {
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 60_000});
 
-    test('renders the PDisk State legend and preserves the Maintenance placeholder', async ({
-        page,
-    }) => {
+    test('renders the PDisk State and Maintenance legends', async ({page}) => {
         await preparePage(page, VDisksGroupBy.State);
 
         const pDiskSelector = page.getByTestId('storage-pdisks-expert-mode');
@@ -379,8 +377,13 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
 
         await pDiskSelector.getByRole('radio', {name: 'Maintenance'}).check();
 
-        await expect(legend).toHaveText('Maintenance');
-        await expect(legend.locator('.g-label')).toHaveCount(0);
+        await expect(legendLabels).toHaveText(['Long term planned', 'No new VDisks', 'No request']);
+        await expect(legendLabels.nth(0)).toHaveClass(/g-label_theme_danger/);
+        await expect(legendLabels.nth(1)).toHaveClass(/g-label_theme_warning/);
+        await expect(legendLabels.nth(2)).toHaveClass(/g-label_theme_success/);
+        await expect(legendLabels.nth(0).locator('svg').first()).toBeVisible();
+        await expect(legendLabels.nth(1).locator('svg').first()).toBeVisible();
+        await expect(legendLabels.nth(2).locator('svg')).toHaveCount(0);
         await expect(page).toHaveURL(/pdisksGroupBy=Maintenance/);
     });
 

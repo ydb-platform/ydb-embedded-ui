@@ -1,5 +1,6 @@
 import {
     ArrowUpFromLine,
+    Ban,
     CircleExclamation,
     CircleExclamationFill,
     CircleQuestionFill,
@@ -10,10 +11,16 @@ import {
     ClockFill,
     HourglassStart,
     TrashBin,
+    Wrench,
     Xmark,
 } from '@gravity-ui/icons';
 
-import type {EDecommitStatus, EDriveStatus, TPDiskState} from '../../types/api/pdisk';
+import type {
+    EDecommitStatus,
+    EDriveStatus,
+    EMaintenanceStatus,
+    TPDiskState,
+} from '../../types/api/pdisk';
 
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
@@ -160,6 +167,33 @@ export function getPDiskDecommitDisplayState(status?: EDecommitStatus): PDiskSta
     return status === undefined
         ? NOT_AVAILABLE_DISPLAY_STATE
         : PDISK_DECOMMIT_DISPLAY_STATE[status];
+}
+
+const PDISK_MAINTENANCE_DISPLAY_STATE: Record<EMaintenanceStatus, PDiskStateDisplayState> = {
+    NOT_SET: {
+        severity: NOT_AVAILABLE_SEVERITY,
+        icon: CircleQuestionFill,
+    },
+    NO_REQUEST: {
+        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
+        icon: undefined,
+    },
+    LONG_TERM_MAINTENANCE_PLANNED: {
+        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+        icon: Wrench,
+    },
+    NO_NEW_VDISKS: {
+        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
+        icon: Ban,
+    },
+};
+
+export function getPDiskMaintenanceDisplayState(
+    status?: EMaintenanceStatus,
+): PDiskStateDisplayState {
+    return status === undefined
+        ? NOT_AVAILABLE_DISPLAY_STATE
+        : PDISK_MAINTENANCE_DISPLAY_STATE[status];
 }
 
 function isPDiskStateDisplayState(
