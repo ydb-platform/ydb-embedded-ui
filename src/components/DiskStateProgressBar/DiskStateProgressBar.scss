@@ -348,6 +348,14 @@
         &#{$block}_green {
             --entity-state-border-color: var(--g-color-line-positive);
             --entity-state-icon-color: var(--g-color-text-positive);
+
+            --entity-state-background-color: var(--g-color-base-positive-light);
+            --entity-state-stripe-color: var(--g-color-base-positive-light);
+
+            &#{$block}_highlighted {
+                --entity-state-background-color: var(--g-color-base-positive-light-hover);
+                --entity-state-stripe-color: var(--g-color-base-positive-light-hover);
+            }
         }
 
         &#{$block}_yellow {
