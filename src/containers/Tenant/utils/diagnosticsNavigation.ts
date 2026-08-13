@@ -23,7 +23,10 @@ export const V2_DATABASE_PAGE_DIAGNOSTICS_TABS = [
 ] as const satisfies readonly TenantDiagnosticsTab[];
 
 const V2_DATABASE_PAGE_TABS = new Set<TenantDiagnosticsTab>(V2_DATABASE_PAGE_DIAGNOSTICS_TABS);
-const V2_DUPLICATED_TABS = new Set<TenantDiagnosticsTab>([TENANT_DIAGNOSTICS_TABS_IDS.tablets]);
+const V2_DUPLICATED_TABS = new Set<TenantDiagnosticsTab>([
+    TENANT_DIAGNOSTICS_TABS_IDS.nodes,
+    TENANT_DIAGNOSTICS_TABS_IDS.tablets,
+]);
 
 export function getTenantPageForDiagnosticsTab(
     tab: TenantDiagnosticsTab,

@@ -179,7 +179,7 @@ const databasePageById = {
 
 const DB_PAGES = V2_DATABASE_PAGE_DIAGNOSTICS_TABS.map((id) => databasePageById[id]);
 
-const DIAGNOSTICS_DB_PAGES = [overview, topShards, tablets, describe, access];
+const DIAGNOSTICS_DB_PAGES = [overview, topShards, nodes, tablets, describe, access];
 
 const ALL_SERVERLESS_DB_PAGES = [
     overview,
@@ -318,9 +318,6 @@ function applyFilters(pages: Page[], options: GetPagesOptions = {}) {
 
     const removals: TenantDiagnosticsTab[] = [];
 
-    if (options.databasePagesDisplay === 'diagnostics') {
-        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.nodes);
-    }
     if (!options.hasTopicData) {
         removals.push(TENANT_DIAGNOSTICS_TABS_IDS.topicData);
     }

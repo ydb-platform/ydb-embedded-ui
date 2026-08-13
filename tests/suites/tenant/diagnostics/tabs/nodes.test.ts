@@ -5,12 +5,12 @@ import {DiagnosticsNodesTable} from '../../../paginatedTable/paginatedTable';
 import {TenantPage} from '../../TenantPage';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
-test.describe('Database Nodes tab', async () => {
+test.describe('Diagnostics Nodes tab', async () => {
     test('Nodes tab shows nodes table with memory viewer', async ({page}) => {
         const pageQueryParams = {
             schema: database,
             database,
-            databasePage: 'database',
+            databasePage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);

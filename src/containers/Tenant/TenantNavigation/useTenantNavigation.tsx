@@ -9,32 +9,17 @@ import routes, {getTenantPath, parseQuery} from '../../../routes';
 import {DEFAULT_USER_SETTINGS, SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {
     LEGACY_TENANT_PAGE,
-    TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_PAGE,
     TENANT_PAGES_IDS,
 } from '../../../store/reducers/tenant/constants';
 import {tenantPageSchema} from '../../../store/reducers/tenant/types';
 import type {TenantPage} from '../../../store/reducers/tenant/types';
 import {useSetting} from '../../../utils/hooks';
-import {TenantTabsGroups} from '../TenantPages';
 import i18n from '../i18n';
-import {getTenantPageForDiagnosticsTab} from '../utils/diagnosticsNavigation';
 import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
 const pagesList: Array<TenantPage> = ['query', 'diagnostics'];
 const pagesListV2: Array<TenantPage> = ['database', 'diagnostics', 'query'];
-
-function shouldResetNodesTab(
-    tenantPage: TenantPage | undefined,
-    diagnosticsTab: unknown,
-    isV2Enabled: boolean,
-) {
-    return (
-        isV2Enabled &&
-        tenantPage === TENANT_PAGES_IDS.diagnostics &&
-        diagnosticsTab === TENANT_DIAGNOSTICS_TABS_IDS.nodes
-    );
-}
 
 const mapPageToIcon: Partial<Record<TenantPage, IconData>> = {
     query: Terminal,
@@ -95,17 +80,7 @@ export function useTenantNavigation(): TenantNavigationItem[] {
         const items = pages.map((key) => {
             const pageId = TENANT_PAGES_IDS[key];
             const pagePath = getTenantPath(
-                {
-                    ...queryParams,
-                    [TENANT_PAGE]: pageId,
-                    ...(shouldResetNodesTab(
-                        pageId,
-                        queryParams[TenantTabsGroups.diagnosticsTab],
-                        isV2Enabled,
-                    ) && {
-                        [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.overview,
-                    }),
-                },
+                {...queryParams, [TENANT_PAGE]: pageId},
                 {withBasename: true},
             );
             const icon = isV2Enabled ? mapPageToIcon2[key] : mapPageToIcon[key];
@@ -132,18 +107,12 @@ export function useTenantNavigation(): TenantNavigationItem[] {
 }
 
 export function useTenantPage() {
-    const isV2Enabled = useNavigationV2Enabled();
     const [
-        {
-            databasePage: databasePageFromQuery,
-            tenantPage: legacyTenantPageFromQuery,
-            diagnosticsTab: diagnosticsTabFromQuery,
-        },
+        {databasePage: databasePageFromQuery, tenantPage: legacyTenantPageFromQuery},
         setQueryParams,
     ] = useQueryParams({
         [TENANT_PAGE]: StringParam,
         [LEGACY_TENANT_PAGE]: StringParam,
-        [TenantTabsGroups.diagnosticsTab]: StringParam,
     });
 
     // Backward compatibility: prefer the new `databasePage` param, but fall back to
@@ -156,16 +125,10 @@ export function useTenantPage() {
 
     const handleTenantPageChange = React.useCallback(
         (value?: TenantPage) => {
-            setQueryParams({
-                [TENANT_PAGE]: value,
-                [LEGACY_TENANT_PAGE]: undefined,
-                ...(shouldResetNodesTab(value, diagnosticsTabFromQuery, isV2Enabled) && {
-                    [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.overview,
-                }),
-            });
+            setQueryParams({[TENANT_PAGE]: value, [LEGACY_TENANT_PAGE]: undefined});
             setInitialTenantPage(value);
         },
-        [diagnosticsTabFromQuery, isV2Enabled, setQueryParams, setInitialTenantPage],
+        [setQueryParams, setInitialTenantPage],
     );
 
     const parsedInitialPage = React.useMemo(
@@ -176,40 +139,21 @@ export function useTenantPage() {
         [initialTenantPage],
     );
 
-    const parsedTenantPage = React.useMemo(
+    const tenantPage = React.useMemo(
         () => tenantPageSchema.catch(parsedInitialPage).parse(tenantPageFromQuery),
         [tenantPageFromQuery, parsedInitialPage],
     );
-
-    const isNodesDiagnosticsDeepLink =
-        isV2Enabled &&
-        tenantPageFromQuery === TENANT_PAGES_IDS.diagnostics &&
-        diagnosticsTabFromQuery === TENANT_DIAGNOSTICS_TABS_IDS.nodes;
-
-    const tenantPage = isNodesDiagnosticsDeepLink
-        ? getTenantPageForDiagnosticsTab(
-              TENANT_DIAGNOSTICS_TABS_IDS.nodes,
-              isV2Enabled,
-              parsedTenantPage,
-          )
-        : parsedTenantPage;
 
     React.useEffect(() => {
         // Migrate legacy `tenantPage` to `databasePage` and drop the old key from the URL.
         if (legacyTenantPageFromQuery !== undefined && legacyTenantPageFromQuery !== null) {
             setQueryParams(
                 {
-                    [TENANT_PAGE]: isNodesDiagnosticsDeepLink
-                        ? tenantPage
-                        : (databasePageFromQuery ?? legacyTenantPageFromQuery),
+                    [TENANT_PAGE]: databasePageFromQuery ?? legacyTenantPageFromQuery,
                     [LEGACY_TENANT_PAGE]: undefined,
                 },
                 'replaceIn',
             );
-            return;
-        }
-        if (isNodesDiagnosticsDeepLink) {
-            setQueryParams({[TENANT_PAGE]: tenantPage}, 'replaceIn');
             return;
         }
         try {
@@ -224,8 +168,6 @@ export function useTenantPage() {
         tenantPageFromQuery,
         legacyTenantPageFromQuery,
         databasePageFromQuery,
-        isNodesDiagnosticsDeepLink,
-        tenantPage,
     ]);
 
     return {tenantPage, handleTenantPageChange} as const;
