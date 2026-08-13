@@ -62,6 +62,21 @@ export interface TDomainKey {
     PathId?: string;
 }
 
+export interface THiveInfoResponse {
+    Tablets?: THiveTabletInfo[];
+}
+
+export interface THiveTabletInfo {
+    /** fixed64 */
+    TabletID?: string;
+    TabletOwner?: {
+        /** fixed64 */
+        Owner?: string;
+    };
+    /** uint64 */
+    ObjectId?: string;
+}
+
 export enum EType {
     'Unknown' = 'Unknown',
     'OldSchemeShard' = 'OldSchemeShard',

@@ -3,6 +3,7 @@ import type {ITabletPreparedHistoryItem} from '../../types/store/tablet';
 import {prepareNodesMap} from '../../utils/nodes';
 
 import {api} from './api';
+import {getTabletObjectKey} from './tablet/utils';
 
 export const tabletApi = api.injectEndpoints({
     endpoints: (build) => ({
@@ -88,6 +89,35 @@ export const tabletApi = api.injectEndpoints({
                 }
             },
             providesTags: ['All'],
+        }),
+        getTabletObjectPath: build.query({
+            queryFn: async (
+                {id, hiveId, database}: {id: string; hiveId: string; database: string},
+                {signal},
+            ) => {
+                try {
+                    const hiveInfo = await window.api.viewer.getHiveTablet({id, hiveId}, {signal});
+                    const objectKey = getTabletObjectKey(hiveInfo, id);
+
+                    if (!objectKey) {
+                        return {data: null};
+                    }
+
+                    const objectDescribe = await window.api.viewer.getTabletDescribe(
+                        objectKey,
+                        database,
+                        {signal},
+                    );
+                    const objectPath = objectDescribe?.Path?.trim();
+
+                    return {data: objectPath || null};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: (_result, _error, arg) => {
+                return ['All', {type: 'Tablet', id: arg.id}];
+            },
         }),
         getAdvancedTableInfo: build.query({
             queryFn: async ({id, hiveId}: {id: string; hiveId: string}, {signal}) => {

@@ -1,11 +1,12 @@
 import {Flex} from '@gravity-ui/uikit';
 import {Link} from 'react-router-dom';
 
-import type {InfoViewerItem} from '../../../../components/InfoViewer';
-import {InfoViewer} from '../../../../components/InfoViewer';
+import {LinkToSchemaObject} from '../../../../components/LinkToSchemaObject/LinkToSchemaObject';
 import {LinkWithIcon} from '../../../../components/LinkWithIcon/LinkWithIcon';
 import {TabletState} from '../../../../components/TabletState/TabletState';
 import {TabletUptime} from '../../../../components/UptimeViewer/UptimeViewer';
+import type {YDBDefinitionListItem} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {getDefaultNodePath, useTabletPagePath} from '../../../../routes';
 import {ETabletState} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
@@ -15,7 +16,8 @@ import {
     useHasDeveloperUi,
 } from '../../../../utils/developerUI/developerUI';
 import {useDatabaseFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
-import {hasHive} from '../../utils';
+import {transformPath} from '../../../Tenant/ObjectSummary/transformPath';
+import {getTabletObjectKind, hasHive} from '../../utils';
 
 import {tabletInfoKeyset} from './i18n';
 
@@ -25,9 +27,11 @@ import './TabletInfo.scss';
 
 interface TabletInfoProps {
     tablet: TTabletStateInfo;
+    objectPath?: string;
+    objectDatabase?: string;
 }
 
-export const TabletInfo = ({tablet}: TabletInfoProps) => {
+export const TabletInfo = ({tablet, objectPath, objectDatabase}: TabletInfoProps) => {
     const getTabletPagePath = useTabletPagePath();
     const hasDeveloperUi = useHasDeveloperUi();
     const database = useDatabaseFromQuery();
@@ -41,17 +45,38 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
         State,
         TenantId: {SchemeShard} = {},
         TabletId,
+        Type,
     } = tablet;
 
     const hasHiveId = hasHive(HiveId);
     const hasUptime = State === ETabletState.Active;
+    const objectKind = getTabletObjectKind(Type);
 
-    const tabletInfo: InfoViewerItem[] = [];
+    const tabletInfo: YDBDefinitionListItem[] = [];
+
+    if (objectPath && objectKind) {
+        const objectDisplayPath = objectDatabase
+            ? transformPath(objectPath, objectDatabase)
+            : objectPath;
+
+        tabletInfo.push({
+            name: tabletInfoKeyset(objectKind === 'table' ? 'field_table' : 'field_topic'),
+            content: (
+                <LinkToSchemaObject
+                    path={objectPath}
+                    database={objectDatabase}
+                    className={b('link')}
+                >
+                    {objectDisplayPath}
+                </LinkToSchemaObject>
+            ),
+        });
+    }
 
     if (hasHiveId) {
         tabletInfo.push({
-            label: tabletInfoKeyset('field_hive'),
-            value: (
+            name: tabletInfoKeyset('field_hive'),
+            content: (
                 <Link to={getTabletPagePath(HiveId)} className={b('link')}>
                     {HiveId}
                 </Link>
@@ -61,8 +86,8 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
 
     if (SchemeShard) {
         tabletInfo.push({
-            label: tabletInfoKeyset('field_scheme-shard'),
-            value: (
+            name: tabletInfoKeyset('field_scheme-shard'),
+            content: (
                 <Link to={getTabletPagePath(SchemeShard)} className={b('link')}>
                     {SchemeShard}
                 </Link>
@@ -70,20 +95,23 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
         });
     }
 
-    tabletInfo.push({label: tabletInfoKeyset('field_state'), value: <TabletState state={State} />});
+    tabletInfo.push({
+        name: tabletInfoKeyset('field_state'),
+        content: <TabletState state={State} />,
+    });
 
     if (hasUptime) {
         tabletInfo.push({
-            label: tabletInfoKeyset('field_uptime'),
-            value: <TabletUptime ChangeTime={ChangeTime} />,
+            name: tabletInfoKeyset('field_uptime'),
+            content: <TabletUptime ChangeTime={ChangeTime} />,
         });
     }
 
     tabletInfo.push(
-        {label: tabletInfoKeyset('field_generation'), value: Generation},
+        {name: tabletInfoKeyset('field_generation'), content: Generation},
         {
-            label: tabletInfoKeyset('field_node'),
-            value: (
+            name: tabletInfoKeyset('field_node'),
+            content: (
                 <Link
                     className={b('link')}
                     to={getDefaultNodePath({id: String(NodeId)}, {database})}
@@ -95,17 +123,8 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
     );
 
     if (FollowerId) {
-        tabletInfo.push({label: tabletInfoKeyset('field_follower'), value: FollowerId});
+        tabletInfo.push({name: tabletInfoKeyset('field_follower'), content: FollowerId});
     }
-
-    const renderTabletInfo = () => {
-        return (
-            <div>
-                <div className={b('section-title')}>{tabletInfoKeyset('title_info')}</div>
-                <InfoViewer info={tabletInfo} />
-            </div>
-        );
-    };
 
     const renderLinks = () => {
         if (!hasDeveloperUi || !TabletId) {
@@ -138,7 +157,11 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
 
     return (
         <Flex gap={10} wrap="nowrap">
-            {renderTabletInfo()}
+            <YDBDefinitionList
+                title={tabletInfoKeyset('title_info')}
+                items={tabletInfo}
+                responsive
+            />
             {renderLinks()}
         </Flex>
     );

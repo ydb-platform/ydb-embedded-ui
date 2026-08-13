@@ -13,6 +13,7 @@ import {getSchemaObjectLinkDiagnosticsTab} from './utils';
 
 interface LinkToSchemaObjectProps extends Omit<React.ComponentProps<typeof InternalLink>, 'to'> {
     path: string;
+    database?: string;
 }
 
 function shouldRefreshSchemaTree(
@@ -30,7 +31,13 @@ function shouldRefreshSchemaTree(
     );
 }
 
-export function LinkToSchemaObject({path, onClick, target, ...props}: LinkToSchemaObjectProps) {
+export function LinkToSchemaObject({
+    path,
+    database,
+    onClick,
+    target,
+    ...props
+}: LinkToSchemaObjectProps) {
     const location = useLocation();
     const isV2NavigationEnabled = useNavigationV2Enabled();
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
@@ -39,7 +46,10 @@ export function LinkToSchemaObject({path, onClick, target, ...props}: LinkToSche
     const diagnosticsTab =
         getSchemaObjectLinkDiagnosticsTab(queryParams, isV2NavigationEnabled) ??
         TENANT_DIAGNOSTICS_TABS_IDS.overview;
-    const pathToSchemaObject = getDiagnosticsPageLink(diagnosticsTab, {schema: path});
+    const pathToSchemaObject = getDiagnosticsPageLink(diagnosticsTab, {
+        ...(database ? {database} : {}),
+        schema: path,
+    });
 
     const handleClick = React.useCallback(
         (event: React.MouseEvent<HTMLAnchorElement>) => {
