@@ -6,9 +6,12 @@ import {ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
 import {InternalLinkButton} from '../../../components/InternalLinkButton/InternalLinkButton';
 import {VersionsBar} from '../../../components/VersionsBar/VersionsBar';
 import {getTenantPath} from '../../../routes';
+import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_PAGE} from '../../../store/reducers/tenant/constants';
 import {cn} from '../../../utils/cn';
 import type {PreparedNodeSystemState} from '../../../utils/nodes';
 import type {PreparedVersion} from '../../../utils/versions/types';
+import {getTenantPageForDiagnosticsTab} from '../../Tenant/utils/diagnosticsNavigation';
+import {useNavigationV2Enabled} from '../../Tenant/utils/useNavigationV2Enabled';
 import i18n from '../i18n';
 import type {GroupedNodesItem} from '../types';
 
@@ -37,6 +40,8 @@ export const NodesTreeTitle = ({
     preparedVersions,
     onClick,
 }: NodesTreeTitleProps) => {
+    const isV2Enabled = useNavigationV2Enabled();
+
     const handleClick = React.useCallback(() => {
         onClick?.();
     }, [onClick]);
@@ -58,14 +63,23 @@ export const NodesTreeTitle = ({
         }
     }, [items, nodes]);
 
+    const nodesLink = React.useMemo(
+        () =>
+            getTenantPath({
+                database: title,
+                [TENANT_PAGE]: getTenantPageForDiagnosticsTab(
+                    TENANT_DIAGNOSTICS_TABS_IDS.nodes,
+                    isV2Enabled,
+                ),
+                diagnosticsTab: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
+            }),
+        [isV2Enabled, title],
+    );
+
     const renderNodesCount = () => {
         if (isDatabase) {
             return (
-                <InternalLinkButton
-                    size="s"
-                    href={getTenantPath({database: title, diagnosticsTab: 'nodes'})}
-                    onClick={stopPropagation}
-                >
+                <InternalLinkButton size="s" href={nodesLink} onClick={stopPropagation}>
                     {i18n('nodes-count', {count: nodesAmount})}
                     <Icon data={ArrowRight} />
                 </InternalLinkButton>
