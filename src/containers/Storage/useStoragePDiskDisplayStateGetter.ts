@@ -7,7 +7,11 @@ import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
 import type {PDiskDisplayStateGetter} from '../../utils/disks/displayState';
 import {getDefaultPDiskDisplayState} from '../../utils/disks/displayState';
 import {calculateSpaceIcon} from '../../utils/disks/iconCalculators';
-import {getPDiskDriveDisplayState, getPDiskStateDisplayState} from '../../utils/disks/pdiskState';
+import {
+    getPDiskDecommitDisplayState,
+    getPDiskDriveDisplayState,
+    getPDiskStateDisplayState,
+} from '../../utils/disks/pdiskState';
 import {calculateSpaceSeverity} from '../../utils/disks/severityCalculators';
 
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
@@ -25,6 +29,8 @@ function getModeModifier(groupBy: PDisksGroupByValue): string | undefined {
             return 'mode-space';
         case PDisksGroupBy.Drive:
             return 'mode-drive';
+        case PDisksGroupBy.Decommit:
+            return 'mode-decommit';
         default:
             return undefined;
     }
@@ -79,6 +85,23 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
                         pDisk.DriveStatus === undefined
                             ? CircleQuestionFill
                             : driveDisplayState.icon,
+                    modeModifier,
+                    isLegendInactive: false,
+                    showNoDataPlaceholder: false,
+                    allocatedPercent: undefined,
+                    width: EXPERT_MODE_PDISK_WIDTH,
+                };
+            }
+
+            if (pdisksGroupBy === PDisksGroupBy.Decommit) {
+                const decommitDisplayState = getPDiskDecommitDisplayState(pDisk.DecommitStatus);
+
+                return {
+                    ...decommitDisplayState,
+                    icon:
+                        pDisk.DecommitStatus === undefined
+                            ? CircleQuestionFill
+                            : decommitDisplayState.icon,
                     modeModifier,
                     isLegendInactive: false,
                     showNoDataPlaceholder: false,

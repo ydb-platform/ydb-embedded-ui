@@ -97,7 +97,8 @@
 
     // State mode: specific visual variants
     &_mode-state,
-    &_mode-drive {
+    &_mode-drive,
+    &_mode-decommit {
         // OK state
         &#{$block}_green {
             --entity-state-border-color: var(--g-color-base-positive-medium);
@@ -113,6 +114,11 @@
         &#{$block}_red {
             --entity-state-border-color: var(--g-color-base-danger-heavy);
         }
+    }
+
+    &_mode-decommit#{$block}_blue {
+        --entity-state-border-color: var(--g-color-base-info-medium);
+        --entity-state-icon-color: var(--g-color-text-info);
     }
 
     &_mode-all {

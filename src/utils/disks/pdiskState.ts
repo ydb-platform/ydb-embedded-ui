@@ -1,4 +1,5 @@
 import {
+    ArrowUpFromLine,
     CircleExclamation,
     CircleExclamationFill,
     CircleQuestionFill,
@@ -7,10 +8,12 @@ import {
     CircleXmarkFill,
     Clock,
     ClockFill,
+    HourglassStart,
     TrashBin,
+    Xmark,
 } from '@gravity-ui/icons';
 
-import type {EDriveStatus, TPDiskState} from '../../types/api/pdisk';
+import type {EDecommitStatus, EDriveStatus, TPDiskState} from '../../types/api/pdisk';
 
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
@@ -128,6 +131,35 @@ const PDISK_DRIVE_DISPLAY_STATE: Record<EDriveStatus, PDiskStateDisplayState> = 
 
 export function getPDiskDriveDisplayState(status?: EDriveStatus): PDiskStateDisplayState {
     return status === undefined ? NOT_AVAILABLE_DISPLAY_STATE : PDISK_DRIVE_DISPLAY_STATE[status];
+}
+
+const PDISK_DECOMMIT_DISPLAY_STATE: Record<EDecommitStatus, PDiskStateDisplayState> = {
+    DECOMMIT_UNSET: {
+        severity: NOT_AVAILABLE_SEVERITY,
+        icon: CircleQuestionFill,
+    },
+    DECOMMIT_NONE: {
+        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
+        icon: undefined,
+    },
+    DECOMMIT_PENDING: {
+        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue,
+        icon: HourglassStart,
+    },
+    DECOMMIT_IMMINENT: {
+        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+        icon: ArrowUpFromLine,
+    },
+    DECOMMIT_REJECTED: {
+        severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
+        icon: Xmark,
+    },
+};
+
+export function getPDiskDecommitDisplayState(status?: EDecommitStatus): PDiskStateDisplayState {
+    return status === undefined
+        ? NOT_AVAILABLE_DISPLAY_STATE
+        : PDISK_DECOMMIT_DISPLAY_STATE[status];
 }
 
 function isPDiskStateDisplayState(
