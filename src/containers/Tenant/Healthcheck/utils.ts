@@ -1,8 +1,28 @@
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 
+import i18n from './i18n';
 import type {CommonIssueCategory} from './shared';
 import type {HealthcheckAssistantSnapshot, HealthcheckAssistantTarget} from './types';
+
+export function getHealthcheckIssueDisclosureLabel({
+    expanded,
+    issue,
+}: {
+    expanded: boolean;
+    issue?: string;
+}) {
+    if (!issue) {
+        return i18n(expanded ? 'action_collapse-issue-details' : 'action_expand-issue-details');
+    }
+
+    return i18n(
+        expanded
+            ? 'action_collapse-issue-details-with-issue'
+            : 'action_expand-issue-details-with-issue',
+        {issue},
+    );
+}
 
 export function getDatabaseHealthcheckAssistantTarget({
     database,
@@ -13,7 +33,7 @@ export function getDatabaseHealthcheckAssistantTarget({
     clusterName?: string;
     scope: 'cluster' | 'database';
 }): HealthcheckAssistantTarget {
-    const request = clusterName === undefined ? {database} : {database, clusterName};
+    const request = clusterName ? {database, clusterName} : {database};
 
     return scope === 'database' ? {scope: 'database', request} : {scope: 'cluster', request};
 }

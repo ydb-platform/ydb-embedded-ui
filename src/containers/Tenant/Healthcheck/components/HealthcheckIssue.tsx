@@ -7,9 +7,9 @@ import {EntityStatus} from '../../../../components/EntityStatusNew/EntityStatus'
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
 import {hcStatusToColorFlag} from '../../../../store/reducers/healthcheckInfo/utils';
 import {useHealthcheckContext} from '../HealthcheckContext';
-import i18n from '../i18n';
 import {b} from '../shared';
 import type {HealthcheckAssistantActionProps} from '../types';
+import {getHealthcheckIssueDisclosureLabel} from '../utils';
 
 import {IssueDetails} from './HealthcheckIssueDetails/HealthcheckIssueDetails';
 import {HealthcheckIssueTabs} from './HealthcheckIssueTabs';
@@ -151,11 +151,10 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                                     type="button"
                                     aria-controls={ariaControls}
                                     aria-expanded={isExpanded}
-                                    aria-label={
-                                        isExpanded
-                                            ? i18n('action_collapse-issue-details')
-                                            : i18n('action_expand-issue-details')
-                                    }
+                                    aria-label={getHealthcheckIssueDisclosureLabel({
+                                        expanded: isExpanded,
+                                        issue: issue.message,
+                                    })}
                                     className={b('issue-chevron')}
                                     data-qa={qa}
                                     disabled={disabled}
