@@ -15,6 +15,9 @@ import {
 describe('disk severity calculators', () => {
     test.each([
         [EFlag.Green, EFlag.Green, COMPACTION_SEVERITY.OK],
+        [EFlag.Blue, EFlag.Green, COMPACTION_SEVERITY.OK],
+        [EFlag.Green, EFlag.Blue, COMPACTION_SEVERITY.OK],
+        [EFlag.Blue, EFlag.Blue, COMPACTION_SEVERITY.OK],
         [undefined, EFlag.Green, NOT_AVAILABLE_SEVERITY],
         [EFlag.Grey, EFlag.Green, NOT_AVAILABLE_SEVERITY],
         [undefined, EFlag.Yellow, COMPACTION_SEVERITY.NOTICE],

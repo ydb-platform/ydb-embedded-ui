@@ -121,6 +121,7 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
                   whiteboardAvailableSize === undefined || whiteboardTotalSize === undefined
                       ? undefined
                       : whiteboardSizeFields.AllocatedSize,
+              AllocatedPercent: whiteboardSizeFields.AllocatedPercent,
               TotalSize: whiteboardTotalSize,
           }
         : undefined;

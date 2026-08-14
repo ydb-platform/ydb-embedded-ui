@@ -117,7 +117,7 @@ export function calculateFrontQueuesSeverity(vDisk: PreparedVDisk): DisplaySever
 /**
  * Calculate severity based on two related status flags.
  * Border color is determined by the worst flag:
- * - Both Green -> Green border (OK)
+ * - Both Green or Blue -> Green border (OK)
  * - Missing or Grey outranks Green -> no-data styling
  * - At least one Yellow -> Yellow border (NOTICE)
  * - At least one Orange or Red -> Red border (WARNING)
@@ -136,7 +136,7 @@ export function calculateFlagPairSeverity(
         return COMPACTION_SEVERITY.NOTICE;
     }
 
-    return firstFlag === EFlag.Green && secondFlag === EFlag.Green
+    return flags.every((flag) => flag === EFlag.Green || flag === EFlag.Blue)
         ? COMPACTION_SEVERITY.OK
         : NOT_AVAILABLE_SEVERITY;
 }

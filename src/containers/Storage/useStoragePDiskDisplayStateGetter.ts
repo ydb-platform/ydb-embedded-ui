@@ -45,11 +45,7 @@ function getModeModifier(groupBy: PDisksGroupByValue): string | undefined {
 }
 
 function requiresWhiteboardData(groupBy: PDisksGroupByValue) {
-    return (
-        groupBy === PDisksGroupBy.State ||
-        groupBy === PDisksGroupBy.Space ||
-        groupBy === PDisksGroupBy.Device
-    );
+    return groupBy === PDisksGroupBy.State || groupBy === PDisksGroupBy.Device;
 }
 
 export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
@@ -79,6 +75,10 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
 
             if (pdisksGroupBy === PDisksGroupBy.Space) {
                 const capacityAlert = pDisk.PDiskCapacityAlert;
+                const allocatedPercent =
+                    pDisk.WhiteboardSize === undefined
+                        ? pDisk.AllocatedPercent
+                        : pDisk.WhiteboardSize.AllocatedPercent;
 
                 return {
                     severity: calculateSpaceSeverity({CapacityAlert: capacityAlert}),
@@ -87,7 +87,7 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
                     isLegendInactive:
                         isCapacityAlert(capacityAlert) && inactiveAlerts.has(capacityAlert),
                     showNoDataPlaceholder: false,
-                    allocatedPercent: pDisk.AllocatedPercent,
+                    allocatedPercent,
                     width: EXPERT_MODE_PDISK_WIDTH,
                 };
             }
