@@ -6,6 +6,8 @@
   "field_state": "State",
   "field_uptime": "Uptime",
   "field_node": "Node",
+  "field_table": "Table",
+  "field_topic": "Topic",
   "field_links": "Links",
   "field_developer-ui-app": "App",
   "field_developer-ui-counters": "Counters",

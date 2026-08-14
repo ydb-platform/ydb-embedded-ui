@@ -38,6 +38,7 @@ import type {TEvSystemStateResponse} from '../../types/api/systemState';
 import type {
     TDomainKey,
     TEvTabletStateResponse,
+    THiveInfoResponse,
     UnmergedTEvTabletStateResponse,
 } from '../../types/api/tablet';
 import type {TTenantInfo, TTenants} from '../../types/api/tenant';
@@ -371,6 +372,21 @@ export class ViewerAPI extends BaseYdbAPI {
                 consumer,
             },
             {concurrentId: concurrentId || 'getConsumer', requestConfig: {signal}},
+        );
+    }
+
+    getHiveTablet(
+        {id, hiveId}: {id: string; hiveId: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<THiveInfoResponse>(
+            this.getPath('/viewer/json/hiveinfo'),
+            {
+                enums: true,
+                hive_id: hiveId,
+                tablet_id: id,
+            },
+            {concurrentId, requestConfig: {signal}},
         );
     }
 

@@ -29,7 +29,7 @@ import {TabletInfo} from './components/TabletInfo';
 import {TabletStorageInfo} from './components/TabletStorageInfo/TabletStorageInfo';
 import {TabletTable} from './components/TabletTable';
 import i18n from './i18n';
-import {hasHive} from './utils';
+import {getTabletObjectKind, hasHive} from './utils';
 
 import './Tablet.scss';
 
@@ -114,7 +114,14 @@ export function Tablet() {
             <PageMetaWithAutorefresh items={metaItems} />
             <LoaderWrapper loading={loading} size="l">
                 {error ? <ResponseError error={error} /> : null}
-                {currentData ? <TabletContent id={id} tablet={tablet} history={history} /> : null}
+                {currentData ? (
+                    <TabletContent
+                        id={id}
+                        tablet={tablet}
+                        history={history}
+                        database={database || databaseFullPath}
+                    />
+                ) : null}
             </LoaderWrapper>
         </Flex>
     );
@@ -124,13 +131,23 @@ function TabletContent({
     id,
     tablet,
     history,
+    database,
 }: {
     id: string;
     tablet: TTabletStateInfo;
     history: ITabletPreparedHistoryItem[];
+    database?: string;
 }) {
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isEmpty = !Object.keys(tablet).length;
-    const {Overall, HiveId, FollowerId, Type} = tablet;
+    const {Overall, HiveId, FollowerId, TabletId, Type} = tablet;
+    const objectKind = getTabletObjectKind(Type);
+    const objectQueryArgs =
+        isUserAllowedToMakeChanges && objectKind && TabletId && hasHive(HiveId) && database
+            ? {id: TabletId, hiveId: HiveId, database}
+            : skipToken;
+    const {currentData: objectPath} = tabletApi.useGetTabletObjectPathQuery(objectQueryArgs);
+    const visibleObjectPath = isUserAllowedToMakeChanges ? objectPath || undefined : undefined;
 
     const tabletName = `${id}${FollowerId ? `.${FollowerId}` : ''}`;
 
@@ -147,7 +164,11 @@ function TabletContent({
                     id={tabletName}
                 />
                 <TabletControls tablet={tablet} />
-                <TabletInfo tablet={tablet} />
+                <TabletInfo
+                    tablet={tablet}
+                    objectPath={visibleObjectPath}
+                    objectDatabase={database}
+                />
             </Flex>
             <TabletTabs id={id} hiveId={HiveId} history={history} />
         </EmptyStateWrapper>
