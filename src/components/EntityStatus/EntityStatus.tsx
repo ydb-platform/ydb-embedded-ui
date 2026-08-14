@@ -51,7 +51,7 @@ interface EntityStatusLabelProps {
     withStatusName?: boolean;
     size?: LabelProps['size'];
     iconSize?: number;
-    onClick?: () => void;
+    onClick?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
 function EntityStatusLabel({
