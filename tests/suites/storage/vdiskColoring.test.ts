@@ -15,6 +15,7 @@ import {storagePage} from '../../utils/constants';
 import {
     ALL_GREEN_VDISK_INDEX,
     MISSING_FRONT_QUEUES_VDISK_INDEX,
+    MISSING_STATE_VDISK_INDEX,
     MISSING_WHITEBOARD_VDISK_INDEX,
     createMockStorageGroupsResponse,
 } from './mockStorageGroups';
@@ -456,7 +457,12 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             .getByTestId('storage-pdisks-expert-mode-legend')
             .locator('.g-label');
         const cases = [
-            {pDiskIndex: 0, vDiskIndex: 0, color: 'grey', iconReference: undefined},
+            {
+                pDiskIndex: 0,
+                vDiskIndex: MISSING_STATE_VDISK_INDEX,
+                color: 'grey',
+                iconReference: 'vdisk',
+            },
             {pDiskIndex: 4, vDiskIndex: 4, color: 'green', iconReference: undefined},
             {pDiskIndex: 5, vDiskIndex: 5, color: 'yellow', iconReference: 'vdisk'},
             {pDiskIndex: 6, vDiskIndex: 9, color: 'red', iconReference: 'vdisk'},
@@ -675,8 +681,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(initialCompactionSlot).toHaveCSS('width', '17px');
             const initialCompactionIcons = initialCompactionSlot.locator('.g-icon');
             await expect(initialCompactionIcons).toHaveCount(2);
-            const expectedPositiveColor = await resolveThemeColor(page, '--g-color-text-positive');
-            await expect(initialCompactionIcons.nth(0)).toHaveCSS('color', expectedPositiveColor);
+            await expect(initialCompactionIcons.nth(0)).toHaveCSS('color', MISSING_INDICATOR_COLOR);
             await expect(initialCompactionIcons.nth(1)).toHaveCSS('color', expectedTextColor);
 
             const [initialCompactionSlotBox, initialCompactionIconBoxes] = await Promise.all([
