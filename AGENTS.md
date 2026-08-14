@@ -130,9 +130,9 @@ src/
 
 ### Key Architectural Patterns
 
-1. **Component Registry Pattern**: Runtime registration of extensible components via `componentsRegistry`
+1. **Component Registry Pattern**: Runtime replacement of whole existing structural components via `componentsRegistry`
 2. **Slots Pattern**: Component composition with extensibility points (`AppSlots`)
-3. **UIFactory Pattern**: `configureUIFactory()` in `src/uiFactory/uiFactory.ts` allows customizing monitoring links, healthcheck views, feature flags, and more when using the library
+3. **UIFactory Pattern**: `configureUIFactory()` in `src/uiFactory/uiFactory.ts` is the primary entry point for package-consumer callbacks, options, configuration, and optional leaf renderers/actions
 4. **Feature-based Organization**: Features grouped with their state, API, and components
 5. **Separation of Concerns**: Clear separation between UI and business logic
 6. **Library Export Pattern**: `src/lib.ts` exports key components, utilities, and configuration functions for use as an npm package
@@ -455,6 +455,11 @@ const [urlSortParam, setUrlSortParam] = useQueryParam<SortOrder[]>(paramName, So
 ### UIFactory Pattern
 
 The `uiFactory` in `src/uiFactory/uiFactory.ts` provides an extensibility layer for customizing the UI when using the project as a library. Use `configureUIFactory()` to override defaults like monitoring links, healthcheck views, feature flags, and access control.
+
+- **ALWAYS** add new package-consumer callbacks, options/configuration, and optional leaf renderers/actions through `configureUIFactory()`; use `renderMonitoring` and `renderNodeTooltipActions` as canonical renderer examples.
+- Reserve `componentsRegistry` for replacing a whole existing structural component.
+- Do not add a registry slot or `additionalProps` for a leaf extension unless the code documents why `uiFactory` cannot express the requirement.
+- Do not migrate existing legacy extension surfaces without a separate task.
 
 ### Debugging Tips
 
