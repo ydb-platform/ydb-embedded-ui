@@ -10,15 +10,15 @@ import i18n from '../i18n';
 
 const newQuery = {
     id: TENANT_QUERY_TABS_ID.newQuery,
-    title: i18n('tabs.newQuery'),
+    title: i18n('title_query-editor-tab'),
 };
 const history = {
     id: TENANT_QUERY_TABS_ID.history,
-    title: i18n('tabs.history'),
+    title: i18n('title_query-history-tab'),
 };
 const saved = {
     id: TENANT_QUERY_TABS_ID.saved,
-    title: i18n('tabs.saved'),
+    title: i18n('title_saved-queries-tab'),
 };
 
 export const queryEditorTabs = [newQuery, history, saved];

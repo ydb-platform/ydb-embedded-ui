@@ -185,12 +185,12 @@ export function useQueryTabsActions() {
             }
 
             reachMetricaGoal('duplicateQueryTab', {tabsCount: tabsOrder.length});
-            const baseTitle = tab.title || i18n('editor-tabs.default-title');
+            const baseTitle = tab.title || i18n('title_new-query');
             const tabId = uuidv4();
             dispatch(
                 addQueryTab({
                     tabId,
-                    title: i18n('editor-tabs.duplicate-title', {title: baseTitle}),
+                    title: i18n('title_query-copy', {title: baseTitle}),
                     input: tab.input,
                     makeActive: true,
                 }),

@@ -134,7 +134,7 @@ function QueriesHistory({queriesHistory}: QueriesHistoryProps) {
                     <Search
                         value={filter}
                         onChange={onChangeFilter}
-                        placeholder={i18n('filter.text.placeholder')}
+                        placeholder={i18n('field_query-text-search')}
                         className={b('search')}
                     />
                 </TableWithControlsLayout.Controls>
@@ -147,7 +147,7 @@ function QueriesHistory({queriesHistory}: QueriesHistoryProps) {
                         detectClickOutside
                         isPercentageWidth
                         drawerControls={drawerControls}
-                        title={i18n('title_query-details')}
+                        title={i18n('title_query-history-details')}
                         defaultWidth={50}
                     >
                         <ResizeableDataTable
@@ -156,7 +156,9 @@ function QueriesHistory({queriesHistory}: QueriesHistoryProps) {
                             data={sortedHistory}
                             settings={QUERY_TABLE_SETTINGS}
                             emptyDataMessage={i18n(
-                                filter ? 'history.empty-search' : 'history.empty',
+                                filter
+                                    ? 'context_query-history-search-empty'
+                                    : 'context_query-history-empty',
                             )}
                             rowClassName={(row) =>
                                 b('table-row', {active: row.queryId === selectedId})

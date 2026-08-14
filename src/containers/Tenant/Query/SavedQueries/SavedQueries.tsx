@@ -42,14 +42,14 @@ const DeleteDialog = ({visible, queryName, onCancelClick, onConfirmClick}: Delet
             onClose={onCancelClick}
             onEnterKeyDown={onConfirmClick}
         >
-            <Dialog.Header caption={i18n('delete-dialog.header')} />
+            <Dialog.Header caption={i18n('title_delete-query')} />
             <Dialog.Body className={b('dialog-body')}>
-                {i18n('delete-dialog.question')}
+                {i18n('confirm_delete-query')}
                 <span className={b('dialog-query-name')}>{` ${queryName}?`}</span>
             </Dialog.Body>
             <Dialog.Footer
-                textButtonApply={i18n('delete-dialog.delete')}
-                textButtonCancel={i18n('delete-dialog.cancel')}
+                textButtonApply={i18n('action_delete-query')}
+                textButtonCancel={i18n('action_cancel-query-deletion')}
                 onClickButtonCancel={onCancelClick}
                 onClickButtonApply={onConfirmClick}
                 propsButtonApply={{className: BRAND_BUTTON_CLASS}}
@@ -123,17 +123,17 @@ export const SavedQueries = () => {
                         <TruncatedQuery value={query.body} maxQueryHeight={MAX_QUERY_HEIGHT} />
                     </div>
                     <span className={b('controls')}>
-                        <ActionTooltip title={i18n('action.edit')}>
-                            <Button view="flat-secondary" aria-label={i18n('action.edit')}>
+                        <ActionTooltip title={i18n('action_edit-query')}>
+                            <Button view="flat-secondary" aria-label={i18n('action_edit-query')}>
                                 <Icon data={Pencil} />
                             </Button>
                         </ActionTooltip>
 
-                        <ActionTooltip title={i18n('delete-dialog.delete')}>
+                        <ActionTooltip title={i18n('action_delete-query')}>
                             <Button
                                 view="flat-secondary"
                                 onClick={onDeleteQueryClick(query.name)}
-                                aria-label={i18n('delete-dialog.delete')}
+                                aria-label={i18n('action_delete-query')}
                             >
                                 <Icon data={TrashBin} />
                             </Button>
@@ -152,7 +152,7 @@ export const SavedQueries = () => {
                 <TableWithControlsLayout.Controls>
                     <Search
                         onChange={onChangeFilter}
-                        placeholder={i18n('filter.text.placeholder')}
+                        placeholder={i18n('field_query-text-search')}
                         className={b('search')}
                     />
                 </TableWithControlsLayout.Controls>
@@ -162,7 +162,11 @@ export const SavedQueries = () => {
                         columns={columns}
                         data={filteredSavedQueries}
                         settings={QUERY_TABLE_SETTINGS}
-                        emptyDataMessage={i18n(filter ? 'history.empty-search' : 'saved.empty')}
+                        emptyDataMessage={i18n(
+                            filter
+                                ? 'context_query-history-search-empty'
+                                : 'context_saved-queries-empty',
+                        )}
                         rowClassName={() => b('row')}
                         onRowClick={(row) =>
                             onQueryClick({

@@ -26,7 +26,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
     const columns: Column<QueryInHistory>[] = [
         {
             name: 'startTime',
-            header: i18n('history.startTime'),
+            header: i18n('field_query-start-time'),
             render: ({row}) => {
                 let startTime: number | undefined;
                 if (valueIsDefined(row.startTime)) {
@@ -48,7 +48,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
         },
         {
             name: 'Status',
-            header: i18n('history.status'),
+            header: i18n('field_query-status'),
             render: ({row: {status}}) => {
                 if (!status) {
                     return EMPTY_DATA_PLACEHOLDER;
@@ -59,7 +59,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
         },
         {
             name: 'Duration',
-            header: i18n('history.duration'),
+            header: i18n('field_query-duration'),
             render: ({row: {durationUs}}) => {
                 if (!valueIsDefined(durationUs)) {
                     return EMPTY_DATA_PLACEHOLDER;
@@ -73,7 +73,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
         },
         {
             name: 'queryText',
-            header: i18n('history.queryText'),
+            header: i18n('field_query-text'),
             render: ({row}) => {
                 return (
                     <YDBSyntaxHighlighter
@@ -92,7 +92,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
             render: ({row}) => {
                 return (
                     <Flex className={b('actions')} gap={2}>
-                        <ActionTooltip title={i18n('action.save-query')}>
+                        <ActionTooltip title={i18n('action_save-query')}>
                             <Button
                                 qa="save-query-button"
                                 onClick={(e) => {
@@ -112,7 +112,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
                                 openInEditor(row);
                             }}
                         >
-                            {i18n('action_open-in-editor')}
+                            {i18n('action_open-query-in-editor')}
                         </Button>
                     </Flex>
                 );
@@ -132,13 +132,13 @@ export function getQueryInfoItems(query: QueryInHistory) {
 
     if (valueIsDefined(startTime)) {
         items.push({
-            name: i18n('history.startTime'),
+            name: i18n('field_query-start-time'),
             content: formatDateTime(startTime),
         });
     }
     if (valueIsDefined(durationUs)) {
         items.push({
-            name: i18n('history.duration'),
+            name: i18n('field_query-duration'),
             content: <QueryDuration durationUs={durationUs} textVariant="body-2" />,
         });
     }

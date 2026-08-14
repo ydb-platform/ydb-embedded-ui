@@ -59,7 +59,7 @@ export function EditorTabItem({
     onCloseOtherTabs,
     onCloseAllTabs,
 }: EditorTabItemProps) {
-    const title = tab.title || i18n('editor-tabs.default-title');
+    const title = tab.title || i18n('title_new-query');
     const isDirty = Boolean(tab.isDirty);
     const executionStatus = getTabExecutionStatus(tab);
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -135,20 +135,20 @@ export function EditorTabItem({
         return [
             [
                 {
-                    text: i18n('editor-tabs.rename-query'),
+                    text: i18n('action_rename-query-tab'),
                     iconStart: <FontCursor />,
                     iconEnd: <Hotkey value={HOTKEY_LABELS.renameTab} />,
                     action: createMenuAction(handleRenameClick),
                 },
                 {
-                    text: i18n('editor-tabs.duplicate'),
+                    text: i18n('action_duplicate-query-tab'),
                     iconStart: <Copy />,
                     action: createMenuAction(handleDuplicateClick),
                 },
             ],
             [
                 {
-                    text: i18n('editor-tabs.save-query-as'),
+                    text: i18n('action_save-query-as'),
                     iconStart: <FloppyDisk />,
                     iconEnd: <Hotkey value={HOTKEY_LABELS.saveQueryAs} />,
                     action: createMenuAction(handleSaveQueryAsClick),
@@ -156,19 +156,19 @@ export function EditorTabItem({
             ],
             [
                 {
-                    text: i18n('editor-tabs.close'),
+                    text: i18n('action_close-query-tab'),
                     iconStart: <Xmark />,
                     iconEnd: <Hotkey value={HOTKEY_LABELS.closeTab} />,
                     action: createMenuAction(() => onCloseTab(tabId)),
                 },
                 {
-                    text: i18n('editor-tabs.close-other-tabs'),
+                    text: i18n('action_close-other-query-tabs'),
                     iconStart: <Xmark />,
                     iconEnd: <Hotkey value={HOTKEY_LABELS.closeOtherTabs} />,
                     action: createMenuAction(handleCloseOtherTabsClick),
                 },
                 {
-                    text: i18n('editor-tabs.close-all-tabs'),
+                    text: i18n('action_close-all-query-tabs'),
                     iconStart: <Xmark />,
                     iconEnd: <Hotkey value={HOTKEY_LABELS.closeAllTabs} />,
                     action: createMenuAction(handleCloseAllTabsClick),
@@ -226,7 +226,7 @@ export function EditorTabItem({
                         />
                     </span>
                     <ActionTooltip
-                        title={i18n('editor-tabs.close')}
+                        title={i18n('action_close-query-tab')}
                         placement={['top-start', 'top-end', 'bottom-start', 'bottom-end']}
                         hotkey={HOTKEY_LABELS.closeTab}
                     >
