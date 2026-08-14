@@ -1,3 +1,5 @@
+@use '../../styles/mixins.scss';
+
 .ydb-entity-status {
     &__note {
         color: inherit;
