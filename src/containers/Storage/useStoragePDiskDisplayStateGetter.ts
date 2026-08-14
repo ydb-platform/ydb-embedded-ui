@@ -75,10 +75,12 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
 
             if (pdisksGroupBy === PDisksGroupBy.Space) {
                 const capacityAlert = pDisk.PDiskCapacityAlert;
+                const whiteboardAllocatedPercent = pDisk.WhiteboardSize?.AllocatedPercent;
                 const allocatedPercent =
-                    pDisk.WhiteboardSize === undefined
-                        ? pDisk.AllocatedPercent
-                        : pDisk.WhiteboardSize.AllocatedPercent;
+                    typeof whiteboardAllocatedPercent === 'number' &&
+                    Number.isFinite(whiteboardAllocatedPercent)
+                        ? whiteboardAllocatedPercent
+                        : pDisk.AllocatedPercent;
 
                 return {
                     severity: calculateSpaceSeverity({CapacityAlert: capacityAlert}),

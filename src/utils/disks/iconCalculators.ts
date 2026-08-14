@@ -170,6 +170,7 @@ function getFlagIconWithColor(flag: EFlag | undefined): IconWithColor | undefine
     }
 
     switch (flag) {
+        case EFlag.Blue:
         case EFlag.Green:
             return {
                 icon: CircleCheckFill,
@@ -199,7 +200,8 @@ export function calculateFlagPairIcon(
     firstFlag: EFlag | undefined,
     secondFlag: EFlag | undefined,
 ): IconWithColor[] | undefined {
-    if (firstFlag === EFlag.Green && secondFlag === EFlag.Green) {
+    const flags = [firstFlag, secondFlag];
+    if (flags.every((flag) => flag === EFlag.Green || flag === EFlag.Blue)) {
         return undefined;
     }
 
