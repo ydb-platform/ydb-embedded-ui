@@ -92,6 +92,7 @@ Before committing ordinary code changes, run `npm run typecheck && npm run lint 
 - Playwright uses page objects from `tests/models/` and `data-qa` selectors (`testIdAttribute` in `playwright.config.ts`). User-visible integration paths must account for both Chromium and Safari projects.
 - For route/state/persistence/API wiring, verify the integration path, not only a new helper or component in isolation.
 - CI workflow changes must not install unpinned latest tools when the lockfile or another job defines the version. Do not let verification jobs rewrite tracked manifests or lockfiles unless that is the task.
+- Use Conventional Commit headers for commits and PR titles, with a lowercase subject and a maximum of 72 characters; CI enforces this for PR titles via `.github/workflows/pr-title.yml`.
 - If a deterministic check fails before reaching product code because of sandbox, credentials, dependencies, or runner setup, report the exact environment blocker and rerun in a suitable environment before changing product code.
 
 ## Done when
