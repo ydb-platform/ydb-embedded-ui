@@ -1,8 +1,14 @@
 import type {Locator, Page} from '@playwright/test';
 import {expect, test} from '@playwright/test';
 
-import {VDisksGroupBy} from '../../../src/containers/Storage/StorageExpertModePanel/constants';
-import type {VDisksGroupByValue} from '../../../src/containers/Storage/StorageExpertModePanel/constants';
+import {
+    PDisksGroupBy,
+    VDisksGroupBy,
+} from '../../../src/containers/Storage/StorageExpertModePanel/constants';
+import type {
+    PDisksGroupByValue,
+    VDisksGroupByValue,
+} from '../../../src/containers/Storage/StorageExpertModePanel/constants';
 import {TPDiskState} from '../../../src/types/api/pdisk';
 import {storagePage} from '../../utils/constants';
 
@@ -32,6 +38,15 @@ const VDISK_GROUP_BY_MODES: {value: VDisksGroupByValue; slug: string}[] = [
     {value: VDisksGroupBy.FrontQueues, slug: 'frontqueues'},
     {value: VDisksGroupBy.Compaction, slug: 'compaction'},
     {value: VDisksGroupBy.All, slug: 'all'},
+];
+
+const PDISK_GROUP_BY_MODES: {value: PDisksGroupByValue; slug: string}[] = [
+    {value: PDisksGroupBy.State, slug: 'state'},
+    {value: PDisksGroupBy.Space, slug: 'space'},
+    {value: PDisksGroupBy.Drive, slug: 'drive'},
+    {value: PDisksGroupBy.Decommit, slug: 'decommit'},
+    {value: PDisksGroupBy.Maintenance, slug: 'maintenance'},
+    {value: PDisksGroupBy.Device, slug: 'device'},
 ];
 
 const STORAGE_GROUPS = [
@@ -127,6 +142,10 @@ function getVDiskProgressBar(item: Locator) {
 
 function getPDiskItems(row: Locator) {
     return getStorageDisksArea(row).locator('.ydb-storage-disks__pdisk-item');
+}
+
+function getPDisksArea(row: Locator) {
+    return getStorageDisksArea(row).locator('.ydb-storage-disks__pdisks-wrapper').first();
 }
 
 function getPDiskProgressBar(item: Locator) {
@@ -299,6 +318,12 @@ async function expectStorageRowsScreenshot(page: Page, name: string) {
     });
 }
 
+async function expectPDiskScreenshot(pDisks: Locator, name: string) {
+    await expect(pDisks).toHaveScreenshot(name, {
+        timeout: 60_000,
+    });
+}
+
 async function expectStorageGroupRowsReady(page: Page) {
     for (const group of STORAGE_GROUPS) {
         const row = getStorageGroupRow(page, group.index);
@@ -320,6 +345,13 @@ async function preparePage(page: Page, vdisksGroupBy: VDisksGroupByValue) {
     await hideFloatingPopups(page);
     await setupForcedHoverStyles(page);
     await expectStorageGroupRowsReady(page);
+}
+
+async function preparePDiskPage(page: Page, pdisksGroupBy: PDisksGroupByValue) {
+    await page.addInitScript((groupByValue) => {
+        localStorage.setItem('storagePDisksGroupBy', JSON.stringify(groupByValue));
+    }, pdisksGroupBy);
+    await preparePage(page, VDisksGroupBy.State);
 }
 
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
@@ -907,6 +939,24 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                     page,
                     `vdisk-${mode.slug}-all-disks-hover-group-2.png`,
                 );
+            });
+        });
+    }
+});
+
+test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
+    test.describe.configure({timeout: 300_000});
+
+    for (const mode of PDISK_GROUP_BY_MODES) {
+        test.describe(`PDisk ${mode.value} mode`, () => {
+            test('renders the first storage group PDisk row', async ({page}) => {
+                await preparePDiskPage(page, mode.value);
+                const pDisks = getPDisksArea(getStorageGroupRow(page, 0));
+
+                await expectPDiskScreenshot(pDisks, `pdisk-${mode.slug}-first-row.png`);
+
+                await forceHoverStorageGroupVDiskItems(page, 0);
+                await expectPDiskScreenshot(pDisks, `pdisk-${mode.slug}-first-row-hover.png`);
             });
         });
     }
