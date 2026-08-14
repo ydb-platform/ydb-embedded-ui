@@ -12,11 +12,12 @@ import {useCurrentSchema} from './TenantContext';
 import i18n from './i18n';
 import {useTenantQueryParams} from './useTenantQueryParams';
 
-interface TenantDrawerWrapperProps {
+interface TenantDrawerHealthcheckProps {
     children: React.ReactNode;
+    clusterName?: string;
 }
 
-export function TenantDrawerHealthcheck({children}: TenantDrawerWrapperProps) {
+export function TenantDrawerHealthcheck({children, clusterName}: TenantDrawerHealthcheckProps) {
     const {database} = useCurrentSchema();
     const {
         handleShowHealthcheckChange,
@@ -25,10 +26,12 @@ export function TenantDrawerHealthcheck({children}: TenantDrawerWrapperProps) {
         handleHealthcheckViewChange,
     } = useTenantQueryParams();
 
-    const healthcheckStatus = useTypedSelector((state) => selectCheckStatus(state, database || ''));
+    const healthcheckStatus = useTypedSelector((state) =>
+        selectCheckStatus(state, database || '', clusterName),
+    );
 
     const healthcheckData = useTypedSelector((state) =>
-        selectAllHealthcheckInfo(state, database || ''),
+        selectAllHealthcheckInfo(state, database || '', clusterName),
     );
 
     const handleCloseDrawer = React.useCallback(() => {
@@ -38,8 +41,8 @@ export function TenantDrawerHealthcheck({children}: TenantDrawerWrapperProps) {
     }, [handleShowHealthcheckChange, handleIssuesFilterChange, handleHealthcheckViewChange]);
 
     const renderDrawerContent = React.useCallback(() => {
-        return <Healthcheck database={database} />;
-    }, [database]);
+        return <Healthcheck database={database} clusterName={clusterName} />;
+    }, [database, clusterName]);
 
     return (
         <HealthcheckDrawer

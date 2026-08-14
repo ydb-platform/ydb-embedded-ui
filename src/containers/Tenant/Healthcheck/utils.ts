@@ -1,7 +1,63 @@
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
+import type {RenderHealthcheckAssistantAction} from '../../../uiFactory/types';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 
+import i18n from './i18n';
 import type {CommonIssueCategory} from './shared';
+import type {HealthcheckAssistantSnapshot, HealthcheckAssistantTarget} from './types';
+
+export function getHealthcheckIssueDisclosureLabel({
+    expanded,
+    issue,
+}: {
+    expanded: boolean;
+    issue?: string;
+}) {
+    if (!issue) {
+        return i18n(expanded ? 'action_collapse-issue-details' : 'action_expand-issue-details');
+    }
+
+    return i18n(
+        expanded
+            ? 'action_collapse-issue-details-with-issue'
+            : 'action_expand-issue-details-with-issue',
+        {issue},
+    );
+}
+
+export function getDatabaseHealthcheckAssistantTarget({
+    database,
+    clusterName,
+    scope,
+}: {
+    database: string;
+    clusterName?: string;
+    scope: 'cluster' | 'database';
+}): HealthcheckAssistantTarget {
+    const request = clusterName ? {database, clusterName} : {database};
+
+    return scope === 'database' ? {scope: 'database', request} : {scope: 'cluster', request};
+}
+
+export function getHealthcheckAssistantContext({
+    renderAction,
+    successful,
+    target,
+    snapshot,
+}: {
+    renderAction?: RenderHealthcheckAssistantAction;
+    successful: boolean;
+    target: HealthcheckAssistantTarget;
+    snapshot: HealthcheckAssistantSnapshot;
+}):
+    | {
+          renderAction: RenderHealthcheckAssistantAction;
+          target: HealthcheckAssistantTarget;
+          snapshot: HealthcheckAssistantSnapshot;
+      }
+    | undefined {
+    return renderAction && successful ? {renderAction, target, snapshot} : undefined;
+}
 
 export function countHealthcheckIssuesByCategory<H extends string = CommonIssueCategory>(
     issueTrees: IssuesTree[],

@@ -2,11 +2,30 @@ import {
     MAX_DRAWER_WIDTH_PERCENTS,
     MIN_DRAWER_WIDTH_PERCENTS,
     MIN_DRAWER_WIDTH_PX,
+    getVisibleRightInset,
     normalizeDrawerWidthFromResize,
     normalizeDrawerWidthFromSavedString,
 } from '../DrawerWidthUtils';
 
 describe('DrawerWidthUtils', () => {
+    describe('getVisibleRightInset', () => {
+        it('returns the full inset when the provider is inside the viewport', () => {
+            expect(getVisibleRightInset({rightInset: 300, rightViewportOverflow: 0})).toBe(300);
+        });
+
+        it('subtracts the part of the inset outside the viewport', () => {
+            expect(getVisibleRightInset({rightInset: 300, rightViewportOverflow: 200})).toBe(100);
+        });
+
+        it('returns zero when the full inset is outside the viewport', () => {
+            expect(getVisibleRightInset({rightInset: 300, rightViewportOverflow: 300})).toBe(0);
+        });
+
+        it('treats negative viewport overflow as zero', () => {
+            expect(getVisibleRightInset({rightInset: 300, rightViewportOverflow: -100})).toBe(300);
+        });
+    });
+
     describe('normalizeDrawerWidthFromSavedString', () => {
         it('falls back when savedWidthString is missing/invalid', () => {
             expect(

@@ -8,7 +8,7 @@ import {cn} from '../../utils/cn';
 import {useSetting} from '../../utils/hooks/useSetting';
 import {CopyLinkButton} from '../CopyLinkButton/CopyLinkButton';
 
-import {useDrawerContext} from './DrawerContext';
+import {isClickInRightInset, useDrawerContextInternal} from './DrawerContext';
 import {
     normalizeDrawerWidthFromResize,
     normalizeDrawerWidthFromSavedString,
@@ -57,7 +57,9 @@ const DrawerPaneContentWrapper = ({
     const [userDrawerWidth, setUserDrawerWidth] = React.useState<number | undefined>(undefined);
 
     const drawerRef = React.useRef<HTMLDivElement>(null);
-    const {containerWidth, itemContainerRef} = useDrawerContext();
+    const {containerWidth, itemContainerRef, rightInset, visibleRightInset} =
+        useDrawerContextInternal();
+    const availableWidth = Math.max(0, containerWidth - visibleRightInset);
 
     const derivedDrawerWidth = React.useMemo(() => {
         return normalizeDrawerWidthFromSavedString({
@@ -70,24 +72,25 @@ const DrawerPaneContentWrapper = ({
         });
     }, [containerWidth, defaultWidth, isPercentageWidth, savedWidthString]);
 
-    const drawerWidth = userDrawerWidth ?? derivedDrawerWidth;
+    const requestedDrawerWidth = userDrawerWidth ?? derivedDrawerWidth;
 
     // Calculate drawer width based on container width percentage if specified
-    const calculatedWidth = React.useMemo(() => {
+    const requestedWidth = React.useMemo(() => {
         if (isPercentageWidth && containerWidth > 0) {
             return Math.round(
-                (containerWidth * (drawerWidth || DEFAULT_DRAWER_WIDTH_PERCENTS)) / 100,
+                (containerWidth * (requestedDrawerWidth || DEFAULT_DRAWER_WIDTH_PERCENTS)) / 100,
             );
         }
-        return drawerWidth || DEFAULT_DRAWER_WIDTH;
-    }, [containerWidth, isPercentageWidth, drawerWidth]);
+        return requestedDrawerWidth || DEFAULT_DRAWER_WIDTH;
+    }, [containerWidth, isPercentageWidth, requestedDrawerWidth]);
+    const calculatedWidth = Math.min(requestedWidth, availableWidth);
 
     const drawerOverlayStyle = React.useMemo<React.CSSProperties>(() => {
         return {
             overflow: 'hidden',
-            ...(containerWidth > 0 ? {width: containerWidth} : {}),
+            width: availableWidth,
         };
-    }, [containerWidth]);
+    }, [availableWidth]);
 
     React.useEffect(() => {
         if (!detectClickOutside || !isVisible) {
@@ -95,7 +98,11 @@ const DrawerPaneContentWrapper = ({
         }
 
         const handleClickOutside = (event: DrawerEvent) => {
-            if (event._capturedInsideDrawer || !event.isTrusted) {
+            if (
+                event._capturedInsideDrawer ||
+                !event.isTrusted ||
+                isClickInRightInset(event, itemContainerRef?.current ?? null, rightInset)
+            ) {
                 return;
             }
 
@@ -114,7 +121,7 @@ const DrawerPaneContentWrapper = ({
             window.clearTimeout(listenerTimeoutId);
             document.removeEventListener('click', handleClickOutside);
         };
-    }, [isVisible, onClose, detectClickOutside]);
+    }, [detectClickOutside, isVisible, itemContainerRef, onClose, rightInset]);
 
     const saveWidthDebounced = React.useMemo(() => {
         return debounce((value: string) => setSavedWidthString(value), SAVE_DEBOUNCE_MS);
@@ -171,7 +178,7 @@ const DrawerPaneContentWrapper = ({
             style={drawerOverlayStyle}
             container={itemContainer}
             resizable
-            maxSize={containerWidth || undefined}
+            maxSize={availableWidth}
             size={calculatedWidth}
             onResizeEnd={handleResizeDrawer}
             disableBodyScrollLock

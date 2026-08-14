@@ -5,13 +5,16 @@ import {
 } from '../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
 import {useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
+import type {IssueLog} from '../../../types/api/healthcheck';
 import {SelfCheckResult} from '../../../types/api/healthcheck';
 import type {ETenantType} from '../../../types/api/tenant';
 import {useTypedSelector} from '../../../utils/hooks';
 
 interface HealthcheckParams {
     leavesIssues: IssuesTree[];
+    issues: IssueLog[];
     loading: boolean;
+    successful: boolean;
     error?: unknown;
     refetch: () => void;
     selfCheckResult: SelfCheckResult;
@@ -51,11 +54,13 @@ export const useHealthcheck = (
 
     return {
         loading: data === undefined && isFetching,
+        successful: data !== undefined && error === undefined,
         error,
         refetch,
         selfCheckResult,
         fulfilledTimeStamp,
         leavesIssues,
+        issues: data?.issue_log ?? [],
     };
 };
 
@@ -81,10 +86,12 @@ export const useClusterHealthcheck = (
 
     return {
         loading: data === undefined && isFetching,
+        successful: data !== undefined && error === undefined,
         error,
         refetch,
         selfCheckResult,
         fulfilledTimeStamp,
         leavesIssues,
+        issues: data?.issue_log ?? [],
     };
 };

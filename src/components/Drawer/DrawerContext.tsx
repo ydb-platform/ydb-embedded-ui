@@ -2,6 +2,8 @@ import React from 'react';
 
 import {cn} from '../../utils/cn';
 
+import {getVisibleRightInset} from './DrawerWidthUtils';
+
 import './Drawer.scss';
 
 const b = cn('ydb-drawer');
@@ -9,24 +11,88 @@ const b = cn('ydb-drawer');
 export interface DrawerContextType {
     containerWidth: number;
     itemContainerRef: React.RefObject<HTMLDivElement> | null;
+    rightInset: number;
     setContainerWidth: React.Dispatch<React.SetStateAction<number>>;
+    setRightInset: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const DrawerContext = React.createContext<DrawerContextType>({
+interface DrawerInternalContextType extends DrawerContextType {
+    visibleRightInset: number;
+}
+
+const DrawerContext = React.createContext<DrawerInternalContextType>({
     containerWidth: 0,
     itemContainerRef: null,
+    rightInset: 0,
     setContainerWidth: () => {},
+    setRightInset: () => {},
+    visibleRightInset: 0,
 });
 
 interface DrawerContextProviderProps {
     children: React.ReactNode;
     className?: string;
+    rightInset?: number;
+    onRightInsetChange?: (rightInset: number) => void;
 }
 
-export const DrawerContextProvider = ({children, className}: DrawerContextProviderProps) => {
-    const [containerWidth, setContainerWidth] = React.useState(0);
+function normalizeRightInset(rightInset: number) {
+    return Number.isFinite(rightInset) ? Math.max(0, rightInset) : 0;
+}
+
+export function isClickInRightInset(
+    event: Pick<MouseEvent, 'clientX' | 'clientY'>,
+    itemContainer: HTMLElement | null,
+    rightInset: number,
+) {
+    if (rightInset <= 0 || !itemContainer) {
+        return false;
+    }
+    const providerContainer = itemContainer.parentElement;
+    if (!providerContainer) {
+        return false;
+    }
+
+    const itemRight = itemContainer.getBoundingClientRect().right;
+    const providerRect = providerContainer.getBoundingClientRect();
+    return (
+        event.clientX >= itemRight &&
+        event.clientX <= providerRect.right &&
+        event.clientY >= providerRect.top &&
+        event.clientY <= providerRect.bottom
+    );
+}
+
+export const DrawerContextProvider = ({
+    children,
+    className,
+    rightInset: controlledRightInset,
+    onRightInsetChange,
+}: DrawerContextProviderProps) => {
+    const [measuredContainerWidth, setContainerWidth] = React.useState(0);
+    const [rightViewportOverflow, setRightViewportOverflow] = React.useState(0);
+    const [internalRightInset, setInternalRightInset] = React.useState(0);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const itemContainerRef = React.useRef<HTMLDivElement>(null);
+    const rightInset = normalizeRightInset(controlledRightInset ?? internalRightInset);
+    const rightInsetRef = React.useRef(rightInset);
+    rightInsetRef.current = rightInset;
+
+    const setRightInset = React.useCallback<React.Dispatch<React.SetStateAction<number>>>(
+        (nextRightInset) => {
+            const nextValue = normalizeRightInset(
+                typeof nextRightInset === 'function'
+                    ? nextRightInset(rightInsetRef.current)
+                    : nextRightInset,
+            );
+            rightInsetRef.current = nextValue;
+            if (controlledRightInset === undefined) {
+                setInternalRightInset(nextValue);
+            }
+            onRightInsetChange?.(nextValue);
+        },
+        [controlledRightInset, onRightInsetChange],
+    );
 
     React.useEffect(() => {
         if (!containerRef.current) {
@@ -39,8 +105,10 @@ export const DrawerContextProvider = ({children, className}: DrawerContextProvid
                 const visibleLeft = Math.max(containerRect.left, 0);
                 const visibleRight = Math.min(containerRect.right, window.innerWidth);
                 const visibleWidth = Math.max(0, visibleRight - visibleLeft);
+                const nextRightViewportOverflow = Math.max(0, containerRect.right - visibleRight);
 
                 setContainerWidth(visibleWidth || containerRef.current.clientWidth);
+                setRightViewportOverflow(nextRightViewportOverflow);
             }
         };
 
@@ -50,21 +118,34 @@ export const DrawerContextProvider = ({children, className}: DrawerContextProvid
         // Update width on resize
         const resizeObserver = new ResizeObserver(updateWidth);
         resizeObserver.observe(containerRef.current);
+        window.addEventListener('resize', updateWidth);
 
         return () => {
             resizeObserver.disconnect();
+            window.removeEventListener('resize', updateWidth);
         };
     }, []);
+
+    const visibleRightInset = getVisibleRightInset({rightInset, rightViewportOverflow});
 
     // Memoize the context value to prevent unnecessary re-renders
     const value = React.useMemo(
         () => ({
-            containerWidth,
+            containerWidth: measuredContainerWidth,
             setContainerWidth,
             itemContainerRef,
+            rightInset,
+            setRightInset,
+            visibleRightInset,
         }),
-        [containerWidth],
+        [measuredContainerWidth, rightInset, setRightInset, visibleRightInset],
     );
+    const itemContainerStyle = React.useMemo<React.CSSProperties | undefined>(() => {
+        if (rightInset === 0) {
+            return undefined;
+        }
+        return {width: `max(0px, calc(100% - ${rightInset}px))`};
+    }, [rightInset]);
 
     return (
         <DrawerContext.Provider value={value}>
@@ -74,13 +155,17 @@ export const DrawerContextProvider = ({children, className}: DrawerContextProvid
                     Children styles should not affect drawer container behaviour 
                     So we mount it out of children in a separate portal
                 */}
-                <div ref={itemContainerRef} className={b('item-container')} />
+                <div
+                    ref={itemContainerRef}
+                    className={b('item-container')}
+                    style={itemContainerStyle}
+                />
             </div>
         </DrawerContext.Provider>
     );
 };
 
-export const useDrawerContext = (): DrawerContextType => {
+const useDrawerContextValue = () => {
     const context = React.useContext(DrawerContext);
 
     if (context === undefined) {
@@ -89,3 +174,7 @@ export const useDrawerContext = (): DrawerContextType => {
 
     return context;
 };
+
+export const useDrawerContext = (): DrawerContextType => useDrawerContextValue();
+
+export const useDrawerContextInternal = (): DrawerInternalContextType => useDrawerContextValue();

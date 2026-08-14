@@ -151,7 +151,10 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
 
     return (
         <DrawerContextProvider>
-            <ClusterDrawerHealthcheck database={cluster?.Domain || ''}>
+            <ClusterDrawerHealthcheck
+                database={cluster?.Domain || ''}
+                clusterName={clusterName ?? undefined}
+            >
                 <div className={b()} ref={container}>
                     <Helmet
                         defaultTitle={`${clusterTitle} — ${appTitle}`}

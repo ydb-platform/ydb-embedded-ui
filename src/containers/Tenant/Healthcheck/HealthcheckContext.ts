@@ -1,5 +1,9 @@
 import React from 'react';
 
+import type {RenderHealthcheckAssistantAction} from '../../../uiFactory/types';
+
+import type {HealthcheckAssistantSnapshot, HealthcheckAssistantTarget} from './types';
+
 export interface HealthcheckContextValue {
     /**
      * Cluster name to inject into generated links.
@@ -9,6 +13,11 @@ export interface HealthcheckContextValue {
     clusterName?: string;
     /** Database to inject into generated links when healthcheck is opened outside its page. */
     database?: string;
+    assistant?: {
+        renderAction: RenderHealthcheckAssistantAction;
+        target: HealthcheckAssistantTarget;
+        snapshot: HealthcheckAssistantSnapshot;
+    };
 }
 
 export const HealthcheckContext = React.createContext<HealthcheckContextValue>({});

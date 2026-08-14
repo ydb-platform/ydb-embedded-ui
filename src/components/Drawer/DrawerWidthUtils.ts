@@ -8,6 +8,11 @@ function clamp(value: number, min: number, max: number) {
     return Math.min(max, Math.max(min, value));
 }
 
+export function getVisibleRightInset(args: {rightInset: number; rightViewportOverflow: number}) {
+    const {rightInset, rightViewportOverflow} = args;
+    return Math.max(0, rightInset - Math.max(0, rightViewportOverflow));
+}
+
 function getFallbackWidth(args: {
     defaultWidth?: number;
     isPercentageWidth?: boolean;
