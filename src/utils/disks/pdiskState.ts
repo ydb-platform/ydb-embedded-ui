@@ -137,7 +137,10 @@ const PDISK_DRIVE_DISPLAY_STATE: Record<EDriveStatus, PDiskStateDisplayState> = 
 };
 
 export function getPDiskDriveDisplayState(status?: EDriveStatus): PDiskStateDisplayState {
-    return status === undefined ? NOT_AVAILABLE_DISPLAY_STATE : PDISK_DRIVE_DISPLAY_STATE[status];
+    if (status === undefined || PDISK_DRIVE_DISPLAY_STATE[status] === undefined) {
+        return NOT_AVAILABLE_DISPLAY_STATE;
+    }
+    return PDISK_DRIVE_DISPLAY_STATE[status];
 }
 
 const PDISK_DECOMMIT_DISPLAY_STATE: Record<EDecommitStatus, PDiskStateDisplayState> = {
@@ -166,7 +169,7 @@ const PDISK_DECOMMIT_DISPLAY_STATE: Record<EDecommitStatus, PDiskStateDisplaySta
 export function getPDiskDecommitDisplayState(status?: EDecommitStatus): PDiskStateDisplayState {
     return status === undefined
         ? NOT_AVAILABLE_DISPLAY_STATE
-        : PDISK_DECOMMIT_DISPLAY_STATE[status];
+        : (PDISK_DECOMMIT_DISPLAY_STATE[status] ?? NOT_AVAILABLE_DISPLAY_STATE);
 }
 
 const PDISK_MAINTENANCE_DISPLAY_STATE: Record<EMaintenanceStatus, PDiskStateDisplayState> = {
@@ -193,7 +196,7 @@ export function getPDiskMaintenanceDisplayState(
 ): PDiskStateDisplayState {
     return status === undefined
         ? NOT_AVAILABLE_DISPLAY_STATE
-        : PDISK_MAINTENANCE_DISPLAY_STATE[status];
+        : (PDISK_MAINTENANCE_DISPLAY_STATE[status] ?? NOT_AVAILABLE_DISPLAY_STATE);
 }
 
 function isPDiskStateDisplayState(

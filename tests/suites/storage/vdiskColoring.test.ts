@@ -954,7 +954,9 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
 
     for (const mode of PDISK_GROUP_BY_MODES) {
         test.describe(`PDisk ${mode.value} mode`, () => {
-            test('renders the first storage group PDisk row', async ({page}) => {
+            test(`renders the first storage group PDisk row in ${mode.slug} mode`, async ({
+                page,
+            }) => {
                 await preparePDiskPage(page, mode.value);
                 const pDisks = getPDisksArea(getStorageGroupRow(page, 0));
 

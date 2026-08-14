@@ -44,6 +44,14 @@ function getModeModifier(groupBy: PDisksGroupByValue): string | undefined {
     }
 }
 
+function requiresWhiteboardData(groupBy: PDisksGroupByValue) {
+    return (
+        groupBy === PDisksGroupBy.State ||
+        groupBy === PDisksGroupBy.Space ||
+        groupBy === PDisksGroupBy.Device
+    );
+}
+
 export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
     const isExpertMode = useIsStorageExpertMode();
     const pdisksGroupBy = usePDisksGroupByParam();
@@ -57,7 +65,7 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
 
             const modeModifier = getModeModifier(pdisksGroupBy);
 
-            if (pDisk.WhiteboardSize === undefined) {
+            if (pDisk.WhiteboardSize === undefined && requiresWhiteboardData(pdisksGroupBy)) {
                 return {
                     severity: NOT_AVAILABLE_SEVERITY,
                     icon: undefined,
