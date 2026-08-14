@@ -14,6 +14,7 @@ const snapshot: HealthcheckAssistantSnapshot = {
     selfCheckResult: SelfCheckResult.DEGRADED,
     issues: [],
 };
+const renderAction = () => null;
 
 describe('Healthcheck assistant context', () => {
     test('preserves the exact cluster-qualified drawer request', () => {
@@ -63,7 +64,7 @@ describe('Healthcheck assistant context', () => {
     test('does not expose an assistant context before a successful response', () => {
         expect(
             getHealthcheckAssistantContext({
-                hasAction: true,
+                renderAction,
                 successful: false,
                 target,
                 snapshot,
@@ -71,14 +72,25 @@ describe('Healthcheck assistant context', () => {
         ).toBeUndefined();
     });
 
-    test('exposes the target and snapshot after a successful response', () => {
+    test('does not expose an assistant context without a renderer', () => {
         expect(
             getHealthcheckAssistantContext({
-                hasAction: true,
+                renderAction: undefined,
                 successful: true,
                 target,
                 snapshot,
             }),
-        ).toEqual({target, snapshot});
+        ).toBeUndefined();
+    });
+
+    test('preserves the exact renderer, target, and snapshot after a successful response', () => {
+        expect(
+            getHealthcheckAssistantContext({
+                renderAction,
+                successful: true,
+                target,
+                snapshot,
+            }),
+        ).toEqual({renderAction, target, snapshot});
     });
 });

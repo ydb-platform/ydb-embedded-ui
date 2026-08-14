@@ -2,10 +2,6 @@ import React from 'react';
 
 import {Flex, Icon} from '@gravity-ui/uikit';
 
-import {
-    useComponent,
-    useHasComponent,
-} from '../../../components/ComponentsProvider/ComponentsProvider';
 import {useDrawerContextInternal} from '../../../components/Drawer/DrawerContext';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Fullscreen} from '../../../components/Fullscreen/Fullscreen';
@@ -14,6 +10,7 @@ import {Loader} from '../../../components/Loader';
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
 import {SelfCheckResult} from '../../../types/api/healthcheck';
 import type {ETenantType} from '../../../types/api/tenant';
+import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useTypedSelector} from '../../../utils/hooks';
 import {getIllustration} from '../../../utils/illustrations';
 import {HEALTHCHECK_RESULT_TO_TEXT} from '../constants';
@@ -120,8 +117,7 @@ function HealthcheckContent({
     target: HealthcheckAssistantTarget;
 }) {
     const SuccessImage = getIllustration('SuccessOperation');
-    const HealthcheckAssistantAction = useComponent('HealthcheckAssistantAction');
-    const hasHealthcheckAssistantAction = useHasComponent('HealthcheckAssistantAction');
+    const renderAssistantAction = uiFactory.healthcheck.renderAssistantAction;
     const healthcheckContext = React.useContext(HealthcheckContext);
     const {visibleRightInset} = useDrawerContextInternal();
 
@@ -149,9 +145,8 @@ function HealthcheckContent({
         () => countHealthcheckIssuesByCategory(leavesIssues),
         [leavesIssues],
     );
-    const showDiagnostics = hasHealthcheckAssistantAction && successful && issues.length > 0;
     const assistant = getHealthcheckAssistantContext({
-        hasAction: hasHealthcheckAssistantAction,
+        renderAction: renderAssistantAction,
         successful,
         target,
         snapshot,
@@ -161,15 +156,15 @@ function HealthcheckContent({
         return (
             <Flex direction="column" gap={3} className={b('controls', {fullscreen})}>
                 <Flex justifyContent="space-between" gap={2}>
-                    {showDiagnostics ? (
+                    {assistant && issues.length > 0 ? (
                         <React.Fragment>
                             <Flex gap={2} alignItems="center">
                                 <HealthcheckStatus status={selfCheckResult} />
-                                <HealthcheckAssistantAction
-                                    action="diagnostics"
-                                    target={target}
-                                    snapshot={snapshot}
-                                />
+                                {assistant.renderAction({
+                                    action: 'diagnostics',
+                                    target: assistant.target,
+                                    snapshot: assistant.snapshot,
+                                })}
                             </Flex>
                             <HealthcheckRefresh
                                 lastFullfiled={fulfilledTimeStamp}

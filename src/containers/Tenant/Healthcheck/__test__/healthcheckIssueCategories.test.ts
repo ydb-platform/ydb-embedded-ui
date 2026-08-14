@@ -1,6 +1,6 @@
 import {getLeavesFromTree} from '../../../../store/reducers/healthcheckInfo/utils';
 import type {IssueLog} from '../../../../types/api/healthcheck';
-import {configureUIFactory} from '../../../../uiFactory/uiFactory';
+import {configureUIFactory, uiFactory} from '../../../../uiFactory/uiFactory';
 import {
     getHealthcheckViewsOrder,
     getHealthckechViewTitles,
@@ -16,6 +16,7 @@ function resetHealthcheckFactory() {
             isIssueTypeOfCategory,
             getHealthckechViewTitles,
             getHealthcheckViewsOrder,
+            renderAssistantAction: undefined,
         },
     });
 }
@@ -113,6 +114,23 @@ describe('healthcheck issue categories', () => {
             storage: 0,
             unknown: 0,
             compute: 1,
+        });
+    });
+
+    test('merges the assistant renderer without losing existing healthcheck configuration', () => {
+        const previousHealthcheck = {
+            issueCategories: uiFactory.healthcheck.issueCategories,
+            isIssueTypeOfCategory: uiFactory.healthcheck.isIssueTypeOfCategory,
+            getHealthckechViewTitles: uiFactory.healthcheck.getHealthckechViewTitles,
+            getHealthcheckViewsOrder: uiFactory.healthcheck.getHealthcheckViewsOrder,
+        };
+        const renderAssistantAction = () => null;
+
+        configureUIFactory({healthcheck: {renderAssistantAction}});
+
+        expect(uiFactory.healthcheck).toMatchObject({
+            ...previousHealthcheck,
+            renderAssistantAction,
         });
     });
 });

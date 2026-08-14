@@ -5,11 +5,9 @@ export class Registry<Entities extends RegistryEntities = {}> {
     type?: Entities;
 
     private entities: any = {};
-    private placeholderIds = new Set<PropertyKey>();
 
     set<Id extends keyof Entities>(id: Id, entity: Entities[Id]) {
         this.entities[id] = entity;
-        this.placeholderIds.delete(id);
 
         return this;
     }
@@ -20,22 +18,11 @@ export class Registry<Entities extends RegistryEntities = {}> {
 
     has<Id extends keyof Entities>(id: Id): boolean {
         const entity = this.entities[id];
-        return Boolean(entity) && !this.placeholderIds.has(id);
+        return entity && entity.name !== 'EmptyPlaceholder';
     }
 
     register<Id extends string, T>(id: Id, entity: T): Registry<Entities & {[key in Id]: T}> {
         this.entities[id] = entity;
-        this.placeholderIds.delete(id);
-
-        return this;
-    }
-
-    registerPlaceholder<Id extends string, T>(
-        id: Id,
-        entity: T,
-    ): Registry<Entities & {[key in Id]: T}> {
-        this.entities[id] = entity;
-        this.placeholderIds.add(id);
 
         return this;
     }

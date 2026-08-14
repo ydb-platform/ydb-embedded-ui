@@ -39,7 +39,12 @@ export type {AsideNavigationProps} from './containers/AsideNavigation/AsideNavig
 export type {ExternalQueryToOpen} from './containers/Tenant/Query/hooks/useOpenExternalQueryInEditor';
 export type {DrawerContextType} from './components/Drawer';
 export type {GetMonitoringLink, GetMonitoringClusterLink} from './utils/monitoring';
-export type {GetReportProblemUrl, IllustrationComponent, IllustrationName} from './uiFactory/types';
+export type {
+    GetReportProblemUrl,
+    IllustrationComponent,
+    IllustrationName,
+    RenderHealthcheckAssistantAction,
+} from './uiFactory/types';
 export type {
     HealthcheckAssistantActionProps,
     HealthcheckAssistantSnapshot,

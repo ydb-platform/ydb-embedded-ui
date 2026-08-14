@@ -1,4 +1,5 @@
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
+import type {RenderHealthcheckAssistantAction} from '../../../uiFactory/types';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 
 import i18n from './i18n';
@@ -39,17 +40,23 @@ export function getDatabaseHealthcheckAssistantTarget({
 }
 
 export function getHealthcheckAssistantContext({
-    hasAction,
+    renderAction,
     successful,
     target,
     snapshot,
 }: {
-    hasAction: boolean;
+    renderAction?: RenderHealthcheckAssistantAction;
     successful: boolean;
     target: HealthcheckAssistantTarget;
     snapshot: HealthcheckAssistantSnapshot;
-}): {target: HealthcheckAssistantTarget; snapshot: HealthcheckAssistantSnapshot} | undefined {
-    return hasAction && successful ? {target, snapshot} : undefined;
+}):
+    | {
+          renderAction: RenderHealthcheckAssistantAction;
+          target: HealthcheckAssistantTarget;
+          snapshot: HealthcheckAssistantSnapshot;
+      }
+    | undefined {
+    return renderAction && successful ? {renderAction, target, snapshot} : undefined;
 }
 
 export function countHealthcheckIssuesByCategory<H extends string = CommonIssueCategory>(

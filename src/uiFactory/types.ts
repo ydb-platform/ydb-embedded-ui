@@ -6,6 +6,7 @@ import type {
     GetHealthcheckViewTitles,
     GetHealthcheckViewsOrder,
 } from '../containers/Tenant/Healthcheck/shared';
+import type {HealthcheckAssistantActionProps} from '../containers/Tenant/Healthcheck/types';
 import type {ClusterInfo} from '../store/reducers/cluster/cluster';
 import type {PreparedStorageNode} from '../store/reducers/storage/types';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
@@ -56,6 +57,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
         isIssueTypeOfCategory: (type: string, category: H) => boolean;
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;
         getHealthcheckViewsOrder: GetHealthcheckViewsOrder<H>;
+        renderAssistantAction?: RenderHealthcheckAssistantAction;
     };
     hasAccess: HasAccess;
     hideGrantAccess?: boolean;
@@ -189,6 +191,10 @@ export type RenderMonitoring = (props: {
 }) => React.ReactNode;
 
 export type RenderNodeTooltipActions = (props: {data?: PreparedStorageNode}) => React.ReactNode;
+
+export type RenderHealthcheckAssistantAction = (
+    props: HealthcheckAssistantActionProps,
+) => React.ReactNode;
 
 export interface UiMetricaGoals {
     runQuery?: string;

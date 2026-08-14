@@ -2,13 +2,11 @@ import React from 'react';
 
 import {ArrowToggle, Disclosure, Divider, Flex, Text} from '@gravity-ui/uikit';
 
-import {useComponent} from '../../../../components/ComponentsProvider/ComponentsProvider';
 import {EntityStatus} from '../../../../components/EntityStatusNew/EntityStatus';
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
 import {hcStatusToColorFlag} from '../../../../store/reducers/healthcheckInfo/utils';
 import {useHealthcheckContext} from '../HealthcheckContext';
 import {b} from '../shared';
-import type {HealthcheckAssistantActionProps} from '../types';
 import {getHealthcheckIssueDisclosureLabel} from '../utils';
 
 import {IssueDetails} from './HealthcheckIssueDetails/HealthcheckIssueDetails';
@@ -17,12 +15,6 @@ import {HealthcheckIssueTabs} from './HealthcheckIssueTabs';
 interface HealthcheckIssueProps {
     issue: IssuesTree;
     expanded?: boolean;
-}
-
-function RegisteredHealthcheckAssistantAction(props: HealthcheckAssistantActionProps) {
-    const HealthcheckAssistantAction = useComponent('HealthcheckAssistantAction');
-
-    return <HealthcheckAssistantAction {...props} />;
 }
 
 export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
@@ -139,12 +131,12 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                                     className={b('issue-action')}
                                     onClick={(event) => event.stopPropagation()}
                                 >
-                                    <RegisteredHealthcheckAssistantAction
-                                        action="fix"
-                                        target={assistant.target}
-                                        snapshot={assistant.snapshot}
-                                        issue={rawIssue}
-                                    />
+                                    {assistant.renderAction({
+                                        action: 'fix',
+                                        target: assistant.target,
+                                        snapshot: assistant.snapshot,
+                                        issue: rawIssue,
+                                    })}
                                 </div>
                                 <Divider className={b('issue-divider')} orientation="vertical" />
                                 <button
