@@ -7,7 +7,7 @@ Replace the 505-line root `AGENTS.md` with a concise, repository-specific guide 
 ## Constraints
 
 - Base the change on `origin/main` commit `8ca43b168f95fb77a53628d417dcb21185516e22`.
-- Update only the root `AGENTS.md`; keep `.github/copilot-instructions.md` unchanged, but check the two files for contradictions.
+- Update the root `AGENTS.md` and add only this design record; keep `.github/copilot-instructions.md` unchanged, but check the two instruction files for contradictions.
 - Preserve project-specific contracts that are not obvious from filenames or standard React/TypeScript knowledge.
 - Document only commands and paths verified against the repository.
 - Keep the result around 100-150 lines and below Codex's default combined project-instruction limit.
@@ -54,4 +54,4 @@ Replace the 505-line root `AGENTS.md` with a concise, repository-specific guide 
 
 ## Rollback
 
-The implementation is a single-file documentation change on `codex/update-agents-md`; rollback is the deletion of the branch/worktree or reverting the eventual `AGENTS.md` commit. No runtime behavior or external state is affected.
+The implementation changes two documentation files on `codex/update-agents-md`: the root `AGENTS.md` and this design record. Rollback is the deletion of the branch/worktree or reverting the documentation commits. No runtime behavior or external state is affected.
