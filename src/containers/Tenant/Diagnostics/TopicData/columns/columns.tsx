@@ -7,7 +7,7 @@ import {ActionTooltip, Icon, Popover, Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 import {Link} from 'react-router-dom';
 
-import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus';
+import {EntityName} from '../../../../../components/EntityName/EntityName';
 import {MultilineTableHeader} from '../../../../../components/MultilineTableHeader/MultilineTableHeader';
 import type {Column} from '../../../../../components/PaginatedTable';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
@@ -52,8 +52,7 @@ export const timestampCreateColumn: Column<TopicMessageEnhanced> = {
     align: DataTable.LEFT,
     render: ({row: {CreateTimestamp}}) =>
         CreateTimestamp ? (
-            <EntityStatus
-                showStatus={false}
+            <EntityName
                 renderName={() => <TopicDataTimestamp timestamp={CreateTimestamp} />}
                 name={formatTimestamp(CreateTimestamp)}
                 hasClipboardButton
@@ -74,8 +73,7 @@ export const timestampWriteColumn: Column<TopicMessageEnhanced> = {
     align: DataTable.LEFT,
     render: ({row: {WriteTimestamp}}) =>
         WriteTimestamp ? (
-            <EntityStatus
-                showStatus={false}
+            <EntityName
                 renderName={() => <TopicDataTimestamp timestamp={WriteTimestamp} />}
                 name={formatTimestamp(WriteTimestamp)}
                 hasClipboardButton
@@ -163,7 +161,7 @@ export const producerIdColumn: Column<TopicMessageEnhanced> = {
     align: DataTable.LEFT,
     render: ({row}) =>
         row.ProducerId ? (
-            <EntityStatus showStatus={false} name={row.ProducerId} hasClipboardButton />
+            <EntityName name={row.ProducerId} hasClipboardButton />
         ) : (
             EMPTY_DATA_PLACEHOLDER
         ),
@@ -175,11 +173,7 @@ export const seqNoColumn: Column<TopicMessageEnhanced> = {
     header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.SEQNO],
     align: DataTable.RIGHT,
     render: ({row}) =>
-        row.SeqNo ? (
-            <EntityStatus showStatus={false} name={row.SeqNo} hasClipboardButton />
-        ) : (
-            EMPTY_DATA_PLACEHOLDER
-        ),
+        row.SeqNo ? <EntityName name={row.SeqNo} hasClipboardButton /> : EMPTY_DATA_PLACEHOLDER,
     width: 100,
 };
 
@@ -188,11 +182,7 @@ export const ipColumn: Column<TopicMessageEnhanced> = {
     header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.IP],
     align: DataTable.LEFT,
     render: ({row}) =>
-        row.Ip ? (
-            <EntityStatus showStatus={false} name={row.Ip} hasClipboardButton />
-        ) : (
-            EMPTY_DATA_PLACEHOLDER
-        ),
+        row.Ip ? <EntityName name={row.Ip} hasClipboardButton /> : EMPTY_DATA_PLACEHOLDER,
     width: 220,
 };
 

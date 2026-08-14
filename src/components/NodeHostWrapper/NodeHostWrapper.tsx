@@ -4,7 +4,8 @@ import type {NodeAddress} from '../../types/additionalProps';
 import type {TNodeInfo, TSystemStateInfo} from '../../types/api/nodes';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {checkIsStorageNode, isUnavailableNode} from '../../utils/nodes';
-import {EntityStatus} from '../EntityStatus/EntityStatus';
+import {EntityName} from '../EntityName/EntityName';
+import {StatusColor} from '../StatusColor/StatusColor';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
 
 export type NodeHostData = NodeAddress &
@@ -48,11 +49,11 @@ export const NodeHostWrapper = ({
         : undefined;
 
     return (
-        <EntityStatus
+        <EntityName
             name={node.Host}
-            status={status}
             path={nodePath}
             hasClipboardButton
+            leadingContent={<StatusColor status={status} />}
             infoPopoverContent={
                 isNodeAvailable ? <NodeEndpointsTooltipContent data={node} /> : null
             }

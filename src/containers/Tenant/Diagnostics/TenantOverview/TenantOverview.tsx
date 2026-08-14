@@ -2,11 +2,12 @@ import React from 'react';
 
 import {Button, Flex, Icon} from '@gravity-ui/uikit';
 
-import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {EntityName} from '../../../../components/EntityName/EntityName';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
 import {ServerlessDBLabel} from '../../../../components/ServerlessDBLabel/ServerlessDBLabel';
+import {StatusColor} from '../../../../components/StatusColor/StatusColor';
 import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {healthcheckApi} from '../../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {
@@ -111,12 +112,12 @@ function TenantName({
 }) {
     return (
         <Flex alignItems="center" style={{overflow: 'hidden'}}>
-            <EntityStatus
-                status={databaseStatus}
+            <EntityName
                 name={name || TENANT_DEFAULT_TITLE}
                 withLeftTrim
                 hasClipboardButton={hasTenant}
                 clipboardButtonAlwaysVisible
+                leadingContent={<StatusColor status={databaseStatus} />}
             />
             {isServerless ? <ServerlessDBLabel className={b('serverless-tag')} /> : null}
         </Flex>

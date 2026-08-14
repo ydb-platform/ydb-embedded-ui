@@ -7,7 +7,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {DrawerContextProvider} from '../../components/Drawer/DrawerContext';
-import {EntityStatus} from '../../components/EntityStatusNew/EntityStatus';
+import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../components/InternalLink';
 import {NetworkTable} from '../../components/NetworkTable/NetworkTable';
 import {useShouldShowClusterNetworkTable} from '../../components/NetworkTable/hooks';

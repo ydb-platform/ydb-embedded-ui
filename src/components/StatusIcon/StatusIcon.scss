@@ -1,25 +1,4 @@
 .ydb-status-icon {
-    &__status-color {
-        &_state_green {
-            background-color: var(--ydb-color-status-green);
-        }
-        &_state_yellow {
-            background-color: var(--ydb-color-status-yellow);
-        }
-        &_state_blue {
-            background-color: var(--ydb-color-status-green);
-        }
-        &_state_red {
-            background-color: var(--ydb-color-status-red);
-        }
-        &_state_grey {
-            background-color: var(--ydb-color-status-grey);
-        }
-        &_state_orange {
-            background-color: var(--ydb-color-status-red);
-        }
-    }
-
     &__status-icon {
         &_state_grey {
             color: var(--ydb-color-status-grey);
@@ -41,7 +20,6 @@
         }
     }
 
-    &__status-color,
     &__status-icon {
         display: inline-flex;
         flex-shrink: 0;

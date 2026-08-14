@@ -2,7 +2,7 @@ import React from 'react';
 
 import {ArrowToggle, Disclosure, Divider, Flex, Text} from '@gravity-ui/uikit';
 
-import {EntityStatus} from '../../../../components/EntityStatusNew/EntityStatus';
+import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
 import {hcStatusToColorFlag} from '../../../../store/reducers/healthcheckInfo/utils';
 import {b} from '../shared';
