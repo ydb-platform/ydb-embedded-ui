@@ -8,7 +8,7 @@ Repository instructions for coding agents working on YDB Embedded UI.
 - Prefer the smallest reversible change that preserves existing behavior and follows the closest working feature slice.
 - Verify repository facts from tracked source, package scripts, and CI configuration; do not copy generic templates into this file.
 - The project is both a standalone React application and the `src/lib.ts` npm library. Treat exported package behavior as a compatibility boundary.
-- Keep durable repository rules here. Put personal tool preferences in user configuration and repeatable workflows in skills.
+- `AGENTS.md` is the primary repository-wide instruction set; `.github/copilot-instructions.md` is a short subset. Keep them non-contradictory without duplicating every rule. Put personal tool preferences in user configuration and repeatable workflows in skills.
 
 ## Commands
 
@@ -27,7 +27,7 @@ Node `>=24.0` and npm `^11.0.0` are required by `package.json`.
 | Library package build                  | `npm run package`          |
 | Playwright                             | `npm run test:e2e`         |
 
-Before committing ordinary code changes, run `npm run typecheck && npm run lint && npm test`. CI also runs `npm run build:embedded` and `npm run package`. Docker E2E commands require `PLAYWRIGHT_APP_BACKEND`; see `scripts/playwright-docker.sh`.
+Before committing ordinary code changes, run `npm run typecheck && npm run lint && npm test`. CI also runs `npm run build:embedded` and `npm run package`. By default, direct Playwright runs start the frontend and expect a reachable YDB backend at `localhost:8765`; override it with `PLAYWRIGHT_APP_BACKEND`. Docker E2E commands require that variable; see `scripts/playwright-docker.sh`.
 
 ## Repository map
 
@@ -40,7 +40,7 @@ Before committing ordinary code changes, run `npm run typecheck && npm run lint 
 | `src/uiFactory/`                     | Package-consumer configuration and leaf extensions         |
 | `src/components/ComponentsProvider/` | Whole structural component replacement registry            |
 | `src/utils/`                         | Shared hooks, formatters, parsers, i18n, and query helpers |
-| `src/types/api/`                     | Backend response types, conventionally prefixed with `T`   |
+| `src/types/api/`                     | Backend response types; follow the owning file's naming    |
 | `src/routes.ts`                      | React Router v5 routes                                     |
 | `src/lib.ts`                         | Public npm-package exports                                 |
 | `tests/models/`, `tests/suites/`     | Playwright page objects and E2E suites                     |
@@ -50,11 +50,12 @@ Before committing ordinary code changes, run `npm run typecheck && npm run lint 
 | Need                       | Follow                                                                               |
 | -------------------------- | ------------------------------------------------------------------------------------ |
 | RTK Query endpoint         | `src/store/reducers/nodesList.ts` and `src/store/reducers/api.ts`                    |
+| Runtime routing/identity   | `src/routes.ts`, `src/services/api/base.ts`, and `src/routes.test.ts`                |
 | Package-consumer extension | `src/uiFactory/uiFactory.ts`, `src/uiFactory/types.ts`, and `src/lib.ts`             |
 | Typed URL state            | `src/containers/Versions/Versions.tsx`                                               |
 | Custom query-param codec   | `src/containers/Tenant/Diagnostics/TopQueries/hooks/useSortParam.ts`                 |
 | Component i18n keyset      | `src/components/StorageGroupInfo/i18n/` and `i18n-naming-ruleset.md`                 |
-| React/import conventions   | `src/components/SplitPane/SplitPane.tsx` and `src/.eslintrc`                         |
+| React/import conventions   | `src/components/SplitPane/SplitPane.tsx` and `eslint.config.mjs`                     |
 | Playwright page object     | `tests/models/BaseModel.ts`, `tests/models/PageModel.ts`, and `playwright.config.ts` |
 
 ## Engineering rules
@@ -69,27 +70,34 @@ Before committing ordinary code changes, run `npm run typecheck && npm run lint 
 
 ### React, UI, and styling
 
-- In TSX/component files use `import React from 'react'`; keep type imports in separate top-level `import type` declarations. Use `React.Fragment`, not fragment shorthand, and do not type components with `React.FC`.
-- Import `isAxiosError` from `utils/response` (`src/utils/response.ts`), not directly from Axios. Avoid direct imports through internal `lib` paths; use the owning component/module export.
+- `eslint.config.mjs` is the active lint source; do not infer enforcement from legacy `src/.eslintrc`. In TSX/component files, use `import React from 'react'` when React is a runtime value or `import type React from 'react'` when only its types are needed, and keep other type imports in separate top-level `import type` declarations. Use `React.Fragment`, not fragment shorthand, and do not introduce new `React.FC` component types.
+- Import `isAxiosError` from `utils/response` (`src/utils/response.ts`), not directly from Axios. Prefer the owning component/module export over internal `lib` paths; preserve intentional legacy exceptions unless changing them is in scope.
 - Prefer Gravity UI components and existing loading/error/notification primitives over custom equivalents.
 - Prefer `PaginatedTable` for standard virtualized data grids; use specialized Gravity UI/TanStack table stacks only when the feature requires them.
-- Put user-facing strings in a component-local i18n keyset and follow `i18n-naming-ruleset.md`; do not merge a small keyset into an unrelated broader one.
+- Give repeated controls unique localized accessible names, preserve visible keyboard focus, do not nest interactive controls, and ensure status meaning remains exposed when ARIA roles make descendants presentational.
+- Put user-facing strings in the narrowest appropriate system, section, page, or component keyset and follow `i18n-naming-ruleset.md`. A component keyset may contain one or many keys; do not merge it into a broader keyset solely because it is small.
 - Create class names with `cn()`. Prefix new SCSS root blocks and new `cn()` block names with `ydb-` unless an established local name must remain compatible; keep BEM element names semantic.
 - Render absent UI values with `EMPTY_DATA_PLACEHOLDER` from `src/utils/constants.ts`. Treat `''` as missing unless the feature explicitly distinguishes it, and guard invalid/empty date values before formatting.
+- Prefer direct event handlers and derived state over effect-driven interaction synchronization. Use effects for external synchronization and clean up subscriptions, timers, editor/model instances, and other resources they own.
 - Memoize expensive derived values, table columns, and dependency-sensitive callbacks when it stabilizes real work; do not add memoization mechanically.
+- For embedded layout changes, verify actual provider/portal ownership, containing-block and viewport boundaries, overflow, fullscreen behavior, and host siblings in both standalone and package-consumer contexts.
+- For design-driven UI work, read linked implementation/design issues, their latest decisions, the exact Figma node, and the live stand when available. Cover requested themes, modes, responsive breakpoints, and loading/empty/error/disabled states; produce visual/stand evidence and surface conflicts instead of silently choosing one source.
 
 ### Data, URLs, and compatibility
 
 - Prefer `use-query-params` for new URL state. Validate decoded values with Zod fallbacks such as `.catch(defaultValue)` and make custom codecs tolerate missing, malformed, and non-string values.
+- Where present, treat `environment`, `clusterName`, `database`, `schema/path`, and `backend` as one runtime identity. Preserve the applicable scope across API and RTK Query arguments/selectors, links, drawers/actions/downloads, callbacks/context, async continuations, and tests; reset or revalidate stale state when scope changes, and use `src/routes.ts` helpers so basename, query state, and legacy/shared deep links survive.
 - When changing table columns, filters, grouping, or sorting, update every connected surface: URL schema, sort whitelist, persisted/shareable state, restored links, drawer/details output, i18n, and relevant tests.
-- Never interpolate raw user input into SQL/YQL without the repository's escaping path. Parenthesize mixed `OR` expressions before combining them with `AND`.
-- Backend fields vary across YDB versions. Prefer compatibility-safe query shapes, normalize responses in code, and keep a tested fallback when a feature depends on newer fields.
+- Never interpolate raw user input into SQL/YQL. Use or extend the closest tested query builder or escaper for the exact syntactic context (identifier versus string literal), add regression coverage, and parenthesize mixed `OR` expressions before combining them with `AND`.
+- Backend fields and enum/status values vary across YDB versions. Prefer compatibility-safe query shapes, normalize unknown values before lookup or rendering, use capability/version checks where available, and keep a tested fallback for newer fields or endpoints.
+- Gate only the feature slice that actually requires a capability or permission. Canonicalize stale URL/persisted selections to an available mode, and cover restricted roles plus older capability versions.
+- Cross-repository contracts are independently owned and versioned: YDB owns `/viewer/*` handlers, proto schemas, and capabilities; YDB EM/meta owns `/meta/*`, proxy behavior, and its assets; downstream wrappers may pin a different UI package version and add auth, proxy, or extension behavior. For changes crossing these boundaries, verify the owning source and affected consumer version—this checkout alone does not prove deployed behavior.
 - Keep `undefined`, `null`, empty string, zero, and invalid numeric/date cases consistent across tables, drawers, badges, and formatters. Guard division by zero explicitly.
 
 ### Tests and CI
 
-- Put Jest tests beside source in `__test__` directories. For bug fixes, add a focused regression or contract test when practical and assert corrected output/state rather than only no-throw behavior.
-- Playwright uses page objects from `tests/models/` and `data-qa` selectors (`testIdAttribute` in `playwright.config.ts`). User-visible integration paths must account for both Chromium and Safari projects.
+- Keep Jest tests colocated with the owning source and follow the nearby file/directory convention. For bug fixes, add a focused regression or contract test when practical and assert corrected output/state rather than only no-throw behavior.
+- Playwright uses page-object models under `tests/models/` and `tests/suites/`, plus `data-qa` selectors (`testIdAttribute` in `playwright.config.ts`). For UI/SCSS changes, run the affected spec in Chromium and Safari, wait for the affected product state, assert the exact entity, and update platform snapshots intentionally. For flaky fixes, validate with retries disabled; do not mask drift by raising timeouts, retries, skips, or the global screenshot threshold.
 - For route/state/persistence/API wiring, verify the integration path, not only a new helper or component in isolation.
 - CI workflow changes must not install unpinned latest tools when the lockfile or another job defines the version. Do not let verification jobs rewrite tracked manifests or lockfiles unless that is the task.
 - Use Conventional Commit headers for commits and PR titles, with a lowercase subject and a maximum of 72 characters; CI enforces this for PR titles via `.github/workflows/pr-title.yml`.
