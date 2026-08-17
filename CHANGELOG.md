@@ -1,5 +1,26 @@
 # Changelog
 
+## [19.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.6.0...v19.0.0) (2026-08-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* **EntityStatus:** get rid of legacy EntityStatus ([#4217](https://github.com/ydb-platform/ydb-embedded-ui/issues/4217))
+
+### Features
+
+* **EntityStatus:** get rid of legacy EntityStatus ([#4217](https://github.com/ydb-platform/ydb-embedded-ui/issues/4217)) ([9ed80ee](https://github.com/ydb-platform/ydb-embedded-ui/commit/9ed80ee95eb4c47bcf74e56844e9ab12d19ac2a4))
+* **Healthcheck:** add AI assistant extension and drawer layout ([#4204](https://github.com/ydb-platform/ydb-embedded-ui/issues/4204)) ([8ca43b1](https://github.com/ydb-platform/ydb-embedded-ui/commit/8ca43b168f95fb77a53628d417dcb21185516e22))
+* implement tabs move for the Database ([#4229](https://github.com/ydb-platform/ydb-embedded-ui/issues/4229)) ([4c17a39](https://github.com/ydb-platform/ydb-embedded-ui/commit/4c17a39b87dd2e03327e7a2c10c53f0538421f58))
+* **Tablet:** add path to table or topic ([#4233](https://github.com/ydb-platform/ydb-embedded-ui/issues/4233)) ([ce26e86](https://github.com/ydb-platform/ydb-embedded-ui/commit/ce26e861aeae9cbc8fd76d893ea9470bbdac0676))
+
+
+### Bug Fixes
+
+* **access:** preserve acl ace boundaries ([#4221](https://github.com/ydb-platform/ydb-embedded-ui/issues/4221)) ([a994656](https://github.com/ydb-platform/ydb-embedded-ui/commit/a994656781d0625ca8813a391899f828e07031ed))
+* **Diagnostics:** partitioning by size disabled if SizeToSplit is unset ([#4220](https://github.com/ydb-platform/ydb-embedded-ui/issues/4220)) ([2ebca62](https://github.com/ydb-platform/ydb-embedded-ui/commit/2ebca6280254fc3ed2146338824a62ca2d11cd12))
+* **TenantOverview:** keep pointer cursor on metric helpmarks ([#4232](https://github.com/ydb-platform/ydb-embedded-ui/issues/4232)) ([3b4925e](https://github.com/ydb-platform/ydb-embedded-ui/commit/3b4925e250e1f32bd0f5fddb7bf2dba49161d93b))
+
 ## [18.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.5.0...v18.6.0) (2026-08-11)
 
 
