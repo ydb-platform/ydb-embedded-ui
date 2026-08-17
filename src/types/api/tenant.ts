@@ -158,7 +158,7 @@ export interface ControlPlane {
     };
 }
 /** incomplete */
-export interface UserAttributes {
+interface UserAttributes {
     database_id?: string;
     folder_id?: string;
     cloud_id?: string;
