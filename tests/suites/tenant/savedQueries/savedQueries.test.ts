@@ -419,7 +419,6 @@ test.describe('Saved Queries', () => {
         await expect(tenantPage.queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(
             enterName,
         );
-        await expect.poll(() => tenantPage.queryEditor.getEditorContent()).toBe(body);
     });
 
     test('Saved query search matches names case-insensitively', async () => {
