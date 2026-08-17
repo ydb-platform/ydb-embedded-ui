@@ -30,7 +30,7 @@ export class RenameSavedQueryDialog {
     }
 
     async getErrorMessage() {
-        const error = this.dialog.locator('.g-text-input__error');
+        const error = this.dialog.locator('[data-qa="control-error-message-qa"]');
         await error.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return error.innerText();
     }

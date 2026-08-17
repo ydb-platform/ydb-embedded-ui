@@ -452,37 +452,20 @@ test.describe('Saved Queries', () => {
     test('Legacy saved query records show the empty Edited placeholder', async ({page}) => {
         const legacyName = `Legacy Saved ${uuidv4()}`;
         const legacyBody = 'SELECT 27 AS legacy_saved_query;';
-        await page.route('**/meta/get_user_settings', async (route) => {
-            const response = await route.fetch();
-            const requestBody = route.request().postDataJSON() as {name?: unknown};
-            const settingNames = Array.isArray(requestBody?.name) ? requestBody.name : [];
+        await page.evaluate(
+            ({name, body}) => {
+                localStorage.setItem('saved_queries', JSON.stringify([{name, body}]));
+            },
+            {name: legacyName, body: legacyBody},
+        );
 
-            if (!settingNames.includes('saved_queries')) {
-                await route.fulfill({response});
-                return;
-            }
+        await page.reload({waitUntil: 'domcontentloaded'});
+        await tenantPage.queryEditor.waitForEditorReady();
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.isVisible();
 
-            const responseBody = (await response.json()) as Record<string, unknown>;
-            await route.fulfill({
-                response,
-                json: {
-                    ...responseBody,
-                    saved_queries: JSON.stringify([{name: legacyName, body: legacyBody}]),
-                },
-            });
-        });
-
-        try {
-            await page.reload({waitUntil: 'domcontentloaded'});
-            await tenantPage.queryEditor.waitForEditorReady();
-            await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
-            await tenantPage.savedQueriesTable.isVisible();
-
-            await expect(tenantPage.savedQueriesTable.getEdited(legacyName)).resolves.toBe(
-                EMPTY_DATA_PLACEHOLDER,
-            );
-        } finally {
-            await page.unroute('**/meta/get_user_settings');
-        }
+        await expect(tenantPage.savedQueriesTable.getEdited(legacyName)).resolves.toBe(
+            EMPTY_DATA_PLACEHOLDER,
+        );
     });
 });

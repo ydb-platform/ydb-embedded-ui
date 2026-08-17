@@ -57,7 +57,7 @@ export class SavedQueriesTable {
         await this.previewDrawer.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         const editedItem = this.previewDrawer
             .locator('.g-definition-list__item')
-            .filter({has: this.previewDrawer.getByText('Edited', {exact: true})});
+            .filter({hasText: 'Edited'});
 
         return editedItem.locator('.g-definition-list__definition').innerText();
     }
