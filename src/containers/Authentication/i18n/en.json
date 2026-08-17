@@ -2,5 +2,6 @@
   "description_default-error": "Unknown error occurred",
   "action_show-password": "Show password",
   "action_hide-password": "Hide password",
-  "action_close": "Close"
+  "action_close": "Close",
+  "action_via-sso": "via SSO"
 }

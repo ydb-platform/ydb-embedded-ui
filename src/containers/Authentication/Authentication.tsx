@@ -2,19 +2,29 @@ import React from 'react';
 
 import {Eye, EyeSlash, Xmark} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Link as ExternalLink, Icon, TextInput} from '@gravity-ui/uikit';
-import {useHistory, useLocation} from 'react-router-dom';
+import {useHistory, useLocation, useRouteMatch} from 'react-router-dom';
 
-import {parseQuery} from '../../routes';
+import routes, {getHomePagePath, parseQuery} from '../../routes';
 import {basename} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
-import {useLoginWithDatabase} from '../../store/reducers/capabilities/hooks';
+import {
+    useLoginWithDatabase,
+    useMetaCapabilitiesQuery,
+    useOidcAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../utils/constants';
 import {prepareCommonErrorMessage} from '../../utils/errors';
 import {useMetaAuth} from '../../utils/hooks/useMetaAuth';
 
 import i18n from './i18n';
-import {isDatabaseError, isPasswordError, isUserError} from './utils';
+import {
+    createSsoAuthorizeUrl,
+    getSsoReturnTo,
+    isDatabaseError,
+    isPasswordError,
+    isUserError,
+} from './utils';
 
 import ydbLogoIcon from '../../assets/icons/ydb.svg';
 
@@ -29,12 +39,16 @@ interface AuthenticationProps {
 function Authentication({closable = false}: AuthenticationProps) {
     const history = useHistory();
     const location = useLocation();
+    const isDirectAuthPage = Boolean(useRouteMatch({path: routes.auth, exact: true}));
 
     const needDatabase = useLoginWithDatabase();
+    useMetaCapabilitiesQuery();
+    const oidcAvailable = useOidcAvailable();
 
     const [authenticate, {isLoading}] = authenticationApi.useAuthenticateMutation();
 
     const {returnUrl, database: databaseFromQuery} = parseQuery(location);
+    const currentHref = window.location.href;
 
     const path = React.useMemo(() => {
         let path: string | undefined;
@@ -64,6 +78,22 @@ function Authentication({closable = false}: AuthenticationProps) {
     }, [returnUrl]);
 
     const useMeta = useMetaAuth(path);
+
+    const ssoUrl = React.useMemo(() => {
+        if (!oidcAvailable) {
+            return undefined;
+        }
+
+        const homePath = getHomePagePath(undefined, undefined, {withBasename: true});
+        const currentUrl = new URL(currentHref);
+        const returnTo = getSsoReturnTo({
+            currentUrl,
+            fallbackPath: homePath,
+            isDirectAuthPage,
+            returnUrl,
+        });
+        return createSsoAuthorizeUrl(currentUrl.host, returnTo);
+    }, [currentHref, isDirectAuthPage, oidcAvailable, returnUrl]);
 
     const [login, setLogin] = React.useState('');
     const [database, setDatabase] = React.useState(databaseFromQuery?.toString() || undefined);
@@ -208,6 +238,17 @@ function Authentication({closable = false}: AuthenticationProps) {
                 >
                     Sign in
                 </Button>
+                {ssoUrl && (
+                    <Button
+                        view="outlined"
+                        href={ssoUrl}
+                        width="max"
+                        size="l"
+                        className={b('button-sso')}
+                    >
+                        {i18n('action_via-sso')}
+                    </Button>
+                )}
                 {/* always preserve place for general error to prevent container height jumping */}
                 <div className={b('general-error')}>{generalError}</div>
             </form>
