@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {renameSavedQueryTabs} from '../../../../store/reducers/query/query';
+import {detachSavedQueryTabs, renameSavedQueryTabs} from '../../../../store/reducers/query/query';
 import {selectSavedQueriesFilter} from '../../../../store/reducers/queryActions/queryActions';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {SavedQuery} from '../../../../types/store/query';
@@ -26,8 +26,9 @@ export function useSavedQueries() {
             const nextSavedQueries = queries.filter((el) => !findQueryByName(el, queryName));
 
             saveQueries(nextSavedQueries);
+            dispatch(detachSavedQueryTabs({savedQueryName: queryName}));
         },
-        [savedQueries, saveQueries],
+        [dispatch, savedQueries, saveQueries],
     );
 
     const saveQuery = React.useCallback(

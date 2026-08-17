@@ -40,6 +40,31 @@ export class SavedQueriesTable {
         await row.locator('[data-qa="rename-saved-query-button"]').click();
     }
 
+    async clickDelete(name: string) {
+        const row = await this.waitForRow(name);
+        await row.hover();
+        await row.locator('[data-qa="delete-saved-query-button"]').click();
+    }
+
+    async getActionNames(name: string) {
+        const row = await this.waitForRow(name);
+        await row.hover();
+        return row
+            .locator('.ydb-saved-queries__actions button')
+            .evaluateAll((buttons) =>
+                buttons.map(
+                    (button) =>
+                        button.getAttribute('aria-label') || button.textContent?.trim() || '',
+                ),
+            );
+    }
+
+    async getActionsWidth(name: string) {
+        const row = await this.waitForRow(name);
+        const box = await row.locator('.ydb-saved-queries__actions').locator('..').boundingBox();
+        return box?.width;
+    }
+
     async selectQuery(name: string) {
         await this.clickEdit(name);
     }

@@ -40,6 +40,37 @@ test.describe('Saved Queries', () => {
         expect(names).toContain(queryName);
     });
 
+    test('Delete action follows Edit and removes the saved query after confirmation', async ({
+        page,
+    }) => {
+        const queryName = await tenantPage.saveQuery(
+            'SELECT 28 AS delete_saved_query;',
+            `Delete Saved ${uuidv4()}`,
+        );
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.isVisible();
+
+        await expect(tenantPage.savedQueriesTable.getActionNames(queryName)).resolves.toEqual([
+            'Rename',
+            'Edit',
+            'Delete',
+        ]);
+        await expect(tenantPage.savedQueriesTable.getActionsWidth(queryName)).resolves.toBe(136);
+
+        await tenantPage.savedQueriesTable.clickDelete(queryName);
+        const dialog = page.locator('.g-dialog').filter({hasText: 'Delete query'});
+        await expect(dialog).toBeVisible();
+        await dialog.getByRole('button', {name: 'Delete', exact: true}).click();
+
+        await expect(await tenantPage.savedQueriesTable.getQueryRow(queryName)).toBeHidden();
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Editor);
+        await expect(tenantPage.queryEditor.isSaveButtonVisible()).resolves.toBe(true);
+        await expect(tenantPage.queryEditor.isSaveButtonDisabled()).resolves.toBe(false);
+        await expect(tenantPage.queryEditor.isEditButtonVisible(1000)).resolves.toBe(false);
+    });
+
     test('Open saved query in the Editor', async () => {
         // First save a query
         const testQuery = 'SELECT 2 AS editor_test;';

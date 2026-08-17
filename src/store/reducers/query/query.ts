@@ -26,6 +26,7 @@ export {
     selectTenantPath,
     selectUserInput,
     applyExternalQueryToActiveTab,
+    detachSavedQueryTabs,
     setActiveQueryTab,
     setHistoryCurrentQueryId,
     setIsDirty,

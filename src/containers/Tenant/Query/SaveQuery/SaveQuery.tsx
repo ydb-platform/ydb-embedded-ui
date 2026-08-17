@@ -1,12 +1,13 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
-import type {ButtonButtonProps, ButtonProps} from '@gravity-ui/uikit';
+import type {ButtonButtonProps} from '@gravity-ui/uikit';
 import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 
 import {
     selectActiveTab,
     selectActiveTabSavedQueryName,
+    selectIsDirty,
     selectUserInput,
     setIsDirty,
     setQueryTabSavedQueryName,
@@ -29,7 +30,7 @@ const b = cn('ydb-save-query');
 export const SAVE_QUERY_DIALOG = 'save-query-dialog';
 
 interface SaveQueryProps {
-    buttonProps?: ButtonProps;
+    buttonProps?: ButtonButtonProps;
 }
 
 export function useSaveQueryWithTabSync() {
@@ -97,9 +98,11 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     const dispatch = useTypedDispatch();
     const activeTab = useTypedSelector(selectActiveTab);
     const activeTabSavedQueryName = useTypedSelector(selectActiveTabSavedQueryName);
+    const isDirty = useTypedSelector(selectIsDirty);
     const currentInput = useTypedSelector(selectUserInput);
     const onSaveQueryClick = useSaveQueryHandler({queryBody: currentInput});
     const currentSavedQueryName = activeTabSavedQueryName;
+    const isSaveDisabled = Boolean(buttonProps.disabled) || !isDirty;
 
     const {saveQuery} = useSavedQueries();
 
@@ -131,7 +134,7 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
             <DropdownMenu
                 items={items}
                 renderSwitcher={(props) => (
-                    <Button {...props} {...buttonProps}>
+                    <Button {...props} {...buttonProps} disabled={isSaveDisabled}>
                         {i18n('action.edit')}
                     </Button>
                 )}
@@ -143,7 +146,11 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     return currentSavedQueryName ? (
         renderSaveDropdownMenu()
     ) : (
-        <SaveQueryButton dialogProps={{queryBody: currentInput}} />
+        <SaveQueryButton
+            {...buttonProps}
+            dialogProps={{queryBody: currentInput}}
+            disabled={isSaveDisabled}
+        />
     );
 }
 

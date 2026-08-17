@@ -537,6 +537,24 @@ const slice = createSlice({
             });
             persistTabsStateToSessionStorage(state);
         },
+        detachSavedQueryTabs: (state, action: PayloadAction<{savedQueryName: string}>) => {
+            const savedQueryName = action.payload.savedQueryName.trim().toLowerCase();
+            let hasDetachedTabs = false;
+
+            Object.values(state.tabsById).forEach((tab) => {
+                if (tab.savedQueryName?.trim().toLowerCase() === savedQueryName) {
+                    tab.savedQueryName = undefined;
+                    tab.savedInput = undefined;
+                    tab.isDirty = true;
+                    hasDetachedTabs = true;
+                }
+            });
+
+            if (hasDetachedTabs) {
+                persistTabsStateToSessionStorage(state);
+                persistDirtyStateToSessionStorage(state);
+            }
+        },
         setQueryTabSavedQueryName: (
             state,
             action: PayloadAction<{tabId: string; savedQueryName: string | undefined}>,
@@ -639,6 +657,7 @@ export const {
     closeQueryTab,
     renameQueryTab,
     renameSavedQueryTabs,
+    detachSavedQueryTabs,
     syncSavedQueryTab,
     setQueryTabSavedQueryName,
     setActiveQueryTab,

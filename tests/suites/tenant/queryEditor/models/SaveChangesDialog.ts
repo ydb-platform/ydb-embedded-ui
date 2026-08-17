@@ -31,9 +31,16 @@ export class SaveChangesDialog {
     }
 
     async clickSave() {
-        const saveButton = this.dialogFooter.getByRole('button', {name: 'Save', exact: true});
+        const saveButton = this.dialogFooter.getByRole('button', {
+            name: 'Save changes',
+            exact: true,
+        });
         await saveButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await saveButton.click();
+    }
+
+    async getDescription() {
+        return this.body.locator(':scope > div').first().innerText();
     }
 
     async setQueryName(value: string) {

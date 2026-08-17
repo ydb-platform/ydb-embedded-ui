@@ -1,4 +1,4 @@
-import {FontCursor} from '@gravity-ui/icons';
+import {FontCursor, TrashBin} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
 import {ActionTooltip, Button, Flex, Icon, Text} from '@gravity-ui/uikit';
 
@@ -11,11 +11,12 @@ import {formatSavedQueryUpdatedAt} from '../utils/savedQueries';
 import {b} from './shared';
 
 type SavedQueryActions = {
+    deleteQuery: (queryName: string) => void;
     openInEditor: (query: SavedQuery) => void;
     renameQuery: (queryName: string) => void;
 };
 
-export function getColumns({openInEditor, renameQuery}: SavedQueryActions) {
+export function getColumns({deleteQuery, openInEditor, renameQuery}: SavedQueryActions) {
     const columns: Column<SavedQuery>[] = [
         {
             name: 'name',
@@ -81,11 +82,24 @@ export function getColumns({openInEditor, renameQuery}: SavedQueryActions) {
                     >
                         {i18n('action_edit-query')}
                     </Button>
+                    <ActionTooltip title={i18n('action_delete-query')}>
+                        <Button
+                            qa="delete-saved-query-button"
+                            view="flat-secondary"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                deleteQuery(row.name);
+                            }}
+                            aria-label={i18n('action_delete-query')}
+                        >
+                            <Icon data={TrashBin} />
+                        </Button>
+                    </ActionTooltip>
                 </Flex>
             ),
             sortable: false,
             resizeable: false,
-            width: 104,
+            width: 136,
         },
     ];
 

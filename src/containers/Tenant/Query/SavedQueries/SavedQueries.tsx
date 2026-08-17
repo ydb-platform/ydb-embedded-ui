@@ -1,8 +1,10 @@
 import React from 'react';
 
-import {FontCursor} from '@gravity-ui/icons';
+import * as NiceModal from '@ebay/nice-modal-react';
+import {FontCursor, TrashBin} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Icon} from '@gravity-ui/uikit';
 
+import {CONFIRMATION_DIALOG} from '../../../../components/ConfirmationDialog/ConfirmationDialog';
 import {DrawerWrapper} from '../../../../components/Drawer';
 import type {DrawerControl} from '../../../../components/Drawer/Drawer';
 import {QueryDetails} from '../../../../components/QueryDetails/QueryDetails';
@@ -14,7 +16,7 @@ import {
     setSavedQueriesFilter,
 } from '../../../../store/reducers/queryActions/queryActions';
 import type {SavedQuery} from '../../../../types/store/query';
-import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
+import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {useOpenExternalQueryInEditor} from '../hooks/useOpenExternalQueryInEditor';
@@ -31,12 +33,14 @@ import './SavedQueries.scss';
 const SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY = 'savedQueriesTableColumnsWidth';
 
 export const SavedQueries = () => {
-    const {savedQueries, filteredSavedQueries, renameSavedQuery} = useSavedQueries();
+    const {savedQueries, filteredSavedQueries, deleteSavedQuery, renameSavedQuery} =
+        useSavedQueries();
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
     const openExternalQueryInEditor = useOpenExternalQueryInEditor();
     const [isPreviewVisible, setIsPreviewVisible] = React.useState(false);
     const [selectedQueryName, setSelectedQueryName] = React.useState<string | null>(null);
+    const [queryNameToDelete, setQueryNameToDelete] = React.useState<string | null>(null);
     const [queryNameToRename, setQueryNameToRename] = React.useState<string | null>(null);
 
     const handleOpenInEditor = React.useCallback(
@@ -71,6 +75,45 @@ export const SavedQueries = () => {
     const handleCloseRenameDialog = React.useCallback(() => {
         setQueryNameToRename(null);
     }, []);
+
+    const handleCloseDeleteDialog = React.useCallback(() => {
+        setQueryNameToDelete(null);
+    }, []);
+
+    const handleDeleteSavedQuery = React.useCallback(
+        (queryName: string) => {
+            deleteSavedQuery(queryName);
+            if (selectedQueryName?.toLowerCase() === queryName.toLowerCase()) {
+                handleClosePreview();
+            }
+            setQueryNameToDelete(null);
+        },
+        [deleteSavedQuery, handleClosePreview, selectedQueryName],
+    );
+
+    const handleOpenDeleteDialog = React.useCallback(
+        (queryName: string) => {
+            setQueryNameToDelete(queryName);
+            NiceModal.show(CONFIRMATION_DIALOG, {
+                id: CONFIRMATION_DIALOG,
+                caption: i18n('title_delete-query'),
+                children: (
+                    <React.Fragment>
+                        {i18n('confirm_delete-query')}
+                        <span className={b('dialog-query-name')}>{` ${queryName}?`}</span>
+                    </React.Fragment>
+                ),
+                textButtonApply: i18n('action_delete-query'),
+                textButtonCancel: i18n('action_cancel'),
+                buttonApplyView: 'action',
+                propsButtonApply: {className: BRAND_BUTTON_CLASS},
+                confirmOnEnter: true,
+                onConfirm: () => handleDeleteSavedQuery(queryName),
+                onClose: handleCloseDeleteDialog,
+            });
+        },
+        [handleCloseDeleteDialog, handleDeleteSavedQuery],
+    );
 
     const handleRenameSavedQuery = React.useCallback(
         (nextName: string) => {
@@ -138,11 +181,30 @@ export const SavedQueries = () => {
                     </ActionTooltip>
                 ),
             });
+            controls.push({
+                type: 'custom',
+                key: 'delete',
+                node: (
+                    <ActionTooltip title={i18n('action_delete-query')}>
+                        <Button
+                            qa="delete-saved-query-button"
+                            view="flat"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                handleOpenDeleteDialog(selectedQuery.name);
+                            }}
+                            aria-label={i18n('action_delete-query')}
+                        >
+                            <Icon data={TrashBin} />
+                        </Button>
+                    </ActionTooltip>
+                ),
+            });
         }
 
         controls.push({type: 'close'});
         return controls;
-    }, [handleOpenRenameDialog, selectedQuery]);
+    }, [handleOpenDeleteDialog, handleOpenRenameDialog, selectedQuery]);
 
     const renderDrawerContent = React.useCallback(() => {
         return selectedQuery ? (
@@ -156,10 +218,11 @@ export const SavedQueries = () => {
 
     const columns = React.useMemo(() => {
         return getColumns({
+            deleteQuery: handleOpenDeleteDialog,
             openInEditor: handleOpenInEditor,
             renameQuery: handleOpenRenameDialog,
         });
-    }, [handleOpenInEditor, handleOpenRenameDialog]);
+    }, [handleOpenDeleteDialog, handleOpenInEditor, handleOpenRenameDialog]);
 
     return (
         <React.Fragment>
@@ -179,7 +242,7 @@ export const SavedQueries = () => {
                             onCloseDrawer={handleClosePreview}
                             renderDrawerContent={renderDrawerContent}
                             drawerId="saved-query-preview"
-                            detectClickOutside={!queryNameToRename}
+                            detectClickOutside={!queryNameToDelete && !queryNameToRename}
                             isPercentageWidth
                             drawerControls={drawerControls}
                             title={selectedQuery?.name || EMPTY_DATA_PLACEHOLDER}
