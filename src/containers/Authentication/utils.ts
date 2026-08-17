@@ -35,7 +35,8 @@ export function getSsoReturnTo({
     returnUrl,
 }: GetSsoReturnToParams) {
     if (!isDirectAuthPage) {
-        return `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`;
+        const path = `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`;
+        return isSafeLocalReturnTo(path) ? path : fallbackPath;
     }
 
     if (typeof returnUrl !== 'string') {
