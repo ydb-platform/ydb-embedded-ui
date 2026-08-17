@@ -103,7 +103,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
             isDomain(path, type);
 
         if (isV2Navigation && isDatabase) {
-            return <DatabaseInfo data={data} path={path} />;
+            return <DatabaseInfo data={data} path={path} database={database} />;
         }
 
         if (!type || type === EPathType.EPathTypeInvalid) {

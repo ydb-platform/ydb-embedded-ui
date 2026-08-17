@@ -121,6 +121,7 @@ export function useTenantBaseInfo(
     const {ControlPlane, Name, Id, Type} = currentData || {};
 
     return {
+        databaseData: currentData,
         controlPlane: ControlPlane,
         name: Name,
         id: Id,
