@@ -75,6 +75,12 @@ export class SavedQueriesTable {
         return this.previewDrawer;
     }
 
+    async closePreview() {
+        await this.previewDrawer.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.previewDrawer.locator('.ydb-drawer__controls button').last().click();
+        await this.previewDrawer.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+    }
+
     async getEdited(name: string) {
         return (await this.waitForRow(name)).locator('.ydb-saved-queries__edited').innerText();
     }

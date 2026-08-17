@@ -414,6 +414,7 @@ test.describe('Saved Queries', () => {
             .poll(() => tenantPage.savedQueriesTable.getEdited(enterName))
             .not.toBe(EMPTY_DATA_PLACEHOLDER);
 
+        await tenantPage.savedQueriesTable.closePreview();
         await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Editor);
         await expect(tenantPage.queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(
             enterName,
