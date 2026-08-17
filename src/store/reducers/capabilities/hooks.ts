@@ -64,7 +64,7 @@ export const useOidcAvailable = () => {
     const authorizeAvailable = useGetMetaFeatureVersion('/meta/oidc/authorize') >= 1;
     const callbackAvailable = useGetMetaFeatureVersion('/meta/oidc/callback') >= 1;
 
-    return authorizeAvailable && callbackAvailable || true;
+    return authorizeAvailable && callbackAvailable;
 };
 
 export const useCreateDirectoryFeatureAvailable = () => {
