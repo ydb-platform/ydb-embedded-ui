@@ -621,7 +621,7 @@ export function YqlEditor({
             });
             editor.addAction({
                 id: 'renameEditorTab',
-                label: i18n('action_rename-query-tab'),
+                label: i18n('action_rename-query'),
                 keybindings: [keybindings.renameTab],
                 run: () => handleRenameTabAction(),
             });

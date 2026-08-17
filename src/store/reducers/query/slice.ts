@@ -524,6 +524,19 @@ const slice = createSlice({
             tab.updatedAt = Date.now();
             persistTabsStateToSessionStorage(state);
         },
+        renameSavedQueryTabs: (
+            state,
+            action: PayloadAction<{previousName: string; nextName: string}>,
+        ) => {
+            const previousName = action.payload.previousName.trim().toLowerCase();
+            Object.values(state.tabsById).forEach((tab) => {
+                if (tab.savedQueryName?.trim().toLowerCase() === previousName) {
+                    tab.title = action.payload.nextName;
+                    tab.savedQueryName = action.payload.nextName;
+                }
+            });
+            persistTabsStateToSessionStorage(state);
+        },
         setQueryTabSavedQueryName: (
             state,
             action: PayloadAction<{tabId: string; savedQueryName: string | undefined}>,
@@ -625,6 +638,7 @@ export const {
     applyExternalQueryToActiveTab,
     closeQueryTab,
     renameQueryTab,
+    renameSavedQueryTabs,
     syncSavedQueryTab,
     setQueryTabSavedQueryName,
     setActiveQueryTab,

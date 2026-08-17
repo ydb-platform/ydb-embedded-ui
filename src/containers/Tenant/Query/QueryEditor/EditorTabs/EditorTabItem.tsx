@@ -135,7 +135,7 @@ export function EditorTabItem({
         return [
             [
                 {
-                    text: i18n('action_rename-query-tab'),
+                    text: i18n('action_rename-query'),
                     iconStart: <FontCursor />,
                     iconEnd: <Hotkey value={HOTKEY_LABELS.renameTab} />,
                     action: createMenuAction(handleRenameClick),

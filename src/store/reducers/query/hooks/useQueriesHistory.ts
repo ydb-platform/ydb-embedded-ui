@@ -6,6 +6,7 @@ import {
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
+import {sortByTimestampDescending} from '../../../../utils/sortByTimestamp';
 import {SETTING_KEYS} from '../../settings/constants';
 import {
     changeUserInput,
@@ -35,11 +36,13 @@ export function useQueriesHistory() {
 
     const filteredHistoryQueries = React.useMemo(() => {
         const normalizedFilter = queriesFilter?.trim().toLowerCase();
-        return normalizedFilter
+        const filteredQueries = normalizedFilter
             ? preparedQueries.filter((item) =>
                   item.queryText.toLowerCase().includes(normalizedFilter),
               )
             : preparedQueries;
+
+        return sortByTimestampDescending(filteredQueries, (query) => query.startTime);
     }, [preparedQueries, queriesFilter]);
 
     // These functions are used inside Monaco editorDidMount

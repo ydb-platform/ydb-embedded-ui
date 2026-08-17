@@ -57,4 +57,5 @@ export type TracingLevel = ValueOf<typeof TRACING_LEVELS>;
 export interface SavedQuery {
     name: string;
     body: string;
+    updatedAt?: number;
 }

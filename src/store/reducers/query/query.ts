@@ -8,6 +8,7 @@ export {
     clearPendingSnippet,
     closeQueryTab,
     renameQueryTab,
+    renameSavedQueryTabs,
     selectActiveTab,
     selectActiveTabId,
     selectActiveTabPendingSnippet,

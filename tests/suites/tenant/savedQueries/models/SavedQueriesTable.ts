@@ -7,12 +7,14 @@ export class SavedQueriesTable {
     private container: Locator;
     private searchInput: Locator;
     private table: Locator;
+    private previewDrawer: Locator;
 
     constructor(page: Page) {
         this.page = page;
         this.container = page.locator('.ydb-saved-queries');
         this.searchInput = this.container.locator('.ydb-saved-queries__search input');
         this.table = this.container.locator('.data-table');
+        this.previewDrawer = page.locator('[data-qa="saved-query-preview"]');
     }
 
     async search(text: string) {
@@ -26,25 +28,66 @@ export class SavedQueriesTable {
         });
     }
 
-    async selectQuery(name: string) {
+    async clickEdit(name: string) {
         const row = await this.waitForRow(name);
         await row.hover();
-        const editButton = row.locator('button:has(svg)').first();
-        await editButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await editButton.click();
+        await row.locator('[data-qa="edit-saved-query-button"]').click();
     }
 
-    async deleteQuery(name: string) {
+    async clickRename(name: string) {
         const row = await this.waitForRow(name);
         await row.hover();
-        const deleteButton = row.locator('button:has(svg)').nth(1);
-        await deleteButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await deleteButton.click();
+        await row.locator('[data-qa="rename-saved-query-button"]').click();
+    }
+
+    async selectQuery(name: string) {
+        await this.clickEdit(name);
+    }
+
+    async clickRow(name: string) {
+        await (await this.waitForRow(name)).click();
+    }
+
+    async getPreviewTitle() {
+        await this.previewDrawer.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.previewDrawer.locator('.ydb-drawer__header-wrapper .g-text').innerText();
+    }
+
+    async getPreviewEdited() {
+        await this.previewDrawer.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        const editedItem = this.previewDrawer
+            .locator('.g-definition-list__item')
+            .filter({has: this.previewDrawer.getByText('Edited', {exact: true})});
+
+        return editedItem.locator('.g-definition-list__definition').innerText();
+    }
+
+    async clickPreviewRename() {
+        await this.previewDrawer.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        const renameButton = this.previewDrawer.locator(
+            'button[data-qa="rename-saved-query-button"]',
+        );
+        await renameButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await renameButton.click();
+    }
+
+    getPreviewDrawer() {
+        return this.previewDrawer;
+    }
+
+    async getEdited(name: string) {
+        return (await this.waitForRow(name)).locator('.ydb-saved-queries__edited').innerText();
+    }
+
+    async isRowActive(name: string) {
+        return (await this.waitForRow(name)).evaluate((row) =>
+            row.classList.contains('ydb-saved-queries__row_active'),
+        );
     }
 
     async getQueryText(name: string) {
         const row = await this.getQueryRow(name);
-        return row.locator('.ydb-saved-queries__query-body').innerText();
+        return row.locator('.ydb-saved-queries__query').innerText();
     }
 
     async getQueryNames(): Promise<string[]> {
@@ -55,7 +98,7 @@ export class SavedQueriesTable {
     async getRow(index: number) {
         const row = this.table.locator('.ydb-saved-queries__row').nth(index);
         const name = await row.locator('.ydb-saved-queries__query-name').innerText();
-        const query = await row.locator('.ydb-saved-queries__query-body').innerText();
+        const query = await row.locator('.ydb-saved-queries__query').innerText();
         return {
             name,
             query,

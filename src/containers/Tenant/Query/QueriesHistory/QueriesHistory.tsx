@@ -15,7 +15,6 @@ import {
     setQueryHistoryFilter,
 } from '../../../../store/reducers/query/query';
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
-import {valueIsDefined} from '../../../../utils';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
@@ -41,21 +40,6 @@ function QueriesHistory({queriesHistory}: QueriesHistoryProps) {
     const [selectedId, setSelectedId] = React.useState<string | null>(null);
     const {savedQueries, saveQuery} = useSavedQueries();
     const openExternalQueryInEditor = useOpenExternalQueryInEditor();
-
-    const sortedHistory = React.useMemo(() => {
-        return queriesHistory.filteredHistoryQueries.toReversed().toSorted((a, historyItem) => {
-            if (valueIsDefined(a.startTime) && valueIsDefined(historyItem.startTime)) {
-                return historyItem.startTime - a.startTime;
-            }
-            if (valueIsDefined(a.startTime)) {
-                return -1;
-            }
-            if (valueIsDefined(historyItem.startTime)) {
-                return 1;
-            }
-            return 0;
-        });
-    }, [queriesHistory.filteredHistoryQueries]);
 
     const drawerControls: DrawerControl[] = React.useMemo(() => [{type: 'close'}], []);
 
@@ -112,8 +96,8 @@ function QueriesHistory({queriesHistory}: QueriesHistoryProps) {
     }, []);
 
     const selectedQuery = React.useMemo(() => {
-        return sortedHistory.find((query) => query.queryId === selectedId);
-    }, [sortedHistory, selectedId]);
+        return queriesHistory.filteredHistoryQueries.find((query) => query.queryId === selectedId);
+    }, [queriesHistory.filteredHistoryQueries, selectedId]);
 
     const renderDrawerContent = React.useCallback(
         () =>
@@ -153,7 +137,7 @@ function QueriesHistory({queriesHistory}: QueriesHistoryProps) {
                         <ResizeableDataTable
                             columnsWidthLSKey={QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY}
                             columns={columns}
-                            data={sortedHistory}
+                            data={queriesHistory.filteredHistoryQueries}
                             settings={QUERY_TABLE_SETTINGS}
                             emptyDataMessage={i18n(
                                 filter

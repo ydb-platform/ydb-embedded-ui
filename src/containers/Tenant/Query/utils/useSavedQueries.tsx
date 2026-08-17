@@ -1,22 +1,23 @@
 import React from 'react';
 
+import {renameSavedQueryTabs} from '../../../../store/reducers/query/query';
 import {selectSavedQueriesFilter} from '../../../../store/reducers/queryActions/queryActions';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {SavedQuery} from '../../../../types/store/query';
-import {useSetting, useTypedSelector} from '../../../../utils/hooks';
+import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {sortByTimestampDescending} from '../../../../utils/sortByTimestamp';
+
+import {filterSavedQueries, renameSavedQueryInList, upsertSavedQuery} from './savedQueries';
 
 export function useSavedQueries() {
     const [savedQueries, saveQueries] = useSetting<SavedQuery[]>(SETTING_KEYS.SAVED_QUERIES);
 
-    const filter = useTypedSelector(selectSavedQueriesFilter).trim().toLowerCase();
+    const dispatch = useTypedDispatch();
+    const filter = useTypedSelector(selectSavedQueriesFilter);
 
     const filteredSavedQueries = React.useMemo(() => {
-        const queries = savedQueries ?? [];
-
-        if (filter) {
-            return queries.filter((item) => item.body.toLowerCase().includes(filter));
-        }
-        return queries;
+        const filteredQueries = filterSavedQueries(savedQueries ?? [], filter);
+        return sortByTimestampDescending(filteredQueries, (query) => query.updatedAt);
     }, [savedQueries, filter]);
 
     const deleteSavedQuery = React.useCallback(
@@ -35,26 +36,29 @@ export function useSavedQueries() {
                 return;
             }
 
-            const currentQueries = savedQueries ?? [];
-            const nextSavedQueries = [...currentQueries];
-
-            const queryIndex = currentQueries.findIndex((el) => findQueryByName(el, queryName));
-
-            if (queryIndex >= 0) {
-                nextSavedQueries[queryIndex] = {
-                    ...currentQueries[queryIndex],
-                    body: queryBody,
-                };
-            } else {
-                nextSavedQueries.push({name: queryName, body: queryBody});
-            }
-
-            saveQueries(nextSavedQueries);
+            saveQueries(upsertSavedQuery(savedQueries ?? [], queryName, queryBody, Date.now()));
         },
         [savedQueries, saveQueries],
     );
 
-    return {savedQueries, filteredSavedQueries, deleteSavedQuery, saveQuery};
+    const renameSavedQuery = React.useCallback(
+        (previousName: string, nextName: string) => {
+            const result = renameSavedQueryInList(
+                savedQueries ?? [],
+                previousName,
+                nextName,
+                Date.now(),
+            );
+            if (result.renamed) {
+                saveQueries(result.queries);
+                dispatch(renameSavedQueryTabs({previousName, nextName}));
+            }
+            return result.renamed;
+        },
+        [dispatch, savedQueries, saveQueries],
+    );
+
+    return {savedQueries, filteredSavedQueries, deleteSavedQuery, saveQuery, renameSavedQuery};
 }
 
 function findQueryByName(query: SavedQuery, name: string) {

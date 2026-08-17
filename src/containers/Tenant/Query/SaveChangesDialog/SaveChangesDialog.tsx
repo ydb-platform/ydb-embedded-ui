@@ -48,9 +48,7 @@ function SaveChangesDialog({
         (value: string) => {
             const validationError = getQueryNameValidationError(value);
             if (validationError) {
-                return validationError === 'not-empty'
-                    ? i18n('error.name-not-empty')
-                    : i18n('error.name-min-length');
+                return i18n('error.name-not-empty');
             }
             const normalizedValue = value.trim().toLowerCase();
             const normalizedExistingQueryName = existingQueryName?.trim().toLowerCase();
