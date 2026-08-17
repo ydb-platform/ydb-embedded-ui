@@ -1,6 +1,6 @@
 import type {BackendSortParam, SchemaPathParam} from './common';
 import type {ECapacityAlert, EFlag} from './enums';
-import type {EDecommitStatus, EDriveStatus, TPDiskStateInfo} from './pdisk';
+import type {EDecommitStatus, EDriveStatus, EMaintenanceStatus, TPDiskStateInfo} from './pdisk';
 import type {EVDiskStatus, TVDiskStateInfo} from './vdisk';
 
 /**
@@ -240,6 +240,7 @@ export interface TStoragePDisk {
     Status?: EDriveStatus;
     DiskSpace?: EFlag;
     DecommitStatus?: EDecommitStatus;
+    MaintenanceStatus?: EMaintenanceStatus;
     /** uint64 */
     SlotSize?: string;
     /** uint64 */

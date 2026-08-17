@@ -12,6 +12,7 @@ import {EVDiskState} from '../../../types/api/vdisk';
 import {
     calculateAllIcon,
     calculateCompactionIcon,
+    calculateFlagPairIcon,
     calculateFrontQueuesIcon,
     calculateSpaceIcon,
 } from '../iconCalculators';
@@ -84,6 +85,21 @@ describe('disk icon calculators', () => {
             {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
             {icon: CircleCheckFill, color: 'var(--g-color-text-positive)'},
         ]);
+    });
+
+    test('keeps a Blue flag in its pair position as a healthy icon', () => {
+        expect(calculateFlagPairIcon(EFlag.Blue, EFlag.Yellow)).toEqual([
+            {icon: CircleCheckFill, color: 'var(--g-color-text-positive)'},
+            {icon: TriangleExclamationFill, color: 'var(--g-color-text-warning)'},
+        ]);
+    });
+
+    test.each([
+        [EFlag.Blue, EFlag.Green],
+        [EFlag.Green, EFlag.Blue],
+        [EFlag.Blue, EFlag.Blue],
+    ])('does not show icons for a fully healthy %s/%s pair', (firstFlag, secondFlag) => {
+        expect(calculateFlagPairIcon(firstFlag, secondFlag)).toBeUndefined();
     });
 
     test.each([

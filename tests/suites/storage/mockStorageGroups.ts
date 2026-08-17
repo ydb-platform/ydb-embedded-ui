@@ -1,4 +1,5 @@
 import {ECapacityAlert, EFlag} from '../../../src/types/api/enums';
+import type {EDecommitStatus, EDriveStatus, EMaintenanceStatus} from '../../../src/types/api/pdisk';
 import {TPDiskState} from '../../../src/types/api/pdisk';
 import type {StorageGroupsResponse, TStorageVDisk} from '../../../src/types/api/storage';
 import {EVDiskState} from '../../../src/types/api/vdisk';
@@ -13,37 +14,61 @@ const MOCK_VDISK_SLOT_ID_BASE = 200;
 
 export const MISSING_WHITEBOARD_VDISK_INDEX = 0;
 export const MISSING_FRONT_QUEUES_VDISK_INDEX = 1;
+export const MISSING_STATE_VDISK_INDEX = 2;
+export const MISSING_FRESH_IMPAIRED_LEVEL_VDISK_INDEX = 5;
+export const MISSING_PDISK_STATE_INDEX = 6;
 export const ALL_GREEN_VDISK_INDEX = 10;
 
-function createMockPDisk(index: number, state = TPDiskState.Normal): TStorageVDisk['PDisk'] {
+function createMockPDisk(
+    index: number,
+    state = TPDiskState.Normal,
+    capacityAlert?: ECapacityAlert,
+    allocatedPercent = 25,
+    hasWhiteboard = true,
+    driveStatus?: EDriveStatus,
+    decommitStatus?: EDecommitStatus,
+    maintenanceStatus?: EMaintenanceStatus,
+    device?: EFlag,
+    realtime?: EFlag,
+): TStorageVDisk['PDisk'] {
+    const totalSize = MOCK_SLOT_SIZE * 16;
+    const availableSize = Math.round(totalSize * (1 - allocatedPercent / 100));
+
     return {
         PDiskId: `${MOCK_NODE_ID_BASE + index}-${MOCK_PDISK_ID_BASE + index}`,
         Path: `/mock/vdisks-state/pdisk-${index}`,
         Type: index % 3 === 0 ? 'nvme' : index % 3 === 1 ? 'ssd' : 'hdd',
         Guid: String(9000000000000000000 + index),
-        TotalSize: String(MOCK_SLOT_SIZE * 16),
-        AvailableSize: String(MOCK_SLOT_SIZE * 12),
-        Status: 'ACTIVE',
+        TotalSize: String(totalSize),
+        AvailableSize: String(availableSize),
+        Status: driveStatus,
+        DecommitStatus: decommitStatus,
+        MaintenanceStatus: maintenanceStatus,
         DiskSpace: EFlag.Green,
         SlotSize: String(MOCK_SLOT_SIZE),
         SlotCount: '16',
-        Whiteboard: {
-            PDiskId: MOCK_PDISK_ID_BASE + index,
-            NodeId: MOCK_NODE_ID_BASE + index,
-            Path: `/mock/vdisks-state/pdisk-${index}`,
-            Guid: String(9000000000000000000 + index),
-            Category: String(index % 3),
-            AvailableSize: String(MOCK_SLOT_SIZE * 12),
-            TotalSize: String(MOCK_SLOT_SIZE * 16),
-            State: state,
-            Device: state === TPDiskState.Normal ? EFlag.Green : EFlag.Red,
-            Realtime: EFlag.Green,
-            StateFlag: state === TPDiskState.Normal ? EFlag.Green : EFlag.Red,
-            Overall: state === TPDiskState.Normal ? EFlag.Green : EFlag.Red,
-            EnforcedDynamicSlotSize: String(MOCK_SLOT_SIZE),
-            ExpectedSlotCount: 16,
-            NumActiveSlots: 1,
-        },
+        ...(hasWhiteboard
+            ? {
+                  Whiteboard: {
+                      PDiskId: MOCK_PDISK_ID_BASE + index,
+                      NodeId: MOCK_NODE_ID_BASE + index,
+                      Path: `/mock/vdisks-state/pdisk-${index}`,
+                      Guid: String(9000000000000000000 + index),
+                      Category: String(index % 3),
+                      AvailableSize: String(availableSize),
+                      TotalSize: String(totalSize),
+                      State: state,
+                      ...(device === undefined ? {} : {Device: device}),
+                      ...(realtime === undefined ? {} : {Realtime: realtime}),
+                      StateFlag: state === TPDiskState.Normal ? EFlag.Green : EFlag.Red,
+                      Overall: state === TPDiskState.Normal ? EFlag.Green : EFlag.Red,
+                      EnforcedDynamicSlotSize: String(MOCK_SLOT_SIZE),
+                      ExpectedSlotCount: 16,
+                      NumActiveSlots: 1,
+                      PDiskCapacityAlert: capacityAlert,
+                  },
+              }
+            : {}),
     };
 }
 
@@ -58,6 +83,14 @@ function createMockVDisk({
     replicated = true,
     donorMode = false,
     pDiskState = TPDiskState.Normal,
+    pDiskCapacityAlert,
+    pDiskAllocatedPercent,
+    pDiskHasWhiteboard = true,
+    pDiskDriveStatus,
+    pDiskDecommitStatus,
+    pDiskMaintenanceStatus,
+    pDiskDevice,
+    pDiskRealtime,
     satisfactionRank,
     allocatedSizeMultiplier,
 }: {
@@ -71,6 +104,14 @@ function createMockVDisk({
     replicated?: boolean;
     donorMode?: boolean;
     pDiskState?: TPDiskState;
+    pDiskCapacityAlert?: ECapacityAlert;
+    pDiskAllocatedPercent?: number;
+    pDiskHasWhiteboard?: boolean;
+    pDiskDriveStatus?: EDriveStatus;
+    pDiskDecommitStatus?: EDecommitStatus;
+    pDiskMaintenanceStatus?: EMaintenanceStatus;
+    pDiskDevice?: EFlag;
+    pDiskRealtime?: EFlag;
     satisfactionRank?: {
         FreshRank?: {RankPercent: number; Flag: EFlag};
         LevelRank?: {RankPercent: number; Flag: EFlag};
@@ -100,7 +141,18 @@ function createMockVDisk({
                   ? 'INIT_PENDING'
                   : 'ERROR',
         DiskSpace: diskSpace,
-        PDisk: createMockPDisk(index, pDiskState),
+        PDisk: createMockPDisk(
+            index,
+            pDiskState,
+            pDiskCapacityAlert,
+            pDiskAllocatedPercent,
+            pDiskHasWhiteboard,
+            pDiskDriveStatus,
+            pDiskDecommitStatus,
+            pDiskMaintenanceStatus,
+            pDiskDevice,
+            pDiskRealtime,
+        ),
         Whiteboard: {
             VDiskId: {
                 GroupID: groupId,
@@ -135,12 +187,21 @@ function createMockVDisk({
 }
 
 export function createMockStorageGroupsResponse(): StorageGroupsResponse {
-    // Define 11 VDisks with different combinations of State, CapacityAlert, FrontQueues, and SatisfactionRank
+    // Define VDisks with different combinations of State, CapacityAlert, FrontQueues, and SatisfactionRank
     // Covers all 6 EVDiskState values, various ECapacityAlert values, and multiple Fresh/Level Rank combinations
     const vDiskConfigs = [
         {
             state: EVDiskState.OK,
             capacityAlert: ECapacityAlert.GREEN,
+            pDiskState: TPDiskState.Normal,
+            pDiskCapacityAlert: ECapacityAlert.GREEN,
+            pDiskHasWhiteboard: true,
+            pDiskAllocatedPercent: 10,
+            pDiskDriveStatus: 'ACTIVE' as EDriveStatus,
+            pDiskDecommitStatus: 'DECOMMIT_NONE' as EDecommitStatus,
+            pDiskMaintenanceStatus: 'NO_REQUEST' as EMaintenanceStatus,
+            pDiskDevice: undefined,
+            pDiskRealtime: undefined,
             frontQueues: EFlag.Green,
             diskSpace: EFlag.Green,
             satisfactionRank: {
@@ -151,6 +212,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         {
             state: EVDiskState.OK,
             capacityAlert: ECapacityAlert.CYAN,
+            pDiskState: TPDiskState.Initial,
+            pDiskCapacityAlert: ECapacityAlert.CYAN,
+            pDiskHasWhiteboard: true,
+            pDiskAllocatedPercent: 20,
+            pDiskDriveStatus: 'INACTIVE' as EDriveStatus,
+            pDiskDecommitStatus: 'DECOMMIT_IMMINENT' as EDecommitStatus,
+            pDiskMaintenanceStatus: 'LONG_TERM_MAINTENANCE_PLANNED' as EMaintenanceStatus,
+            pDiskDevice: EFlag.Yellow,
+            pDiskRealtime: EFlag.Green,
             frontQueues: EFlag.Blue,
             diskSpace: EFlag.Green,
             satisfactionRank: {
@@ -161,6 +231,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         {
             state: EVDiskState.OK,
             capacityAlert: ECapacityAlert.YELLOW,
+            pDiskState: TPDiskState.OpenFileError,
+            pDiskCapacityAlert: ECapacityAlert.YELLOW,
+            pDiskHasWhiteboard: true,
+            pDiskAllocatedPercent: 30,
+            pDiskDriveStatus: 'TO_BE_REMOVED' as EDriveStatus,
+            pDiskDecommitStatus: 'DECOMMIT_PENDING' as EDecommitStatus,
+            pDiskMaintenanceStatus: 'NO_NEW_VDISKS' as EMaintenanceStatus,
+            pDiskDevice: EFlag.Orange,
+            pDiskRealtime: EFlag.Yellow,
             frontQueues: EFlag.Yellow,
             diskSpace: EFlag.Yellow,
             satisfactionRank: {
@@ -171,6 +250,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         {
             state: EVDiskState.OK,
             capacityAlert: ECapacityAlert.ORANGE,
+            pDiskState: TPDiskState.Stopped,
+            pDiskCapacityAlert: ECapacityAlert.ORANGE,
+            pDiskHasWhiteboard: true,
+            pDiskAllocatedPercent: 40,
+            pDiskDriveStatus: 'FAULTY' as EDriveStatus,
+            pDiskDecommitStatus: 'DECOMMIT_REJECTED' as EDecommitStatus,
+            pDiskMaintenanceStatus: 'NO_REQUEST' as EMaintenanceStatus,
+            pDiskDevice: EFlag.Red,
+            pDiskRealtime: EFlag.Orange,
             frontQueues: EFlag.Orange,
             diskSpace: EFlag.Orange,
             satisfactionRank: {
@@ -181,6 +269,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         {
             state: EVDiskState.OK,
             capacityAlert: ECapacityAlert.RED,
+            pDiskState: TPDiskState.InitialFormatReadError,
+            pDiskCapacityAlert: ECapacityAlert.RED,
+            pDiskHasWhiteboard: true,
+            pDiskAllocatedPercent: 50,
+            pDiskDriveStatus: 'BROKEN' as EDriveStatus,
+            pDiskDecommitStatus: 'DECOMMIT_NONE' as EDecommitStatus,
+            pDiskMaintenanceStatus: 'LONG_TERM_MAINTENANCE_PLANNED' as EMaintenanceStatus,
+            pDiskDevice: EFlag.Red,
+            pDiskRealtime: EFlag.Red,
             frontQueues: EFlag.Red,
             diskSpace: EFlag.Red,
             satisfactionRank: {
@@ -191,6 +288,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         {
             state: EVDiskState.Initial,
             capacityAlert: ECapacityAlert.LIGHTYELLOW,
+            pDiskState: TPDiskState.InitialFormatRead,
+            pDiskCapacityAlert: ECapacityAlert.LIGHTYELLOW,
+            pDiskHasWhiteboard: true,
+            pDiskAllocatedPercent: 60,
+            pDiskDriveStatus: 'UNKNOWN' as EDriveStatus,
+            pDiskDecommitStatus: 'DECOMMIT_NONE' as EDecommitStatus,
+            pDiskMaintenanceStatus: 'NO_NEW_VDISKS' as EMaintenanceStatus,
+            pDiskDevice: EFlag.Green,
+            pDiskRealtime: EFlag.Red,
             frontQueues: EFlag.Green,
             diskSpace: EFlag.Green,
             satisfactionRank: {
@@ -201,6 +307,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         {
             state: EVDiskState.SyncGuidRecovery,
             capacityAlert: ECapacityAlert.LIGHTORANGE,
+            pDiskState: TPDiskState.DeviceIoError,
+            pDiskCapacityAlert: ECapacityAlert.LIGHTORANGE,
+            pDiskHasWhiteboard: true,
+            pDiskAllocatedPercent: 70,
+            pDiskDriveStatus: 'ACTIVE' as EDriveStatus,
+            pDiskDecommitStatus: undefined,
+            pDiskMaintenanceStatus: undefined,
+            pDiskDevice: undefined,
+            pDiskRealtime: EFlag.Green,
             frontQueues: EFlag.Yellow,
             diskSpace: EFlag.Yellow,
             satisfactionRank: {
@@ -211,6 +326,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         {
             state: EVDiskState.SyncGuidRecoveryError,
             capacityAlert: ECapacityAlert.PREORANGE,
+            pDiskState: TPDiskState.ChunkQuotaError,
+            pDiskCapacityAlert: ECapacityAlert.PREORANGE,
+            pDiskHasWhiteboard: true,
+            pDiskAllocatedPercent: 80,
+            pDiskDriveStatus: 'ACTIVE' as EDriveStatus,
+            pDiskDecommitStatus: 'DECOMMIT_IMMINENT' as EDecommitStatus,
+            pDiskMaintenanceStatus: 'LONG_TERM_MAINTENANCE_PLANNED' as EMaintenanceStatus,
+            pDiskDevice: EFlag.Green,
+            pDiskRealtime: EFlag.Orange,
             frontQueues: EFlag.Orange,
             diskSpace: EFlag.Red,
             satisfactionRank: {
@@ -221,6 +345,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         {
             state: EVDiskState.LocalRecoveryError,
             capacityAlert: ECapacityAlert.BLACK,
+            pDiskState: TPDiskState.InitialSysLogParseError,
+            pDiskCapacityAlert: ECapacityAlert.BLACK,
+            pDiskHasWhiteboard: true,
+            pDiskAllocatedPercent: 90,
+            pDiskDriveStatus: 'INACTIVE' as EDriveStatus,
+            pDiskDecommitStatus: 'DECOMMIT_PENDING' as EDecommitStatus,
+            pDiskMaintenanceStatus: 'NO_NEW_VDISKS' as EMaintenanceStatus,
+            pDiskDevice: EFlag.Grey,
+            pDiskRealtime: EFlag.Green,
             frontQueues: EFlag.Grey,
             diskSpace: EFlag.Red,
             satisfactionRank: {
@@ -231,6 +364,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         {
             state: EVDiskState.PDiskError,
             capacityAlert: undefined,
+            pDiskState: TPDiskState.Normal,
+            pDiskCapacityAlert: undefined,
+            pDiskHasWhiteboard: false,
+            pDiskAllocatedPercent: 50,
+            pDiskDriveStatus: undefined,
+            pDiskDecommitStatus: undefined,
+            pDiskMaintenanceStatus: undefined,
+            pDiskDevice: EFlag.Green,
+            pDiskRealtime: EFlag.Green,
             frontQueues: EFlag.Red,
             diskSpace: EFlag.Red,
             satisfactionRank: undefined, // No data for this disk
@@ -238,6 +380,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         {
             state: EVDiskState.OK,
             capacityAlert: ECapacityAlert.GREEN,
+            pDiskState: TPDiskState.Normal,
+            pDiskCapacityAlert: undefined,
+            pDiskHasWhiteboard: true,
+            pDiskAllocatedPercent: 75,
+            pDiskDriveStatus: 'FAULTY' as EDriveStatus,
+            pDiskDecommitStatus: 'DECOMMIT_REJECTED' as EDecommitStatus,
+            pDiskMaintenanceStatus: 'NO_REQUEST' as EMaintenanceStatus,
+            pDiskDevice: EFlag.Green,
+            pDiskRealtime: EFlag.Green,
             frontQueues: EFlag.Green,
             diskSpace: EFlag.Green,
             satisfactionRank: {
@@ -253,6 +404,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             index,
             state: config.state,
             capacityAlert: config.capacityAlert,
+            pDiskState: config.pDiskState,
+            pDiskCapacityAlert: config.pDiskCapacityAlert,
+            pDiskAllocatedPercent: config.pDiskAllocatedPercent,
+            pDiskHasWhiteboard: config.pDiskHasWhiteboard,
+            pDiskDriveStatus: config.pDiskDriveStatus,
+            pDiskDecommitStatus: config.pDiskDecommitStatus,
+            pDiskMaintenanceStatus: config.pDiskMaintenanceStatus,
+            pDiskDevice: config.pDiskDevice,
+            pDiskRealtime: config.pDiskRealtime,
             frontQueues: config.frontQueues,
             diskSpace: config.diskSpace,
             replicated: true,
@@ -261,9 +421,13 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         }),
     );
 
-    // Keep explicit no-data and partial-data cases visible during local VDisk coloring checks.
+    // Keep explicit no-data and partial-data cases visible during local disk coloring checks.
     delete firstGroupVDisks[MISSING_WHITEBOARD_VDISK_INDEX].Whiteboard;
     delete firstGroupVDisks[MISSING_FRONT_QUEUES_VDISK_INDEX].Whiteboard?.FrontQueues;
+    delete firstGroupVDisks[MISSING_STATE_VDISK_INDEX].Whiteboard?.VDiskState;
+    delete firstGroupVDisks[MISSING_FRESH_IMPAIRED_LEVEL_VDISK_INDEX].Whiteboard?.SatisfactionRank
+        ?.FreshRank;
+    delete firstGroupVDisks[MISSING_PDISK_STATE_INDEX].PDisk?.Whiteboard?.State;
 
     // Second group - with replication (same disks but replicating)
     const replicatingGroupId = MOCK_GROUP_ID + 1;
@@ -277,6 +441,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             groupGeneration: replicatingGroupGeneration,
             state: config.state,
             capacityAlert: config.capacityAlert,
+            pDiskState: config.pDiskState,
+            pDiskCapacityAlert: config.pDiskCapacityAlert,
+            pDiskAllocatedPercent: config.pDiskAllocatedPercent,
+            pDiskHasWhiteboard: config.pDiskHasWhiteboard,
+            pDiskDriveStatus: config.pDiskDriveStatus,
+            pDiskDecommitStatus: config.pDiskDecommitStatus,
+            pDiskMaintenanceStatus: config.pDiskMaintenanceStatus,
+            pDiskDevice: config.pDiskDevice,
+            pDiskRealtime: config.pDiskRealtime,
             frontQueues: config.frontQueues,
             diskSpace: config.diskSpace,
             replicated: false,
@@ -290,6 +463,15 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             groupGeneration: replicatingGroupGeneration,
             state: config.state,
             capacityAlert: config.capacityAlert,
+            pDiskState: config.pDiskState,
+            pDiskCapacityAlert: config.pDiskCapacityAlert,
+            pDiskAllocatedPercent: config.pDiskAllocatedPercent,
+            pDiskHasWhiteboard: config.pDiskHasWhiteboard,
+            pDiskDriveStatus: config.pDiskDriveStatus,
+            pDiskDecommitStatus: config.pDiskDecommitStatus,
+            pDiskMaintenanceStatus: config.pDiskMaintenanceStatus,
+            pDiskDevice: config.pDiskDevice,
+            pDiskRealtime: config.pDiskRealtime,
             frontQueues: config.frontQueues,
             diskSpace: config.diskSpace,
             replicated: false,

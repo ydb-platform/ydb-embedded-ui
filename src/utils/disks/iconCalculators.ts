@@ -62,6 +62,10 @@ export function calculateStateIcon(vDisk: PreparedVDisk, isDonor?: boolean): Ico
 
     const state = vDisk.VDiskState;
 
+    if (state === undefined) {
+        return CircleQuestionFill;
+    }
+
     // Initial states get Clock icon (Figma: "иконка с часиками")
     if (state === EVDiskState.Initial || state === EVDiskState.SyncGuidRecovery) {
         return ClockFill;
@@ -154,10 +158,10 @@ export function calculateFrontQueuesIcon(
 }
 
 /**
- * Get icon and color for a single compaction rank (Fresh or Level)
- * Maps EFlag to corresponding icon and color from CompactionLegend
+ * Get icon and color for a single status flag.
+ * Maps EFlag to the corresponding pair-legend icon and color.
  */
-function getCompactionRankIconWithColor(flag: EFlag | undefined): IconWithColor | undefined {
+function getFlagIconWithColor(flag: EFlag | undefined): IconWithColor | undefined {
     if (!flag || flag === EFlag.Grey) {
         return {
             icon: CircleQuestionFill,
@@ -166,6 +170,7 @@ function getCompactionRankIconWithColor(flag: EFlag | undefined): IconWithColor 
     }
 
     switch (flag) {
+        case EFlag.Blue:
         case EFlag.Green:
             return {
                 icon: CircleCheckFill,
@@ -189,6 +194,29 @@ function getCompactionRankIconWithColor(flag: EFlag | undefined): IconWithColor 
         default:
             return undefined;
     }
+}
+
+export function calculateFlagPairIcon(
+    firstFlag: EFlag | undefined,
+    secondFlag: EFlag | undefined,
+): IconWithColor[] | undefined {
+    const flags = [firstFlag, secondFlag];
+    if (flags.every((flag) => flag === EFlag.Green || flag === EFlag.Blue)) {
+        return undefined;
+    }
+
+    const firstIconWithColor = getFlagIconWithColor(firstFlag);
+    const secondIconWithColor = getFlagIconWithColor(secondFlag);
+
+    const icons: IconWithColor[] = [];
+    if (firstIconWithColor) {
+        icons.push(firstIconWithColor);
+    }
+    if (secondIconWithColor) {
+        icons.push(secondIconWithColor);
+    }
+
+    return icons.length > 0 ? icons : undefined;
 }
 
 /**
@@ -215,25 +243,7 @@ export function calculateCompactionIcon(
     const freshFlag = vDisk.SatisfactionRank?.FreshRank?.Flag;
     const levelFlag = vDisk.SatisfactionRank?.LevelRank?.Flag;
 
-    // If both ranks are green, no icon
-    if (freshFlag === EFlag.Green && levelFlag === EFlag.Green) {
-        return undefined;
-    }
-
-    // At least one rank is missing or not green - show both icons with their respective colors
-    const freshIconWithColor = getCompactionRankIconWithColor(freshFlag);
-    const levelIconWithColor = getCompactionRankIconWithColor(levelFlag);
-
-    // Return array of icons with colors [Fresh, Level]
-    const icons: IconWithColor[] = [];
-    if (freshIconWithColor) {
-        icons.push(freshIconWithColor);
-    }
-    if (levelIconWithColor) {
-        icons.push(levelIconWithColor);
-    }
-
-    return icons.length > 0 ? icons : undefined;
+    return calculateFlagPairIcon(freshFlag, levelFlag);
 }
 
 /**
