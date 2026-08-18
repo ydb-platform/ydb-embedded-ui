@@ -60,6 +60,8 @@ export type MetaCapability =
     | '/meta/delete_cluster'
     | '/meta/events'
     | '/meta/login'
+    | '/meta/oidc/authorize'
+    | '/meta/oidc/callback'
     | '/meta/whoami'
     | '/meta/databases'
     | '/meta/environments'
