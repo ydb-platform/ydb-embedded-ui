@@ -18,6 +18,7 @@ import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getTabTitleForSave} from '../utils/queryTabTitles';
+import {hasSavedQueryName} from '../utils/savedQueries';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
 import i18n from './i18n';
@@ -180,7 +181,7 @@ function SaveQueryDialog({
         if (!value.trim()) {
             return i18n('error.name-not-empty');
         }
-        if (savedQueries?.some((q) => q.name.toLowerCase() === value.trim().toLowerCase())) {
+        if (savedQueries && hasSavedQueryName(savedQueries, value)) {
             return i18n('error.name-exists');
         }
         return undefined;
@@ -204,7 +205,7 @@ function SaveQueryDialog({
     };
 
     const onSaveClick = () => {
-        onSaveQuery(queryName, queryBody);
+        onSaveQuery(queryName.trim(), queryBody);
         dispatch(setIsDirty(false));
         onCloseDialog();
         onSuccess?.();

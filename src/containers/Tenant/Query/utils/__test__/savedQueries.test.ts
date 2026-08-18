@@ -2,6 +2,7 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {
     filterSavedQueries,
     formatSavedQueryUpdatedAt,
+    hasSavedQueryName,
     hasSavedQueryNameCollision,
     renameSavedQueryInList,
     upsertSavedQuery,
@@ -41,6 +42,7 @@ test('renames an existing query and leaves a missing source unchanged', () => {
 test('detects duplicate names against legacy whitespace-normalized records', () => {
     const legacyQuery = {name: ' Report ', body: 'SELECT 1;', updatedAt: 100};
 
+    expect(hasSavedQueryName([legacyQuery], 'report')).toBe(true);
     expect(hasSavedQueryNameCollision([legacyQuery], 'Another query', 'report')).toBe(true);
     expect(hasSavedQueryNameCollision([legacyQuery], ' Report ', 'report')).toBe(false);
 });

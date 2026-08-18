@@ -4,6 +4,16 @@ import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 
 const normalizeSavedQueryName = (value: string) => value.trim().toLowerCase();
 
+function findSavedQueryIndex(queries: SavedQuery[], name: string): number {
+    const normalizedName = normalizeSavedQueryName(name);
+
+    return queries.findIndex((query) => normalizeSavedQueryName(query.name) === normalizedName);
+}
+
+export function hasSavedQueryName(queries: SavedQuery[], name: string): boolean {
+    return findSavedQueryIndex(queries, name) >= 0;
+}
+
 export function hasSavedQueryNameCollision(
     queries: SavedQuery[],
     currentName: string,
@@ -38,9 +48,7 @@ export function upsertSavedQuery(
     body: string,
     updatedAt: number,
 ): SavedQuery[] {
-    const index = queries.findIndex(
-        (query) => normalizeSavedQueryName(query.name) === normalizeSavedQueryName(name),
-    );
+    const index = findSavedQueryIndex(queries, name);
     if (index < 0) {
         return [...queries, {name, body, updatedAt}];
     }
@@ -55,9 +63,7 @@ export function renameSavedQueryInList(
     nextName: string,
     updatedAt: number,
 ): {queries: SavedQuery[]; renamed: boolean} {
-    const index = queries.findIndex(
-        (query) => normalizeSavedQueryName(query.name) === normalizeSavedQueryName(previousName),
-    );
+    const index = findSavedQueryIndex(queries, previousName);
     if (index < 0) {
         return {queries, renamed: false};
     }
