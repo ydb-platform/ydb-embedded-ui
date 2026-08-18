@@ -47,6 +47,19 @@ Open http://localhost:8765 to view it in the browser.
 
 For API reference, open Swagger UI on http://localhost:8765/viewer/api/.
 
+### AI-assisted local development
+
+[Local YDB Toolkit](https://github.com/astandrik/local-ydb-toolkit) bundles a skill and MCP server for working with Docker-based local YDB.
+
+For Codex, install the plugin once:
+
+```bash
+codex plugin marketplace add astandrik/local-ydb-toolkit --ref main
+codex plugin add local-ydb-toolkit@local-ydb-toolkit
+```
+
+Start a new Codex session after installation. For a basic `/local` database, no config file is required. The agent can start and inspect the database, create a test schema, seed data, or add Playwright request mocks for UI-only scenarios. Changes to Docker or YDB require explicit confirmation.
+
 ### YDB docker images
 
 [Docs on YDB docker images](https://ydb.tech/en/docs/getting_started/self_hosted/ydb_docker)
