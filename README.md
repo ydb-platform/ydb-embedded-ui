@@ -47,6 +47,21 @@ Open http://localhost:8765 to view it in the browser.
 
 For API reference, open Swagger UI on http://localhost:8765/viewer/api/.
 
+### AI-assisted local development
+
+[Local YDB Toolkit](https://github.com/astandrik/local-ydb-toolkit) bundles an MCP server for local YDB tools with a `local-ydb` skill for the recommended workflows and checks.
+
+For Codex, install the plugin once:
+
+```bash
+codex plugin marketplace add astandrik/local-ydb-toolkit
+codex plugin add local-ydb-toolkit@local-ydb-toolkit
+```
+
+Using another agent? The toolkit also supports [Claude Code](https://github.com/astandrik/local-ydb-toolkit#claude-code-plugin), [Gemini CLI and Antigravity](https://github.com/astandrik/local-ydb-toolkit#gemini-cli--antigravity-plugin), and [other MCP clients that support local stdio servers](https://github.com/astandrik/local-ydb-toolkit#nodejs-mcp-server).
+
+Start a new Codex session after installation. A basic `/local` database needs no config file. The agent can manage YDB and seed test data with managed SQL, or use the existing Playwright request mocks for UI-only tests. Mutating tools require explicit confirmation.
+
 ### YDB docker images
 
 [Docs on YDB docker images](https://ydb.tech/en/docs/getting_started/self_hosted/ydb_docker)
