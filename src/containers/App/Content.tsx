@@ -278,14 +278,20 @@ function ContentWrapper(props: ContentWrapperProps) {
         if (authUnavailable || metaAuthUnavailable) {
             return <AccessDenied />;
         }
-        return <Authentication />;
+        return (
+            <GetMetaCapabilities>
+                <Authentication />
+            </GetMetaCapabilities>
+        );
     };
 
     return (
         <Switch>
             {!authUnavailable && !metaAuthUnavailable && (
                 <Route path={routes.auth}>
-                    <Authentication closable />
+                    <GetMetaCapabilities>
+                        <Authentication closable />
+                    </GetMetaCapabilities>
                 </Route>
             )}
             <Route>

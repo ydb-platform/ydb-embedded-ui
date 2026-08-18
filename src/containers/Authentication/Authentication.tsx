@@ -7,11 +7,7 @@ import {useHistory, useLocation, useRouteMatch} from 'react-router-dom';
 import routes, {getHomePagePath, parseQuery} from '../../routes';
 import {basename} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
-import {
-    useLoginWithDatabase,
-    useMetaCapabilitiesQuery,
-    useOidcAvailable,
-} from '../../store/reducers/capabilities/hooks';
+import {useLoginWithDatabase, useOidcAvailable} from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../utils/constants';
 import {prepareCommonErrorMessage} from '../../utils/errors';
@@ -42,7 +38,6 @@ function Authentication({closable = false}: AuthenticationProps) {
     const isDirectAuthPage = Boolean(useRouteMatch({path: routes.auth, exact: true}));
 
     const needDatabase = useLoginWithDatabase();
-    useMetaCapabilitiesQuery();
     const oidcAvailable = useOidcAvailable();
 
     const [authenticate, {isLoading}] = authenticationApi.useAuthenticateMutation();
