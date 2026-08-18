@@ -1,12 +1,16 @@
-import type {YDBDefinitionListItem} from '../../components/YDBDefinitionList/YDBDefinitionList';
 import {
     getHealthcheckViewsOrder,
     getHealthckechViewTitles,
     isIssueTypeOfCategory,
     issueCategories,
 } from '../../containers/Tenant/Healthcheck/shared';
-import type {PreparedTenant} from '../../store/reducers/tenants/types';
+import type {GetAdditionalDatabaseInfoItems} from '../../lib';
 import type {UIFactory} from '../types';
+import {configureUIFactory, uiFactory} from '../uiFactory';
+
+afterEach(() => {
+    configureUIFactory({getAdditionalDatabaseInfoItems: undefined});
+});
 
 test('allows consumers to omit the defaulted maximum VDisk count', () => {
     const factory: UIFactory = {
@@ -23,7 +27,7 @@ test('allows consumers to omit the defaulted maximum VDisk count', () => {
 });
 
 test('supports additional database info items built from prepared tenant data', () => {
-    const databaseData: PreparedTenant = {
+    const databaseData: Parameters<GetAdditionalDatabaseInfoItems>[0]['databaseData'] = {
         sharedTenantName: undefined,
         sharedNodeIds: undefined,
         controlPlaneName: 'database',
@@ -36,29 +40,23 @@ test('supports additional database info items built from prepared tenant data', 
             cloud_id: 'cloud-id',
         },
     };
-    const expectedItems: YDBDefinitionListItem[] = [
+    const getAdditionalDatabaseInfoItems: GetAdditionalDatabaseInfoItems = ({
+        databaseData: value,
+    }) => [
+        {
+            name: 'Cloud ID',
+            content: value.UserAttributes?.cloud_id,
+            copyText: value.UserAttributes?.cloud_id,
+        },
+    ];
+
+    configureUIFactory({getAdditionalDatabaseInfoItems});
+
+    expect(uiFactory.getAdditionalDatabaseInfoItems?.({databaseData})).toEqual([
         {
             name: 'Cloud ID',
             content: 'cloud-id',
             copyText: 'cloud-id',
         },
-    ];
-    const factory: UIFactory = {
-        healthcheck: {
-            issueCategories,
-            isIssueTypeOfCategory,
-            getHealthckechViewTitles,
-            getHealthcheckViewsOrder,
-        },
-        hasAccess: () => true,
-        getAdditionalDatabaseInfoItems: ({databaseData: value}) => [
-            {
-                name: 'Cloud ID',
-                content: value.UserAttributes?.cloud_id,
-                copyText: value.UserAttributes?.cloud_id,
-            },
-        ],
-    };
-
-    expect(factory.getAdditionalDatabaseInfoItems?.({databaseData})).toEqual(expectedItems);
+    ]);
 });
