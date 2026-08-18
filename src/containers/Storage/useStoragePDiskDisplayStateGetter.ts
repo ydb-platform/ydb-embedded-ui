@@ -4,7 +4,7 @@ import {CircleQuestionFill} from '@gravity-ui/icons';
 
 import {isCapacityAlert} from '../../types/api/enums';
 import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
-import type {PDiskDisplayStateGetter} from '../../utils/disks/displayState';
+import type {DiskDisplayMode, PDiskDisplayStateGetter} from '../../utils/disks/displayState';
 import {getDefaultPDiskDisplayState} from '../../utils/disks/displayState';
 import {calculateFlagPairIcon, calculateSpaceIcon} from '../../utils/disks/iconCalculators';
 import {
@@ -25,27 +25,33 @@ import {useIsStorageExpertMode, usePDisksGroupByParam} from './useStorageQueryPa
 
 const EXPERT_MODE_PDISK_WIDTH = 55;
 
-function getModeModifier(groupBy: PDisksGroupByValue): string | undefined {
+function getMode(groupBy: PDisksGroupByValue): DiskDisplayMode | undefined {
     switch (groupBy) {
         case PDisksGroupBy.State:
-            return 'mode-state';
+            return 'state';
         case PDisksGroupBy.Space:
-            return 'mode-space';
+            return 'space';
         case PDisksGroupBy.Drive:
-            return 'mode-drive';
+            return 'drive';
         case PDisksGroupBy.Decommit:
-            return 'mode-decommit';
+            return 'decommit';
         case PDisksGroupBy.Maintenance:
-            return 'mode-maintenance';
+            return 'maintenance';
         case PDisksGroupBy.Device:
-            return 'mode-device';
+            return 'device';
         default:
             return undefined;
     }
 }
 
 function requiresWhiteboardData(groupBy: PDisksGroupByValue) {
-    return groupBy === PDisksGroupBy.State || groupBy === PDisksGroupBy.Device;
+    return (
+        groupBy === PDisksGroupBy.State ||
+        groupBy === PDisksGroupBy.Drive ||
+        groupBy === PDisksGroupBy.Decommit ||
+        groupBy === PDisksGroupBy.Maintenance ||
+        groupBy === PDisksGroupBy.Device
+    );
 }
 
 export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
@@ -59,17 +65,17 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
                 return getDefaultPDiskDisplayState(pDisk);
             }
 
-            const modeModifier = getModeModifier(pdisksGroupBy);
+            const mode = getMode(pdisksGroupBy);
 
             if (pDisk.WhiteboardSize === undefined && requiresWhiteboardData(pdisksGroupBy)) {
                 return {
                     severity: NOT_AVAILABLE_SEVERITY,
                     icon: undefined,
-                    modeModifier,
+                    mode,
                     isLegendInactive: false,
                     showNoDataPlaceholder: true,
                     allocatedPercent: undefined,
-                    width: modeModifier ? EXPERT_MODE_PDISK_WIDTH : undefined,
+                    width: mode ? EXPERT_MODE_PDISK_WIDTH : undefined,
                 };
             }
 
@@ -85,7 +91,7 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
                 return {
                     severity: calculateSpaceSeverity({CapacityAlert: capacityAlert}),
                     icon: calculateSpaceIcon({CapacityAlert: capacityAlert}),
-                    modeModifier,
+                    mode,
                     isLegendInactive:
                         isCapacityAlert(capacityAlert) && inactiveAlerts.has(capacityAlert),
                     showNoDataPlaceholder: false,
@@ -103,7 +109,7 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
                         pDisk.DriveStatus === undefined
                             ? CircleQuestionFill
                             : driveDisplayState.icon,
-                    modeModifier,
+                    mode,
                     isLegendInactive: false,
                     showNoDataPlaceholder: false,
                     allocatedPercent: undefined,
@@ -120,7 +126,7 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
                         pDisk.DecommitStatus === undefined
                             ? CircleQuestionFill
                             : decommitDisplayState.icon,
-                    modeModifier,
+                    mode,
                     isLegendInactive: false,
                     showNoDataPlaceholder: false,
                     allocatedPercent: undefined,
@@ -139,7 +145,7 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
                         pDisk.MaintenanceStatus === undefined
                             ? CircleQuestionFill
                             : maintenanceDisplayState.icon,
-                    modeModifier,
+                    mode,
                     isLegendInactive: false,
                     showNoDataPlaceholder: false,
                     allocatedPercent: undefined,
@@ -151,7 +157,7 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
                 return {
                     severity: calculateFlagPairSeverity(pDisk.Device, pDisk.Realtime),
                     icon: calculateFlagPairIcon(pDisk.Device, pDisk.Realtime),
-                    modeModifier,
+                    mode,
                     isLegendInactive: false,
                     showNoDataPlaceholder: false,
                     allocatedPercent: undefined,
@@ -171,7 +177,7 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
                     stateDisplayState.severity === NOT_AVAILABLE_SEVERITY
                         ? CircleQuestionFill
                         : stateDisplayState.icon,
-                modeModifier,
+                mode,
                 isLegendInactive: false,
                 showNoDataPlaceholder: false,
                 allocatedPercent: undefined,

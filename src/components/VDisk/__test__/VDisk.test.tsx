@@ -36,21 +36,10 @@ jest.mock('../../HoverPopup/HoverPopup', () => ({
 }));
 
 jest.mock('../../DiskStateProgressBar/DiskStateProgressBar', () => ({
-    DiskStateProgressBar: ({
-        icon,
-        noDataPlaceholder,
-        striped,
-    }: {
-        icon?: unknown;
-        noDataPlaceholder?: React.ReactNode;
-        striped?: boolean;
-    }) => (
-        <div
-            data-testid="disk-progress"
-            data-has-icon={icon ? 'true' : 'false'}
-            data-no-data-placeholder={noDataPlaceholder}
-            data-striped={striped ? 'true' : 'false'}
-        />
+    DiskStateProgressBar: ({content, striped}: {content?: React.ReactNode; striped?: boolean}) => (
+        <div data-testid="disk-progress" data-striped={striped ? 'true' : 'false'}>
+            {content}
+        </div>
     ),
 }));
 
@@ -80,10 +69,7 @@ describe('VDisk', () => {
     test('keeps N/D fallback in default mode', () => {
         renderVDisk({data: {}});
 
-        expect(screen.getByTestId('disk-progress')).toHaveAttribute(
-            'data-no-data-placeholder',
-            'N/D',
-        );
+        expect(screen.getByTestId('disk-progress')).toHaveTextContent('N/D');
     });
 
     test('does not mark no data vdisk as replicating in expert modes', () => {
@@ -92,7 +78,9 @@ describe('VDisk', () => {
             getDisplayState: () => ({
                 severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
                 icon: undefined,
-                modeModifier: 'mode-space',
+                mode: 'space',
+                striped: false,
+                iconPlacement: 'inline',
             }),
         });
 
@@ -105,15 +93,14 @@ describe('VDisk', () => {
             getDisplayState: () => ({
                 severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
                 icon: undefined,
-                modeModifier: 'mode-state',
+                mode: 'state',
                 showNoDataPlaceholder: true,
+                striped: false,
+                iconPlacement: 'inline',
             }),
         });
 
-        expect(screen.getByTestId('disk-progress')).toHaveAttribute(
-            'data-no-data-placeholder',
-            'N/D',
-        );
+        expect(screen.getByTestId('disk-progress')).toHaveTextContent('N/D');
     });
 
     test('does not use N/D when only State data is unavailable in expert mode', () => {
@@ -130,31 +117,32 @@ describe('VDisk', () => {
             getDisplayState: () => ({
                 severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
                 icon: undefined,
-                modeModifier: 'mode-state',
+                mode: 'state',
                 showNoDataPlaceholder: false,
+                striped: false,
+                iconPlacement: 'inline',
             }),
         });
 
-        expect(screen.getByTestId('disk-progress')).not.toHaveAttribute('data-no-data-placeholder');
-        expect(screen.getByTestId('disk-progress')).toHaveAttribute('data-has-icon', 'false');
+        expect(screen.getByTestId('disk-progress')).not.toHaveTextContent('N/D');
     });
 
-    test.each(['mode-space', 'mode-frontqueues', 'mode-compaction'])(
-        'does not pass no data placeholder when %s renders status icon',
-        (modeModifier) => {
+    test.each(['space', 'frontQueues', 'compaction'] as const)(
+        'does not render N/D when %s mode uses its status indicator',
+        (mode) => {
             renderVDisk({
                 data: {},
                 getDisplayState: () => ({
                     severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
                     icon: CircleQuestionFill,
-                    modeModifier,
+                    mode,
+                    showNoDataPlaceholder: false,
+                    striped: false,
+                    iconPlacement: 'inline',
                 }),
             });
 
-            expect(screen.getByTestId('disk-progress')).toHaveAttribute('data-has-icon', 'true');
-            expect(screen.getByTestId('disk-progress')).not.toHaveAttribute(
-                'data-no-data-placeholder',
-            );
+            expect(screen.getByTestId('disk-progress')).not.toHaveTextContent('N/D');
         },
     );
 
@@ -175,8 +163,10 @@ describe('VDisk', () => {
             getDisplayState: () => ({
                 severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
                 icon: undefined,
-                modeModifier: 'mode-all',
-                allModeHasIssues: false,
+                mode: 'all',
+                striped: false,
+                iconPlacement: 'inline',
+                allMode: {hasIssues: false, indicators: {}},
             }),
         });
 
@@ -203,8 +193,10 @@ describe('VDisk', () => {
             getDisplayState: () => ({
                 severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
                 icon: undefined,
-                modeModifier: 'mode-all',
-                allModeHasIssues: true,
+                mode: 'all',
+                striped: false,
+                iconPlacement: 'inline',
+                allMode: {hasIssues: true, indicators: {}},
             }),
         });
 
@@ -224,8 +216,10 @@ describe('VDisk', () => {
             getDisplayState: () => ({
                 severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue,
                 icon: undefined,
-                modeModifier: 'mode-all',
-                allModeHasIssues: false,
+                mode: 'all',
+                striped: true,
+                iconPlacement: 'inline',
+                allMode: {hasIssues: false, indicators: {}},
             }),
         });
 
@@ -250,11 +244,87 @@ describe('useStorageVDiskDisplayStateGetter', () => {
             LevelRank: {Flag: EFlag.Green},
         },
     };
+    const POLICY_VDISK = {
+        ...ALL_GREEN_VDISK,
+        Severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
+        Replicated: true,
+        AllocatedPercent: 42,
+    };
 
     beforeEach(() => {
         mockUseIsStorageExpertMode.mockReturnValue(true);
         mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.State);
         mockUseSpaceLegendSelection.mockReturnValue(new Set());
+    });
+
+    test('returns renderer-ready policy outside Expert Mode', () => {
+        mockUseIsStorageExpertMode.mockReturnValue(false);
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(result.current(POLICY_VDISK)).toMatchObject({
+            severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
+            mode: undefined,
+            isLegendInactive: false,
+            allocatedPercent: 42,
+            showAllocatedPercentLabel: true,
+            striped: false,
+            iconPlacement: 'inline',
+        });
+    });
+
+    test.each([
+        {
+            groupBy: VDisksGroupBy.State,
+            mode: 'state',
+            allocatedPercent: undefined,
+            showAllocatedPercentLabel: true,
+            allMode: undefined,
+        },
+        {
+            groupBy: VDisksGroupBy.Space,
+            mode: 'space',
+            allocatedPercent: undefined,
+            showAllocatedPercentLabel: true,
+            allMode: undefined,
+        },
+        {
+            groupBy: VDisksGroupBy.Compaction,
+            mode: 'compaction',
+            allocatedPercent: undefined,
+            showAllocatedPercentLabel: true,
+            allMode: undefined,
+        },
+        {
+            groupBy: VDisksGroupBy.All,
+            mode: 'all',
+            allocatedPercent: 42,
+            showAllocatedPercentLabel: false,
+            allMode: {hasIssues: false},
+        },
+    ] as const)(
+        'returns renderer-ready policy for $mode mode',
+        ({groupBy, mode, allocatedPercent, showAllocatedPercentLabel, allMode}) => {
+            mockUseVDisksGroupByParam.mockReturnValue(groupBy);
+            const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+            expect(result.current(POLICY_VDISK)).toMatchObject({
+                mode,
+                isLegendInactive: false,
+                allocatedPercent,
+                showAllocatedPercentLabel,
+                striped: false,
+                iconPlacement: 'inline',
+                ...(allMode ? {allMode} : {}),
+            });
+        },
+    );
+
+    test('marks Space mode inactive through display-state policy', () => {
+        mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.Space);
+        mockUseSpaceLegendSelection.mockReturnValue(new Set([ECapacityAlert.GREEN]));
+        const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
+
+        expect(result.current(POLICY_VDISK)).toHaveProperty('isLegendInactive', true);
     });
 
     test('does not request N/D when only State is unavailable in expert mode', () => {
@@ -273,8 +343,11 @@ describe('useStorageVDiskDisplayStateGetter', () => {
         ).toMatchObject({
             severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
             icon: CircleQuestionFill,
-            modeModifier: 'mode-state',
+            mode: 'state',
             showNoDataPlaceholder: false,
+            allocatedPercent: undefined,
+            striped: false,
+            iconPlacement: 'inline',
         });
     });
 
@@ -287,16 +360,16 @@ describe('useStorageVDiskDisplayStateGetter', () => {
         expect(displayState).toMatchObject({
             severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
             icon: undefined,
-            modeModifier: 'mode-all',
+            mode: 'all',
             showNoDataPlaceholder: true,
+            allMode: {
+                indicators: {},
+            },
         });
-        expect(displayState).not.toHaveProperty('capacityAlertIndicator');
-        expect(displayState).not.toHaveProperty('frontQueuesIndicator');
-        expect(displayState).not.toHaveProperty('compactionIndicator');
-        expect(displayState).not.toHaveProperty('allModeHasIssues');
+        expect(displayState).not.toHaveProperty('allMode.hasIssues');
     });
 
-    test('uses a dedicated mode-all modifier for Expert Mode All', () => {
+    test('returns renderer-ready policy for Expert Mode All', () => {
         mockUseVDisksGroupByParam.mockReturnValue(VDisksGroupBy.All);
         const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
 
@@ -310,11 +383,17 @@ describe('useStorageVDiskDisplayStateGetter', () => {
                     VDisk: 0,
                 },
                 VDiskState: EVDiskState.OK,
+                Replicated: true,
+                AllocatedPercent: 42,
             }),
         ).toMatchObject({
             severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
-            modeModifier: 'mode-all',
+            mode: 'all',
             showNoDataPlaceholder: false,
+            allocatedPercent: 42,
+            showAllocatedPercentLabel: false,
+            striped: false,
+            iconPlacement: 'inline',
         });
     });
 
@@ -323,7 +402,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
         mockUseSpaceLegendSelection.mockReturnValue(new Set([ECapacityAlert.GREEN]));
         const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
 
-        expect(result.current(ALL_GREEN_VDISK)).toHaveProperty('allModeHasIssues', false);
+        expect(result.current(ALL_GREEN_VDISK)).toHaveProperty('allMode.hasIssues', false);
     });
 
     test('treats Blue FrontQueues as an issue in Expert Mode All', () => {
@@ -331,7 +410,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
         const {result} = renderHook(() => useStorageVDiskDisplayStateGetter());
 
         expect(result.current({...ALL_GREEN_VDISK, FrontQueues: EFlag.Blue})).toHaveProperty(
-            'allModeHasIssues',
+            'allMode.hasIssues',
             true,
         );
     });
@@ -373,7 +452,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
                 ...ALL_GREEN_VDISK,
                 ...override,
             }),
-        ).toHaveProperty('allModeHasIssues', true);
+        ).toHaveProperty('allMode.hasIssues', true);
     });
 
     test('exposes an active Capacity Alert indicator in Expert Mode All', () => {
@@ -391,7 +470,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
                 },
                 CapacityAlert: ECapacityAlert.LIGHTYELLOW,
             }),
-        ).toHaveProperty('capacityAlertIndicator', 'LY');
+        ).toHaveProperty('allMode.indicators.capacityAlert', 'LY');
     });
 
     test('uses a question icon when Capacity Alert data is unavailable in Expert Mode All', () => {
@@ -408,7 +487,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
                     VDisk: 0,
                 },
             }),
-        ).toHaveProperty('capacityAlertIndicator', CircleQuestionFill);
+        ).toHaveProperty('allMode.indicators.capacityAlert', CircleQuestionFill);
     });
 
     test('exposes a FrontQueues warning indicator in Expert Mode All', () => {
@@ -426,7 +505,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
                 },
                 FrontQueues: EFlag.Yellow,
             }),
-        ).toHaveProperty('frontQueuesIndicator', Ellipsis);
+        ).toHaveProperty('allMode.indicators.frontQueues', Ellipsis);
     });
 
     test('uses a question icon when FrontQueues data is unavailable in Expert Mode All', () => {
@@ -443,7 +522,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
                     VDisk: 0,
                 },
             }),
-        ).toHaveProperty('frontQueuesIndicator', CircleQuestionFill);
+        ).toHaveProperty('allMode.indicators.frontQueues', CircleQuestionFill);
     });
 
     test('exposes Compaction rank indicators in Expert Mode All', () => {
@@ -464,7 +543,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
                     LevelRank: {Flag: EFlag.Red},
                 },
             }),
-        ).toHaveProperty('compactionIndicator', [
+        ).toHaveProperty('allMode.indicators.compaction', [
             {icon: CircleCheckFill, color: 'var(--g-color-text-positive)'},
             {icon: CircleXmarkFill, color: 'var(--g-color-text-primary)'},
         ]);
@@ -484,7 +563,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
                     VDisk: 0,
                 },
             }),
-        ).toHaveProperty('compactionIndicator', [
+        ).toHaveProperty('allMode.indicators.compaction', [
             {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
             {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
         ]);
@@ -506,7 +585,7 @@ describe('useStorageVDiskDisplayStateGetter', () => {
                 },
                 CapacityAlert: ECapacityAlert.LIGHTYELLOW,
             }),
-        ).not.toHaveProperty('capacityAlertIndicator');
+        ).not.toHaveProperty('allMode.indicators.capacityAlert');
     });
 
     test('does not expose All-mode indicators outside Expert Mode All', () => {
@@ -528,9 +607,6 @@ describe('useStorageVDiskDisplayStateGetter', () => {
             },
         });
 
-        expect(displayState).not.toHaveProperty('capacityAlertIndicator');
-        expect(displayState).not.toHaveProperty('frontQueuesIndicator');
-        expect(displayState).not.toHaveProperty('compactionIndicator');
-        expect(displayState).not.toHaveProperty('allModeHasIssues');
+        expect(displayState).not.toHaveProperty('allMode');
     });
 });

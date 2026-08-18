@@ -4,10 +4,20 @@ import type {PopupPlacement, PopupProps} from '@gravity-ui/uikit';
 
 import {useVDiskPagePath} from '../../routes';
 import {cn} from '../../utils/cn';
-import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../utils/disks/constants';
-import type {DiskDisplayStateGetter} from '../../utils/disks/displayState';
+import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
+import type {
+    AllModeIndicatorsState,
+    DiskIndicatorValue,
+    VDiskDisplayStateGetter,
+} from '../../utils/disks/displayState';
 import {getDefaultDiskDisplayState} from '../../utils/disks/displayState';
+import {getDiskBarTone} from '../../utils/disks/getDiskBarTone';
+import {getVDiskStatusIcon} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
+import {isNumeric} from '../../utils/utils';
+import {AllModeIndicators} from '../DiskStateProgressBar/AllModeIndicators';
+import {DiskBarLabel} from '../DiskStateProgressBar/DiskBarLabel';
+import {DiskIndicator} from '../DiskStateProgressBar/DiskIndicator';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {InternalLink} from '../InternalLink';
@@ -20,6 +30,87 @@ import './VDisk.scss';
 const b = cn('ydb-vdisk-component');
 
 const DEFAULT_POPUP_OFFSET: PopupProps['offset'] = {mainAxis: 2, crossAxis: 0};
+const EMPTY_ALL_MODE_INDICATORS = {};
+
+interface GetVDiskBarContentParams {
+    allocatedPercent?: number;
+    compact?: boolean;
+    hidden: boolean;
+    noDataPlaceholder?: React.ReactNode;
+    severity: number;
+    showAllocatedPercentLabel?: boolean;
+    showNoDataPlaceholder?: boolean;
+}
+
+function getVDiskBarContent({
+    allocatedPercent,
+    compact,
+    hidden,
+    noDataPlaceholder,
+    severity,
+    showAllocatedPercentLabel,
+    showNoDataPlaceholder,
+}: GetVDiskBarContentParams) {
+    if (hidden) {
+        return null;
+    }
+
+    const hasAllocatedPercent = isNumeric(allocatedPercent) && allocatedPercent >= 0;
+    if (!compact && hasAllocatedPercent && showAllocatedPercentLabel !== false) {
+        return <DiskBarLabel>{`${Math.floor(allocatedPercent)}%`}</DiskBarLabel>;
+    }
+
+    if (!compact && (!hasAllocatedPercent || showNoDataPlaceholder === true) && noDataPlaceholder) {
+        return <DiskBarLabel variant="placeholder">{noDataPlaceholder}</DiskBarLabel>;
+    }
+
+    if (compact && severity === NOT_AVAILABLE_SEVERITY && noDataPlaceholder) {
+        return <DiskBarLabel variant="compact-placeholder">{noDataPlaceholder}</DiskBarLabel>;
+    }
+
+    return null;
+}
+
+interface GetVDiskBarIndicatorParams {
+    hidden: boolean;
+    icon?: DiskIndicatorValue;
+    isDonor?: boolean;
+    placement: 'inline' | 'overlap';
+    severity: number;
+    withIcon?: boolean;
+}
+
+function getVDiskBarIndicator({
+    hidden,
+    icon,
+    isDonor,
+    placement,
+    severity,
+    withIcon,
+}: GetVDiskBarIndicatorParams) {
+    const resolvedIndicator = icon ?? getVDiskStatusIcon(severity, isDonor);
+    if (!withIcon || hidden || !resolvedIndicator) {
+        return {leading: null, overflowVisible: false, showIndicator: false};
+    }
+
+    return {
+        leading: <DiskIndicator value={resolvedIndicator} placement={placement} />,
+        overflowVisible: placement === 'overlap',
+        showIndicator: true,
+    };
+}
+
+function getAllModeOverlay(
+    compact: boolean | undefined,
+    isAllMode: boolean,
+    indicators: AllModeIndicatorsState | undefined,
+) {
+    if (compact || !isAllMode) {
+        return null;
+    }
+
+    return <AllModeIndicators indicators={indicators ?? EMPTY_ALL_MODE_INDICATORS} />;
+}
 
 function getAccessibleName(
     data: PreparedVDisk,
@@ -78,7 +169,7 @@ export interface VDiskProps {
     placement?: PopupPlacement;
     popupOffset?: PopupProps['offset'];
     withOpaqueBackground?: boolean;
-    getDisplayState?: DiskDisplayStateGetter;
+    getDisplayState?: VDiskDisplayStateGetter;
 }
 
 export const VDisk = ({
@@ -103,46 +194,51 @@ export const VDisk = ({
 
     const isDonor = data.DonorMode;
 
-    const {
-        severity,
-        icon,
-        capacityAlertIndicator,
-        frontQueuesIndicator,
-        compactionIndicator,
-        allModeHasIssues,
-        modeModifier,
-        isLegendInactive,
-        showNoDataPlaceholder,
-    } = React.useMemo(
+    const displayState = React.useMemo(
         () => (getDisplayState ?? getDefaultDiskDisplayState)(data, isDonor),
         [data, getDisplayState, isDonor],
     );
+    const {
+        severity,
+        icon,
+        mode,
+        isLegendInactive,
+        showNoDataPlaceholder,
+        allocatedPercent,
+        showAllocatedPercentLabel,
+        striped,
+        iconPlacement,
+        allMode,
+    } = displayState;
 
-    const isAllMode = modeModifier === 'mode-all';
-    const accessibleName = getAccessibleName(data, allModeHasIssues, isAllMode);
-
-    // Check if disk is replicating (not replicated yet) and should show stripes
-    const hasVDiskData = Boolean(data.VDiskState);
-    let isReplicating: boolean;
-    if (!modeModifier || modeModifier === 'mode-state' || isAllMode) {
-        isReplicating = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
-    } else {
-        // Space mode and other expert modes: show stripes for any Replicated=false disk
-        isReplicating = hasVDiskData && data.Replicated === false;
-    }
-
-    // Only the default and All modes show disk allocation (filled bar)
-    const diskAllocatedPercent = !modeModifier || isAllMode ? data.AllocatedPercent : undefined;
-    const shouldShowNoDataPlaceholder =
-        showNoDataPlaceholder !== false &&
-        !(
-            icon &&
-            (modeModifier === 'mode-space' ||
-                modeModifier === 'mode-frontqueues' ||
-                modeModifier === 'mode-compaction')
-        );
-    const shouldPrioritizeNoDataPlaceholder = isAllMode && showNoDataPlaceholder === true;
-    const shouldOverlapIconAtTopLeft = isAllMode && !isDonor && Boolean(withIcon) && Boolean(icon);
+    const isAllMode = mode === 'all';
+    const accessibleName = getAccessibleName(data, allMode?.hasIssues, isAllMode);
+    const hideBarContent = Boolean(isLegendInactive && !isDonor);
+    const {leading, overflowVisible, showIndicator} = getVDiskBarIndicator({
+        hidden: hideBarContent,
+        icon,
+        isDonor,
+        placement: iconPlacement,
+        severity,
+        withIcon,
+    });
+    const noDataPlaceholder = showNoDataPlaceholder === false ? undefined : i18n('context_no-data');
+    const barContent = getVDiskBarContent({
+        allocatedPercent,
+        compact,
+        hidden: hideBarContent,
+        noDataPlaceholder,
+        severity,
+        showAllocatedPercentLabel,
+        showNoDataPlaceholder,
+    });
+    const overlay = getAllModeOverlay(compact, isAllMode, allMode?.indicators);
+    const tone = getDiskBarTone({
+        severity,
+        isDonor,
+        showIndicator,
+        indicator: icon,
+    });
 
     return (
         <HoverPopup
@@ -166,28 +262,21 @@ export const VDisk = ({
                     })}
                 >
                     <DiskStateProgressBar
-                        diskAllocatedPercent={diskAllocatedPercent}
-                        hideAllocatedPercentLabel={isAllMode}
-                        severity={severity}
+                        allocation={allocatedPercent}
+                        tone={tone}
+                        mode={mode}
                         compact={compact}
                         inactive={inactive}
-                        striped={isReplicating || isDonor}
-                        isDonor={isDonor}
+                        striped={striped}
+                        filled={compact && mode === undefined && !striped}
                         className={progressBarClassName}
-                        withIcon={withIcon}
-                        icon={icon}
-                        capacityAlertIndicator={capacityAlertIndicator}
-                        frontQueuesIndicator={frontQueuesIndicator}
-                        compactionIndicator={compactionIndicator}
-                        allModeHasIssues={allModeHasIssues}
-                        modeModifier={modeModifier}
+                        leading={leading}
+                        content={barContent}
+                        overlay={overlay}
                         highlighted={highlighted}
-                        noDataPlaceholder={
-                            shouldShowNoDataPlaceholder ? i18n('context_no-data') : undefined
-                        }
-                        prioritizeNoDataPlaceholder={shouldPrioritizeNoDataPlaceholder}
-                        overlapIconAtTopLeft={shouldOverlapIconAtTopLeft}
-                        isLegendInactive={isLegendInactive}
+                        strongFill={allMode?.hasIssues}
+                        borderless={isLegendInactive}
+                        overflowVisible={overflowVisible}
                     />
                 </InternalLink>
             </div>

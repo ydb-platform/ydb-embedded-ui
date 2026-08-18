@@ -286,7 +286,7 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             },
         },
         {
-            state: EVDiskState.Initial,
+            state: EVDiskState.OK,
             capacityAlert: ECapacityAlert.LIGHTYELLOW,
             pDiskState: TPDiskState.InitialFormatRead,
             pDiskCapacityAlert: ECapacityAlert.LIGHTYELLOW,
@@ -297,8 +297,8 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
             pDiskMaintenanceStatus: 'NO_NEW_VDISKS' as EMaintenanceStatus,
             pDiskDevice: EFlag.Green,
             pDiskRealtime: EFlag.Red,
-            frontQueues: EFlag.Green,
-            diskSpace: EFlag.Green,
+            frontQueues: EFlag.Yellow,
+            diskSpace: EFlag.Yellow,
             satisfactionRank: {
                 FreshRank: {RankPercent: 70, Flag: EFlag.Green},
                 LevelRank: {RankPercent: 105, Flag: EFlag.Red},

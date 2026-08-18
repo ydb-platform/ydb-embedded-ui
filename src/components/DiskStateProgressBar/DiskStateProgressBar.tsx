@@ -1,14 +1,11 @@
 import React from 'react';
 
-import {CircleQuestionFill} from '@gravity-ui/icons';
-import type {IconData} from '@gravity-ui/uikit';
-import {Flex, Icon, Text} from '@gravity-ui/uikit';
+import {Flex} from '@gravity-ui/uikit';
 
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {cn} from '../../utils/cn';
-import {DONOR_COLOR, NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
-import {getDisplaySeverityColor, getVDiskStatusIcon} from '../../utils/disks/helpers';
-import type {IconWithColor} from '../../utils/disks/iconCalculators';
+import type {DiskDisplayMode} from '../../utils/disks/displayState';
+import type {DiskBarTone} from '../../utils/disks/types';
 import {useSetting} from '../../utils/hooks';
 import {isNumeric} from '../../utils/utils';
 
@@ -16,94 +13,48 @@ import './DiskStateProgressBar.scss';
 
 const b = cn('storage-disk-progress-bar');
 
-function renderCapacityAlertIndicator(indicator?: IconData | string) {
-    if (!indicator) {
-        return null;
-    }
-
-    if (typeof indicator === 'string') {
-        return indicator;
-    }
-
-    return (
-        <Icon className={b('all-mode-capacity-alert-indicator-icon')} data={indicator} size={12} />
-    );
-}
-
-function renderIconGroup(icons: IconWithColor[]) {
-    return (
-        <div className={b('icon-group')}>
-            {icons.map(({icon, color}, index) => (
-                <Icon
-                    key={index}
-                    className={b('icon', {overlapped: index > 0})}
-                    data={icon}
-                    size={10}
-                    style={color ? {color} : undefined}
-                />
-            ))}
-        </div>
-    );
-}
-
-function shouldUseLightGreyStyle(icon: IconData | IconWithColor[] | string | undefined) {
-    if (Array.isArray(icon)) {
-        return icon.some(({icon: itemIcon}) => itemIcon === CircleQuestionFill);
-    }
-
-    return icon === CircleQuestionFill;
-}
-
 interface DiskStateProgressBarProps {
-    diskAllocatedPercent?: number;
-    hideAllocatedPercentLabel?: boolean;
-    severity?: number;
+    allocation?: number;
+    tone: DiskBarTone;
+    mode?: DiskDisplayMode;
     compact?: boolean;
     faded?: boolean;
     inactive?: boolean;
     empty?: boolean;
     striped?: boolean;
+    filled?: boolean;
+    leading?: React.ReactNode;
     content?: React.ReactNode;
+    overlay?: React.ReactNode;
     className?: string;
-    isDonor?: boolean;
-    withIcon?: boolean;
-    icon?: IconData | IconWithColor[] | string;
-    capacityAlertIndicator?: IconData | string;
-    frontQueuesIndicator?: IconData;
-    compactionIndicator?: IconWithColor[];
-    allModeHasIssues?: boolean;
-    modeModifier?: string;
     highlighted?: boolean;
-    noDataPlaceholder?: React.ReactNode;
-    prioritizeNoDataPlaceholder?: boolean;
-    overlapIconAtTopLeft?: boolean;
-    isLegendInactive?: boolean;
+    strongFill?: boolean;
+    borderless?: boolean;
+    overflowVisible?: boolean;
+}
+
+function getToneModifier(tone: DiskBarTone) {
+    return tone === 'LightGrey' ? 'light-grey' : tone.toLowerCase();
 }
 
 export function DiskStateProgressBar({
-    diskAllocatedPercent = -1,
-    hideAllocatedPercentLabel,
-    severity,
+    allocation,
+    tone,
+    mode,
     compact,
     faded,
     inactive,
     empty,
-    content,
     striped,
+    filled,
+    leading,
+    content,
+    overlay,
     className,
-    isDonor,
-    withIcon,
-    icon: providedIcon,
-    capacityAlertIndicator,
-    frontQueuesIndicator,
-    compactionIndicator,
-    allModeHasIssues,
-    modeModifier,
     highlighted,
-    noDataPlaceholder,
-    prioritizeNoDataPlaceholder,
-    overlapIconAtTopLeft,
-    isLegendInactive,
+    strongFill,
+    borderless,
+    overflowVisible,
 }: DiskStateProgressBarProps) {
     const [inverted] = useSetting<boolean | undefined>(SETTING_KEYS.INVERTED_DISKS);
 
@@ -114,140 +65,49 @@ export function DiskStateProgressBar({
         empty,
         inactive,
         striped,
+        filled,
         highlighted,
-        'all-mode-has-issues': modeModifier === 'mode-all' && allModeHasIssues,
-        'legend-inactive': isLegendInactive,
-        'overlap-icon-at-top-left': overlapIconAtTopLeft,
-        'light-grey':
-            Boolean(withIcon) &&
-            severity === NOT_AVAILABLE_SEVERITY &&
-            shouldUseLightGreyStyle(providedIcon),
+        'all-mode-has-issues': mode === 'all' && strongFill,
+        'legend-inactive': borderless,
+        'overlap-icon-at-top-left': overflowVisible,
+        [getToneModifier(tone)]: true,
     };
 
-    // Add mode modifier if present
-    if (modeModifier) {
-        mods[modeModifier] = true;
+    if (mode) {
+        mods[`mode-${mode.toLowerCase()}`] = true;
         mods['expert-mode'] = true;
     }
 
-    if (isDonor) {
-        mods[DONOR_COLOR.toLocaleLowerCase()] = true;
-    } else {
-        const color = getDisplaySeverityColor(severity);
-        if (color) {
-            mods[color.toLocaleLowerCase()] = true;
-        }
-    }
+    const hasAllocation = isNumeric(allocation) && allocation >= 0;
 
-    const hasAllocatedPercent = isNumeric(diskAllocatedPercent) && diskAllocatedPercent >= 0;
-    const hideLegendContent = isLegendInactive && !isDonor;
-
-    const renderAllocatedPercent = () => {
-        if (compact) {
-            return null;
-        }
-
-        if (!hasAllocatedPercent) {
-            return null;
-        }
-
-        // diskAllocatedPercent could be more than 100
-        let fillWidth = Math.min(diskAllocatedPercent, 100);
+    let allocationElement: React.ReactNode = null;
+    if (!compact && hasAllocation) {
+        // Allocation could be more than 100.
+        let fillWidth = Math.min(allocation, 100);
         if (inverted) {
-            fillWidth = Math.max(100 - diskAllocatedPercent, 0);
+            fillWidth = Math.max(100 - allocation, 0);
         }
 
-        return <div className={b('fill-bar', mods)} style={{width: `${fillWidth}%`}} />;
-    };
-
-    const renderContent = () => {
-        if (hideLegendContent) {
-            return null;
-        }
-
-        if (content) {
-            return content;
-        }
-
-        if (!compact && hasAllocatedPercent && !hideAllocatedPercentLabel) {
-            return <div className={b('title')}>{`${Math.floor(diskAllocatedPercent)}%`}</div>;
-        }
-
-        if (
-            !compact &&
-            (!hasAllocatedPercent || prioritizeNoDataPlaceholder) &&
-            noDataPlaceholder
-        ) {
-            return <div className={b('title', {text: true})}>{noDataPlaceholder}</div>;
-        }
-
-        if (compact && severity === NOT_AVAILABLE_SEVERITY && noDataPlaceholder) {
-            return <div className={b('title', {compact: true})}>{noDataPlaceholder}</div>;
-        }
-
-        return null;
-    };
-
-    let iconElement: React.ReactNode = null;
-
-    if (withIcon && !hideLegendContent) {
-        // Use provided icon if available, otherwise calculate
-        const icon = providedIcon ?? getVDiskStatusIcon(severity, isDonor);
-
-        if (icon) {
-            // Check if icon is a string (text label for space mode)
-            if (typeof icon === 'string') {
-                iconElement = <div className={b('text-label')}>{icon}</div>;
-            } else if (Array.isArray(icon)) {
-                iconElement = renderIconGroup(icon);
-            } else {
-                iconElement = (
-                    <Icon
-                        className={b('icon', {'overlap-top-left': overlapIconAtTopLeft})}
-                        data={icon}
-                        size={12}
-                    />
-                );
-            }
-        }
+        allocationElement = (
+            <div className={b('fill-bar', mods)} style={{width: `${fillWidth}%`}} />
+        );
     }
-
-    const hasIcon = Boolean(iconElement);
-    const justifyContent = hasIcon ? 'space-between' : 'flex-end';
-    const showAllModeIndicators = !compact && modeModifier === 'mode-all';
 
     return (
         <Flex
             alignItems="center"
-            justifyContent={justifyContent}
+            justifyContent={leading ? 'space-between' : 'flex-end'}
             className={b(mods, className)}
             role="meter"
             aria-label="Disk allocated space"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={hasAllocatedPercent ? diskAllocatedPercent : undefined}
+            aria-valuenow={hasAllocation ? allocation : undefined}
         >
-            {iconElement}
-            {renderAllocatedPercent()}
-            {renderContent()}
-            {showAllModeIndicators && (
-                <div className={b('all-mode-indicators')}>
-                    <Text
-                        as="span"
-                        variant="caption-2"
-                        color="primary"
-                        className={b('all-mode-capacity-alert-indicator-slot')}
-                    >
-                        {renderCapacityAlertIndicator(capacityAlertIndicator)}
-                    </Text>
-                    <span className={b('all-mode-front-queues-indicator-slot')}>
-                        {frontQueuesIndicator && <Icon data={frontQueuesIndicator} size={12} />}
-                    </span>
-                    <div className={b('all-mode-compaction-indicator-slot')}>
-                        {compactionIndicator && renderIconGroup(compactionIndicator)}
-                    </div>
-                </div>
-            )}
+            {leading}
+            {allocationElement}
+            {content}
+            {overlay}
         </Flex>
     );
 }

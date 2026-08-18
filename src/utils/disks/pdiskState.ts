@@ -27,9 +27,9 @@ import {
     NOT_AVAILABLE_SEVERITY,
     SOLID_RED_SEVERITY,
 } from './constants';
-import type {DiskDisplayState} from './displayState';
+import type {BaseDiskDisplayState} from './displayState';
 
-type PDiskStateDisplayState = Pick<DiskDisplayState, 'severity' | 'icon'>;
+type PDiskStateDisplayState = Pick<BaseDiskDisplayState, 'severity' | 'icon'>;
 
 const NOT_AVAILABLE_DISPLAY_STATE: PDiskStateDisplayState = {
     severity: NOT_AVAILABLE_SEVERITY,

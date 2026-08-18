@@ -2,6 +2,8 @@ import React from 'react';
 
 import {isNil} from 'lodash';
 
+import {DiskBarLabel} from '../../../components/DiskStateProgressBar/DiskBarLabel';
+import {DiskIndicator} from '../../../components/DiskStateProgressBar/DiskIndicator';
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../components/InternalLink';
@@ -10,7 +12,10 @@ import {getPDiskPagePath} from '../../../routes';
 import {cn} from '../../../utils/cn';
 import type {PDiskDisplayStateGetter} from '../../../utils/disks/displayState';
 import {getDefaultPDiskDisplayState} from '../../../utils/disks/displayState';
+import {getDiskBarTone} from '../../../utils/disks/getDiskBarTone';
+import {getVDiskStatusIcon} from '../../../utils/disks/helpers';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
+import {isNumeric} from '../../../utils/utils';
 import i18n from '../i18n';
 import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
 import type {StorageViewContext} from '../types';
@@ -69,6 +74,28 @@ export const PDisk = ({
     );
     const noDataPlaceholder =
         displayState.showNoDataPlaceholder === false ? undefined : i18n('no-data');
+    const hideBarContent = Boolean(displayState.isLegendInactive);
+    const resolvedIndicator = displayState.icon ?? getVDiskStatusIcon(displayState.severity, false);
+    const showIndicator = Boolean(withIcon && !hideBarContent && resolvedIndicator);
+    const leading =
+        showIndicator && resolvedIndicator ? <DiskIndicator value={resolvedIndicator} /> : null;
+    const allocatedPercent = displayState.allocatedPercent;
+    const hasAllocatedPercent = isNumeric(allocatedPercent) && allocatedPercent >= 0;
+
+    let barContent: React.ReactNode = null;
+    if (!hideBarContent) {
+        if (hasAllocatedPercent) {
+            barContent = <DiskBarLabel>{`${Math.floor(allocatedPercent)}%`}</DiskBarLabel>;
+        } else if (noDataPlaceholder) {
+            barContent = <DiskBarLabel variant="placeholder">{noDataPlaceholder}</DiskBarLabel>;
+        }
+    }
+
+    const tone = getDiskBarTone({
+        severity: displayState.severity,
+        showIndicator,
+        indicator: displayState.icon,
+    });
 
     let pDiskPath: string | undefined;
 
@@ -103,16 +130,16 @@ export const PDisk = ({
             >
                 <InternalLink to={pDiskPath} className={b('content')}>
                     <DiskStateProgressBar
-                        withIcon={withIcon}
-                        diskAllocatedPercent={displayState.allocatedPercent}
-                        severity={displayState.severity}
-                        icon={displayState.icon}
-                        modeModifier={displayState.modeModifier}
+                        allocation={allocatedPercent}
+                        tone={tone}
+                        mode={displayState.mode}
+                        leading={leading}
+                        content={barContent}
                         className={progressBarClassName}
                         inactive={inactive}
                         highlighted={highlighted}
-                        isLegendInactive={displayState.isLegendInactive}
-                        noDataPlaceholder={noDataPlaceholder}
+                        filled={hasAllocatedPercent && Number(allocatedPercent) > 0}
+                        borderless={displayState.isLegendInactive}
                     />
                 </InternalLink>
             </HoverPopup>
