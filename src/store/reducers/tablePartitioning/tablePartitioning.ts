@@ -9,12 +9,15 @@ import {api} from '../api';
 function alterPartitioningSQL(path: string, values: UpdateTablePartitioningValues) {
     const safePath = path.replace(/`/g, '``');
 
+    const bySize = values.splitBySize
+        ? `AUTO_PARTITIONING_BY_SIZE = ENABLED,
+    AUTO_PARTITIONING_PARTITION_SIZE_MB = ${values.partitionSizeMb}`
+        : 'AUTO_PARTITIONING_BY_SIZE = DISABLED';
     const byLoad = values.splitByLoad ? 'ENABLED' : 'DISABLED';
 
     return `${QUERY_TECHNICAL_MARK}
 ALTER TABLE \`${safePath}\` SET (
-    AUTO_PARTITIONING_BY_SIZE = ENABLED,
-    AUTO_PARTITIONING_PARTITION_SIZE_MB = ${values.partitionSizeMb},
+    ${bySize},
     AUTO_PARTITIONING_MIN_PARTITIONS_COUNT = ${values.minPartitions},
     AUTO_PARTITIONING_MAX_PARTITIONS_COUNT = ${values.maxPartitions},
     AUTO_PARTITIONING_BY_LOAD = ${byLoad}
@@ -23,7 +26,7 @@ ALTER TABLE \`${safePath}\` SET (
 
 export const tablePartitioningApi = api.injectEndpoints({
     endpoints: (build) => ({
-        updateTablePartitioning: build.mutation<void, UpdateTablePartitioningParams>({
+        updateTablePartitioning: build.mutation<null, UpdateTablePartitioningParams>({
             queryFn: async (params, {signal}) => {
                 try {
                     const response = await window.api.viewer.sendQuery(
@@ -40,7 +43,7 @@ export const tablePartitioningApi = api.injectEndpoints({
                         return {error: response.error};
                     }
 
-                    return {data: undefined};
+                    return {data: null};
                 } catch (error) {
                     return {error};
                 }

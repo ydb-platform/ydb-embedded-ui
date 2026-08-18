@@ -18,6 +18,7 @@ export const DEFAULT_MAX_SPLIT_SIZE_GB = formatBytes({
 });
 
 export const DEFAULT_MANAGE_PARTITIONING_VALUE: ManagePartitioningFormState = {
+    splitSizeEnabled: true,
     splitSize: DEFAULT_MAX_SPLIT_SIZE_GB,
     splitUnit: 'gb',
     loadEnabled: true,

@@ -437,6 +437,39 @@ export class Diagnostics {
         });
     }
 
+    getManagePartitioningDialog(): Locator {
+        return this.page.getByRole('dialog');
+    }
+
+    async openManagePartitioningDialog(): Promise<void> {
+        await this.page.getByRole('button', {name: 'Manage partition config'}).click();
+        await this.getManagePartitioningDialog().waitFor({state: 'visible'});
+    }
+
+    getManagePartitioningSizeSwitch(): Locator {
+        return this.getManagePartitioningDialog().getByRole('switch', {name: 'Size'});
+    }
+
+    async toggleManagePartitioningSize(): Promise<void> {
+        await this.getManagePartitioningSizeSwitch().locator('xpath=ancestor::label[1]').click();
+    }
+
+    getManagePartitioningSplitSizeInput(): Locator {
+        return this.getManagePartitioningDialog().getByRole('spinbutton', {name: 'Split Size'});
+    }
+
+    getManagePartitioningMinimumInput(): Locator {
+        return this.getManagePartitioningDialog().getByRole('spinbutton', {name: 'Minimum'});
+    }
+
+    getManagePartitioningMaximumInput(): Locator {
+        return this.getManagePartitioningDialog().getByRole('spinbutton', {name: 'Maximum'});
+    }
+
+    getManagePartitioningApplyButton(): Locator {
+        return this.getManagePartitioningDialog().getByRole('button', {name: 'Apply'});
+    }
+
     async clickMetricTab(title: string): Promise<void> {
         await this.getMetricTab(title).click();
     }
