@@ -1,6 +1,7 @@
 import type React from 'react';
 
 import type {EmptyStateProps} from '../components/EmptyState';
+import type {YDBDefinitionListItem} from '../components/YDBDefinitionList/YDBDefinitionList';
 import type {
     CommonIssueCategory,
     GetHealthcheckViewTitles,
@@ -30,6 +31,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     onCreateDB?: HandleCreateDB;
     onEditDB?: HandleEditDB;
     onDeleteDB?: HandleDeleteDB;
+    getAdditionalDatabaseInfoItems?: GetAdditionalDatabaseInfoItems;
 
     onAddCluster?: HandleAddCluster;
     onEditCluster?: HandleEditCluster;
@@ -147,6 +149,10 @@ export type HandleDeleteDB = (params: {
     clusterName: string;
     databaseData: PreparedTenant;
 }) => Promise<boolean>;
+
+export type GetAdditionalDatabaseInfoItems = (params: {
+    databaseData: PreparedTenant;
+}) => YDBDefinitionListItem[];
 
 export type HandleAddCluster = () => Promise<boolean>;
 

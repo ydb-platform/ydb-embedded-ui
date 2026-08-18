@@ -40,6 +40,7 @@ export type {ExternalQueryToOpen} from './containers/Tenant/Query/hooks/useOpenE
 export type {DrawerContextType} from './components/Drawer';
 export type {GetMonitoringLink, GetMonitoringClusterLink} from './utils/monitoring';
 export type {
+    GetAdditionalDatabaseInfoItems,
     GetReportProblemUrl,
     IllustrationComponent,
     IllustrationName,

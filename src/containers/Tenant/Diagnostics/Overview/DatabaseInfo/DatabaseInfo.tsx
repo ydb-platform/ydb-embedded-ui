@@ -3,12 +3,14 @@ import React from 'react';
 import {Alert, Card, Flex, Text} from '@gravity-ui/uikit';
 
 import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
+import {useTenantBaseInfo} from '../../../../../store/reducers/tenant/tenant';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {SchemaObjectInfo} from '../SchemaObjectInfo';
 
 import {dbInfoKeyset} from './i18n';
+import {prepareAdditionalDatabaseInfoItems} from './utils';
 
 import './DatabaseInfo.scss';
 
@@ -17,15 +19,22 @@ const b = cn('ydb-diagnostics-database-info');
 interface DBInfoProps {
     data?: TEvDescribeSchemeResult;
     path: string;
+    database: string;
 }
 
-export function DatabaseInfo({data, path}: DBInfoProps) {
+export function DatabaseInfo({data, path, database}: DBInfoProps) {
+    const {databaseData} = useTenantBaseInfo(database);
+    const additionalItems = React.useMemo(
+        () => prepareAdditionalDatabaseInfoItems(databaseData),
+        [databaseData],
+    );
+
     const {PathsInside, PathsLimit, ShardsInside, ShardsLimit} =
         data?.PathDescription?.DomainDescription ?? {};
 
     return (
         <Flex direction={'column'} className={b('wrapper')}>
-            <SchemaObjectInfo data={data} path={path} />
+            <SchemaObjectInfo data={data} path={path} additionalItems={additionalItems} />
             <Text as="div" variant="subheader-2" className={b('title')}>
                 {dbInfoKeyset('title_limits-and-usage')}
             </Text>
