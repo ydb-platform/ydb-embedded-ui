@@ -58,6 +58,8 @@ codex plugin marketplace add astandrik/local-ydb-toolkit --ref main
 codex plugin add local-ydb-toolkit@local-ydb-toolkit
 ```
 
+Using another agent? The toolkit also supports [Claude Code](https://github.com/astandrik/local-ydb-toolkit#claude-code-plugin), [Gemini CLI and Antigravity](https://github.com/astandrik/local-ydb-toolkit#gemini-cli--antigravity-plugin), and [other MCP clients that support local stdio servers](https://github.com/astandrik/local-ydb-toolkit#nodejs-mcp-server).
+
 Start a new Codex session after installation. For a basic `/local` database, no config file is required. The agent can start and inspect the database, create a test schema, seed data with managed SQL, or use the existing Playwright request mocks for UI-only scenarios. Mutating tools require explicit confirmation.
 
 ### YDB docker images
