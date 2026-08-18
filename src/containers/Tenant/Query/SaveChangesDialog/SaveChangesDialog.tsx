@@ -7,6 +7,7 @@ import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {getQueryNameValidationError} from '../utils/QueryNameValidation';
+import {hasSavedQueryNameCollision} from '../utils/savedQueries';
 
 import i18n from './i18n';
 
@@ -50,16 +51,7 @@ function SaveChangesDialog({
             if (validationError) {
                 return i18n('error.name-not-empty');
             }
-            const normalizedValue = value.trim().toLowerCase();
-            const normalizedExistingQueryName = existingQueryName?.trim().toLowerCase();
-
-            if (
-                savedQueries?.some(
-                    (q) =>
-                        q.name.toLowerCase() === normalizedValue &&
-                        q.name.toLowerCase() !== normalizedExistingQueryName,
-                )
-            ) {
+            if (hasSavedQueryNameCollision(savedQueries, existingQueryName ?? '', value)) {
                 return i18n('error.name-exists');
             }
             return undefined;
@@ -76,7 +68,7 @@ function SaveChangesDialog({
         const error = validateQueryName(queryName);
         setValidationError(error);
         if (!error) {
-            onSave(queryName);
+            onSave(queryName.trim());
         }
     }, [queryName, validateQueryName, onSave]);
 
