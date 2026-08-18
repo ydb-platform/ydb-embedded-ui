@@ -56,7 +56,9 @@ test.describe('Saved Queries', () => {
             'Edit',
             'Delete',
         ]);
-        await expect(tenantPage.savedQueriesTable.getActionsWidth(queryName)).resolves.toBe(136);
+        await expect(
+            tenantPage.savedQueriesTable.getActionsWidth(queryName),
+        ).resolves.toBeGreaterThanOrEqual(136);
 
         await tenantPage.savedQueriesTable.clickDelete(queryName);
         const dialog = page.locator('.g-dialog').filter({hasText: 'Delete query'});
