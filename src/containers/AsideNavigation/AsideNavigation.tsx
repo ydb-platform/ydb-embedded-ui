@@ -12,6 +12,7 @@ import {cn} from '../../utils/cn';
 import {useSetting} from '../../utils/hooks';
 
 import {InformationPopup} from './InformationPopup';
+import {SsoUserIcon} from './SsoUserIcon/SsoUserIcon';
 import {
     DEFAULT_HOTKEY_GROUPS,
     EDITOR_TABS_HOTKEY_GROUP,
@@ -31,6 +32,7 @@ interface YdbUserDropdownProps {
     user?: {
         login: string;
         icon?: IconData;
+        isSso?: boolean;
     };
     popupAnchor: React.RefObject<HTMLDivElement>;
     children: React.ReactNode;
@@ -51,6 +53,11 @@ function UserDropdown({isCompact, popupAnchor, user, children}: YdbUserDropdownP
             enableTooltip={!isUserDropdownVisible}
             popupRef={popupAnchor}
             popupVisible={isUserDropdownVisible}
+            itemWrapper={
+                user?.isSso
+                    ? (params, makeItem) => makeItem({...params, icon: <SsoUserIcon />})
+                    : undefined
+            }
             onOpenChangePopup={(open) => {
                 if (!open) {
                     setIsUserDropdownVisible(false);
@@ -70,7 +77,7 @@ export interface AsideNavigationProps {
     ydbInternalUser: JSX.Element;
     menuItems?: AsideHeaderItem[];
     content: React.ReactNode;
-    user?: {login: string; icon?: IconData};
+    user?: {login: string; icon?: IconData; isSso?: boolean};
     renderFooterItems?: (
         defaultFooterItems: React.ReactNode[],
         ctx: {compact: boolean; asideRef: React.RefObject<HTMLDivElement>},

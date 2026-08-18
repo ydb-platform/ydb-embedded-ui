@@ -8,6 +8,7 @@
   "account.user": "YDB User",
   "account.login": "Login",
   "account.logout": "Logout",
+  "account.sso-authorised": "SSO authorised",
   "hotkeys.title": "Keyboard shortcuts",
   "hotkeys.query-editor-group-title": "Query Editor",
   "hotkeys.editor-tabs-group-title": "Editor Tabs",
