@@ -511,17 +511,19 @@ test.describe('Editor tabs', () => {
         await expect(queryEditor.isEditButtonVisible(1000)).resolves.toBe(false);
     });
 
-    test('Save and Edit controls are enabled only for dirty tabs', async () => {
-        await expect(queryEditor.isSaveButtonDisabled()).resolves.toBe(true);
+    test('Save and Edit controls stay enabled after executing queries', async () => {
+        await expect(queryEditor.isSaveButtonDisabled()).resolves.toBe(false);
 
         await queryEditor.setQuery('SELECT 1 AS dirty_new_query;');
+        await queryEditor.clickRunButton();
         await expect(queryEditor.isSaveButtonDisabled()).resolves.toBe(false);
 
         const savedQueryName = `Dirty state ${Date.now()}`;
         await tenantPage.saveQuery('SELECT 2 AS clean_saved_query;', savedQueryName);
-        await expect(queryEditor.isEditButtonDisabled()).resolves.toBe(true);
+        await expect(queryEditor.isEditButtonDisabled()).resolves.toBe(false);
 
         await queryEditor.setQuery('SELECT 3 AS dirty_saved_query;');
+        await queryEditor.clickRunButton();
         await expect(queryEditor.isEditButtonDisabled()).resolves.toBe(false);
     });
 

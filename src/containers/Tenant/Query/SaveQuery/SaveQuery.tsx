@@ -7,7 +7,6 @@ import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 import {
     selectActiveTab,
     selectActiveTabSavedQueryName,
-    selectIsDirty,
     selectUserInput,
     setIsDirty,
     setQueryTabSavedQueryName,
@@ -98,11 +97,9 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     const dispatch = useTypedDispatch();
     const activeTab = useTypedSelector(selectActiveTab);
     const activeTabSavedQueryName = useTypedSelector(selectActiveTabSavedQueryName);
-    const isDirty = useTypedSelector(selectIsDirty);
     const currentInput = useTypedSelector(selectUserInput);
     const onSaveQueryClick = useSaveQueryHandler({queryBody: currentInput});
     const currentSavedQueryName = activeTabSavedQueryName;
-    const isSaveDisabled = Boolean(buttonProps.disabled) || !isDirty;
 
     const {saveQuery} = useSavedQueries();
 
@@ -134,7 +131,7 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
             <DropdownMenu
                 items={items}
                 renderSwitcher={(props) => (
-                    <Button {...props} {...buttonProps} disabled={isSaveDisabled}>
+                    <Button {...props} {...buttonProps}>
                         {i18n('action.edit')}
                     </Button>
                 )}
@@ -146,11 +143,7 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     return currentSavedQueryName ? (
         renderSaveDropdownMenu()
     ) : (
-        <SaveQueryButton
-            {...buttonProps}
-            dialogProps={{queryBody: currentInput}}
-            disabled={isSaveDisabled}
-        />
+        <SaveQueryButton {...buttonProps} dialogProps={{queryBody: currentInput}} />
     );
 }
 
