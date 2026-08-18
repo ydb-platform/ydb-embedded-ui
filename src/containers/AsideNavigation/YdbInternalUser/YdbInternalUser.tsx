@@ -8,13 +8,14 @@ import {useClusterWithoutAuthInUI} from '../../../store/reducers/capabilities/ho
 import {cn} from '../../../utils/cn';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useMetaAuth, useMetaAuthUnavailable} from '../../../utils/hooks/useMetaAuth';
+import type {UserInfo} from '../../../utils/user';
 import i18n from '../i18n';
 
 import './YdbInternalUser.scss';
 
 const b = cn('kv-ydb-internal-user');
 
-export function YdbInternalUser({login}: {login?: string}) {
+export function YdbInternalUser({user}: {user?: UserInfo}) {
     const [logout] = authenticationApi.useLogoutMutation();
     const authUnavailable = useClusterWithoutAuthInUI();
     const metaAuthUnavailable = useMetaAuthUnavailable();
@@ -55,10 +56,16 @@ export function YdbInternalUser({login}: {login?: string}) {
     return (
         <div className={b()}>
             <div className={b('user-info-wrapper')}>
-                <div className={b('ydb-internal-user-title')}>{i18n('account.user')}</div>
-                {login && <div className={b('username')}>{login}</div>}
+                <div className={b('ydb-internal-user-title')}>
+                    {user?.isSso ? user.login : i18n('account.user')}
+                </div>
+                {user && (
+                    <div className={b('username')}>
+                        {user.isSso ? i18n('account.sso-authorised') : user.login}
+                    </div>
+                )}
             </div>
-            {login ? (
+            {user ? (
                 <ActionTooltip title={i18n('account.logout')}>
                     <Button
                         view="flat-secondary"

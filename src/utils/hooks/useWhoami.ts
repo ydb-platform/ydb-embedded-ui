@@ -1,5 +1,6 @@
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import type {TUserToken} from '../../types/api/whoami';
+import {getUserInfo} from '../user';
 
 import {useDatabaseFromQuery} from './useDatabaseFromQuery';
 import {useMetaAuth} from './useMetaAuth';
@@ -69,7 +70,7 @@ export function useIsViewerUser() {
 export function useUser() {
     const {currentData} = useWhoami();
 
-    return currentData?.AuthType === 'Login' ? currentData.UserSID : undefined;
+    return getUserInfo(currentData);
 }
 
 export function useMetaUser() {

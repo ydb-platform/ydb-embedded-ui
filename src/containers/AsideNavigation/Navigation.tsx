@@ -209,8 +209,8 @@ export function Navigation({children, userSettings}: NavigationProps) {
     return (
         <AsideNavigation
             settings={<UserSettings settings={userSettings} />}
-            ydbInternalUser={<YdbInternalUser login={ydbUser} />}
-            user={ydbUser ? {login: ydbUser} : undefined}
+            ydbInternalUser={<YdbInternalUser user={ydbUser} />}
+            user={ydbUser ? {login: ydbUser.login, isSso: ydbUser.isSso} : undefined}
             menuItems={menuItems}
             content={children}
             className={b()}
