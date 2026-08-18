@@ -52,12 +52,38 @@
         --entity-state-compact-background-color: var(--entity-state-background-color);
 
         &#{$block}_grey {
-            --entity-state-background-color: var(--g-color-base-neutral-light);
+            --entity-state-background-color: var(--g-color-base-generic-medium);
+            --entity-state-border-color: none;
+            --entity-state-fill-color: var(--g-color-base-neutral-medium);
+
+            border: none;
+
+            &#{$block}_highlighted {
+                --entity-state-background-color: var(--g-color-base-generic-medium-hover);
+                --entity-state-fill-color: var(--g-color-base-neutral-medium-hover);
+            }
+        }
+
+        &#{$block}_light-grey {
             --entity-state-border-color: var(--g-color-line-generic);
-            --entity-state-icon-color: rgba(162, 162, 162, 1);
+            --entity-state-background-color: var(--g-color-base-neutral-light);
+            --entity-state-icon-color: var(--g-color-text-secondary);
+
+            border: $border-width solid var(--entity-state-border-color);
 
             &#{$block}_highlighted {
                 --entity-state-background-color: var(--g-color-base-neutral-light-hover);
+            }
+
+            &#{$block}_mode-compaction,
+            &#{$block}_mode-device {
+                --entity-state-background-color: transparent;
+                box-shadow: none;
+
+                &#{$block}_highlighted {
+                    --entity-state-background-color: var(--g-color-base-neutral-light);
+                    --entity-state-stripe-background-color: var(--g-color-base-neutral-light);
+                }
             }
         }
     }
@@ -71,7 +97,10 @@
     }
 
     // State mode: specific visual variants
-    &_mode-state {
+    &_mode-state,
+    &_mode-drive,
+    &_mode-decommit,
+    &_mode-maintenance {
         // OK state
         &#{$block}_green {
             --entity-state-border-color: var(--g-color-base-positive-medium);
@@ -85,9 +114,13 @@
 
         // PDisk Error
         &#{$block}_red {
-            --entity-state-background-color: var(--g-color-base-danger-medium);
             --entity-state-border-color: var(--g-color-base-danger-heavy);
         }
+    }
+
+    &_mode-decommit#{$block}_blue {
+        --entity-state-border-color: var(--g-color-base-info-medium);
+        --entity-state-icon-color: var(--g-color-text-info);
     }
 
     &_mode-all {
@@ -123,12 +156,10 @@
         &#{$block}_red {
             --entity-state-background-color: transparent;
             --entity-state-border-color: var(--g-color-line-danger);
-            --entity-state-icon-color: var(--g-color-base-danger-heavy);
             --entity-state-fill-color: var(--g-color-base-danger-light);
 
             &#{$block}_highlighted {
                 --entity-state-border-color: var(--g-color-line-danger);
-                --entity-state-icon-color: var(--g-color-base-danger-heavy);
                 --entity-state-background-color: var(--entity-state-fill-color);
             }
         }
@@ -189,9 +220,11 @@
         &#{$block}_spacecyan {
             --entity-state-background-color: var(--ydb-space-cyan-bg);
             --entity-state-border-color: var(--ydb-space-cyan-text);
+            --entity-state-fill-color: var(--ydb-space-cyan-fill-color);
             --ydb-progress-bar-font-color: var(--ydb-space-cyan-text);
             &#{$block}_highlighted {
                 --entity-state-background-color: var(--ydb-space-cyan-bg-hover);
+                --entity-state-fill-color: var(--ydb-space-cyan-fill-color-hover);
             }
         }
 
@@ -202,9 +235,11 @@
                 var(--ydb-space-light-yellow-text)
             );
             --entity-state-stripe-color: var(--ydb-space-light-yellow-stripe);
+            --entity-state-fill-color: var(--ydb-space-light-yellow-fill-color);
             --ydb-progress-bar-font-color: var(--ydb-space-light-yellow-text);
             &#{$block}_highlighted {
                 --entity-state-background-color: var(--ydb-space-light-yellow-bg-hover);
+                --entity-state-fill-color: var(--ydb-space-light-yellow-fill-color-hover);
                 --entity-state-stripe-color: var(--ydb-space-light-yellow-stripe-hover);
             }
         }
@@ -217,27 +252,33 @@
         &#{$block}_spacelightorange {
             --entity-state-background-color: var(--ydb-space-light-orange-bg);
             --entity-state-border-color: var(--ydb-space-light-orange-text);
+            --entity-state-fill-color: var(--ydb-space-light-orange-fill-color);
             --ydb-progress-bar-font-color: var(--ydb-space-light-orange-text);
             &#{$block}_highlighted {
                 --entity-state-background-color: var(--ydb-space-light-orange-bg-hover);
+                --entity-state-fill-color: var(--ydb-space-light-orange-fill-color-hover);
             }
         }
 
         &#{$block}_spacepreorange {
             --entity-state-background-color: var(--ydb-space-pre-orange-bg);
             --entity-state-border-color: var(--ydb-space-pre-orange-text);
+            --entity-state-fill-color: var(--ydb-space-pre-orange-fill-color);
             --ydb-progress-bar-font-color: var(--ydb-space-pre-orange-text);
             &#{$block}_highlighted {
                 --entity-state-background-color: var(--ydb-space-pre-orange-bg-hover);
+                --entity-state-fill-color: var(--ydb-space-pre-orange-fill-color-hover);
             }
         }
 
         &#{$block}_spaceorange {
             --entity-state-background-color: var(--ydb-space-orange-bg);
             --entity-state-border-color: var(--ydb-space-orange-text);
+            --entity-state-fill-color: var(--ydb-space-orange-fill-color);
             --ydb-progress-bar-font-color: var(--ydb-space-orange-text);
             &#{$block}_highlighted {
                 --entity-state-background-color: var(--ydb-space-orange-bg-hover);
+                --entity-state-fill-color: var(--ydb-space-orange-fill-color-hover);
             }
         }
 
@@ -249,11 +290,27 @@
         &#{$block}_spaceblack {
             --entity-state-background-color: var(--ydb-space-black-bg);
             --entity-state-border-color: var(--ydb-space-black-border);
+            --entity-state-fill-color: var(--ydb-space-black-fill-color);
             --ydb-progress-bar-font-color: var(--ydb-space-black-text);
             &#{$block}_highlighted {
                 --entity-state-background-color: var(--ydb-space-black-bg-hover);
                 --entity-state-border-color: var(--ydb-space-black-border-hover);
+                --entity-state-fill-color: var(--ydb-space-black-fill-color-hover);
             }
+        }
+
+        &#{$block}_grey {
+            --entity-state-background-color: var(--ydb-space-no-data-bg);
+            --entity-state-fill-color: var(--ydb-space-no-data-fill-color);
+
+            &#{$block}_highlighted {
+                --entity-state-background-color: var(--ydb-space-no-data-bg-hover);
+                --entity-state-fill-color: var(--ydb-space-no-data-fill-color-hover);
+            }
+        }
+
+        &#{$block}_light-grey {
+            --entity-state-icon-color: var(--ydb-progress-bar-font-color);
         }
     }
 
@@ -274,11 +331,11 @@
 
         &#{$block}_red {
             --entity-state-border-color: var(--g-color-line-danger);
-            --entity-state-icon-color: var(--g-color-text-danger);
         }
     }
 
-    &_mode-compaction {
+    &_mode-compaction,
+    &_mode-device {
         --entity-state-background-color: transparent;
 
         &:not(#{$block}_darkgrey) {
@@ -293,6 +350,14 @@
         &#{$block}_green {
             --entity-state-border-color: var(--g-color-line-positive);
             --entity-state-icon-color: var(--g-color-text-positive);
+
+            --entity-state-background-color: var(--g-color-base-positive-light);
+            --entity-state-stripe-color: var(--g-color-base-positive-light);
+
+            &#{$block}_highlighted {
+                --entity-state-background-color: var(--g-color-base-positive-light-hover);
+                --entity-state-stripe-color: var(--g-color-base-positive-light-hover);
+            }
         }
 
         &#{$block}_yellow {
@@ -302,7 +367,6 @@
 
         &#{$block}_red {
             --entity-state-border-color: var(--g-color-line-danger);
-            --entity-state-icon-color: var(--g-color-text-danger);
         }
     }
 
@@ -332,7 +396,6 @@
     }
 
     &_striped {
-        --entity-state-icon-color: var(--g-color-base-neutral-heavy-hover);
         overflow: hidden;
         // Inset shadow = border overlay without shrinking the striped fill
         border: none;
@@ -347,6 +410,10 @@
         );
         box-shadow: 0 0 0 $border-width
             var(--entity-state-stripe-border-color, var(--entity-state-shadow-color)) inset;
+
+        &:not(#{$block}_red) {
+            --entity-state-icon-color: var(--g-color-base-neutral-heavy-hover);
+        }
 
         &#{$block}_solidred {
             --entity-state-stripe-color: var(--g-color-text-dark-hint);

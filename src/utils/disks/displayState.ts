@@ -2,7 +2,7 @@ import type {IconData} from '@gravity-ui/uikit';
 
 import {DATA_SEVERITY} from './constants';
 import type {IconWithColor} from './iconCalculators';
-import type {DisplaySeverity, PreparedVDisk} from './types';
+import type {DisplaySeverity, PreparedPDisk, PreparedVDisk} from './types';
 
 export interface DiskDisplayState {
     severity: DisplaySeverity;
@@ -16,7 +16,14 @@ export interface DiskDisplayState {
     showNoDataPlaceholder?: boolean;
 }
 
+export interface PDiskDisplayState extends DiskDisplayState {
+    width?: number;
+    allocatedPercent?: number;
+}
+
 export type DiskDisplayStateGetter = (vDisk: PreparedVDisk, isDonor?: boolean) => DiskDisplayState;
+
+export type PDiskDisplayStateGetter = (pDisk: PreparedPDisk) => PDiskDisplayState;
 
 export function getDefaultDiskDisplayState(vDisk: PreparedVDisk): DiskDisplayState {
     return {
@@ -24,5 +31,16 @@ export function getDefaultDiskDisplayState(vDisk: PreparedVDisk): DiskDisplaySta
         icon: undefined,
         modeModifier: undefined,
         isLegendInactive: false,
+    };
+}
+
+export function getDefaultPDiskDisplayState(pDisk: PreparedPDisk): PDiskDisplayState {
+    return {
+        severity: (pDisk.Severity ?? DATA_SEVERITY.GREY) as DisplaySeverity,
+        icon: undefined,
+        modeModifier: undefined,
+        isLegendInactive: false,
+        showNoDataPlaceholder: true,
+        allocatedPercent: pDisk.AllocatedPercent,
     };
 }

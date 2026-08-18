@@ -18,10 +18,9 @@ import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus'
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import {selectResultTab, setResultTab} from '../../../../store/reducers/query/query';
 import type {QueryResult} from '../../../../store/reducers/query/types';
-import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
-import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getIllustration} from '../../../../utils/illustrations';
 import {isExecutionQueryAction} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
@@ -38,6 +37,7 @@ import {TraceButton} from './components/TraceButton/TraceButton';
 import type {SectionID} from './constants';
 import {RESULT_OPTIONS_IDS, getDefaultResultSection, getResultSections} from './constants';
 import i18n from './i18n';
+import {canShowPlanToSvg} from './utils';
 
 import './QueryResultViewer.scss';
 
@@ -99,7 +99,6 @@ export function QueryResultViewer({
     const hasResultSection = getResultSections(resultType).includes(RESULT_OPTIONS_IDS.result);
 
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
-    const [useShowPlanToSvg] = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
     const [copyStatus, setCopyStatus] = React.useState<CopyToClipboardStatus>('pending');
     const copyTimeoutRef = React.useRef<number>();
 
@@ -247,7 +246,7 @@ export function QueryResultViewer({
                 }}
                 error={error}
                 database={database}
-                hasPlanToSvg={Boolean(data?.plan && useShowPlanToSvg && isExecutionResult)}
+                hasPlanToSvg={canShowPlanToSvg(result)}
             />
         );
     };

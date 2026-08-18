@@ -8,12 +8,14 @@ import {ECapacityAlert} from '../../../../types/api/enums';
 import {b} from '../constants';
 import i18n from '../i18n';
 
+import type {SpaceLegendSelectionScope} from './getSpaceLegendSelection';
 import {getSpaceLegendSelection, saveSpaceLegendSelection} from './getSpaceLegendSelection';
 
 import './SpaceLegend.scss';
 
 interface SpaceLegendProps {
     className?: string;
+    selectionScope?: SpaceLegendSelectionScope;
 }
 
 interface SpaceLegendItem {
@@ -55,23 +57,27 @@ const legendItems: SpaceLegendItem[] = [
     {id: ECapacityAlert.BLACK, text: i18n('space_black'), customClass: b('label', {black: true})},
 ];
 
-export function SpaceLegend({className}: SpaceLegendProps) {
+export function SpaceLegend({className, selectionScope = 'vdisks'}: SpaceLegendProps) {
     // Load inactive ECapacityAlert values
-    const [inactiveAlerts, setInactiveAlerts] =
-        React.useState<Set<ECapacityAlert>>(getSpaceLegendSelection);
+    const [inactiveAlerts, setInactiveAlerts] = React.useState<Set<ECapacityAlert>>(() =>
+        getSpaceLegendSelection(selectionScope),
+    );
 
-    const toggleItem = React.useCallback((id: ECapacityAlert) => {
-        setInactiveAlerts((prev) => {
-            const next = new Set(prev);
-            if (next.has(id)) {
-                next.delete(id);
-            } else {
-                next.add(id);
-            }
-            saveSpaceLegendSelection(next);
-            return next;
-        });
-    }, []);
+    const toggleItem = React.useCallback(
+        (id: ECapacityAlert) => {
+            setInactiveAlerts((prev) => {
+                const next = new Set(prev);
+                if (next.has(id)) {
+                    next.delete(id);
+                } else {
+                    next.add(id);
+                }
+                saveSpaceLegendSelection(next, selectionScope);
+                return next;
+            });
+        },
+        [selectionScope],
+    );
 
     return (
         <Flex className={className} gap={2} alignItems="center" wrap="wrap">

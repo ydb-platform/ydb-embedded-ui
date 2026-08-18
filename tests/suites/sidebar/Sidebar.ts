@@ -9,6 +9,7 @@ const hotkeysPanelSelector =
     '.kv-navigation__hotkeys-drawer, [data-qa="hotkeys-panel"] .g-drawer__item';
 const drawerSelector = '.gn-drawer, .g-drawer[data-floating-ui-status="open"], .g-drawer';
 const experimentsPageId = '/experimentsPage';
+const editorPageId = '/editorPage';
 
 function escapeRegExp(value: string) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -184,6 +185,10 @@ export class Sidebar {
 
     async clickExperimentsSection() {
         await this.getSettingsMenuItem(experimentsPageId).click();
+    }
+
+    async clickEditorSection() {
+        await this.getSettingsMenuItem(editorPageId).click();
     }
 
     async toggleExperimentByTitle(title: string) {

@@ -161,6 +161,8 @@ export interface ControlPlane {
 interface UserAttributes {
     database_id?: string;
     folder_id?: string;
+    cloud_id?: string;
+    [key: string]: string | undefined;
 }
 
 export type ETenantType = 'UnknownTenantType' | 'Domain' | 'Dedicated' | 'Shared' | 'Serverless';

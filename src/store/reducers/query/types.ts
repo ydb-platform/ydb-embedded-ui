@@ -7,7 +7,7 @@ import type {
     SimlifiedPlanOperatorOtherParams,
     SimplifiedNode,
 } from '../../../types/api/query';
-import type {IQueryResult, QueryAction} from '../../../types/store/query';
+import type {IQueryResult, QueryAction, StatisticsMode} from '../../../types/store/query';
 
 export type QueryExecutionStatusType = 'loading' | 'completed' | 'failed' | 'stopped' | 'aborted';
 
@@ -69,6 +69,7 @@ export interface QuerySourcePosition {
 export interface QueryResult {
     executionId: string;
     type: QueryAction;
+    statisticsMode?: StatisticsMode;
     data?: PreparedQueryData;
     error?: unknown;
     queryId: string;

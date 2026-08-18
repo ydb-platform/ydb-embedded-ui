@@ -1,5 +1,3 @@
-import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
-import {useSetting} from '../../../../utils/hooks/useSetting';
 import {formatNetworkMetric} from '../../../../utils/metrics/formatMetricLegend';
 import {calculateBaseDiagramValues} from '../../../../utils/metrics/getDiagramValues';
 import i18n from '../../i18n';
@@ -18,10 +16,6 @@ export function ClusterMetricsNetwork({
     collapsed,
     ...rest
 }: ClusterMetricsNetworkProps) {
-    const [showNetworkUtilization] = useSetting<boolean>(SETTING_KEYS.SHOW_NETWORK_UTILIZATION);
-    if (!showNetworkUtilization) {
-        return null;
-    }
     const {status, percents, progressValue} = calculateBaseDiagramValues({
         fillWidth: percentsValue * 100,
         ...rest,

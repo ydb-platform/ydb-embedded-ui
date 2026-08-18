@@ -23,3 +23,9 @@ describe('applyStorageExpertModeSettingAvailability', () => {
         );
     });
 });
+
+describe('getUserSettings', () => {
+    test('does not expose the removed network table experiment', () => {
+        expect(getExperimentSettingKeys(true)).not.toContain('enableNetworkTable');
+    });
+});

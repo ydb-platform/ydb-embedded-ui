@@ -10,11 +10,11 @@ import {DrawerContextProvider} from '../../components/Drawer/DrawerContext';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../components/InternalLink';
 import {NetworkTable} from '../../components/NetworkTable/NetworkTable';
-import {useShouldShowClusterNetworkTable} from '../../components/NetworkTable/hooks';
 import routes, {getClusterPath, getLocationObjectFromHref} from '../../routes';
 import {
     useClusterDashboardAvailable,
     useConfigAvailable,
+    useNodesHandlerHasWorkingClusterNetworkStats,
 } from '../../store/reducers/capabilities/hooks';
 import {
     INITIAL_DEFAULT_CLUSTER_TAB,
@@ -63,7 +63,7 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
     const container = React.useRef<HTMLDivElement>(null);
     const isClusterDashboardAvailable = useClusterDashboardAvailable();
 
-    const shouldShowNetworkTable = useShouldShowClusterNetworkTable();
+    const shouldShowNetworkTable = useNodesHandlerHasWorkingClusterNetworkStats();
     const shouldShowEventsTab = useShouldShowEventsTab();
     const isViewerUser = useIsViewerUser();
     const isConfigsAvailable = useConfigAvailable();
@@ -326,7 +326,7 @@ function useClusterTab() {
     }, [savedDefaultTab]);
     const defaultTab = savedDefaultTabValidated ?? defaultTabFromStore;
 
-    const shouldShowNetworkTable = useShouldShowClusterNetworkTable();
+    const shouldShowNetworkTable = useNodesHandlerHasWorkingClusterNetworkStats();
     const shouldShowEventsTab = useShouldShowEventsTab();
 
     const match = useRouteMatch<{activeTab: string}>(routes.cluster);

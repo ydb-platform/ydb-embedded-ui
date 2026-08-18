@@ -5,7 +5,7 @@ import {
     cleanupMockStreamingFetch,
     setupMockStreamingNonJsonChunk,
 } from '../../utils/mockStreamingFetch';
-import {toggleExperiment} from '../../utils/toggleExperiment';
+import {toggleEditorSetting} from '../../utils/toggleExperiment';
 import {ClusterPage} from '../cluster/ClusterPage';
 import {TenantPage} from '../tenant/TenantPage';
 import {QueryEditor} from '../tenant/queryEditor/models/QueryEditor';
@@ -902,7 +902,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         const tenantPage = new TenantPage(page);
         await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
-        await toggleExperiment(page, 'off', 'Query Streaming');
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
         await setupQueryResult500Mock(page);
 
         const queryEditor = new QueryEditor(page);
@@ -939,7 +939,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         const tenantPage = new TenantPage(page);
         await tenantPage.goto({schema: database, database, databasePage: 'query'});
 
-        await toggleExperiment(page, 'off', 'Query Streaming');
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
         await setupQueryResultNetworkErrorMock(page);
 
         const queryEditor = new QueryEditor(page);

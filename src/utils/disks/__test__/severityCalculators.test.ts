@@ -1,13 +1,32 @@
 import {EFlag} from '../../../types/api/enums';
 import {EVDiskState} from '../../../types/api/vdisk';
 import {
+    COMPACTION_SEVERITY,
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     NOT_AVAILABLE_SEVERITY,
     SOLID_RED_SEVERITY,
 } from '../constants';
-import {calculateAllSeverity, calculateCompactionSeverity} from '../severityCalculators';
+import {
+    calculateAllSeverity,
+    calculateCompactionSeverity,
+    calculateFlagPairSeverity,
+} from '../severityCalculators';
 
 describe('disk severity calculators', () => {
+    test.each([
+        [EFlag.Green, EFlag.Green, COMPACTION_SEVERITY.OK],
+        [EFlag.Blue, EFlag.Green, COMPACTION_SEVERITY.OK],
+        [EFlag.Green, EFlag.Blue, COMPACTION_SEVERITY.OK],
+        [EFlag.Blue, EFlag.Blue, COMPACTION_SEVERITY.OK],
+        [undefined, EFlag.Green, NOT_AVAILABLE_SEVERITY],
+        [EFlag.Grey, EFlag.Green, NOT_AVAILABLE_SEVERITY],
+        [undefined, EFlag.Yellow, COMPACTION_SEVERITY.NOTICE],
+        [EFlag.Grey, EFlag.Yellow, COMPACTION_SEVERITY.NOTICE],
+        [undefined, EFlag.Red, COMPACTION_SEVERITY.WARNING],
+    ])('orders pair severity for %s and %s', (firstFlag, secondFlag, expectedSeverity) => {
+        expect(calculateFlagPairSeverity(firstFlag, secondFlag)).toBe(expectedSeverity);
+    });
+
     test('returns not available severity when both Compaction ranks are grey', () => {
         expect(
             calculateCompactionSeverity({

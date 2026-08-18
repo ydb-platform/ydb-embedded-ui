@@ -160,6 +160,7 @@ export const queryApi = api.injectEndpoints({
                         result: {
                             executionId,
                             type: 'execute',
+                            statisticsMode: querySettings.statisticsMode,
                             queryId: '',
                             isLoading: true,
                             startTime,
@@ -366,6 +367,7 @@ export const queryApi = api.injectEndpoints({
                         result: {
                             executionId,
                             type: actionType,
+                            statisticsMode: effectiveQuerySettings.statisticsMode,
                             queryId,
                             isLoading: true,
                             startTime,
@@ -417,6 +419,7 @@ export const queryApi = api.injectEndpoints({
                                 result: {
                                     executionId,
                                     type: actionType,
+                                    statisticsMode: effectiveQuerySettings.statisticsMode,
                                     error: response,
                                     isLoading: false,
                                     queryId,
@@ -453,6 +456,7 @@ export const queryApi = api.injectEndpoints({
                             result: {
                                 executionId,
                                 type: actionType,
+                                statisticsMode: effectiveQuerySettings.statisticsMode,
                                 data,
                                 isLoading: false,
                                 queryId,

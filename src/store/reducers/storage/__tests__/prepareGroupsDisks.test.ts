@@ -396,9 +396,11 @@ describe('prepareGroupsPDisk', () => {
         expect(preparedData).toEqual(
             expect.objectContaining({
                 AllocatedSize: 1_000_000_000,
+                AllocatedPercent: 25,
                 TotalSize: 4_000_000_000,
                 WhiteboardSize: {
                     AllocatedSize: 1_000_000_000,
+                    AllocatedPercent: 4,
                     TotalSize: 22_000_000_000,
                 },
             }),
@@ -422,6 +424,7 @@ describe('prepareGroupsPDisk', () => {
 
             expect(preparedData.WhiteboardSize).toEqual({
                 AllocatedSize: undefined,
+                AllocatedPercent: NaN,
                 TotalSize: 22_000_000_000,
             });
         },
@@ -480,7 +483,7 @@ describe('prepareGroupsPDisk', () => {
             State: 'Normal',
             Device: 'Green',
             Realtime: 'Green',
-            Status: 'ACTIVE',
+            DriveStatus: 'ACTIVE',
             DiskSpace: 'Green',
             DecommitStatus: 'DECOMMIT_NONE',
 
@@ -490,6 +493,7 @@ describe('prepareGroupsPDisk', () => {
             AllocatedSize: 786306170880,
             WhiteboardSize: {
                 AllocatedSize: 786306170880,
+                AllocatedPercent: 12,
                 TotalSize: 6400161873920,
             },
             Severity: 1,
@@ -539,7 +543,7 @@ describe('prepareGroupsPDisk', () => {
 
             Severity: 0,
 
-            Status: 'ACTIVE',
+            DriveStatus: 'ACTIVE',
             DiskSpace: 'Green',
             DecommitStatus: 'DECOMMIT_NONE',
 
@@ -604,6 +608,7 @@ describe('prepareGroupsPDisk', () => {
             AllocatedSize: 786306170880,
             WhiteboardSize: {
                 AllocatedSize: 786306170880,
+                AllocatedPercent: 12,
                 TotalSize: 6400161873920,
             },
             Severity: 1,

@@ -1,7 +1,9 @@
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {NetworkTable} from '../../../../components/NetworkTable/NetworkTable';
-import {useShouldShowDatabaseNetworkTable} from '../../../../components/NetworkTable/hooks';
-import {useCapabilitiesLoaded} from '../../../../store/reducers/capabilities/hooks';
+import {
+    useCapabilitiesLoaded,
+    useViewerNodesHandlerHasNetworkStats,
+} from '../../../../store/reducers/capabilities/hooks';
 import type {NodesProps} from '../../../Nodes/Nodes';
 
 import {Network} from './Network';
@@ -18,7 +20,7 @@ export function NetworkWrapper({
     scrollContainerRef,
 }: NetworkWrapperProps) {
     const capabilitiesLoaded = useCapabilitiesLoaded();
-    const shouldUseNetworkNodesTable = useShouldShowDatabaseNetworkTable();
+    const shouldUseNetworkNodesTable = useViewerNodesHandlerHasNetworkStats();
 
     const renderContent = () => {
         if (shouldUseNetworkNodesTable) {
