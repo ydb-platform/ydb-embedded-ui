@@ -1,5 +1,19 @@
 # Changelog
 
+## [20.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v19.0.0...v20.0.0) (2026-08-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* reorder settings, remove old experiments ([#4245](https://github.com/ydb-platform/ydb-embedded-ui/issues/4245))
+
+### Features
+
+* **Database:** add configurable additional info ([#4243](https://github.com/ydb-platform/ydb-embedded-ui/issues/4243)) ([617056a](https://github.com/ydb-platform/ydb-embedded-ui/commit/617056ae0d77c386d20dd85d9af43fff0f9b275a))
+* implement button "login with SSO" ([#4242](https://github.com/ydb-platform/ydb-embedded-ui/issues/4242)) ([51a2d66](https://github.com/ydb-platform/ydb-embedded-ui/commit/51a2d669ff6def2be1662b3c59021ec29b0fdacf))
+* **PDisk:** add expert mode for groups mode ([#4235](https://github.com/ydb-platform/ydb-embedded-ui/issues/4235)) ([c81a8db](https://github.com/ydb-platform/ydb-embedded-ui/commit/c81a8dbd18d983e65848076146e828e1519e2a59))
+* reorder settings, remove old experiments ([#4245](https://github.com/ydb-platform/ydb-embedded-ui/issues/4245)) ([abd5f4c](https://github.com/ydb-platform/ydb-embedded-ui/commit/abd5f4cde2f06e023a7c35392a02f431a5254651))
+
 ## [19.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.6.0...v19.0.0) (2026-08-14)
 
 
