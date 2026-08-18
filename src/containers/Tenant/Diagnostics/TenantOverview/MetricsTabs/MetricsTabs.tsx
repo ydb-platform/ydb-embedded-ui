@@ -2,11 +2,9 @@ import {Flex} from '@gravity-ui/uikit';
 import {useLocation} from 'react-router-dom';
 
 import {getTenantPath, parseQuery} from '../../../../../routes';
-import {SETTING_KEYS} from '../../../../../store/reducers/settings/constants';
 import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {TenantMetricsTab} from '../../../../../store/reducers/tenant/types';
 import {cn} from '../../../../../utils/cn';
-import {useSetting} from '../../../../../utils/hooks';
 import {TenantTabsGroups} from '../../../TenantPages';
 import type {TenantOverviewMetrics} from '../metricOverview';
 
@@ -53,12 +51,10 @@ export function MetricsTabs({
         }),
     };
 
-    const [showNetworkUtilization] = useSetting<boolean>(SETTING_KEYS.SHOW_NETWORK_UTILIZATION);
-
     // card variant is handled within subcomponents
 
     const renderNetworkTab = () => {
-        if (isServerless || !showNetworkUtilization || !network) {
+        if (isServerless || !network) {
             return null;
         }
 

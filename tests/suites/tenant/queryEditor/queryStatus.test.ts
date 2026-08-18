@@ -6,7 +6,7 @@ import {
     cleanupMockStreamingFetch,
     setupMockStreamingFetch,
 } from '../../../utils/mockStreamingFetch';
-import {toggleExperiment} from '../../../utils/toggleExperiment';
+import {toggleEditorSetting} from '../../../utils/toggleExperiment';
 import {TenantPage} from '../TenantPage';
 import {longRunningQuery} from '../constants';
 
@@ -73,7 +73,7 @@ test.describe('Test Query Execution Status', async () => {
 
     test('Streaming query shows "Fetching" status while receiving data', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
 
         // Mock fetch — real small-chunk streaming freezes Safari's main thread
         await setupMockStreamingFetch(page);
@@ -86,7 +86,7 @@ test.describe('Test Query Execution Status', async () => {
 
     test('Streaming query transitions from "Fetching" to "Completed"', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
 
         // Mock completes after 10 data chunks then sends QueryResponse
         await setupMockStreamingFetch(page, {totalChunks: 10});
@@ -100,7 +100,7 @@ test.describe('Test Query Execution Status', async () => {
 
     test('Streaming query status transitions follow correct order', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
 
         // Mock completes after 10 data chunks then sends QueryResponse
         await setupMockStreamingFetch(page, {totalChunks: 10});
@@ -128,7 +128,7 @@ test.describe('Test Query Execution Status', async () => {
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
 
         await setupMockStreamingFetch(page, {
             totalChunks: 5,
@@ -145,7 +145,7 @@ test.describe('Test Query Execution Status', async () => {
 
     test('Streaming query shows "Failed" status on server error', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
 
         // Mock sends 3 data chunks then a QueryResponse with error/issues fields
         await setupMockStreamingFetch(page, {errorAfterChunks: 3});

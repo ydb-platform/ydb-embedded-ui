@@ -1,7 +1,6 @@
 import {expect} from '@playwright/test';
 import type {Locator, Page} from '@playwright/test';
 
-import type {StatisticsMode} from '../../../../../src/types/store/query';
 import type {
     QUERY_MODES,
     STATISTICS_MODES,
@@ -33,7 +32,6 @@ export class SettingsDialog {
     private resourcePoolSelect: Locator;
     private transactionModeSelect: Locator;
     private statisticsModeSelect: Locator;
-    private statisticsModeTooltip: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -71,9 +69,6 @@ export class SettingsDialog {
         );
         this.statisticsModeSelect = this.dialog.locator(
             '.ydb-query-settings-dialog__control-wrapper_statisticsMode',
-        );
-        this.statisticsModeTooltip = this.page.locator(
-            '.ydb-query-settings-dialog__statistics-mode-tooltip',
         );
     }
 
@@ -189,11 +184,6 @@ export class SettingsDialog {
         return true;
     }
 
-    async isStatsTooltipVisible() {
-        await this.statisticsModeTooltip.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-
     async isHidden() {
         await this.dialog.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
@@ -259,20 +249,6 @@ export class SettingsDialog {
         await this.timeoutErrorIcon.hover();
         await this.timeoutErrorPopover.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return await this.timeoutErrorPopover.textContent();
-    }
-
-    async isStatisticsOptionDisabled(mode: StatisticsMode) {
-        await this.openSelect(this.statisticsModeSelect);
-        try {
-            const option = this.selectPopup.locator(
-                `.ydb-query-settings-select__item_type_${mode}`,
-            );
-            return await option
-                .evaluate((el) => el.classList.contains('ydb-query-settings-select__item_disabled'))
-                .catch(() => false);
-        } finally {
-            await this.page.keyboard.press('Escape');
-        }
     }
 
     async hoverStatisticsSelect() {

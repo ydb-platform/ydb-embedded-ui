@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Button, Dialog, Flex, TextArea, TextInput, Tooltip} from '@gravity-ui/uikit';
+import {Button, Dialog, Flex, TextArea, TextInput} from '@gravity-ui/uikit';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Controller, useForm} from 'react-hook-form';
 import type {z} from 'zod';
@@ -13,7 +13,6 @@ import {
     selectQueryAction,
     setQueryAction,
 } from '../../../../store/reducers/queryActions/queryActions';
-import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
@@ -21,14 +20,12 @@ import {
     useQueryExecutionSettings,
     useQueryStreamingSetting,
     useResourcePools,
-    useSetting,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
 import type {ResourcePoolValue} from '../../../../utils/query';
 import {
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
-    STATISTICS_MODES_WITH_SVG,
     TRANSACTION_MODES,
     isStreamingSupportedForMode,
     querySettingsValidationSchema,
@@ -99,7 +96,6 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         resolver: zodResolver(querySettingsValidationSchema),
     });
 
-    const [useShowPlanToSvg] = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const enableSnapshotReadWrite = useSnapshotReadWriteAvailable();
     const [isQueryStreamingEnabled] = useQueryStreamingSetting();
@@ -147,16 +143,6 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
             setValue('transactionMode', TRANSACTION_MODES.implicit);
         }
     }, [enableSnapshotReadWrite, transactionMode, setValue]);
-
-    const queryStatisticsOptions = React.useMemo(() => {
-        return QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options.map((option) => {
-            if (!useShowPlanToSvg) {
-                return option;
-            }
-            const isDisabled = !STATISTICS_MODES_WITH_SVG.includes(option.value);
-            return {...option, disabled: isDisabled};
-        });
-    }, [useShowPlanToSvg]);
 
     const transactionModeOptions = React.useMemo(() => {
         return QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.options.filter((option) => {
@@ -243,27 +229,22 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                     <label htmlFor="statisticsMode" className={b('field-title')}>
                         {QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title}
                     </label>
-                    <Tooltip
-                        className={b('statistics-mode-tooltip')}
-                        disabled={!useShowPlanToSvg}
-                        openDelay={0}
-                        content={i18n('tooltip_plan-to-svg-statistics')}
-                    >
-                        <div className={b('control-wrapper', {statisticsMode: true})}>
-                            <Controller
-                                name="statisticsMode"
-                                control={control}
-                                render={({field}) => (
-                                    <QuerySettingsSelect
-                                        id="statisticsMode"
-                                        setting={field.value}
-                                        onUpdateSetting={field.onChange}
-                                        settingOptions={queryStatisticsOptions}
-                                    />
-                                )}
-                            />
-                        </div>
-                    </Tooltip>
+                    <div className={b('control-wrapper', {statisticsMode: true})}>
+                        <Controller
+                            name="statisticsMode"
+                            control={control}
+                            render={({field}) => (
+                                <QuerySettingsSelect
+                                    id="statisticsMode"
+                                    setting={field.value}
+                                    onUpdateSetting={field.onChange}
+                                    settingOptions={
+                                        QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options
+                                    }
+                                />
+                            )}
+                        />
+                    </div>
                 </Flex>
                 <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                     <label htmlFor="limitRows" className={b('field-title')}>

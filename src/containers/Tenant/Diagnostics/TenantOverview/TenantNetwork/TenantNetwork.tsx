@@ -1,10 +1,8 @@
 import {Flex} from '@gravity-ui/uikit';
 
-import {SETTING_KEYS} from '../../../../../store/reducers/settings/constants';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
-import {useSetting} from '../../../../../utils/hooks';
 import {formatNetworkMetric} from '../../../../../utils/metrics/formatMetricLegend';
 import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
 import {MetricPageSummary} from '../MetricPageSummary/MetricPageSummary';
@@ -37,13 +35,7 @@ function getNetworkThroughputText(networkThroughput?: number) {
 
 export function TenantNetwork({database, metric, networkThroughput}: TenantNetworkProps) {
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
-    const [networkTableEnabled] = useSetting(SETTING_KEYS.ENABLE_NETWORK_TABLE);
-
-    const allNodesLink = getDiagnosticsPageLink(
-        networkTableEnabled
-            ? TENANT_DIAGNOSTICS_TABS_IDS.network
-            : TENANT_DIAGNOSTICS_TABS_IDS.nodes,
-    );
+    const allNodesLink = getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.network);
 
     return (
         <Flex direction="column" gap={4} className={b()}>

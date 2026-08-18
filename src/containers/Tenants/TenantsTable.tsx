@@ -17,7 +17,6 @@ import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
-import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {
     filterTenantsByDomain,
     filterTenantsByProblems,
@@ -40,7 +39,7 @@ import {
     formatNumber,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
-import {useAutoRefreshInterval, useSetting} from '../../utils/hooks';
+import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
 import {isNumeric} from '../../utils/utils';
@@ -149,8 +148,6 @@ const TenantsTableContent = ({
 
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
-
-    const [showNetworkUtilization] = useSetting<boolean>(SETTING_KEYS.SHOW_NETWORK_UTILIZATION);
 
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count
@@ -299,30 +296,28 @@ const TenantsTableContent = ({
             },
         ];
 
-        if (showNetworkUtilization) {
-            columns.push({
-                name: DATABASES_COLUMNS_IDS.Network,
-                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Network],
-                width: 120,
-                align: DataTable.RIGHT,
-                defaultOrder: DataTable.DESCENDING,
-                sortAccessor: ({NetworkWriteThroughput = 0}) => Number(NetworkWriteThroughput),
-                render: ({row}) => {
-                    const {NetworkWriteThroughput} = row;
+        columns.push({
+            name: DATABASES_COLUMNS_IDS.Network,
+            header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Network],
+            width: 120,
+            align: DataTable.RIGHT,
+            defaultOrder: DataTable.DESCENDING,
+            sortAccessor: ({NetworkWriteThroughput = 0}) => Number(NetworkWriteThroughput),
+            render: ({row}) => {
+                const {NetworkWriteThroughput} = row;
 
-                    if (!isNumeric(NetworkWriteThroughput)) {
-                        return EMPTY_DATA_PLACEHOLDER;
-                    }
+                if (!isNumeric(NetworkWriteThroughput)) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
 
-                    return formatBytes({
-                        value: NetworkWriteThroughput,
-                        size: 'mb',
-                        withSpeedLabel: true,
-                        precision: 2,
-                    });
-                },
-            });
-        }
+                return formatBytes({
+                    value: NetworkWriteThroughput,
+                    size: 'mb',
+                    withSpeedLabel: true,
+                    precision: 2,
+                });
+            },
+        });
 
         columns.push(
             {
@@ -366,7 +361,6 @@ const TenantsTableContent = ({
         environmentName,
         handleSearchChange,
         onStatusClick,
-        showNetworkUtilization,
         showPoolsColumn,
     ]);
 

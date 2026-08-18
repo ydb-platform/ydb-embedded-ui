@@ -10,7 +10,7 @@ import {
     executeSelectedQueryWithKeybinding,
     waitForBeforeUnloadDialog,
 } from '../../../utils/queryHotkeys';
-import {toggleExperiment} from '../../../utils/toggleExperiment';
+import {toggleEditorSetting} from '../../../utils/toggleExperiment';
 import {QueryEditorMode, TenantPage} from '../TenantPage';
 import {longRunningStreamQuery} from '../constants';
 
@@ -52,7 +52,7 @@ async function seedQueriesHistory(
 
 async function prepareInactiveRunningTab(tenantPage: TenantPage) {
     const {queryEditor} = tenantPage;
-    await toggleExperiment(tenantPage.page, 'on', 'Query Streaming');
+    await toggleEditorSetting(tenantPage.page, 'on', 'Query Streaming');
     await setupMockStreamingFetch(tenantPage.page, {chunkIntervalMs: 1000});
 
     const runningTabId = await queryEditor.editorTabs.getActiveTabId();
@@ -204,7 +204,7 @@ test.describe('Query page leave', () => {
     }) => {
         const tenantPage = await openMultiTabQueryEditor(page);
         const {queryEditor} = tenantPage;
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
         await setupMockStreamingFetch(page, {chunkIntervalMs: 1000});
 
         await queryEditor.setQuery(longRunningStreamQuery);
