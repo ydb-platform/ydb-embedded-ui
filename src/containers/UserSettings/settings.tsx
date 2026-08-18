@@ -4,7 +4,7 @@ import {createNextState} from '@reduxjs/toolkit';
 
 import {codeAssistBackend} from '../../store';
 import {DEFAULT_USER_SETTINGS, SETTING_KEYS} from '../../store/reducers/settings/constants';
-import {AclSyntax, OLD_BACKEND_CLUSTER_NAMES, PAGE_IDS, SECTION_IDS} from '../../utils/constants';
+import {AclSyntax, PAGE_IDS, SECTION_IDS} from '../../utils/constants';
 import {Lang} from '../../utils/i18n';
 
 import type {SettingProps, SettingsInfoFieldProps} from './Setting';
@@ -82,20 +82,9 @@ export const invertedDisksSetting: SettingProps = {
     title: i18n('settings.invertedDisks.title'),
 };
 
-export const enableNetworkTable: SettingProps = {
-    settingKey: SETTING_KEYS.ENABLE_NETWORK_TABLE,
-    title: i18n('settings.enableNetworkTable.title'),
-};
-
 export const enableNewStorageViewSetting: SettingProps = {
     settingKey: SETTING_KEYS.ENABLE_NEW_STORAGE_VIEW,
     title: i18n('settings.enableNewStorageView.title'),
-};
-
-export const useShowPlanToSvgTables: SettingProps = {
-    settingKey: SETTING_KEYS.USE_SHOW_PLAN_SVG,
-    title: i18n('settings.useShowPlanToSvg.title'),
-    description: i18n('settings.useShowPlanToSvg.description'),
 };
 
 export const showDomainDatabase: SettingProps = {
@@ -127,12 +116,6 @@ export const enableQueryStreamingSetting: SettingProps = {
     description: i18n('settings.editor.queryStreaming.description'),
 };
 
-export const enableQueryStreamingOldBackendSetting: SettingProps = {
-    settingKey: SETTING_KEYS.ENABLE_QUERY_STREAMING_OLD_BACKEND,
-    title: i18n('settings.editor.queryStreaming.title'),
-    description: i18n('settings.editor.queryStreaming.description'),
-};
-
 export const enableBlobStorageCapacityMetricsSetting: SettingProps = {
     settingKey: SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS,
     title: i18n('settings.enableBlobStorageCapacityMetrics.title'),
@@ -149,37 +132,6 @@ export const enableStorageExpertModeSetting: SettingProps = {
     title: i18n('settings.enableStorageExpertMode.title'),
     description: i18n('settings.enableStorageExpertMode.description'),
 };
-
-export function applyClusterSpecificQueryStreamingSetting(
-    settings: YDBEmbeddedUISettings,
-    clusterName?: string,
-): YDBEmbeddedUISettings {
-    const isOldBackendCluster = clusterName && OLD_BACKEND_CLUSTER_NAMES.includes(clusterName);
-
-    const queryStreamingSetting = isOldBackendCluster
-        ? enableQueryStreamingOldBackendSetting
-        : enableQueryStreamingSetting;
-
-    return settings.map((page) => {
-        // Look for the experiments page
-        if (page.id === PAGE_IDS.EXPERIMENTS) {
-            return createNextState(page, (draft) => {
-                // Find and replace the query streaming setting in experimentsSection
-                const section = draft.sections[0]; // experimentsSection
-                const settingIndex = section.settings.findIndex(
-                    (setting) =>
-                        'settingKey' in setting &&
-                        setting.settingKey === SETTING_KEYS.ENABLE_QUERY_STREAMING,
-                );
-
-                if (settingIndex !== -1) {
-                    section.settings[settingIndex] = queryStreamingSetting;
-                }
-            });
-        }
-        return page;
-    });
-}
 
 function isSettingWithKey(
     setting: SettingProps | SettingsInfoFieldProps,
@@ -242,11 +194,6 @@ export function applyStorageExpertModeSettingAvailability(
     return hideExperimentSetting(settings, SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE);
 }
 
-export const showNetworkUtilizationSetting: SettingProps = {
-    settingKey: SETTING_KEYS.SHOW_NETWORK_UTILIZATION,
-    title: i18n('settings.showNetworkUtilization.title'),
-};
-
 export const autocompleteOnEnterSetting: SettingProps = {
     settingKey: SETTING_KEYS.AUTOCOMPLETE_ON_ENTER,
     title: i18n('settings.editor.autocomplete-on-enter.title'),
@@ -288,23 +235,13 @@ export const interfaceVersionInfoField: SettingsInfoFieldProps = {
 export const appearanceSection: SettingsSection = {
     id: SECTION_IDS.APPEARANCE,
     title: i18n('section.appearance'),
-    settings: [
-        themeSetting,
-        invertedDisksSetting,
-        binaryDataInPlainTextDisplay,
-        showDomainDatabase,
-        aclSyntaxSetting,
-    ],
+    settings: [themeSetting, invertedDisksSetting, showDomainDatabase, aclSyntaxSetting],
 };
 
 export const experimentsSection: SettingsSection = {
     id: SECTION_IDS.EXPERIMENTS,
     title: i18n('section.experiments'),
     settings: [
-        enableNetworkTable,
-        useShowPlanToSvgTables,
-        enableQueryStreamingSetting,
-        showNetworkUtilizationSetting,
         enableBlobStorageCapacityMetricsSetting,
         enableTenantNavigationV2Setting,
         enableNewStorageViewSetting,
@@ -315,7 +252,13 @@ export const experimentsSection: SettingsSection = {
 export const devSettingsSection: SettingsSection = {
     id: SECTION_IDS.DEV_SETTINGS,
     title: i18n('section.dev-setting'),
-    settings: [enableAutocompleteSetting, autocompleteOnEnterSetting],
+    settings: [enableAutocompleteSetting, autocompleteOnEnterSetting, enableQueryStreamingSetting],
+};
+
+export const resultsSettingsSection: SettingsSection = {
+    id: SECTION_IDS.RESULTS,
+    title: i18n('section.results'),
+    settings: [binaryDataInPlainTextDisplay],
 };
 
 export const aboutSettingsSection: SettingsSection = {
@@ -344,8 +287,7 @@ export const editorPage: SettingsPage = {
     id: PAGE_IDS.EDITOR,
     title: i18n('page.editor'),
     icon: {data: PencilToSquare},
-    sections: [devSettingsSection],
-    hideTitle: true,
+    sections: [devSettingsSection, resultsSettingsSection],
 };
 
 export const aboutPage: SettingsPage = {
@@ -359,11 +301,9 @@ export const aboutPage: SettingsPage = {
 export function getUserSettings({
     singleClusterMode,
     codeAssistantConfigured,
-    clusterName,
 }: {
     singleClusterMode: boolean;
     codeAssistantConfigured?: boolean;
-    clusterName?: string;
 }) {
     const experiments = singleClusterMode
         ? experimentsPage
@@ -378,8 +318,5 @@ export function getUserSettings({
               })
             : editorPage;
 
-    const baseSettings: YDBEmbeddedUISettings = [generalPage, editor, experiments, aboutPage];
-
-    // Apply cluster-specific query streaming logic
-    return applyClusterSpecificQueryStreamingSetting(baseSettings, clusterName);
+    return [generalPage, editor, experiments, aboutPage];
 }

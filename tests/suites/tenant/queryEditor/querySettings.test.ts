@@ -7,7 +7,7 @@ import {
     TRANSACTION_MODES,
 } from '../../../../src/utils/query';
 import {backend, database} from '../../../utils/constants';
-import {toggleExperiment} from '../../../utils/toggleExperiment';
+import {toggleEditorSetting} from '../../../utils/toggleExperiment';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {longRunningQuery} from '../constants';
 
@@ -454,8 +454,8 @@ test.describe('Test Query Settings', async () => {
     }) => {
         const queryEditor = new QueryEditor(page);
 
-        // Turn off Query Streaming experiment
-        await toggleExperiment(page, 'off', 'Query Streaming');
+        // Turn off Query Streaming
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
 
         // Open settings dialog
         await queryEditor.clickGearButton();
@@ -471,8 +471,8 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
 
-        // Restore Query Streaming experiment
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        // Restore Query Streaming
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
     });
 
     test('Resource pool dropdown is populated from system view', async ({page}) => {

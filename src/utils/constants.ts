@@ -65,6 +65,7 @@ export const SECTION_IDS = {
     GENERAL: 'generalSection',
     APPEARANCE: 'appearanceSection',
     DEV_SETTINGS: 'devSettingsSection',
+    RESULTS: 'resultsSettingsSection',
     ABOUT: 'aboutSettingsSection',
 } as const;
 
@@ -111,12 +112,6 @@ export const TENANT_OVERVIEW_TABLES_SETTINGS: Settings = {
     dynamicRender: false,
     sortable: false,
 } as const;
-
-export const OLD_BACKEND_CLUSTER_NAMES = [
-    'cloud_prod_kikimr_global',
-    'cloud_preprod_kikimr_global',
-    'cloud_prod_kikimr_ydb_public_storage',
-];
 
 export const DEV_ENABLE_TRACING_FOR_ALL_REQUESTS = 'enable_tracing_for_all_requests';
 

@@ -6,7 +6,7 @@ import {
     setupMockStreamingFetch,
 } from '../../../utils/mockStreamingFetch';
 import {pressTabHotkey} from '../../../utils/queryHotkeys';
-import {toggleExperiment} from '../../../utils/toggleExperiment';
+import {toggleEditorSetting} from '../../../utils/toggleExperiment';
 import {NavigationTabs, QueryEditorMode, TenantPage} from '../TenantPage';
 import {longRunningStreamQuery} from '../constants';
 import {ObjectSummary} from '../summary/ObjectSummary';
@@ -646,7 +646,7 @@ test.describe('Editor tabs', () => {
         page,
     }) => {
         const runningQueryDialog = new RunningQueryDialog(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
         await setupMockStreamingFetch(page, {chunkIntervalMs: 1000});
 
         await queryEditor.editorTabs.clickAddTab();
@@ -675,7 +675,7 @@ test.describe('Editor tabs', () => {
         page,
     }) => {
         const runningQueryDialog = new RunningQueryDialog(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
         await setupMockStreamingFetch(page, {chunkIntervalMs: 1000});
 
         await queryEditor.setQuery(longRunningStreamQuery);
@@ -700,7 +700,7 @@ test.describe('Editor tabs', () => {
 
     test('Closing the last running tab can end in zero-tabs state', async ({page}) => {
         const runningQueryDialog = new RunningQueryDialog(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
         await setupMockStreamingFetch(page, {chunkIntervalMs: 1000});
 
         await queryEditor.setQuery(longRunningStreamQuery);

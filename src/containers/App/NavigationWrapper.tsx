@@ -5,12 +5,10 @@ import {
     useBlobStorageCapacityMetricsAvailable,
     useDetailedStorageViewAvailable,
 } from '../../store/reducers/capabilities/hooks';
-import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {Navigation} from '../AsideNavigation/Navigation';
 import {
     applyBlobStorageCapacityMetricsSettingAvailability,
-    applyClusterSpecificQueryStreamingSetting,
     applyDetailedStorageViewSettingAvailability,
     applyStorageExpertModeSettingAvailability,
     getUserSettings,
@@ -28,24 +26,12 @@ export function NavigationWrapper({
     userSettings,
     children,
 }: NavigationWrapperProps) {
-    const clusterName = useClusterNameFromQuery();
-
     const blobMetricsAvailable = useBlobStorageCapacityMetricsAvailable();
     const detailedStorageViewAvailable = useDetailedStorageViewAvailable();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
-    let finalUserSettings: YDBEmbeddedUISettings;
-
-    if (userSettings) {
-        // Apply cluster-specific logic to externally provided settings
-        finalUserSettings = applyClusterSpecificQueryStreamingSetting(userSettings, clusterName);
-    } else {
-        // Generate settings internally with cluster-specific logic
-        finalUserSettings = getUserSettings({
-            singleClusterMode,
-            clusterName,
-        });
-    }
+    let finalUserSettings: YDBEmbeddedUISettings =
+        userSettings ?? getUserSettings({singleClusterMode});
 
     finalUserSettings = applyDetailedStorageViewSettingAvailability(
         finalUserSettings,

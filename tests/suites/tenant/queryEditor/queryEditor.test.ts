@@ -13,7 +13,7 @@ import {
     executeQueryWithKeybinding,
     executeSelectedQueryWithKeybinding,
 } from '../../../utils/queryHotkeys';
-import {toggleExperiment} from '../../../utils/toggleExperiment';
+import {toggleEditorSetting} from '../../../utils/toggleExperiment';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {
     createTableQuery,
@@ -351,7 +351,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Stop button has distinct view when query is running', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
         await setupMockStreamingFetch(page);
 
         await queryEditor.setQuery(simpleQuery);
@@ -373,7 +373,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Query streaming finishes with data', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
 
         await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
@@ -394,7 +394,7 @@ test.describe('Test Query Editor', async () => {
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
 
         const htmlBody = '<html><body><h1>502 Bad Gateway</h1><p>nginx</p></body></html>';
         await setupMockStreamingHttpError(page, {
@@ -444,7 +444,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Stopped non-streaming selection does not create a History entry', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'off', 'Query Streaming');
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
         const pendingQuery = await setupPendingNonStreamingQueryMock(page);
         const query = 'SELECT 1;\nSELECT 2;';
 
@@ -469,7 +469,7 @@ test.describe('Test Query Editor', async () => {
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
 
         // Mock fetch to create a controlled streaming response.
         // Real streaming overwhelms Safari's main thread, making
@@ -538,7 +538,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Stop cancels Explain Analyze on the server when streaming is enabled', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
         await queryEditor.setQuery(longRunningQuery);
         const explainAnalyzeButton = queryEditor.getQueryActionButton(ButtonNames.ExplainAnalyze);
         await expectLocatorWidth(explainAnalyzeButton, 111);
@@ -634,7 +634,7 @@ test.describe('Test Query Editor', async () => {
             await route.continue();
         });
 
-        await toggleExperiment(page, 'off', 'Query Streaming');
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
         await queryEditor.setQuery(query);
         await queryEditor.clickRunButton();
         await runRequestCaptured;
@@ -673,7 +673,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Stop button appears when query is started via hotkey', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
         await setupMockStreamingFetch(page);
 
         await queryEditor.setQuery(simpleQuery);
@@ -686,7 +686,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Query started via hotkey is terminated when stop button is clicked', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
         await setupMockStreamingFetch(page);
 
         await queryEditor.setQuery(simpleQuery);
@@ -702,7 +702,7 @@ test.describe('Test Query Editor', async () => {
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'on', 'Query Streaming');
+        await toggleEditorSetting(page, 'on', 'Query Streaming');
         await setupMockStreamingFetch(page);
 
         await queryEditor.setQuery(simpleQuery);
@@ -1059,7 +1059,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Query Settings pragma errors do not navigate the editor', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'off', 'Query Streaming');
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
 
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changePragmas('PRAGMA InvalidPragma;');
