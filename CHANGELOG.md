@@ -1,5 +1,12 @@
 # Changelog
 
+## [20.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.0.0...v20.1.0) (2026-08-18)
+
+
+### Features
+
+* fill user info for externalIdp auth ([#4247](https://github.com/ydb-platform/ydb-embedded-ui/issues/4247)) ([bb70553](https://github.com/ydb-platform/ydb-embedded-ui/commit/bb70553ca0fb83e2fa63b153f8b551d5bd7590e3))
+
 ## [20.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v19.0.0...v20.0.0) (2026-08-18)
 
 
