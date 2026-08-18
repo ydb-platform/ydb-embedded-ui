@@ -58,7 +58,7 @@ codex plugin marketplace add astandrik/local-ydb-toolkit --ref main
 codex plugin add local-ydb-toolkit@local-ydb-toolkit
 ```
 
-Start a new Codex session after installation. For a basic `/local` database, no config file is required. The agent can start and inspect the database, create a test schema, seed data, or add Playwright request mocks for UI-only scenarios. Changes to Docker or YDB require explicit confirmation.
+Start a new Codex session after installation. For a basic `/local` database, no config file is required. The agent can start and inspect the database, create a test schema, seed data with managed SQL, or use the existing Playwright request mocks for UI-only scenarios. Mutating tools require explicit confirmation.
 
 ### YDB docker images
 
