@@ -8,8 +8,15 @@ describe('getUserInfo', () => {
         });
     });
 
-    test('removes only the final SID suffix for ExternalIdp authentication', () => {
+    test('removes the @sso suffix for ExternalIdp authentication', () => {
         expect(getUserInfo({AuthType: 'ExternalIdp', UserSID: 'alice@example.com@sso'})).toEqual({
+            login: 'alice@example.com',
+            isSso: true,
+        });
+    });
+
+    test('keeps an ExternalIdp email without the @sso suffix unchanged', () => {
+        expect(getUserInfo({AuthType: 'ExternalIdp', UserSID: 'alice@example.com'})).toEqual({
             login: 'alice@example.com',
             isSso: true,
         });

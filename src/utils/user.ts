@@ -5,10 +5,10 @@ export interface UserInfo {
     isSso: boolean;
 }
 
-function removeExternalIdpSuffix(userSid: string) {
-    const suffixSeparatorIndex = userSid.lastIndexOf('@');
+const SSO_SUFFIX = '@sso';
 
-    return suffixSeparatorIndex > 0 ? userSid.slice(0, suffixSeparatorIndex) : userSid;
+function removeExternalIdpSuffix(userSid: string) {
+    return userSid.endsWith(SSO_SUFFIX) ? userSid.slice(0, -SSO_SUFFIX.length) : userSid;
 }
 
 export function getUserInfo(userToken?: TUserToken): UserInfo | undefined {
