@@ -1,26 +1,12 @@
-import type {IconData} from '@gravity-ui/uikit';
 import {Icon, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import type {PDiskAllModeIndicatorsState} from '../../utils/disks/displayState';
 
+import {AllModeCapacityAlertIndicator} from './AllModeCapacityAlertIndicator';
 import {DiskIconGroup} from './DiskIndicator';
 
 const b = cn('storage-disk-progress-bar');
-
-function renderCapacityAlertIndicator(indicator?: IconData | string) {
-    if (!indicator) {
-        return null;
-    }
-
-    if (typeof indicator === 'string') {
-        return indicator;
-    }
-
-    return (
-        <Icon className={b('all-mode-capacity-alert-indicator-icon')} data={indicator} size={12} />
-    );
-}
 
 interface PDiskAllModeIndicatorsProps {
     indicators: PDiskAllModeIndicatorsState;
@@ -35,7 +21,7 @@ export function PDiskAllModeIndicators({indicators}: PDiskAllModeIndicatorsProps
                 color="primary"
                 className={b('pdisk-all-mode-capacity-alert-indicator-slot')}
             >
-                {renderCapacityAlertIndicator(indicators.capacityAlert)}
+                <AllModeCapacityAlertIndicator indicator={indicators.capacityAlert} />
             </Text>
             <span className={b('pdisk-all-mode-drive-indicator-slot')}>
                 {indicators.drive && <Icon data={indicators.drive} size={12} />}
