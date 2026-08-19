@@ -1,4 +1,4 @@
-import {getMajorVersion, getMinorVersion} from './parseVersion';
+import {getMajorVersion, getMinorVersion, getOnPremBuildNumber} from './parseVersion';
 import type {VersionsDataMap, VersionsMap} from './types';
 
 export const hashCode = (s: string) => {
@@ -6,11 +6,6 @@ export const hashCode = (s: string) => {
         const num = (a << 5) - a + b.charCodeAt(0); // eslint-disable-line
         return num & num; // eslint-disable-line
     }, 0);
-};
-
-const getOnPremBuildNumber = (version: string) => {
-    const match = version.match(/^\d+\.\d+\.\d+(?:\.ent)?\.(\d+)(?:-[0-9a-zA-Z]+)*$/);
-    return match ? Number(match[1]) : undefined;
 };
 
 export const compareMinorVersions = (versionA: string, versionB: string) => {

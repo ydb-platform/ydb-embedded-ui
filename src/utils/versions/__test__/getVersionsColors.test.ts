@@ -54,6 +54,42 @@ describe('parseVersionsToVersionsDataMap', () => {
         expect(versionData?.color).not.toBe(DEFAULT_COLOR);
     });
 
+    test('groups and orders alphanumeric on-prem builds under their release line', () => {
+        const versionsDataMap = parseVersionsToVersionsDataMap([
+            '24.3.1.10a.08bebbe',
+            '24.3.1.10rc1.454b74b',
+            '24.3.1.100a.deadbee',
+        ]);
+
+        const letterSuffixVersionData = versionsDataMap.get('24.3.1.10a');
+        const prereleaseVersionData = versionsDataMap.get('24.3.1.10rc1');
+        const newerBuildVersionData = versionsDataMap.get('24.3.1.100a');
+
+        expect(letterSuffixVersionData).toEqual(
+            expect.objectContaining({
+                color: expect.any(String),
+                majorIndex: expect.any(Number),
+                minorIndex: expect.any(Number),
+            }),
+        );
+        expect(prereleaseVersionData).toEqual(
+            expect.objectContaining({
+                color: expect.any(String),
+                majorIndex: letterSuffixVersionData?.majorIndex,
+                minorIndex: expect.any(Number),
+            }),
+        );
+        expect(newerBuildVersionData).toEqual(
+            expect.objectContaining({
+                color: expect.any(String),
+                majorIndex: letterSuffixVersionData?.majorIndex,
+                minorIndex: 0,
+            }),
+        );
+        expect(letterSuffixVersionData?.color).not.toBe(DEFAULT_COLOR);
+        expect(prereleaseVersionData?.color).not.toBe(DEFAULT_COLOR);
+    });
+
     test('orders on-prem release lines newest-first', () => {
         const versionsDataMap = parseVersionsToVersionsDataMap([
             '25.3.1.1.08bebbe',

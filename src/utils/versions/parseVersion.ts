@@ -1,6 +1,19 @@
-const ON_PREM_RUNTIME_VERSION_REGEXP =
-    /^(\d+\.\d+\.\d+(?:\.ent)?\.\d+(?:-[0-9a-zA-Z]+)*)\.[0-9a-zA-Z]+$/;
-const ON_PREM_RELEASE_VERSION_REGEXP = /^(\d+\.\d+\.\d+)(?:\.ent)?\.\d+(?:-[0-9a-zA-Z]+)*$/;
+const ON_PREM_BUILD_SUFFIX_PATTERN = String.raw`[0-9a-zA-Z]*(?:-[0-9a-zA-Z]+)*`;
+const ON_PREM_BUILD_PATTERN = String.raw`\d+${ON_PREM_BUILD_SUFFIX_PATTERN}`;
+const ON_PREM_RUNTIME_VERSION_REGEXP = new RegExp(
+    String.raw`^(\d+\.\d+\.\d+(?:\.ent)?\.${ON_PREM_BUILD_PATTERN})\.[0-9a-zA-Z]+$`,
+);
+const ON_PREM_RELEASE_VERSION_REGEXP = new RegExp(
+    String.raw`^(\d+\.\d+\.\d+)(?:\.ent)?\.${ON_PREM_BUILD_PATTERN}$`,
+);
+const ON_PREM_BUILD_NUMBER_REGEXP = new RegExp(
+    String.raw`^\d+\.\d+\.\d+(?:\.ent)?\.(\d+)${ON_PREM_BUILD_SUFFIX_PATTERN}$`,
+);
+
+export const getOnPremBuildNumber = (version: string) => {
+    const match = version.match(ON_PREM_BUILD_NUMBER_REGEXP);
+    return match ? Number(match[1]) : undefined;
+};
 
 export const getMinorVersion = (version: string) => {
     const onPremRuntimeVersionMatch = version.match(ON_PREM_RUNTIME_VERSION_REGEXP);
