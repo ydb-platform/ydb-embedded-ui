@@ -28,6 +28,19 @@ export interface AllModeDisplayState {
     indicators: AllModeIndicatorsState;
 }
 
+export interface PDiskAllModeIndicatorsState {
+    capacityAlert?: IconData | string;
+    drive?: IconData;
+    decommit?: IconData;
+    maintenance?: IconData;
+    device?: IconWithColor[];
+}
+
+export interface PDiskAllModeDisplayState {
+    hasIssues?: boolean;
+    indicators: PDiskAllModeIndicatorsState;
+}
+
 export interface BaseDiskDisplayState {
     severity: DisplaySeverity;
     icon: DiskIndicatorValue | undefined;
@@ -47,6 +60,9 @@ export interface VDiskDisplayState extends BaseDiskDisplayState {
 export interface PDiskDisplayState extends BaseDiskDisplayState {
     width?: number;
     allocatedPercent?: number;
+    showAllocatedPercentLabel?: boolean;
+    iconPlacement?: 'inline' | 'overlap';
+    allMode?: PDiskAllModeDisplayState;
 }
 
 export type VDiskDisplayStateGetter = (
@@ -82,5 +98,7 @@ export function getDefaultPDiskDisplayState(pDisk: PreparedPDisk): PDiskDisplayS
         isLegendInactive: false,
         showNoDataPlaceholder: true,
         allocatedPercent: pDisk.AllocatedPercent,
+        showAllocatedPercentLabel: true,
+        iconPlacement: 'inline',
     };
 }

@@ -1,0 +1,6 @@
+{
+  "context_no-data": "N/D",
+  "context_all-mode-health-healthy": "healthy",
+  "context_all-mode-health-issues": "issues detected",
+  "context_all-mode-accessible-name": "PDisk {{pdiskId}}. Health: {{health}}. State: {{state}}. Capacity alert: {{capacityAlert}}. Drive: {{drive}}. Decommit: {{decommit}}. Maintenance: {{maintenance}}. Device: {{device}}. Realtime: {{realtime}}. Allocated: {{allocatedPercent}}."
+}

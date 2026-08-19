@@ -498,6 +498,28 @@
         }
     }
 
+    &__pdisk-all-mode-indicators {
+        position: absolute;
+        z-index: 2;
+        inset: 0;
+
+        display: grid;
+        justify-content: start;
+        align-items: center;
+        grid-template-columns: 16px 12px 12px 12px 18px;
+        column-gap: var(--g-spacing-1);
+
+        box-sizing: border-box;
+        padding-inline: 5px;
+
+        pointer-events: none;
+
+        #{$block}_grey &,
+        #{$block}_striped & {
+            padding-inline: 6px;
+        }
+    }
+
     &__all-mode-capacity-alert-indicator-slot {
         display: inline-flex;
         justify-content: center;
@@ -520,6 +542,24 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
+    }
+
+    &__pdisk-all-mode-capacity-alert-indicator-slot,
+    &__pdisk-all-mode-drive-indicator-slot,
+    &__pdisk-all-mode-decommit-indicator-slot,
+    &__pdisk-all-mode-maintenance-indicator-slot,
+    &__pdisk-all-mode-device-indicator-slot {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+
+        min-width: 0;
+    }
+
+    &__pdisk-all-mode-device-indicator-slot {
+        #{$block}__icon-group {
+            margin-left: 0;
+        }
     }
 
     &__title {

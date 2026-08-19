@@ -75,4 +75,36 @@ describe('AllLegend', () => {
 
         window.removeEventListener(SPACE_LEGEND_CHANGE_EVENT, listener);
     });
+
+    test('reads and updates the PDisk-scoped selection without mutating the VDisk scope', async () => {
+        const user = userEvent.setup();
+
+        sessionStorage.setItem(SPACE_LEGEND_STORAGE_KEY, JSON.stringify([ECapacityAlert.RED]));
+        sessionStorage.setItem(
+            `${SPACE_LEGEND_STORAGE_KEY}-pdisks`,
+            JSON.stringify([ECapacityAlert.BLACK]),
+        );
+
+        render(
+            <ThemeProvider>
+                <AllLegend />
+                <AllLegend selectionScope="pdisks" />
+            </ThemeProvider>,
+        );
+
+        const [vDisksLegend, pDisksLegend] = screen.getAllByRole('combobox');
+
+        expect(vDisksLegend).toHaveTextContent('Capacity alerts:Except Red');
+        expect(pDisksLegend).toHaveTextContent('Capacity alerts:Except Black');
+
+        await user.click(pDisksLegend);
+        await user.click(screen.getByText('Yellow'));
+
+        expect(vDisksLegend).toHaveTextContent('Capacity alerts:Except Red');
+        expect(pDisksLegend).toHaveTextContent('Capacity alerts:Except Yellow & Black');
+        expect(getSpaceLegendSelection()).toEqual(new Set([ECapacityAlert.RED]));
+        expect(getSpaceLegendSelection('pdisks')).toEqual(
+            new Set([ECapacityAlert.YELLOW, ECapacityAlert.BLACK]),
+        );
+    });
 });

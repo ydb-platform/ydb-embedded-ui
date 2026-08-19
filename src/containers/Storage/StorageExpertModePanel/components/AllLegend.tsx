@@ -7,11 +7,13 @@ import {ECapacityAlert, isCapacityAlert} from '../../../../types/api/enums';
 import {b} from '../constants';
 import i18n from '../i18n';
 
+import type {SpaceLegendSelectionScope} from './getSpaceLegendSelection';
 import {saveSpaceLegendSelection} from './getSpaceLegendSelection';
 import {useSpaceLegendSelection} from './useSpaceLegendSelection';
 
 interface AllLegendProps {
     className?: string;
+    selectionScope?: SpaceLegendSelectionScope;
 }
 
 interface CapacityAlertOptionData {
@@ -94,8 +96,8 @@ function renderOption(option: SelectOption<CapacityAlertOptionData>) {
     );
 }
 
-export function AllLegend({className}: AllLegendProps) {
-    const inactiveAlerts = useSpaceLegendSelection();
+export function AllLegend({className, selectionScope = 'vdisks'}: AllLegendProps) {
+    const inactiveAlerts = useSpaceLegendSelection(selectionScope);
 
     const activeAlerts = React.useMemo(
         () =>
@@ -122,17 +124,20 @@ export function AllLegend({className}: AllLegendProps) {
         return i18n('capacity-alerts_except', {alerts: inactiveAlertNames});
     }, [inactiveAlerts]);
 
-    const handleUpdate = React.useCallback((values: string[]) => {
-        const nextActiveAlerts = new Set(values.filter(isCapacityAlert));
-        const nextInactiveAlerts = new Set(
-            capacityAlertOptions
-                .map(({value}) => value)
-                .filter(isCapacityAlert)
-                .filter((alert) => !nextActiveAlerts.has(alert)),
-        );
+    const handleUpdate = React.useCallback(
+        (values: string[]) => {
+            const nextActiveAlerts = new Set(values.filter(isCapacityAlert));
+            const nextInactiveAlerts = new Set(
+                capacityAlertOptions
+                    .map(({value}) => value)
+                    .filter(isCapacityAlert)
+                    .filter((alert) => !nextActiveAlerts.has(alert)),
+            );
 
-        saveSpaceLegendSelection(nextInactiveAlerts);
-    }, []);
+            saveSpaceLegendSelection(nextInactiveAlerts, selectionScope);
+        },
+        [selectionScope],
+    );
 
     const renderSelectedOption = React.useCallback(
         (_option: SelectOption<CapacityAlertOptionData>, index: number) => (
