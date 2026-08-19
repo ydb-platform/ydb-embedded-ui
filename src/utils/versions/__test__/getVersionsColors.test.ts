@@ -53,4 +53,14 @@ describe('parseVersionsToVersionsDataMap', () => {
         );
         expect(versionData?.color).not.toBe(DEFAULT_COLOR);
     });
+
+    test('orders on-prem release lines newest-first', () => {
+        const versionsDataMap = parseVersionsToVersionsDataMap([
+            '25.3.1.1.08bebbe',
+            '25.4.1.1.454b74b',
+        ]);
+
+        expect(versionsDataMap.get('25.4.1.1')?.majorIndex).toBe(0);
+        expect(versionsDataMap.get('25.3.1.1')?.majorIndex).toBe(1);
+    });
 });

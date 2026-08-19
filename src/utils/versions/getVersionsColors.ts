@@ -30,6 +30,34 @@ export const compareMinorVersions = (versionA: string, versionB: string) => {
     return hashCode(versionB) - hashCode(versionA);
 };
 
+const getOnPremReleaseParts = (version: string) => {
+    if (!/^\d+\.\d+\.\d+$/.test(version)) {
+        return undefined;
+    }
+    return version.split('.').map(Number);
+};
+
+const compareMajorVersions = (versionA: string, versionB: string) => {
+    const partsA = getOnPremReleaseParts(versionA);
+    const partsB = getOnPremReleaseParts(versionB);
+
+    if (partsA && !partsB) {
+        return -1;
+    }
+    if (!partsA && partsB) {
+        return 1;
+    }
+    if (partsA && partsB) {
+        for (let index = 0; index < partsA.length; index++) {
+            if (partsA[index] !== partsB[index]) {
+                return partsB[index] - partsA[index];
+            }
+        }
+    }
+
+    return hashCode(versionA) - hashCode(versionB);
+};
+
 export const COLORS = [
     [
         'var(--versions-orange-1)',
@@ -144,12 +172,7 @@ export const getVersionsMap = (versions: string[], initialMap: VersionsMap = new
 };
 
 export const getVersionsDataMap = (versionsMap: VersionsMap) => {
-    const clustersVersions = Array.from(versionsMap.keys()).map((version) => {
-        return {
-            version,
-            hash: hashCode(version),
-        };
-    });
+    const clustersVersions = Array.from(versionsMap.keys());
 
     const versionsDataMap: VersionsDataMap = new Map();
     // not every version is colored, therefore iteration index can't be used consistently
@@ -157,22 +180,21 @@ export const getVersionsDataMap = (versionsMap: VersionsMap) => {
     let currentColorIndex = COLORS.length - 1;
 
     clustersVersions
-        // ascending by version name, just for consistency
-        // sorting only impacts color choose for a version
-        .sort((a, b) => a.hash - b.hash)
-        .forEach((item) => {
-            if (/^(\w+-)?stable/.test(item.version) || /^\d+\.\d+\.\d+$/.test(item.version)) {
+        // Newer on-prem release lines come first; other formats keep hash-based ordering
+        .sort(compareMajorVersions)
+        .forEach((version) => {
+            if (/^(\w+-)?stable/.test(version) || /^\d+\.\d+\.\d+$/.test(version)) {
                 currentColorIndex = (currentColorIndex + 1) % COLORS.length;
 
-                versionsDataMap.set(item.version, {
+                versionsDataMap.set(version, {
                     // Use first color for major
                     color: COLORS[currentColorIndex][0],
                     majorIndex: currentColorIndex,
                     minorIndex: 0,
                 });
 
-                const minors = Array.from(versionsMap.get(item.version) || []).filter(
-                    (v) => v !== item.version,
+                const minors = Array.from(versionsMap.get(version) || []).filter(
+                    (v) => v !== version,
                 );
 
                 const minorQuantity = minors.length;
@@ -194,7 +216,7 @@ export const getVersionsDataMap = (versionsMap: VersionsMap) => {
                         });
                     });
             } else {
-                versionsDataMap.set(item.version, {
+                versionsDataMap.set(version, {
                     color: DEFAULT_COLOR,
                 });
             }
