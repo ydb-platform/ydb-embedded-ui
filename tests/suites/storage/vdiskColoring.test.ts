@@ -1047,6 +1047,66 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
 test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 300_000});
 
+    test('keeps top-level PDisk BSC statuses visible across Drive, Decommit, and All modes without Whiteboard', async ({
+        page,
+    }) => {
+        const response = createMockStorageGroupsResponse();
+        const targetPDisk =
+            response.StorageGroups?.[0]?.VDisks?.[MISSING_WHITEBOARD_PDISK_INDEX]?.PDisk;
+
+        if (!targetPDisk) {
+            throw new Error('Cannot prepare PDisk BSC fallback regression fixtures');
+        }
+
+        targetPDisk.Status = 'BROKEN';
+        targetPDisk.DecommitStatus = 'DECOMMIT_IMMINENT';
+        targetPDisk.MaintenanceStatus = 'LONG_TERM_MAINTENANCE_PLANNED';
+
+        await preparePDiskPage(page, PDisksGroupBy.Drive, response);
+
+        const pDiskSelector = page.getByTestId('storage-pdisks-expert-mode');
+        const targetPDiskItem = getPDiskItems(getStorageGroupRow(page, 0)).nth(
+            MISSING_WHITEBOARD_PDISK_INDEX,
+        );
+        const targetPDiskBar = getPDiskProgressBar(targetPDiskItem);
+
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-drive/);
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_red/);
+        await expect(targetPDiskBar.locator('.storage-disk-progress-bar__icon')).toHaveCount(1);
+        await expect(targetPDiskBar).not.toContainText('N/D');
+
+        await pDiskSelector.getByRole('radio', {name: 'Decommit'}).check();
+
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-decommit/);
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_red/);
+        await expect(targetPDiskBar.locator('.storage-disk-progress-bar__icon')).toHaveCount(1);
+        await expect(targetPDiskBar).not.toContainText('N/D');
+
+        await pDiskSelector.getByRole('radio', {name: 'All'}).check();
+
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-all/);
+        await expect(targetPDiskBar).not.toContainText('N/D');
+        await expect(
+            targetPDiskBar.locator(PDISK_ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(1);
+        await expect(
+            targetPDiskBar.locator(PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(1);
+        await expect(
+            targetPDiskBar.locator(PDISK_ALL_MODE_DECOMMIT_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(1);
+        await expect(
+            targetPDiskBar.locator(PDISK_ALL_MODE_MAINTENANCE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(1);
+        await expect(
+            targetPDiskBar.locator(PDISK_ALL_MODE_DEVICE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(2);
+        await expect(targetPDiskItem.locator('.pdisk-storage__content')).toHaveAttribute(
+            'aria-label',
+            /Drive: BROKEN\. Decommit: DECOMMIT_IMMINENT\. Maintenance: LONG_TERM_MAINTENANCE_PLANNED\./,
+        );
+    });
+
     test('renders All-mode PDisk overlays, widths, and accessible labels as a stable contract', async ({
         page,
     }) => {
