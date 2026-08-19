@@ -139,7 +139,7 @@ export const getVersionsDataMap = (versionsMap: VersionsMap) => {
         // sorting only impacts color choose for a version
         .sort((a, b) => a.hash - b.hash)
         .forEach((item) => {
-            if (/^(\w+-)?stable/.test(item.version)) {
+            if (/^(\w+-)?stable/.test(item.version) || /^\d+\.\d+\.\d+$/.test(item.version)) {
                 currentColorIndex = (currentColorIndex + 1) % COLORS.length;
 
                 versionsDataMap.set(item.version, {
