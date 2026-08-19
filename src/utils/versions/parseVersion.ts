@@ -6,13 +6,13 @@ const ON_PREM_RUNTIME_VERSION_REGEXP = new RegExp(
 const ON_PREM_RELEASE_VERSION_REGEXP = new RegExp(
     String.raw`^(\d+\.\d+\.\d+)(?:\.ent)?\.${ON_PREM_BUILD_PATTERN}$`,
 );
-const ON_PREM_BUILD_NUMBER_REGEXP = new RegExp(
-    String.raw`^\d+\.\d+\.\d+(?:\.ent)?\.(\d+)${ON_PREM_BUILD_SUFFIX_PATTERN}$`,
+const ON_PREM_BUILD_REGEXP = new RegExp(
+    String.raw`^\d+\.\d+\.\d+(?:\.ent)?\.(\d+)(${ON_PREM_BUILD_SUFFIX_PATTERN})$`,
 );
 
-export const getOnPremBuildNumber = (version: string) => {
-    const match = version.match(ON_PREM_BUILD_NUMBER_REGEXP);
-    return match ? Number(match[1]) : undefined;
+export const getOnPremBuild = (version: string) => {
+    const match = version.match(ON_PREM_BUILD_REGEXP);
+    return match ? {number: Number(match[1]), suffix: match[2]} : undefined;
 };
 
 export const getMinorVersion = (version: string) => {

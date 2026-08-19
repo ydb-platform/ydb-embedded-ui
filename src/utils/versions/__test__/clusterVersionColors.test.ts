@@ -30,4 +30,21 @@ describe('getVersionsData', () => {
             expect(actualOrder).toEqual(expectedOrder);
         });
     });
+
+    test('orders equal-number on-prem hotfixes ahead of base and prerelease builds', () => {
+        const hotfix = '24.1.1.1-hotfixblobstorage-1';
+        const base = '24.1.1.1';
+        const prerelease = '24.1.1.1rc1';
+        const expectedOrder = [hotfix, base, prerelease];
+        const insertionOrders = [expectedOrder, [...expectedOrder].reverse()];
+
+        insertionOrders.forEach((versions) => {
+            const versionsDataMap = getVersionsData(new Map([[0, new Set(versions)]]));
+            const actualOrder = Array.from(versionsDataMap)
+                .sort(([, dataA], [, dataB]) => (dataA.minorIndex ?? 0) - (dataB.minorIndex ?? 0))
+                .map(([version]) => version);
+
+            expect(actualOrder).toEqual(expectedOrder);
+        });
+    });
 });

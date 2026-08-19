@@ -1,4 +1,4 @@
-import {getMajorVersion, getMinorVersion, getOnPremBuildNumber} from './parseVersion';
+import {getMajorVersion, getMinorVersion, getOnPremBuild} from './parseVersion';
 import type {VersionsDataMap, VersionsMap} from './types';
 
 export const hashCode = (s: string) => {
@@ -8,18 +8,42 @@ export const hashCode = (s: string) => {
     }, 0);
 };
 
-export const compareMinorVersions = (versionA: string, versionB: string) => {
-    const buildA = getOnPremBuildNumber(versionA);
-    const buildB = getOnPremBuildNumber(versionB);
+const onPremSuffixCollator = new Intl.Collator('en', {numeric: true});
 
-    if (buildA !== undefined && buildB === undefined) {
+const getOnPremSuffixPriority = (suffix: string) => {
+    if (suffix.startsWith('-hotfix')) {
+        return 0;
+    }
+    return suffix ? 2 : 1;
+};
+
+export const compareMinorVersions = (versionA: string, versionB: string) => {
+    const buildA = getOnPremBuild(versionA);
+    const buildB = getOnPremBuild(versionB);
+
+    if (buildA && !buildB) {
         return -1;
     }
-    if (buildA === undefined && buildB !== undefined) {
+    if (!buildA && buildB) {
         return 1;
     }
-    if (buildA !== undefined && buildB !== undefined && buildA !== buildB) {
-        return buildB - buildA;
+    if (buildA && buildB) {
+        if (buildA.number !== buildB.number) {
+            return buildB.number - buildA.number;
+        }
+
+        const priorityDifference =
+            getOnPremSuffixPriority(buildA.suffix) - getOnPremSuffixPriority(buildB.suffix);
+        if (priorityDifference !== 0) {
+            return priorityDifference;
+        }
+
+        const suffixDifference = onPremSuffixCollator.compare(buildB.suffix, buildA.suffix);
+        if (suffixDifference !== 0) {
+            return suffixDifference;
+        }
+
+        return onPremSuffixCollator.compare(versionB, versionA);
     }
 
     return hashCode(versionB) - hashCode(versionA);
