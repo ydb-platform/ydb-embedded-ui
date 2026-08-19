@@ -43,7 +43,7 @@ function RenameQueryDialog({
         const validationError = getQueryNameValidationError(normalizedTitle);
 
         if (validationError) {
-            setErrorMessage(i18n('alert_query-name-empty'));
+            setErrorMessage(i18n('alert_query-tab-name-empty'));
             return;
         }
 
@@ -63,15 +63,15 @@ function RenameQueryDialog({
             initialFocus={controlRef}
             className={b()}
         >
-            <Dialog.Header caption={i18n('title_rename-query')} />
+            <Dialog.Header caption={i18n('title_rename-query-tab')} />
             <Dialog.Body>
-                <div className={b('dialog-row')}>{i18n('context_rename-query')}</div>
+                <div className={b('dialog-row')}>{i18n('context_rename-query-tab')}</div>
                 <div className={b('dialog-row')}>
                     <div className={b('control-wrapper')}>
                         <TextInput
                             value={nextTitle}
                             onUpdate={handleTitleChange}
-                            placeholder={i18n('field_query-name')}
+                            placeholder={i18n('field_query-tab-name')}
                             controlRef={controlRef}
                             hasClear
                             autoComplete={false}
