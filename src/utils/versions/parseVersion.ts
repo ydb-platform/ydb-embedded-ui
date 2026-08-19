@@ -1,5 +1,6 @@
-const ON_PREM_RUNTIME_VERSION_REGEXP = /^(\d+\.\d+\.\d+(?:\.ent)?\.\d+)\.[0-9a-zA-Z]+$/;
-const ON_PREM_RELEASE_VERSION_REGEXP = /^(\d+\.\d+\.\d+)(?:\.ent)?\.\d+$/;
+const ON_PREM_RUNTIME_VERSION_REGEXP =
+    /^(\d+\.\d+\.\d+(?:\.ent)?\.\d+(?:-[0-9a-zA-Z]+)*)\.[0-9a-zA-Z]+$/;
+const ON_PREM_RELEASE_VERSION_REGEXP = /^(\d+\.\d+\.\d+)(?:\.ent)?\.\d+(?:-[0-9a-zA-Z]+)*$/;
 
 export const getMinorVersion = (version: string) => {
     const onPremRuntimeVersionMatch = version.match(ON_PREM_RUNTIME_VERSION_REGEXP);

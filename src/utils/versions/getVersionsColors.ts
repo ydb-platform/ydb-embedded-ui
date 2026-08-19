@@ -9,7 +9,7 @@ export const hashCode = (s: string) => {
 };
 
 const getOnPremBuildNumber = (version: string) => {
-    const match = version.match(/^\d+\.\d+\.\d+(?:\.ent)?\.(\d+)$/);
+    const match = version.match(/^\d+\.\d+\.\d+(?:\.ent)?\.(\d+)(?:-[0-9a-zA-Z]+)*$/);
     return match ? Number(match[1]) : undefined;
 };
 
@@ -17,6 +17,12 @@ export const compareMinorVersions = (versionA: string, versionB: string) => {
     const buildA = getOnPremBuildNumber(versionA);
     const buildB = getOnPremBuildNumber(versionB);
 
+    if (buildA !== undefined && buildB === undefined) {
+        return -1;
+    }
+    if (buildA === undefined && buildB !== undefined) {
+        return 1;
+    }
     if (buildA !== undefined && buildB !== undefined && buildA !== buildB) {
         return buildB - buildA;
     }

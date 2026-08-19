@@ -38,4 +38,19 @@ describe('parseVersionsToVersionsDataMap', () => {
         expect(versionsDataMap.get('25.4.1.100')?.minorIndex).toBe(0);
         expect(versionsDataMap.get('25.4.1.10')?.minorIndex).toBe(1);
     });
+
+    test('groups suffix-bearing on-prem builds under their release line', () => {
+        const version = '25.3.1.25-hotfixblobstorage-1';
+        const versionsDataMap = parseVersionsToVersionsDataMap([`${version}.08bebbe`]);
+        const versionData = versionsDataMap.get(version);
+
+        expect(versionData).toEqual(
+            expect.objectContaining({
+                color: expect.any(String),
+                majorIndex: expect.any(Number),
+                minorIndex: 0,
+            }),
+        );
+        expect(versionData?.color).not.toBe(DEFAULT_COLOR);
+    });
 });
