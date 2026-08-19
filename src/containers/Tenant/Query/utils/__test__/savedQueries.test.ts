@@ -47,6 +47,32 @@ test('detects duplicate names against legacy whitespace-normalized records', () 
     expect(hasSavedQueryNameCollision([legacyQuery], ' Report ', 'report')).toBe(false);
 });
 
+test('updates and renames the exact legacy duplicate selected by name', () => {
+    const legacyQueries = [
+        {name: ' Report ', body: 'SELECT 1;', updatedAt: 100},
+        {name: 'Report', body: 'SELECT 2;', updatedAt: 200},
+    ];
+
+    expect(upsertSavedQuery(legacyQueries, 'Report', 'SELECT 3;', 300)).toEqual([
+        legacyQueries[0],
+        {name: 'Report', body: 'SELECT 3;', updatedAt: 300},
+    ]);
+    expect(renameSavedQueryInList(legacyQueries, 'Report', 'Summary', 300)).toEqual({
+        renamed: true,
+        queries: [legacyQueries[0], {name: 'Summary', body: 'SELECT 2;', updatedAt: 300}],
+    });
+});
+
+test('does not exempt another legacy duplicate from collision validation', () => {
+    const legacyQueries = [
+        {name: ' Report ', body: 'SELECT 1;', updatedAt: 100},
+        {name: 'Report', body: 'SELECT 2;', updatedAt: 200},
+    ];
+
+    expect(hasSavedQueryNameCollision(legacyQueries, 'Report', ' Report ')).toBe(true);
+    expect(hasSavedQueryNameCollision(legacyQueries, 'Report', 'Report')).toBe(false);
+});
+
 test.each([undefined, Number.NaN, Number.POSITIVE_INFINITY, 0, -1])(
     'renders an invalid timestamp as the shared placeholder',
     (updatedAt) => expect(formatSavedQueryUpdatedAt(updatedAt)).toBe(EMPTY_DATA_PLACEHOLDER),

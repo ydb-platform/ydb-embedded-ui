@@ -216,6 +216,20 @@ function getActiveTab(state: QueryState): QueryTabState | undefined {
     return state.activeTabId ? state.tabsById[state.activeTabId] : undefined;
 }
 
+function getTabsBoundToSavedQuery(
+    tabsById: QueryState['tabsById'],
+    savedQueryName: string,
+): QueryTabState[] {
+    const tabs = Object.values(tabsById);
+    const exactMatches = tabs.filter((tab) => tab.savedQueryName === savedQueryName);
+    if (exactMatches.length) {
+        return exactMatches;
+    }
+
+    const normalizedName = savedQueryName.trim().toLowerCase();
+    return tabs.filter((tab) => tab.savedQueryName?.trim().toLowerCase() === normalizedName);
+}
+
 function getSetQueryTabContentTitle({
     tabsById,
     activeTab,
@@ -528,29 +542,29 @@ const slice = createSlice({
             state,
             action: PayloadAction<{previousName: string; nextName: string}>,
         ) => {
-            const previousName = action.payload.previousName.trim().toLowerCase();
-            Object.values(state.tabsById).forEach((tab) => {
-                if (tab.savedQueryName?.trim().toLowerCase() === previousName) {
-                    tab.title = action.payload.nextName;
-                    tab.savedQueryName = action.payload.nextName;
-                }
+            const matchingTabs = getTabsBoundToSavedQuery(
+                state.tabsById,
+                action.payload.previousName,
+            );
+            matchingTabs.forEach((tab) => {
+                tab.title = action.payload.nextName;
+                tab.savedQueryName = action.payload.nextName;
             });
             persistTabsStateToSessionStorage(state);
         },
         detachSavedQueryTabs: (state, action: PayloadAction<{savedQueryName: string}>) => {
-            const savedQueryName = action.payload.savedQueryName.trim().toLowerCase();
-            let hasDetachedTabs = false;
+            const matchingTabs = getTabsBoundToSavedQuery(
+                state.tabsById,
+                action.payload.savedQueryName,
+            );
 
-            Object.values(state.tabsById).forEach((tab) => {
-                if (tab.savedQueryName?.trim().toLowerCase() === savedQueryName) {
-                    tab.savedQueryName = undefined;
-                    tab.savedInput = undefined;
-                    tab.isDirty = true;
-                    hasDetachedTabs = true;
-                }
+            matchingTabs.forEach((tab) => {
+                tab.savedQueryName = undefined;
+                tab.savedInput = undefined;
+                tab.isDirty = true;
             });
 
-            if (hasDetachedTabs) {
+            if (matchingTabs.length) {
                 persistTabsStateToSessionStorage(state);
                 persistDirtyStateToSessionStorage(state);
             }

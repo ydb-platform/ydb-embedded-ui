@@ -1,5 +1,5 @@
 import {QUERY_EDITOR_CURRENT_QUERY_KEY} from '../../../../utils/constants';
-import queryReducer, {renameSavedQueryTabs} from '../query';
+import queryReducer, {detachSavedQueryTabs, renameSavedQueryTabs} from '../query';
 import type {QueryState} from '../types';
 
 test('renames all tabs bound to a saved query without changing tab state', () => {
@@ -35,7 +35,7 @@ test('renames all tabs bound to a saved query without changing tab state', () =>
                 isTouched: true,
                 createdAt: 3,
                 updatedAt: 4,
-                savedQueryName: 'weekly REPORT',
+                savedQueryName: ' Weekly report ',
                 lastExecutedQueryText: 'SELECT 2;',
                 pendingSnippet: 'SELECT 2;\n',
                 result: {
@@ -93,5 +93,58 @@ test('renames all tabs bound to a saved query without changing tab state', () =>
                 savedQueryName: 'Capacity',
             },
         },
+    });
+});
+
+test('renames and detaches only tabs bound to the exact legacy duplicate', () => {
+    const initialState: QueryState = {
+        activeTabId: 'tab-2',
+        tabsOrder: ['tab-1', 'tab-2'],
+        tabsById: {
+            'tab-1': {
+                id: 'tab-1',
+                title: ' Report ',
+                input: 'SELECT 1;',
+                savedInput: 'SELECT 1;',
+                isDirty: false,
+                createdAt: 1,
+                updatedAt: 2,
+                savedQueryName: ' Report ',
+            },
+            'tab-2': {
+                id: 'tab-2',
+                title: 'Report',
+                input: 'SELECT 2;',
+                savedInput: 'SELECT 2;',
+                isDirty: false,
+                createdAt: 3,
+                updatedAt: 4,
+                savedQueryName: 'Report',
+            },
+        },
+        newTabCounter: 2,
+    };
+
+    const renamedState = queryReducer(
+        initialState,
+        renameSavedQueryTabs({previousName: 'Report', nextName: 'Summary'}),
+    );
+
+    expect(renamedState.tabsById['tab-1']).toEqual(initialState.tabsById['tab-1']);
+    expect(renamedState.tabsById['tab-2']).toMatchObject({
+        title: 'Summary',
+        savedQueryName: 'Summary',
+    });
+
+    const detachedState = queryReducer(
+        initialState,
+        detachSavedQueryTabs({savedQueryName: 'Report'}),
+    );
+
+    expect(detachedState.tabsById['tab-1']).toEqual(initialState.tabsById['tab-1']);
+    expect(detachedState.tabsById['tab-2']).toMatchObject({
+        savedQueryName: undefined,
+        savedInput: undefined,
+        isDirty: true,
     });
 });

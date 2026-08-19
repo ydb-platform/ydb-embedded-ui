@@ -9,13 +9,13 @@ import {
     selectActiveTabSavedQueryName,
     selectUserInput,
     setIsDirty,
-    setQueryTabSavedQueryName,
     syncSavedQueryTab,
 } from '../../../../store/reducers/query/query';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
+import createToast from '../../../../utils/createToast';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getTabTitleForSave} from '../utils/queryTabTitles';
 import {hasSavedQueryName} from '../utils/savedQueries';
@@ -102,18 +102,27 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     const onSaveQueryClick = useSaveQueryHandler({queryBody: currentInput});
     const currentSavedQueryName = activeTabSavedQueryName;
 
-    const {saveQuery} = useSavedQueries();
+    const {updateSavedQuery} = useSavedQueries();
 
     const onEditQueryClick = () => {
-        saveQuery(currentSavedQueryName ?? null, currentInput);
-        if (activeTab && currentSavedQueryName) {
-            dispatch(
-                setQueryTabSavedQueryName({
-                    tabId: activeTab.id,
-                    savedQueryName: currentSavedQueryName,
-                }),
-            );
+        if (!activeTab || !currentSavedQueryName) {
+            return;
         }
+
+        const result = updateSavedQuery(currentSavedQueryName, activeTab.title, currentInput);
+        if (result === 'duplicate') {
+            createToast({
+                name: 'saved-query-name-exists',
+                title: '',
+                content: i18n('error.name-exists'),
+                theme: 'danger',
+            });
+            return;
+        }
+        if (result !== 'updated') {
+            return;
+        }
+
         dispatch(setIsDirty(false));
     };
 

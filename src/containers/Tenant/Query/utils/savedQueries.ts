@@ -5,6 +5,11 @@ import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 const normalizeSavedQueryName = (value: string) => value.trim().toLowerCase();
 
 function findSavedQueryIndex(queries: SavedQuery[], name: string): number {
+    const exactIndex = queries.findIndex((query) => query.name === name);
+    if (exactIndex >= 0) {
+        return exactIndex;
+    }
+
     const normalizedName = normalizeSavedQueryName(name);
 
     return queries.findIndex((query) => normalizeSavedQueryName(query.name) === normalizedName);
@@ -19,15 +24,17 @@ export function hasSavedQueryNameCollision(
     currentName: string,
     candidateName: string,
 ): boolean {
-    const normalizedCurrentName = normalizeSavedQueryName(currentName);
+    if (candidateName === currentName) {
+        return false;
+    }
+
+    const currentIndex = findSavedQueryIndex(queries, currentName);
     const normalizedCandidateName = normalizeSavedQueryName(candidateName);
 
-    return queries.some(({name}) => {
-        const normalizedName = normalizeSavedQueryName(name);
-        return (
-            normalizedName === normalizedCandidateName && normalizedName !== normalizedCurrentName
-        );
-    });
+    return queries.some(
+        ({name}, index) =>
+            index !== currentIndex && normalizeSavedQueryName(name) === normalizedCandidateName,
+    );
 }
 
 export function filterSavedQueries(queries: SavedQuery[], filter: string): SavedQuery[] {

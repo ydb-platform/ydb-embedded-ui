@@ -15,7 +15,7 @@ export class RenameQueryDialog {
     }
 
     async setTitle(title: string) {
-        const input = this.dialog.getByPlaceholder('Query name');
+        const input = this.dialog.getByPlaceholder('Tab name');
         await input.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await input.click();
         await input.clear();

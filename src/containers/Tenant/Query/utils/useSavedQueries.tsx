@@ -7,7 +7,14 @@ import type {SavedQuery} from '../../../../types/store/query';
 import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {sortByTimestampDescending} from '../../../../utils/sortByTimestamp';
 
-import {filterSavedQueries, renameSavedQueryInList, upsertSavedQuery} from './savedQueries';
+import {
+    filterSavedQueries,
+    hasSavedQueryNameCollision,
+    renameSavedQueryInList,
+    upsertSavedQuery,
+} from './savedQueries';
+
+type UpdateSavedQueryResult = 'updated' | 'duplicate' | 'not-found';
 
 export function useSavedQueries() {
     const [savedQueries, saveQueries] = useSetting<SavedQuery[]>(SETTING_KEYS.SAVED_QUERIES);
@@ -59,7 +66,42 @@ export function useSavedQueries() {
         [dispatch, savedQueries, saveQueries],
     );
 
-    return {savedQueries, filteredSavedQueries, deleteSavedQuery, saveQuery, renameSavedQuery};
+    const updateSavedQuery = React.useCallback(
+        (previousName: string, nextName: string, queryBody: string): UpdateSavedQueryResult => {
+            const nameToSave = nextName === previousName ? previousName : nextName.trim();
+            const queries = savedQueries ?? [];
+
+            if (hasSavedQueryNameCollision(queries, previousName, nameToSave)) {
+                return 'duplicate';
+            }
+
+            const updatedAt = Date.now();
+            const renameResult = renameSavedQueryInList(
+                queries,
+                previousName,
+                nameToSave,
+                updatedAt,
+            );
+            if (!renameResult.renamed) {
+                return 'not-found';
+            }
+
+            saveQueries(upsertSavedQuery(renameResult.queries, nameToSave, queryBody, updatedAt));
+            dispatch(renameSavedQueryTabs({previousName, nextName: nameToSave}));
+
+            return 'updated';
+        },
+        [dispatch, savedQueries, saveQueries],
+    );
+
+    return {
+        savedQueries,
+        filteredSavedQueries,
+        deleteSavedQuery,
+        saveQuery,
+        renameSavedQuery,
+        updateSavedQuery,
+    };
 }
 
 function findQueryByName(query: SavedQuery, name: string) {
