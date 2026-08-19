@@ -70,12 +70,14 @@ function ManagePartitioningDialogForm({
     const {
         control,
         handleSubmit,
+        watch,
         trigger,
         formState: {errors, isValid},
     } = useManagePartitioningForm({
         initialValue,
         maxSplitSizeBytes,
     });
+    const splitSizeEnabled = watch('splitSizeEnabled');
 
     const handleApply = handleSubmit(async (data) => {
         setApiError(null);
@@ -96,56 +98,79 @@ function ManagePartitioningDialogForm({
                     <Text variant="subheader-1">{i18n('title_partitioning')}</Text>
 
                     <Flex className={b('row')} gap="3" alignItems="center">
-                        <label htmlFor="splitSize" className={b('label')}>
-                            {i18n('field_split-size')}
+                        <label htmlFor="splitSizeEnabled" className={b('label')}>
+                            {i18n('field_size')}
                         </label>
 
                         <Controller
-                            name="splitSize"
+                            name="splitSizeEnabled"
                             control={control}
                             render={({field}) => (
-                                <TextInput
-                                    id="splitSize"
-                                    type="number"
-                                    value={field.value}
-                                    onUpdate={field.onChange}
-                                    className={b('input')}
-                                    errorMessage={errors.splitSize?.message}
-                                    validationState={errors.splitSize ? 'invalid' : undefined}
-                                    endContent={
-                                        <Controller
-                                            name="splitUnit"
-                                            control={control}
-                                            render={({field: unitField}) => (
-                                                <SplitUnitSelect
-                                                    value={unitField.value}
-                                                    options={UNIT_OPTIONS}
-                                                    onChange={(nextUnit) => {
-                                                        unitField.onChange(nextUnit);
-                                                        trigger('splitSize');
-                                                    }}
-                                                />
-                                            )}
-                                        />
-                                    }
+                                <Switch
+                                    id="splitSizeEnabled"
+                                    checked={field.value}
+                                    onUpdate={(next) => {
+                                        field.onChange(next);
+                                        trigger('splitSize');
+                                    }}
                                 />
                             )}
                         />
-
-                        {typeof maxSplitSizeBytes === 'number' ? (
-                            <Text
-                                variant="body-1"
-                                className={b('hint')}
-                                title={i18n('context_split-size-maximum-bytes', {
-                                    bytes: formatNumber(maxSplitSizeBytes),
-                                })}
-                            >
-                                {i18n('context_split-size-maximum', {
-                                    maxGb: maxSplitSizeGb,
-                                })}
-                            </Text>
-                        ) : null}
                     </Flex>
+
+                    {splitSizeEnabled ? (
+                        <Flex className={b('row')} gap="3" alignItems="center">
+                            <label htmlFor="splitSize" className={b('label')}>
+                                {i18n('field_split-size')}
+                            </label>
+
+                            <Controller
+                                name="splitSize"
+                                control={control}
+                                render={({field}) => (
+                                    <TextInput
+                                        id="splitSize"
+                                        type="number"
+                                        value={field.value}
+                                        onUpdate={field.onChange}
+                                        className={b('input')}
+                                        errorMessage={errors.splitSize?.message}
+                                        validationState={errors.splitSize ? 'invalid' : undefined}
+                                        endContent={
+                                            <Controller
+                                                name="splitUnit"
+                                                control={control}
+                                                render={({field: unitField}) => (
+                                                    <SplitUnitSelect
+                                                        value={unitField.value}
+                                                        options={UNIT_OPTIONS}
+                                                        onChange={(nextUnit) => {
+                                                            unitField.onChange(nextUnit);
+                                                            trigger('splitSize');
+                                                        }}
+                                                    />
+                                                )}
+                                            />
+                                        }
+                                    />
+                                )}
+                            />
+
+                            {typeof maxSplitSizeBytes === 'number' ? (
+                                <Text
+                                    variant="body-1"
+                                    className={b('hint')}
+                                    title={i18n('context_split-size-maximum-bytes', {
+                                        bytes: formatNumber(maxSplitSizeBytes),
+                                    })}
+                                >
+                                    {i18n('context_split-size-maximum', {
+                                        maxGb: maxSplitSizeGb,
+                                    })}
+                                </Text>
+                            ) : null}
+                        </Flex>
+                    ) : null}
 
                     <Flex className={b('row')} gap="3" alignItems="center">
                         <label htmlFor="loadEnabled" className={b('label')}>

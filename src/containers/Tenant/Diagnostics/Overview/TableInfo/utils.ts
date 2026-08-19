@@ -8,14 +8,30 @@ export function prepareUpdatePartitioningRequest(
     database: string,
     path: string,
 ): UpdateTablePartitioningParams {
+    const commonValues = {
+        minPartitions: value.minimum,
+        maxPartitions: value.maximum,
+        splitByLoad: value.loadEnabled,
+    };
+
+    if (!value.splitSizeEnabled) {
+        return {
+            value: {
+                ...commonValues,
+                splitBySize: false,
+            },
+            database,
+            path,
+        };
+    }
+
     const {partitionSizeMb} = splitToPartitionSizeMb(value.splitSize, value.splitUnit);
 
     return {
         value: {
+            ...commonValues,
+            splitBySize: true,
             partitionSizeMb,
-            minPartitions: value.minimum,
-            maxPartitions: value.maximum,
-            splitByLoad: value.loadEnabled,
         },
         database,
         path,

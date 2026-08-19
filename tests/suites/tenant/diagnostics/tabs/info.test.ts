@@ -6,6 +6,73 @@ import {TenantPage} from '../../TenantPage';
 import {Diagnostics} from '../Diagnostics';
 
 const METRIC_SUMMARY_SCREENSHOT_VIEWPORT = {width: 1600, height: 1000};
+const MOCK_PARTITIONING_TABLE_PATH = `${database}/partitioning_table`;
+
+async function setupManagePartitioningMocks(page: Page, sizeToSplit: string) {
+    await page.route('**/viewer/json/describe?*', async (route) => {
+        const url = new URL(route.request().url());
+
+        if (url.searchParams.get('path') !== MOCK_PARTITIONING_TABLE_PATH) {
+            await route.continue();
+            return;
+        }
+
+        await route.fulfill({
+            json: {
+                Status: 'StatusSuccess',
+                Path: MOCK_PARTITIONING_TABLE_PATH,
+                PathDescription: {
+                    Self: {
+                        Name: 'partitioning_table',
+                        PathType: 'EPathTypeTable',
+                    },
+                    Table: {
+                        PartitionConfig: {
+                            PartitioningPolicy: {
+                                SizeToSplit: sizeToSplit,
+                                SplitByLoadSettings: {Enabled: true},
+                                MinPartitionsCount: 4,
+                                MaxPartitionsCount: 100,
+                            },
+                        },
+                    },
+                    TablePartitions: [{}],
+                },
+            },
+        });
+    });
+
+    await page.route('**/viewer/config?*', async (route) => {
+        await route.fulfill({
+            json: {
+                ImmediateControlsConfig: {
+                    SchemeShardControls: {ForceShardSplitDataSize: 4_000_000_000},
+                },
+                StartupConfigYaml: '',
+            },
+        });
+    });
+
+    let resolvePartitioningQuery: (query: string) => void;
+    const partitioningQuery = new Promise<string>((resolve) => {
+        resolvePartitioningQuery = resolve;
+    });
+
+    await page.route('**/viewer/json/query?*', async (route) => {
+        const request = route.request();
+        const body = request.postDataJSON() as {query?: string} | null;
+
+        if (request.method() !== 'POST' || !body?.query?.includes('ALTER TABLE')) {
+            await route.continue();
+            return;
+        }
+
+        resolvePartitioningQuery(body.query);
+        await route.fulfill({json: {}});
+    });
+
+    return {partitioningQuery};
+}
 
 async function expectMetricTabsScreenshot(metricTabs: Locator, name: string) {
     await expect(metricTabs).toBeVisible();
@@ -134,6 +201,76 @@ async function openInfoTab(page: Page) {
 }
 
 test.describe('Diagnostics Info tab', async () => {
+    test('Manage partitioning disables size-based partitioning', async ({page}) => {
+        const {partitioningQuery} = await setupManagePartitioningMocks(
+            page,
+            String(2 * 1024 * 1024 * 1024),
+        );
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: MOCK_PARTITIONING_TABLE_PATH,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const diagnostics = new Diagnostics(page);
+        await diagnostics.openManagePartitioningDialog();
+
+        const sizeSwitch = diagnostics.getManagePartitioningSizeSwitch();
+        await expect(sizeSwitch).toBeChecked();
+        await diagnostics.toggleManagePartitioningSize();
+
+        await expect(sizeSwitch).not.toBeChecked();
+        await expect(diagnostics.getManagePartitioningSplitSizeInput()).toHaveCount(0);
+        await expect(diagnostics.getManagePartitioningApplyButton()).toBeEnabled();
+
+        await diagnostics.getManagePartitioningApplyButton().click();
+        const query = await partitioningQuery;
+
+        expect(query).toContain('AUTO_PARTITIONING_BY_SIZE = DISABLED');
+        expect(query).not.toContain('AUTO_PARTITIONING_PARTITION_SIZE_MB');
+    });
+
+    test('Manage partitioning changes limits when size partitioning is disabled', async ({
+        page,
+    }) => {
+        const {partitioningQuery} = await setupManagePartitioningMocks(page, '0');
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: MOCK_PARTITIONING_TABLE_PATH,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const diagnostics = new Diagnostics(page);
+        await diagnostics.openManagePartitioningDialog();
+
+        const sizeSwitch = diagnostics.getManagePartitioningSizeSwitch();
+        await expect(sizeSwitch).not.toBeChecked();
+        await expect(diagnostics.getManagePartitioningSplitSizeInput()).toHaveCount(0);
+        await expect(diagnostics.getManagePartitioningApplyButton()).toBeEnabled();
+
+        await diagnostics.toggleManagePartitioningSize();
+        await expect(sizeSwitch).toBeChecked();
+        await expect(diagnostics.getManagePartitioningSplitSizeInput()).toHaveValue('');
+        await expect(diagnostics.getManagePartitioningApplyButton()).toBeDisabled();
+
+        await diagnostics.toggleManagePartitioningSize();
+        await expect(diagnostics.getManagePartitioningSplitSizeInput()).toHaveCount(0);
+        await expect(diagnostics.getManagePartitioningApplyButton()).toBeEnabled();
+
+        await diagnostics.getManagePartitioningMinimumInput().fill('5');
+        await diagnostics.getManagePartitioningMaximumInput().fill('50');
+        await diagnostics.getManagePartitioningApplyButton().click();
+        const query = await partitioningQuery;
+
+        expect(query).toContain('AUTO_PARTITIONING_BY_SIZE = DISABLED');
+        expect(query).toContain('AUTO_PARTITIONING_MIN_PARTITIONS_COUNT = 5');
+        expect(query).toContain('AUTO_PARTITIONING_MAX_PARTITIONS_COUNT = 50');
+    });
+
     test('Info tab shows main page elements', async ({page}) => {
         const pageQueryParams = {
             schema: database,

@@ -41,17 +41,22 @@ export function prepareManagePartitioningDialogConfig(
 
     const policy = partitionConfig?.PartitioningPolicy;
 
+    const sizeToSplit = Number(policy?.SizeToSplit);
+    const splitSizeEnabled = Number.isFinite(sizeToSplit) && sizeToSplit > 0;
     const splitByLoadEnabled = Boolean(policy?.SplitByLoadSettings?.Enabled);
 
-    const bytes = Number(policy?.SizeToSplit ?? DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES);
-    const size = formatBytes({
-        value: bytes,
-        withSizeLabel: false,
-    });
+    const bytes = splitSizeEnabled ? sizeToSplit : DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES;
+    const size = splitSizeEnabled
+        ? formatBytes({
+              value: bytes,
+              withSizeLabel: false,
+          })
+        : '';
 
     const unit = getBytesSizeUnit(bytes);
 
     return {
+        splitSizeEnabled,
         splitSize: size,
         splitUnit: unit,
         loadEnabled: splitByLoadEnabled,

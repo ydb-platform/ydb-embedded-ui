@@ -100,34 +100,49 @@ const requiredPositiveInt = (requiredMessage: string) =>
         z.coerce.number<string>({error: requiredMessage}).int().gt(0),
     );
 
+const commonPartitioningSchema = {
+    splitUnit: splitUnitSchema,
+    loadEnabled: z.boolean(),
+    minimum: requiredPositiveInt(i18n('error_required')),
+    maximum: requiredPositiveInt(i18n('error_required')),
+};
+
 export const managePartitioningSchema = (maxSplitSizeBytes?: number) =>
     z
-        .object({
-            splitSize: requiredPositiveNumber(i18n('error_required')),
-            splitUnit: splitUnitSchema,
-
-            loadEnabled: z.boolean(),
-
-            minimum: requiredPositiveInt(i18n('error_required')),
-            maximum: requiredPositiveInt(i18n('error_required')),
-        })
+        .discriminatedUnion('splitSizeEnabled', [
+            z.object({
+                ...commonPartitioningSchema,
+                splitSizeEnabled: z.literal(true),
+                splitSize: requiredPositiveNumber(i18n('error_required')),
+            }),
+            z.object({
+                ...commonPartitioningSchema,
+                splitSizeEnabled: z.literal(false),
+                splitSize: z.string().transform(() => undefined),
+            }),
+        ])
         .superRefine((data, ctx) => {
-            const {bytes, partitionSizeMb} = splitToPartitionSizeMb(data.splitSize, data.splitUnit);
+            if (data.splitSizeEnabled) {
+                const {bytes, partitionSizeMb} = splitToPartitionSizeMb(
+                    data.splitSize,
+                    data.splitUnit,
+                );
 
-            if (maxSplitSizeBytes !== undefined && bytes > maxSplitSizeBytes) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    path: ['splitSize'],
-                    message: i18n('error_value-greater-maximum'),
-                });
-            }
+                if (maxSplitSizeBytes !== undefined && bytes > maxSplitSizeBytes) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ['splitSize'],
+                        message: i18n('error_value-greater-maximum'),
+                    });
+                }
 
-            if (partitionSizeMb < 1) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    path: ['splitSize'],
-                    message: i18n('error_value-too-small'),
-                });
+                if (partitionSizeMb < 1) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ['splitSize'],
+                        message: i18n('error_value-too-small'),
+                    });
+                }
             }
 
             if (data.minimum > data.maximum) {
