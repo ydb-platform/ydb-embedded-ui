@@ -25,6 +25,7 @@ class TreeLayoutEngine {
         // Layout settings
         this.options = {
             horizontalSpacing: options.horizontalSpacing || 40, // horizontal distance between blocks
+            padding: 12,
             verticalSpacing: options.verticalSpacing || 20, // vertical distance between levels
             ...options,
         };
@@ -187,7 +188,7 @@ class TreeLayoutEngine {
         positionNode(this.tree, 0);
     }
 
-    // Normalization of coordinates (so that the minimum coordinates are >= 0)
+    // Normalization of coordinates with padding from the canvas edges
     normalizeCoordinates() {
         if (!this.tree) {
             return;
@@ -207,9 +208,8 @@ class TreeLayoutEngine {
         const minX = Math.min(...allNodes.map((node) => node.x));
         const minY = Math.min(...allNodes.map((node) => node.y));
 
-        // Shift all coordinates so that the minimum ones are equal to 0
-        const offsetX = minX < 0 ? -minX : 0;
-        const offsetY = minY < 0 ? -minY : 0;
+        const offsetX = this.options.padding - minX;
+        const offsetY = this.options.padding - minY;
 
         for (const node of allNodes) {
             node.x += offsetX;
