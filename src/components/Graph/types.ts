@@ -17,6 +17,7 @@ export interface Data<TData = any> {
 // TreeLayout related types
 export interface LayoutOptions {
     horizontalSpacing?: number;
+    padding?: number;
     verticalSpacing?: number;
 }
 
