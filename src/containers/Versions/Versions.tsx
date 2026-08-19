@@ -45,7 +45,7 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
     });
 
     return (
-        <LoaderWrapper loading={loading || isNodesLoading}>
+        <LoaderWrapper loading={loading || isNodesLoading} className={b('loader')}>
             <Versions
                 preparedVersions={preparedVersions}
                 nodes={currentData?.nodes}
