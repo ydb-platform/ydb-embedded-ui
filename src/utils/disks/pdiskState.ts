@@ -14,6 +14,7 @@ import {
     Wrench,
     Xmark,
 } from '@gravity-ui/icons';
+import type {IconData} from '@gravity-ui/uikit';
 
 import type {
     EDecommitStatus,
@@ -27,9 +28,12 @@ import {
     NOT_AVAILABLE_SEVERITY,
     SOLID_RED_SEVERITY,
 } from './constants';
-import type {DiskDisplayState} from './displayState';
+import type {BaseDiskDisplayState} from './displayState';
 
-type PDiskStateDisplayState = Pick<DiskDisplayState, 'severity' | 'icon'>;
+type PDiskStateDisplayState = {
+    severity: BaseDiskDisplayState['severity'];
+    icon: IconData | undefined;
+};
 
 const NOT_AVAILABLE_DISPLAY_STATE: PDiskStateDisplayState = {
     severity: NOT_AVAILABLE_SEVERITY,

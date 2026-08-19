@@ -14,7 +14,12 @@ import {
     mergeColumnsPreservingHiddenPositions,
     useSelectedColumns,
 } from '../../../../utils/hooks/useSelectedColumns';
-import {useIsStorageExpertMode, useVDisksGroupByParam} from '../../useStorageQueryParams';
+import {PDisksGroupBy} from '../../StorageExpertModePanel/constants';
+import {
+    useIsStorageExpertMode,
+    usePDisksGroupByParam,
+    useVDisksGroupByParam,
+} from '../../useStorageQueryParams';
 
 import {getStorageGroupsColumns} from './columns';
 import type {StorageGroupsColumnId} from './constants';
@@ -41,8 +46,10 @@ export function useStorageGroupsSelectedColumns({
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
     const isStorageExpertMode = useIsStorageExpertMode();
     const vdisksGroupBy = useVDisksGroupByParam();
+    const pdisksGroupBy = usePDisksGroupByParam();
     const isVDisksPDisksColumnAvailable = Boolean(isUserAllowedToMakeChanges);
     const isAllVDisksLayout = isStorageExpertMode && vdisksGroupBy === VDisksGroupBy.All;
+    const isAllPDisksLayout = isStorageExpertMode && pdisksGroupBy === PDisksGroupBy.All;
 
     const skippedColumnIds = React.useMemo(() => {
         const skipped: StorageGroupsColumnId[] = [];
@@ -63,10 +70,14 @@ export function useStorageGroupsSelectedColumns({
     }, [bridgeModeEnabled, isUserAllowedToMakeChanges, isViewerUser]);
 
     const columns = React.useMemo(() => {
-        const allColumns = getStorageGroupsColumns({viewContext, isAllVDisksLayout});
+        const allColumns = getStorageGroupsColumns({
+            viewContext,
+            isAllVDisksLayout,
+            isAllPDisksLayout,
+        });
 
         return allColumns.filter((column) => !skippedColumnIds.some((id) => id === column.name));
-    }, [isAllVDisksLayout, skippedColumnIds, viewContext]);
+    }, [isAllPDisksLayout, isAllVDisksLayout, skippedColumnIds, viewContext]);
 
     const stickyColumns = React.useMemo(() => {
         const sticky = [...REQUIRED_STORAGE_GROUPS_COLUMNS];

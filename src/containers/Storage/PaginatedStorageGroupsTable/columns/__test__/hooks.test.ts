@@ -2,7 +2,13 @@ import {renderHook} from '@testing-library/react';
 
 import {VDisksGroupBy} from '../../../../../utils/disks/groupBy';
 import type {VDisksGroupByValue} from '../../../../../utils/disks/groupBy';
-import {VDISKS_CONTAINER_WIDTH, getAllVDisksContainerWidth} from '../../../Disks/constants';
+import {
+    VDISKS_CONTAINER_WIDTH,
+    getAllPDisksContainerWidthExpansion,
+    getAllVDisksContainerWidth,
+} from '../../../Disks/constants';
+import type {PDisksGroupByValue} from '../../../StorageExpertModePanel/constants';
+import {PDisksGroupBy} from '../../../StorageExpertModePanel/constants';
 import {STORAGE_GROUPS_COLUMNS_IDS} from '../constants';
 import {useStorageGroupsSelectedColumns} from '../hooks';
 
@@ -22,6 +28,7 @@ jest.mock('../../../../../utils/hooks/useSetting', () => ({
 
 jest.mock('../../../useStorageQueryParams', () => ({
     useIsStorageExpertMode: jest.fn(),
+    usePDisksGroupByParam: jest.fn(),
     useVDisksGroupByParam: jest.fn(),
 }));
 
@@ -32,7 +39,7 @@ const {useIsUserAllowedToMakeChanges, useIsViewerUser} = jest.requireMock(
     '../../../../../utils/hooks/useIsUserAllowedToMakeChanges',
 );
 const {useSetting} = jest.requireMock('../../../../../utils/hooks/useSetting');
-const {useIsStorageExpertMode, useVDisksGroupByParam} = jest.requireMock(
+const {useIsStorageExpertMode, usePDisksGroupByParam, useVDisksGroupByParam} = jest.requireMock(
     '../../../useStorageQueryParams',
 );
 
@@ -67,6 +74,7 @@ describe('useStorageGroupsSelectedColumns', () => {
         useIsUserAllowedToMakeChanges.mockReturnValue(true);
         useIsViewerUser.mockReturnValue(true);
         useIsStorageExpertMode.mockReturnValue(false);
+        usePDisksGroupByParam.mockReturnValue(PDisksGroupBy.State);
         useVDisksGroupByParam.mockReturnValue(VDisksGroupBy.State);
         useSetting.mockReturnValue([getSavedColumns(), setSavedColumns]);
     });
@@ -126,10 +134,15 @@ describe('useStorageGroupsSelectedColumns', () => {
         ]);
     });
 
-    test('expands VDisks with PDisks only for Expert All mode', () => {
-        const getDisksColumnWidth = (isExpertMode: boolean, vdisksGroupBy: VDisksGroupByValue) => {
+    test('expands VDisks with PDisks only for the enabled Expert All layouts', () => {
+        const getDisksColumnWidth = (
+            isExpertMode: boolean,
+            vdisksGroupBy: VDisksGroupByValue,
+            pdisksGroupBy: PDisksGroupByValue = PDisksGroupBy.State,
+        ) => {
             useIsStorageExpertMode.mockReturnValue(isExpertMode);
             useVDisksGroupByParam.mockReturnValue(vdisksGroupBy);
+            usePDisksGroupByParam.mockReturnValue(pdisksGroupBy);
             useSetting.mockReturnValue([getSavedColumns(true), setSavedColumns]);
 
             const {result, unmount} = renderHook(() =>
@@ -149,10 +162,22 @@ describe('useStorageGroupsSelectedColumns', () => {
             throw new Error('VDisks with PDisks column must have a width');
         }
 
-        expect(getDisksColumnWidth(false, VDisksGroupBy.All)).toBe(ordinaryWidth);
-        expect(getDisksColumnWidth(true, VDisksGroupBy.State)).toBe(ordinaryWidth);
-        expect(getDisksColumnWidth(true, VDisksGroupBy.All)).toBe(
+        expect(getDisksColumnWidth(false, VDisksGroupBy.All, PDisksGroupBy.All)).toBe(
+            ordinaryWidth,
+        );
+        expect(getDisksColumnWidth(true, VDisksGroupBy.State, PDisksGroupBy.State)).toBe(
+            ordinaryWidth,
+        );
+        expect(getDisksColumnWidth(true, VDisksGroupBy.All, PDisksGroupBy.State)).toBe(
             ordinaryWidth + getAllVDisksContainerWidth() - VDISKS_CONTAINER_WIDTH,
+        );
+        expect(getDisksColumnWidth(true, VDisksGroupBy.State, PDisksGroupBy.All)).toBe(
+            ordinaryWidth + getAllPDisksContainerWidthExpansion(),
+        );
+        expect(getDisksColumnWidth(true, VDisksGroupBy.All, PDisksGroupBy.All)).toBe(
+            ordinaryWidth +
+                (getAllVDisksContainerWidth() - VDISKS_CONTAINER_WIDTH) +
+                getAllPDisksContainerWidthExpansion(),
         );
     });
 

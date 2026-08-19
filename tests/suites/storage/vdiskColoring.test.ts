@@ -9,13 +9,13 @@ import type {
     PDisksGroupByValue,
     VDisksGroupByValue,
 } from '../../../src/containers/Storage/StorageExpertModePanel/constants';
+import {ECapacityAlert, EFlag} from '../../../src/types/api/enums';
 import {TPDiskState} from '../../../src/types/api/pdisk';
 import {storagePage} from '../../utils/constants';
 
 import {
     ALL_GREEN_VDISK_INDEX,
     MISSING_FRONT_QUEUES_VDISK_INDEX,
-    MISSING_STATE_VDISK_INDEX,
     MISSING_WHITEBOARD_VDISK_INDEX,
     createMockStorageGroupsResponse,
 } from './mockStorageGroups';
@@ -24,12 +24,12 @@ import {DATABASE, setupVDiskColoringMocks} from './vdiskColoringMocks';
 const VDISKS_COUNT = 11;
 const FRONT_QUEUES_YELLOW_VDISK_INDEX = 2;
 const STATE_ONLY_OK_VDISK_INDEX = 4;
-const INITIAL_VDISK_INDEX = 5;
+const LIGHT_YELLOW_VDISK_INDEX = 5;
 const RECOVERY_ERROR_VDISK_INDEX = 8;
 const PDISK_ERROR_VDISK_INDEX = 9;
+const MISSING_WHITEBOARD_PDISK_INDEX = 9;
 const TRANSPARENT_BACKGROUND = 'rgba(0, 0, 0, 0)';
 const MISSING_INDICATOR_COLOR = 'rgb(162, 162, 162)';
-const INITIAL_ICON_COLOR_TOKEN = '--g-color-base-warning-heavy';
 const PDISK_ERROR_ICON_COLOR_TOKEN = '--g-color-base-danger-heavy';
 const RECOVERY_ERROR_ICON_COLOR_TOKEN = '--g-color-text-primary';
 
@@ -48,6 +48,7 @@ const PDISK_GROUP_BY_MODES: {value: PDisksGroupByValue; slug: string}[] = [
     {value: PDisksGroupBy.Decommit, slug: 'decommit'},
     {value: PDisksGroupBy.Maintenance, slug: 'maintenance'},
     {value: PDisksGroupBy.Device, slug: 'device'},
+    {value: PDisksGroupBy.All, slug: 'all'},
 ];
 
 const STORAGE_GROUPS = [
@@ -64,31 +65,46 @@ const ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR =
     '.storage-disk-progress-bar__all-mode-front-queues-indicator-slot';
 const ALL_MODE_COMPACTION_SLOT_SELECTOR =
     '.storage-disk-progress-bar__all-mode-compaction-indicator-slot';
+const PDISK_ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR =
+    '.storage-disk-progress-bar__pdisk-all-mode-capacity-alert-indicator-slot';
+const PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR =
+    '.storage-disk-progress-bar__pdisk-all-mode-drive-indicator-slot';
+const PDISK_ALL_MODE_DECOMMIT_SLOT_SELECTOR =
+    '.storage-disk-progress-bar__pdisk-all-mode-decommit-indicator-slot';
+const PDISK_ALL_MODE_MAINTENANCE_SLOT_SELECTOR =
+    '.storage-disk-progress-bar__pdisk-all-mode-maintenance-indicator-slot';
+const PDISK_ALL_MODE_DEVICE_SLOT_SELECTOR =
+    '.storage-disk-progress-bar__pdisk-all-mode-device-indicator-slot';
 
-async function enableExpertMode(page: Page, vdisksGroupBy: VDisksGroupByValue) {
-    await page.addInitScript((groupByValue) => {
-        localStorage.setItem('enableStorageExpertMode', JSON.stringify(true));
-        localStorage.setItem('storageExpertMode', JSON.stringify(true));
-        localStorage.setItem('storageVDisksGroupBy', JSON.stringify(groupByValue));
-        localStorage.setItem(
-            'storageGroupsSelectedColumns',
-            JSON.stringify([
-                {id: 'GroupId', selected: true},
-                {id: 'PoolName', selected: true},
-                {id: 'Erasure', selected: true},
-                {id: 'Used', selected: true},
-                {id: 'VDisks', selected: true},
-                {id: 'VDisksPDisks', selected: true},
-            ]),
-        );
-    }, vdisksGroupBy);
+async function enableExpertMode(page: Page, vdisksGroupBy: VDisksGroupByValue, expertMode = true) {
+    await page.addInitScript(
+        ({groupByValue, expertModeEnabled}) => {
+            localStorage.setItem('enableStorageExpertMode', JSON.stringify(true));
+            localStorage.setItem('storageExpertMode', JSON.stringify(expertModeEnabled));
+            localStorage.setItem('storageVDisksGroupBy', JSON.stringify(groupByValue));
+            localStorage.setItem(
+                'storageGroupsSelectedColumns',
+                JSON.stringify([
+                    {id: 'GroupId', selected: true},
+                    {id: 'PoolName', selected: true},
+                    {id: 'Erasure', selected: true},
+                    {id: 'Used', selected: true},
+                    {id: 'VDisks', selected: true},
+                    {id: 'VDisksPDisks', selected: true},
+                ]),
+            );
+        },
+        {groupByValue: vdisksGroupBy, expertModeEnabled: expertMode},
+    );
 }
 
-async function gotoStoragePage(page: Page, vdisksGroupBy: VDisksGroupByValue) {
+async function gotoStoragePage(page: Page, vdisksGroupBy: VDisksGroupByValue, expertMode = true) {
     const url = new URL(storagePage, 'http://localhost');
     url.searchParams.set('database', DATABASE);
     url.searchParams.set('type', 'groups');
-    url.searchParams.set('storageExpertMode', 'true');
+    if (expertMode) {
+        url.searchParams.set('storageExpertMode', 'true');
+    }
     url.searchParams.set('vdisksGroupBy', vdisksGroupBy);
 
     const [storageGroupsResponse] = await Promise.all([
@@ -135,6 +151,10 @@ function getStorageDisksArea(row: Locator) {
 
 function getVDiskItems(row: Locator) {
     return getStorageDisksArea(row).locator('.ydb-storage-disks__vdisk-item');
+}
+
+function getVDisksArea(row: Locator) {
+    return getStorageDisksArea(row).locator(':scope > .g-flex').first();
 }
 
 function getVDiskProgressBar(item: Locator) {
@@ -325,7 +345,39 @@ async function expectPDiskScreenshot(pDisks: Locator, name: string) {
     });
 }
 
-async function expectStorageGroupRowsReady(page: Page) {
+async function expectPDiskAllScreenshot(page: Page, pDisks: Locator, name: string) {
+    await pDisks.scrollIntoViewIfNeeded();
+
+    const box = await pDisks.boundingBox();
+
+    if (!box) {
+        throw new Error(`Cannot take screenshot "${name}": PDisk row has no bounding box`);
+    }
+
+    const x = Math.max(0, box.x - 8);
+    const y = Math.max(0, box.y - 8);
+    const right = box.x + box.width + 8;
+    const bottom = box.y + box.height + 8;
+    const viewport = page.viewportSize();
+
+    await expect(page).toHaveScreenshot(name, {
+        clip: {
+            x,
+            y,
+            width: viewport ? Math.min(right - x, viewport.width - x) : right - x,
+            height: viewport ? Math.min(bottom - y, viewport.height - y) : bottom - y,
+        },
+        timeout: 60_000,
+    });
+}
+
+async function expectVDiskScreenshot(vDisks: Locator, name: string) {
+    await expect(vDisks).toHaveScreenshot(name, {
+        timeout: 60_000,
+    });
+}
+
+async function expectStorageGroupRowsReady(page: Page, expertMode = true) {
     for (const group of STORAGE_GROUPS) {
         const row = getStorageGroupRow(page, group.index);
         const storageDisksArea = getStorageDisksArea(row);
@@ -334,25 +386,37 @@ async function expectStorageGroupRowsReady(page: Page) {
         await expect(storageDisksArea).toBeVisible();
         await expect(vDiskItems).toHaveCount(VDISKS_COUNT);
         await expect(getVDiskProgressBar(vDiskItems.first())).toBeVisible();
-        await expect(row.locator('.ydb-stack')).toHaveCount(group.hasDonors ? VDISKS_COUNT : 0);
+        if (expertMode) {
+            await expect(row.locator('.ydb-stack')).toHaveCount(group.hasDonors ? VDISKS_COUNT : 0);
+        }
     }
 }
 
-async function preparePage(page: Page, vdisksGroupBy: VDisksGroupByValue) {
+async function preparePage(page: Page, vdisksGroupBy: VDisksGroupByValue, expertMode = true) {
     await page.setViewportSize({width: 1500, height: 1000});
-    await enableExpertMode(page, vdisksGroupBy);
+    await enableExpertMode(page, vdisksGroupBy, expertMode);
     await setupVDiskColoringMocks(page);
-    await gotoStoragePage(page, vdisksGroupBy);
+    await gotoStoragePage(page, vdisksGroupBy, expertMode);
     await hideFloatingPopups(page);
     await setupForcedHoverStyles(page);
-    await expectStorageGroupRowsReady(page);
+    await expectStorageGroupRowsReady(page, expertMode);
 }
 
-async function preparePDiskPage(page: Page, pdisksGroupBy: PDisksGroupByValue) {
+async function preparePDiskPage(
+    page: Page,
+    pdisksGroupBy: PDisksGroupByValue,
+    storageGroupsResponse = createMockStorageGroupsResponse(),
+) {
     await page.addInitScript((groupByValue) => {
         localStorage.setItem('storagePDisksGroupBy', JSON.stringify(groupByValue));
     }, pdisksGroupBy);
-    await preparePage(page, VDisksGroupBy.State);
+    await page.setViewportSize({width: 1500, height: 1000});
+    await enableExpertMode(page, VDisksGroupBy.State);
+    await setupVDiskColoringMocks(page, storageGroupsResponse);
+    await gotoStoragePage(page, VDisksGroupBy.State);
+    await hideFloatingPopups(page);
+    await setupForcedHoverStyles(page);
+    await expectStorageGroupRowsReady(page);
 }
 
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
@@ -364,11 +428,6 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         const pDiskSelector = page.getByTestId('storage-pdisks-expert-mode');
         const legend = page.getByTestId('storage-pdisks-expert-mode-legend');
         const legendLabels = legend.locator('.g-label');
-        const vDiskLegendLabels = page
-            .locator('.ydb-storage-expert-mode-panel')
-            .locator(':scope > .g-flex')
-            .first()
-            .locator('.g-label');
 
         await expect(pDiskSelector).toBeVisible();
         await expect(legendLabels).toHaveText([
@@ -396,18 +455,6 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         await expect(legendLabels.nth(5).locator('svg')).toHaveCount(0);
         await expect(legend).toContainText('No statistics available');
 
-        const matchingLegendIconIndexes = [
-            {pDisk: 1, vDisk: 2},
-            {pDisk: 2, vDisk: 3},
-            {pDisk: 4, vDisk: 4},
-        ] as const;
-
-        for (const {pDisk, vDisk} of matchingLegendIconIndexes) {
-            expect(await getIconSvgMarkup(legendLabels.nth(pDisk))).toBe(
-                await getIconSvgMarkup(vDiskLegendLabels.nth(vDisk)),
-            );
-        }
-
         await pDiskSelector.getByRole('radio', {name: 'Maintenance'}).check();
 
         await expect(legendLabels).toHaveText(['Long term planned', 'No new VDisks', 'No request']);
@@ -418,6 +465,32 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         await expect(legendLabels.nth(1).locator('svg').first()).toBeVisible();
         await expect(legendLabels.nth(2).locator('svg')).toHaveCount(0);
         await expect(page).toHaveURL(/pdisksGroupBy=Maintenance/);
+    });
+
+    test('uses filled colors for compact VDisks outside Expert Mode', async ({page}) => {
+        await preparePage(page, VDisksGroupBy.State, false);
+
+        const vDiskItems = getVDiskItems(getStorageGroupRow(page, 0));
+        const greenVDisk = getVDiskProgressBar(vDiskItems.nth(MISSING_FRONT_QUEUES_VDISK_INDEX));
+
+        await expect(greenVDisk).toHaveClass(/storage-disk-progress-bar_compact/);
+        await expect(greenVDisk).toHaveClass(/storage-disk-progress-bar_green/);
+        await expect(greenVDisk).not.toHaveClass(/storage-disk-progress-bar_expert-mode/);
+
+        const [fillLayerColor, actualStyles] = await Promise.all([
+            resolveThemeColor(page, '--g-color-base-positive-light'),
+            greenVDisk.evaluate((element) => {
+                const styles = getComputedStyle(element);
+
+                return {
+                    backgroundColor: styles.backgroundColor,
+                    backgroundImage: styles.backgroundImage,
+                };
+            }),
+        ]);
+
+        expect(actualStyles.backgroundColor).toBe(fillLayerColor);
+        expect(actualStyles.backgroundImage).toContain(fillLayerColor);
     });
 
     test('renders storage group PDisks by State without allocation fill', async ({page}) => {
@@ -452,32 +525,32 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         await expectStorageGroupRowsReady(page);
 
         const pDiskItems = getPDiskItems(getStorageGroupRow(page, 0));
-        const vDiskItems = getVDiskItems(getStorageGroupRow(page, 0));
         const pDiskLegendLabels = page
             .getByTestId('storage-pdisks-expert-mode-legend')
             .locator('.g-label');
         const cases = [
             {
                 pDiskIndex: 0,
-                vDiskIndex: MISSING_STATE_VDISK_INDEX,
-                color: 'grey',
-                iconReference: 'vdisk',
+                color: 'light-grey',
+                iconReference: 'present',
             },
-            {pDiskIndex: 4, vDiskIndex: 4, color: 'green', iconReference: undefined},
-            {pDiskIndex: 5, vDiskIndex: 5, color: 'yellow', iconReference: 'vdisk'},
-            {pDiskIndex: 6, vDiskIndex: 9, color: 'red', iconReference: 'vdisk'},
-            {pDiskIndex: 7, vDiskIndex: 9, color: 'red', iconReference: 'stopped-legend'},
-            {pDiskIndex: 8, vDiskIndex: 8, color: 'solidred', iconReference: 'vdisk'},
+            {pDiskIndex: 4, color: 'green', iconReference: undefined},
+            {pDiskIndex: 5, color: 'yellow', iconReference: 1},
+            {pDiskIndex: 6, color: 'red', iconReference: 2},
+            {pDiskIndex: 7, color: 'red', iconReference: 3},
+            {pDiskIndex: 8, color: 'solidred', iconReference: 4},
         ] as const;
 
-        for (const {pDiskIndex, vDiskIndex, color, iconReference} of cases) {
+        for (const {pDiskIndex, color, iconReference} of cases) {
             const pDiskItem = pDiskItems.nth(pDiskIndex);
             const progressBar = getPDiskProgressBar(pDiskItem);
-            const vDiskProgressBar = getVDiskProgressBar(vDiskItems.nth(vDiskIndex));
             const icon = progressBar.locator('.storage-disk-progress-bar__icon');
 
             await expect(progressBar).toHaveClass(/storage-disk-progress-bar_mode-state/);
             await expect(progressBar).toHaveClass(new RegExp(`storage-disk-progress-bar_${color}`));
+            if (color === 'light-grey') {
+                await expect(progressBar).not.toHaveClass(/storage-disk-progress-bar_grey(?:\s|$)/);
+            }
             await expect(progressBar.locator('.storage-disk-progress-bar__fill-bar')).toHaveCount(
                 0,
             );
@@ -488,31 +561,38 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 await expect(icon).toHaveCount(0);
             } else {
                 await expect(icon).toBeVisible();
-                const expectedIcon =
-                    iconReference === 'vdisk'
-                        ? vDiskProgressBar.locator('.storage-disk-progress-bar__icon')
-                        : pDiskLegendLabels.nth(3);
-
-                expect(await getIconSvgMarkup(icon)).toBe(await getIconSvgMarkup(expectedIcon));
+                if (typeof iconReference === 'number') {
+                    expect(await getIconSvgMarkup(icon)).toBe(
+                        await getIconSvgMarkup(pDiskLegendLabels.nth(iconReference)),
+                    );
+                }
             }
-
-            const [pDiskStyles, vDiskStyles] = await Promise.all(
-                [progressBar, vDiskProgressBar].map((bar) =>
-                    bar.evaluate((element) => {
-                        const styles = getComputedStyle(element);
-
-                        return {
-                            backgroundColor: styles.backgroundColor,
-                            borderColor: styles.borderColor,
-                            iconColor: styles.getPropertyValue('--entity-state-icon-color').trim(),
-                        };
-                    }),
-                ),
-            );
-
-            expect(pDiskStyles).toEqual(vDiskStyles);
         }
     });
+
+    for (const mode of [
+        {value: PDisksGroupBy.Drive, slug: 'drive'},
+        {value: PDisksGroupBy.Decommit, slug: 'decommit'},
+        {value: PDisksGroupBy.Maintenance, slug: 'maintenance'},
+    ] as const) {
+        test(`renders N/D for PDisks without Whiteboard in ${mode.value} mode`, async ({page}) => {
+            await preparePDiskPage(page, mode.value);
+
+            const pDiskItems = getPDiskItems(getStorageGroupRow(page, 0));
+            const progressBar = getPDiskProgressBar(pDiskItems.nth(MISSING_WHITEBOARD_PDISK_INDEX));
+
+            await expect(progressBar).toHaveClass(
+                new RegExp(`storage-disk-progress-bar_mode-${mode.slug}`),
+            );
+            await expect(progressBar).toHaveClass(/storage-disk-progress-bar_grey(?:\s|$)/);
+            await expect(progressBar).not.toHaveClass(/storage-disk-progress-bar_light-grey/);
+            await expect(progressBar).toContainText('N/D');
+            await expect(progressBar.locator('.storage-disk-progress-bar__icon')).toHaveCount(0);
+            await expect(progressBar.locator('.storage-disk-progress-bar__fill-bar')).toHaveCount(
+                0,
+            );
+        });
+    }
 
     test('distinguishes missing Whiteboard data from missing FrontQueues', async ({page}) => {
         await preparePage(page, VDisksGroupBy.FrontQueues);
@@ -577,11 +657,13 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
 
             const ordinaryItems = getVDiskItems(getStorageGroupRow(page, 0));
             const stateOnlyOk = getVDiskProgressBar(ordinaryItems.nth(STATE_ONLY_OK_VDISK_INDEX));
-            const initial = getVDiskProgressBar(ordinaryItems.nth(INITIAL_VDISK_INDEX));
+            const lightYellow = getVDiskProgressBar(ordinaryItems.nth(LIGHT_YELLOW_VDISK_INDEX));
             const missingCapacityAlert = getVDiskProgressBar(
                 ordinaryItems.nth(PDISK_ERROR_VDISK_INDEX),
             );
-            const initialCapacityAlertSlot = initial.locator(ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR);
+            const lightYellowCapacityAlertSlot = lightYellow.locator(
+                ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR,
+            );
             const missingCapacityAlertSlot = missingCapacityAlert.locator(
                 ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR,
             );
@@ -594,8 +676,12 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             const missingFrontQueuesSlot = getVDiskProgressBar(
                 ordinaryItems.nth(MISSING_FRONT_QUEUES_VDISK_INDEX),
             ).locator(ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR);
-            const initialFrontQueuesSlot = initial.locator(ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR);
-            const initialCompactionSlot = initial.locator(ALL_MODE_COMPACTION_SLOT_SELECTOR);
+            const lightYellowFrontQueuesSlot = lightYellow.locator(
+                ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR,
+            );
+            const lightYellowCompactionSlot = lightYellow.locator(
+                ALL_MODE_COMPACTION_SLOT_SELECTOR,
+            );
             const missingCompactionSlot = missingCapacityAlert.locator(
                 ALL_MODE_COMPACTION_SLOT_SELECTOR,
             );
@@ -608,16 +694,17 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             );
             await expect(stateOnlyOk).not.toContainText(/\d+%/);
 
-            await expect(initial).toHaveClass(/storage-disk-progress-bar_yellow/);
-            await expect(initial).not.toContainText(/\d+%/);
-            await expect(initialCapacityAlertSlot).toHaveCount(1);
-            await expect(initialCapacityAlertSlot).toHaveCSS('width', '16px');
-            await expect(initialCapacityAlertSlot).toHaveText('LY');
+            await expect(lightYellow).toHaveClass(/storage-disk-progress-bar_green/);
+            await expect(lightYellow).toHaveClass(/storage-disk-progress-bar_all-mode-has-issues/);
+            await expect(lightYellow).not.toContainText(/\d+%/);
+            await expect(lightYellowCapacityAlertSlot).toHaveCount(1);
+            await expect(lightYellowCapacityAlertSlot).toHaveCSS('width', '16px');
+            await expect(lightYellowCapacityAlertSlot).toHaveText('LY');
 
             const [expectedCaption2, expectedTextColor, actualTypography] = await Promise.all([
                 resolveCaption2Typography(page),
                 resolveThemeColor(page, '--g-color-text-primary'),
-                initialCapacityAlertSlot.evaluate((element) => {
+                lightYellowCapacityAlertSlot.evaluate((element) => {
                     const styles = getComputedStyle(element);
 
                     return {
@@ -635,16 +722,16 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 color: expectedTextColor,
             });
 
-            const [initialBox, initialSlotBox] = await Promise.all([
-                initial.boundingBox(),
-                initialCapacityAlertSlot.boundingBox(),
+            const [lightYellowBox, lightYellowSlotBox] = await Promise.all([
+                lightYellow.boundingBox(),
+                lightYellowCapacityAlertSlot.boundingBox(),
             ]);
 
-            if (!initialBox || !initialSlotBox) {
+            if (!lightYellowBox || !lightYellowSlotBox) {
                 throw new Error('Cannot compare All-mode VDisk and Capacity Alert slot boxes');
             }
 
-            expect(initialSlotBox.x - initialBox.x).toBeCloseTo(4, 5);
+            expect(lightYellowSlotBox.x - lightYellowBox.x).toBeCloseTo(4, 5);
 
             await expect(missingCapacityAlertSlot).toHaveCount(1);
             await expect(missingCapacityAlertSlot).toHaveCSS('width', '16px');
@@ -674,47 +761,53 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(missingFrontQueuesIcon).toBeVisible();
             await expect(missingFrontQueuesIcon).toHaveCSS('color', expectedTextColor);
 
-            await expect(initialFrontQueuesSlot).toHaveCount(1);
-            await expect(initialFrontQueuesSlot).toBeEmpty();
+            await expect(lightYellowFrontQueuesSlot).toHaveCount(1);
+            const lightYellowFrontQueuesIcon = lightYellowFrontQueuesSlot.locator('.g-icon');
+            await expect(lightYellowFrontQueuesIcon).toBeVisible();
+            await expect(lightYellowFrontQueuesIcon).toHaveCSS('color', expectedTextColor);
 
-            await expect(initialCompactionSlot).toHaveCount(1);
-            await expect(initialCompactionSlot).toHaveCSS('width', '17px');
-            const initialCompactionIcons = initialCompactionSlot.locator('.g-icon');
-            await expect(initialCompactionIcons).toHaveCount(2);
-            await expect(initialCompactionIcons.nth(0)).toHaveCSS('color', MISSING_INDICATOR_COLOR);
-            await expect(initialCompactionIcons.nth(1)).toHaveCSS('color', expectedTextColor);
+            await expect(lightYellowCompactionSlot).toHaveCount(1);
+            await expect(lightYellowCompactionSlot).toHaveCSS('width', '17px');
+            const lightYellowCompactionIcons = lightYellowCompactionSlot.locator('.g-icon');
+            await expect(lightYellowCompactionIcons).toHaveCount(2);
+            await expect(lightYellowCompactionIcons.nth(0)).toHaveCSS(
+                'color',
+                MISSING_INDICATOR_COLOR,
+            );
+            await expect(lightYellowCompactionIcons.nth(1)).toHaveCSS('color', expectedTextColor);
 
-            const [initialCompactionSlotBox, initialCompactionIconBoxes] = await Promise.all([
-                initialCompactionSlot.boundingBox(),
-                initialCompactionIcons.evaluateAll((icons) =>
-                    icons.map((icon) => {
-                        const box = icon.getBoundingClientRect();
+            const [lightYellowCompactionSlotBox, lightYellowCompactionIconBoxes] =
+                await Promise.all([
+                    lightYellowCompactionSlot.boundingBox(),
+                    lightYellowCompactionIcons.evaluateAll((icons) =>
+                        icons.map((icon) => {
+                            const box = icon.getBoundingClientRect();
 
-                        return {
-                            height: box.height,
-                            left: box.left,
-                            right: box.right,
-                            width: box.width,
-                        };
-                    }),
-                ),
-            ]);
+                            return {
+                                height: box.height,
+                                left: box.left,
+                                right: box.right,
+                                width: box.width,
+                            };
+                        }),
+                    ),
+                ]);
 
-            if (!initialCompactionSlotBox) {
+            if (!lightYellowCompactionSlotBox) {
                 throw new Error('Cannot compare All-mode VDisk and Compaction slot boxes');
             }
 
-            expect(initialCompactionSlotBox.x - initialBox.x).toBeCloseTo(40, 5);
-            expect(initialCompactionIconBoxes).toHaveLength(2);
-            initialCompactionIconBoxes.forEach((box) => {
+            expect(lightYellowCompactionSlotBox.x - lightYellowBox.x).toBeCloseTo(40, 5);
+            expect(lightYellowCompactionIconBoxes).toHaveLength(2);
+            lightYellowCompactionIconBoxes.forEach((box) => {
                 expect(box.width).toBeCloseTo(10, 5);
                 expect(box.height).toBeCloseTo(10, 5);
             });
             expect(
-                initialCompactionIconBoxes[1].left - initialCompactionIconBoxes[0].left,
+                lightYellowCompactionIconBoxes[1].left - lightYellowCompactionIconBoxes[0].left,
             ).toBeCloseTo(7, 5);
             expect(
-                initialCompactionIconBoxes[1].right - initialCompactionIconBoxes[0].left,
+                lightYellowCompactionIconBoxes[1].right - lightYellowCompactionIconBoxes[0].left,
             ).toBeCloseTo(17, 5);
 
             await expect(missingCompactionSlot).toHaveCount(1);
@@ -735,8 +828,8 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             const healthyCapacityAlertSlot = healthyReplicating.locator(
                 ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR,
             );
-            const initialUnreplicated = getVDiskProgressBar(
-                replicatingItems.nth(INITIAL_VDISK_INDEX),
+            const lightYellowReplicating = getVDiskProgressBar(
+                replicatingItems.nth(LIGHT_YELLOW_VDISK_INDEX),
             );
 
             await expect(healthyReplicating).toHaveClass(/storage-disk-progress-bar_blue/);
@@ -751,8 +844,8 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(healthyCapacityAlertSlot).toHaveCount(1);
             await expect(healthyCapacityAlertSlot).toHaveCSS('width', '16px');
             await expect(healthyCapacityAlertSlot).toBeEmpty();
-            await expect(initialUnreplicated).toHaveClass(/storage-disk-progress-bar_yellow/);
-            await expect(initialUnreplicated).not.toHaveClass(/storage-disk-progress-bar_striped/);
+            await expect(lightYellowReplicating).toHaveClass(/storage-disk-progress-bar_blue/);
+            await expect(lightYellowReplicating).toHaveClass(/storage-disk-progress-bar_striped/);
         });
 
         test('uses State normal and hover colors while preserving allocation fills', async ({
@@ -763,17 +856,16 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             const ordinaryItems = getVDiskItems(getStorageGroupRow(page, 0));
             const stateOnlyOk = getVDiskProgressBar(ordinaryItems.nth(STATE_ONLY_OK_VDISK_INDEX));
             const allGreen = getVDiskProgressBar(ordinaryItems.nth(ALL_GREEN_VDISK_INDEX));
-            const initial = getVDiskProgressBar(ordinaryItems.nth(INITIAL_VDISK_INDEX));
+            const lightYellow = getVDiskProgressBar(ordinaryItems.nth(LIGHT_YELLOW_VDISK_INDEX));
             const pDiskError = getVDiskProgressBar(ordinaryItems.nth(PDISK_ERROR_VDISK_INDEX));
             const recoveryError = getVDiskProgressBar(
                 ordinaryItems.nth(RECOVERY_ERROR_VDISK_INDEX),
             );
             const recoveryErrorFill = getVDiskFillBar(recoveryError);
-            const ordinaryStateBars = [stateOnlyOk, allGreen, initial, pDiskError];
+            const ordinaryStateBars = [stateOnlyOk, allGreen, lightYellow, pDiskError];
             const [
                 positiveMedium,
                 positiveLight,
-                warningLight,
                 dangerLight,
                 dangerHeavy,
                 dangerMedium,
@@ -782,7 +874,6 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             ] = await Promise.all([
                 resolveThemeColor(page, '--g-color-base-positive-medium'),
                 resolveThemeColor(page, '--g-color-base-positive-light'),
-                resolveThemeColor(page, '--g-color-base-warning-light'),
                 resolveThemeColor(page, '--g-color-base-danger-light'),
                 resolveThemeColor(page, '--g-color-base-danger-heavy'),
                 resolveThemeColor(page, '--g-color-base-danger-medium'),
@@ -792,7 +883,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             const ordinaryNormalFillColors = [
                 positiveMedium,
                 positiveLight,
-                warningLight,
+                positiveMedium,
                 dangerLight,
             ];
 
@@ -844,15 +935,15 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(recoveryError).toHaveCSS('background-color', dangerMediumHover);
         });
 
-        test('keeps a partial Initial fill rounded at the lower-left corner', async ({page}) => {
+        test('keeps a partial All-mode fill rounded at the lower-left corner', async ({page}) => {
             await preparePage(page, VDisksGroupBy.All);
 
-            const initial = getVDiskProgressBar(
-                getVDiskItems(getStorageGroupRow(page, 0)).nth(INITIAL_VDISK_INDEX),
+            const lightYellow = getVDiskProgressBar(
+                getVDiskItems(getStorageGroupRow(page, 0)).nth(LIGHT_YELLOW_VDISK_INDEX),
             );
-            const initialFill = getVDiskFillBar(initial);
+            const lightYellowFill = getVDiskFillBar(lightYellow);
 
-            const bottomLeftRadius = await initialFill.evaluate(
+            const bottomLeftRadius = await lightYellowFill.evaluate(
                 (element) => getComputedStyle(element).borderBottomLeftRadius,
             );
 
@@ -908,17 +999,21 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(noWhiteboardVDisk).toHaveCSS('border-style', 'none');
         });
 
-        test('overlaps State status icons with the top-left bar corner', async ({page}) => {
+        test('omits OK State icons and overlaps error icons with the top-left corner', async ({
+            page,
+        }) => {
             await preparePage(page, VDisksGroupBy.All);
 
             const ordinaryItems = getVDiskItems(getStorageGroupRow(page, 0));
-            const initial = getVDiskProgressBar(ordinaryItems.nth(INITIAL_VDISK_INDEX));
+            const lightYellow = getVDiskProgressBar(ordinaryItems.nth(LIGHT_YELLOW_VDISK_INDEX));
             const pDiskError = getVDiskProgressBar(ordinaryItems.nth(PDISK_ERROR_VDISK_INDEX));
             const recoveryError = getVDiskProgressBar(
                 ordinaryItems.nth(RECOVERY_ERROR_VDISK_INDEX),
             );
 
-            await expectStatusIconMatchesReference(page, initial, INITIAL_ICON_COLOR_TOKEN, true);
+            await expect(
+                lightYellow.locator('.storage-disk-progress-bar__icon_overlap-top-left'),
+            ).toHaveCount(0);
             await expectStatusIconMatchesReference(page, pDiskError, PDISK_ERROR_ICON_COLOR_TOKEN);
             await expectStatusIconMatchesReference(
                 page,
@@ -952,6 +1047,182 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
 test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 300_000});
 
+    test('keeps top-level PDisk BSC statuses visible across Drive, Decommit, and All modes without Whiteboard', async ({
+        page,
+    }) => {
+        const response = createMockStorageGroupsResponse();
+        const targetPDisk =
+            response.StorageGroups?.[0]?.VDisks?.[MISSING_WHITEBOARD_PDISK_INDEX]?.PDisk;
+
+        if (!targetPDisk) {
+            throw new Error('Cannot prepare PDisk BSC fallback regression fixtures');
+        }
+
+        targetPDisk.Status = 'BROKEN';
+        targetPDisk.DecommitStatus = 'DECOMMIT_IMMINENT';
+        targetPDisk.MaintenanceStatus = 'LONG_TERM_MAINTENANCE_PLANNED';
+
+        await preparePDiskPage(page, PDisksGroupBy.Drive, response);
+
+        const pDiskSelector = page.getByTestId('storage-pdisks-expert-mode');
+        const targetPDiskItem = getPDiskItems(getStorageGroupRow(page, 0)).nth(
+            MISSING_WHITEBOARD_PDISK_INDEX,
+        );
+        const targetPDiskBar = getPDiskProgressBar(targetPDiskItem);
+
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-drive/);
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_red/);
+        await expect(targetPDiskBar.locator('.storage-disk-progress-bar__icon')).toHaveCount(1);
+        await expect(targetPDiskBar).not.toContainText('N/D');
+
+        await pDiskSelector.getByRole('radio', {name: 'Decommit'}).check();
+
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-decommit/);
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_red/);
+        await expect(targetPDiskBar.locator('.storage-disk-progress-bar__icon')).toHaveCount(1);
+        await expect(targetPDiskBar).not.toContainText('N/D');
+
+        await pDiskSelector.getByRole('radio', {name: 'All'}).check();
+
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-all/);
+        await expect(targetPDiskBar).not.toContainText('N/D');
+        await expect(
+            targetPDiskBar.locator(PDISK_ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(1);
+        await expect(
+            targetPDiskBar.locator(PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(1);
+        await expect(
+            targetPDiskBar.locator(PDISK_ALL_MODE_DECOMMIT_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(1);
+        await expect(
+            targetPDiskBar.locator(PDISK_ALL_MODE_MAINTENANCE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(1);
+        await expect(
+            targetPDiskBar.locator(PDISK_ALL_MODE_DEVICE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(2);
+        await expect(targetPDiskItem.locator('.pdisk-storage__content')).toHaveAttribute(
+            'aria-label',
+            /Drive: BROKEN\. Decommit: DECOMMIT_IMMINENT\. Maintenance: LONG_TERM_MAINTENANCE_PLANNED\./,
+        );
+    });
+
+    test('renders All-mode PDisk overlays, widths, and accessible labels as a stable contract', async ({
+        page,
+    }) => {
+        await preparePDiskPage(page, PDisksGroupBy.All);
+
+        const pDiskItems = getPDiskItems(getStorageGroupRow(page, 0));
+        const healthyPDiskItem = pDiskItems.nth(ALL_GREEN_VDISK_INDEX);
+        const errorPDiskItem = pDiskItems.nth(2);
+        const missingPDiskItem = pDiskItems.nth(MISSING_WHITEBOARD_PDISK_INDEX);
+        const healthyPDiskBar = getPDiskProgressBar(healthyPDiskItem);
+        const errorPDiskBar = getPDiskProgressBar(errorPDiskItem);
+        const missingPDiskBar = getPDiskProgressBar(missingPDiskItem);
+        const healthyOverlay = healthyPDiskBar.locator(
+            '.storage-disk-progress-bar__pdisk-all-mode-indicators',
+        );
+        const healthyOverlaySlots = healthyOverlay.locator(':scope > *');
+
+        await expect(healthyPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-all/);
+        expect((await healthyPDiskItem.boundingBox())?.width).toBe(98);
+        await expect(healthyOverlaySlots).toHaveCount(5);
+        await expect(healthyOverlaySlots.nth(0)).toHaveClass(
+            /pdisk-all-mode-capacity-alert-indicator-slot/,
+        );
+        await expect(healthyOverlaySlots.nth(1)).toHaveClass(/pdisk-all-mode-drive-indicator-slot/);
+        await expect(healthyOverlaySlots.nth(2)).toHaveClass(
+            /pdisk-all-mode-decommit-indicator-slot/,
+        );
+        await expect(healthyOverlaySlots.nth(3)).toHaveClass(
+            /pdisk-all-mode-maintenance-indicator-slot/,
+        );
+        await expect(healthyOverlaySlots.nth(4)).toHaveClass(
+            /pdisk-all-mode-device-indicator-slot/,
+        );
+        // GREEN/CYAN capacity alerts are hidden by the default PDisk All legend selection.
+        await expect(
+            healthyPDiskBar.locator(PDISK_ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR),
+        ).toBeEmpty();
+        await expect(
+            healthyPDiskBar.locator(PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(0);
+        await expect(
+            healthyPDiskBar.locator(PDISK_ALL_MODE_DECOMMIT_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(0);
+        await expect(
+            healthyPDiskBar.locator(PDISK_ALL_MODE_MAINTENANCE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(0);
+        await expect(
+            healthyPDiskBar.locator(PDISK_ALL_MODE_DEVICE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(0);
+        const healthyAccessibleName = new RegExp(
+            `PDisk 7010-110\\. Health: healthy\\. State: Normal\\. ` +
+                `Capacity alert: ${ECapacityAlert.GREEN}\\. Drive: ACTIVE\\. ` +
+                `Decommit: DECOMMIT_NONE\\. Maintenance: NO_REQUEST\\. ` +
+                `Device: ${EFlag.Green}\\. Realtime: ${EFlag.Green}\\. Allocated: 75%\\.`,
+        );
+        await expect(healthyPDiskItem.locator('.pdisk-storage__content')).toHaveAttribute(
+            'aria-label',
+            healthyAccessibleName,
+        );
+
+        await expect(errorPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-all/);
+        await expect(errorPDiskBar).toHaveClass(/storage-disk-progress-bar_red/);
+        await expect(errorPDiskBar).toHaveClass(/storage-disk-progress-bar_all-mode-has-issues/);
+        await expect(errorPDiskBar.locator(PDISK_ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR)).toHaveText(
+            'Y',
+        );
+        await expect(
+            errorPDiskBar.locator(PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(1);
+        await expect(
+            errorPDiskBar.locator(PDISK_ALL_MODE_DECOMMIT_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(1);
+        await expect(
+            errorPDiskBar.locator(PDISK_ALL_MODE_MAINTENANCE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(1);
+        await expect(
+            errorPDiskBar.locator(PDISK_ALL_MODE_DEVICE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(2);
+
+        const errorIcon = errorPDiskBar.locator(
+            '.storage-disk-progress-bar__icon_overlap-top-left',
+        );
+        await expect(errorIcon).toBeVisible();
+
+        const [errorPDiskBarBox, errorIconBox] = await Promise.all([
+            errorPDiskBar.boundingBox(),
+            errorIcon.boundingBox(),
+        ]);
+
+        if (!errorPDiskBarBox || !errorIconBox) {
+            throw new Error('Cannot compare PDisk All-mode bar and state icon boxes');
+        }
+
+        expect(errorIconBox.x).toBeLessThan(errorPDiskBarBox.x);
+        expect(errorIconBox.y).toBeLessThan(errorPDiskBarBox.y);
+        expect(errorIconBox.x + errorIconBox.width).toBeGreaterThan(errorPDiskBarBox.x);
+        expect(errorIconBox.y + errorIconBox.height).toBeGreaterThan(errorPDiskBarBox.y);
+
+        await expect(missingPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-all/);
+        await expect(missingPDiskBar).toHaveClass(/storage-disk-progress-bar_grey(?:\s|$)/);
+        await expect(missingPDiskBar).toContainText('N/D');
+        await expect(missingPDiskBar.locator('.storage-disk-progress-bar__icon')).toHaveCount(0);
+        await expect(
+            missingPDiskBar.locator(PDISK_ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR),
+        ).toBeEmpty();
+        await expect(missingPDiskBar.locator(PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR)).toBeEmpty();
+        await expect(missingPDiskBar.locator(PDISK_ALL_MODE_DECOMMIT_SLOT_SELECTOR)).toBeEmpty();
+        await expect(missingPDiskBar.locator(PDISK_ALL_MODE_MAINTENANCE_SLOT_SELECTOR)).toBeEmpty();
+        await expect(missingPDiskBar.locator(PDISK_ALL_MODE_DEVICE_SLOT_SELECTOR)).toBeEmpty();
+        await expect(missingPDiskBar.locator('.g-icon')).toHaveCount(0);
+        await expect(missingPDiskItem.locator('.pdisk-storage__content')).toHaveAttribute(
+            'aria-label',
+            /PDisk 7009-109\. Health: N\/D\. State: N\/D\. Capacity alert: N\/D\. Drive: N\/D\. Decommit: N\/D\. Maintenance: N\/D\. Device: N\/D\. Realtime: N\/D\. Allocated: N\/D\./,
+        );
+    });
+
     for (const mode of PDISK_GROUP_BY_MODES) {
         test.describe(`PDisk ${mode.value} mode`, () => {
             test(`renders the first storage group PDisk row in ${mode.slug} mode`, async ({
@@ -960,11 +1231,62 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
                 await preparePDiskPage(page, mode.value);
                 const pDisks = getPDisksArea(getStorageGroupRow(page, 0));
 
-                await expectPDiskScreenshot(pDisks, `pdisk-${mode.slug}-first-row.png`);
+                if (mode.value === PDisksGroupBy.All) {
+                    await expectPDiskAllScreenshot(
+                        page,
+                        pDisks,
+                        `pdisk-${mode.slug}-first-row.png`,
+                    );
+                } else {
+                    await expectPDiskScreenshot(pDisks, `pdisk-${mode.slug}-first-row.png`);
+                }
 
                 await forceHoverStorageGroupVDiskItems(page, 0);
-                await expectPDiskScreenshot(pDisks, `pdisk-${mode.slug}-first-row-hover.png`);
+                if (mode.value === PDisksGroupBy.All) {
+                    await expectPDiskAllScreenshot(
+                        page,
+                        pDisks,
+                        `pdisk-${mode.slug}-first-row-hover.png`,
+                    );
+                } else {
+                    await expectPDiskScreenshot(pDisks, `pdisk-${mode.slug}-first-row-hover.png`);
+                }
             });
         });
     }
+});
+
+test.describe('Disk Coloring - Default Mode visual snapshots', () => {
+    test.describe.configure({timeout: 300_000});
+
+    test('renders both storage group VDisk rows with hover states', async ({page}) => {
+        await preparePage(page, VDisksGroupBy.State, false);
+
+        const firstRow = getStorageGroupRow(page, 0);
+        const secondRow = getStorageGroupRow(page, 1);
+        const firstRowVDisks = getVDisksArea(firstRow);
+        const secondRowVDisks = getVDisksArea(secondRow);
+
+        await expectVDiskScreenshot(firstRowVDisks, 'vdisk-default-first-row.png');
+
+        await forceHoverStorageGroupVDiskItems(page, 0);
+        await expectStorageRowsScreenshot(page, 'vdisk-default-first-row-hover.png');
+
+        await clearForcedHover(page);
+        await expectVDiskScreenshot(secondRowVDisks, 'vdisk-default-second-row.png');
+
+        await forceHoverStorageGroupVDiskItems(page, 1);
+        await expectStorageRowsScreenshot(page, 'vdisk-default-second-row-hover.png');
+    });
+
+    test('renders the first storage group PDisk row with hover state', async ({page}) => {
+        await preparePage(page, VDisksGroupBy.State, false);
+
+        const firstRowPDisks = getPDisksArea(getStorageGroupRow(page, 0));
+
+        await expectPDiskScreenshot(firstRowPDisks, 'pdisk-default-first-row.png');
+
+        await forceHoverStorageGroupVDiskItems(page, 0);
+        await expectPDiskScreenshot(firstRowPDisks, 'pdisk-default-first-row-hover.png');
+    });
 });

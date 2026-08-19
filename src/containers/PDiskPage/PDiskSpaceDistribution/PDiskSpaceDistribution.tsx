@@ -20,6 +20,7 @@ import {formatBytes} from '../../../utils/bytesParsers';
 import {cn} from '../../../utils/cn';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../../utils/disks/constants';
+import {getDiskBarTone} from '../../../utils/disks/getDiskBarTone';
 import {pDiskPageKeyset} from '../i18n';
 
 import {isEmptySlot, isLogSlot, isVDiskSlot} from './utils';
@@ -94,11 +95,10 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
         <div className={b(null)}>
             <DiskStateProgressBar
                 className={b('pdisk-bar')}
-                severity={data.Severity}
-                diskAllocatedPercent={data.AllocatedPercent}
+                tone={getDiskBarTone({severity: data.Severity})}
+                allocation={data.AllocatedPercent}
                 content={renderSlots()}
                 faded={true}
-                noDataPlaceholder={pDiskPageKeyset('no-slots-data')}
             />
         </div>
     );
@@ -159,10 +159,12 @@ function Slot<T extends SlotItemType>({
                     <InternalLink to={vDiskPagePath}>
                         <DiskStateProgressBar
                             className={b('slot')}
-                            severity={item.Severity}
-                            diskAllocatedPercent={item.UsagePercent}
+                            tone={getDiskBarTone({
+                                severity: item.Severity,
+                                isDonor,
+                            })}
+                            allocation={item.UsagePercent}
                             striped={isReplicatingColor || isDonor}
-                            isDonor={isDonor}
                             content={
                                 <SlotContent
                                     id={item.Id}
@@ -185,8 +187,8 @@ function Slot<T extends SlotItemType>({
                 >
                     <DiskStateProgressBar
                         className={b('slot')}
-                        severity={item.Severity}
-                        diskAllocatedPercent={item.UsagePercent}
+                        tone={getDiskBarTone({severity: item.Severity})}
+                        allocation={item.UsagePercent}
                         content={
                             <SlotContent
                                 title={pDiskPageKeyset('log')}
@@ -208,7 +210,7 @@ function Slot<T extends SlotItemType>({
                 >
                     <DiskStateProgressBar
                         className={b('slot')}
-                        severity={item.Severity}
+                        tone={getDiskBarTone({severity: item.Severity})}
                         empty
                         content={
                             <SlotContent

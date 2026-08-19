@@ -21,6 +21,9 @@
         min-width: 24px;
 
         &_all {
+            position: relative;
+            top: -2px;
+
             display: flex;
             flex-direction: column;
             gap: 2px;

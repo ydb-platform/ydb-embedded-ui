@@ -74,6 +74,8 @@ function renderPDiskLegend(pdisksGroupBy: PDisksGroupByValue) {
             return <PDiskMaintenanceLegend />;
         case PDisksGroupBy.Device:
             return <PDiskDeviceLegend />;
+        case PDisksGroupBy.All:
+            return <AllLegend selectionScope="pdisks" />;
         default:
             return <div>{getPDisksGroupByLabel(pdisksGroupBy)}</div>;
     }

@@ -6,8 +6,8 @@ import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsSta
 import type {Erasure} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
 import type {
-    DiskDisplayStateGetter,
     PDiskDisplayStateGetter,
+    VDiskDisplayStateGetter,
 } from '../../../utils/disks/displayState';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {PDisk} from '../PDisk';
@@ -106,7 +106,7 @@ interface DisksItemProps {
     compactVDiskWidth?: number;
     withDCMargin?: boolean;
     withIcon?: boolean;
-    getDisplayState?: DiskDisplayStateGetter;
+    getDisplayState?: VDiskDisplayStateGetter;
     isAllVDisksLayout?: boolean;
 }
 
@@ -160,7 +160,7 @@ function PDiskItem({
     withDCMargin,
     withIcon,
     getDisplayState,
-}: DisksItemProps & {getDisplayState?: PDiskDisplayStateGetter}) {
+}: Omit<DisksItemProps, 'getDisplayState'> & {getDisplayState?: PDiskDisplayStateGetter}) {
     const vDiskId = vDisk.StringifiedId;
 
     const isHighlighted = highlightedVDisk === vDiskId;

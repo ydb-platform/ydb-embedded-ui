@@ -28,7 +28,11 @@ import {getUsageSeverity} from '../../../../utils/generateEvaluator';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
-import {VDISKS_CONTAINER_WIDTH, getAllVDisksContainerWidth} from '../../Disks/constants';
+import {
+    VDISKS_CONTAINER_WIDTH,
+    getAllPDisksContainerWidthExpansion,
+    getAllVDisksContainerWidth,
+} from '../../Disks/constants';
 import {VDisks} from '../../VDisks/VDisks';
 import {getDegradedSeverity} from '../../utils';
 import i18n from '../i18n';
@@ -305,6 +309,9 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
     const vDisksContainerWidth = data?.isAllVDisksLayout
         ? getAllVDisksContainerWidth()
         : VDISKS_CONTAINER_WIDTH;
+    const pDisksContainerWidthExpansion = data?.isAllPDisksLayout
+        ? getAllPDisksContainerWidthExpansion()
+        : 0;
 
     return {
         name: STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
@@ -320,7 +327,10 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
             />
         ),
         align: DataTable.LEFT,
-        width: DISKS_COLUMN_WIDTH + vDisksContainerWidth - VDISKS_CONTAINER_WIDTH,
+        width:
+            DISKS_COLUMN_WIDTH +
+            (vDisksContainerWidth - VDISKS_CONTAINER_WIDTH) +
+            pDisksContainerWidthExpansion,
         resizeable: false,
         sortable: false,
     };
