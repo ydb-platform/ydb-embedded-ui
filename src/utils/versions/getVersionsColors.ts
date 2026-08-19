@@ -8,6 +8,22 @@ export const hashCode = (s: string) => {
     }, 0);
 };
 
+const getOnPremBuildNumber = (version: string) => {
+    const match = version.match(/^\d+\.\d+\.\d+(?:\.ent)?\.(\d+)$/);
+    return match ? Number(match[1]) : undefined;
+};
+
+export const compareMinorVersions = (versionA: string, versionB: string) => {
+    const buildA = getOnPremBuildNumber(versionA);
+    const buildB = getOnPremBuildNumber(versionB);
+
+    if (buildA !== undefined && buildB !== undefined && buildA !== buildB) {
+        return buildB - buildA;
+    }
+
+    return hashCode(versionB) - hashCode(versionA);
+};
+
 export const COLORS = [
     [
         'var(--versions-orange-1)',
@@ -149,21 +165,15 @@ export const getVersionsDataMap = (versionsMap: VersionsMap) => {
                     minorIndex: 0,
                 });
 
-                const minors = Array.from(versionsMap.get(item.version) || [])
-                    .filter((v) => v !== item.version)
-                    .map((v) => {
-                        return {
-                            version: v,
-                            hash: hashCode(v),
-                        };
-                    });
+                const minors = Array.from(versionsMap.get(item.version) || []).filter(
+                    (v) => v !== item.version,
+                );
 
                 const minorQuantity = minors.length;
 
                 minors
-                    // descending by version name: newer versions come first,
-                    // so the newer version gets the brighter color
-                    .sort((a, b) => b.hash - a.hash)
+                    // Newer on-prem builds come first; other formats keep hash-based ordering
+                    .sort(compareMinorVersions)
                     .forEach((minor, minorIndex) => {
                         const minorColorVariant = getMinorVersionColorVariant(
                             minorIndex,
@@ -171,7 +181,7 @@ export const getVersionsDataMap = (versionsMap: VersionsMap) => {
                         );
                         const minorColor = COLORS[currentColorIndex][minorColorVariant];
 
-                        versionsDataMap.set(minor.version, {
+                        versionsDataMap.set(minor, {
                             color: minorColor,
                             majorIndex: currentColorIndex,
                             minorIndex: minorIndex,

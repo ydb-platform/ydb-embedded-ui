@@ -28,4 +28,14 @@ describe('parseVersionsToVersionsDataMap', () => {
         expect(enterpriseVersionData?.color).not.toBe(DEFAULT_COLOR);
         expect(enterpriseVersionData?.minorIndex).not.toBe(openSourceVersionData?.minorIndex);
     });
+
+    test('orders on-prem builds by numeric build number', () => {
+        const versionsDataMap = parseVersionsToVersionsDataMap([
+            '25.4.1.10.08bebbe',
+            '25.4.1.100.454b74b',
+        ]);
+
+        expect(versionsDataMap.get('25.4.1.100')?.minorIndex).toBe(0);
+        expect(versionsDataMap.get('25.4.1.10')?.minorIndex).toBe(1);
+    });
 });
