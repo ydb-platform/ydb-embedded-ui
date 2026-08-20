@@ -1,4 +1,4 @@
-import {getMajorVersion, getMinorVersion} from './parseVersion';
+import {getMajorVersion, getMinorVersion, getOnPremBuild} from './parseVersion';
 import type {VersionsDataMap, VersionsMap} from './types';
 
 export const hashCode = (s: string) => {
@@ -6,6 +6,75 @@ export const hashCode = (s: string) => {
         const num = (a << 5) - a + b.charCodeAt(0); // eslint-disable-line
         return num & num; // eslint-disable-line
     }, 0);
+};
+
+const onPremSuffixCollator = new Intl.Collator('en', {numeric: true});
+
+const getOnPremSuffixPriority = (suffix: string) => {
+    if (suffix.startsWith('-hotfix')) {
+        return 0;
+    }
+    return suffix ? 2 : 1;
+};
+
+export const compareMinorVersions = (versionA: string, versionB: string) => {
+    const buildA = getOnPremBuild(versionA);
+    const buildB = getOnPremBuild(versionB);
+
+    if (buildA && !buildB) {
+        return -1;
+    }
+    if (!buildA && buildB) {
+        return 1;
+    }
+    if (buildA && buildB) {
+        if (buildA.number !== buildB.number) {
+            return buildB.number - buildA.number;
+        }
+
+        const priorityDifference =
+            getOnPremSuffixPriority(buildA.suffix) - getOnPremSuffixPriority(buildB.suffix);
+        if (priorityDifference !== 0) {
+            return priorityDifference;
+        }
+
+        const suffixDifference = onPremSuffixCollator.compare(buildB.suffix, buildA.suffix);
+        if (suffixDifference !== 0) {
+            return suffixDifference;
+        }
+
+        return onPremSuffixCollator.compare(versionB, versionA);
+    }
+
+    return hashCode(versionB) - hashCode(versionA);
+};
+
+const getOnPremReleaseParts = (version: string) => {
+    if (!/^\d+\.\d+\.\d+$/.test(version)) {
+        return undefined;
+    }
+    return version.split('.').map(Number);
+};
+
+const compareMajorVersions = (versionA: string, versionB: string) => {
+    const partsA = getOnPremReleaseParts(versionA);
+    const partsB = getOnPremReleaseParts(versionB);
+
+    if (partsA && !partsB) {
+        return -1;
+    }
+    if (!partsA && partsB) {
+        return 1;
+    }
+    if (partsA && partsB) {
+        for (let index = 0; index < partsA.length; index++) {
+            if (partsA[index] !== partsB[index]) {
+                return partsB[index] - partsA[index];
+            }
+        }
+    }
+
+    return hashCode(versionA) - hashCode(versionB);
 };
 
 export const COLORS = [
@@ -122,12 +191,7 @@ export const getVersionsMap = (versions: string[], initialMap: VersionsMap = new
 };
 
 export const getVersionsDataMap = (versionsMap: VersionsMap) => {
-    const clustersVersions = Array.from(versionsMap.keys()).map((version) => {
-        return {
-            version,
-            hash: hashCode(version),
-        };
-    });
+    const clustersVersions = Array.from(versionsMap.keys());
 
     const versionsDataMap: VersionsDataMap = new Map();
     // not every version is colored, therefore iteration index can't be used consistently
@@ -135,35 +199,28 @@ export const getVersionsDataMap = (versionsMap: VersionsMap) => {
     let currentColorIndex = COLORS.length - 1;
 
     clustersVersions
-        // ascending by version name, just for consistency
-        // sorting only impacts color choose for a version
-        .sort((a, b) => a.hash - b.hash)
-        .forEach((item) => {
-            if (/^(\w+-)?stable/.test(item.version)) {
+        // Newer on-prem release lines come first; other formats keep hash-based ordering
+        .sort(compareMajorVersions)
+        .forEach((version) => {
+            if (/^(\w+-)?stable/.test(version) || /^\d+\.\d+\.\d+$/.test(version)) {
                 currentColorIndex = (currentColorIndex + 1) % COLORS.length;
 
-                versionsDataMap.set(item.version, {
+                versionsDataMap.set(version, {
                     // Use first color for major
                     color: COLORS[currentColorIndex][0],
                     majorIndex: currentColorIndex,
                     minorIndex: 0,
                 });
 
-                const minors = Array.from(versionsMap.get(item.version) || [])
-                    .filter((v) => v !== item.version)
-                    .map((v) => {
-                        return {
-                            version: v,
-                            hash: hashCode(v),
-                        };
-                    });
+                const minors = Array.from(versionsMap.get(version) || []).filter(
+                    (v) => v !== version,
+                );
 
                 const minorQuantity = minors.length;
 
                 minors
-                    // descending by version name: newer versions come first,
-                    // so the newer version gets the brighter color
-                    .sort((a, b) => b.hash - a.hash)
+                    // Newer on-prem builds come first; other formats keep hash-based ordering
+                    .sort(compareMinorVersions)
                     .forEach((minor, minorIndex) => {
                         const minorColorVariant = getMinorVersionColorVariant(
                             minorIndex,
@@ -171,14 +228,14 @@ export const getVersionsDataMap = (versionsMap: VersionsMap) => {
                         );
                         const minorColor = COLORS[currentColorIndex][minorColorVariant];
 
-                        versionsDataMap.set(minor.version, {
+                        versionsDataMap.set(minor, {
                             color: minorColor,
                             majorIndex: currentColorIndex,
                             minorIndex: minorIndex,
                         });
                     });
             } else {
-                versionsDataMap.set(item.version, {
+                versionsDataMap.set(version, {
                     color: DEFAULT_COLOR,
                 });
             }

@@ -1,6 +1,11 @@
 import type {MetaClusterVersion} from '../../types/api/meta';
 
-import {COLORS, DEFAULT_COLOR, getMinorVersionColorVariant, hashCode} from './getVersionsColors';
+import {
+    COLORS,
+    DEFAULT_COLOR,
+    compareMinorVersions,
+    getMinorVersionColorVariant,
+} from './getVersionsColors';
 import {getMinorVersion} from './parseVersion';
 import {sortVersions} from './sortVersions';
 import type {
@@ -33,9 +38,8 @@ export const getVersionsData = (versionMap: ColorIndexToVersionsMap) => {
 
     for (const [baseColorIndex, item] of versionMap) {
         Array.from(item)
-            // descending by version name: newer versions come first,
-            // so the newer version gets the brighter color
-            .sort((a, b) => hashCode(b) - hashCode(a))
+            // Newer on-prem builds come first; other formats keep hash-based ordering
+            .sort(compareMinorVersions)
             .forEach((minor, minorIndex) => {
                 if (baseColorIndex === UNDEFINED_COLOR_INDEX) {
                     versionsDataMap.set(minor, {
