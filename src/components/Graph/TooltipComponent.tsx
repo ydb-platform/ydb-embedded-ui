@@ -13,7 +13,7 @@ import type {ExtendedTBlock} from './types';
 const b = cn('ydb-gravity-graph');
 type Props = {
     block: ExtendedTBlock;
-    children: React.ReactNode;
+    children: React.ReactElement<React.HTMLAttributes<HTMLElement>>;
 };
 
 const getStatsContent = (stat: TopologyNodeDataStatsItem | TopologyNodeDataStatsSection) => {
@@ -42,10 +42,19 @@ const getStatsContent = (stat: TopologyNodeDataStatsItem | TopologyNodeDataStats
 const useTooltipContent = (block: ExtendedTBlock) => {
     const firstTab = block?.stats?.[0]?.group || '';
     const [activeTab, setActiveTab] = React.useState(firstTab);
+    const validatedActiveTab = block.stats?.some(({group}) => group === activeTab)
+        ? activeTab
+        : firstTab;
+
+    React.useEffect(() => {
+        if (activeTab !== validatedActiveTab) {
+            setActiveTab(validatedActiveTab);
+        }
+    }, [activeTab, validatedActiveTab]);
 
     return React.useMemo(
         () => (
-            <TabProvider value={activeTab} onUpdate={setActiveTab}>
+            <TabProvider value={validatedActiveTab} onUpdate={setActiveTab}>
                 <TabList className={b('tooltip-tabs')}>
                     {block?.stats?.map((item) => (
                         <Tab value={item.group} key={item.group}>
@@ -60,12 +69,35 @@ const useTooltipContent = (block: ExtendedTBlock) => {
                 ))}
             </TabProvider>
         ),
-        [block?.stats, activeTab],
+        [block?.stats, validatedActiveTab],
     );
 };
 
 export const TooltipComponent = ({block, children}: Props) => {
     const content = useTooltipContent(block);
+    const trigger = React.cloneElement(children, {
+        role: children.props.role ?? 'button',
+        tabIndex: children.props.tabIndex ?? 0,
+        onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+            children.props.onKeyDown?.(event);
+            if (event.defaultPrevented) {
+                return;
+            }
+
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                event.currentTarget.click();
+            } else if (event.key === ' ') {
+                event.preventDefault();
+            }
+        },
+        onKeyUp: (event: React.KeyboardEvent<HTMLElement>) => {
+            children.props.onKeyUp?.(event);
+            if (!event.defaultPrevented && event.key === ' ') {
+                event.currentTarget.click();
+            }
+        },
+    });
 
     return (
         <Popover
@@ -74,10 +106,9 @@ export const TooltipComponent = ({block, children}: Props) => {
             trigger="click"
             placement="right-start"
             className="ydb-gravity-graph__tooltip-content"
-            disablePortal
             strategy="fixed"
         >
-            {children as React.ReactElement}
+            {trigger}
         </Popover>
     );
 };
