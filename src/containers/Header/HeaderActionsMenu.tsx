@@ -1,16 +1,20 @@
 import React from 'react';
 
-import {Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
+import {DatabaseArrowRight, Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
+import {skipToken} from '@reduxjs/toolkit/query';
 import {useHistory} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import type {DropdownMenuItemWithDescription} from '../../components/DropdownMenu';
 import {DropdownMenu} from '../../components/DropdownMenu';
-import {getClusterPath} from '../../routes';
+import {getClusterPath, getTenantPath} from '../../routes';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
+import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
+import {tenantsApi} from '../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {ClusterLinkWithTitle} from '../../types/additionalProps';
 import {uiFactory} from '../../uiFactory/uiFactory';
+import {useDatabasesV2} from '../../utils/hooks/useDatabasesV2';
 import {clusterTabsIds} from '../Cluster/utils';
 
 import {b} from './constants';
@@ -22,6 +26,7 @@ export interface HeaderActionsMenuProps {
     databaseData?: PreparedTenant;
     isDatabaseDataLoading: boolean;
     isV2NavigationEnabled: boolean;
+    isViewerUser?: boolean;
     databaseLinks: ClusterLinkWithTitle[];
 }
 
@@ -31,11 +36,40 @@ export function DBHeaderActionsMenu({
     databaseData,
     isDatabaseDataLoading,
     isV2NavigationEnabled,
+    isViewerUser,
     databaseLinks,
 }: HeaderActionsMenuProps) {
     const history = useHistory();
 
     const emMetaAvailable = useEmMetaAvailable();
+    const isMetaDatabasesAvailable = useDatabasesV2();
+    const {settings} = useClusterBaseInfo();
+
+    const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
+    const shouldResolveSharedDatabaseName =
+        isViewerUser &&
+        databaseData?.Type === 'Serverless' &&
+        Boolean(databaseData.ResourceId) &&
+        !useDatabaseId &&
+        !databaseData.sharedTenantName;
+
+    const {currentData: databases} = tenantsApi.useGetTenantsInfoQuery(
+        shouldResolveSharedDatabaseName ? {clusterName, isMetaDatabasesAvailable} : skipToken,
+    );
+
+    const sharedDatabaseName = React.useMemo(() => {
+        if (databaseData?.sharedTenantName) {
+            return databaseData.sharedTenantName;
+        }
+
+        return databases?.find(({Id}) => Id === databaseData?.ResourceId)?.Name;
+    }, [databaseData?.ResourceId, databaseData?.sharedTenantName, databases]);
+
+    const sharedDatabase = useDatabaseId ? databaseData?.ResourceId : sharedDatabaseName;
+    const sharedDatabasePath =
+        isViewerUser && databaseData?.Type === 'Serverless' && sharedDatabase
+            ? getTenantPath({clusterName, database: sharedDatabase}, {withBasename: true})
+            : undefined;
 
     const isEditDBAvailable = emMetaAvailable && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable = emMetaAvailable && uiFactory.onDeleteDB !== undefined;
@@ -66,6 +100,16 @@ export function DBHeaderActionsMenu({
                     title: headerKeyset('action_connect-to-db'),
                     iconStart: PlugConnection,
                     action: () => getConnectToDBDialog({database}),
+                },
+            ]);
+        }
+
+        if (sharedDatabasePath) {
+            menuItems.push([
+                {
+                    title: headerKeyset('action_go-to-shared-db'),
+                    iconStart: DatabaseArrowRight,
+                    href: sharedDatabasePath,
                 },
             ]);
         }
@@ -115,6 +159,7 @@ export function DBHeaderActionsMenu({
         history,
         isEditDBAvailable,
         isDeleteDBAvailable,
+        sharedDatabasePath,
     ]);
 
     if (!menuItems.length) {

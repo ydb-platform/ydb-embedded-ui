@@ -89,6 +89,7 @@ export function Header() {
                 isDatabaseDataLoading={isDatabaseDataLoading}
                 isAddClusterAvailable={isAddClusterAvailable}
                 isV2NavigationEnabled={isV2NavigationEnabled}
+                isViewerUser={isViewerUser}
                 clusterLinks={clusterLinks}
                 databaseLinks={databaseLinks}
                 handleEditCluster={handleEditCluster}

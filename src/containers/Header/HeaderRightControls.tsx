@@ -20,6 +20,7 @@ interface HeaderRightControlsProps {
     isDatabaseDataLoading: boolean;
     isAddClusterAvailable: boolean;
     isV2NavigationEnabled: boolean;
+    isViewerUser?: boolean;
     clusterLinks: ClusterLinkWithTitle[];
     databaseLinks: ClusterLinkWithTitle[];
     handleEditCluster?: () => Promise<boolean>;
@@ -37,6 +38,7 @@ export function HeaderRightControls({
     isDatabaseDataLoading,
     isAddClusterAvailable,
     isV2NavigationEnabled,
+    isViewerUser,
     clusterLinks,
     databaseLinks,
     handleEditCluster,
@@ -58,6 +60,7 @@ export function HeaderRightControls({
                     databaseData={databaseData}
                     isDatabaseDataLoading={isDatabaseDataLoading}
                     isV2NavigationEnabled={isV2NavigationEnabled}
+                    isViewerUser={isViewerUser}
                     showDeveloperUI={showDeveloperUI}
                     databaseLinks={databaseLinks}
                 />
