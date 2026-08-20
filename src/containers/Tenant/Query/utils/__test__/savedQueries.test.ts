@@ -27,14 +27,21 @@ test('upserts body and timestamp without moving an existing row', () => {
 
 test('renames an existing query and leaves a missing source unchanged', () => {
     expect(renameSavedQueryInList(queries, 'weekly REPORT', 'Daily report', 500)).toEqual({
-        renamed: true,
+        status: 'renamed',
         queries: [
             {name: 'Daily report', body: 'SELECT * FROM weekly;', updatedAt: 500},
             queries[1],
         ],
     });
     expect(renameSavedQueryInList(queries, 'missing', 'Other', 500)).toEqual({
-        renamed: false,
+        status: 'not-found',
+        queries,
+    });
+});
+
+test('returns duplicate without changing saved queries', () => {
+    expect(renameSavedQueryInList(queries, 'Weekly report', ' capacity ', 500)).toEqual({
+        status: 'duplicate',
         queries,
     });
 });
@@ -58,7 +65,7 @@ test('updates and renames the exact legacy duplicate selected by name', () => {
         {name: 'Report', body: 'SELECT 3;', updatedAt: 300},
     ]);
     expect(renameSavedQueryInList(legacyQueries, 'Report', 'Summary', 300)).toEqual({
-        renamed: true,
+        status: 'renamed',
         queries: [legacyQueries[0], {name: 'Summary', body: 'SELECT 2;', updatedAt: 300}],
     });
 });

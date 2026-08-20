@@ -95,7 +95,6 @@ export function SaveQueryButton({dialogProps, children, ...buttonProps}: SaveQue
 }
 
 export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
-    const dispatch = useTypedDispatch();
     const activeTab = useTypedSelector(selectActiveTab);
     const activeTabSavedQueryName = useTypedSelector(selectActiveTabSavedQueryName);
     const currentInput = useTypedSelector(selectUserInput);
@@ -109,7 +108,12 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
             return;
         }
 
-        const result = updateSavedQuery(currentSavedQueryName, activeTab.title, currentInput);
+        const result = updateSavedQuery(
+            currentSavedQueryName,
+            activeTab.title,
+            currentInput,
+            activeTab.id,
+        );
         if (result === 'duplicate') {
             createToast({
                 name: 'saved-query-name-exists',
@@ -122,8 +126,6 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
         if (result !== 'updated') {
             return;
         }
-
-        dispatch(setIsDirty(false));
     };
 
     const renderSaveDropdownMenu = () => {

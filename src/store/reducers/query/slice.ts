@@ -552,6 +552,35 @@ const slice = createSlice({
             });
             persistTabsStateToSessionStorage(state);
         },
+        syncSavedQueryTabsAfterUpdate: (
+            state,
+            action: PayloadAction<{
+                sourceTabId: string;
+                previousName: string;
+                nextName: string;
+                previousBody: string;
+                nextBody: string;
+            }>,
+        ) => {
+            const {sourceTabId, previousName, nextName, previousBody, nextBody} = action.payload;
+            const matchingTabs = getTabsBoundToSavedQuery(state.tabsById, previousName);
+
+            matchingTabs.forEach((tab) => {
+                if (tab.id === sourceTabId || tab.input === previousBody) {
+                    tab.input = nextBody;
+                }
+
+                tab.title = nextName;
+                tab.savedQueryName = nextName;
+                tab.savedInput = nextBody;
+                tab.isDirty = tab.input !== nextBody;
+            });
+
+            if (matchingTabs.length) {
+                persistTabsStateToSessionStorage(state);
+                persistDirtyStateToSessionStorage(state);
+            }
+        },
         detachSavedQueryTabs: (state, action: PayloadAction<{savedQueryName: string}>) => {
             const matchingTabs = getTabsBoundToSavedQuery(
                 state.tabsById,
@@ -671,6 +700,7 @@ export const {
     closeQueryTab,
     renameQueryTab,
     renameSavedQueryTabs,
+    syncSavedQueryTabsAfterUpdate,
     detachSavedQueryTabs,
     syncSavedQueryTab,
     setQueryTabSavedQueryName,

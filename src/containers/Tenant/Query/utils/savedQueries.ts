@@ -4,6 +4,8 @@ import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 
 const normalizeSavedQueryName = (value: string) => value.trim().toLowerCase();
 
+export type RenameSavedQueryStatus = 'renamed' | 'duplicate' | 'not-found';
+
 function findSavedQueryIndex(queries: SavedQuery[], name: string): number {
     const exactIndex = queries.findIndex((query) => query.name === name);
     if (exactIndex >= 0) {
@@ -69,14 +71,17 @@ export function renameSavedQueryInList(
     previousName: string,
     nextName: string,
     updatedAt: number,
-): {queries: SavedQuery[]; renamed: boolean} {
+): {queries: SavedQuery[]; status: RenameSavedQueryStatus} {
     const index = findSavedQueryIndex(queries, previousName);
     if (index < 0) {
-        return {queries, renamed: false};
+        return {queries, status: 'not-found'};
+    }
+    if (hasSavedQueryNameCollision(queries, previousName, nextName)) {
+        return {queries, status: 'duplicate'};
     }
     const nextQueries = [...queries];
     nextQueries[index] = {...queries[index], name: nextName, updatedAt};
-    return {queries: nextQueries, renamed: true};
+    return {queries: nextQueries, status: 'renamed'};
 }
 
 export function formatSavedQueryUpdatedAt(updatedAt?: number): string {

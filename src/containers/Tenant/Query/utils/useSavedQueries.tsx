@@ -1,18 +1,17 @@
 import React from 'react';
 
-import {detachSavedQueryTabs, renameSavedQueryTabs} from '../../../../store/reducers/query/query';
+import {
+    detachSavedQueryTabs,
+    renameSavedQueryTabs,
+    syncSavedQueryTabsAfterUpdate,
+} from '../../../../store/reducers/query/query';
 import {selectSavedQueriesFilter} from '../../../../store/reducers/queryActions/queryActions';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {SavedQuery} from '../../../../types/store/query';
 import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {sortByTimestampDescending} from '../../../../utils/sortByTimestamp';
 
-import {
-    filterSavedQueries,
-    hasSavedQueryNameCollision,
-    renameSavedQueryInList,
-    upsertSavedQuery,
-} from './savedQueries';
+import {filterSavedQueries, renameSavedQueryInList, upsertSavedQuery} from './savedQueries';
 
 type UpdateSavedQueryResult = 'updated' | 'duplicate' | 'not-found';
 
@@ -57,23 +56,24 @@ export function useSavedQueries() {
                 nextName,
                 Date.now(),
             );
-            if (result.renamed) {
+            if (result.status === 'renamed') {
                 saveQueries(result.queries);
                 dispatch(renameSavedQueryTabs({previousName, nextName}));
             }
-            return result.renamed;
+            return result.status;
         },
         [dispatch, savedQueries, saveQueries],
     );
 
     const updateSavedQuery = React.useCallback(
-        (previousName: string, nextName: string, queryBody: string): UpdateSavedQueryResult => {
+        (
+            previousName: string,
+            nextName: string,
+            queryBody: string,
+            sourceTabId: string,
+        ): UpdateSavedQueryResult => {
             const nameToSave = nextName === previousName ? previousName : nextName.trim();
             const queries = savedQueries ?? [];
-
-            if (hasSavedQueryNameCollision(queries, previousName, nameToSave)) {
-                return 'duplicate';
-            }
 
             const updatedAt = Date.now();
             const renameResult = renameSavedQueryInList(
@@ -82,12 +82,25 @@ export function useSavedQueries() {
                 nameToSave,
                 updatedAt,
             );
-            if (!renameResult.renamed) {
+            if (renameResult.status !== 'renamed') {
+                return renameResult.status;
+            }
+
+            const previousQuery = renameResult.queries.find((query) => query.name === nameToSave);
+            if (!previousQuery) {
                 return 'not-found';
             }
 
             saveQueries(upsertSavedQuery(renameResult.queries, nameToSave, queryBody, updatedAt));
-            dispatch(renameSavedQueryTabs({previousName, nextName: nameToSave}));
+            dispatch(
+                syncSavedQueryTabsAfterUpdate({
+                    sourceTabId,
+                    previousName,
+                    nextName: nameToSave,
+                    previousBody: previousQuery.body,
+                    nextBody: queryBody,
+                }),
+            );
 
             return 'updated';
         },

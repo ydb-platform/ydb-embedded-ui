@@ -117,8 +117,13 @@ export const SavedQueries = () => {
 
     const handleRenameSavedQuery = React.useCallback(
         (nextName: string) => {
-            if (!queryNameToRename || !renameSavedQuery(queryNameToRename, nextName)) {
-                return false;
+            if (!queryNameToRename) {
+                return 'not-found' as const;
+            }
+
+            const result = renameSavedQuery(queryNameToRename, nextName);
+            if (result !== 'renamed') {
+                return result;
             }
 
             setSelectedQueryName((currentName) =>
@@ -127,7 +132,7 @@ export const SavedQueries = () => {
                     : currentName,
             );
 
-            return true;
+            return result;
         },
         [queryNameToRename, renameSavedQuery],
     );
@@ -275,7 +280,6 @@ export const SavedQueries = () => {
                 <RenameSavedQueryDialog
                     open
                     currentName={queryNameToRename}
-                    savedQueries={savedQueries ?? []}
                     onClose={handleCloseRenameDialog}
                     onRename={handleRenameSavedQuery}
                 />

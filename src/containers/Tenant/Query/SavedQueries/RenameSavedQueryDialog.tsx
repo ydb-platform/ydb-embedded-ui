@@ -2,12 +2,11 @@ import React from 'react';
 
 import {Dialog, TextInput} from '@gravity-ui/uikit';
 
-import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import i18n from '../i18n';
 import {getQueryNameValidationError} from '../utils/QueryNameValidation';
-import {hasSavedQueryNameCollision} from '../utils/savedQueries';
+import type {RenameSavedQueryStatus} from '../utils/savedQueries';
 
 import './RenameSavedQueryDialog.scss';
 
@@ -16,15 +15,13 @@ const b = cn('ydb-rename-saved-query-dialog');
 interface RenameSavedQueryDialogProps {
     currentName: string;
     open: boolean;
-    savedQueries: SavedQuery[];
     onClose: VoidFunction;
-    onRename: (nextName: string) => boolean;
+    onRename: (nextName: string) => RenameSavedQueryStatus;
 }
 
 export function RenameSavedQueryDialog({
     currentName,
     open,
-    savedQueries,
     onClose,
     onRename,
 }: RenameSavedQueryDialogProps) {
@@ -46,17 +43,18 @@ export function RenameSavedQueryDialog({
             return;
         }
 
-        const duplicateExists = hasSavedQueryNameCollision(savedQueries, currentName, trimmedName);
-
-        if (duplicateExists) {
+        const result = onRename(trimmedName);
+        if (result === 'duplicate') {
             setErrorMessage(i18n('alert_saved-query-name-exists'));
             return;
         }
-
-        if (onRename(trimmedName)) {
-            onClose();
+        if (result === 'not-found') {
+            setErrorMessage(i18n('alert_saved-query-not-found'));
+            return;
         }
-    }, [currentName, nextName, onClose, onRename, savedQueries]);
+
+        onClose();
+    }, [nextName, onClose, onRename]);
 
     const handleSubmit = React.useCallback(
         (event: React.FormEvent<HTMLFormElement>) => {

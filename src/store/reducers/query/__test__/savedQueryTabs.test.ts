@@ -1,5 +1,9 @@
-import {QUERY_EDITOR_CURRENT_QUERY_KEY} from '../../../../utils/constants';
-import queryReducer, {detachSavedQueryTabs, renameSavedQueryTabs} from '../query';
+import {QUERY_EDITOR_CURRENT_QUERY_KEY, QUERY_EDITOR_DIRTY_KEY} from '../../../../utils/constants';
+import queryReducer, {
+    detachSavedQueryTabs,
+    renameSavedQueryTabs,
+    syncSavedQueryTabsAfterUpdate,
+} from '../query';
 import type {QueryState} from '../types';
 
 test('renames all tabs bound to a saved query without changing tab state', () => {
@@ -146,5 +150,102 @@ test('renames and detaches only tabs bound to the exact legacy duplicate', () =>
         savedQueryName: undefined,
         savedInput: undefined,
         isDirty: true,
+    });
+});
+
+test('syncs the saved body into clean tabs and preserves stale local input', () => {
+    const initialState: QueryState = {
+        activeTabId: 'source-tab',
+        tabsOrder: ['source-tab', 'clean-tab', 'stale-tab', 'other-tab'],
+        tabsById: {
+            'source-tab': {
+                id: 'source-tab',
+                title: 'Report draft',
+                input: 'SELECT new;',
+                savedInput: 'SELECT old;',
+                isDirty: true,
+                createdAt: 1,
+                updatedAt: 2,
+                savedQueryName: 'Report',
+            },
+            'clean-tab': {
+                id: 'clean-tab',
+                title: 'Report',
+                input: 'SELECT old;',
+                savedInput: 'SELECT old;',
+                isDirty: false,
+                createdAt: 3,
+                updatedAt: 4,
+                savedQueryName: 'Report',
+            },
+            'stale-tab': {
+                id: 'stale-tab',
+                title: 'Report',
+                input: 'SELECT local;',
+                savedInput: 'SELECT local;',
+                isDirty: false,
+                createdAt: 5,
+                updatedAt: 6,
+                savedQueryName: 'Report',
+            },
+            'other-tab': {
+                id: 'other-tab',
+                title: 'Capacity',
+                input: 'SELECT capacity;',
+                savedInput: 'SELECT capacity;',
+                isDirty: false,
+                createdAt: 7,
+                updatedAt: 8,
+                savedQueryName: 'Capacity',
+            },
+        },
+        newTabCounter: 4,
+    };
+
+    const state = queryReducer(
+        initialState,
+        syncSavedQueryTabsAfterUpdate({
+            sourceTabId: 'source-tab',
+            previousName: 'Report',
+            nextName: 'Summary',
+            previousBody: 'SELECT old;',
+            nextBody: 'SELECT new;',
+        }),
+    );
+
+    expect(state.tabsById['source-tab']).toMatchObject({
+        title: 'Summary',
+        input: 'SELECT new;',
+        savedInput: 'SELECT new;',
+        savedQueryName: 'Summary',
+        isDirty: false,
+    });
+    expect(state.tabsById['clean-tab']).toMatchObject({
+        title: 'Summary',
+        input: 'SELECT new;',
+        savedInput: 'SELECT new;',
+        savedQueryName: 'Summary',
+        isDirty: false,
+    });
+    expect(state.tabsById['stale-tab']).toMatchObject({
+        title: 'Summary',
+        input: 'SELECT local;',
+        savedInput: 'SELECT new;',
+        savedQueryName: 'Summary',
+        isDirty: true,
+    });
+    expect(state.tabsById['other-tab']).toEqual(initialState.tabsById['other-tab']);
+
+    expect(JSON.parse(sessionStorage.getItem(QUERY_EDITOR_CURRENT_QUERY_KEY) ?? '')).toMatchObject({
+        tabsById: {
+            'source-tab': {input: 'SELECT new;', savedInput: 'SELECT new;'},
+            'clean-tab': {input: 'SELECT new;', savedInput: 'SELECT new;'},
+            'stale-tab': {input: 'SELECT local;', savedInput: 'SELECT new;'},
+        },
+    });
+    expect(JSON.parse(sessionStorage.getItem(QUERY_EDITOR_DIRTY_KEY) ?? '')).toMatchObject({
+        'source-tab': false,
+        'clean-tab': false,
+        'stale-tab': true,
     });
 });

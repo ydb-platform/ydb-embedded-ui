@@ -9,6 +9,7 @@ export {
     closeQueryTab,
     renameQueryTab,
     renameSavedQueryTabs,
+    syncSavedQueryTabsAfterUpdate,
     selectActiveTab,
     selectActiveTabId,
     selectActiveTabPendingSnippet,

@@ -10,6 +10,7 @@
   "field_saved-query-name": "Name",
   "field_saved-query-edited-at": "Edited",
   "alert_saved-query-name-exists": "This name already exists",
+  "alert_saved-query-not-found": "Saved query no longer exists",
 
   "title_delete-query": "Delete query",
   "confirm_delete-query": "Are you sure you want to delete query",
