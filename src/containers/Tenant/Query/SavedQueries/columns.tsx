@@ -6,6 +6,7 @@ import {YDBSyntaxHighlighter} from '../../../../components/SyntaxHighlighter/YDB
 import type {SavedQuery} from '../../../../types/store/query';
 import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import i18n from '../i18n';
+import {getQueryPreviewText} from '../utils/queryPreview';
 import {formatSavedQueryUpdatedAt} from '../utils/savedQueries';
 
 import {b} from './shared';
@@ -47,7 +48,7 @@ export function getColumns({deleteQuery, openInEditor, renameQuery}: SavedQueryA
                 <YDBSyntaxHighlighter
                     language="yql"
                     className={b('query')}
-                    text={row.body || EMPTY_DATA_PLACEHOLDER}
+                    text={getQueryPreviewText(row.body) || EMPTY_DATA_PLACEHOLDER}
                 />
             ),
             sortable: false,

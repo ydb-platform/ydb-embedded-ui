@@ -18,10 +18,11 @@ import {
 import type {SavedQuery} from '../../../../types/store/query';
 import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {sortByTimestampDescending} from '../../../../utils/sortByTimestamp';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {useOpenExternalQueryInEditor} from '../hooks/useOpenExternalQueryInEditor';
 import i18n from '../i18n';
-import {formatSavedQueryUpdatedAt} from '../utils/savedQueries';
+import {filterSavedQueries, formatSavedQueryUpdatedAt} from '../utils/savedQueries';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
 import {RenameSavedQueryDialog} from './RenameSavedQueryDialog';
@@ -33,8 +34,7 @@ import './SavedQueries.scss';
 const SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY = 'savedQueriesTableColumnsWidth';
 
 export const SavedQueries = () => {
-    const {savedQueries, filteredSavedQueries, deleteSavedQuery, renameSavedQuery} =
-        useSavedQueries();
+    const {savedQueries, deleteSavedQuery, renameSavedQuery} = useSavedQueries();
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
     const openExternalQueryInEditor = useOpenExternalQueryInEditor();
@@ -42,6 +42,14 @@ export const SavedQueries = () => {
     const [selectedQueryName, setSelectedQueryName] = React.useState<string | null>(null);
     const [queryNameToDelete, setQueryNameToDelete] = React.useState<string | null>(null);
     const [queryNameToRename, setQueryNameToRename] = React.useState<string | null>(null);
+
+    const sortedSavedQueries = React.useMemo(() => {
+        return sortByTimestampDescending(savedQueries ?? [], (query) => query.updatedAt);
+    }, [savedQueries]);
+
+    const filteredSavedQueries = React.useMemo(() => {
+        return filterSavedQueries(sortedSavedQueries, filter);
+    }, [filter, sortedSavedQueries]);
 
     const handleOpenInEditor = React.useCallback(
         (query: SavedQuery) => {

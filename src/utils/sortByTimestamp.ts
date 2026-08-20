@@ -2,7 +2,9 @@ export function sortByTimestampDescending<T>(
     items: readonly T[],
     getTimestamp: (item: T) => number | null | undefined,
 ): T[] {
-    return items.toReversed().toSorted((a, b) => {
+    const sortedItems = items.toReversed();
+
+    return sortedItems.sort((a, b) => {
         const aTimestamp = getTimestamp(a);
         const bTimestamp = getTimestamp(b);
 

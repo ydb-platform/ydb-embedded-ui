@@ -5,13 +5,11 @@ import {
     renameSavedQueryTabs,
     syncSavedQueryTabsAfterUpdate,
 } from '../../../../store/reducers/query/query';
-import {selectSavedQueriesFilter} from '../../../../store/reducers/queryActions/queryActions';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {SavedQuery} from '../../../../types/store/query';
-import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {sortByTimestampDescending} from '../../../../utils/sortByTimestamp';
+import {useSetting, useTypedDispatch} from '../../../../utils/hooks';
 
-import {filterSavedQueries, renameSavedQueryInList, upsertSavedQuery} from './savedQueries';
+import {renameSavedQueryInList, upsertSavedQuery} from './savedQueries';
 
 type UpdateSavedQueryResult = 'updated' | 'duplicate' | 'not-found';
 
@@ -19,12 +17,6 @@ export function useSavedQueries() {
     const [savedQueries, saveQueries] = useSetting<SavedQuery[]>(SETTING_KEYS.SAVED_QUERIES);
 
     const dispatch = useTypedDispatch();
-    const filter = useTypedSelector(selectSavedQueriesFilter);
-
-    const filteredSavedQueries = React.useMemo(() => {
-        const filteredQueries = filterSavedQueries(savedQueries ?? [], filter);
-        return sortByTimestampDescending(filteredQueries, (query) => query.updatedAt);
-    }, [savedQueries, filter]);
 
     const deleteSavedQuery = React.useCallback(
         (queryName: string) => {
@@ -109,7 +101,6 @@ export function useSavedQueries() {
 
     return {
         savedQueries,
-        filteredSavedQueries,
         deleteSavedQuery,
         saveQuery,
         renameSavedQuery,

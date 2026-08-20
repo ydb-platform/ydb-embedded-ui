@@ -30,7 +30,7 @@ const uiFactoryBase: ResolvedUIFactory = {
     useDatabaseId: false,
     settingsBackend: undefined,
     docs: undefined,
-    enableMultiTabQueryEditor: true,
+    enableMultiTabQueryEditor: false,
     hasDeveloperUi: true,
     isDetailedStorageViewAvailable: () => true,
     maxVDisksInStorageGroup: 9,

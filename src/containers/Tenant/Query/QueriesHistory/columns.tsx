@@ -14,6 +14,7 @@ import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../../../utils/cons
 import {formatDateTime, formatDurationMs} from '../../../../utils/dataFormatters/dataFormatters';
 import {parseUsToMs} from '../../../../utils/timeParsers';
 import i18n from '../i18n';
+import {getQueryPreviewText} from '../utils/queryPreview';
 
 import {b} from './shared';
 
@@ -79,7 +80,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
                     <YDBSyntaxHighlighter
                         language="yql"
                         className={b('query')}
-                        text={row.queryText}
+                        text={getQueryPreviewText(row.queryText)}
                     />
                 );
             },
