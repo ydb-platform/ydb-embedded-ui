@@ -147,6 +147,47 @@ E2E tests are run in CI in the `e2e_tests` job. Each shard starts `ghcr.io/ydb-p
 
 ## Making a production bundle.
 
+### Web Workers for package consumers
+
+The computation graph calculates its layout in a Web Worker. By default, the package uses the native bundler pattern:
+
+```ts
+new Worker(new URL('./graphLayout.worker', import.meta.url));
+```
+
+Bundlers that support this pattern, including Rsbuild and Rspack, emit the worker as a separate asset automatically. The emitted worker script must be deployed with the application, served from the application origin, and allowed by the application's Content Security Policy:
+
+```http
+Content-Security-Policy: worker-src 'self'
+```
+
+If application chunks are loaded from a CDN, configure the bundler to keep native worker scripts on the application origin. For example, with Rspack:
+
+```ts
+export default {
+  output: {
+    workerPublicPath: '/build/',
+  },
+};
+```
+
+Consumers that need to resolve the worker URL at runtime can provide a worker factory before rendering `SingleClusterApp` or `MultiClusterApp`. The factory must return a new worker instance on every call:
+
+```ts
+import {configureUIFactory} from 'ydb-embedded-ui';
+
+configureUIFactory({
+  createGraphLayoutWorker: () =>
+    new Worker(window.runtimeConfig.ydbGraphLayoutWorkerUrl, {
+      name: 'ydb-graph-layout',
+    }),
+});
+```
+
+Use `ydb-embedded-ui/dist/graphLayout.worker.js` as the worker entry in the consumer build. Process this entry with the consumer's bundler rather than copying it as an unbundled static file. Publish the resulting worker bundle at the URL returned by the runtime configuration.
+
+If the browser cannot create or load the worker, the graph retries the layout on the main thread. This fallback preserves functionality, but consumers should configure worker delivery to keep expensive layout work off the UI thread.
+
 Base command `npm run build` builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 

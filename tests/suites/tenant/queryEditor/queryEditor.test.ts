@@ -273,6 +273,24 @@ test.describe('Test Query Editor', async () => {
         await expect.poll(() => isGraphContentInsideViewport(explainSchema)).toBe(true);
     });
 
+    test('Computation Graph shows an error state when layout fails', async ({page}) => {
+        await mockExplainPlan(page, {
+            PlanNodeId: 1,
+            PlanNodeType: 'Query',
+            'Node Type': 'Query',
+            Plans: [{PlanNodeId: 1, PlanNodeType: 'Stage', 'Node Type': 'Invalid stage'}],
+        });
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.explain(testQuery, QUERY_MODES.query);
+        await queryEditor.getExplainResult(ExplainResultType.Schema);
+
+        const resultArea = queryEditor.getResultAreaLocator();
+        await expect(resultArea.getByText('Graph can not be rendered')).toBeVisible();
+        await expect(resultArea.locator('.graph-canvas')).toHaveCount(0);
+        await expect(resultArea.getByRole('button', {name: 'Zoom in'})).toHaveCount(0);
+        await expect(resultArea.getByRole('button', {name: 'Zoom out'})).toHaveCount(0);
+    });
+
     test('Computation Graph omits the Tables row for an empty array', async ({page}) => {
         await mockExplainPlan(page, {
             PlanNodeId: 1,

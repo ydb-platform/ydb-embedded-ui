@@ -1,5 +1,5 @@
-import {prepareTreeLayout} from './treeLayout';
-import type {TreeLayoutRequest, TreeLayoutWorkerResponse} from './types';
+import {prepareTreeLayout} from './components/Graph/treeLayout';
+import type {TreeLayoutRequest, TreeLayoutWorkerResponse} from './components/Graph/types';
 
 const workerScope = globalThis as unknown as {
     onmessage: ((event: MessageEvent<TreeLayoutRequest>) => void) | null;
