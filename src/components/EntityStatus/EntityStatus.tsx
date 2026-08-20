@@ -14,12 +14,12 @@ import './EntityStatus.scss';
 
 const b = cn('ydb-entity-status');
 
-const EFlagToLabelTheme: Record<EFlag, LabelProps['theme'] | 'orange'> = {
+const EFlagToLabelTheme: Record<EFlag, LabelProps['theme']> = {
     [EFlag.Red]: 'danger',
     [EFlag.Blue]: 'info',
     [EFlag.Green]: 'success',
     [EFlag.Grey]: 'unknown',
-    [EFlag.Orange]: 'orange',
+    [EFlag.Orange]: 'danger',
     [EFlag.Yellow]: 'warning',
 };
 
@@ -68,10 +68,10 @@ function EntityStatusLabel({
     return (
         <ActionTooltip title={EFlagToDescription[status]} disabled={Boolean(note)}>
             <Label
-                theme={theme === 'orange' ? undefined : theme}
+                theme={theme}
                 icon={<StatusIcon size={iconSize} status={status} />}
                 size={size}
-                className={b({orange: theme === 'orange', clickable: isClickable})}
+                className={b({clickable: isClickable})}
                 onClick={onClick}
                 interactive={isClickable}
             >
