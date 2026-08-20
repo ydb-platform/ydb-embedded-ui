@@ -1,8 +1,11 @@
 import {Text} from '@gravity-ui/uikit';
 
+import {cn} from '../../../utils/cn';
 import {TooltipComponent} from '../TooltipComponent';
 import i18n from '../i18n';
 import type {ExtendedTBlock} from '../types';
+
+const b = cn('ydb-gravity-graph');
 
 type Props = {
     block: ExtendedTBlock;
@@ -15,12 +18,12 @@ export const StageBlockComponent = ({className, block}: Props) => {
             {block.operators?.length
                 ? block.operators.map((item) => <div key={item}>{item}</div>)
                 : block.name}
-            {block.tables?.length ? (
-                <div>
-                    <Text color="secondary">{i18n('label_tables')}: </Text>
-                    {block.tables.join(', ')}
+            {block.tables?.map((table, index) => (
+                <div key={`${table}-${index}`} className={b('stage-table-row')} title={table}>
+                    {index === 0 ? <Text color="secondary">{i18n('label_tables')}: </Text> : null}
+                    {table}
                 </div>
-            ) : null}
+            ))}
         </div>
     );
 

@@ -1,4 +1,4 @@
-import {prepareBlocks} from './utils';
+import {prepareBlocks} from '../utils';
 
 describe('prepareBlocks', () => {
     test('reserves a name row when stage operators is an empty array', () => {

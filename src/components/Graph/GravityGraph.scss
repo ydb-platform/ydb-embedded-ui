@@ -50,6 +50,13 @@
         border-radius: 6px;
     }
 
+    &__stage-table-row {
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
     &__block-content.connection {
         display: flex;
         align-items: center;
