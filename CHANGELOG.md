@@ -1,5 +1,20 @@
 # Changelog
 
+## [20.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.1.0...v20.2.0) (2026-08-20)
+
+
+### Features
+
+* **ManagePartitioning:** support disabled partitioning by size ([#4250](https://github.com/ydb-platform/ydb-embedded-ui/issues/4250)) ([f2e4f4d](https://github.com/ydb-platform/ydb-embedded-ui/commit/f2e4f4d4e2212aa6c2178270f4c7ce2245b4bd13))
+* **Storage:** support All mode for pdisks in groups ([#4249](https://github.com/ydb-platform/ydb-embedded-ui/issues/4249)) ([35fef39](https://github.com/ydb-platform/ydb-embedded-ui/commit/35fef39a0b2f023c52b3ccd401af68cdd504fa6a))
+* **Versions:** support onprem versions ([#4251](https://github.com/ydb-platform/ydb-embedded-ui/issues/4251)) ([a4e5361](https://github.com/ydb-platform/ydb-embedded-ui/commit/a4e5361ed2496ba2248a1404523242b4dcd80469))
+
+
+### Bug Fixes
+
+* **Drawer:** add accessability ([#4256](https://github.com/ydb-platform/ydb-embedded-ui/issues/4256)) ([7a9ac31](https://github.com/ydb-platform/ydb-embedded-ui/commit/7a9ac3125c6700812c15976e9311219076efc69b))
+* **EntityStatus:** support orange EFlag ([#4255](https://github.com/ydb-platform/ydb-embedded-ui/issues/4255)) ([aafa3f2](https://github.com/ydb-platform/ydb-embedded-ui/commit/aafa3f2532cafe3267d3e073bd6c63784aa437d6))
+
 ## [20.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.0.0...v20.1.0) (2026-08-18)
 
 
