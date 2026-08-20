@@ -58,7 +58,12 @@ export function HealthcheckDrawer({
                 key: 'download',
                 node: (
                     <ActionTooltip title={downloadTooltip}>
-                        <Button view="flat" disabled={isDownloadDisabled} onClick={handleDownload}>
+                        <Button
+                            view="flat"
+                            disabled={isDownloadDisabled}
+                            onClick={handleDownload}
+                            aria-label={downloadTooltip}
+                        >
                             <Icon data={ArrowDownToLine} />
                         </Button>
                     </ActionTooltip>

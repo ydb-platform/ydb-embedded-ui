@@ -61,6 +61,7 @@ export function HealthcheckRefresh({lastFullfiled, refresh}: HealthcheckRefreshP
             <ActionTooltip title={i18n('action_refresh')}>
                 <Button
                     view="outlined"
+                    aria-label={i18n('action_refresh')}
                     onClick={() => {
                         refresh();
                     }}

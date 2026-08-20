@@ -13,6 +13,7 @@ import {
     normalizeDrawerWidthFromResize,
     normalizeDrawerWidthFromSavedString,
 } from './DrawerWidthUtils';
+import i18n from './i18n';
 
 import './Drawer.scss';
 
@@ -245,13 +246,14 @@ export const DrawerWrapper = ({
     }, []);
 
     const renderDrawerHeader = () => {
+        const closeTitle = i18n('action_close');
         const controls = [];
         for (const control of drawerControls) {
             switch (control.type) {
                 case 'close':
                     controls.push(
-                        <ActionTooltip title="Close" key="close">
-                            <Button view="flat" onClick={onCloseDrawer}>
+                        <ActionTooltip title={closeTitle} key="close">
+                            <Button view="flat" onClick={onCloseDrawer} aria-label={closeTitle}>
                                 <Icon data={Xmark} size={16} />
                             </Button>
                         </ActionTooltip>,
