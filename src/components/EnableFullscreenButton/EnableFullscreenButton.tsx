@@ -22,7 +22,12 @@ export function EnableFullscreenButton({
     };
     return (
         <ActionTooltip title={i18n('title_fullscreen')}>
-            <Button onClick={onEnableFullscreen} view={view} disabled={disabled}>
+            <Button
+                onClick={onEnableFullscreen}
+                view={view}
+                disabled={disabled}
+                aria-label={i18n('title_fullscreen')}
+            >
                 <Icon data={SquareDashed} />
             </Button>
         </ActionTooltip>
