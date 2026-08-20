@@ -1,5 +1,12 @@
 # Changelog
 
+## [20.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.2.0...v20.2.1) (2026-08-20)
+
+
+### Bug Fixes
+
+* **EntityStatus:** red and blue EFlag color mapping ([#4257](https://github.com/ydb-platform/ydb-embedded-ui/issues/4257)) ([37522a9](https://github.com/ydb-platform/ydb-embedded-ui/commit/37522a987f7ce2eb05047de91d44c7cef66eef54))
+
 ## [20.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.1.0...v20.2.0) (2026-08-20)
 
 
