@@ -95,11 +95,19 @@ function getNodeType(plan: PlanNode) {
 export function preparePlan(plan: PlanNode) {
     const nodes: GraphNode<ExplainPlanNodeData>[] = [];
     const links: Link[] = [];
+    let generatedNodeId = 0;
+
+    const getGraphNodeId = (node: PlanNode) => {
+        return node.PlanNodeId === undefined
+            ? `generated-plan-node:${generatedNodeId++}`
+            : String(node.PlanNodeId);
+    };
 
     function parsePlans(plans: PlanNode[] = [], from: string) {
         plans.forEach((p) => {
+            const nodeId = getGraphNodeId(p);
             const node: GraphNode<ExplainPlanNodeData> = {
-                name: String(p.PlanNodeId),
+                name: nodeId,
                 data: {
                     id: p.PlanNodeId,
                     type: getNodeType(p),
@@ -116,8 +124,9 @@ export function preparePlan(plan: PlanNode) {
     }
 
     const rootPlan = plan;
+    const rootNodeId = getGraphNodeId(rootPlan);
     const rootNode: GraphNode<ExplainPlanNodeData> = {
-        name: String(rootPlan.PlanNodeId),
+        name: rootNodeId,
         data: {
             id: rootPlan.PlanNodeId,
             type: getNodeType(rootPlan),

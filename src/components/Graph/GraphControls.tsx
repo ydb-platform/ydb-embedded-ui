@@ -5,6 +5,8 @@ import {Button, Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 
+import i18n from './i18n';
+
 import MagnifierMinusIcon from '@gravity-ui/icons/svgs/magnifier-minus.svg';
 import MagnifierPlusIcon from '@gravity-ui/icons/svgs/magnifier-plus.svg';
 
@@ -33,10 +35,10 @@ export const GraphControls = ({graph}: Props) => {
 
     return (
         <div className={b('zoom-controls')}>
-            <Button view="raised" onClick={onZoomInClick}>
+            <Button view="raised" onClick={onZoomInClick} aria-label={i18n('action_zoom-in')}>
                 <Icon data={MagnifierPlusIcon} size={16} />
             </Button>
-            <Button view="raised" onClick={onZoomOutClick}>
+            <Button view="raised" onClick={onZoomOutClick} aria-label={i18n('action_zoom-out')}>
                 <Icon data={MagnifierMinusIcon} size={16} />
             </Button>
             <Button view="raised" onClick={onResetZoomClick}>

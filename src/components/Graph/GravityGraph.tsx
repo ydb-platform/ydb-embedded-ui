@@ -54,8 +54,8 @@ const renderBlockFn = (graph: any, block: any) => {
                         block={block}
                         className={b('block-content', block.is)}
                     />
-                    {block.id !== 'undefined' && block.is !== 'result' && (
-                        <div className={b('block-id')}>#{block.id}</div>
+                    {block.planNodeId !== undefined && block.is !== 'result' && (
+                        <div className={b('block-id')}>#{block.planNodeId}</div>
                     )}
                 </React.Fragment>
             ) : (

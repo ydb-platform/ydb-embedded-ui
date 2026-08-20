@@ -4,6 +4,7 @@ import type {GraphNode, Link, TopologyNodeDataStats} from '../../store/reducers/
 
 // Extended block interface with additional properties
 export interface ExtendedTBlock extends TBlock {
+    planNodeId?: number;
     stats?: TopologyNodeDataStats[];
     operators?: string[];
     tables?: string[];
