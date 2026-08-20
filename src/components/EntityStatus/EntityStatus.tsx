@@ -16,7 +16,7 @@ const b = cn('ydb-entity-status');
 
 const EFlagToLabelTheme: Record<EFlag, LabelProps['theme']> = {
     [EFlag.Red]: 'danger',
-    [EFlag.Blue]: 'info',
+    [EFlag.Blue]: 'success',
     [EFlag.Green]: 'success',
     [EFlag.Grey]: 'unknown',
     [EFlag.Orange]: 'danger',
@@ -71,7 +71,7 @@ function EntityStatusLabel({
                 theme={theme}
                 icon={<StatusIcon size={iconSize} status={status} />}
                 size={size}
-                className={b({clickable: isClickable})}
+                className={b({critical: status === EFlag.Red, clickable: isClickable})}
                 onClick={onClick}
                 interactive={isClickable}
             >
