@@ -52,10 +52,11 @@ const getBlockSize = (block: ExplainPlanNodeData) => {
 };
 
 export const prepareBlocks = (nodes: Data['nodes']): TBlock[] => {
-    return nodes.map(({data: {id, name, type, ...rest}, data}) => ({
-        id: String(id),
+    return nodes.map(({name: id, data: {id: planNodeId, name, type, ...rest}, data}) => ({
+        id,
         is: type,
         name,
+        planNodeId,
         ...getBlockSize(data),
         ...rest,
     }));

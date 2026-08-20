@@ -151,6 +151,8 @@ test.describe('Test Query Editor', async () => {
 
         const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
         await expect(explainSchema).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+        await expect(explainSchema.getByRole('button', {name: 'Zoom in'})).toBeVisible();
+        await expect(explainSchema.getByRole('button', {name: 'Zoom out'})).toBeVisible();
 
         const explainJSON = await queryEditor.getExplainResult(ExplainResultType.JSON);
         await expect(explainJSON).toBeVisible({timeout: VISIBILITY_TIMEOUT});
