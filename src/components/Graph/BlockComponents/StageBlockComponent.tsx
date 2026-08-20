@@ -12,7 +12,7 @@ type Props = {
 export const StageBlockComponent = ({className, block}: Props) => {
     const content = (
         <div className={className}>
-            {block.operators
+            {block.operators?.length
                 ? block.operators.map((item) => <div key={item}>{item}</div>)
                 : block.name}
             {block.tables?.length ? (

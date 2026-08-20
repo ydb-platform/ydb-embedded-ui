@@ -11,7 +11,7 @@ const BORDER_HEIGHT = 2;
 
 const getBlockSize = (block: ExplainPlanNodeData) => {
     const ONE_LINE_HEIGHT = BLOCK_TOP_PADDING * 2 + BLOCK_LINE_HEIGHT + BORDER_HEIGHT;
-    const operatorsLength = block.operators?.length ?? 1;
+    const operatorsLength = Math.max(block.operators?.length ?? 0, 1);
     const tablesLength = block.tables?.length ?? 0;
 
     switch (block.type) {
