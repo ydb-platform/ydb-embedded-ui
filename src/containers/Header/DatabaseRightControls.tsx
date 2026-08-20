@@ -19,6 +19,7 @@ interface DatabaseRightControlsProps {
     databaseData?: PreparedTenant;
     isDatabaseDataLoading: boolean;
     isV2NavigationEnabled: boolean;
+    isViewerUser?: boolean;
     showDeveloperUI: boolean;
     databaseLinks: ClusterLinkWithTitle[];
 }
@@ -29,6 +30,7 @@ export function DatabaseRightControls({
     databaseData,
     isDatabaseDataLoading,
     isV2NavigationEnabled,
+    isViewerUser,
     showDeveloperUI,
     databaseLinks,
 }: DatabaseRightControlsProps) {
@@ -62,6 +64,7 @@ export function DatabaseRightControls({
                 databaseData={databaseData}
                 isDatabaseDataLoading={isDatabaseDataLoading}
                 isV2NavigationEnabled={isV2NavigationEnabled}
+                isViewerUser={isViewerUser}
                 databaseLinks={actionDatabaseLinks}
             />
         </React.Fragment>
