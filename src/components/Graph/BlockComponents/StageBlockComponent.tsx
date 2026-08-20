@@ -15,7 +15,7 @@ export const StageBlockComponent = ({className, block}: Props) => {
             {block.operators
                 ? block.operators.map((item) => <div key={item}>{item}</div>)
                 : block.name}
-            {block.tables ? (
+            {block.tables?.length ? (
                 <div>
                     <Text color="secondary">{i18n('label_tables')}: </Text>
                     {block.tables.join(', ')}

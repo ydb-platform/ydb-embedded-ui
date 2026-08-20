@@ -1,12 +1,14 @@
 import React from 'react';
 
 import {GraphState} from '@gravity-ui/graph';
+import type {TBlockId} from '@gravity-ui/graph';
 import type {HookGraphParams} from '@gravity-ui/graph/react';
 import {GraphBlock, GraphCanvas, useGraph, useGraphEvent} from '@gravity-ui/graph/react';
 
 import {cn} from '../../utils/cn';
 
 const b = cn('ydb-gravity-graph');
+const GRAPH_FIT_PADDING = 40;
 
 import {ConnectionBlockComponent} from './BlockComponents/ConnectionBlockComponent';
 import {QueryBlockComponent} from './BlockComponents/QueryBlockComponent';
@@ -67,6 +69,42 @@ const renderBlockFn = (graph: any, block: any) => {
 
 export function GravityGraph<T>({data, theme}: Props<T>) {
     const {graph, start} = useGraph(config);
+    const cameraSizeRef = React.useRef({width: 0, height: 0});
+    const graphBlockIdsRef = React.useRef<TBlockId[]>([]);
+    const fitFrameRef = React.useRef<number>();
+    const fitGraphToViewport = React.useCallback(() => {
+        const {width, height} = graph.cameraService.getCameraState();
+
+        if (
+            graph.state !== GraphState.READY ||
+            width <= 0 ||
+            height <= 0 ||
+            graphBlockIdsRef.current.length === 0
+        ) {
+            return;
+        }
+
+        graph.zoomTo(graphBlockIdsRef.current, {padding: GRAPH_FIT_PADDING});
+    }, [graph]);
+    const scheduleGraphFit = React.useCallback(() => {
+        if (fitFrameRef.current !== undefined) {
+            globalThis.cancelAnimationFrame(fitFrameRef.current);
+        }
+
+        // camera-change is emitted before its new size is committed.
+        fitFrameRef.current = globalThis.requestAnimationFrame(() => {
+            fitFrameRef.current = undefined;
+            fitGraphToViewport();
+        });
+    }, [fitGraphToViewport]);
+
+    React.useEffect(() => {
+        return () => {
+            if (fitFrameRef.current !== undefined) {
+                globalThis.cancelAnimationFrame(fitFrameRef.current);
+            }
+        };
+    }, []);
 
     React.useEffect(() => {
         return runTreeLayout({
@@ -76,14 +114,16 @@ export function GravityGraph<T>({data, theme}: Props<T>) {
             },
             createWorker: () => new Worker(new URL('./treeLayout.worker', import.meta.url)),
             onResult: ({layout, edges}) => {
+                graphBlockIdsRef.current = layout.map(({id}) => id);
                 graph.setEntities({
                     blocks: layout,
                     connections: edges,
                 });
+                scheduleGraphFit();
             },
             onError: console.error,
         });
-    }, [data.nodes, data.links, graph]);
+    }, [data.nodes, data.links, graph, scheduleGraphFit]);
 
     React.useEffect(() => {
         graph.setColors(parseCustomPropertyValue(graphColorsConfig));
@@ -94,7 +134,6 @@ export function GravityGraph<T>({data, theme}: Props<T>) {
             graph.cameraService.set({
                 scale: 1,
                 scaleMax: 1.5,
-                scaleMin: 0.5,
             });
             graph.setConstants({
                 block: {
@@ -102,7 +141,17 @@ export function GravityGraph<T>({data, theme}: Props<T>) {
                 },
             });
             start();
-            // graph.zoomTo("center", { padding: 300 });
+        } else if (state === GraphState.READY) {
+            scheduleGraphFit();
+        }
+    });
+
+    useGraphEvent(graph, 'camera-change', ({width, height}) => {
+        const previousSize = cameraSizeRef.current;
+        cameraSizeRef.current = {width, height};
+
+        if (previousSize.width !== width || previousSize.height !== height) {
+            scheduleGraphFit();
         }
     });
 

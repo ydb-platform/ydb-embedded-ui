@@ -1,6 +1,7 @@
 import {expect, test} from '@playwright/test';
 import type {Locator, Page, Request} from '@playwright/test';
 
+import type {PlanNode} from '../../../../src/types/api/query';
 import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {getClipboardContent} from '../../../utils/clipboard';
 import {backend, database} from '../../../utils/constants';
@@ -106,6 +107,71 @@ async function expectLocatorWidth(locator: Locator, expectedWidth: number) {
     await expect.poll(() => getLocatorWidth(locator)).toBe(expectedWidth);
 }
 
+async function mockExplainPlan(page: Page, plan: PlanNode) {
+    await page.route(`${backend}/viewer/json/query?*`, async (route) => {
+        const body = getViewerQueryRequestBody(route.request());
+
+        if (body?.action !== 'explain-query') {
+            await route.continue();
+            return;
+        }
+
+        await route.fulfill({
+            json: {
+                plan: {
+                    meta: {version: '0.2', type: 'query'},
+                    Plan: plan,
+                },
+            },
+        });
+    });
+}
+
+function isGraphContentInsideViewport(graphLocator: Locator) {
+    return graphLocator.evaluate((root) => {
+        const canvas = root.querySelector('.graph-canvas') as HTMLElement & {
+            [key: symbol]: {
+                api: {getUsableRect(): {x: number; y: number; width: number; height: number}};
+                cameraService: {
+                    getRelativeViewportRect(options: {respectInsets: boolean}): {
+                        x: number;
+                        y: number;
+                        width: number;
+                        height: number;
+                    };
+                };
+            };
+        };
+        const graph = canvas?.[Symbol.for('graph')];
+
+        if (!graph) {
+            return false;
+        }
+
+        const contentRect = graph.api.getUsableRect();
+        if (contentRect.width === 0 && contentRect.height === 0) {
+            return false;
+        }
+        const relativeViewport = graph.cameraService.getRelativeViewportRect({
+            respectInsets: true,
+        });
+        const viewportRect = {
+            x: -relativeViewport.x,
+            y: -relativeViewport.y,
+            width: relativeViewport.width,
+            height: relativeViewport.height,
+        };
+        const tolerance = 1;
+
+        return (
+            contentRect.x >= viewportRect.x - tolerance &&
+            contentRect.x + contentRect.width <= viewportRect.x + viewportRect.width + tolerance &&
+            contentRect.y >= viewportRect.y - tolerance &&
+            contentRect.y + contentRect.height <= viewportRect.y + viewportRect.height + tolerance
+        );
+    });
+}
+
 test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
     const queryActionScreenshotThemes = ['light', 'dark'] as const;
@@ -179,6 +245,60 @@ test.describe('Test Query Editor', async () => {
 
         const explainAST = await queryEditor.getExplainResult(ExplainResultType.AST);
         await expect(explainAST).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+    });
+
+    test('Computation Graph fits a wide plan initially and after resize', async ({page}) => {
+        await mockExplainPlan(page, {
+            PlanNodeId: 1,
+            PlanNodeType: 'Query',
+            'Node Type': 'Query',
+            Plans: [
+                {PlanNodeId: 2, PlanNodeType: 'Stage', 'Node Type': 'Stage 1'},
+                {PlanNodeId: 3, PlanNodeType: 'Stage', 'Node Type': 'Stage 2'},
+                {PlanNodeId: 4, PlanNodeType: 'Stage', 'Node Type': 'Stage 3'},
+                {PlanNodeId: 5, PlanNodeType: 'Stage', 'Node Type': 'Stage 4'},
+                {PlanNodeId: 6, PlanNodeType: 'Stage', 'Node Type': 'Stage 5'},
+                {PlanNodeId: 7, PlanNodeType: 'Stage', 'Node Type': 'Stage 6'},
+            ],
+        });
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.explain(testQuery, QUERY_MODES.query);
+
+        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
+        await expect.poll(() => isGraphContentInsideViewport(explainSchema)).toBe(true);
+
+        await explainSchema.evaluate((element) => {
+            element.setAttribute('style', 'width: 320px; height: 180px');
+        });
+        await expect.poll(() => isGraphContentInsideViewport(explainSchema)).toBe(true);
+    });
+
+    test('Computation Graph omits the Tables row for an empty array', async ({page}) => {
+        await mockExplainPlan(page, {
+            PlanNodeId: 1,
+            PlanNodeType: 'Query',
+            'Node Type': 'Query',
+            Plans: [
+                {
+                    PlanNodeId: 2,
+                    PlanNodeType: 'Stage',
+                    'Node Type': 'Empty tables stage',
+                    Tables: [],
+                },
+            ],
+        });
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.explain(testQuery, QUERY_MODES.query);
+
+        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
+        await expect.poll(() => isGraphContentInsideViewport(explainSchema)).toBe(true);
+        await explainSchema.getByRole('button', {name: '1:1'}).click();
+        const stage = explainSchema
+            .locator('.ydb-gravity-graph__block-content.stage')
+            .filter({hasText: 'Empty tables stage'});
+
+        await expect(stage).toBeVisible();
+        await expect(stage).not.toContainText('Tables:');
     });
 
     test('Explain Analyze runs full-stats explanation and shows plan tabs without result tab', async ({
