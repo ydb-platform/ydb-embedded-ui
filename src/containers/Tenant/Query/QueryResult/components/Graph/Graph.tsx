@@ -23,14 +23,22 @@ export function Graph({explain = {}, theme}: GraphProps) {
     const {links, nodes} = explain;
 
     const data = React.useMemo(() => ({links: links || [], nodes: nodes || []}), [links, nodes]);
+    const [failedData, setFailedData] = React.useState<typeof data>();
+    const handleLayoutError = React.useCallback(
+        (error: Error) => {
+            console.error(error);
+            setFailedData(data);
+        },
+        [data],
+    );
 
-    if (!isValidGraphData(data)) {
+    if (!isValidGraphData(data) || failedData === data) {
         return <StubMessage message={i18n('description.graph-is-not-supported')} />;
     }
 
     return (
         <div className={b('canvas-container')}>
-            <GravityGraph data={data} theme={theme} />
+            <GravityGraph data={data} onError={handleLayoutError} theme={theme} />
         </div>
     );
 }

@@ -5,6 +5,7 @@ import type {TBlockId} from '@gravity-ui/graph';
 import type {HookGraphParams} from '@gravity-ui/graph/react';
 import {GraphBlock, GraphCanvas, useGraph, useGraphEvent} from '@gravity-ui/graph/react';
 
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 
 const b = cn('ydb-gravity-graph');
@@ -26,6 +27,7 @@ import './GravityGraph.scss';
 
 interface Props<T> {
     data: Data<T>;
+    onError: (error: Error) => void;
     theme?: string;
 }
 
@@ -35,6 +37,14 @@ const config: HookGraphParams = {
         connection: NonSelectableConnection,
         showConnectionArrows: false,
     },
+};
+
+const createGraphLayoutWorker = () => {
+    if (uiFactory.createGraphLayoutWorker) {
+        return uiFactory.createGraphLayoutWorker();
+    }
+
+    return new Worker(new URL('../../graphLayout.worker', import.meta.url));
 };
 
 const renderBlockFn = (graph: any, block: any) => {
@@ -67,7 +77,7 @@ const renderBlockFn = (graph: any, block: any) => {
     );
 };
 
-export function GravityGraph<T>({data, theme}: Props<T>) {
+export function GravityGraph<T>({data, onError, theme}: Props<T>) {
     const {graph, start} = useGraph(config);
     const cameraSizeRef = React.useRef({width: 0, height: 0});
     const graphBlockIdsRef = React.useRef<TBlockId[]>([]);
@@ -112,7 +122,7 @@ export function GravityGraph<T>({data, theme}: Props<T>) {
                 nodes: data.nodes,
                 links: data.links,
             },
-            createWorker: () => new Worker(new URL('./treeLayout.worker', import.meta.url)),
+            createWorker: createGraphLayoutWorker,
             onResult: ({layout, edges}) => {
                 graphBlockIdsRef.current = layout.map(({id}) => id);
                 graph.setEntities({
@@ -121,9 +131,9 @@ export function GravityGraph<T>({data, theme}: Props<T>) {
                 });
                 scheduleGraphFit();
             },
-            onError: console.error,
+            onError,
         });
-    }, [data.nodes, data.links, graph, scheduleGraphFit]);
+    }, [data.nodes, data.links, graph, onError, scheduleGraphFit]);
 
     React.useEffect(() => {
         graph.setColors(parseCustomPropertyValue(graphColorsConfig));
