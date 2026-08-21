@@ -22,7 +22,7 @@ export interface SaveChangesDialogOptions {
     existingQueryName?: string;
     queryBody: string;
     savedQueries: SavedQuery[];
-    onSaveQuery: (name: string | null, body: string) => void;
+    onSaveQuery: (name: string, body: string) => boolean;
 }
 
 interface SaveChangesDialogProps extends SaveChangesDialogOptions {
@@ -47,8 +47,8 @@ function SaveChangesDialog({
 
     const validateQueryName = React.useCallback(
         (value: string) => {
-            const validationError = getQueryNameValidationError(value);
-            if (validationError) {
+            const queryNameValidationError = getQueryNameValidationError(value);
+            if (queryNameValidationError) {
                 return i18n('error.name-not-empty');
             }
             if (hasSavedQueryNameCollision(savedQueries, existingQueryName ?? '', value)) {
@@ -137,7 +137,9 @@ export const SaveChangesDialogNiceModal = NiceModal.create((props: SaveChangesDi
 
     const handleSave = React.useCallback(
         (queryName: string) => {
-            props.onSaveQuery(queryName, props.queryBody);
+            if (!props.onSaveQuery(queryName, props.queryBody)) {
+                return;
+            }
             modal.resolve(true);
             handleClose();
         },

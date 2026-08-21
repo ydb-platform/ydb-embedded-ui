@@ -20,6 +20,7 @@ import {getSaveChangesConfirmation} from '../../SaveChangesDialog/SaveChangesDia
 import i18n from '../../i18n';
 import {getNewQueryTitle, getTabTitleForSave} from '../../utils/queryTabTitles';
 import {useSavedQueries} from '../../utils/useSavedQueries';
+import {useUpdateSavedQueryFromTab} from '../../utils/useUpdateSavedQueryFromTab';
 import {queryExecutionManagerInstance} from '../utils/queryExecutionManager';
 
 /**
@@ -42,16 +43,26 @@ export function useQueryTabsActions() {
     const tabsById = useTypedSelector(selectTabsById);
     const newTabCounter = useTypedSelector(selectNewTabCounter);
     const {savedQueries, saveQuery} = useSavedQueries();
+    const updateSavedQueryFromTab = useUpdateSavedQueryFromTab();
 
     const getCurrentTab = useEventHandler((tabId: string) => tabsById[tabId]);
 
     const getDirtyConfirmation = useEventHandler((tab: QueryTabState): Promise<boolean> => {
+        const handleSaveQuery = (queryName: string, queryBody: string) => {
+            if (!tab.savedQueryName) {
+                saveQuery(queryName, queryBody);
+                return true;
+            }
+
+            return updateSavedQueryFromTab(tab, queryName, queryBody);
+        };
+
         return getSaveChangesConfirmation({
             defaultQueryName: getTabTitleForSave(tab) ?? '',
             existingQueryName: tab.savedQueryName,
             queryBody: tab.input,
             savedQueries: savedQueries ?? [],
-            onSaveQuery: saveQuery,
+            onSaveQuery: handleSaveQuery,
         });
     });
 

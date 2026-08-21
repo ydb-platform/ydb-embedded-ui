@@ -15,11 +15,11 @@ import {setQueryAction} from '../../../../store/reducers/queryActions/queryActio
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
-import createToast from '../../../../utils/createToast';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getTabTitleForSave} from '../utils/queryTabTitles';
 import {hasSavedQueryName} from '../utils/savedQueries';
 import {useSavedQueries} from '../utils/useSavedQueries';
+import {useUpdateSavedQueryFromTab} from '../utils/useUpdateSavedQueryFromTab';
 
 import i18n from './i18n';
 
@@ -100,32 +100,14 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     const currentInput = useTypedSelector(selectUserInput);
     const onSaveQueryClick = useSaveQueryHandler({queryBody: currentInput});
     const currentSavedQueryName = activeTabSavedQueryName;
-
-    const {updateSavedQuery} = useSavedQueries();
+    const updateSavedQueryFromTab = useUpdateSavedQueryFromTab();
 
     const onEditQueryClick = () => {
         if (!activeTab || !currentSavedQueryName) {
             return;
         }
 
-        const result = updateSavedQuery(
-            currentSavedQueryName,
-            activeTab.title,
-            currentInput,
-            activeTab.id,
-        );
-        if (result === 'duplicate') {
-            createToast({
-                name: 'saved-query-name-exists',
-                title: '',
-                content: i18n('error.name-exists'),
-                theme: 'danger',
-            });
-            return;
-        }
-        if (result !== 'updated') {
-            return;
-        }
+        updateSavedQueryFromTab(activeTab, activeTab.title, currentInput);
     };
 
     const renderSaveDropdownMenu = () => {
