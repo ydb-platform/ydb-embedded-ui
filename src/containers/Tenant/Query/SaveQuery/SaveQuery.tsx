@@ -19,7 +19,7 @@ import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getTabTitleForSave} from '../utils/queryTabTitles';
 import {hasSavedQueryName} from '../utils/savedQueries';
 import {useSavedQueries} from '../utils/useSavedQueries';
-import {useUpdateSavedQueryFromTab} from '../utils/useUpdateSavedQueryFromTab';
+import {useEditExistingSavedQuery} from '../utils/useUpdateSavedQueryFromTab';
 
 import i18n from './i18n';
 
@@ -100,14 +100,14 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     const currentInput = useTypedSelector(selectUserInput);
     const onSaveQueryClick = useSaveQueryHandler({queryBody: currentInput});
     const currentSavedQueryName = activeTabSavedQueryName;
-    const updateSavedQueryFromTab = useUpdateSavedQueryFromTab();
+    const editExistingSavedQuery = useEditExistingSavedQuery();
 
     const onEditQueryClick = () => {
         if (!activeTab || !currentSavedQueryName) {
             return;
         }
 
-        updateSavedQueryFromTab(activeTab, activeTab.title, currentInput);
+        editExistingSavedQuery(activeTab, currentInput);
     };
 
     const renderSaveDropdownMenu = () => {

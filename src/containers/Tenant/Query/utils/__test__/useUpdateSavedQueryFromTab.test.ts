@@ -2,7 +2,7 @@ import {renderHook} from '@testing-library/react';
 
 import type {QueryTabState} from '../../../../../store/reducers/query/types';
 import createToast from '../../../../../utils/createToast';
-import {useUpdateSavedQueryFromTab} from '../useUpdateSavedQueryFromTab';
+import {useEditExistingSavedQuery, useUpdateSavedQueryFromTab} from '../useUpdateSavedQueryFromTab';
 
 const mockUpdateSavedQuery = jest.fn();
 
@@ -42,6 +42,19 @@ describe('useUpdateSavedQueryFromTab', () => {
             'tab-1',
         );
         expect(createToast).not.toHaveBeenCalled();
+    });
+
+    test('edits an existing query body without accepting a new saved query name', () => {
+        mockUpdateSavedQuery.mockReturnValue('updated');
+        const {result} = renderHook(() => useEditExistingSavedQuery());
+
+        expect(result.current(tab, 'SELECT next;')).toBe(true);
+        expect(mockUpdateSavedQuery).toHaveBeenCalledWith(
+            'Report',
+            'Report',
+            'SELECT next;',
+            'tab-1',
+        );
     });
 
     test('does not update an unbound tab', () => {

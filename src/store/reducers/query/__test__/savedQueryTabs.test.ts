@@ -249,3 +249,59 @@ test('syncs the saved body into clean tabs and preserves stale local input', () 
         'stale-tab': true,
     });
 });
+
+test('preserves tab-only titles when updating a saved query body without renaming it', () => {
+    const initialState: QueryState = {
+        activeTabId: 'source-tab',
+        tabsOrder: ['source-tab', 'clean-tab'],
+        tabsById: {
+            'source-tab': {
+                id: 'source-tab',
+                title: 'Local report tab',
+                input: 'SELECT new;',
+                savedInput: 'SELECT old;',
+                isDirty: true,
+                createdAt: 1,
+                updatedAt: 2,
+                savedQueryName: 'Report',
+            },
+            'clean-tab': {
+                id: 'clean-tab',
+                title: 'Report',
+                input: 'SELECT old;',
+                savedInput: 'SELECT old;',
+                isDirty: false,
+                createdAt: 3,
+                updatedAt: 4,
+                savedQueryName: 'Report',
+            },
+        },
+        newTabCounter: 2,
+    };
+
+    const state = queryReducer(
+        initialState,
+        syncSavedQueryTabsAfterUpdate({
+            sourceTabId: 'source-tab',
+            previousName: 'Report',
+            nextName: 'Report',
+            previousBody: 'SELECT old;',
+            nextBody: 'SELECT new;',
+        }),
+    );
+
+    expect(state.tabsById['source-tab']).toMatchObject({
+        title: 'Local report tab',
+        input: 'SELECT new;',
+        savedInput: 'SELECT new;',
+        savedQueryName: 'Report',
+        isDirty: false,
+    });
+    expect(state.tabsById['clean-tab']).toMatchObject({
+        title: 'Report',
+        input: 'SELECT new;',
+        savedInput: 'SELECT new;',
+        savedQueryName: 'Report',
+        isDirty: false,
+    });
+});

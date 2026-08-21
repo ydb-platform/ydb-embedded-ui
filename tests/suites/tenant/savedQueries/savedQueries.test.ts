@@ -165,6 +165,39 @@ test.describe('Saved Queries', () => {
         expect(row?.query.trim()).toBe(updatedQuery.trim());
     });
 
+    test('Edit existing keeps a tab-only rename out of the saved query', async ({page}) => {
+        const originalQuery = 'SELECT 31 AS tab_only_rename_original;';
+        const updatedQuery = 'SELECT 32 AS tab_only_rename_updated;';
+        const queryName = await tenantPage.saveQuery(originalQuery, `Tab-only Rename ${uuidv4()}`);
+        const tabTitle = `Local Tab ${uuidv4()}`;
+        const tabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
+
+        expect(tabId).not.toBe(null);
+        if (!tabId) {
+            throw new Error('Expected the saved-query tab to be available');
+        }
+
+        const renameQueryDialog = new RenameQueryDialog(page);
+        await tenantPage.queryEditor.editorTabs.openTabMenuById(tabId);
+        await tenantPage.queryEditor.editorTabs.clickMenuAction('Rename');
+        await renameQueryDialog.setTitle(tabTitle);
+        await renameQueryDialog.clickApply();
+
+        await tenantPage.queryEditor.setQuery(updatedQuery);
+        await tenantPage.queryEditor.clickEditButton();
+        await tenantPage.queryEditor.clickEditExistingButton();
+
+        await expect(tenantPage.queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(tabTitle);
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.isVisible();
+
+        const savedQuery = await tenantPage.savedQueriesTable.getRowByName(queryName);
+        const tabTitleQuery = await tenantPage.savedQueriesTable.getRowByName(tabTitle);
+        expect(savedQuery?.query.trim()).toBe(updatedQuery);
+        expect(tabTitleQuery).toBe(null);
+    });
+
     test('Single-tab save as new creates a new saved query and keeps the editor bound to it', async () => {
         await tenantPage.gotoQueryEditor({
             schema: dsVslotsSchema,

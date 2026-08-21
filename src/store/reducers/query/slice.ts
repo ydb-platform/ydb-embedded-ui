@@ -564,13 +564,16 @@ const slice = createSlice({
         ) => {
             const {sourceTabId, previousName, nextName, previousBody, nextBody} = action.payload;
             const matchingTabs = getTabsBoundToSavedQuery(state.tabsById, previousName);
+            const isSavedQueryRenamed = previousName !== nextName;
 
             matchingTabs.forEach((tab) => {
                 if (tab.id === sourceTabId || tab.input === previousBody) {
                     tab.input = nextBody;
                 }
 
-                tab.title = nextName;
+                if (isSavedQueryRenamed) {
+                    tab.title = nextName;
+                }
                 tab.savedQueryName = nextName;
                 tab.savedInput = nextBody;
                 tab.isDirty = tab.input !== nextBody;

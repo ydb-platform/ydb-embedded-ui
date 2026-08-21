@@ -10,12 +10,17 @@ export function useUpdateSavedQueryFromTab() {
     const {updateSavedQuery} = useSavedQueries();
 
     return React.useCallback(
-        (tab: QueryTabState, nextName: string, queryBody: string) => {
+        (tab: QueryTabState, nextSavedQueryName: string, queryBody: string) => {
             if (!tab.savedQueryName) {
                 return false;
             }
 
-            const result = updateSavedQuery(tab.savedQueryName, nextName, queryBody, tab.id);
+            const result = updateSavedQuery(
+                tab.savedQueryName,
+                nextSavedQueryName,
+                queryBody,
+                tab.id,
+            );
             if (result === 'updated') {
                 return true;
             }
@@ -32,5 +37,20 @@ export function useUpdateSavedQueryFromTab() {
             return false;
         },
         [updateSavedQuery],
+    );
+}
+
+export function useEditExistingSavedQuery() {
+    const updateSavedQueryFromTab = useUpdateSavedQueryFromTab();
+
+    return React.useCallback(
+        (tab: QueryTabState, queryBody: string) => {
+            if (!tab.savedQueryName) {
+                return false;
+            }
+
+            return updateSavedQueryFromTab(tab, tab.savedQueryName, queryBody);
+        },
+        [updateSavedQueryFromTab],
     );
 }
