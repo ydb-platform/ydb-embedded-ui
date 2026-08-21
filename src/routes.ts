@@ -185,8 +185,14 @@ export const getClusterPath = (
     return createHref(routes.cluster, params, query, options, domain);
 };
 
-export const getTenantPath = (query: TenantQuery, options?: CreateHrefOptions) => {
-    return createHref(routes.tenant, undefined, query, options);
+export interface TenantPathOptions extends CreateHrefOptions {
+    environment?: string;
+}
+
+export const getTenantPath = (query: TenantQuery, options: TenantPathOptions = {}) => {
+    const {environment: routeEnvironment, ...createHrefOptions} = options;
+
+    return createHref(routes.tenant, {environment: routeEnvironment}, query, createHrefOptions);
 };
 
 export const homePageTabSchema = z.enum(['clusters', 'databases']);
