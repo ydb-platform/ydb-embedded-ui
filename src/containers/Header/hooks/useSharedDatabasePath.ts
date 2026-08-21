@@ -2,12 +2,14 @@ import React from 'react';
 
 import {skipToken} from '@reduxjs/toolkit/query';
 
+import {getTenantBackend} from '../../../components/TenantNameWrapper/utils';
 import {getTenantPath} from '../../../routes';
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import {tenantsApi} from '../../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../../store/reducers/tenants/types';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
+import {useAdditionalTenantsProps} from '../../AppWithClusters/utils/useAdditionalTenantsProps';
 
 interface UseSharedDatabasePathParams {
     clusterName?: string;
@@ -20,6 +22,7 @@ export function useSharedDatabasePath({
     databaseData,
     isViewerUser,
 }: UseSharedDatabasePathParams) {
+    const additionalTenantsProps = useAdditionalTenantsProps({});
     const isMetaDatabasesAvailable = useDatabasesV2();
     const {settings, isResolved: isClusterBaseInfoResolved} = useClusterBaseInfo();
 
@@ -45,11 +48,14 @@ export function useSharedDatabasePath({
     }, [databaseData?.ResourceId, databaseData?.sharedTenantName, databases]);
 
     const sharedDatabase = useDatabaseId ? databaseData?.ResourceId : sharedDatabaseName;
+    const backend = databaseData
+        ? getTenantBackend(databaseData, additionalTenantsProps)
+        : undefined;
 
     return isViewerUser &&
         isClusterBaseInfoResolved &&
         databaseData?.Type === 'Serverless' &&
         sharedDatabase
-        ? getTenantPath({clusterName, database: sharedDatabase}, {withBasename: true})
+        ? getTenantPath({clusterName, database: sharedDatabase, backend}, {withBasename: true})
         : undefined;
 }
