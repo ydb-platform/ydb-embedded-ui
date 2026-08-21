@@ -5,9 +5,9 @@ const QUERY_TEXT_TAB_TITLE_MAX_LENGTH = 60;
 
 export function getNewQueryTitle(counter: number): string {
     if (counter === 0) {
-        return i18n('editor-tabs.default-title');
+        return i18n('title_new-query');
     }
-    return i18n('editor-tabs.default-title-indexed', {index: counter});
+    return i18n('title_new-query-indexed', {index: counter});
 }
 
 export function getQueryTextTabTitle(queryText: string): string {
@@ -17,14 +17,14 @@ export function getQueryTextTabTitle(queryText: string): string {
         .find(Boolean);
 
     if (!firstNonEmptyLine) {
-        return i18n('editor-tabs.default-title');
+        return i18n('title_new-query');
     }
 
     return firstNonEmptyLine.slice(0, QUERY_TEXT_TAB_TITLE_MAX_LENGTH);
 }
 
 export function isDefaultNewQueryTitle(title: string): boolean {
-    const baseTitle = i18n('editor-tabs.default-title');
+    const baseTitle = i18n('title_new-query');
     if (title === baseTitle) {
         return true;
     }
@@ -46,5 +46,5 @@ export function getTabTitleForSave(tab: QueryTabState | undefined): string | und
     if (!tab) {
         return undefined;
     }
-    return tab.title || i18n('editor-tabs.default-title');
+    return tab.title || i18n('title_new-query');
 }

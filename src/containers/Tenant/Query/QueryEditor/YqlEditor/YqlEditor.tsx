@@ -333,7 +333,7 @@ export function YqlEditor({
         editor.focus();
         editor.addAction({
             id: 'sendQuery',
-            label: i18n('action.send-query'),
+            label: i18n('action_send-query'),
             keybindings: [keybindings.sendQuery],
             // A precondition for this action.
             precondition: undefined,
@@ -535,7 +535,7 @@ export function YqlEditor({
 
         editor.addAction({
             id: 'sendSelectedQuery',
-            label: i18n('action.send-selected-query'),
+            label: i18n('action_send-selected-query'),
             keybindings: [keybindings.sendSelectedQuery],
             precondition: 'canSendQueryFragment',
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
@@ -571,7 +571,7 @@ export function YqlEditor({
 
         editor.addAction({
             id: 'previous-query',
-            label: i18n('action.previous-query'),
+            label: i18n('action_open-previous-query'),
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 2,
             run: () => {
@@ -580,7 +580,7 @@ export function YqlEditor({
         });
         editor.addAction({
             id: 'next-query',
-            label: i18n('action.next-query'),
+            label: i18n('action_open-next-query'),
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 3,
             run: () => {
@@ -589,13 +589,13 @@ export function YqlEditor({
         });
         editor.addAction({
             id: 'save-query',
-            label: i18n('action.save-query'),
+            label: i18n('action_save-query'),
             keybindings: [keybindings.saveQuery],
             run: () => handleSaveQueryAsAction(),
         });
         editor.addAction({
             id: 'openKeyboardShortcutsPanel',
-            label: i18n('action.open-shortcuts'),
+            label: i18n('action_open-keyboard-shortcuts'),
             keybindings: [keybindings.shortcutsHotkey],
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 4,
@@ -609,54 +609,54 @@ export function YqlEditor({
         if (isMultiTabQueryEditorEnabled) {
             editor.addAction({
                 id: 'newEditorTab',
-                label: i18n('editor-tabs.action.new-tab'),
+                label: i18n('action_open-new-editor-tab'),
                 keybindings: [keybindings.newTab],
                 run: () => handleNewTabAction(),
             });
             editor.addAction({
                 id: 'closeEditorTab',
-                label: i18n('editor-tabs.action.close-tab'),
+                label: i18n('action_close-editor-tab'),
                 keybindings: [keybindings.closeTab],
                 run: () => handleCloseActiveTabAction(),
             });
             editor.addAction({
                 id: 'renameEditorTab',
-                label: i18n('editor-tabs.rename-query'),
+                label: i18n('action_rename-query'),
                 keybindings: [keybindings.renameTab],
                 run: () => handleRenameTabAction(),
             });
             editor.addAction({
                 id: 'duplicateEditorTab',
-                label: i18n('editor-tabs.duplicate'),
+                label: i18n('action_duplicate-query-tab'),
                 run: () => handleDuplicateActiveTabAction(),
             });
             editor.addAction({
                 id: 'nextEditorTab',
-                label: i18n('editor-tabs.action.next-tab'),
+                label: i18n('action_open-next-editor-tab'),
                 keybindings: [keybindings.nextTab],
                 run: () => handleNextTabAction(),
             });
             editor.addAction({
                 id: 'previousEditorTab',
-                label: i18n('editor-tabs.action.previous-tab'),
+                label: i18n('action_open-previous-editor-tab'),
                 keybindings: [keybindings.previousTab],
                 run: () => handlePreviousTabAction(),
             });
             editor.addAction({
                 id: 'closeOtherEditorTabs',
-                label: i18n('editor-tabs.close-other-tabs'),
+                label: i18n('action_close-other-query-tabs'),
                 keybindings: [keybindings.closeOtherTabs],
                 run: () => handleCloseOtherTabsAction(),
             });
             editor.addAction({
                 id: 'closeAllEditorTabs',
-                label: i18n('editor-tabs.close-all-tabs'),
+                label: i18n('action_close-all-query-tabs'),
                 keybindings: [keybindings.closeAllTabs],
                 run: () => handleCloseAllTabsAction(),
             });
             editor.addAction({
                 id: 'saveQueryAs',
-                label: i18n('editor-tabs.save-query-as'),
+                label: i18n('action_save-query-as'),
                 keybindings: [keybindings.saveQueryAs],
                 run: () => handleSaveQueryAsAction(),
             });

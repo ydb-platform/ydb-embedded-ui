@@ -511,6 +511,22 @@ test.describe('Editor tabs', () => {
         await expect(queryEditor.isEditButtonVisible(1000)).resolves.toBe(false);
     });
 
+    test('Save and Edit controls stay enabled after executing queries', async () => {
+        await expect(queryEditor.isSaveButtonDisabled()).resolves.toBe(false);
+
+        await queryEditor.setQuery('SELECT 1 AS dirty_new_query;');
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.isSaveButtonDisabled()).resolves.toBe(false);
+
+        const savedQueryName = `Dirty state ${Date.now()}`;
+        await tenantPage.saveQuery('SELECT 2 AS clean_saved_query;', savedQueryName);
+        await expect(queryEditor.isEditButtonDisabled()).resolves.toBe(false);
+
+        await queryEditor.setQuery('SELECT 3 AS dirty_saved_query;');
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.isEditButtonDisabled()).resolves.toBe(false);
+    });
+
     test('Shows save changes dialog when closing a dirty newly created unnamed tab', async ({
         page,
     }) => {
@@ -522,6 +538,9 @@ test.describe('Editor tabs', () => {
         await queryEditor.editorTabs.hoverTab('New Query 1');
         await queryEditor.editorTabs.closeTab('New Query 1');
         await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
+        await expect(saveChangesDialog.getDescription()).resolves.toBe(
+            "Your changes will be lost if you don't save them",
+        );
         await saveChangesDialog.clickCancel();
 
         await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(2);

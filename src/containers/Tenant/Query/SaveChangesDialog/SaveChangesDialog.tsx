@@ -7,6 +7,7 @@ import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {getQueryNameValidationError} from '../utils/QueryNameValidation';
+import {hasSavedQueryNameCollision} from '../utils/savedQueries';
 
 import i18n from './i18n';
 
@@ -21,7 +22,7 @@ export interface SaveChangesDialogOptions {
     existingQueryName?: string;
     queryBody: string;
     savedQueries: SavedQuery[];
-    onSaveQuery: (name: string | null, body: string) => void;
+    onSaveQuery: (name: string, body: string) => boolean;
 }
 
 interface SaveChangesDialogProps extends SaveChangesDialogOptions {
@@ -46,22 +47,11 @@ function SaveChangesDialog({
 
     const validateQueryName = React.useCallback(
         (value: string) => {
-            const validationError = getQueryNameValidationError(value);
-            if (validationError) {
-                return validationError === 'not-empty'
-                    ? i18n('error.name-not-empty')
-                    : i18n('error.name-min-length');
+            const queryNameValidationError = getQueryNameValidationError(value);
+            if (queryNameValidationError) {
+                return i18n('error.name-not-empty');
             }
-            const normalizedValue = value.trim().toLowerCase();
-            const normalizedExistingQueryName = existingQueryName?.trim().toLowerCase();
-
-            if (
-                savedQueries?.some(
-                    (q) =>
-                        q.name.toLowerCase() === normalizedValue &&
-                        q.name.toLowerCase() !== normalizedExistingQueryName,
-                )
-            ) {
+            if (hasSavedQueryNameCollision(savedQueries, existingQueryName ?? '', value)) {
                 return i18n('error.name-exists');
             }
             return undefined;
@@ -78,7 +68,7 @@ function SaveChangesDialog({
         const error = validateQueryName(queryName);
         setValidationError(error);
         if (!error) {
-            onSave(queryName);
+            onSave(queryName.trim());
         }
     }, [queryName, validateQueryName, onSave]);
 
@@ -147,7 +137,9 @@ export const SaveChangesDialogNiceModal = NiceModal.create((props: SaveChangesDi
 
     const handleSave = React.useCallback(
         (queryName: string) => {
-            props.onSaveQuery(queryName, props.queryBody);
+            if (!props.onSaveQuery(queryName, props.queryBody)) {
+                return;
+            }
             modal.resolve(true);
             handleClose();
         },

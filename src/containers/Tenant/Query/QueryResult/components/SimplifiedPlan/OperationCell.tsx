@@ -102,12 +102,20 @@ export function OperationCell<TData>({row, depth = 0, params}: OperationCellProp
             {dividers}
             <Flex gap={1} className={block('operation-content')}>
                 {isExpandable && (
-                    <ActionTooltip title={i18n(isExpanded ? 'action.collapse' : 'action.expand')}>
+                    <ActionTooltip
+                        title={i18n(
+                            isExpanded ? 'action_collapse-query-view' : 'action_expand-query-view',
+                        )}
+                    >
                         <Button
                             view="flat"
                             size="xs"
                             onClick={row.getToggleExpandedHandler()}
-                            aria-label={i18n(isExpanded ? 'action.collapse' : 'action.expand')}
+                            aria-label={i18n(
+                                isExpanded
+                                    ? 'action_collapse-query-view'
+                                    : 'action_expand-query-view',
+                            )}
                         >
                             <Button.Icon>
                                 <ArrowToggle

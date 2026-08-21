@@ -210,6 +210,10 @@ export class QueryEditor {
         }
     }
 
+    async isSaveButtonDisabled() {
+        return this.saveButton.isDisabled();
+    }
+
     async clickEditButton() {
         await this.editButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.editButton.click();
@@ -222,6 +226,10 @@ export class QueryEditor {
         } catch {
             return false;
         }
+    }
+
+    async isEditButtonDisabled() {
+        return this.editButton.isDisabled();
     }
 
     async clickSaveAsNewEditButton() {

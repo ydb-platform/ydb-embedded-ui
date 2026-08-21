@@ -20,7 +20,7 @@ export function QueryEditorZeroTabsState({onCreateTab}: QueryEditorZeroTabsState
                 type="button"
                 className={b('card')}
                 onClick={onCreateTab}
-                aria-label={i18n('editor-tabs.empty-state.create-query')}
+                aria-label={i18n('action_create-query')}
                 data-qa="query-editor-zero-tabs-state"
             >
                 <Flex className={b('card-inner')} justifyContent="center" alignItems="center">
@@ -30,7 +30,7 @@ export function QueryEditorZeroTabsState({onCreateTab}: QueryEditorZeroTabsState
                         alignItems="center"
                     >
                         <Text as="span" variant="subheader-2" className={b('title')}>
-                            {i18n('editor-tabs.empty-state.create-query')}
+                            {i18n('action_create-query')}
                         </Text>
                         <Hotkey value={HOTKEY_LABELS.newTab} className={b('hotkey')} />
                     </Flex>
