@@ -4,7 +4,7 @@ import {skipToken} from '@reduxjs/toolkit/query';
 
 import {getTenantBackend} from '../../../components/TenantNameWrapper/utils';
 import {getTenantPath} from '../../../routes';
-import {environment} from '../../../store';
+import {backend as activeBackend, environment} from '../../../store';
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import {tenantsApi} from '../../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../../store/reducers/tenants/types';
@@ -17,6 +17,17 @@ interface UseSharedDatabasePathParams {
     databaseData?: PreparedTenant;
     isViewerUser?: boolean;
     prepareTenantBackend?: AdditionalTenantsProps['prepareTenantBackend'];
+}
+
+function getSharedDatabaseBackend(
+    databaseData: PreparedTenant | undefined,
+    prepareTenantBackend: AdditionalTenantsProps['prepareTenantBackend'],
+) {
+    if (!databaseData) {
+        return activeBackend;
+    }
+
+    return getTenantBackend(databaseData, {prepareTenantBackend}) ?? activeBackend;
 }
 
 export function useSharedDatabasePath({
@@ -52,9 +63,7 @@ export function useSharedDatabasePath({
     }, [databaseData?.ResourceId, databaseData?.sharedTenantName, databases]);
 
     const sharedDatabase = useDatabaseId ? databaseData?.ResourceId : sharedDatabaseName;
-    const backend = databaseData
-        ? getTenantBackend(databaseData, {prepareTenantBackend})
-        : undefined;
+    const backend = getSharedDatabaseBackend(databaseData, prepareTenantBackend);
 
     return isViewerUser &&
         isClusterBaseInfoResolved &&
