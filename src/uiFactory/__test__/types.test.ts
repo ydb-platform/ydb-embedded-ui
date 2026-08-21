@@ -4,12 +4,15 @@ import {
     isIssueTypeOfCategory,
     issueCategories,
 } from '../../containers/Tenant/Healthcheck/shared';
-import type {GetAdditionalDatabaseInfoItems} from '../../lib';
+import type {CreateGraphLayoutWorker, GetAdditionalDatabaseInfoItems} from '../../lib';
 import type {UIFactory} from '../types';
 import {configureUIFactory, uiFactory} from '../uiFactory';
 
 afterEach(() => {
-    configureUIFactory({getAdditionalDatabaseInfoItems: undefined});
+    configureUIFactory({
+        createGraphLayoutWorker: undefined,
+        getAdditionalDatabaseInfoItems: undefined,
+    });
 });
 
 test('allows consumers to omit the defaulted maximum VDisk count', () => {
@@ -59,4 +62,13 @@ test('supports additional database info items built from prepared tenant data', 
             copyText: 'cloud-id',
         },
     ]);
+});
+
+test('supports a custom graph layout worker factory', () => {
+    const worker = {} as Worker;
+    const createGraphLayoutWorker: CreateGraphLayoutWorker = () => worker;
+
+    configureUIFactory({createGraphLayoutWorker});
+
+    expect(uiFactory.createGraphLayoutWorker?.()).toBe(worker);
 });

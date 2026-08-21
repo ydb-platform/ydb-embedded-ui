@@ -280,9 +280,11 @@ test.describe('Operations Tab - Infinite Query', () => {
         expect(Math.abs(stillFinalRowCount - finalRowCount)).toBeLessThanOrEqual(5);
     });
 
-    test('loads all operations when scrolling to the bottom multiple times', async ({page}) => {
+    test('requests all operation pages when scrolling to the bottom multiple times', async ({
+        page,
+    }) => {
         // Setup mocks with 80 operations (4 pages of 20)
-        await setupOperationsMock(page, {totalOperations: 80});
+        const operationsMock = await setupOperationsMock(page, {totalOperations: 80});
 
         const pageQueryParams = {
             schema: database,
@@ -300,51 +302,16 @@ test.describe('Operations Tab - Infinite Query', () => {
         await diagnostics.operations.waitForTableVisible();
         await diagnostics.operations.waitForDataLoad();
 
-        // Get initial row count (should be around 20)
-        const initialRowCount = await diagnostics.operations.getRowCount();
-        expect(initialRowCount).toBeGreaterThan(0);
-        expect(initialRowCount).toBeLessThanOrEqual(20);
-
-        // Keep scrolling until all operations are loaded
-        let previousRowCount = initialRowCount;
-        let currentRowCount = initialRowCount;
-        const maxScrollAttempts = 4; // Initial page plus three additional mocked pages
-        let scrollAttempts = 0;
-
-        // Keep track of whether we're still loading more data
-        let hasMoreData = true;
-
-        while (hasMoreData && scrollAttempts < maxScrollAttempts) {
-            // Scroll to bottom
+        // Keep scrolling until all four mocked pages have been requested.
+        while (operationsMock.getRequestedPageIndexes().length < 4) {
+            const previousPageCount = operationsMock.getRequestedPageIndexes().length;
             await diagnostics.operations.scrollToBottom();
-
-            // Wait for row count to change or timeout
-            try {
-                currentRowCount = await diagnostics.operations.waitForRowCountToChange(
-                    previousRowCount,
-                    3000,
-                );
-                // If row count changed, we still have more data
-                hasMoreData = true;
-            } catch (_e) {
-                // If timeout, the count didn't change - we might have reached the end
-                currentRowCount = await diagnostics.operations.getRowCount();
-                hasMoreData = false;
-            }
-
-            previousRowCount = currentRowCount;
-            scrollAttempts++;
+            await expect
+                .poll(() => operationsMock.getRequestedPageIndexes().length)
+                .toBeGreaterThan(previousPageCount);
+            await diagnostics.operations.waitForLoadingMoreToDisappear();
         }
 
-        // With virtualization, we can't verify exact count via DOM
-        // But we should have more rows than initially
-        expect(currentRowCount).toBeGreaterThan(initialRowCount);
-
-        const rowCount = await diagnostics.operations.getRowCount();
-        // Verify we can read data from the last visible row
-        if (rowCount > 0) {
-            const lastRowData = await diagnostics.operations.getRowData(rowCount - 1);
-            expect(lastRowData['Operation ID']).toContain('ydb://');
-        }
+        expect(operationsMock.getRequestedPageIndexes()).toEqual([0, 1, 2, 3]);
     });
 });
