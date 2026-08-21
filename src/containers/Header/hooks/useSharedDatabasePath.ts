@@ -8,22 +8,23 @@ import {environment} from '../../../store';
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import {tenantsApi} from '../../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../../store/reducers/tenants/types';
+import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
-import {useAdditionalTenantsProps} from '../../AppWithClusters/utils/useAdditionalTenantsProps';
 
 interface UseSharedDatabasePathParams {
     clusterName?: string;
     databaseData?: PreparedTenant;
     isViewerUser?: boolean;
+    prepareTenantBackend?: AdditionalTenantsProps['prepareTenantBackend'];
 }
 
 export function useSharedDatabasePath({
     clusterName,
     databaseData,
     isViewerUser,
+    prepareTenantBackend,
 }: UseSharedDatabasePathParams) {
-    const additionalTenantsProps = useAdditionalTenantsProps({});
     const isMetaDatabasesAvailable = useDatabasesV2();
     const {settings, isResolved: isClusterBaseInfoResolved} = useClusterBaseInfo();
 
@@ -52,7 +53,7 @@ export function useSharedDatabasePath({
 
     const sharedDatabase = useDatabaseId ? databaseData?.ResourceId : sharedDatabaseName;
     const backend = databaseData
-        ? getTenantBackend(databaseData, additionalTenantsProps)
+        ? getTenantBackend(databaseData, {prepareTenantBackend})
         : undefined;
 
     return isViewerUser &&

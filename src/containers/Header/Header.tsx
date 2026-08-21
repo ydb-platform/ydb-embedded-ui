@@ -38,6 +38,7 @@ export function Header() {
         isDatabaseDataLoading,
         clusterLinks,
         databaseLinks,
+        prepareTenantBackend,
     } = useHeaderData({
         metaCapabilitiesLoaded,
         database,
@@ -90,6 +91,7 @@ export function Header() {
                 isAddClusterAvailable={isAddClusterAvailable}
                 isV2NavigationEnabled={isV2NavigationEnabled}
                 isViewerUser={isViewerUser}
+                prepareTenantBackend={prepareTenantBackend}
                 clusterLinks={clusterLinks}
                 databaseLinks={databaseLinks}
                 handleEditCluster={handleEditCluster}
