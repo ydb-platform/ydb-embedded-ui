@@ -1,0 +1,7 @@
+/setup*
+/index.tsx
+**/__test__
+**/__tests__
+**/tests
+**/__mocks__
+**/*.{spec,test}.{js,jsx,ts,tsx}

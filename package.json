@@ -2,7 +2,8 @@
   "name": "ydb-embedded-ui",
   "version": "20.2.1",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "main": "dist/lib.js",
   "engines": {
