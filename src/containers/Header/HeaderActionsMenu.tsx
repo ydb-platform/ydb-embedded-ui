@@ -9,7 +9,7 @@ import {DropdownMenu} from '../../components/DropdownMenu';
 import {getClusterPath} from '../../routes';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
-import type {ClusterLinkWithTitle} from '../../types/additionalProps';
+import type {AdditionalTenantsProps, ClusterLinkWithTitle} from '../../types/additionalProps';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {clusterTabsIds} from '../Cluster/utils';
 
@@ -24,6 +24,7 @@ export interface HeaderActionsMenuProps {
     isDatabaseDataLoading: boolean;
     isV2NavigationEnabled: boolean;
     isViewerUser?: boolean;
+    prepareTenantBackend?: AdditionalTenantsProps['prepareTenantBackend'];
     databaseLinks: ClusterLinkWithTitle[];
 }
 
@@ -34,12 +35,18 @@ export function DBHeaderActionsMenu({
     isDatabaseDataLoading,
     isV2NavigationEnabled,
     isViewerUser,
+    prepareTenantBackend,
     databaseLinks,
 }: HeaderActionsMenuProps) {
     const history = useHistory();
 
     const emMetaAvailable = useEmMetaAvailable();
-    const sharedDatabasePath = useSharedDatabasePath({clusterName, databaseData, isViewerUser});
+    const sharedDatabasePath = useSharedDatabasePath({
+        clusterName,
+        databaseData,
+        isViewerUser,
+        prepareTenantBackend,
+    });
 
     const isEditDBAvailable = emMetaAvailable && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable = emMetaAvailable && uiFactory.onDeleteDB !== undefined;
