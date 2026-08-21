@@ -1,0 +1,354 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - img [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+      - generic [ref=e18]:
+        - button "Information" [ref=e19] [cursor=pointer]:
+          - img [ref=e22]:
+            - img [ref=e23]
+          - generic "Information":
+            - generic: Information
+        - button "Settings" [ref=e25] [cursor=pointer]:
+          - img [ref=e28]:
+            - img [ref=e29]
+          - generic "Settings":
+            - generic: Settings
+        - button "Account" [ref=e31] [cursor=pointer]:
+          - img [ref=e34]:
+            - img [ref=e35]
+          - generic "Account":
+            - generic: Account
+      - button "Expand" [ref=e37] [cursor=pointer]:
+        - img [ref=e38]:
+          - img [ref=e39]
+    - generic [ref=e41]:
+      - banner [ref=e42]:
+        - list [ref=e43]:
+          - listitem [ref=e44]:
+            - link "Cluster" [ref=e45] [cursor=pointer]:
+              - link "Cluster" [ref=e46]:
+                - /url: /cluster
+                - generic [ref=e47]:
+                  - img [ref=e48]
+                  - text: Cluster
+            - generic [ref=e50]: /
+          - listitem [ref=e51]:
+            - link "local" [disabled] [ref=e52]:
+              - generic [ref=e54]:
+                - img [ref=e55]
+                - text: local
+        - generic [ref=e57]:
+          - button "Connect" [ref=e58] [cursor=pointer]:
+            - img [ref=e61]:
+              - img [ref=e62]
+            - generic [ref=e64]: Connect
+          - link "Developer UI" [ref=e65] [cursor=pointer]:
+            - /url: http://localhost:8765/internal
+            - img [ref=e68]:
+              - img [ref=e69]
+            - generic [ref=e71]: Developer UI
+      - main [ref=e72]:
+        - generic [ref=e75]:
+          - generic [ref=e76]:
+            - generic [ref=e78]:
+              - generic [ref=e79]:
+                - generic [ref=e80]: Navigation
+                - generic [ref=e84]:
+                  - generic [ref=e87] [cursor=pointer]:
+                    - button [ref=e88]
+                    - generic [ref=e90]:
+                      - img [ref=e92]
+                      - generic [ref=e94]: /local
+                  - generic [ref=e97] [cursor=pointer]:
+                    - button [ref=e98]
+                    - generic [ref=e100]:
+                      - img [ref=e102]
+                      - generic [ref=e104]: .metadata
+                  - generic [ref=e107] [cursor=pointer]:
+                    - button [ref=e108]
+                    - generic [ref=e110]:
+                      - img [ref=e112]
+                      - generic [ref=e114]: .sys
+                  - generic [ref=e119] [cursor=pointer]:
+                    - img [ref=e121]
+                    - generic [ref=e123]: .sys_health
+              - generic [ref=e125]:
+                - generic [ref=e126]:
+                  - generic [ref=e127]:
+                    - generic [ref=e128]:
+                      - generic [ref=e129]: domain
+                      - generic [ref=e130]: /local
+                    - generic [ref=e131]:
+                      - button "Copy" [ref=e132] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                      - button [ref=e133] [cursor=pointer]:
+                        - img [ref=e136]:
+                          - img [ref=e137]
+                  - tablist [ref=e141]:
+                    - tab "Overview" [selected] [ref=e142] [cursor=pointer]:
+                      - link "Overview" [ref=e145]:
+                        - /url: /database?diagnosticsTab=access&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics&summaryTab=overview
+                - generic [ref=e146]:
+                  - generic [ref=e147]: Directory
+                  - generic [ref=e148]:
+                    - generic [ref=e149]:
+                      - term [ref=e150]:
+                        - generic [ref=e151]: Type
+                      - definition [ref=e153]:
+                        - generic [ref=e154]: Domain
+                    - generic [ref=e155]:
+                      - term [ref=e156]:
+                        - generic [ref=e157]: Id
+                      - definition [ref=e159]:
+                        - generic [ref=e160]: "1"
+                    - generic [ref=e161]:
+                      - term [ref=e162]:
+                        - generic [ref=e163]: Version
+                      - definition [ref=e165]:
+                        - generic [ref=e166]: "27"
+                    - generic [ref=e167]:
+                      - term [ref=e168]:
+                        - generic [ref=e169]: Created
+                      - definition [ref=e171]:
+                        - generic [ref=e172]: 2026-04-30 13:27
+            - generic [ref=e173]:
+              - button [ref=e174] [cursor=pointer]:
+                - img [ref=e177]:
+                  - img [ref=e178]
+              - button [ref=e180] [cursor=pointer]:
+                - img [ref=e183]:
+                  - img [ref=e184]
+          - generic [ref=e188]:
+            - radiogroup [ref=e190]:
+              - generic [ref=e191] [cursor=pointer]:
+                - radio "Query" [ref=e192]
+                - generic [ref=e194]:
+                  - img [ref=e195]:
+                    - img [ref=e196]
+                  - generic [ref=e198]: Query
+              - generic [ref=e199]:
+                - radio "Diagnostics" [checked] [ref=e200]
+                - generic [ref=e202]:
+                  - img [ref=e203]:
+                    - img [ref=e204]
+                  - generic [ref=e208]: Diagnostics
+            - generic [ref=e209]:
+              - generic [ref=e211]:
+                - tablist [ref=e212]:
+                  - tab "Info" [ref=e213] [cursor=pointer]:
+                    - link "Info" [ref=e216]:
+                      - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - tab "Queries" [ref=e217] [cursor=pointer]:
+                    - link "Queries" [ref=e220]:
+                      - /url: /database?diagnosticsTab=topQueries&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - tab "Top shards" [ref=e221] [cursor=pointer]:
+                    - link "Top shards" [ref=e224]:
+                      - /url: /database?diagnosticsTab=topShards&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - tab "Nodes" [ref=e225] [cursor=pointer]:
+                    - link "Nodes" [ref=e228]:
+                      - /url: /database?diagnosticsTab=nodes&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - tab "Tablets" [ref=e229] [cursor=pointer]:
+                    - link "Tablets" [ref=e232]:
+                      - /url: /database?diagnosticsTab=tablets&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - tab "Storage" [ref=e233] [cursor=pointer]:
+                    - link "Storage" [ref=e236]:
+                      - /url: /database?diagnosticsTab=storage&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - tab "Network" [ref=e237] [cursor=pointer]:
+                    - link "Network" [ref=e240]:
+                      - /url: /database?diagnosticsTab=network&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - tab "Describe" [ref=e241] [cursor=pointer]:
+                    - link "Describe" [ref=e244]:
+                      - /url: /database?diagnosticsTab=describe&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - tab "Configs" [ref=e245] [cursor=pointer]:
+                    - link "Configs" [ref=e248]:
+                      - /url: /database?diagnosticsTab=configs&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - tab "Access" [selected] [ref=e249] [cursor=pointer]:
+                    - link "Access" [ref=e252]:
+                      - /url: /database?diagnosticsTab=access&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - tab "Operations" [ref=e253] [cursor=pointer]:
+                    - link "Operations" [ref=e256]:
+                      - /url: /database?diagnosticsTab=operations&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                - generic [ref=e257]:
+                  - button "Refresh" [ref=e258] [cursor=pointer]:
+                    - img [ref=e261]
+                  - group [ref=e264] [cursor=pointer]:
+                    - combobox [ref=e265]:
+                      - generic [ref=e266]: None
+                    - img [ref=e267]:
+                      - img [ref=e268]
+              - generic [ref=e271]:
+                - generic [ref=e272]:
+                  - generic [ref=e273]:
+                    - generic [ref=e275]:
+                      - generic [ref=e276]:
+                        - generic [ref=e277]:
+                          - img "rootnew" [ref=e278]:
+                            - generic [ref=e279]: RO
+                          - img [ref=e281]:
+                            - img [ref=e282]
+                        - generic [ref=e286]:
+                          - generic [ref=e287]: rootnew
+                          - generic [ref=e288]: owner
+                      - generic [ref=e289]:
+                        - separator [ref=e290]
+                        - button [active] [ref=e291] [cursor=pointer]:
+                          - img [ref=e294]:
+                            - img [ref=e295]
+                    - generic [ref=e297]: The owner has complete management authority over the object and cannot acquire or lose any rights associated with it.
+                  - button "Grant Access" [ref=e298] [cursor=pointer]:
+                    - img [ref=e301]:
+                      - img [ref=e302]
+                    - generic [ref=e304]: Grant Access
+                - generic [ref=e306]:
+                  - table [ref=e309]:
+                    - rowgroup [ref=e310]:
+                      - row "Subject Explicit rights Effective rights" [ref=e311]:
+                        - columnheader "Subject" [ref=e312] [cursor=pointer]:
+                          - generic [ref=e313]:
+                            - text: Subject
+                            - img [ref=e315]
+                        - columnheader "Explicit rights" [ref=e317]:
+                          - generic [ref=e319]:
+                            - text: Explicit rights
+                            - button [ref=e320] [cursor=pointer]:
+                              - img [ref=e321]:
+                                - img [ref=e322]
+                        - columnheader "Effective rights" [ref=e324]:
+                          - generic [ref=e326]:
+                            - text: Effective rights
+                            - button [ref=e327] [cursor=pointer]:
+                              - img [ref=e328]:
+                                - img [ref=e329]
+                  - table [ref=e333]:
+                    - rowgroup:
+                      - row "Subject Explicit rights Effective rights":
+                        - columnheader "Subject":
+                          - generic:
+                            - text: Subject
+                            - img [ref=e335] [cursor=pointer]
+                        - columnheader "Explicit rights":
+                          - generic [ref=e337]:
+                            - text: Explicit rights
+                            - button [ref=e338] [cursor=pointer]:
+                              - img [ref=e339]:
+                                - img [ref=e340]
+                        - columnheader "Effective rights":
+                          - generic [ref=e342]:
+                            - text: Effective rights
+                            - button [ref=e343] [cursor=pointer]:
+                              - img [ref=e344]:
+                                - img [ref=e345]
+                    - rowgroup [ref=e347]:
+                      - row "USERS USERS connect connect" [ref=e348]:
+                        - cell "USERS USERS" [ref=e349]:
+                          - generic [ref=e350]:
+                            - img "USERS" [ref=e352]:
+                              - generic [ref=e353]: US
+                            - generic [ref=e355]: USERS
+                        - cell "connect" [ref=e356]:
+                          - generic [ref=e361]: connect
+                        - cell "connect" [ref=e362]:
+                          - generic [ref=e366]: connect
+                      - row "METADATA-READERS METADATA-READERS list list" [ref=e367]:
+                        - cell "METADATA-READERS METADATA-READERS" [ref=e368]:
+                          - generic [ref=e369]:
+                            - img "METADATA-READERS" [ref=e371]:
+                              - generic [ref=e372]: MR
+                            - generic [ref=e374]: METADATA-READERS
+                        - cell "list" [ref=e375]:
+                          - generic [ref=e380]: list
+                        - cell "list" [ref=e381]:
+                          - generic [ref=e385]: list
+                      - row "DATA-READERS DATA-READERS select_row select_row" [ref=e386]:
+                        - cell "DATA-READERS DATA-READERS" [ref=e387]:
+                          - generic [ref=e388]:
+                            - img "DATA-READERS" [ref=e390]:
+                              - generic [ref=e391]: DR
+                            - generic [ref=e393]: DATA-READERS
+                        - cell "select_row" [ref=e394]:
+                          - generic [ref=e395]:
+                            - generic [ref=e399]: select_row
+                            - generic [ref=e400]:
+                              - button [ref=e401] [cursor=pointer]:
+                                - img [ref=e404]:
+                                  - img [ref=e405]
+                              - button [ref=e408] [cursor=pointer]:
+                                - img [ref=e411]:
+                                  - img [ref=e412]
+                        - cell "select_row" [ref=e414]:
+                          - generic [ref=e418]: select_row
+                      - row "DATA-WRITERS DATA-WRITERS update_row erase_row update_row erase_row" [ref=e419]:
+                        - cell "DATA-WRITERS DATA-WRITERS" [ref=e420]:
+                          - generic [ref=e421]:
+                            - img "DATA-WRITERS" [ref=e423]:
+                              - generic [ref=e424]: DW
+                            - generic [ref=e426]: DATA-WRITERS
+                        - cell "update_row erase_row" [ref=e427]:
+                          - generic [ref=e429]:
+                            - generic [ref=e432]: update_row
+                            - generic [ref=e435]: erase_row
+                        - cell "update_row erase_row" [ref=e436]:
+                          - generic [ref=e437]:
+                            - generic [ref=e440]: update_row
+                            - generic [ref=e443]: erase_row
+                      - row "DDL-ADMINS DDL-ADMINS modify_attributes create_directory create_table create_queue remove_schema alter_schema 16384 modify_attributes create_directory create_table create_queue remove_schema alter_schema 16384" [ref=e444]:
+                        - cell "DDL-ADMINS DDL-ADMINS" [ref=e445]:
+                          - generic [ref=e446]:
+                            - img "DDL-ADMINS" [ref=e448]:
+                              - generic [ref=e449]: DA
+                            - generic [ref=e451]: DDL-ADMINS
+                        - cell "modify_attributes create_directory create_table create_queue remove_schema alter_schema 16384" [ref=e452]:
+                          - generic [ref=e454]:
+                            - generic [ref=e457]: modify_attributes
+                            - generic [ref=e460]: create_directory
+                            - generic [ref=e463]: create_table
+                            - generic [ref=e466]: create_queue
+                            - generic [ref=e469]: remove_schema
+                            - generic [ref=e472]: alter_schema
+                            - generic [ref=e475]: "16384"
+                        - cell "modify_attributes create_directory create_table create_queue remove_schema alter_schema 16384" [ref=e476]:
+                          - generic [ref=e477]:
+                            - generic [ref=e480]: modify_attributes
+                            - generic [ref=e483]: create_directory
+                            - generic [ref=e486]: create_table
+                            - generic [ref=e489]: create_queue
+                            - generic [ref=e492]: remove_schema
+                            - generic [ref=e495]: alter_schema
+                            - generic [ref=e498]: "16384"
+                      - row "ACCESS-ADMINS ACCESS-ADMINS grant grant" [ref=e499]:
+                        - cell "ACCESS-ADMINS ACCESS-ADMINS" [ref=e500]:
+                          - generic [ref=e501]:
+                            - img "ACCESS-ADMINS" [ref=e503]:
+                              - generic [ref=e504]: AA
+                            - generic [ref=e506]: ACCESS-ADMINS
+                        - cell "grant" [ref=e507]:
+                          - generic [ref=e512]: grant
+                        - cell "grant" [ref=e513]:
+                          - generic [ref=e517]: grant
+                      - row "DATABASE-ADMINS DATABASE-ADMINS manage manage" [ref=e518]:
+                        - cell "DATABASE-ADMINS DATABASE-ADMINS" [ref=e519]:
+                          - generic [ref=e520]:
+                            - img "DATABASE-ADMINS" [ref=e522]:
+                              - generic [ref=e523]: DA
+                            - generic [ref=e525]: DATABASE-ADMINS
+                        - cell "manage" [ref=e526]:
+                          - generic [ref=e531]: manage
+                        - cell "manage" [ref=e532]:
+                          - generic [ref=e536]: manage
+  - generic [ref=e538]:
+    - img [ref=e540]:
+      - img [ref=e541]
+    - generic [ref=e543]:
+      - heading "Request succeeded" [level=3] [ref=e544]
+      - button "Close" [ref=e545] [cursor=pointer]:
+        - img [ref=e548]:
+          - img [ref=e549]
+      - generic [ref=e551]: Owner has been successfully changed
+```

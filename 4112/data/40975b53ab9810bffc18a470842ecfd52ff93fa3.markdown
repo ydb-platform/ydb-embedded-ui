@@ -1,0 +1,193 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - img [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+      - list [ref=e21]:
+        - generic [ref=e22]:
+          - listitem [ref=e23]:
+            - link "Database" [ref=e28] [cursor=pointer]:
+              - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=database
+              - img [ref=e31]:
+                - img [ref=e32]
+              - generic "Database":
+                - generic: Database
+          - listitem [ref=e34]:
+            - link "Diagnostics" [ref=e39] [cursor=pointer]:
+              - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+              - img [ref=e42]:
+                - img [ref=e43]
+              - generic "Diagnostics":
+                - generic: Diagnostics
+          - listitem [ref=e45]:
+            - link "SQL Editor" [ref=e50] [cursor=pointer]:
+              - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query
+              - img [ref=e53]:
+                - img [ref=e54]
+              - generic "SQL Editor":
+                - generic: SQL Editor
+      - generic [ref=e56]:
+        - button "Information" [ref=e57] [cursor=pointer]:
+          - img [ref=e60]:
+            - img [ref=e61]
+          - generic "Information":
+            - generic: Information
+        - button "Settings" [ref=e63] [cursor=pointer]:
+          - img [ref=e66]:
+            - img [ref=e67]
+          - generic "Settings":
+            - generic: Settings
+        - button "Account" [ref=e69] [cursor=pointer]:
+          - img [ref=e72]:
+            - img [ref=e73]
+          - generic "Account":
+            - generic: Account
+      - button "Expand" [ref=e75] [cursor=pointer]:
+        - img [ref=e76]:
+          - img [ref=e77]
+    - generic [ref=e80]:
+      - banner [ref=e81]:
+        - list [ref=e82]:
+          - listitem [ref=e83]:
+            - link "Cluster" [ref=e84] [cursor=pointer]:
+              - link "Cluster" [ref=e85]:
+                - /url: /cluster
+                - generic [ref=e86]: Cluster
+            - generic [ref=e87]: /
+          - listitem [ref=e88]:
+            - link "local" [disabled] [ref=e89]:
+              - generic [ref=e91]: local
+          - listitem [ref=e92]:
+            - generic [ref=e93]:
+              - generic [ref=e94]:
+                - button "Copy path" [ref=e95] [cursor=pointer]:
+                  - generic:
+                    - generic:
+                      - img:
+                        - img
+                - button [ref=e96] [cursor=pointer]:
+                  - img [ref=e99]:
+                    - img [ref=e100]
+              - generic [ref=e103] [cursor=pointer]:
+                - img [ref=e105]:
+                  - img [ref=e106]
+                - 'button "Good: 1 issue" [ref=e108]':
+                  - generic [ref=e111]:
+                    - text: "Good: 1 issue"
+                    - img [ref=e112]:
+                      - img [ref=e113]
+        - generic [ref=e115]:
+          - link "Developer UI" [ref=e116] [cursor=pointer]:
+            - /url: http://localhost:8765/internal
+            - img [ref=e119]:
+              - img [ref=e120]
+            - generic [ref=e122]: Developer UI
+          - button [ref=e125] [cursor=pointer]:
+            - img [ref=e128]:
+              - img [ref=e129]
+      - main [ref=e131]:
+        - generic [ref=e134]:
+          - generic [ref=e135]:
+            - generic [ref=e137]:
+              - generic [ref=e138]:
+                - generic [ref=e139]: Navigation
+                - generic [ref=e146] [cursor=pointer]:
+                  - button [ref=e147]
+                  - generic [ref=e149]:
+                    - img [ref=e151]
+                    - generic [ref=e153]: /local
+              - generic [ref=e155]:
+                - generic [ref=e156]:
+                  - generic [ref=e157]:
+                    - generic [ref=e158]:
+                      - generic [ref=e159]: domain
+                      - generic [ref=e160]: /local
+                    - generic [ref=e161]:
+                      - button "Copy" [ref=e162] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                      - button [ref=e163] [cursor=pointer]:
+                        - img [ref=e166]:
+                          - img [ref=e167]
+                  - tablist [ref=e171]:
+                    - tab "Overview" [selected] [ref=e172] [cursor=pointer]:
+                      - link "Overview" [ref=e175]:
+                        - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query&summaryTab=overview
+                - generic [ref=e176]:
+                  - generic [ref=e177]: Directory
+                  - generic [ref=e178]:
+                    - generic [ref=e179]:
+                      - term [ref=e180]:
+                        - generic [ref=e181]: Type
+                      - definition [ref=e183]:
+                        - generic [ref=e184]: Domain
+                    - generic [ref=e185]:
+                      - term [ref=e186]:
+                        - generic [ref=e187]: Id
+                      - definition [ref=e189]:
+                        - generic [ref=e190]: "1"
+                    - generic [ref=e191]:
+                      - term [ref=e192]:
+                        - generic [ref=e193]: Version
+                      - definition [ref=e195]:
+                        - generic [ref=e196]: "37"
+                    - generic [ref=e197]:
+                      - term [ref=e198]:
+                        - generic [ref=e199]: Created
+                      - definition [ref=e201]:
+                        - generic [ref=e202]: 2026-07-10 16:23
+            - generic [ref=e203]:
+              - button [ref=e204] [cursor=pointer]:
+                - img [ref=e207]:
+                  - img [ref=e208]
+              - button [ref=e210] [cursor=pointer]:
+                - img [ref=e213]:
+                  - img [ref=e214]
+          - generic [ref=e219]:
+            - tablist [ref=e221]:
+              - tab "Editor" [selected] [ref=e222] [cursor=pointer]:
+                - link "Editor" [ref=e225]:
+                  - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query&queryTab=newQuery
+              - tab "History" [ref=e226] [cursor=pointer]:
+                - link "History" [ref=e229]:
+                  - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query&queryTab=history
+              - tab "Saved" [ref=e230] [cursor=pointer]:
+                - link "Saved" [ref=e233]:
+                  - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query&queryTab=saved
+            - generic [ref=e237]:
+              - code [ref=e241]:
+                - generic [ref=e242]:
+                  - generic [ref=e247]: "1"
+                  - textbox "Editor content" [active] [ref=e255]
+              - generic [ref=e256]:
+                - generic [ref=e257]:
+                  - button "Run" [disabled]:
+                    - generic:
+                      - generic:
+                        - img:
+                          - img
+                    - generic: Run
+                  - button "Explain" [disabled]:
+                    - generic:
+                      - generic:
+                        - img:
+                          - img
+                    - generic: Explain
+                  - button [ref=e258] [cursor=pointer]:
+                    - img [ref=e261]:
+                      - img [ref=e262]
+                - generic [ref=e264]:
+                  - button "New query" [ref=e266] [cursor=pointer]:
+                    - img [ref=e269]
+                    - generic [ref=e271]: New query
+                  - button "Save query" [ref=e272] [cursor=pointer]:
+                    - generic [ref=e273]: Save query
+  - generic [ref=e276]:
+    - alert
+    - alert
+```

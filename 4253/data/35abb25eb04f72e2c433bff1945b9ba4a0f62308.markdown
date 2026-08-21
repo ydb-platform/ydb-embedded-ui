@@ -1,0 +1,372 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - img [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+      - list [ref=e21]:
+        - generic [ref=e22]:
+          - listitem [ref=e23]:
+            - link "Database" [ref=e28] [cursor=pointer]:
+              - /url: /database?diagnosticsTab=overview&summaryTab=schema&schema=%2Flocal%2F.sys%2Fds_vslots&database=%2Flocal&databasePage=database
+              - img [ref=e31]:
+                - img [ref=e32]
+              - generic "Database":
+                - generic: Database
+          - listitem [ref=e34]:
+            - link "Diagnostics" [ref=e39] [cursor=pointer]:
+              - /url: /database?diagnosticsTab=overview&summaryTab=schema&schema=%2Flocal%2F.sys%2Fds_vslots&database=%2Flocal&databasePage=diagnostics
+              - img [ref=e42]:
+                - img [ref=e43]
+              - generic "Diagnostics":
+                - generic: Diagnostics
+          - listitem [ref=e45]:
+            - link "SQL Editor" [ref=e50] [cursor=pointer]:
+              - /url: /database?diagnosticsTab=overview&summaryTab=schema&schema=%2Flocal%2F.sys%2Fds_vslots&database=%2Flocal&databasePage=query
+              - img [ref=e53]:
+                - img [ref=e54]
+              - generic "SQL Editor":
+                - generic: SQL Editor
+      - generic [ref=e56]:
+        - button "Information" [ref=e57] [cursor=pointer]:
+          - img [ref=e60]:
+            - img [ref=e61]
+          - generic "Information":
+            - generic: Information
+        - button "Settings" [ref=e63] [cursor=pointer]:
+          - img [ref=e66]:
+            - img [ref=e67]
+          - generic "Settings":
+            - generic: Settings
+        - button "Account" [ref=e69] [cursor=pointer]:
+          - img [ref=e72]:
+            - img [ref=e73]
+          - generic "Account":
+            - generic: Account
+      - button "Expand" [ref=e75] [cursor=pointer]:
+        - img [ref=e76]:
+          - img [ref=e77]
+    - generic [ref=e80]:
+      - banner [ref=e81]:
+        - list [ref=e82]:
+          - listitem [ref=e83]:
+            - link "Cluster" [ref=e84] [cursor=pointer]:
+              - link "Cluster" [ref=e85]:
+                - /url: /cluster
+                - generic [ref=e86]: Cluster
+            - generic [ref=e87]: /
+          - listitem [ref=e88]:
+            - link "local" [disabled] [ref=e89]:
+              - generic [ref=e91]: local
+          - listitem [ref=e92]:
+            - generic [ref=e93]:
+              - generic [ref=e94]:
+                - button "Copy path" [ref=e95] [cursor=pointer]:
+                  - generic:
+                    - generic:
+                      - img:
+                        - img
+                - button [ref=e96] [cursor=pointer]:
+                  - img [ref=e99]:
+                    - img [ref=e100]
+              - generic [ref=e103] [cursor=pointer]:
+                - img [ref=e105]:
+                  - img [ref=e106]
+                - 'button "Good: 0 issues" [ref=e108]':
+                  - generic [ref=e111]:
+                    - text: "Good: 0 issues"
+                    - img [ref=e112]:
+                      - img [ref=e113]
+        - generic [ref=e115]:
+          - link "Developer UI" [ref=e116] [cursor=pointer]:
+            - /url: http://localhost:8765/internal
+            - img [ref=e119]:
+              - img [ref=e120]
+            - generic [ref=e122]: Developer UI
+          - button [ref=e125] [cursor=pointer]:
+            - img [ref=e128]:
+              - img [ref=e129]
+      - main [ref=e131]:
+        - generic [ref=e134]:
+          - generic [ref=e135]:
+            - generic [ref=e137]:
+              - generic [ref=e138]:
+                - generic [ref=e139]: Navigation
+                - generic [ref=e143]:
+                  - generic [ref=e146] [cursor=pointer]:
+                    - button [ref=e147]
+                    - generic [ref=e149]:
+                      - img [ref=e151]
+                      - generic [ref=e153]: /local
+                  - generic [ref=e156] [cursor=pointer]:
+                    - button [ref=e157]
+                    - generic [ref=e159]:
+                      - img [ref=e161]
+                      - generic [ref=e163]: .metadata
+                  - generic [ref=e166] [cursor=pointer]:
+                    - button [ref=e167]
+                    - generic [ref=e169]:
+                      - img [ref=e171]
+                      - generic [ref=e173]: .sys
+                  - generic [ref=e178] [cursor=pointer]:
+                    - img [ref=e180]
+                    - generic [ref=e182]: auth_effective_permissions
+                  - generic [ref=e187] [cursor=pointer]:
+                    - img [ref=e189]
+                    - generic [ref=e191]: auth_group_members
+                  - generic [ref=e196] [cursor=pointer]:
+                    - img [ref=e198]
+                    - generic [ref=e200]: auth_groups
+                  - generic [ref=e205] [cursor=pointer]:
+                    - img [ref=e207]
+                    - generic [ref=e209]: auth_owners
+                  - generic [ref=e214] [cursor=pointer]:
+                    - img [ref=e216]
+                    - generic [ref=e218]: auth_permissions
+                  - generic [ref=e223] [cursor=pointer]:
+                    - img [ref=e225]
+                    - generic [ref=e227]: auth_users
+                  - generic [ref=e232] [cursor=pointer]:
+                    - img [ref=e234]
+                    - generic [ref=e236]: compile_cache_queries
+                  - generic [ref=e241] [cursor=pointer]:
+                    - img [ref=e243]
+                    - generic [ref=e245]: ds_groups
+                  - generic [ref=e250] [cursor=pointer]:
+                    - img [ref=e252]
+                    - generic [ref=e254]: ds_pdisks
+                  - generic [ref=e259] [cursor=pointer]:
+                    - img [ref=e261]
+                    - generic [ref=e263]: ds_storage_pools
+                  - generic [ref=e268] [cursor=pointer]:
+                    - img [ref=e270]
+                    - generic [ref=e272]: ds_storage_stats
+                  - generic [ref=e277] [cursor=pointer]:
+                    - img [ref=e279]
+                    - generic [ref=e281]: ds_vslots
+                  - generic [ref=e286] [cursor=pointer]:
+                    - img [ref=e288]
+                    - generic [ref=e290]: hive_tablets
+                  - generic [ref=e295] [cursor=pointer]:
+                    - img [ref=e297]
+                    - generic [ref=e299]: nodes
+                  - generic [ref=e304] [cursor=pointer]:
+                    - img [ref=e306]
+                    - generic [ref=e308]: partition_stats
+                  - generic [ref=e313] [cursor=pointer]:
+                    - img [ref=e315]
+                    - generic [ref=e317]: query_metrics_one_minute
+                  - generic [ref=e322] [cursor=pointer]:
+                    - img [ref=e324]
+                    - generic [ref=e326]: query_sessions
+                  - generic [ref=e331] [cursor=pointer]:
+                    - img [ref=e333]
+                    - generic [ref=e335]: resource_pool_classifiers
+              - generic [ref=e337]:
+                - generic [ref=e338]:
+                  - generic [ref=e339]:
+                    - generic [ref=e340]:
+                      - generic [ref=e341]: SysView
+                      - generic [ref=e342]: .sys/ds_vslots
+                    - generic [ref=e343]:
+                      - button "Open preview" [ref=e344] [cursor=pointer]:
+                        - img [ref=e347]:
+                          - img [ref=e348]
+                      - button "Copy" [ref=e350] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                      - button [ref=e351] [cursor=pointer]:
+                        - img [ref=e354]:
+                          - img [ref=e355]
+                  - generic [ref=e358]:
+                    - tablist [ref=e359]:
+                      - tab "Schema" [selected] [ref=e360] [cursor=pointer]:
+                        - link "Schema" [ref=e363]:
+                          - /url: /database?diagnosticsTab=overview&summaryTab=schema&schema=%2Flocal%2F.sys%2Fds_vslots&database=%2Flocal&databasePage=query
+                    - button "Open in Diagnostics" [ref=e365] [cursor=pointer]:
+                      - img [ref=e368]:
+                        - img [ref=e369]
+                - generic [ref=e371]:
+                  - generic [ref=e373]: "Primary key: NodeId, PDiskId, VSlotId"
+                  - generic [ref=e376]:
+                    - table [ref=e379]:
+                      - rowgroup [ref=e385]:
+                        - row "Id Name Type NotNull" [ref=e386]:
+                          - columnheader "Id" [ref=e387] [cursor=pointer]:
+                            - generic [ref=e388]:
+                              - text: Id
+                              - img [ref=e390]
+                          - columnheader "Name" [ref=e392] [cursor=pointer]:
+                            - generic [ref=e393]:
+                              - text: Name
+                              - img [ref=e395]
+                          - columnheader "Type" [ref=e397] [cursor=pointer]:
+                            - generic [ref=e398]:
+                              - text: Type
+                              - img [ref=e400]
+                          - columnheader "NotNull" [ref=e402] [cursor=pointer]:
+                            - generic [ref=e403]:
+                              - text: NotNull
+                              - img [ref=e405]
+                    - table [ref=e411]:
+                      - rowgroup:
+                        - row "Id Name Type NotNull":
+                          - columnheader "Id":
+                            - generic:
+                              - text: Id
+                              - img [ref=e418] [cursor=pointer]
+                          - columnheader "Name":
+                            - generic:
+                              - text: Name
+                              - img [ref=e421] [cursor=pointer]
+                          - columnheader "Type":
+                            - generic:
+                              - text: Type
+                              - img [ref=e424] [cursor=pointer]
+                          - columnheader "NotNull":
+                            - generic:
+                              - text: NotNull
+                              - img [ref=e427] [cursor=pointer]
+                      - rowgroup [ref=e429]:
+                        - row "17 DiskSpace Utf8" [ref=e430]:
+                          - cell "17" [ref=e431]:
+                            - generic [ref=e432]: "17"
+                          - cell "DiskSpace" [ref=e433]
+                          - cell "Utf8" [ref=e434]
+                          - cell [ref=e435]
+                        - row "18 State Utf8" [ref=e436]:
+                          - cell "18" [ref=e437]:
+                            - generic [ref=e438]: "18"
+                          - cell "State" [ref=e439]
+                          - cell "Utf8" [ref=e440]
+                          - cell [ref=e441]
+                        - row "1 NodeId Uint32" [ref=e442]:
+                          - cell "1" [ref=e443]:
+                            - generic [ref=e444]:
+                              - text: "1"
+                              - img [ref=e445]:
+                                - img [ref=e446]
+                          - cell "NodeId" [ref=e448]
+                          - cell "Uint32" [ref=e449]
+                          - cell [ref=e450]
+                        - row "19 PhantomOnly Bool" [ref=e451]:
+                          - cell "19" [ref=e452]:
+                            - generic [ref=e453]: "19"
+                          - cell "PhantomOnly" [ref=e454]
+                          - cell "Bool" [ref=e455]
+                          - cell [ref=e456]
+                        - row "2 PDiskId Uint32" [ref=e457]:
+                          - cell "2" [ref=e458]:
+                            - generic [ref=e459]:
+                              - text: "2"
+                              - img [ref=e460]:
+                                - img [ref=e461]
+                          - cell "PDiskId" [ref=e463]
+                          - cell "Uint32" [ref=e464]
+                          - cell [ref=e465]
+                        - row "3 VSlotId Uint32" [ref=e466]:
+                          - cell "3" [ref=e467]:
+                            - generic [ref=e468]:
+                              - text: "3"
+                              - img [ref=e469]:
+                                - img [ref=e470]
+                          - cell "VSlotId" [ref=e472]
+                          - cell "Uint32" [ref=e473]
+                          - cell [ref=e474]
+                        - row "5 GroupId Uint32" [ref=e475]:
+                          - cell "5" [ref=e476]:
+                            - generic [ref=e477]: "5"
+                          - cell "GroupId" [ref=e478]
+                          - cell "Uint32" [ref=e479]
+                          - cell [ref=e480]
+                        - row "6 GroupGeneration Uint32" [ref=e481]:
+                          - cell "6" [ref=e482]:
+                            - generic [ref=e483]: "6"
+                          - cell "GroupGeneration" [ref=e484]
+                          - cell "Uint32" [ref=e485]
+                          - cell [ref=e486]
+            - generic [ref=e487]:
+              - button "Refresh" [active] [ref=e488] [cursor=pointer]:
+                - img [ref=e491]:
+                  - img [ref=e492]
+              - button [ref=e494] [cursor=pointer]:
+                - img [ref=e497]:
+                  - img [ref=e498]
+          - generic [ref=e503]:
+            - tablist [ref=e505]:
+              - tab "Editor" [selected] [ref=e506] [cursor=pointer]:
+                - link "Editor" [ref=e509]:
+                  - /url: /database?diagnosticsTab=overview&summaryTab=schema&schema=%2Flocal%2F.sys%2Fds_vslots&database=%2Flocal&databasePage=query&queryTab=newQuery
+              - tab "History" [ref=e510] [cursor=pointer]:
+                - link "History" [ref=e513]:
+                  - /url: /database?diagnosticsTab=overview&summaryTab=schema&schema=%2Flocal%2F.sys%2Fds_vslots&database=%2Flocal&databasePage=query&queryTab=history
+              - tab "Saved" [ref=e514] [cursor=pointer]:
+                - link "Saved" [ref=e517]:
+                  - /url: /database?diagnosticsTab=overview&summaryTab=schema&schema=%2Flocal%2F.sys%2Fds_vslots&database=%2Flocal&databasePage=query&queryTab=saved
+            - generic [ref=e520]:
+              - generic [ref=e521]:
+                - code [ref=e525]:
+                  - generic [ref=e526]:
+                    - generic [ref=e531]: "1"
+                    - generic [ref=e537]: "CREATE TABLE `a_test_table_1787293776353` (id Int32, name Text, expire_at Datetime, updated_on Datetime, PRIMARY KEY(id));"
+                    - textbox "Editor content" [ref=e539]: "CREATE TABLE `a_test_table_1787293776353` (id Int32, name Text, expire_at Datetime, updated_on Datetime, PRIMARY KEY(id));"
+                - generic [ref=e540]:
+                  - generic [ref=e541]:
+                    - button "Run" [ref=e543] [cursor=pointer]:
+                      - img [ref=e546]:
+                        - img [ref=e547]
+                      - generic [ref=e549]: Run
+                    - button "Explain" [ref=e551] [cursor=pointer]:
+                      - generic [ref=e552]: Explain
+                    - button "Explain Analyze" [ref=e554] [cursor=pointer]:
+                      - generic [ref=e555]: Explain Analyze
+                    - button [ref=e556] [cursor=pointer]:
+                      - img [ref=e559]:
+                        - img [ref=e560]
+                  - generic [ref=e562]:
+                    - button "New query" [ref=e564] [cursor=pointer]:
+                      - img [ref=e567]
+                      - generic [ref=e569]: New query
+                    - button "Save query" [ref=e570] [cursor=pointer]:
+                      - generic [ref=e571]: Save query
+              - generic [ref=e574]:
+                - generic [ref=e575]:
+                  - radiogroup [ref=e576]:
+                    - generic [ref=e577]:
+                      - radio "Result" [checked] [ref=e578]
+                      - generic [ref=e579]: Result
+                    - generic [ref=e580] [cursor=pointer]:
+                      - radio "Computation Graph" [ref=e581]
+                      - generic [ref=e582]: Computation Graph
+                    - generic [ref=e583] [cursor=pointer]:
+                      - radio "Explain" [ref=e584]
+                      - generic [ref=e585]: Explain
+                    - generic [ref=e586] [cursor=pointer]:
+                      - radio "Stats" [ref=e587]
+                      - generic [ref=e588]: Stats
+                  - generic [ref=e589]:
+                    - img [ref=e591]:
+                      - img [ref=e592]
+                    - generic [ref=e594]:
+                      - generic [ref=e595]: Completed
+                      - generic [ref=e596]:
+                        - generic [ref=e597]: ":"
+                        - generic [ref=e598]: 00:00.065
+                - generic [ref=e599]:
+                  - button [ref=e601] [cursor=pointer]:
+                    - img [ref=e604]
+                  - button [ref=e606] [cursor=pointer]:
+                    - img [ref=e609]:
+                      - img [ref=e610]
+                  - button [ref=e612] [cursor=pointer]:
+                    - img [ref=e615]:
+                      - img [ref=e616]
+  - generic [ref=e623]:
+    - alert
+    - alert
+  - generic [ref=e627]: Refresh
+```
