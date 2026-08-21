@@ -82,5 +82,6 @@ export function useHeaderData({
         isDatabaseDataLoading,
         clusterLinks,
         databaseLinks,
+        prepareTenantBackend: additionalTenantProps.prepareTenantBackend,
     };
 }

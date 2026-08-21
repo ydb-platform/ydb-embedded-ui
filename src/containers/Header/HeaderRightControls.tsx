@@ -1,7 +1,7 @@
 import {Flex} from '@gravity-ui/uikit';
 
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
-import type {ClusterLinkWithTitle} from '../../types/additionalProps';
+import type {AdditionalTenantsProps, ClusterLinkWithTitle} from '../../types/additionalProps';
 import {useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 
 import {ClusterRightControls} from './ClusterRightControls';
@@ -20,6 +20,8 @@ interface HeaderRightControlsProps {
     isDatabaseDataLoading: boolean;
     isAddClusterAvailable: boolean;
     isV2NavigationEnabled: boolean;
+    isViewerUser?: boolean;
+    prepareTenantBackend?: AdditionalTenantsProps['prepareTenantBackend'];
     clusterLinks: ClusterLinkWithTitle[];
     databaseLinks: ClusterLinkWithTitle[];
     handleEditCluster?: () => Promise<boolean>;
@@ -37,6 +39,8 @@ export function HeaderRightControls({
     isDatabaseDataLoading,
     isAddClusterAvailable,
     isV2NavigationEnabled,
+    isViewerUser,
+    prepareTenantBackend,
     clusterLinks,
     databaseLinks,
     handleEditCluster,
@@ -58,6 +62,8 @@ export function HeaderRightControls({
                     databaseData={databaseData}
                     isDatabaseDataLoading={isDatabaseDataLoading}
                     isV2NavigationEnabled={isV2NavigationEnabled}
+                    isViewerUser={isViewerUser}
+                    prepareTenantBackend={prepareTenantBackend}
                     showDeveloperUI={showDeveloperUI}
                     databaseLinks={databaseLinks}
                 />

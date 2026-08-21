@@ -50,6 +50,15 @@ describe('routes', () => {
             );
         });
 
+        test('should preserve an explicitly requested environment for href-based links', () => {
+            expect(
+                getTenantPath(
+                    {database: '/dev02/home/xenoxeno/db1'},
+                    {withBasename: true, environment: 'prod'},
+                ),
+            ).toBe('/monitoring/prod/database?database=%2Fdev02%2Fhome%2Fxenoxeno%2Fdb1');
+        });
+
         test('should not expose nested utm_referrer params as top-level params', () => {
             const location = new URL(URL_WITH_NESTED_REFERRER);
             const query = parseQuery({search: location.search} as Location);
