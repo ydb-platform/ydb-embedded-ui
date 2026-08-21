@@ -12,8 +12,8 @@ jest.mock('../../../../store', () => ({
     backend: undefined,
     basename: '/monitoring',
     clusterName: undefined,
-    environment: undefined,
-    webVersion: false,
+    environment: 'cloud-prod',
+    webVersion: true,
 }));
 
 jest.mock('../../../../store/reducers/cluster/cluster', () => ({
@@ -72,7 +72,35 @@ describe('useSharedDatabasePath', () => {
         );
 
         expect(result.current).toBe(
-            '/monitoring/database?clusterName=cluster&database=shared-name&backend=https%3A%2F%2Fnode-42.example.test%2Fviewer',
+            '/monitoring/cloud-prod/database?clusterName=cluster&database=shared-name&backend=https%3A%2F%2Fnode-42.example.test%2Fviewer',
+        );
+    });
+
+    test('resolves a missing shared database name within the current environment', () => {
+        configureUIFactory({useDatabaseId: false});
+        (useClusterBaseInfo as jest.Mock).mockReturnValue({
+            settings: {use_meta_proxy: true},
+            isResolved: true,
+        });
+        (tenantsApi.useGetTenantsInfoQuery as jest.Mock).mockImplementation(
+            ({environmentName}: {environmentName?: string}) => ({
+                currentData:
+                    environmentName === 'cloud-prod'
+                        ? [{Id: 'resource-id', Name: 'environment-shared-name'}]
+                        : [],
+            }),
+        );
+
+        const {result} = renderHook(() =>
+            useSharedDatabasePath({
+                clusterName: 'cluster',
+                databaseData,
+                isViewerUser: true,
+            }),
+        );
+
+        expect(result.current).toBe(
+            '/monitoring/cloud-prod/database?clusterName=cluster&database=environment-shared-name&backend=https%3A%2F%2Fnode-42.example.test%2Fviewer',
         );
     });
 });

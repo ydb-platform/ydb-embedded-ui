@@ -4,6 +4,7 @@ import {skipToken} from '@reduxjs/toolkit/query';
 
 import {getTenantBackend} from '../../../components/TenantNameWrapper/utils';
 import {getTenantPath} from '../../../routes';
+import {environment} from '../../../store';
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import {tenantsApi} from '../../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../../store/reducers/tenants/types';
@@ -36,7 +37,9 @@ export function useSharedDatabasePath({
         !databaseData.sharedTenantName;
 
     const {currentData: databases} = tenantsApi.useGetTenantsInfoQuery(
-        shouldResolveSharedDatabaseName ? {clusterName, isMetaDatabasesAvailable} : skipToken,
+        shouldResolveSharedDatabaseName
+            ? {clusterName, environmentName: environment, isMetaDatabasesAvailable}
+            : skipToken,
     );
 
     const sharedDatabaseName = React.useMemo(() => {
