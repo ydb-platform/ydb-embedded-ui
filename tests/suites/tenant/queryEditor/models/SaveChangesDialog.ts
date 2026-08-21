@@ -49,6 +49,12 @@ export class SaveChangesDialog {
         await input.fill(value);
     }
 
+    async getQueryName() {
+        const input = this.dialog.getByRole('textbox');
+        await input.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return input.inputValue();
+    }
+
     async getValidationError() {
         const errorMessage = this.dialog
             .getByText(/Name should not be empty|This name already exists/)

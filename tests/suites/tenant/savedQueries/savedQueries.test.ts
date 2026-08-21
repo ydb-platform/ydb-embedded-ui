@@ -242,13 +242,14 @@ test.describe('Saved Queries', () => {
             .toBe(nextQuery);
     });
 
-    test('Saving from the close dialog syncs another clean saved-query tab', async ({page}) => {
+    test('Close-dialog save keeps a tab-only rename out of the saved query', async ({page}) => {
         const originalQuery = 'SELECT 29 AS close_dialog_original;';
         const updatedQuery = 'SELECT 30 AS close_dialog_updated;';
         const queryName = await tenantPage.saveQuery(
             originalQuery,
             `Close Dialog Sync ${uuidv4()}`,
         );
+        const tabTitle = `Local Close Tab ${uuidv4()}`;
         const firstTabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
 
         await tenantPage.queryEditor.editorTabs.clickAddTab();
@@ -262,19 +263,37 @@ test.describe('Saved Queries', () => {
             throw new Error('Expected both saved-query tabs to be available');
         }
 
+        const renameQueryDialog = new RenameQueryDialog(page);
+        await tenantPage.queryEditor.editorTabs.openTabMenuById(secondTabId);
+        await tenantPage.queryEditor.editorTabs.clickMenuAction('Rename');
+        await renameQueryDialog.setTitle(tabTitle);
+        await renameQueryDialog.clickApply();
+
         await tenantPage.queryEditor.setQuery(updatedQuery);
         await tenantPage.queryEditor.editorTabs.hoverTabById(secondTabId);
         await tenantPage.queryEditor.editorTabs.closeTabById(secondTabId);
 
         const saveChangesDialog = new SaveChangesDialog(page);
         await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
+        await expect(saveChangesDialog.getQueryName()).resolves.toBe(queryName);
         await saveChangesDialog.clickSave();
 
         await expect(tenantPage.queryEditor.editorTabs.waitForTabCount(1)).resolves.toBe(true);
         await expect(tenantPage.queryEditor.editorTabs.getActiveTabId()).resolves.toBe(firstTabId);
+        await expect(tenantPage.queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(
+            queryName,
+        );
         await expect
             .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
             .toBe(updatedQuery);
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.isVisible();
+
+        const savedQuery = await tenantPage.savedQueriesTable.getRowByName(queryName);
+        const tabTitleQuery = await tenantPage.savedQueriesTable.getRowByName(tabTitle);
+        expect(savedQuery?.query.trim()).toBe(updatedQuery);
+        expect(tabTitleQuery).toBe(null);
     });
 
     test('Save As from a non-active tab updates the correct tab', async () => {

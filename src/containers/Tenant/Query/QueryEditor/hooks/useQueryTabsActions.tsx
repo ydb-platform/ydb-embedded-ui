@@ -58,7 +58,7 @@ export function useQueryTabsActions() {
         };
 
         return getSaveChangesConfirmation({
-            defaultQueryName: getTabTitleForSave(tab) ?? '',
+            defaultQueryName: tab.savedQueryName ?? getTabTitleForSave(tab) ?? '',
             existingQueryName: tab.savedQueryName,
             queryBody: tab.input,
             savedQueries: savedQueries ?? [],
