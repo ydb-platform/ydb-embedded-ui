@@ -69,6 +69,9 @@ export function useSharedDatabasePath({
         isClusterBaseInfoResolved &&
         databaseData?.Type === 'Serverless' &&
         sharedDatabase
-        ? getTenantPath({clusterName, database: sharedDatabase, backend}, {withBasename: true})
+        ? getTenantPath(
+              {clusterName, database: sharedDatabase, backend},
+              {withBasename: true, environment},
+          )
         : undefined;
 }
