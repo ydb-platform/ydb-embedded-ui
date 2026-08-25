@@ -177,7 +177,7 @@
     "redux": "$redux",
     "typescript": "$typescript",
     "monaco-editor": "$monaco-editor",
-    "tar": "7.5.16",
+    "tar": "^7.5.21",
     "canvas": "^2.11.2"
   }
 }
