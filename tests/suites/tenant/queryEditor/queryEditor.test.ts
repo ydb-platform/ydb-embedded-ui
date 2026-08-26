@@ -107,6 +107,8 @@ async function expectLocatorWidth(locator: Locator, expectedWidth: number) {
 }
 
 test.describe('Test Query Editor', async () => {
+    test.describe.configure({mode: 'parallel'});
+
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
     const queryActionScreenshotThemes = ['light', 'dark'] as const;
 

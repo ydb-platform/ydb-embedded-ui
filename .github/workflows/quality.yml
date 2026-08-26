@@ -49,7 +49,7 @@ jobs:
           CI: 'true'
           PLAYWRIGHT_APP_BACKEND: ${{ steps.ydb.outputs.monitoring-url }}
           # Playwright 1.58 internal weighted sharding; remeasure after suite/version changes.
-          PWTEST_SHARD_WEIGHTS: '222:154:103:97:84:46:99:71'
+          PWTEST_SHARD_WEIGHTS: '240:162:110:109:83:90:72:62'
 
       - name: Upload blob report
         if: always()
