@@ -1,5 +1,12 @@
 # Changelog
 
+## [20.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.2.1...v20.3.0) (2026-08-27)
+
+
+### Features
+
+* **SavedQueries:** redesign ([#4240](https://github.com/ydb-platform/ydb-embedded-ui/issues/4240)) ([489df06](https://github.com/ydb-platform/ydb-embedded-ui/commit/489df065bab68564b9a9b8f84f61c9e4f87c3c76))
+
 ## [20.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.2.0...v20.2.1) (2026-08-20)
 
 
