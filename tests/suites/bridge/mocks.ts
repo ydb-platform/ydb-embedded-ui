@@ -120,14 +120,18 @@ export const mockBridgeHealthcheckUnavailable = (page: Page) => {
     });
 };
 
-export const mockBridgeVisualScenario = async (page: Page) => {
-    await page.route(`**/viewer/json/cluster?*`, async (route: Route) => {
+const mockBridgeVisualCluster = (page: Page) => {
+    return page.route(`**/viewer/json/cluster?*`, async (route: Route) => {
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify(bridgeVisualCluster),
         });
     });
+};
+
+export const mockBridgeVisualScenario = async (page: Page) => {
+    await mockBridgeVisualCluster(page);
     await page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
         await route.fulfill({
             status: 200,
@@ -135,6 +139,25 @@ export const mockBridgeVisualScenario = async (page: Page) => {
             body: JSON.stringify(bridgeVisualHealthcheck),
         });
     });
+};
+
+export const mockBridgeVisualLoadingScenario = async (page: Page) => {
+    let releaseHealthcheck = () => {};
+    const healthcheckGate = new Promise<void>((resolve) => {
+        releaseHealthcheck = resolve;
+    });
+
+    await mockBridgeVisualCluster(page);
+    await page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
+        await healthcheckGate;
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(bridgeVisualHealthcheck),
+        });
+    });
+
+    return releaseHealthcheck;
 };
 
 export const mockClusterWithBridgePiles = (page: Page) => {

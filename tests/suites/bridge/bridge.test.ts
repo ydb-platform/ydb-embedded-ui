@@ -9,6 +9,7 @@ import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
 import {
     mockBridgeHealthcheck,
     mockBridgeHealthcheckUnavailable,
+    mockBridgeVisualLoadingScenario,
     mockBridgeVisualScenario,
     mockCapabilities,
     mockClusterWithBridgePiles,
@@ -195,5 +196,26 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await expect(clusterPage.bridgeSection).toBeVisible();
 
         await expect(clusterPage.bridgeSection).toHaveScreenshot('bridge-piles-states.png');
+    });
+
+    test('on: shows bridge pile healthcheck loading state', async ({page}) => {
+        await page.setViewportSize({width: 1440, height: 900});
+        await mockCapabilities(page, true);
+        const releaseHealthcheck = await mockBridgeVisualLoadingScenario(page);
+
+        try {
+            const clusterPage = new ClusterPage(page);
+            await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
+            await expect(clusterPage.bridgeSection).toBeVisible();
+            await expect(
+                clusterPage.bridgeSection.locator('.ydb-bridge-info-table__healthcheck-skeleton'),
+            ).toHaveCount(6);
+            await expect(clusterPage.bridgeSection).not.toContainText('You are here');
+            await expect(clusterPage.bridgeSection).toHaveScreenshot(
+                'bridge-piles-healthcheck-loading.png',
+            );
+        } finally {
+            releaseHealthcheck();
+        }
     });
 });
