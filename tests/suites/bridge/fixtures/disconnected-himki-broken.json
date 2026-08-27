@@ -1,0 +1,799 @@
+{
+  "self_check_result": "EMERGENCY",
+  "issue_log": [
+    {
+      "id": "RED-4e47-1231c6b1-BSController",
+      "status": "RED",
+      "message": "System tablet is unresponsive",
+      "location": {
+        "compute": {
+          "tablet": {
+            "type": "BSController",
+            "id": ["72057594037932033"]
+          }
+        },
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "type": "SYSTEM_TABLET",
+      "level": 3
+    },
+    {
+      "id": "RED-4e47-1231c6b1-SchemeShard",
+      "status": "RED",
+      "message": "System tablet is unresponsive",
+      "location": {
+        "compute": {
+          "tablet": {
+            "type": "SchemeShard",
+            "id": ["72057594046678944"]
+          }
+        },
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "type": "SYSTEM_TABLET",
+      "level": 3
+    },
+    {
+      "id": "RED-30ee-1231c6b1",
+      "status": "RED",
+      "message": "Compute has issues with system tablets",
+      "location": {
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "reason": ["RED-4e47-1231c6b1-BSController", "RED-4e47-1231c6b1-SchemeShard"],
+      "type": "COMPUTE",
+      "level": 2
+    },
+    {
+      "id": "RED-2f2e-1231c6b1",
+      "status": "RED",
+      "message": "Storage failed",
+      "location": {
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "reason": ["RED-40f1-1231c6b1-80c02825"],
+      "type": "STORAGE",
+      "level": 2
+    },
+    {
+      "id": "RED-846e-1231c6b1",
+      "status": "RED",
+      "message": "System tablet BSC didn't provide information",
+      "location": {
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "type": "STORAGE",
+      "level": 2
+    },
+    {
+      "id": "RED-40f1-1231c6b1-80c02825",
+      "status": "RED",
+      "message": "Pool failed",
+      "location": {
+        "storage": {
+          "pool": {
+            "name": "static"
+          }
+        },
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "reason": ["RED-02e1-1231c6b1-1", "RED-02e1-1231c6b1-2"],
+      "type": "STORAGE_POOL",
+      "level": 3
+    },
+    {
+      "id": "RED-02e1-1231c6b1-1",
+      "status": "RED",
+      "message": "Group failed",
+      "location": {
+        "storage": {
+          "pool": {
+            "name": "static",
+            "group": {
+              "id": ["1"],
+              "pile": {
+                "name": "moscow"
+              }
+            }
+          }
+        },
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "reason": [
+        "RED-9f89-1231c6b1-1-1-7-0-0-0",
+        "RED-9f89-1231c6b1-2-1-7-1-0-0",
+        "RED-9f89-1231c6b1-3-1-7-2-0-0"
+      ],
+      "type": "STORAGE_GROUP",
+      "level": 4
+    },
+    {
+      "id": "RED-02e1-1231c6b1-2",
+      "status": "RED",
+      "message": "Group failed",
+      "location": {
+        "storage": {
+          "pool": {
+            "name": "static",
+            "group": {
+              "id": ["2"],
+              "pile": {
+                "name": "himki"
+              }
+            }
+          }
+        },
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "reason": ["RED-9f89-1231c6b1-4-2-7-0-0-0", "RED-9f89-1231c6b1-6-2-7-2-0-0"],
+      "type": "STORAGE_GROUP",
+      "level": 4
+    },
+    {
+      "id": "RED-9f89-1231c6b1-1-1-7-0-0-0",
+      "status": "RED",
+      "message": "VDisks are not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 1,
+            "host": "ydb-s1.example.com",
+            "port": 19001
+          },
+          "pool": {
+            "name": "static",
+            "group": {
+              "vdisk": {
+                "id": ["1-7-0-0-0", "1-7-0-1-0", "1-7-0-2-0"]
+              },
+              "pile": {
+                "name": "moscow"
+              }
+            }
+          }
+        },
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "reason": ["RED-da05-1-1-1"],
+      "type": "VDISK",
+      "level": 5,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-9f89-1231c6b1-2-1-7-1-0-0",
+      "status": "RED",
+      "message": "VDisks are not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 2,
+            "host": "ydb-s2.example.com",
+            "port": 19001
+          },
+          "pool": {
+            "name": "static",
+            "group": {
+              "vdisk": {
+                "id": ["1-7-1-0-0", "1-7-1-1-0", "1-7-1-2-0"]
+              },
+              "pile": {
+                "name": "moscow"
+              }
+            }
+          }
+        },
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "reason": ["RED-da05-2-2-1"],
+      "type": "VDISK",
+      "level": 5,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-9f89-1231c6b1-3-1-7-2-0-0",
+      "status": "RED",
+      "message": "VDisks are not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 3,
+            "host": "ydb-s3.example.com",
+            "port": 19001
+          },
+          "pool": {
+            "name": "static",
+            "group": {
+              "vdisk": {
+                "id": ["1-7-2-0-0", "1-7-2-1-0", "1-7-2-2-0"]
+              },
+              "pile": {
+                "name": "moscow"
+              }
+            }
+          }
+        },
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "reason": ["RED-da05-3-3-1"],
+      "type": "VDISK",
+      "level": 5,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-9f89-1231c6b1-4-2-7-0-0-0",
+      "status": "RED",
+      "message": "VDisks are not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 4,
+            "host": "ydb-s4.example.com",
+            "port": 19001
+          },
+          "pool": {
+            "name": "static",
+            "group": {
+              "vdisk": {
+                "id": ["2-7-0-0-0", "2-7-0-1-0", "2-7-0-2-0"]
+              },
+              "pile": {
+                "name": "himki"
+              }
+            }
+          }
+        },
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "reason": ["RED-da05-4-4-1"],
+      "type": "VDISK",
+      "level": 5,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-9f89-1231c6b1-6-2-7-2-0-0",
+      "status": "RED",
+      "message": "VDisks are not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 6,
+            "host": "ydb-s6.example.com",
+            "port": 19001
+          },
+          "pool": {
+            "name": "static",
+            "group": {
+              "vdisk": {
+                "id": ["2-7-2-0-0", "2-7-2-1-0", "2-7-2-2-0"]
+              },
+              "pile": {
+                "name": "himki"
+              }
+            }
+          }
+        },
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "reason": ["RED-da05-6-6-1"],
+      "type": "VDISK",
+      "level": 5,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-da05-1-1-1",
+      "status": "RED",
+      "message": "PDisks are not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 1,
+            "host": "ydb-s1.example.com",
+            "port": 19001
+          },
+          "pool": {
+            "group": {
+              "vdisk": {
+                "pdisk": [
+                  {
+                    "id": "1-1",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_1"
+                  },
+                  {
+                    "id": "1-2",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_2"
+                  },
+                  {
+                    "id": "1-3",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_3"
+                  }
+                ]
+              },
+              "pile": {
+                "name": "moscow"
+              }
+            }
+          }
+        }
+      },
+      "reason": ["RED-f833-1"],
+      "type": "PDISK",
+      "level": 6,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-da05-2-2-1",
+      "status": "RED",
+      "message": "PDisks are not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 2,
+            "host": "ydb-s2.example.com",
+            "port": 19001
+          },
+          "pool": {
+            "group": {
+              "vdisk": {
+                "pdisk": [
+                  {
+                    "id": "2-1",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_1"
+                  },
+                  {
+                    "id": "2-2",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_2"
+                  },
+                  {
+                    "id": "2-3",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_3"
+                  }
+                ]
+              },
+              "pile": {
+                "name": "moscow"
+              }
+            }
+          }
+        }
+      },
+      "reason": ["RED-f833-2"],
+      "type": "PDISK",
+      "level": 6,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-da05-3-3-1",
+      "status": "RED",
+      "message": "PDisks are not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 3,
+            "host": "ydb-s3.example.com",
+            "port": 19001
+          },
+          "pool": {
+            "group": {
+              "vdisk": {
+                "pdisk": [
+                  {
+                    "id": "3-1",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_1"
+                  },
+                  {
+                    "id": "3-2",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_2"
+                  },
+                  {
+                    "id": "3-3",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_3"
+                  }
+                ]
+              },
+              "pile": {
+                "name": "moscow"
+              }
+            }
+          }
+        }
+      },
+      "reason": ["RED-f833-3"],
+      "type": "PDISK",
+      "level": 6,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-da05-4-4-1",
+      "status": "RED",
+      "message": "PDisks are not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 4,
+            "host": "ydb-s4.example.com",
+            "port": 19001
+          },
+          "pool": {
+            "group": {
+              "vdisk": {
+                "pdisk": [
+                  {
+                    "id": "4-1",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_1"
+                  },
+                  {
+                    "id": "4-2",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_2"
+                  },
+                  {
+                    "id": "4-3",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_3"
+                  }
+                ]
+              },
+              "pile": {
+                "name": "himki"
+              }
+            }
+          }
+        }
+      },
+      "reason": ["RED-f833-4"],
+      "type": "PDISK",
+      "level": 6,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-da05-6-6-1",
+      "status": "RED",
+      "message": "PDisks are not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 6,
+            "host": "ydb-s6.example.com",
+            "port": 19001
+          },
+          "pool": {
+            "group": {
+              "vdisk": {
+                "pdisk": [
+                  {
+                    "id": "6-1",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_1"
+                  },
+                  {
+                    "id": "6-2",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_2"
+                  },
+                  {
+                    "id": "6-3",
+                    "path": "/dev/disk/by-partlabel/ydb_disk_3"
+                  }
+                ]
+              },
+              "pile": {
+                "name": "himki"
+              }
+            }
+          }
+        }
+      },
+      "reason": ["RED-f833-6"],
+      "type": "PDISK",
+      "level": 6,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-f833-1",
+      "status": "RED",
+      "message": "Storage node is not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 1,
+            "host": "ydb-s1.example.com",
+            "port": 19001
+          }
+        }
+      },
+      "type": "STORAGE_NODE",
+      "level": 7
+    },
+    {
+      "id": "RED-f833-2",
+      "status": "RED",
+      "message": "Storage node is not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 2,
+            "host": "ydb-s2.example.com",
+            "port": 19001
+          }
+        }
+      },
+      "type": "STORAGE_NODE",
+      "level": 7
+    },
+    {
+      "id": "RED-f833-3",
+      "status": "RED",
+      "message": "Storage node is not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 3,
+            "host": "ydb-s3.example.com",
+            "port": 19001
+          }
+        }
+      },
+      "type": "STORAGE_NODE",
+      "level": 7
+    },
+    {
+      "id": "RED-f833-4",
+      "status": "RED",
+      "message": "Storage node is not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 4,
+            "host": "ydb-s4.example.com",
+            "port": 19001
+          }
+        }
+      },
+      "type": "STORAGE_NODE",
+      "level": 7
+    },
+    {
+      "id": "RED-f833-6",
+      "status": "RED",
+      "message": "Storage node is not available",
+      "location": {
+        "storage": {
+          "node": {
+            "id": 6,
+            "host": "ydb-s6.example.com",
+            "port": 19001
+          }
+        }
+      },
+      "type": "STORAGE_NODE",
+      "level": 7
+    },
+    {
+      "id": "RED-edf5-1231c6b1",
+      "status": "RED",
+      "message": "Database has multiple issues",
+      "location": {
+        "database": {
+          "name": "/Root"
+        }
+      },
+      "reason": ["RED-2f2e-1231c6b1", "RED-30ee-1231c6b1", "RED-846e-1231c6b1"],
+      "type": "DATABASE",
+      "level": 1
+    },
+    {
+      "id": "RED-4236-moscow",
+      "status": "RED",
+      "message": "There is not enough functional rings",
+      "location": {
+        "compute": {
+          "state_storage": {
+            "pile": {
+              "name": "moscow"
+            }
+          }
+        }
+      },
+      "type": "PILE_STATE_STORAGE",
+      "level": 2
+    },
+    {
+      "id": "RED-ccd4-moscow-1",
+      "status": "RED",
+      "message": "Rings have unavailable nodes",
+      "location": {
+        "compute": {
+          "state_storage": {
+            "ring": 1,
+            "pile": {
+              "name": "moscow"
+            }
+          }
+        }
+      },
+      "reason": ["RED-b30b-moscow-1-1"],
+      "type": "STATE_STORAGE_RING",
+      "level": 3,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-b30b-moscow-1-1",
+      "status": "RED",
+      "message": "Node is not available",
+      "location": {
+        "compute": {
+          "state_storage": {
+            "ring": 1,
+            "node": {
+              "id": 1
+            },
+            "pile": {
+              "name": "moscow"
+            }
+          }
+        }
+      },
+      "type": "STATE_STORAGE_NODE",
+      "level": 4,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-bda5-moscow",
+      "status": "RED",
+      "message": "There is not enough functional rings",
+      "location": {
+        "compute": {
+          "state_storage": {
+            "pile": {
+              "name": "moscow"
+            }
+          }
+        }
+      },
+      "type": "PILE_SCHEME_BOARD",
+      "level": 2
+    },
+    {
+      "id": "RED-9bdc-moscow-1",
+      "status": "RED",
+      "message": "Rings have unavailable nodes",
+      "location": {
+        "compute": {
+          "state_storage": {
+            "ring": 1,
+            "pile": {
+              "name": "moscow"
+            }
+          }
+        }
+      },
+      "reason": ["RED-106b-moscow-1-1"],
+      "type": "SCHEME_BOARD_RING",
+      "level": 3,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-106b-moscow-1-1",
+      "status": "RED",
+      "message": "Node is not available",
+      "location": {
+        "compute": {
+          "state_storage": {
+            "ring": 1,
+            "node": {
+              "id": 1
+            },
+            "pile": {
+              "name": "moscow"
+            }
+          }
+        }
+      },
+      "type": "SCHEME_BOARD_NODE",
+      "level": 4,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-f118-moscow",
+      "status": "RED",
+      "message": "There is not enough functional rings",
+      "location": {
+        "compute": {
+          "state_storage": {
+            "pile": {
+              "name": "moscow"
+            }
+          }
+        }
+      },
+      "type": "PILE_BOARD",
+      "level": 2
+    },
+    {
+      "id": "RED-aaf7-moscow-1",
+      "status": "RED",
+      "message": "Rings have unavailable nodes",
+      "location": {
+        "compute": {
+          "state_storage": {
+            "ring": 1,
+            "pile": {
+              "name": "moscow"
+            }
+          }
+        }
+      },
+      "reason": ["RED-0632-moscow-1-1"],
+      "type": "BOARD_RING",
+      "level": 3,
+      "listed": 3,
+      "count": 3
+    },
+    {
+      "id": "RED-0632-moscow-1-1",
+      "status": "RED",
+      "message": "Node is not available",
+      "location": {
+        "compute": {
+          "state_storage": {
+            "ring": 1,
+            "node": {
+              "id": 1
+            },
+            "pile": {
+              "name": "moscow"
+            }
+          }
+        }
+      },
+      "type": "BOARD_NODE",
+      "level": 4,
+      "listed": 3,
+      "count": 3
+    }
+  ],
+  "location": {
+    "id": 5,
+    "host": "ydb-s5.example.com",
+    "port": 19001,
+    "pile": {
+      "name": "himki"
+    }
+  }
+}

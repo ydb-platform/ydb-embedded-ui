@@ -1,0 +1,295 @@
+{
+  "Version": 8,
+  "Domain": "/Root",
+  "Overall": "Green",
+  "NodesTotal": 12,
+  "NodesAlive": 12,
+  "NumberOfCpus": 96,
+  "CoresTotal": 24,
+  "CoresUsed": 0.2353659997795212,
+  "LoadAverage": 0.751953125,
+  "PoolStats": [
+    {
+      "Name": "Common",
+      "Usage": 0.009192287304360546,
+      "Threads": 24
+    },
+    {
+      "Name": "IO",
+      "Usage": 0.0012292587062390106,
+      "Threads": 12
+    }
+  ],
+  "MemoryTotal": "201912401920",
+  "MemoryUsed": "7608958976",
+  "StorageTotal": "1797406064640",
+  "StorageUsed": "73723281408",
+  "MapStorageTotal": {
+    "SSD": "1797406064640"
+  },
+  "MapStorageUsed": {
+    "SSD": "73723281408"
+  },
+  "DataCenters": [
+    "P=moscow/",
+    "P=moscow/zone-a",
+    "P=moscow/zone-d",
+    "P=himki/zone-b",
+    "P=himki/",
+    "P=himki/zone-a",
+    "P=moscow/zone-b",
+    "P=himki/zone-d"
+  ],
+  "MapDataCenters": {
+    "P=moscow/": 3,
+    "P=moscow/zone-a": 1,
+    "P=moscow/zone-d": 1,
+    "P=himki/zone-b": 1,
+    "P=himki/": 3,
+    "P=himki/zone-a": 1,
+    "P=moscow/zone-b": 1,
+    "P=himki/zone-d": 1
+  },
+  "Versions": ["26.2.1.ent.1.d377cd9"],
+  "MapVersions": {
+    "26.2.1.ent.1.d377cd9": 12
+  },
+  "MapNodeStates": {
+    "Green": 12
+  },
+  "MapNodeRoles": {
+    "StateStorage": 6,
+    "Storage": 6,
+    "Tenant": 6,
+    "Bootstrapper": 6,
+    "StateStorageBoard": 6,
+    "SchemeBoard": 6
+  },
+  "SystemTablets": [
+    {
+      "TabletId": "72057594046382082",
+      "ChangeTime": "1783087283643",
+      "State": "Active",
+      "Generation": 9,
+      "Type": "Mediator",
+      "NodeId": 2,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594046447618",
+      "ChangeTime": "1783087283657",
+      "State": "Active",
+      "Generation": 9,
+      "Type": "TxAllocator",
+      "NodeId": 2,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594037936130",
+      "ChangeTime": "1783087283639",
+      "State": "Active",
+      "Generation": 9,
+      "Type": "TenantSlotBroker",
+      "NodeId": 2,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594046382081",
+      "ChangeTime": "1783087283660",
+      "State": "Active",
+      "Generation": 9,
+      "Type": "Mediator",
+      "NodeId": 2,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594046447619",
+      "ChangeTime": "1783087283657",
+      "State": "Active",
+      "Generation": 9,
+      "Type": "TxAllocator",
+      "NodeId": 2,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594046316546",
+      "ChangeTime": "1783087155112",
+      "State": "Active",
+      "Generation": 9,
+      "Type": "Coordinator",
+      "NodeId": 1,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594037936128",
+      "ChangeTime": "1783087283657",
+      "State": "Active",
+      "Generation": 10,
+      "Type": "Cms",
+      "NodeId": 2,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594046447617",
+      "ChangeTime": "1783087154659",
+      "State": "Active",
+      "Generation": 9,
+      "Type": "TxAllocator",
+      "NodeId": 1,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594037968897",
+      "ChangeTime": "1783087283665",
+      "State": "Active",
+      "Generation": 10,
+      "Type": "Hive",
+      "NodeId": 2,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594037936131",
+      "ChangeTime": "1783087283639",
+      "State": "Active",
+      "Generation": 9,
+      "Type": "Console",
+      "NodeId": 2,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594037936129",
+      "ChangeTime": "1783087283660",
+      "State": "Active",
+      "Generation": 10,
+      "Type": "NodeBroker",
+      "NodeId": 2,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594046316547",
+      "ChangeTime": "1783087155112",
+      "State": "Active",
+      "Generation": 10,
+      "Type": "Coordinator",
+      "NodeId": 1,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594046316545",
+      "ChangeTime": "1783087155112",
+      "State": "Active",
+      "Generation": 9,
+      "Type": "Coordinator",
+      "NodeId": 1,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594037932033",
+      "ChangeTime": "1783087154687",
+      "State": "Active",
+      "Generation": 10,
+      "Type": "BSController",
+      "NodeId": 1,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594046678944",
+      "ChangeTime": "1783087154675",
+      "State": "Active",
+      "Generation": 9,
+      "Type": "SchemeShard",
+      "NodeId": 1,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    },
+    {
+      "TabletId": "72057594046382083",
+      "ChangeTime": "1783087283648",
+      "State": "Active",
+      "Generation": 10,
+      "Type": "Mediator",
+      "NodeId": 2,
+      "Leader": true,
+      "FollowerId": 0,
+      "Overall": "Green"
+    }
+  ],
+  "StorageStats": [
+    {
+      "PDiskFilter": "Type:ROT",
+      "ErasureSpecies": "mirror-3-dc",
+      "AvailableGroupsToCreate": 0,
+      "AvailableSizeToCreate": "0"
+    },
+    {
+      "PDiskFilter": "Type:SSD",
+      "ErasureSpecies": "mirror-3-dc",
+      "CurrentGroupsCreated": 6,
+      "CurrentAllocatedSize": "40001077248",
+      "CurrentAvailableSize": "184674680832",
+      "AvailableGroupsToCreate": 0,
+      "AvailableSizeToCreate": "0"
+    },
+    {
+      "PDiskFilter": "Type:ROT",
+      "ErasureSpecies": "block-4-2",
+      "AvailableGroupsToCreate": 0,
+      "AvailableSizeToCreate": "0"
+    },
+    {
+      "PDiskFilter": "Type:SSD",
+      "ErasureSpecies": "block-4-2",
+      "AvailableGroupsToCreate": 0,
+      "AvailableSizeToCreate": "0"
+    }
+  ],
+  "Hosts": "6",
+  "Tenants": "1",
+  "NetworkUtilization": 0.00027478802610403363,
+  "NetworkWriteThroughput": "161586",
+  "BridgeInfo": {
+    "Piles": [
+      {
+        "PileId": 1,
+        "Name": "moscow",
+        "State": "PRIMARY",
+        "Nodes": 6
+      },
+      {
+        "PileId": 2,
+        "Name": "himki",
+        "State": "SYNCHRONIZED",
+        "Nodes": 6
+      }
+    ]
+  }
+}

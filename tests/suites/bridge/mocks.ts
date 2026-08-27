@@ -3,6 +3,9 @@ import type {Page, Route} from '@playwright/test';
 import {BridgePileGroupStatus, BridgePileState} from '../../../src/types/api/cluster';
 import {SelfCheckResult, StatusFlag} from '../../../src/types/api/healthcheck';
 
+import bridgeClusterDump from './fixtures/bridge-cluster.json';
+import disconnectedHimkiBrokenDump from './fixtures/disconnected-himki-broken.json';
+
 export const mockCapabilities = (page: Page, enabled: boolean) => {
     return page.route(`**/viewer/capabilities`, async (route: Route) => {
         await route.fulfill({
@@ -118,91 +121,19 @@ export const mockBridgeHealthcheckUnavailable = (page: Page) => {
     });
 };
 
-export const mockClusterWithAllBridgePileStates = (page: Page) => {
-    return page.route(`**/viewer/json/cluster?*`, async (route: Route) => {
+export const mockDisconnectedHimkiBrokenBridgeDump = async (page: Page) => {
+    await page.route(`**/viewer/json/cluster?*`, async (route: Route) => {
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify({
-                Version: 6,
-                Domain: '/dev02',
-                BridgeInfo: {
-                    Piles: [
-                        {
-                            PileId: 1,
-                            Name: 'primary-pile',
-                            State: BridgePileState.PRIMARY,
-                            Nodes: 16,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.FULL]: 24,
-                                [BridgePileGroupStatus.DEGRADED]: 2,
-                            },
-                        },
-                        {
-                            PileId: 2,
-                            Name: 'promoting-pile',
-                            State: BridgePileState.PROMOTED,
-                            Nodes: 12,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.FULL]: 18,
-                                [BridgePileGroupStatus.DEGRADED]: 4,
-                            },
-                        },
-                        {
-                            PileId: 3,
-                            Name: 'sync-pile',
-                            State: BridgePileState.SYNCHRONIZED,
-                            Nodes: 8,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.FULL]: 24,
-                            },
-                        },
-                        {
-                            PileId: 4,
-                            Name: 'not-sync-pile',
-                            State: BridgePileState.NOT_SYNCHRONIZED,
-                            Nodes: 4,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.FULL]: 12,
-                                [BridgePileGroupStatus.DEGRADED]: 4,
-                                [BridgePileGroupStatus.DISINTEGRATED]: 1,
-                            },
-                        },
-                        {
-                            PileId: 5,
-                            Name: 'suspended-pile',
-                            State: BridgePileState.SUSPENDED,
-                            Nodes: 6,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.DEGRADED]: 8,
-                                [BridgePileGroupStatus.DISINTEGRATED]: 2,
-                            },
-                        },
-                        {
-                            PileId: 6,
-                            Name: 'disconnected-pile',
-                            State: BridgePileState.DISCONNECTED,
-                            Nodes: 0,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.UNKNOWN]: 18,
-                            },
-                        },
-                        {
-                            PileId: 7,
-                            Name: 'all-group-statuses-pile',
-                            State: BridgePileState.NOT_SYNCHRONIZED,
-                            Nodes: 19,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.UNKNOWN]: 1,
-                                [BridgePileGroupStatus.FULL]: 4,
-                                [BridgePileGroupStatus.PARTIAL]: 12,
-                                [BridgePileGroupStatus.DEGRADED]: 1,
-                                [BridgePileGroupStatus.DISINTEGRATED]: 1,
-                            },
-                        },
-                    ],
-                },
-            }),
+            body: JSON.stringify(bridgeClusterDump),
+        });
+    });
+    await page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(disconnectedHimkiBrokenDump),
         });
     });
 };

@@ -10,8 +10,8 @@ import {
     mockBridgeHealthcheck,
     mockBridgeHealthcheckUnavailable,
     mockCapabilities,
-    mockClusterWithAllBridgePileStates,
     mockClusterWithBridgePiles,
+    mockDisconnectedHimkiBrokenBridgeDump,
     mockNodesWithPile,
     mockStorageGroupsWithPile,
 } from './mocks';
@@ -185,14 +185,10 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await expect(issueCard).not.toContainText('all-group-statuses-pile');
     });
 
-    test('on: bridge piles visual states', async ({page}) => {
+    test('on: shows bridge piles from a healthcheck dump', async ({page}) => {
         await page.setViewportSize({width: 1440, height: 900});
         await mockCapabilities(page, true);
-        await mockClusterWithAllBridgePileStates(page);
-        await mockBridgeHealthcheck(page, {
-            currentPileName: 'sync-pile',
-            failingPileName: 'disconnected-pile',
-        });
+        await mockDisconnectedHimkiBrokenBridgeDump(page);
 
         const clusterPage = new ClusterPage(page);
         await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
