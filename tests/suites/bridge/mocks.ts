@@ -1,6 +1,7 @@
 import type {Page, Route} from '@playwright/test';
 
 import {BridgePileGroupStatus, BridgePileState} from '../../../src/types/api/cluster';
+import {SelfCheckResult, StatusFlag} from '../../../src/types/api/healthcheck';
 
 export const mockCapabilities = (page: Page, enabled: boolean) => {
     return page.route(`**/viewer/capabilities`, async (route: Route) => {
@@ -54,6 +55,65 @@ export const mockStorageGroupsWithPile = (page: Page) => {
                 TotalGroups: 1,
                 StorageGroups: [{GroupId: '1', PoolName: 'p', MediaType: 'NVME', PileName: 'r1'}],
             }),
+        });
+    });
+};
+
+export const mockBridgeHealthcheck = (
+    page: Page,
+    {
+        currentPileName = 'r2',
+        failingPileName = 'all-group-statuses-pile',
+    }: {currentPileName?: string; failingPileName?: string} = {},
+) => {
+    return page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                self_check_result: SelfCheckResult.MAINTENANCE_REQUIRED,
+                location: {
+                    id: 2,
+                    host: 'current-pile-node',
+                    pile: {name: currentPileName},
+                },
+                issue_log: [
+                    {
+                        id: 'failing-pile-root',
+                        status: StatusFlag.ORANGE,
+                        message: 'Pile requires maintenance',
+                        type: 'STORAGE',
+                        level: 1,
+                        reason: ['failing-pile-leaf'],
+                        location: {
+                            storage: {
+                                pool: {
+                                    group: {
+                                        pile: {name: failingPileName},
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    {
+                        id: 'failing-pile-leaf',
+                        status: StatusFlag.RED,
+                        message: 'Unscoped VDisk failure',
+                        type: 'VDISK',
+                        level: 2,
+                    },
+                ],
+            }),
+        });
+    });
+};
+
+export const mockBridgeHealthcheckUnavailable = (page: Page) => {
+    return page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
+        await route.fulfill({
+            status: 404,
+            contentType: 'application/json',
+            body: JSON.stringify({error: 'Healthcheck is not available'}),
         });
     });
 };

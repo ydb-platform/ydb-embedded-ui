@@ -7,6 +7,8 @@ import {StoragePage} from '../storage/StoragePage';
 import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
 
 import {
+    mockBridgeHealthcheck,
+    mockBridgeHealthcheckUnavailable,
     mockCapabilities,
     mockClusterWithAllBridgePileStates,
     mockClusterWithBridgePiles,
@@ -105,6 +107,7 @@ test.describe('Bridge mode - Cluster Overview', () => {
     test('on: shows Bridge piles section with data', async ({page}) => {
         await mockCapabilities(page, true);
         await mockClusterWithBridgePiles(page);
+        await mockBridgeHealthcheck(page);
 
         const clusterPage = new ClusterPage(page);
         await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
@@ -115,19 +118,81 @@ test.describe('Bridge mode - Cluster Overview', () => {
         // Should show pile cards
         expect(await clusterPage.getPileCardsCount()).toBe(3);
 
+        await expect(
+            clusterPage.pileCards.first().getByTestId('bridge-pile-healthcheck'),
+        ).toContainText('Good');
+
         // Check first pile content
         const firstPileContent = await clusterPage.getFirstPileContent();
         expect(firstPileContent).toContain('r1');
         expect(firstPileContent).toContain('Primary'); // State
-        expect(firstPileContent).toContain('16 nodes'); // Nodes count
-        expect(firstPileContent).toContain('Full'); // Group status
-        expect(firstPileContent).toContain('24'); // Group status count
+        expect(firstPileContent).toContain('Nodes: 16');
+        expect(firstPileContent).not.toContain('Full');
+        await expect(
+            clusterPage.pileCards.first().getByTestId('bridge-pile-healthcheck').locator('button'),
+        ).toHaveCount(0);
+
+        await expect(clusterPage.pileCards.nth(1)).toContainText('You are here');
+        await expect(clusterPage.pileCards.nth(2)).toContainText('Caution');
+    });
+
+    test('on: shows unavailable healthcheck as non-interactive unknown', async ({page}) => {
+        await mockCapabilities(page, true);
+        await mockClusterWithBridgePiles(page);
+        await mockBridgeHealthcheckUnavailable(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
+        await expect(clusterPage.bridgeSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+
+        const healthcheck = clusterPage.pileCards.first().getByTestId('bridge-pile-healthcheck');
+        await expect(healthcheck).toContainText('Unknown');
+        await expect(healthcheck.locator('button')).toHaveCount(0);
+        await expect(clusterPage.bridgeSection).not.toContainText('You are here');
+    });
+
+    test('on: opens the source healthcheck issue from a pile badge', async ({page}) => {
+        await mockCapabilities(page, true);
+        await mockClusterWithBridgePiles(page);
+        await mockBridgeHealthcheck(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
+        await expect(clusterPage.bridgeSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+
+        const failingPile = clusterPage.pileCards.filter({
+            hasText: 'all-group-statuses-pile',
+        });
+        await failingPile.getByTestId('bridge-pile-healthcheck').click();
+
+        const drawer = page.getByTestId('cluster-healthcheck-details');
+        await expect(drawer).toBeVisible();
+        await expect(page).toHaveURL(/showHealthcheck=1/);
+        await expect(page).toHaveURL(/healthcheckIssue=failing-pile-root/);
+        await expect(page).toHaveURL(/healthcheckLeaf=failing-pile-leaf/);
+
+        const issueCard = drawer.getByTestId('healthcheck-issue-failing-pile-leaf');
+        await expect(issueCard).toBeVisible();
+        await expect(issueCard).toBeInViewport();
+        await expect(issueCard.locator('[aria-expanded="true"]')).toHaveCount(1);
+        await expect(issueCard.locator('.ydb-healthcheck__issue-tab_active')).toContainText(
+            'Storage',
+        );
+        await expect(issueCard.getByText('Pile', {exact: true})).toBeVisible();
+        await expect(issueCard.getByText('all-group-statuses-pile', {exact: true})).toBeVisible();
+
+        await issueCard.locator('.ydb-healthcheck__issue-tab').filter({hasText: 'VDisk'}).click();
+        await expect(issueCard).not.toContainText('all-group-statuses-pile');
     });
 
     test('on: bridge piles visual states', async ({page}) => {
         await page.setViewportSize({width: 1440, height: 900});
         await mockCapabilities(page, true);
         await mockClusterWithAllBridgePileStates(page);
+        await mockBridgeHealthcheck(page, {
+            currentPileName: 'sync-pile',
+            failingPileName: 'disconnected-pile',
+        });
 
         const clusterPage = new ClusterPage(page);
         await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
