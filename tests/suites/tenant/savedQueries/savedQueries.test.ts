@@ -1,6 +1,7 @@
 import {expect, test} from '@playwright/test';
 import {v4 as uuidv4} from 'uuid';
 
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../src/utils/emptyDataPlaceholder';
 import {database, dsVslotsSchema} from '../../../utils/constants';
 import {QueryEditorMode, TenantPage} from '../TenantPage';
 import {
@@ -10,6 +11,9 @@ import {
 } from '../queryEditor/models/NewSqlDropdownMenu';
 import {QueryTabs} from '../queryEditor/models/QueryEditor';
 import {RenameQueryDialog} from '../queryEditor/models/RenameQueryDialog';
+import {SaveChangesDialog} from '../queryEditor/models/SaveChangesDialog';
+
+import {RenameSavedQueryDialog} from './models/RenameSavedQueryDialog';
 
 test.describe('Saved Queries', () => {
     let tenantPage: TenantPage;
@@ -35,6 +39,39 @@ test.describe('Saved Queries', () => {
         // Verify saved queries list is displayed and contains our query
         const names = await tenantPage.savedQueriesTable.getQueryNames();
         expect(names).toContain(queryName);
+    });
+
+    test('Delete action follows Edit and removes the saved query after confirmation', async ({
+        page,
+    }) => {
+        const queryName = await tenantPage.saveQuery(
+            'SELECT 28 AS delete_saved_query;',
+            `Delete Saved ${uuidv4()}`,
+        );
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.isVisible();
+
+        await expect(tenantPage.savedQueriesTable.getActionNames(queryName)).resolves.toEqual([
+            'Rename',
+            'Edit',
+            'Delete',
+        ]);
+        await expect(
+            tenantPage.savedQueriesTable.getActionsWidth(queryName),
+        ).resolves.toBeGreaterThanOrEqual(136);
+
+        await tenantPage.savedQueriesTable.clickDelete(queryName);
+        const dialog = page.locator('.g-dialog').filter({hasText: 'Delete query'});
+        await expect(dialog).toBeVisible();
+        await dialog.getByRole('button', {name: 'Delete', exact: true}).click();
+
+        await expect(await tenantPage.savedQueriesTable.getQueryRow(queryName)).toBeHidden();
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Editor);
+        await expect(tenantPage.queryEditor.isSaveButtonVisible()).resolves.toBe(true);
+        await expect(tenantPage.queryEditor.isSaveButtonDisabled()).resolves.toBe(false);
+        await expect(tenantPage.queryEditor.isEditButtonVisible(1000)).resolves.toBe(false);
     });
 
     test('Open saved query in the Editor', async () => {
@@ -128,6 +165,39 @@ test.describe('Saved Queries', () => {
         expect(row?.query.trim()).toBe(updatedQuery.trim());
     });
 
+    test('Edit existing keeps a tab-only rename out of the saved query', async ({page}) => {
+        const originalQuery = 'SELECT 31 AS tab_only_rename_original;';
+        const updatedQuery = 'SELECT 32 AS tab_only_rename_updated;';
+        const queryName = await tenantPage.saveQuery(originalQuery, `Tab-only Rename ${uuidv4()}`);
+        const tabTitle = `Local Tab ${uuidv4()}`;
+        const tabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
+
+        expect(tabId).not.toBe(null);
+        if (!tabId) {
+            throw new Error('Expected the saved-query tab to be available');
+        }
+
+        const renameQueryDialog = new RenameQueryDialog(page);
+        await tenantPage.queryEditor.editorTabs.openTabMenuById(tabId);
+        await tenantPage.queryEditor.editorTabs.clickMenuAction('Rename');
+        await renameQueryDialog.setTitle(tabTitle);
+        await renameQueryDialog.clickApply();
+
+        await tenantPage.queryEditor.setQuery(updatedQuery);
+        await tenantPage.queryEditor.clickEditButton();
+        await tenantPage.queryEditor.clickEditExistingButton();
+
+        await expect(tenantPage.queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(tabTitle);
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.isVisible();
+
+        const savedQuery = await tenantPage.savedQueriesTable.getRowByName(queryName);
+        const tabTitleQuery = await tenantPage.savedQueriesTable.getRowByName(tabTitle);
+        expect(savedQuery?.query.trim()).toBe(updatedQuery);
+        expect(tabTitleQuery).toBe(null);
+    });
+
     test('Single-tab save as new creates a new saved query and keeps the editor bound to it', async () => {
         await tenantPage.gotoQueryEditor({
             schema: dsVslotsSchema,
@@ -170,6 +240,60 @@ test.describe('Saved Queries', () => {
         await expect
             .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
             .toBe(nextQuery);
+    });
+
+    test('Close-dialog save keeps a tab-only rename out of the saved query', async ({page}) => {
+        const originalQuery = 'SELECT 29 AS close_dialog_original;';
+        const updatedQuery = 'SELECT 30 AS close_dialog_updated;';
+        const queryName = await tenantPage.saveQuery(
+            originalQuery,
+            `Close Dialog Sync ${uuidv4()}`,
+        );
+        const tabTitle = `Local Close Tab ${uuidv4()}`;
+        const firstTabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
+
+        await tenantPage.queryEditor.editorTabs.clickAddTab();
+        await tenantPage.openSavedQuery(queryName);
+        const secondTabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
+
+        expect(firstTabId).not.toBe(null);
+        expect(secondTabId).not.toBe(null);
+
+        if (!firstTabId || !secondTabId) {
+            throw new Error('Expected both saved-query tabs to be available');
+        }
+
+        const renameQueryDialog = new RenameQueryDialog(page);
+        await tenantPage.queryEditor.editorTabs.openTabMenuById(secondTabId);
+        await tenantPage.queryEditor.editorTabs.clickMenuAction('Rename');
+        await renameQueryDialog.setTitle(tabTitle);
+        await renameQueryDialog.clickApply();
+
+        await tenantPage.queryEditor.setQuery(updatedQuery);
+        await tenantPage.queryEditor.editorTabs.hoverTabById(secondTabId);
+        await tenantPage.queryEditor.editorTabs.closeTabById(secondTabId);
+
+        const saveChangesDialog = new SaveChangesDialog(page);
+        await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
+        await expect(saveChangesDialog.getQueryName()).resolves.toBe(queryName);
+        await saveChangesDialog.clickSave();
+
+        await expect(tenantPage.queryEditor.editorTabs.waitForTabCount(1)).resolves.toBe(true);
+        await expect(tenantPage.queryEditor.editorTabs.getActiveTabId()).resolves.toBe(firstTabId);
+        await expect(tenantPage.queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(
+            queryName,
+        );
+        await expect
+            .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
+            .toBe(updatedQuery);
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.isVisible();
+
+        const savedQuery = await tenantPage.savedQueriesTable.getRowByName(queryName);
+        const tabTitleQuery = await tenantPage.savedQueriesTable.getRowByName(tabTitle);
+        expect(savedQuery?.query.trim()).toBe(updatedQuery);
+        expect(tabTitleQuery).toBe(null);
     });
 
     test('Save As from a non-active tab updates the correct tab', async () => {
@@ -365,5 +489,104 @@ test.describe('Saved Queries', () => {
         await expect
             .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
             .toBe(query);
+    });
+
+    test('Saved query preview stays open after renaming with Apply and Enter', async ({page}) => {
+        const body = 'SELECT 99 AS saved_preview;\nSELECT 100 AS full_second_line;';
+        const originalName = await tenantPage.saveQuery(body, `Preview ${uuidv4()}`);
+        const applyName = `Preview Apply ${uuidv4()}`;
+        const enterName = `Preview Enter ${uuidv4()}`;
+        const renameDialog = new RenameSavedQueryDialog(page);
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.clickRow(originalName);
+
+        await expect(tenantPage.savedQueriesTable.getPreviewTitle()).resolves.toBe(originalName);
+        await expect
+            .poll(() => tenantPage.savedQueriesTable.getPreviewEdited())
+            .not.toBe(EMPTY_DATA_PLACEHOLDER);
+        await expect(
+            tenantPage.savedQueriesTable.getPreviewDrawer().locator('.ydb-query-details'),
+        ).toContainText(body);
+        await expect.poll(() => tenantPage.savedQueriesTable.isRowActive(originalName)).toBe(true);
+
+        await test.step('Apply button keeps the preview open', async () => {
+            await tenantPage.savedQueriesTable.clickPreviewRename();
+            await renameDialog.setTitle(applyName);
+            await renameDialog.clickApply();
+
+            await renameDialog.waitForHidden();
+            await expect(tenantPage.savedQueriesTable.getPreviewDrawer()).toBeVisible();
+            await expect(tenantPage.savedQueriesTable.getPreviewTitle()).resolves.toBe(applyName);
+        });
+
+        await test.step('Enter keeps the preview open', async () => {
+            await tenantPage.savedQueriesTable.clickPreviewRename();
+            await renameDialog.setTitle(enterName);
+            await renameDialog.pressEnter();
+
+            await renameDialog.waitForHidden();
+            await expect(tenantPage.savedQueriesTable.getPreviewDrawer()).toBeVisible();
+            await expect(tenantPage.savedQueriesTable.getPreviewTitle()).resolves.toBe(enterName);
+        });
+
+        await tenantPage.savedQueriesTable.waitForRow(enterName);
+        await expect
+            .poll(() => tenantPage.savedQueriesTable.getEdited(enterName))
+            .not.toBe(EMPTY_DATA_PLACEHOLDER);
+
+        await tenantPage.savedQueriesTable.closePreview();
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Editor);
+        await expect(tenantPage.queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(
+            enterName,
+        );
+    });
+
+    test('Saved query search matches names case-insensitively', async () => {
+        const name = `Name Match ${uuidv4()}`;
+        await tenantPage.saveQuery('SELECT 22 AS search_name_body;', name);
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.search(name.toUpperCase());
+        await tenantPage.savedQueriesTable.waitForRow(name);
+    });
+
+    test('Renaming a saved query to another query name shows a validation error', async ({
+        page,
+    }) => {
+        const firstName = `Rename Duplicate First ${uuidv4()}`;
+        const secondName = `Rename Duplicate Second ${uuidv4()}`;
+        const duplicateName = secondName.toUpperCase();
+        const renameDialog = new RenameSavedQueryDialog(page);
+
+        await tenantPage.saveQuery('SELECT 25 AS rename_duplicate_first;', firstName);
+        await tenantPage.saveQuery('SELECT 26 AS rename_duplicate_second;', secondName);
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.clickRename(firstName);
+        await renameDialog.setTitle(duplicateName);
+        await renameDialog.clickApply();
+
+        await expect(renameDialog.getErrorMessage()).resolves.toBe('This name already exists');
+    });
+
+    test('Legacy saved query records show the empty Edited placeholder', async ({page}) => {
+        const legacyName = `Legacy Saved ${uuidv4()}`;
+        const legacyBody = 'SELECT 27 AS legacy_saved_query;';
+        await page.evaluate(
+            ({name, body}) => {
+                localStorage.setItem('saved_queries', JSON.stringify([{name, body}]));
+            },
+            {name: legacyName, body: legacyBody},
+        );
+
+        await page.reload({waitUntil: 'domcontentloaded'});
+        await tenantPage.queryEditor.waitForEditorReady();
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.isVisible();
+
+        await expect(tenantPage.savedQueriesTable.getEdited(legacyName)).resolves.toBe(
+            EMPTY_DATA_PLACEHOLDER,
+        );
     });
 });

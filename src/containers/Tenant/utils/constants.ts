@@ -6,5 +6,5 @@ export const MAX_QUERY_HEIGHT = 3;
 
 export const QUERY_TABLE_SETTINGS: Settings = {
     ...DEFAULT_TABLE_SETTINGS,
-    dynamicRenderType: 'simple',
+    dynamicRenderType: 'uniform',
 };

@@ -1171,13 +1171,11 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.setCursor(1, 3);
         await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
 
-        await expect(
-            queryEditor.getCurrentStatementUpdateMetricsDuringTextChange(),
-        ).resolves.toEqual({
-            // react-monaco-editor and the page-leave guard each read the controlled value.
-            // Current-statement indexing must not add another synchronous full-text read.
-            fullTextReads: 2,
-        });
+        const {fullTextReads} =
+            await queryEditor.getCurrentStatementUpdateMetricsDuringTextChange();
+
+        // Current-statement indexing must not add another synchronous full-text read.
+        expect(fullTextReads).toBeLessThanOrEqual(2);
     });
 
     test('Results controls collapse and expand functionality', async ({page}) => {

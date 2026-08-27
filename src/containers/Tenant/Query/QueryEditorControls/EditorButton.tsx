@@ -15,7 +15,7 @@ const b = cn('ydb-query-editor-button');
 const Run = (props: ButtonProps) => (
     <Button {...props} className={b('run-button', undefined, BRAND_BUTTON_CLASS)}>
         <Icon data={PlayFill} size={16} />
-        {i18n('action.run')}
+        {i18n('action_run-query')}
     </Button>
 );
 
@@ -33,25 +33,25 @@ const Stop = ({error, replacedAction, ...props}: StopButtonProps) => (
         })}
     >
         <Icon data={StopFill} size={16} />
-        {i18n('action.stop')}
+        {i18n('action_stop-query')}
     </Button>
 );
 
 const Explain = (props: ButtonProps) => (
     <Button {...props} className={b('explain-button', undefined, BRAND_BUTTON_CLASS)}>
-        {i18n('action.explain')}
+        {i18n('action_explain-query')}
     </Button>
 );
 
 const ExplainAnalyze = (props: ButtonProps) => (
     <ActionTooltip
-        title={i18n('explain-analyze.tooltip.title')}
-        description={i18n('explain-analyze.tooltip.description')}
+        title={i18n('alert_explain-analyze-executes-query')}
+        description={i18n('alert_explain-analyze-applies-changes')}
         openDelay={0}
         placement={['top-start']}
     >
         <Button {...props} className={b('explain-analyze-button', undefined, BRAND_BUTTON_CLASS)}>
-            {i18n('action.explain-analyze')}
+            {i18n('action_explain-analyze-query')}
         </Button>
     </ActionTooltip>
 );
@@ -72,7 +72,7 @@ const Settings = ({onClick, isLoading}: SettingsButtonProps) => {
     return (
         <ActionTooltip
             disabled={changedCurrentSettings.length === 0}
-            title={i18n('gear.tooltip')}
+            title={i18n('alert_query-settings-modified')}
             description={
                 <QuerySettingsDescription
                     prefix=""

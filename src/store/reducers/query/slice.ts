@@ -216,6 +216,20 @@ function getActiveTab(state: QueryState): QueryTabState | undefined {
     return state.activeTabId ? state.tabsById[state.activeTabId] : undefined;
 }
 
+function getTabsBoundToSavedQuery(
+    tabsById: QueryState['tabsById'],
+    savedQueryName: string,
+): QueryTabState[] {
+    const tabs = Object.values(tabsById);
+    const exactMatches = tabs.filter((tab) => tab.savedQueryName === savedQueryName);
+    if (exactMatches.length) {
+        return exactMatches;
+    }
+
+    const normalizedName = savedQueryName.trim().toLowerCase();
+    return tabs.filter((tab) => tab.savedQueryName?.trim().toLowerCase() === normalizedName);
+}
+
 function getSetQueryTabContentTitle({
     tabsById,
     activeTab,
@@ -524,6 +538,69 @@ const slice = createSlice({
             tab.updatedAt = Date.now();
             persistTabsStateToSessionStorage(state);
         },
+        renameSavedQueryTabs: (
+            state,
+            action: PayloadAction<{previousName: string; nextName: string}>,
+        ) => {
+            const matchingTabs = getTabsBoundToSavedQuery(
+                state.tabsById,
+                action.payload.previousName,
+            );
+            matchingTabs.forEach((tab) => {
+                tab.title = action.payload.nextName;
+                tab.savedQueryName = action.payload.nextName;
+            });
+            persistTabsStateToSessionStorage(state);
+        },
+        syncSavedQueryTabsAfterUpdate: (
+            state,
+            action: PayloadAction<{
+                sourceTabId: string;
+                previousName: string;
+                nextName: string;
+                previousBody: string;
+                nextBody: string;
+            }>,
+        ) => {
+            const {sourceTabId, previousName, nextName, previousBody, nextBody} = action.payload;
+            const matchingTabs = getTabsBoundToSavedQuery(state.tabsById, previousName);
+            const isSavedQueryRenamed = previousName !== nextName;
+
+            matchingTabs.forEach((tab) => {
+                if (tab.id === sourceTabId || tab.input === previousBody) {
+                    tab.input = nextBody;
+                }
+
+                if (isSavedQueryRenamed) {
+                    tab.title = nextName;
+                }
+                tab.savedQueryName = nextName;
+                tab.savedInput = nextBody;
+                tab.isDirty = tab.input !== nextBody;
+            });
+
+            if (matchingTabs.length) {
+                persistTabsStateToSessionStorage(state);
+                persistDirtyStateToSessionStorage(state);
+            }
+        },
+        detachSavedQueryTabs: (state, action: PayloadAction<{savedQueryName: string}>) => {
+            const matchingTabs = getTabsBoundToSavedQuery(
+                state.tabsById,
+                action.payload.savedQueryName,
+            );
+
+            matchingTabs.forEach((tab) => {
+                tab.savedQueryName = undefined;
+                tab.savedInput = undefined;
+                tab.isDirty = true;
+            });
+
+            if (matchingTabs.length) {
+                persistTabsStateToSessionStorage(state);
+                persistDirtyStateToSessionStorage(state);
+            }
+        },
         setQueryTabSavedQueryName: (
             state,
             action: PayloadAction<{tabId: string; savedQueryName: string | undefined}>,
@@ -625,6 +702,9 @@ export const {
     applyExternalQueryToActiveTab,
     closeQueryTab,
     renameQueryTab,
+    renameSavedQueryTabs,
+    syncSavedQueryTabsAfterUpdate,
+    detachSavedQueryTabs,
     syncSavedQueryTab,
     setQueryTabSavedQueryName,
     setActiveQueryTab,

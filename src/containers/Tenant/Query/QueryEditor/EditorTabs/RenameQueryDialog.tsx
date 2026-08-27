@@ -43,11 +43,7 @@ function RenameQueryDialog({
         const validationError = getQueryNameValidationError(normalizedTitle);
 
         if (validationError) {
-            setErrorMessage(
-                validationError === 'not-empty'
-                    ? i18n('editor-tabs.rename-query-dialog.error-empty')
-                    : i18n('editor-tabs.rename-query-dialog.error-min-length'),
-            );
+            setErrorMessage(i18n('alert_query-tab-name-empty'));
             return;
         }
 
@@ -67,17 +63,15 @@ function RenameQueryDialog({
             initialFocus={controlRef}
             className={b()}
         >
-            <Dialog.Header caption={i18n('editor-tabs.rename-query-dialog.title')} />
+            <Dialog.Header caption={i18n('title_rename-query-tab')} />
             <Dialog.Body>
-                <div className={b('dialog-row')}>
-                    {i18n('editor-tabs.rename-query-dialog.description')}
-                </div>
+                <div className={b('dialog-row')}>{i18n('context_rename-query-tab')}</div>
                 <div className={b('dialog-row')}>
                     <div className={b('control-wrapper')}>
                         <TextInput
                             value={nextTitle}
                             onUpdate={handleTitleChange}
-                            placeholder={i18n('editor-tabs.rename-query-dialog.input-placeholder')}
+                            placeholder={i18n('field_query-tab-name')}
                             controlRef={controlRef}
                             hasClear
                             autoComplete={false}
@@ -88,8 +82,8 @@ function RenameQueryDialog({
                 </div>
             </Dialog.Body>
             <Dialog.Footer
-                textButtonApply={i18n('editor-tabs.rename-query-dialog.apply')}
-                textButtonCancel={i18n('editor-tabs.rename-query-dialog.cancel')}
+                textButtonApply={i18n('action_apply')}
+                textButtonCancel={i18n('action_cancel')}
                 onClickButtonApply={handleApply}
                 onClickButtonCancel={handleClose}
                 propsButtonApply={{className: BRAND_BUTTON_CLASS}}

@@ -96,7 +96,7 @@ export function EditorTabs() {
             </TabProvider>
             <div className={b('add-icon-button')}>
                 <ActionTooltip
-                    title={i18n('editor-tabs.action.new-tab')}
+                    title={i18n('action_open-new-editor-tab')}
                     placement={['top-start', 'top-end', 'bottom-start', 'bottom-end']}
                     hotkey={HOTKEY_LABELS.newTab}
                 >
@@ -104,7 +104,7 @@ export function EditorTabs() {
                         view="flat-secondary"
                         size="xs"
                         onClick={handleNewTabClick}
-                        aria-label={i18n('editor-tabs.action.new-tab')}
+                        aria-label={i18n('action_open-new-editor-tab')}
                     >
                         <Icon data={Plus} size={12} />
                     </Button>

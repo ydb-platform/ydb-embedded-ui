@@ -27,7 +27,7 @@ export function PreviewContainer(props: PreviewContainerProps) {
     }
 
     const renderContent = () => (
-        <div className={b('message-container')}>{i18n('preview.not-available')}</div>
+        <div className={b('message-container')}>{i18n('context_query-preview-unavailable')}</div>
     );
     return <Preview {...props} renderResult={renderContent} />;
 }

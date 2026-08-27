@@ -2,20 +2,15 @@ import type {Locator, Page} from '@playwright/test';
 
 import {VISIBILITY_TIMEOUT} from '../../TenantPage';
 
-export class RenameQueryDialog {
+export class RenameSavedQueryDialog {
     private dialog: Locator;
 
     constructor(page: Page) {
-        this.dialog = page.locator('.ydb-rename-query-dialog');
-    }
-
-    async isVisible() {
-        await this.dialog.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return true;
+        this.dialog = page.locator('.ydb-rename-saved-query-dialog');
     }
 
     async setTitle(title: string) {
-        const input = this.dialog.getByPlaceholder('Tab name');
+        const input = this.dialog.getByRole('textbox');
         await input.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await input.click();
         await input.clear();
@@ -28,15 +23,19 @@ export class RenameQueryDialog {
         await applyButton.click();
     }
 
-    async clickCancel() {
-        const cancelButton = this.dialog.getByRole('button', {name: 'Cancel'});
-        await cancelButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await cancelButton.click();
+    async pressEnter() {
+        const input = this.dialog.getByRole('textbox');
+        await input.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await input.press('Enter');
     }
 
     async getErrorMessage() {
-        const error = this.dialog.locator('.g-text-input__error');
+        const error = this.dialog.locator('[data-qa="control-error-message-qa"]');
         await error.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return error.innerText();
+    }
+
+    async waitForHidden() {
+        await this.dialog.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
     }
 }

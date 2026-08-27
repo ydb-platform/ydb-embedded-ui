@@ -126,7 +126,7 @@ export const QueryEditorControls = ({
             createToast({
                 name: 'stop-error',
                 title: '',
-                content: i18n('toaster.stop-error'),
+                content: i18n('alert_stop-query-error'),
                 theme: 'danger',
                 autoHiding: STOP_AUTO_HIDE_TIMEOUT,
             });

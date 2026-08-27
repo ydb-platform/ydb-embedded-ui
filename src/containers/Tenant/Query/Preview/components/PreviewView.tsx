@@ -39,9 +39,9 @@ export function Preview({
         return (
             <Flex justifyContent="space-between" alignItems="center" className={b('header')}>
                 <Flex gap={1}>
-                    {i18n('preview.title')}
+                    {i18n('title_query-preview')}
                     <Text color="secondary" variant="body-2">
-                        {truncated ? `${i18n('preview.truncated')} ` : ''}({quantity})
+                        {truncated ? `${i18n('value_truncated-query-preview')} ` : ''}({quantity})
                     </Text>
                     <div className={b('table-name')}>{path}</div>
                 </Flex>
@@ -50,7 +50,7 @@ export function Preview({
                     <Button
                         view="flat-secondary"
                         onClick={handleClosePreview}
-                        title={i18n('preview.close')}
+                        title={i18n('action_close-query-preview')}
                     >
                         <Icon data={Xmark} size={18} />
                     </Button>

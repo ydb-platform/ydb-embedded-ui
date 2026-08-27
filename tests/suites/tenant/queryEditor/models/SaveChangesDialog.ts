@@ -31,9 +31,16 @@ export class SaveChangesDialog {
     }
 
     async clickSave() {
-        const saveButton = this.dialogFooter.getByRole('button', {name: 'Save', exact: true});
+        const saveButton = this.dialogFooter.getByRole('button', {
+            name: 'Save changes',
+            exact: true,
+        });
         await saveButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await saveButton.click();
+    }
+
+    async getDescription() {
+        return this.body.locator(':scope > div').first().innerText();
     }
 
     async setQueryName(value: string) {
@@ -42,11 +49,15 @@ export class SaveChangesDialog {
         await input.fill(value);
     }
 
+    async getQueryName() {
+        const input = this.dialog.getByRole('textbox');
+        await input.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return input.inputValue();
+    }
+
     async getValidationError() {
         const errorMessage = this.dialog
-            .getByText(
-                /Name should not be empty|Name must be at least 3 characters|This name already exists/,
-            )
+            .getByText(/Name should not be empty|This name already exists/)
             .first();
         await errorMessage.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return errorMessage.innerText();
