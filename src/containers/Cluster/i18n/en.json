@@ -25,6 +25,7 @@
   "value_bridge-state-disconnected": "Disconnected",
   "value_bridge-state-unspecified": "Unspecified",
   "label_you-are-here": "You are here",
+  "label_bridge-pile-health-status": "Health status for pile {{pileName}}: {{status}}",
   "value_bridge-group-status-unknown": "Unknown",
   "value_bridge-group-status-full": "Full",
   "value_bridge-group-status-partial": "Partial",

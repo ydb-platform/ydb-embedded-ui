@@ -12,7 +12,7 @@ import {
 import {Flex, Icon, Text} from '@gravity-ui/uikit';
 import type {LabelProps} from '@gravity-ui/uikit';
 
-import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {EntityStatus, getEntityStatusName} from '../../../../components/EntityStatus/EntityStatus';
 import {LabelWithHelpMark} from '../../../../components/LabelWithHelpMark/LabelWithHelpMark';
 import {Skeleton} from '../../../../components/Skeleton/Skeleton';
 import {
@@ -154,6 +154,12 @@ const BridgePileCard = React.memo(function BridgePileCard({
 
     const pileName = pile.Name?.trim() || EMPTY_DATA_PLACEHOLDER;
     const nodes = pile.Nodes === undefined ? EMPTY_DATA_PLACEHOLDER : formatNumber(pile.Nodes);
+    const healthcheckAccessibleName = pileHealthcheck.target
+        ? i18n('label_bridge-pile-health-status', {
+              pileName,
+              status: getEntityStatusName(pileHealthcheck.status),
+          })
+        : undefined;
     const handleHealthcheckClick = React.useCallback(() => {
         if (pileHealthcheck.target) {
             onHealthcheckClick(pileHealthcheck.target);
@@ -180,6 +186,7 @@ const BridgePileCard = React.memo(function BridgePileCard({
                 ) : (
                     <EntityStatus.Label
                         status={pileHealthcheck.status}
+                        accessibleName={healthcheckAccessibleName}
                         size="xs"
                         className={b('healthcheck-status')}
                         onClick={pileHealthcheck.target ? handleHealthcheckClick : undefined}

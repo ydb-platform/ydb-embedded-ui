@@ -44,8 +44,13 @@ const EFlagToStatusName: Record<EFlag, string> = {
     },
 };
 
+export function getEntityStatusName(status: EFlag) {
+    return EFlagToStatusName[status];
+}
+
 interface EntityStatusLabelProps {
     status: EFlag;
+    accessibleName?: string;
     note?: React.ReactNode;
     children?: React.ReactNode;
     className?: string;
@@ -58,6 +63,7 @@ interface EntityStatusLabelProps {
 }
 
 function EntityStatusLabel({
+    accessibleName,
     children,
     className,
     endContent,
@@ -82,9 +88,12 @@ function EntityStatusLabel({
                 interactive={isClickable}
                 qa={qa}
             >
-                <Flex gap="2" wrap="nowrap">
+                {accessibleName ? (
+                    <span className={b('accessible-name')}>{accessibleName}</span>
+                ) : null}
+                <Flex gap="2" wrap="nowrap" aria-hidden={accessibleName ? true : undefined}>
                     {children}
-                    {withStatusName ? EFlagToStatusName[status] : null}
+                    {withStatusName ? getEntityStatusName(status) : null}
                     {endContent ? <Flex alignSelf="center">{endContent}</Flex> : null}
                     {note && <HelpMark className={b('note')}>{note}</HelpMark>}
                 </Flex>

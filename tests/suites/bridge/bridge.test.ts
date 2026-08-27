@@ -164,7 +164,13 @@ test.describe('Bridge mode - Cluster Overview', () => {
         const failingPile = clusterPage.pileCards.filter({
             hasText: 'all-group-statuses-pile',
         });
-        await failingPile.getByTestId('bridge-pile-healthcheck').click();
+        const healthcheckButton = failingPile
+            .getByTestId('bridge-pile-healthcheck')
+            .locator('button');
+        await expect(healthcheckButton).toHaveAccessibleName(
+            'Health status for pile all-group-statuses-pile: Caution',
+        );
+        await healthcheckButton.click();
 
         const drawer = page.getByTestId('cluster-healthcheck-details');
         await expect(drawer).toBeVisible();
