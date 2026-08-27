@@ -13,7 +13,7 @@ import {NodeInfo} from './NodeInfo';
 import {PoolInfo} from './PoolInfo';
 import {IdList, LocationDetails, SectionWithTitle} from './utils';
 
-export type LocationFieldCompute = 'tablet' | 'schema' | 'node' | 'pool' | 'state_storage';
+export type LocationFieldCompute = 'tablet' | 'schema' | 'node' | 'pool' | 'pile' | 'state_storage';
 
 type ComputeLocationType = Location['compute'];
 
@@ -25,6 +25,12 @@ const LocationFieldRenderer: Record<
     pool: (location: ComputeLocationType) => <PoolInfo location={location} key="pool" />,
     tablet: (location: ComputeLocationType) => <TabletInfo location={location} key="tablet" />,
     schema: (location: ComputeLocationType) => <SchemaInfo location={location} key="schema" />,
+    pile: (location: ComputeLocationType) => (
+        <LocationDetails
+            fields={[{value: location?.pile?.name, title: i18n('label_pile')}]}
+            key="pile"
+        />
+    ),
     state_storage: (location: ComputeLocationType) => (
         <StateStorageInfo location={location} key="state_storage" />
     ),
@@ -36,7 +42,7 @@ interface ComputeLocationProps {
 }
 
 export function ComputeLocation({location, hiddenFields = []}: ComputeLocationProps) {
-    const {node, tablet, schema, pool, state_storage: stateStorage} = location ?? {};
+    const {node, tablet, schema, pool, pile, state_storage: stateStorage} = location ?? {};
 
     const fields = React.useMemo(() => {
         const fields: LocationFieldCompute[] = [];
@@ -52,11 +58,14 @@ export function ComputeLocation({location, hiddenFields = []}: ComputeLocationPr
         if (schema) {
             fields.push('schema');
         }
+        if (pile) {
+            fields.push('pile');
+        }
         if (stateStorage) {
             fields.push('state_storage');
         }
         return fields.filter((field) => !hiddenFields.includes(field));
-    }, [node, pool, tablet, schema, stateStorage, hiddenFields]);
+    }, [node, pool, tablet, schema, pile, stateStorage, hiddenFields]);
 
     if (!location || isEmpty(location) || fields.length === 0) {
         return null;
@@ -142,6 +151,7 @@ function StateStorageInfo({location}: ComputeSectionProps) {
                                 : undefined,
                         title: i18n('label_state-storage-ring'),
                     },
+                    {value: stateStorage.pile?.name, title: i18n('label_pile')},
                 ]}
             />
             <NodeInfo node={stateStorage.node} />

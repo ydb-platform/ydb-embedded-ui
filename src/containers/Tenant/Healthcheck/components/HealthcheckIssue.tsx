@@ -15,20 +15,33 @@ import {HealthcheckIssueTabs} from './HealthcheckIssueTabs';
 interface HealthcheckIssueProps {
     issue: IssuesTree;
     expanded?: boolean;
+    targeted?: boolean;
+    targetIssueId?: string;
+    targetRef?: React.RefObject<HTMLDivElement>;
 }
 
-export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
+export function HealthcheckIssue({
+    issue,
+    expanded,
+    targeted,
+    targetIssueId,
+    targetRef,
+}: HealthcheckIssueProps) {
     const {assistant} = useHealthcheckContext();
-    const [selectedTab, setSelectedTab] = React.useState(issue.id);
     const parents = React.useMemo(() => {
-        const parents = [];
+        const branchIssues = [];
         let current: IssuesTree | undefined = issue;
         while (current) {
-            parents.push(current);
+            branchIssues.push(current);
             current = current.parent;
         }
-        return parents.reverse();
+        return branchIssues.reverse();
     }, [issue]);
+    const [selectedTab, setSelectedTab] = React.useState(
+        targetIssueId && parents.some((parentIssue) => parentIssue.id === targetIssueId)
+            ? targetIssueId
+            : issue.id,
+    );
 
     const currentIssue = React.useMemo(() => {
         return parents.find((parent) => parent.id === selectedTab);
@@ -37,10 +50,21 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
         () => assistant?.snapshot.issues.find((item) => item.id === issue.id) ?? issue,
         [assistant?.snapshot.issues, issue],
     );
+    const renderIssueLabels = () => {
+        if (!issue.status) {
+            return null;
+        }
+
+        return (
+            <div className={b('issue-status')}>
+                <EntityStatus.Label size="s" status={hcStatusToColorFlag[issue.status]} />
+            </div>
+        );
+    };
 
     return (
-        <Flex className={b('issue-wrapper')}>
-            <Disclosure className={b('issue-content')} defaultExpanded={expanded}>
+        <Flex ref={targetRef} className={b('issue-wrapper')} qa={`healthcheck-issue-${issue.id}`}>
+            <Disclosure className={b('issue-content')} defaultExpanded={expanded || targeted}>
                 <Disclosure.Summary>
                     {(props) => {
                         const {
@@ -70,14 +94,7 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                                         <Flex direction="column" gap={1} alignSelf="center">
                                             <Text variant="subheader-2">{issue.message}</Text>
 
-                                            {issue.status && (
-                                                <div className={b('issue-status')}>
-                                                    <EntityStatus.Label
-                                                        size="s"
-                                                        status={hcStatusToColorFlag[issue.status]}
-                                                    />
-                                                </div>
-                                            )}
+                                            {renderIssueLabels()}
                                         </Flex>
                                         <Flex
                                             wrap="nowrap"
@@ -118,14 +135,7 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                                 >
                                     <Text variant="subheader-2">{issue.message}</Text>
 
-                                    {issue.status && (
-                                        <div className={b('issue-status')}>
-                                            <EntityStatus.Label
-                                                size="s"
-                                                status={hcStatusToColorFlag[issue.status]}
-                                            />
-                                        </div>
-                                    )}
+                                    {renderIssueLabels()}
                                 </Flex>
                                 <div
                                     className={b('issue-action')}

@@ -30,6 +30,7 @@ type DrawerEvent = MouseEvent & {
 interface DrawerPaneContentWrapperProps {
     isVisible: boolean;
     onClose: () => void;
+    onTransitionInComplete?: () => void;
     children: React.ReactNode;
     drawerId?: string;
     storageKey?: string;
@@ -44,6 +45,7 @@ interface DrawerPaneContentWrapperProps {
 const DrawerPaneContentWrapper = ({
     isVisible,
     onClose,
+    onTransitionInComplete,
     children,
     drawerId = 'drawer',
     storageKey = DRAWER_WIDTH_KEY,
@@ -172,6 +174,7 @@ const DrawerPaneContentWrapper = ({
             qa={drawerId}
             open={isVisible}
             onOpenChange={handleOpenChange}
+            onTransitionInComplete={onTransitionInComplete}
             placement={direction}
             hideVeil={hideVeil}
             className={b('container', className)}
@@ -203,6 +206,7 @@ interface DrawerPaneProps {
     renderDrawerContent: () => React.ReactNode;
     isDrawerVisible: boolean;
     onCloseDrawer: () => void;
+    onTransitionInComplete?: () => void;
     drawerId?: string;
     storageKey?: string;
     defaultWidth?: number;
@@ -221,6 +225,7 @@ export const DrawerWrapper = ({
     renderDrawerContent,
     isDrawerVisible,
     onCloseDrawer,
+    onTransitionInComplete,
     drawerId,
     storageKey,
     defaultWidth,
@@ -289,6 +294,7 @@ export const DrawerWrapper = ({
                 hideVeil={hideVeil}
                 isVisible={isDrawerVisible}
                 onClose={onCloseDrawer}
+                onTransitionInComplete={onTransitionInComplete}
                 drawerId={drawerId}
                 storageKey={storageKey}
                 defaultWidth={defaultWidth}

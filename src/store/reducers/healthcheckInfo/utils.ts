@@ -1,5 +1,5 @@
 import {EFlag} from '../../../types/api/enums';
-import type {IssueLog} from '../../../types/api/healthcheck';
+import type {IssueLog, Location} from '../../../types/api/healthcheck';
 import {SelfCheckResult, StatusFlag} from '../../../types/api/healthcheck';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 
@@ -23,6 +23,46 @@ export const selfCheckResultToHcStatus: Record<SelfCheckResult, StatusFlag> = {
     [SelfCheckResult.EMERGENCY]: StatusFlag.RED,
 };
 
+function getStorageLocationPileNames(location: Location['storage']): Array<string | undefined> {
+    return [location?.pool?.group?.pile?.name, location?.node?.pile?.name];
+}
+
+function getComputeLocationPileNames(location: Location['compute']): Array<string | undefined> {
+    return [
+        location?.pile?.name,
+        location?.state_storage?.pile?.name,
+        location?.node?.pile?.name,
+        location?.state_storage?.node?.pile?.name,
+    ];
+}
+
+export function getHealthcheckIssuePileNames(issue: Pick<IssueLog, 'location'>): string[] {
+    const [storageGroupPile, storageNodePile] = getStorageLocationPileNames(
+        issue.location?.storage,
+    );
+    const [computePile, stateStoragePile, computeNodePile, stateStorageNodePile] =
+        getComputeLocationPileNames(issue.location?.compute);
+    const rawNames = [
+        storageGroupPile,
+        computePile,
+        stateStoragePile,
+        storageNodePile,
+        computeNodePile,
+        stateStorageNodePile,
+        issue.location?.node?.pile?.name,
+        issue.location?.peer?.pile?.name,
+    ];
+
+    const names = new Set<string>();
+    for (const rawName of rawNames) {
+        if (rawName?.trim()) {
+            names.add(rawName);
+        }
+    }
+
+    return Array.from(names);
+}
+
 // Issue type prefixes that should be routed to the "storage" tab in the UI,
 // covering regular disk issues alongside ring/board/state-storage issues.
 // 'BOARD_' (with underscore) is intentionally narrow to match only BOARD_RING /
@@ -35,6 +75,7 @@ const STORAGE_TAB_PREFIXES = [
     'BOARD_',
     'STATE_STORAGE',
 ];
+const STORAGE_TAB_EXACT_TYPES = new Set(['BOARD']);
 
 // Maps a state-storage summary issue type to the corresponding `_RING` type.
 // Backend reports the summary (BLUE) and the detailed RING/NODE chain as
@@ -50,7 +91,10 @@ export function isStorageRelatedType(type?: string): boolean {
     if (!type) {
         return false;
     }
-    return STORAGE_TAB_PREFIXES.some((prefix) => type.startsWith(prefix));
+    return (
+        STORAGE_TAB_EXACT_TYPES.has(type) ||
+        STORAGE_TAB_PREFIXES.some((prefix) => type.startsWith(prefix))
+    );
 }
 
 export function isComputeRelatedType(type?: string): boolean {
@@ -112,9 +156,15 @@ export function linkStateStorageSummaries(issues: IssueLog[]): IssueLog[] {
 
 function getCategoryForUI(issueType?: string) {
     if (issueType) {
-        for (const category of uiFactory.healthcheck.issueCategories) {
-            if (uiFactory.healthcheck.isIssueTypeOfCategory(issueType, category)) {
-                return category;
+        const issueTypeVariants = issueType.startsWith('PILE_')
+            ? [issueType, issueType.slice('PILE_'.length)]
+            : [issueType];
+
+        for (const type of issueTypeVariants) {
+            for (const category of uiFactory.healthcheck.issueCategories) {
+                if (uiFactory.healthcheck.isIssueTypeOfCategory(type, category)) {
+                    return category;
+                }
             }
         }
     }
@@ -125,7 +175,7 @@ function getCategoryForUI(issueType?: string) {
 function extendIssue(
     issue: IssueLog,
     rootTypeForUI?: string,
-    fields?: {parent: IssuesTree},
+    fields?: {parent?: IssuesTree; sourceOrderPath?: number[]},
 ): IssuesTree {
     return {
         ...issue,
@@ -136,12 +186,14 @@ function extendIssue(
 
 export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTree[] {
     const result: IssuesTree[] = [];
+    const rootSourceIndex = issues.findIndex((issue) => issue.id === root.id);
+    const rootSourceOrderPath = [rootSourceIndex];
 
     if (!root.reason || root.reason.length === 0) {
-        return [extendIssue(root)];
+        return [extendIssue(root, undefined, {sourceOrderPath: rootSourceOrderPath})];
     }
 
-    for (const issueId of root.reason) {
+    for (const [reasonIndex, issueId] of root.reason.entries()) {
         const directChild: IssueLog | undefined = issues.find((issue) => issue.id === issueId);
         if (!directChild) {
             continue;
@@ -157,9 +209,12 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
         // standalone card (when it has no `reason` and is not referenced
         // by any other issue) or as a tab in some leaf's breadcrumb. The
         // leaf (issue without `reason`) is the rightmost tab.
-        const rootNode = extendIssue(root, directChildCategory);
+        const rootNode = extendIssue(root, directChildCategory, {
+            sourceOrderPath: rootSourceOrderPath,
+        });
         const initialNode: IssuesTree = extendIssue(directChild, directChildCategory, {
             parent: rootNode,
+            sourceOrderPath: [...rootSourceOrderPath, reasonIndex],
         });
         const stack: IssuesTree[] = [initialNode];
 
@@ -174,12 +229,17 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
                 continue;
             }
 
-            for (const reason of currentNode.reason) {
+            for (const [childReasonIndex, reason] of currentNode.reason.entries()) {
                 const child: IssueLog | undefined = issues.find((issue) => issue.id === reason);
                 if (!child) {
                     continue;
                 }
-                stack.push(extendIssue(child, directChildCategory, {parent: currentNode}));
+                stack.push(
+                    extendIssue(child, directChildCategory, {
+                        parent: currentNode,
+                        sourceOrderPath: [...(currentNode.sourceOrderPath ?? []), childReasonIndex],
+                    }),
+                );
             }
         }
     }

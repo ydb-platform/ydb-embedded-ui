@@ -14,9 +14,17 @@ import {HealthcheckIssue} from './HealthcheckIssue';
 
 interface IssuesProps {
     issues: IssuesTree[];
+    targetIssueId?: string;
+    targetLeafIssueId?: string;
+    targetLeafIssueRef?: React.RefObject<HTMLDivElement>;
 }
 
-export function Issues({issues}: IssuesProps) {
+export function Issues({
+    issues,
+    targetIssueId,
+    targetLeafIssueId,
+    targetLeafIssueRef,
+}: IssuesProps) {
     const SuccessImage = getIllustration('SuccessOperation');
 
     const {view, issuesFilter} = useTenantQueryParams();
@@ -74,6 +82,9 @@ export function Issues({issues}: IssuesProps) {
             issue={issue}
             key={issue.id + Boolean(issuesFilter)}
             expanded={Boolean(issuesFilter)}
+            targeted={issue.id === targetLeafIssueId}
+            targetIssueId={issue.id === targetLeafIssueId ? targetIssueId : undefined}
+            targetRef={issue.id === targetLeafIssueId ? targetLeafIssueRef : undefined}
         />
     ));
 }
