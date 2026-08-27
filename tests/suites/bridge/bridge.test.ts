@@ -9,9 +9,9 @@ import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
 import {
     mockBridgeHealthcheck,
     mockBridgeHealthcheckUnavailable,
+    mockBridgeVisualScenario,
     mockCapabilities,
     mockClusterWithBridgePiles,
-    mockDisconnectedHimkiBrokenBridgeDump,
     mockNodesWithPile,
     mockStorageGroupsWithPile,
 } from './mocks';
@@ -185,10 +185,10 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await expect(issueCard).not.toContainText('all-group-statuses-pile');
     });
 
-    test('on: shows bridge piles from a healthcheck dump', async ({page}) => {
+    test('on: shows combined bridge pile and healthcheck states', async ({page}) => {
         await page.setViewportSize({width: 1440, height: 900});
         await mockCapabilities(page, true);
-        await mockDisconnectedHimkiBrokenBridgeDump(page);
+        await mockBridgeVisualScenario(page);
 
         const clusterPage = new ClusterPage(page);
         await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});

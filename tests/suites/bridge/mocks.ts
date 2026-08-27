@@ -3,8 +3,7 @@ import type {Page, Route} from '@playwright/test';
 import {BridgePileGroupStatus, BridgePileState} from '../../../src/types/api/cluster';
 import {SelfCheckResult, StatusFlag} from '../../../src/types/api/healthcheck';
 
-import bridgeClusterDump from './fixtures/bridge-cluster.json';
-import disconnectedHimkiBrokenDump from './fixtures/disconnected-himki-broken.json';
+import {bridgeVisualCluster, bridgeVisualHealthcheck} from './fixtures/bridgeVisualScenario';
 
 export const mockCapabilities = (page: Page, enabled: boolean) => {
     return page.route(`**/viewer/capabilities`, async (route: Route) => {
@@ -121,19 +120,19 @@ export const mockBridgeHealthcheckUnavailable = (page: Page) => {
     });
 };
 
-export const mockDisconnectedHimkiBrokenBridgeDump = async (page: Page) => {
+export const mockBridgeVisualScenario = async (page: Page) => {
     await page.route(`**/viewer/json/cluster?*`, async (route: Route) => {
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify(bridgeClusterDump),
+            body: JSON.stringify(bridgeVisualCluster),
         });
     });
     await page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify(disconnectedHimkiBrokenDump),
+            body: JSON.stringify(bridgeVisualHealthcheck),
         });
     });
 };
