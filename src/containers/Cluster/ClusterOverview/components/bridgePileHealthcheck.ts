@@ -33,6 +33,12 @@ const STATUS_PRIORITY: Record<StatusFlag, number> = {
     [StatusFlag.RED]: 5,
 };
 
+function normalizeStatus(status: unknown): StatusFlag {
+    return typeof status === 'string' && Object.hasOwn(STATUS_PRIORITY, status)
+        ? (status as StatusFlag)
+        : StatusFlag.UNSPECIFIED;
+}
+
 function getBranch(leaf: IssuesTree): IssuesTree[] {
     const branch: IssuesTree[] = [];
     let current: IssuesTree | undefined = leaf;
@@ -82,12 +88,8 @@ function compareSourceOrder(left?: number[], right?: number[]): number {
 }
 
 function isWorseCandidate(candidate: Candidate, current: Candidate): boolean {
-    const candidatePriority = candidate.issue.status
-        ? STATUS_PRIORITY[candidate.issue.status]
-        : STATUS_PRIORITY[StatusFlag.UNSPECIFIED];
-    const currentPriority = current.issue.status
-        ? STATUS_PRIORITY[current.issue.status]
-        : STATUS_PRIORITY[StatusFlag.UNSPECIFIED];
+    const candidatePriority = STATUS_PRIORITY[normalizeStatus(candidate.issue.status)];
+    const currentPriority = STATUS_PRIORITY[normalizeStatus(current.issue.status)];
 
     if (candidatePriority !== currentPriority) {
         return candidatePriority > currentPriority;
@@ -129,7 +131,7 @@ export function getBridgePileHealthcheck(
         return {status: EFlag.Green};
     }
 
-    const issueStatus = selectedCandidate.issue.status ?? StatusFlag.UNSPECIFIED;
+    const issueStatus = normalizeStatus(selectedCandidate.issue.status);
     return {
         status: hcStatusToColorFlag[issueStatus],
         target: {

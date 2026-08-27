@@ -204,6 +204,45 @@ describe('getBridgePileHealthcheck', () => {
         expect(getBridgePileHealthcheck('himki', [issue], true).status).toBe(expected);
     });
 
+    test('renders an unknown runtime status as unknown', () => {
+        const issue = makeIssue('issue', {
+            status: 'FUTURE_STATUS' as StatusFlag,
+            level: 1,
+            pileName: 'himki',
+        });
+
+        expect(getBridgePileHealthcheck('himki', [issue], true)).toEqual({
+            status: EFlag.Grey,
+            target: {
+                issueId: 'issue',
+                leafIssueId: 'issue',
+                view: 'storage',
+            },
+        });
+    });
+
+    test('does not let an unknown runtime status outrank a known issue', () => {
+        const unknownIssue = makeIssue('unknown-issue', {
+            status: 'FUTURE_STATUS' as StatusFlag,
+            level: 1,
+            pileName: 'himki',
+        });
+        const criticalIssue = makeIssue('critical-issue', {
+            status: StatusFlag.RED,
+            level: 1,
+            pileName: 'himki',
+        });
+
+        expect(getBridgePileHealthcheck('himki', [unknownIssue, criticalIssue], true)).toEqual({
+            status: EFlag.Red,
+            target: {
+                issueId: 'critical-issue',
+                leafIssueId: 'critical-issue',
+                view: 'storage',
+            },
+        });
+    });
+
     test('returns good for a successful response without pile-scoped issues', () => {
         const otherPileIssue = makeIssue('other-pile', {
             status: StatusFlag.RED,
