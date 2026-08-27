@@ -1,50 +1,42 @@
-@use '../../../../styles/mixins.scss';
-
-@mixin bridge-group-status-background {
-    &_theme_positive {
-        background-color: var(--g-color-text-positive);
-    }
-
-    &_theme_warning {
-        background-color: var(--g-color-text-warning);
-    }
-
-    &_theme_danger {
-        background-color: var(--g-color-text-danger);
-    }
-
-    &_theme_dark-complementary {
-        background-color: var(--g-color-text-dark-complementary);
-    }
-
-    &_theme_secondary {
-        background-color: var(--g-color-text-secondary);
-    }
-}
-
 .ydb-bridge-info-table {
+    gap: 10px;
+
     height: 100%;
 
     &__pile {
+        box-sizing: border-box;
         width: 321px;
-        padding: var(--g-spacing-3) var(--g-spacing-4);
+        min-height: 98px;
+        padding: var(--g-spacing-3);
 
+        border: 1px solid transparent;
         border-radius: var(--g-border-radius-s);
         background-color: var(--g-color-base-generic);
 
-        @include mixins.body-2-typography();
+        &_current {
+            border-color: var(--g-color-line-brand);
+        }
     }
 
-    &__pile-title {
+    &__pile-name {
         min-width: 0;
     }
 
-    &__state-label {
+    &__current-pile {
         flex-shrink: 0;
 
-        &_with-help .g-label__text {
-            margin-inline: var(--g-spacing-1) var(--g-spacing-1);
-        }
+        white-space: nowrap;
+
+        color: var(--g-color-text-info);
+    }
+
+    &__state-label,
+    &__healthcheck-status {
+        flex-shrink: 0;
+    }
+
+    &__state-label_with-help .g-label__text {
+        margin-inline: var(--g-spacing-1) var(--g-spacing-1);
     }
 
     &__state-help {
@@ -55,69 +47,12 @@
         white-space: pre-line;
     }
 
-    &__statuses {
-        width: 100%;
-    }
-}
-
-.ydb-bridge-info-table-progress {
-    display: flex;
-    overflow: hidden;
-    align-items: center;
-    gap: var(--g-spacing-half);
-
-    height: 10px;
-
-    border-radius: var(--g-border-radius-xs);
-
-    &_empty {
-        background-color: var(--g-color-sfx-shadow);
+    &__healthcheck-skeleton {
+        width: 72px;
+        height: 20px;
     }
 
-    &__item {
-        min-width: 8px;
-        height: 4px;
-
-        border-radius: var(--g-border-radius-xs);
-
-        @include bridge-group-status-background();
-    }
-}
-
-.ydb-bridge-info-table-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--g-spacing-2);
-
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-
-    list-style: none;
-
-    &__item {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--g-spacing-1);
-
-        min-width: 0;
-    }
-
-    &__dot {
-        flex: 0 0 6px;
-
-        width: 6px;
-        height: 6px;
-
-        border-radius: 50%;
-
-        @include bridge-group-status-background();
-    }
-
-    &__label {
-        overflow: hidden;
-
-        white-space: nowrap;
-        text-overflow: ellipsis;
+    &__nodes {
+        color: var(--g-color-text-secondary);
     }
 }

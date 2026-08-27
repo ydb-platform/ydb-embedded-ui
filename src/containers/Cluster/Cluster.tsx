@@ -170,6 +170,7 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
                         <div className={b('dashboard')}>
                             <ClusterOverview
                                 cluster={cluster ?? {}}
+                                clusterName={clusterName ?? undefined}
                                 groupStats={groupsStats}
                                 loading={infoLoading}
                                 error={clusterError || cluster?.error}

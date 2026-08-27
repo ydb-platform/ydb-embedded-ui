@@ -32,6 +32,7 @@ import './ClusterOverview.scss';
 
 interface ClusterOverviewProps {
     cluster: TClusterInfo;
+    clusterName?: string;
     groupStats?: ClusterGroupsStats;
     loading?: boolean;
     error?: IResponseError | string;
