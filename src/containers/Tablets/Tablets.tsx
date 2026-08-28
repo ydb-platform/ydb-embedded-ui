@@ -2,7 +2,6 @@ import React from 'react';
 
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
-import {StringParam, useQueryParams} from 'use-query-params';
 
 import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
@@ -12,6 +11,7 @@ import {valueIsDefined} from '../../utils';
 import {useAutoRefreshInterval, useTypedSelector} from '../../utils/hooks';
 
 import {TabletsTable} from './TabletsTable';
+import {useTabletQueryParams} from './useTabletQueryParams';
 
 const TABLET_ID_SEARCH_DEBOUNCE = 1000;
 const TABLET_ID_PATTERN = /^\d+$/;
@@ -60,8 +60,8 @@ export function Tablets({
     // search remains client-side over the already loaded tablets list.
     const isDatabasePage = !isNil(path) && !isNil(databaseFullPath) && path === databaseFullPath;
 
-    const [{tabletsSearch}] = useQueryParams({tabletsSearch: StringParam});
-    const currentSearch = tabletsSearch ?? '';
+    const {tabletsSearch} = useTabletQueryParams();
+    const currentSearch = tabletsSearch;
 
     // Debounce the search value before sending it to the backend, since the
     // request can be heavy.

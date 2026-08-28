@@ -1,5 +1,6 @@
 {
   "noTabletsData": "No tablets data",
+  "noTabletsMatchFilters": "No tablets match the selected filters",
   "Type": "Type",
   "Tablet": "Tablet",
   "State": "State",
@@ -13,5 +14,7 @@
   "controls.kill-not-allowed": "You don't have enough rights to restart tablet",
   "controls.kill-impossible-follower": "It's impossible to restart a follower",
   "controls.search-placeholder": "Tablet ID",
+  "controls.type-filter-label": "Type",
+  "controls.type-filter-placeholder": "All types",
   "controls.entities-count-label": "Tablets"
 }

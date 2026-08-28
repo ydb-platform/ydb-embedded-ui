@@ -2,9 +2,8 @@ import React from 'react';
 
 import {ArrowRotateLeft} from '@gravity-ui/icons';
 import type {Column as DataTableColumn, SortOrder} from '@gravity-ui/react-data-table';
-import {Icon, Text} from '@gravity-ui/uikit';
+import {Icon, Select, Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
-import {StringParam, useQueryParams} from 'use-query-params';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {EntitiesCount} from '../../components/EntitiesCount';
@@ -24,6 +23,8 @@ import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/consta
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 
 import i18n from './i18n';
+import {useTabletQueryParams} from './useTabletQueryParams';
+import {filterTablets, getAvailableTabletTypes} from './utils';
 
 function isFollowerTablet(state: TTabletStateInfo) {
     return state.Leader === false;
@@ -228,54 +229,57 @@ export function TabletsTable({
     nodeId,
     backendSearchActive,
 }: TabletsTableProps) {
-    const [{tabletsSearch}, setQueryParams] = useQueryParams({
-        tabletsSearch: StringParam,
-    });
+    const {tabletsSearch, tabletTypes, handleTabletsSearchChange, handleTabletTypesChange} =
+        useTabletQueryParams();
 
     // Track sort state for scroll dependencies
     const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
     const {filteredTablets, showEndOfRange} = React.useMemo(() => {
-        let showEnd = false;
-        if (backendSearchActive) {
-            // Backend already filtered the list; just scan once for showEndOfRange.
-            for (const tablet of tablets) {
-                if (tablet.EndOfRangeKeyPrefix) {
-                    showEnd = true;
-                    break;
-                }
-            }
-            return {filteredTablets: tablets, showEndOfRange: showEnd};
-        }
-
-        const preparedTabletsSearch = tabletsSearch?.trim() ?? '';
-
         return {
-            filteredTablets: tablets.filter((tablet) => {
-                showEnd = showEnd || Boolean(tablet.EndOfRangeKeyPrefix);
-                return String(tablet.TabletId).includes(preparedTabletsSearch);
+            filteredTablets: filterTablets(tablets, {
+                tabletIdSearch: backendSearchActive ? undefined : tabletsSearch,
+                tabletTypes,
             }),
-            showEndOfRange: showEnd,
+            showEndOfRange: tablets.some((tablet) => Boolean(tablet.EndOfRangeKeyPrefix)),
         };
-    }, [tablets, tabletsSearch, backendSearchActive]);
+    }, [tablets, tabletsSearch, tabletTypes, backendSearchActive]);
+
+    const tabletTypeOptions = React.useMemo(() => {
+        return getAvailableTabletTypes(tablets, tabletTypes).map((tabletType) => ({
+            value: tabletType,
+            content: tabletType,
+        }));
+    }, [tablets, tabletTypes]);
 
     const columns = React.useMemo(
         () => getColumns({nodeId, showEndOfRange}),
         [nodeId, showEndOfRange],
     );
 
-    const handleSearchQueryChange = (value: string) => {
-        setQueryParams({tabletsSearch: value || undefined}, 'replaceIn');
-    };
+    const filtersActive = Boolean(tabletsSearch.trim()) || tabletTypes.length > 0;
 
     return (
         <TableWithControlsLayout fullHeight>
             <TableWithControlsLayout.Controls>
                 <Search
                     placeholder={i18n('controls.search-placeholder')}
-                    onChange={handleSearchQueryChange}
-                    value={tabletsSearch ?? ''}
+                    onChange={handleTabletsSearchChange}
+                    value={tabletsSearch}
                     width={238}
+                />
+                <Select
+                    multiple
+                    filterable
+                    hasClear
+                    qa="tablets-type-filter"
+                    aria-label={i18n('controls.type-filter-label')}
+                    label={i18n('controls.type-filter-label')}
+                    placeholder={i18n('controls.type-filter-placeholder')}
+                    value={tabletTypes}
+                    options={tabletTypeOptions}
+                    onUpdate={handleTabletTypesChange}
+                    width={220}
                 />
                 <EntitiesCount
                     label={i18n('controls.entities-count-label')}
@@ -287,14 +291,16 @@ export function TabletsTable({
             {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table
                 scrollContainerRef={scrollContainerRef}
-                scrollDependencies={[tabletsSearch, sortParams]}
+                scrollDependencies={[tabletsSearch, tabletTypes, sortParams]}
                 loading={loading}
             >
                 <ResizeableDataTable
                     columns={columns}
                     data={filteredTablets}
                     settings={DEFAULT_TABLE_SETTINGS}
-                    emptyDataMessage={i18n('noTabletsData')}
+                    emptyDataMessage={
+                        filtersActive ? i18n('noTabletsMatchFilters') : i18n('noTabletsData')
+                    }
                     onSortChange={setSortParams}
                 />
             </TableWithControlsLayout.Table>
