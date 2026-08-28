@@ -191,7 +191,30 @@ export function recoverXhrResponseFromNetworkError(
     return recoveredResponse;
 }
 
-export function handleBaseApiResponseError(error: unknown): Promise<never> {
+function isWhoamiResponse(response: unknown) {
+    if (
+        !isRecord(response) ||
+        !isRecord(response.config) ||
+        typeof response.config.url !== 'string'
+    ) {
+        return false;
+    }
+
+    const requestPath = response.config.url.split(/[?#]/, 1)[0];
+
+    return requestPath.endsWith('/viewer/json/whoami') || requestPath.endsWith('/meta/whoami');
+}
+
+function shouldRedirectToAuth(
+    response: unknown,
+): response is {status: 401; data: {authUrl: string}} {
+    return isRedirectToAuth(response) && !isWhoamiResponse(response);
+}
+
+export function handleBaseApiResponseError(
+    error: unknown,
+    redirectToAuth = (authUrl: string) => window.location.assign(authUrl),
+): Promise<never> {
     recoverXhrResponseFromNetworkError(error);
 
     const response =
@@ -199,8 +222,8 @@ export function handleBaseApiResponseError(error: unknown): Promise<never> {
             ? error.response
             : undefined;
 
-    if (isRedirectToAuth(response)) {
-        window.location.assign(response.data.authUrl);
+    if (shouldRedirectToAuth(response)) {
+        redirectToAuth(response.data.authUrl);
     }
 
     if (isNeedResetResponse(response?.data) && document.visibilityState === 'visible') {

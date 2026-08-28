@@ -227,4 +227,39 @@ describe('handleBaseApiResponseError', () => {
             Reflect.deleteProperty(document, 'visibilityState');
         }
     });
+
+    test.each([
+        '/viewer/json/whoami?database=%2FRoot',
+        '/proxy/cluster/test-cluster/viewer/json/whoami',
+        '/api/meta3/meta/whoami',
+    ])('does not redirect automatically for whoami request %s', async (url) => {
+        const assign = jest.fn();
+        const error = {
+            response: {
+                status: 401,
+                data: {authUrl: 'https://auth.example.com/login'},
+                config: {url},
+            },
+        };
+
+        await expect(handleBaseApiResponseError(error, assign)).rejects.toBe(error);
+
+        expect(assign).not.toHaveBeenCalled();
+    });
+
+    test('preserves automatic redirect for other requests', async () => {
+        const assign = jest.fn();
+        const authUrl = 'https://auth.example.com/login';
+        const error = {
+            response: {
+                status: 401,
+                data: {authUrl},
+                config: {url: '/viewer/json/nodes'},
+            },
+        };
+
+        await expect(handleBaseApiResponseError(error, assign)).rejects.toBe(error);
+
+        expect(assign).toHaveBeenCalledWith(authUrl);
+    });
 });
