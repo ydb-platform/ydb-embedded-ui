@@ -177,6 +177,7 @@ export function useClusterBaseInfo() {
         settings: parseSettingsField(data.settings),
         links: parseLinksField(data.links),
 
+        isError,
         isResolved,
     };
 }
@@ -201,7 +202,7 @@ export function useClusterProxySettingResolved() {
 
 type ClusterBaseInfo = ReturnType<typeof useClusterBaseInfo>;
 
-export type ClusterInfo = Omit<ClusterBaseInfo, 'isResolved'>;
+export type ClusterInfo = Omit<ClusterBaseInfo, 'isError' | 'isResolved'>;
 
 const createClusterInfoSelector = createSelector(
     (clusterName?: string) => clusterName,
