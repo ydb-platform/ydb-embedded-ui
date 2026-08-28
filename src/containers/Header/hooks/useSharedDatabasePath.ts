@@ -91,13 +91,18 @@ export function useSharedDatabasePath({
     prepareTenantBackend,
 }: UseSharedDatabasePathParams) {
     const isMetaDatabasesAvailable = useDatabasesV2();
-    const {settings, isResolved: isClusterBaseInfoResolved} = useClusterBaseInfo();
+    const {
+        settings,
+        isError: isClusterBaseInfoError,
+        isResolved: isClusterBaseInfoResolved,
+    } = useClusterBaseInfo();
     const isMonitoringAllowed = useIsUserAllowedToMakeChanges();
+    const isClusterBaseInfoAvailable = isClusterBaseInfoResolved && !isClusterBaseInfoError;
 
     const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
     const shouldResolveSharedDatabaseName = canResolveSharedDatabaseName({
         databaseData,
-        isClusterBaseInfoResolved,
+        isClusterBaseInfoResolved: isClusterBaseInfoAvailable,
         isViewerUser,
         useDatabaseId,
     });
@@ -150,7 +155,7 @@ export function useSharedDatabasePath({
         backend,
         clusterName,
         databaseData,
-        isClusterBaseInfoResolved,
+        isClusterBaseInfoResolved: isClusterBaseInfoAvailable,
         isViewerUser,
         sharedDatabase,
     });
