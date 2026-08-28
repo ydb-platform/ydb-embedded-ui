@@ -49,6 +49,53 @@ export const tenantsApi = api.injectEndpoints({
             },
             providesTags: ['All'],
         }),
+        getSharedDatabaseName: build.query<
+            string | null,
+            {
+                backend?: string;
+                clusterName?: string;
+                database?: string;
+                environmentName?: string;
+                isMonitoringAllowed: boolean;
+                resourceId: string;
+            }
+        >({
+            queryFn: async ({clusterName, database, isMonitoringAllowed, resourceId}, {signal}) => {
+                if (isMonitoringAllowed && database) {
+                    try {
+                        const data = await window.api.viewer.getTabletDescribe(
+                            {PathId: resourceId},
+                            database,
+                            {signal},
+                        );
+                        const sharedDatabaseName = data?.Path?.trim();
+
+                        if (sharedDatabaseName) {
+                            return {data: sharedDatabaseName};
+                        }
+                    } catch (error) {
+                        if (signal.aborted) {
+                            return {error};
+                        }
+                    }
+                }
+
+                try {
+                    const response = await window.api.viewer.getTenants(
+                        {clusterName, metadataCache: false, storage: false},
+                        {signal},
+                    );
+                    const sharedDatabaseName = response.TenantInfo?.find(
+                        ({Id}) => Id === resourceId,
+                    )?.Name?.trim();
+
+                    return {data: sharedDatabaseName || null};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
     }),
     overrideExisting: 'throw',
 });
