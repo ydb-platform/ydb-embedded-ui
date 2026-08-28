@@ -1,9 +1,10 @@
 import type {
     TPQPartitionConfig,
+    TPQPartitionStrategy,
     TPQTabletConfig,
     TPersQueueGroupDescription,
 } from '../../../types/api/schema';
-import {EMeteringMode} from '../../../types/api/schema';
+import {EMeteringMode, EPQPartitionStrategyType} from '../../../types/api/schema';
 import {HOUR_IN_SECONDS} from '../../../utils/constants';
 import {formatBps, formatBytes, formatNumber} from '../../../utils/dataFormatters/dataFormatters';
 import {createInfoFormatter} from '../utils';
@@ -11,6 +12,13 @@ import {createInfoFormatter} from '../utils';
 const EMeteringModeToNames: Record<EMeteringMode, string> = {
     [EMeteringMode.METERING_MODE_REQUEST_UNITS]: 'request-units',
     [EMeteringMode.METERING_MODE_RESERVED_CAPACITY]: 'reserved-capacity',
+};
+
+const EPQPartitionStrategyTypeToNames: Record<EPQPartitionStrategyType, string> = {
+    [EPQPartitionStrategyType.DISABLED]: 'Disabled',
+    [EPQPartitionStrategyType.CAN_SPLIT]: 'Up',
+    [EPQPartitionStrategyType.CAN_SPLIT_AND_MERGE]: 'Up and down',
+    [EPQPartitionStrategyType.PAUSED]: 'Paused',
 };
 
 export const formatPQGroupItem = createInfoFormatter<TPersQueueGroupDescription>({
@@ -46,5 +54,18 @@ export const formatPQPartitionConfig = createInfoFormatter<TPQPartitionConfig>({
     labels: {
         StorageLimitBytes: 'Retention storage',
         WriteSpeedInBytesPerSecond: 'Partitions write speed',
+    },
+});
+
+export const formatPQPartitionStrategy = createInfoFormatter<TPQPartitionStrategy>({
+    values: {
+        PartitionStrategyType: (value) => value && EPQPartitionStrategyTypeToNames[value],
+        MinPartitionCount: (value) => formatNumber(value ?? 1),
+        MaxPartitionCount: (value) => formatNumber(value ?? 1),
+    },
+    labels: {
+        PartitionStrategyType: 'Autopartitioning',
+        MinPartitionCount: 'Min partitions count',
+        MaxPartitionCount: 'Max partitions count',
     },
 });
