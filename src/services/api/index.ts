@@ -4,8 +4,8 @@ import type {AxiosRequestConfig} from 'axios';
 import {codeAssistBackend} from '../../store';
 
 import {AuthAPI} from './auth';
-import type {CsrfTokenGetter} from './base';
-import {getCsrfTokenFromCookie} from './base';
+import type {CsrfTokenGetter, UnauthenticatedHandler} from './base';
+import {BaseYdbAPI, getCsrfTokenFromCookie} from './base';
 import {CodeAssistAPI} from './codeAssist';
 import {MetaAPI} from './meta';
 import {MetaSettingsAPI} from './metaSettings';
@@ -90,5 +90,13 @@ export class YdbEmbeddedAPI {
         this.tablets = new TabletsAPI(axiosParams, baseApiParams);
         this.vdisk = new VDiskAPI(axiosParams, baseApiParams);
         this.viewer = new ViewerAPI(axiosParams, baseApiParams);
+    }
+
+    setOnUnauthenticated(handler: UnauthenticatedHandler) {
+        Object.values(this).forEach((api) => {
+            if (api instanceof BaseYdbAPI) {
+                api.setOnUnauthenticated(handler);
+            }
+        });
     }
 }

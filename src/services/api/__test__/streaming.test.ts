@@ -8,6 +8,7 @@ jest.mock('@mjackson/multipart-parser', () => ({
 }));
 
 import {CSRF_TOKEN_HEADER_NAME} from '../base';
+import {YdbEmbeddedAPI} from '../index';
 import {StreamingAPI} from '../streaming';
 
 function createStreamingApi(csrfTokenGetter: () => string | undefined = () => undefined) {
@@ -37,6 +38,15 @@ function createFetchResponseMock() {
         headers: {
             get: jest.fn(() => null),
         },
+    } as unknown as Response;
+}
+
+function createUnauthorizedFetchResponseMock() {
+    return {
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized',
+        text: jest.fn(async () => JSON.stringify({authUrl: 'https://auth.example.com/login'})),
     } as unknown as Response;
 }
 
@@ -113,5 +123,28 @@ describe('StreamingAPI requests', () => {
                 database: '/Root/test',
             }),
         );
+    });
+
+    test('reports authentication required for a streaming authUrl response', async () => {
+        const api = new YdbEmbeddedAPI({
+            webVersion: false,
+            withCredentials: false,
+            singleClusterMode: true,
+            proxyMeta: false,
+            useRelativePath: false,
+            useMetaSettings: false,
+            csrfTokenGetter: undefined,
+            defaults: undefined,
+        });
+        const onUnauthenticated = jest.fn();
+        api.setOnUnauthenticated(onUnauthenticated);
+        global.fetch = jest.fn(async () => createUnauthorizedFetchResponseMock());
+
+        await expect(
+            api.streaming.streamQuery({base64: false} as never, createStreamQueryOptions()),
+        ).resolves.toBeUndefined();
+
+        expect(onUnauthenticated).toHaveBeenCalledTimes(1);
+        expect(onUnauthenticated).toHaveBeenCalledWith();
     });
 });

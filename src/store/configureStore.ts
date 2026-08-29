@@ -11,6 +11,7 @@ import {parseJson} from '../utils/utils';
 import {getUrlData} from './getUrlData';
 import rootReducer from './reducers';
 import {api as storeApi} from './reducers/api';
+import {setIsAuthenticated} from './reducers/authentication/authentication';
 import {preloadUserSettingsFromLS, syncUserSettingsFromLS} from './reducers/settings/settings';
 import getLocationMiddleware from './state-url-mapping';
 
@@ -79,6 +80,7 @@ export function configureStore({
     aRootReducer = rootReducer,
     singleClusterMode = isSingleClusterMode,
     environments = [] as string[],
+    enableOidcAuthenticationChoice = false,
     api = new YdbEmbeddedAPI({
         webVersion,
         singleClusterMode: isSingleClusterMode,
@@ -109,6 +111,12 @@ export function configureStore({
         storeApi.middleware,
     ]);
     listenForHistoryChange(store, history);
+
+    if (enableOidcAuthenticationChoice) {
+        api.setOnUnauthenticated?.(() => {
+            store.dispatch(setIsAuthenticated(false));
+        });
+    }
 
     syncUserSettingsFromLS(store);
     if (!api.metaSettings) {

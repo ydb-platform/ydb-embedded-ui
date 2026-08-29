@@ -132,7 +132,11 @@ export class StreamingAPI extends BaseYdbAPI {
                 .catch(() => undefined);
             if (isRedirectToAuth({status: response.status, data: responseData})) {
                 const data = responseData as {authUrl: string};
-                window.location.assign(data.authUrl);
+                if (this.onUnauthenticated) {
+                    this.onUnauthenticated();
+                } else {
+                    window.location.assign(data.authUrl);
+                }
                 return;
             }
             if (isNeedResetResponse(responseData) && document.visibilityState === 'visible') {

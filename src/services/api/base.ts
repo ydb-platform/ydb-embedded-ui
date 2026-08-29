@@ -20,6 +20,7 @@ export type AxiosOptions = {
 };
 
 export type CsrfTokenGetter = () => string | undefined;
+export type UnauthenticatedHandler = () => void;
 
 const CSRF_PROTECTED_METHODS = new Set(['post', 'put', 'delete', 'patch']);
 
@@ -191,29 +192,10 @@ export function recoverXhrResponseFromNetworkError(
     return recoveredResponse;
 }
 
-function isWhoamiResponse(response: unknown) {
-    if (
-        !isRecord(response) ||
-        !isRecord(response.config) ||
-        typeof response.config.url !== 'string'
-    ) {
-        return false;
-    }
-
-    const requestPath = response.config.url.split(/[?#]/, 1)[0];
-
-    return requestPath.endsWith('/viewer/json/whoami') || requestPath.endsWith('/meta/whoami');
-}
-
-function shouldRedirectToAuth(
-    response: unknown,
-): response is {status: 401; data: {authUrl: string}} {
-    return isRedirectToAuth(response) && !isWhoamiResponse(response);
-}
-
 export function handleBaseApiResponseError(
     error: unknown,
     redirectToAuth = (authUrl: string) => window.location.assign(authUrl),
+    onUnauthenticated?: UnauthenticatedHandler,
 ): Promise<never> {
     recoverXhrResponseFromNetworkError(error);
 
@@ -222,8 +204,12 @@ export function handleBaseApiResponseError(
             ? error.response
             : undefined;
 
-    if (shouldRedirectToAuth(response)) {
-        redirectToAuth(response.data.authUrl);
+    if (isRedirectToAuth(response)) {
+        if (onUnauthenticated) {
+            onUnauthenticated();
+        } else {
+            redirectToAuth(response.data.authUrl);
+        }
     }
 
     if (isNeedResetResponse(response?.data) && document.visibilityState === 'visible') {
@@ -239,6 +225,7 @@ export class BaseYdbAPI extends AxiosWrapper {
     singleClusterMode: BaseAPIParams['singleClusterMode'];
     useRelativePath: BaseAPIParams['useRelativePath'];
     protected csrfTokenGetter: CsrfTokenGetter;
+    protected onUnauthenticated?: UnauthenticatedHandler;
 
     constructor(axiosOptions: AxiosWrapperOptions, baseApiParams: BaseAPIParams) {
         super(axiosOptions);
@@ -292,7 +279,13 @@ export class BaseYdbAPI extends AxiosWrapper {
         });
 
         // Interceptor to process OIDC auth and NEED_RESET
-        this._axios.interceptors.response.use(null, handleBaseApiResponseError);
+        this._axios.interceptors.response.use(null, (error) =>
+            handleBaseApiResponseError(error, undefined, this.onUnauthenticated),
+        );
+    }
+
+    setOnUnauthenticated(handler: UnauthenticatedHandler) {
+        this.onUnauthenticated = handler;
     }
 
     getPath(path: string, clusterNameOverride?: string) {

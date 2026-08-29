@@ -1,44 +1,101 @@
-import {configureStore} from '@reduxjs/toolkit';
+import type {AxiosAdapter, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
+import {AxiosError} from 'axios';
 
-import type {YdbEmbeddedAPI} from '../../../../services/api';
-import {api} from '../../api';
-import authentication, {authenticationApi} from '../authentication';
+import {YdbEmbeddedAPI} from '../../../../services/api';
+import {configureStore as configureAppStore} from '../../../configureStore';
+import {authenticationApi} from '../authentication';
 
-function createTestStore() {
-    return configureStore({
-        reducer: {
-            [api.reducerPath]: api.reducer,
-            authentication,
-        },
-        middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware),
-    });
+function createUnauthorizedAdapter(data: unknown): AxiosAdapter {
+    return async (config: InternalAxiosRequestConfig) => {
+        const response: AxiosResponse = {
+            data,
+            status: 401,
+            statusText: 'Unauthorized',
+            headers: {},
+            config,
+        };
+
+        throw new AxiosError(
+            'Request failed with status code 401',
+            AxiosError.ERR_BAD_REQUEST,
+            config,
+            undefined,
+            response,
+        );
+    };
 }
 
-describe('authenticationApi.whoami', () => {
-    const originalApi = window.api;
+describe('configureStore authentication notifications', () => {
+    test('preserves automatic OIDC redirect by default', () => {
+        let onUnauthenticated: (() => void) | undefined;
+        const embeddedApi = {
+            setOnUnauthenticated: (handler: () => void) => {
+                onUnauthenticated = handler;
+            },
+        };
+        const {store} = configureAppStore({api: embeddedApi as never});
 
-    afterEach(() => {
-        window.api = originalApi;
+        expect(onUnauthenticated).toBeUndefined();
+        expect(store.getState().authentication.isAuthenticated).toBe(true);
     });
 
-    test('sets unauthenticated state when whoami returns 401 with authUrl', async () => {
-        window.api = {
-            viewer: {
-                whoami: jest.fn().mockRejectedValue({
-                    status: 401,
-                    data: {authUrl: 'https://auth.example.com/login'},
-                }),
+    test('sets unauthenticated state when OIDC authentication choice is enabled', () => {
+        let onUnauthenticated: (() => void) | undefined;
+        const embeddedApi = {
+            setOnUnauthenticated: (handler: () => void) => {
+                onUnauthenticated = handler;
             },
-        } as unknown as YdbEmbeddedAPI;
-        const store = createTestStore();
+        };
+        const {store} = configureAppStore({
+            api: embeddedApi as never,
+            enableOidcAuthenticationChoice: true,
+        });
 
-        await store.dispatch(
-            authenticationApi.endpoints.whoami.initiate(
-                {database: '/Root', useMeta: false},
-                {subscribe: false},
-            ),
-        );
+        onUnauthenticated?.();
 
         expect(store.getState().authentication.isAuthenticated).toBe(false);
+    });
+
+    test.each([
+        {
+            title: 'a plain whoami 401 response',
+            responseData: {},
+            enableOidcAuthenticationChoice: false,
+        },
+        {
+            title: 'a whoami authUrl response when the OIDC choice is enabled',
+            responseData: {authUrl: 'https://auth.example.com/login'},
+            enableOidcAuthenticationChoice: true,
+        },
+    ])('opens the Authentication page for $title', async (testCase) => {
+        const originalChecksSetting = window.react_app_disable_checks;
+        window.react_app_disable_checks = true;
+        try {
+            const api = new YdbEmbeddedAPI({
+                webVersion: false,
+                withCredentials: false,
+                singleClusterMode: true,
+                proxyMeta: false,
+                useRelativePath: false,
+                useMetaSettings: false,
+                csrfTokenGetter: undefined,
+                defaults: {adapter: createUnauthorizedAdapter(testCase.responseData)},
+            });
+            const {store} = configureAppStore({
+                api,
+                enableOidcAuthenticationChoice: testCase.enableOidcAuthenticationChoice,
+            });
+
+            await store.dispatch(
+                authenticationApi.endpoints.whoami.initiate(
+                    {database: '/Root', useMeta: false},
+                    {subscribe: false},
+                ),
+            );
+
+            expect(store.getState().authentication.isAuthenticated).toBe(false);
+        } finally {
+            window.react_app_disable_checks = originalChecksSetting;
+        }
     });
 });
