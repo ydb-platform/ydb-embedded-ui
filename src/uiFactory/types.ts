@@ -52,6 +52,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     renderNodeTooltipActions?: RenderNodeTooltipActions;
     clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
+    enableOidcAuthenticationChoice?: boolean;
     enableMultiTabQueryEditor?: boolean;
 
     healthcheck: {

@@ -30,6 +30,7 @@ const uiFactoryBase: ResolvedUIFactory = {
     useDatabaseId: false,
     settingsBackend: undefined,
     docs: undefined,
+    enableOidcAuthenticationChoice: false,
     enableMultiTabQueryEditor: false,
     hasDeveloperUi: true,
     isDetailedStorageViewAvailable: () => true,

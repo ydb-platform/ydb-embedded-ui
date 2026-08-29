@@ -2,6 +2,7 @@ import type {AxiosAdapter, AxiosResponse, InternalAxiosRequestConfig} from 'axio
 import {AxiosError} from 'axios';
 
 import {YdbEmbeddedAPI} from '../../../../services/api';
+import {configureUIFactory} from '../../../../uiFactory/uiFactory';
 import {configureStore as configureAppStore} from '../../../configureStore';
 import {authenticationApi} from '../authentication';
 
@@ -26,6 +27,10 @@ function createUnauthorizedAdapter(data: unknown): AxiosAdapter {
 }
 
 describe('configureStore authentication notifications', () => {
+    afterEach(() => {
+        configureUIFactory({enableOidcAuthenticationChoice: false});
+    });
+
     test('preserves automatic OIDC redirect by default', () => {
         let onUnauthenticated: (() => void) | undefined;
         const embeddedApi = {
@@ -46,10 +51,8 @@ describe('configureStore authentication notifications', () => {
                 onUnauthenticated = handler;
             },
         };
-        const {store} = configureAppStore({
-            api: embeddedApi as never,
-            enableOidcAuthenticationChoice: true,
-        });
+        configureUIFactory({enableOidcAuthenticationChoice: true});
+        const {store} = configureAppStore({api: embeddedApi as never});
 
         onUnauthenticated?.();
 
@@ -81,10 +84,10 @@ describe('configureStore authentication notifications', () => {
                 csrfTokenGetter: undefined,
                 defaults: {adapter: createUnauthorizedAdapter(testCase.responseData)},
             });
-            const {store} = configureAppStore({
-                api,
+            configureUIFactory({
                 enableOidcAuthenticationChoice: testCase.enableOidcAuthenticationChoice,
             });
+            const {store} = configureAppStore({api});
 
             await store.dispatch(
                 authenticationApi.endpoints.whoami.initiate(

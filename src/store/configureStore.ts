@@ -6,6 +6,7 @@ import {isNil} from 'lodash';
 import {listenForHistoryChange} from 'redux-location-state';
 
 import {YdbEmbeddedAPI} from '../services/api';
+import {uiFactory} from '../uiFactory/uiFactory';
 import {parseJson} from '../utils/utils';
 
 import {getUrlData} from './getUrlData';
@@ -80,7 +81,6 @@ export function configureStore({
     aRootReducer = rootReducer,
     singleClusterMode = isSingleClusterMode,
     environments = [] as string[],
-    enableOidcAuthenticationChoice = false,
     api = new YdbEmbeddedAPI({
         webVersion,
         singleClusterMode: isSingleClusterMode,
@@ -112,7 +112,7 @@ export function configureStore({
     ]);
     listenForHistoryChange(store, history);
 
-    if (enableOidcAuthenticationChoice) {
+    if (uiFactory.enableOidcAuthenticationChoice) {
         api.setOnUnauthenticated?.(() => {
             store.dispatch(setIsAuthenticated(false));
         });
