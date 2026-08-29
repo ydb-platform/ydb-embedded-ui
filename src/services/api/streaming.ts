@@ -134,6 +134,7 @@ export class StreamingAPI extends BaseYdbAPI {
                 const data = responseData as {authUrl: string};
                 if (this.onUnauthenticated) {
                     this.onUnauthenticated();
+                    throw createStreamingResponseError(response, responseData);
                 } else {
                     window.location.assign(data.authUrl);
                 }

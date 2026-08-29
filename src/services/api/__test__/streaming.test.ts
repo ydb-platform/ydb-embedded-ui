@@ -46,6 +46,8 @@ function createUnauthorizedFetchResponseMock() {
         ok: false,
         status: 401,
         statusText: 'Unauthorized',
+        url: 'https://viewer.example.com/viewer/query',
+        headers: new Headers(),
         text: jest.fn(async () => JSON.stringify({authUrl: 'https://auth.example.com/login'})),
     } as unknown as Response;
 }
@@ -125,7 +127,7 @@ describe('StreamingAPI requests', () => {
         );
     });
 
-    test('reports authentication required for a streaming authUrl response', async () => {
+    test('rejects a streaming authUrl response after reporting authentication required', async () => {
         const api = new YdbEmbeddedAPI({
             webVersion: false,
             withCredentials: false,
@@ -142,7 +144,13 @@ describe('StreamingAPI requests', () => {
 
         await expect(
             api.streaming.streamQuery({base64: false} as never, createStreamQueryOptions()),
-        ).resolves.toBeUndefined();
+        ).rejects.toMatchObject({
+            message: '401 Unauthorized',
+            status: 401,
+            statusText: 'Unauthorized',
+            data: {authUrl: 'https://auth.example.com/login'},
+            config: {url: 'https://viewer.example.com/viewer/query', method: 'POST'},
+        });
 
         expect(onUnauthenticated).toHaveBeenCalledTimes(1);
         expect(onUnauthenticated).toHaveBeenCalledWith();
