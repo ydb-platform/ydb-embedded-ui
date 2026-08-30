@@ -109,9 +109,25 @@ export function ClusterDrawerHealthcheck({
     const healthcheckData = useTypedSelector((state) =>
         selectAllHealthcheckInfo(state, database, clusterName),
     );
-    const targetLeafIssueRef = React.useRef<HTMLDivElement>(null);
+    const targetLeafIssueRef = React.useRef<HTMLDivElement | null>(null);
+    const drawerTransitionCompleteRef = React.useRef(false);
+    const scrolledTargetRef = React.useRef<{
+        issueId?: string;
+        leafIssueId?: string;
+    }>({});
 
-    const handleTransitionInComplete = React.useCallback(() => {
+    const scrollToTargetIssue = React.useCallback(() => {
+        if (!drawerTransitionCompleteRef.current || !healthcheckIssue || !healthcheckLeaf) {
+            return;
+        }
+
+        if (
+            scrolledTargetRef.current.issueId === healthcheckIssue &&
+            scrolledTargetRef.current.leafIssueId === healthcheckLeaf
+        ) {
+            return;
+        }
+
         const targetIssue = targetLeafIssueRef.current;
         const scrollContainer = targetIssue?.closest<HTMLElement>('.ydb-fullscreen__content');
         if (!targetIssue || !scrollContainer) {
@@ -125,10 +141,31 @@ export function ClusterDrawerHealthcheck({
             scrollContainer.getBoundingClientRect().top -
             (controls?.getBoundingClientRect().height ?? 0);
 
+        scrolledTargetRef.current = {
+            issueId: healthcheckIssue,
+            leafIssueId: healthcheckLeaf,
+        };
         scrollContainer.scrollTo({top: Math.max(0, targetTop), behavior: 'smooth'});
-    }, []);
+    }, [healthcheckIssue, healthcheckLeaf]);
+
+    const handleTargetLeafIssueRef = React.useCallback(
+        (element: HTMLDivElement | null) => {
+            targetLeafIssueRef.current = element;
+            if (element) {
+                window.requestAnimationFrame(scrollToTargetIssue);
+            }
+        },
+        [scrollToTargetIssue],
+    );
+
+    const handleTransitionInComplete = React.useCallback(() => {
+        drawerTransitionCompleteRef.current = true;
+        scrollToTargetIssue();
+    }, [scrollToTargetIssue]);
 
     const handleCloseDrawer = React.useCallback(() => {
+        drawerTransitionCompleteRef.current = false;
+        scrolledTargetRef.current = {};
         handleCloseHealthcheck();
     }, [handleCloseHealthcheck]);
 
@@ -140,10 +177,10 @@ export function ClusterDrawerHealthcheck({
                 scope="cluster"
                 targetIssueId={healthcheckIssue ?? undefined}
                 targetLeafIssueId={healthcheckLeaf ?? undefined}
-                targetLeafIssueRef={targetLeafIssueRef}
+                targetLeafIssueRef={handleTargetLeafIssueRef}
             />
         );
-    }, [clusterName, database, healthcheckIssue, healthcheckLeaf]);
+    }, [clusterName, database, handleTargetLeafIssueRef, healthcheckIssue, healthcheckLeaf]);
 
     return (
         <HealthcheckDrawer

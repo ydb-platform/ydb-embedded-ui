@@ -192,6 +192,44 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await expect(issueCard).not.toContainText('all-group-statuses-pile');
     });
 
+    test('on: scrolls to a deep-linked issue after delayed healthcheck loading', async ({page}) => {
+        await page.setViewportSize({width: 1440, height: 500});
+        await mockCapabilities(page, true);
+        const releaseHealthcheck = await mockBridgeVisualLoadingScenario(page);
+
+        try {
+            const clusterPage = new ClusterPage(page);
+            await clusterPage.goto(
+                {
+                    showHealthcheck: 1,
+                    view: 'storage',
+                    healthcheckIssue: 'BLUE-promoted-pile-pool',
+                    healthcheckLeaf: 'BLUE-promoted-pile-group',
+                },
+                {waitUntil: 'domcontentloaded'},
+            );
+
+            const drawer = page.getByTestId('cluster-healthcheck-details');
+            const issueCard = drawer.getByTestId('healthcheck-issue-BLUE-promoted-pile-group');
+            const scrollContainer = drawer.locator('.ydb-fullscreen__content');
+
+            await expect(drawer).toBeVisible();
+            await expect(issueCard).toHaveCount(0);
+
+            // Keep the request pending until Gravity Drawer has completed its 300 ms transition.
+            await page.waitForTimeout(350);
+            releaseHealthcheck();
+
+            await expect(issueCard).toBeVisible();
+            await expect
+                .poll(() => scrollContainer.evaluate((element) => element.scrollTop))
+                .toBeGreaterThan(0);
+            await expect(issueCard).toBeInViewport();
+        } finally {
+            releaseHealthcheck();
+        }
+    });
+
     test('on: shows combined bridge pile and healthcheck states', async ({page}) => {
         await page.setViewportSize({width: 1440, height: 900});
         await mockCapabilities(page, true);

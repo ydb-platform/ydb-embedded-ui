@@ -17,7 +17,7 @@ interface HealthcheckIssueProps {
     expanded?: boolean;
     targeted?: boolean;
     targetIssueId?: string;
-    targetRef?: React.RefObject<HTMLDivElement>;
+    targetRef?: React.Ref<HTMLDivElement>;
 }
 
 export function HealthcheckIssue({

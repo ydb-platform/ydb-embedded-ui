@@ -50,7 +50,7 @@ type HealthcheckDetailsProps = (
 ) & {
     targetIssueId?: string;
     targetLeafIssueId?: string;
-    targetLeafIssueRef?: React.RefObject<HTMLDivElement>;
+    targetLeafIssueRef?: React.Ref<HTMLDivElement>;
 };
 
 export function Healthcheck(props: HealthcheckDetailsProps) {
@@ -94,7 +94,7 @@ function DatabaseHealthcheckInner({
     scope?: 'cluster' | 'database';
     targetIssueId?: string;
     targetLeafIssueId?: string;
-    targetLeafIssueRef?: React.RefObject<HTMLDivElement>;
+    targetLeafIssueRef?: React.Ref<HTMLDivElement>;
 }) {
     const healthcheck = useHealthcheck(database, {clusterName, databaseType});
     const target = getDatabaseHealthcheckAssistantTarget({database, clusterName, scope});
@@ -142,7 +142,7 @@ function HealthcheckContent({
     target: HealthcheckAssistantTarget;
     targetIssueId?: string;
     targetLeafIssueId?: string;
-    targetLeafIssueRef?: React.RefObject<HTMLDivElement>;
+    targetLeafIssueRef?: React.Ref<HTMLDivElement>;
 }) {
     const SuccessImage = getIllustration('SuccessOperation');
     const renderAssistantAction = uiFactory.healthcheck.renderAssistantAction;

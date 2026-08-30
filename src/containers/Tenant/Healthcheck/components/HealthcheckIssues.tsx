@@ -16,7 +16,7 @@ interface IssuesProps {
     issues: IssuesTree[];
     targetIssueId?: string;
     targetLeafIssueId?: string;
-    targetLeafIssueRef?: React.RefObject<HTMLDivElement>;
+    targetLeafIssueRef?: React.Ref<HTMLDivElement>;
 }
 
 export function Issues({
