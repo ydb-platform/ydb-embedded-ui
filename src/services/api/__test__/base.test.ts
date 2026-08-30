@@ -232,7 +232,10 @@ describe('handleBaseApiResponseError', () => {
         '/viewer/json/whoami?database=%2FRoot',
         '/proxy/cluster/test-cluster/viewer/json/whoami',
         '/api/meta3/meta/whoami',
-    ])('reports authentication required for whoami request %s', async (url) => {
+        '/viewer/capabilities',
+        '/viewer/json/nodes',
+        '/capabilities',
+    ])('reports authentication required for request %s', async (url) => {
         const onUnauthenticated = jest.fn();
         const redirectToAuth = jest.fn();
         const error = {
@@ -251,29 +254,6 @@ describe('handleBaseApiResponseError', () => {
         expect(onUnauthenticated).toHaveBeenCalledWith();
         expect(redirectToAuth).not.toHaveBeenCalled();
     });
-
-    test.each(['/viewer/capabilities', '/viewer/json/nodes', '/capabilities'])(
-        'reports authentication required for non-whoami request %s',
-        async (url) => {
-            const onUnauthenticated = jest.fn();
-            const redirectToAuth = jest.fn();
-            const error = {
-                response: {
-                    status: 401,
-                    data: {authUrl: 'https://auth.example.com/login'},
-                    config: {url},
-                },
-            };
-
-            await expect(
-                handleBaseApiResponseError(error, redirectToAuth, onUnauthenticated),
-            ).rejects.toBe(error);
-
-            expect(onUnauthenticated).toHaveBeenCalledTimes(1);
-            expect(onUnauthenticated).toHaveBeenCalledWith();
-            expect(redirectToAuth).not.toHaveBeenCalled();
-        },
-    );
 
     test('preserves automatic redirect when no authentication handler is configured', async () => {
         const redirectToAuth = jest.fn();
