@@ -80,7 +80,9 @@ export function Issues({
     return filteredIssuesCurrentView.map((issue) => (
         <HealthcheckIssue
             issue={issue}
-            key={issue.id + Boolean(issuesFilter)}
+            key={`${issue.id}:${Boolean(issuesFilter)}:${
+                issue.id === targetLeafIssueId ? targetIssueId : ''
+            }`}
             expanded={Boolean(issuesFilter)}
             targeted={issue.id === targetLeafIssueId}
             targetIssueId={issue.id === targetLeafIssueId ? targetIssueId : undefined}

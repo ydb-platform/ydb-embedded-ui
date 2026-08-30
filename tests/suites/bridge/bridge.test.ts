@@ -230,6 +230,35 @@ test.describe('Bridge mode - Cluster Overview', () => {
         }
     });
 
+    test('on: updates the selected tab when the target changes in an open drawer', async ({
+        page,
+    }) => {
+        await mockCapabilities(page, true);
+        await mockBridgeVisualScenario(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
+        await expect(clusterPage.bridgeSection).toBeVisible();
+
+        const promotedPile = clusterPage.pileCards.filter({hasText: 'promoted-pile'});
+        await promotedPile.getByTestId('bridge-pile-healthcheck').locator('button').click();
+
+        const drawer = page.getByTestId('cluster-healthcheck-details');
+        const issueCard = drawer.getByTestId('healthcheck-issue-BLUE-promoted-pile-group');
+        const activeTab = issueCard.locator('.ydb-healthcheck__issue-tab_active');
+
+        await expect(activeTab).toContainText('Storage pool');
+
+        await page.evaluate(() => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('healthcheckIssue', 'BLUE-promoted-pile-group');
+            window.history.pushState({}, '', url);
+            window.dispatchEvent(new PopStateEvent('popstate'));
+        });
+
+        await expect(activeTab).toContainText('Storage group');
+    });
+
     test('on: shows combined bridge pile and healthcheck states', async ({page}) => {
         await page.setViewportSize({width: 1440, height: 900});
         await mockCapabilities(page, true);
