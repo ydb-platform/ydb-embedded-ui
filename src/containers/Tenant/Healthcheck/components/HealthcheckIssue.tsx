@@ -29,13 +29,13 @@ export function HealthcheckIssue({
 }: HealthcheckIssueProps) {
     const {assistant} = useHealthcheckContext();
     const parents = React.useMemo(() => {
-        const branchIssues = [];
+        const parents = [];
         let current: IssuesTree | undefined = issue;
         while (current) {
-            branchIssues.push(current);
+            parents.push(current);
             current = current.parent;
         }
-        return branchIssues.reverse();
+        return parents.reverse();
     }, [issue]);
     const [selectedTab, setSelectedTab] = React.useState(
         targetIssueId && parents.some((parentIssue) => parentIssue.id === targetIssueId)
@@ -50,17 +50,6 @@ export function HealthcheckIssue({
         () => assistant?.snapshot.issues.find((item) => item.id === issue.id) ?? issue,
         [assistant?.snapshot.issues, issue],
     );
-    const renderIssueLabels = () => {
-        if (!issue.status) {
-            return null;
-        }
-
-        return (
-            <div className={b('issue-status')}>
-                <EntityStatus.Label size="s" status={hcStatusToColorFlag[issue.status]} />
-            </div>
-        );
-    };
 
     return (
         <Flex ref={targetRef} className={b('issue-wrapper')} qa={`healthcheck-issue-${issue.id}`}>
@@ -94,7 +83,14 @@ export function HealthcheckIssue({
                                         <Flex direction="column" gap={1} alignSelf="center">
                                             <Text variant="subheader-2">{issue.message}</Text>
 
-                                            {renderIssueLabels()}
+                                            {issue.status && (
+                                                <div className={b('issue-status')}>
+                                                    <EntityStatus.Label
+                                                        size="s"
+                                                        status={hcStatusToColorFlag[issue.status]}
+                                                    />
+                                                </div>
+                                            )}
                                         </Flex>
                                         <Flex
                                             wrap="nowrap"
@@ -135,7 +131,14 @@ export function HealthcheckIssue({
                                 >
                                     <Text variant="subheader-2">{issue.message}</Text>
 
-                                    {renderIssueLabels()}
+                                    {issue.status && (
+                                        <div className={b('issue-status')}>
+                                            <EntityStatus.Label
+                                                size="s"
+                                                status={hcStatusToColorFlag[issue.status]}
+                                            />
+                                        </div>
+                                    )}
                                 </Flex>
                                 <div
                                     className={b('issue-action')}

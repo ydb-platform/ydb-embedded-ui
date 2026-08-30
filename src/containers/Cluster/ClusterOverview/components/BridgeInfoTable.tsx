@@ -12,7 +12,7 @@ import {
 import {Flex, Icon, Text} from '@gravity-ui/uikit';
 import type {LabelProps} from '@gravity-ui/uikit';
 
-import {EntityStatus, getEntityStatusName} from '../../../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LabelWithHelpMark} from '../../../../components/LabelWithHelpMark/LabelWithHelpMark';
 import {Skeleton} from '../../../../components/Skeleton/Skeleton';
 import {
@@ -126,12 +126,14 @@ const BridgePileCard = React.memo(function BridgePileCard({
             return null;
         }
 
+        const showStateHelp = Boolean(help);
+
         return (
             <LabelWithHelpMark
                 theme={theme}
                 size="xs"
                 icon={icon}
-                className={b('state-label', {'with-help': Boolean(help)})}
+                className={b('state-label', {'with-help': showStateHelp})}
                 contentGap={2}
                 help={help}
                 helpMarkProps={{
@@ -154,17 +156,11 @@ const BridgePileCard = React.memo(function BridgePileCard({
 
     const pileName = pile.Name?.trim() || EMPTY_DATA_PLACEHOLDER;
     const nodes = pile.Nodes === undefined ? EMPTY_DATA_PLACEHOLDER : formatNumber(pile.Nodes);
-    const healthcheckAccessibleName = pileHealthcheck.target
-        ? i18n('label_bridge-pile-health-status', {
-              pileName,
-              status: getEntityStatusName(pileHealthcheck.status),
-          })
-        : undefined;
-    const handleHealthcheckClick = React.useCallback(() => {
+    const handleHealthcheckClick = () => {
         if (pileHealthcheck.target) {
             onHealthcheckClick(pileHealthcheck.target);
         }
-    }, [onHealthcheckClick, pileHealthcheck.target]);
+    };
 
     return (
         <Flex direction="column" gap={2} className={b('pile', {current})} qa="bridge-pile-card">
@@ -186,7 +182,6 @@ const BridgePileCard = React.memo(function BridgePileCard({
                 ) : (
                     <EntityStatus.Label
                         status={pileHealthcheck.status}
-                        accessibleName={healthcheckAccessibleName}
                         size="xs"
                         className={b('healthcheck-status')}
                         onClick={pileHealthcheck.target ? handleHealthcheckClick : undefined}
@@ -196,7 +191,13 @@ const BridgePileCard = React.memo(function BridgePileCard({
                             ) : undefined
                         }
                         qa="bridge-pile-healthcheck"
-                    />
+                    >
+                        {pileHealthcheck.target ? (
+                            <span className={b('healthcheck-accessible-prefix')}>
+                                {i18n('label_bridge-pile-health-status-prefix', {pileName})}
+                            </span>
+                        ) : null}
+                    </EntityStatus.Label>
                 )}
             </Flex>
             <Flex gap={1} alignItems="center" className={b('nodes')}>

@@ -53,20 +53,18 @@ function getBranch(leaf: IssuesTree): IssuesTree[] {
 
 function getBranchCandidate(leaf: IssuesTree, pileName: string): Candidate | undefined {
     const branch = getBranch(leaf);
-    let candidate: Candidate | undefined;
 
-    branch.forEach((issue, branchIndex) => {
+    for (const [branchIndex, issue] of branch.entries()) {
         if (!getHealthcheckIssuePileNames(issue).includes(pileName)) {
-            return;
+            continue;
         }
 
+        // Backend guarantees increasing levels; add validation here if that can change.
         const level = issue.level ?? branchIndex;
-        if (!candidate || level < candidate.level) {
-            candidate = {issue, leaf, level};
-        }
-    });
+        return {issue, leaf, level};
+    }
 
-    return candidate;
+    return undefined;
 }
 
 function compareSourceOrder(left?: number[], right?: number[]): number {
