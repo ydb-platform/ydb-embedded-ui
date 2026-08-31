@@ -1,7 +1,7 @@
 import type {TTenantInfo} from '../../../types/api/tenant';
 import {api} from '../api';
 
-import type {PreparedTenant} from './types';
+import type {PreparedTenant, SharedDatabaseTarget} from './types';
 import {prepareTenants} from './utils';
 
 export const tenantsApi = api.injectEndpoints({
@@ -49,19 +49,23 @@ export const tenantsApi = api.injectEndpoints({
             },
             providesTags: ['All'],
         }),
-        getSharedDatabaseName: build.query<
-            string | null,
+        getSharedDatabase: build.query<
+            SharedDatabaseTarget | null,
             {
                 backend?: string;
                 clusterName?: string;
                 database?: string;
                 environmentName?: string;
                 isMonitoringAllowed: boolean;
+                needNodeIds?: boolean;
                 resourceId: string;
             }
         >({
-            queryFn: async ({clusterName, database, isMonitoringAllowed, resourceId}, {signal}) => {
-                if (isMonitoringAllowed && database) {
+            queryFn: async (
+                {clusterName, database, isMonitoringAllowed, needNodeIds, resourceId},
+                {signal},
+            ) => {
+                if (isMonitoringAllowed && database && !needNodeIds) {
                     try {
                         const data = await window.api.viewer.getTabletDescribe(
                             {PathId: resourceId},
@@ -71,7 +75,7 @@ export const tenantsApi = api.injectEndpoints({
                         const sharedDatabaseName = data?.Path?.trim();
 
                         if (sharedDatabaseName) {
-                            return {data: sharedDatabaseName};
+                            return {data: {name: sharedDatabaseName}};
                         }
                     } catch (error) {
                         if (signal.aborted) {
@@ -85,11 +89,14 @@ export const tenantsApi = api.injectEndpoints({
                         {clusterName, metadataCache: false, storage: false},
                         {signal},
                     );
-                    const sharedDatabaseName = response.TenantInfo?.find(
-                        ({Id}) => Id === resourceId,
-                    )?.Name?.trim();
+                    const sharedDatabase = response.TenantInfo?.find(({Id}) => Id === resourceId);
+                    const sharedDatabaseName = sharedDatabase?.Name?.trim();
 
-                    return {data: sharedDatabaseName || null};
+                    return {
+                        data: sharedDatabaseName
+                            ? {name: sharedDatabaseName, nodeIds: sharedDatabase?.NodeIds}
+                            : null,
+                    };
                 } catch (error) {
                     return {error};
                 }

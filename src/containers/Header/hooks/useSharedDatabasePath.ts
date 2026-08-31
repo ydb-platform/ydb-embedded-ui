@@ -7,7 +7,7 @@ import {getTenantPath} from '../../../routes';
 import {backend as activeBackend, environment} from '../../../store';
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import {tenantsApi} from '../../../store/reducers/tenants/tenants';
-import type {PreparedTenant} from '../../../store/reducers/tenants/types';
+import type {PreparedTenant, SharedDatabaseTarget} from '../../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
@@ -44,14 +44,30 @@ function canResolveSharedDatabaseName({
 }
 
 function getSharedDatabaseBackend(
-    databaseData: PreparedTenant | undefined,
+    sharedDatabase: SharedDatabaseTarget | undefined,
     prepareTenantBackend: AdditionalTenantsProps['prepareTenantBackend'],
 ) {
-    if (!databaseData) {
+    if (!sharedDatabase) {
         return activeBackend;
     }
 
-    return getTenantBackend(databaseData, {prepareTenantBackend}) ?? activeBackend;
+    return (
+        getTenantBackend({NodeIds: sharedDatabase.nodeIds}, {prepareTenantBackend}) ?? activeBackend
+    );
+}
+
+function shouldResolveSharedDatabaseNodeIds(
+    balancer: string | undefined,
+    settings: {use_meta_proxy?: boolean} | undefined,
+    prepareTenantBackend: AdditionalTenantsProps['prepareTenantBackend'],
+) {
+    const useMetaProxy = Boolean(
+        window.api.meta && uiFactory.useMetaProxy && settings?.use_meta_proxy !== false,
+    );
+
+    return Boolean(
+        balancer && !useMetaProxy && prepareTenantBackend && !prepareTenantBackend(undefined),
+    );
 }
 
 function getResolvedSharedDatabasePath({
@@ -92,6 +108,7 @@ export function useSharedDatabasePath({
 }: UseSharedDatabasePathParams) {
     const isMetaDatabasesAvailable = useDatabasesV2();
     const {
+        balancer,
         settings,
         isError: isClusterBaseInfoError,
         isResolved: isClusterBaseInfoResolved,
@@ -100,6 +117,11 @@ export function useSharedDatabasePath({
     const isClusterBaseInfoAvailable = isClusterBaseInfoResolved && !isClusterBaseInfoError;
 
     const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
+    const needSharedDatabaseNodeIds = shouldResolveSharedDatabaseNodeIds(
+        balancer,
+        settings,
+        prepareTenantBackend,
+    );
     const shouldResolveSharedDatabaseName = canResolveSharedDatabaseName({
         databaseData,
         isClusterBaseInfoResolved: isClusterBaseInfoAvailable,
@@ -110,7 +132,7 @@ export function useSharedDatabasePath({
     const shouldResolveSharedDatabaseFromViewer =
         shouldResolveSharedDatabaseName && !window.api.meta;
 
-    const {currentData: sharedDatabaseNameFromViewer} = tenantsApi.useGetSharedDatabaseNameQuery(
+    const {currentData: sharedDatabaseFromViewer} = tenantsApi.useGetSharedDatabaseQuery(
         shouldResolveSharedDatabaseFromViewer && databaseData?.ResourceId
             ? {
                   clusterName,
@@ -118,6 +140,7 @@ export function useSharedDatabasePath({
                   backend: activeBackend,
                   environmentName: environment,
                   isMonitoringAllowed: isMonitoringAllowed === true,
+                  needNodeIds: needSharedDatabaseNodeIds,
                   resourceId: databaseData.ResourceId,
               }
             : skipToken,
@@ -132,24 +155,34 @@ export function useSharedDatabasePath({
             : skipToken,
     );
 
-    const sharedDatabaseName = React.useMemo(() => {
+    const sharedDatabaseTarget = React.useMemo<SharedDatabaseTarget | undefined>(() => {
         if (databaseData?.sharedTenantName) {
-            return databaseData.sharedTenantName;
+            return {
+                name: databaseData.sharedTenantName,
+                nodeIds: databaseData.sharedNodeIds,
+            };
         }
 
-        return (
-            sharedDatabaseNameFromViewer ??
-            databases?.find(({Id}) => Id === databaseData?.ResourceId)?.Name
-        );
+        if (sharedDatabaseFromViewer) {
+            return sharedDatabaseFromViewer;
+        }
+
+        const sharedDatabase = databases?.find(({Id}) => Id === databaseData?.ResourceId);
+        const sharedDatabaseName = sharedDatabase?.Name?.trim();
+
+        return sharedDatabaseName
+            ? {name: sharedDatabaseName, nodeIds: sharedDatabase?.NodeIds}
+            : undefined;
     }, [
         databaseData?.ResourceId,
+        databaseData?.sharedNodeIds,
         databaseData?.sharedTenantName,
         databases,
-        sharedDatabaseNameFromViewer,
+        sharedDatabaseFromViewer,
     ]);
 
-    const sharedDatabase = useDatabaseId ? databaseData?.ResourceId : sharedDatabaseName;
-    const backend = getSharedDatabaseBackend(databaseData, prepareTenantBackend);
+    const sharedDatabase = useDatabaseId ? databaseData?.ResourceId : sharedDatabaseTarget?.name;
+    const backend = getSharedDatabaseBackend(sharedDatabaseTarget, prepareTenantBackend);
 
     return getResolvedSharedDatabasePath({
         backend,
