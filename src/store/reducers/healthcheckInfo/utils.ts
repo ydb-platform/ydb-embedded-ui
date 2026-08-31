@@ -86,6 +86,37 @@ const STATE_STORAGE_SUMMARY_TO_RING: Record<string, string> = {
     BOARD: 'BOARD_RING',
     STATE_STORAGE: 'STATE_STORAGE_RING',
 };
+const PILE_ISSUE_TYPE_PREFIX = 'PILE_';
+
+function getStateStorageSummaryRingType(issueType?: string) {
+    const summaryType = issueType?.startsWith(PILE_ISSUE_TYPE_PREFIX)
+        ? issueType.slice(PILE_ISSUE_TYPE_PREFIX.length)
+        : issueType;
+
+    return summaryType ? STATE_STORAGE_SUMMARY_TO_RING[summaryType] : undefined;
+}
+
+function getStateStoragePileName(issue: IssueLog) {
+    return issue.location?.compute?.state_storage?.pile?.name;
+}
+
+function getStateStorageSummaryRingIssues(
+    summary: IssueLog,
+    issuesByType: Partial<Record<string, IssueLog[]>>,
+) {
+    const ringType = getStateStorageSummaryRingType(summary.type);
+    const ringIssues = ringType ? issuesByType[ringType] : undefined;
+    if (!ringIssues || !summary.type?.startsWith(PILE_ISSUE_TYPE_PREFIX)) {
+        return ringIssues;
+    }
+
+    const pileName = getStateStoragePileName(summary);
+    if (!pileName?.trim()) {
+        return [];
+    }
+
+    return ringIssues.filter((ringIssue) => getStateStoragePileName(ringIssue) === pileName);
+}
 
 export function isStorageRelatedType(type?: string): boolean {
     if (!type) {
@@ -102,8 +133,9 @@ export function isComputeRelatedType(type?: string): boolean {
 }
 
 /**
- * Links state-storage summary issues (`SCHEME_BOARD`, `BOARD`, `STATE_STORAGE`)
- * to their corresponding `_RING` issues by synthesizing a `reason` array.
+ * Links state-storage summary issues to their corresponding `_RING` issues by
+ * synthesizing a `reason` array. Pile summaries link only to rings from the
+ * same state-storage pile.
  *
  * Backend emits these as parallel trees — the summary as a BLUE root with no
  * reason, and the RING/NODE chain as a separate RED root. After linking, the
@@ -112,29 +144,28 @@ export function isComputeRelatedType(type?: string): boolean {
  * existing `Storage / Storage pool / ... / PDisk` rendering.
  */
 export function linkStateStorageSummaries(issues: IssueLog[]): IssueLog[] {
-    // Pre-index ids by type once so we don't do O(n) lookups per issue.
-    const idsByType: Partial<Record<string, string[]>> = {};
+    // Pre-index issues by type once so we don't do O(n) lookups per summary.
+    const issuesByType: Partial<Record<string, IssueLog[]>> = {};
     for (const issue of issues) {
         if (!issue.type) {
             continue;
         }
-        const bucket = idsByType[issue.type];
+        const bucket = issuesByType[issue.type];
         if (bucket) {
-            bucket.push(issue.id);
+            bucket.push(issue);
         } else {
-            idsByType[issue.type] = [issue.id];
+            issuesByType[issue.type] = [issue];
         }
     }
 
     // Detect whether any summary actually needs patching; if not, return the
     // original array so downstream selectors keep their reference equality.
     const needsLinking = issues.some((issue) => {
-        const ringType = issue.type ? STATE_STORAGE_SUMMARY_TO_RING[issue.type] : undefined;
-        if (!ringType || (issue.reason && issue.reason.length > 0)) {
+        if (issue.reason && issue.reason.length > 0) {
             return false;
         }
-        const ringIds = idsByType[ringType];
-        return Boolean(ringIds && ringIds.length > 0);
+        const ringIssues = getStateStorageSummaryRingIssues(issue, issuesByType);
+        return Boolean(ringIssues && ringIssues.length > 0);
     });
 
     if (!needsLinking) {
@@ -142,15 +173,14 @@ export function linkStateStorageSummaries(issues: IssueLog[]): IssueLog[] {
     }
 
     return issues.map((issue) => {
-        const ringType = issue.type ? STATE_STORAGE_SUMMARY_TO_RING[issue.type] : undefined;
-        if (!ringType || (issue.reason && issue.reason.length > 0)) {
+        if (issue.reason && issue.reason.length > 0) {
             return issue;
         }
-        const ringIds = idsByType[ringType];
-        if (!ringIds || ringIds.length === 0) {
+        const ringIssues = getStateStorageSummaryRingIssues(issue, issuesByType);
+        if (!ringIssues || ringIssues.length === 0) {
             return issue;
         }
-        return {...issue, reason: ringIds};
+        return {...issue, reason: ringIssues.map((ringIssue) => ringIssue.id)};
     });
 }
 
