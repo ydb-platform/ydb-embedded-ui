@@ -12,7 +12,7 @@ export interface BridgePileHealthcheckTarget {
     view: string;
 }
 
-export interface BridgePileHealthcheck {
+interface BridgePileHealthcheck {
     status: EFlag;
     target?: BridgePileHealthcheckTarget;
 }

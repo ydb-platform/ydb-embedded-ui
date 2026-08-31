@@ -163,7 +163,7 @@ const BridgePileCard = React.memo(function BridgePileCard({
     };
 
     return (
-        <Flex direction="column" gap={2} className={b('pile', {current})} qa="bridge-pile-card">
+        <Flex direction="column" gap={2} className={b('pile', {current})}>
             <Flex justifyContent="space-between" alignItems="flex-start" gap={2} width="100%">
                 <Text variant="subheader-1" ellipsis className={b('pile-name')}>
                     {pileName}
