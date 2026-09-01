@@ -156,6 +156,9 @@ export function linkStateStorageSummaries(issues: IssueLog[]): IssueLog[] {
 
 function getCategoryForUI(issueType?: string) {
     if (issueType) {
+        // Compatibility fallback until HealthCheck links every PILE_* summary to its
+        // *_RING children through reason. Once those links are guaranteed, the branch
+        // category will come from the direct child after the root and this can be removed.
         const issueTypeVariants = issueType.startsWith('PILE_')
             ? [issueType, issueType.slice('PILE_'.length)]
             : [issueType];
