@@ -9,6 +9,7 @@ import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
 import {
     mockBridgeHealthcheck,
     mockBridgeHealthcheckUnavailable,
+    mockBridgeHealthcheckWithoutPileSupport,
     mockBridgeVisualLoadingScenario,
     mockBridgeVisualScenario,
     mockCapabilities,
@@ -149,6 +150,34 @@ test.describe('Bridge mode - Cluster Overview', () => {
         const healthcheck = clusterPage.pileCards.first().getByTestId('bridge-pile-healthcheck');
         await expect(healthcheck).toContainText('Unknown');
         await expect(healthcheck.locator('button')).toHaveCount(0);
+        await expect(clusterPage.bridgeSection).not.toContainText('You are here');
+    });
+
+    test('on: keeps healthcheck without pile support unknown', async ({page}) => {
+        await page.route('**/viewer/json/whoami*', async (route) => {
+            await route.fulfill({
+                json: {
+                    UserSID: 'bridge-test-user',
+                    UserID: 'bridge-test-user',
+                    AuthType: 'Login',
+                    IsViewerAllowed: true,
+                    IsMonitoringAllowed: true,
+                },
+            });
+        });
+        await mockCapabilities(page, true);
+        await mockClusterWithBridgePiles(page);
+        await mockBridgeHealthcheckWithoutPileSupport(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
+        await expect(clusterPage.bridgeSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+
+        for (const pileCard of await clusterPage.pileCards.all()) {
+            const healthcheck = pileCard.getByTestId('bridge-pile-healthcheck');
+            await expect(healthcheck).toContainText('Unknown');
+            await expect(healthcheck.locator('button')).toHaveCount(0);
+        }
         await expect(clusterPage.bridgeSection).not.toContainText('You are here');
     });
 

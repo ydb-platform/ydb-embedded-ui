@@ -104,6 +104,31 @@ export const mockBridgeHealthcheck = (page: Page) => {
     });
 };
 
+export const mockBridgeHealthcheckWithoutPileSupport = (page: Page) => {
+    return page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                self_check_result: SelfCheckResult.EMERGENCY,
+                location: {
+                    id: 2,
+                    host: 'legacy-healthcheck-node',
+                },
+                issue_log: [
+                    {
+                        id: 'unscoped-red-issue',
+                        status: StatusFlag.RED,
+                        message: 'Healthcheck cannot attribute this issue to a pile',
+                        type: 'STORAGE',
+                        level: 1,
+                    },
+                ],
+            }),
+        });
+    });
+};
+
 export const mockBridgeHealthcheckUnavailable = (page: Page) => {
     return page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
         await route.fulfill({

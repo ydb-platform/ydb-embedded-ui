@@ -232,7 +232,10 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
         selectLeavesIssues(state, database ?? '', clusterName),
     );
 
-    const healthcheckAvailable = healthcheckData !== undefined && healthcheckError === undefined;
+    const healthcheckAvailable =
+        healthcheckData !== undefined &&
+        healthcheckError === undefined &&
+        Boolean(healthcheckData.location?.pile?.name?.trim());
     const healthcheckLoading = healthcheckData === undefined && healthcheckFetching;
     const currentPileName = healthcheckData?.location?.pile?.name;
 
