@@ -187,6 +187,20 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await expect(scopedHealthcheck).toContainText('Caution');
         await expect(scopedHealthcheck.locator('button')).toHaveCount(1);
         await expect(clusterPage.bridgeSection).not.toContainText('You are here');
+
+        await page.unroute('**/viewer/json/healthcheck?*');
+        await mockBridgeHealthcheck(page, null);
+        await page.reload({waitUntil: 'domcontentloaded'});
+        await expect(clusterPage.bridgeSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+
+        for (const pileName of ['r1', 'r2']) {
+            const healthcheck = clusterPage.pileCards
+                .filter({hasText: pileName})
+                .getByTestId('bridge-pile-healthcheck');
+            await expect(healthcheck).toContainText('Good');
+        }
+        await expect(scopedHealthcheck).toContainText('Caution');
+        await expect(clusterPage.bridgeSection).not.toContainText('You are here');
     });
 
     test('on: opens the source healthcheck issue from a pile badge', async ({page}) => {

@@ -243,7 +243,7 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
     const healthcheckAvailable = healthcheckData !== undefined && healthcheckError === undefined;
     const healthcheckLoading = healthcheckData === undefined && healthcheckFetching;
     const currentPileName = healthcheckData?.location?.pile?.name;
-    const healthcheckSupportsPiles = Boolean(currentPileName?.trim());
+    const healthcheckSupportsPiles = healthcheckData?.location?.pile !== undefined;
 
     const sortedPiles = React.useMemo(() => {
         return piles

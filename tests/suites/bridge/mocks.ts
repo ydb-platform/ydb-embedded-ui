@@ -61,7 +61,7 @@ export const mockStorageGroupsWithPile = (page: Page) => {
     });
 };
 
-export const mockBridgeHealthcheck = (page: Page) => {
+export const mockBridgeHealthcheck = (page: Page, currentPileName: string | null = 'r2') => {
     return page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
         await route.fulfill({
             status: 200,
@@ -71,7 +71,7 @@ export const mockBridgeHealthcheck = (page: Page) => {
                 location: {
                     id: 2,
                     host: 'current-pile-node',
-                    pile: {name: 'r2'},
+                    pile: currentPileName === null ? {} : {name: currentPileName},
                 },
                 issue_log: [
                     {
