@@ -107,6 +107,7 @@ interface BridgePileCardProps {
     pile: TBridgePile;
     current: boolean;
     healthcheckAvailable: boolean;
+    healthcheckSupportsPiles: boolean;
     healthcheckLoading: boolean;
     leavesIssues: ReturnType<typeof selectLeavesIssues>;
     onHealthcheckClick: (target: BridgePileHealthcheckTarget) => void;
@@ -116,6 +117,7 @@ const BridgePileCard = React.memo(function BridgePileCard({
     pile,
     current,
     healthcheckAvailable,
+    healthcheckSupportsPiles,
     healthcheckLoading,
     leavesIssues,
     onHealthcheckClick,
@@ -150,8 +152,14 @@ const BridgePileCard = React.memo(function BridgePileCard({
     }, [pile.State]);
 
     const pileHealthcheck = React.useMemo(
-        () => getBridgePileHealthcheck(pile.Name, leavesIssues, healthcheckAvailable),
-        [healthcheckAvailable, leavesIssues, pile.Name],
+        () =>
+            getBridgePileHealthcheck(
+                pile.Name,
+                leavesIssues,
+                healthcheckAvailable,
+                healthcheckSupportsPiles,
+            ),
+        [healthcheckAvailable, healthcheckSupportsPiles, leavesIssues, pile.Name],
     );
 
     const pileName = pile.Name?.trim() || EMPTY_DATA_PLACEHOLDER;
@@ -232,12 +240,10 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
         selectLeavesIssues(state, database ?? '', clusterName),
     );
 
-    const healthcheckAvailable =
-        healthcheckData !== undefined &&
-        healthcheckError === undefined &&
-        Boolean(healthcheckData.location?.pile?.name?.trim());
+    const healthcheckAvailable = healthcheckData !== undefined && healthcheckError === undefined;
     const healthcheckLoading = healthcheckData === undefined && healthcheckFetching;
     const currentPileName = healthcheckData?.location?.pile?.name;
+    const healthcheckSupportsPiles = Boolean(currentPileName?.trim());
 
     const sortedPiles = React.useMemo(() => {
         return piles
@@ -260,6 +266,7 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
                     pile={pile}
                     current={Boolean(currentPileName?.trim() && pile.Name === currentPileName)}
                     healthcheckAvailable={healthcheckAvailable}
+                    healthcheckSupportsPiles={healthcheckSupportsPiles}
                     healthcheckLoading={healthcheckLoading}
                     leavesIssues={leavesIssues}
                     onHealthcheckClick={handleOpenHealthcheckIssue}

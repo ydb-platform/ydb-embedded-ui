@@ -153,7 +153,7 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await expect(clusterPage.bridgeSection).not.toContainText('You are here');
     });
 
-    test('on: keeps healthcheck without pile support unknown', async ({page}) => {
+    test('on: uses scoped issues without assuming global pile support', async ({page}) => {
         await page.route('**/viewer/json/whoami*', async (route) => {
             await route.fulfill({
                 json: {
@@ -173,11 +173,19 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
         await expect(clusterPage.bridgeSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
 
-        for (const pileCard of await clusterPage.pileCards.all()) {
-            const healthcheck = pileCard.getByTestId('bridge-pile-healthcheck');
+        for (const pileName of ['r1', 'r2']) {
+            const healthcheck = clusterPage.pileCards
+                .filter({hasText: pileName})
+                .getByTestId('bridge-pile-healthcheck');
             await expect(healthcheck).toContainText('Unknown');
             await expect(healthcheck.locator('button')).toHaveCount(0);
         }
+
+        const scopedHealthcheck = clusterPage.pileCards
+            .filter({hasText: 'all-group-statuses-pile'})
+            .getByTestId('bridge-pile-healthcheck');
+        await expect(scopedHealthcheck).toContainText('Caution');
+        await expect(scopedHealthcheck.locator('button')).toHaveCount(1);
         await expect(clusterPage.bridgeSection).not.toContainText('You are here');
     });
 

@@ -112,6 +112,7 @@ export function getBridgePileHealthcheck(
     pileName: string | undefined,
     leavesIssues: IssuesTree[],
     healthcheckAvailable: boolean,
+    healthcheckSupportsPiles = healthcheckAvailable,
 ): BridgePileHealthcheck {
     if (!healthcheckAvailable || !pileName?.trim()) {
         return {status: EFlag.Grey};
@@ -126,7 +127,7 @@ export function getBridgePileHealthcheck(
     }
 
     if (!selectedCandidate) {
-        return {status: EFlag.Green};
+        return {status: healthcheckSupportsPiles ? EFlag.Green : EFlag.Grey};
     }
 
     const issueStatus = normalizeStatus(selectedCandidate.issue.status);

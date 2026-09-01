@@ -123,6 +123,22 @@ export const mockBridgeHealthcheckWithoutPileSupport = (page: Page) => {
                         type: 'STORAGE',
                         level: 1,
                     },
+                    {
+                        id: 'scoped-orange-issue',
+                        status: StatusFlag.ORANGE,
+                        message: 'Pile requires maintenance',
+                        type: 'STORAGE',
+                        level: 1,
+                        location: {
+                            storage: {
+                                pool: {
+                                    group: {
+                                        pile: {name: 'all-group-statuses-pile'},
+                                    },
+                                },
+                            },
+                        },
+                    },
                 ],
             }),
         });
