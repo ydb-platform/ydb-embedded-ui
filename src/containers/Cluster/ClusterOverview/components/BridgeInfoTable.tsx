@@ -9,7 +9,7 @@ import {
     LinkSlash,
     MapPin,
 } from '@gravity-ui/icons';
-import {Flex, Icon, Text} from '@gravity-ui/uikit';
+import {Flex, Icon, Label, Text} from '@gravity-ui/uikit';
 import type {LabelProps} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
@@ -171,16 +171,20 @@ const BridgePileCard = React.memo(function BridgePileCard({
     };
 
     return (
-        <Flex direction="column" gap={2} className={b('pile', {current})}>
+        <Flex direction="column" gap={2} className={b('pile')}>
             <Flex justifyContent="space-between" alignItems="flex-start" gap={2} width="100%">
                 <Text variant="subheader-1" ellipsis className={b('pile-name')}>
                     {pileName}
                 </Text>
                 {current ? (
-                    <Flex gap={1} alignItems="center" className={b('current-pile')}>
-                        <Icon data={MapPin} size={12} />
-                        <Text variant="body-1">{i18n('label_you-are-here')}</Text>
-                    </Flex>
+                    <Label
+                        theme="clear"
+                        size="xs"
+                        icon={<Icon data={MapPin} size={12} />}
+                        className={b('current-pile')}
+                    >
+                        {i18n('label_you-are-here')}
+                    </Label>
                 ) : null}
             </Flex>
             <Flex gap={2} alignItems="center" wrap>

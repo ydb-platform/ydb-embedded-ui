@@ -134,7 +134,12 @@ test.describe('Bridge mode - Cluster Overview', () => {
             clusterPage.pileCards.first().getByTestId('bridge-pile-healthcheck').locator('button'),
         ).toHaveCount(0);
 
-        await expect(clusterPage.pileCards.nth(1)).toContainText('You are here');
+        await expect(
+            clusterPage.pileCards
+                .nth(1)
+                .locator('.g-label_theme_clear')
+                .filter({hasText: 'You are here'}),
+        ).toBeVisible();
         await expect(clusterPage.pileCards.nth(2)).toContainText('Caution');
     });
 
