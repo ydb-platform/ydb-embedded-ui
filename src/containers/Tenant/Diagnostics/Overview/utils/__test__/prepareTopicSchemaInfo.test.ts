@@ -3,6 +3,7 @@ import type {
     TEvDescribeSchemeResult,
     TPQPartitionStrategy,
 } from '../../../../../../types/api/schema';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../../utils/constants';
 import {prepareTopicSchemaInfo} from '../prepareTopicSchemaInfo';
 
 const buildDescribe = (partitionStrategy?: TPQPartitionStrategy): TEvDescribeSchemeResult =>
@@ -55,5 +56,35 @@ describe('prepareTopicSchemaInfo', () => {
         const info = prepareTopicSchemaInfo(buildDescribe());
 
         expect(info.find(({label}) => label === 'Autopartitioning')).toBeUndefined();
+    });
+
+    it('keeps the autopartitioning row for an unknown strategy from a newer backend', () => {
+        const info = prepareTopicSchemaInfo(
+            buildDescribe({
+                PartitionStrategyType: 'SOME_FUTURE_STRATEGY' as EPQPartitionStrategyType,
+                MinPartitionCount: 2,
+                MaxPartitionCount: 10,
+            }),
+        );
+
+        expect(info).toEqual(
+            expect.arrayContaining([{label: 'Autopartitioning', value: 'SOME_FUTURE_STRATEGY'}]),
+        );
+    });
+
+    it('renders the placeholder for a bound the API did not supply', () => {
+        const info = prepareTopicSchemaInfo(
+            buildDescribe({
+                PartitionStrategyType: EPQPartitionStrategyType.CAN_SPLIT_AND_MERGE,
+                MinPartitionCount: 2,
+            }),
+        );
+
+        expect(info).toEqual(
+            expect.arrayContaining([
+                {label: 'Min partitions count', value: '2'},
+                {label: 'Max partitions count', value: EMPTY_DATA_PLACEHOLDER},
+            ]),
+        );
     });
 });

@@ -5,8 +5,9 @@ import type {
     TPersQueueGroupDescription,
 } from '../../../types/api/schema';
 import {EMeteringMode, EPQPartitionStrategyType} from '../../../types/api/schema';
-import {HOUR_IN_SECONDS} from '../../../utils/constants';
+import {EMPTY_DATA_PLACEHOLDER, HOUR_IN_SECONDS} from '../../../utils/constants';
 import {formatBps, formatBytes, formatNumber} from '../../../utils/dataFormatters/dataFormatters';
+import i18n from '../i18n';
 import {createInfoFormatter} from '../utils';
 
 const EMeteringModeToNames: Record<EMeteringMode, string> = {
@@ -15,10 +16,10 @@ const EMeteringModeToNames: Record<EMeteringMode, string> = {
 };
 
 const EPQPartitionStrategyTypeToNames: Record<EPQPartitionStrategyType, string> = {
-    [EPQPartitionStrategyType.DISABLED]: 'Disabled',
-    [EPQPartitionStrategyType.CAN_SPLIT]: 'Up',
-    [EPQPartitionStrategyType.CAN_SPLIT_AND_MERGE]: 'Up and down',
-    [EPQPartitionStrategyType.PAUSED]: 'Paused',
+    [EPQPartitionStrategyType.DISABLED]: i18n('value_autopartitioning-disabled'),
+    [EPQPartitionStrategyType.CAN_SPLIT]: i18n('value_autopartitioning-up'),
+    [EPQPartitionStrategyType.CAN_SPLIT_AND_MERGE]: i18n('value_autopartitioning-up-and-down'),
+    [EPQPartitionStrategyType.PAUSED]: i18n('value_autopartitioning-paused'),
 };
 
 export const formatPQGroupItem = createInfoFormatter<TPersQueueGroupDescription>({
@@ -57,15 +58,21 @@ export const formatPQPartitionConfig = createInfoFormatter<TPQPartitionConfig>({
     },
 });
 
+const formatPartitionCount = (value?: number) =>
+    value === undefined ? EMPTY_DATA_PLACEHOLDER : formatNumber(value);
+
 export const formatPQPartitionStrategy = createInfoFormatter<TPQPartitionStrategy>({
     values: {
-        PartitionStrategyType: (value) => value && EPQPartitionStrategyTypeToNames[value],
-        MinPartitionCount: (value) => formatNumber(value ?? 1),
-        MaxPartitionCount: (value) => formatNumber(value ?? 1),
+        // Fall back to the raw enum value so a strategy introduced by a newer YDB
+        // version still renders the Autopartitioning row instead of being dropped.
+        PartitionStrategyType: (value) =>
+            value && (EPQPartitionStrategyTypeToNames[value] ?? value),
+        MinPartitionCount: formatPartitionCount,
+        MaxPartitionCount: formatPartitionCount,
     },
     labels: {
-        PartitionStrategyType: 'Autopartitioning',
-        MinPartitionCount: 'Min partitions count',
-        MaxPartitionCount: 'Max partitions count',
+        PartitionStrategyType: i18n('field_autopartitioning'),
+        MinPartitionCount: i18n('field_min-partitions-count'),
+        MaxPartitionCount: i18n('field_max-partitions-count'),
     },
 });

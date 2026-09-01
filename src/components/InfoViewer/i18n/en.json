@@ -1,5 +1,12 @@
 {
   "common.created": "Created",
   "common.type": "Type",
-  "no-data": "No data"
+  "no-data": "No data",
+  "field_autopartitioning": "Autopartitioning",
+  "field_min-partitions-count": "Min partitions count",
+  "field_max-partitions-count": "Max partitions count",
+  "value_autopartitioning-disabled": "Disabled",
+  "value_autopartitioning-up": "Up",
+  "value_autopartitioning-up-and-down": "Up and down",
+  "value_autopartitioning-paused": "Paused"
 }
