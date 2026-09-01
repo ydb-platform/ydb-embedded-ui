@@ -83,12 +83,20 @@ export class ViewerAPI extends BaseYdbAPI {
         );
     }
 
-    getTenants({clusterName}: {clusterName?: string}, {concurrentId, signal}: AxiosOptions = {}) {
+    getTenants(
+        {
+            clusterName,
+            metadataCache,
+            storage = true,
+        }: {clusterName?: string; metadataCache?: boolean; storage?: boolean},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<TTenantInfo>(
             this.getPath('/viewer/json/tenantinfo'),
             {
                 tablets: false,
-                storage: true,
+                storage,
+                metadata_cache: metadataCache,
                 cluster_name: clusterName,
             },
             {concurrentId, requestConfig: {signal}},
