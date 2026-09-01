@@ -128,14 +128,12 @@ const BridgePileCard = React.memo(function BridgePileCard({
             return null;
         }
 
-        const showStateHelp = Boolean(help);
-
         return (
             <LabelWithHelpMark
                 theme={theme}
                 size="xs"
                 icon={icon}
-                className={b('state-label', {'with-help': showStateHelp})}
+                className={b('state-label')}
                 contentGap={2}
                 help={help}
                 helpMarkProps={{
