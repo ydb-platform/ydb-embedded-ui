@@ -139,6 +139,8 @@ export function DecommissionButton({
                 warningText={getDecommissionWarningText(newDecommission)}
                 withRetry={withRetry}
                 withCheckBox
+                applyButtonText={pDiskPageKeyset('decommission-dialog-title')}
+                applyButtonView="outlined-danger"
                 retryButtonText={pDiskPageKeyset('decommission-dialog-force-change')}
                 onConfirm={handleConfirmAction}
                 onConfirmActionSuccess={handleConfirmActionSuccess}

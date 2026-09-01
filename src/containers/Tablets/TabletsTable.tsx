@@ -189,7 +189,9 @@ function TabletActions(tablet: TTabletStateInfo) {
         <ButtonWithConfirmDialog
             buttonView="outlined"
             dialogHeader={i18n('dialog.kill-header')}
-            dialogWarning={i18n('dialog.kill-text')}
+            dialogText={i18n('dialog.kill-text')}
+            applyButtonText={i18n('dialog.kill-header')}
+            applyButtonView="action"
             onConfirmAction={() => {
                 return killTablet({id}).unwrap();
             }}

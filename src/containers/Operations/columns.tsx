@@ -216,6 +216,8 @@ function OperationsActions({operation, database}: OperationsActionsProps) {
                         buttonView="outlined"
                         dialogHeader={i18n('header_forget')}
                         dialogText={i18n('text_forget')}
+                        applyButtonText={i18n('header_forget')}
+                        applyButtonView="outlined-danger"
                         onConfirmAction={() =>
                             forgetOperation({id, database})
                                 .unwrap()
@@ -244,6 +246,8 @@ function OperationsActions({operation, database}: OperationsActionsProps) {
                         buttonView="outlined"
                         dialogHeader={i18n('header_cancel')}
                         dialogText={i18n('text_cancel')}
+                        applyButtonText={i18n('header_cancel')}
+                        applyButtonView="outlined-danger"
                         onConfirmAction={() =>
                             cancelOperation({id, database})
                                 .unwrap()
