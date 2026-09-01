@@ -4,17 +4,29 @@
     $block: &;
 
     --ydb-table-with-controls-layout-controls-height: 44px;
+    --ydb-table-with-controls-layout-controls-padding-top: 0;
+    --data-table-row-height: 64px;
+    --data-table-cell-align: top;
 
     overflow: auto;
 
     height: 100%;
-    padding: 0 20px;
+    padding: 0 0 var(--g-spacing-5) var(--g-spacing-5);
 
     @include mixins.flex-container();
 
-    .ydb-table-with-controls-layout__controls {
-        height: var(--ydb-table-with-controls-layout-controls-height);
-        padding-top: 0;
+    .data-table__th {
+        height: 40px;
+    }
+
+    .data-table__row:hover {
+        #{$block}__actions {
+            visibility: visible;
+        }
+    }
+
+    &__table-with-controls {
+        width: fit-content;
     }
 
     &__search {
@@ -24,42 +36,59 @@
     &__row {
         cursor: pointer;
 
-        :hover {
-            #{$block}__controls {
-                display: flex;
+        &_active {
+            .data-table__td {
+                background-color: var(--g-color-base-selection);
+            }
+
+            &:hover {
+                .data-table__td {
+                    background: var(--g-color-base-selection-hover) !important;
+                }
             }
         }
     }
 
-    &__query-name {
+    &__query-name,
+    &__edited {
         overflow: hidden;
 
-        white-space: pre-wrap;
         text-overflow: ellipsis;
     }
 
     &__query {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
+        --ydb-syntax-highlighter-height: 54px;
+        --ydb-syntax-highlighter-content-overflow: hidden;
 
-    &__query-body {
         overflow: hidden;
         flex-grow: 1;
 
-        max-width: 100%;
-
         white-space: pre;
-        text-overflow: ellipsis;
+
+        pre {
+            padding: 0;
+
+            @include mixins.text-code-1();
+        }
+
+        code {
+            display: inline-flex;
+            flex-direction: column;
+
+            width: 100%;
+
+            white-space: pre;
+
+            .line {
+                display: inline-block;
+                overflow: hidden;
+
+                text-overflow: ellipsis;
+            }
+        }
     }
 
-    &__controls {
-        display: none;
-    }
-
-    &__dialog-query-name {
-        font-weight: 500;
+    &__actions {
+        visibility: hidden;
     }
 }

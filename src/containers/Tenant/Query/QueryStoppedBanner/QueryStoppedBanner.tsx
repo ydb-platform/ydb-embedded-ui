@@ -25,12 +25,14 @@ export function QueryStoppedBanner() {
             theme="normal"
             align="center"
             style={{paddingTop: 11, paddingBottom: 11}}
-            message={<div className={b('message')}>{i18n('banner.query-stopped.message')}</div>}
+            message={
+                <div className={b('message')}>{i18n('alert_query-stopped-outdated-data')}</div>
+            }
             layout="horizontal"
             actions={
                 <Alert.Actions>
                     <Alert.Action view="normal" onClick={closeBanner}>
-                        {i18n('banner.query-stopped.never-show')}
+                        {i18n('action_hide-query-stopped-alert')}
                     </Alert.Action>
                 </Alert.Actions>
             }

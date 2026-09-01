@@ -20,7 +20,7 @@ export function QuerySettingsBanner() {
             style={{paddingTop: 11, paddingBottom: 11}}
             message={
                 <QuerySettingsDescription
-                    prefix={i18n('banner.query-settings.message')}
+                    prefix={i18n('alert_modified-query-settings')}
                     querySettings={changedLastExecutionSettingsDescriptions}
                 />
             }

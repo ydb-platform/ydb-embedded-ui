@@ -5,7 +5,7 @@ import {ActionTooltip, Button, Icon} from '@gravity-ui/uikit';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
-import type {ClusterLinkWithTitle} from '../../types/additionalProps';
+import type {AdditionalTenantsProps, ClusterLinkWithTitle} from '../../types/additionalProps';
 import {CLUSTER_LINK_CONTEXT} from '../../utils/clusterLinks/clusterLinkConstants';
 
 import {DeveloperUIControl} from './GlobalRightControls';
@@ -19,6 +19,8 @@ interface DatabaseRightControlsProps {
     databaseData?: PreparedTenant;
     isDatabaseDataLoading: boolean;
     isV2NavigationEnabled: boolean;
+    isViewerUser?: boolean;
+    prepareTenantBackend?: AdditionalTenantsProps['prepareTenantBackend'];
     showDeveloperUI: boolean;
     databaseLinks: ClusterLinkWithTitle[];
 }
@@ -29,6 +31,8 @@ export function DatabaseRightControls({
     databaseData,
     isDatabaseDataLoading,
     isV2NavigationEnabled,
+    isViewerUser,
+    prepareTenantBackend,
     showDeveloperUI,
     databaseLinks,
 }: DatabaseRightControlsProps) {
@@ -62,6 +66,8 @@ export function DatabaseRightControls({
                 databaseData={databaseData}
                 isDatabaseDataLoading={isDatabaseDataLoading}
                 isV2NavigationEnabled={isV2NavigationEnabled}
+                isViewerUser={isViewerUser}
+                prepareTenantBackend={prepareTenantBackend}
                 databaseLinks={actionDatabaseLinks}
             />
         </React.Fragment>

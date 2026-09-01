@@ -44,9 +44,7 @@ export class SaveQueryDialog {
 
     async getValidationError() {
         const errorMessage = this.dialog
-            .getByText(
-                /Name should not be empty|Name must be at least 3 characters|This name already exists/,
-            )
+            .getByText(/Name should not be empty|This name already exists/)
             .first();
         await errorMessage.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return errorMessage.innerText();

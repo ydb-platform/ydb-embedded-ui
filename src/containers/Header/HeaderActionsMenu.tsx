@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
+import {DatabaseArrowRight, Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
 import {useHistory} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
@@ -9,11 +9,12 @@ import {DropdownMenu} from '../../components/DropdownMenu';
 import {getClusterPath} from '../../routes';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
-import type {ClusterLinkWithTitle} from '../../types/additionalProps';
+import type {AdditionalTenantsProps, ClusterLinkWithTitle} from '../../types/additionalProps';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {clusterTabsIds} from '../Cluster/utils';
 
 import {b} from './constants';
+import {useSharedDatabasePath} from './hooks/useSharedDatabasePath';
 import {headerKeyset} from './i18n';
 
 export interface HeaderActionsMenuProps {
@@ -22,6 +23,8 @@ export interface HeaderActionsMenuProps {
     databaseData?: PreparedTenant;
     isDatabaseDataLoading: boolean;
     isV2NavigationEnabled: boolean;
+    isViewerUser?: boolean;
+    prepareTenantBackend?: AdditionalTenantsProps['prepareTenantBackend'];
     databaseLinks: ClusterLinkWithTitle[];
 }
 
@@ -31,11 +34,19 @@ export function DBHeaderActionsMenu({
     databaseData,
     isDatabaseDataLoading,
     isV2NavigationEnabled,
+    isViewerUser,
+    prepareTenantBackend,
     databaseLinks,
 }: HeaderActionsMenuProps) {
     const history = useHistory();
 
     const emMetaAvailable = useEmMetaAvailable();
+    const sharedDatabasePath = useSharedDatabasePath({
+        clusterName,
+        databaseData,
+        isViewerUser,
+        prepareTenantBackend,
+    });
 
     const isEditDBAvailable = emMetaAvailable && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable = emMetaAvailable && uiFactory.onDeleteDB !== undefined;
@@ -66,6 +77,16 @@ export function DBHeaderActionsMenu({
                     title: headerKeyset('action_connect-to-db'),
                     iconStart: PlugConnection,
                     action: () => getConnectToDBDialog({database}),
+                },
+            ]);
+        }
+
+        if (sharedDatabasePath) {
+            menuItems.push([
+                {
+                    title: headerKeyset('action_go-to-shared-db'),
+                    iconStart: DatabaseArrowRight,
+                    href: sharedDatabasePath,
                 },
             ]);
         }
@@ -115,6 +136,7 @@ export function DBHeaderActionsMenu({
         history,
         isEditDBAvailable,
         isDeleteDBAvailable,
+        sharedDatabasePath,
     ]);
 
     if (!menuItems.length) {

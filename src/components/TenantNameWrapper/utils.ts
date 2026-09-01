@@ -2,7 +2,7 @@ import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
 
 export function getTenantBackend(
-    tenant: PreparedTenant,
+    tenant: Pick<PreparedTenant, 'NodeIds'> & Partial<Pick<PreparedTenant, 'sharedNodeIds'>>,
     additionalTenantsProps?: AdditionalTenantsProps,
 ) {
     if (typeof additionalTenantsProps?.prepareTenantBackend !== 'function') {

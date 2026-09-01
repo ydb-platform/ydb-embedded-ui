@@ -14,4 +14,9 @@ export interface PreparedTenant extends TTenant {
     groupsCount: number;
 }
 
+export interface SharedDatabaseTarget {
+    name: string;
+    nodeIds?: number[];
+}
+
 export type MetricStatus = ValueOf<typeof METRIC_STATUS>;

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
-import type {ButtonButtonProps, ButtonProps} from '@gravity-ui/uikit';
+import type {ButtonButtonProps} from '@gravity-ui/uikit';
 import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 
 import {
@@ -9,7 +9,6 @@ import {
     selectActiveTabSavedQueryName,
     selectUserInput,
     setIsDirty,
-    setQueryTabSavedQueryName,
     syncSavedQueryTab,
 } from '../../../../store/reducers/query/query';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
@@ -18,7 +17,9 @@ import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getTabTitleForSave} from '../utils/queryTabTitles';
+import {hasSavedQueryName} from '../utils/savedQueries';
 import {useSavedQueries} from '../utils/useSavedQueries';
+import {useEditExistingSavedQuery} from '../utils/useUpdateSavedQueryFromTab';
 
 import i18n from './i18n';
 
@@ -29,7 +30,7 @@ const b = cn('ydb-save-query');
 export const SAVE_QUERY_DIALOG = 'save-query-dialog';
 
 interface SaveQueryProps {
-    buttonProps?: ButtonProps;
+    buttonProps?: ButtonButtonProps;
 }
 
 export function useSaveQueryWithTabSync() {
@@ -94,26 +95,19 @@ export function SaveQueryButton({dialogProps, children, ...buttonProps}: SaveQue
 }
 
 export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
-    const dispatch = useTypedDispatch();
     const activeTab = useTypedSelector(selectActiveTab);
     const activeTabSavedQueryName = useTypedSelector(selectActiveTabSavedQueryName);
     const currentInput = useTypedSelector(selectUserInput);
     const onSaveQueryClick = useSaveQueryHandler({queryBody: currentInput});
     const currentSavedQueryName = activeTabSavedQueryName;
-
-    const {saveQuery} = useSavedQueries();
+    const editExistingSavedQuery = useEditExistingSavedQuery();
 
     const onEditQueryClick = () => {
-        saveQuery(currentSavedQueryName ?? null, currentInput);
-        if (activeTab && currentSavedQueryName) {
-            dispatch(
-                setQueryTabSavedQueryName({
-                    tabId: activeTab.id,
-                    savedQueryName: currentSavedQueryName,
-                }),
-            );
+        if (!activeTab || !currentSavedQueryName) {
+            return;
         }
-        dispatch(setIsDirty(false));
+
+        editExistingSavedQuery(activeTab, currentInput);
     };
 
     const renderSaveDropdownMenu = () => {
@@ -143,7 +137,7 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     return currentSavedQueryName ? (
         renderSaveDropdownMenu()
     ) : (
-        <SaveQueryButton dialogProps={{queryBody: currentInput}} />
+        <SaveQueryButton {...buttonProps} dialogProps={{queryBody: currentInput}} />
     );
 }
 
@@ -180,7 +174,7 @@ function SaveQueryDialog({
         if (!value.trim()) {
             return i18n('error.name-not-empty');
         }
-        if (savedQueries?.some((q) => q.name.toLowerCase() === value.trim().toLowerCase())) {
+        if (savedQueries && hasSavedQueryName(savedQueries, value)) {
             return i18n('error.name-exists');
         }
         return undefined;
@@ -204,7 +198,7 @@ function SaveQueryDialog({
     };
 
     const onSaveClick = () => {
-        onSaveQuery(queryName, queryBody);
+        onSaveQuery(queryName.trim(), queryBody);
         dispatch(setIsDirty(false));
         onCloseDialog();
         onSuccess?.();

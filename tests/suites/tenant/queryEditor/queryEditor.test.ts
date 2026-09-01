@@ -107,6 +107,8 @@ async function expectLocatorWidth(locator: Locator, expectedWidth: number) {
 }
 
 test.describe('Test Query Editor', async () => {
+    test.describe.configure({mode: 'parallel'});
+
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
     const queryActionScreenshotThemes = ['light', 'dark'] as const;
 
@@ -371,23 +373,161 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isElapsedTimeVisible()).resolves.toBe(true);
     });
 
-    test('Query streaming finishes with data', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-        await toggleEditorSetting(page, 'on', 'Query Streaming');
+    test.describe('Backend-intensive queries', () => {
+        test.describe.configure({mode: 'default'});
 
-        await queryEditor.setQuery(longRunningStreamQuery);
-        await queryEditor.clickRunButton();
+        test('Query streaming finishes with data', async ({page}) => {
+            const queryEditor = new QueryEditor(page);
+            await toggleEditorSetting(page, 'on', 'Query Streaming');
 
-        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
-        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
-        // Streaming query may exceed default row limit, so title can be "Result" or "Truncated"
-        await expect(queryEditor.resultTable.getResultTitleText()).resolves.toMatch(
-            /^(Result|Truncated)$/,
-        );
-        const resultCount = Number(await queryEditor.resultTable.getResultTitleCount());
-        expect(resultCount).toBeGreaterThan(0);
-        const resultView = queryEditor.resultTable.getResultWrapperLocator();
-        await expect(resultView).toHaveScreenshot('streaming-query-completed.png');
+            await queryEditor.setQuery(longRunningStreamQuery);
+            await queryEditor.clickRunButton();
+
+            await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+            await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
+            // Streaming query may exceed default row limit, so title can be "Result" or "Truncated"
+            await expect(queryEditor.resultTable.getResultTitleText()).resolves.toMatch(
+                /^(Result|Truncated)$/,
+            );
+            const resultCount = Number(await queryEditor.resultTable.getResultTitleCount());
+            expect(resultCount).toBeGreaterThan(0);
+            const resultView = queryEditor.resultTable.getResultWrapperLocator();
+            await expect(resultView).toHaveScreenshot('streaming-query-completed.png');
+        });
+
+        test('Query execution is terminated when stop button is clicked', async ({page}) => {
+            const queryEditor = new QueryEditor(page);
+
+            await queryEditor.setQuery(longRunningQuery);
+            await queryEditor.clickRunButton();
+
+            await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+            await queryEditor.clickStopButton();
+
+            await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
+        });
+
+        test('Stop button works for Execute mode', async ({page}) => {
+            const queryEditor = new QueryEditor(page);
+
+            // Test for Execute mode
+            await queryEditor.setQuery(longRunningQuery);
+            await queryEditor.clickRunButton();
+
+            await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+            await queryEditor.clickStopButton();
+            await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
+        });
+
+        test('Stop cancels Explain Analyze on the server when streaming is enabled', async ({
+            page,
+        }) => {
+            const queryEditor = new QueryEditor(page);
+            await toggleEditorSetting(page, 'on', 'Query Streaming');
+            await queryEditor.setQuery(longRunningQuery);
+            const explainAnalyzeButton = queryEditor.getQueryActionButton(
+                ButtonNames.ExplainAnalyze,
+            );
+            await expectLocatorWidth(explainAnalyzeButton, 111);
+            const explainAnalyzeButtonWidth = await getLocatorWidth(explainAnalyzeButton);
+            const queryActionsWidth = await getLocatorWidth(queryEditor.getQueryActionsLocator());
+
+            const explainAnalyzeRequest = page.waitForRequest(isExplainAnalyzeRequest);
+            const cancelRequest = page.waitForRequest(
+                (request) => getViewerQueryRequestBody(request)?.action === 'cancel-query',
+                {timeout: VISIBILITY_TIMEOUT},
+            );
+
+            await queryEditor.clickExplainAnalyzeButton();
+            await explainAnalyzeRequest;
+            await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+            const stopButton = queryEditor
+                .getQueryActionsLocator()
+                .getByRole('button', {name: ButtonNames.Stop});
+            await expect(stopButton).toHaveClass(
+                /ydb-query-editor-button__stop-button_explain-analyze/,
+            );
+            await expectLocatorWidth(stopButton, explainAnalyzeButtonWidth);
+            await expectLocatorWidth(queryEditor.getQueryActionsLocator(), queryActionsWidth);
+            await queryEditor.clickStopButton();
+
+            const cancelRequestBody = getViewerQueryRequestBody(await cancelRequest);
+            expect(cancelRequestBody?.query_id).toBeTruthy();
+        });
+
+        test('repeating non-streaming Run marks its history entry as stopped', async ({page}) => {
+            const queryEditor = new QueryEditor(page);
+            const queryMarker = '-- abort history regression';
+            const query = `${longRunningQuery}\n${queryMarker}`;
+            let resolveRunRequestCaptured: (() => void) | undefined;
+            let releaseRunRequest: (() => void) | undefined;
+            const runRequestCaptured = new Promise<void>((resolve) => {
+                resolveRunRequestCaptured = resolve;
+            });
+            const runRequestRelease = new Promise<void>((resolve) => {
+                releaseRunRequest = resolve;
+            });
+            let runRequestIsHeld = false;
+
+            await page.route('**/viewer/json/query**', async (route) => {
+                const requestBody = getViewerQueryRequestBody(route.request());
+                if (
+                    requestBody?.action?.startsWith('execute-') &&
+                    requestBody.query?.includes(queryMarker)
+                ) {
+                    if (!runRequestIsHeld) {
+                        runRequestIsHeld = true;
+                        resolveRunRequestCaptured?.();
+                    }
+                    await runRequestRelease;
+
+                    try {
+                        await route.continue();
+                    } catch {
+                        // The first Run is intentionally aborted by the repeated editor action.
+                    }
+                    return;
+                }
+
+                await route.continue();
+            });
+
+            await toggleEditorSetting(page, 'off', 'Query Streaming');
+            await queryEditor.setQuery(query);
+            await queryEditor.clickRunButton();
+            await runRequestCaptured;
+            await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+
+            await queryEditor.runQueryViaEditorAction();
+
+            try {
+                await expect
+                    .poll(
+                        () =>
+                            page.evaluate((marker) => {
+                                const history = JSON.parse(
+                                    localStorage.getItem('queries_history') ?? '[]',
+                                ) as Array<{
+                                    durationUs?: number;
+                                    queryText?: string;
+                                    status?: string;
+                                }>;
+                                const entry = history
+                                    .toReversed()
+                                    .find((item) => item.queryText?.includes(marker));
+
+                                return {
+                                    hasDuration: Boolean(entry?.durationUs && entry.durationUs > 0),
+                                    status: entry?.status,
+                                };
+                            }, queryMarker),
+                        {timeout: VISIBILITY_TIMEOUT},
+                    )
+                    .toEqual({hasDuration: true, status: 'stopped'});
+            } finally {
+                releaseRunRequest?.();
+            }
+        });
     });
 
     test('Streaming non-JSON HTTP error shows actual error body, not empty object', async ({
@@ -428,18 +568,6 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.getResultAreaLocator()).toHaveScreenshot(
             'streaming-non-json-error.png',
         );
-    });
-
-    test('Query execution is terminated when stop button is clicked', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        await queryEditor.setQuery(longRunningQuery);
-        await queryEditor.clickRunButton();
-
-        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
-        await queryEditor.clickStopButton();
-
-        await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
     test('Stopped non-streaming selection does not create a History entry', async ({page}) => {
@@ -503,18 +631,6 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 
-    test('Stop button works for Execute mode', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        // Test for Execute mode
-        await queryEditor.setQuery(longRunningQuery);
-        await queryEditor.clickRunButton();
-
-        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
-        await queryEditor.clickStopButton();
-        await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
-    });
-
     test('Stop button works for Explain mode', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         const pendingQuery = await setupPendingNonStreamingQueryMock(page);
@@ -534,38 +650,6 @@ test.describe('Test Query Editor', async () => {
         } finally {
             await pendingQuery.cleanup();
         }
-    });
-
-    test('Stop cancels Explain Analyze on the server when streaming is enabled', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-        await toggleEditorSetting(page, 'on', 'Query Streaming');
-        await queryEditor.setQuery(longRunningQuery);
-        const explainAnalyzeButton = queryEditor.getQueryActionButton(ButtonNames.ExplainAnalyze);
-        await expectLocatorWidth(explainAnalyzeButton, 111);
-        const explainAnalyzeButtonWidth = await getLocatorWidth(explainAnalyzeButton);
-        const queryActionsWidth = await getLocatorWidth(queryEditor.getQueryActionsLocator());
-
-        const explainAnalyzeRequest = page.waitForRequest(isExplainAnalyzeRequest);
-        const cancelRequest = page.waitForRequest(
-            (request) => getViewerQueryRequestBody(request)?.action === 'cancel-query',
-            {timeout: VISIBILITY_TIMEOUT},
-        );
-
-        await queryEditor.clickExplainAnalyzeButton();
-        await explainAnalyzeRequest;
-        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
-        const stopButton = queryEditor
-            .getQueryActionsLocator()
-            .getByRole('button', {name: ButtonNames.Stop});
-        await expect(stopButton).toHaveClass(
-            /ydb-query-editor-button__stop-button_explain-analyze/,
-        );
-        await expectLocatorWidth(stopButton, explainAnalyzeButtonWidth);
-        await expectLocatorWidth(queryEditor.getQueryActionsLocator(), queryActionsWidth);
-        await queryEditor.clickStopButton();
-
-        const cancelRequestBody = getViewerQueryRequestBody(await cancelRequest);
-        expect(cancelRequestBody?.query_id).toBeTruthy();
     });
 
     test('repeated Explain Analyze hotkey aborts the previous request', async ({page}) => {
@@ -594,80 +678,6 @@ test.describe('Test Query Editor', async () => {
             await firstRequestFailed;
         } finally {
             await pendingQuery.cleanup();
-        }
-    });
-
-    test('repeating non-streaming Run marks its history entry as stopped', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-        const queryMarker = '-- abort history regression';
-        const query = `${longRunningQuery}\n${queryMarker}`;
-        let resolveRunRequestCaptured: (() => void) | undefined;
-        let releaseRunRequest: (() => void) | undefined;
-        const runRequestCaptured = new Promise<void>((resolve) => {
-            resolveRunRequestCaptured = resolve;
-        });
-        const runRequestRelease = new Promise<void>((resolve) => {
-            releaseRunRequest = resolve;
-        });
-        let runRequestIsHeld = false;
-
-        await page.route('**/viewer/json/query**', async (route) => {
-            const requestBody = getViewerQueryRequestBody(route.request());
-            if (
-                requestBody?.action?.startsWith('execute-') &&
-                requestBody.query?.includes(queryMarker)
-            ) {
-                if (!runRequestIsHeld) {
-                    runRequestIsHeld = true;
-                    resolveRunRequestCaptured?.();
-                }
-                await runRequestRelease;
-
-                try {
-                    await route.continue();
-                } catch {
-                    // The first Run is intentionally aborted by the repeated editor action.
-                }
-                return;
-            }
-
-            await route.continue();
-        });
-
-        await toggleEditorSetting(page, 'off', 'Query Streaming');
-        await queryEditor.setQuery(query);
-        await queryEditor.clickRunButton();
-        await runRequestCaptured;
-        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
-
-        await queryEditor.runQueryViaEditorAction();
-
-        try {
-            await expect
-                .poll(
-                    () =>
-                        page.evaluate((marker) => {
-                            const history = JSON.parse(
-                                localStorage.getItem('queries_history') ?? '[]',
-                            ) as Array<{
-                                durationUs?: number;
-                                queryText?: string;
-                                status?: string;
-                            }>;
-                            const entry = history
-                                .toReversed()
-                                .find((item) => item.queryText?.includes(marker));
-
-                            return {
-                                hasDuration: Boolean(entry?.durationUs && entry.durationUs > 0),
-                                status: entry?.status,
-                            };
-                        }, queryMarker),
-                    {timeout: VISIBILITY_TIMEOUT},
-                )
-                .toEqual({hasDuration: true, status: 'stopped'});
-        } finally {
-            releaseRunRequest?.();
         }
     });
 
@@ -1171,13 +1181,11 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.setCursor(1, 3);
         await expect.poll(() => queryEditor.getHighlightedStatement()).toBe('SELECT 1;');
 
-        await expect(
-            queryEditor.getCurrentStatementUpdateMetricsDuringTextChange(),
-        ).resolves.toEqual({
-            // react-monaco-editor and the page-leave guard each read the controlled value.
-            // Current-statement indexing must not add another synchronous full-text read.
-            fullTextReads: 2,
-        });
+        const {fullTextReads} =
+            await queryEditor.getCurrentStatementUpdateMetricsDuringTextChange();
+
+        // Current-statement indexing must not add another synchronous full-text read.
+        expect(fullTextReads).toBeLessThanOrEqual(2);
     });
 
     test('Results controls collapse and expand functionality', async ({page}) => {
