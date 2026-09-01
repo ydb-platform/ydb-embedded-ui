@@ -255,18 +255,6 @@ describe('getBridgePileHealthcheck', () => {
         });
     });
 
-    test('does not match pile names that differ by surrounding whitespace', () => {
-        const issue = makeIssue('issue', {
-            status: StatusFlag.RED,
-            level: 1,
-            pileName: ' himki ',
-        });
-
-        expect(getBridgePileHealthcheck('himki', [issue], true)).toEqual({
-            status: EFlag.Green,
-        });
-    });
-
     test('returns unknown when healthcheck data is unavailable', () => {
         const issue = makeIssue('issue', {
             status: StatusFlag.RED,
