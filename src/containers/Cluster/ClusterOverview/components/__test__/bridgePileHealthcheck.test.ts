@@ -281,33 +281,12 @@ describe('healthcheck issue pile location', () => {
             {storage: {pool: {group: {pile: {name: 'storage-group-pile'}}}}},
             'storage-group-pile',
         ],
-        [
-            'storage node',
-            {storage: {node: {pile: {name: 'storage-node-pile'}}}},
-            'storage-node-pile',
-        ],
         ['compute', {compute: {pile: {name: 'compute-pile'}}}, 'compute-pile'],
         [
             'state storage',
             {compute: {state_storage: {pile: {name: 'state-storage-pile'}}}},
             'state-storage-pile',
         ],
-        [
-            'compute node',
-            {compute: {node: {pile: {name: 'compute-node-pile'}}}},
-            'compute-node-pile',
-        ],
-        [
-            'state storage node',
-            {
-                compute: {
-                    state_storage: {node: {pile: {name: 'state-storage-node-pile'}}},
-                },
-            },
-            'state-storage-node-pile',
-        ],
-        ['node', {node: {pile: {name: 'node-pile'}}}, 'node-pile'],
-        ['peer', {peer: {pile: {name: 'peer-pile'}}}, 'peer-pile'],
     ])('finds a pile on %s location', (_label, location, expectedPileName) => {
         const issue: IssueLog = {id: 'issue', location};
 
@@ -321,7 +300,7 @@ describe('healthcheck issue pile location', () => {
         expect(getHealthcheckIssuePileNames(leaf)).toEqual([]);
     });
 
-    test('returns every distinct explicit pile name in deterministic order', () => {
+    test('returns distinct supported pile names in deterministic order', () => {
         const issue: IssueLog = {
             id: 'issue',
             location: {
@@ -336,10 +315,6 @@ describe('healthcheck issue pile location', () => {
             },
         };
 
-        expect(getHealthcheckIssuePileNames(issue)).toEqual([
-            'group-pile',
-            'compute-pile',
-            'node-pile',
-        ]);
+        expect(getHealthcheckIssuePileNames(issue)).toEqual(['group-pile', 'compute-pile']);
     });
 });

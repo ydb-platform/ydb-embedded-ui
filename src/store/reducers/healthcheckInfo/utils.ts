@@ -1,5 +1,5 @@
 import {EFlag} from '../../../types/api/enums';
-import type {IssueLog, Location} from '../../../types/api/healthcheck';
+import type {IssueLog} from '../../../types/api/healthcheck';
 import {SelfCheckResult, StatusFlag} from '../../../types/api/healthcheck';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 
@@ -23,34 +23,11 @@ export const selfCheckResultToHcStatus: Record<SelfCheckResult, StatusFlag> = {
     [SelfCheckResult.EMERGENCY]: StatusFlag.RED,
 };
 
-function getStorageLocationPileNames(location: Location['storage']): Array<string | undefined> {
-    return [location?.pool?.group?.pile?.name, location?.node?.pile?.name];
-}
-
-function getComputeLocationPileNames(location: Location['compute']): Array<string | undefined> {
-    return [
-        location?.pile?.name,
-        location?.state_storage?.pile?.name,
-        location?.node?.pile?.name,
-        location?.state_storage?.node?.pile?.name,
-    ];
-}
-
 export function getHealthcheckIssuePileNames(issue: Pick<IssueLog, 'location'>): string[] {
-    const [storageGroupPile, storageNodePile] = getStorageLocationPileNames(
-        issue.location?.storage,
-    );
-    const [computePile, stateStoragePile, computeNodePile, stateStorageNodePile] =
-        getComputeLocationPileNames(issue.location?.compute);
     const rawNames = [
-        storageGroupPile,
-        computePile,
-        stateStoragePile,
-        storageNodePile,
-        computeNodePile,
-        stateStorageNodePile,
-        issue.location?.node?.pile?.name,
-        issue.location?.peer?.pile?.name,
+        issue.location?.storage?.pool?.group?.pile?.name,
+        issue.location?.compute?.pile?.name,
+        issue.location?.compute?.state_storage?.pile?.name,
     ];
 
     const names = new Set<string>();
