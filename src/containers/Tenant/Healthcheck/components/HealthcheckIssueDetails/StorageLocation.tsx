@@ -81,8 +81,9 @@ function GroupInfo({location}: StorageSectionProps) {
     const {group} = pool ?? {};
 
     const ids = group?.id;
+    const pileName = group?.pile?.name;
 
-    if (!ids?.length) {
+    if (!ids?.length && !pileName) {
         return null;
     }
 
@@ -93,6 +94,7 @@ function GroupInfo({location}: StorageSectionProps) {
                     value: ids?.length ? <IdList ids={ids} /> : undefined,
                     title: i18n('label_group-id'),
                 },
+                {value: pileName, title: i18n('label_pile')},
             ]}
         />
     );

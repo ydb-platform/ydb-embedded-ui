@@ -19,10 +19,15 @@ interface ClusterDrawerHealthcheckProps {
 }
 
 export function useClusterHealthcheckQueryParams() {
-    const [{showHealthcheck, issuesFilter, view}, setQueryParams] = useQueryParams({
+    const [
+        {showHealthcheck, issuesFilter, view, healthcheckIssue, healthcheckLeaf},
+        setQueryParams,
+    ] = useQueryParams({
         showHealthcheck: BooleanParam,
         issuesFilter: StringParam,
         view: StringParam,
+        healthcheckIssue: StringParam,
+        healthcheckLeaf: StringParam,
     });
 
     const handleShowHealthcheckChange = React.useCallback(
@@ -46,6 +51,35 @@ export function useClusterHealthcheckQueryParams() {
         [setQueryParams],
     );
 
+    const handleOpenHealthcheckIssue = React.useCallback(
+        (target: {issueId: string; leafIssueId: string; view: string}) => {
+            setQueryParams(
+                {
+                    showHealthcheck: true,
+                    issuesFilter: undefined,
+                    view: target.view,
+                    healthcheckIssue: target.issueId,
+                    healthcheckLeaf: target.leafIssueId,
+                },
+                'replaceIn',
+            );
+        },
+        [setQueryParams],
+    );
+
+    const handleCloseHealthcheck = React.useCallback(() => {
+        setQueryParams(
+            {
+                showHealthcheck: undefined,
+                issuesFilter: undefined,
+                view: undefined,
+                healthcheckIssue: undefined,
+                healthcheckLeaf: undefined,
+            },
+            'replaceIn',
+        );
+    }, [setQueryParams]);
+
     return {
         showHealthcheck,
         handleShowHealthcheckChange,
@@ -53,6 +87,10 @@ export function useClusterHealthcheckQueryParams() {
         handleIssuesFilterChange,
         view,
         handleHealthcheckViewChange,
+        healthcheckIssue,
+        healthcheckLeaf,
+        handleOpenHealthcheckIssue,
+        handleCloseHealthcheck,
     };
 }
 
@@ -61,12 +99,8 @@ export function ClusterDrawerHealthcheck({
     database,
     clusterName,
 }: ClusterDrawerHealthcheckProps) {
-    const {
-        handleShowHealthcheckChange,
-        showHealthcheck,
-        handleIssuesFilterChange,
-        handleHealthcheckViewChange,
-    } = useClusterHealthcheckQueryParams();
+    const {showHealthcheck, healthcheckIssue, healthcheckLeaf, handleCloseHealthcheck} =
+        useClusterHealthcheckQueryParams();
 
     const healthcheckStatus = useTypedSelector((state) =>
         selectCheckStatus(state, database, clusterName),
@@ -75,21 +109,86 @@ export function ClusterDrawerHealthcheck({
     const healthcheckData = useTypedSelector((state) =>
         selectAllHealthcheckInfo(state, database, clusterName),
     );
+    const targetLeafIssueRef = React.useRef<HTMLDivElement | null>(null);
+    const drawerTransitionCompleteRef = React.useRef(false);
+    const scrolledTargetRef = React.useRef<{
+        issueId?: string;
+        leafIssueId?: string;
+    }>({});
+
+    const scrollToTargetIssue = React.useCallback(() => {
+        if (!drawerTransitionCompleteRef.current || !healthcheckIssue || !healthcheckLeaf) {
+            return;
+        }
+
+        if (
+            scrolledTargetRef.current.issueId === healthcheckIssue &&
+            scrolledTargetRef.current.leafIssueId === healthcheckLeaf
+        ) {
+            return;
+        }
+
+        const targetIssue = targetLeafIssueRef.current;
+        const scrollContainer = targetIssue?.closest<HTMLElement>('.ydb-fullscreen__content');
+        if (!targetIssue || !scrollContainer) {
+            return;
+        }
+
+        const controls = scrollContainer.querySelector<HTMLElement>('.ydb-healthcheck__controls');
+        const targetTop =
+            scrollContainer.scrollTop +
+            targetIssue.getBoundingClientRect().top -
+            scrollContainer.getBoundingClientRect().top -
+            (controls?.getBoundingClientRect().height ?? 0);
+
+        scrolledTargetRef.current = {
+            issueId: healthcheckIssue,
+            leafIssueId: healthcheckLeaf,
+        };
+        scrollContainer.scrollTo({top: Math.max(0, targetTop), behavior: 'smooth'});
+    }, [healthcheckIssue, healthcheckLeaf]);
+
+    const handleTargetLeafIssueRef = React.useCallback(
+        (element: HTMLDivElement | null) => {
+            targetLeafIssueRef.current = element;
+            if (element) {
+                window.requestAnimationFrame(scrollToTargetIssue);
+            }
+        },
+        [scrollToTargetIssue],
+    );
+
+    const handleTransitionInComplete = React.useCallback(() => {
+        drawerTransitionCompleteRef.current = true;
+        scrollToTargetIssue();
+    }, [scrollToTargetIssue]);
 
     const handleCloseDrawer = React.useCallback(() => {
-        handleShowHealthcheckChange(false);
-        handleIssuesFilterChange(undefined);
-        handleHealthcheckViewChange(undefined);
-    }, [handleShowHealthcheckChange, handleIssuesFilterChange, handleHealthcheckViewChange]);
+        drawerTransitionCompleteRef.current = false;
+        scrolledTargetRef.current = {};
+        handleCloseHealthcheck();
+    }, [handleCloseHealthcheck]);
 
     const renderDrawerContent = React.useCallback(() => {
-        return <Healthcheck database={database} clusterName={clusterName} scope="cluster" />;
-    }, [clusterName, database]);
+        return (
+            <Healthcheck
+                database={database}
+                clusterName={clusterName}
+                scope="cluster"
+                targetIssueId={healthcheckIssue ?? undefined}
+                targetLeafIssueId={healthcheckLeaf ?? undefined}
+                targetLeafIssueRef={handleTargetLeafIssueRef}
+            />
+        );
+    }, [clusterName, database, handleTargetLeafIssueRef, healthcheckIssue, healthcheckLeaf]);
 
     return (
         <HealthcheckDrawer
             isDrawerVisible={Boolean(showHealthcheck) && Boolean(database)}
             onCloseDrawer={handleCloseDrawer}
+            onTransitionInComplete={
+                healthcheckIssue && healthcheckLeaf ? handleTransitionInComplete : undefined
+            }
             renderDrawerContent={renderDrawerContent}
             drawerId="cluster-healthcheck-details"
             storageKey="cluster-healthcheck-details-drawer-width"

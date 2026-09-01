@@ -61,6 +61,22 @@ describe('healthcheck issue categories', () => {
         });
     });
 
+    test('classifies pile summary issues by the type after the PILE_ prefix', () => {
+        const issues: IssueLog[] = [
+            {id: 'scheme-board', type: 'PILE_SCHEME_BOARD'},
+            {id: 'state-storage', type: 'PILE_STATE_STORAGE'},
+            {id: 'board', type: 'PILE_BOARD'},
+        ];
+
+        const leaves = issues.flatMap((issue) => getLeavesFromTree(issues, issue));
+
+        expect(leaves).toEqual([
+            expect.objectContaining({id: 'scheme-board', categoryForUI: 'storage'}),
+            expect.objectContaining({id: 'state-storage', categoryForUI: 'storage'}),
+            expect.objectContaining({id: 'board', categoryForUI: 'storage'}),
+        ]);
+    });
+
     test('uses configured custom categories for classification and counting', () => {
         configureUIFactory<'network' | 'storage'>({
             healthcheck: {

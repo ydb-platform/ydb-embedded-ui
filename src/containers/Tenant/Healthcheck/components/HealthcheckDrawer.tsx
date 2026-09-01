@@ -15,6 +15,7 @@ interface HealthcheckDrawerProps {
     children: React.ReactNode;
     isDrawerVisible: boolean;
     onCloseDrawer: () => void;
+    onTransitionInComplete?: () => void;
     renderDrawerContent: () => React.ReactNode;
     drawerId: string;
     storageKey: string;
@@ -30,6 +31,7 @@ export function HealthcheckDrawer({
     children,
     isDrawerVisible,
     onCloseDrawer,
+    onTransitionInComplete,
     renderDrawerContent,
     drawerId,
     storageKey,
@@ -83,6 +85,7 @@ export function HealthcheckDrawer({
         <DrawerWrapper
             isDrawerVisible={isDrawerVisible}
             onCloseDrawer={onCloseDrawer}
+            onTransitionInComplete={onTransitionInComplete}
             renderDrawerContent={renderDrawerContent}
             drawerId={drawerId}
             storageKey={storageKey}

@@ -33,6 +33,7 @@ export function NodeInfo({node, title}: NodeInfoProps) {
                 {value: nodeLink, title: i18n('label_node-id')},
                 {value: node.host, title: i18n('label_node-host'), copy: node.host},
                 {value: node.port, title: i18n('label_node-port')},
+                {value: node.pile?.name, title: i18n('label_pile')},
             ]}
         />
     );

@@ -1,6 +1,9 @@
 import type {Page, Route} from '@playwright/test';
 
 import {BridgePileGroupStatus, BridgePileState} from '../../../src/types/api/cluster';
+import {SelfCheckResult, StatusFlag} from '../../../src/types/api/healthcheck';
+
+import {bridgeVisualCluster, bridgeVisualHealthcheck} from './fixtures/bridgeVisualScenario';
 
 export const mockCapabilities = (page: Page, enabled: boolean) => {
     return page.route(`**/viewer/capabilities`, async (route: Route) => {
@@ -58,93 +61,138 @@ export const mockStorageGroupsWithPile = (page: Page) => {
     });
 };
 
-export const mockClusterWithAllBridgePileStates = (page: Page) => {
-    return page.route(`**/viewer/json/cluster?*`, async (route: Route) => {
+export const mockBridgeHealthcheck = (page: Page, currentPileName: string | null = 'r2') => {
+    return page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({
-                Version: 6,
-                Domain: '/dev02',
-                BridgeInfo: {
-                    Piles: [
-                        {
-                            PileId: 1,
-                            Name: 'primary-pile',
-                            State: BridgePileState.PRIMARY,
-                            Nodes: 16,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.FULL]: 24,
-                                [BridgePileGroupStatus.DEGRADED]: 2,
-                            },
-                        },
-                        {
-                            PileId: 2,
-                            Name: 'promoting-pile',
-                            State: BridgePileState.PROMOTED,
-                            Nodes: 12,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.FULL]: 18,
-                                [BridgePileGroupStatus.DEGRADED]: 4,
-                            },
-                        },
-                        {
-                            PileId: 3,
-                            Name: 'sync-pile',
-                            State: BridgePileState.SYNCHRONIZED,
-                            Nodes: 8,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.FULL]: 24,
-                            },
-                        },
-                        {
-                            PileId: 4,
-                            Name: 'not-sync-pile',
-                            State: BridgePileState.NOT_SYNCHRONIZED,
-                            Nodes: 4,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.FULL]: 12,
-                                [BridgePileGroupStatus.DEGRADED]: 4,
-                                [BridgePileGroupStatus.DISINTEGRATED]: 1,
-                            },
-                        },
-                        {
-                            PileId: 5,
-                            Name: 'suspended-pile',
-                            State: BridgePileState.SUSPENDED,
-                            Nodes: 6,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.DEGRADED]: 8,
-                                [BridgePileGroupStatus.DISINTEGRATED]: 2,
-                            },
-                        },
-                        {
-                            PileId: 6,
-                            Name: 'disconnected-pile',
-                            State: BridgePileState.DISCONNECTED,
-                            Nodes: 0,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.UNKNOWN]: 18,
-                            },
-                        },
-                        {
-                            PileId: 7,
-                            Name: 'all-group-statuses-pile',
-                            State: BridgePileState.NOT_SYNCHRONIZED,
-                            Nodes: 19,
-                            GroupStatuses: {
-                                [BridgePileGroupStatus.UNKNOWN]: 1,
-                                [BridgePileGroupStatus.FULL]: 4,
-                                [BridgePileGroupStatus.PARTIAL]: 12,
-                                [BridgePileGroupStatus.DEGRADED]: 1,
-                                [BridgePileGroupStatus.DISINTEGRATED]: 1,
-                            },
-                        },
-                    ],
+                self_check_result: SelfCheckResult.MAINTENANCE_REQUIRED,
+                location: {
+                    id: 2,
+                    host: 'current-pile-node',
+                    pile: currentPileName === null ? {} : {name: currentPileName},
                 },
+                issue_log: [
+                    {
+                        id: 'failing-pile-root',
+                        status: StatusFlag.ORANGE,
+                        message: 'Pile requires maintenance',
+                        type: 'STORAGE',
+                        level: 1,
+                        reason: ['failing-pile-leaf'],
+                        location: {
+                            storage: {
+                                pool: {
+                                    group: {
+                                        pile: {name: 'all-group-statuses-pile'},
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    {
+                        id: 'failing-pile-leaf',
+                        status: StatusFlag.RED,
+                        message: 'Unscoped VDisk failure',
+                        type: 'VDISK',
+                        level: 2,
+                    },
+                ],
             }),
         });
     });
+};
+
+export const mockBridgeHealthcheckWithoutPileSupport = (page: Page) => {
+    return page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                self_check_result: SelfCheckResult.EMERGENCY,
+                location: {
+                    id: 2,
+                    host: 'legacy-healthcheck-node',
+                },
+                issue_log: [
+                    {
+                        id: 'unscoped-red-issue',
+                        status: StatusFlag.RED,
+                        message: 'Healthcheck cannot attribute this issue to a pile',
+                        type: 'STORAGE',
+                        level: 1,
+                    },
+                    {
+                        id: 'scoped-orange-issue',
+                        status: StatusFlag.ORANGE,
+                        message: 'Pile requires maintenance',
+                        type: 'STORAGE',
+                        level: 1,
+                        location: {
+                            storage: {
+                                pool: {
+                                    group: {
+                                        pile: {name: 'all-group-statuses-pile'},
+                                    },
+                                },
+                            },
+                        },
+                    },
+                ],
+            }),
+        });
+    });
+};
+
+export const mockBridgeHealthcheckUnavailable = (page: Page) => {
+    return page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
+        await route.fulfill({
+            status: 404,
+            contentType: 'application/json',
+            body: JSON.stringify({error: 'Healthcheck is not available'}),
+        });
+    });
+};
+
+const mockBridgeVisualCluster = (page: Page) => {
+    return page.route(`**/viewer/json/cluster?*`, async (route: Route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(bridgeVisualCluster),
+        });
+    });
+};
+
+export const mockBridgeVisualScenario = async (page: Page) => {
+    await mockBridgeVisualCluster(page);
+    await page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(bridgeVisualHealthcheck),
+        });
+    });
+};
+
+export const mockBridgeVisualLoadingScenario = async (page: Page) => {
+    let releaseHealthcheck = () => {};
+    const healthcheckGate = new Promise<void>((resolve) => {
+        releaseHealthcheck = resolve;
+    });
+
+    await mockBridgeVisualCluster(page);
+    await page.route(`**/viewer/json/healthcheck?*`, async (route: Route) => {
+        await healthcheckGate;
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(bridgeVisualHealthcheck),
+        });
+    });
+
+    return releaseHealthcheck;
 };
 
 export const mockClusterWithBridgePiles = (page: Page) => {

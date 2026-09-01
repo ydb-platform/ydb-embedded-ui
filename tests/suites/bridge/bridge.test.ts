@@ -7,8 +7,12 @@ import {StoragePage} from '../storage/StoragePage';
 import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
 
 import {
+    mockBridgeHealthcheck,
+    mockBridgeHealthcheckUnavailable,
+    mockBridgeHealthcheckWithoutPileSupport,
+    mockBridgeVisualLoadingScenario,
+    mockBridgeVisualScenario,
     mockCapabilities,
-    mockClusterWithAllBridgePileStates,
     mockClusterWithBridgePiles,
     mockNodesWithPile,
     mockStorageGroupsWithPile,
@@ -105,6 +109,7 @@ test.describe('Bridge mode - Cluster Overview', () => {
     test('on: shows Bridge piles section with data', async ({page}) => {
         await mockCapabilities(page, true);
         await mockClusterWithBridgePiles(page);
+        await mockBridgeHealthcheck(page);
 
         const clusterPage = new ClusterPage(page);
         await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
@@ -115,24 +120,231 @@ test.describe('Bridge mode - Cluster Overview', () => {
         // Should show pile cards
         expect(await clusterPage.getPileCardsCount()).toBe(3);
 
+        await expect(
+            clusterPage.pileCards.first().getByTestId('bridge-pile-healthcheck'),
+        ).toContainText('Good');
+
         // Check first pile content
         const firstPileContent = await clusterPage.getFirstPileContent();
         expect(firstPileContent).toContain('r1');
         expect(firstPileContent).toContain('Primary'); // State
-        expect(firstPileContent).toContain('16 nodes'); // Nodes count
-        expect(firstPileContent).toContain('Full'); // Group status
-        expect(firstPileContent).toContain('24'); // Group status count
+        expect(firstPileContent).toContain('Nodes: 16');
+        expect(firstPileContent).not.toContain('Full');
+        await expect(
+            clusterPage.pileCards.first().getByTestId('bridge-pile-healthcheck').locator('button'),
+        ).toHaveCount(0);
+
+        await expect(
+            clusterPage.pileCards
+                .nth(1)
+                .locator('.g-label_theme_clear')
+                .filter({hasText: 'You are here'}),
+        ).toBeVisible();
+        await expect(clusterPage.pileCards.nth(2)).toContainText('Caution');
     });
 
-    test('on: bridge piles visual states', async ({page}) => {
+    test('on: shows unavailable healthcheck as non-interactive unknown', async ({page}) => {
+        await mockCapabilities(page, true);
+        await mockClusterWithBridgePiles(page);
+        await mockBridgeHealthcheckUnavailable(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
+        await expect(clusterPage.bridgeSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+
+        const healthcheck = clusterPage.pileCards.first().getByTestId('bridge-pile-healthcheck');
+        await expect(healthcheck).toContainText('Unknown');
+        await expect(healthcheck.locator('button')).toHaveCount(0);
+        await expect(clusterPage.bridgeSection).not.toContainText('You are here');
+    });
+
+    test('on: uses scoped issues without assuming global pile support', async ({page}) => {
+        await page.route('**/viewer/json/whoami*', async (route) => {
+            await route.fulfill({
+                json: {
+                    UserSID: 'bridge-test-user',
+                    UserID: 'bridge-test-user',
+                    AuthType: 'Login',
+                    IsViewerAllowed: true,
+                    IsMonitoringAllowed: true,
+                },
+            });
+        });
+        await mockCapabilities(page, true);
+        await mockClusterWithBridgePiles(page);
+        await mockBridgeHealthcheckWithoutPileSupport(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
+        await expect(clusterPage.bridgeSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+
+        for (const pileName of ['r1', 'r2']) {
+            const healthcheck = clusterPage.pileCards
+                .filter({hasText: pileName})
+                .getByTestId('bridge-pile-healthcheck');
+            await expect(healthcheck).toContainText('Unknown');
+            await expect(healthcheck.locator('button')).toHaveCount(0);
+        }
+
+        const scopedHealthcheck = clusterPage.pileCards
+            .filter({hasText: 'all-group-statuses-pile'})
+            .getByTestId('bridge-pile-healthcheck');
+        await expect(scopedHealthcheck).toContainText('Caution');
+        await expect(scopedHealthcheck.locator('button')).toHaveCount(1);
+        await expect(clusterPage.bridgeSection).not.toContainText('You are here');
+
+        await page.unroute('**/viewer/json/healthcheck?*');
+        await mockBridgeHealthcheck(page, null);
+        await page.reload({waitUntil: 'domcontentloaded'});
+        await expect(clusterPage.bridgeSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+
+        for (const pileName of ['r1', 'r2']) {
+            const healthcheck = clusterPage.pileCards
+                .filter({hasText: pileName})
+                .getByTestId('bridge-pile-healthcheck');
+            await expect(healthcheck).toContainText('Good');
+        }
+        await expect(scopedHealthcheck).toContainText('Caution');
+        await expect(clusterPage.bridgeSection).not.toContainText('You are here');
+    });
+
+    test('on: opens the source healthcheck issue from a pile badge', async ({page}) => {
+        await mockCapabilities(page, true);
+        await mockClusterWithBridgePiles(page);
+        await mockBridgeHealthcheck(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
+        await expect(clusterPage.bridgeSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+
+        const failingPile = clusterPage.pileCards.filter({
+            hasText: 'all-group-statuses-pile',
+        });
+        const healthcheckButton = failingPile
+            .getByTestId('bridge-pile-healthcheck')
+            .locator('button');
+        await expect(healthcheckButton).toHaveAccessibleName(
+            'Health status for pile all-group-statuses-pile: Caution',
+        );
+        await healthcheckButton.click();
+
+        const drawer = page.getByTestId('cluster-healthcheck-details');
+        await expect(drawer).toBeVisible();
+        await expect(page).toHaveURL(/showHealthcheck=1/);
+        await expect(page).toHaveURL(/healthcheckIssue=failing-pile-root/);
+        await expect(page).toHaveURL(/healthcheckLeaf=failing-pile-leaf/);
+
+        const issueCard = drawer.getByTestId('healthcheck-issue-failing-pile-leaf');
+        await expect(issueCard).toBeVisible();
+        await expect(issueCard).toBeInViewport();
+        await expect(issueCard.locator('[aria-expanded="true"]')).toHaveCount(1);
+        await expect(issueCard.locator('.ydb-healthcheck__issue-tab_active')).toContainText(
+            'Storage',
+        );
+        await expect(issueCard.getByText('Pile', {exact: true})).toBeVisible();
+        await expect(issueCard.getByText('all-group-statuses-pile', {exact: true})).toBeVisible();
+
+        await issueCard.locator('.ydb-healthcheck__issue-tab').filter({hasText: 'VDisk'}).click();
+        await expect(issueCard).not.toContainText('all-group-statuses-pile');
+    });
+
+    test('on: scrolls to a deep-linked issue after delayed healthcheck loading', async ({page}) => {
+        await page.setViewportSize({width: 1440, height: 500});
+        await mockCapabilities(page, true);
+        const releaseHealthcheck = await mockBridgeVisualLoadingScenario(page);
+
+        try {
+            const clusterPage = new ClusterPage(page);
+            await clusterPage.goto(
+                {
+                    showHealthcheck: 1,
+                    view: 'storage',
+                    healthcheckIssue: 'BLUE-promoted-pile-pool',
+                    healthcheckLeaf: 'BLUE-promoted-pile-group',
+                },
+                {waitUntil: 'domcontentloaded'},
+            );
+
+            const drawer = page.getByTestId('cluster-healthcheck-details');
+            const issueCard = drawer.getByTestId('healthcheck-issue-BLUE-promoted-pile-group');
+            const scrollContainer = drawer.locator('.ydb-fullscreen__content');
+
+            await expect(drawer).toBeVisible();
+            await expect(issueCard).toHaveCount(0);
+
+            // Keep the request pending until Gravity Drawer has completed its 300 ms transition.
+            await page.waitForTimeout(350);
+            releaseHealthcheck();
+
+            await expect(issueCard).toBeVisible();
+            await expect
+                .poll(() => scrollContainer.evaluate((element) => element.scrollTop))
+                .toBeGreaterThan(0);
+            await expect(issueCard).toBeInViewport();
+        } finally {
+            releaseHealthcheck();
+        }
+    });
+
+    test('on: updates the selected tab when the target changes in an open drawer', async ({
+        page,
+    }) => {
+        await mockCapabilities(page, true);
+        await mockBridgeVisualScenario(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
+        await expect(clusterPage.bridgeSection).toBeVisible();
+
+        const promotedPile = clusterPage.pileCards.filter({hasText: 'promoted-pile'});
+        await promotedPile.getByTestId('bridge-pile-healthcheck').locator('button').click();
+
+        const drawer = page.getByTestId('cluster-healthcheck-details');
+        const issueCard = drawer.getByTestId('healthcheck-issue-BLUE-promoted-pile-group');
+        const activeTab = issueCard.locator('.ydb-healthcheck__issue-tab_active');
+
+        await expect(activeTab).toContainText('Storage pool');
+
+        await page.evaluate(() => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('healthcheckIssue', 'BLUE-promoted-pile-group');
+            window.history.pushState({}, '', url);
+            window.dispatchEvent(new PopStateEvent('popstate'));
+        });
+
+        await expect(activeTab).toContainText('Storage group');
+    });
+
+    test('on: shows combined bridge pile and healthcheck states', async ({page}) => {
         await page.setViewportSize({width: 1440, height: 900});
         await mockCapabilities(page, true);
-        await mockClusterWithAllBridgePileStates(page);
+        await mockBridgeVisualScenario(page);
 
         const clusterPage = new ClusterPage(page);
         await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
         await expect(clusterPage.bridgeSection).toBeVisible();
 
         await expect(clusterPage.bridgeSection).toHaveScreenshot('bridge-piles-states.png');
+    });
+
+    test('on: shows bridge pile healthcheck loading state', async ({page}) => {
+        await page.setViewportSize({width: 1440, height: 900});
+        await mockCapabilities(page, true);
+        const releaseHealthcheck = await mockBridgeVisualLoadingScenario(page);
+
+        try {
+            const clusterPage = new ClusterPage(page);
+            await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
+            await expect(clusterPage.bridgeSection).toBeVisible();
+            await expect(
+                clusterPage.bridgeSection.locator('.ydb-bridge-info-table__healthcheck-skeleton'),
+            ).toHaveCount(6);
+            await expect(clusterPage.bridgeSection).not.toContainText('You are here');
+            await expect(clusterPage.bridgeSection).toHaveScreenshot(
+                'bridge-piles-healthcheck-loading.png',
+            );
+        } finally {
+            releaseHealthcheck();
+        }
     });
 });

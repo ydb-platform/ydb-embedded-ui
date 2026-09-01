@@ -17,10 +17,15 @@ export enum StatusFlag {
     RED = 'RED',
 }
 
+interface LocationBridgePile {
+    name?: string;
+}
+
 interface LocationNode {
     id?: number;
     host?: string;
     port?: number;
+    pile?: LocationBridgePile;
 }
 
 interface LocationStoragePDisk {
@@ -36,6 +41,7 @@ interface LocationStorageVDisk {
 interface LocationStorageGroup {
     id?: string[];
     vdisk?: LocationStorageVDisk;
+    pile?: LocationBridgePile;
 }
 
 interface LocationStoragePool {
@@ -66,6 +72,7 @@ interface LocationComputeSchema {
 interface LocationComputeStateStorage {
     node?: LocationNode;
     ring?: number;
+    pile?: LocationBridgePile;
 }
 
 interface LocationCompute {
@@ -73,6 +80,7 @@ interface LocationCompute {
     pool?: LocationComputePool;
     tablet?: LocationComputeTablet;
     schema?: LocationComputeSchema;
+    pile?: LocationBridgePile;
     state_storage?: LocationComputeStateStorage;
 }
 

@@ -14,9 +14,17 @@ import {HealthcheckIssue} from './HealthcheckIssue';
 
 interface IssuesProps {
     issues: IssuesTree[];
+    targetIssueId?: string;
+    targetLeafIssueId?: string;
+    targetLeafIssueRef?: React.Ref<HTMLDivElement>;
 }
 
-export function Issues({issues}: IssuesProps) {
+export function Issues({
+    issues,
+    targetIssueId,
+    targetLeafIssueId,
+    targetLeafIssueRef,
+}: IssuesProps) {
     const SuccessImage = getIllustration('SuccessOperation');
 
     const {view, issuesFilter} = useTenantQueryParams();
@@ -72,8 +80,13 @@ export function Issues({issues}: IssuesProps) {
     return filteredIssuesCurrentView.map((issue) => (
         <HealthcheckIssue
             issue={issue}
-            key={issue.id + Boolean(issuesFilter)}
+            key={`${issue.id}:${Boolean(issuesFilter)}:${
+                issue.id === targetLeafIssueId ? targetIssueId : ''
+            }`}
             expanded={Boolean(issuesFilter)}
+            targeted={issue.id === targetLeafIssueId}
+            targetIssueId={issue.id === targetLeafIssueId ? targetIssueId : undefined}
+            targetRef={issue.id === targetLeafIssueId ? targetLeafIssueRef : undefined}
         />
     ));
 }

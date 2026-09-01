@@ -34,7 +34,7 @@ import cryCatIcon from '../../../assets/icons/cry-cat.svg';
 
 import './Healthcheck.scss';
 
-type HealthcheckDetailsProps =
+type HealthcheckDetailsProps = (
     | {
           database: string;
           clusterName?: string;
@@ -46,7 +46,12 @@ type HealthcheckDetailsProps =
           database?: undefined;
           databaseType?: undefined;
           scope?: 'cluster';
-      };
+      }
+) & {
+    targetIssueId?: string;
+    targetLeafIssueId?: string;
+    targetLeafIssueRef?: React.Ref<HTMLDivElement>;
+};
 
 export function Healthcheck(props: HealthcheckDetailsProps) {
     if (props.database !== undefined) {
@@ -59,6 +64,9 @@ export function Healthcheck(props: HealthcheckDetailsProps) {
                     clusterName={props.clusterName}
                     databaseType={props.databaseType}
                     scope={props.scope}
+                    targetIssueId={props.targetIssueId}
+                    targetLeafIssueId={props.targetLeafIssueId}
+                    targetLeafIssueRef={props.targetLeafIssueRef}
                 />
             </HealthcheckContext.Provider>
         );
@@ -76,16 +84,30 @@ function DatabaseHealthcheckInner({
     clusterName,
     databaseType,
     scope = 'database',
+    targetIssueId,
+    targetLeafIssueId,
+    targetLeafIssueRef,
 }: {
     database: string;
     clusterName?: string;
     databaseType?: ETenantType;
     scope?: 'cluster' | 'database';
+    targetIssueId?: string;
+    targetLeafIssueId?: string;
+    targetLeafIssueRef?: React.Ref<HTMLDivElement>;
 }) {
     const healthcheck = useHealthcheck(database, {clusterName, databaseType});
     const target = getDatabaseHealthcheckAssistantTarget({database, clusterName, scope});
 
-    return <HealthcheckContent healthcheck={healthcheck} target={target} />;
+    return (
+        <HealthcheckContent
+            healthcheck={healthcheck}
+            target={target}
+            targetIssueId={targetIssueId}
+            targetLeafIssueId={targetLeafIssueId}
+            targetLeafIssueRef={targetLeafIssueRef}
+        />
+    );
 }
 
 function ClusterHealthcheckInner({clusterName}: {clusterName: string}) {
@@ -112,9 +134,15 @@ interface HealthcheckResult {
 function HealthcheckContent({
     healthcheck,
     target,
+    targetIssueId,
+    targetLeafIssueId,
+    targetLeafIssueRef,
 }: {
     healthcheck: HealthcheckResult;
     target: HealthcheckAssistantTarget;
+    targetIssueId?: string;
+    targetLeafIssueId?: string;
+    targetLeafIssueRef?: React.Ref<HTMLDivElement>;
 }) {
     const SuccessImage = getIllustration('SuccessOperation');
     const renderAssistantAction = uiFactory.healthcheck.renderAssistantAction;
@@ -214,7 +242,12 @@ function HealthcheckContent({
             <Flex direction="column" grow={1}>
                 {renderControls()}
                 <Flex direction="column" gap={4} grow={1} className={b('issues')}>
-                    <Issues issues={leavesIssues} />
+                    <Issues
+                        issues={leavesIssues}
+                        targetIssueId={targetIssueId}
+                        targetLeafIssueId={targetLeafIssueId}
+                        targetLeafIssueRef={targetLeafIssueRef}
+                    />
                 </Flex>
             </Flex>
         );
