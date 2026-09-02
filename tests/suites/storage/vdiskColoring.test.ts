@@ -1089,8 +1089,8 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 getVDiskItems(getStorageGroupRow(page, 0)).nth(MISSING_WHITEBOARD_VDISK_INDEX),
             );
             const [normalColor, highlightedColor] = await Promise.all([
-                resolveThemeColor(page, '--g-color-base-neutral-medium'),
-                resolveThemeColor(page, '--g-color-base-neutral-medium-hover'),
+                resolveThemeColor(page, '--g-color-base-neutral-light'),
+                resolveThemeColor(page, '--g-color-base-neutral-light-hover'),
             ]);
 
             await expectAllocationFill(noWhiteboardVDisk, 10);

@@ -4,7 +4,7 @@ import {loadFromSessionStorage, saveToSessionStorage} from '../../../../utils';
 export const SPACE_LEGEND_STORAGE_KEY = 'ydb-space-legend-inactive';
 export const SPACE_LEGEND_CHANGE_EVENT = 'spaceLegendChange';
 
-export type SpaceLegendSelectionScope = 'vdisks' | 'pdisks';
+export type SpaceLegendSelectionScope = 'vdisks' | 'pdisks' | 'nodes-vdisks' | 'nodes-pdisks';
 
 // By default, GREEN and CYAN are inactive (deselected)
 const defaultInactive = new Set([ECapacityAlert.GREEN, ECapacityAlert.CYAN]);

@@ -1,9 +1,12 @@
 import React from 'react';
 
 import {cn} from '../../../utils/cn';
+import type {PDiskDisplayStateGetter} from '../../../utils/disks/displayState';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import {PDisk} from '../PDisk/';
 import type {StorageViewContext} from '../types';
+import {useStorageNodesPDiskDisplayStateGetter} from '../useStoragePDiskDisplayStateGetter';
+import {useIsStorageExpertMode} from '../useStorageQueryParams';
 import {isPdiskActive} from '../utils';
 
 import './PDisks.scss';
@@ -19,6 +22,12 @@ interface PDisksProps {
 
 export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDisksProps) {
     const [highlightedDisk, setHighlightedDisk] = React.useState<string | undefined>();
+    const isStorageExpertMode = useIsStorageExpertMode();
+    const getStoragePDiskDisplayState = useStorageNodesPDiskDisplayStateGetter();
+    const getPDiskDisplayState = React.useCallback<PDiskDisplayStateGetter>(
+        (pDisk) => ({...getStoragePDiskDisplayState(pDisk), width: pDiskWidth}),
+        [getStoragePDiskDisplayState, pDiskWidth],
+    );
 
     if (!pDisks.length) {
         return null;
@@ -41,6 +50,9 @@ export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDis
                             vDisks={relatedVDisks}
                             viewContext={viewContext}
                             width={pDiskWidth}
+                            withIcon={isStorageExpertMode}
+                            withVDiskIcons={false}
+                            getDisplayState={getPDiskDisplayState}
                             showPopup={highlighted}
                             onShowPopup={() => setHighlightedDisk(id)}
                             onHidePopup={() => setHighlightedDisk(undefined)}

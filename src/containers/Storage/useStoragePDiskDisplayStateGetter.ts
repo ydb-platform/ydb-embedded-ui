@@ -25,10 +25,15 @@ import {
 } from '../../utils/disks/severityCalculators';
 
 import {EXPERT_MODE_ALL_PDISK_WIDTH, EXPERT_MODE_PDISK_WIDTH} from './Disks/constants';
+import type {SpaceLegendSelectionScope} from './StorageExpertModePanel/components/getSpaceLegendSelection';
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
 import {PDisksGroupBy} from './StorageExpertModePanel/constants';
 import type {PDisksGroupByValue} from './StorageExpertModePanel/constants';
-import {useIsStorageExpertMode, usePDisksGroupByParam} from './useStorageQueryParams';
+import {
+    useIsStorageExpertMode,
+    useNodesPDisksGroupByParam,
+    usePDisksGroupByParam,
+} from './useStorageQueryParams';
 
 function getMode(groupBy: PDisksGroupByValue): DiskDisplayMode | undefined {
     switch (groupBy) {
@@ -243,10 +248,12 @@ function getStatusModeDisplayState({
     return undefined;
 }
 
-export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
+function usePDiskDisplayStateGetter(
+    pdisksGroupBy: PDisksGroupByValue,
+    selectionScope: SpaceLegendSelectionScope,
+): PDiskDisplayStateGetter {
     const isExpertMode = useIsStorageExpertMode();
-    const pdisksGroupBy = usePDisksGroupByParam();
-    const inactiveAlerts = useSpaceLegendSelection('pdisks');
+    const inactiveAlerts = useSpaceLegendSelection(selectionScope);
 
     return React.useCallback(
         (pDisk) => {
@@ -334,4 +341,16 @@ export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
         },
         [inactiveAlerts, isExpertMode, pdisksGroupBy],
     );
+}
+
+export function useStoragePDiskDisplayStateGetter(): PDiskDisplayStateGetter {
+    const pdisksGroupBy = usePDisksGroupByParam();
+
+    return usePDiskDisplayStateGetter(pdisksGroupBy, 'pdisks');
+}
+
+export function useStorageNodesPDiskDisplayStateGetter(): PDiskDisplayStateGetter {
+    const pdisksGroupBy = useNodesPDisksGroupByParam();
+
+    return usePDiskDisplayStateGetter(pdisksGroupBy, 'nodes-pdisks');
 }

@@ -19,6 +19,6 @@ export function AllModeCapacityAlertIndicator({indicator}: AllModeCapacityAlertI
     }
 
     return (
-        <Icon className={b('all-mode-capacity-alert-indicator-icon')} data={indicator} size={12} />
+        <Icon className={b('all-mode-missing-data-indicator-icon')} data={indicator} size={12} />
     );
 }

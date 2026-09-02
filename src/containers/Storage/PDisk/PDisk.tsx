@@ -177,6 +177,7 @@ interface PDiskProps {
     delayOpen?: number;
     delayClose?: number;
     withIcon?: boolean;
+    withVDiskIcons?: boolean;
     inactive?: boolean;
     highlighted?: boolean;
     highlightedDisk?: string;
@@ -197,6 +198,7 @@ export const PDisk = ({
     delayOpen = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     delayClose = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     withIcon,
+    withVDiskIcons,
     inactive,
     highlighted,
     highlightedDisk,
@@ -262,7 +264,7 @@ export const PDisk = ({
             <PDiskVDisks
                 vDisks={vDisks}
                 viewContext={viewContext}
-                withIcon={withIcon}
+                withIcon={withVDiskIcons ?? withIcon}
                 delayOpen={delayOpen}
                 delayClose={delayClose}
                 highlightedDisk={highlightedDisk}

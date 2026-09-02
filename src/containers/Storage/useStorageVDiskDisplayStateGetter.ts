@@ -25,8 +25,13 @@ import {
 } from '../../utils/disks/iconCalculators';
 import type {PreparedVDisk} from '../../utils/disks/types';
 
+import type {SpaceLegendSelectionScope} from './StorageExpertModePanel/components/getSpaceLegendSelection';
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
-import {useIsStorageExpertMode, useVDisksGroupByParam} from './useStorageQueryParams';
+import {
+    useIsStorageExpertMode,
+    useNodesVDisksGroupByParam,
+    useVDisksGroupByParam,
+} from './useStorageQueryParams';
 
 function getMode(groupBy: VDisksGroupByValue): DiskDisplayMode {
     switch (groupBy) {
@@ -166,10 +171,12 @@ function getExpertVDiskDisplayState({
     return displayState;
 }
 
-export function useStorageVDiskDisplayStateGetter(): VDiskDisplayStateGetter {
+function useVDiskDisplayStateGetter(
+    vdisksGroupBy: VDisksGroupByValue,
+    selectionScope: SpaceLegendSelectionScope,
+): VDiskDisplayStateGetter {
     const isExpertMode = useIsStorageExpertMode();
-    const vdisksGroupBy = useVDisksGroupByParam();
-    const inactiveLegendItems = useSpaceLegendSelection();
+    const inactiveLegendItems = useSpaceLegendSelection(selectionScope);
 
     return React.useCallback(
         (vDisk, isDonor) => {
@@ -186,4 +193,16 @@ export function useStorageVDiskDisplayStateGetter(): VDiskDisplayStateGetter {
         },
         [inactiveLegendItems, isExpertMode, vdisksGroupBy],
     );
+}
+
+export function useStorageVDiskDisplayStateGetter(): VDiskDisplayStateGetter {
+    const vdisksGroupBy = useVDisksGroupByParam();
+
+    return useVDiskDisplayStateGetter(vdisksGroupBy, 'vdisks');
+}
+
+export function useStorageNodesVDiskDisplayStateGetter(): VDiskDisplayStateGetter {
+    const vdisksGroupBy = useNodesVDisksGroupByParam();
+
+    return useVDiskDisplayStateGetter(vdisksGroupBy, 'nodes-vdisks');
 }
