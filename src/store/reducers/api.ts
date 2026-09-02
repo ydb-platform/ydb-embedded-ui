@@ -1,6 +1,8 @@
 import type {BaseQueryFn} from '@reduxjs/toolkit/query';
 import {createApi} from '@reduxjs/toolkit/query/react';
 
+import {CLUSTER_DATA_TAG, DATABASE_DATA_TAG} from './entityDataTags';
+
 export const api = createApi({
     baseQuery: fakeBaseQuery(),
     /**
@@ -27,6 +29,8 @@ export const api = createApi({
         'Backups',
         'BackupsSchedule',
         'OperationList',
+        DATABASE_DATA_TAG,
+        CLUSTER_DATA_TAG,
     ],
 });
 

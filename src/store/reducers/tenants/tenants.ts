@@ -1,5 +1,6 @@
 import type {TTenantInfo} from '../../../types/api/tenant';
 import {api} from '../api';
+import {DATABASE_DATA_LIST_TAG} from '../entityDataTags';
 
 import type {PreparedTenant, SharedDatabaseTarget} from './types';
 import {prepareTenants} from './utils';
@@ -47,7 +48,7 @@ export const tenantsApi = api.injectEndpoints({
                 const {clusterName, environmentName} = queryArgs;
                 return {clusterName, environmentName};
             },
-            providesTags: ['All'],
+            providesTags: ['All', DATABASE_DATA_LIST_TAG],
         }),
         getSharedDatabase: build.query<
             SharedDatabaseTarget | null,
