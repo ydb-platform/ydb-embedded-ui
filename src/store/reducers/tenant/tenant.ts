@@ -91,7 +91,22 @@ export const tenantApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: (_result, _error, arg) => ['All', getDatabaseDataTag(arg)],
+            providesTags: (result, _error, {clusterName, database}) => {
+                const databaseAliases = new Set([database]);
+                if (result?.Id) {
+                    databaseAliases.add(result.Id);
+                }
+                if (result?.Name) {
+                    databaseAliases.add(result.Name);
+                }
+
+                return [
+                    'All' as const,
+                    ...Array.from(databaseAliases, (databaseAlias) =>
+                        getDatabaseDataTag({clusterName, database: databaseAlias}),
+                    ),
+                ];
+            },
             serializeQueryArgs: ({queryArgs}) => {
                 const {clusterName, database} = queryArgs;
                 return {clusterName, database};

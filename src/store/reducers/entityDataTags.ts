@@ -2,7 +2,6 @@ export const DATABASE_DATA_TAG = 'DatabaseData';
 export const CLUSTER_DATA_TAG = 'ClusterData';
 
 const ENTITY_DATA_LIST_TAG_ID = 'LIST';
-const DEFAULT_CLUSTER_DATA_TAG_ID = '__default_cluster__';
 
 export const DATABASE_DATA_LIST_TAG = {
     type: DATABASE_DATA_TAG,
@@ -30,6 +29,6 @@ export function getDatabaseDataTag({
 export function getClusterDataTag(clusterName?: string) {
     return {
         type: CLUSTER_DATA_TAG,
-        id: clusterName ?? DEFAULT_CLUSTER_DATA_TAG_ID,
+        id: JSON.stringify(clusterName ?? null),
     } as const;
 }

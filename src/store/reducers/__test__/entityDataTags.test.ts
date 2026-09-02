@@ -116,6 +116,55 @@ describe('entity data tags', () => {
         ).toEqual([{endpointName: 'getTenantInfo', originalArgs: clusterADatabaseArgs}]);
     });
 
+    test('maps database id and name tags to both alias queries', async () => {
+        const clusterName = 'cluster-a';
+        const databaseId = 'database-id';
+        const databaseName = '/Root/database';
+        window.api = {
+            meta: {
+                getTenants: jest.fn().mockResolvedValue({
+                    TenantInfo: [{Id: databaseId, Name: databaseName}],
+                }),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const databaseIdArgs = {
+            clusterName,
+            database: databaseId,
+            isMetaDatabasesAvailable: false,
+        };
+        const databaseNameArgs = {
+            clusterName,
+            database: databaseName,
+            isMetaDatabasesAvailable: false,
+        };
+
+        await store.dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate(databaseIdArgs, {subscribe: false}),
+        );
+        await store.dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate(databaseNameArgs, {subscribe: false}),
+        );
+
+        const aliasQueries = [
+            {endpointName: 'getTenantInfo', originalArgs: databaseIdArgs},
+            {endpointName: 'getTenantInfo', originalArgs: databaseNameArgs},
+        ];
+
+        expect(
+            selectInvalidatedQueries(store, {
+                type: 'DatabaseData',
+                id: '["cluster-a","database-id"]',
+            }),
+        ).toEqual(aliasQueries);
+        expect(
+            selectInvalidatedQueries(store, {
+                type: 'DatabaseData',
+                id: '["cluster-a","/Root/database"]',
+            }),
+        ).toEqual(aliasQueries);
+    });
+
     test('targets the clusters list with the cluster list tag', async () => {
         window.api = {
             meta: {
@@ -157,9 +206,44 @@ describe('entity data tags', () => {
             clusterApi.endpoints.getClusterBaseInfo.initiate('cluster-b', {subscribe: false}),
         );
 
-        expect(selectInvalidatedQueries(store, {type: 'ClusterData', id: 'cluster-a'})).toEqual([
+        expect(selectInvalidatedQueries(store, {type: 'ClusterData', id: '"cluster-a"'})).toEqual([
             {endpointName: 'getClusterInfo', originalArgs: 'cluster-a'},
             {endpointName: 'getClusterBaseInfo', originalArgs: 'cluster-a'},
         ]);
+    });
+
+    test('keeps reserved cluster names isolated from list and default tags', async () => {
+        window.api = {
+            viewer: {
+                getClusterInfo: jest.fn().mockResolvedValue({}),
+            },
+            meta: {
+                getClustersList: jest.fn().mockResolvedValue({clusters: []}),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+
+        await store.dispatch(
+            clustersApi.endpoints.getClustersList.initiate(undefined, {subscribe: false}),
+        );
+        await store.dispatch(clusterApi.endpoints.getClusterInfo.initiate(undefined));
+        await store.dispatch(clusterApi.endpoints.getClusterInfo.initiate('LIST'));
+        await store.dispatch(clusterApi.endpoints.getClusterInfo.initiate('__default_cluster__'));
+
+        expect(selectInvalidatedQueries(store, CLUSTER_LIST_TAG)).toEqual([
+            {endpointName: 'getClustersList', originalArgs: undefined},
+        ]);
+        expect(selectInvalidatedQueries(store, {type: 'ClusterData', id: 'null'})).toEqual([
+            {endpointName: 'getClusterInfo', originalArgs: undefined},
+        ]);
+        expect(selectInvalidatedQueries(store, {type: 'ClusterData', id: '"LIST"'})).toEqual([
+            {endpointName: 'getClusterInfo', originalArgs: 'LIST'},
+        ]);
+        expect(
+            selectInvalidatedQueries(store, {
+                type: 'ClusterData',
+                id: '"__default_cluster__"',
+            }),
+        ).toEqual([{endpointName: 'getClusterInfo', originalArgs: '__default_cluster__'}]);
     });
 });
