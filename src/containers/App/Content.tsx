@@ -2,7 +2,7 @@ import React from 'react';
 
 import {connect} from 'react-redux';
 import type {RedirectProps} from 'react-router-dom';
-import {Redirect, Route, Switch} from 'react-router-dom';
+import {Redirect, Route, Switch, useLocation} from 'react-router-dom';
 
 import {Unauthenticated} from '../../components/Errors/401';
 import {AccessDenied} from '../../components/Errors/403';
@@ -41,6 +41,7 @@ import {
     TenantSlot,
     VDiskPageSlot,
 } from './appSlots';
+import {shouldRedirectClusterRouteToRoot} from './clusterRouteGuard';
 import {getLegacyClusterTenantsRedirect, getLegacyTenantRedirect} from './legacyRedirects';
 
 import './App.scss';
@@ -148,6 +149,12 @@ export function Content(props: ContentProps) {
     const {singleClusterMode} = props;
 
     const slots = useSlots(props);
+    const currentLocation = useLocation();
+    const shouldRedirectToRoot = shouldRedirectClusterRouteToRoot({
+        singleClusterMode,
+        pathname: currentLocation.pathname,
+        search: currentLocation.search,
+    });
 
     const additionalRoutes = slots.get(RoutesSlot);
 
@@ -158,6 +165,7 @@ export function Content(props: ContentProps) {
     return (
         <Switch>
             {additionalRoutes?.rendered}
+            {shouldRedirectToRoot ? <Redirect to="/" /> : null}
             <Route>
                 <Header />
                 <Switch>
