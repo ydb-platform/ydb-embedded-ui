@@ -1,5 +1,19 @@
 # Changelog
 
+## [20.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.3.0...v20.4.0) (2026-09-02)
+
+
+### Features
+
+* **Header:** add link to shared DB for serverless ([#4254](https://github.com/ydb-platform/ydb-embedded-ui/issues/4254)) ([8ffa088](https://github.com/ydb-platform/ydb-embedded-ui/commit/8ffa0887e39b1ab14eb63cdaae0738150e750d66))
+* implement new bridge piles for 2DC sync progress ([#4279](https://github.com/ydb-platform/ydb-embedded-ui/issues/4279)) ([bbb67a2](https://github.com/ydb-platform/ydb-embedded-ui/commit/bbb67a29785cd5424155d5ab5a51fb5d4216e73f))
+* **TabletsTable:** select tablets by type ([#4285](https://github.com/ydb-platform/ydb-embedded-ui/issues/4285)) ([3814186](https://github.com/ydb-platform/ydb-embedded-ui/commit/38141868de3b556d6771cba373a4d06f3cb45301))
+
+
+### Bug Fixes
+
+* **SavedQueries:** make column with actions sticky ([#4292](https://github.com/ydb-platform/ydb-embedded-ui/issues/4292)) ([52711fd](https://github.com/ydb-platform/ydb-embedded-ui/commit/52711fd62ac9371e81dee8e89a5c3c8d4206a625))
+
 ## [20.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.2.1...v20.3.0) (2026-08-27)
 
 
