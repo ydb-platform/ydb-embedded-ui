@@ -52,6 +52,7 @@ export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDis
                             width={pDiskWidth}
                             withIcon={isStorageExpertMode}
                             withVDiskIcons={false}
+                            showTypeLabel={isStorageExpertMode}
                             getDisplayState={getPDiskDisplayState}
                             showPopup={highlighted}
                             onShowPopup={() => setHighlightedDisk(id)}

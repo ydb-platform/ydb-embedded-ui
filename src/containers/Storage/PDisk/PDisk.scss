@@ -42,4 +42,30 @@
             }
         }
     }
+
+    &__node-bar-content {
+        position: absolute;
+        z-index: 2;
+        inset: 0;
+
+        display: grid;
+        align-items: center;
+        grid-template-columns: 1fr auto 1fr;
+    }
+
+    &__node-bar-left {
+        justify-self: start;
+    }
+
+    &__node-bar-center {
+        justify-self: center;
+
+        .storage-disk-progress-bar__title {
+            margin-right: 0;
+        }
+    }
+
+    &__node-bar-type {
+        justify-self: end;
+    }
 }

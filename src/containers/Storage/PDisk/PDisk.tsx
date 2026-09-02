@@ -11,6 +11,7 @@ import {InternalLink} from '../../../components/InternalLink';
 import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 import {getPDiskPagePath} from '../../../routes';
 import {cn} from '../../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import type {
     DiskDisplayMode,
     DiskIndicatorValue,
@@ -32,6 +33,22 @@ import './PDisk.scss';
 
 const b = cn('pdisk-storage');
 const EMPTY_ALL_MODE_INDICATORS = {};
+
+interface PDiskNodeBarContentProps {
+    left?: React.ReactNode;
+    center?: React.ReactNode;
+    type?: React.ReactNode;
+}
+
+function PDiskNodeBarContent({left, center, type}: PDiskNodeBarContentProps) {
+    return (
+        <div className={b('node-bar-content')}>
+            <div className={b('node-bar-left')}>{left}</div>
+            <div className={b('node-bar-center')}>{center}</div>
+            <div className={b('node-bar-type')}>{type}</div>
+        </div>
+    );
+}
 
 interface GetPDiskBarContentParams {
     allocatedPercent?: number;
@@ -178,6 +195,7 @@ interface PDiskProps {
     delayClose?: number;
     withIcon?: boolean;
     withVDiskIcons?: boolean;
+    showTypeLabel?: boolean;
     inactive?: boolean;
     highlighted?: boolean;
     highlightedDisk?: string;
@@ -199,6 +217,7 @@ export const PDisk = ({
     delayClose = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     withIcon,
     withVDiskIcons,
+    showTypeLabel,
     inactive,
     highlighted,
     highlightedDisk,
@@ -241,6 +260,17 @@ export const PDisk = ({
         showAllocatedPercentLabel: displayState.showAllocatedPercentLabel,
         showNoDataPlaceholder: displayState.showNoDataPlaceholder,
     });
+    const showAllocatedPercentLabel =
+        !hideBarContent && hasAllocatedPercent && displayState.showAllocatedPercentLabel !== false;
+    const content = showTypeLabel ? (
+        <PDiskNodeBarContent
+            left={leading || showAllocatedPercentLabel ? null : barContent}
+            center={showAllocatedPercentLabel ? barContent : null}
+            type={<DiskBarLabel>{data.Type || EMPTY_DATA_PLACEHOLDER}</DiskBarLabel>}
+        />
+    ) : (
+        barContent
+    );
     const overlay = getAllModeOverlay(displayState.mode, displayState.allMode?.indicators);
 
     const tone = getDiskBarTone({
@@ -286,7 +316,7 @@ export const PDisk = ({
                         tone={tone}
                         mode={displayState.mode}
                         leading={leading}
-                        content={barContent}
+                        content={content}
                         overlay={overlay}
                         className={progressBarClassName}
                         inactive={inactive}
