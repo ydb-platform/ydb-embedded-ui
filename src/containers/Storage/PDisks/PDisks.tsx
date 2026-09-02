@@ -1,9 +1,8 @@
 import React from 'react';
 
 import {cn} from '../../../utils/cn';
-import type {PDiskDisplayStateGetter} from '../../../utils/disks/displayState';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
-import {PDisk} from '../PDisk/';
+import {PDiskWithVDisks} from '../PDisk/';
 import type {StorageViewContext} from '../types';
 import {useStorageNodesPDiskDisplayStateGetter} from '../useStoragePDiskDisplayStateGetter';
 import {useIsStorageExpertMode} from '../useStorageQueryParams';
@@ -24,10 +23,6 @@ export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDis
     const [highlightedDisk, setHighlightedDisk] = React.useState<string | undefined>();
     const isStorageExpertMode = useIsStorageExpertMode();
     const getStoragePDiskDisplayState = useStorageNodesPDiskDisplayStateGetter();
-    const getPDiskDisplayState = React.useCallback<PDiskDisplayStateGetter>(
-        (pDisk) => ({...getStoragePDiskDisplayState(pDisk), width: pDiskWidth}),
-        [getStoragePDiskDisplayState, pDiskWidth],
-    );
 
     if (!pDisks.length) {
         return null;
@@ -44,7 +39,7 @@ export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDis
 
                 return (
                     <div className={b('pdisks-item')} key={id}>
-                        <PDisk
+                        <PDiskWithVDisks
                             data={pDisk}
                             inactive={!isPdiskActive(pDisk, viewContext)}
                             vDisks={relatedVDisks}
@@ -53,7 +48,7 @@ export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDis
                             withIcon={isStorageExpertMode}
                             withVDiskIcons={false}
                             showTypeLabel={isStorageExpertMode}
-                            getDisplayState={getPDiskDisplayState}
+                            getDisplayState={getStoragePDiskDisplayState}
                             showPopup={highlighted}
                             onShowPopup={() => setHighlightedDisk(id)}
                             onHidePopup={() => setHighlightedDisk(undefined)}

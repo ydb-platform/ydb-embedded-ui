@@ -16,7 +16,7 @@ import type {StorageNodesPaginatedTableData} from '../types';
  *
  * Visual model:
  * - One PDisk cell renders a horizontal row of compact VDisks above the PDisk progress bar
- *   (`src/containers/Storage/PDisk/PDisk.tsx`).
+ *   (`src/containers/Storage/PDisk/PDiskWithVDisks.tsx`).
  * - Each VDisk "slot" has a hard minimum width and a gap between slots:
  *   - slot min-width is effectively 8px:
  *     - `--pdisk-vdisk-width: 8px` (`src/containers/Storage/PDisk/PDisk.scss`)

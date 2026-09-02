@@ -21,12 +21,10 @@ import type {
 import {getDefaultPDiskDisplayState} from '../../../utils/disks/displayState';
 import {getDiskBarTone} from '../../../utils/disks/getDiskBarTone';
 import {getPDiskId, getVDiskStatusIcon} from '../../../utils/disks/helpers';
-import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
+import type {PreparedPDisk} from '../../../utils/disks/types';
 import {isNumeric} from '../../../utils/utils';
 import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
-import type {StorageViewContext} from '../types';
 
-import {PDiskVDisks} from './PDiskVDisks';
 import {i18n} from './i18n';
 
 import './PDisk.scss';
@@ -47,6 +45,34 @@ function PDiskNodeBarContent({left, center, type}: PDiskNodeBarContentProps) {
             <div className={b('node-bar-center')}>{center}</div>
             <div className={b('node-bar-type')}>{type}</div>
         </div>
+    );
+}
+
+interface GetPDiskContentParams {
+    barContent: React.ReactNode;
+    data: PreparedPDisk;
+    leading: React.ReactNode;
+    showAllocatedPercentLabel: boolean;
+    showTypeLabel?: boolean;
+}
+
+function getPDiskContent({
+    barContent,
+    data,
+    leading,
+    showAllocatedPercentLabel,
+    showTypeLabel,
+}: GetPDiskContentParams) {
+    if (!showTypeLabel) {
+        return barContent;
+    }
+
+    return (
+        <PDiskNodeBarContent
+            left={leading || showAllocatedPercentLabel ? null : barContent}
+            center={showAllocatedPercentLabel ? barContent : null}
+            type={<DiskBarLabel>{data.Type || EMPTY_DATA_PLACEHOLDER}</DiskBarLabel>}
+        />
     );
 }
 
@@ -181,48 +207,40 @@ function getAccessibleName(
     });
 }
 
-interface PDiskProps {
+export interface PDiskProps {
     data?: PreparedPDisk;
-    vDisks?: PreparedVDisk[];
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
     className?: string;
     progressBarClassName?: string;
-    viewContext?: StorageViewContext;
     width?: number;
     delayOpen?: number;
     delayClose?: number;
     withIcon?: boolean;
-    withVDiskIcons?: boolean;
     showTypeLabel?: boolean;
     inactive?: boolean;
     highlighted?: boolean;
-    highlightedDisk?: string;
-    setHighlightedDisk?: (id?: string) => void;
     getDisplayState?: PDiskDisplayStateGetter;
+    topContent?: React.ReactNode;
 }
 
 export const PDisk = ({
     data = {},
-    vDisks,
     showPopup,
     onShowPopup,
     onHidePopup,
     className,
     progressBarClassName,
-    viewContext,
     width,
     delayOpen = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     delayClose = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     withIcon,
-    withVDiskIcons,
     showTypeLabel,
     inactive,
     highlighted,
-    highlightedDisk,
-    setHighlightedDisk,
     getDisplayState,
+    topContent,
 }: PDiskProps) => {
     const {NodeId, PDiskId} = data;
     const pDiskIdsDefined = !isNil(NodeId) && !isNil(PDiskId);
@@ -262,15 +280,13 @@ export const PDisk = ({
     });
     const showAllocatedPercentLabel =
         !hideBarContent && hasAllocatedPercent && displayState.showAllocatedPercentLabel !== false;
-    const content = showTypeLabel ? (
-        <PDiskNodeBarContent
-            left={leading || showAllocatedPercentLabel ? null : barContent}
-            center={showAllocatedPercentLabel ? barContent : null}
-            type={<DiskBarLabel>{data.Type || EMPTY_DATA_PLACEHOLDER}</DiskBarLabel>}
-        />
-    ) : (
-        barContent
-    );
+    const content = getPDiskContent({
+        barContent,
+        data,
+        leading,
+        showAllocatedPercentLabel,
+        showTypeLabel,
+    });
     const overlay = getAllModeOverlay(displayState.mode, displayState.allMode?.indicators);
 
     const tone = getDiskBarTone({
@@ -289,17 +305,9 @@ export const PDisk = ({
         <div
             className={b(null, className)}
             ref={anchorRef}
-            style={{width: displayState.width ?? width}}
+            style={{width: width ?? displayState.width}}
         >
-            <PDiskVDisks
-                vDisks={vDisks}
-                viewContext={viewContext}
-                withIcon={withVDiskIcons ?? withIcon}
-                delayOpen={delayOpen}
-                delayClose={delayClose}
-                highlightedDisk={highlightedDisk}
-                setHighlightedDisk={setHighlightedDisk}
-            />
+            {topContent}
             <HoverPopup
                 showPopup={showPopup}
                 offset={{mainAxis: 2, crossAxis: 0}}

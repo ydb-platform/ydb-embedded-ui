@@ -1,35 +1,35 @@
 import {VDisk} from '../../../components/VDisk/VDisk';
 import {cn} from '../../../utils/cn';
 import type {PreparedVDisk} from '../../../utils/disks/types';
+import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
 import type {StorageViewContext} from '../types';
 import {isVdiskActive} from '../utils';
 
+import type {PDiskProps} from './PDisk';
+import {PDisk} from './PDisk';
+
 const b = cn('pdisk-storage');
 
-interface PDiskVDisksProps {
+interface PDiskWithVDisksProps extends Omit<PDiskProps, 'topContent'> {
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
-    withIcon?: boolean;
-    delayOpen: number;
-    delayClose: number;
+    withVDiskIcons?: boolean;
     highlightedDisk?: string;
     setHighlightedDisk?: (id?: string) => void;
 }
 
-export function PDiskVDisks({
+export function PDiskWithVDisks({
     vDisks,
     viewContext,
     withIcon,
-    delayOpen,
-    delayClose,
+    withVDiskIcons,
+    delayOpen = DISKS_POPUP_DEBOUNCE_TIMEOUT,
+    delayClose = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     highlightedDisk,
     setHighlightedDisk,
-}: PDiskVDisksProps) {
-    if (!vDisks?.length) {
-        return null;
-    }
-
-    return (
+    ...pDiskProps
+}: PDiskWithVDisksProps) {
+    const vDisksContent = vDisks?.length ? (
         <div className={b('vdisks')}>
             {vDisks.map((vDisk) => {
                 const vDiskId = vDisk.StringifiedId;
@@ -46,7 +46,7 @@ export function PDiskVDisks({
                         }}
                     >
                         <VDisk
-                            withIcon={withIcon}
+                            withIcon={withVDiskIcons ?? withIcon}
                             data={vDisk}
                             inactive={!isVdiskActive(vDisk, viewContext)}
                             compact
@@ -61,5 +61,15 @@ export function PDiskVDisks({
                 );
             })}
         </div>
+    ) : null;
+
+    return (
+        <PDisk
+            {...pDiskProps}
+            withIcon={withIcon}
+            delayOpen={delayOpen}
+            delayClose={delayClose}
+            topContent={vDisksContent}
+        />
     );
 }
