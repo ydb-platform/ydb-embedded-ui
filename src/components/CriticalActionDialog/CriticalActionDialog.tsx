@@ -106,7 +106,6 @@ export function CriticalActionDialog<T>({
     const renderDialogContent = () => {
         const isRetry = Boolean(error && withRetry);
         let currentApplyButtonText: string | undefined = applyButtonText;
-        const currentApplyButtonView = isRetry ? 'outlined-danger' : applyButtonView;
 
         if (error) {
             currentApplyButtonText = isRetry
@@ -135,9 +134,8 @@ export function CriticalActionDialog<T>({
                     propsButtonApply={{
                         type: 'submit',
                         disabled: withCheckBox && !checkBoxChecked,
-                        view: currentApplyButtonView,
-                        className:
-                            currentApplyButtonView === 'action' ? BRAND_BUTTON_CLASS : undefined,
+                        view: applyButtonView,
+                        className: applyButtonView === 'action' ? BRAND_BUTTON_CLASS : undefined,
                     }}
                     onClickButtonCancel={onClose}
                     onClickButtonApply={() => onApply(isRetry ? true : undefined)}
