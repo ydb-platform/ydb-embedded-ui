@@ -37,6 +37,7 @@ export const TENANT_DIAGNOSTICS_TABS_IDS = {
     access: 'access',
     backups: 'backups',
     monitoring: 'monitoring',
+    computationGraph: 'computationGraph',
 } as const;
 
 export const TENANT_SUMMARY_TABS_IDS = {
