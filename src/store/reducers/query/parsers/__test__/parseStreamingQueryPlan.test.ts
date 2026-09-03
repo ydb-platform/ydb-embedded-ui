@@ -29,4 +29,13 @@ describe('parseStreamingQueryPlan', () => {
         const result = parseStreamingQueryPlan(JSON.stringify(plan));
         expect(result).toEqual(plan);
     });
+
+    test('returns parsed object for plan with unsupported meta version', () => {
+        const plan = {
+            meta: {version: '0.1', type: 'query'},
+            Plan: {PlanNodeId: 1, PlanNodeType: 'Query', Plans: []},
+        };
+        const result = parseStreamingQueryPlan(JSON.stringify(plan));
+        expect(result).toEqual(plan);
+    });
 });
