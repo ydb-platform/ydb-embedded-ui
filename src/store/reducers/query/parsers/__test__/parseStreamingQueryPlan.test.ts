@@ -38,4 +38,13 @@ describe('parseStreamingQueryPlan', () => {
         const result = parseStreamingQueryPlan(JSON.stringify(plan));
         expect(result).toEqual(plan);
     });
+
+    test('returns undefined when meta is null', () => {
+        expect(parseStreamingQueryPlan(JSON.stringify({meta: null}))).toBeUndefined();
+    });
+
+    test('returns the object for meta-only plan without Plan key; preparePlanData yields no nodes for it', () => {
+        const plan = {meta: {version: '0.2', type: 'query'}};
+        expect(parseStreamingQueryPlan(JSON.stringify(plan))).toEqual(plan);
+    });
 });
