@@ -17,9 +17,23 @@ describe('shouldRedirectClusterRouteToRoot', () => {
             expected: true,
         },
         {
+            name: 'redirects a multi-cluster route with trailing segments and no clusterName',
+            singleClusterMode: false,
+            pathname: '/cluster/databases/extra',
+            search: '?databasePage=query',
+            expected: true,
+        },
+        {
             name: 'keeps a multi-cluster route with clusterName',
             singleClusterMode: false,
             pathname: '/cluster/databases',
+            search: '?clusterName=my-cluster',
+            expected: false,
+        },
+        {
+            name: 'keeps a multi-cluster route with trailing segments and clusterName',
+            singleClusterMode: false,
+            pathname: '/cluster/databases/extra',
             search: '?clusterName=my-cluster',
             expected: false,
         },

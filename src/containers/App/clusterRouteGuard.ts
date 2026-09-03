@@ -1,4 +1,6 @@
-import {checkIsClusterPage} from '../../routes';
+import {matchPath} from 'react-router-dom';
+
+import routes from '../../routes';
 
 export function shouldRedirectClusterRouteToRoot({
     singleClusterMode,
@@ -9,7 +11,12 @@ export function shouldRedirectClusterRouteToRoot({
     pathname: string;
     search: string;
 }) {
-    if (singleClusterMode || !checkIsClusterPage(pathname)) {
+    const clusterRouteMatch = matchPath(pathname, {
+        path: routes.cluster,
+        exact: false,
+    });
+
+    if (singleClusterMode || !clusterRouteMatch) {
         return false;
     }
 
