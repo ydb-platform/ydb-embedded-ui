@@ -67,6 +67,25 @@ export interface TPQTabletConfig {
     Partitions?: TPartition[];
 
     MeteringMode?: EMeteringMode;
+
+    PartitionStrategy?: TPQPartitionStrategy;
+}
+
+export enum EPQPartitionStrategyType {
+    DISABLED = 'DISABLED',
+    CAN_SPLIT = 'CAN_SPLIT',
+    CAN_SPLIT_AND_MERGE = 'CAN_SPLIT_AND_MERGE',
+    PAUSED = 'PAUSED',
+}
+
+/** Strategy for automatically changing the number of topic partitions depending on the load */
+export interface TPQPartitionStrategy {
+    MinPartitionCount?: number;
+    MaxPartitionCount?: number;
+    ScaleThresholdSeconds?: number;
+    ScaleUpPartitionWriteSpeedThresholdPercent?: number;
+    ScaleDownPartitionWriteSpeedThresholdPercent?: number;
+    PartitionStrategyType?: EPQPartitionStrategyType;
 }
 
 export interface TPQPartitionConfig {
