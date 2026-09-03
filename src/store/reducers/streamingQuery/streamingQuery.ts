@@ -14,6 +14,18 @@ WHERE Path = '${safePath}'
 LIMIT 1`;
 }
 
+function getStreamingQueryPlanSQL(path: string) {
+    const safePath = path.replace(/'/g, "''");
+    return `${QUERY_TECHNICAL_MARK}
+SELECT
+    Status,
+    Issues,
+    Plan
+FROM \`.sys/streaming_queries\`
+WHERE Path = '${safePath}'
+LIMIT 1`;
+}
+
 export const streamingQueriesApi = api.injectEndpoints({
     endpoints: (build) => ({
         getStreamingQueryInfo: build.query({
@@ -34,6 +46,31 @@ export const streamingQueriesApi = api.injectEndpoints({
                     }
 
                     const data = parseQueryAPIResponse(response);
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+        getStreamingQueryPlan: build.query({
+            queryFn: async ({database, path}: {database: string; path: string}, {signal}) => {
+                try {
+                    const rawResponse = await window.api.viewer.sendQuery(
+                        {
+                            query: getStreamingQueryPlanSQL(path),
+                            database,
+                            action: 'execute-query',
+                            internal_call: true,
+                        },
+                        {signal, withRetries: true},
+                    );
+
+                    if (isQueryErrorResponse(rawResponse)) {
+                        return {error: rawResponse};
+                    }
+
+                    const data = parseQueryAPIResponse(rawResponse);
                     return {data};
                 } catch (error) {
                     return {error};

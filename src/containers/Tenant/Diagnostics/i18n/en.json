@@ -15,6 +15,7 @@
   "title_describe": "Describe",
   "title_hot-keys": "Hot keys",
   "title_graph": "Graph",
+  "title_computation-graph": "Computation Graph",
   "title_consumers": "Consumers",
   "title_partitions": "Partitions",
   "title_data": "Data",

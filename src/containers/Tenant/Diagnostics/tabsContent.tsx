@@ -19,6 +19,7 @@ import {HotKeys} from './HotKeys/HotKeys';
 import {NetworkWrapper} from './Network/NetworkWrapper';
 import {Partitions} from './Partitions/Partitions';
 import {StorageUsage} from './StorageUsage/StorageUsage';
+import {StreamingQueryGraph} from './StreamingQueryGraph';
 import {TenantOverview} from './TenantOverview/TenantOverview';
 import {TopQueries} from './TopQueries/TopQueries';
 import {TopShards} from './TopShards/TopShards';
@@ -182,6 +183,9 @@ const diagnosticsTabRenderers: Record<TenantDiagnosticsTab, DiagnosticsTabRender
             database,
             scrollContainerRef,
         }),
+    [TENANT_DIAGNOSTICS_TABS_IDS.computationGraph]: ({database, path}) => (
+        <StreamingQueryGraph database={database} path={path} />
+    ),
     [TENANT_DIAGNOSTICS_TABS_IDS.monitoring]: ({database, databaseFullPath}) => {
         const content = uiFactory.renderMonitoring?.({database, databaseFullPath});
 

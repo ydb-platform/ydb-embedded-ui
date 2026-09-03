@@ -1,0 +1,10 @@
+@use '../../../../styles/mixins.scss';
+
+.ydb-streaming-query-graph {
+    overflow: hidden;
+    @include mixins.flex-container();
+
+    &__loader {
+        margin: auto;
+    }
+}

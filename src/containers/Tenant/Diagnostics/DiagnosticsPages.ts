@@ -115,6 +115,11 @@ const graph = {
     title: i18n('title_graph'),
 };
 
+const computationGraph = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.computationGraph,
+    title: i18n('title_computation-graph'),
+};
+
 const consumers = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.consumers,
     title: i18n('title_consumers'),
@@ -241,7 +246,7 @@ const EXTERNAL_TABLE_PAGES = [overview, schema, describe, access];
 
 const VIEW_PAGES = [overview, schema, describe, access];
 
-const STREAMING_QUERY_PAGES = [overview, describe, access];
+const STREAMING_QUERY_PAGES = [overview, computationGraph, describe, access];
 const SECRET_PAGES = [overview, describe, access];
 
 // verbose mapping to guarantee correct tabs for new path types
