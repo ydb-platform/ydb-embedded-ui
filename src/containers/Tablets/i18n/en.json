@@ -10,7 +10,7 @@
   "Generation": "Generation",
   "Uptime": "Uptime",
   "dialog.kill-header": "Restart tablet",
-  "dialog.kill-text": "The tablet will be restarted. Do you want to proceed?",
+  "dialog.kill-text": "The tablet will restart. A portion of table data will be temporarily unavailable. Active transactions and scans will be interrupted with a retriable error and can be retried.",
   "controls.kill-not-allowed": "You don't have enough rights to restart tablet",
   "controls.kill-impossible-follower": "It's impossible to restart a follower",
   "controls.search-placeholder": "Tablet ID",
