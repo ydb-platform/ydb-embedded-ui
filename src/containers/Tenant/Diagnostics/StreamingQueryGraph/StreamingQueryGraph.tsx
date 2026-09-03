@@ -1,16 +1,20 @@
+import React from 'react';
+
 import {useThemeValue} from '@gravity-ui/uikit';
 
+import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
 import {parseStreamingQueryPlan} from '../../../../store/reducers/query/parsers/parseStreamingQueryPlan';
 import {preparePlanData} from '../../../../store/reducers/query/parsers/preparePlanData';
 import {streamingQueriesApi} from '../../../../store/reducers/streamingQuery/streamingQuery';
-import type {ErrorResponse} from '../../../../types/api/query';
 import {cn} from '../../../../utils/cn';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
-import {isErrorResponse} from '../../../../utils/query';
-import {ResultIssuesModal} from '../../Query/Issues/Issues';
+import {parseIssuesData} from '../../../../utils/query';
+import {ResultIssues} from '../../Query/Issues/Issues';
 import {Graph} from '../../Query/QueryResult/components/Graph/Graph';
+
+import i18n from './i18n';
 
 import './StreamingQueryGraph.scss';
 
@@ -26,30 +30,49 @@ export function StreamingQueryGraph({database, path}: StreamingQueryGraphProps) 
     const theme = useThemeValue();
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const {data: queryResult, isFetching} = streamingQueriesApi.useGetStreamingQueryPlanQuery(
+    const {
+        currentData: planData,
+        isFetching,
+        error,
+    } = streamingQueriesApi.useGetStreamingQueryPlanQuery(
         {database, path},
         {skip: !database || !path, pollingInterval: autoRefreshInterval},
     );
 
-    const loading = isFetching && queryResult === undefined;
+    const row = planData?.resultSets?.[0]?.result?.[0];
+
+    const preparedPlan = React.useMemo(
+        () => preparePlanData(parseStreamingQueryPlan(getStringifiedData(row?.Plan))),
+        [row?.Plan],
+    );
+
+    const loading = isFetching && planData === undefined;
 
     if (loading) {
         return <Loader size="s" className={b('loader')} />;
     }
 
-    const row = queryResult?.resultSets?.[0]?.result?.[0];
-    const preparedPlan = preparePlanData(parseStreamingQueryPlan(getStringifiedData(row?.Plan)));
+    if (error && !planData) {
+        return (
+            <div className={b()}>
+                <ResponseError error={error} />
+            </div>
+        );
+    }
 
     const hasNodes = Boolean(preparedPlan?.nodes?.length);
-    const issuesRaw = row?.Issues;
-    const issues = parseIssues(issuesRaw);
+    const issues = parseIssuesData(row?.Issues);
 
     if (!hasNodes && issues) {
         return (
             <div className={b()}>
-                <ResultIssuesModal data={issues} />
+                <ResultIssues data={issues} />
             </div>
         );
+    }
+
+    if (!hasNodes) {
+        return <div className={b()}>{i18n('description_no-plan')}</div>;
     }
 
     return (
@@ -57,19 +80,4 @@ export function StreamingQueryGraph({database, path}: StreamingQueryGraphProps) 
             <Graph explain={preparedPlan} theme={theme} />
         </div>
     );
-}
-
-function parseIssues(raw: unknown): ErrorResponse | string | undefined {
-    if (typeof raw === 'string' && raw) {
-        try {
-            const parsed: unknown = JSON.parse(raw);
-            return isErrorResponse(parsed) ? parsed : raw;
-        } catch {
-            return raw;
-        }
-    }
-    if (isErrorResponse(raw)) {
-        return raw;
-    }
-    return undefined;
 }
