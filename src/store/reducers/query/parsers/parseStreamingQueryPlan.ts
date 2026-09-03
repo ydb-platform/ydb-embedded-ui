@@ -6,7 +6,11 @@ export function parseStreamingQueryPlan(planText?: string): QueryPlan | undefine
     }
     try {
         const parsed: unknown = JSON.parse(planText);
-        if (!parsed || typeof parsed !== 'object' || !('meta' in parsed)) {
+        if (!parsed || typeof parsed !== 'object') {
+            return undefined;
+        }
+        const meta = (parsed as Record<string, unknown>).meta;
+        if (typeof meta !== 'object' || meta === null) {
             return undefined;
         }
         return parsed as QueryPlan;
