@@ -2,6 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {api} from '../api';
+import {CLUSTER_DATA_LIST_TAG} from '../entityDataTags';
 
 import type {ClustersFilters} from './types';
 import {prepareClustersData} from './utils';
@@ -43,7 +44,7 @@ export const clustersApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: ['All', CLUSTER_DATA_LIST_TAG],
         }),
     }),
     overrideExisting: 'throw',

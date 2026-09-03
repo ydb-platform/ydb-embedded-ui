@@ -13,6 +13,7 @@ import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChange
 import {isQueryErrorResponse} from '../../../utils/query';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
+import {getClusterDataTag} from '../entityDataTags';
 import {selectNodesMap} from '../nodesList';
 
 import {
@@ -117,7 +118,7 @@ export const clusterApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: (_result, _error, clusterName) => ['All', getClusterDataTag(clusterName)],
         }),
         getClusterBaseInfo: builder.query({
             queryFn: async (clusterName: string, {signal}) => {
@@ -131,7 +132,7 @@ export const clusterApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: (_result, _error, clusterName) => ['All', getClusterDataTag(clusterName)],
         }),
     }),
     overrideExisting: 'throw',
