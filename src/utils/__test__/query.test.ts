@@ -3,6 +3,7 @@ import {
     isErrorResponse,
     isExecutionQueryAction,
     isQueryErrorResponse,
+    parseIssuesData,
 } from '../query';
 
 describe('isExecutionQueryAction', () => {
@@ -72,5 +73,35 @@ describe('isErrorResponse', () => {
         expect(isErrorResponse(null)).toBe(false);
         expect(isErrorResponse(undefined)).toBe(false);
         expect(isErrorResponse('error')).toBe(false);
+    });
+});
+
+describe('parseIssuesData', () => {
+    test('returns ErrorResponse when JSON string parses to ErrorResponse', () => {
+        const raw = JSON.stringify({
+            issues: [{severity: 1, message: 'err'}],
+            status: 'GENERIC_ERROR',
+        });
+        const result = parseIssuesData(raw);
+        expect(result).toEqual(JSON.parse(raw));
+    });
+
+    test('returns raw string when JSON is valid but not ErrorResponse', () => {
+        const raw = JSON.stringify({status: 'pending'});
+        expect(parseIssuesData(raw)).toBe(raw);
+    });
+
+    test('returns raw string for malformed JSON', () => {
+        const raw = '{not json';
+        expect(parseIssuesData(raw)).toBe(raw);
+    });
+
+    test('returns undefined for undefined', () => {
+        expect(parseIssuesData(undefined)).toBeUndefined();
+    });
+
+    test('returns ErrorResponse object when passed directly', () => {
+        const data = {issues: [{severity: 1, message: 'err'}], status: 'OVERLOADED'};
+        expect(parseIssuesData(data)).toBe(data);
     });
 });
