@@ -26,7 +26,6 @@ interface StreamingQueryGraphProps {
 const b = cn('ydb-streaming-query-graph');
 
 export function StreamingQueryGraph({database, path}: StreamingQueryGraphProps) {
-    // theme triggers key= remount of YDBGraph so it re-reads CSS colour variables from the DOM
     const theme = useThemeValue();
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
