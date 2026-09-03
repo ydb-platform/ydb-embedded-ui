@@ -26,27 +26,29 @@ WHERE Path = '${safePath}'
 LIMIT 1`;
 }
 
+async function execStreamingSQL(
+    sql: string,
+    {database, signal}: {database: string; signal: AbortSignal},
+) {
+    const response = await window.api.viewer.sendQuery(
+        {query: sql, database, action: 'execute-query', internal_call: true},
+        {signal, withRetries: true},
+    );
+    if (isQueryErrorResponse(response)) {
+        return {error: response};
+    }
+    return {data: parseQueryAPIResponse(response)};
+}
+
 export const streamingQueriesApi = api.injectEndpoints({
     endpoints: (build) => ({
         getStreamingQueryInfo: build.query({
             queryFn: async ({database, path}: {database: string; path: string}, {signal}) => {
                 try {
-                    const response = await window.api.viewer.sendQuery(
-                        {
-                            query: getStreamingQueryInfoSQL(path),
-                            database,
-                            action: 'execute-query',
-                            internal_call: true,
-                        },
-                        {signal, withRetries: true},
-                    );
-
-                    if (isQueryErrorResponse(response)) {
-                        return {error: response};
-                    }
-
-                    const data = parseQueryAPIResponse(response);
-                    return {data};
+                    return await execStreamingSQL(getStreamingQueryInfoSQL(path), {
+                        database,
+                        signal,
+                    });
                 } catch (error) {
                     return {error};
                 }
@@ -56,22 +58,10 @@ export const streamingQueriesApi = api.injectEndpoints({
         getStreamingQueryPlan: build.query({
             queryFn: async ({database, path}: {database: string; path: string}, {signal}) => {
                 try {
-                    const rawResponse = await window.api.viewer.sendQuery(
-                        {
-                            query: getStreamingQueryPlanSQL(path),
-                            database,
-                            action: 'execute-query',
-                            internal_call: true,
-                        },
-                        {signal, withRetries: true},
-                    );
-
-                    if (isQueryErrorResponse(rawResponse)) {
-                        return {error: rawResponse};
-                    }
-
-                    const data = parseQueryAPIResponse(rawResponse);
-                    return {data};
+                    return await execStreamingSQL(getStreamingQueryPlanSQL(path), {
+                        database,
+                        signal,
+                    });
                 } catch (error) {
                     return {error};
                 }
