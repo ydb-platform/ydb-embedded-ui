@@ -132,28 +132,30 @@ export function useSharedDatabasePath({
     const shouldResolveSharedDatabaseFromViewer =
         shouldResolveSharedDatabaseName && !window.api.meta;
 
-    const {currentData: sharedDatabaseFromViewer} = tenantsApi.useGetSharedDatabaseQuery(
-        shouldResolveSharedDatabaseFromViewer && databaseData?.ResourceId
-            ? {
-                  clusterName,
-                  database: databaseData.Name,
-                  backend: activeBackend,
-                  environmentName: environment,
-                  isMonitoringAllowed: isMonitoringAllowed === true,
-                  needNodeIds: needSharedDatabaseNodeIds,
-                  resourceId: databaseData.ResourceId,
-              }
-            : skipToken,
-    );
+    const {currentData: sharedDatabaseFromViewer, isFetching: isSharedDatabaseFromViewerFetching} =
+        tenantsApi.useGetSharedDatabaseQuery(
+            shouldResolveSharedDatabaseFromViewer && databaseData?.ResourceId
+                ? {
+                      clusterName,
+                      database: databaseData.Name,
+                      backend: activeBackend,
+                      environmentName: environment,
+                      isMonitoringAllowed: isMonitoringAllowed === true,
+                      needNodeIds: needSharedDatabaseNodeIds,
+                      resourceId: databaseData.ResourceId,
+                  }
+                : skipToken,
+        );
 
     const shouldResolveSharedDatabaseFromMetaList =
         shouldResolveSharedDatabaseName && Boolean(window.api.meta);
 
-    const {currentData: databases} = tenantsApi.useGetTenantsInfoQuery(
-        shouldResolveSharedDatabaseFromMetaList
-            ? {clusterName, environmentName: environment, isMetaDatabasesAvailable}
-            : skipToken,
-    );
+    const {currentData: databases, isFetching: isDatabasesFetching} =
+        tenantsApi.useGetTenantsInfoQuery(
+            shouldResolveSharedDatabaseFromMetaList
+                ? {clusterName, environmentName: environment, isMetaDatabasesAvailable}
+                : skipToken,
+        );
 
     const sharedDatabaseTarget = React.useMemo<SharedDatabaseTarget | undefined>(() => {
         if (databaseData?.sharedTenantName) {
@@ -184,12 +186,17 @@ export function useSharedDatabasePath({
     const sharedDatabase = useDatabaseId ? databaseData?.ResourceId : sharedDatabaseTarget?.name;
     const backend = getSharedDatabaseBackend(sharedDatabaseTarget, prepareTenantBackend);
 
-    return getResolvedSharedDatabasePath({
-        backend,
-        clusterName,
-        databaseData,
-        isClusterBaseInfoResolved: isClusterBaseInfoAvailable,
-        isViewerUser,
-        sharedDatabase,
-    });
+    return {
+        isSharedDatabaseLoading:
+            (isSharedDatabaseFromViewerFetching && sharedDatabaseFromViewer === undefined) ||
+            (isDatabasesFetching && databases === undefined),
+        sharedDatabasePath: getResolvedSharedDatabasePath({
+            backend,
+            clusterName,
+            databaseData,
+            isClusterBaseInfoResolved: isClusterBaseInfoAvailable,
+            isViewerUser,
+            sharedDatabase,
+        }),
+    };
 }

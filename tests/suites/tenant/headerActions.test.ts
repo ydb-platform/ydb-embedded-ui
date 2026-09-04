@@ -39,7 +39,14 @@ async function setupDatabaseMocks(
     {
         describeResult = 'success',
         isMonitoringAllowed,
-    }: {describeResult?: 'error' | 'success'; isMonitoringAllowed: boolean},
+        tenantListResponse,
+        tenantListIncludesSharedDatabase = true,
+    }: {
+        describeResult?: 'error' | 'success';
+        isMonitoringAllowed: boolean;
+        tenantListResponse?: Promise<void>;
+        tenantListIncludesSharedDatabase?: boolean;
+    },
 ) {
     const requestLog: SharedDatabaseRequestLog = {
         describeByPathId: [],
@@ -95,13 +102,20 @@ async function setupDatabaseMocks(
             storage: url.searchParams.get('storage'),
             tablets: url.searchParams.get('tablets'),
         });
-        await route.fulfill({json: {TenantInfo: [serverlessDatabase, sharedDatabase]}});
+        await tenantListResponse;
+        await route.fulfill({
+            json: {
+                TenantInfo: tenantListIncludesSharedDatabase
+                    ? [serverlessDatabase, sharedDatabase]
+                    : [serverlessDatabase],
+            },
+        });
     });
 
     return requestLog;
 }
 
-async function openServerlessDatabaseMenu(page: Page) {
+async function gotoServerlessDatabase(page: Page) {
     await page.addInitScript(() => {
         localStorage.setItem('enableTenantNavigationV2', JSON.stringify(true));
     });
@@ -112,6 +126,10 @@ async function openServerlessDatabaseMenu(page: Page) {
         database: serverlessDatabase.Name,
         databasePage: 'diagnostics',
     });
+}
+
+async function openServerlessDatabaseMenu(page: Page) {
+    await gotoServerlessDatabase(page);
 
     const actionsMenu = page.locator('.header__actions-menu');
     await actionsMenu.getByRole('button').click();
@@ -129,6 +147,93 @@ async function openServerlessDatabaseMenu(page: Page) {
 }
 
 test.describe('Database header actions', () => {
+    test('shows the pending shared database action without blocking other actions', async ({
+        page,
+    }) => {
+        let resolveTenantListResponse: () => void = () => undefined;
+        const tenantListResponse = new Promise<void>((resolve) => {
+            resolveTenantListResponse = resolve;
+        });
+        await setupDatabaseMocks(page, {
+            isMonitoringAllowed: false,
+            tenantListIncludesSharedDatabase: false,
+            tenantListResponse,
+        });
+
+        await gotoServerlessDatabase(page);
+
+        const actionsMenu = page.locator('.header__actions-menu');
+        await actionsMenu.getByRole('button').click();
+
+        try {
+            await expect(
+                page.getByRole('menuitem', {name: 'Connect to database', exact: true}),
+            ).toBeVisible();
+
+            const sharedDatabaseLoader = page.getByTestId('shared-database-link-loader');
+            const pendingSharedDatabaseMenuItem = page
+                .getByRole('menuitem')
+                .filter({has: sharedDatabaseLoader});
+            await expect(sharedDatabaseLoader).toBeVisible();
+            await expect(pendingSharedDatabaseMenuItem).toContainText(/\S/);
+
+            const tenantListResponseFinished = page.waitForResponse((response) => {
+                const url = new URL(response.url());
+
+                return (
+                    url.pathname.endsWith('/viewer/json/tenantinfo') &&
+                    !url.searchParams.get('database')
+                );
+            });
+            resolveTenantListResponse();
+            await tenantListResponseFinished;
+
+            await expect(sharedDatabaseLoader).toBeHidden();
+            await expect(
+                page.getByRole('menuitem', {name: 'Go to shared database', exact: true}),
+            ).toBeHidden();
+        } finally {
+            resolveTenantListResponse();
+        }
+    });
+
+    test('keeps the pending shared database action compact', async ({page}) => {
+        let resolveTenantListResponse: () => void = () => undefined;
+        const tenantListResponse = new Promise<void>((resolve) => {
+            resolveTenantListResponse = resolve;
+        });
+        await setupDatabaseMocks(page, {
+            isMonitoringAllowed: false,
+            tenantListResponse,
+        });
+
+        await gotoServerlessDatabase(page);
+
+        const actionsMenu = page.locator('.header__actions-menu');
+        await actionsMenu.getByRole('button').click();
+
+        try {
+            const sharedDatabaseLoader = page.getByTestId('shared-database-link-loader');
+            const menuItems = page.getByRole('menuitem');
+            const referenceMenuItem = menuItems.first();
+            const pendingSharedDatabaseMenuItem = menuItems.filter({has: sharedDatabaseLoader});
+            await expect(pendingSharedDatabaseMenuItem).toBeVisible();
+
+            const [referenceMenuItemHeight, pendingSharedDatabaseMenuItemHeight] =
+                await Promise.all([
+                    referenceMenuItem.evaluate((element) => element.getBoundingClientRect().height),
+                    pendingSharedDatabaseMenuItem.evaluate(
+                        (element) => element.getBoundingClientRect().height,
+                    ),
+                ]);
+            expect(
+                Math.abs(pendingSharedDatabaseMenuItemHeight - referenceMenuItemHeight),
+            ).toBeLessThan(0.5);
+        } finally {
+            resolveTenantListResponse();
+        }
+    });
+
     test('resolves the shared database with describe for a monitoring user', async ({page}) => {
         const requestLog = await setupDatabaseMocks(page, {isMonitoringAllowed: true});
 

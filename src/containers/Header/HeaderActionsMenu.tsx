@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {DatabaseArrowRight, Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
+import {Flex, Spin, Text} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
@@ -41,7 +42,7 @@ export function DBHeaderActionsMenu({
     const history = useHistory();
 
     const emMetaAvailable = useEmMetaAvailable();
-    const sharedDatabasePath = useSharedDatabasePath({
+    const {isSharedDatabaseLoading, sharedDatabasePath} = useSharedDatabasePath({
         clusterName,
         databaseData,
         isViewerUser,
@@ -81,7 +82,24 @@ export function DBHeaderActionsMenu({
             ]);
         }
 
-        if (sharedDatabasePath) {
+        if (isSharedDatabaseLoading) {
+            menuItems.push([
+                {
+                    title: (
+                        <Flex alignItems="center" gap={2}>
+                            <Spin size="xs" qa="shared-database-link-loader" />
+                            <Text>{headerKeyset('action_go-to-shared-db')}</Text>
+                        </Flex>
+                    ),
+                    action: () => undefined,
+                    disabled: true,
+                    extraProps: {
+                        'aria-busy': true,
+                        'aria-label': headerKeyset('status_loading-shared-db'),
+                    },
+                },
+            ]);
+        } else if (sharedDatabasePath) {
             menuItems.push([
                 {
                     title: headerKeyset('action_go-to-shared-db'),
@@ -136,6 +154,7 @@ export function DBHeaderActionsMenu({
         history,
         isEditDBAvailable,
         isDeleteDBAvailable,
+        isSharedDatabaseLoading,
         sharedDatabasePath,
     ]);
 
