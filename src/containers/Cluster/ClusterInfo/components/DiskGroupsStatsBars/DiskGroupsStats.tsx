@@ -1,53 +1,146 @@
 import React from 'react';
 
-import {Flex, Label, Text} from '@gravity-ui/uikit';
+import {Card, Flex, HelpMark, Label, Text, Tooltip} from '@gravity-ui/uikit';
 
 import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
-import type {
-    ClusterGroupsStats,
-    DiskErasureGroupsStats,
-} from '../../../../../store/reducers/cluster/types';
+import type {ClusterGroupsStats} from '../../../../../store/reducers/cluster/types';
+import {cn} from '../../../../../utils/cn';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import i18n from '../../../i18n';
 
-interface GroupsStatsPopupContentProps {
-    stats: DiskErasureGroupsStats;
-    storageType: string;
+import type {PreparedDiskGroupsStats, PreparedErasureGroupsStats} from './utils';
+import {prepareClusterGroupsStats} from './utils';
+
+import './DiskGroupsStats.scss';
+
+const b = cn('ydb-disk-groups-stats');
+
+const ERASURE_COLORS: Record<string, string> = {
+    'block-4-2': 'var(--g-color-base-info-heavy)',
+    'mirror-3-dc': 'var(--g-color-base-utility-heavy)',
+    'mirror-3of4': 'var(--g-color-base-utility-heavy)',
+    none: 'var(--g-color-base-neutral-heavy)',
+};
+
+function getErasureColor(erasure: string) {
+    return ERASURE_COLORS[erasure] ?? 'var(--g-color-base-neutral-heavy)';
 }
 
-function DiskGroupStats({stats, storageType}: GroupsStatsPopupContentProps) {
-    const {erasure} = stats;
+function formatGroups(count: number) {
+    return i18n('value_groups', {
+        count,
+        formattedCount: formatNumber(count),
+    });
+}
 
-    const availableGroups = stats.totalGroups - stats.createdGroups;
+function formatAvailableGroups({min, max}: PreparedDiskGroupsStats['availableGroups']) {
+    if (min === max) {
+        return formatGroups(min);
+    }
 
-    const availableGroupsString =
-        availableGroups === 1
-            ? i18n('title_available-one')
-            : i18n('title_available-other', {
-                  count: formatNumber(availableGroups),
-              });
+    return i18n('value_available-groups-range', {
+        min: formatNumber(min),
+        max: formatNumber(max),
+    });
+}
+
+function getErasureTooltip(stats: PreparedErasureGroupsStats) {
+    return i18n('context_available-groups-by-erasure', {
+        count: stats.availableGroups,
+        formattedCount: formatNumber(stats.availableGroups),
+        erasure: stats.erasure,
+    });
+}
+
+function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
+    const {allocatedGroups, availableGroups, diskType, erasures, progressTotalGroups} = stats;
+    const progressValue = progressTotalGroups > 0 ? allocatedGroups / progressTotalGroups : 0;
+    const progressPercent = progressValue * 100;
+    const availableGroupsContext = i18n('context_available-groups');
+
+    const segments = erasures
+        .filter(
+            ({createdGroups, availableGroups: availableCount}) =>
+                createdGroups > 0 || availableCount > 0,
+        )
+        .map((erasureStats) => ({
+            id: erasureStats.erasure,
+            value: erasureStats.createdGroups,
+            minWidth: 10,
+            color: getErasureColor(erasureStats.erasure),
+            className: b('progress-segment'),
+            content: (
+                <Tooltip content={getErasureTooltip(erasureStats)}>
+                    <div
+                        aria-label={getErasureTooltip(erasureStats)}
+                        className={b('progress-segment-trigger')}
+                        tabIndex={0}
+                    />
+                </Tooltip>
+            ),
+        }));
 
     return (
-        <Flex direction="column" gap={2}>
-            <Flex justifyContent="space-between" alignItems="center">
-                <Text variant="subheader-1">{storageType}</Text>
-                <Flex gap={4} wrap="nowrap" alignItems="center">
-                    <Label theme="info">{availableGroupsString}</Label>
-                    <Text color="secondary">
-                        {i18n('title_allocated', {
-                            used: formatNumber(stats.createdGroups),
-                            total: formatNumber(stats.totalGroups),
+        <Card view="filled" className={b('card')}>
+            <Flex direction="column" gap={1}>
+                <Flex direction="column" gap={2}>
+                    <Flex justifyContent="space-between" alignItems="center" gap={2}>
+                        <Text variant="subheader-1">{diskType}</Text>
+                        <Label
+                            theme="info"
+                            value={
+                                <Flex alignItems="center" gap={1}>
+                                    {formatAvailableGroups(availableGroups)}
+                                    <HelpMark
+                                        iconSize="s"
+                                        aria-label={i18n('action_show-available-groups-info', {
+                                            diskType,
+                                        })}
+                                        className={b('available-help')}
+                                        popoverProps={{placement: ['top', 'bottom']}}
+                                    >
+                                        {availableGroupsContext}
+                                    </HelpMark>
+                                </Flex>
+                            }
+                        >
+                            {i18n('title_available')}
+                        </Label>
+                    </Flex>
+                    <div
+                        role="group"
+                        aria-label={i18n('context_storage-group-allocation-progress', {
+                            diskType,
+                            percent: Math.round(progressPercent),
                         })}
-                    </Text>
+                    >
+                        <SegmentedProgress
+                            segments={segments}
+                            total={progressTotalGroups}
+                            hideLabels
+                        />
+                    </div>
+                </Flex>
+                <Flex justifyContent="space-between" alignItems="center" gap={2} wrap="wrap">
+                    <Flex alignItems="center" gap={4} wrap="wrap">
+                        {erasures.map((erasureStats) => (
+                            <Flex key={erasureStats.erasure} alignItems="center" gap={2}>
+                                <span
+                                    aria-hidden="true"
+                                    className={b('legend-dot')}
+                                    style={{backgroundColor: getErasureColor(erasureStats.erasure)}}
+                                />
+                                <Text>{erasureStats.erasure}</Text>
+                                <Text color="secondary">
+                                    {formatGroups(erasureStats.createdGroups)}
+                                </Text>
+                            </Flex>
+                        ))}
+                    </Flex>
+                    <Text color="secondary">{formatGroups(allocatedGroups)}</Text>
                 </Flex>
             </Flex>
-            <SegmentedProgress
-                value={stats.createdGroups}
-                total={stats.totalGroups}
-                labelStart={erasure}
-                ariaLabel={i18n('context_storage-group-allocation-progress')}
-            />
-        </Flex>
+        </Card>
     );
 }
 
@@ -56,26 +149,21 @@ interface StorageGroupStatsProps {
 }
 
 export function StorageGroupStats({groupStats}: StorageGroupStatsProps) {
-    const stats = React.useMemo(() => {
-        const result: React.ReactNode[] = [];
-
-        Object.entries(groupStats).forEach(([storageType, stats]) => {
-            Object.values(stats).forEach((erasureStats) => {
-                result.push(
-                    <DiskGroupStats
-                        key={`${storageType}|${erasureStats.erasure}`}
-                        stats={erasureStats}
-                        storageType={storageType}
-                    />,
-                );
-            });
-        });
-        return result;
-    }, [groupStats]);
+    const stats = React.useMemo(() => prepareClusterGroupsStats(groupStats), [groupStats]);
 
     return (
-        <Flex direction="column" gap={5}>
-            {stats}
-        </Flex>
+        <React.Fragment>
+            <Text as="div" variant="subheader-2">
+                {i18n('title_storage-groups')}{' '}
+                <Text color="secondary" variant="subheader-2">
+                    {formatNumber(stats.allocatedGroups)}
+                </Text>
+            </Text>
+            <Flex direction="column" gap={1}>
+                {stats.disks.map((diskStats) => (
+                    <DiskGroupStats key={diskStats.diskType} stats={diskStats} />
+                ))}
+            </Flex>
+        </React.Fragment>
     );
 }

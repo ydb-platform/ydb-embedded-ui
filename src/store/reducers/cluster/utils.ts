@@ -37,6 +37,15 @@ const getDiskType = (rawTypeString: string) => {
 
 function getGroupStats(data?: KeyValueRow[] | TStorageStats[]) {
     const result: ClusterGroupsStats = {};
+    const groupsWithCreatedStats = new Set<string>();
+
+    data?.forEach(({PDiskFilter, ErasureSpecies: erasure, CurrentGroupsCreated}) => {
+        const diskType = PDiskFilter && typeof PDiskFilter === 'string' && getDiskType(PDiskFilter);
+
+        if (diskType && erasure && typeof erasure === 'string' && Number(CurrentGroupsCreated)) {
+            groupsWithCreatedStats.add(`${diskType}|${erasure}`);
+        }
+    });
 
     data?.forEach((stats) => {
         const {
@@ -55,7 +64,18 @@ function getGroupStats(data?: KeyValueRow[] | TStorageStats[]) {
         const availableSize = Number(CurrentAvailableSize) || 0;
         const diskType = PDiskFilter && typeof PDiskFilter === 'string' && getDiskType(PDiskFilter);
 
-        if (diskType && erasure && typeof erasure === 'string' && createdGroups) {
+        const hasGroups = createdGroups > 0 || availableGroupsToCreate > 0;
+        const groupsStatsKey = `${diskType}|${erasure}`;
+        const isRedundantEmptyStats =
+            createdGroups === 0 && groupsWithCreatedStats.has(groupsStatsKey);
+
+        if (
+            diskType &&
+            erasure &&
+            typeof erasure === 'string' &&
+            hasGroups &&
+            !isRedundantEmptyStats
+        ) {
             const preparedStats = {
                 diskType,
                 erasure,
