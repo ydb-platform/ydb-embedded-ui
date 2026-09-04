@@ -250,7 +250,7 @@ export function parseIssuesData(raw: unknown): ErrorResponse | string | undefine
     if (typeof raw === 'string' && raw) {
         try {
             const parsed: unknown = JSON.parse(raw);
-            return isErrorResponse(parsed) ? parsed : raw;
+            return isErrorResponse(parsed) ? parsed : undefined;
         } catch {
             return raw;
         }

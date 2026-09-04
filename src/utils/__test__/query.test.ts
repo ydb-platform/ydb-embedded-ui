@@ -86,9 +86,9 @@ describe('parseIssuesData', () => {
         expect(result).toEqual(JSON.parse(raw));
     });
 
-    test('returns raw string when JSON is valid but not ErrorResponse', () => {
-        const raw = JSON.stringify({status: 'pending'});
-        expect(parseIssuesData(raw)).toBe(raw);
+    test('returns undefined when JSON is valid but not ErrorResponse', () => {
+        expect(parseIssuesData(JSON.stringify({status: 'pending'}))).toBeUndefined();
+        expect(parseIssuesData('{}')).toBeUndefined();
     });
 
     test('returns raw string for malformed JSON', () => {
