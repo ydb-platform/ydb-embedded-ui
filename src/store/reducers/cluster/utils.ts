@@ -64,7 +64,7 @@ function getGroupStats(data?: KeyValueRow[] | TStorageStats[]) {
         const availableSize = Number(CurrentAvailableSize) || 0;
         const diskType = PDiskFilter && typeof PDiskFilter === 'string' && getDiskType(PDiskFilter);
 
-        const hasGroups = createdGroups > 0 || availableGroupsToCreate > 0;
+        const hasCreatedGroups = createdGroups > 0;
         const groupsStatsKey = `${diskType}|${erasure}`;
         const isRedundantEmptyStats =
             createdGroups === 0 && groupsWithCreatedStats.has(groupsStatsKey);
@@ -73,7 +73,7 @@ function getGroupStats(data?: KeyValueRow[] | TStorageStats[]) {
             diskType &&
             erasure &&
             typeof erasure === 'string' &&
-            hasGroups &&
+            hasCreatedGroups &&
             !isRedundantEmptyStats
         ) {
             const preparedStats = {

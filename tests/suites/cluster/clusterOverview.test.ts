@@ -165,7 +165,7 @@ test.describe('Cluster Overview', () => {
         });
     });
 
-    test('allocated storage groups hide empty media and erasure placeholders', async ({page}) => {
+    test('allocated storage groups hide unallocated media and erasure policies', async ({page}) => {
         await setupMonitoringUserMock(page);
         await setupClusterDashboardCapabilitiesMock(page);
         await setupNodesListMock(page);
@@ -179,12 +179,13 @@ test.describe('Cluster Overview', () => {
                         {
                             PDiskFilter: 'Type:ROT',
                             ErasureSpecies: 'block-4-2',
-                            AvailableGroupsToCreate: 0,
+                            CurrentGroupsCreated: 0,
+                            AvailableGroupsToCreate: 80,
                         },
                         {
                             PDiskFilter: 'Type:ROT',
                             ErasureSpecies: 'mirror-3-dc',
-                            AvailableGroupsToCreate: 0,
+                            AvailableGroupsToCreate: 84,
                         },
                         {
                             PDiskFilter: 'Type:SSD',
@@ -195,7 +196,8 @@ test.describe('Cluster Overview', () => {
                         {
                             PDiskFilter: 'Type:SSD',
                             ErasureSpecies: 'mirror-3-dc',
-                            AvailableGroupsToCreate: 0,
+                            CurrentGroupsCreated: 0,
+                            AvailableGroupsToCreate: 1103,
                         },
                     ],
                 },
@@ -322,37 +324,30 @@ test.describe('Cluster Overview', () => {
             const ssdProgress = storageSection.getByRole('group', {
                 name: 'SSD storage group allocation: 0%',
             });
-            await expect(hddProgress.getByRole('progressbar')).toHaveAttribute(
-                'aria-valuenow',
-                '0',
-            );
+            await expect(hddProgress).toHaveCount(0);
             await expect(ssdProgress.getByRole('progressbar')).toHaveAttribute(
                 'aria-valuenow',
                 '0.2',
             );
             await expect(storageSection.getByText('none', {exact: true})).toHaveCount(0);
+            await expect(storageSection.getByText('block-4-2', {exact: true})).toHaveCount(0);
+            await expect(storageSection.getByText('HDD', {exact: true})).toHaveCount(0);
+            await expect(storageSection.getByText('600 groups', {exact: true})).toBeVisible();
 
-            const hddSegments = hddProgress.locator('.ydb-disk-groups-stats__progress-segment');
             const ssdSegments = ssdProgress.locator('.ydb-disk-groups-stats__progress-segment');
-            await expect(hddSegments).toHaveCount(1);
-            await expect(ssdSegments).toHaveCount(2);
-            expect(
-                await hddSegments.evaluateAll((segments) =>
-                    segments.map((segment) => segment.getBoundingClientRect().width),
-                ),
-            ).toEqual([10]);
+            await expect(ssdSegments).toHaveCount(1);
             expect(
                 await ssdSegments.evaluateAll((segments) =>
                     segments.map((segment) => segment.getBoundingClientRect().width),
                 ),
-            ).toEqual([10, 10]);
+            ).toEqual([10]);
 
             await ssdProgress
                 .locator('.ydb-disk-groups-stats__progress-segment-trigger')
                 .first()
                 .hover();
             await expect(
-                page.getByText('600 groups available if only block-4-2 is used', {exact: true}),
+                page.getByText('600 groups available if only mirror-3-dc is used', {exact: true}),
             ).toBeVisible();
             await page.mouse.move(0, 0);
 

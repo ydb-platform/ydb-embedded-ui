@@ -83,15 +83,15 @@ describe('prepareClusterGroupsStats', () => {
         const groupStats: ClusterGroupsStats = {
             HDD: {
                 'block-4-2': createStats('HDD', 'block-4-2', 65, 0),
-                'mirror-3-dc': createStats('HDD', 'mirror-3-dc', 0, 202),
+                'mirror-3-dc': createStats('HDD', 'mirror-3-dc', 5, 202),
             },
         };
 
         expect(prepareClusterGroupsStats(groupStats)).toEqual({
-            allocatedGroups: 65,
+            allocatedGroups: 70,
             disks: [
                 {
-                    allocatedGroups: 65,
+                    allocatedGroups: 70,
                     availableGroups: {
                         average: 101,
                         max: 202,
@@ -106,11 +106,11 @@ describe('prepareClusterGroupsStats', () => {
                         },
                         {
                             availableGroups: 202,
-                            createdGroups: 0,
+                            createdGroups: 5,
                             erasure: 'mirror-3-dc',
                         },
                     ],
-                    progressTotalGroups: 166,
+                    progressTotalGroups: 171,
                 },
             ],
         });

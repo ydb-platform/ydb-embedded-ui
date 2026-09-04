@@ -63,10 +63,7 @@ function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
     const availableGroupsContext = i18n('context_available-groups');
 
     const segments = erasures
-        .filter(
-            ({createdGroups, availableGroups: availableCount}) =>
-                createdGroups > 0 || availableCount > 0,
-        )
+        .filter(({createdGroups}) => createdGroups > 0)
         .map((erasureStats) => ({
             id: erasureStats.erasure,
             value: erasureStats.createdGroups,

@@ -124,14 +124,6 @@ describe('parseGroupsStatsQueryResponse', () => {
                 erasure: 'mirror-3-dc',
                 totalGroups: 64,
             },
-            'block-4-2': {
-                allocatedSize: 0,
-                availableSize: 0,
-                createdGroups: 0,
-                diskType: 'HDD',
-                erasure: 'block-4-2',
-                totalGroups: 20,
-            },
         },
         SSD: {
             'mirror-3-dc': {
@@ -180,7 +172,9 @@ describe('getGroupStatsFromClusterInfo', () => {
         [undefined, 0],
         [0, undefined],
         [undefined, undefined],
-    ])('omits empty groups with created=%s and available=%s', (created, available) => {
+        [0, 52],
+        [undefined, 52],
+    ])('omits unallocated groups with created=%s and available=%s', (created, available) => {
         expect(
             getGroupStatsFromClusterInfo({
                 StorageStats: [
@@ -197,7 +191,7 @@ describe('getGroupStatsFromClusterInfo', () => {
 
     test.each([
         {created: 11, available: undefined, expectedCreated: 11, expectedTotal: 11},
-        {created: undefined, available: 52, expectedCreated: 0, expectedTotal: 52},
+        {created: 11, available: 52, expectedCreated: 11, expectedTotal: 63},
     ])(
         'keeps groups with created=$created and available=$available',
         ({created, available, expectedCreated, expectedTotal}) => {
@@ -227,19 +221,20 @@ describe('getGroupStatsFromClusterInfo', () => {
         },
     );
 
-    test('omits empty media and erasure placeholders from cluster storage stats', () => {
+    test('omits unallocated media and erasure policies despite positive availability', () => {
         expect(
             getGroupStatsFromClusterInfo({
                 StorageStats: [
                     {
                         PDiskFilter: 'Type:ROT',
                         ErasureSpecies: 'block-4-2',
-                        AvailableGroupsToCreate: 0,
+                        CurrentGroupsCreated: 0,
+                        AvailableGroupsToCreate: 80,
                     },
                     {
                         PDiskFilter: 'Type:ROT',
                         ErasureSpecies: 'mirror-3-dc',
-                        AvailableGroupsToCreate: 0,
+                        AvailableGroupsToCreate: 84,
                     },
                     {
                         PDiskFilter: 'Type:SSD',
@@ -250,7 +245,8 @@ describe('getGroupStatsFromClusterInfo', () => {
                     {
                         PDiskFilter: 'Type:SSD',
                         ErasureSpecies: 'mirror-3-dc',
-                        AvailableGroupsToCreate: 0,
+                        CurrentGroupsCreated: 0,
+                        AvailableGroupsToCreate: 1103,
                     },
                 ],
             }),
