@@ -71,7 +71,12 @@ export function StreamingQueryGraph({database, path}: StreamingQueryGraphProps) 
     }
 
     if (!hasNodes) {
-        return <div className={b()}>{i18n('description_no-plan')}</div>;
+        const unsupported = Boolean(preparedPlan?.version && !preparedPlan.nodes);
+        return (
+            <div className={b()}>
+                {unsupported ? i18n('description_unsupported-plan') : i18n('description_no-plan')}
+            </div>
+        );
     }
 
     return (
