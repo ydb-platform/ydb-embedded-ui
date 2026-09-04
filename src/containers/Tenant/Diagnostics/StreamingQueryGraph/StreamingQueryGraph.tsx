@@ -4,8 +4,7 @@ import {useThemeValue} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
-import {parseStreamingQueryPlan} from '../../../../store/reducers/query/parsers/parseStreamingQueryPlan';
-import {preparePlanData} from '../../../../store/reducers/query/parsers/preparePlanData';
+import {prepareStreamingQueryPlan} from '../../../../store/reducers/query/parsers/prepareStreamingQueryPlan';
 import {streamingQueriesApi} from '../../../../store/reducers/streamingQuery/streamingQuery';
 import {cn} from '../../../../utils/cn';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
@@ -40,8 +39,8 @@ export function StreamingQueryGraph({database, path}: StreamingQueryGraphProps) 
 
     const row = planData?.resultSets?.[0]?.result?.[0];
 
-    const preparedPlan = React.useMemo(
-        () => preparePlanData(parseStreamingQueryPlan(getStringifiedData(row?.Plan))),
+    const {hasPlan, prepared} = React.useMemo(
+        () => prepareStreamingQueryPlan(getStringifiedData(row?.Plan)),
         [row?.Plan],
     );
 
@@ -59,7 +58,7 @@ export function StreamingQueryGraph({database, path}: StreamingQueryGraphProps) 
         );
     }
 
-    const hasNodes = Boolean(preparedPlan?.nodes?.length);
+    const hasNodes = Boolean(prepared?.nodes?.length);
     const issues = parseIssuesData(row?.Issues);
 
     if (!hasNodes && issues) {
@@ -71,17 +70,16 @@ export function StreamingQueryGraph({database, path}: StreamingQueryGraphProps) 
     }
 
     if (!hasNodes) {
-        const unsupported = Boolean(preparedPlan?.version && !preparedPlan.nodes);
         return (
             <div className={b()}>
-                {unsupported ? i18n('description_unsupported-plan') : i18n('description_no-plan')}
+                {hasPlan ? i18n('description_unsupported-plan') : i18n('description_no-plan')}
             </div>
         );
     }
 
     return (
         <div className={b()}>
-            <Graph explain={preparedPlan} theme={theme} />
+            <Graph explain={prepared} theme={theme} />
         </div>
     );
 }
