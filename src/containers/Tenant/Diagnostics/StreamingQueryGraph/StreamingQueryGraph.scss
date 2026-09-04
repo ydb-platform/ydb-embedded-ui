@@ -2,6 +2,10 @@
 
 .ydb-streaming-query-graph {
     overflow: hidden;
+    flex-grow: 1;
+
+    height: 100%;
+
     @include mixins.flex-container();
 
     &__loader {
