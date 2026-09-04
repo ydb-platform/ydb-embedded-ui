@@ -56,6 +56,10 @@ function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
     const {allocatedGroups, availableGroups, diskType, erasures, progressTotalGroups} = stats;
     const progressValue = progressTotalGroups > 0 ? allocatedGroups / progressTotalGroups : 0;
     const progressPercent = progressValue * 100;
+    const progressLabel = i18n('context_storage-group-allocation-progress', {
+        diskType,
+        percent: Math.round(progressPercent),
+    });
     const availableGroupsContext = i18n('context_available-groups');
 
     const segments = erasures
@@ -74,6 +78,7 @@ function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
                     <div
                         aria-label={getErasureTooltip(erasureStats)}
                         className={b('progress-segment-trigger')}
+                        role="img"
                         tabIndex={0}
                     />
                 </Tooltip>
@@ -107,16 +112,11 @@ function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
                             {i18n('title_available')}
                         </Label>
                     </Flex>
-                    <div
-                        role="group"
-                        aria-label={i18n('context_storage-group-allocation-progress', {
-                            diskType,
-                            percent: Math.round(progressPercent),
-                        })}
-                    >
+                    <div role="group" aria-label={progressLabel}>
                         <SegmentedProgress
                             segments={segments}
                             total={progressTotalGroups}
+                            ariaLabel={progressLabel}
                             hideLabels
                         />
                     </div>

@@ -152,18 +152,25 @@ export function SegmentedProgress(props: SegmentedProgressProps) {
               width: props.total > 0 ? clampPercent((segment.value / props.total) * 100) : 0,
           }))
         : undefined;
+    const hasSegmentContent = segmentSections?.some(
+        ({content}) => content !== undefined && content !== null,
+    );
+    const progressAriaProps = {
+        role: 'progressbar' as const,
+        'aria-label': ariaLabel,
+        'aria-valuemin': 0,
+        'aria-valuemax': 100,
+        'aria-valuenow': normalizedUsed,
+    };
 
     return (
         <Flex direction="column" gap={1}>
             <div
-                className={b({theme}, className)}
+                className={b({theme, 'with-content': hasSegmentContent}, className)}
                 data-qa={dataQa}
-                role="progressbar"
-                aria-label={ariaLabel}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={normalizedUsed}
+                {...(hasSegmentContent ? undefined : progressAriaProps)}
             >
+                {hasSegmentContent && <div className={b('status')} {...progressAriaProps} />}
                 {segmentSections
                     ? segmentSections.map((segment) => {
                           return segment.width > 0 || (segment.minWidth ?? 0) > 0 ? (
