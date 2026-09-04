@@ -246,6 +246,21 @@ export function isErrorResponse(data: unknown): data is ErrorResponse {
     return Boolean(data && typeof data === 'object' && 'issues' in data);
 }
 
+export function parseIssuesData(raw: unknown): ErrorResponse | string | undefined {
+    if (typeof raw === 'string' && raw) {
+        try {
+            const parsed: unknown = JSON.parse(raw);
+            return isErrorResponse(parsed) ? parsed : undefined;
+        } catch {
+            return raw;
+        }
+    }
+    if (isErrorResponse(raw)) {
+        return raw;
+    }
+    return undefined;
+}
+
 // Although schema is set in request, if schema is not supported default schema for the version will be used
 // So we should additionally parse response
 export function parseQueryAPIResponse(
