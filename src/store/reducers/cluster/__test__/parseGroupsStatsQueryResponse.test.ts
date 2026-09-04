@@ -1,4 +1,4 @@
-import {parseGroupsStatsQueryResponse} from '../utils';
+import {getGroupStatsFromClusterInfo, parseGroupsStatsQueryResponse} from '../utils';
 
 describe('parseGroupsStatsQueryResponse', () => {
     const columns = [
@@ -139,5 +139,128 @@ describe('parseGroupsStatsQueryResponse', () => {
     test('should correctly parse data', () => {
         expect(parseGroupsStatsQueryResponse(dataSet1)).toEqual(parsedDataSet1);
         expect(parseGroupsStatsQueryResponse(dataSet2)).toEqual(parsedDataSet2);
+    });
+
+    test('treats missing available groups count as zero', () => {
+        const data = {
+            result: [
+                {
+                    columns,
+                    rows: [['Type:SSD', 'block-4-2', '0', '0', 10, undefined]],
+                },
+            ],
+        };
+
+        expect(parseGroupsStatsQueryResponse(data)).toEqual({
+            SSD: {
+                'block-4-2': {
+                    allocatedSize: 0,
+                    availableSize: 0,
+                    createdGroups: 10,
+                    diskType: 'SSD',
+                    erasure: 'block-4-2',
+                    totalGroups: 10,
+                },
+            },
+        });
+    });
+});
+
+describe('getGroupStatsFromClusterInfo', () => {
+    test.each([
+        [0, 0],
+        [undefined, 0],
+        [0, undefined],
+        [undefined, undefined],
+        [0, 52],
+        [undefined, 52],
+    ])('omits unallocated groups with created=%s and available=%s', (created, available) => {
+        expect(
+            getGroupStatsFromClusterInfo({
+                StorageStats: [
+                    {
+                        PDiskFilter: 'Type:SSD',
+                        ErasureSpecies: 'block-4-2',
+                        CurrentGroupsCreated: created,
+                        AvailableGroupsToCreate: available,
+                    },
+                ],
+            }),
+        ).toEqual({});
+    });
+
+    test.each([
+        {created: 11, available: undefined, expectedCreated: 11, expectedTotal: 11},
+        {created: 11, available: 52, expectedCreated: 11, expectedTotal: 63},
+    ])(
+        'keeps groups with created=$created and available=$available',
+        ({created, available, expectedCreated, expectedTotal}) => {
+            expect(
+                getGroupStatsFromClusterInfo({
+                    StorageStats: [
+                        {
+                            PDiskFilter: 'Type:SSD',
+                            ErasureSpecies: 'block-4-2',
+                            CurrentGroupsCreated: created,
+                            AvailableGroupsToCreate: available,
+                        },
+                    ],
+                }),
+            ).toEqual({
+                SSD: {
+                    'block-4-2': {
+                        diskType: 'SSD',
+                        erasure: 'block-4-2',
+                        createdGroups: expectedCreated,
+                        totalGroups: expectedTotal,
+                        allocatedSize: 0,
+                        availableSize: 0,
+                    },
+                },
+            });
+        },
+    );
+
+    test('omits unallocated media and erasure policies despite positive availability', () => {
+        expect(
+            getGroupStatsFromClusterInfo({
+                StorageStats: [
+                    {
+                        PDiskFilter: 'Type:ROT',
+                        ErasureSpecies: 'block-4-2',
+                        CurrentGroupsCreated: 0,
+                        AvailableGroupsToCreate: 80,
+                    },
+                    {
+                        PDiskFilter: 'Type:ROT',
+                        ErasureSpecies: 'mirror-3-dc',
+                        AvailableGroupsToCreate: 84,
+                    },
+                    {
+                        PDiskFilter: 'Type:SSD',
+                        ErasureSpecies: 'block-4-2',
+                        CurrentGroupsCreated: 11,
+                        AvailableGroupsToCreate: 52,
+                    },
+                    {
+                        PDiskFilter: 'Type:SSD',
+                        ErasureSpecies: 'mirror-3-dc',
+                        CurrentGroupsCreated: 0,
+                        AvailableGroupsToCreate: 1103,
+                    },
+                ],
+            }),
+        ).toEqual({
+            SSD: {
+                'block-4-2': {
+                    diskType: 'SSD',
+                    erasure: 'block-4-2',
+                    createdGroups: 11,
+                    totalGroups: 63,
+                    allocatedSize: 0,
+                    availableSize: 0,
+                },
+            },
+        });
     });
 });
