@@ -14,7 +14,8 @@ import './DropdownMenu.scss';
 const b = cn('ydb-dropdown-menu');
 
 export interface DropdownMenuItemWithDescription<T = HTMLElement>
-    extends Omit<DropdownMenuItem<T>, 'text' | 'iconStart'> {
+    extends Omit<DropdownMenuItem<T>, 'text' | 'iconStart' | 'title'> {
+    title: React.ReactNode;
     description?: React.ReactNode;
     iconStart?: IconProps['data'];
 }
@@ -30,7 +31,7 @@ function renderMenuItemText({
 }: Pick<DropdownMenuItemWithDescription, 'title' | 'description'>) {
     return (
         <Flex direction="column" className={b('item-content')}>
-            <Text className={b('item-title')}>{title}</Text>
+            {typeof title === 'string' ? <Text className={b('item-title')}>{title}</Text> : title}
             {description ? (
                 <Text color="secondary" className={b('item-description')}>
                     {description}
