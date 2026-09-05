@@ -15,7 +15,7 @@ const b = cn('ydb-dropdown-menu');
 
 export interface DropdownMenuItemWithDescription<T = HTMLElement>
     extends Omit<DropdownMenuItem<T>, 'text' | 'iconStart' | 'title'> {
-    title?: React.ReactNode;
+    title: React.ReactNode;
     description?: React.ReactNode;
     iconStart?: IconProps['data'];
 }

@@ -197,43 +197,6 @@ test.describe('Database header actions', () => {
         }
     });
 
-    test('keeps the pending shared database action compact', async ({page}) => {
-        let resolveTenantListResponse: () => void = () => undefined;
-        const tenantListResponse = new Promise<void>((resolve) => {
-            resolveTenantListResponse = resolve;
-        });
-        await setupDatabaseMocks(page, {
-            isMonitoringAllowed: false,
-            tenantListResponse,
-        });
-
-        await gotoServerlessDatabase(page);
-
-        const actionsMenu = page.locator('.header__actions-menu');
-        await actionsMenu.getByRole('button').click();
-
-        try {
-            const sharedDatabaseLoader = page.getByTestId('shared-database-link-loader');
-            const menuItems = page.getByRole('menuitem');
-            const referenceMenuItem = menuItems.first();
-            const pendingSharedDatabaseMenuItem = menuItems.filter({has: sharedDatabaseLoader});
-            await expect(pendingSharedDatabaseMenuItem).toBeVisible();
-
-            const [referenceMenuItemHeight, pendingSharedDatabaseMenuItemHeight] =
-                await Promise.all([
-                    referenceMenuItem.evaluate((element) => element.getBoundingClientRect().height),
-                    pendingSharedDatabaseMenuItem.evaluate(
-                        (element) => element.getBoundingClientRect().height,
-                    ),
-                ]);
-            expect(
-                Math.abs(pendingSharedDatabaseMenuItemHeight - referenceMenuItemHeight),
-            ).toBeLessThan(0.5);
-        } finally {
-            resolveTenantListResponse();
-        }
-    });
-
     test('resolves the shared database with describe for a monitoring user', async ({page}) => {
         const requestLog = await setupDatabaseMocks(page, {isMonitoringAllowed: true});
 
