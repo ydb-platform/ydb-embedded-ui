@@ -1,0 +1,155 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e41]:
+    - banner [ref=e42]:
+      - list [ref=e43]:
+        - listitem [ref=e44]:
+          - link "Cluster" [ref=e45] [cursor=pointer]:
+            - link "Cluster" [ref=e46]:
+              - /url: /cluster
+              - generic [ref=e47]:
+                - img [ref=e48]
+                - text: Cluster
+          - generic [ref=e50]: /
+        - listitem [ref=e51]:
+          - link "local" [disabled] [ref=e52]:
+            - generic [ref=e54]:
+              - img [ref=e55]
+              - text: local
+      - generic [ref=e57]:
+        - button "Connect" [ref=e58] [cursor=pointer]:
+          - img [ref=e61]:
+            - img [ref=e62]
+          - generic [ref=e64]: Connect
+        - link "Developer UI" [ref=e65] [cursor=pointer]:
+          - /url: http://localhost:8765/internal
+          - img [ref=e68]:
+            - img [ref=e69]
+          - generic [ref=e71]: Developer UI
+    - main [ref=e72]:
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - generic [ref=e81]:
+            - generic [ref=e82]:
+              - generic [ref=e83]:
+                - generic [ref=e84]:
+                  - generic [ref=e85]: Table
+                  - generic [ref=e86]: storage_usage_media_stats_table
+                - generic [ref=e87]:
+                  - button "Open preview" [ref=e88] [cursor=pointer]:
+                    - img [ref=e91]:
+                      - img [ref=e92]
+                  - button "Copy" [ref=e94] [cursor=pointer]:
+                    - generic:
+                      - generic:
+                        - img:
+                          - img
+                  - button [ref=e95] [cursor=pointer]:
+                    - img [ref=e98]:
+                      - img [ref=e99]
+              - tablist [ref=e103]:
+                - tab "Overview" [selected] [ref=e104] [cursor=pointer]:
+                  - link "Overview" [ref=e107]:
+                    - /url: /database?diagnosticsTab=storageUsage&schema=%2Flocal%2Fstorage_usage_media_stats_table&database=%2Flocal&databasePage=diagnostics&summaryTab=overview
+                - tab "Schema" [ref=e108] [cursor=pointer]:
+                  - link "Schema" [ref=e111]:
+                    - /url: /database?diagnosticsTab=storageUsage&schema=%2Flocal%2Fstorage_usage_media_stats_table&database=%2Flocal&databasePage=diagnostics&summaryTab=schema
+            - generic [ref=e112]:
+              - generic [ref=e113]: Table
+              - generic [ref=e114]:
+                - generic [ref=e115]:
+                  - term [ref=e116]:
+                    - generic [ref=e117]: Type
+                  - definition [ref=e119]:
+                    - generic [ref=e120]: Table
+                - generic [ref=e121]:
+                  - term [ref=e122]:
+                    - generic [ref=e123]: Data size
+                  - definition [ref=e125]:
+                    - generic [ref=e126]: 0 B
+          - generic [ref=e127]:
+            - button [ref=e128] [cursor=pointer]:
+              - img [ref=e131]:
+                - img [ref=e132]
+            - button [ref=e134] [cursor=pointer]:
+              - img [ref=e137]:
+                - img [ref=e138]
+        - generic [ref=e142]:
+          - radiogroup [ref=e144]:
+            - generic [ref=e145] [cursor=pointer]:
+              - radio "Query" [ref=e146]
+              - generic [ref=e148]:
+                - img [ref=e149]:
+                  - img [ref=e150]
+                - generic [ref=e152]: Query
+            - generic [ref=e153]:
+              - radio "Diagnostics" [checked] [ref=e154]
+              - generic [ref=e156]:
+                - img [ref=e157]:
+                  - img [ref=e158]
+                - generic [ref=e162]: Diagnostics
+          - generic [ref=e165]:
+            - tablist [ref=e166]:
+              - tab "Info" [ref=e167] [cursor=pointer]:
+                - link "Info" [ref=e170]:
+                  - /url: /database?diagnosticsTab=overview&schema=%2Flocal%2Fstorage_usage_media_stats_table&database=%2Flocal&databasePage=diagnostics
+              - tab "Schema" [ref=e171] [cursor=pointer]:
+                - link "Schema" [ref=e174]:
+                  - /url: /database?diagnosticsTab=schema&schema=%2Flocal%2Fstorage_usage_media_stats_table&database=%2Flocal&databasePage=diagnostics
+              - tab "Top shards" [ref=e175] [cursor=pointer]:
+                - link "Top shards" [ref=e178]:
+                  - /url: /database?diagnosticsTab=topShards&schema=%2Flocal%2Fstorage_usage_media_stats_table&database=%2Flocal&databasePage=diagnostics
+              - tab "Nodes" [ref=e179] [cursor=pointer]:
+                - link "Nodes" [ref=e182]:
+                  - /url: /database?diagnosticsTab=nodes&schema=%2Flocal%2Fstorage_usage_media_stats_table&database=%2Flocal&databasePage=diagnostics
+              - tab "Graph" [ref=e183] [cursor=pointer]:
+                - link "Graph" [ref=e186]:
+                  - /url: /database?diagnosticsTab=graph&schema=%2Flocal%2Fstorage_usage_media_stats_table&database=%2Flocal&databasePage=diagnostics
+              - tab "Tablets" [ref=e187] [cursor=pointer]:
+                - link "Tablets" [ref=e190]:
+                  - /url: /database?diagnosticsTab=tablets&schema=%2Flocal%2Fstorage_usage_media_stats_table&database=%2Flocal&databasePage=diagnostics
+              - tab "Storage" [selected] [ref=e191] [cursor=pointer]:
+                - link "Storage" [ref=e194]:
+                  - /url: /database?diagnosticsTab=storageUsage&schema=%2Flocal%2Fstorage_usage_media_stats_table&database=%2Flocal&databasePage=diagnostics
+              - tab "Hot keys" [ref=e195] [cursor=pointer]:
+                - link "Hot keys" [ref=e198]:
+                  - /url: /database?diagnosticsTab=hotKeys&schema=%2Flocal%2Fstorage_usage_media_stats_table&database=%2Flocal&databasePage=diagnostics
+              - tab "Describe" [ref=e199] [cursor=pointer]:
+                - link "Describe" [ref=e202]:
+                  - /url: /database?diagnosticsTab=describe&schema=%2Flocal%2Fstorage_usage_media_stats_table&database=%2Flocal&databasePage=diagnostics
+              - tab "Access" [ref=e203] [cursor=pointer]:
+                - link "Access" [ref=e206]:
+                  - /url: /database?diagnosticsTab=access&schema=%2Flocal%2Fstorage_usage_media_stats_table&database=%2Flocal&databasePage=diagnostics
+            - generic [ref=e207]:
+              - button "Refresh" [ref=e208] [cursor=pointer]:
+                - img [ref=e211]
+              - group [ref=e214] [cursor=pointer]:
+                - combobox [ref=e215]:
+                  - generic [ref=e216]: None
+                - img [ref=e217]:
+                  - img [ref=e218]
+```

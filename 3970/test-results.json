@@ -1,0 +1,3189 @@
+{
+  "config": {
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "/work/tests/playwrightSetup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/playwright-artifacts/test-results-20260608061638-2441",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "name": "safari",
+        "testDir": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "./playwright-artifacts/playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "./playwright-artifacts/test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "configFile": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/merge.config.ts",
+    "rootDir": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui",
+    "quiet": false,
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.58.0",
+    "workers": 2,
+    "webServer": {
+      "command": "npm start",
+      "env": {
+        "DISABLE_ESLINT_PLUGIN": "true",
+        "TSC_COMPILE_ON_ERROR": "true",
+        "REACT_APP_BACKEND": "http://localhost:8765",
+        "REACT_APP_META_BACKEND": "undefined",
+        "REACT_APP_DISABLE_CHECKS": "true",
+        "REACT_APP_E2E_UI_OVERRIDES": "true"
+      },
+      "port": 3000,
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "bridge/bridge.test.ts",
+      "file": "bridge/bridge.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Bridge mode - Nodes table",
+          "file": "bridge/bridge.test.ts",
+          "line": 16,
+          "column": 6,
+          "specs": [
+            {
+              "title": "off: no Pile Name column and no group-by option",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7480,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:18.083Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "88612f6e2d15657b9e48-ab57aa80c67bcd226ec1",
+              "file": "bridge/bridge.test.ts",
+              "line": 17,
+              "column": 9
+            },
+            {
+              "title": "on: shows Pile Name column",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7558,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:26.461Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "88612f6e2d15657b9e48-a9bb6561607bfba58e02",
+              "file": "bridge/bridge.test.ts",
+              "line": 30,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Bridge mode - Storage nodes",
+          "file": "bridge/bridge.test.ts",
+          "line": 43,
+          "column": 6,
+          "specs": [
+            {
+              "title": "on: shows Pile Name",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4673,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:34.046Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "88612f6e2d15657b9e48-783fbc4562c68547eebc",
+              "file": "bridge/bridge.test.ts",
+              "line": 44,
+              "column": 9
+            },
+            {
+              "title": "off: hides Pile Name",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4515,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:38.737Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "88612f6e2d15657b9e48-fe45e807f30cb4b6a6f0",
+              "file": "bridge/bridge.test.ts",
+              "line": 57,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Bridge mode - Storage groups",
+          "file": "bridge/bridge.test.ts",
+          "line": 68,
+          "column": 6,
+          "specs": [
+            {
+              "title": "on: shows Pile Name and group-by option",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5370,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:43.288Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "88612f6e2d15657b9e48-89874d516d441011d5c5",
+              "file": "bridge/bridge.test.ts",
+              "line": 69,
+              "column": 9
+            },
+            {
+              "title": "off: hides Pile Name and group-by option",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4866,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:48.701Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "88612f6e2d15657b9e48-29e910f98885f90f7d4b",
+              "file": "bridge/bridge.test.ts",
+              "line": 82,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Bridge mode - Cluster Overview",
+          "file": "bridge/bridge.test.ts",
+          "line": 93,
+          "column": 6,
+          "specs": [
+            {
+              "title": "off: does not show Bridge piles section",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5591,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:53.584Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "88612f6e2d15657b9e48-64bcd630b02022a3d1e0",
+              "file": "bridge/bridge.test.ts",
+              "line": 94,
+              "column": 9
+            },
+            {
+              "title": "on: shows Bridge piles section with data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4703,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:59.193Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "88612f6e2d15657b9e48-931032271e4a0673c3e4",
+              "file": "bridge/bridge.test.ts",
+              "line": 104,
+              "column": 9
+            },
+            {
+              "title": "on: bridge piles visual states",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4776,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:03.926Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "88612f6e2d15657b9e48-5ca3e26e708a34c5e703",
+              "file": "bridge/bridge.test.ts",
+              "line": 126,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "errorDisplay/errorDisplay.test.ts",
+      "file": "errorDisplay/errorDisplay.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Error Display — ResponseError and PageError across pages",
+          "file": "errorDisplay/errorDisplay.test.ts",
+          "line": 61,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Cluster — 400 plain text with traceresponse and x-request-id",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 7587,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:18.137Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-4345b32b947ce8d49ee7",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 64,
+              "column": 9
+            },
+            {
+              "title": "Node — network error shows ERR_NETWORK code",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 8850,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:26.609Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-3c54ecddcd75aabaa070",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 96,
+              "column": 9
+            },
+            {
+              "title": "Cluster — proxy diagnostics from headers show proxy ids, rewritten path and target",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5538,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:35.481Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-ff632defa47a56fd71ce",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 121,
+              "column": 9
+            },
+            {
+              "title": "PDisk — 503 empty body with x-worker-name",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5109,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:41.047Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-f483b89b68a161c59916",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 159,
+              "column": 9
+            },
+            {
+              "title": "VDisk — 429 JSON with expandable issues",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 6219,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:46.188Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-608aafc47c4ddbc944c6",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 184,
+              "column": 9
+            },
+            {
+              "title": "StorageGroup — 429 HTML body with x-proxy-name and x-trace-id",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 4953,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:52.421Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-8ce75e17f5908fccd6fd",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 213,
+              "column": 9
+            },
+            {
+              "title": "Tablet — 400 JSON with only code field shows code as message",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5287,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:18:57.391Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-6731be195a599b67c2f9",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 247,
+              "column": 9
+            },
+            {
+              "title": "StorageGroup — toggle button says \"Response\" and expands/collapses response body",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3514,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:02.698Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-9a0f1ccfae50f2ba7ebb",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 275,
+              "column": 9
+            },
+            {
+              "title": "VDisk — toggle button says \"Issues\" and expands/collapses issues",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3955,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:06.230Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-1e9fa277566d8aa36b3a",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 305,
+              "column": 9
+            },
+            {
+              "title": "Full-page — whoami 500 blocks entire page with trace headers",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2990,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:10.196Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-e7d7df09edd11d3ec1be",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 336,
+              "column": 9
+            },
+            {
+              "title": "Full-page — whoami 500 collapsed vs expanded details",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2584,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:13.202Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-fd31b1463b97ddc80fa2",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 380,
+              "column": 9
+            },
+            {
+              "title": "Full-page — whoami 503 text body with x-worker-name",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2099,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:15.805Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-6f5622b5ee832b7c0a3d",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 400,
+              "column": 9
+            },
+            {
+              "title": "Full-page — whoami 503 JSON body shows proxy diagnostics from proxyDiagnostics",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2241,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:17.916Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-02738472e403242a57b9",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 426,
+              "column": 9
+            },
+            {
+              "title": "Full-page — whoami proxy headers override proxyDiagnostics body values",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2003,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:20.169Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-2a561783fc4500efd182",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 461,
+              "column": 9
+            },
+            {
+              "title": "Full-page — whoami network error blocks entire page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2846,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:22.184Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-6a6bfa1536b18acac6c4",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 488,
+              "column": 9
+            },
+            {
+              "title": "Full-page — whoami hybrid network error restores 404 and response headers",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2249,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:25.040Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-ac5ae32159cf824bd233",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 517,
+              "column": 9
+            },
+            {
+              "title": "Full-page — whoami recoverable XHR network error restores 504 and worker details",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2441,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:27.300Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-625dcee31744a2337609",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 562,
+              "column": 9
+            },
+            {
+              "title": "Full-page — whoami 502 HTML body with x-proxy-name",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3162,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:29.753Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-520cd9aee851a85716b1",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 603,
+              "column": 9
+            },
+            {
+              "title": "TenantOverview — 400 tenant info shows ResponseError",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 6771,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:32.924Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-8e6bc965ac68f00b57e2",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 640,
+              "column": 9
+            },
+            {
+              "title": "Monitoring — gateway JSON error is readable and expandable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 6382,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:39.707Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-72a622e6a5b88e46eb05",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 661,
+              "column": 9
+            },
+            {
+              "title": "Monitoring — generic JSON error is readable and expandable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 6932,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:46.100Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-0c5143f74ab13d8260ec",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 707,
+              "column": 9
+            },
+            {
+              "title": "Tenant — 403 describe shows AccessDenied",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 16941,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:53.047Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-846d6bfcf43ebbcdf593",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 758,
+              "column": 9
+            },
+            {
+              "title": "Cluster — 401 capabilities shows Unauthenticated",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 13404,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:09.997Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-b50b8f1fdf2eecc73072",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 781,
+              "column": 9
+            },
+            {
+              "title": "Cluster — 401 whoami with NEED_RESET causes page to reload",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2873,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:23.421Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-f5af7168220ad2692845",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 803,
+              "column": 9
+            },
+            {
+              "title": "Query result — 500 with trace headers shows ResponseError with details",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 6197,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:26.305Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-71552a7050fb448f3192",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 838,
+              "column": 9
+            },
+            {
+              "title": "Query result — network error shows ResponseError",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5706,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:32.512Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-e123cf732027125ddf09",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 877,
+              "column": 9
+            },
+            {
+              "title": "Streaming query — 500 with trace headers shows ResponseError with details",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 8440,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:38.227Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-f569949bb1315f3fc358",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 906,
+              "column": 9
+            },
+            {
+              "title": "Streaming query — mid-stream network error preserves headers from initial response",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 8313,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:46.679Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-a25cd0cd198c9d71b4da",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 950,
+              "column": 9
+            },
+            {
+              "title": "Streaming query — pre-connection network error shows URL from enriched error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 8940,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:55.014Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-ef8ae3a123443291ebdf",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 991,
+              "column": 9
+            },
+            {
+              "title": "Streaming query — non-JSON chunk shows parse error with raw text preview",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 8120,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:03.968Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a23ab0052cf775e33c4-21aaba8623df5ef2a605",
+              "file": "errorDisplay/errorDisplay.test.ts",
+              "line": 1024,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "internalViewer/internalViewer.test.ts",
+      "file": "internalViewer/internalViewer.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Test InternalViewer",
+          "file": "internalViewer/internalViewer.test.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Test internalViewer header link",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1817,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:08.725Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bbf5c844619cf507bedd-fd92e2909195446d618f",
+              "file": "internalViewer/internalViewer.test.ts",
+              "line": 4,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "memoryViewer/memoryViewer.test.ts",
+      "file": "memoryViewer/memoryViewer.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Memory Viewer Widget",
+          "file": "memoryViewer/memoryViewer.test.ts",
+          "line": 8,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Memory viewer is visible and has correct status",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5535,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:10.598Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9018696e884d04f1a6b5-96b55b29deac2f3f1c63",
+              "file": "memoryViewer/memoryViewer.test.ts",
+              "line": 26,
+              "column": 9
+            },
+            {
+              "title": "Memory viewer shows correct base metrics",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5487,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:16.151Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9018696e884d04f1a6b5-24b49bcfb14f8ea9248b",
+              "file": "memoryViewer/memoryViewer.test.ts",
+              "line": 34,
+              "column": 9
+            },
+            {
+              "title": "Memory viewer popup shows on hover with all metrics",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6524,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:21.660Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9018696e884d04f1a6b5-eb7c9644afca65ef27a9",
+              "file": "memoryViewer/memoryViewer.test.ts",
+              "line": 49,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "nodes/nodes.test.ts",
+      "file": "nodes/nodes.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Test Nodes page",
+          "file": "nodes/nodes.test.ts",
+          "line": 8,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Nodes page is OK",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1452,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:28.213Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-bf95b0df97e12d005041",
+              "file": "nodes/nodes.test.ts",
+              "line": 9,
+              "column": 9
+            },
+            {
+              "title": "Nodes page has nodes table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4137,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:29.685Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-27276561dc94b142dbcd",
+              "file": "nodes/nodes.test.ts",
+              "line": 15,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Test Nodes Paginated Table",
+          "file": "nodes/nodes.test.ts",
+          "line": 26,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Table loads and displays data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5675,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:33.836Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-4be8d949e2e78b78c323",
+              "file": "nodes/nodes.test.ts",
+              "line": 33,
+              "column": 9
+            },
+            {
+              "title": "Search by hostname filters the table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6246,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:39.522Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-6dba9c00ddb5249131bc",
+              "file": "nodes/nodes.test.ts",
+              "line": 43,
+              "column": 9
+            },
+            {
+              "title": "Table groups displayed correctly if group by option is selected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6293,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:45.780Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-073d9ea87da34243ab4e",
+              "file": "nodes/nodes.test.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "Node count is displayed correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5695,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:52.094Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-cfd303a4348690adba49",
+              "file": "nodes/nodes.test.ts",
+              "line": 70,
+              "column": 9
+            },
+            {
+              "title": "Uptime values are displayed in correct format",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3616,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:19:57.814Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-29db22f9bbc969b0a101",
+              "file": "nodes/nodes.test.ts",
+              "line": 82,
+              "column": 9
+            },
+            {
+              "title": "Refresh button updates the table data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6473,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:01.439Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-ffa22a725090e9f87aa1",
+              "file": "nodes/nodes.test.ts",
+              "line": 101,
+              "column": 9
+            },
+            {
+              "title": "Row data can be retrieved correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4370,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:07.921Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-f6e2c8d7a9ef5547b627",
+              "file": "nodes/nodes.test.ts",
+              "line": 116,
+              "column": 9
+            },
+            {
+              "title": "Column values can be retrieved correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3350,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:12.300Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-347999c1d980fbe9847c",
+              "file": "nodes/nodes.test.ts",
+              "line": 132,
+              "column": 9
+            },
+            {
+              "title": "Table displays empty data message when no entities",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4324,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:15.659Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-873269e69e591edb1252",
+              "file": "nodes/nodes.test.ts",
+              "line": 146,
+              "column": 9
+            },
+            {
+              "title": "Autorefresh updates data when initially empty data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 20485,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:19.993Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-2e624e4b7cf5bf517423",
+              "file": "nodes/nodes.test.ts",
+              "line": 160,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Test Node Page Threads Tab",
+          "file": "nodes/nodes.test.ts",
+          "line": 191,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Threads tab is hidden when node has no thread data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5226,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:40.490Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-1a9a479fac642a09455f",
+              "file": "nodes/nodes.test.ts",
+              "line": 192,
+              "column": 9
+            },
+            {
+              "title": "Threads tab is visible when node has thread data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4734,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:45.727Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-bd7f2564978016f55493",
+              "file": "nodes/nodes.test.ts",
+              "line": 223,
+              "column": 9
+            },
+            {
+              "title": "Threads tab is hidden when node has empty thread array",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4545,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:50.474Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fefa58c6d5e81985f950-6ad5a3298ee9800d89b7",
+              "file": "nodes/nodes.test.ts",
+              "line": 267,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "paginatedTable/paginatedTable.test.ts",
+      "file": "paginatedTable/paginatedTable.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "PaginatedTable",
+          "file": "paginatedTable/paginatedTable.test.ts",
+          "line": 13,
+          "column": 6,
+          "specs": [
+            {
+              "title": "loads data in chunks when scrolling",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8886,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:20:55.038Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6b61d0231fa13785694-20e20263369fd12f1d1e",
+              "file": "paginatedTable/paginatedTable.test.ts",
+              "line": 14,
+              "column": 9
+            },
+            {
+              "title": "loads data when scrolling to middle of table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9261,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:03.935Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6b61d0231fa13785694-df51f2dbf40217fc22c1",
+              "file": "paginatedTable/paginatedTable.test.ts",
+              "line": 55,
+              "column": 9
+            },
+            {
+              "title": "displays empty state when no data is present",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4893,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:13.211Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6b61d0231fa13785694-69b06e68e1fe13684ad9",
+              "file": "paginatedTable/paginatedTable.test.ts",
+              "line": 84,
+              "column": 9
+            },
+            {
+              "title": "handles 10 pages of data correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9281,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:18.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6b61d0231fa13785694-4ad6529c7d937cc96605",
+              "file": "paginatedTable/paginatedTable.test.ts",
+              "line": 101,
+              "column": 9
+            },
+            {
+              "title": "handles 100 pages of data correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9153,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:27.414Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6b61d0231fa13785694-d48954da93c384289291",
+              "file": "paginatedTable/paginatedTable.test.ts",
+              "line": 126,
+              "column": 9
+            },
+            {
+              "title": "displays inline error when a chunk fails to load",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9598,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:36.578Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6b61d0231fa13785694-882329b5ceb6e40148bc",
+              "file": "paginatedTable/paginatedTable.test.ts",
+              "line": 151,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "routing/legacyRedirects.test.ts",
+      "file": "routing/legacyRedirects.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Legacy redirects",
+          "file": "routing/legacyRedirects.test.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "redirects cluster tenants URL to databases tab",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1802,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:12.109Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f9c0de1b5e9b0eeb8fde-eddad3228b510bb3dfc2",
+              "file": "routing/legacyRedirects.test.ts",
+              "line": 4,
+              "column": 9
+            },
+            {
+              "title": "redirects tenant URL to database page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2327,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:13.927Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f9c0de1b5e9b0eeb8fde-4ed053e50d5572d2d52f",
+              "file": "routing/legacyRedirects.test.ts",
+              "line": 14,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "sidebar/sidebar.test.ts",
+      "file": "sidebar/sidebar.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Test Sidebar",
+          "file": "sidebar/sidebar.test.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Sidebar is visible and loads correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1871,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:16.285Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d82d43fd4f9e4849f9c-a0992cf6b94e55d41a2b",
+              "file": "sidebar/sidebar.test.ts",
+              "line": 17,
+              "column": 9
+            },
+            {
+              "title": "Logo button is visible and clickable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2515,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:18.180Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d82d43fd4f9e4849f9c-4354e7acccbfda64c2ad",
+              "file": "sidebar/sidebar.test.ts",
+              "line": 23,
+              "column": 9
+            },
+            {
+              "title": "Settings button is visible and clickable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2873,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:20.723Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d82d43fd4f9e4849f9c-4c06aa715fab42eb1fdb",
+              "file": "sidebar/sidebar.test.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "Settings button click opens drawer with correct sections",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3589,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:23.636Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d82d43fd4f9e4849f9c-11ef89a3d13dc9519ffe",
+              "file": "sidebar/sidebar.test.ts",
+              "line": 37,
+              "column": 9
+            },
+            {
+              "title": "Information button is visible and clickable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 4822,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:27.251Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d82d43fd4f9e4849f9c-f38b8cc652715be7b307",
+              "file": "sidebar/sidebar.test.ts",
+              "line": 56,
+              "column": 9
+            },
+            {
+              "title": "Information popup contains documentation and keyboard shortcuts",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 4522,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:32.083Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d82d43fd4f9e4849f9c-9e4f5db96fe2db9713b6",
+              "file": "sidebar/sidebar.test.ts",
+              "line": 63,
+              "column": 9
+            },
+            {
+              "title": "Clicking hotkeys button in information popup opens hotkeys panel with title",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 6409,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:36.619Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d82d43fd4f9e4849f9c-e8bcc6a01d4940e6c5dd",
+              "file": "sidebar/sidebar.test.ts",
+              "line": 82,
+              "column": 9
+            },
+            {
+              "title": "Account button is visible and clickable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2203,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:43.044Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d82d43fd4f9e4849f9c-68670511a06da64f5d1b",
+              "file": "sidebar/sidebar.test.ts",
+              "line": 106,
+              "column": 9
+            },
+            {
+              "title": "Pressing Ctrl+K in editor page opens hotkeys panel",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 6042,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:45.262Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d82d43fd4f9e4849f9c-baf692bd8222d5f920e5",
+              "file": "sidebar/sidebar.test.ts",
+              "line": 113,
+              "column": 9
+            },
+            {
+              "title": "Sidebar can be collapsed and expanded",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5047,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:51.320Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d82d43fd4f9e4849f9c-071c1957a426effe35ee",
+              "file": "sidebar/sidebar.test.ts",
+              "line": 140,
+              "column": 9
+            },
+            {
+              "title": "Footer items are visible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1814,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:56.388Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d82d43fd4f9e4849f9c-1cad3917159e58888507",
+              "file": "sidebar/sidebar.test.ts",
+              "line": 158,
+              "column": 9
+            },
+            {
+              "title": "Can toggle experiments in settings",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 9600,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:58.215Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d82d43fd4f9e4849f9c-6806dffe69b0e0acc0a6",
+              "file": "sidebar/sidebar.test.ts",
+              "line": 166,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "storage/storage.test.ts",
+      "file": "storage/storage.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Test Storage page",
+          "file": "storage/storage.test.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Storage page is OK",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1928,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:46.195Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d969e94bd7792d423276-6ab7b4abce16c448532b",
+              "file": "storage/storage.test.ts",
+              "line": 8,
+              "column": 9
+            },
+            {
+              "title": "Storage page has groups table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4249,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:48.143Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d969e94bd7792d423276-20ff1fb3669b6da39922",
+              "file": "storage/storage.test.ts",
+              "line": 14,
+              "column": 9
+            },
+            {
+              "title": "Storage page has nodes table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4865,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:52.405Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d969e94bd7792d423276-3c2cd1079c68e4b3d9c9",
+              "file": "storage/storage.test.ts",
+              "line": 23,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Test Storage Paginated Table",
+          "file": "storage/storage.test.ts",
+          "line": 33,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Table loads and displays data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6174,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:21:57.282Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d969e94bd7792d423276-1a5e4639c7a714d4cef1",
+              "file": "storage/storage.test.ts",
+              "line": 48,
+              "column": 9
+            },
+            {
+              "title": "Search by pool name filters the table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6784,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:22:03.469Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d969e94bd7792d423276-71705db781cd6bb89c8d",
+              "file": "storage/storage.test.ts",
+              "line": 58,
+              "column": 9
+            },
+            {
+              "title": "Radio button selection changes displayed data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4774,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:22:10.266Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d969e94bd7792d423276-457202a46d75040204b7",
+              "file": "storage/storage.test.ts",
+              "line": 73,
+              "column": 9
+            },
+            {
+              "title": "Groups count is displayed correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3702,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:22:15.053Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d969e94bd7792d423276-7ed6bb4846ab39edbbcd",
+              "file": "storage/storage.test.ts",
+              "line": 88,
+              "column": 9
+            },
+            {
+              "title": "Row data can be retrieved correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4104,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:22:18.762Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d969e94bd7792d423276-24292046b6279fe473db",
+              "file": "storage/storage.test.ts",
+              "line": 100,
+              "column": 9
+            },
+            {
+              "title": "Column values can be retrieved correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3812,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:22:22.875Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d969e94bd7792d423276-460a2c4e1eab69b99b05",
+              "file": "storage/storage.test.ts",
+              "line": 115,
+              "column": 9
+            },
+            {
+              "title": "Clicking on Group ID header sorts the table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7932,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-08T06:22:26.697Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d969e94bd7792d423276-4c2937a37492103f2c9e",
+              "file": "storage/storage.test.ts",
+              "line": 129,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-06-08T06:17:43.822Z",
+    "duration": 290931.81396484375,
+    "expected": 88,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
