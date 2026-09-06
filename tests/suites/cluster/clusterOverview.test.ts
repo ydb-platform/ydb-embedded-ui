@@ -342,10 +342,7 @@ test.describe('Cluster Overview', () => {
                 ),
             ).toEqual([10]);
 
-            await ssdProgress
-                .locator('.ydb-disk-groups-stats__progress-segment-trigger')
-                .first()
-                .hover();
+            await ssdProgress.locator('.ydb-disk-groups-stats__progress-segment').first().hover();
             await expect(
                 page.getByText('600 groups available if only mirror-3-dc is used', {exact: true}),
             ).toBeVisible();
@@ -445,7 +442,7 @@ test.describe('Cluster Overview', () => {
             expect(popoverBounds.y + popoverBounds.height).toBeLessThanOrEqual(helpMarkBounds.y);
 
             const firstSegment = storageSection
-                .locator('.ydb-disk-groups-stats__progress-segment-trigger')
+                .locator('.ydb-disk-groups-stats__progress-segment')
                 .first();
             await firstSegment.hover();
             await expect(
@@ -454,7 +451,7 @@ test.describe('Cluster Overview', () => {
             await page.mouse.move(0, 0);
 
             const noneSegment = storageSection
-                .locator('.ydb-disk-groups-stats__progress-segment-trigger')
+                .locator('.ydb-disk-groups-stats__progress-segment')
                 .nth(2);
             await noneSegment.hover();
             await expect(

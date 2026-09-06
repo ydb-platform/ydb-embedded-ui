@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Flex, Text} from '@gravity-ui/uikit';
+import {Flex, Text, Tooltip} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 
@@ -46,7 +46,8 @@ export interface SegmentedProgressSegment {
     minWidth?: number;
     color?: string;
     className?: string;
-    content?: React.ReactNode;
+    tooltip?: string;
+    ariaLabelledBy?: string;
 }
 
 interface SegmentedProgressBySegmentsProps extends SegmentedProgressBaseProps {
@@ -140,7 +141,6 @@ export function SegmentedProgress(props: SegmentedProgressProps) {
     } = props;
 
     const percentUsed = getPercentUsed(props);
-    const safePercentUsed = clampPercent(percentUsed);
     const normalizedUsed = React.useMemo(
         () => clampPercent(normalizePercent(percentUsed)),
         [normalizePercent, percentUsed],
@@ -152,51 +152,74 @@ export function SegmentedProgress(props: SegmentedProgressProps) {
               width: props.total > 0 ? clampPercent((segment.value / props.total) * 100) : 0,
           }))
         : undefined;
-    const hasSegmentContent = segmentSections?.some(
-        ({content}) => content !== undefined && content !== null,
-    );
-    const progressAriaProps = {
-        role: 'progressbar' as const,
-        'aria-label': ariaLabel,
-        'aria-valuemin': 0,
-        'aria-valuemax': 100,
-        'aria-valuenow': normalizedUsed,
+    const hasSegmentTooltips = segmentSections?.some(({tooltip}) => Boolean(tooltip));
+    const hasEmptySection = (segmentSections ? percentUsed : fillWidth) < 100;
+
+    const renderSections = () => {
+        if (segmentSections) {
+            return segmentSections
+                .filter((segment) => segment.width > 0 || (segment.minWidth ?? 0) > 0)
+                .map((segment) => {
+                    const section = (
+                        <div
+                            key={segment.id}
+                            aria-label={segment.tooltip}
+                            aria-labelledby={segment.ariaLabelledBy}
+                            className={b('section', {used: true}, segment.className)}
+                            role={segment.tooltip ? 'img' : undefined}
+                            style={{
+                                width: `${segment.width}%`,
+                                minWidth: segment.minWidth,
+                                backgroundColor: segment.color,
+                            }}
+                            tabIndex={segment.tooltip ? 0 : undefined}
+                        />
+                    );
+
+                    if (!segment.tooltip) {
+                        return section;
+                    }
+
+                    return (
+                        <Tooltip key={segment.id} content={segment.tooltip}>
+                            {section}
+                        </Tooltip>
+                    );
+                });
+        }
+
+        if (fillWidth > 0) {
+            return <div className={b('section', {used: true})} style={{width: `${fillWidth}%`}} />;
+        }
+
+        return null;
+    };
+
+    const renderProgress = () => {
+        const progressAriaProps = {
+            role: 'progressbar' as const,
+            'aria-label': ariaLabel,
+            'aria-valuemin': 0,
+            'aria-valuemax': 100,
+            'aria-valuenow': normalizedUsed,
+        };
+        // Keep focusable segment content outside the progressbar's presentational subtree.
+        return (
+            <div
+                className={b({theme, 'with-tooltips': hasSegmentTooltips}, className)}
+                data-qa={dataQa}
+                {...(hasSegmentTooltips ? undefined : progressAriaProps)}
+            >
+                {hasSegmentTooltips && <div className={b('status')} {...progressAriaProps} />}
+                {renderSections()}
+                {hasEmptySection && <div className={b('section')} style={{flexGrow: 1}} />}
+            </div>
+        );
     };
 
     return (
         <Flex direction="column" gap={1}>
-            <div
-                className={b({theme, 'with-content': hasSegmentContent}, className)}
-                data-qa={dataQa}
-                {...(hasSegmentContent ? undefined : progressAriaProps)}
-            >
-                {hasSegmentContent && <div className={b('status')} {...progressAriaProps} />}
-                {segmentSections
-                    ? segmentSections.map((segment) => {
-                          return segment.width > 0 || (segment.minWidth ?? 0) > 0 ? (
-                              <div
-                                  key={segment.id}
-                                  className={b('section', {used: true}, segment.className)}
-                                  style={{
-                                      width: `${segment.width}%`,
-                                      minWidth: segment.minWidth,
-                                      backgroundColor: segment.color,
-                                  }}
-                              >
-                                  {segment.content}
-                              </div>
-                          ) : null;
-                      })
-                    : fillWidth > 0 && (
-                          <div
-                              className={b('section', {used: true})}
-                              style={{width: `${fillWidth}%`}}
-                          />
-                      )}
-                {100 - (segmentSections ? safePercentUsed : fillWidth) > 0 && (
-                    <div className={b('section')} style={{flexGrow: 1}} />
-                )}
-            </div>
+            {renderProgress()}
             {!hideLabels && (
                 <Flex width="100%">
                     {labelStart && <Text color="secondary">{labelStart}</Text>}

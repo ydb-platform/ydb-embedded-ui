@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Card, Flex, HelpMark, Label, Text, Tooltip} from '@gravity-ui/uikit';
+import {Card, Flex, HelpMark, Label, Text} from '@gravity-ui/uikit';
 
 import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
 import type {ClusterGroupsStats} from '../../../../../store/reducers/cluster/types';
@@ -53,6 +53,7 @@ function getErasureTooltip(stats: PreparedErasureGroupsStats) {
 }
 
 function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
+    const legendId = React.useId();
     const {allocatedGroups, availableGroups, diskType, erasures, progressTotalGroups} = stats;
     const progressValue = progressTotalGroups > 0 ? allocatedGroups / progressTotalGroups : 0;
     const progressPercent = progressValue * 100;
@@ -62,25 +63,16 @@ function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
     });
     const availableGroupsContext = i18n('context_available-groups');
 
-    const segments = erasures
-        .filter(({createdGroups}) => createdGroups > 0)
-        .map((erasureStats) => ({
-            id: erasureStats.erasure,
-            value: erasureStats.createdGroups,
-            minWidth: 10,
-            color: getErasureColor(erasureStats.erasure),
-            className: b('progress-segment'),
-            content: (
-                <Tooltip content={getErasureTooltip(erasureStats)}>
-                    <div
-                        aria-label={getErasureTooltip(erasureStats)}
-                        className={b('progress-segment-trigger')}
-                        role="img"
-                        tabIndex={0}
-                    />
-                </Tooltip>
-            ),
-        }));
+    const visibleErasures = erasures.filter(({createdGroups}) => createdGroups > 0);
+    const segments = visibleErasures.map((erasureStats, index) => ({
+        id: erasureStats.erasure,
+        value: erasureStats.createdGroups,
+        minWidth: 10,
+        color: getErasureColor(erasureStats.erasure),
+        className: b('progress-segment'),
+        tooltip: getErasureTooltip(erasureStats),
+        ariaLabelledBy: `${legendId}-${index}`,
+    }));
 
     return (
         <Card view="filled" className={b('card')}>
@@ -120,8 +112,13 @@ function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
                 </Flex>
                 <Flex justifyContent="space-between" alignItems="center" gap={2} wrap="wrap">
                     <Flex alignItems="center" gap={4} wrap="wrap">
-                        {erasures.map((erasureStats) => (
-                            <Flex key={erasureStats.erasure} alignItems="center" gap={2}>
+                        {visibleErasures.map((erasureStats, index) => (
+                            <Flex
+                                key={erasureStats.erasure}
+                                id={`${legendId}-${index}`}
+                                alignItems="center"
+                                gap={2}
+                            >
                                 <span
                                     aria-hidden="true"
                                     className={b('legend-dot')}
