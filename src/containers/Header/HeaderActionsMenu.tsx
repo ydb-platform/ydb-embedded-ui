@@ -95,6 +95,7 @@ export function DBHeaderActionsMenu({
                     disabled: true,
                     extraProps: {
                         'aria-busy': true,
+                        'aria-disabled': true,
                         'aria-label': headerKeyset('status_loading-shared-db'),
                     },
                 },
