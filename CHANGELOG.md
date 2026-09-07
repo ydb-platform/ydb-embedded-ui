@@ -1,5 +1,16 @@
 # Changelog
 
+## [21.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.5.0...v21.0.0) (2026-09-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* **graph:** use new library with web workers ([#4253](https://github.com/ydb-platform/ydb-embedded-ui/issues/4253))
+
+### Features
+
+* **graph:** use new library with web workers ([#4253](https://github.com/ydb-platform/ydb-embedded-ui/issues/4253)) ([c88d663](https://github.com/ydb-platform/ydb-embedded-ui/commit/c88d6632674afb41eec2ff0018b862dc75e7238a))
+
 ## [20.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.4.0...v20.5.0) (2026-09-03)
 
 
