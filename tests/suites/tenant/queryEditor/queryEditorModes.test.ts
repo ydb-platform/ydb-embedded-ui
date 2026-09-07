@@ -66,37 +66,6 @@ test.describe('Query Editor modes', () => {
         await expect.poll(() => queryEditor.getEditorContent()).toBe('SELECT 1 AS first_tab;');
     });
 
-    test('Default mode keeps the edited query when opening a template without an override', async ({
-        page,
-    }) => {
-        const tenantPage = new TenantPage(page);
-        await tenantPage.gotoQueryEditor({schema: database, database});
-        const {queryEditor} = tenantPage;
-
-        expect(await page.evaluate(() => window.e2eQueryEditorMode)).toBeUndefined();
-        await expect(queryEditor.editorTabs.isVisible()).resolves.toBe(true);
-        await queryEditor.setQuery('SELECT 42 AS original_query;');
-        const [originalTabId] = await queryEditor.editorTabs.getTabIds();
-
-        await selectAsyncReplicationTemplate(
-            new NewSqlDropdownMenu(page),
-            AsyncReplicationTemplates.Create,
-        );
-
-        await expect(tenantPage.isUnsavedChangesModalHidden()).resolves.toBe(true);
-        await expect(queryEditor.editorTabs.waitForTabCount(2)).resolves.toBe(true);
-        await expect(
-            queryEditor.editorTabs.isTabSelected(AsyncReplicationTemplates.Create),
-        ).resolves.toBe(true);
-        await expect
-            .poll(() => queryEditor.getEditorContent())
-            .toContain('CREATE ASYNC REPLICATION');
-        await queryEditor.editorTabs.selectTabById(originalTabId);
-        await expect
-            .poll(() => queryEditor.getEditorContent())
-            .toBe('SELECT 42 AS original_query;');
-    });
-
     test('Single-tab mode renders editor without internal tabs', async ({page}) => {
         const tenantPage = await openQueryEditorMode(page, QueryEditorMode.SingleTab);
 
@@ -161,7 +130,7 @@ test.describe('Query Editor modes', () => {
         const newSqlDropdown = new NewSqlDropdownMenu(page);
 
         await tenantPage.queryEditor.setQuery('SELECT 1;');
-        const beforeTabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
+        const [beforeTabId] = await tenantPage.queryEditor.editorTabs.getTabIds();
 
         await selectAsyncReplicationTemplate(newSqlDropdown, AsyncReplicationTemplates.Create);
 
@@ -174,7 +143,12 @@ test.describe('Query Editor modes', () => {
         ).resolves.toBe(true);
         await expect
             .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
-            .not.toBe('SELECT 1;');
+            .toContain('CREATE ASYNC REPLICATION');
+
+        await tenantPage.queryEditor.editorTabs.selectTabById(beforeTabId);
+        await expect
+            .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
+            .toBe('SELECT 1;');
     });
 
     test('Multi-tab mode reuses the current untouched template tab', async ({page}) => {

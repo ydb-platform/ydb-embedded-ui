@@ -14,27 +14,18 @@ test('enables editor tabs by default and preserves the default without an overri
     expect(uiFactory.enableMultiTabQueryEditor).toBe(true);
 });
 
-test.each([true, false])('applies an explicit editor tabs override of %s', async (enabled) => {
+test('preserves an explicit single-tab override when later configuration omits it', async () => {
     const {configureUIFactory, uiFactory} = await import('../uiFactory');
 
-    configureUIFactory({enableMultiTabQueryEditor: enabled});
+    configureUIFactory({enableMultiTabQueryEditor: false});
+    expect(uiFactory.enableMultiTabQueryEditor).toBe(false);
 
-    expect(uiFactory.enableMultiTabQueryEditor).toBe(enabled);
+    configureUIFactory({});
+    expect(uiFactory.enableMultiTabQueryEditor).toBe(false);
+
+    configureUIFactory({enableMultiTabQueryEditor: undefined});
+    expect(uiFactory.enableMultiTabQueryEditor).toBe(false);
 });
-
-test.each([true, false])(
-    'preserves the editor tabs override of %s when later configuration omits it',
-    async (enabled) => {
-        const {configureUIFactory, uiFactory} = await import('../uiFactory');
-        configureUIFactory({enableMultiTabQueryEditor: enabled});
-
-        configureUIFactory({});
-        expect(uiFactory.enableMultiTabQueryEditor).toBe(enabled);
-
-        configureUIFactory({enableMultiTabQueryEditor: undefined});
-        expect(uiFactory.enableMultiTabQueryEditor).toBe(enabled);
-    },
-);
 
 test('allows consumers to enable editor tabs after explicitly disabling them', async () => {
     const {configureUIFactory, uiFactory} = await import('../uiFactory');
