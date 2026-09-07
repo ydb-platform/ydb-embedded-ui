@@ -98,9 +98,11 @@ test.describe('Drawer visual snapshots', () => {
 
         await expect(sidebar.getInformationPopup()).toBeVisible();
         await sidebar.clickHotkeysButton();
+        await page.mouse.move(0, 0);
 
         const hotkeysPanel = sidebar.getHotkeysPanelRoot();
         await expect(hotkeysPanel).toBeVisible();
+        await expect(hotkeysPanel.getByText('Editor Tabs', {exact: true})).toBeVisible();
         await expect(hotkeysPanel).toHaveScreenshot('drawer-hotkeys-from-information.png');
     });
 
@@ -129,6 +131,7 @@ test.describe('Drawer visual snapshots', () => {
         const hotkeysPanel = sidebar.getHotkeysPanelRoot();
 
         await sidebar.openHotkeysPanelWithShortcut();
+        await expect(hotkeysPanel.getByText('Editor Tabs', {exact: true})).toBeVisible();
         await expect(hotkeysPanel).toHaveScreenshot('drawer-hotkeys-from-shortcut.png');
     });
 
