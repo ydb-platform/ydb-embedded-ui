@@ -3,6 +3,7 @@ import React from 'react';
 import {Magnifier} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import {Icon, Select, Text} from '@gravity-ui/uikit';
+import {useHistory} from 'react-router-dom';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
@@ -19,9 +20,14 @@ import {
     selectStatusFilter,
     selectVersionFilter,
 } from '../../store/reducers/clusters/selectors';
+import type {PreparedCluster} from '../../store/reducers/clusters/types';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {
+    KEYBOARD_FOCUS_ACTIVE_CLASS_NAME,
+    useListKeyboardNavigation,
+} from '../../utils/hooks/useListKeyboardNavigation';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
 
@@ -35,6 +41,7 @@ import {
 } from './constants';
 import i18n from './i18n';
 import {b} from './shared';
+import {calculateClusterPath} from './utils';
 
 import './Clusters.scss';
 
@@ -43,6 +50,8 @@ interface ClustersProps {
 }
 
 export function Clusters({scrollContainerRef}: ClustersProps) {
+    const history = useHistory();
+    const tableContainerRef = React.useRef<HTMLDivElement>(null);
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const query = clustersApi.useGetClustersListQuery(undefined, {
         pollingInterval: autoRefreshInterval,
@@ -87,7 +96,19 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const handleDrawerClose = React.useCallback(() => {
         setHealthcheckClusterName(undefined);
     }, []);
+    const openCluster = React.useCallback(
+        (row: PreparedCluster) => {
+            const clusterPath = calculateClusterPath(row);
 
+            if (/^https?:\/\//.test(clusterPath)) {
+                window.location.assign(clusterPath);
+                return;
+            }
+
+            history.push(clusterPath);
+        },
+        [history],
+    );
     const rawColumns = React.useMemo(() => {
         return getClustersColumns({
             isEditClusterAvailable,
@@ -182,6 +203,25 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const filteredClusters = React.useMemo(() => {
         return filterClusters(clusters ?? [], {clusterName, status, service, version, galaxy});
     }, [clusterName, clusters, service, status, version, galaxy]);
+
+    const {
+        handleKeyDownCapture,
+        handleListMouseLeaveCapture,
+        handleListMouseMoveCapture,
+        getFocusedRowClassName,
+        isKeyboardFocusActive,
+    } = useListKeyboardNavigation({
+        items: filteredClusters,
+        onActivate: openCluster,
+        resetDeps: [
+            clusterName,
+            status.join('|'),
+            service.join('|'),
+            version.join('|'),
+            galaxy.join('|'),
+        ],
+        listContainerRef: tableContainerRef,
+    });
 
     const statuses = React.useMemo(() => {
         return Array.from(
@@ -283,18 +323,25 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
 
     const renderContent = () => {
         return (
-            <ResizeableDataTable
-                isLoading={query.isLoading}
-                columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
-                wrapperClassName={b('table')}
-                data={filteredClusters}
-                columns={filteredColumnsToShow}
-                settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
-                initialSortOrder={{
-                    columnId: COLUMNS_NAMES.TITLE,
-                    order: DataTable.ASCENDING,
-                }}
-            />
+            <div ref={tableContainerRef}>
+                <ResizeableDataTable
+                    isLoading={query.isLoading}
+                    columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
+                    wrapperClassName={
+                        isKeyboardFocusActive
+                            ? `${b('table')} ${KEYBOARD_FOCUS_ACTIVE_CLASS_NAME}`
+                            : b('table')
+                    }
+                    data={filteredClusters}
+                    columns={filteredColumnsToShow}
+                    rowClassName={(_row, index) => getFocusedRowClassName(index)}
+                    settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
+                    initialSortOrder={{
+                        columnId: COLUMNS_NAMES.TITLE,
+                        order: DataTable.ASCENDING,
+                    }}
+                />
+            </div>
         );
     };
 
@@ -304,22 +351,29 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
             isVisible={Boolean(healthcheckClusterName)}
             onClose={handleDrawerClose}
         >
-            <TableWithControlsLayout fullHeight className={b(null)}>
-                <TableWithControlsLayout.Controls
-                    className={b('controls')}
-                    renderExtraControls={renderColumnSetup}
-                >
-                    {renderControls()}
-                </TableWithControlsLayout.Controls>
-                {query.isError ? <ResponseError error={query.error} /> : null}
-                {renderClustersCount()}
-                <TableWithControlsLayout.Table
-                    scrollContainerRef={scrollContainerRef}
-                    className={b('table-wrapper')}
-                >
-                    {renderContent()}
-                </TableWithControlsLayout.Table>
-            </TableWithControlsLayout>
+            <div onKeyDownCapture={handleKeyDownCapture}>
+                <TableWithControlsLayout fullHeight className={b(null)}>
+                    <TableWithControlsLayout.Controls
+                        className={b('controls')}
+                        renderExtraControls={renderColumnSetup}
+                    >
+                        {renderControls()}
+                    </TableWithControlsLayout.Controls>
+                    {query.isError ? <ResponseError error={query.error} /> : null}
+                    {renderClustersCount()}
+                    <TableWithControlsLayout.Table
+                        scrollContainerRef={scrollContainerRef}
+                        className={b('table-wrapper')}
+                    >
+                        <div
+                            onMouseMoveCapture={handleListMouseMoveCapture}
+                            onMouseLeave={handleListMouseLeaveCapture}
+                        >
+                            {renderContent()}
+                        </div>
+                    </TableWithControlsLayout.Table>
+                </TableWithControlsLayout>
+            </div>
         </ClusterDrawerHealthcheck>
     );
 }

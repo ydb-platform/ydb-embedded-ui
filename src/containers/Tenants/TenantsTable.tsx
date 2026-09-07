@@ -5,6 +5,7 @@ import type {Column, SortOrder} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import type {LabelProps} from '@gravity-ui/uikit';
 import {Button, Flex, Icon, Label} from '@gravity-ui/uikit';
+import {useHistory} from 'react-router-dom';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {ResponseError} from '../../components/Errors/ResponseError';
@@ -15,6 +16,8 @@ import {Search} from '../../components/Search';
 import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
+import {getTenantBackend} from '../../components/TenantNameWrapper/utils';
+import {getTenantPath} from '../../routes';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {
@@ -40,6 +43,10 @@ import {
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval} from '../../utils/hooks';
+import {
+    KEYBOARD_FOCUS_ACTIVE_CLASS_NAME,
+    useListKeyboardNavigation,
+} from '../../utils/hooks/useListKeyboardNavigation';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
 import {isNumeric} from '../../utils/utils';
@@ -131,6 +138,8 @@ const TenantsTableContent = ({
     onStatusClick,
 }: TenantsTableContentProps) => {
     const SuccessImage = getIllustration('SuccessOperation');
+    const history = useHistory();
+    const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
@@ -144,7 +153,7 @@ const TenantsTableContent = ({
 
     const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
 
-    const {domain: domainRoot} = useClusterBaseInfo();
+    const {domain: domainRoot, settings} = useClusterBaseInfo();
 
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
@@ -168,6 +177,43 @@ const TenantsTableContent = ({
 
         return filteredBySearch;
     }, [tenants, withProblems, search]);
+
+    const openTenant = React.useCallback(
+        (tenant: PreparedTenant) => {
+            const backend = getTenantBackend(tenant, additionalTenantsProps);
+            const isExternalLink = Boolean(environmentName) || Boolean(backend);
+            const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
+            const tenantPath = getTenantPath(
+                {
+                    clusterName: tenant.Cluster,
+                    database: useDatabaseId ? tenant.Id : tenant.Name,
+                    backend,
+                },
+                {withBasename: isExternalLink},
+            );
+
+            if (isExternalLink) {
+                window.location.assign(tenantPath);
+                return;
+            }
+
+            history.push(tenantPath);
+        },
+        [additionalTenantsProps, environmentName, history, settings?.use_meta_proxy],
+    );
+
+    const {
+        handleKeyDownCapture,
+        handleListMouseLeaveCapture,
+        handleListMouseMoveCapture,
+        getFocusedRowClassName,
+        isKeyboardFocusActive,
+    } = useListKeyboardNavigation({
+        items: filteredTenants,
+        onActivate: openTenant,
+        resetDeps: [search, showWithProblemsFilter ? String(withProblems) : ''],
+        listContainerRef: tableContainerRef,
+    });
 
     const renderCreateDBButton = () => {
         const buttonAvailable = isCreateDBAvailable && clusterName;
@@ -378,14 +424,20 @@ const TenantsTableContent = ({
         }
 
         return (
-            <ResizeableDataTable
-                columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
-                data={filteredTenants}
-                columns={columnsToShow}
-                settings={DEFAULT_TABLE_SETTINGS}
-                emptyDataMessage={i18n('no-databases')}
-                onSortChange={setSortParams}
-            />
+            <div ref={tableContainerRef}>
+                <ResizeableDataTable
+                    columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
+                    data={filteredTenants}
+                    columns={columnsToShow}
+                    wrapperClassName={
+                        isKeyboardFocusActive ? KEYBOARD_FOCUS_ACTIVE_CLASS_NAME : undefined
+                    }
+                    settings={DEFAULT_TABLE_SETTINGS}
+                    emptyDataMessage={i18n('no-databases')}
+                    onSortChange={setSortParams}
+                    rowClassName={(_row, index) => getFocusedRowClassName(index)}
+                />
+            </div>
         );
     };
 
@@ -410,7 +462,7 @@ const TenantsTableContent = ({
     };
 
     return (
-        <div className={b('table-wrapper')}>
+        <div className={b('table-wrapper')} onKeyDownCapture={handleKeyDownCapture}>
             <TableWithControlsLayout fullHeight>
                 <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
                     {renderControls()}
@@ -421,7 +473,12 @@ const TenantsTableContent = ({
                     loading={loading}
                     scrollDependencies={[search, withProblems, sortParams]}
                 >
-                    {currentData ? renderTable() : null}
+                    <div
+                        onMouseMoveCapture={handleListMouseMoveCapture}
+                        onMouseLeave={handleListMouseLeaveCapture}
+                    >
+                        {currentData ? renderTable() : null}
+                    </div>
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
         </div>
