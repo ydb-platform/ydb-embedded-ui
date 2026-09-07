@@ -14,6 +14,14 @@ const b = cn('kv-navigation');
 
 export const SHORTCUTS_HOTKEY = isMacOS() ? 'cmd+K' : 'ctrl+K';
 
+export const LIST_NAVIGATION_HOTKEY_GROUP: HotkeysGroup = {
+    title: i18n('hotkeys.list-navigation-group-title'),
+    items: [
+        {title: i18n('hotkeys.move-between-rows'), value: 'up / down'},
+        {title: i18n('hotkeys.open-selected-row'), value: 'enter'},
+    ],
+};
+
 export const DEFAULT_HOTKEY_GROUPS: HotkeysGroup[] = [
     {
         title: i18n('hotkeys.query-editor-group-title'),
@@ -36,6 +44,7 @@ export const DEFAULT_HOTKEY_GROUPS: HotkeysGroup[] = [
             },
         ],
     },
+    LIST_NAVIGATION_HOTKEY_GROUP,
 ];
 
 export const EDITOR_TABS_HOTKEY_GROUP: HotkeysGroup = {
