@@ -31,6 +31,72 @@ async function selectAsyncReplicationTemplate(
 }
 
 test.describe('Query Editor modes', () => {
+    test('Default mode preserves separate editor tabs after reload without an override', async ({
+        page,
+    }) => {
+        const tenantPage = new TenantPage(page);
+        await tenantPage.gotoQueryEditor({schema: database, database});
+        const {queryEditor} = tenantPage;
+        const {editorTabs} = queryEditor;
+
+        expect(await page.evaluate(() => window.e2eQueryEditorMode)).toBeUndefined();
+        await expect(editorTabs.isVisible()).resolves.toBe(true);
+        await expect(editorTabs.getTabCount()).resolves.toBe(1);
+
+        await queryEditor.setQuery('SELECT 1 AS first_tab;');
+        await editorTabs.clickAddTab();
+        await expect(editorTabs.waitForTabCount(2)).resolves.toBe(true);
+        await queryEditor.setQuery('SELECT 2 AS second_tab;');
+        const tabIds = await editorTabs.getTabIds();
+
+        await editorTabs.selectTabById(tabIds[0]);
+        await expect.poll(() => queryEditor.getEditorContent()).toBe('SELECT 1 AS first_tab;');
+        await editorTabs.selectTabById(tabIds[1]);
+        await expect.poll(() => queryEditor.getEditorContent()).toBe('SELECT 2 AS second_tab;');
+
+        page.once('dialog', (dialog) => dialog.accept());
+        await page.reload();
+        await queryEditor.waitForEditorReady();
+
+        expect(await page.evaluate(() => window.e2eQueryEditorMode)).toBeUndefined();
+        await expect(editorTabs.getTabIds()).resolves.toEqual(tabIds);
+        await expect(editorTabs.getActiveTabId()).resolves.toBe(tabIds[1]);
+        await expect.poll(() => queryEditor.getEditorContent()).toBe('SELECT 2 AS second_tab;');
+        await editorTabs.selectTabById(tabIds[0]);
+        await expect.poll(() => queryEditor.getEditorContent()).toBe('SELECT 1 AS first_tab;');
+    });
+
+    test('Default mode keeps the edited query when opening a template without an override', async ({
+        page,
+    }) => {
+        const tenantPage = new TenantPage(page);
+        await tenantPage.gotoQueryEditor({schema: database, database});
+        const {queryEditor} = tenantPage;
+
+        expect(await page.evaluate(() => window.e2eQueryEditorMode)).toBeUndefined();
+        await expect(queryEditor.editorTabs.isVisible()).resolves.toBe(true);
+        await queryEditor.setQuery('SELECT 42 AS original_query;');
+        const [originalTabId] = await queryEditor.editorTabs.getTabIds();
+
+        await selectAsyncReplicationTemplate(
+            new NewSqlDropdownMenu(page),
+            AsyncReplicationTemplates.Create,
+        );
+
+        await expect(tenantPage.isUnsavedChangesModalHidden()).resolves.toBe(true);
+        await expect(queryEditor.editorTabs.waitForTabCount(2)).resolves.toBe(true);
+        await expect(
+            queryEditor.editorTabs.isTabSelected(AsyncReplicationTemplates.Create),
+        ).resolves.toBe(true);
+        await expect
+            .poll(() => queryEditor.getEditorContent())
+            .toContain('CREATE ASYNC REPLICATION');
+        await queryEditor.editorTabs.selectTabById(originalTabId);
+        await expect
+            .poll(() => queryEditor.getEditorContent())
+            .toBe('SELECT 42 AS original_query;');
+    });
+
     test('Single-tab mode renders editor without internal tabs', async ({page}) => {
         const tenantPage = await openQueryEditorMode(page, QueryEditorMode.SingleTab);
 

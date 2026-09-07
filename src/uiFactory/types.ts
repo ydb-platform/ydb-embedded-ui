@@ -53,6 +53,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     renderNodeTooltipActions?: RenderNodeTooltipActions;
     clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
+    /** Defaults to true. Undefined preserves the current value when configuring the UI. */
     enableMultiTabQueryEditor?: boolean;
 
     /** Creates a fresh computation-graph layout worker for each layout run. */
