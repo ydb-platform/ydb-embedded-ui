@@ -30,7 +30,7 @@ const uiFactoryBase: ResolvedUIFactory = {
     useDatabaseId: false,
     settingsBackend: undefined,
     docs: undefined,
-    enableMultiTabQueryEditor: false,
+    enableMultiTabQueryEditor: true,
     hasDeveloperUi: true,
     isDetailedStorageViewAvailable: () => true,
     maxVDisksInStorageGroup: 9,
@@ -46,9 +46,19 @@ type UIFactoryOverrides<H extends string, T extends string> = Omit<
 export function configureUIFactory<H extends string, T extends string = string>(
     overrides: UIFactoryOverrides<H, T>,
 ) {
-    const {healthcheck, hasAccess, maxVDisksInStorageGroup, ...restOverrides} = overrides;
+    const {
+        healthcheck,
+        hasAccess,
+        maxVDisksInStorageGroup,
+        enableMultiTabQueryEditor,
+        ...restOverrides
+    } = overrides;
 
     Object.assign(uiFactoryBase, restOverrides);
+
+    if (typeof enableMultiTabQueryEditor === 'boolean') {
+        uiFactoryBase.enableMultiTabQueryEditor = enableMultiTabQueryEditor;
+    }
 
     // Only override hasAccess when an actual function is provided.
     // Forwarding an optional config field could pass `undefined` here,

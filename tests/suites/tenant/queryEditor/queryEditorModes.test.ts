@@ -37,9 +37,11 @@ test.describe('Query Editor modes', () => {
         await expect(tenantPage.queryEditor.editorTabs.isHidden()).resolves.toBe(true);
     });
 
-    test('Multi-tab mode renders editor with internal tabs', async ({page}) => {
-        const tenantPage = await openQueryEditorMode(page, QueryEditorMode.MultiTab);
+    test('Default mode renders editor with internal tabs', async ({page}) => {
+        const tenantPage = new TenantPage(page);
+        await tenantPage.gotoQueryEditor({schema: database, database});
 
+        expect(await page.evaluate(() => window.e2eQueryEditorMode)).toBeUndefined();
         await expect(tenantPage.queryEditor.editorTabs.isVisible()).resolves.toBe(true);
         await expect(tenantPage.queryEditor.editorTabs.getTabCount()).resolves.toBe(1);
     });
@@ -95,7 +97,7 @@ test.describe('Query Editor modes', () => {
         const newSqlDropdown = new NewSqlDropdownMenu(page);
 
         await tenantPage.queryEditor.setQuery('SELECT 1;');
-        const beforeTabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
+        const [beforeTabId] = await tenantPage.queryEditor.editorTabs.getTabIds();
 
         await selectAsyncReplicationTemplate(newSqlDropdown, AsyncReplicationTemplates.Create);
 
@@ -108,7 +110,12 @@ test.describe('Query Editor modes', () => {
         ).resolves.toBe(true);
         await expect
             .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
-            .not.toBe('SELECT 1;');
+            .toContain('CREATE ASYNC REPLICATION');
+
+        await tenantPage.queryEditor.editorTabs.selectTabById(beforeTabId);
+        await expect
+            .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
+            .toBe('SELECT 1;');
     });
 
     test('Multi-tab mode reuses the current untouched template tab', async ({page}) => {
