@@ -1,8 +1,6 @@
 import React from 'react';
 
-import type {Data} from '@gravity-ui/paranoid';
-
-import {YDBGraph} from '../../../../../../components/Graph/Graph';
+import {GravityGraph} from '../../../../../../components/Graph/GravityGraph';
 import type {PreparedPlan} from '../../../../../../store/reducers/query/types';
 import {cn} from '../../../../../../utils/cn';
 import i18n from '../../i18n';
@@ -17,22 +15,30 @@ interface GraphProps {
     theme?: string;
 }
 
-function isValidGraphData(data: Partial<Data>): data is Data {
+function isValidGraphData(data: Partial<PreparedPlan>) {
     return Boolean(data.links && data.nodes && data.nodes.length);
 }
 
 export function Graph({explain = {}, theme}: GraphProps) {
     const {links, nodes} = explain;
 
-    const data = React.useMemo(() => ({links, nodes}), [links, nodes]);
+    const data = React.useMemo(() => ({links: links || [], nodes: nodes || []}), [links, nodes]);
+    const [failedData, setFailedData] = React.useState<typeof data>();
+    const handleLayoutError = React.useCallback(
+        (error: Error) => {
+            console.error(error);
+            setFailedData(data);
+        },
+        [data],
+    );
 
-    if (!isValidGraphData(data)) {
+    if (!isValidGraphData(data) || failedData === data) {
         return <StubMessage message={i18n('description.graph-is-not-supported')} />;
     }
 
     return (
         <div className={b('canvas-container')}>
-            <YDBGraph key={theme} data={data} />
+            <GravityGraph data={data} onError={handleLayoutError} theme={theme} />
         </div>
     );
 }

@@ -33,6 +33,10 @@ interface OperationMockOptions {
     pageSize?: number;
 }
 
+interface OperationsMockController {
+    getRequestedPageIndexes(): number[];
+}
+
 const generateBuildIndexOperations = (start: number, count: number): Operation[] => {
     const now = Math.floor(Date.now() / 1000);
     return Array.from({length: count}, (_, i) => {
@@ -116,8 +120,12 @@ const generateExportOperations = (start: number, count: number): Operation[] => 
     });
 };
 
-export const setupOperationsMock = async (page: Page, options?: OperationMockOptions) => {
+export const setupOperationsMock = async (
+    page: Page,
+    options?: OperationMockOptions,
+): Promise<OperationsMockController> => {
     const totalOperations = options?.totalOperations || 100;
+    const requestedBuildIndexPages = new Set<number>();
 
     await page.route(`${backend}/operation/list*`, async (route) => {
         const url = new URL(route.request().url());
@@ -159,7 +167,15 @@ export const setupOperationsMock = async (page: Page, options?: OperationMockOpt
             contentType: 'application/json',
             body: JSON.stringify(response),
         });
+
+        if (kind === 'buildindex') {
+            requestedBuildIndexPages.add(pageIndex);
+        }
     });
+
+    return {
+        getRequestedPageIndexes: () => [...requestedBuildIndexPages].sort((a, b) => a - b),
+    };
 };
 
 export const setupEmptyOperationsMock = async (page: Page) => {
