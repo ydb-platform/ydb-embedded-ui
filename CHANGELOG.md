@@ -1,5 +1,17 @@
 # Changelog
 
+## [20.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.4.0...v20.5.0) (2026-09-03)
+
+
+### Features
+
+* **TopicInfo:** show topic autopartitioning settings ([#4284](https://github.com/ydb-platform/ydb-embedded-ui/issues/4284)) ([0610f0f](https://github.com/ydb-platform/ydb-embedded-ui/commit/0610f0f5fd9e3c90df95900f46ff89a67e47d879))
+
+
+### Bug Fixes
+
+* if no cluster name redirect to root ([#4301](https://github.com/ydb-platform/ydb-embedded-ui/issues/4301)) ([7319000](https://github.com/ydb-platform/ydb-embedded-ui/commit/7319000950012ee3b4c7f4e64ae2d4addb0d901d))
+
 ## [20.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.3.0...v20.4.0) (2026-09-02)
 
 
