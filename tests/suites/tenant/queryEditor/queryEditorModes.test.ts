@@ -31,50 +31,17 @@ async function selectAsyncReplicationTemplate(
 }
 
 test.describe('Query Editor modes', () => {
-    test('Default mode preserves separate editor tabs after reload without an override', async ({
-        page,
-    }) => {
-        const tenantPage = new TenantPage(page);
-        await tenantPage.gotoQueryEditor({schema: database, database});
-        const {queryEditor} = tenantPage;
-        const {editorTabs} = queryEditor;
-
-        expect(await page.evaluate(() => window.e2eQueryEditorMode)).toBeUndefined();
-        await expect(editorTabs.isVisible()).resolves.toBe(true);
-        await expect(editorTabs.getTabCount()).resolves.toBe(1);
-
-        await queryEditor.setQuery('SELECT 1 AS first_tab;');
-        await editorTabs.clickAddTab();
-        await expect(editorTabs.waitForTabCount(2)).resolves.toBe(true);
-        await queryEditor.setQuery('SELECT 2 AS second_tab;');
-        const tabIds = await editorTabs.getTabIds();
-
-        await editorTabs.selectTabById(tabIds[0]);
-        await expect.poll(() => queryEditor.getEditorContent()).toBe('SELECT 1 AS first_tab;');
-        await editorTabs.selectTabById(tabIds[1]);
-        await expect.poll(() => queryEditor.getEditorContent()).toBe('SELECT 2 AS second_tab;');
-
-        page.once('dialog', (dialog) => dialog.accept());
-        await page.reload();
-        await queryEditor.waitForEditorReady();
-
-        expect(await page.evaluate(() => window.e2eQueryEditorMode)).toBeUndefined();
-        await expect(editorTabs.getTabIds()).resolves.toEqual(tabIds);
-        await expect(editorTabs.getActiveTabId()).resolves.toBe(tabIds[1]);
-        await expect.poll(() => queryEditor.getEditorContent()).toBe('SELECT 2 AS second_tab;');
-        await editorTabs.selectTabById(tabIds[0]);
-        await expect.poll(() => queryEditor.getEditorContent()).toBe('SELECT 1 AS first_tab;');
-    });
-
     test('Single-tab mode renders editor without internal tabs', async ({page}) => {
         const tenantPage = await openQueryEditorMode(page, QueryEditorMode.SingleTab);
 
         await expect(tenantPage.queryEditor.editorTabs.isHidden()).resolves.toBe(true);
     });
 
-    test('Multi-tab mode renders editor with internal tabs', async ({page}) => {
-        const tenantPage = await openQueryEditorMode(page, QueryEditorMode.MultiTab);
+    test('Default mode renders editor with internal tabs', async ({page}) => {
+        const tenantPage = new TenantPage(page);
+        await tenantPage.gotoQueryEditor({schema: database, database});
 
+        expect(await page.evaluate(() => window.e2eQueryEditorMode)).toBeUndefined();
         await expect(tenantPage.queryEditor.editorTabs.isVisible()).resolves.toBe(true);
         await expect(tenantPage.queryEditor.editorTabs.getTabCount()).resolves.toBe(1);
     });

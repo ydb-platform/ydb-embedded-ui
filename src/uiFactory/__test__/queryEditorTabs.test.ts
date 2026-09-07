@@ -1,10 +1,6 @@
-beforeEach(() => {
-    jest.resetModules();
-});
+import {configureUIFactory, uiFactory} from '../uiFactory';
 
-test('enables editor tabs by default and preserves the default without an override', async () => {
-    const {configureUIFactory, uiFactory} = await import('../uiFactory');
-
+test('enables editor tabs by default and changes the mode only for explicit overrides', () => {
     expect(uiFactory.enableMultiTabQueryEditor).toBe(true);
 
     configureUIFactory({});
@@ -12,10 +8,6 @@ test('enables editor tabs by default and preserves the default without an overri
 
     configureUIFactory({enableMultiTabQueryEditor: undefined});
     expect(uiFactory.enableMultiTabQueryEditor).toBe(true);
-});
-
-test('preserves an explicit single-tab override when later configuration omits it', async () => {
-    const {configureUIFactory, uiFactory} = await import('../uiFactory');
 
     configureUIFactory({enableMultiTabQueryEditor: false});
     expect(uiFactory.enableMultiTabQueryEditor).toBe(false);
@@ -25,13 +17,7 @@ test('preserves an explicit single-tab override when later configuration omits i
 
     configureUIFactory({enableMultiTabQueryEditor: undefined});
     expect(uiFactory.enableMultiTabQueryEditor).toBe(false);
-});
 
-test('allows consumers to enable editor tabs after explicitly disabling them', async () => {
-    const {configureUIFactory, uiFactory} = await import('../uiFactory');
-
-    configureUIFactory({enableMultiTabQueryEditor: false});
     configureUIFactory({enableMultiTabQueryEditor: true});
-
     expect(uiFactory.enableMultiTabQueryEditor).toBe(true);
 });
