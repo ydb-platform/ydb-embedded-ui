@@ -65,6 +65,8 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;
         getHealthcheckViewsOrder: GetHealthcheckViewsOrder<H>;
         renderAssistantAction?: RenderHealthcheckAssistantAction;
+        /** Renders inside the open drawer independently of its loading, error or issue state. */
+        renderDrawerExtension?: () => React.ReactNode;
     };
     hasAccess: HasAccess;
     hideGrantAccess?: boolean;
