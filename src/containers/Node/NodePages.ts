@@ -57,6 +57,7 @@ export const nodePageTabSchema = z.preprocess(
 export const nodePageQueryParams = {
     database: StringParam,
     clusterName: StringParam,
+    backend: StringParam,
 };
 
 export type NodePageQuery = QueryParamsTypeFromQueryObject<typeof nodePageQueryParams>;

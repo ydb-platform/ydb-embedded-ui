@@ -50,12 +50,14 @@ export function Node() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
 
-    const match = useRouteMatch<{id: string; activeTab: string}>(routes.node);
+    const match = useRouteMatch<{id: string; activeTab: string; environment?: string}>(routes.node);
 
     const nodeId = match?.params.id;
     const activeTabIdFromQuery = match?.params.activeTab;
+    const environment = match?.params.environment;
 
-    const [{database: tenantNameFromQuery, clusterName}] = useQueryParams(nodePageQueryParams);
+    const [{database: tenantNameFromQuery, clusterName, backend}] =
+        useQueryParams(nodePageQueryParams);
     const database = tenantNameFromQuery?.toString();
 
     const activeTabId = nodePageTabSchema.parse(activeTabIdFromQuery);
@@ -137,8 +139,8 @@ export function Node() {
 
         if (activeTab.id !== activeTabId || activeTabIdFromQuery === 'structure') {
             const path = getDefaultNodePath(
-                {id: nodeId, activeTab: activeTab.id},
-                {database, clusterName: clusterName ?? undefined},
+                {id: nodeId, activeTab: activeTab.id, environment},
+                {database, clusterName: clusterName ?? undefined, backend: backend ?? undefined},
             );
 
             history.replace(path);
@@ -147,6 +149,8 @@ export function Node() {
         nodeId,
         database,
         clusterName,
+        backend,
+        environment,
         activeTab.id,
         activeTabId,
         activeTabIdFromQuery,
@@ -166,6 +170,8 @@ export function Node() {
                     nodeId={nodeId}
                     database={database}
                     clusterName={clusterName ?? undefined}
+                    backend={backend ?? undefined}
+                    environment={environment}
                     activeTabId={activeTab.id}
                     tabs={nodeTabs}
                     parentContainer={container}
@@ -240,6 +246,8 @@ interface NodePageContentProps {
     nodeId: string;
     database?: string;
     clusterName?: string;
+    backend?: string;
+    environment?: string;
 
     activeTabId: NodeTab;
     tabs: {id: string; title: string}[];
@@ -251,6 +259,8 @@ function NodePageContent({
     nodeId,
     database,
     clusterName,
+    backend,
+    environment,
     activeTabId,
     tabs,
     parentContainer,
@@ -262,8 +272,8 @@ function NodePageContent({
                     <TabList className={b('tab-list')} size="l">
                         {tabs.map(({id, title}) => {
                             const path = getDefaultNodePath(
-                                {id: nodeId, activeTab: id as NodeTab},
-                                {database, clusterName},
+                                {id: nodeId, activeTab: id as NodeTab, environment},
+                                {database, clusterName, backend},
                             );
                             return (
                                 <Tab value={id} key={id}>

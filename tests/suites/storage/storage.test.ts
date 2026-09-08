@@ -40,56 +40,74 @@ test.describe('Storage groups API without capabilities', () => {
         });
     }
 
-    test('preserves database and cluster through legacy node redirects and tab navigation', async ({
-        page,
-    }) => {
-        const legacyStorageRequests: string[] = [];
-        page.on('request', (request) => {
-            if (request.url().includes('/viewer/json/storage')) {
-                legacyStorageRequests.push(request.url());
-            }
-        });
+    for (const environment of [undefined, 'cloud-prod']) {
+        test(`preserves node scope through legacy redirects and tabs (${environment ?? 'default'})`, async ({
+            page,
+        }) => {
+            const nodePath = [environment, 'node', NODE_ID].filter(Boolean).join('/');
+            const backendOverride = environment ? 'http://127.0.0.1:8765' : undefined;
+            const legacyStorageRequests: string[] = [];
+            page.on('request', (request) => {
+                if (request.url().includes('/viewer/json/storage')) {
+                    legacyStorageRequests.push(request.url());
+                }
+            });
 
-        const storageResponse = page.waitForResponse(
-            (response) => response.url().includes('/storage/groups?') && response.ok(),
-        );
-        await new PageModel(page, `node/${NODE_ID}/structure`, {
-            database: DATABASE,
-            clusterName: 'storage-test-cluster',
-        }).goto();
-        const response = await storageResponse;
-        const requestParams = new URL(response.url()).searchParams;
-        const nodePage = new NodePage(page, NODE_ID);
+            const storageResponse = page.waitForResponse(
+                (response) => response.url().includes('/storage/groups?') && response.ok(),
+            );
+            await new PageModel(page, `${nodePath}/structure`, {
+                database: DATABASE,
+                clusterName: 'storage-test-cluster',
+                backend: backendOverride,
+            }).goto();
+            const response = await storageResponse;
+            const requestParams = new URL(response.url()).searchParams;
+            const nodePage = new NodePage(page, NODE_ID);
 
-        await expect(
-            nodePage.tabs.getByRole('tab', {name: 'Storage', exact: true}),
-        ).toHaveAttribute('aria-selected', 'true');
-        await expect(page.getByRole('link', {name: GROUP_ID, exact: true}).first()).toBeVisible();
-        await expect(page).toHaveURL(new RegExp(`/node/${NODE_ID}/storage\\?`));
-        expect(new URL(page.url()).searchParams.get('database')).toBe(DATABASE);
-        expect(new URL(page.url()).searchParams.get('clusterName')).toBe('storage-test-cluster');
-        expect(requestParams.get('database')).toBe(DATABASE);
-        expect(requestParams.get('node_id')).toBe(NODE_ID);
-        expect(await nodePage.getAllTabNames()).not.toContain('Structure');
-
-        for (const {name, path} of [
-            {name: 'Tablets', path: 'tablets'},
-            {name: 'Storage', path: 'storage'},
-        ]) {
-            const tab = nodePage.tabs.getByRole('tab', {name, exact: true});
-            await tab.click();
-
-            await expect(tab).toHaveAttribute('aria-selected', 'true');
-            await expect(page).toHaveURL(new RegExp(`/node/${NODE_ID}/${path}\\?`));
+            await expect(
+                nodePage.tabs.getByRole('tab', {name: 'Storage', exact: true}),
+            ).toHaveAttribute('aria-selected', 'true');
+            await expect(
+                page.getByRole('link', {name: GROUP_ID, exact: true}).first(),
+            ).toBeVisible();
+            await expect(page).toHaveURL(new RegExp(`/${nodePath}/storage\\?`));
             expect(new URL(page.url()).searchParams.get('database')).toBe(DATABASE);
             expect(new URL(page.url()).searchParams.get('clusterName')).toBe(
                 'storage-test-cluster',
             );
-        }
+            expect(new URL(page.url()).searchParams.get('backend')).toBe(backendOverride ?? null);
+            if (backendOverride) {
+                expect(new URL(response.url()).origin).toBe(backendOverride);
+            }
+            expect(requestParams.get('database')).toBe(DATABASE);
+            expect(requestParams.get('node_id')).toBe(NODE_ID);
+            expect(await nodePage.getAllTabNames()).not.toContain('Structure');
 
-        await expect(page.getByRole('link', {name: GROUP_ID, exact: true}).first()).toBeVisible();
-        expect(legacyStorageRequests).toEqual([]);
-    });
+            for (const {name, path} of [
+                {name: 'Tablets', path: 'tablets'},
+                {name: 'Storage', path: 'storage'},
+            ]) {
+                const tab = nodePage.tabs.getByRole('tab', {name, exact: true});
+                await tab.click();
+
+                await expect(tab).toHaveAttribute('aria-selected', 'true');
+                await expect(page).toHaveURL(new RegExp(`/${nodePath}/${path}\\?`));
+                expect(new URL(page.url()).searchParams.get('database')).toBe(DATABASE);
+                expect(new URL(page.url()).searchParams.get('clusterName')).toBe(
+                    'storage-test-cluster',
+                );
+                expect(new URL(page.url()).searchParams.get('backend')).toBe(
+                    backendOverride ?? null,
+                );
+            }
+
+            await expect(
+                page.getByRole('link', {name: GROUP_ID, exact: true}).first(),
+            ).toBeVisible();
+            expect(legacyStorageRequests).toEqual([]);
+        });
+    }
 });
 
 test.describe('Test Storage page', async () => {
