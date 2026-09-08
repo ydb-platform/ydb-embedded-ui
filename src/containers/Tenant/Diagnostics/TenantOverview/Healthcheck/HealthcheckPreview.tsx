@@ -7,6 +7,7 @@ import {healthcheckApi} from '../../../../../store/reducers/healthcheckInfo/heal
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import {cn} from '../../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
+import {useClusterNameFromQuery} from '../../../../../utils/hooks/useDatabaseFromQuery';
 import {isEnumMember} from '../../../../../utils/typecheckers';
 import {HEALTHCHECK_RESULT_TO_TEXT} from '../../../constants';
 import {useTenantQueryParams} from '../../../useTenantQueryParams';
@@ -24,6 +25,7 @@ interface HealthcheckPreviewProps {
 
 export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     const {database} = props;
+    const clusterName = useClusterNameFromQuery();
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {handleShowHealthcheckChange} = useTenantQueryParams();
@@ -33,7 +35,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
         isFetching,
         error,
     } = healthcheckApi.useGetHealthcheckInfoQuery(
-        {database},
+        {database, clusterName},
         {
             pollingInterval: autoRefreshInterval,
         },

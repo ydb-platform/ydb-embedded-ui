@@ -22,6 +22,10 @@ jest.mock('../../../../../../utils/hooks', () => ({
     useAutoRefreshInterval: () => [0],
 }));
 
+jest.mock('../../../../../../utils/hooks/useDatabaseFromQuery', () => ({
+    useClusterNameFromQuery: () => undefined,
+}));
+
 jest.mock('../../../../useTenantQueryParams', () => ({
     useTenantQueryParams: () => ({
         handleShowHealthcheckChange: jest.fn(),
