@@ -40,7 +40,7 @@ test.describe('Storage groups API without capabilities', () => {
         });
     }
 
-    test('redirects legacy node structure links to storage and preserves database and cluster', async ({
+    test('preserves database and cluster through legacy node redirects and tab navigation', async ({
         page,
     }) => {
         const legacyStorageRequests: string[] = [];
@@ -71,6 +71,23 @@ test.describe('Storage groups API without capabilities', () => {
         expect(requestParams.get('database')).toBe(DATABASE);
         expect(requestParams.get('node_id')).toBe(NODE_ID);
         expect(await nodePage.getAllTabNames()).not.toContain('Structure');
+
+        for (const {name, path} of [
+            {name: 'Tablets', path: 'tablets'},
+            {name: 'Storage', path: 'storage'},
+        ]) {
+            const tab = nodePage.tabs.getByRole('tab', {name, exact: true});
+            await tab.click();
+
+            await expect(tab).toHaveAttribute('aria-selected', 'true');
+            await expect(page).toHaveURL(new RegExp(`/node/${NODE_ID}/${path}\\?`));
+            expect(new URL(page.url()).searchParams.get('database')).toBe(DATABASE);
+            expect(new URL(page.url()).searchParams.get('clusterName')).toBe(
+                'storage-test-cluster',
+            );
+        }
+
+        await expect(page.getByRole('link', {name: GROUP_ID, exact: true}).first()).toBeVisible();
         expect(legacyStorageRequests).toEqual([]);
     });
 });

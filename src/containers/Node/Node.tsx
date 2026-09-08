@@ -165,6 +165,7 @@ export function Node() {
                 <NodePageContent
                     nodeId={nodeId}
                     database={database}
+                    clusterName={clusterName ?? undefined}
                     activeTabId={activeTab.id}
                     tabs={nodeTabs}
                     parentContainer={container}
@@ -238,6 +239,7 @@ function NodePageInfo({node, loading}: NodePageInfoProps) {
 interface NodePageContentProps {
     nodeId: string;
     database?: string;
+    clusterName?: string;
 
     activeTabId: NodeTab;
     tabs: {id: string; title: string}[];
@@ -248,6 +250,7 @@ interface NodePageContentProps {
 function NodePageContent({
     nodeId,
     database,
+    clusterName,
     activeTabId,
     tabs,
     parentContainer,
@@ -260,7 +263,7 @@ function NodePageContent({
                         {tabs.map(({id, title}) => {
                             const path = getDefaultNodePath(
                                 {id: nodeId, activeTab: id as NodeTab},
-                                {database},
+                                {database, clusterName},
                             );
                             return (
                                 <Tab value={id} key={id}>
