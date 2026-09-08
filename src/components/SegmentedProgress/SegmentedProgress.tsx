@@ -152,7 +152,6 @@ export function SegmentedProgress(props: SegmentedProgressProps) {
               width: props.total > 0 ? clampPercent((segment.value / props.total) * 100) : 0,
           }))
         : undefined;
-    const hasSegmentTooltips = segmentSections?.some(({tooltip}) => Boolean(tooltip));
     const hasEmptySection = (segmentSections ? percentUsed : fillWidth) < 100;
 
     const renderSections = () => {
@@ -196,21 +195,16 @@ export function SegmentedProgress(props: SegmentedProgressProps) {
     };
 
     const renderProgress = () => {
-        const progressAriaProps = {
-            role: 'progressbar' as const,
-            'aria-label': ariaLabel,
-            'aria-valuemin': 0,
-            'aria-valuemax': 100,
-            'aria-valuenow': normalizedUsed,
-        };
-        // Keep focusable segment content outside the progressbar's presentational subtree.
         return (
             <div
-                className={b({theme, 'with-tooltips': hasSegmentTooltips}, className)}
+                className={b({theme}, className)}
                 data-qa={dataQa}
-                {...(hasSegmentTooltips ? undefined : progressAriaProps)}
+                role="progressbar"
+                aria-label={ariaLabel}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={normalizedUsed}
             >
-                {hasSegmentTooltips && <div className={b('status')} {...progressAriaProps} />}
                 {renderSections()}
                 {hasEmptySection && <div className={b('section')} style={{flexGrow: 1}} />}
             </div>

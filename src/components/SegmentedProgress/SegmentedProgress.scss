@@ -13,17 +13,6 @@
     width: 100%;
     height: var(--ydb-segmented-progress-height);
 
-    &_with-tooltips {
-        position: relative;
-    }
-
-    &__status {
-        position: absolute;
-        inset: 0;
-
-        pointer-events: none;
-    }
-
     &_theme_neutral {
         --ydb-segmented-progress-used-color: var(--g-color-line-generic);
     }
