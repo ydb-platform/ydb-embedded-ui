@@ -5,7 +5,6 @@
   "button-confirm": "Confirm",
   "button-retry": "Retry",
   "button-cancel": "Cancel",
-  "button-close": "Close",
 
-  "checkbox-text": "I understand what I'm doing"
+  "checkbox-text": "I understand the impact of this action"
 }

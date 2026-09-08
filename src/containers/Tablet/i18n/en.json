@@ -16,9 +16,9 @@
   "dialog.stop-header": "Stop tablet",
   "dialog.resume-header": "Resume tablet",
 
-  "dialog.kill-text": "The tablet will be restarted. Do you want to proceed?",
-  "dialog.stop-text": "The tablet will be stopped. Do you want to proceed?",
-  "dialog.resume-text": "The tablet will be resumed. Do you want to proceed?",
+  "dialog.kill-text": "The tablet will restart. A portion of table data will be temporarily unavailable. Active transactions and scans will be interrupted with a retriable error and can be retried.",
+  "dialog.stop-text": "The tablet will be stopped. The key range will be unavailable until the tablet is manually resumed. Data is not deleted and will be restored after resume.",
+  "dialog.resume-text": "The tablet will be resumed and return to Active state.",
 
   "emptyState": "The tablet was not found",
 

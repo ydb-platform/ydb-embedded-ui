@@ -6,6 +6,7 @@ import type {ButtonView} from '@gravity-ui/uikit';
 import {ResultIssues} from '../../containers/Tenant/Query/Issues/Issues';
 import type {IResponseError} from '../../types/api/error';
 import {cn} from '../../utils/cn';
+import {BRAND_BUTTON_CLASS} from '../../utils/constants';
 import {isResponseError, isResponseErrorWithIssues} from '../../utils/response';
 
 import {criticalActionDialogKeyset} from './i18n';
@@ -103,29 +104,13 @@ export function CriticalActionDialog<T>({
     };
 
     const renderDialogContent = () => {
-        if (error) {
-            return (
-                <React.Fragment>
-                    <Dialog.Header caption={header} />
-                    <Dialog.Body>
-                        <Alert theme="danger" message={parseError(error)} view="outlined" />
-                    </Dialog.Body>
+        const isRetry = Boolean(error && withRetry);
+        let currentApplyButtonText: string | undefined = applyButtonText;
 
-                    <Dialog.Footer
-                        loading={false}
-                        preset="default"
-                        textButtonApply={
-                            withRetry
-                                ? retryButtonText || criticalActionDialogKeyset('button-retry')
-                                : undefined
-                        }
-                        textButtonCancel={criticalActionDialogKeyset('button-close')}
-                        propsButtonApply={{view: 'normal'}}
-                        onClickButtonApply={() => onApply(true)}
-                        onClickButtonCancel={onClose}
-                    />
-                </React.Fragment>
-            );
+        if (error) {
+            currentApplyButtonText = isRetry
+                ? retryButtonText || criticalActionDialogKeyset('button-retry')
+                : undefined;
         }
 
         return (
@@ -136,6 +121,7 @@ export function CriticalActionDialog<T>({
                     <Flex direction="column" gap={4}>
                         {description && <Text as="div">{description}</Text>}
                         {warningText && <Alert theme="warning" message={warningText} />}
+                        {error && <Alert theme="danger" message={parseError(error)} />}
                         {renderCheckBox()}
                     </Flex>
                 </Dialog.Body>
@@ -143,15 +129,16 @@ export function CriticalActionDialog<T>({
                 <Dialog.Footer
                     loading={isLoading}
                     preset="default"
-                    textButtonApply={applyButtonText}
+                    textButtonApply={currentApplyButtonText}
                     textButtonCancel={criticalActionDialogKeyset('button-cancel')}
                     propsButtonApply={{
                         type: 'submit',
                         disabled: withCheckBox && !checkBoxChecked,
                         view: applyButtonView,
+                        className: applyButtonView === 'action' ? BRAND_BUTTON_CLASS : undefined,
                     }}
                     onClickButtonCancel={onClose}
-                    onClickButtonApply={() => onApply()}
+                    onClickButtonApply={() => onApply(isRetry ? true : undefined)}
                 />
             </React.Fragment>
         );
@@ -160,7 +147,7 @@ export function CriticalActionDialog<T>({
     return (
         <Dialog
             open={visible}
-            hasCloseButton={false}
+            hasCloseButton
             className={b()}
             size="s"
             onClose={onClose}

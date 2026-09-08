@@ -16,11 +16,11 @@
   "no-slots-data": "No slots data",
 
   "restart-pdisk-button": "Restart PDisk",
-  "force-restart-pdisk-button": "Restart anyway",
+  "force-restart-pdisk-button": "Restart PDisk anyway",
   "restart-pdisk-not-allowed": "You don't have enough rights to restart PDisk",
 
   "restart-pdisk-dialog-header": "Restart PDisk",
-  "restart-pdisk-dialog-text": "PDisk will be restarted. Do you want to proceed?",
+  "restart-pdisk-dialog-text": "Are you sure you want to restart this PDisk?",
 
   "decommission-none": "None",
   "decommission-imminent": "Imminent",
@@ -34,7 +34,7 @@
   "decommission-dialog-title": "Change decommission status",
   "decommission-dialog-force-change": "Change anyway",
 
-  "decommission-dialog-imminent-warning": "This will start imminent decommission. Existing slots will be moved from the disk",
+  "decommission-dialog-imminent-warning": "This will start imminent decommission. All existing slots will be moved from the disk.",
   "decommission-dialog-pending-warning": "This will start pending decommission. Decommission will be planned for this disk, but will not start immediatelly. Existing slots will not be moved from the disk, but no new slots will be allocated on it",
   "decommission-dialog-rejected-warning": "This will start rejected decommission. No slots from other disks are placed on this disk in the process of decommission",
   "decommission-dialog-none-warning": "This will reset decommission mode, allowing the disk to  be used by the storage"
