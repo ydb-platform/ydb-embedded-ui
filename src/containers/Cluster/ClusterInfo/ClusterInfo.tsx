@@ -115,7 +115,7 @@ export const ClusterInfo = ({
             return null;
         }
         return (
-            <InfoSection className={b('storage-section')}>
+            <InfoSection className={b('storage-section')} dataQa="cluster-storage-groups">
                 <StorageGroupStats stats={preparedGroupStats} />
             </InfoSection>
         );
@@ -157,11 +157,12 @@ export const ClusterInfo = ({
 interface InfoSectionProps {
     children: React.ReactNode;
     className?: string;
+    dataQa?: string;
 }
 
-function InfoSection({children, className}: InfoSectionProps) {
+function InfoSection({children, className, dataQa}: InfoSectionProps) {
     return (
-        <Flex direction="column" gap={2} className={className}>
+        <Flex direction="column" gap={2} className={className} qa={dataQa}>
             {children}
         </Flex>
     );

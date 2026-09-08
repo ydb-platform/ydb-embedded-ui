@@ -46,6 +46,7 @@ export interface SegmentedProgressSegment {
     minWidth?: number;
     color?: string;
     className?: string;
+    dataQa?: string;
     tooltip?: string;
     ariaLabelledBy?: string;
 }
@@ -73,7 +74,7 @@ function clampPercent(percent: number) {
     return percent;
 }
 
-function defaultNormalizePercent(percent: number) {
+export function defaultNormalizePercent(percent: number) {
     if (percent < 1) {
         return Math.round(percent * 10) / 10;
     }
@@ -165,6 +166,7 @@ export function SegmentedProgress(props: SegmentedProgressProps) {
                             aria-label={segment.tooltip}
                             aria-labelledby={segment.ariaLabelledBy}
                             className={b('section', {used: true}, segment.className)}
+                            data-qa={segment.dataQa}
                             role={segment.tooltip ? 'img' : undefined}
                             style={{
                                 width: `${segment.width}%`,

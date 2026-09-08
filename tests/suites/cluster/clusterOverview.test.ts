@@ -213,7 +213,7 @@ test.describe('Cluster Overview', () => {
         const clusterPage = new ClusterPage(page);
         await clusterPage.goto({}, {waitUntil: 'domcontentloaded'});
 
-        const storageSection = clusterPage.clusterInfo.locator('.cluster-info__storage-section');
+        const storageSection = clusterPage.storageGroups;
         await expect(storageSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
         await expect(
             storageSection.getByText('Allocated Storage Groups 11', {exact: true}),
@@ -265,9 +265,7 @@ test.describe('Cluster Overview', () => {
         await expect(overview.getByText('42%', {exact: true})).toBeVisible({
             timeout: VISIBILITY_TIMEOUT,
         });
-        await expect(clusterPage.clusterInfo.locator('.cluster-info__storage-section')).toHaveCount(
-            0,
-        );
+        await expect(clusterPage.storageGroups).toHaveCount(0);
     });
 
     test('allocated storage groups fit a narrow viewport', async ({page}) => {
@@ -281,11 +279,11 @@ test.describe('Cluster Overview', () => {
         const clusterPage = new ClusterPage(page);
         await clusterPage.goto({}, {waitUntil: 'domcontentloaded'});
 
-        const storageSection = clusterPage.clusterInfo.locator('.cluster-info__storage-section');
+        const storageSection = clusterPage.storageGroups;
         await expect(
             storageSection.getByText('Allocated Storage Groups 737', {exact: true}),
         ).toBeVisible({timeout: VISIBILITY_TIMEOUT});
-        const cards = storageSection.locator('.ydb-disk-groups-stats__card');
+        const cards = clusterPage.storageGroupCards;
         await expect(cards).toHaveCount(2);
 
         const cardBounds = await cards.evaluateAll((elements) =>
@@ -357,9 +355,7 @@ test.describe('Cluster Overview', () => {
             const clusterPage = new ClusterPage(page);
             await clusterPage.goto({}, {waitUntil: 'domcontentloaded'});
 
-            const storageSection = clusterPage.clusterInfo.locator(
-                '.cluster-info__storage-section',
-            );
+            const storageSection = clusterPage.storageGroups;
             await expect(storageSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
             await expect(
                 storageSection.getByText('Allocated Storage Groups 1', {exact: true}),
@@ -368,7 +364,7 @@ test.describe('Cluster Overview', () => {
                 name: 'HDD storage group allocation: 0%',
             });
             const ssdProgress = storageSection.getByRole('group', {
-                name: 'SSD storage group allocation: 0%',
+                name: 'SSD storage group allocation: 0.2%',
             });
             await expect(hddProgress).toHaveCount(0);
             await expect(ssdProgress.getByRole('progressbar')).toHaveAttribute(
@@ -380,7 +376,7 @@ test.describe('Cluster Overview', () => {
             await expect(storageSection.getByText('HDD', {exact: true})).toHaveCount(0);
             await expect(storageSection.getByText('600 groups', {exact: true})).toBeVisible();
 
-            const ssdSegments = ssdProgress.locator('.ydb-disk-groups-stats__progress-segment');
+            const ssdSegments = clusterPage.getStorageGroupSegments(ssdProgress);
             await expect(ssdSegments).toHaveCount(1);
             expect(
                 await ssdSegments.evaluateAll((segments) =>
@@ -388,7 +384,7 @@ test.describe('Cluster Overview', () => {
                 ),
             ).toEqual([10]);
 
-            await ssdProgress.locator('.ydb-disk-groups-stats__progress-segment').first().hover();
+            await ssdSegments.first().hover();
             await expect(
                 page.getByText('600 groups available if only mirror-3-dc is used', {exact: true}),
             ).toBeVisible();
@@ -412,9 +408,7 @@ test.describe('Cluster Overview', () => {
             const clusterPage = new ClusterPage(page);
             await clusterPage.goto({}, {waitUntil: 'domcontentloaded'});
 
-            const storageSection = clusterPage.clusterInfo.locator(
-                '.cluster-info__storage-section',
-            );
+            const storageSection = clusterPage.storageGroups;
             await expect(storageSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
             await expect(
                 storageSection.getByText('Allocated Storage Groups 737', {exact: true}),
@@ -441,8 +435,8 @@ test.describe('Cluster Overview', () => {
             const hddProgress = storageSection.getByRole('group', {
                 name: 'HDD storage group allocation: 58%',
             });
-            const segmentGaps = await hddProgress
-                .locator('.ydb-disk-groups-stats__progress-segment')
+            const segmentGaps = await clusterPage
+                .getStorageGroupSegments(hddProgress)
                 .evaluateAll((segments) =>
                     segments.slice(1).map((segment, index) => {
                         const previousBounds = segments[index].getBoundingClientRect();
@@ -487,18 +481,14 @@ test.describe('Cluster Overview', () => {
             }
             expect(popoverBounds.y + popoverBounds.height).toBeLessThanOrEqual(helpMarkBounds.y);
 
-            const firstSegment = storageSection
-                .locator('.ydb-disk-groups-stats__progress-segment')
-                .first();
+            const firstSegment = clusterPage.getStorageGroupSegments().first();
             await firstSegment.hover();
             await expect(
                 page.getByText('199 groups available if only block-4-2 is used', {exact: true}),
             ).toBeVisible();
             await page.mouse.move(0, 0);
 
-            const noneSegment = storageSection
-                .locator('.ydb-disk-groups-stats__progress-segment')
-                .nth(2);
+            const noneSegment = clusterPage.getStorageGroupSegments().nth(2);
             await noneSegment.hover();
             await expect(
                 page.getByText('0 groups available if only none is used', {exact: true}),

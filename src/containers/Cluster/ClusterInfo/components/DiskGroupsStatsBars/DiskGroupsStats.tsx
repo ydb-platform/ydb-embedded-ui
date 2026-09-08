@@ -2,7 +2,10 @@ import React from 'react';
 
 import {Card, Flex, HelpMark, Label, Text} from '@gravity-ui/uikit';
 
-import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
+import {
+    SegmentedProgress,
+    defaultNormalizePercent,
+} from '../../../../../components/SegmentedProgress/SegmentedProgress';
 import {cn} from '../../../../../utils/cn';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import i18n from '../../../i18n';
@@ -61,7 +64,7 @@ function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
     const progressPercent = progressValue * 100;
     const progressLabel = i18n('context_storage-group-allocation-progress', {
         diskType,
-        percent: Math.round(progressPercent),
+        percent: defaultNormalizePercent(progressPercent),
     });
     const availableGroupsContext = i18n('context_available-groups');
 
@@ -71,12 +74,13 @@ function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
         minWidth: 10,
         color: getErasureColor(erasureStats.erasure),
         className: b('progress-segment'),
+        dataQa: 'cluster-storage-group-segment',
         tooltip: getErasureTooltip(erasureStats),
         ariaLabelledBy: `${legendId}-${index}`,
     }));
 
     return (
-        <Card view="filled" className={b('card')}>
+        <Card view="filled" className={b('card')} qa="cluster-storage-group-card">
             <Flex direction="column" gap={1}>
                 <Flex direction="column" gap={2}>
                     <Flex justifyContent="space-between" alignItems="center" gap={2}>
