@@ -30,7 +30,7 @@ import {
 } from '../../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../../components/nodesColumns/types';
 import {cn} from '../../../../utils/cn';
-import {PDisks} from '../../PDisks/PDisks';
+import {PDisksCompact} from '../../PDisks/PDisksCompact';
 
 import type {GetStorageNodesColumnsParams} from './types';
 
@@ -49,7 +49,7 @@ export const getPDisksColumn = ({
         width: columnsSettings?.pDiskContainerWidth,
         render: ({row}) => {
             return (
-                <PDisks
+                <PDisksCompact
                     pDisks={row.PDisks}
                     vDisks={row.VDisks}
                     viewContext={viewContext}

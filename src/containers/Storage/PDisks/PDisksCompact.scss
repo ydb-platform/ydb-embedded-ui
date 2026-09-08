@@ -1,0 +1,34 @@
+@use '../../../styles/mixins';
+
+.ydb-storage-pdisks-compact {
+    display: block;
+    overflow: visible;
+
+    &__anchor {
+        display: inline-block;
+    }
+
+    &__vdisk,
+    &__pdisk-background,
+    &__pdisk-fill {
+        @include mixins.entity-state-colors();
+    }
+
+    &__vdisk {
+        fill: var(--entity-state-fill-color);
+
+        &_inactive {
+            opacity: 0.5;
+        }
+    }
+
+    &__pdisk-background {
+        fill: var(--entity-state-background-color);
+        stroke: var(--entity-state-border-color);
+        vector-effect: non-scaling-stroke;
+    }
+
+    &__pdisk-fill {
+        fill: var(--entity-state-fill-color);
+    }
+}
