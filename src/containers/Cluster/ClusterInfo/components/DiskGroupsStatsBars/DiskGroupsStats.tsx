@@ -3,13 +3,15 @@ import React from 'react';
 import {Card, Flex, HelpMark, Label, Text} from '@gravity-ui/uikit';
 
 import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
-import type {ClusterGroupsStats} from '../../../../../store/reducers/cluster/types';
 import {cn} from '../../../../../utils/cn';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import i18n from '../../../i18n';
 
-import type {PreparedDiskGroupsStats, PreparedErasureGroupsStats} from './utils';
-import {prepareClusterGroupsStats} from './utils';
+import type {
+    PreparedClusterGroupsStats,
+    PreparedDiskGroupsStats,
+    PreparedErasureGroupsStats,
+} from './utils';
 
 import './DiskGroupsStats.scss';
 
@@ -63,8 +65,7 @@ function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
     });
     const availableGroupsContext = i18n('context_available-groups');
 
-    const visibleErasures = erasures.filter(({createdGroups}) => createdGroups > 0);
-    const segments = visibleErasures.map((erasureStats, index) => ({
+    const segments = erasures.map((erasureStats, index) => ({
         id: erasureStats.erasure,
         value: erasureStats.createdGroups,
         minWidth: 10,
@@ -112,7 +113,7 @@ function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
                 </Flex>
                 <Flex justifyContent="space-between" alignItems="center" gap={2} wrap="wrap">
                     <Flex alignItems="center" gap={4} wrap="wrap">
-                        {visibleErasures.map((erasureStats, index) => (
+                        {erasures.map((erasureStats, index) => (
                             <Flex
                                 key={erasureStats.erasure}
                                 id={`${legendId}-${index}`}
@@ -139,12 +140,10 @@ function DiskGroupStats({stats}: {stats: PreparedDiskGroupsStats}) {
 }
 
 interface StorageGroupStatsProps {
-    groupStats: ClusterGroupsStats;
+    stats: PreparedClusterGroupsStats;
 }
 
-export function StorageGroupStats({groupStats}: StorageGroupStatsProps) {
-    const stats = React.useMemo(() => prepareClusterGroupsStats(groupStats), [groupStats]);
-
+export function StorageGroupStats({stats}: StorageGroupStatsProps) {
     return (
         <React.Fragment>
             <Text as="div" variant="subheader-2">

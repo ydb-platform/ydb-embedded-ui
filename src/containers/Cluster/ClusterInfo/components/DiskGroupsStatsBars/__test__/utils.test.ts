@@ -16,6 +16,46 @@ const createStats = (
 });
 
 describe('prepareClusterGroupsStats', () => {
+    test('excludes unallocated media and erasure policies from card values', () => {
+        const groupStats: ClusterGroupsStats = {
+            HDD: {
+                'mirror-3-dc': createStats('HDD', 'mirror-3-dc', 0, 84),
+            },
+            SSD: {
+                'block-4-2': createStats('SSD', 'block-4-2', 11, 52),
+                'mirror-3-dc': createStats('SSD', 'mirror-3-dc', 0, 1103),
+            },
+        };
+
+        expect(prepareClusterGroupsStats(groupStats)).toEqual({
+            allocatedGroups: 11,
+            disks: [
+                {
+                    diskType: 'SSD',
+                    allocatedGroups: 11,
+                    availableGroups: {min: 52, max: 52, average: 52},
+                    progressTotalGroups: 63,
+                    erasures: [{erasure: 'block-4-2', createdGroups: 11, availableGroups: 52}],
+                },
+            ],
+        });
+    });
+
+    test.each([0, -1])('returns no cards when created groups count is %s', (createdGroups) => {
+        expect(
+            prepareClusterGroupsStats({
+                SSD: {
+                    'block-4-2': createStats('SSD', 'block-4-2', createdGroups, 52),
+                },
+            }),
+        ).toEqual({disks: [], allocatedGroups: 0});
+    });
+
+    test('omits empty disk types', () => {
+        expect(prepareClusterGroupsStats({SSD: {}})).toEqual({disks: [], allocatedGroups: 0});
+        expect(prepareClusterGroupsStats({})).toEqual({disks: [], allocatedGroups: 0});
+    });
+
     test('calculates totals and the midpoint of the available range', () => {
         const groupStats: ClusterGroupsStats = {
             SSD: {

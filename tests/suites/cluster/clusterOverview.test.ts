@@ -194,6 +194,12 @@ test.describe('Cluster Overview', () => {
                             AvailableGroupsToCreate: 52,
                         },
                         {
+                            PDiskFilter: 'Type:SSD,Kind:99',
+                            ErasureSpecies: 'block-4-2',
+                            CurrentGroupsCreated: 0,
+                            AvailableGroupsToCreate: 900,
+                        },
+                        {
                             PDiskFilter: 'Type:SSD',
                             ErasureSpecies: 'mirror-3-dc',
                             CurrentGroupsCreated: 0,
@@ -222,6 +228,46 @@ test.describe('Cluster Overview', () => {
         await expect(storageSection.getByText('block-4-2', {exact: true})).toBeVisible();
         await expect(storageSection.getByText('HDD', {exact: true})).toHaveCount(0);
         await expect(storageSection.getByText('mirror-3-dc', {exact: true})).toHaveCount(0);
+    });
+
+    test('allocated storage groups hide the section when no groups are created', async ({page}) => {
+        await setupMonitoringUserMock(page);
+        await setupClusterDashboardCapabilitiesMock(page);
+        await setupNodesListMock(page);
+        await page.route('**/viewer/json/cluster**', async (route) => {
+            await route.fulfill({
+                json: {
+                    Version: 8,
+                    Domain: '/local',
+                    Overall: 'Green',
+                    NetworkUtilization: 0.42,
+                    StorageStats: [
+                        {
+                            PDiskFilter: 'Type:SSD',
+                            ErasureSpecies: 'block-4-2',
+                            CurrentGroupsCreated: 0,
+                            AvailableGroupsToCreate: 200,
+                        },
+                        {
+                            PDiskFilter: 'Type:ROT',
+                            ErasureSpecies: 'mirror-3-dc',
+                            AvailableGroupsToCreate: 100,
+                        },
+                    ],
+                },
+            });
+        });
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto({}, {waitUntil: 'domcontentloaded'});
+
+        const overview = page.locator('.ydb-cluster-dashboard__overview-wrapper');
+        await expect(overview.getByText('42%', {exact: true})).toBeVisible({
+            timeout: VISIBILITY_TIMEOUT,
+        });
+        await expect(clusterPage.clusterInfo.locator('.cluster-info__storage-section')).toHaveCount(
+            0,
+        );
     });
 
     test('allocated storage groups fit a narrow viewport', async ({page}) => {

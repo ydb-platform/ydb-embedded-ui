@@ -44,14 +44,19 @@ export function prepareClusterGroupsStats(
     let allocatedGroups = 0;
 
     const disks = Object.entries(groupStats)
-        .map(([diskType, diskStats]) => {
+        .flatMap(([diskType, diskStats]) => {
             const erasures = Object.values(diskStats)
+                .filter(({createdGroups}) => createdGroups > 0)
                 .map((stats) => ({
                     erasure: stats.erasure,
                     createdGroups: stats.createdGroups,
                     availableGroups: stats.totalGroups - stats.createdGroups,
                 }))
                 .sort((a, b) => getErasureOrder(a.erasure) - getErasureOrder(b.erasure));
+
+            if (erasures.length === 0) {
+                return [];
+            }
 
             const diskAllocatedGroups = erasures.reduce(
                 (sum, stats) => sum + stats.createdGroups,
@@ -64,17 +69,19 @@ export function prepareClusterGroupsStats(
 
             allocatedGroups += diskAllocatedGroups;
 
-            return {
-                diskType,
-                erasures,
-                allocatedGroups: diskAllocatedGroups,
-                availableGroups: {
-                    min: minAvailableGroups,
-                    max: maxAvailableGroups,
-                    average: averageAvailableGroups,
+            return [
+                {
+                    diskType,
+                    erasures,
+                    allocatedGroups: diskAllocatedGroups,
+                    availableGroups: {
+                        min: minAvailableGroups,
+                        max: maxAvailableGroups,
+                        average: averageAvailableGroups,
+                    },
+                    progressTotalGroups: diskAllocatedGroups + averageAvailableGroups,
                 },
-                progressTotalGroups: diskAllocatedGroups + averageAvailableGroups,
-            };
+            ];
         })
         .sort((a, b) => getDiskTypeOrder(a.diskType) - getDiskTypeOrder(b.diskType));
 
