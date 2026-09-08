@@ -25,7 +25,6 @@ const ROUTES = {
     sysinfo: `${backend}/viewer/json/sysinfo*`,
     pdiskInfo: `${backend}/pdisk/info*`,
     storageGroups: `${backend}/storage/groups*`,
-    storageInfo: `${backend}/viewer/json/storage*`,
     tabletInfo: `${backend}/viewer/json/tabletinfo*`,
     describe: `${backend}/viewer/json/describe*`,
     tenantInfo: `${backend}/viewer/json/tenantinfo*`,
@@ -127,15 +126,6 @@ export async function setupStorageGroup429HtmlMock(page: Page) {
     const html =
         '<html><body><h1>429 Too Many Requests</h1><p>Rate limit exceeded</p></body></html>';
     await mockRoute(page, ROUTES.storageGroups, {
-        status: 429,
-        contentType: 'text/html',
-        body: html,
-        headers: {
-            'x-trace-id': 'e2etest00112233445566778899aabbcc',
-            'x-proxy-name': 'https://test-proxy-node.example.net:443',
-        },
-    });
-    await mockRoute(page, ROUTES.storageInfo, {
         status: 429,
         contentType: 'text/html',
         body: html,

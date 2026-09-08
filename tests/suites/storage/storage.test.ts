@@ -1,8 +1,79 @@
 import {expect, test} from '@playwright/test';
 
+import {PageModel} from '../../models/PageModel';
+import {NodePage} from '../nodes/NodePage';
 import {ClusterStorageTable} from '../paginatedTable/paginatedTable';
 
 import {StoragePage} from './StoragePage';
+import {DATABASE, GROUP_ID, NODE_ID, setupVDiskPageMocks} from './vdiskPageMocks';
+
+test.describe('Storage groups API without capabilities', () => {
+    test.beforeEach(async ({page}) => {
+        await setupVDiskPageMocks(page);
+        await page.route('**/viewer/capabilities*', (route) =>
+            route.fulfill({json: {Capabilities: {}}}),
+        );
+    });
+
+    for (const path of ['cluster/storage', 'storageGroup']) {
+        test(`loads ${path} through storage/groups`, async ({page}) => {
+            const storageRequests: string[] = [];
+            page.on('request', (request) => {
+                if (/\/(storage\/groups|viewer\/json\/storage)(\?|$)/.test(request.url())) {
+                    storageRequests.push(new URL(request.url()).pathname);
+                }
+            });
+
+            const storageResponse = page.waitForResponse(
+                (response) => response.url().includes('/storage/groups?') && response.ok(),
+            );
+            await new PageModel(page, path, {groupId: GROUP_ID}).goto();
+            await storageResponse;
+
+            await expect(
+                page.getByRole('link', {name: GROUP_ID, exact: true}).first(),
+            ).toBeVisible();
+            expect(storageRequests).toContain('/storage/groups');
+            expect(storageRequests.every((requestPath) => requestPath === '/storage/groups')).toBe(
+                true,
+            );
+        });
+    }
+
+    test('redirects legacy node structure links to storage and preserves database and cluster', async ({
+        page,
+    }) => {
+        const legacyStorageRequests: string[] = [];
+        page.on('request', (request) => {
+            if (request.url().includes('/viewer/json/storage')) {
+                legacyStorageRequests.push(request.url());
+            }
+        });
+
+        const storageResponse = page.waitForResponse(
+            (response) => response.url().includes('/storage/groups?') && response.ok(),
+        );
+        await new PageModel(page, `node/${NODE_ID}/structure`, {
+            database: DATABASE,
+            clusterName: 'storage-test-cluster',
+        }).goto();
+        const response = await storageResponse;
+        const requestParams = new URL(response.url()).searchParams;
+        const nodePage = new NodePage(page, NODE_ID);
+
+        await expect(
+            nodePage.tabs.getByRole('tab', {name: 'Storage', exact: true}),
+        ).toHaveAttribute('aria-selected', 'true');
+        await expect(page.getByRole('link', {name: GROUP_ID, exact: true}).first()).toBeVisible();
+        await expect(page).toHaveURL(new RegExp(`/node/${NODE_ID}/storage\\?`));
+        expect(new URL(page.url()).searchParams.get('database')).toBe(DATABASE);
+        expect(new URL(page.url()).searchParams.get('clusterName')).toBe('storage-test-cluster');
+        expect(requestParams.get('database')).toBe(DATABASE);
+        expect(requestParams.get('node_id')).toBe(NODE_ID);
+        expect(await nodePage.getAllTabNames()).not.toContain('Structure');
+        expect(legacyStorageRequests).toEqual([]);
+    });
+});
 
 test.describe('Test Storage page', async () => {
     test('Storage page is OK', async ({page}) => {

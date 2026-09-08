@@ -1,10 +1,7 @@
 import React from 'react';
 
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
-import {
-    useCapabilitiesLoaded,
-    useStorageGroupsHandlerAvailable,
-} from '../../../../../store/reducers/capabilities/hooks';
+import {useCapabilitiesLoaded} from '../../../../../store/reducers/capabilities/hooks';
 import {storageApi} from '../../../../../store/reducers/storage/storage';
 import type {GroupsRequiredField} from '../../../../../types/api/storage';
 import {
@@ -45,7 +42,6 @@ interface TopGroupsProps {
 
 export function TopGroups({tenant, capacityMetricsEnabled}: TopGroupsProps) {
     const capabilitiesLoaded = useCapabilitiesLoaded();
-    const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {columns, fieldsRequired, sort} = React.useMemo(
@@ -59,7 +55,6 @@ export function TopGroups({tenant, capacityMetricsEnabled}: TopGroupsProps) {
             sort,
             with: 'all',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
-            shouldUseGroupsHandler: groupsHandlerAvailable,
             fieldsRequired,
         },
         {

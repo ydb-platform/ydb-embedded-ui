@@ -12,7 +12,6 @@
   "yes": "Yes",
   "no": "No",
   "group-generation": "Group Generation",
-  "latency": "Latency",
   "allocation-units": "Allocation Units",
   "context_allocation-units": "The number of channels used by tablets to write data to the storage group.",
   "state": "State",

@@ -13,53 +13,46 @@ import {GROUPS_COLUMNS_TO_DATA_FIELDS, getStorageGroupsColumnSortField} from './
 
 type GetStorageGroups = FetchData<PreparedStorageGroup, PreparedStorageGroupFilters>;
 
-export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
-    const fetchData: GetStorageGroups = React.useCallback(
-        async (params) => {
-            const {limit, offset, sortParams, filters, columnsIds} = params;
-            const {sortOrder, columnId} = sortParams ?? {};
-            const {
-                searchValue,
-                visibleEntities,
-                database,
-                nodeId,
-                groupId,
-                pDiskId,
-                filterGroup,
-                filterGroupBy,
-            } = filters ?? {};
+export function useGroupsGetter() {
+    const fetchData: GetStorageGroups = React.useCallback(async (params) => {
+        const {limit, offset, sortParams, filters, columnsIds} = params;
+        const {sortOrder, columnId} = sortParams ?? {};
+        const {
+            searchValue,
+            visibleEntities,
+            database,
+            nodeId,
+            groupId,
+            pDiskId,
+            filterGroup,
+            filterGroupBy,
+        } = filters ?? {};
 
-            const sortField = getStorageGroupsColumnSortField(columnId);
-            const sort = sortField ? prepareSortValue(sortField, sortOrder) : undefined;
-            const dataFieldsRequired = getRequiredDataFields(
-                columnsIds,
-                GROUPS_COLUMNS_TO_DATA_FIELDS,
-            );
+        const sortField = getStorageGroupsColumnSortField(columnId);
+        const sort = sortField ? prepareSortValue(sortField, sortOrder) : undefined;
+        const dataFieldsRequired = getRequiredDataFields(columnsIds, GROUPS_COLUMNS_TO_DATA_FIELDS);
 
-            const {groups, found, total} = await requestStorageData({
-                limit,
-                offset,
-                sort,
-                filter: searchValue?.trim(),
-                with: visibleEntities,
-                database,
-                nodeId,
-                groupId,
-                pDiskId,
-                filter_group: filterGroup,
-                filter_group_by: filterGroupBy,
-                fieldsRequired: dataFieldsRequired,
-                shouldUseGroupsHandler,
-            });
+        const {groups, found, total} = await requestStorageData({
+            limit,
+            offset,
+            sort,
+            filter: searchValue?.trim(),
+            with: visibleEntities,
+            database,
+            nodeId,
+            groupId,
+            pDiskId,
+            filter_group: filterGroup,
+            filter_group_by: filterGroupBy,
+            fieldsRequired: dataFieldsRequired,
+        });
 
-            return {
-                data: groups || [],
-                found: found || 0,
-                total: total || 0,
-            };
-        },
-        [shouldUseGroupsHandler],
-    );
+        return {
+            data: groups || [],
+            found: found || 0,
+            total: total || 0,
+        };
+    }, []);
 
     return fetchData;
 }

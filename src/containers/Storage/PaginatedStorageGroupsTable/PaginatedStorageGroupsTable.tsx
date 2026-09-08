@@ -3,10 +3,7 @@ import React from 'react';
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
 import type {RenderErrorMessage} from '../../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../../components/PaginatedTable';
-import {
-    useCapabilitiesLoaded,
-    useStorageGroupsHandlerAvailable,
-} from '../../../store/reducers/capabilities/hooks';
+import {useCapabilitiesLoaded} from '../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
 import type {GroupsGroupByField} from '../../../types/api/storage';
@@ -65,9 +62,8 @@ export const PaginatedStorageGroupsTable = ({
     initialEntitiesCount,
 }: PaginatedStorageGroupsTableProps) => {
     const capabilitiesLoaded = useCapabilitiesLoaded();
-    const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
 
-    const fetchData = useGroupsGetter(groupsHandlerAvailable);
+    const fetchData = useGroupsGetter();
 
     const hasVDisksColumns = React.useMemo(() => {
         return columns.some((column) => columnsWithVDisks.has(column.name));

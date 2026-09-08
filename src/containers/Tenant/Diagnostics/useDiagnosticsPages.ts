@@ -3,7 +3,6 @@ import React from 'react';
 import {
     useConfigAvailable,
     useNewStorageViewEnabled,
-    useStorageGroupsHandlerAvailable,
     useStorageStatsAvailable,
     useTopicDataAvailable,
 } from '../../../store/reducers/capabilities/hooks';
@@ -42,10 +41,8 @@ export function useDiagnosticsPages({
 
     const hasConfigs = useConfigAvailable();
     const newStorageViewEnabled = useNewStorageViewEnabled();
-    const storageGroupsAvailable = useStorageGroupsHandlerAvailable();
     const storageStatsAvailable = useStorageStatsAvailable();
-    const hasStorageUsageCapabilities = storageGroupsAvailable && storageStatsAvailable;
-    const hasStorageUsage = newStorageViewEnabled && hasStorageUsageCapabilities;
+    const hasStorageUsage = newStorageViewEnabled && storageStatsAvailable;
     const hasTopicData = useTopicDataAvailable();
     const isViewerUser = useIsViewerUser();
     const userPermissions = useUserPermissions();

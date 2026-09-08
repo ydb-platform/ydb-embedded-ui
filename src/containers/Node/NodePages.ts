@@ -9,7 +9,6 @@ import i18n from './i18n';
 const NODE_TABS_IDS = {
     storage: 'storage',
     tablets: 'tablets',
-    structure: 'structure',
     threads: 'threads',
     network: 'network',
     configs: 'configs',
@@ -22,12 +21,6 @@ export const NODE_TABS = [
         id: NODE_TABS_IDS.storage,
         get title() {
             return i18n('tabs.storage');
-        },
-    },
-    {
-        id: NODE_TABS_IDS.structure,
-        get title() {
-            return i18n('tabs.structure');
         },
     },
     {
@@ -56,12 +49,13 @@ export const NODE_TABS = [
     },
 ];
 
-export const nodePageTabSchema = z.nativeEnum(NODE_TABS_IDS).catch(NODE_TABS_IDS.tablets);
+export const nodePageTabSchema = z.preprocess(
+    (value) => (value === 'structure' ? NODE_TABS_IDS.storage : value),
+    z.nativeEnum(NODE_TABS_IDS).catch(NODE_TABS_IDS.tablets),
+);
 
 export const nodePageQueryParams = {
     database: StringParam,
-    pdiskId: StringParam,
-    vdiskId: StringParam,
     clusterName: StringParam,
 };
 

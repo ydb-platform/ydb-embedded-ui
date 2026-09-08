@@ -81,10 +81,6 @@ export const useTracingLevelOptionAvailable = () => {
     return useGetFeatureVersion('/viewer/query') > 2;
 };
 
-export const useStorageGroupsHandlerAvailable = () => {
-    return useGetFeatureVersion('/storage/groups') > 2;
-};
-
 export const useStorageStatsAvailable = () => {
     return useGetFeatureVersion('/viewer/storage_stats') > 0;
 };

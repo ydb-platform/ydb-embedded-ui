@@ -1,16 +1,7 @@
 import type {EFlag} from '../../../types/api/enums';
 import type {TNodeInfo, TNodesInfo} from '../../../types/api/nodes';
 import {TPDiskState} from '../../../types/api/pdisk';
-import type {
-    StorageGroupsResponse,
-    TGroupsStorageGroupInfo,
-    TStorageGroupInfo,
-    TStorageGroupInfoV2,
-    TStorageInfo,
-    TStoragePoolInfo,
-} from '../../../types/api/storage';
-import {EVDiskState} from '../../../types/api/vdisk';
-import type {TVDiskStateInfo} from '../../../types/api/vdisk';
+import type {StorageGroupsResponse, TGroupsStorageGroupInfo} from '../../../types/api/storage';
 import {
     getColorSeverity,
     getDataSeverityColor,
@@ -21,7 +12,6 @@ import {
     prepareWhiteboardVDiskData,
 } from '../../../utils/disks/prepareDisks';
 import {prepareNodeSystemState} from '../../../utils/nodes';
-import {getUsage} from '../../../utils/storage';
 import {parseUsToMs} from '../../../utils/timeParsers';
 import {parseOptionalNonNegativeNumber} from '../../../utils/utils';
 
@@ -47,7 +37,7 @@ const normalizeMaxPercent = (value: number | string | null | undefined): number 
 
 // ==== Prepare groups ====
 
-function getGroupDiskSpaceStatus(group: TStorageGroupInfo | TGroupsStorageGroupInfo): EFlag {
+function getGroupDiskSpaceStatus(group: TGroupsStorageGroupInfo): EFlag {
     const {DiskSpace, VDisks = []} = group;
 
     if (DiskSpace) {
@@ -60,157 +50,6 @@ function getGroupDiskSpaceStatus(group: TStorageGroupInfo | TGroupsStorageGroupI
     // We cast it since we know VDisk.DiskSpace is always EFlag
     return getDataSeverityColor(maxSeverity);
 }
-
-const prepareVDisk = (vDisk: TVDiskStateInfo, poolName: string | undefined) => {
-    const preparedVDisk = prepareWhiteboardVDiskData(vDisk);
-
-    // VDisk doesn't have its own StoragePoolName when located inside StoragePool data
-    return {
-        ...preparedVDisk,
-        StoragePoolName: poolName,
-        Donors: preparedVDisk?.Donors?.map((donor) => ({
-            ...donor,
-            StoragePoolName: poolName,
-        })),
-    };
-};
-
-const prepareStorageGroupData = (
-    group: TStorageGroupInfo,
-    pool: TStoragePoolInfo,
-): PreparedStorageGroup => {
-    let missing = 0;
-    let usedSpaceBytes = 0;
-    let limitSizeBytes = 0;
-    let readSpeedBytesPerSec = 0;
-    let writeSpeedBytesPerSec = 0;
-    let mediaType: string | undefined;
-
-    const {Name: poolName, MediaType: poolMediaType} = pool;
-
-    if (group.VDisks) {
-        for (const vDisk of group.VDisks) {
-            const {
-                Replicated,
-                VDiskState,
-                AvailableSize,
-                AllocatedSize,
-                PDisk,
-                ReadThroughput,
-                WriteThroughput,
-            } = vDisk;
-
-            const {
-                Type: PDiskType,
-                State: PDiskState,
-                AvailableSize: PDiskAvailableSize,
-            } = prepareWhiteboardPDiskData(PDisk);
-
-            if (
-                Replicated === false ||
-                PDiskState !== TPDiskState.Normal ||
-                VDiskState !== EVDiskState.OK
-            ) {
-                missing += 1;
-            }
-
-            const available = Number(AvailableSize ?? PDiskAvailableSize) || 0;
-            const allocated = Number(AllocatedSize) || 0;
-
-            usedSpaceBytes += allocated;
-            limitSizeBytes += available + allocated;
-
-            readSpeedBytesPerSec += Number(ReadThroughput) || 0;
-            writeSpeedBytesPerSec += Number(WriteThroughput) || 0;
-
-            mediaType = PDiskType && (PDiskType === mediaType || !mediaType) ? PDiskType : 'Mixed';
-        }
-    }
-
-    const vDisks = group.VDisks?.map((vdisk) => prepareVDisk(vdisk, poolName));
-
-    // Do not calculate usage if there is no limit
-    const usage = limitSizeBytes
-        ? getUsage({Used: usedSpaceBytes, Limit: limitSizeBytes}, 5)
-        : undefined;
-
-    const diskSpaceStatus = getGroupDiskSpaceStatus(group);
-
-    return {
-        ...group,
-        GroupGeneration: group.GroupGeneration ? String(group.GroupGeneration) : undefined,
-        GroupId: group.GroupID,
-        Overall: group.Overall,
-        VDisks: vDisks,
-        Usage: usage,
-        Read: readSpeedBytesPerSec,
-        Write: writeSpeedBytesPerSec,
-        PoolName: poolName,
-        Used: usedSpaceBytes,
-        Limit: limitSizeBytes,
-        Degraded: missing,
-        MediaType: poolMediaType || mediaType || undefined,
-        DiskSpace: diskSpaceStatus,
-    };
-};
-
-const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedStorageGroup => {
-    const {
-        VDisks = [],
-        PoolName,
-        Usage = 0,
-        Read = 0,
-        Write = 0,
-        Used = 0,
-        Limit = 0,
-        Degraded = 0,
-        Kind,
-        MediaType,
-        GroupID,
-        Overall,
-        GroupGeneration,
-    } = group;
-
-    const vDisks = VDisks.map((vdisk) => prepareVDisk(vdisk, PoolName));
-    const usage = Number(Usage) * 100;
-
-    const diskSpaceStatus = getGroupDiskSpaceStatus(group);
-
-    return {
-        ...group,
-        PoolName,
-        GroupId: GroupID,
-        MediaType: MediaType || Kind,
-        VDisks: vDisks,
-        Usage: usage,
-        Overall,
-        GroupGeneration: GroupGeneration ? String(GroupGeneration) : undefined,
-        Read: Number(Read),
-        Write: Number(Write),
-        Used: Number(Used),
-        Limit: Number(Limit),
-        Degraded: Number(Degraded),
-        DiskSpace: diskSpaceStatus,
-    };
-};
-
-const prepareStorageGroups = (
-    StorageGroups?: TStorageGroupInfoV2[],
-    StoragePools?: TStoragePoolInfo[],
-) => {
-    let preparedGroups: PreparedStorageGroup[] = [];
-    if (StorageGroups) {
-        preparedGroups = StorageGroups.map(prepareStorageGroupDataV2);
-    } else {
-        StoragePools?.forEach((pool) => {
-            pool.Groups?.forEach((group) => {
-                preparedGroups.push(prepareStorageGroupData(group, pool));
-            });
-        });
-    }
-
-    return preparedGroups;
-};
 
 // ==== Prepare nodes ====
 
@@ -358,18 +197,6 @@ export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageRe
         found: Number(FoundNodes),
         tableGroups,
         columnsSettings: {maxSlotsPerDisk, maxDisksPerNode},
-    };
-};
-
-export const prepareStorageResponse = (data: TStorageInfo): PreparedStorageResponse => {
-    const {StoragePools, StorageGroups, TotalGroups, FoundGroups} = data;
-
-    const preparedGroups = prepareStorageGroups(StorageGroups, StoragePools);
-
-    return {
-        groups: preparedGroups,
-        total: Number(TotalGroups) || preparedGroups.length,
-        found: Number(FoundGroups),
     };
 };
 

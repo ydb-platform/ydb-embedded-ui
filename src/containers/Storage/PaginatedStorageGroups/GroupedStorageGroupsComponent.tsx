@@ -112,7 +112,6 @@ export function GroupedStorageGroupsComponent({
             groupId,
             pDiskId,
             filter: groupsSearchValue.trim(),
-            shouldUseGroupsHandler: true,
             group: storageGroupsGroupByParam,
         },
         {

@@ -83,16 +83,7 @@ export interface PreparedStorageGroup {
     VDisks?: PreparedVDisk[];
 
     Kind?: string;
-    ChangeTime?: number | string;
     GroupGeneration?: string;
-    Latency?: EFlag;
-    AcquiredUnits?: string;
-    AcquiredIOPS?: number;
-    AcquiredThroughput?: string;
-    AcquiredSize?: string;
-    MaximumIOPS?: number;
-    MaximumThroughput?: string;
-    MaximumSize?: string;
 
     AllocationUnits?: string | number;
     GroupSizeInUnits?: number;
