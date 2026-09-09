@@ -31,7 +31,7 @@ export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDis
 
                 const relatedVDisks = vDisks.filter((vdisk) => vdisk.PDiskId === pDisk.PDiskId);
 
-                const highlighted = highlightedDisk === id;
+                const highlighted = id !== undefined && highlightedDisk === id;
 
                 return (
                     <div className={b('pdisks-item')} key={id}>
