@@ -40,7 +40,7 @@
     "@ydb-platform/monaco-ghost": "^0.6.1",
     "axios": "^1.18.0",
     "axios-retry": "^4.5.0",
-    "colord": "^2.9.3",
+    "colord": "^2.10.0",
     "copy-to-clipboard": "^3.3.3",
     "crc-32": "^1.2.2",
     "history": "^4.10.1",
