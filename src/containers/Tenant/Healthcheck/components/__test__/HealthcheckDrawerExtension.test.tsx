@@ -1,7 +1,8 @@
 import React from 'react';
 
-import {render, screen, waitFor} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 
+import type {DrawerWrapper} from '../../../../../components/Drawer';
 import {
     DrawerContextProvider,
     useDrawerContext,
@@ -18,11 +19,7 @@ function mockDrawerWrapper({
     isDrawerVisible,
     renderDrawerContent,
     children,
-}: {
-    isDrawerVisible: boolean;
-    renderDrawerContent: () => React.ReactNode;
-    children: React.ReactNode;
-}) {
+}: React.ComponentProps<typeof DrawerWrapper>) {
     return (
         <React.Fragment>
             {children}
@@ -53,9 +50,11 @@ function InsetProbe() {
     return <output data-testid="right-inset">{rightInset}</output>;
 }
 
+const onInsetChange = jest.fn();
+
 function DrawerFixture({open = true}: {open?: boolean}) {
     return (
-        <DrawerContextProvider>
+        <DrawerContextProvider onRightInsetChange={onInsetChange}>
             <HealthcheckDrawer
                 isDrawerVisible={open}
                 onCloseDrawer={jest.fn()}
@@ -75,16 +74,12 @@ function DrawerFixture({open = true}: {open?: boolean}) {
 
 describe('Healthcheck drawer extension', () => {
     const originalHealthcheck = {...uiFactory.healthcheck};
-    const onMount = jest.fn();
-    const onUnmount = jest.fn();
 
     function Extension() {
         const {setRightInset} = useDrawerContext();
         React.useEffect(() => {
-            onMount();
             setRightInset(434);
             return () => {
-                onUnmount();
                 setRightInset(0);
             };
         }, [setRightInset]);
@@ -122,9 +117,10 @@ describe('Healthcheck drawer extension', () => {
         });
     });
 
-    test('retains the extension and inset across data states, then cleans up on close', async () => {
+    test('retains the extension and inset across data states, then cleans up on close', () => {
+        const degraded = mockHealthcheck;
         const {rerender, unmount} = render(<DrawerFixture />);
-        await waitFor(() => expect(screen.getByTestId('right-inset')).toHaveTextContent('434'));
+        expect(screen.getByTestId('right-inset')).toHaveTextContent('434');
         expect(screen.getByRole('button', {name: 'Diagnostics'})).toBeInTheDocument();
 
         const states = [
@@ -139,34 +135,28 @@ describe('Healthcheck drawer extension', () => {
             expect(screen.getByTestId('drawer-extension')).toBeInTheDocument();
             expect(screen.getByTestId('right-inset')).toHaveTextContent('434');
             expect(screen.queryByRole('button', {name: 'Diagnostics'})).not.toBeInTheDocument();
-            expect(onMount).toHaveBeenCalledTimes(1);
-            expect(onUnmount).not.toHaveBeenCalled();
+            expect(onInsetChange.mock.calls).toEqual([[434]]);
         }
 
-        mockHealthcheck = {
-            ...mockHealthcheck,
-            selfCheckResult: SelfCheckResult.DEGRADED,
-            issues: [{id: 'next-issue'}],
-            leavesIssues: [{id: 'next-issue', categoryForUI: 'storage'}],
-        };
+        mockHealthcheck = degraded;
         rerender(<DrawerFixture />);
         expect(screen.getByRole('button', {name: 'Diagnostics'})).toBeInTheDocument();
-        expect(onMount).toHaveBeenCalledTimes(1);
+        expect(onInsetChange.mock.calls).toEqual([[434]]);
 
         rerender(<DrawerFixture open={false} />);
         expect(screen.queryByTestId('drawer-extension')).not.toBeInTheDocument();
         expect(screen.getByTestId('right-inset')).toHaveTextContent('0');
-        expect(onUnmount).toHaveBeenCalledTimes(1);
+        expect(onInsetChange.mock.calls).toEqual([[434], [0]]);
 
         rerender(<DrawerFixture />);
-        expect(onMount).toHaveBeenCalledTimes(2);
+        expect(onInsetChange.mock.calls).toEqual([[434], [0], [434]]);
         unmount();
-        expect(onUnmount).toHaveBeenCalledTimes(2);
+        expect(onInsetChange.mock.calls).toEqual([[434], [0], [434], [0]]);
     });
 
     test('does not render an extension while closed or without registration', () => {
         const {rerender} = render(<DrawerFixture open={false} />);
-        expect(onMount).not.toHaveBeenCalled();
+        expect(onInsetChange).not.toHaveBeenCalled();
         configureUIFactory({healthcheck: {renderDrawerExtension: undefined}});
         rerender(<DrawerFixture />);
         expect(screen.getByText('Issue list')).toBeInTheDocument();
