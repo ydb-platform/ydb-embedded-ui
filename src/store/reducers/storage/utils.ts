@@ -237,10 +237,10 @@ const prepareStorageNodeData = (
         }).length || 0;
 
     const pDisks = PDisks?.map((pDisk) => {
-        return {
-            ...prepareWhiteboardPDiskData(pDisk),
+        return prepareWhiteboardPDiskData({
+            ...pDisk,
             NodeId,
-        };
+        });
     });
     const vDisks = VDisks?.map((vDisk) => {
         return {
