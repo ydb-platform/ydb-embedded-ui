@@ -1,8 +1,8 @@
 import React from 'react';
 
+import {ThemeProvider} from '@gravity-ui/uikit';
 import {render, screen} from '@testing-library/react';
 
-import type {DrawerWrapper} from '../../../../../components/Drawer';
 import {
     DrawerContextProvider,
     useDrawerContext,
@@ -15,24 +15,11 @@ import {HealthcheckDrawer} from '../HealthcheckDrawer';
 
 let mockHealthcheck: ReturnType<typeof useHealthcheck>;
 
-function mockDrawerWrapper({
-    isDrawerVisible,
-    renderDrawerContent,
-    children,
-}: React.ComponentProps<typeof DrawerWrapper>) {
-    return (
-        <React.Fragment>
-            {children}
-            {isDrawerVisible ? renderDrawerContent() : null}
-        </React.Fragment>
-    );
-}
-
-jest.mock('../../../../../components/Drawer', () => ({DrawerWrapper: mockDrawerWrapper}));
 jest.mock('../../../../../components/Fullscreen/Fullscreen', () => ({
     Fullscreen: ({children}: {children: React.ReactNode}) => children,
 }));
 jest.mock('../../../../../utils/hooks', () => ({
+    useTypedDispatch: () => jest.fn(),
     useTypedSelector: (selector: (state: {fullscreen: boolean}) => unknown) =>
         selector({fullscreen: false}),
 }));
@@ -42,8 +29,11 @@ jest.mock('../../../../../utils/illustrations', () => ({
 jest.mock('../../useHealthcheck', () => ({useHealthcheck: () => mockHealthcheck}));
 jest.mock('../HealthcheckFilter', () => ({HealthcheckFilter: () => null}));
 jest.mock('../HealthcheckView', () => ({HealthcheckView: () => null}));
-jest.mock('../HealthcheckRefresh', () => ({HealthcheckRefresh: () => null}));
 jest.mock('../HealthcheckIssues', () => ({Issues: () => <div>Issue list</div>}));
+
+jest.mock('../../../../../utils/hooks/useSetting', () => ({
+    useSetting: () => [undefined, jest.fn()],
+}));
 
 function InsetProbe() {
     const {rightInset} = useDrawerContext();
@@ -51,24 +41,38 @@ function InsetProbe() {
 }
 
 const onInsetChange = jest.fn();
+const actionTargets = jest.fn();
+const originalResizeObserver = window.ResizeObserver;
 
-function DrawerFixture({open = true}: {open?: boolean}) {
+function DrawerFixture({
+    open = true,
+    database = '/test',
+    clusterName = 'cluster',
+}: {
+    open?: boolean;
+    database?: string;
+    clusterName?: string;
+}) {
     return (
-        <DrawerContextProvider onRightInsetChange={onInsetChange}>
-            <HealthcheckDrawer
-                isDrawerVisible={open}
-                onCloseDrawer={jest.fn()}
-                renderDrawerContent={() => <Healthcheck database="/test" clusterName="cluster" />}
-                drawerId="healthcheck"
-                storageKey="healthcheck"
-                title="Healthcheck"
-                healthcheckData={undefined}
-                downloadFilePrefix="healthcheck"
-                downloadTooltip="Download"
-            >
-                <InsetProbe />
-            </HealthcheckDrawer>
-        </DrawerContextProvider>
+        <ThemeProvider theme="light">
+            <DrawerContextProvider onRightInsetChange={onInsetChange}>
+                <HealthcheckDrawer
+                    isDrawerVisible={open}
+                    onCloseDrawer={jest.fn()}
+                    renderDrawerContent={() => (
+                        <Healthcheck database={database} clusterName={clusterName} />
+                    )}
+                    drawerId="healthcheck"
+                    storageKey="healthcheck"
+                    title="Healthcheck"
+                    healthcheckData={undefined}
+                    downloadFilePrefix="healthcheck"
+                    downloadTooltip="Download"
+                >
+                    <InsetProbe />
+                </HealthcheckDrawer>
+            </DrawerContextProvider>
+        </ThemeProvider>
     );
 }
 
@@ -88,6 +92,17 @@ describe('Healthcheck drawer extension', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+            x: 0,
+            y: 0,
+            top: 0,
+            left: 0,
+            width: 1389,
+            height: 764,
+            right: 1389,
+            bottom: 764,
+            toJSON() {},
+        });
         window.ResizeObserver = jest.fn(() => ({
             observe: jest.fn(),
             unobserve: jest.fn(),
@@ -106,15 +121,30 @@ describe('Healthcheck drawer extension', () => {
         configureUIFactory({
             healthcheck: {
                 renderDrawerExtension: () => <Extension />,
-                renderAssistantAction: () => <button>Diagnostics</button>,
+                renderAssistantAction: (props) => {
+                    actionTargets(props.target);
+                    return <button>Diagnostics</button>;
+                },
             },
         });
     });
 
     afterEach(() => {
+        jest.restoreAllMocks();
+        window.ResizeObserver = originalResizeObserver;
         configureUIFactory({
-            healthcheck: {renderDrawerExtension: undefined, ...originalHealthcheck},
+            healthcheck: {
+                renderDrawerExtension: undefined,
+                renderAssistantAction: undefined,
+                ...originalHealthcheck,
+            },
         });
+        expect(uiFactory.healthcheck.renderAssistantAction).toBe(
+            originalHealthcheck.renderAssistantAction,
+        );
+        expect(uiFactory.healthcheck.renderDrawerExtension).toBe(
+            originalHealthcheck.renderDrawerExtension,
+        );
     });
 
     test('retains the extension and inset across data states, then cleans up on close', () => {
@@ -152,6 +182,32 @@ describe('Healthcheck drawer extension', () => {
         expect(onInsetChange.mock.calls).toEqual([[434], [0], [434]]);
         unmount();
         expect(onInsetChange.mock.calls).toEqual([[434], [0], [434], [0]]);
+    });
+
+    test('keeps the extension mounted while Diagnostics receives the new target', () => {
+        const {rerender} = render(<DrawerFixture database="/first" clusterName="alpha" />);
+        const extension = screen.getByTestId('drawer-extension');
+        expect(actionTargets).toHaveBeenLastCalledWith({
+            scope: 'database',
+            request: {database: '/first', clusterName: 'alpha'},
+        });
+        rerender(<DrawerFixture database="/second" clusterName="beta" />);
+        expect(screen.getByTestId('drawer-extension')).toBe(extension);
+        expect(onInsetChange.mock.calls).toEqual([[434]]);
+        expect(actionTargets).toHaveBeenLastCalledWith({
+            scope: 'database',
+            request: {database: '/second', clusterName: 'beta'},
+        });
+    });
+
+    test('renders the extension after the header and before Healthcheck', () => {
+        render(<DrawerFixture />);
+        const extension = screen.getByTestId('drawer-extension');
+        expect(extension.parentElement).toHaveClass('ydb-drawer__content-wrapper');
+        expect(extension.previousElementSibling).toContainElement(screen.getByText('Healthcheck'));
+        expect(extension.nextElementSibling).toContainElement(
+            screen.getByRole('button', {name: 'Diagnostics'}),
+        );
     });
 
     test('does not render an extension while closed or without registration', () => {

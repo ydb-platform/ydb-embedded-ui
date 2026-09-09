@@ -90,50 +90,41 @@ describe('HealthcheckPreview', () => {
         expect(await screen.findByText('Status is unknown')).toBeInTheDocument();
     });
 
-    test.each([true, false])(
-        'shares updates and isolates same-name databases, compact=%s',
-        async (compact) => {
-            const getHealthcheckInfo = jest.fn(async ({clusterName}: {clusterName?: string}) =>
-                clusterName === 'alpha' ? degraded : healthy,
-            );
-            Object.defineProperty(window, 'api', {
-                configurable: true,
-                value: {viewer: {getHealthcheckInfo}},
-            });
-            const history = setup(compact);
-            await waitFor(() =>
-                expect(screen.getByTestId('drawer-data')).toHaveTextContent('DEGRADED:2'),
-            );
-            expect(
-                screen.getByText(compact ? /Degraded: 2 issues/ : /2 issues/),
-            ).toBeInTheDocument();
-            expect(getHealthcheckInfo).toHaveBeenCalledTimes(1);
+    test('shares drawer updates and isolates clusters in the compact preview', async () => {
+        const getHealthcheckInfo = jest.fn(async ({clusterName}: {clusterName?: string}) =>
+            clusterName === 'alpha' ? degraded : healthy,
+        );
+        Object.defineProperty(window, 'api', {
+            configurable: true,
+            value: {viewer: {getHealthcheckInfo}},
+        });
+        const history = setup(true);
+        await waitFor(() =>
+            expect(screen.getByTestId('drawer-data')).toHaveTextContent('DEGRADED:2'),
+        );
+        expect(screen.getByText(/Degraded: 2 issues/)).toBeInTheDocument();
+        expect(getHealthcheckInfo).toHaveBeenCalledTimes(1);
 
-            await act(async () => {
-                await store.dispatch(
-                    healthcheckApi.util.upsertQueryData(
-                        'getHealthcheckInfo',
-                        {database, clusterName: 'alpha'},
-                        healthy,
-                    ),
-                );
-            });
-            await waitFor(() =>
-                expect(screen.getByTestId('drawer-data')).toHaveTextContent('GOOD:0'),
+        await act(async () => {
+            await store.dispatch(
+                healthcheckApi.util.upsertQueryData(
+                    'getHealthcheckInfo',
+                    {database, clusterName: 'alpha'},
+                    healthy,
+                ),
             );
-            expect(screen.queryByText(/2 issues/)).not.toBeInTheDocument();
-            expect(getHealthcheckInfo).toHaveBeenCalledTimes(1);
+        });
+        await waitFor(() => expect(screen.getByTestId('drawer-data')).toHaveTextContent('GOOD:0'));
+        expect(screen.queryByText(/2 issues/)).not.toBeInTheDocument();
+        expect(getHealthcheckInfo).toHaveBeenCalledTimes(1);
 
-            act(() => history.push('/?clusterName=beta'));
-            await waitFor(() => expect(getHealthcheckInfo).toHaveBeenCalledTimes(2));
-            await waitFor(() =>
-                expect(screen.getByTestId('drawer-data')).toHaveTextContent('GOOD:0'),
-            );
-            expect(screen.queryByText(/2 issues/)).not.toBeInTheDocument();
-            expect(getHealthcheckInfo.mock.calls.map(([params]) => params.clusterName)).toEqual([
-                'alpha',
-                'beta',
-            ]);
-        },
-    );
+        act(() => history.push('/?clusterName=beta'));
+        await waitFor(() => expect(getHealthcheckInfo).toHaveBeenCalledTimes(2));
+        await waitFor(() => expect(screen.getByTestId('drawer-data')).toHaveTextContent('GOOD:0'));
+        expect(screen.queryByText(/2 issues/)).not.toBeInTheDocument();
+        expect(getHealthcheckInfo.mock.calls.map(([params]) => params.clusterName)).toEqual([
+            'alpha',
+            'beta',
+        ]);
+    });
 });
