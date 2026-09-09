@@ -110,6 +110,7 @@ export function GroupedStorageNodesComponent({
         database,
         viewContext,
         columnsSettings,
+        scrollContainerRef,
     });
 
     const searchFieldsRequired = React.useMemo(() => {

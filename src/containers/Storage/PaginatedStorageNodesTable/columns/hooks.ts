@@ -9,7 +9,10 @@ import {
     useBlobStorageCapacityMetricsEnabled,
     useBridgeModeEnabled,
 } from '../../../../store/reducers/capabilities/hooks';
+import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
+import {getSettingValue} from '../../../../store/reducers/settings/settings';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
+import {useTypedSelector} from '../../../../utils/hooks';
 import {
     mergeColumnsPreservingHiddenPositions,
     useSelectedColumns,
@@ -31,9 +34,13 @@ export function useStorageNodesSelectedColumns({
     database,
     viewContext,
     columnsSettings,
+    scrollContainerRef,
 }: GetStorageNodesColumnsParams) {
     const bridgeModeEnabled = useBridgeModeEnabled();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+    const invertedDisks = useTypedSelector(
+        (state) => getSettingValue(state, SETTING_KEYS.INVERTED_DISKS) as boolean | undefined,
+    );
 
     const skippedColumnIds = React.useMemo(() => {
         const skipped: NodesColumnId[] = [];
@@ -46,10 +53,23 @@ export function useStorageNodesSelectedColumns({
     }, [bridgeModeEnabled]);
 
     const columns = React.useMemo(() => {
-        const allColumns = getStorageNodesColumns({database, viewContext, columnsSettings});
+        const allColumns = getStorageNodesColumns({
+            database,
+            viewContext,
+            columnsSettings,
+            scrollContainerRef,
+            invertedDisks,
+        });
 
         return allColumns.filter((column) => !skippedColumnIds.some((id) => id === column.name));
-    }, [database, viewContext, columnsSettings, skippedColumnIds]);
+    }, [
+        database,
+        viewContext,
+        columnsSettings,
+        scrollContainerRef,
+        invertedDisks,
+        skippedColumnIds,
+    ]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {

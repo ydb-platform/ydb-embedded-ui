@@ -29,6 +29,7 @@ export function StorageNodesComponent({
         database,
         viewContext,
         columnsSettings,
+        scrollContainerRef,
     });
 
     return (

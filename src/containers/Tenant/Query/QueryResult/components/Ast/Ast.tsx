@@ -1,5 +1,4 @@
-import MonacoEditor from 'react-monaco-editor';
-
+import {MonacoEditor} from '../../../../../../components/MonacoEditor/MonacoEditor';
 import {cn} from '../../../../../../utils/cn';
 import {S_EXPRESSION_LANGUAGE_ID} from '../../../../../../utils/monaco/constats';
 

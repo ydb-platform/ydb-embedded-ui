@@ -1,0 +1,73 @@
+@use '../../../styles/mixins';
+
+.ydb-pdisk-svg {
+    display: block;
+
+    min-width: var(--pdisk-min-width);
+    height: 40px;
+
+    &_clickable {
+        cursor: pointer;
+    }
+
+    &__svg {
+        display: block;
+        overflow: visible;
+    }
+
+    &__vdisk,
+    &__pdisk,
+    &__pattern-background,
+    &__pattern-stripe {
+        @include mixins.entity-state-colors(&);
+    }
+
+    &__vdisk {
+        fill: var(--entity-state-fill-color);
+        stroke: var(--entity-state-border-color);
+        stroke-width: 1px;
+        vector-effect: non-scaling-stroke;
+
+        &_inactive {
+            opacity: 0.5;
+        }
+    }
+
+    &__pdisk {
+        &_inactive {
+            opacity: 0.5;
+        }
+    }
+
+    &__pdisk-background {
+        fill: var(--entity-state-background-color);
+    }
+
+    &__pdisk-fill {
+        fill: var(--entity-state-fill-color);
+    }
+
+    &__pdisk-border {
+        fill: transparent;
+        stroke: var(--entity-state-border-color);
+        stroke-width: 1px;
+        vector-effect: non-scaling-stroke;
+    }
+
+    &__pdisk-label {
+        font-family: var(--g-text-caption-font-family);
+        font-size: var(--g-text-caption-1-font-size);
+        user-select: none;
+        pointer-events: none;
+
+        fill: var(--g-color-text-primary);
+    }
+
+    &__pattern-background {
+        fill: var(--entity-state-stripe-background-color, var(--entity-state-background-color));
+    }
+
+    &__pattern-stripe {
+        fill: var(--entity-state-stripe-color, var(--entity-state-fill-color));
+    }
+}
