@@ -419,6 +419,102 @@ async function preparePDiskPage(
     await expectStorageGroupRowsReady(page);
 }
 
+test('keeps paired disk popups inside the viewport without expanding the page', async ({
+    page,
+}, testInfo) => {
+    await page.setViewportSize({width: 1500, height: 1000});
+    await enableExpertMode(page, VDisksGroupBy.All);
+    await page.addInitScript(() => {
+        localStorage.setItem('storagePDisksGroupBy', JSON.stringify('All'));
+    });
+    await setupVDiskColoringMocks(page);
+    await gotoStoragePage(page, VDisksGroupBy.All);
+    await expectStorageGroupRowsReady(page);
+
+    const row = getStorageGroupRow(page, 0);
+    const vDisk = getVDiskItems(row).nth(8);
+    const pDisk = getPDiskItems(row).nth(8);
+    await expect(vDisk).toBeInViewport();
+    await expect(pDisk).not.toBeInViewport();
+
+    const pageWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    await vDisk.hover();
+
+    const vDiskPopup = page.locator('.ydb-popover').filter({
+        has: page.getByText('9000000000-1-0-0-8', {exact: true}),
+    });
+    const pDiskPopup = page.locator('.ydb-popover').filter({
+        has: page.getByText('7008-108', {exact: true}),
+    });
+    await expect(vDiskPopup).toBeVisible();
+    await expect(pDiskPopup).toBeHidden();
+    await expect(getPDiskProgressBar(pDisk)).toHaveClass(/storage-disk-progress-bar_highlighted/);
+    await expect
+        .poll(() => page.evaluate(() => document.documentElement.scrollWidth))
+        .toBe(pageWidth);
+
+    await page.mouse.move(0, 0);
+    await expect(vDiskPopup).toBeHidden();
+    await pDisk.evaluate((element) => {
+        const container = element.closest('.ydb-cluster');
+        if (!container) {
+            throw new Error('Missing cluster scroll container');
+        }
+        const visibleRight = container.getBoundingClientRect().left + container.clientWidth;
+        container.scrollLeft += element.getBoundingClientRect().left - visibleRight;
+    });
+    await expect(vDisk).toBeInViewport();
+    await vDisk.hover();
+    await expect(vDiskPopup).toBeVisible();
+    await page.locator('.ydb-cluster').evaluate((element) => {
+        element.scrollTo({left: element.scrollLeft + 10});
+    });
+    await expect(pDisk).toBeInViewport();
+    await expect(pDiskPopup).toBeVisible();
+    for (const popup of [vDiskPopup, pDiskPopup]) {
+        await expect(popup).toBeInViewport({ratio: 1});
+    }
+    await expect
+        .poll(() => page.evaluate(() => document.documentElement.scrollWidth))
+        .toBe(pageWidth);
+    await pDiskPopup.getByRole('link', {name: 'Go to PDisk', exact: true}).hover();
+    await expect(vDiskPopup).toBeVisible();
+    await expect(pDiskPopup).toBeVisible();
+
+    await testInfo.attach('paired-disk-popups', {
+        body: await page.screenshot({path: testInfo.outputPath('paired-disk-popups.png')}),
+        contentType: 'image/png',
+    });
+    await page.keyboard.press('Escape');
+    await expect(vDiskPopup).toBeHidden();
+    await expect(pDiskPopup).toBeHidden();
+
+    await pDisk.hover();
+    await expect(vDiskPopup).toBeVisible();
+    await expect(pDiskPopup).toBeVisible();
+
+    const maxPageWidthWhileClosing = await pDiskPopup.evaluate((popup) => {
+        const container = document.querySelector('.ydb-cluster');
+        if (!container) {
+            throw new Error('Missing cluster scroll container');
+        }
+        return new Promise<number>((resolve) => {
+            let maxWidth = document.documentElement.scrollWidth;
+            const sample = () => {
+                maxWidth = Math.max(maxWidth, document.documentElement.scrollWidth);
+                if (!popup.isConnected) {
+                    resolve(maxWidth);
+                    return;
+                }
+                requestAnimationFrame(sample);
+            };
+            requestAnimationFrame(sample);
+            container.scrollTo({left: 0});
+        });
+    });
+    expect(maxPageWidthWhileClosing).toBe(pageWidth);
+});
+
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 60_000});
 

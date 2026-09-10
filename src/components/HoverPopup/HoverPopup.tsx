@@ -8,6 +8,25 @@ import {YDB_POPOVER_CLASS_NAME} from '../../utils/constants';
 
 const DEBOUNCE_TIMEOUT = 100;
 
+function useVisibleAnchor(anchorElement: HTMLElement | null, open: boolean) {
+    const [visibleAnchor, setVisibleAnchor] = React.useState<HTMLElement | null>(null);
+
+    React.useLayoutEffect(() => {
+        setVisibleAnchor(null);
+        if (!open || !anchorElement) {
+            return undefined;
+        }
+
+        const observer = new IntersectionObserver(([entry]) => {
+            setVisibleAnchor(entry.isIntersecting ? anchorElement : null);
+        });
+        observer.observe(anchorElement);
+        return () => observer.disconnect();
+    }, [anchorElement, open]);
+
+    return anchorElement !== null && visibleAnchor === anchorElement;
+}
+
 type HoverPopupProps = {
     children: React.ReactNode;
     renderPopupContent: (controls: {onClose: VoidFunction}) => React.ReactNode;
@@ -28,7 +47,7 @@ export const HoverPopup = ({
     anchorRef,
     onShowPopup,
     onHidePopup,
-    placement = ['top', 'bottom'],
+    placement = ['top', 'bottom', 'left', 'right'],
     contentClassName,
     delayClose = DEBOUNCE_TIMEOUT,
     delayOpen = DEBOUNCE_TIMEOUT,
@@ -124,9 +143,11 @@ export const HoverPopup = ({
     }, [closePopup]);
 
     const internalOpen = isPopupVisible || isPopupContentHovered || isFocused;
-    const open = internalOpen || showPopup;
+    const open = Boolean(internalOpen || showPopup);
 
     const anchorElement = anchorRef?.current || anchor.current;
+    // Clipping a paired disk must not clear the shared hover state via onHidePopup.
+    const isAnchorVisible = useVisibleAnchor(anchorElement, open);
 
     return (
         <React.Fragment>
@@ -142,9 +163,11 @@ export const HoverPopup = ({
                         }
                     }}
                     placement={placement}
+                    // Exiting popups must not expand the page when their anchors scroll offscreen.
+                    strategy="fixed"
                     returnFocus={false}
                     hasArrow
-                    open={open}
+                    open={open && isAnchorVisible}
                     // bigger offset for easier switching to neighbour nodes
                     // matches the default offset for popup with arrow out of a sense of beauty
                     offset={offset || {mainAxis: 12, crossAxis: 0}}
