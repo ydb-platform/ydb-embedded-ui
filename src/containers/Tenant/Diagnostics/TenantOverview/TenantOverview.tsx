@@ -311,11 +311,11 @@ export function TenantOverview({
 
     // Use healthcheck self_check_result as the database status color when available;
     // fall back to tenantinfo.Overall (e.g. for Serverless databases where healthcheck is skipped).
-    // Polling is managed by HealthcheckPreview (deduped via the same cache key); the database
+    // Polling is managed by HealthcheckPreview via the same {database, clusterName} cache key. The database
     // status badge is only rendered when !isV2NavigationEnabled, so skip the query in V2 mode
     // and until tenant info is loaded to avoid spurious requests.
     const {currentData: healthcheckData} = healthcheckApi.useGetHealthcheckInfoQuery(
-        {database},
+        {database, clusterName},
         {
             skip: shouldSkipHealthcheck({isServerless, isV2NavigationEnabled, tenant}),
         },

@@ -7,6 +7,7 @@ import {DrawerWrapper} from '../../../../components/Drawer';
 import type {DrawerControl} from '../../../../components/Drawer';
 import {EnableFullscreenButton} from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import type {SelfCheckResult} from '../../../../types/api/healthcheck';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {createAndDownloadJsonFile} from '../../../../utils/downloadFile';
 
 import {HealthcheckDrawerTitle} from './HealthcheckDrawerTitle';
@@ -42,6 +43,20 @@ export function HealthcheckDrawer({
     downloadTooltip,
     isDownloadDisabled,
 }: HealthcheckDrawerProps) {
+    const renderDrawerExtension = uiFactory.healthcheck.renderDrawerExtension;
+    const renderContentWithExtension = React.useCallback(() => {
+        if (!renderDrawerExtension) {
+            return renderDrawerContent();
+        }
+
+        return (
+            <React.Fragment>
+                {renderDrawerExtension()}
+                {renderDrawerContent()}
+            </React.Fragment>
+        );
+    }, [renderDrawerContent, renderDrawerExtension]);
+
     const handleDownload = React.useCallback(
         (event: React.MouseEvent<HTMLButtonElement>) => {
             event.stopPropagation();
@@ -86,7 +101,7 @@ export function HealthcheckDrawer({
             isDrawerVisible={isDrawerVisible}
             onCloseDrawer={onCloseDrawer}
             onTransitionInComplete={onTransitionInComplete}
-            renderDrawerContent={renderDrawerContent}
+            renderDrawerContent={renderContentWithExtension}
             drawerId={drawerId}
             storageKey={storageKey}
             detectClickOutside
