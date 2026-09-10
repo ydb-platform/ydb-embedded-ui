@@ -90,9 +90,8 @@ interface PDiskSvgProps {
     viewContext?: StorageViewContext;
     width: number;
     inactive?: boolean;
-    delayClose?: number;
     activeDiskKey?: string;
-    setActiveDiskKey?: (id?: string) => void;
+    setActiveDiskKey: (id?: string) => void;
     inverted?: boolean;
 }
 
@@ -403,7 +402,6 @@ export function PDiskSvg({
     viewContext,
     width,
     inactive,
-    delayClose = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     activeDiskKey,
     setActiveDiskKey,
     inverted,
@@ -413,9 +411,7 @@ export function PDiskSvg({
     const anchorRef = React.useRef<HTMLDivElement>(null);
     const popupContentRef = React.useRef<HTMLDivElement>(null);
     const patternIdPrefix = React.useId().replace(/:/g, '');
-    const [innerActiveDiskKey, setInnerActiveDiskKey] = React.useState<string | undefined>();
     const [isPopupPositionReady, setIsPopupPositionReady] = React.useState(false);
-    const resolvedActiveDiskKey = setActiveDiskKey ? activeDiskKey : innerActiveDiskKey;
 
     const vDiskAreas = React.useMemo(
         () => getVDiskAreas({vDisks, viewContext, width}),
@@ -427,16 +423,16 @@ export function PDiskSvg({
     );
     const vDiskPaths = React.useMemo(() => getVDiskPaths(vDiskAreas), [vDiskAreas]);
     const activeArea = React.useMemo<DiskArea | undefined>(() => {
-        if (!resolvedActiveDiskKey) {
+        if (!activeDiskKey) {
             return undefined;
         }
 
-        if (pDiskArea.key === resolvedActiveDiskKey) {
+        if (pDiskArea.key === activeDiskKey) {
             return pDiskArea;
         }
 
-        return vDiskAreas.find((area) => area.key === resolvedActiveDiskKey);
-    }, [pDiskArea, resolvedActiveDiskKey, vDiskAreas]);
+        return vDiskAreas.find((area) => area.key === activeDiskKey);
+    }, [activeDiskKey, pDiskArea, vDiskAreas]);
     const hasActiveArea = Boolean(activeArea);
     const activePath = React.useMemo(() => {
         if (!activeArea) {
@@ -453,24 +449,13 @@ export function PDiskSvg({
         });
     }, [activeArea, getVDiskLink]);
 
-    const setActiveDisk = React.useCallback(
-        (key?: string) => {
-            if (setActiveDiskKey) {
-                setActiveDiskKey(key);
-            } else {
-                setInnerActiveDiskKey(key);
-            }
-        },
-        [setActiveDiskKey],
-    );
-
     const closePopup = React.useCallback(() => {
-        setActiveDisk(undefined);
-    }, [setActiveDisk]);
+        setActiveDiskKey(undefined);
+    }, [setActiveDiskKey]);
 
     const debouncedClosePopup = React.useMemo(
-        () => debounce(closePopup, delayClose),
-        [closePopup, delayClose],
+        () => debounce(closePopup, DISKS_POPUP_DEBOUNCE_TIMEOUT),
+        [closePopup],
     );
 
     React.useEffect(() => {
@@ -539,14 +524,14 @@ export function PDiskSvg({
             }
 
             debouncedClosePopup.cancel();
-            if (area.key === resolvedActiveDiskKey) {
+            if (area.key === activeDiskKey) {
                 return;
             }
 
             closeOtherPopups(patternIdPrefix);
-            setActiveDisk(area.key);
+            setActiveDiskKey(area.key);
         },
-        [debouncedClosePopup, patternIdPrefix, resolvedActiveDiskKey, setActiveDisk],
+        [activeDiskKey, debouncedClosePopup, patternIdPrefix, setActiveDiskKey],
     );
 
     const handleMouseMove = React.useCallback(

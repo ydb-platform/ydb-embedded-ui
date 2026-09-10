@@ -30,7 +30,7 @@ import {
 } from '../../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../../components/nodesColumns/types';
 import {cn} from '../../../../utils/cn';
-import {PDisksCompact} from '../../PDisks/PDisksCompact';
+import {PDisks} from '../../PDisks/PDisks';
 
 import type {GetStorageNodesColumnsParams} from './types';
 
@@ -41,7 +41,6 @@ const b = cn('ydb-storage-nodes-columns');
 export const getPDisksColumn = ({
     viewContext,
     columnsSettings,
-    scrollContainerRef,
     invertedDisks,
 }: GetStorageNodesColumnsParams): NodesColumn => {
     return {
@@ -51,12 +50,11 @@ export const getPDisksColumn = ({
         width: columnsSettings?.pDiskContainerWidth,
         render: ({row}) => {
             return (
-                <PDisksCompact
+                <PDisks
                     pDisks={row.PDisks}
                     vDisks={row.VDisks}
                     viewContext={viewContext}
                     pDiskWidth={columnsSettings?.pDiskWidth}
-                    scrollContainerRef={scrollContainerRef}
                     inverted={invertedDisks}
                 />
             );
@@ -71,7 +69,6 @@ export const getStorageNodesColumns = ({
     database,
     viewContext,
     columnsSettings,
-    scrollContainerRef,
     invertedDisks,
 }: GetStorageNodesColumnsParams): NodesColumn[] => {
     const columns: NodesColumn[] = [
@@ -89,7 +86,7 @@ export const getStorageNodesColumns = ({
         getDiskSpaceUsageColumn(),
         getVersionColumn(),
         getMissingDisksColumn(),
-        getPDisksColumn({viewContext, columnsSettings, scrollContainerRef, invertedDisks}),
+        getPDisksColumn({viewContext, columnsSettings, invertedDisks}),
         getTabletsColumn({database}),
         getPDiskUsageColumn(),
         getVDiskSlotUsageColumn(),

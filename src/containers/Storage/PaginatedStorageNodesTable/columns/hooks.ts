@@ -34,7 +34,6 @@ export function useStorageNodesSelectedColumns({
     database,
     viewContext,
     columnsSettings,
-    scrollContainerRef,
 }: GetStorageNodesColumnsParams) {
     const bridgeModeEnabled = useBridgeModeEnabled();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
@@ -57,19 +56,11 @@ export function useStorageNodesSelectedColumns({
             database,
             viewContext,
             columnsSettings,
-            scrollContainerRef,
             invertedDisks,
         });
 
         return allColumns.filter((column) => !skippedColumnIds.some((id) => id === column.name));
-    }, [
-        database,
-        viewContext,
-        columnsSettings,
-        scrollContainerRef,
-        invertedDisks,
-        skippedColumnIds,
-    ]);
+    }, [database, viewContext, columnsSettings, invertedDisks, skippedColumnIds]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {

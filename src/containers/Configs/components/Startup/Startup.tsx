@@ -1,8 +1,8 @@
 import {useThemeValue} from '@gravity-ui/uikit';
+import MonacoEditor from 'react-monaco-editor';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
-import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import {configsApi} from '../../../../store/reducers/configs';
 import {useAutoRefreshInterval} from '../../../../utils/hooks/useAutoRefreshInterval';
 

@@ -2,23 +2,25 @@ import React from 'react';
 
 import {cn} from '../../../utils/cn';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
-import {PDisk} from '../PDisk/';
+import {PDiskSvg} from '../PDisk/PDiskSvg';
 import type {StorageViewContext} from '../types';
 import {isPdiskActive} from '../utils';
 
 import './PDisks.scss';
 
 const b = cn('ydb-storage-pdisks');
+const PDISK_MIN_WIDTH = 165;
 
 interface PDisksProps {
     pDisks?: PreparedPDisk[];
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
     pDiskWidth?: number;
+    inverted?: boolean;
 }
 
-export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDisksProps) {
-    const [highlightedDisk, setHighlightedDisk] = React.useState<string | undefined>();
+export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth, inverted}: PDisksProps) {
+    const [activeDiskKey, setActiveDiskKey] = React.useState<string | undefined>();
 
     if (!pDisks.length) {
         return null;
@@ -31,22 +33,17 @@ export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDis
 
                 const relatedVDisks = vDisks.filter((vdisk) => vdisk.PDiskId === pDisk.PDiskId);
 
-                const highlighted = highlightedDisk === id;
-
                 return (
                     <div className={b('pdisks-item')} key={id}>
-                        <PDisk
+                        <PDiskSvg
                             data={pDisk}
                             inactive={!isPdiskActive(pDisk, viewContext)}
                             vDisks={relatedVDisks}
                             viewContext={viewContext}
-                            width={pDiskWidth}
-                            showPopup={highlighted}
-                            onShowPopup={() => setHighlightedDisk(id)}
-                            onHidePopup={() => setHighlightedDisk(undefined)}
-                            highlighted={highlighted}
-                            highlightedDisk={highlightedDisk}
-                            setHighlightedDisk={setHighlightedDisk}
+                            width={pDiskWidth ?? PDISK_MIN_WIDTH}
+                            inverted={inverted}
+                            activeDiskKey={activeDiskKey}
+                            setActiveDiskKey={setActiveDiskKey}
                         />
                     </div>
                 );

@@ -1,5 +1,3 @@
-import type React from 'react';
-
 import type {VisibleEntities} from '../../../../store/reducers/storage/types';
 import type {StorageViewContext} from '../../types';
 
@@ -13,6 +11,5 @@ export interface GetStorageNodesColumnsParams {
     database?: string;
     viewContext?: StorageViewContext;
     columnsSettings?: StorageNodesColumnsSettings;
-    scrollContainerRef?: React.RefObject<HTMLElement>;
     invertedDisks?: boolean;
 }

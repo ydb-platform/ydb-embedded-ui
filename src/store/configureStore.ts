@@ -51,16 +51,12 @@ function _configureStore<
         preloadedState,
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
-                immutableCheck: checksDisabled
-                    ? false
-                    : {
-                          ignoredPaths: ['api'],
-                      },
+                immutableCheck: checksDisabled ? false : undefined,
                 serializableCheck: checksDisabled
                     ? false
                     : {
                           ignoredPaths: ['api'],
-                          ignoredActions: ['api/sendQuery/rejected', 'api/executeQuery/fulfilled'],
+                          ignoredActions: ['api/sendQuery/rejected'],
                       },
             }).concat(locationMiddleware, ...middleware),
     });
