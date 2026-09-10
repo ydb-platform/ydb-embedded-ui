@@ -1,14 +1,7 @@
-import React from 'react';
-
-import {cn} from '../../../utils/cn';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
-import {PDisk} from '../PDisk/';
 import type {StorageViewContext} from '../types';
-import {isPdiskActive} from '../utils';
 
-import './PDisks.scss';
-
-const b = cn('ydb-storage-pdisks');
+import {PDisksPreview} from './PDisksPreview';
 
 interface PDisksProps {
     pDisks?: PreparedPDisk[];
@@ -18,39 +11,12 @@ interface PDisksProps {
 }
 
 export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDisksProps) {
-    const [highlightedDisk, setHighlightedDisk] = React.useState<string | undefined>();
-
-    if (!pDisks.length) {
-        return null;
-    }
-
     return (
-        <div className={b('pdisks-wrapper')}>
-            {pDisks.map((pDisk) => {
-                const id = pDisk.StringifiedId;
-
-                const relatedVDisks = vDisks.filter((vdisk) => vdisk.PDiskId === pDisk.PDiskId);
-
-                const highlighted = id !== undefined && highlightedDisk === id;
-
-                return (
-                    <div className={b('pdisks-item')} key={id}>
-                        <PDisk
-                            data={pDisk}
-                            inactive={!isPdiskActive(pDisk, viewContext)}
-                            vDisks={relatedVDisks}
-                            viewContext={viewContext}
-                            width={pDiskWidth}
-                            showPopup={highlighted}
-                            onShowPopup={() => setHighlightedDisk(id)}
-                            onHidePopup={() => setHighlightedDisk(undefined)}
-                            highlighted={highlighted}
-                            highlightedDisk={highlightedDisk}
-                            setHighlightedDisk={setHighlightedDisk}
-                        />
-                    </div>
-                );
-            })}
-        </div>
+        <PDisksPreview
+            pDisks={pDisks}
+            vDisks={vDisks}
+            viewContext={viewContext}
+            pDiskWidth={pDiskWidth}
+        />
     );
 }
