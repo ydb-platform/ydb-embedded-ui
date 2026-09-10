@@ -46,7 +46,6 @@ export const getPDisksColumn = ({
         name: NODES_COLUMNS_IDS.PDisks,
         header: NODES_COLUMNS_TITLES.PDisks,
         className: b('pdisks-column'),
-        width: columnsSettings?.pDiskContainerWidth,
         render: ({row}) => {
             return (
                 <PDisks

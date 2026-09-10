@@ -1,0 +1,168 @@
+@use '../../../styles/mixins';
+
+.ydb-storage-pdisks-preview {
+    display: flex;
+    align-items: center;
+
+    height: 41px;
+
+    &__item {
+        position: relative;
+
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+
+        height: 41px;
+        padding: 0;
+
+        cursor: pointer;
+
+        color: inherit;
+        border: 0;
+        background: transparent;
+
+        transition: width 0.16s ease;
+
+        &_compact:hover,
+        &_compact:focus-visible {
+            --ydb-storage-pdisks-preview-fill-green: var(--g-color-base-positive-medium);
+            --ydb-storage-pdisks-preview-fill-blue: var(--g-color-base-info-heavy);
+            --ydb-storage-pdisks-preview-fill-yellow: var(--g-color-base-warning-medium);
+            --ydb-storage-pdisks-preview-fill-orange: var(--g-color-private-orange-400);
+            --ydb-storage-pdisks-preview-fill-red: var(--g-color-base-danger-medium);
+            --ydb-storage-pdisks-preview-fill-darkgrey: var(--g-color-base-neutral-medium);
+            --ydb-storage-pdisks-preview-fill-grey: var(--g-color-text-dark-complementary);
+            --ydb-storage-pdisks-preview-fill-light-grey: var(--g-color-base-neutral-medium);
+
+            .ydb-storage-pdisks-preview__svg {
+                filter: brightness(0.9) saturate(1.35);
+            }
+        }
+
+        &_active {
+            justify-content: center;
+
+            animation: ydb-storage-pdisks-preview-fade-in 0.12s ease;
+        }
+    }
+
+    &__control {
+        display: flex;
+        align-items: center;
+
+        width: 100%;
+        height: 100%;
+        padding: 0;
+
+        cursor: pointer;
+
+        color: inherit;
+        border: 0;
+        background: transparent;
+    }
+
+    &__svg {
+        position: relative;
+
+        display: block;
+
+        cursor: pointer;
+
+        transition: filter 0.12s ease;
+    }
+
+    &__pdisk-background {
+        fill: var(--entity-state-background-color);
+    }
+
+    &__pdisk-background,
+    &__pdisk-fill,
+    &__vdisk-fill {
+        transition:
+            fill 0.12s ease,
+            opacity 0.12s ease;
+
+        @include mixins.entity-state-colors(&);
+
+        &_solidred {
+            --entity-state-background-color: var(--g-color-base-danger-heavy);
+            --entity-state-fill-color: var(--g-color-base-danger-heavy);
+        }
+
+        &_green {
+            --entity-state-fill-color: var(
+                --ydb-storage-pdisks-preview-fill-green,
+                var(--g-color-base-positive-light-hover)
+            );
+        }
+
+        &_blue {
+            --entity-state-fill-color: var(
+                --ydb-storage-pdisks-preview-fill-blue,
+                var(--g-color-base-info-medium-hover)
+            );
+        }
+
+        &_yellow {
+            --entity-state-fill-color: var(
+                --ydb-storage-pdisks-preview-fill-yellow,
+                var(--g-color-base-warning-light-hover)
+            );
+        }
+
+        &_orange {
+            --entity-state-fill-color: var(
+                --ydb-storage-pdisks-preview-fill-orange,
+                var(--g-color-private-orange-300)
+            );
+        }
+
+        &_red {
+            --entity-state-fill-color: var(
+                --ydb-storage-pdisks-preview-fill-red,
+                var(--g-color-base-danger-light-hover)
+            );
+        }
+
+        &_darkgrey {
+            --entity-state-fill-color: var(
+                --ydb-storage-pdisks-preview-fill-darkgrey,
+                var(--g-color-base-neutral-light-hover)
+            );
+        }
+
+        &_grey {
+            --entity-state-fill-color: var(
+                --ydb-storage-pdisks-preview-fill-grey,
+                var(--g-color-text-dark-complementary)
+            );
+        }
+
+        &_light-grey {
+            --entity-state-fill-color: var(
+                --ydb-storage-pdisks-preview-fill-light-grey,
+                var(--g-color-base-neutral-light-hover)
+            );
+        }
+
+        &_inactive {
+            opacity: 0.5;
+        }
+    }
+
+    &__pdisk-fill,
+    &__vdisk-fill {
+        fill: var(--entity-state-fill-color);
+    }
+}
+
+@keyframes ydb-storage-pdisks-preview-fade-in {
+    from {
+        opacity: 0.65;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
