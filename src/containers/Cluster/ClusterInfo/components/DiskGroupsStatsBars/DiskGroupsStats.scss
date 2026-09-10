@@ -1,0 +1,18 @@
+.ydb-disk-groups-stats {
+    &__card {
+        padding: var(--g-spacing-3) var(--g-spacing-4);
+    }
+
+    &__available-help {
+        color: inherit;
+    }
+
+    &__legend-dot {
+        flex: 0 0 8px;
+
+        width: 8px;
+        height: 8px;
+
+        border-radius: 50%;
+    }
+}

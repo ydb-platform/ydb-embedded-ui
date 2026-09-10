@@ -15,6 +15,7 @@ import {BridgeInfoTable} from '../ClusterOverview/components/BridgeInfoTable';
 import i18n from '../i18n';
 
 import {StorageGroupStats} from './components/DiskGroupsStatsBars/DiskGroupsStats';
+import {prepareClusterGroupsStats} from './components/DiskGroupsStatsBars/utils';
 import {b} from './shared';
 
 import './ClusterInfo.scss';
@@ -35,12 +36,16 @@ export const ClusterInfo = ({
     loading,
     error,
     additionalClusterProps = {},
-    groupStats = {},
+    groupStats,
     bridgePiles,
 }: ClusterInfoProps) => {
     const {info = [], links = []} = additionalClusterProps;
 
     const clusterLinks = useClusterLinks(links);
+    const preparedGroupStats = React.useMemo(
+        () => prepareClusterGroupsStats(groupStats ?? {}),
+        [groupStats],
+    );
 
     const noDetails = (error && !cluster) || (!info.length && !clusterLinks.length);
 
@@ -106,17 +111,12 @@ export const ClusterInfo = ({
     };
 
     const renderStorageGroupsSection = () => {
-        if (loading || Object.keys(groupStats).length === 0) {
+        if (loading || preparedGroupStats.disks.length === 0) {
             return null;
         }
         return (
-            <InfoSection className={b('storage-section')}>
-                <Text as="div" variant="subheader-2" className={b('section-title')}>
-                    {i18n('title_storage-groups')}
-                </Text>
-                <Card view="filled" className={b('section', {compact: true})}>
-                    <StorageGroupStats groupStats={groupStats} />
-                </Card>
+            <InfoSection className={b('storage-section')} dataQa="cluster-storage-groups">
+                <StorageGroupStats stats={preparedGroupStats} />
             </InfoSection>
         );
     };
@@ -157,11 +157,12 @@ export const ClusterInfo = ({
 interface InfoSectionProps {
     children: React.ReactNode;
     className?: string;
+    dataQa?: string;
 }
 
-function InfoSection({children, className}: InfoSectionProps) {
+function InfoSection({children, className, dataQa}: InfoSectionProps) {
     return (
-        <Flex direction="column" gap={2} className={className}>
+        <Flex direction="column" gap={2} className={className} qa={dataQa}>
             {children}
         </Flex>
     );

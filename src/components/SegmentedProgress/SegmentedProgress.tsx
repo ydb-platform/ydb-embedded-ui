@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Flex, Text} from '@gravity-ui/uikit';
+import {Flex, Text, Tooltip} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 
@@ -28,6 +28,7 @@ interface SegmentedProgressByValueProps extends SegmentedProgressBaseProps {
     total: number;
     fillPercent?: never;
     displayNoLimit?: DisplayNoLimit;
+    segments?: never;
 }
 
 interface SegmentedProgressByFillPercentProps extends SegmentedProgressBaseProps {
@@ -35,11 +36,33 @@ interface SegmentedProgressByFillPercentProps extends SegmentedProgressBaseProps
     value?: never;
     total?: never;
     displayNoLimit?: never;
+    segments?: never;
+}
+
+export interface SegmentedProgressSegment {
+    id: string;
+    value: number;
+    /** Minimum width in pixels. A positive value keeps zero-value segments visible. */
+    minWidth?: number;
+    color?: string;
+    className?: string;
+    dataQa?: string;
+    tooltip?: string;
+    ariaLabelledBy?: string;
+}
+
+interface SegmentedProgressBySegmentsProps extends SegmentedProgressBaseProps {
+    segments: SegmentedProgressSegment[];
+    total: number;
+    value?: never;
+    fillPercent?: never;
+    displayNoLimit?: never;
 }
 
 export type SegmentedProgressProps =
     | SegmentedProgressByValueProps
-    | SegmentedProgressByFillPercentProps;
+    | SegmentedProgressByFillPercentProps
+    | SegmentedProgressBySegmentsProps;
 
 function clampPercent(percent: number) {
     if (!Number.isFinite(percent) || percent <= 0) {
@@ -51,7 +74,7 @@ function clampPercent(percent: number) {
     return percent;
 }
 
-function defaultNormalizePercent(percent: number) {
+export function defaultNormalizePercent(percent: number) {
     if (percent < 1) {
         return Math.round(percent * 10) / 10;
     }
@@ -64,9 +87,23 @@ function isFillPercentMode(
     return typeof props.fillPercent === 'number';
 }
 
+function isSegmentsMode(props: SegmentedProgressProps): props is SegmentedProgressBySegmentsProps {
+    return Array.isArray(props.segments);
+}
+
 function getPercentUsed(props: SegmentedProgressProps) {
     if (isFillPercentMode(props)) {
         return props.fillPercent;
+    }
+
+    if (isSegmentsMode(props)) {
+        if (props.total > 0) {
+            const value = props.segments.reduce((sum, segment) => sum + segment.value, 0);
+
+            return (value / props.total) * 100;
+        }
+
+        return 0;
     }
 
     if (props.total > 0) {
@@ -110,9 +147,57 @@ export function SegmentedProgress(props: SegmentedProgressProps) {
         [normalizePercent, percentUsed],
     );
     const fillWidth = getFillWidth(props, normalizedUsed);
+    const segmentSections = isSegmentsMode(props)
+        ? props.segments.map((segment) => ({
+              ...segment,
+              width: props.total > 0 ? clampPercent((segment.value / props.total) * 100) : 0,
+          }))
+        : undefined;
+    const hasEmptySection = (segmentSections ? percentUsed : fillWidth) < 100;
 
-    return (
-        <Flex direction="column" gap={1}>
+    const renderSections = () => {
+        if (segmentSections) {
+            return segmentSections
+                .filter((segment) => segment.width > 0 || (segment.minWidth ?? 0) > 0)
+                .map((segment) => {
+                    const section = (
+                        <div
+                            key={segment.id}
+                            aria-label={segment.tooltip}
+                            aria-labelledby={segment.ariaLabelledBy}
+                            className={b('section', {used: true}, segment.className)}
+                            data-qa={segment.dataQa}
+                            role={segment.tooltip ? 'img' : undefined}
+                            style={{
+                                width: `${segment.width}%`,
+                                minWidth: segment.minWidth,
+                                backgroundColor: segment.color,
+                            }}
+                            tabIndex={segment.tooltip ? 0 : undefined}
+                        />
+                    );
+
+                    if (!segment.tooltip) {
+                        return section;
+                    }
+
+                    return (
+                        <Tooltip key={segment.id} content={segment.tooltip}>
+                            {section}
+                        </Tooltip>
+                    );
+                });
+        }
+
+        if (fillWidth > 0) {
+            return <div className={b('section', {used: true})} style={{width: `${fillWidth}%`}} />;
+        }
+
+        return null;
+    };
+
+    const renderProgress = () => {
+        return (
             <div
                 className={b({theme}, className)}
                 data-qa={dataQa}
@@ -122,11 +207,15 @@ export function SegmentedProgress(props: SegmentedProgressProps) {
                 aria-valuemax={100}
                 aria-valuenow={normalizedUsed}
             >
-                {fillWidth > 0 && (
-                    <div className={b('section', {used: true})} style={{width: `${fillWidth}%`}} />
-                )}
-                {100 - fillWidth > 0 && <div className={b('section')} style={{flexGrow: 1}} />}
+                {renderSections()}
+                {hasEmptySection && <div className={b('section')} style={{flexGrow: 1}} />}
             </div>
+        );
+    };
+
+    return (
+        <Flex direction="column" gap={1}>
+            {renderProgress()}
             {!hideLabels && (
                 <Flex width="100%">
                     {labelStart && <Text color="secondary">{labelStart}</Text>}

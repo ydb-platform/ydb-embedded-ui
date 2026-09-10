@@ -7,6 +7,8 @@ export class ClusterPage extends PageModel {
     readonly clusterInfo: Locator;
     readonly bridgeSection: Locator;
     readonly pileCards: Locator;
+    readonly storageGroups: Locator;
+    readonly storageGroupCards: Locator;
 
     constructor(page: Page) {
         super(page, clusterPage);
@@ -14,6 +16,12 @@ export class ClusterPage extends PageModel {
         this.clusterInfo = this.selector.locator('.cluster-info');
         this.bridgeSection = this.clusterInfo.locator('.cluster-info__bridge-section');
         this.pileCards = this.bridgeSection.locator('.ydb-bridge-info-table__pile');
+        this.storageGroups = this.selector.getByTestId('cluster-storage-groups');
+        this.storageGroupCards = this.storageGroups.getByTestId('cluster-storage-group-card');
+    }
+
+    getStorageGroupSegments(container: Locator = this.storageGroups): Locator {
+        return container.getByTestId('cluster-storage-group-segment');
     }
 
     async isBridgeSectionVisible(): Promise<boolean> {

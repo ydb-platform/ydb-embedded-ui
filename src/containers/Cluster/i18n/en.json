@@ -1,8 +1,17 @@
 {
-  "title_allocated": "Allocated : {{used}} of {{total}} groups",
-  "title_available-one": "Available : 1 group",
-  "title_available-other": "Available : {{count}} groups",
-  "context_storage-group-allocation-progress": "Storage group allocation progress",
+  "title_available": "Available",
+  "value_groups": {
+    "one": "{{formattedCount}} group",
+    "other": "{{formattedCount}} groups"
+  },
+  "value_available-groups-range": "{{min}}–{{max}} groups",
+  "context_available-groups": "Estimated number of free groups available for allocation.",
+  "action_show-available-groups-info": "About available {{diskType}} storage groups",
+  "context_available-groups-by-erasure": {
+    "one": "{{formattedCount}} group available if only {{erasure}} is used",
+    "other": "{{formattedCount}} groups available if only {{erasure}} is used"
+  },
+  "context_storage-group-allocation-progress": "{{diskType}} storage group allocation: {{percent}}%",
   "title_cpu": "CPU",
   "title_storage-groups": "Allocated Storage Groups",
   "title_memory": "Memory",

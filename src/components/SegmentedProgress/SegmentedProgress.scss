@@ -35,6 +35,11 @@
 
         border-radius: var(--g-border-radius-xs);
         background-color: var(--ydb-segmented-progress-empty-color);
+
+        &:focus-visible {
+            outline: 2px solid var(--g-color-line-focus);
+            outline-offset: -2px;
+        }
     }
 
     &__section:not(&__section_used) {
