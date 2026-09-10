@@ -16,7 +16,13 @@ jest.mock('./utils/hooks/useDatabaseFromQuery', () => ({
 
 import type {Location} from 'history';
 
-import {getClustersPath, getPDiskPagePath, getTenantPath, parseQuery} from './routes';
+import {
+    getClustersPath,
+    getDefaultNodePath,
+    getPDiskPagePath,
+    getTenantPath,
+    parseQuery,
+} from './routes';
 
 const URL_WITH_NESTED_REFERRER =
     'https://monitoring.example.test/database?currentMetric=RowUpdates&queryTab=newQuery&diagnosticsTab=nodes&summaryTab=overview&metricsTab=memory&selectedConsumer=consumer&clusterName=global&database=database&databasePage=query&schema=%2Fglobal%2Fdatabase%2Ftable&utm_referrer=https%3A%2F%2Fmonitoring.example.test%2Fdatabase%3FcurrentMetric%3DRowUpdates%26queryTab%3DnewQuery%26diagnosticsTab%3Dschema%26summaryTab%3Doverview%26metricsTab%3Dmemory%26selectedConsumer%3Dconsumer%26clusterName%3Dglobal%26database%3Ddatabase%26databasePage%3Dquery%26schema%3D%252Fglobal%252Fdatabase%252Fnested_table%26utm_referrer%3Dhttps%253A%252F%252Fsso.example.test%252F%26monitoringTab%3Ddiagnostics%26from%3D1771092117420%26to%3D1771178517420%26interval%3D1d&monitoringTab=diagnostics&from=1771092117420&to=1771178517420&interval=1d';
@@ -26,6 +32,35 @@ function getSearchParams(path: string) {
 }
 
 describe('routes', () => {
+    describe('getDefaultNodePath', () => {
+        test.each([false, true])(
+            'preserves explicit node scope with webVersion=false and withBasename=%s',
+            (withBasename) => {
+                const backend = 'https://backend.example.test/ydb?x=1&y=2';
+                const path = getDefaultNodePath(
+                    {id: 42, activeTab: 'storage', environment: 'cloud-prod'},
+                    {database: '/local', clusterName: 'storage-test-cluster', backend},
+                    {withBasename},
+                );
+                const url = new URL(path, 'https://ui.example.test');
+
+                expect(url.pathname).toBe(
+                    `${withBasename ? '/monitoring' : ''}/cloud-prod/node/42/storage`,
+                );
+                expect(url.searchParams.get('database')).toBe('/local');
+                expect(url.searchParams.get('clusterName')).toBe('storage-test-cluster');
+                expect(url.searchParams.get('backend')).toBe(backend);
+                expect(url.searchParams.has('y')).toBe(false);
+            },
+        );
+
+        test('keeps node links without environment or backend unchanged', () => {
+            expect(getDefaultNodePath({id: 42, activeTab: 'tablets'}, {database: '/local'})).toBe(
+                '/node/42/tablets?database=%2Flocal',
+            );
+        });
+    });
+
     describe('getPDiskPagePath', () => {
         test('should create pDisk path without basename by default', () => {
             expect(getPDiskPagePath(1001, 4)).toBe('/pDisk?nodeId=4&pDiskId=1001');

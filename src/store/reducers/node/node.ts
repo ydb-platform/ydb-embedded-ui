@@ -15,17 +15,6 @@ export const nodeApi = api.injectEndpoints({
             },
             providesTags: ['All'],
         }),
-        getNodeStructure: build.query({
-            queryFn: async ({nodeId}: {nodeId: string}, {signal}) => {
-                try {
-                    const data = await window.api.viewer.getStorageInfo({nodeId}, {signal});
-                    return {data};
-                } catch (error) {
-                    return {error};
-                }
-            },
-            providesTags: ['All'],
-        }),
     }),
     overrideExisting: 'throw',
 });

@@ -8,7 +8,7 @@ import {
 import type {
     GroupsGroupByField,
     GroupsRequiredField,
-    StorageV2SortValue,
+    GroupsSortField,
 } from '../../../../types/api/storage';
 import type {ValueOf} from '../../../../types/common';
 
@@ -295,7 +295,7 @@ export const GROUPS_COLUMNS_TO_DATA_FIELDS: Record<StorageGroupsColumnId, Groups
 
 const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
     StorageGroupsColumnId,
-    StorageV2SortValue | undefined
+    GroupsSortField | undefined
 > = {
     GroupId: 'GroupId',
     PoolName: 'PoolName',

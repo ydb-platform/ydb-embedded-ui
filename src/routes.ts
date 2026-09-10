@@ -169,7 +169,7 @@ export function getStorageGroupPath(groupId: string | number, query: Query = {})
 }
 
 export function getDefaultNodePath(
-    params: {id: string | number; activeTab?: NodeTab},
+    params: {id: string | number; activeTab?: NodeTab; environment?: string},
     query: NodePageQuery = {},
     options?: CreateHrefOptions,
 ) {

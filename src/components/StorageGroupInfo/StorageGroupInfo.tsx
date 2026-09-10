@@ -43,7 +43,6 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
         Read,
         Write,
         GroupGeneration,
-        Latency,
         AllocationUnits,
         State,
         MissingDisks,
@@ -140,12 +139,6 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
             });
         }
         runtimeInfo.push(...toInfoViewerItems(getStorageGroupCapacityInfoItems(data)));
-        if (valueIsDefined(Latency)) {
-            runtimeInfo.push({
-                label: storageGroupInfoKeyset('latency'),
-                value: <StatusIcon status={Latency} />,
-            });
-        }
         if (valueIsDefined(LatencyPutTabletLogMs)) {
             runtimeInfo.push({
                 label: storageGroupInfoKeyset('latency-put-tablet-log'),
@@ -256,12 +249,6 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('disk-space'),
             value: <StatusIcon status={DiskSpace} />,
-        });
-    }
-    if (valueIsDefined(Latency)) {
-        storageGroupInfoSecondColumn.push({
-            label: storageGroupInfoKeyset('latency'),
-            value: <StatusIcon status={Latency} />,
         });
     }
     if (valueIsDefined(LatencyPutTabletLogMs)) {

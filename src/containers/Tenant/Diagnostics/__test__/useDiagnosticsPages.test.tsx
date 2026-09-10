@@ -4,7 +4,6 @@ import {
     useCapabilitiesLoaded,
     useConfigAvailable,
     useNewStorageViewEnabled,
-    useStorageGroupsHandlerAvailable,
     useStorageStatsAvailable,
     useTopicDataAvailable,
 } from '../../../../store/reducers/capabilities/hooks';
@@ -20,7 +19,6 @@ jest.mock('../../../../store/reducers/capabilities/hooks', () => ({
     useCapabilitiesLoaded: jest.fn(),
     useConfigAvailable: jest.fn(),
     useNewStorageViewEnabled: jest.fn(),
-    useStorageGroupsHandlerAvailable: jest.fn(),
     useStorageStatsAvailable: jest.fn(),
     useTopicDataAvailable: jest.fn(),
 }));
@@ -54,7 +52,6 @@ describe('useDiagnosticsPages', () => {
         (useCapabilitiesLoaded as jest.Mock).mockReturnValue(true);
         (useConfigAvailable as jest.Mock).mockReturnValue(true);
         (useNewStorageViewEnabled as jest.Mock).mockReturnValue(true);
-        (useStorageGroupsHandlerAvailable as jest.Mock).mockReturnValue(true);
         (useStorageStatsAvailable as jest.Mock).mockReturnValue(true);
         (useTopicDataAvailable as jest.Mock).mockReturnValue(true);
         (useClusterBaseInfo as jest.Mock).mockReturnValue({monitoring: {}});

@@ -18,7 +18,6 @@ jest.mock('../../../../components/LoaderWrapper/LoaderWrapper', () => ({
 
 jest.mock('../../../../store/reducers/capabilities/hooks', () => ({
     useCapabilitiesLoaded: jest.fn(() => true),
-    useStorageGroupsHandlerAvailable: jest.fn(() => true),
 }));
 
 jest.mock('../getGroups', () => ({

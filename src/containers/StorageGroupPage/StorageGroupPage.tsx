@@ -9,10 +9,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {StorageGroupInfo} from '../../components/StorageGroupInfo/StorageGroupInfo';
-import {
-    useCapabilitiesLoaded,
-    useStorageGroupsHandlerAvailable,
-} from '../../store/reducers/capabilities/hooks';
+import {useCapabilitiesLoaded} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {storageApi} from '../../store/reducers/storage/storage';
 import {EFlag} from '../../types/api/enums';
@@ -41,11 +38,10 @@ export function StorageGroupPage() {
     }, [dispatch, groupId, database]);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const shouldUseGroupsHandler = useStorageGroupsHandlerAvailable();
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupQuery = storageApi.useGetStorageGroupsInfoQuery(
         valueIsDefined(groupId)
-            ? {groupId, shouldUseGroupsHandler, with: 'all', fieldsRequired: 'all', database}
+            ? {groupId, with: 'all', fieldsRequired: 'all', database}
             : skipToken,
         {
             pollingInterval: autoRefreshInterval,

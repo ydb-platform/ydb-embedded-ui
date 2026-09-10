@@ -16,7 +16,6 @@ import routes, {getDefaultNodePath} from '../../routes';
 import {
     useCapabilitiesLoaded,
     useConfigAvailable,
-    useDiskPagesAvailable,
     useViewerPeersHandlerAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
@@ -34,7 +33,6 @@ import {Tablets} from '../Tablets/Tablets';
 
 import type {NodeTab} from './NodePages';
 import {NODE_TABS, nodePageQueryParams, nodePageTabSchema} from './NodePages';
-import NodeStructure from './NodeStructure/NodeStructure';
 import {Threads} from './Threads/Threads';
 import i18n from './i18n';
 
@@ -52,12 +50,14 @@ export function Node() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
 
-    const match = useRouteMatch<{id: string; activeTab: string}>(routes.node);
+    const match = useRouteMatch<{id: string; activeTab: string; environment?: string}>(routes.node);
 
     const nodeId = match?.params.id;
     const activeTabIdFromQuery = match?.params.activeTab;
+    const environment = match?.params.environment;
 
-    const [{database: tenantNameFromQuery}] = useQueryParams(nodePageQueryParams);
+    const [{database: tenantNameFromQuery, clusterName, backend}] =
+        useQueryParams(nodePageQueryParams);
     const database = tenantNameFromQuery?.toString();
 
     const activeTabId = nodePageTabSchema.parse(activeTabIdFromQuery);
@@ -72,7 +72,6 @@ export function Node() {
     } = nodeApi.useGetNodeInfoQuery(params, {pollingInterval: autoRefreshInterval});
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
-    const isDiskPagesAvailable = useDiskPagesAvailable();
     const isPeersHandlerAvailable = useViewerPeersHandlerAvailable();
 
     const pageLoading = isLoading || !capabilitiesLoaded;
@@ -88,9 +87,6 @@ export function Node() {
         }
         if (!configsAvailable) {
             skippedTabs.push('configs');
-        }
-        if (isDiskPagesAvailable) {
-            skippedTabs.push('structure');
         }
         if ((!database && !isViewerUser) || !hasThreads) {
             skippedTabs.push('threads');
@@ -111,7 +107,6 @@ export function Node() {
         return {activeTab: actualActiveTab, nodeTabs: actualNodeTabs};
     }, [
         isStorageNode,
-        isDiskPagesAvailable,
         isPeersHandlerAvailable,
         activeTabId,
         hasThreads,
@@ -142,12 +137,26 @@ export function Node() {
             return;
         }
 
-        if (activeTab.id !== activeTabId) {
-            const path = getDefaultNodePath({id: nodeId, activeTab: activeTab.id}, {database});
+        if (activeTab.id !== activeTabId || activeTabIdFromQuery === 'structure') {
+            const path = getDefaultNodePath(
+                {id: nodeId, activeTab: activeTab.id, environment},
+                {database, clusterName: clusterName ?? undefined, backend: backend ?? undefined},
+            );
 
             history.replace(path);
         }
-    }, [nodeId, database, activeTab.id, activeTabId, history, activeTab]);
+    }, [
+        nodeId,
+        database,
+        clusterName,
+        backend,
+        environment,
+        activeTab.id,
+        activeTabId,
+        activeTabIdFromQuery,
+        history,
+        activeTab,
+    ]);
 
     return (
         <div className={b(null)} ref={container}>
@@ -160,6 +169,9 @@ export function Node() {
                 <NodePageContent
                     nodeId={nodeId}
                     database={database}
+                    clusterName={clusterName ?? undefined}
+                    backend={backend ?? undefined}
+                    environment={environment}
                     activeTabId={activeTab.id}
                     tabs={nodeTabs}
                     parentContainer={container}
@@ -233,6 +245,9 @@ function NodePageInfo({node, loading}: NodePageInfoProps) {
 interface NodePageContentProps {
     nodeId: string;
     database?: string;
+    clusterName?: string;
+    backend?: string;
+    environment?: string;
 
     activeTabId: NodeTab;
     tabs: {id: string; title: string}[];
@@ -243,6 +258,9 @@ interface NodePageContentProps {
 function NodePageContent({
     nodeId,
     database,
+    clusterName,
+    backend,
+    environment,
     activeTabId,
     tabs,
     parentContainer,
@@ -254,8 +272,8 @@ function NodePageContent({
                     <TabList className={b('tab-list')} size="l">
                         {tabs.map(({id, title}) => {
                             const path = getDefaultNodePath(
-                                {id: nodeId, activeTab: id as NodeTab},
-                                {database},
+                                {id: nodeId, activeTab: id as NodeTab, environment},
+                                {database, clusterName, backend},
                             );
                             return (
                                 <Tab value={id} key={id}>
@@ -294,10 +312,6 @@ function NodePageContent({
                         onlyActive
                     />
                 );
-            }
-
-            case 'structure': {
-                return <NodeStructure nodeId={nodeId} />;
             }
 
             case 'threads': {
