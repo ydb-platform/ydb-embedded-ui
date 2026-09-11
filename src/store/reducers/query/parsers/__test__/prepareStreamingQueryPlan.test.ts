@@ -30,6 +30,22 @@ describe('prepareStreamingQueryPlan', () => {
         expect(result.prepared).toBeUndefined();
     });
 
+    test('rejects a node type that is not a string', () => {
+        const result = prepareStreamingQueryPlan(plan('"Plan": {"Node Type": {}, "Plans": []}'));
+        expect(result.hasPlan).toBe(true);
+        expect(result.prepared).toBeUndefined();
+    });
+
+    test('rejects a nested node whose fields are not renderable', () => {
+        const result = prepareStreamingQueryPlan(
+            plan(
+                '"Plan": {"Node Type": "Query", "Plans": [{"Node Type": "Stage", "Operators": [{"Name": {}}]}]}',
+            ),
+        );
+        expect(result.hasPlan).toBe(true);
+        expect(result.prepared).toBeUndefined();
+    });
+
     test('reports an unsupported version without nodes', () => {
         const result = prepareStreamingQueryPlan(
             '{"meta": {"version": "0.1", "type": "query"}, "Plan": {"Node Type": "Stage"}}',
