@@ -1,4 +1,5 @@
 import type {Action, Reducer, UnknownAction} from '@reduxjs/toolkit';
+import {createNextState} from '@reduxjs/toolkit';
 import type {History, Location} from 'history';
 import each from 'lodash/each';
 import keys from 'lodash/keys';
@@ -75,7 +76,10 @@ export const paramSetup = {
 } as const;
 
 function mergeLocationToState<S>(state: S, location: Pick<LocationWithQuery, 'query'>): S {
-    return merge({}, state, location.query);
+    // Preserve cached API data when updating only URL-backed state.
+    return createNextState(state, (draft) => {
+        merge(draft, location.query);
+    });
 }
 
 function restoreUnknownParams(location: Location, prevLocation: Location) {
