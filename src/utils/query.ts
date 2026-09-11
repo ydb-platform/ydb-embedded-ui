@@ -246,16 +246,20 @@ export function isErrorResponse(data: unknown): data is ErrorResponse {
     return Boolean(data && typeof data === 'object' && 'issues' in data);
 }
 
+function hasIssueContent(data: ErrorResponse) {
+    return Boolean(data.error || data.issues?.length);
+}
+
 export function parseIssuesData(raw: unknown): ErrorResponse | string | undefined {
     if (typeof raw === 'string' && raw) {
         try {
             const parsed: unknown = JSON.parse(raw);
-            return isErrorResponse(parsed) ? parsed : undefined;
+            return isErrorResponse(parsed) && hasIssueContent(parsed) ? parsed : undefined;
         } catch {
             return raw;
         }
     }
-    if (isErrorResponse(raw)) {
+    if (isErrorResponse(raw) && hasIssueContent(raw)) {
         return raw;
     }
     return undefined;

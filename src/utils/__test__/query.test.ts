@@ -86,6 +86,12 @@ describe('parseIssuesData', () => {
         expect(result).toEqual(JSON.parse(raw));
     });
 
+    test('returns undefined when the issue collection is empty', () => {
+        expect(parseIssuesData(JSON.stringify({issues: []}))).toBeUndefined();
+        expect(parseIssuesData(JSON.stringify({issues: null}))).toBeUndefined();
+        expect(parseIssuesData({issues: []})).toBeUndefined();
+    });
+
     test('returns undefined when JSON is valid but not ErrorResponse', () => {
         expect(parseIssuesData(JSON.stringify({status: 'pending'}))).toBeUndefined();
         expect(parseIssuesData('{}')).toBeUndefined();
