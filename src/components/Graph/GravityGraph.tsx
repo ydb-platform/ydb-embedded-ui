@@ -21,7 +21,7 @@ import {NonSelectableConnection} from './NonSelectableConnection';
 import {graphColorsConfig} from './colorsConfig';
 import {runTreeLayout} from './runTreeLayout';
 import type {Data} from './types';
-import {parseCustomPropertyValue} from './utils';
+import {isSameTopology, parseCustomPropertyValue} from './utils';
 
 import './GravityGraph.scss';
 
@@ -124,12 +124,17 @@ export function GravityGraph<T>({data, onError, theme}: Props<T>) {
             },
             createWorker: createGraphLayoutWorker,
             onResult: ({layout, edges}) => {
-                graphBlockIdsRef.current = layout.map(({id}) => id);
+                const blockIds = layout.map(({id}) => id);
+                // Statistics-only updates keep the topology, so the camera stays where the user put it.
+                const sameTopology = isSameTopology(graphBlockIdsRef.current, blockIds);
+                graphBlockIdsRef.current = blockIds;
                 graph.setEntities({
                     blocks: layout,
                     connections: edges,
                 });
-                scheduleGraphFit();
+                if (!sameTopology) {
+                    scheduleGraphFit();
+                }
             },
             onError,
         });
