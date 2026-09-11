@@ -1,4 +1,4 @@
-import type {TBlock} from '@gravity-ui/graph';
+import type {TBlock, TBlockId} from '@gravity-ui/graph';
 
 import type {ExplainPlanNodeData} from '../../store/reducers/query/types';
 
@@ -109,4 +109,8 @@ export function parseCustomPropertyValue<T extends AbstractGraphColorsConfig>(
     }
 
     return parsed as T;
+}
+
+export function isSameTopology(previous: TBlockId[], next: TBlockId[]) {
+    return previous.length === next.length && previous.every((id, index) => id === next[index]);
 }
