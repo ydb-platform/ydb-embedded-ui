@@ -24,6 +24,12 @@ describe('prepareStreamingQueryPlan', () => {
         expect(result.prepared).toBeUndefined();
     });
 
+    test('rejects a root plan node that is not a node', () => {
+        const result = prepareStreamingQueryPlan(plan('"Plan": {}'));
+        expect(result.hasPlan).toBe(true);
+        expect(result.prepared).toBeUndefined();
+    });
+
     test('reports an unsupported version without nodes', () => {
         const result = prepareStreamingQueryPlan(
             '{"meta": {"version": "0.1", "type": "query"}, "Plan": {"Node Type": "Stage"}}',
