@@ -9,7 +9,29 @@ interface StreamingQueryPlan {
 }
 
 function isPlanNode(value: unknown) {
-    return Boolean(value && typeof value === 'object' && 'Node Type' in value);
+    return Boolean(
+        value &&
+            typeof value === 'object' &&
+            'Node Type' in value &&
+            typeof (value as {'Node Type': unknown})['Node Type'] === 'string',
+    );
+}
+
+function isStringList(value: unknown) {
+    return (
+        value === undefined || (Array.isArray(value) && value.every((i) => typeof i === 'string'))
+    );
+}
+
+// The graph blocks render these fields directly, so anything else would throw while drawing.
+function isRenderable(prepared: PreparedQueryData['preparedPlan']) {
+    return (prepared?.nodes ?? []).every(({data}) => {
+        return (
+            (data?.name === undefined || typeof data.name === 'string') &&
+            isStringList(data?.operators) &&
+            isStringList(data?.tables)
+        );
+    });
 }
 
 export function prepareStreamingQueryPlan(planText?: string): StreamingQueryPlan {
@@ -22,7 +44,7 @@ export function prepareStreamingQueryPlan(planText?: string): StreamingQueryPlan
     }
     try {
         const {simplifiedPlan: _simplifiedPlan, ...prepared} = preparePlanData(plan);
-        return {hasPlan: true, prepared};
+        return isRenderable(prepared) ? {hasPlan: true, prepared} : {hasPlan: true};
     } catch {
         return {hasPlan: true};
     }
