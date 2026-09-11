@@ -33,8 +33,11 @@ interface DiskStateProgressBarProps {
     overflowVisible?: boolean;
 }
 
-function getToneModifier(tone: DiskBarTone) {
-    return tone === 'LightGrey' ? 'light-grey' : tone.toLowerCase();
+export function getDiskStateColorMods(tone: DiskBarTone, highlighted?: boolean) {
+    return {
+        [tone === 'LightGrey' ? 'light-grey' : tone.toLowerCase()]: true,
+        highlighted,
+    };
 }
 
 export function DiskStateProgressBar({
@@ -66,11 +69,10 @@ export function DiskStateProgressBar({
         inactive,
         striped,
         filled,
-        highlighted,
         'all-mode-has-issues': mode === 'all' && strongFill,
         'legend-inactive': borderless,
         'overlap-icon-at-top-left': overflowVisible,
-        [getToneModifier(tone)]: true,
+        ...getDiskStateColorMods(tone, highlighted),
     };
 
     if (mode) {

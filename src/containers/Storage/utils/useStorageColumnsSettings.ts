@@ -1,5 +1,8 @@
 import React from 'react';
 
+import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
+import {useSetting} from '../../../utils/hooks/useSetting';
+import {getPDisksPreviewColumnWidth} from '../PDisks/PDisksPreview';
 import type {StorageNodesColumnsSettings} from '../PaginatedStorageNodesTable/columns/types';
 import type {StorageNodesPaginatedTableData} from '../types';
 
@@ -35,6 +38,8 @@ const MAX_SLOTS_DEFAULT = 1;
 const PAGNATED_TABLE_CELL_HORIZONTAL_PADDING = 10;
 
 export function useStorageColumnsSettings() {
+    const [pDisksPreviewEnabled] = useSetting<boolean>(SETTING_KEYS.ENABLE_PDISKS_PREVIEW);
+    const [previewColumnWidth, setPreviewColumnWidth] = React.useState<number>();
     const [pDiskWidth, setPDiskWidth] = React.useState<number | undefined>(undefined);
     const [pDiskContainerWidth, setPDiskContainerWidth] = React.useState<number | undefined>(
         undefined,
@@ -59,6 +64,12 @@ export function useStorageColumnsSettings() {
 
                 setPDiskWidth(calculatedPDiskWidth);
                 setPDiskContainerWidth(calculatedPDiskContainerWidth);
+                setPreviewColumnWidth(
+                    getPDisksPreviewColumnWidth({
+                        maxSlotsPerDisk: maxSlots,
+                        maxDisksPerNode: maxDisks,
+                    }),
+                );
             }
         },
         [pDiskWidth],
@@ -67,9 +78,10 @@ export function useStorageColumnsSettings() {
     const columnsSettings: StorageNodesColumnsSettings = React.useMemo(() => {
         return {
             pDiskWidth: pDiskWidth || PDISK_MIN_WIDTH,
-            pDiskContainerWidth: pDiskContainerWidth,
+            pDiskContainerWidth: pDisksPreviewEnabled ? previewColumnWidth : pDiskContainerWidth,
+            pDisksPreviewEnabled,
         };
-    }, [pDiskContainerWidth, pDiskWidth]);
+    }, [pDiskContainerWidth, pDiskWidth, pDisksPreviewEnabled, previewColumnWidth]);
 
     return {
         handleDataFetched,

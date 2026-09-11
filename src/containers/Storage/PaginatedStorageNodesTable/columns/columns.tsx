@@ -31,6 +31,7 @@ import {
 import type {NodesColumn} from '../../../../components/nodesColumns/types';
 import {cn} from '../../../../utils/cn';
 import {PDisks} from '../../PDisks/PDisks';
+import {PDisksPreview} from '../../PDisks/PDisksPreview';
 
 import type {GetStorageNodesColumnsParams} from './types';
 
@@ -42,13 +43,15 @@ export const getPDisksColumn = ({
     viewContext,
     columnsSettings,
 }: GetStorageNodesColumnsParams): NodesColumn => {
+    const Disks = columnsSettings?.pDisksPreviewEnabled ? PDisksPreview : PDisks;
     return {
         name: NODES_COLUMNS_IDS.PDisks,
         header: NODES_COLUMNS_TITLES.PDisks,
         className: b('pdisks-column'),
+        width: columnsSettings?.pDiskContainerWidth,
         render: ({row}) => {
             return (
-                <PDisks
+                <Disks
                     pDisks={row.PDisks}
                     vDisks={row.VDisks}
                     viewContext={viewContext}
