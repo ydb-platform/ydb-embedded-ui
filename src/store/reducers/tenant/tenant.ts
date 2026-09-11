@@ -5,6 +5,7 @@ import type {TTenantInfo} from '../../../types/api/tenant';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
 import {api} from '../api';
+import {getDatabaseDataTag} from '../entityDataTags';
 import {prepareTenants} from '../tenants/utils';
 
 import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
@@ -90,7 +91,22 @@ export const tenantApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: (result, _error, {clusterName, database}) => {
+                const databaseAliases = new Set([database]);
+                if (result?.Id) {
+                    databaseAliases.add(result.Id);
+                }
+                if (result?.Name) {
+                    databaseAliases.add(result.Name);
+                }
+
+                return [
+                    'All' as const,
+                    ...Array.from(databaseAliases, (databaseAlias) =>
+                        getDatabaseDataTag({clusterName, database: databaseAlias}),
+                    ),
+                ];
+            },
             serializeQueryArgs: ({queryArgs}) => {
                 const {clusterName, database} = queryArgs;
                 return {clusterName, database};
