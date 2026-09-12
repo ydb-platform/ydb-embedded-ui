@@ -94,6 +94,7 @@ export function NodesTable({
 
     return (
         <ResizeablePaginatedTable
+            keyboardNavigationLinkSelector={'a.ydb-entity-name__name[href*="/node/"]'}
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
             scrollContainerRef={scrollContainerRef}
             columns={columns}

@@ -204,7 +204,6 @@ const TenantsTableContent = ({
 
     const {
         handleKeyDownCapture,
-        handleListMouseLeaveCapture,
         handleListMouseMoveCapture,
         getFocusedRowClassName,
         isKeyboardFocusActive,
@@ -473,10 +472,7 @@ const TenantsTableContent = ({
                     loading={loading}
                     scrollDependencies={[search, withProblems, sortParams]}
                 >
-                    <div
-                        onMouseMoveCapture={handleListMouseMoveCapture}
-                        onMouseLeave={handleListMouseLeaveCapture}
-                    >
+                    <div onMouseMoveCapture={handleListMouseMoveCapture}>
                         {currentData ? renderTable() : null}
                     </div>
                 </TableWithControlsLayout.Table>

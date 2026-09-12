@@ -109,6 +109,7 @@ export const PaginatedStorageGroupsTable = ({
     return (
         <LoaderWrapper loading={!capabilitiesLoaded}>
             <ResizeablePaginatedTable
+                keyboardNavigationLinkSelector={'a.ydb-entity-name__name[href*="/storageGroup?"]'}
                 columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
                 scrollContainerRef={scrollContainerRef}
                 columns={columns}

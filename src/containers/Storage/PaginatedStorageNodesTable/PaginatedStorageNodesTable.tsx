@@ -99,6 +99,7 @@ export const PaginatedStorageNodesTable = ({
 
     return (
         <ResizeablePaginatedTable
+            keyboardNavigationLinkSelector={'a.ydb-entity-name__name[href*="/node/"]'}
             columnsWidthLSKey={STORAGE_NODES_COLUMNS_WIDTH_LS_KEY}
             scrollContainerRef={scrollContainerRef}
             columns={columns}

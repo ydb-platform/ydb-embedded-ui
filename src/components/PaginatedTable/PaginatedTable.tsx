@@ -16,6 +16,7 @@ import type {
     RenderEmptyDataMessage,
     RenderErrorMessage,
 } from './types';
+import {KeyboardRowContext, useKeyboardNavigation} from './useKeyboardNavigation';
 import {isSortColumnAvailable} from './utils';
 
 import './PaginatedTable.scss';
@@ -38,6 +39,8 @@ export interface PaginatedTableProps<T, F> {
     onDataFetched?: (data: PaginatedTableData<T>) => void;
     keepCache?: boolean;
     fetchOverscan?: number;
+    /** Opt in to row navigation using the selector of each row's primary link. */
+    keyboardNavigationLinkSelector?: string;
 }
 
 const DEFAULT_PAGINATION_LIMIT = 20;
@@ -60,6 +63,7 @@ export const PaginatedTable = <T, F>({
     onDataFetched,
     keepCache = true,
     fetchOverscan,
+    keyboardNavigationLinkSelector,
 }: PaginatedTableProps<T, F>) => {
     // Get state and setters from context
     const {tableState, setSortParams, setTotalEntities, setFoundEntities, setIsInitialLoad} =
@@ -76,6 +80,16 @@ export const PaginatedTable = <T, F>({
     React.useEffect(() => {
         setFilters(rawFilters);
     }, [rawFilters]);
+
+    const keyboard = useKeyboardNavigation({
+        tableRef,
+        scrollContainerRef,
+        linkSelector: keyboardNavigationLinkSelector,
+        rowCount: foundEntities,
+        rowHeight,
+        filters: rawFilters,
+        sortParams: activeSortParams,
+    });
 
     const handleDataFetched = React.useCallback(
         (data?: PaginatedTableData<T>) => {
@@ -138,8 +152,10 @@ export const PaginatedTable = <T, F>({
     );
 
     return (
-        <div ref={tableRef} className={b(null, containerClassName)}>
-            {renderTable()}
+        <div ref={tableRef} className={b(null, containerClassName)} {...keyboard.tableProps}>
+            <KeyboardRowContext.Provider value={keyboard.focusedIndex}>
+                {renderTable()}
+            </KeyboardRowContext.Provider>
         </div>
     );
 };

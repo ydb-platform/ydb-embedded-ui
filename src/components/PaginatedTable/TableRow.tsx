@@ -1,8 +1,11 @@
+import React from 'react';
+
 import {Skeleton} from '@gravity-ui/uikit';
 
 import {DEFAULT_ALIGN, DEFAULT_RESIZEABLE} from './constants';
 import {b} from './shared';
 import type {AlignType, Column, GetRowClassName, OnRowClick} from './types';
+import {KeyboardRowContext} from './useKeyboardNavigation';
 import {typedMemo} from './utils';
 
 interface TableCellProps {
@@ -71,6 +74,7 @@ export const LoadingTableRow = typedMemo(function <T>({columns, height}: Loading
 interface TableRowProps<T> {
     columns: Column<T>[];
     row: T;
+    rowIndex?: number;
     height: number;
     getRowClassName?: GetRowClassName<T>;
     onRowClick?: OnRowClick<T>;
@@ -78,12 +82,21 @@ interface TableRowProps<T> {
 
 export const TableRow = <T,>({
     row,
+    rowIndex,
     columns,
     getRowClassName,
     height,
     onRowClick,
 }: TableRowProps<T>) => {
-    const additionalClassName = getRowClassName?.(row);
+    const focusedIndex = React.useContext(KeyboardRowContext);
+    const additionalClassName = [
+        getRowClassName?.(row),
+        rowIndex !== undefined && rowIndex === focusedIndex
+            ? 'ydb-keyboard-focused-row'
+            : undefined,
+    ]
+        .filter(Boolean)
+        .join(' ');
     const rowClickable = typeof onRowClick === 'function';
 
     const handleClick: React.MouseEventHandler<HTMLTableRowElement> = (event) => {
@@ -98,6 +111,8 @@ export const TableRow = <T,>({
         <tr
             className={b('row', {clickable: rowClickable}, additionalClassName)}
             style={{height}}
+            data-row-index={rowIndex}
+            aria-selected={focusedIndex === undefined ? undefined : rowIndex === focusedIndex}
             onClick={rowClickable ? handleClick : undefined}
         >
             {columns.map((column) => {

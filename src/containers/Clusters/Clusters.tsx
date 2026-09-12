@@ -3,7 +3,6 @@ import React from 'react';
 import {Magnifier} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import {Icon, Select, Text} from '@gravity-ui/uikit';
-import {useHistory} from 'react-router-dom';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
@@ -50,7 +49,6 @@ interface ClustersProps {
 }
 
 export function Clusters({scrollContainerRef}: ClustersProps) {
-    const history = useHistory();
     const tableContainerRef = React.useRef<HTMLDivElement>(null);
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const query = clustersApi.useGetClustersListQuery(undefined, {
@@ -96,19 +94,9 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const handleDrawerClose = React.useCallback(() => {
         setHealthcheckClusterName(undefined);
     }, []);
-    const openCluster = React.useCallback(
-        (row: PreparedCluster) => {
-            const clusterPath = calculateClusterPath(row);
-
-            if (/^https?:\/\//.test(clusterPath)) {
-                window.location.assign(clusterPath);
-                return;
-            }
-
-            history.push(clusterPath);
-        },
-        [history],
-    );
+    const openCluster = React.useCallback((row: PreparedCluster) => {
+        window.location.assign(calculateClusterPath(row));
+    }, []);
     const rawColumns = React.useMemo(() => {
         return getClustersColumns({
             isEditClusterAvailable,
@@ -206,7 +194,6 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
 
     const {
         handleKeyDownCapture,
-        handleListMouseLeaveCapture,
         handleListMouseMoveCapture,
         getFocusedRowClassName,
         isKeyboardFocusActive,
@@ -365,12 +352,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                         scrollContainerRef={scrollContainerRef}
                         className={b('table-wrapper')}
                     >
-                        <div
-                            onMouseMoveCapture={handleListMouseMoveCapture}
-                            onMouseLeave={handleListMouseLeaveCapture}
-                        >
-                            {renderContent()}
-                        </div>
+                        <div onMouseMoveCapture={handleListMouseMoveCapture}>{renderContent()}</div>
                     </TableWithControlsLayout.Table>
                 </TableWithControlsLayout>
             </div>

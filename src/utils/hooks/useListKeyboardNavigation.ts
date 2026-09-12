@@ -25,7 +25,7 @@ function isTextInput(target: HTMLElement) {
     return ['text', 'search', 'email', 'url', 'tel', 'password', ''].includes(input.type);
 }
 
-function shouldHandleKeyboardNavigation(target: HTMLElement | null) {
+export function shouldHandleKeyboardNavigation(target: HTMLElement | null) {
     if (!target) {
         return true;
     }
@@ -87,7 +87,33 @@ export function useListKeyboardNavigation<T>({
             );
 
             if (row instanceof HTMLElement) {
-                row.scrollIntoView({block: 'nearest'});
+                const stickyHead = listContainerRef.current?.querySelector<HTMLElement>(
+                    '.data-table__sticky_head',
+                );
+                // Wide rows can make scrollIntoView shift horizontal ancestors as well.
+                // Keep their positions while allowing the selected row to scroll vertically.
+                const horizontalPositions: Array<{element: HTMLElement; left: number}> = [];
+                for (let element = row.parentElement; element; element = element.parentElement) {
+                    horizontalPositions.push({element, left: element.scrollLeft});
+                }
+                row.scrollIntoView({block: 'nearest', behavior: 'instant'});
+                if (stickyHead) {
+                    const overlap =
+                        stickyHead.getBoundingClientRect().bottom - row.getBoundingClientRect().top;
+                    if (overlap > 0) {
+                        const scrollContainer = horizontalPositions.find(
+                            ({element}) =>
+                                element.scrollHeight > element.clientHeight &&
+                                /auto|scroll/.test(getComputedStyle(element).overflowY),
+                        )?.element;
+                        scrollContainer?.scrollBy({top: -overlap, behavior: 'instant'});
+                    }
+                }
+                for (const {element, left} of horizontalPositions) {
+                    if (element.scrollLeft !== left) {
+                        element.scrollTo({left, top: element.scrollTop, behavior: 'instant'});
+                    }
+                }
             }
         });
 
@@ -97,16 +123,17 @@ export function useListKeyboardNavigation<T>({
     }, [focusedIndex, isFocusVisible, items.length, listContainerRef]);
 
     const handleKeyDownCapture = React.useCallback(
-        (event: React.KeyboardEvent<HTMLElement>) => {
+        (event: Pick<KeyboardEvent, 'target' | 'key' | 'repeat' | 'preventDefault'>) => {
             if (!shouldHandleKeyboardNavigation(event.target as HTMLElement | null)) {
                 return;
             }
 
-            if (!items.length) {
-                return;
-            }
-
             if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                // Keep arrows reserved for list navigation even when filtering yields no rows.
+                event.preventDefault();
+                if (!items.length) {
+                    return;
+                }
                 // DataTable keeps source indices after sorting; traverse rendered row order.
                 const rows = listContainerRef.current?.querySelectorAll('tbody tr');
                 const indices = Array.from(rows ?? []).flatMap((row) => {
@@ -124,20 +151,37 @@ export function useListKeyboardNavigation<T>({
                     0,
                     Math.min(Math.max(0, currentPosition) + offset, indices.length - 1),
                 );
-                event.preventDefault();
                 setIsFocusVisible(true);
                 setIsMouseHoverOverrideActive(false);
                 setFocusedIndex(indices[nextPosition]);
                 return;
             }
 
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' && items.length) {
                 event.preventDefault();
+                // A held Enter can reach the next page after its search input receives focus.
+                if (event.repeat) {
+                    return;
+                }
                 onActivate(items[getClampedFocusedIndex(focusedIndex, items.length)]);
             }
         },
         [focusedIndex, isFocusVisible, items, listContainerRef, onActivate],
     );
+
+    React.useEffect(() => {
+        const handleDocumentKeyDown = (event: KeyboardEvent) => {
+            // Back can restore focus to the document instead of the list's search input.
+            if (
+                !event.defaultPrevented &&
+                (event.target === document.body || event.target === document.documentElement)
+            ) {
+                handleKeyDownCapture(event);
+            }
+        };
+        document.addEventListener('keydown', handleDocumentKeyDown);
+        return () => document.removeEventListener('keydown', handleDocumentKeyDown);
+    }, [handleKeyDownCapture]);
 
     const getFocusedRowClassName = React.useCallback(
         (index: number, className?: string) => {
@@ -169,17 +213,12 @@ export function useListKeyboardNavigation<T>({
         [isFocusVisible],
     );
 
-    const handleListMouseLeaveCapture = React.useCallback(() => {
-        setIsMouseHoverOverrideActive(false);
-    }, []);
-
     return {
         focusedIndex,
         isFocusVisible,
         isKeyboardFocusActive: isFocusVisible && !isMouseHoverOverrideActive,
         handleKeyDownCapture,
         handleListMouseMoveCapture,
-        handleListMouseLeaveCapture,
         getFocusedRowClassName,
     };
 }
