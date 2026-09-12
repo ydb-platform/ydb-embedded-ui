@@ -21,7 +21,7 @@ import {NonSelectableConnection} from './NonSelectableConnection';
 import {graphColorsConfig} from './colorsConfig';
 import {runTreeLayout} from './runTreeLayout';
 import type {Data} from './types';
-import {parseCustomPropertyValue} from './utils';
+import {getLayoutSignature, parseCustomPropertyValue} from './utils';
 
 import './GravityGraph.scss';
 
@@ -81,6 +81,7 @@ export function GravityGraph<T>({data, onError, theme}: Props<T>) {
     const {graph, start} = useGraph(config);
     const cameraSizeRef = React.useRef({width: 0, height: 0});
     const graphBlockIdsRef = React.useRef<TBlockId[]>([]);
+    const layoutSignatureRef = React.useRef<string>();
     const fitFrameRef = React.useRef<number>();
     const fitGraphToViewport = React.useCallback(() => {
         const {width, height} = graph.cameraService.getCameraState();
@@ -125,11 +126,17 @@ export function GravityGraph<T>({data, onError, theme}: Props<T>) {
             createWorker: createGraphLayoutWorker,
             onResult: ({layout, edges}) => {
                 graphBlockIdsRef.current = layout.map(({id}) => id);
+                // Statistics-only updates keep the layout, so the camera stays where the user put it.
+                const signature = getLayoutSignature(layout, edges);
+                const sameLayout = layoutSignatureRef.current === signature;
+                layoutSignatureRef.current = signature;
                 graph.setEntities({
                     blocks: layout,
                     connections: edges,
                 });
-                scheduleGraphFit();
+                if (!sameLayout) {
+                    scheduleGraphFit();
+                }
             },
             onError,
         });

@@ -7,7 +7,6 @@ import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitio
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YQLCodePreview} from '../../../../../components/YQLCodePreview/YQLCodePreview';
 import {streamingQueriesApi} from '../../../../../store/reducers/streamingQuery/streamingQuery';
-import type {ErrorResponse} from '../../../../../types/api/query';
 import type {IQueryResult} from '../../../../../types/store/query';
 import {cn} from '../../../../../utils/cn';
 import {
@@ -15,7 +14,7 @@ import {
     stripIndentByFirstLine,
     trimOuterEmptyLines,
 } from '../../../../../utils/dataFormatters/dataFormatters';
-import {isErrorResponse} from '../../../../../utils/query';
+import {parseIssuesData} from '../../../../../utils/query';
 import {ResultIssuesModal} from '../../../Query/Issues/Issues';
 
 import i18n from './i18n';
@@ -89,7 +88,7 @@ function prepareStreamingQueryItems(sysData?: IQueryResult) {
     const errorRaw = sysData.resultSets?.[0]?.result?.[0]?.Error;
 
     // We use custom error check, because error type can be non-standard
-    const errorData = parseErrorData(errorRaw);
+    const errorData = parseIssuesData(errorRaw);
 
     info.push({
         name: i18n('field_query-state'),
@@ -104,21 +103,4 @@ function prepareStreamingQueryItems(sysData?: IQueryResult) {
     }
 
     return {items: info, queryText: normalizedQueryText};
-}
-
-function parseErrorData(raw: unknown): ErrorResponse | string | undefined {
-    if (typeof raw === 'string') {
-        try {
-            const parsed = JSON.parse(raw);
-            return isErrorResponse(parsed) ? parsed : undefined;
-        } catch {
-            return raw;
-        }
-    }
-
-    if (isErrorResponse(raw)) {
-        return raw;
-    }
-
-    return undefined;
 }
