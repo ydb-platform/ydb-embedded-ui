@@ -1,5 +1,28 @@
 # Changelog
 
+## [22.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v21.1.0...v22.0.0) (2026-09-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* **storage:** remove legacy storage api ([#4323](https://github.com/ydb-platform/ydb-embedded-ui/issues/4323))
+
+### Features
+
+* add database and cluster data tags ([#4300](https://github.com/ydb-platform/ydb-embedded-ui/issues/4300)) ([38b6856](https://github.com/ydb-platform/ydb-embedded-ui/commit/38b68563b4574fb7ab4718ddfd8b622752b00dc1))
+* clarify allocated storage groups in cluster overview ([#4311](https://github.com/ydb-platform/ydb-embedded-ui/issues/4311)) ([d461e9f](https://github.com/ydb-platform/ydb-embedded-ui/commit/d461e9f1f1a17b44cf460da3cfebde39a3640baa))
+
+
+### Bug Fixes
+
+* preserve redux cache when updating url state ([#4349](https://github.com/ydb-platform/ydb-embedded-ui/issues/4349)) ([26f8c81](https://github.com/ydb-platform/ydb-embedded-ui/commit/26f8c81cd881ea57f190657fa374202a467c86d1))
+* **storage:** prevent disk popups from expanding the page ([#4342](https://github.com/ydb-platform/ydb-embedded-ui/issues/4342)) ([f967fa6](https://github.com/ydb-platform/ydb-embedded-ui/commit/f967fa6b167e57911898ebe35d7b1d15298d805e))
+
+
+### Code Refactoring
+
+* **storage:** remove legacy storage api ([#4323](https://github.com/ydb-platform/ydb-embedded-ui/issues/4323)) ([668a1b3](https://github.com/ydb-platform/ydb-embedded-ui/commit/668a1b33c2151aec04c4d572381cf8db7a0d8903))
+
 ## [21.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v21.0.0...v21.1.0) (2026-09-10)
 
 
