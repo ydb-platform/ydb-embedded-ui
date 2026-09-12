@@ -159,6 +159,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
             <TableRow
                 key={index}
                 row={rowData as T}
+                rowIndex={id * chunkSize + index}
                 columns={columns}
                 height={rowHeight}
                 getRowClassName={getRowClassName}
