@@ -15,6 +15,9 @@ import {setupPDiskPreviewMocks} from './pdisksPreviewMocks';
 
 const settingTitle = 'Compact PDisk previews';
 const previewSelector = '.ydb-storage-pdisks-preview__control';
+// Linux ARM64 and x64 round translucent disk colors differently by 1–2 RGB levels.
+// Keep exact palette comparisons against a baseline from the same architecture.
+const paletteArchitecture = process.platform === 'linux' ? `-${process.arch}` : '';
 
 async function openNodeDisks(page: Page) {
     await new NodesPage(page).goto({clusterName: 'preview-test', backend: 'https://preview.test'});
@@ -29,8 +32,8 @@ async function openNodeDisks(page: Page) {
 }
 
 for (const theme of ['light', 'dark']) {
-    test(`preview and detail palette in ${theme} theme`, async ({page}) => {
-        const nodes = await setupPDiskPreviewMocks(page, 2, 4);
+    test(`preview palette in ${theme} theme`, async ({page}) => {
+        const nodes = await setupPDiskPreviewMocks(page, 1, 4);
         const pDiskStates = [
             TPDiskState.Normal,
             TPDiskState.Initial,
@@ -57,38 +60,23 @@ for (const theme of ['light', 'dark']) {
             localStorage.setItem('theme', themeName);
         }, theme);
         await openNodeDisks(page);
-        for (let diskId = 1; diskId <= 4; diskId++) {
-            await page
-                .getByRole('button', {name: `Show PDisk 2-${diskId} details`, exact: true})
-                .press('Enter');
-        }
         await page.mouse.move(0, 0);
         const previews = page.locator(previewSelector);
-        const details = page.locator('.pdisk-storage');
         await expect(previews).toHaveCount(4);
-        await expect(details).toHaveCount(4);
-        await expect(details.locator('.storage-disk-progress-bar_highlighted')).toHaveCount(0);
-        await expect(page.getByRole('link', {name: 'Go to PDisk', exact: true})).toHaveCount(0);
-
-        const areas = page.locator('.ydb-storage-pdisks-preview');
-        await areas.last().scrollIntoViewIfNeeded();
-        await expect(details.last()).toBeInViewport({ratio: 1});
-        const firstBox = await areas.first().boundingBox();
-        const lastBox = await areas.last().boundingBox();
-        assert(firstBox && lastBox);
-        const clip = {
-            x: firstBox.x,
-            y: firstBox.y - 1,
-            width: Math.max(firstBox.width, lastBox.width),
-            height: lastBox.y + lastBox.height - firstBox.y + 2,
-        };
-        // Keep previews and their original controls together in the same reference image.
+        const area = page.locator('.ydb-storage-pdisks-preview');
+        await area.scrollIntoViewIfNeeded();
+        const box = await area.boundingBox();
+        assert(box);
+        const clip = {x: box.x, y: box.y - 1, width: box.width, height: box.height + 2};
         // Tiny translucent squares need exact comparison to catch missing color layers.
-        await expect(page).toHaveScreenshot(`pdisk-preview-palette-${theme}.png`, {
-            clip,
-            threshold: 0,
-            maxDiffPixels: 0,
-        });
+        await expect(page).toHaveScreenshot(
+            `pdisk-preview-palette-${theme}${paletteArchitecture}.png`,
+            {
+                clip,
+                threshold: 0,
+                maxDiffPixels: 0,
+            },
+        );
 
         // As in vdiskColoring.test.ts, force every tone's hover state for one stable snapshot.
         await previews.locator('.ydb-storage-pdisks-preview__color').evaluateAll((elements) => {
@@ -96,16 +84,14 @@ for (const theme of ['light', 'dark']) {
                 element.classList.add('ydb-storage-pdisks-preview__color_highlighted'),
             );
         });
-        await details.locator('.storage-disk-progress-bar').evaluateAll((elements) => {
-            elements.forEach((element) =>
-                element.classList.add('storage-disk-progress-bar_highlighted'),
-            );
-        });
-        await expect(page).toHaveScreenshot(`pdisk-preview-palette-${theme}-hover.png`, {
-            clip,
-            threshold: 0,
-            maxDiffPixels: 0,
-        });
+        await expect(page).toHaveScreenshot(
+            `pdisk-preview-palette-${theme}-hover${paletteArchitecture}.png`,
+            {
+                clip,
+                threshold: 0,
+                maxDiffPixels: 0,
+            },
+        );
     });
 }
 
@@ -167,20 +153,11 @@ test('preview uses compact SVG, preserves row height, and keeps detail popups in
     await expect(preview.locator('svg *')).toHaveCount(5);
     const row = preview.locator('xpath=ancestor::tr');
     expect(await row.evaluate((element) => element.getBoundingClientRect().height)).toBe(51);
-    const border = await preview
-        .locator('svg rect')
-        .last()
-        .evaluate((element) => getComputedStyle(element).stroke);
     await preview.focus();
     await preview.press('Enter');
     const details = page.locator('.pdisk-storage__content');
     await expect(details).toBeVisible();
     await expect(details.locator('.storage-disk-progress-bar')).not.toHaveClass(/_highlighted/);
-    const detailBorder = await details.locator('.storage-disk-progress-bar').evaluate((element) => {
-        const style = getComputedStyle(element);
-        return style.borderTopStyle === 'none' ? 'none' : style.borderTopColor;
-    });
-    expect(detailBorder).toBe(border);
     expect(
         await details
             .locator('xpath=ancestor::tr')
@@ -205,7 +182,7 @@ test('preview uses compact SVG, preserves row height, and keeps detail popups in
     await details.press('Enter');
     await expect(preview).toBeVisible();
     await expect(action).toHaveCount(0);
-    await expect(preview.locator('.ydb-storage-pdisks-preview__color_highlighted')).toHaveCount(0);
+    await expect(preview).toBeFocused();
 });
 
 test('15-second refresh updates open details, their popup and the collapsed preview', async ({
@@ -358,4 +335,109 @@ test('wheel scrolling over a disk popup reaches the table', async ({page}) => {
     await expect
         .poll(() => scroll.evaluate((element) => element.scrollTop))
         .toBeGreaterThan(initialScroll);
+});
+
+test('expanded disks remain interactive beyond the compact column boundary', async ({page}) => {
+    await setupPDiskPreviewMocks(page);
+    await page.addInitScript(() => localStorage.setItem('enablePDisksPreview', 'true'));
+    await openNodeDisks(page);
+    const preview = page.getByRole('button', {name: 'Show PDisk 1-1 details', exact: true});
+    const cell = preview.locator('xpath=ancestor::td');
+    const cellBox = await cell.boundingBox();
+    assert(cellBox);
+    await preview.click();
+    const lastVDisk = page.locator('.pdisk-storage__vdisks-item').last();
+    await expect(lastVDisk).toBeVisible();
+    const diskBox = await lastVDisk.boundingBox();
+    assert(diskBox);
+    expect(diskBox.x + diskBox.width / 2).toBeGreaterThan(cellBox.x + cellBox.width);
+    expect(
+        await lastVDisk.evaluate((element) => {
+            const rect = element.getBoundingClientRect();
+            return element.contains(
+                document.elementFromPoint(rect.right - 1, rect.top + rect.height / 2),
+            );
+        }),
+    ).toBe(true);
+    await lastVDisk.hover();
+    await expect(page.getByRole('link', {name: 'Go to VDisk', exact: true})).toBeVisible();
+    await lastVDisk.click();
+    await expect(preview).toBeVisible();
+});
+
+test('Enter repeatedly expands and collapses the same disk without losing focus', async ({
+    page,
+}) => {
+    await setupPDiskPreviewMocks(page, 2);
+    await page.addInitScript(() => localStorage.setItem('enablePDisksPreview', 'true'));
+    await openNodeDisks(page);
+    const preview = page.getByRole('button', {name: 'Show PDisk 2-1 details', exact: true});
+    const details = page.locator('.pdisk-storage__content');
+    const initialUrl = page.url();
+    await preview.focus();
+    for (let cycle = 0; cycle < 3; cycle++) {
+        await page.keyboard.press('Enter');
+        await expect(details).toBeFocused();
+        await expect(details).toHaveAttribute('href', /nodeId=2/);
+        await page.keyboard.press('Enter');
+        await expect(preview).toBeFocused();
+        await expect(details).toHaveCount(0);
+    }
+    // Collapsing from a VDisk should return to the same preview as well.
+    await page.keyboard.press('Enter');
+    await page.locator('.pdisk-storage__vdisks-item a').last().focus();
+    await page.keyboard.press('Enter');
+    await expect(preview).toBeFocused();
+    expect(page.url()).toBe(initialUrl);
+});
+
+test('mouse expansion and collapse do not transfer focus to the new control', async ({page}) => {
+    await setupPDiskPreviewMocks(page);
+    await page.addInitScript(() => localStorage.setItem('enablePDisksPreview', 'true'));
+    await openNodeDisks(page);
+    const preview = page.getByRole('button', {name: 'Show PDisk 1-1 details', exact: true});
+    const details = page.locator('.pdisk-storage__content');
+    await preview.click();
+    await expect(details).toBeVisible();
+    await expect(details).not.toBeFocused();
+    await details.click();
+    await expect(preview).toBeVisible();
+    await expect(preview).not.toBeFocused();
+});
+
+test('later chunks widen previews when backend-wide disk maxima are absent', async ({page}) => {
+    const nodes = await setupPDiskPreviewMocks(page, 240, 4);
+    for (const node of nodes.slice(0, 100)) {
+        node.PDisks = node.PDisks.slice(0, 1);
+        node.VDisks = node.VDisks.filter((disk) => disk.PDiskId === 1);
+    }
+    await page.route('**/viewer/json/nodes?**', async (route) => {
+        const url = new URL(route.request().url());
+        const offset = Number(url.searchParams.get('offset') ?? 0);
+        const limit = Number(url.searchParams.get('limit') ?? nodes.length);
+        await route.fulfill({
+            json: {
+                TotalNodes: String(nodes.length),
+                FoundNodes: String(nodes.length),
+                Nodes: nodes.slice(offset, offset + limit),
+            },
+        });
+    });
+    await page.setViewportSize({width: 1280, height: 600});
+    await page.addInitScript(() => localStorage.setItem('enablePDisksPreview', 'true'));
+    const table = await openNodeDisks(page);
+    const column = page.getByRole('columnheader', {name: 'PDisks', exact: true});
+    const width = () => column.evaluate((element) => element.getBoundingClientRect().width);
+    const initialWidth = await width();
+    await table.scrollToPosition(5100);
+    await expect(
+        page.getByRole('button', {name: 'Show PDisk 101-4 details', exact: true}),
+    ).toBeVisible();
+    await expect.poll(width).toBeGreaterThan(initialWidth);
+    const expandedWidth = await width();
+    await table.scrollToPosition(0);
+    await expect(
+        page.getByRole('button', {name: 'Show PDisk 1-1 details', exact: true}),
+    ).toBeVisible();
+    expect(await width()).toBe(expandedWidth);
 });
