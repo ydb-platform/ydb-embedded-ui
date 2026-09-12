@@ -8,6 +8,7 @@ import type {PDisk} from '../PDisk';
 import {PDisksPreview} from './PDisksPreview';
 
 let mockInverted = false;
+const mockDetailsById = new Map<string, React.ComponentProps<typeof PDisk>>();
 let mockDetailsProps: React.ComponentProps<typeof PDisk>;
 
 jest.mock('../../../utils/hooks/useSetting', () => ({useSetting: () => [mockInverted]}));
@@ -15,6 +16,7 @@ jest.mock('../../../store', () => ({singleClusterMode: true}));
 jest.mock('../PDisk', () => ({
     PDisk: (props: React.ComponentProps<typeof PDisk>) => {
         mockDetailsProps = props;
+        mockDetailsById.set(props.data?.StringifiedId || '', props);
         return <button>Expanded PDisk</button>;
     },
 }));
@@ -92,4 +94,17 @@ test('closing details clears highlight and ignores callbacks from the previous e
     expect(mockDetailsProps.highlighted).toBe(false);
     act(() => mockDetailsProps.onShowPopup?.());
     expect(mockDetailsProps.highlighted).toBe(true);
+});
+
+test('collapsing another group and its delayed hide callback preserve the highlighted owner', () => {
+    const secondDisk = {...pDisk, PDiskId: 2, StringifiedId: '1-2'};
+    render(<PDisksPreview pDisks={[pDisk, secondDisk]} vDisks={vDisks} />);
+    fireEvent.click(screen.getByRole('button', {name: 'Show PDisk 1-1 details'}));
+    fireEvent.click(screen.getByRole('button', {name: 'Show PDisk 1-2 details'}));
+    const firstHide = mockDetailsById.get('1-1')?.onHidePopup;
+    act(() => mockDetailsById.get('1-2')?.onShowPopup?.());
+    act(() => firstHide?.());
+    expect(mockDetailsById.get('1-2')?.highlighted).toBe(true);
+    fireEvent.click(screen.getAllByRole('button', {name: 'Expanded PDisk'})[0]);
+    expect(mockDetailsById.get('1-2')?.highlighted).toBe(true);
 });
