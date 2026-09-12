@@ -1,0 +1,202 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - link "Cluster" [ref=e46] [cursor=pointer]:
+            - link "Cluster" [ref=e47]:
+              - /url: /cluster
+              - generic [ref=e48]: Cluster
+          - generic [ref=e49]: /
+        - listitem [ref=e50]:
+          - link "Database" [ref=e51] [cursor=pointer]:
+            - link "Database" [ref=e52]:
+              - /url: /database?database=%2Flocal
+              - generic [ref=e53]: Database
+          - generic [ref=e54]: /
+        - listitem [ref=e55]:
+          - link "Storage Group" [ref=e56] [cursor=pointer]:
+            - generic [ref=e58]: Storage Group
+          - generic [ref=e59]: /
+        - listitem [ref=e60]:
+          - link "VDisk 2181038080-1-0-0-0" [disabled] [ref=e61]:
+            - generic [ref=e63]: VDisk 2181038080-1-0-0-0
+      - link "Developer UI" [ref=e65] [cursor=pointer]:
+        - /url: http://localhost:8765/internal
+        - img [ref=e68]:
+          - img [ref=e69]
+        - generic [ref=e71]: Developer UI
+    - main [ref=e72]:
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - generic [ref=e75]: "FQDN: storage-node-07.ydb · Node: 42 · Storage · KLG · PDisk: 1000 · ROT"
+          - generic [ref=e76]:
+            - button "Refresh" [ref=e77] [cursor=pointer]:
+              - img [ref=e80]
+            - group [ref=e83] [cursor=pointer]:
+              - combobox [ref=e84]:
+                - generic [ref=e85]: None
+              - img [ref=e86]:
+                - img [ref=e87]
+        - generic [ref=e90]:
+          - generic [ref=e91]: VDisk
+          - text: 2181038080-1-0-0-0
+        - button "Evict VDisk" [ref=e95] [cursor=pointer]:
+          - img [ref=e98]:
+            - img [ref=e99]
+          - generic [ref=e101]: Evict VDisk
+        - generic [ref=e102]:
+          - generic [ref=e104]:
+            - generic [ref=e105]:
+              - term [ref=e106]:
+                - generic [ref=e107]: Storage Pool Name
+              - definition [ref=e109]: dynamic_storage_pool:1
+            - generic [ref=e110]:
+              - term [ref=e111]:
+                - generic [ref=e112]: Size
+              - definition [ref=e114]: 10 / 196 GB
+            - generic [ref=e115]:
+              - term [ref=e116]:
+                - generic [ref=e117]: Usage
+              - definition [ref=e119]: 5%
+            - generic [ref=e120]:
+              - term [ref=e121]:
+                - generic [ref=e122]: Disk Space
+              - definition [ref=e124]
+            - generic [ref=e126]:
+              - term [ref=e127]:
+                - generic [ref=e128]: Front Queues
+              - definition [ref=e130]
+            - generic [ref=e132]:
+              - term [ref=e133]:
+                - generic [ref=e134]: Fresh Rank Satisfaction
+              - definition [ref=e136]
+            - generic [ref=e138]:
+              - term [ref=e139]:
+                - generic [ref=e140]: Level Rank Satisfaction
+              - definition [ref=e142]
+          - generic [ref=e145]:
+            - generic [ref=e146]:
+              - term [ref=e147]:
+                - generic [ref=e148]: VDisk Slot Id
+              - definition [ref=e150]: "1001"
+            - generic [ref=e151]:
+              - term [ref=e152]:
+                - generic [ref=e153]: PDisk Id
+              - definition [ref=e155]:
+                - link "1000" [ref=e156] [cursor=pointer]:
+                  - /url: /pDisk?nodeId=42&pDiskId=1000
+            - generic [ref=e157]:
+              - term [ref=e158]:
+                - generic [ref=e159]: Links
+              - definition [ref=e161]:
+                - link "Developer UI" [ref=e163] [cursor=pointer]:
+                  - /url: http://localhost:8765/node/42/actors/vdisks/vdisk000001000_000001001
+                  - text: Developer UI
+                  - img [ref=e164]
+        - tablist [ref=e167]:
+          - tab "Storage" [selected] [ref=e168] [cursor=pointer]:
+            - link "Storage" [ref=e171]:
+              - /url: /vDisk?activeTab=storage&nodeId=42&vDiskId=2181038080-1-0-0-0&database=%2Flocal
+          - tab "Tablets" [ref=e172] [cursor=pointer]:
+            - link "Tablets" [ref=e175]:
+              - /url: /vDisk?activeTab=tablets&nodeId=42&vDiskId=2181038080-1-0-0-0&database=%2Flocal
+        - generic [ref=e176]:
+          - generic [ref=e177]:
+            - generic [ref=e180]:
+              - textbox "Group ID, Pool name" [active] [ref=e183]
+              - radiogroup [ref=e184]:
+                - generic [ref=e185]:
+                  - radio "Groups" [checked] [ref=e186]
+                  - generic [ref=e187]: Groups
+                - generic [ref=e188] [cursor=pointer]:
+                  - radio "Nodes" [ref=e189]
+                  - generic [ref=e190]: Nodes
+              - generic [ref=e191]: "Group by:"
+              - group [ref=e193] [cursor=pointer]:
+                - combobox [ref=e194]:
+                  - generic [ref=e195]: "-"
+                - img [ref=e196]:
+                  - img [ref=e197]
+              - generic [ref=e201]: "Groups: 0 of 1"
+            - button "5/17" [ref=e204] [cursor=pointer]:
+              - img [ref=e207]:
+                - img [ref=e208]
+              - generic [ref=e211]: 5/17
+          - table [ref=e214]:
+            - rowgroup [ref=e215]:
+              - row "Group ID Pool Name Erasure Used VDisks" [ref=e216]:
+                - columnheader "Group ID" [ref=e217]:
+                  - generic [ref=e218] [cursor=pointer]:
+                    - generic [ref=e220]: Group ID
+                    - img [ref=e222]
+                - columnheader "Pool Name" [ref=e224]:
+                  - generic [ref=e225] [cursor=pointer]:
+                    - generic [ref=e227]: Pool Name
+                    - img [ref=e229]
+                - columnheader "Erasure" [ref=e231]:
+                  - generic [ref=e232] [cursor=pointer]:
+                    - generic [ref=e234]: Erasure
+                    - img [ref=e236]
+                - columnheader "Used" [ref=e238]:
+                  - generic [ref=e239] [cursor=pointer]:
+                    - generic [ref=e241]: Used
+                    - img [ref=e243]
+                - columnheader "VDisks" [ref=e245]:
+                  - generic [ref=e248]: VDisks
+            - rowgroup [ref=e249]:
+              - row "2181038080 Copy dynamic_storage_pool:1 mirror-3-dc 10 GB 5 4 4" [ref=e250]:
+                - cell "2181038080 Copy" [ref=e251]:
+                  - generic [ref=e253]:
+                    - generic "2181038080" [ref=e254]:
+                      - link "2181038080" [ref=e255] [cursor=pointer]:
+                        - /url: /storageGroup?groupId=2181038080&database=%2Flocal
+                    - button "Copy" [ref=e256] [cursor=pointer]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                - cell "dynamic_storage_pool:1" [ref=e257]:
+                  - generic [ref=e259] [cursor=pointer]: dynamic_storage_pool:1
+                - cell "mirror-3-dc" [ref=e260]
+                - cell "10 GB" [ref=e261]
+                - cell "5 4 4" [ref=e262]:
+                  - generic [ref=e263]:
+                    - link "5" [ref=e267] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=42&vDiskId=2181038080-1-0-0-0&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e268]:
+                        - generic [ref=e270]: 5%
+                    - link "4" [ref=e274] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=42&vDiskId=2181038080-1-0-0-1&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e275]:
+                        - generic [ref=e277]: 4%
+                    - link "4" [ref=e281] [cursor=pointer]:
+                      - /url: /vDisk?nodeId=42&vDiskId=2181038080-1-0-0-2&database=%2Flocal
+                      - meter "Disk allocated space" [ref=e282]:
+                        - generic [ref=e284]: 4%
+```

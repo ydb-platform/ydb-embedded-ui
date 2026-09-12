@@ -1,0 +1,313 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e41]:
+    - banner [ref=e42]:
+      - list [ref=e43]:
+        - listitem [ref=e44]:
+          - link "Cluster" [ref=e45] [cursor=pointer]:
+            - link "Cluster" [ref=e46]:
+              - /url: /cluster
+              - generic [ref=e47]:
+                - img [ref=e48]
+                - text: Cluster
+          - generic [ref=e50]: /
+        - listitem [ref=e51]:
+          - link "local" [disabled] [ref=e52]:
+            - generic [ref=e54]:
+              - img [ref=e55]
+              - text: local
+      - generic [ref=e57]:
+        - button "Connect" [ref=e58] [cursor=pointer]:
+          - img [ref=e61]:
+            - img [ref=e62]
+          - generic [ref=e64]: Connect
+        - link "Developer UI" [ref=e65] [cursor=pointer]:
+          - /url: http://localhost:8765/internal
+          - img [ref=e68]:
+            - img [ref=e69]
+          - generic [ref=e71]: Developer UI
+    - main [ref=e72]:
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - generic [ref=e78]:
+            - generic [ref=e79]:
+              - generic [ref=e80]: Navigation
+              - generic [ref=e84]:
+                - generic [ref=e87] [cursor=pointer]:
+                  - button [ref=e88]
+                  - generic [ref=e90]:
+                    - img [ref=e92]
+                    - generic [ref=e94]: /local
+                - generic [ref=e97] [cursor=pointer]:
+                  - button [ref=e98]
+                  - generic [ref=e100]:
+                    - img [ref=e102]
+                    - generic [ref=e104]: .metadata
+                - generic [ref=e107] [cursor=pointer]:
+                  - button [ref=e108]
+                  - generic [ref=e110]:
+                    - img [ref=e112]
+                    - generic [ref=e114]: .sys
+                - generic [ref=e119] [cursor=pointer]:
+                  - img [ref=e121]
+                  - generic [ref=e123]: .sys_health
+                - generic [ref=e128] [cursor=pointer]:
+                  - img [ref=e130]
+                  - generic [ref=e132]: a_test_table_1779692889886
+                - generic [ref=e137] [cursor=pointer]:
+                  - img [ref=e139]
+                  - generic [ref=e141]: a_test_table_1779692902009
+            - generic [ref=e143]:
+              - generic [ref=e144]:
+                - generic [ref=e145]:
+                  - generic [ref=e146]:
+                    - generic [ref=e147]: ColumnTable
+                    - generic [ref=e148]: storage_usage_column_table
+                  - generic [ref=e149]:
+                    - button "Open preview" [ref=e150] [cursor=pointer]:
+                      - img [ref=e153]:
+                        - img [ref=e154]
+                    - button "Copy" [ref=e156] [cursor=pointer]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                    - button [ref=e157] [cursor=pointer]:
+                      - img [ref=e160]:
+                        - img [ref=e161]
+                - tablist [ref=e165]:
+                  - tab "Overview" [selected] [ref=e166] [cursor=pointer]:
+                    - link "Overview" [ref=e169]:
+                      - /url: /database?diagnosticsTab=storageUsage&schema=%2Flocal%2Fstorage_usage_column_table&database=%2Flocal&databasePage=diagnostics&summaryTab=overview
+                  - tab "Schema" [ref=e170] [cursor=pointer]:
+                    - link "Schema" [ref=e173]:
+                      - /url: /database?diagnosticsTab=storageUsage&schema=%2Flocal%2Fstorage_usage_column_table&database=%2Flocal&databasePage=diagnostics&summaryTab=schema
+              - generic [ref=e174]:
+                - generic [ref=e175]: Column-oriented table
+                - generic [ref=e176]:
+                  - generic [ref=e177]:
+                    - term [ref=e178]:
+                      - generic [ref=e179]: Type
+                    - definition [ref=e181]:
+                      - generic [ref=e182]: ColumnTable
+                  - generic [ref=e183]:
+                    - term [ref=e184]:
+                      - generic [ref=e185]: Data size
+                    - definition [ref=e187]:
+                      - generic [ref=e188]: 30 GB
+          - generic [ref=e189]:
+            - button [ref=e190] [cursor=pointer]:
+              - img [ref=e193]:
+                - img [ref=e194]
+            - button [ref=e196] [cursor=pointer]:
+              - img [ref=e199]:
+                - img [ref=e200]
+        - generic [ref=e204]:
+          - radiogroup [ref=e206]:
+            - generic [ref=e207] [cursor=pointer]:
+              - radio "Query" [ref=e208]
+              - generic [ref=e210]:
+                - img [ref=e211]:
+                  - img [ref=e212]
+                - generic [ref=e214]: Query
+            - generic [ref=e215]:
+              - radio "Diagnostics" [checked] [ref=e216]
+              - generic [ref=e218]:
+                - img [ref=e219]:
+                  - img [ref=e220]
+                - generic [ref=e224]: Diagnostics
+          - generic [ref=e225]:
+            - generic [ref=e227]:
+              - tablist [ref=e228]:
+                - tab "Info" [ref=e229] [cursor=pointer]:
+                  - link "Info" [ref=e232]:
+                    - /url: /database?diagnosticsTab=overview&schema=%2Flocal%2Fstorage_usage_column_table&database=%2Flocal&databasePage=diagnostics
+                - tab "Schema" [ref=e233] [cursor=pointer]:
+                  - link "Schema" [ref=e236]:
+                    - /url: /database?diagnosticsTab=schema&schema=%2Flocal%2Fstorage_usage_column_table&database=%2Flocal&databasePage=diagnostics
+                - tab "Top shards" [ref=e237] [cursor=pointer]:
+                  - link "Top shards" [ref=e240]:
+                    - /url: /database?diagnosticsTab=topShards&schema=%2Flocal%2Fstorage_usage_column_table&database=%2Flocal&databasePage=diagnostics
+                - tab "Nodes" [ref=e241] [cursor=pointer]:
+                  - link "Nodes" [ref=e244]:
+                    - /url: /database?diagnosticsTab=nodes&schema=%2Flocal%2Fstorage_usage_column_table&database=%2Flocal&databasePage=diagnostics
+                - tab "Tablets" [ref=e245] [cursor=pointer]:
+                  - link "Tablets" [ref=e248]:
+                    - /url: /database?diagnosticsTab=tablets&schema=%2Flocal%2Fstorage_usage_column_table&database=%2Flocal&databasePage=diagnostics
+                - tab "Storage" [selected] [ref=e249] [cursor=pointer]:
+                  - link "Storage" [ref=e252]:
+                    - /url: /database?diagnosticsTab=storageUsage&schema=%2Flocal%2Fstorage_usage_column_table&database=%2Flocal&databasePage=diagnostics
+                - tab "Describe" [ref=e253] [cursor=pointer]:
+                  - link "Describe" [ref=e256]:
+                    - /url: /database?diagnosticsTab=describe&schema=%2Flocal%2Fstorage_usage_column_table&database=%2Flocal&databasePage=diagnostics
+                - tab "Access" [ref=e257] [cursor=pointer]:
+                  - link "Access" [ref=e260]:
+                    - /url: /database?diagnosticsTab=access&schema=%2Flocal%2Fstorage_usage_column_table&database=%2Flocal&databasePage=diagnostics
+              - generic [ref=e261]:
+                - button "Refresh" [ref=e262] [cursor=pointer]:
+                  - img [ref=e265]
+                - group [ref=e268] [cursor=pointer]:
+                  - combobox [ref=e269]:
+                    - generic [ref=e270]: None
+                  - img [ref=e271]:
+                    - img [ref=e272]
+            - generic [ref=e276]:
+              - generic [ref=e278]:
+                - generic [ref=e280]:
+                  - generic [ref=e281]:
+                    - text: 30 GB
+                    - generic [ref=e282]:
+                      - generic [ref=e283]: Data size
+                      - button [ref=e284] [cursor=pointer]:
+                        - img [ref=e285]:
+                          - img [ref=e286]
+                  - generic [ref=e288]:
+                    - text: 61 GB
+                    - generic [ref=e290]: Disk usage
+                  - generic [ref=e291]:
+                    - text: 2x
+                    - generic [ref=e292]:
+                      - generic [ref=e293]: Overhead
+                      - button [ref=e294] [cursor=pointer]:
+                        - img [ref=e295]:
+                          - img [ref=e296]
+                - generic [ref=e299]:
+                  - text: "4"
+                  - generic [ref=e301]: Storage groups
+              - generic [ref=e302]:
+                - generic [ref=e303]:
+                  - generic [ref=e304]: Storage groups usage
+                  - generic [ref=e305]: "4"
+                - generic [ref=e306]:
+                  - generic [ref=e308]:
+                    - table [ref=e311]:
+                      - rowgroup [ref=e312]:
+                        - row "Storage Group Used Limit Share" [ref=e313]:
+                          - columnheader "Storage Group" [ref=e314]:
+                            - generic [ref=e315]: Storage Group
+                          - columnheader "Used" [ref=e316]:
+                            - generic [ref=e318]:
+                              - generic [ref=e319]: Used
+                              - button [ref=e320] [cursor=pointer]:
+                                - img [ref=e321]:
+                                  - img [ref=e322]
+                          - columnheader "Limit" [ref=e324]:
+                            - generic [ref=e326]:
+                              - generic [ref=e327]: Limit
+                              - button [ref=e328] [cursor=pointer]:
+                                - img [ref=e329]:
+                                  - img [ref=e330]
+                          - columnheader "Share" [ref=e332]:
+                            - generic [ref=e334]:
+                              - generic [ref=e335]: Share
+                              - button [ref=e336] [cursor=pointer]:
+                                - img [ref=e337]:
+                                  - img [ref=e338]
+                    - table [ref=e342]:
+                      - rowgroup [ref=e343]:
+                        - row "Storage Group Used Limit Share" [ref=e344]:
+                          - columnheader "Storage Group" [ref=e345]:
+                            - generic [ref=e346]: Storage Group
+                          - columnheader "Used" [ref=e347]:
+                            - generic [ref=e349]:
+                              - generic [ref=e350]: Used
+                              - button [ref=e351] [cursor=pointer]:
+                                - img [ref=e352]:
+                                  - img [ref=e353]
+                          - columnheader "Limit" [ref=e355]:
+                            - generic [ref=e357]:
+                              - generic [ref=e358]: Limit
+                              - button [ref=e359] [cursor=pointer]:
+                                - img [ref=e360]:
+                                  - img [ref=e361]
+                          - columnheader "Share" [ref=e363]:
+                            - generic [ref=e365]:
+                              - generic [ref=e366]: Share
+                              - button [ref=e367] [cursor=pointer]:
+                                - img [ref=e368]:
+                                  - img [ref=e369]
+                      - rowgroup [ref=e371]:
+                        - row "2181038080 Copy mirror-3-dc 22 GB 2 TB 36.0655737704918 36%" [ref=e372]:
+                          - cell "2181038080 Copy mirror-3-dc" [ref=e373]:
+                            - generic [ref=e374]:
+                              - generic [ref=e377]:
+                                - generic "2181038080" [ref=e378]:
+                                  - link "2181038080" [ref=e379] [cursor=pointer]:
+                                    - /url: /storageGroup?groupId=2181038080&database=%2Flocal
+                                - button "Copy" [ref=e380] [cursor=pointer]:
+                                  - generic:
+                                    - generic:
+                                      - img:
+                                        - img
+                              - generic [ref=e381]: mirror-3-dc
+                          - cell "22 GB" [ref=e382]
+                          - cell "2 TB" [ref=e383]
+                          - cell "36.0655737704918 36%" [ref=e384]:
+                            - generic [ref=e385]:
+                              - progressbar [ref=e386]
+                              - generic [ref=e389]: 36%
+                        - row "2181038083 Copy mirror-3-dc 16 GB 2 TB 26.229508196721312 26%" [ref=e390]:
+                          - cell "2181038083 Copy mirror-3-dc" [ref=e391]:
+                            - generic [ref=e392]:
+                              - generic [ref=e395]:
+                                - generic "2181038083" [ref=e396]:
+                                  - link "2181038083" [ref=e397] [cursor=pointer]:
+                                    - /url: /storageGroup?groupId=2181038083&database=%2Flocal
+                                - button "Copy" [ref=e398] [cursor=pointer]:
+                                  - generic:
+                                    - generic:
+                                      - img:
+                                        - img
+                              - generic [ref=e399]: mirror-3-dc
+                          - cell "16 GB" [ref=e400]
+                          - cell "2 TB" [ref=e401]
+                          - cell "26.229508196721312 26%" [ref=e402]:
+                            - generic [ref=e403]:
+                              - progressbar [ref=e404]
+                              - generic [ref=e407]: 26%
+                        - row "2181038082 Copy mirror-3-dc 12 GB 2 TB 19.672131147540984 20%" [ref=e408]:
+                          - cell "2181038082 Copy mirror-3-dc" [ref=e409]:
+                            - generic [ref=e410]:
+                              - generic [ref=e413]:
+                                - generic "2181038082" [ref=e414]:
+                                  - link "2181038082" [ref=e415] [cursor=pointer]:
+                                    - /url: /storageGroup?groupId=2181038082&database=%2Flocal
+                                - button "Copy" [ref=e416] [cursor=pointer]:
+                                  - generic:
+                                    - generic:
+                                      - img:
+                                        - img
+                              - generic [ref=e417]: mirror-3-dc
+                          - cell "12 GB" [ref=e418]
+                          - cell "2 TB" [ref=e419]
+                          - cell "19.672131147540984 20%" [ref=e420]:
+                            - generic [ref=e421]:
+                              - progressbar [ref=e422]
+                              - generic [ref=e425]: 20%
+                  - button "Show 1 more" [ref=e426] [cursor=pointer]:
+                    - generic [ref=e427]: Show 1 more
+```

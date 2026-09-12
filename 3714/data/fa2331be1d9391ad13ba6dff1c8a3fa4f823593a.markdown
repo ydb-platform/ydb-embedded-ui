@@ -1,0 +1,217 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - img [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+      - generic [ref=e18]:
+        - button "Information" [ref=e19] [cursor=pointer]:
+          - img [ref=e22]:
+            - img [ref=e23]
+          - generic "Information":
+            - generic: Information
+        - button "Settings" [ref=e25] [cursor=pointer]:
+          - img [ref=e28]:
+            - img [ref=e29]
+          - generic "Settings":
+            - generic: Settings
+        - button "Account" [ref=e31] [cursor=pointer]:
+          - img [ref=e34]:
+            - img [ref=e35]
+          - generic "Account":
+            - generic: Account
+      - button "Expand" [ref=e37] [cursor=pointer]:
+        - img [ref=e38]:
+          - img [ref=e39]
+    - generic [ref=e41]:
+      - banner [ref=e42]:
+        - list [ref=e43]:
+          - listitem [ref=e44]:
+            - link "Cluster" [ref=e45] [cursor=pointer]:
+              - link "Cluster" [ref=e46]:
+                - /url: /cluster
+                - generic [ref=e47]:
+                  - img [ref=e48]
+                  - text: Cluster
+            - generic [ref=e50]: /
+          - listitem [ref=e51]:
+            - link "/local" [disabled] [ref=e52]:
+              - generic [ref=e54]:
+                - img [ref=e55]
+                - text: /local
+        - generic [ref=e57]:
+          - button "Connect" [ref=e58] [cursor=pointer]:
+            - img [ref=e61]:
+              - img [ref=e62]
+            - generic [ref=e64]: Connect
+          - separator [ref=e65]
+          - link "Developer UI" [ref=e66] [cursor=pointer]:
+            - /url: http://localhost:8765/internal
+            - img [ref=e69]:
+              - img [ref=e70]
+            - generic [ref=e72]: Developer UI
+      - main [ref=e73]:
+        - generic [ref=e76]:
+          - generic [ref=e77]:
+            - generic [ref=e79]:
+              - generic [ref=e80]:
+                - generic [ref=e81]: Navigation
+                - generic [ref=e85]:
+                  - generic [ref=e88] [cursor=pointer]:
+                    - button [ref=e89]
+                    - generic [ref=e91]:
+                      - img [ref=e93]
+                      - generic [ref=e95]: /local
+                  - generic [ref=e98] [cursor=pointer]:
+                    - button [ref=e99]
+                    - generic [ref=e101]:
+                      - img [ref=e103]
+                      - generic [ref=e105]: .metadata
+                  - generic [ref=e108] [cursor=pointer]:
+                    - button [ref=e109]
+                    - generic [ref=e111]:
+                      - img [ref=e113]
+                      - generic [ref=e115]: .sys
+                  - generic [ref=e120] [cursor=pointer]:
+                    - img [ref=e122]
+                    - generic [ref=e124]: auth_effective_permissions
+                  - generic [ref=e129] [cursor=pointer]:
+                    - img [ref=e131]
+                    - generic [ref=e133]: auth_group_members
+                  - generic [ref=e138] [cursor=pointer]:
+                    - img [ref=e140]
+                    - generic [ref=e142]: auth_groups
+                  - generic [ref=e147] [cursor=pointer]:
+                    - img [ref=e149]
+                    - generic [ref=e151]: auth_owners
+                  - generic [ref=e156] [cursor=pointer]:
+                    - img [ref=e158]
+                    - generic [ref=e160]: auth_permissions
+                  - generic [ref=e165] [cursor=pointer]:
+                    - img [ref=e167]
+                    - generic [ref=e169]: auth_users
+                  - generic [ref=e174] [cursor=pointer]:
+                    - img [ref=e176]
+                    - generic [ref=e178]: compile_cache_queries
+                  - generic [ref=e183] [cursor=pointer]:
+                    - img [ref=e185]
+                    - generic [ref=e187]: ds_groups
+              - generic [ref=e189]:
+                - generic [ref=e190]:
+                  - generic [ref=e191]:
+                    - generic [ref=e192]:
+                      - generic [ref=e193]: SysView
+                      - generic [ref=e194]: .sys/ds_vslots
+                    - generic [ref=e195]:
+                      - button "Open preview" [ref=e196] [cursor=pointer]:
+                        - img [ref=e199]:
+                          - img [ref=e200]
+                      - button "Copy" [ref=e202] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                      - button [ref=e203] [cursor=pointer]:
+                        - img [ref=e206]:
+                          - img [ref=e207]
+                  - tablist [ref=e211]:
+                    - tab "Overview" [selected] [ref=e212] [cursor=pointer]:
+                      - link "Overview" [ref=e215]:
+                        - /url: /tenant?diagnosticsTab=overview&schema=/local/.sys/ds_vslots&database=/local&tenantPage=query&summaryTab=overview
+                    - tab "Schema" [ref=e216] [cursor=pointer]:
+                      - link "Schema" [ref=e219]:
+                        - /url: /tenant?diagnosticsTab=overview&schema=/local/.sys/ds_vslots&database=/local&tenantPage=query&summaryTab=schema
+                - generic [ref=e220]:
+                  - generic [ref=e221]: System view
+                  - generic [ref=e222]:
+                    - generic [ref=e223]:
+                      - term [ref=e224]:
+                        - generic [ref=e225]: Type
+                      - definition [ref=e227]:
+                        - generic [ref=e228]: SysView
+                    - generic [ref=e229]:
+                      - term [ref=e230]:
+                        - generic [ref=e231]: Id
+                      - definition [ref=e233]:
+                        - generic [ref=e234]: "11"
+                    - generic [ref=e235]:
+                      - term [ref=e236]:
+                        - generic [ref=e237]: Version
+                      - definition [ref=e239]:
+                        - generic [ref=e240]: "2"
+                    - generic [ref=e241]:
+                      - term [ref=e242]:
+                        - generic [ref=e243]: Created
+                      - definition [ref=e245]:
+                        - generic [ref=e246]: 2026-03-31 12:45
+                    - generic [ref=e247]:
+                      - term [ref=e248]:
+                        - generic [ref=e249]: System view type
+                      - definition [ref=e251]:
+                        - generic [ref=e252]: VSlots
+            - generic [ref=e253]:
+              - button [ref=e254] [cursor=pointer]:
+                - img [ref=e257]:
+                  - img [ref=e258]
+              - button [ref=e260] [cursor=pointer]:
+                - img [ref=e263]:
+                  - img [ref=e264]
+          - generic [ref=e268]:
+            - radiogroup [ref=e270]:
+              - generic [ref=e271]:
+                - radio "Query" [checked] [ref=e272]
+                - generic [ref=e274]:
+                  - img [ref=e275]:
+                    - img [ref=e276]
+                  - generic [ref=e278]: Query
+              - generic [ref=e279] [cursor=pointer]:
+                - radio "Diagnostics" [ref=e280]
+                - generic [ref=e282]:
+                  - img [ref=e283]:
+                    - img [ref=e284]
+                  - generic [ref=e288]: Diagnostics
+            - generic [ref=e289]:
+              - tablist [ref=e291]:
+                - tab "Editor" [selected] [ref=e292] [cursor=pointer]:
+                  - link "Editor" [ref=e295]:
+                    - /url: /tenant?diagnosticsTab=overview&schema=/local/.sys/ds_vslots&database=/local&tenantPage=query&queryTab=newQuery
+                - tab "History" [ref=e296] [cursor=pointer]:
+                  - link "History" [ref=e299]:
+                    - /url: /tenant?diagnosticsTab=overview&schema=/local/.sys/ds_vslots&database=/local&tenantPage=query&queryTab=history
+                - tab "Saved" [ref=e300] [cursor=pointer]:
+                  - link "Saved" [ref=e303]:
+                    - /url: /tenant?diagnosticsTab=overview&schema=/local/.sys/ds_vslots&database=/local&tenantPage=query&queryTab=saved
+              - generic [ref=e307]:
+                - code [ref=e311]:
+                  - generic [ref=e312]:
+                    - generic [ref=e317]: "1"
+                    - textbox "Editor content" [active] [ref=e325]
+                - generic [ref=e326]:
+                  - generic [ref=e327]:
+                    - button "Run" [disabled]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                      - generic: Run
+                    - button "Explain" [disabled]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                      - generic: Explain
+                    - button [ref=e328] [cursor=pointer]:
+                      - img [ref=e331]:
+                        - img [ref=e332]
+                  - generic [ref=e334]:
+                    - button "New query" [ref=e336] [cursor=pointer]:
+                      - img [ref=e339]
+                      - generic [ref=e341]: New query
+                    - button "Save query" [ref=e342] [cursor=pointer]:
+                      - generic [ref=e343]: Save query
+  - generic [ref=e346]:
+    - alert
+    - alert
+```

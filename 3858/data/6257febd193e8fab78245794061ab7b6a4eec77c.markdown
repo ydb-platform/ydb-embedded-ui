@@ -1,0 +1,260 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e41]:
+    - banner [ref=e42]:
+      - list [ref=e43]:
+        - listitem [ref=e44]:
+          - link "Cluster" [disabled] [ref=e45]:
+            - generic [ref=e47]:
+              - img [ref=e48]
+              - text: Cluster
+      - link "Developer UI" [ref=e51] [cursor=pointer]:
+        - /url: http://localhost:8765/internal
+        - img [ref=e54]:
+          - img [ref=e55]
+        - generic [ref=e57]: Developer UI
+    - main [ref=e58]:
+      - generic [ref=e60]:
+        - generic [ref=e62]:
+          - text: DEV02
+          - generic [ref=e63] [cursor=pointer]:
+            - img [ref=e65]:
+              - img [ref=e66]
+            - button "Good" [ref=e68]:
+              - generic [ref=e71]: Good
+        - generic [ref=e72]:
+          - button "Refresh" [ref=e73] [cursor=pointer]:
+            - img [ref=e76]
+          - group [ref=e79] [cursor=pointer]:
+            - combobox [ref=e80]:
+              - generic [ref=e81]: None
+            - img [ref=e82]:
+              - img [ref=e83]
+        - generic [ref=e86]:
+          - button "Overview" [expanded] [ref=e87] [cursor=pointer]:
+            - img [ref=e89]:
+              - img [ref=e90]
+            - generic [ref=e93]:
+              - img [ref=e94]:
+                - img [ref=e95]
+              - generic [ref=e97]: Overview
+          - region "Overview" [ref=e98]:
+            - generic [ref=e99]:
+              - generic [ref=e100]:
+                - generic [ref=e101]:
+                  - generic [ref=e102]:
+                    - img [ref=e103]
+                    - generic [ref=e107]: 0.21%
+                  - generic [ref=e108]:
+                    - generic [ref=e110]: 2 of 949 cores
+                    - generic [ref=e111]:
+                      - generic [ref=e112]: CPU load
+                      - button [ref=e113] [cursor=pointer]:
+                        - img [ref=e114]:
+                          - img [ref=e115]
+                - generic [ref=e117]:
+                  - generic [ref=e118]:
+                    - img [ref=e119]
+                    - generic [ref=e123]: 11.86%
+                  - generic [ref=e124]:
+                    - generic [ref=e126]: 12 of 102 TB
+                    - generic [ref=e127]:
+                      - generic [ref=e128]: Storage SSD
+                      - button [ref=e129] [cursor=pointer]:
+                        - img [ref=e130]:
+                          - img [ref=e131]
+                - generic [ref=e133]:
+                  - generic [ref=e134]:
+                    - img [ref=e135]
+                    - generic [ref=e139]: 2.45%
+                  - generic [ref=e140]:
+                    - generic [ref=e142]: 0.1 of 3 TB
+                    - generic [ref=e143]:
+                      - generic [ref=e144]: Memory used
+                      - button [ref=e145] [cursor=pointer]:
+                        - img [ref=e146]:
+                          - img [ref=e147]
+                - generic [ref=e149]:
+                  - generic [ref=e150]:
+                    - img [ref=e151]
+                    - generic [ref=e155]: 0.09%
+                  - generic [ref=e156]:
+                    - generic [ref=e158]: 1 MB/s
+                    - generic [ref=e159]:
+                      - generic [ref=e160]: Network Usage
+                      - button [ref=e161] [cursor=pointer]:
+                        - img [ref=e162]:
+                          - img [ref=e163]
+              - generic [ref=e166]:
+                - generic [ref=e167]:
+                  - generic [ref=e168]: Allocated Storage Groups
+                  - generic [ref=e171]:
+                    - generic [ref=e172]:
+                      - generic [ref=e173]: SSD
+                      - generic [ref=e174]:
+                        - generic [ref=e177]: "Available : 47 groups"
+                        - generic [ref=e178]: "Allocated : 16 of 63 groups"
+                    - generic [ref=e179]:
+                      - progressbar "Storage group allocation progress" [ref=e180]
+                      - generic [ref=e183]:
+                        - generic [ref=e184]: block-4-2
+                        - generic [ref=e185]: 25%
+                - generic [ref=e186]:
+                  - generic [ref=e187]: Bridge Piles 2
+                  - generic [ref=e188]:
+                    - generic [ref=e189]:
+                      - generic [ref=e190]: r1
+                      - generic [ref=e191]:
+                        - generic [ref=e192]:
+                          - term [ref=e193]:
+                            - generic [ref=e194]: State
+                          - definition [ref=e196]:
+                            - generic [ref=e199]: PRIMARY
+                        - generic [ref=e200]:
+                          - term [ref=e201]:
+                            - generic [ref=e202]: Nodes
+                          - definition [ref=e204]: "16"
+                    - generic [ref=e205]:
+                      - generic [ref=e206]: r2
+                      - generic [ref=e207]:
+                        - generic [ref=e208]:
+                          - term [ref=e209]:
+                            - generic [ref=e210]: State
+                          - definition [ref=e212]:
+                            - generic [ref=e215]: SYNCHRONIZED
+                        - generic [ref=e216]:
+                          - term [ref=e217]:
+                            - generic [ref=e218]: Nodes
+                          - definition [ref=e220]: "12"
+        - tablist [ref=e222]:
+          - tab "Databases" [selected] [ref=e223] [cursor=pointer]:
+            - link "Databases" [ref=e226]:
+              - /url: /cluster/databases
+          - tab "Nodes" [ref=e227] [cursor=pointer]:
+            - link "Nodes" [ref=e230]:
+              - /url: /cluster/nodes
+          - tab "Storage" [ref=e231] [cursor=pointer]:
+            - link "Storage" [ref=e234]:
+              - /url: /cluster/storage
+          - tab "Tablets" [ref=e235] [cursor=pointer]:
+            - link "Tablets" [ref=e238]:
+              - /url: /cluster/tablets
+          - tab "Versions" [ref=e239] [cursor=pointer]:
+            - link "Versions" [ref=e242]:
+              - /url: /cluster/versions
+        - generic [ref=e245]:
+          - generic [ref=e246]:
+            - generic [ref=e247]:
+              - textbox "Database name" [active] [ref=e250]
+              - radiogroup [ref=e251]:
+                - generic [ref=e252]:
+                  - radio "All" [checked] [ref=e253]
+                  - generic [ref=e254]: All
+                - generic [ref=e255] [cursor=pointer]:
+                  - radio "With problems" [ref=e256]
+                  - generic [ref=e257]: With problems
+              - generic [ref=e260]: "Databases: 1"
+            - button "10/10" [ref=e264] [cursor=pointer]:
+              - img [ref=e267]:
+                - img [ref=e268]
+              - generic [ref=e271]: 10/10
+          - generic [ref=e274]:
+            - table [ref=e277]:
+              - rowgroup [ref=e278]:
+                - row "Database Type State CPU Memory Storage Network Nodes Groups Pools" [ref=e279]:
+                  - columnheader "Database" [ref=e280]:
+                    - generic [ref=e281]: Database
+                  - columnheader "Type" [ref=e282]:
+                    - generic [ref=e283]: Type
+                  - columnheader "State" [ref=e284]:
+                    - generic [ref=e285]: State
+                  - columnheader "CPU" [ref=e286]:
+                    - generic [ref=e287]: CPU
+                  - columnheader "Memory" [ref=e288]:
+                    - generic [ref=e289]: Memory
+                  - columnheader "Storage" [ref=e290]:
+                    - generic [ref=e291]: Storage
+                  - columnheader "Network" [ref=e292]:
+                    - generic [ref=e293]: Network
+                  - columnheader "Nodes" [ref=e294]:
+                    - generic [ref=e295]: Nodes
+                  - columnheader "Groups" [ref=e296]:
+                    - generic [ref=e297]: Groups
+                  - columnheader "Pools" [ref=e298]:
+                    - generic [ref=e299]: Pools
+            - table [ref=e304]:
+              - rowgroup:
+                - row "Database Type State CPU Memory Storage Network Nodes Groups Pools":
+                  - columnheader "Database":
+                    - generic: Database
+                  - columnheader "Type":
+                    - generic: Type
+                  - columnheader "State":
+                    - generic: State
+                  - columnheader "CPU":
+                    - generic: CPU
+                  - columnheader "Memory":
+                    - generic: Memory
+                  - columnheader "Storage":
+                    - generic: Storage
+                  - columnheader "Network":
+                    - generic: Network
+                  - columnheader "Nodes":
+                    - generic: Nodes
+                  - columnheader "Groups":
+                    - generic: Groups
+                  - columnheader "Pools":
+                    - generic: Pools
+              - rowgroup [ref=e305]:
+                - row "local Good /local Copy Domain Running 0.022 1 GB — — 1 2" [ref=e306]:
+                  - cell "local Good /local Copy" [ref=e307]:
+                    - generic [ref=e308]:
+                      - generic [ref=e309]:
+                        - link "local" [ref=e311] [cursor=pointer]:
+                          - /url: /database?database=%2Flocal
+                        - generic [ref=e313]:
+                          - img [ref=e315]:
+                            - img [ref=e316]
+                          - generic [ref=e320]: Good
+                      - generic [ref=e321]:
+                        - generic [ref=e322]: /local
+                        - button "Copy" [ref=e323] [cursor=pointer]:
+                          - generic:
+                            - generic:
+                              - img:
+                                - img
+                  - cell "Domain" [ref=e324]
+                  - cell "Running" [ref=e325]:
+                    - generic [ref=e328]: Running
+                  - cell "0.022" [ref=e329]
+                  - cell "1 GB" [ref=e330]
+                  - cell "—" [ref=e331]
+                  - cell "—" [ref=e332]
+                  - cell "1" [ref=e333]
+                  - cell "2" [ref=e334]
+                  - cell [ref=e335]
+```
