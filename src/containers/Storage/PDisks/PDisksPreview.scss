@@ -1,8 +1,8 @@
-@use '../../../components/DiskStateProgressBar/diskStateColors';
+@use '../../../styles/mixins';
 
 .ydb-storage-pdisks-preview {
     &__color {
-        @include diskStateColors.disk-state-colors(&);
+        @include mixins.entity-state-colors(&);
     }
 
     &__control {

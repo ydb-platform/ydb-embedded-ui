@@ -3,15 +3,11 @@ import React from 'react';
 import {Button, Flex, PortalProvider} from '@gravity-ui/uikit';
 import {createPortal} from 'react-dom';
 
-import {getDiskStateColorMods} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {cn} from '../../../utils/cn';
-import {
-    getDefaultDiskDisplayState,
-    getDefaultPDiskDisplayState,
-} from '../../../utils/disks/displayState';
-import {getDiskBarTone} from '../../../utils/disks/getDiskBarTone';
-import type {DiskBarTone, PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
+import {DONOR_COLOR} from '../../../utils/disks/constants';
+import {getDataSeverityColor} from '../../../utils/disks/helpers';
+import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import {useSetting} from '../../../utils/hooks/useSetting';
 import {isNumeric} from '../../../utils/utils';
 import {PDisk} from '../PDisk';
@@ -65,10 +61,13 @@ interface PDiskPreviewItemProps extends PDiskPreviewSvgProps {
     setHighlightedDisk: (id?: string) => void;
 }
 
+// The preview uses ordinary prepared-data severity, independently of Expert mode display states.
+type PreviewTone = ReturnType<typeof getDataSeverityColor> | typeof DONOR_COLOR;
+
 interface VDiskPath {
     key: string;
     path: string;
-    tone: DiskBarTone;
+    tone: PreviewTone;
     inactive: boolean;
 }
 
@@ -86,8 +85,8 @@ function getFilledSize(percent: unknown, size: number, inverted = false) {
     return (filledPercent / 100) * size;
 }
 
-function getBarClassName(element: string, tone: DiskBarTone, highlighted?: boolean) {
-    return b('color', getDiskStateColorMods(tone, highlighted), b(element));
+function getBarClassName(element: string, tone: PreviewTone, highlighted?: boolean) {
+    return b('color', {[tone.toLowerCase()]: true, highlighted}, b(element));
 }
 
 function getPDiskKey(pDisk: PreparedPDisk, index: number) {
@@ -102,10 +101,7 @@ function getVDiskPaths(vDisks: PreparedVDisk[], viewContext?: StorageViewContext
         const row = index % VDISKS_WITHOUT_PDISK_COLUMN;
         const x = VDISK_X + column * (VDISK_SIZE + VDISK_COLUMN_GAP);
         const y = row * (VDISK_SIZE + VDISK_GAP);
-        const tone = getDiskBarTone({
-            severity: getDefaultDiskDisplayState(vDisk, vDisk.DonorMode).severity,
-            isDonor: vDisk.DonorMode,
-        });
+        const tone = vDisk.DonorMode ? DONOR_COLOR : getDataSeverityColor(vDisk.Severity);
         const inactive = !isVdiskActive(vDisk, viewContext);
         const key = `${tone}-${inactive}`;
         const rectPath = `M${x} ${y}h${VDISK_SIZE}v${VDISK_SIZE}h-${VDISK_SIZE}z`;
@@ -143,9 +139,8 @@ function PDiskPreviewSvg({
     highlighted,
     inverted,
 }: PDiskPreviewSvgProps) {
-    const displayState = getDefaultPDiskDisplayState(pDisk);
-    const pDiskTone = getDiskBarTone({severity: displayState.severity});
-    const pDiskFilledHeight = getFilledSize(displayState.allocatedPercent, PDISK_HEIGHT, inverted);
+    const pDiskTone = getDataSeverityColor(pDisk.Severity);
+    const pDiskFilledHeight = getFilledSize(pDisk.AllocatedPercent, PDISK_HEIGHT, inverted);
     const pDiskFillY = inverted ? PDISK_Y : PDISK_Y + PDISK_HEIGHT - pDiskFilledHeight;
     const vDiskPaths = React.useMemo(
         () => getVDiskPaths(vDisks, viewContext),
@@ -232,8 +227,21 @@ function PDiskPreviewItem({
     const [previewFocused, setPreviewFocused] = React.useState(false);
     const popupContainerRef = React.useRef<HTMLElement | null>(null);
     const detailsRef = React.useRef<HTMLDivElement>(null);
+    const diskLinkRef = React.useRef<HTMLAnchorElement>(null);
+    const previewRef = React.useRef<HTMLButtonElement>(null);
+    const transferFocusRef = React.useRef(false);
     const popupHostRef = React.useRef<HTMLDivElement>(null);
     const [popupAvailableHeight, setPopupAvailableHeight] = React.useState(0);
+
+    React.useLayoutEffect(() => {
+        if (!transferFocusRef.current) {
+            return;
+        }
+        transferFocusRef.current = false;
+        // Transfer keyboard focus after React replaces the activated control.
+        const target = detailsOpened ? diskLinkRef.current : previewRef.current;
+        target?.focus({preventScroll: true});
+    }, [detailsOpened]);
 
     React.useLayoutEffect(() => {
         const container = popupContainerRef.current;
@@ -295,6 +303,7 @@ function PDiskPreviewItem({
 
             event.preventDefault();
             event.stopPropagation();
+            transferFocusRef.current = event.detail === 0;
             closeDetails();
         },
         [closeDetails],
@@ -305,12 +314,14 @@ function PDiskPreviewItem({
             <Button
                 view="flat"
                 className={b('control')}
+                ref={previewRef}
                 onMouseEnter={() => setPreviewHovered(true)}
                 onMouseLeave={() => setPreviewHovered(false)}
                 onFocus={() => setPreviewFocused(true)}
                 onBlur={() => setPreviewFocused(false)}
                 onClick={(event) => {
                     event.stopPropagation();
+                    transferFocusRef.current = event.detail === 0;
                     // Keep popup wheel events in the table's native scroll container.
                     let container = event.currentTarget.parentElement;
                     while (
@@ -361,6 +372,7 @@ function PDiskPreviewItem({
                     onClickCapture={handleOpenedDetailsClick}
                 >
                     <PDisk
+                        linkRef={diskLinkRef}
                         data={pDisk}
                         inactive={!isPdiskActive(pDisk, viewContext)}
                         vDisks={vDisks}

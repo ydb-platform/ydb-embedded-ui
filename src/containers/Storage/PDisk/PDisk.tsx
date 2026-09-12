@@ -172,6 +172,7 @@ interface PDiskProps {
     onHidePopup?: VoidFunction;
     className?: string;
     progressBarClassName?: string;
+    linkRef?: React.Ref<HTMLAnchorElement>;
     viewContext?: StorageViewContext;
     width?: number;
     delayOpen?: number;
@@ -192,6 +193,7 @@ export const PDisk = ({
     onHidePopup,
     className,
     progressBarClassName,
+    linkRef,
     viewContext,
     width,
     delayOpen = DISKS_POPUP_DEBOUNCE_TIMEOUT,
@@ -278,7 +280,12 @@ export const PDisk = ({
                 delayOpen={delayOpen}
                 delayClose={delayClose}
             >
-                <InternalLink to={pDiskPath} aria-label={accessibleName} className={b('content')}>
+                <InternalLink
+                    to={pDiskPath}
+                    innerRef={linkRef}
+                    aria-label={accessibleName}
+                    className={b('content')}
+                >
                     <DiskStateProgressBar
                         allocation={allocatedPercent}
                         tone={tone}
