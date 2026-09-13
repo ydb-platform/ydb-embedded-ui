@@ -90,6 +90,9 @@ export interface TPathDescription {
     SysViewDescription?: TSysViewDescription;
 
     ReplicationDescription?: TReplicationDescription;
+
+    // for resource pool
+    ResourcePoolDescription?: TResourcePoolDescription;
 }
 
 export interface TDirEntry {
@@ -348,4 +351,19 @@ export interface TTablePartition {
 interface TUserAttribute {
     Key?: string;
     Value?: string;
+}
+
+/**
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/flat_scheme_op.proto
+ *
+ * TResourcePoolDescription from flat_scheme_op.proto
+ */
+export interface TResourcePoolDescription {
+    Name?: string;
+    /** fixed64 */
+    PathId?: string;
+    Version?: string;
+    Properties?: {
+        Properties?: Record<string, string>;
+    };
 }

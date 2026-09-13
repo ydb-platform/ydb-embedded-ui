@@ -8,6 +8,7 @@ import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {EPathType} from '../../../../../types/api/schema';
 import {prepareReplicationItems} from '../AsyncReplicationInfo';
 import {prepareChangefeedInfo} from '../ChangefeedInfo';
+import {prepareResourcePoolItems} from '../ResourcePoolInfo';
 import {prepareColumnTableGeneralInfo} from '../TableInfo/prepareTableInfo/prepareColumnTableInfo';
 
 import {SchemaObjectInfo} from './SchemaObjectInfo';
@@ -68,6 +69,8 @@ export function SchemaObjectInfoContainer({data, type, path}: SchemaObjectInfoCo
                 return externalTableInfoItems;
             case EPathType.EPathTypeReplication:
                 return data ? prepareReplicationItems(data) : undefined;
+            case EPathType.EPathTypeResourcePool:
+                return data ? prepareResourcePoolItems(data) : undefined;
             default:
                 return tableIndexOverviewInfo?.additionalItems;
         }
