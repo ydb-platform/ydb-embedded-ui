@@ -16,16 +16,16 @@ const PROPERTY_GROUPS: PropertyGroup[] = [
     {
         title: i18n('group_queue'),
         properties: [
-            {key: 'CONCURRENT_QUERY_LIMIT', label: i18n('field_concurrent-query-limit')},
-            {key: 'QUEUE_SIZE', label: i18n('field_queue-size')},
-            {key: 'DATABASE_LOAD_CPU_THRESHOLD', label: i18n('field_database-load-cpu-threshold')},
+            {key: 'concurrent_query_limit', label: i18n('field_concurrent-query-limit')},
+            {key: 'queue_size', label: i18n('field_queue-size')},
+            {key: 'database_load_cpu_threshold', label: i18n('field_database-load-cpu-threshold')},
         ],
     },
     {
         title: i18n('group_cpu'),
         properties: [
             {
-                key: 'TOTAL_CPU_LIMIT_PERCENT_PER_NODE',
+                key: 'total_cpu_limit_percent_per_node',
                 label: i18n('field_total-cpu-limit-percent-per-node'),
             },
         ],
@@ -33,7 +33,7 @@ const PROPERTY_GROUPS: PropertyGroup[] = [
 ];
 
 function formatValue(value: string | undefined): React.ReactNode {
-    if (value === undefined || value === '') {
+    if (value === undefined || value === '' || value === '-1') {
         return <Text color="secondary">{i18n('value_not-set')}</Text>;
     }
     return <Text variant="code-inline-2">{value}</Text>;
