@@ -133,6 +133,12 @@ export const enableStorageExpertModeSetting: SettingProps = {
     description: i18n('settings.enableStorageExpertMode.description'),
 };
 
+export const enablePDisksPreviewSetting: SettingProps = {
+    settingKey: SETTING_KEYS.ENABLE_PDISKS_PREVIEW,
+    title: i18n('settings.enablePDisksPreview.title'),
+    description: i18n('settings.enablePDisksPreview.description'),
+};
+
 function isSettingWithKey(
     setting: SettingProps | SettingsInfoFieldProps,
     settingKey: string,
@@ -246,6 +252,7 @@ export const experimentsSection: SettingsSection = {
         enableTenantNavigationV2Setting,
         enableNewStorageViewSetting,
         enableStorageExpertModeSetting,
+        enablePDisksPreviewSetting,
     ],
 };
 

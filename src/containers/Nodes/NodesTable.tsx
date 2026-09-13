@@ -2,7 +2,10 @@ import React from 'react';
 
 import type {PaginatedTableData} from '../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../components/PaginatedTable';
-import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
+import {
+    NODES_COLUMNS_IDS,
+    NODES_COLUMNS_WIDTH_LS_KEY,
+} from '../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../components/nodesColumns/types';
 import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import type {NodesFilters} from '../../store/reducers/nodes/types';
@@ -94,6 +97,9 @@ export function NodesTable({
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
             scrollContainerRef={scrollContainerRef}
             columns={columns}
+            rowHeight={
+                columns.some((column) => column.name === NODES_COLUMNS_IDS.PDisks) ? 51 : undefined
+            }
             fetchData={getNodes}
             initialEntitiesCount={initialEntitiesCount}
             renderErrorMessage={renderPaginatedTableErrorMessage}

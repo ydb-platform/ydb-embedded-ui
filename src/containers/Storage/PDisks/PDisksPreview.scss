@@ -1,0 +1,54 @@
+@use '../../../styles/mixins';
+
+.ydb-storage-pdisks-preview {
+    &__color {
+        @include mixins.entity-state-colors(&);
+    }
+
+    &__control {
+        // Match the SVG height and avoid adding padding to the compact disk grid.
+        --g-button-height: 41px;
+        --g-button-padding: 0;
+        --g-button-background-color-hover: transparent;
+
+        flex-shrink: 0;
+    }
+
+    &__popup-provider {
+        display: contents;
+    }
+
+    &__popup-provider .ydb-popover {
+        overflow: auto;
+
+        // Leave room for the popup arrow, offset and border.
+        max-height: calc(var(--ydb-disk-popup-available-height) - var(--g-spacing-4));
+    }
+
+    &__svg {
+        display: block;
+    }
+
+    &__pdisk-background,
+    &__vdisk-background {
+        fill: var(--entity-state-background-color, var(--g-color-base-misc-light));
+    }
+
+    &__pdisk-fill,
+    &__vdisk-fill {
+        fill: var(--entity-state-fill-color, var(--g-color-base-misc-medium));
+    }
+
+    &__pdisk-border {
+        fill: none;
+        stroke: var(--entity-state-border-color, var(--g-color-base-misc-heavy));
+    }
+
+    &__vdisk-fill {
+        stroke: var(
+            --entity-state-shadow-color,
+            var(--entity-state-border-color, var(--g-color-base-misc-heavy))
+        );
+        stroke-width: 2px;
+    }
+}

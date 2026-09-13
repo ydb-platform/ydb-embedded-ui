@@ -1,4 +1,4 @@
-import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
+import {DEFAULT_USER_SETTINGS, SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {applyStorageExpertModeSettingAvailability, getUserSettings} from '../settings';
 
 function getExperimentSettingKeys(available: boolean) {
@@ -25,6 +25,12 @@ describe('applyStorageExpertModeSettingAvailability', () => {
 });
 
 describe('getUserSettings', () => {
+    test('exposes compact PDisk previews as an experiment disabled by default', () => {
+        expect(getExperimentSettingKeys(true)).toContain(SETTING_KEYS.ENABLE_PDISKS_PREVIEW);
+        expect(getExperimentSettingKeys(false)).toContain(SETTING_KEYS.ENABLE_PDISKS_PREVIEW);
+        expect(DEFAULT_USER_SETTINGS[SETTING_KEYS.ENABLE_PDISKS_PREVIEW]).toBe(false);
+    });
+
     test('does not expose the removed network table experiment', () => {
         expect(getExperimentSettingKeys(true)).not.toContain('enableNetworkTable');
     });
