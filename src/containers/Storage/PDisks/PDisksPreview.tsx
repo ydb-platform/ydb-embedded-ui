@@ -27,9 +27,7 @@ const VDISK_COLUMN_GAP = 1;
 const PDISK_WIDTH = VDISK_SIZE;
 const PDISK_HEIGHT = VDISK_SIZE * 6 + VDISK_GAP * 5;
 const SUMMARY_HEIGHT = PDISK_HEIGHT;
-// Scroll virtualization requires actual row heights to match its calculations to prevent jumps.
-// NodesTable with PDisks and PaginatedStorageNodesTable expect 51px rows:
-// 40px content + 10px cell padding + 1px border.
+// Match the existing PDisks container: 40px content + 10px cell padding + 1px border.
 // The 41px SVG/button intentionally extends into the cell padding without enlarging the row.
 const DISKS_CONTAINER_HEIGHT = 40;
 const PDISK_X = 0;
