@@ -22,10 +22,10 @@ export const prepareTopicSchemaInfo = (data?: TEvDescribeSchemeResult): Array<In
         return [];
     }
 
-    const {Partitions = [], PQTabletConfig = {PartitionConfig: {LifetimeSeconds: 0}}} = pqGroupData;
+    const {Partitions = [], PQTabletConfig} = pqGroupData;
 
-    const {Codecs, MeteringMode, PartitionStrategy} = PQTabletConfig;
-    const {WriteSpeedInBytesPerSecond, StorageLimitBytes} = PQTabletConfig.PartitionConfig;
+    const {Codecs, MeteringMode, PartitionStrategy, PartitionConfig} = PQTabletConfig ?? {};
+    const {WriteSpeedInBytesPerSecond, StorageLimitBytes} = PartitionConfig ?? {};
 
     //@ts-expect-error
     const pqGeneralInfo = formatObject<TPersQueueGroupDescription>(formatPQGroupItem, {
