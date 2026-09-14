@@ -8,7 +8,7 @@ export interface TPersQueueGroupDescription {
     PartitionsToDelete?: number[];
     NextPartitionId?: number;
     PartitionPerTablet?: number;
-    PQTabletConfig: TPQTabletConfig;
+    PQTabletConfig?: TPQTabletConfig;
     Partitions?: TPartition[];
     /** uint64 */
     AlterVersion?: string;
@@ -23,7 +23,7 @@ export interface TPersQueueGroupDescription {
 export interface TPQTabletConfig {
     /** uint64 */
     CacheSize?: string;
-    PartitionConfig: TPQPartitionConfig;
+    PartitionConfig?: TPQPartitionConfig;
     /** @deprecated use Partitions */
     PartitionIds?: number[];
     TopicName?: string;
