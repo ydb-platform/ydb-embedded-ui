@@ -45,7 +45,17 @@ export function useStorageColumnsSettings() {
         if (!data?.columnsSettings) {
             return;
         }
-        setMaxima((previous) => previous ?? data.columnsSettings);
+        const {maxSlotsPerDisk, maxDisksPerNode} = data.columnsSettings;
+        // Without backend-wide maxima, response preparation uses the current chunk only.
+        // Keep both maxima independently: the most disks and slots may be on different pages.
+        setMaxima((previous) => {
+            const maxSlots = Math.max(previous?.maxSlotsPerDisk || 1, maxSlotsPerDisk || 1);
+            const maxDisks = Math.max(previous?.maxDisksPerNode || 1, maxDisksPerNode || 1);
+            if (previous?.maxSlotsPerDisk === maxSlots && previous.maxDisksPerNode === maxDisks) {
+                return previous;
+            }
+            return {maxSlotsPerDisk: maxSlots, maxDisksPerNode: maxDisks};
+        });
     }, []);
 
     const columnsSettings: StorageNodesColumnsSettings = React.useMemo(() => {
