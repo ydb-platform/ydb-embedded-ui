@@ -567,3 +567,53 @@ test('later chunks widen previews when backend-wide disk maxima are absent', asy
     ).toBeVisible();
     expect(await width()).toBe(expandedWidth);
 });
+
+test('filtering to a narrow node should match the width after reload', async ({page}) => {
+    const nodes = await setupPDiskPreviewMocks(page, 2, 12);
+    nodes[0].PDisks = nodes[0].PDisks.slice(0, 1);
+    nodes[0].VDisks = nodes[0].VDisks.filter((disk) => disk.PDiskId === 1);
+    await page.route('**/viewer/json/nodes?**', async (route) => {
+        const filter = new URL(route.request().url()).searchParams.get('filter');
+        const result = filter ? [nodes[0]] : nodes;
+        await route.fulfill({
+            json: {TotalNodes: '2', FoundNodes: String(result.length), Nodes: result},
+        });
+    });
+    await page.addInitScript(() => {
+        localStorage.setItem('enablePDisksPreview', 'true');
+        localStorage.setItem(
+            'nodesTableSelectedColumns',
+            JSON.stringify(['NodeId', 'Host', 'PDisks']),
+        );
+    });
+    await new NodesPage(page).goto({clusterName: 'preview-test', backend: 'https://preview.test'});
+    await expect(
+        page.getByRole('button', {name: 'Show PDisk 2-12 details', exact: true}),
+    ).toBeVisible();
+    const column = page.getByRole('columnheader', {name: 'PDisks', exact: true});
+    const width = () => column.evaluate((el) => el.getBoundingClientRect().width);
+    const initialWidth = await width();
+    await new ClusterNodesTable(page).getControls().search('preview-node-1');
+    await expect(
+        page.getByRole('button', {name: 'Show PDisk 2-12 details', exact: true}),
+    ).toHaveCount(0);
+    await expect(
+        page.getByRole('button', {name: 'Show PDisk 1-1 details', exact: true}),
+    ).toBeVisible();
+    await expect.poll(width).toBeLessThan(100);
+    const filteredWidth = await width();
+    expect(filteredWidth).toBeLessThan(initialWidth);
+    await new ClusterNodesTable(page).getControls().search('');
+    await expect(
+        page.getByRole('button', {name: 'Show PDisk 2-12 details', exact: true}),
+    ).toBeVisible();
+    await expect.poll(width).toBe(initialWidth);
+    await new ClusterNodesTable(page).getControls().search('preview-node-1');
+    await expect.poll(width).toBe(filteredWidth);
+    await page.reload();
+    await expect(
+        page.getByRole('button', {name: 'Show PDisk 1-1 details', exact: true}),
+    ).toBeVisible();
+    const reloadedWidth = await width();
+    expect(filteredWidth).toBe(reloadedWidth);
+});

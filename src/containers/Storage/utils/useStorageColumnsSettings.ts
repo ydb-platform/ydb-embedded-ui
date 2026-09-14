@@ -39,8 +39,12 @@ const PAGNATED_TABLE_CELL_HORIZONTAL_PADDING = 10;
 
 export function useStorageColumnsSettings() {
     const [pDisksPreviewEnabled] = useSetting<boolean>(SETTING_KEYS.ENABLE_PDISKS_PREVIEW);
-    const [maxima, setMaxima] = React.useState<StorageNodesPaginatedTableData['columnsSettings']>();
-    const [previewColumnWidth, setPreviewColumnWidth] = React.useState(0);
+    const [widths, setWidths] = React.useState<{
+        selectionKey?: string;
+        maxima?: StorageNodesPaginatedTableData['columnsSettings'];
+        previewColumnWidth: number;
+    }>({previewColumnWidth: 0});
+    const {maxima, previewColumnWidth} = widths;
 
     const handleDataFetched = React.useCallback((data: StorageNodesPaginatedTableData) => {
         if (!data) {
@@ -50,21 +54,40 @@ export function useStorageColumnsSettings() {
             (width, node) => Math.max(width, getPDisksPreviewColumnWidth(node)),
             0,
         );
-        // Retain the widest loaded row so replacing virtualized chunks does not shrink the column.
-        setPreviewColumnWidth((previous) => Math.max(previous, fetchedPreviewWidth));
-        if (!data?.columnsSettings) {
-            return;
-        }
-        const {maxSlotsPerDisk, maxDisksPerNode} = data.columnsSettings;
-        // Without backend-wide maxima, response preparation uses the current chunk only.
-        // Keep both maxima independently: the most disks and slots may be on different pages.
-        setMaxima((previous) => {
-            const maxSlots = Math.max(previous?.maxSlotsPerDisk || 1, maxSlotsPerDisk || 1);
-            const maxDisks = Math.max(previous?.maxDisksPerNode || 1, maxDisksPerNode || 1);
-            if (previous?.maxSlotsPerDisk === maxSlots && previous.maxDisksPerNode === maxDisks) {
+        setWidths((previous) => {
+            // Retain maxima across chunks of one selection, including its grouped tables.
+            // Use the response's key so a callback rerender cannot relabel cached old data.
+            const sameSelection = previous.selectionKey === data.selectionKey;
+            const previousMaxima = sameSelection ? previous.maxima : undefined;
+            const previewWidth = Math.max(
+                sameSelection ? previous.previewColumnWidth : 0,
+                fetchedPreviewWidth,
+            );
+            const nextMaxima = data.columnsSettings
+                ? {
+                      maxSlotsPerDisk: Math.max(
+                          previousMaxima?.maxSlotsPerDisk || 1,
+                          data.columnsSettings.maxSlotsPerDisk || 1,
+                      ),
+                      maxDisksPerNode: Math.max(
+                          previousMaxima?.maxDisksPerNode || 1,
+                          data.columnsSettings.maxDisksPerNode || 1,
+                      ),
+                  }
+                : previousMaxima;
+            if (
+                sameSelection &&
+                previous.previewColumnWidth === previewWidth &&
+                previous.maxima?.maxSlotsPerDisk === nextMaxima?.maxSlotsPerDisk &&
+                previous.maxima?.maxDisksPerNode === nextMaxima?.maxDisksPerNode
+            ) {
                 return previous;
             }
-            return {maxSlotsPerDisk: maxSlots, maxDisksPerNode: maxDisks};
+            return {
+                selectionKey: data.selectionKey,
+                maxima: nextMaxima,
+                previewColumnWidth: previewWidth,
+            };
         });
     }, []);
 
