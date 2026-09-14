@@ -1,7 +1,6 @@
 import React from 'react';
 
-import {Button, Flex, PortalProvider} from '@gravity-ui/uikit';
-import {createPortal} from 'react-dom';
+import {Button, Flex} from '@gravity-ui/uikit';
 
 import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {cn} from '../../../utils/cn';
@@ -223,13 +222,9 @@ function PDiskPreviewItem({
     const [detailsOpened, setDetailsOpened] = React.useState(false);
     const [previewHovered, setPreviewHovered] = React.useState(false);
     const [previewFocused, setPreviewFocused] = React.useState(false);
-    const popupContainerRef = React.useRef<HTMLElement | null>(null);
-    const detailsRef = React.useRef<HTMLDivElement>(null);
     const diskLinkRef = React.useRef<HTMLAnchorElement>(null);
     const previewRef = React.useRef<HTMLButtonElement>(null);
     const transferFocusRef = React.useRef(false);
-    const popupHostRef = React.useRef<HTMLDivElement>(null);
-    const [popupAvailableHeight, setPopupAvailableHeight] = React.useState(0);
 
     React.useLayoutEffect(() => {
         if (!transferFocusRef.current) {
@@ -241,35 +236,6 @@ function PDiskPreviewItem({
         target?.focus({preventScroll: true});
     }, [detailsOpened]);
 
-    React.useLayoutEffect(() => {
-        const container = popupContainerRef.current;
-        const details = detailsRef.current;
-        if (!detailsOpened || !container || !details) {
-            return undefined;
-        }
-
-        // Let Gravity place the popup on either side without clipping its content.
-        const updatePopupHeight = () => {
-            const containerRect = container.getBoundingClientRect();
-            const detailsRect = details.getBoundingClientRect();
-            setPopupAvailableHeight(
-                Math.max(
-                    detailsRect.top - Math.max(containerRect.top, 0),
-                    Math.min(containerRect.bottom, window.innerHeight) - detailsRect.bottom,
-                ),
-            );
-        };
-        const observer = new ResizeObserver(updatePopupHeight);
-        observer.observe(container);
-        container.addEventListener('scroll', updatePopupHeight, {passive: true});
-        window.addEventListener('resize', updatePopupHeight);
-        updatePopupHeight();
-        return () => {
-            observer.disconnect();
-            container.removeEventListener('scroll', updatePopupHeight);
-            window.removeEventListener('resize', updatePopupHeight);
-        };
-    }, [detailsOpened, highlightedDisk]);
     const clearOwnHighlight = React.useCallback(() => {
         setHighlightedDisk((current) =>
             current === id || vDisks.some((disk) => disk.StringifiedId === current)
@@ -331,15 +297,6 @@ function PDiskPreviewItem({
                 onClick={(event) => {
                     event.stopPropagation();
                     transferFocusRef.current = event.detail === 0;
-                    // Keep popup wheel events in the table's native scroll container.
-                    let container = event.currentTarget.parentElement;
-                    while (
-                        container &&
-                        !/(auto|scroll)/.test(getComputedStyle(container).overflowY)
-                    ) {
-                        container = container.parentElement;
-                    }
-                    popupContainerRef.current = container;
                     setDetailsOpened(true);
                 }}
                 aria-label={i18n('action_show-pdisks-details', {id})}
@@ -357,46 +314,28 @@ function PDiskPreviewItem({
     }
 
     return (
-        <React.Fragment>
-            {popupContainerRef.current &&
-                createPortal(
-                    <div
-                        className={b('popup-provider')}
-                        ref={popupHostRef}
-                        style={
-                            {
-                                '--ydb-disk-popup-available-height': `${popupAvailableHeight}px`,
-                            } as React.CSSProperties
-                        }
-                    />,
-                    popupContainerRef.current,
-                )}
-            <PortalProvider container={popupHostRef}>
-                <Flex
-                    alignItems="center"
-                    shrink={0}
-                    height={SUMMARY_HEIGHT}
-                    spacing={{px: 1}}
-                    ref={detailsRef}
-                    onClickCapture={handleOpenedDetailsClick}
-                >
-                    <PDisk
-                        linkRef={diskLinkRef}
-                        data={pDisk}
-                        inactive={!isPdiskActive(pDisk, viewContext)}
-                        vDisks={vDisks}
-                        viewContext={viewContext}
-                        width={expandedWidth}
-                        showPopup={highlightedDisk === id}
-                        onShowPopup={() => setDetailsHighlightedDisk(id)}
-                        onHidePopup={() => setDetailsHighlightedDisk(undefined)}
-                        highlighted={highlightedDisk === id}
-                        highlightedDisk={highlightedDisk}
-                        setHighlightedDisk={setDetailsHighlightedDisk}
-                    />
-                </Flex>
-            </PortalProvider>
-        </React.Fragment>
+        <Flex
+            alignItems="center"
+            shrink={0}
+            height={SUMMARY_HEIGHT}
+            spacing={{px: 1}}
+            onClickCapture={handleOpenedDetailsClick}
+        >
+            <PDisk
+                linkRef={diskLinkRef}
+                data={pDisk}
+                inactive={!isPdiskActive(pDisk, viewContext)}
+                vDisks={vDisks}
+                viewContext={viewContext}
+                width={expandedWidth}
+                showPopup={highlightedDisk === id}
+                onShowPopup={() => setDetailsHighlightedDisk(id)}
+                onHidePopup={() => setDetailsHighlightedDisk(undefined)}
+                highlighted={highlightedDisk === id}
+                highlightedDisk={highlightedDisk}
+                setHighlightedDisk={setDetailsHighlightedDisk}
+            />
+        </Flex>
     );
 }
 

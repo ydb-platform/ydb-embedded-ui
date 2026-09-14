@@ -14,17 +14,6 @@
         flex-shrink: 0;
     }
 
-    &__popup-provider {
-        display: contents;
-    }
-
-    &__popup-provider .ydb-popover {
-        overflow: auto;
-
-        // Leave room for the popup arrow, offset and border.
-        max-height: calc(var(--ydb-disk-popup-available-height) - var(--g-spacing-4));
-    }
-
     &__svg {
         display: block;
     }

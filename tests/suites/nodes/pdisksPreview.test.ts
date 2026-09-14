@@ -169,8 +169,7 @@ test('preview uses compact SVG, preserves row height, and keeps detail popups in
     await expect(action).toBeVisible();
     expect(
         await action.evaluate((element) => {
-            const host = element.closest('.ydb-storage-pdisks-preview__popup-provider');
-            const scrollContainer = host?.parentElement;
+            const scrollContainer = element.closest('.ydb-cluster');
             return Boolean(
                 scrollContainer &&
                     /(auto|scroll)/.test(getComputedStyle(scrollContainer).overflowY) &&
@@ -328,8 +327,7 @@ test('wheel scrolling over a disk popup reaches the table', async ({page}) => {
     await page.locator('.pdisk-storage__content').hover();
     const action = page.getByRole('link', {name: 'Go to PDisk', exact: true});
     await action.hover();
-    const host = page.locator('.ydb-storage-pdisks-preview__popup-provider');
-    const scroll = host.locator('..');
+    const scroll = page.locator('.ydb-cluster');
     const initialScroll = await scroll.evaluate((element) => element.scrollTop);
     await page.mouse.wheel(0, 200);
     await expect
