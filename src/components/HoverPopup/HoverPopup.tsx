@@ -150,7 +150,7 @@ export const HoverPopup = ({
     const anchorElement = anchorRef?.current || anchor.current;
     // Clipping a paired disk must not clear the shared hover state via onHidePopup.
     const isAnchorVisible = useVisibleAnchor(anchorElement, open);
-    const {container, maxHeight} = usePopupScrollContainer(anchorElement, open);
+    const container = usePopupScrollContainer(anchorElement);
 
     return (
         <React.Fragment>
@@ -183,10 +183,7 @@ export const HoverPopup = ({
                         onMouseLeave={onPopupMouseLeave}
                         onBlur={onPopupBlur}
                     >
-                        <div
-                            className={YDB_POPOVER_CLASS_NAME}
-                            style={container ? {maxHeight, overflow: 'auto'} : undefined}
-                        >
+                        <div className={YDB_POPOVER_CLASS_NAME}>
                             {renderPopupContent({onClose: closePopup})}
                         </div>
                     </div>

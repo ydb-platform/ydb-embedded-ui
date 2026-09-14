@@ -7,6 +7,6 @@ test('preserves portal behavior outside tables even inside a scroll container', 
     container.style.overflowY = 'auto';
     const anchor = document.createElement('span');
     container.append(anchor);
-    const {result} = renderHook(() => usePopupScrollContainer(anchor, true));
-    expect(result.current).toEqual({});
+    const {result} = renderHook(() => usePopupScrollContainer(anchor));
+    expect(result.current).toBeUndefined();
 });

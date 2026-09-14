@@ -3,6 +3,7 @@ import React from 'react';
 import {Flex} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
+import {PopupScrollContainerContext} from '../HoverPopup/PopupScrollContainerContext';
 import {TableSkeleton} from '../TableSkeleton/TableSkeleton';
 
 import {useTableScroll} from './useTableScroll';
@@ -69,7 +70,9 @@ TableWithControlsLayout.Table = function Table({
 
     return (
         <div ref={tableContainerRef} className={b('table', className)}>
-            {children}
+            <PopupScrollContainerContext.Provider value={scrollContainerRef}>
+                {children}
+            </PopupScrollContainerContext.Provider>
         </div>
     );
 };

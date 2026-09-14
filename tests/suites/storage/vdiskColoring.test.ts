@@ -538,6 +538,9 @@ test('wheel over disk popups scrolls the storage table', async ({page}) => {
         await (name === 'PDisk' ? getPDiskItems(row) : getVDiskItems(row)).first().hover();
         const action = page.getByRole('link', {name: `Go to ${name}`, exact: true});
         await expect(action).toHaveAttribute('href', /nodeId=7000/);
+        const popup = page.locator('.ydb-popover').filter({has: action});
+        await expect(popup).toHaveCSS('max-height', 'none');
+        await expect(popup).toHaveCSS('overflow-y', 'visible');
         await action.hover();
         const before = await scroll.evaluate((element) => element.scrollTop);
         await page.mouse.wheel(0, 200);
