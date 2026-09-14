@@ -47,6 +47,7 @@ export const ContentWithPopup = ({
         <React.Fragment>
             <Popup
                 container={container}
+                strategy="fixed"
                 floatingStyles={{fontFamily: 'var(--g-text-body-font-family)', ...floatingStyles}}
                 anchorElement={anchor.current}
                 open={isPinned || isPopupVisible}
