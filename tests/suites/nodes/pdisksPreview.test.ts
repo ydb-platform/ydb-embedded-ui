@@ -178,7 +178,7 @@ test('preview uses compact SVG, preserves row height, and keeps detail popups in
         }),
     ).toBe(true);
     await page.mouse.move(0, 0);
-    await details.press('Enter');
+    await details.press('Escape');
     await expect(preview).toBeVisible();
     await expect(action).toHaveCount(0);
     await expect(preview).toBeFocused();
@@ -335,37 +335,99 @@ test('wheel scrolling over a disk popup reaches the table', async ({page}) => {
         .toBeGreaterThan(initialScroll);
 });
 
-test('expanded disks remain interactive beyond the compact column boundary', async ({page}) => {
-    await setupPDiskPreviewMocks(page);
-    await page.addInitScript(() => localStorage.setItem('enablePDisksPreview', 'true'));
-    await openNodeDisks(page);
-    const preview = page.getByRole('button', {name: 'Show PDisk 1-1 details', exact: true});
-    const cell = preview.locator('xpath=ancestor::td');
-    const cellBox = await cell.boundingBox();
-    assert(cellBox);
-    await preview.click();
-    const lastVDisk = page.locator('.pdisk-storage__vdisks-item').last();
-    await expect(lastVDisk).toBeVisible();
-    const diskBox = await lastVDisk.boundingBox();
-    assert(diskBox);
-    expect(diskBox.x + diskBox.width / 2).toBeGreaterThan(cellBox.x + cellBox.width);
-    expect(
-        await lastVDisk.evaluate((element) => {
-            const rect = element.getBoundingClientRect();
-            return element.contains(
-                document.elementFromPoint(rect.right - 1, rect.top + rect.height / 2),
+for (const disksPerNode of [1, 3]) {
+    test(`expanding ${disksPerNode} disks widens the column without overlapping its neighbour`, async ({
+        page,
+    }, testInfo) => {
+        await setupPDiskPreviewMocks(page, 2, disksPerNode);
+        await page.addInitScript(() => {
+            localStorage.setItem('enablePDisksPreview', 'true');
+            localStorage.setItem(
+                'nodesTableSelectedColumns',
+                JSON.stringify(['NodeId', 'Host', 'PDisks', 'Tablets']),
             );
-        }),
-    ).toBe(true);
-    await lastVDisk.hover();
-    await expect(page.getByRole('link', {name: 'Go to VDisk', exact: true})).toBeVisible();
-    await lastVDisk.click();
-    await expect(preview).toBeVisible();
-});
+        });
+        await openNodeDisks(page);
+        const row = page.getByRole('row').filter({
+            has: page.getByRole('link', {name: 'preview-node-1', exact: true}),
+        });
+        // Locate the cell through the stable node identity: expanding replaces the preview button.
+        const cell = row.locator('.ydb-storage-nodes-columns__pdisks-column');
+        const column = page.getByRole('columnheader', {name: 'PDisks', exact: true});
+        const neighbour = row.getByRole('cell').last();
+        const neighbourColumn = page.getByRole('columnheader', {name: 'Tablets', exact: true});
+        const initialCellBox = await cell.boundingBox();
+        const initialNeighbourBox = await neighbour.boundingBox();
+        assert(initialCellBox);
+        assert(initialNeighbourBox);
+        expect(initialNeighbourBox.x).toBe(initialCellBox.x + initialCellBox.width);
 
-test('Enter repeatedly expands and collapses the same disk without losing focus', async ({
-    page,
-}) => {
+        let previousWidth = initialCellBox.width;
+        for (let diskId = 1; diskId <= disksPerNode; diskId++) {
+            await page
+                .getByRole('button', {name: `Show PDisk 1-${diskId} details`, exact: true})
+                .click();
+            await expect(row.locator('.pdisk-storage__content')).toHaveCount(diskId);
+            await expect
+                .poll(() => cell.evaluate((element) => element.getBoundingClientRect().width))
+                .toBeGreaterThan(previousWidth);
+            const cellBox = await cell.boundingBox();
+            const columnBox = await column.boundingBox();
+            const neighbourBox = await neighbour.boundingBox();
+            const neighbourColumnBox = await neighbourColumn.boundingBox();
+            assert(cellBox);
+            assert(columnBox);
+            assert(neighbourBox);
+            assert(neighbourColumnBox);
+            expect(columnBox.width).toBe(cellBox.width);
+            expect(neighbourBox.x).toBe(cellBox.x + cellBox.width);
+            expect(neighbourColumnBox.x).toBe(neighbourBox.x);
+            expect(neighbourBox.x).toBeGreaterThan(initialNeighbourBox.x);
+            for (const disk of await cell.locator('.pdisk-storage').all()) {
+                const diskBox = await disk.boundingBox();
+                assert(diskBox);
+                expect(diskBox.x).toBeGreaterThanOrEqual(cellBox.x);
+                expect(diskBox.x + diskBox.width).toBeLessThanOrEqual(neighbourBox.x);
+            }
+            previousWidth = cellBox.width;
+        }
+        await testInfo.attach('column-widths', {
+            body: JSON.stringify({collapsed: initialCellBox.width, expanded: previousWidth}),
+            contentType: 'application/json',
+        });
+
+        const lastVDisk = row.locator('.pdisk-storage__vdisks-item').last();
+        await expect(lastVDisk).toBeVisible();
+        expect(
+            await lastVDisk.evaluate((element) => {
+                const rect = element.getBoundingClientRect();
+                return element.contains(
+                    document.elementFromPoint(rect.right - 1, rect.top + rect.height / 2),
+                );
+            }),
+        ).toBe(true);
+        await lastVDisk.hover();
+        await expect(page.getByRole('link', {name: 'Go to VDisk', exact: true})).toBeVisible();
+        await lastVDisk.click();
+        await expect(
+            page.getByRole('button', {name: `Show PDisk 1-${disksPerNode} details`, exact: true}),
+        ).toBeVisible();
+        for (let diskId = disksPerNode - 1; diskId >= 1; diskId--) {
+            await row.locator('.pdisk-storage__content').last().click();
+            await expect(
+                page.getByRole('button', {name: `Show PDisk 1-${diskId} details`, exact: true}),
+            ).toBeVisible();
+        }
+        await expect
+            .poll(() => cell.evaluate((element) => element.getBoundingClientRect().width))
+            .toBe(initialCellBox.width);
+        expect(await neighbour.evaluate((element) => element.getBoundingClientRect().x)).toBe(
+            initialNeighbourBox.x,
+        );
+    });
+}
+
+test('Enter expands and Escape collapses the same disk without losing focus', async ({page}) => {
     await setupPDiskPreviewMocks(page, 2);
     await page.addInitScript(() => localStorage.setItem('enablePDisksPreview', 'true'));
     await openNodeDisks(page);
@@ -377,17 +439,57 @@ test('Enter repeatedly expands and collapses the same disk without losing focus'
         await page.keyboard.press('Enter');
         await expect(details).toBeFocused();
         await expect(details).toHaveAttribute('href', /nodeId=2/);
-        await page.keyboard.press('Enter');
+        await page.keyboard.press('Escape');
         await expect(preview).toBeFocused();
         await expect(details).toHaveCount(0);
     }
     // Collapsing from a VDisk should return to the same preview as well.
     await page.keyboard.press('Enter');
     await page.locator('.pdisk-storage__vdisks-item a').last().focus();
-    await page.keyboard.press('Enter');
+    await page.keyboard.press('Escape');
     await expect(preview).toBeFocused();
     expect(page.url()).toBe(initialUrl);
 });
+
+for (const diskType of ['PDisk', 'VDisk'] as const) {
+    test(`Enter navigates to the expanded ${diskType}`, async ({page, browserName}) => {
+        await setupPDiskPreviewMocks(page, 2);
+        await page.addInitScript(() => localStorage.setItem('enablePDisksPreview', 'true'));
+        await openNodeDisks(page);
+        const preview = page.getByRole('button', {name: 'Show PDisk 2-1 details', exact: true});
+        await preview.focus();
+        await page.keyboard.press('Enter');
+        const pDisk = page.locator('.pdisk-storage__content');
+        await expect(pDisk).toBeFocused();
+        // The last VDisk precedes the PDisk link in the natural keyboard order.
+        if (diskType === 'VDisk') {
+            // WebKit on macOS uses Option+Tab to include links in keyboard navigation.
+            await page.keyboard.press(
+                browserName === 'webkit' && process.platform === 'darwin'
+                    ? 'Alt+Shift+Tab'
+                    : 'Shift+Tab',
+            );
+        }
+        const link =
+            diskType === 'PDisk' ? pDisk : page.locator('.pdisk-storage__vdisks-item a').last();
+        await expect(link).toBeFocused();
+        const href = await link.getAttribute('href');
+        assert(href);
+        const target = new URL(href, page.url());
+        expect(target.searchParams.get('nodeId')).toBe('2');
+        expect(target.searchParams.get(diskType === 'PDisk' ? 'pDiskId' : 'vDiskId')).toBe(
+            diskType === 'PDisk' ? '1' : '12-1-0-0-0',
+        );
+        await page.keyboard.press('Enter');
+        await expect(page).toHaveURL(
+            (url) =>
+                url.pathname === target.pathname &&
+                Array.from(target.searchParams).every(
+                    ([key, value]) => url.searchParams.get(key) === value,
+                ),
+        );
+    });
+}
 
 test('mouse expansion and collapse do not transfer focus to the new control', async ({page}) => {
     await setupPDiskPreviewMocks(page);

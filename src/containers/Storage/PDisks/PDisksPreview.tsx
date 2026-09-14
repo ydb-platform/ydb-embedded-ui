@@ -270,6 +270,7 @@ function PDiskPreviewItem({
     const handleOpenedDetailsClick = React.useCallback(
         (event: React.MouseEvent<unknown>) => {
             if (
+                event.detail === 0 ||
                 !(event.currentTarget instanceof Node) ||
                 !event.currentTarget.contains(event.target as Node)
             ) {
@@ -278,11 +279,26 @@ function PDiskPreviewItem({
 
             event.preventDefault();
             event.stopPropagation();
-            transferFocusRef.current = event.detail === 0;
+            transferFocusRef.current = false;
             closeDetails();
         },
         [closeDetails],
     );
+
+    const handleOpenedDetailsKeyDown = (event: React.KeyboardEvent<unknown>) => {
+        // Portalled popup controls handle their own Escape without collapsing the disk.
+        if (
+            event.key !== 'Escape' ||
+            !(event.currentTarget instanceof Node) ||
+            !event.currentTarget.contains(event.target as Node)
+        ) {
+            return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        transferFocusRef.current = true;
+        closeDetails();
+    };
 
     if (!detailsOpened) {
         return (
@@ -320,6 +336,7 @@ function PDiskPreviewItem({
             height={SUMMARY_HEIGHT}
             spacing={{px: 1}}
             onClickCapture={handleOpenedDetailsClick}
+            onKeyDown={handleOpenedDetailsKeyDown}
         >
             <PDisk
                 linkRef={diskLinkRef}

@@ -87,7 +87,7 @@ test('closing details clears highlight and ignores callbacks from the previous e
     fireEvent.click(screen.getByRole('button', {name: 'Show PDisk 1-1 details'}));
     expect(mockDetailsProps.highlighted).toBe(false);
     const delayedShow = mockDetailsProps.onShowPopup;
-    fireEvent.click(screen.getByRole('button', {name: 'Expanded PDisk'}));
+    fireEvent.click(screen.getByRole('button', {name: 'Expanded PDisk'}), {detail: 1});
     fireEvent.click(screen.getByRole('button', {name: 'Show PDisk 1-1 details'}));
 
     act(() => delayedShow?.());
@@ -105,6 +105,25 @@ test('collapsing another group and its delayed hide callback preserve the highli
     act(() => mockDetailsById.get('1-2')?.onShowPopup?.());
     act(() => firstHide?.());
     expect(mockDetailsById.get('1-2')?.highlighted).toBe(true);
-    fireEvent.click(screen.getAllByRole('button', {name: 'Expanded PDisk'})[0]);
+    fireEvent.click(screen.getAllByRole('button', {name: 'Expanded PDisk'})[0], {detail: 1});
     expect(mockDetailsById.get('1-2')?.highlighted).toBe(true);
+});
+
+test('keyboard activation is not cancelled and Escape collapses only the focused disk', () => {
+    const outerKeyDown = jest.fn();
+    render(
+        <div onKeyDown={outerKeyDown}>
+            <PDisksPreview pDisks={[pDisk]} vDisks={vDisks} />
+        </div>,
+    );
+    const preview = screen.getByRole('button', {name: 'Show PDisk 1-1 details'});
+    fireEvent.click(preview);
+    const details = screen.getByRole('button', {name: 'Expanded PDisk'});
+    expect(fireEvent.click(details, {detail: 0})).toBe(true);
+    expect(details).toBeVisible();
+
+    fireEvent.keyDown(details, {key: 'Escape'});
+    expect(outerKeyDown).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', {name: 'Expanded PDisk'})).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Show PDisk 1-1 details'})).toHaveFocus();
 });
