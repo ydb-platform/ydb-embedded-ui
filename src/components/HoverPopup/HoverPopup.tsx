@@ -160,6 +160,8 @@ export const HoverPopup = ({
             {anchorElement ? (
                 <Popup
                     container={container}
+                    // Keep portal typography when the page uses a different font.
+                    floatingStyles={{fontFamily: 'var(--g-text-body-font-family)'}}
                     anchorElement={anchorElement}
                     onOpenChange={(_open, _event, reason) => {
                         if (reason === 'escape-key') {

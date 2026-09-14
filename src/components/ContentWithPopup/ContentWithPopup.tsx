@@ -19,6 +19,7 @@ export const ContentWithPopup = ({
     pinOnClick,
     hasArrow = true,
     placement = ['top', 'bottom'],
+    floatingStyles,
     ...props
 }: ContentWithPopupProps) => {
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
@@ -46,6 +47,7 @@ export const ContentWithPopup = ({
         <React.Fragment>
             <Popup
                 container={container}
+                floatingStyles={{fontFamily: 'var(--g-text-body-font-family)', ...floatingStyles}}
                 anchorElement={anchor.current}
                 open={isPinned || isPopupVisible}
                 placement={placement}
