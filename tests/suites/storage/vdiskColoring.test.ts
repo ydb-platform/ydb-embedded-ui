@@ -515,6 +515,39 @@ test('keeps paired disk popups inside the viewport without expanding the page', 
     expect(maxPageWidthWhileClosing).toBe(pageWidth);
 });
 
+test('wheel over disk popups scrolls the storage table', async ({page}) => {
+    const response = createMockStorageGroupsResponse();
+    const group = response.StorageGroups?.[0];
+    if (!group) {
+        throw new Error('Missing storage group fixture');
+    }
+    response.StorageGroups = Array.from({length: 40}, (_, index) => ({
+        ...group,
+        GroupId: String(9000000000 + index),
+    }));
+    response.TotalGroups = response.FoundGroups = 40;
+    await page.setViewportSize({width: 1500, height: 800});
+    await enableExpertMode(page, VDisksGroupBy.State, false);
+    await setupVDiskColoringMocks(page, response);
+    await gotoStoragePage(page, VDisksGroupBy.State, false);
+    await expectStorageGroupRowsReady(page, false);
+    const scroll = page.locator('.ydb-cluster');
+    for (const name of ['PDisk', 'VDisk']) {
+        await scroll.evaluate((element) => element.scrollTo({top: 0, left: 0}));
+        const row = getStorageGroupRow(page, 0);
+        await (name === 'PDisk' ? getPDiskItems(row) : getVDiskItems(row)).first().hover();
+        const action = page.getByRole('link', {name: `Go to ${name}`, exact: true});
+        await expect(action).toHaveAttribute('href', /nodeId=7000/);
+        await action.hover();
+        const before = await scroll.evaluate((element) => element.scrollTop);
+        await page.mouse.wheel(0, 200);
+        await expect
+            .poll(() => scroll.evaluate((element) => element.scrollTop))
+            .toBeGreaterThan(before);
+        await page.keyboard.press('Escape');
+    }
+});
+
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 60_000});
 

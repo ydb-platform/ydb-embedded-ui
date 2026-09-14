@@ -1,6 +1,9 @@
 import React from 'react';
 
+import {PopupScrollContainerContext} from './PopupScrollContainerContext';
+
 export function usePopupScrollContainer(anchor: HTMLElement | null, open: boolean) {
+    const containerRef = React.useContext(PopupScrollContainerContext);
     const [layout, setLayout] = React.useState<{
         container?: HTMLElement;
         maxHeight?: number;
@@ -15,16 +18,13 @@ export function usePopupScrollContainer(anchor: HTMLElement | null, open: boolea
         if (!view) {
             return undefined;
         }
-        let container = anchor.parentElement;
-        while (container && !/(auto|scroll)/.test(view.getComputedStyle(container).overflowY)) {
-            // A portal outside the fullscreen element would not be visible.
-            if (container === doc.fullscreenElement) {
-                break;
-            }
-            container = container.parentElement;
-        }
-        if (!container) {
-            // Preserve the application's PortalProvider when there is no local scroll container.
+        const container = containerRef?.current;
+        if (
+            !container ||
+            !container.contains(anchor) ||
+            (doc.fullscreenElement && !doc.fullscreenElement.contains(container))
+        ) {
+            // Outside the table's DOM / fullscreen boundary, preserve the existing portal behavior.
             setLayout({});
             return undefined;
         }
@@ -57,7 +57,7 @@ export function usePopupScrollContainer(anchor: HTMLElement | null, open: boolea
             doc.removeEventListener('scroll', updateLayout, true);
             view.removeEventListener('resize', updateLayout);
         };
-    }, [anchor, open]);
+    }, [anchor, open, containerRef]);
 
     return layout;
 }
