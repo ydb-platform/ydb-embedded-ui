@@ -1,5 +1,12 @@
 # Changelog
 
+## [21.0.0-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v21.0.0...v21.0.0-hotfix.1) (2026-09-14)
+
+
+### Bug Fixes
+
+* **topic:** handle missing partition config in topic info ([aa8291d](https://github.com/ydb-platform/ydb-embedded-ui/commit/aa8291d93457ddfe82f0e1154d8399eb2ff04bf4))
+
 ## [21.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v20.5.0...v21.0.0) (2026-09-07)
 
 
