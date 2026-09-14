@@ -7,6 +7,7 @@ export function getPopupScrollContainer(anchor: HTMLElement | null) {
     while (parent) {
         if (
             parent === doc.fullscreenElement ||
+            parent.classList.contains('ydb-fullscreen_fullscreen') ||
             (/auto|scroll/.test(doc.defaultView?.getComputedStyle(parent).overflowY ?? '') &&
                 parent.scrollHeight > parent.clientHeight)
         ) {
