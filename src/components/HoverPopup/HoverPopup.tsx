@@ -6,6 +6,8 @@ import debounce from 'lodash/debounce';
 
 import {YDB_POPOVER_CLASS_NAME} from '../../utils/constants';
 
+import {getPopupScrollContainer} from './getPopupScrollContainer';
+
 const DEBOUNCE_TIMEOUT = 100;
 
 function useVisibleAnchor(anchorElement: HTMLElement | null, open: boolean) {
@@ -148,6 +150,7 @@ export const HoverPopup = ({
     const anchorElement = anchorRef?.current || anchor.current;
     // Clipping a paired disk must not clear the shared hover state via onHidePopup.
     const isAnchorVisible = useVisibleAnchor(anchorElement, open);
+    const container = getPopupScrollContainer(anchorElement);
 
     return (
         <React.Fragment>
@@ -156,6 +159,9 @@ export const HoverPopup = ({
             </span>
             {anchorElement ? (
                 <Popup
+                    container={container}
+                    // Keep portal typography when the page uses a different font.
+                    floatingStyles={{fontFamily: 'var(--g-text-body-font-family)'}}
                     anchorElement={anchorElement}
                     onOpenChange={(_open, _event, reason) => {
                         if (reason === 'escape-key') {
