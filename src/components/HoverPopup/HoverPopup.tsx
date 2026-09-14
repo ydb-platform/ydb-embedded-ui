@@ -6,6 +6,8 @@ import debounce from 'lodash/debounce';
 
 import {YDB_POPOVER_CLASS_NAME} from '../../utils/constants';
 
+import {usePopupScrollContainer} from './usePopupScrollContainer';
+
 const DEBOUNCE_TIMEOUT = 100;
 
 function useVisibleAnchor(anchorElement: HTMLElement | null, open: boolean) {
@@ -148,6 +150,7 @@ export const HoverPopup = ({
     const anchorElement = anchorRef?.current || anchor.current;
     // Clipping a paired disk must not clear the shared hover state via onHidePopup.
     const isAnchorVisible = useVisibleAnchor(anchorElement, open);
+    const {container, maxHeight} = usePopupScrollContainer(anchorElement, open);
 
     return (
         <React.Fragment>
@@ -156,6 +159,7 @@ export const HoverPopup = ({
             </span>
             {anchorElement ? (
                 <Popup
+                    container={container}
                     anchorElement={anchorElement}
                     onOpenChange={(_open, _event, reason) => {
                         if (reason === 'escape-key') {
@@ -179,7 +183,10 @@ export const HoverPopup = ({
                         onMouseLeave={onPopupMouseLeave}
                         onBlur={onPopupBlur}
                     >
-                        <div className={YDB_POPOVER_CLASS_NAME}>
+                        <div
+                            className={YDB_POPOVER_CLASS_NAME}
+                            style={container ? {maxHeight, overflow: 'auto'} : undefined}
+                        >
                             {renderPopupContent({onClose: closePopup})}
                         </div>
                     </div>
