@@ -515,7 +515,7 @@ test('keeps paired disk popups inside the viewport without expanding the page', 
     expect(maxPageWidthWhileClosing).toBe(pageWidth);
 });
 
-test('wheel over disk popups scrolls the storage table', async ({page}) => {
+test('wheel over disk popups scrolls the page', async ({page}) => {
     const response = createMockStorageGroupsResponse();
     const group = response.StorageGroups?.[0];
     if (!group) {

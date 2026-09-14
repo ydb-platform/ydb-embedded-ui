@@ -6,7 +6,7 @@ import debounce from 'lodash/debounce';
 
 import {YDB_POPOVER_CLASS_NAME} from '../../utils/constants';
 
-import {usePopupScrollContainer} from './usePopupScrollContainer';
+import {getPopupScrollContainer} from './getPopupScrollContainer';
 
 const DEBOUNCE_TIMEOUT = 100;
 
@@ -150,7 +150,7 @@ export const HoverPopup = ({
     const anchorElement = anchorRef?.current || anchor.current;
     // Clipping a paired disk must not clear the shared hover state via onHidePopup.
     const isAnchorVisible = useVisibleAnchor(anchorElement, open);
-    const container = usePopupScrollContainer(anchorElement);
+    const container = getPopupScrollContainer(anchorElement);
 
     return (
         <React.Fragment>

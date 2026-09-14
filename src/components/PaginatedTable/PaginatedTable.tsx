@@ -1,7 +1,5 @@
 import React from 'react';
 
-import {PopupScrollContainerContext} from '../HoverPopup/PopupScrollContainerContext';
-
 import {usePaginatedTableState} from './PaginatedTableContext';
 import {TableChunksRenderer} from './TableChunksRenderer';
 import {TableHead} from './TableHead';
@@ -141,9 +139,7 @@ export const PaginatedTable = <T, F>({
 
     return (
         <div ref={tableRef} className={b(null, containerClassName)}>
-            <PopupScrollContainerContext.Provider value={scrollContainerRef}>
-                {renderTable()}
-            </PopupScrollContainerContext.Provider>
+            {renderTable()}
         </div>
     );
 };

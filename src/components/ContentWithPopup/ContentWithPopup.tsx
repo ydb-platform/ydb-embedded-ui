@@ -3,7 +3,7 @@ import React from 'react';
 import type {PopupProps} from '@gravity-ui/uikit';
 import {Popup} from '@gravity-ui/uikit';
 
-import {usePopupScrollContainer} from '../HoverPopup/usePopupScrollContainer';
+import {getPopupScrollContainer} from '../HoverPopup/getPopupScrollContainer';
 
 interface ContentWithPopupProps extends PopupProps {
     content: React.ReactNode;
@@ -24,7 +24,7 @@ export const ContentWithPopup = ({
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
     const [isPinned, setIsPinned] = React.useState(false);
     const anchor = React.useRef(null);
-    const container = usePopupScrollContainer(anchor.current);
+    const container = getPopupScrollContainer(anchor.current);
 
     const showPopup = () => {
         setIsPopupVisible(true);
