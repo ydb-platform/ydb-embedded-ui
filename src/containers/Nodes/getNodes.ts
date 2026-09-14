@@ -66,6 +66,5 @@ export const getNodes: FetchData<
         data: preparedResponse.nodes || [],
         found: preparedResponse.found || 0,
         total: preparedResponse.total || 0,
-        columnsSettings: preparedResponse.columnsSettings,
     };
 };
