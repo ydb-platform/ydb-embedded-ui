@@ -77,11 +77,9 @@ test.describe('Query History', () => {
     test('Query executed with keybinding is saved in history', async ({page}) => {
         const testQuery = 'SELECT 1 AS keybinding_test;';
 
-        // Focus on the query editor
+        await queryEditor.setQuery(testQuery);
+        await expect.poll(() => queryEditor.getEditorContent()).toBe(testQuery);
         await queryEditor.focusEditor();
-
-        // Type the query
-        await page.keyboard.type(testQuery);
 
         // Use the keybinding to execute the query
         await executeQueryWithKeybinding(page);

@@ -70,7 +70,8 @@ export class SavedQueriesTable {
     }
 
     async clickRow(name: string) {
-        await (await this.waitForRow(name)).click();
+        const row = await this.waitForRow(name);
+        await row.locator('.ydb-saved-queries__query-name').click();
     }
 
     async getPreviewTitle() {
