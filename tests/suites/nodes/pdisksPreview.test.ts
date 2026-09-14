@@ -505,6 +505,32 @@ test('mouse expansion and collapse do not transfer focus to the new control', as
     await expect(preview).not.toBeFocused();
 });
 
+test('collapsed previews reserve space for actual disks instead of backend-wide maxima', async ({
+    page,
+}) => {
+    const nodes = await setupPDiskPreviewMocks(page);
+    await page.route('**/viewer/json/nodes?**', async (route) => {
+        await route.fulfill({
+            json: {
+                TotalNodes: '1',
+                FoundNodes: '1',
+                MaximumSlotsPerDisk: '120',
+                MaximumDisksPerNode: '12',
+                Nodes: nodes,
+            },
+        });
+    });
+    await page.addInitScript(() => localStorage.setItem('enablePDisksPreview', 'true'));
+    await openNodeDisks(page);
+    await expect(
+        page.getByRole('button', {name: 'Show PDisk 1-1 details', exact: true}),
+    ).toBeVisible();
+    const column = page.getByRole('columnheader', {name: 'PDisks', exact: true});
+    await expect
+        .poll(() => column.evaluate((element) => element.getBoundingClientRect().width))
+        .toBeLessThan(100);
+});
+
 test('later chunks widen previews when backend-wide disk maxima are absent', async ({page}) => {
     const nodes = await setupPDiskPreviewMocks(page, 240, 4);
     for (const node of nodes.slice(0, 100)) {

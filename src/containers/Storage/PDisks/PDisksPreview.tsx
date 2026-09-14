@@ -121,11 +121,22 @@ function getSummaryWidth(vDisksCount: number) {
 }
 
 export function getPDisksPreviewColumnWidth({
-    maxSlotsPerDisk,
-    maxDisksPerNode,
-}: NonNullable<StorageNodesPaginatedTableData['columnsSettings']>) {
-    // Keep the column width stable as virtualized rows are replaced, including the gaps and cell padding.
-    return maxDisksPerNode * getSummaryWidth(maxSlotsPerDisk) + (maxDisksPerNode - 1) * 2 + 20;
+    PDisks = [],
+    VDisks = [],
+}: Pick<StorageNodesPaginatedTableData['data'][number], 'PDisks' | 'VDisks'>) {
+    if (!PDisks.length) {
+        return 0;
+    }
+    const slotsPerDisk = new Map<PreparedVDisk['PDiskId'], number>();
+    for (const disk of VDisks) {
+        slotsPerDisk.set(disk.PDiskId, (slotsPerDisk.get(disk.PDiskId) ?? 0) + 1);
+    }
+    // Each preview contains only its actual slots, not the cluster-wide maximum.
+    const disksWidth = PDisks.reduce(
+        (width, disk) => width + getSummaryWidth(slotsPerDisk.get(disk.PDiskId) ?? 0),
+        0,
+    );
+    return disksWidth + (PDisks.length - 1) * 2 + 20;
 }
 
 function PDiskPreviewSvg({

@@ -40,8 +40,18 @@ const PAGNATED_TABLE_CELL_HORIZONTAL_PADDING = 10;
 export function useStorageColumnsSettings() {
     const [pDisksPreviewEnabled] = useSetting<boolean>(SETTING_KEYS.ENABLE_PDISKS_PREVIEW);
     const [maxima, setMaxima] = React.useState<StorageNodesPaginatedTableData['columnsSettings']>();
+    const [previewColumnWidth, setPreviewColumnWidth] = React.useState(0);
 
     const handleDataFetched = React.useCallback((data: StorageNodesPaginatedTableData) => {
+        if (!data) {
+            return;
+        }
+        const fetchedPreviewWidth = data.data.reduce(
+            (width, node) => Math.max(width, getPDisksPreviewColumnWidth(node)),
+            0,
+        );
+        // Retain the widest loaded row so replacing virtualized chunks does not shrink the column.
+        setPreviewColumnWidth((previous) => Math.max(previous, fetchedPreviewWidth));
         if (!data?.columnsSettings) {
             return;
         }
@@ -72,13 +82,12 @@ export function useStorageColumnsSettings() {
             : undefined;
         return {
             pDiskWidth,
-            pDiskContainerWidth:
-                pDisksPreviewEnabled && maxima
-                    ? getPDisksPreviewColumnWidth(maxima)
-                    : pDiskContainerWidth,
+            pDiskContainerWidth: pDisksPreviewEnabled
+                ? previewColumnWidth || undefined
+                : pDiskContainerWidth,
             pDisksPreviewEnabled,
         };
-    }, [maxima, pDisksPreviewEnabled]);
+    }, [maxima, pDisksPreviewEnabled, previewColumnWidth]);
 
     return {
         handleDataFetched,

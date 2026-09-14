@@ -5,7 +5,7 @@ import {act, fireEvent, render, screen} from '@testing-library/react';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {PDisk} from '../PDisk';
 
-import {PDisksPreview} from './PDisksPreview';
+import {PDisksPreview, getPDisksPreviewColumnWidth} from './PDisksPreview';
 
 let mockInverted = false;
 const mockDetailsById = new Map<string, React.ComponentProps<typeof PDisk>>();
@@ -31,6 +31,17 @@ const vDisks: PreparedVDisk[] = Array.from({length: 12}, (_, index) => ({
 
 beforeEach(() => {
     mockInverted = false;
+});
+
+test('preview column width sums actual slot counts and includes gaps and cell padding', () => {
+    expect(getPDisksPreviewColumnWidth({})).toBe(0);
+    expect(getPDisksPreviewColumnWidth({PDisks: [pDisk], VDisks: vDisks})).toBe(40);
+    expect(
+        getPDisksPreviewColumnWidth({
+            PDisks: [pDisk, {...pDisk, PDiskId: 2}],
+            VDisks: [...vDisks, {PDiskId: 99}],
+        }),
+    ).toBe(48);
 });
 
 test('groups identical VDisks and updates the preview on data refresh', () => {
