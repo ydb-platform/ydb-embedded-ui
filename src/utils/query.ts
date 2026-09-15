@@ -250,16 +250,43 @@ function hasIssueContent(data: ErrorResponse) {
     return Boolean(data.error || data.issues?.length);
 }
 
+// The issues view walks this tree and renders these fields, so anything else would throw while drawing.
+function isIssueTree(value: unknown): boolean {
+    return (
+        Array.isArray(value) &&
+        value.every((issue) => {
+            if (!issue || typeof issue !== 'object' || Array.isArray(issue)) {
+                return false;
+            }
+            const {message, issues} = issue as {message?: unknown; issues?: unknown};
+            return (
+                (message === undefined || typeof message === 'string') &&
+                (issues === undefined || issues === null || isIssueTree(issues))
+            );
+        })
+    );
+}
+
+function hasRenderableIssues(data: ErrorResponse) {
+    const message: unknown = data.error?.message;
+    return (
+        (message === undefined || typeof message === 'string') &&
+        (data.issues === undefined || data.issues === null || isIssueTree(data.issues))
+    );
+}
+
 export function parseIssuesData(raw: unknown): ErrorResponse | string | undefined {
     if (typeof raw === 'string' && raw) {
         try {
             const parsed: unknown = JSON.parse(raw);
-            return isErrorResponse(parsed) && hasIssueContent(parsed) ? parsed : undefined;
+            return isErrorResponse(parsed) && hasIssueContent(parsed) && hasRenderableIssues(parsed)
+                ? parsed
+                : undefined;
         } catch {
             return raw;
         }
     }
-    if (isErrorResponse(raw) && hasIssueContent(raw)) {
+    if (isErrorResponse(raw) && hasIssueContent(raw) && hasRenderableIssues(raw)) {
         return raw;
     }
     return undefined;
