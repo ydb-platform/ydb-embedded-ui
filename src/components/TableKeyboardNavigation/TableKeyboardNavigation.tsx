@@ -274,7 +274,9 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
         if (current) {
             const {findRowIndex, getRowKey, isValidIndex, getLast} = optionsRef.current;
             const matchedIndex =
-                current.key !== undefined && findRowIndex
+                current.key !== undefined &&
+                getRowKey?.(current.index) !== current.key &&
+                findRowIndex
                     ? findRowIndex(current.key, current.index)
                     : current.index;
             const position = matchedIndex ?? current.index;
