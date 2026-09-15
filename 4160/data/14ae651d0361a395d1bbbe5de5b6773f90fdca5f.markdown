@@ -1,0 +1,418 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - link "Cluster" [disabled] [ref=e46]:
+            - generic [ref=e48]:
+              - img [ref=e49]
+              - text: Cluster
+      - link "Developer UI" [ref=e52] [cursor=pointer]:
+        - /url: http://localhost:8765/internal
+        - img [ref=e55]:
+          - img [ref=e56]
+        - generic [ref=e58]: Developer UI
+    - main [ref=e59]:
+      - generic [ref=e61]:
+        - generic [ref=e63]:
+          - text: LOCAL
+          - generic [ref=e64] [cursor=pointer]:
+            - img [ref=e66]:
+              - img [ref=e67]
+            - button "Good" [ref=e69]:
+              - generic [ref=e72]: Good
+        - generic [ref=e73]:
+          - button "Refresh" [ref=e74] [cursor=pointer]:
+            - img [ref=e77]
+          - group [ref=e80] [cursor=pointer]:
+            - combobox [ref=e81]:
+              - generic [ref=e82]: None
+            - img [ref=e83]:
+              - img [ref=e84]
+        - tablist [ref=e87]:
+          - tab "Databases" [ref=e88] [cursor=pointer]:
+            - link "Databases" [ref=e91]:
+              - /url: /cluster/databases
+          - tab "Nodes" [ref=e92] [cursor=pointer]:
+            - link "Nodes" [ref=e95]:
+              - /url: /cluster/nodes
+          - tab "Storage" [selected] [ref=e96] [cursor=pointer]:
+            - link "Storage" [ref=e99]:
+              - /url: /cluster/storage
+          - tab "Network" [ref=e100] [cursor=pointer]:
+            - link "Network" [ref=e103]:
+              - /url: /cluster/network
+          - tab "Tablets" [ref=e104] [cursor=pointer]:
+            - link "Tablets" [ref=e107]:
+              - /url: /cluster/tablets
+          - tab "Versions" [ref=e108] [cursor=pointer]:
+            - link "Versions" [ref=e111]:
+              - /url: /cluster/versions
+        - generic [ref=e113]:
+          - generic [ref=e114]:
+            - generic [ref=e116]:
+              - generic [ref=e117]:
+                - textbox "Group ID, Pool name" [active] [ref=e120]
+                - radiogroup [ref=e121]:
+                  - generic [ref=e122]:
+                    - radio "Groups" [checked] [ref=e123]
+                    - generic [ref=e124]: Groups
+                  - generic [ref=e125] [cursor=pointer]:
+                    - radio "Nodes" [ref=e126]
+                    - generic [ref=e127]: Nodes
+                - generic [ref=e128]: "Group by:"
+                - group [ref=e130] [cursor=pointer]:
+                  - combobox [ref=e131]:
+                    - generic [ref=e132]: "-"
+                  - img [ref=e133]:
+                    - img [ref=e134]
+                - generic [ref=e138]: "Groups: 2"
+                - button "Expert mode" [pressed] [ref=e139] [cursor=pointer]:
+                  - img [ref=e142]:
+                    - img [ref=e143]
+                  - generic [ref=e145]: Expert mode
+              - generic [ref=e147]:
+                - generic [ref=e148]: "VDisks:"
+                - radiogroup [ref=e149]:
+                  - generic [ref=e150]:
+                    - radio "State" [checked] [ref=e151]
+                    - generic [ref=e152]: State
+                  - generic [ref=e153] [cursor=pointer]:
+                    - radio "Space" [ref=e154]
+                    - generic [ref=e155]: Space
+                  - generic [ref=e156] [cursor=pointer]:
+                    - radio "Front queues" [ref=e157]
+                    - generic [ref=e158]: Front queues
+                  - generic [ref=e159] [cursor=pointer]:
+                    - radio "Compaction" [ref=e160]
+                    - generic [ref=e161]: Compaction
+                - generic [ref=e162]:
+                  - generic [ref=e163]:
+                    - generic [ref=e166]: Ok
+                    - generic [ref=e169]: Replication
+                    - generic [ref=e170]:
+                      - img [ref=e172]:
+                        - img [ref=e173]
+                      - generic [ref=e176]: Initial
+                    - generic [ref=e177]:
+                      - img [ref=e179]:
+                        - img [ref=e180]
+                      - generic [ref=e183]: PDisk Error
+                    - generic [ref=e184]:
+                      - img [ref=e186]:
+                        - img [ref=e187]
+                      - generic [ref=e190]: Error
+                    - generic [ref=e193]: N/D
+                  - generic [ref=e194]: No statistics available
+            - button "5/20" [ref=e197] [cursor=pointer]:
+              - img [ref=e200]:
+                - img [ref=e201]
+              - generic [ref=e204]: 5/20
+          - table [ref=e207]:
+            - rowgroup [ref=e208]:
+              - row "Group ID Pool Name Erasure Used VDisks PDisks" [ref=e209]:
+                - columnheader "Group ID" [ref=e210]:
+                  - generic [ref=e211] [cursor=pointer]:
+                    - generic [ref=e213]: Group ID
+                    - img [ref=e215]
+                - columnheader "Pool Name" [ref=e217]:
+                  - generic [ref=e218] [cursor=pointer]:
+                    - generic [ref=e220]: Pool Name
+                    - img [ref=e222]
+                - columnheader "Erasure" [ref=e224]:
+                  - generic [ref=e225] [cursor=pointer]:
+                    - generic [ref=e227]: Erasure
+                    - img [ref=e229]
+                - columnheader "Used" [ref=e231]:
+                  - generic [ref=e232] [cursor=pointer]:
+                    - generic [ref=e234]: Used
+                    - img [ref=e236]
+                - columnheader "VDisks PDisks" [ref=e238]:
+                  - generic [ref=e242]:
+                    - generic [ref=e243]: VDisks
+                    - generic [ref=e244]: PDisks
+            - rowgroup [ref=e245]:
+              - row "9000000000 Copy mock-vdisk-states block-4-2 34 GB 25 25 25 25 25 25 25 25 25 25" [ref=e246]:
+                - cell "9000000000 Copy" [ref=e247]:
+                  - generic [ref=e249]:
+                    - generic "9000000000" [ref=e250]:
+                      - link "9000000000" [ref=e251] [cursor=pointer]:
+                        - /url: /storageGroup?groupId=9000000000&database=%2FRoot
+                    - button "Copy" [ref=e252] [cursor=pointer]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                - cell "mock-vdisk-states" [ref=e253]:
+                  - generic [ref=e255] [cursor=pointer]: mock-vdisk-states
+                - cell "block-4-2" [ref=e256]
+                - cell "34 GB" [ref=e257]
+                - cell "25 25 25 25 25 25 25 25 25 25" [ref=e258]:
+                  - generic [ref=e259]:
+                    - generic [ref=e260]:
+                      - link [ref=e265] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e266]
+                      - link [ref=e271] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e272]
+                      - link [ref=e277] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e278]
+                      - link [ref=e283] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e284]
+                      - link [ref=e289] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e290]
+                      - link [ref=e295] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e296]:
+                          - img [ref=e297]:
+                            - img [ref=e298]
+                      - link [ref=e304] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e305]:
+                          - img [ref=e306]:
+                            - img [ref=e307]
+                      - link [ref=e313] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e314]:
+                          - img [ref=e315]:
+                            - img [ref=e316]
+                      - link [ref=e322] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e323]:
+                          - img [ref=e324]:
+                            - img [ref=e325]
+                      - link [ref=e331] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e332]:
+                          - img [ref=e333]:
+                            - img [ref=e334]
+                    - generic [ref=e336]:
+                      - link "25" [ref=e339] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7000&pDiskId=100
+                        - meter "Disk allocated space" [ref=e340]:
+                          - generic [ref=e342]: 25%
+                      - link "25" [ref=e345] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7001&pDiskId=101
+                        - meter "Disk allocated space" [ref=e346]:
+                          - generic [ref=e348]: 25%
+                      - link "25" [ref=e351] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7002&pDiskId=102
+                        - meter "Disk allocated space" [ref=e352]:
+                          - generic [ref=e354]: 25%
+                      - link "25" [ref=e357] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7003&pDiskId=103
+                        - meter "Disk allocated space" [ref=e358]:
+                          - generic [ref=e360]: 25%
+                      - link "25" [ref=e363] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7004&pDiskId=104
+                        - meter "Disk allocated space" [ref=e364]:
+                          - generic [ref=e366]: 25%
+                      - link "25" [ref=e369] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7005&pDiskId=105
+                        - meter "Disk allocated space" [ref=e370]:
+                          - generic [ref=e372]: 25%
+                      - link "25" [ref=e375] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7006&pDiskId=106
+                        - meter "Disk allocated space" [ref=e376]:
+                          - generic [ref=e378]: 25%
+                      - link "25" [ref=e381] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7007&pDiskId=107
+                        - meter "Disk allocated space" [ref=e382]:
+                          - generic [ref=e384]: 25%
+                      - link "25" [ref=e387] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7008&pDiskId=108
+                        - meter "Disk allocated space" [ref=e388]:
+                          - generic [ref=e390]: 25%
+                      - link "25" [ref=e393] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7009&pDiskId=109
+                        - meter "Disk allocated space" [ref=e394]:
+                          - generic [ref=e396]: 25%
+              - row "9000000001 Copy mock-replicating-disks block-4-2 34 GB 25 25 25 25 25 25 25 25 25 25" [ref=e397]:
+                - cell "9000000001 Copy" [ref=e398]:
+                  - generic [ref=e400]:
+                    - generic "9000000001" [ref=e401]:
+                      - link "9000000001" [ref=e402] [cursor=pointer]:
+                        - /url: /storageGroup?groupId=9000000001&database=%2FRoot
+                    - button "Copy" [ref=e403] [cursor=pointer]:
+                      - generic:
+                        - generic:
+                          - img:
+                            - img
+                - cell "mock-replicating-disks" [ref=e404]:
+                  - generic [ref=e406] [cursor=pointer]: mock-replicating-disks
+                - cell "block-4-2" [ref=e407]
+                - cell "34 GB" [ref=e408]
+                - cell "25 25 25 25 25 25 25 25 25 25" [ref=e409]:
+                  - generic [ref=e410]:
+                    - generic [ref=e411]:
+                      - generic [ref=e414]:
+                        - link [ref=e418] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7000&vDiskId=9000000001-1-0-0-0&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e419]
+                        - link [ref=e423] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7100&vDiskId=9000000001-1-0-0-100&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e424]:
+                            - img [ref=e425]:
+                              - img [ref=e426]
+                      - generic [ref=e430]:
+                        - link [ref=e434] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-1&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e435]
+                        - link [ref=e439] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7101&vDiskId=9000000001-1-0-0-101&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e440]:
+                            - img [ref=e441]:
+                              - img [ref=e442]
+                      - generic [ref=e446]:
+                        - link [ref=e450] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7002&vDiskId=9000000001-1-0-0-2&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e451]
+                        - link [ref=e455] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7102&vDiskId=9000000001-1-0-0-102&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e456]:
+                            - img [ref=e457]:
+                              - img [ref=e458]
+                      - generic [ref=e462]:
+                        - link [ref=e466] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7003&vDiskId=9000000001-1-0-0-3&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e467]
+                        - link [ref=e471] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7103&vDiskId=9000000001-1-0-0-103&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e472]:
+                            - img [ref=e473]:
+                              - img [ref=e474]
+                      - generic [ref=e478]:
+                        - link [ref=e482] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7004&vDiskId=9000000001-1-0-0-4&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e483]
+                        - link [ref=e487] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7104&vDiskId=9000000001-1-0-0-104&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e488]:
+                            - img [ref=e489]:
+                              - img [ref=e490]
+                      - generic [ref=e494]:
+                        - link [ref=e498] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7005&vDiskId=9000000001-1-0-0-5&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e499]:
+                            - img [ref=e500]:
+                              - img [ref=e501]
+                        - link [ref=e506] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7105&vDiskId=9000000001-1-0-0-105&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e507]:
+                            - img [ref=e508]:
+                              - img [ref=e509]
+                      - generic [ref=e513]:
+                        - link [ref=e517] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7006&vDiskId=9000000001-1-0-0-6&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e518]:
+                            - img [ref=e519]:
+                              - img [ref=e520]
+                        - link [ref=e525] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7106&vDiskId=9000000001-1-0-0-106&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e526]:
+                            - img [ref=e527]:
+                              - img [ref=e528]
+                      - generic [ref=e532]:
+                        - link [ref=e536] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7007&vDiskId=9000000001-1-0-0-7&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e537]:
+                            - img [ref=e538]:
+                              - img [ref=e539]
+                        - link [ref=e544] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7107&vDiskId=9000000001-1-0-0-107&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e545]:
+                            - img [ref=e546]:
+                              - img [ref=e547]
+                      - generic [ref=e551]:
+                        - link [ref=e555] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7008&vDiskId=9000000001-1-0-0-8&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e556]:
+                            - img [ref=e557]:
+                              - img [ref=e558]
+                        - link [ref=e563] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7108&vDiskId=9000000001-1-0-0-108&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e564]:
+                            - img [ref=e565]:
+                              - img [ref=e566]
+                      - generic [ref=e570]:
+                        - link [ref=e574] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7009&vDiskId=9000000001-1-0-0-9&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e575]:
+                            - img [ref=e576]:
+                              - img [ref=e577]
+                        - link [ref=e582] [cursor=pointer]:
+                          - /url: /vDisk?nodeId=7109&vDiskId=9000000001-1-0-0-109&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e583]:
+                            - img [ref=e584]:
+                              - img [ref=e585]
+                    - generic [ref=e587]:
+                      - link "25" [ref=e590] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7000&pDiskId=100
+                        - meter "Disk allocated space" [ref=e591]:
+                          - generic [ref=e593]: 25%
+                      - link "25" [ref=e596] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7001&pDiskId=101
+                        - meter "Disk allocated space" [ref=e597]:
+                          - generic [ref=e599]: 25%
+                      - link "25" [ref=e602] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7002&pDiskId=102
+                        - meter "Disk allocated space" [ref=e603]:
+                          - generic [ref=e605]: 25%
+                      - link "25" [ref=e608] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7003&pDiskId=103
+                        - meter "Disk allocated space" [ref=e609]:
+                          - generic [ref=e611]: 25%
+                      - link "25" [ref=e614] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7004&pDiskId=104
+                        - meter "Disk allocated space" [ref=e615]:
+                          - generic [ref=e617]: 25%
+                      - link "25" [ref=e620] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7005&pDiskId=105
+                        - meter "Disk allocated space" [ref=e621]:
+                          - generic [ref=e623]: 25%
+                      - link "25" [ref=e626] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7006&pDiskId=106
+                        - meter "Disk allocated space" [ref=e627]:
+                          - generic [ref=e629]: 25%
+                      - link "25" [ref=e632] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7007&pDiskId=107
+                        - meter "Disk allocated space" [ref=e633]:
+                          - generic [ref=e635]: 25%
+                      - link "25" [ref=e638] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7008&pDiskId=108
+                        - meter "Disk allocated space" [ref=e639]:
+                          - generic [ref=e641]: 25%
+                      - link "25" [ref=e644] [cursor=pointer]:
+                        - /url: /pDisk?nodeId=7009&pDiskId=109
+                        - meter "Disk allocated space" [ref=e645]:
+                          - generic [ref=e647]: 25%
+```
