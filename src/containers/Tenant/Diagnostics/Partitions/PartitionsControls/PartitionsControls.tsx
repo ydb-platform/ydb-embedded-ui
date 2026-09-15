@@ -121,6 +121,7 @@ export const PartitionsControls = ({
                 value={partitionIdSearchValue}
             />
             <Search
+                tableFilter
                 onChange={handleGeneralSearchChange}
                 placeholder={i18n('controls.generalSearch')}
                 className={b('search', {general: true})}

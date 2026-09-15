@@ -1,17 +1,14 @@
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
-import qs from 'qs';
 
 import {InternalLink} from '../../../../../components/InternalLink';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../lib';
-import {getTenantPath} from '../../../../../routes';
-import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {IPreparedConsumerData} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
 import {formatDurationMs} from '../../../../../utils/dataFormatters/dataFormatters';
-import {TenantTabsGroups} from '../../../TenantPages';
 import {ReadLagsHeader} from '../Headers';
+import {getConsumerPath} from '../getConsumerPath';
 import {
     CONSUMERS_COLUMNS_IDS,
     CONSUMERS_COLUMNS_TITILES,
@@ -84,18 +81,5 @@ interface ConsumerProps {
 }
 
 function Consumer({name}: ConsumerProps) {
-    const queryParams = qs.parse(location.search, {
-        ignoreQueryPrefix: true,
-    });
-    return (
-        <InternalLink
-            to={getTenantPath({
-                ...queryParams,
-                [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.partitions,
-                selectedConsumer: name,
-            })}
-        >
-            {name}
-        </InternalLink>
-    );
+    return <InternalLink to={getConsumerPath(name)}>{name}</InternalLink>;
 }

@@ -95,6 +95,7 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
                     {showFullError ? <ResponseError error={error} /> : null}
                     {showTable ? (
                         <ResizeableDataTable
+                            getKeyboardRowKey={(operation) => operation.id}
                             columns={getColumns({database, kind})}
                             columnsWidthLSKey={OPERATIONS_SELECTED_COLUMNS_KEY}
                             data={operations}

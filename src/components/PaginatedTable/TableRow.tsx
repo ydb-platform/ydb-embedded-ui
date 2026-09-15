@@ -80,20 +80,46 @@ interface TableRowProps<T> {
     onRowClick?: OnRowClick<T>;
 }
 
-export const TableRow = <T,>({
+// Data updates still render cells; moving the keyboard highlight does not.
+const TableRowCells = typedMemo(function TableRowCells<T>({
+    columns,
+    row,
+    height,
+}: Pick<TableRowProps<T>, 'columns' | 'row' | 'height'>) {
+    return (
+        <React.Fragment>
+            {columns.map((column) => {
+                const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
+
+                return (
+                    <TableRowCell
+                        key={column.name}
+                        height={height}
+                        width={column.width}
+                        align={column.align}
+                        className={column.className}
+                        resizeable={resizeable}
+                    >
+                        {column.render({row})}
+                    </TableRowCell>
+                );
+            })}
+        </React.Fragment>
+    );
+});
+
+const TableRowView = typedMemo(function TableRowView<T>({
     row,
     rowIndex,
     columns,
     getRowClassName,
     height,
     onRowClick,
-}: TableRowProps<T>) => {
-    const focusedIndex = React.useContext(KeyboardRowContext);
+    keyboardFocused,
+}: TableRowProps<T> & {keyboardFocused: boolean}) {
     const additionalClassName = [
         getRowClassName?.(row),
-        rowIndex !== undefined && rowIndex === focusedIndex
-            ? 'ydb-keyboard-focused-row'
-            : undefined,
+        keyboardFocused ? 'ydb-keyboard-focused-row' : undefined,
     ]
         .filter(Boolean)
         .join(' ');
@@ -112,28 +138,20 @@ export const TableRow = <T,>({
             className={b('row', {clickable: rowClickable}, additionalClassName)}
             style={{height}}
             data-row-index={rowIndex}
-            aria-selected={focusedIndex === undefined ? undefined : rowIndex === focusedIndex}
+            aria-selected={keyboardFocused || undefined}
             onClick={rowClickable ? handleClick : undefined}
         >
-            {columns.map((column) => {
-                const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
-
-                return (
-                    <TableRowCell
-                        key={column.name}
-                        height={height}
-                        width={column.width}
-                        align={column.align}
-                        className={column.className}
-                        resizeable={resizeable}
-                    >
-                        {column.render({row})}
-                    </TableRowCell>
-                );
-            })}
+            <TableRowCells columns={columns} row={row} height={height} />
         </tr>
     );
-};
+});
+
+export function TableRow<T>(props: TableRowProps<T>) {
+    const focusedIndex = React.useContext(KeyboardRowContext);
+    const keyboardFocused = props.rowIndex !== undefined && props.rowIndex === focusedIndex;
+
+    return <TableRowView {...props} keyboardFocused={keyboardFocused} />;
+}
 
 interface EmptyTableRowProps<T> {
     columns: Column<T>[];

@@ -43,10 +43,6 @@ import {
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval} from '../../utils/hooks';
-import {
-    KEYBOARD_FOCUS_ACTIVE_CLASS_NAME,
-    useListKeyboardNavigation,
-} from '../../utils/hooks/useListKeyboardNavigation';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
 import {isNumeric} from '../../utils/utils';
@@ -139,7 +135,6 @@ const TenantsTableContent = ({
 }: TenantsTableContentProps) => {
     const SuccessImage = getIllustration('SuccessOperation');
     const history = useHistory();
-    const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
@@ -202,18 +197,6 @@ const TenantsTableContent = ({
         [additionalTenantsProps, environmentName, history, settings?.use_meta_proxy],
     );
 
-    const {
-        handleKeyDownCapture,
-        handleListMouseMoveCapture,
-        getFocusedRowClassName,
-        isKeyboardFocusActive,
-    } = useListKeyboardNavigation({
-        items: filteredTenants,
-        onActivate: openTenant,
-        resetDeps: [search, showWithProblemsFilter ? String(withProblems) : ''],
-        listContainerRef: tableContainerRef,
-    });
-
     const renderCreateDBButton = () => {
         const buttonAvailable = isCreateDBAvailable && clusterName;
 
@@ -237,6 +220,7 @@ const TenantsTableContent = ({
         return (
             <React.Fragment>
                 <Search
+                    tableFilter
                     value={search}
                     onChange={handleSearchChange}
                     placeholder="Database name"
@@ -423,18 +407,18 @@ const TenantsTableContent = ({
         }
 
         return (
-            <div ref={tableContainerRef}>
+            <div>
                 <ResizeableDataTable
+                    onKeyboardActivate={openTenant}
+                    getKeyboardRowKey={(tenant) =>
+                        JSON.stringify([tenant.Cluster, tenant.Id ?? tenant.Name])
+                    }
                     columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
                     data={filteredTenants}
                     columns={columnsToShow}
-                    wrapperClassName={
-                        isKeyboardFocusActive ? KEYBOARD_FOCUS_ACTIVE_CLASS_NAME : undefined
-                    }
                     settings={DEFAULT_TABLE_SETTINGS}
                     emptyDataMessage={i18n('no-databases')}
                     onSortChange={setSortParams}
-                    rowClassName={(_row, index) => getFocusedRowClassName(index)}
                 />
             </div>
         );
@@ -461,7 +445,7 @@ const TenantsTableContent = ({
     };
 
     return (
-        <div className={b('table-wrapper')} onKeyDownCapture={handleKeyDownCapture}>
+        <div className={b('table-wrapper')}>
             <TableWithControlsLayout fullHeight>
                 <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
                     {renderControls()}
@@ -472,9 +456,7 @@ const TenantsTableContent = ({
                     loading={loading}
                     scrollDependencies={[search, withProblems, sortParams]}
                 >
-                    <div onMouseMoveCapture={handleListMouseMoveCapture}>
-                        {currentData ? renderTable() : null}
-                    </div>
+                    <div>{currentData ? renderTable() : null}</div>
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
         </div>

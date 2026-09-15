@@ -62,7 +62,7 @@
     }
 
     &.ydb-keyboard-focus-active {
-        #{$block}__row:hover {
+        #{$block}__row:hover:not(.ydb-keyboard-focused-row) {
             background: transparent !important;
         }
     }

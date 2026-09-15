@@ -153,7 +153,7 @@ export const TopShards = ({database, path, databaseFullPath}: TopShardsProps) =>
     };
 
     return (
-        <TableWithControlsLayout>
+        <TableWithControlsLayout keyboardNavigation={false}>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
 
             {filters.mode === EShardsWorkloadMode.History && (

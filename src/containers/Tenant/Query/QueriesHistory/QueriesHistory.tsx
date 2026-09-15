@@ -116,6 +116,7 @@ function QueriesHistory({queriesHistory}: QueriesHistoryProps) {
             <TableWithControlsLayout className={b('table-with-controls')}>
                 <TableWithControlsLayout.Controls>
                     <Search
+                        tableFilter
                         value={filter}
                         onChange={onChangeFilter}
                         placeholder={i18n('field_query-text-search')}
@@ -135,6 +136,8 @@ function QueriesHistory({queriesHistory}: QueriesHistoryProps) {
                         defaultWidth={50}
                     >
                         <ResizeableDataTable
+                            onKeyboardActivate={handleShowPreview}
+                            getKeyboardRowKey={(query) => query.queryId}
                             columnsWidthLSKey={QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY}
                             columns={columns}
                             data={queriesHistory.filteredHistoryQueries}

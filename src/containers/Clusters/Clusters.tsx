@@ -23,10 +23,6 @@ import type {PreparedCluster} from '../../store/reducers/clusters/types';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {
-    KEYBOARD_FOCUS_ACTIVE_CLASS_NAME,
-    useListKeyboardNavigation,
-} from '../../utils/hooks/useListKeyboardNavigation';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
 
@@ -49,7 +45,6 @@ interface ClustersProps {
 }
 
 export function Clusters({scrollContainerRef}: ClustersProps) {
-    const tableContainerRef = React.useRef<HTMLDivElement>(null);
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const query = clustersApi.useGetClustersListQuery(undefined, {
         pollingInterval: autoRefreshInterval,
@@ -192,24 +187,6 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         return filterClusters(clusters ?? [], {clusterName, status, service, version, galaxy});
     }, [clusterName, clusters, service, status, version, galaxy]);
 
-    const {
-        handleKeyDownCapture,
-        handleListMouseMoveCapture,
-        getFocusedRowClassName,
-        isKeyboardFocusActive,
-    } = useListKeyboardNavigation({
-        items: filteredClusters,
-        onActivate: openCluster,
-        resetDeps: [
-            clusterName,
-            status.join('|'),
-            service.join('|'),
-            version.join('|'),
-            galaxy.join('|'),
-        ],
-        listContainerRef: tableContainerRef,
-    });
-
     const statuses = React.useMemo(() => {
         return Array.from(
             new Set(
@@ -224,6 +201,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         return (
             <React.Fragment>
                 <Search
+                    tableFilter
                     placeholder={i18n('controls_search-placeholder')}
                     endContent={<Icon data={Magnifier} className={b('search-icon')} />}
                     onChange={changeClusterName}
@@ -310,18 +288,15 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
 
     const renderContent = () => {
         return (
-            <div ref={tableContainerRef}>
+            <div>
                 <ResizeableDataTable
+                    onKeyboardActivate={openCluster}
+                    getKeyboardRowKey={(cluster) => cluster.name}
                     isLoading={query.isLoading}
                     columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
-                    wrapperClassName={
-                        isKeyboardFocusActive
-                            ? `${b('table')} ${KEYBOARD_FOCUS_ACTIVE_CLASS_NAME}`
-                            : b('table')
-                    }
+                    wrapperClassName={b('table')}
                     data={filteredClusters}
                     columns={filteredColumnsToShow}
-                    rowClassName={(_row, index) => getFocusedRowClassName(index)}
                     settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
                     initialSortOrder={{
                         columnId: COLUMNS_NAMES.TITLE,
@@ -338,7 +313,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
             isVisible={Boolean(healthcheckClusterName)}
             onClose={handleDrawerClose}
         >
-            <div onKeyDownCapture={handleKeyDownCapture}>
+            <div>
                 <TableWithControlsLayout fullHeight className={b(null)}>
                     <TableWithControlsLayout.Controls
                         className={b('controls')}
@@ -352,7 +327,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                         scrollContainerRef={scrollContainerRef}
                         className={b('table-wrapper')}
                     >
-                        <div onMouseMoveCapture={handleListMouseMoveCapture}>{renderContent()}</div>
+                        <div>{renderContent()}</div>
                     </TableWithControlsLayout.Table>
                 </TableWithControlsLayout>
             </div>

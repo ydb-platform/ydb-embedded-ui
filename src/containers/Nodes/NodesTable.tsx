@@ -1,5 +1,8 @@
 import React from 'react';
 
+import {useHistory} from 'react-router-dom';
+
+import {getNodeHostPath} from '../../components/NodeHostWrapper/NodeHostWrapper';
 import type {PaginatedTableData} from '../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import {
@@ -55,6 +58,7 @@ export function NodesTable({
     initialEntitiesCount,
     onDataFetched,
 }: NodesTableProps) {
+    const history = useHistory();
     const SuccessImage = getIllustration('SuccessOperation');
 
     const useMetaProxy = useClusterWithProxy();
@@ -94,7 +98,13 @@ export function NodesTable({
 
     return (
         <ResizeablePaginatedTable
-            keyboardNavigationLinkSelector={'a.ydb-entity-name__name[href*="/node/"]'}
+            getKeyboardRowKey={(node) => node.NodeId}
+            onKeyboardActivate={(node) => {
+                const nodePath = getNodeHostPath(node, database);
+                if (nodePath) {
+                    history.push(nodePath);
+                }
+            }}
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
             scrollContainerRef={scrollContainerRef}
             columns={columns}

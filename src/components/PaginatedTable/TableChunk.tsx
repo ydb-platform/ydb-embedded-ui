@@ -9,7 +9,7 @@ import {ResponseError} from '../Errors/ResponseError';
 import {usePaginatedTableState} from './PaginatedTableContext';
 import {EmptyTableRow, LoadingTableRow, TableRow} from './TableRow';
 import type {PaginatedTableId} from './constants';
-import {shouldSendColumnIds} from './constants';
+import {getTableChunkQueryParams} from './getTableChunkQueryParams';
 import i18n from './i18n';
 import type {
     Column,
@@ -71,25 +71,16 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {noBatching} = usePaginatedTableState();
 
-    const hasColumnsIdsInRequest = shouldSendColumnIds(tableName);
-
-    const columnsIds = React.useMemo(
-        () =>
-            // sort ids to prevent refetch if only order was changed
-            hasColumnsIdsInRequest ? columns.map((column) => column.name).toSorted() : [],
-        [columns, hasColumnsIdsInRequest],
-    );
-
-    const queryParams = {
+    const queryParams = getTableChunkQueryParams({
         offset: id * chunkSize,
         limit: chunkSize,
-        fetchData: fetchData as FetchData<T, unknown>,
+        fetchData,
         filters,
         sortParams,
-        columnsIds,
+        columns,
         tableName,
         noBatching,
-    };
+    });
 
     tableDataApi.useFetchTableChunkQuery(queryParams, {
         skip: isTimeoutActive || !shouldFetch,

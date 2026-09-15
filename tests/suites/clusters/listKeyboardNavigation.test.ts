@@ -275,3 +275,25 @@ test('vertical keyboard scrolling keeps the selected row clear of sticky headers
             .toBe(true);
     }
 });
+
+test('first row stays highlighted after returning with arrows under a stationary pointer', async ({
+    page,
+}) => {
+    await new PageModel(page).goto();
+    const firstRow = page
+        .locator('.ydb-clusters tbody tr')
+        .filter({has: page.getByRole('link', {name: 'Alpha', exact: true})});
+    await expect(firstRow).toBeVisible();
+    await expect(page.locator('.ydb-keyboard-focused-row')).toHaveCount(0);
+    await firstRow.hover();
+    await page.locator('.ydb-clusters input').first().focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('.ydb-keyboard-focused-row')).toContainText('Bravo');
+    const selectedBackground = await page
+        .locator('.ydb-keyboard-focused-row')
+        .evaluate((row) => getComputedStyle(row).backgroundColor);
+    expect(selectedBackground).not.toBe('rgba(0, 0, 0, 0)');
+    await page.keyboard.press('ArrowUp');
+    await expect(page.locator('.ydb-keyboard-focused-row')).toContainText('Alpha');
+    await expect(firstRow).toHaveCSS('background-color', selectedBackground);
+});
