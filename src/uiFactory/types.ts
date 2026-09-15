@@ -51,7 +51,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     renderEvents?: RenderEvents;
     renderMonitoring?: RenderMonitoring;
     renderNodeTooltipActions?: RenderNodeTooltipActions;
-    /** Takes precedence over the legacy ChatPanel registry entry, which is used when omitted. */
+    /** Renders the shared chat inside the application providers. */
     renderChatPanel?: () => React.ReactNode;
     clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
