@@ -128,7 +128,7 @@ function getMissingVDiskDisplayState(
         showNoDataPlaceholder: true,
         allocatedPercent: isAllMode ? vDisk.AllocatedPercent : undefined,
         showAllocatedPercentLabel: !isAllMode,
-        striped: false,
+        striped: Boolean(isDonor),
         iconPlacement: 'inline',
     };
 

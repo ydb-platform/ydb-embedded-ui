@@ -30,12 +30,12 @@ export function getDiskBarTone({
     indicator,
     isNoData,
 }: GetDiskBarToneParams): DiskBarTone {
-    if (isNoData) {
-        return EFlag.Grey;
-    }
-
     if (isDonor) {
         return DONOR_COLOR;
+    }
+
+    if (isNoData) {
+        return EFlag.Grey;
     }
 
     if (

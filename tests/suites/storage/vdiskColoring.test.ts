@@ -1153,6 +1153,42 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         });
     });
 
+    test('keeps donor styling without Whiteboard data in every Expert mode', async ({page}) => {
+        const response = createMockStorageGroupsResponse();
+        const donor = response.StorageGroups?.[1]?.VDisks?.[0]?.Donors?.[0];
+        if (!donor) {
+            throw new Error('Cannot prepare donor without Whiteboard data');
+        }
+        delete donor.Whiteboard;
+
+        await page.setViewportSize({width: 1500, height: 1000});
+        await enableExpertMode(page, VDisksGroupBy.State);
+        await setupVDiskColoringMocks(page, response);
+
+        for (const mode of VDISK_GROUP_BY_MODES) {
+            await gotoStoragePage(page, mode.value);
+            await hideFloatingPopups(page);
+            await expectStorageGroupRowsReady(page);
+            await forceHoverStorageGroupVDiskItems(page, 1);
+
+            const donorItem = getVDiskItems(getStorageGroupRow(page, 1))
+                .first()
+                .locator('.ydb-stack__item_donor');
+            const donorBar = getVDiskProgressBar(donorItem);
+            await expect(donorItem.getByRole('link')).toHaveAttribute('href', /nodeId=7100/);
+            await expect(donorBar).toHaveClass(/storage-disk-progress-bar_darkgrey/);
+            await expect(donorBar).toHaveClass(/storage-disk-progress-bar_striped/);
+            await expect(donorBar).toHaveCSS('background-image', /repeating-linear-gradient/);
+            await expect(donorBar).toContainText('N/D');
+
+            const unavailableBar = getVDiskProgressBar(
+                getVDiskItems(getStorageGroupRow(page, 0)).nth(MISSING_WHITEBOARD_VDISK_INDEX),
+            );
+            await expect(unavailableBar).toHaveClass(/storage-disk-progress-bar_grey(?:\s|$)/);
+            await expect(unavailableBar).not.toHaveClass(/storage-disk-progress-bar_striped/);
+        }
+    });
+
     for (const mode of VDISK_GROUP_BY_MODES) {
         test.describe(`${mode.value} mode`, () => {
             test('renders both storage group VDisk rows', async ({page}) => {
