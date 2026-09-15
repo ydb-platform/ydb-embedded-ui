@@ -3,12 +3,13 @@ import React from 'react';
 import type DataTable from '@gravity-ui/react-data-table';
 import type {Column, DynamicInnerRefT, Settings, SortOrder} from '@gravity-ui/react-data-table';
 
+import {cn} from '../../utils/cn';
 import {useTableKeyboardAdapter} from '../TableKeyboardNavigation/TableKeyboardNavigation';
 import {KEYBOARD_FOCUSED_ROW_CLASS_NAME} from '../TableKeyboardNavigation/utils';
 
 import {getDataTableOrder} from './getDataTableOrder';
 
-const rowPrefix = 'ydb-list-keyboard-navigation__row_index_';
+const b = cn('ydb-list-keyboard-navigation');
 
 interface Props<T> {
     data: T[];
@@ -118,8 +119,9 @@ export function DataTableKeyboardNavigation<T>({
         }
         virtualList.current?.scrollAround(keyboard.selected);
         const revealRow = () => {
+            const rowClassName = b('row', {index: String(sourceIndex)});
             const row = tableRef.current?.querySelector<HTMLElement>(
-                `tbody tr.${rowPrefix}${sourceIndex}`,
+                `tbody tr.${rowClassName.split(' ').join('.')}`,
             );
             if (!row) {
                 return false;
@@ -174,7 +176,11 @@ export function DataTableKeyboardNavigation<T>({
         dynamicInnerRef,
         active: keyboard.focusedIndex !== undefined,
         getRowClassName: (index) =>
-            `${rowPrefix}${index}${index === focusedSourceIndex ? ` ${KEYBOARD_FOCUSED_ROW_CLASS_NAME}` : ''}`,
+            b(
+                'row',
+                {index: String(index)},
+                index === focusedSourceIndex ? KEYBOARD_FOCUSED_ROW_CLASS_NAME : undefined,
+            ),
         onSort: setInternalSort,
     });
 }

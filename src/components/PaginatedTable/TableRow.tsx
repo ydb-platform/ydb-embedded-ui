@@ -2,6 +2,8 @@ import React from 'react';
 
 import {Skeleton} from '@gravity-ui/uikit';
 
+import {KEYBOARD_FOCUSED_ROW_CLASS_NAME} from '../TableKeyboardNavigation/utils';
+
 import {DEFAULT_ALIGN, DEFAULT_RESIZEABLE} from './constants';
 import {b} from './shared';
 import type {AlignType, Column, GetRowClassName, OnRowClick} from './types';
@@ -118,7 +120,7 @@ const TableRowView = typedMemo(function TableRowView<T>({
 }: TableRowProps<T> & {keyboardFocused: boolean}) {
     const additionalClassName = [
         getRowClassName?.(row),
-        keyboardFocused ? 'ydb-keyboard-focused-row' : undefined,
+        keyboardFocused ? KEYBOARD_FOCUSED_ROW_CLASS_NAME : undefined,
     ]
         .filter(Boolean)
         .join(' ');
