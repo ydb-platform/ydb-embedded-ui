@@ -46,6 +46,14 @@ describe('prepareStreamingQueryPlan', () => {
         expect(result.prepared).toBeUndefined();
     });
 
+    test('rejects a plan node id that is not a number', () => {
+        const result = prepareStreamingQueryPlan(
+            plan('"Plan": {"Node Type": "Stage", "PlanNodeId": {}}'),
+        );
+        expect(result.hasPlan).toBe(true);
+        expect(result.prepared).toBeUndefined();
+    });
+
     test('reports an unsupported version without nodes', () => {
         const result = prepareStreamingQueryPlan(
             '{"meta": {"version": "0.1", "type": "query"}, "Plan": {"Node Type": "Stage"}}',
