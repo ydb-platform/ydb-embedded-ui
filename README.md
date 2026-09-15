@@ -145,6 +145,26 @@ PLAYWRIGHT_APP_BACKEND=http://localhost:8765 npm run test:e2e:docker:report
 
 E2E tests are run in CI in the `e2e_tests` job. Each shard starts `ghcr.io/ydb-platform/local-ydb:nightly` in root topology through `setup-local-ydb`, then passes the action monitoring URL to the Playwright Docker flow.
 
+### Testing the UI shipped with a YDB release
+
+The **Release UI E2E** workflow accepts `ydb_tag` (the published local-ydb tag) and
+`ydb_sha` (its full YDB commit SHA). It resolves the embedded UI version from that
+commit's monitoring changelog and checks out the matching UI tag as an immutable
+test commit. The workflow itself runs from `main`; both revisions are recorded.
+
+All existing Chromium and Safari tests run in eight isolated shards against the
+image's `/monitoring/` UI. The workflow verifies the image digest, `ydb.revision`
+and served HTML before testing. Each shard uses `/local`, no authentication and
+the existing Docker runner, with retries disabled. It does not replace embedded
+assets, filter tests or update snapshots. Tests requiring development-only UI
+overrides can fail; adapting those tests is a separate task.
+
+The `release-e2e-report` artifact contains the HTML/JSON reports, release identity,
+shard completeness and failure diagnostics, retained for 30 days. Missing shards,
+setup failures and empty results produce an incomplete run, never a pass. The
+release CI integration is non-blocking: this workflow reports actual failures,
+while release acceptance and deployment retain their existing dependencies.
+
 ## Making a production bundle.
 
 ### Web Workers for package consumers
