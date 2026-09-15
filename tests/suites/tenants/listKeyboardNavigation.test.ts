@@ -25,7 +25,12 @@ test('database arrows and Enter follow the displayed rows and preserve cluster s
     await expect(page.locator('.ydb-keyboard-focused-row')).toContainText('zulu');
     await search.press('ArrowDown');
     await expect(page.locator('.ydb-keyboard-focused-row')).toContainText('alpha');
-    await search.press('Enter');
-    await expect(page).toHaveURL(/database=.*alpha/);
+    const href = await page.getByRole('link', {name: 'alpha', exact: true}).getAttribute('href');
+    if (!href) {
+        throw new Error('The selected database must have a navigation link');
+    }
+    const destination = new URL(href, page.url()).href;
+    await Promise.all([page.waitForURL(destination), search.press('Enter')]);
+    expect(new URL(page.url()).searchParams.get('database')).toBe('/local/alpha');
     expect(new URL(page.url()).searchParams.get('clusterName')).toBe('keyboard-test');
 });

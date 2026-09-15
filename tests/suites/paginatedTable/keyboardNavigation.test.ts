@@ -100,9 +100,9 @@ for (const kind of ['nodes', 'groups'] as const) {
         }
         const lastRow = page.locator(focusedRow);
         await expect(lastRow.locator(primaryLink)).toHaveText(rowName(85));
-        await expect(
-            page.getByRole('status').filter({hasText: 'Selected row 86 of'}),
-        ).toContainText(rowName(85));
+        await expect(page.getByRole('status').filter({hasText: 'Selected row 86 of'})).toHaveText(
+            `Selected row 86 of 120: ${kind === 'nodes' ? '86, host-85.test' : '9085'}`,
+        );
         await expect(search).toBeFocused();
         for (let index = 84; index >= 0; index--) {
             await page.keyboard.press('ArrowUp');

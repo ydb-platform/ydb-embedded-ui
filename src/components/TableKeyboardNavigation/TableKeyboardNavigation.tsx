@@ -174,11 +174,13 @@ export function TableKeyboardNavigationScope({
     enabled = true,
     containerRef,
     inherit = false,
+    resetKey,
 }: {
     children: React.ReactNode;
     enabled?: boolean;
     containerRef?: React.RefObject<HTMLElement>;
     inherit?: boolean;
+    resetKey?: string;
 }) {
     const parent = React.useContext(ScopeContext);
     const own = React.useMemo<Scope>(
@@ -193,6 +195,13 @@ export function TableKeyboardNavigationScope({
         [enabled, parent, containerRef],
     );
     const scope = inherit && enabled && parent ? parent : own;
+    const previousResetKey = React.useRef(resetKey);
+    React.useLayoutEffect(() => {
+        if (previousResetKey.current !== resetKey) {
+            previousResetKey.current = resetKey;
+            resetScope(scope);
+        }
+    }, [scope, resetKey]);
     React.useEffect(() => {
         if (scope !== own) {
             return undefined;
@@ -274,6 +283,7 @@ interface AdapterOptions {
     resetDeps: React.DependencyList;
     isValidIndex?: (index: number) => boolean;
     getRowKey?: (index: number) => string | number | undefined;
+    getRowLabel?: (index: number) => string | undefined;
     findRowIndex?: (key: string | number, previousIndex: number) => number | undefined;
     subscribe?: (listener: () => void) => () => void;
 }
@@ -394,7 +404,14 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
             const row = element.querySelector<HTMLElement>(
                 `tbody tr.${KEYBOARD_FOCUSED_ROW_CLASS_NAME}`,
             );
-            const text = (row?.innerText ?? row?.textContent ?? '').replace(/\s+/g, ' ').trim();
+            const {getRowLabel} = optionsRef.current;
+            const text = (
+                getRowLabel
+                    ? (getRowLabel(index) ?? '')
+                    : (row?.innerText ?? row?.textContent ?? '')
+            )
+                .replace(/\s+/g, ' ')
+                .trim();
             const lastIndex = optionsRef.current.getLast();
             if (!text || lastIndex === undefined) {
                 return false;

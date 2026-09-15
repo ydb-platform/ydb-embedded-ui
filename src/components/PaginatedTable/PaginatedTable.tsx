@@ -48,6 +48,7 @@ export interface PaginatedTableProps<T, F> {
     fetchOverscan?: number;
     onKeyboardActivate?: (row: T) => void;
     getKeyboardRowKey?: (row: T) => string | number | undefined;
+    getKeyboardRowLabel?: (row: T) => string | undefined;
 }
 
 const DEFAULT_PAGINATION_LIMIT = 20;
@@ -72,6 +73,7 @@ export const PaginatedTable = <T, F>({
     fetchOverscan,
     onKeyboardActivate,
     getKeyboardRowKey,
+    getKeyboardRowLabel,
 }: PaginatedTableProps<T, F>) => {
     const store = useStore<RootState>();
     // Get state and setters from context
@@ -118,6 +120,11 @@ export const PaginatedTable = <T, F>({
     const getRowKey = (index: number) => {
         const row = getRow(index);
         return row === undefined ? undefined : getKeyboardRowKey?.(row);
+    };
+
+    const getRowLabel = (index: number) => {
+        const row = getRow(index);
+        return row === undefined ? undefined : getKeyboardRowLabel?.(row);
     };
 
     const findRowIndex = (key: string | number, previousIndex: number) => {
@@ -218,6 +225,7 @@ export const PaginatedTable = <T, F>({
             scrollContainerRef={scrollContainerRef}
             onActivate={onKeyboardActivate ? activateRow : undefined}
             getRowKey={getKeyboardRowKey ? getRowKey : undefined}
+            getRowLabel={getKeyboardRowLabel ? getRowLabel : undefined}
             findRowIndex={getKeyboardRowKey ? findRowIndex : undefined}
             subscribe={store.subscribe}
             rowCount={foundEntities}

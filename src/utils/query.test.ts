@@ -6,14 +6,34 @@ import type {
     TKqpStatsQuery,
 } from '../types/api/query';
 
+import {EMPTY_DATA_PLACEHOLDER} from './constants';
 import {
     DEFAULT_QUERY_SETTINGS,
     MAX_QUERY_TIMEOUT_SECONDS,
+    getQueryShortText,
     parseQueryAPIResponse,
     parseQueryExplainPlan,
     querySettingsRestoreSchema,
     querySettingsValidationSchema,
 } from './query';
+
+describe('getQueryShortText', () => {
+    test('collapses whitespace in a short query', () => {
+        expect(getQueryShortText('  SELECT\n\t*   FROM users;  ')).toBe('SELECT * FROM users;');
+    });
+
+    test('limits a long query to a short preview', () => {
+        const preview = getQueryShortText(
+            'SELECT name FROM users WHERE ' + 'name = 1 OR '.repeat(100),
+        );
+        expect(preview).toMatch(/^SELECT name FROM users WHERE .*\.\.\.$/);
+        expect(preview.length).toBeLessThanOrEqual(120);
+    });
+
+    test.each([undefined, '', ' \n\t '])('handles empty query text: %j', (query) => {
+        expect(getQueryShortText(query)).toBe(EMPTY_DATA_PLACEHOLDER);
+    });
+});
 
 describe('API utils', () => {
     describe('json/viewer/query', () => {

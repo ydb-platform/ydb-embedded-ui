@@ -18,6 +18,7 @@ interface Props<T> {
     nullBeforeNumbers?: boolean;
     onActivate?: (row: T) => void;
     getRowKey?: (row: T) => string | number | undefined;
+    getRowLabel?: (row: T) => string | undefined;
     sortOrder?: SortOrder | SortOrder[];
     children: (options: {
         tableRef: React.RefCallback<HTMLDivElement>;
@@ -37,6 +38,7 @@ export function DataTableKeyboardNavigation<T>({
     nullBeforeNumbers,
     onActivate,
     getRowKey,
+    getRowLabel,
     sortOrder,
     children,
 }: Props<T>) {
@@ -103,6 +105,12 @@ export function DataTableKeyboardNavigation<T>({
             return row === undefined ? undefined : getRowKey?.(row);
         },
         findRowIndex: getRowKey ? (key) => indexByKey.get(key) : undefined,
+        getRowLabel: getRowLabel
+            ? (index) => {
+                  const row = order.data[indices[index]];
+                  return row === undefined ? undefined : getRowLabel(row);
+              }
+            : undefined,
         resetDeps: [sortOrder, internalSort, getRowKey ? undefined : data],
     });
     const scrolledRevision = React.useRef(0);

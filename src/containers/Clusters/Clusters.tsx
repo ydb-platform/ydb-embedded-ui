@@ -21,7 +21,7 @@ import {
 } from '../../store/reducers/clusters/selectors';
 import type {PreparedCluster} from '../../store/reducers/clusters/types';
 import {uiFactory} from '../../uiFactory/uiFactory';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
@@ -292,6 +292,9 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                 <ResizeableDataTable
                     onKeyboardActivate={openCluster}
                     getKeyboardRowKey={(cluster) => cluster.name}
+                    getKeyboardRowLabel={(cluster) =>
+                        cluster.title || cluster.name || EMPTY_DATA_PLACEHOLDER
+                    }
                     isLoading={query.isLoading}
                     columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
                     wrapperClassName={b('table')}
@@ -314,7 +317,11 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
             onClose={handleDrawerClose}
         >
             <div>
-                <TableWithControlsLayout fullHeight className={b(null)}>
+                <TableWithControlsLayout
+                    fullHeight
+                    className={b(null)}
+                    keyboardNavigationResetKey={JSON.stringify([status, service, version, galaxy])}
+                >
                     <TableWithControlsLayout.Controls
                         className={b('controls')}
                         renderExtraControls={renderColumnSetup}

@@ -2,7 +2,10 @@ import React from 'react';
 
 import {useHistory} from 'react-router-dom';
 
-import {getNodeHostPath} from '../../../components/NodeHostWrapper/NodeHostWrapper';
+import {
+    getNodeHostLabel,
+    getNodeHostPath,
+} from '../../../components/NodeHostWrapper/NodeHostWrapper';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
@@ -44,6 +47,7 @@ export function NodeNetworkTable({
     return (
         <ResizeablePaginatedTable
             getKeyboardRowKey={(node) => node.NodeId}
+            getKeyboardRowLabel={getNodeHostLabel}
             onKeyboardActivate={(node) => {
                 const nodePath = getNodeHostPath(node, database);
                 if (nodePath) {

@@ -5,7 +5,7 @@ import {PageModel} from '../../models/PageModel';
 const clusters = [
     {name: 'zulu', title: 'Zulu'},
     {name: 'alpha', title: 'Alpha'},
-    {name: 'bravo', title: 'Bravo'},
+    {name: 'bravo', title: 'Bravo', service: 'analytics'},
 ];
 
 test.beforeEach(async ({page}) => {
@@ -30,8 +30,8 @@ test('arrows and Enter activate the highlighted cluster in displayed order', asy
     await search.press('ArrowDown');
     const selected = table.locator('.ydb-keyboard-focused-row');
     await expect(selected).toContainText('Bravo');
-    await expect(page.getByRole('status').filter({hasText: 'Selected row 2 of 3:'})).toContainText(
-        'Bravo',
+    await expect(page.getByRole('status').filter({hasText: 'Selected row 2 of 3:'})).toHaveText(
+        'Selected row 2 of 3: Bravo',
     );
     await expect(search).toBeFocused();
     const href = await selected
@@ -162,6 +162,21 @@ for (const firstKey of ['ArrowUp', 'ArrowDown']) {
         await expect(page).toHaveURL(/clusterName=bravo/);
     });
 }
+
+test('changing the service filter clears the keyboard selection', async ({page}) => {
+    await new PageModel(page).goto();
+    const search = page.locator('.ydb-clusters input').first();
+    await expect(page.getByRole('link', {name: 'Alpha', exact: true})).toBeVisible();
+    await search.press('ArrowUp');
+    await expect(page.locator('.ydb-keyboard-focused-row')).toContainText('Alpha');
+
+    await page.getByRole('combobox').filter({hasText: 'Service'}).click();
+    await page.locator('.g-select-list__option').getByText('analytics', {exact: true}).click();
+    await expect(page.locator('.ydb-clusters tbody tr')).toHaveCount(1);
+    await expect(page.getByRole('link', {name: 'Bravo', exact: true})).toBeVisible();
+    await expect(page.locator('.ydb-keyboard-focused-row')).toHaveCount(0);
+    await expect(page.locator('.ydb-table-keyboard-navigation__announcement')).toHaveText('');
+});
 
 test('arrows preserve the filter caret when no rows match', async ({page}) => {
     await new PageModel(page).goto();
