@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       ui_sha: ${{ steps.release.outputs.ui_sha }}
-      image: ${{ steps.release.outputs.image }}
+      playwright_version: ${{ steps.release.outputs.playwright_version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -63,11 +63,6 @@ jobs:
           ref: ${{ github.workflow_sha }}
           path: controller
           persist-credentials: false
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.resolve.outputs.ui_sha }}
-          path: ui
-          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -92,14 +87,17 @@ jobs:
           YDB_CONTAINER: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}-static
       - name: Run all release-version tests
         id: tests
-        working-directory: ui
-        run: bash scripts/playwright-docker.sh --shard=${{ matrix.shard }}/8 --retries=0 --trace=retain-on-failure --update-snapshots=none --forbid-only
+        run: bash controller/scripts/playwright-docker.sh --shard=${{ matrix.shard }}/8 --retries=0 --trace=retain-on-failure --update-snapshots=none --forbid-only
         env:
           CI: 'true'
           PLAYWRIGHT_APP_BACKEND: http://localhost:8765
           PLAYWRIGHT_BASE_URL: http://localhost:8765/monitoring/
           PLAYWRIGHT_VIDEO: retain-on-failure
+          PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}
+          PLAYWRIGHT_RELEASE_VERSION: ${{ needs.resolve.outputs.playwright_version }}
+          PLAYWRIGHT_RELEASE_OUTPUT: ${{ github.workspace }}/ui
       - name: Record shard result and diagnostics
+        id: record
         if: always()
         run: |
           mkdir -p release-artifacts
@@ -114,7 +112,7 @@ jobs:
           TEST_OUTCOME: ${{ steps.tests.outcome }}
           YDB_CONTAINER: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}-static
       - name: Upload shard reports
-        if: always()
+        if: always() && steps.record.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: release-e2e-shard-${{ matrix.shard }}
@@ -139,12 +137,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - uses: actions/checkout@v4
-        if: needs.resolve.result == 'success'
-        with:
-          ref: ${{ needs.resolve.outputs.ui_sha }}
-          path: ui
-          persist-credentials: false
       - name: Download all available results
         uses: actions/download-artifact@v4
         with:
@@ -156,19 +148,24 @@ jobs:
         run: |
           mkdir -p release-artifacts
           node controller/.github/workflows/scripts/release-e2e-report.js collect downloaded ui/all-blob-reports
-      - name: Install matching report dependencies
-        if: needs.resolve.result == 'success' && steps.collect.outputs.has_blobs == 'true'
-        working-directory: ui
-        run: npm ci --ignore-scripts
       - name: Merge with the test version of Playwright
         if: needs.resolve.result == 'success' && steps.collect.outputs.has_blobs == 'true'
-        working-directory: ui
-        run: npm exec --no -- playwright merge-reports --config=merge.config.ts ./all-blob-reports
+        run: bash controller/scripts/playwright-docker.sh
+        env:
+          CI: 'true'
+          PLAYWRIGHT_RELEASE_MODE: report
+          PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}
+          PLAYWRIGHT_RELEASE_VERSION: ${{ needs.resolve.outputs.playwright_version }}
+          PLAYWRIGHT_RELEASE_OUTPUT: ${{ github.workspace }}/ui
+      - name: Sanitize report files
+        id: sanitize
+        if: always()
+        run: node controller/.github/workflows/scripts/release-e2e-report.js sanitize ui
       - name: Summarize completeness and test results
         if: always()
         run: node controller/.github/workflows/scripts/release-e2e-report.js summarize
       - name: Upload complete or partial report
-        if: always()
+        if: always() && steps.sanitize.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: release-e2e-report

@@ -91,6 +91,17 @@ async function resolveRelease(
     if (uiPackage.version !== uiVersion) {
         throw new Error(`UI package version ${uiPackage.version} does not match ${uiVersion}`);
     }
+    const lockfile = JSON.parse(
+        decodeFile(
+            await github(
+                `ydb-platform/ydb-embedded-ui/contents/package-lock.json?ref=${uiCommit.sha}`,
+            ),
+        ),
+    );
+    const playwrightVersion = lockfile.packages?.['node_modules/@playwright/test']?.version;
+    if (!/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/.test(playwrightVersion || '')) {
+        throw new Error('UI lockfile has no valid Playwright version');
+    }
     const index = decodeFile(await github(`${viewerPath}/index.html?ref=${ydbSha}`));
     const imageDigest = await digest(ydbTag);
     if (!DIGEST_PATTERN.test(imageDigest)) {
@@ -101,6 +112,7 @@ async function resolveRelease(
         ydb_sha: ydbSha,
         ui_version: uiVersion,
         ui_sha: uiCommit.sha,
+        playwright_version: playwrightVersion,
         image: `${IMAGE_REPOSITORY}:${ydbTag}`,
         image_digest: imageDigest,
         index_sha256: createHash('sha256').update(index).digest('hex'),

@@ -46,18 +46,41 @@ function collectReports(directory, destination, total = 8) {
     return shards;
 }
 
+function sanitizeArtifacts(directory) {
+    const removed = [];
+    if (!fs.existsSync(directory)) {
+        return removed;
+    }
+    for (const name of fs.readdirSync(directory)) {
+        const file = path.join(directory, name);
+        const stat = fs.lstatSync(file);
+        if (stat.isDirectory()) {
+            removed.push(...sanitizeArtifacts(file));
+        } else if (!stat.isFile()) {
+            // Never let uploaded container output follow a link into the runner.
+            fs.unlinkSync(file);
+            removed.push(file);
+        }
+    }
+    return removed;
+}
+
 function isShardComplete(shard, provenance) {
     return (
         shard.setup === 'success' &&
         shard.identity === 'success' &&
         ['success', 'failure'].includes(shard.tests) &&
         shard.blobs === 1 &&
+        !shard.artifact_errors?.length &&
         shard.image_digest === provenance?.image_digest
     );
 }
 
-function summarize(shards, report, provenance) {
+function summarize(shards, report, provenance, artifactErrors = []) {
     const problems = [];
+    if (artifactErrors.length) {
+        problems.push('Unsafe report artifact files were removed');
+    }
     if (shards.length !== 8 || new Set(shards.map((shard) => shard.shard)).size !== 8) {
         problems.push('Expected exactly eight distinct shards');
     }
@@ -124,6 +147,7 @@ async function main() {
                     setup: process.env.SETUP_OUTCOME,
                     identity: process.env.IDENTITY_OUTCOME,
                     tests: process.env.TEST_OUTCOME,
+                    artifact_errors: sanitizeArtifacts('ui'),
                     ...image,
                 },
                 null,
@@ -137,6 +161,9 @@ async function main() {
             process.env.GITHUB_OUTPUT,
             `has_blobs=${shards.some((shard) => shard.blobs > 0)}\n`,
         );
+    } else if (command === 'sanitize') {
+        const errors = sanitizeArtifacts(args[0]);
+        fs.writeFileSync('release-artifacts/report-artifact-errors.json', JSON.stringify(errors));
     } else if (command === 'summarize') {
         const shards = JSON.parse(fs.readFileSync('release-artifacts/shards.json', 'utf8'));
         const provenancePath = 'downloaded/release-e2e-provenance/provenance.json';
@@ -147,7 +174,11 @@ async function main() {
         const report = fs.existsSync(reportPath)
             ? JSON.parse(fs.readFileSync(reportPath, 'utf8'))
             : undefined;
-        const summary = summarize(shards, report, provenance);
+        const errorsPath = 'release-artifacts/report-artifact-errors.json';
+        const artifactErrors = fs.existsSync(errorsPath)
+            ? JSON.parse(fs.readFileSync(errorsPath, 'utf8'))
+            : [];
+        const summary = summarize(shards, report, provenance, artifactErrors);
         if (report) {
             const {total, passed, failed, flaky, skipped} = readTestResults(reportPath);
             summary.counts = {total, passed, failed, flaky, skipped};
@@ -178,4 +209,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = {verifyImage, collectReports, summarize};
+module.exports = {verifyImage, collectReports, summarize, sanitizeArtifacts};

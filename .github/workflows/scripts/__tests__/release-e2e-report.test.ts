@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import {collectReports, summarize, verifyImage} from '../release-e2e-report';
+import {collectReports, sanitizeArtifacts, summarize, verifyImage} from '../release-e2e-report';
 
 const index = '<html>shipped UI</html>';
 const provenance = {
@@ -49,6 +49,27 @@ describe('release image proof', () => {
 });
 
 describe('report completeness', () => {
+    test('removes artifact links without reading or modifying their targets', () => {
+        const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'release-artifact-test-'));
+        try {
+            const artifacts = path.join(directory, 'artifacts');
+            fs.mkdirSync(artifacts);
+            const outside = path.join(directory, 'runner-file');
+            fs.writeFileSync(outside, 'private fixture');
+            fs.symlinkSync(outside, path.join(artifacts, 'unsafe.txt'));
+            fs.writeFileSync(path.join(artifacts, 'result.json'), '{}');
+            const errors = sanitizeArtifacts(artifacts);
+            expect(errors).toEqual([path.join(artifacts, 'unsafe.txt')]);
+            expect(fs.readFileSync(outside, 'utf8')).toBe('private fixture');
+            expect(fs.readdirSync(artifacts)).toEqual(['result.json']);
+            expect(summarize(shards(), report, provenance, errors).status).toBe('incomplete');
+            const records = shards();
+            Object.assign(records[0], {artifact_errors: errors});
+            expect(summarize(records, report, provenance).status).toBe('incomplete');
+        } finally {
+            fs.rmSync(directory, {recursive: true, force: true});
+        }
+    });
     test('passes only a complete successful run', () => {
         expect(summarize(shards(), report, provenance)).toMatchObject({
             status: 'passed',
