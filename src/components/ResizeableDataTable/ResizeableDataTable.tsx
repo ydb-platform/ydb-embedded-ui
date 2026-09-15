@@ -20,9 +20,7 @@ export interface ResizeableDataTableProps<T> extends Omit<DataTableProps<T>, 'th
     columnsWidthLSKey?: string;
     reserveResizePadding?: boolean;
     wrapperClassName?: string;
-    /** Enter activates the selected data row, even when its DOM element is not mounted. */
     onKeyboardActivate?: (row: T) => void;
-    /** Stable entity identity for keyboard selection across data refreshes. */
     getKeyboardRowKey?: (row: T) => string | number | undefined;
 
     /**

@@ -46,9 +46,7 @@ export interface PaginatedTableProps<T, F> {
     onDataFetched?: (data: PaginatedTableData<T>) => void;
     keepCache?: boolean;
     fetchOverscan?: number;
-    /** Enter activates the selected loaded data row, even when its DOM element is not mounted. */
     onKeyboardActivate?: (row: T) => void;
-    /** Stable entity identity for keyboard selection across data refreshes. */
     getKeyboardRowKey?: (row: T) => string | number | undefined;
 }
 
@@ -130,7 +128,6 @@ export const PaginatedTable = <T, F>({
         const queryParams = getQueryParams(0);
         const cachedArgs = tableDataApi.util.selectCachedArgsForQuery(state, 'fetchTableChunk');
         for (const args of cachedArgs) {
-            // RTK Query ignores the fetch function in its cache key; offset identifies the page.
             if (
                 !isEqual(
                     {...args, offset: 0, fetchData: undefined},
@@ -149,7 +146,6 @@ export const PaginatedTable = <T, F>({
     };
 
     const activateRow = (index: number) => {
-        // An unloaded row has no action yet; Enter never schedules a later navigation.
         const row = getRow(index);
         if (row !== undefined) {
             onKeyboardActivate?.(row);

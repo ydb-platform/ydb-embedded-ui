@@ -62,7 +62,6 @@ export function DataTableKeyboardNavigation<T>({
             return;
         }
         const next = getDataTableOrder(table).filter((index) => index < data.length);
-        // Keep data and its visual order together while the table applies an update.
         setOrder((previous) =>
             previous.data === data &&
             previous.indices.length === next.length &&
@@ -117,7 +116,6 @@ export function DataTableKeyboardNavigation<T>({
         if (sourceIndex === undefined) {
             return undefined;
         }
-        // Polling may move the selected entity; only a keyboard action requests scrolling.
         virtualList.current?.scrollAround(keyboard.selected);
         const revealRow = () => {
             const row = tableRef.current?.querySelector<HTMLElement>(
@@ -149,8 +147,6 @@ export function DataTableKeyboardNavigation<T>({
                     element.scrollLeft = left;
                 }
             }
-            // A data update can restart the effect before ReactList mounts the row.
-            // Keep the keyboard request pending until the row was actually revealed.
             scrolledRevision.current = keyboard.scrollRevision;
             return true;
         };
@@ -161,7 +157,6 @@ export function DataTableKeyboardNavigation<T>({
         if (!container) {
             return undefined;
         }
-        // ReactList mounts an offscreen row after processing the scroll event.
         const observer = new MutationObserver(() => {
             if (revealRow()) {
                 observer.disconnect();

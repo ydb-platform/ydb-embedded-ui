@@ -27,11 +27,6 @@ export function getNodeHostPath(node: PreparedNodeSystemState, database?: string
         return undefined;
     }
 
-    // Storage nodes do not belong to any specific database.
-    // Including a database in the path would filter data on the node page by that database,
-    // but for storage nodes this would result in no data being shown.
-    // Database from node data cannot be used, because we use database ids when uiFactory.useDatabaseId
-    // https://github.com/ydb-platform/ydb-embedded-ui/issues/3006
     const databaseInPath = checkIsStorageNode(node) ? undefined : (database ?? node.TenantName);
 
     return getDefaultNodePath(
