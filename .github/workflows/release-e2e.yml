@@ -1,0 +1,172 @@
+name: Release UI E2E
+run-name: UI e2e for YDB ${{ inputs.ydb_tag }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      ydb_tag:
+        description: Published local-ydb release tag
+        required: true
+        type: string
+      ydb_sha:
+        description: Expected full YDB commit SHA
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    name: Resolve release identity
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      ui_sha: ${{ steps.release.outputs.ui_sha }}
+      playwright_version: ${{ steps.release.outputs.playwright_version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: controller
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Resolve YDB, embedded UI and image digest
+        id: release
+        run: node controller/.github/workflows/scripts/resolve-release-ui.js
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          YDB_TAG: ${{ inputs.ydb_tag }}
+          YDB_SHA: ${{ inputs.ydb_sha }}
+          WORKFLOW_SHA: ${{ github.workflow_sha }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-e2e-provenance
+          path: release-artifacts
+          retention-days: 30
+
+  e2e:
+    name: Release UI tests (${{ matrix.shard }}/8)
+    needs: resolve
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: controller
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-e2e-provenance
+          path: release-artifacts
+      - name: Start release local-ydb
+        uses: astandrik/setup-local-ydb@07ceb4e25e2fcefd51c9cad5b6ee396767ef030b # v1.1.0
+        with:
+          version: ${{ inputs.ydb_tag }}
+          topology: root
+          auth: 'false'
+          cleanup: 'true'
+          monitoring-port: 8765
+          container-prefix: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
+      - name: Verify running image and served UI
+        run: node controller/.github/workflows/scripts/release-e2e-report.js verify release-artifacts/provenance.json "$YDB_CONTAINER"
+        env:
+          YDB_CONTAINER: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}-static
+      - name: Run all release-version tests
+        id: tests
+        run: bash controller/scripts/playwright-docker.sh --shard=${{ matrix.shard }}/8 --retries=0 --trace=retain-on-failure --update-snapshots=none --forbid-only
+        env:
+          CI: 'true'
+          PLAYWRIGHT_APP_BACKEND: http://localhost:8765
+          PLAYWRIGHT_BASE_URL: http://localhost:8765/monitoring/
+          PLAYWRIGHT_VIDEO: retain-on-failure
+          PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}
+          PLAYWRIGHT_RELEASE_VERSION: ${{ needs.resolve.outputs.playwright_version }}
+          PLAYWRIGHT_RELEASE_OUTPUT: ${{ github.workspace }}/ui
+      - name: Collect diagnostics and sanitize artifacts
+        id: sanitize
+        if: always()
+        run: |
+          mkdir -p release-artifacts
+          if [ "$TEST_OUTCOME" != success ]; then
+            docker logs --tail 1000 "$YDB_CONTAINER" > release-artifacts/local-ydb.log 2>&1 || true
+          fi
+          node controller/.github/workflows/scripts/release-e2e-report.js sanitize ui
+        env:
+          TEST_OUTCOME: ${{ steps.tests.outcome }}
+          YDB_CONTAINER: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}-static
+      - name: Upload shard reports
+        if: always() && steps.sanitize.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-e2e-shard-${{ matrix.shard }}
+          path: |
+            release-artifacts/
+            ui/blob-report/
+            ui/playwright-artifacts/
+          retention-days: 30
+
+  report:
+    name: Merge and verify complete report
+    needs: [resolve, e2e]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: controller
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Download all available results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-e2e-*
+          path: downloaded
+      - name: Collect shard reports
+        id: collect
+        if: always()
+        run: node controller/.github/workflows/scripts/release-e2e-report.js collect downloaded ui/all-blob-reports
+      - name: Merge with the test version of Playwright
+        if: needs.resolve.result == 'success' && steps.collect.outputs.has_blobs == 'true'
+        run: bash controller/scripts/playwright-docker.sh
+        env:
+          CI: 'true'
+          PLAYWRIGHT_RELEASE_MODE: report
+          PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}
+          PLAYWRIGHT_RELEASE_VERSION: ${{ needs.resolve.outputs.playwright_version }}
+          PLAYWRIGHT_RELEASE_OUTPUT: ${{ github.workspace }}/ui
+      - name: Sanitize report files
+        id: sanitize
+        if: always()
+        run: node controller/.github/workflows/scripts/release-e2e-report.js sanitize ui
+      - name: Summarize completeness and test results
+        if: always()
+        run: node controller/.github/workflows/scripts/release-e2e-report.js summarize
+        env:
+          REPORT_SHARDS: ${{ steps.collect.outputs.shards }}
+          TEST_JOBS_RESULT: ${{ needs.e2e.result }}
+          SANITIZE_RESULT: ${{ steps.sanitize.outcome }}
+      - name: Upload complete or partial report
+        if: always() && steps.sanitize.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-e2e-report
+          path: |
+            ui/playwright-artifacts/
+            downloaded/release-e2e-provenance/
+          retention-days: 30
