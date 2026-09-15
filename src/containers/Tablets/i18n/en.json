@@ -16,5 +16,6 @@
   "controls.search-placeholder": "Tablet ID",
   "controls.type-filter-label": "Type",
   "controls.type-filter-placeholder": "All types",
-  "controls.entities-count-label": "Tablets"
+  "controls.entities-count-label": "Tablets",
+  "value_follower": "follower {{id}}"
 }

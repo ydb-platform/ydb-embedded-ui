@@ -16,6 +16,7 @@ export interface PaginatedTableWithLayoutProps {
     initialState?: Partial<PaginatedTableState>;
     fullHeight?: boolean;
     noBatching?: boolean;
+    inheritKeyboardNavigation?: boolean;
 }
 
 const TableWrapper = ({
@@ -88,10 +89,14 @@ export const PaginatedTableWithLayout = ({
     initialState,
     noBatching,
     fullHeight = true,
+    inheritKeyboardNavigation = false,
 }: PaginatedTableWithLayoutProps) => {
     return (
         <PaginatedTableProvider initialState={initialState} noBatching={noBatching}>
-            <TableWithControlsLayout fullHeight={fullHeight}>
+            <TableWithControlsLayout
+                fullHeight={fullHeight}
+                inheritKeyboardNavigation={inheritKeyboardNavigation}
+            >
                 <ControlsSection controls={controls} extraControls={extraControls} />
                 <ErrorSection error={error} />
                 <TableWrapper table={table} tableWrapperProps={tableWrapperProps} />

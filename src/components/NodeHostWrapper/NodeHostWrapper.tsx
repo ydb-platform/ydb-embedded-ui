@@ -4,6 +4,7 @@ import type {NodeAddress} from '../../types/additionalProps';
 import type {TNodeInfo, TSystemStateInfo} from '../../types/api/nodes';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {checkIsStorageNode, isUnavailableNode} from '../../utils/nodes';
+import type {PreparedNodeSystemState} from '../../utils/nodes';
 import {EntityName} from '../EntityName/EntityName';
 import {StatusColor} from '../StatusColor/StatusColor';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
@@ -21,6 +22,27 @@ interface NodeHostWrapperProps {
     statusForIcon?: 'SystemState' | 'ConnectStatus';
 }
 
+export function getNodeHostPath(node: PreparedNodeSystemState, database?: string) {
+    if (!node.Host || node.NodeId === undefined || isUnavailableNode(node)) {
+        return undefined;
+    }
+
+    const databaseInPath = checkIsStorageNode(node) ? undefined : (database ?? node.TenantName);
+
+    return getDefaultNodePath(
+        {id: node.NodeId, activeTab: node.TenantName ? 'tablets' : 'storage'},
+        {database: databaseInPath},
+    );
+}
+
+export function getNodeHostLabel(node: PreparedNodeSystemState) {
+    return (
+        [node.NodeId, node.Host]
+            .filter((value) => value !== undefined && value !== null && value !== '')
+            .join(', ') || EMPTY_DATA_PLACEHOLDER
+    );
+}
+
 export const NodeHostWrapper = ({
     node,
     database,
@@ -34,19 +56,7 @@ export const NodeHostWrapper = ({
 
     const isNodeAvailable = !isUnavailableNode(node);
 
-    // Storage nodes do not belong to any specific database.
-    // Including a database in the path would filter data on the node page by that database,
-    // but for storage nodes this would result in no data being shown.
-    // Database from node data cannot be used, because we use database ids when uiFactory.useDatabaseId
-    // https://github.com/ydb-platform/ydb-embedded-ui/issues/3006
-    const databaseInPath = checkIsStorageNode(node) ? undefined : (database ?? node.TenantName);
-
-    const nodePath = isNodeAvailable
-        ? getDefaultNodePath(
-              {id: node.NodeId, activeTab: node.TenantName ? 'tablets' : 'storage'},
-              {database: databaseInPath},
-          )
-        : undefined;
+    const nodePath = getNodeHostPath(node, database);
 
     return (
         <EntityName
