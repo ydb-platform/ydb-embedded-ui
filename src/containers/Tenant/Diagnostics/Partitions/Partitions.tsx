@@ -115,9 +115,6 @@ export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) 
     const renderContent = () => {
         return (
             <ResizeableDataTable
-                getKeyboardRowKey={(partition) =>
-                    JSON.stringify([database, path, partition.partitionId])
-                }
                 columnsWidthLSKey={PARTITIONS_COLUMNS_WIDTH_LS_KEY}
                 wrapperClassName={b('table')}
                 data={partitionsToRender}
