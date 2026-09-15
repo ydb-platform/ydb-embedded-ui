@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {CircleXmarkFill, ClockFill} from '@gravity-ui/icons';
+
 import {ECapacityAlert, EFlag, isCapacityAlert} from '../../types/api/enums';
 import {EVDiskState} from '../../types/api/vdisk';
 import {
@@ -22,6 +24,7 @@ import {
     calculateCompactionIcon,
     calculateFrontQueuesIcon,
     calculateSpaceIcon,
+    calculateStateIcon,
 } from '../../utils/disks/iconCalculators';
 import type {PreparedVDisk} from '../../utils/disks/types';
 
@@ -76,7 +79,7 @@ function getAllModeIndicators(
     return {
         ...(capacityAlert ? {capacityAlert} : {}),
         ...(frontQueues ? {frontQueues} : {}),
-        ...(compaction ? {compaction} : {}),
+        ...(compaction?.length ? {compaction} : {}),
     };
 }
 
@@ -110,15 +113,22 @@ function getMissingVDiskDisplayState(
     mode: DiskDisplayMode,
 ): VDiskDisplayState {
     const isAllMode = mode === 'all';
+    let icon: VDiskDisplayState['icon'];
+    if (isDonor) {
+        icon = calculateStateIcon(vDisk, isDonor);
+    } else if (mode === 'state' || isAllMode) {
+        icon = getKnownVDiskStateIcon(vDisk);
+    }
     const displayState: VDiskDisplayState = {
         severity: NOT_AVAILABLE_SEVERITY,
-        icon: undefined,
+        icon,
         mode,
+        isNoData: true,
         isLegendInactive: false,
         showNoDataPlaceholder: true,
         allocatedPercent: isAllMode ? vDisk.AllocatedPercent : undefined,
         showAllocatedPercentLabel: !isAllMode,
-        striped: Boolean(isDonor),
+        striped: false,
         iconPlacement: 'inline',
     };
 
@@ -127,6 +137,21 @@ function getMissingVDiskDisplayState(
     }
 
     return displayState;
+}
+
+function getKnownVDiskStateIcon(vDisk: PreparedVDisk) {
+    if (vDisk.VDiskState !== undefined) {
+        return calculateStateIcon(vDisk);
+    }
+
+    switch (vDisk.Status) {
+        case 'ERROR':
+            return CircleXmarkFill;
+        case 'INIT_PENDING':
+            return ClockFill;
+        default:
+            return undefined;
+    }
 }
 
 interface GetExpertVDiskDisplayStateParams {
@@ -143,7 +168,7 @@ function getExpertVDiskDisplayState({
     vdisksGroupBy,
 }: GetExpertVDiskDisplayStateParams): VDiskDisplayState {
     const mode = getMode(vdisksGroupBy);
-    if (!vDisk.VDiskId) {
+    if (!(vDisk.HasWhiteboardData ?? Boolean(vDisk.VDiskId))) {
         return getMissingVDiskDisplayState(vDisk, isDonor, mode);
     }
 

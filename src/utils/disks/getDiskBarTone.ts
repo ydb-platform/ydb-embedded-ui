@@ -1,5 +1,7 @@
 import {CircleQuestionFill} from '@gravity-ui/icons';
 
+import {EFlag} from '../../types/api/enums';
+
 import {DONOR_COLOR, NOT_AVAILABLE_SEVERITY} from './constants';
 import type {DiskIndicatorValue} from './displayState';
 import {getDisplaySeverityColor} from './helpers';
@@ -10,6 +12,7 @@ interface GetDiskBarToneParams {
     isDonor?: boolean;
     showIndicator?: boolean;
     indicator?: DiskIndicatorValue;
+    isNoData?: boolean;
 }
 
 function hasMissingDataIndicator(indicator: DiskIndicatorValue | undefined) {
@@ -25,7 +28,12 @@ export function getDiskBarTone({
     isDonor,
     showIndicator,
     indicator,
+    isNoData,
 }: GetDiskBarToneParams): DiskBarTone {
+    if (isNoData) {
+        return EFlag.Grey;
+    }
+
     if (isDonor) {
         return DONOR_COLOR;
     }

@@ -1,11 +1,13 @@
 import React from 'react';
 
 import {cn} from '../../../utils/cn';
+import {VDisksGroupBy} from '../../../utils/disks/groupBy';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import {PDiskWithVDisks} from '../PDisk/';
 import type {StorageViewContext} from '../types';
 import {useStorageNodesPDiskDisplayStateGetter} from '../useStoragePDiskDisplayStateGetter';
-import {useIsStorageExpertMode} from '../useStorageQueryParams';
+import {useIsStorageExpertMode, useNodesVDisksGroupByParam} from '../useStorageQueryParams';
+import {useStorageNodesVDiskDisplayStateGetter} from '../useStorageVDiskDisplayStateGetter';
 import {isPdiskActive} from '../utils';
 
 import './PDisks.scss';
@@ -17,19 +19,29 @@ interface PDisksProps {
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
     pDiskWidth?: number;
+    pDiskHeight?: number;
 }
 
-export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDisksProps) {
+export function PDisks({
+    pDisks = [],
+    vDisks = [],
+    viewContext,
+    pDiskWidth,
+    pDiskHeight,
+}: PDisksProps) {
     const [highlightedDisk, setHighlightedDisk] = React.useState<string | undefined>();
     const isStorageExpertMode = useIsStorageExpertMode();
+    const vDisksGroupBy = useNodesVDisksGroupByParam();
+    const isAllVDisksLayout = isStorageExpertMode && vDisksGroupBy === VDisksGroupBy.All;
     const getStoragePDiskDisplayState = useStorageNodesPDiskDisplayStateGetter();
+    const getStorageVDiskDisplayState = useStorageNodesVDiskDisplayStateGetter();
 
     if (!pDisks.length) {
         return null;
     }
 
     return (
-        <div className={b('pdisks-wrapper')}>
+        <div className={b('pdisks-wrapper')} style={{height: pDiskHeight}}>
             {pDisks.map((pDisk) => {
                 const id = pDisk.StringifiedId;
 
@@ -46,7 +58,10 @@ export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDis
                             viewContext={viewContext}
                             width={pDiskWidth}
                             withIcon={isStorageExpertMode}
-                            withVDiskIcons={false}
+                            withVDiskIcons={isStorageExpertMode}
+                            getVDiskDisplayState={getStorageVDiskDisplayState}
+                            expertMode={isStorageExpertMode}
+                            isAllVDisksLayout={isAllVDisksLayout}
                             showTypeLabel={isStorageExpertMode}
                             getDisplayState={getStoragePDiskDisplayState}
                             showPopup={highlighted}

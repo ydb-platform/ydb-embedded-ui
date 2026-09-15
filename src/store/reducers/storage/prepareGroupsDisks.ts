@@ -72,6 +72,7 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
     return {
         ...mergedVDiskData,
         ...vDiskSizeFields,
+        HasWhiteboardData: Boolean(data.Whiteboard),
         ...(WhiteboardSize ? {WhiteboardSize} : {}),
         PDisk: preparedPDisk,
         Donors: preparedDonors,
@@ -138,6 +139,7 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
 
     return {
         ...mergedPDiskData,
+        HasWhiteboardData: Boolean(whiteboardPDisk),
         StringifiedId,
         AllocatedPercent,
         AllocatedSize,

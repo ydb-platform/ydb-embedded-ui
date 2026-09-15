@@ -47,6 +47,7 @@ export interface BaseDiskDisplayState {
     mode: DiskDisplayMode | undefined;
     isLegendInactive?: boolean;
     showNoDataPlaceholder?: boolean;
+    isNoData?: boolean;
 }
 
 export interface VDiskDisplayState extends BaseDiskDisplayState {

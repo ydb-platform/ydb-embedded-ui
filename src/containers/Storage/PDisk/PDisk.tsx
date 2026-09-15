@@ -12,12 +12,7 @@ import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 import {getPDiskPagePath} from '../../../routes';
 import {cn} from '../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
-import type {
-    DiskDisplayMode,
-    DiskIndicatorValue,
-    PDiskAllModeIndicatorsState,
-    PDiskDisplayStateGetter,
-} from '../../../utils/disks/displayState';
+import type {DiskIndicatorValue, PDiskDisplayStateGetter} from '../../../utils/disks/displayState';
 import {getDefaultPDiskDisplayState} from '../../../utils/disks/displayState';
 import {getDiskBarTone} from '../../../utils/disks/getDiskBarTone';
 import {getPDiskId, getVDiskStatusIcon} from '../../../utils/disks/helpers';
@@ -51,27 +46,36 @@ function PDiskNodeBarContent({left, center, type}: PDiskNodeBarContentProps) {
 interface GetPDiskContentParams {
     barContent: React.ReactNode;
     data: PreparedPDisk;
-    leading: React.ReactNode;
+    hasIndicators: boolean;
     showAllocatedPercentLabel: boolean;
     showTypeLabel?: boolean;
+    isNoData?: boolean;
 }
 
 function getPDiskContent({
     barContent,
     data,
-    leading,
+    hasIndicators,
     showAllocatedPercentLabel,
     showTypeLabel,
+    isNoData,
 }: GetPDiskContentParams) {
     if (!showTypeLabel) {
         return barContent;
     }
 
+    const showNoDataLabel = isNoData && !showAllocatedPercentLabel;
+
     return (
         <PDiskNodeBarContent
-            left={leading || showAllocatedPercentLabel ? null : barContent}
+            left={hasIndicators || showAllocatedPercentLabel || showNoDataLabel ? null : barContent}
             center={showAllocatedPercentLabel ? barContent : null}
-            type={<DiskBarLabel>{data.Type || EMPTY_DATA_PLACEHOLDER}</DiskBarLabel>}
+            type={
+                <React.Fragment>
+                    {showNoDataLabel ? barContent : null}
+                    <DiskBarLabel>{data.Type || EMPTY_DATA_PLACEHOLDER}</DiskBarLabel>
+                </React.Fragment>
+            }
         />
     );
 }
@@ -143,23 +147,11 @@ function getPDiskBarIndicator({
     };
 }
 
-function getAllModeOverlay(
-    mode: DiskDisplayMode | undefined,
-    indicators: PDiskAllModeIndicatorsState | undefined,
-) {
-    if (mode !== 'all') {
-        return null;
-    }
-
-    return <PDiskAllModeIndicators indicators={indicators ?? EMPTY_ALL_MODE_INDICATORS} />;
-}
-
 function getAccessibleName(
     data: PreparedPDisk,
     allocatedPercent: number | undefined,
     hasIssues: boolean | undefined,
     isAllMode: boolean,
-    showNoDataPlaceholder: boolean | undefined,
 ) {
     if (!isAllMode) {
         return undefined;
@@ -167,17 +159,11 @@ function getAccessibleName(
 
     const noData = i18n('context_no-data');
 
-    let allocated = noData;
-    if (showNoDataPlaceholder !== true) {
-        const hasAllocatedPercent =
-            typeof allocatedPercent === 'number' &&
-            Number.isFinite(allocatedPercent) &&
-            allocatedPercent >= 0;
-
-        if (hasAllocatedPercent) {
-            allocated = `${Math.floor(allocatedPercent)}%`;
-        }
-    }
+    const hasAllocatedPercent =
+        typeof allocatedPercent === 'number' &&
+        Number.isFinite(allocatedPercent) &&
+        allocatedPercent >= 0;
+    const allocated = hasAllocatedPercent ? `${Math.floor(allocatedPercent)}%` : noData;
 
     const health =
         hasIssues === undefined
@@ -261,7 +247,6 @@ export const PDisk = ({
         allocatedPercent,
         displayState.allMode?.hasIssues,
         isAllMode,
-        displayState.showNoDataPlaceholder,
     );
     const {leading, overflowVisible, showIndicator} = getPDiskBarIndicator({
         hidden: hideBarContent,
@@ -280,19 +265,25 @@ export const PDisk = ({
     });
     const showAllocatedPercentLabel =
         !hideBarContent && hasAllocatedPercent && displayState.showAllocatedPercentLabel !== false;
+    const allModeIndicators = displayState.allMode?.indicators ?? EMPTY_ALL_MODE_INDICATORS;
+    const hasAllModeIndicators = isAllMode && Object.values(allModeIndicators).some(Boolean);
+    const overlay = hasAllModeIndicators ? (
+        <PDiskAllModeIndicators indicators={allModeIndicators} />
+    ) : null;
     const content = getPDiskContent({
         barContent,
         data,
-        leading,
+        hasIndicators: showIndicator || hasAllModeIndicators,
         showAllocatedPercentLabel,
         showTypeLabel,
+        isNoData: displayState.isNoData,
     });
-    const overlay = getAllModeOverlay(displayState.mode, displayState.allMode?.indicators);
 
     const tone = getDiskBarTone({
         severity: displayState.severity,
         showIndicator,
         indicator: displayState.icon,
+        isNoData: displayState.isNoData,
     });
 
     let pDiskPath: string | undefined;

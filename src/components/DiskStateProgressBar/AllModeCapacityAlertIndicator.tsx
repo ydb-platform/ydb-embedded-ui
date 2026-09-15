@@ -7,9 +7,13 @@ const b = cn('storage-disk-progress-bar');
 
 interface AllModeCapacityAlertIndicatorProps {
     indicator?: IconData | string;
+    iconSize?: number;
 }
 
-export function AllModeCapacityAlertIndicator({indicator}: AllModeCapacityAlertIndicatorProps) {
+export function AllModeCapacityAlertIndicator({
+    indicator,
+    iconSize = 12,
+}: AllModeCapacityAlertIndicatorProps) {
     if (!indicator) {
         return null;
     }
@@ -19,6 +23,10 @@ export function AllModeCapacityAlertIndicator({indicator}: AllModeCapacityAlertI
     }
 
     return (
-        <Icon className={b('all-mode-missing-data-indicator-icon')} data={indicator} size={12} />
+        <Icon
+            className={b('all-mode-missing-data-indicator-icon')}
+            data={indicator}
+            size={iconSize}
+        />
     );
 }

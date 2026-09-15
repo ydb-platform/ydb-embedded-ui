@@ -4,6 +4,7 @@ import type {StorageViewContext} from '../../types';
 export interface StorageNodesColumnsSettings {
     pDiskWidth?: number;
     pDiskContainerWidth?: number;
+    pDiskHeight?: number;
 }
 
 export interface GetStorageNodesColumnsParams {

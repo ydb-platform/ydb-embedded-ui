@@ -56,18 +56,6 @@ function getMode(groupBy: PDisksGroupByValue): DiskDisplayMode | undefined {
     }
 }
 
-function requiresWhiteboardData(groupBy: PDisksGroupByValue) {
-    return groupBy === PDisksGroupBy.State || groupBy === PDisksGroupBy.Device;
-}
-
-function hasBSCStatusData(pDisk: Parameters<PDiskDisplayStateGetter>[0]) {
-    return (
-        pDisk.DriveStatus !== undefined ||
-        pDisk.DecommitStatus !== undefined ||
-        pDisk.MaintenanceStatus !== undefined
-    );
-}
-
 function getAllocatedPercent(pDisk: Parameters<PDiskDisplayStateGetter>[0]) {
     const whiteboardAllocatedPercent = pDisk.WhiteboardSize?.AllocatedPercent;
 
@@ -92,43 +80,54 @@ function isAllModeHealthy(pDisk: Parameters<PDiskDisplayStateGetter>[0]) {
 function getAllModeIndicators(
     pDisk: Parameters<PDiskDisplayStateGetter>[0],
     isCapacityAlertInactive: boolean,
+    hasWhiteboardData = true,
 ): PDiskAllModeIndicatorsState {
     const capacityAlertIcon = isCapacityAlertInactive
         ? undefined
         : calculateSpaceIcon({CapacityAlert: pDisk.PDiskCapacityAlert});
-    const driveDisplayState = getPDiskDriveDisplayState(pDisk.DriveStatus);
-    const decommitDisplayState = getPDiskDecommitDisplayState(pDisk.DecommitStatus);
-    const maintenanceDisplayState = getPDiskMaintenanceDisplayState(pDisk.MaintenanceStatus);
+    const driveIcon = getBSCStatusDisplayState(pDisk, 'drive', hasWhiteboardData)?.icon;
+    const decommitIcon = getBSCStatusDisplayState(pDisk, 'decommit', hasWhiteboardData)?.icon;
+    const maintenanceIcon = getBSCStatusDisplayState(pDisk, 'maintenance', hasWhiteboardData)?.icon;
     const deviceIcon = calculateFlagPairIcon(pDisk.Device, pDisk.Realtime);
-    const driveIcon = pDisk.DriveStatus === undefined ? CircleQuestionFill : driveDisplayState.icon;
-    const decommitIcon =
-        pDisk.DecommitStatus === undefined ? CircleQuestionFill : decommitDisplayState.icon;
-    const maintenanceIcon =
-        pDisk.MaintenanceStatus === undefined ? CircleQuestionFill : maintenanceDisplayState.icon;
 
     return {
-        ...(capacityAlertIcon ? {capacityAlert: capacityAlertIcon} : {}),
+        ...(capacityAlertIcon && (hasWhiteboardData || isCapacityAlert(pDisk.PDiskCapacityAlert))
+            ? {capacityAlert: capacityAlertIcon}
+            : {}),
         ...(driveIcon ? {drive: driveIcon} : {}),
         ...(decommitIcon ? {decommit: decommitIcon} : {}),
         ...(maintenanceIcon ? {maintenance: maintenanceIcon} : {}),
-        ...(deviceIcon ? {device: deviceIcon} : {}),
+        ...(deviceIcon && hasWhiteboardData ? {device: deviceIcon} : {}),
     };
 }
 
-function getMissingAllModeDisplayState(
+function getMissingPDiskDisplayState(
     pDisk: Parameters<PDiskDisplayStateGetter>[0],
+    mode: DiskDisplayMode | undefined,
+    inactiveAlerts: Set<ECapacityAlert>,
 ): PDiskDisplayState {
+    const isCapacityAlertInactive =
+        isCapacityAlert(pDisk.PDiskCapacityAlert) && inactiveAlerts.has(pDisk.PDiskCapacityAlert);
+    let icon: PDiskDisplayState['icon'] = getBSCStatusDisplayState(pDisk, mode, false)?.icon;
+    if (mode === 'space' && isCapacityAlert(pDisk.PDiskCapacityAlert) && !isCapacityAlertInactive) {
+        icon = calculateSpaceIcon({CapacityAlert: pDisk.PDiskCapacityAlert});
+    }
+
     return {
         severity: NOT_AVAILABLE_SEVERITY,
-        icon: undefined,
-        mode: 'all',
+        icon,
+        mode,
+        isNoData: true,
         isLegendInactive: false,
         showNoDataPlaceholder: true,
-        allocatedPercent: getAllocatedPercent(pDisk),
-        showAllocatedPercentLabel: false,
+        allocatedPercent:
+            mode === 'all' || mode === 'space' ? getAllocatedPercent(pDisk) : undefined,
+        showAllocatedPercentLabel: mode !== 'all',
         iconPlacement: 'inline',
-        width: EXPERT_MODE_ALL_PDISK_WIDTH,
-        allMode: {indicators: {}},
+        width: mode === 'all' ? EXPERT_MODE_ALL_PDISK_WIDTH : EXPERT_MODE_PDISK_WIDTH,
+        ...(mode === 'all'
+            ? {allMode: {indicators: getAllModeIndicators(pDisk, isCapacityAlertInactive, false)}}
+            : {}),
     };
 }
 
@@ -162,90 +161,35 @@ function getAllModeDisplayState(
     };
 }
 
-function getMissingStatusDisplayState(mode: DiskDisplayMode | undefined): PDiskDisplayState {
+function getBSCStatusDisplayState(
+    pDisk: Parameters<PDiskDisplayStateGetter>[0],
+    mode: DiskDisplayMode | undefined,
+    hasWhiteboardData: boolean,
+) {
+    let status: string | undefined;
+    let displayState: ReturnType<typeof getPDiskDriveDisplayState>;
+
+    switch (mode) {
+        case 'drive':
+            status = pDisk.DriveStatus;
+            displayState = getPDiskDriveDisplayState(pDisk.DriveStatus);
+            break;
+        case 'decommit':
+            status = pDisk.DecommitStatus;
+            displayState = getPDiskDecommitDisplayState(pDisk.DecommitStatus);
+            break;
+        case 'maintenance':
+            status = pDisk.MaintenanceStatus;
+            displayState = getPDiskMaintenanceDisplayState(pDisk.MaintenanceStatus);
+            break;
+        default:
+            return undefined;
+    }
+
     return {
-        severity: NOT_AVAILABLE_SEVERITY,
-        icon: undefined,
-        mode,
-        isLegendInactive: false,
-        showNoDataPlaceholder: true,
-        allocatedPercent: undefined,
-        width: mode ? EXPERT_MODE_PDISK_WIDTH : undefined,
+        ...displayState,
+        icon: status === undefined && hasWhiteboardData ? CircleQuestionFill : displayState.icon,
     };
-}
-
-interface GetStatusModeDisplayStateParams {
-    hasWhiteboardData: boolean;
-    mode: DiskDisplayMode | undefined;
-    pDisk: Parameters<PDiskDisplayStateGetter>[0];
-    pdisksGroupBy: PDisksGroupByValue;
-}
-
-function getStatusModeDisplayState({
-    hasWhiteboardData,
-    mode,
-    pDisk,
-    pdisksGroupBy,
-}: GetStatusModeDisplayStateParams): PDiskDisplayState | undefined {
-    if (pdisksGroupBy === PDisksGroupBy.Drive) {
-        if (!hasWhiteboardData && pDisk.DriveStatus === undefined) {
-            return getMissingStatusDisplayState(mode);
-        }
-
-        const driveDisplayState = getPDiskDriveDisplayState(pDisk.DriveStatus);
-
-        return {
-            ...driveDisplayState,
-            icon: pDisk.DriveStatus === undefined ? CircleQuestionFill : driveDisplayState.icon,
-            mode,
-            isLegendInactive: false,
-            showNoDataPlaceholder: false,
-            allocatedPercent: undefined,
-            width: EXPERT_MODE_PDISK_WIDTH,
-        };
-    }
-
-    if (pdisksGroupBy === PDisksGroupBy.Decommit) {
-        if (!hasWhiteboardData && pDisk.DecommitStatus === undefined) {
-            return getMissingStatusDisplayState(mode);
-        }
-
-        const decommitDisplayState = getPDiskDecommitDisplayState(pDisk.DecommitStatus);
-
-        return {
-            ...decommitDisplayState,
-            icon:
-                pDisk.DecommitStatus === undefined ? CircleQuestionFill : decommitDisplayState.icon,
-            mode,
-            isLegendInactive: false,
-            showNoDataPlaceholder: false,
-            allocatedPercent: undefined,
-            width: EXPERT_MODE_PDISK_WIDTH,
-        };
-    }
-
-    if (pdisksGroupBy === PDisksGroupBy.Maintenance) {
-        if (!hasWhiteboardData && pDisk.MaintenanceStatus === undefined) {
-            return getMissingStatusDisplayState(mode);
-        }
-
-        const maintenanceDisplayState = getPDiskMaintenanceDisplayState(pDisk.MaintenanceStatus);
-
-        return {
-            ...maintenanceDisplayState,
-            icon:
-                pDisk.MaintenanceStatus === undefined
-                    ? CircleQuestionFill
-                    : maintenanceDisplayState.icon,
-            mode,
-            isLegendInactive: false,
-            showNoDataPlaceholder: false,
-            allocatedPercent: undefined,
-            width: EXPERT_MODE_PDISK_WIDTH,
-        };
-    }
-
-    return undefined;
 }
 
 function usePDiskDisplayStateGetter(
@@ -262,18 +206,10 @@ function usePDiskDisplayStateGetter(
             }
 
             const mode = getMode(pdisksGroupBy);
-            const hasWhiteboardData = pDisk.WhiteboardSize !== undefined;
+            const hasWhiteboardData = pDisk.HasWhiteboardData ?? pDisk.WhiteboardSize !== undefined;
 
-            if (
-                pdisksGroupBy === PDisksGroupBy.All &&
-                !hasWhiteboardData &&
-                !hasBSCStatusData(pDisk)
-            ) {
-                return getMissingAllModeDisplayState(pDisk);
-            }
-
-            if (!hasWhiteboardData && requiresWhiteboardData(pdisksGroupBy)) {
-                return getMissingStatusDisplayState(mode);
+            if (!hasWhiteboardData) {
+                return getMissingPDiskDisplayState(pDisk, mode, inactiveAlerts);
             }
 
             const allocatedPercent = getAllocatedPercent(pDisk);
@@ -297,15 +233,17 @@ function usePDiskDisplayStateGetter(
                 return getAllModeDisplayState(pDisk, inactiveAlerts);
             }
 
-            const statusDisplayState = getStatusModeDisplayState({
-                hasWhiteboardData,
-                mode,
-                pDisk,
-                pdisksGroupBy,
-            });
+            const statusDisplayState = getBSCStatusDisplayState(pDisk, mode, hasWhiteboardData);
 
             if (statusDisplayState) {
-                return statusDisplayState;
+                return {
+                    ...statusDisplayState,
+                    mode,
+                    isLegendInactive: false,
+                    showNoDataPlaceholder: false,
+                    allocatedPercent: undefined,
+                    width: EXPERT_MODE_PDISK_WIDTH,
+                };
             }
 
             if (pdisksGroupBy === PDisksGroupBy.Device) {

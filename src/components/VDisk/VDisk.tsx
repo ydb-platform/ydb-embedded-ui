@@ -5,11 +5,7 @@ import type {PopupPlacement, PopupProps} from '@gravity-ui/uikit';
 import {useVDiskPagePath} from '../../routes';
 import {cn} from '../../utils/cn';
 import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
-import type {
-    AllModeIndicatorsState,
-    DiskIndicatorValue,
-    VDiskDisplayStateGetter,
-} from '../../utils/disks/displayState';
+import type {DiskIndicatorValue, VDiskDisplayStateGetter} from '../../utils/disks/displayState';
 import {getDefaultDiskDisplayState} from '../../utils/disks/displayState';
 import {getDiskBarTone} from '../../utils/disks/getDiskBarTone';
 import {getVDiskStatusIcon} from '../../utils/disks/helpers';
@@ -74,6 +70,9 @@ function getVDiskBarContent({
 interface GetVDiskBarIndicatorParams {
     hidden: boolean;
     icon?: DiskIndicatorValue;
+    indicatorClassName?: string;
+    iconGroupSize?: number;
+    iconSize?: number;
     isDonor?: boolean;
     placement: 'inline' | 'overlap';
     severity: number;
@@ -83,6 +82,9 @@ interface GetVDiskBarIndicatorParams {
 function getVDiskBarIndicator({
     hidden,
     icon,
+    indicatorClassName,
+    iconGroupSize,
+    iconSize,
     isDonor,
     placement,
     severity,
@@ -94,22 +96,18 @@ function getVDiskBarIndicator({
     }
 
     return {
-        leading: <DiskIndicator value={resolvedIndicator} placement={placement} />,
+        leading: (
+            <DiskIndicator
+                value={resolvedIndicator}
+                placement={placement}
+                iconSize={iconSize}
+                iconGroupSize={iconGroupSize}
+                className={indicatorClassName}
+            />
+        ),
         overflowVisible: placement === 'overlap',
         showIndicator: true,
     };
-}
-
-function getAllModeOverlay(
-    compact: boolean | undefined,
-    isAllMode: boolean,
-    indicators: AllModeIndicatorsState | undefined,
-) {
-    if (compact || !isAllMode) {
-        return null;
-    }
-
-    return <AllModeIndicators indicators={indicators ?? EMPTY_ALL_MODE_INDICATORS} />;
 }
 
 function getAccessibleName(
@@ -144,7 +142,7 @@ function getAccessibleName(
     return i18n('context_all-mode-accessible-name', {
         vdiskId: data.StringifiedId || noData,
         health,
-        state: data.VDiskState || noData,
+        state: data.VDiskState || data.Status || noData,
         replication,
         capacityAlert: data.CapacityAlert || noData,
         frontQueues: data.FrontQueues || noData,
@@ -157,6 +155,7 @@ function getAccessibleName(
 export interface VDiskProps {
     data?: PreparedVDisk;
     compact?: boolean;
+    allModeSize?: 's' | 'm';
     inactive?: boolean;
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
@@ -165,6 +164,9 @@ export interface VDiskProps {
     delayOpen?: number;
     delayClose?: number;
     withIcon?: boolean;
+    iconSize?: number;
+    iconGroupSize?: number;
+    indicatorClassName?: string;
     highlighted?: boolean;
     placement?: PopupPlacement;
     popupOffset?: PopupProps['offset'];
@@ -175,6 +177,7 @@ export interface VDiskProps {
 export const VDisk = ({
     data = {},
     compact,
+    allModeSize,
     inactive,
     showPopup,
     onShowPopup,
@@ -183,6 +186,9 @@ export const VDisk = ({
     delayClose,
     delayOpen,
     withIcon,
+    iconSize,
+    iconGroupSize,
+    indicatorClassName,
     highlighted,
     placement = ['top', 'bottom', 'left', 'right'],
     popupOffset = DEFAULT_POPUP_OFFSET,
@@ -209,6 +215,7 @@ export const VDisk = ({
         striped,
         iconPlacement,
         allMode,
+        isNoData,
     } = displayState;
 
     const isAllMode = mode === 'all';
@@ -217,6 +224,9 @@ export const VDisk = ({
     const {leading, overflowVisible, showIndicator} = getVDiskBarIndicator({
         hidden: hideBarContent,
         icon,
+        indicatorClassName,
+        iconGroupSize,
+        iconSize,
         isDonor,
         placement: iconPlacement,
         severity,
@@ -232,12 +242,19 @@ export const VDisk = ({
         showAllocatedPercentLabel,
         showNoDataPlaceholder,
     });
-    const overlay = getAllModeOverlay(compact, isAllMode, allMode?.indicators);
+    const overlay =
+        !compact && isAllMode && !isNoData ? (
+            <AllModeIndicators
+                indicators={allMode?.indicators ?? EMPTY_ALL_MODE_INDICATORS}
+                size={allModeSize}
+            />
+        ) : null;
     const tone = getDiskBarTone({
         severity,
         isDonor,
         showIndicator,
         indicator: icon,
+        isNoData,
     });
 
     return (

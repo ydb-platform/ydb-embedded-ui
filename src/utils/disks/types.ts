@@ -1,6 +1,6 @@
 import type {EFlag} from '../../types/api/enums';
 import type {EDriveStatus, TPDiskInfo, TPDiskStateInfo} from '../../types/api/pdisk';
-import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
+import type {EVDiskStatus, TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import type {ValueOf} from '../../types/common';
 
 import type {PDISK_TYPES} from './getPDiskType';
@@ -71,6 +71,7 @@ export type PreparedPDisk = Omit<
     'AvailableSize' | 'TotalSize' | 'EnforcedDynamicSlotSize'
 > &
     Omit<Partial<TPDiskInfo>, 'Type' | 'AvailableSize' | 'TotalSize'> & {
+        HasWhiteboardData?: boolean;
         Type?: PDiskType;
         Severity?: number;
         StringifiedId?: string;
@@ -96,6 +97,8 @@ export interface VDiskRecipientRef {
 
 export interface PreparedVDisk
     extends Omit<TVDiskStateInfo, 'PDisk' | 'AvailableSize' | 'AllocatedSize' | 'Donors'> {
+    HasWhiteboardData?: boolean;
+    Status?: EVDiskStatus;
     PDisk?: PreparedPDisk;
     Severity?: number;
     StringifiedId?: string;
