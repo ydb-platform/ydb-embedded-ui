@@ -23,6 +23,11 @@ function githubFixture(version: string) {
         if (path.includes('package.json')) {
             return file(JSON.stringify({version}));
         }
+        if (path.includes('package-lock.json')) {
+            return file(
+                JSON.stringify({packages: {'node_modules/@playwright/test': {version: '1.58.0'}}}),
+            );
+        }
         return file('<html>release UI</html>');
     });
 }
@@ -107,5 +112,16 @@ describe('release UI identity', () => {
                 async () => 'latest',
             ),
         ).rejects.toThrow('digest');
+    });
+
+    test('rejects a missing Playwright lockfile version before resolving the image', async () => {
+        const fixture = githubFixture('18.1.0');
+        const github = (path: string) =>
+            path.includes('package-lock.json') ? Promise.resolve(file('{}')) : fixture(path);
+        const digest = jest.fn();
+        await expect(
+            resolveRelease({ydbTag: '26.2.1.14', ydbSha, workflowSha}, github, digest),
+        ).rejects.toThrow('Playwright version');
+        expect(digest).not.toHaveBeenCalled();
     });
 });

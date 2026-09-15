@@ -5,19 +5,41 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$PROJECT_DIR"
 
-if [ -z "${PLAYWRIGHT_APP_BACKEND:-}" ]; then
+RELEASE_REF="${PLAYWRIGHT_RELEASE_REF:-}"
+RELEASE_MODE="${PLAYWRIGHT_RELEASE_MODE:-test}"
+RELEASE_OUTPUT="${PLAYWRIGHT_RELEASE_OUTPUT:-${PROJECT_DIR}/playwright-artifacts/release}"
+
+if [ -n "$RELEASE_REF" ]; then
+  if [[ ! "$RELEASE_REF" =~ ^[a-f0-9]{40}$ ]] || [[ ! "${PLAYWRIGHT_RELEASE_VERSION:-}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
+    echo "Error: release mode requires a commit SHA and a pinned Playwright version" >&2
+    exit 1
+  fi
+  if [[ "$RELEASE_MODE" != test && "$RELEASE_MODE" != report ]]; then
+    echo "Error: PLAYWRIGHT_RELEASE_MODE must be test or report" >&2
+    exit 1
+  fi
+  PLAYWRIGHT_VERSION="$PLAYWRIGHT_RELEASE_VERSION"
+else
+  RELEASE_MODE=test
+  PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")
+fi
+
+if [ "$RELEASE_MODE" = test ] && [ -z "${PLAYWRIGHT_APP_BACKEND:-}" ]; then
   echo "Error: PLAYWRIGHT_APP_BACKEND is required. Start a backend separately and pass its URL." >&2
   exit 1
 fi
 
-PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")
 if [ -z "$PLAYWRIGHT_VERSION" ]; then
   echo "Error: Could not determine Playwright version from package-lock.json" >&2
   exit 1
 fi
 
-BACKEND_CONFIG="$(node .github/workflows/scripts/resolve-playwright-backend.js "$PLAYWRIGHT_APP_BACKEND")"
-IFS=$'\t' read -r PLAYWRIGHT_BACKEND PLAYWRIGHT_PROXY_TARGET <<< "$BACKEND_CONFIG"
+PLAYWRIGHT_BACKEND=""
+PLAYWRIGHT_PROXY_TARGET=""
+if [ "$RELEASE_MODE" = test ]; then
+  BACKEND_CONFIG="$(node .github/workflows/scripts/resolve-playwright-backend.js "$PLAYWRIGHT_APP_BACKEND")"
+  IFS=$'\t' read -r PLAYWRIGHT_BACKEND PLAYWRIGHT_PROXY_TARGET <<< "$BACKEND_CONFIG"
+fi
 
 DOCKER_IMAGE="mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-noble"
 RUN_ID="$(date +%Y%m%d%H%M%S)-$$"
@@ -32,6 +54,15 @@ PWTEST_SHARD_WEIGHTS="${PWTEST_SHARD_WEIGHTS:-}"
 
 PLAYWRIGHT_COMMAND=$(cat <<'SCRIPT'
 set -euo pipefail
+
+if [ -n "${PLAYWRIGHT_RELEASE_REF:-}" ]; then
+  # Release code is only extracted and executed inside this container. The host's
+  # workspace, Docker socket and GitHub cache/artifact credentials are not mounted.
+  curl --fail --location --retry 2 --max-time 120 \
+    "https://codeload.github.com/ydb-platform/ydb-embedded-ui/tar.gz/${PLAYWRIGHT_RELEASE_REF}" \
+    --output /tmp/ui-source.tar.gz
+  tar -xzf /tmp/ui-source.tar.gz --strip-components=1 -C /work
+fi
 
 if [ -n "${PLAYWRIGHT_PROXY_TARGET:-}" ]; then
   node <<'NODE' &
@@ -56,6 +87,10 @@ NODE
 fi
 
 echo "Running npm ci"
+if [ "${PLAYWRIGHT_RELEASE_MODE:-test}" = report ]; then
+  npm ci --ignore-scripts
+  exec npx --no playwright merge-reports --config=merge.config.ts ./all-blob-reports
+fi
 npm ci
 
 echo "Running Playwright tests"
@@ -64,7 +99,7 @@ SCRIPT
 )
 
 echo "Using Playwright Docker image: ${DOCKER_IMAGE}"
-echo "Using backend: ${PLAYWRIGHT_APP_BACKEND}"
+echo "Using backend: ${PLAYWRIGHT_APP_BACKEND:-}"
 if [ -n "$PLAYWRIGHT_PROXY_TARGET" ]; then
   echo "Using container backend proxy: ${PLAYWRIGHT_BACKEND} -> ${PLAYWRIGHT_PROXY_TARGET}"
 fi
@@ -75,12 +110,28 @@ if [ -n "$PLAYWRIGHT_PLATFORM" ]; then
   DOCKER_RUN_ARGS+=(--platform "$PLAYWRIGHT_PLATFORM")
 fi
 
+if [ -n "$RELEASE_REF" ]; then
+  mkdir -p "$RELEASE_OUTPUT/blob-report" "$RELEASE_OUTPUT/playwright-artifacts"
+  RELEASE_OUTPUT="$(cd "$RELEASE_OUTPUT" && pwd)"
+  DOCKER_RUN_ARGS+=(
+    -v "$RELEASE_OUTPUT/blob-report:/work/blob-report"
+    -v "$RELEASE_OUTPUT/playwright-artifacts:/work/playwright-artifacts"
+  )
+  if [ "$RELEASE_MODE" = report ]; then
+    DOCKER_RUN_ARGS+=(-v "$RELEASE_OUTPUT/all-blob-reports:/work/all-blob-reports:ro")
+  fi
+  REPORT_DIR="$RELEASE_OUTPUT/playwright-artifacts/playwright-report"
+else
+  DOCKER_RUN_ARGS+=(
+    -v "${PROJECT_DIR}:/work"
+    -v "ydb-embedded-ui-node-modules:/work/node_modules"
+  )
+fi
+
 echo "Installing dependencies and running Playwright tests in Docker"
 set +e
 docker "${DOCKER_RUN_ARGS[@]}" \
   --add-host host.docker.internal:host-gateway \
-  -v "${PROJECT_DIR}:/work" \
-  -v "ydb-embedded-ui-node-modules:/work/node_modules" \
   -w /work \
   -e CI="${CI:-}" \
   -e PLAYWRIGHT_VIDEO="${PLAYWRIGHT_VIDEO:-}" \
@@ -89,6 +140,8 @@ docker "${DOCKER_RUN_ARGS[@]}" \
   -e PLAYWRIGHT_BASE_URL="${PLAYWRIGHT_BASE_URL_VALUE}" \
   -e PLAYWRIGHT_OUTPUT_DIR="${PLAYWRIGHT_OUTPUT_DIR}" \
   -e PLAYWRIGHT_PROXY_TARGET="${PLAYWRIGHT_PROXY_TARGET}" \
+  -e PLAYWRIGHT_RELEASE_REF="$RELEASE_REF" \
+  -e PLAYWRIGHT_RELEASE_MODE="$RELEASE_MODE" \
   "${DOCKER_IMAGE}" \
   /bin/bash -c "$PLAYWRIGHT_COMMAND" -- "$@"
 TEST_EXIT_CODE=$?
