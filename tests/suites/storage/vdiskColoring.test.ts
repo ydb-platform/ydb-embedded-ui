@@ -719,7 +719,19 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(progressBar).toHaveClass(/storage-disk-progress-bar_grey(?:\s|$)/);
             await expect(progressBar).not.toHaveClass(/storage-disk-progress-bar_light-grey/);
             await expect(progressBar).toContainText('N/D');
-            await expect(progressBar.locator('.storage-disk-progress-bar__icon')).toHaveCount(0);
+            const icon = progressBar.locator('.storage-disk-progress-bar__icon');
+            if (mode.value === PDisksGroupBy.Drive) {
+                await expect(icon).toBeVisible();
+                const inactiveLegendItem = page
+                    .getByTestId('storage-pdisks-expert-mode-legend')
+                    .locator('.g-label')
+                    .filter({hasText: 'Inactive'});
+                expect(await getIconSvgMarkup(icon)).toBe(
+                    await getIconSvgMarkup(inactiveLegendItem),
+                );
+            } else {
+                await expect(icon).toHaveCount(0);
+            }
             await expect(progressBar.locator('.storage-disk-progress-bar__fill-bar')).toHaveCount(
                 0,
             );
@@ -1102,24 +1114,10 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 normalColor,
             );
             await expect(noWhiteboardVDisk).toHaveCSS('border-style', 'none');
-            const noWhiteboardCapacityAlertSlot = noWhiteboardVDisk.locator(
-                ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR,
-            );
-            await expect(noWhiteboardCapacityAlertSlot).toHaveCount(1);
-            await expect(noWhiteboardCapacityAlertSlot).toBeEmpty();
-            await expect(noWhiteboardCapacityAlertSlot.locator('.g-icon')).toHaveCount(0);
-            const noWhiteboardFrontQueuesSlot = noWhiteboardVDisk.locator(
-                ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR,
-            );
-            await expect(noWhiteboardFrontQueuesSlot).toHaveCount(1);
-            await expect(noWhiteboardFrontQueuesSlot).toBeEmpty();
-            await expect(noWhiteboardFrontQueuesSlot.locator('.g-icon')).toHaveCount(0);
-            const noWhiteboardCompactionSlot = noWhiteboardVDisk.locator(
-                ALL_MODE_COMPACTION_SLOT_SELECTOR,
-            );
-            await expect(noWhiteboardCompactionSlot).toHaveCount(1);
-            await expect(noWhiteboardCompactionSlot).toBeEmpty();
-            await expect(noWhiteboardCompactionSlot.locator('.g-icon')).toHaveCount(0);
+            await expect(
+                noWhiteboardVDisk.locator('.storage-disk-progress-bar__all-mode-indicators'),
+            ).toHaveCount(0);
+            await expect(noWhiteboardVDisk.locator('.g-icon')).toHaveCount(0);
 
             await forceHoverStorageGroupVDiskItems(page, 0);
 
@@ -1203,24 +1201,25 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
         const targetPDiskBar = getPDiskProgressBar(targetPDiskItem);
 
         await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-drive/);
-        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_red/);
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_grey(?:\s|$)/);
         await expect(targetPDiskBar.locator('.storage-disk-progress-bar__icon')).toHaveCount(1);
-        await expect(targetPDiskBar).not.toContainText('N/D');
+        await expect(targetPDiskBar).toContainText('N/D');
 
         await pDiskSelector.getByRole('radio', {name: 'Decommit'}).check();
 
         await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-decommit/);
-        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_red/);
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_grey(?:\s|$)/);
         await expect(targetPDiskBar.locator('.storage-disk-progress-bar__icon')).toHaveCount(1);
-        await expect(targetPDiskBar).not.toContainText('N/D');
+        await expect(targetPDiskBar).toContainText('N/D');
 
         await pDiskSelector.getByRole('radio', {name: 'All'}).check();
 
         await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-all/);
-        await expect(targetPDiskBar).not.toContainText('N/D');
+        await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_grey(?:\s|$)/);
+        await expect(targetPDiskBar).toContainText('N/D');
         await expect(
             targetPDiskBar.locator(PDISK_ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR).locator('.g-icon'),
-        ).toHaveCount(1);
+        ).toHaveCount(0);
         await expect(
             targetPDiskBar.locator(PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR).locator('.g-icon'),
         ).toHaveCount(1);
@@ -1232,7 +1231,7 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
         ).toHaveCount(1);
         await expect(
             targetPDiskBar.locator(PDISK_ALL_MODE_DEVICE_SLOT_SELECTOR).locator('.g-icon'),
-        ).toHaveCount(2);
+        ).toHaveCount(0);
         await expect(targetPDiskItem.locator('.pdisk-storage__content')).toHaveAttribute(
             'aria-label',
             /Drive: BROKEN\. Decommit: DECOMMIT_IMMINENT\. Maintenance: LONG_TERM_MAINTENANCE_PLANNED\./,
@@ -1254,40 +1253,12 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
         const healthyOverlay = healthyPDiskBar.locator(
             '.storage-disk-progress-bar__pdisk-all-mode-indicators',
         );
-        const healthyOverlaySlots = healthyOverlay.locator(':scope > *');
 
         await expect(healthyPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-all/);
         expect((await healthyPDiskItem.boundingBox())?.width).toBe(98);
-        await expect(healthyOverlaySlots).toHaveCount(5);
-        await expect(healthyOverlaySlots.nth(0)).toHaveClass(
-            /pdisk-all-mode-capacity-alert-indicator-slot/,
-        );
-        await expect(healthyOverlaySlots.nth(1)).toHaveClass(/pdisk-all-mode-drive-indicator-slot/);
-        await expect(healthyOverlaySlots.nth(2)).toHaveClass(
-            /pdisk-all-mode-decommit-indicator-slot/,
-        );
-        await expect(healthyOverlaySlots.nth(3)).toHaveClass(
-            /pdisk-all-mode-maintenance-indicator-slot/,
-        );
-        await expect(healthyOverlaySlots.nth(4)).toHaveClass(
-            /pdisk-all-mode-device-indicator-slot/,
-        );
         // GREEN/CYAN capacity alerts are hidden by the default PDisk All legend selection.
-        await expect(
-            healthyPDiskBar.locator(PDISK_ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR),
-        ).toBeEmpty();
-        await expect(
-            healthyPDiskBar.locator(PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR).locator('.g-icon'),
-        ).toHaveCount(0);
-        await expect(
-            healthyPDiskBar.locator(PDISK_ALL_MODE_DECOMMIT_SLOT_SELECTOR).locator('.g-icon'),
-        ).toHaveCount(0);
-        await expect(
-            healthyPDiskBar.locator(PDISK_ALL_MODE_MAINTENANCE_SLOT_SELECTOR).locator('.g-icon'),
-        ).toHaveCount(0);
-        await expect(
-            healthyPDiskBar.locator(PDISK_ALL_MODE_DEVICE_SLOT_SELECTOR).locator('.g-icon'),
-        ).toHaveCount(0);
+        await expect(healthyOverlay).toHaveCount(0);
+        await expect(healthyPDiskBar.locator('.g-icon')).toHaveCount(0);
         const healthyAccessibleName = new RegExp(
             `PDisk 7010-110\\. Health: healthy\\. State: Normal\\. ` +
                 `Capacity alert: ${ECapacityAlert.GREEN}\\. Drive: ACTIVE\\. ` +
@@ -1302,6 +1273,21 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
         await expect(errorPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-all/);
         await expect(errorPDiskBar).toHaveClass(/storage-disk-progress-bar_red/);
         await expect(errorPDiskBar).toHaveClass(/storage-disk-progress-bar_all-mode-has-issues/);
+        const errorOverlaySlots = errorPDiskBar.locator(
+            '.storage-disk-progress-bar__pdisk-all-mode-indicators > *',
+        );
+        await expect(errorOverlaySlots).toHaveCount(5);
+        await expect(errorOverlaySlots.nth(0)).toHaveClass(
+            /pdisk-all-mode-capacity-alert-indicator-slot/,
+        );
+        await expect(errorOverlaySlots.nth(1)).toHaveClass(/pdisk-all-mode-drive-indicator-slot/);
+        await expect(errorOverlaySlots.nth(2)).toHaveClass(
+            /pdisk-all-mode-decommit-indicator-slot/,
+        );
+        await expect(errorOverlaySlots.nth(3)).toHaveClass(
+            /pdisk-all-mode-maintenance-indicator-slot/,
+        );
+        await expect(errorOverlaySlots.nth(4)).toHaveClass(/pdisk-all-mode-device-indicator-slot/);
         await expect(errorPDiskBar.locator(PDISK_ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR)).toHaveText(
             'Y',
         );
@@ -1344,14 +1330,16 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
         await expect(
             missingPDiskBar.locator(PDISK_ALL_MODE_CAPACITY_ALERT_SLOT_SELECTOR),
         ).toBeEmpty();
-        await expect(missingPDiskBar.locator(PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR)).toBeEmpty();
+        await expect(
+            missingPDiskBar.locator(PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR).locator('.g-icon'),
+        ).toHaveCount(1);
         await expect(missingPDiskBar.locator(PDISK_ALL_MODE_DECOMMIT_SLOT_SELECTOR)).toBeEmpty();
         await expect(missingPDiskBar.locator(PDISK_ALL_MODE_MAINTENANCE_SLOT_SELECTOR)).toBeEmpty();
         await expect(missingPDiskBar.locator(PDISK_ALL_MODE_DEVICE_SLOT_SELECTOR)).toBeEmpty();
-        await expect(missingPDiskBar.locator('.g-icon')).toHaveCount(0);
+        await expect(missingPDiskBar.locator('.g-icon')).toHaveCount(1);
         await expect(missingPDiskItem.locator('.pdisk-storage__content')).toHaveAttribute(
             'aria-label',
-            /PDisk 7009-109\. Health: N\/D\. State: N\/D\. Capacity alert: N\/D\. Drive: N\/D\. Decommit: N\/D\. Maintenance: N\/D\. Device: N\/D\. Realtime: N\/D\. Allocated: N\/D\./,
+            /PDisk 7009-109\. Health: N\/D\. State: N\/D\. Capacity alert: N\/D\. Drive: INACTIVE\. Decommit: N\/D\. Maintenance: N\/D\. Device: N\/D\. Realtime: N\/D\. Allocated: 50%\./,
         );
     });
 

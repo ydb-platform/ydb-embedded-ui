@@ -71,6 +71,7 @@ describe('prepareWhiteboardVDiskData', () => {
         } as const as TVDiskStateInfo;
 
         const expectedResult = {
+            HasWhiteboardData: true,
             StringifiedId: '0-1-0-0-0',
             VDiskId: {
                 GroupID: 0,
@@ -151,6 +152,7 @@ describe('prepareWhiteboardVDiskData', () => {
         } as const as TVSlotId;
 
         const expectedResult = {
+            HasWhiteboardData: false,
             NodeId: 1,
             PDiskId: 2,
             VDiskSlotId: 3,
@@ -195,6 +197,7 @@ describe('prepareWhiteboardPDiskData', () => {
         } as const as TPDiskStateInfo;
 
         const expectedResult = {
+            HasWhiteboardData: true,
             PDiskId: 1,
             NodeId: 1,
             StringifiedId: '1-1',
