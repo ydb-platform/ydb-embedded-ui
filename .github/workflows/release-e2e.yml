@@ -71,7 +71,6 @@ jobs:
           name: release-e2e-provenance
           path: release-artifacts
       - name: Start release local-ydb
-        id: ydb
         uses: astandrik/setup-local-ydb@07ceb4e25e2fcefd51c9cad5b6ee396767ef030b # v1.1.0
         with:
           version: ${{ inputs.ydb_tag }}
@@ -81,7 +80,6 @@ jobs:
           monitoring-port: 8765
           container-prefix: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
       - name: Verify running image and served UI
-        id: identity
         run: node controller/.github/workflows/scripts/release-e2e-report.js verify release-artifacts/provenance.json "$YDB_CONTAINER"
         env:
           YDB_CONTAINER: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}-static
@@ -96,23 +94,20 @@ jobs:
           PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}
           PLAYWRIGHT_RELEASE_VERSION: ${{ needs.resolve.outputs.playwright_version }}
           PLAYWRIGHT_RELEASE_OUTPUT: ${{ github.workspace }}/ui
-      - name: Record shard result and diagnostics
-        id: record
+      - name: Collect diagnostics and sanitize artifacts
+        id: sanitize
         if: always()
         run: |
           mkdir -p release-artifacts
-          node controller/.github/workflows/scripts/release-e2e-report.js record
           if [ "$TEST_OUTCOME" != success ]; then
             docker logs --tail 1000 "$YDB_CONTAINER" > release-artifacts/local-ydb.log 2>&1 || true
           fi
+          node controller/.github/workflows/scripts/release-e2e-report.js sanitize ui
         env:
-          SHARD: ${{ matrix.shard }}
-          SETUP_OUTCOME: ${{ steps.ydb.outcome }}
-          IDENTITY_OUTCOME: ${{ steps.identity.outcome }}
           TEST_OUTCOME: ${{ steps.tests.outcome }}
           YDB_CONTAINER: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}-static
       - name: Upload shard reports
-        if: always() && steps.record.outcome == 'success'
+        if: always() && steps.sanitize.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: release-e2e-shard-${{ matrix.shard }}
@@ -145,9 +140,7 @@ jobs:
       - name: Collect shard reports
         id: collect
         if: always()
-        run: |
-          mkdir -p release-artifacts
-          node controller/.github/workflows/scripts/release-e2e-report.js collect downloaded ui/all-blob-reports
+        run: node controller/.github/workflows/scripts/release-e2e-report.js collect downloaded ui/all-blob-reports
       - name: Merge with the test version of Playwright
         if: needs.resolve.result == 'success' && steps.collect.outputs.has_blobs == 'true'
         run: bash controller/scripts/playwright-docker.sh
@@ -164,13 +157,16 @@ jobs:
       - name: Summarize completeness and test results
         if: always()
         run: node controller/.github/workflows/scripts/release-e2e-report.js summarize
+        env:
+          REPORT_SHARDS: ${{ steps.collect.outputs.shards }}
+          TEST_JOBS_RESULT: ${{ needs.e2e.result }}
+          SANITIZE_RESULT: ${{ steps.sanitize.outcome }}
       - name: Upload complete or partial report
         if: always() && steps.sanitize.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: release-e2e-report
           path: |
-            release-artifacts/
             ui/playwright-artifacts/
-            downloaded/
+            downloaded/release-e2e-provenance/
           retention-days: 30

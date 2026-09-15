@@ -163,9 +163,11 @@ uploading and make the report incomplete. It does not replace embedded
 assets, filter tests or update snapshots. Tests requiring development-only UI
 overrides can fail; adapting those tests is a separate task.
 
-The `release-e2e-report` artifact contains the HTML/JSON reports, release identity,
-shard completeness and failure diagnostics, retained for 30 days. Missing shards,
-setup failures and empty results produce an incomplete run, never a pass. The
+The `release-e2e-report` artifact contains the standard Playwright HTML/JSON reports
+and release identity; individual shard artifacts retain container logs and raw
+results. All artifacts are retained for 30 days. A short GitHub job summary shows
+test counts and shard completeness. Missing shards, setup failures
+and empty results produce an incomplete run, never a pass. The
 release CI integration is non-blocking: this workflow reports actual failures,
 while release acceptance and deployment retain their existing dependencies.
 
