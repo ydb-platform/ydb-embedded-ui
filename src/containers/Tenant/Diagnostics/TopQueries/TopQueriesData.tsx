@@ -165,7 +165,13 @@ export const TopQueriesData = ({
             <TableWithControlsLayout.Table>
                 <QueriesTableWithDrawer
                     getKeyboardRowKey={(row) =>
-                        JSON.stringify([database, row.IntervalEnd, row.EndTime, row.QueryText])
+                        JSON.stringify([
+                            database,
+                            row.Rank,
+                            row.IntervalEnd,
+                            row.EndTime,
+                            row.QueryText,
+                        ])
                     }
                     columns={columnsToShow}
                     data={rows || []}
