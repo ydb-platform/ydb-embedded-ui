@@ -1,12 +1,16 @@
 import {EPQPartitionStrategyType} from '../../../../../../types/api/schema';
 import type {
     TEvDescribeSchemeResult,
+    TPQPartitionConfig,
     TPQPartitionStrategy,
 } from '../../../../../../types/api/schema';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../../utils/constants';
 import {prepareTopicSchemaInfo} from '../prepareTopicSchemaInfo';
 
-const buildDescribe = (partitionStrategy?: TPQPartitionStrategy): TEvDescribeSchemeResult =>
+const buildDescribe = (
+    partitionStrategy?: TPQPartitionStrategy,
+    partitionConfig: Partial<TPQPartitionConfig> = {LifetimeSeconds: 3600},
+): TEvDescribeSchemeResult =>
     ({
         PathDescription: {
             PersQueueGroup: {
@@ -14,7 +18,7 @@ const buildDescribe = (partitionStrategy?: TPQPartitionStrategy): TEvDescribeSch
                 TotalGroupCount: 1,
                 Partitions: [{PartitionId: 0}],
                 PQTabletConfig: {
-                    PartitionConfig: {LifetimeSeconds: 3600},
+                    PartitionConfig: partitionConfig,
                     PartitionStrategy: partitionStrategy,
                 },
             },
@@ -22,6 +26,69 @@ const buildDescribe = (partitionStrategy?: TPQPartitionStrategy): TEvDescribeSch
     }) as unknown as TEvDescribeSchemeResult;
 
 describe('prepareTopicSchemaInfo', () => {
+    it('keeps the partition count and shows a retention placeholder without PQTabletConfig', () => {
+        const data = buildDescribe();
+        delete data.PathDescription?.PersQueueGroup?.PQTabletConfig;
+
+        expect(prepareTopicSchemaInfo(data)).toEqual([
+            {label: 'Partitions count', value: '1'},
+            {label: 'Retention', value: EMPTY_DATA_PLACEHOLDER},
+        ]);
+    });
+
+    it('keeps partitioning and autopartitioning rows without PartitionConfig', () => {
+        const data = buildDescribe({
+            PartitionStrategyType: EPQPartitionStrategyType.CAN_SPLIT_AND_MERGE,
+            MinPartitionCount: 2,
+            MaxPartitionCount: 10,
+        });
+        delete data.PathDescription?.PersQueueGroup?.PQTabletConfig?.PartitionConfig;
+
+        expect(prepareTopicSchemaInfo(data)).toEqual([
+            {label: 'Partitions count', value: '1'},
+            {label: 'Retention', value: EMPTY_DATA_PLACEHOLDER},
+            {label: 'Autopartitioning', value: 'Up and down'},
+            {label: 'Min partitions count', value: '2'},
+            {label: 'Max partitions count', value: '10'},
+        ]);
+    });
+
+    it.each([undefined, NaN, Infinity, -Infinity])(
+        'keeps available topic settings and shows a placeholder when retention is %s',
+        (lifetimeSeconds) => {
+            const data = buildDescribe(
+                {
+                    PartitionStrategyType: EPQPartitionStrategyType.CAN_SPLIT_AND_MERGE,
+                    MinPartitionCount: 2,
+                    MaxPartitionCount: 10,
+                },
+                {
+                    LifetimeSeconds: lifetimeSeconds,
+                    StorageLimitBytes: '2000000',
+                    WriteSpeedInBytesPerSecond: '1000000',
+                },
+            );
+
+            expect(prepareTopicSchemaInfo(data)).toEqual(
+                expect.arrayContaining([
+                    {label: 'Partitions count', value: '1'},
+                    {label: 'Retention', value: EMPTY_DATA_PLACEHOLDER},
+                    {label: 'Retention storage', value: '2 MB'},
+                    {label: 'Partitions write speed', value: '1 MB/s'},
+                    {label: 'Autopartitioning', value: 'Up and down'},
+                    {label: 'Min partitions count', value: '2'},
+                    {label: 'Max partitions count', value: '10'},
+                ]),
+            );
+        },
+    );
+
+    it('renders zero retention as a value instead of a placeholder', () => {
+        const info = prepareTopicSchemaInfo(buildDescribe(undefined, {LifetimeSeconds: 0}));
+
+        expect(info).toEqual(expect.arrayContaining([{label: 'Retention', value: '0 hours'}]));
+    });
+
     it('shows autopartitioning strategy and bounds when enabled', () => {
         const info = prepareTopicSchemaInfo(
             buildDescribe({
