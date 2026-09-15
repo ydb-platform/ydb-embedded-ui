@@ -188,7 +188,7 @@ const TenantsTableContent = ({
             );
 
             if (isExternalLink) {
-                window.location.assign(tenantPath);
+                window.open(tenantPath, '_blank', 'noopener,noreferrer');
                 return;
             }
 
