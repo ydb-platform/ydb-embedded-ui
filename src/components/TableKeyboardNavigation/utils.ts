@@ -1,5 +1,7 @@
-export const KEYBOARD_FOCUSED_ROW_CLASS_NAME = 'ydb-keyboard-focused-row';
-export const KEYBOARD_FOCUS_ACTIVE_CLASS_NAME = 'ydb-keyboard-focus-active';
+import {cn} from '../../utils/cn';
+
+export const KEYBOARD_FOCUSED_ROW_CLASS_NAME = cn('ydb-keyboard-focused-row')();
+export const KEYBOARD_FOCUS_ACTIVE_CLASS_NAME = cn('ydb-keyboard-focus-active')();
 
 function isTextInput(target: HTMLElement) {
     if (target.tagName !== 'INPUT') {
