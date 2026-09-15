@@ -6,6 +6,7 @@ import {Helmet} from 'react-helmet-async';
 
 import {componentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
 import {FullscreenProvider} from '../../components/Fullscreen/FullscreenContext';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {useTypedSelector} from '../../utils/hooks';
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
 
@@ -27,7 +28,7 @@ export interface AppProps {
 }
 
 function App({store, history, children, userSettings, appTitle = defaultAppTitle}: AppProps) {
-    const ChatPanel = componentsRegistry.get('ChatPanel');
+    const ChatPanel = uiFactory.renderChatPanel ?? componentsRegistry.get('ChatPanel');
 
     return (
         <Providers store={store} history={history} appTitle={appTitle}>
