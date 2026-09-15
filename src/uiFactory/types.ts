@@ -51,7 +51,6 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     renderEvents?: RenderEvents;
     renderMonitoring?: RenderMonitoring;
     renderNodeTooltipActions?: RenderNodeTooltipActions;
-    /** Renders the shared chat inside the application providers. */
     renderChatPanel?: RenderChatPanel;
     clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
