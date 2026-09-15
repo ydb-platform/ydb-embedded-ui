@@ -22,6 +22,7 @@ export interface ResizeableDataTableProps<T> extends Omit<DataTableProps<T>, 'th
     wrapperClassName?: string;
     onKeyboardActivate?: (row: T) => void;
     getKeyboardRowKey?: (row: T) => string | number | undefined;
+    getKeyboardRowLabel?: (row: T) => string | undefined;
 
     /**
      * Not enough meta data (settings, sizes, features, etc.) to properly render table columns
@@ -41,6 +42,7 @@ export interface ResizeableDataTableProps<T> extends Omit<DataTableProps<T>, 'th
 export function ResizeableDataTable<T>({
     onKeyboardActivate,
     getKeyboardRowKey,
+    getKeyboardRowLabel,
     rowClassName,
     wrapperClassName,
     onSortChange,
@@ -65,6 +67,7 @@ export function ResizeableDataTable<T>({
             nullBeforeNumbers={props.nullBeforeNumbers}
             onActivate={onKeyboardActivate}
             getRowKey={getKeyboardRowKey}
+            getRowLabel={getKeyboardRowLabel}
             sortOrder={props.sortOrder}
         >
             {({

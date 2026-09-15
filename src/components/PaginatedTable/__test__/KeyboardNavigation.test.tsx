@@ -6,6 +6,7 @@ import {
     TableKeyboardNavigationScope,
     useTableSearch,
 } from '../../TableKeyboardNavigation/TableKeyboardNavigation';
+import {TableWithControlsLayout} from '../../TableWithControlsLayout/TableWithControlsLayout';
 import {KeyboardNavigation} from '../KeyboardNavigation';
 import {TableRow} from '../TableRow';
 import type {Column} from '../types';
@@ -92,9 +93,13 @@ test('arrows update selection without rendering controls or cells, and data upda
 function NavigationFixture({
     withSearch,
     showRows = true,
+    getRowLabel,
+    onActivate,
 }: {
     withSearch: boolean;
     showRows?: boolean;
+    getRowLabel?: (index: number) => string | undefined;
+    onActivate?: (index: number) => void;
 }) {
     const inputRef = React.useRef<HTMLInputElement>(null);
     const tableRef = React.useRef<HTMLDivElement>(null);
@@ -105,6 +110,8 @@ function NavigationFixture({
             scrollContainerRef={tableRef}
             rowCount={2}
             rowHeight={0}
+            getRowLabel={getRowLabel}
+            onActivate={onActivate}
         >
             <input ref={inputRef} aria-label="Filter" />
             <table>
@@ -146,6 +153,44 @@ test('announces the latest selection after virtual rows mount', async () => {
         expect(screen.getByRole('status')).toHaveTextContent('Selected row 1 of 2: 0');
     });
     expect(input).toHaveFocus();
+});
+
+test('announces the supplied row label instead of cell contents', () => {
+    render(
+        <TableKeyboardNavigationScope>
+            <NavigationFixture withSearch getRowLabel={(index) => `Node ${index}`} />
+        </TableKeyboardNavigationScope>,
+    );
+    const input = screen.getByRole('textbox');
+    input.focus();
+    fireEvent.keyDown(input, {key: 'ArrowDown'});
+    expect(screen.getByRole('status').textContent).toBe('Selected row 2 of 2: Node 1');
+    expect(input).toHaveFocus();
+});
+
+test('filter changes reset selection while rerenders preserve it', () => {
+    const onActivate = jest.fn();
+    const table = (status: string[]) => (
+        <TableWithControlsLayout keyboardNavigationResetKey={JSON.stringify(status)}>
+            <NavigationFixture withSearch onActivate={onActivate} />
+        </TableWithControlsLayout>
+    );
+    const {rerender} = render(table([]));
+    const input = screen.getByRole('textbox');
+    input.focus();
+    fireEvent.keyDown(input, {key: 'ArrowDown'});
+    expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('1');
+
+    rerender(table([]));
+    fireEvent.keyDown(input, {key: 'Enter'});
+    expect(onActivate).toHaveBeenLastCalledWith(1);
+
+    rerender(table(['Green']));
+    expect(document.querySelector('.ydb-keyboard-focused-row')).toBeNull();
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+    expect(input).toHaveFocus();
+    fireEvent.keyDown(input, {key: 'Enter'});
+    expect(onActivate).toHaveBeenLastCalledWith(0);
 });
 
 test.each([

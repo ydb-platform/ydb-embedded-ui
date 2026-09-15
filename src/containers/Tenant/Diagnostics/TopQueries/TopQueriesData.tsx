@@ -137,7 +137,9 @@ export const TopQueriesData = ({
     };
 
     return (
-        <TableWithControlsLayout>
+        <TableWithControlsLayout
+            keyboardNavigationResetKey={JSON.stringify([timeFrame, filters.from, filters.to])}
+        >
             <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
                 {renderQueryModeControl()}
                 <Select

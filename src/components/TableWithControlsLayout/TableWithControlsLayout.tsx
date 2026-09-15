@@ -19,6 +19,7 @@ interface TableWithControlsLayoutItemProps {
     fullHeight?: boolean;
     keyboardNavigation?: boolean;
     inheritKeyboardNavigation?: boolean;
+    keyboardNavigationResetKey?: string;
 }
 
 export interface TableWrapperProps extends Omit<TableWithControlsLayoutItemProps, 'children'> {
@@ -34,6 +35,7 @@ export const TableWithControlsLayout = ({
     fullHeight,
     keyboardNavigation = true,
     inheritKeyboardNavigation = false,
+    keyboardNavigationResetKey,
 }: TableWithControlsLayoutItemProps) => {
     const containerRef = React.useRef<HTMLDivElement>(null);
     return (
@@ -41,6 +43,7 @@ export const TableWithControlsLayout = ({
             enabled={keyboardNavigation}
             containerRef={containerRef}
             inherit={inheritKeyboardNavigation}
+            resetKey={keyboardNavigationResetKey}
         >
             <div
                 ref={containerRef}

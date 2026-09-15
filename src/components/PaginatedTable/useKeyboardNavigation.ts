@@ -11,6 +11,7 @@ export interface KeyboardNavigationParams {
     scrollContainerRef: React.RefObject<HTMLElement>;
     onActivate?: (index: number) => void;
     getRowKey?: (index: number) => string | number | undefined;
+    getRowLabel?: (index: number) => string | undefined;
     findRowIndex?: (key: string | number, previousIndex: number) => number | undefined;
     subscribe?: (listener: () => void) => () => void;
     rowCount: number;
@@ -32,6 +33,7 @@ export function useKeyboardNavigation({
     scrollContainerRef,
     onActivate,
     getRowKey,
+    getRowLabel,
     findRowIndex,
     subscribe,
     rowCount,
@@ -50,6 +52,7 @@ export function useKeyboardNavigation({
         },
         activate: onActivate,
         getRowKey,
+        getRowLabel,
         findRowIndex,
         subscribe,
         isValidIndex: (index) => index >= 0 && index < getCount(),

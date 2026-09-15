@@ -3,7 +3,6 @@ import React from 'react';
 import {Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
 import {ClipboardButton, Flex, Link, Text} from '@gravity-ui/uikit';
 
-import {getTenantPath} from '../../routes';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
@@ -23,7 +22,7 @@ import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {InternalLink} from '../InternalLink/InternalLink';
 
 import i18n from './i18n';
-import {getTenantBackend} from './utils';
+import {getTenantLink} from './utils';
 
 import './TenantNameWrapper.scss';
 
@@ -34,6 +33,7 @@ interface TenantNameWrapperProps {
     clusterName?: string;
     additionalTenantsProps?: AdditionalTenantsProps;
     externalLink?: boolean;
+    link?: ReturnType<typeof getTenantLink>;
     onStatusClick?: (tenant: PreparedTenant, database: string | undefined) => void;
 }
 
@@ -42,6 +42,7 @@ export function TenantNameWrapper({
     clusterName,
     additionalTenantsProps,
     externalLink,
+    link: tenantLink,
     onStatusClick,
 }: TenantNameWrapperProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
@@ -51,8 +52,17 @@ export function TenantNameWrapper({
 
     const {settings} = useClusterBaseInfo();
 
-    const backend = getTenantBackend(tenant, additionalTenantsProps);
-    const isExternalLink = externalLink || Boolean(backend);
+    const {
+        href: dbUrl,
+        database,
+        isExternalLink,
+    } = tenantLink ??
+    getTenantLink({
+        tenant,
+        additionalTenantsProps,
+        externalLink,
+        useDatabaseId: uiFactory.useDatabaseId && settings?.use_meta_proxy !== false,
+    });
     const useMetaProxy = uiFactory.useMetaProxy && settings?.use_meta_proxy !== false;
 
     const legacyLinks = React.useMemo(
@@ -74,17 +84,6 @@ export function TenantNameWrapper({
         [allResolvedLinks, showMonitoring],
     );
 
-    const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
-    const database = useDatabaseId ? tenant.Id : tenant.Name;
-
-    const dbUrl = getTenantPath(
-        {
-            clusterName: tenant.Cluster,
-            database,
-            backend,
-        },
-        {withBasename: isExternalLink},
-    );
     const dbName = tenant.controlPlaneName;
     const dbPath = tenant.Name ?? i18n('context_unknown');
     const dbStatus = tenant.Overall;

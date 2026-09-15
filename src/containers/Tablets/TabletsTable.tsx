@@ -279,7 +279,10 @@ export function TabletsTable({
     const filtersActive = Boolean(tabletsSearch.trim()) || tabletTypes.length > 0;
 
     return (
-        <TableWithControlsLayout fullHeight>
+        <TableWithControlsLayout
+            fullHeight
+            keyboardNavigationResetKey={JSON.stringify(tabletTypes)}
+        >
             <TableWithControlsLayout.Controls>
                 <Search
                     tableFilter
@@ -319,6 +322,19 @@ export function TabletsTable({
                         onKeyboardActivate={openTablet}
                         getKeyboardRowKey={(tablet) =>
                             JSON.stringify([tablet.TabletId, tablet.FollowerId ?? 0])
+                        }
+                        getKeyboardRowLabel={(tablet) =>
+                            [
+                                tablet.Type,
+                                tablet.TabletId,
+                                tablet.FollowerId || isFollowerTablet(tablet)
+                                    ? i18n('value_follower', {
+                                          id: tablet.FollowerId ?? EMPTY_DATA_PLACEHOLDER,
+                                      })
+                                    : undefined,
+                            ]
+                                .filter(Boolean)
+                                .join(', ') || EMPTY_DATA_PLACEHOLDER
                         }
                         columns={columns}
                         data={filteredTablets}

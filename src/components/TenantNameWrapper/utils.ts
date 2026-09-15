@@ -1,3 +1,4 @@
+import {getTenantPath} from '../../routes';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
 
@@ -16,4 +17,29 @@ export function getTenantBackend(
         nodeId = nodeIds[index].toString();
     }
     return additionalTenantsProps.prepareTenantBackend(nodeId);
+}
+
+export function getTenantLink({
+    tenant,
+    additionalTenantsProps,
+    externalLink,
+    useDatabaseId,
+}: {
+    tenant: PreparedTenant;
+    additionalTenantsProps?: AdditionalTenantsProps;
+    externalLink?: boolean;
+    useDatabaseId?: boolean;
+}) {
+    const backend = getTenantBackend(tenant, additionalTenantsProps);
+    const isExternalLink = Boolean(externalLink || backend);
+    const database = useDatabaseId ? tenant.Id : tenant.Name;
+
+    return {
+        database,
+        isExternalLink,
+        href: getTenantPath(
+            {clusterName: tenant.Cluster, database, backend},
+            {withBasename: isExternalLink},
+        ),
+    };
 }

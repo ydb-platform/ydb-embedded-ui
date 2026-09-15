@@ -265,6 +265,9 @@ export const SavedQueries = () => {
                             <ResizeableDataTable
                                 onKeyboardActivate={handleShowPreview}
                                 getKeyboardRowKey={(query) => query.name}
+                                getKeyboardRowLabel={(query) =>
+                                    query.name || EMPTY_DATA_PLACEHOLDER
+                                }
                                 columnsWidthLSKey={SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY}
                                 columns={columns}
                                 data={filteredSavedQueries}

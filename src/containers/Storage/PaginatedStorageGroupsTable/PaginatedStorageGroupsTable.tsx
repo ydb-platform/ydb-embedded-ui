@@ -11,6 +11,7 @@ import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
 import type {GroupsGroupByField} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
 import {STORAGE_GROUPS_COLUMNS_IDS, STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
@@ -115,6 +116,7 @@ export const PaginatedStorageGroupsTable = ({
         <LoaderWrapper loading={!capabilitiesLoaded}>
             <ResizeablePaginatedTable
                 getKeyboardRowKey={(group) => group.GroupId}
+                getKeyboardRowLabel={(group) => group.GroupId?.toString() || EMPTY_DATA_PLACEHOLDER}
                 onKeyboardActivate={(group) => {
                     if (group.GroupId !== undefined) {
                         history.push(getStorageGroupPath(group.GroupId));

@@ -16,8 +16,7 @@ import {Search} from '../../components/Search';
 import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
-import {getTenantBackend} from '../../components/TenantNameWrapper/utils';
-import {getTenantPath} from '../../routes';
+import {getTenantLink} from '../../components/TenantNameWrapper/utils';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {
@@ -171,30 +170,39 @@ const TenantsTableContent = ({
         const filteredBySearch = filterTenantsBySearch(filteredByProblems, search);
 
         return filteredBySearch;
-    }, [tenants, withProblems, search]);
+    }, [tenants, withProblems, search, showWithProblemsFilter]);
+
+    const tenantLinks = React.useMemo(
+        () =>
+            new Map(
+                tenants.map((tenant) => [
+                    tenant,
+                    getTenantLink({
+                        tenant,
+                        additionalTenantsProps,
+                        externalLink: Boolean(environmentName),
+                        useDatabaseId:
+                            uiFactory.useDatabaseId && settings?.use_meta_proxy !== false,
+                    }),
+                ]),
+            ),
+        [tenants, additionalTenantsProps, environmentName, settings?.use_meta_proxy],
+    );
 
     const openTenant = React.useCallback(
         (tenant: PreparedTenant) => {
-            const backend = getTenantBackend(tenant, additionalTenantsProps);
-            const isExternalLink = Boolean(environmentName) || Boolean(backend);
-            const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
-            const tenantPath = getTenantPath(
-                {
-                    clusterName: tenant.Cluster,
-                    database: useDatabaseId ? tenant.Id : tenant.Name,
-                    backend,
-                },
-                {withBasename: isExternalLink},
-            );
-
-            if (isExternalLink) {
-                window.open(tenantPath, '_blank', 'noopener,noreferrer');
+            const link = tenantLinks.get(tenant);
+            if (!link) {
+                return;
+            }
+            if (link.isExternalLink) {
+                window.open(link.href, '_blank', 'noopener,noreferrer');
                 return;
             }
 
-            history.push(tenantPath);
+            history.push(link.href);
         },
-        [additionalTenantsProps, environmentName, history, settings?.use_meta_proxy],
+        [tenantLinks, history],
     );
 
     const renderCreateDBButton = () => {
@@ -250,6 +258,7 @@ const TenantsTableContent = ({
                         clusterName={clusterName}
                         additionalTenantsProps={additionalTenantsProps}
                         externalLink={Boolean(environmentName)}
+                        link={tenantLinks.get(row)}
                         onStatusClick={onStatusClick}
                     />
                 ),
@@ -391,6 +400,7 @@ const TenantsTableContent = ({
         handleSearchChange,
         onStatusClick,
         showPoolsColumn,
+        tenantLinks,
     ]);
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
@@ -412,6 +422,12 @@ const TenantsTableContent = ({
                     onKeyboardActivate={openTenant}
                     getKeyboardRowKey={(tenant) =>
                         JSON.stringify([tenant.Cluster, tenant.Id ?? tenant.Name])
+                    }
+                    getKeyboardRowLabel={(tenant) =>
+                        tenant.controlPlaneName ||
+                        tenant.Name ||
+                        tenant.Id ||
+                        EMPTY_DATA_PLACEHOLDER
                     }
                     columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
                     data={filteredTenants}
@@ -446,7 +462,14 @@ const TenantsTableContent = ({
 
     return (
         <div className={b('table-wrapper')}>
-            <TableWithControlsLayout fullHeight>
+            <TableWithControlsLayout
+                fullHeight
+                keyboardNavigationResetKey={JSON.stringify([
+                    withProblems,
+                    showDomainDatabase,
+                    showWithProblemsFilter,
+                ])}
+            >
                 <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
                     {renderControls()}
                 </TableWithControlsLayout.Controls>

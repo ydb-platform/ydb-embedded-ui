@@ -35,6 +35,14 @@ export function getNodeHostPath(node: PreparedNodeSystemState, database?: string
     );
 }
 
+export function getNodeHostLabel(node: PreparedNodeSystemState) {
+    return (
+        [node.NodeId, node.Host]
+            .filter((value) => value !== undefined && value !== null && value !== '')
+            .join(', ') || EMPTY_DATA_PLACEHOLDER
+    );
+}
+
 export const NodeHostWrapper = ({
     node,
     database,

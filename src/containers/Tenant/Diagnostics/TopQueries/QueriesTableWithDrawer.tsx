@@ -8,6 +8,7 @@ import type {DrawerControl} from '../../../../components/Drawer/Drawer';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import type {KeyValueRow} from '../../../../types/api/query';
 import {cn} from '../../../../utils/cn';
+import {getQueryShortText} from '../../../../utils/query';
 
 import {QueryDetailsDrawerContent} from './QueryDetails/QueryDetailsDrawerContent';
 import i18n from './i18n';
@@ -106,6 +107,7 @@ export function QueriesTableWithDrawer({
             <ResizeableDataTable
                 onKeyboardActivate={handleRowClick}
                 getKeyboardRowKey={getKeyboardRowKey}
+                getKeyboardRowLabel={(row) => getQueryShortText(row.QueryText?.toString())}
                 emptyDataMessage={emptyDataMessage || i18n('no-data')}
                 columnsWidthLSKey={columnsWidthLSKey}
                 columns={columns}
