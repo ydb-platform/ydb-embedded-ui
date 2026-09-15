@@ -92,6 +92,21 @@ describe('parseIssuesData', () => {
         expect(parseIssuesData({issues: []})).toBeUndefined();
     });
 
+    test('returns undefined when issue entries are malformed', () => {
+        expect(parseIssuesData(JSON.stringify({issues: [null]}))).toBeUndefined();
+        expect(parseIssuesData(JSON.stringify({issues: ['oops']}))).toBeUndefined();
+        expect(parseIssuesData(JSON.stringify({issues: [{message: {}}]}))).toBeUndefined();
+        expect(parseIssuesData(JSON.stringify({issues: [{issues: [null]}]}))).toBeUndefined();
+        expect(parseIssuesData(JSON.stringify({error: {message: {}}, issues: []}))).toBeUndefined();
+    });
+
+    test('accepts a nested issue tree', () => {
+        const raw = JSON.stringify({
+            issues: [{message: 'outer', issues: [{message: 'inner', issues: null}]}],
+        });
+        expect(parseIssuesData(raw)).toEqual(JSON.parse(raw));
+    });
+
     test('returns undefined when JSON is valid but not ErrorResponse', () => {
         expect(parseIssuesData(JSON.stringify({status: 'pending'}))).toBeUndefined();
         expect(parseIssuesData('{}')).toBeUndefined();
