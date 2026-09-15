@@ -1,0 +1,98 @@
+import type {Page, Route} from '@playwright/test';
+
+import {DATABASE, HIVE_ID, TABLET_ID, setupTabletObjectLinkMocks} from './tabletObjectLinkMocks';
+
+interface Options {
+    flag?: boolean;
+    capabilityError?: number;
+    tabletType?: string;
+    admin?: boolean;
+    monitoring?: boolean;
+}
+
+export async function setupTabletDevUiMocks(page: Page, options: Options) {
+    const requests: {method: string; url: string}[] = [];
+    let state = 'Active';
+    const tabletType = options.tabletType ?? 'DataShard';
+    const json = (route: Route, body: object, status = 200) =>
+        route.fulfill({status, contentType: 'application/json', body: JSON.stringify(body)});
+    const appOrigin = new URL(process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000').origin;
+
+    // Mock every non-UI origin, including popups; never forward requests to a real backend.
+    await page.context().route('**/*', (route) => {
+        if (new URL(route.request().url()).origin === appOrigin) {
+            return route.continue();
+        }
+        return json(route, {});
+    });
+    await setupTabletObjectLinkMocks(page, {tabletType: 'DataShard', isMonitoringAllowed: true});
+
+    await page.route('**/viewer/capabilities*', (route) =>
+        json(
+            route,
+            {
+                Capabilities: {},
+                Settings: {Features: {EnableTabletDevUiSecurePath: options.flag}},
+            },
+            options.capabilityError ?? 200,
+        ),
+    );
+    await page.route('**/viewer/json/whoami*', (route) =>
+        json(route, {
+            IsDatabaseAllowed: true,
+            IsViewerAllowed: true,
+            IsMonitoringAllowed: options.monitoring ?? true,
+            IsAdministrationAllowed: options.admin ?? true,
+        }),
+    );
+    await page.route('**/viewer/json/tabletinfo*', (route) => {
+        const tablet = {
+            TabletId: TABLET_ID,
+            Type: tabletType,
+            State: state,
+            Overall: 'Green',
+            Leader: true,
+            NodeId: 1,
+            HiveId: HIVE_ID,
+            TenantId: {SchemeShard: '1', PathId: '2'},
+        };
+        return json(
+            route,
+            new URL(route.request().url()).searchParams.get('merge') === 'false'
+                ? {'1': {TabletStateInfo: [tablet]}}
+                : {TabletStateInfo: [tablet]},
+        );
+    });
+    await page.context().route('**/tablets/app**', async (route) => {
+        const request = route.request();
+        const url = new URL(request.url());
+        requests.push({method: request.method(), url: request.url()});
+        if (options.admin === false && url.pathname.endsWith('/secure')) {
+            return json(route, {error: 'Forbidden'}, 403);
+        }
+        const action = url.searchParams.get('page');
+        if (action === 'StopTablet' || action === 'ResumeTablet') {
+            state = action === 'StopTablet' ? 'Stopped' : 'Active';
+            return json(route, {});
+        }
+        if (action === 'TabletInfo') {
+            return json(route, {
+                Id: TABLET_ID,
+                BoundChannels: [{}, {StoragePoolName: 'tablet-devui-test-pool'}],
+                TabletStorageInfo: {
+                    Channels: [{Channel: 1, History: [{FromGeneration: 1, GroupID: 12345}]}],
+                },
+            });
+        }
+        return route.fulfill({
+            status: 200,
+            contentType: 'text/html',
+            body: `<h1>App for ${tabletType} ${TABLET_ID}</h1>`,
+        });
+    });
+
+    return {
+        requests,
+        url: `tablet/${TABLET_ID}?database=${encodeURIComponent(DATABASE)}`,
+    };
+}

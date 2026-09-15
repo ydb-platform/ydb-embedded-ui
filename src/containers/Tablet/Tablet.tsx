@@ -14,6 +14,7 @@ import {InternalLink} from '../../components/InternalLink';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {tabletPageQueryParams, useTabletPagePath} from '../../routes';
+import {useTabletDevUiSecurePath} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {tabletApi} from '../../store/reducers/tablet';
 import {EFlag} from '../../types/api/enums';
@@ -232,8 +233,9 @@ function TabletTabs({
 
 function Channels({id, hiveId}: {id: string; hiveId: string}) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const useSecurePath = useTabletDevUiSecurePath();
     const {currentData, error, isFetching} = tabletApi.useGetAdvancedTableInfoQuery(
-        {id, hiveId},
+        {id, hiveId, useSecurePath},
         {
             pollingInterval: autoRefreshInterval,
         },

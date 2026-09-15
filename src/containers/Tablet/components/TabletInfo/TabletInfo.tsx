@@ -8,13 +8,15 @@ import {TabletUptime} from '../../../../components/UptimeViewer/UptimeViewer';
 import type {YDBDefinitionListItem} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {getDefaultNodePath, useTabletPagePath} from '../../../../routes';
-import {ETabletState} from '../../../../types/api/tablet';
+import {useTabletDevUiSecurePath} from '../../../../store/reducers/capabilities/hooks';
+import {ETabletState, EType} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
 import {cn} from '../../../../utils/cn';
 import {
     createTabletDeveloperUIHref,
     useHasDeveloperUi,
 } from '../../../../utils/developerUI/developerUI';
+import {getTabletDevUiAppPage} from '../../../../utils/developerUI/tabletDevUi';
 import {useDatabaseFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {transformPath} from '../../../Tenant/ObjectSummary/transformPath';
 import {getTabletObjectKind, hasHive} from '../../utils';
@@ -34,6 +36,7 @@ interface TabletInfoProps {
 export const TabletInfo = ({tablet, objectPath, objectDatabase}: TabletInfoProps) => {
     const getTabletPagePath = useTabletPagePath();
     const hasDeveloperUi = useHasDeveloperUi();
+    const useSecurePath = useTabletDevUiSecurePath();
     const database = useDatabaseFromQuery();
 
     const {
@@ -51,6 +54,10 @@ export const TabletInfo = ({tablet, objectPath, objectDatabase}: TabletInfoProps
     const hasHiveId = hasHive(HiveId);
     const hasUptime = State === ETabletState.Active;
     const objectKind = getTabletObjectKind(Type);
+    // These tablet types move the whole App page to the secure subtree.
+    const secureApp =
+        useSecurePath &&
+        (Type === EType.DataShard || Type === EType.Hive || Type === EType.BSController);
 
     const tabletInfo: YDBDefinitionListItem[] = [];
 
@@ -136,7 +143,10 @@ export const TabletInfo = ({tablet, objectPath, objectDatabase}: TabletInfoProps
                 <Flex direction="column" gap={3}>
                     <LinkWithIcon
                         title={tabletInfoKeyset('field_developer-ui-app')}
-                        url={createTabletDeveloperUIHref(TabletId, 'app')}
+                        url={createTabletDeveloperUIHref(
+                            TabletId,
+                            getTabletDevUiAppPage(secureApp),
+                        )}
                     />
                     <LinkWithIcon
                         title={tabletInfoKeyset('field_developer-ui-counters')}

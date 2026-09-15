@@ -8,6 +8,7 @@ import {
     createTabletDeveloperUIHref,
     createVDiskDeveloperUILink,
 } from '../developerUI';
+import {getTabletDevUiAppPage} from '../tabletDevUi';
 
 describe('Developer UI links generators', () => {
     beforeAll(() => {
@@ -292,5 +293,18 @@ describe('Developer UI links generators', () => {
                 expect(createTabletDeveloperUIHref(123)).toBe('/custom/tablets?TabletID=123');
             });
         });
+    });
+});
+
+describe('Tablet DevUI secure App composition', () => {
+    test.each([
+        [undefined, 'app'],
+        [false, 'app'],
+        [true, 'app/secure'],
+    ] as const)('selects the path for flag %s without changing host or tablet', (flag, page) => {
+        const host = '/api/meta3/proxy/cluster/test/devui/node/8';
+        expect(
+            createTabletDeveloperUIHref('101', getTabletDevUiAppPage(flag), 'TabletID', host),
+        ).toBe(`${host}/tablets/${page}?TabletID=101`);
     });
 });
