@@ -52,7 +52,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     renderMonitoring?: RenderMonitoring;
     renderNodeTooltipActions?: RenderNodeTooltipActions;
     /** Renders the shared chat inside the application providers. */
-    renderChatPanel?: () => React.ReactNode;
+    renderChatPanel?: RenderChatPanel;
     clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
     /** Defaults to true. Undefined preserves the current value when configuring the UI. */
@@ -209,6 +209,8 @@ export type RenderMonitoring = (props: {
 }) => React.ReactNode;
 
 export type RenderNodeTooltipActions = (props: {data?: PreparedStorageNode}) => React.ReactNode;
+
+export type RenderChatPanel = () => React.ReactNode;
 
 export type RenderHealthcheckAssistantAction = (
     props: HealthcheckAssistantActionProps,
