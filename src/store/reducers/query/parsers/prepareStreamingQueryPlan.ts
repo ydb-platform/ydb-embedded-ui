@@ -27,6 +27,7 @@ function isStringList(value: unknown) {
 function isRenderable(prepared: PreparedQueryData['preparedPlan']) {
     return (prepared?.nodes ?? []).every(({data}) => {
         return (
+            (data?.id === undefined || typeof data.id === 'number') &&
             (data?.name === undefined || typeof data.name === 'string') &&
             isStringList(data?.operators) &&
             isStringList(data?.tables)
