@@ -13,6 +13,7 @@ import {isPdiskActive} from '../utils';
 import './PDisks.scss';
 
 const b = cn('ydb-storage-pdisks');
+const EMPTY_VDISKS: PreparedVDisk[] = [];
 
 interface PDisksProps {
     pDisks?: PreparedPDisk[];
@@ -24,7 +25,7 @@ interface PDisksProps {
 
 export function PDisks({
     pDisks = [],
-    vDisks = [],
+    vDisks = EMPTY_VDISKS,
     viewContext,
     pDiskWidth,
     pDiskHeight,
@@ -35,6 +36,18 @@ export function PDisks({
     const isAllVDisksLayout = isStorageExpertMode && vDisksGroupBy === VDisksGroupBy.All;
     const getStoragePDiskDisplayState = useStorageNodesPDiskDisplayStateGetter();
     const getStorageVDiskDisplayState = useStorageNodesVDiskDisplayStateGetter();
+    const vDisksByPDisk = React.useMemo(() => {
+        const disksByPDisk = new Map<PreparedVDisk['PDiskId'], PreparedVDisk[]>();
+        for (const vDisk of vDisks) {
+            const disks = disksByPDisk.get(vDisk.PDiskId);
+            if (disks) {
+                disks.push(vDisk);
+            } else {
+                disksByPDisk.set(vDisk.PDiskId, [vDisk]);
+            }
+        }
+        return disksByPDisk;
+    }, [vDisks]);
 
     if (!pDisks.length) {
         return null;
@@ -45,7 +58,7 @@ export function PDisks({
             {pDisks.map((pDisk) => {
                 const id = pDisk.StringifiedId;
 
-                const relatedVDisks = vDisks.filter((vdisk) => vdisk.PDiskId === pDisk.PDiskId);
+                const relatedVDisks = vDisksByPDisk.get(pDisk.PDiskId);
 
                 const highlighted = id !== undefined && highlightedDisk === id;
 

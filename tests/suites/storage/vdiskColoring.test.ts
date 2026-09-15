@@ -18,6 +18,7 @@ import {
     MISSING_FRONT_QUEUES_VDISK_INDEX,
     MISSING_WHITEBOARD_VDISK_INDEX,
     createMockStorageGroupsResponse,
+    createMockStorageNodesResponse,
 } from './mockStorageGroups';
 import {DATABASE, setupVDiskColoringMocks} from './vdiskColoringMocks';
 
@@ -553,6 +554,71 @@ test('wheel over disk popups scrolls the page', async ({page}) => {
 
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 60_000});
+
+    test('keeps node PDisk layout stable across hover and Expert mode changes', async ({page}) => {
+        await page.setViewportSize({width: 1500, height: 1000});
+        await enableExpertMode(page, VDisksGroupBy.State);
+        await page.addInitScript(() => {
+            localStorage.setItem(
+                'storageNodesSelectedColumns',
+                JSON.stringify([
+                    {id: 'NodeId', selected: true},
+                    {id: 'PDisks', selected: true},
+                ]),
+            );
+        });
+        await setupVDiskColoringMocks(page);
+        await page.route('**/viewer/json/nodes?*', async (route) => {
+            await route.fulfill({json: createMockStorageNodesResponse()});
+        });
+
+        const url = new URL(storagePage, 'http://localhost');
+        url.searchParams.set('database', DATABASE);
+        url.searchParams.set('type', 'nodes');
+        url.searchParams.set('visible', 'all');
+        url.searchParams.set('storageExpertMode', 'true');
+        url.searchParams.set('nodesVdisksGroupBy', VDisksGroupBy.State);
+        url.searchParams.set('nodesPdisksGroupBy', PDisksGroupBy.All);
+        await page.goto(`${url.pathname}${url.search}`);
+        await hideFloatingPopups(page);
+
+        const row = page
+            .locator('.ydb-paginated-table__row')
+            .filter({has: page.getByText('7000', {exact: true})});
+        const pDisks = row.locator('.ydb-storage-pdisks__pdisks-item');
+        await expect(pDisks).toHaveCount(4);
+        const vDiskCounts = [8, 16, 24, 8];
+
+        for (const {mode, width, disksPerRow, rowHeight} of [
+            {mode: 'State', width: 165, disksPerRow: 8, rowHeight: 83},
+            {mode: 'All', width: 186, disksPerRow: 4, rowHeight: 155},
+            {mode: 'State', width: 165, disksPerRow: 8, rowHeight: 83},
+        ]) {
+            await page
+                .locator('.ydb-storage-expert-mode-panel')
+                .getByRole('radio', {name: mode, exact: true})
+                .first()
+                .check();
+            await expect(row).toHaveCSS('height', `${rowHeight}px`);
+            for (const [index, count] of vDiskCounts.entries()) {
+                const pDisk = pDisks.nth(index);
+                await expect(pDisk.locator('.pdisk-storage')).toHaveCSS('width', `${width}px`);
+                await expect(pDisk.locator('.pdisk-storage__vdisks-item')).toHaveCount(count);
+                await expect(pDisk.locator('.pdisk-storage__vdisks-row')).toHaveCount(
+                    count / disksPerRow,
+                );
+            }
+
+            const vDisk = pDisks.nth(2).locator('.pdisk-storage__vdisks-item').first();
+            const bar = getVDiskProgressBar(vDisk);
+            await vDisk.hover();
+            await expect(bar).toHaveClass(/storage-disk-progress-bar_highlighted/);
+            await page.mouse.move(0, 0);
+            await expect(bar).not.toHaveClass(/storage-disk-progress-bar_highlighted/);
+            await expect(pDisks.nth(2).locator('.pdisk-storage__vdisks-item')).toHaveCount(24);
+            await expect(row).toHaveCSS('height', `${rowHeight}px`);
+        }
+    });
 
     test('renders the PDisk State and Maintenance legends', async ({page}) => {
         await preparePage(page, VDisksGroupBy.State);

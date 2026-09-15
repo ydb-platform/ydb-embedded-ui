@@ -1,3 +1,4 @@
+import {CircleQuestionFill} from '@gravity-ui/icons';
 import type {IconData} from '@gravity-ui/uikit';
 import {Icon} from '@gravity-ui/uikit';
 
@@ -24,7 +25,11 @@ export function AllModeCapacityAlertIndicator({
 
     return (
         <Icon
-            className={b('all-mode-missing-data-indicator-icon')}
+            className={
+                indicator === CircleQuestionFill
+                    ? b('all-mode-missing-data-indicator-icon')
+                    : undefined
+            }
             data={indicator}
             size={iconSize}
         />

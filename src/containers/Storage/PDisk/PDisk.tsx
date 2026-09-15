@@ -200,6 +200,7 @@ export interface PDiskProps {
     onHidePopup?: VoidFunction;
     className?: string;
     progressBarClassName?: string;
+    // Nodes derive this width from their VDisk rows, overriding the Groups mode defaults.
     width?: number;
     delayOpen?: number;
     delayClose?: number;

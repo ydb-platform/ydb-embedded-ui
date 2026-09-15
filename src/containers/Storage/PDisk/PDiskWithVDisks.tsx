@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {chunk} from 'lodash';
 
 import {VDisk} from '../../../components/VDisk/VDisk';
@@ -46,12 +48,17 @@ export function PDiskWithVDisks({
     setHighlightedDisk,
     ...pDiskProps
 }: PDiskWithVDisksProps) {
-    const compactVDiskRows = expertMode
-        ? calculateNodeExpertVDiskRows(vDisks ?? [], width)
-        : [(vDisks ?? []).map((vDisk) => ({vDisk, width: undefined}))];
-    const vDiskRows = isAllVDisksLayout
-        ? chunk(compactVDiskRows.flat(), NODE_EXPERT_ALL_VDISKS_PER_ROW)
-        : compactVDiskRows;
+    const vDiskRows = React.useMemo(() => {
+        const compactVDiskRows = expertMode
+            ? calculateNodeExpertVDiskRows(vDisks ?? [], width)
+            : [(vDisks ?? []).map((vDisk) => ({vDisk, width: undefined}))];
+
+        // All-mode size markers use the compact allocation scale; only the fixed-width cards
+        // are regrouped into rows of four.
+        return isAllVDisksLayout
+            ? chunk(compactVDiskRows.flat(), NODE_EXPERT_ALL_VDISKS_PER_ROW)
+            : compactVDiskRows;
+    }, [expertMode, isAllVDisksLayout, vDisks, width]);
     const vDisksContent = vDisks?.length ? (
         <div className={b('vdisks', {expert: expertMode})}>
             {vDiskRows.map((row, rowIndex) => (
