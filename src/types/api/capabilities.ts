@@ -5,7 +5,7 @@ export interface CapabilitiesResponse {
     Capabilities: Record<Partial<Capability>, number>;
     Settings?: {
         Security?: Record<Partial<SecuritySetting>, boolean>;
-        Features?: Record<Partial<FeatureSetting>, boolean>;
+        Features?: Partial<Record<FeatureSetting, boolean>>;
         Database?: {
             GraphShardExists?: boolean;
         };
@@ -34,7 +34,7 @@ export type Capability =
 
 export type SecuritySetting = 'UseLoginProvider' | 'DomainLoginOnly';
 
-export type FeatureSetting = 'EnableAnalyzeLongRunningOperation';
+export type FeatureSetting = 'EnableAnalyzeLongRunningOperation' | 'EnableTabletDevUiSecurePath';
 
 export interface MetaCapabilitiesResponse {
     Capabilities: Record<Partial<MetaCapability>, number>;
