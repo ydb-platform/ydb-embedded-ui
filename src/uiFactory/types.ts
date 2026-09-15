@@ -51,6 +51,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     renderEvents?: RenderEvents;
     renderMonitoring?: RenderMonitoring;
     renderNodeTooltipActions?: RenderNodeTooltipActions;
+    renderChatPanel?: RenderChatPanel;
     clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
     /** Defaults to true. Undefined preserves the current value when configuring the UI. */
@@ -207,6 +208,8 @@ export type RenderMonitoring = (props: {
 }) => React.ReactNode;
 
 export type RenderNodeTooltipActions = (props: {data?: PreparedStorageNode}) => React.ReactNode;
+
+export type RenderChatPanel = () => React.ReactNode;
 
 export type RenderHealthcheckAssistantAction = (
     props: HealthcheckAssistantActionProps,
