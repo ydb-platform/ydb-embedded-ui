@@ -80,7 +80,6 @@ interface TableRowProps<T> {
     onRowClick?: OnRowClick<T>;
 }
 
-// Data updates still render cells; moving the keyboard highlight does not.
 const TableRowCells = typedMemo(function TableRowCells<T>({
     columns,
     row,

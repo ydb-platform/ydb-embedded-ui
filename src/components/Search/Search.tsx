@@ -16,7 +16,6 @@ interface SearchProps extends Omit<TextInputProps, 'onUpdate' | 'onChange'> {
     width?: React.CSSProperties['width'];
     debounce?: number;
     inputRef?: React.RefObject<HTMLInputElement>;
-    /** Registers this input as the global filter for the surrounding table layout. */
     tableFilter?: boolean;
 }
 

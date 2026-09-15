@@ -385,6 +385,5 @@ test('nodes: repeated arrows keep selection across chunks in a large list', asyn
         }
     }
     expect(errors).toEqual([]);
-    // Virtualization should not accumulate every visited row in the DOM.
     expect(await page.locator('[data-row-index]').count()).toBeLessThan(200);
 });

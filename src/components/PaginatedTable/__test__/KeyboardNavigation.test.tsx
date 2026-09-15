@@ -11,7 +11,6 @@ import {TableRow} from '../TableRow';
 import type {Column} from '../types';
 
 beforeEach(() => {
-    // jsdom has no layout; expose a rendered rectangle for the visibility guard.
     jest.spyOn(HTMLElement.prototype, 'getClientRects').mockReturnValue([
         new DOMRect(0, 0, 100, 20),
     ] as unknown as DOMRectList);

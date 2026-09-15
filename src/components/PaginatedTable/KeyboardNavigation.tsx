@@ -11,7 +11,6 @@ interface KeyboardNavigationProps extends Omit<KeyboardNavigationParams, 'tableR
     className?: string;
 }
 
-// Keep keyboard state outside the data table so selection does not rerender its controls/chunks.
 export function KeyboardNavigation({children, className, ...params}: KeyboardNavigationProps) {
     const keyboard = useKeyboardNavigation(params);
     const tableClassName = [

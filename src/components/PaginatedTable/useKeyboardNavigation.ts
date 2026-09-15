@@ -82,7 +82,6 @@ export function useKeyboardNavigation({
             containerRect.top + stickyTop + headRect.height,
         );
         const rowRect = row?.getBoundingClientRect();
-        // Scroll to unloaded rows as well, letting the existing chunk loader fetch them.
         const top = rowRect?.top ?? body.getBoundingClientRect().top + focusedIndex * rowHeight;
         const bottom = rowRect?.bottom ?? top + rowHeight;
         const visibleBottom = Math.min(

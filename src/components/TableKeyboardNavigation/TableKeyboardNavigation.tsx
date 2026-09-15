@@ -62,7 +62,6 @@ function resolveTable(scope: Scope, target: HTMLElement) {
     const direct = available.find((adapter) => adapter.element.contains(target));
     const fromSearch = scope.searches.has(target as HTMLInputElement);
     const fromDocument = target === document.body || target === document.documentElement;
-    // Only the registered global search may delegate text-input keys to the table.
     if (target.closest('input, [role="textbox"], [role="searchbox"]') && !fromSearch) {
         return undefined;
     }
@@ -70,7 +69,6 @@ function resolveTable(scope: Scope, target: HTMLElement) {
         return undefined;
     }
     if (fromDocument) {
-        // Back may restore focus to body. With several independent searches, do not guess.
         const searches = Array.from(
             document.querySelectorAll<HTMLInputElement>('[data-table-keyboard-search]'),
         ).filter((search) => !search.disabled && isVisible(search));
@@ -79,7 +77,6 @@ function resolveTable(scope: Scope, target: HTMLElement) {
         }
     }
     const tables = available.sort((a, b) => {
-        // compareDocumentPosition returns DOM position flags.
         // eslint-disable-next-line no-bitwise
         return a.element.compareDocumentPosition(b.element) & Node.DOCUMENT_POSITION_FOLLOWING
             ? -1
@@ -114,7 +111,6 @@ function handleKeyDown(scope: Scope, event: KeyboardEvent) {
     }
     const resolved = resolveTable(scope, event.target);
     if (!resolved) {
-        // Keep the search caret stable when filtering leaves no navigable rows.
         if (event.key !== 'Enter' && scope.searches.has(event.target as HTMLInputElement)) {
             event.preventDefault();
         }
@@ -256,7 +252,6 @@ type RowSelection = {index: number; key?: string | number};
 type Selection = RowSelection | undefined;
 const subscribeToNothing = () => () => {};
 
-// Only this boundary rerenders on selection; table controls and data stay outside it.
 export function useTableKeyboardAdapter(options: AdapterOptions) {
     const scope = React.useContext(ScopeContext);
     const [scrollRevision, setScrollRevision] = React.useState(0);
@@ -282,7 +277,6 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
                 current.key !== undefined && findRowIndex
                     ? findRowIndex(current.key, current.index)
                     : current.index;
-            // Keep the visual position when the entity disappears, clamping to the last row.
             const position = matchedIndex ?? current.index;
             const index = isValidIndex?.(position) === false ? getLast() : position;
             next = index === undefined ? undefined : {index, key: getRowKey?.(index)};
