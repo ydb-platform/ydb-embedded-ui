@@ -30,6 +30,10 @@ test('arrows and Enter activate the highlighted cluster in displayed order', asy
     await search.press('ArrowDown');
     const selected = table.locator('.ydb-keyboard-focused-row');
     await expect(selected).toContainText('Bravo');
+    await expect(page.getByRole('status').filter({hasText: 'Selected row 2 of 3:'})).toContainText(
+        'Bravo',
+    );
+    await expect(search).toBeFocused();
     const href = await selected
         .getByRole('link', {name: 'Bravo', exact: true})
         .getAttribute('href');

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 
 import {
     TableKeyboardNavigationScope,
@@ -63,6 +63,10 @@ test('arrows update selection without rendering controls or cells, and data upda
 
     const {rerender} = render(<Table />);
     const input = screen.getByRole('textbox');
+    input.focus();
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+    expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByRole('status')).toHaveAttribute('aria-atomic', 'true');
     expect(document.querySelector('.ydb-keyboard-focused-row')).toBeNull();
     Controls.mockClear();
     renderCell.mockClear();
@@ -70,8 +74,11 @@ test('arrows update selection without rendering controls or cells, and data upda
     for (let iteration = 0; iteration < 20; iteration++) {
         fireEvent.keyDown(input, {key: 'ArrowDown'});
         expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('second');
+        expect(screen.getByRole('status')).toHaveTextContent('Selected row 2 of 2: second');
+        expect(input).toHaveFocus();
         fireEvent.keyDown(input, {key: 'ArrowUp'});
         expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('first');
+        expect(screen.getByRole('status')).toHaveTextContent('Selected row 1 of 2: first');
     }
     expect(Controls).not.toHaveBeenCalled();
     expect(renderCell).not.toHaveBeenCalled();
@@ -82,7 +89,13 @@ test('arrows update selection without rendering controls or cells, and data upda
     expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('updated');
 });
 
-function NavigationFixture({withSearch}: {withSearch: boolean}) {
+function NavigationFixture({
+    withSearch,
+    showRows = true,
+}: {
+    withSearch: boolean;
+    showRows?: boolean;
+}) {
     const inputRef = React.useRef<HTMLInputElement>(null);
     const tableRef = React.useRef<HTMLDivElement>(null);
     useTableSearch(inputRef, withSearch);
@@ -96,7 +109,7 @@ function NavigationFixture({withSearch}: {withSearch: boolean}) {
             <input ref={inputRef} aria-label="Filter" />
             <table>
                 <tbody>
-                    {[0, 1].map((index) => (
+                    {(showRows ? [0, 1] : []).map((index) => (
                         <TableRow
                             key={index}
                             row={index}
@@ -110,6 +123,30 @@ function NavigationFixture({withSearch}: {withSearch: boolean}) {
         </KeyboardNavigation>
     );
 }
+
+test('announces the latest selection after virtual rows mount', async () => {
+    const {rerender} = render(
+        <TableKeyboardNavigationScope>
+            <NavigationFixture withSearch showRows={false} />
+        </TableKeyboardNavigationScope>,
+    );
+    const input = screen.getByRole('textbox');
+    input.focus();
+    fireEvent.keyDown(input, {key: 'ArrowDown'});
+    fireEvent.keyDown(input, {key: 'ArrowUp'});
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+
+    rerender(
+        <TableKeyboardNavigationScope>
+            <NavigationFixture withSearch />
+        </TableKeyboardNavigationScope>,
+    );
+
+    await waitFor(() => {
+        expect(screen.getByRole('status')).toHaveTextContent('Selected row 1 of 2: 0');
+    });
+    expect(input).toHaveFocus();
+});
 
 test.each([
     {enabled: true, withSearch: false},
