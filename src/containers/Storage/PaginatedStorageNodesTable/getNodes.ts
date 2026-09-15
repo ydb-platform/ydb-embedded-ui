@@ -12,6 +12,7 @@ import type {NodesRequestParams} from '../../../types/api/nodes';
 import {prepareSortValue} from '../../../utils/filters';
 import {getUptimeParamValue} from '../../../utils/nodes';
 import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
+import {getStorageNodesSelectionKey} from '../utils/getStorageNodesSelectionKey';
 
 export const getStorageNodes: FetchData<
     PreparedStorageNode,
@@ -44,6 +45,8 @@ export const getStorageNodes: FetchData<
 
     const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
 
+    const selectionKey = getStorageNodesSelectionKey(filters, type, storage);
+
     const response = await window.api.viewer.getNodes({
         type,
         storage,
@@ -66,5 +69,6 @@ export const getStorageNodes: FetchData<
         found: preparedResponse.found || 0,
         total: preparedResponse.total || 0,
         columnsSettings: preparedResponse.columnsSettings,
+        selectionKey,
     };
 };
