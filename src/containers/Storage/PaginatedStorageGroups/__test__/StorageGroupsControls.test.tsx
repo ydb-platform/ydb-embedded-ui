@@ -37,8 +37,8 @@ jest.mock('../../../../utils/hooks/useIsUserAllowedToMakeChanges', () => ({
     useIsUserAllowedToMakeChanges: jest.fn(),
 }));
 
-jest.mock('../../StorageExpertModePanel/StorageExpertModePanel', () => ({
-    StorageExpertModePanel: () => <div>storage expert panel</div>,
+jest.mock('../../StorageExpertModePanel/StorageGroupsExpertModePanel', () => ({
+    StorageGroupsExpertModePanel: () => <div>storage expert panel</div>,
 }));
 
 jest.mock('../../StorageTypeFilter/StorageTypeFilter', () => ({

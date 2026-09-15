@@ -1,7 +1,6 @@
 import {
     ArrowUpFromLine,
     Ban,
-    CircleExclamation,
     CircleExclamationFill,
     CircleQuestionFill,
     CircleStopFill,
@@ -11,6 +10,7 @@ import {
     ClockFill,
     HourglassStart,
     TrashBin,
+    TriangleExclamation,
     Wrench,
     Xmark,
 } from '@gravity-ui/icons';
@@ -128,7 +128,7 @@ const PDISK_DRIVE_DISPLAY_STATE: Record<EDriveStatus, PDiskStateDisplayState> = 
     },
     FAULTY: {
         severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
-        icon: CircleExclamation,
+        icon: TriangleExclamation,
     },
     BROKEN: {
         severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,

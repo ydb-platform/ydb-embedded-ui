@@ -39,6 +39,7 @@ interface StorageNodeGroupProps {
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     handleShowAllNodes: VoidFunction;
     onDataFetched: (data: any) => void;
+    rowHeight: number;
 }
 
 export const StorageNodeGroup = React.memo(function StorageNodeGroup({
@@ -55,6 +56,7 @@ export const StorageNodeGroup = React.memo(function StorageNodeGroup({
     onIsExpandedChange,
     handleShowAllNodes,
     onDataFetched,
+    rowHeight,
 }: StorageNodeGroupProps) {
     return (
         <TableGroup
@@ -82,6 +84,7 @@ export const StorageNodeGroup = React.memo(function StorageNodeGroup({
                         renderErrorMessage={renderPaginatedTableErrorMessage}
                         columns={columns}
                         initialEntitiesCount={count}
+                        rowHeight={rowHeight}
                         onDataFetched={onDataFetched}
                     />
                 }
@@ -105,7 +108,7 @@ export function GroupedStorageNodesComponent({
     const {nodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
         useStorageQueryParams();
 
-    const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
+    const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings();
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
         viewContext,
@@ -173,6 +176,7 @@ export function GroupedStorageNodesComponent({
                         onIsExpandedChange={setIsGroupExpanded}
                         handleShowAllNodes={handleShowAllNodes}
                         columns={columnsToShow}
+                        rowHeight={rowHeight}
                         onDataFetched={handleDataFetched}
                     />
                 );

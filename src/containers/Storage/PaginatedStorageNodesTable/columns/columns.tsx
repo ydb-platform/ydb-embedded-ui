@@ -54,6 +54,7 @@ export const getPDisksColumn = ({
                     vDisks={row.VDisks}
                     viewContext={viewContext}
                     pDiskWidth={columnsSettings?.pDiskWidth}
+                    pDiskHeight={columnsSettings?.pDiskHeight}
                 />
             );
         },

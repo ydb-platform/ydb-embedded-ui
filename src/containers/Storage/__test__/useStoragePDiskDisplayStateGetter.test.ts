@@ -130,37 +130,39 @@ describe('useStoragePDiskDisplayStateGetter', () => {
         });
     });
 
-    test('uses top-level BSC DriveStatus without Whiteboard in Drive mode', () => {
+    test('keeps the BSC DriveStatus icon on a no-data disk in Drive mode', () => {
         mockUsePDisksGroupByParam.mockReturnValue(PDisksGroupBy.Drive);
         const {result} = renderHook(() => useStoragePDiskDisplayStateGetter());
 
         expect(result.current({AllocatedPercent: 25, DriveStatus: 'BROKEN'})).toMatchObject({
-            severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+            severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
             icon: CircleXmark,
             mode: 'drive',
-            showNoDataPlaceholder: false,
+            isNoData: true,
+            showNoDataPlaceholder: true,
             allocatedPercent: undefined,
             width: 55,
         });
     });
 
-    test('uses top-level BSC DecommitStatus without Whiteboard in Decommit mode', () => {
+    test('keeps the BSC DecommitStatus icon on a no-data disk in Decommit mode', () => {
         mockUsePDisksGroupByParam.mockReturnValue(PDisksGroupBy.Decommit);
         const {result} = renderHook(() => useStoragePDiskDisplayStateGetter());
 
         expect(
             result.current({AllocatedPercent: 25, DecommitStatus: 'DECOMMIT_IMMINENT'}),
         ).toMatchObject({
-            severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+            severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
             icon: ArrowUpFromLine,
             mode: 'decommit',
-            showNoDataPlaceholder: false,
+            isNoData: true,
+            showNoDataPlaceholder: true,
             allocatedPercent: undefined,
             width: 55,
         });
     });
 
-    test('uses top-level BSC MaintenanceStatus without Whiteboard in Maintenance mode', () => {
+    test('keeps the BSC MaintenanceStatus icon on a no-data disk in Maintenance mode', () => {
         mockUsePDisksGroupByParam.mockReturnValue(PDisksGroupBy.Maintenance);
         const {result} = renderHook(() => useStoragePDiskDisplayStateGetter());
 
@@ -170,10 +172,11 @@ describe('useStoragePDiskDisplayStateGetter', () => {
                 MaintenanceStatus: 'LONG_TERM_MAINTENANCE_PLANNED',
             }),
         ).toMatchObject({
-            severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+            severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
             icon: Wrench,
             mode: 'maintenance',
-            showNoDataPlaceholder: false,
+            isNoData: true,
+            showNoDataPlaceholder: true,
             allocatedPercent: undefined,
             width: 55,
         });
@@ -184,7 +187,8 @@ describe('useStoragePDiskDisplayStateGetter', () => {
 
         expect(result.current({AllocatedPercent: 25})).toMatchObject({
             mode: 'space',
-            showNoDataPlaceholder: false,
+            isNoData: true,
+            showNoDataPlaceholder: true,
             allocatedPercent: 25,
             width: 55,
         });
@@ -287,7 +291,7 @@ describe('useStoragePDiskDisplayStateGetter', () => {
         expect(result.current({AllocatedPercent: 25}).allMode?.hasIssues).toBeUndefined();
     });
 
-    test('uses top-level BSC statuses in All mode without Whiteboard instead of the fully missing contract', () => {
+    test('keeps known BSC indicators without inventing Whiteboard indicators in no-data All mode', () => {
         mockUsePDisksGroupByParam.mockReturnValue(PDisksGroupBy.All);
         const {result} = renderHook(() => useStoragePDiskDisplayStateGetter());
 
@@ -300,27 +304,25 @@ describe('useStoragePDiskDisplayStateGetter', () => {
 
         expect(displayState).toMatchObject({
             severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
-            icon: CircleQuestionFill,
+            icon: undefined,
             mode: 'all',
+            isNoData: true,
             width: EXPERT_MODE_ALL_PDISK_WIDTH,
             allocatedPercent: 25,
             showAllocatedPercentLabel: false,
-            showNoDataPlaceholder: false,
-            iconPlacement: 'overlap',
+            showNoDataPlaceholder: true,
+            iconPlacement: 'inline',
             allMode: {
-                hasIssues: true,
                 indicators: {
-                    capacityAlert: CircleQuestionFill,
                     drive: CircleXmark,
                     decommit: ArrowUpFromLine,
                 },
             },
         });
+        expect(displayState.allMode?.hasIssues).toBeUndefined();
+        expect(displayState.allMode?.indicators.capacityAlert).toBeUndefined();
         expect(displayState.allMode?.indicators.maintenance).toBeUndefined();
-        expect(displayState.allMode?.indicators.device).toHaveLength(2);
-        expect(
-            displayState.allMode?.indicators.device?.every(({icon}) => icon === CircleQuestionFill),
-        ).toBe(true);
+        expect(displayState.allMode?.indicators.device).toBeUndefined();
     });
 
     test('hides only the inactive All-mode capacity indicator without suppressing issue detection', () => {

@@ -1,46 +1,82 @@
 import React from 'react';
 
 import {cn} from '../../../utils/cn';
+import {VDisksGroupBy} from '../../../utils/disks/groupBy';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
-import {PDisk} from '../PDisk/';
+import {PDiskWithVDisks} from '../PDisk/';
 import type {StorageViewContext} from '../types';
+import {useStorageNodesPDiskDisplayStateGetter} from '../useStoragePDiskDisplayStateGetter';
+import {useIsStorageExpertMode, useNodesVDisksGroupByParam} from '../useStorageQueryParams';
+import {useStorageNodesVDiskDisplayStateGetter} from '../useStorageVDiskDisplayStateGetter';
 import {isPdiskActive} from '../utils';
 
 import './PDisks.scss';
 
 const b = cn('ydb-storage-pdisks');
+const EMPTY_VDISKS: PreparedVDisk[] = [];
 
 interface PDisksProps {
     pDisks?: PreparedPDisk[];
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
     pDiskWidth?: number;
+    pDiskHeight?: number;
 }
 
-export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDisksProps) {
+export function PDisks({
+    pDisks = [],
+    vDisks = EMPTY_VDISKS,
+    viewContext,
+    pDiskWidth,
+    pDiskHeight,
+}: PDisksProps) {
     const [highlightedDisk, setHighlightedDisk] = React.useState<string | undefined>();
+    const isStorageExpertMode = useIsStorageExpertMode();
+    const vDisksGroupBy = useNodesVDisksGroupByParam();
+    const isAllVDisksLayout = isStorageExpertMode && vDisksGroupBy === VDisksGroupBy.All;
+    const getStoragePDiskDisplayState = useStorageNodesPDiskDisplayStateGetter();
+    const getStorageVDiskDisplayState = useStorageNodesVDiskDisplayStateGetter();
+    const vDisksByPDisk = React.useMemo(() => {
+        const disksByPDisk = new Map<PreparedVDisk['PDiskId'], PreparedVDisk[]>();
+        for (const vDisk of vDisks) {
+            const disks = disksByPDisk.get(vDisk.PDiskId);
+            if (disks) {
+                disks.push(vDisk);
+            } else {
+                disksByPDisk.set(vDisk.PDiskId, [vDisk]);
+            }
+        }
+        return disksByPDisk;
+    }, [vDisks]);
 
     if (!pDisks.length) {
         return null;
     }
 
     return (
-        <div className={b('pdisks-wrapper')}>
+        <div className={b('pdisks-wrapper')} style={{height: pDiskHeight}}>
             {pDisks.map((pDisk) => {
                 const id = pDisk.StringifiedId;
 
-                const relatedVDisks = vDisks.filter((vdisk) => vdisk.PDiskId === pDisk.PDiskId);
+                const relatedVDisks = vDisksByPDisk.get(pDisk.PDiskId);
 
                 const highlighted = id !== undefined && highlightedDisk === id;
 
                 return (
                     <div className={b('pdisks-item')} key={id}>
-                        <PDisk
+                        <PDiskWithVDisks
                             data={pDisk}
                             inactive={!isPdiskActive(pDisk, viewContext)}
                             vDisks={relatedVDisks}
                             viewContext={viewContext}
                             width={pDiskWidth}
+                            withIcon={isStorageExpertMode}
+                            withVDiskIcons={isStorageExpertMode}
+                            getVDiskDisplayState={getStorageVDiskDisplayState}
+                            expertMode={isStorageExpertMode}
+                            isAllVDisksLayout={isAllVDisksLayout}
+                            showTypeLabel={isStorageExpertMode}
+                            getDisplayState={getStoragePDiskDisplayState}
                             showPopup={highlighted}
                             onShowPopup={() => setHighlightedDisk(id)}
                             onHidePopup={() => setHighlightedDisk(undefined)}

@@ -76,14 +76,20 @@ const prepareStorageNodeData = (
         }).length || 0;
 
     const pDisks = PDisks?.map((pDisk) => {
-        return prepareWhiteboardPDiskData({
-            ...pDisk,
-            NodeId,
-        });
+        // In the flat nodes response, identity and sizes can also come from BSC.
+        const hasWhiteboardData =
+            pDisk.State !== undefined ||
+            pDisk.StateFlag !== undefined ||
+            pDisk.Overall !== undefined ||
+            pDisk.CreateTime !== undefined ||
+            pDisk.ChangeTime !== undefined ||
+            pDisk.Device !== undefined ||
+            pDisk.Realtime !== undefined;
+        return prepareWhiteboardPDiskData({...pDisk, NodeId}, hasWhiteboardData ? pDisk : null);
     });
     const vDisks = VDisks?.map((vDisk) => {
         return {
-            ...prepareWhiteboardVDiskData(vDisk),
+            ...prepareWhiteboardVDiskData({...vDisk, VDiskId: vDisk.VDiskId}),
             NodeId,
         };
     });

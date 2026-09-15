@@ -19,7 +19,7 @@ import {
     getStorageGroupsGroupByOptions,
 } from '../PaginatedStorageGroupsTable/columns/constants';
 import type {StorageGroupsColumn} from '../PaginatedStorageGroupsTable/columns/types';
-import {StorageExpertModePanel} from '../StorageExpertModePanel/StorageExpertModePanel';
+import {StorageGroupsExpertModePanel} from '../StorageExpertModePanel/StorageGroupsExpertModePanel';
 import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
 import {StorageVisibleEntitiesFilter} from '../StorageVisibleEntitiesFilter/StorageVisibleEntitiesFilter';
 import i18n from '../i18n';
@@ -137,7 +137,7 @@ export function StorageGroupsControls({
                 ) : null}
             </Flex>
             {canUseStorageExpertMode && isStorageExpertMode && isVDisksPDisksColumnVisible ? (
-                <StorageExpertModePanel />
+                <StorageGroupsExpertModePanel />
             ) : null}
         </Flex>
     );

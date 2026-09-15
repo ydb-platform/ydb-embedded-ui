@@ -23,7 +23,7 @@ export function StorageNodesComponent({
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
-    const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
+    const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings();
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
@@ -60,6 +60,7 @@ export function StorageNodesComponent({
                     renderErrorMessage={renderPaginatedTableErrorMessage}
                     columns={columnsToShow}
                     initialEntitiesCount={initialEntitiesCount}
+                    rowHeight={rowHeight}
                     onDataFetched={handleDataFetched}
                 />
             }

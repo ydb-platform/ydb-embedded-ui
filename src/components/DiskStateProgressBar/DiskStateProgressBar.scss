@@ -51,25 +51,16 @@
     &_expert-mode {
         --entity-state-compact-background-color: var(--entity-state-background-color);
 
-        &#{$block}_grey {
-            --entity-state-background-color: var(--g-color-base-generic-medium);
-            --entity-state-border-color: none;
-            --entity-state-fill-color: var(--g-color-base-neutral-medium);
-
-            border: none;
-
-            &#{$block}_highlighted {
-                --entity-state-background-color: var(--g-color-base-generic-medium-hover);
-                --entity-state-fill-color: var(--g-color-base-neutral-medium-hover);
-            }
-        }
-
         &#{$block}_light-grey {
             --entity-state-border-color: var(--g-color-line-generic);
             --entity-state-background-color: var(--g-color-base-neutral-light);
             --entity-state-icon-color: var(--g-color-text-secondary);
 
             border: $border-width solid var(--entity-state-border-color);
+
+            &#{$block}_striped {
+                border: none;
+            }
 
             &#{$block}_highlighted {
                 --entity-state-background-color: var(--g-color-base-neutral-light-hover);
@@ -193,22 +184,6 @@
             }
         }
 
-        &#{$block}_grey {
-            --entity-state-background-color: var(--g-color-base-neutral-medium);
-            --entity-state-border-color: none;
-            --entity-state-fill-color: var(--g-color-base-neutral-medium);
-
-            border: none;
-
-            &#{$block}_highlighted {
-                --entity-state-background-color: var(--g-color-base-neutral-medium-hover);
-                --entity-state-border-color: none;
-                --entity-state-fill-color: var(--g-color-base-neutral-medium-hover);
-
-                border: none;
-            }
-        }
-
         #{$block}__fill-bar {
             border-radius: calc(var(--disk-border-radius, var(--g-border-radius-m)) - 1px) 0 0
                 calc(var(--disk-border-radius, var(--g-border-radius-m)) - 1px);
@@ -315,16 +290,6 @@
             }
         }
 
-        &#{$block}_grey {
-            --entity-state-background-color: var(--ydb-space-no-data-bg);
-            --entity-state-fill-color: var(--ydb-space-no-data-fill-color);
-
-            &#{$block}_highlighted {
-                --entity-state-background-color: var(--ydb-space-no-data-bg-hover);
-                --entity-state-fill-color: var(--ydb-space-no-data-fill-color-hover);
-            }
-        }
-
         &#{$block}_light-grey {
             --entity-state-icon-color: var(--ydb-progress-bar-font-color);
         }
@@ -383,6 +348,23 @@
 
         &#{$block}_red {
             --entity-state-border-color: var(--g-color-line-danger);
+        }
+    }
+
+    // Keep N/D colors independent from expert mode-specific backgrounds.
+    &_grey {
+        --ydb-progress-bar-font-color: var(--g-color-text-secondary);
+        --entity-state-icon-color: var(--g-color-text-secondary);
+        --entity-state-border-color: none;
+        --entity-state-background-color: var(--g-color-base-neutral-light);
+        --entity-state-fill-color: var(--g-color-base-neutral-light);
+
+        color: var(--g-color-text-secondary);
+        border: none;
+
+        &#{$block}_highlighted {
+            --entity-state-background-color: var(--g-color-base-neutral-light-hover);
+            --entity-state-fill-color: var(--g-color-base-neutral-light-hover);
         }
     }
 
@@ -478,6 +460,8 @@
     }
 
     &__all-mode-indicators {
+        --all-mode-indicators-padding: var(--g-spacing-1);
+
         position: absolute;
         z-index: 2;
         inset: 0;
@@ -488,13 +472,20 @@
         column-gap: var(--g-spacing-1);
 
         box-sizing: border-box;
-        padding-inline: calc(var(--g-spacing-1) - $border-width);
+        padding-inline: calc(var(--all-mode-indicators-padding) - $border-width);
 
         pointer-events: none;
 
         #{$block}_grey &,
         #{$block}_striped & {
-            padding-inline: var(--g-spacing-1);
+            padding-inline: var(--all-mode-indicators-padding);
+        }
+
+        &_size_s {
+            --all-mode-indicators-padding: var(--g-spacing-half);
+
+            grid-template-columns: 14px 8px 13px;
+            column-gap: var(--g-spacing-half);
         }
     }
 
@@ -524,9 +515,14 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
+
+        &_size_s {
+            font-size: 10px;
+            line-height: 12px;
+        }
     }
 
-    &__all-mode-capacity-alert-indicator-icon {
+    &__all-mode-missing-data-indicator-icon {
         color: rgba(162, 162, 162, 1);
     }
 
@@ -580,8 +576,11 @@
         }
 
         &_compact {
+            overflow: hidden;
+
+            min-width: 0;
             margin-right: auto;
-            margin-left: var(--g-spacing-1);
+            margin-left: var(--progress-bar-compact-placeholder-margin-left, var(--g-spacing-1));
         }
     }
 
@@ -603,6 +602,10 @@
                 margin-left: -3px;
             }
         }
+    }
+
+    &__all-mode-compaction-icons_size_s {
+        margin-left: 0;
     }
 
     &__icon {

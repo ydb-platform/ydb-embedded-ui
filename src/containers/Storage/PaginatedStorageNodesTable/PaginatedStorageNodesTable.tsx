@@ -8,6 +8,7 @@ import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {cn} from '../../../utils/cn';
 import {NodesUptimeFilterValues, isUnavailableNode} from '../../../utils/nodes';
+import {STORAGE_NODES_DEFAULT_ROW_HEIGHT} from '../PaginatedStorageNodes/nodeExpertModeLayout';
 
 import {StorageNodesEmptyDataMessage} from './StorageNodesEmptyDataMessage';
 import {STORAGE_NODES_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
@@ -39,6 +40,7 @@ interface PaginatedStorageNodesTableProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;
+    rowHeight?: number;
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
 }
 
@@ -56,6 +58,7 @@ export const PaginatedStorageNodesTable = ({
     scrollContainerRef,
     renderErrorMessage,
     initialEntitiesCount,
+    rowHeight = STORAGE_NODES_DEFAULT_ROW_HEIGHT,
     onDataFetched,
 }: PaginatedStorageNodesTableProps) => {
     const tableFilters = React.useMemo(() => {
@@ -103,7 +106,7 @@ export const PaginatedStorageNodesTable = ({
             scrollContainerRef={scrollContainerRef}
             columns={columns}
             fetchData={getStorageNodes}
-            rowHeight={51}
+            rowHeight={rowHeight}
             initialEntitiesCount={initialEntitiesCount}
             renderErrorMessage={renderErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}
