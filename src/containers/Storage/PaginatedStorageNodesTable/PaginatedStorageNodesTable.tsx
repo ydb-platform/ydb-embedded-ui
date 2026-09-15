@@ -1,5 +1,8 @@
 import React from 'react';
 
+import {useHistory} from 'react-router-dom';
+
+import {getNodeHostPath} from '../../../components/NodeHostWrapper/NodeHostWrapper';
 import type {PaginatedTableData, RenderErrorMessage} from '../../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import type {NodesColumn} from '../../../components/nodesColumns/types';
@@ -58,6 +61,7 @@ export const PaginatedStorageNodesTable = ({
     initialEntitiesCount,
     onDataFetched,
 }: PaginatedStorageNodesTableProps) => {
+    const history = useHistory();
     const tableFilters = React.useMemo(() => {
         return {
             searchValue,
@@ -99,7 +103,13 @@ export const PaginatedStorageNodesTable = ({
 
     return (
         <ResizeablePaginatedTable
-            keyboardNavigationLinkSelector={'a.ydb-entity-name__name[href*="/node/"]'}
+            getKeyboardRowKey={(node) => node.NodeId}
+            onKeyboardActivate={(node) => {
+                const nodePath = getNodeHostPath(node, database);
+                if (nodePath) {
+                    history.push(nodePath);
+                }
+            }}
             columnsWidthLSKey={STORAGE_NODES_COLUMNS_WIDTH_LS_KEY}
             scrollContainerRef={scrollContainerRef}
             columns={columns}

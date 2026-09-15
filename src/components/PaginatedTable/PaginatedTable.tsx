@@ -1,10 +1,18 @@
 import React from 'react';
 
+import isEqual from 'lodash/isEqual';
+import {useStore} from 'react-redux';
+
+import type {RootState} from '../../store';
+import {tableDataApi} from '../../store/reducers/tableData';
+
+import {KeyboardNavigation} from './KeyboardNavigation';
 import {usePaginatedTableState} from './PaginatedTableContext';
 import {TableChunksRenderer} from './TableChunksRenderer';
 import {TableHead} from './TableHead';
 import type {PaginatedTableId} from './constants';
 import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
+import {getTableChunkQueryParams} from './getTableChunkQueryParams';
 import {b} from './shared';
 import type {
     Column,
@@ -16,7 +24,6 @@ import type {
     RenderEmptyDataMessage,
     RenderErrorMessage,
 } from './types';
-import {KeyboardRowContext, useKeyboardNavigation} from './useKeyboardNavigation';
 import {isSortColumnAvailable} from './utils';
 
 import './PaginatedTable.scss';
@@ -39,8 +46,10 @@ export interface PaginatedTableProps<T, F> {
     onDataFetched?: (data: PaginatedTableData<T>) => void;
     keepCache?: boolean;
     fetchOverscan?: number;
-    /** Opt in to row navigation using the selector of each row's primary link. */
-    keyboardNavigationLinkSelector?: string;
+    /** Enter activates the selected loaded data row, even when its DOM element is not mounted. */
+    onKeyboardActivate?: (row: T) => void;
+    /** Stable entity identity for keyboard selection across data refreshes. */
+    getKeyboardRowKey?: (row: T) => string | number | undefined;
 }
 
 const DEFAULT_PAGINATION_LIMIT = 20;
@@ -63,11 +72,19 @@ export const PaginatedTable = <T, F>({
     onDataFetched,
     keepCache = true,
     fetchOverscan,
-    keyboardNavigationLinkSelector,
+    onKeyboardActivate,
+    getKeyboardRowKey,
 }: PaginatedTableProps<T, F>) => {
+    const store = useStore<RootState>();
     // Get state and setters from context
-    const {tableState, setSortParams, setTotalEntities, setFoundEntities, setIsInitialLoad} =
-        usePaginatedTableState();
+    const {
+        tableState,
+        noBatching,
+        setSortParams,
+        setTotalEntities,
+        setFoundEntities,
+        setIsInitialLoad,
+    } = usePaginatedTableState();
 
     const {sortParams, foundEntities} = tableState;
     const activeSortParams = isSortColumnAvailable(sortParams, columns) ? sortParams : undefined;
@@ -81,15 +98,63 @@ export const PaginatedTable = <T, F>({
         setFilters(rawFilters);
     }, [rawFilters]);
 
-    const keyboard = useKeyboardNavigation({
-        tableRef,
-        scrollContainerRef,
-        linkSelector: keyboardNavigationLinkSelector,
-        rowCount: foundEntities,
-        rowHeight,
-        filters: rawFilters,
-        sortParams: activeSortParams,
-    });
+    const getQueryParams = (offset: number) =>
+        getTableChunkQueryParams({
+            offset,
+            limit: chunkSize,
+            fetchData,
+            filters: rawFilters,
+            sortParams: activeSortParams,
+            columns,
+            tableName,
+            noBatching,
+        });
+
+    const getRow = (index: number) => {
+        const offset = Math.floor(index / chunkSize) * chunkSize;
+        const queryParams = getQueryParams(offset);
+        const {data} = tableDataApi.endpoints.fetchTableChunk.select(queryParams)(store.getState());
+        return data?.data[index - offset] as T | undefined;
+    };
+
+    const getRowKey = (index: number) => {
+        const row = getRow(index);
+        return row === undefined ? undefined : getKeyboardRowKey?.(row);
+    };
+
+    const findRowIndex = (key: string | number, previousIndex: number) => {
+        if (getRowKey(previousIndex) === key) {
+            return previousIndex;
+        }
+        const state = store.getState();
+        const queryParams = getQueryParams(0);
+        const cachedArgs = tableDataApi.util.selectCachedArgsForQuery(state, 'fetchTableChunk');
+        for (const args of cachedArgs) {
+            // RTK Query ignores the fetch function in its cache key; offset identifies the page.
+            if (
+                !isEqual(
+                    {...args, offset: 0, fetchData: undefined},
+                    {...queryParams, fetchData: undefined},
+                )
+            ) {
+                continue;
+            }
+            const {data} = tableDataApi.endpoints.fetchTableChunk.select(args)(state);
+            const index = data?.data.findIndex((row) => getKeyboardRowKey?.(row as T) === key);
+            if (index !== undefined && index >= 0) {
+                return args.offset + index;
+            }
+        }
+        return undefined;
+    };
+
+    const activateRow = (index: number) => {
+        // An unloaded row has no action yet; Enter never schedules a later navigation.
+        const row = getRow(index);
+        if (row !== undefined) {
+            onKeyboardActivate?.(row);
+        }
+    };
 
     const handleDataFetched = React.useCallback(
         (data?: PaginatedTableData<T>) => {
@@ -152,10 +217,20 @@ export const PaginatedTable = <T, F>({
     );
 
     return (
-        <div ref={tableRef} className={b(null, containerClassName)} {...keyboard.tableProps}>
-            <KeyboardRowContext.Provider value={keyboard.focusedIndex}>
-                {renderTable()}
-            </KeyboardRowContext.Provider>
-        </div>
+        <KeyboardNavigation
+            tableRef={tableRef}
+            scrollContainerRef={scrollContainerRef}
+            onActivate={onKeyboardActivate ? activateRow : undefined}
+            getRowKey={getKeyboardRowKey ? getRowKey : undefined}
+            findRowIndex={getKeyboardRowKey ? findRowIndex : undefined}
+            subscribe={store.subscribe}
+            rowCount={foundEntities}
+            rowHeight={rowHeight}
+            filters={rawFilters}
+            sortParams={activeSortParams}
+            className={b(null, containerClassName)}
+        >
+            {renderTable()}
+        </KeyboardNavigation>
     );
 };

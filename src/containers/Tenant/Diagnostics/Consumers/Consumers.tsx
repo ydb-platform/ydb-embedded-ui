@@ -1,11 +1,13 @@
 import React from 'react';
 
 import escapeRegExp from 'lodash/escapeRegExp';
+import {useHistory} from 'react-router-dom';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
+import {TableKeyboardNavigationScope} from '../../../../components/TableKeyboardNavigation/TableKeyboardNavigation';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {
     selectPreparedConsumersData,
@@ -20,6 +22,7 @@ import {isCdcStreamEntityType} from '../../utils/schema';
 
 import {ConsumersTopicStats} from './TopicStats';
 import {CONSUMERS_COLUMNS_WIDTH_LS_KEY, columns} from './columns';
+import {getConsumerPath} from './getConsumerPath';
 import i18n from './i18n';
 
 import './Consumers.scss';
@@ -34,6 +37,8 @@ interface ConsumersProps {
 }
 
 export const Consumers = ({path, database, type, databaseFullPath}: ConsumersProps) => {
+    const history = useHistory();
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const isCdcStream = isCdcStreamEntityType(type);
     const useMetaProxy = useClusterWithProxy();
 
@@ -77,31 +82,40 @@ export const Consumers = ({path, database, type, databaseFullPath}: ConsumersPro
     }
 
     return (
-        <div className={b()}>
-            <div className={b('controls')}>
-                <Search
-                    onChange={handleSearchChange}
-                    placeholder={i18n('controls.search')}
-                    className={b('search')}
-                    value={searchValue}
-                />
-                {topic && <ConsumersTopicStats data={topic} />}
-            </div>
-            {error ? <ResponseError error={error} /> : null}
-            {consumers ? (
-                <div className={b('table-wrapper')}>
-                    <div className={b('table-content')}>
-                        <ResizeableDataTable
-                            columnsWidthLSKey={CONSUMERS_COLUMNS_WIDTH_LS_KEY}
-                            wrapperClassName={b('table')}
-                            data={dataToRender}
-                            columns={columns}
-                            settings={DEFAULT_TABLE_SETTINGS}
-                            emptyDataMessage={i18n('table.emptyDataMessage')}
-                        />
-                    </div>
+        <TableKeyboardNavigationScope containerRef={containerRef}>
+            <div ref={containerRef} data-table-keyboard-scope="" className={b()}>
+                <div className={b('controls')}>
+                    <Search
+                        tableFilter
+                        onChange={handleSearchChange}
+                        placeholder={i18n('controls.search')}
+                        className={b('search')}
+                        value={searchValue}
+                    />
+                    {topic && <ConsumersTopicStats data={topic} />}
                 </div>
-            ) : null}
-        </div>
+                {error ? <ResponseError error={error} /> : null}
+                {consumers ? (
+                    <div className={b('table-wrapper')}>
+                        <div className={b('table-content')}>
+                            <ResizeableDataTable
+                                getKeyboardRowKey={(consumer) => consumer.name}
+                                onKeyboardActivate={(consumer) => {
+                                    if (consumer.name) {
+                                        history.push(getConsumerPath(consumer.name));
+                                    }
+                                }}
+                                columnsWidthLSKey={CONSUMERS_COLUMNS_WIDTH_LS_KEY}
+                                wrapperClassName={b('table')}
+                                data={dataToRender}
+                                columns={columns}
+                                settings={DEFAULT_TABLE_SETTINGS}
+                                emptyDataMessage={i18n('table.emptyDataMessage')}
+                            />
+                        </div>
+                    </div>
+                ) : null}
+            </div>
+        </TableKeyboardNavigationScope>
     );
 };

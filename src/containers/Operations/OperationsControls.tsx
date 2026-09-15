@@ -28,6 +28,7 @@ export function OperationsControls({
     return (
         <React.Fragment>
             <Search
+                tableFilter
                 value={searchValue}
                 onChange={handleSearchChange}
                 placeholder={i18n('pleaceholder_search')}

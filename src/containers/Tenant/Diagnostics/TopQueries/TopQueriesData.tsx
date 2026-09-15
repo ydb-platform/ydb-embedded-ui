@@ -152,6 +152,7 @@ export const TopQueriesData = ({
                     defaultValue={DEFAULT_TIME_FILTER_VALUE}
                 />
                 <Search
+                    tableFilter
                     value={filters.text}
                     inputRef={inputRef}
                     onChange={handleTextSearchUpdate}
@@ -163,6 +164,9 @@ export const TopQueriesData = ({
             {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table>
                 <QueriesTableWithDrawer
+                    getKeyboardRowKey={(row) =>
+                        JSON.stringify([database, row.IntervalEnd, row.EndTime, row.QueryText])
+                    }
                     columns={columnsToShow}
                     data={rows || []}
                     isFetching={isFetching && currentData === undefined}

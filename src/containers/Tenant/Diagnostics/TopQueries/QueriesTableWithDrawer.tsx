@@ -18,6 +18,7 @@ const b = cn('kv-top-queries');
 interface SimpleTableWithDrawerProps {
     columns: Column<KeyValueRow>[];
     data: KeyValueRow[];
+    getKeyboardRowKey?: (row: KeyValueRow) => string | number | undefined;
     isFetching?: boolean;
     isLoading?: boolean;
     onRowClick?: (
@@ -40,6 +41,7 @@ interface SimpleTableWithDrawerProps {
 export function QueriesTableWithDrawer({
     columns,
     data,
+    getKeyboardRowKey,
     isFetching,
     isLoading,
     onRowClick,
@@ -102,6 +104,8 @@ export function QueriesTableWithDrawer({
             drawerControls={finalDrawerControls}
         >
             <ResizeableDataTable
+                onKeyboardActivate={handleRowClick}
+                getKeyboardRowKey={getKeyboardRowKey}
                 emptyDataMessage={emptyDataMessage || i18n('no-data')}
                 columnsWidthLSKey={columnsWidthLSKey}
                 columns={columns}

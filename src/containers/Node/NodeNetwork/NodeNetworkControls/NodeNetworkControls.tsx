@@ -23,6 +23,7 @@ export function NodeNetworkControls({
     return (
         <React.Fragment>
             <Search
+                tableFilter
                 value={searchValue}
                 onChange={onSearchChange}
                 placeholder={i18n('search-placeholder')}

@@ -61,6 +61,7 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
             onIsExpandedChange={onIsExpandedChange}
         >
             <PaginatedTableWithLayout
+                inheritKeyboardNavigation
                 initialState={{sortParams: undefined}}
                 table={
                     <PaginatedStorageGroupsTable

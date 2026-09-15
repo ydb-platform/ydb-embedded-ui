@@ -8,8 +8,8 @@ import {generateNodeMock} from './mocks';
 
 const focusedRow = '.ydb-keyboard-focused-row';
 
-async function mockList(page: Page, kind: 'nodes' | 'groups') {
-    const nodes = await generateNodeMock({offset: 0, limit: 120});
+async function mockList(page: Page, kind: 'nodes' | 'groups', totalRows = 120) {
+    const nodes = await generateNodeMock({offset: 0, limit: totalRows});
     const groups = nodes.map((_, index) => ({
         GroupId: String(9000 + index),
         PoolName: 'keyboard-test',
@@ -62,12 +62,12 @@ async function mockList(page: Page, kind: 'nodes' | 'groups') {
                     kind === 'nodes'
                         ? {
                               Nodes: rows.slice(offset, offset + limit),
-                              TotalNodes: 120,
+                              TotalNodes: totalRows,
                               FoundNodes: rows.length,
                           }
                         : {
                               StorageGroups: rows.slice(offset, offset + limit),
-                              TotalGroups: 120,
+                              TotalGroups: totalRows,
                               FoundGroups: rows.length,
                           },
             });
@@ -132,6 +132,29 @@ for (const kind of ['nodes', 'groups'] as const) {
         await expect(table.locator(primaryLink).first()).toHaveText(rowName(0));
         await page.keyboard.press('ArrowDown');
         await expect(page.locator(focusedRow)).toContainText(rowName(1));
+    });
+
+    test(`${kind}: first row stays highlighted after returning under a stationary pointer`, async ({
+        page,
+    }) => {
+        await mockList(page, kind);
+        await new PageModel(page, path).goto();
+        const table = page.locator('[data-keyboard-navigation]');
+        const firstRow = table.locator('[data-row-index="0"]');
+        await expect(firstRow.locator(primaryLink)).toHaveText(rowName(0));
+        await expect(page.locator(focusedRow)).toHaveCount(0);
+        await firstRow.hover();
+        await page.locator('input').first().focus();
+        await page.keyboard.press('ArrowDown');
+        await expect(page.locator(focusedRow)).toContainText(rowName(1));
+        const selectedBackground = await page
+            .locator(focusedRow)
+            .evaluate((row) => getComputedStyle(row).backgroundColor);
+        expect(selectedBackground).not.toBe('rgba(0, 0, 0, 0)');
+        await expect(firstRow).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+        await page.keyboard.press('ArrowUp');
+        await expect(page.locator(focusedRow)).toContainText(rowName(0));
+        await expect(firstRow).toHaveCSS('background-color', selectedBackground);
     });
 
     test(`${kind}: arrows move between expanded groups`, async ({page}) => {
@@ -249,6 +272,32 @@ for (const kind of ['nodes', 'groups'] as const) {
         await expect(page.locator(focusedRow)).toContainText(rowName(1));
     });
 
+    test(`${kind}: mouse links remain clickable after keyboard navigation`, async ({
+        page,
+    }, testInfo) => {
+        await mockList(page, kind);
+        await new PageModel(page, path).goto();
+        const firstLink = page.locator('[data-keyboard-navigation]').locator(primaryLink).first();
+        await expect(firstLink).toHaveText(rowName(0));
+        await firstLink.hover();
+        await page.keyboard.press('ArrowDown');
+        await expect(page.locator(focusedRow)).toContainText(rowName(1));
+        const href = await firstLink.getAttribute('href');
+        if (!href) {
+            throw new Error('The first row must have a navigation link');
+        }
+        await page.screenshot({path: testInfo.outputPath('native-hover.png')});
+        const destination = new URL(href, page.url());
+        await firstLink.click();
+        await expect(page).toHaveURL(
+            (url) =>
+                url.pathname === destination.pathname &&
+                Array.from(destination.searchParams).every(
+                    ([key, value]) => url.searchParams.get(key) === value,
+                ),
+        );
+    });
+
     test(`${kind}: filtering resets selection and empty lists preserve the caret`, async ({
         page,
     }) => {
@@ -285,4 +334,57 @@ test('storage nodes use the same keyboard navigation', async ({page}) => {
     await expect(page.locator(focusedRow)).toContainText('host-1.test');
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL((url) => url.pathname.startsWith('/node/2/'));
+});
+
+test('nodes: arrows do not update uptime cells', async ({page}, testInfo) => {
+    const now = new Date();
+    await page.clock.setFixedTime(now);
+    await mockList(page, 'nodes');
+    await new PageModel(page, 'cluster/nodes').goto();
+    const table = page.locator('[data-keyboard-navigation]');
+    const firstRow = table.locator('[data-row-index="0"]');
+    await expect(firstRow).toContainText('host-0.test');
+    const headers = await table.locator('thead th').allTextContents();
+    const uptimeIndex = headers.findIndex((header) => header.includes('Uptime'));
+    expect(uptimeIndex).toBeGreaterThanOrEqual(0);
+    const uptime = firstRow.locator('td').nth(uptimeIndex);
+    const initialUptime = await uptime.innerText();
+    expect(initialUptime).not.toBe('');
+    await page.clock.setFixedTime(new Date(now.getTime() + 120_000));
+    await page.locator('input').first().focus();
+    for (let iteration = 0; iteration < 10; iteration++) {
+        await page.keyboard.press('ArrowDown');
+        await expect(page.locator(focusedRow)).toContainText('host-1.test');
+        await page.keyboard.press('ArrowUp');
+        await expect(page.locator(focusedRow)).toContainText('host-0.test');
+    }
+    await expect(uptime).toHaveText(initialUptime);
+    await page.screenshot({path: testInfo.outputPath('nodes-keyboard.png')});
+});
+
+test('nodes: repeated arrows keep selection across chunks in a large list', async ({page}) => {
+    await mockList(page, 'nodes', 5000);
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    page.on('crash', () => errors.push('Page crashed'));
+    await new PageModel(page, 'cluster/nodes').goto();
+    await expect(page.getByRole('link', {name: 'host-0.test', exact: true})).toBeVisible();
+    await page.locator('input').first().focus();
+    for (let round = 0; round < 2; round++) {
+        for (let index = 1; index <= 100; index++) {
+            await page.keyboard.press('ArrowDown');
+            if (index % 20 === 0) {
+                await expect(page.locator(focusedRow)).toContainText(`host-${index}.test`);
+            }
+        }
+        for (let index = 99; index >= 0; index--) {
+            await page.keyboard.press('ArrowUp');
+            if (index % 20 === 0) {
+                await expect(page.locator(focusedRow)).toContainText(`host-${index}.test`);
+            }
+        }
+    }
+    expect(errors).toEqual([]);
+    // Virtualization should not accumulate every visited row in the DOM.
+    expect(await page.locator('[data-row-index]').count()).toBeLessThan(200);
 });

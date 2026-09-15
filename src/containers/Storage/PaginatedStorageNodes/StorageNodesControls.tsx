@@ -58,6 +58,7 @@ export function StorageNodesControls({
     return (
         <React.Fragment>
             <Search
+                tableFilter
                 value={nodesSearchValue}
                 onChange={handleTextFilterNodesChange}
                 placeholder={i18n('controls_nodes-search-placeholder')}
