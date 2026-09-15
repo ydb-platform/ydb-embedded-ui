@@ -15,6 +15,7 @@ import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
 import {DatabaseInfo} from './DatabaseInfo/DatabaseInfo';
 import {DefaultEntityInfo} from './DefaultEntityInfo';
+import {ResourcePoolInfo} from './ResourcePoolInfo';
 import {SchemaObjectInfoContainer} from './SchemaObjectInfo/SchemaObjectInfoContainer';
 import {StreamingQueryInfo} from './StreamingQueryInfo';
 import {TableInfo} from './TableInfo';
@@ -55,7 +56,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
         const pathTypeToComponent: Record<EPathType, (() => React.ReactNode) | undefined> = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
-            [EPathType.EPathTypeResourcePool]: undefined,
+            [EPathType.EPathTypeResourcePool]: () => <ResourcePoolInfo data={data} />,
             [EPathType.EPathTypeSecret]: undefined,
             [EPathType.EPathTypeTable]: renderTableInfo,
             [EPathType.EPathTypeSysView]: undefined,

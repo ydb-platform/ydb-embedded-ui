@@ -1,11 +1,16 @@
-import type React from 'react';
+import React from 'react';
 
-import {Text} from '@gravity-ui/uikit';
+import {Flex, Text} from '@gravity-ui/uikit';
 
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 
 import i18n from './i18n';
+
+/** Sentinel value meaning "no limit" for a resource-pool property. */
+const NO_LIMIT_VALUE = '-1';
 
 interface PropertyGroup {
     title: string;
@@ -32,28 +37,73 @@ const PROPERTY_GROUPS: PropertyGroup[] = [
     },
 ];
 
+function isAbsent(value: string | undefined): value is undefined | '' {
+    return value === undefined || value === '';
+}
+
 function formatValue(value: string | undefined): React.ReactNode {
-    if (value === undefined || value === '' || value === '-1') {
-        return <Text color="secondary">{i18n('value_not-set')}</Text>;
+    if (isAbsent(value)) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+    if (value === NO_LIMIT_VALUE) {
+        return <Text color="secondary">{i18n('value_no-limit')}</Text>;
     }
     return <Text variant="code-inline-2">{value}</Text>;
 }
 
-export function prepareResourcePoolItems(data: TEvDescribeSchemeResult): YDBDefinitionListItem[] {
-    const properties = data.PathDescription?.ResourcePoolDescription?.Properties?.Properties || {};
+/** Only present copyText for values that are shown as concrete numbers. */
+function getCopyText(value: string | undefined): string | undefined {
+    if (isAbsent(value) || value === NO_LIMIT_VALUE) {
+        return undefined;
+    }
+    return value;
+}
 
-    const info: YDBDefinitionListItem[] = [];
+function prepareGroupItems(
+    properties: Record<string, string>,
+    group: PropertyGroup,
+): YDBDefinitionListItem[] {
+    return group.properties.map(({key, label}) => {
+        const value = properties[key];
+        return {
+            name: label,
+            content: formatValue(value),
+            copyText: getCopyText(value),
+        };
+    });
+}
 
-    for (const group of PROPERTY_GROUPS) {
-        for (const {key, label} of group.properties) {
-            const value = properties[key];
-            info.push({
-                name: label,
-                content: formatValue(value),
-                copyText: value || undefined,
-            });
-        }
+interface ResourcePoolInfoProps {
+    data?: TEvDescribeSchemeResult;
+}
+
+/** Displays overview for ResourcePool EPathType */
+export function ResourcePoolInfo({data}: ResourcePoolInfoProps) {
+    if (!data) {
+        return null;
     }
 
-    return info;
+    const properties = data.PathDescription?.ResourcePoolDescription?.Properties?.Properties || {};
+
+    const sections = PROPERTY_GROUPS.map((group) => ({
+        title: group.title,
+        items: prepareGroupItems(properties, group),
+    })).filter((section) => section.items.length > 0);
+
+    if (sections.length === 0) {
+        return null;
+    }
+
+    return (
+        <Flex direction="column" gap={3}>
+            {sections.map((section) => (
+                <YDBDefinitionList
+                    key={section.title}
+                    title={section.title}
+                    items={section.items}
+                    responsive
+                />
+            ))}
+        </Flex>
+    );
 }
