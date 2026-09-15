@@ -8,7 +8,9 @@ for (const scenario of [
     {name: 'enabled', flag: true, suffix: 'app/secure'},
     {name: 'disabled', flag: false, suffix: 'app'},
     {name: 'missing', suffix: 'app'},
+    {name: 'not found', capabilityError: 404, suffix: 'app'},
     {name: 'unavailable', capabilityError: 503, suffix: 'app'},
+    {name: 'network error', capabilityError: 'network' as const, suffix: 'app'},
 ]) {
     test(`Tablet DevUI ${scenario.name}: Storage and stop/resume use the selected path`, async ({
         page,
@@ -55,6 +57,41 @@ for (const scenario of [
             expect(url.searchParams.get('TabletID')).toBe(HIVE_ID);
             expect(url.searchParams.get('tablet')).toBe(TABLET_ID);
         }
+    });
+}
+
+for (const scenario of [
+    {name: 'no Settings', response: {Capabilities: {}}},
+    {name: 'no Features', response: {Capabilities: {}, Settings: {}}},
+    {
+        name: 'non-boolean flag',
+        response: {
+            Capabilities: {},
+            Settings: {Features: {EnableTabletDevUiSecurePath: 'true'}},
+        },
+    },
+]) {
+    test(`Tablet DevUI ${scenario.name}: App and Storage use the legacy path`, async ({
+        page,
+        baseURL,
+    }) => {
+        const mock = await setupTabletDevUiMocks(page, {}, baseURL);
+        await page.route('**/viewer/capabilities*', (route) =>
+            route.fulfill({json: scenario.response}),
+        );
+        const tablet = new TabletPage(page);
+        await tablet.goto();
+        await expect(tablet.app).toHaveAttribute(
+            'href',
+            new RegExp(`/tablets/app\\?TabletID=${TABLET_ID}$`),
+        );
+        await tablet.storage.click();
+        await expect(tablet.storagePool).toBeVisible();
+        expect(mock.requests).toHaveLength(1);
+        const url = new URL(mock.requests[0].url);
+        expect(url.pathname).toBe('/tablets/app');
+        expect(url.searchParams.get('TabletID')).toBe(HIVE_ID);
+        expect(url.searchParams.get('tablet')).toBe(TABLET_ID);
     });
 }
 

@@ -4,7 +4,7 @@ import {HIVE_ID, TABLET_ID} from './tabletObjectLinkMocks';
 
 interface Options {
     flag?: boolean;
-    capabilityError?: number;
+    capabilityError?: number | 'network';
     tabletType?: string;
     admin?: boolean;
     monitoring?: boolean;
@@ -32,16 +32,19 @@ export async function setupTabletDevUiMocks(
     });
     await page.route('**/viewer/json/nodelist*', (route) => json(route, [{Id: 1, Host: 'node-1'}]));
 
-    await page.route('**/viewer/capabilities*', (route) =>
-        json(
+    await page.route('**/viewer/capabilities*', (route) => {
+        if (options.capabilityError === 'network') {
+            return route.abort('connectionfailed');
+        }
+        return json(
             route,
             {
                 Capabilities: {'/pdisk/info': options.diskApi ? 1 : 0},
                 Settings: {Features: {EnableTabletDevUiSecurePath: options.flag}},
             },
             options.capabilityError ?? 200,
-        ),
-    );
+        );
+    });
     await page.route('**/viewer/json/whoami*', (route) =>
         json(route, {
             IsDatabaseAllowed: true,
