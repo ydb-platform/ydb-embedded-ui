@@ -1,6 +1,13 @@
 import React from 'react';
 
-import {shouldHandleKeyboardNavigation} from './utils';
+import {cn} from '../../utils/cn';
+
+import i18n from './i18n';
+import {KEYBOARD_FOCUSED_ROW_CLASS_NAME, shouldHandleKeyboardNavigation} from './utils';
+
+import './TableKeyboardNavigation.scss';
+
+const tableKeyboardNavigationCn = cn('ydb-table-keyboard-navigation');
 
 interface Scope {
     enabled: boolean;
@@ -9,6 +16,7 @@ interface Scope {
     adapters: Set<Adapter>;
     activeAdapter?: Adapter;
     listeners: Set<() => void>;
+    announcementRef: React.RefObject<HTMLDivElement>;
 }
 
 interface Adapter {
@@ -32,6 +40,14 @@ function isVisible(element: HTMLElement) {
 function resetScope(scope: Scope) {
     scope.activeAdapter = undefined;
     scope.adapters.forEach((adapter) => adapter.select(undefined));
+    updateAnnouncement(scope, '');
+}
+
+function updateAnnouncement(scope: Scope, text: string) {
+    const announcement = scope.announcementRef.current;
+    if (announcement) {
+        announcement.textContent = text;
+    }
 }
 
 function notifyScope(scope: Scope) {
@@ -172,6 +188,7 @@ export function TableKeyboardNavigationScope({
             searches: new Set(),
             adapters: new Set(),
             listeners: new Set(),
+            announcementRef: React.createRef<HTMLDivElement>(),
         }),
         [enabled, parent, containerRef],
     );
@@ -186,7 +203,20 @@ export function TableKeyboardNavigationScope({
             document.removeEventListener('keydown', onKeyDown);
         };
     }, [scope, own, parent]);
-    return <ScopeContext.Provider value={scope}>{children}</ScopeContext.Provider>;
+    return (
+        <ScopeContext.Provider value={scope}>
+            {children}
+            {scope === own && scope.enabled && (
+                <div
+                    ref={scope.announcementRef}
+                    className={tableKeyboardNavigationCn('announcement')}
+                    role="status"
+                    aria-live="polite"
+                    aria-atomic="true"
+                />
+            )}
+        </ScopeContext.Provider>
+    );
 }
 
 export function useTableNavigationEnabled() {
@@ -341,9 +371,57 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
             scope.adapters.delete(adapter);
             if (scope.activeAdapter === adapter) {
                 scope.activeAdapter = undefined;
+                updateAnnouncement(scope, '');
             }
         };
     }, [scope, element, select, getSelected]);
+    React.useEffect(() => {
+        if (!scope || !element || scope.activeAdapter?.element !== element) {
+            return undefined;
+        }
+        updateAnnouncement(scope, '');
+        const index = selection?.index;
+        if (hover || index === undefined) {
+            return undefined;
+        }
+        const announceRow = () => {
+            if (
+                scope.activeAdapter?.element !== element ||
+                scope.activeAdapter.getSelected() !== index
+            ) {
+                return false;
+            }
+            const row = element.querySelector<HTMLElement>(
+                `tbody tr.${KEYBOARD_FOCUSED_ROW_CLASS_NAME}`,
+            );
+            const text = (row?.innerText ?? row?.textContent ?? '').replace(/\s+/g, ' ').trim();
+            const lastIndex = optionsRef.current.getLast();
+            if (!text || lastIndex === undefined) {
+                return false;
+            }
+            updateAnnouncement(
+                scope,
+                i18n('value_selected-row', {position: index + 1, total: lastIndex + 1, text}),
+            );
+            return true;
+        };
+        if (announceRow()) {
+            return undefined;
+        }
+        const observer = new MutationObserver(() => {
+            if (announceRow()) {
+                observer.disconnect();
+            }
+        });
+        observer.observe(element, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+            attributes: true,
+            attributeFilter: ['class'],
+        });
+        return () => observer.disconnect();
+    }, [scope, element, selection?.index, selection?.key, scrollRevision, hover]);
     return {
         ref,
         scrollRevision,
