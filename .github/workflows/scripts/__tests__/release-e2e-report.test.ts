@@ -1,3 +1,4 @@
+import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -16,15 +17,7 @@ const image = {
     RepoDigests: [`ghcr.io/ydb-platform/local-ydb@${provenance.image_digest}`],
     Config: {Labels: {'ydb.revision': provenance.ydb_sha}},
 };
-const shards = () =>
-    Array.from({length: 8}, (_, i) => ({
-        shard: i + 1,
-        setup: 'success',
-        identity: 'success',
-        tests: 'success',
-        image_digest: provenance.image_digest,
-        blobs: 1,
-    }));
+const context = {shards: 8, jobs: 'success', artifacts: 'success'};
 const report = {stats: {expected: 80, unexpected: 0, flaky: 0, skipped: 2}, errors: []};
 
 describe('release image proof', () => {
@@ -62,52 +55,40 @@ describe('report completeness', () => {
             expect(errors).toEqual([path.join(artifacts, 'unsafe.txt')]);
             expect(fs.readFileSync(outside, 'utf8')).toBe('private fixture');
             expect(fs.readdirSync(artifacts)).toEqual(['result.json']);
-            expect(summarize(shards(), report, provenance, errors).status).toBe('incomplete');
-            const records = shards();
-            Object.assign(records[0], {artifact_errors: errors});
-            expect(summarize(records, report, provenance).status).toBe('incomplete');
+            expect(summarize(report, provenance, {...context, artifacts: 'failure'}).status).toBe(
+                'incomplete',
+            );
         } finally {
             fs.rmSync(directory, {recursive: true, force: true});
         }
     });
     test('passes only a complete successful run', () => {
-        expect(summarize(shards(), report, provenance)).toMatchObject({
-            status: 'passed',
-            complete: true,
-        });
+        expect(summarize(report, provenance, context).status).toBe('passed');
     });
-    test('retains genuine test failures as a complete failed run', () => {
-        const records = shards();
-        records[2].tests = 'failure';
+    test('reports both test failures and job failures', () => {
         expect(
-            summarize(records, {...report, stats: {...report.stats, unexpected: 3}}, provenance),
-        ).toMatchObject({status: 'failed', complete: true});
+            summarize({...report, stats: {...report.stats, unexpected: 3}}, provenance, context)
+                .status,
+        ).toBe('failed');
+        expect(summarize(report, provenance, {...context, jobs: 'failure'}).status).toBe('failed');
     });
-    test.each(['setup', 'identity', 'tests'])('a skipped %s step cannot pass', (step) => {
-        const records = shards();
-        Object.assign(records[2], {[step]: 'skipped'});
-        expect(summarize(records, report, provenance)).toMatchObject({
-            status: 'incomplete',
-            complete: false,
-        });
+    test.each(['cancelled', 'skipped', undefined])('does not pass unfinished jobs (%s)', (jobs) => {
+        expect(summarize(report, provenance, {...context, jobs}).status).toBe('incomplete');
     });
-    test('detects missing, duplicate and wrong-image shard reports', () => {
-        for (const patch of [{blobs: 0}, {blobs: 2}, {image_digest: 'other'}]) {
-            const records = shards();
-            Object.assign(records[3], patch);
-            expect(summarize(records, report, provenance).status).toBe('incomplete');
-        }
-    });
-    test('does not greenwash missing reports, setup errors or an all-skipped run', () => {
-        expect(summarize([], report, provenance).status).toBe('incomplete');
-        expect(summarize(shards(), undefined, provenance).status).toBe('incomplete');
-        expect(summarize(shards(), report, undefined).status).toBe('incomplete');
+    test('does not pass missing identity, partial reports, setup errors or empty results', () => {
+        expect(summarize(report, provenance, {...context, shards: 7}).status).toBe('incomplete');
+        expect(summarize(undefined, provenance, context).status).toBe('incomplete');
+        expect(summarize(report, undefined, context).status).toBe('incomplete');
         expect(
-            summarize(shards(), {...report, errors: [{message: 'global setup failed'}]}, provenance)
+            summarize({...report, errors: [{message: 'global setup failed'}]}, provenance, context)
                 .status,
         ).toBe('incomplete');
         expect(
-            summarize(shards(), {...report, stats: {...report.stats, expected: 0}}, provenance)
+            summarize({...report, stats: {...report.stats, expected: 0}}, provenance, context)
+                .status,
+        ).toBe('incomplete');
+        expect(
+            summarize({...report, stats: {...report.stats, expected: -1}}, provenance, context)
                 .status,
         ).toBe('incomplete');
     });
@@ -115,20 +96,55 @@ describe('report completeness', () => {
         const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'release-e2e-test-'));
         try {
             const shard = path.join(directory, 'release-e2e-shard-1');
-            fs.mkdirSync(path.join(shard, 'release-artifacts'), {recursive: true});
             fs.mkdirSync(path.join(shard, 'ui', 'blob-report'), {recursive: true});
-            fs.writeFileSync(
-                path.join(shard, 'release-artifacts', 'shard.json'),
-                JSON.stringify(shards()[0]),
-            );
             fs.writeFileSync(path.join(shard, 'ui', 'blob-report', 'report.zip'), 'blob');
             const destination = path.join(directory, 'merged');
-            const records = collectReports(directory, destination);
-            expect(records).toHaveLength(8);
-            expect(records[0].blobs).toBe(1);
-            expect(records[1]).toMatchObject({shard: 2, blobs: 0, error: expect.any(String)});
+            expect(collectReports(directory, destination)).toEqual({shards: 1, hasBlobs: true});
             expect(fs.readdirSync(destination)).toEqual(['1-report.zip']);
-            expect(summarize(records, report, provenance).status).toBe('incomplete');
+            fs.writeFileSync(path.join(shard, 'ui', 'blob-report', 'duplicate.zip'), 'blob');
+            expect(collectReports(directory, destination)).toEqual({shards: 0, hasBlobs: true});
+        } finally {
+            fs.rmSync(directory, {recursive: true, force: true});
+        }
+    });
+    test('CLI writes a short job summary and preserves the standard report', () => {
+        const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'release-summary-test-'));
+        try {
+            const result = path.join(directory, 'ui/playwright-artifacts/test-results.json');
+            const identity = path.join(
+                directory,
+                'downloaded/release-e2e-provenance/provenance.json',
+            );
+            for (const file of [result, identity]) {
+                fs.mkdirSync(path.dirname(file), {recursive: true});
+            }
+            fs.writeFileSync(result, JSON.stringify(report));
+            fs.writeFileSync(identity, JSON.stringify(provenance));
+            const jobSummary = path.join(directory, 'job-summary.md');
+            const run = (shards: string) =>
+                execFileSync(
+                    process.execPath,
+                    [path.resolve(__dirname, '../release-e2e-report.js'), 'summarize'],
+                    {
+                        cwd: directory,
+                        env: {
+                            ...process.env,
+                            GITHUB_STEP_SUMMARY: jobSummary,
+                            REPORT_SHARDS: shards,
+                            TEST_JOBS_RESULT: 'success',
+                            SANITIZE_RESULT: 'success',
+                        },
+                    },
+                );
+            run('8');
+            expect(fs.readFileSync(jobSummary, 'utf8')).toContain('80 passed, 0 failed');
+            expect(() => run('7')).toThrow();
+            expect(fs.readFileSync(jobSummary, 'utf8')).toContain(
+                'Reports received from 7/8 shards',
+            );
+            expect(fs.readFileSync(result, 'utf8')).toBe(JSON.stringify(report));
+            expect(fs.readdirSync(path.dirname(result))).toEqual(['test-results.json']);
+            expect(fs.existsSync(path.join(directory, 'release-artifacts'))).toBe(false);
         } finally {
             fs.rmSync(directory, {recursive: true, force: true});
         }

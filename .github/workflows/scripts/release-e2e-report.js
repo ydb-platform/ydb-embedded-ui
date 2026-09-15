@@ -4,7 +4,6 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const {IMAGE_REPOSITORY} = require('./resolve-release-ui');
-const {readTestResults} = require('./utils/results');
 
 function verifyImage(provenance, container, image, index) {
     if (
@@ -22,28 +21,24 @@ function verifyImage(provenance, container, image, index) {
     return {image_id: image.Id, image_digest: provenance.image_digest, index_verified: true};
 }
 
-function collectReports(directory, destination, total = 8) {
+function collectReports(directory, destination) {
     fs.mkdirSync(destination, {recursive: true});
-    const shards = [];
-    for (let shard = 1; shard <= total; shard++) {
-        const root = path.join(directory, `release-e2e-shard-${shard}`);
-        const recordPath = path.join(root, 'release-artifacts', 'shard.json');
-        const blobPath = path.join(root, 'ui', 'blob-report');
-        const blobs = fs.existsSync(blobPath)
-            ? fs.readdirSync(blobPath).filter((file) => file.endsWith('.zip'))
+    let shards = 0;
+    let hasBlobs = false;
+    for (let shard = 1; shard <= 8; shard++) {
+        const source = path.join(directory, `release-e2e-shard-${shard}`, 'ui/blob-report');
+        const blobs = fs.existsSync(source)
+            ? fs.readdirSync(source).filter((file) => file.endsWith('.zip'))
             : [];
-        let record;
-        try {
-            record = JSON.parse(fs.readFileSync(recordPath, 'utf8'));
-        } catch {
-            record = {shard, error: 'Missing or invalid shard record'};
+        if (blobs.length === 1) {
+            shards++;
         }
         for (const file of blobs) {
-            fs.copyFileSync(path.join(blobPath, file), path.join(destination, `${shard}-${file}`));
+            fs.copyFileSync(path.join(source, file), path.join(destination, `${shard}-${file}`));
+            hasBlobs = true;
         }
-        shards.push({...record, shard, blobs: blobs.length});
     }
-    return shards;
+    return {shards, hasBlobs};
 }
 
 function sanitizeArtifacts(directory) {
@@ -65,55 +60,45 @@ function sanitizeArtifacts(directory) {
     return removed;
 }
 
-function isShardComplete(shard, provenance) {
-    return (
-        shard.setup === 'success' &&
-        shard.identity === 'success' &&
-        ['success', 'failure'].includes(shard.tests) &&
-        shard.blobs === 1 &&
-        !shard.artifact_errors?.length &&
-        shard.image_digest === provenance?.image_digest
-    );
-}
-
-function summarize(shards, report, provenance, artifactErrors = []) {
+function summarize(report, provenance, {shards, jobs, artifacts}) {
     const problems = [];
-    if (artifactErrors.length) {
-        problems.push('Unsafe report artifact files were removed');
-    }
-    if (shards.length !== 8 || new Set(shards.map((shard) => shard.shard)).size !== 8) {
-        problems.push('Expected exactly eight distinct shards');
+    if (shards !== 8) {
+        problems.push(`Reports received from ${shards}/8 shards`);
     }
     if (!provenance) {
         problems.push('Release identity could not be resolved');
     }
-    for (const shard of shards) {
-        if (!isShardComplete(shard, provenance)) {
-            problems.push(`Shard ${shard.shard}: setup, identity or report incomplete`);
-        }
+    if (artifacts !== 'success') {
+        problems.push('Artifact sanitization did not pass');
+    }
+    if (!['success', 'failure'].includes(jobs)) {
+        problems.push('Test jobs did not complete');
     }
     const stats = report?.stats;
-    if (
-        !stats ||
-        ['expected', 'unexpected', 'flaky', 'skipped'].some(
-            (key) => !Number.isInteger(stats[key]) || stats[key] < 0,
-        ) ||
-        stats.expected + stats.unexpected + stats.flaky === 0
-    ) {
+    const validStats =
+        stats &&
+        ['expected', 'unexpected', 'flaky', 'skipped'].every(
+            (key) => Number.isInteger(stats[key]) && stats[key] >= 0,
+        );
+    if (!validStats || stats.expected + stats.unexpected + stats.flaky === 0) {
         problems.push('Merged report is missing or contains no executed tests');
     }
     if (report?.errors?.length) {
         problems.push('Playwright reported errors outside individual tests');
     }
-    const complete = problems.length === 0;
-    let status = 'incomplete';
-    if (complete) {
-        status =
-            stats.unexpected || stats.flaky || shards.some((shard) => shard.tests !== 'success')
-                ? 'failed'
-                : 'passed';
+    if (problems.length) {
+        return {status: 'incomplete', summary: problems.join('\n\n')};
     }
-    return {status, complete, provenance, shards, stats, problems};
+    const status =
+        jobs === 'success' && stats.unexpected === 0 && stats.flaky === 0 ? 'passed' : 'failed';
+    return {
+        status,
+        summary: `Reports: 8/8 shards. Test jobs: ${jobs}.\n\nTests: ${stats.expected} passed, ${stats.unexpected} failed, ${stats.flaky} flaky, ${stats.skipped} skipped.`,
+    };
+}
+
+function readJson(file) {
+    return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : undefined;
 }
 
 async function main() {
@@ -132,69 +117,30 @@ async function main() {
         if (!response.ok) {
             throw new Error(`Monitoring returned HTTP ${response.status}`);
         }
-        const identity = verifyImage(provenance, container, image, await response.text());
-        fs.writeFileSync('release-artifacts/image.json', JSON.stringify(identity, null, 2));
-    } else if (command === 'record') {
-        const imagePath = 'release-artifacts/image.json';
-        const image = fs.existsSync(imagePath)
-            ? JSON.parse(fs.readFileSync(imagePath, 'utf8'))
-            : {};
-        fs.writeFileSync(
-            'release-artifacts/shard.json',
-            JSON.stringify(
-                {
-                    shard: Number(process.env.SHARD),
-                    setup: process.env.SETUP_OUTCOME,
-                    identity: process.env.IDENTITY_OUTCOME,
-                    tests: process.env.TEST_OUTCOME,
-                    artifact_errors: sanitizeArtifacts('ui'),
-                    ...image,
-                },
-                null,
-                2,
-            ),
-        );
+        console.info(verifyImage(provenance, container, image, await response.text()));
     } else if (command === 'collect') {
-        const shards = collectReports(args[0], args[1]);
-        fs.writeFileSync('release-artifacts/shards.json', JSON.stringify(shards, null, 2));
-        fs.appendFileSync(
-            process.env.GITHUB_OUTPUT,
-            `has_blobs=${shards.some((shard) => shard.blobs > 0)}\n`,
-        );
+        const {shards, hasBlobs} = collectReports(args[0], args[1]);
+        fs.appendFileSync(process.env.GITHUB_OUTPUT, `shards=${shards}\nhas_blobs=${hasBlobs}\n`);
     } else if (command === 'sanitize') {
-        const errors = sanitizeArtifacts(args[0]);
-        fs.writeFileSync('release-artifacts/report-artifact-errors.json', JSON.stringify(errors));
-    } else if (command === 'summarize') {
-        const shards = JSON.parse(fs.readFileSync('release-artifacts/shards.json', 'utf8'));
-        const provenancePath = 'downloaded/release-e2e-provenance/provenance.json';
-        const provenance = fs.existsSync(provenancePath)
-            ? JSON.parse(fs.readFileSync(provenancePath, 'utf8'))
-            : undefined;
-        const reportPath = 'ui/playwright-artifacts/test-results.json';
-        const report = fs.existsSync(reportPath)
-            ? JSON.parse(fs.readFileSync(reportPath, 'utf8'))
-            : undefined;
-        const errorsPath = 'release-artifacts/report-artifact-errors.json';
-        const artifactErrors = fs.existsSync(errorsPath)
-            ? JSON.parse(fs.readFileSync(errorsPath, 'utf8'))
-            : [];
-        const summary = summarize(shards, report, provenance, artifactErrors);
-        if (report) {
-            const {total, passed, failed, flaky, skipped} = readTestResults(reportPath);
-            summary.counts = {total, passed, failed, flaky, skipped};
+        const removed = sanitizeArtifacts(args[0]);
+        if (removed.length) {
+            throw new Error(`Unsafe artifact files removed: ${removed.join(', ')}`);
         }
-        fs.writeFileSync('release-artifacts/summary.json', JSON.stringify(summary, null, 2));
-        const text = `Release UI e2e: ${summary.status}\n\n${JSON.stringify(summary, null, 2)}`;
-        const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        fs.writeFileSync(
-            'release-artifacts/summary.html',
-            `<!doctype html><meta charset="utf-8"><title>Release UI e2e</title><pre>${escaped}</pre>`,
+    } else if (command === 'summarize') {
+        const {status, summary} = summarize(
+            readJson('ui/playwright-artifacts/test-results.json'),
+            readJson('downloaded/release-e2e-provenance/provenance.json'),
+            {
+                shards: Number(process.env.REPORT_SHARDS || 0),
+                jobs: process.env.TEST_JOBS_RESULT,
+                artifacts: process.env.SANITIZE_RESULT,
+            },
         );
         fs.appendFileSync(
             process.env.GITHUB_STEP_SUMMARY,
-            `### Release UI e2e: ${summary.status}\n\n\`\`\`json\n${JSON.stringify({provenance, stats: summary.stats, problems: summary.problems}, null, 2)}\n\`\`\`\n`,
+            `### Release UI e2e: ${status}\n\n${summary}\n`,
         );
-        if (summary.status !== 'passed') {
+        if (status !== 'passed') {
             process.exitCode = 1;
         }
     } else {
