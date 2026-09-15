@@ -166,7 +166,7 @@ export const TabletInfo = ({tablet, objectPath, objectDatabase}: TabletInfoProps
     };
 
     return (
-        <Flex gap={10} wrap="nowrap">
+        <Flex gap={10} wrap="nowrap" qa="tablet-info">
             <YDBDefinitionList
                 title={tabletInfoKeyset('title_info')}
                 items={tabletInfo}

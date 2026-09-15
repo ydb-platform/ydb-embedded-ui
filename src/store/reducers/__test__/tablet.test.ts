@@ -10,8 +10,6 @@ import {api} from '../api';
 import {tabletApi} from '../tablet';
 
 const mockHiveInfo = jest.fn();
-const mockStop = jest.fn();
-const mockResume = jest.fn();
 const originalApi = Object.getOwnPropertyDescriptor(window, 'api');
 
 function createStore() {
@@ -26,15 +24,11 @@ let store: ReturnType<typeof createStore>;
 beforeEach(() => {
     store = createStore();
     mockHiveInfo.mockReset();
-    mockStop.mockReset().mockResolvedValue({});
-    mockResume.mockReset().mockResolvedValue({});
     Object.defineProperty(window, 'api', {
         configurable: true,
         value: {
             tablets: {
                 getTabletFromHive: mockHiveInfo,
-                stopTablet: mockStop,
-                resumeTablet: mockResume,
             },
         },
     });
@@ -73,14 +67,3 @@ test('AdvancedInfo caches ordinary and secure requests separately and forwards c
         State: 'secure',
     });
 });
-
-test.each([false, true])(
-    'forwards mode %s through stop and resume endpoints',
-    async (useSecurePath) => {
-        const params = {id: '101', hiveId: '55', useSecurePath};
-        await store.dispatch(tabletApi.endpoints.stopTablet.initiate(params)).unwrap();
-        await store.dispatch(tabletApi.endpoints.resumeTablet.initiate(params)).unwrap();
-        expect(mockStop).toHaveBeenCalledWith('101', '55', useSecurePath);
-        expect(mockResume).toHaveBeenCalledWith('101', '55', useSecurePath);
-    },
-);

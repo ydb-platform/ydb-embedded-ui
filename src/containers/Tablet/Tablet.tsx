@@ -203,7 +203,7 @@ function TabletTabs({
     }, [activeTab, tabletTab, setParams]);
 
     return (
-        <Flex gap={5} direction="column">
+        <Flex gap={5} direction="column" qa="tablet-tabs">
             {/* block wrapper fror tabs to preserve height */}
             <div>
                 <TabProvider value={tabletTab}>

@@ -1,6 +1,6 @@
 import type {Page, Route} from '@playwright/test';
 
-import {DATABASE, HIVE_ID, TABLET_ID, setupTabletObjectLinkMocks} from './tabletObjectLinkMocks';
+import {HIVE_ID, TABLET_ID} from './tabletObjectLinkMocks';
 
 interface Options {
     flag?: boolean;
@@ -8,15 +8,20 @@ interface Options {
     tabletType?: string;
     admin?: boolean;
     monitoring?: boolean;
+    diskApi?: boolean;
 }
 
-export async function setupTabletDevUiMocks(page: Page, options: Options) {
-    const requests: {method: string; url: string}[] = [];
+export async function setupTabletDevUiMocks(
+    page: Page,
+    options: Options,
+    baseURL = 'http://localhost:3000',
+) {
+    const requests: {method: string; url: string; body: unknown; accept?: string}[] = [];
     let state = 'Active';
     const tabletType = options.tabletType ?? 'DataShard';
     const json = (route: Route, body: object, status = 200) =>
         route.fulfill({status, contentType: 'application/json', body: JSON.stringify(body)});
-    const appOrigin = new URL(process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000').origin;
+    const appOrigin = new URL(baseURL).origin;
 
     // Mock every non-UI origin, including popups; never forward requests to a real backend.
     await page.context().route('**/*', (route) => {
@@ -25,13 +30,13 @@ export async function setupTabletDevUiMocks(page: Page, options: Options) {
         }
         return json(route, {});
     });
-    await setupTabletObjectLinkMocks(page, {tabletType: 'DataShard', isMonitoringAllowed: true});
+    await page.route('**/viewer/json/nodelist*', (route) => json(route, [{Id: 1, Host: 'node-1'}]));
 
     await page.route('**/viewer/capabilities*', (route) =>
         json(
             route,
             {
-                Capabilities: {},
+                Capabilities: {'/pdisk/info': options.diskApi ? 1 : 0},
                 Settings: {Features: {EnableTabletDevUiSecurePath: options.flag}},
             },
             options.capabilityError ?? 200,
@@ -63,12 +68,20 @@ export async function setupTabletDevUiMocks(page: Page, options: Options) {
                 : {TabletStateInfo: [tablet]},
         );
     });
-    await page.context().route('**/tablets/app**', async (route) => {
+    await page.context().route(/\/(?:tablets\/app|vdisk\/evict)/, async (route) => {
         const request = route.request();
         const url = new URL(request.url());
-        requests.push({method: request.method(), url: request.url()});
+        requests.push({
+            method: request.method(),
+            url: request.url(),
+            body: request.postDataJSON(),
+            accept: request.headers().accept,
+        });
         if (options.admin === false && url.pathname.endsWith('/secure')) {
             return json(route, {error: 'Forbidden'}, 403);
+        }
+        if (url.pathname.endsWith('/vdisk/evict') || url.searchParams.get('exec') === '1') {
+            return json(route, {result: true});
         }
         const action = url.searchParams.get('page');
         if (action === 'StopTablet' || action === 'ResumeTablet') {
@@ -91,8 +104,5 @@ export async function setupTabletDevUiMocks(page: Page, options: Options) {
         });
     });
 
-    return {
-        requests,
-        url: `tablet/${TABLET_ID}?database=${encodeURIComponent(DATABASE)}`,
-    };
+    return {requests};
 }

@@ -41,7 +41,7 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
         tablet.State === ETabletState.Stopped || tablet.State === ETabletState.Deleted;
 
     return (
-        <Flex gap={2} wrap="nowrap">
+        <Flex gap={2} wrap="nowrap" qa="tablet-controls">
             <ButtonWithConfirmDialog
                 dialogHeader={i18n('dialog.kill-header')}
                 dialogText={i18n('dialog.kill-text')}
