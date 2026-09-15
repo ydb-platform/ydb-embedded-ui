@@ -1,0 +1,9 @@
+{
+  "group_queue": "Очередь и конкурентность",
+  "group_cpu": "CPU",
+  "field_concurrent-query-limit": "Лимит конкурентных запросов",
+  "field_queue-size": "Размер очереди",
+  "field_database-load-cpu-threshold": "Порог загрузки CPU базы данных",
+  "field_total-cpu-limit-percent-per-node": "Общий лимит CPU % на узел",
+  "value_no-limit": "Без лимита"
+}
