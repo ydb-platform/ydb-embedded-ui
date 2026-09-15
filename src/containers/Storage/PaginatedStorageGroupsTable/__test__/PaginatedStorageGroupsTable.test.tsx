@@ -1,6 +1,9 @@
 import React from 'react';
 
 import {render} from '@testing-library/react';
+import {MemoryRouter} from 'react-router-dom';
+import {QueryParamProvider} from 'use-query-params';
+import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 
 import type {ResizeablePaginatedTable} from '../../../../components/PaginatedTable';
 import {PaginatedStorageGroupsTable} from '../PaginatedStorageGroupsTable';
@@ -36,7 +39,13 @@ const defaultProps = {
 };
 
 function renderTable(columns: StorageGroupsColumn[]) {
-    render(<PaginatedStorageGroupsTable {...defaultProps} columns={columns} />);
+    render(
+        <MemoryRouter>
+            <QueryParamProvider adapter={ReactRouter5Adapter}>
+                <PaginatedStorageGroupsTable {...defaultProps} columns={columns} />
+            </QueryParamProvider>
+        </MemoryRouter>,
+    );
 }
 
 describe('PaginatedStorageGroupsTable', () => {
