@@ -420,6 +420,44 @@ async function preparePDiskPage(
     await expectStorageGroupRowsReady(page);
 }
 
+async function prepareNodesPage(
+    page: Page,
+    vdisksGroupBy: VDisksGroupByValue,
+    pdisksGroupBy: PDisksGroupByValue,
+) {
+    await page.setViewportSize({width: 1500, height: 1000});
+    await enableExpertMode(page, vdisksGroupBy);
+    await page.addInitScript(() => {
+        localStorage.setItem(
+            'storageNodesSelectedColumns',
+            JSON.stringify([
+                {id: 'NodeId', selected: true},
+                {id: 'PDisks', selected: true},
+            ]),
+        );
+    });
+    await setupVDiskColoringMocks(page);
+    await page.route('**/viewer/json/nodes?*', async (route) => {
+        await route.fulfill({json: createMockStorageNodesResponse()});
+    });
+
+    const url = new URL(storagePage, 'http://localhost');
+    url.searchParams.set('database', DATABASE);
+    url.searchParams.set('type', 'nodes');
+    url.searchParams.set('visible', 'all');
+    url.searchParams.set('storageExpertMode', 'true');
+    url.searchParams.set('nodesVdisksGroupBy', vdisksGroupBy);
+    url.searchParams.set('nodesPdisksGroupBy', pdisksGroupBy);
+    const [nodesResponse] = await Promise.all([
+        page.waitForResponse(
+            (response) => response.url().includes('/viewer/json/nodes?') && response.ok(),
+        ),
+        page.goto(`${url.pathname}${url.search}`),
+    ]);
+    await nodesResponse.finished();
+    await hideFloatingPopups(page);
+}
+
 test('keeps paired disk popups inside the viewport without expanding the page', async ({
     page,
 }, testInfo) => {
@@ -556,37 +594,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 60_000});
 
     test('keeps node PDisk layout stable across hover and Expert mode changes', async ({page}) => {
-        await page.setViewportSize({width: 1500, height: 1000});
-        await enableExpertMode(page, VDisksGroupBy.State);
-        await page.addInitScript(() => {
-            localStorage.setItem(
-                'storageNodesSelectedColumns',
-                JSON.stringify([
-                    {id: 'NodeId', selected: true},
-                    {id: 'PDisks', selected: true},
-                ]),
-            );
-        });
-        await setupVDiskColoringMocks(page);
-        await page.route('**/viewer/json/nodes?*', async (route) => {
-            await route.fulfill({json: createMockStorageNodesResponse()});
-        });
-
-        const url = new URL(storagePage, 'http://localhost');
-        url.searchParams.set('database', DATABASE);
-        url.searchParams.set('type', 'nodes');
-        url.searchParams.set('visible', 'all');
-        url.searchParams.set('storageExpertMode', 'true');
-        url.searchParams.set('nodesVdisksGroupBy', VDisksGroupBy.State);
-        url.searchParams.set('nodesPdisksGroupBy', PDisksGroupBy.All);
-        const [nodesResponse] = await Promise.all([
-            page.waitForResponse(
-                (response) => response.url().includes('/viewer/json/nodes?') && response.ok(),
-            ),
-            page.goto(`${url.pathname}${url.search}`),
-        ]);
-        await nodesResponse.finished();
-        await hideFloatingPopups(page);
+        await prepareNodesPage(page, VDisksGroupBy.State, PDisksGroupBy.All);
 
         const row = page
             .locator('.ydb-paginated-table__row')
@@ -626,6 +634,40 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(row).toHaveCSS('height', `${rowHeight}px`);
         }
     });
+
+    for (const vDiskMode of VDISK_GROUP_BY_MODES) {
+        for (const pDiskMode of PDISK_GROUP_BY_MODES) {
+            if (vDiskMode.value !== VDisksGroupBy.State && pDiskMode.value !== PDisksGroupBy.All) {
+                continue;
+            }
+
+            test(`renders all three node rows with VDisks ${vDiskMode.value} and PDisks ${pDiskMode.value}`, async ({
+                page,
+            }) => {
+                await prepareNodesPage(page, vDiskMode.value, pDiskMode.value);
+
+                const table = page.locator('.ydb-paginated-table__table');
+                const rows = table.locator('.ydb-paginated-table__row');
+                await expect(rows).toHaveCount(3);
+
+                for (const [index, vDiskCount] of [56, 64, 72].entries()) {
+                    const row = rows.nth(index);
+                    await expect(
+                        row.getByRole('cell', {name: String(7000 + index), exact: true}),
+                    ).toBeVisible();
+                    await expect(row.locator('.ydb-storage-pdisks__pdisks-item')).toHaveCount(4);
+                    await expect(row.locator('.pdisk-storage__vdisks-item')).toHaveCount(
+                        vDiskCount,
+                    );
+                }
+
+                await page.mouse.move(0, 0);
+                await expect(table).toHaveScreenshot(
+                    `nodes-vdisks-${vDiskMode.slug}-pdisks-${pDiskMode.slug}.png`,
+                );
+            });
+        }
+    }
 
     test('renders No data last in Expert Mode legends except All', async ({page}, testInfo) => {
         await preparePage(page, VDisksGroupBy.State);
