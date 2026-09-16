@@ -82,7 +82,6 @@ function getPDiskContent({
 
 interface GetPDiskBarContentParams {
     allocatedPercent?: number;
-    hidden: boolean;
     isAllMode: boolean;
     noDataPlaceholder?: React.ReactNode;
     showAllocatedPercentLabel?: boolean;
@@ -91,16 +90,11 @@ interface GetPDiskBarContentParams {
 
 function getPDiskBarContent({
     allocatedPercent,
-    hidden,
     isAllMode,
     noDataPlaceholder,
     showAllocatedPercentLabel,
     showNoDataPlaceholder,
 }: GetPDiskBarContentParams) {
-    if (hidden) {
-        return null;
-    }
-
     const hasAllocatedPercent = isNumeric(allocatedPercent) && allocatedPercent >= 0;
     if (hasAllocatedPercent && showAllocatedPercentLabel !== false) {
         return <DiskBarLabel>{`${Math.floor(allocatedPercent)}%`}</DiskBarLabel>;
@@ -239,7 +233,6 @@ export const PDisk = ({
     const isAllMode = displayState.mode === 'all';
     const noDataPlaceholder =
         displayState.showNoDataPlaceholder === false ? undefined : i18n('context_no-data');
-    const hideBarContent = Boolean(displayState.isLegendInactive);
     const allocatedPercent = displayState.allocatedPercent;
     const hasAllocatedPercent = isNumeric(allocatedPercent) && allocatedPercent >= 0;
     const iconPlacement = displayState.iconPlacement ?? 'inline';
@@ -250,7 +243,7 @@ export const PDisk = ({
         isAllMode,
     );
     const {leading, overflowVisible, showIndicator} = getPDiskBarIndicator({
-        hidden: hideBarContent,
+        hidden: Boolean(displayState.isLegendInactive),
         icon: displayState.icon,
         placement: iconPlacement,
         severity: displayState.severity,
@@ -258,14 +251,13 @@ export const PDisk = ({
     });
     const barContent = getPDiskBarContent({
         allocatedPercent,
-        hidden: hideBarContent,
         isAllMode,
         noDataPlaceholder,
         showAllocatedPercentLabel: displayState.showAllocatedPercentLabel,
         showNoDataPlaceholder: displayState.showNoDataPlaceholder,
     });
     const showAllocatedPercentLabel =
-        !hideBarContent && hasAllocatedPercent && displayState.showAllocatedPercentLabel !== false;
+        hasAllocatedPercent && displayState.showAllocatedPercentLabel !== false;
     const allModeIndicators = displayState.allMode?.indicators ?? EMPTY_ALL_MODE_INDICATORS;
     const hasAllModeIndicators = isAllMode && Object.values(allModeIndicators).some(Boolean);
     const overlay = hasAllModeIndicators ? (
@@ -323,7 +315,7 @@ export const PDisk = ({
                         highlighted={highlighted}
                         filled={hasAllocatedPercent && Number(allocatedPercent) > 0}
                         strongFill={displayState.allMode?.hasIssues}
-                        borderless={displayState.isLegendInactive}
+                        borderless={displayState.borderless}
                         overflowVisible={overflowVisible}
                     />
                 </InternalLink>

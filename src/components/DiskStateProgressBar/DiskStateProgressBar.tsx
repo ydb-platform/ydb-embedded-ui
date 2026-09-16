@@ -67,8 +67,8 @@ export function DiskStateProgressBar({
         striped,
         filled,
         highlighted,
+        borderless,
         'all-mode-has-issues': mode === 'all' && strongFill,
-        'legend-inactive': borderless,
         'overlap-icon-at-top-left': overflowVisible,
         [getToneModifier(tone)]: true,
     };

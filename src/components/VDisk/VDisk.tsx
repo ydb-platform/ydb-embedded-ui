@@ -31,7 +31,6 @@ const EMPTY_ALL_MODE_INDICATORS = {};
 interface GetVDiskBarContentParams {
     allocatedPercent?: number;
     compact?: boolean;
-    hidden: boolean;
     noDataPlaceholder?: React.ReactNode;
     severity: number;
     showAllocatedPercentLabel?: boolean;
@@ -41,16 +40,11 @@ interface GetVDiskBarContentParams {
 function getVDiskBarContent({
     allocatedPercent,
     compact,
-    hidden,
     noDataPlaceholder,
     severity,
     showAllocatedPercentLabel,
     showNoDataPlaceholder,
 }: GetVDiskBarContentParams) {
-    if (hidden) {
-        return null;
-    }
-
     const hasAllocatedPercent = isNumeric(allocatedPercent) && allocatedPercent >= 0;
     if (!compact && hasAllocatedPercent && showAllocatedPercentLabel !== false) {
         return <DiskBarLabel>{`${Math.floor(allocatedPercent)}%`}</DiskBarLabel>;
@@ -209,6 +203,7 @@ export const VDisk = ({
         icon,
         mode,
         isLegendInactive,
+        borderless,
         showNoDataPlaceholder,
         allocatedPercent,
         showAllocatedPercentLabel,
@@ -220,9 +215,8 @@ export const VDisk = ({
 
     const isAllMode = mode === 'all';
     const accessibleName = getAccessibleName(data, allMode?.hasIssues, isAllMode);
-    const hideBarContent = Boolean(isLegendInactive && !isDonor);
     const {leading, overflowVisible, showIndicator} = getVDiskBarIndicator({
-        hidden: hideBarContent,
+        hidden: Boolean(isLegendInactive && !isDonor),
         icon,
         indicatorClassName,
         iconGroupSize,
@@ -236,7 +230,6 @@ export const VDisk = ({
     const barContent = getVDiskBarContent({
         allocatedPercent,
         compact,
-        hidden: hideBarContent,
         noDataPlaceholder,
         severity,
         showAllocatedPercentLabel,
@@ -292,7 +285,7 @@ export const VDisk = ({
                         overlay={overlay}
                         highlighted={highlighted}
                         strongFill={allMode?.hasIssues}
-                        borderless={isLegendInactive}
+                        borderless={borderless}
                         overflowVisible={overflowVisible}
                     />
                 </InternalLink>

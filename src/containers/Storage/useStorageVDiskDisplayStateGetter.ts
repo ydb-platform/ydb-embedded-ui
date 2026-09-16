@@ -111,6 +111,7 @@ function getMissingVDiskDisplayState(
     vDisk: PreparedVDisk,
     isDonor: boolean | undefined,
     mode: DiskDisplayMode,
+    showNoDataPlaceholder: boolean,
 ): VDiskDisplayState {
     const isAllMode = mode === 'all';
     let icon: VDiskDisplayState['icon'];
@@ -125,7 +126,7 @@ function getMissingVDiskDisplayState(
         mode,
         isNoData: true,
         isLegendInactive: false,
-        showNoDataPlaceholder: true,
+        showNoDataPlaceholder,
         allocatedPercent: isAllMode ? vDisk.AllocatedPercent : undefined,
         showAllocatedPercentLabel: !isAllMode,
         striped: Boolean(isDonor),
@@ -157,6 +158,7 @@ function getKnownVDiskStateIcon(vDisk: PreparedVDisk) {
 interface GetExpertVDiskDisplayStateParams {
     inactiveLegendItems: Set<ECapacityAlert>;
     isDonor?: boolean;
+    selectionScope: SpaceLegendSelectionScope;
     vDisk: PreparedVDisk;
     vdisksGroupBy: VDisksGroupByValue;
 }
@@ -164,12 +166,13 @@ interface GetExpertVDiskDisplayStateParams {
 function getExpertVDiskDisplayState({
     inactiveLegendItems,
     isDonor,
+    selectionScope,
     vDisk,
     vdisksGroupBy,
 }: GetExpertVDiskDisplayStateParams): VDiskDisplayState {
     const mode = getMode(vdisksGroupBy);
     if (!(vDisk.HasWhiteboardData ?? Boolean(vDisk.VDiskId))) {
-        return getMissingVDiskDisplayState(vDisk, isDonor, mode);
+        return getMissingVDiskDisplayState(vDisk, isDonor, mode, selectionScope !== 'nodes-vdisks');
     }
 
     const severity = getSeverityCalculator(vdisksGroupBy)(vDisk);
@@ -177,11 +180,18 @@ function getExpertVDiskDisplayState({
     const isCapacityAlertInactive =
         isCapacityAlert(vDisk.CapacityAlert) && inactiveLegendItems.has(vDisk.CapacityAlert);
     const allMode = getAllModeDisplayState(mode, vDisk, isDonor, isCapacityAlertInactive);
+    const spaceBorderless = mode === 'space' && isCapacityAlertInactive;
+    const stateBorderless =
+        mode === 'state' &&
+        !isDonor &&
+        (severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green ||
+            severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
     const displayState: VDiskDisplayState = {
         severity,
         icon,
         mode,
         isLegendInactive: mode === 'space' && isCapacityAlertInactive,
+        borderless: spaceBorderless || stateBorderless,
         showNoDataPlaceholder: false,
         allocatedPercent: mode === 'all' ? vDisk.AllocatedPercent : undefined,
         showAllocatedPercentLabel: mode !== 'all',
@@ -212,11 +222,12 @@ function useVDiskDisplayStateGetter(
             return getExpertVDiskDisplayState({
                 inactiveLegendItems,
                 isDonor,
+                selectionScope,
                 vDisk,
                 vdisksGroupBy,
             });
         },
-        [inactiveLegendItems, isExpertMode, vdisksGroupBy],
+        [inactiveLegendItems, isExpertMode, selectionScope, vdisksGroupBy],
     );
 }
 

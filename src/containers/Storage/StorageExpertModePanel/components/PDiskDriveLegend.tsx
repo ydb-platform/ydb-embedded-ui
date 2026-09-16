@@ -23,6 +23,7 @@ const legendItems: PDiskDriveLegendItem[] = [
     {text: i18n('drive_to-be-removed'), theme: 'warning', icon: TrashBin},
     {text: i18n('drive_faulty'), theme: 'danger', icon: TriangleExclamation},
     {text: i18n('drive_broken'), theme: 'danger', icon: CircleXmark},
+    {text: i18n('value_no-data'), theme: 'unknown'},
 ];
 
 export function PDiskDriveLegend({className}: PDiskDriveLegendProps) {

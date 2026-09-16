@@ -579,12 +579,19 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         url.searchParams.set('storageExpertMode', 'true');
         url.searchParams.set('nodesVdisksGroupBy', VDisksGroupBy.State);
         url.searchParams.set('nodesPdisksGroupBy', PDisksGroupBy.All);
-        await page.goto(`${url.pathname}${url.search}`);
+        const [nodesResponse] = await Promise.all([
+            page.waitForResponse(
+                (response) => response.url().includes('/viewer/json/nodes?') && response.ok(),
+            ),
+            page.goto(`${url.pathname}${url.search}`),
+        ]);
+        await nodesResponse.finished();
         await hideFloatingPopups(page);
 
         const row = page
             .locator('.ydb-paginated-table__row')
             .filter({has: page.getByText('7000', {exact: true})});
+        await expect(row).toBeVisible();
         const pDisks = row.locator('.ydb-storage-pdisks__pdisks-item');
         await expect(pDisks).toHaveCount(4);
         const vDiskCounts = [8, 16, 24, 8];
@@ -620,7 +627,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         }
     });
 
-    test('renders the PDisk State and Maintenance legends', async ({page}) => {
+    test('renders No data last in Expert Mode legends except All', async ({page}, testInfo) => {
         await preparePage(page, VDisksGroupBy.State);
 
         const pDiskSelector = page.getByTestId('storage-pdisks-expert-mode');
@@ -634,7 +641,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             'Attention',
             'Stopped',
             'Error',
-            'N/D',
+            'No data',
         ]);
         await expect(legendLabels.nth(0)).toHaveClass(/g-label_theme_success/);
         await expect(legendLabels.nth(1)).toHaveClass(/g-label_theme_warning/);
@@ -655,7 +662,6 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
 
         await pDiskSelector.getByRole('radio', {name: 'Maintenance'}).check();
 
-        await expect(legendLabels).toHaveText(['Long term planned', 'No new VDisks', 'No request']);
         await expect(legendLabels.nth(0)).toHaveClass(/g-label_theme_danger/);
         await expect(legendLabels.nth(1)).toHaveClass(/g-label_theme_warning/);
         await expect(legendLabels.nth(2)).toHaveClass(/g-label_theme_success/);
@@ -663,6 +669,32 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         await expect(legendLabels.nth(1).locator('svg').first()).toBeVisible();
         await expect(legendLabels.nth(2).locator('svg')).toHaveCount(0);
         await expect(page).toHaveURL(/pdisksGroupBy=Maintenance/);
+
+        const panel = page.locator('.ydb-storage-expert-mode-panel');
+        for (const [index, modes] of [VDISK_GROUP_BY_MODES, PDISK_GROUP_BY_MODES].entries()) {
+            const legendRow = panel.locator(':scope > .g-flex').nth(index);
+            for (const mode of modes) {
+                await legendRow.locator(`input[type="radio"][value="${mode.value}"]`).check();
+                const noData = legendRow.locator('.g-label').filter({hasText: /^No data$/});
+                if (mode.value === VDisksGroupBy.All) {
+                    await expect(legendRow.getByRole('combobox')).toBeVisible();
+                    await expect(noData).toHaveCount(0);
+                    continue;
+                }
+                await expect(noData).toHaveCount(1);
+                await expect(noData).toBeVisible();
+                await expect(noData).toHaveClass(/g-label_theme_unknown/);
+                await expect(noData.locator('svg')).toHaveCount(0);
+                await expect(legendRow.locator('.g-label').last()).toHaveText('No data');
+            }
+        }
+
+        await testInfo.attach('expert-mode-legends-all', {
+            body: await panel.screenshot({
+                path: testInfo.outputPath('expert-mode-legends-all.png'),
+            }),
+            contentType: 'image/png',
+        });
     });
 
     test('uses filled colors for compact VDisks outside Expert Mode', async ({page}) => {

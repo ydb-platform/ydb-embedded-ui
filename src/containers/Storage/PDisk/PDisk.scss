@@ -112,6 +112,8 @@
     }
 
     &__node-bar-type {
+        --ydb-progress-bar-font-color: var(--entity-state-font-color);
+
         display: flex;
         align-items: center;
         justify-self: end;

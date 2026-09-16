@@ -1,9 +1,4 @@
-import {
-    CircleCheckFill,
-    CircleExclamationFill,
-    CircleXmarkFill,
-    TriangleExclamationFill,
-} from '@gravity-ui/icons';
+import {CircleExclamationFill, CircleXmarkFill, TriangleExclamationFill} from '@gravity-ui/icons';
 import type {IconData, LabelProps} from '@gravity-ui/uikit';
 import {Flex, Icon, Label, Text} from '@gravity-ui/uikit';
 
@@ -18,14 +13,14 @@ interface StatusPairLegendProps {
 interface StatusPairLegendItem {
     text: string;
     theme: LabelProps['theme'];
-    icon: IconData;
+    icon?: IconData;
     className?: string;
 }
 
 const iconSize = 12;
 
 const legendItems: StatusPairLegendItem[] = [
-    {text: i18n('compaction_ok'), theme: 'success', icon: CircleCheckFill},
+    {text: i18n('compaction_ok'), theme: 'success'},
     {text: i18n('compaction_notice'), theme: 'warning', icon: TriangleExclamationFill},
     {text: i18n('compaction_warning'), theme: 'danger', icon: CircleExclamationFill},
     {
@@ -47,11 +42,14 @@ export function StatusPairLegend({className, label}: StatusPairLegendProps) {
                         size="xs"
                         theme={theme}
                         className={labelClassName}
-                        icon={<Icon data={icon} size={iconSize} />}
+                        icon={icon ? <Icon data={icon} size={iconSize} /> : undefined}
                     >
                         {text}
                     </Label>
                 ))}
+                <Label size="xs" theme="unknown">
+                    {i18n('value_no-data')}
+                </Label>
             </Flex>
             <Text className={b('empty-statistics')} color="secondary">
                 {i18n('context_no-statistics')}

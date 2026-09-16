@@ -216,13 +216,15 @@ function usePDiskDisplayStateGetter(
 
             if (pdisksGroupBy === PDisksGroupBy.Space) {
                 const capacityAlert = pDisk.PDiskCapacityAlert;
+                const isCapacityAlertInactive =
+                    isCapacityAlert(capacityAlert) && inactiveAlerts.has(capacityAlert);
 
                 return {
                     severity: calculateSpaceSeverity({CapacityAlert: capacityAlert}),
                     icon: calculateSpaceIcon({CapacityAlert: capacityAlert}),
                     mode,
-                    isLegendInactive:
-                        isCapacityAlert(capacityAlert) && inactiveAlerts.has(capacityAlert),
+                    isLegendInactive: isCapacityAlertInactive,
+                    borderless: isCapacityAlertInactive,
                     showNoDataPlaceholder: false,
                     allocatedPercent,
                     width: EXPERT_MODE_PDISK_WIDTH,

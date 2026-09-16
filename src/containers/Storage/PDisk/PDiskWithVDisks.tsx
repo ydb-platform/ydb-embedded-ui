@@ -19,7 +19,7 @@ import type {PDiskProps} from './PDisk';
 import {PDisk} from './PDisk';
 
 const b = cn('pdisk-storage');
-const NODE_EXPERT_VDISK_ICON_SIZE = 8;
+const NODE_EXPERT_VDISK_ICON_SIZE = 10;
 const NODE_EXPERT_VDISK_ICON_GROUP_SIZE = 8;
 
 interface PDiskWithVDisksProps extends Omit<PDiskProps, 'topContent'> {

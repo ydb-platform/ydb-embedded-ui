@@ -46,6 +46,7 @@ export interface BaseDiskDisplayState {
     icon: DiskIndicatorValue | undefined;
     mode: DiskDisplayMode | undefined;
     isLegendInactive?: boolean;
+    borderless?: boolean;
     showNoDataPlaceholder?: boolean;
     isNoData?: boolean;
 }

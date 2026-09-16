@@ -29,6 +29,7 @@ const legendItems: PDiskMaintenanceLegendItem[] = [
         icon: Ban,
     },
     {text: i18n('value_maintenance-no-request'), theme: 'success'},
+    {text: i18n('value_no-data'), theme: 'unknown'},
 ];
 
 export function PDiskMaintenanceLegend({className}: PDiskMaintenanceLegendProps) {

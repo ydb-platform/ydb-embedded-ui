@@ -22,6 +22,7 @@ const legendItems: PDiskDecommitLegendItem[] = [
     {text: i18n('value_decommit-rejected'), theme: 'warning', icon: Xmark},
     {text: i18n('value_decommit-pending'), theme: 'info', icon: HourglassStart},
     {text: i18n('value_decommit-none'), theme: 'success'},
+    {text: i18n('value_no-data'), theme: 'unknown'},
 ];
 
 export function PDiskDecommitLegend({className}: PDiskDecommitLegendProps) {
