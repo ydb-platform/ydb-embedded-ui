@@ -25,6 +25,16 @@ jobs:
       ui_sha: ${{ steps.release.outputs.ui_sha }}
       playwright_version: ${{ steps.release.outputs.playwright_version }}
     steps:
+      - name: Require main workflow revision
+        run: |
+          if [ "$GITHUB_REF" != refs/heads/main ]; then
+            mkdir -p release-artifacts
+            message='Release UI E2E must run from main. Select main when dispatching this workflow.'
+            printf '%s\n' "$message" > release-artifacts/setup-error.txt
+            printf '### Release UI e2e: setup failed\n\n%s\n' "$message" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::$message"
+            exit 1
+          fi
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.workflow_sha }}
@@ -120,7 +130,7 @@ jobs:
   report:
     name: Merge and verify complete report
     needs: [resolve, e2e]
-    if: always()
+    if: always() && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:

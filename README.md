@@ -150,7 +150,8 @@ E2E tests are run in CI in the `e2e_tests` job. Each shard starts `ghcr.io/ydb-p
 The **Release UI E2E** workflow accepts `ydb_tag` (the published local-ydb tag) and
 `ydb_sha` (its full YDB commit SHA). It resolves the embedded UI version from that
 commit's monitoring changelog and resolves the matching UI tag to an immutable
-test commit. The workflow itself runs from `main`; both revisions are recorded.
+test commit. Select `main` when dispatching the workflow; other branches and tags
+are rejected before controller checkout. Both revisions are recorded.
 
 All existing Chromium and Safari tests run in eight isolated shards against the
 image's `/monitoring/` UI. The workflow verifies the image digest, `ydb.revision`
@@ -164,9 +165,9 @@ assets, filter tests or update snapshots. Tests requiring development-only UI
 overrides can fail; adapting those tests is a separate task.
 
 The `release-e2e-report` artifact contains the standard Playwright HTML/JSON reports
-and release identity; individual shard artifacts retain container logs and raw
-results. All artifacts are retained for 30 days. A short GitHub job summary shows
-test counts and shard completeness. Missing shards, setup failures
+and release identity; individual shard artifacts retain raw results and container
+logs when the test step is unsuccessful. All artifacts are retained for 30 days.
+A short GitHub job summary shows test counts and shard completeness. Missing shards, setup failures
 and empty results produce an incomplete run, never a pass. The
 release CI integration is non-blocking: this workflow reports actual failures,
 while release acceptance and deployment retain their existing dependencies.
