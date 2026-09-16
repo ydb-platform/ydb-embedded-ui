@@ -42,11 +42,8 @@ function isAbsent(value: string | undefined): value is undefined | '' {
 }
 
 function formatValue(value: string | undefined): React.ReactNode {
-    if (isAbsent(value)) {
+    if (isAbsent(value) || value === NO_LIMIT_VALUE) {
         return EMPTY_DATA_PLACEHOLDER;
-    }
-    if (value === NO_LIMIT_VALUE) {
-        return <Text color="secondary">{i18n('value_no-limit')}</Text>;
     }
     return <Text variant="code-inline-2">{value}</Text>;
 }

@@ -1,9 +1,9 @@
 {
+  "title_pool-settings": "Pool Settings",
   "group_queue": "Queue & Concurrency",
   "group_cpu": "CPU",
   "field_concurrent-query-limit": "Concurrent query limit",
   "field_queue-size": "Queue size",
   "field_database-load-cpu-threshold": "Database load CPU threshold",
-  "field_total-cpu-limit-percent-per-node": "Total CPU limit % per node",
-  "value_no-limit": "No limit"
+  "field_total-cpu-limit-percent-per-node": "Total CPU limit % per node"
 }
