@@ -37,10 +37,10 @@ function isRenderable(prepared: PreparedQueryData['preparedPlan']) {
 
 export function prepareStreamingQueryPlan(planText?: string): StreamingQueryPlan {
     const plan = parseStreamingQueryPlan(planText);
-    if (!plan) {
+    if (!plan?.Plan) {
         return {hasPlan: false};
     }
-    if (plan.Plan && !isPlanNode(plan.Plan)) {
+    if (!isPlanNode(plan.Plan)) {
         return {hasPlan: true};
     }
     try {

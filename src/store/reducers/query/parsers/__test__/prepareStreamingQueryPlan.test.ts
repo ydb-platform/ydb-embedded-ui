@@ -10,6 +10,12 @@ describe('prepareStreamingQueryPlan', () => {
         expect(prepareStreamingQueryPlan('{not json').hasPlan).toBe(false);
     });
 
+    test('reports no plan for a metadata-only document', () => {
+        const result = prepareStreamingQueryPlan('{"meta": {"version": "0.2", "type": "query"}}');
+        expect(result.hasPlan).toBe(false);
+        expect(result.prepared).toBeUndefined();
+    });
+
     test('prepares nodes of a supported plan', () => {
         const result = prepareStreamingQueryPlan(
             plan('"Plan": {"PlanNodeId": 1, "Node Type": "Stage", "Plans": []}'),
