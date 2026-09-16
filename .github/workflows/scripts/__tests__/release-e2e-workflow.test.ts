@@ -51,6 +51,7 @@ test.each(['refs/heads/main', 'refs/heads/feature', 'refs/tags/v1.0.0'])(
 
 test('redirects release SPA routes while preserving backend requests and streaming', async () => {
     const upstream = http.createServer((request, response) => {
+        response.setHeader('Content-Type', 'text/plain');
         response.setHeader('x-method', request.method || '');
         response.setHeader('x-probe', request.headers['x-probe'] || '');
         response.writeHead(request.url === '/missing' ? 404 : 200);
