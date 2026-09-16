@@ -199,6 +199,15 @@ export const useAnalyzeOperationAvailable = () => {
     return operationListVersion >= 2 && Boolean(analyzeLongRunningOperationEnabled);
 };
 
+export const useTabletDevUiSecurePath = () => {
+    const database = useDatabaseFromQuery();
+
+    return useTypedSelector((state) => {
+        const {data, isError} = selectDatabaseCapabilities(state, database);
+        return !isError && data?.Settings?.Features?.EnableTabletDevUiSecurePath === true;
+    });
+};
+
 export const useGraphShardExists = () => {
     const database = useDatabaseFromQuery();
 

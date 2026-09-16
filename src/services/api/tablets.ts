@@ -1,4 +1,5 @@
 import type {TTabletHiveResponse} from '../../types/api/tablet';
+import {getTabletDevUiAppPage} from '../../utils/developerUI/tabletDevUi';
 import type {Nullable} from '../../utils/typecheckers';
 
 import type {AxiosOptions} from './base';
@@ -11,6 +12,7 @@ export class TabletsAPI extends BaseYdbAPI {
         failRealmIdx,
         failDomainIdx,
         vDiskIdx,
+        useSecurePath = false,
     }: {
         groupId: string | number;
         groupGeneration: string | number;
@@ -18,12 +20,15 @@ export class TabletsAPI extends BaseYdbAPI {
         failDomainIdx: string | number;
         vDiskIdx: string | number;
         force?: boolean;
+        useSecurePath?: boolean;
     }) {
         // BSC Id is constant for all ydb clusters
         const BSC_TABLET_ID = '72057594037932033';
 
         return this.post(
-            this.getPath(`/tablets/app?TabletID=${BSC_TABLET_ID}&exec=1`),
+            this.getPath(
+                `/tablets/${getTabletDevUiAppPage(useSecurePath)}?TabletID=${BSC_TABLET_ID}&exec=1`,
+            ),
             {
                 Command: {
                     ReassignGroupDisk: {
@@ -54,28 +59,32 @@ export class TabletsAPI extends BaseYdbAPI {
         );
     }
 
-    stopTablet(id: string, hiveId: string) {
+    stopTablet(id: string, hiveId: string, useSecurePath = false) {
         return this.post<unknown>(
-            this.getPath(`/tablets/app?TabletID=${hiveId}&page=StopTablet&tablet=${id}`),
+            this.getPath(
+                `/tablets/${getTabletDevUiAppPage(useSecurePath)}?TabletID=${hiveId}&page=StopTablet&tablet=${id}`,
+            ),
             {},
             {requestConfig: {'axios-retry': {retries: 0}}},
         );
     }
 
-    resumeTablet(id: string, hiveId: string) {
+    resumeTablet(id: string, hiveId: string, useSecurePath = false) {
         return this.post<unknown>(
-            this.getPath(`/tablets/app?TabletID=${hiveId}&page=ResumeTablet&tablet=${id}`),
+            this.getPath(
+                `/tablets/${getTabletDevUiAppPage(useSecurePath)}?TabletID=${hiveId}&page=ResumeTablet&tablet=${id}`,
+            ),
             {},
             {requestConfig: {'axios-retry': {retries: 0}}},
         );
     }
 
     getTabletFromHive(
-        {id, hiveId}: {id: string; hiveId: string},
+        {id, hiveId, useSecurePath = false}: {id: string; hiveId: string; useSecurePath?: boolean},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<Nullable<TTabletHiveResponse>>(
-            this.getPath('/tablets/app'),
+            this.getPath(`/tablets/${getTabletDevUiAppPage(useSecurePath)}`),
             {
                 TabletID: hiveId,
                 page: 'TabletInfo',

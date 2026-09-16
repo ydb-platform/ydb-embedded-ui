@@ -120,10 +120,13 @@ export const tabletApi = api.injectEndpoints({
             },
         }),
         getAdvancedTableInfo: build.query({
-            queryFn: async ({id, hiveId}: {id: string; hiveId: string}, {signal}) => {
+            queryFn: async (
+                {id, hiveId, useSecurePath}: {id: string; hiveId: string; useSecurePath?: boolean},
+                {signal},
+            ) => {
                 try {
                     const tabletResponseData = await window.api.tablets.getTabletFromHive(
-                        {id, hiveId},
+                        {id, hiveId, useSecurePath},
                         {signal},
                     );
 
@@ -153,9 +156,17 @@ export const tabletApi = api.injectEndpoints({
             },
         }),
         stopTablet: build.mutation({
-            queryFn: async ({id, hiveId}: {id: string; hiveId: string}) => {
+            queryFn: async ({
+                id,
+                hiveId,
+                useSecurePath,
+            }: {
+                id: string;
+                hiveId: string;
+                useSecurePath?: boolean;
+            }) => {
                 try {
-                    const data = await window.api.tablets.stopTablet(id, hiveId);
+                    const data = await window.api.tablets.stopTablet(id, hiveId, useSecurePath);
                     return {data};
                 } catch (error) {
                     return {error};
@@ -169,9 +180,17 @@ export const tabletApi = api.injectEndpoints({
             },
         }),
         resumeTablet: build.mutation({
-            queryFn: async ({id, hiveId}: {id: string; hiveId: string}) => {
+            queryFn: async ({
+                id,
+                hiveId,
+                useSecurePath,
+            }: {
+                id: string;
+                hiveId: string;
+                useSecurePath?: boolean;
+            }) => {
                 try {
-                    const data = await window.api.tablets.resumeTablet(id, hiveId);
+                    const data = await window.api.tablets.resumeTablet(id, hiveId, useSecurePath);
                     return {data};
                 } catch (error) {
                     return {error};
