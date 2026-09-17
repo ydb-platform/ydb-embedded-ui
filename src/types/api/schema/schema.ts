@@ -6,6 +6,7 @@ import type {TExternalDataSourceDescription} from './externalDataSource';
 import type {TExternalTableDescription} from './externalTable';
 import type {TPersQueueGroupDescription} from './persQueueGroup';
 import type {TReplicationDescription} from './replication';
+import type {TPathID} from './shared';
 import type {TSysViewDescription} from './sysView';
 import type {TTableDescription, TTableStats} from './table';
 import type {TIndexDescription} from './tableIndex';
@@ -360,8 +361,7 @@ interface TUserAttribute {
  */
 export interface TResourcePoolDescription {
     Name?: string;
-    /** fixed64 */
-    PathId?: string;
+    PathId?: TPathID;
     Version?: string;
     Properties?: {
         Properties?: Record<string, string>;
