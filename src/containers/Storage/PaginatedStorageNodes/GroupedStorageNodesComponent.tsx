@@ -16,7 +16,7 @@ import {TableGroup} from '../TableGroup/TableGroup';
 import {useExpandedGroups} from '../TableGroup/useExpandedTableGroups';
 import i18n from '../i18n';
 import {b} from '../shared';
-import {useStorageQueryParams} from '../useStorageQueryParams';
+import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
 import {useStorageColumnsSettings} from '../utils';
 
 import {StorageNodesControls} from './StorageNodesControls';
@@ -108,7 +108,10 @@ export function GroupedStorageNodesComponent({
     const {nodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
         useStorageQueryParams();
 
-    const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings();
+    const expertMode = useIsStorageExpertMode();
+    const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings({
+        expertMode,
+    });
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
         viewContext,

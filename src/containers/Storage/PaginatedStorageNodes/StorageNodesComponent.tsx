@@ -4,7 +4,7 @@ import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabili
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageNodesTable} from '../PaginatedStorageNodesTable/PaginatedStorageNodesTable';
-import {useStorageQueryParams} from '../useStorageQueryParams';
+import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
 import {useStorageColumnsSettings} from '../utils';
 
 import {StorageNodesControlsWithTableState} from './StorageNodesControls';
@@ -23,7 +23,10 @@ export function StorageNodesComponent({
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
-    const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings();
+    const expertMode = useIsStorageExpertMode();
+    const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings({
+        expertMode,
+    });
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,

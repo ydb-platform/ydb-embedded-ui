@@ -11,7 +11,7 @@ import {
 } from '../PaginatedStorageNodes/nodeExpertModeLayout';
 import type {StorageNodesColumnsSettings} from '../PaginatedStorageNodesTable/columns/types';
 import type {StorageNodesPaginatedTableData} from '../types';
-import {useIsStorageExpertMode, useNodesVDisksGroupByParam} from '../useStorageQueryParams';
+import {useNodesVDisksGroupByParam} from '../useStorageQueryParams';
 
 /**
  * Storage → Nodes → column "PDisks": size coupling notes (keep in sync)
@@ -19,7 +19,7 @@ import {useIsStorageExpertMode, useNodesVDisksGroupByParam} from '../useStorageQ
  * Data flow:
  * - `window.api.viewer.getNodes()` returns `MaximumSlotsPerDisk` / `MaximumDisksPerNode`
  *   → `prepareStorageNodesResponse()` maps them into `columnsSettings`
- *   → `handleDataFetched()` stores the response-wide maxima
+ *   → `handleDataFetched()` retains the largest dimensions observed while the table is mounted
  *   → this hook derives the PDisk column width, PDisk content height, and virtualized row height.
  *
  * Default mode keeps VDisks in one row and grows PDisk width when necessary. Expert mode uses
@@ -37,10 +37,9 @@ interface StorageDisksLayoutData {
     maxDisksPerNode: number;
 }
 
-export function useStorageColumnsSettings() {
-    const isStorageExpertMode = useIsStorageExpertMode();
+export function useStorageColumnsSettings({expertMode = false} = {}) {
     const vDisksGroupBy = useNodesVDisksGroupByParam();
-    const isAllVDisksLayout = isStorageExpertMode && vDisksGroupBy === VDisksGroupBy.All;
+    const isAllVDisksLayout = expertMode && vDisksGroupBy === VDisksGroupBy.All;
     const [layoutData, setLayoutData] = React.useState<StorageDisksLayoutData>();
 
     const handleDataFetched = React.useCallback((data: StorageNodesPaginatedTableData) => {
@@ -50,14 +49,23 @@ export function useStorageColumnsSettings() {
 
         const nextLayoutData = data.columnsSettings;
         setLayoutData((currentLayoutData) => {
+            const maxSlotsPerDisk = Math.max(
+                currentLayoutData?.maxSlotsPerDisk ?? 0,
+                nextLayoutData.maxSlotsPerDisk,
+            );
+            const maxDisksPerNode = Math.max(
+                currentLayoutData?.maxDisksPerNode ?? 0,
+                nextLayoutData.maxDisksPerNode,
+            );
+
             if (
-                currentLayoutData?.maxSlotsPerDisk === nextLayoutData.maxSlotsPerDisk &&
-                currentLayoutData.maxDisksPerNode === nextLayoutData.maxDisksPerNode
+                currentLayoutData?.maxSlotsPerDisk === maxSlotsPerDisk &&
+                currentLayoutData.maxDisksPerNode === maxDisksPerNode
             ) {
                 return currentLayoutData;
             }
 
-            return nextLayoutData;
+            return {maxSlotsPerDisk, maxDisksPerNode};
         });
     }, []);
 
@@ -67,16 +75,16 @@ export function useStorageColumnsSettings() {
     const expertPDiskWidth = isAllVDisksLayout
         ? NODE_EXPERT_ALL_PDISK_WIDTH
         : NODE_EXPERT_PDISK_WIDTH;
-    const pDiskWidth = isStorageExpertMode
+    const pDiskWidth = expertMode
         ? expertPDiskWidth
         : Math.max(
               maxSlotsPerDisk * PDISK_VDISK_WIDTH + (maxSlotsPerDisk - 1) * PDISK_GAP_WIDTH,
               NODE_EXPERT_PDISK_WIDTH,
           );
-    const pDiskHeight = isStorageExpertMode
+    const pDiskHeight = expertMode
         ? getNodeExpertPDiskHeight(maxSlotsPerDisk, isAllVDisksLayout)
         : STORAGE_NODES_DEFAULT_PDISK_HEIGHT;
-    const rowHeight = isStorageExpertMode
+    const rowHeight = expertMode
         ? getStorageNodesExpertRowHeight(maxSlotsPerDisk, isAllVDisksLayout)
         : STORAGE_NODES_DEFAULT_ROW_HEIGHT;
     const pDiskContainerWidth = layoutData
@@ -86,8 +94,8 @@ export function useStorageColumnsSettings() {
         : undefined;
 
     const columnsSettings: StorageNodesColumnsSettings = React.useMemo(
-        () => ({pDiskWidth, pDiskContainerWidth, pDiskHeight}),
-        [pDiskContainerWidth, pDiskHeight, pDiskWidth],
+        () => ({pDiskWidth, pDiskContainerWidth, pDiskHeight, expertMode}),
+        [pDiskContainerWidth, pDiskHeight, pDiskWidth, expertMode],
     );
 
     return {

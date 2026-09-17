@@ -3,9 +3,14 @@ import React from 'react';
 import type {PopupPlacement, PopupProps} from '@gravity-ui/uikit';
 
 import {useVDiskPagePath} from '../../routes';
+import {EFlag, isCapacityAlert} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
 import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
-import type {DiskIndicatorValue, VDiskDisplayStateGetter} from '../../utils/disks/displayState';
+import type {
+    DiskIndicatorValue,
+    VDiskDisplayState,
+    VDiskDisplayStateGetter,
+} from '../../utils/disks/displayState';
 import {getDefaultDiskDisplayState} from '../../utils/disks/displayState';
 import {getDiskBarTone} from '../../utils/disks/getDiskBarTone';
 import {getVDiskStatusIcon} from '../../utils/disks/helpers';
@@ -104,15 +109,35 @@ function getVDiskBarIndicator({
     };
 }
 
-function getAccessibleName(
-    data: PreparedVDisk,
-    hasIssues: boolean | undefined,
-    isAllMode: boolean,
-) {
-    if (!isAllMode) {
-        return undefined;
+function getFlagAccessibleName(flag: EFlag | undefined) {
+    switch (flag) {
+        case EFlag.Green:
+        case EFlag.Blue:
+            return i18n('value_ok');
+        case EFlag.Yellow:
+            return i18n('value_notice');
+        case EFlag.Orange:
+            return i18n('value_warning');
+        case EFlag.Red:
+            return i18n('value_impaired');
+        default:
+            return i18n('context_no-data');
+    }
+}
+
+function getReplicationAccessibleName(replicated: boolean | undefined) {
+    if (replicated === undefined) {
+        return i18n('context_no-data');
     }
 
+    return i18n(
+        replicated
+            ? 'context_all-mode-replication-complete'
+            : 'context_all-mode-replication-in-progress',
+    );
+}
+
+function getAllModeAccessibleName(data: PreparedVDisk, hasIssues: boolean | undefined) {
     const noData = i18n('context_no-data');
     const health =
         hasIssues === undefined
@@ -124,26 +149,65 @@ function getAccessibleName(
         Number.isFinite(data.AllocatedPercent) && Number(data.AllocatedPercent) >= 0
             ? `${data.AllocatedPercent}%`
             : noData;
-    const replication =
-        data.Replicated === undefined
-            ? noData
-            : i18n(
-                  data.Replicated
-                      ? 'context_all-mode-replication-complete'
-                      : 'context_all-mode-replication-in-progress',
-              );
-
     return i18n('context_all-mode-accessible-name', {
         vdiskId: data.StringifiedId || noData,
         health,
         state: data.VDiskState || data.Status || noData,
-        replication,
+        replication: getReplicationAccessibleName(data.Replicated),
         capacityAlert: data.CapacityAlert || noData,
         frontQueues: data.FrontQueues || noData,
         freshCompaction: data.SatisfactionRank?.FreshRank?.Flag || noData,
         levelCompaction: data.SatisfactionRank?.LevelRank?.Flag || noData,
         allocatedPercent,
     });
+}
+
+function getAccessibleName(data: PreparedVDisk, {mode, allMode, isNoData}: VDiskDisplayState) {
+    if (!mode) {
+        return undefined;
+    }
+    if (mode === 'all') {
+        return getAllModeAccessibleName(data, allMode?.hasIssues);
+    }
+
+    const noData = i18n('context_no-data');
+    let diskName = i18n(data.DonorMode ? 'context_donor-vdisk' : 'context_vdisk', {
+        vdiskId: data.StringifiedId || noData,
+        nodeId: data.NodeId ?? noData,
+    });
+    if (isNoData) {
+        diskName = i18n('context_vdisk-no-whiteboard', {disk: diskName, noData});
+    }
+
+    const {CapacityAlert, FrontQueues, SatisfactionRank, Replicated} = isNoData ? {} : data;
+    const {FreshRank, LevelRank} = SatisfactionRank ?? {};
+
+    switch (mode) {
+        case 'state':
+            return i18n('context_state-accessible-name', {
+                disk: diskName,
+                state: data.VDiskState || data.Status || noData,
+                replication: getReplicationAccessibleName(Replicated),
+            });
+        case 'space':
+            return i18n('context_space-accessible-name', {
+                disk: diskName,
+                capacityAlert: isCapacityAlert(CapacityAlert) ? CapacityAlert : noData,
+            });
+        case 'frontQueues':
+            return i18n('context_front-queues-accessible-name', {
+                disk: diskName,
+                frontQueues: getFlagAccessibleName(FrontQueues),
+            });
+        case 'compaction':
+            return i18n('context_compaction-accessible-name', {
+                disk: diskName,
+                freshCompaction: getFlagAccessibleName(FreshRank?.Flag),
+                levelCompaction: getFlagAccessibleName(LevelRank?.Flag),
+            });
+        default:
+            return undefined;
+    }
 }
 
 export interface VDiskProps {
@@ -214,7 +278,7 @@ export const VDisk = ({
     } = displayState;
 
     const isAllMode = mode === 'all';
-    const accessibleName = getAccessibleName(data, allMode?.hasIssues, isAllMode);
+    const accessibleName = getAccessibleName(data, displayState);
     const {leading, overflowVisible, showIndicator} = getVDiskBarIndicator({
         hidden: Boolean(isLegendInactive && !isDonor),
         icon,

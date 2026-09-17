@@ -55,6 +55,7 @@ export const getPDisksColumn = ({
                     viewContext={viewContext}
                     pDiskWidth={columnsSettings?.pDiskWidth}
                     pDiskHeight={columnsSettings?.pDiskHeight}
+                    expertMode={columnsSettings?.expertMode}
                 />
             );
         },

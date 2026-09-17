@@ -11,6 +11,7 @@ import type {
 } from '../../../src/containers/Storage/StorageExpertModePanel/constants';
 import {ECapacityAlert, EFlag} from '../../../src/types/api/enums';
 import {TPDiskState} from '../../../src/types/api/pdisk';
+import {EVDiskState} from '../../../src/types/api/vdisk';
 import {storagePage} from '../../utils/constants';
 
 import {
@@ -424,6 +425,7 @@ async function prepareNodesPage(
     page: Page,
     vdisksGroupBy: VDisksGroupByValue,
     pdisksGroupBy: PDisksGroupByValue,
+    nodesData = createMockStorageNodesResponse(),
 ) {
     await page.setViewportSize({width: 1500, height: 1000});
     await enableExpertMode(page, vdisksGroupBy);
@@ -438,7 +440,7 @@ async function prepareNodesPage(
     });
     await setupVDiskColoringMocks(page);
     await page.route('**/viewer/json/nodes?*', async (route) => {
-        await route.fulfill({json: createMockStorageNodesResponse()});
+        await route.fulfill({json: nodesData});
     });
 
     const url = new URL(storagePage, 'http://localhost');
@@ -592,6 +594,132 @@ test('wheel over disk popups scrolls the page', async ({page}) => {
 
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 60_000});
+
+    test('keeps Expert disk rendering scoped to Storage when navigating to Nodes', async ({
+        page,
+    }) => {
+        await page.addInitScript(() => {
+            localStorage.setItem('storageType', JSON.stringify('nodes'));
+            localStorage.setItem(
+                'nodesTableSelectedColumns',
+                JSON.stringify([
+                    {id: 'NodeId', selected: true},
+                    {id: 'PDisks', selected: true},
+                ]),
+            );
+        });
+        await prepareNodesPage(page, VDisksGroupBy.State, PDisksGroupBy.State);
+        const expertPanel = page.locator('.ydb-storage-expert-mode-panel');
+        await expertPanel.getByRole('radio', {name: 'All', exact: true}).first().check();
+        await expertPanel.getByRole('radio', {name: 'All', exact: true}).last().check();
+
+        const row = page
+            .locator('.ydb-paginated-table__row')
+            .filter({has: page.getByText('7000', {exact: true})});
+        const pDisk = row.locator('.ydb-storage-pdisks__pdisks-item').nth(2);
+        await expect(row).toHaveCSS('height', '155px');
+        await expect(pDisk.locator('.pdisk-storage__vdisks-row')).toHaveCount(6);
+        await expect(pDisk.locator('.pdisk-storage__vdisk-size-indicator')).toHaveCount(24);
+        await expect(pDisk.locator(PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR)).toHaveCount(1);
+
+        await page.locator('[data-cluster-tab-id="nodes"]').click();
+        await expect(page).toHaveURL(/\/cluster\/nodes/);
+        await expect(row).toHaveCSS('height', '51px');
+        await expect(pDisk.locator('.pdisk-storage__vdisks-item')).toHaveCount(24);
+        await expect(pDisk.locator('.pdisk-storage__vdisks-row')).toHaveCount(1);
+        await expect(pDisk.locator('.pdisk-storage')).toHaveCSS('width', '165px');
+        await expect(row.locator('.ydb-storage-pdisks__pdisks-wrapper')).toHaveCSS(
+            'height',
+            '40px',
+        );
+        await expect(pDisk.locator('.pdisk-storage__vdisk-size-indicator')).toHaveCount(0);
+        await expect(pDisk.locator(PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR)).toHaveCount(0);
+        await expect(pDisk.locator(ALL_MODE_FRONT_QUEUES_SLOT_SELECTOR)).toHaveCount(0);
+
+        await page.locator('[data-cluster-tab-id="storage"]').click();
+        await expect(
+            expertPanel.getByRole('radio', {name: 'All', exact: true}).first(),
+        ).toBeChecked();
+        await expect(
+            expertPanel.getByRole('radio', {name: 'All', exact: true}).last(),
+        ).toBeChecked();
+        await expect(row).toHaveCSS('height', '155px');
+        await expect(pDisk.locator('.pdisk-storage__vdisks-row')).toHaveCount(6);
+        await expect(pDisk.locator('.pdisk-storage__vdisk-size-indicator')).toHaveCount(24);
+        await expect(pDisk.locator(PDISK_ALL_MODE_DRIVE_SLOT_SELECTOR)).toHaveCount(1);
+    });
+
+    test('labels node VDisk links in every Expert mode', async ({page}) => {
+        const response = createMockStorageNodesResponse();
+        const vDisk = response.Nodes?.[0]?.VDisks?.[1];
+        const donor = response.Nodes?.[0]?.VDisks?.[2];
+        if (!vDisk || !donor) {
+            throw new Error('Cannot prepare VDisks for accessible names');
+        }
+        Object.assign(vDisk, {
+            VDiskState: EVDiskState.OK,
+            Replicated: false,
+            CapacityAlert: ECapacityAlert.RED,
+            FrontQueues: EFlag.Yellow,
+            SatisfactionRank: {
+                FreshRank: {Flag: EFlag.Green},
+                LevelRank: {Flag: EFlag.Red},
+            },
+        });
+        donor.DonorMode = true;
+
+        await prepareNodesPage(page, VDisksGroupBy.State, PDisksGroupBy.All, response);
+        const row = page.locator('.ydb-paginated-table__row').filter({
+            has: page.getByText('7000', {exact: true}),
+        });
+        const disks = row
+            .locator('.ydb-storage-pdisks__pdisks-item')
+            .first()
+            .locator('.pdisk-storage__vdisks-item');
+
+        for (const {mode, status, missingStatus} of [
+            {
+                mode: 'State',
+                status: 'State: OK. Replication: in progress.',
+                missingStatus: 'State: N/D. Replication: N/D.',
+            },
+            {mode: 'Space', status: 'Capacity alert: RED.', missingStatus: 'Capacity alert: N/D.'},
+            {
+                mode: 'Front queues',
+                status: 'Front queues: Notice.',
+                missingStatus: 'Front queues: N/D.',
+            },
+            {
+                mode: 'Compaction',
+                status: 'Fresh compaction: OK. Level compaction: Impaired.',
+                missingStatus: 'Fresh compaction: N/D. Level compaction: N/D.',
+            },
+        ]) {
+            await page
+                .locator('.ydb-storage-expert-mode-panel')
+                .getByRole('radio', {name: mode, exact: true})
+                .first()
+                .check();
+            await expect(disks.nth(1).getByRole('link')).toHaveAccessibleName(
+                `VDisk 9000000000-1-0-0-1 on node 7000. ${status}`,
+            );
+            await expect(disks.first().getByRole('link')).toHaveAccessibleName(
+                `VDisk 7000-100-200 on node 7000. Whiteboard: N/D. ${missingStatus}`,
+            );
+            await expect(disks.nth(2).getByRole('link')).toHaveAccessibleName(
+                /^Donor VDisk 9000000000-1-0-0-2 on node 7000\./,
+            );
+        }
+
+        await page
+            .locator('.ydb-storage-expert-mode-panel')
+            .getByRole('radio', {name: 'All', exact: true})
+            .first()
+            .check();
+        await expect(disks.nth(1).getByRole('link')).toHaveAccessibleName(
+            /^VDisk 9000000000-1-0-0-1\. Health: issues detected\. State: OK\. Replication: in progress\. Capacity alert: RED\. Front queues: Yellow\. Fresh compaction: Green\. Level compaction: Red\. Allocated: \d+%\.$/,
+        );
+    });
 
     test('keeps node PDisk layout stable across hover and Expert mode changes', async ({page}) => {
         await prepareNodesPage(page, VDisksGroupBy.State, PDisksGroupBy.All);

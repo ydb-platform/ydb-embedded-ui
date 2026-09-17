@@ -5,6 +5,7 @@ export interface StorageNodesColumnsSettings {
     pDiskWidth?: number;
     pDiskContainerWidth?: number;
     pDiskHeight?: number;
+    expertMode?: boolean;
 }
 
 export interface GetStorageNodesColumnsParams {
