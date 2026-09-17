@@ -7,7 +7,7 @@ function createShardQuery(path: string, databaseFullPath: string) {
     return createPartitionStatsQuery({
         databaseFullPath,
         path,
-        selectFields: ['Path', 'TabletId', 'CPUCores'],
+        selectFields: ['Path', 'TabletId', 'CPUCores', 'FollowerId'],
         sortOrder: [{columnId: 'CPUCores', order: -1}],
         limit: TENANT_OVERVIEW_TABLES_LIMIT,
     });
