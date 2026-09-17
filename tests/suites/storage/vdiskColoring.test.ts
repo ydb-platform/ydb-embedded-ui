@@ -1481,6 +1481,109 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
 test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 300_000});
 
+    test('labels node PDisk links in every Expert mode', async ({page}) => {
+        const response = createMockStorageNodesResponse();
+        const [missing, bscOnly, withWhiteboard, partial] = response.Nodes?.[0]?.PDisks ?? [];
+        if (!missing || !bscOnly || !withWhiteboard || !partial) {
+            throw new Error('Cannot prepare PDisks for accessible names');
+        }
+        Object.assign(missing, {AvailableSize: undefined, TotalSize: undefined});
+        Object.assign(bscOnly, {
+            DriveStatus: 'BROKEN',
+            DecommitStatus: 'DECOMMIT_IMMINENT',
+            MaintenanceStatus: 'LONG_TERM_MAINTENANCE_PLANNED',
+            AvailableSize: '50',
+            TotalSize: '100',
+        });
+        Object.assign(withWhiteboard, {
+            State: TPDiskState.OpenFileError,
+            PDiskCapacityAlert: ECapacityAlert.RED,
+            Device: EFlag.Green,
+            Realtime: EFlag.Red,
+            DriveStatus: 'FAULTY',
+            DecommitStatus: 'DECOMMIT_PENDING',
+            MaintenanceStatus: 'NO_NEW_VDISKS',
+            AvailableSize: '100',
+            TotalSize: '100',
+        });
+        Object.assign(partial, {
+            State: TPDiskState.Normal,
+            PDiskCapacityAlert: undefined,
+            Device: undefined,
+            Realtime: undefined,
+            DriveStatus: undefined,
+            DecommitStatus: undefined,
+            MaintenanceStatus: undefined,
+            AvailableSize: undefined,
+            TotalSize: undefined,
+        });
+        await prepareNodesPage(page, VDisksGroupBy.State, PDisksGroupBy.State, response);
+
+        const row = page.locator('.ydb-paginated-table__row').filter({
+            has: page.getByText('7000', {exact: true}),
+        });
+        const disks = row.locator('.ydb-storage-pdisks__pdisks-item');
+        const selector = page.getByTestId('storage-nodes-pdisks-expert-mode');
+        for (const {mode, status, bscStatus, missingStatus, partialStatus = missingStatus} of [
+            {
+                mode: 'State',
+                status: 'State: OpenFileError.',
+                bscStatus: 'State: N/D.',
+                missingStatus: 'State: N/D.',
+                partialStatus: 'State: Normal.',
+            },
+            {
+                mode: 'Space',
+                status: 'Capacity alert: RED. Allocated: 0%.',
+                bscStatus: 'Capacity alert: N/D. Allocated: 50%.',
+                missingStatus: 'Capacity alert: N/D. Allocated: N/D.',
+            },
+            {
+                mode: 'Drive',
+                status: 'Drive: FAULTY.',
+                bscStatus: 'Drive: BROKEN.',
+                missingStatus: 'Drive: N/D.',
+            },
+            {
+                mode: 'Decommit',
+                status: 'Decommit: DECOMMIT_PENDING.',
+                bscStatus: 'Decommit: DECOMMIT_IMMINENT.',
+                missingStatus: 'Decommit: N/D.',
+            },
+            {
+                mode: 'Maintenance',
+                status: 'Maintenance: NO_NEW_VDISKS.',
+                bscStatus: 'Maintenance: LONG_TERM_MAINTENANCE_PLANNED.',
+                missingStatus: 'Maintenance: N/D.',
+            },
+            {
+                mode: 'Device',
+                status: 'Device: Green. Realtime: Red.',
+                bscStatus: 'Device: N/D. Realtime: N/D.',
+                missingStatus: 'Device: N/D. Realtime: N/D.',
+            },
+        ]) {
+            await selector.getByRole('radio', {name: mode, exact: true}).check();
+            await expect(disks.nth(2).locator('.pdisk-storage__content')).toHaveAccessibleName(
+                `PDisk 7000-102. ${status}`,
+            );
+            await expect(disks.nth(1).locator('.pdisk-storage__content')).toHaveAccessibleName(
+                `PDisk 7000-101. Whiteboard: N/D. ${bscStatus}`,
+            );
+            await expect(disks.first().locator('.pdisk-storage__content')).toHaveAccessibleName(
+                `PDisk 7000-100. Whiteboard: N/D. ${missingStatus}`,
+            );
+            await expect(disks.nth(3).locator('.pdisk-storage__content')).toHaveAccessibleName(
+                `PDisk 7000-103. ${partialStatus}`,
+            );
+        }
+
+        await selector.getByRole('radio', {name: 'All', exact: true}).check();
+        await expect(disks.nth(2).locator('.pdisk-storage__content')).toHaveAccessibleName(
+            'PDisk 7000-102. Health: issues detected. State: OpenFileError. Capacity alert: RED. Drive: FAULTY. Decommit: DECOMMIT_PENDING. Maintenance: NO_NEW_VDISKS. Device: Green. Realtime: Red. Allocated: 0%.',
+        );
+    });
+
     test('keeps top-level PDisk BSC statuses visible across Drive, Decommit, and All modes without Whiteboard', async ({
         page,
     }) => {
@@ -1504,6 +1607,9 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
         );
         const targetPDiskBar = getPDiskProgressBar(targetPDiskItem);
 
+        await expect(targetPDiskItem.locator('.pdisk-storage__content')).toHaveAccessibleName(
+            'PDisk 7009-109. Whiteboard: N/D. Drive: BROKEN.',
+        );
         await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-drive/);
         await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_grey(?:\s|$)/);
         await expect(targetPDiskBar.locator('.storage-disk-progress-bar__icon')).toHaveCount(1);
@@ -1511,6 +1617,9 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
 
         await pDiskSelector.getByRole('radio', {name: 'Decommit'}).check();
 
+        await expect(targetPDiskItem.locator('.pdisk-storage__content')).toHaveAccessibleName(
+            'PDisk 7009-109. Whiteboard: N/D. Decommit: DECOMMIT_IMMINENT.',
+        );
         await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-decommit/);
         await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_grey(?:\s|$)/);
         await expect(targetPDiskBar.locator('.storage-disk-progress-bar__icon')).toHaveCount(1);

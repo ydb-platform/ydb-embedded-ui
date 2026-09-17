@@ -10,9 +10,14 @@ import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../components/InternalLink';
 import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 import {getPDiskPagePath} from '../../../routes';
+import {isCapacityAlert} from '../../../types/api/enums';
 import {cn} from '../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
-import type {DiskIndicatorValue, PDiskDisplayStateGetter} from '../../../utils/disks/displayState';
+import type {
+    DiskIndicatorValue,
+    PDiskDisplayState,
+    PDiskDisplayStateGetter,
+} from '../../../utils/disks/displayState';
 import {getDefaultPDiskDisplayState} from '../../../utils/disks/displayState';
 import {getDiskBarTone} from '../../../utils/disks/getDiskBarTone';
 import {getPDiskId, getVDiskStatusIcon} from '../../../utils/disks/helpers';
@@ -141,40 +146,37 @@ function getPDiskBarIndicator({
     };
 }
 
-function getAccessibleName(
-    data: PreparedPDisk,
-    allocatedPercent: number | undefined,
-    hasIssues: boolean | undefined,
-    isAllMode: boolean,
-) {
-    if (!isAllMode) {
-        return undefined;
-    }
+function getAccessiblePDiskId(data: PreparedPDisk) {
+    return (
+        data.StringifiedId ||
+        getPDiskId({nodeId: data.NodeId, pDiskId: data.PDiskId}) ||
+        i18n('context_no-data')
+    );
+}
 
-    const noData = i18n('context_no-data');
-
+function getAllocatedPercentAccessibleName(allocatedPercent: number | undefined) {
     const hasAllocatedPercent =
         typeof allocatedPercent === 'number' &&
         Number.isFinite(allocatedPercent) &&
         allocatedPercent >= 0;
-    const allocated = hasAllocatedPercent ? `${Math.floor(allocatedPercent)}%` : noData;
 
+    return hasAllocatedPercent ? `${Math.floor(allocatedPercent)}%` : i18n('context_no-data');
+}
+
+function getAllModeAccessibleName(
+    data: PreparedPDisk,
+    allocatedPercent: number | undefined,
+    hasIssues: boolean | undefined,
+) {
+    const noData = i18n('context_no-data');
     const health =
         hasIssues === undefined
             ? noData
             : i18n(
                   hasIssues ? 'context_all-mode-health-issues' : 'context_all-mode-health-healthy',
               );
-    const pDiskId =
-        data.StringifiedId ??
-        getPDiskId({
-            nodeId: data.NodeId,
-            pDiskId: data.PDiskId,
-        }) ??
-        noData;
-
     return i18n('context_all-mode-accessible-name', {
-        pdiskId: pDiskId,
+        pdiskId: getAccessiblePDiskId(data),
         health,
         state: data.State || noData,
         capacityAlert: data.PDiskCapacityAlert || noData,
@@ -183,8 +185,63 @@ function getAccessibleName(
         maintenance: data.MaintenanceStatus || noData,
         device: data.Device || noData,
         realtime: data.Realtime || noData,
-        allocatedPercent: allocated,
+        allocatedPercent: getAllocatedPercentAccessibleName(allocatedPercent),
     });
+}
+
+function getAccessibleName(
+    data: PreparedPDisk,
+    {mode, allMode, isNoData, allocatedPercent}: PDiskDisplayState,
+) {
+    if (!mode) {
+        return undefined;
+    }
+    if (mode === 'all') {
+        return getAllModeAccessibleName(data, allocatedPercent, allMode?.hasIssues);
+    }
+
+    const noData = i18n('context_no-data');
+    let diskName = i18n('context_pdisk', {pdiskId: getAccessiblePDiskId(data)});
+    if (isNoData) {
+        diskName = i18n('context_pdisk-no-whiteboard', {disk: diskName, noData});
+    }
+    const {State, Device, Realtime} = isNoData ? {} : data;
+
+    switch (mode) {
+        case 'state':
+            return i18n('context_state-accessible-name', {disk: diskName, state: State || noData});
+        case 'space':
+            return i18n('context_space-accessible-name', {
+                disk: diskName,
+                capacityAlert: isCapacityAlert(data.PDiskCapacityAlert)
+                    ? data.PDiskCapacityAlert
+                    : noData,
+                allocatedPercent: getAllocatedPercentAccessibleName(allocatedPercent),
+            });
+        case 'drive':
+            return i18n('context_drive-accessible-name', {
+                disk: diskName,
+                drive: data.DriveStatus || noData,
+            });
+        case 'decommit':
+            return i18n('context_decommit-accessible-name', {
+                disk: diskName,
+                decommit: data.DecommitStatus || noData,
+            });
+        case 'maintenance':
+            return i18n('context_maintenance-accessible-name', {
+                disk: diskName,
+                maintenance: data.MaintenanceStatus || noData,
+            });
+        case 'device':
+            return i18n('context_device-accessible-name', {
+                disk: diskName,
+                device: Device || noData,
+                realtime: Realtime || noData,
+            });
+        default:
+            return undefined;
+    }
 }
 
 export interface PDiskProps {
@@ -236,12 +293,7 @@ export const PDisk = ({
     const allocatedPercent = displayState.allocatedPercent;
     const hasAllocatedPercent = isNumeric(allocatedPercent) && allocatedPercent >= 0;
     const iconPlacement = displayState.iconPlacement ?? 'inline';
-    const accessibleName = getAccessibleName(
-        data,
-        allocatedPercent,
-        displayState.allMode?.hasIssues,
-        isAllMode,
-    );
+    const accessibleName = getAccessibleName(data, displayState);
     const {leading, overflowVisible, showIndicator} = getPDiskBarIndicator({
         hidden: Boolean(displayState.isLegendInactive),
         icon: displayState.icon,

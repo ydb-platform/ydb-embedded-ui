@@ -1,5 +1,13 @@
 {
   "context_no-data": "N/D",
+  "context_pdisk": "PDisk {{pdiskId}}",
+  "context_pdisk-no-whiteboard": "{{disk}}. Whiteboard: {{noData}}",
+  "context_state-accessible-name": "{{disk}}. State: {{state}}.",
+  "context_space-accessible-name": "{{disk}}. Capacity alert: {{capacityAlert}}. Allocated: {{allocatedPercent}}.",
+  "context_drive-accessible-name": "{{disk}}. Drive: {{drive}}.",
+  "context_decommit-accessible-name": "{{disk}}. Decommit: {{decommit}}.",
+  "context_maintenance-accessible-name": "{{disk}}. Maintenance: {{maintenance}}.",
+  "context_device-accessible-name": "{{disk}}. Device: {{device}}. Realtime: {{realtime}}.",
   "context_all-mode-health-healthy": "healthy",
   "context_all-mode-health-issues": "issues detected",
   "context_all-mode-accessible-name": "PDisk {{pdiskId}}. Health: {{health}}. State: {{state}}. Capacity alert: {{capacityAlert}}. Drive: {{drive}}. Decommit: {{decommit}}. Maintenance: {{maintenance}}. Device: {{device}}. Realtime: {{realtime}}. Allocated: {{allocatedPercent}}."
