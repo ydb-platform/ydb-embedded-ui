@@ -1,6 +1,6 @@
 {
   "tablet-id": "TabletId",
-  "value_follower": "Follower",
+  "value_follower": "follower",
   "cpu-cores": "CPUCores",
   "data-size": "DataSize (B)",
   "context_data-size": "The total data size in bytes for a single table shard",

@@ -1,6 +1,7 @@
 import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
+import {getClipboardContent} from '../../../../utils/clipboard';
 import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 
@@ -104,7 +105,7 @@ for (const view of ['immediate', 'history', 'overview'] as const) {
 
         const rows = page.locator('tr.data-table__row').filter({hasText: TABLET_ID});
         await expect(rows).toHaveCount(5);
-        await expect(rows.getByText(/^follower$/i)).toHaveCount(2);
+        await expect(rows.getByText('follower', {exact: true})).toHaveCount(2);
 
         for (let index = 0; index < 3; index++) {
             const leader = rows.nth(index).getByRole('link', {name: TABLET_ID, exact: true});
@@ -116,7 +117,7 @@ for (const view of ['immediate', 'history', 'overview'] as const) {
             const name = `${TABLET_ID}.${followerId}`;
             const link = page.getByRole('link', {name, exact: true});
             const row = rows.filter({has: link});
-            const label = row.getByText(/^follower$/i);
+            const label = row.getByText('follower', {exact: true});
             await expect(label).toBeVisible();
             const labelBounds = await label.boundingBox();
             const cellBounds = await row.locator('td').filter({has: link}).boundingBox();
@@ -135,8 +136,6 @@ for (const view of ['immediate', 'history', 'overview'] as const) {
         const followerRow = rows.filter({hasText: `${TABLET_ID}.5`});
         await followerRow.hover();
         await followerRow.locator('.ydb-entity-name__clipboard-button').click();
-        await expect
-            .poll(() => page.evaluate(() => navigator.clipboard.readText()))
-            .toBe(`${TABLET_ID}.5`);
+        await expect.poll(() => getClipboardContent(page)).toBe(`${TABLET_ID}.5`);
     });
 }
