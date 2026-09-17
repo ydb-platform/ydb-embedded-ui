@@ -112,6 +112,12 @@ test('redirects release SPA routes while preserving backend requests and streami
                 '/monitoring/cluster/nodes?database=%2Flocal&x=a%2Bb',
             ],
             ['/vDisk?nodeId=42', 'HEAD', '/monitoring/vDisk?nodeId=42'],
+            ['/pDisk?nodeId=42&pDiskId=1000', 'GET', '/monitoring/pDisk?nodeId=42&pDiskId=1000'],
+            [
+                '/storageGroup?database=%2Flocal&groupId=1',
+                'HEAD',
+                '/monitoring/storageGroup?database=%2Flocal&groupId=1',
+            ],
         ]) {
             const response = await request(url, method);
             expect(response.status).toBe(307);

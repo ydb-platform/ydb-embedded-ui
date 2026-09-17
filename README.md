@@ -156,7 +156,10 @@ are rejected before controller checkout. Both revisions are recorded.
 All existing Chromium and Safari tests run in eight isolated shards against the
 image's `/monitoring/` UI. The workflow verifies the image digest, `ydb.revision`
 and served HTML before testing. Each shard uses `/local`, no authentication and
-the existing Docker runner, with retries disabled. The trusted runner downloads
+the existing Docker runner, with retries disabled. Release test mode requires HTTP
+for `PLAYWRIGHT_APP_BACKEND` and any supplied `PLAYWRIGHT_BASE_URL`; HTTPS is rejected
+before Docker starts. The ordinary Docker mode continues to support HTTPS backends.
+The trusted runner downloads
 and executes release-version source only inside Playwright containers, including
 report merging. These containers receive no CI credentials, host checkout or Docker
 socket; only report directories are mounted. Artifact links are removed before

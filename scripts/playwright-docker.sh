@@ -29,6 +29,20 @@ if [ "$RELEASE_MODE" = test ] && [ -z "${PLAYWRIGHT_APP_BACKEND:-}" ]; then
   exit 1
 fi
 
+if [ -n "$RELEASE_REF" ] && [ "$RELEASE_MODE" = test ]; then
+  node - "$PLAYWRIGHT_APP_BACKEND" "${PLAYWRIGHT_BASE_URL:-}" <<'NODE'
+for (const [name, value] of [
+  ['PLAYWRIGHT_APP_BACKEND', process.argv[2]],
+  ['PLAYWRIGHT_BASE_URL', process.argv[3]],
+]) {
+  if (value && new URL(value).protocol !== 'http:') {
+    console.error(`Error: ${name} must use HTTP in release mode`);
+    process.exit(1);
+  }
+}
+NODE
+fi
+
 if [ -z "$PLAYWRIGHT_VERSION" ]; then
   echo "Error: Could not determine Playwright version from package-lock.json" >&2
   exit 1
@@ -74,7 +88,8 @@ const release = process.env.PLAYWRIGHT_RELEASE_REF && process.env.PLAYWRIGHT_REL
 const server = release ? http.createServer((request, response) => {
   const pathname = request.url.split('?')[0];
   if ((request.method === 'GET' || request.method === 'HEAD') &&
-      (pathname === '/cluster' || pathname.startsWith('/cluster/') || pathname === '/vDisk')) {
+      (pathname === '/cluster' || pathname.startsWith('/cluster/') ||
+       ['/vDisk', '/pDisk', '/storageGroup'].includes(pathname))) {
     response.writeHead(307, {Location: `/monitoring${request.url}`});
     response.end();
     return;

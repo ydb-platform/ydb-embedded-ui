@@ -1,4 +1,4 @@
-import {execFileSync} from 'node:child_process';
+import {execFileSync, spawnSync} from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -30,7 +30,10 @@ describe('release Playwright container boundary', () => {
                         PLAYWRIGHT_RELEASE_VERSION: '1.58.0',
                         PLAYWRIGHT_RELEASE_MODE: mode,
                         PLAYWRIGHT_RELEASE_OUTPUT: output,
-                        PLAYWRIGHT_APP_BACKEND: 'http://localhost:8765',
+                        PLAYWRIGHT_APP_BACKEND:
+                            mode === 'report'
+                                ? ''
+                                : `${mode === 'local' ? 'https' : 'http'}://localhost:8765`,
                         GITHUB_TOKEN: 'must-not-enter-container',
                         ACTIONS_RUNTIME_TOKEN: 'must-not-enter-container',
                     },
@@ -42,6 +45,7 @@ describe('release Playwright container boundary', () => {
                         `${root}:/work`,
                         'ydb-embedded-ui-node-modules:/work/node_modules',
                     ]);
+                    expect(args).toContain('PLAYWRIGHT_APP_BACKEND=https://localhost:8765');
                 } else {
                     expect(mounts).toContain(`${output}/blob-report:/work/blob-report`);
                     expect(mounts).toContain(
@@ -78,4 +82,39 @@ describe('release Playwright container boundary', () => {
             }),
         ).toThrow('release mode requires a commit SHA');
     });
+
+    test.each(['PLAYWRIGHT_APP_BACKEND', 'PLAYWRIGHT_BASE_URL'])(
+        'rejects HTTPS in %s before starting release Docker',
+        (variable) => {
+            const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'release-https-test-'));
+            try {
+                const capture = path.join(directory, 'docker-called');
+                fs.writeFileSync(path.join(directory, 'docker'), '#!/bin/sh\ntouch "$CAPTURE"\n', {
+                    mode: 0o755,
+                });
+                const result = spawnSync('bash', [runner], {
+                    cwd: root,
+                    encoding: 'utf8',
+                    env: {
+                        ...process.env,
+                        PATH: `${directory}:${process.env.PATH}`,
+                        CAPTURE: capture,
+                        PLAYWRIGHT_RELEASE_REF: 'a'.repeat(40),
+                        PLAYWRIGHT_RELEASE_VERSION: '1.58.0',
+                        PLAYWRIGHT_RELEASE_MODE: 'test',
+                        PLAYWRIGHT_RELEASE_OUTPUT: path.join(directory, 'output'),
+                        PLAYWRIGHT_APP_BACKEND: 'http://localhost:8765',
+                        PLAYWRIGHT_BASE_URL: 'http://localhost:8765/monitoring/',
+                        [variable]: 'https://localhost:8765/monitoring/',
+                    },
+                });
+                expect(result.error).toBeUndefined();
+                expect(result.status).toBe(1);
+                expect(result.stderr).toContain(`${variable} must use HTTP in release mode`);
+                expect(fs.existsSync(capture)).toBe(false);
+            } finally {
+                fs.rmSync(directory, {recursive: true, force: true});
+            }
+        },
+    );
 });
