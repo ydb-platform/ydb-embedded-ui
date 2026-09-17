@@ -4,7 +4,10 @@ import {ArrowsOppositeToDots} from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
-import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
+import {
+    useDiskPagesAvailable,
+    useTabletDevUiSecurePath,
+} from '../../store/reducers/capabilities/hooks';
 import type {ModifyDiskResponse} from '../../types/api/modifyDisk';
 import type {TVDiskID} from '../../types/api/vdisk';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
@@ -37,6 +40,7 @@ export const EvictVDiskButton = ({
 }: EvictVDiskButtonProps) => {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const newDiskApiAvailable = useDiskPagesAvailable();
+    const useSecurePath = useTabletDevUiSecurePath();
 
     const handleEvictVDisk = React.useCallback(
         async (isRetry?: boolean) => {
@@ -54,7 +58,10 @@ export const EvictVDiskButton = ({
             if (newDiskApiAvailable) {
                 response = await window.api.vdisk.evictVDisk(requestParams);
             } else {
-                response = await window.api.tablets.evictVDiskOld(requestParams);
+                response = await window.api.tablets.evictVDiskOld({
+                    ...requestParams,
+                    useSecurePath,
+                });
             }
 
             if (response?.result === false) {
@@ -65,7 +72,7 @@ export const EvictVDiskButton = ({
                 throw err;
             }
         },
-        [vDiskId, newDiskApiAvailable],
+        [vDiskId, newDiskApiAvailable, useSecurePath],
     );
 
     return (

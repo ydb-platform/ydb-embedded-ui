@@ -174,7 +174,7 @@ export function VDiskPage() {
             return null;
         }
         return (
-            <div className={vDiskPageCn('controls')}>
+            <div className={vDiskPageCn('controls')} data-qa="vdisk-controls">
                 <EvictVDiskButton
                     vDiskId={resolvedVDiskId}
                     donorMode={vDiskData?.DonorMode}
