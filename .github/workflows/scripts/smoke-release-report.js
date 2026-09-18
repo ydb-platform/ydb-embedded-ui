@@ -33,9 +33,12 @@ module.exports = {testDir: '.', retries: 0, reporter: [['blob', {outputDir: '/bl
 CONFIG
 cat > fixture.spec.js <<'TEST'
 const {test, expect} = require('@playwright/test');
+const fs = require('node:fs');
 test('passes', () => expect(1).toBe(1));
 test('fails with attachment', async ({}, info) => {
-    await info.attach('proof', {body: Buffer.from('release report attachment'), contentType: 'text/plain'});
+    const file = info.outputPath('proof.txt');
+    fs.writeFileSync(file, 'release report attachment');
+    await info.attach('proof', {path: file, contentType: 'text/plain'});
     expect(1).toBe(2);
 });
 TEST
@@ -79,7 +82,15 @@ grep '/input/resources' /tmp/readonly.log
         [1, 1, 0, 0],
     );
     assert.ok(fs.statSync(path.join(artifacts, 'playwright-report/index.html')).size > 0);
-    assert.ok(fs.readdirSync(path.join(artifacts, 'playwright-report/data')).length > 0);
+    const data = path.join(artifacts, 'playwright-report/data');
+    assert.ok(
+        fs
+            .readdirSync(data)
+            .some(
+                (file) =>
+                    fs.readFileSync(path.join(data, file), 'utf8') === 'release report attachment',
+            ),
+    );
     assert.equal(digest(), before);
     assert.deepEqual(fs.readdirSync(blobs), inputs);
     console.info(
