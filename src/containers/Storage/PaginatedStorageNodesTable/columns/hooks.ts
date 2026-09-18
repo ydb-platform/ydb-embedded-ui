@@ -51,12 +51,18 @@ export function useStorageNodesSelectedColumns({
         return allColumns.filter((column) => !skippedColumnIds.some((id) => id === column.name));
     }, [database, viewContext, columnsSettings, skippedColumnIds]);
 
-    const requiredColumns = React.useMemo(() => {
+    const stickyColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {
             return [...REQUIRED_STORAGE_NODES_COLUMNS, NODES_COLUMNS_IDS.Missing];
         }
         return REQUIRED_STORAGE_NODES_COLUMNS;
     }, [visibleEntities]);
+
+    const requiredColumns = React.useMemo(() => {
+        return columnsSettings?.expertMode
+            ? [...stickyColumns, NODES_COLUMNS_IDS.PDisks]
+            : stickyColumns;
+    }, [columnsSettings?.expertMode, stickyColumns]);
 
     const defaultColumns = React.useMemo(() => {
         if (!bridgeModeEnabled) {
@@ -73,6 +79,7 @@ export function useStorageNodesSelectedColumns({
         NODES_COLUMNS_TITLES,
         defaultColumns,
         requiredColumns,
+        stickyColumns,
     );
 
     const hiddenCapacityColumnIds = blobMetricsEnabled
