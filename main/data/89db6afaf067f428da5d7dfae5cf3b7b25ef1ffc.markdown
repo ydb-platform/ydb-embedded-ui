@@ -1,0 +1,257 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - img [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+      - list [ref=e21]:
+        - generic [ref=e22]:
+          - listitem [ref=e23]:
+            - link "Database" [ref=e28] [cursor=pointer]:
+              - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=database
+              - img [ref=e31]:
+                - img [ref=e32]
+              - generic "Database":
+                - generic: Database
+          - listitem [ref=e34]:
+            - link "Diagnostics" [ref=e39] [cursor=pointer]:
+              - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+              - img [ref=e42]:
+                - img [ref=e43]
+              - generic "Diagnostics":
+                - generic: Diagnostics
+          - listitem [ref=e45]:
+            - link "SQL Editor" [ref=e50] [cursor=pointer]:
+              - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query
+              - img [ref=e53]:
+                - img [ref=e54]
+              - generic "SQL Editor":
+                - generic: SQL Editor
+      - generic [ref=e56]:
+        - button "Information" [ref=e57] [cursor=pointer]:
+          - img [ref=e60]:
+            - img [ref=e61]
+          - generic "Information":
+            - generic: Information
+        - button "Settings" [ref=e63] [cursor=pointer]:
+          - img [ref=e66]:
+            - img [ref=e67]
+          - generic "Settings":
+            - generic: Settings
+        - button "Account" [ref=e69] [cursor=pointer]:
+          - img [ref=e72]:
+            - img [ref=e73]
+          - generic "Account":
+            - generic: Account
+      - button "Expand" [ref=e75] [cursor=pointer]:
+        - img [ref=e76]:
+          - img [ref=e77]
+    - generic [ref=e80]:
+      - banner [ref=e81]:
+        - list [ref=e82]:
+          - listitem [ref=e83]:
+            - link "Cluster" [ref=e84] [cursor=pointer]:
+              - link "Cluster" [ref=e85]:
+                - /url: /cluster
+                - generic [ref=e86]: Cluster
+            - generic [ref=e87]: /
+          - listitem [ref=e88]:
+            - link "local" [disabled] [ref=e89]:
+              - generic [ref=e91]: local
+          - listitem [ref=e92]:
+            - generic [ref=e93]:
+              - generic [ref=e94]:
+                - button "Copy path" [ref=e95] [cursor=pointer]:
+                  - generic:
+                    - generic:
+                      - img:
+                        - img
+                - button [ref=e96] [cursor=pointer]:
+                  - img [ref=e99]:
+                    - img [ref=e100]
+              - generic [ref=e103] [cursor=pointer]:
+                - img [ref=e105]:
+                  - img [ref=e106]
+                - 'button "Good: 1 issue" [ref=e108]':
+                  - generic [ref=e111]:
+                    - text: "Good: 1 issue"
+                    - img [ref=e112]:
+                      - img [ref=e113]
+        - generic [ref=e115]:
+          - link "Developer UI" [ref=e116] [cursor=pointer]:
+            - /url: http://localhost:8765/internal
+            - img [ref=e119]:
+              - img [ref=e120]
+            - generic [ref=e122]: Developer UI
+          - button [ref=e125] [cursor=pointer]:
+            - img [ref=e128]:
+              - img [ref=e129]
+      - main [ref=e131]:
+        - generic [ref=e134]:
+          - generic [ref=e135]:
+            - generic [ref=e138]:
+              - generic [ref=e139]: Navigation
+              - generic [ref=e143]:
+                - generic [ref=e146] [cursor=pointer]:
+                  - button [ref=e147]
+                  - generic [ref=e149]:
+                    - img [ref=e151]
+                    - generic [ref=e153]: /local
+                - generic [ref=e156] [cursor=pointer]:
+                  - button [ref=e157]
+                  - generic [ref=e159]:
+                    - img [ref=e161]
+                    - generic [ref=e163]: .metadata
+                - generic [ref=e166] [cursor=pointer]:
+                  - button [ref=e167]
+                  - generic [ref=e169]:
+                    - img [ref=e171]
+                    - generic [ref=e173]: .sys
+                - generic [ref=e178] [cursor=pointer]:
+                  - img [ref=e180]
+                  - generic [ref=e182]: ydb_row_table
+            - generic [ref=e183]:
+              - button [ref=e184] [cursor=pointer]:
+                - img [ref=e187]:
+                  - img [ref=e188]
+              - button [ref=e190] [cursor=pointer]:
+                - img [ref=e193]:
+                  - img [ref=e194]
+          - generic [ref=e199]:
+            - tablist [ref=e201]:
+              - tab "Editor" [selected] [ref=e202] [cursor=pointer]:
+                - link "Editor" [ref=e205]:
+                  - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query&queryTab=newQuery
+              - tab "History" [ref=e206] [cursor=pointer]:
+                - link "History" [ref=e209]:
+                  - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query&queryTab=history
+              - tab "Saved" [ref=e210] [cursor=pointer]:
+                - link "Saved" [ref=e213]:
+                  - /url: /database?diagnosticsTab=overview&schema=%2Flocal&database=%2Flocal&databasePage=query&queryTab=saved
+            - generic [ref=e216]:
+              - generic [ref=e217]:
+                - generic [ref=e218]:
+                  - tablist [ref=e219]:
+                    - tab "New Query" [selected] [ref=e220] [cursor=pointer]:
+                      - generic [ref=e224]: New Query
+                  - button "New editor tab" [ref=e226] [cursor=pointer]:
+                    - img [ref=e229]:
+                      - img [ref=e230]
+                - code [ref=e235]:
+                  - generic [ref=e236]:
+                    - generic [ref=e241]: "1"
+                    - generic [ref=e247]: SELECT 1;
+                    - textbox "Editor content" [ref=e249]: SELECT 1;
+                - generic [ref=e250]:
+                  - generic [ref=e251]:
+                    - button "Run" [ref=e253] [cursor=pointer]:
+                      - img [ref=e256]:
+                        - img [ref=e257]
+                      - generic [ref=e259]: Run
+                    - button "Explain" [ref=e261] [cursor=pointer]:
+                      - generic [ref=e262]: Explain
+                    - button "Explain Analyze" [ref=e264] [cursor=pointer]:
+                      - generic [ref=e265]: Explain Analyze
+                    - button [ref=e266] [cursor=pointer]:
+                      - img [ref=e269]:
+                        - img [ref=e270]
+                  - generic [ref=e272]:
+                    - button "New query" [ref=e274] [cursor=pointer]:
+                      - img [ref=e277]
+                      - generic [ref=e279]: New query
+                    - button "Save query" [ref=e280] [cursor=pointer]:
+                      - generic [ref=e281]: Save query
+              - generic [ref=e283]:
+                - generic [ref=e284]:
+                  - generic [ref=e285]:
+                    - radiogroup [ref=e286]:
+                      - generic [ref=e287]:
+                        - radio "Result" [checked] [ref=e288]
+                        - generic [ref=e289]: Result
+                      - generic [ref=e290] [cursor=pointer]:
+                        - radio "Computation Graph" [ref=e291]
+                        - generic [ref=e292]: Computation Graph
+                      - generic [ref=e293] [cursor=pointer]:
+                        - radio "Explain" [ref=e294]
+                        - generic [ref=e295]: Explain
+                      - generic [ref=e296] [cursor=pointer]:
+                        - radio "Stats" [ref=e297]
+                        - generic [ref=e298]: Stats
+                    - generic [ref=e299]:
+                      - img [ref=e301]:
+                        - img [ref=e302]
+                      - generic [ref=e304]:
+                        - generic [ref=e305]: Completed
+                        - generic [ref=e306]:
+                          - generic [ref=e307]: ":"
+                          - generic [ref=e308]: 00:02.716
+                  - generic [ref=e309]:
+                    - button [ref=e311] [cursor=pointer]:
+                      - img [ref=e314]
+                    - button "Copy result" [ref=e316] [cursor=pointer]:
+                      - img [ref=e319]:
+                        - img [ref=e320]
+                    - button "Fullscreen" [ref=e322] [cursor=pointer]:
+                      - img [ref=e325]:
+                        - img [ref=e326]
+                    - button [ref=e328] [cursor=pointer]:
+                      - img [ref=e331]:
+                        - img [ref=e332]
+                - generic [ref=e338]:
+                  - generic [ref=e339]:
+                    - generic [ref=e340]: Result
+                    - generic [ref=e341]: "10"
+                  - generic [ref=e343]:
+                    - table [ref=e346]:
+                      - rowgroup [ref=e347]:
+                        - row "# x" [ref=e348]:
+                          - columnheader "#" [ref=e349]:
+                            - generic [ref=e350]: "#"
+                          - columnheader "x" [ref=e351]:
+                            - generic [ref=e352]: x
+                    - table [ref=e357]:
+                      - rowgroup:
+                        - row "# x":
+                          - columnheader "#":
+                            - generic: "#"
+                          - columnheader "x":
+                            - generic: x
+                      - rowgroup [ref=e358]:
+                        - row "1 1" [ref=e359]:
+                          - cell "1" [ref=e360]
+                          - cell "1" [ref=e361]:
+                            - generic [ref=e362] [cursor=pointer]: "1"
+                        - row "2 2" [ref=e363]:
+                          - cell "2" [ref=e364]
+                          - cell "2" [ref=e365]:
+                            - generic [ref=e366] [cursor=pointer]: "2"
+                        - row "3 3" [ref=e367]:
+                          - cell "3" [ref=e368]
+                          - cell "3" [ref=e369]:
+                            - generic [ref=e370] [cursor=pointer]: "3"
+                        - row "4 4" [ref=e371]:
+                          - cell "4" [ref=e372]
+                          - cell "4" [ref=e373]:
+                            - generic [ref=e374] [cursor=pointer]: "4"
+                        - row "5 5" [ref=e375]:
+                          - cell "5" [ref=e376]
+                          - cell "5" [ref=e377]:
+                            - generic [ref=e378] [cursor=pointer]: "5"
+                        - row "6 6" [ref=e379]:
+                          - cell "6" [ref=e380]
+                          - cell "6" [ref=e381]:
+                            - generic [ref=e382] [cursor=pointer]: "6"
+                        - row "7 7" [ref=e383]:
+                          - cell "7" [ref=e384]
+                          - cell "7" [ref=e385]:
+                            - generic [ref=e386] [cursor=pointer]: "7"
+                        - row "8 8" [ref=e387]:
+                          - cell "8" [ref=e388]
+                          - cell "8" [ref=e389]:
+                            - generic [ref=e390] [cursor=pointer]: "8"
+  - generic [ref=e391]:
+    - alert
+    - alert
+```

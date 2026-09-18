@@ -1,0 +1,186 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - img [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+      - generic [ref=e18]:
+        - button "Information" [ref=e19] [cursor=pointer]:
+          - img [ref=e22]:
+            - img [ref=e23]
+          - generic "Information":
+            - generic: Information
+        - button "Settings" [ref=e25] [cursor=pointer]:
+          - img [ref=e28]:
+            - img [ref=e29]
+          - generic "Settings":
+            - generic: Settings
+        - button "Account" [ref=e31] [cursor=pointer]:
+          - img [ref=e34]:
+            - img [ref=e35]
+          - generic "Account":
+            - generic: Account
+      - button "Expand" [ref=e37] [cursor=pointer]:
+        - img [ref=e38]:
+          - img [ref=e39]
+    - generic [ref=e41]:
+      - banner [ref=e42]:
+        - list [ref=e43]:
+          - listitem [ref=e44]:
+            - link "Cluster" [ref=e45] [cursor=pointer]:
+              - link "Cluster" [ref=e46]:
+                - /url: /cluster
+                - generic [ref=e47]:
+                  - img [ref=e48]
+                  - text: Cluster
+            - generic [ref=e50]: /
+          - listitem [ref=e51]:
+            - link "local" [disabled] [ref=e52]:
+              - generic [ref=e54]:
+                - img [ref=e55]
+                - text: local
+        - generic [ref=e57]:
+          - button "Connect" [ref=e58] [cursor=pointer]:
+            - img [ref=e61]:
+              - img [ref=e62]
+            - generic [ref=e64]: Connect
+          - link "Admin UI" [ref=e65] [cursor=pointer]:
+            - /url: http://localhost:8765/internal
+            - img [ref=e68]:
+              - img [ref=e69]
+            - generic [ref=e71]: Admin UI
+      - main [ref=e72]:
+        - generic [ref=e75]:
+          - generic [ref=e76]:
+            - generic [ref=e78]:
+              - generic [ref=e79]:
+                - generic [ref=e80]: Navigation
+                - generic [ref=e84]:
+                  - generic [ref=e87] [cursor=pointer]:
+                    - button [ref=e88]
+                    - generic [ref=e90]:
+                      - img [ref=e92]
+                      - generic [ref=e94]: /local
+                  - generic [ref=e97] [cursor=pointer]:
+                    - button [ref=e98]
+                    - generic [ref=e100]:
+                      - img [ref=e102]
+                      - generic [ref=e104]: .metadata
+                  - generic [ref=e107] [cursor=pointer]:
+                    - button [ref=e108]
+                    - generic [ref=e110]:
+                      - img [ref=e112]
+                      - generic [ref=e114]: .sys
+                  - generic [ref=e117] [cursor=pointer]:
+                    - button [ref=e118]
+                    - generic [ref=e120]:
+                      - img [ref=e122]
+                      - generic [ref=e124]: .sys_health
+                  - generic [ref=e129] [cursor=pointer]:
+                    - img [ref=e131]
+                    - generic [ref=e133]: a_test_table_1775977813118
+                  - generic [ref=e138] [cursor=pointer]:
+                    - img [ref=e140]
+                    - generic [ref=e142]: a_test_table_1775977816077
+                  - generic [ref=e147] [cursor=pointer]:
+                    - img [ref=e149]
+                    - generic [ref=e151]: a_test_table_1775977823172
+                  - generic [ref=e156] [cursor=pointer]:
+                    - img [ref=e158]
+                    - generic [ref=e160]: a_test_table_1775977826921
+                  - generic [ref=e165] [cursor=pointer]:
+                    - img [ref=e167]
+                    - generic [ref=e169]: a_test_table_1775977838378
+                  - generic [ref=e174] [cursor=pointer]:
+                    - img [ref=e176]
+                    - generic [ref=e178]: a_test_table_1775977849328
+                  - generic [ref=e183] [cursor=pointer]:
+                    - img [ref=e185]
+                    - generic [ref=e187]: a_test_table_1775977868168
+                  - generic [ref=e192] [cursor=pointer]:
+                    - img [ref=e194]
+                    - generic [ref=e196]: a_test_table_1775977882453
+              - generic [ref=e198]:
+                - generic [ref=e199]:
+                  - generic [ref=e200]:
+                    - generic [ref=e201]:
+                      - generic [ref=e202]: domain
+                      - generic [ref=e203]: /local
+                    - generic [ref=e204]:
+                      - button "Copy" [ref=e205] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                      - button [ref=e206] [cursor=pointer]:
+                        - img [ref=e209]:
+                          - img [ref=e210]
+                  - tablist [ref=e214]:
+                    - tab "Overview" [selected] [ref=e215] [cursor=pointer]:
+                      - link "Overview" [ref=e218]:
+                        - /url: /tenant?diagnosticsTab=overview&schema=/local&database=/local&tenantPage=query&summaryTab=overview
+                - generic [ref=e219]:
+                  - generic [ref=e220]: Directory
+                  - generic [ref=e221]:
+                    - generic [ref=e222]:
+                      - term [ref=e223]:
+                        - generic [ref=e224]: Type
+                      - definition [ref=e226]:
+                        - generic [ref=e227]: Domain
+                    - generic [ref=e228]:
+                      - term [ref=e229]:
+                        - generic [ref=e230]: Id
+                      - definition [ref=e232]:
+                        - generic [ref=e233]: "1"
+                    - generic [ref=e234]:
+                      - term [ref=e235]:
+                        - generic [ref=e236]: Version
+                      - definition [ref=e238]:
+                        - generic [ref=e239]: "79"
+                    - generic [ref=e240]:
+                      - term [ref=e241]:
+                        - generic [ref=e242]: Created
+                      - definition [ref=e244]:
+                        - generic [ref=e245]: 2026-04-12 07:06
+            - generic [ref=e246]:
+              - button [ref=e247] [cursor=pointer]:
+                - img [ref=e250]:
+                  - img [ref=e251]
+              - button [ref=e253] [cursor=pointer]:
+                - img [ref=e256]:
+                  - img [ref=e257]
+          - generic [ref=e261]:
+            - radiogroup [ref=e263]:
+              - generic [ref=e264]:
+                - radio "Query" [checked] [ref=e265]
+                - generic [ref=e267]:
+                  - img [ref=e268]:
+                    - img [ref=e269]
+                  - generic [ref=e271]: Query
+              - generic [ref=e272] [cursor=pointer]:
+                - radio "Diagnostics" [ref=e273]
+                - generic [ref=e275]:
+                  - img [ref=e276]:
+                    - img [ref=e277]
+                  - generic [ref=e281]: Diagnostics
+            - generic [ref=e282]:
+              - tablist [ref=e284]:
+                - tab "Editor" [selected] [ref=e285] [cursor=pointer]:
+                  - link "Editor" [ref=e288]:
+                    - /url: /tenant?diagnosticsTab=overview&schema=/local&database=/local&tenantPage=query&queryTab=newQuery
+                - tab "History" [ref=e289] [cursor=pointer]:
+                  - link "History" [ref=e292]:
+                    - /url: /tenant?diagnosticsTab=overview&schema=/local&database=/local&tenantPage=query&queryTab=history
+                - tab "Saved" [ref=e293] [cursor=pointer]:
+                  - link "Saved" [ref=e296]:
+                    - /url: /tenant?diagnosticsTab=overview&schema=/local&database=/local&tenantPage=query&queryTab=saved
+              - button "Create new query" [ref=e300] [cursor=pointer]:
+                - generic [ref=e302]:
+                  - generic [ref=e303]: Create new query
+                  - generic [ref=e304]: Ctrl + Alt + T
+  - generic [ref=e305]:
+    - alert
+    - alert
+```

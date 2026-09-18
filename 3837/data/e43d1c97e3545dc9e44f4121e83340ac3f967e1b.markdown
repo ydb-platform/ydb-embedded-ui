@@ -1,0 +1,2571 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e41]:
+    - banner [ref=e42]:
+      - list [ref=e43]:
+        - listitem [ref=e44]:
+          - link "Cluster" [disabled] [ref=e45]:
+            - generic [ref=e47]:
+              - img [ref=e48]
+              - text: Cluster
+      - link "Developer UI" [ref=e51] [cursor=pointer]:
+        - /url: http://localhost:8765/internal
+        - img [ref=e54]:
+          - img [ref=e55]
+        - generic [ref=e57]: Developer UI
+    - main [ref=e58]:
+      - generic [ref=e60]:
+        - generic [ref=e62]:
+          - text: LOCAL
+          - generic [ref=e63] [cursor=pointer]:
+            - img [ref=e65]:
+              - img [ref=e66]
+            - button "Good" [ref=e68]:
+              - generic [ref=e71]: Good
+        - generic [ref=e72]:
+          - button "Refresh" [ref=e73] [cursor=pointer]:
+            - img [ref=e76]
+          - group [ref=e79] [cursor=pointer]:
+            - combobox [ref=e80]:
+              - generic [ref=e81]: None
+            - img [ref=e82]:
+              - img [ref=e83]
+        - generic [ref=e86]:
+          - button "Overview" [expanded] [ref=e87] [cursor=pointer]:
+            - img [ref=e89]:
+              - img [ref=e90]
+            - generic [ref=e93]:
+              - img [ref=e94]:
+                - img [ref=e95]
+              - generic [ref=e97]: Overview
+          - region "Overview" [ref=e98]:
+            - generic [ref=e100]:
+              - generic [ref=e101]:
+                - generic [ref=e102]:
+                  - img [ref=e103]
+                  - generic [ref=e107]: 0.13%
+                - generic [ref=e108]:
+                  - generic [ref=e110]: 0 of 8 cores
+                  - generic [ref=e111]:
+                    - generic [ref=e112]: CPU load
+                    - button [ref=e113] [cursor=pointer]:
+                      - img [ref=e114]:
+                        - img [ref=e115]
+              - generic [ref=e117]:
+                - generic [ref=e118]:
+                  - img [ref=e119]
+                  - generic [ref=e123]: 0.23%
+                - generic [ref=e124]:
+                  - generic [ref=e126]: 0.2 of 69 GB
+                  - generic [ref=e127]:
+                    - generic [ref=e128]: Storage HDD
+                    - button [ref=e129] [cursor=pointer]:
+                      - img [ref=e130]:
+                        - img [ref=e131]
+              - generic [ref=e133]:
+                - generic [ref=e134]:
+                  - img [ref=e135]
+                  - generic [ref=e139]: 2.8%
+                - generic [ref=e140]:
+                  - generic [ref=e142]: 0.5 of 17 GB
+                  - generic [ref=e143]:
+                    - generic [ref=e144]: Memory used
+                    - button [ref=e145] [cursor=pointer]:
+                      - img [ref=e146]:
+                        - img [ref=e147]
+        - tablist [ref=e151]:
+          - tab "Databases" [ref=e152] [cursor=pointer]:
+            - link "Databases" [ref=e155]:
+              - /url: /cluster/tenants
+          - tab "Nodes" [selected] [ref=e156] [cursor=pointer]:
+            - link "Nodes" [ref=e159]:
+              - /url: /cluster/nodes
+          - tab "Storage" [ref=e160] [cursor=pointer]:
+            - link "Storage" [ref=e163]:
+              - /url: /cluster/storage
+          - tab "Network" [ref=e164] [cursor=pointer]:
+            - link "Network" [ref=e167]:
+              - /url: /cluster/network
+          - tab "Tablets" [ref=e168] [cursor=pointer]:
+            - link "Tablets" [ref=e171]:
+              - /url: /cluster/tablets
+          - tab "Versions" [ref=e172] [cursor=pointer]:
+            - link "Versions" [ref=e175]:
+              - /url: /cluster/versions
+          - tab "Configs" [ref=e176] [cursor=pointer]:
+            - link "Configs" [ref=e179]:
+              - /url: /cluster/configs
+        - generic [ref=e181]:
+          - generic [ref=e182]:
+            - generic [ref=e183]:
+              - textbox "Host name" [active] [ref=e186]
+              - generic [ref=e187]: "Group by:"
+              - group [ref=e189] [cursor=pointer]:
+                - combobox [ref=e190]:
+                  - generic [ref=e191]: "-"
+                - img [ref=e192]:
+                  - img [ref=e193]
+              - generic [ref=e197]: "Nodes: 1000"
+            - button "7/15" [ref=e200] [cursor=pointer]:
+              - img [ref=e203]:
+                - img [ref=e204]
+              - generic [ref=e207]: 7/15
+          - table [ref=e210]:
+            - rowgroup [ref=e211]:
+              - row "# Host Uptime CPU RAM Version Tablets" [ref=e212]:
+                - columnheader "#" [ref=e213]:
+                  - generic [ref=e214] [cursor=pointer]:
+                    - generic [ref=e216]: "#"
+                    - img [ref=e218]
+                - columnheader "Host" [ref=e220]:
+                  - generic [ref=e221] [cursor=pointer]:
+                    - generic [ref=e223]: Host
+                    - img [ref=e225]
+                - columnheader "Uptime" [ref=e227]:
+                  - generic [ref=e228] [cursor=pointer]:
+                    - generic [ref=e230]: Uptime
+                    - img [ref=e232]
+                - columnheader "CPU" [ref=e234]:
+                  - generic [ref=e235] [cursor=pointer]:
+                    - generic [ref=e237]: CPU
+                    - img [ref=e239]
+                - columnheader "RAM" [ref=e241]:
+                  - generic [ref=e242] [cursor=pointer]:
+                    - generic [ref=e244]: RAM
+                    - img [ref=e246]
+                - columnheader "Version" [ref=e248]:
+                  - generic [ref=e249] [cursor=pointer]:
+                    - generic [ref=e251]: Version
+                    - img [ref=e253]
+                - columnheader "Tablets" [ref=e255]:
+                  - generic [ref=e258]: Tablets
+            - rowgroup [ref=e259]:
+              - row [ref=e260]:
+                - cell [ref=e261]
+              - 'row "461 host-460.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e262]':
+                - cell "461" [ref=e263]
+                - cell "host-460.test Copy" [ref=e264]:
+                  - generic [ref=e267]:
+                    - generic "host-460.test" [ref=e268]:
+                      - link "host-460.test" [ref=e269] [cursor=pointer]:
+                        - /url: /node/461/tablets?database=local
+                    - generic:
+                      - button [ref=e270] [cursor=pointer]:
+                        - img [ref=e273]:
+                          - img [ref=e274]
+                      - button "Copy" [ref=e276] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e277]:
+                  - generic [ref=e279] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e280]:
+                  - generic [ref=e282] [cursor=pointer]: —
+                - cell "9 GB" [ref=e283]:
+                  - generic [ref=e288] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e289]:
+                  - generic [ref=e291] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e292]':
+                  - generic [ref=e293]:
+                    - 'link "DS: undefined" [ref=e294]':
+                      - /url: /node/461/tablets?database=local
+                    - 'link "DS: undefined" [ref=e295]':
+                      - /url: /node/461/tablets?database=local
+              - 'row "462 host-461.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e296]':
+                - cell "462" [ref=e297]
+                - cell "host-461.test Copy" [ref=e298]:
+                  - generic [ref=e301]:
+                    - generic "host-461.test" [ref=e302]:
+                      - link "host-461.test" [ref=e303] [cursor=pointer]:
+                        - /url: /node/462/tablets?database=local
+                    - generic:
+                      - button [ref=e304] [cursor=pointer]:
+                        - img [ref=e307]:
+                          - img [ref=e308]
+                      - button "Copy" [ref=e310] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e311]:
+                  - generic [ref=e313] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e314]:
+                  - generic [ref=e316] [cursor=pointer]: —
+                - cell "10 GB" [ref=e317]:
+                  - generic [ref=e322] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e323]:
+                  - generic [ref=e325] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e326]':
+                  - generic [ref=e327]:
+                    - 'link "DS: undefined" [ref=e328]':
+                      - /url: /node/462/tablets?database=local
+                    - 'link "DS: undefined" [ref=e329]':
+                      - /url: /node/462/tablets?database=local
+              - 'row "463 host-462.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e330]':
+                - cell "463" [ref=e331]
+                - cell "host-462.test Copy" [ref=e332]:
+                  - generic [ref=e335]:
+                    - generic "host-462.test" [ref=e336]:
+                      - link "host-462.test" [ref=e337] [cursor=pointer]:
+                        - /url: /node/463/tablets?database=local
+                    - generic:
+                      - button [ref=e338] [cursor=pointer]:
+                        - img [ref=e341]:
+                          - img [ref=e342]
+                      - button "Copy" [ref=e344] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e345]:
+                  - generic [ref=e347] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e348]:
+                  - generic [ref=e350] [cursor=pointer]: —
+                - cell "11 GB" [ref=e351]:
+                  - generic [ref=e356] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e357]:
+                  - generic [ref=e359] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e360]':
+                  - generic [ref=e361]:
+                    - 'link "DS: undefined" [ref=e362]':
+                      - /url: /node/463/tablets?database=local
+                    - 'link "DS: undefined" [ref=e363]':
+                      - /url: /node/463/tablets?database=local
+              - 'row "464 host-463.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e364]':
+                - cell "464" [ref=e365]
+                - cell "host-463.test Copy" [ref=e366]:
+                  - generic [ref=e369]:
+                    - generic "host-463.test" [ref=e370]:
+                      - link "host-463.test" [ref=e371] [cursor=pointer]:
+                        - /url: /node/464/tablets?database=local
+                    - generic:
+                      - button [ref=e372] [cursor=pointer]:
+                        - img [ref=e375]:
+                          - img [ref=e376]
+                      - button "Copy" [ref=e378] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e379]:
+                  - generic [ref=e381] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e382]:
+                  - generic [ref=e384] [cursor=pointer]: —
+                - cell "12 GB" [ref=e385]:
+                  - generic [ref=e390] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e391]:
+                  - generic [ref=e393] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e394]':
+                  - generic [ref=e395]:
+                    - 'link "DS: undefined" [ref=e396]':
+                      - /url: /node/464/tablets?database=local
+                    - 'link "DS: undefined" [ref=e397]':
+                      - /url: /node/464/tablets?database=local
+              - 'row "465 host-464.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e398]':
+                - cell "465" [ref=e399]
+                - cell "host-464.test Copy" [ref=e400]:
+                  - generic [ref=e403]:
+                    - generic "host-464.test" [ref=e404]:
+                      - link "host-464.test" [ref=e405] [cursor=pointer]:
+                        - /url: /node/465/tablets?database=local
+                    - generic:
+                      - button [ref=e406] [cursor=pointer]:
+                        - img [ref=e409]:
+                          - img [ref=e410]
+                      - button "Copy" [ref=e412] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e413]:
+                  - generic [ref=e415] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e416]:
+                  - generic [ref=e418] [cursor=pointer]: —
+                - cell "9 GB" [ref=e419]:
+                  - generic [ref=e424] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e425]:
+                  - generic [ref=e427] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e428]':
+                  - generic [ref=e429]:
+                    - 'link "DS: undefined" [ref=e430]':
+                      - /url: /node/465/tablets?database=local
+                    - 'link "DS: undefined" [ref=e431]':
+                      - /url: /node/465/tablets?database=local
+              - 'row "466 host-465.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e432]':
+                - cell "466" [ref=e433]
+                - cell "host-465.test Copy" [ref=e434]:
+                  - generic [ref=e437]:
+                    - generic "host-465.test" [ref=e438]:
+                      - link "host-465.test" [ref=e439] [cursor=pointer]:
+                        - /url: /node/466/tablets?database=local
+                    - generic:
+                      - button [ref=e440] [cursor=pointer]:
+                        - img [ref=e443]:
+                          - img [ref=e444]
+                      - button "Copy" [ref=e446] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e447]:
+                  - generic [ref=e449] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e450]:
+                  - generic [ref=e452] [cursor=pointer]: —
+                - cell "10 GB" [ref=e453]:
+                  - generic [ref=e458] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e459]:
+                  - generic [ref=e461] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e462]':
+                  - generic [ref=e463]:
+                    - 'link "DS: undefined" [ref=e464]':
+                      - /url: /node/466/tablets?database=local
+                    - 'link "DS: undefined" [ref=e465]':
+                      - /url: /node/466/tablets?database=local
+              - 'row "467 host-466.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e466]':
+                - cell "467" [ref=e467]
+                - cell "host-466.test Copy" [ref=e468]:
+                  - generic [ref=e471]:
+                    - generic "host-466.test" [ref=e472]:
+                      - link "host-466.test" [ref=e473] [cursor=pointer]:
+                        - /url: /node/467/tablets?database=local
+                    - generic:
+                      - button [ref=e474] [cursor=pointer]:
+                        - img [ref=e477]:
+                          - img [ref=e478]
+                      - button "Copy" [ref=e480] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e481]:
+                  - generic [ref=e483] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e484]:
+                  - generic [ref=e486] [cursor=pointer]: —
+                - cell "11 GB" [ref=e487]:
+                  - generic [ref=e492] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e493]:
+                  - generic [ref=e495] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e496]':
+                  - generic [ref=e497]:
+                    - 'link "DS: undefined" [ref=e498]':
+                      - /url: /node/467/tablets?database=local
+                    - 'link "DS: undefined" [ref=e499]':
+                      - /url: /node/467/tablets?database=local
+              - 'row "468 host-467.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e500]':
+                - cell "468" [ref=e501]
+                - cell "host-467.test Copy" [ref=e502]:
+                  - generic [ref=e505]:
+                    - generic "host-467.test" [ref=e506]:
+                      - link "host-467.test" [ref=e507] [cursor=pointer]:
+                        - /url: /node/468/tablets?database=local
+                    - generic:
+                      - button [ref=e508] [cursor=pointer]:
+                        - img [ref=e511]:
+                          - img [ref=e512]
+                      - button "Copy" [ref=e514] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e515]:
+                  - generic [ref=e517] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e518]:
+                  - generic [ref=e520] [cursor=pointer]: —
+                - cell "12 GB" [ref=e521]:
+                  - generic [ref=e526] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e527]:
+                  - generic [ref=e529] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e530]':
+                  - generic [ref=e531]:
+                    - 'link "DS: undefined" [ref=e532]':
+                      - /url: /node/468/tablets?database=local
+                    - 'link "DS: undefined" [ref=e533]':
+                      - /url: /node/468/tablets?database=local
+              - 'row "469 host-468.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e534]':
+                - cell "469" [ref=e535]
+                - cell "host-468.test Copy" [ref=e536]:
+                  - generic [ref=e539]:
+                    - generic "host-468.test" [ref=e540]:
+                      - link "host-468.test" [ref=e541] [cursor=pointer]:
+                        - /url: /node/469/tablets?database=local
+                    - generic:
+                      - button [ref=e542] [cursor=pointer]:
+                        - img [ref=e545]:
+                          - img [ref=e546]
+                      - button "Copy" [ref=e548] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e549]:
+                  - generic [ref=e551] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e552]:
+                  - generic [ref=e554] [cursor=pointer]: —
+                - cell "9 GB" [ref=e555]:
+                  - generic [ref=e560] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e561]:
+                  - generic [ref=e563] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e564]':
+                  - generic [ref=e565]:
+                    - 'link "DS: undefined" [ref=e566]':
+                      - /url: /node/469/tablets?database=local
+                    - 'link "DS: undefined" [ref=e567]':
+                      - /url: /node/469/tablets?database=local
+              - 'row "470 host-469.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e568]':
+                - cell "470" [ref=e569]
+                - cell "host-469.test Copy" [ref=e570]:
+                  - generic [ref=e573]:
+                    - generic "host-469.test" [ref=e574]:
+                      - link "host-469.test" [ref=e575] [cursor=pointer]:
+                        - /url: /node/470/tablets?database=local
+                    - generic:
+                      - button [ref=e576] [cursor=pointer]:
+                        - img [ref=e579]:
+                          - img [ref=e580]
+                      - button "Copy" [ref=e582] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e583]:
+                  - generic [ref=e585] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e586]:
+                  - generic [ref=e588] [cursor=pointer]: —
+                - cell "10 GB" [ref=e589]:
+                  - generic [ref=e594] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e595]:
+                  - generic [ref=e597] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e598]':
+                  - generic [ref=e599]:
+                    - 'link "DS: undefined" [ref=e600]':
+                      - /url: /node/470/tablets?database=local
+                    - 'link "DS: undefined" [ref=e601]':
+                      - /url: /node/470/tablets?database=local
+              - 'row "471 host-470.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e602]':
+                - cell "471" [ref=e603]
+                - cell "host-470.test Copy" [ref=e604]:
+                  - generic [ref=e607]:
+                    - generic "host-470.test" [ref=e608]:
+                      - link "host-470.test" [ref=e609] [cursor=pointer]:
+                        - /url: /node/471/tablets?database=local
+                    - generic:
+                      - button [ref=e610] [cursor=pointer]:
+                        - img [ref=e613]:
+                          - img [ref=e614]
+                      - button "Copy" [ref=e616] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e617]:
+                  - generic [ref=e619] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e620]:
+                  - generic [ref=e622] [cursor=pointer]: —
+                - cell "11 GB" [ref=e623]:
+                  - generic [ref=e628] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e629]:
+                  - generic [ref=e631] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e632]':
+                  - generic [ref=e633]:
+                    - 'link "DS: undefined" [ref=e634]':
+                      - /url: /node/471/tablets?database=local
+                    - 'link "DS: undefined" [ref=e635]':
+                      - /url: /node/471/tablets?database=local
+              - 'row "472 host-471.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e636]':
+                - cell "472" [ref=e637]
+                - cell "host-471.test Copy" [ref=e638]:
+                  - generic [ref=e641]:
+                    - generic "host-471.test" [ref=e642]:
+                      - link "host-471.test" [ref=e643] [cursor=pointer]:
+                        - /url: /node/472/tablets?database=local
+                    - generic:
+                      - button [ref=e644] [cursor=pointer]:
+                        - img [ref=e647]:
+                          - img [ref=e648]
+                      - button "Copy" [ref=e650] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e651]:
+                  - generic [ref=e653] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e654]:
+                  - generic [ref=e656] [cursor=pointer]: —
+                - cell "12 GB" [ref=e657]:
+                  - generic [ref=e662] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e663]:
+                  - generic [ref=e665] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e666]':
+                  - generic [ref=e667]:
+                    - 'link "DS: undefined" [ref=e668]':
+                      - /url: /node/472/tablets?database=local
+                    - 'link "DS: undefined" [ref=e669]':
+                      - /url: /node/472/tablets?database=local
+              - 'row "473 host-472.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e670]':
+                - cell "473" [ref=e671]
+                - cell "host-472.test Copy" [ref=e672]:
+                  - generic [ref=e675]:
+                    - generic "host-472.test" [ref=e676]:
+                      - link "host-472.test" [ref=e677] [cursor=pointer]:
+                        - /url: /node/473/tablets?database=local
+                    - generic:
+                      - button [ref=e678] [cursor=pointer]:
+                        - img [ref=e681]:
+                          - img [ref=e682]
+                      - button "Copy" [ref=e684] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e685]:
+                  - generic [ref=e687] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e688]:
+                  - generic [ref=e690] [cursor=pointer]: —
+                - cell "9 GB" [ref=e691]:
+                  - generic [ref=e696] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e697]:
+                  - generic [ref=e699] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e700]':
+                  - generic [ref=e701]:
+                    - 'link "DS: undefined" [ref=e702]':
+                      - /url: /node/473/tablets?database=local
+                    - 'link "DS: undefined" [ref=e703]':
+                      - /url: /node/473/tablets?database=local
+              - 'row "474 host-473.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e704]':
+                - cell "474" [ref=e705]
+                - cell "host-473.test Copy" [ref=e706]:
+                  - generic [ref=e709]:
+                    - generic "host-473.test" [ref=e710]:
+                      - link "host-473.test" [ref=e711] [cursor=pointer]:
+                        - /url: /node/474/tablets?database=local
+                    - generic:
+                      - button [ref=e712] [cursor=pointer]:
+                        - img [ref=e715]:
+                          - img [ref=e716]
+                      - button "Copy" [ref=e718] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e719]:
+                  - generic [ref=e721] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e722]:
+                  - generic [ref=e724] [cursor=pointer]: —
+                - cell "10 GB" [ref=e725]:
+                  - generic [ref=e730] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e731]:
+                  - generic [ref=e733] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e734]':
+                  - generic [ref=e735]:
+                    - 'link "DS: undefined" [ref=e736]':
+                      - /url: /node/474/tablets?database=local
+                    - 'link "DS: undefined" [ref=e737]':
+                      - /url: /node/474/tablets?database=local
+              - 'row "475 host-474.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e738]':
+                - cell "475" [ref=e739]
+                - cell "host-474.test Copy" [ref=e740]:
+                  - generic [ref=e743]:
+                    - generic "host-474.test" [ref=e744]:
+                      - link "host-474.test" [ref=e745] [cursor=pointer]:
+                        - /url: /node/475/tablets?database=local
+                    - generic:
+                      - button [ref=e746] [cursor=pointer]:
+                        - img [ref=e749]:
+                          - img [ref=e750]
+                      - button "Copy" [ref=e752] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e753]:
+                  - generic [ref=e755] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e756]:
+                  - generic [ref=e758] [cursor=pointer]: —
+                - cell "11 GB" [ref=e759]:
+                  - generic [ref=e764] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e765]:
+                  - generic [ref=e767] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e768]':
+                  - generic [ref=e769]:
+                    - 'link "DS: undefined" [ref=e770]':
+                      - /url: /node/475/tablets?database=local
+                    - 'link "DS: undefined" [ref=e771]':
+                      - /url: /node/475/tablets?database=local
+              - 'row "476 host-475.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e772]':
+                - cell "476" [ref=e773]
+                - cell "host-475.test Copy" [ref=e774]:
+                  - generic [ref=e777]:
+                    - generic "host-475.test" [ref=e778]:
+                      - link "host-475.test" [ref=e779] [cursor=pointer]:
+                        - /url: /node/476/tablets?database=local
+                    - generic:
+                      - button [ref=e780] [cursor=pointer]:
+                        - img [ref=e783]:
+                          - img [ref=e784]
+                      - button "Copy" [ref=e786] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e787]:
+                  - generic [ref=e789] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e790]:
+                  - generic [ref=e792] [cursor=pointer]: —
+                - cell "12 GB" [ref=e793]:
+                  - generic [ref=e798] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e799]:
+                  - generic [ref=e801] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e802]':
+                  - generic [ref=e803]:
+                    - 'link "DS: undefined" [ref=e804]':
+                      - /url: /node/476/tablets?database=local
+                    - 'link "DS: undefined" [ref=e805]':
+                      - /url: /node/476/tablets?database=local
+              - 'row "477 host-476.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e806]':
+                - cell "477" [ref=e807]
+                - cell "host-476.test Copy" [ref=e808]:
+                  - generic [ref=e811]:
+                    - generic "host-476.test" [ref=e812]:
+                      - link "host-476.test" [ref=e813] [cursor=pointer]:
+                        - /url: /node/477/tablets?database=local
+                    - generic:
+                      - button [ref=e814] [cursor=pointer]:
+                        - img [ref=e817]:
+                          - img [ref=e818]
+                      - button "Copy" [ref=e820] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e821]:
+                  - generic [ref=e823] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e824]:
+                  - generic [ref=e826] [cursor=pointer]: —
+                - cell "9 GB" [ref=e827]:
+                  - generic [ref=e832] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e833]:
+                  - generic [ref=e835] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e836]':
+                  - generic [ref=e837]:
+                    - 'link "DS: undefined" [ref=e838]':
+                      - /url: /node/477/tablets?database=local
+                    - 'link "DS: undefined" [ref=e839]':
+                      - /url: /node/477/tablets?database=local
+              - 'row "478 host-477.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e840]':
+                - cell "478" [ref=e841]
+                - cell "host-477.test Copy" [ref=e842]:
+                  - generic [ref=e845]:
+                    - generic "host-477.test" [ref=e846]:
+                      - link "host-477.test" [ref=e847] [cursor=pointer]:
+                        - /url: /node/478/tablets?database=local
+                    - generic:
+                      - button [ref=e848] [cursor=pointer]:
+                        - img [ref=e851]:
+                          - img [ref=e852]
+                      - button "Copy" [ref=e854] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e855]:
+                  - generic [ref=e857] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e858]:
+                  - generic [ref=e860] [cursor=pointer]: —
+                - cell "10 GB" [ref=e861]:
+                  - generic [ref=e866] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e867]:
+                  - generic [ref=e869] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e870]':
+                  - generic [ref=e871]:
+                    - 'link "DS: undefined" [ref=e872]':
+                      - /url: /node/478/tablets?database=local
+                    - 'link "DS: undefined" [ref=e873]':
+                      - /url: /node/478/tablets?database=local
+              - 'row "479 host-478.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e874]':
+                - cell "479" [ref=e875]
+                - cell "host-478.test Copy" [ref=e876]:
+                  - generic [ref=e879]:
+                    - generic "host-478.test" [ref=e880]:
+                      - link "host-478.test" [ref=e881] [cursor=pointer]:
+                        - /url: /node/479/tablets?database=local
+                    - generic:
+                      - button [ref=e882] [cursor=pointer]:
+                        - img [ref=e885]:
+                          - img [ref=e886]
+                      - button "Copy" [ref=e888] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e889]:
+                  - generic [ref=e891] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e892]:
+                  - generic [ref=e894] [cursor=pointer]: —
+                - cell "11 GB" [ref=e895]:
+                  - generic [ref=e900] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e901]:
+                  - generic [ref=e903] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e904]':
+                  - generic [ref=e905]:
+                    - 'link "DS: undefined" [ref=e906]':
+                      - /url: /node/479/tablets?database=local
+                    - 'link "DS: undefined" [ref=e907]':
+                      - /url: /node/479/tablets?database=local
+              - 'row "480 host-479.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e908]':
+                - cell "480" [ref=e909]
+                - cell "host-479.test Copy" [ref=e910]:
+                  - generic [ref=e913]:
+                    - generic "host-479.test" [ref=e914]:
+                      - link "host-479.test" [ref=e915] [cursor=pointer]:
+                        - /url: /node/480/tablets?database=local
+                    - generic:
+                      - button [ref=e916] [cursor=pointer]:
+                        - img [ref=e919]:
+                          - img [ref=e920]
+                      - button "Copy" [ref=e922] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e923]:
+                  - generic [ref=e925] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e926]:
+                  - generic [ref=e928] [cursor=pointer]: —
+                - cell "12 GB" [ref=e929]:
+                  - generic [ref=e934] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e935]:
+                  - generic [ref=e937] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e938]':
+                  - generic [ref=e939]:
+                    - 'link "DS: undefined" [ref=e940]':
+                      - /url: /node/480/tablets?database=local
+                    - 'link "DS: undefined" [ref=e941]':
+                      - /url: /node/480/tablets?database=local
+              - 'row "481 host-480.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e942]':
+                - cell "481" [ref=e943]
+                - cell "host-480.test Copy" [ref=e944]:
+                  - generic [ref=e947]:
+                    - generic "host-480.test" [ref=e948]:
+                      - link "host-480.test" [ref=e949] [cursor=pointer]:
+                        - /url: /node/481/tablets?database=local
+                    - generic:
+                      - button [ref=e950] [cursor=pointer]:
+                        - img [ref=e953]:
+                          - img [ref=e954]
+                      - button "Copy" [ref=e956] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e957]:
+                  - generic [ref=e959] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e960]:
+                  - generic [ref=e962] [cursor=pointer]: —
+                - cell "9 GB" [ref=e963]:
+                  - generic [ref=e968] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e969]:
+                  - generic [ref=e971] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e972]':
+                  - generic [ref=e973]:
+                    - 'link "DS: undefined" [ref=e974]':
+                      - /url: /node/481/tablets?database=local
+                    - 'link "DS: undefined" [ref=e975]':
+                      - /url: /node/481/tablets?database=local
+              - 'row "482 host-481.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e976]':
+                - cell "482" [ref=e977]
+                - cell "host-481.test Copy" [ref=e978]:
+                  - generic [ref=e981]:
+                    - generic "host-481.test" [ref=e982]:
+                      - link "host-481.test" [ref=e983] [cursor=pointer]:
+                        - /url: /node/482/tablets?database=local
+                    - generic:
+                      - button [ref=e984] [cursor=pointer]:
+                        - img [ref=e987]:
+                          - img [ref=e988]
+                      - button "Copy" [ref=e990] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e991]:
+                  - generic [ref=e993] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e994]:
+                  - generic [ref=e996] [cursor=pointer]: —
+                - cell "10 GB" [ref=e997]:
+                  - generic [ref=e1002] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e1003]:
+                  - generic [ref=e1005] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1006]':
+                  - generic [ref=e1007]:
+                    - 'link "DS: undefined" [ref=e1008]':
+                      - /url: /node/482/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1009]':
+                      - /url: /node/482/tablets?database=local
+              - 'row "483 host-482.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1010]':
+                - cell "483" [ref=e1011]
+                - cell "host-482.test Copy" [ref=e1012]:
+                  - generic [ref=e1015]:
+                    - generic "host-482.test" [ref=e1016]:
+                      - link "host-482.test" [ref=e1017] [cursor=pointer]:
+                        - /url: /node/483/tablets?database=local
+                    - generic:
+                      - button [ref=e1018] [cursor=pointer]:
+                        - img [ref=e1021]:
+                          - img [ref=e1022]
+                      - button "Copy" [ref=e1024] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1025]:
+                  - generic [ref=e1027] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1028]:
+                  - generic [ref=e1030] [cursor=pointer]: —
+                - cell "11 GB" [ref=e1031]:
+                  - generic [ref=e1036] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e1037]:
+                  - generic [ref=e1039] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1040]':
+                  - generic [ref=e1041]:
+                    - 'link "DS: undefined" [ref=e1042]':
+                      - /url: /node/483/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1043]':
+                      - /url: /node/483/tablets?database=local
+              - 'row "484 host-483.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1044]':
+                - cell "484" [ref=e1045]
+                - cell "host-483.test Copy" [ref=e1046]:
+                  - generic [ref=e1049]:
+                    - generic "host-483.test" [ref=e1050]:
+                      - link "host-483.test" [ref=e1051] [cursor=pointer]:
+                        - /url: /node/484/tablets?database=local
+                    - generic:
+                      - button [ref=e1052] [cursor=pointer]:
+                        - img [ref=e1055]:
+                          - img [ref=e1056]
+                      - button "Copy" [ref=e1058] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1059]:
+                  - generic [ref=e1061] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1062]:
+                  - generic [ref=e1064] [cursor=pointer]: —
+                - cell "12 GB" [ref=e1065]:
+                  - generic [ref=e1070] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e1071]:
+                  - generic [ref=e1073] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1074]':
+                  - generic [ref=e1075]:
+                    - 'link "DS: undefined" [ref=e1076]':
+                      - /url: /node/484/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1077]':
+                      - /url: /node/484/tablets?database=local
+              - 'row "485 host-484.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1078]':
+                - cell "485" [ref=e1079]
+                - cell "host-484.test Copy" [ref=e1080]:
+                  - generic [ref=e1083]:
+                    - generic "host-484.test" [ref=e1084]:
+                      - link "host-484.test" [ref=e1085] [cursor=pointer]:
+                        - /url: /node/485/tablets?database=local
+                    - generic:
+                      - button [ref=e1086] [cursor=pointer]:
+                        - img [ref=e1089]:
+                          - img [ref=e1090]
+                      - button "Copy" [ref=e1092] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1093]:
+                  - generic [ref=e1095] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1096]:
+                  - generic [ref=e1098] [cursor=pointer]: —
+                - cell "9 GB" [ref=e1099]:
+                  - generic [ref=e1104] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e1105]:
+                  - generic [ref=e1107] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1108]':
+                  - generic [ref=e1109]:
+                    - 'link "DS: undefined" [ref=e1110]':
+                      - /url: /node/485/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1111]':
+                      - /url: /node/485/tablets?database=local
+              - 'row "486 host-485.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1112]':
+                - cell "486" [ref=e1113]
+                - cell "host-485.test Copy" [ref=e1114]:
+                  - generic [ref=e1117]:
+                    - generic "host-485.test" [ref=e1118]:
+                      - link "host-485.test" [ref=e1119] [cursor=pointer]:
+                        - /url: /node/486/tablets?database=local
+                    - generic:
+                      - button [ref=e1120] [cursor=pointer]:
+                        - img [ref=e1123]:
+                          - img [ref=e1124]
+                      - button "Copy" [ref=e1126] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1127]:
+                  - generic [ref=e1129] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1130]:
+                  - generic [ref=e1132] [cursor=pointer]: —
+                - cell "10 GB" [ref=e1133]:
+                  - generic [ref=e1138] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e1139]:
+                  - generic [ref=e1141] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1142]':
+                  - generic [ref=e1143]:
+                    - 'link "DS: undefined" [ref=e1144]':
+                      - /url: /node/486/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1145]':
+                      - /url: /node/486/tablets?database=local
+              - 'row "487 host-486.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1146]':
+                - cell "487" [ref=e1147]
+                - cell "host-486.test Copy" [ref=e1148]:
+                  - generic [ref=e1151]:
+                    - generic "host-486.test" [ref=e1152]:
+                      - link "host-486.test" [ref=e1153] [cursor=pointer]:
+                        - /url: /node/487/tablets?database=local
+                    - generic:
+                      - button [ref=e1154] [cursor=pointer]:
+                        - img [ref=e1157]:
+                          - img [ref=e1158]
+                      - button "Copy" [ref=e1160] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1161]:
+                  - generic [ref=e1163] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1164]:
+                  - generic [ref=e1166] [cursor=pointer]: —
+                - cell "11 GB" [ref=e1167]:
+                  - generic [ref=e1172] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e1173]:
+                  - generic [ref=e1175] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1176]':
+                  - generic [ref=e1177]:
+                    - 'link "DS: undefined" [ref=e1178]':
+                      - /url: /node/487/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1179]':
+                      - /url: /node/487/tablets?database=local
+              - 'row "488 host-487.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1180]':
+                - cell "488" [ref=e1181]
+                - cell "host-487.test Copy" [ref=e1182]:
+                  - generic [ref=e1185]:
+                    - generic "host-487.test" [ref=e1186]:
+                      - link "host-487.test" [ref=e1187] [cursor=pointer]:
+                        - /url: /node/488/tablets?database=local
+                    - generic:
+                      - button [ref=e1188] [cursor=pointer]:
+                        - img [ref=e1191]:
+                          - img [ref=e1192]
+                      - button "Copy" [ref=e1194] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1195]:
+                  - generic [ref=e1197] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1198]:
+                  - generic [ref=e1200] [cursor=pointer]: —
+                - cell "12 GB" [ref=e1201]:
+                  - generic [ref=e1206] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e1207]:
+                  - generic [ref=e1209] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1210]':
+                  - generic [ref=e1211]:
+                    - 'link "DS: undefined" [ref=e1212]':
+                      - /url: /node/488/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1213]':
+                      - /url: /node/488/tablets?database=local
+              - 'row "489 host-488.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1214]':
+                - cell "489" [ref=e1215]
+                - cell "host-488.test Copy" [ref=e1216]:
+                  - generic [ref=e1219]:
+                    - generic "host-488.test" [ref=e1220]:
+                      - link "host-488.test" [ref=e1221] [cursor=pointer]:
+                        - /url: /node/489/tablets?database=local
+                    - generic:
+                      - button [ref=e1222] [cursor=pointer]:
+                        - img [ref=e1225]:
+                          - img [ref=e1226]
+                      - button "Copy" [ref=e1228] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1229]:
+                  - generic [ref=e1231] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1232]:
+                  - generic [ref=e1234] [cursor=pointer]: —
+                - cell "9 GB" [ref=e1235]:
+                  - generic [ref=e1240] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e1241]:
+                  - generic [ref=e1243] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1244]':
+                  - generic [ref=e1245]:
+                    - 'link "DS: undefined" [ref=e1246]':
+                      - /url: /node/489/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1247]':
+                      - /url: /node/489/tablets?database=local
+              - 'row "490 host-489.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1248]':
+                - cell "490" [ref=e1249]
+                - cell "host-489.test Copy" [ref=e1250]:
+                  - generic [ref=e1253]:
+                    - generic "host-489.test" [ref=e1254]:
+                      - link "host-489.test" [ref=e1255] [cursor=pointer]:
+                        - /url: /node/490/tablets?database=local
+                    - generic:
+                      - button [ref=e1256] [cursor=pointer]:
+                        - img [ref=e1259]:
+                          - img [ref=e1260]
+                      - button "Copy" [ref=e1262] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1263]:
+                  - generic [ref=e1265] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1266]:
+                  - generic [ref=e1268] [cursor=pointer]: —
+                - cell "10 GB" [ref=e1269]:
+                  - generic [ref=e1274] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e1275]:
+                  - generic [ref=e1277] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1278]':
+                  - generic [ref=e1279]:
+                    - 'link "DS: undefined" [ref=e1280]':
+                      - /url: /node/490/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1281]':
+                      - /url: /node/490/tablets?database=local
+              - 'row "491 host-490.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1282]':
+                - cell "491" [ref=e1283]
+                - cell "host-490.test Copy" [ref=e1284]:
+                  - generic [ref=e1287]:
+                    - generic "host-490.test" [ref=e1288]:
+                      - link "host-490.test" [ref=e1289] [cursor=pointer]:
+                        - /url: /node/491/tablets?database=local
+                    - generic:
+                      - button [ref=e1290] [cursor=pointer]:
+                        - img [ref=e1293]:
+                          - img [ref=e1294]
+                      - button "Copy" [ref=e1296] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1297]:
+                  - generic [ref=e1299] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1300]:
+                  - generic [ref=e1302] [cursor=pointer]: —
+                - cell "11 GB" [ref=e1303]:
+                  - generic [ref=e1308] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e1309]:
+                  - generic [ref=e1311] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1312]':
+                  - generic [ref=e1313]:
+                    - 'link "DS: undefined" [ref=e1314]':
+                      - /url: /node/491/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1315]':
+                      - /url: /node/491/tablets?database=local
+              - 'row "492 host-491.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1316]':
+                - cell "492" [ref=e1317]
+                - cell "host-491.test Copy" [ref=e1318]:
+                  - generic [ref=e1321]:
+                    - generic "host-491.test" [ref=e1322]:
+                      - link "host-491.test" [ref=e1323] [cursor=pointer]:
+                        - /url: /node/492/tablets?database=local
+                    - generic:
+                      - button [ref=e1324] [cursor=pointer]:
+                        - img [ref=e1327]:
+                          - img [ref=e1328]
+                      - button "Copy" [ref=e1330] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1331]:
+                  - generic [ref=e1333] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1334]:
+                  - generic [ref=e1336] [cursor=pointer]: —
+                - cell "12 GB" [ref=e1337]:
+                  - generic [ref=e1342] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e1343]:
+                  - generic [ref=e1345] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1346]':
+                  - generic [ref=e1347]:
+                    - 'link "DS: undefined" [ref=e1348]':
+                      - /url: /node/492/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1349]':
+                      - /url: /node/492/tablets?database=local
+              - 'row "493 host-492.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1350]':
+                - cell "493" [ref=e1351]
+                - cell "host-492.test Copy" [ref=e1352]:
+                  - generic [ref=e1355]:
+                    - generic "host-492.test" [ref=e1356]:
+                      - link "host-492.test" [ref=e1357] [cursor=pointer]:
+                        - /url: /node/493/tablets?database=local
+                    - generic:
+                      - button [ref=e1358] [cursor=pointer]:
+                        - img [ref=e1361]:
+                          - img [ref=e1362]
+                      - button "Copy" [ref=e1364] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1365]:
+                  - generic [ref=e1367] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1368]:
+                  - generic [ref=e1370] [cursor=pointer]: —
+                - cell "9 GB" [ref=e1371]:
+                  - generic [ref=e1376] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e1377]:
+                  - generic [ref=e1379] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1380]':
+                  - generic [ref=e1381]:
+                    - 'link "DS: undefined" [ref=e1382]':
+                      - /url: /node/493/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1383]':
+                      - /url: /node/493/tablets?database=local
+              - 'row "494 host-493.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1384]':
+                - cell "494" [ref=e1385]
+                - cell "host-493.test Copy" [ref=e1386]:
+                  - generic [ref=e1389]:
+                    - generic "host-493.test" [ref=e1390]:
+                      - link "host-493.test" [ref=e1391] [cursor=pointer]:
+                        - /url: /node/494/tablets?database=local
+                    - generic:
+                      - button [ref=e1392] [cursor=pointer]:
+                        - img [ref=e1395]:
+                          - img [ref=e1396]
+                      - button "Copy" [ref=e1398] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1399]:
+                  - generic [ref=e1401] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1402]:
+                  - generic [ref=e1404] [cursor=pointer]: —
+                - cell "10 GB" [ref=e1405]:
+                  - generic [ref=e1410] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e1411]:
+                  - generic [ref=e1413] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1414]':
+                  - generic [ref=e1415]:
+                    - 'link "DS: undefined" [ref=e1416]':
+                      - /url: /node/494/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1417]':
+                      - /url: /node/494/tablets?database=local
+              - 'row "495 host-494.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1418]':
+                - cell "495" [ref=e1419]
+                - cell "host-494.test Copy" [ref=e1420]:
+                  - generic [ref=e1423]:
+                    - generic "host-494.test" [ref=e1424]:
+                      - link "host-494.test" [ref=e1425] [cursor=pointer]:
+                        - /url: /node/495/tablets?database=local
+                    - generic:
+                      - button [ref=e1426] [cursor=pointer]:
+                        - img [ref=e1429]:
+                          - img [ref=e1430]
+                      - button "Copy" [ref=e1432] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1433]:
+                  - generic [ref=e1435] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1436]:
+                  - generic [ref=e1438] [cursor=pointer]: —
+                - cell "11 GB" [ref=e1439]:
+                  - generic [ref=e1444] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e1445]:
+                  - generic [ref=e1447] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1448]':
+                  - generic [ref=e1449]:
+                    - 'link "DS: undefined" [ref=e1450]':
+                      - /url: /node/495/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1451]':
+                      - /url: /node/495/tablets?database=local
+              - 'row "496 host-495.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1452]':
+                - cell "496" [ref=e1453]
+                - cell "host-495.test Copy" [ref=e1454]:
+                  - generic [ref=e1457]:
+                    - generic "host-495.test" [ref=e1458]:
+                      - link "host-495.test" [ref=e1459] [cursor=pointer]:
+                        - /url: /node/496/tablets?database=local
+                    - generic:
+                      - button [ref=e1460] [cursor=pointer]:
+                        - img [ref=e1463]:
+                          - img [ref=e1464]
+                      - button "Copy" [ref=e1466] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1467]:
+                  - generic [ref=e1469] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1470]:
+                  - generic [ref=e1472] [cursor=pointer]: —
+                - cell "12 GB" [ref=e1473]:
+                  - generic [ref=e1478] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e1479]:
+                  - generic [ref=e1481] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1482]':
+                  - generic [ref=e1483]:
+                    - 'link "DS: undefined" [ref=e1484]':
+                      - /url: /node/496/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1485]':
+                      - /url: /node/496/tablets?database=local
+              - 'row "497 host-496.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1486]':
+                - cell "497" [ref=e1487]
+                - cell "host-496.test Copy" [ref=e1488]:
+                  - generic [ref=e1491]:
+                    - generic "host-496.test" [ref=e1492]:
+                      - link "host-496.test" [ref=e1493] [cursor=pointer]:
+                        - /url: /node/497/tablets?database=local
+                    - generic:
+                      - button [ref=e1494] [cursor=pointer]:
+                        - img [ref=e1497]:
+                          - img [ref=e1498]
+                      - button "Copy" [ref=e1500] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1501]:
+                  - generic [ref=e1503] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1504]:
+                  - generic [ref=e1506] [cursor=pointer]: —
+                - cell "9 GB" [ref=e1507]:
+                  - generic [ref=e1512] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e1513]:
+                  - generic [ref=e1515] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1516]':
+                  - generic [ref=e1517]:
+                    - 'link "DS: undefined" [ref=e1518]':
+                      - /url: /node/497/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1519]':
+                      - /url: /node/497/tablets?database=local
+              - 'row "498 host-497.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1520]':
+                - cell "498" [ref=e1521]
+                - cell "host-497.test Copy" [ref=e1522]:
+                  - generic [ref=e1525]:
+                    - generic "host-497.test" [ref=e1526]:
+                      - link "host-497.test" [ref=e1527] [cursor=pointer]:
+                        - /url: /node/498/tablets?database=local
+                    - generic:
+                      - button [ref=e1528] [cursor=pointer]:
+                        - img [ref=e1531]:
+                          - img [ref=e1532]
+                      - button "Copy" [ref=e1534] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1535]:
+                  - generic [ref=e1537] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1538]:
+                  - generic [ref=e1540] [cursor=pointer]: —
+                - cell "10 GB" [ref=e1541]:
+                  - generic [ref=e1546] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e1547]:
+                  - generic [ref=e1549] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1550]':
+                  - generic [ref=e1551]:
+                    - 'link "DS: undefined" [ref=e1552]':
+                      - /url: /node/498/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1553]':
+                      - /url: /node/498/tablets?database=local
+              - 'row "499 host-498.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1554]':
+                - cell "499" [ref=e1555]
+                - cell "host-498.test Copy" [ref=e1556]:
+                  - generic [ref=e1559]:
+                    - generic "host-498.test" [ref=e1560]:
+                      - link "host-498.test" [ref=e1561] [cursor=pointer]:
+                        - /url: /node/499/tablets?database=local
+                    - generic:
+                      - button [ref=e1562] [cursor=pointer]:
+                        - img [ref=e1565]:
+                          - img [ref=e1566]
+                      - button "Copy" [ref=e1568] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1569]:
+                  - generic [ref=e1571] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1572]:
+                  - generic [ref=e1574] [cursor=pointer]: —
+                - cell "11 GB" [ref=e1575]:
+                  - generic [ref=e1580] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e1581]:
+                  - generic [ref=e1583] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1584]':
+                  - generic [ref=e1585]:
+                    - 'link "DS: undefined" [ref=e1586]':
+                      - /url: /node/499/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1587]':
+                      - /url: /node/499/tablets?database=local
+              - 'row "500 host-499.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1588]':
+                - cell "500" [ref=e1589]
+                - cell "host-499.test Copy" [ref=e1590]:
+                  - generic [ref=e1593]:
+                    - generic "host-499.test" [ref=e1594]:
+                      - link "host-499.test" [ref=e1595] [cursor=pointer]:
+                        - /url: /node/500/tablets?database=local
+                    - generic:
+                      - button [ref=e1596] [cursor=pointer]:
+                        - img [ref=e1599]:
+                          - img [ref=e1600]
+                      - button "Copy" [ref=e1602] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1603]:
+                  - generic [ref=e1605] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1606]:
+                  - generic [ref=e1608] [cursor=pointer]: —
+                - cell "12 GB" [ref=e1609]:
+                  - generic [ref=e1614] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e1615]:
+                  - generic [ref=e1617] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1618]':
+                  - generic [ref=e1619]:
+                    - 'link "DS: undefined" [ref=e1620]':
+                      - /url: /node/500/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1621]':
+                      - /url: /node/500/tablets?database=local
+              - 'row "501 host-500.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1622]':
+                - cell "501" [ref=e1623]
+                - cell "host-500.test Copy" [ref=e1624]:
+                  - generic [ref=e1627]:
+                    - generic "host-500.test" [ref=e1628]:
+                      - link "host-500.test" [ref=e1629] [cursor=pointer]:
+                        - /url: /node/501/tablets?database=local
+                    - generic:
+                      - button [ref=e1630] [cursor=pointer]:
+                        - img [ref=e1633]:
+                          - img [ref=e1634]
+                      - button "Copy" [ref=e1636] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1637]:
+                  - generic [ref=e1639] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1640]:
+                  - generic [ref=e1642] [cursor=pointer]: —
+                - cell "9 GB" [ref=e1643]:
+                  - generic [ref=e1648] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e1649]:
+                  - generic [ref=e1651] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1652]':
+                  - generic [ref=e1653]:
+                    - 'link "DS: undefined" [ref=e1654]':
+                      - /url: /node/501/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1655]':
+                      - /url: /node/501/tablets?database=local
+              - 'row "502 host-501.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1656]':
+                - cell "502" [ref=e1657]
+                - cell "host-501.test Copy" [ref=e1658]:
+                  - generic [ref=e1661]:
+                    - generic "host-501.test" [ref=e1662]:
+                      - link "host-501.test" [ref=e1663] [cursor=pointer]:
+                        - /url: /node/502/tablets?database=local
+                    - generic:
+                      - button [ref=e1664] [cursor=pointer]:
+                        - img [ref=e1667]:
+                          - img [ref=e1668]
+                      - button "Copy" [ref=e1670] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1671]:
+                  - generic [ref=e1673] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1674]:
+                  - generic [ref=e1676] [cursor=pointer]: —
+                - cell "10 GB" [ref=e1677]:
+                  - generic [ref=e1682] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e1683]:
+                  - generic [ref=e1685] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1686]':
+                  - generic [ref=e1687]:
+                    - 'link "DS: undefined" [ref=e1688]':
+                      - /url: /node/502/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1689]':
+                      - /url: /node/502/tablets?database=local
+              - 'row "503 host-502.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1690]':
+                - cell "503" [ref=e1691]
+                - cell "host-502.test Copy" [ref=e1692]:
+                  - generic [ref=e1695]:
+                    - generic "host-502.test" [ref=e1696]:
+                      - link "host-502.test" [ref=e1697] [cursor=pointer]:
+                        - /url: /node/503/tablets?database=local
+                    - generic:
+                      - button [ref=e1698] [cursor=pointer]:
+                        - img [ref=e1701]:
+                          - img [ref=e1702]
+                      - button "Copy" [ref=e1704] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1705]:
+                  - generic [ref=e1707] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1708]:
+                  - generic [ref=e1710] [cursor=pointer]: —
+                - cell "11 GB" [ref=e1711]:
+                  - generic [ref=e1716] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e1717]:
+                  - generic [ref=e1719] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1720]':
+                  - generic [ref=e1721]:
+                    - 'link "DS: undefined" [ref=e1722]':
+                      - /url: /node/503/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1723]':
+                      - /url: /node/503/tablets?database=local
+              - 'row "504 host-503.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1724]':
+                - cell "504" [ref=e1725]
+                - cell "host-503.test Copy" [ref=e1726]:
+                  - generic [ref=e1729]:
+                    - generic "host-503.test" [ref=e1730]:
+                      - link "host-503.test" [ref=e1731] [cursor=pointer]:
+                        - /url: /node/504/tablets?database=local
+                    - generic:
+                      - button [ref=e1732] [cursor=pointer]:
+                        - img [ref=e1735]:
+                          - img [ref=e1736]
+                      - button "Copy" [ref=e1738] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1739]:
+                  - generic [ref=e1741] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1742]:
+                  - generic [ref=e1744] [cursor=pointer]: —
+                - cell "12 GB" [ref=e1745]:
+                  - generic [ref=e1750] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e1751]:
+                  - generic [ref=e1753] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1754]':
+                  - generic [ref=e1755]:
+                    - 'link "DS: undefined" [ref=e1756]':
+                      - /url: /node/504/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1757]':
+                      - /url: /node/504/tablets?database=local
+              - 'row "505 host-504.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1758]':
+                - cell "505" [ref=e1759]
+                - cell "host-504.test Copy" [ref=e1760]:
+                  - generic [ref=e1763]:
+                    - generic "host-504.test" [ref=e1764]:
+                      - link "host-504.test" [ref=e1765] [cursor=pointer]:
+                        - /url: /node/505/tablets?database=local
+                    - generic:
+                      - button [ref=e1766] [cursor=pointer]:
+                        - img [ref=e1769]:
+                          - img [ref=e1770]
+                      - button "Copy" [ref=e1772] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1773]:
+                  - generic [ref=e1775] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1776]:
+                  - generic [ref=e1778] [cursor=pointer]: —
+                - cell "9 GB" [ref=e1779]:
+                  - generic [ref=e1784] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e1785]:
+                  - generic [ref=e1787] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1788]':
+                  - generic [ref=e1789]:
+                    - 'link "DS: undefined" [ref=e1790]':
+                      - /url: /node/505/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1791]':
+                      - /url: /node/505/tablets?database=local
+              - 'row "506 host-505.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1792]':
+                - cell "506" [ref=e1793]
+                - cell "host-505.test Copy" [ref=e1794]:
+                  - generic [ref=e1797]:
+                    - generic "host-505.test" [ref=e1798]:
+                      - link "host-505.test" [ref=e1799] [cursor=pointer]:
+                        - /url: /node/506/tablets?database=local
+                    - generic:
+                      - button [ref=e1800] [cursor=pointer]:
+                        - img [ref=e1803]:
+                          - img [ref=e1804]
+                      - button "Copy" [ref=e1806] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1807]:
+                  - generic [ref=e1809] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1810]:
+                  - generic [ref=e1812] [cursor=pointer]: —
+                - cell "10 GB" [ref=e1813]:
+                  - generic [ref=e1818] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e1819]:
+                  - generic [ref=e1821] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1822]':
+                  - generic [ref=e1823]:
+                    - 'link "DS: undefined" [ref=e1824]':
+                      - /url: /node/506/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1825]':
+                      - /url: /node/506/tablets?database=local
+              - 'row "507 host-506.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1826]':
+                - cell "507" [ref=e1827]
+                - cell "host-506.test Copy" [ref=e1828]:
+                  - generic [ref=e1831]:
+                    - generic "host-506.test" [ref=e1832]:
+                      - link "host-506.test" [ref=e1833] [cursor=pointer]:
+                        - /url: /node/507/tablets?database=local
+                    - generic:
+                      - button [ref=e1834] [cursor=pointer]:
+                        - img [ref=e1837]:
+                          - img [ref=e1838]
+                      - button "Copy" [ref=e1840] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1841]:
+                  - generic [ref=e1843] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1844]:
+                  - generic [ref=e1846] [cursor=pointer]: —
+                - cell "11 GB" [ref=e1847]:
+                  - generic [ref=e1852] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e1853]:
+                  - generic [ref=e1855] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1856]':
+                  - generic [ref=e1857]:
+                    - 'link "DS: undefined" [ref=e1858]':
+                      - /url: /node/507/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1859]':
+                      - /url: /node/507/tablets?database=local
+              - 'row "508 host-507.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1860]':
+                - cell "508" [ref=e1861]
+                - cell "host-507.test Copy" [ref=e1862]:
+                  - generic [ref=e1865]:
+                    - generic "host-507.test" [ref=e1866]:
+                      - link "host-507.test" [ref=e1867] [cursor=pointer]:
+                        - /url: /node/508/tablets?database=local
+                    - generic:
+                      - button [ref=e1868] [cursor=pointer]:
+                        - img [ref=e1871]:
+                          - img [ref=e1872]
+                      - button "Copy" [ref=e1874] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1875]:
+                  - generic [ref=e1877] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1878]:
+                  - generic [ref=e1880] [cursor=pointer]: —
+                - cell "12 GB" [ref=e1881]:
+                  - generic [ref=e1886] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e1887]:
+                  - generic [ref=e1889] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1890]':
+                  - generic [ref=e1891]:
+                    - 'link "DS: undefined" [ref=e1892]':
+                      - /url: /node/508/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1893]':
+                      - /url: /node/508/tablets?database=local
+              - 'row "509 host-508.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1894]':
+                - cell "509" [ref=e1895]
+                - cell "host-508.test Copy" [ref=e1896]:
+                  - generic [ref=e1899]:
+                    - generic "host-508.test" [ref=e1900]:
+                      - link "host-508.test" [ref=e1901] [cursor=pointer]:
+                        - /url: /node/509/tablets?database=local
+                    - generic:
+                      - button [ref=e1902] [cursor=pointer]:
+                        - img [ref=e1905]:
+                          - img [ref=e1906]
+                      - button "Copy" [ref=e1908] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1909]:
+                  - generic [ref=e1911] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1912]:
+                  - generic [ref=e1914] [cursor=pointer]: —
+                - cell "9 GB" [ref=e1915]:
+                  - generic [ref=e1920] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e1921]:
+                  - generic [ref=e1923] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1924]':
+                  - generic [ref=e1925]:
+                    - 'link "DS: undefined" [ref=e1926]':
+                      - /url: /node/509/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1927]':
+                      - /url: /node/509/tablets?database=local
+              - 'row "510 host-509.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1928]':
+                - cell "510" [ref=e1929]
+                - cell "host-509.test Copy" [ref=e1930]:
+                  - generic [ref=e1933]:
+                    - generic "host-509.test" [ref=e1934]:
+                      - link "host-509.test" [ref=e1935] [cursor=pointer]:
+                        - /url: /node/510/tablets?database=local
+                    - generic:
+                      - button [ref=e1936] [cursor=pointer]:
+                        - img [ref=e1939]:
+                          - img [ref=e1940]
+                      - button "Copy" [ref=e1942] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1943]:
+                  - generic [ref=e1945] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1946]:
+                  - generic [ref=e1948] [cursor=pointer]: —
+                - cell "10 GB" [ref=e1949]:
+                  - generic [ref=e1954] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e1955]:
+                  - generic [ref=e1957] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1958]':
+                  - generic [ref=e1959]:
+                    - 'link "DS: undefined" [ref=e1960]':
+                      - /url: /node/510/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1961]':
+                      - /url: /node/510/tablets?database=local
+              - 'row "511 host-510.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1962]':
+                - cell "511" [ref=e1963]
+                - cell "host-510.test Copy" [ref=e1964]:
+                  - generic [ref=e1967]:
+                    - generic "host-510.test" [ref=e1968]:
+                      - link "host-510.test" [ref=e1969] [cursor=pointer]:
+                        - /url: /node/511/tablets?database=local
+                    - generic:
+                      - button [ref=e1970] [cursor=pointer]:
+                        - img [ref=e1973]:
+                          - img [ref=e1974]
+                      - button "Copy" [ref=e1976] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e1977]:
+                  - generic [ref=e1979] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e1980]:
+                  - generic [ref=e1982] [cursor=pointer]: —
+                - cell "11 GB" [ref=e1983]:
+                  - generic [ref=e1988] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e1989]:
+                  - generic [ref=e1991] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e1992]':
+                  - generic [ref=e1993]:
+                    - 'link "DS: undefined" [ref=e1994]':
+                      - /url: /node/511/tablets?database=local
+                    - 'link "DS: undefined" [ref=e1995]':
+                      - /url: /node/511/tablets?database=local
+              - 'row "512 host-511.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e1996]':
+                - cell "512" [ref=e1997]
+                - cell "host-511.test Copy" [ref=e1998]:
+                  - generic [ref=e2001]:
+                    - generic "host-511.test" [ref=e2002]:
+                      - link "host-511.test" [ref=e2003] [cursor=pointer]:
+                        - /url: /node/512/tablets?database=local
+                    - generic:
+                      - button [ref=e2004] [cursor=pointer]:
+                        - img [ref=e2007]:
+                          - img [ref=e2008]
+                      - button "Copy" [ref=e2010] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2011]:
+                  - generic [ref=e2013] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2014]:
+                  - generic [ref=e2016] [cursor=pointer]: —
+                - cell "12 GB" [ref=e2017]:
+                  - generic [ref=e2022] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e2023]:
+                  - generic [ref=e2025] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2026]':
+                  - generic [ref=e2027]:
+                    - 'link "DS: undefined" [ref=e2028]':
+                      - /url: /node/512/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2029]':
+                      - /url: /node/512/tablets?database=local
+              - 'row "513 host-512.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2030]':
+                - cell "513" [ref=e2031]
+                - cell "host-512.test Copy" [ref=e2032]:
+                  - generic [ref=e2035]:
+                    - generic "host-512.test" [ref=e2036]:
+                      - link "host-512.test" [ref=e2037] [cursor=pointer]:
+                        - /url: /node/513/tablets?database=local
+                    - generic:
+                      - button [ref=e2038] [cursor=pointer]:
+                        - img [ref=e2041]:
+                          - img [ref=e2042]
+                      - button "Copy" [ref=e2044] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2045]:
+                  - generic [ref=e2047] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2048]:
+                  - generic [ref=e2050] [cursor=pointer]: —
+                - cell "9 GB" [ref=e2051]:
+                  - generic [ref=e2056] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e2057]:
+                  - generic [ref=e2059] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2060]':
+                  - generic [ref=e2061]:
+                    - 'link "DS: undefined" [ref=e2062]':
+                      - /url: /node/513/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2063]':
+                      - /url: /node/513/tablets?database=local
+              - 'row "514 host-513.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2064]':
+                - cell "514" [ref=e2065]
+                - cell "host-513.test Copy" [ref=e2066]:
+                  - generic [ref=e2069]:
+                    - generic "host-513.test" [ref=e2070]:
+                      - link "host-513.test" [ref=e2071] [cursor=pointer]:
+                        - /url: /node/514/tablets?database=local
+                    - generic:
+                      - button [ref=e2072] [cursor=pointer]:
+                        - img [ref=e2075]:
+                          - img [ref=e2076]
+                      - button "Copy" [ref=e2078] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2079]:
+                  - generic [ref=e2081] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2082]:
+                  - generic [ref=e2084] [cursor=pointer]: —
+                - cell "10 GB" [ref=e2085]:
+                  - generic [ref=e2090] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e2091]:
+                  - generic [ref=e2093] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2094]':
+                  - generic [ref=e2095]:
+                    - 'link "DS: undefined" [ref=e2096]':
+                      - /url: /node/514/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2097]':
+                      - /url: /node/514/tablets?database=local
+              - 'row "515 host-514.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2098]':
+                - cell "515" [ref=e2099]
+                - cell "host-514.test Copy" [ref=e2100]:
+                  - generic [ref=e2103]:
+                    - generic "host-514.test" [ref=e2104]:
+                      - link "host-514.test" [ref=e2105] [cursor=pointer]:
+                        - /url: /node/515/tablets?database=local
+                    - generic:
+                      - button [ref=e2106] [cursor=pointer]:
+                        - img [ref=e2109]:
+                          - img [ref=e2110]
+                      - button "Copy" [ref=e2112] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2113]:
+                  - generic [ref=e2115] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2116]:
+                  - generic [ref=e2118] [cursor=pointer]: —
+                - cell "11 GB" [ref=e2119]:
+                  - generic [ref=e2124] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e2125]:
+                  - generic [ref=e2127] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2128]':
+                  - generic [ref=e2129]:
+                    - 'link "DS: undefined" [ref=e2130]':
+                      - /url: /node/515/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2131]':
+                      - /url: /node/515/tablets?database=local
+              - 'row "516 host-515.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2132]':
+                - cell "516" [ref=e2133]
+                - cell "host-515.test Copy" [ref=e2134]:
+                  - generic [ref=e2137]:
+                    - generic "host-515.test" [ref=e2138]:
+                      - link "host-515.test" [ref=e2139] [cursor=pointer]:
+                        - /url: /node/516/tablets?database=local
+                    - generic:
+                      - button [ref=e2140] [cursor=pointer]:
+                        - img [ref=e2143]:
+                          - img [ref=e2144]
+                      - button "Copy" [ref=e2146] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2147]:
+                  - generic [ref=e2149] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2150]:
+                  - generic [ref=e2152] [cursor=pointer]: —
+                - cell "12 GB" [ref=e2153]:
+                  - generic [ref=e2158] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e2159]:
+                  - generic [ref=e2161] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2162]':
+                  - generic [ref=e2163]:
+                    - 'link "DS: undefined" [ref=e2164]':
+                      - /url: /node/516/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2165]':
+                      - /url: /node/516/tablets?database=local
+              - 'row "517 host-516.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2166]':
+                - cell "517" [ref=e2167]
+                - cell "host-516.test Copy" [ref=e2168]:
+                  - generic [ref=e2171]:
+                    - generic "host-516.test" [ref=e2172]:
+                      - link "host-516.test" [ref=e2173] [cursor=pointer]:
+                        - /url: /node/517/tablets?database=local
+                    - generic:
+                      - button [ref=e2174] [cursor=pointer]:
+                        - img [ref=e2177]:
+                          - img [ref=e2178]
+                      - button "Copy" [ref=e2180] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2181]:
+                  - generic [ref=e2183] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2184]:
+                  - generic [ref=e2186] [cursor=pointer]: —
+                - cell "9 GB" [ref=e2187]:
+                  - generic [ref=e2192] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e2193]:
+                  - generic [ref=e2195] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2196]':
+                  - generic [ref=e2197]:
+                    - 'link "DS: undefined" [ref=e2198]':
+                      - /url: /node/517/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2199]':
+                      - /url: /node/517/tablets?database=local
+              - 'row "518 host-517.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2200]':
+                - cell "518" [ref=e2201]
+                - cell "host-517.test Copy" [ref=e2202]:
+                  - generic [ref=e2205]:
+                    - generic "host-517.test" [ref=e2206]:
+                      - link "host-517.test" [ref=e2207] [cursor=pointer]:
+                        - /url: /node/518/tablets?database=local
+                    - generic:
+                      - button [ref=e2208] [cursor=pointer]:
+                        - img [ref=e2211]:
+                          - img [ref=e2212]
+                      - button "Copy" [ref=e2214] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2215]:
+                  - generic [ref=e2217] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2218]:
+                  - generic [ref=e2220] [cursor=pointer]: —
+                - cell "10 GB" [ref=e2221]:
+                  - generic [ref=e2226] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e2227]:
+                  - generic [ref=e2229] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2230]':
+                  - generic [ref=e2231]:
+                    - 'link "DS: undefined" [ref=e2232]':
+                      - /url: /node/518/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2233]':
+                      - /url: /node/518/tablets?database=local
+              - 'row "519 host-518.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2234]':
+                - cell "519" [ref=e2235]
+                - cell "host-518.test Copy" [ref=e2236]:
+                  - generic [ref=e2239]:
+                    - generic "host-518.test" [ref=e2240]:
+                      - link "host-518.test" [ref=e2241] [cursor=pointer]:
+                        - /url: /node/519/tablets?database=local
+                    - generic:
+                      - button [ref=e2242] [cursor=pointer]:
+                        - img [ref=e2245]:
+                          - img [ref=e2246]
+                      - button "Copy" [ref=e2248] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2249]:
+                  - generic [ref=e2251] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2252]:
+                  - generic [ref=e2254] [cursor=pointer]: —
+                - cell "11 GB" [ref=e2255]:
+                  - generic [ref=e2260] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e2261]:
+                  - generic [ref=e2263] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2264]':
+                  - generic [ref=e2265]:
+                    - 'link "DS: undefined" [ref=e2266]':
+                      - /url: /node/519/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2267]':
+                      - /url: /node/519/tablets?database=local
+              - 'row "520 host-519.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2268]':
+                - cell "520" [ref=e2269]
+                - cell "host-519.test Copy" [ref=e2270]:
+                  - generic [ref=e2273]:
+                    - generic "host-519.test" [ref=e2274]:
+                      - link "host-519.test" [ref=e2275] [cursor=pointer]:
+                        - /url: /node/520/tablets?database=local
+                    - generic:
+                      - button [ref=e2276] [cursor=pointer]:
+                        - img [ref=e2279]:
+                          - img [ref=e2280]
+                      - button "Copy" [ref=e2282] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2283]:
+                  - generic [ref=e2285] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2286]:
+                  - generic [ref=e2288] [cursor=pointer]: —
+                - cell "12 GB" [ref=e2289]:
+                  - generic [ref=e2294] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e2295]:
+                  - generic [ref=e2297] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2298]':
+                  - generic [ref=e2299]:
+                    - 'link "DS: undefined" [ref=e2300]':
+                      - /url: /node/520/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2301]':
+                      - /url: /node/520/tablets?database=local
+              - 'row "521 host-520.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2302]':
+                - cell "521" [ref=e2303]
+                - cell "host-520.test Copy" [ref=e2304]:
+                  - generic [ref=e2307]:
+                    - generic "host-520.test" [ref=e2308]:
+                      - link "host-520.test" [ref=e2309] [cursor=pointer]:
+                        - /url: /node/521/tablets?database=local
+                    - generic:
+                      - button [ref=e2310] [cursor=pointer]:
+                        - img [ref=e2313]:
+                          - img [ref=e2314]
+                      - button "Copy" [ref=e2316] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2317]:
+                  - generic [ref=e2319] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2320]:
+                  - generic [ref=e2322] [cursor=pointer]: —
+                - cell "9 GB" [ref=e2323]:
+                  - generic [ref=e2328] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e2329]:
+                  - generic [ref=e2331] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2332]':
+                  - generic [ref=e2333]:
+                    - 'link "DS: undefined" [ref=e2334]':
+                      - /url: /node/521/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2335]':
+                      - /url: /node/521/tablets?database=local
+              - 'row "522 host-521.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2336]':
+                - cell "522" [ref=e2337]
+                - cell "host-521.test Copy" [ref=e2338]:
+                  - generic [ref=e2341]:
+                    - generic "host-521.test" [ref=e2342]:
+                      - link "host-521.test" [ref=e2343] [cursor=pointer]:
+                        - /url: /node/522/tablets?database=local
+                    - generic:
+                      - button [ref=e2344] [cursor=pointer]:
+                        - img [ref=e2347]:
+                          - img [ref=e2348]
+                      - button "Copy" [ref=e2350] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2351]:
+                  - generic [ref=e2353] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2354]:
+                  - generic [ref=e2356] [cursor=pointer]: —
+                - cell "10 GB" [ref=e2357]:
+                  - generic [ref=e2362] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e2363]:
+                  - generic [ref=e2365] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2366]':
+                  - generic [ref=e2367]:
+                    - 'link "DS: undefined" [ref=e2368]':
+                      - /url: /node/522/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2369]':
+                      - /url: /node/522/tablets?database=local
+              - 'row "523 host-522.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2370]':
+                - cell "523" [ref=e2371]
+                - cell "host-522.test Copy" [ref=e2372]:
+                  - generic [ref=e2375]:
+                    - generic "host-522.test" [ref=e2376]:
+                      - link "host-522.test" [ref=e2377] [cursor=pointer]:
+                        - /url: /node/523/tablets?database=local
+                    - generic:
+                      - button [ref=e2378] [cursor=pointer]:
+                        - img [ref=e2381]:
+                          - img [ref=e2382]
+                      - button "Copy" [ref=e2384] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2385]:
+                  - generic [ref=e2387] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2388]:
+                  - generic [ref=e2390] [cursor=pointer]: —
+                - cell "11 GB" [ref=e2391]:
+                  - generic [ref=e2396] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e2397]:
+                  - generic [ref=e2399] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2400]':
+                  - generic [ref=e2401]:
+                    - 'link "DS: undefined" [ref=e2402]':
+                      - /url: /node/523/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2403]':
+                      - /url: /node/523/tablets?database=local
+              - 'row "524 host-523.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2404]':
+                - cell "524" [ref=e2405]
+                - cell "host-523.test Copy" [ref=e2406]:
+                  - generic [ref=e2409]:
+                    - generic "host-523.test" [ref=e2410]:
+                      - link "host-523.test" [ref=e2411] [cursor=pointer]:
+                        - /url: /node/524/tablets?database=local
+                    - generic:
+                      - button [ref=e2412] [cursor=pointer]:
+                        - img [ref=e2415]:
+                          - img [ref=e2416]
+                      - button "Copy" [ref=e2418] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2419]:
+                  - generic [ref=e2421] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2422]:
+                  - generic [ref=e2424] [cursor=pointer]: —
+                - cell "12 GB" [ref=e2425]:
+                  - generic [ref=e2430] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e2431]:
+                  - generic [ref=e2433] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2434]':
+                  - generic [ref=e2435]:
+                    - 'link "DS: undefined" [ref=e2436]':
+                      - /url: /node/524/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2437]':
+                      - /url: /node/524/tablets?database=local
+              - 'row "525 host-524.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2438]':
+                - cell "525" [ref=e2439]
+                - cell "host-524.test Copy" [ref=e2440]:
+                  - generic [ref=e2443]:
+                    - generic "host-524.test" [ref=e2444]:
+                      - link "host-524.test" [ref=e2445] [cursor=pointer]:
+                        - /url: /node/525/tablets?database=local
+                    - generic:
+                      - button [ref=e2446] [cursor=pointer]:
+                        - img [ref=e2449]:
+                          - img [ref=e2450]
+                      - button "Copy" [ref=e2452] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2453]:
+                  - generic [ref=e2455] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2456]:
+                  - generic [ref=e2458] [cursor=pointer]: —
+                - cell "9 GB" [ref=e2459]:
+                  - generic [ref=e2464] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e2465]:
+                  - generic [ref=e2467] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2468]':
+                  - generic [ref=e2469]:
+                    - 'link "DS: undefined" [ref=e2470]':
+                      - /url: /node/525/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2471]':
+                      - /url: /node/525/tablets?database=local
+              - 'row "526 host-525.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2472]':
+                - cell "526" [ref=e2473]
+                - cell "host-525.test Copy" [ref=e2474]:
+                  - generic [ref=e2477]:
+                    - generic "host-525.test" [ref=e2478]:
+                      - link "host-525.test" [ref=e2479] [cursor=pointer]:
+                        - /url: /node/526/tablets?database=local
+                    - generic:
+                      - button [ref=e2480] [cursor=pointer]:
+                        - img [ref=e2483]:
+                          - img [ref=e2484]
+                      - button "Copy" [ref=e2486] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2487]:
+                  - generic [ref=e2489] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2490]:
+                  - generic [ref=e2492] [cursor=pointer]: —
+                - cell "10 GB" [ref=e2493]:
+                  - generic [ref=e2498] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e2499]:
+                  - generic [ref=e2501] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2502]':
+                  - generic [ref=e2503]:
+                    - 'link "DS: undefined" [ref=e2504]':
+                      - /url: /node/526/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2505]':
+                      - /url: /node/526/tablets?database=local
+              - 'row "527 host-526.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2506]':
+                - cell "527" [ref=e2507]
+                - cell "host-526.test Copy" [ref=e2508]:
+                  - generic [ref=e2511]:
+                    - generic "host-526.test" [ref=e2512]:
+                      - link "host-526.test" [ref=e2513] [cursor=pointer]:
+                        - /url: /node/527/tablets?database=local
+                    - generic:
+                      - button [ref=e2514] [cursor=pointer]:
+                        - img [ref=e2517]:
+                          - img [ref=e2518]
+                      - button "Copy" [ref=e2520] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2521]:
+                  - generic [ref=e2523] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2524]:
+                  - generic [ref=e2526] [cursor=pointer]: —
+                - cell "11 GB" [ref=e2527]:
+                  - generic [ref=e2532] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e2533]:
+                  - generic [ref=e2535] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2536]':
+                  - generic [ref=e2537]:
+                    - 'link "DS: undefined" [ref=e2538]':
+                      - /url: /node/527/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2539]':
+                      - /url: /node/527/tablets?database=local
+              - 'row "528 host-527.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2540]':
+                - cell "528" [ref=e2541]
+                - cell "host-527.test Copy" [ref=e2542]:
+                  - generic [ref=e2545]:
+                    - generic "host-527.test" [ref=e2546]:
+                      - link "host-527.test" [ref=e2547] [cursor=pointer]:
+                        - /url: /node/528/tablets?database=local
+                    - generic:
+                      - button [ref=e2548] [cursor=pointer]:
+                        - img [ref=e2551]:
+                          - img [ref=e2552]
+                      - button "Copy" [ref=e2554] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2555]:
+                  - generic [ref=e2557] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2558]:
+                  - generic [ref=e2560] [cursor=pointer]: —
+                - cell "12 GB" [ref=e2561]:
+                  - generic [ref=e2566] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e2567]:
+                  - generic [ref=e2569] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2570]':
+                  - generic [ref=e2571]:
+                    - 'link "DS: undefined" [ref=e2572]':
+                      - /url: /node/528/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2573]':
+                      - /url: /node/528/tablets?database=local
+              - 'row "529 host-528.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2574]':
+                - cell "529" [ref=e2575]
+                - cell "host-528.test Copy" [ref=e2576]:
+                  - generic [ref=e2579]:
+                    - generic "host-528.test" [ref=e2580]:
+                      - link "host-528.test" [ref=e2581] [cursor=pointer]:
+                        - /url: /node/529/tablets?database=local
+                    - generic:
+                      - button [ref=e2582] [cursor=pointer]:
+                        - img [ref=e2585]:
+                          - img [ref=e2586]
+                      - button "Copy" [ref=e2588] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2589]:
+                  - generic [ref=e2591] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2592]:
+                  - generic [ref=e2594] [cursor=pointer]: —
+                - cell "9 GB" [ref=e2595]:
+                  - generic [ref=e2600] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e2601]:
+                  - generic [ref=e2603] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2604]':
+                  - generic [ref=e2605]:
+                    - 'link "DS: undefined" [ref=e2606]':
+                      - /url: /node/529/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2607]':
+                      - /url: /node/529/tablets?database=local
+              - 'row "530 host-529.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2608]':
+                - cell "530" [ref=e2609]
+                - cell "host-529.test Copy" [ref=e2610]:
+                  - generic [ref=e2613]:
+                    - generic "host-529.test" [ref=e2614]:
+                      - link "host-529.test" [ref=e2615] [cursor=pointer]:
+                        - /url: /node/530/tablets?database=local
+                    - generic:
+                      - button [ref=e2616] [cursor=pointer]:
+                        - img [ref=e2619]:
+                          - img [ref=e2620]
+                      - button "Copy" [ref=e2622] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2623]:
+                  - generic [ref=e2625] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2626]:
+                  - generic [ref=e2628] [cursor=pointer]: —
+                - cell "10 GB" [ref=e2629]:
+                  - generic [ref=e2634] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e2635]:
+                  - generic [ref=e2637] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2638]':
+                  - generic [ref=e2639]:
+                    - 'link "DS: undefined" [ref=e2640]':
+                      - /url: /node/530/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2641]':
+                      - /url: /node/530/tablets?database=local
+              - 'row "531 host-530.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2642]':
+                - cell "531" [ref=e2643]
+                - cell "host-530.test Copy" [ref=e2644]:
+                  - generic [ref=e2647]:
+                    - generic "host-530.test" [ref=e2648]:
+                      - link "host-530.test" [ref=e2649] [cursor=pointer]:
+                        - /url: /node/531/tablets?database=local
+                    - generic:
+                      - button [ref=e2650] [cursor=pointer]:
+                        - img [ref=e2653]:
+                          - img [ref=e2654]
+                      - button "Copy" [ref=e2656] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2657]:
+                  - generic [ref=e2659] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2660]:
+                  - generic [ref=e2662] [cursor=pointer]: —
+                - cell "11 GB" [ref=e2663]:
+                  - generic [ref=e2668] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e2669]:
+                  - generic [ref=e2671] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2672]':
+                  - generic [ref=e2673]:
+                    - 'link "DS: undefined" [ref=e2674]':
+                      - /url: /node/531/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2675]':
+                      - /url: /node/531/tablets?database=local
+              - 'row "532 host-531.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2676]':
+                - cell "532" [ref=e2677]
+                - cell "host-531.test Copy" [ref=e2678]:
+                  - generic [ref=e2681]:
+                    - generic "host-531.test" [ref=e2682]:
+                      - link "host-531.test" [ref=e2683] [cursor=pointer]:
+                        - /url: /node/532/tablets?database=local
+                    - generic:
+                      - button [ref=e2684] [cursor=pointer]:
+                        - img [ref=e2687]:
+                          - img [ref=e2688]
+                      - button "Copy" [ref=e2690] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2691]:
+                  - generic [ref=e2693] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2694]:
+                  - generic [ref=e2696] [cursor=pointer]: —
+                - cell "12 GB" [ref=e2697]:
+                  - generic [ref=e2702] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e2703]:
+                  - generic [ref=e2705] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2706]':
+                  - generic [ref=e2707]:
+                    - 'link "DS: undefined" [ref=e2708]':
+                      - /url: /node/532/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2709]':
+                      - /url: /node/532/tablets?database=local
+              - 'row "533 host-532.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2710]':
+                - cell "533" [ref=e2711]
+                - cell "host-532.test Copy" [ref=e2712]:
+                  - generic [ref=e2715]:
+                    - generic "host-532.test" [ref=e2716]:
+                      - link "host-532.test" [ref=e2717] [cursor=pointer]:
+                        - /url: /node/533/tablets?database=local
+                    - generic:
+                      - button [ref=e2718] [cursor=pointer]:
+                        - img [ref=e2721]:
+                          - img [ref=e2722]
+                      - button "Copy" [ref=e2724] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2725]:
+                  - generic [ref=e2727] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2728]:
+                  - generic [ref=e2730] [cursor=pointer]: —
+                - cell "9 GB" [ref=e2731]:
+                  - generic [ref=e2736] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e2737]:
+                  - generic [ref=e2739] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2740]':
+                  - generic [ref=e2741]:
+                    - 'link "DS: undefined" [ref=e2742]':
+                      - /url: /node/533/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2743]':
+                      - /url: /node/533/tablets?database=local
+              - 'row "534 host-533.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2744]':
+                - cell "534" [ref=e2745]
+                - cell "host-533.test Copy" [ref=e2746]:
+                  - generic [ref=e2749]:
+                    - generic "host-533.test" [ref=e2750]:
+                      - link "host-533.test" [ref=e2751] [cursor=pointer]:
+                        - /url: /node/534/tablets?database=local
+                    - generic:
+                      - button [ref=e2752] [cursor=pointer]:
+                        - img [ref=e2755]:
+                          - img [ref=e2756]
+                      - button "Copy" [ref=e2758] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2759]:
+                  - generic [ref=e2761] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2762]:
+                  - generic [ref=e2764] [cursor=pointer]: —
+                - cell "10 GB" [ref=e2765]:
+                  - generic [ref=e2770] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e2771]:
+                  - generic [ref=e2773] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2774]':
+                  - generic [ref=e2775]:
+                    - 'link "DS: undefined" [ref=e2776]':
+                      - /url: /node/534/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2777]':
+                      - /url: /node/534/tablets?database=local
+              - 'row "535 host-534.test Copy 4:00:00 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2778]':
+                - cell "535" [ref=e2779]
+                - cell "host-534.test Copy" [ref=e2780]:
+                  - generic [ref=e2783]:
+                    - generic "host-534.test" [ref=e2784]:
+                      - link "host-534.test" [ref=e2785] [cursor=pointer]:
+                        - /url: /node/535/tablets?database=local
+                    - generic:
+                      - button [ref=e2786] [cursor=pointer]:
+                        - img [ref=e2789]:
+                          - img [ref=e2790]
+                      - button "Copy" [ref=e2792] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2793]:
+                  - generic [ref=e2795] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2796]:
+                  - generic [ref=e2798] [cursor=pointer]: —
+                - cell "11 GB" [ref=e2799]:
+                  - generic [ref=e2804] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e2805]:
+                  - generic [ref=e2807] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2808]':
+                  - generic [ref=e2809]:
+                    - 'link "DS: undefined" [ref=e2810]':
+                      - /url: /node/535/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2811]':
+                      - /url: /node/535/tablets?database=local
+              - 'row "536 host-535.test Copy 4:00:00 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2812]':
+                - cell "536" [ref=e2813]
+                - cell "host-535.test Copy" [ref=e2814]:
+                  - generic [ref=e2817]:
+                    - generic "host-535.test" [ref=e2818]:
+                      - link "host-535.test" [ref=e2819] [cursor=pointer]:
+                        - /url: /node/536/tablets?database=local
+                    - generic:
+                      - button [ref=e2820] [cursor=pointer]:
+                        - img [ref=e2823]:
+                          - img [ref=e2824]
+                      - button "Copy" [ref=e2826] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2827]:
+                  - generic [ref=e2829] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2830]:
+                  - generic [ref=e2832] [cursor=pointer]: —
+                - cell "12 GB" [ref=e2833]:
+                  - generic [ref=e2838] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e2839]:
+                  - generic [ref=e2841] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2842]':
+                  - generic [ref=e2843]:
+                    - 'link "DS: undefined" [ref=e2844]':
+                      - /url: /node/536/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2845]':
+                      - /url: /node/536/tablets?database=local
+              - 'row "537 host-536.test Copy 4:00:00 — 9 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2846]':
+                - cell "537" [ref=e2847]
+                - cell "host-536.test Copy" [ref=e2848]:
+                  - generic [ref=e2851]:
+                    - generic "host-536.test" [ref=e2852]:
+                      - link "host-536.test" [ref=e2853] [cursor=pointer]:
+                        - /url: /node/537/tablets?database=local
+                    - generic:
+                      - button [ref=e2854] [cursor=pointer]:
+                        - img [ref=e2857]:
+                          - img [ref=e2858]
+                      - button "Copy" [ref=e2860] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2861]:
+                  - generic [ref=e2863] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2864]:
+                  - generic [ref=e2866] [cursor=pointer]: —
+                - cell "9 GB" [ref=e2867]:
+                  - generic [ref=e2872] [cursor=pointer]: 9 GB
+                - cell "main.b7cfb36" [ref=e2873]:
+                  - generic [ref=e2875] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2876]':
+                  - generic [ref=e2877]:
+                    - 'link "DS: undefined" [ref=e2878]':
+                      - /url: /node/537/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2879]':
+                      - /url: /node/537/tablets?database=local
+              - 'row "538 host-537.test Copy 4:00:00 — 10 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2880]':
+                - cell "538" [ref=e2881]
+                - cell "host-537.test Copy" [ref=e2882]:
+                  - generic [ref=e2885]:
+                    - generic "host-537.test" [ref=e2886]:
+                      - link "host-537.test" [ref=e2887] [cursor=pointer]:
+                        - /url: /node/538/tablets?database=local
+                    - generic:
+                      - button [ref=e2888] [cursor=pointer]:
+                        - img [ref=e2891]:
+                          - img [ref=e2892]
+                      - button "Copy" [ref=e2894] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:00" [ref=e2895]:
+                  - generic [ref=e2897] [cursor=pointer]: 4:00:00
+                - cell "—" [ref=e2898]:
+                  - generic [ref=e2900] [cursor=pointer]: —
+                - cell "10 GB" [ref=e2901]:
+                  - generic [ref=e2906] [cursor=pointer]: 10 GB
+                - cell "main.b7cfb36" [ref=e2907]:
+                  - generic [ref=e2909] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2910]':
+                  - generic [ref=e2911]:
+                    - 'link "DS: undefined" [ref=e2912]':
+                      - /url: /node/538/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2913]':
+                      - /url: /node/538/tablets?database=local
+              - 'row "539 host-538.test Copy 4:00:01 — 11 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2914]':
+                - cell "539" [ref=e2915]
+                - cell "host-538.test Copy" [ref=e2916]:
+                  - generic [ref=e2919]:
+                    - generic "host-538.test" [ref=e2920]:
+                      - link "host-538.test" [ref=e2921] [cursor=pointer]:
+                        - /url: /node/539/tablets?database=local
+                    - generic:
+                      - button [ref=e2922] [cursor=pointer]:
+                        - img [ref=e2925]:
+                          - img [ref=e2926]
+                      - button "Copy" [ref=e2928] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:01" [ref=e2929]:
+                  - generic [ref=e2931] [cursor=pointer]: 4:00:01
+                - cell "—" [ref=e2932]:
+                  - generic [ref=e2934] [cursor=pointer]: —
+                - cell "11 GB" [ref=e2935]:
+                  - generic [ref=e2940] [cursor=pointer]: 11 GB
+                - cell "main.b7cfb36" [ref=e2941]:
+                  - generic [ref=e2943] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2944]':
+                  - generic [ref=e2945]:
+                    - 'link "DS: undefined" [ref=e2946]':
+                      - /url: /node/539/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2947]':
+                      - /url: /node/539/tablets?database=local
+              - 'row "540 host-539.test Copy 4:00:01 — 12 GB main.b7cfb36 DS: undefined DS: undefined" [ref=e2948]':
+                - cell "540" [ref=e2949]
+                - cell "host-539.test Copy" [ref=e2950]:
+                  - generic [ref=e2953]:
+                    - generic "host-539.test" [ref=e2954]:
+                      - link "host-539.test" [ref=e2955] [cursor=pointer]:
+                        - /url: /node/540/tablets?database=local
+                    - generic:
+                      - button [ref=e2956] [cursor=pointer]:
+                        - img [ref=e2959]:
+                          - img [ref=e2960]
+                      - button "Copy" [ref=e2962] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - cell "4:00:01" [ref=e2963]:
+                  - generic [ref=e2965] [cursor=pointer]: 4:00:01
+                - cell "—" [ref=e2966]:
+                  - generic [ref=e2968] [cursor=pointer]: —
+                - cell "12 GB" [ref=e2969]:
+                  - generic [ref=e2974] [cursor=pointer]: 12 GB
+                - cell "main.b7cfb36" [ref=e2975]:
+                  - generic [ref=e2977] [cursor=pointer]: main.b7cfb36
+                - 'cell "DS: undefined DS: undefined" [ref=e2978]':
+                  - generic [ref=e2979]:
+                    - 'link "DS: undefined" [ref=e2980]':
+                      - /url: /node/540/tablets?database=local
+                    - 'link "DS: undefined" [ref=e2981]':
+                      - /url: /node/540/tablets?database=local
+              - row [ref=e2982]:
+                - cell [ref=e2983]
+```
