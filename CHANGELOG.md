@@ -1,5 +1,22 @@
 # Changelog
 
+## [22.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.0.0...v22.1.0) (2026-09-18)
+
+
+### Features
+
+* add expert mode for nodes ([#4364](https://github.com/ydb-platform/ydb-embedded-ui/issues/4364)) ([4ed00d4](https://github.com/ydb-platform/ydb-embedded-ui/commit/4ed00d44fee912238dc52e0b2875dff30a63da10))
+* add resource pool info to diagnostics overview ([#4350](https://github.com/ydb-platform/ydb-embedded-ui/issues/4350)) ([24379e2](https://github.com/ydb-platform/ydb-embedded-ui/commit/24379e24e2e9c1925773cfbd7c3077baad92be14))
+* **node:** display ram usage below load average ([#4373](https://github.com/ydb-platform/ydb-embedded-ui/issues/4373)) ([e17771b](https://github.com/ydb-platform/ydb-embedded-ui/commit/e17771b843f955b4cd68b49fb5964256e73a38bd))
+
+
+### Bug Fixes
+
+* **ci:** support manual release e2e runs and report recovery ([#4372](https://github.com/ydb-platform/ydb-embedded-ui/issues/4372)) ([f5ce64f](https://github.com/ydb-platform/ydb-embedded-ui/commit/f5ce64f9baef456da777d7e660aa3ba098b6ddce))
+* distinguish followers in top shards ([#4371](https://github.com/ydb-platform/ydb-embedded-ui/issues/4371)) ([b039b91](https://github.com/ydb-platform/ydb-embedded-ui/commit/b039b91cf132d811a8af5645024b59125040c3f1))
+* respect secure tablet devui paths ([#4362](https://github.com/ydb-platform/ydb-embedded-ui/issues/4362)) ([3328371](https://github.com/ydb-platform/ydb-embedded-ui/commit/332837153d936d975a78e9fddd6baa25a60315ea))
+* **topic:** handle missing partition config in topic info ([#4358](https://github.com/ydb-platform/ydb-embedded-ui/issues/4358)) ([f9cba2d](https://github.com/ydb-platform/ydb-embedded-ui/commit/f9cba2d8edf9b109d88d8b6b9869c156ceba2fba))
+
 ## [22.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v21.1.0...v22.0.0) (2026-09-15)
 
 
