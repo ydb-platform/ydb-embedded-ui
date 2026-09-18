@@ -1,4 +1,3 @@
-const {createHash} = require('node:crypto');
 const fs = require('node:fs');
 
 const IMAGE_REPOSITORY = 'ghcr.io/ydb-platform/local-ydb';
@@ -106,7 +105,6 @@ async function resolveRelease(
     if (!/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/.test(playwrightVersion || '')) {
         throw new Error('UI lockfile has no valid Playwright version');
     }
-    const index = decodeFile(await github(`${viewerPath}/index.html?ref=${ydbSha}`));
     const imageDigest = await digest(ydbTag);
     if (!DIGEST_PATTERN.test(imageDigest)) {
         throw new Error('Invalid image digest');
@@ -116,10 +114,10 @@ async function resolveRelease(
         ydb_sha: ydbSha,
         ui_version: uiVersion,
         ui_sha: uiCommit.sha,
+        frontend_mode: 'npm-start',
         playwright_version: playwrightVersion,
         image: `${IMAGE_REPOSITORY}:${ydbTag}`,
         image_digest: imageDigest,
-        index_sha256: createHash('sha256').update(index).digest('hex'),
         workflow_sha: workflowSha,
     };
 }

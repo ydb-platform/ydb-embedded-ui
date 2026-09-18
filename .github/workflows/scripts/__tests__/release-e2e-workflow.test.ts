@@ -54,7 +54,13 @@ test.each(
     }
 });
 
-test('redirects release SPA routes while preserving backend requests and streaming', async () => {
+test('starts the release-version frontend while keeping local-ydb as its backend', () => {
+    expect(workflow).not.toContain('PLAYWRIGHT_BASE_URL:');
+    expect(workflow).toContain('PLAYWRIGHT_APP_BACKEND: http://localhost:8765');
+    expect(workflow).toContain('PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}');
+});
+
+test('forwards backend routes and streaming without rewriting UI paths', async () => {
     const upstream = http.createServer((request, response) => {
         response.setHeader('Content-Type', 'text/plain');
         response.setHeader('x-method', request.method || '');
@@ -109,26 +115,9 @@ test('redirects release SPA routes while preserving backend requests and streami
                     .on('error', reject)
                     .end();
             });
-        for (const [url, method, location] of [
-            ['/cluster', 'GET', '/monitoring/cluster'],
-            [
-                '/cluster/nodes?database=%2Flocal&x=a%2Bb',
-                'GET',
-                '/monitoring/cluster/nodes?database=%2Flocal&x=a%2Bb',
-            ],
-            ['/vDisk?nodeId=42', 'HEAD', '/monitoring/vDisk?nodeId=42'],
-            ['/pDisk?nodeId=42&pDiskId=1000', 'GET', '/monitoring/pDisk?nodeId=42&pDiskId=1000'],
-            [
-                '/storageGroup?database=%2Flocal&groupId=1',
-                'HEAD',
-                '/monitoring/storageGroup?database=%2Flocal&groupId=1',
-            ],
-        ]) {
-            const response = await request(url, method);
-            expect(response.status).toBe(307);
-            expect(response.headers.location).toBe(location);
-        }
         for (const [url, method, status] of [
+            ['/cluster/nodes?database=%2Flocal&x=a%2Bb', 'GET', 200],
+            ['/vDisk?nodeId=42', 'HEAD', 200],
             ['/', 'GET', 200],
             ['/monitoring/cluster/nodes', 'GET', 200],
             ['/viewer/json/nodes', 'GET', 200],
@@ -136,7 +125,11 @@ test('redirects release SPA routes while preserving backend requests and streami
             ['/missing', 'GET', 404],
         ] as const) {
             const response = await request(url, method);
-            expect(response).toMatchObject({status, body: url, headers: {'x-method': method}});
+            expect(response).toMatchObject({
+                status,
+                body: method === 'HEAD' ? '' : url,
+                headers: {'x-method': method},
+            });
             expect(response.headers.location).toBeUndefined();
         }
         let body = '';
@@ -161,7 +154,7 @@ test('redirects release SPA routes while preserving backend requests and streami
         expect(body).toBe('firstlast');
         upstream.closeAllConnections();
         await new Promise<void>((resolve) => upstream.close(() => resolve()));
-        expect((await request('/viewer/json/nodes')).status).toBe(502);
+        await expect(request('/viewer/json/nodes')).rejects.toMatchObject({code: 'ECONNRESET'});
     } finally {
         proxy?.close();
         upstream.closeAllConnections();
