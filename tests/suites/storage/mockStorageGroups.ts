@@ -1,4 +1,5 @@
 import {ECapacityAlert, EFlag} from '../../../src/types/api/enums';
+import type {TNodeInfo, TNodesInfo} from '../../../src/types/api/nodes';
 import type {EDecommitStatus, EDriveStatus, EMaintenanceStatus} from '../../../src/types/api/pdisk';
 import {TPDiskState} from '../../../src/types/api/pdisk';
 import type {StorageGroupsResponse, TStorageVDisk} from '../../../src/types/api/storage';
@@ -429,6 +430,11 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
         ?.FreshRank;
     delete firstGroupVDisks[MISSING_PDISK_STATE_INDEX].PDisk?.Whiteboard?.State;
 
+    const bscOnlyPDisk = firstGroupVDisks.find(({PDisk}) => PDisk && !PDisk.Whiteboard)?.PDisk;
+    if (bscOnlyPDisk) {
+        bscOnlyPDisk.Status = 'INACTIVE';
+    }
+
     // Second group - with replication (same disks but replicating)
     const replicatingGroupId = MOCK_GROUP_ID + 1;
     const replicatingGroupGeneration = 1;
@@ -562,5 +568,137 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
                 CapacityAlert: ECapacityAlert.YELLOW,
             },
         ],
+    };
+}
+
+const MOCK_NODE_GROUPS = [
+    {name: 'mock-storage-group-1', vDisksPerPDisk: [8, 16, 24, 8]},
+    {name: 'mock-storage-group-2', vDisksPerPDisk: [16, 24, 8, 16]},
+    {name: 'mock-storage-group-3', vDisksPerPDisk: [24, 8, 16, 24]},
+] as const;
+
+export function createMockStorageNodesResponse(filterGroup?: string): TNodesInfo {
+    const storageGroups = createMockStorageGroupsResponse().StorageGroups ?? [];
+    const diskSources = storageGroups
+        .flatMap((group) => group.VDisks ?? [])
+        .filter((storageVDisk) => storageVDisk.Whiteboard && storageVDisk.PDisk?.Whiteboard);
+
+    const groupedNodes = MOCK_NODE_GROUPS.map(({name, vDisksPerPDisk}, nodeIndex) => {
+        const nodeId = MOCK_NODE_ID_BASE + nodeIndex;
+        const pDisks: NonNullable<TNodeInfo['PDisks']> = [];
+        const vDisks: NonNullable<TNodeInfo['VDisks']> = [];
+
+        vDisksPerPDisk.forEach((vDiskCount, pDiskIndex) => {
+            const pDiskId = MOCK_PDISK_ID_BASE + nodeIndex * vDisksPerPDisk.length + pDiskIndex;
+            const pDiskSource =
+                diskSources[(nodeIndex * vDisksPerPDisk.length + pDiskIndex) % diskSources.length]
+                    ?.PDisk;
+            const pDiskWhiteboard = pDiskSource?.Whiteboard;
+
+            if (!pDiskWhiteboard) {
+                return;
+            }
+
+            const isNoDataPDisk = nodeIndex === 0 && pDiskIndex < 2;
+            const hasBSCStatuses = !isNoDataPDisk || pDiskIndex === 1;
+            const bscStatuses = {
+                DriveStatus: pDiskSource.Status,
+                DecommitStatus: pDiskSource.DecommitStatus,
+                MaintenanceStatus: pDiskSource.MaintenanceStatus,
+            };
+            const pDiskWithBSCStatuses = {
+                ...(isNoDataPDisk ? {} : pDiskWhiteboard),
+                ...(hasBSCStatuses ? bscStatuses : {}),
+                NodeId: nodeId,
+                PDiskId: pDiskId,
+                Category: pDiskWhiteboard.Category,
+                Path: `/mock/nodes/${nodeId}/pdisk-${pDiskId}`,
+                TotalSize: pDiskSource.TotalSize,
+                AvailableSize: pDiskSource.AvailableSize,
+                ExpectedSlotCount: vDiskCount,
+                NumActiveSlots: vDiskCount,
+            };
+            pDisks.push(pDiskWithBSCStatuses);
+
+            for (let vDiskIndex = 0; vDiskIndex < vDiskCount; vDiskIndex++) {
+                const vDiskSource =
+                    diskSources[
+                        (nodeIndex * 24 + pDiskIndex * 8 + vDiskIndex) % diskSources.length
+                    ];
+                const vDiskWhiteboard = vDiskSource?.Whiteboard;
+
+                if (!vDiskSource || !vDiskWhiteboard) {
+                    continue;
+                }
+
+                const allocatedSize = Math.round(
+                    (MOCK_SLOT_SIZE * (vDiskIndex + 1)) / (vDiskCount + 1),
+                );
+                const vDiskSlotId =
+                    MOCK_VDISK_SLOT_ID_BASE + nodeIndex * 1000 + pDiskIndex * 100 + vDiskIndex;
+                const isNoDataVDisk = nodeIndex === 0 && pDiskIndex < 2 && vDiskIndex === 0;
+
+                const vDisk = {
+                    ...(isNoDataVDisk ? {} : vDiskWhiteboard),
+                    ...(isNoDataVDisk && pDiskIndex === 1 ? {Status: 'ERROR' as const} : {}),
+                    VDiskId: isNoDataVDisk
+                        ? undefined
+                        : {
+                              GroupID: MOCK_GROUP_ID + nodeIndex,
+                              GroupGeneration: MOCK_GROUP_GENERATION,
+                              Ring: pDiskIndex,
+                              Domain: 0,
+                              VDisk: vDiskIndex,
+                          },
+                    NodeId: nodeId,
+                    PDiskId: pDiskId,
+                    VDiskSlotId: vDiskSlotId,
+                    Guid: String(vDiskSlotId),
+                    AllocatedSize: String(allocatedSize),
+                    AvailableSize: String(MOCK_SLOT_SIZE - allocatedSize),
+                    Donors: isNoDataVDisk
+                        ? undefined
+                        : vDiskSource.Donors?.flatMap((donor) =>
+                              donor.Whiteboard ? [donor.Whiteboard] : [],
+                          ),
+                };
+                vDisks.push(vDisk);
+            }
+        });
+
+        const node: TNodeInfo = {
+            NodeId: nodeId,
+            SystemState: {
+                NodeId: nodeId,
+                Host: `mock-storage-node-${nodeId}.ydb`,
+                NodeName: `mock-storage-node-${nodeId}`,
+                Roles: ['Storage'],
+                SystemState: EFlag.Green,
+                Location: {DataCenter: 'mock-dc', Rack: `mock-rack-${nodeIndex + 1}`},
+            },
+            PDisks: pDisks,
+            VDisks: vDisks,
+            UptimeSeconds: 60 * 60,
+            Disconnected: false,
+            MaxPDiskUsage: 70,
+            MaxVDiskSlotUsage: 82,
+            MaxVDiskRawUsage: 64,
+            CapacityAlert: ECapacityAlert.RED,
+        };
+
+        return {name, node};
+    });
+    const nodes = groupedNodes
+        .filter(({name}) => filterGroup === undefined || name === filterGroup)
+        .map(({node}) => node);
+
+    return {
+        Overall: EFlag.Red,
+        Nodes: nodes,
+        NodeGroups: groupedNodes.map(({name}) => ({GroupName: name, NodeCount: 1})),
+        TotalNodes: String(nodes.length),
+        FoundNodes: String(nodes.length),
+        MaximumSlotsPerDisk: '24',
+        MaximumDisksPerNode: '4',
     };
 }

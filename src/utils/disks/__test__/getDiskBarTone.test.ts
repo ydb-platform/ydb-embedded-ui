@@ -4,15 +4,31 @@ import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY, DONOR_COLOR} from '../constants';
 import {getDiskBarTone} from '../getDiskBarTone';
 
 describe('getDiskBarTone', () => {
-    test('uses donor tone regardless of severity and indicator', () => {
+    test.each([false, true])(
+        'uses donor tone regardless of severity, indicator, and isNoData=%s',
+        (isNoData) => {
+            expect(
+                getDiskBarTone({
+                    severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+                    isDonor: true,
+                    showIndicator: true,
+                    indicator: CircleQuestionFill,
+                    isNoData,
+                }),
+            ).toBe(DONOR_COLOR);
+        },
+    );
+
+    test('uses the no-data tone for an ordinary disk even with a missing-data indicator', () => {
         expect(
             getDiskBarTone({
-                severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
-                isDonor: true,
+                severity: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
+                isDonor: false,
                 showIndicator: true,
                 indicator: CircleQuestionFill,
+                isNoData: true,
             }),
-        ).toBe(DONOR_COLOR);
+        ).toBe('Grey');
     });
 
     test('uses light grey only when a missing-data indicator is visible', () => {

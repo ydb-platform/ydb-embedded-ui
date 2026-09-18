@@ -10,22 +10,21 @@ import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../components/InternalLink';
 import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 import {getPDiskPagePath} from '../../../routes';
+import {isCapacityAlert} from '../../../types/api/enums';
 import {cn} from '../../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import type {
-    DiskDisplayMode,
     DiskIndicatorValue,
-    PDiskAllModeIndicatorsState,
+    PDiskDisplayState,
     PDiskDisplayStateGetter,
 } from '../../../utils/disks/displayState';
 import {getDefaultPDiskDisplayState} from '../../../utils/disks/displayState';
 import {getDiskBarTone} from '../../../utils/disks/getDiskBarTone';
 import {getPDiskId, getVDiskStatusIcon} from '../../../utils/disks/helpers';
-import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
+import type {PreparedPDisk} from '../../../utils/disks/types';
 import {isNumeric} from '../../../utils/utils';
 import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
-import type {StorageViewContext} from '../types';
 
-import {PDiskVDisks} from './PDiskVDisks';
 import {i18n} from './i18n';
 
 import './PDisk.scss';
@@ -33,9 +32,61 @@ import './PDisk.scss';
 const b = cn('pdisk-storage');
 const EMPTY_ALL_MODE_INDICATORS = {};
 
+interface PDiskNodeBarContentProps {
+    left?: React.ReactNode;
+    center?: React.ReactNode;
+    type?: React.ReactNode;
+}
+
+function PDiskNodeBarContent({left, center, type}: PDiskNodeBarContentProps) {
+    return (
+        <div className={b('node-bar-content')}>
+            <div className={b('node-bar-left')}>{left}</div>
+            <div className={b('node-bar-center')}>{center}</div>
+            <div className={b('node-bar-type')}>{type}</div>
+        </div>
+    );
+}
+
+interface GetPDiskContentParams {
+    barContent: React.ReactNode;
+    data: PreparedPDisk;
+    hasIndicators: boolean;
+    showAllocatedPercentLabel: boolean;
+    showTypeLabel?: boolean;
+    isNoData?: boolean;
+}
+
+function getPDiskContent({
+    barContent,
+    data,
+    hasIndicators,
+    showAllocatedPercentLabel,
+    showTypeLabel,
+    isNoData,
+}: GetPDiskContentParams) {
+    if (!showTypeLabel) {
+        return barContent;
+    }
+
+    const showNoDataLabel = isNoData && !showAllocatedPercentLabel;
+
+    return (
+        <PDiskNodeBarContent
+            left={hasIndicators || showAllocatedPercentLabel || showNoDataLabel ? null : barContent}
+            center={showAllocatedPercentLabel ? barContent : null}
+            type={
+                <React.Fragment>
+                    {showNoDataLabel ? barContent : null}
+                    <DiskBarLabel>{data.Type || EMPTY_DATA_PLACEHOLDER}</DiskBarLabel>
+                </React.Fragment>
+            }
+        />
+    );
+}
+
 interface GetPDiskBarContentParams {
     allocatedPercent?: number;
-    hidden: boolean;
     isAllMode: boolean;
     noDataPlaceholder?: React.ReactNode;
     showAllocatedPercentLabel?: boolean;
@@ -44,16 +95,11 @@ interface GetPDiskBarContentParams {
 
 function getPDiskBarContent({
     allocatedPercent,
-    hidden,
     isAllMode,
     noDataPlaceholder,
     showAllocatedPercentLabel,
     showNoDataPlaceholder,
 }: GetPDiskBarContentParams) {
-    if (hidden) {
-        return null;
-    }
-
     const hasAllocatedPercent = isNumeric(allocatedPercent) && allocatedPercent >= 0;
     if (hasAllocatedPercent && showAllocatedPercentLabel !== false) {
         return <DiskBarLabel>{`${Math.floor(allocatedPercent)}%`}</DiskBarLabel>;
@@ -100,58 +146,37 @@ function getPDiskBarIndicator({
     };
 }
 
-function getAllModeOverlay(
-    mode: DiskDisplayMode | undefined,
-    indicators: PDiskAllModeIndicatorsState | undefined,
-) {
-    if (mode !== 'all') {
-        return null;
-    }
-
-    return <PDiskAllModeIndicators indicators={indicators ?? EMPTY_ALL_MODE_INDICATORS} />;
+function getAccessiblePDiskId(data: PreparedPDisk) {
+    return (
+        data.StringifiedId ||
+        getPDiskId({nodeId: data.NodeId, pDiskId: data.PDiskId}) ||
+        i18n('context_no-data')
+    );
 }
 
-function getAccessibleName(
+function getAllocatedPercentAccessibleName(allocatedPercent: number | undefined) {
+    const hasAllocatedPercent =
+        typeof allocatedPercent === 'number' &&
+        Number.isFinite(allocatedPercent) &&
+        allocatedPercent >= 0;
+
+    return hasAllocatedPercent ? `${Math.floor(allocatedPercent)}%` : i18n('context_no-data');
+}
+
+function getAllModeAccessibleName(
     data: PreparedPDisk,
     allocatedPercent: number | undefined,
     hasIssues: boolean | undefined,
-    isAllMode: boolean,
-    showNoDataPlaceholder: boolean | undefined,
 ) {
-    if (!isAllMode) {
-        return undefined;
-    }
-
     const noData = i18n('context_no-data');
-
-    let allocated = noData;
-    if (showNoDataPlaceholder !== true) {
-        const hasAllocatedPercent =
-            typeof allocatedPercent === 'number' &&
-            Number.isFinite(allocatedPercent) &&
-            allocatedPercent >= 0;
-
-        if (hasAllocatedPercent) {
-            allocated = `${Math.floor(allocatedPercent)}%`;
-        }
-    }
-
     const health =
         hasIssues === undefined
             ? noData
             : i18n(
                   hasIssues ? 'context_all-mode-health-issues' : 'context_all-mode-health-healthy',
               );
-    const pDiskId =
-        data.StringifiedId ??
-        getPDiskId({
-            nodeId: data.NodeId,
-            pDiskId: data.PDiskId,
-        }) ??
-        noData;
-
     return i18n('context_all-mode-accessible-name', {
-        pdiskId: pDiskId,
+        pdiskId: getAccessiblePDiskId(data),
         health,
         state: data.State || noData,
         capacityAlert: data.PDiskCapacityAlert || noData,
@@ -160,48 +185,100 @@ function getAccessibleName(
         maintenance: data.MaintenanceStatus || noData,
         device: data.Device || noData,
         realtime: data.Realtime || noData,
-        allocatedPercent: allocated,
+        allocatedPercent: getAllocatedPercentAccessibleName(allocatedPercent),
     });
 }
 
-interface PDiskProps {
+function getAccessibleName(
+    data: PreparedPDisk,
+    {mode, allMode, isNoData, allocatedPercent}: PDiskDisplayState,
+) {
+    if (!mode) {
+        return undefined;
+    }
+    if (mode === 'all') {
+        return getAllModeAccessibleName(data, allocatedPercent, allMode?.hasIssues);
+    }
+
+    const noData = i18n('context_no-data');
+    let diskName = i18n('context_pdisk', {pdiskId: getAccessiblePDiskId(data)});
+    if (isNoData) {
+        diskName = i18n('context_pdisk-no-whiteboard', {disk: diskName, noData});
+    }
+    const {State, Device, Realtime} = isNoData ? {} : data;
+
+    switch (mode) {
+        case 'state':
+            return i18n('context_state-accessible-name', {disk: diskName, state: State || noData});
+        case 'space':
+            return i18n('context_space-accessible-name', {
+                disk: diskName,
+                capacityAlert: isCapacityAlert(data.PDiskCapacityAlert)
+                    ? data.PDiskCapacityAlert
+                    : noData,
+                allocatedPercent: getAllocatedPercentAccessibleName(allocatedPercent),
+            });
+        case 'drive':
+            return i18n('context_drive-accessible-name', {
+                disk: diskName,
+                drive: data.DriveStatus || noData,
+            });
+        case 'decommit':
+            return i18n('context_decommit-accessible-name', {
+                disk: diskName,
+                decommit: data.DecommitStatus || noData,
+            });
+        case 'maintenance':
+            return i18n('context_maintenance-accessible-name', {
+                disk: diskName,
+                maintenance: data.MaintenanceStatus || noData,
+            });
+        case 'device':
+            return i18n('context_device-accessible-name', {
+                disk: diskName,
+                device: Device || noData,
+                realtime: Realtime || noData,
+            });
+        default:
+            return undefined;
+    }
+}
+
+export interface PDiskProps {
     data?: PreparedPDisk;
-    vDisks?: PreparedVDisk[];
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
     className?: string;
     progressBarClassName?: string;
-    viewContext?: StorageViewContext;
+    // Nodes derive this width from their VDisk rows, overriding the Groups mode defaults.
     width?: number;
     delayOpen?: number;
     delayClose?: number;
     withIcon?: boolean;
+    showTypeLabel?: boolean;
     inactive?: boolean;
     highlighted?: boolean;
-    highlightedDisk?: string;
-    setHighlightedDisk?: (id?: string) => void;
     getDisplayState?: PDiskDisplayStateGetter;
+    topContent?: React.ReactNode;
 }
 
 export const PDisk = ({
     data = {},
-    vDisks,
     showPopup,
     onShowPopup,
     onHidePopup,
     className,
     progressBarClassName,
-    viewContext,
     width,
     delayOpen = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     delayClose = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     withIcon,
+    showTypeLabel,
     inactive,
     highlighted,
-    highlightedDisk,
-    setHighlightedDisk,
     getDisplayState,
+    topContent,
 }: PDiskProps) => {
     const {NodeId, PDiskId} = data;
     const pDiskIdsDefined = !isNil(NodeId) && !isNil(PDiskId);
@@ -213,19 +290,12 @@ export const PDisk = ({
     const isAllMode = displayState.mode === 'all';
     const noDataPlaceholder =
         displayState.showNoDataPlaceholder === false ? undefined : i18n('context_no-data');
-    const hideBarContent = Boolean(displayState.isLegendInactive);
     const allocatedPercent = displayState.allocatedPercent;
     const hasAllocatedPercent = isNumeric(allocatedPercent) && allocatedPercent >= 0;
     const iconPlacement = displayState.iconPlacement ?? 'inline';
-    const accessibleName = getAccessibleName(
-        data,
-        allocatedPercent,
-        displayState.allMode?.hasIssues,
-        isAllMode,
-        displayState.showNoDataPlaceholder,
-    );
+    const accessibleName = getAccessibleName(data, displayState);
     const {leading, overflowVisible, showIndicator} = getPDiskBarIndicator({
-        hidden: hideBarContent,
+        hidden: Boolean(displayState.isLegendInactive),
         icon: displayState.icon,
         placement: iconPlacement,
         severity: displayState.severity,
@@ -233,18 +303,32 @@ export const PDisk = ({
     });
     const barContent = getPDiskBarContent({
         allocatedPercent,
-        hidden: hideBarContent,
         isAllMode,
         noDataPlaceholder,
         showAllocatedPercentLabel: displayState.showAllocatedPercentLabel,
         showNoDataPlaceholder: displayState.showNoDataPlaceholder,
     });
-    const overlay = getAllModeOverlay(displayState.mode, displayState.allMode?.indicators);
+    const showAllocatedPercentLabel =
+        hasAllocatedPercent && displayState.showAllocatedPercentLabel !== false;
+    const allModeIndicators = displayState.allMode?.indicators ?? EMPTY_ALL_MODE_INDICATORS;
+    const hasAllModeIndicators = isAllMode && Object.values(allModeIndicators).some(Boolean);
+    const overlay = hasAllModeIndicators ? (
+        <PDiskAllModeIndicators indicators={allModeIndicators} />
+    ) : null;
+    const content = getPDiskContent({
+        barContent,
+        data,
+        hasIndicators: showIndicator || hasAllModeIndicators,
+        showAllocatedPercentLabel,
+        showTypeLabel,
+        isNoData: displayState.isNoData,
+    });
 
     const tone = getDiskBarTone({
         severity: displayState.severity,
         showIndicator,
         indicator: displayState.icon,
+        isNoData: displayState.isNoData,
     });
 
     let pDiskPath: string | undefined;
@@ -257,17 +341,9 @@ export const PDisk = ({
         <div
             className={b(null, className)}
             ref={anchorRef}
-            style={{width: displayState.width ?? width}}
+            style={{width: width ?? displayState.width}}
         >
-            <PDiskVDisks
-                vDisks={vDisks}
-                viewContext={viewContext}
-                withIcon={withIcon}
-                delayOpen={delayOpen}
-                delayClose={delayClose}
-                highlightedDisk={highlightedDisk}
-                setHighlightedDisk={setHighlightedDisk}
-            />
+            {topContent}
             <HoverPopup
                 showPopup={showPopup}
                 offset={{mainAxis: 2, crossAxis: 0}}
@@ -284,14 +360,14 @@ export const PDisk = ({
                         tone={tone}
                         mode={displayState.mode}
                         leading={leading}
-                        content={barContent}
+                        content={content}
                         overlay={overlay}
                         className={progressBarClassName}
                         inactive={inactive}
                         highlighted={highlighted}
                         filled={hasAllocatedPercent && Number(allocatedPercent) > 0}
                         strongFill={displayState.allMode?.hasIssues}
-                        borderless={displayState.isLegendInactive}
+                        borderless={displayState.borderless}
                         overflowVisible={overflowVisible}
                     />
                 </InternalLink>

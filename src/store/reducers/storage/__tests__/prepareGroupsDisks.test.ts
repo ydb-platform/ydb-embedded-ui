@@ -136,6 +136,7 @@ describe('prepareGroupsVDisk', () => {
         } as const as TStorageVDisk;
 
         const expectedResult = {
+            HasWhiteboardData: true,
             VDiskId: {
                 GroupID: 2181038134,
                 GroupGeneration: 22,
@@ -190,6 +191,7 @@ describe('prepareGroupsVDisk', () => {
             Donors: undefined,
 
             PDisk: {
+                HasWhiteboardData: false,
                 AllocatedPercent: NaN,
                 AllocatedSize: NaN,
                 AvailableSize: NaN,
@@ -218,6 +220,7 @@ describe('prepareGroupsVDisk', () => {
         } as const as TStorageVDisk;
 
         const expectedResult = {
+            HasWhiteboardData: false,
             StringifiedId: '2181038134-22-0-0-0',
             NodeId: 224,
 
@@ -236,6 +239,7 @@ describe('prepareGroupsVDisk', () => {
             VDiskId: undefined,
 
             PDisk: {
+                HasWhiteboardData: false,
                 AllocatedPercent: NaN,
                 AllocatedSize: NaN,
                 AvailableSize: NaN,
@@ -293,6 +297,7 @@ describe('prepareGroupsVDisk', () => {
         } as const as TStorageVDisk;
 
         const expectedResult = {
+            HasWhiteboardData: true,
             VDiskId: {
                 GroupID: 2181038134,
                 GroupGeneration: 22,
@@ -345,6 +350,7 @@ describe('prepareGroupsVDisk', () => {
             Donors: undefined,
 
             PDisk: {
+                HasWhiteboardData: false,
                 AllocatedPercent: NaN,
                 AllocatedSize: NaN,
                 AvailableSize: NaN,
@@ -468,6 +474,7 @@ describe('prepareGroupsPDisk', () => {
         };
 
         const expectedResult = {
+            HasWhiteboardData: true,
             NodeId: 224,
             PDiskId: 1001,
             StringifiedId: '224-1001',
@@ -531,6 +538,7 @@ describe('prepareGroupsPDisk', () => {
         };
 
         const expectedResult = {
+            HasWhiteboardData: false,
             NodeId: 224,
             PDiskId: 1001,
             StringifiedId: '224-1001',
@@ -586,6 +594,7 @@ describe('prepareGroupsPDisk', () => {
         };
 
         const expectedResult = {
+            HasWhiteboardData: true,
             NodeId: 224,
             PDiskId: 1001,
             StringifiedId: '224-1001',

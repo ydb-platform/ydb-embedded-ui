@@ -1,4 +1,6 @@
+import {CircleQuestionFill} from '@gravity-ui/icons';
 import {Icon, Text} from '@gravity-ui/uikit';
+import type {IconData} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import type {PDiskAllModeIndicatorsState} from '../../utils/disks/displayState';
@@ -10,6 +12,17 @@ const b = cn('storage-disk-progress-bar');
 
 interface PDiskAllModeIndicatorsProps {
     indicators: PDiskAllModeIndicatorsState;
+}
+
+function PDiskAllModeStatusIndicator({indicator}: {indicator?: IconData}) {
+    if (!indicator) {
+        return null;
+    }
+
+    const className =
+        indicator === CircleQuestionFill ? b('all-mode-missing-data-indicator-icon') : undefined;
+
+    return <Icon className={className} data={indicator} size={12} />;
 }
 
 export function PDiskAllModeIndicators({indicators}: PDiskAllModeIndicatorsProps) {
@@ -24,13 +37,13 @@ export function PDiskAllModeIndicators({indicators}: PDiskAllModeIndicatorsProps
                 <AllModeCapacityAlertIndicator indicator={indicators.capacityAlert} />
             </Text>
             <span className={b('pdisk-all-mode-drive-indicator-slot')}>
-                {indicators.drive && <Icon data={indicators.drive} size={12} />}
+                <PDiskAllModeStatusIndicator indicator={indicators.drive} />
             </span>
             <span className={b('pdisk-all-mode-decommit-indicator-slot')}>
-                {indicators.decommit && <Icon data={indicators.decommit} size={12} />}
+                <PDiskAllModeStatusIndicator indicator={indicators.decommit} />
             </span>
             <span className={b('pdisk-all-mode-maintenance-indicator-slot')}>
-                {indicators.maintenance && <Icon data={indicators.maintenance} size={12} />}
+                <PDiskAllModeStatusIndicator indicator={indicators.maintenance} />
             </span>
             <span className={b('pdisk-all-mode-device-indicator-slot')}>
                 {indicators.device && <DiskIconGroup icons={indicators.device} />}

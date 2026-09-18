@@ -3,11 +3,12 @@ import React from 'react';
 import type {PopupPlacement, PopupProps} from '@gravity-ui/uikit';
 
 import {useVDiskPagePath} from '../../routes';
+import {EFlag, isCapacityAlert} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
 import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
 import type {
-    AllModeIndicatorsState,
     DiskIndicatorValue,
+    VDiskDisplayState,
     VDiskDisplayStateGetter,
 } from '../../utils/disks/displayState';
 import {getDefaultDiskDisplayState} from '../../utils/disks/displayState';
@@ -35,7 +36,6 @@ const EMPTY_ALL_MODE_INDICATORS = {};
 interface GetVDiskBarContentParams {
     allocatedPercent?: number;
     compact?: boolean;
-    hidden: boolean;
     noDataPlaceholder?: React.ReactNode;
     severity: number;
     showAllocatedPercentLabel?: boolean;
@@ -45,16 +45,11 @@ interface GetVDiskBarContentParams {
 function getVDiskBarContent({
     allocatedPercent,
     compact,
-    hidden,
     noDataPlaceholder,
     severity,
     showAllocatedPercentLabel,
     showNoDataPlaceholder,
 }: GetVDiskBarContentParams) {
-    if (hidden) {
-        return null;
-    }
-
     const hasAllocatedPercent = isNumeric(allocatedPercent) && allocatedPercent >= 0;
     if (!compact && hasAllocatedPercent && showAllocatedPercentLabel !== false) {
         return <DiskBarLabel>{`${Math.floor(allocatedPercent)}%`}</DiskBarLabel>;
@@ -74,6 +69,9 @@ function getVDiskBarContent({
 interface GetVDiskBarIndicatorParams {
     hidden: boolean;
     icon?: DiskIndicatorValue;
+    indicatorClassName?: string;
+    iconGroupSize?: number;
+    iconSize?: number;
     isDonor?: boolean;
     placement: 'inline' | 'overlap';
     severity: number;
@@ -83,6 +81,9 @@ interface GetVDiskBarIndicatorParams {
 function getVDiskBarIndicator({
     hidden,
     icon,
+    indicatorClassName,
+    iconGroupSize,
+    iconSize,
     isDonor,
     placement,
     severity,
@@ -94,33 +95,49 @@ function getVDiskBarIndicator({
     }
 
     return {
-        leading: <DiskIndicator value={resolvedIndicator} placement={placement} />,
+        leading: (
+            <DiskIndicator
+                value={resolvedIndicator}
+                placement={placement}
+                iconSize={iconSize}
+                iconGroupSize={iconGroupSize}
+                className={indicatorClassName}
+            />
+        ),
         overflowVisible: placement === 'overlap',
         showIndicator: true,
     };
 }
 
-function getAllModeOverlay(
-    compact: boolean | undefined,
-    isAllMode: boolean,
-    indicators: AllModeIndicatorsState | undefined,
-) {
-    if (compact || !isAllMode) {
-        return null;
+function getFlagAccessibleName(flag: EFlag | undefined) {
+    switch (flag) {
+        case EFlag.Green:
+        case EFlag.Blue:
+            return i18n('value_ok');
+        case EFlag.Yellow:
+            return i18n('value_notice');
+        case EFlag.Orange:
+            return i18n('value_warning');
+        case EFlag.Red:
+            return i18n('value_impaired');
+        default:
+            return i18n('context_no-data');
     }
-
-    return <AllModeIndicators indicators={indicators ?? EMPTY_ALL_MODE_INDICATORS} />;
 }
 
-function getAccessibleName(
-    data: PreparedVDisk,
-    hasIssues: boolean | undefined,
-    isAllMode: boolean,
-) {
-    if (!isAllMode) {
-        return undefined;
+function getReplicationAccessibleName(replicated: boolean | undefined) {
+    if (replicated === undefined) {
+        return i18n('context_no-data');
     }
 
+    return i18n(
+        replicated
+            ? 'context_all-mode-replication-complete'
+            : 'context_all-mode-replication-in-progress',
+    );
+}
+
+function getAllModeAccessibleName(data: PreparedVDisk, hasIssues: boolean | undefined) {
     const noData = i18n('context_no-data');
     const health =
         hasIssues === undefined
@@ -132,20 +149,11 @@ function getAccessibleName(
         Number.isFinite(data.AllocatedPercent) && Number(data.AllocatedPercent) >= 0
             ? `${data.AllocatedPercent}%`
             : noData;
-    const replication =
-        data.Replicated === undefined
-            ? noData
-            : i18n(
-                  data.Replicated
-                      ? 'context_all-mode-replication-complete'
-                      : 'context_all-mode-replication-in-progress',
-              );
-
     return i18n('context_all-mode-accessible-name', {
         vdiskId: data.StringifiedId || noData,
         health,
-        state: data.VDiskState || noData,
-        replication,
+        state: data.VDiskState || data.Status || noData,
+        replication: getReplicationAccessibleName(data.Replicated),
         capacityAlert: data.CapacityAlert || noData,
         frontQueues: data.FrontQueues || noData,
         freshCompaction: data.SatisfactionRank?.FreshRank?.Flag || noData,
@@ -154,9 +162,58 @@ function getAccessibleName(
     });
 }
 
+function getAccessibleName(data: PreparedVDisk, {mode, allMode, isNoData}: VDiskDisplayState) {
+    if (!mode) {
+        return undefined;
+    }
+    if (mode === 'all') {
+        return getAllModeAccessibleName(data, allMode?.hasIssues);
+    }
+
+    const noData = i18n('context_no-data');
+    let diskName = i18n(data.DonorMode ? 'context_donor-vdisk' : 'context_vdisk', {
+        vdiskId: data.StringifiedId || noData,
+        nodeId: data.NodeId ?? noData,
+    });
+    if (isNoData) {
+        diskName = i18n('context_vdisk-no-whiteboard', {disk: diskName, noData});
+    }
+
+    const {CapacityAlert, FrontQueues, SatisfactionRank, Replicated} = isNoData ? {} : data;
+    const {FreshRank, LevelRank} = SatisfactionRank ?? {};
+
+    switch (mode) {
+        case 'state':
+            return i18n('context_state-accessible-name', {
+                disk: diskName,
+                state: data.VDiskState || data.Status || noData,
+                replication: getReplicationAccessibleName(Replicated),
+            });
+        case 'space':
+            return i18n('context_space-accessible-name', {
+                disk: diskName,
+                capacityAlert: isCapacityAlert(CapacityAlert) ? CapacityAlert : noData,
+            });
+        case 'frontQueues':
+            return i18n('context_front-queues-accessible-name', {
+                disk: diskName,
+                frontQueues: getFlagAccessibleName(FrontQueues),
+            });
+        case 'compaction':
+            return i18n('context_compaction-accessible-name', {
+                disk: diskName,
+                freshCompaction: getFlagAccessibleName(FreshRank?.Flag),
+                levelCompaction: getFlagAccessibleName(LevelRank?.Flag),
+            });
+        default:
+            return undefined;
+    }
+}
+
 export interface VDiskProps {
     data?: PreparedVDisk;
     compact?: boolean;
+    allModeSize?: 's' | 'm';
     inactive?: boolean;
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
@@ -165,6 +222,9 @@ export interface VDiskProps {
     delayOpen?: number;
     delayClose?: number;
     withIcon?: boolean;
+    iconSize?: number;
+    iconGroupSize?: number;
+    indicatorClassName?: string;
     highlighted?: boolean;
     placement?: PopupPlacement;
     popupOffset?: PopupProps['offset'];
@@ -175,6 +235,7 @@ export interface VDiskProps {
 export const VDisk = ({
     data = {},
     compact,
+    allModeSize,
     inactive,
     showPopup,
     onShowPopup,
@@ -183,6 +244,9 @@ export const VDisk = ({
     delayClose,
     delayOpen,
     withIcon,
+    iconSize,
+    iconGroupSize,
+    indicatorClassName,
     highlighted,
     placement = ['top', 'bottom', 'left', 'right'],
     popupOffset = DEFAULT_POPUP_OFFSET,
@@ -203,20 +267,24 @@ export const VDisk = ({
         icon,
         mode,
         isLegendInactive,
+        borderless,
         showNoDataPlaceholder,
         allocatedPercent,
         showAllocatedPercentLabel,
         striped,
         iconPlacement,
         allMode,
+        isNoData,
     } = displayState;
 
     const isAllMode = mode === 'all';
-    const accessibleName = getAccessibleName(data, allMode?.hasIssues, isAllMode);
-    const hideBarContent = Boolean(isLegendInactive && !isDonor);
+    const accessibleName = getAccessibleName(data, displayState);
     const {leading, overflowVisible, showIndicator} = getVDiskBarIndicator({
-        hidden: hideBarContent,
+        hidden: Boolean(isLegendInactive && !isDonor),
         icon,
+        indicatorClassName,
+        iconGroupSize,
+        iconSize,
         isDonor,
         placement: iconPlacement,
         severity,
@@ -226,18 +294,24 @@ export const VDisk = ({
     const barContent = getVDiskBarContent({
         allocatedPercent,
         compact,
-        hidden: hideBarContent,
         noDataPlaceholder,
         severity,
         showAllocatedPercentLabel,
         showNoDataPlaceholder,
     });
-    const overlay = getAllModeOverlay(compact, isAllMode, allMode?.indicators);
+    const overlay =
+        !compact && isAllMode && !isNoData ? (
+            <AllModeIndicators
+                indicators={allMode?.indicators ?? EMPTY_ALL_MODE_INDICATORS}
+                size={allModeSize}
+            />
+        ) : null;
     const tone = getDiskBarTone({
         severity,
         isDonor,
         showIndicator,
         indicator: icon,
+        isNoData,
     });
 
     return (
@@ -275,7 +349,7 @@ export const VDisk = ({
                         overlay={overlay}
                         highlighted={highlighted}
                         strongFill={allMode?.hasIssues}
-                        borderless={isLegendInactive}
+                        borderless={borderless}
                         overflowVisible={overflowVisible}
                     />
                 </InternalLink>

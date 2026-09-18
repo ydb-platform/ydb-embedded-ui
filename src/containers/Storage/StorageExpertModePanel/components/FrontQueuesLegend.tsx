@@ -28,6 +28,7 @@ const legendItems: FrontQueuesLegendItem[] = [
         icon: Dots9,
         className: b('label-danger-heavy'),
     },
+    {text: i18n('value_no-data'), theme: 'unknown'},
 ];
 
 export function FrontQueuesLegend({className}: FrontQueuesLegendProps) {

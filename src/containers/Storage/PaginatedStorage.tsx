@@ -4,6 +4,8 @@ import {PaginatedStorageGroups} from './PaginatedStorageGroups';
 import {PaginatedStorageNodes} from './PaginatedStorageNodes';
 import type {StorageViewContext} from './types';
 import {
+    useSaveNodesPDisksGroupBy,
+    useSaveNodesVDisksGroupBy,
     useSavePDisksGroupBy,
     useSaveStorageExpertMode,
     useSaveStorageType,
@@ -31,6 +33,8 @@ export const PaginatedStorage = (props: PaginatedStorageProps) => {
     useSaveStorageExpertMode();
     useSaveVDisksGroupBy();
     useSavePDisksGroupBy();
+    useSaveNodesVDisksGroupBy();
+    useSaveNodesPDisksGroupBy();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const isNodes = storageType === 'nodes';

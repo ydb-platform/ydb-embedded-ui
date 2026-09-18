@@ -22,10 +22,17 @@ import {storageNodesGroupByParamSchema} from './PaginatedStorageNodesTable/colum
 import {
     PDisksGroupBy,
     VDisksGroupBy,
+    nodesPdisksGroupBySchema,
+    nodesVdisksGroupBySchema,
     pdisksGroupBySchema,
     vdisksGroupBySchema,
 } from './StorageExpertModePanel/constants';
-import type {PDisksGroupByValue, VDisksGroupByValue} from './StorageExpertModePanel/constants';
+import type {
+    NodesPDisksGroupByValue,
+    NodesVDisksGroupByValue,
+    PDisksGroupByValue,
+    VDisksGroupByValue,
+} from './StorageExpertModePanel/constants';
 import {STORAGE_SEARCH_PARAM_BY_TYPE} from './constants';
 
 interface StorageGroupByCleanupParams {
@@ -81,6 +88,8 @@ export function useStorageQueryParams() {
         storageExpertMode: BooleanParam,
         vdisksGroupBy: StringParam,
         pdisksGroupBy: StringParam,
+        nodesVdisksGroupBy: StringParam,
+        nodesPdisksGroupBy: StringParam,
     });
 
     const [savedStorageType, setSavedStorageType] = useSetting<StorageType>(
@@ -126,6 +135,26 @@ export function useStorageQueryParams() {
 
     const pdisksGroupBy = pdisksGroupBySchema.parse(
         queryParams.pdisksGroupBy ?? savedPDisksGroupBy,
+    );
+
+    const [savedNodesVDisksGroupBy, setSavedNodesVDisksGroupBy] =
+        useSetting<NodesVDisksGroupByValue>(
+            SETTING_KEYS.STORAGE_NODES_VDISKS_GROUP_BY,
+            VDisksGroupBy.State,
+        );
+
+    const nodesVdisksGroupBy = nodesVdisksGroupBySchema.parse(
+        queryParams.nodesVdisksGroupBy ?? savedNodesVDisksGroupBy,
+    );
+
+    const [savedNodesPDisksGroupBy, setSavedNodesPDisksGroupBy] =
+        useSetting<NodesPDisksGroupByValue>(
+            SETTING_KEYS.STORAGE_NODES_PDISKS_GROUP_BY,
+            PDisksGroupBy.State,
+        );
+
+    const nodesPdisksGroupBy = nodesPdisksGroupBySchema.parse(
+        queryParams.nodesPdisksGroupBy ?? savedNodesPDisksGroupBy,
     );
 
     React.useEffect(() => {
@@ -198,6 +227,22 @@ export function useStorageQueryParams() {
         [setQueryParams, setSavedPDisksGroupBy],
     );
 
+    const handleNodesVDisksGroupByChange = React.useCallback(
+        (value: NodesVDisksGroupByValue) => {
+            setQueryParams({nodesVdisksGroupBy: value}, 'replaceIn');
+            setSavedNodesVDisksGroupBy(value);
+        },
+        [setQueryParams, setSavedNodesVDisksGroupBy],
+    );
+
+    const handleNodesPDisksGroupByChange = React.useCallback(
+        (value: NodesPDisksGroupByValue) => {
+            setQueryParams({nodesPdisksGroupBy: value}, 'replaceIn');
+            setSavedNodesPDisksGroupBy(value);
+        },
+        [setQueryParams, setSavedNodesPDisksGroupBy],
+    );
+
     const handleShowAllGroups = () => {
         handleVisibleEntitiesChange('all');
     };
@@ -235,6 +280,8 @@ export function useStorageQueryParams() {
         storageExpertMode,
         vdisksGroupBy,
         pdisksGroupBy,
+        nodesVdisksGroupBy,
+        nodesPdisksGroupBy,
 
         handleTextFilterGroupsChange,
         handleTextFilterNodesChange,
@@ -247,6 +294,8 @@ export function useStorageQueryParams() {
         handleStorageExpertModeChange,
         handleVDisksGroupByChange,
         handlePDisksGroupByChange,
+        handleNodesVDisksGroupByChange,
+        handleNodesPDisksGroupByChange,
 
         handleShowAllGroups,
         handleShowAllNodes,
@@ -296,6 +345,32 @@ export function usePDisksGroupByParam() {
     );
 }
 
+export function useNodesVDisksGroupByParam() {
+    const [queryNodesVDisksGroupBy] = useQueryParam('nodesVdisksGroupBy', StringParam);
+    const [savedNodesVDisksGroupBy] = useSetting<NodesVDisksGroupByValue>(
+        SETTING_KEYS.STORAGE_NODES_VDISKS_GROUP_BY,
+        VDisksGroupBy.State,
+    );
+
+    return React.useMemo(
+        () => nodesVdisksGroupBySchema.parse(queryNodesVDisksGroupBy ?? savedNodesVDisksGroupBy),
+        [queryNodesVDisksGroupBy, savedNodesVDisksGroupBy],
+    );
+}
+
+export function useNodesPDisksGroupByParam() {
+    const [queryNodesPDisksGroupBy] = useQueryParam('nodesPdisksGroupBy', StringParam);
+    const [savedNodesPDisksGroupBy] = useSetting<NodesPDisksGroupByValue>(
+        SETTING_KEYS.STORAGE_NODES_PDISKS_GROUP_BY,
+        PDisksGroupBy.State,
+    );
+
+    return React.useMemo(
+        () => nodesPdisksGroupBySchema.parse(queryNodesPDisksGroupBy ?? savedNodesPDisksGroupBy),
+        [queryNodesPDisksGroupBy, savedNodesPDisksGroupBy],
+    );
+}
+
 export function useSaveVDisksGroupBy() {
     const [queryVDisksGroupBy, setQueryVDisksGroupBy] = useQueryParam('vdisksGroupBy', StringParam);
     const [savedVDisksGroupBy] = useSetting<VDisksGroupByValue>(
@@ -332,6 +407,50 @@ export function useSavePDisksGroupBy() {
             setQueryPDisksGroupBy(normalizedPDisksGroupBy, 'replaceIn');
         }
     }, [normalizedPDisksGroupBy, queryPDisksGroupBy, setQueryPDisksGroupBy]);
+}
+
+export function useSaveNodesVDisksGroupBy() {
+    const [queryNodesVDisksGroupBy, setQueryNodesVDisksGroupBy] = useQueryParam(
+        'nodesVdisksGroupBy',
+        StringParam,
+    );
+    const [savedNodesVDisksGroupBy] = useSetting<NodesVDisksGroupByValue>(
+        SETTING_KEYS.STORAGE_NODES_VDISKS_GROUP_BY,
+        VDisksGroupBy.State,
+    );
+
+    const normalizedNodesVDisksGroupBy = React.useMemo(
+        () => nodesVdisksGroupBySchema.parse(queryNodesVDisksGroupBy ?? savedNodesVDisksGroupBy),
+        [queryNodesVDisksGroupBy, savedNodesVDisksGroupBy],
+    );
+
+    React.useEffect(() => {
+        if (normalizedNodesVDisksGroupBy !== queryNodesVDisksGroupBy) {
+            setQueryNodesVDisksGroupBy(normalizedNodesVDisksGroupBy, 'replaceIn');
+        }
+    }, [normalizedNodesVDisksGroupBy, queryNodesVDisksGroupBy, setQueryNodesVDisksGroupBy]);
+}
+
+export function useSaveNodesPDisksGroupBy() {
+    const [queryNodesPDisksGroupBy, setQueryNodesPDisksGroupBy] = useQueryParam(
+        'nodesPdisksGroupBy',
+        StringParam,
+    );
+    const [savedNodesPDisksGroupBy] = useSetting<NodesPDisksGroupByValue>(
+        SETTING_KEYS.STORAGE_NODES_PDISKS_GROUP_BY,
+        PDisksGroupBy.State,
+    );
+
+    const normalizedNodesPDisksGroupBy = React.useMemo(
+        () => nodesPdisksGroupBySchema.parse(queryNodesPDisksGroupBy ?? savedNodesPDisksGroupBy),
+        [queryNodesPDisksGroupBy, savedNodesPDisksGroupBy],
+    );
+
+    React.useEffect(() => {
+        if (normalizedNodesPDisksGroupBy !== queryNodesPDisksGroupBy) {
+            setQueryNodesPDisksGroupBy(normalizedNodesPDisksGroupBy, 'replaceIn');
+        }
+    }, [normalizedNodesPDisksGroupBy, queryNodesPDisksGroupBy, setQueryNodesPDisksGroupBy]);
 }
 
 export function useSaveStorageExpertMode() {

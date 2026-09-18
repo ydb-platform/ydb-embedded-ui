@@ -54,10 +54,12 @@ export const getPDisksColumn = ({
                     vDisks={row.VDisks}
                     viewContext={viewContext}
                     pDiskWidth={columnsSettings?.pDiskWidth}
+                    pDiskHeight={columnsSettings?.pDiskHeight}
+                    expertMode={columnsSettings?.expertMode}
                 />
             );
         },
-        align: DataTable.CENTER,
+        align: DataTable.LEFT,
         sortable: false,
         resizeable: false,
     };

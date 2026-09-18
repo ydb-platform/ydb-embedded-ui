@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {CircleXmarkFill, ClockFill} from '@gravity-ui/icons';
+
 import {ECapacityAlert, EFlag, isCapacityAlert} from '../../types/api/enums';
 import {EVDiskState} from '../../types/api/vdisk';
 import {
@@ -22,11 +24,17 @@ import {
     calculateCompactionIcon,
     calculateFrontQueuesIcon,
     calculateSpaceIcon,
+    calculateStateIcon,
 } from '../../utils/disks/iconCalculators';
 import type {PreparedVDisk} from '../../utils/disks/types';
 
+import type {SpaceLegendSelectionScope} from './StorageExpertModePanel/components/getSpaceLegendSelection';
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
-import {useIsStorageExpertMode, useVDisksGroupByParam} from './useStorageQueryParams';
+import {
+    useIsStorageExpertMode,
+    useNodesVDisksGroupByParam,
+    useVDisksGroupByParam,
+} from './useStorageQueryParams';
 
 function getMode(groupBy: VDisksGroupByValue): DiskDisplayMode {
     switch (groupBy) {
@@ -71,7 +79,7 @@ function getAllModeIndicators(
     return {
         ...(capacityAlert ? {capacityAlert} : {}),
         ...(frontQueues ? {frontQueues} : {}),
-        ...(compaction ? {compaction} : {}),
+        ...(compaction?.length ? {compaction} : {}),
     };
 }
 
@@ -103,14 +111,22 @@ function getMissingVDiskDisplayState(
     vDisk: PreparedVDisk,
     isDonor: boolean | undefined,
     mode: DiskDisplayMode,
+    showNoDataPlaceholder: boolean,
 ): VDiskDisplayState {
     const isAllMode = mode === 'all';
+    let icon: VDiskDisplayState['icon'];
+    if (isDonor) {
+        icon = calculateStateIcon(vDisk, isDonor);
+    } else if (mode === 'state' || isAllMode) {
+        icon = getKnownVDiskStateIcon(vDisk);
+    }
     const displayState: VDiskDisplayState = {
         severity: NOT_AVAILABLE_SEVERITY,
-        icon: undefined,
+        icon,
         mode,
+        isNoData: true,
         isLegendInactive: false,
-        showNoDataPlaceholder: true,
+        showNoDataPlaceholder,
         allocatedPercent: isAllMode ? vDisk.AllocatedPercent : undefined,
         showAllocatedPercentLabel: !isAllMode,
         striped: Boolean(isDonor),
@@ -124,9 +140,25 @@ function getMissingVDiskDisplayState(
     return displayState;
 }
 
+function getKnownVDiskStateIcon(vDisk: PreparedVDisk) {
+    if (vDisk.VDiskState !== undefined) {
+        return calculateStateIcon(vDisk);
+    }
+
+    switch (vDisk.Status) {
+        case 'ERROR':
+            return CircleXmarkFill;
+        case 'INIT_PENDING':
+            return ClockFill;
+        default:
+            return undefined;
+    }
+}
+
 interface GetExpertVDiskDisplayStateParams {
     inactiveLegendItems: Set<ECapacityAlert>;
     isDonor?: boolean;
+    selectionScope: SpaceLegendSelectionScope;
     vDisk: PreparedVDisk;
     vdisksGroupBy: VDisksGroupByValue;
 }
@@ -134,12 +166,13 @@ interface GetExpertVDiskDisplayStateParams {
 function getExpertVDiskDisplayState({
     inactiveLegendItems,
     isDonor,
+    selectionScope,
     vDisk,
     vdisksGroupBy,
 }: GetExpertVDiskDisplayStateParams): VDiskDisplayState {
     const mode = getMode(vdisksGroupBy);
-    if (!vDisk.VDiskId) {
-        return getMissingVDiskDisplayState(vDisk, isDonor, mode);
+    if (!(vDisk.HasWhiteboardData ?? Boolean(vDisk.VDiskId))) {
+        return getMissingVDiskDisplayState(vDisk, isDonor, mode, selectionScope !== 'nodes-vdisks');
     }
 
     const severity = getSeverityCalculator(vdisksGroupBy)(vDisk);
@@ -147,11 +180,18 @@ function getExpertVDiskDisplayState({
     const isCapacityAlertInactive =
         isCapacityAlert(vDisk.CapacityAlert) && inactiveLegendItems.has(vDisk.CapacityAlert);
     const allMode = getAllModeDisplayState(mode, vDisk, isDonor, isCapacityAlertInactive);
+    const spaceBorderless = mode === 'space' && isCapacityAlertInactive;
+    const stateBorderless =
+        mode === 'state' &&
+        !isDonor &&
+        (severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green ||
+            severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
     const displayState: VDiskDisplayState = {
         severity,
         icon,
         mode,
         isLegendInactive: mode === 'space' && isCapacityAlertInactive,
+        borderless: spaceBorderless || stateBorderless,
         showNoDataPlaceholder: false,
         allocatedPercent: mode === 'all' ? vDisk.AllocatedPercent : undefined,
         showAllocatedPercentLabel: mode !== 'all',
@@ -166,10 +206,12 @@ function getExpertVDiskDisplayState({
     return displayState;
 }
 
-export function useStorageVDiskDisplayStateGetter(): VDiskDisplayStateGetter {
+function useVDiskDisplayStateGetter(
+    vdisksGroupBy: VDisksGroupByValue,
+    selectionScope: SpaceLegendSelectionScope,
+): VDiskDisplayStateGetter {
     const isExpertMode = useIsStorageExpertMode();
-    const vdisksGroupBy = useVDisksGroupByParam();
-    const inactiveLegendItems = useSpaceLegendSelection();
+    const inactiveLegendItems = useSpaceLegendSelection(selectionScope);
 
     return React.useCallback(
         (vDisk, isDonor) => {
@@ -180,10 +222,23 @@ export function useStorageVDiskDisplayStateGetter(): VDiskDisplayStateGetter {
             return getExpertVDiskDisplayState({
                 inactiveLegendItems,
                 isDonor,
+                selectionScope,
                 vDisk,
                 vdisksGroupBy,
             });
         },
-        [inactiveLegendItems, isExpertMode, vdisksGroupBy],
+        [inactiveLegendItems, isExpertMode, selectionScope, vdisksGroupBy],
     );
+}
+
+export function useStorageVDiskDisplayStateGetter(): VDiskDisplayStateGetter {
+    const vdisksGroupBy = useVDisksGroupByParam();
+
+    return useVDiskDisplayStateGetter(vdisksGroupBy, 'vdisks');
+}
+
+export function useStorageNodesVDiskDisplayStateGetter(): VDiskDisplayStateGetter {
+    const vdisksGroupBy = useNodesVDisksGroupByParam();
+
+    return useVDiskDisplayStateGetter(vdisksGroupBy, 'nodes-vdisks');
 }

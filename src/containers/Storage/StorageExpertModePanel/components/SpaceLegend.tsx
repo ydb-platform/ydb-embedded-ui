@@ -102,6 +102,9 @@ export function SpaceLegend({className, selectionScope = 'vdisks'}: SpaceLegendP
                         </Label>
                     );
                 })}
+                <Label size="xs" theme="unknown">
+                    {i18n('value_no-data')}
+                </Label>
             </Flex>
             <Text className={b('empty-statistics')} color="secondary">
                 {i18n('context_no-statistics')}

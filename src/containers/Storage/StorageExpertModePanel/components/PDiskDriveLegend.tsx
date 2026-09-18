@@ -1,4 +1,4 @@
-import {CircleExclamation, CircleXmark, Clock, TrashBin} from '@gravity-ui/icons';
+import {CircleXmark, Clock, TrashBin, TriangleExclamation} from '@gravity-ui/icons';
 import type {IconData, LabelProps} from '@gravity-ui/uikit';
 import {Flex, Icon, Label, Text} from '@gravity-ui/uikit';
 
@@ -21,8 +21,9 @@ const legendItems: PDiskDriveLegendItem[] = [
     {text: i18n('drive_active'), theme: 'success'},
     {text: i18n('drive_inactive'), theme: 'warning', icon: Clock},
     {text: i18n('drive_to-be-removed'), theme: 'warning', icon: TrashBin},
-    {text: i18n('drive_faulty'), theme: 'danger', icon: CircleExclamation},
+    {text: i18n('drive_faulty'), theme: 'danger', icon: TriangleExclamation},
     {text: i18n('drive_broken'), theme: 'danger', icon: CircleXmark},
+    {text: i18n('value_no-data'), theme: 'unknown'},
 ];
 
 export function PDiskDriveLegend({className}: PDiskDriveLegendProps) {

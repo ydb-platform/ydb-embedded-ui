@@ -16,7 +16,7 @@ import {TableGroup} from '../TableGroup/TableGroup';
 import {useExpandedGroups} from '../TableGroup/useExpandedTableGroups';
 import i18n from '../i18n';
 import {b} from '../shared';
-import {useStorageQueryParams} from '../useStorageQueryParams';
+import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
 import {useStorageColumnsSettings} from '../utils';
 
 import {StorageNodesControls} from './StorageNodesControls';
@@ -39,6 +39,7 @@ interface StorageNodeGroupProps {
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     handleShowAllNodes: VoidFunction;
     onDataFetched: (data: any) => void;
+    rowHeight: number;
 }
 
 export const StorageNodeGroup = React.memo(function StorageNodeGroup({
@@ -55,6 +56,7 @@ export const StorageNodeGroup = React.memo(function StorageNodeGroup({
     onIsExpandedChange,
     handleShowAllNodes,
     onDataFetched,
+    rowHeight,
 }: StorageNodeGroupProps) {
     return (
         <TableGroup
@@ -82,6 +84,7 @@ export const StorageNodeGroup = React.memo(function StorageNodeGroup({
                         renderErrorMessage={renderPaginatedTableErrorMessage}
                         columns={columns}
                         initialEntitiesCount={count}
+                        rowHeight={rowHeight}
                         onDataFetched={onDataFetched}
                     />
                 }
@@ -105,7 +108,10 @@ export function GroupedStorageNodesComponent({
     const {nodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
         useStorageQueryParams();
 
-    const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
+    const expertMode = useIsStorageExpertMode();
+    const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings({
+        expertMode,
+    });
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
         viewContext,
@@ -173,6 +179,7 @@ export function GroupedStorageNodesComponent({
                         onIsExpandedChange={setIsGroupExpanded}
                         handleShowAllNodes={handleShowAllNodes}
                         columns={columnsToShow}
+                        rowHeight={rowHeight}
                         onDataFetched={handleDataFetched}
                     />
                 );
