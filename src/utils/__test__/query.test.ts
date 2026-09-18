@@ -3,6 +3,7 @@ import {
     isErrorResponse,
     isExecutionQueryAction,
     isQueryErrorResponse,
+    parseIssuesData,
 } from '../query';
 
 describe('isExecutionQueryAction', () => {
@@ -72,5 +73,67 @@ describe('isErrorResponse', () => {
         expect(isErrorResponse(null)).toBe(false);
         expect(isErrorResponse(undefined)).toBe(false);
         expect(isErrorResponse('error')).toBe(false);
+    });
+});
+
+describe('parseIssuesData', () => {
+    test('returns ErrorResponse when JSON string parses to ErrorResponse', () => {
+        const raw = JSON.stringify({
+            issues: [{severity: 1, message: 'err'}],
+            status: 'GENERIC_ERROR',
+        });
+        const result = parseIssuesData(raw);
+        expect(result).toEqual(JSON.parse(raw));
+    });
+
+    test('returns undefined when the issue collection is empty', () => {
+        expect(parseIssuesData(JSON.stringify({issues: []}))).toBeUndefined();
+        expect(parseIssuesData(JSON.stringify({issues: null}))).toBeUndefined();
+        expect(parseIssuesData({issues: []})).toBeUndefined();
+    });
+
+    test('returns undefined when issue entries are malformed', () => {
+        expect(parseIssuesData(JSON.stringify({issues: [null]}))).toBeUndefined();
+        expect(parseIssuesData(JSON.stringify({issues: ['oops']}))).toBeUndefined();
+        expect(parseIssuesData(JSON.stringify({issues: [{message: {}}]}))).toBeUndefined();
+        expect(parseIssuesData(JSON.stringify({issues: [{issues: [null]}]}))).toBeUndefined();
+        expect(parseIssuesData(JSON.stringify({error: {message: {}}, issues: []}))).toBeUndefined();
+    });
+
+    test('returns undefined when an issue code is not a number', () => {
+        expect(
+            parseIssuesData(JSON.stringify({issues: [{message: 'outer', issue_code: {}}]})),
+        ).toBeUndefined();
+        expect(
+            parseIssuesData(
+                JSON.stringify({issues: [{message: 'outer', issues: [{issue_code: []}]}]}),
+            ),
+        ).toBeUndefined();
+    });
+
+    test('accepts a nested issue tree', () => {
+        const raw = JSON.stringify({
+            issues: [{message: 'outer', issue_code: 1, issues: [{message: 'inner', issues: null}]}],
+        });
+        expect(parseIssuesData(raw)).toEqual(JSON.parse(raw));
+    });
+
+    test('returns undefined when JSON is valid but not ErrorResponse', () => {
+        expect(parseIssuesData(JSON.stringify({status: 'pending'}))).toBeUndefined();
+        expect(parseIssuesData('{}')).toBeUndefined();
+    });
+
+    test('returns raw string for malformed JSON', () => {
+        const raw = '{not json';
+        expect(parseIssuesData(raw)).toBe(raw);
+    });
+
+    test('returns undefined for undefined', () => {
+        expect(parseIssuesData(undefined)).toBeUndefined();
+    });
+
+    test('returns ErrorResponse object when passed directly', () => {
+        const data = {issues: [{severity: 1, message: 'err'}], status: 'OVERLOADED'};
+        expect(parseIssuesData(data)).toBe(data);
     });
 });

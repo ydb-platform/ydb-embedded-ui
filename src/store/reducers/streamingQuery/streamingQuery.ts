@@ -14,27 +14,61 @@ WHERE Path = '${safePath}'
 LIMIT 1`;
 }
 
+function getStreamingQueryPlanSQL(path: string, columns: string) {
+    const safePath = path.replace(/'/g, "''");
+    return `${QUERY_TECHNICAL_MARK}
+SELECT
+    ${columns}
+FROM \`.sys/streaming_queries\`
+WHERE Path = '${safePath}'
+LIMIT 1`;
+}
+
+async function execStreamingSQL(
+    sql: string,
+    {database, signal}: {database: string; signal: AbortSignal},
+) {
+    const response = await window.api.viewer.sendQuery(
+        {query: sql, database, action: 'execute-query', internal_call: true},
+        {signal, withRetries: true},
+    );
+    if (isQueryErrorResponse(response)) {
+        return {error: response};
+    }
+    return {data: parseQueryAPIResponse(response)};
+}
+
 export const streamingQueriesApi = api.injectEndpoints({
     endpoints: (build) => ({
         getStreamingQueryInfo: build.query({
             queryFn: async ({database, path}: {database: string; path: string}, {signal}) => {
                 try {
-                    const response = await window.api.viewer.sendQuery(
-                        {
-                            query: getStreamingQueryInfoSQL(path),
-                            database,
-                            action: 'execute-query',
-                            internal_call: true,
-                        },
-                        {signal, withRetries: true},
+                    return await execStreamingSQL(getStreamingQueryInfoSQL(path), {
+                        database,
+                        signal,
+                    });
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+        getStreamingQueryPlan: build.query({
+            queryFn: async ({database, path}: {database: string; path: string}, {signal}) => {
+                try {
+                    const result = await execStreamingSQL(
+                        getStreamingQueryPlanSQL(path, 'Status, Issues, Plan'),
+                        {database, signal},
                     );
-
-                    if (isQueryErrorResponse(response)) {
-                        return {error: response};
+                    if (!('error' in result)) {
+                        return result;
                     }
-
-                    const data = parseQueryAPIResponse(response);
-                    return {data};
+                    // A backend without the Plan column still reports the query state.
+                    const fallback = await execStreamingSQL(
+                        getStreamingQueryPlanSQL(path, 'Status, Issues'),
+                        {database, signal},
+                    );
+                    return 'error' in fallback ? result : fallback;
                 } catch (error) {
                     return {error};
                 }
