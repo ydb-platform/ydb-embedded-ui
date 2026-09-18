@@ -17,5 +17,6 @@
   "title.endpoints": "Endpoints",
   "title.roles": "Roles",
   "title.pools": "Pools",
-  "title.load-average": "Load average"
+  "title.load-average": "Load average",
+  "title_ram": "RAM"
 }

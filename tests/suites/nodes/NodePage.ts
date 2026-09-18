@@ -8,6 +8,7 @@ export class NodePage extends PageModel {
     readonly threadsTab: Locator;
     readonly tabletsTab: Locator;
     readonly storageTab: Locator;
+    readonly ram: Locator;
 
     constructor(page: Page, nodeId: string) {
         super(page, `node/${nodeId}`);
@@ -16,6 +17,7 @@ export class NodePage extends PageModel {
         this.threadsTab = this.tabs.locator('[value="threads"]');
         this.tabletsTab = this.tabs.locator('[value="tablets"]');
         this.storageTab = this.tabs.locator('[value="storage"]');
+        this.ram = this.selector.getByTestId('node-ram');
     }
 
     async waitForNodePageLoad() {
