@@ -100,9 +100,20 @@ describe('parseIssuesData', () => {
         expect(parseIssuesData(JSON.stringify({error: {message: {}}, issues: []}))).toBeUndefined();
     });
 
+    test('returns undefined when an issue code is not a number', () => {
+        expect(
+            parseIssuesData(JSON.stringify({issues: [{message: 'outer', issue_code: {}}]})),
+        ).toBeUndefined();
+        expect(
+            parseIssuesData(
+                JSON.stringify({issues: [{message: 'outer', issues: [{issue_code: []}]}]}),
+            ),
+        ).toBeUndefined();
+    });
+
     test('accepts a nested issue tree', () => {
         const raw = JSON.stringify({
-            issues: [{message: 'outer', issues: [{message: 'inner', issues: null}]}],
+            issues: [{message: 'outer', issue_code: 1, issues: [{message: 'inner', issues: null}]}],
         });
         expect(parseIssuesData(raw)).toEqual(JSON.parse(raw));
     });

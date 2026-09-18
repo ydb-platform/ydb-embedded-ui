@@ -258,9 +258,18 @@ function isIssueTree(value: unknown): boolean {
             if (!issue || typeof issue !== 'object' || Array.isArray(issue)) {
                 return false;
             }
-            const {message, issues} = issue as {message?: unknown; issues?: unknown};
+            const {
+                message,
+                issue_code: issueCode,
+                issues,
+            } = issue as {
+                message?: unknown;
+                issue_code?: unknown;
+                issues?: unknown;
+            };
             return (
                 (message === undefined || typeof message === 'string') &&
+                (issueCode === undefined || typeof issueCode === 'number') &&
                 (issues === undefined || issues === null || isIssueTree(issues))
             );
         })
