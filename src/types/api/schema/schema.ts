@@ -6,6 +6,7 @@ import type {TExternalDataSourceDescription} from './externalDataSource';
 import type {TExternalTableDescription} from './externalTable';
 import type {TPersQueueGroupDescription} from './persQueueGroup';
 import type {TReplicationDescription} from './replication';
+import type {TPathID} from './shared';
 import type {TSysViewDescription} from './sysView';
 import type {TTableDescription, TTableStats} from './table';
 import type {TIndexDescription} from './tableIndex';
@@ -90,6 +91,9 @@ export interface TPathDescription {
     SysViewDescription?: TSysViewDescription;
 
     ReplicationDescription?: TReplicationDescription;
+
+    // for resource pool
+    ResourcePoolDescription?: TResourcePoolDescription;
 }
 
 export interface TDirEntry {
@@ -348,4 +352,18 @@ export interface TTablePartition {
 interface TUserAttribute {
     Key?: string;
     Value?: string;
+}
+
+/**
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/flat_scheme_op.proto
+ *
+ * TResourcePoolDescription from flat_scheme_op.proto
+ */
+export interface TResourcePoolDescription {
+    Name?: string;
+    PathId?: TPathID;
+    Version?: string;
+    Properties?: {
+        Properties?: Record<string, string>;
+    };
 }
