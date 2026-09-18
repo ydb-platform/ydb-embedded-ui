@@ -86,6 +86,7 @@ export const RunningQueriesData = ({
             <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
                 {renderQueryModeControl()}
                 <Search
+                    tableFilter
                     value={filters.text}
                     onChange={handleTextSearchUpdate}
                     placeholder={i18n('filter.text.placeholder')}
@@ -97,6 +98,9 @@ export const RunningQueriesData = ({
             {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table>
                 <QueriesTableWithDrawer
+                    getKeyboardRowKey={(row) =>
+                        JSON.stringify([database, row.SessionId, row.QueryStartAt])
+                    }
                     columns={columnsToShow}
                     data={rows || []}
                     isFetching={isFetching && currentData === undefined}

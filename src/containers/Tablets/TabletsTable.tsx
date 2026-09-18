@@ -4,6 +4,7 @@ import {ArrowRotateLeft} from '@gravity-ui/icons';
 import type {Column as DataTableColumn, SortOrder} from '@gravity-ui/react-data-table';
 import {Icon, Select, Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
+import {useHistory} from 'react-router-dom';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {EntitiesCount} from '../../components/EntitiesCount';
@@ -16,6 +17,7 @@ import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/
 import {TabletNameWrapper} from '../../components/TabletNameWrapper/TabletNameWrapper';
 import {TabletState} from '../../components/TabletState/TabletState';
 import {TabletUptime} from '../../components/UptimeViewer/UptimeViewer';
+import {useTabletPagePath} from '../../routes';
 import {tabletApi} from '../../store/reducers/tablet';
 import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
@@ -259,12 +261,31 @@ export function TabletsTable({
         [nodeId, showEndOfRange],
     );
 
+    const history = useHistory();
+    const getTabletPagePath = useTabletPagePath();
+    const openTablet = React.useCallback(
+        (tablet: TTabletStateInfo) => {
+            if (tablet.TabletId) {
+                history.push(
+                    getTabletPagePath(tablet.TabletId, {
+                        followerId: tablet.FollowerId ? String(tablet.FollowerId) : undefined,
+                    }),
+                );
+            }
+        },
+        [getTabletPagePath, history],
+    );
+
     const filtersActive = Boolean(tabletsSearch.trim()) || tabletTypes.length > 0;
 
     return (
-        <TableWithControlsLayout fullHeight>
+        <TableWithControlsLayout
+            fullHeight
+            keyboardNavigationResetKey={JSON.stringify(tabletTypes)}
+        >
             <TableWithControlsLayout.Controls>
                 <Search
+                    tableFilter
                     placeholder={i18n('controls.search-placeholder')}
                     onChange={handleTabletsSearchChange}
                     value={tabletsSearch}
@@ -296,15 +317,34 @@ export function TabletsTable({
                 scrollDependencies={[tabletsSearch, tabletTypes, sortParams]}
                 loading={loading}
             >
-                <ResizeableDataTable
-                    columns={columns}
-                    data={filteredTablets}
-                    settings={DEFAULT_TABLE_SETTINGS}
-                    emptyDataMessage={
-                        filtersActive ? i18n('noTabletsMatchFilters') : i18n('noTabletsData')
-                    }
-                    onSortChange={setSortParams}
-                />
+                <div>
+                    <ResizeableDataTable
+                        onKeyboardActivate={openTablet}
+                        getKeyboardRowKey={(tablet) =>
+                            JSON.stringify([tablet.TabletId, tablet.FollowerId ?? 0])
+                        }
+                        getKeyboardRowLabel={(tablet) =>
+                            [
+                                tablet.Type,
+                                tablet.TabletId,
+                                tablet.FollowerId || isFollowerTablet(tablet)
+                                    ? i18n('value_follower', {
+                                          id: tablet.FollowerId ?? EMPTY_DATA_PLACEHOLDER,
+                                      })
+                                    : undefined,
+                            ]
+                                .filter(Boolean)
+                                .join(', ') || EMPTY_DATA_PLACEHOLDER
+                        }
+                        columns={columns}
+                        data={filteredTablets}
+                        settings={DEFAULT_TABLE_SETTINGS}
+                        emptyDataMessage={
+                            filtersActive ? i18n('noTabletsMatchFilters') : i18n('noTabletsData')
+                        }
+                        onSortChange={setSortParams}
+                    />
+                </div>
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
     );

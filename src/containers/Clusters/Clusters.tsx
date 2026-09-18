@@ -19,8 +19,9 @@ import {
     selectStatusFilter,
     selectVersionFilter,
 } from '../../store/reducers/clusters/selectors';
+import type {PreparedCluster} from '../../store/reducers/clusters/types';
 import {uiFactory} from '../../uiFactory/uiFactory';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
@@ -35,6 +36,7 @@ import {
 } from './constants';
 import i18n from './i18n';
 import {b} from './shared';
+import {calculateClusterPath} from './utils';
 
 import './Clusters.scss';
 
@@ -87,7 +89,9 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const handleDrawerClose = React.useCallback(() => {
         setHealthcheckClusterName(undefined);
     }, []);
-
+    const openCluster = React.useCallback((row: PreparedCluster) => {
+        window.location.assign(calculateClusterPath(row));
+    }, []);
     const rawColumns = React.useMemo(() => {
         return getClustersColumns({
             isEditClusterAvailable,
@@ -197,6 +201,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         return (
             <React.Fragment>
                 <Search
+                    tableFilter
                     placeholder={i18n('controls_search-placeholder')}
                     endContent={<Icon data={Magnifier} className={b('search-icon')} />}
                     onChange={changeClusterName}
@@ -283,18 +288,25 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
 
     const renderContent = () => {
         return (
-            <ResizeableDataTable
-                isLoading={query.isLoading}
-                columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
-                wrapperClassName={b('table')}
-                data={filteredClusters}
-                columns={filteredColumnsToShow}
-                settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
-                initialSortOrder={{
-                    columnId: COLUMNS_NAMES.TITLE,
-                    order: DataTable.ASCENDING,
-                }}
-            />
+            <div>
+                <ResizeableDataTable
+                    onKeyboardActivate={openCluster}
+                    getKeyboardRowKey={(cluster) => cluster.name}
+                    getKeyboardRowLabel={(cluster) =>
+                        cluster.title || cluster.name || EMPTY_DATA_PLACEHOLDER
+                    }
+                    isLoading={query.isLoading}
+                    columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
+                    wrapperClassName={b('table')}
+                    data={filteredClusters}
+                    columns={filteredColumnsToShow}
+                    settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
+                    initialSortOrder={{
+                        columnId: COLUMNS_NAMES.TITLE,
+                        order: DataTable.ASCENDING,
+                    }}
+                />
+            </div>
         );
     };
 
@@ -304,22 +316,28 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
             isVisible={Boolean(healthcheckClusterName)}
             onClose={handleDrawerClose}
         >
-            <TableWithControlsLayout fullHeight className={b(null)}>
-                <TableWithControlsLayout.Controls
-                    className={b('controls')}
-                    renderExtraControls={renderColumnSetup}
+            <div>
+                <TableWithControlsLayout
+                    fullHeight
+                    className={b(null)}
+                    keyboardNavigationResetKey={JSON.stringify([status, service, version, galaxy])}
                 >
-                    {renderControls()}
-                </TableWithControlsLayout.Controls>
-                {query.isError ? <ResponseError error={query.error} /> : null}
-                {renderClustersCount()}
-                <TableWithControlsLayout.Table
-                    scrollContainerRef={scrollContainerRef}
-                    className={b('table-wrapper')}
-                >
-                    {renderContent()}
-                </TableWithControlsLayout.Table>
-            </TableWithControlsLayout>
+                    <TableWithControlsLayout.Controls
+                        className={b('controls')}
+                        renderExtraControls={renderColumnSetup}
+                    >
+                        {renderControls()}
+                    </TableWithControlsLayout.Controls>
+                    {query.isError ? <ResponseError error={query.error} /> : null}
+                    {renderClustersCount()}
+                    <TableWithControlsLayout.Table
+                        scrollContainerRef={scrollContainerRef}
+                        className={b('table-wrapper')}
+                    >
+                        <div>{renderContent()}</div>
+                    </TableWithControlsLayout.Table>
+                </TableWithControlsLayout>
+            </div>
         </ClusterDrawerHealthcheck>
     );
 }

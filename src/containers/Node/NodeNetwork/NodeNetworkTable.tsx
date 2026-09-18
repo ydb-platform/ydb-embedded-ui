@@ -1,7 +1,14 @@
 import React from 'react';
 
+import {useHistory} from 'react-router-dom';
+
+import {
+    getNodeHostLabel,
+    getNodeHostPath,
+} from '../../../components/NodeHostWrapper/NodeHostWrapper';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
+import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {Column} from '../../../utils/tableUtils/types';
 
@@ -25,6 +32,8 @@ export function NodeNetworkTable({
     scrollContainerRef,
     onDataFetched,
 }: NodeNetworkTableProps) {
+    const history = useHistory();
+    const database = useDatabaseFromQuery();
     const filters = React.useMemo(
         () => ({
             nodeId,
@@ -37,6 +46,14 @@ export function NodeNetworkTable({
 
     return (
         <ResizeablePaginatedTable
+            getKeyboardRowKey={(node) => node.NodeId}
+            getKeyboardRowLabel={getNodeHostLabel}
+            onKeyboardActivate={(node) => {
+                const nodePath = getNodeHostPath(node, database);
+                if (nodePath) {
+                    history.push(nodePath);
+                }
+            }}
             columnsWidthLSKey={NODE_NETWORK_COLUMNS_WIDTH_LS_KEY}
             scrollContainerRef={scrollContainerRef}
             columns={columns}
