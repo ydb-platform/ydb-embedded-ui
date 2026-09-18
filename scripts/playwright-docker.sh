@@ -132,7 +132,9 @@ fi
 echo "Running npm ci"
 if [ "${PLAYWRIGHT_RELEASE_MODE:-test}" = report ]; then
   npm ci --ignore-scripts
-  exec npx --no playwright merge-reports --config=merge.config.ts ./all-blob-reports
+  reports=$(mktemp -d)
+  cp ./all-blob-reports/*.zip "$reports/"
+  exec npx --no playwright merge-reports --config=merge.config.ts "$reports"
 fi
 npm ci
 

@@ -152,4 +152,4 @@ if (require.main === module) {
         });
 }
 
-module.exports = {getEmbeddedVersion, resolveRelease, IMAGE_REPOSITORY};
+module.exports = {getEmbeddedVersion, resolveRelease, IMAGE_REPOSITORY, readGithub};
