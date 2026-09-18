@@ -1,4 +1,5 @@
 import DataTable from '@gravity-ui/react-data-table';
+import {Flex, Text} from '@gravity-ui/uikit';
 
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNumber, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
@@ -53,14 +54,22 @@ export const getTabletIdColumn: GetShardsColumn = () => {
             if (!row.TabletId) {
                 return EMPTY_DATA_PLACEHOLDER;
             }
+            const followerId = Number(row.FollowerId);
+            const isFollower = followerId > 0;
+
             return (
-                <TabletNameWrapper
-                    tabletId={row.TabletId}
-                    followerId={row.FollowerId || undefined}
-                />
+                <Flex alignItems="center" gap={2}>
+                    <Flex minWidth={0}>
+                        <TabletNameWrapper
+                            tabletId={row.TabletId}
+                            followerId={isFollower ? followerId : undefined}
+                        />
+                    </Flex>
+                    {isFollower ? <Text color="secondary">{i18n('value_follower')}</Text> : null}
+                </Flex>
             );
         },
-        width: 220,
+        width: 280,
     };
 };
 export const getNodeIdColumn: GetShardsColumn = () => {
