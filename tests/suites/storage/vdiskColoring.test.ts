@@ -13,6 +13,7 @@ import {ECapacityAlert, EFlag} from '../../../src/types/api/enums';
 import {TPDiskState} from '../../../src/types/api/pdisk';
 import {EVDiskState} from '../../../src/types/api/vdisk';
 import {storagePage} from '../../utils/constants';
+import {ClusterStorageTable} from '../paginatedTable/paginatedTable';
 
 import {
     ALL_GREEN_VDISK_INDEX,
@@ -426,6 +427,7 @@ async function prepareNodesPage(
     vdisksGroupBy: VDisksGroupByValue,
     pdisksGroupBy: PDisksGroupByValue,
     nodesData = createMockStorageNodesResponse(),
+    {hidePopups = true}: {hidePopups?: boolean} = {},
 ) {
     await page.setViewportSize({width: 1500, height: 1000});
     await enableExpertMode(page, vdisksGroupBy);
@@ -457,7 +459,9 @@ async function prepareNodesPage(
         page.goto(`${url.pathname}${url.search}`),
     ]);
     await nodesResponse.finished();
-    await hideFloatingPopups(page);
+    if (hidePopups) {
+        await hideFloatingPopups(page);
+    }
 }
 
 test('keeps paired disk popups inside the viewport without expanding the page', async ({
@@ -594,6 +598,74 @@ test('wheel over disk popups scrolls the page', async ({page}) => {
 
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 60_000});
+
+    for (const scope of ['groups', 'nodes']) {
+        test(`labels Expert mode radio groups in ${scope}`, async ({page}) => {
+            if (scope === 'groups') {
+                await preparePage(page, VDisksGroupBy.State);
+            } else {
+                await prepareNodesPage(page, VDisksGroupBy.State, PDisksGroupBy.State);
+            }
+
+            const panel = page.locator('.ydb-storage-expert-mode-panel');
+            for (const label of ['VDisks:', 'PDisks:']) {
+                const group = panel.getByRole('radiogroup', {name: label, exact: true});
+                await expect(group).toBeVisible();
+                await group.getByRole('radio', {name: 'All', exact: true}).check();
+                await expect(group.getByRole('radio', {name: 'All', exact: true})).toBeChecked();
+            }
+        });
+    }
+
+    test('requires the node PDisks column only in Expert mode', async ({page}) => {
+        await prepareNodesPage(page, VDisksGroupBy.All, PDisksGroupBy.All, undefined, {
+            hidePopups: false,
+        });
+        const controls = new ClusterStorageTable(page).getControls();
+        const row = page.locator('.ydb-paginated-table__row').filter({
+            has: page.getByText('7000', {exact: true}),
+        });
+        const panel = page.locator('.ydb-storage-expert-mode-panel');
+        const expertModeButton = page.getByRole('button', {name: 'Expert mode', exact: true});
+        const pDisks = row.locator('.ydb-storage-pdisks__pdisks-item');
+
+        await expertModeButton.click();
+        await expect(panel).toBeHidden();
+        await controls.openColumnSetup();
+        await controls.setColumnUnchecked('PDisks');
+        await controls.closeColumnSetup();
+        await expect(pDisks).toHaveCount(0);
+        await expect(row).toHaveCSS('height', '41px');
+
+        await expertModeButton.click();
+        await expect(pDisks).toHaveCount(4);
+        await expect(row).toHaveCSS('height', '155px');
+        await expect(
+            panel.getByRole('radiogroup', {name: 'VDisks:', exact: true}).getByRole('radio', {
+                name: 'All',
+                exact: true,
+            }),
+        ).toBeChecked();
+        await controls.openColumnSetup();
+        await page.locator('.g-tree-select__popup [data-list-item="PDisks"]').click();
+        await controls.closeColumnSetup();
+        await expect(pDisks).toHaveCount(4);
+        await expect(row).toHaveCSS('height', '155px');
+
+        await expertModeButton.click();
+        await expect(panel).toBeHidden();
+        await controls.openColumnSetup();
+        await controls.setColumnUnchecked('PDisks');
+        await controls.closeColumnSetup();
+        await expect(pDisks).toHaveCount(0);
+        await expect(row).toHaveCSS('height', '41px');
+
+        await controls.openColumnSetup();
+        await controls.setColumnChecked('PDisks');
+        await controls.closeColumnSetup();
+        await expect(pDisks).toHaveCount(4);
+        await expect(row).toHaveCSS('height', '51px');
+    });
 
     test('keeps Expert disk rendering scoped to Storage when navigating to Nodes', async ({
         page,
