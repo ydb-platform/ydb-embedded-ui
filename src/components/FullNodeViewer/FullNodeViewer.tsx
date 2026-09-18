@@ -2,13 +2,16 @@ import {Flex} from '@gravity-ui/uikit';
 
 import type {PreparedNode} from '../../store/reducers/node/types';
 import {cn} from '../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {formatStorageValues} from '../../utils/dataFormatters/dataFormatters';
 import {useNodeDeveloperUIHref} from '../../utils/hooks/useNodeDeveloperUIHref';
-import {InfoViewer} from '../InfoViewer/InfoViewer';
-import type {InfoViewerItem} from '../InfoViewer/InfoViewer';
+import {isNumeric} from '../../utils/utils';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {PoolUsage} from '../PoolUsage/PoolUsage';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {NodeUptime} from '../UptimeViewer/UptimeViewer';
+import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
 import i18n from './i18n';
 
@@ -24,68 +27,108 @@ const getLoadAverageIntervalTitle = (index: number) => {
     return [i18n('la-interval-1m'), i18n('la-interval-5m'), i18n('la-interval-15m')][index];
 };
 
+const formatMemoryValues = (value?: number, total?: number) =>
+    formatStorageValues(value, total, 'gb', undefined, true);
+
 // eslint-disable-next-line complexity
 export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
     const developerUIHref = useNodeDeveloperUIHref(node);
 
-    const commonInfo: InfoViewerItem[] = [];
+    const commonInfo: YDBDefinitionListItem[] = [];
 
     if (node?.Tenants?.length) {
-        commonInfo.push({label: i18n('database'), value: node.Tenants[0]});
+        commonInfo.push({
+            name: i18n('database'),
+            content: node.Tenants[0] || EMPTY_DATA_PLACEHOLDER,
+        });
     }
 
     commonInfo.push(
-        {label: i18n('version'), value: node?.Version},
+        {name: i18n('version'), content: node?.Version || EMPTY_DATA_PLACEHOLDER},
         {
-            label: i18n('uptime'),
-            value: <NodeUptime StartTime={node?.StartTime} DisconnectTime={node?.DisconnectTime} />,
+            name: i18n('uptime'),
+            content: (
+                <NodeUptime StartTime={node?.StartTime} DisconnectTime={node?.DisconnectTime} />
+            ),
         },
-        {label: i18n('dc'), value: node?.DataCenterDescription || node?.DC},
+        {
+            name: i18n('dc'),
+            content: node?.DataCenterDescription || node?.DC || EMPTY_DATA_PLACEHOLDER,
+        },
     );
 
     if (node?.Rack) {
-        commonInfo.push({label: i18n('rack'), value: node?.Rack});
+        commonInfo.push({name: i18n('rack'), content: node.Rack});
     }
 
     if (developerUIHref) {
         commonInfo.push({
-            label: i18n('links'),
-            value: <LinkWithIcon url={developerUIHref} title={i18n('developer-ui')} />,
+            name: i18n('links'),
+            content: <LinkWithIcon url={developerUIHref} title={i18n('developer-ui')} />,
         });
     }
 
     const endpointsInfo = node?.Endpoints?.map(({Name, Address}) => ({
-        label: Name,
-        value: Address,
+        name: Name || EMPTY_DATA_PLACEHOLDER,
+        content: Address || EMPTY_DATA_PLACEHOLDER,
     }));
 
-    const averageInfo = node?.LoadAveragePercents?.map((load, loadIndex) => ({
-        label: getLoadAverageIntervalTitle(loadIndex),
-        value: (
-            <ProgressViewer value={load} percents={true} colorizeProgress={true} capacity={100} />
-        ),
-    }));
+    const averageInfo =
+        node?.LoadAveragePercents?.map((load, loadIndex) => ({
+            name: getLoadAverageIntervalTitle(loadIndex),
+            content: (
+                <ProgressViewer
+                    value={load}
+                    percents={true}
+                    colorizeProgress={true}
+                    capacity={100}
+                />
+            ),
+        })) ?? [];
 
     if (!node) {
         return <div className="error">{i18n('no-data')}</div>;
     }
 
+    const memoryUsed = isNumeric(node.MemoryUsed) ? Number(node.MemoryUsed) : undefined;
+    const memoryLimit = isNumeric(node.MemoryLimit) ? Number(node.MemoryLimit) : undefined;
+    const hasMemoryUsed =
+        memoryUsed !== undefined && Number.isFinite(memoryUsed) && memoryUsed >= 0;
+    const hasMemoryLimit =
+        memoryLimit !== undefined && Number.isFinite(memoryLimit) && memoryLimit > 0;
+
+    const renderMemory = () => {
+        if (!hasMemoryUsed) {
+            return EMPTY_DATA_PLACEHOLDER;
+        }
+        if (!hasMemoryLimit) {
+            return formatMemoryValues(memoryUsed)[0];
+        }
+
+        return (
+            <ProgressViewer
+                value={memoryUsed}
+                capacity={memoryLimit}
+                formatValues={formatMemoryValues}
+                colorizeProgress
+            />
+        );
+    };
+
     return (
         <div className={b(null, className)}>
             <Flex wrap gap={4}>
                 <Flex direction="column" gap={2}>
-                    <InfoViewer
-                        title={i18n('title.common-info')}
-                        className={b('section')}
-                        info={commonInfo}
-                    />
+                    <div className={b('section')}>
+                        <div className={b('section-title')}>{i18n('title.common-info')}</div>
+                        <YDBDefinitionList items={commonInfo} nameMaxWidth={100} compact />
+                    </div>
 
                     {endpointsInfo && endpointsInfo.length ? (
-                        <InfoViewer
-                            title={i18n('title.endpoints')}
-                            className={b('section')}
-                            info={endpointsInfo}
-                        />
+                        <div className={b('section')}>
+                            <div className={b('section-title')}>{i18n('title.endpoints')}</div>
+                            <YDBDefinitionList items={endpointsInfo} nameMaxWidth={100} compact />
+                        </div>
                     ) : null}
                 </Flex>
 
@@ -99,11 +142,15 @@ export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
                         </div>
                     </div>
 
-                    <InfoViewer
-                        title={i18n('title.load-average')}
-                        className={b('section', {average: true})}
-                        info={averageInfo}
-                    />
+                    <div className={b('section', {average: true})}>
+                        <div className={b('section-title')}>{i18n('title.load-average')}</div>
+                        <YDBDefinitionList items={averageInfo} nameMaxWidth={100} compact />
+                    </div>
+
+                    <div className={b('section', {ram: true})} data-qa="node-ram">
+                        <div className={b('section-title')}>{i18n('title_ram')}</div>
+                        {renderMemory()}
+                    </div>
                 </Flex>
 
                 {node.Roles && node.Roles.length ? (
