@@ -25,7 +25,7 @@ function fixture(version = '18.1.0') {
             JSON.stringify({packages: {'node_modules/@playwright/test': {version: '1.58.0'}}}),
         ),
     };
-    const run = (options = input) =>
+    const run = (options: {ydbTag: string; ydbSha?: string; workflowSha: string} = input) =>
         resolveRelease(
             options,
             async (path: string) => {
@@ -52,6 +52,26 @@ test.each(['18.1.0', '15.6.0-hotfix.1'])(
         });
     },
 );
+
+test.each([undefined, ''])(
+    'resolves the tag commit when the expected SHA is %p',
+    async (ydbSha) => {
+        await expect(fixture().run({...input, ydbSha})).resolves.toMatchObject({
+            ydb_sha: input.ydbSha,
+            ui_sha: uiSha,
+            image_digest: imageDigest,
+        });
+    },
+);
+
+test('rejects a malformed explicit or resolved YDB SHA', async () => {
+    await expect(fixture().run({...input, ydbSha: 'main'})).rejects.toThrow('full commit SHAs');
+    const {responses, run} = fixture();
+    responses[ydbCommit] = {sha: 'main'};
+    await expect(run({...input, ydbSha: ''})).rejects.toThrow(
+        'YDB tag did not resolve to a commit SHA',
+    );
+});
 
 test('rejects a YDB tag pointing to a different commit', async () => {
     const {responses, run} = fixture();

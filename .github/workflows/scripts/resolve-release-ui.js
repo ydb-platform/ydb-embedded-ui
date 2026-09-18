@@ -62,19 +62,23 @@ async function resolveImageDigest(tag) {
 }
 
 async function resolveRelease(
-    {ydbTag, ydbSha, workflowSha},
+    {ydbTag, ydbSha: expectedYdbSha, workflowSha},
     github = readGithub,
     digest = resolveImageDigest,
 ) {
     if (!/^\d+(?:\.\d+){2,3}(?:-[A-Za-z0-9.-]+)?$/.test(ydbTag)) {
         throw new Error('ydb_tag must be an exact numeric YDB release tag');
     }
-    if (!SHA_PATTERN.test(ydbSha) || !SHA_PATTERN.test(workflowSha)) {
+    if ((expectedYdbSha && !SHA_PATTERN.test(expectedYdbSha)) || !SHA_PATTERN.test(workflowSha)) {
         throw new Error('YDB and workflow revisions must be full commit SHAs');
     }
     const commit = await github(`ydb-platform/ydb/commits/${encodeURIComponent(ydbTag)}`);
-    if (commit.sha !== ydbSha) {
-        throw new Error(`YDB tag resolves to ${commit.sha}, expected ${ydbSha}`);
+    const ydbSha = commit.sha;
+    if (!SHA_PATTERN.test(ydbSha)) {
+        throw new Error('YDB tag did not resolve to a commit SHA');
+    }
+    if (expectedYdbSha && ydbSha !== expectedYdbSha) {
+        throw new Error(`YDB tag resolves to ${ydbSha}, expected ${expectedYdbSha}`);
     }
     const viewerPath = `ydb-platform/ydb/contents/ydb/core/viewer/monitoring`;
     const changelog = decodeFile(await github(`${viewerPath}/CHANGELOG.md?ref=${ydbSha}`));

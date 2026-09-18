@@ -9,8 +9,8 @@ on:
         required: true
         type: string
       ydb_sha:
-        description: Expected full YDB commit SHA
-        required: true
+        description: Optional expected full YDB commit SHA (leave blank to resolve from tag)
+        required: false
         type: string
 
 permissions:
