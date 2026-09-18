@@ -3,7 +3,7 @@ const {createHash} = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const {IMAGE_REPOSITORY} = require('./resolve-release-ui');
+const {IMAGE_REPOSITORY, readGithub} = require('./resolve-release-ui');
 
 function verifyImage(provenance, container, image, index) {
     if (
@@ -19,6 +19,74 @@ function verifyImage(provenance, container, image, index) {
         throw new Error('Served /monitoring/ index does not match the release sources');
     }
     return {image_id: image.Id, image_digest: provenance.image_digest, index_verified: true};
+}
+
+async function readReportSource({runId, repository, workflowSha}, github = readGithub) {
+    if (!/^[1-9][0-9]*$/.test(runId || '')) {
+        throw new Error('source_run_id must be a numeric GitHub run ID');
+    }
+    const endpoint = `${repository}/actions/runs/${runId}`;
+    const run = await github(endpoint);
+    if (
+        String(run.id) !== runId ||
+        run.repository?.full_name !== repository ||
+        run.path !== '.github/workflows/release-e2e.yml' ||
+        run.event !== 'workflow_dispatch' ||
+        run.head_branch !== 'main' ||
+        !/^[a-f0-9]{40}$/.test(run.head_sha || '') ||
+        !Number.isInteger(run.run_attempt) ||
+        run.run_attempt < 1
+    ) {
+        throw new Error('Source must be a release-e2e.yml run from main in this repository');
+    }
+    const jobs = [];
+    for (let page = 1; ; page++) {
+        const batch = await github(
+            `${endpoint}/attempts/${run.run_attempt}/jobs?per_page=100&page=${page}`,
+        );
+        jobs.push(...batch.jobs);
+        if (jobs.length >= batch.total_count || batch.jobs.length === 0) {
+            break;
+        }
+    }
+    const names = [
+        'Resolve release identity',
+        ...Array.from({length: 8}, (_, i) => `Release UI tests (${i + 1}/8)`),
+    ];
+    const selected = names.map((name) => {
+        const matches = jobs.filter((job) => job.name === name);
+        return matches.length === 1 ? matches[0] : undefined;
+    });
+    const tests = selected
+        .slice(1)
+        .map((job) => job?.steps?.find((step) => step.name === 'Run all release-version tests'));
+    const results = [...selected, ...tests];
+    const completed = results.every(
+        (job) => job?.status === 'completed' && ['success', 'failure'].includes(job.conclusion),
+    );
+    let jobsResult = 'incomplete';
+    if (completed && selected[0].conclusion === 'success') {
+        jobsResult = results.some((job) => job.conclusion === 'failure') ? 'failure' : 'success';
+    }
+    return {
+        source_run_id: runId,
+        source_run_attempt: run.run_attempt,
+        source_workflow_sha: run.head_sha,
+        report_workflow_sha: workflowSha,
+        jobs_result: jobsResult,
+    };
+}
+
+function prepareReport(provenance, source) {
+    if (
+        !provenance ||
+        !/^[a-f0-9]{40}$/.test(provenance.ui_sha || '') ||
+        !/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/.test(provenance.playwright_version || '') ||
+        provenance.workflow_sha !== source.source_workflow_sha
+    ) {
+        throw new Error('Missing or invalid provenance for the source release run');
+    }
+    return provenance;
 }
 
 function collectReports(directory, destination) {
@@ -60,7 +128,7 @@ function sanitizeArtifacts(directory) {
     return removed;
 }
 
-function summarize(report, provenance, {shards, jobs, artifacts}) {
+function summarize(report, provenance, {shards, jobs, artifacts, merge}) {
     const problems = [];
     if (shards !== 8) {
         problems.push(`Reports received from ${shards}/8 shards`);
@@ -73,6 +141,9 @@ function summarize(report, provenance, {shards, jobs, artifacts}) {
     }
     if (!['success', 'failure'].includes(jobs)) {
         problems.push('Test jobs did not complete');
+    }
+    if (merge !== 'success') {
+        problems.push('Report merge did not complete');
     }
     const stats = report?.stats;
     const validStats =
@@ -103,7 +174,29 @@ function readJson(file) {
 
 async function main() {
     const [command, ...args] = process.argv.slice(2);
-    if (command === 'verify') {
+    if (command === 'source') {
+        const source = await readReportSource({
+            runId: process.env.SOURCE_RUN_ID,
+            repository: process.env.GITHUB_REPOSITORY,
+            workflowSha: process.env.GITHUB_WORKFLOW_SHA,
+        });
+        fs.mkdirSync('report-metadata', {recursive: true});
+        fs.writeFileSync('report-metadata/report-source.json', JSON.stringify(source, null, 2));
+        fs.appendFileSync(process.env.GITHUB_OUTPUT, `jobs_result=${source.jobs_result}\n`);
+        fs.appendFileSync(
+            process.env.GITHUB_STEP_SUMMARY,
+            `Source: [run ${source.source_run_id}, attempt ${source.source_run_attempt}](https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${source.source_run_id})\n\n`,
+        );
+    } else if (command === 'prepare') {
+        const provenance = prepareReport(
+            readJson('downloaded/release-e2e-provenance/provenance.json'),
+            readJson('report-metadata/report-source.json'),
+        );
+        fs.appendFileSync(
+            process.env.GITHUB_OUTPUT,
+            `ui_sha=${provenance.ui_sha}\nplaywright_version=${provenance.playwright_version}\n`,
+        );
+    } else if (command === 'verify') {
         const provenance = JSON.parse(fs.readFileSync(args[0], 'utf8'));
         const container = JSON.parse(
             execFileSync('docker', ['inspect', args[1]], {encoding: 'utf8'}),
@@ -134,6 +227,7 @@ async function main() {
                 shards: Number(process.env.REPORT_SHARDS || 0),
                 jobs: process.env.TEST_JOBS_RESULT,
                 artifacts: process.env.SANITIZE_RESULT,
+                merge: process.env.MERGE_RESULT,
             },
         );
         fs.appendFileSync(
@@ -150,9 +244,24 @@ async function main() {
 
 if (require.main === module) {
     main().catch((error) => {
+        if (['source', 'prepare'].includes(process.argv[2])) {
+            fs.mkdirSync('report-metadata', {recursive: true});
+            fs.writeFileSync('report-metadata/setup-error.txt', error.message);
+            fs.appendFileSync(
+                process.env.GITHUB_STEP_SUMMARY,
+                `Report setup failed: ${error.message}\n`,
+            );
+        }
         console.error(error.message);
         process.exitCode = 1;
     });
 }
 
-module.exports = {verifyImage, collectReports, summarize, sanitizeArtifacts};
+module.exports = {
+    verifyImage,
+    collectReports,
+    summarize,
+    sanitizeArtifacts,
+    readReportSource,
+    prepareReport,
+};

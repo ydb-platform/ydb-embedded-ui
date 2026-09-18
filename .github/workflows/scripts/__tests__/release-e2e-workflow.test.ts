@@ -10,44 +10,49 @@ import {runInNewContext} from 'node:vm';
 
 const root = path.resolve(__dirname, '../../../..');
 const workflow = fs.readFileSync(path.join(root, '.github/workflows/release-e2e.yml'), 'utf8');
-
-test.each(['refs/heads/main', 'refs/heads/feature', 'refs/tags/v1.0.0'])(
-    'checks %s before any controller checkout',
-    (ref) => {
-        const guard = workflow
-            .split('\n  e2e:')[0]
-            .match(/ {4}steps:\n {6}- name:.*\n {8}run: \|\n((?: {10}.*\n)+)/)?.[1];
-        if (!guard) {
-            throw new Error('Resolve must start with an inline guard before checkout');
-        }
-        const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'release-dispatch-'));
-        try {
-            const summary = path.join(directory, 'summary.md');
-            const result = spawnSync('bash', ['-e', '-c', guard], {
-                cwd: directory,
-                env: {...process.env, GITHUB_REF: ref, GITHUB_STEP_SUMMARY: summary},
-                encoding: 'utf8',
-            });
-            if (result.error) {
-                throw result.error;
-            }
-            const error = path.join(directory, 'release-artifacts/setup-error.txt');
-            if (ref === 'refs/heads/main') {
-                expect(result.status).toBe(0);
-                expect(fs.existsSync(error)).toBe(false);
-            } else {
-                expect(result.status).toBe(1);
-                expect(fs.readFileSync(error, 'utf8')).toMatch(/main/);
-                expect(fs.readFileSync(summary, 'utf8')).toContain(fs.readFileSync(error, 'utf8'));
-            }
-            expect(workflow.split('\n  report:')[1]).toContain(
-                "    if: always() && github.ref == 'refs/heads/main'\n",
-            );
-        } finally {
-            fs.rmSync(directory, {recursive: true, force: true});
-        }
-    },
+const reportWorkflow = fs.readFileSync(
+    path.join(root, '.github/workflows/release-e2e-report.yml'),
+    'utf8',
 );
+
+test.each(
+    [workflow, reportWorkflow].flatMap((source) =>
+        ['refs/heads/main', 'refs/heads/feature', 'refs/tags/v1.0.0'].map((ref) => ({source, ref})),
+    ),
+)('checks $ref before any controller checkout', ({source, ref}) => {
+    const guard = source
+        .split('\n  e2e:')[0]
+        .match(/ {4}steps:\n {6}- name:.*\n(?: {8}id:.*\n)? {8}run: \|\n((?: {10}.*\n)+)/)?.[1];
+    if (!guard) {
+        throw new Error('Resolve must start with an inline guard before checkout');
+    }
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'release-dispatch-'));
+    try {
+        const summary = path.join(directory, 'summary.md');
+        const result = spawnSync('bash', ['-e', '-c', guard], {
+            cwd: directory,
+            env: {...process.env, GITHUB_REF: ref, GITHUB_STEP_SUMMARY: summary},
+            encoding: 'utf8',
+        });
+        if (result.error) {
+            throw result.error;
+        }
+        const error = path.join(directory, 'release-artifacts/setup-error.txt');
+        if (ref === 'refs/heads/main') {
+            expect(result.status).toBe(0);
+            expect(fs.existsSync(error)).toBe(false);
+        } else {
+            expect(result.status).toBe(1);
+            expect(fs.readFileSync(error, 'utf8')).toMatch(/main/);
+            expect(fs.readFileSync(summary, 'utf8')).toContain(fs.readFileSync(error, 'utf8'));
+        }
+        expect(workflow.split('\n  report:')[1]).toContain(
+            "    if: always() && github.ref == 'refs/heads/main'\n",
+        );
+    } finally {
+        fs.rmSync(directory, {recursive: true, force: true});
+    }
+});
 
 test('redirects release SPA routes while preserving backend requests and streaming', async () => {
     const upstream = http.createServer((request, response) => {

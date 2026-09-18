@@ -1,0 +1,108 @@
+name: Release UI E2E report
+run-name: UI e2e report for run ${{ inputs.source_run_id }}
+
+on:
+  workflow_call:
+    inputs:
+      source_run_id:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Source Release UI E2E run ID
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  report:
+    name: Merge and verify complete report
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Require main workflow revision
+        id: main
+        run: |
+          if [ "$GITHUB_REF" != refs/heads/main ]; then
+            mkdir -p release-artifacts
+            message='Release UI E2E reports must run from main. Select main when dispatching this workflow.'
+            printf '%s\n' "$message" > release-artifacts/setup-error.txt
+            printf '### Release UI e2e: setup failed\n\n%s\n' "$message" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::$message"
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+        id: controller
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: controller
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify source release run and jobs
+        id: source
+        run: node controller/.github/workflows/scripts/release-e2e-report.js source
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+      - name: Download source provenance
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-e2e-provenance
+          path: downloaded/release-e2e-provenance
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.source_run_id }}
+      - name: Download source shard results
+        if: always() && steps.source.outcome == 'success'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: release-e2e-shard-*
+          path: downloaded
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.source_run_id }}
+      - name: Read original test versions
+        id: prepare
+        if: always() && steps.source.outcome == 'success'
+        run: node controller/.github/workflows/scripts/release-e2e-report.js prepare
+      - name: Collect shard reports
+        id: collect
+        if: always() && steps.source.outcome == 'success'
+        run: node controller/.github/workflows/scripts/release-e2e-report.js collect downloaded ui/all-blob-reports
+      - name: Merge with the test version of Playwright
+        id: merge
+        if: always() && steps.prepare.outcome == 'success' && steps.collect.outputs.has_blobs == 'true'
+        run: bash controller/scripts/playwright-docker.sh
+        env:
+          CI: 'true'
+          PLAYWRIGHT_RELEASE_MODE: report
+          PLAYWRIGHT_RELEASE_REF: ${{ steps.prepare.outputs.ui_sha }}
+          PLAYWRIGHT_RELEASE_VERSION: ${{ steps.prepare.outputs.playwright_version }}
+          PLAYWRIGHT_RELEASE_OUTPUT: ${{ github.workspace }}/ui
+      - name: Sanitize report files
+        id: sanitize
+        if: always() && steps.controller.outcome == 'success'
+        run: node controller/.github/workflows/scripts/release-e2e-report.js sanitize ui
+      - name: Summarize completeness and test results
+        if: always() && steps.controller.outcome == 'success'
+        run: node controller/.github/workflows/scripts/release-e2e-report.js summarize
+        env:
+          REPORT_SHARDS: ${{ steps.collect.outputs.shards }}
+          TEST_JOBS_RESULT: ${{ steps.source.outputs.jobs_result }}
+          SANITIZE_RESULT: ${{ steps.sanitize.outcome }}
+          MERGE_RESULT: ${{ steps.merge.outcome }}
+      - name: Upload complete or partial report
+        if: always() && (steps.sanitize.outcome == 'success' || steps.main.outcome == 'failure')
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-e2e-report
+          path: |
+            ui/playwright-artifacts/
+            downloaded/release-e2e-provenance/
+            report-metadata/
+            release-artifacts/
+          retention-days: 30
