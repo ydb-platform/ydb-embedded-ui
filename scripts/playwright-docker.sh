@@ -29,18 +29,9 @@ if [ "$RELEASE_MODE" = test ] && [ -z "${PLAYWRIGHT_APP_BACKEND:-}" ]; then
   exit 1
 fi
 
-if [ -n "$RELEASE_REF" ] && [ "$RELEASE_MODE" = test ]; then
-  node - "$PLAYWRIGHT_APP_BACKEND" "${PLAYWRIGHT_BASE_URL:-}" <<'NODE'
-for (const [name, value] of [
-  ['PLAYWRIGHT_APP_BACKEND', process.argv[2]],
-  ['PLAYWRIGHT_BASE_URL', process.argv[3]],
-]) {
-  if (value && new URL(value).protocol !== 'http:') {
-    console.error(`Error: ${name} must use HTTP in release mode`);
-    process.exit(1);
-  }
-}
-NODE
+if [ -n "$RELEASE_REF" ] && [ "$RELEASE_MODE" = test ] && [ -n "${PLAYWRIGHT_BASE_URL:-}" ]; then
+  echo "Error: PLAYWRIGHT_BASE_URL must be unset for release tests so Playwright starts npm start" >&2
+  exit 1
 fi
 
 if [ -z "$PLAYWRIGHT_VERSION" ]; then
@@ -81,38 +72,9 @@ fi
 if [ -n "${PLAYWRIGHT_PROXY_TARGET:-}" ]; then
   node <<'NODE' &
 const net = require('net');
-const http = require('http');
 const target = new URL(process.env.PLAYWRIGHT_PROXY_TARGET);
 const port = Number(target.port || (target.protocol === 'https:' ? 443 : 80));
-const release = process.env.PLAYWRIGHT_RELEASE_REF && process.env.PLAYWRIGHT_RELEASE_MODE === 'test';
-const server = release ? http.createServer((request, response) => {
-  const pathname = request.url.split('?')[0];
-  if ((request.method === 'GET' || request.method === 'HEAD') &&
-      (pathname === '/cluster' || pathname.startsWith('/cluster/') ||
-       ['/vDisk', '/pDisk', '/storageGroup'].includes(pathname))) {
-    response.writeHead(307, {Location: `/monitoring${request.url}`});
-    response.end();
-    return;
-  }
-  const upstream = http.request({
-    hostname: target.hostname, port, method: request.method, path: request.url, headers: request.headers,
-  }, (incoming) => {
-    response.writeHead(incoming.statusCode, incoming.headers);
-    incoming.on('error', () => response.destroy());
-    incoming.pipe(response);
-  });
-  upstream.on('error', () => {
-    if (response.headersSent) {
-      response.destroy();
-    } else {
-      response.writeHead(502);
-      response.end('Backend unavailable');
-    }
-  });
-  request.on('error', () => upstream.destroy());
-  response.on('close', () => upstream.destroy());
-  request.pipe(upstream);
-}) : net.createServer((client) => {
+const server = net.createServer((client) => {
   const upstream = net.connect(port, target.hostname);
   client.pipe(upstream);
   upstream.pipe(client);
