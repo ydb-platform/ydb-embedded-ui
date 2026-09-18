@@ -147,6 +147,30 @@ E2E tests are run in CI in the `e2e_tests` job. Each shard starts `ghcr.io/ydb-p
 
 ## Making a production bundle.
 
+### Custom Healthcheck panel
+
+`healthcheck.renderDrawerSurface` replaces `healthcheck.renderDrawerExtension`. The new renderer owns the panel shell, rather than adding a child to the existing drawer. It runs as a React component inside the application providers, including while the panel is closed.
+
+```tsx
+import type {HealthcheckDrawerSurfaceProps} from 'ydb-embedded-ui';
+import {configureUIFactory} from 'ydb-embedded-ui';
+
+function HealthcheckSurface(props: HealthcheckDrawerSurfaceProps) {
+  // Use the default surface when an external panel host is unavailable.
+  return props.renderDefault();
+}
+
+configureUIFactory({healthcheck: {renderDrawerSurface: HealthcheckSurface}});
+```
+
+A custom host renders `renderContent()` instead of `renderDefault()`. The content includes the existing header, download/fullscreen/close controls, and Healthcheck states. Fullscreen content stays within the custom surface; the host uses `isFullscreen` to give it the available space.
+
+- `open` and `onClose` remain controlled by the original Healthcheck owner.
+- `width` is the requested width in pixels. Clamp it to the host's available space without changing the stored preference. Call `onResizeEnd(width)` only after a user resize; the package preserves its existing pixel/percentage settings format.
+- Keep the last open content until the exit animation finishes: the owner may clear its target immediately on close. Retain the React presentation locally, not in application/session storage, and keep the original React contexts when using portals.
+- Call `onTransitionInComplete` after the current opening finishes, not after a cancelled or superseded animation; it is used for issue-link scrolling.
+- The host owns focus, outside-click handling, animation and exit cleanup. Without a registered renderer, the package uses the standalone drawer.
+
 ### Web Workers for package consumers
 
 The computation graph calculates its layout in a Web Worker. By default, the package uses the native bundler pattern:

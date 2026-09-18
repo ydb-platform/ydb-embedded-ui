@@ -1,0 +1,7 @@
+.ydb-healthcheck-drawer-content {
+    height: 100%;
+
+    &_fullscreen .ydb-drawer__header-wrapper {
+        visibility: hidden;
+    }
+}

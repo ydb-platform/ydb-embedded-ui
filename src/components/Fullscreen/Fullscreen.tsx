@@ -9,6 +9,7 @@ import {useResizeObserverTrigger} from '../../utils/hooks/useResizeObserverTrigg
 import {Portal} from '../Portal/Portal';
 
 import {useFullscreenContext} from './FullscreenContext';
+import i18n from './i18n';
 
 import disableFullscreenIcon from '../../assets/icons/disableFullscreen.svg';
 
@@ -20,27 +21,38 @@ interface FullscreenProps {
     children: React.ReactNode;
     className?: string;
     rightInset?: number;
+    contained?: boolean;
 }
 
-export function Fullscreen({children, className, rightInset = 0}: FullscreenProps) {
+export function Fullscreen({
+    children,
+    className,
+    rightInset = 0,
+    contained = false,
+}: FullscreenProps) {
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useTypedDispatch();
     const fullscreenRootRef = useFullscreenContext();
     const normalizedRightInset = Number.isFinite(rightInset) ? Math.max(0, rightInset) : 0;
     const fullscreenStyle = React.useMemo<React.CSSProperties | undefined>(() => {
-        return isFullscreen && normalizedRightInset > 0 ? {right: normalizedRightInset} : undefined;
-    }, [isFullscreen, normalizedRightInset]);
+        return !contained && isFullscreen && normalizedRightInset > 0
+            ? {right: normalizedRightInset}
+            : undefined;
+    }, [contained, isFullscreen, normalizedRightInset]);
     const closeButtonStyle = React.useMemo<React.CSSProperties | undefined>(() => {
-        return isFullscreen && normalizedRightInset > 0
+        return !contained && isFullscreen && normalizedRightInset > 0
             ? {right: 20 + normalizedRightInset}
             : undefined;
-    }, [isFullscreen, normalizedRightInset]);
+    }, [contained, isFullscreen, normalizedRightInset]);
 
     const onDisableFullScreen = React.useCallback(() => {
         dispatch(disableFullscreen());
     }, [dispatch]);
 
     React.useEffect(() => {
+        if (contained) {
+            return undefined;
+        }
         const escFunction = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 onDisableFullScreen();
@@ -51,10 +63,13 @@ export function Fullscreen({children, className, rightInset = 0}: FullscreenProp
         return () => {
             document.removeEventListener('keydown', escFunction, false);
         };
-    }, [onDisableFullScreen]);
+    }, [contained, onDisableFullScreen]);
 
     const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
     React.useEffect(() => {
+        if (contained) {
+            return undefined;
+        }
         const div = document.createElement('div');
         fullscreenRootRef.current?.appendChild(div);
         div.style.display = 'contents';
@@ -63,7 +78,7 @@ export function Fullscreen({children, className, rightInset = 0}: FullscreenProp
             setContainer(null);
             div.remove();
         };
-    }, [fullscreenRootRef]);
+    }, [contained, fullscreenRootRef]);
 
     const ref = React.useRef<HTMLDivElement>(null);
     React.useLayoutEffect(() => {
@@ -79,25 +94,30 @@ export function Fullscreen({children, className, rightInset = 0}: FullscreenProp
     // Trigger resize event when fullscreen state changes to force virtualization recalculation
     useResizeObserverTrigger([isFullscreen]);
 
-    if (!container) {
-        return null;
-    }
-
-    return (
-        <div ref={ref} style={{display: 'contents'}}>
-            <Portal container={container}>
-                <div className={b({fullscreen: isFullscreen}, className)} style={fullscreenStyle}>
-                    <Button
-                        onClick={onDisableFullScreen}
-                        view="raised"
-                        className={b('close-button')}
-                        style={closeButtonStyle}
-                    >
-                        <Icon data={disableFullscreenIcon} />
-                    </Button>
-                    <div className={b('content')}>{children}</div>
-                </div>
-            </Portal>
+    const content = (
+        <div
+            className={b({fullscreen: isFullscreen, contained}, className)}
+            style={fullscreenStyle}
+        >
+            <Button
+                onClick={onDisableFullScreen}
+                view="raised"
+                className={b('close-button')}
+                style={closeButtonStyle}
+                aria-label={i18n('action_exit-fullscreen')}
+            >
+                <Icon data={disableFullscreenIcon} />
+            </Button>
+            <div className={b('content')}>{children}</div>
         </div>
     );
+
+    if (contained) {
+        return content;
+    }
+    return container ? (
+        <div ref={ref} style={{display: 'contents'}}>
+            <Portal container={container}>{content}</Portal>
+        </div>
+    ) : null;
 }

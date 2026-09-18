@@ -8,6 +8,7 @@ import {
     useDrawerContext,
 } from '../../../../../components/Drawer/DrawerContext';
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
+import type {HealthcheckDrawerSurfaceProps} from '../../../../../uiFactory/types';
 import {configureUIFactory, uiFactory} from '../../../../../uiFactory/uiFactory';
 import {Healthcheck} from '../../Healthcheck';
 import type {useHealthcheck} from '../../useHealthcheck';
@@ -76,7 +77,7 @@ function DrawerFixture({
     );
 }
 
-describe('Healthcheck drawer extension', () => {
+describe('Healthcheck drawer surface', () => {
     const originalHealthcheck = {...uiFactory.healthcheck};
 
     function Extension() {
@@ -88,6 +89,15 @@ describe('Healthcheck drawer extension', () => {
             };
         }, [setRightInset]);
         return <span data-testid="drawer-extension" />;
+    }
+
+    function Surface({open, renderContent}: HealthcheckDrawerSurfaceProps) {
+        return open ? (
+            <div data-testid="drawer-surface">
+                <Extension />
+                {renderContent()}
+            </div>
+        ) : null;
     }
 
     beforeEach(() => {
@@ -120,7 +130,7 @@ describe('Healthcheck drawer extension', () => {
         };
         configureUIFactory({
             healthcheck: {
-                renderDrawerExtension: () => <Extension />,
+                renderDrawerSurface: Surface,
                 renderAssistantAction: (props) => {
                     actionTargets(props.target);
                     return <button>Diagnostics</button>;
@@ -134,7 +144,7 @@ describe('Healthcheck drawer extension', () => {
         window.ResizeObserver = originalResizeObserver;
         configureUIFactory({
             healthcheck: {
-                renderDrawerExtension: undefined,
+                renderDrawerSurface: undefined,
                 renderAssistantAction: undefined,
                 ...originalHealthcheck,
             },
@@ -142,12 +152,12 @@ describe('Healthcheck drawer extension', () => {
         expect(uiFactory.healthcheck.renderAssistantAction).toBe(
             originalHealthcheck.renderAssistantAction,
         );
-        expect(uiFactory.healthcheck.renderDrawerExtension).toBe(
-            originalHealthcheck.renderDrawerExtension,
+        expect(uiFactory.healthcheck.renderDrawerSurface).toBe(
+            originalHealthcheck.renderDrawerSurface,
         );
     });
 
-    test('retains the extension and inset across data states, then cleans up on close', () => {
+    test('retains the registered surface across data states, then cleans up on close', () => {
         const degraded = mockHealthcheck;
         const {rerender, unmount} = render(<DrawerFixture />);
         expect(screen.getByTestId('right-inset')).toHaveTextContent('434');
@@ -184,7 +194,7 @@ describe('Healthcheck drawer extension', () => {
         expect(onInsetChange.mock.calls).toEqual([[434], [0], [434], [0]]);
     });
 
-    test('keeps the extension mounted while Diagnostics receives the new target', () => {
+    test('keeps the surface mounted while Diagnostics receives the new target', () => {
         const {rerender} = render(<DrawerFixture database="/first" clusterName="alpha" />);
         const extension = screen.getByTestId('drawer-extension');
         expect(actionTargets).toHaveBeenLastCalledWith({
@@ -200,20 +210,19 @@ describe('Healthcheck drawer extension', () => {
         });
     });
 
-    test('renders the extension after the header and before Healthcheck', () => {
+    test('provides the header and body without mounting a second default surface', () => {
         render(<DrawerFixture />);
-        const extension = screen.getByTestId('drawer-extension');
-        expect(extension.parentElement).toHaveClass('ydb-drawer__content-wrapper');
-        expect(extension.previousElementSibling).toContainElement(screen.getByText('Healthcheck'));
-        expect(extension.nextElementSibling).toContainElement(
-            screen.getByRole('button', {name: 'Diagnostics'}),
-        );
+        const surface = screen.getByTestId('drawer-surface');
+        const content = surface.querySelector('.ydb-drawer__content-wrapper');
+        expect(content?.firstElementChild).toContainElement(screen.getByText('Healthcheck'));
+        expect(content).toContainElement(screen.getByRole('button', {name: 'Diagnostics'}));
+        expect(document.querySelector('.ydb-drawer__item')).not.toBeInTheDocument();
     });
 
-    test('does not render an extension while closed or without registration', () => {
+    test('does not mount custom content while closed or without registration', () => {
         const {rerender} = render(<DrawerFixture open={false} />);
         expect(onInsetChange).not.toHaveBeenCalled();
-        configureUIFactory({healthcheck: {renderDrawerExtension: undefined}});
+        configureUIFactory({healthcheck: {renderDrawerSurface: undefined}});
         rerender(<DrawerFixture />);
         expect(screen.getByText('Issue list')).toBeInTheDocument();
         expect(screen.getByTestId('right-inset')).toHaveTextContent('0');

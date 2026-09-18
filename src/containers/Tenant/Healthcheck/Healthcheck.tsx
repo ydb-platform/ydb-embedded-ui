@@ -18,6 +18,7 @@ import {HEALTHCHECK_RESULT_TO_TEXT} from '../constants';
 import {HealthcheckContext} from './HealthcheckContext';
 import {HealthcheckFilter} from './components/HealthcheckFilter';
 import {Issues} from './components/HealthcheckIssues';
+import {HealthcheckPresentationContext} from './components/HealthcheckPresentationContext';
 import {HealthcheckRefresh} from './components/HealthcheckRefresh';
 import {HealthcheckView} from './components/HealthcheckView';
 import i18n from './i18n';
@@ -147,6 +148,7 @@ function HealthcheckContent({
     const SuccessImage = getIllustration('SuccessOperation');
     const renderAssistantAction = uiFactory.healthcheck.renderAssistantAction;
     const healthcheckContext = React.useContext(HealthcheckContext);
+    const contained = React.useContext(HealthcheckPresentationContext);
     const {visibleRightInset} = useDrawerContextInternal();
 
     const fullscreen = useTypedSelector((state) => state.fullscreen);
@@ -255,7 +257,7 @@ function HealthcheckContent({
 
     return (
         <HealthcheckContext.Provider value={{...healthcheckContext, assistant}}>
-            <Fullscreen rightInset={visibleRightInset}>
+            <Fullscreen rightInset={visibleRightInset} contained={contained}>
                 <Flex className={b()} grow={1}>
                     {renderContent()}
                 </Flex>

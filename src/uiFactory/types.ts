@@ -1,5 +1,6 @@
 import type React from 'react';
 
+import type {DrawerSurfaceProps} from '../components/Drawer/Drawer';
 import type {EmptyStateProps} from '../components/EmptyState';
 import type {YDBDefinitionListItem} from '../components/YDBDefinitionList/YDBDefinitionList';
 import type {
@@ -66,11 +67,8 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;
         getHealthcheckViewsOrder: GetHealthcheckViewsOrder<H>;
         renderAssistantAction?: RenderHealthcheckAssistantAction;
-        /**
-         * Renders after the drawer header and before Healthcheck content.
-         * Stays mounted while the drawer is open, independent of loading, error or issue state.
-         */
-        renderDrawerExtension?: () => React.ReactNode;
+        /** Replaces the panel shell; renderDefault preserves the standalone drawer. */
+        renderDrawerSurface?: RenderHealthcheckDrawerSurface;
     };
     hasAccess: HasAccess;
     hideGrantAccess?: boolean;
@@ -213,6 +211,14 @@ export type RenderChatPanel = () => React.ReactNode;
 
 export type RenderHealthcheckAssistantAction = (
     props: HealthcheckAssistantActionProps,
+) => React.ReactNode;
+
+export interface HealthcheckDrawerSurfaceProps extends DrawerSurfaceProps {
+    isFullscreen: boolean;
+}
+
+export type RenderHealthcheckDrawerSurface = (
+    props: HealthcheckDrawerSurfaceProps,
 ) => React.ReactNode;
 
 export interface UiMetricaGoals {

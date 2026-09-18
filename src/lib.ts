@@ -46,6 +46,8 @@ export type {
     IllustrationComponent,
     IllustrationName,
     RenderHealthcheckAssistantAction,
+    RenderHealthcheckDrawerSurface,
+    HealthcheckDrawerSurfaceProps,
 } from './uiFactory/types';
 export type {
     HealthcheckAssistantActionProps,
