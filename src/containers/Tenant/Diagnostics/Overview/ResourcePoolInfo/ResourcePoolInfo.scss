@@ -1,0 +1,24 @@
+.ydb-diagnostics-resource-pool-info {
+    $column-width: 310px;
+
+    &__row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: var(--g-spacing-9);
+    }
+
+    &__col {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+
+        width: $column-width;
+    }
+
+    &__loader {
+        margin-top: 50px;
+    }
+}

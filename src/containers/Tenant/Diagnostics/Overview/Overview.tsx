@@ -16,6 +16,7 @@ import {ChangefeedInfo} from './ChangefeedInfo';
 import {DatabaseInfo} from './DatabaseInfo/DatabaseInfo';
 import {DefaultEntityInfo} from './DefaultEntityInfo';
 import {ResourcePoolInfo} from './ResourcePoolInfo';
+import {ResourcePoolUsage} from './ResourcePoolInfo/ResourcePoolUsage';
 import {SchemaObjectInfoContainer} from './SchemaObjectInfo/SchemaObjectInfoContainer';
 import {StreamingQueryInfo} from './StreamingQueryInfo';
 import {TableInfo} from './TableInfo';
@@ -56,7 +57,19 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
         const pathTypeToComponent: Record<EPathType, (() => React.ReactNode) | undefined> = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
-            [EPathType.EPathTypeResourcePool]: () => <ResourcePoolInfo data={data} />,
+            [EPathType.EPathTypeResourcePool]: () => (
+                <div className="ydb-diagnostics-resource-pool-info__row">
+                    <div className="ydb-diagnostics-resource-pool-info__col">
+                        <ResourcePoolInfo data={data} />
+                    </div>
+                    <div className="ydb-diagnostics-resource-pool-info__col">
+                        <ResourcePoolUsage
+                            database={database}
+                            poolName={data?.PathDescription?.ResourcePoolDescription?.Name || ''}
+                        />
+                    </div>
+                </div>
+            ),
             [EPathType.EPathTypeSecret]: undefined,
             [EPathType.EPathTypeTable]: renderTableInfo,
             [EPathType.EPathTypeSysView]: undefined,
