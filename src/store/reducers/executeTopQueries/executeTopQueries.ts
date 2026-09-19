@@ -106,6 +106,17 @@ WHERE Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 AND QueryStartAt is not null`;
 }
 
+function getRunningQueriesByPoolText(poolName: string) {
+    const escapedPoolName = poolName.replace(/'/g, "''");
+    return `${QUERY_TECHNICAL_MARK}
+SELECT
+    COUNT_IF(State = 'EXECUTING') as RunningQueriesCount,
+    COUNT_IF(State = 'QUEUED') as QueuedQueriesCount
+FROM \`.sys/query_sessions\`
+WHERE Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
+AND WmPoolId = '${escapedPoolName}'`;
+}
+
 interface QueriesRequestParams {
     database: string;
     filters?: TopQueriesFilters;
@@ -222,6 +233,44 @@ export const topQueriesApi = api.injectEndpoints({
                             runningQueriesCount: Number(row?.RunningQueriesCount) || 0,
                             uniqueApplications: Number(row?.UniqueApplications) || 0,
                             uniqueUsers: Number(row?.UniqueUsers) || 0,
+                        },
+                    };
+                } catch (error) {
+                    return {error};
+                }
+            },
+            forceRefetch() {
+                return true;
+            },
+            providesTags: ['All'],
+        }),
+        getRunningQueriesByPool: build.query({
+            queryFn: async (
+                {database, poolName}: {database: string; poolName: string},
+                {signal},
+            ) => {
+                try {
+                    const response = await window.api.viewer.sendQuery(
+                        {
+                            query: getRunningQueriesByPoolText(poolName),
+                            database,
+                            action: 'execute-query',
+                            internal_call: true,
+                        },
+                        {signal, withRetries: true},
+                    );
+
+                    if (isQueryErrorResponse(response)) {
+                        throw response;
+                    }
+
+                    const data = parseQueryAPIResponse(response);
+                    const row = data?.resultSets?.[0]?.result?.[0];
+
+                    return {
+                        data: {
+                            runningQueriesCount: Number(row?.RunningQueriesCount) || 0,
+                            queuedQueriesCount: Number(row?.QueuedQueriesCount) || 0,
                         },
                     };
                 } catch (error) {
