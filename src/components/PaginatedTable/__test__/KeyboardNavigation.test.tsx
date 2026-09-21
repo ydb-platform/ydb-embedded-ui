@@ -1,8 +1,9 @@
 import React from 'react';
 
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 
 import {
+    TableKeyboardNavigationGroupContext,
     TableKeyboardNavigationScope,
     useTableSearch,
 } from '../../TableKeyboardNavigation/TableKeyboardNavigation';
@@ -168,6 +169,68 @@ test('announces the supplied row label instead of cell contents', () => {
     expect(input).toHaveFocus();
 });
 
+test('announces the group when selection moves between grouped tables', () => {
+    function GroupTable({group}: {group: string}) {
+        const tableRef = React.useRef<HTMLDivElement>(null);
+        const rows = [`${group}-0`, `${group}-1`];
+        return (
+            <TableKeyboardNavigationGroupContext.Provider value={group}>
+                <KeyboardNavigation
+                    tableRef={tableRef}
+                    scrollContainerRef={tableRef}
+                    rowCount={rows.length}
+                    rowHeight={0}
+                    getRowLabel={(index) => rows[index]}
+                >
+                    <table>
+                        <tbody>
+                            {rows.map((row, index) => (
+                                <TableRow
+                                    key={row}
+                                    row={row}
+                                    rowIndex={index}
+                                    height={0}
+                                    columns={[
+                                        {
+                                            name: 'Name',
+                                            align: 'left',
+                                            render: ({row: value}) => value,
+                                        },
+                                    ]}
+                                />
+                            ))}
+                        </tbody>
+                    </table>
+                </KeyboardNavigation>
+            </TableKeyboardNavigationGroupContext.Provider>
+        );
+    }
+
+    function GroupedNavigationFixture() {
+        const inputRef = React.useRef<HTMLInputElement>(null);
+        useTableSearch(inputRef, true);
+        return (
+            <React.Fragment>
+                <input ref={inputRef} aria-label="Filter" />
+                <GroupTable group="east" />
+                <GroupTable group="west" />
+            </React.Fragment>
+        );
+    }
+
+    render(
+        <TableKeyboardNavigationScope>
+            <GroupedNavigationFixture />
+        </TableKeyboardNavigationScope>,
+    );
+    const input = screen.getByRole('textbox');
+    input.focus();
+    fireEvent.keyDown(input, {key: 'ArrowDown'});
+    expect(screen.getByRole('status')).toHaveTextContent('Group east. Selected row 2 of 2: east-1');
+    fireEvent.keyDown(input, {key: 'ArrowDown'});
+    expect(screen.getByRole('status')).toHaveTextContent('Group west. Selected row 1 of 2: west-0');
+});
+
 test('filter changes reset selection while rerenders preserve it', () => {
     const onActivate = jest.fn();
     const table = (status: string[]) => (
@@ -189,6 +252,89 @@ test('filter changes reset selection while rerenders preserve it', () => {
     expect(document.querySelector('.ydb-keyboard-focused-row')).toBeNull();
     expect(screen.getByRole('status')).toBeEmptyDOMElement();
     expect(input).toHaveFocus();
+    fireEvent.keyDown(input, {key: 'Enter'});
+    expect(onActivate).toHaveBeenLastCalledWith(0);
+});
+
+test('hides and does not activate a selected row while its key is temporarily missing', () => {
+    const listeners = new Set<() => void>();
+    const subscribe = (listener: () => void) => {
+        listeners.add(listener);
+        return () => listeners.delete(listener);
+    };
+    const notify = () => {
+        act(() => listeners.forEach((listener) => listener()));
+    };
+    const onActivate = jest.fn();
+
+    function KeyedNavigationFixture({rows, pending}: {rows: number[]; pending: boolean}) {
+        const inputRef = React.useRef<HTMLInputElement>(null);
+        const tableRef = React.useRef<HTMLDivElement>(null);
+        useTableSearch(inputRef, true);
+        return (
+            <KeyboardNavigation
+                tableRef={tableRef}
+                scrollContainerRef={tableRef}
+                rowCount={rows.length}
+                rowHeight={0}
+                getRowKey={(index) => rows[index]}
+                findRowIndex={(key) => {
+                    const index = rows.indexOf(Number(key));
+                    return index === -1 ? undefined : index;
+                }}
+                isRowLookupPending={() => pending}
+                subscribe={subscribe}
+                onActivate={onActivate}
+            >
+                <input ref={inputRef} aria-label="Filter" />
+                <table>
+                    <tbody>
+                        {rows.map((row, index) => (
+                            <TableRow
+                                key={index}
+                                row={row}
+                                rowIndex={index}
+                                height={0}
+                                columns={[
+                                    {name: 'ID', align: 'left', render: ({row: value}) => value},
+                                ]}
+                            />
+                        ))}
+                    </tbody>
+                </table>
+            </KeyboardNavigation>
+        );
+    }
+
+    const table = (rows: number[], pending = false) => (
+        <TableKeyboardNavigationScope>
+            <KeyedNavigationFixture rows={rows} pending={pending} />
+        </TableKeyboardNavigationScope>
+    );
+    const {rerender} = render(table([20, 21]));
+    const input = screen.getByRole('textbox');
+    input.focus();
+    fireEvent.keyDown(input, {key: 'ArrowUp'});
+    expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('20');
+
+    rerender(table([21, 21], true));
+    notify();
+    expect(document.querySelector('.ydb-keyboard-focused-row')).toBeNull();
+    fireEvent.keyDown(input, {key: 'Enter'});
+    expect(onActivate).not.toHaveBeenCalled();
+
+    rerender(table([21, 20]));
+    notify();
+    expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('20');
+    fireEvent.keyDown(input, {key: 'Enter'});
+    expect(onActivate).toHaveBeenLastCalledWith(1);
+
+    onActivate.mockClear();
+    rerender(table([21, 21], true));
+    notify();
+    expect(document.querySelector('.ydb-keyboard-focused-row')).toBeNull();
+    fireEvent.keyDown(input, {key: 'ArrowUp'});
+    expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('21');
     fireEvent.keyDown(input, {key: 'Enter'});
     expect(onActivate).toHaveBeenLastCalledWith(0);
 });

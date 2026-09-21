@@ -31,6 +31,9 @@ interface Adapter {
 }
 
 const ScopeContext = React.createContext<Scope | null>(null);
+export const TableKeyboardNavigationGroupContext = React.createContext<string | undefined>(
+    undefined,
+);
 
 function isVisible(element: HTMLElement) {
     const rect = element.getBoundingClientRect();
@@ -285,15 +288,17 @@ interface AdapterOptions {
     getRowKey?: (index: number) => string | number | undefined;
     getRowLabel?: (index: number) => string | undefined;
     findRowIndex?: (key: string | number, previousIndex: number) => number | undefined;
+    isRowLookupPending?: () => boolean;
     subscribe?: (listener: () => void) => () => void;
 }
 
-type RowSelection = {index: number; key?: string | number};
+type RowSelection = {index: number; key?: string | number; pending?: boolean};
 type Selection = RowSelection | undefined;
 const subscribeToNothing = () => () => {};
 
 export function useTableKeyboardAdapter(options: AdapterOptions) {
     const scope = React.useContext(ScopeContext);
+    const group = React.useContext(TableKeyboardNavigationGroupContext);
     const [scrollRevision, setScrollRevision] = React.useState(0);
     const [hover, setHover] = React.useState(false);
     const selectedRef = React.useRef<Selection>();
@@ -312,19 +317,30 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
         const current = selectedRef.current;
         let next = current;
         if (current) {
-            const {findRowIndex, getRowKey, isValidIndex, getLast} = optionsRef.current;
+            const {findRowIndex, getRowKey, isRowLookupPending, isValidIndex, getLast} =
+                optionsRef.current;
             const matchedIndex =
                 current.key !== undefined &&
                 getRowKey?.(current.index) !== current.key &&
                 findRowIndex
                     ? findRowIndex(current.key, current.index)
                     : current.index;
-            const position = matchedIndex ?? current.index;
-            const index = isValidIndex?.(position) === false ? getLast() : position;
-            next = index === undefined ? undefined : {index, key: getRowKey?.(index)};
+            if (matchedIndex === undefined && isRowLookupPending?.()) {
+                next = {...current, pending: true};
+            } else {
+                const position = matchedIndex ?? current.index;
+                const index = isValidIndex?.(position) === false ? getLast() : position;
+                next = index === undefined ? undefined : {index, key: getRowKey?.(index)};
+            }
         }
         const previous = snapshotRef.current;
-        if (previous && next && previous.index === next.index && previous.key === next.key) {
+        if (
+            previous &&
+            next &&
+            previous.index === next.index &&
+            previous.key === next.key &&
+            previous.pending === next.pending
+        ) {
             return previous;
         }
         snapshotRef.current = next;
@@ -373,7 +389,11 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
             getSelected,
             select,
             get activate() {
-                return optionsRef.current.activate;
+                const activate = optionsRef.current.activate;
+                if (!activate || !getSelection()?.pending) {
+                    return activate;
+                }
+                return () => undefined;
             },
         };
         scope.adapters.add(adapter);
@@ -391,7 +411,7 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
         }
         updateAnnouncement(scope, '');
         const index = selection?.index;
-        if (hover || index === undefined) {
+        if (hover || selection?.pending || index === undefined) {
             return undefined;
         }
         const announceRow = () => {
@@ -418,7 +438,18 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
             }
             updateAnnouncement(
                 scope,
-                i18n('value_selected-row', {position: index + 1, total: lastIndex + 1, text}),
+                group
+                    ? i18n('value_selected-row-in-group', {
+                          group,
+                          position: index + 1,
+                          total: lastIndex + 1,
+                          text,
+                      })
+                    : i18n('value_selected-row', {
+                          position: index + 1,
+                          total: lastIndex + 1,
+                          text,
+                      }),
             );
             return true;
         };
@@ -438,12 +469,21 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
             attributeFilter: ['class'],
         });
         return () => observer.disconnect();
-    }, [scope, element, selection?.index, selection?.key, scrollRevision, hover]);
+    }, [
+        scope,
+        element,
+        selection?.index,
+        selection?.key,
+        selection?.pending,
+        scrollRevision,
+        hover,
+        group,
+    ]);
     return {
         ref,
         scrollRevision,
         selected: selection?.index,
-        focusedIndex: hover ? undefined : selection?.index,
+        focusedIndex: hover || selection?.pending ? undefined : selection?.index,
         onMouseMove: (event: React.MouseEvent<HTMLElement>) => {
             if (selectedRef.current && (event.target as HTMLElement).closest('tbody tr')) {
                 setHover(true);

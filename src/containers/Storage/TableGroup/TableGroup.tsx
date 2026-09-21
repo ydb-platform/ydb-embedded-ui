@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ArrowToggle, Label, Text} from '@gravity-ui/uikit';
 
+import {TableKeyboardNavigationGroupContext} from '../../../components/TableKeyboardNavigation/TableKeyboardNavigation';
 import {cn} from '../../../utils/cn';
 
 import './TableGroup.scss';
@@ -48,7 +49,11 @@ export const TableGroup = ({
 
     const renderContent = () => {
         if (expanded) {
-            return <div className={b('content')}>{children}</div>;
+            return (
+                <TableKeyboardNavigationGroupContext.Provider value={title}>
+                    <div className={b('content')}>{children}</div>
+                </TableKeyboardNavigationGroupContext.Provider>
+            );
         }
 
         return null;

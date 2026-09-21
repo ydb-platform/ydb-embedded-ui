@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {QueryStatus} from '@reduxjs/toolkit/query';
 import isEqual from 'lodash/isEqual';
 import {useStore} from 'react-redux';
 
@@ -152,6 +153,26 @@ export const PaginatedTable = <T, F>({
         return undefined;
     };
 
+    const isRowLookupPending = () => {
+        const state = store.getState();
+        const queryParams = getQueryParams(0);
+        const cachedArgs = tableDataApi.util.selectCachedArgsForQuery(state, 'fetchTableChunk');
+        return cachedArgs.some((args) => {
+            if (
+                !isEqual(
+                    {...args, offset: 0, fetchData: undefined},
+                    {...queryParams, fetchData: undefined},
+                )
+            ) {
+                return false;
+            }
+            return (
+                tableDataApi.endpoints.fetchTableChunk.select(args)(state).status ===
+                QueryStatus.pending
+            );
+        });
+    };
+
     const activateRow = (index: number) => {
         const row = getRow(index);
         if (row !== undefined) {
@@ -227,6 +248,7 @@ export const PaginatedTable = <T, F>({
             getRowKey={getKeyboardRowKey ? getRowKey : undefined}
             getRowLabel={getKeyboardRowLabel ? getRowLabel : undefined}
             findRowIndex={getKeyboardRowKey ? findRowIndex : undefined}
+            isRowLookupPending={getKeyboardRowKey ? isRowLookupPending : undefined}
             subscribe={store.subscribe}
             rowCount={foundEntities}
             rowHeight={rowHeight}

@@ -176,6 +176,11 @@ for (const kind of ['nodes', 'groups'] as const) {
         await page.keyboard.press('ArrowDown');
         await expect(page.locator(focusedRow)).toHaveCount(1);
         await expect(page.locator(focusedRow)).toContainText(rowName(2));
+        await expect(page.getByRole('status')).toHaveText(
+            kind === 'nodes'
+                ? 'Group second. Selected row 1 of 2: 3, host-2.test'
+                : 'Group second. Selected row 1 of 2: 9002',
+        );
         await page.keyboard.press('ArrowUp');
         await expect(page.locator(focusedRow)).toHaveCount(1);
         await expect(page.locator(focusedRow)).toContainText(rowName(1));
