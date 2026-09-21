@@ -305,6 +305,14 @@ async function forceHoverStorageGroupVDiskItems(page: Page, groupIndex: number) 
     await clearForcedHover(page);
 
     const row = getStorageGroupRow(page, groupIndex);
+    const diskItem = getVDiskItems(row).first();
+    const getDiskGeometry = () =>
+        diskItem.evaluate((element) => {
+            const {y, height} = element.getBoundingClientRect();
+            return {y, height};
+        });
+    const geometry = await getDiskGeometry();
+
     await row.evaluate((element, rowClass) => {
         element.classList.add(rowClass);
     }, FORCED_HOVER_ROW_CLASS);
@@ -314,6 +322,8 @@ async function forceHoverStorageGroupVDiskItems(page: Page, groupIndex: number) 
     await row.locator('.ydb-stack').evaluateAll((stacks, stackClass) => {
         stacks.forEach((stack) => stack.classList.add(stackClass));
     }, FORCED_EXPANDED_STACK_CLASS);
+
+    await expect.poll(getDiskGeometry).toEqual(geometry);
 }
 
 async function expectStorageRowsScreenshot(page: Page, name: string) {
