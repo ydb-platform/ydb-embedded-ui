@@ -48,6 +48,62 @@ describe('useStorageNodesSelectedColumns', () => {
         ]);
     });
 
+    test.each(['all', 'missing'] as const)(
+        'requires PDisks only in Expert mode without changing its saved position (%s)',
+        (visibleEntities) => {
+            useSetting.mockReturnValue([
+                [
+                    {id: NODES_COLUMNS_IDS.NodeId, selected: true},
+                    {id: NODES_COLUMNS_IDS.Host, selected: true},
+                    {id: NODES_COLUMNS_IDS.PDisks, selected: false},
+                    {id: NODES_COLUMNS_IDS.Uptime, selected: true},
+                ],
+                setSavedColumns,
+            ]);
+            const {result, rerender} = renderHook(
+                ({expertMode}) =>
+                    useStorageNodesSelectedColumns({
+                        visibleEntities,
+                        columnsSettings: {expertMode},
+                    }),
+                {initialProps: {expertMode: false}},
+            );
+
+            for (const expertMode of [false, true, false]) {
+                rerender({expertMode});
+
+                expect(
+                    result.current.columnsToSelect.find(({id}) => id === NODES_COLUMNS_IDS.PDisks),
+                ).toEqual(
+                    expect.objectContaining({
+                        selected: expertMode,
+                        required: expertMode,
+                        sticky: undefined,
+                    }),
+                );
+                expect(
+                    result.current.columnsToShow
+                        .map(({name}) => name)
+                        .filter((name) => name !== NODES_COLUMNS_IDS.Missing),
+                ).toEqual(
+                    expertMode
+                        ? ['NodeId', 'Host', 'PDisks', 'Uptime']
+                        : ['NodeId', 'Host', 'Uptime'],
+                );
+
+                if (visibleEntities === 'missing') {
+                    expect(
+                        result.current.columnsToSelect.find(
+                            ({id}) => id === NODES_COLUMNS_IDS.Missing,
+                        ),
+                    ).toEqual(
+                        expect.objectContaining({required: true, selected: true, sticky: 'start'}),
+                    );
+                }
+            }
+        },
+    );
+
     test('replaces legacy disk usage with explicit capacity columns when enabled', () => {
         useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
 

@@ -1,4 +1,4 @@
-import type React from 'react';
+import React from 'react';
 
 import {Flex, SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 
@@ -37,10 +37,15 @@ export function ExpertModeRow<T extends string>({
     legend,
     qa,
 }: ExpertModeRowProps<T>) {
+    const labelId = React.useId();
+
     return (
         <Flex gap={3} alignItems="center">
-            <Text variant="subheader-1">{label}</Text>
+            <Text id={labelId} variant="subheader-1">
+                {label}
+            </Text>
             <SegmentedRadioGroup
+                aria-labelledby={labelId}
                 qa={qa}
                 value={value}
                 onUpdate={(nextValue) => onUpdate(nextValue as T)}
