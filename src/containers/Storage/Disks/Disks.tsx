@@ -90,7 +90,7 @@ const VDiskItem = React.memo(function VDiskItem({
                 renderContent={renderContent}
                 placeholderProps={placeholderProps}
                 data={vDisk}
-                hidePDiskInPopup
+                hideMainPDiskInPopup
                 compact={!isAllVDisksLayout}
                 withIcon={withIcon}
                 inactive={inactive}
