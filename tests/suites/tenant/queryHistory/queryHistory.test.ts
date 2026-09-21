@@ -82,6 +82,7 @@ test.describe('Query History', () => {
 
         // Type the query
         await page.keyboard.type(testQuery);
+        await expect.poll(() => queryEditor.getEditorContent()).toContain(testQuery);
 
         // Use the keybinding to execute the query
         await executeQueryWithKeybinding(page);
