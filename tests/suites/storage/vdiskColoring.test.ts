@@ -343,6 +343,8 @@ async function expectStorageRowsScreenshot(page: Page, name: string) {
 }
 
 async function expectPDiskScreenshot(pDisks: Locator, name: string) {
+    await pDisks.scrollIntoViewIfNeeded();
+    await expect(pDisks.locator('.pdisk-storage')).toHaveCount(VDISKS_COUNT);
     await expect(pDisks).toHaveScreenshot(name, {
         timeout: 60_000,
     });
@@ -350,6 +352,7 @@ async function expectPDiskScreenshot(pDisks: Locator, name: string) {
 
 async function expectPDiskAllScreenshot(page: Page, pDisks: Locator, name: string) {
     await pDisks.scrollIntoViewIfNeeded();
+    await expect(pDisks.locator('.pdisk-storage')).toHaveCount(VDISKS_COUNT);
 
     const box = await pDisks.boundingBox();
 
@@ -420,6 +423,7 @@ async function preparePDiskPage(
     await hideFloatingPopups(page);
     await setupForcedHoverStyles(page);
     await expectStorageGroupRowsReady(page);
+    await getPDisksArea(getStorageGroupRow(page, 0)).scrollIntoViewIfNeeded();
 }
 
 async function prepareNodesPage(
@@ -997,6 +1001,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         await expectStorageGroupRowsReady(page);
 
         const pDiskItems = getPDiskItems(getStorageGroupRow(page, 0));
+        await getPDisksArea(getStorageGroupRow(page, 0)).scrollIntoViewIfNeeded();
         const pDiskLegendLabels = page
             .getByTestId('storage-pdisks-expert-mode-legend')
             .locator('.g-label');
@@ -1698,6 +1703,7 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
         await expect(targetPDiskBar).toContainText('N/D');
 
         await pDiskSelector.getByRole('radio', {name: 'All'}).check();
+        await targetPDiskItem.scrollIntoViewIfNeeded();
 
         await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_mode-all/);
         await expect(targetPDiskBar).toHaveClass(/storage-disk-progress-bar_grey(?:\s|$)/);

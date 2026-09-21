@@ -4,7 +4,10 @@
     }
 
     &__item {
+        flex-shrink: 0;
+
         width: 55px;
+        min-height: var(--g-text-subheader-2-line-height);
         margin-right: var(--g-spacing-1);
 
         &_with-dc-margin {

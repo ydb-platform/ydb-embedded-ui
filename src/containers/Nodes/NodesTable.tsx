@@ -19,6 +19,8 @@ import {getNodes} from './getNodes';
 import i18n from './i18n';
 import {getRowClassName} from './shared';
 
+const ROW_HEIGHT_WITH_PDISKS = 51;
+
 interface NodesTableProps {
     path?: string;
     database?: string;
@@ -98,7 +100,9 @@ export function NodesTable({
             scrollContainerRef={scrollContainerRef}
             columns={columns}
             rowHeight={
-                columns.some((column) => column.name === NODES_COLUMNS_IDS.PDisks) ? 51 : undefined
+                columns.some(({name}) => name === NODES_COLUMNS_IDS.PDisks)
+                    ? ROW_HEIGHT_WITH_PDISKS
+                    : undefined
             }
             fetchData={getNodes}
             initialEntitiesCount={initialEntitiesCount}

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {Flex, useLayoutContext} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import type {Erasure} from '../../../types/api/storage';
@@ -16,9 +17,15 @@ import type {StorageViewContext} from '../types';
 import {useStoragePDiskDisplayStateGetter} from '../useStoragePDiskDisplayStateGetter';
 import {useStorageVDiskDisplayStateGetter} from '../useStorageVDiskDisplayStateGetter';
 import {isPdiskActive, isVdiskActive, useVDisksWithDCMargins} from '../utils';
+import {useVirtualizedDiskList} from '../utils/useVirtualizedDiskList';
 
 import {calculateCompactVDiskWidths} from './calculateCompactVDiskWidths';
-import {ALL_VDISK_WIDTH, VDISKS_CONTAINER_WIDTH, getAllVDisksContainerWidth} from './constants';
+import {
+    ALL_VDISK_WIDTH,
+    EXPERT_MODE_PDISK_WIDTH,
+    VDISKS_CONTAINER_WIDTH,
+    getAllVDisksContainerWidth,
+} from './constants';
 
 import './Disks.scss';
 
@@ -32,7 +39,117 @@ interface DisksProps {
     isAllVDisksLayout?: boolean;
 }
 
-export function Disks({
+interface DisksItemProps {
+    vDisk: PreparedVDisk;
+    viewContext?: StorageViewContext;
+    inactive?: boolean;
+    highlighted: boolean;
+    setHighlightedVDisk?: (id?: string) => void;
+    compactVDiskWidth?: number;
+    withDCMargin?: boolean;
+    withIcon?: boolean;
+    getDisplayState?: VDiskDisplayStateGetter;
+    isAllVDisksLayout?: boolean;
+    renderContent: boolean;
+}
+
+const VDiskItem = React.memo(function VDiskItem({
+    vDisk,
+    highlighted,
+    inactive,
+    setHighlightedVDisk,
+    compactVDiskWidth,
+    withIcon,
+    getDisplayState,
+    isAllVDisksLayout,
+    renderContent,
+}: DisksItemProps) {
+    // Do not show PDisk popup for VDisk
+    const vDiskToShow = React.useMemo(() => ({...vDisk, PDisk: undefined}), [vDisk]);
+
+    const style: React.CSSProperties = isAllVDisksLayout
+        ? {width: ALL_VDISK_WIDTH, flexBasis: ALL_VDISK_WIDTH}
+        : {width: compactVDiskWidth, flexBasis: compactVDiskWidth};
+
+    return (
+        <div style={style} className={b('vdisk-item', {all: isAllVDisksLayout})}>
+            {isAllVDisksLayout ? (
+                <div
+                    aria-hidden
+                    className={b('vdisk-size-indicator')}
+                    style={{
+                        width: compactVDiskWidth,
+                        visibility: renderContent ? undefined : 'hidden',
+                    }}
+                />
+            ) : null}
+            <VDiskWithDonorsStack
+                renderContent={renderContent}
+                data={vDiskToShow}
+                compact={!isAllVDisksLayout}
+                withIcon={withIcon}
+                inactive={inactive}
+                delayOpen={DISKS_POPUP_DEBOUNCE_TIMEOUT}
+                delayClose={DISKS_POPUP_DEBOUNCE_TIMEOUT}
+                highlightedVDisk={highlighted ? vDisk.StringifiedId : undefined}
+                setHighlightedVDisk={setHighlightedVDisk}
+                progressBarClassName={b('vdisk-progress-bar')}
+                getDisplayState={getDisplayState}
+            />
+        </div>
+    );
+});
+
+const PDiskItem = React.memo(function PDiskItem({
+    vDisk,
+    viewContext,
+    highlighted,
+    setHighlightedVDisk,
+    withDCMargin,
+    withIcon,
+    getDisplayState,
+    renderContent,
+}: Omit<DisksItemProps, 'getDisplayState'> & {getDisplayState?: PDiskDisplayStateGetter}) {
+    const vDiskId = vDisk.StringifiedId;
+
+    const onShowPopup = React.useCallback(
+        () => setHighlightedVDisk?.(vDiskId),
+        [setHighlightedVDisk, vDiskId],
+    );
+    const onHidePopup = React.useCallback(
+        () => setHighlightedVDisk?.(undefined),
+        [setHighlightedVDisk],
+    );
+
+    if (!vDisk.PDisk) {
+        return null;
+    }
+
+    return (
+        <div
+            className={b('pdisk-item', {['with-dc-margin']: withDCMargin})}
+            style={{width: getDisplayState?.(vDisk.PDisk).width ?? EXPERT_MODE_PDISK_WIDTH}}
+        >
+            {(renderContent || highlighted) && (
+                <PDisk
+                    progressBarClassName={b('pdisk-progress-bar')}
+                    data={vDisk.PDisk}
+                    inactive={!isPdiskActive(vDisk.PDisk, viewContext)}
+                    showPopup={highlighted}
+                    delayOpen={DISKS_POPUP_DEBOUNCE_TIMEOUT}
+                    delayClose={DISKS_POPUP_DEBOUNCE_TIMEOUT}
+                    onShowPopup={onShowPopup}
+                    onHidePopup={onHidePopup}
+                    withIcon={withIcon}
+                    highlighted={highlighted}
+                    getDisplayState={getDisplayState}
+                />
+            )}
+        </div>
+    );
+});
+
+export const Disks = React.memo(function Disks({
     vDisks = [],
     viewContext,
     erasure,
@@ -44,6 +161,21 @@ export function Disks({
     const getPDiskDisplayState = useStoragePDiskDisplayStateGetter();
 
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
+    const vDiskList = useVirtualizedDiskList(
+        vDisks,
+        vDisks.every((disk) => Boolean(disk.StringifiedId)),
+    );
+    // Missing disk identities produce non-focusable placeholders; keep all links reachable.
+    const pDiskList = useVirtualizedDiskList(
+        vDisks,
+        vDisks.every(({PDisk: pDisk}) => !isNil(pDisk?.NodeId) && !isNil(pDisk?.PDiskId)),
+    );
+
+    React.useEffect(() => {
+        setHighlightedVDisk((id) =>
+            vDisks.some((disk) => disk.StringifiedId === id) ? id : undefined,
+        );
+    }, [vDisks]);
 
     const {
         theme: {spaceBaseSize},
@@ -63,126 +195,44 @@ export function Disks({
 
     return (
         <div className={b(null)}>
-            <Flex direction="row" gap={1} grow style={{width: vDisksContainerWidth}}>
-                {vDisks?.map((vDisk, index) => (
+            <Flex
+                direction="row"
+                gap={1}
+                grow
+                style={{width: vDisksContainerWidth}}
+                ref={vDiskList.containerRef}
+            >
+                {vDisks.map((vDisk, index) => (
                     <VDiskItem
                         key={vDisk.StringifiedId || index}
                         vDisk={vDisk}
                         inactive={!isVdiskActive(vDisk, viewContext)}
-                        highlightedVDisk={highlightedVDisk}
+                        highlighted={highlightedVDisk === vDisk.StringifiedId}
                         setHighlightedVDisk={setHighlightedVDisk}
                         compactVDiskWidth={compactVDiskWidths[index]}
                         withIcon={withIcon}
                         getDisplayState={getVDiskDisplayState}
                         isAllVDisksLayout={isAllVDisksLayout}
+                        renderContent={vDiskList.shouldRenderDisk(index)}
                     />
                 ))}
             </Flex>
 
-            <div className={b('pdisks-wrapper')}>
-                {vDisks?.map((vDisk, index) => (
+            <div className={b('pdisks-wrapper')} ref={pDiskList.containerRef}>
+                {vDisks.map((vDisk, index) => (
                     <PDiskItem
-                        key={vDisk?.PDisk?.StringifiedId || index}
+                        key={vDisk.StringifiedId || index}
                         vDisk={vDisk}
                         viewContext={viewContext}
-                        highlightedVDisk={highlightedVDisk}
+                        highlighted={highlightedVDisk === vDisk.StringifiedId}
                         setHighlightedVDisk={setHighlightedVDisk}
                         withDCMargin={vDisksWithDCMargins.includes(index)}
                         withIcon={withIcon}
                         getDisplayState={getPDiskDisplayState}
+                        renderContent={pDiskList.shouldRenderDisk(index)}
                     />
                 ))}
             </div>
         </div>
     );
-}
-
-interface DisksItemProps {
-    vDisk: PreparedVDisk;
-    viewContext?: StorageViewContext;
-    inactive?: boolean;
-    highlightedVDisk?: string;
-    setHighlightedVDisk?: (id?: string) => void;
-    compactVDiskWidth?: number;
-    withDCMargin?: boolean;
-    withIcon?: boolean;
-    getDisplayState?: VDiskDisplayStateGetter;
-    isAllVDisksLayout?: boolean;
-}
-
-function VDiskItem({
-    vDisk,
-    highlightedVDisk,
-    inactive,
-    setHighlightedVDisk,
-    compactVDiskWidth,
-    withIcon,
-    getDisplayState,
-    isAllVDisksLayout,
-}: DisksItemProps) {
-    // Do not show PDisk popup for VDisk
-    const vDiskToShow = {...vDisk, PDisk: undefined};
-
-    const style: React.CSSProperties = isAllVDisksLayout
-        ? {width: ALL_VDISK_WIDTH, flexBasis: ALL_VDISK_WIDTH}
-        : {width: compactVDiskWidth, flexBasis: compactVDiskWidth};
-
-    return (
-        <div style={style} className={b('vdisk-item', {all: isAllVDisksLayout})}>
-            {isAllVDisksLayout ? (
-                <div
-                    aria-hidden
-                    className={b('vdisk-size-indicator')}
-                    style={{width: compactVDiskWidth}}
-                />
-            ) : null}
-            <VDiskWithDonorsStack
-                data={vDiskToShow}
-                compact={!isAllVDisksLayout}
-                withIcon={withIcon}
-                inactive={inactive}
-                delayOpen={DISKS_POPUP_DEBOUNCE_TIMEOUT}
-                delayClose={DISKS_POPUP_DEBOUNCE_TIMEOUT}
-                highlightedVDisk={highlightedVDisk}
-                setHighlightedVDisk={setHighlightedVDisk}
-                progressBarClassName={b('vdisk-progress-bar')}
-                getDisplayState={getDisplayState}
-            />
-        </div>
-    );
-}
-
-function PDiskItem({
-    vDisk,
-    viewContext,
-    highlightedVDisk,
-    setHighlightedVDisk,
-    withDCMargin,
-    withIcon,
-    getDisplayState,
-}: Omit<DisksItemProps, 'getDisplayState'> & {getDisplayState?: PDiskDisplayStateGetter}) {
-    const vDiskId = vDisk.StringifiedId;
-
-    const isHighlighted = highlightedVDisk === vDiskId;
-
-    if (!vDisk.PDisk) {
-        return null;
-    }
-
-    return (
-        <PDisk
-            className={b('pdisk-item', {['with-dc-margin']: withDCMargin})}
-            progressBarClassName={b('pdisk-progress-bar')}
-            data={vDisk.PDisk}
-            inactive={!isPdiskActive(vDisk.PDisk, viewContext)}
-            showPopup={isHighlighted}
-            delayOpen={DISKS_POPUP_DEBOUNCE_TIMEOUT}
-            delayClose={DISKS_POPUP_DEBOUNCE_TIMEOUT}
-            onShowPopup={() => setHighlightedVDisk?.(vDiskId)}
-            onHidePopup={() => setHighlightedVDisk?.(undefined)}
-            withIcon={withIcon}
-            highlighted={isHighlighted}
-            getDisplayState={getDisplayState}
-        />
-    );
-}
+});

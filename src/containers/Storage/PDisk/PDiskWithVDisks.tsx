@@ -33,7 +33,91 @@ interface PDiskWithVDisksProps extends Omit<PDiskProps, 'topContent'> {
     setHighlightedDisk?: (id?: string) => void;
 }
 
-export function PDiskWithVDisks({
+interface VDiskItemProps {
+    vDisk: PreparedVDisk;
+    vDiskWidth?: number;
+    viewContext?: StorageViewContext;
+    withIcon?: boolean;
+    getVDiskDisplayState?: VDiskDisplayStateGetter;
+    expertMode?: boolean;
+    isAllVDisksLayout?: boolean;
+    delayOpen: number;
+    delayClose: number;
+    highlighted: boolean;
+    setHighlightedDisk?: (id?: string) => void;
+}
+
+const VDiskItem = React.memo(function VDiskItem({
+    vDisk,
+    vDiskWidth,
+    viewContext,
+    withIcon,
+    getVDiskDisplayState,
+    expertMode,
+    isAllVDisksLayout,
+    delayOpen,
+    delayClose,
+    highlighted,
+    setHighlightedDisk,
+}: VDiskItemProps) {
+    const id = vDisk.StringifiedId;
+    const onShowPopup = React.useCallback(() => setHighlightedDisk?.(id), [id, setHighlightedDisk]);
+    const onHidePopup = React.useCallback(
+        () => setHighlightedDisk?.(undefined),
+        [setHighlightedDisk],
+    );
+    const diskWidth = isAllVDisksLayout ? NODE_EXPERT_ALL_VDISK_WIDTH : vDiskWidth;
+
+    return (
+        <div
+            className={b('vdisks-item', {all: isAllVDisksLayout})}
+            style={
+                expertMode
+                    ? {width: diskWidth, flexBasis: diskWidth}
+                    : {
+                          // 1 is small enough for empty disks to be of the minimum width
+                          // but if all of them are empty, `flex-grow: 1` would size them evenly
+                          flexGrow: Number(vDisk.AllocatedSize) || 1,
+                      }
+            }
+        >
+            {isAllVDisksLayout ? (
+                <div
+                    aria-hidden
+                    className={b('vdisk-size-indicator')}
+                    style={{width: vDiskWidth}}
+                />
+            ) : null}
+            <VDisk
+                withIcon={withIcon}
+                data={vDisk}
+                inactive={!isVdiskActive(vDisk, viewContext)}
+                compact={!isAllVDisksLayout}
+                allModeSize={isAllVDisksLayout ? 's' : undefined}
+                delayOpen={delayOpen}
+                delayClose={delayClose}
+                showPopup={highlighted}
+                onShowPopup={onShowPopup}
+                onHidePopup={onHidePopup}
+                highlighted={highlighted}
+                getDisplayState={getVDiskDisplayState}
+                iconSize={expertMode ? NODE_EXPERT_VDISK_ICON_SIZE : undefined}
+                iconGroupSize={expertMode ? NODE_EXPERT_VDISK_ICON_GROUP_SIZE : undefined}
+                indicatorClassName={expertMode ? b('vdisk-indicator') : undefined}
+                progressBarClassName={
+                    expertMode
+                        ? b('vdisk-progress-bar', {
+                              expert: true,
+                              all: isAllVDisksLayout,
+                          })
+                        : undefined
+                }
+            />
+        </div>
+    );
+});
+
+export const PDiskWithVDisks = React.memo(function PDiskWithVDisks({
     vDisks,
     viewContext,
     withIcon,
@@ -63,66 +147,22 @@ export function PDiskWithVDisks({
         <div className={b('vdisks', {expert: expertMode})}>
             {vDiskRows.map((row, rowIndex) => (
                 <div key={row[0]?.vDisk.StringifiedId ?? rowIndex} className={b('vdisks-row')}>
-                    {row.map(({vDisk, width: vDiskWidth}) => {
-                        const vDiskId = vDisk.StringifiedId;
-                        const highlighted = highlightedDisk === vDiskId;
-                        const diskWidth = isAllVDisksLayout
-                            ? NODE_EXPERT_ALL_VDISK_WIDTH
-                            : vDiskWidth;
-
-                        return (
-                            <div
-                                key={vDiskId}
-                                className={b('vdisks-item', {all: isAllVDisksLayout})}
-                                style={
-                                    expertMode
-                                        ? {width: diskWidth, flexBasis: diskWidth}
-                                        : {
-                                              // 1 is small enough for empty disks to be of the minimum width
-                                              // but if all of them are empty, `flex-grow: 1` would size them evenly
-                                              flexGrow: Number(vDisk.AllocatedSize) || 1,
-                                          }
-                                }
-                            >
-                                {isAllVDisksLayout ? (
-                                    <div
-                                        aria-hidden
-                                        className={b('vdisk-size-indicator')}
-                                        style={{width: vDiskWidth}}
-                                    />
-                                ) : null}
-                                <VDisk
-                                    withIcon={withVDiskIcons ?? withIcon}
-                                    data={vDisk}
-                                    inactive={!isVdiskActive(vDisk, viewContext)}
-                                    compact={!isAllVDisksLayout}
-                                    allModeSize={isAllVDisksLayout ? 's' : undefined}
-                                    delayOpen={delayOpen}
-                                    delayClose={delayClose}
-                                    showPopup={highlighted}
-                                    onShowPopup={() => setHighlightedDisk?.(vDiskId)}
-                                    onHidePopup={() => setHighlightedDisk?.(undefined)}
-                                    highlighted={highlighted}
-                                    getDisplayState={getVDiskDisplayState}
-                                    iconSize={expertMode ? NODE_EXPERT_VDISK_ICON_SIZE : undefined}
-                                    iconGroupSize={
-                                        expertMode ? NODE_EXPERT_VDISK_ICON_GROUP_SIZE : undefined
-                                    }
-                                    indicatorClassName={
-                                        expertMode ? b('vdisk-indicator') : undefined
-                                    }
-                                    progressBarClassName={
-                                        expertMode
-                                            ? b('vdisk-progress-bar', {
-                                                  expert: true,
-                                                  all: isAllVDisksLayout,
-                                              })
-                                            : undefined
-                                    }
-                                />
-                            </div>
-                        );
-                    })}
+                    {row.map(({vDisk, width: vDiskWidth}) => (
+                        <VDiskItem
+                            key={vDisk.StringifiedId}
+                            vDisk={vDisk}
+                            vDiskWidth={vDiskWidth}
+                            viewContext={viewContext}
+                            withIcon={withVDiskIcons ?? withIcon}
+                            getVDiskDisplayState={getVDiskDisplayState}
+                            expertMode={expertMode}
+                            isAllVDisksLayout={isAllVDisksLayout}
+                            delayOpen={delayOpen}
+                            delayClose={delayClose}
+                            highlighted={highlightedDisk === vDisk.StringifiedId}
+                            setHighlightedDisk={setHighlightedDisk}
+                        />
+                    ))}
                 </div>
             ))}
         </div>
@@ -138,4 +178,4 @@ export function PDiskWithVDisks({
             topContent={vDisksContent}
         />
     );
-}
+});
