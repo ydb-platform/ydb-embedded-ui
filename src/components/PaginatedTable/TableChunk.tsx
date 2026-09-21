@@ -113,8 +113,9 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         };
     }, [shouldFetch, isTimeoutActive]);
 
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
         if (currentData) {
+            // Consumers derive row dimensions from the response before loaded rows are painted.
             onDataFetched({
                 ...currentData,
                 data: currentData.data as T[],

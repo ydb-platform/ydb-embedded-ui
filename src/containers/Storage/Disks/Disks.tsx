@@ -135,7 +135,7 @@ function VDiskItem({
             ) : null}
             <VDiskWithDonorsStack
                 data={vDisk}
-                hidePDiskInPopup
+                hideMainPDiskInPopup
                 compact={!isAllVDisksLayout}
                 withIcon={withIcon}
                 inactive={inactive}

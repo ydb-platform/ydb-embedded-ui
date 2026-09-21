@@ -929,6 +929,60 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         );
     });
 
+    test('renders loaded node rows at their final height on initial and cached loads', async ({
+        page,
+    }) => {
+        await page.addInitScript(() => {
+            const heights: number[] = [];
+            Object.assign(window, {observedNodeRowHeights: heights});
+            const observer = new MutationObserver(() => {
+                const row = Array.from(
+                    document.querySelectorAll<HTMLTableRowElement>('.ydb-paginated-table__row'),
+                ).find((element) =>
+                    Array.from(element.cells).some((cell) => cell.textContent === '7000'),
+                );
+                if (!row?.querySelector('.pdisk-storage__vdisks-item')) {
+                    return;
+                }
+                const height = row.getBoundingClientRect().height;
+                if (height > 0 && height !== heights[heights.length - 1]) {
+                    heights.push(height);
+                }
+            });
+            observer.observe(document, {
+                subtree: true,
+                childList: true,
+                attributes: true,
+                attributeFilter: ['style', 'class'],
+            });
+        });
+        const getObservedHeights = () =>
+            page.evaluate(
+                () =>
+                    (window as typeof window & {observedNodeRowHeights: number[]})
+                        .observedNodeRowHeights,
+            );
+
+        await prepareNodesPage(page, VDisksGroupBy.All, PDisksGroupBy.Space);
+        const row = page.locator('.ydb-paginated-table__row').filter({
+            has: page.getByText('7000', {exact: true}),
+        });
+        await expect(row).toHaveCSS('height', '155px');
+        expect(await getObservedHeights()).toEqual([155]);
+
+        const typeFilter = page.getByTestId('storage-type-filter');
+        await typeFilter.getByRole('radio', {name: 'Groups', exact: true}).check();
+        await expect(page.getByRole('link', {name: '9000000000', exact: true})).toBeVisible();
+        await page.evaluate(() => {
+            (
+                window as typeof window & {observedNodeRowHeights: number[]}
+            ).observedNodeRowHeights.length = 0;
+        });
+        await typeFilter.getByRole('radio', {name: 'Nodes', exact: true}).check();
+        await expect(row).toHaveCSS('height', '155px');
+        expect(await getObservedHeights()).toEqual([155]);
+    });
+
     test('keeps node PDisk layout stable across hover and Expert mode changes', async ({page}) => {
         await prepareNodesPage(page, VDisksGroupBy.State, PDisksGroupBy.All);
 

@@ -8,13 +8,15 @@ import {Stack} from '../Stack/Stack';
 import type {VDiskProps} from './VDisk';
 import {VDisk} from './VDisk';
 
-interface VDiskWithDonorsStackProps extends Omit<VDiskProps, 'withOpaqueBackground'> {
+interface VDiskWithDonorsStackProps
+    extends Omit<VDiskProps, 'withOpaqueBackground' | 'hidePDiskInPopup'> {
     data?: PreparedVDisk;
     className?: string;
     stackClassName?: string;
     highlightedVDisk?: string;
     setHighlightedVDisk?: (id?: string) => void;
     progressBarClassName?: string;
+    hideMainPDiskInPopup?: boolean;
 }
 
 const diskInStackPlacement: PopupPlacement = ['left', 'right'];
@@ -27,7 +29,7 @@ export function VDiskWithDonorsStack({
     stackClassName,
     withIcon,
     compact,
-    hidePDiskInPopup,
+    hideMainPDiskInPopup,
     highlightedVDisk,
     setHighlightedVDisk,
     showPopup: _showPopup,
@@ -71,7 +73,7 @@ export function VDiskWithDonorsStack({
     const mainVDiskProps: Partial<VDiskProps> = {
         ...restProps,
         compact,
-        hidePDiskInPopup,
+        hidePDiskInPopup: hideMainPDiskInPopup,
         withIcon,
         showPopup: isHighlighted,
         highlighted: isHighlighted,
