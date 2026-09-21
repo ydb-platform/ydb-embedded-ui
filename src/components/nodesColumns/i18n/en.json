@@ -1,6 +1,7 @@
 {
   "node-id": "Node ID",
   "host": "Host",
+  "field_ic-port": "IC port",
   "database": "Database",
   "node-name": "Node Name",
   "dc": "DC",

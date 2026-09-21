@@ -12,6 +12,7 @@ export const NODES_COLUMNS_WIDTH_LS_KEY = 'nodesTableColumnsWidth';
 export const NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',
     Host: 'Host',
+    ICPort: 'ICPort',
     NetworkHost: 'NetworkHost',
     Database: 'Database',
     NodeName: 'NodeName',
@@ -66,6 +67,9 @@ export const NODES_COLUMNS_TITLES = {
     },
     get Host() {
         return i18n('host');
+    },
+    get ICPort() {
+        return i18n('field_ic-port');
     },
     get NetworkHost() {
         return i18n('host');
@@ -219,6 +223,7 @@ export function getNodesGroupByFieldTitle(groupByField: NodesGroupByField) {
 export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredField[]> = {
     NodeId: ['NodeId'],
     Host: ['Host', 'Rack', 'Database', 'SystemState'],
+    ICPort: ['SystemState'],
     NetworkHost: ['Host', 'Rack', 'Database', 'SystemState', 'ConnectStatus'],
     Database: ['Database'],
     NodeName: ['NodeName'],
@@ -253,6 +258,7 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
 const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undefined> = {
     NodeId: 'NodeId',
     Host: 'Host',
+    ICPort: undefined,
     NetworkHost: 'Host',
     Database: 'Database',
     NodeName: 'NodeName',
