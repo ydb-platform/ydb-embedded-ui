@@ -191,7 +191,7 @@ function getAllModeAccessibleName(
 
 function getAccessibleName(
     data: PreparedPDisk,
-    {mode, allMode, isNoData, allocatedPercent}: PDiskDisplayState,
+    {mode, allMode, isNoData, allocatedPercent, driveType}: PDiskDisplayState,
 ) {
     if (!mode) {
         return undefined;
@@ -208,6 +208,11 @@ function getAccessibleName(
     const {State, Device, Realtime} = isNoData ? {} : data;
 
     switch (mode) {
+        case 'driveType':
+            return i18n('context_drive-type-accessible-name', {
+                disk: diskName,
+                driveType: driveType || noData,
+            });
         case 'state':
             return i18n('context_state-accessible-name', {disk: diskName, state: State || noData});
         case 'space':
@@ -325,6 +330,7 @@ export const PDisk = ({
     });
 
     const tone = getDiskBarTone({
+        driveType: displayState.driveType,
         severity: displayState.severity,
         showIndicator,
         indicator: displayState.icon,

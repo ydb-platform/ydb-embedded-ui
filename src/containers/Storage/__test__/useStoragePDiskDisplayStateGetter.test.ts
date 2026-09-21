@@ -52,6 +52,43 @@ describe('useStoragePDiskDisplayStateGetter', () => {
         });
     });
 
+    test('keeps N/D without Whiteboard data even when the drive type is known', () => {
+        mockUsePDisksGroupByParam.mockReturnValue(PDisksGroupBy.DriveType);
+        const {result} = renderHook(() => useStoragePDiskDisplayStateGetter());
+
+        expect(result.current({Type: 'SSD', HasWhiteboardData: false})).toMatchObject({
+            mode: 'driveType',
+            driveType: undefined,
+            icon: undefined,
+            isNoData: true,
+            showNoDataPlaceholder: true,
+        });
+    });
+
+    test('shows a missing indicator when the drive type is unavailable', () => {
+        mockUsePDisksGroupByParam.mockReturnValue(PDisksGroupBy.DriveType);
+        const {result} = renderHook(() => useStoragePDiskDisplayStateGetter());
+
+        expect(result.current({HasWhiteboardData: true})).toMatchObject({
+            mode: 'driveType',
+            driveType: undefined,
+            icon: CircleQuestionFill,
+        });
+    });
+
+    test('shows N/D without an icon when both drive type and Whiteboard are missing', () => {
+        mockUsePDisksGroupByParam.mockReturnValue(PDisksGroupBy.DriveType);
+        const {result} = renderHook(() => useStoragePDiskDisplayStateGetter());
+
+        expect(result.current({HasWhiteboardData: false})).toMatchObject({
+            mode: 'driveType',
+            driveType: undefined,
+            icon: undefined,
+            isNoData: true,
+            showNoDataPlaceholder: true,
+        });
+    });
+
     test.each([
         {groupBy: PDisksGroupBy.State, mode: 'state', allocatedPercent: undefined, width: 55},
         {groupBy: PDisksGroupBy.Space, mode: 'space', allocatedPercent: 40, width: 55},

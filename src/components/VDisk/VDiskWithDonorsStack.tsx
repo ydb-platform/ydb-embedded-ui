@@ -27,6 +27,7 @@ export function VDiskWithDonorsStack({
     stackClassName,
     withIcon,
     compact,
+    hidePDiskInPopup,
     highlightedVDisk,
     setHighlightedVDisk,
     showPopup: _showPopup,
@@ -70,6 +71,7 @@ export function VDiskWithDonorsStack({
     const mainVDiskProps: Partial<VDiskProps> = {
         ...restProps,
         compact,
+        hidePDiskInPopup,
         withIcon,
         showPopup: isHighlighted,
         highlighted: isHighlighted,

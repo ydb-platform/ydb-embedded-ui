@@ -25,7 +25,7 @@ export type ExtendedDiskColor =
  */
 export type DiskColor = EFlag | ExtendedDiskColor;
 
-export type DiskBarTone = DiskColor | 'DarkGrey' | 'LightGrey';
+export type DiskBarTone = DiskColor | 'DarkGrey' | 'LightGrey' | PDiskType;
 
 /**
  * Basic severity levels for data storage (0-5).

@@ -18,7 +18,10 @@ import {ClusterStorageTable} from '../paginatedTable/paginatedTable';
 import {
     ALL_GREEN_VDISK_INDEX,
     MISSING_FRONT_QUEUES_VDISK_INDEX,
+    MISSING_PDISK_TYPE_INDEX,
+    MISSING_WHITEBOARD_PDISK_INDEX,
     MISSING_WHITEBOARD_VDISK_INDEX,
+    UNKNOWN_PDISK_TYPE_INDEX,
     createMockStorageGroupsResponse,
     createMockStorageNodesResponse,
 } from './mockStorageGroups';
@@ -30,7 +33,6 @@ const STATE_ONLY_OK_VDISK_INDEX = 4;
 const LIGHT_YELLOW_VDISK_INDEX = 5;
 const RECOVERY_ERROR_VDISK_INDEX = 8;
 const PDISK_ERROR_VDISK_INDEX = 9;
-const MISSING_WHITEBOARD_PDISK_INDEX = 9;
 const TRANSPARENT_BACKGROUND = 'rgba(0, 0, 0, 0)';
 const MISSING_INDICATOR_COLOR = 'rgb(162, 162, 162)';
 const PDISK_ERROR_ICON_COLOR_TOKEN = '--g-color-base-danger-heavy';
@@ -596,6 +598,140 @@ test('wheel over disk popups scrolls the page', async ({page}) => {
     }
 });
 
+test.describe('Drive type - groups expert mode', () => {
+    for (const theme of ['light', 'dark']) {
+        test(`shows drive types and preserves group-only selection in ${theme} theme`, async ({
+            page,
+        }, testInfo) => {
+            await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+            await page.addInitScript(() => {
+                localStorage.setItem('enableStorageExpertMode', 'true');
+                localStorage.setItem('storageExpertMode', 'true');
+                localStorage.setItem(
+                    'storageGroupsSelectedColumns',
+                    JSON.stringify([
+                        {id: 'GroupId', selected: true},
+                        {id: 'VDisksPDisks', selected: true},
+                    ]),
+                );
+            });
+            await page.setViewportSize({width: 1900, height: 1000});
+            await setupVDiskColoringMocks(page);
+            await gotoStoragePage(page, VDisksGroupBy.State);
+            await hideFloatingPopups(page);
+            await expectStorageGroupRowsReady(page);
+
+            const panel = page.locator('.ydb-storage-expert-mode-panel');
+            const selectors = panel.getByRole('radio', {name: 'Drive type', exact: true});
+            await expect(selectors).toHaveCount(2);
+            const row = page.locator('.ydb-paginated-table__row').filter({
+                has: page.getByRole('link', {name: '9000000000', exact: true}),
+            });
+            await expect(row).toBeVisible();
+            await expect(getVDiskItems(row).nth(0).getByRole('link')).toHaveText('N/D');
+            await expect(
+                row.locator('.ydb-storage-disks__pdisk-item').nth(9).getByRole('link'),
+            ).toHaveText('N/D');
+            await selectors.first().check();
+            await selectors.last().check();
+            await expect(page).toHaveURL(/vdisksGroupBy=DriveType/);
+            await expect(page).toHaveURL(/pdisksGroupBy=DriveType/);
+
+            for (const [index, type, color] of [
+                [1, 'SSD', 'misc-medium'],
+                [2, 'HDD', 'utility-light'],
+                [6, 'NVME', 'info-light'],
+            ] as const) {
+                const vDisk = getVDiskItems(row).nth(index).getByRole('link');
+                const pDisk = row
+                    .locator('.ydb-storage-disks__pdisk-item')
+                    .nth(index)
+                    .getByRole('link');
+                for (const disk of [vDisk, pDisk]) {
+                    await expect(disk).toHaveAccessibleName(new RegExp(`Drive type: ${type}\\.$`));
+                    await expect(disk).toHaveText(type);
+                    const bar = disk.getByRole('meter');
+                    await expect(bar).toHaveCSS(
+                        'background-color',
+                        await resolveThemeColor(page, `--g-color-base-${color}`),
+                    );
+                    await expect(getVDiskFillBar(bar)).toHaveCount(0);
+                }
+            }
+            await expect(
+                row.locator('.ydb-storage-disks__pdisk-item').nth(0).getByRole('link'),
+            ).toHaveText('NVME');
+            for (const index of [MISSING_PDISK_TYPE_INDEX, UNKNOWN_PDISK_TYPE_INDEX]) {
+                for (const disk of [
+                    getVDiskItems(row).nth(index).getByRole('link'),
+                    row.locator('.ydb-storage-disks__pdisk-item').nth(index).getByRole('link'),
+                ]) {
+                    await expect(disk).toHaveAccessibleName(/Drive type: N\/D\.$/);
+                    await expect(disk.locator('.g-icon')).toHaveCount(1);
+                    await expect(disk).not.toContainText('future-drive-type');
+                }
+            }
+            const donor = page.getByRole('link', {
+                name: 'Donor VDisk 9000000001-1-0-0-100 on node 7100. Drive type: SSD.',
+                exact: true,
+            });
+            await expect(donor).toHaveText('SSD');
+            await expect(donor.getByRole('meter')).not.toHaveClass(/_striped/);
+            for (const disk of [
+                getVDiskItems(row).nth(0).getByRole('link'),
+                getVDiskItems(row).nth(9).getByRole('link'),
+                row.locator('.ydb-storage-disks__pdisk-item').nth(9).getByRole('link'),
+                page.getByRole('link', {
+                    name: 'Donor VDisk 9000000001-1-0-0-109 on node 7109. PDisk Whiteboard: N/D. Drive type: N/D.',
+                    exact: true,
+                }),
+            ]) {
+                await expect(disk).toHaveText('N/D');
+                await expect(disk).toHaveAccessibleName(/Whiteboard: N\/D\. Drive type: N\/D\.$/);
+                await expect(disk.locator('.g-icon')).toHaveCount(0);
+                await expect(disk.getByRole('meter')).toHaveClass(/storage-disk-progress-bar_grey/);
+            }
+            await expectStorageRowsScreenshot(page, `drive-type-${theme}.png`);
+            await page.screenshot({path: testInfo.outputPath(`drive-type-${theme}-page.png`)});
+
+            await page.reload();
+            await expect(selectors.first()).toBeChecked();
+            await expect(selectors.last()).toBeChecked();
+            await page.route('**/viewer/json/nodes?*', (route) =>
+                route.fulfill({json: createMockStorageNodesResponse()}),
+            );
+            await page
+                .getByTestId('storage-type-filter')
+                .getByRole('radio', {name: 'Nodes', exact: true})
+                .check();
+            await expect(panel.getByRole('radio', {name: 'Drive type', exact: true})).toHaveCount(
+                0,
+            );
+            await expect(page.locator('.storage-disk-progress-bar_mode-drivetype')).toHaveCount(0);
+            await page
+                .getByTestId('storage-type-filter')
+                .getByRole('radio', {name: 'Groups', exact: true})
+                .check();
+            await expect(selectors.first()).toBeChecked();
+            await expect(selectors.last()).toBeChecked();
+            await page.goto(
+                `${storagePage}?database=${encodeURIComponent(DATABASE)}&type=groups&storageExpertMode=true`,
+            );
+            await expect(selectors.first()).toBeChecked();
+            await expect(selectors.last()).toBeChecked();
+        });
+    }
+
+    test('does not apply Drive type outside expert mode', async ({page}) => {
+        await page.addInitScript(() =>
+            localStorage.setItem('storagePDisksGroupBy', JSON.stringify('DriveType')),
+        );
+        await preparePage(page, VDisksGroupBy.DriveType, false);
+        await expect(page.locator('.ydb-storage-expert-mode-panel')).toHaveCount(0);
+        await expect(page.locator('.storage-disk-progress-bar_mode-drivetype')).toHaveCount(0);
+    });
+});
+
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 60_000});
 
@@ -915,7 +1051,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         const panel = page.locator('.ydb-storage-expert-mode-panel');
         for (const [index, modes] of [VDISK_GROUP_BY_MODES, PDISK_GROUP_BY_MODES].entries()) {
             const legendRow = panel.locator(':scope > .g-flex').nth(index);
-            for (const mode of modes) {
+            for (const mode of [...modes, {value: VDisksGroupBy.DriveType}]) {
                 await legendRow.locator(`input[type="radio"][value="${mode.value}"]`).check();
                 const noData = legendRow.locator('.g-label').filter({hasText: /^No data$/});
                 if (mode.value === VDisksGroupBy.All) {

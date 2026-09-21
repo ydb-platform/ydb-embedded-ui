@@ -120,9 +120,6 @@ function VDiskItem({
     getDisplayState,
     isAllVDisksLayout,
 }: DisksItemProps) {
-    // Do not show PDisk popup for VDisk
-    const vDiskToShow = {...vDisk, PDisk: undefined};
-
     const style: React.CSSProperties = isAllVDisksLayout
         ? {width: ALL_VDISK_WIDTH, flexBasis: ALL_VDISK_WIDTH}
         : {width: compactVDiskWidth, flexBasis: compactVDiskWidth};
@@ -137,7 +134,8 @@ function VDiskItem({
                 />
             ) : null}
             <VDiskWithDonorsStack
-                data={vDiskToShow}
+                data={vDisk}
+                hidePDiskInPopup
                 compact={!isAllVDisksLayout}
                 withIcon={withIcon}
                 inactive={inactive}
