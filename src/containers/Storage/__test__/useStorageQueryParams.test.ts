@@ -96,6 +96,15 @@ describe('getStorageGroupByCleanupPatch', () => {
 });
 
 describe('PDisk expert mode query params', () => {
+    test('accepts DriveType for groups and falls back to State for nodes', () => {
+        const constants = jest.requireActual('../StorageExpertModePanel/constants');
+
+        expect(constants.vdisksGroupBySchema.parse('DriveType')).toBe('DriveType');
+        expect(constants.pdisksGroupBySchema.parse('DriveType')).toBe('DriveType');
+        expect(constants.nodesVdisksGroupBySchema.parse('DriveType')).toBe('State');
+        expect(constants.nodesPdisksGroupBySchema.parse('DriveType')).toBe('State');
+    });
+
     test('normalizes an invalid PDisk mode to State', () => {
         const constants = jest.requireActual('../StorageExpertModePanel/constants');
 

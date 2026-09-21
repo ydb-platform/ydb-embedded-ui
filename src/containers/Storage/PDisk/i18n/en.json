@@ -1,4 +1,5 @@
 {
+  "context_drive-type-accessible-name": "{{disk}}. Drive type: {{driveType}}.",
   "context_no-data": "N/D",
   "context_pdisk": "PDisk {{pdiskId}}",
   "context_pdisk-no-whiteboard": "{{disk}}. Whiteboard: {{noData}}",

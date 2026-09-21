@@ -1,4 +1,5 @@
 {
+  "value_drive-type": "Drive type",
   "label_vdisks": "VDisks:",
   "label_pdisks": "PDisks:",
   "value_state": "State",

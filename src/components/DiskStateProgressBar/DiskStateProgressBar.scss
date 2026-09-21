@@ -133,6 +133,21 @@
         --entity-state-icon-color: var(--g-color-text-info);
     }
 
+    &_mode-drivetype {
+        @each $type, $theme, $intensity in (ssd misc medium, hdd utility light, nvme info light) {
+            &#{$block}_#{$type} {
+                --entity-state-background-color: var(--g-color-base-#{$theme}-#{$intensity});
+                --ydb-progress-bar-font-color: var(--g-color-text-#{$theme});
+
+                &#{$block}_highlighted {
+                    --entity-state-background-color: var(
+                        --g-color-base-#{$theme}-#{$intensity}-hover
+                    );
+                }
+            }
+        }
+    }
+
     &_mode-all {
         &#{$block}_green {
             --entity-state-background-color: transparent;

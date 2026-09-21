@@ -3,6 +3,7 @@ import {PDisksGroupBy, VDisksGroupBy} from '../constants';
 
 import {AllLegend} from './AllLegend';
 import {CompactionLegend} from './CompactionLegend';
+import {DriveTypeLegend} from './DriveTypeLegend';
 import {FrontQueuesLegend} from './FrontQueuesLegend';
 import {PDiskDecommitLegend} from './PDiskDecommitLegend';
 import {PDiskDeviceLegend} from './PDiskDeviceLegend';
@@ -18,6 +19,8 @@ export function renderVDiskLegend(
     selectionScope: SpaceLegendSelectionScope,
 ) {
     switch (vdisksGroupBy) {
+        case VDisksGroupBy.DriveType:
+            return <DriveTypeLegend />;
         case VDisksGroupBy.State:
             return <StateLegend />;
         case VDisksGroupBy.Space:
@@ -38,6 +41,8 @@ export function renderPDiskLegend(
     selectionScope: SpaceLegendSelectionScope,
 ) {
     switch (pdisksGroupBy) {
+        case PDisksGroupBy.DriveType:
+            return <DriveTypeLegend />;
         case PDisksGroupBy.State:
             return <PDiskStateLegend />;
         case PDisksGroupBy.Space:

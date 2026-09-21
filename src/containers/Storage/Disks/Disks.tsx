@@ -66,9 +66,6 @@ const VDiskItem = React.memo(function VDiskItem({
     renderContent,
     placeholderProps,
 }: DisksItemProps) {
-    // Do not show PDisk popup for VDisk
-    const vDiskToShow = React.useMemo(() => ({...vDisk, PDisk: undefined}), [vDisk]);
-
     const style: React.CSSProperties = isAllVDisksLayout
         ? {width: ALL_VDISK_WIDTH, flexBasis: ALL_VDISK_WIDTH}
         : {width: compactVDiskWidth, flexBasis: compactVDiskWidth};
@@ -92,7 +89,8 @@ const VDiskItem = React.memo(function VDiskItem({
             <VDiskWithDonorsStack
                 renderContent={renderContent}
                 placeholderProps={placeholderProps}
-                data={vDiskToShow}
+                data={vDisk}
+                hidePDiskInPopup
                 compact={!isAllVDisksLayout}
                 withIcon={withIcon}
                 inactive={inactive}
