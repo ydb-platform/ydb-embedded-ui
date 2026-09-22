@@ -68,7 +68,7 @@ export function VDiskTypeLabel({type}: {type?: string}) {
 export function VDiskCapacityAlertLabel({value}: {value?: string}) {
     const capacityAlert = normalizeCapacityAlert(value);
     if (!capacityAlert) {
-        return null;
+        return <VDiskStatusLabel size="xs" value={i18n('value_no-data')} theme="unknown" />;
     }
 
     return (

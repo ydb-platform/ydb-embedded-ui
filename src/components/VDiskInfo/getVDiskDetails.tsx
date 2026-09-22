@@ -1,7 +1,6 @@
 import {isNil} from 'lodash';
 
 import type {NodeMetadata} from '../../types/store/nodesList';
-import {normalizeCapacityAlert} from '../../utils/capacityAlerts';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {formatMetricPercent, formatStorageMetricPair} from '../../utils/storageMetrics';
@@ -71,15 +70,12 @@ export function getVDiskCapacityItems(
             content: formatStorageMetricPair(size.AllocatedSize, size.SizeLimit),
         });
     }
-    const capacityAlert = normalizeCapacityAlert(data.CapacityAlert);
-    if (capacityAlert) {
-        items.push({
-            id: 'capacity-alert',
-            name: i18n('field_capacity-alert'),
-            content: <VDiskCapacityAlertLabel value={capacityAlert} />,
-            note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
-        });
-    }
+    items.push({
+        id: 'capacity-alert',
+        name: i18n('field_capacity-alert'),
+        content: <VDiskCapacityAlertLabel value={data.CapacityAlert} />,
+        note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+    });
     for (const [id, name, value, note] of [
         [
             'vdisk-slot-usage',
