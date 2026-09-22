@@ -166,8 +166,8 @@ function DiskHeader({data = {}}: {data?: PreparedVDisk}) {
             </Flex>
             <Flex gap={1} wrap="wrap" alignItems="center">
                 <VDiskStateLabel state={data.VDiskState} />
-                <VDiskDonorLabel donorMode={DonorMode} />
                 <VDiskReplicationStatus data={data} />
+                <VDiskDonorLabel donorMode={DonorMode} />
             </Flex>
         </React.Fragment>
     );
