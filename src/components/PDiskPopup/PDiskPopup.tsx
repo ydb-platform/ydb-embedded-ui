@@ -8,6 +8,7 @@ import {getPDiskPagePath} from '../../routes';
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
+import type {NodeMetadata} from '../../types/store/nodesList';
 import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculatePDiskSeverity';
@@ -35,7 +36,7 @@ const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
 export const preparePDiskData = (
     data: PreparedPDisk,
-    nodeData?: {Host?: string; DC?: string},
+    nodeData?: NodeMetadata,
     capacityMetricsEnabled = false,
 ) => {
     const {AvailableSize, TotalSize, NodeId, Path, Realtime, Type, Device} = data;
@@ -171,14 +172,17 @@ export const buildPDiskFooter = (
 
 interface PDiskPopupProps {
     data: PreparedPDisk;
+    nodeData?: NodeMetadata;
+    nameMaxWidth?: number;
 }
 
-export const PDiskPopup = ({data}: PDiskPopupProps) => {
+export const PDiskPopup = ({data, nodeData: parentNodeData, nameMaxWidth}: PDiskPopupProps) => {
     const database = useDatabaseFromQuery();
     const hasDeveloperUi = useHasDeveloperUi();
     const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
-    const nodeData = isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId);
+    const nodeData =
+        parentNodeData ?? (isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId));
 
     const info = React.useMemo(
         () => preparePDiskData(data, nodeData, capacityMetricsEnabled),
@@ -205,7 +209,7 @@ export const PDiskPopup = ({data}: PDiskPopupProps) => {
             items={info}
             headerLabels={headerLabels}
             footer={footer}
-            nameMaxWidth={capacityMetricsEnabled ? 220 : 100}
+            nameMaxWidth={nameMaxWidth ?? (capacityMetricsEnabled ? 220 : 100)}
         />
     );
 };

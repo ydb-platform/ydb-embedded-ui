@@ -36,11 +36,7 @@ import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/Evi
 import {InternalLink} from '../InternalLink';
 import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
-import {
-    buildPDiskFooter,
-    preparePDiskData,
-    preparePDiskHeaderLabels,
-} from '../PDiskPopup/PDiskPopup';
+import {PDiskPopup} from '../PDiskPopup/PDiskPopup';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 import type {
     YDBDefinitionListHeaderLabel,
@@ -509,25 +505,9 @@ export const VDiskPopup = ({data, nodeData: parentNodeData, onClose}: VDiskPopup
         [data, isFullData, hasDeveloperUi, getVDiskLink, handleAfterEvictVDisk],
     );
 
-    const pdiskInfo = React.useMemo(
-        () =>
-            isFullData &&
-            data.PDisk &&
-            preparePDiskData(data.PDisk, nodeData, capacityMetricsEnabled),
-        [data, nodeData, isFullData, capacityMetricsEnabled],
-    );
-    const pdiskHeaderLabels = React.useMemo(
-        () => (isFullData && data.PDisk ? preparePDiskHeaderLabels(data.PDisk) : []),
-        [data, isFullData],
-    );
-
-    const pdiskFooter = React.useMemo(
-        () => (isFullData && data.PDisk ? buildPDiskFooter(data.PDisk, hasDeveloperUi) : null),
-        [data, isFullData, hasDeveloperUi],
-    );
+    const pdisk = isFullData ? data.PDisk : undefined;
 
     const vdiskId = isFullData ? data.StringifiedId : undefined;
-    const pdiskId = isFullData ? data.PDisk?.StringifiedId : undefined;
     const nameMaxWidth = isFullData && capacityMetricsEnabled ? 220 : 100;
 
     return (
@@ -541,18 +521,10 @@ export const VDiskPopup = ({data, nodeData: parentNodeData, onClose}: VDiskPopup
                 nameMaxWidth={nameMaxWidth}
                 footer={vdiskFooter}
             />
-            {pdiskInfo && isViewerUser && (
+            {pdisk && isViewerUser && (
                 <React.Fragment>
                     <Divider className={b('custom-divider')} />
-                    <YDBDefinitionList
-                        compact
-                        title="PDisk"
-                        titleSuffix={{title: pdiskId ?? EMPTY_DATA_PLACEHOLDER, copyText: pdiskId}}
-                        items={pdiskInfo}
-                        headerLabels={pdiskHeaderLabels}
-                        footer={pdiskFooter}
-                        nameMaxWidth={nameMaxWidth}
-                    />
+                    <PDiskPopup data={pdisk} nodeData={nodeData} nameMaxWidth={nameMaxWidth} />
                 </React.Fragment>
             )}
         </div>
