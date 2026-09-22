@@ -476,7 +476,12 @@ export function VDiskPopup({data, nodeData: parentNodeData, onClose}: VDiskPopup
     const vdiskId = fullData?.StringifiedId;
     const handleAfterEvictVDisk = () => {
         dispatch(
-            api.util.invalidateTags(['TableData', 'StorageData', {type: 'VDiskData', id: vdiskId}]),
+            api.util.invalidateTags([
+                'TableData',
+                'StorageData',
+                'PDiskData',
+                {type: 'VDiskData', id: vdiskId},
+            ]),
         );
         onClose?.();
     };
