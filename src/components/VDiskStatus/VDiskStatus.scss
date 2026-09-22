@@ -1,0 +1,33 @@
+@use '../../styles/mixins.scss';
+
+.ydb-vdisk-status {
+    &__label_danger-heavy {
+        @include mixins.danger-heavy-label();
+    }
+
+    &__tooltip {
+        display: inline-flex;
+
+        cursor: pointer;
+
+        border-radius: var(--g-border-radius-s);
+
+        &:focus-visible {
+            outline: 2px solid var(--g-color-line-focus);
+            outline-offset: 2px;
+        }
+    }
+
+    &__replication-progress {
+        min-height: 24px;
+        padding: 0 10px;
+
+        color: var(--g-color-text-info);
+        border-radius: var(--g-border-radius-s);
+        background-color: var(--g-color-base-selection);
+    }
+
+    &__progress-bar {
+        width: 96px;
+    }
+}

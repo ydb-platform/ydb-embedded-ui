@@ -7,6 +7,7 @@ import {
 } from '@gravity-ui/icons';
 import type {IconData, LabelProps} from '@gravity-ui/uikit';
 
+import {EFlag} from '../../types/api/enums';
 import {EVDiskDetailedReplicationStatus, EVDiskState} from '../../types/api/vdisk';
 import {
     NOT_AVAILABLE_SEVERITY,
@@ -17,7 +18,7 @@ import {
 import {calculateStateIcon} from '../../utils/disks/iconCalculators';
 import type {PreparedVDisk} from '../../utils/disks/types';
 
-import {vDiskPopupKeyset as i18n} from './i18n';
+import {vDiskStatusKeyset as i18n} from './i18n';
 
 export interface VDiskStatusLabel {
     value: string;
@@ -26,6 +27,10 @@ export interface VDiskStatusLabel {
     icon?: IconData;
     tooltip?: string;
     dangerHeavy?: boolean;
+}
+
+export function isVDiskFlagVisible(flag?: EFlag): flag is EFlag {
+    return Boolean(flag && flag !== EFlag.Grey);
 }
 
 export function getVDiskTypeTooltip(type?: string): string | undefined {

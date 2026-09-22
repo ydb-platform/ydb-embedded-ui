@@ -1,118 +1,48 @@
 import React from 'react';
 
 import {ChevronDown, ChevronUp, Wrench} from '@gravity-ui/icons';
-import type {LabelProps} from '@gravity-ui/uikit';
-import {
-    Button,
-    ClipboardButton,
-    Divider,
-    Flex,
-    Icon,
-    Label,
-    Progress,
-    Text,
-    Tooltip,
-} from '@gravity-ui/uikit';
-import {capitalize, isNil} from 'lodash';
+import {Button, ClipboardButton, Divider, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import {selectNodesMap} from '../../store/reducers/nodesList';
-import {EFlag, isCapacityAlert} from '../../types/api/enums';
 import type {TVDiskID} from '../../types/api/vdisk';
-import {EVDiskDetailedReplicationStatus} from '../../types/api/vdisk';
 import type {NodeMetadata} from '../../types/store/nodesList';
-import {getCapacityAlertTheme, normalizeCapacityAlert} from '../../utils/capacityAlerts';
 import {cn} from '../../utils/cn';
 import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatPercent, parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
+import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
-import {VDISK_LABEL_CONFIG} from '../../utils/disks/constants';
 import {isFullVDiskData} from '../../utils/disks/helpers';
-import {calculateFrontQueuesIcon, getFlagIconWithColor} from '../../utils/disks/iconCalculators';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {formatMetricPercent, formatStorageMetricPair} from '../../utils/storageMetrics';
-import {formatDurationToShortTimeFormat} from '../../utils/timeParsers';
 import {bytesToSpeed, parseOptionalNonNegativeNumber} from '../../utils/utils';
-import {EFlagToLabelTheme} from '../EntityStatus/utils';
 import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/EvictVDiskButton';
 import {InternalLink} from '../InternalLink';
 import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {PDiskPopup} from '../PDiskPopup/PDiskPopup';
-import {getFlagStatusText} from '../VDisk/getFlagStatusText';
+import {getVDiskCapacityItems, getVDiskLocationItems} from '../VDiskInfo/getVDiskDetails';
+import {
+    VDiskCompactionRankLabel,
+    VDiskDonorLabel,
+    VDiskFrontQueuesLabel,
+    VDiskReplicationStatus,
+    VDiskStateLabel,
+    VDiskTypeLabel,
+    isVDiskFlagVisible,
+} from '../VDiskStatus';
 import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
-import {
-    CAPACITY_CONFIGURATION_HELP_TEXT,
-    CAPACITY_METRICS_HELP_TEXT,
-} from '../capacityMetricsColumns/constants';
-import {formatCapacityUnitCount} from '../capacityMetricsColumns/formatters';
 
 import {vDiskPopupKeyset as i18n} from './i18n';
-import type {VDiskStatusLabel} from './statuses';
-import {getVDiskReplicationLabel, getVDiskStateLabel, getVDiskTypeTooltip} from './statuses';
 
 import './VDiskPopup.scss';
 
 const b = cn('ydb-vdisk-popup');
-
-function StatusLabel({
-    value,
-    theme = 'normal',
-    icon,
-    title,
-    tooltip,
-    dangerHeavy,
-    size = 's',
-}: VDiskStatusLabel & Pick<LabelProps, 'size'>) {
-    const label = (
-        <Label
-            size={size}
-            theme={theme}
-            className={b('status-label', {'danger-heavy': dangerHeavy})}
-            icon={icon ? <Icon data={icon} size={12} /> : undefined}
-            value={title ? value : undefined}
-        >
-            {title ?? value}
-        </Label>
-    );
-    return tooltip ? (
-        <Tooltip content={tooltip} placement="top">
-            <span tabIndex={0} className={b('status-tooltip')}>
-                {label}
-            </span>
-        </Tooltip>
-    ) : (
-        label
-    );
-}
-
-function getFlagLabel(flag?: EFlag, title?: string, frontQueues = false) {
-    if (!flag || flag === EFlag.Grey) {
-        return null;
-    }
-
-    const theme = EFlagToLabelTheme[flag] ?? 'normal';
-    const icon = frontQueues
-        ? calculateFrontQueuesIcon({FrontQueues: flag})
-        : getFlagIconWithColor(flag)?.icon;
-
-    return (
-        <StatusLabel
-            value={getFlagStatusText(flag)}
-            title={title}
-            theme={theme}
-            icon={icon}
-            dangerHeavy={flag === EFlag.Red}
-            size="xs"
-        />
-    );
-}
 
 function DiskLocation({
     data,
@@ -123,20 +53,7 @@ function DiskLocation({
 }) {
     const [expanded, setExpanded] = React.useState(false);
     const detailsId = React.useId();
-    const fullData = isFullVDiskData(data) ? data : undefined;
-    const slotId = isFullVDiskData(data) ? data.VDiskSlotId : data.VSlotId;
-    const entries = [
-        {name: i18n('label_fqdn'), value: nodeData.Host},
-        {name: i18n('label_rack'), value: nodeData.Rack},
-        {name: i18n('label_datacenter'), value: nodeData.DC},
-        {name: i18n('label_pdisk-path'), value: fullData?.PDiskPath ?? fullData?.PDisk?.Path},
-        {name: i18n('label_node-id'), value: data.NodeId},
-        {name: i18n('label_pdisk-id'), value: data.PDiskId},
-        {name: i18n('label_vslot-id'), value: slotId},
-    ];
-    const items = entries.flatMap(({name, value}) =>
-        isNil(value) || value === '' ? [] : [{name, content: value, copyText: value}],
-    );
+    const items = getVDiskLocationItems(data, nodeData);
     if (!items.length) {
         return null;
     }
@@ -178,55 +95,23 @@ function DiskLocation({
     );
 }
 
-function ReplicationProgress({data}: {data: PreparedVDisk}) {
-    const progress = parseOptionalNonNegativeNumber(data.ReplicationProgress);
-    const percentage =
-        progress !== undefined && progress <= 1 ? Math.round(progress * 100) : undefined;
-    const seconds = parseOptionalNonNegativeNumber(data.ReplicationSecondsRemaining);
-    const remaining =
-        seconds !== undefined && seconds > 0
-            ? formatDurationToShortTimeFormat(Math.ceil(seconds) * 1000, 2, {compact: true})
-            : undefined;
-    if (percentage === undefined && !remaining) {
-        return null;
-    }
-    return (
-        <Flex alignItems="center" gap={2} className={b('replication-progress')}>
-            {percentage !== undefined && (
-                <React.Fragment>
-                    <span>{formatPercent(percentage / 100, 0)}</span>
-                    <div
-                        role="progressbar"
-                        aria-label={i18n('label_replication-progress')}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                        aria-valuenow={percentage}
-                        className={b('progress-bar')}
-                    >
-                        <Progress value={percentage} theme="info" size="xs" />
-                    </div>
-                </React.Fragment>
-            )}
-            {remaining && <span>{i18n('context_remaining', {duration: remaining})}</span>}
-        </Flex>
-    );
-}
-
 function getRuntimeItems(data: PreparedVDisk): YDBDefinitionListItem[] {
     const items: YDBDefinitionListItem[] = [];
-    const frontQueues = getFlagLabel(data.FrontQueues, undefined, true);
-    if (frontQueues) {
-        items.push({name: i18n('label_front-queues'), content: frontQueues});
+    if (isVDiskFlagVisible(data.FrontQueues)) {
+        items.push({
+            name: i18n('label_front-queues'),
+            content: <VDiskFrontQueuesLabel flag={data.FrontQueues} />,
+        });
     }
-    const fresh = getFlagLabel(data.SatisfactionRank?.FreshRank?.Flag, i18n('label_fresh'));
-    const level = getFlagLabel(data.SatisfactionRank?.LevelRank?.Flag, i18n('label_level'));
-    if (fresh || level) {
+    const fresh = data.SatisfactionRank?.FreshRank?.Flag;
+    const level = data.SatisfactionRank?.LevelRank?.Flag;
+    if (isVDiskFlagVisible(fresh) || isVDiskFlagVisible(level)) {
         items.push({
             name: i18n('label_compaction'),
             content: (
                 <Flex direction="column" gap={1} alignItems="flex-start">
-                    {fresh}
-                    {level}
+                    <VDiskCompactionRankLabel flag={fresh} rank="fresh" />
+                    <VDiskCompactionRankLabel flag={level} rank="level" />
                 </Flex>
             ),
         });
@@ -254,64 +139,12 @@ function getStorageItems(
             copyText: data.StoragePoolName,
         });
     }
-    if (parseOptionalNonNegativeNumber(data.GroupSizeInUnits) !== undefined) {
-        items.push({
-            name: i18n('label_group-size'),
-            content: formatCapacityUnitCount(data.GroupSizeInUnits),
-            note: CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits,
-        });
-    }
-    const size = capacityMetricsEnabled ? (data.WhiteboardSize ?? data) : data;
-    if (
-        parseOptionalNonNegativeNumber(size.AllocatedSize) !== undefined ||
-        parseOptionalNonNegativeNumber(size.SizeLimit) !== undefined
-    ) {
-        items.push({
-            name: i18n('label_size'),
-            content: formatStorageMetricPair(size.AllocatedSize, size.SizeLimit),
-        });
-    }
-    const capacityAlert = normalizeCapacityAlert(data.CapacityAlert);
-    if (capacityAlert) {
-        items.push({
-            name: i18n('label_capacity-alert'),
-            content: (
-                <StatusLabel
-                    size="xs"
-                    value={capitalize(capacityAlert.replaceAll('_', ' '))}
-                    theme={
-                        isCapacityAlert(capacityAlert)
-                            ? getCapacityAlertTheme(capacityAlert)
-                            : 'normal'
-                    }
-                />
-            ),
-            note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
-        });
-    }
-    for (const [name, value, note] of [
-        [
-            i18n('label_slot-usage'),
-            data.VDiskSlotUsage,
-            CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
-        ],
-        [i18n('label_raw-usage'), data.VDiskRawUsage, CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage],
-    ] as const) {
-        if (parseOptionalNonNegativeNumber(value) !== undefined) {
-            items.push({name, content: formatMetricPercent(value), note});
-        }
-    }
-    return items;
+    return [...items, ...getVDiskCapacityItems(data, {useWhiteboardSize: capacityMetricsEnabled})];
 }
 
 function DiskHeader({data = {}}: {data?: PreparedVDisk}) {
     const {StringifiedId, PDiskType, PDisk, DonorMode} = data;
     const type = PDiskType ?? PDisk?.Type;
-    const typeLabel = type?.toUpperCase() === 'NVME' ? 'NVMe' : type;
-    const stateLabel = getVDiskStateLabel(data);
-    const replicationLabel = getVDiskReplicationLabel(data);
-    const showReplicationProgress =
-        data.DetailedReplicationStatus === EVDiskDetailedReplicationStatus.InProgress;
 
     return (
         <React.Fragment>
@@ -329,15 +162,12 @@ function DiskHeader({data = {}}: {data?: PreparedVDisk}) {
                         aria-label={i18n('action_copy-field', {field: i18n('label_vdisk')})}
                     />
                 )}
-                {typeLabel && <StatusLabel value={typeLabel} tooltip={getVDiskTypeTooltip(type)} />}
+                <VDiskTypeLabel type={type} />
             </Flex>
             <Flex gap={1} wrap="wrap" alignItems="center">
-                <StatusLabel {...stateLabel} />
-                {DonorMode && (
-                    <StatusLabel value={i18n('label_donor')} {...VDISK_LABEL_CONFIG.donor} />
-                )}
-                {replicationLabel && <StatusLabel {...replicationLabel} />}
-                {showReplicationProgress && <ReplicationProgress data={data} />}
+                <VDiskStateLabel state={data.VDiskState} />
+                <VDiskDonorLabel donorMode={DonorMode} />
+                <VDiskReplicationStatus data={data} />
             </Flex>
         </React.Fragment>
     );
