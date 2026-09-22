@@ -34,7 +34,6 @@ const LIGHT_YELLOW_VDISK_INDEX = 5;
 const RECOVERY_ERROR_VDISK_INDEX = 8;
 const PDISK_ERROR_VDISK_INDEX = 9;
 const TRANSPARENT_BACKGROUND = 'rgba(0, 0, 0, 0)';
-const MISSING_INDICATOR_COLOR = 'rgb(162, 162, 162)';
 const PDISK_ERROR_ICON_COLOR_TOKEN = '--g-color-base-danger-heavy';
 const RECOVERY_ERROR_ICON_COLOR_TOKEN = '--g-color-text-primary';
 
@@ -1343,6 +1342,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             page,
         }) => {
             await preparePage(page, VDisksGroupBy.All);
+            const missingIndicatorColor = await resolveThemeColor(page, '--g-color-text-hint');
 
             const ordinaryItems = getVDiskItems(getStorageGroupRow(page, 0));
             const stateOnlyOk = getVDiskProgressBar(ordinaryItems.nth(STATE_ONLY_OK_VDISK_INDEX));
@@ -1426,7 +1426,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(missingCapacityAlertSlot).toHaveCSS('width', '16px');
             const missingCapacityAlertIcon = missingCapacityAlertSlot.locator('.g-icon');
             await expect(missingCapacityAlertIcon).toBeVisible();
-            await expect(missingCapacityAlertIcon).toHaveCSS('color', MISSING_INDICATOR_COLOR);
+            await expect(missingCapacityAlertIcon).toHaveCSS('color', missingIndicatorColor);
 
             await expect(frontQueuesYellowSlot).toHaveCount(1);
             await expect(frontQueuesYellowSlot).toHaveCSS('width', '12px');
@@ -1448,7 +1448,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(missingFrontQueuesSlot).toHaveCount(1);
             const missingFrontQueuesIcon = missingFrontQueuesSlot.locator('.g-icon');
             await expect(missingFrontQueuesIcon).toBeVisible();
-            await expect(missingFrontQueuesIcon).toHaveCSS('color', expectedTextColor);
+            await expect(missingFrontQueuesIcon).toHaveCSS('color', missingIndicatorColor);
 
             await expect(lightYellowFrontQueuesSlot).toHaveCount(1);
             const lightYellowFrontQueuesIcon = lightYellowFrontQueuesSlot.locator('.g-icon');
@@ -1461,7 +1461,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(lightYellowCompactionIcons).toHaveCount(2);
             await expect(lightYellowCompactionIcons.nth(0)).toHaveCSS(
                 'color',
-                MISSING_INDICATOR_COLOR,
+                missingIndicatorColor,
             );
             await expect(lightYellowCompactionIcons.nth(1)).toHaveCSS('color', expectedTextColor);
 
@@ -1507,7 +1507,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 [0, 1].map((index) =>
                     expect(missingCompactionIcons.nth(index)).toHaveCSS(
                         'color',
-                        MISSING_INDICATOR_COLOR,
+                        missingIndicatorColor,
                     ),
                 ),
             );
@@ -1646,8 +1646,8 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 getVDiskItems(getStorageGroupRow(page, 0)).nth(MISSING_WHITEBOARD_VDISK_INDEX),
             );
             const [normalColor, highlightedColor] = await Promise.all([
-                resolveThemeColor(page, '--g-color-base-neutral-light'),
-                resolveThemeColor(page, '--g-color-base-neutral-light-hover'),
+                resolveThemeColor(page, '--g-color-base-neutral-medium'),
+                resolveThemeColor(page, '--g-color-base-neutral-medium-hover'),
             ]);
 
             await expectAllocationFill(noWhiteboardVDisk, 10);

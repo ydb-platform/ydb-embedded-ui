@@ -564,8 +564,8 @@ describe('useStorageVDiskDisplayStateGetter', () => {
                 },
             }),
         ).toHaveProperty('allMode.indicators.compaction', [
-            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
-            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
+            {icon: CircleQuestionFill, color: 'var(--g-color-text-hint)'},
+            {icon: CircleQuestionFill, color: 'var(--g-color-text-hint)'},
         ]);
     });
 
