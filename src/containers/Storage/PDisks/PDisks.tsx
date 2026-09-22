@@ -98,7 +98,7 @@ export const PDisks = React.memo(function PDisks({
     expertMode = false,
 }: PDisksProps) {
     const [highlightedDisk, setHighlightedDisk] = React.useState<string | undefined>();
-    const {containerRef, shouldRenderDisk} = useVirtualizedDiskList(
+    const {containerRef, shouldRenderDisk, getPlaceholderProps} = useVirtualizedDiskList(
         pDisks,
         pDisks.every((disk) => !isNil(disk.NodeId) && !isNil(disk.PDiskId)),
     );
@@ -148,7 +148,12 @@ export const PDisks = React.memo(function PDisks({
 
                 return (
                     // Keep the full row geometry while offscreen disks are unmounted.
-                    <div className={b('pdisks-item')} key={id || index} style={{width: pDiskWidth}}>
+                    <div
+                        className={b('pdisks-item')}
+                        key={id || index}
+                        style={{width: pDiskWidth}}
+                        {...(hasOpenPopup ? undefined : getPlaceholderProps(index))}
+                    >
                         {(shouldRenderDisk(index) || hasOpenPopup) && (
                             <PDiskItem
                                 pDisk={pDisk}

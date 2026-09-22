@@ -13,6 +13,7 @@ function getDiskKey(disks: readonly DiskItem[], index: number) {
 export function useVirtualizedDiskList(disks: readonly DiskItem[], enabled = true) {
     const shouldVirtualize = enabled && disks.length >= MIN_VIRTUALIZED_DISKS_COUNT;
     const containerRef = React.useRef<HTMLDivElement | null>(null);
+    const pendingFocusRef = React.useRef<{element: HTMLDivElement; fromEnd: boolean}>();
     const [visibleKeys, setVisibleKeys] = React.useState<Set<string | number>>(() => new Set());
     const [lastFocusedKey, setLastFocusedKey] = React.useState<string | number>();
     const lastFocusedIndex = disks.findIndex(
@@ -24,6 +25,40 @@ export function useVirtualizedDiskList(disks: readonly DiskItem[], enabled = tru
             setLastFocusedKey(undefined);
         }
     }, [lastFocusedIndex, lastFocusedKey]);
+
+    const placeholderProps = React.useMemo<React.HTMLAttributes<HTMLDivElement>>(
+        () => ({
+            tabIndex: 0,
+            onFocus: (event) => {
+                if (event.target !== event.currentTarget) {
+                    return;
+                }
+                const index = Array.from(containerRef.current?.children ?? []).findIndex(
+                    (element) => element.contains(event.currentTarget),
+                );
+                if (index !== -1) {
+                    pendingFocusRef.current = {
+                        element: event.currentTarget,
+                        fromEnd: index === disks.length - 1,
+                    };
+                    setLastFocusedKey(getDiskKey(disks, index));
+                }
+            },
+        }),
+        [disks],
+    );
+
+    React.useLayoutEffect(() => {
+        const pendingFocus = pendingFocusRef.current;
+        pendingFocusRef.current = undefined;
+        if (!pendingFocus || document.activeElement !== pendingFocus.element) {
+            return;
+        }
+        // Mount the boundary disk before handing focus to its first/last link.
+        const links = pendingFocus.element.querySelectorAll<HTMLAnchorElement>('a[href]');
+        const link = pendingFocus.fromEnd ? links[links.length - 1] : links[0];
+        link?.focus();
+    });
 
     React.useEffect(() => {
         const container = containerRef.current;
@@ -98,5 +133,11 @@ export function useVirtualizedDiskList(disks: readonly DiskItem[], enabled = tru
     return {
         containerRef,
         shouldRenderDisk,
+        getPlaceholderProps: (index: number) =>
+            shouldVirtualize &&
+            !shouldRenderDisk(index) &&
+            (index === 0 || index === disks.length - 1)
+                ? placeholderProps
+                : undefined,
     };
 }

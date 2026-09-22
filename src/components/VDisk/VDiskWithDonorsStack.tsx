@@ -16,6 +16,7 @@ interface VDiskWithDonorsStackProps extends Omit<VDiskProps, 'withOpaqueBackgrou
     setHighlightedVDisk?: (id?: string) => void;
     progressBarClassName?: string;
     renderContent?: boolean;
+    placeholderProps?: React.HTMLAttributes<HTMLDivElement>;
 }
 
 const diskInStackPlacement: PopupPlacement = ['left', 'right'];
@@ -35,6 +36,7 @@ export function VDiskWithDonorsStack({
     onHidePopup: _onHidePopup,
     highlighted: _highlighted,
     renderContent = true,
+    placeholderProps,
     ...restProps
 }: VDiskWithDonorsStackProps) {
     const donors = data?.Donors ?? EMPTY_DONORS;
@@ -69,7 +71,7 @@ export function VDiskWithDonorsStack({
 
     // Keep the stack's state and popup anchors until a main/donor interaction finishes.
     if (!renderContent && !isHighlighted && !highlightedVDiskInStack) {
-        return <div className={className} />;
+        return <div className={className} {...placeholderProps} />;
     }
 
     // Spread restProps first, then explicitly override critical fields to prevent

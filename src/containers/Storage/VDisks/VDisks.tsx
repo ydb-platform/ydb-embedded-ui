@@ -31,7 +31,7 @@ export const VDisks = React.memo(function VDisks({
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
 
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
-    const {containerRef, shouldRenderDisk} = useVirtualizedDiskList(
+    const {containerRef, shouldRenderDisk, getPlaceholderProps} = useVirtualizedDiskList(
         vDisks,
         vDisks.every((disk) => Boolean(disk.StringifiedId)),
     );
@@ -48,6 +48,7 @@ export const VDisks = React.memo(function VDisks({
                 <VDiskItem
                     withIcon={withIcon}
                     renderContent={shouldRenderDisk(index)}
+                    placeholderProps={getPlaceholderProps(index)}
                     key={vDisk.StringifiedId || index}
                     data={vDisk}
                     inactive={!isVdiskActive(vDisk, viewContext)}

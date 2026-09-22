@@ -51,6 +51,7 @@ interface DisksItemProps {
     getDisplayState?: VDiskDisplayStateGetter;
     isAllVDisksLayout?: boolean;
     renderContent: boolean;
+    placeholderProps?: React.HTMLAttributes<HTMLDivElement>;
 }
 
 const VDiskItem = React.memo(function VDiskItem({
@@ -63,6 +64,7 @@ const VDiskItem = React.memo(function VDiskItem({
     getDisplayState,
     isAllVDisksLayout,
     renderContent,
+    placeholderProps,
 }: DisksItemProps) {
     // Do not show PDisk popup for VDisk
     const vDiskToShow = React.useMemo(() => ({...vDisk, PDisk: undefined}), [vDisk]);
@@ -85,6 +87,7 @@ const VDiskItem = React.memo(function VDiskItem({
             ) : null}
             <VDiskWithDonorsStack
                 renderContent={renderContent}
+                placeholderProps={placeholderProps}
                 data={vDiskToShow}
                 compact={!isAllVDisksLayout}
                 withIcon={withIcon}
@@ -109,6 +112,7 @@ const PDiskItem = React.memo(function PDiskItem({
     withIcon,
     getDisplayState,
     renderContent,
+    placeholderProps,
 }: Omit<DisksItemProps, 'getDisplayState'> & {getDisplayState?: PDiskDisplayStateGetter}) {
     const vDiskId = vDisk.StringifiedId;
 
@@ -129,6 +133,7 @@ const PDiskItem = React.memo(function PDiskItem({
         <div
             className={b('pdisk-item', {['with-dc-margin']: withDCMargin})}
             style={{width: getDisplayState?.(vDisk.PDisk).width ?? EXPERT_MODE_PDISK_WIDTH}}
+            {...(renderContent || highlighted ? undefined : placeholderProps)}
         >
             {(renderContent || highlighted) && (
                 <PDisk
@@ -161,7 +166,6 @@ export const Disks = React.memo(function Disks({
     const getPDiskDisplayState = useStoragePDiskDisplayStateGetter();
 
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
-    const [hasFocus, setHasFocus] = React.useState(false);
     const vDiskList = useVirtualizedDiskList(
         vDisks,
         vDisks.every((disk) => Boolean(disk.StringifiedId)),
@@ -195,15 +199,7 @@ export const Disks = React.memo(function Disks({
         : VDISKS_CONTAINER_WIDTH;
 
     return (
-        <div
-            className={b(null)}
-            onFocusCapture={() => setHasFocus(true)}
-            onBlurCapture={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget)) {
-                    setHasFocus(false);
-                }
-            }}
-        >
+        <div className={b(null)}>
             <Flex
                 direction="row"
                 gap={1}
@@ -222,10 +218,8 @@ export const Disks = React.memo(function Disks({
                         withIcon={withIcon}
                         getDisplayState={getVDiskDisplayState}
                         isAllVDisksLayout={isAllVDisksLayout}
-                        renderContent={
-                            vDiskList.shouldRenderDisk(index) ||
-                            (hasFocus && index === vDisks.length - 1)
-                        }
+                        renderContent={vDiskList.shouldRenderDisk(index)}
+                        placeholderProps={vDiskList.getPlaceholderProps(index)}
                     />
                 ))}
             </Flex>
@@ -241,9 +235,8 @@ export const Disks = React.memo(function Disks({
                         withDCMargin={vDisksWithDCMargins.includes(index)}
                         withIcon={withIcon}
                         getDisplayState={getPDiskDisplayState}
-                        renderContent={
-                            pDiskList.shouldRenderDisk(index) || (hasFocus && index === 0)
-                        }
+                        renderContent={pDiskList.shouldRenderDisk(index)}
+                        placeholderProps={pDiskList.getPlaceholderProps(index)}
                     />
                 ))}
             </div>
