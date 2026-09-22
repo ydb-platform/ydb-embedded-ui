@@ -5,6 +5,7 @@ import {valueIsDefined} from '../../utils';
 import {formatBytes} from '../../utils/bytesParsers';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
+import {formatPDiskType} from '../../utils/disks/getPDiskType';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {getPDiskCapacityInfoItems, toInfoViewerItems} from '../DiskCapacityInfo/DiskCapacityInfo';
 import type {InfoViewerItem} from '../InfoViewer';
@@ -57,7 +58,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
     const generalInfo: InfoViewerItem[] = [];
 
     if (valueIsDefined(Category)) {
-        generalInfo.push({label: pDiskInfoKeyset('type'), value: Type});
+        generalInfo.push({label: pDiskInfoKeyset('type'), value: formatPDiskType(Type)});
     }
     if (valueIsDefined(Path)) {
         generalInfo.push({label: pDiskInfoKeyset('path'), value: Path});

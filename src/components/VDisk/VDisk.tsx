@@ -13,6 +13,7 @@ import type {
 } from '../../utils/disks/displayState';
 import {getDefaultDiskDisplayState} from '../../utils/disks/displayState';
 import {getDiskBarTone} from '../../utils/disks/getDiskBarTone';
+import {formatPDiskType} from '../../utils/disks/getPDiskType';
 import {getVDiskStatusIcon} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {isNumeric} from '../../utils/utils';
@@ -195,7 +196,7 @@ function getAccessibleName(
         case 'driveType':
             return i18n('context_drive-type-accessible-name', {
                 disk: diskName,
-                driveType: driveType || noData,
+                driveType: formatPDiskType(driveType) || noData,
             });
         case 'state':
             return i18n('context_state-accessible-name', {
