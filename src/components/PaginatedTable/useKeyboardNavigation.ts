@@ -13,7 +13,7 @@ export interface KeyboardNavigationParams {
     getRowKey?: (index: number) => string | number | undefined;
     getRowLabel?: (index: number) => string | undefined;
     findRowIndex?: (key: string | number, previousIndex: number) => number | undefined;
-    getRowLookupRevision?: () => string | undefined;
+    getRowLookupRevision?: (revision?: string) => string | undefined;
     isRowLookupPending?: (revision: string | undefined) => boolean;
     subscribe?: (listener: () => void) => () => void;
     rowCount: number;

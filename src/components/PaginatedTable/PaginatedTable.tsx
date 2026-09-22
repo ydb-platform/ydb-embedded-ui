@@ -143,7 +143,8 @@ export const PaginatedTable = <T, F>({
         });
     };
 
-    const getRowLookupRevision = () => getChunkLookupRevision(getActiveChunkLookupStates());
+    const getRowLookupRevision = (revision?: string) =>
+        getChunkLookupRevision(getActiveChunkLookupStates(), revision);
 
     const findRowIndex = (key: string | number, previousIndex: number) => {
         if (getRowKey(previousIndex) === key) {

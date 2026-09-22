@@ -259,7 +259,7 @@ test('filter changes reset selection while rerenders preserve it', () => {
     expect(onActivate).toHaveBeenLastCalledWith(0);
 });
 
-test('preserves a selected row until independently refreshed chunks are consistent', () => {
+test('reconciles a selected row only after independently refreshed chunks are consistent', () => {
     const listeners = new Set<() => void>();
     const subscribe = (listener: () => void) => {
         listeners.add(listener);
@@ -294,7 +294,9 @@ test('preserves a selected row until independently refreshed chunks are consiste
                     return index === -1 ? undefined : index;
                 }}
                 getRowLookupRevision={
-                    lookupStates ? () => getChunkLookupRevision(lookupStates) : undefined
+                    lookupStates
+                        ? (revision) => getChunkLookupRevision(lookupStates, revision)
+                        : undefined
                 }
                 isRowLookupPending={(revision) =>
                     lookupStates ? isChunkLookupPending(lookupStates, revision) : pending
@@ -378,6 +380,32 @@ test('preserves a selected row until independently refreshed chunks are consiste
     expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('21');
     fireEvent.keyDown(input, {key: 'Enter'});
     expect(onActivate).toHaveBeenLastCalledWith(0);
+
+    onActivate.mockClear();
+    rerender(table([120, 121, 122], false, initialLookupStates));
+    notify();
+    fireEvent.keyDown(input, {key: 'ArrowDown'});
+    expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('121');
+
+    rerender(
+        table([120, 121, 122], false, [
+            {offset: 0, status: QueryStatus.fulfilled, fulfilledTimeStamp: 2},
+            {offset: 20, status: QueryStatus.fulfilled, fulfilledTimeStamp: 1},
+        ]),
+    );
+    notify();
+    expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('121');
+
+    rerender(
+        table([120, 122, 123], false, [
+            {offset: 0, status: QueryStatus.fulfilled, fulfilledTimeStamp: 2},
+            {offset: 20, status: QueryStatus.fulfilled, fulfilledTimeStamp: 2},
+        ]),
+    );
+    notify();
+    expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('122');
+    fireEvent.keyDown(input, {key: 'Enter'});
+    expect(onActivate).toHaveBeenLastCalledWith(1);
 });
 
 test.each([

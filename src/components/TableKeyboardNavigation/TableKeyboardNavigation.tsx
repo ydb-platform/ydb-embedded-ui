@@ -288,7 +288,7 @@ interface AdapterOptions {
     getRowKey?: (index: number) => string | number | undefined;
     getRowLabel?: (index: number) => string | undefined;
     findRowIndex?: (key: string | number, previousIndex: number) => number | undefined;
-    getRowLookupRevision?: () => string | undefined;
+    getRowLookupRevision?: (revision?: string) => string | undefined;
     isRowLookupPending?: (revision: string | undefined) => boolean;
     subscribe?: (listener: () => void) => () => void;
 }
@@ -348,7 +348,7 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
                         : {
                               index,
                               key: getRowKey?.(index),
-                              lookupRevision: getRowLookupRevision?.(),
+                              lookupRevision: getRowLookupRevision?.(current.lookupRevision),
                           };
             }
         }
