@@ -8,20 +8,11 @@ import {cn} from '../../utils/cn';
 import {StatusIcon} from '../StatusIconNew/StatusIcon';
 
 import i18n from './i18n';
-import {EFlagToDescription} from './utils';
+import {EFlagToDescription, EFlagToLabelTheme} from './utils';
 
 import './EntityStatus.scss';
 
 const b = cn('ydb-entity-status');
-
-const EFlagToLabelTheme: Record<EFlag, LabelProps['theme']> = {
-    [EFlag.Red]: 'danger',
-    [EFlag.Blue]: 'success',
-    [EFlag.Green]: 'success',
-    [EFlag.Grey]: 'unknown',
-    [EFlag.Orange]: 'danger',
-    [EFlag.Yellow]: 'warning',
-};
 
 const EFlagToStatusName: Record<EFlag, string> = {
     get [EFlag.Red]() {

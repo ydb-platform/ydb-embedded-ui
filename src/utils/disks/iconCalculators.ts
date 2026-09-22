@@ -161,7 +161,7 @@ export function calculateFrontQueuesIcon(
  * Get icon and color for a single status flag.
  * Maps EFlag to the corresponding pair-legend icon and color.
  */
-function getFlagIconWithColor(flag: EFlag | undefined): IconWithColor | undefined {
+export function getFlagIconWithColor(flag: EFlag | undefined): IconWithColor | undefined {
     if (!flag || flag === EFlag.Grey) {
         return {
             icon: CircleQuestionFill,
