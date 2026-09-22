@@ -89,7 +89,7 @@ jobs:
           cleanup: 'true'
           monitoring-port: 8765
           container-prefix: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
-      - name: Verify running image and served UI
+      - name: Verify running backend image
         run: node controller/.github/workflows/scripts/release-e2e-report.js verify release-artifacts/provenance.json "$YDB_CONTAINER"
         env:
           YDB_CONTAINER: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}-static
@@ -99,7 +99,6 @@ jobs:
         env:
           CI: 'true'
           PLAYWRIGHT_APP_BACKEND: http://localhost:8765
-          PLAYWRIGHT_BASE_URL: http://localhost:8765/monitoring/
           PLAYWRIGHT_VIDEO: retain-on-failure
           PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}
           PLAYWRIGHT_RELEASE_VERSION: ${{ needs.resolve.outputs.playwright_version }}

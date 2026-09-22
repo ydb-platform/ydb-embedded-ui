@@ -1,5 +1,4 @@
 import {execFileSync} from 'node:child_process';
-import {createHash} from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -13,11 +12,10 @@ import {
     verifyImage,
 } from '../release-e2e-report';
 
-const index = '<html>shipped UI</html>';
 const provenance = {
     ydb_sha: 'a'.repeat(40),
     image_digest: `sha256:${'b'.repeat(64)}`,
-    index_sha256: createHash('sha256').update(index).digest('hex'),
+    frontend_mode: 'npm-start',
 };
 const image = {
     Id: 'sha256:container-image',
@@ -27,17 +25,23 @@ const image = {
 const context = {shards: 8, jobs: 'success', artifacts: 'success', merge: 'success'};
 const report = {stats: {expected: 80, unexpected: 0, flaky: 0, skipped: 2}, errors: []};
 
-test('accepts the expected image and rejects mismatched image, revision or HTML', () => {
+test('accepts the expected backend image and rejects mismatched digest or revision', () => {
     const container = {Image: image.Id};
-    expect(verifyImage(provenance, container, image, index).index_verified).toBe(true);
-    expect(() => verifyImage(provenance, {Image: 'other'}, image, index)).toThrow('digest');
-    expect(() => verifyImage(provenance, container, {...image, RepoDigests: []}, index)).toThrow(
-        'digest',
+    expect(verifyImage(provenance, container, image)).toEqual({
+        image_id: image.Id,
+        image_digest: provenance.image_digest,
+    });
+    expect(() => verifyImage(provenance, {Image: 'other'}, image)).toThrow('digest');
+    expect(() => verifyImage(provenance, container, {...image, RepoDigests: []})).toThrow('digest');
+    expect(() => verifyImage(provenance, container, {...image, Config: {Labels: {}}})).toThrow(
+        'revision',
     );
-    expect(() =>
-        verifyImage(provenance, container, {...image, Config: {Labels: {}}}, index),
-    ).toThrow('revision');
-    expect(() => verifyImage(provenance, container, image, 'dev UI')).toThrow('Served');
+});
+
+test.each(['npm-start', undefined])('labels new and historical frontend modes: %s', (mode) => {
+    const result = summarize(report, {...provenance, frontend_mode: mode}, context);
+    expect(result.status).toBe('passed');
+    expect(result.summary).toContain(`Frontend: ${mode ?? 'image'}`);
 });
 
 test('a failed test or job cannot produce a passing summary', () => {
