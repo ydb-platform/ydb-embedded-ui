@@ -133,6 +133,7 @@ const PDiskItem = React.memo(function PDiskItem({
         <div
             className={b('pdisk-item', {['with-dc-margin']: withDCMargin})}
             style={{width: getDisplayState?.(vDisk.PDisk).width ?? EXPERT_MODE_PDISK_WIDTH}}
+            tabIndex={-1}
             {...(renderContent || highlighted ? undefined : placeholderProps)}
         >
             {(renderContent || highlighted) && (

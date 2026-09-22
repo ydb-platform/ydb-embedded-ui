@@ -28,6 +28,8 @@ export function useVirtualizedDiskList(disks: readonly DiskItem[], enabled = tru
 
     const placeholderProps = React.useMemo<React.HTMLAttributes<HTMLDivElement>>(
         () => ({
+            // Wrappers fall back to -1 when content mounts: removing tabIndex would
+            // blur the placeholder before the layout effect can focus its link.
             tabIndex: 0,
             onFocus: (event) => {
                 if (event.target !== event.currentTarget) {
