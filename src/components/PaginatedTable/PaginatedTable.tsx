@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {QueryStatus} from '@reduxjs/toolkit/query';
 import isEqual from 'lodash/isEqual';
 import {useStore} from 'react-redux';
 
@@ -14,6 +13,7 @@ import {TableHead} from './TableHead';
 import type {PaginatedTableId} from './constants';
 import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
 import {getTableChunkQueryParams} from './getTableChunkQueryParams';
+import {getChunkLookupRevision, isChunkLookupPending} from './rowLookup';
 import {b} from './shared';
 import type {
     Column,
@@ -91,6 +91,7 @@ export const PaginatedTable = <T, F>({
     const activeSortParams = isSortColumnAvailable(sortParams, columns) ? sortParams : undefined;
 
     const tableRef = React.useRef<HTMLDivElement>(null);
+    const activeChunkOffsetsRef = React.useRef<number[]>([]);
 
     // this prevent situation when filters are new, but active chunks is not yet recalculated (it will be done to the next rendrer, so we bring filters change on the next render too)
     const [filters, setFilters] = React.useState(rawFilters);
@@ -128,6 +129,22 @@ export const PaginatedTable = <T, F>({
         return row === undefined ? undefined : getKeyboardRowLabel?.(row);
     };
 
+    const getActiveChunkLookupStates = () => {
+        const state = store.getState();
+        return activeChunkOffsetsRef.current.map((offset) => {
+            const queryState = tableDataApi.endpoints.fetchTableChunk.select(
+                getQueryParams(offset),
+            )(state);
+            return {
+                offset,
+                status: queryState.status,
+                fulfilledTimeStamp: queryState.fulfilledTimeStamp,
+            };
+        });
+    };
+
+    const getRowLookupRevision = () => getChunkLookupRevision(getActiveChunkLookupStates());
+
     const findRowIndex = (key: string | number, previousIndex: number) => {
         if (getRowKey(previousIndex) === key) {
             return previousIndex;
@@ -153,25 +170,12 @@ export const PaginatedTable = <T, F>({
         return undefined;
     };
 
-    const isRowLookupPending = () => {
-        const state = store.getState();
-        const queryParams = getQueryParams(0);
-        const cachedArgs = tableDataApi.util.selectCachedArgsForQuery(state, 'fetchTableChunk');
-        return cachedArgs.some((args) => {
-            if (
-                !isEqual(
-                    {...args, offset: 0, fetchData: undefined},
-                    {...queryParams, fetchData: undefined},
-                )
-            ) {
-                return false;
-            }
-            return (
-                tableDataApi.endpoints.fetchTableChunk.select(args)(state).status ===
-                QueryStatus.pending
-            );
-        });
-    };
+    const isRowLookupPending = (revision: string | undefined) =>
+        isChunkLookupPending(getActiveChunkLookupStates(), revision);
+
+    const handleActiveChunkOffsetsChange = React.useCallback((offsets: number[]) => {
+        activeChunkOffsetsRef.current = offsets;
+    }, []);
 
     const activateRow = (index: number) => {
         const row = getRow(index);
@@ -233,6 +237,7 @@ export const PaginatedTable = <T, F>({
                     renderErrorMessage={renderErrorMessage}
                     renderEmptyDataMessage={renderEmptyDataMessage}
                     onDataFetched={handleDataFetched}
+                    onActiveChunkOffsetsChange={handleActiveChunkOffsetsChange}
                     keepCache={keepCache}
                     fetchOverscan={fetchOverscan}
                 />
@@ -248,6 +253,7 @@ export const PaginatedTable = <T, F>({
             getRowKey={getKeyboardRowKey ? getRowKey : undefined}
             getRowLabel={getKeyboardRowLabel ? getRowLabel : undefined}
             findRowIndex={getKeyboardRowKey ? findRowIndex : undefined}
+            getRowLookupRevision={getKeyboardRowKey ? getRowLookupRevision : undefined}
             isRowLookupPending={getKeyboardRowKey ? isRowLookupPending : undefined}
             subscribe={store.subscribe}
             rowCount={foundEntities}

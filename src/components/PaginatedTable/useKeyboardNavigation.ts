@@ -13,7 +13,8 @@ export interface KeyboardNavigationParams {
     getRowKey?: (index: number) => string | number | undefined;
     getRowLabel?: (index: number) => string | undefined;
     findRowIndex?: (key: string | number, previousIndex: number) => number | undefined;
-    isRowLookupPending?: () => boolean;
+    getRowLookupRevision?: () => string | undefined;
+    isRowLookupPending?: (revision: string | undefined) => boolean;
     subscribe?: (listener: () => void) => () => void;
     rowCount: number;
     rowHeight: number;
@@ -36,6 +37,7 @@ export function useKeyboardNavigation({
     getRowKey,
     getRowLabel,
     findRowIndex,
+    getRowLookupRevision,
     isRowLookupPending,
     subscribe,
     rowCount,
@@ -56,6 +58,7 @@ export function useKeyboardNavigation({
         getRowKey,
         getRowLabel,
         findRowIndex,
+        getRowLookupRevision,
         isRowLookupPending,
         subscribe,
         isValidIndex: (index) => index >= 0 && index < getCount(),

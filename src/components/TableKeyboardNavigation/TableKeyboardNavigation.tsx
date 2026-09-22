@@ -288,11 +288,17 @@ interface AdapterOptions {
     getRowKey?: (index: number) => string | number | undefined;
     getRowLabel?: (index: number) => string | undefined;
     findRowIndex?: (key: string | number, previousIndex: number) => number | undefined;
-    isRowLookupPending?: () => boolean;
+    getRowLookupRevision?: () => string | undefined;
+    isRowLookupPending?: (revision: string | undefined) => boolean;
     subscribe?: (listener: () => void) => () => void;
 }
 
-type RowSelection = {index: number; key?: string | number; pending?: boolean};
+type RowSelection = {
+    index: number;
+    key?: string | number;
+    lookupRevision?: string;
+    pending?: boolean;
+};
 type Selection = RowSelection | undefined;
 const subscribeToNothing = () => () => {};
 
@@ -317,20 +323,33 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
         const current = selectedRef.current;
         let next = current;
         if (current) {
-            const {findRowIndex, getRowKey, isRowLookupPending, isValidIndex, getLast} =
-                optionsRef.current;
+            const {
+                findRowIndex,
+                getRowKey,
+                getRowLookupRevision,
+                isRowLookupPending,
+                isValidIndex,
+                getLast,
+            } = optionsRef.current;
             const matchedIndex =
                 current.key !== undefined &&
                 getRowKey?.(current.index) !== current.key &&
                 findRowIndex
                     ? findRowIndex(current.key, current.index)
                     : current.index;
-            if (matchedIndex === undefined && isRowLookupPending?.()) {
+            if (matchedIndex === undefined && isRowLookupPending?.(current.lookupRevision)) {
                 next = {...current, pending: true};
             } else {
                 const position = matchedIndex ?? current.index;
                 const index = isValidIndex?.(position) === false ? getLast() : position;
-                next = index === undefined ? undefined : {index, key: getRowKey?.(index)};
+                next =
+                    index === undefined
+                        ? undefined
+                        : {
+                              index,
+                              key: getRowKey?.(index),
+                              lookupRevision: getRowLookupRevision?.(),
+                          };
             }
         }
         const previous = snapshotRef.current;
@@ -339,6 +358,7 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
             next &&
             previous.index === next.index &&
             previous.key === next.key &&
+            previous.lookupRevision === next.lookupRevision &&
             previous.pending === next.pending
         ) {
             return previous;
@@ -356,7 +376,13 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
     }, [selection]);
     const select = React.useCallback((index: number | undefined) => {
         const next =
-            index === undefined ? undefined : {index, key: optionsRef.current.getRowKey?.(index)};
+            index === undefined
+                ? undefined
+                : {
+                      index,
+                      key: optionsRef.current.getRowKey?.(index),
+                      lookupRevision: optionsRef.current.getRowLookupRevision?.(),
+                  };
         const previous = selectedRef.current;
         selectedRef.current = next;
         if (previous?.index !== next?.index || previous?.key !== next?.key) {

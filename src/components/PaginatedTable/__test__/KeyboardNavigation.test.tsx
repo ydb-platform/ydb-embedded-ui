@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {QueryStatus} from '@reduxjs/toolkit/query';
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 
 import {
@@ -10,6 +11,8 @@ import {
 import {TableWithControlsLayout} from '../../TableWithControlsLayout/TableWithControlsLayout';
 import {KeyboardNavigation} from '../KeyboardNavigation';
 import {TableRow} from '../TableRow';
+import type {ChunkLookupState} from '../rowLookup';
+import {getChunkLookupRevision, isChunkLookupPending} from '../rowLookup';
 import type {Column} from '../types';
 
 beforeEach(() => {
@@ -256,7 +259,7 @@ test('filter changes reset selection while rerenders preserve it', () => {
     expect(onActivate).toHaveBeenLastCalledWith(0);
 });
 
-test('hides and does not activate a selected row while its key is temporarily missing', () => {
+test('preserves a selected row until independently refreshed chunks are consistent', () => {
     const listeners = new Set<() => void>();
     const subscribe = (listener: () => void) => {
         listeners.add(listener);
@@ -267,7 +270,15 @@ test('hides and does not activate a selected row while its key is temporarily mi
     };
     const onActivate = jest.fn();
 
-    function KeyedNavigationFixture({rows, pending}: {rows: number[]; pending: boolean}) {
+    function KeyedNavigationFixture({
+        rows,
+        pending,
+        lookupStates,
+    }: {
+        rows: number[];
+        pending: boolean;
+        lookupStates?: ChunkLookupState[];
+    }) {
         const inputRef = React.useRef<HTMLInputElement>(null);
         const tableRef = React.useRef<HTMLDivElement>(null);
         useTableSearch(inputRef, true);
@@ -282,7 +293,12 @@ test('hides and does not activate a selected row while its key is temporarily mi
                     const index = rows.indexOf(Number(key));
                     return index === -1 ? undefined : index;
                 }}
-                isRowLookupPending={() => pending}
+                getRowLookupRevision={
+                    lookupStates ? () => getChunkLookupRevision(lookupStates) : undefined
+                }
+                isRowLookupPending={(revision) =>
+                    lookupStates ? isChunkLookupPending(lookupStates, revision) : pending
+                }
                 subscribe={subscribe}
                 onActivate={onActivate}
             >
@@ -306,24 +322,49 @@ test('hides and does not activate a selected row while its key is temporarily mi
         );
     }
 
-    const table = (rows: number[], pending = false) => (
+    const table = (rows: number[], pending = false, lookupStates?: ChunkLookupState[]) => (
         <TableKeyboardNavigationScope>
-            <KeyedNavigationFixture rows={rows} pending={pending} />
+            <KeyedNavigationFixture rows={rows} pending={pending} lookupStates={lookupStates} />
         </TableKeyboardNavigationScope>
     );
-    const {rerender} = render(table([20, 21]));
+    const initialLookupStates: ChunkLookupState[] = [
+        {offset: 0, status: QueryStatus.fulfilled, fulfilledTimeStamp: 1},
+        {offset: 20, status: QueryStatus.fulfilled, fulfilledTimeStamp: 1},
+    ];
+    const {rerender} = render(table([20, 21], false, initialLookupStates));
     const input = screen.getByRole('textbox');
     input.focus();
     fireEvent.keyDown(input, {key: 'ArrowUp'});
     expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('20');
 
-    rerender(table([21, 21], true));
+    rerender(
+        table([21, 21], false, [
+            {offset: 0, status: QueryStatus.fulfilled, fulfilledTimeStamp: 2},
+            {offset: 20, status: QueryStatus.fulfilled, fulfilledTimeStamp: 1},
+        ]),
+    );
     notify();
     expect(document.querySelector('.ydb-keyboard-focused-row')).toBeNull();
     fireEvent.keyDown(input, {key: 'Enter'});
     expect(onActivate).not.toHaveBeenCalled();
 
-    rerender(table([21, 20]));
+    rerender(
+        table([21, 21], false, [
+            {offset: 0, status: QueryStatus.fulfilled, fulfilledTimeStamp: 2},
+            {offset: 20, status: QueryStatus.rejected, fulfilledTimeStamp: 1},
+        ]),
+    );
+    notify();
+    expect(document.querySelector('.ydb-keyboard-focused-row')).toBeNull();
+    fireEvent.keyDown(input, {key: 'Enter'});
+    expect(onActivate).not.toHaveBeenCalled();
+
+    rerender(
+        table([21, 20], false, [
+            {offset: 0, status: QueryStatus.fulfilled, fulfilledTimeStamp: 2},
+            {offset: 20, status: QueryStatus.fulfilled, fulfilledTimeStamp: 2},
+        ]),
+    );
     notify();
     expect(document.querySelector('.ydb-keyboard-focused-row')).toHaveTextContent('20');
     fireEvent.keyDown(input, {key: 'Enter'});
