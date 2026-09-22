@@ -32,9 +32,16 @@ export const isUnavailableNode = <
 export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
     return nodesList?.reduce<NodesMap>((nodeHosts, node) => {
         if (valueIsDefined(node.Id)) {
+            const physicalLocation = node.PhysicalLocation;
+            // The legacy numeric Rack can be a hash of the actual rack name.
+            const Rack = physicalLocation?.Location
+                ? physicalLocation.Location.match(/(?:^|\/)R=([^/]+)/)?.[1]
+                : physicalLocation?.Rack?.toString();
+
             nodeHosts.set(node.Id, {
                 Host: node.Host,
-                DC: node.PhysicalLocation?.DataCenterId,
+                DC: physicalLocation?.DataCenterId,
+                Rack,
             });
         }
         return nodeHosts;

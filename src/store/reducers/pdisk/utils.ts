@@ -62,9 +62,11 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
         };
     }
 
-    const preparedVDisks = WhiteboardVDisksData.map((disk) =>
-        prepareWhiteboardVDiskData({...disk, NodeId}),
-    );
+    const preparedVDisks = WhiteboardVDisksData.map((disk) => ({
+        ...prepareWhiteboardVDiskData({...disk, NodeId}),
+        PDiskType: preparedPDisk.Type,
+        PDiskPath: preparedPDisk.Path,
+    }));
 
     setDonorRecipientReferences((cb) => {
         for (const vDisk of preparedVDisks) {
@@ -145,6 +147,7 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
         NodeHost: preparedNode.Host,
         NodeType: preparedNode.Roles?.[0],
         NodeDC: preparedNode.DC,
+        NodeRack: preparedNode.Rack,
         SlotItems: diskSlots,
     };
 }

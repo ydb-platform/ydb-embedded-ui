@@ -77,6 +77,8 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
         HasWhiteboardData: hasWhiteboardData,
         ...(WhiteboardSize ? {WhiteboardSize} : {}),
         PDisk: preparedPDisk,
+        PDiskType: preparedPDisk.Type,
+        PDiskPath: preparedPDisk.Path,
         Donors: preparedDonors,
         PDiskId,
         StringifiedId,

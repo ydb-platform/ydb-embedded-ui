@@ -11,6 +11,7 @@ import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import type {TVDiskID} from '../../types/api/vdisk';
 import {EVDiskState} from '../../types/api/vdisk';
+import type {NodeMetadata} from '../../types/store/nodesList';
 import {cn} from '../../utils/cn';
 import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatDurationSeconds, parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
@@ -443,12 +444,24 @@ const prepareHeaderLabels = (data: PreparedVDisk): YDBDefinitionListHeaderLabel[
     return labels;
 };
 
+function useNodeMetadata(nodeId: number | undefined, parentNodeData?: NodeMetadata): NodeMetadata {
+    const database = useDatabaseFromQuery();
+    const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
+    const storedNodeData = isNil(nodeId) ? undefined : nodesMap?.get(nodeId);
+    return {
+        Host: parentNodeData?.Host || storedNodeData?.Host,
+        DC: parentNodeData?.DC || storedNodeData?.DC,
+        Rack: parentNodeData?.Rack || storedNodeData?.Rack,
+    };
+}
+
 interface VDiskPopupProps {
     data: PreparedVDisk | UnavailableDonor;
+    nodeData?: NodeMetadata;
     onClose?: VoidFunction;
 }
 
-export const VDiskPopup = ({data, onClose}: VDiskPopupProps) => {
+export const VDiskPopup = ({data, nodeData: parentNodeData, onClose}: VDiskPopupProps) => {
     const dispatch = useTypedDispatch();
     const isFullData = isFullVDiskData(data);
     const isViewerUser = useIsViewerUser();
@@ -457,7 +470,7 @@ export const VDiskPopup = ({data, onClose}: VDiskPopupProps) => {
     const hasDeveloperUi = useHasDeveloperUi();
     const getVDiskLink = useVDiskPagePath();
 
-    const database = useDatabaseFromQuery();
+    const nodeData = useNodeMetadata(data.NodeId, parentNodeData);
 
     const vdiskInfo = React.useMemo(
         () =>
@@ -496,8 +509,6 @@ export const VDiskPopup = ({data, onClose}: VDiskPopupProps) => {
         [data, isFullData, hasDeveloperUi, getVDiskLink, handleAfterEvictVDisk],
     );
 
-    const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
-    const nodeData = isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId);
     const pdiskInfo = React.useMemo(
         () =>
             isFullData &&

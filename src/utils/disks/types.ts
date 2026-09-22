@@ -98,6 +98,8 @@ export interface PreparedVDisk
     extends Omit<TVDiskStateInfo, 'PDisk' | 'AvailableSize' | 'AllocatedSize' | 'Donors'> {
     Status?: EVDiskStatus;
     PDisk?: PreparedPDisk;
+    PDiskType?: string;
+    PDiskPath?: string;
     Severity?: number;
     StringifiedId?: string;
 
