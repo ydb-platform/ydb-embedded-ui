@@ -153,6 +153,7 @@ function Slot<T extends SlotItemType>({
             return (
                 <HoverPopup
                     renderPopupContent={() => <VDiskInfo data={item.SlotData} withTitle />}
+                    keepOpenOnFocus
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >

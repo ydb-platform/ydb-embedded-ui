@@ -40,6 +40,7 @@ type HoverPopupProps = {
     delayOpen?: number;
     delayClose?: number;
     contentClassName?: string;
+    keepOpenOnFocus?: boolean;
 } & Pick<PopupProps, 'placement' | 'offset'>;
 
 export const HoverPopup = ({
@@ -52,6 +53,7 @@ export const HoverPopup = ({
     onHidePopup,
     placement = ['top', 'bottom', 'left', 'right'],
     contentClassName,
+    keepOpenOnFocus = false,
     delayClose = DEBOUNCE_TIMEOUT,
     delayOpen = DEBOUNCE_TIMEOUT,
 }: HoverPopupProps) => {
@@ -141,9 +143,22 @@ export const HoverPopup = ({
         reportOpen(true);
     }, [reportOpen]);
 
-    const onPopupBlur = React.useCallback(() => {
-        setIsFocused(false);
-    }, []);
+    const onPopupFocus = React.useCallback(() => {
+        if (keepOpenOnFocus) {
+            debouncedHandleHidePopup.cancel();
+            setIsFocused(true);
+            reportOpen(true);
+        }
+    }, [keepOpenOnFocus, debouncedHandleHidePopup, reportOpen]);
+
+    const onPopupBlur = React.useCallback(
+        (event: React.FocusEvent<HTMLDivElement>) => {
+            if (!keepOpenOnFocus || !event.currentTarget.contains(event.relatedTarget)) {
+                setIsFocused(false);
+            }
+        },
+        [keepOpenOnFocus],
+    );
 
     const onPopupEscapeKeyDown = React.useCallback(() => {
         closePopup();
@@ -189,6 +204,7 @@ export const HoverPopup = ({
                         onMouseEnter={onPopupMouseEnter}
                         onMouseLeave={onPopupMouseLeave}
                         onBlur={onPopupBlur}
+                        onFocus={onPopupFocus}
                     >
                         <div className={YDB_POPOVER_CLASS_NAME}>
                             {renderPopupContent({onClose: closePopup})}
