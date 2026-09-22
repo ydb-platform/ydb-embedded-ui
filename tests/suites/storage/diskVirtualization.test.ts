@@ -206,26 +206,29 @@ for (const expertMode of [false, true]) {
     });
 }
 
-test('keeps keyboard navigation across virtualized VDisks and PDisks', async ({
-    page,
-    browserName,
-}) => {
-    const storagePage = await openGroups(page, true);
-    const modifier = browserName === 'webkit' && process.platform === 'darwin' ? 'Alt+' : '';
-    const vDisks = storagePage.getGroupVDiskItems(GROUP_ID, true);
-    const pDisks = storagePage.getGroupPDiskItems(GROUP_ID);
-    const links = [vDisks, pDisks].flatMap((items) =>
-        Array.from({length: 11}, (_, index) => items.nth(index).getByRole('link')),
-    );
-    await links[0].focus();
-    for (const link of links.slice(1)) {
-        await page.keyboard.press(`${modifier}Tab`);
-        await expect(link).toBeFocused();
-        await expect(link).toBeInViewport();
-    }
-    for (const link of links.slice(0, -1).toReversed()) {
-        await page.keyboard.press(`${modifier}Shift+Tab`);
-        await expect(link).toBeFocused();
-        await expect(link).toBeInViewport();
-    }
-});
+for (const width of [320, 480]) {
+    test(`keeps keyboard navigation across virtualized VDisks and PDisks (viewport: ${width})`, async ({
+        page,
+        browserName,
+    }) => {
+        const storagePage = await openGroups(page, true);
+        await page.setViewportSize({width, height: 720});
+        const modifier = browserName === 'webkit' && process.platform === 'darwin' ? 'Alt+' : '';
+        const vDisks = storagePage.getGroupVDiskItems(GROUP_ID, true);
+        const pDisks = storagePage.getGroupPDiskItems(GROUP_ID);
+        const links = [vDisks, pDisks].flatMap((items) =>
+            Array.from({length: 11}, (_, index) => items.nth(index).getByRole('link')),
+        );
+        await links[0].focus();
+        for (const link of links.slice(1)) {
+            await page.keyboard.press(`${modifier}Tab`);
+            await expect(link).toBeFocused();
+            await expect(link).toBeInViewport();
+        }
+        for (const link of links.slice(0, -1).toReversed()) {
+            await page.keyboard.press(`${modifier}Shift+Tab`);
+            await expect(link).toBeFocused();
+            await expect(link).toBeInViewport();
+        }
+    });
+}

@@ -161,6 +161,7 @@ export const Disks = React.memo(function Disks({
     const getPDiskDisplayState = useStoragePDiskDisplayStateGetter();
 
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
+    const [hasFocus, setHasFocus] = React.useState(false);
     const vDiskList = useVirtualizedDiskList(
         vDisks,
         vDisks.every((disk) => Boolean(disk.StringifiedId)),
@@ -194,7 +195,15 @@ export const Disks = React.memo(function Disks({
         : VDISKS_CONTAINER_WIDTH;
 
     return (
-        <div className={b(null)}>
+        <div
+            className={b(null)}
+            onFocusCapture={() => setHasFocus(true)}
+            onBlurCapture={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) {
+                    setHasFocus(false);
+                }
+            }}
+        >
             <Flex
                 direction="row"
                 gap={1}
@@ -213,7 +222,10 @@ export const Disks = React.memo(function Disks({
                         withIcon={withIcon}
                         getDisplayState={getVDiskDisplayState}
                         isAllVDisksLayout={isAllVDisksLayout}
-                        renderContent={vDiskList.shouldRenderDisk(index)}
+                        renderContent={
+                            vDiskList.shouldRenderDisk(index) ||
+                            (hasFocus && index === vDisks.length - 1)
+                        }
                     />
                 ))}
             </Flex>
@@ -229,7 +241,9 @@ export const Disks = React.memo(function Disks({
                         withDCMargin={vDisksWithDCMargins.includes(index)}
                         withIcon={withIcon}
                         getDisplayState={getPDiskDisplayState}
-                        renderContent={pDiskList.shouldRenderDisk(index)}
+                        renderContent={
+                            pDiskList.shouldRenderDisk(index) || (hasFocus && index === 0)
+                        }
                     />
                 ))}
             </div>
