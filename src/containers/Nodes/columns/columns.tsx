@@ -3,6 +3,7 @@ import {
     getDataCenterColumn,
     getDatabaseColumn,
     getHostColumn,
+    getICPortColumn,
     getLoadAverageColumn,
     getMemoryColumn,
     getNodeIdColumn,
@@ -23,6 +24,7 @@ export function getNodesColumns(params: GetNodesColumnsParams): NodesColumn[] {
     const columns: NodesColumn[] = [
         getNodeIdColumn(),
         getHostColumn(params),
+        getICPortColumn(),
         getNodeNameColumn(),
         getDatabaseColumn(),
         getDataCenterColumn(),

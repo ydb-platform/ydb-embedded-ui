@@ -2,7 +2,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {DefinitionList, Tooltip} from '@gravity-ui/uikit';
 
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
-import type {TMemoryStats, TPoolStats} from '../../types/api/nodes';
+import type {TEndpoint, TMemoryStats, TPoolStats} from '../../types/api/nodes';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
@@ -56,6 +56,18 @@ export function getHostColumn<T extends PreparedStorageNode>({
         },
         width: 350,
         align: DataTable.LEFT,
+    };
+}
+
+export function getICPortColumn<T extends {Endpoints?: TEndpoint[]}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.ICPort,
+        header: NODES_COLUMNS_TITLES.ICPort,
+        render: ({row}) =>
+            row.Endpoints?.find(({Name}) => Name === 'ic')?.Address?.replace(/^:/, '') ||
+            EMPTY_DATA_PLACEHOLDER,
+        width: 100,
+        align: DataTable.RIGHT,
     };
 }
 
