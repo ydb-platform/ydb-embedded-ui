@@ -14,6 +14,10 @@ import type {PreparedPDisk, PreparedVDisk} from './types';
 export function prepareWhiteboardVDiskData(
     vDiskState: TVDiskStateInfo | TVSlotId = {},
 ): PreparedVDisk {
+    const hasWhiteboardData =
+        ('HasWhiteboardData' in vDiskState ? vDiskState.HasWhiteboardData : undefined) ??
+        (isFullVDiskData(vDiskState) && Boolean(vDiskState.VDiskId));
+
     if (!isFullVDiskData(vDiskState)) {
         const {NodeId, PDiskId, VSlotId, ...restVDiskFields} = vDiskState;
 
@@ -30,7 +34,7 @@ export function prepareWhiteboardVDiskData(
 
         return {
             ...restVDiskFields,
-            HasWhiteboardData: false,
+            HasWhiteboardData: hasWhiteboardData,
             StringifiedId,
             NodeId,
             PDiskId,
@@ -62,7 +66,7 @@ export function prepareWhiteboardVDiskData(
         AllocatedSize: AllocatedSize,
         SlotSize: PDisk?.EnforcedDynamicSlotSize,
     });
-    const WhiteboardSize = VDiskId
+    const WhiteboardSize = hasWhiteboardData
         ? prepareWhiteboardVDiskSizeFields({
               AvailableSize,
               AllocatedSize,
@@ -106,7 +110,7 @@ export function prepareWhiteboardVDiskData(
         ...restVDiskFields,
         ...vDiskSizeFields,
         WhiteboardSize,
-        HasWhiteboardData: Boolean(VDiskId),
+        HasWhiteboardData: hasWhiteboardData,
 
         VDiskId,
         NodeId,
@@ -123,6 +127,7 @@ export function prepareWhiteboardPDiskData(
     pdiskState: TPDiskStateInfo = {},
     whiteboardSizeSource: Pick<TPDiskStateInfo, 'AvailableSize' | 'TotalSize'> | null = pdiskState,
 ): PreparedPDisk {
+    const hasWhiteboardData = pdiskState.HasWhiteboardData ?? Boolean(whiteboardSizeSource);
     const {
         AvailableSize,
         TotalSize,
@@ -142,9 +147,10 @@ export function prepareWhiteboardPDiskData(
         AvailableSize,
         TotalSize,
     });
-    const WhiteboardSize = whiteboardSizeSource
-        ? prepareWhiteboardPDiskSizeFields(whiteboardSizeSource)
-        : undefined;
+    const WhiteboardSize =
+        hasWhiteboardData && whiteboardSizeSource
+            ? prepareWhiteboardPDiskSizeFields(whiteboardSizeSource)
+            : undefined;
 
     const Severity = calculatePDiskSeverity({
         State,
@@ -154,7 +160,7 @@ export function prepareWhiteboardPDiskData(
     return {
         ...restPDiskFields,
         ...pdiskPreparedSizeFields,
-        HasWhiteboardData: Boolean(whiteboardSizeSource),
+        HasWhiteboardData: hasWhiteboardData,
         ...(WhiteboardSize ? {WhiteboardSize} : {}),
         PDiskId,
         NodeId,

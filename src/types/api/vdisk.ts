@@ -6,6 +6,8 @@ import type {TPDiskStateInfo} from './pdisk';
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/node_whiteboard.proto
  */
 export interface TVDiskStateInfo {
+    /** Whether viewer received Whiteboard data for this disk. */
+    HasWhiteboardData?: boolean;
     VDiskId?: TVDiskID;
     /** uint64 */
     CreateTime?: string;

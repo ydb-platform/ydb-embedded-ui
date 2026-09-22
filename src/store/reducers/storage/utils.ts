@@ -76,15 +76,16 @@ const prepareStorageNodeData = (
         }).length || 0;
 
     const pDisks = PDisks?.map((pDisk) => {
-        // In the flat nodes response, identity and sizes can also come from BSC.
+        // Older viewers have no marker; identity and sizes can also come from BSC.
         const hasWhiteboardData =
-            pDisk.State !== undefined ||
-            pDisk.StateFlag !== undefined ||
-            pDisk.Overall !== undefined ||
-            pDisk.CreateTime !== undefined ||
-            pDisk.ChangeTime !== undefined ||
-            pDisk.Device !== undefined ||
-            pDisk.Realtime !== undefined;
+            pDisk.HasWhiteboardData ??
+            (pDisk.State !== undefined ||
+                pDisk.StateFlag !== undefined ||
+                pDisk.Overall !== undefined ||
+                pDisk.CreateTime !== undefined ||
+                pDisk.ChangeTime !== undefined ||
+                pDisk.Device !== undefined ||
+                pDisk.Realtime !== undefined);
         return prepareWhiteboardPDiskData({...pDisk, NodeId}, hasWhiteboardData ? pDisk : null);
     });
     const vDisks = VDisks?.map((vDisk) => {
