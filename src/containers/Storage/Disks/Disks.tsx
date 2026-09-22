@@ -126,7 +126,8 @@ const PDiskItem = React.memo(function PDiskItem({
     );
 
     if (!vDisk.PDisk) {
-        return null;
+        // Preserve disk indices for focus tracking while virtualization is disabled.
+        return <div hidden />;
     }
 
     return (

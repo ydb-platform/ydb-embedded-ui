@@ -64,7 +64,7 @@ export function useVirtualizedDiskList(disks: readonly DiskItem[], enabled = tru
 
     React.useEffect(() => {
         const container = containerRef.current;
-        if (!container || !enabled) {
+        if (!container) {
             return undefined;
         }
 
@@ -121,7 +121,7 @@ export function useVirtualizedDiskList(disks: readonly DiskItem[], enabled = tru
             observer.disconnect();
             container.removeEventListener('focusin', onFocus);
         };
-    }, [disks, enabled, shouldVirtualize]);
+    }, [disks, shouldVirtualize]);
 
     const shouldRenderDisk = (index: number) =>
         !shouldVirtualize ||

@@ -194,3 +194,18 @@ test('renders every disk while virtualization is disabled', () => {
     rerender({items: disks, virtualized: false});
     expect(renderedIndices()).toEqual(disks.map((_, index) => index));
 });
+
+test('preserves focus when refreshed identities enable virtualization', () => {
+    const partialDisks = disks.map((disk, index) => (index === 0 ? {StringifiedId: ''} : disk));
+    const {children, rerender, renderedIndices} = setup(false, partialDisks);
+    const focusedLink = children[6].querySelector('button');
+
+    act(() => focusedLink?.focus());
+    expect(observers).toHaveLength(0);
+
+    rerender({items: disks, virtualized: true});
+
+    // Keep the keyboard target mounted before the observer reports any visible disks.
+    expect(renderedIndices()).toEqual([5, 6, 7]);
+    expect(observers).toHaveLength(1);
+});
