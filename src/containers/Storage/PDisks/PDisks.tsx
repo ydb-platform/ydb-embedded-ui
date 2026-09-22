@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {isNil} from 'lodash';
+
 import {cn} from '../../../utils/cn';
 import type {
     PDiskDisplayStateGetter,
@@ -96,7 +98,10 @@ export const PDisks = React.memo(function PDisks({
     expertMode = false,
 }: PDisksProps) {
     const [highlightedDisk, setHighlightedDisk] = React.useState<string | undefined>();
-    const {containerRef, shouldRenderDisk} = useVirtualizedDiskList(pDisks);
+    const {containerRef, shouldRenderDisk} = useVirtualizedDiskList(
+        pDisks,
+        pDisks.every((disk) => !isNil(disk.NodeId) && !isNil(disk.PDiskId)),
+    );
     const vDisksGroupBy = useNodesVDisksGroupByParam();
     const isAllVDisksLayout = expertMode && vDisksGroupBy === VDisksGroupBy.All;
     const getStoragePDiskDisplayState = useStorageNodesPDiskDisplayStateGetter();
