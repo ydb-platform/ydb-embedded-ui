@@ -3,6 +3,7 @@ import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDB
 import {topQueriesApi} from '../../../../../store/reducers/executeTopQueries/executeTopQueries';
 import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
+import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 
 import i18n from './i18n';
 
@@ -17,12 +18,13 @@ interface ResourcePoolUsageProps {
 
 /** Displays running/queued query counts for a resource pool */
 export function ResourcePoolUsage({database, poolName}: ResourcePoolUsageProps) {
-    const {data, isFetching, error} = topQueriesApi.useGetRunningQueriesByPoolQuery(
+    const [autoRefreshInterval] = useAutoRefreshInterval();
+    const {currentData, isFetching, error} = topQueriesApi.useGetRunningQueriesByPoolQuery(
         {database, poolName},
-        {skip: !poolName},
+        {skip: !poolName, pollingInterval: autoRefreshInterval},
     );
 
-    const loading = isFetching && data === undefined;
+    const loading = isFetching && currentData === undefined;
 
     if (loading) {
         return <Loader size="s" className={b('loader')} />;
@@ -37,11 +39,11 @@ export function ResourcePoolUsage({database, poolName}: ResourcePoolUsageProps) 
             items={[
                 {
                     name: i18n('field_running-queries'),
-                    content: data?.runningQueriesCount ?? EMPTY_DATA_PLACEHOLDER,
+                    content: currentData?.runningQueriesCount ?? EMPTY_DATA_PLACEHOLDER,
                 },
                 {
                     name: i18n('field_queued-queries'),
-                    content: data?.queuedQueriesCount ?? EMPTY_DATA_PLACEHOLDER,
+                    content: currentData?.queuedQueriesCount ?? EMPTY_DATA_PLACEHOLDER,
                 },
             ]}
             title={i18n('title_usage')}

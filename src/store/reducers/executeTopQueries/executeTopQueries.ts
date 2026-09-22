@@ -277,9 +277,6 @@ export const topQueriesApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            forceRefetch() {
-                return true;
-            },
             providesTags: ['All'],
         }),
     }),
