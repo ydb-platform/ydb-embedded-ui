@@ -32,7 +32,7 @@ export const PDISK_TYPES = {
     MVME: 'NVME',
 } as const;
 
-export function formatPDiskType(type?: PDiskType) {
+export function formatPDiskType(type?: string) {
     return type === 'NVME' ? 'NVMe' : type;
 }
 
