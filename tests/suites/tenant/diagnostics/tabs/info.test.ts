@@ -568,8 +568,9 @@ test.describe('Diagnostics Info tab', async () => {
         await expect(infoContent).toHaveScreenshot('vector-index-info-overlap-clusters.png');
     });
 
-    test('Info tab displays fulltext index settings with use_filter_snowball', async ({page}) => {
+    test('Info tab displays optional fulltext analyzer settings', async ({page}) => {
         const mockIndexPath = '/local/test_table/my_fulltext_index';
+        let useFilterSuperlemmer: boolean | undefined;
 
         // Mock describe API to return a fulltext index with all settings
         await page.route(`**/viewer/json/describe?*`, async (route) => {
@@ -607,7 +608,9 @@ test.describe('Diagnostics Info tab', async () => {
                                                     language: 'english',
                                                     use_filter_lowercase: true,
                                                     use_filter_stopwords: true,
-                                                    use_filter_snowball: true,
+                                                    use_filter_snowball:
+                                                        useFilterSuperlemmer !== true,
+                                                    use_filter_superlemmer: useFilterSuperlemmer,
                                                 },
                                             },
                                         ],
@@ -642,9 +645,23 @@ test.describe('Diagnostics Info tab', async () => {
         await expect(indexSettings.getByText('Filter Snowball')).toBeVisible();
         await expect(indexSettings.getByText('Filter Lowercase')).toBeVisible();
         await expect(indexSettings.getByText('Filter Stopwords')).toBeVisible();
+        await expect(indexSettings.getByText('Filter Superlemmer')).toHaveCount(0);
 
         // Visual snapshot of fulltext index info with all settings
         await expect(infoContent).toHaveScreenshot('fulltext-index-info-settings.png');
+
+        for (const {value, status} of [
+            {value: true, status: 'Enabled'},
+            {value: false, status: 'Disabled'},
+        ]) {
+            useFilterSuperlemmer = value;
+            await page.reload();
+
+            const superlemmerRow = indexSettings
+                .locator('.info-viewer__row')
+                .filter({hasText: 'Filter Superlemmer'});
+            await expect(superlemmerRow.locator('.info-viewer__value')).toHaveText(status);
+        }
     });
 
     test('Info tab omits undefined schema metadata', async ({page}) => {
