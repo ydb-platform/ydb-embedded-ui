@@ -13,7 +13,7 @@ import {getFlagStatusText} from '../VDisk/getFlagStatusText';
 
 import {vDiskStatusKeyset as i18n} from './i18n';
 import type {VDiskStatusLabel as VDiskStatusLabelData} from './statuses';
-import {getVDiskStateLabel, getVDiskTypeTooltip, isVDiskFlagVisible} from './statuses';
+import {getVDiskStateLabel, getVDiskTypeTooltip} from './statuses';
 
 import './VDiskStatus.scss';
 
@@ -89,22 +89,23 @@ function VDiskFlagLabel({
     title?: string;
     frontQueues?: boolean;
 }) {
-    if (!isVDiskFlagVisible(flag)) {
-        return null;
-    }
-
-    const theme = EFlagToLabelTheme[flag] ?? 'normal';
+    const resolvedFlag = flag || EFlag.Grey;
+    const theme = EFlagToLabelTheme[resolvedFlag] ?? 'normal';
     const icon = frontQueues
-        ? calculateFrontQueuesIcon({FrontQueues: flag})
-        : getFlagIconWithColor(flag)?.icon;
+        ? calculateFrontQueuesIcon({FrontQueues: resolvedFlag})
+        : getFlagIconWithColor(resolvedFlag)?.icon;
 
     return (
         <VDiskStatusLabel
-            value={getFlagStatusText(flag)}
+            value={
+                resolvedFlag === EFlag.Grey
+                    ? i18n('value_no-data')
+                    : getFlagStatusText(resolvedFlag)
+            }
             title={title}
             theme={theme}
             icon={icon}
-            dangerHeavy={flag === EFlag.Red}
+            dangerHeavy={resolvedFlag === EFlag.Red}
             size="xs"
         />
     );

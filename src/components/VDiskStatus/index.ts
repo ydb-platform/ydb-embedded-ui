@@ -8,4 +8,3 @@ export {
     VDiskTypeLabel,
 } from './VDiskStatus';
 export {VDiskReplicationStatus} from './VDiskReplicationStatus';
-export {isVDiskFlagVisible} from './statuses';

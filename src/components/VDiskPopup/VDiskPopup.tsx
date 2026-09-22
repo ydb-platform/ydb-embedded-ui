@@ -33,7 +33,6 @@ import {
     VDiskReplicationStatus,
     VDiskStateLabel,
     VDiskTypeLabel,
-    isVDiskFlagVisible,
 } from '../VDiskStatus';
 import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
@@ -96,26 +95,27 @@ function DiskLocation({
 }
 
 function getRuntimeItems(data: PreparedVDisk): YDBDefinitionListItem[] {
-    const items: YDBDefinitionListItem[] = [];
-    if (isVDiskFlagVisible(data.FrontQueues)) {
-        items.push({
+    const items: YDBDefinitionListItem[] = [
+        {
             name: i18n('label_front-queues'),
             content: <VDiskFrontQueuesLabel flag={data.FrontQueues} />,
-        });
-    }
-    const fresh = data.SatisfactionRank?.FreshRank?.Flag;
-    const level = data.SatisfactionRank?.LevelRank?.Flag;
-    if (isVDiskFlagVisible(fresh) || isVDiskFlagVisible(level)) {
-        items.push({
+        },
+        {
             name: i18n('label_compaction'),
             content: (
                 <Flex direction="column" gap={1} alignItems="flex-start">
-                    <VDiskCompactionRankLabel flag={fresh} rank="fresh" />
-                    <VDiskCompactionRankLabel flag={level} rank="level" />
+                    <VDiskCompactionRankLabel
+                        flag={data.SatisfactionRank?.FreshRank?.Flag}
+                        rank="fresh"
+                    />
+                    <VDiskCompactionRankLabel
+                        flag={data.SatisfactionRank?.LevelRank?.Flag}
+                        rank="level"
+                    />
                 </Flex>
             ),
-        });
-    }
+        },
+    ];
     for (const [name, value] of [
         [i18n('label_read'), data.ReadThroughput],
         [i18n('label_write'), data.WriteThroughput],
