@@ -1,3 +1,4 @@
+import {CircleQuestionFill} from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
@@ -53,7 +54,14 @@ export function DiskIndicator({
 
     return (
         <Icon
-            className={b('icon', {'overlap-top-left': placement === 'overlap'}, className)}
+            className={b(
+                'icon',
+                {
+                    'overlap-top-left': placement === 'overlap',
+                    'missing-data': value === CircleQuestionFill,
+                },
+                className,
+            )}
             data={value}
             size={iconSize}
         />

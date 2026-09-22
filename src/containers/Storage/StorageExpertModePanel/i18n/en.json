@@ -2,7 +2,7 @@
   "value_drive-type": "Drive type",
   "value_ssd": "SSD",
   "value_hdd": "HDD",
-  "value_nvme": "NVME",
+  "value_nvme": "NVMe",
   "label_vdisks": "VDisks:",
   "label_pdisks": "PDisks:",
   "value_state": "State",

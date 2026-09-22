@@ -34,7 +34,7 @@ describe('disk icon calculators', () => {
                 },
             }),
         ).toEqual([
-            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
+            {icon: CircleQuestionFill, color: 'var(--g-color-text-hint)'},
             {icon: TriangleExclamationFill, color: 'var(--g-color-text-warning)'},
         ]);
     });
@@ -48,14 +48,14 @@ describe('disk icon calculators', () => {
             }),
         ).toEqual([
             {icon: CircleCheckFill, color: 'var(--g-color-text-positive)'},
-            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
+            {icon: CircleQuestionFill, color: 'var(--g-color-text-hint)'},
         ]);
     });
 
     test('returns question icons when both Compaction ranks are missing', () => {
         expect(calculateCompactionIcon({})).toEqual([
-            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
-            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
+            {icon: CircleQuestionFill, color: 'var(--g-color-text-hint)'},
+            {icon: CircleQuestionFill, color: 'var(--g-color-text-hint)'},
         ]);
     });
 
@@ -68,8 +68,8 @@ describe('disk icon calculators', () => {
                 },
             }),
         ).toEqual([
-            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
-            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
+            {icon: CircleQuestionFill, color: 'var(--g-color-text-hint)'},
+            {icon: CircleQuestionFill, color: 'var(--g-color-text-hint)'},
         ]);
     });
 
@@ -82,7 +82,7 @@ describe('disk icon calculators', () => {
                 },
             }),
         ).toEqual([
-            {icon: CircleQuestionFill, color: 'rgba(162, 162, 162, 1)'},
+            {icon: CircleQuestionFill, color: 'var(--g-color-text-hint)'},
             {icon: CircleCheckFill, color: 'var(--g-color-text-positive)'},
         ]);
     });
