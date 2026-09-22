@@ -7,7 +7,7 @@
   "context_space-accessible-name": "{{disk}}. Capacity alert: {{capacityAlert}}.",
   "context_front-queues-accessible-name": "{{disk}}. Front queues: {{frontQueues}}.",
   "context_compaction-accessible-name": "{{disk}}. Fresh compaction: {{freshCompaction}}. Level compaction: {{levelCompaction}}.",
-  "value_ok": "OK",
+  "value_ok": "Ok",
   "value_notice": "Notice",
   "value_warning": "Warning",
   "value_impaired": "Impaired",
