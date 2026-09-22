@@ -17,6 +17,8 @@ export interface TEvPDiskStateResponse {
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/node_whiteboard.proto
  */
 export interface TPDiskStateInfo {
+    /** Whether viewer received Whiteboard data for this disk. */
+    HasWhiteboardData?: boolean;
     PDiskId?: number;
     /** uint64 */
     CreateTime?: string;
