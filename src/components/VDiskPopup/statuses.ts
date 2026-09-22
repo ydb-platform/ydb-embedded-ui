@@ -28,6 +28,19 @@ export interface VDiskStatusLabel {
     dangerHeavy?: boolean;
 }
 
+export function getVDiskTypeTooltip(type?: string): string | undefined {
+    switch (type?.toUpperCase()) {
+        case 'HDD':
+            return i18n('context_hdd');
+        case 'SSD':
+            return i18n('context_ssd');
+        case 'NVME':
+            return i18n('context_nvme');
+        default:
+            return undefined;
+    }
+}
+
 export function getVDiskStateLabel(data: PreparedVDisk): VDiskStatusLabel {
     const state = data.VDiskState;
     const severity = state

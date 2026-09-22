@@ -55,7 +55,7 @@ import {formatCapacityUnitCount} from '../capacityMetricsColumns/formatters';
 
 import {vDiskPopupKeyset as i18n} from './i18n';
 import type {VDiskStatusLabel} from './statuses';
-import {getVDiskReplicationLabel, getVDiskStateLabel} from './statuses';
+import {getVDiskReplicationLabel, getVDiskStateLabel, getVDiskTypeTooltip} from './statuses';
 
 import './VDiskPopup.scss';
 
@@ -329,7 +329,7 @@ function DiskHeader({data = {}}: {data?: PreparedVDisk}) {
                         aria-label={i18n('action_copy-field', {field: i18n('label_vdisk')})}
                     />
                 )}
-                {typeLabel && <Label size="s">{typeLabel}</Label>}
+                {typeLabel && <StatusLabel value={typeLabel} tooltip={getVDiskTypeTooltip(type)} />}
             </Flex>
             <Flex gap={1} wrap="wrap" alignItems="center">
                 <StatusLabel {...stateLabel} />
