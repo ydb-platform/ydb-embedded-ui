@@ -2,6 +2,7 @@ import {CircleQuestionFill} from '@gravity-ui/icons';
 
 import {NOT_AVAILABLE_SEVERITY} from './constants';
 import type {BaseDiskDisplayState} from './displayState';
+import {formatPDiskType} from './getPDiskType';
 import type {PDiskType, PreparedPDisk} from './types';
 
 export function getDriveTypeDisplayState(pDisk: PreparedPDisk = {}): BaseDiskDisplayState {
@@ -21,7 +22,7 @@ export function getDriveTypeDisplayState(pDisk: PreparedPDisk = {}): BaseDiskDis
         mode: 'driveType',
         driveType,
         severity: NOT_AVAILABLE_SEVERITY,
-        icon: isNoData ? undefined : (driveType ?? CircleQuestionFill),
+        icon: isNoData ? undefined : (formatPDiskType(driveType) ?? CircleQuestionFill),
         isNoData,
         borderless: true,
         showNoDataPlaceholder: isNoData,

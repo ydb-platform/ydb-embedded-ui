@@ -20,6 +20,7 @@ import type {
 } from '../../../utils/disks/displayState';
 import {getDefaultPDiskDisplayState} from '../../../utils/disks/displayState';
 import {getDiskBarTone} from '../../../utils/disks/getDiskBarTone';
+import {formatPDiskType} from '../../../utils/disks/getPDiskType';
 import {getPDiskId, getVDiskStatusIcon} from '../../../utils/disks/helpers';
 import type {PreparedPDisk} from '../../../utils/disks/types';
 import {isNumeric} from '../../../utils/utils';
@@ -78,7 +79,9 @@ function getPDiskContent({
             type={
                 <React.Fragment>
                     {showNoDataLabel ? barContent : null}
-                    <DiskBarLabel>{data.Type || EMPTY_DATA_PLACEHOLDER}</DiskBarLabel>
+                    <DiskBarLabel>
+                        {formatPDiskType(data.Type) || EMPTY_DATA_PLACEHOLDER}
+                    </DiskBarLabel>
                 </React.Fragment>
             }
         />
@@ -211,7 +214,7 @@ function getAccessibleName(
         case 'driveType':
             return i18n('context_drive-type-accessible-name', {
                 disk: diskName,
-                driveType: driveType || noData,
+                driveType: formatPDiskType(driveType) || noData,
             });
         case 'state':
             return i18n('context_state-accessible-name', {disk: diskName, state: State || noData});

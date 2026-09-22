@@ -653,7 +653,7 @@ test.describe('Drive type - groups expert mode', () => {
             for (const [index, type, color] of [
                 [1, 'SSD', 'misc-medium'],
                 [2, 'HDD', 'utility-light'],
-                [6, 'NVME', 'info-light'],
+                [6, 'NVMe', 'info-light'],
             ] as const) {
                 const vDisk = getVDiskItems(row).nth(index).getByRole('link');
                 const pDisk = row
@@ -673,7 +673,7 @@ test.describe('Drive type - groups expert mode', () => {
             }
             await expect(
                 row.locator('.ydb-storage-disks__pdisk-item').nth(0).getByRole('link'),
-            ).toHaveText('NVME');
+            ).toHaveText('NVMe');
             for (const index of [MISSING_PDISK_TYPE_INDEX, UNKNOWN_PDISK_TYPE_INDEX]) {
                 for (const disk of [
                     getVDiskItems(row).nth(index).getByRole('link'),
