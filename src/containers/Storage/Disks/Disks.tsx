@@ -74,7 +74,11 @@ const VDiskItem = React.memo(function VDiskItem({
         : {width: compactVDiskWidth, flexBasis: compactVDiskWidth};
 
     return (
-        <div style={style} className={b('vdisk-item', {all: isAllVDisksLayout})}>
+        <div
+            style={style}
+            className={b('vdisk-item', {all: isAllVDisksLayout})}
+            data-disk-id={vDisk.StringifiedId}
+        >
             {isAllVDisksLayout ? (
                 <div
                     aria-hidden
@@ -127,12 +131,13 @@ const PDiskItem = React.memo(function PDiskItem({
 
     if (!vDisk.PDisk) {
         // Preserve disk indices for focus tracking while virtualization is disabled.
-        return <div hidden />;
+        return <div data-disk-id={vDiskId} hidden />;
     }
 
     return (
         <div
             className={b('pdisk-item', {['with-dc-margin']: withDCMargin})}
+            data-disk-id={vDiskId}
             style={{width: getDisplayState?.(vDisk.PDisk).width ?? EXPERT_MODE_PDISK_WIDTH}}
             tabIndex={-1}
             {...(renderContent || highlighted ? undefined : placeholderProps)}

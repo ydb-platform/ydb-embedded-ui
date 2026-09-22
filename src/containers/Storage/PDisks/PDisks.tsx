@@ -151,6 +151,7 @@ export const PDisks = React.memo(function PDisks({
                     <div
                         className={b('pdisks-item')}
                         key={id || index}
+                        data-disk-id={id}
                         style={{width: pDiskWidth}}
                         tabIndex={-1}
                         {...(hasOpenPopup ? undefined : getPlaceholderProps(index))}

@@ -10,6 +10,10 @@ function getDiskKey(disks: readonly DiskItem[], index: number) {
     return disks[index]?.StringifiedId || index;
 }
 
+function getElementDiskKey(element: Element, index: number) {
+    return element.getAttribute('data-disk-id') || index;
+}
+
 export function useVirtualizedDiskList(disks: readonly DiskItem[], enabled = true) {
     const shouldVirtualize = enabled && disks.length >= MIN_VIRTUALIZED_DISKS_COUNT;
     const containerRef = React.useRef<HTMLDivElement | null>(null);
@@ -37,19 +41,20 @@ export function useVirtualizedDiskList(disks: readonly DiskItem[], enabled = tru
                 if (event.target !== event.currentTarget) {
                     return;
                 }
-                const index = Array.from(containerRef.current?.children ?? []).findIndex(
-                    (element) => element.contains(event.currentTarget),
+                const elements = Array.from(containerRef.current?.children ?? []);
+                const index = elements.findIndex((element) =>
+                    element.contains(event.currentTarget),
                 );
                 if (index !== -1) {
                     pendingFocusRef.current = {
                         element: event.currentTarget,
-                        fromEnd: index === disks.length - 1,
+                        fromEnd: index === elements.length - 1,
                     };
-                    setLastFocusedKey(getDiskKey(disks, index));
+                    setLastFocusedKey(getElementDiskKey(elements[index], index));
                 }
             },
         }),
-        [disks],
+        [],
     );
 
     React.useLayoutEffect(() => {
@@ -75,11 +80,12 @@ export function useVirtualizedDiskList(disks: readonly DiskItem[], enabled = tru
             if (!(target instanceof Node)) {
                 return;
             }
-            const index = Array.from(container.children).findIndex((element) =>
-                element.contains(target),
-            );
+            const elements = Array.from(container.children);
+            const index = elements.findIndex((element) => element.contains(target));
             if (index !== -1) {
-                setLastFocusedKey(getDiskKey(disks, index));
+                // React restores focus before effects update after a reorder. Read
+                // the committed DOM identity, not an index into the previous data.
+                setLastFocusedKey(getElementDiskKey(elements[index], index));
             }
         };
         container.addEventListener('focusin', onFocus);
@@ -90,7 +96,10 @@ export function useVirtualizedDiskList(disks: readonly DiskItem[], enabled = tru
 
         // Each disk keeps one direct child as its sized placeholder.
         const keysByElement = new Map(
-            Array.from(container.children, (element, index) => [element, getDiskKey(disks, index)]),
+            Array.from(container.children, (element, index) => [
+                element,
+                getElementDiskKey(element, index),
+            ]),
         );
         const intersectingKeys = new Set<string | number>();
         let active = true;

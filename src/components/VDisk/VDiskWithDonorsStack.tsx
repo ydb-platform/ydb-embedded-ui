@@ -71,7 +71,9 @@ export function VDiskWithDonorsStack({
 
     // Keep the stack's state and popup anchors until a main/donor interaction finishes.
     if (!renderContent && !isHighlighted && !highlightedVDiskInStack) {
-        return <div className={className} tabIndex={-1} {...placeholderProps} />;
+        return (
+            <div className={className} data-disk-id={stackId} tabIndex={-1} {...placeholderProps} />
+        );
     }
 
     // Spread restProps first, then explicitly override critical fields to prevent
@@ -131,7 +133,7 @@ export function VDiskWithDonorsStack({
     );
 
     return (
-        <div className={className} tabIndex={-1}>
+        <div className={className} data-disk-id={stackId} tabIndex={-1}>
             {content}
         </div>
     );

@@ -172,6 +172,38 @@ test('tracks the correct disks after data is reordered on refresh', async ({page
     await expect(nodesPage.getVDiskLink(1, '1010-1-0-0-0')).toBeInViewport();
 });
 
+test('preserves keyboard focus when auto-refresh reorders disks', async ({page, browserName}) => {
+    const modifier = browserName === 'webkit' && process.platform === 'darwin' ? 'Alt+' : '';
+    const mock = await setupLargeDisksMock(page, 1);
+    const nodesPage = new NodesPage(page);
+    const table = new ClusterNodesTable(page);
+    await nodesPage.goto();
+    await table.waitForTableData();
+    const disk = nodesPage.getPDiskLink(1, 3);
+    await expect(disk).toBeInViewport();
+    await page.clock.install({time: new Date('2026-01-01T00:00:00Z')});
+    await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
+    await table.getControls().setRefreshInterval('15 sec');
+    await disk.focus();
+    await expect(disk).toBeFocused();
+
+    mock.reversePDisks();
+    await page.clock.runFor(15_000);
+    // Let the table's request-batching timer finish after the polling interval fires.
+    await page.clock.resume();
+    await expect(
+        nodesPage.table.locator('.ydb-storage-pdisks__pdisks-item').first(),
+    ).toHaveAttribute('data-disk-id', '1-66');
+    await expect(disk).toBeFocused();
+
+    await page.keyboard.press(`${modifier}Tab`);
+    const nextDisk = nodesPage.getVDiskLink(1, '1010-1-0-0-0');
+    await expect(nextDisk).toBeFocused();
+    await expect(nextDisk).toBeInViewport();
+    await page.keyboard.press(`${modifier}Shift+Tab`);
+    await expect(disk).toBeFocused();
+});
+
 test('keeps disk rendering bounded when scrolling a large Nodes table', async ({page}) => {
     await setupLargeDisksMock(page);
     const nodesPage = new NodesPage(page);

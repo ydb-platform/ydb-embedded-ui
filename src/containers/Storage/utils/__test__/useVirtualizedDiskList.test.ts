@@ -51,8 +51,9 @@ const disks = Array.from({length: 11}, (_, index) => ({StringifiedId: `disk-${in
 
 function setup(enabled = true, initialDisks = disks) {
     const container = document.createElement('div');
-    const children = initialDisks.map(() => {
+    const children = initialDisks.map((disk) => {
         const child = document.createElement('div');
+        child.setAttribute('data-disk-id', disk.StringifiedId);
         child.append(document.createElement('button'));
         container.append(child);
         return child;
@@ -166,6 +167,23 @@ test('keeps the last focused disk and neighbors mounted for keyboard return navi
     expect(renderedIndices()).toEqual([3, 4, 5]);
 });
 
+test('preserves disk identity when focus is restored before the reorder effect updates', () => {
+    const {children, container, rerender, renderedIndices} = setup();
+    const focusedLink = children[3].querySelector('button');
+    act(() => focusedLink?.focus());
+
+    act(() => {
+        container.replaceChildren(...children.toReversed());
+        // Match React's commit order: move DOM nodes, restore focus, then update effects.
+        focusedLink?.focus();
+        rerender({items: disks.toReversed(), virtualized: true});
+    });
+
+    // Disk 3 now occupies index 7; it must stay mounted without visibility notifications.
+    expect(renderedIndices()).toEqual([6, 7, 8]);
+    expect(document.activeElement).toBe(focusedLink);
+});
+
 test('clears the keyboard return target when its disk disappears', () => {
     const {children, rerender, renderedIndices} = setup();
     act(() => children[3].querySelector('button')?.focus());
@@ -177,6 +195,7 @@ test('clears the keyboard return target when its disk disappears', () => {
 
 test('keeps missing identities independent when visibility changes', () => {
     const {children, rerender, renderedIndices} = setup();
+    children.forEach((child) => child.removeAttribute('data-disk-id'));
     rerender({items: disks.map(() => ({StringifiedId: ''})), virtualized: true});
     act(() => {
         latestObserver().publish(children[3], true);
