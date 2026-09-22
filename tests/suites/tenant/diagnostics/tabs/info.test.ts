@@ -570,6 +570,7 @@ test.describe('Diagnostics Info tab', async () => {
 
     test('Info tab displays optional fulltext analyzer settings', async ({page}) => {
         const mockIndexPath = '/local/test_table/my_fulltext_index';
+        const diagnostics = new Diagnostics(page);
         let useFilterSuperlemmer: boolean | undefined;
 
         // Mock describe API to return a fulltext index with all settings
@@ -645,7 +646,7 @@ test.describe('Diagnostics Info tab', async () => {
         await expect(indexSettings.getByText('Filter Snowball')).toBeVisible();
         await expect(indexSettings.getByText('Filter Lowercase')).toBeVisible();
         await expect(indexSettings.getByText('Filter Stopwords')).toBeVisible();
-        await expect(indexSettings.getByText('Filter Superlemmer')).toHaveCount(0);
+        await expect(diagnostics.getInfoViewerValue('Filter Superlemmer')).toHaveCount(0);
 
         // Visual snapshot of fulltext index info with all settings
         await expect(infoContent).toHaveScreenshot('fulltext-index-info-settings.png');
@@ -657,10 +658,7 @@ test.describe('Diagnostics Info tab', async () => {
             useFilterSuperlemmer = value;
             await page.reload();
 
-            const superlemmerRow = indexSettings
-                .locator('.info-viewer__row')
-                .filter({hasText: 'Filter Superlemmer'});
-            await expect(superlemmerRow.locator('.info-viewer__value')).toHaveText(status);
+            await expect(diagnostics.getInfoViewerValue('Filter Superlemmer')).toHaveText(status);
         }
     });
 
