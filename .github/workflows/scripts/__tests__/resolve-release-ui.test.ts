@@ -24,7 +24,9 @@ function fixture(version = '18.1.0') {
             JSON.stringify({packages: {'node_modules/@playwright/test': {version: '1.58.0'}}}),
         ),
     };
-    const run = (options: {ydbTag: string; ydbSha?: string; workflowSha: string} = input) =>
+    const run = (
+        options: {ydbTag: string; ydbSha?: string; testsSha?: string; workflowSha: string} = input,
+    ) =>
         resolveRelease(
             options,
             async (path: string) => {
@@ -46,12 +48,34 @@ test.each(['18.1.0', '15.6.0-hotfix.1'])(
             ydb_sha: input.ydbSha,
             ui_version: version,
             ui_sha: uiSha,
+            tests_sha: uiSha,
             playwright_version: '1.58.0',
             image_digest: imageDigest,
             frontend_mode: 'npm-start',
         });
     },
 );
+
+test('selects test dependencies without changing the release UI identity', async () => {
+    const {responses, run} = fixture();
+    const testsSha = 'e'.repeat(40);
+    responses[`${uiRepo}/commits/${testsSha}`] = {sha: testsSha};
+    responses[`${uiRepo}/contents/package-lock.json?ref=${testsSha}`] = file(
+        JSON.stringify({packages: {'node_modules/@playwright/test': {version: '1.59.0'}}}),
+    );
+    await expect(run({...input, testsSha})).resolves.toMatchObject({
+        ui_sha: uiSha,
+        ui_version: '18.1.0',
+        tests_sha: testsSha,
+        playwright_version: '1.59.0',
+    });
+    await expect(run({...input, testsSha: ''})).resolves.toMatchObject({tests_sha: uiSha});
+    responses[`${uiRepo}/commits/${testsSha}`] = {sha: uiSha};
+    await expect(run({...input, testsSha})).rejects.toThrow('Test revision');
+    responses[`${uiRepo}/commits/${testsSha}`] = new Error('Commit not found');
+    await expect(run({...input, testsSha})).rejects.toThrow('Commit not found');
+    await expect(run({...input, testsSha: 'main'})).rejects.toThrow('tests_sha');
+});
 
 test.each([undefined, ''])(
     'resolves the tag commit when the expected SHA is %p',

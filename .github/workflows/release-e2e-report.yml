@@ -81,6 +81,7 @@ jobs:
           CI: 'true'
           PLAYWRIGHT_RELEASE_MODE: report
           PLAYWRIGHT_RELEASE_REF: ${{ steps.prepare.outputs.ui_sha }}
+          PLAYWRIGHT_RELEASE_TEST_REF: ${{ steps.prepare.outputs.tests_sha }}
           PLAYWRIGHT_RELEASE_VERSION: ${{ steps.prepare.outputs.playwright_version }}
           PLAYWRIGHT_RELEASE_OUTPUT: ${{ github.workspace }}/ui
       - name: Sanitize report files

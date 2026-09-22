@@ -58,6 +58,12 @@ test('starts the release-version frontend while keeping local-ydb as its backend
     expect(workflow).not.toContain('PLAYWRIGHT_BASE_URL:');
     expect(workflow).toContain('PLAYWRIGHT_APP_BACKEND: http://localhost:8765');
     expect(workflow).toContain('PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}');
+    expect(workflow).toContain(
+        'PLAYWRIGHT_RELEASE_TEST_REF: ${{ needs.resolve.outputs.tests_sha }}',
+    );
+    expect(reportWorkflow).toContain(
+        'PLAYWRIGHT_RELEASE_TEST_REF: ${{ steps.prepare.outputs.tests_sha }}',
+    );
 });
 
 test('forwards backend routes and streaming without rewriting UI paths', async () => {
