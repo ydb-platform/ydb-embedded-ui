@@ -72,10 +72,16 @@ export function DiskTypeLabel({type}: {type?: string}) {
     return value ? <DiskStatusLabel value={value} tooltip={tooltip} /> : null;
 }
 
-export function DiskCapacityAlertLabel({value}: {value?: string}) {
+export function DiskCapacityAlertLabel({
+    value,
+    emptyText = i18n('value_no-data'),
+}: {
+    value?: string;
+    emptyText?: string;
+}) {
     const capacityAlert = normalizeCapacityAlert(value);
     if (!capacityAlert) {
-        return <DiskStatusLabel size="xs" value={i18n('value_no-data')} theme="unknown" />;
+        return <DiskStatusLabel size="xs" value={emptyText} theme="unknown" />;
     }
     return (
         <DiskStatusLabel

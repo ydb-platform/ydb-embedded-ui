@@ -15,33 +15,26 @@ export function getPDiskRuntimeItems(data: PreparedPDisk): DiskDetailItem[] {
     ];
 }
 
-export function getPDiskCapacityItems(
-    data: PreparedPDisk,
-    {useWhiteboardSize}: {useWhiteboardSize: boolean},
-): DiskDetailItem[] {
-    const size = useWhiteboardSize ? (data.WhiteboardSize ?? data) : data;
-    const available = (value: unknown) => parseOptionalNonNegativeNumber(value) !== undefined;
-    const fields = [
-        {id: 'slot-size-in-units', visible: available(data.SlotSizeInUnits)},
-        {id: 'space', visible: available(size.AllocatedSize) || available(size.TotalSize)},
-        {id: 'capacity-alert', visible: true},
-        {id: 'pdisk-usage', visible: available(data.PDiskUsage)},
-        {id: 'slots', visible: available(data.NumActiveSlots) || available(data.ExpectedSlotCount)},
-    ];
-    const capacityItems = getPDiskCapacityInfoItems(
-        useWhiteboardSize ? data : {...data, WhiteboardSize: undefined},
-        {withUsage: true, withCapacityAlert: true, fixedDecimalPlaces: 2},
-    );
+export function getPDiskCapacityItems(data: PreparedPDisk): DiskDetailItem[] {
+    const fieldOrder = ['slot-size-in-units', 'space', 'capacity-alert', 'pdisk-usage', 'slots'];
+    const capacityItems = getPDiskCapacityInfoItems(data, {
+        withUsage: true,
+        withCapacityAlert: true,
+        fixedDecimalPlaces: 2,
+    });
     const items: DiskDetailItem[] = [];
-    for (const {id, visible} of fields) {
-        const field = visible ? capacityItems.find((item) => item.id === id) : undefined;
+    for (const id of fieldOrder) {
+        const field = capacityItems.find((item) => item.id === id);
         if (field) {
             items.push({
                 id,
                 name: field.title,
                 content:
                     id === 'capacity-alert' ? (
-                        <DiskCapacityAlertLabel value={data.PDiskCapacityAlert} />
+                        <DiskCapacityAlertLabel
+                            value={data.PDiskCapacityAlert}
+                            emptyText={i18n('value_no-data')}
+                        />
                     ) : (
                         field.value
                     ),
@@ -49,6 +42,12 @@ export function getPDiskCapacityItems(
             });
         }
     }
+    return items;
+}
+
+export function getPDiskLogItems(data: PreparedPDisk): DiskDetailItem[] {
+    const items: DiskDetailItem[] = [];
+    const available = (value: unknown) => parseOptionalNonNegativeNumber(value) !== undefined;
     if (available(data.LogUsedSize) || available(data.LogTotalSize)) {
         items.push({
             id: 'log-size',

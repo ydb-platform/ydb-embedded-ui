@@ -30,6 +30,7 @@ export function getVDiskLocationItems(
             VDiskSlotId: isFullVDiskData(data) ? data.VDiskSlotId : data.VSlotId,
         },
         nodeData,
+        {withVDiskSlotId: true},
     );
 }
 

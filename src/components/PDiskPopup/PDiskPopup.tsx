@@ -11,6 +11,8 @@ import {BRAND_BUTTON_CLASS} from '../../utils/constants';
 import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useNodeMetadata} from '../../utils/hooks/useNodeMetadata';
+import {isNumeric} from '../../utils/utils';
+import type {DiskDetailItem} from '../DiskInfo/getDiskLocationItems';
 import {getDiskLocationItems} from '../DiskInfo/getDiskLocationItems';
 import {
     DiskPopup,
@@ -21,7 +23,11 @@ import {
 import {DiskStatusLabel} from '../DiskStatus/DiskStatus';
 import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
-import {getPDiskCapacityItems, getPDiskRuntimeItems} from '../PDiskInfo/getPDiskDetails';
+import {
+    getPDiskCapacityItems,
+    getPDiskLogItems,
+    getPDiskRuntimeItems,
+} from '../PDiskInfo/getPDiskDetails';
 import {
     getPDiskDecommitLabel,
     getPDiskDriveLabel,
@@ -31,6 +37,15 @@ import {
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
 import {pDiskPopupKeyset} from './i18n';
+
+function getStorageItems(data: PreparedPDisk, capacityMetricsEnabled: boolean): DiskDetailItem[] {
+    const items = getPDiskCapacityItems(data).filter(
+        ({id}) =>
+            capacityMetricsEnabled ||
+            (id === 'space' && isNumeric(data.TotalSize) && isNumeric(data.AvailableSize)),
+    );
+    return [...items, ...getPDiskLogItems(data)];
+}
 
 export const buildPDiskFooter = (
     data: PreparedPDisk,
@@ -86,7 +101,8 @@ export function PDiskPopupContent({
     const nodeData = useNodeMetadata(data.NodeId, parentNodeData);
     const hasDeveloperUi = useHasDeveloperUi();
     const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
-    const storageItems = getPDiskCapacityItems(data, {useWhiteboardSize: capacityMetricsEnabled});
+    const storageItems = getStorageItems(data, capacityMetricsEnabled);
+    const locationItems = getDiskLocationItems(data, nodeData);
     const statusLabels = [
         {id: 'state', label: getPDiskStateLabel(data.State)},
         {
@@ -107,10 +123,7 @@ export function PDiskPopupContent({
                     label ? <DiskStatusLabel key={id} {...label} /> : null,
                 )}
             />
-            <DiskPopupLocation
-                items={getDiskLocationItems(data, nodeData)}
-                title={pDiskPopupKeyset('label_pdisk')}
-            />
+            <DiskPopupLocation items={locationItems} title={pDiskPopupKeyset('label_pdisk')} />
             <YDBDefinitionList items={getPDiskRuntimeItems(data)} nameMaxWidth={nameMaxWidth} />
             {storageItems.length > 0 && (
                 <React.Fragment>
