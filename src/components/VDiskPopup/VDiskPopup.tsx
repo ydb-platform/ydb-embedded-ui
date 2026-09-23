@@ -29,7 +29,7 @@ import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/Evi
 import {InternalLink} from '../InternalLink';
 import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
-import {PDiskPopup} from '../PDiskPopup/PDiskPopup';
+import {PDiskPopupContent} from '../PDiskPopup/PDiskPopup';
 import {getVDiskCapacityItems, getVDiskLocationItems} from '../VDiskInfo/getVDiskDetails';
 import {
     VDiskCompactionRankLabel,
@@ -253,9 +253,10 @@ export function VDiskPopup({data, nodeData: parentNodeData, onClose}: VDiskPopup
         });
     }
     const relationItems = fullData ? getRelationItems(fullData, getVDiskLink) : [];
-    const pdisk = fullData?.PDisk;
+    const pdisk = isViewerUser ? fullData?.PDisk : undefined;
     return (
-        <DiskPopup className={b(null, 'vdisk-storage-popup')}>
+        <DiskPopup combined={Boolean(pdisk)} className={b(null, 'vdisk-storage-popup')}>
+            {pdisk && <PDiskPopupContent data={pdisk} nodeData={nodeData} />}
             <DiskPopupPanel footer={<DiskFooter data={data} onSuccess={handleAfterEvictVDisk} />}>
                 <DiskHeader data={fullData} />
                 <DiskPopupLocation
@@ -273,12 +274,6 @@ export function VDiskPopup({data, nodeData: parentNodeData, onClose}: VDiskPopup
                     <YDBDefinitionList items={relationItems} nameMaxWidth={150} />
                 )}
             </DiskPopupPanel>
-            {pdisk && isViewerUser && (
-                <React.Fragment>
-                    <Divider className={b('pdisk-divider')} />
-                    <PDiskPopup data={pdisk} nodeData={nodeData} nameMaxWidth={150} />
-                </React.Fragment>
-            )}
         </DiskPopup>
     );
 }

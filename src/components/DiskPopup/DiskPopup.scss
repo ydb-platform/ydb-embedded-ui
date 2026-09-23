@@ -9,6 +9,8 @@
     line-height: var(--g-text-body-1-line-height);
 
     &_combined {
+        --ydb-pdisk-log-size-progress-width: 50px;
+
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 

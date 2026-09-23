@@ -1,132 +1,36 @@
 import React from 'react';
 
 import {Wrench} from '@gravity-ui/icons';
-import {Flex, Label} from '@gravity-ui/uikit';
+import {Divider, Flex} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {getPDiskPagePath} from '../../routes';
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
-import {EFlag} from '../../types/api/enums';
 import type {NodeMetadata} from '../../types/store/nodesList';
-import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {BRAND_BUTTON_CLASS} from '../../utils/constants';
 import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
-import {getStateSeverity} from '../../utils/disks/calculatePDiskSeverity';
-import {NUMERIC_SEVERITY_TO_LABEL_VIEW} from '../../utils/disks/constants';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useNodeMetadata} from '../../utils/hooks/useNodeMetadata';
-import {bytesToGB, isNumeric} from '../../utils/utils';
+import {getDiskLocationItems} from '../DiskInfo/getDiskLocationItems';
 import {
-    getPDiskCapacityInfoItems,
-    toDefinitionListItems,
-} from '../DiskCapacityInfo/DiskCapacityInfo';
+    DiskPopup,
+    DiskPopupHeader,
+    DiskPopupLocation,
+    DiskPopupPanel,
+} from '../DiskPopup/DiskPopup';
+import {DiskStatusLabel} from '../DiskStatus/DiskStatus';
 import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
-import {StatusIcon} from '../StatusIcon/StatusIcon';
-import type {
-    YDBDefinitionListHeaderLabel,
-    YDBDefinitionListItem,
-} from '../YDBDefinitionList/YDBDefinitionList';
+import {getPDiskCapacityItems, getPDiskRuntimeItems} from '../PDiskInfo/getPDiskDetails';
+import {
+    getPDiskDecommitLabel,
+    getPDiskDriveLabel,
+    getPDiskMaintenanceLabel,
+    getPDiskStateLabel,
+} from '../PDiskInfo/statuses';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
 import {pDiskPopupKeyset} from './i18n';
-
-const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
-
-export const preparePDiskData = (
-    data: PreparedPDisk,
-    nodeData?: NodeMetadata,
-    capacityMetricsEnabled = false,
-) => {
-    const {AvailableSize, TotalSize, NodeId, Path, Realtime, Type, Device} = data;
-
-    const pdiskData: YDBDefinitionListItem[] = [
-        {name: pDiskPopupKeyset('label_type'), content: Type || pDiskPopupKeyset('value_unknown')},
-    ];
-
-    if (NodeId) {
-        pdiskData.push({
-            name: pDiskPopupKeyset('label_node-id'),
-            content: NodeId,
-            copyText: NodeId,
-        });
-    }
-
-    if (nodeData?.Host) {
-        pdiskData.push({
-            name: pDiskPopupKeyset('label_host'),
-            content: nodeData.Host,
-            copyText: nodeData.Host,
-        });
-    }
-
-    if (nodeData?.DC) {
-        pdiskData.push({name: pDiskPopupKeyset('label_dc'), content: <Label>{nodeData.DC}</Label>});
-    }
-
-    if (Path) {
-        pdiskData.push({name: pDiskPopupKeyset('label_path'), content: Path, copyText: Path});
-    }
-
-    if (capacityMetricsEnabled) {
-        pdiskData.push(
-            ...toDefinitionListItems(
-                getPDiskCapacityInfoItems(data, {
-                    withUsage: true,
-                    withCapacityAlert: true,
-                }),
-            ),
-        );
-    } else if (isNumeric(TotalSize) && isNumeric(AvailableSize)) {
-        pdiskData.push({
-            name: pDiskPopupKeyset('label_available'),
-            content: `${bytesToGB(AvailableSize)} ${pDiskPopupKeyset('value_of')} ${bytesToGB(TotalSize)}`,
-        });
-    }
-
-    if (Realtime && errorColors.includes(Realtime)) {
-        pdiskData.push({
-            name: pDiskPopupKeyset('label_realtime'),
-            content: <StatusIcon mode="icons" status={Realtime} />,
-        });
-    }
-
-    if (Device && errorColors.includes(Device)) {
-        pdiskData.push({
-            name: pDiskPopupKeyset('label_device'),
-            content: <StatusIcon mode="icons" status={Device} />,
-        });
-    }
-
-    return pdiskData;
-};
-
-export const preparePDiskHeaderLabels = (data: PreparedPDisk): YDBDefinitionListHeaderLabel[] => {
-    const labels: YDBDefinitionListHeaderLabel[] = [];
-    const {State} = data;
-
-    if (!State) {
-        labels.push({
-            id: 'state',
-            value: pDiskPopupKeyset('context_not-available'),
-        });
-
-        return labels;
-    }
-
-    if (State) {
-        const severity = getStateSeverity(State);
-        const {theme, icon} = NUMERIC_SEVERITY_TO_LABEL_VIEW[severity];
-
-        labels.push({
-            id: 'state',
-            value: State,
-            theme: theme,
-            icon: icon,
-        });
-    }
-
-    return labels;
-};
 
 export const buildPDiskFooter = (
     data: PreparedPDisk,
@@ -174,37 +78,54 @@ interface PDiskPopupProps {
     nameMaxWidth?: number;
 }
 
-export const PDiskPopup = ({data, nodeData: parentNodeData, nameMaxWidth}: PDiskPopupProps) => {
+export function PDiskPopupContent({
+    data,
+    nodeData: parentNodeData,
+    nameMaxWidth = 150,
+}: PDiskPopupProps) {
+    const nodeData = useNodeMetadata(data.NodeId, parentNodeData);
     const hasDeveloperUi = useHasDeveloperUi();
     const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
-    const nodeData = useNodeMetadata(data.NodeId, parentNodeData);
-
-    const info = React.useMemo(
-        () => preparePDiskData(data, nodeData, capacityMetricsEnabled),
-        [data, nodeData, capacityMetricsEnabled],
-    );
-
-    const headerLabels = React.useMemo<YDBDefinitionListHeaderLabel[]>(
-        () => preparePDiskHeaderLabels(data),
-        [data],
-    );
-
-    const footer = React.useMemo(
-        () => buildPDiskFooter(data, hasDeveloperUi),
-        [data, hasDeveloperUi],
-    );
-
-    const pdiskId = data.StringifiedId;
+    const storageItems = getPDiskCapacityItems(data, {useWhiteboardSize: capacityMetricsEnabled});
+    const statusLabels = [
+        {id: 'state', label: getPDiskStateLabel(data.State)},
+        {
+            id: 'drive',
+            label: getPDiskDriveLabel(data.DriveStatus ?? data.StatusV2 ?? data.Status),
+        },
+        {id: 'decommit', label: getPDiskDecommitLabel(data.DecommitStatus)},
+        {id: 'maintenance', label: getPDiskMaintenanceLabel(data.MaintenanceStatus)},
+    ];
 
     return (
-        <YDBDefinitionList
-            compact
-            title="PDisk"
-            titleSuffix={{title: pdiskId ?? EMPTY_DATA_PLACEHOLDER, copyText: pdiskId}}
-            items={info}
-            headerLabels={headerLabels}
-            footer={footer}
-            nameMaxWidth={nameMaxWidth ?? (capacityMetricsEnabled ? 220 : 100)}
-        />
+        <DiskPopupPanel footer={buildPDiskFooter(data, hasDeveloperUi)}>
+            <DiskPopupHeader
+                title={pDiskPopupKeyset('label_pdisk')}
+                id={data.StringifiedId}
+                type={data.Type}
+                statuses={statusLabels.map(({id, label}) =>
+                    label ? <DiskStatusLabel key={id} {...label} /> : null,
+                )}
+            />
+            <DiskPopupLocation
+                items={getDiskLocationItems(data, nodeData)}
+                title={pDiskPopupKeyset('label_pdisk')}
+            />
+            <YDBDefinitionList items={getPDiskRuntimeItems(data)} nameMaxWidth={nameMaxWidth} />
+            {storageItems.length > 0 && (
+                <React.Fragment>
+                    <Divider />
+                    <YDBDefinitionList items={storageItems} nameMaxWidth={nameMaxWidth} />
+                </React.Fragment>
+            )}
+        </DiskPopupPanel>
     );
-};
+}
+
+export function PDiskPopup(props: PDiskPopupProps) {
+    return (
+        <DiskPopup>
+            <PDiskPopupContent {...props} />
+        </DiskPopup>
+    );
+}
