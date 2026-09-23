@@ -5,6 +5,7 @@ import type {Column, SortOrder} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import type {LabelProps} from '@gravity-ui/uikit';
 import {Button, Flex, Icon, Label} from '@gravity-ui/uikit';
+import {useHistory} from 'react-router-dom';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {ResponseError} from '../../components/Errors/ResponseError';
@@ -15,6 +16,7 @@ import {Search} from '../../components/Search';
 import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
+import {getTenantLink} from '../../components/TenantNameWrapper/utils';
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {
@@ -131,6 +133,7 @@ const TenantsTableContent = ({
     onStatusClick,
 }: TenantsTableContentProps) => {
     const SuccessImage = getIllustration('SuccessOperation');
+    const history = useHistory();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
@@ -144,7 +147,7 @@ const TenantsTableContent = ({
 
     const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
 
-    const {domain: domainRoot} = useClusterBaseInfo();
+    const {domain: domainRoot, settings} = useClusterBaseInfo();
 
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
@@ -167,7 +170,40 @@ const TenantsTableContent = ({
         const filteredBySearch = filterTenantsBySearch(filteredByProblems, search);
 
         return filteredBySearch;
-    }, [tenants, withProblems, search]);
+    }, [tenants, withProblems, search, showWithProblemsFilter]);
+
+    const tenantLinks = React.useMemo(
+        () =>
+            new Map(
+                tenants.map((tenant) => [
+                    tenant,
+                    getTenantLink({
+                        tenant,
+                        additionalTenantsProps,
+                        externalLink: Boolean(environmentName),
+                        useDatabaseId:
+                            uiFactory.useDatabaseId && settings?.use_meta_proxy !== false,
+                    }),
+                ]),
+            ),
+        [tenants, additionalTenantsProps, environmentName, settings?.use_meta_proxy],
+    );
+
+    const openTenant = React.useCallback(
+        (tenant: PreparedTenant) => {
+            const link = tenantLinks.get(tenant);
+            if (!link) {
+                return;
+            }
+            if (link.isExternalLink) {
+                window.open(link.href, '_blank', 'noopener,noreferrer');
+                return;
+            }
+
+            history.push(link.href);
+        },
+        [tenantLinks, history],
+    );
 
     const renderCreateDBButton = () => {
         const buttonAvailable = isCreateDBAvailable && clusterName;
@@ -192,6 +228,7 @@ const TenantsTableContent = ({
         return (
             <React.Fragment>
                 <Search
+                    tableFilter
                     value={search}
                     onChange={handleSearchChange}
                     placeholder="Database name"
@@ -221,6 +258,7 @@ const TenantsTableContent = ({
                         clusterName={clusterName}
                         additionalTenantsProps={additionalTenantsProps}
                         externalLink={Boolean(environmentName)}
+                        link={tenantLinks.get(row)}
                         onStatusClick={onStatusClick}
                     />
                 ),
@@ -362,6 +400,7 @@ const TenantsTableContent = ({
         handleSearchChange,
         onStatusClick,
         showPoolsColumn,
+        tenantLinks,
     ]);
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
@@ -378,14 +417,26 @@ const TenantsTableContent = ({
         }
 
         return (
-            <ResizeableDataTable
-                columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
-                data={filteredTenants}
-                columns={columnsToShow}
-                settings={DEFAULT_TABLE_SETTINGS}
-                emptyDataMessage={i18n('no-databases')}
-                onSortChange={setSortParams}
-            />
+            <div>
+                <ResizeableDataTable
+                    onKeyboardActivate={openTenant}
+                    getKeyboardRowKey={(tenant) =>
+                        JSON.stringify([tenant.Cluster, tenant.Id ?? tenant.Name])
+                    }
+                    getKeyboardRowLabel={(tenant) =>
+                        tenant.controlPlaneName ||
+                        tenant.Name ||
+                        tenant.Id ||
+                        EMPTY_DATA_PLACEHOLDER
+                    }
+                    columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
+                    data={filteredTenants}
+                    columns={columnsToShow}
+                    settings={DEFAULT_TABLE_SETTINGS}
+                    emptyDataMessage={i18n('no-databases')}
+                    onSortChange={setSortParams}
+                />
+            </div>
         );
     };
 
@@ -411,7 +462,14 @@ const TenantsTableContent = ({
 
     return (
         <div className={b('table-wrapper')}>
-            <TableWithControlsLayout fullHeight>
+            <TableWithControlsLayout
+                fullHeight
+                keyboardNavigationResetKey={JSON.stringify([
+                    withProblems,
+                    showDomainDatabase,
+                    showWithProblemsFilter,
+                ])}
+            >
                 <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
                     {renderControls()}
                 </TableWithControlsLayout.Controls>
@@ -421,7 +479,7 @@ const TenantsTableContent = ({
                     loading={loading}
                     scrollDependencies={[search, withProblems, sortParams]}
                 >
-                    {currentData ? renderTable() : null}
+                    <div>{currentData ? renderTable() : null}</div>
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
         </div>

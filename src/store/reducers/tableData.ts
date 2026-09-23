@@ -16,7 +16,7 @@ interface PaginatedTableParams<T, F> {
     noBatching?: boolean;
 }
 
-function endpoints<T, F>(build: EndpointBuilder<BaseQueryFn, string, string>) {
+function endpoints<T, F>(build: EndpointBuilder<BaseQueryFn, string, typeof api.reducerPath>) {
     return {
         fetchTableChunk: build.query<PaginatedTableData<T>, PaginatedTableParams<T, F>>({
             queryFn: async (

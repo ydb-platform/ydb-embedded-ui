@@ -1,8 +1,13 @@
+import React from 'react';
+
 import {Skeleton} from '@gravity-ui/uikit';
+
+import {KEYBOARD_FOCUSED_ROW_CLASS_NAME} from '../TableKeyboardNavigation/utils';
 
 import {DEFAULT_ALIGN, DEFAULT_RESIZEABLE} from './constants';
 import {b} from './shared';
 import type {AlignType, Column, GetRowClassName, OnRowClick} from './types';
+import {KeyboardRowContext} from './useKeyboardNavigation';
 import {typedMemo} from './utils';
 
 interface TableCellProps {
@@ -71,35 +76,19 @@ export const LoadingTableRow = typedMemo(function <T>({columns, height}: Loading
 interface TableRowProps<T> {
     columns: Column<T>[];
     row: T;
+    rowIndex?: number;
     height: number;
     getRowClassName?: GetRowClassName<T>;
     onRowClick?: OnRowClick<T>;
 }
 
-export const TableRow = <T,>({
-    row,
+const TableRowCells = typedMemo(function TableRowCells<T>({
     columns,
-    getRowClassName,
+    row,
     height,
-    onRowClick,
-}: TableRowProps<T>) => {
-    const additionalClassName = getRowClassName?.(row);
-    const rowClickable = typeof onRowClick === 'function';
-
-    const handleClick: React.MouseEventHandler<HTMLTableRowElement> = (event) => {
-        if (!rowClickable || event.defaultPrevented) {
-            return;
-        }
-
-        onRowClick?.(row, event);
-    };
-
+}: Pick<TableRowProps<T>, 'columns' | 'row' | 'height'>) {
     return (
-        <tr
-            className={b('row', {clickable: rowClickable}, additionalClassName)}
-            style={{height}}
-            onClick={rowClickable ? handleClick : undefined}
-        >
+        <React.Fragment>
             {columns.map((column) => {
                 const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
 
@@ -116,9 +105,54 @@ export const TableRow = <T,>({
                     </TableRowCell>
                 );
             })}
+        </React.Fragment>
+    );
+});
+
+const TableRowView = typedMemo(function TableRowView<T>({
+    row,
+    rowIndex,
+    columns,
+    getRowClassName,
+    height,
+    onRowClick,
+    keyboardFocused,
+}: TableRowProps<T> & {keyboardFocused: boolean}) {
+    const additionalClassName = [
+        getRowClassName?.(row),
+        keyboardFocused ? KEYBOARD_FOCUSED_ROW_CLASS_NAME : undefined,
+    ]
+        .filter(Boolean)
+        .join(' ');
+    const rowClickable = typeof onRowClick === 'function';
+
+    const handleClick: React.MouseEventHandler<HTMLTableRowElement> = (event) => {
+        if (!rowClickable || event.defaultPrevented) {
+            return;
+        }
+
+        onRowClick?.(row, event);
+    };
+
+    return (
+        <tr
+            className={b('row', {clickable: rowClickable}, additionalClassName)}
+            style={{height}}
+            data-row-index={rowIndex}
+            aria-selected={keyboardFocused || undefined}
+            onClick={rowClickable ? handleClick : undefined}
+        >
+            <TableRowCells columns={columns} row={row} height={height} />
         </tr>
     );
-};
+});
+
+export function TableRow<T>(props: TableRowProps<T>) {
+    const focusedIndex = React.useContext(KeyboardRowContext);
+    const keyboardFocused = props.rowIndex !== undefined && props.rowIndex === focusedIndex;
+
+    return <TableRowView {...props} keyboardFocused={keyboardFocused} />;
+}
 
 interface EmptyTableRowProps<T> {
     columns: Column<T>[];

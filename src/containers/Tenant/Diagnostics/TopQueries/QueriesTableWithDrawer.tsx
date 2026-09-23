@@ -8,6 +8,7 @@ import type {DrawerControl} from '../../../../components/Drawer/Drawer';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import type {KeyValueRow} from '../../../../types/api/query';
 import {cn} from '../../../../utils/cn';
+import {getQueryShortText} from '../../../../utils/query';
 
 import {QueryDetailsDrawerContent} from './QueryDetails/QueryDetailsDrawerContent';
 import i18n from './i18n';
@@ -18,6 +19,7 @@ const b = cn('kv-top-queries');
 interface SimpleTableWithDrawerProps {
     columns: Column<KeyValueRow>[];
     data: KeyValueRow[];
+    getKeyboardRowKey?: (row: KeyValueRow) => string | number | undefined;
     isFetching?: boolean;
     isLoading?: boolean;
     onRowClick?: (
@@ -40,6 +42,7 @@ interface SimpleTableWithDrawerProps {
 export function QueriesTableWithDrawer({
     columns,
     data,
+    getKeyboardRowKey,
     isFetching,
     isLoading,
     onRowClick,
@@ -102,6 +105,9 @@ export function QueriesTableWithDrawer({
             drawerControls={finalDrawerControls}
         >
             <ResizeableDataTable
+                onKeyboardActivate={handleRowClick}
+                getKeyboardRowKey={getKeyboardRowKey}
+                getKeyboardRowLabel={(row) => getQueryShortText(row.QueryText?.toString())}
                 emptyDataMessage={emptyDataMessage || i18n('no-data')}
                 columnsWidthLSKey={columnsWidthLSKey}
                 columns={columns}

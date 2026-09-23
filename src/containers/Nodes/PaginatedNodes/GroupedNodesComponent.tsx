@@ -65,6 +65,7 @@ const NodeGroup = React.memo(function NodeGroup({
             onIsExpandedChange={onIsExpandedChange}
         >
             <PaginatedTableWithLayout
+                inheritKeyboardNavigation
                 initialState={{sortParams: undefined}}
                 table={
                     <NodesTable

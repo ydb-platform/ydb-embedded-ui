@@ -31,6 +31,7 @@ export interface TableChunksRendererProps<T, F> {
     renderErrorMessage?: RenderErrorMessage;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     onDataFetched: (data?: PaginatedTableData<T>) => void;
+    onActiveChunkOffsetsChange: (offsets: number[]) => void;
     keepCache: boolean;
     fetchOverscan?: number;
 }
@@ -51,6 +52,7 @@ export const TableChunksRenderer = <T, F>({
     renderErrorMessage,
     renderEmptyDataMessage,
     onDataFetched,
+    onActiveChunkOffsetsChange,
     keepCache,
     fetchOverscan,
 }: TableChunksRendererProps<T, F>) => {
@@ -62,6 +64,16 @@ export const TableChunksRenderer = <T, F>({
         chunkSize,
         fetchOverscan,
     });
+
+    const activeChunkOffsets = React.useMemo(
+        () => chunkStates.flatMap((state, index) => (state.shouldFetch ? [index * chunkSize] : [])),
+        [chunkSize, chunkStates],
+    );
+
+    React.useLayoutEffect(() => {
+        onActiveChunkOffsetsChange(activeChunkOffsets);
+        return () => onActiveChunkOffsetsChange([]);
+    }, [activeChunkOffsets, onActiveChunkOffsetsChange]);
 
     const lastChunkSize = React.useMemo(() => {
         // If foundEntities = 0, there will only first chunk

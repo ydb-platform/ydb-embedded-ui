@@ -79,6 +79,7 @@ export function StorageNodesControls({
         <Flex direction="column" gap={2} width="100%">
             <Flex gap={2} alignItems="center" wrap className={b('controls-row')}>
                 <Search
+                    tableFilter
                     value={nodesSearchValue}
                     onChange={handleTextFilterNodesChange}
                     placeholder={i18n('controls_nodes-search-placeholder')}

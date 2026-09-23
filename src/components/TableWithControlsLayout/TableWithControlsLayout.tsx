@@ -3,6 +3,7 @@ import React from 'react';
 import {Flex} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
+import {TableKeyboardNavigationScope} from '../TableKeyboardNavigation/TableKeyboardNavigation';
 import {TableSkeleton} from '../TableSkeleton/TableSkeleton';
 
 import {useTableScroll} from './useTableScroll';
@@ -16,6 +17,9 @@ interface TableWithControlsLayoutItemProps {
     renderExtraControls?: () => React.ReactNode;
     className?: string;
     fullHeight?: boolean;
+    keyboardNavigation?: boolean;
+    inheritKeyboardNavigation?: boolean;
+    keyboardNavigationResetKey?: string;
 }
 
 export interface TableWrapperProps extends Omit<TableWithControlsLayoutItemProps, 'children'> {
@@ -29,8 +33,29 @@ export const TableWithControlsLayout = ({
     children,
     className,
     fullHeight,
+    keyboardNavigation = true,
+    inheritKeyboardNavigation = false,
+    keyboardNavigationResetKey,
 }: TableWithControlsLayoutItemProps) => {
-    return <div className={b({'full-height': fullHeight}, className)}>{children}</div>;
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    return (
+        <TableKeyboardNavigationScope
+            enabled={keyboardNavigation}
+            containerRef={containerRef}
+            inherit={inheritKeyboardNavigation}
+            resetKey={keyboardNavigationResetKey}
+        >
+            <div
+                ref={containerRef}
+                data-table-keyboard-scope={
+                    inheritKeyboardNavigation && keyboardNavigation ? undefined : ''
+                }
+                className={b({'full-height': fullHeight}, className)}
+            >
+                {children}
+            </div>
+        </TableKeyboardNavigationScope>
+    );
 };
 
 TableWithControlsLayout.Controls = function TableControls({
