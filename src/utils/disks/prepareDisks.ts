@@ -1,6 +1,6 @@
 import {isNil} from 'lodash';
 
-import type {TPDiskStateInfo} from '../../types/api/pdisk';
+import type {TPDiskInfo, TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import {stringifyVdiskId} from '../dataFormatters/dataFormatters';
 import {isNumeric, parseOptionalNonNegativeNumber} from '../utils';
@@ -124,7 +124,7 @@ export function prepareWhiteboardVDiskData(
 }
 
 export function prepareWhiteboardPDiskData(
-    pdiskState: TPDiskStateInfo = {},
+    pdiskState: TPDiskStateInfo & Pick<TPDiskInfo, 'StatusV2'> = {},
     whiteboardSizeSource: Pick<TPDiskStateInfo, 'AvailableSize' | 'TotalSize'> | null = pdiskState,
 ): PreparedPDisk {
     const hasWhiteboardData = pdiskState.HasWhiteboardData ?? Boolean(whiteboardSizeSource);
@@ -170,6 +170,7 @@ export function prepareWhiteboardPDiskData(
         State,
         Severity,
         SlotSize: EnforcedDynamicSlotSize,
+        DriveStatus: pdiskState.Status ?? pdiskState.StatusV2,
     };
 }
 
