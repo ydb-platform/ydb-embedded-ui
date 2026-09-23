@@ -5,7 +5,6 @@ import {
     CirclePause,
     CircleStop,
 } from '@gravity-ui/icons';
-import type {IconData, LabelProps} from '@gravity-ui/uikit';
 
 import {EVDiskDetailedReplicationStatus, EVDiskState} from '../../types/api/vdisk';
 import {
@@ -16,32 +15,11 @@ import {
 } from '../../utils/disks/constants';
 import {calculateStateIcon} from '../../utils/disks/iconCalculators';
 import type {PreparedVDisk} from '../../utils/disks/types';
+import type {DiskStatusLabelData} from '../DiskStatus/DiskStatus';
 
 import {vDiskStatusKeyset as i18n} from './i18n';
 
-export interface VDiskStatusLabel {
-    value: string;
-    title?: string;
-    theme?: LabelProps['theme'];
-    icon?: IconData;
-    tooltip?: string;
-    dangerHeavy?: boolean;
-}
-
-export function getVDiskTypeTooltip(type?: string): string | undefined {
-    switch (type?.toUpperCase()) {
-        case 'HDD':
-            return i18n('context_hdd');
-        case 'SSD':
-            return i18n('context_ssd');
-        case 'NVME':
-            return i18n('context_nvme');
-        default:
-            return undefined;
-    }
-}
-
-export function getVDiskStateLabel(data: PreparedVDisk): VDiskStatusLabel {
+export function getVDiskStateLabel(data: PreparedVDisk): DiskStatusLabelData {
     const state = data.VDiskState;
     const severity = state
         ? (VDISK_STATE_SEVERITY_FOR_STATE_MODE[state] ?? NOT_AVAILABLE_SEVERITY)
@@ -58,7 +36,7 @@ export function getVDiskStateLabel(data: PreparedVDisk): VDiskStatusLabel {
         };
     }
 
-    const labels: Record<EVDiskState, Pick<VDiskStatusLabel, 'value' | 'tooltip'>> = {
+    const labels: Record<EVDiskState, Pick<DiskStatusLabelData, 'value' | 'tooltip'>> = {
         [EVDiskState.OK]: {
             value: i18n('value_ok'),
             tooltip: i18n('context_state-ok'),
@@ -93,7 +71,7 @@ export function getVDiskStateLabel(data: PreparedVDisk): VDiskStatusLabel {
     };
 }
 
-export function getVDiskReplicationLabel(data: PreparedVDisk): VDiskStatusLabel | undefined {
+export function getVDiskReplicationLabel(data: PreparedVDisk): DiskStatusLabelData | undefined {
     switch (data.DetailedReplicationStatus) {
         case EVDiskDetailedReplicationStatus.Replicated:
             return replicatedLabel();
@@ -137,7 +115,7 @@ export function getVDiskReplicationLabel(data: PreparedVDisk): VDiskStatusLabel 
     }
 }
 
-function replicatedLabel(): VDiskStatusLabel {
+function replicatedLabel(): DiskStatusLabelData {
     return {
         value: i18n('label_replicated'),
         theme: 'success',

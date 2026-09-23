@@ -7,7 +7,6 @@ import {isNil} from 'lodash';
 import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
-import {selectNodesMap} from '../../store/reducers/nodesList';
 import type {TVDiskID} from '../../types/api/vdisk';
 import type {NodeMetadata} from '../../types/store/nodesList';
 import {cn} from '../../utils/cn';
@@ -16,10 +15,11 @@ import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {useTypedDispatch} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useNodeMetadata} from '../../utils/hooks/useNodeMetadata';
 import {bytesToSpeed, parseOptionalNonNegativeNumber} from '../../utils/utils';
+import {DiskTypeLabel} from '../DiskStatus/DiskStatus';
 import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/EvictVDiskButton';
 import {InternalLink} from '../InternalLink';
 import {InternalLinkButton} from '../InternalLinkButton';
@@ -32,7 +32,6 @@ import {
     VDiskFrontQueuesLabel,
     VDiskReplicationStatus,
     VDiskStateLabel,
-    VDiskTypeLabel,
 } from '../VDiskStatus';
 import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
@@ -162,7 +161,7 @@ function DiskHeader({data = {}}: {data?: PreparedVDisk}) {
                         aria-label={i18n('action_copy-field', {field: i18n('label_vdisk')})}
                     />
                 )}
-                <VDiskTypeLabel type={type} />
+                <DiskTypeLabel type={type} />
             </Flex>
             <Flex gap={1} wrap="wrap" alignItems="center">
                 <VDiskStateLabel state={data.VDiskState} />
@@ -277,17 +276,6 @@ function getRelationItems(data: PreparedVDisk, getVDiskLink: ReturnType<typeof u
         relationItems.push({name: i18n('label_unsync-vdisks'), content: data?.UnsyncedVDisks});
     }
     return relationItems;
-}
-
-function useNodeMetadata(nodeId: number | undefined, parentNodeData?: NodeMetadata): NodeMetadata {
-    const database = useDatabaseFromQuery();
-    const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
-    const storedNodeData = isNil(nodeId) ? undefined : nodesMap?.get(nodeId);
-    return {
-        Host: parentNodeData?.Host || storedNodeData?.Host,
-        DC: parentNodeData?.DC || storedNodeData?.DC,
-        Rack: parentNodeData?.Rack || storedNodeData?.Rack,
-    };
 }
 
 interface VDiskPopupProps {

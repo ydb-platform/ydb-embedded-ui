@@ -6,7 +6,6 @@ import {isNil} from 'lodash';
 
 import {getPDiskPagePath} from '../../routes';
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
-import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import type {NodeMetadata} from '../../types/store/nodesList';
 import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
@@ -14,8 +13,7 @@ import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/develop
 import {getStateSeverity} from '../../utils/disks/calculatePDiskSeverity';
 import {NUMERIC_SEVERITY_TO_LABEL_VIEW} from '../../utils/disks/constants';
 import type {PreparedPDisk} from '../../utils/disks/types';
-import {useTypedSelector} from '../../utils/hooks';
-import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {useNodeMetadata} from '../../utils/hooks/useNodeMetadata';
 import {bytesToGB, isNumeric} from '../../utils/utils';
 import {
     getPDiskCapacityInfoItems,
@@ -177,12 +175,9 @@ interface PDiskPopupProps {
 }
 
 export const PDiskPopup = ({data, nodeData: parentNodeData, nameMaxWidth}: PDiskPopupProps) => {
-    const database = useDatabaseFromQuery();
     const hasDeveloperUi = useHasDeveloperUi();
     const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
-    const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
-    const nodeData =
-        parentNodeData ?? (isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId));
+    const nodeData = useNodeMetadata(data.NodeId, parentNodeData);
 
     const info = React.useMemo(
         () => preparePDiskData(data, nodeData, capacityMetricsEnabled),

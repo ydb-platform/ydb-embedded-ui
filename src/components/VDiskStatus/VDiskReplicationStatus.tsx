@@ -8,10 +8,12 @@ import {formatPercent} from '../../utils/dataFormatters/dataFormatters';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {formatDurationToShortTimeFormat} from '../../utils/timeParsers';
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
+import {DiskStatusLabel} from '../DiskStatus/DiskStatus';
 
-import {VDiskStatusLabel} from './VDiskStatus';
 import {vDiskStatusKeyset as i18n} from './i18n';
 import {getVDiskReplicationLabel} from './statuses';
+
+import './VDiskStatus.scss';
 
 const b = cn('ydb-vdisk-status');
 
@@ -32,7 +34,7 @@ export function VDiskReplicationStatus({data}: VDiskReplicationStatusProps) {
 
     return (
         <React.Fragment>
-            {label && <VDiskStatusLabel {...label} />}
+            {label && <DiskStatusLabel {...label} />}
             {showProgress && <ReplicationProgress data={data} />}
         </React.Fragment>
     );
