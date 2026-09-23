@@ -51,6 +51,32 @@ test('a failed test or job cannot produce a passing summary', () => {
     expect(summarize(report, provenance, {...context, jobs: 'failure'}).status).toBe('failed');
 });
 
+test.each([
+    [79, 1],
+    [0, 80],
+])('accepts recovered tests and reports %s passed / %s flaky', (expected, flaky) => {
+    const result = summarize(
+        {...report, stats: {...report.stats, expected, flaky}},
+        provenance,
+        context,
+    );
+    expect(result.status).toBe('passed');
+    expect(result.summary).toContain(`${expected} passed, 0 failed, ${flaky} flaky, 2 skipped`);
+});
+
+test('recovered tests cannot hide final failures, cleanup failures or incomplete reports', () => {
+    const recovered = {...report, stats: {...report.stats, flaky: 1}};
+    expect(
+        summarize({...recovered, stats: {...recovered.stats, unexpected: 1}}, provenance, context)
+            .status,
+    ).toBe('failed');
+    expect(summarize(recovered, provenance, {...context, jobs: 'failure'}).status).toBe('failed');
+    expect(summarize(recovered, provenance, {...context, shards: 7}).status).toBe('incomplete');
+    expect(summarize({...recovered, errors: ['setup failed']}, provenance, context).status).toBe(
+        'incomplete',
+    );
+});
+
 test('unavailable, empty or interrupted results remain incomplete', () => {
     expect(summarize(undefined, provenance, context).status).toBe('incomplete');
     expect(summarize(report, undefined, context).status).toBe('incomplete');
@@ -224,8 +250,12 @@ describe('report files', () => {
         expect(collect().shards).toBe(6);
     });
 
-    test('CLI preserves the standard report and fails an incomplete run', () => {
-        const result = write('ui/playwright-artifacts/test-results.json', JSON.stringify(report));
+    test('CLI accepts recovered tests, preserves their report and fails an incomplete run', () => {
+        const recovered = {...report, stats: {...report.stats, expected: 79, flaky: 1}};
+        const result = write(
+            'ui/playwright-artifacts/test-results.json',
+            JSON.stringify(recovered),
+        );
         write('downloaded/release-e2e-provenance/provenance.json', JSON.stringify(provenance));
         const summary = path.join(directory, 'job-summary.md');
         const run = (shards: string) =>
@@ -245,10 +275,10 @@ describe('report files', () => {
                 },
             );
         run('8');
-        expect(fs.readFileSync(summary, 'utf8')).toContain('80 passed, 0 failed');
+        expect(fs.readFileSync(summary, 'utf8')).toContain('79 passed, 0 failed, 1 flaky');
         expect(() => run('7')).toThrow();
         expect(fs.readFileSync(summary, 'utf8')).toContain('Reports received from 7/8 shards');
-        expect(fs.readFileSync(result, 'utf8')).toBe(JSON.stringify(report));
+        expect(fs.readFileSync(result, 'utf8')).toBe(JSON.stringify(recovered));
         expect(fs.existsSync(path.join(directory, 'release-artifacts'))).toBe(false);
     });
 });

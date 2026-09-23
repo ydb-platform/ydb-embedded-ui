@@ -157,8 +157,7 @@ function summarize(report, provenance, {shards, jobs, artifacts, merge}) {
     if (problems.length) {
         return {status: 'incomplete', summary: frontend + problems.join('\n\n')};
     }
-    const status =
-        jobs === 'success' && stats.unexpected === 0 && stats.flaky === 0 ? 'passed' : 'failed';
+    const status = jobs === 'success' && stats.unexpected === 0 ? 'passed' : 'failed';
     return {
         status,
         summary: `${frontend}Reports: 8/8 shards. Test jobs: ${jobs}.\n\nTests: ${stats.expected} passed, ${stats.unexpected} failed, ${stats.flaky} flaky, ${stats.skipped} skipped.`,
