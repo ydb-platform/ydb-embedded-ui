@@ -31,7 +31,7 @@ export function getVDiskStateLabel(data: PreparedVDisk): DiskStatusLabelData {
         severity === NOT_AVAILABLE_SEVERITY
     ) {
         return {
-            value: i18n('value_unknown'),
+            value: i18n('value_no-data'),
             theme: 'unknown',
             icon: CircleQuestion,
             tooltip: i18n('context_state-no-data'),
@@ -102,6 +102,9 @@ export function getVDiskReplicationLabel(data: PreparedVDisk): DiskStatusLabelDa
                 tooltip: i18n('context_replication-phantoms-only'),
             };
         default:
+            if (data.DetailedReplicationStatus) {
+                return undefined;
+            }
             if (data.Replicated === true) {
                 return replicatedLabel();
             }

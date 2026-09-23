@@ -577,6 +577,8 @@ test.describe('Storage disk popup snapshots', () => {
 
         const vDiskPanel = await getDiskPopupPanel(popup, 'VDisk', VDISK_ID);
         const pDiskPanel = await getDiskPopupPanel(popup, 'PDisk', `${NODE_ID}-${PDISK_ID}`);
+        await expect(vDiskPanel.getByText('No data', {exact: true})).toBeVisible();
+        await expect(pDiskPanel.getByText('Unknown', {exact: true})).toBeVisible();
         await expectHDDLabel(vDiskPanel);
         await expectHDDLabel(pDiskPanel);
         for (const label of ['Device', 'Realtime']) {
@@ -650,6 +652,7 @@ test.describe('Storage disk popup snapshots', () => {
         await expect(popup.getByRole('link', {name: 'Go to PDisk'})).toBeVisible();
 
         const panel = await getDiskPopupPanel(popup, 'PDisk', `${NODE_ID}-${PDISK_ID}`);
+        await expect(panel.getByText('Unknown', {exact: true})).toBeVisible();
         await expectHDDLabel(panel);
         for (const label of ['Device', 'Realtime']) {
             await expectDefinitionListRowValue(panel, label, 'Not available');

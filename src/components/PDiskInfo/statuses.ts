@@ -115,19 +115,18 @@ export function getPDiskStateLabel(state?: TPDiskState): DiskStatusLabelData {
 }
 
 export function getPDiskDriveLabel(status?: EDriveStatus): DiskStatusLabelData | undefined {
-    if (!status) {
+    if (!status || status === 'UNKNOWN') {
         return undefined;
     }
-    const labels: Record<EDriveStatus, StatusText> = {
+    const labels: Record<Exclude<EDriveStatus, 'UNKNOWN'>, StatusText> = {
         ACTIVE: {value: i18n('value_active'), tooltip: i18n('context_active')},
         INACTIVE: {value: i18n('value_inactive'), tooltip: i18n('context_inactive')},
         TO_BE_REMOVED: {value: i18n('value_to-be-removed'), tooltip: i18n('context_to-be-removed')},
         FAULTY: {value: i18n('value_faulty'), tooltip: i18n('context_faulty')},
         BROKEN: {value: i18n('value_broken'), tooltip: i18n('context_broken')},
-        UNKNOWN: unknownLabel(),
     };
-    if (!Object.hasOwn(labels, status) || status === 'UNKNOWN') {
-        return unknownLabel();
+    if (!Object.hasOwn(labels, status)) {
+        return undefined;
     }
     const view = getLabelView(getPDiskDriveDisplayState(status));
     let icon = view.icon;
@@ -145,10 +144,10 @@ export function getPDiskDriveLabel(status?: EDriveStatus): DiskStatusLabelData |
 }
 
 export function getPDiskDecommitLabel(status?: EDecommitStatus): DiskStatusLabelData | undefined {
-    if (!status) {
+    if (!status || status === 'DECOMMIT_UNSET') {
         return undefined;
     }
-    const labels: Record<EDecommitStatus, StatusText> = {
+    const labels: Record<Exclude<EDecommitStatus, 'DECOMMIT_UNSET'>, StatusText> = {
         DECOMMIT_NONE: {value: i18n('value_decommit-none'), tooltip: i18n('context_decommit-none')},
         DECOMMIT_PENDING: {
             value: i18n('value_decommit-pending'),
@@ -162,10 +161,9 @@ export function getPDiskDecommitLabel(status?: EDecommitStatus): DiskStatusLabel
             value: i18n('value_decommit-imminent'),
             tooltip: i18n('context_decommit-imminent'),
         },
-        DECOMMIT_UNSET: unknownLabel(),
     };
-    if (!Object.hasOwn(labels, status) || status === 'DECOMMIT_UNSET') {
-        return unknownLabel();
+    if (!Object.hasOwn(labels, status)) {
+        return undefined;
     }
     const view = getLabelView(getPDiskDecommitDisplayState(status));
     return {...labels[status], ...view, icon: status === 'DECOMMIT_NONE' ? Ban : view.icon};
@@ -196,7 +194,7 @@ export function getPDiskMaintenanceLabel(
         },
     };
     if (!Object.hasOwn(labels, status)) {
-        return {...unknownLabel(), title: i18n('label_maintenance')};
+        return undefined;
     }
     const view = getLabelView(getPDiskMaintenanceDisplayState(status));
     return {
