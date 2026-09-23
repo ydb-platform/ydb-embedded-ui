@@ -81,7 +81,7 @@ jobs:
           name: release-e2e-provenance
           path: release-artifacts
       - name: Start release local-ydb
-        uses: astandrik/setup-local-ydb@07ceb4e25e2fcefd51c9cad5b6ee396767ef030b # v1.1.0
+        uses: astandrik/setup-local-ydb@ba59d49d74fdab2f308132e72da6d4e111b7200d # verified cleanup
         with:
           version: ${{ inputs.ydb_tag }}
           topology: root
