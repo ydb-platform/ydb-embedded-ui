@@ -21,7 +21,7 @@ export function ResourcePoolUsage({database, poolName}: ResourcePoolUsageProps) 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = topQueriesApi.useGetRunningQueriesByPoolQuery(
         {database, poolName},
-        {skip: !poolName, pollingInterval: autoRefreshInterval},
+        {skip: !poolName, pollingInterval: autoRefreshInterval, refetchOnMountOrArgChange: true},
     );
 
     const loading = isFetching && currentData === undefined;
