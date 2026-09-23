@@ -48,7 +48,7 @@ test('fails with attachment', async ({}, info) => {
     expect(1).toBe(2);
 });
 TEST
-npx --no playwright test --retries=2 --grep 'recovers on retry'
+npx --no playwright test --retries=2 --grep 'recovers on retry' --reporter=line
 if npx --no playwright test --retries=2; then
     echo 'Fixture should contain a failed test' >&2
     exit 1
