@@ -6,6 +6,12 @@ const os = require('node:os');
 const path = require('node:path');
 
 const image = 'mcr.microsoft.com/playwright:v1.58.0-noble';
+const workflow = fs.readFileSync(path.resolve(__dirname, '../release-e2e.yml'), 'utf8');
+const testCommand = workflow.match(
+    /^\s+run: bash controller\/scripts\/playwright-docker\.sh[^\n]+/m,
+)?.[0];
+const releaseRetries = testCommand?.match(/--retries=\d+\b/)?.[0];
+assert.ok(releaseRetries, 'Release workflow must specify the retry policy');
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'release-report-smoke-'));
 const blobs = path.join(directory, 'all-blob-reports');
 fs.mkdirSync(blobs);
@@ -16,6 +22,8 @@ try {
         [
             'run',
             '--rm',
+            '-e',
+            `RELEASE_RETRIES=${releaseRetries}`,
             '-v',
             `${blobs}:/blobs`,
             '-v',
@@ -48,8 +56,8 @@ test('fails with attachment', async ({}, info) => {
     expect(1).toBe(2);
 });
 TEST
-npx --no playwright test --retries=2 --grep 'recovers on retry' --reporter=line
-if npx --no playwright test --retries=2; then
+npx --no playwright test "$RELEASE_RETRIES" --grep 'recovers on retry' --reporter=line
+if npx --no playwright test "$RELEASE_RETRIES"; then
     echo 'Fixture should contain a failed test' >&2
     exit 1
 fi
