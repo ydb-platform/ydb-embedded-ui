@@ -1,6 +1,7 @@
 import React from 'react';
 
 import isEqual from 'lodash/isEqual';
+import omit from 'lodash/omit';
 import {useStore} from 'react-redux';
 
 import type {RootState} from '../../store';
@@ -78,14 +79,7 @@ export const PaginatedTable = <T, F>({
 }: PaginatedTableProps<T, F>) => {
     const store = useStore<RootState>();
     // Get state and setters from context
-    const {
-        tableState,
-        noBatching,
-        setSortParams,
-        setTotalEntities,
-        setFoundEntities,
-        setIsInitialLoad,
-    } = usePaginatedTableState();
+    const {tableState, noBatching, setSortParams, dispatchCounts} = usePaginatedTableState();
 
     const {sortParams, foundEntities} = tableState;
     const activeSortParams = isSortColumnAvailable(sortParams, columns) ? sortParams : undefined;
@@ -99,6 +93,25 @@ export const PaginatedTable = <T, F>({
     React.useEffect(() => {
         setFilters(rawFilters);
     }, [rawFilters]);
+
+    const countsQuery = React.useMemo(
+        () =>
+            omit(
+                getTableChunkQueryParams({
+                    offset: 0,
+                    limit: chunkSize,
+                    fetchData,
+                    filters,
+                    sortParams: activeSortParams,
+                    columns,
+                    tableName,
+                    noBatching,
+                }),
+                'offset',
+                'fetchData',
+            ),
+        [chunkSize, fetchData, filters, activeSortParams, columns, tableName, noBatching],
+    );
 
     const getQueryParams = (offset: number) =>
         getTableChunkQueryParams({
@@ -186,15 +199,16 @@ export const PaginatedTable = <T, F>({
     };
 
     const handleDataFetched = React.useCallback(
-        (data?: PaginatedTableData<T>) => {
-            if (data) {
-                setTotalEntities(data.total);
-                setFoundEntities(data.found);
-                setIsInitialLoad(false);
-                onDataFetched?.(data);
-            }
+        (data: PaginatedTableData<T>) => {
+            dispatchCounts({
+                type: 'dataReceived',
+                query: countsQuery,
+                total: data.total,
+                found: data.found,
+            });
+            onDataFetched?.(data);
         },
-        [onDataFetched, setFoundEntities, setIsInitialLoad, setTotalEntities],
+        [countsQuery, dispatchCounts, onDataFetched],
     );
 
     // Set will-change: transform on scroll container if not already set
@@ -208,15 +222,9 @@ export const PaginatedTable = <T, F>({
         }
     }, [scrollContainerRef.current]);
 
-    // Reset table on initialization and filters change
     React.useLayoutEffect(() => {
-        const defaultTotal = initialEntitiesCount || 0;
-        const defaultFound = initialEntitiesCount || 1;
-
-        setTotalEntities(defaultTotal);
-        setFoundEntities(defaultFound);
-        setIsInitialLoad(true);
-    }, [initialEntitiesCount, setTotalEntities, setFoundEntities, setIsInitialLoad]);
+        dispatchCounts({type: 'initialize', query: countsQuery, initialEntitiesCount});
+    }, [countsQuery, initialEntitiesCount, dispatchCounts]);
 
     const renderTable = () => (
         <table className={b('table')}>

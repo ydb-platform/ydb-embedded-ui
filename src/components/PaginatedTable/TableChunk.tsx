@@ -42,7 +42,7 @@ interface TableChunkProps<T, F> {
     onRowClick?: OnRowClick<T>;
     renderErrorMessage?: RenderErrorMessage;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
-    onDataFetched: (data?: PaginatedTableData<T>) => void;
+    onDataFetched: (data: PaginatedTableData<T>) => void;
 
     keepCache?: boolean;
 }

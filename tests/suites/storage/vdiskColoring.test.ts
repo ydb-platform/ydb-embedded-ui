@@ -942,6 +942,110 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         );
     });
 
+    test('preserves group counts and pagination after returning to a cached table', async ({
+        page,
+    }) => {
+        await page.setViewportSize({width: 1500, height: 1000});
+        await enableExpertMode(page, VDisksGroupBy.State, false);
+        await page.addInitScript(() => {
+            localStorage.setItem('auto-refresh-interval', '0');
+            localStorage.setItem(
+                'storageGroupsSelectedColumns',
+                JSON.stringify([{id: 'GroupId', selected: true}]),
+            );
+        });
+        await setupVDiskColoringMocks(page);
+        await page.route('**/viewer/json/nodes?*', (route) =>
+            route.fulfill({json: createMockStorageNodesResponse()}),
+        );
+
+        const response = createMockStorageGroupsResponse();
+        const groups = Array.from({length: 245}, (_, index) => ({
+            ...response.StorageGroups?.[0],
+            GroupId: String(9000000000 + index),
+        }));
+        const requestedOffsets: number[] = [];
+        const columnsResponse = Promise.withResolvers<void>();
+        await page.route('**/storage/groups?*', async (route) => {
+            const url = new URL(route.request().url());
+            const offset = Number(url.searchParams.get('offset') || 0);
+            const limit = Number(url.searchParams.get('limit') || groups.length);
+            const filter = url.searchParams.get('filter') || '';
+            const filteredGroups = groups.filter((group) => group.GroupId.includes(filter));
+            requestedOffsets.push(offset);
+            if (url.searchParams.get('fields_required')?.split(',').includes('Erasure')) {
+                await columnsResponse.promise;
+            }
+            return route.fulfill({
+                json: {
+                    ...response,
+                    TotalGroups: groups.length,
+                    FoundGroups: filteredGroups.length,
+                    StorageGroups: filteredGroups.slice(offset, offset + limit),
+                },
+            });
+        });
+
+        await gotoStoragePage(page, VDisksGroupBy.State, false);
+        const table = new ClusterStorageTable(page);
+        await expect.poll(() => table.getCount()).toBe(245);
+        await table.scrollToBottom();
+        await expect(page.getByRole('link', {name: '9000000244', exact: true})).toBeVisible();
+        const initialRequests = requestedOffsets.length;
+
+        const typeFilter = page.getByTestId('storage-type-filter');
+        await typeFilter.getByRole('radio', {name: 'Nodes', exact: true}).check();
+        await expect(page.getByRole('cell', {name: '7000', exact: true})).toBeVisible();
+        await typeFilter.getByRole('radio', {name: 'Groups', exact: true}).check();
+
+        await expect.poll(() => table.getCount()).toBe(245);
+        await table.scrollToBottom();
+        await expect(page.getByRole('link', {name: '9000000244', exact: true})).toBeVisible();
+        expect(requestedOffsets).toHaveLength(initialRequests);
+
+        const scrollContainer = page.locator('.ydb-cluster');
+        const scrollTop = await scrollContainer.evaluate((element) => element.scrollTop);
+        const tableElement = page.locator('.ydb-paginated-table__table');
+        const tableHeight = await tableElement.evaluate((element) => element.clientHeight);
+        const columnsRequest = page.waitForRequest((request) => {
+            const url = new URL(request.url());
+            return (
+                url.pathname.endsWith('/storage/groups') &&
+                Boolean(url.searchParams.get('fields_required')?.split(',').includes('Erasure'))
+            );
+        });
+        try {
+            await table.getControls().openColumnSetup();
+            await table.getControls().setColumnChecked('Erasure');
+            await table.getControls().closeColumnSetup();
+            await columnsRequest;
+            expect(await tableElement.evaluate((element) => element.clientHeight)).toBe(
+                tableHeight,
+            );
+            expect(await scrollContainer.evaluate((element) => element.scrollTop)).toBeCloseTo(
+                scrollTop,
+                0,
+            );
+        } finally {
+            columnsResponse.resolve();
+        }
+        await expect.poll(() => table.getCount()).toBe(245);
+        await expect(page.getByRole('link', {name: '9000000244', exact: true})).toBeVisible();
+
+        await table.search('9000000244');
+        await expect.poll(() => table.getCount()).toBe(1);
+        await expect(page.getByRole('link', {name: '9000000244', exact: true})).toBeVisible();
+
+        await table.search('missing');
+        await expect(await table.getEmptyDataMessageLocator()).toBeVisible();
+        await expect.poll(() => table.getCount()).toBe(0);
+
+        await table.search('');
+        await expect.poll(() => table.getCount()).toBe(245);
+        await table.scrollToBottom();
+        await expect(page.getByRole('link', {name: '9000000244', exact: true})).toBeVisible();
+    });
+
     test('renders loaded node rows at their final height on initial and cached loads', async ({
         page,
     }) => {
