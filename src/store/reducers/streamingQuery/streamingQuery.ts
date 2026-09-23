@@ -14,11 +14,13 @@ WHERE Path = '${safePath}'
 LIMIT 1`;
 }
 
-function getStreamingQueryPlanSQL(path: string, columns: string) {
+function getStreamingQueryPlanSQL(path: string) {
     const safePath = path.replace(/'/g, "''");
     return `${QUERY_TECHNICAL_MARK}
 SELECT
-    ${columns}
+    Status,
+    Issues,
+    Plan
 FROM \`.sys/streaming_queries\`
 WHERE Path = '${safePath}'
 LIMIT 1`;
@@ -56,19 +58,10 @@ export const streamingQueriesApi = api.injectEndpoints({
         getStreamingQueryPlan: build.query({
             queryFn: async ({database, path}: {database: string; path: string}, {signal}) => {
                 try {
-                    const result = await execStreamingSQL(
-                        getStreamingQueryPlanSQL(path, 'Status, Issues, Plan'),
-                        {database, signal},
-                    );
-                    if (!('error' in result)) {
-                        return result;
-                    }
-                    // A backend without the Plan column still reports the query state.
-                    const fallback = await execStreamingSQL(
-                        getStreamingQueryPlanSQL(path, 'Status, Issues'),
-                        {database, signal},
-                    );
-                    return 'error' in fallback ? result : fallback;
+                    return await execStreamingSQL(getStreamingQueryPlanSQL(path), {
+                        database,
+                        signal,
+                    });
                 } catch (error) {
                     return {error};
                 }
