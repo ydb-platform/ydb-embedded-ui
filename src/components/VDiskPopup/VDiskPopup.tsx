@@ -30,7 +30,12 @@ import {InternalLink} from '../InternalLink';
 import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {PDiskPopupContent} from '../PDiskPopup/PDiskPopup';
-import {getVDiskCapacityItems, getVDiskLocationItems} from '../VDiskInfo/getVDiskDetails';
+import {
+    getVDiskCapacityItems,
+    getVDiskIdentityItems,
+    getVDiskLocationItems,
+} from '../VDiskInfo/getVDiskDetails';
+import {vDiskInfoKeyset} from '../VDiskInfo/i18n';
 import {
     VDiskCompactionRankLabel,
     VDiskDonorLabel,
@@ -47,7 +52,10 @@ import './VDiskPopup.scss';
 
 const b = cn('ydb-vdisk-popup');
 
-function getRuntimeItems(data: PreparedVDisk): YDBDefinitionListItem[] {
+function getRuntimeItems(
+    data: PreparedVDisk,
+    withUnreadableBlobs: boolean,
+): YDBDefinitionListItem[] {
     const items: YDBDefinitionListItem[] = [
         {
             name: i18n('label_front-queues'),
@@ -76,6 +84,12 @@ function getRuntimeItems(data: PreparedVDisk): YDBDefinitionListItem[] {
         if (parseOptionalNonNegativeNumber(value) !== undefined) {
             items.push({name, content: bytesToSpeed(value)});
         }
+    }
+    if (withUnreadableBlobs && !isNil(data.HasUnreadableBlobs)) {
+        items.push({
+            name: vDiskInfoKeyset('has-unreadable-blobs'),
+            content: vDiskInfoKeyset(data.HasUnreadableBlobs ? 'yes' : 'no'),
+        });
     }
     return items;
 }
@@ -128,9 +142,11 @@ const resolveVDiskId = (data: PreparedVDisk): Required<TVDiskID> | undefined => 
 function DiskFooter({
     data,
     onSuccess,
+    withActions,
 }: {
     data: PreparedVDisk | UnavailableDonor;
     onSuccess: VoidFunction;
+    withActions: boolean;
 }) {
     const hasDeveloperUi = useHasDeveloperUi();
     const getVDiskLink = useVDiskPagePath();
@@ -160,7 +176,7 @@ function DiskFooter({
                     hideEndIcon
                 />
             )}
-            {(pageLink || resolvedId) && (
+            {withActions && (pageLink || resolvedId) && (
                 <Flex gap={2} wrap="wrap" className={b('actions')}>
                     {pageLink && (
                         <InternalLinkButton
@@ -222,9 +238,15 @@ interface VDiskPopupProps {
     data: PreparedVDisk | UnavailableDonor;
     nodeData?: NodeMetadata;
     onClose?: VoidFunction;
+    view?: 'default' | 'space-distribution';
 }
 
-export function VDiskPopup({data, nodeData: parentNodeData, onClose}: VDiskPopupProps) {
+export function VDiskPopup({
+    data,
+    nodeData: parentNodeData,
+    onClose,
+    view = 'default',
+}: VDiskPopupProps) {
     const dispatch = useTypedDispatch();
     const nodeData = useNodeMetadata(data.NodeId, parentNodeData);
     const isViewerUser = useIsViewerUser();
@@ -243,7 +265,9 @@ export function VDiskPopup({data, nodeData: parentNodeData, onClose}: VDiskPopup
         );
         onClose?.();
     };
-    const runtimeItems = fullData ? getRuntimeItems(fullData) : [];
+    const isSpaceDistribution = view === 'space-distribution';
+    const runtimeItems = fullData ? getRuntimeItems(fullData, isSpaceDistribution) : [];
+    const identityItems = isSpaceDistribution ? getVDiskIdentityItems(fullData) : [];
     const storageItems = fullData ? getStorageItems(fullData, capacityMetricsEnabled) : [];
     if (!fullData && data.StoragePoolName) {
         storageItems.push({
@@ -253,11 +277,19 @@ export function VDiskPopup({data, nodeData: parentNodeData, onClose}: VDiskPopup
         });
     }
     const relationItems = fullData ? getRelationItems(fullData, getVDiskLink) : [];
-    const pdisk = isViewerUser ? fullData?.PDisk : undefined;
+    const pdisk = !isSpaceDistribution && isViewerUser ? fullData?.PDisk : undefined;
     return (
         <DiskPopup combined={Boolean(pdisk)} className={b(null, 'vdisk-storage-popup')}>
             {pdisk && <PDiskPopupContent data={pdisk} nodeData={nodeData} />}
-            <DiskPopupPanel footer={<DiskFooter data={data} onSuccess={handleAfterEvictVDisk} />}>
+            <DiskPopupPanel
+                footer={
+                    <DiskFooter
+                        data={data}
+                        onSuccess={handleAfterEvictVDisk}
+                        withActions={!isSpaceDistribution}
+                    />
+                }
+            >
                 <DiskHeader data={fullData} />
                 <DiskPopupLocation
                     items={getVDiskLocationItems(data, nodeData)}
@@ -272,6 +304,12 @@ export function VDiskPopup({data, nodeData: parentNodeData, onClose}: VDiskPopup
                 )}
                 {relationItems.length > 0 && (
                     <YDBDefinitionList items={relationItems} nameMaxWidth={150} />
+                )}
+                {identityItems.length > 0 && (
+                    <React.Fragment>
+                        <Divider />
+                        <YDBDefinitionList items={identityItems} nameMaxWidth={150} />
+                    </React.Fragment>
                 )}
             </DiskPopupPanel>
         </DiskPopup>

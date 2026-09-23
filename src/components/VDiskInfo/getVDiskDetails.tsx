@@ -1,3 +1,5 @@
+import {isNil} from 'lodash';
+
 import type {NodeMetadata} from '../../types/store/nodesList';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
@@ -28,6 +30,18 @@ export function getVDiskLocationItems(
             VDiskSlotId: isFullVDiskData(data) ? data.VDiskSlotId : data.VSlotId,
         },
         nodeData,
+    );
+}
+
+export function getVDiskIdentityItems(data: PreparedVDisk = {}): DiskDetailItem[] {
+    const entries = [
+        {id: 'kind', name: i18n('kind'), value: data.Kind},
+        {id: 'guid', name: i18n('guid'), value: data.Guid},
+        {id: 'incarnation-guid', name: i18n('incarnation-guid'), value: data.IncarnationGuid},
+        {id: 'instance-guid', name: i18n('instance-guid'), value: data.InstanceGuid},
+    ];
+    return entries.flatMap(({id, name, value}) =>
+        isNil(value) || value === '' ? [] : [{id, name, content: value}],
     );
 }
 
