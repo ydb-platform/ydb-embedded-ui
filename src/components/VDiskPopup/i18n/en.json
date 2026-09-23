@@ -9,8 +9,5 @@
   "label_recipient": "Recipient",
   "action_open-in-developer-ui": "Open in Developer UI",
   "action_go-to-vdisk": "Go to VDisk",
-  "label_compaction": "Compaction",
-  "action_copy-field": "Copy {{field}}",
-  "action_expand-details": "Show VDisk location details",
-  "action_collapse-details": "Hide VDisk location details"
+  "label_compaction": "Compaction"
 }

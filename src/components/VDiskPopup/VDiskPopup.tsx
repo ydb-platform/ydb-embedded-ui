@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {ChevronDown, ChevronUp, Wrench} from '@gravity-ui/icons';
-import {Button, ClipboardButton, Divider, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {Wrench} from '@gravity-ui/icons';
+import {Divider, Flex} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {useVDiskPagePath} from '../../routes';
@@ -19,7 +19,12 @@ import {useTypedDispatch} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useNodeMetadata} from '../../utils/hooks/useNodeMetadata';
 import {bytesToSpeed, parseOptionalNonNegativeNumber} from '../../utils/utils';
-import {DiskTypeLabel} from '../DiskStatus/DiskStatus';
+import {
+    DiskPopup,
+    DiskPopupHeader,
+    DiskPopupLocation,
+    DiskPopupPanel,
+} from '../DiskPopup/DiskPopup';
 import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/EvictVDiskButton';
 import {InternalLink} from '../InternalLink';
 import {InternalLinkButton} from '../InternalLinkButton';
@@ -41,57 +46,6 @@ import {vDiskPopupKeyset as i18n} from './i18n';
 import './VDiskPopup.scss';
 
 const b = cn('ydb-vdisk-popup');
-
-function DiskLocation({
-    data,
-    nodeData,
-}: {
-    data: PreparedVDisk | UnavailableDonor;
-    nodeData: NodeMetadata;
-}) {
-    const [expanded, setExpanded] = React.useState(false);
-    const detailsId = React.useId();
-    const items = getVDiskLocationItems(data, nodeData);
-    if (!items.length) {
-        return null;
-    }
-    const hasDetails = items.length > 2;
-    return (
-        <div className={b('location')}>
-            <div className={b('location-summary', {'with-toggle': hasDetails})}>
-                <YDBDefinitionList
-                    items={items.slice(0, 2)}
-                    nameMaxWidth={100}
-                    className={b('properties', {location: true})}
-                />
-                {hasDetails && (
-                    <Button
-                        view="flat-secondary"
-                        size="xs"
-                        className={b('location-toggle')}
-                        aria-label={i18n(
-                            expanded ? 'action_collapse-details' : 'action_expand-details',
-                        )}
-                        aria-expanded={expanded}
-                        aria-controls={detailsId}
-                        onClick={() => setExpanded(!expanded)}
-                    >
-                        <Icon data={expanded ? ChevronUp : ChevronDown} size={12} />
-                    </Button>
-                )}
-            </div>
-            {hasDetails && (
-                <div id={detailsId} hidden={!expanded} className={b('location-details')}>
-                    <YDBDefinitionList
-                        items={items.slice(2)}
-                        nameMaxWidth={100}
-                        className={b('properties', {location: true})}
-                    />
-                </div>
-            )}
-        </div>
-    );
-}
 
 function getRuntimeItems(data: PreparedVDisk): YDBDefinitionListItem[] {
     const items: YDBDefinitionListItem[] = [
@@ -142,33 +96,19 @@ function getStorageItems(
 }
 
 function DiskHeader({data = {}}: {data?: PreparedVDisk}) {
-    const {StringifiedId, PDiskType, PDisk, DonorMode} = data;
-    const type = PDiskType ?? PDisk?.Type;
-
     return (
-        <React.Fragment>
-            <Flex gap={1} alignItems="center" wrap="wrap" className={b('header')}>
-                <Text variant="subheader-2">{i18n('label_vdisk')}</Text>
-                <Text color="secondary">•</Text>
-                <Text variant="body-2" color="secondary" className={b('id')}>
-                    {StringifiedId ?? EMPTY_DATA_PLACEHOLDER}
-                </Text>
-                {StringifiedId && (
-                    <ClipboardButton
-                        text={StringifiedId}
-                        size="s"
-                        view="flat-secondary"
-                        aria-label={i18n('action_copy-field', {field: i18n('label_vdisk')})}
-                    />
-                )}
-                <DiskTypeLabel type={type} />
-            </Flex>
-            <Flex gap={1} wrap="wrap" alignItems="center">
-                <VDiskStateLabel state={data.VDiskState} />
-                <VDiskReplicationStatus data={data} />
-                <VDiskDonorLabel donorMode={DonorMode} />
-            </Flex>
-        </React.Fragment>
+        <DiskPopupHeader
+            title={i18n('label_vdisk')}
+            id={data.StringifiedId}
+            type={data.PDiskType ?? data.PDisk?.Type}
+            statuses={
+                <React.Fragment>
+                    <VDiskStateLabel state={data.VDiskState} />
+                    <VDiskReplicationStatus data={data} />
+                    <VDiskDonorLabel donorMode={data.DonorMode} />
+                </React.Fragment>
+            }
+        />
     );
 }
 
@@ -315,40 +255,30 @@ export function VDiskPopup({data, nodeData: parentNodeData, onClose}: VDiskPopup
     const relationItems = fullData ? getRelationItems(fullData, getVDiskLink) : [];
     const pdisk = fullData?.PDisk;
     return (
-        <div className={b(null, 'vdisk-storage-popup')}>
-            <Flex direction="column" gap={2}>
+        <DiskPopup className={b(null, 'vdisk-storage-popup')}>
+            <DiskPopupPanel footer={<DiskFooter data={data} onSuccess={handleAfterEvictVDisk} />}>
                 <DiskHeader data={fullData} />
-                <DiskLocation data={data} nodeData={nodeData} />
+                <DiskPopupLocation
+                    items={getVDiskLocationItems(data, nodeData)}
+                    title={i18n('label_vdisk')}
+                />
                 {runtimeItems.length > 0 && (
-                    <YDBDefinitionList
-                        items={runtimeItems}
-                        nameMaxWidth={150}
-                        className={b('properties')}
-                    />
+                    <YDBDefinitionList items={runtimeItems} nameMaxWidth={150} />
                 )}
                 {runtimeItems.length > 0 && storageItems.length > 0 && <Divider />}
                 {storageItems.length > 0 && (
-                    <YDBDefinitionList
-                        items={storageItems}
-                        nameMaxWidth={150}
-                        className={b('properties')}
-                    />
+                    <YDBDefinitionList items={storageItems} nameMaxWidth={150} />
                 )}
                 {relationItems.length > 0 && (
-                    <YDBDefinitionList
-                        items={relationItems}
-                        nameMaxWidth={150}
-                        className={b('properties')}
-                    />
+                    <YDBDefinitionList items={relationItems} nameMaxWidth={150} />
                 )}
-                <DiskFooter data={data} onSuccess={handleAfterEvictVDisk} />
-            </Flex>
+            </DiskPopupPanel>
             {pdisk && isViewerUser && (
                 <React.Fragment>
                     <Divider className={b('pdisk-divider')} />
                     <PDiskPopup data={pdisk} nodeData={nodeData} nameMaxWidth={150} />
                 </React.Fragment>
             )}
-        </div>
+        </DiskPopup>
     );
 }

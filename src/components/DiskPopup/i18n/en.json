@@ -1,0 +1,5 @@
+{
+  "action_copy-field": "Copy {{field}}",
+  "action_expand-details": "Show {{disk}} location details",
+  "action_collapse-details": "Hide {{disk}} location details"
+}
