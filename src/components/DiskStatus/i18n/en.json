@@ -1,5 +1,5 @@
 {
-  "value_no-data": "No data",
+  "value_no-data": "Not available",
   "context_hdd": "Hard disk drive",
   "context_ssd": "Solid-state drive",
   "context_nvme": "Solid-state drive connected over NVMe interface"

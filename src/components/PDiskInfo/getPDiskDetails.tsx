@@ -31,10 +31,7 @@ export function getPDiskCapacityItems(data: PreparedPDisk): DiskDetailItem[] {
                 name: field.title,
                 content:
                     id === 'capacity-alert' ? (
-                        <DiskCapacityAlertLabel
-                            value={data.PDiskCapacityAlert}
-                            emptyText={i18n('value_no-data')}
-                        />
+                        <DiskCapacityAlertLabel value={data.PDiskCapacityAlert} />
                     ) : (
                         field.value
                     ),

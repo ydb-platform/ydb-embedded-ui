@@ -13,7 +13,6 @@
   "value_local-recovery-error": "Local Recovery Error",
   "value_sync-guid-recovery-error": "Sync Guid Recovery Error",
   "value_unknown": "Unknown",
-  "value_no-data": "Not Available",
   "value_waiting-for-token": "Waiting for token",
   "value_phantoms-only": "Phantoms only",
   "label_not-replicated": "Not replicated",

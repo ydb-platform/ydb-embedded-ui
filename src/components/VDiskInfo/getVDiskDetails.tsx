@@ -1,7 +1,6 @@
 import {isNil} from 'lodash';
 
 import type {NodeMetadata} from '../../types/store/nodesList';
-import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {getDiskLocationItems} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {isFullVDiskData} from '../../utils/disks/helpers';
@@ -67,12 +66,7 @@ export function getVDiskCapacityItems(
         {
             id: 'capacity-alert',
             name: i18n('field_capacity-alert'),
-            content: (
-                <DiskCapacityAlertLabel
-                    value={data.CapacityAlert}
-                    emptyText={EMPTY_DATA_PLACEHOLDER}
-                />
-            ),
+            content: <DiskCapacityAlertLabel value={data.CapacityAlert} />,
             note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
         },
         {
