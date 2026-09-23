@@ -101,6 +101,30 @@ const readSource = (run = sourceRun, jobs = sourceJobs, runId = '123') =>
         throw new Error(`Unexpected GitHub endpoint: ${endpoint}`);
     });
 
+test.each([
+    ['failure', 'failed'],
+    ['cancelled', 'incomplete'],
+])('successful tests cannot hide a %s post-cleanup job', async (conclusion, expectedStatus) => {
+    const jobs = sourceJobs.map((job, i) => ({
+        ...job,
+        conclusion: i === 1 ? conclusion : 'success',
+        steps: job.steps
+            ? [
+                  ...job.steps.map((step) => ({...step, conclusion: 'success'})),
+                  {
+                      name: 'Post Start release local-ydb',
+                      status: 'completed',
+                      conclusion: i === 1 ? conclusion : 'success',
+                  },
+              ]
+            : undefined,
+    }));
+    const source = await readSource(sourceRun, jobs);
+    expect(summarize(report, provenance, {...context, jobs: source.jobs_result}).status).toBe(
+        expectedStatus,
+    );
+});
+
 test('recovers completed failed tests while the parent run is still running', async () => {
     const source = await readSource();
     expect(source).toEqual({
