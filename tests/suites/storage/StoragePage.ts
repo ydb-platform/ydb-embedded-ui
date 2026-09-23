@@ -22,4 +22,20 @@ export class StoragePage extends PageModel {
     async selectEntityType(type: EntityType) {
         await this.entityTypeSelector.getByLabel(type).click();
     }
+
+    getGroupRow(groupId: string) {
+        return this.table.getByRole('row').filter({
+            has: this.page.getByRole('link', {name: groupId, exact: true}),
+        });
+    }
+
+    getGroupVDiskItems(groupId: string, expertMode = false) {
+        return this.getGroupRow(groupId).locator(
+            expertMode ? '.ydb-storage-disks__vdisk-item' : '.ydb-storage-vdisks__item',
+        );
+    }
+
+    getGroupPDiskItems(groupId: string) {
+        return this.getGroupRow(groupId).locator('.ydb-storage-disks__pdisk-item');
+    }
 }

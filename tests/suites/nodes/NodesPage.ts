@@ -37,6 +37,44 @@ export class NodesPage extends PageModel {
         await this.groupByPopup.waitFor({state: 'visible'});
         await this.groupByPopup.locator('.g-select-list__option').getByText(option).click();
     }
+
+    getPDiskLink(nodeId: number, pDiskId: number) {
+        return this.table.locator(
+            `.pdisk-storage__content[href*="nodeId=${nodeId}&"][href$="&pDiskId=${pDiskId}"]`,
+        );
+    }
+
+    getVDiskLink(nodeId: number, vDiskId: string) {
+        return this.table.locator(
+            `.ydb-vdisk-component__content[href*="nodeId=${nodeId}&"][href*="vDiskId=${vDiskId}"]`,
+        );
+    }
+
+    getHostCopyButton(host: string) {
+        return this.table
+            .getByRole('row')
+            .filter({hasText: host})
+            .getByRole('button', {name: 'Copy', exact: true});
+    }
+
+    async getDiskRenderingStats() {
+        return this.table.evaluate((table) => ({
+            elements: table.querySelectorAll('*').length,
+            vDisks: table.querySelectorAll('.ydb-vdisk-component').length,
+        }));
+    }
+
+    async scrollDisksToEnd() {
+        await this.page.locator('.ydb-cluster').evaluate((element) => {
+            element.scrollTo({left: element.scrollWidth, top: element.scrollTop});
+        });
+    }
+
+    async scrollDisksToStart() {
+        await this.page.locator('.ydb-cluster').evaluate((element) => {
+            element.scrollTo({left: 0, top: element.scrollTop});
+        });
+    }
     async waitForTableGroupsLoaded() {
         await this.page.locator('.table-skeleton').waitFor({state: 'hidden'});
         await this.tableGroupsWrapper.waitFor({state: 'visible'});

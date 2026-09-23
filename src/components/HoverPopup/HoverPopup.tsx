@@ -5,6 +5,7 @@ import {Popup} from '@gravity-ui/uikit';
 import debounce from 'lodash/debounce';
 
 import {YDB_POPOVER_CLASS_NAME} from '../../utils/constants';
+import {useEventHandler} from '../../utils/hooks/useEventHandler';
 
 import {getPopupScrollContainer} from './getPopupScrollContainer';
 
@@ -62,22 +63,19 @@ export const HoverPopup = ({
 
     const reportedOpenRef = React.useRef(false);
 
-    const reportOpen = React.useCallback(
-        (nextOpen: boolean, force = false) => {
-            if (!force && reportedOpenRef.current === nextOpen) {
-                return;
-            }
+    const reportOpen = useEventHandler((nextOpen: boolean, force = false) => {
+        if (!force && reportedOpenRef.current === nextOpen) {
+            return;
+        }
 
-            reportedOpenRef.current = nextOpen;
+        reportedOpenRef.current = nextOpen;
 
-            if (nextOpen) {
-                onShowPopup?.();
-            } else {
-                onHidePopup?.();
-            }
-        },
-        [onShowPopup, onHidePopup],
-    );
+        if (nextOpen) {
+            onShowPopup?.();
+        } else {
+            onHidePopup?.();
+        }
+    });
 
     const debouncedHandleShowPopup = React.useMemo(
         () =>
@@ -100,6 +98,13 @@ export const HoverPopup = ({
             }, delayClose),
         [delayClose, reportOpen, hidePopup],
     );
+
+    React.useEffect(() => {
+        return () => {
+            debouncedHandleShowPopup.cancel();
+            debouncedHandleHidePopup.cancel();
+        };
+    }, [debouncedHandleShowPopup, debouncedHandleHidePopup]);
 
     const closePopup = React.useCallback(() => {
         debouncedHandleShowPopup.cancel();
