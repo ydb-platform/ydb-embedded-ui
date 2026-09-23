@@ -6,6 +6,7 @@ import {Loader} from '../../../../components/Loader';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {EPathType} from '../../../../types/api/schema';
+import {cn} from '../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {ViewInfo} from '../../Info/View/View';
 import {isDomain} from '../../ObjectSummary/transformPath';
@@ -29,6 +30,8 @@ interface OverviewProps {
     database: string;
     databaseFullPath: string;
 }
+
+const b = cn('ydb-diagnostics-resource-pool-info');
 
 function Overview({type, path, database, databaseFullPath}: OverviewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -58,11 +61,11 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeResourcePool]: () => (
-                <div className="ydb-diagnostics-resource-pool-info__row">
-                    <div className="ydb-diagnostics-resource-pool-info__col">
+                <div className={b('row')}>
+                    <div className={b('col')}>
                         <ResourcePoolInfo data={data} />
                     </div>
-                    <div className="ydb-diagnostics-resource-pool-info__col">
+                    <div className={b('col')}>
                         <ResourcePoolUsage
                             database={database}
                             poolName={data?.PathDescription?.ResourcePoolDescription?.Name || ''}
