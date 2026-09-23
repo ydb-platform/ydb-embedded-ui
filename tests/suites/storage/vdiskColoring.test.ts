@@ -1576,7 +1576,7 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
         }
         Object.assign(missing, {AvailableSize: undefined, TotalSize: undefined});
         Object.assign(bscOnly, {
-            DriveStatus: 'BROKEN',
+            Status: 'BROKEN',
             DecommitStatus: 'DECOMMIT_IMMINENT',
             MaintenanceStatus: 'LONG_TERM_MAINTENANCE_PLANNED',
             AvailableSize: '50',
@@ -1587,7 +1587,7 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
             PDiskCapacityAlert: ECapacityAlert.RED,
             Device: EFlag.Green,
             Realtime: EFlag.Red,
-            DriveStatus: 'FAULTY',
+            Status: 'FAULTY',
             DecommitStatus: 'DECOMMIT_PENDING',
             MaintenanceStatus: 'NO_NEW_VDISKS',
             AvailableSize: '100',
@@ -1598,7 +1598,7 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
             PDiskCapacityAlert: undefined,
             Device: undefined,
             Realtime: undefined,
-            DriveStatus: undefined,
+            Status: undefined,
             DecommitStatus: undefined,
             MaintenanceStatus: undefined,
             AvailableSize: undefined,

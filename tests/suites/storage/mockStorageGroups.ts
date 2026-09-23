@@ -602,7 +602,7 @@ export function createMockStorageNodesResponse(filterGroup?: string): TNodesInfo
             const isNoDataPDisk = nodeIndex === 0 && pDiskIndex < 2;
             const hasBSCStatuses = !isNoDataPDisk || pDiskIndex === 1;
             const bscStatuses = {
-                DriveStatus: pDiskSource.Status,
+                Status: pDiskSource.Status,
                 DecommitStatus: pDiskSource.DecommitStatus,
                 MaintenanceStatus: pDiskSource.MaintenanceStatus,
             };
