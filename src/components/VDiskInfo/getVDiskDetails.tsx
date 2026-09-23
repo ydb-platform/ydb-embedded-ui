@@ -1,12 +1,12 @@
 import {isNil} from 'lodash';
 
 import type {NodeMetadata} from '../../types/store/nodesList';
+import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
+import {getDiskLocationItems} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {formatMetricPercent, formatStorageMetricPair} from '../../utils/storageMetrics';
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
-import type {DiskDetailItem} from '../DiskInfo/getDiskLocationItems';
-import {getDiskLocationItems} from '../DiskInfo/getDiskLocationItems';
 import {DiskCapacityAlertLabel} from '../DiskStatus/DiskStatus';
 import {
     CAPACITY_CONFIGURATION_HELP_TEXT,

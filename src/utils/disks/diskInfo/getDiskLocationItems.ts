@@ -1,8 +1,8 @@
 import {isNil} from 'lodash';
 
-import type {NodeMetadata} from '../../types/store/nodesList';
-import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
+import type {YDBDefinitionListItem} from '../../../components/YDBDefinitionList/YDBDefinitionList';
+import type {NodeMetadata} from '../../../types/store/nodesList';
+import {EMPTY_DATA_PLACEHOLDER} from '../../constants';
 
 import i18n from './i18n';
 

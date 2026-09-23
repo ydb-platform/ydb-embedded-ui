@@ -9,11 +9,11 @@ import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabil
 import type {NodeMetadata} from '../../types/store/nodesList';
 import {BRAND_BUTTON_CLASS} from '../../utils/constants';
 import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
+import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
+import {getDiskLocationItems} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useNodeMetadata} from '../../utils/hooks/useNodeMetadata';
 import {isNumeric} from '../../utils/utils';
-import type {DiskDetailItem} from '../DiskInfo/getDiskLocationItems';
-import {getDiskLocationItems} from '../DiskInfo/getDiskLocationItems';
 import {
     DiskPopup,
     DiskPopupHeader,

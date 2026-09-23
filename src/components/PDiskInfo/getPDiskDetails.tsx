@@ -1,8 +1,8 @@
 import {formatBytes} from '../../utils/bytesParsers';
+import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 import {getPDiskCapacityInfoItems} from '../DiskCapacityInfo/DiskCapacityInfo';
-import type {DiskDetailItem} from '../DiskInfo/getDiskLocationItems';
 import {DiskCapacityAlertLabel, DiskFlagLabel} from '../DiskStatus/DiskStatus';
 
 import {PDiskLogSize} from './PDiskLogSize';
