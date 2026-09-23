@@ -110,7 +110,7 @@ function getRunningQueriesByPoolText(poolName: string) {
     const escapedPoolName = poolName.replace(/'/g, "''");
     return `${QUERY_TECHNICAL_MARK}
 SELECT
-    COUNT_IF(State = 'EXECUTING') as RunningQueriesCount,
+    COUNT_IF(State = 'EXECUTING' AND (WmState IS NULL OR WmState NOT IN ('PENDING', 'DELAYED'))) as RunningQueriesCount,
     COUNT_IF(State = 'QUEUED' OR WmState = 'PENDING' OR WmState = 'DELAYED') as QueuedQueriesCount
 FROM \`.sys/query_sessions\`
 WHERE Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
