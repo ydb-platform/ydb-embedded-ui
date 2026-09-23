@@ -67,7 +67,7 @@ export function getVDiskCapacityItems(
         items.push({
             id: 'size',
             name: i18n('size'),
-            content: formatStorageMetricPair(size.AllocatedSize, size.SizeLimit),
+            content: formatStorageMetricPair(size.AllocatedSize, size.SizeLimit, 2),
         });
     }
     items.push({
@@ -91,7 +91,7 @@ export function getVDiskCapacityItems(
         ],
     ] as const) {
         if (parseOptionalNonNegativeNumber(value) !== undefined) {
-            items.push({id, name, content: formatMetricPercent(value), note});
+            items.push({id, name, content: formatMetricPercent(value, 2), note});
         }
     }
     return items;

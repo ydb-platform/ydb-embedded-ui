@@ -1,6 +1,11 @@
 import {GIGABYTE, KILOBYTE, MEGABYTE, PETABYTE, TERABYTE, UNBREAKABLE_GAP} from '../constants';
 import type {FormatToSizeArgs, FormatValuesArgs} from '../dataFormatters/common';
-import {formatNumber, roundToPrecision} from '../dataFormatters/dataFormatters';
+import {
+    formatNumber,
+    roundToDecimalPlaces,
+    roundToPrecision,
+} from '../dataFormatters/dataFormatters';
+import {configuredNumeral} from '../numeral';
 import {isNumeric} from '../utils';
 
 import i18n from './i18n';
@@ -57,8 +62,20 @@ export const getBytesSizeUnit = (value: number) => {
     return size;
 };
 
-const formatToSize = ({value, size = 'mb', precision = 0}: FormatToSizeArgs<BytesSizes>) => {
-    const result = roundToPrecision(Number(value) / sizes[size].value, precision);
+const formatToSize = ({
+    value,
+    size = 'mb',
+    precision = 0,
+    fixedDecimalPlaces,
+}: FormatToSizeArgs<BytesSizes> & {fixedDecimalPlaces?: number}) => {
+    const convertedValue = Number(value) / sizes[size].value;
+    if (fixedDecimalPlaces !== undefined) {
+        const pattern = fixedDecimalPlaces > 0 ? `0,0.${'0'.repeat(fixedDecimalPlaces)}` : '0,0';
+        return configuredNumeral(roundToDecimalPlaces(convertedValue, fixedDecimalPlaces)).format(
+            pattern,
+        );
+    }
+    const result = roundToPrecision(convertedValue, precision);
 
     return formatNumber(result);
 };
@@ -78,7 +95,7 @@ export const formatBytes = ({
     withSizeLabel = true,
     delimiter,
     ...params
-}: FormatValuesArgs<BytesSizes>) => {
+}: FormatValuesArgs<BytesSizes> & {fixedDecimalPlaces?: number}) => {
     if (!isNumeric(value)) {
         return '';
     }

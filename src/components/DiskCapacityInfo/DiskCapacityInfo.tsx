@@ -98,14 +98,26 @@ export function getVDiskCapacityInfoItems(
 
 export function getPDiskCapacityInfoItems(
     data: PreparedPDisk | undefined,
-    {withUsage, withCapacityAlert}: {withUsage: boolean; withCapacityAlert: boolean},
+    {
+        withUsage,
+        withCapacityAlert,
+        fixedDecimalPlaces,
+    }: {
+        withUsage: boolean;
+        withCapacityAlert: boolean;
+        fixedDecimalPlaces?: number;
+    },
 ): DiskCapacityInfoItem[] {
     const sizeData = data?.WhiteboardSize ?? data;
     const items: DiskCapacityInfoItem[] = [
         {
             id: 'space',
             title: i18n('field_space'),
-            value: formatStorageMetricPair(sizeData?.AllocatedSize, sizeData?.TotalSize),
+            value: formatStorageMetricPair(
+                sizeData?.AllocatedSize,
+                sizeData?.TotalSize,
+                fixedDecimalPlaces,
+            ),
         },
     ];
 
@@ -113,7 +125,7 @@ export function getPDiskCapacityInfoItems(
         items.push({
             id: 'pdisk-usage',
             title: CAPACITY_METRICS_COLUMN_TITLES.MaxPDiskUsage,
-            value: formatMetricPercent(data?.PDiskUsage),
+            value: formatMetricPercent(data?.PDiskUsage, fixedDecimalPlaces),
             note: CAPACITY_METRICS_HELP_TEXT.MaxPDiskUsage,
         });
     }

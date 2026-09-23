@@ -1,5 +1,5 @@
 import type {BytesSizes} from './bytesParsers';
-import {bytesSizes, getBytesSizeUnit, sizes} from './bytesParsers';
+import {bytesSizes, formatBytes, getBytesSizeUnit, sizes} from './bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from './constants';
 import {
     formatNumber,
@@ -165,24 +165,38 @@ export function formatMetricBytes(
         : EMPTY_DATA_PLACEHOLDER;
 }
 
-export function formatMetricPercent(value?: unknown) {
+export function formatMetricPercent(value?: unknown, fixedDecimalPlaces?: number) {
     const numericValue = parseOptionalNonNegativeNumber(value);
 
     if (numericValue === undefined) {
         return EMPTY_DATA_PLACEHOLDER;
     }
 
-    const precision = Number.isInteger(numericValue) ? 0 : 1;
+    const precision = fixedDecimalPlaces ?? (Number.isInteger(numericValue) ? 0 : 1);
 
-    return formatPercent(numericValue / 100, precision) || EMPTY_DATA_PLACEHOLDER;
+    return (
+        formatPercent(numericValue / 100, precision, {fixed: fixedDecimalPlaces !== undefined}) ||
+        EMPTY_DATA_PLACEHOLDER
+    );
 }
 
-export function formatStorageMetricPair(value?: string | number, capacity?: string | number) {
+export function formatStorageMetricPair(
+    value?: string | number,
+    capacity?: string | number,
+    fixedDecimalPlaces?: number,
+) {
     const parsedValue = parseOptionalNonNegativeNumber(value);
     const parsedCapacity = parseOptionalNonNegativeNumber(capacity);
 
     if (parsedValue === undefined || parsedCapacity === undefined) {
         return EMPTY_DATA_PLACEHOLDER;
+    }
+
+    if (fixedDecimalPlaces !== undefined) {
+        return [
+            formatBytes({value: parsedValue, size: 'gb', withSizeLabel: false, fixedDecimalPlaces}),
+            formatBytes({value: parsedCapacity, size: 'gb', fixedDecimalPlaces}),
+        ].join(' / ');
     }
 
     return formatStorageValuesToGb(parsedValue, parsedCapacity).join(' / ');
