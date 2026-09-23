@@ -1,12 +1,13 @@
 import React from 'react';
 
 import {ChevronDown, ChevronUp} from '@gravity-ui/icons';
-import {Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {Button, ClipboardButton, Flex, Icon, Text, Tooltip} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {DiskTypeLabel} from '../DiskStatus/DiskStatus';
-import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
+import {EntityName} from '../EntityName/EntityName';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
 import i18n from './i18n';
@@ -78,17 +79,47 @@ export function DiskPopupHeader({
     );
 }
 
-export function DiskPopupLocation({items, title}: {items: YDBDefinitionListItem[]; title: string}) {
+export function DiskPopupText({value}: {value?: string | number}) {
+    const hasValue = value !== undefined && value !== '';
+    const text = hasValue ? value : EMPTY_DATA_PLACEHOLDER;
+    return (
+        <Tooltip content={text} disabled={!hasValue} className={b('text-tooltip')}>
+            <span className={b('text')} tabIndex={hasValue ? 0 : undefined}>
+                {text}
+            </span>
+        </Tooltip>
+    );
+}
+
+export function DiskPopupLocation({items, title}: {items: DiskDetailItem[]; title: string}) {
     const [expanded, setExpanded] = React.useState(false);
     const detailsId = React.useId();
     if (!items.length) {
         return null;
     }
     const hasDetails = items.length > 2;
+    const summaryItems = items.slice(0, 2).map((item) =>
+        item.id === 'fqdn'
+            ? {
+                  ...item,
+                  content: <DiskPopupText value={item.copyText} />,
+              }
+            : item,
+    );
+    const detailItems = items.slice(2).map((item) =>
+        item.id === 'pdisk-path' && typeof item.copyText === 'string'
+            ? {
+                  ...item,
+                  content: (
+                      <EntityName name={item.copyText} withLeftTrim className={b('pdisk-path')} />
+                  ),
+              }
+            : item,
+    );
     return (
         <div className={b('location')}>
             <div className={b('location-summary', {'with-toggle': hasDetails})}>
-                <YDBDefinitionList items={items.slice(0, 2)} nameMaxWidth={100} />
+                <YDBDefinitionList items={summaryItems} nameMaxWidth={100} />
                 {hasDetails && (
                     <Button
                         view="flat-secondary"
@@ -108,7 +139,7 @@ export function DiskPopupLocation({items, title}: {items: YDBDefinitionListItem[
             </div>
             {hasDetails && (
                 <div id={detailsId} hidden={!expanded} className={b('location-details')}>
-                    <YDBDefinitionList items={items.slice(2)} nameMaxWidth={100} />
+                    <YDBDefinitionList items={detailItems} nameMaxWidth={100} />
                 </div>
             )}
         </div>

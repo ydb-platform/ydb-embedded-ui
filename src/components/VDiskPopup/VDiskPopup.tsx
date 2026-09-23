@@ -25,6 +25,7 @@ import {
     DiskPopupHeader,
     DiskPopupLocation,
     DiskPopupPanel,
+    DiskPopupText,
 } from '../DiskPopup/DiskPopup';
 import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/EvictVDiskButton';
 import {InternalLinkButton} from '../InternalLinkButton';
@@ -110,7 +111,7 @@ function getStorageItems(
     if (data.StoragePoolName) {
         items.push({
             name: i18n('label_storage-pool'),
-            content: data.StoragePoolName,
+            content: <DiskPopupText value={data.StoragePoolName} />,
             copyText: data.StoragePoolName,
         });
     }
@@ -246,7 +247,7 @@ export function VDiskPopup({
     if (!fullData && data.StoragePoolName) {
         storageItems.push({
             name: i18n('label_storage-pool'),
-            content: data.StoragePoolName,
+            content: <DiskPopupText value={data.StoragePoolName} />,
             copyText: data.StoragePoolName,
         });
     }
