@@ -6,6 +6,11 @@ const os = require('node:os');
 const path = require('node:path');
 
 const image = 'mcr.microsoft.com/playwright:v1.58.0-noble';
+const runner = path.resolve(__dirname, '../../../scripts/playwright-docker.sh');
+const command = fs
+    .readFileSync(runner, 'utf8')
+    .match(/PLAYWRIGHT_COMMAND=\$\(cat <<'SCRIPT'\n([\s\S]*?)\nSCRIPT\n\)/)?.[1];
+assert.ok(command, 'Runner must provide its container command');
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'release-report-smoke-'));
 const blobs = path.join(directory, 'all-blob-reports');
 fs.mkdirSync(blobs);
@@ -20,6 +25,8 @@ try {
             `${blobs}:/blobs`,
             '-v',
             `${blobs}:/input:ro`,
+            '-e',
+            `RELEASE_RUNNER_COMMAND=${command}`,
             image,
             'bash',
             '-c',
@@ -51,6 +58,65 @@ if npx --no playwright merge-reports --reporter=json /input > /tmp/readonly.log 
     exit 1
 fi
 grep '/input/resources' /tmp/readonly.log
+
+# Exercise the real container command with two small source archives.
+mkdir -p /tmp/release-fixture/{ui,tests/src,bin}
+node <<'FIXTURE'
+const fs = require('node:fs');
+const root = '/tmp/release-fixture/';
+for (const [name, dependencies] of [['ui', {}], ['tests', {'@playwright/test': '1.58.0'}]]) {
+  fs.writeFileSync(root + name + '/package.json', JSON.stringify({
+    name, version: '1.0.0', scripts: {start: 'node server.cjs'}, dependencies,
+  }));
+  fs.writeFileSync(root + name + '/server.cjs', [
+    "let hasTests = true; try { require.resolve('@playwright/test'); } catch { hasTests = false; }",
+    "require('node:http').createServer((_, res) => res.end(JSON.stringify({",
+    "  frontend: require('./package.json').name, flag: process.env.FIXTURE_FLAG, hasTests,",
+    "}))).listen(3000);",
+  ].join('\n'));
+}
+fs.writeFileSync(root + 'tests/src/marker.cjs', "module.exports = 'tests-source';");
+fs.writeFileSync(root + 'tests/playwright.config.ts', [
+  "export default {testDir: '.', testMatch: '*.test.js', workers: 1, retries: 0,",
+  "reporter: [['json', {outputFile: '/tmp/release-fixture/result.json'}]],",
+  "webServer: {command: 'npm start', port: 3000, env: {FIXTURE_FLAG: 'from-tests'}},",
+  "use: {baseURL: 'http://localhost:3000/'}};",
+].join('\n'));
+fs.writeFileSync(root + 'tests/identity.test.js', [
+  "const {test, expect} = require('@playwright/test');",
+  "test('keeps the release frontend and test dependencies separate', async ({request}) => {",
+  "  expect(require('./src/marker.cjs')).toBe('tests-source');",
+  "  const response = await request.get('/');",
+  "  expect(await response.json()).toEqual({frontend: 'ui', flag: 'from-tests', hasTests: false});",
+  "});",
+].join('\n'));
+FIXTURE
+for source in ui tests; do
+  (cd "/tmp/release-fixture/$source" && npm install --package-lock-only --ignore-scripts --no-audit --no-fund)
+done
+ui_ref=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+tests_ref=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+tar -czf "/tmp/release-fixture/$ui_ref.tgz" -C /tmp/release-fixture ui
+tar -czf "/tmp/release-fixture/$tests_ref.tgz" -C /tmp/release-fixture tests
+cat > /tmp/release-fixture/bin/curl <<'CURL'
+#!/bin/bash
+set -euo pipefail
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    https://codeload.github.com/*) ref=$(basename "$1") ;;
+    --output) shift; output="$1" ;;
+  esac
+  shift
+done
+cp "/tmp/release-fixture/$ref.tgz" "$output"
+CURL
+chmod +x /tmp/release-fixture/bin/curl
+mkdir -p /work
+cd /work
+PATH="/tmp/release-fixture/bin:$PATH" CI=true \
+  PLAYWRIGHT_RELEASE_REF="$ui_ref" PLAYWRIGHT_RELEASE_TEST_REF="$tests_ref" \
+  PLAYWRIGHT_RELEASE_MODE=test bash -c "$RELEASE_RUNNER_COMMAND"
+node -e "require('node:assert/strict').equal(require('/tmp/release-fixture/result.json').stats.expected, 1)"
 `,
         ],
         {stdio: 'inherit'},
@@ -63,13 +129,14 @@ grep '/input/resources' /tmp/readonly.log
             .update(fs.readFileSync(path.join(blobs, inputs[0])))
             .digest('hex');
     const before = digest();
-    execFileSync('bash', [path.resolve(__dirname, '../../../scripts/playwright-docker.sh')], {
+    execFileSync('bash', [runner], {
         stdio: 'inherit',
         env: {
             ...process.env,
             CI: 'true',
             PLAYWRIGHT_RELEASE_MODE: 'report',
             PLAYWRIGHT_RELEASE_REF: '85e1e1d44e7df6b0f69b4a81e92d2336fb809941',
+            PLAYWRIGHT_RELEASE_TEST_REF: 'f7d3750c673e65078ccb9ac7d0d96cce153702d8',
             PLAYWRIGHT_RELEASE_VERSION: '1.58.0',
             PLAYWRIGHT_RELEASE_OUTPUT: directory,
             PLAYWRIGHT_SHOW_REPORT: '',
@@ -94,7 +161,7 @@ grep '/input/resources' /tmp/readonly.log
     assert.equal(digest(), before);
     assert.deepEqual(fs.readdirSync(blobs), inputs);
     console.info(
-        'Report smoke passed: HTML, JSON and attachment retained; 1 passed, 1 failed; input ZIP unchanged.',
+        'Release smoke passed: separate frontend/test checkouts; test-revision report merge; HTML, JSON and attachment retained; input ZIP unchanged.',
     );
 } finally {
     // The runner writes files as root; remove only this smoke's temporary output.

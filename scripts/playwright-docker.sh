@@ -6,11 +6,12 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$PROJECT_DIR"
 
 RELEASE_REF="${PLAYWRIGHT_RELEASE_REF:-}"
+TEST_REF="${PLAYWRIGHT_RELEASE_TEST_REF:-$RELEASE_REF}"
 RELEASE_MODE="${PLAYWRIGHT_RELEASE_MODE:-test}"
 RELEASE_OUTPUT="${PLAYWRIGHT_RELEASE_OUTPUT:-${PROJECT_DIR}/playwright-artifacts/release}"
 
 if [ -n "$RELEASE_REF" ]; then
-  if [[ ! "$RELEASE_REF" =~ ^[a-f0-9]{40}$ ]] || [[ ! "${PLAYWRIGHT_RELEASE_VERSION:-}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
+  if [[ ! "$RELEASE_REF" =~ ^[a-f0-9]{40}$ ]] || [[ ! "$TEST_REF" =~ ^[a-f0-9]{40}$ ]] || [[ ! "${PLAYWRIGHT_RELEASE_VERSION:-}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
     echo "Error: release mode requires a commit SHA and a pinned Playwright version" >&2
     exit 1
   fi
@@ -20,6 +21,10 @@ if [ -n "$RELEASE_REF" ]; then
   fi
   PLAYWRIGHT_VERSION="$PLAYWRIGHT_RELEASE_VERSION"
 else
+  if [ -n "$TEST_REF" ]; then
+    echo "Error: PLAYWRIGHT_RELEASE_TEST_REF requires release mode" >&2
+    exit 1
+  fi
   RELEASE_MODE=test
   PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")
 fi
@@ -63,10 +68,14 @@ set -euo pipefail
 if [ -n "${PLAYWRIGHT_RELEASE_REF:-}" ]; then
   # Release code is only extracted and executed inside this container. The host's
   # workspace, Docker socket and GitHub cache/artifact credentials are not mounted.
-  curl --fail --location --retry 2 --max-time 120 \
-    "https://codeload.github.com/ydb-platform/ydb-embedded-ui/tar.gz/${PLAYWRIGHT_RELEASE_REF}" \
-    --output /tmp/ui-source.tar.gz
-  tar -xzf /tmp/ui-source.tar.gz --strip-components=1 -C /work
+  fetch_source() {
+    mkdir -p "$2"
+    curl --fail --location --retry 2 --max-time 120 \
+      "https://codeload.github.com/ydb-platform/ydb-embedded-ui/tar.gz/$1" \
+      --output /tmp/ui-source.tar.gz
+    tar -xzf /tmp/ui-source.tar.gz --strip-components=1 -C "$2"
+  }
+  fetch_source "$PLAYWRIGHT_RELEASE_TEST_REF" /work
 fi
 
 if [ -n "${PLAYWRIGHT_PROXY_TARGET:-}" ]; then
@@ -100,8 +109,32 @@ if [ "${PLAYWRIGHT_RELEASE_MODE:-test}" = report ]; then
 fi
 npm ci
 
+config=playwright.config.ts
+if [ -n "${PLAYWRIGHT_RELEASE_REF:-}" ] && [ "$PLAYWRIGHT_RELEASE_TEST_REF" != "$PLAYWRIGHT_RELEASE_REF" ]; then
+  fetch_source "$PLAYWRIGHT_RELEASE_REF" /tmp/release-ui
+  (cd /tmp/release-ui && npm ci)
+  cat > release-playwright.config.ts <<'CONFIG'
+import config from './playwright.config';
+
+if (!config.webServer || Array.isArray(config.webServer)) {
+    throw new Error('Release tests must define a single Playwright webServer');
+}
+
+export default {
+    ...config,
+    webServer: {
+        ...config.webServer,
+        command: 'npm start',
+        cwd: '/tmp/release-ui',
+        reuseExistingServer: false,
+    },
+};
+CONFIG
+  config=release-playwright.config.ts
+fi
+
 echo "Running Playwright tests"
-npx playwright test --config=playwright.config.ts "$@"
+npx playwright test --config="$config" "$@"
 SCRIPT
 )
 
@@ -148,6 +181,7 @@ docker "${DOCKER_RUN_ARGS[@]}" \
   -e PLAYWRIGHT_OUTPUT_DIR="${PLAYWRIGHT_OUTPUT_DIR}" \
   -e PLAYWRIGHT_PROXY_TARGET="${PLAYWRIGHT_PROXY_TARGET}" \
   -e PLAYWRIGHT_RELEASE_REF="$RELEASE_REF" \
+  -e PLAYWRIGHT_RELEASE_TEST_REF="$TEST_REF" \
   -e PLAYWRIGHT_RELEASE_MODE="$RELEASE_MODE" \
   "${DOCKER_IMAGE}" \
   /bin/bash -c "$PLAYWRIGHT_COMMAND" -- "$@"

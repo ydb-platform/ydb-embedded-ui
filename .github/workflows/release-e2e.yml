@@ -12,6 +12,10 @@ on:
         description: Optional expected full YDB commit SHA (leave blank to resolve from tag)
         required: false
         type: string
+      tests_sha:
+        description: Optional full UI repository commit SHA for tests (defaults to the embedded UI revision)
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -23,6 +27,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       ui_sha: ${{ steps.release.outputs.ui_sha }}
+      tests_sha: ${{ steps.release.outputs.tests_sha }}
       playwright_version: ${{ steps.release.outputs.playwright_version }}
     steps:
       - name: Require main workflow revision
@@ -50,6 +55,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           YDB_TAG: ${{ inputs.ydb_tag }}
           YDB_SHA: ${{ inputs.ydb_sha }}
+          TESTS_SHA: ${{ inputs.tests_sha }}
           WORKFLOW_SHA: ${{ github.workflow_sha }}
       - uses: actions/upload-artifact@v4
         if: always()
@@ -101,6 +107,7 @@ jobs:
           PLAYWRIGHT_APP_BACKEND: http://localhost:8765
           PLAYWRIGHT_VIDEO: retain-on-failure
           PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}
+          PLAYWRIGHT_RELEASE_TEST_REF: ${{ needs.resolve.outputs.tests_sha }}
           PLAYWRIGHT_RELEASE_VERSION: ${{ needs.resolve.outputs.playwright_version }}
           PLAYWRIGHT_RELEASE_OUTPUT: ${{ github.workspace }}/ui
       - name: Collect diagnostics and sanitize artifacts

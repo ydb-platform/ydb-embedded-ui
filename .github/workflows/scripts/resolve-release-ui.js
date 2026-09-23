@@ -60,8 +60,21 @@ async function resolveImageDigest(tag) {
     return digest;
 }
 
+async function getPlaywrightVersion(testsSha, github) {
+    const lockfile = JSON.parse(
+        decodeFile(
+            await github(`ydb-platform/ydb-embedded-ui/contents/package-lock.json?ref=${testsSha}`),
+        ),
+    );
+    const version = lockfile.packages?.['node_modules/@playwright/test']?.version;
+    if (!/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/.test(version || '')) {
+        throw new Error('Test lockfile has no valid Playwright version');
+    }
+    return version;
+}
+
 async function resolveRelease(
-    {ydbTag, ydbSha: expectedYdbSha, workflowSha},
+    {ydbTag, ydbSha: expectedYdbSha, testsSha: requestedTestsSha, workflowSha},
     github = readGithub,
     digest = resolveImageDigest,
 ) {
@@ -70,6 +83,9 @@ async function resolveRelease(
     }
     if ((expectedYdbSha && !SHA_PATTERN.test(expectedYdbSha)) || !SHA_PATTERN.test(workflowSha)) {
         throw new Error('YDB and workflow revisions must be full commit SHAs');
+    }
+    if (requestedTestsSha && !SHA_PATTERN.test(requestedTestsSha)) {
+        throw new Error('tests_sha must be a full commit SHA');
     }
     const commit = await github(`ydb-platform/ydb/commits/${encodeURIComponent(ydbTag)}`);
     const ydbSha = commit.sha;
@@ -94,17 +110,14 @@ async function resolveRelease(
     if (uiPackage.version !== uiVersion) {
         throw new Error(`UI package version ${uiPackage.version} does not match ${uiVersion}`);
     }
-    const lockfile = JSON.parse(
-        decodeFile(
-            await github(
-                `ydb-platform/ydb-embedded-ui/contents/package-lock.json?ref=${uiCommit.sha}`,
-            ),
-        ),
-    );
-    const playwrightVersion = lockfile.packages?.['node_modules/@playwright/test']?.version;
-    if (!/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/.test(playwrightVersion || '')) {
-        throw new Error('UI lockfile has no valid Playwright version');
+    const testsSha = requestedTestsSha || uiCommit.sha;
+    if (testsSha !== uiCommit.sha) {
+        const testsCommit = await github(`ydb-platform/ydb-embedded-ui/commits/${testsSha}`);
+        if (testsCommit.sha !== testsSha) {
+            throw new Error('Test revision does not match tests_sha');
+        }
     }
+    const playwrightVersion = await getPlaywrightVersion(testsSha, github);
     const imageDigest = await digest(ydbTag);
     if (!DIGEST_PATTERN.test(imageDigest)) {
         throw new Error('Invalid image digest');
@@ -114,6 +127,7 @@ async function resolveRelease(
         ydb_sha: ydbSha,
         ui_version: uiVersion,
         ui_sha: uiCommit.sha,
+        tests_sha: testsSha,
         frontend_mode: 'npm-start',
         playwright_version: playwrightVersion,
         image: `${IMAGE_REPOSITORY}:${ydbTag}`,
@@ -127,6 +141,7 @@ if (require.main === module) {
     resolveRelease({
         ydbTag: process.env.YDB_TAG,
         ydbSha: process.env.YDB_SHA,
+        testsSha: process.env.TESTS_SHA,
         workflowSha: process.env.WORKFLOW_SHA,
     })
         .then((provenance) => {

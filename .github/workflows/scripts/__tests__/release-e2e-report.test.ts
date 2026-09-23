@@ -16,6 +16,7 @@ const provenance = {
     ydb_sha: 'a'.repeat(40),
     image_digest: `sha256:${'b'.repeat(64)}`,
     frontend_mode: 'npm-start',
+    ui_sha: 'd'.repeat(40),
 };
 const image = {
     Id: 'sha256:container-image',
@@ -114,10 +115,16 @@ test('recovers completed failed tests while the parent run is still running', as
         'failed',
     );
     const ui = {ui_sha: 'd'.repeat(40), playwright_version: '1.58.0', workflow_sha: workflowSha};
-    expect(prepareReport(ui, source)).toEqual(ui);
+    expect(prepareReport(ui, source)).toEqual({...ui, tests_sha: ui.ui_sha});
+    const override = {...ui, tests_sha: 'f'.repeat(40)};
+    expect(prepareReport(override, source)).toEqual(override);
+    const summary = summarize(report, override, context).summary;
+    expect(summary).toContain(`UI: ${ui.ui_sha}`);
+    expect(summary).toContain(`Tests: ${override.tests_sha}`);
     for (const invalid of [
         undefined,
         {...ui, ui_sha: 'main'},
+        {...ui, tests_sha: 'main'},
         {...ui, playwright_version: 'latest'},
         {...ui, workflow_sha: 'e'.repeat(40)},
     ]) {

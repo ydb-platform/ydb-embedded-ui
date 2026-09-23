@@ -77,12 +77,13 @@ function prepareReport(provenance, source) {
     if (
         !provenance ||
         !/^[a-f0-9]{40}$/.test(provenance.ui_sha || '') ||
+        !/^[a-f0-9]{40}$/.test(provenance.tests_sha ?? provenance.ui_sha) ||
         !/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/.test(provenance.playwright_version || '') ||
         provenance.workflow_sha !== source.source_workflow_sha
     ) {
         throw new Error('Missing or invalid provenance for the source release run');
     }
-    return provenance;
+    return {...provenance, tests_sha: provenance.tests_sha ?? provenance.ui_sha};
 }
 
 function collectReports(directory, destination) {
@@ -125,7 +126,9 @@ function sanitizeArtifacts(directory) {
 }
 
 function summarize(report, provenance, {shards, jobs, artifacts, merge}) {
-    const frontend = provenance ? `Frontend: ${provenance.frontend_mode ?? 'image'}.\n\n` : '';
+    const frontend = provenance
+        ? `Frontend: ${provenance.frontend_mode ?? 'image'}. UI: ${provenance.ui_sha}. Tests: ${provenance.tests_sha ?? provenance.ui_sha}.\n\n`
+        : '';
     const problems = [];
     if (shards !== 8) {
         problems.push(`Reports received from ${shards}/8 shards`);
@@ -191,7 +194,7 @@ async function main() {
         );
         fs.appendFileSync(
             process.env.GITHUB_OUTPUT,
-            `ui_sha=${provenance.ui_sha}\nplaywright_version=${provenance.playwright_version}\n`,
+            `ui_sha=${provenance.ui_sha}\ntests_sha=${provenance.tests_sha}\nplaywright_version=${provenance.playwright_version}\n`,
         );
     } else if (command === 'verify') {
         const provenance = JSON.parse(fs.readFileSync(args[0], 'utf8'));

@@ -22,6 +22,7 @@ describe('release Playwright container boundary', () => {
             PATH: `${directory}:${process.env.PATH}`,
             CAPTURE: path.join(directory, 'arguments.json'),
             PLAYWRIGHT_RELEASE_REF: 'a'.repeat(40),
+            PLAYWRIGHT_RELEASE_TEST_REF: '',
             PLAYWRIGHT_RELEASE_VERSION: '1.58.0',
             PLAYWRIGHT_RELEASE_MODE: 'test',
             PLAYWRIGHT_RELEASE_OUTPUT: path.join(directory, 'output'),
@@ -37,6 +38,7 @@ describe('release Playwright container boundary', () => {
 
     test.each([
         ['test', 'http://localhost:8765'],
+        ['override', 'http://localhost:8765'],
         ['report', ''],
         ['local', 'https://localhost:8765'],
     ])('sets safe mounts and credentials in %s mode', (mode, backend) => {
@@ -45,7 +47,8 @@ describe('release Playwright container boundary', () => {
             env: {
                 ...env,
                 PLAYWRIGHT_RELEASE_REF: mode === 'local' ? '' : env.PLAYWRIGHT_RELEASE_REF,
-                PLAYWRIGHT_RELEASE_MODE: mode,
+                PLAYWRIGHT_RELEASE_MODE: mode === 'override' ? 'test' : mode,
+                PLAYWRIGHT_RELEASE_TEST_REF: mode === 'override' ? 'b'.repeat(40) : '',
                 PLAYWRIGHT_APP_BACKEND: backend,
             },
         });
@@ -65,6 +68,9 @@ describe('release Playwright container boundary', () => {
             expect(mounts).toContain(`${output}/playwright-artifacts:/work/playwright-artifacts`);
             expect(mounts).not.toContain(`${root}:/work`);
             expect(args).toContain(`PLAYWRIGHT_RELEASE_REF=${'a'.repeat(40)}`);
+            expect(args).toContain(
+                `PLAYWRIGHT_RELEASE_TEST_REF=${(mode === 'override' ? 'b' : 'a').repeat(40)}`,
+            );
         }
         expect(mounts.some((mount) => mount.includes('docker.sock'))).toBe(false);
         expect(args.some((arg) => arg.includes('must-not-enter-container'))).toBe(false);
@@ -78,15 +84,18 @@ describe('release Playwright container boundary', () => {
         }
     });
 
-    test('rejects an unpinned release ref before starting Docker', () => {
-        expect(() =>
-            execFileSync('bash', [runner], {
-                cwd: root,
-                env: {...env, PLAYWRIGHT_RELEASE_REF: 'main', PLAYWRIGHT_APP_BACKEND: ''},
-                stdio: 'pipe',
-            }),
-        ).toThrow('release mode requires a commit SHA');
-    });
+    test.each(['PLAYWRIGHT_RELEASE_REF', 'PLAYWRIGHT_RELEASE_TEST_REF'])(
+        'rejects an unpinned %s before starting Docker',
+        (variable) => {
+            expect(() =>
+                execFileSync('bash', [runner], {
+                    cwd: root,
+                    env: {...env, [variable]: 'main', PLAYWRIGHT_APP_BACKEND: ''},
+                    stdio: 'pipe',
+                }),
+            ).toThrow('release mode requires a commit SHA');
+        },
+    );
 
     test('rejects an external frontend before starting release Docker', () => {
         const result = spawnSync('bash', [runner], {
