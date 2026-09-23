@@ -88,9 +88,9 @@ grep '/input/resources' /tmp/readonly.log
         [report.stats.expected, report.stats.unexpected, report.stats.skipped, report.stats.flaky],
         [1, 1, 0, 1],
     );
-    const recovered = report.suites
-        .flatMap((suite) => suite.specs)
-        .find((spec) => spec.title === 'recovers on retry with attachment')?.tests[0];
+    const specs = report.suites.flatMap((suite) => suite.specs);
+    const recovered = specs.find((spec) => spec.title === 'recovers on retry with attachment')
+        ?.tests[0];
     assert.equal(recovered?.status, 'flaky');
     assert.deepEqual(
         recovered.results.map(({status, retry}) => ({status, retry})),
@@ -100,6 +100,12 @@ grep '/input/resources' /tmp/readonly.log
         ],
     );
     assert.ok(recovered.results[0].attachments.some(({name}) => name === 'retry-proof'));
+    const exhausted = specs.find((spec) => spec.title === 'fails with attachment')?.tests[0];
+    assert.equal(exhausted?.status, 'unexpected');
+    assert.deepEqual(
+        exhausted.results.map(({status, retry}) => ({status, retry})),
+        [0, 1, 2].map((retry) => ({status: 'failed', retry})),
+    );
     assert.ok(fs.statSync(path.join(artifacts, 'playwright-report/index.html')).size > 0);
     const data = path.join(artifacts, 'playwright-report/data');
     const attachments = fs
