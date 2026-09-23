@@ -1,6 +1,7 @@
 import {isNil} from 'lodash';
 
 import type {NodeMetadata} from '../../types/store/nodesList';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {getDiskLocationItems} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {isFullVDiskData} from '../../utils/disks/helpers';
@@ -48,51 +49,52 @@ export function getVDiskIdentityItems(data: PreparedVDisk = {}): DiskDetailItem[
 
 export function getVDiskCapacityItems(
     data: PreparedVDisk,
-    {useWhiteboardSize}: {useWhiteboardSize: boolean},
+    {capacityMetricsEnabled}: {capacityMetricsEnabled: boolean},
 ): DiskDetailItem[] {
-    const items: DiskDetailItem[] = [];
-    if (parseOptionalNonNegativeNumber(data.GroupSizeInUnits) !== undefined) {
-        items.push({
+    const size = capacityMetricsEnabled ? (data.WhiteboardSize ?? data) : data;
+    const items: DiskDetailItem[] = [
+        {
             id: 'group-size-in-units',
             name: i18n('field_group-size-in-units'),
             content: formatCapacityUnitCount(data.GroupSizeInUnits),
             note: CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits,
-        });
-    }
-    const size = useWhiteboardSize ? (data.WhiteboardSize ?? data) : data;
-    if (
-        parseOptionalNonNegativeNumber(size.AllocatedSize) !== undefined ||
-        parseOptionalNonNegativeNumber(size.SizeLimit) !== undefined
-    ) {
-        items.push({
+        },
+        {
             id: 'size',
             name: i18n('size'),
             content: formatStorageMetricPair(size.AllocatedSize, size.SizeLimit, 2),
+        },
+        {
+            id: 'capacity-alert',
+            name: i18n('field_capacity-alert'),
+            content: (
+                <DiskCapacityAlertLabel
+                    value={data.CapacityAlert}
+                    emptyText={EMPTY_DATA_PLACEHOLDER}
+                />
+            ),
+            note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+        },
+        {
+            id: 'vdisk-slot-usage',
+            name: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
+            content: formatMetricPercent(data.VDiskSlotUsage, 2),
+            note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
+        },
+    ];
+    if (parseOptionalNonNegativeNumber(data.VDiskRawUsage) !== undefined) {
+        items.push({
+            id: 'vdisk-raw-usage',
+            name: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage,
+            content: formatMetricPercent(data.VDiskRawUsage, 2),
+            note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
         });
     }
-    items.push({
-        id: 'capacity-alert',
-        name: i18n('field_capacity-alert'),
-        content: <DiskCapacityAlertLabel value={data.CapacityAlert} />,
-        note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
-    });
-    for (const [id, name, value, note] of [
-        [
-            'vdisk-slot-usage',
-            CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
-            data.VDiskSlotUsage,
-            CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
-        ],
-        [
-            'vdisk-raw-usage',
-            CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage,
-            data.VDiskRawUsage,
-            CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
-        ],
-    ] as const) {
-        if (parseOptionalNonNegativeNumber(value) !== undefined) {
-            items.push({id, name, content: formatMetricPercent(value, 2), note});
-        }
-    }
-    return items;
+    return items.filter(
+        ({id}) =>
+            capacityMetricsEnabled ||
+            (id === 'size' &&
+                (parseOptionalNonNegativeNumber(size.AllocatedSize) !== undefined ||
+                    parseOptionalNonNegativeNumber(size.SizeLimit) !== undefined)),
+    );
 }

@@ -10,7 +10,7 @@ import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabil
 import type {TVDiskID} from '../../types/api/vdisk';
 import type {NodeMetadata} from '../../types/store/nodesList';
 import {cn} from '../../utils/cn';
-import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {BRAND_BUTTON_CLASS} from '../../utils/constants';
 import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {isFullVDiskData} from '../../utils/disks/helpers';
@@ -26,7 +26,6 @@ import {
     DiskPopupPanel,
 } from '../DiskPopup/DiskPopup';
 import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/EvictVDiskButton';
-import {InternalLink} from '../InternalLink';
 import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {PDiskPopupContent} from '../PDiskPopup/PDiskPopup';
@@ -106,7 +105,7 @@ function getStorageItems(
             copyText: data.StoragePoolName,
         });
     }
-    return [...items, ...getVDiskCapacityItems(data, {useWhiteboardSize: capacityMetricsEnabled})];
+    return [...items, ...getVDiskCapacityItems(data, {capacityMetricsEnabled})];
 }
 
 function DiskHeader({data = {}}: {data?: PreparedVDisk}) {
@@ -201,39 +200,6 @@ function DiskFooter({
     );
 }
 
-function getRelationItems(data: PreparedVDisk, getVDiskLink: ReturnType<typeof useVDiskPagePath>) {
-    const relationItems: YDBDefinitionListItem[] = [];
-    const renderDiskLink = (disk: {NodeId?: number; StringifiedId?: string}) => {
-        const path = getVDiskLink({nodeId: disk.NodeId, vDiskId: disk.StringifiedId});
-        const title = `${i18n('label_vdisk')} ${disk.StringifiedId ?? EMPTY_DATA_PLACEHOLDER}`;
-        return path ? <InternalLink to={path}>{title}</InternalLink> : title;
-    };
-    if (data?.Donors?.length) {
-        relationItems.push({
-            name: i18n('label_donor'),
-            content: (
-                <Flex direction="column" gap={1}>
-                    {data.Donors.map((disk, index) => (
-                        <React.Fragment key={disk.StringifiedId ?? index}>
-                            {renderDiskLink(disk)}
-                        </React.Fragment>
-                    ))}
-                </Flex>
-            ),
-        });
-    }
-    if (data?.DonorMode && data.Recipient) {
-        relationItems.push({
-            name: i18n('label_recipient'),
-            content: renderDiskLink(data.Recipient),
-        });
-    }
-    if (parseOptionalNonNegativeNumber(data?.UnsyncedVDisks)) {
-        relationItems.push({name: i18n('label_unsync-vdisks'), content: data?.UnsyncedVDisks});
-    }
-    return relationItems;
-}
-
 interface VDiskPopupProps {
     data: PreparedVDisk | UnavailableDonor;
     nodeData?: NodeMetadata;
@@ -251,7 +217,6 @@ export function VDiskPopup({
     const nodeData = useNodeMetadata(data.NodeId, parentNodeData);
     const isViewerUser = useIsViewerUser();
     const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
-    const getVDiskLink = useVDiskPagePath();
     const fullData = isFullVDiskData(data) ? data : undefined;
     const vdiskId = fullData?.StringifiedId;
     const handleAfterEvictVDisk = () => {
@@ -276,7 +241,6 @@ export function VDiskPopup({
             copyText: data.StoragePoolName,
         });
     }
-    const relationItems = fullData ? getRelationItems(fullData, getVDiskLink) : [];
     const pdisk = !isSpaceDistribution && isViewerUser ? fullData?.PDisk : undefined;
     return (
         <DiskPopup combined={Boolean(pdisk)} className={b(null, 'vdisk-storage-popup')}>
@@ -301,9 +265,6 @@ export function VDiskPopup({
                 {runtimeItems.length > 0 && storageItems.length > 0 && <Divider />}
                 {storageItems.length > 0 && (
                     <YDBDefinitionList items={storageItems} nameMaxWidth={150} />
-                )}
-                {relationItems.length > 0 && (
-                    <YDBDefinitionList items={relationItems} nameMaxWidth={150} />
                 )}
                 {identityItems.length > 0 && (
                     <React.Fragment>

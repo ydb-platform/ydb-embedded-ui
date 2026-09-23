@@ -3,6 +3,7 @@ import {
     ArrowsRotateLeftSlash,
     Check,
     CirclePause,
+    CircleQuestion,
     CircleStop,
 } from '@gravity-ui/icons';
 
@@ -30,8 +31,9 @@ export function getVDiskStateLabel(data: PreparedVDisk): DiskStatusLabelData {
         severity === NOT_AVAILABLE_SEVERITY
     ) {
         return {
-            value: i18n('value_no-data'),
+            value: i18n('value_unknown'),
             theme: 'unknown',
+            icon: CircleQuestion,
             tooltip: i18n('context_state-no-data'),
         };
     }

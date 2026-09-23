@@ -22,12 +22,17 @@ export function VDiskFrontQueuesLabel({flag}: {flag?: EFlag}) {
         <DiskFlagLabel
             flag={flag}
             icon={calculateFrontQueuesIcon({FrontQueues: flag || EFlag.Grey})}
+            emptyText={i18n('value_no-data')}
         />
     );
 }
 
 export function VDiskCompactionRankLabel({flag, rank}: {flag?: EFlag; rank: 'fresh' | 'level'}) {
     return (
-        <DiskFlagLabel flag={flag} title={i18n(rank === 'fresh' ? 'label_fresh' : 'label_level')} />
+        <DiskFlagLabel
+            flag={flag}
+            title={i18n(rank === 'fresh' ? 'label_fresh' : 'label_level')}
+            emptyText={i18n('value_no-data')}
+        />
     );
 }

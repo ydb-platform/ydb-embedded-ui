@@ -96,19 +96,17 @@ export function DiskFlagLabel({
     flag,
     title,
     icon,
+    emptyText = i18n('value_no-data'),
 }: {
     flag?: EFlag;
     title?: string;
     icon?: IconData;
+    emptyText?: string;
 }) {
     const resolvedFlag = flag || EFlag.Grey;
     return (
         <DiskStatusLabel
-            value={
-                resolvedFlag === EFlag.Grey
-                    ? i18n('value_no-data')
-                    : getFlagStatusText(resolvedFlag)
-            }
+            value={resolvedFlag === EFlag.Grey ? emptyText : getFlagStatusText(resolvedFlag)}
             title={title}
             theme={EFlagToLabelTheme[resolvedFlag] ?? 'normal'}
             icon={icon ?? getFlagIconWithColor(resolvedFlag)?.icon}
