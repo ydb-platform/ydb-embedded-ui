@@ -6,6 +6,7 @@ import {EFlag, isCapacityAlert} from '../../types/api/enums';
 import {getCapacityAlertTheme, normalizeCapacityAlert} from '../../utils/capacityAlerts';
 import {cn} from '../../utils/cn';
 import {getFlagIconWithColor} from '../../utils/disks/iconCalculators';
+import {normalizeMediaType} from '../../utils/disks/normalizeMediaType';
 import {EFlagToLabelTheme} from '../EntityStatus/utils';
 import {getFlagStatusText} from '../VDisk/getFlagStatusText';
 
@@ -56,9 +57,13 @@ export function DiskStatusLabel({
 }
 
 export function DiskTypeLabel({type}: {type?: string}) {
-    const value = type?.toUpperCase() === 'NVME' ? 'NVMe' : type;
+    if (!type?.trim()) {
+        return null;
+    }
+    const mediaType = normalizeMediaType(type);
+    const value = mediaType === 'NVME' ? 'NVMe' : mediaType;
     let tooltip: string | undefined;
-    switch (type?.toUpperCase()) {
+    switch (mediaType) {
         case 'HDD':
             tooltip = i18n('context_hdd');
             break;
@@ -69,7 +74,7 @@ export function DiskTypeLabel({type}: {type?: string}) {
             tooltip = i18n('context_nvme');
             break;
     }
-    return value ? <DiskStatusLabel value={value} tooltip={tooltip} /> : null;
+    return <DiskStatusLabel value={value} tooltip={tooltip} />;
 }
 
 export function DiskCapacityAlertLabel({
