@@ -33,12 +33,13 @@ export function DiskStatusLabel({
     tooltip,
     dangerHeavy,
     size = 's',
-}: DiskStatusLabelData & Pick<LabelProps, 'size'>) {
+    className,
+}: DiskStatusLabelData & Pick<LabelProps, 'size' | 'className'>) {
     const label = (
         <Label
             size={size}
             theme={theme}
-            className={b('label', {'danger-heavy': dangerHeavy})}
+            className={b('label', {'danger-heavy': dangerHeavy}, className)}
             icon={icon ? <Icon data={icon} size={12} /> : undefined}
             value={title ? value : undefined}
         >
@@ -56,7 +57,7 @@ export function DiskStatusLabel({
     );
 }
 
-export function DiskTypeLabel({type}: {type?: string}) {
+export function DiskTypeLabel({type, size}: {type?: string} & Pick<LabelProps, 'size'>) {
     if (!type?.trim()) {
         return null;
     }
@@ -74,7 +75,18 @@ export function DiskTypeLabel({type}: {type?: string}) {
             tooltip = i18n('context_nvme');
             break;
     }
-    return <DiskStatusLabel value={value} tooltip={tooltip} />;
+    return (
+        <DiskStatusLabel
+            value={value}
+            tooltip={tooltip}
+            size={size}
+            className={b('type', {
+                hdd: mediaType === 'HDD',
+                ssd: mediaType === 'SSD',
+                nvme: mediaType === 'NVME',
+            })}
+        />
+    );
 }
 
 export function DiskCapacityAlertLabel({

@@ -120,7 +120,7 @@ export function PDiskPopupContent({
                 id={data.StringifiedId}
                 type={data.Type}
                 statuses={statusLabels.map(({id, label}) =>
-                    label ? <DiskStatusLabel key={id} {...label} /> : null,
+                    label ? <DiskStatusLabel key={id} {...label} size="xs" /> : null,
                 )}
             />
             <DiskPopupLocation items={locationItems} title={pDiskPopupKeyset('label_pdisk')} />

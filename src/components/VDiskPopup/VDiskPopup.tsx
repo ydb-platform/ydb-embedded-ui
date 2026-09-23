@@ -116,9 +116,9 @@ function DiskHeader({data = {}}: {data?: PreparedVDisk}) {
             type={data.PDiskType ?? data.PDisk?.Type}
             statuses={
                 <React.Fragment>
-                    <VDiskStateLabel state={data.VDiskState} />
-                    <VDiskReplicationStatus data={data} />
-                    <VDiskDonorLabel donorMode={data.DonorMode} />
+                    <VDiskStateLabel state={data.VDiskState} size="xs" />
+                    <VDiskReplicationStatus data={data} size="xs" />
+                    <VDiskDonorLabel donorMode={data.DonorMode} size="xs" />
                 </React.Fragment>
             }
         />

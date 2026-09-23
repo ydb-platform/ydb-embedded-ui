@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {LabelProps} from '@gravity-ui/uikit';
 import {Flex, Progress} from '@gravity-ui/uikit';
 
 import {EVDiskDetailedReplicationStatus} from '../../types/api/vdisk';
@@ -17,7 +18,7 @@ import './VDiskStatus.scss';
 
 const b = cn('ydb-vdisk-status');
 
-interface VDiskReplicationStatusProps {
+interface VDiskReplicationStatusProps extends Pick<LabelProps, 'size'> {
     data: Pick<
         PreparedVDisk,
         | 'DetailedReplicationStatus'
@@ -27,20 +28,20 @@ interface VDiskReplicationStatusProps {
     >;
 }
 
-export function VDiskReplicationStatus({data}: VDiskReplicationStatusProps) {
+export function VDiskReplicationStatus({data, size}: VDiskReplicationStatusProps) {
     const label = getVDiskReplicationLabel(data);
     const showProgress =
         data.DetailedReplicationStatus === EVDiskDetailedReplicationStatus.InProgress;
 
     return (
         <React.Fragment>
-            {label && <DiskStatusLabel {...label} />}
-            {showProgress && <ReplicationProgress data={data} />}
+            {label && <DiskStatusLabel {...label} size={size} />}
+            {showProgress && <ReplicationProgress data={data} size={size} />}
         </React.Fragment>
     );
 }
 
-function ReplicationProgress({data}: VDiskReplicationStatusProps) {
+function ReplicationProgress({data, size}: VDiskReplicationStatusProps) {
     const progress = parseOptionalNonNegativeNumber(data.ReplicationProgress);
     const percentage =
         progress !== undefined && progress <= 1 ? Math.round(progress * 100) : undefined;
@@ -53,7 +54,7 @@ function ReplicationProgress({data}: VDiskReplicationStatusProps) {
         return null;
     }
     return (
-        <Flex alignItems="center" gap={2} className={b('replication-progress')}>
+        <Flex alignItems="center" gap={2} className={b('replication-progress', {size})}>
             {percentage !== undefined && (
                 <React.Fragment>
                     <span>{formatPercent(percentage / 100, 0)}</span>

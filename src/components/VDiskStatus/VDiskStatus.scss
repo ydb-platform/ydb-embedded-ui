@@ -6,6 +6,11 @@
         color: var(--g-color-text-info);
         border-radius: var(--g-border-radius-s);
         background-color: var(--g-color-base-selection);
+
+        &_size_xs {
+            min-height: 18px;
+            padding: 0 var(--g-spacing-1);
+        }
     }
 
     &__progress-bar {

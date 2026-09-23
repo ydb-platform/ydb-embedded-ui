@@ -69,7 +69,7 @@ export function DiskPopupHeader({
                         aria-label={i18n('action_copy-field', {field: title})}
                     />
                 )}
-                <DiskTypeLabel type={type} />
+                <DiskTypeLabel type={type} size="xs" />
             </Flex>
             <Flex gap={1} wrap="wrap" alignItems="center">
                 {statuses}
