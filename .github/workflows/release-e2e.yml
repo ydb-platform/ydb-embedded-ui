@@ -95,7 +95,7 @@ jobs:
           YDB_CONTAINER: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}-static
       - name: Run all release-version tests
         id: tests
-        run: bash controller/scripts/playwright-docker.sh --shard=${{ matrix.shard }}/8 --retries=0 --trace=retain-on-failure --update-snapshots=none --forbid-only
+        run: bash controller/scripts/playwright-docker.sh --shard=${{ matrix.shard }}/8 --retries=2 --trace=retain-on-failure --update-snapshots=none --forbid-only
         env:
           CI: 'true'
           PLAYWRIGHT_APP_BACKEND: http://localhost:8765

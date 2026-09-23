@@ -35,6 +35,12 @@ cat > fixture.spec.js <<'TEST'
 const {test, expect} = require('@playwright/test');
 const fs = require('node:fs');
 test('passes', () => expect(1).toBe(1));
+test('recovers on retry with attachment', async ({}, info) => {
+    const file = info.outputPath('retry-proof.txt');
+    fs.writeFileSync(file, 'release retry attachment');
+    await info.attach('retry-proof', {path: file, contentType: 'text/plain'});
+    expect(info.retry).toBe(1);
+});
 test('fails with attachment', async ({}, info) => {
     const file = info.outputPath('proof.txt');
     fs.writeFileSync(file, 'release report attachment');
@@ -42,7 +48,8 @@ test('fails with attachment', async ({}, info) => {
     expect(1).toBe(2);
 });
 TEST
-if npx --no playwright test; then
+npx --no playwright test --retries=2 --grep 'recovers on retry'
+if npx --no playwright test --retries=2; then
     echo 'Fixture should contain a failed test' >&2
     exit 1
 fi
@@ -79,22 +86,31 @@ grep '/input/resources' /tmp/readonly.log
     const report = JSON.parse(fs.readFileSync(path.join(artifacts, 'test-results.json'), 'utf8'));
     assert.deepEqual(
         [report.stats.expected, report.stats.unexpected, report.stats.skipped, report.stats.flaky],
-        [1, 1, 0, 0],
+        [1, 1, 0, 1],
     );
+    const recovered = report.suites
+        .flatMap((suite) => suite.specs)
+        .find((spec) => spec.title === 'recovers on retry with attachment')?.tests[0];
+    assert.equal(recovered?.status, 'flaky');
+    assert.deepEqual(
+        recovered.results.map(({status, retry}) => ({status, retry})),
+        [
+            {status: 'failed', retry: 0},
+            {status: 'passed', retry: 1},
+        ],
+    );
+    assert.ok(recovered.results[0].attachments.some(({name}) => name === 'retry-proof'));
     assert.ok(fs.statSync(path.join(artifacts, 'playwright-report/index.html')).size > 0);
     const data = path.join(artifacts, 'playwright-report/data');
-    assert.ok(
-        fs
-            .readdirSync(data)
-            .some(
-                (file) =>
-                    fs.readFileSync(path.join(data, file), 'utf8') === 'release report attachment',
-            ),
-    );
+    const attachments = fs
+        .readdirSync(data)
+        .map((file) => fs.readFileSync(path.join(data, file), 'utf8'));
+    assert.ok(attachments.includes('release report attachment'));
+    assert.ok(attachments.includes('release retry attachment'));
     assert.equal(digest(), before);
     assert.deepEqual(fs.readdirSync(blobs), inputs);
     console.info(
-        'Report smoke passed: HTML, JSON and attachment retained; 1 passed, 1 failed; input ZIP unchanged.',
+        'Report smoke passed: retry recovery and failure attachments retained; 1 passed, 1 failed, 1 flaky; input ZIP unchanged.',
     );
 } finally {
     // The runner writes files as root; remove only this smoke's temporary output.
