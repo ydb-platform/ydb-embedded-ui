@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {useThemeValue} from '@gravity-ui/uikit';
+import {Text, useThemeValue} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
@@ -22,7 +22,15 @@ interface StreamingQueryGraphProps {
     path: string;
 }
 
+const RUNNING_STATUS = 'RUNNING';
+
 const b = cn('ydb-streaming-query-graph');
+
+const PLAN_STATE_MESSAGES = {
+    empty: 'description_no-plan',
+    unparsed: 'description_unparsed-plan',
+    unsupported: 'description_unsupported-plan',
+} as const;
 
 export function StreamingQueryGraph({database, path}: StreamingQueryGraphProps) {
     const theme = useThemeValue();
@@ -39,47 +47,33 @@ export function StreamingQueryGraph({database, path}: StreamingQueryGraphProps) 
 
     const row = planData?.resultSets?.[0]?.result?.[0];
 
-    const {hasPlan, prepared} = React.useMemo(
+    const {state, prepared} = React.useMemo(
         () => prepareStreamingQueryPlan(getStringifiedData(row?.Plan)),
         [row?.Plan],
     );
 
-    const loading = isFetching && planData === undefined;
-
-    if (loading) {
+    if (isFetching && planData === undefined) {
         return <Loader size="s" className={b('loader')} />;
     }
 
-    if (error && !planData) {
-        return (
-            <div className={b()}>
-                <ResponseError error={error} />
-            </div>
-        );
-    }
-
-    const hasNodes = Boolean(prepared?.nodes?.length);
+    const status = getStringifiedData(row?.Status);
     const issues = parseIssuesData(row?.Issues);
-
-    if (!hasNodes && issues) {
-        return (
-            <div className={b()}>
-                <ResultIssues data={issues} />
-            </div>
-        );
-    }
-
-    if (!hasNodes) {
-        return (
-            <div className={b()}>
-                {hasPlan ? i18n('description_unsupported-plan') : i18n('description_no-plan')}
-            </div>
-        );
-    }
+    const showStatus = Boolean(issues) || Boolean(status && status !== RUNNING_STATUS);
 
     return (
         <div className={b()}>
-            <Graph explain={prepared} theme={theme} />
+            {error ? <ResponseError error={error} /> : null}
+            {showStatus ? (
+                <div className={b('status')}>
+                    {status ? <Text variant="subheader-2">{status}</Text> : null}
+                    {issues ? <ResultIssues data={issues} /> : null}
+                </div>
+            ) : null}
+            {state === 'ready' ? (
+                <Graph explain={prepared} theme={theme} />
+            ) : (
+                <div>{i18n(PLAN_STATE_MESSAGES[state])}</div>
+            )}
         </div>
     );
 }

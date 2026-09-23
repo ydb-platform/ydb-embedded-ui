@@ -1,4 +1,5 @@
 {
   "description_no-plan": "The query has not reported its plan yet.",
+  "description_unparsed-plan": "The plan cannot be displayed.",
   "description_unsupported-plan": "The plan version is not supported and cannot be rendered."
 }

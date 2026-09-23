@@ -3,16 +3,46 @@ import {prepareStreamingQueryPlan} from '../prepareStreamingQueryPlan';
 const plan = (body: string) => `{"meta": {"version": "0.2", "type": "query"}, ${body}}`;
 
 describe('prepareStreamingQueryPlan', () => {
-    test('reports no plan for missing, empty and malformed text', () => {
-        expect(prepareStreamingQueryPlan(undefined).hasPlan).toBe(false);
-        expect(prepareStreamingQueryPlan('').hasPlan).toBe(false);
-        expect(prepareStreamingQueryPlan('{}').hasPlan).toBe(false);
-        expect(prepareStreamingQueryPlan('{not json').hasPlan).toBe(false);
+    test('reports an empty plan for missing, empty and metadata-only text', () => {
+        expect(prepareStreamingQueryPlan(undefined).state).toBe('empty');
+        expect(prepareStreamingQueryPlan('').state).toBe('empty');
+        expect(prepareStreamingQueryPlan('{}').state).toBe('empty');
+        expect(prepareStreamingQueryPlan('{"meta": {"version": "0.2"}}').state).toBe('empty');
     });
 
-    test('reports no plan for a metadata-only document', () => {
-        const result = prepareStreamingQueryPlan('{"meta": {"version": "0.2", "type": "query"}}');
-        expect(result.hasPlan).toBe(false);
+    test('reports an unparsed plan for text that is not readable', () => {
+        // The backend truncates an oversized plan, which leaves invalid JSON behind.
+        expect(prepareStreamingQueryPlan(`${plan('"Plan": {"Node')}...\n(TRUNCATED)`).state).toBe(
+            'unparsed',
+        );
+        expect(prepareStreamingQueryPlan('{not json').state).toBe('unparsed');
+    });
+
+    test('reports an unparsed plan for a root that is not a plan node', () => {
+        expect(prepareStreamingQueryPlan(plan('"Plan": {}')).state).toBe('unparsed');
+        expect(prepareStreamingQueryPlan(plan('"Plan": {"Node Type": {}}')).state).toBe('unparsed');
+        expect(prepareStreamingQueryPlan(plan('"Plan": {"Plans": {}}')).state).toBe('unparsed');
+    });
+
+    test('reports an unparsed plan when a node cannot be rendered', () => {
+        expect(
+            prepareStreamingQueryPlan(plan('"Plan": {"Node Type": "Stage", "PlanNodeId": {}}'))
+                .state,
+        ).toBe('unparsed');
+        expect(
+            prepareStreamingQueryPlan(
+                plan(
+                    '"Plan": {"Node Type": "Query", "Plans": [{"Node Type": "Stage", "Operators": [{"Name": {}}]}]}',
+                ),
+            ).state,
+        ).toBe('unparsed');
+    });
+
+    test('reports an unsupported version separately from a missing plan', () => {
+        const result = prepareStreamingQueryPlan(
+            '{"meta": {"version": "0.1", "type": "query"}, "Plan": {"Node Type": "Stage"}}',
+        );
+        expect(result.state).toBe('unsupported');
         expect(result.prepared).toBeUndefined();
     });
 
@@ -20,51 +50,7 @@ describe('prepareStreamingQueryPlan', () => {
         const result = prepareStreamingQueryPlan(
             plan('"Plan": {"PlanNodeId": 1, "Node Type": "Stage", "Plans": []}'),
         );
-        expect(result.hasPlan).toBe(true);
+        expect(result.state).toBe('ready');
         expect(result.prepared?.nodes?.length).toBeGreaterThan(0);
-    });
-
-    test('keeps a structurally invalid plan from throwing', () => {
-        const result = prepareStreamingQueryPlan(plan('"Plan": {"Plans": {}}'));
-        expect(result.hasPlan).toBe(true);
-        expect(result.prepared).toBeUndefined();
-    });
-
-    test('rejects a root plan node that is not a node', () => {
-        const result = prepareStreamingQueryPlan(plan('"Plan": {}'));
-        expect(result.hasPlan).toBe(true);
-        expect(result.prepared).toBeUndefined();
-    });
-
-    test('rejects a node type that is not a string', () => {
-        const result = prepareStreamingQueryPlan(plan('"Plan": {"Node Type": {}, "Plans": []}'));
-        expect(result.hasPlan).toBe(true);
-        expect(result.prepared).toBeUndefined();
-    });
-
-    test('rejects a nested node whose fields are not renderable', () => {
-        const result = prepareStreamingQueryPlan(
-            plan(
-                '"Plan": {"Node Type": "Query", "Plans": [{"Node Type": "Stage", "Operators": [{"Name": {}}]}]}',
-            ),
-        );
-        expect(result.hasPlan).toBe(true);
-        expect(result.prepared).toBeUndefined();
-    });
-
-    test('rejects a plan node id that is not a number', () => {
-        const result = prepareStreamingQueryPlan(
-            plan('"Plan": {"Node Type": "Stage", "PlanNodeId": {}}'),
-        );
-        expect(result.hasPlan).toBe(true);
-        expect(result.prepared).toBeUndefined();
-    });
-
-    test('reports an unsupported version without nodes', () => {
-        const result = prepareStreamingQueryPlan(
-            '{"meta": {"version": "0.1", "type": "query"}, "Plan": {"Node Type": "Stage"}}',
-        );
-        expect(result.hasPlan).toBe(true);
-        expect(result.prepared?.nodes).toBeUndefined();
     });
 });

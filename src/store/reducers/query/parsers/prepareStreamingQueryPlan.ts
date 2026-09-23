@@ -1,20 +1,23 @@
+import type {QueryPlan} from '../../../../types/api/query';
 import type {PreparedQueryData} from '../types';
 
-import {parseStreamingQueryPlan} from './parseStreamingQueryPlan';
 import {preparePlanData} from './preparePlanData';
 
+// empty: nothing has been published yet; unparsed: a plan arrived but cannot be read,
+// for instance truncated by the backend; unsupported: a readable plan of an unknown version.
+export type StreamingQueryPlanState = 'empty' | 'unparsed' | 'unsupported' | 'ready';
+
 interface StreamingQueryPlan {
-    hasPlan: boolean;
+    state: StreamingQueryPlanState;
     prepared?: PreparedQueryData['preparedPlan'];
 }
 
+function isObject(value: unknown): value is Record<string, unknown> {
+    return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
 function isPlanNode(value: unknown) {
-    return Boolean(
-        value &&
-            typeof value === 'object' &&
-            'Node Type' in value &&
-            typeof (value as {'Node Type': unknown})['Node Type'] === 'string',
-    );
+    return isObject(value) && typeof value['Node Type'] === 'string';
 }
 
 function isStringList(value: unknown) {
@@ -36,17 +39,36 @@ function isRenderable(prepared: PreparedQueryData['preparedPlan']) {
 }
 
 export function prepareStreamingQueryPlan(planText?: string): StreamingQueryPlan {
-    const plan = parseStreamingQueryPlan(planText);
-    if (!plan?.Plan) {
-        return {hasPlan: false};
+    if (!planText) {
+        return {state: 'empty'};
     }
-    if (!isPlanNode(plan.Plan)) {
-        return {hasPlan: true};
-    }
+
+    let parsed: unknown;
     try {
-        const {simplifiedPlan: _simplifiedPlan, ...prepared} = preparePlanData(plan);
-        return isRenderable(prepared) ? {hasPlan: true, prepared} : {hasPlan: true};
+        parsed = JSON.parse(planText);
     } catch {
-        return {hasPlan: true};
+        return {state: 'unparsed'};
+    }
+
+    if (!isObject(parsed) || !isObject(parsed.meta)) {
+        return {state: 'empty'};
+    }
+    if (!parsed.Plan) {
+        return {state: 'empty'};
+    }
+    if (!isPlanNode(parsed.Plan)) {
+        return {state: 'unparsed'};
+    }
+
+    try {
+        const {simplifiedPlan: _simplifiedPlan, ...prepared} = preparePlanData(
+            parsed as unknown as QueryPlan,
+        );
+        if (!isRenderable(prepared)) {
+            return {state: 'unparsed'};
+        }
+        return prepared.nodes?.length ? {state: 'ready', prepared} : {state: 'unsupported'};
+    } catch {
+        return {state: 'unparsed'};
     }
 }
