@@ -9,6 +9,7 @@ import {api} from '../../store/reducers/api';
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import type {TVDiskID} from '../../types/api/vdisk';
 import type {NodeMetadata} from '../../types/store/nodesList';
+import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../utils/constants';
 import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
@@ -18,7 +19,7 @@ import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedDispatch} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useNodeMetadata} from '../../utils/hooks/useNodeMetadata';
-import {bytesToSpeed, parseOptionalNonNegativeNumber} from '../../utils/utils';
+import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 import {
     DiskPopup,
     DiskPopupHeader,
@@ -81,7 +82,15 @@ function getRuntimeItems(
         [i18n('label_write'), data.WriteThroughput],
     ] as const) {
         if (parseOptionalNonNegativeNumber(value) !== undefined) {
-            items.push({name, content: bytesToSpeed(value)});
+            items.push({
+                name,
+                content: formatBytes({
+                    value,
+                    size: 'mb',
+                    fixedDecimalPlaces: 2,
+                    withSpeedLabel: true,
+                }),
+            });
         }
     }
     if (withUnreadableBlobs && !isNil(data.HasUnreadableBlobs)) {
