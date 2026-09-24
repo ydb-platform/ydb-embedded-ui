@@ -777,7 +777,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             },
             {
                 mode: 'Compaction',
-                status: 'Fresh compaction: OK. Level compaction: Impaired.',
+                status: 'Fresh compaction: Ok. Level compaction: Impaired.',
                 missingStatus: 'Fresh compaction: N/D. Level compaction: N/D.',
             },
         ]) {
