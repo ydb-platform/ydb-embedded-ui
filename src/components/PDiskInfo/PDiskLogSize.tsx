@@ -1,6 +1,7 @@
 import {Flex, Progress} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatStorageMetricPair} from '../../utils/storageMetrics';
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 
@@ -18,17 +19,19 @@ export function PDiskLogSize({used, total}: {used?: string; total?: string}) {
             ? Math.min(100, (usedSize / totalSize) * 100)
             : undefined;
 
+    if (percentage === undefined) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+
     return (
         <Flex gap={1} alignItems="center" className={b()}>
-            {percentage !== undefined && (
-                <Progress
-                    className={b('progress')}
-                    value={percentage}
-                    theme="success"
-                    size="s"
-                    aria-label={i18n('log-size')}
-                />
-            )}
+            <Progress
+                className={b('progress')}
+                value={percentage}
+                theme="success"
+                size="s"
+                aria-label={i18n('log-size')}
+            />
             <span>{formatStorageMetricPair(usedSize, totalSize, 2)}</span>
         </Flex>
     );
