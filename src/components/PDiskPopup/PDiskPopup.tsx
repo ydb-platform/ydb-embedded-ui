@@ -39,7 +39,7 @@ import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 import {pDiskPopupKeyset} from './i18n';
 
 function getStorageItems(data: PreparedPDisk, capacityMetricsEnabled: boolean): DiskDetailItem[] {
-    const items = getPDiskCapacityItems(data).filter(
+    const items = getPDiskCapacityItems(data, {useWhiteboardSize: capacityMetricsEnabled}).filter(
         ({id}) =>
             capacityMetricsEnabled ||
             (id === 'space' && isNumeric(data.TotalSize) && isNumeric(data.AvailableSize)),

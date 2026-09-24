@@ -15,12 +15,16 @@ export function getPDiskRuntimeItems(data: PreparedPDisk): DiskDetailItem[] {
     ];
 }
 
-export function getPDiskCapacityItems(data: PreparedPDisk): DiskDetailItem[] {
+export function getPDiskCapacityItems(
+    data: PreparedPDisk,
+    {useWhiteboardSize = true}: {useWhiteboardSize?: boolean} = {},
+): DiskDetailItem[] {
     const fieldOrder = ['slot-size-in-units', 'space', 'capacity-alert', 'pdisk-usage', 'slots'];
     const capacityItems = getPDiskCapacityInfoItems(data, {
         withUsage: true,
         withCapacityAlert: true,
         fixedDecimalPlaces: 2,
+        useWhiteboardSize,
     });
     const items: DiskDetailItem[] = [];
     for (const id of fieldOrder) {

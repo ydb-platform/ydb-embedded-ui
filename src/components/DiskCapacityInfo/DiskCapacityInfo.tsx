@@ -102,13 +102,15 @@ export function getPDiskCapacityInfoItems(
         withUsage,
         withCapacityAlert,
         fixedDecimalPlaces,
+        useWhiteboardSize = true,
     }: {
         withUsage: boolean;
         withCapacityAlert: boolean;
         fixedDecimalPlaces?: number;
+        useWhiteboardSize?: boolean;
     },
 ): DiskCapacityInfoItem[] {
-    const sizeData = data?.WhiteboardSize ?? data;
+    const sizeData = useWhiteboardSize ? (data?.WhiteboardSize ?? data) : data;
     const items: DiskCapacityInfoItem[] = [
         {
             id: 'space',

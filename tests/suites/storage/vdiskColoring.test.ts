@@ -1568,6 +1568,46 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
 test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 300_000});
 
+    for (const capacityMetricsEnabled of [false, true]) {
+        test(`selects PDisk Space source with capacity metrics ${capacityMetricsEnabled ? 'enabled' : 'disabled'}`, async ({
+            page,
+        }) => {
+            const response = createMockStorageGroupsResponse();
+            const pDisk = response.StorageGroups?.[0]?.VDisks?.[0]?.PDisk;
+            if (!pDisk?.Whiteboard || !pDisk.PDiskId) {
+                throw new Error('Cannot prepare PDisk with partial Whiteboard size');
+            }
+            pDisk.TotalSize = '100000000000';
+            pDisk.AvailableSize = '60000000000';
+            delete pDisk.Whiteboard.AvailableSize;
+            delete pDisk.Whiteboard.TotalSize;
+
+            await page.addInitScript((enabled) => {
+                localStorage.setItem('blobStorageCapacityMetrics', JSON.stringify(enabled));
+            }, capacityMetricsEnabled);
+            await page.setViewportSize({width: 1500, height: 1000});
+            await enableExpertMode(page, VDisksGroupBy.State);
+            await setupVDiskColoringMocks(page, response);
+            await gotoStoragePage(page, VDisksGroupBy.State);
+            await expectStorageGroupRowsReady(page);
+
+            const pDiskItem = getPDiskItems(getStorageGroupRow(page, 0)).first();
+            await getPDiskProgressBar(pDiskItem).hover();
+            const popup = page.locator('.ydb-popover').filter({
+                has: page.getByText(pDisk.PDiskId, {exact: true}),
+            });
+            await expect(popup).toBeVisible();
+            const space = popup
+                .locator('.g-definition-list__item')
+                .filter({has: page.getByText('Space', {exact: true})})
+                .locator('.g-definition-list__definition');
+            await expect(space).toHaveText(capacityMetricsEnabled ? '—' : /40\.00 \/ 100\.00\s*GB/);
+            await expect(popup.getByText('PDisk Usage', {exact: true})).toHaveCount(
+                capacityMetricsEnabled ? 1 : 0,
+            );
+        });
+    }
+
     test('labels node PDisk links in every Expert mode', async ({page}) => {
         const response = createMockStorageNodesResponse();
         const [missing, bscOnly, withWhiteboard, partial] = response.Nodes?.[0]?.PDisks ?? [];
