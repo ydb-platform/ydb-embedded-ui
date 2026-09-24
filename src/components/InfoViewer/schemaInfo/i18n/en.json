@@ -34,6 +34,7 @@
   "field_filter_length_min": "Filter Length Min",
   "field_filter_length_max": "Filter Length Max",
   "field_use_filter_snowball": "Filter Snowball",
+  "field_use_filter_superlemmer": "Filter Superlemmer",
   "filter_enabled": "Enabled",
   "filter_disabled": "Disabled",
 

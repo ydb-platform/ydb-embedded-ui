@@ -47,7 +47,7 @@ export const InfoViewer = ({
             {info && info.length > 0 ? (
                 <div className={b('items')}>
                     {info.map((data, infoIndex) => (
-                        <div className={b('row')} key={infoIndex}>
+                        <div className={b('row')} key={infoIndex} data-qa="info-viewer-row">
                             <div className={b('label')}>
                                 <div className={b('label-text', {multiline: multilineLabels})}>
                                     {data.label}
@@ -55,7 +55,9 @@ export const InfoViewer = ({
                                 {dots && <div className={b('dots')} />}
                             </div>
 
-                            <div className={b('value')}>{data.value}</div>
+                            <div className={b('value')} data-qa="info-viewer-value">
+                                {data.value}
+                            </div>
                         </div>
                     ))}
                 </div>

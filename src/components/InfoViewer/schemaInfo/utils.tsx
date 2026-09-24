@@ -184,6 +184,8 @@ export function buildFulltextIndexSettingsInfo(
             filter_length_max: (v) => (typeof v === 'number' ? formatNumber(v) : v),
             use_filter_snowball: (v) =>
                 v === true ? i18n('filter_enabled') : i18n('filter_disabled'),
+            use_filter_superlemmer: (v) =>
+                v === true ? i18n('filter_enabled') : i18n('filter_disabled'),
         },
         labels: {
             tokenizer: i18n('field_tokenizer'),
@@ -198,6 +200,7 @@ export function buildFulltextIndexSettingsInfo(
             filter_length_min: i18n('field_filter_length_min'),
             filter_length_max: i18n('field_filter_length_max'),
             use_filter_snowball: i18n('field_use_filter_snowball'),
+            use_filter_superlemmer: i18n('field_use_filter_superlemmer'),
         },
     });
 
@@ -216,6 +219,7 @@ export function buildFulltextIndexSettingsInfo(
         filter_length_min,
         filter_length_max,
         use_filter_snowball,
+        use_filter_superlemmer,
     } = analyzers ?? {};
     if (tokenizer !== undefined) {
         info.push(fulltextIndexAnalyzersFormatter('tokenizer', tokenizer));
@@ -256,6 +260,11 @@ export function buildFulltextIndexSettingsInfo(
     }
     if (use_filter_snowball !== undefined) {
         info.push(fulltextIndexAnalyzersFormatter('use_filter_snowball', use_filter_snowball));
+    }
+    if (use_filter_superlemmer !== undefined) {
+        info.push(
+            fulltextIndexAnalyzersFormatter('use_filter_superlemmer', use_filter_superlemmer),
+        );
     }
 
     return info;
