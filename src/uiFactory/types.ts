@@ -216,6 +216,12 @@ export type RenderHealthcheckAssistantAction = (
 ) => React.ReactNode;
 
 export interface UiMetricaGoals {
+    /** Creation attempt after form validation. Params: objectType (row_table, column_table, topic). */
+    createObject?: string;
+    /** Successful creation response. Params: objectType. */
+    createObjectSuccess?: string;
+    /** Failed creation. Params: objectType, errorType (ydb, http, network, timeout, cancelled, unknown), httpStatus (HTTP errors only). */
+    createObjectError?: string;
     runQuery?: string;
     explainAnalyzeQuery?: string;
     stopQuery?: string;
