@@ -1,5 +1,13 @@
 # Changelog
 
+## [22.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.1.0...v22.2.0) (2026-09-24)
+
+
+### Features
+
+* **storage:** add drive type to groups expert mode ([#4385](https://github.com/ydb-platform/ydb-embedded-ui/issues/4385)) ([62338cf](https://github.com/ydb-platform/ydb-embedded-ui/commit/62338cfb0e86a83b3311b1bb68431718d852ba1a))
+* track table and topic creation metrics ([#4409](https://github.com/ydb-platform/ydb-embedded-ui/issues/4409)) ([fd217f5](https://github.com/ydb-platform/ydb-embedded-ui/commit/fd217f5657e3da5d23420d5cde8992b20845e25b))
+
 ## [22.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.0.0...v22.1.0) (2026-09-24)
 
 
