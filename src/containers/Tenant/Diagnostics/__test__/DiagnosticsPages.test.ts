@@ -128,4 +128,15 @@ describe('DiagnosticsPages', () => {
 
         expect(pages.map((page) => page.id)).toContain(TENANT_DIAGNOSTICS_TABS_IDS.backups);
     });
+
+    test('streaming query pages include computationGraph in order', () => {
+        const pages = getPagesByType(EPathType.EPathTypeStreamingQuery, undefined, BASE_OPTIONS);
+
+        expect(pages.map((page) => page.id)).toEqual([
+            TENANT_DIAGNOSTICS_TABS_IDS.overview,
+            TENANT_DIAGNOSTICS_TABS_IDS.computationGraph,
+            TENANT_DIAGNOSTICS_TABS_IDS.describe,
+            TENANT_DIAGNOSTICS_TABS_IDS.access,
+        ]);
+    });
 });

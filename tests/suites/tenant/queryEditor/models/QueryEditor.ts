@@ -277,6 +277,11 @@ export class QueryEditor {
     }
 
     async focusEditor() {
+        await this.waitForEditorReady();
+        // The textarea exists before monaco attaches to it, and keystrokes sent in between are lost.
+        await this.page.waitForFunction(() => Boolean(window.ydbEditor), null, {
+            timeout: VISIBILITY_TIMEOUT,
+        });
         await this.editorTextArea.focus();
     }
 
