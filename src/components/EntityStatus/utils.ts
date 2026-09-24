@@ -1,17 +1,6 @@
-import type {LabelProps} from '@gravity-ui/uikit';
-
 import {EFlag} from '../../types/api/enums';
 
 import i18n from './i18n';
-
-export const EFlagToLabelTheme: Record<EFlag, LabelProps['theme']> = {
-    [EFlag.Red]: 'danger',
-    [EFlag.Blue]: 'success',
-    [EFlag.Green]: 'success',
-    [EFlag.Grey]: 'unknown',
-    [EFlag.Orange]: 'danger',
-    [EFlag.Yellow]: 'warning',
-};
 
 export const EFlagToDescription: Record<EFlag, string> = {
     get [EFlag.Red]() {

@@ -7,8 +7,8 @@ import {getCapacityAlertTheme, normalizeCapacityAlert} from '../../utils/capacit
 import {cn} from '../../utils/cn';
 import {getFlagIconWithColor} from '../../utils/disks/iconCalculators';
 import {normalizeMediaType} from '../../utils/disks/normalizeMediaType';
-import {EFlagToLabelTheme} from '../EntityStatus/utils';
-import {getFlagStatusText} from '../VDisk/getFlagStatusText';
+import {EFlagToLabelTheme} from '../EntityStatus/EntityStatus';
+import {getFlagStatusText} from '../VDisk/VDisk';
 
 import i18n from './i18n';
 

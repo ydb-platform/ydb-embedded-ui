@@ -3,7 +3,7 @@ import React from 'react';
 import type {PopupPlacement, PopupProps} from '@gravity-ui/uikit';
 
 import {useVDiskPagePath} from '../../routes';
-import {isCapacityAlert} from '../../types/api/enums';
+import {EFlag, isCapacityAlert} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
 import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
 import type {
@@ -24,7 +24,6 @@ import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {InternalLink} from '../InternalLink';
 import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
 
-import {getFlagStatusText} from './getFlagStatusText';
 import {i18n} from './i18n';
 
 import './VDisk.scss';
@@ -108,6 +107,22 @@ function getVDiskBarIndicator({
         overflowVisible: placement === 'overlap',
         showIndicator: true,
     };
+}
+
+export function getFlagStatusText(flag: EFlag | undefined) {
+    switch (flag) {
+        case EFlag.Green:
+        case EFlag.Blue:
+            return i18n('value_ok');
+        case EFlag.Yellow:
+            return i18n('value_notice');
+        case EFlag.Orange:
+            return i18n('value_warning');
+        case EFlag.Red:
+            return i18n('value_impaired');
+        default:
+            return i18n('context_no-data');
+    }
 }
 
 function getReplicationAccessibleName(replicated: boolean | undefined) {
