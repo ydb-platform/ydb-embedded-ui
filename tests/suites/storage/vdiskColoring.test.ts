@@ -942,6 +942,86 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         );
     });
 
+    test('preserves refreshed group counts when resizing a column during a partial refresh', async ({
+        page,
+    }) => {
+        await page.setViewportSize({width: 1500, height: 1000});
+        await enableExpertMode(page, VDisksGroupBy.State, false);
+        await page.addInitScript(() => {
+            localStorage.setItem('auto-refresh-interval', '15000');
+            localStorage.setItem(
+                'storageGroupsSelectedColumns',
+                JSON.stringify([{id: 'GroupId', selected: true}]),
+            );
+        });
+        await setupVDiskColoringMocks(page);
+        const response = createMockStorageGroupsResponse();
+        const groups = Array.from({length: 55}, (_, index) => ({
+            ...response.StorageGroups?.[0],
+            GroupId: String(9000000000 + index),
+        }));
+        const requestsByOffset = new Map<number, number>();
+        const delayedRequest = Promise.withResolvers<void>();
+        const delayedResponse = Promise.withResolvers<void>();
+        await page.route('**/storage/groups?*', async (route) => {
+            const url = new URL(route.request().url());
+            const offset = Number(url.searchParams.get('offset') || 0);
+            const limit = Number(url.searchParams.get('limit') || groups.length);
+            const requestCount = (requestsByOffset.get(offset) || 0) + 1;
+            requestsByOffset.set(offset, requestCount);
+            const count = requestCount === 1 ? 45 : 55;
+            if (offset > 0 && requestCount > 1) {
+                delayedRequest.resolve();
+                await delayedResponse.promise;
+            }
+            await route.fulfill({
+                json: {
+                    ...response,
+                    TotalGroups: count,
+                    FoundGroups: count,
+                    StorageGroups: groups.slice(0, count).slice(offset, offset + limit),
+                },
+            });
+        });
+
+        try {
+            await gotoStoragePage(page, VDisksGroupBy.State, false);
+            const table = new ClusterStorageTable(page);
+            await expect.poll(() => table.getCount()).toBe(45);
+            await expect(page.getByRole('link', {name: '9000000044', exact: true})).toBeAttached();
+            await expect.poll(() => table.getCount(), {timeout: 25000}).toBe(55);
+            await delayedRequest.promise;
+
+            const header = page
+                .locator('.ydb-paginated-table__head-cell-wrapper')
+                .filter({hasText: 'Group ID'});
+            const initialWidth = await header.evaluate(
+                (element) => element.getBoundingClientRect().width,
+            );
+            const handle = await header
+                .locator('.ydb-paginated-table__resize-handler')
+                .boundingBox();
+            if (!handle) {
+                throw new Error('Group ID resize handle is not visible');
+            }
+            const x = handle.x + handle.width / 2;
+            const y = handle.y + handle.height / 2;
+            await page.mouse.move(x, y);
+            await page.mouse.down();
+            try {
+                await page.mouse.move(x + 80, y, {steps: 5});
+                await expect
+                    .poll(() => header.evaluate((element) => element.getBoundingClientRect().width))
+                    .toBeGreaterThan(initialWidth + 40);
+            } finally {
+                await page.mouse.up();
+            }
+            await expect.poll(() => table.getCount()).toBe(55);
+        } finally {
+            delayedResponse.resolve();
+        }
+    });
+
     test('preserves group counts and pagination after returning to a cached table', async ({
         page,
     }) => {

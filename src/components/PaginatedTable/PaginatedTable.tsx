@@ -94,24 +94,26 @@ export const PaginatedTable = <T, F>({
         setFilters(rawFilters);
     }, [rawFilters]);
 
-    const countsQuery = React.useMemo(
-        () =>
-            omit(
-                getTableChunkQueryParams({
-                    offset: 0,
-                    limit: chunkSize,
-                    fetchData,
-                    filters,
-                    sortParams: activeSortParams,
-                    columns,
-                    tableName,
-                    noBatching,
-                }),
-                'offset',
-                'fetchData',
-            ),
-        [chunkSize, fetchData, filters, activeSortParams, columns, tableName, noBatching],
+    const nextCountsQuery = omit(
+        getTableChunkQueryParams({
+            offset: 0,
+            limit: chunkSize,
+            fetchData,
+            filters,
+            sortParams: activeSortParams,
+            columns,
+            tableName,
+            noBatching,
+        }),
+        'offset',
+        'fetchData',
     );
+    const [countsQuery, setCountsQuery] = React.useState(nextCountsQuery);
+
+    // Resizing columns must not replay cached chunk responses through a new callback.
+    if (!isEqual(countsQuery, nextCountsQuery)) {
+        setCountsQuery(nextCountsQuery);
+    }
 
     const getQueryParams = (offset: number) =>
         getTableChunkQueryParams({
