@@ -4,6 +4,7 @@ import {createSelector} from '@reduxjs/toolkit';
 import type {IProtobufTimeObject} from '../../../types/api/common';
 import type {TopicDataRequest} from '../../../types/api/topic';
 import {convertBytesObjectToSpeed} from '../../../utils/bytesParsers';
+import {reachObjectCreationGoal} from '../../../utils/objectCreationMetrics';
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query';
 import {parseLag, parseTimestampToIdleTime} from '../../../utils/timeParsers';
 import type {RootState} from '../../defaultStore';
@@ -82,6 +83,7 @@ export const topicApi = api.injectEndpoints({
                 database: string;
                 formData: TopicFormValues;
             }) => {
+                reachObjectCreationGoal('createObject', 'topic');
                 try {
                     const query = buildCreateTopicQuery(formData);
 
@@ -92,11 +94,15 @@ export const topicApi = api.injectEndpoints({
                     });
 
                     if (isQueryErrorResponse(response)) {
+                        reachObjectCreationGoal('createObjectError', 'topic', response);
                         return {error: response};
                     }
 
-                    return {data: parseQueryAPIResponse(response)};
+                    const data = parseQueryAPIResponse(response);
+                    reachObjectCreationGoal('createObjectSuccess', 'topic');
+                    return {data};
                 } catch (error) {
+                    reachObjectCreationGoal('createObjectError', 'topic', error);
                     return {error};
                 }
             },

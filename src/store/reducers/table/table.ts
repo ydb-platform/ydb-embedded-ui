@@ -1,5 +1,6 @@
 import type {SchemaPathParam} from '../../../types/api/common';
 import type {TEvDescribeSchemeResult} from '../../../types/api/schema/schema';
+import {reachObjectCreationGoal} from '../../../utils/objectCreationMetrics';
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query';
 import {api} from '../api';
 
@@ -42,6 +43,8 @@ export const tableApi = api.injectEndpoints({
                 database: string;
                 formValues: TableFormValues;
             }) => {
+                const objectType = formValues.type === 'row' ? 'row_table' : 'column_table';
+                reachObjectCreationGoal('createObject', objectType);
                 try {
                     const {
                         type,
@@ -79,12 +82,15 @@ export const tableApi = api.injectEndpoints({
                     });
 
                     if (isQueryErrorResponse(response)) {
+                        reachObjectCreationGoal('createObjectError', objectType, response);
                         return {error: response};
                     }
 
                     const data = parseQueryAPIResponse(response);
+                    reachObjectCreationGoal('createObjectSuccess', objectType);
                     return {data};
                 } catch (error) {
+                    reachObjectCreationGoal('createObjectError', objectType, error);
                     return {error};
                 }
             },
