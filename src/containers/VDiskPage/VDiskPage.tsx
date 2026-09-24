@@ -23,6 +23,7 @@ import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {cn} from '../../utils/cn';
 import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {VDISK_LABEL_CONFIG} from '../../utils/disks/constants';
+import {formatPDiskType} from '../../utils/disks/getPDiskType';
 import {getDataSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useAppTitle} from '../App/AppTitleContext';
@@ -122,7 +123,14 @@ export function VDiskPage() {
             <PageMetaWithAutorefresh
                 className={vDiskPageCn('meta')}
                 loading={loading}
-                items={[hostItem, nodeIdItem, NodeType, NodeDC, pDiskIdItem, PDiskType]}
+                items={[
+                    hostItem,
+                    nodeIdItem,
+                    NodeType,
+                    NodeDC,
+                    pDiskIdItem,
+                    formatPDiskType(PDiskType),
+                ]}
             />
         );
     };

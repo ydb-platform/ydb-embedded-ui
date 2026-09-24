@@ -17,6 +17,7 @@ function getVDiskOptions(): ExpertModeOption<VDisksGroupByValue>[] {
         {value: VDisksGroupBy.Space, content: i18n('value_space')},
         {value: VDisksGroupBy.FrontQueues, content: i18n('value_front-queues')},
         {value: VDisksGroupBy.Compaction, content: i18n('value_compaction')},
+        {value: VDisksGroupBy.DriveType, content: i18n('value_drive-type')},
         {value: VDisksGroupBy.All, content: i18n('value_all')},
     ];
 }
@@ -29,6 +30,7 @@ function getPDiskOptions(): ExpertModeOption<PDisksGroupByValue>[] {
         {value: PDisksGroupBy.Decommit, content: i18n('value_pdisks-decommit')},
         {value: PDisksGroupBy.Maintenance, content: i18n('value_pdisks-maintenance')},
         {value: PDisksGroupBy.Device, content: i18n('value_pdisks-device')},
+        {value: PDisksGroupBy.DriveType, content: i18n('value_drive-type')},
         {value: PDisksGroupBy.All, content: i18n('value_pdisks-all')},
     ];
 }

@@ -3,6 +3,7 @@
   "context_vdisk": "VDisk {{vdiskId}} on node {{nodeId}}",
   "context_donor-vdisk": "Donor VDisk {{vdiskId}} on node {{nodeId}}",
   "context_vdisk-no-whiteboard": "{{disk}}. Whiteboard: {{noData}}",
+  "context_pdisk-no-whiteboard": "{{disk}}. PDisk Whiteboard: {{noData}}",
   "context_state-accessible-name": "{{disk}}. State: {{state}}. Replication: {{replication}}.",
   "context_space-accessible-name": "{{disk}}. Capacity alert: {{capacityAlert}}.",
   "context_front-queues-accessible-name": "{{disk}}. Front queues: {{frontQueues}}.",
@@ -15,5 +16,6 @@
   "context_all-mode-health-issues": "issues detected",
   "context_all-mode-replication-complete": "complete",
   "context_all-mode-replication-in-progress": "in progress",
-  "context_all-mode-accessible-name": "VDisk {{vdiskId}}. Health: {{health}}. State: {{state}}. Replication: {{replication}}. Capacity alert: {{capacityAlert}}. Front queues: {{frontQueues}}. Fresh compaction: {{freshCompaction}}. Level compaction: {{levelCompaction}}. Allocated: {{allocatedPercent}}."
+  "context_all-mode-accessible-name": "VDisk {{vdiskId}}. Health: {{health}}. State: {{state}}. Replication: {{replication}}. Capacity alert: {{capacityAlert}}. Front queues: {{frontQueues}}. Fresh compaction: {{freshCompaction}}. Level compaction: {{levelCompaction}}. Allocated: {{allocatedPercent}}.",
+  "context_drive-type-accessible-name": "{{disk}}. Drive type: {{driveType}}."
 }

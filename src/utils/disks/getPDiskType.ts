@@ -32,6 +32,10 @@ export const PDISK_TYPES = {
     MVME: 'NVME',
 } as const;
 
+export function formatPDiskType(type?: string) {
+    return type === 'NVME' ? 'NVMe' : type;
+}
+
 // Bear with me.
 // Disk type is determined by the field Category.
 // Category is a bit field defined as follows:

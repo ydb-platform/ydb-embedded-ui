@@ -30,7 +30,7 @@ export interface TableChunksRendererProps<T, F> {
     onRowClick?: OnRowClick<T>;
     renderErrorMessage?: RenderErrorMessage;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
-    onDataFetched: (data?: PaginatedTableData<T>) => void;
+    onDataFetched: (data: PaginatedTableData<T>) => void;
     onActiveChunkOffsetsChange: (offsets: number[]) => void;
     keepCache: boolean;
     fetchOverscan?: number;

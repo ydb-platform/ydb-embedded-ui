@@ -12,6 +12,7 @@ import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants'
 import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculatePDiskSeverity';
 import {NUMERIC_SEVERITY_TO_LABEL_VIEW} from '../../utils/disks/constants';
+import {formatPDiskType} from '../../utils/disks/getPDiskType';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
@@ -41,7 +42,10 @@ export const preparePDiskData = (
     const {AvailableSize, TotalSize, NodeId, Path, Realtime, Type, Device} = data;
 
     const pdiskData: YDBDefinitionListItem[] = [
-        {name: pDiskPopupKeyset('label_type'), content: Type || pDiskPopupKeyset('value_unknown')},
+        {
+            name: pDiskPopupKeyset('label_type'),
+            content: formatPDiskType(Type) || pDiskPopupKeyset('value_unknown'),
+        },
     ];
 
     if (NodeId) {

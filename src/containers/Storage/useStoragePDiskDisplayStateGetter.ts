@@ -12,6 +12,7 @@ import type {
     PDiskDisplayStateGetter,
 } from '../../utils/disks/displayState';
 import {getDefaultPDiskDisplayState} from '../../utils/disks/displayState';
+import {getDriveTypeDisplayState} from '../../utils/disks/driveType';
 import {calculateFlagPairIcon, calculateSpaceIcon} from '../../utils/disks/iconCalculators';
 import {
     getPDiskDecommitDisplayState,
@@ -203,6 +204,13 @@ function usePDiskDisplayStateGetter(
         (pDisk) => {
             if (!isExpertMode) {
                 return getDefaultPDiskDisplayState(pDisk);
+            }
+
+            if (pdisksGroupBy === PDisksGroupBy.DriveType) {
+                return {
+                    ...getDriveTypeDisplayState(pDisk),
+                    width: EXPERT_MODE_PDISK_WIDTH,
+                };
             }
 
             const mode = getMode(pdisksGroupBy);

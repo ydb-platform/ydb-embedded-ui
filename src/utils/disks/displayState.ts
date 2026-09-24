@@ -2,13 +2,14 @@ import type {IconData} from '@gravity-ui/uikit';
 
 import {DATA_SEVERITY, DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from './constants';
 import type {IconWithColor} from './iconCalculators';
-import type {DisplaySeverity, PreparedPDisk, PreparedVDisk} from './types';
+import type {DisplaySeverity, PDiskType, PreparedPDisk, PreparedVDisk} from './types';
 
 export type DiskDisplayMode =
     | 'state'
     | 'space'
     | 'frontQueues'
     | 'compaction'
+    | 'driveType'
     | 'all'
     | 'drive'
     | 'decommit'
@@ -42,6 +43,7 @@ export interface PDiskAllModeDisplayState {
 }
 
 export interface BaseDiskDisplayState {
+    driveType?: PDiskType;
     severity: DisplaySeverity;
     icon: DiskIndicatorValue | undefined;
     mode: DiskDisplayMode | undefined;
