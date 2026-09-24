@@ -345,6 +345,7 @@ export const PDisk = ({
         >
             {topContent}
             <HoverPopup
+                keepOpenOnFocus
                 showPopup={showPopup}
                 offset={{mainAxis: 2, crossAxis: 0}}
                 anchorRef={anchorRef}

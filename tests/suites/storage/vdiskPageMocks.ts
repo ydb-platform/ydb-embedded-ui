@@ -26,6 +26,8 @@ export interface SetupVDiskPageMocksOptions {
     pDiskId?: string;
     isViewerAllowed?: boolean;
     withDonors?: boolean;
+    withoutCompaction?: boolean;
+    storagePoolName?: string;
     allocatedSize?: string;
     availableSize?: string;
     whiteboardAllocatedSize?: string;
@@ -114,6 +116,8 @@ function createStorageGroupsResponse({
     availableSize = '186000000000',
     pDiskId = PDISK_ID,
     withDonors,
+    withoutCompaction,
+    storagePoolName = STORAGE_POOL_NAME,
     withCapacityMetrics,
     whiteboardAllocatedSize,
     whiteboardAvailableSize,
@@ -128,6 +132,8 @@ function createStorageGroupsResponse({
     | 'availableSize'
     | 'pDiskId'
     | 'withDonors'
+    | 'withoutCompaction'
+    | 'storagePoolName'
     | 'withCapacityMetrics'
     | 'whiteboardAllocatedSize'
     | 'whiteboardAvailableSize'
@@ -141,7 +147,7 @@ function createStorageGroupsResponse({
         StorageGroups: [
             {
                 GroupId: GROUP_ID,
-                PoolName: STORAGE_POOL_NAME,
+                PoolName: storagePoolName,
                 MediaType: 'SSD',
                 ErasureSpecies: 'mirror-3-dc',
                 Used: '10000000000',
@@ -168,7 +174,7 @@ function createStorageGroupsResponse({
                         VDiskSlotId: 1001,
                         AllocatedSize: allocatedSize,
                         AvailableSize: availableSize,
-                        StoragePoolName: STORAGE_POOL_NAME,
+                        StoragePoolName: storagePoolName,
                         DiskSpace: 'Green',
                         FrontQueues: 'Green',
                         ...(withCapacityMetrics
@@ -180,14 +186,16 @@ function createStorageGroupsResponse({
                               }
                             : {}),
                         ...(withDonors ? {VDiskState: 'OK', Replicated: false} : {}),
-                        SatisfactionRank: {
-                            FreshRank: {
-                                Flag: 'Green',
-                            },
-                            LevelRank: {
-                                Flag: 'Green',
-                            },
-                        },
+                        SatisfactionRank: withoutCompaction
+                            ? undefined
+                            : {
+                                  FreshRank: {
+                                      Flag: 'Green',
+                                  },
+                                  LevelRank: {
+                                      Flag: 'Green',
+                                  },
+                              },
                         PDisk: {
                             PDiskId: `${NODE_ID}-${pDiskId}`,
                             Type: 'ROT',
@@ -380,6 +388,8 @@ async function setupStorageGroupsMock(
         availableSize,
         pDiskId = PDISK_ID,
         withDonors,
+        withoutCompaction,
+        storagePoolName,
         withCapacityMetrics,
         whiteboardAllocatedSize,
         whiteboardAvailableSize,
@@ -394,6 +404,8 @@ async function setupStorageGroupsMock(
         | 'availableSize'
         | 'pDiskId'
         | 'withDonors'
+        | 'withoutCompaction'
+        | 'storagePoolName'
         | 'withCapacityMetrics'
         | 'whiteboardAllocatedSize'
         | 'whiteboardAvailableSize'
@@ -414,6 +426,8 @@ async function setupStorageGroupsMock(
                     availableSize,
                     pDiskId,
                     withDonors,
+                    withoutCompaction,
+                    storagePoolName,
                     withCapacityMetrics,
                     whiteboardAllocatedSize,
                     whiteboardAvailableSize,
@@ -547,6 +561,26 @@ export async function setupPDiskInfoMock(
             }),
         });
     });
+}
+
+export async function setupDiskNodeMetadataMock(
+    page: Page,
+    {host, rack, datacenter}: Pick<SetupVDiskPageMocksOptions, 'host' | 'rack' | 'datacenter'>,
+) {
+    await page.route('**/viewer/json/nodelist?*', (route) =>
+        route.fulfill({
+            json: [
+                {
+                    Id: Number(NODE_ID),
+                    Host: host,
+                    PhysicalLocation: {
+                        Location: rack ? `R=${rack}` : undefined,
+                        DataCenterId: datacenter,
+                    },
+                },
+            ],
+        }),
+    );
 }
 
 export async function setupVDiskPageMocks(page: Page, options: SetupVDiskPageMocksOptions = {}) {

@@ -4,14 +4,23 @@ import type {PopupProps} from '@gravity-ui/uikit';
 import {Popup} from '@gravity-ui/uikit';
 import debounce from 'lodash/debounce';
 
+import {cn} from '../../utils/cn';
 import {YDB_POPOVER_CLASS_NAME} from '../../utils/constants';
 import {useEventHandler} from '../../utils/hooks/useEventHandler';
 
 import {getPopupScrollContainer} from './getPopupScrollContainer';
+import {usePopupPriority} from './usePopupPriority';
 
+import './HoverPopup.scss';
+
+const b = cn('ydb-hover-popup');
 const DEBOUNCE_TIMEOUT = 100;
 
-function useVisibleAnchor(anchorElement: HTMLElement | null, open: boolean) {
+function useVisibleAnchor(
+    anchorElement: HTMLElement | null,
+    open: boolean,
+    onHidden: VoidFunction,
+) {
     const [visibleAnchor, setVisibleAnchor] = React.useState<HTMLElement | null>(null);
 
     React.useLayoutEffect(() => {
@@ -22,10 +31,13 @@ function useVisibleAnchor(anchorElement: HTMLElement | null, open: boolean) {
 
         const observer = new IntersectionObserver(([entry]) => {
             setVisibleAnchor(entry.isIntersecting ? anchorElement : null);
+            if (!entry.isIntersecting) {
+                onHidden();
+            }
         });
         observer.observe(anchorElement);
         return () => observer.disconnect();
-    }, [anchorElement, open]);
+    }, [anchorElement, onHidden, open]);
 
     return anchorElement !== null && visibleAnchor === anchorElement;
 }
@@ -71,6 +83,9 @@ export const HoverPopup = ({
     });
 
     const anchor = React.useRef<HTMLSpanElement>(null);
+    const popupContent = React.useRef<HTMLDivElement>(null);
+    const {activate, zIndex} = usePopupPriority();
+    const bringToFront = useEventHandler(() => activate(anchorRef?.current || anchor.current));
 
     const reportedOpenRef = React.useRef(false);
 
@@ -126,7 +141,11 @@ export const HoverPopup = ({
         updatePopupState({visible: false, hovered: false, focused: false}, true);
     }, [debouncedHandleHidePopup, debouncedHandleShowPopup, updatePopupState]);
 
-    const onMouseEnter = () => {
+    const onMouseEnter = (event: React.MouseEvent<HTMLSpanElement>) => {
+        if (event.buttons !== 0) {
+            return;
+        }
+        bringToFront();
         debouncedHandleHidePopup.cancel();
         debouncedHandleShowPopup();
     };
@@ -136,26 +155,50 @@ export const HoverPopup = ({
         debouncedHandleHidePopup();
     };
 
-    const onPopupMouseEnter = React.useCallback(() => {
-        debouncedHandleHidePopup.cancel();
-        updatePopupState({hovered: true});
-    }, [debouncedHandleHidePopup, updatePopupState]);
+    const onPopupMouseEnter = React.useCallback(
+        (event: React.MouseEvent<HTMLDivElement>) => {
+            if (event.buttons === 0) {
+                bringToFront();
+            }
+            debouncedHandleHidePopup.cancel();
+            updatePopupState({hovered: true});
+        },
+        [bringToFront, debouncedHandleHidePopup, updatePopupState],
+    );
 
     const onPopupMouseLeave = React.useCallback(() => {
         updatePopupState({hovered: false});
         debouncedHandleHidePopup();
     }, [debouncedHandleHidePopup, updatePopupState]);
 
-    const onPopupContextMenu = React.useCallback(() => {
-        updatePopupState({focused: true});
-    }, [updatePopupState]);
+    const onPopupContextMenu = React.useCallback(
+        (event: React.MouseEvent<HTMLDivElement>) => {
+            bringToFront();
+            if (keepOpenOnFocus) {
+                event.currentTarget.focus({preventScroll: true});
+            }
+            updatePopupState({focused: true});
+        },
+        [bringToFront, keepOpenOnFocus, updatePopupState],
+    );
+
+    const onPopupMouseDown = React.useCallback(
+        (event: React.MouseEvent<HTMLDivElement>) => {
+            if (keepOpenOnFocus && event.button === 0) {
+                // Plain text needs a focus owner too, so dragging a selection out keeps the card open.
+                event.currentTarget.focus({preventScroll: true});
+            }
+        },
+        [keepOpenOnFocus],
+    );
 
     const onPopupFocus = React.useCallback(() => {
+        bringToFront();
         if (keepOpenOnFocus) {
             debouncedHandleHidePopup.cancel();
             updatePopupState({focused: true});
         }
-    }, [keepOpenOnFocus, debouncedHandleHidePopup, updatePopupState]);
+    }, [bringToFront, keepOpenOnFocus, debouncedHandleHidePopup, updatePopupState]);
 
     const onPopupBlur = React.useCallback(
         (event: React.FocusEvent<HTMLDivElement>) => {
@@ -173,9 +216,40 @@ export const HoverPopup = ({
     const open = Boolean(internalOpen || showPopup);
 
     const anchorElement = anchorRef?.current || anchor.current;
-    // Clipping a paired disk must not clear the shared hover state via onHidePopup.
-    const isAnchorVisible = useVisibleAnchor(anchorElement, open);
+    const closeWhenAnchorHidden = React.useCallback(() => {
+        const {visible, hovered, focused} = popupStateRef.current;
+        // A paired disk can be open through showPopup without owning the active interaction.
+        if (visible || hovered || focused) {
+            closePopup();
+        }
+    }, [closePopup]);
+    const isAnchorVisible = useVisibleAnchor(anchorElement, open, closeWhenAnchorHidden);
     const container = getPopupScrollContainer(anchorElement);
+
+    React.useEffect(() => {
+        if (!keepOpenOnFocus || !internalOpen || !anchorElement) {
+            return undefined;
+        }
+
+        const ownerDocument = anchorElement.ownerDocument;
+        const onPointerDown = (event: PointerEvent) => {
+            if (!popupStateRef.current.focused) {
+                return;
+            }
+            const path = event.composedPath();
+            if (
+                path.includes(anchorElement) ||
+                (popupContent.current && path.includes(popupContent.current))
+            ) {
+                return;
+            }
+            // Clicking a non-focusable object outside the card must clear its focus too.
+            closePopup();
+        };
+
+        ownerDocument.addEventListener('pointerdown', onPointerDown, true);
+        return () => ownerDocument.removeEventListener('pointerdown', onPointerDown, true);
+    }, [anchorElement, closePopup, internalOpen, keepOpenOnFocus]);
 
     return (
         <React.Fragment>
@@ -185,6 +259,7 @@ export const HoverPopup = ({
             {anchorElement ? (
                 <Popup
                     container={container}
+                    zIndex={zIndex}
                     // Keep portal typography when the page uses a different font.
                     floatingStyles={{fontFamily: 'var(--g-text-body-font-family)'}}
                     anchorElement={anchorElement}
@@ -204,8 +279,11 @@ export const HoverPopup = ({
                     offset={offset || {mainAxis: 12, crossAxis: 0}}
                 >
                     <div
-                        className={contentClassName}
+                        ref={popupContent}
+                        className={b('content', contentClassName)}
+                        tabIndex={keepOpenOnFocus ? -1 : undefined}
                         onContextMenu={onPopupContextMenu}
+                        onMouseDown={onPopupMouseDown}
                         onMouseEnter={onPopupMouseEnter}
                         onMouseLeave={onPopupMouseLeave}
                         onBlur={onPopupBlur}

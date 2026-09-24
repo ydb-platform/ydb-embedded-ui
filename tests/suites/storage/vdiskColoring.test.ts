@@ -507,6 +507,7 @@ test('keeps paired disk popups inside the viewport without expanding the page', 
     });
     await expect(vDiskPopup).toBeVisible();
     await expect(pDiskPopup).toBeHidden();
+    await expect(vDiskPopup).toHaveCSS('width', '400px');
     await expect(getPDiskProgressBar(pDisk)).toHaveClass(/storage-disk-progress-bar_highlighted/);
     await expect
         .poll(() => page.evaluate(() => document.documentElement.scrollWidth))
@@ -530,6 +531,22 @@ test('keeps paired disk popups inside the viewport without expanding the page', 
     });
     await expect(pDisk).toBeInViewport();
     await expect(pDiskPopup).toBeVisible();
+    await expect(pDiskPopup).toHaveCSS('width', '400px');
+    const floatingVDisk = vDiskPopup.locator('xpath=ancestor::*[@data-floating-ui-placement][1]');
+    const floatingPDisk = pDiskPopup.locator('xpath=ancestor::*[@data-floating-ui-placement][1]');
+    const zIndex = (popup: Locator) =>
+        popup.evaluate((element) => Number(getComputedStyle(element).zIndex));
+    for (const [anchor, foreground, background] of [
+        [vDisk, floatingVDisk, floatingPDisk],
+        [pDisk, floatingPDisk, floatingVDisk],
+        [vDisk, floatingVDisk, floatingPDisk],
+    ]) {
+        await anchor.hover();
+        await expect
+            .poll(async () => (await zIndex(foreground)) - (await zIndex(background)))
+            .toBeGreaterThan(0);
+    }
+    await expect(vDiskPopup.getByText('PDisk ID', {exact: true})).toHaveCount(1);
     for (const popup of [vDiskPopup, pDiskPopup]) {
         await expect(popup).toBeInViewport({ratio: 1});
     }
@@ -572,6 +589,37 @@ test('keeps paired disk popups inside the viewport without expanding the page', 
         });
     });
     expect(maxPageWidthWhileClosing).toBe(pageWidth);
+});
+
+test('closes a focused disk popup when its anchor scrolls out of view', async ({page}) => {
+    await page.setViewportSize({width: 1500, height: 800});
+    await enableExpertMode(page, VDisksGroupBy.All);
+    await setupVDiskColoringMocks(page);
+    await gotoStoragePage(page, VDisksGroupBy.All);
+
+    const scroll = page.locator('.ydb-cluster');
+    const vDisk = getVDiskItems(getStorageGroupRow(page, 0)).first();
+    await expect(vDisk).toBeVisible();
+    await vDisk.hover();
+    const popup = page.locator('.ydb-popover').filter({
+        has: page.getByRole('link', {name: 'Go to VDisk', exact: true}),
+    });
+    const action = popup.getByRole('link', {name: 'Go to VDisk', exact: true});
+    await action.focus();
+    await expect(action).toBeFocused();
+    await page.mouse.move(0, 0);
+
+    await scroll.evaluate((element) => {
+        element.style.setProperty('padding-bottom', '1200px');
+        element.scrollTo({top: element.scrollHeight});
+    });
+    await expect.poll(() => scroll.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+    await expect(vDisk).not.toBeInViewport();
+    await expect(popup).toBeHidden();
+
+    await scroll.evaluate((element) => element.scrollTo({top: 0}));
+    await expect(vDisk).toBeInViewport();
+    await expect(popup).toBeHidden();
 });
 
 test('wheel over disk popups scrolls the page', async ({page}) => {

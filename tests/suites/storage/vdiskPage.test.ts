@@ -17,6 +17,7 @@ import {
     STORAGE_POOL_NAME,
     VDISK_ID,
     VDISK_PAGE_PATH,
+    setupDiskNodeMetadataMock,
     setupPDiskInfoMock,
     setupVDiskBlobIndexStatMock,
     setupVDiskPageMocks,
@@ -244,7 +245,11 @@ async function getDiskPopupPanel(container: Locator, title: 'VDisk' | 'PDisk', i
     return panel;
 }
 
-async function expectDiskLocationDisclosure(panel: Locator, title: 'VDisk' | 'PDisk') {
+async function expectDiskLocationDisclosure(
+    panel: Locator,
+    title: 'VDisk' | 'PDisk',
+    withPDiskId = true,
+) {
     const details = panel.locator('.ydb-disk-popup__location-details');
     const expand = panel.getByRole('button', {name: `Show ${title} location details`, exact: true});
 
@@ -261,7 +266,11 @@ async function expectDiskLocationDisclosure(panel: Locator, title: 'VDisk' | 'PD
     await expect(collapse).toHaveAttribute('aria-expanded', 'true');
     await expect(details).toBeVisible();
     await expectDefinitionListRowValue(details, 'Node ID', NODE_ID);
-    await expectDefinitionListRowValue(details, 'PDisk ID', PDISK_ID);
+    if (withPDiskId) {
+        await expectDefinitionListRowValue(details, 'PDisk ID', PDISK_ID);
+    } else {
+        await expect(getDefinitionListRow(details, 'PDisk ID')).toHaveCount(0);
+    }
     if (title === 'VDisk') {
         await expectDefinitionListRowValue(details, 'VDisk Slot ID', '1001');
     }
@@ -556,7 +565,222 @@ test.describe('Storage disk popup snapshots', () => {
         await enableStorageDisksColumn(page);
     });
 
+    for (const viewportWidth of [1280, 560]) {
+        for (const combined of [false, true]) {
+            test(`wraps long content in ${combined ? 'combined' : 'single'} disk popup at ${viewportWidth}px`, async ({
+                page,
+            }, testInfo) => {
+                const host = `storage-${'long-hostname-'.repeat(12)}.ydb`;
+                const rack = 'rack-'.repeat(35);
+                await page.setViewportSize({width: viewportWidth, height: 1000});
+                await setupVDiskPageMocks(page, {
+                    host,
+                    rack,
+                    withoutCompaction: true,
+                    storagePoolName: 'storage-pool-'.repeat(40),
+                });
+                await setupDiskNodeMetadataMock(page, {host, rack});
+                await page.goto(VDISK_PAGE_PATH);
+                const table = new ClusterStorageTable(page);
+                await table.waitForTableData();
+                const trigger = page
+                    .locator(
+                        combined
+                            ? '.ydb-storage-vdisks__wrapper .storage-disk-progress-bar'
+                            : '.ydb-storage-disks__pdisk-progress-bar',
+                    )
+                    .first();
+                await trigger.hover();
+
+                const popup = page.locator('.ydb-disk-popup').filter({
+                    has: page.getByRole('link', {
+                        name: combined ? 'Go to VDisk' : 'Go to PDisk',
+                        exact: true,
+                    }),
+                });
+                await expect(popup).toBeVisible();
+                await expect(popup.locator('.ydb-disk-popup__panel')).toHaveCount(combined ? 2 : 1);
+                const baseWidth = combined && viewportWidth > 700 ? 593 : 368;
+                const maxWidth = baseWidth + (combined ? 120 : 50);
+                await expect(popup).toHaveCSS('max-width', `${maxWidth}px`);
+                const width = await popup.evaluate(
+                    (element) => element.getBoundingClientRect().width,
+                );
+                const outerWidth = await popup
+                    .locator('xpath=..')
+                    .evaluate((element) => element.getBoundingClientRect().width);
+                expect(outerWidth).toBeCloseTo(width + 32, 2);
+                if (combined && viewportWidth > 700) {
+                    expect(width).toBeGreaterThan(baseWidth);
+                    expect(width).toBeLessThanOrEqual(maxWidth);
+                } else {
+                    expect(width).toBeCloseTo(baseWidth, 0);
+                }
+                await expect
+                    .poll(() =>
+                        popup.evaluate((element) => element.scrollWidth - element.clientWidth),
+                    )
+                    .toBeLessThanOrEqual(1);
+
+                if (combined) {
+                    await expect(
+                        popup.locator('.g-label__key').filter({hasText: 'Not available'}),
+                    ).toHaveCount(2);
+                    const compactionTextLines = await popup
+                        .locator('.ydb-vdisk-popup__compaction .g-label__text')
+                        .evaluateAll((labels) =>
+                            labels.map((label) => {
+                                const range = document.createRange();
+                                range.selectNodeContents(label);
+                                return new Set(
+                                    Array.from(range.getClientRects(), (rect) =>
+                                        Math.round(rect.top),
+                                    ),
+                                ).size;
+                            }),
+                        );
+                    expect(compactionTextLines).toEqual([1, 1]);
+                }
+                const clippedLabelText = await popup
+                    .locator('.ydb-disk-status__label')
+                    .evaluateAll((labels) =>
+                        labels.flatMap((label) => {
+                            const box = label.getBoundingClientRect();
+                            const walker = document.createTreeWalker(label, NodeFilter.SHOW_TEXT);
+                            const clipped: string[] = [];
+                            while (walker.nextNode()) {
+                                if (!walker.currentNode.textContent?.trim()) {
+                                    continue;
+                                }
+                                const range = document.createRange();
+                                range.selectNodeContents(walker.currentNode);
+                                for (const rect of range.getClientRects()) {
+                                    if (
+                                        rect.width &&
+                                        (rect.left < box.left - 1 ||
+                                            rect.right > box.right + 1 ||
+                                            rect.bottom > box.bottom + 1)
+                                    ) {
+                                        clipped.push(walker.currentNode.textContent);
+                                    }
+                                }
+                            }
+                            return clipped;
+                        }),
+                    );
+                expect(clippedLabelText).toEqual([]);
+                const hostname = popup
+                    .locator('.ydb-disk-popup__text')
+                    .filter({hasText: host})
+                    .first();
+                await expect(hostname).toHaveCSS('text-overflow', 'ellipsis');
+                await expect(hostname).toHaveCSS('white-space', 'nowrap');
+                await expect
+                    .poll(() =>
+                        hostname.evaluate((element) => element.scrollWidth > element.clientWidth),
+                    )
+                    .toBe(true);
+                const rackValue = popup
+                    .locator('.g-definition-list__definition')
+                    .filter({hasText: rack})
+                    .first();
+                const rackLines = await rackValue.evaluate((element, text) => {
+                    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+                    while (walker.nextNode()) {
+                        if (walker.currentNode.textContent === text) {
+                            const range = document.createRange();
+                            range.selectNodeContents(walker.currentNode);
+                            return range.getClientRects().length;
+                        }
+                    }
+                    return 0;
+                }, rack);
+                expect(rackLines).toBeGreaterThan(1);
+                await testInfo.attach('disk-popup-wrapped-content', {
+                    body: await page.screenshot(),
+                    contentType: 'image/png',
+                });
+            });
+        }
+    }
+
+    for (const combined of [false, true]) {
+        test(`only Compaction may expand the ${combined ? 'combined' : 'single'} disk popup`, async ({
+            page,
+        }) => {
+            await page.setViewportSize({width: 1280, height: 1000});
+            for (const longValues of [false, true]) {
+                const host = longValues
+                    ? `storage-${'long-hostname-'.repeat(12)}.ydb`
+                    : 'host.test';
+                const rack = longValues ? 'rack-'.repeat(35) : 'rack-1';
+                const storagePoolName = longValues ? 'storage-pool-'.repeat(40) : STORAGE_POOL_NAME;
+                const options = longValues
+                    ? {
+                          allocatedSize: '9000000000000000000',
+                          availableSize: '9000000000000000000',
+                          pDiskBscAvailableSize: '9000000000000000000',
+                          pDiskBscTotalSize: '18000000000000000000',
+                      }
+                    : {};
+                await setupVDiskPageMocks(page, {storagePoolName, ...options});
+                await setupDiskNodeMetadataMock(page, {host, rack});
+                await page.goto(VDISK_PAGE_PATH);
+                await new ClusterStorageTable(page).waitForTableData();
+                await page
+                    .locator(
+                        combined
+                            ? '.ydb-storage-vdisks__wrapper .storage-disk-progress-bar'
+                            : '.ydb-storage-disks__pdisk-progress-bar',
+                    )
+                    .first()
+                    .hover();
+                const popup = (
+                    await waitForDiskPopup(page, combined ? 'Go to VDisk' : 'Go to PDisk')
+                ).locator('.ydb-disk-popup');
+                await expect(popup).toHaveCSS('width', `${combined ? 593 : 368}px`);
+                await expect(popup.locator('xpath=..')).toHaveCSS(
+                    'width',
+                    `${combined ? 625 : 400}px`,
+                );
+                expect(
+                    await popup.evaluate((element) => element.scrollWidth - element.clientWidth),
+                ).toBeLessThanOrEqual(1);
+                if (longValues && combined) {
+                    await expect(popup.getByText(storagePoolName, {exact: true})).toBeVisible();
+                }
+            }
+        });
+    }
+
     for (const closeBy of ['blur', 'escape'] as const) {
+        test(`popup review: retains PDisk focus until ${closeBy}`, async ({page}) => {
+            await page.clock.install();
+            await page.setViewportSize({width: 1500, height: 1000});
+            await setupVDiskPageMocks(page);
+            await page.goto(VDISK_PAGE_PATH);
+            await new ClusterStorageTable(page).waitForTableData();
+            await page.locator('.ydb-storage-disks__pdisk-progress-bar').first().hover();
+            const popup = await waitForDiskPopup(page, 'Go to PDisk');
+            const toggle = popup.getByRole('button', {
+                name: /^(Show|Hide) PDisk location details$/,
+            });
+            await toggle.click();
+            await expect(toggle).toBeFocused();
+            await page.mouse.move(0, 0);
+            await page.clock.fastForward(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+            await expect(popup).toBeVisible();
+            await expect(
+                page.locator('.ydb-storage-disks__pdisk-progress-bar').first(),
+            ).toHaveClass(/storage-disk-progress-bar_highlighted/);
+            if (closeBy === 'escape') {
+                await page.keyboard.press('Escape');
+            } else {
+                await page.getByRole('button', {name: 'Refresh', exact: true}).first().focus();
+            }
+            await expect(popup).toBeHidden();
+        });
+
         test(`keeps the donor stack expanded until the focused popup closes by ${closeBy}`, async ({
             page,
         }) => {
@@ -599,6 +823,68 @@ test.describe('Storage disk popup snapshots', () => {
         });
     }
 
+    for (const disk of ['PDisk', 'VDisk'] as const) {
+        test(`popup review: keeps ${disk} open while selecting text outside the card`, async ({
+            page,
+        }) => {
+            await page.clock.install();
+            await page.setViewportSize({width: 1500, height: 1200});
+            await setupVDiskPageMocks(page);
+            await page.goto(VDISK_PAGE_PATH);
+            await new ClusterStorageTable(page).waitForTableData();
+            await page
+                .locator(
+                    disk === 'PDisk'
+                        ? '.ydb-storage-disks__pdisk-progress-bar'
+                        : '.ydb-storage-vdisks__wrapper .storage-disk-progress-bar',
+                )
+                .first()
+                .hover();
+            const popup = await waitForDiskPopup(page, `Go to ${disk}`);
+            const panel = await getDiskPopupPanel(
+                popup,
+                disk,
+                disk === 'PDisk' ? `${NODE_ID}-${PDISK_ID}` : VDISK_ID,
+            );
+            const heading = panel.getByText(disk, {exact: true});
+            await heading.hover();
+            const headingBox = await heading.boundingBox();
+            const popupBox = await popup.boundingBox();
+            if (!headingBox || !popupBox) {
+                throw new Error('Missing disk popup selection bounds');
+            }
+            const x = headingBox.x + headingBox.width;
+            const y = headingBox.y + headingBox.height / 2;
+            await page.mouse.move(headingBox.x + 1, y);
+            await page.mouse.down();
+            const focusOwner = popup.locator('xpath=..');
+            await expect(focusOwner).toBeFocused();
+            await expect(focusOwner).toHaveCSS('outline-style', 'none');
+            await page.mouse.move(x, y, {steps: 5});
+            await expect
+                .poll(() => page.evaluate(() => window.getSelection()?.toString()))
+                .toContain(disk);
+            await page.mouse.move(x, popupBox.y + popupBox.height + 8, {steps: 5});
+            await page.clock.fastForward(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+            await expect(popup).toBeVisible();
+            await page.mouse.up();
+            await expect
+                .poll(() =>
+                    popup.evaluate((element) => {
+                        const selection = window.getSelection();
+                        return Boolean(
+                            selection?.anchorNode &&
+                                element.contains(selection.anchorNode) &&
+                                !selection.isCollapsed,
+                        );
+                    }),
+                )
+                .toBe(true);
+            await page.getByRole('button', {name: 'Refresh', exact: true}).first().focus();
+            await expect(popup).toBeHidden();
+        });
+    }
+
     test('renders redesigned VDisk popup actions', async ({page}) => {
         await page.setViewportSize({width: 1500, height: 1000});
         await setupVDiskPageMocks(page);
@@ -629,7 +915,7 @@ test.describe('Storage disk popup snapshots', () => {
             await expectDefinitionListRowValue(pDiskPanel, label, 'Not available');
         }
         await expect(popup).toHaveScreenshot('vdisk-popup-actions.png');
-        await expectDiskLocationDisclosure(vDiskPanel, 'VDisk');
+        await expectDiskLocationDisclosure(vDiskPanel, 'VDisk', false);
         await expectDiskLocationDisclosure(pDiskPanel, 'PDisk');
     });
 

@@ -65,7 +65,12 @@ function getRuntimeItems(
         {
             name: i18n('label_compaction'),
             content: (
-                <Flex direction="column" gap={1} alignItems="flex-start">
+                <Flex
+                    direction="column"
+                    gap={1}
+                    alignItems="flex-start"
+                    className={b('compaction')}
+                >
                     <VDiskCompactionRankLabel
                         flag={data.SatisfactionRank?.FreshRank?.Flag}
                         rank="fresh"
@@ -252,6 +257,9 @@ export function VDiskPopup({
         });
     }
     const pdisk = !isSpaceDistribution && isViewerUser ? fullData?.PDisk : undefined;
+    const locationItems = getVDiskLocationItems(data, nodeData).filter(
+        ({id}) => !pdisk || id !== 'pdisk-id',
+    );
     return (
         <DiskPopup combined={Boolean(pdisk)} className={b(null, 'vdisk-storage-popup')}>
             {pdisk && <PDiskPopupContent data={pdisk} nodeData={nodeData} />}
@@ -265,10 +273,7 @@ export function VDiskPopup({
                 }
             >
                 <DiskHeader data={fullData} />
-                <DiskPopupLocation
-                    items={getVDiskLocationItems(data, nodeData)}
-                    title={i18n('label_vdisk')}
-                />
+                <DiskPopupLocation items={locationItems} title={i18n('label_vdisk')} />
                 {runtimeItems.length > 0 && (
                     <YDBDefinitionList items={runtimeItems} nameMaxWidth={150} />
                 )}

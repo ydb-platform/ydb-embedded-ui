@@ -1,21 +1,28 @@
 .ydb-disk-popup {
     --ydb-disk-popup-base-width: 368px;
+    --ydb-disk-popup-width-growth: 50px;
 
     overflow-y: auto;
 
-    width: min-content;
+    width: max-content;
     min-width: min(var(--ydb-disk-popup-base-width), calc(100vw - 64px));
-    max-width: min(calc(var(--ydb-disk-popup-base-width) + 50px), calc(100vw - 64px));
+    max-width: min(
+        calc(var(--ydb-disk-popup-base-width) + var(--ydb-disk-popup-width-growth)),
+        calc(100vw - 64px)
+    );
     max-height: calc(100vh - 64px);
 
     font-size: var(--g-text-body-1-font-size);
     line-height: var(--g-text-body-1-line-height);
+    overflow-wrap: anywhere;
 
     &_combined {
-        --ydb-disk-popup-base-width: 625px;
+        --ydb-disk-popup-base-width: 593px;
+        --ydb-disk-popup-width-growth: 120px;
         --ydb-pdisk-log-size-progress-width: 50px;
 
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     &__panel {
@@ -42,6 +49,28 @@
         display: flex;
         flex-direction: column;
         gap: var(--g-spacing-2);
+    }
+
+    // Only Compaction contributes to the intrinsic width; other sections fit the card.
+    &__body > :not(:has(.ydb-vdisk-popup__compaction)),
+    &__footer,
+    .g-definition-list__item:not(:has(.ydb-vdisk-popup__compaction)) {
+        contain: inline-size;
+    }
+
+    .ydb-vdisk-popup__compaction {
+        width: max-content;
+        max-width: 100%;
+    }
+
+    .g-definition-list__item:has(.ydb-vdisk-popup__compaction) {
+        .g-definition-list__term-container {
+            flex-shrink: 1;
+        }
+
+        .g-definition-list__definition {
+            flex-shrink: 0;
+        }
     }
 
     &__footer {
@@ -71,6 +100,47 @@
         flex-basis: 0;
 
         min-width: 0;
+    }
+
+    .ydb-disk-status__tooltip {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .ydb-disk-status__label {
+        min-width: 0;
+        max-width: 100%;
+        height: auto;
+        min-height: var(--_--height);
+
+        .g-label__text {
+            display: block;
+            overflow: visible;
+
+            min-width: 0;
+
+            text-align: start;
+            white-space: nowrap;
+        }
+
+        .g-label__content,
+        .g-label__value,
+        .g-label__key,
+        .g-label__separator {
+            display: inline;
+            overflow: visible;
+
+            text-overflow: clip;
+        }
+    }
+
+    .ydb-pdisk-log-size,
+    .ydb-vdisk-status__replication-progress {
+        flex-wrap: wrap;
+
+        max-width: 100%;
+
+        white-space: normal;
     }
 
     &__location {
@@ -103,6 +173,11 @@
         overflow-wrap: anywhere;
     }
 
+    &__text[tabindex],
+    &__pdisk-path {
+        cursor: pointer;
+    }
+
     &__pdisk-path {
         --entity-name-height: var(--g-text-body-1-line-height);
 
@@ -133,7 +208,7 @@
         &_combined {
             --ydb-disk-popup-base-width: 368px;
 
-            flex-direction: column;
+            grid-template-columns: minmax(0, 1fr);
         }
 
         &_combined &__panel:first-child {
