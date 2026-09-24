@@ -1,6 +1,7 @@
 import type {Locator, Page} from '@playwright/test';
 import {expect, test} from '@playwright/test';
 
+import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../../../src/containers/Storage/shared';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../src/utils/emptyDataPlaceholder';
 import {ClusterStorageTable} from '../paginatedTable/paginatedTable';
 import {Sidebar} from '../sidebar/Sidebar';
@@ -554,6 +555,49 @@ test.describe('Storage disk popup snapshots', () => {
         await enableNewStorageView(page);
         await enableStorageDisksColumn(page);
     });
+
+    for (const closeBy of ['blur', 'escape'] as const) {
+        test(`keeps the donor stack expanded until the focused popup closes by ${closeBy}`, async ({
+            page,
+        }) => {
+            await page.clock.install();
+            await page.setViewportSize({width: 1500, height: 1000});
+            await setupVDiskPageMocks(page, {withDonors: true});
+            await page.goto(VDISK_PAGE_PATH);
+
+            const storageTable = new ClusterStorageTable(page);
+            await storageTable.waitForTableData();
+            const stack = page.locator('.ydb-storage-vdisks__wrapper .ydb-stack').first();
+            await stack.locator('.ydb-stack__item_main').hover();
+            const popup = await waitForDiskPopup(page, 'Go to VDisk');
+            const panel = await getDiskPopupPanel(popup, 'VDisk', VDISK_ID);
+            const locationToggle = panel.getByRole('button', {
+                name: 'Show VDisk location details',
+                exact: true,
+            });
+            await locationToggle.focus();
+            await expect(locationToggle).toBeFocused();
+            await page.mouse.move(0, 0);
+            await page.clock.fastForward(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+
+            await expect(popup).toBeVisible();
+            await expect(stack).toHaveClass(/ydb-stack_expanded/);
+
+            const goToVDisk = panel.getByRole('link', {name: 'Go to VDisk', exact: true});
+            await goToVDisk.focus();
+            await page.clock.fastForward(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+            await expect(goToVDisk).toBeFocused();
+            await expect(stack).toHaveClass(/ydb-stack_expanded/);
+
+            if (closeBy === 'escape') {
+                await page.keyboard.press('Escape');
+            } else {
+                await page.getByRole('button', {name: 'Refresh', exact: true}).first().focus();
+            }
+            await expect(popup).toBeHidden();
+            await expect(stack).not.toHaveClass(/ydb-stack_expanded/);
+        });
+    }
 
     test('renders redesigned VDisk popup actions', async ({page}) => {
         await page.setViewportSize({width: 1500, height: 1000});

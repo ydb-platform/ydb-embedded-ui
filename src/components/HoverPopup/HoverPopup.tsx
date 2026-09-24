@@ -43,6 +43,12 @@ type HoverPopupProps = {
     keepOpenOnFocus?: boolean;
 } & Pick<PopupProps, 'placement' | 'offset'>;
 
+type PopupState = {
+    visible: boolean;
+    hovered: boolean;
+    focused: boolean;
+};
+
 export const HoverPopup = ({
     children,
     renderPopupContent,
@@ -57,9 +63,12 @@ export const HoverPopup = ({
     delayClose = DEBOUNCE_TIMEOUT,
     delayOpen = DEBOUNCE_TIMEOUT,
 }: HoverPopupProps) => {
-    const [isPopupVisible, setIsPopupVisible] = React.useState(false);
-    const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
-    const [isFocused, setIsFocused] = React.useState(false);
+    const [internalOpen, setInternalOpen] = React.useState(false);
+    const popupStateRef = React.useRef<PopupState>({
+        visible: false,
+        hovered: false,
+        focused: false,
+    });
 
     const anchor = React.useRef<HTMLSpanElement>(null);
 
@@ -79,26 +88,29 @@ export const HoverPopup = ({
         }
     });
 
+    const updatePopupState = useEventHandler((patch: Partial<PopupState>, force = false) => {
+        const nextState = {...popupStateRef.current, ...patch};
+        popupStateRef.current = nextState;
+
+        const nextOpen = nextState.visible || nextState.hovered || nextState.focused;
+        setInternalOpen(nextOpen);
+        reportOpen(nextOpen, force);
+    });
+
     const debouncedHandleShowPopup = React.useMemo(
         () =>
             debounce(() => {
-                setIsPopupVisible(true);
-                reportOpen(true);
+                updatePopupState({visible: true});
             }, delayOpen),
-        [delayOpen, reportOpen],
+        [delayOpen, updatePopupState],
     );
-
-    const hidePopup = React.useCallback(() => {
-        setIsPopupVisible(false);
-    }, []);
 
     const debouncedHandleHidePopup = React.useMemo(
         () =>
             debounce(() => {
-                hidePopup();
-                reportOpen(false);
+                updatePopupState({visible: false});
             }, delayClose),
-        [delayClose, reportOpen, hidePopup],
+        [delayClose, updatePopupState],
     );
 
     React.useEffect(() => {
@@ -111,11 +123,8 @@ export const HoverPopup = ({
     const closePopup = React.useCallback(() => {
         debouncedHandleShowPopup.cancel();
         debouncedHandleHidePopup.cancel();
-        setIsPopupVisible(false);
-        setIsPopupContentHovered(false);
-        setIsFocused(false);
-        reportOpen(false, true);
-    }, [debouncedHandleHidePopup, debouncedHandleShowPopup, reportOpen]);
+        updatePopupState({visible: false, hovered: false, focused: false}, true);
+    }, [debouncedHandleHidePopup, debouncedHandleShowPopup, updatePopupState]);
 
     const onMouseEnter = () => {
         debouncedHandleHidePopup.cancel();
@@ -129,42 +138,38 @@ export const HoverPopup = ({
 
     const onPopupMouseEnter = React.useCallback(() => {
         debouncedHandleHidePopup.cancel();
-        setIsPopupContentHovered(true);
-        reportOpen(true);
-    }, [reportOpen, debouncedHandleHidePopup]);
+        updatePopupState({hovered: true});
+    }, [debouncedHandleHidePopup, updatePopupState]);
 
     const onPopupMouseLeave = React.useCallback(() => {
-        setIsPopupContentHovered(false);
+        updatePopupState({hovered: false});
         debouncedHandleHidePopup();
-    }, [debouncedHandleHidePopup]);
+    }, [debouncedHandleHidePopup, updatePopupState]);
 
     const onPopupContextMenu = React.useCallback(() => {
-        setIsFocused(true);
-        reportOpen(true);
-    }, [reportOpen]);
+        updatePopupState({focused: true});
+    }, [updatePopupState]);
 
     const onPopupFocus = React.useCallback(() => {
         if (keepOpenOnFocus) {
             debouncedHandleHidePopup.cancel();
-            setIsFocused(true);
-            reportOpen(true);
+            updatePopupState({focused: true});
         }
-    }, [keepOpenOnFocus, debouncedHandleHidePopup, reportOpen]);
+    }, [keepOpenOnFocus, debouncedHandleHidePopup, updatePopupState]);
 
     const onPopupBlur = React.useCallback(
         (event: React.FocusEvent<HTMLDivElement>) => {
             if (!keepOpenOnFocus || !event.currentTarget.contains(event.relatedTarget)) {
-                setIsFocused(false);
+                updatePopupState({focused: false});
             }
         },
-        [keepOpenOnFocus],
+        [keepOpenOnFocus, updatePopupState],
     );
 
     const onPopupEscapeKeyDown = React.useCallback(() => {
         closePopup();
     }, [closePopup]);
 
-    const internalOpen = isPopupVisible || isPopupContentHovered || isFocused;
     const open = Boolean(internalOpen || showPopup);
 
     const anchorElement = anchorRef?.current || anchor.current;
