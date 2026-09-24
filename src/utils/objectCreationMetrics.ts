@@ -1,15 +1,15 @@
-import {isQueryErrorResponse} from './query';
+import {isQueryCancelledError, isQueryErrorResponse} from './query';
 import {isNetworkError, isResponseError} from './response';
 import {reachMetricaGoal} from './yaMetrica';
 
 type ObjectType = 'row_table' | 'column_table' | 'topic';
 type CreationGoal = 'createObject' | 'createObjectSuccess' | 'createObjectError';
 
-function getErrorParams(error: unknown): Record<string, string | number> {
+export function getObjectCreationErrorParams(error: unknown): Record<string, string | number> {
+    if (isQueryCancelledError(error)) {
+        return {errorType: 'cancelled'};
+    }
     if (isResponseError(error)) {
-        if (error.isCancelled) {
-            return {errorType: 'cancelled'};
-        }
         if (typeof error.status === 'number' && error.status > 0) {
             return {errorType: 'http', httpStatus: error.status};
         }
@@ -39,7 +39,7 @@ export function reachObjectCreationGoal(
     try {
         reachMetricaGoal(goal, {
             objectType,
-            ...(goal === 'createObjectError' ? getErrorParams(error) : {}),
+            ...(goal === 'createObjectError' ? getObjectCreationErrorParams(error) : {}),
         });
     } catch {
         // Analytics failures must not affect the creation request or its result.
