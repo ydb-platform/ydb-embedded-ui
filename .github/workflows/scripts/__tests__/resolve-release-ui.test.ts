@@ -19,7 +19,6 @@ function fixture(version = '18.1.0') {
         [`${viewer}/CHANGELOG.md?ref=${input.ydbSha}`]: file(
             `## [${version}](https://example.test)`,
         ),
-        [`${viewer}/index.html?ref=${input.ydbSha}`]: file('<html>release UI</html>'),
         [uiFile('package.json')]: file(JSON.stringify({version})),
         [uiFile('package-lock.json')]: file(
             JSON.stringify({packages: {'node_modules/@playwright/test': {version: '1.58.0'}}}),
@@ -49,6 +48,7 @@ test.each(['18.1.0', '15.6.0-hotfix.1'])(
             ui_sha: uiSha,
             playwright_version: '1.58.0',
             image_digest: imageDigest,
+            frontend_mode: 'npm-start',
         });
     },
 );

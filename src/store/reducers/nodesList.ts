@@ -27,7 +27,6 @@ const createGetNodesListSelector = createSelector(
 );
 
 export const selectNodesMap = createSelector(
-    (state: RootState) => state,
-    (_state: RootState, database?: string) => createGetNodesListSelector(database),
-    (state, selectNodesList) => prepareNodesMap(selectNodesList(state).data),
+    (state: RootState, database?: string) => createGetNodesListSelector(database)(state).data,
+    prepareNodesMap,
 );

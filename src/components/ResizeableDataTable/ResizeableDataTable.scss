@@ -1,6 +1,16 @@
 .ydb-resizeable-data-table {
     width: max-content;
 
+    .ydb-keyboard-focused-row {
+        background: var(--g-color-base-simple-hover-solid);
+    }
+
+    &.ydb-keyboard-focus-active {
+        .data-table__row:hover:not(.ydb-keyboard-focused-row) {
+            background: transparent !important;
+        }
+    }
+
     &_reserve-resize-padding {
         // padding for easier resize of the last column
         padding-right: var(--g-spacing-5);

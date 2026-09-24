@@ -1,5 +1,8 @@
 import React from 'react';
 
+import {useHistory} from 'react-router-dom';
+
+import {getNodeHostLabel, getNodeHostPath} from '../../components/NodeHostWrapper/NodeHostWrapper';
 import type {PaginatedTableData} from '../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import {
@@ -18,6 +21,8 @@ import {renderPaginatedTableErrorMessage} from '../../utils/renderPaginatedTable
 import {getNodes} from './getNodes';
 import i18n from './i18n';
 import {getRowClassName} from './shared';
+
+const ROW_HEIGHT_WITH_PDISKS = 51;
 
 interface NodesTableProps {
     path?: string;
@@ -55,6 +60,7 @@ export function NodesTable({
     initialEntitiesCount,
     onDataFetched,
 }: NodesTableProps) {
+    const history = useHistory();
     const SuccessImage = getIllustration('SuccessOperation');
 
     const useMetaProxy = useClusterWithProxy();
@@ -94,11 +100,21 @@ export function NodesTable({
 
     return (
         <ResizeablePaginatedTable
+            getKeyboardRowKey={(node) => node.NodeId}
+            getKeyboardRowLabel={getNodeHostLabel}
+            onKeyboardActivate={(node) => {
+                const nodePath = getNodeHostPath(node, database);
+                if (nodePath) {
+                    history.push(nodePath);
+                }
+            }}
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
             scrollContainerRef={scrollContainerRef}
             columns={columns}
             rowHeight={
-                columns.some((column) => column.name === NODES_COLUMNS_IDS.PDisks) ? 51 : undefined
+                columns.some(({name}) => name === NODES_COLUMNS_IDS.PDisks)
+                    ? ROW_HEIGHT_WITH_PDISKS
+                    : undefined
             }
             fetchData={getNodes}
             initialEntitiesCount={initialEntitiesCount}

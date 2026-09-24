@@ -9,6 +9,7 @@ import type {PDiskType, PreparedVDisk} from '../../../utils/disks/types';
 import {parseOptionalNonNegativeNumber} from '../../../utils/utils';
 
 export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
+    const hasWhiteboardData = data.HasWhiteboardData ?? Boolean(data.Whiteboard);
     const {Whiteboard: whiteboardVDisk = {}, PDisk, ...bscVDisk} = data;
 
     const mergedVDiskData = {
@@ -36,13 +37,14 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
     const whiteboardSlotSize = parseOptionalNonNegativeNumber(
         PDisk?.Whiteboard?.EnforcedDynamicSlotSize,
     );
-    const whiteboardSizeFields = data.Whiteboard
-        ? prepareVDiskSizeFields({
-              AvailableSize: whiteboardAvailableSize,
-              AllocatedSize: whiteboardAllocatedSize,
-              SlotSize: whiteboardSlotSize,
-          })
-        : undefined;
+    const whiteboardSizeFields =
+        hasWhiteboardData && data.Whiteboard
+            ? prepareVDiskSizeFields({
+                  AvailableSize: whiteboardAvailableSize,
+                  AllocatedSize: whiteboardAllocatedSize,
+                  SlotSize: whiteboardSlotSize,
+              })
+            : undefined;
     const WhiteboardSize = whiteboardSizeFields
         ? {
               AllocatedSize:
@@ -72,7 +74,7 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
     return {
         ...mergedVDiskData,
         ...vDiskSizeFields,
-        HasWhiteboardData: Boolean(data.Whiteboard),
+        HasWhiteboardData: hasWhiteboardData,
         ...(WhiteboardSize ? {WhiteboardSize} : {}),
         PDisk: preparedPDisk,
         Donors: preparedDonors,
@@ -83,6 +85,7 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
 }
 
 export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {}) {
+    const hasWhiteboardData = data.HasWhiteboardData ?? Boolean(data.Whiteboard);
     const {Whiteboard: whiteboardPDisk, Status: DriveStatus, ...bscPDisk} = data;
 
     const mergedPDiskData = {
@@ -110,12 +113,12 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
     const whiteboardAvailableSize = parseOptionalNonNegativeNumber(whiteboardPDisk?.AvailableSize);
     const whiteboardTotalSize = parseOptionalNonNegativeNumber(whiteboardPDisk?.TotalSize);
     const whiteboardSizeFields =
-        whiteboardPDisk === undefined
-            ? undefined
-            : preparePDiskSizeFields({
+        hasWhiteboardData && whiteboardPDisk
+            ? preparePDiskSizeFields({
                   AvailableSize: whiteboardAvailableSize,
                   TotalSize: whiteboardTotalSize,
-              });
+              })
+            : undefined;
     const WhiteboardSize = whiteboardSizeFields
         ? {
               AllocatedSize:
@@ -139,7 +142,7 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
 
     return {
         ...mergedPDiskData,
-        HasWhiteboardData: Boolean(whiteboardPDisk),
+        HasWhiteboardData: hasWhiteboardData,
         StringifiedId,
         AllocatedPercent,
         AllocatedSize,

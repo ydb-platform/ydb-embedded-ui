@@ -387,6 +387,13 @@ export class Diagnostics {
         return this.tabs.locator(`a[data-tab="${tabName}"]`);
     }
 
+    getInfoViewerValue(label: string): Locator {
+        return this.page
+            .getByTestId('info-viewer-row')
+            .filter({has: this.page.getByText(label, {exact: true})})
+            .getByTestId('info-viewer-value');
+    }
+
     async clickTab(tabName: DiagnosticsTab): Promise<void> {
         const tab = this.getTab(tabName);
         await tab.click();

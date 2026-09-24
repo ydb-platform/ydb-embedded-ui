@@ -82,7 +82,7 @@ test.describe('PaginatedTable', () => {
 
         // Scroll to middle of container
         await paginatedTable.scrollToMiddle();
-        await paginatedTable.waitForTableData();
+        await expect.poll(() => paginatedTable.getColumnValues('Host')).toContain('host-500.test');
 
         // Get data from middle rows to verify middle chunk loaded
         const rowCount = await paginatedTable.getRowCount();

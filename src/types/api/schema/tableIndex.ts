@@ -82,6 +82,7 @@ export interface TFulltextIndexAnalyzers {
     filter_length_min?: number;
     filter_length_max?: number;
     use_filter_snowball?: boolean;
+    use_filter_superlemmer?: boolean;
 }
 
 export interface TFulltextIndexColumnAnalyzers {

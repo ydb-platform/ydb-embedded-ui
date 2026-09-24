@@ -1,5 +1,4 @@
 import {execFileSync} from 'node:child_process';
-import {createHash} from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -13,11 +12,10 @@ import {
     verifyImage,
 } from '../release-e2e-report';
 
-const index = '<html>shipped UI</html>';
 const provenance = {
     ydb_sha: 'a'.repeat(40),
     image_digest: `sha256:${'b'.repeat(64)}`,
-    index_sha256: createHash('sha256').update(index).digest('hex'),
+    frontend_mode: 'npm-start',
 };
 const image = {
     Id: 'sha256:container-image',
@@ -27,17 +25,23 @@ const image = {
 const context = {shards: 8, jobs: 'success', artifacts: 'success', merge: 'success'};
 const report = {stats: {expected: 80, unexpected: 0, flaky: 0, skipped: 2}, errors: []};
 
-test('accepts the expected image and rejects mismatched image, revision or HTML', () => {
+test('accepts the expected backend image and rejects mismatched digest or revision', () => {
     const container = {Image: image.Id};
-    expect(verifyImage(provenance, container, image, index).index_verified).toBe(true);
-    expect(() => verifyImage(provenance, {Image: 'other'}, image, index)).toThrow('digest');
-    expect(() => verifyImage(provenance, container, {...image, RepoDigests: []}, index)).toThrow(
-        'digest',
+    expect(verifyImage(provenance, container, image)).toEqual({
+        image_id: image.Id,
+        image_digest: provenance.image_digest,
+    });
+    expect(() => verifyImage(provenance, {Image: 'other'}, image)).toThrow('digest');
+    expect(() => verifyImage(provenance, container, {...image, RepoDigests: []})).toThrow('digest');
+    expect(() => verifyImage(provenance, container, {...image, Config: {Labels: {}}})).toThrow(
+        'revision',
     );
-    expect(() =>
-        verifyImage(provenance, container, {...image, Config: {Labels: {}}}, index),
-    ).toThrow('revision');
-    expect(() => verifyImage(provenance, container, image, 'dev UI')).toThrow('Served');
+});
+
+test.each(['npm-start', undefined])('labels new and historical frontend modes: %s', (mode) => {
+    const result = summarize(report, {...provenance, frontend_mode: mode}, context);
+    expect(result.status).toBe('passed');
+    expect(result.summary).toContain(`Frontend: ${mode ?? 'image'}`);
 });
 
 test('a failed test or job cannot produce a passing summary', () => {
@@ -45,6 +49,32 @@ test('a failed test or job cannot produce a passing summary', () => {
         summarize({...report, stats: {...report.stats, unexpected: 3}}, provenance, context).status,
     ).toBe('failed');
     expect(summarize(report, provenance, {...context, jobs: 'failure'}).status).toBe('failed');
+});
+
+test.each([
+    [79, 1],
+    [0, 80],
+])('accepts recovered tests and reports %s passed / %s flaky', (expected, flaky) => {
+    const result = summarize(
+        {...report, stats: {...report.stats, expected, flaky}},
+        provenance,
+        context,
+    );
+    expect(result.status).toBe('passed');
+    expect(result.summary).toContain(`${expected} passed, 0 failed, ${flaky} flaky, 2 skipped`);
+});
+
+test('recovered tests cannot hide final failures, cleanup failures or incomplete reports', () => {
+    const recovered = {...report, stats: {...report.stats, flaky: 1}};
+    expect(
+        summarize({...recovered, stats: {...recovered.stats, unexpected: 1}}, provenance, context)
+            .status,
+    ).toBe('failed');
+    expect(summarize(recovered, provenance, {...context, jobs: 'failure'}).status).toBe('failed');
+    expect(summarize(recovered, provenance, {...context, shards: 7}).status).toBe('incomplete');
+    expect(summarize({...recovered, errors: ['setup failed']}, provenance, context).status).toBe(
+        'incomplete',
+    );
 });
 
 test('unavailable, empty or interrupted results remain incomplete', () => {
@@ -96,6 +126,30 @@ const readSource = (run = sourceRun, jobs = sourceJobs, runId = '123') =>
         }
         throw new Error(`Unexpected GitHub endpoint: ${endpoint}`);
     });
+
+test.each([
+    ['failure', 'failed'],
+    ['cancelled', 'incomplete'],
+])('successful tests cannot hide a %s post-cleanup job', async (conclusion, expectedStatus) => {
+    const jobs = sourceJobs.map((job, i) => ({
+        ...job,
+        conclusion: i === 1 ? conclusion : 'success',
+        steps: job.steps
+            ? [
+                  ...job.steps.map((step) => ({...step, conclusion: 'success'})),
+                  {
+                      name: 'Post Start release local-ydb',
+                      status: 'completed',
+                      conclusion: i === 1 ? conclusion : 'success',
+                  },
+              ]
+            : undefined,
+    }));
+    const source = await readSource(sourceRun, jobs);
+    expect(summarize(report, provenance, {...context, jobs: source.jobs_result}).status).toBe(
+        expectedStatus,
+    );
+});
 
 test('recovers completed failed tests while the parent run is still running', async () => {
     const source = await readSource();
@@ -196,8 +250,12 @@ describe('report files', () => {
         expect(collect().shards).toBe(6);
     });
 
-    test('CLI preserves the standard report and fails an incomplete run', () => {
-        const result = write('ui/playwright-artifacts/test-results.json', JSON.stringify(report));
+    test('CLI accepts recovered tests, preserves their report and fails an incomplete run', () => {
+        const recovered = {...report, stats: {...report.stats, expected: 79, flaky: 1}};
+        const result = write(
+            'ui/playwright-artifacts/test-results.json',
+            JSON.stringify(recovered),
+        );
         write('downloaded/release-e2e-provenance/provenance.json', JSON.stringify(provenance));
         const summary = path.join(directory, 'job-summary.md');
         const run = (shards: string) =>
@@ -217,10 +275,10 @@ describe('report files', () => {
                 },
             );
         run('8');
-        expect(fs.readFileSync(summary, 'utf8')).toContain('80 passed, 0 failed');
+        expect(fs.readFileSync(summary, 'utf8')).toContain('79 passed, 0 failed, 1 flaky');
         expect(() => run('7')).toThrow();
         expect(fs.readFileSync(summary, 'utf8')).toContain('Reports received from 7/8 shards');
-        expect(fs.readFileSync(result, 'utf8')).toBe(JSON.stringify(report));
+        expect(fs.readFileSync(result, 'utf8')).toBe(JSON.stringify(recovered));
         expect(fs.existsSync(path.join(directory, 'release-artifacts'))).toBe(false);
     });
 });

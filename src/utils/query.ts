@@ -1,3 +1,4 @@
+import {truncate} from 'lodash';
 import {z} from 'zod';
 
 import {YQLType} from '../types';
@@ -20,7 +21,13 @@ import type {
     TransactionMode,
 } from '../types/store/query';
 
+import {EMPTY_DATA_PLACEHOLDER} from './emptyDataPlaceholder';
 import {isAbortError, isAxiosResponse, isNetworkError, isResponseError} from './response';
+
+export function getQueryShortText(queryText: string | undefined) {
+    const text = queryText?.replace(/\s+/g, ' ').trim();
+    return text ? truncate(text, {length: 120, separator: ' '}) : EMPTY_DATA_PLACEHOLDER;
+}
 
 export const TRANSACTION_MODES = {
     serializable: 'serializable-read-write',

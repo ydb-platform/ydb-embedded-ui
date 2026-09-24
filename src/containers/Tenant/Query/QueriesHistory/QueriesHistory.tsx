@@ -16,6 +16,7 @@ import {
 } from '../../../../store/reducers/query/query';
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {getQueryShortText} from '../../../../utils/query';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
 import {useOpenExternalQueryInEditor} from '../hooks/useOpenExternalQueryInEditor';
@@ -116,6 +117,7 @@ function QueriesHistory({queriesHistory}: QueriesHistoryProps) {
             <TableWithControlsLayout className={b('table-with-controls')}>
                 <TableWithControlsLayout.Controls>
                     <Search
+                        tableFilter
                         value={filter}
                         onChange={onChangeFilter}
                         placeholder={i18n('field_query-text-search')}
@@ -135,6 +137,9 @@ function QueriesHistory({queriesHistory}: QueriesHistoryProps) {
                         defaultWidth={50}
                     >
                         <ResizeableDataTable
+                            onKeyboardActivate={handleShowPreview}
+                            getKeyboardRowKey={(query) => query.queryId}
+                            getKeyboardRowLabel={(query) => getQueryShortText(query.queryText)}
                             columnsWidthLSKey={QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY}
                             columns={columns}
                             data={queriesHistory.filteredHistoryQueries}

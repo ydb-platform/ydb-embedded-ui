@@ -57,6 +57,16 @@
         }
     }
 
+    .ydb-keyboard-focused-row {
+        background: var(--paginated-table-hover-color);
+    }
+
+    &.ydb-keyboard-focus-active {
+        #{$block}__row:hover:not(.ydb-keyboard-focused-row) {
+            background: transparent !important;
+        }
+    }
+
     &__head {
         z-index: 2;
         @include mixins.sticky-top();

@@ -133,6 +133,22 @@ describe('buildFulltextIndexSettingsInfo', () => {
         expect(result[0]).toEqual({label: 'Filter Snowball', value: 'Disabled'});
     });
 
+    test.each([
+        {value: true, status: 'Enabled'},
+        {value: false, status: 'Disabled'},
+    ])('displays use_filter_superlemmer=$value as $status', ({value, status}) => {
+        const result = buildFulltextIndexSettingsInfo({
+            columns: [
+                {
+                    column: 'text_column',
+                    analyzers: {use_filter_superlemmer: value},
+                },
+            ],
+        });
+
+        expect(result).toEqual([{label: 'Filter Superlemmer', value: status}]);
+    });
+
     test('displays all settings including use_filter_snowball', () => {
         const result = buildFulltextIndexSettingsInfo({
             layout: 'FLAT_RELEVANCE',

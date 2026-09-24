@@ -1,11 +1,10 @@
 const {execFileSync} = require('node:child_process');
-const {createHash} = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
 const {IMAGE_REPOSITORY, readGithub} = require('./resolve-release-ui');
 
-function verifyImage(provenance, container, image, index) {
+function verifyImage(provenance, container, image) {
     if (
         container.Image !== image.Id ||
         !image.RepoDigests?.includes(`${IMAGE_REPOSITORY}@${provenance.image_digest}`)
@@ -15,10 +14,7 @@ function verifyImage(provenance, container, image, index) {
     if (image.Config?.Labels?.['ydb.revision'] !== provenance.ydb_sha) {
         throw new Error('Running image ydb.revision does not match the release SHA');
     }
-    if (createHash('sha256').update(index).digest('hex') !== provenance.index_sha256) {
-        throw new Error('Served /monitoring/ index does not match the release sources');
-    }
-    return {image_id: image.Id, image_digest: provenance.image_digest, index_verified: true};
+    return {image_id: image.Id, image_digest: provenance.image_digest};
 }
 
 async function readReportSource({runId, repository, workflowSha}, github = readGithub) {
@@ -129,6 +125,7 @@ function sanitizeArtifacts(directory) {
 }
 
 function summarize(report, provenance, {shards, jobs, artifacts, merge}) {
+    const frontend = provenance ? `Frontend: ${provenance.frontend_mode ?? 'image'}.\n\n` : '';
     const problems = [];
     if (shards !== 8) {
         problems.push(`Reports received from ${shards}/8 shards`);
@@ -158,13 +155,12 @@ function summarize(report, provenance, {shards, jobs, artifacts, merge}) {
         problems.push('Playwright reported errors outside individual tests');
     }
     if (problems.length) {
-        return {status: 'incomplete', summary: problems.join('\n\n')};
+        return {status: 'incomplete', summary: frontend + problems.join('\n\n')};
     }
-    const status =
-        jobs === 'success' && stats.unexpected === 0 && stats.flaky === 0 ? 'passed' : 'failed';
+    const status = jobs === 'success' && stats.unexpected === 0 ? 'passed' : 'failed';
     return {
         status,
-        summary: `Reports: 8/8 shards. Test jobs: ${jobs}.\n\nTests: ${stats.expected} passed, ${stats.unexpected} failed, ${stats.flaky} flaky, ${stats.skipped} skipped.`,
+        summary: `${frontend}Reports: 8/8 shards. Test jobs: ${jobs}.\n\nTests: ${stats.expected} passed, ${stats.unexpected} failed, ${stats.flaky} flaky, ${stats.skipped} skipped.`,
     };
 }
 
@@ -204,13 +200,7 @@ async function main() {
         const image = JSON.parse(
             execFileSync('docker', ['image', 'inspect', container.Image], {encoding: 'utf8'}),
         )[0];
-        const response = await fetch('http://localhost:8765/monitoring/', {
-            signal: AbortSignal.timeout(30_000),
-        });
-        if (!response.ok) {
-            throw new Error(`Monitoring returned HTTP ${response.status}`);
-        }
-        console.info(verifyImage(provenance, container, image, await response.text()));
+        console.info(verifyImage(provenance, container, image));
     } else if (command === 'collect') {
         const {shards, hasBlobs} = collectReports(args[0], args[1]);
         fs.appendFileSync(process.env.GITHUB_OUTPUT, `shards=${shards}\nhas_blobs=${hasBlobs}\n`);

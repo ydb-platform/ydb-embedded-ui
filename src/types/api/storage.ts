@@ -106,6 +106,8 @@ export interface TGroupsStorageGroupInfo {
  * VDisk data from storage/groups handler
  */
 export interface TStorageVDisk {
+    /** Whether viewer received Whiteboard data for this disk. */
+    HasWhiteboardData?: boolean;
     VDiskId?: string;
     NodeId?: number;
     /** uint64 */
@@ -123,6 +125,8 @@ export interface TStorageVDisk {
  * PDisk data from storage/groups handler
  */
 export interface TStoragePDisk {
+    /** Whether viewer received Whiteboard data for this disk. */
+    HasWhiteboardData?: boolean;
     PDiskId?: string;
     Path?: string;
     Type?: 'hdd' | 'ssd' | 'nvme';

@@ -1,0 +1,4 @@
+{
+  "value_selected-row": "Selected row {{position}} of {{total}}: {{text}}",
+  "value_selected-row-in-group": "Group {{group}}. Selected row {{position}} of {{total}}: {{text}}"
+}

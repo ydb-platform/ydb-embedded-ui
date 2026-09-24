@@ -243,6 +243,7 @@ export const SavedQueries = () => {
                 <TableWithControlsLayout className={b('table-with-controls')}>
                     <TableWithControlsLayout.Controls>
                         <Search
+                            tableFilter
                             value={filter}
                             onChange={handleChangeFilter}
                             placeholder={i18n('field_saved-query-search')}
@@ -262,6 +263,11 @@ export const SavedQueries = () => {
                             defaultWidth={50}
                         >
                             <ResizeableDataTable
+                                onKeyboardActivate={handleShowPreview}
+                                getKeyboardRowKey={(query) => query.name}
+                                getKeyboardRowLabel={(query) =>
+                                    query.name || EMPTY_DATA_PLACEHOLDER
+                                }
                                 columnsWidthLSKey={SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY}
                                 columns={columns}
                                 data={filteredSavedQueries}
