@@ -14,7 +14,8 @@ export function getNodeMemory(
             ? (allocated ?? 0) + (caches ?? 0)
             : undefined;
 
-    const memoryUsed = anonRss ?? allocatorUsage ?? parseOptionalNonNegativeNumber(node.MemoryUsed);
+    // The backend sorts both Memory and MemoryDetailed by MemoryUsed.
+    const memoryUsed = parseOptionalNonNegativeNumber(node.MemoryUsed) ?? anonRss ?? allocatorUsage;
     const memoryLimit =
         parseOptionalNonNegativeNumber(stats?.HardLimit) ||
         parseOptionalNonNegativeNumber(node.MemoryLimit) ||

@@ -7,7 +7,7 @@ import {EMPTY_DATA_PLACEHOLDER, GIGABYTE} from '../../utils/constants';
 import {getNodeMemory} from '../../utils/memory';
 import type {FormatProgressViewerValues} from '../../utils/progress';
 import {calculateProgressStatus} from '../../utils/progress';
-import {isNumeric} from '../../utils/utils';
+import {isNumeric, parseOptionalNonNegativeNumber} from '../../utils/utils';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 
@@ -50,7 +50,7 @@ export interface MemoryProgressViewerProps {
 
 export function MemoryViewer({
     stats,
-    memoryUsed: fallbackMemoryUsed,
+    memoryUsed,
     memoryLimit: fallbackMemoryLimit,
     percents,
     formatValues,
@@ -60,7 +60,7 @@ export function MemoryViewer({
 }: MemoryProgressViewerProps) {
     const {memoryUsed: memoryUsage, memoryLimit: capacity} = getNodeMemory({
         MemoryStats: stats,
-        MemoryUsed: fallbackMemoryUsed,
+        MemoryUsed: memoryUsed,
         MemoryLimit: fallbackMemoryLimit,
     });
     const theme = useTheme();
@@ -68,22 +68,17 @@ export function MemoryViewer({
     if (memoryUsage === undefined) {
         return EMPTY_DATA_PLACEHOLDER;
     }
-    if (capacity === undefined) {
-        return formatValues(memoryUsage)[0];
-    }
-
-    let fillWidth =
-        Math.floor((parseFloat(String(memoryUsage)) / parseFloat(String(capacity))) * 100) || 0;
-    fillWidth = fillWidth > 100 ? 100 : fillWidth;
+    const fillWidth =
+        capacity === undefined ? 0 : Math.min(100, Math.floor((memoryUsage / capacity) * 100));
     let valueText: number | string | undefined = memoryUsage,
         capacityText: number | string | undefined = capacity,
         divider = '/';
-    if (percents) {
+    if (percents && capacity !== undefined) {
         valueText = fillWidth + '%';
         capacityText = '';
         divider = '';
     } else if (formatValues) {
-        [valueText, capacityText] = formatValues(Number(memoryUsage), Number(capacity));
+        [valueText, capacityText] = formatValues(memoryUsage, capacity);
     }
 
     const renderContent = () => {
@@ -95,13 +90,23 @@ export function MemoryViewer({
     };
 
     const calculateMemoryShare = (segmentSize: number) => {
-        if (!memoryUsage) {
+        if (!memoryUsage || capacity === undefined) {
             return 0;
         }
-        return (segmentSize / parseFloat(String(capacity))) * 100;
+        return (segmentSize / capacity) * 100;
     };
 
-    const memorySegments = getMemorySegments(stats, Number(memoryUsage));
+    // Without anonymous RSS, the backend's MemoryUsed excludes allocator caches.
+    const allocatorCachesIncludedInUsage =
+        parseOptionalNonNegativeNumber(memoryUsed) === undefined ||
+        parseOptionalNonNegativeNumber(stats.AnonRss) !== undefined;
+    const memorySegments = getMemorySegments(
+        {...stats, HardLimit: capacity === undefined ? undefined : String(capacity)},
+        memoryUsage,
+        {
+            allocatorCachesIncludedInUsage,
+        },
+    );
 
     const status = calculateProgressStatus({
         fillWidth,
@@ -149,9 +154,9 @@ export function MemoryViewer({
             )}
         >
             <div className={b({theme, status}, className)}>
-                <div className={b('progress-container')}>
+                <div className={capacity === undefined ? undefined : b('progress-container')}>
                     {memorySegments
-                        .filter(({isInfo}) => !isInfo)
+                        .filter(({isInfo}) => !isInfo && capacity !== undefined)
                         .map((segment) => {
                             if (segment.value < MIN_VISIBLE_MEMORY_VALUE) {
                                 return null;
