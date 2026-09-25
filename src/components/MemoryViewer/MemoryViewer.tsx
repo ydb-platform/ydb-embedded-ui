@@ -3,14 +3,15 @@ import {DefinitionList, Flex, useTheme} from '@gravity-ui/uikit';
 import type {TMemoryStats} from '../../types/api/nodes';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
-import {GIGABYTE} from '../../utils/constants';
+import {EMPTY_DATA_PLACEHOLDER, GIGABYTE} from '../../utils/constants';
+import {getNodeMemory} from '../../utils/memory';
 import type {FormatProgressViewerValues} from '../../utils/progress';
 import {calculateProgressStatus} from '../../utils/progress';
 import {isNumeric} from '../../utils/utils';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 
-import {calculateAllocatedMemory, getMemorySegments} from './utils';
+import {getMemorySegments} from './utils';
 
 import './MemoryViewer.scss';
 
@@ -38,6 +39,8 @@ const formatDetailedValues: FormatProgressViewerValues = (value, total) => {
 
 export interface MemoryProgressViewerProps {
     stats: TMemoryStats;
+    memoryUsed?: string;
+    memoryLimit?: string;
     className?: string;
     warningThreshold?: number;
     dangerThreshold?: number;
@@ -47,17 +50,28 @@ export interface MemoryProgressViewerProps {
 
 export function MemoryViewer({
     stats,
+    memoryUsed: fallbackMemoryUsed,
+    memoryLimit: fallbackMemoryLimit,
     percents,
     formatValues,
     className,
     warningThreshold,
     dangerThreshold,
 }: MemoryProgressViewerProps) {
-    const memoryUsage = stats.AnonRss ?? calculateAllocatedMemory(stats);
-
-    const capacity = stats.HardLimit;
-
+    const {memoryUsed: memoryUsage, memoryLimit: capacity} = getNodeMemory({
+        MemoryStats: stats,
+        MemoryUsed: fallbackMemoryUsed,
+        MemoryLimit: fallbackMemoryLimit,
+    });
     const theme = useTheme();
+
+    if (memoryUsage === undefined) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+    if (capacity === undefined) {
+        return formatValues(memoryUsage)[0];
+    }
+
     let fillWidth =
         Math.floor((parseFloat(String(memoryUsage)) / parseFloat(String(capacity))) * 100) || 0;
     fillWidth = fillWidth > 100 ? 100 : fillWidth;
