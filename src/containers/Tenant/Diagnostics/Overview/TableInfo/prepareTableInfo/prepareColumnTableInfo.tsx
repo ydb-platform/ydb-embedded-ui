@@ -42,7 +42,17 @@ export function prepareColumnTableGeneralInfo(columnTable: TColumnTableDescripti
     if (columnTable.TtlSettings) {
         const ttlInfo = prepareTTL(columnTable?.TtlSettings);
         if (ttlInfo) {
-            left.push(ttlInfo);
+            left.push({
+                ...ttlInfo,
+                content: (
+                    <span
+                        style={{whiteSpace: 'break-spaces', wordBreak: 'break-word'}}
+                        data-qa="table-ttl"
+                    >
+                        {ttlInfo.content}
+                    </span>
+                ),
+            });
         }
     }
 

@@ -42,6 +42,12 @@ export function SchemaObjectInfo({
     );
 
     return (
-        <YDBDefinitionList items={items} responsive className={b('list')} wrapperClassName={b()} />
+        <YDBDefinitionList
+            items={items}
+            responsive
+            className={b('list')}
+            wrapperClassName={b()}
+            dataQa="schema-object-info"
+        />
     );
 }

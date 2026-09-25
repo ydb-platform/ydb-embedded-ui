@@ -394,6 +394,10 @@ export class Diagnostics {
             .getByTestId('info-viewer-value');
     }
 
+    getSchemaObjectInfo(): Locator {
+        return this.page.getByTestId('schema-object-info');
+    }
+
     async clickTab(tabName: DiagnosticsTab): Promise<void> {
         const tab = this.getTab(tabName);
         await tab.click();

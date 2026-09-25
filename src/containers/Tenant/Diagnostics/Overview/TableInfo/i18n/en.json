@@ -26,6 +26,10 @@
   "field_compression-groups": "Compression & families",
 
   "value_ttl-config": "column: '{{columnName}}', expire after: {{expireTime}}",
+  "value_ttl-tiered-config": "column: '{{columnName}}'\n{{tiers}}",
+  "value_ttl-evict": "evict to: '{{storageName}}', after: {{expireTime}}",
+  "value_ttl-delete": "delete after: {{expireTime}}",
+  "value_ttl-unknown-action": "unknown action, after: {{expireTime}}",
   "value_partitioning-by-size-enabled": "Enabled, split size: {{size}}",
   "value_enabled": "Enabled",
   "value_disabled": "Disabled",

@@ -66,7 +66,17 @@ export function prepareRowTableGeneralInfo(
     if (TTLSettings) {
         const ttlInfo = prepareTTL(TTLSettings);
         if (ttlInfo) {
-            left.push(ttlInfo);
+            left.push({
+                ...ttlInfo,
+                content: (
+                    <span
+                        style={{whiteSpace: 'break-spaces', wordBreak: 'break-word'}}
+                        data-qa="table-ttl"
+                    >
+                        {ttlInfo.content}
+                    </span>
+                ),
+            });
         }
     }
 
