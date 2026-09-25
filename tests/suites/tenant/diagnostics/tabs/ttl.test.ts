@@ -4,11 +4,13 @@ import type {Page} from '@playwright/test';
 import type {TColumnDataLifeCycle} from '../../../../../src/types/api/schema';
 import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
+import {Diagnostics} from '../Diagnostics';
 
 const TABLE_NAME = 'ttl_column_table';
 const TABLE_PATH = `${database}/${TABLE_NAME}`;
 
 async function setupTtlMocks(page: Page, ttl: TColumnDataLifeCycle) {
+    const unexpectedRequests: string[] = [];
     await page.route('**/viewer/**', async (route) => {
         const url = new URL(route.request().url());
         switch (url.pathname) {
@@ -24,6 +26,9 @@ async function setupTtlMocks(page: Page, ttl: TColumnDataLifeCycle) {
                 return;
             case '/viewer/capabilities':
                 await route.fulfill({json: {Database: database, Capabilities: {}, Settings: {}}});
+                return;
+            case '/viewer/json/nodelist':
+                await route.fulfill({json: []});
                 return;
             case '/viewer/json/tenantinfo':
                 await route.fulfill({
@@ -50,13 +55,15 @@ async function setupTtlMocks(page: Page, ttl: TColumnDataLifeCycle) {
                 return;
             }
             default:
-                await route.fulfill({json: {}});
+                unexpectedRequests.push(`${route.request().method()} ${url.pathname}`);
+                await route.abort();
         }
     });
+    return unexpectedRequests;
 }
 
 test('shows tiered TTL from describe response in column table Info', async ({page}) => {
-    await setupTtlMocks(page, {
+    const unexpectedRequests = await setupTtlMocks(page, {
         Enabled: {
             ColumnName: 'created_at',
             ExpireAfterSeconds: 60,
@@ -77,7 +84,7 @@ test('shows tiered TTL from describe response in column table Info', async ({pag
     });
     await tenantPage.isDiagnosticsVisible();
 
-    const info = page.locator('.ydb-schema-object-info');
+    const info = new Diagnostics(page).getSchemaObjectInfo();
     await expect(info.getByText(TABLE_PATH, {exact: true})).toBeVisible();
     await expect(info.getByText('TTL for rows', {exact: true})).toBeVisible();
     await expect(
@@ -86,4 +93,5 @@ test('shows tiered TTL from describe response in column table Info', async ({pag
             {exact: true},
         ),
     ).toBeVisible();
+    expect(unexpectedRequests).toEqual([]);
 });
