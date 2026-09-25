@@ -106,11 +106,12 @@ export function getPDiskStateLabel(state?: TPDiskState): DiskStatusLabelData {
     if (!label) {
         return unknownLabel();
     }
-    const view = getLabelView(getPDiskStateDisplayState(state));
+    const {theme, icon, dangerHeavy} = getLabelView(getPDiskStateDisplayState(state));
     return {
         ...label,
-        ...view,
-        icon: state === TPDiskState.Normal ? Check : view.icon,
+        theme,
+        icon: state === TPDiskState.Normal ? Check : icon,
+        dangerHeavy,
     };
 }
 
@@ -128,8 +129,8 @@ export function getPDiskDriveLabel(status?: EDriveStatus): DiskStatusLabelData |
     if (!Object.hasOwn(labels, status)) {
         return undefined;
     }
-    const view = getLabelView(getPDiskDriveDisplayState(status));
-    let icon = view.icon;
+    const {theme, icon: defaultIcon} = getLabelView(getPDiskDriveDisplayState(status));
+    let icon = defaultIcon;
     if (status === 'ACTIVE') {
         icon = Check;
     } else if (status === 'BROKEN') {
@@ -137,7 +138,7 @@ export function getPDiskDriveLabel(status?: EDriveStatus): DiskStatusLabelData |
     }
     return {
         ...labels[status],
-        ...view,
+        theme,
         icon,
         dangerHeavy: status === 'BROKEN',
     };
@@ -165,8 +166,13 @@ export function getPDiskDecommitLabel(status?: EDecommitStatus): DiskStatusLabel
     if (!Object.hasOwn(labels, status)) {
         return undefined;
     }
-    const view = getLabelView(getPDiskDecommitDisplayState(status));
-    return {...labels[status], ...view, icon: status === 'DECOMMIT_NONE' ? Ban : view.icon};
+    const {theme, icon, dangerHeavy} = getLabelView(getPDiskDecommitDisplayState(status));
+    return {
+        ...labels[status],
+        theme,
+        icon: status === 'DECOMMIT_NONE' ? Ban : icon,
+        dangerHeavy,
+    };
 }
 
 export function getPDiskMaintenanceLabel(
@@ -196,13 +202,13 @@ export function getPDiskMaintenanceLabel(
     if (!Object.hasOwn(labels, status)) {
         return undefined;
     }
-    const view = getLabelView(getPDiskMaintenanceDisplayState(status));
+    const {theme, icon, dangerHeavy} = getLabelView(getPDiskMaintenanceDisplayState(status));
     return {
         ...labels[status],
-        ...view,
         title: i18n('label_maintenance'),
         // An explicitly unset status is shown as a normal state in the popup design.
-        theme: status === 'NOT_SET' ? 'success' : view.theme,
-        icon: status === 'NOT_SET' ? undefined : view.icon,
+        theme: status === 'NOT_SET' ? 'success' : theme,
+        icon: status === 'NOT_SET' ? undefined : icon,
+        dangerHeavy,
     };
 }

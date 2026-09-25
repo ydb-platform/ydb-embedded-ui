@@ -90,14 +90,9 @@ export const buildPDiskFooter = (
 interface PDiskPopupProps {
     data: PreparedPDisk;
     nodeData?: NodeMetadata;
-    nameMaxWidth?: number;
 }
 
-export function PDiskPopupContent({
-    data,
-    nodeData: parentNodeData,
-    nameMaxWidth = 150,
-}: PDiskPopupProps) {
+export function PDiskPopupContent({data, nodeData: parentNodeData}: PDiskPopupProps) {
     const nodeData = useNodeMetadata(data.NodeId, parentNodeData);
     const hasDeveloperUi = useHasDeveloperUi();
     const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
@@ -105,10 +100,7 @@ export function PDiskPopupContent({
     const locationItems = getDiskLocationItems(data, nodeData);
     const statusLabels = [
         {id: 'state', label: getPDiskStateLabel(data.State)},
-        {
-            id: 'drive',
-            label: getPDiskDriveLabel(data.DriveStatus ?? data.StatusV2 ?? data.Status),
-        },
+        {id: 'drive', label: getPDiskDriveLabel(data.DriveStatus)},
         {id: 'decommit', label: getPDiskDecommitLabel(data.DecommitStatus)},
         {id: 'maintenance', label: getPDiskMaintenanceLabel(data.MaintenanceStatus)},
     ];
@@ -124,11 +116,11 @@ export function PDiskPopupContent({
                 )}
             />
             <DiskPopupLocation items={locationItems} title={pDiskPopupKeyset('label_pdisk')} />
-            <YDBDefinitionList items={getPDiskRuntimeItems(data)} nameMaxWidth={nameMaxWidth} />
+            <YDBDefinitionList items={getPDiskRuntimeItems(data)} nameMaxWidth={150} />
             {storageItems.length > 0 && (
                 <React.Fragment>
                     <Divider />
-                    <YDBDefinitionList items={storageItems} nameMaxWidth={nameMaxWidth} />
+                    <YDBDefinitionList items={storageItems} nameMaxWidth={150} />
                 </React.Fragment>
             )}
         </DiskPopupPanel>

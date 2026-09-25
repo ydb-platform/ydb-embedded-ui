@@ -25,11 +25,7 @@ export function getVDiskStateLabel(data: PreparedVDisk): DiskStatusLabelData {
     const severity = state
         ? (VDISK_STATE_SEVERITY_FOR_STATE_MODE[state] ?? NOT_AVAILABLE_SEVERITY)
         : NOT_AVAILABLE_SEVERITY;
-    if (
-        !state ||
-        !Object.values(EVDiskState).includes(state) ||
-        severity === NOT_AVAILABLE_SEVERITY
-    ) {
+    if (!state || severity === NOT_AVAILABLE_SEVERITY) {
         return {
             value: i18n('value_no-data'),
             theme: 'unknown',
@@ -67,7 +63,7 @@ export function getVDiskStateLabel(data: PreparedVDisk): DiskStatusLabelData {
 
     return {
         ...labels[state],
-        ...NUMERIC_SEVERITY_TO_LABEL_VIEW[severity],
+        theme: NUMERIC_SEVERITY_TO_LABEL_VIEW[severity].theme,
         icon: state === EVDiskState.OK ? Check : calculateStateIcon(data),
         dangerHeavy: severity === SOLID_RED_SEVERITY,
     };
