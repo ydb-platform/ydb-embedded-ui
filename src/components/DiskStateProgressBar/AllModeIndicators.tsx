@@ -1,3 +1,4 @@
+import {CircleQuestionFill} from '@gravity-ui/icons';
 import {Icon, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
@@ -31,7 +32,17 @@ export function AllModeIndicators({indicators, size = 'm'}: AllModeIndicatorsPro
                 />
             </Text>
             <span className={b('all-mode-front-queues-indicator-slot')}>
-                {indicators.frontQueues && <Icon data={indicators.frontQueues} size={iconSize} />}
+                {indicators.frontQueues && (
+                    <Icon
+                        className={
+                            indicators.frontQueues === CircleQuestionFill
+                                ? b('all-mode-missing-data-indicator-icon')
+                                : undefined
+                        }
+                        data={indicators.frontQueues}
+                        size={iconSize}
+                    />
+                )}
             </span>
             <div className={b('all-mode-compaction-indicator-slot')}>
                 {indicators.compaction && (

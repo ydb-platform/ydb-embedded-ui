@@ -165,7 +165,7 @@ export function getFlagIconWithColor(flag: EFlag | undefined): IconWithColor | u
     if (!flag || flag === EFlag.Grey) {
         return {
             icon: CircleQuestionFill,
-            color: 'rgba(162, 162, 162, 1)',
+            color: 'var(--g-color-text-hint)',
         };
     }
 
@@ -230,7 +230,7 @@ export function calculateFlagPairIcon(
  * - Yellow: TriangleExclamationFill (text-warning)
  * - Orange: CircleExclamationFill (text-danger)
  * - Red: CircleXmarkFill (text-primary)
- * - Missing: CircleQuestionFill (rgba(162, 162, 162, 1))
+ * - Missing: CircleQuestionFill (text-hint)
  */
 export function calculateCompactionIcon(
     vDisk: PreparedVDisk,

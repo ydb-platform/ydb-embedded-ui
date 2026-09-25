@@ -1,5 +1,7 @@
 import React from 'react';
 
+import type {TableCountsAction} from './tableCounts';
+import {tableCountsReducer} from './tableCounts';
 import type {PaginatedTableState} from './types';
 
 // Default state for the table
@@ -18,18 +20,14 @@ interface PaginatedTableStateContextType {
 
     // Granular setters
     setSortParams: (params: PaginatedTableState['sortParams']) => void;
-    setTotalEntities: (total: number) => void;
-    setFoundEntities: (found: number) => void;
-    setIsInitialLoad: (isInitial: boolean) => void;
+    dispatchCounts: React.Dispatch<TableCountsAction>;
 }
 
 // Creating the context with default values
 export const PaginatedTableStateContext = React.createContext<PaginatedTableStateContextType>({
     tableState: defaultTableState,
     setSortParams: () => undefined,
-    setTotalEntities: () => undefined,
-    setFoundEntities: () => undefined,
-    setIsInitialLoad: () => undefined,
+    dispatchCounts: () => undefined,
 });
 
 // Provider component props
@@ -45,18 +43,17 @@ export const PaginatedTableProvider = ({
     initialState = {},
     noBatching,
 }: PaginatedTableStateProviderProps) => {
-    // Use individual state variables for each field
     const [sortParams, setSortParams] = React.useState<PaginatedTableState['sortParams']>(
         initialState.sortParams ?? defaultTableState.sortParams,
     );
-    const [totalEntities, setTotalEntities] = React.useState<number>(
-        initialState.totalEntities ?? defaultTableState.totalEntities,
-    );
-    const [foundEntities, setFoundEntities] = React.useState<number>(
-        initialState.foundEntities ?? defaultTableState.foundEntities,
-    );
-    const [isInitialLoad, setIsInitialLoad] = React.useState<boolean>(
-        initialState.isInitialLoad ?? defaultTableState.isInitialLoad,
+    const [{totalEntities, foundEntities, isInitialLoad}, dispatchCounts] = React.useReducer(
+        tableCountsReducer,
+        {
+            totalEntities: initialState.totalEntities ?? defaultTableState.totalEntities,
+            foundEntities: initialState.foundEntities ?? defaultTableState.foundEntities,
+            isInitialLoad: initialState.isInitialLoad ?? defaultTableState.isInitialLoad,
+            hasLoadedData: initialState.isInitialLoad === false,
+        },
     );
 
     // Construct tableState from individual state variables
@@ -70,15 +67,13 @@ export const PaginatedTableProvider = ({
         [sortParams, totalEntities, foundEntities, isInitialLoad],
     );
 
-    // Create the context value with the constructed tableState and direct setters
+    // Create the context value with the constructed tableState and its update functions
     const contextValue = React.useMemo(
         () => ({
             tableState,
             noBatching,
             setSortParams,
-            setTotalEntities,
-            setFoundEntities,
-            setIsInitialLoad,
+            dispatchCounts,
         }),
         [tableState, noBatching],
     );

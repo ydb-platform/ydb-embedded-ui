@@ -13,6 +13,7 @@ import type {
 } from '../../utils/disks/displayState';
 import {getDefaultDiskDisplayState} from '../../utils/disks/displayState';
 import {getDiskBarTone} from '../../utils/disks/getDiskBarTone';
+import {formatPDiskType} from '../../utils/disks/getPDiskType';
 import {getVDiskStatusIcon} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {isNumeric} from '../../utils/utils';
@@ -162,7 +163,10 @@ function getAllModeAccessibleName(data: PreparedVDisk, hasIssues: boolean | unde
     });
 }
 
-function getAccessibleName(data: PreparedVDisk, {mode, allMode, isNoData}: VDiskDisplayState) {
+function getAccessibleName(
+    data: PreparedVDisk,
+    {mode, allMode, isNoData, driveType}: VDiskDisplayState,
+) {
     if (!mode) {
         return undefined;
     }
@@ -176,13 +180,24 @@ function getAccessibleName(data: PreparedVDisk, {mode, allMode, isNoData}: VDisk
         nodeId: data.NodeId ?? noData,
     });
     if (isNoData) {
-        diskName = i18n('context_vdisk-no-whiteboard', {disk: diskName, noData});
+        const hasVDiskWhiteboardData = data.HasWhiteboardData ?? Boolean(data.VDiskId);
+        diskName = i18n(
+            mode === 'driveType' && hasVDiskWhiteboardData
+                ? 'context_pdisk-no-whiteboard'
+                : 'context_vdisk-no-whiteboard',
+            {disk: diskName, noData},
+        );
     }
 
     const {CapacityAlert, FrontQueues, SatisfactionRank, Replicated} = isNoData ? {} : data;
     const {FreshRank, LevelRank} = SatisfactionRank ?? {};
 
     switch (mode) {
+        case 'driveType':
+            return i18n('context_drive-type-accessible-name', {
+                disk: diskName,
+                driveType: formatPDiskType(driveType) || noData,
+            });
         case 'state':
             return i18n('context_state-accessible-name', {
                 disk: diskName,
@@ -230,6 +245,7 @@ export interface VDiskProps {
     popupOffset?: PopupProps['offset'];
     withOpaqueBackground?: boolean;
     getDisplayState?: VDiskDisplayStateGetter;
+    hidePDiskInPopup?: boolean;
 }
 
 export const VDisk = ({
@@ -252,6 +268,7 @@ export const VDisk = ({
     popupOffset = DEFAULT_POPUP_OFFSET,
     withOpaqueBackground,
     getDisplayState,
+    hidePDiskInPopup,
 }: VDiskProps) => {
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
@@ -285,7 +302,7 @@ export const VDisk = ({
         indicatorClassName,
         iconGroupSize,
         iconSize,
-        isDonor,
+        isDonor: mode !== 'driveType' && isDonor,
         placement: iconPlacement,
         severity,
         withIcon,
@@ -307,8 +324,9 @@ export const VDisk = ({
             />
         ) : null;
     const tone = getDiskBarTone({
+        driveType: displayState.driveType,
         severity,
-        isDonor,
+        isDonor: mode !== 'driveType' && isDonor,
         showIndicator,
         indicator: icon,
         isNoData,
@@ -319,7 +337,12 @@ export const VDisk = ({
             showPopup={showPopup}
             onShowPopup={onShowPopup}
             onHidePopup={onHidePopup}
-            renderPopupContent={({onClose}) => <VDiskPopup data={data} onClose={onClose} />}
+            renderPopupContent={({onClose}) => (
+                <VDiskPopup
+                    data={hidePDiskInPopup ? {...data, PDisk: undefined} : data}
+                    onClose={onClose}
+                />
+            )}
             keepOpenOnFocus
             offset={popupOffset}
             delayClose={delayClose}

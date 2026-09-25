@@ -16,8 +16,11 @@ const MOCK_VDISK_SLOT_ID_BASE = 200;
 export const MISSING_WHITEBOARD_VDISK_INDEX = 0;
 export const MISSING_FRONT_QUEUES_VDISK_INDEX = 1;
 export const MISSING_STATE_VDISK_INDEX = 2;
+export const MISSING_PDISK_TYPE_INDEX = 3;
+export const UNKNOWN_PDISK_TYPE_INDEX = 4;
 export const MISSING_FRESH_IMPAIRED_LEVEL_VDISK_INDEX = 5;
 export const MISSING_PDISK_STATE_INDEX = 6;
+export const MISSING_WHITEBOARD_PDISK_INDEX = 9;
 export const ALL_GREEN_VDISK_INDEX = 10;
 
 function createMockPDisk(
@@ -429,6 +432,17 @@ export function createMockStorageGroupsResponse(): StorageGroupsResponse {
     delete firstGroupVDisks[MISSING_FRESH_IMPAIRED_LEVEL_VDISK_INDEX].Whiteboard?.SatisfactionRank
         ?.FreshRank;
     delete firstGroupVDisks[MISSING_PDISK_STATE_INDEX].PDisk?.Whiteboard?.State;
+
+    const missingTypePDisk = firstGroupVDisks[MISSING_PDISK_TYPE_INDEX].PDisk;
+    if (missingTypePDisk) {
+        delete missingTypePDisk.Type;
+        delete missingTypePDisk.Whiteboard?.Category;
+    }
+
+    const unknownTypePDisk = firstGroupVDisks[UNKNOWN_PDISK_TYPE_INDEX].PDisk;
+    if (unknownTypePDisk) {
+        Object.assign(unknownTypePDisk, {Type: 'future-drive-type'});
+    }
 
     const bscOnlyPDisk = firstGroupVDisks.find(({PDisk}) => PDisk && !PDisk.Whiteboard)?.PDisk;
     if (bscOnlyPDisk) {

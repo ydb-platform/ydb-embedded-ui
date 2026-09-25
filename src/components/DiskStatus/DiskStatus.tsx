@@ -5,6 +5,7 @@ import {capitalize} from 'lodash';
 import {EFlag, isCapacityAlert} from '../../types/api/enums';
 import {getCapacityAlertTheme, normalizeCapacityAlert} from '../../utils/capacityAlerts';
 import {cn} from '../../utils/cn';
+import {formatPDiskType} from '../../utils/disks/getPDiskType';
 import {getFlagIconWithColor} from '../../utils/disks/iconCalculators';
 import {normalizeMediaType} from '../../utils/disks/normalizeMediaType';
 import {EFlagToLabelTheme} from '../EntityStatus/EntityStatus';
@@ -62,7 +63,7 @@ export function DiskTypeLabel({type, size}: {type?: string} & Pick<LabelProps, '
         return null;
     }
     const mediaType = normalizeMediaType(type);
-    const value = mediaType === 'NVME' ? 'NVMe' : mediaType;
+    const value = formatPDiskType(mediaType) ?? mediaType;
     let tooltip: string | undefined;
     switch (mediaType) {
         case 'HDD':

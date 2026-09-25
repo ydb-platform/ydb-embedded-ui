@@ -18,7 +18,10 @@ import {ClusterStorageTable} from '../paginatedTable/paginatedTable';
 import {
     ALL_GREEN_VDISK_INDEX,
     MISSING_FRONT_QUEUES_VDISK_INDEX,
+    MISSING_PDISK_TYPE_INDEX,
+    MISSING_WHITEBOARD_PDISK_INDEX,
     MISSING_WHITEBOARD_VDISK_INDEX,
+    UNKNOWN_PDISK_TYPE_INDEX,
     createMockStorageGroupsResponse,
     createMockStorageNodesResponse,
 } from './mockStorageGroups';
@@ -30,9 +33,7 @@ const STATE_ONLY_OK_VDISK_INDEX = 4;
 const LIGHT_YELLOW_VDISK_INDEX = 5;
 const RECOVERY_ERROR_VDISK_INDEX = 8;
 const PDISK_ERROR_VDISK_INDEX = 9;
-const MISSING_WHITEBOARD_PDISK_INDEX = 9;
 const TRANSPARENT_BACKGROUND = 'rgba(0, 0, 0, 0)';
-const MISSING_INDICATOR_COLOR = 'rgb(162, 162, 162)';
 const PDISK_ERROR_ICON_COLOR_TOKEN = '--g-color-base-danger-heavy';
 const RECOVERY_ERROR_ICON_COLOR_TOKEN = '--g-color-text-primary';
 
@@ -658,6 +659,140 @@ test('wheel over disk popups scrolls the page', async ({page}) => {
     }
 });
 
+test.describe('Drive type - groups expert mode', () => {
+    for (const theme of ['light', 'dark']) {
+        test(`shows drive types and preserves group-only selection in ${theme} theme`, async ({
+            page,
+        }, testInfo) => {
+            await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+            await page.addInitScript(() => {
+                localStorage.setItem('enableStorageExpertMode', 'true');
+                localStorage.setItem('storageExpertMode', 'true');
+                localStorage.setItem(
+                    'storageGroupsSelectedColumns',
+                    JSON.stringify([
+                        {id: 'GroupId', selected: true},
+                        {id: 'VDisksPDisks', selected: true},
+                    ]),
+                );
+            });
+            await page.setViewportSize({width: 1900, height: 1000});
+            await setupVDiskColoringMocks(page);
+            await gotoStoragePage(page, VDisksGroupBy.State);
+            await hideFloatingPopups(page);
+            await expectStorageGroupRowsReady(page);
+
+            const panel = page.locator('.ydb-storage-expert-mode-panel');
+            const selectors = panel.getByRole('radio', {name: 'Drive type', exact: true});
+            await expect(selectors).toHaveCount(2);
+            const row = page.locator('.ydb-paginated-table__row').filter({
+                has: page.getByRole('link', {name: '9000000000', exact: true}),
+            });
+            await expect(row).toBeVisible();
+            await expect(getVDiskItems(row).nth(0).getByRole('link')).toHaveText('N/D');
+            await expect(
+                row.locator('.ydb-storage-disks__pdisk-item').nth(9).getByRole('link'),
+            ).toHaveText('N/D');
+            await selectors.first().check();
+            await selectors.last().check();
+            await expect(page).toHaveURL(/vdisksGroupBy=DriveType/);
+            await expect(page).toHaveURL(/pdisksGroupBy=DriveType/);
+
+            for (const [index, type, color] of [
+                [1, 'SSD', 'misc-medium'],
+                [2, 'HDD', 'utility-light'],
+                [6, 'NVMe', 'info-light'],
+            ] as const) {
+                const vDisk = getVDiskItems(row).nth(index).getByRole('link');
+                const pDisk = row
+                    .locator('.ydb-storage-disks__pdisk-item')
+                    .nth(index)
+                    .getByRole('link');
+                for (const disk of [vDisk, pDisk]) {
+                    await expect(disk).toHaveAccessibleName(new RegExp(`Drive type: ${type}\\.$`));
+                    await expect(disk).toHaveText(type);
+                    const bar = disk.getByRole('meter');
+                    await expect(bar).toHaveCSS(
+                        'background-color',
+                        await resolveThemeColor(page, `--g-color-base-${color}`),
+                    );
+                    await expect(getVDiskFillBar(bar)).toHaveCount(0);
+                }
+            }
+            await expect(
+                row.locator('.ydb-storage-disks__pdisk-item').nth(0).getByRole('link'),
+            ).toHaveText('NVMe');
+            for (const index of [MISSING_PDISK_TYPE_INDEX, UNKNOWN_PDISK_TYPE_INDEX]) {
+                for (const disk of [
+                    getVDiskItems(row).nth(index).getByRole('link'),
+                    row.locator('.ydb-storage-disks__pdisk-item').nth(index).getByRole('link'),
+                ]) {
+                    await expect(disk).toHaveAccessibleName(/Drive type: N\/D\.$/);
+                    await expect(disk.locator('.g-icon')).toHaveCount(1);
+                    await expect(disk).not.toContainText('future-drive-type');
+                }
+            }
+            const donor = page.getByRole('link', {
+                name: 'Donor VDisk 9000000001-1-0-0-100 on node 7100. Drive type: SSD.',
+                exact: true,
+            });
+            await expect(donor).toHaveText('SSD');
+            await expect(donor.getByRole('meter')).not.toHaveClass(/_striped/);
+            for (const disk of [
+                getVDiskItems(row).nth(0).getByRole('link'),
+                getVDiskItems(row).nth(9).getByRole('link'),
+                row.locator('.ydb-storage-disks__pdisk-item').nth(9).getByRole('link'),
+                page.getByRole('link', {
+                    name: 'Donor VDisk 9000000001-1-0-0-109 on node 7109. PDisk Whiteboard: N/D. Drive type: N/D.',
+                    exact: true,
+                }),
+            ]) {
+                await expect(disk).toHaveText('N/D');
+                await expect(disk).toHaveAccessibleName(/Whiteboard: N\/D\. Drive type: N\/D\.$/);
+                await expect(disk.locator('.g-icon')).toHaveCount(0);
+                await expect(disk.getByRole('meter')).toHaveClass(/storage-disk-progress-bar_grey/);
+            }
+            await expectStorageRowsScreenshot(page, `drive-type-${theme}.png`);
+            await page.screenshot({path: testInfo.outputPath(`drive-type-${theme}-page.png`)});
+
+            await page.reload();
+            await expect(selectors.first()).toBeChecked();
+            await expect(selectors.last()).toBeChecked();
+            await page.route('**/viewer/json/nodes?*', (route) =>
+                route.fulfill({json: createMockStorageNodesResponse()}),
+            );
+            await page
+                .getByTestId('storage-type-filter')
+                .getByRole('radio', {name: 'Nodes', exact: true})
+                .check();
+            await expect(panel.getByRole('radio', {name: 'Drive type', exact: true})).toHaveCount(
+                0,
+            );
+            await expect(page.locator('.storage-disk-progress-bar_mode-drivetype')).toHaveCount(0);
+            await page
+                .getByTestId('storage-type-filter')
+                .getByRole('radio', {name: 'Groups', exact: true})
+                .check();
+            await expect(selectors.first()).toBeChecked();
+            await expect(selectors.last()).toBeChecked();
+            await page.goto(
+                `${storagePage}?database=${encodeURIComponent(DATABASE)}&type=groups&storageExpertMode=true`,
+            );
+            await expect(selectors.first()).toBeChecked();
+            await expect(selectors.last()).toBeChecked();
+        });
+    }
+
+    test('does not apply Drive type outside expert mode', async ({page}) => {
+        await page.addInitScript(() =>
+            localStorage.setItem('storagePDisksGroupBy', JSON.stringify('DriveType')),
+        );
+        await preparePage(page, VDisksGroupBy.DriveType, false);
+        await expect(page.locator('.ydb-storage-expert-mode-panel')).toHaveCount(0);
+        await expect(page.locator('.storage-disk-progress-bar_mode-drivetype')).toHaveCount(0);
+    });
+});
+
 test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 60_000});
 
@@ -855,6 +990,244 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         );
     });
 
+    test('preserves refreshed group counts when resizing a column during a partial refresh', async ({
+        page,
+    }) => {
+        await page.setViewportSize({width: 1500, height: 1000});
+        await enableExpertMode(page, VDisksGroupBy.State, false);
+        await page.addInitScript(() => {
+            localStorage.setItem('auto-refresh-interval', '15000');
+            localStorage.setItem(
+                'storageGroupsSelectedColumns',
+                JSON.stringify([{id: 'GroupId', selected: true}]),
+            );
+        });
+        await setupVDiskColoringMocks(page);
+        const response = createMockStorageGroupsResponse();
+        const groups = Array.from({length: 55}, (_, index) => ({
+            ...response.StorageGroups?.[0],
+            GroupId: String(9000000000 + index),
+        }));
+        const requestsByOffset = new Map<number, number>();
+        const delayedRequest = Promise.withResolvers<void>();
+        const delayedResponse = Promise.withResolvers<void>();
+        await page.route('**/storage/groups?*', async (route) => {
+            const url = new URL(route.request().url());
+            const offset = Number(url.searchParams.get('offset') || 0);
+            const limit = Number(url.searchParams.get('limit') || groups.length);
+            const requestCount = (requestsByOffset.get(offset) || 0) + 1;
+            requestsByOffset.set(offset, requestCount);
+            const count = requestCount === 1 ? 45 : 55;
+            if (offset > 0 && requestCount > 1) {
+                delayedRequest.resolve();
+                await delayedResponse.promise;
+            }
+            await route.fulfill({
+                json: {
+                    ...response,
+                    TotalGroups: count,
+                    FoundGroups: count,
+                    StorageGroups: groups.slice(0, count).slice(offset, offset + limit),
+                },
+            });
+        });
+
+        try {
+            await gotoStoragePage(page, VDisksGroupBy.State, false);
+            const table = new ClusterStorageTable(page);
+            await expect.poll(() => table.getCount()).toBe(45);
+            await expect(page.getByRole('link', {name: '9000000044', exact: true})).toBeAttached();
+            await expect.poll(() => table.getCount(), {timeout: 25000}).toBe(55);
+            await delayedRequest.promise;
+
+            const header = page
+                .locator('.ydb-paginated-table__head-cell-wrapper')
+                .filter({hasText: 'Group ID'});
+            const initialWidth = await header.evaluate(
+                (element) => element.getBoundingClientRect().width,
+            );
+            const handle = await header
+                .locator('.ydb-paginated-table__resize-handler')
+                .boundingBox();
+            if (!handle) {
+                throw new Error('Group ID resize handle is not visible');
+            }
+            const x = handle.x + handle.width / 2;
+            const y = handle.y + handle.height / 2;
+            await page.mouse.move(x, y);
+            await page.mouse.down();
+            try {
+                await page.mouse.move(x + 80, y, {steps: 5});
+                await expect
+                    .poll(() => header.evaluate((element) => element.getBoundingClientRect().width))
+                    .toBeGreaterThan(initialWidth + 40);
+            } finally {
+                await page.mouse.up();
+            }
+            await expect.poll(() => table.getCount()).toBe(55);
+        } finally {
+            delayedResponse.resolve();
+        }
+    });
+
+    test('preserves group counts and pagination after returning to a cached table', async ({
+        page,
+    }) => {
+        await page.setViewportSize({width: 1500, height: 1000});
+        await enableExpertMode(page, VDisksGroupBy.State, false);
+        await page.addInitScript(() => {
+            localStorage.setItem('auto-refresh-interval', '0');
+            localStorage.setItem(
+                'storageGroupsSelectedColumns',
+                JSON.stringify([{id: 'GroupId', selected: true}]),
+            );
+        });
+        await setupVDiskColoringMocks(page);
+        await page.route('**/viewer/json/nodes?*', (route) =>
+            route.fulfill({json: createMockStorageNodesResponse()}),
+        );
+
+        const response = createMockStorageGroupsResponse();
+        const groups = Array.from({length: 245}, (_, index) => ({
+            ...response.StorageGroups?.[0],
+            GroupId: String(9000000000 + index),
+        }));
+        const requestedOffsets: number[] = [];
+        const columnsResponse = Promise.withResolvers<void>();
+        await page.route('**/storage/groups?*', async (route) => {
+            const url = new URL(route.request().url());
+            const offset = Number(url.searchParams.get('offset') || 0);
+            const limit = Number(url.searchParams.get('limit') || groups.length);
+            const filter = url.searchParams.get('filter') || '';
+            const filteredGroups = groups.filter((group) => group.GroupId.includes(filter));
+            requestedOffsets.push(offset);
+            if (url.searchParams.get('fields_required')?.split(',').includes('Erasure')) {
+                await columnsResponse.promise;
+            }
+            return route.fulfill({
+                json: {
+                    ...response,
+                    TotalGroups: groups.length,
+                    FoundGroups: filteredGroups.length,
+                    StorageGroups: filteredGroups.slice(offset, offset + limit),
+                },
+            });
+        });
+
+        await gotoStoragePage(page, VDisksGroupBy.State, false);
+        const table = new ClusterStorageTable(page);
+        await expect.poll(() => table.getCount()).toBe(245);
+        await table.scrollToBottom();
+        await expect(page.getByRole('link', {name: '9000000244', exact: true})).toBeVisible();
+        const initialRequests = requestedOffsets.length;
+
+        const typeFilter = page.getByTestId('storage-type-filter');
+        await typeFilter.getByRole('radio', {name: 'Nodes', exact: true}).check();
+        await expect(page.getByRole('cell', {name: '7000', exact: true})).toBeVisible();
+        await typeFilter.getByRole('radio', {name: 'Groups', exact: true}).check();
+
+        await expect.poll(() => table.getCount()).toBe(245);
+        await table.scrollToBottom();
+        await expect(page.getByRole('link', {name: '9000000244', exact: true})).toBeVisible();
+        expect(requestedOffsets).toHaveLength(initialRequests);
+
+        const scrollContainer = page.locator('.ydb-cluster');
+        const scrollTop = await scrollContainer.evaluate((element) => element.scrollTop);
+        const tableElement = page.locator('.ydb-paginated-table__table');
+        const tableHeight = await tableElement.evaluate((element) => element.clientHeight);
+        const columnsRequest = page.waitForRequest((request) => {
+            const url = new URL(request.url());
+            return (
+                url.pathname.endsWith('/storage/groups') &&
+                Boolean(url.searchParams.get('fields_required')?.split(',').includes('Erasure'))
+            );
+        });
+        try {
+            await table.getControls().openColumnSetup();
+            await table.getControls().setColumnChecked('Erasure');
+            await table.getControls().closeColumnSetup();
+            await columnsRequest;
+            expect(await tableElement.evaluate((element) => element.clientHeight)).toBe(
+                tableHeight,
+            );
+            expect(await scrollContainer.evaluate((element) => element.scrollTop)).toBeCloseTo(
+                scrollTop,
+                0,
+            );
+        } finally {
+            columnsResponse.resolve();
+        }
+        await expect.poll(() => table.getCount()).toBe(245);
+        await expect(page.getByRole('link', {name: '9000000244', exact: true})).toBeVisible();
+
+        await table.search('9000000244');
+        await expect.poll(() => table.getCount()).toBe(1);
+        await expect(page.getByRole('link', {name: '9000000244', exact: true})).toBeVisible();
+
+        await table.search('missing');
+        await expect(await table.getEmptyDataMessageLocator()).toBeVisible();
+        await expect.poll(() => table.getCount()).toBe(0);
+
+        await table.search('');
+        await expect.poll(() => table.getCount()).toBe(245);
+        await table.scrollToBottom();
+        await expect(page.getByRole('link', {name: '9000000244', exact: true})).toBeVisible();
+    });
+
+    test('renders loaded node rows at their final height on initial and cached loads', async ({
+        page,
+    }) => {
+        await page.addInitScript(() => {
+            const heights: number[] = [];
+            Object.assign(window, {observedNodeRowHeights: heights});
+            const observer = new MutationObserver(() => {
+                const row = Array.from(
+                    document.querySelectorAll<HTMLTableRowElement>('.ydb-paginated-table__row'),
+                ).find((element) =>
+                    Array.from(element.cells).some((cell) => cell.textContent === '7000'),
+                );
+                if (!row?.querySelector('.pdisk-storage__vdisks-item')) {
+                    return;
+                }
+                const height = row.getBoundingClientRect().height;
+                if (height > 0 && height !== heights[heights.length - 1]) {
+                    heights.push(height);
+                }
+            });
+            observer.observe(document, {
+                subtree: true,
+                childList: true,
+                attributes: true,
+                attributeFilter: ['style', 'class'],
+            });
+        });
+        const getObservedHeights = () =>
+            page.evaluate(
+                () =>
+                    (window as typeof window & {observedNodeRowHeights: number[]})
+                        .observedNodeRowHeights,
+            );
+
+        await prepareNodesPage(page, VDisksGroupBy.All, PDisksGroupBy.Space);
+        const row = page.locator('.ydb-paginated-table__row').filter({
+            has: page.getByText('7000', {exact: true}),
+        });
+        await expect(row).toHaveCSS('height', '155px');
+        expect(await getObservedHeights()).toEqual([155]);
+
+        const typeFilter = page.getByTestId('storage-type-filter');
+        await typeFilter.getByRole('radio', {name: 'Groups', exact: true}).check();
+        await expect(page.getByRole('link', {name: '9000000000', exact: true})).toBeVisible();
+        await page.evaluate(() => {
+            (
+                window as typeof window & {observedNodeRowHeights: number[]}
+            ).observedNodeRowHeights.length = 0;
+        });
+        await typeFilter.getByRole('radio', {name: 'Nodes', exact: true}).check();
+        await expect(row).toHaveCSS('height', '155px');
+        expect(await getObservedHeights()).toEqual([155]);
+    });
+
     test('keeps node PDisk layout stable across hover and Expert mode changes', async ({page}) => {
         await prepareNodesPage(page, VDisksGroupBy.State, PDisksGroupBy.All);
 
@@ -977,7 +1350,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
         const panel = page.locator('.ydb-storage-expert-mode-panel');
         for (const [index, modes] of [VDISK_GROUP_BY_MODES, PDISK_GROUP_BY_MODES].entries()) {
             const legendRow = panel.locator(':scope > .g-flex').nth(index);
-            for (const mode of modes) {
+            for (const mode of [...modes, {value: VDisksGroupBy.DriveType}]) {
                 await legendRow.locator(`input[type="radio"][value="${mode.value}"]`).check();
                 const noData = legendRow.locator('.g-label').filter({hasText: /^No data$/});
                 if (mode.value === VDisksGroupBy.All) {
@@ -1201,6 +1574,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             page,
         }) => {
             await preparePage(page, VDisksGroupBy.All);
+            const missingIndicatorColor = await resolveThemeColor(page, '--g-color-text-hint');
 
             const ordinaryItems = getVDiskItems(getStorageGroupRow(page, 0));
             const stateOnlyOk = getVDiskProgressBar(ordinaryItems.nth(STATE_ONLY_OK_VDISK_INDEX));
@@ -1284,7 +1658,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(missingCapacityAlertSlot).toHaveCSS('width', '16px');
             const missingCapacityAlertIcon = missingCapacityAlertSlot.locator('.g-icon');
             await expect(missingCapacityAlertIcon).toBeVisible();
-            await expect(missingCapacityAlertIcon).toHaveCSS('color', MISSING_INDICATOR_COLOR);
+            await expect(missingCapacityAlertIcon).toHaveCSS('color', missingIndicatorColor);
 
             await expect(frontQueuesYellowSlot).toHaveCount(1);
             await expect(frontQueuesYellowSlot).toHaveCSS('width', '12px');
@@ -1306,7 +1680,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(missingFrontQueuesSlot).toHaveCount(1);
             const missingFrontQueuesIcon = missingFrontQueuesSlot.locator('.g-icon');
             await expect(missingFrontQueuesIcon).toBeVisible();
-            await expect(missingFrontQueuesIcon).toHaveCSS('color', expectedTextColor);
+            await expect(missingFrontQueuesIcon).toHaveCSS('color', missingIndicatorColor);
 
             await expect(lightYellowFrontQueuesSlot).toHaveCount(1);
             const lightYellowFrontQueuesIcon = lightYellowFrontQueuesSlot.locator('.g-icon');
@@ -1319,7 +1693,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             await expect(lightYellowCompactionIcons).toHaveCount(2);
             await expect(lightYellowCompactionIcons.nth(0)).toHaveCSS(
                 'color',
-                MISSING_INDICATOR_COLOR,
+                missingIndicatorColor,
             );
             await expect(lightYellowCompactionIcons.nth(1)).toHaveCSS('color', expectedTextColor);
 
@@ -1365,7 +1739,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 [0, 1].map((index) =>
                     expect(missingCompactionIcons.nth(index)).toHaveCSS(
                         'color',
-                        MISSING_INDICATOR_COLOR,
+                        missingIndicatorColor,
                     ),
                 ),
             );
@@ -1504,8 +1878,8 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
                 getVDiskItems(getStorageGroupRow(page, 0)).nth(MISSING_WHITEBOARD_VDISK_INDEX),
             );
             const [normalColor, highlightedColor] = await Promise.all([
-                resolveThemeColor(page, '--g-color-base-neutral-light'),
-                resolveThemeColor(page, '--g-color-base-neutral-light-hover'),
+                resolveThemeColor(page, '--g-color-base-neutral-medium'),
+                resolveThemeColor(page, '--g-color-base-neutral-medium-hover'),
             ]);
 
             await expectAllocationFill(noWhiteboardVDisk, 10);

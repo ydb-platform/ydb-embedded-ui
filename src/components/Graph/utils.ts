@@ -3,7 +3,7 @@ import type {TBlock} from '@gravity-ui/graph';
 import type {ExplainPlanNodeData} from '../../store/reducers/query/types';
 
 import type {AbstractGraphColorsConfig} from './colorsConfig';
-import type {Data, TreeConnection} from './types';
+import type {Data, EdgeResult, TreeConnection} from './types';
 
 const BLOCK_TOP_PADDING = 8;
 const BLOCK_LINE_HEIGHT = 16;
@@ -109,4 +109,12 @@ export function parseCustomPropertyValue<T extends AbstractGraphColorsConfig>(
     }
 
     return parsed as T;
+}
+
+// Identifies the geometry the camera is aimed at: block placement and the edges between them.
+export function getLayoutSignature(blocks: TBlock[], edges: EdgeResult[]) {
+    return JSON.stringify([
+        blocks.map(({id, x, y, width, height}) => [id, x, y, width, height]),
+        edges.map(({sourceBlockId, targetBlockId}) => [sourceBlockId, targetBlockId]),
+    ]);
 }

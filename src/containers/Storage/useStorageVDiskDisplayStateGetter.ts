@@ -16,6 +16,7 @@ import type {
     VDiskDisplayStateGetter,
 } from '../../utils/disks/displayState';
 import {getDefaultDiskDisplayState} from '../../utils/disks/displayState';
+import {getDriveTypeDisplayState} from '../../utils/disks/driveType';
 import {getIconCalculator} from '../../utils/disks/getIconStrategy';
 import {getSeverityCalculator} from '../../utils/disks/getSeverityStrategy';
 import type {VDisksGroupByValue} from '../../utils/disks/groupBy';
@@ -170,8 +171,17 @@ function getExpertVDiskDisplayState({
     vDisk,
     vdisksGroupBy,
 }: GetExpertVDiskDisplayStateParams): VDiskDisplayState {
+    const hasWhiteboardData = vDisk.HasWhiteboardData ?? Boolean(vDisk.VDiskId);
+    if (vdisksGroupBy === VDisksGroupBy.DriveType) {
+        return {
+            ...getDriveTypeDisplayState(hasWhiteboardData ? vDisk.PDisk : undefined),
+            striped: false,
+            iconPlacement: 'inline',
+        };
+    }
+
     const mode = getMode(vdisksGroupBy);
-    if (!(vDisk.HasWhiteboardData ?? Boolean(vDisk.VDiskId))) {
+    if (!hasWhiteboardData) {
         return getMissingVDiskDisplayState(vDisk, isDonor, mode, selectionScope !== 'nodes-vdisks');
     }
 

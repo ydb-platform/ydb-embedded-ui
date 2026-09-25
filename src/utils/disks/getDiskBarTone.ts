@@ -5,9 +5,10 @@ import {EFlag} from '../../types/api/enums';
 import {DONOR_COLOR, NOT_AVAILABLE_SEVERITY} from './constants';
 import type {DiskIndicatorValue} from './displayState';
 import {getDisplaySeverityColor} from './helpers';
-import type {DiskBarTone} from './types';
+import type {DiskBarTone, PDiskType} from './types';
 
 interface GetDiskBarToneParams {
+    driveType?: PDiskType;
     severity?: number;
     isDonor?: boolean;
     showIndicator?: boolean;
@@ -24,12 +25,17 @@ function hasMissingDataIndicator(indicator: DiskIndicatorValue | undefined) {
 }
 
 export function getDiskBarTone({
+    driveType,
     severity,
     isDonor,
     showIndicator,
     indicator,
     isNoData,
 }: GetDiskBarToneParams): DiskBarTone {
+    if (driveType) {
+        return driveType;
+    }
+
     if (isDonor) {
         return DONOR_COLOR;
     }

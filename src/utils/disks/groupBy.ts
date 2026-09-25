@@ -3,6 +3,7 @@ export const VDisksGroupBy = {
     Space: 'Space',
     FrontQueues: 'FrontQueues',
     Compaction: 'Compaction',
+    DriveType: 'DriveType',
     All: 'All',
 } as const;
 
