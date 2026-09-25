@@ -163,6 +163,28 @@ function getAllModeAccessibleName(data: PreparedVDisk, hasIssues: boolean | unde
     });
 }
 
+function getAccessibleDiskName(
+    data: PreparedVDisk,
+    {mode, isNoData}: Pick<VDiskDisplayState, 'mode' | 'isNoData'>,
+) {
+    const noData = i18n('context_no-data');
+    const diskName = i18n(data.DonorMode ? 'context_donor-vdisk' : 'context_vdisk', {
+        vdiskId: data.StringifiedId || noData,
+        nodeId: data.NodeId ?? noData,
+    });
+    if (!isNoData) {
+        return diskName;
+    }
+
+    const hasVDiskWhiteboardData = data.HasWhiteboardData ?? Boolean(data.VDiskId);
+    return i18n(
+        mode === 'driveType' && hasVDiskWhiteboardData
+            ? 'context_pdisk-no-whiteboard'
+            : 'context_vdisk-no-whiteboard',
+        {disk: diskName, noData},
+    );
+}
+
 function getAccessibleName(
     data: PreparedVDisk,
     {mode, allMode, isNoData, driveType}: VDiskDisplayState,
@@ -175,20 +197,7 @@ function getAccessibleName(
     }
 
     const noData = i18n('context_no-data');
-    let diskName = i18n(data.DonorMode ? 'context_donor-vdisk' : 'context_vdisk', {
-        vdiskId: data.StringifiedId || noData,
-        nodeId: data.NodeId ?? noData,
-    });
-    if (isNoData) {
-        const hasVDiskWhiteboardData = data.HasWhiteboardData ?? Boolean(data.VDiskId);
-        diskName = i18n(
-            mode === 'driveType' && hasVDiskWhiteboardData
-                ? 'context_pdisk-no-whiteboard'
-                : 'context_vdisk-no-whiteboard',
-            {disk: diskName, noData},
-        );
-    }
-
+    const diskName = getAccessibleDiskName(data, {mode, isNoData});
     const {CapacityAlert, FrontQueues, SatisfactionRank, Replicated} = isNoData ? {} : data;
     const {FreshRank, LevelRank} = SatisfactionRank ?? {};
 
