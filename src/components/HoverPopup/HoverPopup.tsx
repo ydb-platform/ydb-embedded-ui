@@ -217,9 +217,8 @@ export const HoverPopup = ({
 
     const anchorElement = anchorRef?.current || anchor.current;
     const closeWhenAnchorHidden = React.useCallback(() => {
-        const {visible, hovered, focused} = popupStateRef.current;
-        // A paired disk can be open through showPopup without owning the active interaction.
-        if (visible || hovered || focused) {
+        // Release focus immediately; ordinary hover keeps its delayed close.
+        if (popupStateRef.current.focused) {
             closePopup();
         }
     }, [closePopup]);
