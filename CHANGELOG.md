@@ -1,5 +1,19 @@
 # Changelog
 
+## [22.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.2.0...v22.3.0) (2026-09-25)
+
+
+### Features
+
+* show running/queued query counts for resource pool ([#4377](https://github.com/ydb-platform/ydb-embedded-ui/issues/4377)) ([02ac0d0](https://github.com/ydb-platform/ydb-embedded-ui/commit/02ac0d07a7f4d8df43eaf24f529e26b43c944197))
+* **StreamingQuery:** add Computation Graph tab ([#4314](https://github.com/ydb-platform/ydb-embedded-ui/issues/4314)) ([f570252](https://github.com/ydb-platform/ydb-embedded-ui/commit/f57025262ab7353dc79fc9598060d7479be095cd))
+
+
+### Bug Fixes
+
+* reload data after login ([#4416](https://github.com/ydb-platform/ydb-embedded-ui/issues/4416)) ([22af11b](https://github.com/ydb-platform/ydb-embedded-ui/commit/22af11b1b1ea40f76dc6c43ea787e994e5d6368f))
+* show tiered ttl settings in column table info ([#4413](https://github.com/ydb-platform/ydb-embedded-ui/issues/4413)) ([7d1c5a4](https://github.com/ydb-platform/ydb-embedded-ui/commit/7d1c5a4b0e435610d85afbf122c514a0198db397))
+
 ## [22.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.1.0...v22.2.0) (2026-09-24)
 
 
