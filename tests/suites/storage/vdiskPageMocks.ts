@@ -447,6 +447,7 @@ async function setupStorageNodesMock(
     page: Page,
     {
         withCapacityMetrics = false,
+        rack,
         whiteboardAllocatedSize,
         whiteboardAvailableSize,
         whiteboardSlotSize,
@@ -455,6 +456,7 @@ async function setupStorageNodesMock(
     }: Pick<
         SetupVDiskPageMocksOptions,
         | 'withCapacityMetrics'
+        | 'rack'
         | 'whiteboardAllocatedSize'
         | 'whiteboardAvailableSize'
         | 'whiteboardSlotSize'
@@ -476,6 +478,7 @@ async function setupStorageNodesMock(
                             NodeId: Number(NODE_ID),
                             Host: 'storage-node-07.ydb',
                             Roles: ['Storage'],
+                            Location: {Rack: rack},
                         },
                         PDisks: [
                             createPDiskWhiteboardData(withCapacityMetrics, {

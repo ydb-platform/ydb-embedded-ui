@@ -4,6 +4,7 @@ import type {PopupPlacement, PopupProps} from '@gravity-ui/uikit';
 
 import {useVDiskPagePath} from '../../routes';
 import {EFlag, isCapacityAlert} from '../../types/api/enums';
+import type {NodeMetadata} from '../../types/store/nodesList';
 import {cn} from '../../utils/cn';
 import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
 import type {
@@ -236,6 +237,7 @@ function getAccessibleName(
 
 export interface VDiskProps {
     data?: PreparedVDisk;
+    nodeData?: NodeMetadata;
     compact?: boolean;
     allModeSize?: 's' | 'm';
     inactive?: boolean;
@@ -259,6 +261,7 @@ export interface VDiskProps {
 
 export const VDisk = ({
     data = {},
+    nodeData,
     compact,
     allModeSize,
     inactive,
@@ -349,6 +352,7 @@ export const VDisk = ({
             renderPopupContent={({onClose}) => (
                 <VDiskPopup
                     data={hidePDiskInPopup ? {...data, PDisk: undefined} : data}
+                    nodeData={nodeData}
                     onClose={onClose}
                 />
             )}

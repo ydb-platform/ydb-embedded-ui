@@ -1085,6 +1085,7 @@ test.describe('Blob storage capacity metrics integration', () => {
         await enableStorageNodesCapacityColumns(page);
         const capacityFixture = {
             withCapacityMetrics: true,
+            rack: 'Rack-from-node-response',
             allocatedSize: '1000000000',
             availableSize: '3000000000',
             whiteboardAllocatedSize: '1000000000',
@@ -1104,6 +1105,7 @@ test.describe('Blob storage capacity metrics integration', () => {
         const expectedPopupPDiskUsage = '70.50%';
         await setupVDiskPageMocks(page, capacityFixture);
         await setupPDiskInfoMock(page, capacityFixture);
+        await setupDiskNodeMetadataMock(page, {rack: 'Rack-from-nodelist'});
 
         await page.goto(VDISK_PAGE_PATH);
 
@@ -1132,6 +1134,7 @@ test.describe('Blob storage capacity metrics integration', () => {
         await groupsVDisk.hover();
         const groupsVDiskPopup = await waitForDiskPopup(page, 'Go to VDisk');
         const groupsVDiskInfo = await getDiskPopupPanel(groupsVDiskPopup, 'VDisk', VDISK_ID);
+        await expectDefinitionListRowPlaceholder(groupsVDiskInfo, 'Rack');
         await expect(getDefinitionListValue(groupsVDiskInfo, 'Size')).toHaveText(expectedPopupSize);
         await expect(getDefinitionListValue(groupsVDiskInfo, 'VDisk Slot Usage')).toHaveText(
             expectedPopupVDiskSlotUsage,
@@ -1144,6 +1147,7 @@ test.describe('Blob storage capacity metrics integration', () => {
             'PDisk',
             `${NODE_ID}-${PDISK_ID}`,
         );
+        await expectDefinitionListRowPlaceholder(nestedPDiskInfo, 'Rack');
         await expect(getDefinitionListValue(nestedPDiskInfo, 'PDisk Usage')).toHaveText(
             expectedPopupPDiskUsage,
         );
@@ -1160,6 +1164,7 @@ test.describe('Blob storage capacity metrics integration', () => {
             'PDisk',
             `${NODE_ID}-${PDISK_ID}`,
         );
+        await expectDefinitionListRowPlaceholder(groupsPDiskInfo, 'Rack');
         for (const label of [
             'Space',
             'PDisk Usage',
@@ -1211,6 +1216,7 @@ test.describe('Blob storage capacity metrics integration', () => {
             .last();
         await expect(nestedVDiskPopup).toBeVisible();
         await getDiskPopupPanel(nestedVDiskPopup, 'VDisk', VDISK_ID);
+        await expectDefinitionListRowValue(nestedVDiskPopup, 'Rack', capacityFixture.rack);
         await expectDeveloperUILink(nestedVDiskPopup, getDeveloperUIActorPath('vdisks'));
         await expect(nestedVDiskPopup.getByRole('link', {name: 'Go to VDisk'})).toHaveCount(0);
         await expect(nestedVDiskPopup.getByRole('button', {name: 'Evict VDisk'})).toHaveCount(0);
@@ -1267,7 +1273,13 @@ test.describe('Blob storage capacity metrics integration', () => {
             runtimeLabels.indexOf('Allocation Units') + 1,
         );
 
+        const nodesRequestPromise = page.waitForRequest((request) =>
+            new URL(request.url()).pathname.endsWith('/viewer/json/nodes'),
+        );
         await page.goto(VDISK_PAGE_PATH.replace('type=groups', 'type=nodes'));
+        const nodesRequest = await nodesRequestPromise;
+        const fieldsRequired = new URL(nodesRequest.url()).searchParams.get('fields_required');
+        expect(fieldsRequired?.split(',')).toContain('Rack');
 
         await storageTable.waitForTableToLoad();
         await storageTable.waitForTableData();
@@ -1283,6 +1295,7 @@ test.describe('Blob storage capacity metrics integration', () => {
         await nodesVDisk.hover();
         const nodesVDiskPopup = await waitForDiskPopup(page, 'Go to VDisk');
         const nodesVDiskInfo = await getDiskPopupPanel(nodesVDiskPopup, 'VDisk', VDISK_ID);
+        await expectDefinitionListRowValue(nodesVDiskInfo, 'Rack', capacityFixture.rack);
         await expect(getDefinitionListValue(nodesVDiskInfo, 'Size')).toHaveText(expectedPopupSize);
         await expect(getDefinitionListValue(nodesVDiskInfo, 'VDisk Slot Usage')).toHaveText(
             expectedPopupVDiskSlotUsage,
@@ -1304,6 +1317,7 @@ test.describe('Blob storage capacity metrics integration', () => {
             'PDisk',
             `${NODE_ID}-${PDISK_ID}`,
         );
+        await expectDefinitionListRowValue(nodesPDiskInfo, 'Rack', capacityFixture.rack);
         await expect(getDefinitionListValue(nodesPDiskInfo, 'Space')).toHaveText(expectedPopupSize);
         await expect(getDefinitionListValue(nodesPDiskInfo, 'PDisk Usage')).toHaveText(
             expectedPopupPDiskUsage,

@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ChevronDown, ChevronUp} from '@gravity-ui/icons';
 import {Button, ClipboardButton, Flex, Icon, Text, Tooltip} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
@@ -80,7 +81,7 @@ export function DiskPopupHeader({
 }
 
 export function DiskPopupText({value}: {value?: string | number}) {
-    const hasValue = value !== undefined && value !== '';
+    const hasValue = !isNil(value) && value !== '';
     const text = hasValue ? value : EMPTY_DATA_PLACEHOLDER;
     return (
         <Tooltip content={text} disabled={!hasValue} className={b('text-tooltip')}>

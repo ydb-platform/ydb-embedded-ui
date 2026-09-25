@@ -16,6 +16,6 @@ export function useNodeMetadata(
     return {
         Host: parentNodeData?.Host || storedNodeData?.Host,
         DC: parentNodeData?.DC || storedNodeData?.DC,
-        Rack: parentNodeData?.Rack || storedNodeData?.Rack,
+        Rack: parentNodeData?.Rack,
     };
 }

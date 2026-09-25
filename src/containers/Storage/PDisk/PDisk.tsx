@@ -11,6 +11,7 @@ import {InternalLink} from '../../../components/InternalLink';
 import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 import {getPDiskPagePath} from '../../../routes';
 import {isCapacityAlert} from '../../../types/api/enums';
+import type {NodeMetadata} from '../../../types/store/nodesList';
 import {cn} from '../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import type {
@@ -254,6 +255,7 @@ function getAccessibleName(
 
 export interface PDiskProps {
     data?: PreparedPDisk;
+    nodeData?: NodeMetadata;
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
@@ -273,6 +275,7 @@ export interface PDiskProps {
 
 export const PDisk = ({
     data = {},
+    nodeData,
     showPopup,
     onShowPopup,
     onHidePopup,
@@ -360,7 +363,7 @@ export const PDisk = ({
                 anchorRef={anchorRef}
                 onShowPopup={onShowPopup}
                 onHidePopup={onHidePopup}
-                renderPopupContent={() => <PDiskPopup data={data} />}
+                renderPopupContent={() => <PDiskPopup data={data} nodeData={nodeData} />}
                 delayOpen={delayOpen}
                 delayClose={delayClose}
             >
