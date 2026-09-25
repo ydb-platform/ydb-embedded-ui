@@ -1,0 +1,237 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - link "Cluster" [disabled] [ref=e46]:
+            - generic [ref=e48]: Cluster
+      - link "Developer UI" [ref=e50] [cursor=pointer]:
+        - /url: http://localhost:8765/internal
+        - img [ref=e53]:
+          - img [ref=e54]
+        - generic [ref=e56]: Developer UI
+    - main [ref=e57]:
+      - generic [ref=e59]:
+        - generic [ref=e61]:
+          - text: LOCAL
+          - generic [ref=e62] [cursor=pointer]:
+            - img [ref=e64]:
+              - img [ref=e65]
+            - button "Good" [ref=e67]:
+              - generic [ref=e70]: Good
+        - generic [ref=e71]:
+          - button "Refresh" [active] [ref=e72] [cursor=pointer]:
+            - img [ref=e75]
+          - group [ref=e78] [cursor=pointer]:
+            - combobox [ref=e79]:
+              - generic [ref=e80]: None
+            - img [ref=e81]:
+              - img [ref=e82]
+        - generic [ref=e85]:
+          - button "Overview" [expanded] [ref=e86] [cursor=pointer]:
+            - img [ref=e88]:
+              - img [ref=e89]
+            - generic [ref=e92]:
+              - img [ref=e93]:
+                - img [ref=e94]
+              - generic [ref=e96]: Overview
+          - region "Overview" [ref=e97]:
+            - generic [ref=e98]:
+              - generic [ref=e99]:
+                - generic [ref=e100]:
+                  - generic [ref=e101]:
+                    - img [ref=e102]
+                    - generic [ref=e106]: 0.3%
+                  - generic [ref=e107]:
+                    - generic [ref=e109]: 0 of 4 cores
+                    - generic [ref=e110]:
+                      - generic [ref=e111]: CPU load
+                      - button [ref=e112] [cursor=pointer]:
+                        - img [ref=e113]:
+                          - img [ref=e114]
+                - generic [ref=e116]:
+                  - generic [ref=e117]:
+                    - img [ref=e118]
+                    - generic [ref=e122]: 0.2%
+                  - generic [ref=e123]:
+                    - generic [ref=e125]: 161 MB of 68.7 GB
+                    - generic [ref=e126]:
+                      - generic [ref=e127]: Storage HDD
+                      - button [ref=e128] [cursor=pointer]:
+                        - img [ref=e129]:
+                          - img [ref=e130]
+                - generic [ref=e132]:
+                  - generic [ref=e133]:
+                    - img [ref=e134]
+                    - generic [ref=e138]: 3%
+                  - generic [ref=e139]:
+                    - generic [ref=e141]: 0.55 of 16.8 GB
+                    - generic [ref=e142]:
+                      - generic [ref=e143]: Memory used
+                      - button [ref=e144] [cursor=pointer]:
+                        - img [ref=e145]:
+                          - img [ref=e146]
+              - generic [ref=e150]:
+                - generic [ref=e151]: Allocated Storage Groups 2
+                - generic [ref=e154]:
+                  - generic [ref=e155]:
+                    - generic [ref=e156]:
+                      - generic [ref=e157]: HDD
+                      - generic [ref=e159]:
+                        - generic [ref=e160]: Available
+                        - generic [ref=e161]:
+                          - generic [ref=e162]: ":"
+                          - generic [ref=e164]:
+                            - text: 13 groups
+                            - button "About available HDD storage groups" [ref=e165] [cursor=pointer]:
+                              - img [ref=e166]:
+                                - img [ref=e167]
+                    - 'group "HDD storage group allocation: 13%" [ref=e169]':
+                      - 'progressbar "HDD storage group allocation: 13%" [ref=e171]':
+                        - img "none 2 groups" [ref=e172]
+                  - generic [ref=e174]:
+                    - generic [ref=e176]:
+                      - generic [ref=e178]: none
+                      - generic [ref=e179]: 2 groups
+                    - generic [ref=e180]: 2 groups
+        - tablist [ref=e182]:
+          - tab "Databases" [ref=e183] [cursor=pointer]:
+            - link "Databases" [ref=e186]:
+              - /url: /cluster/databases
+          - tab "Nodes" [selected] [ref=e187] [cursor=pointer]:
+            - link "Nodes" [ref=e190]:
+              - /url: /cluster/nodes
+          - tab "Storage" [ref=e191] [cursor=pointer]:
+            - link "Storage" [ref=e194]:
+              - /url: /cluster/storage
+          - tab "Network" [ref=e195] [cursor=pointer]:
+            - link "Network" [ref=e198]:
+              - /url: /cluster/network
+          - tab "Tablets" [ref=e199] [cursor=pointer]:
+            - link "Tablets" [ref=e202]:
+              - /url: /cluster/tablets
+          - tab "Versions" [ref=e203] [cursor=pointer]:
+            - link "Versions" [ref=e206]:
+              - /url: /cluster/versions
+          - tab "Configs" [ref=e207] [cursor=pointer]:
+            - link "Configs" [ref=e210]:
+              - /url: /cluster/configs
+        - generic [ref=e211]:
+          - generic [ref=e212]:
+            - generic [ref=e213]:
+              - generic [ref=e214]:
+                - textbox "Host name" [ref=e217]
+                - generic [ref=e218]: "Group by:"
+                - group [ref=e220] [cursor=pointer]:
+                  - combobox [ref=e221]:
+                    - generic [ref=e222]: "-"
+                  - img [ref=e223]:
+                    - img [ref=e224]
+                - generic [ref=e228]: "Nodes: 1"
+              - button "7/16" [ref=e231] [cursor=pointer]:
+                - img [ref=e234]:
+                  - img [ref=e235]
+                - generic [ref=e238]: 7/16
+            - table [ref=e241]:
+              - rowgroup [ref=e242]:
+                - row "# Host Uptime CPU RAM Version Tablets" [ref=e243]:
+                  - columnheader "#" [ref=e244]:
+                    - generic [ref=e245] [cursor=pointer]:
+                      - generic [ref=e247]: "#"
+                      - img [ref=e249]
+                  - columnheader "Host" [ref=e251]:
+                    - generic [ref=e252] [cursor=pointer]:
+                      - generic [ref=e254]: Host
+                      - img [ref=e256]
+                  - columnheader "Uptime" [ref=e258]:
+                    - generic [ref=e259] [cursor=pointer]:
+                      - generic [ref=e261]: Uptime
+                      - img [ref=e263]
+                  - columnheader "CPU" [ref=e265]:
+                    - generic [ref=e266] [cursor=pointer]:
+                      - generic [ref=e268]: CPU
+                      - img [ref=e270]
+                  - columnheader "RAM" [ref=e272]:
+                    - generic [ref=e273] [cursor=pointer]:
+                      - generic [ref=e275]: RAM
+                      - img [ref=e277]
+                  - columnheader "Version" [ref=e279]:
+                    - generic [ref=e280] [cursor=pointer]:
+                      - generic [ref=e282]: Version
+                      - img [ref=e284]
+                  - columnheader "Tablets" [ref=e286]:
+                    - generic [ref=e289]: Tablets
+              - rowgroup [ref=e290]:
+                - 'row "1 89e7e159c70f Copy 2:32 0% 0.5 GB main.2ec7383 BS: 1 C: 1 CM: 1 CN: 1 H: 1 M: 1 NB: 1 SS: 1 TA: 1 TB: 1" [ref=e291]':
+                  - cell "1" [ref=e292]
+                  - cell "89e7e159c70f Copy" [ref=e293]:
+                    - generic [ref=e297]:
+                      - generic "89e7e159c70f" [ref=e298]:
+                        - link "89e7e159c70f" [ref=e299] [cursor=pointer]:
+                          - /url: /node/1/storage
+                      - generic:
+                        - button [ref=e300] [cursor=pointer]:
+                          - img [ref=e303]:
+                            - img [ref=e304]
+                        - button "Copy" [ref=e306] [cursor=pointer]:
+                          - generic:
+                            - generic:
+                              - img:
+                                - img
+                  - cell "2:32" [ref=e307]:
+                    - generic [ref=e309] [cursor=pointer]: 2:32
+                  - cell "0%" [ref=e310]:
+                    - generic [ref=e314] [cursor=pointer]: 0%
+                  - cell "0.5 GB" [ref=e315]:
+                    - generic [ref=e320] [cursor=pointer]: 0.5 GB
+                  - cell "main.2ec7383" [ref=e321]:
+                    - generic [ref=e323] [cursor=pointer]: main.2ec7383
+                  - 'cell "BS: 1 C: 1 CM: 1 CN: 1 H: 1 M: 1 NB: 1 SS: 1 TA: 1 TB: 1" [ref=e324]':
+                    - generic [ref=e325]:
+                      - 'link "BS: 1" [ref=e326]':
+                        - /url: /node/1/tablets
+                      - 'link "C: 1" [ref=e327]':
+                        - /url: /node/1/tablets
+                      - 'link "CM: 1" [ref=e328]':
+                        - /url: /node/1/tablets
+                      - 'link "CN: 1" [ref=e329]':
+                        - /url: /node/1/tablets
+                      - 'link "H: 1" [ref=e330]':
+                        - /url: /node/1/tablets
+                      - 'link "M: 1" [ref=e331]':
+                        - /url: /node/1/tablets
+                      - 'link "NB: 1" [ref=e332]':
+                        - /url: /node/1/tablets
+                      - 'link "SS: 1" [ref=e333]':
+                        - /url: /node/1/tablets
+                      - 'link "TA: 1" [ref=e334]':
+                        - /url: /node/1/tablets
+                      - 'link "TB: 1" [ref=e335]':
+                        - /url: /node/1/tablets
+          - status [ref=e336]
+```

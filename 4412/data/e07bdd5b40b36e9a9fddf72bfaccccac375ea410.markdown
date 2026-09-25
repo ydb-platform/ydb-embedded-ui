@@ -1,0 +1,109 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - list [ref=e21]:
+      - generic [ref=e22]:
+        - listitem [ref=e23]:
+          - link "Database" [ref=e28] [cursor=pointer]:
+            - /url: /database?diagnosticsTab=overview&database=%2Flocal&schema=%2Flocal&databasePage=database
+            - img [ref=e31]:
+              - img [ref=e32]
+            - generic "Database":
+              - generic: Database
+        - listitem [ref=e34]:
+          - link "Diagnostics" [ref=e39] [cursor=pointer]:
+            - /url: /database?diagnosticsTab=overview&database=%2Flocal&schema=%2Flocal&databasePage=diagnostics
+            - img [ref=e42]:
+              - img [ref=e43]
+            - generic "Diagnostics":
+              - generic: Diagnostics
+        - listitem [ref=e45]:
+          - link "SQL Editor" [ref=e50] [cursor=pointer]:
+            - /url: /database?diagnosticsTab=overview&database=%2Flocal&schema=%2Flocal&databasePage=query
+            - img [ref=e53]:
+              - img [ref=e54]
+            - generic "SQL Editor":
+              - generic: SQL Editor
+    - generic [ref=e56]:
+      - button "Information" [ref=e57] [cursor=pointer]:
+        - img [ref=e60]:
+          - img [ref=e61]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e63] [cursor=pointer]:
+        - img [ref=e66]:
+          - img [ref=e67]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e69] [cursor=pointer]:
+        - img [ref=e72]:
+          - img [ref=e73]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e75] [cursor=pointer]:
+      - img [ref=e76]:
+        - img [ref=e77]
+  - generic [ref=e80]:
+    - banner [ref=e81]:
+      - list [ref=e82]:
+        - listitem [ref=e83]:
+          - link "Cluster" [ref=e84] [cursor=pointer]:
+            - link "Cluster" [ref=e85]:
+              - /url: /cluster
+              - generic [ref=e86]: Cluster
+          - generic [ref=e87]: /
+        - listitem [ref=e88]:
+          - link "local" [disabled] [ref=e89]:
+            - generic [ref=e91]: local
+        - listitem [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94]:
+              - button "Copy path" [ref=e95] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - img:
+                      - img
+              - button [ref=e96] [cursor=pointer]:
+                - img [ref=e99]:
+                  - img [ref=e100]
+            - generic [ref=e103] [cursor=pointer]:
+              - img [ref=e105]:
+                - img [ref=e106]
+              - 'button "Unspecified: 0 issues" [ref=e108]':
+                - generic [ref=e111]:
+                  - text: "Unspecified: 0 issues"
+                  - img [ref=e112]:
+                    - img [ref=e113]
+      - generic [ref=e115]:
+        - link "Developer UI" [ref=e116] [cursor=pointer]:
+          - /url: http://localhost:8765/internal
+          - img [ref=e119]:
+            - img [ref=e120]
+          - generic [ref=e122]: Developer UI
+        - button [ref=e125] [cursor=pointer]:
+          - img [ref=e128]:
+            - img [ref=e129]
+    - main [ref=e131]:
+      - generic [ref=e134]:
+        - generic [ref=e139]:
+          - button [ref=e140] [cursor=pointer]:
+            - img [ref=e143]:
+              - img [ref=e144]
+          - button [ref=e146] [cursor=pointer]:
+            - img [ref=e149]:
+              - img [ref=e150]
+        - tablist [ref=e157]:
+          - tab "Editor" [selected] [ref=e158] [cursor=pointer]:
+            - link "Editor" [ref=e161]:
+              - /url: /database?diagnosticsTab=overview&database=%2Flocal&schema=%2Flocal&databasePage=query&queryTab=newQuery
+          - tab "History" [ref=e162] [cursor=pointer]:
+            - link "History" [ref=e165]:
+              - /url: /database?diagnosticsTab=overview&database=%2Flocal&schema=%2Flocal&databasePage=query&queryTab=history
+          - tab "Saved" [ref=e166] [cursor=pointer]:
+            - link "Saved" [ref=e169]:
+              - /url: /database?diagnosticsTab=overview&database=%2Flocal&schema=%2Flocal&databasePage=query&queryTab=saved
+```
