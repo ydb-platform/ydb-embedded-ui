@@ -1,0 +1,34 @@
+.ydb-disk-status {
+    &__type_hdd {
+        color: var(--g-color-text-utility);
+        background-color: var(--g-color-base-utility-light);
+    }
+
+    &__type_ssd {
+        color: var(--g-color-text-misc);
+        background-color: var(--g-color-base-misc-medium);
+    }
+
+    &__type_nvme {
+        color: var(--g-color-text-info);
+        background-color: var(--g-color-base-info-light);
+    }
+
+    &__label_danger-heavy {
+        color: var(--g-color-text-light-primary);
+        background-color: var(--g-color-base-danger-heavy);
+    }
+
+    &__tooltip {
+        display: inline-flex;
+
+        cursor: pointer;
+
+        border-radius: var(--g-border-radius-s);
+
+        &:focus-visible {
+            outline: 2px solid var(--g-color-line-focus);
+            outline-offset: 2px;
+        }
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "field_fqdn": "FQDN",
+  "field_rack": "Rack",
+  "field_datacenter": "Datacenter",
+  "field_pdisk-path": "PDisk Path",
+  "field_node-id": "Node ID",
+  "field_pdisk-id": "PDisk ID",
+  "field_vdisk-slot-id": "VDisk Slot ID"
+}

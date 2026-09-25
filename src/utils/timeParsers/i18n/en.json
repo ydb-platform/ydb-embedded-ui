@@ -7,5 +7,9 @@
   "hours": "{{hours}}\u00a0h",
   "min": "{{minutes}}\u00a0m",
   "sec": "{{seconds}}\u00a0s",
-  "ms": "{{ms}}\u00a0ms"
+  "ms": "{{ms}}\u00a0ms",
+  "value_compact-days": "{{days}}d",
+  "value_compact-hours": "{{hours}}h",
+  "value_compact-minutes": "{{minutes}}min",
+  "value_compact-seconds": "{{seconds}}s"
 }

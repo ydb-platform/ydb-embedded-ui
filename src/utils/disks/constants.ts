@@ -157,6 +157,9 @@ export const NUMERIC_SEVERITY_TO_LABEL_VIEW: Record<number, LabelVisualConfig> =
         theme: 'danger',
         icon: CircleExclamation,
     },
+    [SOLID_RED_SEVERITY]: {
+        theme: 'danger',
+    },
     [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue]: {
         theme: 'info',
         icon: ArrowsRotateLeft,

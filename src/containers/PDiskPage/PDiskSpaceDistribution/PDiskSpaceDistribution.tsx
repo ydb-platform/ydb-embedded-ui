@@ -4,7 +4,7 @@ import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/Dis
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../components/InternalLink';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
-import {VDiskInfo} from '../../../components/VDiskInfo/VDiskInfo';
+import {VDiskPopup} from '../../../components/VDiskPopup/VDiskPopup';
 import type {YDBDefinitionListItem} from '../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../components/YDBDefinitionList/YDBDefinitionList';
 import {useVDiskPagePath} from '../../../routes';
@@ -15,6 +15,7 @@ import type {
     SlotItem,
     SlotItemType,
 } from '../../../store/reducers/pdisk/types';
+import type {NodeMetadata} from '../../../types/store/nodesList';
 import {valueIsDefined} from '../../../utils';
 import {formatBytes} from '../../../utils/bytesParsers';
 import {cn} from '../../../utils/cn';
@@ -80,6 +81,7 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
                     minNonLogTotal={minNonLogTotal}
                     pDiskId={PDiskId}
                     nodeId={NodeId}
+                    nodeData={{Host: data.NodeHost, DC: data.NodeDC, Rack: data.NodeRack}}
                     getVDiskPagePath={getVDiskPagePath}
                     key={index}
                 />
@@ -110,6 +112,7 @@ interface SlotProps<T extends SlotItemType> {
 
     pDiskId?: string | number;
     nodeId?: string | number;
+    nodeData?: NodeMetadata;
     getVDiskPagePath?: (
         params: {nodeId: string | number | undefined; vDiskId: string | undefined},
         query?: {activeTab?: string},
@@ -138,6 +141,7 @@ function Slot<T extends SlotItemType>({
     item,
     minNonLogTotal,
     nodeId,
+    nodeData,
     getVDiskPagePath,
 }: SlotProps<T>) {
     const renderContent = () => {
@@ -152,7 +156,15 @@ function Slot<T extends SlotItemType>({
 
             return (
                 <HoverPopup
-                    renderPopupContent={() => <VDiskInfo data={item.SlotData} withTitle />}
+                    renderPopupContent={({onClose}) => (
+                        <VDiskPopup
+                            data={item.SlotData}
+                            nodeData={nodeData}
+                            onClose={onClose}
+                            view="space-distribution"
+                        />
+                    )}
+                    keepOpenOnFocus
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >

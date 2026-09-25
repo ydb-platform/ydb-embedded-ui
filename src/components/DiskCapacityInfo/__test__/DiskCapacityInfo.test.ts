@@ -344,6 +344,24 @@ describe('DiskCapacityInfo builders', () => {
         expect(spaceItem.value).toBe(EMPTY_DATA_PLACEHOLDER);
     });
 
+    test('uses legacy PDisk size when Whiteboard size is disabled', () => {
+        const [spaceItem] = getPDiskCapacityInfoItems(
+            {
+                AllocatedSize: 40_000_000_000,
+                TotalSize: 100_000_000_000,
+                WhiteboardSize: {TotalSize: 22_000_000_000},
+            },
+            {
+                withUsage: false,
+                withCapacityAlert: false,
+                fixedDecimalPlaces: 2,
+                useWhiteboardSize: false,
+            },
+        );
+
+        expect(spaceItem.value).toBe(`40.00 / 100.00${UNBREAKABLE_GAP}GB`);
+    });
+
     test('formats normalized storage-group scalar values without rendering a component', () => {
         const items = getStorageGroupCapacityInfoItems({
             Degraded: 0,

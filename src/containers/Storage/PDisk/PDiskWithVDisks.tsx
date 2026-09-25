@@ -3,6 +3,7 @@ import React from 'react';
 import {chunk} from 'lodash';
 
 import {VDisk} from '../../../components/VDisk/VDisk';
+import type {NodeMetadata} from '../../../types/store/nodesList';
 import {cn} from '../../../utils/cn';
 import type {VDiskDisplayStateGetter} from '../../../utils/disks/displayState';
 import type {PreparedVDisk} from '../../../utils/disks/types';
@@ -35,6 +36,7 @@ interface PDiskWithVDisksProps extends Omit<PDiskProps, 'topContent'> {
 
 interface VDiskItemProps {
     vDisk: PreparedVDisk;
+    nodeData?: NodeMetadata;
     vDiskWidth?: number;
     viewContext?: StorageViewContext;
     withIcon?: boolean;
@@ -49,6 +51,7 @@ interface VDiskItemProps {
 
 const VDiskItem = React.memo(function VDiskItem({
     vDisk,
+    nodeData,
     vDiskWidth,
     viewContext,
     withIcon,
@@ -91,6 +94,7 @@ const VDiskItem = React.memo(function VDiskItem({
             <VDisk
                 withIcon={withIcon}
                 data={vDisk}
+                nodeData={nodeData}
                 inactive={!isVdiskActive(vDisk, viewContext)}
                 compact={!isAllVDisksLayout}
                 allModeSize={isAllVDisksLayout ? 's' : undefined}
@@ -119,6 +123,7 @@ const VDiskItem = React.memo(function VDiskItem({
 
 export const PDiskWithVDisks = React.memo(function PDiskWithVDisks({
     vDisks,
+    nodeData,
     viewContext,
     withIcon,
     withVDiskIcons,
@@ -151,6 +156,7 @@ export const PDiskWithVDisks = React.memo(function PDiskWithVDisks({
                         <VDiskItem
                             key={vDisk.StringifiedId}
                             vDisk={vDisk}
+                            nodeData={nodeData}
                             vDiskWidth={vDiskWidth}
                             viewContext={viewContext}
                             withIcon={withVDiskIcons ?? withIcon}
@@ -171,6 +177,7 @@ export const PDiskWithVDisks = React.memo(function PDiskWithVDisks({
     return (
         <PDisk
             {...pDiskProps}
+            nodeData={nodeData}
             width={width}
             withIcon={withIcon}
             delayOpen={delayOpen}

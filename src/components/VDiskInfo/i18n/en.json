@@ -3,11 +3,9 @@
   "label_pdisk-id": "PDisk Id",
   "pool-name": "Storage Pool Name",
   "kind": "Kind",
-
   "guid": "GUID",
   "incarnation-guid": "Incarnation GUID",
   "instance-guid": "Instance GUID",
-
   "replication-status": "Replicated",
   "replication-progress": "Replication Progress",
   "replication-time-remaining": "Time Remaining",
@@ -15,25 +13,20 @@
   "label_recipient": "Recipient",
   "state-status": "VDisk State",
   "space-status": "Disk Space",
-
   "fresh-rank-satisfaction": "Fresh Rank Satisfaction",
   "level-rank-satisfaction": "Level Rank Satisfaction",
-
   "front-queues": "Front Queues",
   "has-unreadable-blobs": "Has Unreadable Blobs",
-
   "size": "Size",
   "usage": "Usage",
-
   "read-throughput": "Read Throughput",
   "write-throughput": "Write Throughput",
-
   "links": "Links",
   "vdisk-page": "VDisk page",
   "developer-ui": "Developer UI",
-
   "yes": "Yes",
   "no": "No",
-
-  "vdiks-title": "VDisk"
+  "vdiks-title": "VDisk",
+  "field_group-size-in-units": "Group Size in Units",
+  "field_capacity-alert": "Capacity alert"
 }

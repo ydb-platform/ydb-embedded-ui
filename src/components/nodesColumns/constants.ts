@@ -247,7 +247,7 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     ClockSkew: ['ClockSkew'],
     Missing: ['Missing'],
     Tablets: ['Tablets', 'Database'],
-    PDisks: ['PDisks'],
+    PDisks: ['PDisks', 'Rack'],
     PileName: ['PileName'],
     MaxPDiskUsage: ['MaxPDiskUsage'],
     MaxVDiskSlotUsage: ['MaxVDiskSlotUsage', 'CapacityAlert'],

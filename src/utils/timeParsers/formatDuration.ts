@@ -7,10 +7,15 @@ import i18n from './i18n';
  * Process time difference in ms and returns formated time.
  * By default only two major values are returned (days & hours, hours & minutes, minutes & seconds, etc.).
  * It can be altered with valuesCount arg
+ * Compact format omits milliseconds and spaces between numbers and unit labels.
  *
  * value - duration in ms
  */
-export const formatDurationToShortTimeFormat = (value: number, valuesCount: 1 | 2 = 2) => {
+export const formatDurationToShortTimeFormat = (
+    value: number,
+    valuesCount: 1 | 2 = 2,
+    {compact = false}: {compact?: boolean} = {},
+) => {
     const ms = value % 1000;
     let remain = Math.floor(value / 1000);
 
@@ -32,6 +37,22 @@ export const formatDurationToShortTimeFormat = (value: number, valuesCount: 1 | 
         seconds,
         ms,
     };
+
+    if (compact) {
+        const units = [
+            {value: days, key: 'value_compact-days'},
+            {value: hours, key: 'value_compact-hours'},
+            {value: minutes, key: 'value_compact-minutes'},
+            {value: seconds, key: 'value_compact-seconds'},
+        ] as const;
+        const firstNonZeroUnit = units.findIndex((unit) => unit.value > 0);
+
+        return units
+            .slice(firstNonZeroUnit < 0 ? -1 : firstNonZeroUnit)
+            .slice(0, valuesCount)
+            .map(({key}) => i18n(key, duration))
+            .join(' ');
+    }
 
     if (valuesCount === 2) {
         if (days > 0) {

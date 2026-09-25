@@ -14,7 +14,7 @@ import './EntityStatus.scss';
 
 const b = cn('ydb-entity-status');
 
-const EFlagToLabelTheme: Record<EFlag, LabelProps['theme']> = {
+export const EFlagToLabelTheme: Record<EFlag, LabelProps['theme']> = {
     [EFlag.Red]: 'danger',
     [EFlag.Blue]: 'success',
     [EFlag.Green]: 'success',
