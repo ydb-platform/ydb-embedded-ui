@@ -47,9 +47,9 @@ function ReplicationProgress({data, size}: VDiskReplicationStatusProps) {
         progress !== undefined && progress <= 1 ? Math.round(progress * 100) : undefined;
     const seconds = parseOptionalNonNegativeNumber(data.ReplicationSecondsRemaining);
     const remaining =
-        seconds !== undefined && seconds > 0
-            ? formatDurationToShortTimeFormat(Math.ceil(seconds) * 1000, 2, {compact: true})
-            : undefined;
+        seconds === undefined
+            ? undefined
+            : formatDurationToShortTimeFormat(Math.ceil(seconds) * 1000, 2, {compact: true});
     if (percentage === undefined && !remaining) {
         return null;
     }
