@@ -1,5 +1,5 @@
 import type {EColumnCodec, EUnit, TPathID, TStorageSettings, TTypeInfo} from './shared';
-import type {TFamilyDescription} from './table';
+import type {TFamilyDescription, TTTLTier} from './table';
 
 export interface TColumnTableDescription {
     Name?: string;
@@ -71,6 +71,7 @@ interface TTtl {
     ExpireAfterBytes?: string;
 
     ColumnUnit?: EUnit;
+    Tiers?: TTTLTier[];
 }
 
 interface TColumnTableSchema {

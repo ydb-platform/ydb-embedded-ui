@@ -66,6 +66,13 @@ interface TEnabled {
     ExpireAfterSeconds?: number;
     ColumnUnit?: EUnit;
     SysSettings?: TSysSettings;
+    Tiers?: TTTLTier[];
+}
+
+export interface TTTLTier {
+    ApplyAfterSeconds?: number;
+    Delete?: {};
+    EvictToExternalStorage?: {Storage?: string};
 }
 
 interface TSysSettings {
