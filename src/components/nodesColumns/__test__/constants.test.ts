@@ -24,3 +24,10 @@ describe('storage nodes capacity column contracts', () => {
         expect(getNodesColumnSortField(columnId)).toBe(expectedSortField);
     });
 });
+
+test('requests detailed memory when only RAM is selected', () => {
+    expect(getRequiredDataFields([NODES_COLUMNS_IDS.RAM], NODES_COLUMNS_TO_DATA_FIELDS)).toEqual([
+        'Memory',
+        'MemoryDetailed',
+    ]);
+});
