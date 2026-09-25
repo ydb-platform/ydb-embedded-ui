@@ -11,19 +11,38 @@ describe('getNodeMemory', () => {
         ).toEqual({memoryUsed: 21474836480, memoryLimit: 25769803776});
     });
 
-    test('prefers anonymous RSS over allocator and legacy usage, including zero', () => {
+    test('uses the backend sorting value when detailed counters differ', () => {
         expect(
             getNodeMemory({
                 MemoryUsed: '200',
                 MemoryStats: {AnonRss: '0', AllocatedMemory: '100', AllocatorCachesMemory: '20'},
             }),
-        ).toEqual({memoryUsed: 0, memoryLimit: undefined});
+        ).toEqual({memoryUsed: 200, memoryLimit: undefined});
     });
+
+    test('does not add allocator caches to the backend sorting value', () => {
+        expect(
+            getNodeMemory({
+                MemoryUsed: '100',
+                MemoryStats: {AllocatedMemory: '100', AllocatorCachesMemory: '20'},
+            }).memoryUsed,
+        ).toBe(100);
+    });
+
+    test('preserves a zero backend usage instead of falling back to detailed counters', () => {
+        expect(getNodeMemory({MemoryUsed: '0', MemoryStats: {AnonRss: '200'}}).memoryUsed).toBe(0);
+    });
+
+    test.each([undefined, '', 'invalid', '-1', 'Infinity'])(
+        'uses detailed consumption when backend usage is unavailable: %j',
+        (MemoryUsed) => {
+            expect(getNodeMemory({MemoryUsed, MemoryStats: {AnonRss: '0'}}).memoryUsed).toBe(0);
+        },
+    );
 
     test('includes allocator caches when anonymous RSS is unavailable', () => {
         expect(
             getNodeMemory({
-                MemoryUsed: '100',
                 MemoryStats: {AllocatedMemory: '100', AllocatorCachesMemory: '20'},
             }),
         ).toEqual({memoryUsed: 120, memoryLimit: undefined});
