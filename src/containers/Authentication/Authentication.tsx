@@ -4,7 +4,7 @@ import {Eye, EyeSlash, Xmark} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Link as ExternalLink, Icon, TextInput} from '@gravity-ui/uikit';
 import {useHistory, useLocation, useRouteMatch} from 'react-router-dom';
 
-import routes, {getHomePagePath, parseQuery} from '../../routes';
+import routes, {getClusterPath, getHomePagePath, parseQuery} from '../../routes';
 import {basename} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {useLoginWithDatabase, useOidcAvailable} from '../../store/reducers/capabilities/hooks';
@@ -12,11 +12,12 @@ import {cn} from '../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../utils/constants';
 import {prepareCommonErrorMessage} from '../../utils/errors';
 import {useMetaAuth} from '../../utils/hooks/useMetaAuth';
+import {useTypedSelector} from '../../utils/hooks/useTypedSelector';
 
 import i18n from './i18n';
 import {
     createSsoAuthorizeUrl,
-    getSsoReturnTo,
+    getAuthReturnTo,
     isDatabaseError,
     isPasswordError,
     isUserError,
@@ -36,6 +37,7 @@ function Authentication({closable = false}: AuthenticationProps) {
     const history = useHistory();
     const location = useLocation();
     const isDirectAuthPage = Boolean(useRouteMatch({path: routes.auth, exact: true}));
+    const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
     const needDatabase = useLoginWithDatabase();
     const oidcAvailable = useOidcAvailable();
@@ -45,49 +47,40 @@ function Authentication({closable = false}: AuthenticationProps) {
     const {returnUrl, database: databaseFromQuery} = parseQuery(location);
     const currentHref = window.location.href;
 
-    const path = React.useMemo(() => {
-        let path: string | undefined;
+    const returnTo = React.useMemo(() => {
+        const fallbackPath = singleClusterMode
+            ? getClusterPath(undefined, undefined, {withBasename: true})
+            : getHomePagePath(undefined, undefined, {withBasename: true});
 
-        if (returnUrl) {
-            const decodedUrl = decodeURIComponent(returnUrl.toString());
+        return getAuthReturnTo({
+            currentUrl: new URL(currentHref),
+            fallbackPath,
+            isDirectAuthPage,
+            returnUrl,
+        });
+    }, [currentHref, isDirectAuthPage, returnUrl, singleClusterMode]);
 
-            // to prevent page reload we use router history
-            // history navigates relative to origin
-            // so we remove origin to make it work properly
-            const url = new URL(decodedUrl);
-            let pathname = url.pathname;
-
-            // Remove basename from pathname since history.replace expects paths relative to basename
-            if (basename && pathname.startsWith(basename)) {
-                pathname = pathname.slice(basename.length);
-            }
-
-            // Ensure pathname starts with /
-            if (pathname && !pathname.startsWith('/')) {
-                pathname = '/' + pathname;
-            }
-
-            path = pathname + url.search;
-        }
-        return path;
-    }, [returnUrl]);
-
-    const useMeta = useMetaAuth(path);
+    const pathname = new URL(returnTo, currentHref).pathname;
+    // Route matching for meta authentication expects a pathname without the router basename.
+    const authPath =
+        basename && pathname.startsWith(`${basename}/`)
+            ? pathname.slice(basename.length)
+            : pathname;
+    const useMeta = useMetaAuth(authPath);
 
     const ssoUrl = React.useMemo(() => {
         if (!oidcAvailable) {
             return undefined;
         }
 
-        const homePath = getHomePagePath(undefined, undefined, {withBasename: true});
         const currentUrl = new URL(currentHref);
-        const returnTo = getSsoReturnTo({
+        const ssoReturnTo = getAuthReturnTo({
             currentUrl,
-            fallbackPath: homePath,
+            fallbackPath: getHomePagePath(undefined, undefined, {withBasename: true}),
             isDirectAuthPage,
             returnUrl,
         });
-        return createSsoAuthorizeUrl(currentUrl.host, returnTo);
+        return createSsoAuthorizeUrl(currentUrl.host, ssoReturnTo);
     }, [currentHref, isDirectAuthPage, oidcAvailable, returnUrl]);
 
     const [login, setLogin] = React.useState('');
@@ -121,8 +114,10 @@ function Authentication({closable = false}: AuthenticationProps) {
         authenticate({user: login, password, database, useMeta})
             .unwrap()
             .then(() => {
-                if (path) {
-                    history.replace(path);
+                if (isDirectAuthPage) {
+                    window.location.replace(returnTo);
+                } else {
+                    window.location.reload();
                 }
             })
             .catch((error) => {
