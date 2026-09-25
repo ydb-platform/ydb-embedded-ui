@@ -15,7 +15,7 @@ describe('prepareTTL', () => {
         };
 
         expect(prepareTTL(ttl)?.content).toBe(
-            "column: 'created_at', evict to: '/local/warm', after: 1\u00a0h; evict to: '/local/cold', after: 1\u00a0d; delete after: 7\u00a0d",
+            "column: 'created_at'\nevict to: '/local/warm', after: 1\u00a0h\nevict to: '/local/cold', after: 1\u00a0d\ndelete after: 7\u00a0d",
         );
     });
 
@@ -28,7 +28,7 @@ describe('prepareTTL', () => {
         };
 
         expect(prepareTTL(ttl)?.content).toBe(
-            "column: 'created_at', evict to: '/local/cold', after: 0\u00a0ms",
+            "column: 'created_at'\nevict to: '/local/cold', after: 0\u00a0ms",
         );
     });
 
@@ -46,7 +46,7 @@ describe('prepareTTL', () => {
             },
         };
 
-        expect(prepareTTL(ttl)?.content).toBe("column: 'created_at', delete after: 0\u00a0ms");
+        expect(prepareTTL(ttl)?.content).toBe("column: 'created_at'\ndelete after: 0\u00a0ms");
     });
 
     test.each([undefined, ''])('shows a placeholder for a missing storage name %p', (Storage) => {
@@ -58,7 +58,7 @@ describe('prepareTTL', () => {
         };
 
         expect(prepareTTL(ttl)?.content).toBe(
-            "column: 'created_at', evict to: '—', after: 1\u00a0h",
+            "column: 'created_at'\nevict to: '—', after: 1\u00a0h",
         );
     });
 
@@ -72,7 +72,7 @@ describe('prepareTTL', () => {
         };
 
         expect(prepareTTL(ttl)?.content).toBe(
-            "column: 'created_at', unknown action, after: 1\u00a0h",
+            "column: 'created_at'\nunknown action, after: 1\u00a0h",
         );
     });
 
@@ -89,7 +89,7 @@ describe('prepareTTL', () => {
         };
 
         expect(prepareTTL(ttl)?.content).toBe(
-            "column: 'created_at', evict to: '/local/cold', after: 1\u00a0h; unknown action, after: 1\u00a0d; delete after: 7\u00a0d",
+            "column: 'created_at'\nevict to: '/local/cold', after: 1\u00a0h\nunknown action, after: 1\u00a0d\ndelete after: 7\u00a0d",
         );
     });
 
@@ -105,7 +105,7 @@ describe('prepareTTL', () => {
         };
 
         expect(prepareTTL(ttl)?.content).toBe(
-            "column: 'created_at', evict to: '/local/cold', after: 1\u00a0h",
+            "column: 'created_at'\nevict to: '/local/cold', after: 1\u00a0h",
         );
     });
 

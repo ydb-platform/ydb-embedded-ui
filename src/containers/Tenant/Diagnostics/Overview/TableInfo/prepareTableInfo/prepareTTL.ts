@@ -45,7 +45,7 @@ export function prepareTTL(ttl: TTTLSettings | TColumnDataLifeCycle) {
             name: i18n('field_ttl-for-rows'),
             content: i18n('value_ttl-tiered-config', {
                 columnName: enabled.ColumnName,
-                tiers: tiers.join('; '),
+                tiers: tiers.join('\n'),
             }),
         };
     }

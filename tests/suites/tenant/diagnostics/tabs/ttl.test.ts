@@ -87,11 +87,13 @@ test('shows tiered TTL from describe response in column table Info', async ({pag
     const info = new Diagnostics(page).getSchemaObjectInfo();
     await expect(info.getByText(TABLE_PATH, {exact: true})).toBeVisible();
     await expect(info.getByText('TTL for rows', {exact: true})).toBeVisible();
-    await expect(
-        info.getByText(
-            "column: 'created_at', evict to: '/local/warm', after: 1 h; evict to: '/local/cold', after: 1 d; delete after: 7 d",
-            {exact: true},
-        ),
-    ).toBeVisible();
+    const ttl = info.getByTestId('table-ttl');
+    await expect(ttl).toBeVisible();
+    expect((await ttl.innerText()).replace(/\u00a0/g, ' ').split('\n')).toEqual([
+        "column: 'created_at'",
+        "evict to: '/local/warm', after: 1 h",
+        "evict to: '/local/cold', after: 1 d",
+        'delete after: 7 d',
+    ]);
     expect(unexpectedRequests).toEqual([]);
 });

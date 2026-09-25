@@ -1,4 +1,4 @@
-import {Label} from '@gravity-ui/uikit';
+import {Label, Text} from '@gravity-ui/uikit';
 
 import type {YDBDefinitionListItem} from '../../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TPartitionConfig, TTTLSettings} from '../../../../../../types/api/schema';
@@ -66,7 +66,14 @@ export function prepareRowTableGeneralInfo(
     if (TTLSettings) {
         const ttlInfo = prepareTTL(TTLSettings);
         if (ttlInfo) {
-            left.push(ttlInfo);
+            left.push({
+                ...ttlInfo,
+                content: (
+                    <Text whiteSpace="break-spaces" wordBreak="break-word" qa="table-ttl">
+                        {ttlInfo.content}
+                    </Text>
+                ),
+            });
         }
     }
 
