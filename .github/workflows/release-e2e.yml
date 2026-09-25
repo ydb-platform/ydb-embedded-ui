@@ -19,7 +19,7 @@ permissions:
 jobs:
   resolve:
     name: Resolve release identity
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       ui_sha: ${{ steps.release.outputs.ui_sha }}
@@ -61,7 +61,7 @@ jobs:
   e2e:
     name: Release UI tests (${{ matrix.shard }}/8)
     needs: resolve
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -81,13 +81,13 @@ jobs:
           name: release-e2e-provenance
           path: release-artifacts
       - name: Start release local-ydb
+        id: ydb
         uses: astandrik/setup-local-ydb@ba59d49d74fdab2f308132e72da6d4e111b7200d # verified cleanup
         with:
           version: ${{ inputs.ydb_tag }}
           topology: root
           auth: 'false'
           cleanup: 'true'
-          monitoring-port: 8765
           container-prefix: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
       - name: Verify running backend image
         run: node controller/.github/workflows/scripts/release-e2e-report.js verify release-artifacts/provenance.json "$YDB_CONTAINER"
@@ -95,11 +95,12 @@ jobs:
           YDB_CONTAINER: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}-static
       - name: Run all release-version tests
         id: tests
-        run: bash controller/scripts/playwright-docker.sh --shard=${{ matrix.shard }}/8 --retries=2 --trace=retain-on-failure --update-snapshots=none --forbid-only
+        # Apply current CI policy even when the released config has older defaults.
+        run: bash controller/scripts/playwright-docker.sh --shard=${{ matrix.shard }}/8 --workers=2 --retries=2 --trace=on-first-retry --update-snapshots=none --forbid-only
         env:
           CI: 'true'
-          PLAYWRIGHT_APP_BACKEND: http://localhost:8765
-          PLAYWRIGHT_VIDEO: retain-on-failure
+          PLAYWRIGHT_APP_BACKEND: ${{ steps.ydb.outputs.monitoring-url }}
+          PLAYWRIGHT_VIDEO: on-first-retry
           PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}
           PLAYWRIGHT_RELEASE_VERSION: ${{ needs.resolve.outputs.playwright_version }}
           PLAYWRIGHT_RELEASE_OUTPUT: ${{ github.workspace }}/ui
