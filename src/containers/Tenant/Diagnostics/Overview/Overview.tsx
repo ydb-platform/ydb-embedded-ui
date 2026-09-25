@@ -6,6 +6,7 @@ import {Loader} from '../../../../components/Loader';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {EPathType} from '../../../../types/api/schema';
+import {cn} from '../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {ViewInfo} from '../../Info/View/View';
 import {isDomain} from '../../ObjectSummary/transformPath';
@@ -16,6 +17,7 @@ import {ChangefeedInfo} from './ChangefeedInfo';
 import {DatabaseInfo} from './DatabaseInfo/DatabaseInfo';
 import {DefaultEntityInfo} from './DefaultEntityInfo';
 import {ResourcePoolInfo} from './ResourcePoolInfo';
+import {ResourcePoolUsage} from './ResourcePoolInfo/ResourcePoolUsage';
 import {SchemaObjectInfoContainer} from './SchemaObjectInfo/SchemaObjectInfoContainer';
 import {StreamingQueryInfo} from './StreamingQueryInfo';
 import {TableInfo} from './TableInfo';
@@ -28,6 +30,8 @@ interface OverviewProps {
     database: string;
     databaseFullPath: string;
 }
+
+const b = cn('ydb-diagnostics-resource-pool-info');
 
 function Overview({type, path, database, databaseFullPath}: OverviewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -56,7 +60,19 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
         const pathTypeToComponent: Record<EPathType, (() => React.ReactNode) | undefined> = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
-            [EPathType.EPathTypeResourcePool]: () => <ResourcePoolInfo data={data} />,
+            [EPathType.EPathTypeResourcePool]: () => (
+                <div className={b('row')}>
+                    <div className={b('col')}>
+                        <ResourcePoolInfo data={data} />
+                    </div>
+                    <div className={b('col')}>
+                        <ResourcePoolUsage
+                            database={database}
+                            poolName={data?.PathDescription?.ResourcePoolDescription?.Name || ''}
+                        />
+                    </div>
+                </div>
+            ),
             [EPathType.EPathTypeSecret]: undefined,
             [EPathType.EPathTypeTable]: renderTableInfo,
             [EPathType.EPathTypeSysView]: undefined,
