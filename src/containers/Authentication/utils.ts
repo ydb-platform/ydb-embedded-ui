@@ -11,7 +11,7 @@ export function createSsoAuthorizeUrl(host: string, returnTo: string) {
     return url.href;
 }
 
-interface GetSsoReturnToParams {
+interface GetAuthReturnToParams {
     currentUrl: URL;
     fallbackPath: string;
     isDirectAuthPage: boolean;
@@ -28,12 +28,12 @@ function isSafeLocalReturnTo(path: string) {
     );
 }
 
-export function getSsoReturnTo({
+export function getAuthReturnTo({
     currentUrl,
     fallbackPath,
     isDirectAuthPage,
     returnUrl,
-}: GetSsoReturnToParams) {
+}: GetAuthReturnToParams) {
     if (!isDirectAuthPage) {
         const path = `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`;
         return isSafeLocalReturnTo(path) ? path : fallbackPath;
