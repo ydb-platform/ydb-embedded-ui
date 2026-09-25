@@ -89,6 +89,8 @@ test('shows tiered TTL from describe response in column table Info', async ({pag
     await expect(info.getByText('TTL for rows', {exact: true})).toBeVisible();
     const ttl = info.getByTestId('table-ttl');
     await expect(ttl).toBeVisible();
+    const infoFontSize = await info.evaluate((element) => getComputedStyle(element).fontSize);
+    await expect(ttl).toHaveCSS('font-size', infoFontSize);
     expect((await ttl.innerText()).replace(/\u00a0/g, ' ').split('\n')).toEqual([
         "column: 'created_at'",
         "evict to: '/local/warm', after: 1 h",

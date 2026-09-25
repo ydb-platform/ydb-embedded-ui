@@ -45,9 +45,12 @@ export function prepareColumnTableGeneralInfo(columnTable: TColumnTableDescripti
             left.push({
                 ...ttlInfo,
                 content: (
-                    <Text whiteSpace="break-spaces" wordBreak="break-word" qa="table-ttl">
+                    <span
+                        style={{whiteSpace: 'break-spaces', wordBreak: 'break-word'}}
+                        data-qa="table-ttl"
+                    >
                         {ttlInfo.content}
-                    </Text>
+                    </span>
                 ),
             });
         }

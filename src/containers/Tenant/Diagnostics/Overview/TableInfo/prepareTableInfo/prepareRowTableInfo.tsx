@@ -1,4 +1,4 @@
-import {Label, Text} from '@gravity-ui/uikit';
+import {Label} from '@gravity-ui/uikit';
 
 import type {YDBDefinitionListItem} from '../../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TPartitionConfig, TTTLSettings} from '../../../../../../types/api/schema';
@@ -69,9 +69,12 @@ export function prepareRowTableGeneralInfo(
             left.push({
                 ...ttlInfo,
                 content: (
-                    <Text whiteSpace="break-spaces" wordBreak="break-word" qa="table-ttl">
+                    <span
+                        style={{whiteSpace: 'break-spaces', wordBreak: 'break-word'}}
+                        data-qa="table-ttl"
+                    >
                         {ttlInfo.content}
-                    </Text>
+                    </span>
                 ),
             });
         }
