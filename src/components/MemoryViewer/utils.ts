@@ -3,12 +3,6 @@ import {isNumeric} from '../../utils/utils';
 
 import i18n from './i18n';
 
-export function calculateAllocatedMemory(stats: TMemoryStats) {
-    const allocatedMemory = getMaybeNumber(stats.AllocatedMemory) || 0;
-    const allocatorCaches = getMaybeNumber(stats.AllocatorCachesMemory) || 0;
-    return String(allocatedMemory + allocatorCaches);
-}
-
 function getMaybeNumber(value: string | number | undefined): number | undefined {
     return isNumeric(value) ? parseFloat(String(value)) : undefined;
 }
