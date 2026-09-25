@@ -14,6 +14,7 @@ import {getDiskLocationItems} from '../../utils/disks/diskInfo/getDiskLocationIt
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useNodeMetadata} from '../../utils/hooks/useNodeMetadata';
 import {isNumeric} from '../../utils/utils';
+import {getPDiskCapacityItems} from '../DiskCapacityInfo/DiskCapacityInfo';
 import {
     DiskPopup,
     DiskPopupHeader,
@@ -23,11 +24,7 @@ import {
 import {DiskStatusLabel} from '../DiskStatus/DiskStatus';
 import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
-import {
-    getPDiskCapacityItems,
-    getPDiskLogItems,
-    getPDiskRuntimeItems,
-} from '../PDiskInfo/getPDiskDetails';
+import {getPDiskLogItems, getPDiskRuntimeItems} from '../PDiskInfo/getPDiskDetails';
 import {
     getPDiskDecommitLabel,
     getPDiskDriveLabel,

@@ -6,6 +6,7 @@ import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
 import {isCapacityAlert} from '../../types/api/enums';
 import {getCapacityAlertTheme, normalizeCapacityAlert} from '../../utils/capacityAlerts';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import type {PreparedPDisk, PreparedVDisk} from '../../utils/disks/types';
 import {
     formatMetricCountPair,
@@ -13,8 +14,12 @@ import {
     formatNormalizedMetricPercent,
     formatStorageMetricPair,
 } from '../../utils/storageMetrics';
+import {parseOptionalNonNegativeNumber} from '../../utils/utils';
+import {DiskCapacityAlertLabel} from '../DiskStatus/DiskStatus';
 import type {InfoViewerItem} from '../InfoViewer';
+import {pDiskInfoKeyset} from '../PDiskInfo/i18n';
 import {TitleWithHelpMark} from '../TitleWithHelpmark/TitleWithHelpmark';
+import {vDiskInfoKeyset} from '../VDiskInfo/i18n';
 import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
 import {
     CAPACITY_CONFIGURATION_HELP_TEXT,
@@ -155,6 +160,82 @@ export function getPDiskCapacityInfoItems(
         });
     }
 
+    return items;
+}
+
+export function getVDiskCapacityItems(
+    data: PreparedVDisk,
+    {capacityMetricsEnabled}: {capacityMetricsEnabled: boolean},
+): DiskDetailItem[] {
+    const size: Pick<PreparedVDisk, 'AllocatedSize' | 'SizeLimit' | 'HasCompleteSizeData'> =
+        capacityMetricsEnabled ? (data.WhiteboardSize ?? data) : data;
+    const items: DiskDetailItem[] = [
+        {
+            id: 'group-size-in-units',
+            name: vDiskInfoKeyset('field_group-size-in-units'),
+            content: formatCapacityUnitCount(data.GroupSizeInUnits),
+            note: CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits,
+        },
+        {
+            id: 'size',
+            name: vDiskInfoKeyset('size'),
+            content:
+                size.HasCompleteSizeData === false
+                    ? EMPTY_DATA_PLACEHOLDER
+                    : formatStorageMetricPair(size.AllocatedSize, size.SizeLimit, 2),
+        },
+        {
+            id: 'capacity-alert',
+            name: vDiskInfoKeyset('field_capacity-alert'),
+            content: <DiskCapacityAlertLabel value={data.CapacityAlert} />,
+            note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+        },
+        {
+            id: 'vdisk-slot-usage',
+            name: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
+            content: formatMetricPercent(data.VDiskSlotUsage, 2),
+            note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
+        },
+    ];
+    if (parseOptionalNonNegativeNumber(data.VDiskRawUsage) !== undefined) {
+        items.push({
+            id: 'vdisk-raw-usage',
+            name: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage,
+            content: formatMetricPercent(data.VDiskRawUsage, 2),
+            note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
+        });
+    }
+    return items.filter(({id}) => capacityMetricsEnabled || id === 'size');
+}
+
+export function getPDiskCapacityItems(
+    data: PreparedPDisk,
+    {useWhiteboardSize = true}: {useWhiteboardSize?: boolean} = {},
+): DiskDetailItem[] {
+    const fieldOrder = ['slot-size-in-units', 'space', 'capacity-alert', 'pdisk-usage', 'slots'];
+    const capacityItems = getPDiskCapacityInfoItems(data, {
+        withUsage: true,
+        withCapacityAlert: true,
+        fixedDecimalPlaces: 2,
+        useWhiteboardSize,
+    });
+    const items: DiskDetailItem[] = [];
+    for (const id of fieldOrder) {
+        const field = capacityItems.find((item) => item.id === id);
+        if (field) {
+            items.push({
+                id,
+                name: field.title,
+                content:
+                    id === 'capacity-alert' ? (
+                        <DiskCapacityAlertLabel value={data.PDiskCapacityAlert} />
+                    ) : (
+                        field.value
+                    ),
+                note: id === 'slots' ? pDiskInfoKeyset('context_slots') : field.note,
+            });
+        }
+    }
     return items;
 }
 

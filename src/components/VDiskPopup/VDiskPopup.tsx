@@ -20,6 +20,7 @@ import {useTypedDispatch} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useNodeMetadata} from '../../utils/hooks/useNodeMetadata';
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
+import {getVDiskCapacityItems} from '../DiskCapacityInfo/DiskCapacityInfo';
 import {
     DiskPopup,
     DiskPopupHeader,
@@ -31,11 +32,7 @@ import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/Evi
 import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {PDiskPopupContent} from '../PDiskPopup/PDiskPopup';
-import {
-    getVDiskCapacityItems,
-    getVDiskIdentityItems,
-    getVDiskLocationItems,
-} from '../VDiskInfo/getVDiskDetails';
+import {getVDiskIdentityItems, getVDiskLocationItems} from '../VDiskInfo/getVDiskDetails';
 import {vDiskInfoKeyset} from '../VDiskInfo/i18n';
 import {
     VDiskCompactionRankLabel,
