@@ -1,6 +1,7 @@
 import {isNil} from 'lodash';
 
 import type {NodeMetadata} from '../../types/store/nodesList';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {getDiskLocationItems} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {isFullVDiskData} from '../../utils/disks/helpers';
@@ -50,7 +51,8 @@ export function getVDiskCapacityItems(
     data: PreparedVDisk,
     {capacityMetricsEnabled}: {capacityMetricsEnabled: boolean},
 ): DiskDetailItem[] {
-    const size = capacityMetricsEnabled ? (data.WhiteboardSize ?? data) : data;
+    const size: Pick<PreparedVDisk, 'AllocatedSize' | 'SizeLimit' | 'HasCompleteSizeData'> =
+        capacityMetricsEnabled ? (data.WhiteboardSize ?? data) : data;
     const items: DiskDetailItem[] = [
         {
             id: 'group-size-in-units',
@@ -61,7 +63,10 @@ export function getVDiskCapacityItems(
         {
             id: 'size',
             name: i18n('size'),
-            content: formatStorageMetricPair(size.AllocatedSize, size.SizeLimit, 2),
+            content:
+                size.HasCompleteSizeData === false
+                    ? EMPTY_DATA_PLACEHOLDER
+                    : formatStorageMetricPair(size.AllocatedSize, size.SizeLimit, 2),
         },
         {
             id: 'capacity-alert',
@@ -84,11 +89,5 @@ export function getVDiskCapacityItems(
             note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
         });
     }
-    return items.filter(
-        ({id}) =>
-            capacityMetricsEnabled ||
-            (id === 'size' &&
-                (parseOptionalNonNegativeNumber(size.AllocatedSize) !== undefined ||
-                    parseOptionalNonNegativeNumber(size.SizeLimit) !== undefined)),
-    );
+    return items.filter(({id}) => capacityMetricsEnabled || id === 'size');
 }

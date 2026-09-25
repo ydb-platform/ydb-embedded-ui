@@ -260,6 +260,11 @@ export function prepareVDiskSizeFields({
         SizeLimit: sizeLimit,
         FreeSize: freeSize,
         AllocatedPercent: allocatedPercent,
+        HasCompleteSizeData:
+            parseOptionalNonNegativeNumber(AllocatedSize) !== undefined &&
+            (hasSizeLimitFallback
+                ? parseOptionalNonNegativeNumber(SlotSize) !== undefined
+                : parseOptionalNonNegativeNumber(AvailableSize) !== undefined),
     };
 }
 
