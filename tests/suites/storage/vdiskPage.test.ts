@@ -248,7 +248,7 @@ async function getDiskPopupPanel(container: Locator, title: 'VDisk' | 'PDisk', i
 async function expectDiskLocationDisclosure(
     panel: Locator,
     title: 'VDisk' | 'PDisk',
-    withPDiskId = true,
+    withPDiskDetails = true,
 ) {
     const details = panel.locator('.ydb-disk-popup__location-details');
     const expand = panel.getByRole('button', {name: `Show ${title} location details`, exact: true});
@@ -266,10 +266,11 @@ async function expectDiskLocationDisclosure(
     await expect(collapse).toHaveAttribute('aria-expanded', 'true');
     await expect(details).toBeVisible();
     await expectDefinitionListRowValue(details, 'Node ID', NODE_ID);
-    if (withPDiskId) {
+    if (withPDiskDetails) {
         await expectDefinitionListRowValue(details, 'PDisk ID', PDISK_ID);
     } else {
         await expect(getDefinitionListRow(details, 'PDisk ID')).toHaveCount(0);
+        await expect(getDefinitionListRow(details, 'PDisk Path')).toHaveCount(0);
     }
     if (title === 'VDisk') {
         await expectDefinitionListRowValue(details, 'VDisk Slot ID', '1001');
@@ -909,7 +910,7 @@ test.describe('Storage disk popup snapshots', () => {
         const pDiskPanel = await getDiskPopupPanel(popup, 'PDisk', `${NODE_ID}-${PDISK_ID}`);
         await expect(vDiskPanel.getByText('No data', {exact: true})).toBeVisible();
         await expect(pDiskPanel.getByText('Unknown', {exact: true})).toBeVisible();
-        await expectHDDLabel(vDiskPanel);
+        await expect(vDiskPanel.getByText('HDD', {exact: true})).toHaveCount(0);
         await expectHDDLabel(pDiskPanel);
         for (const label of ['Device', 'Realtime']) {
             await expectDefinitionListRowValue(pDiskPanel, label, 'Not available');

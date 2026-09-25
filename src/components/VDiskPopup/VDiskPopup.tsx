@@ -122,12 +122,18 @@ function getStorageItems(
         : items;
 }
 
-function DiskHeader({data = {}}: {data?: PreparedVDisk}) {
+function DiskHeader({
+    data = {},
+    withPDiskType = true,
+}: {
+    data?: PreparedVDisk;
+    withPDiskType?: boolean;
+}) {
     return (
         <DiskPopupHeader
             title={i18n('label_vdisk')}
             id={data.StringifiedId}
-            type={data.PDiskType ?? data.PDisk?.Type}
+            type={withPDiskType ? (data.PDiskType ?? data.PDisk?.Type) : undefined}
             statuses={
                 <React.Fragment>
                     <VDiskStateLabel state={data.VDiskState} size="xs" />
@@ -281,13 +287,13 @@ export function VDiskPopup({
           )
         : buildUnavailableVDiskFooter(data, hasDeveloperUi);
     const locationItems = getVDiskLocationItems(data, nodeData).filter(
-        ({id}) => !pdisk || id !== 'pdisk-id',
+        ({id}) => !pdisk || (id !== 'pdisk-id' && id !== 'pdisk-path'),
     );
     return (
         <DiskPopup combined={Boolean(pdisk)} className={b(null, 'vdisk-storage-popup')}>
             {pdisk && <PDiskPopupContent data={pdisk} nodeData={nodeData} />}
             <DiskPopupPanel footer={footer}>
-                <DiskHeader data={fullData} />
+                <DiskHeader data={fullData} withPDiskType={!pdisk} />
                 <DiskPopupLocation items={locationItems} title={i18n('label_vdisk')} />
                 {runtimeItems.length > 0 && (
                     <YDBDefinitionList items={runtimeItems} nameMaxWidth={150} />
