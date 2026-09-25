@@ -33,10 +33,10 @@ export function prepareTTL(ttl: TTTLSettings | TColumnDataLifeCycle) {
             if (tier.Delete) {
                 return [i18n('value_ttl-delete', {expireTime})];
             }
-            return [];
+            return [i18n('value_ttl-unknown-action', {expireTime})];
         });
 
-        // Nonempty tiers supersede the legacy expiry, even for unknown actions.
+        // Nonempty tiers supersede the legacy expiry, even if all delays are invalid.
         if (!tiers.length) {
             return undefined;
         }

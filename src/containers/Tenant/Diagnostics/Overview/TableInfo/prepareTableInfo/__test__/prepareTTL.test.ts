@@ -62,16 +62,35 @@ describe('prepareTTL', () => {
         );
     });
 
-    test('ignores unknown tier actions without presenting legacy expiry as active', () => {
+    test('shows unknown tier actions instead of hiding TTL or using the legacy expiry', () => {
         const ttl = {
             Enabled: {
                 ColumnName: 'created_at',
                 ExpireAfterSeconds: 60,
-                Tiers: [{ApplyAfterSeconds: 3600}],
+                Tiers: [{ApplyAfterSeconds: 3600, FutureAction: {}}],
             },
         };
 
-        expect(prepareTTL(ttl)).toBeUndefined();
+        expect(prepareTTL(ttl)?.content).toBe(
+            "column: 'created_at', unknown action, after: 1\u00a0h",
+        );
+    });
+
+    test('preserves unknown tiers alongside known actions in their original order', () => {
+        const ttl = {
+            Enabled: {
+                ColumnName: 'created_at',
+                Tiers: [
+                    {ApplyAfterSeconds: 3600, EvictToExternalStorage: {Storage: '/local/cold'}},
+                    {ApplyAfterSeconds: 86400, FutureAction: {}},
+                    {ApplyAfterSeconds: 604800, Delete: {}},
+                ],
+            },
+        };
+
+        expect(prepareTTL(ttl)?.content).toBe(
+            "column: 'created_at', evict to: '/local/cold', after: 1\u00a0h; unknown action, after: 1\u00a0d; delete after: 7\u00a0d",
+        );
     });
 
     test.each([undefined, -1, NaN, Infinity])('ignores an invalid tier delay %p', (delay) => {
