@@ -920,6 +920,38 @@ test.describe('Storage disk popup snapshots', () => {
         await expectDiskLocationDisclosure(pDiskPanel, 'PDisk');
     });
 
+    test('renders a slot-only donor popup with available location data', async ({page}) => {
+        await page.setViewportSize({width: 1500, height: 1000});
+        await setupVDiskPageMocks(page, {
+            host: 'donor-node-42.ydb',
+            rack: 'Rack-D42',
+            datacenter: 'KLG',
+        });
+        await setupPDiskInfoMock(page, {withSlotOnlyDonor: true});
+        await page.goto(`/pDisk?nodeId=${NODE_ID}&pDiskId=${PDISK_ID}`);
+
+        const slot = page.locator('.ydb-pdisk-space-distribution__slot-wrapper a').first();
+        await expect(slot).toBeVisible();
+        await slot.hover();
+        const popup = page
+            .locator('.ydb-pdisk-space-distribution__vdisk-popup')
+            .filter({visible: true})
+            .last();
+        await expect(popup).toBeVisible();
+        await expect(popup.locator('.ydb-disk-popup__panel')).toHaveCount(1);
+        await expect(popup.locator('a[href$="_000001011"]')).toBeVisible();
+        await expectDefinitionListRowValue(popup, 'FQDN', 'donor-node-42.ydb');
+        await expectDefinitionListRowValue(popup, 'Rack', 'Rack-D42');
+        await expectDefinitionListRowValue(popup, 'Storage Pool Name', STORAGE_POOL_NAME);
+
+        await popup.getByRole('button', {name: 'Show VDisk location details'}).click();
+        await expectDefinitionListRowValue(popup, 'Datacenter', 'KLG');
+        await expectDefinitionListRowValue(popup, 'Node ID', NODE_ID);
+        await expectDefinitionListRowValue(popup, 'PDisk ID', PDISK_ID);
+        await expectDefinitionListRowValue(popup, 'VDisk Slot ID', '1011');
+        await expect(popup).toHaveScreenshot('unavailable-donor-popup.png');
+    });
+
     test('closes VDisk popup after successful eviction', async ({page}) => {
         let evictRequestCount = 0;
 

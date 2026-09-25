@@ -106,7 +106,7 @@ function getRuntimeItems(
 }
 
 function getStorageItems(
-    data: PreparedVDisk | UnavailableDonor,
+    data: PreparedVDisk,
     capacityMetricsEnabled: boolean,
 ): YDBDefinitionListItem[] {
     const items: YDBDefinitionListItem[] = [];
@@ -162,14 +162,14 @@ function buildUnavailableVDiskFooter(
     data: UnavailableDonor,
     hasDeveloperUi: boolean,
 ): React.ReactNode | null {
-    const {NodeId, PDiskId, VSlotId} = data;
-    if (!hasDeveloperUi || isNil(NodeId) || isNil(PDiskId) || isNil(VSlotId)) {
+    const {NodeId, PDiskId, VDiskSlotId} = data;
+    if (!hasDeveloperUi || isNil(NodeId) || isNil(PDiskId) || isNil(VDiskSlotId)) {
         return null;
     }
     const developerLink = createVDiskDeveloperUILink({
         nodeId: NodeId,
         pDiskId: PDiskId,
-        vDiskSlotId: VSlotId,
+        vDiskSlotId: VDiskSlotId,
     });
     return (
         <LinkWithIcon
@@ -241,7 +241,7 @@ function buildVDiskFooter(
 }
 
 interface VDiskPopupProps {
-    data: PreparedVDisk | UnavailableDonor;
+    data: PreparedVDisk;
     nodeData?: NodeMetadata;
     onClose?: VoidFunction;
     view?: 'default' | 'space-distribution';

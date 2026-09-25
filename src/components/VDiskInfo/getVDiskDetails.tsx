@@ -4,12 +4,12 @@ import type {NodeMetadata} from '../../types/store/nodesList';
 import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {getDiskLocationItems} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {isFullVDiskData} from '../../utils/disks/helpers';
-import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
+import type {PreparedVDisk} from '../../utils/disks/types';
 
 import {vDiskInfoKeyset as i18n} from './i18n';
 
 export function getVDiskLocationItems(
-    data: PreparedVDisk | UnavailableDonor,
+    data: PreparedVDisk,
     nodeData: NodeMetadata,
 ): DiskDetailItem[] {
     const fullData = isFullVDiskData(data) ? data : undefined;
@@ -18,7 +18,7 @@ export function getVDiskLocationItems(
             NodeId: data.NodeId,
             PDiskId: data.PDiskId,
             Path: fullData?.PDiskPath ?? fullData?.PDisk?.Path,
-            VDiskSlotId: isFullVDiskData(data) ? data.VDiskSlotId : data.VSlotId,
+            VDiskSlotId: data.VDiskSlotId,
         },
         nodeData,
         {withVDiskSlotId: true},

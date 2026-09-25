@@ -26,6 +26,7 @@ export interface SetupVDiskPageMocksOptions {
     pDiskId?: string;
     isViewerAllowed?: boolean;
     withDonors?: boolean;
+    withSlotOnlyDonor?: boolean;
     withoutCompaction?: boolean;
     storagePoolName?: string;
     allocatedSize?: string;
@@ -508,6 +509,7 @@ export async function setupPDiskInfoMock(
     page: Page,
     {
         withCapacityMetrics = false,
+        withSlotOnlyDonor = false,
         whiteboardAllocatedSize,
         whiteboardAvailableSize,
         whiteboardSlotSize = '20000000000',
@@ -518,6 +520,7 @@ export async function setupPDiskInfoMock(
     }: Pick<
         SetupVDiskPageMocksOptions,
         | 'withCapacityMetrics'
+        | 'withSlotOnlyDonor'
         | 'whiteboardAllocatedSize'
         | 'whiteboardAvailableSize'
         | 'whiteboardSlotSize'
@@ -539,10 +542,20 @@ export async function setupPDiskInfoMock(
                         pDiskWhiteboardTotalSize,
                     }),
                     VDisks: [
-                        createVDiskWhiteboardData(withCapacityMetrics, {
-                            whiteboardAllocatedSize,
-                            whiteboardAvailableSize,
-                        }),
+                        withSlotOnlyDonor
+                            ? {
+                                  NodeId: Number(NODE_ID),
+                                  PDiskId: Number(PDISK_ID),
+                                  VSlotId: 1011,
+                                  DonorMode: true,
+                                  StoragePoolName: STORAGE_POOL_NAME,
+                                  AllocatedSize: '1000000000',
+                                  AvailableSize: '19000000000',
+                              }
+                            : createVDiskWhiteboardData(withCapacityMetrics, {
+                                  whiteboardAllocatedSize,
+                                  whiteboardAvailableSize,
+                              }),
                     ],
                 },
                 BSC: {
