@@ -1,3 +1,4 @@
 {
-  "empty": "Table is empty"
+  "empty": "Table is empty",
+  "action.copy-row": "Copy row"
 }

@@ -2,7 +2,9 @@ import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column, Settings} from '@gravity-ui/react-data-table';
+import {ClipboardButton} from '@gravity-ui/uikit';
 
+import {buildTsvBlobParts} from '../../containers/Tenant/Query/utils/getPreparedResult';
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
@@ -28,6 +30,22 @@ export const b = cn('ydb-query-result-table');
 
 const WIDTH_PREDICTION_ROWS_COUNT = 100;
 
+//used buildTsvBlobParts to convert row to tsv format for copying, so that copied value is the same as when user exports data to tsv
+const rowToTsv = (row: KeyValueRow) => buildTsvBlobParts([row]).slice(2).join('');
+
+const copyColumn: Column<KeyValueRow> = {
+    name: 'copy',
+    header: '',
+    width: 40,
+    render: ({row}) => (
+        <ClipboardButton
+            text={rowToTsv(row)}
+            view="flat-secondary"
+            size="s"
+            title={i18n('action.copy-row')}
+        />
+    ),
+};
 const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefined) => {
     if (!columns.length) {
         return [];
@@ -35,7 +53,7 @@ const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefi
 
     const dataSlice = data?.slice(0, WIDTH_PREDICTION_ROWS_COUNT);
 
-    return columns.map(({name, type}) => {
+    const dataColumns = columns.map(({name, type}) => {
         const columnType = getColumnType(type);
 
         const column: Column<KeyValueRow> = {
@@ -43,17 +61,19 @@ const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefi
             width: getColumnWidth({data: dataSlice, name}),
             align: columnType === 'number' ? DataTable.RIGHT : DataTable.LEFT,
             render: ({row}) => {
-                const data = row[name];
+                const rowData = row[name];
                 const normalizedData =
-                    columnType === 'binary-string' && typeof data === 'string'
-                        ? JSON.stringify(data).slice(1, -1)
-                        : String(data);
+                    columnType === 'binary-string' && typeof rowData === 'string'
+                        ? JSON.stringify(rowData).slice(1, -1)
+                        : String(rowData);
                 return <Cell value={normalizedData} />;
             },
         };
 
         return column;
     });
+
+    return dataColumns;
 };
 
 const prepareGenericColumns = (data: KeyValueRow[] | undefined) => {
@@ -63,7 +83,7 @@ const prepareGenericColumns = (data: KeyValueRow[] | undefined) => {
 
     const dataSlice = data?.slice(0, WIDTH_PREDICTION_ROWS_COUNT);
 
-    return Object.keys(data[0]).map((name) => {
+    const dataColumns = Object.keys(data[0]).map((name) => {
         const column: Column<KeyValueRow> = {
             name,
             width: getColumnWidth({data: dataSlice, name}),
@@ -73,6 +93,7 @@ const prepareGenericColumns = (data: KeyValueRow[] | undefined) => {
 
         return column;
     });
+    return dataColumns;
 };
 
 const getRowIndex = (_: unknown, index: number) => index;
@@ -91,7 +112,20 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
     const {columns, data, settings: propsSettings} = props;
 
     const preparedColumns = React.useMemo(() => {
-        return columns ? prepareTypedColumns(columns, data) : prepareGenericColumns(data);
+        const dataColumns = columns
+            ? prepareTypedColumns(columns, data)
+            : prepareGenericColumns(data);
+
+        if (!dataColumns.length) {
+            return dataColumns;
+        }
+        const existingNames = new Set(dataColumns.map((col) => col.name));
+        let copyColumnName = 'copy';
+        while (existingNames.has(copyColumnName)) {
+            copyColumnName = `_${copyColumnName}_`;
+        }
+
+        return [...dataColumns, {...copyColumn, name: copyColumnName}];
     }, [columns, data]);
 
     const settings = React.useMemo(() => {
