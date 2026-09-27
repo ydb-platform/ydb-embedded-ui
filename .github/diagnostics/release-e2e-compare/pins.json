@@ -1,0 +1,18 @@
+{
+  "controller_sha": "71b800f1d788ce7cbb339984ee3541999026ea18",
+  "ui15_sha": "85e1e1d44e7df6b0f69b4a81e92d2336fb809941",
+  "playwright": "mcr.microsoft.com/playwright@sha256:35c7d48b4ccaf3aca5018f5f1bf7f50c7da7d61d176c530741f4f2e9ca336c34",
+  "images": {
+    "26.2.1.14": {
+      "digest": "sha256:9e46fd45875551a75bcf34d0bb9ca0baa1d8763a4ccf2070af45f4467c4b7402",
+      "revision": "1bd0f9c372384549fe4ff21c29f44609a20f5450"
+    }
+  },
+  "source_manifest_sha256": "8fc580c4ca99192d29ab69a76460956c343b4f70e56d6e0f4cb6093e4a49aa46",
+  "source_files": 1905,
+  "controller_files": {
+    "scripts/playwright-docker.sh": "7705e731044816838d1af38596ef64195223ad9501a829eb749d4b738f064c4f",
+    ".github/workflows/scripts/resolve-playwright-backend.js": "27d7b20f3cd9ab7cf64c02da5ed86a3a0c58cff869477c794cee9bc441ccd5ba",
+    ".github/workflows/scripts/release-e2e-report.js": "7d7ab4c82eb6d7c66326cafeebb5568484fdd1891b153f0598ead6dba8a7c641"
+  }
+}
