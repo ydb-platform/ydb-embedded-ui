@@ -3,28 +3,15 @@ import React from 'react';
 import {fireEvent, render, screen} from '@testing-library/react';
 
 import type {PreparedTenant} from '../../../../../store/reducers/tenants/types';
-import {configureUIFactory, uiFactory} from '../../../../../uiFactory/uiFactory';
 import {ClusterDrawerHealthcheck as ClusterPageDrawer} from '../../../../Cluster/ClusterDrawerHealthcheck';
 import {ClusterDrawerHealthcheck as ClustersDrawer} from '../../../../Clusters/ClusterDrawerHealthcheck';
 import {DatabaseDrawerHealthcheck} from '../../../../Tenants/DatabaseDrawerHealthcheck';
 import {TenantDrawerHealthcheck} from '../../../TenantDrawerHealthcheck';
 import type {HealthcheckAssistantTarget} from '../../types';
+import {HealthcheckDrawer} from '../HealthcheckDrawer';
 
-jest.mock('../../../../../components/Drawer', () => ({
-    DrawerWrapper: ({
-        isDrawerVisible,
-        renderDrawerContent,
-        children,
-    }: {
-        isDrawerVisible: boolean;
-        renderDrawerContent: () => React.ReactNode;
-        children: React.ReactNode;
-    }) => (
-        <div>
-            {children}
-            {isDrawerVisible && renderDrawerContent()}
-        </div>
-    ),
+jest.mock('../HealthcheckDrawer', () => ({
+    HealthcheckDrawer: jest.fn(({children}: {children: React.ReactNode}) => children),
 }));
 jest.mock('../../../../../utils/hooks', () => ({useTypedSelector: () => undefined}));
 jest.mock('../../../TenantContext', () => ({useCurrentSchema: () => ({database: '/Root/db'})}));
@@ -41,7 +28,7 @@ jest.mock('use-query-params', () => ({
     StringParam: {},
     useQueryParams: () => [{showHealthcheck: true}, jest.fn()],
 }));
-jest.mock('../../Healthcheck', () => ({Healthcheck: () => <div>Loading healthcheck</div>}));
+jest.mock('../../Healthcheck', () => ({Healthcheck: () => null}));
 
 const tenant: PreparedTenant = {
     Name: '/Root/db',
@@ -58,48 +45,27 @@ const tenant: PreparedTenant = {
 };
 
 describe('Healthcheck drawer target owners', () => {
-    const originalExtension = uiFactory.healthcheck.renderDrawerExtension;
-    const targets = jest.fn();
-    beforeEach(() => {
-        targets.mockClear();
-        configureUIFactory({
-            healthcheck: {
-                renderDrawerExtension: (props) => {
-                    targets(props?.target);
-                    return null;
-                },
-            },
-        });
-    });
-    afterEach(() => configureUIFactory({healthcheck: {renderDrawerExtension: originalExtension}}));
+    beforeEach(() => jest.clearAllMocks());
 
-    test.each<{name: string; element: React.ReactElement; target: HealthcheckAssistantTarget}>([
-        {
-            name: 'all clusters',
-            element: (
-                <ClustersDrawer clusterName="alpha" isVisible onClose={jest.fn()}>
-                    Page
-                </ClustersDrawer>
-            ),
-            target: {scope: 'cluster', request: {clusterName: 'alpha'}},
-        },
-        {
-            name: 'cluster page',
-            element: (
-                <ClusterPageDrawer clusterName="alpha" database="/Root">
-                    Page
-                </ClusterPageDrawer>
-            ),
-            target: {scope: 'cluster', request: {clusterName: 'alpha', database: '/Root'}},
-        },
-        {
-            name: 'database page',
-            element: <TenantDrawerHealthcheck clusterName="alpha">Page</TenantDrawerHealthcheck>,
-            target: {scope: 'database', request: {clusterName: 'alpha', database: '/Root/db'}},
-        },
-    ])('provides $name identity before data resolves', ({element, target}) => {
+    test.each<[string, React.ReactElement, HealthcheckAssistantTarget]>([
+        [
+            'all clusters',
+            <ClustersDrawer clusterName="alpha" isVisible onClose={jest.fn()} children={null} />,
+            {scope: 'cluster', request: {clusterName: 'alpha'}},
+        ],
+        [
+            'cluster page',
+            <ClusterPageDrawer clusterName="alpha" database="/Root" children={null} />,
+            {scope: 'cluster', request: {clusterName: 'alpha', database: '/Root'}},
+        ],
+        [
+            'database page',
+            <TenantDrawerHealthcheck clusterName="alpha" children={null} />,
+            {scope: 'database', request: {clusterName: 'alpha', database: '/Root/db'}},
+        ],
+    ])('passes the %s target before data resolves', (_name, element, target) => {
         render(element);
-        expect(targets).toHaveBeenLastCalledWith(target);
+        expect(jest.mocked(HealthcheckDrawer).mock.lastCall?.[0].target).toEqual(target);
     });
 
     test.each([undefined, 'explicit-cluster'])(
@@ -114,9 +80,8 @@ describe('Healthcheck drawer target owners', () => {
                     )}
                 </DatabaseDrawerHealthcheck>,
             );
-            expect(targets).not.toHaveBeenCalled();
             fireEvent.click(screen.getByRole('button', {name: 'Open healthcheck'}));
-            expect(targets).toHaveBeenLastCalledWith({
+            expect(jest.mocked(HealthcheckDrawer).mock.lastCall?.[0].target).toEqual({
                 scope: 'database',
                 request: {database: '/Root/db', clusterName: clusterName ?? 'tenant-cluster'},
             });

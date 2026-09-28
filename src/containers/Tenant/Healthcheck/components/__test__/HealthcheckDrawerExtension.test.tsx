@@ -151,9 +151,17 @@ describe('Healthcheck drawer extension', () => {
         );
     });
 
-    test('retains the extension and inset across data states, then cleans up on close', () => {
+    test('preserves the extension, target and inset across data states, then cleans up on close', () => {
+        const target: HealthcheckAssistantTarget = {
+            scope: 'cluster',
+            request: {clusterName: 'alpha'},
+        };
+        const renderExtension = jest.fn(() => <Extension />);
+        configureUIFactory({healthcheck: {renderDrawerExtension: renderExtension}});
         const degraded = mockHealthcheck;
-        const {rerender, unmount} = render(<DrawerFixture />);
+        const {rerender, unmount} = render(<DrawerFixture target={target} />);
+        const extension = screen.getByTestId('drawer-extension');
+        expect(renderExtension).toHaveBeenLastCalledWith({target});
         expect(screen.getByTestId('right-inset')).toHaveTextContent('434');
         expect(screen.getByRole('button', {name: 'Diagnostics'})).toBeInTheDocument();
 
@@ -165,16 +173,23 @@ describe('Healthcheck drawer extension', () => {
         ];
         for (const state of states) {
             mockHealthcheck = {...mockHealthcheck, ...state};
-            rerender(<DrawerFixture />);
-            expect(screen.getByTestId('drawer-extension')).toBeInTheDocument();
+            rerender(<DrawerFixture target={target} />);
+            expect(screen.getByTestId('drawer-extension')).toBe(extension);
+            expect(renderExtension).toHaveBeenLastCalledWith({target});
             expect(screen.getByTestId('right-inset')).toHaveTextContent('434');
             expect(screen.queryByRole('button', {name: 'Diagnostics'})).not.toBeInTheDocument();
             expect(onInsetChange.mock.calls).toEqual([[434]]);
         }
 
         mockHealthcheck = degraded;
-        rerender(<DrawerFixture />);
+        rerender(<DrawerFixture target={target} />);
         expect(screen.getByRole('button', {name: 'Diagnostics'})).toBeInTheDocument();
+        expect(onInsetChange.mock.calls).toEqual([[434]]);
+
+        const nextTarget: HealthcheckAssistantTarget = {...target, request: {clusterName: 'beta'}};
+        rerender(<DrawerFixture target={nextTarget} />);
+        expect(renderExtension).toHaveBeenLastCalledWith({target: nextTarget});
+        expect(screen.getByTestId('drawer-extension')).toBe(extension);
         expect(onInsetChange.mock.calls).toEqual([[434]]);
 
         rerender(<DrawerFixture open={false} />);
@@ -183,6 +198,7 @@ describe('Healthcheck drawer extension', () => {
         expect(onInsetChange.mock.calls).toEqual([[434], [0]]);
 
         rerender(<DrawerFixture />);
+        expect(renderExtension).toHaveBeenLastCalledWith({target: undefined});
         expect(onInsetChange.mock.calls).toEqual([[434], [0], [434]]);
         unmount();
         expect(onInsetChange.mock.calls).toEqual([[434], [0], [434], [0]]);
@@ -202,49 +218,6 @@ describe('Healthcheck drawer extension', () => {
             scope: 'database',
             request: {database: '/second', clusterName: 'beta'},
         });
-    });
-
-    test('passes explicit target without mounting actions and updates it without remounting the extension', () => {
-        const targets = jest.fn();
-        configureUIFactory({
-            healthcheck: {
-                renderDrawerExtension: (props) => {
-                    targets(props?.target);
-                    return <Extension />;
-                },
-            },
-        });
-        const alpha: HealthcheckAssistantTarget = {
-            scope: 'cluster',
-            request: {clusterName: 'alpha'},
-        };
-        const beta: HealthcheckAssistantTarget = {scope: 'cluster', request: {clusterName: 'beta'}};
-        mockHealthcheck = {...mockHealthcheck, loading: true, successful: false};
-        const {rerender} = render(<DrawerFixture target={alpha} />);
-        const extension = screen.getByTestId('drawer-extension');
-        expect(targets).toHaveBeenLastCalledWith(alpha);
-        for (const state of [
-            {loading: false, error: {message: 'Unavailable'}},
-            {
-                error: undefined,
-                successful: true,
-                selfCheckResult: SelfCheckResult.GOOD,
-                issues: [],
-                leavesIssues: [],
-            },
-        ]) {
-            mockHealthcheck = {...mockHealthcheck, ...state};
-            rerender(<DrawerFixture target={alpha} />);
-            expect(targets).toHaveBeenLastCalledWith(alpha);
-            expect(screen.getByTestId('drawer-extension')).toBe(extension);
-            expect(screen.queryByRole('button', {name: 'Diagnostics'})).not.toBeInTheDocument();
-        }
-        rerender(<DrawerFixture target={beta} />);
-        expect(targets).toHaveBeenLastCalledWith(beta);
-        expect(screen.getByTestId('drawer-extension')).toBe(extension);
-        expect(onInsetChange.mock.calls).toEqual([[434]]);
-        rerender(<DrawerFixture />);
-        expect(targets).toHaveBeenLastCalledWith(undefined);
     });
 
     test('renders the extension after the header and before Healthcheck', () => {
