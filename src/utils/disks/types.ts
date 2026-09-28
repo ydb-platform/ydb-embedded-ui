@@ -98,6 +98,8 @@ export interface PreparedVDisk
     extends Omit<TVDiskStateInfo, 'PDisk' | 'AvailableSize' | 'AllocatedSize' | 'Donors'> {
     Status?: EVDiskStatus;
     PDisk?: PreparedPDisk;
+    PDiskType?: string;
+    PDiskPath?: string;
     Severity?: number;
     StringifiedId?: string;
 
@@ -106,6 +108,8 @@ export interface PreparedVDisk
     AllocatedPercent?: number;
     SizeLimit?: number;
     FreeSize?: number;
+    /** Whether the source provides allocated size and enough data to determine its limit. */
+    HasCompleteSizeData?: boolean;
     WhiteboardSize?: {
         AllocatedSize?: number;
         SizeLimit?: number;

@@ -88,10 +88,14 @@ const prepareStorageNodeData = (
                 pDisk.Realtime !== undefined);
         return prepareWhiteboardPDiskData({...pDisk, NodeId}, hasWhiteboardData ? pDisk : null);
     });
+    const pDisksById = new Map(pDisks?.map((pDisk) => [pDisk.PDiskId, pDisk]));
     const vDisks = VDisks?.map((vDisk) => {
+        const pDisk = vDisk.PDiskId === undefined ? undefined : pDisksById.get(vDisk.PDiskId);
         return {
             ...prepareWhiteboardVDiskData({...vDisk, VDiskId: vDisk.VDiskId}),
             NodeId,
+            PDiskType: pDisk?.Type,
+            PDiskPath: pDisk?.Path,
         };
     });
 

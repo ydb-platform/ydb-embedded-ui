@@ -56,6 +56,10 @@ export interface TPDiskStateInfo {
     /** float; percent in the 0..100 scale. */
     PDiskUsage?: number;
     PDiskCapacityAlert?: ECapacityAlert | string;
+    /** Added by viewer from the BlobStorage controller system view. */
+    Status?: EDriveStatus;
+    DecommitStatus?: EDecommitStatus;
+    MaintenanceStatus?: EMaintenanceStatus;
 }
 
 export enum TPDiskState {
