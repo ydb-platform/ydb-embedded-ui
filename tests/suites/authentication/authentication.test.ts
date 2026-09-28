@@ -177,6 +177,9 @@ test.describe('Authentication', () => {
 
         await expect.poll(() => documentRequests).toBe(2);
         const editor = new QueryEditor(page);
+        // The reload boots the whole app again, and on WebKit in CI the editor can take
+        // longer than the default expect timeout to mount, so wait for it explicitly first.
+        await editor.waitForEditorReady();
         await expect.poll(() => editor.getEditorContent()).toBe('SELECT 42 AS preserved_draft;');
         await expect(editor.editorTabs.getActiveTabTitle()).resolves.toBe('Login draft');
     });
