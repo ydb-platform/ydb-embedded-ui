@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+- **healthcheck:** expose the drawer target to extensions independently of loading and issue state
+
 ## [22.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.1.0...v22.2.0) (2026-09-24)
 
 

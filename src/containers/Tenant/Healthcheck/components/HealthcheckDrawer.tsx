@@ -9,10 +9,12 @@ import {EnableFullscreenButton} from '../../../../components/EnableFullscreenBut
 import type {SelfCheckResult} from '../../../../types/api/healthcheck';
 import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {createAndDownloadJsonFile} from '../../../../utils/downloadFile';
+import type {HealthcheckAssistantTarget} from '../types';
 
 import {HealthcheckDrawerTitle} from './HealthcheckDrawerTitle';
 
 interface HealthcheckDrawerProps {
+    target?: HealthcheckAssistantTarget;
     children: React.ReactNode;
     isDrawerVisible: boolean;
     onCloseDrawer: () => void;
@@ -29,6 +31,7 @@ interface HealthcheckDrawerProps {
 }
 
 export function HealthcheckDrawer({
+    target,
     children,
     isDrawerVisible,
     onCloseDrawer,
@@ -51,11 +54,11 @@ export function HealthcheckDrawer({
 
         return (
             <React.Fragment>
-                {renderDrawerExtension()}
+                {renderDrawerExtension({target})}
                 {renderDrawerContent()}
             </React.Fragment>
         );
-    }, [renderDrawerContent, renderDrawerExtension]);
+    }, [renderDrawerContent, renderDrawerExtension, target]);
 
     const handleDownload = React.useCallback(
         (event: React.MouseEvent<HTMLButtonElement>) => {
