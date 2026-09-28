@@ -6,16 +6,15 @@ import {isNil} from 'lodash';
 
 import {getPDiskPagePath} from '../../routes';
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
-import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
+import type {NodeMetadata} from '../../types/store/nodesList';
 import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculatePDiskSeverity';
 import {NUMERIC_SEVERITY_TO_LABEL_VIEW} from '../../utils/disks/constants';
 import {formatPDiskType} from '../../utils/disks/getPDiskType';
 import type {PreparedPDisk} from '../../utils/disks/types';
-import {useTypedSelector} from '../../utils/hooks';
-import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {useNodeMetadata} from '../../utils/hooks/useNodeMetadata';
 import {bytesToGB, isNumeric} from '../../utils/utils';
 import {
     getPDiskCapacityInfoItems,
@@ -175,14 +174,13 @@ export const buildPDiskFooter = (
 
 interface PDiskPopupProps {
     data: PreparedPDisk;
+    nodeData?: NodeMetadata;
 }
 
-export const PDiskPopup = ({data}: PDiskPopupProps) => {
-    const database = useDatabaseFromQuery();
+export const PDiskPopupContent = ({data, nodeData: parentNodeData}: PDiskPopupProps) => {
+    const nodeData = useNodeMetadata(data.NodeId, parentNodeData);
     const hasDeveloperUi = useHasDeveloperUi();
     const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
-    const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
-    const nodeData = isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId);
 
     const info = React.useMemo(
         () => preparePDiskData(data, nodeData, capacityMetricsEnabled),
@@ -213,3 +211,5 @@ export const PDiskPopup = ({data}: PDiskPopupProps) => {
         />
     );
 };
+
+export const PDiskPopup = (props: PDiskPopupProps) => <PDiskPopupContent {...props} />;
