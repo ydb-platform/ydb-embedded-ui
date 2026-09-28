@@ -8,6 +8,7 @@ import {YDB_POPOVER_CLASS_NAME} from '../../utils/constants';
 import {useEventHandler} from '../../utils/hooks/useEventHandler';
 
 import {getPopupScrollContainer} from './getPopupScrollContainer';
+import {usePopupPriority} from './usePopupPriority';
 
 const DEBOUNCE_TIMEOUT = 100;
 
@@ -60,6 +61,8 @@ export const HoverPopup = ({
     const [isFocused, setIsFocused] = React.useState(false);
 
     const anchor = React.useRef<HTMLSpanElement>(null);
+    const {activate, zIndex} = usePopupPriority();
+    const bringToFront = useEventHandler(() => activate(anchorRef?.current || anchor.current));
 
     const reportedOpenRef = React.useRef(false);
 
@@ -115,7 +118,11 @@ export const HoverPopup = ({
         reportOpen(false, true);
     }, [debouncedHandleHidePopup, debouncedHandleShowPopup, reportOpen]);
 
-    const onMouseEnter = () => {
+    const onMouseEnter = (event: React.MouseEvent<HTMLSpanElement>) => {
+        if (event.buttons !== 0) {
+            return;
+        }
+        bringToFront();
         debouncedHandleHidePopup.cancel();
         debouncedHandleShowPopup();
     };
@@ -125,11 +132,17 @@ export const HoverPopup = ({
         debouncedHandleHidePopup();
     };
 
-    const onPopupMouseEnter = React.useCallback(() => {
-        debouncedHandleHidePopup.cancel();
-        setIsPopupContentHovered(true);
-        reportOpen(true);
-    }, [reportOpen, debouncedHandleHidePopup]);
+    const onPopupMouseEnter = React.useCallback(
+        (event: React.MouseEvent<HTMLDivElement>) => {
+            if (event.buttons === 0) {
+                bringToFront();
+            }
+            debouncedHandleHidePopup.cancel();
+            setIsPopupContentHovered(true);
+            reportOpen(true);
+        },
+        [bringToFront, reportOpen, debouncedHandleHidePopup],
+    );
 
     const onPopupMouseLeave = React.useCallback(() => {
         setIsPopupContentHovered(false);
@@ -137,9 +150,10 @@ export const HoverPopup = ({
     }, [debouncedHandleHidePopup]);
 
     const onPopupContextMenu = React.useCallback(() => {
+        bringToFront();
         setIsFocused(true);
         reportOpen(true);
-    }, [reportOpen]);
+    }, [bringToFront, reportOpen]);
 
     const onPopupBlur = React.useCallback(() => {
         setIsFocused(false);
@@ -165,6 +179,7 @@ export const HoverPopup = ({
             {anchorElement ? (
                 <Popup
                     container={container}
+                    zIndex={zIndex}
                     // Keep portal typography when the page uses a different font.
                     floatingStyles={{fontFamily: 'var(--g-text-body-font-family)'}}
                     anchorElement={anchorElement}
