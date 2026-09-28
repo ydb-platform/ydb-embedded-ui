@@ -1,24 +1,26 @@
-# Temporary release E2E trace comparison
+# Temporary memory-only release E2E comparison
 
-This branch is an experiment, not a proposed change to the normal release workflow.
-Do not merge it into main. Dispatch `release-e2e.yml` from this diagnostic branch
-with `ydb_tag=26.2.1.14`. No production sources, tests, snapshots or lockfiles change.
+Do not merge this diagnostic branch. It tests one hypothesis about the standard
+release runner: does setting `--memory=8g` on the Playwright container affect
+frontend readiness? All six runs use the original setup-local-ydb action with
+root topology, auth false, monitoring8765 and fresh containers/data. The original
+UI/test/lockfile/snapshot SHA and controller are frozen in pins.json.
 
-The workflow executes the original shard6/8 (114Safari cases) six times in order
-trace-on, off, off, on, on, off. It uses the native comparison pins in `pins.json`,
-two workers, no retries, unchanged test timeouts and video retain-on-failure.
-Only the trace CLI option changes. Each trial starts fresh Docker containers/data.
-The selected UI sources run through the unchanged controller at71b800f; source
-hashes are checked against the prior native comparison. Real Rubik loading is
-required in both Chromium and WebKit before the trials start.
+The sequence is uncapped,8g,8g,uncapped,uncapped,8g. Each run executes the entire
+original Safari shard6/8 with2workers, retries0, trace retain-on-failure and video
+retain-on-failure. Test timeouts and sources are unchanged. Docker memory is the
+only experimental option; no CPU limits, swap flag, extra browser warmup, custom
+backend network or backend resource limit is introduced. The host's existing
+swap and runtime behavior are recorded, not modified.
 
-Each completed trial is merged into HTML/JSON and uploaded immediately for30days.
-Scenario failures do not prevent the remaining trials, but the final job is red.
-Preparation errors, missing results, unsafe artifacts or cleanup errors stop the
-series and cannot become green. Runtime tokens never enter the test container.
+`memory-compare.py` reuses report validation from the preceding diagnostic
+compare.py. `memory-docker.py` adds experiment names/labels and identical source
+verification/resource observation to both variants; only theBtestcontainer gets
+--memory=8g. Report containers remain uncapped. All artifacts are uploaded for30
+days. Failures remain visible without retries; missing results or failed cleanup
+cannot produce a green result. The action post steps also verify removed resources.
 
-`compare.py` and `docker-wrapper.py` reuse the native diagnostic harness. The
-GitHub adaptation removes the host-specific egress tunnel and runs each trial as
-a separate workflow step so its report survives later failures. Product runner
-and source code remain pinned and unchanged. Existing release/report workflows
-on main are unaffected. This branch requires no PR or merge to execute.
+A passing run alone does not establish causality. Compare first attempts, Storage
+assertion timing, whole-run timing and measuredCPU/RAM across allthree pairs.
+If uncapped and8g do not separate, report the hypothesis as unconfirmed and do
+not add a memory limit to the production runner.

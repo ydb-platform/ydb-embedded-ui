@@ -1,43 +1,37 @@
-name: Release UI E2E trace comparison
-run-name: 'Trace comparison: local-ydb26.2.1.14 / UI15.6.0-hotfix.1 / shard6of8'
-
+name: Release UI E2E memory comparison
+run-name: 'Memory control: local-ydb26.2.1.14 / UI15.6.0-hotfix.1 / shard6of8'
 on:
   workflow_dispatch:
     inputs:
       ydb_tag:
         description: Fixed diagnostic release (26.2.1.14)
+        type: string
         required: true
         default: '26.2.1.14'
-        type: string
       ydb_sha:
         description: Optional expected YDB SHA
-        required: false
         type: string
-
+        required: false
 permissions:
   contents: read
-
 jobs:
   compare:
-    name: Three sequential trace pairs (shard 6/8)
+    name: Standard shard6 - memory-only A/B
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 180
     env:
       COMPARE_ROOT: ${{ github.workspace }}/experiment
       HARNESS: ${{ github.workspace }}/diagnostic/.github/diagnostics/release-e2e-compare
     steps:
-      - name: Require the diagnostic branch and fixed release
+      - name: Verify diagnostic scope
         env:
           YDB_TAG: ${{ inputs.ydb_tag }}
           YDB_SHA: ${{ inputs.ydb_sha }}
         run: |
-          if [ "$GITHUB_REF" != refs/heads/codex/release-e2e-github-compare-20260927 ] || [ "$YDB_TAG" != 26.2.1.14 ]; then
-            echo '::error::This temporary workflow only runs the fixed trace comparison.'
-            exit 1
-          fi
-          if [ -n "$YDB_SHA" ] && [ "$YDB_SHA" != 1bd0f9c372384549fe4ff21c29f44609a20f5450 ]; then
-            echo '::error::Unexpected YDB revision.'
-            exit 1
+          test "$GITHUB_REF" = refs/heads/codex/release-e2e-memory-compare-20260928
+          test "$YDB_TAG" = 26.2.1.14
+          if [ -n "$YDB_SHA" ]; then
+            test "$YDB_SHA" = 1bd0f9c372384549fe4ff21c29f44609a20f5450
           fi
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -46,133 +40,191 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: 71b800f1d788ce7cbb339984ee3541999026ea18
+          ref: 7d1c5a4b0e435610d85afbf122c514a0198db397
           path: experiment/controller
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24.13.1'
-      - name: Verify pinned inputs, browsers, fonts, backend and shard inventory
+      - name: Verify pinned inputs
         id: prepare
-        timeout-minutes: 15
-        run: python3 "$HARNESS/compare.py" prepare
-      - name: Upload preflight evidence
+        timeout-minutes: 10
+        run: python3 "$HARNESS/memory-compare.py" prepare
+      - name: Upload preparation evidence
         if: always() && steps.prepare.outcome != 'skipped'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: trace-compare-preflight
+          name: memory-compare-provenance
           path: |
-            experiment/inventory/
             experiment/provenance.json
             experiment/pins.json
             experiment/source-sha256.txt
             experiment/*.log
-            experiment/status.json
           if-no-files-found: error
           retention-days: 30
 
-      - name: Trial 1 - trace retain-on-failure
+      - name: Start standard backend 1
+        id: backend_1
+        uses: astandrik/setup-local-ydb@ba59d49d74fdab2f308132e72da6d4e111b7200d
+        with:
+          version: '26.2.1.14'
+          topology: root
+          auth: 'false'
+          cleanup: 'true'
+          monitoring-port: 8765
+          container-prefix: memory-ui-${{ github.run_id }}-${{ github.run_attempt }}-1
+      - name: Trial 1 - memory uncapped
         id: trial_1
         timeout-minutes: 40
-        run: python3 "$HARNESS/compare.py" trial 1
-      - name: Upload trial 1 evidence
+        run: python3 "$HARNESS/memory-compare.py" trial 1
+      - name: Upload trial 1
         id: upload_1
         if: always() && steps.trial_1.outcome != 'skipped'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: trace-compare-1-a
-          path: experiment/trials/github-shard6-1-a/
+          name: memory-compare-1-uncapped
+          path: experiment/trials/memory-shard6-1/
           if-no-files-found: error
           retention-days: 30
 
-      - name: Trial 2 - trace off
+      - name: Start standard backend 2
+        id: backend_2
+        uses: astandrik/setup-local-ydb@ba59d49d74fdab2f308132e72da6d4e111b7200d
+        with:
+          version: '26.2.1.14'
+          topology: root
+          auth: 'false'
+          cleanup: 'true'
+          monitoring-port: 8765
+          container-prefix: memory-ui-${{ github.run_id }}-${{ github.run_attempt }}-2
+      - name: Trial 2 - memory 8g
         id: trial_2
         timeout-minutes: 40
-        run: python3 "$HARNESS/compare.py" trial 2
-      - name: Upload trial 2 evidence
+        run: python3 "$HARNESS/memory-compare.py" trial 2
+      - name: Upload trial 2
         id: upload_2
         if: always() && steps.trial_2.outcome != 'skipped'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: trace-compare-2-b
-          path: experiment/trials/github-shard6-2-b/
+          name: memory-compare-2-8g
+          path: experiment/trials/memory-shard6-2/
           if-no-files-found: error
           retention-days: 30
 
-      - name: Trial 3 - trace off
+      - name: Start standard backend 3
+        id: backend_3
+        uses: astandrik/setup-local-ydb@ba59d49d74fdab2f308132e72da6d4e111b7200d
+        with:
+          version: '26.2.1.14'
+          topology: root
+          auth: 'false'
+          cleanup: 'true'
+          monitoring-port: 8765
+          container-prefix: memory-ui-${{ github.run_id }}-${{ github.run_attempt }}-3
+      - name: Trial 3 - memory 8g
         id: trial_3
         timeout-minutes: 40
-        run: python3 "$HARNESS/compare.py" trial 3
-      - name: Upload trial 3 evidence
+        run: python3 "$HARNESS/memory-compare.py" trial 3
+      - name: Upload trial 3
         id: upload_3
         if: always() && steps.trial_3.outcome != 'skipped'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: trace-compare-3-b
-          path: experiment/trials/github-shard6-3-b/
+          name: memory-compare-3-8g
+          path: experiment/trials/memory-shard6-3/
           if-no-files-found: error
           retention-days: 30
 
-      - name: Trial 4 - trace retain-on-failure
+      - name: Start standard backend 4
+        id: backend_4
+        uses: astandrik/setup-local-ydb@ba59d49d74fdab2f308132e72da6d4e111b7200d
+        with:
+          version: '26.2.1.14'
+          topology: root
+          auth: 'false'
+          cleanup: 'true'
+          monitoring-port: 8765
+          container-prefix: memory-ui-${{ github.run_id }}-${{ github.run_attempt }}-4
+      - name: Trial 4 - memory uncapped
         id: trial_4
         timeout-minutes: 40
-        run: python3 "$HARNESS/compare.py" trial 4
-      - name: Upload trial 4 evidence
+        run: python3 "$HARNESS/memory-compare.py" trial 4
+      - name: Upload trial 4
         id: upload_4
         if: always() && steps.trial_4.outcome != 'skipped'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: trace-compare-4-a
-          path: experiment/trials/github-shard6-4-a/
+          name: memory-compare-4-uncapped
+          path: experiment/trials/memory-shard6-4/
           if-no-files-found: error
           retention-days: 30
 
-      - name: Trial 5 - trace retain-on-failure
+      - name: Start standard backend 5
+        id: backend_5
+        uses: astandrik/setup-local-ydb@ba59d49d74fdab2f308132e72da6d4e111b7200d
+        with:
+          version: '26.2.1.14'
+          topology: root
+          auth: 'false'
+          cleanup: 'true'
+          monitoring-port: 8765
+          container-prefix: memory-ui-${{ github.run_id }}-${{ github.run_attempt }}-5
+      - name: Trial 5 - memory uncapped
         id: trial_5
         timeout-minutes: 40
-        run: python3 "$HARNESS/compare.py" trial 5
-      - name: Upload trial 5 evidence
+        run: python3 "$HARNESS/memory-compare.py" trial 5
+      - name: Upload trial 5
         id: upload_5
         if: always() && steps.trial_5.outcome != 'skipped'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: trace-compare-5-a
-          path: experiment/trials/github-shard6-5-a/
+          name: memory-compare-5-uncapped
+          path: experiment/trials/memory-shard6-5/
           if-no-files-found: error
           retention-days: 30
 
-      - name: Trial 6 - trace off
+      - name: Start standard backend 6
+        id: backend_6
+        uses: astandrik/setup-local-ydb@ba59d49d74fdab2f308132e72da6d4e111b7200d
+        with:
+          version: '26.2.1.14'
+          topology: root
+          auth: 'false'
+          cleanup: 'true'
+          monitoring-port: 8765
+          container-prefix: memory-ui-${{ github.run_id }}-${{ github.run_attempt }}-6
+      - name: Trial 6 - memory 8g
         id: trial_6
         timeout-minutes: 40
-        run: python3 "$HARNESS/compare.py" trial 6
-      - name: Upload trial 6 evidence
+        run: python3 "$HARNESS/memory-compare.py" trial 6
+      - name: Upload trial 6
         id: upload_6
         if: always() && steps.trial_6.outcome != 'skipped'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: trace-compare-6-b
-          path: experiment/trials/github-shard6-6-b/
+          name: memory-compare-6-8g
+          path: experiment/trials/memory-shard6-6/
           if-no-files-found: error
           retention-days: 30
 
-      - name: Verify cleanup of all experiment resources
+      - name: Verify cleanup
         if: always() && steps.prepare.outcome != 'skipped'
-        run: python3 "$HARNESS/compare.py" cleanup
-      - name: Summarize completeness and test outcomes
+        run: python3 "$HARNESS/memory-compare.py" cleanup
+      - name: Summarize all six trials
+        if: always() && steps.prepare.outcome != 'skipped'
         env:
           UPLOAD_RESULTS: '${{ steps.upload_1.outcome }} ${{ steps.upload_2.outcome }} ${{ steps.upload_3.outcome }} ${{ steps.upload_4.outcome }} ${{ steps.upload_5.outcome }} ${{ steps.upload_6.outcome }}'
-        if: always() && steps.prepare.outcome != 'skipped'
-        run: python3 "$HARNESS/compare.py" summarize
+        run: python3 "$HARNESS/memory-compare.py" summarize
       - name: Upload final metadata
         if: always() && steps.prepare.outcome != 'skipped'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: trace-compare-summary
+          name: memory-compare-summary
           path: |
             experiment/status.json
             experiment/summary.json
             experiment/summary.md
-            experiment/cleanup.json
+            experiment/cleanup/
             experiment/provenance.json
             experiment/pins.json
           if-no-files-found: error

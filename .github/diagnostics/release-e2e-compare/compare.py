@@ -396,7 +396,7 @@ def summarize():
         conclusion = 'failed'
     else:
         conclusion = 'passed'
-    rows = ['# Release E2E trace comparison', '', 'Conclusion: **' + conclusion + '**', '',
+    rows = ['# Release E2E memory comparison', '', 'Conclusion: **' + conclusion + '**', '',
             '| Trial | Passed | Failed | Skipped | Playwright seconds |', '|---|---:|---:|---:|---:|']
     for t in STATE['trials']:
         c = t.get('counts', {})
