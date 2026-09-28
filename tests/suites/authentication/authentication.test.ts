@@ -2,6 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {Authentication} from '../../models/Authentication';
 import {backend} from '../../utils/constants';
+import {VISIBILITY_TIMEOUT} from '../tenant/constants';
 import {QueryEditor} from '../tenant/queryEditor/models/QueryEditor';
 
 test.describe('Authentication', () => {
@@ -177,7 +178,12 @@ test.describe('Authentication', () => {
 
         await expect.poll(() => documentRequests).toBe(2);
         const editor = new QueryEditor(page);
-        await expect.poll(() => editor.getEditorContent()).toBe('SELECT 42 AS preserved_draft;');
+        // The reload boots the whole app again, and on WebKit in CI the editor can take
+        // longer than the default expect timeout to mount, so wait for it explicitly first.
+        await editor.waitForEditorReady();
+        await expect
+            .poll(() => editor.getEditorContent(), {timeout: VISIBILITY_TIMEOUT})
+            .toBe('SELECT 42 AS preserved_draft;');
         await expect(editor.editorTabs.getActiveTabTitle()).resolves.toBe('Login draft');
     });
 });
