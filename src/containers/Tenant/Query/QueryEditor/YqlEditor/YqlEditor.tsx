@@ -119,6 +119,14 @@ export function YqlEditor({
     const currentStatementCleanupRef = React.useRef<VoidFunction>();
     const [isEditorMounted, setIsEditorMounted] = React.useState(false);
 
+    React.useEffect(() => {
+        // onEditorReady removes the parent's visibility:hidden loading state.
+        // Focus after that render commits; focusing during editorDidMount is too early.
+        if (isEditorMounted) {
+            editorRef.current?.focus();
+        }
+    }, [isEditorMounted]);
+
     const isMultiTabQueryEditorEnabled = useMultiTabQueryEditorEnabled();
     const isAutocompleteEnabled = useEventHandler(() => Boolean(enableAutocomplete));
 
@@ -330,7 +338,6 @@ export function YqlEditor({
         if (!isMultiTabQueryEditorEnabled) {
             initUserPrompt(editor, getLastQueryText);
         }
-        editor.focus();
         editor.addAction({
             id: 'sendQuery',
             label: i18n('action_send-query'),
