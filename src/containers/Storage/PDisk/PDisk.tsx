@@ -257,6 +257,7 @@ export interface PDiskProps {
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
+    onClosePopup?: VoidFunction;
     className?: string;
     progressBarClassName?: string;
     // Nodes derive this width from their VDisk rows, overriding the Groups mode defaults.
@@ -276,6 +277,7 @@ export const PDisk = ({
     showPopup,
     onShowPopup,
     onHidePopup,
+    onClosePopup,
     className,
     progressBarClassName,
     width,
@@ -359,6 +361,7 @@ export const PDisk = ({
                 anchorRef={anchorRef}
                 onShowPopup={onShowPopup}
                 onHidePopup={onHidePopup}
+                onClosePopup={onClosePopup}
                 renderPopupContent={() => <PDiskPopup data={data} />}
                 delayOpen={delayOpen}
                 delayClose={delayClose}

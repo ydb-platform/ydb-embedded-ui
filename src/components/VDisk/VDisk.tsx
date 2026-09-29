@@ -242,6 +242,7 @@ export interface VDiskProps {
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
+    onClosePopup?: VoidFunction;
     progressBarClassName?: string;
     delayOpen?: number;
     delayClose?: number;
@@ -265,6 +266,7 @@ export const VDisk = ({
     showPopup,
     onShowPopup,
     onHidePopup,
+    onClosePopup,
     progressBarClassName,
     delayClose,
     delayOpen,
@@ -346,6 +348,7 @@ export const VDisk = ({
             showPopup={showPopup}
             onShowPopup={onShowPopup}
             onHidePopup={onHidePopup}
+            onClosePopup={onClosePopup}
             renderPopupContent={({onClose}) => (
                 <VDiskPopup
                     data={hidePDiskInPopup ? {...data, PDisk: undefined} : data}

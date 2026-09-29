@@ -44,11 +44,34 @@ import {
 import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
-import {vDiskPopupKeyset as i18n} from './i18n';
+import {vDiskPopupKeyset} from './i18n';
 
 import './VDiskPopup.scss';
 
 const b = cn('ydb-vdisk-popup');
+
+function buildUnavailableVDiskFooter(
+    data: UnavailableDonor,
+    withDeveloperUILink: boolean,
+): React.ReactNode | null {
+    const {NodeId, PDiskId, VDiskSlotId} = data;
+    if (!withDeveloperUILink || isNil(NodeId) || isNil(PDiskId) || isNil(VDiskSlotId)) {
+        return null;
+    }
+    const vDiskInternalViewerPath = createVDiskDeveloperUILink({
+        nodeId: NodeId,
+        pDiskId: PDiskId,
+        vDiskSlotId: VDiskSlotId,
+    });
+    return (
+        <LinkWithIcon
+            title={vDiskPopupKeyset('action_open-in-developer-ui')}
+            url={vDiskInternalViewerPath}
+            icon={Wrench}
+            hideEndIcon
+        />
+    );
+}
 
 function getRuntimeItems(
     data: PreparedVDisk,
@@ -56,11 +79,11 @@ function getRuntimeItems(
 ): YDBDefinitionListItem[] {
     const items: YDBDefinitionListItem[] = [
         {
-            name: i18n('label_front-queues'),
+            name: vDiskPopupKeyset('label_front-queues'),
             content: <VDiskFrontQueuesLabel flag={data.FrontQueues} />,
         },
         {
-            name: i18n('label_compaction'),
+            name: vDiskPopupKeyset('label_compaction'),
             content: (
                 <Flex
                     direction="column"
@@ -81,8 +104,8 @@ function getRuntimeItems(
         },
     ];
     for (const [name, value] of [
-        [i18n('label_read'), data.ReadThroughput],
-        [i18n('label_write'), data.WriteThroughput],
+        [vDiskPopupKeyset('label_read'), data.ReadThroughput],
+        [vDiskPopupKeyset('label_write'), data.WriteThroughput],
     ] as const) {
         if (parseOptionalNonNegativeNumber(value) !== undefined) {
             items.push({
@@ -112,7 +135,7 @@ function getStorageItems(
     const items: YDBDefinitionListItem[] = [];
     if (data.StoragePoolName) {
         items.push({
-            name: i18n('label_storage-pool'),
+            name: vDiskPopupKeyset('label_storage-pool'),
             content: <DiskPopupText value={data.StoragePoolName} />,
             copyText: data.StoragePoolName,
         });
@@ -122,23 +145,33 @@ function getStorageItems(
         : items;
 }
 
+function getLocationItems(data: PreparedVDisk, nodeData: NodeMetadata, withPDiskPanel: boolean) {
+    const items = getVDiskLocationItems(data, nodeData);
+    if (!withPDiskPanel) {
+        return items;
+    }
+    return items.filter(({id}) => id !== 'pdisk-id' && id !== 'pdisk-path');
+}
+
 function DiskHeader({
     data = {},
+    donorMode,
     withPDiskType = true,
 }: {
     data?: PreparedVDisk;
+    donorMode?: boolean;
     withPDiskType?: boolean;
 }) {
     return (
         <DiskPopupHeader
-            title={i18n('label_vdisk')}
+            title={vDiskPopupKeyset('label_vdisk')}
             id={data.StringifiedId}
             type={withPDiskType ? (data.PDiskType ?? data.PDisk?.Type) : undefined}
             statuses={
                 <React.Fragment>
                     <VDiskStateLabel state={data.VDiskState} size="xs" />
                     <VDiskReplicationStatus data={data} size="xs" />
-                    <VDiskDonorLabel donorMode={data.DonorMode} size="xs" />
+                    <VDiskDonorLabel donorMode={donorMode} size="xs" />
                 </React.Fragment>
             }
         />
@@ -158,78 +191,55 @@ const resolveVDiskId = (data: PreparedVDisk): Required<TVDiskID> | undefined => 
     return isAllVdiskParamsDefined(parsed) ? parsed : undefined;
 };
 
-function buildUnavailableVDiskFooter(
-    data: UnavailableDonor,
-    hasDeveloperUi: boolean,
-): React.ReactNode | null {
-    const {NodeId, PDiskId, VDiskSlotId} = data;
-    if (!hasDeveloperUi || isNil(NodeId) || isNil(PDiskId) || isNil(VDiskSlotId)) {
-        return null;
-    }
-    const developerLink = createVDiskDeveloperUILink({
-        nodeId: NodeId,
-        pDiskId: PDiskId,
-        vDiskSlotId: VDiskSlotId,
-    });
-    return (
-        <LinkWithIcon
-            title={i18n('action_open-in-developer-ui')}
-            url={developerLink}
-            icon={Wrench}
-            hideEndIcon
-        />
-    );
-}
-
 function buildVDiskFooter(
     data: PreparedVDisk,
-    hasDeveloperUi: boolean,
-    getVDiskLink: ReturnType<typeof useVDiskPagePath>,
+    withDeveloperUILink: boolean,
+    getVDiskLinkFn: ReturnType<typeof useVDiskPagePath>,
     onSuccess: VoidFunction,
     withActions: boolean,
 ): React.ReactNode | null {
     const {NodeId, PDiskId, VDiskSlotId, StringifiedId, DonorMode} = data;
-    const developerLink =
-        hasDeveloperUi && !isNil(NodeId) && !isNil(PDiskId) && !isNil(VDiskSlotId)
+    const vDiskInternalViewerPath =
+        withDeveloperUILink && !isNil(NodeId) && !isNil(PDiskId) && !isNil(VDiskSlotId)
             ? createVDiskDeveloperUILink({
                   nodeId: NodeId,
                   pDiskId: PDiskId,
                   vDiskSlotId: VDiskSlotId,
               })
             : undefined;
-    const pageLink =
-        withActions && hasDeveloperUi && !isNil(NodeId) && StringifiedId
-            ? getVDiskLink({nodeId: NodeId, vDiskId: StringifiedId})
+    const vDiskPagePath =
+        withActions && withDeveloperUILink && !isNil(NodeId) && StringifiedId
+            ? getVDiskLinkFn({nodeId: NodeId, vDiskId: StringifiedId})
             : undefined;
-    const resolvedId = withActions ? resolveVDiskId(data) : undefined;
-    if (!developerLink && !pageLink && !resolvedId) {
+    const resolvedVDiskId = withActions ? resolveVDiskId(data) : undefined;
+    if (!vDiskInternalViewerPath && !vDiskPagePath && !resolvedVDiskId) {
         return null;
     }
     return (
         <React.Fragment>
-            {developerLink && (
+            {vDiskInternalViewerPath && (
                 <LinkWithIcon
-                    title={i18n('action_open-in-developer-ui')}
-                    url={developerLink}
+                    title={vDiskPopupKeyset('action_open-in-developer-ui')}
+                    url={vDiskInternalViewerPath}
                     icon={Wrench}
                     hideEndIcon
                 />
             )}
-            {(pageLink || resolvedId) && (
+            {(vDiskPagePath || resolvedVDiskId) && (
                 <Flex gap={2} wrap="wrap" className={b('actions')}>
-                    {pageLink && (
+                    {vDiskPagePath && (
                         <InternalLinkButton
-                            href={pageLink}
+                            href={vDiskPagePath}
                             view="action"
                             size="m"
                             className={BRAND_BUTTON_CLASS}
                         >
-                            {i18n('action_go-to-vdisk')}
+                            {vDiskPopupKeyset('action_go-to-vdisk')}
                         </InternalLinkButton>
                     )}
-                    {resolvedId && (
+                    {resolvedVDiskId && (
                         <EvictVDiskButton
-                            vDiskId={resolvedId}
+                            vDiskId={resolvedVDiskId}
                             donorMode={DonorMode}
                             onSuccess={onSuccess}
                         />
@@ -277,7 +287,7 @@ export function VDiskPopup({
     const identityItems = isSpaceDistribution ? getVDiskIdentityItems(fullData) : [];
     const storageItems = getStorageItems(data, capacityMetricsEnabled);
     const pdisk = !isSpaceDistribution && isViewerUser ? fullData?.PDisk : undefined;
-    const footer = isFullVDiskData(data)
+    const vdiskFooter = isFullVDiskData(data)
         ? buildVDiskFooter(
               data,
               hasDeveloperUi,
@@ -286,14 +296,12 @@ export function VDiskPopup({
               !isSpaceDistribution,
           )
         : buildUnavailableVDiskFooter(data, hasDeveloperUi);
-    const locationItems = getVDiskLocationItems(data, nodeData).filter(
-        ({id}) => !pdisk || (id !== 'pdisk-id' && id !== 'pdisk-path'),
-    );
+    const locationItems = getLocationItems(data, nodeData, Boolean(pdisk));
     return (
         <DiskPopup combined={Boolean(pdisk)} className={b(null, 'vdisk-storage-popup')}>
             {pdisk && <PDiskPopupContent data={pdisk} nodeData={nodeData} />}
-            <DiskPopupPanel footer={footer}>
-                <DiskHeader data={fullData} withPDiskType={!pdisk} />
+            <DiskPopupPanel footer={vdiskFooter}>
+                <DiskHeader data={fullData} donorMode={data.DonorMode} withPDiskType={!pdisk} />
                 <DiskPopupLocation items={locationItems} />
                 {runtimeItems.length > 0 && (
                     <YDBDefinitionList items={runtimeItems} nameMaxWidth={150} />

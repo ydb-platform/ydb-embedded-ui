@@ -479,6 +479,123 @@ async function prepareNodesPage(
     }
 }
 
+for (const firstDisk of ['vdisk', 'pdisk'] as const) {
+    test(`keeps paired disk popups open when moving between cards from ${firstDisk}`, async ({
+        page,
+    }) => {
+        await page.setViewportSize({width: 1800, height: 1000});
+        await enableExpertMode(page, VDisksGroupBy.All);
+        await page.addInitScript(() => {
+            localStorage.setItem('storagePDisksGroupBy', JSON.stringify('All'));
+        });
+        await setupVDiskColoringMocks(page);
+        await gotoStoragePage(page, VDisksGroupBy.All);
+        await expectStorageGroupRowsReady(page);
+
+        const row = getStorageGroupRow(page, 0);
+        const vDisk = getVDiskItems(row).first();
+        const pDisk = getPDiskItems(row).first();
+        const firstAnchor = firstDisk === 'vdisk' ? vDisk : pDisk;
+        const popupFor = (id: string) =>
+            page.locator('.ydb-popover').filter({has: page.getByText(id, {exact: true})});
+        const vDiskPopup = popupFor('9000000000-1-0-0-0');
+        const pDiskPopup = popupFor('7000-100');
+        const popups = [vDiskPopup, pDiskPopup];
+        const hoverPopup = async (popup: Locator) => {
+            const point = await popup.evaluate((element) => {
+                const {left, top, width, height} = element.getBoundingClientRect();
+                for (const x of [left + 12, left + width - 12, left + width / 2]) {
+                    for (const y of [top + 12, top + height - 12, top + height / 2]) {
+                        const target = document.elementFromPoint(x, y);
+                        if (target && element.contains(target)) {
+                            return {x, y};
+                        }
+                    }
+                }
+                return undefined;
+            });
+            if (!point) {
+                throw new Error('The popup has no exposed area to hover');
+            }
+            await page.mouse.move(point.x, point.y);
+        };
+        const zIndex = (popup: Locator) =>
+            popup
+                .locator('xpath=ancestor::*[@data-floating-ui-placement][1]')
+                .evaluate((element) => Number(getComputedStyle(element).zIndex));
+
+        await firstAnchor.hover();
+        for (const popup of popups) {
+            await expect(popup).toBeVisible();
+        }
+        await page.clock.install({time: new Date('2026-01-01T00:00:00Z')});
+        await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
+
+        for (const [foreground, background] of [
+            [pDiskPopup, vDiskPopup],
+            [vDiskPopup, pDiskPopup],
+            [pDiskPopup, vDiskPopup],
+        ]) {
+            await hoverPopup(foreground);
+            // Let the previous card's 200 ms close timer run while staying on its peer.
+            await page.clock.runFor(400);
+            for (const popup of popups) {
+                await expect(popup).toBeVisible();
+            }
+            await expect(getVDiskProgressBar(vDisk)).toHaveClass(
+                /storage-disk-progress-bar_highlighted/,
+            );
+            await expect(getPDiskProgressBar(pDisk)).toHaveClass(
+                /storage-disk-progress-bar_highlighted/,
+            );
+            await expect
+                .poll(async () => (await zIndex(foreground)) - (await zIndex(background)))
+                .toBeGreaterThan(0);
+        }
+
+        await hoverPopup(vDiskPopup);
+        await page.clock.runFor(50);
+        await hoverPopup(pDiskPopup);
+        await page.clock.runFor(400);
+        for (const popup of popups) {
+            await expect(popup).toBeVisible();
+        }
+
+        await page.clock.resume();
+        await page.mouse.move(0, 0);
+        for (const popup of popups) {
+            await expect(popup).toBeHidden();
+        }
+
+        await firstAnchor.hover();
+        for (const popup of popups) {
+            await expect(popup).toBeVisible();
+        }
+        await page.keyboard.press('Escape');
+        for (const popup of popups) {
+            await expect(popup).toBeHidden();
+        }
+
+        await page.mouse.move(0, 0);
+        await firstAnchor.hover();
+        for (const popup of popups) {
+            await expect(popup).toBeVisible();
+        }
+        await getVDiskItems(row).nth(1).hover();
+        const nextPopups = [popupFor('9000000000-1-0-0-1'), popupFor('7001-101')];
+        for (const popup of nextPopups) {
+            await expect(popup).toBeVisible();
+        }
+        for (const popup of popups) {
+            await expect(popup).toBeHidden();
+        }
+        await page.mouse.move(0, 0);
+        for (const popup of nextPopups) {
+            await expect(popup).toBeHidden();
+        }
+    });
+}
+
 test('keeps paired disk popups inside the viewport without expanding the page', async ({
     page,
 }, testInfo) => {

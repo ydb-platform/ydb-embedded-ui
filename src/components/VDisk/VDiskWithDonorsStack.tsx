@@ -37,6 +37,7 @@ export function VDiskWithDonorsStack({
     showPopup: _showPopup,
     onShowPopup: _onShowPopup,
     onHidePopup: _onHidePopup,
+    onClosePopup,
     highlighted: _highlighted,
     renderContent = true,
     placeholderProps,
@@ -90,6 +91,7 @@ export function VDiskWithDonorsStack({
         highlighted: isHighlighted,
         onShowPopup,
         onHidePopup,
+        onClosePopup,
     };
 
     // Donor VDisks intentionally avoid using and changing highlightedVDiskState.

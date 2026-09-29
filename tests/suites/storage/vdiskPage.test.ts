@@ -826,6 +826,7 @@ test.describe('Storage disk popup snapshots', () => {
             .last();
         await expect(popup).toBeVisible();
         await expect(popup.locator('.ydb-disk-popup__panel')).toHaveCount(1);
+        await expect(popup.getByText('Donor', {exact: true})).toBeVisible();
         await expect(popup.locator('a[href$="_000001011"]')).toBeVisible();
         await expectDefinitionListRowValue(popup, 'FQDN', 'donor-node-42.ydb');
         await expectDefinitionListRowValue(popup, 'Rack', 'Rack-D42');
@@ -1319,6 +1320,7 @@ test.describe('Blob storage capacity metrics integration', () => {
         const vDiskPopup = await waitForDiskPopup(page, 'Go to VDisk');
         const vDiskPopupInfo = await getDiskPopupPanel(vDiskPopup, 'VDisk', VDISK_ID);
         await expectDefinitionListRowPlaceholder(vDiskPopupInfo, 'VDisk Slot Usage');
+        await expectDefinitionListRowPlaceholder(vDiskPopupInfo, 'VDisk Raw Usage');
         await expectDefinitionListRowValue(vDiskPopupInfo, 'Capacity alert', 'Not available');
         await expectDefinitionListRowValue(vDiskPopupInfo, 'Group Size in Units', '1 (implicit)');
         await closeDiskPopup(page, vDiskPopup);

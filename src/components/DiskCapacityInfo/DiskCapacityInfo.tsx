@@ -14,7 +14,6 @@ import {
     formatNormalizedMetricPercent,
     formatStorageMetricPair,
 } from '../../utils/storageMetrics';
-import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 import {DiskCapacityAlertLabel} from '../DiskStatus/DiskStatus';
 import type {InfoViewerItem} from '../InfoViewer';
 import {pDiskInfoKeyset} from '../PDiskInfo/i18n';
@@ -196,15 +195,13 @@ export function getVDiskCapacityItems(
             content: formatMetricPercent(data.VDiskSlotUsage, 2),
             note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
         },
-    ];
-    if (parseOptionalNonNegativeNumber(data.VDiskRawUsage) !== undefined) {
-        items.push({
+        {
             id: 'vdisk-raw-usage',
             name: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage,
             content: formatMetricPercent(data.VDiskRawUsage, 2),
             note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
-        });
-    }
+        },
+    ];
     return items.filter(({id}) => capacityMetricsEnabled || id === 'size');
 }
 
