@@ -338,7 +338,11 @@ export function useTableKeyboardAdapter(options: AdapterOptions) {
                     ? findRowIndex(current.key, current.index)
                     : current.index;
             if (matchedIndex === undefined && isRowLookupPending?.(current.lookupRevision)) {
-                next = {...current, pending: true};
+                next = {
+                    ...current,
+                    lookupRevision: getRowLookupRevision?.(current.lookupRevision),
+                    pending: true,
+                };
             } else {
                 const position = matchedIndex ?? current.index;
                 const index = isValidIndex?.(position) === false ? getLast() : position;
