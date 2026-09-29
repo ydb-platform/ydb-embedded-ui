@@ -4,6 +4,25 @@ import {EVDiskState} from '../../../../types/api/vdisk';
 import {preparePDiskDataResponse} from '../utils';
 
 describe('preparePDiskDataResponse', () => {
+    test('keeps DDisks distinct from VDisks and unavailable metrics unknown', () => {
+        const result = preparePDiskDataResponse([
+            {
+                Whiteboard: {
+                    PDisk: {PDiskId: 1, ExpectedSlotCount: 2, NumActiveSlots: 1},
+                    DDisks: [{NodeId: 3, PDiskId: 1, DDiskSlotId: 1010, HasWhiteboardData: false}],
+                },
+            },
+            {},
+        ]);
+        const slots = result.SlotItems ?? [];
+        expect(slots.filter((slot) => slot.SlotType === 'vDisk')).toHaveLength(0);
+        const ddisks = slots.filter((slot) => slot.SlotType === 'dDisk');
+        expect(ddisks).toHaveLength(1);
+        expect(ddisks[0].Used).toBeUndefined();
+        expect(ddisks[0].UsagePercent).toBeUndefined();
+        expect(slots.filter((slot) => slot.SlotType === 'empty')).toHaveLength(1);
+    });
+
     const rawData = {
         Whiteboard: {
             PDisk: {

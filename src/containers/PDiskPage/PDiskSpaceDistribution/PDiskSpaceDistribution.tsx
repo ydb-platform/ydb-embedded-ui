@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {DDisk} from '../../../components/DDisk/DDisk';
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../components/InternalLink';
@@ -23,7 +24,7 @@ import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../../utils/disks/constan
 import {getDiskBarTone} from '../../../utils/disks/getDiskBarTone';
 import {pDiskPageKeyset} from '../i18n';
 
-import {isEmptySlot, isLogSlot, isVDiskSlot} from './utils';
+import {isDDiskSlot, isEmptySlot, isLogSlot, isVDiskSlot} from './utils';
 
 import './PDiskSpaceDistribution.scss';
 
@@ -141,6 +142,9 @@ function Slot<T extends SlotItemType>({
     getVDiskPagePath,
 }: SlotProps<T>) {
     const renderContent = () => {
+        if (isDDiskSlot(item)) {
+            return <DDisk data={item.SlotData} />;
+        }
         if (isVDiskSlot(item)) {
             const vDiskPagePath = getVDiskPagePath?.({
                 nodeId,

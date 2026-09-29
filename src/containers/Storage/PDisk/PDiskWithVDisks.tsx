@@ -2,7 +2,9 @@ import React from 'react';
 
 import {chunk} from 'lodash';
 
+import {DDisk} from '../../../components/DDisk/DDisk';
 import {VDisk} from '../../../components/VDisk/VDisk';
+import type {TDDiskStateInfo} from '../../../types/api/ddisk';
 import {cn} from '../../../utils/cn';
 import type {VDiskDisplayStateGetter} from '../../../utils/disks/displayState';
 import type {PreparedVDisk} from '../../../utils/disks/types';
@@ -24,6 +26,7 @@ const NODE_EXPERT_VDISK_ICON_GROUP_SIZE = 8;
 
 interface PDiskWithVDisksProps extends Omit<PDiskProps, 'topContent'> {
     vDisks?: PreparedVDisk[];
+    dDisks?: TDDiskStateInfo[];
     viewContext?: StorageViewContext;
     withVDiskIcons?: boolean;
     getVDiskDisplayState?: VDiskDisplayStateGetter;
@@ -119,6 +122,7 @@ const VDiskItem = React.memo(function VDiskItem({
 
 export const PDiskWithVDisks = React.memo(function PDiskWithVDisks({
     vDisks,
+    dDisks,
     viewContext,
     withIcon,
     withVDiskIcons,
@@ -133,40 +137,72 @@ export const PDiskWithVDisks = React.memo(function PDiskWithVDisks({
     ...pDiskProps
 }: PDiskWithVDisksProps) {
     const vDiskRows = React.useMemo(() => {
+        // Share slot geometry, while keeping DDisk rendering and actor links separate.
+        const slots: (PreparedVDisk & {ddisk?: TDDiskStateInfo})[] = [
+            ...(dDisks ?? []).map((disk) => ({
+                StringifiedId: `ddisk-${disk.NodeId}-${disk.PDiskId}-${disk.DDiskSlotId}`,
+                AllocatedSize:
+                    disk.AllocatedSize === undefined ? undefined : Number(disk.AllocatedSize),
+                ddisk: disk,
+            })),
+            ...(vDisks ?? []),
+        ];
         const compactVDiskRows = expertMode
-            ? calculateNodeExpertVDiskRows(vDisks ?? [], width)
-            : [(vDisks ?? []).map((vDisk) => ({vDisk, width: undefined}))];
+            ? calculateNodeExpertVDiskRows(slots, width)
+            : [slots.map((vDisk) => ({vDisk, width: undefined}))];
 
         // All-mode size markers use the compact allocation scale; only the fixed-width cards
         // are regrouped into rows of four.
         return isAllVDisksLayout
             ? chunk(compactVDiskRows.flat(), NODE_EXPERT_ALL_VDISKS_PER_ROW)
             : compactVDiskRows;
-    }, [expertMode, isAllVDisksLayout, vDisks, width]);
-    const vDisksContent = vDisks?.length ? (
-        <div className={b('vdisks', {expert: expertMode})}>
-            {vDiskRows.map((row, rowIndex) => (
-                <div key={row[0]?.vDisk.StringifiedId ?? rowIndex} className={b('vdisks-row')}>
-                    {row.map(({vDisk, width: vDiskWidth}) => (
-                        <VDiskItem
-                            key={vDisk.StringifiedId}
-                            vDisk={vDisk}
-                            vDiskWidth={vDiskWidth}
-                            viewContext={viewContext}
-                            withIcon={withVDiskIcons ?? withIcon}
-                            getVDiskDisplayState={getVDiskDisplayState}
-                            expertMode={expertMode}
-                            isAllVDisksLayout={isAllVDisksLayout}
-                            delayOpen={delayOpen}
-                            delayClose={delayClose}
-                            highlighted={highlightedDisk === vDisk.StringifiedId}
-                            setHighlightedDisk={setHighlightedDisk}
-                        />
-                    ))}
-                </div>
-            ))}
-        </div>
-    ) : null;
+    }, [dDisks, expertMode, isAllVDisksLayout, vDisks, width]);
+    const vDisksContent =
+        vDisks?.length || dDisks?.length ? (
+            <div className={b('vdisks', {expert: expertMode})}>
+                {vDiskRows.map((row, rowIndex) => (
+                    <div key={row[0]?.vDisk.StringifiedId ?? rowIndex} className={b('vdisks-row')}>
+                        {row.map(({vDisk, width: vDiskWidth}) =>
+                            vDisk.ddisk ? (
+                                <div
+                                    key={vDisk.StringifiedId}
+                                    className={b('vdisks-item')}
+                                    style={
+                                        expertMode
+                                            ? {
+                                                  width: isAllVDisksLayout
+                                                      ? NODE_EXPERT_ALL_VDISK_WIDTH
+                                                      : vDiskWidth,
+                                                  flexBasis: isAllVDisksLayout
+                                                      ? NODE_EXPERT_ALL_VDISK_WIDTH
+                                                      : vDiskWidth,
+                                              }
+                                            : {flexGrow: vDisk.AllocatedSize || 1}
+                                    }
+                                >
+                                    <DDisk data={vDisk.ddisk} compact />
+                                </div>
+                            ) : (
+                                <VDiskItem
+                                    key={vDisk.StringifiedId}
+                                    vDisk={vDisk}
+                                    vDiskWidth={vDiskWidth}
+                                    viewContext={viewContext}
+                                    withIcon={withVDiskIcons ?? withIcon}
+                                    getVDiskDisplayState={getVDiskDisplayState}
+                                    expertMode={expertMode}
+                                    isAllVDisksLayout={isAllVDisksLayout}
+                                    delayOpen={delayOpen}
+                                    delayClose={delayClose}
+                                    highlighted={highlightedDisk === vDisk.StringifiedId}
+                                    setHighlightedDisk={setHighlightedDisk}
+                                />
+                            ),
+                        )}
+                    </div>
+                ))}
+            </div>
+        ) : null;
 
     return (
         <PDisk

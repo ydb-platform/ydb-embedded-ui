@@ -1,3 +1,4 @@
+import type {TDDiskStateInfo} from '../../../types/api/ddisk';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 
 export interface PDiskData extends PreparedPDisk {
@@ -5,7 +6,7 @@ export interface PDiskData extends PreparedPDisk {
     NodeHost?: string;
     NodeType?: string;
     NodeDC?: string;
-    SlotItems?: (SlotItem<'vDisk'> | SlotItem<'log'> | SlotItem<'empty'>)[];
+    SlotItems?: (SlotItem<'vDisk'> | SlotItem<'dDisk'> | SlotItem<'log'> | SlotItem<'empty'>)[];
 }
 
 export interface SlotItem<T extends SlotItemType> {
@@ -19,11 +20,13 @@ export interface SlotItem<T extends SlotItemType> {
 
     SlotData: T extends 'vDisk'
         ? PreparedVDisk
-        : T extends 'log'
-          ? LogSlotData
-          : T extends 'empty'
-            ? EmptySlotData
-            : undefined;
+        : T extends 'dDisk'
+          ? TDDiskStateInfo
+          : T extends 'log'
+            ? LogSlotData
+            : T extends 'empty'
+              ? EmptySlotData
+              : undefined;
 }
 
 export type LogSlotData = Pick<PDiskData, 'LogUsedSize' | 'LogTotalSize' | 'SystemSize'>;
@@ -32,4 +35,4 @@ export type EmptySlotData = {
     Size: number;
 };
 
-export type SlotItemType = 'vDisk' | 'log' | 'empty';
+export type SlotItemType = 'vDisk' | 'dDisk' | 'log' | 'empty';

@@ -1,0 +1,13 @@
+{
+  "label_node": "Node",
+  "label_pdisk": "PDisk",
+  "label_slot": "DDisk slot",
+  "label_used": "Allocated",
+  "label_available": "Available",
+  "label_total": "Owner limit",
+  "label_occupancy": "DDisk occupancy",
+  "label_buffer-occupancy": "Persistent Buffer occupancy",
+  "label_unavailable": "Current disk data is unavailable",
+  "action_ddisk": "Open DDisk",
+  "action_buffer": "Open Persistent Buffer"
+}

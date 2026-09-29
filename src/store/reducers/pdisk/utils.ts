@@ -102,11 +102,20 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
         };
     });
 
+    const ddiskSlots: SlotItem<'dDisk'>[] = (Whiteboard.DDisks ?? []).map((disk) => ({
+        SlotType: 'dDisk',
+        Id: disk.DDiskSlotId,
+        Used: disk.AllocatedSize === undefined ? undefined : Number(disk.AllocatedSize),
+        Total: disk.TotalSize === undefined ? undefined : Number(disk.TotalSize),
+        UsagePercent: disk.DDiskOccupancy === undefined ? undefined : disk.DDiskOccupancy * 100,
+        SlotData: {...disk, NodeId: disk.NodeId ?? NodeId},
+    }));
+
     let emptySlots: SlotItem<'empty'>[] = [];
 
     // Use NumActiveSlots from API if available, otherwise fallback to vdisksSlots.length
     // NumActiveSlots accounts for VDisks that occupy multiple physical slots (GroupSizeInUnits > 1)
-    const occupiedSlots = NumActiveSlots ?? vdisksSlots.length;
+    const occupiedSlots = NumActiveSlots ?? vdisksSlots.length + ddiskSlots.length;
 
     if (ExpectedSlotCount && ExpectedSlotCount > occupiedSlots) {
         const emptySlotsCount = ExpectedSlotCount - occupiedSlots;
@@ -133,7 +142,7 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
         });
     }
 
-    const diskSlots: PDiskData['SlotItems'] = [...vdisksSlots, ...emptySlots];
+    const diskSlots: PDiskData['SlotItems'] = [...vdisksSlots, ...ddiskSlots, ...emptySlots];
 
     if (logSlot && diskSlots.length > 0) {
         diskSlots.unshift(logSlot);
