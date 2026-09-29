@@ -1,5 +1,12 @@
 # Changelog
 
+## [22.2.0-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.2.0...v22.2.0-hotfix.1) (2026-09-29)
+
+
+### Bug Fixes
+
+* preserve keyboard selection during partial polling ([#4422](https://github.com/ydb-platform/ydb-embedded-ui/issues/4422)) ([6a72d18](https://github.com/ydb-platform/ydb-embedded-ui/commit/6a72d1866fa90f2de7062cdc0411a9843fd847d3))
+
 ## [22.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.1.0...v22.2.0) (2026-09-24)
 
 
