@@ -31,7 +31,8 @@ interface VDiskReplicationStatusProps extends Pick<LabelProps, 'size'> {
 export function VDiskReplicationStatus({data, size}: VDiskReplicationStatusProps) {
     const label = getVDiskReplicationLabel(data);
     const showProgress =
-        data.DetailedReplicationStatus === EVDiskDetailedReplicationStatus.InProgress;
+        data.DetailedReplicationStatus === EVDiskDetailedReplicationStatus.InProgress ||
+        (!data.DetailedReplicationStatus && data.Replicated === false);
 
     return (
         <React.Fragment>

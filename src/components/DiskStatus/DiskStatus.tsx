@@ -11,7 +11,7 @@ import {getFlagIconWithColor} from '../../utils/disks/iconCalculators';
 import {normalizeMediaType} from '../../utils/disks/normalizeMediaType';
 import {calculateSpaceSeverity} from '../../utils/disks/severityCalculators';
 import {EFlagToLabelTheme} from '../EntityStatus/EntityStatus';
-import {getFlagStatusText} from '../VDisk/VDisk';
+import {getFlagStatusText} from '../VDisk/getFlagStatusText';
 
 import i18n from './i18n';
 

@@ -104,7 +104,7 @@ export function DiskPopupLocation({items}: {items: DiskDetailItem[]}) {
         return null;
     }
     const locationItems = items.map((item) => {
-        if (item.id === 'fqdn') {
+        if (['fqdn', 'rack', 'datacenter'].includes(item.id)) {
             return {...item, content: <DiskPopupText value={item.copyText} />};
         }
         if (item.id === 'pdisk-path' && typeof item.copyText === 'string') {

@@ -561,7 +561,7 @@ test.describe('Storage disk popup snapshots', () => {
 
     for (const viewportWidth of [1280, 560]) {
         for (const combined of [false, true]) {
-            test(`wraps long content in ${combined ? 'combined' : 'single'} disk popup at ${viewportWidth}px`, async ({
+            test(`truncates long location values in ${combined ? 'combined' : 'single'} disk popup at ${viewportWidth}px`, async ({
                 page,
             }) => {
                 const host = `storage-${'long-hostname-'.repeat(12)}.ydb`;
@@ -570,10 +570,11 @@ test.describe('Storage disk popup snapshots', () => {
                 await setupVDiskPageMocks(page, {
                     host,
                     rack,
+                    datacenter: LONG_DATACENTER,
                     withoutCompaction: true,
                     storagePoolName: 'storage-pool-'.repeat(40),
                 });
-                await setupDiskNodeMetadataMock(page, {host, rack});
+                await setupDiskNodeMetadataMock(page, {host, rack, datacenter: LONG_DATACENTER});
                 await page.goto(VDISK_PAGE_PATH);
                 const table = new ClusterStorageTable(page);
                 await table.waitForTableData();
@@ -663,33 +664,22 @@ test.describe('Storage disk popup snapshots', () => {
                         }),
                     );
                 expect(clippedLabelText).toEqual([]);
-                const hostname = popup
-                    .locator('.ydb-disk-popup__text')
-                    .filter({hasText: host})
-                    .first();
-                await expect(hostname).toHaveCSS('text-overflow', 'ellipsis');
-                await expect(hostname).toHaveCSS('white-space', 'nowrap');
-                await expect
-                    .poll(() =>
-                        hostname.evaluate((element) => element.scrollWidth > element.clientWidth),
-                    )
-                    .toBe(true);
-                const rackValue = popup
-                    .locator('.g-definition-list__definition')
-                    .filter({hasText: rack})
-                    .first();
-                const rackLines = await rackValue.evaluate((element, text) => {
-                    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-                    while (walker.nextNode()) {
-                        if (walker.currentNode.textContent === text) {
-                            const range = document.createRange();
-                            range.selectNodeContents(walker.currentNode);
-                            return range.getClientRects().length;
-                        }
-                    }
-                    return 0;
-                }, rack);
-                expect(rackLines).toBeGreaterThan(1);
+                for (const value of [host, rack, LONG_DATACENTER]) {
+                    const text = popup
+                        .locator('.ydb-disk-popup__text')
+                        .filter({hasText: value})
+                        .first();
+                    await expect(text).toHaveCSS('text-overflow', 'ellipsis');
+                    await expect(text).toHaveCSS('white-space', 'nowrap');
+                    await expect
+                        .poll(() =>
+                            text.evaluate((element) => element.scrollWidth > element.clientWidth),
+                        )
+                        .toBe(true);
+                    await text.hover();
+                    await expect(page.getByRole('tooltip').filter({hasText: value})).toBeVisible();
+                    await popup.locator('.ydb-disk-popup__id').first().hover();
+                }
             });
         }
     }
