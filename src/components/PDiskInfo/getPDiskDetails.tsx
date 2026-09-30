@@ -1,4 +1,5 @@
 import {formatBytes} from '../../utils/bytesParsers';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
@@ -15,23 +16,22 @@ export function getPDiskRuntimeItems(data: PreparedPDisk): DiskDetailItem[] {
 }
 
 export function getPDiskLogItems(data: PreparedPDisk): DiskDetailItem[] {
-    const items: DiskDetailItem[] = [];
-    const available = (value: unknown) => parseOptionalNonNegativeNumber(value) !== undefined;
-    if (available(data.LogUsedSize) || available(data.LogTotalSize)) {
-        items.push({
+    const systemSize = parseOptionalNonNegativeNumber(data.SystemSize);
+    return [
+        {
             id: 'log-size',
             name: i18n('log-size'),
             content: <PDiskLogSize used={data.LogUsedSize} total={data.LogTotalSize} />,
             note: i18n('context_log-size'),
-        });
-    }
-    if (available(data.SystemSize)) {
-        items.push({
+        },
+        {
             id: 'system-size',
             name: i18n('system-size'),
-            content: formatBytes({value: data.SystemSize, fixedDecimalPlaces: 2}),
+            content:
+                systemSize === undefined
+                    ? EMPTY_DATA_PLACEHOLDER
+                    : formatBytes({value: systemSize, fixedDecimalPlaces: 2}),
             note: i18n('context_system-size'),
-        });
-    }
-    return items;
+        },
+    ];
 }

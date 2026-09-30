@@ -255,6 +255,9 @@ async function expectDiskLocation(
         await expect(getDefinitionListRow(location, field)).toBeVisible();
     }
     await expect(
+        getDefinitionListValue(location, 'FQDN').locator('.ydb-disk-popup__text'),
+    ).toHaveCSS('cursor', 'default');
+    await expect(
         location.getByRole('button', {name: /^(Show|Hide) .* location details$/}),
     ).toHaveCount(0);
     await expectDefinitionListRowValue(location, 'Node ID', NODE_ID);
@@ -274,6 +277,7 @@ async function expectHDDLabel(panel: Locator) {
     const label = panel.getByText('HDD', {exact: true});
     await expect(label).toBeVisible();
     await label.hover();
+    await expect(label).toHaveCSS('cursor', 'default');
     const tooltip = panel.page().getByRole('tooltip').filter({hasText: 'Hard disk drive'});
     await expect(tooltip).toBeVisible();
     await panel.locator('.ydb-disk-popup__id').hover();
@@ -559,7 +563,7 @@ test.describe('Storage disk popup snapshots', () => {
         for (const combined of [false, true]) {
             test(`wraps long content in ${combined ? 'combined' : 'single'} disk popup at ${viewportWidth}px`, async ({
                 page,
-            }, testInfo) => {
+            }) => {
                 const host = `storage-${'long-hostname-'.repeat(12)}.ydb`;
                 const rack = 'rack-'.repeat(35);
                 await page.setViewportSize({width: viewportWidth, height: 1000});
@@ -686,59 +690,46 @@ test.describe('Storage disk popup snapshots', () => {
                     return 0;
                 }, rack);
                 expect(rackLines).toBeGreaterThan(1);
-                await testInfo.attach('disk-popup-wrapped-content', {
-                    body: await page.screenshot(),
-                    contentType: 'image/png',
-                });
             });
         }
     }
 
     for (const combined of [false, true]) {
-        test(`only Compaction may expand the ${combined ? 'combined' : 'single'} disk popup`, async ({
+        test(`keeps long fields within the standard ${combined ? 'combined' : 'single'} disk popup width`, async ({
             page,
         }) => {
             await page.setViewportSize({width: 1280, height: 1000});
-            for (const longValues of [false, true]) {
-                const host = longValues
-                    ? `storage-${'long-hostname-'.repeat(12)}.ydb`
-                    : 'host.test';
-                const rack = longValues ? 'rack-'.repeat(35) : 'rack-1';
-                const storagePoolName = longValues ? 'storage-pool-'.repeat(40) : STORAGE_POOL_NAME;
-                const options = longValues
-                    ? {
-                          allocatedSize: '9000000000000000000',
-                          availableSize: '9000000000000000000',
-                          pDiskBscAvailableSize: '9000000000000000000',
-                          pDiskBscTotalSize: '18000000000000000000',
-                      }
-                    : {};
-                await setupVDiskPageMocks(page, {storagePoolName, ...options});
-                await setupDiskNodeMetadataMock(page, {host, rack});
-                await page.goto(VDISK_PAGE_PATH);
-                await new ClusterStorageTable(page).waitForTableData();
-                await page
-                    .locator(
-                        combined
-                            ? '.ydb-storage-vdisks__wrapper .storage-disk-progress-bar'
-                            : '.ydb-storage-disks__pdisk-progress-bar',
-                    )
-                    .first()
-                    .hover();
-                const popup = (
-                    await waitForDiskPopup(page, combined ? 'Go to VDisk' : 'Go to PDisk')
-                ).locator('.ydb-disk-popup');
-                await expect(popup).toHaveCSS('width', `${combined ? 593 : 368}px`);
-                await expect(popup.locator('xpath=..')).toHaveCSS(
-                    'width',
-                    `${combined ? 625 : 400}px`,
-                );
-                expect(
-                    await popup.evaluate((element) => element.scrollWidth - element.clientWidth),
-                ).toBeLessThanOrEqual(1);
-                if (longValues && combined) {
-                    await expect(popup.getByText(storagePoolName, {exact: true})).toBeVisible();
-                }
+            const host = `storage-${'long-hostname-'.repeat(12)}.ydb`;
+            const rack = 'rack-'.repeat(35);
+            const storagePoolName = 'storage-pool-'.repeat(40);
+            await setupVDiskPageMocks(page, {
+                storagePoolName,
+                allocatedSize: '9000000000000000000',
+                availableSize: '9000000000000000000',
+                pDiskBscAvailableSize: '9000000000000000000',
+                pDiskBscTotalSize: '18000000000000000000',
+            });
+            await setupDiskNodeMetadataMock(page, {host, rack});
+            await page.goto(VDISK_PAGE_PATH);
+            await new ClusterStorageTable(page).waitForTableData();
+            await page
+                .locator(
+                    combined
+                        ? '.ydb-storage-vdisks__wrapper .storage-disk-progress-bar'
+                        : '.ydb-storage-disks__pdisk-progress-bar',
+                )
+                .first()
+                .hover();
+            const popup = (
+                await waitForDiskPopup(page, combined ? 'Go to VDisk' : 'Go to PDisk')
+            ).locator('.ydb-disk-popup');
+            await expect(popup).toHaveCSS('width', `${combined ? 593 : 368}px`);
+            await expect(popup.locator('xpath=..')).toHaveCSS('width', `${combined ? 625 : 400}px`);
+            expect(
+                await popup.evaluate((element) => element.scrollWidth - element.clientWidth),
+            ).toBeLessThanOrEqual(1);
+            if (combined) {
+                await expect(popup.getByText(storagePoolName, {exact: true})).toBeVisible();
             }
         });
     }
@@ -795,6 +786,11 @@ test.describe('Storage disk popup snapshots', () => {
 
         const vDiskPanel = await getDiskPopupPanel(popup, 'VDisk', VDISK_ID);
         const pDiskPanel = await getDiskPopupPanel(popup, 'PDisk', `${NODE_ID}-${PDISK_ID}`);
+        await expect(
+            getDefinitionListValue(vDiskPanel, 'Storage Pool Name').locator(
+                '.ydb-disk-popup__text',
+            ),
+        ).toHaveCSS('cursor', 'default');
         await expect(vDiskPanel.getByText('No data', {exact: true})).toBeVisible();
         await expect(pDiskPanel.getByText('Unknown', {exact: true})).toBeVisible();
         await expect(vDiskPanel.getByText('HDD', {exact: true})).toHaveCount(0);
@@ -827,8 +823,13 @@ test.describe('Storage disk popup snapshots', () => {
         await expect(popup).toBeVisible();
         await expect(popup.locator('.ydb-disk-popup__panel')).toHaveCount(1);
         await expect(popup.getByText('Donor', {exact: true})).toBeVisible();
+        await expect(popup.getByText('Donor', {exact: true})).toHaveCSS('cursor', 'default');
         await expect(popup.locator('a[href$="_000001011"]')).toBeVisible();
         await expectDefinitionListRowValue(popup, 'FQDN', 'donor-node-42.ydb');
+        await expect(popup.getByText('donor-node-42.ydb', {exact: true})).toHaveCSS(
+            'cursor',
+            'default',
+        );
         await expectDefinitionListRowValue(popup, 'Rack', 'Rack-D42');
         await expectDefinitionListRowValue(popup, 'Storage Pool Name', STORAGE_POOL_NAME);
 
@@ -836,6 +837,12 @@ test.describe('Storage disk popup snapshots', () => {
         await expectDefinitionListRowValue(popup, 'Node ID', NODE_ID);
         await expectDefinitionListRowValue(popup, 'PDisk ID', PDISK_ID);
         await expectDefinitionListRowValue(popup, 'VDisk Slot ID', '1011');
+        for (const field of ['Front Queues', 'Compaction', 'Read Throughput', 'Size']) {
+            await expect(getDefinitionListRow(popup, field)).toHaveCount(0);
+        }
+        for (const field of ['Kind', 'GUID', 'Incarnation GUID', 'Instance GUID']) {
+            await expectDefinitionListRowPlaceholder(popup, field);
+        }
         await expect(popup).toHaveScreenshot('unavailable-donor-popup.png');
     });
 
@@ -909,6 +916,41 @@ test.describe('Storage disk popup snapshots', () => {
         }
         await expectDiskLocation(panel, 'PDisk');
         await expect(popup).toHaveScreenshot('pdisk-popup-actions.png');
+    });
+
+    test('shows placeholders for missing disk popup fields', async ({page}) => {
+        await page.setViewportSize({width: 1500, height: 1000});
+        await setupVDiskPageMocks(page, {storagePoolName: ''});
+        await setupPDiskInfoMock(page);
+        await page.goto(VDISK_PAGE_PATH);
+        await new ClusterStorageTable(page).waitForTableData();
+
+        await page
+            .locator('.ydb-storage-vdisks__wrapper .storage-disk-progress-bar')
+            .first()
+            .hover();
+        const vDiskPopup = await waitForDiskPopup(page, 'Go to VDisk');
+        const vDiskPanel = await getDiskPopupPanel(vDiskPopup, 'VDisk', VDISK_ID);
+        for (const field of ['Storage Pool Name', 'Read Throughput', 'Write Throughput']) {
+            await expectDefinitionListRowPlaceholder(vDiskPanel, field);
+        }
+        await closeDiskPopup(page, vDiskPopup);
+
+        await page.locator('.ydb-storage-disks__pdisk-progress-bar').first().hover();
+        const pDiskPopup = await waitForDiskPopup(page, 'Go to PDisk');
+        for (const field of ['Space', 'Log Size', 'System Size']) {
+            await expectDefinitionListRowPlaceholder(pDiskPopup, field);
+        }
+        await closeDiskPopup(page, pDiskPopup);
+
+        await page.goto(`/pDisk?nodeId=${NODE_ID}&pDiskId=${PDISK_ID}`);
+        await page.locator('.ydb-pdisk-space-distribution__slot-wrapper a').first().hover();
+        const slotPopup = page
+            .locator('.ydb-pdisk-space-distribution__vdisk-popup')
+            .filter({visible: true})
+            .last();
+        await expect(slotPopup).toBeVisible();
+        await expectDefinitionListRowPlaceholder(slotPopup, 'Has Unreadable Blobs');
     });
 });
 
@@ -1031,6 +1073,9 @@ test.describe('Blob storage capacity metrics integration', () => {
             'PDisk',
             `${NODE_ID}-${PDISK_ID}`,
         );
+        await expect(
+            getDefinitionListValue(nestedPDiskInfo, 'PDisk Path').locator('.ydb-disk-popup__text'),
+        ).toHaveCSS('cursor', 'default');
         await expect(getDefinitionListValue(nestedPDiskInfo, 'PDisk Usage')).toHaveText(
             expectedPopupPDiskUsage,
         );

@@ -165,25 +165,22 @@
 
         min-width: 0;
 
+        cursor: default;
         white-space: nowrap;
         text-overflow: ellipsis;
+
+        &_with-left-trim {
+            text-align: end;
+            direction: rtl;
+
+            > span {
+                unicode-bidi: plaintext;
+            }
+        }
     }
 
     &__text-tooltip {
         overflow-wrap: anywhere;
-    }
-
-    &__text[tabindex],
-    &__pdisk-path {
-        cursor: pointer;
-    }
-
-    &__pdisk-path {
-        --entity-name-height: var(--g-text-body-1-line-height);
-
-        min-width: 0;
-
-        font: inherit;
     }
 
     @media (max-width: 700px) {

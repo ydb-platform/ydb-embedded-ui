@@ -3,11 +3,13 @@ import {Icon, Label, Tooltip} from '@gravity-ui/uikit';
 import {capitalize} from 'lodash';
 
 import {EFlag, isCapacityAlert} from '../../types/api/enums';
-import {getCapacityAlertTheme, normalizeCapacityAlert} from '../../utils/capacityAlerts';
+import {normalizeCapacityAlert} from '../../utils/capacityAlerts';
 import {cn} from '../../utils/cn';
 import {formatPDiskType} from '../../utils/disks/getPDiskType';
+import {getDisplaySeverityColor} from '../../utils/disks/helpers';
 import {getFlagIconWithColor} from '../../utils/disks/iconCalculators';
 import {normalizeMediaType} from '../../utils/disks/normalizeMediaType';
+import {calculateSpaceSeverity} from '../../utils/disks/severityCalculators';
 import {EFlagToLabelTheme} from '../EntityStatus/EntityStatus';
 import {getFlagStatusText} from '../VDisk/VDisk';
 
@@ -101,11 +103,16 @@ export function DiskCapacityAlertLabel({
     if (!capacityAlert) {
         return <DiskStatusLabel size="xs" value={emptyText} theme="unknown" />;
     }
+    const color = isCapacityAlert(capacityAlert)
+        ? getDisplaySeverityColor(
+              calculateSpaceSeverity({CapacityAlert: capacityAlert}),
+          ).toLowerCase()
+        : undefined;
     return (
         <DiskStatusLabel
             size="xs"
             value={capitalize(capacityAlert.replaceAll('_', ' '))}
-            theme={isCapacityAlert(capacityAlert) ? getCapacityAlertTheme(capacityAlert) : 'normal'}
+            className={b('capacity-alert', {color})}
         />
     );
 }

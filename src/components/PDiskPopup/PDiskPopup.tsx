@@ -13,7 +13,6 @@ import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationIte
 import {getDiskLocationItems} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useNodeMetadata} from '../../utils/hooks/useNodeMetadata';
-import {isNumeric} from '../../utils/utils';
 import {getPDiskCapacityItems} from '../DiskCapacityInfo/DiskCapacityInfo';
 import {
     DiskPopup,
@@ -37,9 +36,7 @@ import {pDiskPopupKeyset} from './i18n';
 
 function getStorageItems(data: PreparedPDisk, capacityMetricsEnabled: boolean): DiskDetailItem[] {
     const items = getPDiskCapacityItems(data, {useWhiteboardSize: capacityMetricsEnabled}).filter(
-        ({id}) =>
-            capacityMetricsEnabled ||
-            (id === 'space' && isNumeric(data.TotalSize) && isNumeric(data.AvailableSize)),
+        ({id}) => capacityMetricsEnabled || id === 'space',
     );
     return [...items, ...getPDiskLogItems(data)];
 }

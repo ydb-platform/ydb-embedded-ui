@@ -11,7 +11,7 @@ import type {TVDiskID} from '../../types/api/vdisk';
 import type {NodeMetadata} from '../../types/store/nodesList';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
-import {BRAND_BUTTON_CLASS} from '../../utils/constants';
+import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {isFullVDiskData} from '../../utils/disks/helpers';
@@ -107,22 +107,26 @@ function getRuntimeItems(
         [vDiskPopupKeyset('label_read'), data.ReadThroughput],
         [vDiskPopupKeyset('label_write'), data.WriteThroughput],
     ] as const) {
-        if (parseOptionalNonNegativeNumber(value) !== undefined) {
-            items.push({
-                name,
-                content: formatBytes({
-                    value,
-                    size: 'mb',
-                    fixedDecimalPlaces: 2,
-                    withSpeedLabel: true,
-                }),
-            });
-        }
+        const throughput = parseOptionalNonNegativeNumber(value);
+        items.push({
+            name,
+            content:
+                throughput === undefined
+                    ? EMPTY_DATA_PLACEHOLDER
+                    : formatBytes({
+                          value: throughput,
+                          size: 'mb',
+                          fixedDecimalPlaces: 2,
+                          withSpeedLabel: true,
+                      }),
+        });
     }
-    if (withUnreadableBlobs && !isNil(data.HasUnreadableBlobs)) {
+    if (withUnreadableBlobs) {
         items.push({
             name: vDiskInfoKeyset('has-unreadable-blobs'),
-            content: vDiskInfoKeyset(data.HasUnreadableBlobs ? 'yes' : 'no'),
+            content: isNil(data.HasUnreadableBlobs)
+                ? EMPTY_DATA_PLACEHOLDER
+                : vDiskInfoKeyset(data.HasUnreadableBlobs ? 'yes' : 'no'),
         });
     }
     return items;
@@ -132,14 +136,13 @@ function getStorageItems(
     data: PreparedVDisk,
     capacityMetricsEnabled: boolean,
 ): YDBDefinitionListItem[] {
-    const items: YDBDefinitionListItem[] = [];
-    if (data.StoragePoolName) {
-        items.push({
+    const items: YDBDefinitionListItem[] = [
+        {
             name: vDiskPopupKeyset('label_storage-pool'),
             content: <DiskPopupText value={data.StoragePoolName} />,
             copyText: data.StoragePoolName,
-        });
-    }
+        },
+    ];
     return isFullVDiskData(data)
         ? [...items, ...getVDiskCapacityItems(data, {capacityMetricsEnabled})]
         : items;

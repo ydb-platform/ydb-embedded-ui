@@ -7,7 +7,6 @@ import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {DiskTypeLabel} from '../DiskStatus/DiskStatus';
-import {EntityName} from '../EntityName/EntityName';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
 import i18n from './i18n';
@@ -79,13 +78,22 @@ export function DiskPopupHeader({
     );
 }
 
-export function DiskPopupText({value}: {value?: string | number}) {
+export function DiskPopupText({
+    value,
+    withLeftTrim = false,
+}: {
+    value?: string | number;
+    withLeftTrim?: boolean;
+}) {
     const hasValue = !isNil(value) && value !== '';
     const text = hasValue ? value : EMPTY_DATA_PLACEHOLDER;
     return (
         <Tooltip content={text} disabled={!hasValue} className={b('text-tooltip')}>
-            <span className={b('text')} tabIndex={hasValue ? 0 : undefined}>
-                {text}
+            <span
+                className={b('text', {'with-left-trim': withLeftTrim})}
+                tabIndex={hasValue ? 0 : undefined}
+            >
+                {withLeftTrim ? <span>{text}</span> : text}
             </span>
         </Tooltip>
     );
@@ -102,9 +110,7 @@ export function DiskPopupLocation({items}: {items: DiskDetailItem[]}) {
         if (item.id === 'pdisk-path' && typeof item.copyText === 'string') {
             return {
                 ...item,
-                content: (
-                    <EntityName name={item.copyText} withLeftTrim className={b('pdisk-path')} />
-                ),
+                content: <DiskPopupText value={item.copyText} withLeftTrim />,
             };
         }
         return item;

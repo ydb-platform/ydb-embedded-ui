@@ -745,6 +745,80 @@ test('wheel over disk popups scrolls the page', async ({page}) => {
     }
 });
 
+test.describe('Capacity alert popup palette', () => {
+    for (const theme of ['light', 'dark']) {
+        test(`uses detailed Space colors in disk popups in ${theme} theme`, async ({page}) => {
+            await page.setViewportSize({width: 2560, height: 1440});
+            await page.addInitScript((value) => {
+                localStorage.setItem('theme', value);
+                localStorage.setItem('blobStorageCapacityMetrics', JSON.stringify(true));
+            }, theme);
+            await enableExpertMode(page, VDisksGroupBy.State);
+            await setupVDiskColoringMocks(page);
+            await gotoStoragePage(page, VDisksGroupBy.State);
+            await expectStorageGroupRowsReady(page);
+
+            const row = getStorageGroupRow(page, 0);
+            const cases = [
+                [
+                    ALL_GREEN_VDISK_INDEX,
+                    'Green',
+                    '--g-color-text-positive-heavy',
+                    '--g-color-base-positive-light',
+                ],
+                [1, 'Cyan', '--ydb-space-cyan-text', '--ydb-space-cyan-bg'],
+                [5, 'Light yellow', '--ydb-space-light-yellow-text', '--ydb-space-light-yellow-bg'],
+                [2, 'Yellow', '--g-color-text-warning-heavy', '--g-color-base-warning-light'],
+                [6, 'Light orange', '--ydb-space-light-orange-text', '--ydb-space-light-orange-bg'],
+                [7, 'Pre orange', '--ydb-space-pre-orange-text', '--ydb-space-pre-orange-bg'],
+                [3, 'Orange', '--ydb-space-orange-text', '--ydb-space-orange-bg'],
+                [4, 'Red', '--g-color-base-danger-heavy', '--g-color-base-danger-light'],
+                [8, 'Black', '--ydb-space-black-text', '--ydb-space-black-bg'],
+            ] as const;
+
+            for (const [index, text, textToken, backgroundToken] of cases) {
+                await getVDiskItems(row).nth(index).hover();
+                const [color, background] = await Promise.all([
+                    resolveThemeColor(page, textToken),
+                    resolveThemeColor(page, backgroundToken),
+                ]);
+
+                for (const id of [`9000000000-1-0-0-${index}`, `${7000 + index}-${100 + index}`]) {
+                    const popup = page.locator('.ydb-popover').filter({
+                        has: page.getByText(id, {exact: true}),
+                    });
+                    const badge = popup
+                        .locator('.g-label')
+                        .filter({hasText: new RegExp(`^${text}$`)});
+                    await expect(badge).toBeVisible();
+                    await expect(badge).toHaveCSS('color', color);
+                    await expect(badge).toHaveCSS('background-color', background);
+                }
+
+                await page.keyboard.press('Escape');
+                await expect(page.locator('.ydb-popover').filter({visible: true})).toHaveCount(0);
+            }
+
+            for (const name of ['VDisks:', 'PDisks:']) {
+                const control = page.getByRole('radiogroup', {name, exact: true});
+                await control.getByRole('radio', {name: 'Space', exact: true}).check();
+                const legend = control.locator('..');
+                for (const [, text, textToken, backgroundToken] of cases) {
+                    const badge = legend.locator(
+                        `.ydb-storage-expert-mode-panel__label_${text.toLowerCase().replaceAll(' ', '-')}`,
+                    );
+                    const color = await resolveThemeColor(page, textToken);
+                    const background = await resolveThemeColor(page, backgroundToken);
+                    await expect(badge).toHaveCSS('color', color);
+                    await expect(badge).toHaveCSS('background-color', background);
+                    await badge.hover();
+                    await expect(badge).toHaveCSS('background-color', background);
+                }
+            }
+        });
+    }
+});
+
 test.describe('Drive type - groups expert mode', () => {
     for (const theme of ['light', 'dark']) {
         test(`shows drive types and preserves group-only selection in ${theme} theme`, async ({

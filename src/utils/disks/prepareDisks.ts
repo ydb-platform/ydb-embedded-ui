@@ -8,7 +8,7 @@ import {isNumeric, parseOptionalNonNegativeNumber} from '../utils';
 import {calculatePDiskSeverity} from './calculatePDiskSeverity';
 import {calculateVDiskSeverity} from './calculateVDiskSeverity';
 import {getPDiskType} from './getPDiskType';
-import {getPDiskId, isFullVDiskData} from './helpers';
+import {getPDiskId, isFullVDiskData, makeVDiskLocationKey} from './helpers';
 import type {PreparedPDisk, PreparedVDisk} from './types';
 
 export function prepareWhiteboardVDiskData(
@@ -21,16 +21,7 @@ export function prepareWhiteboardVDiskData(
     if (!isFullVDiskData(vDiskState)) {
         const {NodeId, PDiskId, VSlotId, ...restVDiskFields} = vDiskState;
 
-        const vDiskId =
-            !isNil(VSlotId) && !isNil(PDiskId) && !isNil(NodeId)
-                ? {
-                      NodeId,
-                      PDiskId,
-                      VSlotId,
-                  }
-                : undefined;
-
-        const StringifiedId = stringifyVdiskId(vDiskId);
+        const StringifiedId = makeVDiskLocationKey(NodeId, PDiskId, VSlotId) ?? '';
 
         return {
             ...restVDiskFields,

@@ -1,6 +1,7 @@
 import {isNil} from 'lodash';
 
 import type {NodeMetadata} from '../../types/store/nodesList';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {getDiskLocationItems} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {isFullVDiskData} from '../../utils/disks/helpers';
@@ -32,7 +33,9 @@ export function getVDiskIdentityItems(data: PreparedVDisk = {}): DiskDetailItem[
         {id: 'incarnation-guid', name: i18n('incarnation-guid'), value: data.IncarnationGuid},
         {id: 'instance-guid', name: i18n('instance-guid'), value: data.InstanceGuid},
     ];
-    return entries.flatMap(({id, name, value}) =>
-        isNil(value) || value === '' ? [] : [{id, name, content: value}],
-    );
+    return entries.map(({id, name, value}) => ({
+        id,
+        name,
+        content: isNil(value) || value === '' ? EMPTY_DATA_PLACEHOLDER : value,
+    }));
 }
