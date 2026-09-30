@@ -2,43 +2,66 @@ import type {TPathID} from './shared';
 
 export interface TSysViewDescription {
     Name?: string;
-    Type?: ESysViewType;
+    /**
+     * ESysViewType: enum name ("EVSlots") on YDB <= 26.3.1.x,
+     * numeric value (13) since ydb-platform/ydb#54332
+     */
+    Type?: ESysViewType | number;
     SourceObject?: TPathID;
 }
 
-export type ESysViewType =
-    | 'EPartitionStats'
-    | 'ENodes'
-    | 'ETopQueriesByDurationOneMinute'
-    | 'ETopQueriesByDurationOneHour'
-    | 'ETopQueriesByReadBytesOneMinute'
-    | 'ETopQueriesByReadBytesOneHour'
-    | 'ETopQueriesByCpuTimeOneMinute'
-    | 'ETopQueriesByCpuTimeOneHour'
-    | 'ETopQueriesByRequestUnitsOneMinute'
-    | 'ETopQueriesByRequestUnitsOneHour'
-    | 'EQuerySessions'
-    | 'EPDisks'
-    | 'EVSlots'
-    | 'EGroups'
-    | 'EStoragePools'
-    | 'EStorageStats'
-    | 'ETablets'
-    | 'EQueryMetricsOneMinute'
-    | 'ETopPartitionsByCpuOneMinute'
-    | 'ETopPartitionsByCpuOneHour'
-    | 'ETopPartitionsByTliOneMinute'
-    | 'ETopPartitionsByTliOneHour'
-    | 'EResourcePoolClassifiers'
-    | 'EResourcePools'
-    | 'EAuthUsers'
-    | 'EAuthGroups'
-    | 'EAuthGroupMembers'
-    | 'EAuthOwners'
-    | 'EAuthPermissions'
-    | 'EAuthEffectivePermissions'
-    | 'EPgTables'
-    | 'EInformationSchemaTables'
-    | 'EPgClass'
-    | 'EShowCreate'
-    | 'ECompileCacheQueries';
+/**
+ * Numeric ESysViewType values
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/sys_view_types.proto
+ */
+export const SYS_VIEW_TYPE_IDS = {
+    EPartitionStats: 1,
+    ENodes: 2,
+    ETopQueriesByDurationOneMinute: 3,
+    ETopQueriesByDurationOneHour: 4,
+    ETopQueriesByReadBytesOneMinute: 5,
+    ETopQueriesByReadBytesOneHour: 6,
+    ETopQueriesByCpuTimeOneMinute: 7,
+    ETopQueriesByCpuTimeOneHour: 8,
+    ETopQueriesByRequestUnitsOneMinute: 9,
+    ETopQueriesByRequestUnitsOneHour: 10,
+    EQuerySessions: 11,
+    EPDisks: 12,
+    EVSlots: 13,
+    EGroups: 14,
+    EStoragePools: 15,
+    EStorageStats: 16,
+    ETablets: 17,
+    EQueryMetricsOneMinute: 18,
+    ETopPartitionsByCpuOneMinute: 19,
+    ETopPartitionsByCpuOneHour: 20,
+    ETopPartitionsByTliOneMinute: 21,
+    ETopPartitionsByTliOneHour: 22,
+    EResourcePoolClassifiers: 23,
+    EResourcePools: 24,
+    EAuthUsers: 25,
+    EAuthGroups: 26,
+    EAuthGroupMembers: 27,
+    EAuthOwners: 28,
+    EAuthPermissions: 29,
+    EAuthEffectivePermissions: 30,
+    EPgTables: 31,
+    EInformationSchemaTables: 32,
+    EPgClass: 33,
+    EShowCreate: 34,
+    ECompileCacheQueries: 35,
+    EStorePrimaryIndexStats: 36,
+    EStorePrimaryIndexSchemaStats: 37,
+    EStorePrimaryIndexPortionStats: 38,
+    EStorePrimaryIndexGranuleStats: 39,
+    EStorePrimaryIndexOptimizerStats: 40,
+    ETablePrimaryIndexStats: 41,
+    ETablePrimaryIndexSchemaStats: 42,
+    ETablePrimaryIndexPortionStats: 43,
+    ETablePrimaryIndexGranuleStats: 44,
+    ETablePrimaryIndexOptimizerStats: 45,
+    EStreamingQueries: 46,
+    EUdfModules: 47,
+} as const;
+
+export type ESysViewType = keyof typeof SYS_VIEW_TYPE_IDS;
