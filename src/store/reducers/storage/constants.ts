@@ -7,4 +7,6 @@ export const VISIBLE_ENTITIES = {
 export const STORAGE_TYPES = {
     groups: 'groups',
     nodes: 'nodes',
+    nbs: 'nbs',
+    ddisks: 'ddisks',
 } as const;

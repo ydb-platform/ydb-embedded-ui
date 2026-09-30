@@ -1,9 +1,26 @@
+import type {NbsListParams, NbsListResponse} from '../../types/api/nbs';
 import type {GroupsRequestParams, StorageGroupsResponse} from '../../types/api/storage';
 
 import type {AxiosOptions} from './base';
 import {BaseYdbAPI} from './base';
 
 export class StorageAPI extends BaseYdbAPI {
+    async getNbsStorage(
+        view: 'tablets' | 'disks',
+        params: NbsListParams,
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        const result = await this.get<NbsListResponse>(
+            this.getPath(`/cms/api/json/ddisk/${view}`),
+            params,
+            {concurrentId, requestConfig: {signal}},
+        );
+        if (result.Status?.Code !== 'OK') {
+            throw new Error(result.Status?.Reason || result.Status?.Code || 'Invalid CMS response');
+        }
+        return result;
+    }
+
     getStorageGroups(
         {nodeId, pDiskId, groupId, fieldsRequired, filter, ...params}: GroupsRequestParams,
         {concurrentId, signal}: AxiosOptions = {},

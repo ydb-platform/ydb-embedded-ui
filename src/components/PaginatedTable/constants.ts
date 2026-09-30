@@ -23,6 +23,8 @@ export const PAGINATED_TABLE_IDS = {
     STORAGE_GROUPS: 'storage-groups',
     TOPIC_DATA: 'topic-data',
     NODE_PEERS: 'node-peers',
+    NBS_TABLETS: 'nbs-tablets',
+    NBS_DDISKS: 'nbs-ddisks',
 } as const;
 
 export type PaginatedTableId = (typeof PAGINATED_TABLE_IDS)[keyof typeof PAGINATED_TABLE_IDS];
@@ -33,6 +35,8 @@ export const PAGINATED_TABLE_COLUMN_IDS_IN_REQUEST: Record<PaginatedTableId, boo
     [PAGINATED_TABLE_IDS.STORAGE_GROUPS]: true,
     [PAGINATED_TABLE_IDS.TOPIC_DATA]: true,
     [PAGINATED_TABLE_IDS.NODE_PEERS]: false,
+    [PAGINATED_TABLE_IDS.NBS_TABLETS]: false,
+    [PAGINATED_TABLE_IDS.NBS_DDISKS]: false,
 };
 
 export function shouldSendColumnIds(tableId: PaginatedTableId): boolean {
