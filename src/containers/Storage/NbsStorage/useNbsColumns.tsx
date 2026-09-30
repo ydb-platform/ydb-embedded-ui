@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {Link} from '@gravity-ui/uikit';
 
 import type {Column} from '../../../components/PaginatedTable';
@@ -26,15 +24,6 @@ export function useNbsColumns(disks: boolean) {
                 hideCapacity
             />
         );
-    const tabletLinks = (ids?: string[]) =>
-        ids?.length
-            ? ids.map((id, index) => (
-                  <React.Fragment key={id}>
-                      {index > 0 ? ', ' : ''}
-                      <Link href={tabletPath(id)}>{id}</Link>
-                  </React.Fragment>
-              ))
-            : EMPTY_DATA_PLACEHOLDER;
     const column = (
         name: string,
         header: string,
@@ -69,14 +58,18 @@ export function useNbsColumns(disks: boolean) {
               column(
                   'ddiskTablets',
                   i18n('ddisk-tablets'),
-                  ({row}) => ('DiskId' in row ? tabletLinks(row.DDiskTabletIds) : null),
-                  260,
+                  ({row}) =>
+                      'DiskId' in row ? (row.DDiskTabletCount ?? EMPTY_DATA_PLACEHOLDER) : null,
+                  180,
               ),
               column(
                   'bufferTablets',
                   i18n('buffer-tablets'),
-                  ({row}) => ('DiskId' in row ? tabletLinks(row.PersistentBufferTabletIds) : null),
-                  260,
+                  ({row}) =>
+                      'DiskId' in row
+                          ? (row.PersistentBufferTabletCount ?? EMPTY_DATA_PLACEHOLDER)
+                          : null,
+                  180,
               ),
           ]
         : [

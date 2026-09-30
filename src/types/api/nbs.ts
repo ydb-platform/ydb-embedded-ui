@@ -11,8 +11,8 @@ export interface NbsTablet {
 
 export interface NbsDisk {
     DiskId: {NodeId: number; PDiskId: number; DDiskSlotId: number};
-    DDiskTabletIds?: string[];
-    PersistentBufferTabletIds?: string[];
+    DDiskTabletCount?: number;
+    PersistentBufferTabletCount?: number;
     Available?: boolean;
     State?: string;
     DDiskOccupancy?: number;
@@ -29,6 +29,7 @@ export interface NbsListParams {
     group_by?: 'degrade' | 'disk_usage';
     filter_group?: string;
     filter_tablet_id?: string;
+    include_tablet_ids?: boolean;
 }
 
 export interface NbsListResponse {

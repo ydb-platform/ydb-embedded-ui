@@ -74,8 +74,8 @@ test('DDisk sorting sends the selected role and direction to CMS and survives re
                         Available: true,
                         DDiskOccupancy: 0,
                         PersistentBufferOccupancy: 0.75,
-                        DDiskTabletIds: [TABLETS[0].TabletId],
-                        PersistentBufferTabletIds: [],
+                        DDiskTabletCount: 12345,
+                        PersistentBufferTabletCount: 67890,
                     },
                 ],
             },
@@ -83,6 +83,9 @@ test('DDisk sorting sends the selected role and direction to CMS and survives re
     });
     await new PageModel(page, 'cluster/storage', {type: 'ddisks'}).goto();
     await expect(page.getByText('42:1000:1010', {exact: true})).toBeVisible();
+    await expect(page.getByText('12345', {exact: true})).toBeVisible();
+    await expect(page.getByText('67890', {exact: true})).toBeVisible();
+    expect(requests[0].get('include_tablet_ids')).toBe('false');
     await expect(page.getByText('0.0%', {exact: true})).toBeVisible();
     await expect(page.getByText('75.0%', {exact: true})).toBeVisible();
     await page.getByLabel('Sort by', {exact: true}).click();

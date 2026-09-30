@@ -17,6 +17,7 @@ export const getNbsStorage: FetchData<NbsRow, NbsFilters> = async ({
         disks ? 'disks' : 'tablets',
         {
             ...params,
+            ...(disks ? {include_tablet_ids: false} : {}),
             limit,
             offset,
         },
