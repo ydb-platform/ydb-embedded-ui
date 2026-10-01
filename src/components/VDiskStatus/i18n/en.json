@@ -16,6 +16,7 @@
   "value_waiting-for-token": "Waiting for token",
   "value_phantoms-only": "Phantoms only",
   "label_not-replicated": "Not replicated",
+  "value_no-detailed-status": "No detailed status",
   "context_state-ok": "The VDisk is operating normally",
   "context_state-initial": "The VDisk is starting",
   "context_state-sync-guid-recovery": "The VDisk is synchronizing with other VDisks of the group",

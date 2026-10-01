@@ -16,6 +16,7 @@ import {
 } from '../../utils/disks/constants';
 import {calculateStateIcon} from '../../utils/disks/iconCalculators';
 import type {PreparedVDisk} from '../../utils/disks/types';
+import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 import type {DiskStatusLabelData} from '../DiskStatus/DiskStatus';
 
 import {vDiskStatusKeyset as i18n} from './i18n';
@@ -105,6 +106,17 @@ export function getVDiskReplicationLabel(data: PreparedVDisk): DiskStatusLabelDa
                 return replicatedLabel();
             }
             if (data.Replicated === false) {
+                const progress = parseOptionalNonNegativeNumber(data.ReplicationProgress);
+                const seconds = parseOptionalNonNegativeNumber(data.ReplicationSecondsRemaining);
+                if ((progress !== undefined && progress <= 1) || seconds !== undefined) {
+                    return {
+                        title: i18n('label_replication'),
+                        value: i18n('value_no-detailed-status'),
+                        theme: 'info',
+                        icon: ArrowsRotateLeft,
+                        tooltip: i18n('context_not-replicated'),
+                    };
+                }
                 return {
                     value: i18n('label_not-replicated'),
                     theme: 'normal',

@@ -1,3 +1,5 @@
+import {ArrowsRotateLeft, ArrowsRotateLeftSlash} from '@gravity-ui/icons';
+
 import type {EVDiskDetailedReplicationStatus} from '../../types/api/vdisk';
 import {EVDiskState} from '../../types/api/vdisk';
 
@@ -31,8 +33,39 @@ describe('VDisk replication label', () => {
     });
 
     test('uses the boolean fallback only when the detailed status is absent', () => {
-        expect(getVDiskReplicationLabel({Replicated: false})?.value).toBe('Not replicated');
+        expect(getVDiskReplicationLabel({Replicated: false})).toMatchObject({
+            value: 'Not replicated',
+            theme: 'normal',
+            icon: ArrowsRotateLeftSlash,
+        });
         expect(getVDiskReplicationLabel({Replicated: true})?.value).toBe('Replicated');
         expect(getVDiskReplicationLabel({})).toBeUndefined();
+    });
+
+    test.each([
+        {ReplicationProgress: 0},
+        {ReplicationProgress: 0.77},
+        {ReplicationProgress: 1},
+        {ReplicationSecondsRemaining: 0},
+        {ReplicationSecondsRemaining: 125},
+    ])('shows No detailed status with available replication metrics %p', (metrics) => {
+        expect(getVDiskReplicationLabel({Replicated: false, ...metrics})).toMatchObject({
+            title: 'Replication',
+            value: 'No detailed status',
+            theme: 'info',
+            icon: ArrowsRotateLeft,
+        });
+    });
+
+    test.each([
+        {ReplicationProgress: -0.1},
+        {ReplicationProgress: 1.1},
+        {ReplicationProgress: NaN},
+        {ReplicationSecondsRemaining: -1},
+        {ReplicationSecondsRemaining: Infinity},
+    ])('keeps Not replicated when replication metrics are invalid %p', (metrics) => {
+        expect(getVDiskReplicationLabel({Replicated: false, ...metrics})?.value).toBe(
+            'Not replicated',
+        );
     });
 });
