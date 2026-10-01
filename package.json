@@ -38,7 +38,7 @@
     "@reduxjs/toolkit": "^2.8.2",
     "@tanstack/react-table": "^8.20.6",
     "@ydb-platform/monaco-ghost": "^0.6.1",
-    "axios": "^1.18.0",
+    "axios": "^1.20.0",
     "axios-retry": "^4.5.0",
     "colord": "^2.10.0",
     "copy-to-clipboard": "^3.3.3",
