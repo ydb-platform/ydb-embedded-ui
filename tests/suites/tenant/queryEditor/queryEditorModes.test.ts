@@ -2,13 +2,14 @@ import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
 import {database} from '../../../utils/constants';
-import {QueryEditorMode, TenantPage} from '../TenantPage';
+import {NavigationTabs, QueryEditorMode, TenantPage} from '../TenantPage';
 
 import {
     AsyncReplicationTemplates,
     NewSqlDropdownMenu,
     TemplateCategory,
 } from './models/NewSqlDropdownMenu';
+import {QueryTabs} from './models/QueryEditor';
 
 async function openQueryEditorMode(page: Page, mode: QueryEditorMode) {
     const tenantPage = new TenantPage(page);
@@ -35,6 +36,7 @@ test.describe('Query Editor modes', () => {
         const tenantPage = await openQueryEditorMode(page, QueryEditorMode.SingleTab);
 
         await expect(tenantPage.queryEditor.editorTabs.isHidden()).resolves.toBe(true);
+        await expect(tenantPage.queryEditor.editorTextArea).toBeFocused();
     });
 
     test('Default mode renders editor with internal tabs', async ({page}) => {
@@ -44,6 +46,27 @@ test.describe('Query Editor modes', () => {
         expect(await page.evaluate(() => window.e2eQueryEditorMode)).toBeUndefined();
         await expect(tenantPage.queryEditor.editorTabs.isVisible()).resolves.toBe(true);
         await expect(tenantPage.queryEditor.editorTabs.getTabCount()).resolves.toBe(1);
+        await expect(tenantPage.queryEditor.editorTextArea).toBeFocused();
+
+        await page.keyboard.type('SELECT 1;');
+        await expect.poll(() => tenantPage.queryEditor.getEditorContent()).toBe('SELECT 1;');
+    });
+
+    test('Editor receives focus when entering from diagnostics and returning from history', async ({
+        page,
+    }) => {
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({schema: database, database, databasePage: 'diagnostics'});
+
+        await tenantPage.selectNavigationTab(NavigationTabs.Query);
+        await expect(tenantPage.queryEditor.editorTextArea).toBeFocused();
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Editor);
+        await expect(tenantPage.queryEditor.editorTextArea).toBeFocused();
+
+        await page.keyboard.type('SELECT 2;');
+        await expect.poll(() => tenantPage.queryEditor.getEditorContent()).toBe('SELECT 2;');
     });
 
     test('Single-tab mode recreates the editor after restoring zero-tabs state', async ({page}) => {
