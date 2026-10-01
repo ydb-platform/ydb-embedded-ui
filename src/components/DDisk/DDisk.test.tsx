@@ -11,6 +11,7 @@ test('links to the selected DDisk and Persistent Buffer instead of a VDisk', () 
     render(
         <DDiskInfo
             data={{
+                StoragePoolName: 'pool-a',
                 NodeId: 3,
                 PDiskId: 1000,
                 DDiskSlotId: 1010,
@@ -32,6 +33,7 @@ test('links to the selected DDisk and Persistent Buffer instead of a VDisk', () 
     expect(buffer.searchParams.get('pb')).toBe('[3:5893148750:1010]');
     expect(buffer.searchParams.get('describeFreeSpace')).toBe('1');
     expect(buffer.searchParams.get('showTablets')).toBe('1');
+    expect(screen.getByText('pool-a')).toBeInTheDocument();
     expect(screen.getByText('25.0%')).toBeInTheDocument();
     expect(screen.getByText('50.0%')).toBeInTheDocument();
     expect(screen.queryByText(/VDisk/)).not.toBeInTheDocument();

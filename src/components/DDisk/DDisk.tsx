@@ -6,10 +6,8 @@ import type {TDDiskStateInfo} from '../../types/api/ddisk';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {
-    createDeveloperUILinkWithNodeId,
-    useHasDeveloperUi,
-} from '../../utils/developerUI/developerUI';
+import {getDDiskDeveloperUIHrefs} from '../../utils/developerUI/ddisk';
+import {useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
@@ -27,22 +25,17 @@ const bytes = (value?: string) =>
 
 export function DDiskInfo({data}: {data: TDDiskStateInfo}) {
     const hasDeveloperUi = useHasDeveloperUi();
-    const base =
-        data.NodeId === undefined ? undefined : createDeveloperUILinkWithNodeId(data.NodeId);
-    const query = new URLSearchParams({
-        formPresent: '1',
-        autoRefresh: '1',
-        describeFreeSpace: '1',
-        showTablets: '1',
-        refreshRate: '1',
-        pb: data.PersistentBufferId ?? '',
-    });
+    const links = getDDiskDeveloperUIHrefs(data);
     return (
         <Flex direction="column" gap={3} className={b('popup')}>
             <Text variant="subheader-2">DDisk {data.DDiskSlotId}</Text>
             {data.HasWhiteboardData === false && <Text>{i18n('label_unavailable')}</Text>}
             <YDBDefinitionList
                 items={[
+                    {
+                        name: i18n('label_pool'),
+                        content: data.StoragePoolName || EMPTY_DATA_PLACEHOLDER,
+                    },
                     {name: i18n('label_node'), content: data.NodeId ?? EMPTY_DATA_PLACEHOLDER},
                     {name: i18n('label_pdisk'), content: data.PDiskId ?? EMPTY_DATA_PLACEHOLDER},
                     {name: i18n('label_slot'), content: data.DDiskSlotId ?? EMPTY_DATA_PLACEHOLDER},
@@ -56,23 +49,19 @@ export function DDiskInfo({data}: {data: TDDiskStateInfo}) {
                     },
                 ]}
             />
-            {hasDeveloperUi && base && (
+            {hasDeveloperUi && data.NodeId !== undefined && (
                 <Flex gap={2}>
                     <Button
-                        href={data.DDiskPath ? `${base}/${data.DDiskPath}` : undefined}
-                        disabled={!data.DDiskPath}
+                        href={links.ddisk}
+                        disabled={!links.ddisk}
                         target="_blank"
                         rel="noopener noreferrer"
                     >
                         {i18n('action_ddisk')}
                     </Button>
                     <Button
-                        href={
-                            data.PersistentBufferId
-                                ? `${base}/actors/persistent_buffer?${query}`
-                                : undefined
-                        }
-                        disabled={!data.PersistentBufferId}
+                        href={links.buffer}
+                        disabled={!links.buffer}
                         target="_blank"
                         rel="noopener noreferrer"
                     >

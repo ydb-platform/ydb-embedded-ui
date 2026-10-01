@@ -21,5 +21,9 @@
   "descending": "По убыванию",
   "problems": "Только проблемы",
   "disk": "DDisk",
-  "usage-help": "Максимальная заполненность владельца DDisk. При отсутствии замеров отображается «Нет данных»."
+  "usage-help": "Максимальная заполненность владельца DDisk. При отсутствии замеров отображается «Нет данных».",
+  "disk-id": "Disk ID",
+  "pool": "Пул",
+  "buffer": "Persistent Buffer",
+  "open-buffer": "Открыть Persistent Buffer"
 }

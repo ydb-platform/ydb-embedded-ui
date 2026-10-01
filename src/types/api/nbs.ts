@@ -1,5 +1,6 @@
 export interface NbsTablet {
     TabletId: string;
+    DiskId?: string;
     Revision?: number;
     GroupsCount?: number;
     LastChangedAt?: string | number;
@@ -11,6 +12,9 @@ export interface NbsTablet {
 
 export interface NbsDisk {
     DiskId: {NodeId: number; PDiskId: number; DDiskSlotId: number};
+    StoragePoolName?: string;
+    DDiskPath?: string;
+    PersistentBufferId?: string;
     DDiskTabletCount?: number;
     PersistentBufferTabletCount?: number;
     Available?: boolean;

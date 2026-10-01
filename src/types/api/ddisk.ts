@@ -4,6 +4,7 @@ export interface TDDiskStateInfo {
     PDiskId?: number;
     DDiskSlotId?: number;
     GroupId?: number;
+    StoragePoolName?: string;
     AllocatedSize?: string;
     AvailableSize?: string;
     TotalSize?: string;

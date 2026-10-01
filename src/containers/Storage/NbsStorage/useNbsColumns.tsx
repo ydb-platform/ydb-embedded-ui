@@ -3,13 +3,18 @@ import {Link} from '@gravity-ui/uikit';
 import type {Column} from '../../../components/PaginatedTable';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
-import {createTabletDeveloperUIHref} from '../../../utils/developerUI/developerUI';
+import {getDDiskDeveloperUIHrefs} from '../../../utils/developerUI/ddisk';
+import {
+    createTabletDeveloperUIHref,
+    useHasDeveloperUi,
+} from '../../../utils/developerUI/developerUI';
 
 import {formatUsage} from './getData';
 import type {NbsRow} from './getData';
 import i18n from './i18n';
 
 export function useNbsColumns(disks: boolean) {
+    const hasDeveloperUi = useHasDeveloperUi();
     const usage = (value?: number) =>
         formatUsage(value) === undefined ? (
             EMPTY_DATA_PLACEHOLDER
@@ -37,35 +42,59 @@ export function useNbsColumns(disks: boolean) {
     });
     const columns: Column<NbsRow>[] = disks
         ? [
-              column('disk', i18n('disk'), ({row}) =>
-                  'DiskId' in row
-                      ? `${row.DiskId.NodeId}:${row.DiskId.PDiskId}:${row.DiskId.DDiskSlotId}`
-                      : null,
+              column('disk', i18n('disk'), ({row}) => {
+                  if ('TabletId' in row) {
+                      return null;
+                  }
+                  const id = `${row.DiskId.NodeId}:${row.DiskId.PDiskId}:${row.DiskId.DDiskSlotId}`;
+                  const href = getDDiskDeveloperUIHrefs({...row, ...row.DiskId}).ddisk;
+                  return hasDeveloperUi && href ? <Link href={href}>{id}</Link> : id;
+              }),
+              column('pool', i18n('pool'), ({row}) =>
+                  'TabletId' in row ? null : row.StoragePoolName || EMPTY_DATA_PLACEHOLDER,
+              ),
+              column(
+                  'buffer',
+                  i18n('buffer'),
+                  ({row}) => {
+                      if ('TabletId' in row) {
+                          return null;
+                      }
+                      const href = getDDiskDeveloperUIHrefs({...row, ...row.DiskId}).buffer;
+                      return hasDeveloperUi && href ? (
+                          <Link href={href}>{i18n('open-buffer')}</Link>
+                      ) : (
+                          EMPTY_DATA_PLACEHOLDER
+                      );
+                  },
+                  200,
               ),
               column('state', i18n('state'), ({row}) =>
-                  'DiskId' in row ? (row.State ?? EMPTY_DATA_PLACEHOLDER) : null,
+                  !('TabletId' in row) ? (row.State ?? EMPTY_DATA_PLACEHOLDER) : null,
               ),
               column('ddiskUsage', i18n('ddisk-usage'), ({row}) =>
-                  'DiskId' in row ? usage(row.DDiskOccupancy) : null,
+                  !('TabletId' in row) ? usage(row.DDiskOccupancy) : null,
               ),
               column(
                   'bufferUsage',
                   i18n('buffer-usage'),
-                  ({row}) => ('DiskId' in row ? usage(row.PersistentBufferOccupancy) : null),
+                  ({row}) => (!('TabletId' in row) ? usage(row.PersistentBufferOccupancy) : null),
                   220,
               ),
               column(
                   'ddiskTablets',
                   i18n('ddisk-tablets'),
                   ({row}) =>
-                      'DiskId' in row ? (row.DDiskTabletCount ?? EMPTY_DATA_PLACEHOLDER) : null,
+                      !('TabletId' in row)
+                          ? (row.DDiskTabletCount ?? EMPTY_DATA_PLACEHOLDER)
+                          : null,
                   180,
               ),
               column(
                   'bufferTablets',
                   i18n('buffer-tablets'),
                   ({row}) =>
-                      'DiskId' in row
+                      !('TabletId' in row)
                           ? (row.PersistentBufferTabletCount ?? EMPTY_DATA_PLACEHOLDER)
                           : null,
                   180,
@@ -82,6 +111,12 @@ export function useNbsColumns(disks: boolean) {
                           </Link>
                       ) : null,
                   220,
+              ),
+              column(
+                  'diskId',
+                  i18n('disk-id'),
+                  ({row}) => ('TabletId' in row ? row.DiskId || EMPTY_DATA_PLACEHOLDER : null),
+                  260,
               ),
               column('groups', i18n('groups'), ({row}) =>
                   'TabletId' in row ? (row.GroupsCount ?? EMPTY_DATA_PLACEHOLDER) : null,

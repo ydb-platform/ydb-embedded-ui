@@ -21,5 +21,9 @@
   "descending": "Descending",
   "problems": "Only problems",
   "disk": "DDisk",
-  "usage-help": "Maximum underlying DDisk owner occupancy. Missing samples are shown as no data."
+  "usage-help": "Maximum underlying DDisk owner occupancy. Missing samples are shown as no data.",
+  "disk-id": "Disk ID",
+  "pool": "Pool",
+  "buffer": "Persistent Buffer",
+  "open-buffer": "Open Persistent Buffer"
 }

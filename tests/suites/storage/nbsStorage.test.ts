@@ -6,7 +6,13 @@ import {setupVDiskPageMocks} from './vdiskPageMocks';
 
 const TABLETS = [
     {TabletId: '72075186224037901', GroupsCount: 2, DiskUsage: 1.2, Degrade: 2},
-    {TabletId: '72075186224037902', GroupsCount: 1, DiskUsage: 0.45, Degrade: 0},
+    {
+        TabletId: '72075186224037902',
+        DiskId: 'volume-42',
+        GroupsCount: 1,
+        DiskUsage: 0.45,
+        Degrade: 0,
+    },
     {TabletId: '72075186224037903', GroupsCount: 1, Degrade: 1},
 ];
 
@@ -49,6 +55,7 @@ test('NBS tablets group by usage and degrade and keep unknown monitoring separat
         'href',
         new RegExp(`/tablets/app\\?TabletID=${TABLETS[1].TabletId}$`),
     );
+    await expect(page.getByText('volume-42', {exact: true})).toBeVisible();
     await expect(page.getByText('45.0%', {exact: true})).toBeVisible();
     await page.getByRole('button', {name: /≥100%/}).click();
     await expect(page.getByText('120.0%', {exact: true})).toBeVisible();
@@ -74,6 +81,9 @@ test('DDisk sorting sends the selected role and direction to CMS and survives re
                 Disks: [
                     {
                         DiskId: {NodeId: 42, PDiskId: 1000, DDiskSlotId: 1010},
+                        StoragePoolName: 'pool-a',
+                        DDiskPath: 'actors/ddisks/ddisk_p000001000_s000001010',
+                        PersistentBufferId: '[42:5893148750:1010]',
                         State: 'Normal',
                         Available: true,
                         DDiskOccupancy: 0,
@@ -87,6 +97,14 @@ test('DDisk sorting sends the selected role and direction to CMS and survives re
     });
     await new PageModel(page, 'cluster/storage', {type: 'ddisks'}).goto();
     await expect(page.getByText('42:1000:1010', {exact: true})).toBeVisible();
+    await expect(page.getByText('pool-a', {exact: true})).toBeVisible();
+    await expect(page.getByRole('link', {name: '42:1000:1010', exact: true})).toHaveAttribute(
+        'href',
+        /\/node\/42\/actors\/ddisks\/ddisk_p000001000_s000001010$/,
+    );
+    await expect(
+        page.getByRole('link', {name: 'Open Persistent Buffer', exact: true}),
+    ).toHaveAttribute('href', /\/node\/42\/actors\/persistent_buffer\?/);
     await expect(page.getByText('12345', {exact: true})).toBeVisible();
     await expect(page.getByText('67890', {exact: true})).toBeVisible();
     expect(requests[0].get('include_tablet_ids')).toBe('false');
