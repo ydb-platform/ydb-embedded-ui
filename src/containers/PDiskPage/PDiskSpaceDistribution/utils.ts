@@ -4,6 +4,10 @@ export function isVDiskSlot(slot: SlotItem<SlotItemType>): slot is SlotItem<'vDi
     return slot.SlotType === 'vDisk';
 }
 
+export function isDDiskSlot(slot: SlotItem<SlotItemType>): slot is SlotItem<'dDisk'> {
+    return slot.SlotType === 'dDisk';
+}
+
 export function isLogSlot(slot: SlotItem<SlotItemType>): slot is SlotItem<'log'> {
     return slot.SlotType === 'log';
 }

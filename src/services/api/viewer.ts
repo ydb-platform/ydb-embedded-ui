@@ -147,6 +147,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 fields_required: preparedFieldsRequired,
                 path: this.getSchemaPath(path),
                 storage: isStorage,
+                include_ddisks: true,
                 ...params,
             },
             {concurrentId, requestConfig: {signal}},

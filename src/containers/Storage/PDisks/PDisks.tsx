@@ -2,6 +2,7 @@ import React from 'react';
 
 import {isNil} from 'lodash';
 
+import type {TDDiskStateInfo} from '../../../types/api/ddisk';
 import {cn} from '../../../utils/cn';
 import type {
     PDiskDisplayStateGetter,
@@ -25,6 +26,7 @@ const EMPTY_VDISKS: PreparedVDisk[] = [];
 interface PDisksProps {
     pDisks?: PreparedPDisk[];
     vDisks?: PreparedVDisk[];
+    dDisks?: TDDiskStateInfo[];
     viewContext?: StorageViewContext;
     pDiskWidth?: number;
     pDiskHeight?: number;
@@ -34,6 +36,7 @@ interface PDisksProps {
 interface PDiskItemProps {
     pDisk: PreparedPDisk;
     vDisks?: PreparedVDisk[];
+    dDisks?: TDDiskStateInfo[];
     viewContext?: StorageViewContext;
     pDiskWidth?: number;
     expertMode: boolean;
@@ -48,6 +51,7 @@ interface PDiskItemProps {
 const PDiskItem = React.memo(function PDiskItem({
     pDisk,
     vDisks,
+    dDisks,
     viewContext,
     pDiskWidth,
     expertMode,
@@ -70,6 +74,7 @@ const PDiskItem = React.memo(function PDiskItem({
             data={pDisk}
             inactive={!isPdiskActive(pDisk, viewContext)}
             vDisks={vDisks}
+            dDisks={dDisks}
             viewContext={viewContext}
             width={pDiskWidth}
             withIcon={expertMode}
@@ -92,6 +97,7 @@ const PDiskItem = React.memo(function PDiskItem({
 export const PDisks = React.memo(function PDisks({
     pDisks = [],
     vDisks = EMPTY_VDISKS,
+    dDisks,
     viewContext,
     pDiskWidth,
     pDiskHeight,
@@ -160,6 +166,7 @@ export const PDisks = React.memo(function PDisks({
                             <PDiskItem
                                 pDisk={pDisk}
                                 vDisks={relatedVDisks}
+                                dDisks={dDisks?.filter((disk) => disk.PDiskId === pDisk.PDiskId)}
                                 viewContext={viewContext}
                                 pDiskWidth={pDiskWidth}
                                 expertMode={expertMode}

@@ -65,6 +65,7 @@ export class PDiskAPI extends BaseYdbAPI {
             {
                 node_id: nodeId,
                 pdisk_id: pDiskId,
+                include_ddisks: true,
             },
             {concurrentId, requestConfig: {signal}},
         );
