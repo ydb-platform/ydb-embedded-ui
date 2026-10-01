@@ -12,23 +12,34 @@ import {usePopupPriority} from './usePopupPriority';
 
 const DEBOUNCE_TIMEOUT = 100;
 
-function useVisibleAnchor(anchorElement: HTMLElement | null, open: boolean) {
+function useVisibleAnchor(
+    anchorElement: HTMLElement | null,
+    open: boolean,
+    onHidden: VoidFunction,
+) {
     const [visibleAnchor, setVisibleAnchor] = React.useState<HTMLElement | null>(null);
+    // Mouse events can arrive before React renders the observer's next visibility state.
+    const visibleAnchorRef = React.useRef<HTMLElement | null>(null);
 
     React.useLayoutEffect(() => {
         setVisibleAnchor(null);
+        visibleAnchorRef.current = null;
         if (!open || !anchorElement) {
             return undefined;
         }
 
         const observer = new IntersectionObserver(([entry]) => {
-            setVisibleAnchor(entry.isIntersecting ? anchorElement : null);
+            visibleAnchorRef.current = entry.isIntersecting ? anchorElement : null;
+            setVisibleAnchor(visibleAnchorRef.current);
+            if (!entry.isIntersecting) {
+                onHidden();
+            }
         });
         observer.observe(anchorElement);
         return () => observer.disconnect();
-    }, [anchorElement, open]);
+    }, [anchorElement, open, onHidden]);
 
-    return anchorElement !== null && visibleAnchor === anchorElement;
+    return [anchorElement !== null && visibleAnchor === anchorElement, visibleAnchorRef] as const;
 }
 
 type HoverPopupProps = {
@@ -121,6 +132,25 @@ export const HoverPopup = ({
         onClosePopup?.();
     }, [debouncedHandleHidePopup, debouncedHandleShowPopup, onClosePopup, reportOpen]);
 
+    const hideClippedPopup = useEventHandler(() => {
+        debouncedHandleShowPopup.cancel();
+        setIsPopupContentHovered(false);
+        setIsFocused(false);
+        debouncedHandleHidePopup();
+    });
+
+    const internalOpen = isPopupVisible || isPopupContentHovered || isFocused;
+    const open = Boolean(internalOpen || showPopup);
+
+    const anchorElement = anchorRef?.current || anchor.current;
+    // Release only this popup's hover source; a hovered peer can keep the pair open.
+    const [isAnchorVisible, visibleAnchorRef] = useVisibleAnchor(
+        anchorElement,
+        open,
+        hideClippedPopup,
+    );
+    const container = getPopupScrollContainer(anchorElement);
+
     const onMouseEnter = (event: React.MouseEvent<HTMLSpanElement>) => {
         if (event.buttons !== 0) {
             return;
@@ -137,6 +167,10 @@ export const HoverPopup = ({
 
     const onPopupMouseEnter = React.useCallback(
         (event: React.MouseEvent<HTMLDivElement>) => {
+            // An exiting popup can still receive events during its close animation.
+            if (!open || visibleAnchorRef.current !== anchorElement) {
+                return;
+            }
             if (event.buttons === 0) {
                 bringToFront();
             }
@@ -144,7 +178,7 @@ export const HoverPopup = ({
             setIsPopupContentHovered(true);
             reportOpen(true);
         },
-        [bringToFront, reportOpen, debouncedHandleHidePopup],
+        [bringToFront, reportOpen, debouncedHandleHidePopup, open, visibleAnchorRef, anchorElement],
     );
 
     const onPopupMouseLeave = React.useCallback(() => {
@@ -153,10 +187,13 @@ export const HoverPopup = ({
     }, [debouncedHandleHidePopup]);
 
     const onPopupContextMenu = React.useCallback(() => {
+        if (!open || visibleAnchorRef.current !== anchorElement) {
+            return;
+        }
         bringToFront();
         setIsFocused(true);
         reportOpen(true);
-    }, [bringToFront, reportOpen]);
+    }, [bringToFront, reportOpen, open, visibleAnchorRef, anchorElement]);
 
     const onPopupBlur = React.useCallback(() => {
         setIsFocused(false);
@@ -165,14 +202,6 @@ export const HoverPopup = ({
     const onPopupEscapeKeyDown = React.useCallback(() => {
         closePopup();
     }, [closePopup]);
-
-    const internalOpen = isPopupVisible || isPopupContentHovered || isFocused;
-    const open = Boolean(internalOpen || showPopup);
-
-    const anchorElement = anchorRef?.current || anchor.current;
-    // Clipping a paired disk must not clear the shared hover state via onHidePopup.
-    const isAnchorVisible = useVisibleAnchor(anchorElement, open);
-    const container = getPopupScrollContainer(anchorElement);
 
     return (
         <React.Fragment>

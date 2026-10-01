@@ -709,7 +709,7 @@ test('keeps paired disk popups inside the viewport without expanding the page', 
     expect(maxPageWidthWhileClosing).toBe(pageWidth);
 });
 
-test('wheel over disk popups scrolls the page', async ({page}) => {
+test('wheel over disk popups scrolls the page and clears clipped hover state', async ({page}) => {
     const response = createMockStorageGroupsResponse();
     const group = response.StorageGroups?.[0];
     if (!group) {
@@ -729,7 +729,8 @@ test('wheel over disk popups scrolls the page', async ({page}) => {
     for (const name of ['PDisk', 'VDisk']) {
         await scroll.evaluate((element) => element.scrollTo({top: 0, left: 0}));
         const row = getStorageGroupRow(page, 0);
-        await (name === 'PDisk' ? getPDiskItems(row) : getVDiskItems(row)).first().hover();
+        const anchor = (name === 'PDisk' ? getPDiskItems(row) : getVDiskItems(row)).first();
+        await anchor.hover();
         const action = page.getByRole('link', {name: `Go to ${name}`, exact: true});
         await expect(action).toHaveAttribute('href', /nodeId=7000/);
         const popup = page.locator('.ydb-popover').filter({has: action});
@@ -737,11 +738,20 @@ test('wheel over disk popups scrolls the page', async ({page}) => {
         await expect(popup).toHaveCSS('overflow-y', 'visible');
         await action.hover();
         const before = await scroll.evaluate((element) => element.scrollTop);
-        await page.mouse.wheel(0, 200);
+        await page.mouse.wheel(0, 600);
         await expect
             .poll(() => scroll.evaluate((element) => element.scrollTop))
-            .toBeGreaterThan(before);
-        await page.keyboard.press('Escape');
+            .toBeGreaterThan(before + 500);
+        await expect(anchor).not.toBeInViewport();
+        await page.mouse.move(0, 0);
+        await scroll.evaluate((element) => element.scrollTo({top: 0}));
+        await expect(anchor).toBeInViewport();
+        await expect(page.locator('.ydb-popover').filter({visible: true})).toHaveCount(0);
+
+        await anchor.hover();
+        await expect(action).toBeVisible();
+        await page.mouse.move(0, 0);
+        await expect(page.locator('.ydb-popover').filter({visible: true})).toHaveCount(0);
     }
 });
 
