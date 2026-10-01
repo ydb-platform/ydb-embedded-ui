@@ -45,6 +45,10 @@ test('NBS tablets group by usage and degrade and keep unknown monitoring separat
     await expect(page.getByRole('button', {name: /40–50%/})).toBeVisible();
     await page.getByRole('button', {name: /40–50%/}).click();
     await expect(page.getByRole('link', {name: TABLETS[1].TabletId, exact: true})).toBeVisible();
+    await expect(page.getByRole('link', {name: TABLETS[1].TabletId, exact: true})).toHaveAttribute(
+        'href',
+        new RegExp(`/tablets/app\\?TabletID=${TABLETS[1].TabletId}$`),
+    );
     await expect(page.getByText('45.0%', {exact: true})).toBeVisible();
     await page.getByRole('button', {name: /≥100%/}).click();
     await expect(page.getByText('120.0%', {exact: true})).toBeVisible();

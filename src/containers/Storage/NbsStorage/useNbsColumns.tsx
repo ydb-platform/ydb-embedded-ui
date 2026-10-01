@@ -2,15 +2,14 @@ import {Link} from '@gravity-ui/uikit';
 
 import type {Column} from '../../../components/PaginatedTable';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
-import {useTabletPagePath} from '../../../routes';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
+import {createTabletDeveloperUIHref} from '../../../utils/developerUI/developerUI';
 
 import {formatUsage} from './getData';
 import type {NbsRow} from './getData';
 import i18n from './i18n';
 
 export function useNbsColumns(disks: boolean) {
-    const tabletPath = useTabletPagePath();
     const usage = (value?: number) =>
         formatUsage(value) === undefined ? (
             EMPTY_DATA_PLACEHOLDER
@@ -78,7 +77,9 @@ export function useNbsColumns(disks: boolean) {
                   i18n('tablet'),
                   ({row}) =>
                       'TabletId' in row ? (
-                          <Link href={tabletPath(row.TabletId)}>{row.TabletId}</Link>
+                          <Link href={createTabletDeveloperUIHref(row.TabletId, 'app')}>
+                              {row.TabletId}
+                          </Link>
                       ) : null,
                   220,
               ),
