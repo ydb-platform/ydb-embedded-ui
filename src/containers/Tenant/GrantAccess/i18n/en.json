@@ -1,7 +1,7 @@
 {
   "description_select-row": "Retrieve data rows from tables using SELECT queries.",
-  "description_update-row": "Modify existing data rows with UPDATE operations.",
-  "description_erase-row": "Modify existing data rows with UPDATE operations.",
+  "description_update-row": "Write rows into tables: INSERT, UPSERT, REPLACE and UPDATE (also required to write to topics). There is no separate insert permission.",
+  "description_erase-row": "Delete data rows with DELETE operations.",
   "description_write-attributes": "Modify object metadata and manage access permissions.",
   "description_create-directory": "Create new subdirectories in the database namespace.",
   "description_create-table": "Define new tables with specified schemas.",
