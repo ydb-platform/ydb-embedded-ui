@@ -74,6 +74,11 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
          * Stays mounted while the drawer is open, independent of loading, error or issue state.
          */
         renderDrawerExtension?: (props: HealthcheckDrawerExtensionProps) => React.ReactNode;
+        /**
+         * Disables modal focus management so the page and adjacent panels remain accessible.
+         * Configure before rendering the app. Defaults to false; does not change the veil or outside clicks.
+         */
+        disableModal?: boolean;
     };
     hasAccess: HasAccess;
     hideGrantAccess?: boolean;

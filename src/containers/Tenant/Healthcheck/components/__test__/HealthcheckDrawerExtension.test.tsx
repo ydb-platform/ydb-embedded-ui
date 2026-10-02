@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ThemeProvider} from '@gravity-ui/uikit';
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 
 import {
     DrawerContextProvider,
@@ -140,6 +140,7 @@ describe('Healthcheck drawer extension', () => {
             healthcheck: {
                 renderDrawerExtension: undefined,
                 renderAssistantAction: undefined,
+                disableModal: undefined,
                 ...originalHealthcheck,
             },
         });
@@ -150,6 +151,53 @@ describe('Healthcheck drawer extension', () => {
             originalHealthcheck.renderDrawerExtension,
         );
     });
+
+    test.each([undefined, false, true])(
+        'uses the configured disableModal=%s through HealthcheckDrawer',
+        async (disableModal) => {
+            configureUIFactory({healthcheck: {disableModal}});
+
+            function ConfiguredDrawer() {
+                const [open, setOpen] = React.useState(false);
+                const close = React.useCallback(() => setOpen(false), []);
+
+                return (
+                    <ThemeProvider theme="light">
+                        <DrawerContextProvider>
+                            <HealthcheckDrawer
+                                isDrawerVisible={open}
+                                onCloseDrawer={close}
+                                drawerId="configured-healthcheck"
+                                storageKey="configured-healthcheck"
+                                title="Configured Healthcheck"
+                                healthcheckData={undefined}
+                                downloadFilePrefix="healthcheck"
+                                downloadTooltip="Download"
+                                renderDrawerContent={() => <input aria-label="Filter" />}
+                            >
+                                <button onClick={() => setOpen(true)}>Open Healthcheck</button>
+                                <button>Adjacent panel</button>
+                            </HealthcheckDrawer>
+                        </DrawerContextProvider>
+                    </ThemeProvider>
+                );
+            }
+
+            render(<ConfiguredDrawer />);
+            fireEvent.click(screen.getByRole('button', {name: 'Open Healthcheck'}));
+            const drawer = await screen.findByRole('dialog', {name: 'Configured Healthcheck'});
+            if (disableModal) {
+                expect(screen.getByRole('button', {name: 'Adjacent panel'})).toBeInTheDocument();
+            } else {
+                expect(
+                    screen.queryByRole('button', {name: 'Adjacent panel'}),
+                ).not.toBeInTheDocument();
+            }
+            fireEvent.click(within(drawer).getByRole('button', {name: 'Close'}));
+            await waitFor(() => expect(drawer).not.toBeInTheDocument());
+            expect(screen.getByRole('button', {name: 'Adjacent panel'})).toBeInTheDocument();
+        },
+    );
 
     test('preserves the extension, target and inset across data states, then cleans up on close', () => {
         const target: HealthcheckAssistantTarget = {
