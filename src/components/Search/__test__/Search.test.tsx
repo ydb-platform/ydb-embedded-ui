@@ -1,3 +1,4 @@
+import {ThemeProvider} from '@gravity-ui/uikit';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -16,7 +17,7 @@ describe('Search', () => {
         const onChange = jest.fn();
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
 
-        render(<Search onChange={onChange} value="" />);
+        render(<Search onChange={onChange} value="" />, {wrapper: ThemeProvider});
 
         const input = screen.getByRole('textbox');
         await user.type(input, '  hello  ');
@@ -31,7 +32,7 @@ describe('Search', () => {
         const onChange = jest.fn();
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
 
-        render(<Search onChange={onChange} value="" />);
+        render(<Search onChange={onChange} value="" />, {wrapper: ThemeProvider});
 
         const input = screen.getByRole('textbox');
         await user.type(input, 'hello world');
@@ -45,7 +46,7 @@ describe('Search', () => {
         const onChange = jest.fn();
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
 
-        render(<Search onChange={onChange} value="" />);
+        render(<Search onChange={onChange} value="" />, {wrapper: ThemeProvider});
 
         const input = screen.getByRole('textbox');
         await user.type(input, '   ');

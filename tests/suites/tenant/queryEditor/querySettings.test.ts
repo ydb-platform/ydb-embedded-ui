@@ -294,6 +294,9 @@ test.describe('Test Query Settings', async () => {
 
         // Dialog should stay open with validation error
         await expect(queryEditor.settingsDialog.isTimeoutError()).resolves.toBe(true);
+        await expect(queryEditor.settingsDialog.getTimeoutErrorMessage()).resolves.toBe(
+            `Too big: expected number to be <=${MAX_QUERY_TIMEOUT_SECONDS}`,
+        );
 
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
     });
@@ -314,6 +317,9 @@ test.describe('Test Query Settings', async () => {
 
         // Dialog should stay open with validation error
         await expect(queryEditor.settingsDialog.isTimeoutError()).resolves.toBe(true);
+        await expect(queryEditor.settingsDialog.getTimeoutErrorMessage()).resolves.toBe(
+            'Too small: expected number to be >0',
+        );
 
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
     });
