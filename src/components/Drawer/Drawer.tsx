@@ -216,11 +216,7 @@ const DrawerPaneContentWrapper = ({
     }
 
     return (
-        <div
-            className={b('click-handler')}
-            onClickCapture={handleClickInsideDrawer}
-            onKeyDown={handleKeyDown}
-        >
+        <div className={b('event-boundary')} onKeyDown={handleKeyDown}>
             <GravityDrawer
                 qa={drawerId}
                 open={isVisible}
@@ -244,7 +240,9 @@ const DrawerPaneContentWrapper = ({
                 floatingRef={drawerRef}
                 returnFocus={disableModal ? false : undefined}
             >
-                {children}
+                <div className={b('click-handler')} onClickCapture={handleClickInsideDrawer}>
+                    {children}
+                </div>
             </GravityDrawer>
         </div>
     );
