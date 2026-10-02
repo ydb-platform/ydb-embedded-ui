@@ -1,6 +1,8 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from '@playwright/test';
 
+import {clickDrawerVeil} from '../../utils/clickDrawerVeil';
+
 type Panel = 'Healthcheck' | 'companion';
 
 async function openFixture(page: Page, mode: Window['e2eHealthcheckDrawerMode'] = 'non-modal') {
@@ -83,6 +85,12 @@ test.describe('Non-modal Healthcheck accessibility', () => {
                 body: await page.screenshot(),
                 contentType: 'image/png',
             });
+
+            await clickDrawerVeil(page, page.getByTestId('fixture-healthcheck'));
+            await expect(panel(page, 'Healthcheck')).toHaveCount(0);
+            await expect(panel(page, 'companion')).toBeVisible();
+            await openPanel(page, 'Healthcheck');
+            await expect(page.getByRole('dialog')).toHaveCount(2);
         });
 
         for (const closing of ['Healthcheck', 'companion'] as const) {
@@ -148,12 +156,22 @@ test.describe('Non-modal Healthcheck accessibility', () => {
         await expect(page.getByRole('dialog')).toHaveCount(2);
     });
 
-    test('Escape dismisses the nested dialog before Healthcheck', async ({page}) => {
+    test('Cancel and Escape dismiss the nested dialog before Healthcheck', async ({page}) => {
         await openFixture(page);
         await openBoth(page, 'Healthcheck');
         await panel(page, 'Healthcheck').getByRole('button', {name: 'Open confirmation'}).focus();
         await page.keyboard.press('Enter');
         const nested = page.getByRole('dialog', {name: 'Nested confirmation', exact: true});
+        await expect(nested).toBeVisible();
+        await expect
+            .poll(() => nested.evaluate((element) => element.contains(document.activeElement)))
+            .toBe(true);
+        await nested.getByRole('button', {name: 'Cancel', exact: true}).click();
+        await expect(nested).toHaveCount(0);
+        await expect(page.getByRole('dialog')).toHaveCount(2);
+
+        await panel(page, 'Healthcheck').getByRole('button', {name: 'Open confirmation'}).focus();
+        await page.keyboard.press('Enter');
         await expect(nested).toBeVisible();
         await expect
             .poll(() => nested.evaluate((element) => element.contains(document.activeElement)))
