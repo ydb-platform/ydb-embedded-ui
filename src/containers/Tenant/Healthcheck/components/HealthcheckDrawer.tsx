@@ -104,6 +104,7 @@ export function HealthcheckDrawer({
             renderDrawerContent={renderContentWithExtension}
             drawerId={drawerId}
             storageKey={storageKey}
+            disableModal={uiFactory.healthcheck.disableModal}
             detectClickOutside
             hideVeil={false}
             isPercentageWidth
