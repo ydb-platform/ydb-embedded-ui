@@ -1,0 +1,32 @@
+@use '../../styles/mixins';
+
+.ydb-vdisk-status {
+    &__replication-progress {
+        box-sizing: border-box;
+        min-height: 24px;
+        padding: 0 10px;
+
+        color: var(--g-color-text-info-heavy);
+        border-radius: var(--g-border-radius-xs);
+        background-color: var(--g-color-base-selection);
+        @include mixins.text-body-short();
+
+        &_size_xs {
+            min-height: 20px;
+            padding: 2px 6px;
+        }
+
+        > span {
+            white-space: nowrap;
+        }
+    }
+
+    &__progress-bar {
+        --g-progress-empty-background-color: var(--g-color-base-info-light);
+        --g-progress-filled-background-color: var(--g-color-base-info-heavy);
+
+        flex-shrink: 0;
+
+        width: 103px;
+    }
+}

@@ -31,6 +31,19 @@ import './Disks.scss';
 
 const b = cn('ydb-storage-disks');
 
+interface DiskPopupState {
+    id: string;
+    vdisk: boolean;
+    pdisk: boolean;
+}
+
+type DiskPopupChangeHandler = (
+    id: string | undefined,
+    source: 'vdisk' | 'pdisk',
+    open: boolean,
+    closePair?: boolean,
+) => void;
+
 interface DisksProps {
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
@@ -44,7 +57,7 @@ interface DisksItemProps {
     viewContext?: StorageViewContext;
     inactive?: boolean;
     highlighted: boolean;
-    setHighlightedVDisk?: (id?: string) => void;
+    onPopupChange: DiskPopupChangeHandler;
     compactVDiskWidth?: number;
     withDCMargin?: boolean;
     withIcon?: boolean;
@@ -58,7 +71,7 @@ const VDiskItem = React.memo(function VDiskItem({
     vDisk,
     highlighted,
     inactive,
-    setHighlightedVDisk,
+    onPopupChange,
     compactVDiskWidth,
     withIcon,
     getDisplayState,
@@ -66,6 +79,15 @@ const VDiskItem = React.memo(function VDiskItem({
     renderContent,
     placeholderProps,
 }: DisksItemProps) {
+    const vDiskId = vDisk.StringifiedId;
+    const setHighlightedVDisk = React.useCallback(
+        (id?: string) => onPopupChange(vDiskId, 'vdisk', Boolean(id)),
+        [onPopupChange, vDiskId],
+    );
+    const onClosePopup = React.useCallback(
+        () => onPopupChange(vDiskId, 'vdisk', false, true),
+        [onPopupChange, vDiskId],
+    );
     const style: React.CSSProperties = isAllVDisksLayout
         ? {width: ALL_VDISK_WIDTH, flexBasis: ALL_VDISK_WIDTH}
         : {width: compactVDiskWidth, flexBasis: compactVDiskWidth};
@@ -98,6 +120,7 @@ const VDiskItem = React.memo(function VDiskItem({
                 delayClose={DISKS_POPUP_DEBOUNCE_TIMEOUT}
                 highlightedVDisk={highlighted ? vDisk.StringifiedId : undefined}
                 setHighlightedVDisk={setHighlightedVDisk}
+                onClosePopup={onClosePopup}
                 progressBarClassName={b('vdisk-progress-bar')}
                 getDisplayState={getDisplayState}
             />
@@ -109,7 +132,7 @@ const PDiskItem = React.memo(function PDiskItem({
     vDisk,
     viewContext,
     highlighted,
-    setHighlightedVDisk,
+    onPopupChange,
     withDCMargin,
     withIcon,
     getDisplayState,
@@ -119,12 +142,16 @@ const PDiskItem = React.memo(function PDiskItem({
     const vDiskId = vDisk.StringifiedId;
 
     const onShowPopup = React.useCallback(
-        () => setHighlightedVDisk?.(vDiskId),
-        [setHighlightedVDisk, vDiskId],
+        () => onPopupChange(vDiskId, 'pdisk', true),
+        [onPopupChange, vDiskId],
     );
     const onHidePopup = React.useCallback(
-        () => setHighlightedVDisk?.(undefined),
-        [setHighlightedVDisk],
+        () => onPopupChange(vDiskId, 'pdisk', false),
+        [onPopupChange, vDiskId],
+    );
+    const onClosePopup = React.useCallback(
+        () => onPopupChange(vDiskId, 'pdisk', false, true),
+        [onPopupChange, vDiskId],
     );
 
     if (!vDisk.PDisk) {
@@ -150,6 +177,7 @@ const PDiskItem = React.memo(function PDiskItem({
                     delayClose={DISKS_POPUP_DEBOUNCE_TIMEOUT}
                     onShowPopup={onShowPopup}
                     onHidePopup={onHidePopup}
+                    onClosePopup={onClosePopup}
                     withIcon={withIcon}
                     highlighted={highlighted}
                     getDisplayState={getDisplayState}
@@ -170,7 +198,33 @@ export const Disks = React.memo(function Disks({
     const getVDiskDisplayState = useStorageVDiskDisplayStateGetter();
     const getPDiskDisplayState = useStoragePDiskDisplayStateGetter();
 
-    const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
+    const [popupState, setPopupState] = React.useState<DiskPopupState>();
+    const highlightedVDisk = popupState?.id;
+    const onPopupChange = React.useCallback<DiskPopupChangeHandler>(
+        (id, source, open, closePair) => {
+            if (!id) {
+                return;
+            }
+            setPopupState((current) => {
+                // A delayed close from another pair must not clear the current pair.
+                if (!open && current?.id !== id) {
+                    return current;
+                }
+                if (closePair) {
+                    return undefined;
+                }
+                const next = {
+                    id,
+                    vdisk: false,
+                    pdisk: false,
+                    ...(current?.id === id ? current : {}),
+                    [source]: open,
+                };
+                return next.vdisk || next.pdisk ? next : undefined;
+            });
+        },
+        [],
+    );
     const vDiskList = useVirtualizedDiskList(
         vDisks,
         vDisks.every((disk) => Boolean(disk.StringifiedId)),
@@ -182,8 +236,8 @@ export const Disks = React.memo(function Disks({
     );
 
     React.useEffect(() => {
-        setHighlightedVDisk((id) =>
-            vDisks.some((disk) => disk.StringifiedId === id) ? id : undefined,
+        setPopupState((current) =>
+            vDisks.some((disk) => disk.StringifiedId === current?.id) ? current : undefined,
         );
     }, [vDisks]);
 
@@ -218,7 +272,7 @@ export const Disks = React.memo(function Disks({
                         vDisk={vDisk}
                         inactive={!isVdiskActive(vDisk, viewContext)}
                         highlighted={highlightedVDisk === vDisk.StringifiedId}
-                        setHighlightedVDisk={setHighlightedVDisk}
+                        onPopupChange={onPopupChange}
                         compactVDiskWidth={compactVDiskWidths[index]}
                         withIcon={withIcon}
                         getDisplayState={getVDiskDisplayState}
@@ -236,7 +290,7 @@ export const Disks = React.memo(function Disks({
                         vDisk={vDisk}
                         viewContext={viewContext}
                         highlighted={highlightedVDisk === vDisk.StringifiedId}
-                        setHighlightedVDisk={setHighlightedVDisk}
+                        onPopupChange={onPopupChange}
                         withDCMargin={vDisksWithDCMargins.includes(index)}
                         withIcon={withIcon}
                         getDisplayState={getPDiskDisplayState}

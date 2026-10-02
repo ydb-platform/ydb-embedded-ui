@@ -1,6 +1,6 @@
 import {isNil} from 'lodash';
 
-import type {TPDiskStateInfo} from '../../types/api/pdisk';
+import type {TPDiskInfo, TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import {stringifyVdiskId} from '../dataFormatters/dataFormatters';
 import {isNumeric, parseOptionalNonNegativeNumber} from '../utils';
@@ -8,7 +8,7 @@ import {isNumeric, parseOptionalNonNegativeNumber} from '../utils';
 import {calculatePDiskSeverity} from './calculatePDiskSeverity';
 import {calculateVDiskSeverity} from './calculateVDiskSeverity';
 import {getPDiskType} from './getPDiskType';
-import {getPDiskId, isFullVDiskData} from './helpers';
+import {getPDiskId, isFullVDiskData, makeVDiskLocationKey} from './helpers';
 import type {PreparedPDisk, PreparedVDisk} from './types';
 
 export function prepareWhiteboardVDiskData(
@@ -21,16 +21,7 @@ export function prepareWhiteboardVDiskData(
     if (!isFullVDiskData(vDiskState)) {
         const {NodeId, PDiskId, VSlotId, ...restVDiskFields} = vDiskState;
 
-        const vDiskId =
-            !isNil(VSlotId) && !isNil(PDiskId) && !isNil(NodeId)
-                ? {
-                      NodeId,
-                      PDiskId,
-                      VSlotId,
-                  }
-                : undefined;
-
-        const StringifiedId = stringifyVdiskId(vDiskId);
+        const StringifiedId = makeVDiskLocationKey(NodeId, PDiskId, VSlotId) ?? '';
 
         return {
             ...restVDiskFields,
@@ -124,7 +115,7 @@ export function prepareWhiteboardVDiskData(
 }
 
 export function prepareWhiteboardPDiskData(
-    pdiskState: TPDiskStateInfo = {},
+    pdiskState: TPDiskStateInfo & Pick<TPDiskInfo, 'StatusV2'> = {},
     whiteboardSizeSource: Pick<TPDiskStateInfo, 'AvailableSize' | 'TotalSize'> | null = pdiskState,
 ): PreparedPDisk {
     const hasWhiteboardData = pdiskState.HasWhiteboardData ?? Boolean(whiteboardSizeSource);
@@ -170,6 +161,7 @@ export function prepareWhiteboardPDiskData(
         State,
         Severity,
         SlotSize: EnforcedDynamicSlotSize,
+        DriveStatus: pdiskState.Status ?? pdiskState.StatusV2,
     };
 }
 
@@ -259,6 +251,11 @@ export function prepareVDiskSizeFields({
         SizeLimit: sizeLimit,
         FreeSize: freeSize,
         AllocatedPercent: allocatedPercent,
+        HasCompleteSizeData:
+            parseOptionalNonNegativeNumber(AllocatedSize) !== undefined &&
+            (hasSizeLimitFallback
+                ? parseOptionalNonNegativeNumber(SlotSize) !== undefined
+                : parseOptionalNonNegativeNumber(AvailableSize) !== undefined),
     };
 }
 

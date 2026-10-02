@@ -3,7 +3,7 @@ import React from 'react';
 import type {PopupPlacement, PopupProps} from '@gravity-ui/uikit';
 
 import {useVDiskPagePath} from '../../routes';
-import {EFlag, isCapacityAlert} from '../../types/api/enums';
+import {isCapacityAlert} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
 import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
 import type {
@@ -25,6 +25,7 @@ import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {InternalLink} from '../InternalLink';
 import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
 
+import {getFlagStatusText} from './getFlagStatusText';
 import {i18n} from './i18n';
 
 import './VDisk.scss';
@@ -110,22 +111,6 @@ function getVDiskBarIndicator({
     };
 }
 
-function getFlagAccessibleName(flag: EFlag | undefined) {
-    switch (flag) {
-        case EFlag.Green:
-        case EFlag.Blue:
-            return i18n('value_ok');
-        case EFlag.Yellow:
-            return i18n('value_notice');
-        case EFlag.Orange:
-            return i18n('value_warning');
-        case EFlag.Red:
-            return i18n('value_impaired');
-        default:
-            return i18n('context_no-data');
-    }
-}
-
 function getReplicationAccessibleName(replicated: boolean | undefined) {
     if (replicated === undefined) {
         return i18n('context_no-data');
@@ -163,6 +148,28 @@ function getAllModeAccessibleName(data: PreparedVDisk, hasIssues: boolean | unde
     });
 }
 
+function getAccessibleDiskName(
+    data: PreparedVDisk,
+    {mode, isNoData}: Pick<VDiskDisplayState, 'mode' | 'isNoData'>,
+) {
+    const noData = i18n('context_no-data');
+    const diskName = i18n(data.DonorMode ? 'context_donor-vdisk' : 'context_vdisk', {
+        vdiskId: data.StringifiedId || noData,
+        nodeId: data.NodeId ?? noData,
+    });
+    if (!isNoData) {
+        return diskName;
+    }
+
+    const hasVDiskWhiteboardData = data.HasWhiteboardData ?? Boolean(data.VDiskId);
+    return i18n(
+        mode === 'driveType' && hasVDiskWhiteboardData
+            ? 'context_pdisk-no-whiteboard'
+            : 'context_vdisk-no-whiteboard',
+        {disk: diskName, noData},
+    );
+}
+
 function getAccessibleName(
     data: PreparedVDisk,
     {mode, allMode, isNoData, driveType}: VDiskDisplayState,
@@ -175,20 +182,7 @@ function getAccessibleName(
     }
 
     const noData = i18n('context_no-data');
-    let diskName = i18n(data.DonorMode ? 'context_donor-vdisk' : 'context_vdisk', {
-        vdiskId: data.StringifiedId || noData,
-        nodeId: data.NodeId ?? noData,
-    });
-    if (isNoData) {
-        const hasVDiskWhiteboardData = data.HasWhiteboardData ?? Boolean(data.VDiskId);
-        diskName = i18n(
-            mode === 'driveType' && hasVDiskWhiteboardData
-                ? 'context_pdisk-no-whiteboard'
-                : 'context_vdisk-no-whiteboard',
-            {disk: diskName, noData},
-        );
-    }
-
+    const diskName = getAccessibleDiskName(data, {mode, isNoData});
     const {CapacityAlert, FrontQueues, SatisfactionRank, Replicated} = isNoData ? {} : data;
     const {FreshRank, LevelRank} = SatisfactionRank ?? {};
 
@@ -212,13 +206,13 @@ function getAccessibleName(
         case 'frontQueues':
             return i18n('context_front-queues-accessible-name', {
                 disk: diskName,
-                frontQueues: getFlagAccessibleName(FrontQueues),
+                frontQueues: getFlagStatusText(FrontQueues),
             });
         case 'compaction':
             return i18n('context_compaction-accessible-name', {
                 disk: diskName,
-                freshCompaction: getFlagAccessibleName(FreshRank?.Flag),
-                levelCompaction: getFlagAccessibleName(LevelRank?.Flag),
+                freshCompaction: getFlagStatusText(FreshRank?.Flag),
+                levelCompaction: getFlagStatusText(LevelRank?.Flag),
             });
         default:
             return undefined;
@@ -233,6 +227,7 @@ export interface VDiskProps {
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
+    onClosePopup?: VoidFunction;
     progressBarClassName?: string;
     delayOpen?: number;
     delayClose?: number;
@@ -256,6 +251,7 @@ export const VDisk = ({
     showPopup,
     onShowPopup,
     onHidePopup,
+    onClosePopup,
     progressBarClassName,
     delayClose,
     delayOpen,
@@ -337,6 +333,7 @@ export const VDisk = ({
             showPopup={showPopup}
             onShowPopup={onShowPopup}
             onHidePopup={onHidePopup}
+            onClosePopup={onClosePopup}
             renderPopupContent={({onClose}) => (
                 <VDiskPopup
                     data={hidePDiskInPopup ? {...data, PDisk: undefined} : data}
