@@ -1,5 +1,12 @@
 # Changelog
 
+## [22.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.3.0...v22.4.0) (2026-10-02)
+
+
+### Features
+
+* implement PDisk & VDisk info tooltips ([#4397](https://github.com/ydb-platform/ydb-embedded-ui/issues/4397)) ([558de75](https://github.com/ydb-platform/ydb-embedded-ui/commit/558de75d18c460aeda99f3afead9657e31de0676))
+
 ## [22.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.2.0...v22.3.0) (2026-09-30)
 
 
