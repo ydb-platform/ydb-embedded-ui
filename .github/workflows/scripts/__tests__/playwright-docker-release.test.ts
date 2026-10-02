@@ -88,6 +88,18 @@ describe('release Playwright container boundary', () => {
         ).toThrow('release mode requires a commit SHA');
     });
 
+    test('forwards an action-selected monitoring port through the container proxy', () => {
+        execFileSync('bash', [runner], {
+            cwd: root,
+            env: {...env, PLAYWRIGHT_APP_BACKEND: 'http://127.0.0.1:39473'},
+        });
+        const args: string[] = JSON.parse(
+            fs.readFileSync(path.join(directory, 'arguments.json'), 'utf8'),
+        );
+        expect(args).toContain('PLAYWRIGHT_APP_BACKEND=http://localhost:8765');
+        expect(args).toContain('PLAYWRIGHT_PROXY_TARGET=http://host.docker.internal:39473');
+    });
+
     test('rejects an external frontend before starting release Docker', () => {
         const result = spawnSync('bash', [runner], {
             cwd: root,
