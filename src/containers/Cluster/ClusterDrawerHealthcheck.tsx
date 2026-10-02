@@ -9,6 +9,7 @@ import {
 import {useTypedSelector} from '../../utils/hooks';
 import {Healthcheck} from '../Tenant/Healthcheck/Healthcheck';
 import {HealthcheckDrawer} from '../Tenant/Healthcheck/components/HealthcheckDrawer';
+import {getDatabaseHealthcheckAssistantTarget} from '../Tenant/Healthcheck/utils';
 
 import i18n from './i18n';
 
@@ -184,6 +185,11 @@ export function ClusterDrawerHealthcheck({
 
     return (
         <HealthcheckDrawer
+            target={getDatabaseHealthcheckAssistantTarget({
+                database,
+                clusterName,
+                scope: 'cluster',
+            })}
             isDrawerVisible={Boolean(showHealthcheck) && Boolean(database)}
             onCloseDrawer={handleCloseDrawer}
             onTransitionInComplete={

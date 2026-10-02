@@ -7,7 +7,10 @@ import type {
     GetHealthcheckViewTitles,
     GetHealthcheckViewsOrder,
 } from '../containers/Tenant/Healthcheck/shared';
-import type {HealthcheckAssistantActionProps} from '../containers/Tenant/Healthcheck/types';
+import type {
+    HealthcheckAssistantActionProps,
+    HealthcheckAssistantTarget,
+} from '../containers/Tenant/Healthcheck/types';
 import type {ClusterInfo} from '../store/reducers/cluster/cluster';
 import type {PreparedStorageNode} from '../store/reducers/storage/types';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
@@ -70,7 +73,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
          * Renders after the drawer header and before Healthcheck content.
          * Stays mounted while the drawer is open, independent of loading, error or issue state.
          */
-        renderDrawerExtension?: () => React.ReactNode;
+        renderDrawerExtension?: (props: HealthcheckDrawerExtensionProps) => React.ReactNode;
     };
     hasAccess: HasAccess;
     hideGrantAccess?: boolean;
@@ -210,6 +213,10 @@ export type RenderMonitoring = (props: {
 export type RenderNodeTooltipActions = (props: {data?: PreparedStorageNode}) => React.ReactNode;
 
 export type RenderChatPanel = () => React.ReactNode;
+
+export interface HealthcheckDrawerExtensionProps {
+    target?: HealthcheckAssistantTarget;
+}
 
 export type RenderHealthcheckAssistantAction = (
     props: HealthcheckAssistantActionProps,
