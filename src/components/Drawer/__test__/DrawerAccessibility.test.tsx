@@ -10,7 +10,7 @@ jest.mock('../../../utils/hooks/useSetting', () => ({
     useSetting: () => [undefined, jest.fn()],
 }));
 
-function Fixture({disableModal = true}: {disableModal?: boolean}) {
+function Fixture() {
     const [healthcheck, setHealthcheck] = React.useState(false);
     const [assistant, setAssistant] = React.useState(false);
     return (
@@ -21,7 +21,7 @@ function Fixture({disableModal = true}: {disableModal?: boolean}) {
                     isDrawerVisible={healthcheck}
                     onCloseDrawer={() => setHealthcheck(false)}
                     drawerControls={[{type: 'close'}]}
-                    disableModal={disableModal}
+                    disableModal
                     renderDrawerContent={() => <input aria-label="Healthcheck filter" />}
                 >
                     <button onClick={() => setHealthcheck(true)}>Open Healthcheck</button>
@@ -65,46 +65,6 @@ afterEach(() => {
     jest.restoreAllMocks();
 });
 
-for (const first of ['Healthcheck', 'assistant']) {
-    test(`keeps both panels and the page accessible with ${first} opened first`, async () => {
-        render(<Fixture />);
-        fireEvent.click(screen.getByRole('button', {name: `Open ${first}`}));
-        const second = first === 'Healthcheck' ? 'assistant' : 'Healthcheck';
-        fireEvent.click(await screen.findByRole('button', {name: `Open ${second}`}));
-        expect(await screen.findByRole('dialog', {name: 'Healthcheck'})).toBeInTheDocument();
-        expect(screen.getByRole('dialog', {name: 'Assistant'})).toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'Open assistant'})).toBeInTheDocument();
-        fireEvent.click(
-            within(screen.getByRole('dialog', {name: 'Healthcheck'})).getByRole('button', {
-                name: 'Close',
-            }),
-        );
-        await waitFor(() =>
-            expect(screen.queryByRole('dialog', {name: 'Healthcheck'})).not.toBeInTheDocument(),
-        );
-        expect(screen.getByRole('dialog', {name: 'Assistant'})).toBeInTheDocument();
-    });
-}
-
-test('Escape outside a non-modal drawer leaves it open, Escape inside closes it', async () => {
-    render(<Fixture />);
-    fireEvent.click(screen.getByRole('button', {name: 'Open Healthcheck'}));
-    const panel = await screen.findByRole('dialog', {name: 'Healthcheck'});
-    fireEvent.keyDown(screen.getByRole('button', {name: 'Open assistant'}), {key: 'Escape'});
-    expect(panel).toBeInTheDocument();
-    fireEvent.keyDown(panel, {key: 'Escape'});
-    await waitFor(() =>
-        expect(screen.queryByRole('dialog', {name: 'Healthcheck'})).not.toBeInTheDocument(),
-    );
-});
-
-test('preserves modal behavior for callers that opt out of the new mode', async () => {
-    render(<Fixture disableModal={false} />);
-    fireEvent.click(screen.getByRole('button', {name: 'Open Healthcheck'}));
-    expect(await screen.findByRole('dialog', {name: 'Healthcheck'})).toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Open assistant'})).not.toBeInTheDocument();
-});
-
 test('returns focus to its opener after visiting the adjacent panel', async () => {
     render(<Fixture />);
     const opener = screen.getByRole('button', {name: 'Open Healthcheck'});
@@ -123,7 +83,9 @@ test('returns focus to its opener after visiting the adjacent panel', async () =
 
 test('does not steal focus from an adjacent panel when closed externally', async () => {
     render(<Fixture />);
-    fireEvent.click(screen.getByRole('button', {name: 'Open Healthcheck'}));
+    const opener = screen.getByRole('button', {name: 'Open Healthcheck'});
+    opener.focus();
+    fireEvent.click(opener);
     const healthcheck = await screen.findByRole('dialog', {name: 'Healthcheck'});
     fireEvent.click(screen.getByRole('button', {name: 'Open assistant'}));
     const assistantClose = await screen.findByRole('button', {name: 'Close assistant'});

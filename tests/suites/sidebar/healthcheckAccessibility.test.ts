@@ -91,11 +91,14 @@ test.describe('Non-modal Healthcheck accessibility', () => {
             await expect(panel(page, 'companion')).toBeVisible();
             await openPanel(page, 'Healthcheck');
             await expect(page.getByRole('dialog')).toHaveCount(2);
+            await page.reload();
+            await expect(page.getByTestId('healthcheck-drawer-fixture')).toBeVisible();
+            await openBoth(page, first);
         });
 
         for (const closing of ['Healthcheck', 'companion'] as const) {
             for (const method of ['Close', 'Escape'] as const) {
-                test(`${first} first: ${method} ${closing}, reopen and reload`, async ({page}) => {
+                test(`${first} first: ${method} ${closing} and reopen`, async ({page}) => {
                     await openFixture(page);
                     await openBoth(page, first);
                     const closingPanel = panel(page, closing);
@@ -118,9 +121,6 @@ test.describe('Non-modal Healthcheck accessibility', () => {
                     ).toBeFocused();
                     await openPanel(page, closing);
                     await expect(page.getByRole('dialog')).toHaveCount(2);
-                    await page.reload();
-                    await expect(page.getByTestId('healthcheck-drawer-fixture')).toBeVisible();
-                    await openBoth(page, first);
                 });
             }
         }

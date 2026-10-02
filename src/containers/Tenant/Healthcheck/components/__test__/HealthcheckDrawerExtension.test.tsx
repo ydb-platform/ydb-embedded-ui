@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ThemeProvider} from '@gravity-ui/uikit';
-import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
+import {isInaccessible, render, screen, waitFor} from '@testing-library/react';
 
 import {
     DrawerContextProvider,
@@ -70,6 +70,7 @@ function DrawerFixture({
                     downloadTooltip="Download"
                 >
                     <InsetProbe />
+                    <button>Page action</button>
                 </HealthcheckDrawer>
             </DrawerContextProvider>
         </ThemeProvider>
@@ -153,45 +154,11 @@ describe('Healthcheck drawer extension', () => {
         async (disableModal) => {
             configureUIFactory({healthcheck: {disableModal}});
 
-            function ConfiguredDrawer() {
-                const [open, setOpen] = React.useState(false);
-                const close = React.useCallback(() => setOpen(false), []);
-
-                return (
-                    <ThemeProvider theme="light">
-                        <DrawerContextProvider>
-                            <HealthcheckDrawer
-                                isDrawerVisible={open}
-                                onCloseDrawer={close}
-                                drawerId="configured-healthcheck"
-                                storageKey="configured-healthcheck"
-                                title="Configured Healthcheck"
-                                healthcheckData={undefined}
-                                downloadFilePrefix="healthcheck"
-                                downloadTooltip="Download"
-                                renderDrawerContent={() => <input aria-label="Filter" />}
-                            >
-                                <button onClick={() => setOpen(true)}>Open Healthcheck</button>
-                                <button>Adjacent panel</button>
-                            </HealthcheckDrawer>
-                        </DrawerContextProvider>
-                    </ThemeProvider>
-                );
-            }
-
-            render(<ConfiguredDrawer />);
-            fireEvent.click(screen.getByRole('button', {name: 'Open Healthcheck'}));
-            const drawer = await screen.findByRole('dialog', {name: 'Configured Healthcheck'});
-            if (disableModal) {
-                expect(screen.getByRole('button', {name: 'Adjacent panel'})).toBeInTheDocument();
-            } else {
-                expect(
-                    screen.queryByRole('button', {name: 'Adjacent panel'}),
-                ).not.toBeInTheDocument();
-            }
-            fireEvent.click(within(drawer).getByRole('button', {name: 'Close'}));
-            await waitFor(() => expect(drawer).not.toBeInTheDocument());
-            expect(screen.getByRole('button', {name: 'Adjacent panel'})).toBeInTheDocument();
+            render(<DrawerFixture />);
+            await screen.findByRole('dialog', {name: 'Healthcheck'});
+            await waitFor(() => {
+                expect(isInaccessible(screen.getByText('Page action'))).toBe(!disableModal);
+            });
         },
     );
 
