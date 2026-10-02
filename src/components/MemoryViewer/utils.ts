@@ -3,12 +3,6 @@ import {isNumeric} from '../../utils/utils';
 
 import i18n from './i18n';
 
-export function calculateAllocatedMemory(stats: TMemoryStats) {
-    const allocatedMemory = getMaybeNumber(stats.AllocatedMemory) || 0;
-    const allocatorCaches = getMaybeNumber(stats.AllocatorCachesMemory) || 0;
-    return String(allocatedMemory + allocatorCaches);
-}
-
 function getMaybeNumber(value: string | number | undefined): number | undefined {
     return isNumeric(value) ? parseFloat(String(value)) : undefined;
 }
@@ -34,7 +28,11 @@ export function getMemorySegmentColor(key: string): string {
     return MEMORY_SEGMENT_COLORS[key] || MEMORY_SEGMENT_COLORS['Other'];
 }
 
-export function getMemorySegments(stats: TMemoryStats, memoryUsage: number): MemorySegment[] {
+export function getMemorySegments(
+    stats: TMemoryStats,
+    memoryUsage: number,
+    {allocatorCachesIncludedInUsage = true}: {allocatorCachesIncludedInUsage?: boolean} = {},
+): MemorySegment[] {
     const segments = [
         {
             label: i18n('text_shared-cache'),
@@ -61,12 +59,12 @@ export function getMemorySegments(stats: TMemoryStats, memoryUsage: number): Mem
             label: i18n('text_allocator-caches'),
             key: 'AllocatorCachesMemory',
             value: getMaybeNumber(stats.AllocatorCachesMemory),
-            isInfo: false,
+            isInfo: !allocatorCachesIncludedInUsage,
         },
     ];
 
     const nonInfoSegments = segments.filter(
-        (segment) => segment.value !== undefined,
+        (segment) => !segment.isInfo && segment.value !== undefined,
     ) as MemorySegment[];
     const sumNonInfoSegments = nonInfoSegments.reduce((acc, segment) => acc + segment.value, 0);
 
