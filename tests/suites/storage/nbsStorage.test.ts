@@ -103,7 +103,7 @@ test('DDisk sorting sends the selected role and direction to CMS and survives re
         /\/node\/42\/actors\/ddisks\/ddisk_p000001000_s000001010$/,
     );
     await expect(
-        page.getByRole('link', {name: 'Open Persistent Buffer', exact: true}),
+        page.getByRole('link', {name: '[42:5893148750:1010]', exact: true}),
     ).toHaveAttribute('href', /\/node\/42\/actors\/persistent_buffer\?/);
     await expect(page.getByText('12345', {exact: true})).toBeVisible();
     await expect(page.getByText('67890', {exact: true})).toBeVisible();
@@ -133,6 +133,59 @@ test('DDisk sorting sends the selected role and direction to CMS and survives re
         .poll(() => requests.some((p) => p.get('sort_by') === 'ddisk_occupancy'))
         .toBe(true);
 });
+
+for (const scenario of [
+    {name: 'disconnected', hasWhiteboardData: false, state: 'Normal', failed: true},
+    {name: 'faulty PDisk', hasWhiteboardData: true, state: 'DeviceIoError', failed: true},
+    {name: 'healthy', hasWhiteboardData: true, state: 'Normal', failed: false},
+]) {
+    test(`Nodes DDisk color: ${scenario.name}`, async ({page}, testInfo) => {
+        await page.route('**/viewer/json/nodes?*', (route) =>
+            route.fulfill({
+                json: {
+                    TotalNodes: '1',
+                    FoundNodes: '1',
+                    Nodes: [
+                        {
+                            NodeId: 42,
+                            SystemState: {NodeId: 42, Host: 'storage-node.ydb', Roles: ['Storage']},
+                            PDisks: [{PDiskId: 1000, NodeId: 42, State: scenario.state}],
+                            DDisks: [
+                                {
+                                    NodeId: 42,
+                                    PDiskId: 1000,
+                                    DDiskSlotId: 1010,
+                                    HasWhiteboardData: scenario.hasWhiteboardData,
+                                    PersistentBufferId: '[42:5893148750:1010]',
+                                    DDiskOccupancy: 0.25,
+                                },
+                            ],
+                        },
+                    ],
+                },
+            }),
+        );
+        await new PageModel(page, 'cluster/storage', {type: 'nodes'}).goto();
+        const disk = page.getByRole('button', {name: 'DDisk 42:1000:1010', exact: true});
+        await expect(disk).toBeVisible();
+        if (scenario.failed) {
+            await expect(disk).toHaveClass(/ydb-ddisk_failed/);
+        } else {
+            await expect(disk).not.toHaveClass(/ydb-ddisk_failed/);
+        }
+        const colors = await disk.evaluate((element) => {
+            const style = getComputedStyle(element);
+            const probe = document.createElement('div');
+            probe.style.backgroundColor = 'var(--ydb-color-status-red)';
+            element.appendChild(probe);
+            const red = getComputedStyle(probe).backgroundColor;
+            probe.remove();
+            return {actual: style.backgroundColor, red};
+        });
+        expect(colors.actual === colors.red).toBe(scenario.failed);
+        await page.screenshot({path: testInfo.outputPath('ddisk-nodes.png')});
+    });
+}
 
 test('CMS application errors are visible even with HTTP 200', async ({page}) => {
     await page.route('**/cms/api/json/ddisk/tablets?*', (route) =>

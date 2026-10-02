@@ -30,6 +30,11 @@
         border-style: dashed;
     }
 
+    &_failed {
+        border-color: var(--ydb-color-status-red);
+        background: var(--ydb-color-status-red);
+    }
+
     &__popup {
         padding: 12px;
     }

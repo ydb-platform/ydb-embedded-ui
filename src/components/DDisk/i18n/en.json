@@ -9,6 +9,6 @@
   "label_buffer-occupancy": "Persistent Buffer occupancy",
   "label_unavailable": "Current disk data is unavailable",
   "action_ddisk": "Open DDisk",
-  "action_buffer": "Open Persistent Buffer",
+  "label_failed": "Underlying PDisk is faulty",
   "label_pool": "Pool"
 }

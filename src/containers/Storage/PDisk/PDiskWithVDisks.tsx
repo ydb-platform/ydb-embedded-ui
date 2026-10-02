@@ -180,7 +180,11 @@ export const PDiskWithVDisks = React.memo(function PDiskWithVDisks({
                                             : {flexGrow: vDisk.AllocatedSize || 1}
                                     }
                                 >
-                                    <DDisk data={vDisk.ddisk} compact />
+                                    <DDisk
+                                        data={vDisk.ddisk}
+                                        pDiskState={pDiskProps.data?.State}
+                                        compact
+                                    />
                                 </div>
                             ) : (
                                 <VDiskItem

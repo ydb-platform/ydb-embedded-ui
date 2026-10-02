@@ -3,11 +3,14 @@ import React from 'react';
 import {Button, Flex, Text} from '@gravity-ui/uikit';
 
 import type {TDDiskStateInfo} from '../../types/api/ddisk';
+import type {TPDiskState} from '../../types/api/pdisk';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {getDDiskDeveloperUIHrefs} from '../../utils/developerUI/ddisk';
 import {useHasDeveloperUi} from '../../utils/developerUI/developerUI';
+import {getStateSeverity} from '../../utils/disks/calculatePDiskSeverity';
+import {DATA_SEVERITY} from '../../utils/disks/constants';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
@@ -65,7 +68,7 @@ export function DDiskInfo({data}: {data: TDDiskStateInfo}) {
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        {i18n('action_buffer')}
+                        {data.PersistentBufferId || EMPTY_DATA_PLACEHOLDER}
                     </Button>
                 </Flex>
             )}
@@ -73,9 +76,25 @@ export function DDiskInfo({data}: {data: TDDiskStateInfo}) {
     );
 }
 
-export function DDisk({data, compact = false}: {data: TDDiskStateInfo; compact?: boolean}) {
+export function DDisk({
+    data,
+    compact = false,
+    pDiskState,
+}: {
+    data: TDDiskStateInfo;
+    compact?: boolean;
+    pDiskState?: TPDiskState;
+}) {
     const [focused, setFocused] = React.useState(false);
     const label = `DDisk ${data.NodeId}:${data.PDiskId}:${data.DDiskSlotId}`;
+    const unavailable = data.HasWhiteboardData === false;
+    const failed = getStateSeverity(pDiskState) === DATA_SEVERITY.RED;
+    let description;
+    if (unavailable) {
+        description = i18n('label_unavailable');
+    } else if (failed) {
+        description = i18n('label_failed');
+    }
     return (
         <HoverPopup
             renderPopupContent={() => <DDiskInfo data={data} />}
@@ -84,8 +103,9 @@ export function DDisk({data, compact = false}: {data: TDDiskStateInfo; compact?:
         >
             <button
                 type="button"
-                className={b({compact, unavailable: data.HasWhiteboardData === false})}
+                className={b({compact, unavailable, failed: unavailable || failed})}
                 aria-label={label}
+                aria-description={description}
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
                 onKeyDown={(event) => {

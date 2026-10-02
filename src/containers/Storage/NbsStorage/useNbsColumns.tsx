@@ -61,11 +61,8 @@ export function useNbsColumns(disks: boolean) {
                           return null;
                       }
                       const href = getDDiskDeveloperUIHrefs({...row, ...row.DiskId}).buffer;
-                      return hasDeveloperUi && href ? (
-                          <Link href={href}>{i18n('open-buffer')}</Link>
-                      ) : (
-                          EMPTY_DATA_PLACEHOLDER
-                      );
+                      const id = row.PersistentBufferId || EMPTY_DATA_PLACEHOLDER;
+                      return hasDeveloperUi && href ? <Link href={href}>{id}</Link> : id;
                   },
                   200,
               ),
