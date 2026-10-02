@@ -7,7 +7,7 @@ import {Provider} from 'react-redux';
 import {DrawerContextProvider} from '../../src/components/Drawer/DrawerContext';
 import {HealthcheckDrawer} from '../../src/containers/Tenant/Healthcheck/components/HealthcheckDrawer';
 import {store} from '../../src/store/defaultStore';
-import {configureUIFactory, uiFactory} from '../../src/uiFactory/uiFactory';
+import {configureUIFactory} from '../../src/uiFactory/uiFactory';
 
 const COMPANION_WIDTH = 320;
 
@@ -109,7 +109,7 @@ export function renderHealthcheckDrawerFixture(
     mode: NonNullable<Window['e2eHealthcheckDrawerMode']>,
 ) {
     const overrides = mode === 'default' ? {} : {disableModal: mode === 'non-modal'};
-    configureUIFactory({healthcheck: {...uiFactory.healthcheck, ...overrides}});
+    configureUIFactory({healthcheck: overrides});
 
     const container = document.getElementById('root');
     if (!container) {
