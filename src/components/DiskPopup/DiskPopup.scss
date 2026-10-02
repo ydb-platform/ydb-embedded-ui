@@ -2,15 +2,12 @@
     --ydb-disk-popup-base-width: 368px;
     --ydb-disk-popup-width-growth: 50px;
 
-    overflow-y: auto;
-
     width: max-content;
     min-width: min(var(--ydb-disk-popup-base-width), calc(100vw - 64px));
     max-width: min(
         calc(var(--ydb-disk-popup-base-width) + var(--ydb-disk-popup-width-growth)),
         calc(100vw - 64px)
     );
-    max-height: calc(100vh - 64px);
 
     font-size: var(--g-text-body-1-font-size);
     line-height: var(--g-text-body-1-line-height);
