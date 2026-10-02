@@ -18,7 +18,6 @@ export class SettingsDialog {
     private outputChunkMaxSizeInput: Locator;
     private pragmasInput: Locator;
     private limitRowsErrorIcon: Locator;
-    private limitRowsErrorPopover: Locator;
     private timeoutInput: Locator;
     private timeoutSwitch: Locator;
     private timeoutSwitchHint: Locator;
@@ -26,7 +25,6 @@ export class SettingsDialog {
     private timeoutLabel: Locator;
 
     private timeoutErrorIcon: Locator;
-    private timeoutErrorPopover: Locator;
 
     private queryModeSelect: Locator;
     private resourcePoolSelect: Locator;
@@ -45,7 +43,6 @@ export class SettingsDialog {
         this.limitRowsErrorIcon = this.dialog.locator(
             '.ydb-query-settings-dialog__limit-rows [data-qa="control-error-icon-qa"]',
         );
-        this.limitRowsErrorPopover = this.page.locator('.g-popover-legacy__tooltip-content');
         this.selectPopup = page.locator('.ydb-query-settings-select__popup');
         this.timeoutInput = this.dialog.locator('.ydb-query-settings-timeout__input');
         this.timeoutSwitch = this.dialog.locator('.ydb-timeout-label__switch');
@@ -55,7 +52,6 @@ export class SettingsDialog {
         this.timeoutErrorIcon = this.dialog.locator(
             '.ydb-query-settings-timeout__input [data-qa="control-error-icon-qa"]',
         );
-        this.timeoutErrorPopover = this.page.locator('.g-popover-legacy__tooltip-content');
 
         // Define distinct locators for selects
         this.queryModeSelect = this.dialog.locator(
@@ -168,9 +164,7 @@ export class SettingsDialog {
     }
 
     async getLimitRowsErrorMessage() {
-        await this.limitRowsErrorIcon.hover();
-        await this.limitRowsErrorPopover.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return await this.limitRowsErrorPopover.textContent();
+        return this.getErrorMessage(this.limitRowsErrorIcon);
     }
 
     async clickButton(buttonName: ButtonNames) {
@@ -246,14 +240,22 @@ export class SettingsDialog {
     }
 
     async getTimeoutErrorMessage() {
-        await this.timeoutErrorIcon.hover();
-        await this.timeoutErrorPopover.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return await this.timeoutErrorPopover.textContent();
+        return this.getErrorMessage(this.timeoutErrorIcon);
     }
 
     async hoverStatisticsSelect() {
         await this.statisticsModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.statisticsModeSelect.hover();
+    }
+
+    private async getErrorMessage(errorIcon: Locator) {
+        await errorIcon.hover();
+        await expect(errorIcon).toHaveAttribute('aria-expanded', 'true');
+        await expect(errorIcon).toHaveAttribute('aria-controls', /.+/);
+        const popoverId = await errorIcon.getAttribute('aria-controls');
+        const popover = this.page.locator(`[id="${popoverId}"]`);
+        await expect(popover).toBeVisible();
+        return popover.textContent();
     }
 
     private async openSelect(selectWrapper: Locator) {
