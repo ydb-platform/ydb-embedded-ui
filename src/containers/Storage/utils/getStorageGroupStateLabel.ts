@@ -1,4 +1,4 @@
-import type {DiskStatusLabelData} from '../../../components/DiskStatus/DiskStatus';
+import type {TitledDiskStatusLabelData} from '../../../components/DiskStatus/DiskStatus';
 import {
     DATA_SEVERITY,
     NUMERIC_SEVERITY_TO_LABEL_VIEW,
@@ -10,10 +10,13 @@ const stateSeverities = new Map<string, DisplaySeverity>([
     ['ok', DATA_SEVERITY.GREEN],
     ['replicating', DATA_SEVERITY.BLUE],
     ['starting', DATA_SEVERITY.YELLOW],
+    ['degraded', DATA_SEVERITY.YELLOW],
     ['dead', SOLID_RED_SEVERITY],
 ]);
 
-export function getStorageGroupStateLabel(state?: string | null): DiskStatusLabelData | undefined {
+export function getStorageGroupStateLabel(
+    state?: string | null,
+): TitledDiskStatusLabelData | undefined {
     const normalizedState = state?.trim();
 
     if (!normalizedState) {
@@ -28,9 +31,7 @@ export function getStorageGroupStateLabel(state?: string | null): DiskStatusLabe
     if (status === 'degraded') {
         const count = value?.split('(', 1)[0].trim();
 
-        if (count === '1') {
-            severity = DATA_SEVERITY.YELLOW;
-        } else if (count === '2') {
+        if (count === '2') {
             severity = DATA_SEVERITY.RED;
         }
     }
@@ -40,8 +41,8 @@ export function getStorageGroupStateLabel(state?: string | null): DiskStatusLabe
     const formattedValue = value?.replace(/\s*\(/g, ' (');
 
     return {
-        title: formattedValue ? title : undefined,
-        value: formattedValue ?? title,
+        title,
+        value: formattedValue,
         theme: labelView.theme,
         dangerHeavy: Boolean(labelView.dangerHeavy),
     };

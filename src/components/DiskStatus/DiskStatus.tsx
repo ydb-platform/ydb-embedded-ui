@@ -28,6 +28,11 @@ export interface DiskStatusLabelData {
     dangerHeavy?: boolean;
 }
 
+export type TitledDiskStatusLabelData = Omit<DiskStatusLabelData, 'title' | 'value'> & {
+    title: string;
+    value?: string;
+};
+
 export function DiskStatusLabel({
     value,
     theme = 'normal',
@@ -37,7 +42,7 @@ export function DiskStatusLabel({
     dangerHeavy,
     size = 's',
     className,
-}: DiskStatusLabelData & Pick<LabelProps, 'size' | 'className'>) {
+}: (DiskStatusLabelData | TitledDiskStatusLabelData) & Pick<LabelProps, 'size' | 'className'>) {
     const label = (
         <Label
             size={size}
