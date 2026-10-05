@@ -1,4 +1,5 @@
 import {defineConfig, loadEnv} from '@rsbuild/core';
+import type {Rspack} from '@rsbuild/core';
 import {pluginReact} from '@rsbuild/plugin-react';
 import {pluginSass} from '@rsbuild/plugin-sass';
 import {pluginSvgr} from '@rsbuild/plugin-svgr';
@@ -79,6 +80,7 @@ export default defineConfig({
     source: {
         entry: {
             index: './src/index.tsx',
+            metricChart: './src/metricChart.tsx',
         },
         include: [
             'node_modules/antlr4-c3',
@@ -120,6 +122,36 @@ export default defineConfig({
                 }),
             ]);
 
+            config.optimization = {...config.optimization, runtimeChunk: 'single'};
+            appendPlugins([
+                {
+                    apply(compiler: Rspack.Compiler) {
+                        compiler.hooks.thisCompilation.tap('MetricChartAssets', (compilation) => {
+                            compilation.hooks.processAssets.tap(
+                                {
+                                    name: 'MetricChartAssets',
+                                    stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT,
+                                },
+                                () => {
+                                    const files =
+                                        compilation.entrypoints.get('metricChart')?.getFiles() ||
+                                        [];
+                                    const assets = {
+                                        scripts: files.filter((file) => file.endsWith('.js')),
+                                        styles: files.filter((file) => file.endsWith('.css')),
+                                    };
+                                    compilation.emitAsset(
+                                        'static/js/metric-chart-assets.json',
+                                        new compiler.webpack.sources.RawSource(
+                                            JSON.stringify(assets),
+                                        ),
+                                    );
+                                },
+                            );
+                        });
+                    },
+                },
+            ]);
             return config;
         },
     },
