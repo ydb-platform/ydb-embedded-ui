@@ -124,9 +124,21 @@ function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaDat
     const {Columns: HashColumns = []} = HashSharding;
 
     const preparedColumns = Columns?.map((column) => {
-        const {Id, Name, Type, NotNull, Serializer} = column;
+        const {Id, Name, Type, NotNull, Serializer, DataAccessorConstructor, DictionaryEncoding} =
+            column;
         const rawColumnCodec = Serializer?.ArrowCompression?.Codec;
         const compressionLevel = Serializer?.ArrowCompression?.Level;
+        const accessorClassName =
+            DataAccessorConstructor !== null &&
+            typeof DataAccessorConstructor === 'object' &&
+            'ClassName' in DataAccessorConstructor
+                ? DataAccessorConstructor.ClassName
+                : undefined;
+        // Modern schemas use the accessor; older versions expose DictionaryEncoding.
+        const dictionaryEncoding =
+            typeof accessorClassName === 'string' && accessorClassName
+                ? accessorClassName === 'DICTIONARY'
+                : DictionaryEncoding?.Enabled;
 
         const keyColumnIndex =
             KeyColumnNames?.findIndex((keyColumnName) => keyColumnName === Name) ?? -1;
@@ -144,6 +156,7 @@ function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaDat
             columnCodec: formatColumnCodec(rawColumnCodec, compressionLevel),
             rawColumnCodec,
             columnCodecLevel: compressionLevel,
+            dictionaryEncoding,
         };
     });
 
