@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {dateTimeParse} from '@gravity-ui/date-utils';
 import {Label} from '@gravity-ui/uikit';
 
 import {Loader} from '../../../../../components/Loader';
@@ -13,7 +14,6 @@ import type {IQueryResult} from '../../../../../types/store/query';
 import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {
-    formatDateTime,
     getStringifiedData,
     stripIndentByFirstLine,
     trimOuterEmptyLines,
@@ -142,10 +142,12 @@ function formatLifecycleValue(
     fallback?: string | number,
 ) {
     const milliseconds = typeof timestamp === 'string' ? Date.parse(timestamp) : NaN;
+    const dateMilliseconds =
+        Number.isFinite(milliseconds) && milliseconds > 0 ? milliseconds : Number(fallback);
     const date =
-        Number.isFinite(milliseconds) && milliseconds > 0
-            ? formatDateTime(milliseconds)
-            : formatDateTime(fallback);
+        Number.isFinite(dateMilliseconds) && dateMilliseconds > 0
+            ? dateTimeParse(dateMilliseconds)?.format('YYYY-MM-DD HH:mm:ss')
+            : undefined;
 
     if (!date && !user) {
         return undefined;
