@@ -44,19 +44,34 @@ const EFlagToStatusName: Record<EFlag, string> = {
     },
 };
 
-interface EntityStatusLabelProps {
+interface EntityStatusLabelBaseProps {
     status: EFlag;
-    note?: React.ReactNode;
-    children?: React.ReactNode;
     className?: string;
-    endContent?: React.ReactNode;
-    withStatusName?: boolean;
-    view?: 'default' | 'compact';
     size?: LabelProps['size'];
     iconSize?: number;
-    onClick?: (event: React.MouseEvent<HTMLElement>) => void;
     qa?: string;
 }
+
+interface DefaultEntityStatusLabelProps {
+    view?: 'default';
+    note?: React.ReactNode;
+    children?: React.ReactNode;
+    endContent?: React.ReactNode;
+    withStatusName?: boolean;
+    onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+}
+
+interface CompactEntityStatusLabelProps {
+    view: 'compact';
+    note?: never;
+    children?: never;
+    endContent?: never;
+    withStatusName?: never;
+    onClick?: never;
+}
+
+type EntityStatusLabelProps = EntityStatusLabelBaseProps &
+    (DefaultEntityStatusLabelProps | CompactEntityStatusLabelProps);
 
 function EntityStatusLabel({
     children,
