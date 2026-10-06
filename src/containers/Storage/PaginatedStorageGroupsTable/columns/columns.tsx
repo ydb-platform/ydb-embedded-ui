@@ -6,6 +6,7 @@ import {Flex, Icon, Label, Popover} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPopover';
+import {DiskStatusLabel} from '../../../../components/DiskStatus/DiskStatus';
 import {EntityName} from '../../../../components/EntityName/EntityName';
 import {StatusIcon} from '../../../../components/StatusIcon/StatusIcon';
 import {TitleWithHelpMark} from '../../../../components/TitleWithHelpmark/TitleWithHelpmark';
@@ -35,6 +36,7 @@ import {
 } from '../../Disks/constants';
 import {VDisks} from '../../VDisks/VDisks';
 import {getDegradedSeverity} from '../../utils';
+import {getStorageGroupStateLabel} from '../../utils/getStorageGroupStateLabel';
 import i18n from '../i18n';
 
 import {
@@ -122,9 +124,14 @@ const degradedColumn: StorageGroupsColumn = {
     resizeMinWidth: 110,
     render: ({row}) =>
         row.Degraded ? (
-            <Label theme={getDegradedSeverity(row)}>Degraded: {row.Degraded}</Label>
+            <DiskStatusLabel
+                size="xs"
+                title="Degraded"
+                value={String(row.Degraded)}
+                theme={getDegradedSeverity(row)}
+            />
         ) : (
-            '-'
+            EMPTY_DATA_PLACEHOLDER
         ),
     align: DataTable.LEFT,
     defaultOrder: DataTable.DESCENDING,
@@ -133,7 +140,21 @@ const stateColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.State,
     header: STORAGE_GROUPS_COLUMNS_TITLES.State,
     width: 150,
-    render: ({row}) => row.State ?? EMPTY_DATA_PLACEHOLDER,
+    render: ({row}) => {
+        const state = getStorageGroupStateLabel(row.State);
+
+        return state ? (
+            <DiskStatusLabel
+                size="xs"
+                title={state.title}
+                value={state.value}
+                theme={state.theme}
+                dangerHeavy={state.dangerHeavy}
+            />
+        ) : (
+            EMPTY_DATA_PLACEHOLDER
+        );
+    },
     align: DataTable.LEFT,
     defaultOrder: DataTable.DESCENDING,
 };

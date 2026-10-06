@@ -2,11 +2,7 @@ import {Ban, Check, CircleQuestionFill, CircleXmarkFill} from '@gravity-ui/icons
 
 import type {EDecommitStatus, EDriveStatus, EMaintenanceStatus} from '../../types/api/pdisk';
 import {TPDiskState} from '../../types/api/pdisk';
-import {
-    NOT_AVAILABLE_SEVERITY,
-    NUMERIC_SEVERITY_TO_LABEL_VIEW,
-    SOLID_RED_SEVERITY,
-} from '../../utils/disks/constants';
+import {NOT_AVAILABLE_SEVERITY, NUMERIC_SEVERITY_TO_LABEL_VIEW} from '../../utils/disks/constants';
 import {
     getPDiskDecommitDisplayState,
     getPDiskDriveDisplayState,
@@ -35,13 +31,12 @@ function getLabelView({
     DiskStatusLabelData,
     'theme' | 'icon' | 'dangerHeavy'
 > {
+    const labelView = NUMERIC_SEVERITY_TO_LABEL_VIEW[severity];
+
     return {
-        theme:
-            severity === NOT_AVAILABLE_SEVERITY
-                ? 'unknown'
-                : NUMERIC_SEVERITY_TO_LABEL_VIEW[severity]?.theme,
+        theme: severity === NOT_AVAILABLE_SEVERITY ? 'unknown' : labelView?.theme,
         icon,
-        dangerHeavy: severity === SOLID_RED_SEVERITY,
+        dangerHeavy: Boolean(labelView?.dangerHeavy),
     };
 }
 

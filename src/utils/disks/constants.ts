@@ -142,6 +142,7 @@ export const PDISK_STATE_SEVERITY = {
 export interface LabelVisualConfig {
     theme: LabelProps['theme'];
     icon?: IconData;
+    dangerHeavy?: boolean;
 }
 
 export const NUMERIC_SEVERITY_TO_LABEL_VIEW: Record<number, LabelVisualConfig> = {
@@ -159,6 +160,7 @@ export const NUMERIC_SEVERITY_TO_LABEL_VIEW: Record<number, LabelVisualConfig> =
     },
     [SOLID_RED_SEVERITY]: {
         theme: 'danger',
+        dangerHeavy: true,
     },
     [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue]: {
         theme: 'info',

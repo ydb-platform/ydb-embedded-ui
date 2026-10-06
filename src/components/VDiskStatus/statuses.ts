@@ -11,7 +11,6 @@ import {EVDiskDetailedReplicationStatus, EVDiskState} from '../../types/api/vdis
 import {
     NOT_AVAILABLE_SEVERITY,
     NUMERIC_SEVERITY_TO_LABEL_VIEW,
-    SOLID_RED_SEVERITY,
     VDISK_STATE_SEVERITY_FOR_STATE_MODE,
 } from '../../utils/disks/constants';
 import {calculateStateIcon} from '../../utils/disks/iconCalculators';
@@ -62,11 +61,13 @@ export function getVDiskStateLabel(data: PreparedVDisk): DiskStatusLabelData {
         },
     };
 
+    const labelView = NUMERIC_SEVERITY_TO_LABEL_VIEW[severity];
+
     return {
         ...labels[state],
-        theme: NUMERIC_SEVERITY_TO_LABEL_VIEW[severity].theme,
+        theme: labelView.theme,
         icon: state === EVDiskState.OK ? Check : calculateStateIcon(data),
-        dangerHeavy: severity === SOLID_RED_SEVERITY,
+        dangerHeavy: Boolean(labelView.dangerHeavy),
     };
 }
 
