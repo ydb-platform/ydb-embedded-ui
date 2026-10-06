@@ -6,7 +6,7 @@ function getStreamingQueryInfoSQL(path: string) {
     // Select available columns so older backends without lifecycle fields remain supported.
     const safePath = path.replace(/'/g, "''");
     return `${QUERY_TECHNICAL_MARK}
-SELECT *
+SELECT * WITHOUT Plan, Ast
 FROM \`.sys/streaming_queries\`
 WHERE Path = '${safePath}'
 LIMIT 1`;
