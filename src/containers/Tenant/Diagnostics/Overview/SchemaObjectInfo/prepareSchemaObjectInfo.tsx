@@ -40,6 +40,7 @@ interface PrepareSchemaObjectInfoItemsParams {
     itemsAfterType?: YDBDefinitionListItem[];
     additionalItems?: YDBDefinitionListItem[];
     showAdministrativeFields?: boolean;
+    createdContent?: string;
 }
 
 function isPresent(value: string | number | undefined): value is string | number {
@@ -83,6 +84,7 @@ export function prepareSchemaObjectInfoItems({
     itemsAfterType = [],
     additionalItems = [],
     showAdministrativeFields = false,
+    createdContent,
 }: PrepareSchemaObjectInfoItemsParams): YDBDefinitionListItem[] {
     const self = data?.PathDescription?.Self;
     let pathId = self?.PathId;
@@ -116,10 +118,10 @@ export function prepareSchemaObjectInfoItems({
         );
     }
 
-    if (Number(createStep)) {
+    if (createdContent || Number(createStep)) {
         items.push({
             name: tenantKeyset('field_created'),
-            content: formatDateTime(createStep),
+            content: createdContent || formatDateTime(createStep),
         });
     }
 

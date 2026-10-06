@@ -3,12 +3,10 @@ import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query'
 import {api} from '../api';
 
 function getStreamingQueryInfoSQL(path: string) {
+    // Select available columns so older backends without lifecycle fields remain supported.
     const safePath = path.replace(/'/g, "''");
     return `${QUERY_TECHNICAL_MARK}
-SELECT
-    Status AS State,
-    Issues AS Error,
-    Text
+SELECT *
 FROM \`.sys/streaming_queries\`
 WHERE Path = '${safePath}'
 LIMIT 1`;

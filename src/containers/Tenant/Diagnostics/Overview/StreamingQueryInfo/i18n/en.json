@@ -1,5 +1,9 @@
 {
   "field_query-state": "State",
   "field_query-error": "Error",
-  "field_query-text": "Text"
+  "field_query-text": "Text",
+  "field_started": "Started",
+  "field_modified": "Modified",
+  "field_stopped": "Stopped",
+  "value_date-by-user": "{{date}} by {{user}}"
 }

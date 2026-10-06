@@ -7,15 +7,20 @@ import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitio
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YQLCodePreview} from '../../../../../components/YQLCodePreview/YQLCodePreview';
 import {streamingQueriesApi} from '../../../../../store/reducers/streamingQuery/streamingQuery';
+import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
+import {EPathType} from '../../../../../types/api/schema';
 import type {IQueryResult} from '../../../../../types/store/query';
 import {cn} from '../../../../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {
+    formatDateTime,
     getStringifiedData,
     stripIndentByFirstLine,
     trimOuterEmptyLines,
 } from '../../../../../utils/dataFormatters/dataFormatters';
 import {parseIssuesData} from '../../../../../utils/query';
 import {ResultIssuesModal} from '../../../Query/Issues/Issues';
+import {SchemaObjectInfo} from '../SchemaObjectInfo/SchemaObjectInfo';
 
 import i18n from './i18n';
 
@@ -24,26 +29,41 @@ import './StreamingQueryInfo.scss';
 interface StreamingQueryProps {
     database: string;
     path: string;
+    data?: TEvDescribeSchemeResult;
 }
 
 const b = cn('ydb-streaming-query-info');
 
-export function StreamingQueryInfo({database, path}: StreamingQueryProps) {
-    const {data: sysData, isFetching} = streamingQueriesApi.useGetStreamingQueryInfoQuery(
+export function StreamingQueryInfo({database, path, data}: StreamingQueryProps) {
+    const {currentData: sysData, isFetching} = streamingQueriesApi.useGetStreamingQueryInfoQuery(
         {database, path},
         {skip: !database || !path},
     );
     const loading = isFetching && sysData === undefined;
 
-    if (loading) {
-        return <Loader size="s" className={b('loader')} />;
-    }
-
     const {items, queryText} = prepareStreamingQueryItems(sysData);
+
+    const row = sysData?.resultSets?.[0]?.result?.[0];
+    const createdContent =
+        formatLifecycleValue(
+            row?.CreatedAt,
+            row?.CreatedBy,
+            data?.PathDescription?.Self?.CreateStep,
+        ) ?? (row && 'CreatedAt' in row ? EMPTY_DATA_PLACEHOLDER : undefined);
 
     return (
         <React.Fragment>
-            <YDBDefinitionList items={items} />
+            <SchemaObjectInfo
+                data={data}
+                fallbackType={EPathType.EPathTypeStreamingQuery}
+                path={path}
+                createdContent={createdContent}
+            />
+            {loading ? (
+                <Loader size="s" className={b('loader')} />
+            ) : (
+                <YDBDefinitionList items={items} />
+            )}
             {queryText ? (
                 <YQLCodePreview title={i18n('field_query-text')} text={queryText} />
             ) : null}
@@ -78,14 +98,25 @@ function prepareStreamingQueryItems(sysData?: IQueryResult) {
         return {items: [], queryText: undefined};
     }
 
-    const info: YDBDefinitionListItem[] = [];
-    const state = getStringifiedData(sysData.resultSets?.[0]?.result?.[0]?.State);
+    const row = sysData.resultSets?.[0]?.result?.[0];
+    const lifecycleFields = [
+        {name: i18n('field_started'), timestamp: 'StartedAt', user: 'StartedBy'},
+        {name: i18n('field_modified'), timestamp: 'ModifiedAt', user: 'ModifiedBy'},
+        {name: i18n('field_stopped'), timestamp: 'FinishedAt', user: 'StoppedBy'},
+    ];
+    const info: YDBDefinitionListItem[] = lifecycleFields
+        .filter(({timestamp}) => row && timestamp in row)
+        .map(({name, timestamp, user}) => ({
+            name,
+            content: formatLifecycleValue(row?.[timestamp], row?.[user]) ?? EMPTY_DATA_PLACEHOLDER,
+        }));
+    const state = getStringifiedData(row?.Status);
 
-    const queryText = getStringifiedData(sysData.resultSets?.[0]?.result?.[0]?.Text);
+    const queryText = getStringifiedData(row?.Text);
     let normalizedQueryText = trimOuterEmptyLines(queryText);
     normalizedQueryText = stripIndentByFirstLine(normalizedQueryText);
 
-    const errorRaw = sysData.resultSets?.[0]?.result?.[0]?.Error;
+    const errorRaw = row?.Issues;
 
     // We use custom error check, because error type can be non-standard
     const errorData = parseIssuesData(errorRaw);
@@ -103,4 +134,24 @@ function prepareStreamingQueryItems(sysData?: IQueryResult) {
     }
 
     return {items: info, queryText: normalizedQueryText};
+}
+
+function formatLifecycleValue(
+    timestamp: string | number | null | undefined,
+    user: string | number | null | undefined,
+    fallback?: string | number,
+) {
+    const milliseconds = typeof timestamp === 'string' ? Date.parse(timestamp) : NaN;
+    const date =
+        Number.isFinite(milliseconds) && milliseconds > 0
+            ? formatDateTime(milliseconds)
+            : formatDateTime(fallback);
+
+    if (!date && !user) {
+        return undefined;
+    }
+
+    return user
+        ? i18n('value_date-by-user', {date: date || EMPTY_DATA_PLACEHOLDER, user: String(user)})
+        : date;
 }

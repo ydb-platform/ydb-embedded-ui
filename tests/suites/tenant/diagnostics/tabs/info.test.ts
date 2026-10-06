@@ -777,8 +777,8 @@ test.describe('Diagnostics Info tab', async () => {
                         {
                             rows: [['RUNNING', '{}', 'SELECT 1;']],
                             columns: [
-                                {name: 'State', type: 'Utf8?'},
-                                {name: 'Error', type: 'Utf8?'},
+                                {name: 'Status', type: 'Utf8?'},
+                                {name: 'Issues', type: 'Utf8?'},
                                 {name: 'Text', type: 'Utf8?'},
                             ],
                         },
