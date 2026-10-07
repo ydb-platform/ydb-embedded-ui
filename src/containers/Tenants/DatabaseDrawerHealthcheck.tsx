@@ -8,6 +8,7 @@ import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {Healthcheck} from '../Tenant/Healthcheck/Healthcheck';
 import {HealthcheckDrawer} from '../Tenant/Healthcheck/components/HealthcheckDrawer';
+import {getDatabaseHealthcheckAssistantTarget} from '../Tenant/Healthcheck/utils';
 import tenantI18n from '../Tenant/i18n';
 import {useTenantQueryParams} from '../Tenant/useTenantQueryParams';
 
@@ -78,6 +79,15 @@ export function DatabaseDrawerHealthcheck({children, clusterName}: DatabaseDrawe
 
     return (
         <HealthcheckDrawer
+            target={
+                database
+                    ? getDatabaseHealthcheckAssistantTarget({
+                          database,
+                          clusterName: selectedClusterName,
+                          scope: 'database',
+                      })
+                    : undefined
+            }
             isDrawerVisible={Boolean(database)}
             onCloseDrawer={handleCloseDrawer}
             renderDrawerContent={renderDrawerContent}

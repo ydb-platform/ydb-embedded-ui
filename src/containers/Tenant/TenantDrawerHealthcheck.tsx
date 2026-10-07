@@ -8,6 +8,7 @@ import {useTypedSelector} from '../../utils/hooks';
 
 import {Healthcheck} from './Healthcheck/Healthcheck';
 import {HealthcheckDrawer} from './Healthcheck/components/HealthcheckDrawer';
+import {getDatabaseHealthcheckAssistantTarget} from './Healthcheck/utils';
 import {useCurrentSchema} from './TenantContext';
 import i18n from './i18n';
 import {useTenantQueryParams} from './useTenantQueryParams';
@@ -46,6 +47,15 @@ export function TenantDrawerHealthcheck({children, clusterName}: TenantDrawerHea
 
     return (
         <HealthcheckDrawer
+            target={
+                database
+                    ? getDatabaseHealthcheckAssistantTarget({
+                          database,
+                          clusterName,
+                          scope: 'database',
+                      })
+                    : undefined
+            }
             isDrawerVisible={Boolean(showHealthcheck)}
             onCloseDrawer={handleCloseDrawer}
             renderDrawerContent={renderDrawerContent}
