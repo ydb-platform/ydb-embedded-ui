@@ -1,3 +1,5 @@
+import type React from 'react';
+
 import {ChevronRight} from '@gravity-ui/icons';
 import {ActionTooltip, Alert, Button, Flex, Icon, Label, Skeleton} from '@gravity-ui/uikit';
 
@@ -5,6 +7,7 @@ import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {SELF_CHECK_RESULT_CONFIG} from '../../../../../components/HealthcheckStatus/config';
 import {healthcheckApi} from '../../../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
+import {uiFactory} from '../../../../../uiFactory/uiFactory';
 import {cn} from '../../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../../utils/hooks/useDatabaseFromQuery';
@@ -29,6 +32,13 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {handleShowHealthcheckChange} = useTenantQueryParams();
+    const openHealthcheck = (event: React.MouseEvent<HTMLElement>) => {
+        if (uiFactory.healthcheck.disableModal) {
+            // Pointer clicks do not focus buttons in WebKit; capture the actual opener.
+            event.currentTarget.focus();
+        }
+        handleShowHealthcheckChange(true);
+    };
 
     const {
         currentData: data,
@@ -80,9 +90,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
                             className={b('icon', {[modifier]: true})}
                         />
                     }
-                    onClick={() => {
-                        handleShowHealthcheckChange(true);
-                    }}
+                    onClick={openHealthcheck}
                 >
                     <Flex alignItems={'center'} gap={1}>
                         {statusConfig.title}: {i18n('issues-count', {count: issuesCount})}
@@ -109,13 +117,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
                     {issuesText ? ` ${issuesText}` : ''}
                 </Flex>
                 {issuesCount && (
-                    <Button
-                        onClick={() => {
-                            handleShowHealthcheckChange(true);
-                        }}
-                    >
-                        {i18n('action_review-issues')}
-                    </Button>
+                    <Button onClick={openHealthcheck}>{i18n('action_review-issues')}</Button>
                 )}
             </Flex>
         );

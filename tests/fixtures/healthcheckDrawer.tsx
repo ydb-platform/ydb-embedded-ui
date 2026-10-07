@@ -106,7 +106,7 @@ function HealthcheckDrawerFixture() {
 }
 
 export function renderHealthcheckDrawerFixture(
-    mode: NonNullable<Window['e2eHealthcheckDrawerMode']>,
+    mode: Exclude<NonNullable<Window['e2eHealthcheckDrawerMode']>, 'non-modal-page'>,
 ) {
     const overrides = mode === 'default' ? {} : {disableModal: mode === 'non-modal'};
     configureUIFactory({healthcheck: overrides});

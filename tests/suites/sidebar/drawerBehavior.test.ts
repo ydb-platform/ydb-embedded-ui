@@ -4,6 +4,7 @@ import {expect, test} from '@playwright/test';
 import {clickDrawerVeil} from '../../utils/clickDrawerVeil';
 import {getClipboardContent} from '../../utils/clipboard';
 import {backend, database} from '../../utils/constants';
+import {mockHealthcheckWithIssue} from '../../utils/healthcheck';
 import {TenantPage} from '../tenant/TenantPage';
 import {Diagnostics} from '../tenant/diagnostics/Diagnostics';
 import {setupTopQueriesMock} from '../tenant/diagnostics/mocks';
@@ -191,30 +192,6 @@ async function addQueryHistoryEntry(page: Page) {
         },
         {queryText: HISTORY_QUERY_TEXT},
     );
-}
-
-async function mockHealthcheckWithIssue(page: Page) {
-    await page.route('**/viewer/json/healthcheck**', async (route) => {
-        await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({
-                self_check_result: 'DEGRADED',
-                issue_log: [
-                    {
-                        id: 'drawer-healthcheck-issue',
-                        status: 'YELLOW',
-                        message: 'Drawer healthcheck issue',
-                        location: {
-                            database: {
-                                name: TEST_DATABASE,
-                            },
-                        },
-                    },
-                ],
-            }),
-        });
-    });
 }
 
 test.describe('Drawer behavior', () => {
