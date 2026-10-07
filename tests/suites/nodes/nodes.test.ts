@@ -1,9 +1,10 @@
 import {expect, test} from '@playwright/test';
-import type {Page} from '@playwright/test';
+import type {Page, Request} from '@playwright/test';
 
 import {backend} from '../../utils/constants';
 import {NodePage} from '../nodes/NodePage';
 import {NodesPage} from '../nodes/NodesPage';
+import {generateNodeMock} from '../paginatedTable/mocks';
 import {ClusterNodesTable} from '../paginatedTable/paginatedTable';
 
 const THREADS_TEST_DATABASE = '/Root/db';
@@ -171,18 +172,61 @@ test.describe('Test Nodes Paginated Table', async () => {
     });
 
     test('Refresh button updates the table data', async ({page}) => {
+        const now = new Date('2026-01-01T12:00:00Z');
+        await page.clock.setFixedTime(now);
+        let refreshRequested = false;
+        let releaseRefresh: (() => void) | undefined;
+        const refreshReleased = new Promise<void>((resolve) => {
+            releaseRefresh = resolve;
+        });
+        await page.route('**/viewer/json/nodes?*', async (route) => {
+            const [node] = await generateNodeMock({offset: 0, limit: 1});
+            const uptimeSeconds = refreshRequested ? 3610 : 3600;
+            if (refreshRequested) {
+                await refreshReleased;
+            }
+            await route.fulfill({
+                json: {
+                    Overall: 'Green',
+                    TotalNodes: '1',
+                    FoundNodes: '1',
+                    Nodes: [
+                        {
+                            ...node,
+                            UptimeSeconds: uptimeSeconds,
+                            SystemState: {
+                                ...node.SystemState,
+                                StartTime: String(now.getTime() - uptimeSeconds * 1000),
+                            },
+                        },
+                    ],
+                },
+            });
+        });
+        await page.reload();
         const paginatedTable = new ClusterNodesTable(page);
-
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
+        await expect.poll(() => paginatedTable.getColumnValues('Uptime')).toEqual(['1:00:00']);
 
-        const initialUptimeValues = await paginatedTable.getColumnValues('Uptime');
-        await page.waitForTimeout(2000); // Wait for some time to pass
-        await paginatedTable.getControls().clickRefreshButton();
-        await paginatedTable.waitForTableData();
-
-        const updatedUptimeValues = await paginatedTable.getColumnValues('Uptime');
-        expect(updatedUptimeValues).not.toEqual(initialUptimeValues);
+        refreshRequested = true;
+        const isNodesRequest = (request: Request) =>
+            new URL(request.url()).pathname === '/viewer/json/nodes';
+        try {
+            const [request] = await Promise.all([
+                page.waitForRequest(isNodesRequest),
+                paginatedTable.getControls().clickRefreshButton(),
+            ]);
+            expect(await paginatedTable.getColumnValues('Uptime')).toEqual(['1:00:00']);
+            const refreshed = page.waitForEvent('requestfinished', {
+                predicate: (finishedRequest) => finishedRequest === request,
+            });
+            releaseRefresh?.();
+            await refreshed;
+        } finally {
+            releaseRefresh?.();
+        }
+        await expect.poll(() => paginatedTable.getColumnValues('Uptime')).toEqual(['1:00:10']);
     });
 
     test('Row data can be retrieved correctly', async ({page}) => {
