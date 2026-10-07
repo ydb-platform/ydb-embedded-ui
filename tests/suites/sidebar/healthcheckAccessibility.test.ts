@@ -2,10 +2,16 @@ import type {Page} from '@playwright/test';
 import {expect, test} from '@playwright/test';
 
 import {clickDrawerVeil} from '../../utils/clickDrawerVeil';
+import {backend, database} from '../../utils/constants';
+import {mockHealthcheckWithIssue} from '../../utils/healthcheck';
+import {TenantPage} from '../tenant/TenantPage';
 
 type Panel = 'Healthcheck' | 'companion';
 
-async function openFixture(page: Page, mode: Window['e2eHealthcheckDrawerMode'] = 'non-modal') {
+async function openFixture(
+    page: Page,
+    mode: Exclude<Window['e2eHealthcheckDrawerMode'], 'non-modal-page'> = 'non-modal',
+) {
     await page.addInitScript((value) => {
         window.e2eHealthcheckDrawerMode = value;
     }, mode);
@@ -199,5 +205,76 @@ test.describe('Non-modal Healthcheck accessibility', () => {
                 page.getByRole('button', {name: 'Open Healthcheck', exact: true}),
             ).toBeFocused();
         });
+    }
+});
+
+test.describe('Real Healthcheck opener', () => {
+    for (const compact of [true, false]) {
+        for (const input of ['pointer', 'keyboard'] as const) {
+            for (const close of ['Close', 'Escape'] as const) {
+                test(`${compact ? 'compact' : 'Review issues'} ${input} returns focus after ${close}`, async ({
+                    page,
+                }) => {
+                    await page.addInitScript((useCompact) => {
+                        window.e2eHealthcheckDrawerMode = 'non-modal-page';
+                        localStorage.setItem(
+                            'enableTenantNavigationV2',
+                            JSON.stringify(useCompact),
+                        );
+                    }, compact);
+                    await mockHealthcheckWithIssue(page);
+
+                    const tenantPage = new TenantPage(page);
+                    await tenantPage.goto(
+                        {schema: database, database, backend, databasePage: 'diagnostics'},
+                        {waitUntil: 'commit'},
+                    );
+                    await page
+                        .locator('.kv-tenant-diagnostics')
+                        .waitFor({state: 'visible', timeout: 30000});
+
+                    const opener = page.getByRole('button', {
+                        name: compact ? 'Degraded: 1 issue' : 'Review issues',
+                        exact: true,
+                    });
+                    await expect(opener).toBeVisible();
+                    if (input === 'pointer') {
+                        const previousFocus = compact
+                            ? page.getByTestId('aside-navigation').locator('a[href]').first()
+                            : page.getByRole('link').first();
+                        await previousFocus.focus();
+                        await expect(previousFocus).toBeFocused();
+                        await opener.click();
+                    } else {
+                        await opener.focus();
+                        await opener.press('Enter');
+                    }
+
+                    const drawer = page
+                        .getByTestId('tenant-healthcheck-details')
+                        .getByRole('dialog');
+                    await expect(drawer).toBeVisible();
+                    await expect(page).toHaveURL(
+                        (url) => url.searchParams.get('showHealthcheck') === '1',
+                    );
+                    if (close === 'Escape') {
+                        const filter = drawer.getByRole('textbox').first();
+                        await filter.focus();
+                        await filter.press('Escape');
+                    } else {
+                        const closeButton = drawer.getByRole('button', {
+                            name: 'Close',
+                            exact: true,
+                        });
+                        await closeButton.focus();
+                        await closeButton.press('Enter');
+                    }
+                    await expect(drawer).toHaveCount(0);
+                    await expect(page).toHaveURL((url) => !url.searchParams.has('showHealthcheck'));
+                    await expect(opener).toBeVisible();
+                    await expect(opener).toBeFocused();
+                });
+            }
+        }
     }
 });
