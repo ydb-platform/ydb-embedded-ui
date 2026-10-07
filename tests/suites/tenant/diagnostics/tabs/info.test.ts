@@ -807,6 +807,123 @@ test.describe('Diagnostics Info tab', async () => {
         });
     });
 
+    test('Streaming Query Info displays lifecycle fields', async ({page}) => {
+        const mockStreamingQueryPath = '/local/test_streaming_query';
+        const createStep = 1_767_326_645_000;
+        await setupMonitoringUserMock(page, false);
+
+        await page.route('**/viewer/json/describe?*', async (route) => {
+            const url = new URL(route.request().url());
+            const path = url.searchParams.get('path');
+            const subs = url.searchParams.get('subs');
+
+            if (path === mockStreamingQueryPath && subs === '0') {
+                await route.fulfill({
+                    json: {
+                        Status: 'StatusSuccess',
+                        Path: mockStreamingQueryPath,
+                        PathDescription: {
+                            Self: {
+                                Name: 'test_streaming_query',
+                                PathType: 'EPathTypeStreamingQuery',
+                                CreateStep: String(createStep),
+                            },
+                        },
+                    },
+                });
+                return;
+            }
+
+            if (path === database && subs === '1') {
+                await route.fulfill({
+                    json: {
+                        Path: database,
+                        PathDescription: {
+                            Self: {
+                                Name: 'local',
+                                PathType: 'EPathTypeSubDomain',
+                            },
+                            Children: [
+                                {
+                                    Name: 'test_streaming_query',
+                                    PathType: 'EPathTypeStreamingQuery',
+                                },
+                            ],
+                        },
+                    },
+                });
+                return;
+            }
+
+            await route.continue();
+        });
+
+        await page.route('**/viewer/json/query?*', async (route) => {
+            await route.fulfill({
+                json: {
+                    version: 8,
+                    result: [
+                        {
+                            rows: [
+                                [
+                                    '2026-01-02T04:05:06',
+                                    'starter',
+                                    '2026-01-02T05:06:07',
+                                    'editor',
+                                    '2026-01-02T06:07:08',
+                                    'stopper',
+                                    'STOPPED',
+                                    '{}',
+                                    'SELECT 1;',
+                                ],
+                            ],
+                            columns: [
+                                {name: 'StartedAt', type: 'Utf8?'},
+                                {name: 'StartedBy', type: 'Utf8?'},
+                                {name: 'ModifiedAt', type: 'Utf8?'},
+                                {name: 'ModifiedBy', type: 'Utf8?'},
+                                {name: 'FinishedAt', type: 'Utf8?'},
+                                {name: 'StoppedBy', type: 'Utf8?'},
+                                {name: 'Status', type: 'Utf8?'},
+                                {name: 'Issues', type: 'Utf8?'},
+                                {name: 'Text', type: 'Utf8?'},
+                            ],
+                        },
+                    ],
+                },
+            });
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockStreamingQueryPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        const getInfoValue = (label: string) =>
+            infoContent
+                .locator('.g-definition-list__item')
+                .filter({has: page.locator('dt').getByText(label, {exact: true})})
+                .locator('dd');
+        const createdDate = await page.evaluate((timestamp) => {
+            const date = new Date(timestamp);
+            const pad = (value: number) => String(value).padStart(2, '0');
+
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(
+                date.getHours(),
+            )}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+        }, createStep);
+
+        await expect(getInfoValue('Created')).toHaveText(createdDate);
+        await expect(getInfoValue('Started')).toHaveText('2026-01-02 04:05:06 by starter');
+        await expect(getInfoValue('Modified')).toHaveText('2026-01-02 05:06:07 by editor');
+        await expect(getInfoValue('Stopped')).toHaveText('2026-01-02 06:07:08 by stopper');
+        await expect(getInfoValue('State')).toHaveText('STOPPED');
+    });
+
     test('View Info includes YQL code preview', async ({page}) => {
         const mockViewPath = '/local/test_view';
 

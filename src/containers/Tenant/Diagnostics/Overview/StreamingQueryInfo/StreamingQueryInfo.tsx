@@ -41,15 +41,10 @@ export function StreamingQueryInfo({database, path, data}: StreamingQueryProps) 
     );
     const loading = isFetching && sysData === undefined;
 
-    const {items, queryText} = prepareStreamingQueryItems(sysData);
-
-    const row = sysData?.resultSets?.[0]?.result?.[0];
-    const createdContent =
-        formatLifecycleValue(
-            row?.CreatedAt,
-            row?.CreatedBy,
-            data?.PathDescription?.Self?.CreateStep,
-        ) ?? (row && 'CreatedAt' in row ? EMPTY_DATA_PLACEHOLDER : undefined);
+    const {items, queryText, createdContent} = prepareStreamingQueryInfo(
+        sysData,
+        data?.PathDescription?.Self?.CreateStep,
+    );
 
     return (
         <React.Fragment>
@@ -93,12 +88,15 @@ function StateLabel({state}: {state?: string}) {
     return <Label theme={theme}>{state}</Label>;
 }
 
-function prepareStreamingQueryItems(sysData?: IQueryResult) {
+export function prepareStreamingQueryInfo(sysData?: IQueryResult, createStep?: string | number) {
     if (!sysData) {
-        return {items: [], queryText: undefined};
+        return {items: [], queryText: undefined, createdContent: undefined};
     }
 
     const row = sysData.resultSets?.[0]?.result?.[0];
+    const createdContent =
+        formatLifecycleValue(row?.CreatedAt, row?.CreatedBy, createStep) ??
+        (row && 'CreatedAt' in row ? EMPTY_DATA_PLACEHOLDER : undefined);
     const lifecycleFields = [
         {name: i18n('field_started'), timestamp: 'StartedAt', user: 'StartedBy'},
         {name: i18n('field_modified'), timestamp: 'ModifiedAt', user: 'ModifiedBy'},
@@ -133,7 +131,7 @@ function prepareStreamingQueryItems(sysData?: IQueryResult) {
         });
     }
 
-    return {items: info, queryText: normalizedQueryText};
+    return {items: info, queryText: normalizedQueryText, createdContent};
 }
 
 function formatLifecycleValue(
@@ -141,7 +139,12 @@ function formatLifecycleValue(
     user: string | number | null | undefined,
     fallback?: string | number,
 ) {
-    const milliseconds = typeof timestamp === 'string' ? Date.parse(timestamp) : NaN;
+    let milliseconds = NaN;
+    if (typeof timestamp === 'number') {
+        milliseconds = timestamp;
+    } else if (typeof timestamp === 'string') {
+        milliseconds = Date.parse(timestamp);
+    }
     const dateMilliseconds =
         Number.isFinite(milliseconds) && milliseconds > 0 ? milliseconds : Number(fallback);
     const date =
