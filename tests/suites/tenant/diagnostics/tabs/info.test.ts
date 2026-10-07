@@ -285,32 +285,41 @@ test.describe('Diagnostics Info tab', async () => {
         await expect(diagnostics.areInfoCardsVisible()).resolves.toBe(true);
     });
 
-    test('Info tab shows resource utilization', async ({page}) => {
-        const pageQueryParams = {
-            schema: database,
-            database,
-            databasePage: 'database',
-            diagnosticsTab: 'database',
-        };
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
+    for (const withMetrics of [true, false]) {
+        test(
+            withMetrics
+                ? 'Info tab shows resource utilization'
+                : 'Info tab shows unavailable resource utilization',
+            async ({page}) => {
+                if (withMetrics) {
+                    await setupMetricTabsTenantInfoMock(page);
+                } else {
+                    await setupTenantInfoWithoutMetricsMock(page);
+                }
+                const diagnostics = await openInfoTab(page);
 
-        const diagnostics = new Diagnostics(page);
-
-        const utilization = await diagnostics.getResourceUtilization();
-
-        expect(utilization.cpu.title).toBe('CPU');
-        expect(utilization.cpu.percentage).toMatch(/\d+(\.\d+)?%/);
-        expect(utilization.cpu.description).toBe('Load across all actor system pools');
-
-        expect(utilization.storage.title).toBe('Storage');
-        expect(utilization.storage.percentage).toMatch(/\d+(\.\d+)?%/);
-        expect(utilization.storage.description).toBe('Total usage including user data');
-
-        expect(utilization.memory.title).toBe('Memory');
-        expect(utilization.memory.percentage).toMatch(/\d+(\.\d+)?%/);
-        expect(utilization.memory.description).toBe('Total consumed by DB processes');
-    });
+                await expect
+                    .poll(() => diagnostics.getResourceUtilization())
+                    .toEqual({
+                        cpu: {
+                            title: 'CPU',
+                            percentage: withMetrics ? '7%' : 'N/A',
+                            description: 'Load across all actor system pools',
+                        },
+                        storage: {
+                            title: 'Storage',
+                            percentage: withMetrics ? '90%' : 'N/A',
+                            description: 'Total usage including user data',
+                        },
+                        memory: {
+                            title: 'Memory',
+                            percentage: withMetrics ? '50%' : 'N/A',
+                            description: 'Total consumed by DB processes',
+                        },
+                    });
+            },
+        );
+    }
 
     test('Info metric tabs match visual baseline', async ({page}) => {
         await setupMetricTabsTenantInfoMock(page);

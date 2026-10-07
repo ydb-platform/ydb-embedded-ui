@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ThemeProvider} from '@gravity-ui/uikit';
-import {render, screen} from '@testing-library/react';
+import {isInaccessible, render, screen, waitFor} from '@testing-library/react';
 
 import {
     DrawerContextProvider,
@@ -70,6 +70,7 @@ function DrawerFixture({
                     downloadTooltip="Download"
                 >
                     <InsetProbe />
+                    <button>Page action</button>
                 </HealthcheckDrawer>
             </DrawerContextProvider>
         </ThemeProvider>
@@ -136,6 +137,7 @@ describe('Healthcheck drawer extension', () => {
             healthcheck: {
                 renderDrawerExtension: undefined,
                 renderAssistantAction: undefined,
+                disableModal: undefined,
                 ...originalHealthcheck,
             },
         });
@@ -146,6 +148,19 @@ describe('Healthcheck drawer extension', () => {
             originalHealthcheck.renderDrawerExtension,
         );
     });
+
+    test.each([undefined, false, true])(
+        'uses the configured disableModal=%s through HealthcheckDrawer',
+        async (disableModal) => {
+            configureUIFactory({healthcheck: {disableModal}});
+
+            render(<DrawerFixture />);
+            await screen.findByRole('dialog', {name: 'Healthcheck'});
+            await waitFor(() => {
+                expect(isInaccessible(screen.getByText('Page action'))).toBe(!disableModal);
+            });
+        },
+    );
 
     test('retains the extension and inset across data states, then cleans up on close', () => {
         const degraded = mockHealthcheck;

@@ -55,6 +55,18 @@ async function render() {
     applyE2EMonitoringOverride();
     applyE2EStorageGroupsOverride();
 
+    if (process.env.REACT_APP_E2E_UI_OVERRIDES === 'true' && window.e2eHealthcheckDrawerMode) {
+        if (window.e2eHealthcheckDrawerMode === 'non-modal-page') {
+            configureUIFactory({healthcheck: {disableModal: true}});
+        } else {
+            const {renderHealthcheckDrawerFixture} = await import(
+                '../tests/fixtures/healthcheckDrawer'
+            );
+            renderHealthcheckDrawerFixture(window.e2eHealthcheckDrawerMode);
+            return;
+        }
+    }
+
     let App;
     if (
         process.env.REACT_APP_META_BACKEND === undefined ||

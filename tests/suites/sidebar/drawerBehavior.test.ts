@@ -1,8 +1,10 @@
 import type {Locator, Page} from '@playwright/test';
 import {expect, test} from '@playwright/test';
 
+import {clickDrawerVeil} from '../../utils/clickDrawerVeil';
 import {getClipboardContent} from '../../utils/clipboard';
 import {backend, database} from '../../utils/constants';
+import {mockHealthcheckWithIssue} from '../../utils/healthcheck';
 import {TenantPage} from '../tenant/TenantPage';
 import {Diagnostics} from '../tenant/diagnostics/Diagnostics';
 import {setupTopQueriesMock} from '../tenant/diagnostics/mocks';
@@ -192,30 +194,6 @@ async function addQueryHistoryEntry(page: Page) {
     );
 }
 
-async function mockHealthcheckWithIssue(page: Page) {
-    await page.route('**/viewer/json/healthcheck**', async (route) => {
-        await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({
-                self_check_result: 'DEGRADED',
-                issue_log: [
-                    {
-                        id: 'drawer-healthcheck-issue',
-                        status: 'YELLOW',
-                        message: 'Drawer healthcheck issue',
-                        location: {
-                            database: {
-                                name: TEST_DATABASE,
-                            },
-                        },
-                    },
-                ],
-            }),
-        });
-    });
-}
-
 test.describe('Drawer behavior', () => {
     test('grant access drawer stays open on opening and inside clicks, closes on outside click', async ({
         page,
@@ -238,8 +216,15 @@ test.describe('Drawer behavior', () => {
         await grantAccessDrawer.locator('input[name="subjectInput"]').click();
         await expect(grantAccessDrawer).toBeVisible();
 
+        await clickDrawerVeil(page, page.getByTestId('tenant-grant-access'));
+        await expect(grantAccessDrawer).toBeHidden();
+        await expect(page).toHaveURL((url) => !url.searchParams.has('showGrantAccess'));
+
+        await diagnostics.clickGrantAccessButton();
+        await expect(grantAccessDrawer).toBeVisible();
         await clickOutsideDrawerInAside(page);
         await expect(grantAccessDrawer).toBeHidden();
+        await expect(page).toHaveURL((url) => !url.searchParams.has('showGrantAccess'));
     });
 
     test('healthcheck drawer close button and outside click close without layout overlap', async ({
@@ -282,13 +267,19 @@ test.describe('Drawer behavior', () => {
             .last()
             .click();
         await expect(healthcheckDrawer).toBeHidden();
-        await expect(page).not.toHaveURL(/showHealthcheck=true/);
+        await expect(page).toHaveURL((url) => !url.searchParams.has('showHealthcheck'));
+
+        await openCompactHealthcheckDrawer(page);
+        await expect(healthcheckDrawer).toBeVisible();
+        await clickDrawerVeil(page, healthcheckDrawer);
+        await expect(healthcheckDrawer).toBeHidden();
+        await expect(page).toHaveURL((url) => !url.searchParams.has('showHealthcheck'));
 
         await openCompactHealthcheckDrawer(page);
         await expect(healthcheckDrawer).toBeVisible();
         await clickOutsideDrawerInAside(page);
         await expect(healthcheckDrawer).toBeHidden();
-        await expect(page).not.toHaveURL(/showHealthcheck=true/);
+        await expect(page).toHaveURL((url) => !url.searchParams.has('showHealthcheck'));
     });
 
     test('query history preview drawer keeps inside clicks and clears row state on close', async ({
