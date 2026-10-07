@@ -4,6 +4,7 @@ import {Label} from '@gravity-ui/uikit';
 
 import {ECapacityAlert, EFlag} from '../../../types/api/enums';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from '../../../utils/constants';
+import {DiskCapacityAlertLabel} from '../../DiskStatus/DiskStatus';
 import {
     CAPACITY_CONFIGURATION_HELP_TEXT,
     CAPACITY_METRICS_HELP_TEXT,
@@ -148,19 +149,6 @@ describe('DiskCapacityInfo builders', () => {
                     {PDiskCapacityAlert: ECapacityAlert.LIGHTYELLOW},
                     {withUsage: false, withCapacityAlert: true},
                 ),
-        ],
-        [
-            'storage group',
-            () =>
-                getStorageGroupCapacityInfoItems({
-                    Degraded: 0,
-                    Read: 0,
-                    Write: 0,
-                    Used: 0,
-                    Limit: 0,
-                    DiskSpace: EFlag.Green,
-                    CapacityAlert: ECapacityAlert.LIGHTYELLOW,
-                }),
         ],
     ])('renders a known %s capacity alert as plain text', (_surface, buildItems) => {
         const value = buildItems().find(({id}) => id === 'capacity-alert')?.value;
@@ -376,16 +364,16 @@ describe('DiskCapacityInfo builders', () => {
         });
 
         expect(items.map(({id}) => id)).toEqual([
+            'capacity-alert',
             'vdisk-slot-usage',
             'vdisk-raw-usage',
-            'capacity-alert',
         ]);
-        expect(items.find(({id}) => id === 'vdisk-slot-usage')?.value).toEqual(
+        expect(items.find(({id}) => id === 'vdisk-slot-usage')?.value).toBe('82.25%');
+        expect(items.find(({id}) => id === 'capacity-alert')?.value).toEqual(
             expect.objectContaining({
-                type: Label,
+                type: DiskCapacityAlertLabel,
                 props: expect.objectContaining({
-                    children: '82.25%',
-                    theme: 'normal',
+                    value: 'FUTURE_ALERT',
                 }),
             }),
         );

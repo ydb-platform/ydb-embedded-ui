@@ -239,14 +239,22 @@ export function getPDiskCapacityItems(
 export function getStorageGroupCapacityInfoItems(
     data: PreparedStorageGroup | undefined,
 ): DiskCapacityInfoItem[] {
+    const capacityAlert = normalizeCapacityAlert(data?.CapacityAlert);
     return [
+        {
+            id: 'capacity-alert',
+            title: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
+            value: capacityAlert ? (
+                <DiskCapacityAlertLabel value={capacityAlert} />
+            ) : (
+                EMPTY_DATA_PLACEHOLDER
+            ),
+            note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+        },
         {
             id: 'vdisk-slot-usage',
             title: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
-            value: getAlertAwareUsageValue(
-                formatNormalizedMetricPercent(data?.MaxVDiskSlotUsage),
-                data?.CapacityAlert,
-            ),
+            value: formatNormalizedMetricPercent(data?.MaxVDiskSlotUsage),
             note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
         },
         {
@@ -254,12 +262,6 @@ export function getStorageGroupCapacityInfoItems(
             title: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage,
             value: formatNormalizedMetricPercent(data?.MaxVDiskRawUsage),
             note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
-        },
-        {
-            id: 'capacity-alert',
-            title: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
-            value: getCapacityAlertValue(data?.CapacityAlert),
-            note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
         },
     ];
 }

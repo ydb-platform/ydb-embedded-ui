@@ -1,3 +1,9 @@
+import {ClipboardButton, Flex} from '@gravity-ui/uikit';
+
+import type {StorageGroupBreadcrumbsOptions} from '../../store/reducers/header/types';
+import {StorageGroupStateLabel} from '../Storage/StorageGroupStateLabel';
+import {storageGroupPageKeyset} from '../StorageGroupPage/i18n';
+
 import {HeaderBreadcrumbs} from './HeaderBreadcrumbs';
 import {HeaderLeftControls} from './HeaderLeftControls';
 import {HeaderRightControls} from './HeaderRightControls';
@@ -66,7 +72,7 @@ export function Header() {
         return null;
     }
 
-    const leftControls =
+    let leftControls =
         database && isDatabasePage && isV2NavigationEnabled ? (
             <HeaderLeftControls
                 database={database}
@@ -74,6 +80,24 @@ export function Header() {
                 isDatabaseDataLoading={isDatabaseDataLoading}
             />
         ) : null;
+
+    if (page === 'storageGroup') {
+        const {groupId, state} = pageBreadcrumbsOptions as StorageGroupBreadcrumbsOptions;
+        leftControls = (
+            <Flex alignItems="center" gap={2} className={b('left-controls')}>
+                {groupId && (
+                    <ClipboardButton
+                        text={groupId}
+                        view="flat-secondary"
+                        size="s"
+                        aria-label={storageGroupPageKeyset('action_copy-group-id')}
+                        tooltipInitialText={storageGroupPageKeyset('action_copy-group-id')}
+                    />
+                )}
+                <StorageGroupStateLabel state={state} size="xs" />
+            </Flex>
+        );
+    }
 
     return (
         <header className={b()}>

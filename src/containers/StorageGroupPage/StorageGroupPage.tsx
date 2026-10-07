@@ -1,24 +1,27 @@
 import React from 'react';
 
+import {ArrowLeft} from '@gravity-ui/icons';
+import {Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
+import {useHistory} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 
-import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
+import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
-import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {StorageGroupInfo} from '../../components/StorageGroupInfo/StorageGroupInfo';
 import {useCapabilitiesLoaded} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {storageApi} from '../../store/reducers/storage/storage';
-import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
+import {StorageGroupStateLabel} from '../Storage/StorageGroupStateLabel';
 
 import {storageGroupPageKeyset} from './i18n';
 
@@ -28,14 +31,11 @@ const storageGroupPageCn = cn('ydb-storage-group-page');
 
 export function StorageGroupPage() {
     const dispatch = useTypedDispatch();
+    const history = useHistory();
     const database = useDatabaseFromQuery();
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     const [{groupId}] = useQueryParams({groupId: StringParam});
-
-    React.useEffect(() => {
-        dispatch(setHeaderBreadcrumbs('storageGroup', {groupId, database}));
-    }, [dispatch, groupId, database]);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const capabilitiesLoaded = useCapabilitiesLoaded();
@@ -49,7 +49,14 @@ export function StorageGroupPage() {
         },
     );
 
-    const storageGroupData = groupQuery.data?.groups?.[0];
+    const storageGroupData = groupQuery.currentData?.groups?.[0];
+    const state = storageGroupData?.State;
+
+    React.useEffect(() => {
+        dispatch(
+            setHeaderBreadcrumbs('storageGroup', {groupId: groupId ?? undefined, database, state}),
+        );
+    }, [dispatch, groupId, database, state]);
 
     const loading = groupQuery.isFetching && storageGroupData === undefined;
     const {appTitle} = useAppTitle();
@@ -72,25 +79,46 @@ export function StorageGroupPage() {
             return null;
         }
 
-        const items = [`${storageGroupPageKeyset('pool-name')}: ${storageGroupData?.PoolName}`];
+        const hasPreviousPage = history.length > 1;
 
         return (
-            <PageMetaWithAutorefresh
+            <Flex
                 className={storageGroupPageCn('meta')}
-                loading={loading}
-                items={items}
-            />
+                alignItems="center"
+                justifyContent={hasPreviousPage ? 'space-between' : 'flex-end'}
+                gap={2}
+            >
+                {hasPreviousPage && (
+                    <Button view="outlined" onClick={() => history.goBack()}>
+                        <Icon data={ArrowLeft} />
+                        {storageGroupPageKeyset('action_back')}
+                    </Button>
+                )}
+                <AutoRefreshControl />
+            </Flex>
         );
     };
 
     const renderPageTitle = () => {
         return (
-            <EntityPageTitle
-                className={storageGroupPageCn('title')}
-                entityName={storageGroupPageKeyset('storage-group')}
-                status={storageGroupData?.Overall || EFlag.Grey}
-                id={groupId}
-            />
+            <Flex className={storageGroupPageCn('title')} alignItems="center" gap={2} wrap="wrap">
+                <Text variant="header-1">{storageGroupPageKeyset('storage-group')}</Text>
+                <Flex alignItems="center" gap={1}>
+                    <Text variant="header-1" color="hint">
+                        {groupId || EMPTY_DATA_PLACEHOLDER}
+                    </Text>
+                    {groupId && (
+                        <ClipboardButton
+                            text={groupId}
+                            view="flat-secondary"
+                            size="s"
+                            aria-label={storageGroupPageKeyset('action_copy-group-id')}
+                            tooltipInitialText={storageGroupPageKeyset('action_copy-group-id')}
+                        />
+                    )}
+                </Flex>
+                <StorageGroupStateLabel state={state} />
+            </Flex>
         );
     };
 
@@ -132,10 +160,12 @@ export function StorageGroupPage() {
     return (
         <div className={storageGroupPageCn(null)} ref={containerRef}>
             {renderHelmet()}
-            {renderPageMeta()}
-            {renderPageTitle()}
-            {renderError()}
-            {renderInfo()}
+            <div className={storageGroupPageCn('summary')}>
+                {renderPageMeta()}
+                {renderPageTitle()}
+                {renderError()}
+                {renderInfo()}
+            </div>
             {renderStorage()}
         </div>
     );

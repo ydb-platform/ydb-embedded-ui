@@ -36,6 +36,7 @@ export interface TenantBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
 export interface StorageGroupBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
     groupId?: string;
     database?: string;
+    state?: string;
 }
 
 export interface NodeBreadcrumbsOptions extends TenantBreadcrumbsOptions {
@@ -76,7 +77,9 @@ export type PageBreadcrumbsOptions<T extends Page = undefined> = T extends 'home
           ? NodeBreadcrumbsOptions
           : T extends 'tablet'
             ? TabletBreadcrumbsOptions
-            : {};
+            : T extends 'storageGroup'
+              ? StorageGroupBreadcrumbsOptions
+              : {};
 
 export interface HeaderState {
     page?: Page;

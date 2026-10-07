@@ -1,5 +1,6 @@
 {
   "storage-group": "Storage Group",
   "storage": "Storage",
-  "pool-name": "Pool Name"
+  "action_back": "Back",
+  "action_copy-group-id": "Copy Storage Group ID"
 }
