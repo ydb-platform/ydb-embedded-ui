@@ -1363,13 +1363,15 @@ test.describe('Blob storage capacity metrics integration', () => {
         await page.goto(`/storageGroup?database=/local&groupId=${GROUP_ID}`);
 
         const groupInfo = page.locator('.ydb-storage-group-page__info');
-        for (const label of [
-            'VDisk Slot Usage',
-            'VDisk Raw Usage',
-            'Capacity Alert',
-            'Group Size In Units',
-        ]) {
+        for (const label of ['VDisk Slot Usage', 'VDisk Raw Usage', 'Capacity Alert']) {
             await expectDefinitionListRowPlaceholder(groupInfo, label);
         }
+        await expectDefinitionListRowValue(groupInfo, 'Group Size In Units', '1 (implicit)');
+        await expect(
+            page.getByRole('button', {name: 'Copy Storage Group ID from breadcrumb', exact: true}),
+        ).toBeVisible();
+        await expect(
+            page.getByRole('button', {name: 'Copy Storage Group ID from page title', exact: true}),
+        ).toBeVisible();
     });
 });

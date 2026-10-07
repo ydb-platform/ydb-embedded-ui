@@ -90,7 +90,7 @@ export function Header() {
                         text={groupId}
                         view="flat-secondary"
                         size="s"
-                        aria-label={storageGroupPageKeyset('action_copy-group-id')}
+                        aria-label={storageGroupPageKeyset('action_copy-group-id-from-breadcrumb')}
                         tooltipInitialText={storageGroupPageKeyset('action_copy-group-id')}
                     />
                 )}

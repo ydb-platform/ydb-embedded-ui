@@ -112,7 +112,7 @@ export function StorageGroupPage() {
                             text={groupId}
                             view="flat-secondary"
                             size="s"
-                            aria-label={storageGroupPageKeyset('action_copy-group-id')}
+                            aria-label={storageGroupPageKeyset('action_copy-group-id-from-title')}
                             tooltipInitialText={storageGroupPageKeyset('action_copy-group-id')}
                         />
                     )}

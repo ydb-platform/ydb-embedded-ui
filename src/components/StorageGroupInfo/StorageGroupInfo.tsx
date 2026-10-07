@@ -93,9 +93,7 @@ export function StorageGroupInfo({data, className}: StorageGroupInfoProps) {
     if (capacityMetricsEnabled) {
         capacityItems.push({
             name: diskCapacityInfoKeyset('field_group-size-in-units'),
-            content: isNonEmptyValue(GroupSizeInUnits)
-                ? formatCapacityUnitCount(GroupSizeInUnits)
-                : EMPTY_DATA_PLACEHOLDER,
+            content: formatCapacityUnitCount(GroupSizeInUnits),
             note: CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits,
         });
     }
