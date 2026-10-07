@@ -198,3 +198,87 @@ test('CMS application errors are visible even with HTTP 200', async ({page}) => 
         page.getByText('Cannot collect cluster state', {exact: false}).first(),
     ).toBeVisible();
 });
+
+test('tablet groups load on click, filter degraded groups and restore the mode', async ({
+    page,
+}, testInfo) => {
+    const snapshots: string[] = [];
+    const disks: string[] = [];
+    const tabletId = TABLETS[0].TabletId;
+    const healthy = {NodeId: 1, PDiskId: 1, DDiskSlotId: 1010};
+    const failed = {NodeId: 2, PDiskId: 1, DDiskSlotId: 1010};
+    await page.route('**/cms/api/json/ddisk/tablets?*', (route) =>
+        route.fulfill({
+            json: {
+                Status: {Code: 'OK'},
+                TotalCount: 1,
+                Tablets: [TABLETS[0]],
+            },
+        }),
+    );
+    await page.route('**/cms/api/json/ddisk/tablet?*', (route) => {
+        snapshots.push(new URL(route.request().url()).searchParams.get('tablet_id') || '');
+        return route.fulfill({
+            json: {
+                Status: 'OK',
+                TabletId: tabletId,
+                Revision: 1,
+                Groups: [
+                    {DirectBlockGroupId: 100, NumVChunksClaimed: 1, DDiskId: [healthy]},
+                    {DirectBlockGroupId: 101, NumVChunksClaimed: 2, DDiskId: [failed]},
+                ],
+            },
+        });
+    });
+    await page.route('**/cms/api/json/ddisk/disks?*', (route) => {
+        disks.push(new URL(route.request().url()).searchParams.get('filter_tablet_id') || '');
+        return route.fulfill({
+            json: {
+                Status: {Code: 'OK'},
+                TotalCount: 2,
+                Disks: [
+                    {DiskId: healthy, Available: true},
+                    {DiskId: failed, Available: false},
+                ],
+            },
+        });
+    });
+    await new PageModel(page, 'cluster/storage', {type: 'nbs'}).goto();
+    const button = page.getByRole('button', {name: 'Show groups for tablet ' + tabletId});
+    await expect(button).toBeVisible();
+    expect(snapshots).toEqual([]);
+    expect(disks).toEqual([]);
+    await button.click();
+    await expect(page.getByText('100', {exact: true})).toBeVisible();
+    await expect(page.getByText('101', {exact: true})).toBeVisible();
+    expect(snapshots.every((id) => id === tabletId)).toBe(true);
+    expect(disks.every((id) => id === tabletId)).toBe(true);
+    await page.getByLabel('Show groups', {exact: true}).click();
+    await page.getByRole('option', {name: 'Degraded groups', exact: true}).click();
+    await expect(page.getByText('100', {exact: true})).not.toBeVisible();
+    await expect(page.getByText('101', {exact: true})).toBeVisible();
+    await expect(page).toHaveURL(/nbsGroupsMode=degraded/);
+    await page.reload();
+    await expect(page.getByLabel('Show groups', {exact: true})).toContainText('Degraded groups');
+    await expect(page.getByText('101', {exact: true})).toBeVisible();
+    await expect(page.getByText('100', {exact: true})).not.toBeVisible();
+    await expect
+        .poll(() =>
+            page.getByText('101', {exact: true}).evaluate((cell) => {
+                const head = cell.closest('table')?.querySelector('thead');
+                return Boolean(
+                    head && cell.getBoundingClientRect().top >= head.getBoundingClientRect().bottom,
+                );
+            }),
+        )
+        .toBe(true);
+    await expect(page.getByRole('button', {name: 'DDisk 2:1:1010', exact: true})).toHaveClass(
+        /ydb-ddisk_failed/,
+    );
+    await page.screenshot({path: testInfo.outputPath('tablet-degraded-groups.png')});
+    await page.getByLabel('Show groups', {exact: true}).click();
+    await page.getByRole('option', {name: 'All groups', exact: true}).click();
+    await expect(page.getByText('100', {exact: true})).toBeVisible();
+    await page.locator('button[aria-label="Close"]').click();
+    await expect(page.getByText('100', {exact: true})).not.toBeVisible();
+});

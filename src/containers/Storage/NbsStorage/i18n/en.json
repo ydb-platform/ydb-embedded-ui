@@ -25,5 +25,14 @@
   "disk-id": "Disk ID",
   "pool": "Pool",
   "buffer": "Persistent Buffer",
-  "open-buffer": "Open Persistent Buffer"
+  "open-buffer": "Open Persistent Buffer",
+  "show-groups": "Show groups for tablet {{tabletId}}",
+  "tablet-groups": "Groups of tablet {{tabletId}}",
+  "group-id": "Group ID",
+  "vchunks": "vChunks",
+  "show-group-mode": "Show groups",
+  "all-groups": "All groups",
+  "degraded-groups": "Degraded groups",
+  "empty-groups": "No groups",
+  "empty-degraded-groups": "No degraded groups"
 }

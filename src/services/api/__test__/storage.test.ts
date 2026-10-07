@@ -51,3 +51,17 @@ test('CMS errors in successful HTTP responses must not appear as empty tables', 
     const {api} = createApi({Status: {Code: 'ERROR_TEMP', Reason: 'Cannot collect cluster state'}});
     await expect(api.getNbsStorage('tablets', {})).rejects.toThrow('Cannot collect cluster state');
 });
+
+test('tablet snapshot preserves backend prefix, uint64 ID and cancellation', async () => {
+    const snapshot = {Status: 'OK', TabletId: '18446744073709551615', Groups: []};
+    const {api, requests} = createApi(snapshot);
+    const signal = new AbortController().signal;
+    expect(await api.getNbsTablet(snapshot.TabletId, {signal})).toEqual(snapshot);
+    expect(requests[0].url).toBe('/backend/node/8/cms/api/json/ddisk/tablet');
+    expect(requests[0].params).toEqual({tablet_id: snapshot.TabletId});
+    expect(requests[0].signal).toBe(signal);
+});
+test('tablet snapshot errors remain visible', async () => {
+    const {api} = createApi({Status: 'NOT_FOUND', ErrorReason: 'DDisk snapshot is not available'});
+    await expect(api.getNbsTablet('41')).rejects.toThrow('DDisk snapshot is not available');
+});

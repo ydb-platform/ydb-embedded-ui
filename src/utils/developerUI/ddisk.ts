@@ -9,10 +9,12 @@ export function getDDiskDeveloperUIHrefs(data: TDDiskStateInfo) {
         formPresent: '1',
         autoRefresh: '1',
         describeFreeSpace: '1',
-        showTablets: '1',
         refreshRate: '1',
         pb: data.PersistentBufferId ?? '',
     });
+    if (data.PersistentBufferId) {
+        query.set(`tabletOpen.${data.PersistentBufferId}`, '1');
+    }
     return {
         ddisk: base && data.DDiskPath ? `${base}/${data.DDiskPath}` : undefined,
         buffer:

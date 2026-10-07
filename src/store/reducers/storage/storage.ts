@@ -3,11 +3,27 @@ import type {NodesRequestParams} from '../../../types/api/nodes';
 import type {GroupsRequestParams} from '../../../types/api/storage';
 import {api} from '../api';
 
+import {getTabletGroups} from './getNbsTabletGroups';
 import {requestStorageData} from './requestStorageData';
 import {prepareStorageNodesResponse} from './utils';
 
 export const storageApi = api.injectEndpoints({
     endpoints: (builder) => ({
+        getNbsTabletDetails: builder.query({
+            queryFn: async (
+                {
+                    tabletId,
+                }: {tabletId: string; backend?: string; clusterName?: string; environment?: string},
+                {signal},
+            ) => {
+                try {
+                    return {data: await getTabletGroups(tabletId, signal)};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All', 'StorageData'],
+        }),
         getNbsTabletGroups: builder.query({
             queryFn: async (params: NbsListParams, {signal}) => {
                 try {

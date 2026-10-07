@@ -34,7 +34,8 @@ test('links to the selected DDisk and Persistent Buffer instead of a VDisk', () 
     expect(buffer.pathname).toBe('/node/3/actors/persistent_buffer');
     expect(buffer.searchParams.get('pb')).toBe('[3:5893148750:1010]');
     expect(buffer.searchParams.get('describeFreeSpace')).toBe('1');
-    expect(buffer.searchParams.get('showTablets')).toBe('1');
+    expect(buffer.searchParams.get('showTablets')).toBeNull();
+    expect(buffer.searchParams.get('tabletOpen.[3:5893148750:1010]')).toBe('1');
     expect(screen.getByText('pool-a')).toBeInTheDocument();
     expect(screen.getByText('25.0%')).toBeInTheDocument();
     expect(screen.getByText('50.0%')).toBeInTheDocument();

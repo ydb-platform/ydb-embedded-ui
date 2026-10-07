@@ -43,3 +43,18 @@ export interface NbsListResponse {
     Disks?: NbsDisk[];
     Groups?: {Name: string; Count: number}[];
 }
+
+export interface NbsDirectBlockGroup {
+    DirectBlockGroupId?: string | number;
+    NumVChunksClaimed?: number;
+    DDiskId?: NbsDisk['DiskId'][];
+    PersistentBufferDDiskId?: NbsDisk['DiskId'][];
+}
+
+export interface NbsTabletResponse {
+    Status?: string;
+    ErrorReason?: string;
+    TabletId?: string;
+    Revision?: string | number;
+    Groups?: NbsDirectBlockGroup[];
+}

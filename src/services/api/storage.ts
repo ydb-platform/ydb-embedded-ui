@@ -1,4 +1,4 @@
-import type {NbsListParams, NbsListResponse} from '../../types/api/nbs';
+import type {NbsListParams, NbsListResponse, NbsTabletResponse} from '../../types/api/nbs';
 import type {GroupsRequestParams, StorageGroupsResponse} from '../../types/api/storage';
 
 import type {AxiosOptions} from './base';
@@ -17,6 +17,18 @@ export class StorageAPI extends BaseYdbAPI {
         );
         if (result.Status?.Code !== 'OK') {
             throw new Error(result.Status?.Reason || result.Status?.Code || 'Invalid CMS response');
+        }
+        return result;
+    }
+
+    async getNbsTablet(tabletId: string, {concurrentId, signal}: AxiosOptions = {}) {
+        const result = await this.get<NbsTabletResponse>(
+            this.getPath('/cms/api/json/ddisk/tablet'),
+            {tablet_id: tabletId},
+            {concurrentId, requestConfig: {signal}},
+        );
+        if (result.Status !== 'OK') {
+            throw new Error(result.ErrorReason || result.Status || 'Invalid CMS response');
         }
         return result;
     }

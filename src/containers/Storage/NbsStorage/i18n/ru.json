@@ -25,5 +25,14 @@
   "disk-id": "Disk ID",
   "pool": "Пул",
   "buffer": "Persistent Buffer",
-  "open-buffer": "Открыть Persistent Buffer"
+  "open-buffer": "Открыть Persistent Buffer",
+  "show-groups": "Показать группы таблетки {{tabletId}}",
+  "tablet-groups": "Группы таблетки {{tabletId}}",
+  "group-id": "ID группы",
+  "vchunks": "vChunks",
+  "show-group-mode": "Показать группы",
+  "all-groups": "Все группы",
+  "degraded-groups": "Деградировавшие группы",
+  "empty-groups": "Нет групп",
+  "empty-degraded-groups": "Нет деградировавших групп"
 }

@@ -23,6 +23,7 @@ export const PAGINATED_TABLE_IDS = {
     STORAGE_GROUPS: 'storage-groups',
     TOPIC_DATA: 'topic-data',
     NODE_PEERS: 'node-peers',
+    NBS_TABLET_GROUPS: 'nbs-tablet-groups',
     NBS_TABLETS: 'nbs-tablets',
     NBS_DDISKS: 'nbs-ddisks',
 } as const;
@@ -35,6 +36,7 @@ export const PAGINATED_TABLE_COLUMN_IDS_IN_REQUEST: Record<PaginatedTableId, boo
     [PAGINATED_TABLE_IDS.STORAGE_GROUPS]: true,
     [PAGINATED_TABLE_IDS.TOPIC_DATA]: true,
     [PAGINATED_TABLE_IDS.NODE_PEERS]: false,
+    [PAGINATED_TABLE_IDS.NBS_TABLET_GROUPS]: false,
     [PAGINATED_TABLE_IDS.NBS_TABLETS]: false,
     [PAGINATED_TABLE_IDS.NBS_DDISKS]: false,
 };

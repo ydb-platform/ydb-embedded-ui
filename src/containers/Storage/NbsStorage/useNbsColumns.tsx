@@ -1,4 +1,4 @@
-import {Link} from '@gravity-ui/uikit';
+import {Button, Link} from '@gravity-ui/uikit';
 
 import type {Column} from '../../../components/PaginatedTable';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
@@ -13,7 +13,7 @@ import {formatUsage} from './getData';
 import type {NbsRow} from './getData';
 import i18n from './i18n';
 
-export function useNbsColumns(disks: boolean) {
+export function useNbsColumns(disks: boolean, onShowGroups: (tabletId: string) => void) {
     const hasDeveloperUi = useHasDeveloperUi();
     const usage = (value?: number) =>
         formatUsage(value) === undefined ? (
@@ -116,7 +116,15 @@ export function useNbsColumns(disks: boolean) {
                   260,
               ),
               column('groups', i18n('groups'), ({row}) =>
-                  'TabletId' in row ? (row.GroupsCount ?? EMPTY_DATA_PLACEHOLDER) : null,
+                  'TabletId' in row ? (
+                      <Button
+                          view="flat"
+                          aria-label={i18n('show-groups', {tabletId: row.TabletId})}
+                          onClick={() => onShowGroups(row.TabletId)}
+                      >
+                          {row.GroupsCount ?? EMPTY_DATA_PLACEHOLDER}
+                      </Button>
+                  ) : null,
               ),
               column(
                   'usage',
