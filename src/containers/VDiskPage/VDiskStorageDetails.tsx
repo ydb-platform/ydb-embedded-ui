@@ -1,195 +1,82 @@
-import {Button, Divider, Flex, Text} from '@gravity-ui/uikit';
+import {Text} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
-import {ClipboardButton} from '../../components/ClipboardButton/ClipboardButton';
+import {InternalLinkButton} from '../../components/InternalLinkButton';
+import {VDiskCopyableValue} from '../../components/VDiskInfo/VDiskCopyableValue';
+import {getVDiskLocationItems} from '../../components/VDiskInfo/getVDiskDetails';
 import {getPDiskPagePath} from '../../routes';
 import type {VDiskData} from '../../store/reducers/vdisk/types';
 import {cn} from '../../utils/cn';
-import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {
-    formatMetricBytes,
-    formatMetricPercent,
-    getMetricBytesCommonSize,
-} from '../../utils/storageMetrics';
 
 import {vDiskPageKeyset} from './i18n';
 
 import './VDiskStorageDetails.scss';
 
 const b = cn('ydb-vdisk-storage-details');
+const LOCATION_IDS = ['datacenter', 'rack', 'fqdn', 'pdisk-path'];
 
 interface VDiskStorageDetailsProps {
     className?: string;
     data?: VDiskData;
 }
 
-interface MetricItemProps {
-    title: string;
-    value: string;
-}
-
-interface CopyableDetailItemProps {
-    title: string;
-    value?: string | number;
-}
-
-interface DetailItemProps {
-    title: string;
-    value?: string | number;
-}
-
-interface TruncatedDetailValueProps {
-    value?: string | number;
-}
-
-function MetricItem({title, value}: MetricItemProps) {
+function DetailItem({item}: {item: DiskDetailItem}) {
+    const copyText = item.copyText === undefined ? undefined : String(item.copyText);
     return (
-        <div className={b('metric')}>
-            <Text variant="subheader-2" className={b('value')}>
-                {value}
-            </Text>
-            <Text color="secondary" className={b('label')}>
-                {title}
-            </Text>
-        </div>
-    );
-}
-
-function DetailItem({title, value}: DetailItemProps) {
-    return (
-        <div className={b('detail')}>
-            <TruncatedDetailValue value={value} />
-            <Text color="secondary" className={b('label')}>
-                {title}
-            </Text>
-        </div>
-    );
-}
-
-function TruncatedDetailValue({value}: TruncatedDetailValueProps) {
-    const normalizedValue =
-        value === undefined || value === null || value === '' ? undefined : String(value);
-    const displayValue = normalizedValue ?? EMPTY_DATA_PLACEHOLDER;
-
-    return (
-        <CellWithPopover
-            content={normalizedValue}
-            disabled={!normalizedValue}
-            placement={['top', 'bottom']}
-            fullWidth
-            wrapperClassName={b('value-popover')}
-            className={b('value-popover-content')}
-        >
-            <Text variant="subheader-2" className={b('value')}>
-                {displayValue}
-            </Text>
-        </CellWithPopover>
-    );
-}
-
-function CopyableDetailItem({title, value}: CopyableDetailItemProps) {
-    const normalizedValue =
-        value === undefined || value === null || value === '' ? undefined : String(value);
-    const displayValue = normalizedValue ?? EMPTY_DATA_PLACEHOLDER;
-
-    return (
-        <div className={b('detail')}>
-            <Flex alignItems="center" gap="1" className={b('value-row', {copyable: true})}>
+        <div className={b('detail')} data-qa={`vdisk-location-${item.id}`}>
+            <Text color="secondary">{item.name}</Text>
+            <VDiskCopyableValue copyText={copyText} fieldName={item.name}>
                 <CellWithPopover
-                    content={normalizedValue}
-                    disabled={!normalizedValue}
+                    content={copyText}
+                    disabled={!copyText}
                     placement={['top', 'bottom']}
                     fullWidth
-                    wrapperClassName={b('value-popover', {copyable: true})}
-                    className={b('value-popover-content', {copyable: true})}
+                    wrapperClassName={b('value-popover')}
+                    className={b('value-popover-content', {
+                        'with-left-trim': item.id === 'pdisk-path',
+                    })}
                 >
-                    <Text variant="subheader-2" className={b('value')}>
-                        {displayValue}
-                    </Text>
+                    <span tabIndex={copyText ? 0 : undefined}>{item.content}</span>
                 </CellWithPopover>
-                <ClipboardButton
-                    copyText={normalizedValue}
-                    withLabel={false}
-                    view="flat-secondary"
-                    size="s"
-                />
-            </Flex>
-            <Text color="secondary" className={b('label')}>
-                {title}
-            </Text>
+            </VDiskCopyableValue>
         </div>
     );
 }
 
-export function VDiskStorageDetails({className, data}: VDiskStorageDetailsProps) {
+export function VDiskStorageDetails({className, data = {}}: VDiskStorageDetailsProps) {
     const isViewerUser = useIsViewerUser();
-
-    const used = Number(data?.AllocatedSize);
-    const total = Number(data?.SizeLimit);
-    const usage = Number(data?.AllocatedPercent);
-    const free = Number(data?.FreeSize);
-    const metricsSize = getMetricBytesCommonSize([used, total, free]);
-
-    const {NodeDC, NodeRack, NodeHost, NodeId, PDiskId} = data || {};
-
     const pDiskPath =
-        isViewerUser && NodeId !== undefined && PDiskId !== undefined
-            ? getPDiskPagePath(PDiskId, NodeId, undefined, {withBasename: true})
+        isViewerUser && !isNil(data.NodeId) && !isNil(data.PDiskId)
+            ? getPDiskPagePath(data.PDiskId, data.NodeId)
             : undefined;
+    const items = getVDiskLocationItems(data, {
+        Host: data.NodeHost,
+        Rack: data.NodeRack,
+        DC: data.NodeDC,
+    });
 
     return (
-        <div className={b(null, className)}>
-            <Flex alignItems="center" gap="1" className={b('title')}>
-                <Text variant="subheader-2">{vDiskPageKeyset('title_storage-details')}</Text>
-            </Flex>
-            <div className={b('cards')}>
-                <div className={b('card', {metrics: true})}>
-                    <MetricItem
-                        title={vDiskPageKeyset('field_storage-details-used')}
-                        value={formatMetricBytes(used, metricsSize)}
-                    />
-                    <MetricItem
-                        title={vDiskPageKeyset('field_storage-details-total')}
-                        value={formatMetricBytes(total, metricsSize)}
-                    />
-                    <MetricItem
-                        title={vDiskPageKeyset('field_storage-details-free')}
-                        value={formatMetricBytes(free, metricsSize)}
-                    />
-                    <Divider orientation="vertical" />
-                    <MetricItem
-                        title={vDiskPageKeyset('field_storage-details-usage')}
-                        value={formatMetricPercent(usage)}
-                    />
-                </div>
-                <div className={b('card', {details: true})}>
-                    <div className={b('details')}>
-                        <DetailItem title={vDiskPageKeyset('field_datacenter')} value={NodeDC} />
-                        <CopyableDetailItem
-                            title={vDiskPageKeyset('field_rack')}
-                            value={NodeRack}
-                        />
-                        <CopyableDetailItem
-                            title={vDiskPageKeyset('field_node')}
-                            value={NodeHost}
-                        />
-                        <CopyableDetailItem
-                            title={vDiskPageKeyset('field_pdisk-id')}
-                            value={PDiskId}
-                        />
-                    </div>
-                    {pDiskPath ? (
-                        <Button
-                            href={pDiskPath}
-                            view="action"
-                            size="m"
-                            className={BRAND_BUTTON_CLASS}
-                        >
-                            {vDiskPageKeyset('action_go-to-pdisk')}
-                        </Button>
-                    ) : null}
-                </div>
+        <div className={b(null, className)} data-qa="vdisk-location">
+            <div className={b('card')}>
+                {LOCATION_IDS.map((id) => {
+                    const item = items.find((entry) => entry.id === id);
+                    return item ? <DetailItem key={id} item={item} /> : null;
+                })}
+            </div>
+            <div className={b('card', {ids: true})}>
+                {items
+                    .filter(({id}) => !LOCATION_IDS.includes(id))
+                    .map((item) => (
+                        <DetailItem key={item.id} item={item} />
+                    ))}
+                {pDiskPath && (
+                    <InternalLinkButton href={pDiskPath} size="s" view="normal">
+                        {vDiskPageKeyset('action_go-to-pdisk')}
+                    </InternalLinkButton>
+                )}
             </div>
         </div>
     );

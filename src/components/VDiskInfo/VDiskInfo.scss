@@ -1,7 +1,23 @@
 .ydb-vdisk-info {
-    &__info {
-        flex: unset;
+    --g-definition-list-item-gap: var(--g-spacing-3);
 
-        width: 500px;
+    &__metrics {
+        width: 100%;
+    }
+
+    &__column {
+        flex: 1 1 400px;
+
+        min-width: 0;
+        max-width: 500px;
+    }
+
+    &__identity {
+        width: 100%;
+        max-width: 500px;
+    }
+
+    &__disk {
+        width: 55px;
     }
 }

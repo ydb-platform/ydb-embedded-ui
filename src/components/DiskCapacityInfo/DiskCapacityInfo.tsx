@@ -1,10 +1,7 @@
 import React from 'react';
 
-import {Label} from '@gravity-ui/uikit';
-
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
-import {isCapacityAlert} from '../../types/api/enums';
-import {getCapacityAlertTheme, normalizeCapacityAlert} from '../../utils/capacityAlerts';
+import {normalizeCapacityAlert} from '../../utils/capacityAlerts';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import type {PreparedPDisk, PreparedVDisk} from '../../utils/disks/types';
@@ -38,66 +35,6 @@ export interface DiskCapacityInfoItem {
 
 function getCapacityAlertValue(value: unknown): React.ReactNode {
     return normalizeCapacityAlert(value) ?? EMPTY_DATA_PLACEHOLDER;
-}
-
-function getAlertAwareUsageValue(value: string, capacityAlertValue: unknown): React.ReactNode {
-    if (value === EMPTY_DATA_PLACEHOLDER) {
-        return value;
-    }
-
-    const capacityAlert = normalizeCapacityAlert(capacityAlertValue);
-    const theme = isCapacityAlert(capacityAlert) ? getCapacityAlertTheme(capacityAlert) : 'normal';
-
-    return <Label theme={theme}>{value}</Label>;
-}
-
-export function getVDiskCapacityInfoItems(
-    data: PreparedVDisk | undefined,
-    {withRawUsage}: {withRawUsage: boolean},
-): DiskCapacityInfoItem[] {
-    const sizeData = data?.WhiteboardSize ?? data?.DisplaySize ?? data;
-    const items: DiskCapacityInfoItem[] = [
-        {
-            id: 'size',
-            title: i18n('field_size'),
-            value: formatStorageMetricPair(sizeData?.AllocatedSize, sizeData?.SizeLimit),
-        },
-        {
-            id: 'vdisk-slot-usage',
-            title: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
-            value: getAlertAwareUsageValue(
-                formatMetricPercent(data?.VDiskSlotUsage),
-                data?.CapacityAlert,
-            ),
-            note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
-        },
-    ];
-
-    if (withRawUsage) {
-        items.push({
-            id: 'vdisk-raw-usage',
-            title: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage,
-            value: formatMetricPercent(data?.VDiskRawUsage),
-            note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
-        });
-    }
-
-    items.push(
-        {
-            id: 'group-size-in-units',
-            title: i18n('field_group-size-in-units'),
-            value: formatCapacityUnitCount(data?.GroupSizeInUnits),
-            note: CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits,
-        },
-        {
-            id: 'capacity-alert',
-            title: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
-            value: getCapacityAlertValue(data?.CapacityAlert),
-            note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
-        },
-    );
-
-    return items;
 }
 
 export function getPDiskCapacityInfoItems(

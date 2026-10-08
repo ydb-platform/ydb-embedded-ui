@@ -2,6 +2,7 @@ import {HeaderBreadcrumbs} from './HeaderBreadcrumbs';
 import {HeaderLeftControls} from './HeaderLeftControls';
 import {HeaderRightControls} from './HeaderRightControls';
 import {StorageGroupLeftControls} from './StorageGroupLeftControls';
+import {VDiskLeftControls} from './VDiskLeftControls';
 import {b} from './constants';
 import {useHeaderBreadcrumbs} from './hooks/useHeaderBreadcrumbs';
 import {useHeaderData} from './hooks/useHeaderData';
@@ -70,6 +71,9 @@ export function Header() {
     const renderLeftControls = () => {
         if (page === 'storageGroup') {
             return <StorageGroupLeftControls />;
+        }
+        if (page === 'vDisk') {
+            return <VDiskLeftControls />;
         }
         return database && isDatabasePage && isV2NavigationEnabled ? (
             <HeaderLeftControls
