@@ -1,11 +1,14 @@
 import React from 'react';
 
-import {Flex, Icon, Label, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
+import {ArrowLeft, Wrench} from '@gravity-ui/icons';
+import {Button, Flex, Icon, Tab, TabList, TabProvider, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 import {Helmet} from 'react-helmet-async';
+import {useHistory} from 'react-router-dom';
 
-import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
+import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
+import {DiskTypeLabel} from '../../components/DiskStatus/DiskStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {
     EvictVDiskButton,
@@ -13,18 +16,24 @@ import {
 } from '../../components/EvictVDiskButton/EvictVDiskButton';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink/InternalLink';
-import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
+import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
+import {VDiskCopyableValue} from '../../components/VDiskInfo/VDiskCopyableValue';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
+import {vDiskInfoKeyset} from '../../components/VDiskInfo/i18n';
+import {
+    VDiskDonorLabel,
+    VDiskReplicationStatus,
+    VDiskStateLabel,
+} from '../../components/VDiskStatus';
 import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
 import {useNewStorageViewEnabled} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {cn} from '../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
-import {VDISK_LABEL_CONFIG} from '../../utils/disks/constants';
-import {formatPDiskType} from '../../utils/disks/getPDiskType';
-import {getDataSeverityColor} from '../../utils/disks/helpers';
+import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
@@ -40,12 +49,15 @@ const vDiskPageCn = cn('ydb-vdisk-page');
 
 export function VDiskPage() {
     const dispatch = useTypedDispatch();
+    const history = useHistory();
+    const showBackButton = history.length > 1;
     const getVDiskPagePath = useVDiskPagePath();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     const {nodeId, vDiskId: vDiskIdParam, database, vDiskTab, vDiskTabs} = useVDiskQueryParams();
     const newStorageViewEnabled = useNewStorageViewEnabled();
+    const hasDeveloperUi = useHasDeveloperUi();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -77,17 +89,7 @@ export function VDiskPage() {
     }, [dispatch, database, vDiskData?.VDiskId?.GroupID, vDiskData?.StringifiedId]);
 
     const loading = isFetching && vDiskData === undefined;
-    const {
-        NodeHost,
-        NodeId,
-        NodeType,
-        NodeDC,
-        PDiskId,
-        PDiskType,
-        Severity,
-        VDiskId,
-        StringifiedId,
-    } = vDiskData || {};
+    const {NodeHost, NodeId, PDiskId, PDiskType, VDiskId, StringifiedId} = vDiskData || {};
 
     const resolvedVDiskId = VDiskId || (!loading && parseVdiskId(vDiskIdParam)) || undefined;
     const {GroupID} = resolvedVDiskId || {};
@@ -115,52 +117,63 @@ export function VDiskPage() {
     };
 
     const renderPageMeta = () => {
-        const hostItem = NodeHost ? `${vDiskPageKeyset('fqdn')}: ${NodeHost}` : undefined;
-        const nodeIdItem = NodeId ? `${vDiskPageKeyset('node')}: ${NodeId}` : undefined;
-        const pDiskIdItem = NodeId ? `${vDiskPageKeyset('pdisk')}: ${PDiskId}` : undefined;
-
         return (
-            <PageMetaWithAutorefresh
+            <Flex
                 className={vDiskPageCn('meta')}
-                loading={loading}
-                items={[
-                    hostItem,
-                    nodeIdItem,
-                    NodeType,
-                    NodeDC,
-                    pDiskIdItem,
-                    formatPDiskType(PDiskType),
-                ]}
-            />
+                alignItems="center"
+                justifyContent={showBackButton ? 'space-between' : 'flex-end'}
+                gap={1}
+            >
+                {showBackButton && (
+                    <Button size="m" view="outlined" onClick={() => history.goBack()}>
+                        <Icon data={ArrowLeft} size={16} />
+                        {vDiskPageKeyset('action_back')}
+                    </Button>
+                )}
+                <AutoRefreshControl />
+            </Flex>
         );
     };
 
     const renderTitleMeta = () => {
-        if (!vDiskData?.DonorMode) {
-            return null;
-        }
-        const donorLabelConfig = VDISK_LABEL_CONFIG.donor;
         return (
-            <Label
-                theme={donorLabelConfig.theme}
-                icon={donorLabelConfig.icon ? <Icon data={donorLabelConfig.icon} /> : undefined}
-                size="m"
-            >
-                {vDiskPageKeyset('label_donor')}
-            </Label>
+            <Flex gap={2} wrap="wrap" alignItems="center">
+                <VDiskStateLabel state={vDiskData?.VDiskState} size="s" />
+                {vDiskData?.DonorMode ? (
+                    <VDiskDonorLabel donorMode size="s" />
+                ) : (
+                    <VDiskReplicationStatus data={vDiskData || {}} size="s" />
+                )}
+                <DiskTypeLabel type={PDiskType} size="s" />
+            </Flex>
         );
     };
 
     const renderPageTitle = () => {
         return (
-            <Flex gap={2} alignItems="center">
-                <EntityPageTitle
-                    className={vDiskPageCn('title')}
-                    entityName={vDiskPageKeyset('vdisk')}
-                    status={getDataSeverityColor(Severity)}
-                    id={vDiskId}
-                    metaInfo={renderTitleMeta()}
-                />
+            <Flex direction="column" gap={1} className={vDiskPageCn('title')} qa="vdisk-header">
+                <Flex gap={3} alignItems="center" wrap="wrap">
+                    <VDiskCopyableValue copyText={vDiskId} fieldName={vDiskPageKeyset('vdisk')}>
+                        <Text as="h1" variant="header-1" className={vDiskPageCn('heading')}>
+                            {vDiskPageKeyset('vdisk')}{' '}
+                            <Text color="hint" variant="header-1">
+                                {vDiskId || EMPTY_DATA_PLACEHOLDER}
+                            </Text>
+                        </Text>
+                    </VDiskCopyableValue>
+                    {renderTitleMeta()}
+                </Flex>
+                <Flex gap={1} alignItems="center" className={vDiskPageCn('pool')}>
+                    <Text color="secondary">{vDiskInfoKeyset('pool-name')}:</Text>
+                    <VDiskCopyableValue
+                        copyText={vDiskData?.StoragePoolName}
+                        fieldName={vDiskInfoKeyset('pool-name')}
+                    >
+                        <Text color="secondary" className={vDiskPageCn('pool-name')}>
+                            {vDiskData?.StoragePoolName || EMPTY_DATA_PLACEHOLDER}
+                        </Text>
+                    </VDiskCopyableValue>
+                </Flex>
             </Flex>
         );
     };
@@ -178,22 +191,41 @@ export function VDiskPage() {
     }, [dispatch, vDiskId]);
 
     const renderControls = () => {
-        if (!isAllVdiskParamsDefined(resolvedVDiskId)) {
+        const canEvict = isAllVdiskParamsDefined(resolvedVDiskId) && !vDiskData?.DonorMode;
+        const developerUILink =
+            hasDeveloperUi && !isNil(NodeId) && !isNil(PDiskId) && !isNil(vDiskSlotId)
+                ? createVDiskDeveloperUILink({
+                      nodeId: NodeId,
+                      pDiskId: PDiskId,
+                      vDiskSlotId,
+                  })
+                : undefined;
+        if (!canEvict && !developerUILink) {
             return null;
         }
         return (
             <div className={vDiskPageCn('controls')} data-qa="vdisk-controls">
-                <EvictVDiskButton
-                    vDiskId={resolvedVDiskId}
-                    donorMode={vDiskData?.DonorMode}
-                    onSuccess={handleAfterEvictVDisk}
-                />
+                {canEvict && isAllVdiskParamsDefined(resolvedVDiskId) && (
+                    <EvictVDiskButton
+                        vDiskId={resolvedVDiskId}
+                        view="action"
+                        onSuccess={handleAfterEvictVDisk}
+                    />
+                )}
+                {developerUILink && (
+                    <LinkWithIcon
+                        title={vDiskPageKeyset('action_open-in-developer-ui')}
+                        url={developerUILink}
+                        icon={Wrench}
+                        hideEndIcon
+                    />
+                )}
             </div>
         );
     };
 
     const renderInfo = () => {
-        return <VDiskInfo data={vDiskData} className={vDiskPageCn('info')} wrap />;
+        return <VDiskInfo key={vDiskId} data={vDiskData} className={vDiskPageCn('info')} />;
     };
 
     const renderStorageDetails = () => {
@@ -284,8 +316,8 @@ export function VDiskPage() {
         return (
             <React.Fragment>
                 {error ? <ResponseError error={error} /> : null}
-                {renderInfo()}
                 {renderStorageDetails()}
+                {renderInfo()}
                 {renderTabs()}
                 {renderTabsContent()}
             </React.Fragment>

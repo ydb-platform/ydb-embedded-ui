@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ArrowsOppositeToDots} from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
+import type {ButtonProps} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {
@@ -10,6 +11,7 @@ import {
 } from '../../store/reducers/capabilities/hooks';
 import type {ModifyDiskResponse} from '../../types/api/modifyDisk';
 import type {TVDiskID} from '../../types/api/vdisk';
+import {BRAND_BUTTON_CLASS} from '../../utils/constants';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {ButtonWithConfirmDialog} from '../ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 
@@ -19,6 +21,7 @@ interface EvictVDiskButtonProps {
     vDiskId: Required<TVDiskID>;
     donorMode?: boolean;
     fullWidth?: boolean;
+    view?: ButtonProps['view'];
     onSuccess?: () => void;
 }
 
@@ -36,6 +39,7 @@ export const EvictVDiskButton = ({
     vDiskId,
     donorMode,
     fullWidth,
+    view = 'normal',
     onSuccess,
 }: EvictVDiskButtonProps) => {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
@@ -80,7 +84,8 @@ export const EvictVDiskButton = ({
             onConfirmAction={handleEvictVDisk}
             onConfirmActionSuccess={onSuccess}
             buttonDisabled={!isUserAllowedToMakeChanges || donorMode}
-            buttonView="normal"
+            buttonView={view}
+            buttonClassName={view === 'action' ? BRAND_BUTTON_CLASS : undefined}
             buttonWidth={fullWidth ? 'max' : undefined}
             dialogHeader={evictVDiskButtonKeyset('title_evict-dialog')}
             dialogText={evictVDiskButtonKeyset('confirm_evict')}

@@ -6,6 +6,7 @@ import {VDiskPage} from './VDiskPage';
 import {
     DONOR_VDISK_ID,
     GROUP_ID,
+    NODE_ID,
     VDISK_ID,
     VDISK_PAGE_PATH,
     setupVDiskPageMocks,
@@ -69,7 +70,14 @@ test('VDisk eviction keeps donor and permission restrictions', async ({page, bas
     const mock = await setupTabletDevUiMocks(page, options, baseURL);
     const donor = new VDiskPage(page, VDISK_PAGE_PATH.replace(VDISK_ID, DONOR_VDISK_ID));
     await donor.goto();
-    await expect(donor.evict).toBeDisabled();
+    await expect(page.getByTestId('vdisk-header').getByText('Donor', {exact: true})).toBeVisible();
+    await expect(
+        page.getByTestId('vdisk-page-info').getByRole('link', {
+            name: `VDisk ${VDISK_ID} on node ${NODE_ID}`,
+            exact: true,
+        }),
+    ).toBeVisible();
+    await expect(donor.evict).toHaveCount(0);
 
     options.monitoring = false;
     const vdisk = new VDiskPage(page);

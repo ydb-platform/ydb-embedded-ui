@@ -1,0 +1,16 @@
+.ydb-vdisk-copyable-value {
+    position: relative;
+
+    width: fit-content;
+    min-width: 0;
+    max-width: 100%;
+
+    &_with-copy {
+        padding-inline-end: var(--g-spacing-7);
+    }
+
+    &__button {
+        position: absolute;
+        inset-inline-end: 0;
+    }
+}

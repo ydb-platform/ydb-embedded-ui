@@ -2,8 +2,6 @@
   "label_storage-pool": "Storage Pool Name",
   "label_vdisk": "VDisk",
   "label_front-queues": "Front Queues",
-  "label_read": "Read Throughput",
-  "label_write": "Write Throughput",
   "action_open-in-developer-ui": "Open in Developer UI",
   "action_go-to-vdisk": "Go to VDisk",
   "label_compaction": "Compaction"

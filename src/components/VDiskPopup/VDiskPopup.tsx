@@ -9,7 +9,6 @@ import {api} from '../../store/reducers/api';
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import type {TVDiskID} from '../../types/api/vdisk';
 import type {NodeMetadata} from '../../types/store/nodesList';
-import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
 import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
@@ -19,7 +18,6 @@ import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedDispatch} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useNodeMetadata} from '../../utils/hooks/useNodeMetadata';
-import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 import {getVDiskCapacityItems} from '../DiskCapacityInfo/DiskCapacityInfo';
 import {
     DiskPopup,
@@ -32,7 +30,11 @@ import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/Evi
 import {InternalLinkButton} from '../InternalLinkButton';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {PDiskPopupContent} from '../PDiskPopup/PDiskPopup';
-import {getVDiskIdentityItems, getVDiskLocationItems} from '../VDiskInfo/getVDiskDetails';
+import {
+    getVDiskIdentityItems,
+    getVDiskLocationItems,
+    getVDiskThroughputItems,
+} from '../VDiskInfo/getVDiskDetails';
 import {vDiskInfoKeyset} from '../VDiskInfo/i18n';
 import {
     VDiskCompactionRankLabel,
@@ -103,24 +105,7 @@ function getRuntimeItems(
             ),
         },
     ];
-    for (const [name, value] of [
-        [vDiskPopupKeyset('label_read'), data.ReadThroughput],
-        [vDiskPopupKeyset('label_write'), data.WriteThroughput],
-    ] as const) {
-        const throughput = parseOptionalNonNegativeNumber(value);
-        items.push({
-            name,
-            content:
-                throughput === undefined
-                    ? EMPTY_DATA_PLACEHOLDER
-                    : formatBytes({
-                          value: throughput,
-                          size: 'mb',
-                          fixedDecimalPlaces: 2,
-                          withSpeedLabel: true,
-                      }),
-        });
-    }
+    items.push(...getVDiskThroughputItems(data));
     if (withUnreadableBlobs) {
         items.push({
             name: vDiskInfoKeyset('has-unreadable-blobs'),

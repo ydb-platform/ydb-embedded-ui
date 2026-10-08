@@ -99,22 +99,24 @@ export function DiskPopupText({
     );
 }
 
+export function DiskLocationValue({item}: {item: DiskDetailItem}) {
+    if (['fqdn', 'rack', 'datacenter'].includes(item.id)) {
+        return <DiskPopupText value={item.copyText} />;
+    }
+    if (item.id === 'pdisk-path' && typeof item.copyText === 'string') {
+        return <DiskPopupText value={item.copyText} withLeftTrim />;
+    }
+    return item.content;
+}
+
 export function DiskPopupLocation({items}: {items: DiskDetailItem[]}) {
     if (!items.length) {
         return null;
     }
-    const locationItems = items.map((item) => {
-        if (['fqdn', 'rack', 'datacenter'].includes(item.id)) {
-            return {...item, content: <DiskPopupText value={item.copyText} />};
-        }
-        if (item.id === 'pdisk-path' && typeof item.copyText === 'string') {
-            return {
-                ...item,
-                content: <DiskPopupText value={item.copyText} withLeftTrim />,
-            };
-        }
-        return item;
-    });
+    const locationItems = items.map((item) => ({
+        ...item,
+        content: <DiskLocationValue item={item} />,
+    }));
     return (
         <div className={b('location')}>
             <YDBDefinitionList items={locationItems} nameMaxWidth={100} />
