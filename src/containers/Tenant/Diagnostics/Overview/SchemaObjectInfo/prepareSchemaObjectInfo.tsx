@@ -40,6 +40,7 @@ interface PrepareSchemaObjectInfoItemsParams {
     itemsAfterType?: YDBDefinitionListItem[];
     additionalItems?: YDBDefinitionListItem[];
     showAdministrativeFields?: boolean;
+    createdContent?: YDBDefinitionListItem['content'];
 }
 
 function isPresent(value: string | number | undefined): value is string | number {
@@ -83,6 +84,7 @@ export function prepareSchemaObjectInfoItems({
     itemsAfterType = [],
     additionalItems = [],
     showAdministrativeFields = false,
+    createdContent,
 }: PrepareSchemaObjectInfoItemsParams): YDBDefinitionListItem[] {
     const self = data?.PathDescription?.Self;
     let pathId = self?.PathId;
@@ -116,21 +118,20 @@ export function prepareSchemaObjectInfoItems({
         );
     }
 
-    if (Number(createStep)) {
+    items.push({
+        name: schemaObjectInfoKeyset('field_full-path'),
+        content: isPresent(fullPath) ? fullPath : EMPTY_DATA_PLACEHOLDER,
+        copyText: isPresent(fullPath) ? fullPath : undefined,
+    });
+
+    if (createdContent || Number(createStep)) {
         items.push({
             name: tenantKeyset('field_created'),
-            content: formatDateTime(createStep),
+            content: createdContent || formatDateTime(createStep),
         });
     }
 
-    items.push(
-        {
-            name: schemaObjectInfoKeyset('field_full-path'),
-            content: isPresent(fullPath) ? fullPath : EMPTY_DATA_PLACEHOLDER,
-            copyText: isPresent(fullPath) ? fullPath : undefined,
-        },
-        ...additionalItems,
-    );
+    items.push(...additionalItems);
 
     return items.filter(({content}) => content !== undefined && content !== null && content !== '');
 }
