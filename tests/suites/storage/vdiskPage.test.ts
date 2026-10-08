@@ -1373,5 +1373,6 @@ test.describe('Blob storage capacity metrics integration', () => {
         await expect(
             page.getByRole('button', {name: 'Copy Storage Group ID from page title', exact: true}),
         ).toBeVisible();
+        await expect(page.getByRole('banner').getByText('Ok', {exact: true})).toBeVisible();
     });
 });

@@ -36,7 +36,6 @@ export interface TenantBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
 export interface StorageGroupBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
     groupId?: string;
     database?: string;
-    state?: string;
 }
 
 export interface NodeBreadcrumbsOptions extends TenantBreadcrumbsOptions {

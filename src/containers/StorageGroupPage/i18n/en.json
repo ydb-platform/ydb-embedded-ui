@@ -3,6 +3,5 @@
   "storage": "Storage",
   "action_back": "Back",
   "action_copy-group-id": "Copy Storage Group ID",
-  "action_copy-group-id-from-breadcrumb": "Copy Storage Group ID from breadcrumb",
   "action_copy-group-id-from-title": "Copy Storage Group ID from page title"
 }

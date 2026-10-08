@@ -1,12 +1,7 @@
-import {ClipboardButton, Flex} from '@gravity-ui/uikit';
-
-import type {StorageGroupBreadcrumbsOptions} from '../../store/reducers/header/types';
-import {StorageGroupStateLabel} from '../Storage/StorageGroupStateLabel';
-import {storageGroupPageKeyset} from '../StorageGroupPage/i18n';
-
 import {HeaderBreadcrumbs} from './HeaderBreadcrumbs';
 import {HeaderLeftControls} from './HeaderLeftControls';
 import {HeaderRightControls} from './HeaderRightControls';
+import {StorageGroupLeftControls} from './StorageGroupLeftControls';
 import {b} from './constants';
 import {useHeaderBreadcrumbs} from './hooks/useHeaderBreadcrumbs';
 import {useHeaderData} from './hooks/useHeaderData';
@@ -72,36 +67,25 @@ export function Header() {
         return null;
     }
 
-    let leftControls =
-        database && isDatabasePage && isV2NavigationEnabled ? (
+    const renderLeftControls = () => {
+        if (page === 'storageGroup') {
+            return <StorageGroupLeftControls />;
+        }
+        return database && isDatabasePage && isV2NavigationEnabled ? (
             <HeaderLeftControls
                 database={database}
                 databaseData={databaseData}
                 isDatabaseDataLoading={isDatabaseDataLoading}
             />
         ) : null;
-
-    if (page === 'storageGroup') {
-        const {groupId, state} = pageBreadcrumbsOptions as StorageGroupBreadcrumbsOptions;
-        leftControls = (
-            <Flex alignItems="center" gap={2} className={b('left-controls')}>
-                {groupId && (
-                    <ClipboardButton
-                        text={groupId}
-                        view="flat-secondary"
-                        size="s"
-                        aria-label={storageGroupPageKeyset('action_copy-group-id-from-breadcrumb')}
-                        tooltipInitialText={storageGroupPageKeyset('action_copy-group-id')}
-                    />
-                )}
-                <StorageGroupStateLabel state={state} size="xs" />
-            </Flex>
-        );
-    }
+    };
 
     return (
         <header className={b()}>
-            <HeaderBreadcrumbs breadcrumbItems={breadcrumbItems} endContent={leftControls} />
+            <HeaderBreadcrumbs
+                breadcrumbItems={breadcrumbItems}
+                endContent={renderLeftControls()}
+            />
 
             <HeaderRightControls
                 clusterName={clusterName}

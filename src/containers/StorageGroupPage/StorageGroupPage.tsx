@@ -53,10 +53,8 @@ export function StorageGroupPage() {
     const state = storageGroupData?.State;
 
     React.useEffect(() => {
-        dispatch(
-            setHeaderBreadcrumbs('storageGroup', {groupId: groupId ?? undefined, database, state}),
-        );
-    }, [dispatch, groupId, database, state]);
+        dispatch(setHeaderBreadcrumbs('storageGroup', {groupId: groupId ?? undefined, database}));
+    }, [dispatch, groupId, database]);
 
     const loading = groupQuery.isFetching && storageGroupData === undefined;
     const {appTitle} = useAppTitle();
