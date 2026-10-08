@@ -124,9 +124,15 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
         return clusterTabs.filter((el) => !skippedTabs.includes(el.id));
     }, [shouldShowEventsTab, shouldShowNetworkTable, showConfigs]);
 
-    const handleStatusClick = React.useCallback(() => {
-        handleShowHealthcheckChange(true);
-    }, [handleShowHealthcheckChange]);
+    const handleStatusClick = React.useCallback(
+        (event: React.MouseEvent<HTMLElement>) => {
+            if (uiFactory.healthcheck.disableModal) {
+                event.currentTarget.focus();
+            }
+            handleShowHealthcheckChange(true);
+        },
+        [handleShowHealthcheckChange],
+    );
 
     const getClusterTitle = () => {
         if (infoLoading) {

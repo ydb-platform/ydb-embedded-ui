@@ -192,6 +192,9 @@ export function TenantNameWrapper({
     const handleStatusClick = React.useCallback(
         (event: React.MouseEvent<HTMLElement>) => {
             event.stopPropagation();
+            if (uiFactory.healthcheck.disableModal) {
+                event.currentTarget.focus();
+            }
             onStatusClick?.(tenant, database);
         },
         [database, onStatusClick, tenant],

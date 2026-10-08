@@ -1,17 +1,15 @@
-import type {Page} from '@playwright/test';
+import type {Locator, Page} from '@playwright/test';
 import {expect, test} from '@playwright/test';
 
 import {clickDrawerVeil} from '../../utils/clickDrawerVeil';
 import {backend, database} from '../../utils/constants';
-import {mockHealthcheckWithIssue} from '../../utils/healthcheck';
+import {mockHealthcheckMeta, mockHealthcheckWithIssue} from '../../utils/healthcheck';
+import {mockBridgeHealthcheck, mockCapabilities, mockClusterWithBridgePiles} from '../bridge/mocks';
 import {TenantPage} from '../tenant/TenantPage';
 
 type Panel = 'Healthcheck' | 'companion';
 
-async function openFixture(
-    page: Page,
-    mode: Exclude<Window['e2eHealthcheckDrawerMode'], 'non-modal-page'> = 'non-modal',
-) {
+async function openFixture(page: Page, mode: 'default' | 'modal' | 'non-modal' = 'non-modal') {
     await page.addInitScript((value) => {
         window.e2eHealthcheckDrawerMode = value;
     }, mode);
@@ -271,6 +269,114 @@ test.describe('Real Healthcheck opener', () => {
                     }
                     await expect(drawer).toHaveCount(0);
                     await expect(page).toHaveURL((url) => !url.searchParams.has('showHealthcheck'));
+                    await expect(opener).toBeVisible();
+                    await expect(opener).toBeFocused();
+                });
+            }
+        }
+    }
+});
+
+test.describe('Additional Healthcheck openers', () => {
+    for (const surface of ['cluster', 'databases', 'clusters', 'bridge'] as const) {
+        for (const input of ['pointer', 'keyboard'] as const) {
+            for (const close of ['Close', 'Escape'] as const) {
+                test(`${surface} ${input} returns focus after ${close}`, async ({page}) => {
+                    const meta = surface === 'databases' || surface === 'clusters';
+                    await page.addInitScript((withMeta) => {
+                        window.e2eHealthcheckDrawerMode = withMeta
+                            ? 'non-modal-meta-page'
+                            : 'non-modal-page';
+                    }, meta);
+                    await mockHealthcheckWithIssue(page);
+                    if (meta) {
+                        await mockHealthcheckMeta(page);
+                    } else {
+                        await page.route('**/viewer/json/cluster?*', (route) =>
+                            route.fulfill({json: {Domain: database, Overall: 'Yellow'}}),
+                        );
+                    }
+                    if (surface === 'bridge') {
+                        await mockCapabilities(page, true);
+                        await mockClusterWithBridgePiles(page);
+                        await mockBridgeHealthcheck(page);
+                    }
+
+                    const pathname = surface === 'clusters' ? '/' : '/cluster/databases';
+                    const params = surface === 'databases' ? '?clusterName=healthcheck-test' : '';
+                    await page.goto(pathname + params, {waitUntil: 'commit'});
+                    await page
+                        .locator(surface === 'clusters' ? '.ydb-clusters' : '.ydb-cluster')
+                        .waitFor({state: 'visible', timeout: 30000});
+
+                    let opener: Locator;
+                    if (surface === 'bridge') {
+                        opener = page.getByRole('button', {
+                            name: 'Health status for pile all-group-statuses-pile: Caution',
+                            exact: true,
+                        });
+                    } else if (surface === 'cluster') {
+                        opener = page
+                            .locator('.ydb-cluster__title')
+                            .getByRole('button', {name: 'Warning', exact: true});
+                    } else {
+                        const rowName =
+                            surface === 'databases' ? 'local' : 'Healthcheck test cluster';
+                        opener = page
+                            .getByRole('row')
+                            .filter({has: page.getByRole('link', {name: rowName, exact: true})})
+                            .getByRole('button', {name: 'Warning', exact: true});
+                    }
+                    await expect(opener).toBeVisible();
+                    if (input === 'pointer') {
+                        const previousFocus = page.getByRole('textbox').first();
+                        await previousFocus.focus();
+                        await expect(previousFocus).toBeFocused();
+                        await opener.click();
+                    } else {
+                        await opener.focus();
+                        await opener.press('Enter');
+                    }
+
+                    const drawerId =
+                        surface === 'databases'
+                            ? 'database-list-healthcheck-details'
+                            : 'cluster-healthcheck-details';
+                    const drawer = page.getByTestId(drawerId).getByRole('dialog');
+                    await expect(drawer).toBeVisible();
+                    if (surface === 'cluster' || surface === 'bridge') {
+                        await expect(page).toHaveURL(
+                            (url) => url.searchParams.get('showHealthcheck') === '1',
+                        );
+                    }
+                    if (surface === 'bridge') {
+                        await expect(page).toHaveURL(
+                            (url) =>
+                                url.searchParams.get('healthcheckLeaf') === 'failing-pile-leaf',
+                        );
+                    }
+                    if (close === 'Escape') {
+                        const filter = drawer.getByRole('textbox').first();
+                        await filter.focus();
+                        await filter.press('Escape');
+                    } else {
+                        const closeButton = drawer.getByRole('button', {
+                            name: 'Close',
+                            exact: true,
+                        });
+                        await closeButton.focus();
+                        await closeButton.press('Enter');
+                    }
+                    await expect(drawer).toHaveCount(0);
+                    await expect(page).toHaveURL((url) =>
+                        [
+                            'showHealthcheck',
+                            'healthcheckIssue',
+                            'healthcheckLeaf',
+                            'issuesFilter',
+                            'view',
+                        ].every((key) => !url.searchParams.has(key)),
+                    );
                     await expect(opener).toBeVisible();
                     await expect(opener).toBeFocused();
                 });

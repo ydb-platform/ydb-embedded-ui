@@ -56,8 +56,14 @@ async function render() {
     applyE2EStorageGroupsOverride();
 
     if (process.env.REACT_APP_E2E_UI_OVERRIDES === 'true' && window.e2eHealthcheckDrawerMode) {
-        if (window.e2eHealthcheckDrawerMode === 'non-modal-page') {
+        if (
+            window.e2eHealthcheckDrawerMode === 'non-modal-page' ||
+            window.e2eHealthcheckDrawerMode === 'non-modal-meta-page'
+        ) {
             configureUIFactory({healthcheck: {disableModal: true}});
+            if (window.e2eHealthcheckDrawerMode === 'non-modal-meta-page') {
+                configureUIFactory({useMetaProxy: true});
+            }
         } else {
             const {renderHealthcheckDrawerFixture} = await import(
                 '../tests/fixtures/healthcheckDrawer'
