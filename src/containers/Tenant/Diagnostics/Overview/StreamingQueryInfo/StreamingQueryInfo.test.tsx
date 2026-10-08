@@ -1,4 +1,7 @@
+import React from 'react';
+
 import {dateTimeParse} from '@gravity-ui/date-utils';
+import {render} from '@testing-library/react';
 
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 
@@ -12,6 +15,10 @@ function buildQueryResult(row: Record<string, string | number | null>) {
             },
         ],
     };
+}
+
+function renderContent(content: React.ReactNode) {
+    return render(<React.Fragment>{content}</React.Fragment>).container.textContent;
 }
 
 function formatDate(value: string | number) {
@@ -38,8 +45,12 @@ describe('prepareStreamingQueryInfo', () => {
             }),
         );
 
-        expect(result.createdContent).toBe(`${formatDate('2026-01-02T03:04:05Z')} by creator`);
-        expect(result.items.map(({name, content}) => ({name, content}))).toEqual([
+        expect(renderContent(result.createdContent)).toBe(
+            `${formatDate('2026-01-02T03:04:05Z')} by creator`,
+        );
+        expect(
+            result.items.map(({name, content}) => ({name, content: renderContent(content)})),
+        ).toEqual([
             {
                 name: 'Started',
                 content: `${formatDate('2026-01-02T04:05:06Z')} by starter`,
@@ -52,7 +63,6 @@ describe('prepareStreamingQueryInfo', () => {
                 name: 'Stopped',
                 content: `${formatDate('2026-01-02T06:07:08Z')} by stopper`,
             },
-            {name: 'State', content: expect.anything()},
         ]);
         expect(result.queryText).toBe('SELECT 1;');
     });
@@ -103,12 +113,39 @@ describe('prepareStreamingQueryInfo', () => {
             }),
         );
 
-        expect(result.createdContent).toBe(`${formatDate(createdAt)} by creator`);
-        expect(result.items.slice(0, 3)).toEqual([
+        expect(renderContent(result.createdContent)).toBe(`${formatDate(createdAt)} by creator`);
+        expect(
+            result.items
+                .slice(0, 3)
+                .map(({name, content}) => ({name, content: renderContent(content)})),
+        ).toEqual([
             {name: 'Started', content: `${formatDate(startedAt)} by starter`},
             {name: 'Modified', content: `${formatDate(modifiedAt)} by editor`},
             {name: 'Stopped', content: `${formatDate(finishedAt)} by stopper`},
         ]);
+    });
+
+    test('renders the author in a neutral label with by outside it', () => {
+        const result = prepareStreamingQueryInfo(
+            buildQueryResult({StartedAt: '2026-01-02T04:05:06Z', StartedBy: 'user@domain'}),
+        );
+        const {container, getByText} = render(
+            <React.Fragment>{result.items[0].content}</React.Fragment>,
+        );
+
+        expect(container).toHaveTextContent(`${formatDate('2026-01-02T04:05:06Z')} by user@domain`);
+        expect(getByText('user@domain').closest('.g-label')).toHaveClass('g-label_theme_normal');
+        expect(getByText('user@domain').closest('.g-label')).toHaveTextContent(/^user@domain$/);
+    });
+
+    test.each([null, ''])('shows only the date when the author is %p', (user) => {
+        const result = prepareStreamingQueryInfo(
+            buildQueryResult({StartedAt: '2026-01-02T04:05:06Z', StartedBy: user}),
+        );
+        const {container} = render(<React.Fragment>{result.items[0].content}</React.Fragment>);
+
+        expect(container.textContent).toBe(formatDate('2026-01-02T04:05:06Z'));
+        expect(container.querySelector('.g-label')).toBeNull();
     });
 
     test('omits lifecycle fields that are absent in an older schema', () => {
@@ -117,8 +154,8 @@ describe('prepareStreamingQueryInfo', () => {
         );
 
         expect(result.createdContent).toBeUndefined();
-        expect(result.items).toHaveLength(1);
-        expect(result.items[0].name).toBe('State');
+        expect(result.items).toHaveLength(0);
+        expect(result.stateItems[0].name).toBe('State');
     });
 
     test('uses the describe creation step when CreatedAt is unavailable', () => {

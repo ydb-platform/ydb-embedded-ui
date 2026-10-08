@@ -40,7 +40,7 @@ interface PrepareSchemaObjectInfoItemsParams {
     itemsAfterType?: YDBDefinitionListItem[];
     additionalItems?: YDBDefinitionListItem[];
     showAdministrativeFields?: boolean;
-    createdContent?: string;
+    createdContent?: YDBDefinitionListItem['content'];
 }
 
 function isPresent(value: string | number | undefined): value is string | number {
@@ -118,6 +118,12 @@ export function prepareSchemaObjectInfoItems({
         );
     }
 
+    items.push({
+        name: schemaObjectInfoKeyset('field_full-path'),
+        content: isPresent(fullPath) ? fullPath : EMPTY_DATA_PLACEHOLDER,
+        copyText: isPresent(fullPath) ? fullPath : undefined,
+    });
+
     if (createdContent || Number(createStep)) {
         items.push({
             name: tenantKeyset('field_created'),
@@ -125,14 +131,7 @@ export function prepareSchemaObjectInfoItems({
         });
     }
 
-    items.push(
-        {
-            name: schemaObjectInfoKeyset('field_full-path'),
-            content: isPresent(fullPath) ? fullPath : EMPTY_DATA_PLACEHOLDER,
-            copyText: isPresent(fullPath) ? fullPath : undefined,
-        },
-        ...additionalItems,
-    );
+    items.push(...additionalItems);
 
     return items.filter(({content}) => content !== undefined && content !== null && content !== '');
 }

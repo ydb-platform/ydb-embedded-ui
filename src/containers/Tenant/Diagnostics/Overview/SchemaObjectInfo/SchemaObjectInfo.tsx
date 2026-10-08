@@ -18,7 +18,7 @@ export interface SchemaObjectInfoProps {
     path: string;
     itemsAfterType?: YDBDefinitionListItem[];
     additionalItems?: YDBDefinitionListItem[];
-    createdContent?: string;
+    createdContent?: YDBDefinitionListItem['content'];
 }
 
 export function SchemaObjectInfo({

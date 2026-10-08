@@ -921,7 +921,21 @@ test.describe('Diagnostics Info tab', async () => {
         await expect(getInfoValue('Started')).toHaveText('2026-01-02 04:05:06 by starter');
         await expect(getInfoValue('Modified')).toHaveText('2026-01-02 05:06:07 by editor');
         await expect(getInfoValue('Stopped')).toHaveText('2026-01-02 06:07:08 by stopper');
+        for (const [field, author] of [
+            ['Started', 'starter'],
+            ['Modified', 'editor'],
+            ['Stopped', 'stopper'],
+        ]) {
+            await expect(getInfoValue(field).locator('.g-label_theme_normal')).toHaveText(author);
+        }
+        await expect(getInfoValue('Created').locator('.g-label')).toHaveCount(0);
         await expect(getInfoValue('State')).toHaveText('STOPPED');
+        await expect(infoContent.getByTestId('schema-object-info').locator('dt')).toHaveText([
+            'Type',
+            'State',
+            'Full Path',
+            'Created',
+        ]);
     });
 
     test('View Info includes YQL code preview', async ({page}) => {

@@ -41,7 +41,7 @@ export function StreamingQueryInfo({database, path, data}: StreamingQueryProps) 
     );
     const loading = isFetching && sysData === undefined;
 
-    const {items, queryText, createdContent} = prepareStreamingQueryInfo(
+    const {items, queryText, createdContent, stateItems} = prepareStreamingQueryInfo(
         sysData,
         data?.PathDescription?.Self?.CreateStep,
     );
@@ -53,12 +53,13 @@ export function StreamingQueryInfo({database, path, data}: StreamingQueryProps) 
                 fallbackType={EPathType.EPathTypeStreamingQuery}
                 path={path}
                 createdContent={createdContent}
+                itemsAfterType={stateItems}
             />
             {loading ? (
                 <Loader size="s" className={b('loader')} />
-            ) : (
+            ) : items.length ? (
                 <YDBDefinitionList items={items} />
-            )}
+            ) : null}
             {queryText ? (
                 <YQLCodePreview title={i18n('field_query-text')} text={queryText} />
             ) : null}
@@ -90,7 +91,7 @@ function StateLabel({state}: {state?: string}) {
 
 export function prepareStreamingQueryInfo(sysData?: IQueryResult, createStep?: string | number) {
     if (!sysData) {
-        return {items: [], queryText: undefined, createdContent: undefined};
+        return {items: [], queryText: undefined, createdContent: undefined, stateItems: []};
     }
 
     const row = sysData.resultSets?.[0]?.result?.[0];
@@ -119,10 +120,9 @@ export function prepareStreamingQueryInfo(sysData?: IQueryResult, createStep?: s
     // We use custom error check, because error type can be non-standard
     const errorData = parseIssuesData(errorRaw);
 
-    info.push({
-        name: i18n('field_query-state'),
-        content: <StateLabel state={state} />,
-    });
+    const stateItems: YDBDefinitionListItem[] = [
+        {name: i18n('field_query-state'), content: <StateLabel state={state} />},
+    ];
 
     if (errorData) {
         info.push({
@@ -131,7 +131,7 @@ export function prepareStreamingQueryInfo(sysData?: IQueryResult, createStep?: s
         });
     }
 
-    return {items: info, queryText: normalizedQueryText, createdContent};
+    return {items: info, queryText: normalizedQueryText, createdContent, stateItems};
 }
 
 function formatLifecycleValue(
@@ -156,7 +156,14 @@ function formatLifecycleValue(
         return undefined;
     }
 
-    return user
-        ? i18n('value_date-by-user', {date: date || EMPTY_DATA_PLACEHOLDER, user: String(user)})
-        : date;
+    if (!user) {
+        return date;
+    }
+
+    return (
+        <React.Fragment>
+            {i18n('value_date-by-user', {date: date || EMPTY_DATA_PLACEHOLDER})}{' '}
+            <Label theme="normal">{String(user)}</Label>
+        </React.Fragment>
+    );
 }
