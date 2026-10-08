@@ -43,7 +43,12 @@ interface Window {
     react_app_disable_checks?: boolean;
     e2eQueryEditorMode?: 'single-tab' | 'multi-tab';
     e2eMonitoringError?: unknown;
-    e2eHealthcheckDrawerMode?: 'default' | 'modal' | 'non-modal' | 'non-modal-page';
+    e2eHealthcheckDrawerMode?:
+        | 'default'
+        | 'modal'
+        | 'non-modal'
+        | 'non-modal-page'
+        | 'non-modal-meta-page';
 
     systemSettings?: import('../store/reducers/settings/types').SettingsObject;
 

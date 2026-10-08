@@ -21,6 +21,7 @@ import {
 } from '../../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import type {TBridgePile} from '../../../../types/api/cluster';
 import {BridgePileState} from '../../../../types/api/cluster';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
@@ -162,8 +163,11 @@ const BridgePileCard = React.memo(function BridgePileCard({
 
     const pileName = pile.Name?.trim() || EMPTY_DATA_PLACEHOLDER;
     const nodes = pile.Nodes === undefined ? EMPTY_DATA_PLACEHOLDER : formatNumber(pile.Nodes);
-    const handleHealthcheckClick = () => {
+    const handleHealthcheckClick = (event: React.MouseEvent<HTMLElement>) => {
         if (pileHealthcheck.target) {
+            if (uiFactory.healthcheck.disableModal) {
+                event.currentTarget.focus();
+            }
             onHealthcheckClick(pileHealthcheck.target);
         }
     };
