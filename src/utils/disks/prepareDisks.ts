@@ -57,13 +57,7 @@ export function prepareWhiteboardVDiskData(
         AllocatedSize: AllocatedSize,
         SlotSize: PDisk?.EnforcedDynamicSlotSize,
     });
-    const WhiteboardSize = hasWhiteboardData
-        ? prepareWhiteboardVDiskSizeFields({
-              AvailableSize,
-              AllocatedSize,
-              SlotSize: PDisk?.EnforcedDynamicSlotSize,
-          })
-        : undefined;
+    const WhiteboardSize = hasWhiteboardData ? vDiskSizeFields.DisplaySize : undefined;
 
     const Severity = calculateVDiskSeverity(vDiskState);
 
@@ -165,33 +159,6 @@ export function prepareWhiteboardPDiskData(
     };
 }
 
-function prepareWhiteboardVDiskSizeFields({
-    AvailableSize,
-    AllocatedSize,
-    SlotSize,
-}: {
-    AvailableSize: unknown;
-    AllocatedSize: unknown;
-    SlotSize: unknown;
-}) {
-    const allocatedSize = parseOptionalNonNegativeNumber(AllocatedSize);
-    const availableSize = parseOptionalNonNegativeNumber(AvailableSize);
-    const slotSize = parseOptionalNonNegativeNumber(SlotSize);
-    const preparedSizeFields = prepareVDiskSizeFields({
-        AvailableSize: availableSize,
-        AllocatedSize: allocatedSize,
-        SlotSize: slotSize,
-    });
-
-    return {
-        AllocatedSize: allocatedSize === undefined ? undefined : preparedSizeFields.AllocatedSize,
-        SizeLimit:
-            availableSize === undefined && slotSize === undefined
-                ? undefined
-                : preparedSizeFields.SizeLimit,
-    };
-}
-
 function prepareWhiteboardPDiskSizeFields({
     AvailableSize,
     TotalSize,
@@ -245,17 +212,27 @@ export function prepareVDiskSizeFields({
     });
     const allocatedPercent = sizeLimit > 0 ? Math.floor((allocated * 100) / sizeLimit) : NaN;
 
+    // Preserve missing values for display without changing the legacy calculations above.
+    const displayAllocatedSize = parseOptionalNonNegativeNumber(AllocatedSize);
+    const displayAvailableSize = parseOptionalNonNegativeNumber(AvailableSize);
+    const displaySlotSize = parseOptionalNonNegativeNumber(SlotSize);
+    let displaySizeLimit: number | undefined;
+    if (!displayAvailableSize && displaySlotSize) {
+        displaySizeLimit = displaySlotSize;
+    } else if (displayAllocatedSize !== undefined && displayAvailableSize !== undefined) {
+        displaySizeLimit = displayAllocatedSize + displayAvailableSize;
+    }
+
     return {
         AvailableSize: available,
         AllocatedSize: allocated,
         SizeLimit: sizeLimit,
         FreeSize: freeSize,
         AllocatedPercent: allocatedPercent,
-        HasCompleteSizeData:
-            parseOptionalNonNegativeNumber(AllocatedSize) !== undefined &&
-            (hasSizeLimitFallback
-                ? parseOptionalNonNegativeNumber(SlotSize) !== undefined
-                : parseOptionalNonNegativeNumber(AvailableSize) !== undefined),
+        DisplaySize: {
+            AllocatedSize: displayAllocatedSize,
+            SizeLimit: displaySizeLimit,
+        },
     };
 }
 

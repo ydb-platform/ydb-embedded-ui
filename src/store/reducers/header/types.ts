@@ -76,7 +76,9 @@ export type PageBreadcrumbsOptions<T extends Page = undefined> = T extends 'home
           ? NodeBreadcrumbsOptions
           : T extends 'tablet'
             ? TabletBreadcrumbsOptions
-            : {};
+            : T extends 'storageGroup'
+              ? StorageGroupBreadcrumbsOptions
+              : {};
 
 export interface HeaderState {
     page?: Page;

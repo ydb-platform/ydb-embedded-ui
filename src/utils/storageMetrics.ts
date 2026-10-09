@@ -1,11 +1,7 @@
 import type {BytesSizes} from './bytesParsers';
 import {bytesSizes, formatBytes, getBytesSizeUnit, sizes} from './bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from './constants';
-import {
-    formatNumber,
-    formatPercent,
-    formatStorageValuesToGb,
-} from './dataFormatters/dataFormatters';
+import {formatNumber, formatPercent, roundToDecimalPlaces} from './dataFormatters/dataFormatters';
 import {parseOptionalNonNegativeNumber} from './utils';
 
 export interface FormatMetricBytesOptions {
@@ -173,11 +169,10 @@ export function formatMetricPercent(value?: unknown, fixedDecimalPlaces?: number
     }
 
     const precision = fixedDecimalPlaces ?? (Number.isInteger(numericValue) ? 0 : 1);
+    const fixed =
+        fixedDecimalPlaces !== undefined && roundToDecimalPlaces(numericValue, precision) !== 0;
 
-    return (
-        formatPercent(numericValue / 100, precision, {fixed: fixedDecimalPlaces !== undefined}) ||
-        EMPTY_DATA_PLACEHOLDER
-    );
+    return formatPercent(numericValue / 100, precision, {fixed}) || EMPTY_DATA_PLACEHOLDER;
 }
 
 export function formatStorageMetricPair(
@@ -188,18 +183,22 @@ export function formatStorageMetricPair(
     const parsedValue = parseOptionalNonNegativeNumber(value);
     const parsedCapacity = parseOptionalNonNegativeNumber(capacity);
 
-    if (parsedValue === undefined || parsedCapacity === undefined) {
+    if (parsedValue === undefined && parsedCapacity === undefined) {
         return EMPTY_DATA_PLACEHOLDER;
     }
 
-    if (fixedDecimalPlaces !== undefined) {
-        return [
-            formatBytes({value: parsedValue, size: 'gb', withSizeLabel: false, fixedDecimalPlaces}),
-            formatBytes({value: parsedCapacity, size: 'gb', fixedDecimalPlaces}),
-        ].join(' / ');
-    }
-
-    return formatStorageValuesToGb(parsedValue, parsedCapacity).join(' / ');
+    return [
+        formatBytes({
+            value: parsedValue,
+            size: 'gb',
+            precision: 1,
+            withSizeLabel: parsedCapacity === undefined,
+            fixedDecimalPlaces,
+        }),
+        formatBytes({value: parsedCapacity, size: 'gb', fixedDecimalPlaces}),
+    ]
+        .map((formattedValue) => formattedValue || EMPTY_DATA_PLACEHOLDER)
+        .join(' / ');
 }
 
 export function formatNormalizedMetricPercent(value?: number) {
@@ -209,7 +208,7 @@ export function formatNormalizedMetricPercent(value?: number) {
         return EMPTY_DATA_PLACEHOLDER;
     }
 
-    return formatPercent(parsedValue, 2, {fixed: true}) || EMPTY_DATA_PLACEHOLDER;
+    return formatMetricPercent(parsedValue * 100, 2);
 }
 
 export function formatMetricCount(value?: unknown) {
@@ -226,7 +225,7 @@ export function formatMetricCountPair(value?: unknown, capacity?: unknown) {
     const formattedValue = formatMetricCount(value);
     const formattedCapacity = formatMetricCount(capacity);
 
-    if (formattedValue === EMPTY_DATA_PLACEHOLDER || formattedCapacity === EMPTY_DATA_PLACEHOLDER) {
+    if (formattedValue === EMPTY_DATA_PLACEHOLDER && formattedCapacity === EMPTY_DATA_PLACEHOLDER) {
         return EMPTY_DATA_PLACEHOLDER;
     }
 

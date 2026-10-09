@@ -183,7 +183,10 @@ describe('prepareGroupsVDisk', () => {
             SizeLimit: 265405071360,
             FreeSize: 234461593600,
             AllocatedPercent: 11,
-            HasCompleteSizeData: true,
+            DisplaySize: {
+                AllocatedSize: 30943477760,
+                SizeLimit: 265405071360,
+            },
             WhiteboardSize: {
                 AllocatedSize: 30943477760,
                 SizeLimit: 265405071360,
@@ -234,7 +237,10 @@ describe('prepareGroupsVDisk', () => {
             SizeLimit: 265405071360,
             FreeSize: 234461593600,
             AllocatedPercent: 11,
-            HasCompleteSizeData: true,
+            DisplaySize: {
+                AllocatedSize: 30943477760,
+                SizeLimit: 265405071360,
+            },
 
             Donors: undefined,
             PDiskId: undefined,
@@ -344,7 +350,10 @@ describe('prepareGroupsVDisk', () => {
             SizeLimit: 265405071360,
             FreeSize: 234461593600,
             AllocatedPercent: 11,
-            HasCompleteSizeData: true,
+            DisplaySize: {
+                AllocatedSize: 30943477760,
+                SizeLimit: 265405071360,
+            },
             WhiteboardSize: {
                 AllocatedSize: 30943477760,
                 SizeLimit: 265405071360,

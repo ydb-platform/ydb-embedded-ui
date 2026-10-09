@@ -996,6 +996,31 @@ test.describe('Blob storage capacity metrics integration', () => {
         });
     }
 
+    test('keeps known values in partial VDisk and PDisk size pairs', async ({page}) => {
+        await enableBlobStorageCapacityMetrics(page);
+        await enableStorageDisksColumn(page);
+        await setupVDiskPageMocks(page, {
+            withCapacityMetrics: true,
+            whiteboardAllocatedSize: '1000000000',
+            whiteboardAvailableSize: '',
+            whiteboardSlotSize: '',
+            pDiskWhiteboardAvailableSize: '',
+            pDiskWhiteboardTotalSize: '22000000000',
+        });
+        await page.goto(VDISK_PAGE_PATH);
+        await new ClusterStorageTable(page).waitForTableData();
+
+        await page
+            .locator('.ydb-storage-vdisks__wrapper .storage-disk-progress-bar')
+            .first()
+            .hover();
+        const popup = await waitForDiskPopup(page, 'Go to VDisk');
+        const vDiskPanel = await getDiskPopupPanel(popup, 'VDisk', VDISK_ID);
+        const pDiskPanel = await getDiskPopupPanel(popup, 'PDisk', `${NODE_ID}-${PDISK_ID}`);
+        await expect(getDefinitionListValue(vDiskPanel, 'Size')).toHaveText(/1\.00\s*GB \/ —/);
+        await expect(getDefinitionListValue(pDiskPanel, 'Space')).toHaveText(/— \/ 22\.00\s*GB/);
+    });
+
     test('shows the same explicit metrics across pages and Groups, Nodes, and PDisk popups', async ({
         page,
     }) => {
@@ -1149,9 +1174,9 @@ test.describe('Blob storage capacity metrics integration', () => {
 
         const groupInfo = page.locator('.ydb-storage-group-page__info');
         for (const label of [
+            'Pool Name',
             'Group Generation',
             'Erasure Species',
-            'Media Type',
             'Group Size In Units',
             'VDisk Slot Usage',
             'VDisk Raw Usage',
@@ -1161,33 +1186,13 @@ test.describe('Blob storage capacity metrics integration', () => {
         }
         await expect(groupInfo.getByText('Usage', {exact: true})).toHaveCount(0);
         await expect(groupInfo.getByText('Disk Space', {exact: true})).toHaveCount(0);
-        const groupInfoColumns = groupInfo.locator(':scope > .info-viewer');
-        await expect(groupInfoColumns).toHaveCount(2);
-        const configurationInfo = groupInfoColumns.nth(0);
-        const runtimeInfo = groupInfoColumns.nth(1);
-        await expect(
-            configurationInfo.getByText('Group Size In Units', {exact: true}),
-        ).toBeVisible();
+        const configurationInfo = groupInfo.locator('.ydb-storage-group-info__configuration');
+        const capacityInfo = groupInfo.locator('.ydb-storage-group-info__capacity');
+        await expect(configurationInfo.getByText('Group Generation', {exact: true})).toBeVisible();
+        await expect(capacityInfo.getByText('Group Size In Units', {exact: true})).toBeVisible();
         await expect(configurationInfo.getByText('Units', {exact: true})).toHaveCount(0);
-        const allocationUnitsLabel = runtimeInfo.getByText('Allocation Units', {exact: true});
-        await expect(allocationUnitsLabel).toBeVisible();
-        await allocationUnitsLabel.getByRole('button').hover();
-        await expect(
-            page.getByText(
-                'The number of channels used by tablets to write data to the storage group.',
-                {exact: true},
-            ),
-        ).toBeVisible();
-
-        const runtimeLabels = await runtimeInfo
-            .locator('.info-viewer__label-text')
-            .allTextContents();
-        expect(runtimeLabels.indexOf('Allocation Units')).toBe(
-            runtimeLabels.indexOf('Available Space') + 1,
-        );
-        expect(runtimeLabels.indexOf('VDisk Slot Usage')).toBe(
-            runtimeLabels.indexOf('Allocation Units') + 1,
-        );
+        await expectDefinitionListRowValue(capacityInfo, 'VDisk Slot Usage', '82.25%');
+        await expectDefinitionListRowValue(capacityInfo, 'VDisk Raw Usage', '64.50%');
 
         await page.goto(VDISK_PAGE_PATH.replace('type=groups', 'type=nodes'));
 
@@ -1384,8 +1389,15 @@ test.describe('Blob storage capacity metrics integration', () => {
 
         const groupInfo = page.locator('.ydb-storage-group-page__info');
         for (const label of ['VDisk Slot Usage', 'VDisk Raw Usage', 'Capacity Alert']) {
-            await expectInfoViewerRowPlaceholder(groupInfo, label);
+            await expectDefinitionListRowPlaceholder(groupInfo, label);
         }
-        await expectInfoViewerRowValue(groupInfo, 'Group Size In Units', '1 (implicit)');
+        await expectDefinitionListRowValue(groupInfo, 'Group Size In Units', '1 (implicit)');
+        await expect(
+            page.getByRole('button', {name: 'Copy Storage Group ID from breadcrumb', exact: true}),
+        ).toBeVisible();
+        await expect(
+            page.getByRole('button', {name: 'Copy Storage Group ID from page title', exact: true}),
+        ).toBeVisible();
+        await expect(page.getByRole('banner').getByText('Ok', {exact: true})).toBeVisible();
     });
 });

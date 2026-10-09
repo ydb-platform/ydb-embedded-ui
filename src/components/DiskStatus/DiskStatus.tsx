@@ -41,14 +41,16 @@ export function DiskStatusLabel({
     tooltip,
     dangerHeavy,
     size = 's',
+    iconSize = 12,
     className,
-}: (DiskStatusLabelData | TitledDiskStatusLabelData) & Pick<LabelProps, 'size' | 'className'>) {
+}: (DiskStatusLabelData | TitledDiskStatusLabelData) &
+    Pick<LabelProps, 'size' | 'className'> & {iconSize?: number}) {
     const label = (
         <Label
             size={size}
             theme={theme}
             className={b('label', {'danger-heavy': dangerHeavy}, className)}
-            icon={icon ? <Icon data={icon} size={12} /> : undefined}
+            icon={icon ? <Icon data={icon} size={iconSize} /> : undefined}
             value={title ? value : undefined}
         >
             {title ?? value}

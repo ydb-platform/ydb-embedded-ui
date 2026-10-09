@@ -1,297 +1,158 @@
-import {Flex} from '@gravity-ui/uikit';
+import {Flex, Text, Tooltip} from '@gravity-ui/uikit';
 
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
-import {valueIsDefined} from '../../utils';
-import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
-import {getDocsLink} from '../../utils/docs';
+import {isNonEmptyValue} from '../../utils';
+import {formatBytes} from '../../utils/bytesParsers';
+import {cn} from '../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {formatMetricPercent, formatStorageMetricPair} from '../../utils/storageMetrics';
 import {formatToMs} from '../../utils/timeParsers';
-import {bytesToSpeed} from '../../utils/utils';
+import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 import {
     getStorageGroupCapacityInfoItems,
-    toInfoViewerItems,
+    toDefinitionListItems,
 } from '../DiskCapacityInfo/DiskCapacityInfo';
 import diskCapacityInfoKeyset from '../DiskCapacityInfo/i18n';
-import type {InfoViewerItem} from '../InfoViewer';
-import {InfoViewer} from '../InfoViewer';
-import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
-import {TitleWithHelpMark} from '../TitleWithHelpmark/TitleWithHelpmark';
+import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 import {CAPACITY_CONFIGURATION_HELP_TEXT} from '../capacityMetricsColumns/constants';
 import {formatCapacityUnitCount} from '../capacityMetricsColumns/formatters';
 
 import {storageGroupInfoKeyset} from './i18n';
 
-interface StorageGroupInfoProps extends Omit<InfoViewerProps, 'info'> {
+import './StorageGroupInfo.scss';
+
+const b = cn('ydb-storage-group-info');
+
+interface StorageGroupInfoProps {
     data?: PreparedStorageGroup;
     className?: string;
 }
 
-// eslint-disable-next-line complexity
-export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageGroupInfoProps) {
+export function StorageGroupInfo({data, className}: StorageGroupInfoProps) {
     const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
-
     const {
-        Encryption,
-        Overall,
-        DiskSpace,
-        MediaType,
-        ErasureSpecies,
-        Used,
-        Limit,
-        Usage,
-        Read,
-        Write,
+        PoolName,
         GroupGeneration,
-        AllocationUnits,
-        State,
+        ErasureSpecies,
         MissingDisks,
-        Available,
         LatencyPutTabletLogMs,
         LatencyPutUserDataMs,
         LatencyGetFastMs,
+        Read,
+        Write,
         GroupSizeInUnits,
+        Used,
+        Limit,
+        Available,
+        Usage,
+        DiskSpace,
     } = data || {};
-
-    const distributedStorageChannelDocsLink = getDocsLink('distributedStorageChannel');
-    const allocationUnitsLabel = (
-        <TitleWithHelpMark
-            header={storageGroupInfoKeyset('allocation-units')}
-            note={storageGroupInfoKeyset('context_allocation-units')}
-            docsLink={distributedStorageChannelDocsLink}
-        />
-    );
+    const configurationItems: YDBDefinitionListItem[] = [
+        {
+            name: storageGroupInfoKeyset('field_pool-name'),
+            content: PoolName ? (
+                <Tooltip content={PoolName}>
+                    <Text ellipsisLines={2} wordBreak="break-word">
+                        {PoolName}
+                    </Text>
+                </Tooltip>
+            ) : (
+                EMPTY_DATA_PLACEHOLDER
+            ),
+        },
+        ...(
+            [
+                [storageGroupInfoKeyset('group-generation'), GroupGeneration],
+                [storageGroupInfoKeyset('erasure-species'), ErasureSpecies],
+                [storageGroupInfoKeyset('missing-disks'), MissingDisks],
+            ] as const
+        ).map(([name, value]) => ({
+            name,
+            content: isNonEmptyValue(value) ? value : EMPTY_DATA_PLACEHOLDER,
+        })),
+    ];
+    const latencyItems: YDBDefinitionListItem[] = (
+        [
+            [storageGroupInfoKeyset('latency-put-tablet-log'), LatencyPutTabletLogMs],
+            [storageGroupInfoKeyset('latency-put-user-data'), LatencyPutUserDataMs],
+            [storageGroupInfoKeyset('latency-get-fast'), LatencyGetFastMs],
+        ] as const
+    ).map(([name, value]) => {
+        const latency = parseOptionalNonNegativeNumber(value);
+        return {
+            name,
+            content: latency === undefined ? EMPTY_DATA_PLACEHOLDER : formatToMs(latency),
+        };
+    });
+    const throughputItems: YDBDefinitionListItem[] = (
+        [
+            [storageGroupInfoKeyset('read-throughput'), Read],
+            [storageGroupInfoKeyset('write-throughput'), Write],
+        ] as const
+    ).map(([name, value]) => ({
+        name,
+        content:
+            formatBytes({
+                value: parseOptionalNonNegativeNumber(value),
+                size: 'mb',
+                fixedDecimalPlaces: 2,
+                withSpeedLabel: true,
+            }) || EMPTY_DATA_PLACEHOLDER,
+    }));
+    const capacityItems: YDBDefinitionListItem[] = [];
 
     if (capacityMetricsEnabled) {
-        const configurationInfo: InfoViewerItem[] = [];
-        const runtimeInfo: InfoViewerItem[] = [];
-
-        if (valueIsDefined(GroupGeneration)) {
-            configurationInfo.push({
-                label: storageGroupInfoKeyset('group-generation'),
-                value: GroupGeneration,
-            });
-        }
-        if (valueIsDefined(ErasureSpecies)) {
-            configurationInfo.push({
-                label: storageGroupInfoKeyset('erasure-species'),
-                value: ErasureSpecies,
-            });
-        }
-        if (valueIsDefined(MediaType)) {
-            configurationInfo.push({
-                label: storageGroupInfoKeyset('media-type'),
-                value: MediaType,
-            });
-        }
-        if (valueIsDefined(Encryption)) {
-            configurationInfo.push({
-                label: storageGroupInfoKeyset('encryption'),
-                value: Encryption ? storageGroupInfoKeyset('yes') : storageGroupInfoKeyset('no'),
-            });
-        }
-        configurationInfo.push({
-            label: (
-                <TitleWithHelpMark
-                    header={diskCapacityInfoKeyset('field_group-size-in-units')}
-                    note={CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits}
-                />
-            ),
-            value: formatCapacityUnitCount(GroupSizeInUnits),
+        capacityItems.push({
+            name: diskCapacityInfoKeyset('field_group-size-in-units'),
+            content: formatCapacityUnitCount(GroupSizeInUnits),
+            note: CAPACITY_CONFIGURATION_HELP_TEXT.GroupSizeInUnits,
         });
-
-        if (valueIsDefined(Overall)) {
-            runtimeInfo.push({
-                label: storageGroupInfoKeyset('overall'),
-                value: <StatusIcon status={Overall} />,
-            });
-        }
-        if (valueIsDefined(State)) {
-            runtimeInfo.push({label: storageGroupInfoKeyset('state'), value: State});
-        }
-        if (valueIsDefined(MissingDisks)) {
-            runtimeInfo.push({
-                label: storageGroupInfoKeyset('missing-disks'),
-                value: MissingDisks,
-            });
-        }
-        if (valueIsDefined(Used) && valueIsDefined(Limit)) {
-            const usedNum = Number(Used);
-            const limitNum = Number(Limit);
-            const hasSpaceData = Number.isFinite(usedNum) && Number.isFinite(limitNum);
-            runtimeInfo.push({
-                label: storageGroupInfoKeyset('used-space'),
-                value: hasSpaceData
-                    ? formatStorageValuesToGb(usedNum, limitNum).join(' / ')
-                    : storageGroupInfoKeyset('no-data'),
-            });
-        }
-        if (valueIsDefined(Available)) {
-            runtimeInfo.push({
-                label: storageGroupInfoKeyset('available'),
-                value: formatStorageValuesToGb(Number(Available)),
-            });
-        }
-        if (valueIsDefined(AllocationUnits)) {
-            runtimeInfo.push({
-                label: allocationUnitsLabel,
-                value: AllocationUnits,
-            });
-        }
-        runtimeInfo.push(...toInfoViewerItems(getStorageGroupCapacityInfoItems(data)));
-        if (valueIsDefined(LatencyPutTabletLogMs)) {
-            runtimeInfo.push({
-                label: storageGroupInfoKeyset('latency-put-tablet-log'),
-                value: formatToMs(LatencyPutTabletLogMs),
-            });
-        }
-        if (valueIsDefined(LatencyPutUserDataMs)) {
-            runtimeInfo.push({
-                label: storageGroupInfoKeyset('latency-put-user-data'),
-                value: formatToMs(LatencyPutUserDataMs),
-            });
-        }
-        if (valueIsDefined(LatencyGetFastMs)) {
-            runtimeInfo.push({
-                label: storageGroupInfoKeyset('latency-get-fast'),
-                value: formatToMs(LatencyGetFastMs),
-            });
-        }
-        if (valueIsDefined(Read)) {
-            runtimeInfo.push({
-                label: storageGroupInfoKeyset('read-throughput'),
-                value: bytesToSpeed(Number(Read)),
-            });
-        }
-        if (valueIsDefined(Write)) {
-            runtimeInfo.push({
-                label: storageGroupInfoKeyset('write-throughput'),
-                value: bytesToSpeed(Number(Write)),
-            });
-        }
-
-        return (
-            <Flex className={className} gap={2} direction="row" wrap>
-                <InfoViewer info={configurationInfo} {...infoViewerProps} />
-                <InfoViewer info={runtimeInfo} {...infoViewerProps} />
-            </Flex>
+    }
+    capacityItems.push(
+        {
+            name: storageGroupInfoKeyset('used-space'),
+            content: formatStorageMetricPair(Used, Limit, 2),
+        },
+        {
+            name: storageGroupInfoKeyset('available'),
+            content:
+                formatBytes({
+                    value: parseOptionalNonNegativeNumber(Available),
+                    size: 'gb',
+                    fixedDecimalPlaces: 2,
+                }) || EMPTY_DATA_PLACEHOLDER,
+        },
+    );
+    if (capacityMetricsEnabled) {
+        capacityItems.push(...toDefinitionListItems(getStorageGroupCapacityInfoItems(data)));
+    } else {
+        capacityItems.push(
+            {
+                name: storageGroupInfoKeyset('usage'),
+                content: formatMetricPercent(Usage, 2),
+            },
+            {
+                name: storageGroupInfoKeyset('disk-space'),
+                content: DiskSpace ? <StatusIcon status={DiskSpace} /> : EMPTY_DATA_PLACEHOLDER,
+            },
         );
     }
 
-    const storageGroupInfoFirstColumn = [];
-
-    if (valueIsDefined(GroupGeneration)) {
-        storageGroupInfoFirstColumn.push({
-            label: storageGroupInfoKeyset('group-generation'),
-            value: GroupGeneration,
-        });
-    }
-    if (valueIsDefined(ErasureSpecies)) {
-        storageGroupInfoFirstColumn.push({
-            label: storageGroupInfoKeyset('erasure-species'),
-            value: ErasureSpecies,
-        });
-    }
-    if (valueIsDefined(MediaType)) {
-        storageGroupInfoFirstColumn.push({
-            label: storageGroupInfoKeyset('media-type'),
-            value: MediaType,
-        });
-    }
-    if (valueIsDefined(Encryption)) {
-        storageGroupInfoFirstColumn.push({
-            label: storageGroupInfoKeyset('encryption'),
-            value: Encryption ? storageGroupInfoKeyset('yes') : storageGroupInfoKeyset('no'),
-        });
-    }
-    if (valueIsDefined(Overall)) {
-        storageGroupInfoFirstColumn.push({
-            label: storageGroupInfoKeyset('overall'),
-            value: <StatusIcon status={Overall} />,
-        });
-    }
-    if (valueIsDefined(State)) {
-        storageGroupInfoFirstColumn.push({label: storageGroupInfoKeyset('state'), value: State});
-    }
-    if (valueIsDefined(MissingDisks)) {
-        storageGroupInfoFirstColumn.push({
-            label: storageGroupInfoKeyset('missing-disks'),
-            value: MissingDisks,
-        });
-    }
-
-    const storageGroupInfoSecondColumn = [];
-
-    if (valueIsDefined(Used) && valueIsDefined(Limit)) {
-        const usedNum = Number(Used);
-        const limitNum = Number(Limit);
-        const hasSpaceData = Number.isFinite(usedNum) && Number.isFinite(limitNum);
-        storageGroupInfoSecondColumn.push({
-            label: storageGroupInfoKeyset('used-space'),
-            value: hasSpaceData
-                ? formatStorageValuesToGb(usedNum, limitNum).join(' / ')
-                : storageGroupInfoKeyset('no-data'),
-        });
-    }
-    if (valueIsDefined(Available)) {
-        storageGroupInfoSecondColumn.push({
-            label: storageGroupInfoKeyset('available'),
-            value: formatStorageValuesToGb(Number(Available)),
-        });
-    }
-    if (valueIsDefined(Usage)) {
-        storageGroupInfoSecondColumn.push({
-            label: storageGroupInfoKeyset('usage'),
-            value: `${Usage.toFixed(2)}%`,
-        });
-    }
-    if (valueIsDefined(DiskSpace)) {
-        storageGroupInfoSecondColumn.push({
-            label: storageGroupInfoKeyset('disk-space'),
-            value: <StatusIcon status={DiskSpace} />,
-        });
-    }
-    if (valueIsDefined(LatencyPutTabletLogMs)) {
-        storageGroupInfoSecondColumn.push({
-            label: storageGroupInfoKeyset('latency-put-tablet-log'),
-            value: formatToMs(LatencyPutTabletLogMs),
-        });
-    }
-    if (valueIsDefined(LatencyPutUserDataMs)) {
-        storageGroupInfoSecondColumn.push({
-            label: storageGroupInfoKeyset('latency-put-user-data'),
-            value: formatToMs(LatencyPutUserDataMs),
-        });
-    }
-    if (valueIsDefined(LatencyGetFastMs)) {
-        storageGroupInfoSecondColumn.push({
-            label: storageGroupInfoKeyset('latency-get-fast'),
-            value: formatToMs(LatencyGetFastMs),
-        });
-    }
-    if (valueIsDefined(AllocationUnits)) {
-        storageGroupInfoSecondColumn.push({
-            label: allocationUnitsLabel,
-            value: AllocationUnits,
-        });
-    }
-    if (valueIsDefined(Read)) {
-        storageGroupInfoSecondColumn.push({
-            label: storageGroupInfoKeyset('read-throughput'),
-            value: bytesToSpeed(Number(Read)),
-        });
-    }
-    if (valueIsDefined(Write)) {
-        storageGroupInfoSecondColumn.push({
-            label: storageGroupInfoKeyset('write-throughput'),
-            value: bytesToSpeed(Number(Write)),
-        });
-    }
-
     return (
-        <Flex className={className} gap={2} direction="row" wrap>
-            <InfoViewer info={storageGroupInfoFirstColumn} {...infoViewerProps} />
-            <InfoViewer info={storageGroupInfoSecondColumn} {...infoViewerProps} />
+        <Flex className={b(null, className)} wrap="wrap">
+            <Flex direction="column" gap={4} className={b('configuration')}>
+                <YDBDefinitionList items={configurationItems} nameMaxWidth={200} />
+                <YDBDefinitionList items={latencyItems} nameMaxWidth={200} />
+                <YDBDefinitionList items={throughputItems} nameMaxWidth={200} />
+            </Flex>
+            <YDBDefinitionList
+                items={capacityItems}
+                nameMaxWidth={200}
+                wrapperClassName={b('capacity')}
+            />
         </Flex>
     );
 }

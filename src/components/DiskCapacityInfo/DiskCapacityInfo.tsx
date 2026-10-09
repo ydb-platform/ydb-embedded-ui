@@ -55,7 +55,7 @@ export function getVDiskCapacityInfoItems(
     data: PreparedVDisk | undefined,
     {withRawUsage}: {withRawUsage: boolean},
 ): DiskCapacityInfoItem[] {
-    const sizeData = data?.WhiteboardSize ?? data;
+    const sizeData = data?.WhiteboardSize ?? data?.DisplaySize ?? data;
     const items: DiskCapacityInfoItem[] = [
         {
             id: 'size',
@@ -166,8 +166,8 @@ export function getVDiskCapacityItems(
     data: PreparedVDisk,
     {capacityMetricsEnabled}: {capacityMetricsEnabled: boolean},
 ): DiskDetailItem[] {
-    const size: Pick<PreparedVDisk, 'AllocatedSize' | 'SizeLimit' | 'HasCompleteSizeData'> =
-        capacityMetricsEnabled ? (data.WhiteboardSize ?? data) : data;
+    const size =
+        (capacityMetricsEnabled ? data.WhiteboardSize : undefined) ?? data.DisplaySize ?? data;
     const items: DiskDetailItem[] = [
         {
             id: 'group-size-in-units',
@@ -178,10 +178,7 @@ export function getVDiskCapacityItems(
         {
             id: 'size',
             name: vDiskInfoKeyset('size'),
-            content:
-                size.HasCompleteSizeData === false
-                    ? EMPTY_DATA_PLACEHOLDER
-                    : formatStorageMetricPair(size.AllocatedSize, size.SizeLimit, 2),
+            content: formatStorageMetricPair(size.AllocatedSize, size.SizeLimit, 2),
         },
         {
             id: 'capacity-alert',
@@ -239,14 +236,22 @@ export function getPDiskCapacityItems(
 export function getStorageGroupCapacityInfoItems(
     data: PreparedStorageGroup | undefined,
 ): DiskCapacityInfoItem[] {
+    const capacityAlert = normalizeCapacityAlert(data?.CapacityAlert);
     return [
+        {
+            id: 'capacity-alert',
+            title: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
+            value: capacityAlert ? (
+                <DiskCapacityAlertLabel value={capacityAlert} />
+            ) : (
+                EMPTY_DATA_PLACEHOLDER
+            ),
+            note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+        },
         {
             id: 'vdisk-slot-usage',
             title: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
-            value: getAlertAwareUsageValue(
-                formatNormalizedMetricPercent(data?.MaxVDiskSlotUsage),
-                data?.CapacityAlert,
-            ),
+            value: formatNormalizedMetricPercent(data?.MaxVDiskSlotUsage),
             note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
         },
         {
@@ -254,12 +259,6 @@ export function getStorageGroupCapacityInfoItems(
             title: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage,
             value: formatNormalizedMetricPercent(data?.MaxVDiskRawUsage),
             note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
-        },
-        {
-            id: 'capacity-alert',
-            title: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
-            value: getCapacityAlertValue(data?.CapacityAlert),
-            note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
         },
     ];
 }
