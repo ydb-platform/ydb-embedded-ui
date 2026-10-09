@@ -13,6 +13,7 @@ import {
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../utils/generateEvaluator';
+import {getNodeMemory} from '../../utils/memory';
 import type {Column} from '../../utils/tableUtils/types';
 import {formatToMs, parseUsToMs} from '../../utils/timeParsers';
 import {bytesToSpeed, isNumeric} from '../../utils/utils';
@@ -169,22 +170,26 @@ export function getUptimeColumn<
     };
 }
 
-export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: string}>(): Column<T> {
+export function getRAMColumn<
+    T extends {MemoryStats?: TMemoryStats; MemoryUsed?: string; MemoryLimit?: string},
+>(): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.RAM,
         header: NODES_COLUMNS_TITLES.RAM,
-        sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
+        sortAccessor: (row) => getNodeMemory(row).memoryUsed ?? 0,
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) => {
+            const {memoryUsed: used, memoryLimit: limit} = getNodeMemory(row);
             const [memoryUsed, memoryLimit] = formatStorageValues(
-                isNumeric(row.MemoryUsed) ? Number(row.MemoryUsed) : undefined,
-                isNumeric(row.MemoryLimit) ? Number(row.MemoryLimit) : undefined,
+                used,
+                limit,
                 'gb',
                 undefined,
                 true,
             );
 
             const hasData = memoryUsed || memoryLimit;
+            const memoryContent = used === undefined ? EMPTY_DATA_PLACEHOLDER : memoryUsed;
 
             return (
                 <CellWithPopover
@@ -206,10 +211,10 @@ export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: strin
                         </DefinitionList>
                     }
                 >
-                    {isNumeric(row.MemoryUsed) ? (
+                    {used !== undefined && limit !== undefined ? (
                         <ProgressViewer
-                            value={row.MemoryUsed}
-                            capacity={row.MemoryLimit}
+                            value={used}
+                            capacity={limit}
                             formatValues={(value, total) =>
                                 formatStorageValues(value, total, 'gb', undefined, true)
                             }
@@ -218,7 +223,7 @@ export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: strin
                             hideCapacity
                         />
                     ) : (
-                        EMPTY_DATA_PLACEHOLDER
+                        memoryContent
                     )}
                 </CellWithPopover>
             );
@@ -238,18 +243,27 @@ export function getMemoryColumn<
         render: ({row}) => {
             if (row.MemoryStats) {
                 return (
-                    <MemoryViewer formatValues={formatStorageValuesToGb} stats={row.MemoryStats} />
+                    <MemoryViewer
+                        formatValues={formatStorageValuesToGb}
+                        stats={row.MemoryStats}
+                        memoryUsed={row.MemoryUsed}
+                        memoryLimit={row.MemoryLimit}
+                    />
                 );
             }
 
-            if (!isNumeric(row.MemoryUsed)) {
+            const {memoryUsed, memoryLimit} = getNodeMemory(row);
+            if (memoryUsed === undefined) {
                 return EMPTY_DATA_PLACEHOLDER;
+            }
+            if (memoryLimit === undefined) {
+                return formatStorageValuesToGb(memoryUsed)[0];
             }
 
             return (
                 <ProgressViewer
-                    value={row.MemoryUsed}
-                    capacity={row.MemoryLimit}
+                    value={memoryUsed}
+                    capacity={memoryLimit}
                     formatValues={formatStorageValuesToGb}
                     colorizeProgress={true}
                 />

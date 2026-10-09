@@ -5,7 +5,7 @@ import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatStorageValues} from '../../utils/dataFormatters/dataFormatters';
 import {useNodeDeveloperUIHref} from '../../utils/hooks/useNodeDeveloperUIHref';
-import {isNumeric} from '../../utils/utils';
+import {getNodeMemory} from '../../utils/memory';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {PoolUsage} from '../PoolUsage/PoolUsage';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
@@ -90,18 +90,13 @@ export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
         return <div className="error">{i18n('no-data')}</div>;
     }
 
-    const memoryUsed = isNumeric(node.MemoryUsed) ? Number(node.MemoryUsed) : undefined;
-    const memoryLimit = isNumeric(node.MemoryLimit) ? Number(node.MemoryLimit) : undefined;
-    const hasMemoryUsed =
-        memoryUsed !== undefined && Number.isFinite(memoryUsed) && memoryUsed >= 0;
-    const hasMemoryLimit =
-        memoryLimit !== undefined && Number.isFinite(memoryLimit) && memoryLimit > 0;
+    const {memoryUsed, memoryLimit} = getNodeMemory(node);
 
     const renderMemory = () => {
-        if (!hasMemoryUsed) {
+        if (memoryUsed === undefined) {
             return EMPTY_DATA_PLACEHOLDER;
         }
-        if (!hasMemoryLimit) {
+        if (memoryLimit === undefined) {
             return formatMemoryValues(memoryUsed)[0];
         }
 

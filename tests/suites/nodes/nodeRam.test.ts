@@ -8,12 +8,14 @@ import {NodePage} from './NodePage';
 
 async function mockNodeMemory(
     page: Page,
-    memory: Pick<TSystemStateInfo, 'MemoryUsed' | 'MemoryLimit'>,
+    memory: Pick<TSystemStateInfo, 'MemoryUsed' | 'MemoryLimit' | 'MemoryStats'>,
 ) {
     await page.route(/\/viewer\//, async (route) => {
         const url = new URL(route.request().url());
         let json: unknown = {};
-        if (url.pathname.endsWith('/sysinfo')) {
+        if (url.pathname.endsWith('/sysinfo') && url.searchParams.get('node_id') === '.') {
+            json = {SystemStateInfo: [{NodeId: 1, Host: 'bootstrap-node', SystemState: 'Green'}]};
+        } else if (url.pathname.endsWith('/sysinfo')) {
             expect(url.searchParams.get('node_id')).toBe('42');
             json = {
                 SystemStateInfo: [
@@ -40,6 +42,22 @@ async function mockNodeMemory(
 }
 
 test.describe('Node RAM', () => {
+    test('uses the effective YDB limit on the node page', async ({page}) => {
+        await mockNodeMemory(page, {
+            MemoryUsed: '20000000000',
+            MemoryLimit: '32000000000',
+            MemoryStats: {AnonRss: '20000000000', HardLimit: '24000000000'},
+        });
+        const nodePage = new NodePage(page, '42');
+        await nodePage.goto();
+        await nodePage.waitForNodePageLoad();
+        await expect(nodePage.ram).toHaveText(/RAM20\s*GB\s*\/\s*24\s*GB/);
+        await expect(nodePage.ram.locator('.progress-viewer__line')).toHaveAttribute(
+            'style',
+            'width: 83%;',
+        );
+    });
+
     for (const theme of ['light', 'dark']) {
         test(`shows memory usage below Load average in ${theme} theme`, async ({
             page,
