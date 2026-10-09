@@ -1,9 +1,10 @@
 import {expect, request as playwrightRequest, test} from '@playwright/test';
 
+import type {ExecuteQueryResponse} from '../../../../../src/types/api/query';
 import {getClipboardContent} from '../../../../utils/clipboard';
 import {backend, database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
-import {longRunningStreamQuery, simpleQuery} from '../../constants';
+import {getLongRunningStreamQuery, longRunningStreamQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {
     Diagnostics,
@@ -61,9 +62,7 @@ test.describe('Diagnostics Queries tab', async () => {
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
 
         const runningQueryMarker = `e2e-running-query-${test.info().project.name}-${Date.now()}`;
-        const runningQuery = `-- ${runningQueryMarker}\n${new Array(400)
-            .fill(simpleQuery)
-            .join('\n')}`;
+        const runningQuery = `-- ${runningQueryMarker}\n${getLongRunningStreamQuery(500_000)}`;
         const storageState = await page.context().storageState();
         const queryRequestContext = await playwrightRequest.newContext({storageState});
         const csrfToken = (await page.context().cookies(backend)).find(
@@ -84,6 +83,7 @@ test.describe('Diagnostics Queries tab', async () => {
                     syntax: 'yql_v1',
                     schema: 'multipart',
                 },
+                timeout: 20_000,
             })
             .then(async (response) => {
                 if (!response.ok()) {
@@ -96,28 +96,82 @@ test.describe('Diagnostics Queries tab', async () => {
                 runningQueryRequestError = error;
             });
 
+        const deadline = Date.now() + 10_000;
+        let pendingPoll: Promise<boolean> | undefined;
+        const refreshRunningQueries = async () => {
+            if (runningQueryRequestError) {
+                throw runningQueryRequestError;
+            }
+
+            const timeout = Math.max(1, deadline - Date.now());
+            const [requestResult, refreshResult] = await Promise.allSettled([
+                page.waitForEvent('requestfinished', {
+                    predicate: (request) => {
+                        if (
+                            new URL(request.url()).pathname !== '/viewer/json/query' ||
+                            request.method() !== 'POST'
+                        ) {
+                            return false;
+                        }
+                        const body: {query?: string} = request.postDataJSON();
+                        return Boolean(
+                            body.query?.includes('`.sys/query_sessions`') &&
+                                /SELECT\s+\*/i.test(body.query),
+                        );
+                    },
+                    timeout,
+                }),
+                diagnostics.clickRefreshButton(timeout),
+            ]);
+            if (refreshResult.status === 'rejected') {
+                throw refreshResult.reason;
+            }
+            if (requestResult.status === 'rejected') {
+                throw requestResult.reason;
+            }
+            const response = await requestResult.value.response();
+            if (!response) {
+                throw new Error('Running queries request completed without a response');
+            }
+            expect(response.ok(), `Running queries HTTP status: ${response.status()}`).toBe(true);
+            const body: ExecuteQueryResponse & {status?: string} = await response.json();
+            expect(body.status, `Running queries response: ${await response.text()}`).toBe(
+                'SUCCESS',
+            );
+            const result = body.result?.[0];
+            const queryColumn = result?.columns?.findIndex(({name}) => name === 'Query') ?? -1;
+            return Boolean(
+                result?.rows?.some((row) => {
+                    const query = row[queryColumn];
+                    return typeof query === 'string' && query.includes(runningQueryMarker);
+                }),
+            );
+        };
+
         try {
             await expect
                 .poll(
-                    async () => {
-                        if (runningQueryRequestError) {
-                            throw runningQueryRequestError;
-                        }
-
-                        await diagnostics.clickRefreshButton();
-                        const queryTexts = await page
-                            .locator('.ydb-fixed-height-query')
-                            .allInnerTexts();
-                        return queryTexts.some((queryText) =>
-                            queryText.includes(runningQueryMarker),
-                        );
+                    () => {
+                        pendingPoll = refreshRunningQueries();
+                        return pendingPoll;
                     },
                     {timeout: 10_000},
                 )
                 .toBe(true);
+            await expect(
+                page.locator('.ydb-fixed-height-query').filter({hasText: runningQueryMarker}),
+            ).toBeVisible();
         } finally {
-            await queryRequestContext.dispose();
-            await runningQueryRequest;
+            await pendingPoll?.catch(() => undefined);
+            try {
+                // Closing the HTTP context can leave the server query running.
+                await runningQueryRequest;
+            } finally {
+                await queryRequestContext.dispose();
+            }
+        }
+        if (runningQueryRequestError) {
+            throw runningQueryRequestError;
         }
     });
 

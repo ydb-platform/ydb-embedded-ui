@@ -80,17 +80,26 @@ export function HealthcheckIssue({
                                         justifyContent="space-between"
                                         className={b('issue-summary')}
                                     >
-                                        <Flex direction="column" gap={1} alignSelf="center">
-                                            <Text variant="subheader-2">{issue.message}</Text>
-
+                                        <Flex
+                                            gap={2}
+                                            alignItems="center"
+                                            className={b('issue-message')}
+                                        >
                                             {issue.status && (
                                                 <div className={b('issue-status')}>
                                                     <EntityStatus.Label
+                                                        view="compact"
                                                         size="s"
                                                         status={hcStatusToColorFlag[issue.status]}
                                                     />
                                                 </div>
                                             )}
+                                            <Text
+                                                variant="subheader-2"
+                                                className={b('issue-title')}
+                                            >
+                                                {issue.message}
+                                            </Text>
                                         </Flex>
                                         <Flex
                                             wrap="nowrap"
@@ -124,21 +133,22 @@ export function HealthcheckIssue({
                             >
                                 <Flex
                                     id={id}
-                                    direction="column"
-                                    gap={1}
-                                    alignSelf="center"
+                                    gap={2}
+                                    alignItems="center"
                                     className={b('issue-message')}
                                 >
-                                    <Text variant="subheader-2">{issue.message}</Text>
-
                                     {issue.status && (
                                         <div className={b('issue-status')}>
                                             <EntityStatus.Label
+                                                view="compact"
                                                 size="s"
                                                 status={hcStatusToColorFlag[issue.status]}
                                             />
                                         </div>
                                     )}
+                                    <Text variant="subheader-2" className={b('issue-title')}>
+                                        {issue.message}
+                                    </Text>
                                 </Flex>
                                 <div
                                     className={b('issue-action')}
