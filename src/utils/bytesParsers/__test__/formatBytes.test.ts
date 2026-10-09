@@ -2,6 +2,24 @@ import {UNBREAKABLE_GAP} from '../../constants';
 import {formatBytes} from '../formatBytes';
 
 describe('formatBytes', () => {
+    test.each([0, 1, 4_000_000])('omits decimals when %s bytes round to zero GB', (value) => {
+        expect(formatBytes({value, size: 'gb', fixedDecimalPlaces: 2})).toBe(
+            `0${UNBREAKABLE_GAP}GB`,
+        );
+    });
+
+    test('keeps two decimals for non-zero sizes and speeds', () => {
+        expect(formatBytes({value: 1_000_000_000, size: 'gb', fixedDecimalPlaces: 2})).toBe(
+            `1.00${UNBREAKABLE_GAP}GB`,
+        );
+        expect(
+            formatBytes({value: 5_000, size: 'mb', fixedDecimalPlaces: 2, withSpeedLabel: true}),
+        ).toBe(`0.01${UNBREAKABLE_GAP}MB/s`);
+        expect(
+            formatBytes({value: 0, size: 'mb', fixedDecimalPlaces: 2, withSpeedLabel: true}),
+        ).toBe(`0${UNBREAKABLE_GAP}MB/s`);
+    });
+
     test('should work with only value', () => {
         expect(formatBytes({value: 100})).toBe(`100${UNBREAKABLE_GAP}B`);
         expect(formatBytes({value: 100_000})).toBe(`100${UNBREAKABLE_GAP}KB`);

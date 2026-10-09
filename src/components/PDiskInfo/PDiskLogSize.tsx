@@ -1,7 +1,6 @@
 import {Flex, Progress} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
-import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatStorageMetricPair} from '../../utils/storageMetrics';
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 
@@ -20,7 +19,7 @@ export function PDiskLogSize({used, total}: {used?: string; total?: string}) {
             : undefined;
 
     if (percentage === undefined) {
-        return EMPTY_DATA_PLACEHOLDER;
+        return formatStorageMetricPair(usedSize, totalSize, 2);
     }
 
     return (

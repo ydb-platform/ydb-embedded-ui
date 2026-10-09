@@ -32,31 +32,14 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
         SlotSize: PDisk?.SlotSize,
     });
 
-    const whiteboardAllocatedSize = parseOptionalNonNegativeNumber(whiteboardVDisk.AllocatedSize);
-    const whiteboardAvailableSize = parseOptionalNonNegativeNumber(whiteboardVDisk.AvailableSize);
-    const whiteboardSlotSize = parseOptionalNonNegativeNumber(
-        PDisk?.Whiteboard?.EnforcedDynamicSlotSize,
-    );
-    const whiteboardSizeFields =
+    const WhiteboardSize =
         hasWhiteboardData && data.Whiteboard
             ? prepareVDiskSizeFields({
-                  AvailableSize: whiteboardAvailableSize,
-                  AllocatedSize: whiteboardAllocatedSize,
-                  SlotSize: whiteboardSlotSize,
-              })
+                  AvailableSize: whiteboardVDisk.AvailableSize,
+                  AllocatedSize: whiteboardVDisk.AllocatedSize,
+                  SlotSize: PDisk?.Whiteboard?.EnforcedDynamicSlotSize,
+              }).DisplaySize
             : undefined;
-    const WhiteboardSize = whiteboardSizeFields
-        ? {
-              AllocatedSize:
-                  whiteboardAllocatedSize === undefined
-                      ? undefined
-                      : whiteboardSizeFields.AllocatedSize,
-              SizeLimit:
-                  whiteboardAvailableSize === undefined && whiteboardSlotSize === undefined
-                      ? undefined
-                      : whiteboardSizeFields.SizeLimit,
-          }
-        : undefined;
 
     const preparedDonors = bscVDisk.Donors?.map((donor) => {
         const preparedDonor = prepareGroupsVDisk(donor);

@@ -2,7 +2,7 @@
     gap: var(--g-spacing-4) var(--g-spacing-6);
 
     &__configuration {
-        width: 380px;
+        width: 400px;
         max-width: 100%;
     }
 
@@ -13,5 +13,9 @@
 
     .g-definition-list {
         --g-definition-list-item-gap: var(--g-spacing-3);
+    }
+
+    .g-definition-list__definition {
+        min-width: 0;
     }
 }

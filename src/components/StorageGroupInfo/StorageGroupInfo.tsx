@@ -1,4 +1,4 @@
-import {Flex} from '@gravity-ui/uikit';
+import {Flex, Text, Tooltip} from '@gravity-ui/uikit';
 
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
@@ -8,7 +8,7 @@ import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatMetricPercent, formatStorageMetricPair} from '../../utils/storageMetrics';
 import {formatToMs} from '../../utils/timeParsers';
-import {bytesToSpeed, parseOptionalNonNegativeNumber} from '../../utils/utils';
+import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 import {
     getStorageGroupCapacityInfoItems,
     toDefinitionListItems,
@@ -53,7 +53,15 @@ export function StorageGroupInfo({data, className}: StorageGroupInfoProps) {
     const configurationItems: YDBDefinitionListItem[] = [
         {
             name: storageGroupInfoKeyset('field_pool-name'),
-            content: PoolName || EMPTY_DATA_PLACEHOLDER,
+            content: PoolName ? (
+                <Tooltip content={PoolName}>
+                    <Text ellipsisLines={2} wordBreak="break-word">
+                        {PoolName}
+                    </Text>
+                </Tooltip>
+            ) : (
+                EMPTY_DATA_PLACEHOLDER
+            ),
         },
         ...(
             [
@@ -86,7 +94,13 @@ export function StorageGroupInfo({data, className}: StorageGroupInfoProps) {
         ] as const
     ).map(([name, value]) => ({
         name,
-        content: bytesToSpeed(parseOptionalNonNegativeNumber(value)) || EMPTY_DATA_PLACEHOLDER,
+        content:
+            formatBytes({
+                value: parseOptionalNonNegativeNumber(value),
+                size: 'mb',
+                fixedDecimalPlaces: 2,
+                withSpeedLabel: true,
+            }) || EMPTY_DATA_PLACEHOLDER,
     }));
     const capacityItems: YDBDefinitionListItem[] = [];
 

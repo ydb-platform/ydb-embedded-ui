@@ -996,6 +996,31 @@ test.describe('Blob storage capacity metrics integration', () => {
         });
     }
 
+    test('keeps known values in partial VDisk and PDisk size pairs', async ({page}) => {
+        await enableBlobStorageCapacityMetrics(page);
+        await enableStorageDisksColumn(page);
+        await setupVDiskPageMocks(page, {
+            withCapacityMetrics: true,
+            whiteboardAllocatedSize: '1000000000',
+            whiteboardAvailableSize: '',
+            whiteboardSlotSize: '',
+            pDiskWhiteboardAvailableSize: '',
+            pDiskWhiteboardTotalSize: '22000000000',
+        });
+        await page.goto(VDISK_PAGE_PATH);
+        await new ClusterStorageTable(page).waitForTableData();
+
+        await page
+            .locator('.ydb-storage-vdisks__wrapper .storage-disk-progress-bar')
+            .first()
+            .hover();
+        const popup = await waitForDiskPopup(page, 'Go to VDisk');
+        const vDiskPanel = await getDiskPopupPanel(popup, 'VDisk', VDISK_ID);
+        const pDiskPanel = await getDiskPopupPanel(popup, 'PDisk', `${NODE_ID}-${PDISK_ID}`);
+        await expect(getDefinitionListValue(vDiskPanel, 'Size')).toHaveText(/1\.00\s*GB \/ —/);
+        await expect(getDefinitionListValue(pDiskPanel, 'Space')).toHaveText(/— \/ 22\.00\s*GB/);
+    });
+
     test('shows the same explicit metrics across pages and Groups, Nodes, and PDisk popups', async ({
         page,
     }) => {

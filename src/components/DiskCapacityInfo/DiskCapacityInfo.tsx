@@ -55,7 +55,7 @@ export function getVDiskCapacityInfoItems(
     data: PreparedVDisk | undefined,
     {withRawUsage}: {withRawUsage: boolean},
 ): DiskCapacityInfoItem[] {
-    const sizeData = data?.WhiteboardSize ?? data;
+    const sizeData = data?.WhiteboardSize ?? data?.DisplaySize ?? data;
     const items: DiskCapacityInfoItem[] = [
         {
             id: 'size',
@@ -166,8 +166,8 @@ export function getVDiskCapacityItems(
     data: PreparedVDisk,
     {capacityMetricsEnabled}: {capacityMetricsEnabled: boolean},
 ): DiskDetailItem[] {
-    const size: Pick<PreparedVDisk, 'AllocatedSize' | 'SizeLimit' | 'HasCompleteSizeData'> =
-        capacityMetricsEnabled ? (data.WhiteboardSize ?? data) : data;
+    const size =
+        (capacityMetricsEnabled ? data.WhiteboardSize : undefined) ?? data.DisplaySize ?? data;
     const items: DiskDetailItem[] = [
         {
             id: 'group-size-in-units',
@@ -178,10 +178,7 @@ export function getVDiskCapacityItems(
         {
             id: 'size',
             name: vDiskInfoKeyset('size'),
-            content:
-                size.HasCompleteSizeData === false
-                    ? EMPTY_DATA_PLACEHOLDER
-                    : formatStorageMetricPair(size.AllocatedSize, size.SizeLimit, 2),
+            content: formatStorageMetricPair(size.AllocatedSize, size.SizeLimit, 2),
         },
         {
             id: 'capacity-alert',

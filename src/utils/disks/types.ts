@@ -108,8 +108,11 @@ export interface PreparedVDisk
     AllocatedPercent?: number;
     SizeLimit?: number;
     FreeSize?: number;
-    /** Whether the source provides allocated size and enough data to determine its limit. */
-    HasCompleteSizeData?: boolean;
+    /** Size values for display, preserving missing source values independently. */
+    DisplaySize?: {
+        AllocatedSize?: number;
+        SizeLimit?: number;
+    };
     WhiteboardSize?: {
         AllocatedSize?: number;
         SizeLimit?: number;

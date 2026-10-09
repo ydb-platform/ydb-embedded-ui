@@ -133,9 +133,9 @@ export function StorageGroupPage() {
         }
         return (
             <React.Fragment>
-                <div className={storageGroupPageCn('storage-title')}>
+                <Text as="h2" variant="subheader-3" className={storageGroupPageCn('storage-title')}>
                     {storageGroupPageKeyset('storage')}
-                </div>
+                </Text>
                 <PaginatedStorage
                     database={database}
                     groupId={groupId}

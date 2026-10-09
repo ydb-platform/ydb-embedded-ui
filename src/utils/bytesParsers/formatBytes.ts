@@ -70,10 +70,12 @@ const formatToSize = ({
 }: FormatToSizeArgs<BytesSizes> & {fixedDecimalPlaces?: number}) => {
     const convertedValue = Number(value) / sizes[size].value;
     if (fixedDecimalPlaces !== undefined) {
-        const pattern = fixedDecimalPlaces > 0 ? `0,0.${'0'.repeat(fixedDecimalPlaces)}` : '0,0';
-        return configuredNumeral(roundToDecimalPlaces(convertedValue, fixedDecimalPlaces)).format(
-            pattern,
-        );
+        const roundedValue = roundToDecimalPlaces(convertedValue, fixedDecimalPlaces);
+        const pattern =
+            roundedValue !== 0 && fixedDecimalPlaces > 0
+                ? `0,0.${'0'.repeat(fixedDecimalPlaces)}`
+                : '0,0';
+        return configuredNumeral(roundedValue).format(pattern);
     }
     const result = roundToPrecision(convertedValue, precision);
 
