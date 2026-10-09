@@ -11,7 +11,13 @@ const testCommand = workflow.match(
     /^\s+run: bash controller\/scripts\/playwright-docker\.sh[^\n]+/m,
 )?.[0];
 const releaseRetries = testCommand?.match(/--retries=\d+\b/)?.[0];
+const releaseWorkers = testCommand?.match(/--workers=\d+\b/)?.[0];
+const releaseTrace = testCommand?.match(/--trace=[a-z-]+\b/)?.[0];
+const releaseVideo = workflow.match(/^\s+PLAYWRIGHT_VIDEO: ([a-z-]+)$/m)?.[1];
 assert.ok(releaseRetries, 'Release workflow must specify the retry policy');
+assert.ok(releaseWorkers, 'Release workflow must specify the CI worker count');
+assert.ok(releaseTrace, 'Release workflow must specify the trace policy');
+assert.ok(releaseVideo, 'Release workflow must specify the video policy');
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'release-report-smoke-'));
 const blobs = path.join(directory, 'all-blob-reports');
 fs.mkdirSync(blobs);
@@ -24,6 +30,12 @@ try {
             '--rm',
             '-e',
             `RELEASE_RETRIES=${releaseRetries}`,
+            '-e',
+            `RELEASE_WORKERS=${releaseWorkers}`,
+            '-e',
+            `RELEASE_TRACE=${releaseTrace}`,
+            '-e',
+            `PLAYWRIGHT_VIDEO=${releaseVideo}`,
             '-v',
             `${blobs}:/blobs`,
             '-v',
@@ -37,27 +49,35 @@ mkdir /tmp/fixture
 cd /tmp/fixture
 npm install --no-save --ignore-scripts --no-audit --no-fund @playwright/test@1.58.0
 cat > playwright.config.js <<'CONFIG'
-module.exports = {testDir: '.', retries: 0, reporter: [['blob', {outputDir: '/blobs'}]]};
+module.exports = {
+    testDir: '.', retries: 0, reporter: [['blob', {outputDir: '/blobs'}]],
+    use: {video: process.env.PLAYWRIGHT_VIDEO, screenshot: 'only-on-failure'},
+};
 CONFIG
 cat > fixture.spec.js <<'TEST'
 const {test, expect} = require('@playwright/test');
 const fs = require('node:fs');
-test('passes', () => expect(1).toBe(1));
-test('recovers on retry with attachment', async ({}, info) => {
+test('passes', async ({page}) => {
+    await page.setContent('<p>ready</p>');
+    await expect(page.getByText('ready')).toBeVisible();
+});
+test('recovers on retry with attachment', async ({page}, info) => {
+    await page.setContent('<p>retry fixture</p>');
     const file = info.outputPath('retry-proof.txt');
     fs.writeFileSync(file, 'release retry attachment');
     await info.attach('retry-proof', {path: file, contentType: 'text/plain'});
     expect(info.retry).toBe(1);
 });
-test('fails with attachment', async ({}, info) => {
+test('fails with attachment', async ({page}, info) => {
+    await page.setContent('<p>failure fixture</p>');
     const file = info.outputPath('proof.txt');
     fs.writeFileSync(file, 'release report attachment');
     await info.attach('proof', {path: file, contentType: 'text/plain'});
     expect(1).toBe(2);
 });
 TEST
-npx --no playwright test "$RELEASE_RETRIES" --grep 'recovers on retry' --reporter=line
-if npx --no playwright test "$RELEASE_RETRIES"; then
+npx --no playwright test "$RELEASE_RETRIES" "$RELEASE_WORKERS" "$RELEASE_TRACE" --grep 'recovers on retry' --reporter=line
+if npx --no playwright test "$RELEASE_RETRIES" "$RELEASE_WORKERS" "$RELEASE_TRACE"; then
     echo 'Fixture should contain a failed test' >&2
     exit 1
 fi
@@ -96,6 +116,7 @@ grep '/input/resources' /tmp/readonly.log
         [report.stats.expected, report.stats.unexpected, report.stats.skipped, report.stats.flaky],
         [1, 1, 0, 1],
     );
+    assert.equal(report.config.workers, Number(releaseWorkers.split('=')[1]));
     const specs = report.suites.flatMap((suite) => suite.specs);
     const recovered = specs.find((spec) => spec.title === 'recovers on retry with attachment')
         ?.tests[0];
@@ -114,17 +135,36 @@ grep '/input/resources' /tmp/readonly.log
         exhausted.results.map(({status, retry}) => ({status, retry})),
         [0, 1, 2].map((retry) => ({status: 'failed', retry})),
     );
+    for (const result of specs.flatMap((spec) => spec.tests[0].results)) {
+        const names = result.attachments.map(({name}) => name);
+        assert.deepEqual(
+            names.filter((name) => name === 'trace' || name === 'video').sort(),
+            result.retry === 1 ? ['trace', 'video'] : [],
+        );
+        if (result.status === 'failed') {
+            assert.ok(names.includes('screenshot'), 'Every failed attempt keeps its screenshot');
+        }
+    }
     assert.ok(fs.statSync(path.join(artifacts, 'playwright-report/index.html')).size > 0);
     const data = path.join(artifacts, 'playwright-report/data');
-    const attachments = fs
-        .readdirSync(data)
+    const files = fs.readdirSync(data);
+    for (const extension of ['.zip', '.webm', '.png']) {
+        assert.ok(
+            files.some(
+                (file) => file.endsWith(extension) && fs.statSync(path.join(data, file)).size,
+            ),
+            `Merged HTML report must retain ${extension} attachments`,
+        );
+    }
+    const attachments = files
+        .filter((file) => file.endsWith('.txt'))
         .map((file) => fs.readFileSync(path.join(data, file), 'utf8'));
     assert.ok(attachments.includes('release report attachment'));
     assert.ok(attachments.includes('release retry attachment'));
     assert.equal(digest(), before);
     assert.deepEqual(fs.readdirSync(blobs), inputs);
     console.info(
-        'Report smoke passed: retry recovery and failure attachments retained; 1 passed, 1 failed, 1 flaky; input ZIP unchanged.',
+        'Report smoke passed: CI retries and first-retry trace/video verified; failed-attempt screenshots and attachments retained; input ZIP unchanged.',
     );
 } finally {
     // The runner writes files as root; remove only this smoke's temporary output.

@@ -36,7 +36,7 @@ jobs:
 
       - name: Start local YDB
         id: ydb
-        uses: astandrik/setup-local-ydb@07ceb4e25e2fcefd51c9cad5b6ee396767ef030b # v1.1.0
+        uses: astandrik/setup-local-ydb@ba59d49d74fdab2f308132e72da6d4e111b7200d # v1.1.1, verified cleanup
         with:
           version: nightly
           topology: root
