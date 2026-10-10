@@ -6,7 +6,11 @@ import {isNonEmptyValue} from '../../utils';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatMetricPercent, formatStorageMetricPair} from '../../utils/storageMetrics';
+import {
+    formatMetricPercent,
+    formatStorageMetricPair,
+    formatStorageThroughput,
+} from '../../utils/storageMetrics';
 import {formatToMs} from '../../utils/timeParsers';
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 import {
@@ -94,13 +98,7 @@ export function StorageGroupInfo({data, className}: StorageGroupInfoProps) {
         ] as const
     ).map(([name, value]) => ({
         name,
-        content:
-            formatBytes({
-                value: parseOptionalNonNegativeNumber(value),
-                size: 'mb',
-                fixedDecimalPlaces: 2,
-                withSpeedLabel: true,
-            }) || EMPTY_DATA_PLACEHOLDER,
+        content: formatStorageThroughput(value),
     }));
     const capacityItems: YDBDefinitionListItem[] = [];
 

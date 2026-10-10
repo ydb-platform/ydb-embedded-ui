@@ -51,9 +51,8 @@ function getPageCapacityItems(data: PreparedVDisk, capacityMetricsEnabled: boole
 export function VDiskInfo({data = {}, className}: VDiskInfoProps) {
     const [expanded, setExpanded] = React.useState(false);
     const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
-    const disks = data.DonorMode
-        ? [data.Recipient].filter((disk) => disk !== undefined)
-        : data.Donors;
+    const donors = data.Replicated === false ? data.Donors : undefined;
+    const disks = data.DonorMode ? [data.Recipient].filter((disk) => disk !== undefined) : donors;
     const runtimeItems: YDBDefinitionListItem[] = [
         {
             name: vDiskInfoKeyset('front-queues'),

@@ -27,6 +27,12 @@ for (const scenario of [
         await vdisk.goto();
         await vdisk.evict.click();
         await expect(vdisk.dialog).toBeVisible();
+        await expect(
+            vdisk.dialog.getByText('The VDisk will be evicted from the PDisk.', {exact: true}),
+        ).toBeVisible();
+        await expect(vdisk.dialog.locator('.g-alert.g-card_theme_warning')).toHaveText(
+            'This VDisk will be replaced by a new one in the group. Data will be replicated to the new disk. The old VDisk will serve as a donor until replication is complete, and then it will be removed.',
+        );
         expect(mock.requests.filter(({method}) => method === 'POST')).toHaveLength(0);
         await vdisk.confirmEvict.click();
         await expect(vdisk.dialog).toBeHidden();

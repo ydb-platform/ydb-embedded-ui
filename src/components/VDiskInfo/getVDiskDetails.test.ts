@@ -3,11 +3,11 @@ import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from '../../utils/constants';
 import {getVDiskIdentityItems, getVDiskThroughputItems} from './getVDiskDetails';
 
 describe('VDisk detail items', () => {
-    test('formats zero and nonzero throughput with two decimal places', () => {
+    test('formats nonzero throughput with two decimal places and preserves zero', () => {
         const items = getVDiskThroughputItems({ReadThroughput: '1000000', WriteThroughput: '0'});
         expect(items.map(({content}) => content)).toEqual([
             `1.00${UNBREAKABLE_GAP}MB/s`,
-            `0.00${UNBREAKABLE_GAP}MB/s`,
+            `0${UNBREAKABLE_GAP}MB/s`,
         ]);
     });
 

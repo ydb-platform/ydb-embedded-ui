@@ -41,7 +41,7 @@ export function DiskStatusLabel({
     tooltip,
     dangerHeavy,
     size = 's',
-    iconSize = size === 's' ? 14 : 12,
+    iconSize = 12,
     className,
 }: (DiskStatusLabelData | TitledDiskStatusLabelData) &
     Pick<LabelProps, 'size' | 'className'> & {iconSize?: number}) {
