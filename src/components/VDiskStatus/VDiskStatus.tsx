@@ -10,7 +10,13 @@ import {vDiskStatusKeyset as i18n} from './i18n';
 import {getVDiskStateLabel} from './statuses';
 
 export function VDiskStateLabel({state, size}: {state?: EVDiskState} & Pick<LabelProps, 'size'>) {
-    return <DiskStatusLabel {...getVDiskStateLabel({VDiskState: state})} size={size} />;
+    return (
+        <DiskStatusLabel
+            {...getVDiskStateLabel({VDiskState: state})}
+            size={size}
+            iconSize={size === 'xs' ? 12 : 14}
+        />
+    );
 }
 
 export function VDiskDonorLabel({
@@ -18,7 +24,12 @@ export function VDiskDonorLabel({
     size,
 }: {donorMode?: boolean} & Pick<LabelProps, 'size'>) {
     return donorMode ? (
-        <DiskStatusLabel value={i18n('label_donor')} {...VDISK_LABEL_CONFIG.donor} size={size} />
+        <DiskStatusLabel
+            value={i18n('label_donor')}
+            {...VDISK_LABEL_CONFIG.donor}
+            size={size}
+            iconSize={size === 'xs' ? 12 : 14}
+        />
     ) : null;
 }
 

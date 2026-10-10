@@ -1,375 +1,153 @@
 import React from 'react';
 
-import {Flex} from '@gravity-ui/uikit';
+import {ChevronDown, ChevronUp} from '@gravity-ui/icons';
+import {Button, Flex, Icon} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
-import {getPDiskPagePath, useVDiskPagePath} from '../../routes';
 import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
-import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
-import {
-    formatDurationSeconds,
-    formatStorageValuesToGb,
-} from '../../utils/dataFormatters/dataFormatters';
-import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
-import {getDataSeverityColor} from '../../utils/disks/helpers';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {PreparedVDisk} from '../../utils/disks/types';
-import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {bytesToSpeed} from '../../utils/utils';
-import {InternalLink} from '../InternalLink';
-import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
-import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
-import {StatusIcon} from '../StatusIcon/StatusIcon';
+import {formatMetricPercent} from '../../utils/storageMetrics';
+import {getVDiskCapacityItems} from '../DiskCapacityInfo/DiskCapacityInfo';
+import {DiskFlagLabel} from '../DiskStatus/DiskStatus';
+import {VDisk} from '../VDisk/VDisk';
+import {VDiskCompactionRankLabel, VDiskFrontQueuesLabel} from '../VDiskStatus';
 import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
-import {getVDiskCapacityColumns} from './getVDiskCapacityColumns';
+import {VDiskCopyableValue} from './VDiskCopyableValue';
+import {getVDiskIdentityItems, getVDiskThroughputItems} from './getVDiskDetails';
 import {vDiskInfoKeyset} from './i18n';
 
 import './VDiskInfo.scss';
 
 const b = cn('ydb-vdisk-info');
 
-interface VDiskInfoProps<T extends PreparedVDisk> {
-    data?: T;
-    /** @deprecated VDisk page link is now rendered externally */
-    withVDiskPageLink?: boolean;
-    withTitle?: boolean;
+interface VDiskInfoProps {
+    data?: PreparedVDisk;
     className?: string;
-    wrap?: true;
 }
 
-// eslint-disable-next-line complexity
-export function VDiskInfo<T extends PreparedVDisk>({
-    data,
-    withVDiskPageLink,
-    withTitle,
-    className,
-    wrap,
-}: VDiskInfoProps<T>) {
-    const hasDeveloperUi = useHasDeveloperUi();
-    const isViewerUser = useIsViewerUser();
-    const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
-
-    const getVDiskPagePath = useVDiskPagePath();
-
-    const {
-        FrontQueues,
-        Guid,
-        Replicated,
-        ReplicationProgress,
-        ReplicationSecondsRemaining,
-        Donors,
-        VDiskState,
-        VDiskSlotId,
-        Kind,
-        SatisfactionRank,
-        HasUnreadableBlobs,
-        IncarnationGuid,
-        InstanceGuid,
-        StoragePoolName,
-        ReadThroughput,
-        WriteThroughput,
-        PDiskId,
-        StringifiedId,
-        NodeId,
-        Recipient,
-    } = data || {};
-
-    const capacityColumns = capacityMetricsEnabled
-        ? getVDiskCapacityColumns({data, isViewerUser})
-        : undefined;
-    const leftColumn: YDBDefinitionListItem[] = capacityColumns?.leftColumn ?? [];
-    const rightColumn: YDBDefinitionListItem[] = capacityColumns?.rightColumn ?? [];
-    const linksColumn = capacityMetricsEnabled ? leftColumn : rightColumn;
-
+function getPageCapacityItems(data: PreparedVDisk, capacityMetricsEnabled: boolean) {
+    const capacityItems = getVDiskCapacityItems(data, {capacityMetricsEnabled});
     if (!capacityMetricsEnabled) {
-        const {AllocatedSize, SizeLimit, AllocatedPercent, DiskSpace} = data || {};
-
-        if (!isNil(StoragePoolName)) {
-            leftColumn.push({name: vDiskInfoKeyset('pool-name'), content: StoragePoolName});
-        }
-        if (!isNil(VDiskState)) {
-            leftColumn.push({
-                name: vDiskInfoKeyset('state-status'),
-                content: VDiskState,
-            });
-        }
-
-        if (Number(AllocatedSize) >= 0 && Number(SizeLimit) >= 0) {
-            leftColumn.push({
-                name: vDiskInfoKeyset('size'),
-                content: formatStorageValuesToGb(Number(AllocatedSize), Number(SizeLimit)).join(
-                    ' / ',
-                ),
-            });
-        }
-        if (!isNaN(Number(AllocatedPercent))) {
-            leftColumn.push({
+        capacityItems.push(
+            {
+                id: 'usage',
                 name: vDiskInfoKeyset('usage'),
-                content: `${AllocatedPercent}%`,
-            });
-        }
-
-        if (!isNil(DiskSpace)) {
-            leftColumn.push({
+                content: formatMetricPercent(data.AllocatedPercent, 2),
+            },
+            {
+                id: 'disk-space',
                 name: vDiskInfoKeyset('space-status'),
-                content: <StatusIcon status={DiskSpace} />,
-            });
-        }
-    }
-
-    if (!capacityMetricsEnabled) {
-        if (!isNil(FrontQueues)) {
-            leftColumn.push({
-                name: vDiskInfoKeyset('front-queues'),
-                content: <StatusIcon status={FrontQueues} />,
-            });
-        }
-        if (!isNil(SatisfactionRank?.FreshRank?.Flag)) {
-            leftColumn.push({
-                name: vDiskInfoKeyset('fresh-rank-satisfaction'),
-                content: <StatusIcon status={SatisfactionRank?.FreshRank?.Flag} />,
-            });
-        }
-        if (!isNil(SatisfactionRank?.LevelRank?.Flag)) {
-            leftColumn.push({
-                name: vDiskInfoKeyset('level-rank-satisfaction'),
-                content: <StatusIcon status={SatisfactionRank?.LevelRank?.Flag} />,
-            });
-        }
-        if (!isNil(ReadThroughput)) {
-            leftColumn.push({
-                name: vDiskInfoKeyset('read-throughput'),
-                content: bytesToSpeed(ReadThroughput),
-            });
-        }
-        if (!isNil(WriteThroughput)) {
-            leftColumn.push({
-                name: vDiskInfoKeyset('write-throughput'),
-                content: bytesToSpeed(WriteThroughput),
-            });
-        }
-    }
-
-    if (!isNil(Replicated)) {
-        rightColumn.push({
-            name: vDiskInfoKeyset('replication-status'),
-            content: Replicated ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
-        });
-    }
-    // Only show replication progress and time remaining when disk is not replicated and state is OK
-    if (Replicated === false && VDiskState === EVDiskState.OK) {
-        if (!isNil(ReplicationProgress)) {
-            rightColumn.push({
-                name: vDiskInfoKeyset('replication-progress'),
-                content: (
-                    <ProgressViewer
-                        value={Math.round(ReplicationProgress * 100)}
-                        percents
-                        defaultStatus="info"
-                        capacity={100}
-                    />
-                ),
-            });
-        }
-        if (!isNil(ReplicationSecondsRemaining)) {
-            const timeRemaining = formatDurationSeconds(ReplicationSecondsRemaining);
-            if (timeRemaining) {
-                rightColumn.push({
-                    name: vDiskInfoKeyset('replication-time-remaining'),
-                    content: timeRemaining,
-                });
-            }
-        }
-    }
-    if (!capacityMetricsEnabled && !isNil(VDiskSlotId)) {
-        rightColumn.push({name: vDiskInfoKeyset('slot-id'), content: VDiskSlotId});
-    }
-    if (!capacityMetricsEnabled && !isNil(PDiskId)) {
-        const pDiskPath =
-            isViewerUser && !isNil(NodeId) ? getPDiskPagePath(PDiskId, NodeId) : undefined;
-
-        const content = pDiskPath ? <InternalLink to={pDiskPath}>{PDiskId}</InternalLink> : PDiskId;
-
-        rightColumn.push({
-            name: vDiskInfoKeyset('label_pdisk-id'),
-            content,
-        });
-    }
-
-    if (!capacityMetricsEnabled && !isNil(Kind)) {
-        rightColumn.push({name: vDiskInfoKeyset('kind'), content: Kind});
-    }
-    if (!capacityMetricsEnabled && !isNil(Guid)) {
-        rightColumn.push({name: vDiskInfoKeyset('guid'), content: Guid});
-    }
-    if (!capacityMetricsEnabled && !isNil(IncarnationGuid)) {
-        rightColumn.push({name: vDiskInfoKeyset('incarnation-guid'), content: IncarnationGuid});
-    }
-    if (!capacityMetricsEnabled && !isNil(InstanceGuid)) {
-        rightColumn.push({name: vDiskInfoKeyset('instance-guid'), content: InstanceGuid});
-    }
-    if (!capacityMetricsEnabled && !isNil(HasUnreadableBlobs)) {
-        rightColumn.push({
-            name: vDiskInfoKeyset('has-unreadable-blobs'),
-            content: HasUnreadableBlobs ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
-        });
-    }
-    if (!isNil(Recipient) && !isNil(Recipient.StringifiedId)) {
-        const recipientPath = getVDiskPagePath({
-            nodeId: Recipient.NodeId,
-            vDiskId: Recipient.StringifiedId,
-        });
-        rightColumn.push({
-            name: vDiskInfoKeyset('label_recipient'),
-            content: recipientPath ? (
-                <InternalLink to={recipientPath}>{Recipient.StringifiedId}</InternalLink>
-            ) : (
-                Recipient.StringifiedId
-            ),
-        });
-    }
-
-    // Show donors list when replication is in progress
-    if (Replicated === false && Donors?.length) {
-        const donorLinks = Donors.map((donor, index) => {
-            const {StringifiedId: id, NodeId: dNodeId} = donor;
-
-            if (!id) {
-                return null;
-            }
-
-            const vDiskPath = getVDiskPagePath({
-                nodeId: dNodeId,
-                vDiskId: id,
-            });
-
-            return vDiskPath ? (
-                <InternalLink key={index} to={vDiskPath}>
-                    {id}
-                </InternalLink>
-            ) : null;
-        }).filter(Boolean);
-
-        if (donorLinks.length) {
-            rightColumn.push({
-                name: vDiskInfoKeyset('donors'),
-                content: (
-                    <Flex direction="column" gap={1}>
-                        {donorLinks}
-                    </Flex>
-                ),
-            });
-        }
-    }
-    if (capacityMetricsEnabled) {
-        if (!isNil(FrontQueues)) {
-            rightColumn.push({
-                name: vDiskInfoKeyset('front-queues'),
-                content: <StatusIcon status={FrontQueues} />,
-            });
-        }
-        if (!isNil(SatisfactionRank?.FreshRank?.Flag)) {
-            rightColumn.push({
-                name: vDiskInfoKeyset('fresh-rank-satisfaction'),
-                content: <StatusIcon status={SatisfactionRank?.FreshRank?.Flag} />,
-            });
-        }
-        if (!isNil(SatisfactionRank?.LevelRank?.Flag)) {
-            rightColumn.push({
-                name: vDiskInfoKeyset('level-rank-satisfaction'),
-                content: <StatusIcon status={SatisfactionRank?.LevelRank?.Flag} />,
-            });
-        }
-        if (!isNil(HasUnreadableBlobs)) {
-            rightColumn.push({
-                name: vDiskInfoKeyset('has-unreadable-blobs'),
-                content: HasUnreadableBlobs ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
-            });
-        }
-        if (!isNil(ReadThroughput)) {
-            rightColumn.push({
-                name: vDiskInfoKeyset('read-throughput'),
-                content: bytesToSpeed(ReadThroughput),
-            });
-        }
-        if (!isNil(WriteThroughput)) {
-            rightColumn.push({
-                name: vDiskInfoKeyset('write-throughput'),
-                content: bytesToSpeed(WriteThroughput),
-            });
-        }
-    }
-    const links: React.ReactNode[] = [];
-    const vDiskPagePath = getVDiskPagePath({
-        nodeId: NodeId,
-        vDiskId: StringifiedId,
-    });
-    if (withVDiskPageLink && vDiskPagePath) {
-        links.push(
-            <LinkWithIcon
-                key={vDiskPagePath}
-                title={vDiskInfoKeyset('vdisk-page')}
-                url={vDiskPagePath}
-                external={false}
-            />,
+                content: <DiskFlagLabel flag={data.DiskSpace} />,
+            },
         );
     }
+    return capacityItems;
+}
 
-    if (hasDeveloperUi && !isNil(NodeId) && !isNil(VDiskSlotId) && !isNil(PDiskId)) {
-        const vDiskInternalViewerPath = createVDiskDeveloperUILink({
-            nodeId: NodeId,
-            pDiskId: PDiskId,
-            vDiskSlotId: VDiskSlotId,
-        });
-
-        links.push(
-            <LinkWithIcon
-                key={vDiskInternalViewerPath}
-                title={vDiskInfoKeyset('developer-ui')}
-                url={vDiskInternalViewerPath}
-            />,
-        );
-    }
-
-    if (links.length) {
-        linksColumn.push({
-            name: vDiskInfoKeyset('links'),
+export function VDiskInfo({data = {}, className}: VDiskInfoProps) {
+    const [expanded, setExpanded] = React.useState(false);
+    const capacityMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+    const donors = data.Replicated === false ? data.Donors : undefined;
+    const disks = data.DonorMode ? [data.Recipient].filter((disk) => disk !== undefined) : donors;
+    const runtimeItems: YDBDefinitionListItem[] = [
+        {
+            name: vDiskInfoKeyset('front-queues'),
+            content: <VDiskFrontQueuesLabel flag={data.FrontQueues} />,
+        },
+        {
+            name: vDiskInfoKeyset('field_compaction'),
             content: (
-                <Flex wrap="wrap" gap={2}>
-                    {links}
+                <Flex gap={1} wrap="wrap">
+                    <VDiskCompactionRankLabel
+                        flag={data.SatisfactionRank?.FreshRank?.Flag}
+                        rank="fresh"
+                    />
+                    <VDiskCompactionRankLabel
+                        flag={data.SatisfactionRank?.LevelRank?.Flag}
+                        rank="level"
+                    />
                 </Flex>
             ),
-        });
-    }
+        },
+        {
+            name: vDiskInfoKeyset('has-unreadable-blobs'),
+            content: isNil(data.HasUnreadableBlobs)
+                ? EMPTY_DATA_PLACEHOLDER
+                : vDiskInfoKeyset(data.HasUnreadableBlobs ? 'yes' : 'no'),
+        },
+        ...getVDiskThroughputItems(data),
+        {
+            name: vDiskInfoKeyset(data.DonorMode ? 'label_recipient' : 'donors'),
+            content: disks?.length ? (
+                <Flex gap={2} wrap="wrap">
+                    {disks.map((disk) => (
+                        <div className={b('disk')} key={disk.StringifiedId}>
+                            <VDisk data={disk} withIcon />
+                        </div>
+                    ))}
+                </Flex>
+            ) : (
+                vDiskInfoKeyset('no')
+            ),
+        },
+    ];
+    const capacityItems = getPageCapacityItems(data, capacityMetricsEnabled);
+    const identityItems = getVDiskIdentityItems(data, {
+        copyFields: ['guid', 'incarnation-guid', 'instance-guid'],
+    }).map(({copyText, ...item}) => ({
+        ...item,
+        content: (
+            <VDiskCopyableValue
+                copyText={copyText === undefined ? undefined : String(copyText)}
+                fieldName={item.name}
+            >
+                {item.content}
+            </VDiskCopyableValue>
+        ),
+    }));
 
-    const title = data && withTitle ? <VDiskTitle data={data} /> : null;
-
-    // Component is used both on vdisk page and in popups
-    // Display in two columns on page (row + wrap) and in one column in popups (column + nowrap)
     return (
-        <Flex className={className} gap={2} direction={wrap ? 'row' : 'column'} wrap={wrap}>
-            {leftColumn.length > 0 && (
-                <YDBDefinitionList title={title} items={leftColumn} wrapperClassName={b('info')} />
+        <Flex
+            className={b(null, className)}
+            direction="column"
+            alignItems="flex-start"
+            gap={3}
+            qa="vdisk-page-info"
+        >
+            <Flex className={b('metrics')} gap={6} gapRow={3} wrap="wrap">
+                <YDBDefinitionList
+                    items={runtimeItems}
+                    nameMaxWidth={200}
+                    wrapperClassName={b('column')}
+                />
+                {capacityItems.length > 0 && (
+                    <YDBDefinitionList
+                        items={capacityItems}
+                        nameMaxWidth={200}
+                        wrapperClassName={b('column')}
+                    />
+                )}
+            </Flex>
+            {expanded && (
+                <YDBDefinitionList
+                    items={identityItems}
+                    nameMaxWidth={200}
+                    wrapperClassName={b('identity')}
+                />
             )}
-            {rightColumn.length > 0 && (
-                <YDBDefinitionList items={rightColumn} wrapperClassName={b('info')} />
-            )}
-        </Flex>
-    );
-}
-
-interface VDiskTitleProps<T extends PreparedVDisk> {
-    data: T;
-}
-
-function VDiskTitle<T extends PreparedVDisk>({data}: VDiskTitleProps<T>) {
-    return (
-        <Flex gap={2} alignItems="center">
-            {vDiskInfoKeyset('vdiks-title')}
-            <StatusIcon status={getDataSeverityColor(data.Severity)} />
-            {data.StringifiedId}
+            <Button
+                size="m"
+                view="outlined"
+                onClick={() => setExpanded(!expanded)}
+                aria-expanded={expanded}
+            >
+                {vDiskInfoKeyset(expanded ? 'action_show-less' : 'action_show-more')}
+                <Icon data={expanded ? ChevronUp : ChevronDown} />
+            </Button>
         </Flex>
     );
 }

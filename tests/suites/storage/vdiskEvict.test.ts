@@ -6,6 +6,7 @@ import {VDiskPage} from './VDiskPage';
 import {
     DONOR_VDISK_ID,
     GROUP_ID,
+    NODE_ID,
     VDISK_ID,
     VDISK_PAGE_PATH,
     setupVDiskPageMocks,
@@ -26,6 +27,12 @@ for (const scenario of [
         await vdisk.goto();
         await vdisk.evict.click();
         await expect(vdisk.dialog).toBeVisible();
+        await expect(
+            vdisk.dialog.getByText('The VDisk will be evicted from the PDisk.', {exact: true}),
+        ).toBeVisible();
+        await expect(vdisk.dialog.locator('.g-alert.g-card_theme_warning')).toHaveText(
+            'This VDisk will be replaced by a new one in the group. Data will be replicated to the new disk. The old VDisk will serve as a donor until replication is complete, and then it will be removed.',
+        );
         expect(mock.requests.filter(({method}) => method === 'POST')).toHaveLength(0);
         await vdisk.confirmEvict.click();
         await expect(vdisk.dialog).toBeHidden();
@@ -69,7 +76,14 @@ test('VDisk eviction keeps donor and permission restrictions', async ({page, bas
     const mock = await setupTabletDevUiMocks(page, options, baseURL);
     const donor = new VDiskPage(page, VDISK_PAGE_PATH.replace(VDISK_ID, DONOR_VDISK_ID));
     await donor.goto();
-    await expect(donor.evict).toBeDisabled();
+    await expect(page.getByTestId('vdisk-header').getByText('Donor', {exact: true})).toBeVisible();
+    await expect(
+        page.getByTestId('vdisk-page-info').getByRole('link', {
+            name: `VDisk ${VDISK_ID} on node ${NODE_ID}`,
+            exact: true,
+        }),
+    ).toBeVisible();
+    await expect(donor.evict).toHaveCount(0);
 
     options.monitoring = false;
     const vdisk = new VDiskPage(page);

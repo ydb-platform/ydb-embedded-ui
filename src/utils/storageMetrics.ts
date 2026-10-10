@@ -201,6 +201,17 @@ export function formatStorageMetricPair(
         .join(' / ');
 }
 
+export function formatStorageThroughput(value?: string | number) {
+    return (
+        formatBytes({
+            value: parseOptionalNonNegativeNumber(value),
+            size: 'mb',
+            fixedDecimalPlaces: 2,
+            withSpeedLabel: true,
+        }) || EMPTY_DATA_PLACEHOLDER
+    );
+}
+
 export function formatNormalizedMetricPercent(value?: number) {
     const parsedValue = parseOptionalNonNegativeNumber(value);
 

@@ -1,7 +1,3 @@
-import React from 'react';
-
-import {Label} from '@gravity-ui/uikit';
-
 import {prepareGroupsVDisk} from '../../../store/reducers/storage/prepareGroupsDisks';
 import {ECapacityAlert, EFlag} from '../../../types/api/enums';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from '../../../utils/constants';
@@ -17,16 +13,15 @@ import {
 import {
     getPDiskCapacityInfoItems,
     getStorageGroupCapacityInfoItems,
-    getVDiskCapacityInfoItems,
     getVDiskCapacityItems,
 } from '../DiskCapacityInfo';
 
 describe('DiskCapacityInfo builders', () => {
     test('maps capacity detail item IDs to the shared help texts', () => {
-        const getNotesById = (items: ReturnType<typeof getVDiskCapacityInfoItems>) =>
+        const getNotesById = (items: Array<{id: string; note?: unknown}>) =>
             Object.fromEntries(items.map(({id, note}) => [id, note]));
 
-        expect(getNotesById(getVDiskCapacityInfoItems(undefined, {withRawUsage: true}))).toEqual(
+        expect(getNotesById(getVDiskCapacityItems({}, {capacityMetricsEnabled: true}))).toEqual(
             expect.objectContaining({
                 'vdisk-slot-usage': CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
                 'vdisk-raw-usage': CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
@@ -57,198 +52,89 @@ describe('DiskCapacityInfo builders', () => {
         );
     });
 
-    test('builds exact VDisk capacity values', () => {
-        const items = getVDiskCapacityInfoItems(
+    test('formats VDisk capacity with two decimal places and preserves zero', () => {
+        const items = getVDiskCapacityItems(
             {
                 AllocatedSize: 1_000_000_000,
                 SizeLimit: 2_000_000_000,
                 VDiskSlotUsage: 82.25,
-                VDiskRawUsage: 64.5,
+                VDiskRawUsage: 0,
                 GroupSizeInUnits: 0,
                 CapacityAlert: ECapacityAlert.LIGHTYELLOW,
             },
-            {withRawUsage: true},
+            {capacityMetricsEnabled: true},
         );
-
-        expect(items.map(({id, title, value}) => ({id, title, value})).slice(0, 4)).toEqual([
-            {
-                id: 'size',
-                title: 'Size',
-                value: `1 / 2${UNBREAKABLE_GAP}GB`,
-            },
-            {
-                id: 'vdisk-slot-usage',
-                title: 'VDisk Slot Usage',
-                value: expect.objectContaining({
-                    type: Label,
-                    props: expect.objectContaining({
-                        children: '82.3%',
-                        theme: 'warning',
-                    }),
-                }),
-            },
-            {
-                id: 'vdisk-raw-usage',
-                title: 'VDisk Raw Usage',
-                value: '64.5%',
-            },
-            {
-                id: 'group-size-in-units',
-                title: 'Group Size In Units',
-                value: '1 (implicit)',
-            },
-        ]);
-        expect(items.map(({id}) => id)).toEqual([
-            'size',
-            'vdisk-slot-usage',
-            'vdisk-raw-usage',
-            'group-size-in-units',
-            'capacity-alert',
-        ]);
+        expect(items.find(({id}) => id === 'size')?.content).toBe(
+            `1.00 / 2.00${UNBREAKABLE_GAP}GB`,
+        );
+        expect(items.find(({id}) => id === 'vdisk-slot-usage')?.content).toBe('82.25%');
+        expect(items.find(({id}) => id === 'vdisk-raw-usage')?.content).toBe('0%');
+        expect(items.find(({id}) => id === 'group-size-in-units')?.content).toBe('1 (implicit)');
     });
 
-    test('keeps every VDisk item while optional scalar values are absent', () => {
-        const items = getVDiskCapacityInfoItems(undefined, {withRawUsage: true});
-
-        expect(items.map(({id}) => id)).toEqual([
+    test('keeps unavailable VDisk fields without treating zero as missing', () => {
+        const emptyItems = getVDiskCapacityItems({}, {capacityMetricsEnabled: true});
+        const fieldIds = [
+            'group-size-in-units',
             'size',
+            'capacity-alert',
             'vdisk-slot-usage',
             'vdisk-raw-usage',
-            'group-size-in-units',
-            'capacity-alert',
-        ]);
-        expect(items.slice(0, 4).map(({value}) => value)).toEqual([
-            EMPTY_DATA_PLACEHOLDER,
-            EMPTY_DATA_PLACEHOLDER,
-            EMPTY_DATA_PLACEHOLDER,
+        ];
+        expect(emptyItems.map(({id}) => id)).toEqual(fieldIds);
+        for (const id of ['size', 'vdisk-slot-usage', 'vdisk-raw-usage']) {
+            expect(emptyItems.find((item) => item.id === id)?.content).toBe(EMPTY_DATA_PLACEHOLDER);
+        }
+        expect(emptyItems.find(({id}) => id === 'group-size-in-units')?.content).toBe(
             '1 (implicit)',
-        ]);
-    });
-
-    test.each([
-        ['missing', undefined],
-        ['null', null],
-        ['empty', ''],
-        ['whitespace-only', '   '],
-    ])('renders %s VDisk capacity alerts as the empty-data placeholder', (_caseName, value) => {
-        const items = getVDiskCapacityInfoItems(
-            {CapacityAlert: value as unknown as string},
-            {withRawUsage: false},
         );
-
-        expect(items.find(({id}) => id === 'capacity-alert')?.value).toBe(EMPTY_DATA_PLACEHOLDER);
-    });
-
-    test.each([
-        [
-            'VDisk',
-            () =>
-                getVDiskCapacityInfoItems(
-                    {CapacityAlert: ECapacityAlert.LIGHTYELLOW},
-                    {withRawUsage: false},
-                ),
-        ],
-        [
-            'PDisk',
-            () =>
-                getPDiskCapacityInfoItems(
-                    {PDiskCapacityAlert: ECapacityAlert.LIGHTYELLOW},
-                    {withUsage: false, withCapacityAlert: true},
-                ),
-        ],
-    ])('renders a known %s capacity alert as plain text', (_surface, buildItems) => {
-        const value = buildItems().find(({id}) => id === 'capacity-alert')?.value;
-
-        expect(value).toBe(ECapacityAlert.LIGHTYELLOW);
-    });
-
-    test('renders an unknown capacity alert as plain text', () => {
-        const items = getVDiskCapacityInfoItems(
-            {CapacityAlert: 'FUTURE_ALERT'},
-            {withRawUsage: false},
+        const items = getVDiskCapacityItems(
+            {VDiskRawUsage: 0, VDiskSlotUsage: NaN, CapacityAlert: '   '},
+            {capacityMetricsEnabled: true},
         );
-        const value = items.find(({id}) => id === 'capacity-alert')?.value;
-
-        expect(value).toBe('FUTURE_ALERT');
+        expect(items.map(({id}) => id)).toEqual(fieldIds);
+        expect(items.find(({id}) => id === 'vdisk-slot-usage')?.content).toBe(
+            EMPTY_DATA_PLACEHOLDER,
+        );
+        expect(items.find(({id}) => id === 'vdisk-raw-usage')?.content).toBe('0%');
     });
 
-    test('uses a neutral theme when VDisk Slot Usage has no recognized alert', () => {
-        const items = getVDiskCapacityInfoItems(
+    test('keeps the classic size when the capacity experiment is disabled', () => {
+        const items = getVDiskCapacityItems(
             {
+                AllocatedSize: 1_000_000_000,
+                SizeLimit: 4_000_000_000,
                 VDiskSlotUsage: 82.25,
-                CapacityAlert: 'FUTURE_ALERT',
+                WhiteboardSize: {AllocatedSize: 0, SizeLimit: 22_000_000_000},
             },
-            {withRawUsage: false},
+            {capacityMetricsEnabled: false},
         );
-        const value = items.find(({id}) => id === 'vdisk-slot-usage')?.value;
-
-        expect(value).toEqual(
-            expect.objectContaining({
-                type: Label,
-                props: expect.objectContaining({
-                    children: '82.3%',
-                    theme: 'normal',
-                }),
-            }),
-        );
+        expect(items.map(({id}) => id)).toEqual(['size']);
+        expect(items[0].content).toBe(`1.00 / 4.00${UNBREAKABLE_GAP}GB`);
     });
 
-    test('keeps missing VDisk Slot Usage as the plain placeholder', () => {
-        const items = getVDiskCapacityInfoItems(
-            {CapacityAlert: ECapacityAlert.LIGHTYELLOW},
-            {withRawUsage: false},
-        );
-        const value = items.find(({id}) => id === 'vdisk-slot-usage')?.value;
-
-        expect(React.isValidElement(value)).toBe(false);
-        expect(value).toBe(EMPTY_DATA_PLACEHOLDER);
-    });
-
-    test('uses the Whiteboard VDisk size instead of the legacy BSC size', () => {
-        const [sizeItem] = getVDiskCapacityInfoItems(
+    test('preserves zero in Whiteboard VDisk size', () => {
+        const items = getVDiskCapacityItems(
             {
                 AllocatedSize: 1_000_000_000,
                 SizeLimit: 4_000_000_000,
-                WhiteboardSize: {
-                    AllocatedSize: 1_000_000_000,
-                    SizeLimit: 22_000_000_000,
-                },
+                WhiteboardSize: {AllocatedSize: 0, SizeLimit: 22_000_000_000},
             },
-            {withRawUsage: false},
+            {capacityMetricsEnabled: true},
         );
-
-        expect(sizeItem.value).toBe(`1 / 22${UNBREAKABLE_GAP}GB`);
+        expect(items.find(({id}) => id === 'size')?.content).toBe(`0 / 22.00${UNBREAKABLE_GAP}GB`);
     });
 
-    test('preserves zero in the Whiteboard VDisk size', () => {
-        const [sizeItem] = getVDiskCapacityInfoItems(
+    test('does not mix a partial Whiteboard VDisk size with BSC size', () => {
+        const items = getVDiskCapacityItems(
             {
                 AllocatedSize: 1_000_000_000,
                 SizeLimit: 4_000_000_000,
-                WhiteboardSize: {
-                    AllocatedSize: 0,
-                    SizeLimit: 22_000_000_000,
-                },
+                WhiteboardSize: {AllocatedSize: 1_000_000_000},
             },
-            {withRawUsage: false},
+            {capacityMetricsEnabled: true},
         );
-
-        expect(sizeItem.value).toBe(`0 / 22${UNBREAKABLE_GAP}GB`);
-    });
-
-    test('does not mix a partial Whiteboard VDisk size with the legacy BSC size', () => {
-        const [sizeItem] = getVDiskCapacityInfoItems(
-            {
-                AllocatedSize: 1_000_000_000,
-                SizeLimit: 4_000_000_000,
-                WhiteboardSize: {
-                    AllocatedSize: 1_000_000_000,
-                },
-            },
-            {withRawUsage: false},
-        );
-
-        expect(sizeItem.value).toBe(`1${UNBREAKABLE_GAP}GB / —`);
+        expect(items.find(({id}) => id === 'size')?.content).toBe(`1.00${UNBREAKABLE_GAP}GB / —`);
     });
 
     test.each([
@@ -312,6 +198,17 @@ describe('DiskCapacityInfo builders', () => {
             expect(items.find(({id}) => id === 'size')?.content).toBe(expected);
         },
     );
+
+    test('renders a known PDisk capacity alert as plain text', () => {
+        const items = getPDiskCapacityInfoItems(
+            {PDiskCapacityAlert: ECapacityAlert.LIGHTYELLOW},
+            {withUsage: false, withCapacityAlert: true},
+        );
+
+        expect(items.find(({id}) => id === 'capacity-alert')?.value).toBe(
+            ECapacityAlert.LIGHTYELLOW,
+        );
+    });
 
     test('builds exact PDisk scalar values without rendering a component', () => {
         const items = getPDiskCapacityInfoItems(
