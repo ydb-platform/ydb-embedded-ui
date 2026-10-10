@@ -383,13 +383,48 @@ async function expectVDiskDetailsOrder(page: Page, capacityLabels: string[]) {
 }
 
 test.describe('VDisk page storage details', () => {
-    test('does not render storage details when experiment is disabled', async ({page}) => {
-        await setupVDiskPageMocks(page);
+    test('hides only Rack and PDisk Path when experiment is disabled', async ({page}) => {
+        await setupVDiskPageMocks(page, {datacenter: LONG_DATACENTER, host: LONG_HOST});
         await page.goto(VDISK_PAGE_PATH);
 
+        const storageDetails = page.getByTestId('vdisk-location');
+        const rack = storageDetails.getByTestId('vdisk-location-rack');
+        const pDiskPath = storageDetails.getByTestId('vdisk-location-pdisk-path');
+
         await expect(page.locator('.ydb-paginated-table__table')).toBeVisible();
-        await expect(page.locator('.ydb-vdisk-storage-details')).toHaveCount(0);
+        await expect(storageDetails).toBeVisible();
+        await expect(storageDetails).toHaveCount(1);
+        await expect(storageDetails.locator('.ydb-vdisk-storage-details__detail')).toHaveCount(5);
+        await expect(storageDetails.getByRole('link', {name: 'Go to PDisk'})).toBeVisible();
+        for (const [id, value] of [
+            ['datacenter', LONG_DATACENTER],
+            ['fqdn', LONG_HOST],
+            ['node-id', NODE_ID],
+            ['pdisk-id', PDISK_ID],
+            ['vdisk-slot-id', '1001'],
+        ]) {
+            await expect(
+                storageDetails.getByTestId(`vdisk-location-${id}`).getByText(value, {exact: true}),
+            ).toBeVisible();
+        }
+        await expect(rack).toHaveCount(0);
+        await expect(pDiskPath).toHaveCount(0);
         await expectVDiskDetailsOrder(page, ['Size', 'Usage', 'Disk Space']);
+
+        const sidebar = new Sidebar(page);
+        for (const enabled of [true, false]) {
+            await sidebar.clickSettings();
+            await sidebar.clickExperimentsSection();
+            await sidebar.toggleExperimentByTitle('Detailed storage view');
+            await sidebar.closeDrawer();
+
+            await expect(storageDetails.locator('.ydb-vdisk-storage-details__detail')).toHaveCount(
+                enabled ? 7 : 5,
+            );
+            await expect(rack).toHaveCount(enabled ? 1 : 0);
+            await expect(pDiskPath).toHaveCount(enabled ? 1 : 0);
+            await expect(storageDetails.getByRole('link', {name: 'Go to PDisk'})).toBeVisible();
+        }
     });
 
     test('renders one updated location bar with the experiment enabled', async ({page}) => {
@@ -552,6 +587,14 @@ test.describe('VDisk page storage tab', () => {
 
         await expect(background).toBeVisible();
         await expect(items.nth(2)).toBeVisible();
+
+        await setupVDiskPageMocks(page, {withDonors: true, replicated: true});
+        await page.reload();
+        await expect(
+            page.getByTestId('vdisk-header').getByText('Replicated', {exact: true}),
+        ).toBeVisible();
+        await expectDefinitionListRowValue(vDiskInfo, 'Donors', 'No');
+        await expect(getDefinitionListRow(vDiskInfo, 'Donors').getByRole('link')).toHaveCount(0);
     });
 
     test('renders expanded vDisk stack snapshot', async ({page}) => {
@@ -593,17 +636,13 @@ test.describe('VDisk page storage tab', () => {
 
         await expect(goToPDiskLink).toBeVisible();
         await expect(page.getByRole('button', {name: 'Back', exact: true})).toHaveCount(0);
-        const titleY = await page
-            .getByRole('heading', {name: `VDisk ${VDISK_ID}`, exact: true})
-            .evaluate((element) => element.getBoundingClientRect().top);
-        const pageMeta = page.locator('.ydb-vdisk-page__meta');
-        const refreshButton = pageMeta.getByRole('button', {name: 'Refresh', exact: true});
+        const autoRefreshControl = page.locator('.auto-refresh-control');
+        const refreshButton = autoRefreshControl.getByRole('button', {
+            name: 'Refresh',
+            exact: true,
+        });
         await expect(refreshButton).toBeVisible();
-        await expect(pageMeta.getByTestId('ydb-autorefresh-select')).toBeVisible();
-        const refreshBottom = await refreshButton.evaluate(
-            (element) => element.getBoundingClientRect().bottom,
-        );
-        expect(refreshBottom).toBeLessThan(titleY);
+        await expect(autoRefreshControl.getByTestId('ydb-autorefresh-select')).toBeVisible();
         await expect(goToPDiskLink).toHaveAttribute(
             'href',
             new RegExp(`/pDisk\\?nodeId=${NODE_ID}&pDiskId=${PDISK_ID}$`),
@@ -626,7 +665,7 @@ test.describe('VDisk page storage tab', () => {
         const pDiskUrl = page.url();
         await page.goto(VDISK_PAGE_PATH);
         await expect(refreshButton).toBeVisible();
-        await expect(pageMeta.getByTestId('ydb-autorefresh-select')).toBeVisible();
+        await expect(autoRefreshControl.getByTestId('ydb-autorefresh-select')).toBeVisible();
         await page.getByRole('button', {name: 'Back', exact: true}).click();
         await expect(page).toHaveURL(pDiskUrl);
     });
@@ -1136,7 +1175,7 @@ test.describe('Blob storage capacity metrics integration', () => {
         await storageTable.waitForTableToLoad();
         await storageTable.waitForTableData();
 
-        await expect(page.getByTestId('vdisk-location')).toHaveCount(0);
+        await expect(page.getByTestId('vdisk-location')).toHaveCount(1);
         const vDiskInfo = page.locator('.ydb-vdisk-page__info');
         for (const label of [
             'Size',

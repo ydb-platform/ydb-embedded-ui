@@ -36,7 +36,7 @@ export function VDiskReplicationStatus({data, size}: VDiskReplicationStatusProps
 
     return (
         <React.Fragment>
-            {label && <DiskStatusLabel {...label} size={size} />}
+            {label && <DiskStatusLabel {...label} size={size} iconSize={size === 'xs' ? 12 : 14} />}
             {showProgress && <ReplicationProgress data={data} size={size} />}
         </React.Fragment>
     );

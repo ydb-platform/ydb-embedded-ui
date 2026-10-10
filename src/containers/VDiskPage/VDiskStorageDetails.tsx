@@ -6,6 +6,7 @@ import {InternalLinkButton} from '../../components/InternalLinkButton';
 import {VDiskCopyableValue} from '../../components/VDiskInfo/VDiskCopyableValue';
 import {getVDiskLocationItems} from '../../components/VDiskInfo/getVDiskDetails';
 import {getPDiskPagePath} from '../../routes';
+import {useNewStorageViewEnabled} from '../../store/reducers/capabilities/hooks';
 import type {VDiskData} from '../../store/reducers/vdisk/types';
 import {cn} from '../../utils/cn';
 import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
@@ -48,6 +49,7 @@ function DetailItem({item}: {item: DiskDetailItem}) {
 
 export function VDiskStorageDetails({className, data = {}}: VDiskStorageDetailsProps) {
     const isViewerUser = useIsViewerUser();
+    const newStorageViewEnabled = useNewStorageViewEnabled();
     const pDiskPath =
         isViewerUser && !isNil(data.NodeId) && !isNil(data.PDiskId)
             ? getPDiskPagePath(data.PDiskId, data.NodeId)
@@ -56,7 +58,7 @@ export function VDiskStorageDetails({className, data = {}}: VDiskStorageDetailsP
         Host: data.NodeHost,
         Rack: data.NodeRack,
         DC: data.NodeDC,
-    });
+    }).filter(({id}) => newStorageViewEnabled || (id !== 'rack' && id !== 'pdisk-path'));
 
     return (
         <div className={b(null, className)} data-qa="vdisk-location">

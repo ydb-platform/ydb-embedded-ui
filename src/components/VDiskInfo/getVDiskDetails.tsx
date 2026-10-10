@@ -1,13 +1,12 @@
 import {isNil} from 'lodash';
 
 import type {NodeMetadata} from '../../types/store/nodesList';
-import {formatBytes} from '../../utils/bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {getDiskLocationItems} from '../../utils/disks/diskInfo/getDiskLocationItems';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
-import {parseOptionalNonNegativeNumber} from '../../utils/utils';
+import {formatStorageThroughput} from '../../utils/storageMetrics';
 import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
 
 import {vDiskInfoKeyset as i18n} from './i18n';
@@ -57,19 +56,8 @@ export function getVDiskThroughputItems(data: PreparedVDisk = {}): YDBDefinition
             [i18n('read-throughput'), data.ReadThroughput],
             [i18n('write-throughput'), data.WriteThroughput],
         ] as const
-    ).map(([name, value]) => {
-        const throughput = parseOptionalNonNegativeNumber(value);
-        return {
-            name,
-            content:
-                throughput === undefined
-                    ? EMPTY_DATA_PLACEHOLDER
-                    : formatBytes({
-                          value: throughput,
-                          size: 'mb',
-                          fixedDecimalPlaces: 2,
-                          withSpeedLabel: true,
-                      }),
-        };
-    });
+    ).map(([name, value]) => ({
+        name,
+        content: formatStorageThroughput(value),
+    }));
 }

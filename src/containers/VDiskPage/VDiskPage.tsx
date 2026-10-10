@@ -27,7 +27,6 @@ import {
 } from '../../components/VDiskStatus';
 import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
-import {useNewStorageViewEnabled} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {cn} from '../../utils/cn';
@@ -56,7 +55,6 @@ export function VDiskPage() {
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     const {nodeId, vDiskId: vDiskIdParam, database, vDiskTab, vDiskTabs} = useVDiskQueryParams();
-    const newStorageViewEnabled = useNewStorageViewEnabled();
     const hasDeveloperUi = useHasDeveloperUi();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -117,20 +115,22 @@ export function VDiskPage() {
     };
 
     const renderPageMeta = () => {
+        if (!showBackButton) {
+            return null;
+        }
+
         return (
             <Flex
                 className={vDiskPageCn('meta')}
                 alignItems="center"
-                justifyContent={showBackButton ? 'space-between' : 'flex-end'}
+                justifyContent="space-between"
                 gap={1}
             >
-                {showBackButton && (
-                    <Button size="m" view="outlined" onClick={() => history.goBack()}>
-                        <Icon data={ArrowLeft} size={16} />
-                        {vDiskPageKeyset('action_back')}
-                    </Button>
-                )}
-                <AutoRefreshControl />
+                <Button size="m" view="outlined" onClick={() => history.goBack()}>
+                    <Icon data={ArrowLeft} size={16} />
+                    {vDiskPageKeyset('action_back')}
+                </Button>
+                <AutoRefreshControl className={vDiskPageCn('refresh-control')} />
             </Flex>
         );
     };
@@ -151,29 +151,40 @@ export function VDiskPage() {
 
     const renderPageTitle = () => {
         return (
-            <Flex direction="column" gap={1} className={vDiskPageCn('title')} qa="vdisk-header">
-                <Flex gap={3} alignItems="center" wrap="wrap">
-                    <VDiskCopyableValue copyText={vDiskId} fieldName={vDiskPageKeyset('vdisk')}>
-                        <Text as="h1" variant="header-1" className={vDiskPageCn('heading')}>
-                            {vDiskPageKeyset('vdisk')}{' '}
-                            <Text color="hint" variant="header-1">
-                                {vDiskId || EMPTY_DATA_PLACEHOLDER}
+            <Flex
+                className={vDiskPageCn('title')}
+                alignItems="flex-start"
+                gap={2}
+                wrap="nowrap"
+                qa="vdisk-header"
+            >
+                <Flex direction="column" gap={1} className={vDiskPageCn('title-content')}>
+                    <Flex gap={3} alignItems="center" wrap="wrap">
+                        <VDiskCopyableValue copyText={vDiskId} fieldName={vDiskPageKeyset('vdisk')}>
+                            <Text as="h1" variant="header-1" className={vDiskPageCn('heading')}>
+                                {vDiskPageKeyset('vdisk')}{' '}
+                                <Text color="hint" variant="header-1">
+                                    {vDiskId || EMPTY_DATA_PLACEHOLDER}
+                                </Text>
                             </Text>
-                        </Text>
-                    </VDiskCopyableValue>
-                    {renderTitleMeta()}
+                        </VDiskCopyableValue>
+                        {renderTitleMeta()}
+                    </Flex>
+                    <Flex gap={1} alignItems="center" className={vDiskPageCn('pool')}>
+                        <Text color="secondary">{vDiskInfoKeyset('pool-name')}:</Text>
+                        <VDiskCopyableValue
+                            copyText={vDiskData?.StoragePoolName}
+                            fieldName={vDiskInfoKeyset('pool-name')}
+                        >
+                            <Text color="secondary" className={vDiskPageCn('pool-name')}>
+                                {vDiskData?.StoragePoolName || EMPTY_DATA_PLACEHOLDER}
+                            </Text>
+                        </VDiskCopyableValue>
+                    </Flex>
                 </Flex>
-                <Flex gap={1} alignItems="center" className={vDiskPageCn('pool')}>
-                    <Text color="secondary">{vDiskInfoKeyset('pool-name')}:</Text>
-                    <VDiskCopyableValue
-                        copyText={vDiskData?.StoragePoolName}
-                        fieldName={vDiskInfoKeyset('pool-name')}
-                    >
-                        <Text color="secondary" className={vDiskPageCn('pool-name')}>
-                            {vDiskData?.StoragePoolName || EMPTY_DATA_PLACEHOLDER}
-                        </Text>
-                    </VDiskCopyableValue>
-                </Flex>
+                {!showBackButton && (
+                    <AutoRefreshControl className={vDiskPageCn('refresh-control')} />
+                )}
             </Flex>
         );
     };
@@ -229,10 +240,6 @@ export function VDiskPage() {
     };
 
     const renderStorageDetails = () => {
-        if (!newStorageViewEnabled) {
-            return null;
-        }
-
         return <VDiskStorageDetails data={vDiskData} className={vDiskPageCn('storage-details')} />;
     };
 
