@@ -1,5 +1,16 @@
 # Changelog
 
+## [22.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.3.0...v22.4.0) (2026-10-09)
+
+
+### Features
+
+* add streaming query lifecycle fields (YQ-4756) ([#4472](https://github.com/ydb-platform/ydb-embedded-ui/issues/4472)) ([a2659a0](https://github.com/ydb-platform/ydb-embedded-ui/commit/a2659a05cf93c6cf863294e7f534e74371736abd))
+* **healthcheck:** expose drawer target to extensions ([#4421](https://github.com/ydb-platform/ydb-embedded-ui/issues/4421)) ([6afd63a](https://github.com/ydb-platform/ydb-embedded-ui/commit/6afd63a351af22856f71fb698b7ed9b4d1b0c0cd))
+* implement colored state labels for storage groups ([#4458](https://github.com/ydb-platform/ydb-embedded-ui/issues/4458)) ([460eed1](https://github.com/ydb-platform/ydb-embedded-ui/commit/460eed14a922e3a3f430702e30b72eadb45bccee))
+* implement PDisk & VDisk info tooltips ([#4397](https://github.com/ydb-platform/ydb-embedded-ui/issues/4397)) ([558de75](https://github.com/ydb-platform/ydb-embedded-ui/commit/558de75d18c460aeda99f3afead9657e31de0676))
+* **storage:** redesign storage group page header and details ([#4473](https://github.com/ydb-platform/ydb-embedded-ui/issues/4473)) ([052f8d9](https://github.com/ydb-platform/ydb-embedded-ui/commit/052f8d9663885f40027f46b887c6ac8bf6726cc7))
+
 ## [22.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.2.0...v22.3.0) (2026-09-30)
 
 
