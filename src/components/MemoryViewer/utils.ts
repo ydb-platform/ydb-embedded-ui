@@ -1,5 +1,5 @@
 import type {TMemoryStats} from '../../types/api/nodes';
-import {isNumeric} from '../../utils/utils';
+import {isNumeric, parseOptionalNonNegativeNumber} from '../../utils/utils';
 
 import i18n from './i18n';
 
@@ -31,7 +31,10 @@ export function getMemorySegmentColor(key: string): string {
 export function getMemorySegments(
     stats: TMemoryStats,
     memoryUsage: number,
-    {allocatorCachesIncludedInUsage = true}: {allocatorCachesIncludedInUsage?: boolean} = {},
+    {
+        allocatorCachesIncludedInUsage = true,
+        memoryLimit,
+    }: {allocatorCachesIncludedInUsage?: boolean; memoryLimit?: number} = {},
 ): MemorySegment[] {
     const segments = [
         {
@@ -91,15 +94,21 @@ export function getMemorySegments(
             isInfo: true,
         },
         {
+            label: i18n('text_memory-limit'),
+            key: 'MemoryLimit',
+            value: memoryLimit,
+            isInfo: true,
+        },
+        {
             label: i18n('text_soft-limit'),
             key: 'SoftLimit',
-            value: getMaybeNumber(stats.SoftLimit),
+            value: parseOptionalNonNegativeNumber(stats.SoftLimit) || undefined,
             isInfo: true,
         },
         {
             label: i18n('text_hard-limit'),
             key: 'HardLimit',
-            value: getMaybeNumber(stats.HardLimit),
+            value: parseOptionalNonNegativeNumber(stats.HardLimit) || undefined,
             isInfo: true,
         },
     );

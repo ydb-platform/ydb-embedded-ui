@@ -33,7 +33,7 @@ interface VersionsContainerProps {
 export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isLoading: isNodesLoading} = nodesApi.useGetNodesQuery(
-        {tablets: false, fieldsRequired: ['SystemState', 'SubDomainKey', 'MemoryDetailed']},
+        {tablets: false, fieldsRequired: ['SystemState', 'SubDomainKey']},
         {pollingInterval: autoRefreshInterval},
     );
     const versionsDataMap = useVersionsDataMap(cluster);

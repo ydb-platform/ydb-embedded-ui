@@ -51,7 +51,7 @@ export interface MemoryProgressViewerProps {
 export function MemoryViewer({
     stats,
     memoryUsed,
-    memoryLimit: fallbackMemoryLimit,
+    memoryLimit,
     percents,
     formatValues,
     className,
@@ -61,7 +61,7 @@ export function MemoryViewer({
     const {memoryUsed: memoryUsage, memoryLimit: capacity} = getNodeMemory({
         MemoryStats: stats,
         MemoryUsed: memoryUsed,
-        MemoryLimit: fallbackMemoryLimit,
+        MemoryLimit: memoryLimit,
     });
     const theme = useTheme();
 
@@ -97,16 +97,10 @@ export function MemoryViewer({
     };
 
     // Without anonymous RSS, the backend's MemoryUsed excludes allocator caches.
-    const allocatorCachesIncludedInUsage =
-        parseOptionalNonNegativeNumber(memoryUsed) === undefined ||
-        parseOptionalNonNegativeNumber(stats.AnonRss) !== undefined;
-    const memorySegments = getMemorySegments(
-        {...stats, HardLimit: capacity === undefined ? undefined : String(capacity)},
-        memoryUsage,
-        {
-            allocatorCachesIncludedInUsage,
-        },
-    );
+    const memorySegments = getMemorySegments(stats, memoryUsage, {
+        allocatorCachesIncludedInUsage: parseOptionalNonNegativeNumber(stats.AnonRss) !== undefined,
+        memoryLimit: capacity,
+    });
 
     const status = calculateProgressStatus({
         fillWidth,

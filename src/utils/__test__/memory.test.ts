@@ -1,14 +1,14 @@
 import {getNodeMemory} from '../memory';
 
 describe('getNodeMemory', () => {
-    test('uses the process consumption and effective YDB limit instead of host memory', () => {
+    test('uses the system limit even when consumption exceeds the controller hard limit', () => {
         expect(
             getNodeMemory({
-                MemoryUsed: '21474836480',
+                MemoryUsed: '27917287424',
                 MemoryLimit: '34359738368',
-                MemoryStats: {AnonRss: '21474836480', HardLimit: '25769803776'},
+                MemoryStats: {AnonRss: '27917287424', HardLimit: '25769803776'},
             }),
-        ).toEqual({memoryUsed: 21474836480, memoryLimit: 25769803776});
+        ).toEqual({memoryUsed: 27917287424, memoryLimit: 34359738368});
     });
 
     test('uses the backend sorting value when detailed counters differ', () => {
@@ -40,20 +40,19 @@ describe('getNodeMemory', () => {
         },
     );
 
-    test('includes allocator caches when anonymous RSS is unavailable', () => {
+    test('falls back to allocated memory without adding allocator caches', () => {
         expect(
             getNodeMemory({
                 MemoryStats: {AllocatedMemory: '100', AllocatorCachesMemory: '20'},
             }),
-        ).toEqual({memoryUsed: 120, memoryLimit: undefined});
+        ).toEqual({memoryUsed: 100, memoryLimit: undefined});
     });
 
-    test.each([{AllocatedMemory: '100'}, {AllocatorCachesMemory: '100'}])(
-        'uses the available allocator counters: %j',
-        (MemoryStats) => {
-            expect(getNodeMemory({MemoryStats}).memoryUsed).toBe(100);
-        },
-    );
+    test('does not treat allocator caches alone as total process usage', () => {
+        expect(
+            getNodeMemory({MemoryStats: {AllocatorCachesMemory: '100'}}).memoryUsed,
+        ).toBeUndefined();
+    });
 
     test.each([undefined, {}, {HardLimit: '250'}])(
         'preserves legacy usage when detailed consumption is absent: %j',
@@ -80,7 +79,7 @@ describe('getNodeMemory', () => {
         ).toEqual({memoryUsed: 100, memoryLimit: 250});
     });
 
-    test('falls back to the legacy limit for a zero hard limit', () => {
+    test('keeps the system limit when the controller hard limit is zero', () => {
         expect(getNodeMemory({MemoryLimit: '250', MemoryStats: {HardLimit: '0'}}).memoryLimit).toBe(
             250,
         );
@@ -94,10 +93,10 @@ describe('getNodeMemory', () => {
     );
 
     test.each([undefined, '', 'invalid', '0', '-1', 'Infinity'])(
-        'keeps unknown limits absent: %j',
+        'does not substitute a controller limit for an unknown system limit: %j',
         (value) => {
             expect(
-                getNodeMemory({MemoryLimit: value, MemoryStats: {HardLimit: value}}).memoryLimit,
+                getNodeMemory({MemoryLimit: value, MemoryStats: {HardLimit: '250'}}).memoryLimit,
             ).toBeUndefined();
         },
     );

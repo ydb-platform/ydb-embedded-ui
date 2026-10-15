@@ -232,7 +232,7 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     Version: ['Version'],
     Uptime: ['Uptime', 'DisconnectTime'],
     Memory: ['Memory', 'MemoryDetailed'],
-    RAM: ['Memory', 'MemoryDetailed'],
+    RAM: ['Memory'],
     Pools: ['CPU'],
     CPU: ['CPU'],
     LoadAverage: ['LoadAverage'],

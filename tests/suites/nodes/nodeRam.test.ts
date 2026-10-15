@@ -42,19 +42,19 @@ async function mockNodeMemory(
 }
 
 test.describe('Node RAM', () => {
-    test('uses the effective YDB limit on the node page', async ({page}) => {
+    test('uses the system limit when usage exceeds the controller hard limit', async ({page}) => {
         await mockNodeMemory(page, {
-            MemoryUsed: '20000000000',
+            MemoryUsed: '26000000000',
             MemoryLimit: '32000000000',
-            MemoryStats: {AnonRss: '20000000000', HardLimit: '24000000000'},
+            MemoryStats: {AnonRss: '26000000000', HardLimit: '24000000000'},
         });
         const nodePage = new NodePage(page, '42');
         await nodePage.goto();
         await nodePage.waitForNodePageLoad();
-        await expect(nodePage.ram).toHaveText(/RAM20\s*GB\s*\/\s*24\s*GB/);
+        await expect(nodePage.ram).toHaveText(/RAM26\s*GB\s*\/\s*32\s*GB/);
         await expect(nodePage.ram.locator('.progress-viewer__line')).toHaveAttribute(
             'style',
-            'width: 83%;',
+            'width: 81%;',
         );
     });
 
