@@ -428,8 +428,8 @@ export class Diagnostics {
         return getRowCellsText(row);
     }
 
-    async clickRefreshButton(): Promise<void> {
-        await this.refreshButton.click();
+    async clickRefreshButton(timeout?: number): Promise<void> {
+        await this.refreshButton.click({timeout});
     }
 
     async setAutoRefresh(option: string): Promise<void> {

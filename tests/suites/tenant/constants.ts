@@ -9,11 +9,15 @@ export const longTableSelect = (limit?: number) =>
 
 // 400 is pretty enough
 export const longRunningQuery = new Array(400).fill(simpleQuery).join('');
-// 50K rows with Argon2 — slow per-row hashing gives enough CPU time for streaming + Top queries
-export const longRunningStreamQuery = `$data = ListFromRange(1, 50000);
+export const getLongRunningStreamQuery = (
+    rowCount: number,
+) => `$data = ListFromRange(1, ${rowCount});
 SELECT x, Digest::Argon2(CAST(x AS String), "test_salt") AS hash
 FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
+
+// 50K rows with Argon2 — slow per-row hashing gives enough CPU time for streaming + Top queries
+export const longRunningStreamQuery = getLongRunningStreamQuery(50_000);
 
 export const selectFromMyRowTableQuery = 'select * from `my_row_table`';
 

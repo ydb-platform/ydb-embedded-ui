@@ -44,18 +44,34 @@ const EFlagToStatusName: Record<EFlag, string> = {
     },
 };
 
-interface EntityStatusLabelProps {
+interface EntityStatusLabelBaseProps {
     status: EFlag;
-    note?: React.ReactNode;
-    children?: React.ReactNode;
     className?: string;
-    endContent?: React.ReactNode;
-    withStatusName?: boolean;
     size?: LabelProps['size'];
     iconSize?: number;
-    onClick?: (event: React.MouseEvent<HTMLElement>) => void;
     qa?: string;
 }
+
+interface DefaultEntityStatusLabelProps {
+    view?: 'default';
+    note?: React.ReactNode;
+    children?: React.ReactNode;
+    endContent?: React.ReactNode;
+    withStatusName?: boolean;
+    onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+}
+
+interface CompactEntityStatusLabelProps {
+    view: 'compact';
+    note?: never;
+    children?: never;
+    endContent?: never;
+    withStatusName?: never;
+    onClick?: never;
+}
+
+type EntityStatusLabelProps = EntityStatusLabelBaseProps &
+    (DefaultEntityStatusLabelProps | CompactEntityStatusLabelProps);
 
 function EntityStatusLabel({
     children,
@@ -63,12 +79,29 @@ function EntityStatusLabel({
     endContent,
     status,
     withStatusName = true,
+    view = 'default',
     note,
     size = 'm',
     iconSize = 14,
     onClick,
     qa,
 }: EntityStatusLabelProps) {
+    if (view === 'compact') {
+        const statusName = EFlagToStatusName[status];
+        return (
+            <ActionTooltip title={statusName}>
+                <span className={b('compact')} role="img" aria-label={statusName}>
+                    <Label
+                        theme={status === EFlag.Blue ? 'info' : EFlagToLabelTheme[status]}
+                        icon={<StatusIcon size={iconSize} status={status} />}
+                        size={size}
+                        className={b(null, className)}
+                        qa={qa}
+                    />
+                </span>
+            </ActionTooltip>
+        );
+    }
     const theme = EFlagToLabelTheme[status];
     const isClickable = Boolean(onClick);
     return (

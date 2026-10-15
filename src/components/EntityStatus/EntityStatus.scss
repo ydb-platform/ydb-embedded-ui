@@ -1,6 +1,11 @@
 @use '../../styles/mixins.scss';
 
 .ydb-entity-status {
+    &__compact {
+        display: inline-flex;
+        flex-shrink: 0;
+    }
+
     &__note {
         color: inherit;
     }
