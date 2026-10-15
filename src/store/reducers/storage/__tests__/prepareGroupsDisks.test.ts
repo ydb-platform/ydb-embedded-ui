@@ -401,6 +401,32 @@ describe('prepareGroupsVDisk', () => {
 });
 
 describe('prepareGroupsPDisk', () => {
+    test.each([
+        {SlotCount: '16', expected: 16},
+        {SlotCount: '0', expected: 0},
+        {SlotCount: undefined, expected: undefined},
+        {SlotCount: '', expected: undefined},
+        {SlotCount: 'invalid', expected: undefined},
+        {SlotCount: '-1', expected: undefined},
+    ])('uses the valid SlotCount fallback: $SlotCount', ({SlotCount, expected}) => {
+        const preparedData = prepareGroupsPDisk({
+            SlotCount,
+            Whiteboard: {NumActiveSlots: 14},
+        });
+
+        expect(preparedData.NumActiveSlots).toBe(14);
+        expect(preparedData.ExpectedSlotCount).toBe(expected);
+    });
+
+    test.each([0, 24])('preserves Whiteboard ExpectedSlotCount=%p', (ExpectedSlotCount) => {
+        const preparedData = prepareGroupsPDisk({
+            SlotCount: '16',
+            Whiteboard: {ExpectedSlotCount},
+        });
+
+        expect(preparedData.ExpectedSlotCount).toBe(ExpectedSlotCount);
+    });
+
     test('Should preserve the BSC size and prepare a separate Whiteboard size', () => {
         const preparedData = prepareGroupsPDisk({
             AvailableSize: '3000000000',
