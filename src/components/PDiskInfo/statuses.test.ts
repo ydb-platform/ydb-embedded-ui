@@ -25,8 +25,8 @@ describe('PDisk status labels', () => {
                     getPDiskDriveLabel(status as EDriveStatus),
                 ],
                 [
-                    'Decomission',
-                    'Decomission status is not available',
+                    'Decommission',
+                    'Decommission status is not available',
                     getPDiskDecommitLabel(status as EDecommitStatus),
                 ],
                 [
@@ -59,9 +59,9 @@ describe('PDisk status labels', () => {
             icon: CircleQuestionFill,
         });
         expect(getPDiskDecommitLabel('DECOMMIT_UNSET')).toMatchObject({
-            title: 'Decomission',
+            title: 'Decommission',
             value: 'N/A',
-            tooltip: 'Decomission status is not available',
+            tooltip: 'Decommission status is not available',
             theme: 'unknown',
             icon: CircleQuestionFill,
         });

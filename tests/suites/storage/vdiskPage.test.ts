@@ -1024,7 +1024,7 @@ test.describe('Storage disk popup snapshots', () => {
         await expect(panel.getByText('Unknown', {exact: true})).toBeVisible();
         for (const [status, tooltip] of [
             ['Drive status', 'Drive is not available'],
-            ['Decomission', 'Decomission status is not available'],
+            ['Decommission', 'Decommission status is not available'],
             ['Maintenance', 'Maintenance status is not available'],
         ]) {
             const label = panel.locator('.ydb-disk-status__label').filter({hasText: status});
