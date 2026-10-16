@@ -159,24 +159,26 @@ export function Node() {
     ]);
 
     return (
-        <div className={b(null)} ref={container}>
+        <div className={b(null)}>
             {<NodePageHelmet node={node} activeTabTitle={activeTab.title} />}
             {<NodePageMeta node={node} loading={pageLoading} />}
-            {<NodePageTitle node={node} />}
-            {error ? <ResponseError error={error} className={b('error')} /> : null}
-            {<NodePageInfo node={node} loading={pageLoading} />}
-            {!pageLoading && nodeId ? (
-                <NodePageContent
-                    nodeId={nodeId}
-                    database={database}
-                    clusterName={clusterName ?? undefined}
-                    backend={backend ?? undefined}
-                    environment={environment}
-                    activeTabId={activeTab.id}
-                    tabs={nodeTabs}
-                    parentContainer={container}
-                />
-            ) : null}
+            <div className={b('content')} ref={container}>
+                {<NodePageTitle node={node} />}
+                {error ? <ResponseError error={error} className={b('error')} /> : null}
+                {<NodePageInfo node={node} loading={pageLoading} />}
+                {!pageLoading && nodeId ? (
+                    <NodePageContent
+                        nodeId={nodeId}
+                        database={database}
+                        clusterName={clusterName ?? undefined}
+                        backend={backend ?? undefined}
+                        environment={environment}
+                        activeTabId={activeTab.id}
+                        tabs={nodeTabs}
+                        parentContainer={container}
+                    />
+                ) : null}
+            </div>
         </div>
     );
 }

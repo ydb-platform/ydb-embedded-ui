@@ -1,14 +1,22 @@
 @use '../../styles//mixins.scss';
 
 .ydb-pdisk-page {
-    position: relative;
-
-    overflow: auto;
+    display: flex;
+    flex-direction: column;
 
     height: 100%;
-    padding: 0 20px;
+    min-height: 0;
 
-    &__meta,
+    &__content {
+        position: relative;
+
+        overflow: auto;
+        flex: 1;
+
+        min-height: 0;
+        padding: 0 20px;
+    }
+
     &__title,
     &__info,
     &__controls,
@@ -20,7 +28,9 @@
     }
 
     &__meta {
-        margin-top: 20px;
+        flex-shrink: 0;
+
+        margin: 20px;
     }
 
     &__tabs {
