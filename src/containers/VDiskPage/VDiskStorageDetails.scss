@@ -29,6 +29,11 @@
 
         min-width: 0;
         max-width: 250px;
+
+        &_location {
+            min-width: 100px;
+            max-width: 200px;
+        }
     }
 
     &__value-popover {

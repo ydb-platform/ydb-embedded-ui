@@ -27,7 +27,10 @@ interface VDiskStorageDetailsProps {
 function DetailItem({item}: {item: DiskDetailItem}) {
     const copyText = item.copyText === undefined ? undefined : String(item.copyText);
     return (
-        <div className={b('detail')} data-qa={`vdisk-location-${item.id}`}>
+        <div
+            className={b('detail', {location: LOCATION_IDS.includes(item.id)})}
+            data-qa={`vdisk-location-${item.id}`}
+        >
             <Text color="secondary">{item.name}</Text>
             <VDiskCopyableValue copyText={copyText} fieldName={item.name}>
                 <CellWithPopover
