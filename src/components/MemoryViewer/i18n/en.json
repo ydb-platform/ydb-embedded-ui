@@ -5,8 +5,9 @@
   "text_memtable": "MemTable",
   "text_query-execution": "Query Execution",
   "text_usage": "Usage",
-  "text_soft-limit": "Soft Limit",
-  "text_hard-limit": "Hard Limit",
+  "text_soft-limit": "Memory Controller Soft Limit",
+  "text_hard-limit": "Memory Controller Hard Limit",
   "text_other": "Other",
-  "text_memory-details": "Memory Details"
+  "text_memory-details": "Memory Details",
+  "text_memory-limit": "Memory Limit"
 }
