@@ -293,12 +293,14 @@ export function VDiskPage() {
     };
 
     return (
-        <div className={vDiskPageCn(null)} ref={containerRef}>
+        <div className={vDiskPageCn(null)}>
             {renderHelmet()}
             {renderPageMeta()}
-            {renderPageTitle()}
-            {renderControls()}
-            {renderContent()}
+            <div className={vDiskPageCn('content')} ref={containerRef}>
+                {renderPageTitle()}
+                {renderControls()}
+                {renderContent()}
+            </div>
         </div>
     );
 }

@@ -106,24 +106,26 @@ export function Tablet() {
     }
 
     return (
-        <Flex gap={5} direction="column" className={b()}>
+        <Flex direction="column" className={b()}>
             <Helmet>
                 <title>{`${id} — ${i18n('tablet.header')} — ${
                     databaseFullPath || queryClusterName || CLUSTER_DEFAULT_TITLE
                 }`}</title>
             </Helmet>
-            <PageMetaWithAutorefresh items={metaItems} />
-            <LoaderWrapper loading={loading} size="l">
-                {error ? <ResponseError error={error} /> : null}
-                {currentData ? (
-                    <TabletContent
-                        id={id}
-                        tablet={tablet}
-                        history={history}
-                        database={database || databaseFullPath}
-                    />
-                ) : null}
-            </LoaderWrapper>
+            <PageMetaWithAutorefresh items={metaItems} className={b('meta')} />
+            <Flex gap={5} direction="column" className={b('content')}>
+                <LoaderWrapper loading={loading} size="l">
+                    {error ? <ResponseError error={error} /> : null}
+                    {currentData ? (
+                        <TabletContent
+                            id={id}
+                            tablet={tablet}
+                            history={history}
+                            database={database || databaseFullPath}
+                        />
+                    ) : null}
+                </LoaderWrapper>
+            </Flex>
         </Flex>
     );
 }
