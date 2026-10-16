@@ -737,7 +737,9 @@ test.describe('Storage disk popup snapshots', () => {
 
                 if (combined) {
                     await expect(
-                        popup.locator('.g-label__key').filter({hasText: 'Not available'}),
+                        popup
+                            .locator('.ydb-vdisk-popup__compaction .g-label__key')
+                            .filter({hasText: 'Not available'}),
                     ).toHaveCount(2);
                     const compactionTextLines = await popup
                         .locator('.ydb-vdisk-popup__compaction .g-label__text')
@@ -782,6 +784,8 @@ test.describe('Storage disk popup snapshots', () => {
                         }),
                     );
                 expect(clippedLabelText).toEqual([]);
+                // Bring this card above its overlapping peer before checking text tooltips.
+                await popup.locator('.ydb-disk-popup__id').first().hover();
                 for (const value of [host, rack, LONG_DATACENTER]) {
                     const text = popup
                         .locator('.ydb-disk-popup__text')
@@ -1018,6 +1022,18 @@ test.describe('Storage disk popup snapshots', () => {
 
         const panel = await getDiskPopupPanel(popup, 'PDisk', `${NODE_ID}-${PDISK_ID}`);
         await expect(panel.getByText('Unknown', {exact: true})).toBeVisible();
+        for (const [status, tooltip] of [
+            ['Drive status', 'Drive is not available'],
+            ['Decomission', 'Decomission status is not available'],
+            ['Maintenance', 'Maintenance status is not available'],
+        ]) {
+            const label = panel.locator('.ydb-disk-status__label').filter({hasText: status});
+            await expect(label).toHaveText(`${status}:N/A`);
+            await label.hover();
+            await expect(page.getByRole('tooltip')).toHaveText(tooltip);
+        }
+        await panel.locator('.ydb-disk-popup__id').hover();
+        await expect(page.getByRole('tooltip')).toBeHidden();
         await expectHDDLabel(panel);
         for (const label of ['Device', 'Realtime']) {
             await expectDefinitionListRowValue(panel, label, 'Not available');
