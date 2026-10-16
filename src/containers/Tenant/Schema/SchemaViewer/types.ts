@@ -15,6 +15,7 @@ export type SchemaData = {
     columnCodec?: string;
     rawColumnCodec?: EColumnCodec;
     columnCodecLevel?: number;
+    dictionaryEncoding?: boolean;
     defaultValue?: string | number | boolean;
 };
 
