@@ -1,6 +1,5 @@
 import type {StorageGroupsResponse} from '../../../types/api/storage';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
-import type {PreparedVDisk} from '../../../utils/disks/types';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 import {prepareGroupsVDisk} from '../storage/prepareGroupsDisks';
 
@@ -20,14 +19,16 @@ export function prepareVDiskDataResponse(
 
     const preparedVDisk = prepareGroupsVDisk(rawVDisk);
 
-    let currentVDisk: PreparedVDisk = {};
+    let currentVDisk: VDiskData = {};
 
     if (preparedVDisk.StringifiedId === vDiskId) {
         currentVDisk = preparedVDisk;
     } else {
         for (const donor of preparedVDisk.Donors ?? []) {
             if (donor.StringifiedId === vDiskId) {
-                currentVDisk = donor;
+                // Keep the recipient's metrics without a back-reference to this donor.
+                const {Donors: _donors, ...recipient} = preparedVDisk;
+                currentVDisk = {...donor, Recipient: recipient};
                 break;
             }
         }
@@ -40,7 +41,6 @@ export function prepareVDiskDataResponse(
 
     const NodeId = currentVDisk.NodeId ?? preparedPDisk?.NodeId ?? preparedNode.NodeId;
     const NodeHost = preparedNode.Host;
-    const NodeType = preparedNode.Roles?.[0];
     const NodeDC = preparedNode.DC;
     const NodeRack = preparedNode.Rack;
 
@@ -52,7 +52,6 @@ export function prepareVDiskDataResponse(
 
         NodeId,
         NodeHost,
-        NodeType,
         NodeDC,
         NodeRack,
 

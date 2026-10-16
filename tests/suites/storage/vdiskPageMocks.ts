@@ -26,6 +26,7 @@ export interface SetupVDiskPageMocksOptions {
     pDiskId?: string;
     isViewerAllowed?: boolean;
     withDonors?: boolean;
+    replicated?: boolean;
     withSlotOnlyDonor?: boolean;
     withoutCompaction?: boolean;
     storagePoolName?: string;
@@ -117,6 +118,7 @@ function createStorageGroupsResponse({
     availableSize = '186000000000',
     pDiskId = PDISK_ID,
     withDonors,
+    replicated,
     withoutCompaction,
     storagePoolName = STORAGE_POOL_NAME,
     withCapacityMetrics,
@@ -133,6 +135,7 @@ function createStorageGroupsResponse({
     | 'availableSize'
     | 'pDiskId'
     | 'withDonors'
+    | 'replicated'
     | 'withoutCompaction'
     | 'storagePoolName'
     | 'withCapacityMetrics'
@@ -187,6 +190,7 @@ function createStorageGroupsResponse({
                               }
                             : {}),
                         ...(withDonors ? {VDiskState: 'OK', Replicated: false} : {}),
+                        ...(replicated === undefined ? {} : {Replicated: replicated}),
                         SatisfactionRank: withoutCompaction
                             ? undefined
                             : {
@@ -389,6 +393,7 @@ async function setupStorageGroupsMock(
         availableSize,
         pDiskId = PDISK_ID,
         withDonors,
+        replicated,
         withoutCompaction,
         storagePoolName,
         withCapacityMetrics,
@@ -405,6 +410,7 @@ async function setupStorageGroupsMock(
         | 'availableSize'
         | 'pDiskId'
         | 'withDonors'
+        | 'replicated'
         | 'withoutCompaction'
         | 'storagePoolName'
         | 'withCapacityMetrics'
@@ -427,6 +433,7 @@ async function setupStorageGroupsMock(
                     availableSize,
                     pDiskId,
                     withDonors,
+                    replicated,
                     withoutCompaction,
                     storagePoolName,
                     withCapacityMetrics,

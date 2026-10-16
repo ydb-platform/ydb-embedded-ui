@@ -11,6 +11,10 @@
         background-color: var(--g-color-base-selection);
         @include mixins.text-body-short();
 
+        &_size_s {
+            border-radius: var(--g-border-radius-s);
+        }
+
         &_size_xs {
             min-height: 20px;
             padding: 2px 6px;
