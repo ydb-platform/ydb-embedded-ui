@@ -106,10 +106,12 @@ test.describe('Test Query Execution Status', async () => {
         await setupMockStreamingFetch(page, {totalChunks: 10});
 
         await queryEditor.setQuery(testQuery);
-        await queryEditor.clickRunButton();
+        const [transitions] = await Promise.all([
+            queryEditor.collectStatusTransitions('Completed'),
+            queryEditor.clickRunButton(),
+        ]);
 
         const validStreamingStatuses = ['Preparing', 'Running', 'Fetching', 'Completed'];
-        const transitions = await queryEditor.collectStatusTransitions('Completed');
 
         for (let i = 0; i < transitions.length; i++) {
             expect(validStreamingStatuses).toContain(transitions[i]);

@@ -75,7 +75,8 @@
 
         height: 100%;
     }
-    &__click-handler {
+    &__click-handler,
+    &__event-boundary {
         display: contents;
     }
 }

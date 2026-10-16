@@ -28,6 +28,7 @@ type DrawerEvent = MouseEvent & {
 };
 
 interface DrawerPaneContentWrapperProps {
+    labelledBy?: string;
     isVisible: boolean;
     onClose: () => void;
     onTransitionInComplete?: () => void;
@@ -40,6 +41,7 @@ interface DrawerPaneContentWrapperProps {
     defaultWidth?: number;
     isPercentageWidth?: boolean;
     hideVeil?: boolean;
+    disableModal?: boolean;
 }
 
 const DrawerPaneContentWrapper = ({
@@ -55,11 +57,38 @@ const DrawerPaneContentWrapper = ({
     detectClickOutside = false,
     isPercentageWidth,
     hideVeil = true,
+    disableModal = false,
+    labelledBy,
 }: DrawerPaneContentWrapperProps) => {
     const [savedWidthString, setSavedWidthString] = useSetting<string | undefined>(storageKey);
     const [userDrawerWidth, setUserDrawerWidth] = React.useState<number | undefined>(undefined);
 
     const drawerRef = React.useRef<HTMLDivElement>(null);
+    const openerRef = React.useRef<HTMLElement | null>(null);
+
+    // Floating UI suppresses return focus after focus-out, even if the drawer stays open.
+    React.useLayoutEffect(() => {
+        if (!disableModal) {
+            return;
+        }
+        const activeElement = document.activeElement;
+        if (isVisible) {
+            if (
+                activeElement instanceof HTMLElement &&
+                !drawerRef.current?.contains(activeElement)
+            ) {
+                openerRef.current = activeElement;
+            }
+        } else {
+            if (
+                (drawerRef.current?.contains(activeElement) || activeElement === document.body) &&
+                openerRef.current?.isConnected
+            ) {
+                openerRef.current.focus();
+            }
+            openerRef.current = null;
+        }
+    }, [disableModal, isVisible]);
     const {containerWidth, itemContainerRef, rightInset, visibleRightInset} =
         useDrawerContextInternal();
     const availableWidth = Math.max(0, containerWidth - visibleRightInset);
@@ -150,18 +179,35 @@ const DrawerPaneContentWrapper = ({
         [containerWidth, isPercentageWidth, saveWidthDebounced],
     );
 
-    const handleOpenChange = React.useCallback(
-        (open: boolean) => {
-            if (!open) {
+    const handleOpenChange = React.useCallback<
+        NonNullable<React.ComponentProps<typeof GravityDrawer>['onOpenChange']>
+    >(
+        (open, _event, reason) => {
+            if (!open && !(disableModal && reason === 'focus-out')) {
                 onClose();
             }
         },
-        [onClose],
+        [disableModal, onClose],
     );
 
     const handleClickInsideDrawer = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         const nativeEvent = event.nativeEvent as DrawerEvent;
         nativeEvent._capturedInsideDrawer = true;
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (
+            disableModal &&
+            event.key === 'Escape' &&
+            !event.defaultPrevented &&
+            !event.nativeEvent.isComposing &&
+            event.target instanceof Element &&
+            event.target.closest('[role="dialog"]') === drawerRef.current
+        ) {
+            event.preventDefault();
+            event.stopPropagation();
+            onClose();
+        }
     };
 
     const itemContainer = itemContainerRef?.current;
@@ -170,29 +216,35 @@ const DrawerPaneContentWrapper = ({
     }
 
     return (
-        <GravityDrawer
-            qa={drawerId}
-            open={isVisible}
-            onOpenChange={handleOpenChange}
-            onTransitionInComplete={onTransitionInComplete}
-            placement={direction}
-            hideVeil={hideVeil}
-            className={b('container', className)}
-            contentClassName={b('item')}
-            style={drawerOverlayStyle}
-            container={itemContainer}
-            resizable
-            maxSize={availableWidth}
-            size={calculatedWidth}
-            onResizeEnd={handleResizeDrawer}
-            disableBodyScrollLock
-            disableOutsideClick={detectClickOutside}
-            floatingRef={detectClickOutside ? drawerRef : undefined}
-        >
-            <div className={b('click-handler')} onClickCapture={handleClickInsideDrawer}>
-                {children}
-            </div>
-        </GravityDrawer>
+        <div className={b('event-boundary')} onKeyDown={handleKeyDown}>
+            <GravityDrawer
+                qa={drawerId}
+                open={isVisible}
+                onOpenChange={handleOpenChange}
+                onTransitionInComplete={onTransitionInComplete}
+                placement={direction}
+                hideVeil={hideVeil}
+                className={b('container', className)}
+                contentClassName={b('item')}
+                style={drawerOverlayStyle}
+                container={itemContainer}
+                resizable
+                maxSize={availableWidth}
+                size={calculatedWidth}
+                onResizeEnd={handleResizeDrawer}
+                aria-labelledby={labelledBy}
+                disableModal={disableModal}
+                disableEscapeKeyDown={disableModal}
+                disableBodyScrollLock
+                disableOutsideClick={detectClickOutside}
+                floatingRef={drawerRef}
+                returnFocus={disableModal ? false : undefined}
+            >
+                <div className={b('click-handler')} onClickCapture={handleClickInsideDrawer}>
+                    {children}
+                </div>
+            </GravityDrawer>
+        </div>
     );
 };
 
@@ -218,6 +270,7 @@ interface DrawerPaneProps {
     title?: React.ReactNode;
     headerClassName?: string;
     hideVeil?: boolean;
+    disableModal?: boolean;
 }
 
 export const DrawerWrapper = ({
@@ -237,7 +290,9 @@ export const DrawerWrapper = ({
     title,
     headerClassName,
     hideVeil,
+    disableModal,
 }: DrawerPaneProps) => {
+    const titleId = React.useId();
     const onCloseDrawerRef = React.useRef(onCloseDrawer);
 
     React.useEffect(() => {
@@ -281,7 +336,9 @@ export const DrawerWrapper = ({
                 alignItems="center"
                 className={b('header-wrapper', headerClassName)}
             >
-                <Text variant="subheader-2">{title}</Text>
+                <Text id={titleId} variant="subheader-2">
+                    {title}
+                </Text>
                 <Flex className={b('controls')}>{controls}</Flex>
             </Flex>
         );
@@ -292,6 +349,8 @@ export const DrawerWrapper = ({
             {children}
             <DrawerPaneContentWrapper
                 hideVeil={hideVeil}
+                disableModal={disableModal}
+                labelledBy={title ? titleId : undefined}
                 isVisible={isDrawerVisible}
                 onClose={onCloseDrawer}
                 onTransitionInComplete={onTransitionInComplete}

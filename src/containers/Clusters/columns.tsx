@@ -211,6 +211,9 @@ function getTitleColumn({
                         onClickCapture={(e) => {
                             e.stopPropagation();
                             e.preventDefault();
+                            if (uiFactory.healthcheck.disableModal) {
+                                e.currentTarget.focus();
+                            }
                             onStatusClick(row);
                         }}
                     >
