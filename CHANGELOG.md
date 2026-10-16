@@ -1,5 +1,19 @@
 # Changelog
 
+## [22.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.4.0...v22.5.0) (2026-10-16)
+
+
+### Features
+
+* compact Healthcheck issue rows ([#4463](https://github.com/ydb-platform/ydb-embedded-ui/issues/4463)) ([74b270f](https://github.com/ydb-platform/ydb-embedded-ui/commit/74b270fa17a1d09f63af70c8e694ee6e6d24eecb))
+* redesign vdisk page ([#4476](https://github.com/ydb-platform/ydb-embedded-ui/issues/4476)) ([2a7fb43](https://github.com/ydb-platform/ydb-embedded-ui/commit/2a7fb43357d6bf91e8761ff74285aeee72dda09a))
+
+
+### Bug Fixes
+
+* **storage:** restore pdisk slot limits in groups ([#4488](https://github.com/ydb-platform/ydb-embedded-ui/issues/4488)) ([31fa39b](https://github.com/ydb-platform/ydb-embedded-ui/commit/31fa39b66fcecc4df6cbbffd9ed6a05115cd913a))
+* **storage:** support structured node location ([#4487](https://github.com/ydb-platform/ydb-embedded-ui/issues/4487)) ([3ba97a5](https://github.com/ydb-platform/ydb-embedded-ui/commit/3ba97a566a458e0669812107dc8d28d1ddca1561))
+
 ## [22.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.3.0...v22.4.0) (2026-10-09)
 
 
