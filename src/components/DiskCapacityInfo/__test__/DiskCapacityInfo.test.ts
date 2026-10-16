@@ -1,4 +1,5 @@
 import {prepareGroupsVDisk} from '../../../store/reducers/storage/prepareGroupsDisks';
+import {prepareGroupsResponse} from '../../../store/reducers/storage/utils';
 import {ECapacityAlert, EFlag} from '../../../types/api/enums';
 import {EMPTY_DATA_PLACEHOLDER, UNBREAKABLE_GAP} from '../../../utils/constants';
 import {
@@ -208,6 +209,30 @@ describe('DiskCapacityInfo builders', () => {
         expect(items.find(({id}) => id === 'capacity-alert')?.value).toBe(
             ECapacityAlert.LIGHTYELLOW,
         );
+    });
+
+    test('shows PDisk slots from a Groups response without Whiteboard ExpectedSlotCount', () => {
+        const {groups} = prepareGroupsResponse({
+            StorageGroups: [
+                {
+                    GroupId: '1',
+                    VDisks: [
+                        {
+                            PDisk: {
+                                SlotCount: '16',
+                                Whiteboard: {NumActiveSlots: 14},
+                            },
+                        },
+                    ],
+                },
+            ],
+        });
+        const items = getPDiskCapacityInfoItems(groups?.[0].VDisks?.[0].PDisk, {
+            withUsage: true,
+            withCapacityAlert: true,
+        });
+
+        expect(items.find(({id}) => id === 'slots')?.value).toBe('14 / 16');
     });
 
     test('builds exact PDisk scalar values without rendering a component', () => {

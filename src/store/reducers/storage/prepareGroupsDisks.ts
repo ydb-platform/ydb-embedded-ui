@@ -137,6 +137,8 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
         Type,
         Severity,
         SlotSize,
+        ExpectedSlotCount:
+            mergedPDiskData.ExpectedSlotCount ?? parseOptionalNonNegativeNumber(bscPDisk.SlotCount),
         DriveStatus,
     };
 }
