@@ -1,12 +1,28 @@
 .ydb-vdisk-page {
     --g-definition-list-item-gap: var(--g-spacing-3);
-    position: relative;
-
-    overflow: auto;
-    overflow-anchor: none;
+    display: flex;
+    flex-direction: column;
 
     height: 100%;
-    padding: 20px 20px 0;
+    min-height: 0;
+
+    &__header {
+        flex-shrink: 0;
+
+        padding: 20px 20px 0;
+    }
+
+    &__content {
+        position: relative;
+
+        overflow: auto;
+        overflow-anchor: none;
+
+        flex: 1;
+
+        min-height: 0;
+        padding: 0 20px;
+    }
 
     &__meta,
     &__title,

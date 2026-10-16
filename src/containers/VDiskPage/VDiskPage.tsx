@@ -332,12 +332,16 @@ export function VDiskPage() {
     };
 
     return (
-        <div className={vDiskPageCn(null)} ref={containerRef}>
+        <div className={vDiskPageCn(null)}>
             {renderHelmet()}
-            {renderPageMeta()}
-            {renderPageTitle()}
-            {renderControls()}
-            {renderContent()}
+            <div className={vDiskPageCn('header')}>
+                {showBackButton ? renderPageMeta() : renderPageTitle()}
+            </div>
+            <div className={vDiskPageCn('content')} ref={containerRef}>
+                {showBackButton ? renderPageTitle() : null}
+                {renderControls()}
+                {renderContent()}
+            </div>
         </div>
     );
 }

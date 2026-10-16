@@ -3,8 +3,22 @@
 .ydb-tablet-page {
     $_: &;
     height: 100%;
-    padding: 20px;
+    min-height: 0;
     @include mixins.body-2-typography();
+
+    &__meta {
+        flex-shrink: 0;
+
+        margin: 20px;
+    }
+
+    &__content {
+        overflow: auto;
+        flex: 1;
+
+        min-height: 0;
+        padding: 0 20px 20px;
+    }
 
     &__placeholder {
         display: flex;

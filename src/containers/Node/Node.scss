@@ -3,14 +3,22 @@
 .node {
     --ydb-configs-controls-height: 62px;
     --ydb-configs-container-height: calc(100vh - var(--header-height));
-    position: relative;
-
-    overflow: auto;
+    display: flex;
+    flex-direction: column;
 
     height: 100%;
-    padding: 0 20px;
+    min-height: 0;
 
-    &__meta,
+    &__content {
+        position: relative;
+
+        overflow: auto;
+        flex: 1;
+
+        min-height: 0;
+        padding: 0 20px;
+    }
+
     &__title,
     &__info,
     &__error,
@@ -22,7 +30,9 @@
     }
 
     &__meta {
-        margin-top: 20px;
+        flex-shrink: 0;
+
+        margin: 20px;
     }
 
     &__tabs,

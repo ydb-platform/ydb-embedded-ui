@@ -308,15 +308,19 @@ export function PDiskPage() {
     };
 
     return (
-        <div className={pdiskPageCn(null)} ref={containerRef}>
+        <div className={pdiskPageCn(null)}>
             {renderHelmet()}
-            {renderPageMeta()}
-            {renderPageTitle()}
-            {renderControls()}
-            {renderError()}
-            {renderInfo()}
-            {renderTabs()}
-            {renderTabsContent()}
+            <div className={pdiskPageCn('header')}>
+                {showBackButton ? renderPageMeta() : renderPageTitle()}
+            </div>
+            <div className={pdiskPageCn('content')} ref={containerRef}>
+                {showBackButton ? renderPageTitle() : null}
+                {renderControls()}
+                {renderError()}
+                {renderInfo()}
+                {renderTabs()}
+                {renderTabsContent()}
+            </div>
         </div>
     );
 }
