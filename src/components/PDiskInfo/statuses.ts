@@ -24,6 +24,16 @@ function unknownLabel(): DiskStatusLabelData {
     };
 }
 
+function unavailableLabel(title: string, tooltip: string): DiskStatusLabelData {
+    return {
+        title,
+        value: i18n('value_not-available'),
+        tooltip,
+        theme: 'unknown',
+        icon: CircleQuestionFill,
+    };
+}
+
 function getLabelView({
     severity,
     icon,
@@ -112,7 +122,7 @@ export function getPDiskStateLabel(state?: TPDiskState): DiskStatusLabelData {
 
 export function getPDiskDriveLabel(status?: EDriveStatus): DiskStatusLabelData | undefined {
     if (!status || status === 'UNKNOWN') {
-        return undefined;
+        return unavailableLabel(i18n('field_drive'), i18n('context_drive-not-available'));
     }
     const labels: Record<Exclude<EDriveStatus, 'UNKNOWN'>, StatusText> = {
         ACTIVE: {value: i18n('value_active'), tooltip: i18n('context_active')},
@@ -141,7 +151,7 @@ export function getPDiskDriveLabel(status?: EDriveStatus): DiskStatusLabelData |
 
 export function getPDiskDecommitLabel(status?: EDecommitStatus): DiskStatusLabelData | undefined {
     if (!status || status === 'DECOMMIT_UNSET') {
-        return undefined;
+        return unavailableLabel(i18n('field_decommit'), i18n('context_decommit-not-available'));
     }
     const labels: Record<Exclude<EDecommitStatus, 'DECOMMIT_UNSET'>, StatusText> = {
         DECOMMIT_NONE: {value: i18n('value_decommit-none'), tooltip: i18n('context_decommit-none')},
@@ -174,7 +184,10 @@ export function getPDiskMaintenanceLabel(
     status?: EMaintenanceStatus,
 ): DiskStatusLabelData | undefined {
     if (!status) {
-        return undefined;
+        return unavailableLabel(
+            i18n('label_maintenance'),
+            i18n('context_maintenance-not-available'),
+        );
     }
     const labels: Record<EMaintenanceStatus, StatusText> = {
         NO_REQUEST: {
