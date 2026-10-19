@@ -15,7 +15,6 @@ interface SearchProps extends Omit<TextInputProps, 'onUpdate' | 'onChange'> {
     onChange: (value: string) => void;
     value?: string;
     width?: React.CSSProperties['width'];
-    /** Set to 0 to update the controlled value immediately; debounce requests separately. */
     debounce?: number;
     inputRef?: React.RefObject<HTMLInputElement>;
     tableFilter?: boolean;
