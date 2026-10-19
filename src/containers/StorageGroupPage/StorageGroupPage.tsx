@@ -1,13 +1,14 @@
 import React from 'react';
 
 import {ArrowLeft} from '@gravity-ui/icons';
-import {Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {Button, Flex, Icon, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {useHistory} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
+import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {StorageGroupInfo} from '../../components/StorageGroupInfo/StorageGroupInfo';
@@ -110,22 +111,15 @@ export function StorageGroupPage() {
                     wrap="wrap"
                 >
                     <Text variant="header-1">{storageGroupPageKeyset('storage-group')}</Text>
-                    <Flex alignItems="center" gap={1}>
+                    <CopyableValue
+                        copyText={groupId}
+                        fieldName={storageGroupPageKeyset('storage-group')}
+                        copyButtonLabel={storageGroupPageKeyset('action_copy-group-id-from-title')}
+                    >
                         <Text variant="header-1" color="hint">
                             {groupId || EMPTY_DATA_PLACEHOLDER}
                         </Text>
-                        {groupId && (
-                            <ClipboardButton
-                                text={groupId}
-                                view="flat-secondary"
-                                size="s"
-                                aria-label={storageGroupPageKeyset(
-                                    'action_copy-group-id-from-title',
-                                )}
-                                tooltipInitialText={storageGroupPageKeyset('action_copy-group-id')}
-                            />
-                        )}
-                    </Flex>
+                    </CopyableValue>
                     <StorageGroupStateLabel state={state} />
                 </Flex>
                 {showRefreshInTitle && (

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
 import {normalizeCapacityAlert} from '../../utils/capacityAlerts';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
@@ -12,11 +10,8 @@ import {
     formatStorageMetricPair,
 } from '../../utils/storageMetrics';
 import {DiskCapacityAlertLabel} from '../DiskStatus/DiskStatus';
-import type {InfoViewerItem} from '../InfoViewer';
 import {pDiskInfoKeyset} from '../PDiskInfo/i18n';
-import {TitleWithHelpMark} from '../TitleWithHelpmark/TitleWithHelpmark';
 import {vDiskInfoKeyset} from '../VDiskInfo/i18n';
-import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
 import {
     CAPACITY_CONFIGURATION_HELP_TEXT,
     CAPACITY_METRICS_COLUMN_TITLES,
@@ -25,79 +20,6 @@ import {
 import {formatCapacityUnitCount} from '../capacityMetricsColumns/formatters';
 
 import i18n from './i18n';
-
-export interface DiskCapacityInfoItem {
-    id: string;
-    title: string;
-    value: React.ReactNode;
-    note?: string;
-}
-
-function getCapacityAlertValue(value: unknown): React.ReactNode {
-    return normalizeCapacityAlert(value) ?? EMPTY_DATA_PLACEHOLDER;
-}
-
-export function getPDiskCapacityInfoItems(
-    data: PreparedPDisk | undefined,
-    {
-        withUsage,
-        withCapacityAlert,
-        fixedDecimalPlaces,
-        useWhiteboardSize = true,
-    }: {
-        withUsage: boolean;
-        withCapacityAlert: boolean;
-        fixedDecimalPlaces?: number;
-        useWhiteboardSize?: boolean;
-    },
-): DiskCapacityInfoItem[] {
-    const sizeData = useWhiteboardSize ? (data?.WhiteboardSize ?? data) : data;
-    const items: DiskCapacityInfoItem[] = [
-        {
-            id: 'space',
-            title: i18n('field_space'),
-            value: formatStorageMetricPair(
-                sizeData?.AllocatedSize,
-                sizeData?.TotalSize,
-                fixedDecimalPlaces,
-            ),
-        },
-    ];
-
-    if (withUsage) {
-        items.push({
-            id: 'pdisk-usage',
-            title: CAPACITY_METRICS_COLUMN_TITLES.MaxPDiskUsage,
-            value: formatMetricPercent(data?.PDiskUsage, fixedDecimalPlaces),
-            note: CAPACITY_METRICS_HELP_TEXT.MaxPDiskUsage,
-        });
-    }
-
-    items.push(
-        {
-            id: 'slots',
-            title: i18n('field_slots'),
-            value: formatMetricCountPair(data?.NumActiveSlots, data?.ExpectedSlotCount),
-        },
-        {
-            id: 'slot-size-in-units',
-            title: i18n('field_slot-size-in-units'),
-            value: formatCapacityUnitCount(data?.SlotSizeInUnits),
-            note: CAPACITY_CONFIGURATION_HELP_TEXT.SlotSizeInUnits,
-        },
-    );
-
-    if (withCapacityAlert) {
-        items.push({
-            id: 'capacity-alert',
-            title: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
-            value: getCapacityAlertValue(data?.PDiskCapacityAlert),
-            note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
-        });
-    }
-
-    return items;
-}
 
 export function getVDiskCapacityItems(
     data: PreparedVDisk,
@@ -143,42 +65,49 @@ export function getPDiskCapacityItems(
     data: PreparedPDisk,
     {useWhiteboardSize = true}: {useWhiteboardSize?: boolean} = {},
 ): DiskDetailItem[] {
-    const fieldOrder = ['slot-size-in-units', 'space', 'capacity-alert', 'pdisk-usage', 'slots'];
-    const capacityItems = getPDiskCapacityInfoItems(data, {
-        withUsage: true,
-        withCapacityAlert: true,
-        fixedDecimalPlaces: 2,
-        useWhiteboardSize,
-    });
-    const items: DiskDetailItem[] = [];
-    for (const id of fieldOrder) {
-        const field = capacityItems.find((item) => item.id === id);
-        if (field) {
-            items.push({
-                id,
-                name: field.title,
-                content:
-                    id === 'capacity-alert' ? (
-                        <DiskCapacityAlertLabel value={data.PDiskCapacityAlert} />
-                    ) : (
-                        field.value
-                    ),
-                note: id === 'slots' ? pDiskInfoKeyset('context_slots') : field.note,
-            });
-        }
-    }
-    return items;
+    const size = useWhiteboardSize ? (data.WhiteboardSize ?? data) : data;
+    return [
+        {
+            id: 'slot-size-in-units',
+            name: i18n('field_slot-size-in-units'),
+            content: formatCapacityUnitCount(data.SlotSizeInUnits),
+            note: CAPACITY_CONFIGURATION_HELP_TEXT.SlotSizeInUnits,
+        },
+        {
+            id: 'space',
+            name: i18n('field_space'),
+            content: formatStorageMetricPair(size.AllocatedSize, size.TotalSize, 2),
+        },
+        {
+            id: 'capacity-alert',
+            name: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
+            content: <DiskCapacityAlertLabel value={data.PDiskCapacityAlert} />,
+            note: CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
+        },
+        {
+            id: 'pdisk-usage',
+            name: CAPACITY_METRICS_COLUMN_TITLES.MaxPDiskUsage,
+            content: formatMetricPercent(data.PDiskUsage, 2),
+            note: CAPACITY_METRICS_HELP_TEXT.MaxPDiskUsage,
+        },
+        {
+            id: 'slots',
+            name: i18n('field_slots'),
+            content: formatMetricCountPair(data.NumActiveSlots, data.ExpectedSlotCount),
+            note: pDiskInfoKeyset('context_slots'),
+        },
+    ];
 }
 
 export function getStorageGroupCapacityInfoItems(
     data: PreparedStorageGroup | undefined,
-): DiskCapacityInfoItem[] {
+): DiskDetailItem[] {
     const capacityAlert = normalizeCapacityAlert(data?.CapacityAlert);
     return [
         {
             id: 'capacity-alert',
-            title: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
-            value: capacityAlert ? (
+            name: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
+            content: capacityAlert ? (
                 <DiskCapacityAlertLabel value={capacityAlert} />
             ) : (
                 EMPTY_DATA_PLACEHOLDER
@@ -187,26 +116,15 @@ export function getStorageGroupCapacityInfoItems(
         },
         {
             id: 'vdisk-slot-usage',
-            title: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
-            value: formatNormalizedMetricPercent(data?.MaxVDiskSlotUsage),
+            name: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
+            content: formatNormalizedMetricPercent(data?.MaxVDiskSlotUsage),
             note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskSlotUsage,
         },
         {
             id: 'vdisk-raw-usage',
-            title: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage,
-            value: formatNormalizedMetricPercent(data?.MaxVDiskRawUsage),
+            name: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage,
+            content: formatNormalizedMetricPercent(data?.MaxVDiskRawUsage),
             note: CAPACITY_METRICS_HELP_TEXT.MaxVDiskRawUsage,
         },
     ];
-}
-
-export function toDefinitionListItems(items: DiskCapacityInfoItem[]): YDBDefinitionListItem[] {
-    return items.map(({title, value, note}) => ({name: title, content: value, note}));
-}
-
-export function toInfoViewerItems(items: DiskCapacityInfoItem[]): InfoViewerItem[] {
-    return items.map(({title, value, note}) => ({
-        label: note ? <TitleWithHelpMark header={title} note={note} /> : title,
-        value,
-    }));
 }

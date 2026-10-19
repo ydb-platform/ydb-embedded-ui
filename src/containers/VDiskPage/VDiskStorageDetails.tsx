@@ -2,8 +2,8 @@ import {Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
+import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
 import {InternalLinkButton} from '../../components/InternalLinkButton';
-import {VDiskCopyableValue} from '../../components/VDiskInfo/VDiskCopyableValue';
 import {getVDiskLocationItems} from '../../components/VDiskInfo/getVDiskDetails';
 import {getPDiskPagePath} from '../../routes';
 import {useNewStorageViewEnabled} from '../../store/reducers/capabilities/hooks';
@@ -32,7 +32,7 @@ function DetailItem({item}: {item: DiskDetailItem}) {
             data-qa={`vdisk-location-${item.id}`}
         >
             <Text color="secondary">{item.name}</Text>
-            <VDiskCopyableValue copyText={copyText} fieldName={item.name}>
+            <CopyableValue copyText={copyText} fieldName={item.name}>
                 <CellWithPopover
                     content={copyText}
                     disabled={!copyText}
@@ -45,7 +45,7 @@ function DetailItem({item}: {item: DiskDetailItem}) {
                 >
                     <span tabIndex={copyText ? 0 : undefined}>{item.content}</span>
                 </CellWithPopover>
-            </VDiskCopyableValue>
+            </CopyableValue>
         </div>
     );
 }

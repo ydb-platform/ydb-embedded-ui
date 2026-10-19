@@ -18,7 +18,6 @@
   "field_group-size-in-units": "Group Size in Units",
   "field_capacity-alert": "Capacity alert",
   "field_compaction": "Compaction",
-  "action_copy-field": "Copy {{field}}",
   "action_show-more": "Show more",
   "action_show-less": "Show less"
 }

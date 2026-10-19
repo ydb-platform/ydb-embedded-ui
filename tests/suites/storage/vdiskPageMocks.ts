@@ -517,6 +517,7 @@ export async function setupPDiskInfoMock(
     {
         withCapacityMetrics = false,
         withSlotOnlyDonor = false,
+        pDiskPath = '/dev/pdisk0',
         whiteboardAllocatedSize,
         whiteboardAvailableSize,
         whiteboardSlotSize = '20000000000',
@@ -535,7 +536,7 @@ export async function setupPDiskInfoMock(
         | 'pDiskBscTotalSize'
         | 'pDiskWhiteboardAvailableSize'
         | 'pDiskWhiteboardTotalSize'
-    > = {},
+    > & {pDiskPath?: string} = {},
 ) {
     await page.route('**/pdisk/info*', async (route) => {
         await route.fulfill({
@@ -543,11 +544,14 @@ export async function setupPDiskInfoMock(
             contentType: 'application/json',
             body: JSON.stringify({
                 Whiteboard: {
-                    PDisk: createPDiskWhiteboardData(withCapacityMetrics, {
-                        whiteboardSlotSize,
-                        pDiskWhiteboardAvailableSize,
-                        pDiskWhiteboardTotalSize,
-                    }),
+                    PDisk: {
+                        ...createPDiskWhiteboardData(withCapacityMetrics, {
+                            whiteboardSlotSize,
+                            pDiskWhiteboardAvailableSize,
+                            pDiskWhiteboardTotalSize,
+                        }),
+                        Path: pDiskPath,
+                    },
                     VDisks: [
                         withSlotOnlyDonor
                             ? {
@@ -568,7 +572,7 @@ export async function setupPDiskInfoMock(
                 BSC: {
                     PDisk: {
                         Type: 'ROT',
-                        Path: '/dev/pdisk0',
+                        Path: pDiskPath,
                         Guid: '123456789',
                         AvailableSize: pDiskBscAvailableSize,
                         TotalSize: pDiskBscTotalSize,

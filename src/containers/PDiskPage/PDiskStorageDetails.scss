@@ -1,0 +1,51 @@
+.ydb-pdisk-storage-details {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--g-spacing-5);
+
+    width: fit-content;
+    max-width: 100%;
+    padding: var(--g-spacing-3) var(--g-spacing-5);
+
+    border-radius: var(--g-border-radius-m);
+    background-color: var(--g-color-base-generic);
+
+    &__detail {
+        --g-definition-list-item-gap: 0px;
+
+        min-width: 0;
+        max-width: 200px;
+
+        &_location {
+            min-width: 100px;
+        }
+
+        .g-definition-list__definition {
+            min-width: 0;
+            max-width: 100%;
+        }
+    }
+
+    &__value-popover {
+        flex: 0 1 auto;
+
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    &__value-popover-content {
+        width: auto;
+        min-width: 0;
+        max-width: 100%;
+
+        &_with-left-trim {
+            text-align: end;
+            direction: rtl;
+
+            > span {
+                unicode-bidi: plaintext;
+            }
+        }
+    }
+}

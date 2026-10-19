@@ -4,12 +4,14 @@
     position: relative;
 
     overflow: auto;
+    overflow-anchor: none;
 
     height: 100%;
-    padding: 0 20px;
+    padding: 20px 20px 0;
 
     &__meta,
     &__title,
+    &__storage-details,
     &__info,
     &__controls,
     &__tabs {
@@ -19,8 +21,23 @@
         margin-bottom: 20px;
     }
 
-    &__meta {
-        margin-top: 20px;
+    &__heading {
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    &__title-content {
+        flex: 1;
+
+        min-width: 0;
+    }
+
+    &__refresh-control {
+        flex-shrink: 0;
+    }
+
+    &__storage-details {
+        margin-bottom: var(--g-spacing-4);
     }
 
     &__tabs {
@@ -31,15 +48,9 @@
         padding: 20px 0;
     }
 
-    &__title {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: var(--g-spacing-2);
-    }
-
     &__controls {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         gap: var(--g-spacing-2);
     }
