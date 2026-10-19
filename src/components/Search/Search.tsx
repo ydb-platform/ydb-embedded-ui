@@ -1,6 +1,7 @@
 import React from 'react';
 
 import type {TextInputProps} from '@gravity-ui/uikit';
+import {TextInput} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {DebouncedTextInput} from '../DebouncedInput/DebouncedTextInput';
@@ -14,6 +15,7 @@ interface SearchProps extends Omit<TextInputProps, 'onUpdate' | 'onChange'> {
     onChange: (value: string) => void;
     value?: string;
     width?: React.CSSProperties['width'];
+    /** Set to 0 to update the controlled value immediately; debounce requests separately. */
     debounce?: number;
     inputRef?: React.RefObject<HTMLInputElement>;
     tableFilter?: boolean;
@@ -40,17 +42,20 @@ export const Search = ({
         [onChange],
     );
 
-    return (
-        <DebouncedTextInput
-            debounce={debounce}
-            hasClear
-            autoFocus
-            controlRef={controlRef}
-            style={{width}}
-            className={b(null, className)}
-            value={value}
-            onUpdate={onUpdate}
-            {...props}
-        />
+    const inputProps: TextInputProps = {
+        hasClear: true,
+        autoFocus: true,
+        controlRef,
+        style: {width},
+        className: b(null, className),
+        value,
+        onUpdate,
+        ...props,
+    };
+
+    return debounce === 0 ? (
+        <TextInput {...inputProps} />
+    ) : (
+        <DebouncedTextInput debounce={debounce} {...inputProps} />
     );
 };
