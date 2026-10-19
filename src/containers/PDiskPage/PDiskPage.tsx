@@ -28,7 +28,6 @@ import {api} from '../../store/reducers/api';
 import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {pDiskApi} from '../../store/reducers/pdisk/pdisk';
-import type {EDecommitStatus} from '../../types/api/pdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
@@ -39,7 +38,6 @@ import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedT
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
-import {DecommissionButton} from './DecommissionButton/DecommissionButton';
 import {PDiskSpaceDistribution} from './PDiskSpaceDistribution/PDiskSpaceDistribution';
 import {PDiskStorageDetails} from './PDiskStorageDetails';
 import {pDiskPageKeyset} from './i18n';
@@ -110,27 +108,6 @@ export function PDiskPage() {
                 newDiskApiAvailable ? 'restartPDisk' : 'restartPDiskOld'
             ]({nodeId, pDiskId, force: isRetry});
 
-            if (response?.result === false) {
-                const err = {
-                    statusText: response.error,
-                    retryPossible: response.forceRetryPossible,
-                };
-                throw err;
-            }
-        }
-    };
-
-    const handleDecommissionChange = async (
-        newDecommissionStatus?: EDecommitStatus,
-        isRetry?: boolean,
-    ) => {
-        if (pDiskParamsDefined) {
-            const response = await window.api.pdisk.changePDiskStatus({
-                nodeId,
-                pDiskId,
-                force: isRetry,
-                decommissionStatus: newDecommissionStatus,
-            });
             if (response?.result === false) {
                 const err = {
                     statusText: response.error,
@@ -249,15 +226,6 @@ export function PDiskPage() {
                     <Icon data={ArrowRotateLeft} />
                     {pDiskPageKeyset('restart-pdisk-button')}
                 </ButtonWithConfirmDialog>
-                {newDiskApiAvailable ? (
-                    <DecommissionButton
-                        decommission={DecommitStatus}
-                        onConfirmAction={handleDecommissionChange}
-                        onConfirmActionSuccess={handleAfterAction}
-                        buttonDisabled={!pDiskParamsDefined || !isUserAllowedToMakeChanges}
-                        popoverDisabled={isUserAllowedToMakeChanges}
-                    />
-                ) : null}
                 {hasDeveloperUi && pDiskParamsDefined && (
                     <LinkWithIcon
                         title={pDiskPageKeyset('action_open-in-developer-ui')}
