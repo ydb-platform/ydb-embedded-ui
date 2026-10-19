@@ -3,7 +3,7 @@ import React from 'react';
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../components/InternalLink';
-import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
+import {PDiskLogSize} from '../../../components/PDiskInfo/PDiskLogSize';
 import {VDiskPopup} from '../../../components/VDiskPopup/VDiskPopup';
 import type {YDBDefinitionListItem} from '../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../components/YDBDefinitionList/YDBDefinitionList';
@@ -286,20 +286,14 @@ function LogInfo({data}: LogInfoProps) {
     const items: YDBDefinitionListItem[] = [
         {
             name: pDiskPageKeyset('label.log-size'),
-            content: (
-                <ProgressViewer
-                    value={LogUsedSize}
-                    capacity={LogTotalSize}
-                    formatValues={formatStorageValuesToGb}
-                />
-            ),
+            content: <PDiskLogSize used={LogUsedSize} total={LogTotalSize} />,
         },
     ];
 
     if (valueIsDefined(SystemSize)) {
         items.push({
             name: pDiskPageKeyset('label.system-size'),
-            content: formatBytes({value: SystemSize}),
+            content: formatBytes({value: SystemSize, fixedDecimalPlaces: 2}),
         });
     }
 

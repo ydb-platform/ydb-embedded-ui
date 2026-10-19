@@ -675,6 +675,28 @@ test.describe('VDisk page storage tab', () => {
         await copyPDiskId.click();
         await expect.poll(() => getClipboardContent(page)).toBe(`${NODE_ID}-${PDISK_ID}`);
 
+        await page
+            .locator('.ydb-pdisk-space-distribution__slot-wrapper')
+            .filter({has: page.getByText('Log', {exact: true})})
+            .hover();
+        const logPopup = page
+            .locator('.ydb-pdisk-space-distribution__vdisk-popup')
+            .filter({visible: true})
+            .last();
+        await expect(logPopup).toBeVisible();
+        for (const [label, value] of [
+            ['Log Size', '1.00 / 5.00 GB'],
+            ['System Size', '1.00 GB'],
+        ]) {
+            await expectDefinitionListRowValue(
+                pDiskPage.getByTestId('pdisk-page-info'),
+                label,
+                value,
+            );
+            await expectDefinitionListRowValue(logPopup, label, value);
+        }
+        await closeDiskPopup(page, logPopup);
+
         const pDiskUrl = page.url();
         await page.goto(VDISK_PAGE_PATH);
         await expect(refreshButton).toBeVisible();
