@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {act, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {createMemoryHistory} from 'history';
 import {Router} from 'react-router-dom';
@@ -76,6 +76,24 @@ describe('Nodes search URL integration', () => {
         expect(screen.getByRole('status')).toHaveTextContent(/^abc$/);
         expect(input).toHaveValue('abc');
         expect(input).toHaveFocus();
+    });
+
+    it('keeps the next character when the previous filter update is still pending', async () => {
+        const {user, input} = setup();
+        await user.type(input, 'b');
+
+        act(() => {
+            jest.advanceTimersByTime(200);
+            // Type before React commits the previous debounced update.
+            fireEvent.change(input, {target: {value: 'abc'}});
+        });
+
+        expect(input).toHaveValue('abc');
+        expect(input).toHaveFocus();
+
+        act(() => jest.advanceTimersByTime(200));
+        expect(input).toHaveValue('abc');
+        expect(screen.getByRole('status')).toHaveTextContent(/^abc$/);
     });
 
     it('accepts Back, Forward and external clearing while a filter is pending', async () => {
