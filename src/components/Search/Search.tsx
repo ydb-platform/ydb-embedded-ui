@@ -41,20 +41,19 @@ export const Search = ({
         [onChange],
     );
 
-    const inputProps: TextInputProps = {
-        hasClear: true,
-        autoFocus: true,
-        controlRef,
-        style: {width},
-        className: b(null, className),
-        value,
-        onUpdate,
-        ...props,
-    };
+    const Input = debounce === 0 ? TextInput : DebouncedTextInput;
 
-    return debounce === 0 ? (
-        <TextInput {...inputProps} />
-    ) : (
-        <DebouncedTextInput debounce={debounce} {...inputProps} />
+    return (
+        <Input
+            {...(debounce === 0 ? {} : {debounce})}
+            hasClear
+            autoFocus
+            controlRef={controlRef}
+            style={{width}}
+            className={b(null, className)}
+            value={value}
+            onUpdate={onUpdate}
+            {...props}
+        />
     );
 };
