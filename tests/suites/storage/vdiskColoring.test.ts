@@ -562,6 +562,8 @@ for (const firstDisk of ['vdisk', 'pdisk'] as const) {
         }
 
         await page.clock.resume();
+        // Clicking Evict in the peer must release the PDisk context-menu pin, not the pair.
+        await pDiskPopup.getByText('7000-100', {exact: true}).dispatchEvent('contextmenu');
         await hoverPopup(vDiskPopup);
         await vDiskPopup.getByRole('button', {name: 'Evict VDisk', exact: true}).click();
         const evictionDialog = page.getByRole('dialog');

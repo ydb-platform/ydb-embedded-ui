@@ -174,6 +174,13 @@ export const HoverPopup = ({
                             (!keepOpen.current || keepOpen.current === 'context-menu')
                         ) {
                             closePopup();
+                        } else if (
+                            reason === 'outside-press' &&
+                            keepOpen.current === 'context-menu'
+                        ) {
+                            // Release this pin without dismissing a hovered peer or its dialog.
+                            keepOpen.current = null;
+                            resumeHover();
                         }
                     }}
                     placement={placement}

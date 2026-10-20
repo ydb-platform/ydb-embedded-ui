@@ -949,6 +949,50 @@ test.describe('Storage disk popup snapshots', () => {
         });
     }
 
+    for (const disk of ['PDisk', 'VDisk'] as const) {
+        for (const outsideTarget of ['input', 'background'] as const) {
+            test(`releases ${disk} contextmenu pin on ${outsideTarget} click without a popup blur`, async ({
+                page,
+            }) => {
+                await page.setViewportSize({width: 1500, height: 1000});
+                await setupVDiskPageMocks(page);
+                await page.goto(VDISK_PAGE_PATH);
+                await new ClusterStorageTable(page).waitForTableData();
+                const search = page.getByRole('textbox', {
+                    name: 'Group ID, Pool name',
+                    exact: true,
+                });
+                await search.focus();
+                const anchor = page
+                    .locator(
+                        disk === 'PDisk'
+                            ? '.ydb-storage-disks__pdisk-progress-bar'
+                            : '.ydb-storage-vdisks__wrapper .storage-disk-progress-bar',
+                    )
+                    .first();
+                await anchor.hover();
+                const popup = await waitForDiskPopup(page, `Go to ${disk}`);
+                const id = disk === 'PDisk' ? `${NODE_ID}-${PDISK_ID}` : VDISK_ID;
+                // The plain header does not take focus, so clicking outside cannot blur it.
+                await popup.getByText(id, {exact: true}).dispatchEvent('contextmenu');
+                await expect(search).toBeFocused();
+                await page.mouse.move(0, 0);
+                await page.waitForTimeout(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+                await expect(popup).toBeVisible();
+                if (outsideTarget === 'input') {
+                    await search.click();
+                } else {
+                    await page.mouse.click(0, 0);
+                }
+                await expect(popup).toBeHidden();
+                await expect(anchor).toBeVisible();
+                await anchor.hover();
+                await expect(popup).toBeVisible();
+                await closeDiskPopup(page, popup);
+            });
+        }
+    }
+
     test('renders redesigned VDisk popup actions', async ({page}) => {
         await page.setViewportSize({width: 1500, height: 1000});
         await setupVDiskPageMocks(page);
