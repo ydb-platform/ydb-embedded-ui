@@ -87,7 +87,7 @@ export function VDiskWithDonorsStack({
         compact,
         hidePDiskInPopup: hideMainPDiskInPopup,
         withIcon,
-        showPopup: isHighlighted,
+        showPopup: stackId && setHighlightedVDisk ? isHighlighted : isHighlighted || undefined,
         highlighted: isHighlighted,
         onShowPopup,
         onHidePopup,

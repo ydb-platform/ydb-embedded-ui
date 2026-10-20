@@ -48,14 +48,20 @@
         gap: var(--g-spacing-2);
     }
 
-    // Only Compaction contributes to the intrinsic width; other sections fit the card.
-    &__body > :not(:has(.ydb-vdisk-popup__compaction)),
+    // Compaction and Log Size values contribute to the intrinsic width; other sections fit the card.
+    &__body
+        > :not(
+            :has(.ydb-vdisk-popup__compaction, .g-definition-list__definition .ydb-pdisk-log-size)
+        ),
     &__footer,
-    .g-definition-list__item:not(:has(.ydb-vdisk-popup__compaction)) {
+    .g-definition-list__item:not(
+            :has(.ydb-vdisk-popup__compaction, .g-definition-list__definition .ydb-pdisk-log-size)
+        ) {
         contain: inline-size;
     }
 
-    .ydb-vdisk-popup__compaction {
+    .ydb-vdisk-popup__compaction,
+    .g-definition-list__definition .ydb-pdisk-log-size {
         width: max-content;
         max-width: 100%;
     }

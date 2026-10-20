@@ -183,8 +183,9 @@ function buildVDiskFooter(
     data: PreparedVDisk,
     withDeveloperUILink: boolean,
     getVDiskLinkFn: ReturnType<typeof useVDiskPagePath>,
-    onSuccess: VoidFunction,
+    onSuccess: (isDialogOpen: boolean) => void,
     withActions: boolean,
+    onDialogOpen?: () => VoidFunction,
 ): React.ReactNode | null {
     const {NodeId, PDiskId, VDiskSlotId, StringifiedId, DonorMode} = data;
     const vDiskInternalViewerPath =
@@ -230,6 +231,7 @@ function buildVDiskFooter(
                             vDiskId={resolvedVDiskId}
                             donorMode={DonorMode}
                             onSuccess={onSuccess}
+                            onDialogOpen={onDialogOpen}
                         />
                     )}
                 </Flex>
@@ -242,6 +244,7 @@ interface VDiskPopupProps {
     data: PreparedVDisk;
     nodeData?: NodeMetadata;
     onClose?: VoidFunction;
+    onDialogOpen?: () => VoidFunction;
     view?: 'default' | 'space-distribution';
 }
 
@@ -249,6 +252,7 @@ export function VDiskPopup({
     data,
     nodeData: parentNodeData,
     onClose,
+    onDialogOpen,
     view = 'default',
 }: VDiskPopupProps) {
     const dispatch = useTypedDispatch();
@@ -259,7 +263,7 @@ export function VDiskPopup({
     const getVDiskLink = useVDiskPagePath();
     const fullData = isFullVDiskData(data) ? data : undefined;
     const vdiskId = fullData?.StringifiedId;
-    const handleAfterEvictVDisk = () => {
+    const handleAfterEvictVDisk = (isDialogOpen: boolean) => {
         dispatch(
             api.util.invalidateTags([
                 'TableData',
@@ -268,7 +272,9 @@ export function VDiskPopup({
                 {type: 'VDiskData', id: vdiskId},
             ]),
         );
-        onClose?.();
+        if (isDialogOpen) {
+            onClose?.();
+        }
     };
     const isSpaceDistribution = view === 'space-distribution';
     const runtimeItems = fullData ? getRuntimeItems(fullData, isSpaceDistribution) : [];
@@ -282,6 +288,7 @@ export function VDiskPopup({
               getVDiskLink,
               handleAfterEvictVDisk,
               !isSpaceDistribution,
+              onDialogOpen,
           )
         : buildUnavailableVDiskFooter(data, hasDeveloperUi);
     const locationItems = getLocationItems(data, nodeData, Boolean(pdisk));

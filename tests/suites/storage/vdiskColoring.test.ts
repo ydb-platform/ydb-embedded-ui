@@ -562,6 +562,28 @@ for (const firstDisk of ['vdisk', 'pdisk'] as const) {
         }
 
         await page.clock.resume();
+        await hoverPopup(vDiskPopup);
+        await vDiskPopup.getByRole('button', {name: 'Evict VDisk', exact: true}).click();
+        const evictionDialog = page.getByRole('dialog');
+        await expect(evictionDialog).toBeVisible();
+        const anchorBox = await vDisk.boundingBox();
+        if (!anchorBox) {
+            throw new Error('VDisk anchor has no bounding box');
+        }
+        await page.mouse.move(
+            anchorBox.x + anchorBox.width / 2,
+            anchorBox.y + anchorBox.height / 2,
+        );
+        await page.waitForTimeout(400);
+        for (const popup of popups) {
+            await expect(popup).toBeVisible();
+        }
+        await page.keyboard.press('Escape');
+        await expect(evictionDialog).toBeHidden();
+        await page.waitForTimeout(400);
+        for (const popup of popups) {
+            await expect(popup).toBeVisible();
+        }
         await page.mouse.move(0, 0);
         for (const popup of popups) {
             await expect(popup).toBeHidden();
@@ -571,10 +593,18 @@ for (const firstDisk of ['vdisk', 'pdisk'] as const) {
         for (const popup of popups) {
             await expect(popup).toBeVisible();
         }
+        await hoverPopup(vDiskPopup);
+        await hoverPopup(pDiskPopup);
+        await page.clock.pauseAt(new Date((await page.evaluate(() => Date.now())) + 1000));
         await page.keyboard.press('Escape');
+        await page.clock.runFor(25);
+        // Escape dismisses the pair, including the sibling that previously lost hover.
+        await hoverPopup(vDiskPopup);
+        await page.clock.runFor(400);
         for (const popup of popups) {
             await expect(popup).toBeHidden();
         }
+        await page.clock.resume();
 
         await page.mouse.move(0, 0);
         await firstAnchor.hover();

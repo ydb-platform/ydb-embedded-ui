@@ -13,8 +13,9 @@ async function openGroups(
     page: Page,
     expertMode: boolean,
     response = createMockStorageGroupsResponse(),
+    viewport = {width: 480, height: 720},
 ) {
-    await page.setViewportSize({width: 480, height: 720});
+    await page.setViewportSize(viewport);
     await page.addInitScript((expert) => {
         localStorage.setItem('enableStorageExpertMode', 'true');
         localStorage.setItem('storageExpertMode', JSON.stringify(expert));
@@ -232,3 +233,54 @@ for (const width of [320, 480]) {
         }
     });
 }
+
+test('closes eviction confirmation when refreshed data removes its source row', async ({page}) => {
+    await page.addInitScript(() => {
+        localStorage.setItem('auto-refresh-interval', '1000');
+    });
+    const response = createMockStorageGroupsResponse();
+    let evictRequests = 0;
+    await page.route('**/tablets/app?*', async (route) => {
+        evictRequests++;
+        await route.fulfill({json: {result: true}});
+    });
+    const storagePage = await openGroups(page, false, response, {width: 1500, height: 1000});
+    const sourceRow = storagePage.getGroupRow(GROUP_ID);
+    await storagePage.getGroupVDiskItems(GROUP_ID, false).first().getByRole('link').hover();
+    const popup = page
+        .locator('.vdisk-storage-popup')
+        .filter({hasText: `${GROUP_ID}-1-0-0-0`})
+        .last();
+    await popup.getByRole('button', {name: 'Evict VDisk', exact: true}).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(popup).toBeVisible();
+    // Remove the source through polling, independently of native focus restoration on scroll.
+    response.StorageGroups = [];
+    response.TotalGroups = response.FoundGroups = 0;
+    await expect(sourceRow).toHaveCount(0);
+    await expect(popup).toHaveCount(0);
+    await expect(dialog).toBeHidden();
+    expect(evictRequests).toBe(0);
+});
+
+test('opens a VDisk popup without an identity for parent coordination', async ({page}) => {
+    const response = createMockStorageGroupsResponse();
+    const disk = response.StorageGroups?.[0]?.VDisks?.[0];
+    if (!disk) {
+        throw new Error('Missing VDisk fixture');
+    }
+    delete disk.VDiskId;
+    delete disk.Whiteboard;
+    const storagePage = await openGroups(page, false, response, {width: 1500, height: 1000});
+    await storagePage
+        .getGroupVDiskItems(GROUP_ID)
+        .first()
+        .locator('.storage-disk-progress-bar')
+        .hover();
+    const popup = page.locator('.vdisk-storage-popup');
+    await expect(popup).toBeVisible();
+    await expect(popup).toContainText('7000');
+    await page.mouse.move(0, 0);
+    await expect(popup).toBeHidden();
+});
