@@ -18,6 +18,7 @@ import {toaster} from '../../utils/createToast';
 import {useSetting} from '../../utils/hooks';
 
 import {AppTitleProvider} from './AppTitleContext';
+import {BackNavigationProvider} from './BackNavigationContext';
 
 interface ProvidersProps {
     store: Store;
@@ -38,18 +39,20 @@ export function Providers({
         <HelmetProvider>
             <Provider store={store}>
                 <Router history={history}>
-                    <QueryParamProvider adapter={ReactRouter5Adapter}>
-                        <AppTitleProvider appTitle={appTitle}>
-                            <Theme>
-                                <ToasterProvider toaster={toaster}>
-                                    <ComponentsProvider registry={componentsRegistry}>
-                                        <NiceModal.Provider>{children}</NiceModal.Provider>
-                                        <ToasterComponent />
-                                    </ComponentsProvider>
-                                </ToasterProvider>
-                            </Theme>
-                        </AppTitleProvider>
-                    </QueryParamProvider>
+                    <BackNavigationProvider history={history}>
+                        <QueryParamProvider adapter={ReactRouter5Adapter}>
+                            <AppTitleProvider appTitle={appTitle}>
+                                <Theme>
+                                    <ToasterProvider toaster={toaster}>
+                                        <ComponentsProvider registry={componentsRegistry}>
+                                            <NiceModal.Provider>{children}</NiceModal.Provider>
+                                            <ToasterComponent />
+                                        </ComponentsProvider>
+                                    </ToasterProvider>
+                                </Theme>
+                            </AppTitleProvider>
+                        </QueryParamProvider>
+                    </BackNavigationProvider>
                 </Router>
             </Provider>
         </HelmetProvider>

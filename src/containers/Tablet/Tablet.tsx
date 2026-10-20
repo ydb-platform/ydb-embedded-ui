@@ -7,12 +7,13 @@ import {useParams} from 'react-router-dom';
 import {useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
+import {StickyAutoRefreshControl} from '../../components/AutoRefreshControl/StickyAutoRefreshControl';
 import {EmptyStateWrapper} from '../../components/EmptyState';
 import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InternalLink} from '../../components/InternalLink';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
-import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
+import {PageMeta} from '../../components/PageMeta/PageMeta';
 import {tabletPageQueryParams, useTabletPagePath} from '../../routes';
 import {useTabletDevUiSecurePath} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
@@ -106,14 +107,17 @@ export function Tablet() {
     }
 
     return (
-        <Flex direction="column" className={b()}>
+        <div className={b()}>
             <Helmet>
                 <title>{`${id} — ${i18n('tablet.header')} — ${
                     databaseFullPath || queryClusterName || CLUSTER_DEFAULT_TITLE
                 }`}</title>
             </Helmet>
-            <PageMetaWithAutorefresh items={metaItems} className={b('meta')} />
+            <StickyAutoRefreshControl />
             <Flex gap={5} direction="column" className={b('content')}>
+                <Flex alignItems="center" className={b('meta')}>
+                    <PageMeta items={metaItems} />
+                </Flex>
                 <LoaderWrapper loading={loading} size="l">
                     {error ? <ResponseError error={error} /> : null}
                     {currentData ? (
@@ -126,7 +130,7 @@ export function Tablet() {
                     ) : null}
                 </LoaderWrapper>
             </Flex>
-        </Flex>
+        </div>
     );
 }
 
@@ -207,7 +211,7 @@ function TabletTabs({
     return (
         <Flex gap={5} direction="column" qa="tablet-tabs">
             {/* block wrapper fror tabs to preserve height */}
-            <div>
+            <div className={b('tabs')}>
                 <TabProvider value={tabletTab}>
                     <TabList size="l">
                         {TABLET_PAGE_TABS.filter(({isAdvanced}) =>

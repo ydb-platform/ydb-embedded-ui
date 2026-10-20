@@ -8,7 +8,7 @@ import {useHistory} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
-import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
+import {StickyAutoRefreshControl} from '../../components/AutoRefreshControl/StickyAutoRefreshControl';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
 import {DiskStatusLabel, DiskTypeLabel} from '../../components/DiskStatus/DiskStatus';
@@ -36,6 +36,7 @@ import {getPDiskId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useAppTitle} from '../App/AppTitleContext';
+import {useCanGoBack} from '../App/BackNavigationContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
 import {PDiskSpaceDistribution} from './PDiskSpaceDistribution/PDiskSpaceDistribution';
@@ -71,7 +72,7 @@ const pDiskTabSchema = z.nativeEnum(PDISK_TABS_IDS).catch(PDISK_TABS_IDS.spaceDi
 export function PDiskPage() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
-    const showBackButton = history.length > 1;
+    const showBackButton = useCanGoBack();
     const hasDeveloperUi = useHasDeveloperUi();
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
@@ -159,7 +160,6 @@ export function PDiskPage() {
                     <Icon data={ArrowLeft} size={16} />
                     {pDiskPageKeyset('action_back')}
                 </Button>
-                <AutoRefreshControl className={pdiskPageCn('refresh-control')} />
             </Flex>
         );
     };
@@ -173,7 +173,7 @@ export function PDiskPage() {
         ];
         return (
             <Flex
-                className={pdiskPageCn('title')}
+                className={pdiskPageCn('title', {'with-refresh': !showBackButton})}
                 gap={2}
                 alignItems="flex-start"
                 qa="pdisk-header"
@@ -199,9 +199,6 @@ export function PDiskPage() {
                         <DiskTypeLabel type={pDiskData?.Type} size="s" />
                     </Flex>
                 </Flex>
-                {!showBackButton && (
-                    <AutoRefreshControl className={pdiskPageCn('refresh-control')} />
-                )}
             </Flex>
         );
     };
@@ -308,19 +305,16 @@ export function PDiskPage() {
     };
 
     return (
-        <div className={pdiskPageCn(null)}>
+        <div className={pdiskPageCn(null)} ref={containerRef}>
             {renderHelmet()}
-            <div className={pdiskPageCn('header')}>
-                {showBackButton ? renderPageMeta() : renderPageTitle()}
-            </div>
-            <div className={pdiskPageCn('content')} ref={containerRef}>
-                {showBackButton ? renderPageTitle() : null}
-                {renderControls()}
-                {renderError()}
-                {renderInfo()}
-                {renderTabs()}
-                {renderTabsContent()}
-            </div>
+            <StickyAutoRefreshControl />
+            {renderPageMeta()}
+            {renderPageTitle()}
+            {renderControls()}
+            {renderError()}
+            {renderInfo()}
+            {renderTabs()}
+            {renderTabsContent()}
         </div>
     );
 }

@@ -1,19 +1,6 @@
 @use '../../styles//mixins.scss';
 
 .ydb-page-meta {
-    & > &__info {
-        display: block;
-        overflow: hidden;
-
-        min-width: 0;
-
-        text-overflow: ellipsis;
-    }
-
-    &__auto-refresh {
-        flex-shrink: 0;
-    }
-
     &__info {
         display: flex;
         flex-grow: 1;

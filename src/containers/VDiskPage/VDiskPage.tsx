@@ -7,7 +7,7 @@ import {isNil} from 'lodash';
 import {Helmet} from 'react-helmet-async';
 import {useHistory} from 'react-router-dom';
 
-import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
+import {StickyAutoRefreshControl} from '../../components/AutoRefreshControl/StickyAutoRefreshControl';
 import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
 import {DiskTypeLabel} from '../../components/DiskStatus/DiskStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
@@ -35,6 +35,7 @@ import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useAppTitle} from '../App/AppTitleContext';
+import {useCanGoBack} from '../App/BackNavigationContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
 import {VDiskStorageDetails} from './VDiskStorageDetails';
@@ -49,7 +50,7 @@ const vDiskPageCn = cn('ydb-vdisk-page');
 export function VDiskPage() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
-    const showBackButton = history.length > 1;
+    const showBackButton = useCanGoBack();
     const getVDiskPagePath = useVDiskPagePath();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
@@ -130,7 +131,6 @@ export function VDiskPage() {
                     <Icon data={ArrowLeft} size={16} />
                     {vDiskPageKeyset('action_back')}
                 </Button>
-                <AutoRefreshControl className={vDiskPageCn('refresh-control')} />
             </Flex>
         );
     };
@@ -152,7 +152,7 @@ export function VDiskPage() {
     const renderPageTitle = () => {
         return (
             <Flex
-                className={vDiskPageCn('title')}
+                className={vDiskPageCn('title', {'with-refresh': !showBackButton})}
                 alignItems="flex-start"
                 gap={2}
                 wrap="nowrap"
@@ -182,9 +182,6 @@ export function VDiskPage() {
                         </CopyableValue>
                     </Flex>
                 </Flex>
-                {!showBackButton && (
-                    <AutoRefreshControl className={vDiskPageCn('refresh-control')} />
-                )}
             </Flex>
         );
     };
@@ -332,16 +329,13 @@ export function VDiskPage() {
     };
 
     return (
-        <div className={vDiskPageCn(null)}>
+        <div className={vDiskPageCn(null)} ref={containerRef}>
             {renderHelmet()}
-            <div className={vDiskPageCn('header')}>
-                {showBackButton ? renderPageMeta() : renderPageTitle()}
-            </div>
-            <div className={vDiskPageCn('content')} ref={containerRef}>
-                {showBackButton ? renderPageTitle() : null}
-                {renderControls()}
-                {renderContent()}
-            </div>
+            <StickyAutoRefreshControl />
+            {renderPageMeta()}
+            {renderPageTitle()}
+            {renderControls()}
+            {renderContent()}
         </div>
     );
 }

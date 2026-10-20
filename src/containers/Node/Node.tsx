@@ -6,12 +6,13 @@ import {Helmet} from 'react-helmet-async';
 import {useHistory, useRouteMatch} from 'react-router-dom';
 import {useQueryParams} from 'use-query-params';
 
+import {StickyAutoRefreshControl} from '../../components/AutoRefreshControl/StickyAutoRefreshControl';
 import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink';
-import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
+import {PageMeta} from '../../components/PageMeta/PageMeta';
 import routes, {getDefaultNodePath} from '../../routes';
 import {
     useCapabilitiesLoaded,
@@ -159,26 +160,25 @@ export function Node() {
     ]);
 
     return (
-        <div className={b(null)}>
+        <div className={b(null)} ref={container}>
             {<NodePageHelmet node={node} activeTabTitle={activeTab.title} />}
+            <StickyAutoRefreshControl />
             {<NodePageMeta node={node} loading={pageLoading} />}
-            <div className={b('content')} ref={container}>
-                {<NodePageTitle node={node} />}
-                {error ? <ResponseError error={error} className={b('error')} /> : null}
-                {<NodePageInfo node={node} loading={pageLoading} />}
-                {!pageLoading && nodeId ? (
-                    <NodePageContent
-                        nodeId={nodeId}
-                        database={database}
-                        clusterName={clusterName ?? undefined}
-                        backend={backend ?? undefined}
-                        environment={environment}
-                        activeTabId={activeTab.id}
-                        tabs={nodeTabs}
-                        parentContainer={container}
-                    />
-                ) : null}
-            </div>
+            {<NodePageTitle node={node} />}
+            {error ? <ResponseError error={error} className={b('error')} /> : null}
+            {<NodePageInfo node={node} loading={pageLoading} />}
+            {!pageLoading && nodeId ? (
+                <NodePageContent
+                    nodeId={nodeId}
+                    database={database}
+                    clusterName={clusterName ?? undefined}
+                    backend={backend ?? undefined}
+                    environment={environment}
+                    activeTabId={activeTab.id}
+                    tabs={nodeTabs}
+                    parentContainer={container}
+                />
+            ) : null}
         </div>
     );
 }
@@ -208,11 +208,9 @@ function NodePageMeta({node, loading}: NodePageMetaProps) {
     const dcItem = node?.DC ? `${i18n('dc')}: ${node.DC}` : undefined;
 
     return (
-        <PageMetaWithAutorefresh
-            loading={loading}
-            items={[hostItem, dcItem]}
-            className={b('meta')}
-        />
+        <div className={b('meta')}>
+            <PageMeta loading={loading} items={[hostItem, dcItem]} />
+        </div>
     );
 }
 

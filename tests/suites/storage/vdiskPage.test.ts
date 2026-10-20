@@ -698,11 +698,20 @@ test.describe('VDisk page storage tab', () => {
         await closeDiskPopup(page, logPopup);
 
         const pDiskUrl = page.url();
-        await page.goto(VDISK_PAGE_PATH);
+        await page.getByRole('button', {name: 'Back', exact: true}).click();
+        await expect(goToPDiskLink).toBeVisible();
         await expect(refreshButton).toBeVisible();
         await expect(autoRefreshControl.getByTestId('ydb-autorefresh-select')).toBeVisible();
-        await page.getByRole('button', {name: 'Back', exact: true}).click();
+        await expect(page.getByRole('button', {name: 'Back', exact: true})).toHaveCount(0);
+        await page.reload();
+        await expect(goToPDiskLink).toBeVisible();
+        await expect(page.getByRole('button', {name: 'Back', exact: true})).toHaveCount(0);
+
+        await page.goForward();
         await expect(page).toHaveURL(pDiskUrl);
+        await expect(page.getByRole('button', {name: 'Back', exact: true})).toBeVisible();
+        await page.reload();
+        await expect(page.getByRole('button', {name: 'Back', exact: true})).toBeVisible();
     });
 });
 

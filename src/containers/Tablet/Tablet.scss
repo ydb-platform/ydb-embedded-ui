@@ -2,22 +2,32 @@
 
 .ydb-tablet-page {
     $_: &;
+    --sticky-tabs-height: 40px;
+    position: relative;
+
+    overflow: auto;
+
     height: 100%;
-    min-height: 0;
+    padding: 0 20px 20px;
     @include mixins.body-2-typography();
 
-    &__meta {
-        flex-shrink: 0;
-
-        margin: 20px;
+    &__content {
+        // The sticky refresh wrapper already supplies the initial 20px page inset.
+        min-height: calc(100% - 20px);
     }
 
-    &__content {
-        overflow: auto;
-        flex: 1;
+    &__meta {
+        min-height: 28px;
+        padding-right: 121px;
+    }
 
-        min-height: 0;
-        padding: 0 20px 20px;
+    &__tabs {
+        z-index: 3;
+
+        height: var(--sticky-tabs-height);
+        padding-right: 125px;
+
+        @include mixins.sticky-top();
     }
 
     &__placeholder {

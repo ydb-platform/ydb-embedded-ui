@@ -1,28 +1,16 @@
+@use '../../styles/mixins.scss';
+
 .ydb-vdisk-page {
+    --sticky-tabs-height: 40px;
+    --data-table-start: var(--sticky-tabs-height);
     --g-definition-list-item-gap: var(--g-spacing-3);
-    display: flex;
-    flex-direction: column;
+    position: relative;
+
+    overflow: auto;
+    overflow-anchor: none;
 
     height: 100%;
-    min-height: 0;
-
-    &__header {
-        flex-shrink: 0;
-
-        padding: 20px 20px 0;
-    }
-
-    &__content {
-        position: relative;
-
-        overflow: auto;
-        overflow-anchor: none;
-
-        flex: 1;
-
-        min-height: 0;
-        padding: 0 20px;
-    }
+    padding: 0 20px;
 
     &__meta,
     &__title,
@@ -52,8 +40,8 @@
         min-width: 0;
     }
 
-    &__refresh-control {
-        flex-shrink: 0;
+    &__title_with-refresh {
+        padding-right: 125px;
     }
 
     &__controls {
@@ -69,5 +57,15 @@
 
     &__tablets-content {
         margin-top: var(--g-spacing-4);
+    }
+
+    &__tabs {
+        z-index: 3;
+
+        height: var(--sticky-tabs-height);
+        margin-bottom: 0;
+        padding-right: 125px;
+
+        @include mixins.sticky-top();
     }
 }

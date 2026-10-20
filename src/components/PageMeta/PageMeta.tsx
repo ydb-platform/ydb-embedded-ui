@@ -37,7 +37,7 @@ export function PageMetaWithAutorefresh({className, ...rest}: PageMetaProps) {
             className={b(null, className)}
         >
             <PageMeta {...rest} />
-            <AutoRefreshControl className={b('auto-refresh')} />
+            <AutoRefreshControl />
         </Flex>
     );
 }
