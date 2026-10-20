@@ -4,19 +4,25 @@ import {ClipboardButton, Flex} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 
-import {vDiskInfoKeyset} from './i18n';
+import i18n from './i18n';
 
-import './VDiskCopyableValue.scss';
+import './CopyableValue.scss';
 
-const b = cn('ydb-vdisk-copyable-value');
+const b = cn('ydb-copyable-value');
 
-interface VDiskCopyableValueProps {
+interface CopyableValueProps {
     children: React.ReactNode;
     copyText?: string | null;
     fieldName: string;
+    copyButtonLabel?: string;
 }
 
-export function VDiskCopyableValue({children, copyText, fieldName}: VDiskCopyableValueProps) {
+export function CopyableValue({
+    children,
+    copyText,
+    fieldName,
+    copyButtonLabel,
+}: CopyableValueProps) {
     return (
         <Flex inline alignItems="center" className={b({'with-copy': Boolean(copyText)})}>
             {children}
@@ -26,7 +32,7 @@ export function VDiskCopyableValue({children, copyText, fieldName}: VDiskCopyabl
                     text={copyText}
                     size="s"
                     view="flat-secondary"
-                    aria-label={vDiskInfoKeyset('action_copy-field', {field: fieldName})}
+                    aria-label={copyButtonLabel ?? i18n('action_copy-field', {field: fieldName})}
                 />
             )}
         </Flex>

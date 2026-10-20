@@ -3,6 +3,7 @@ import {expect, test} from '@playwright/test';
 
 import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../../../src/containers/Storage/shared';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../src/utils/emptyDataPlaceholder';
+import {getClipboardContent} from '../../utils/clipboard';
 import {ClusterStorageTable} from '../paginatedTable/paginatedTable';
 import {Sidebar} from '../sidebar/Sidebar';
 
@@ -217,16 +218,6 @@ test.describe('VDisk page tabs', () => {
     });
 });
 
-function getInfoViewerRow(container: Locator, label: string) {
-    const exactLabel = container
-        .locator('.info-viewer__label-text')
-        .getByText(label, {exact: true});
-
-    return exactLabel.locator(
-        'xpath=ancestor::div[contains(concat(" ", normalize-space(@class), " "), " info-viewer__row ")][1]',
-    );
-}
-
 function getDefinitionListRow(container: Locator, label: string) {
     const exactLabel = container
         .locator('.g-definition-list__term-wrapper')
@@ -311,20 +302,6 @@ async function expectDefinitionListLabelOnOneLine(container: Locator, label: str
     });
 
     expect(textLineCount).toBe(1);
-}
-
-async function expectInfoViewerRowPlaceholder(container: Locator, label: string) {
-    const row = getInfoViewerRow(container, label);
-
-    await expect(row).toBeVisible();
-    await expect(row.getByText(EMPTY_DATA_PLACEHOLDER, {exact: true})).toBeVisible();
-}
-
-async function expectInfoViewerRowValue(container: Locator, label: string, value: string) {
-    const row = getInfoViewerRow(container, label);
-
-    await expect(row).toBeVisible();
-    await expect(row.getByText(value, {exact: true})).toBeVisible();
 }
 
 async function expectDefinitionListRowPlaceholder(container: Locator, label: string) {
@@ -623,8 +600,13 @@ test.describe('VDisk page storage tab', () => {
     });
 
     test('Go to PDisk navigates to PDisk page', async ({page, baseURL}) => {
+        await page.setViewportSize({width: 1440, height: 900});
+        await page.addInitScript(() => {
+            localStorage.setItem('theme', JSON.stringify('light'));
+        });
+        await enableBlobStorageCapacityMetrics(page);
         await setupVDiskPageMocks(page);
-        await setupPDiskInfoMock(page);
+        await setupPDiskInfoMock(page, {withCapacityMetrics: true});
         // Replace the initial about:blank entry to model opening the page without history.
         await page.evaluate(
             (url) => window.location.replace(url),
@@ -662,12 +644,114 @@ test.describe('VDisk page storage tab', () => {
         await expect(page.locator('.ydb-pdisk-space-distribution')).toBeVisible();
         await expect(page.getByText('Space distribution', {exact: true})).toBeVisible();
 
+        const pDiskPage = page.locator('.ydb-pdisk-page');
+        await expect(
+            pDiskPage.getByRole('heading', {name: `PDisk ${NODE_ID}-${PDISK_ID}`, exact: true}),
+        ).toBeVisible();
+        await expect(pDiskPage.getByText('PDisk Usage', {exact: true})).toBeVisible();
+        const header = page.locator('header.header');
+        const copyPDiskId = header.getByRole('button', {
+            name: 'Copy PDisk ID from breadcrumb',
+            exact: true,
+        });
+        await expect(header.getByText(`PDisk ${NODE_ID}-${PDISK_ID}`, {exact: true})).toBeVisible();
+        await expect(copyPDiskId).toBeVisible();
+        await expect(header.getByText('Ok', {exact: true})).toBeVisible();
+        await page.mouse.move(0, 0);
+        const headerBox = await header.boundingBox();
+        const pageBox = await pDiskPage.boundingBox();
+        const tabsBox = await pDiskPage.locator('.ydb-pdisk-page__tabs').boundingBox();
+        if (!headerBox || !pageBox || !tabsBox) {
+            throw new Error('PDisk page summary is not visible');
+        }
+        await expect(page).toHaveScreenshot('pdisk-page-summary.png', {
+            clip: {
+                x: pageBox.x,
+                y: headerBox.y,
+                width: pageBox.width,
+                height: tabsBox.y + tabsBox.height - headerBox.y,
+            },
+        });
+        await copyPDiskId.click();
+        await expect.poll(() => getClipboardContent(page)).toBe(`${NODE_ID}-${PDISK_ID}`);
+
+        await page
+            .locator('.ydb-pdisk-space-distribution__slot-wrapper')
+            .filter({has: page.getByText('Log', {exact: true})})
+            .hover();
+        const logPopup = page
+            .locator('.ydb-pdisk-space-distribution__vdisk-popup')
+            .filter({visible: true})
+            .last();
+        await expect(logPopup).toBeVisible();
+        for (const [label, value] of [
+            ['Log Size', '1.00 / 5.00 GB'],
+            ['System Size', '1.00 GB'],
+        ]) {
+            await expectDefinitionListRowValue(
+                pDiskPage.getByTestId('pdisk-page-info'),
+                label,
+                value,
+            );
+            await expectDefinitionListRowValue(logPopup, label, value);
+        }
+        await closeDiskPopup(page, logPopup);
+
         const pDiskUrl = page.url();
         await page.goto(VDISK_PAGE_PATH);
         await expect(refreshButton).toBeVisible();
         await expect(autoRefreshControl.getByTestId('ydb-autorefresh-select')).toBeVisible();
         await page.getByRole('button', {name: 'Back', exact: true}).click();
         await expect(page).toHaveURL(pDiskUrl);
+    });
+});
+
+test.describe('PDisk page storage details', () => {
+    test('truncates long PDisk location values', async ({page}) => {
+        const rack = `${LONG_RACK}-storage-section-12`;
+        const pDiskPath = '/dev/disk/by-partlabel/cluster-production-storage-nvme-01';
+        await page.setViewportSize({width: 1440, height: 900});
+        await page.addInitScript(() => {
+            localStorage.setItem('theme', JSON.stringify('light'));
+        });
+        await setupVDiskPageMocks(page, {
+            datacenter: LONG_DATACENTER,
+            rack,
+            host: LONG_HOST,
+        });
+        await setupPDiskInfoMock(page, {pDiskPath});
+        await page.goto(`/pDisk?nodeId=${NODE_ID}&pDiskId=${PDISK_ID}`);
+
+        await expect(
+            page.getByRole('heading', {name: `PDisk ${NODE_ID}-${PDISK_ID}`, exact: true}),
+        ).toBeVisible();
+        const storageDetails = page.getByTestId('pdisk-location');
+        for (const [id, value] of [
+            ['datacenter', LONG_DATACENTER],
+            ['rack', rack],
+            ['fqdn', LONG_HOST],
+            ['pdisk-path', pDiskPath],
+        ]) {
+            const content = storageDetails
+                .getByTestId(`pdisk-location-${id}`)
+                .locator('.ydb-cell-with-popover__children-wrapper');
+            await expect(content).toHaveText(value);
+            await expect
+                .poll(() =>
+                    content.evaluate((element) => element.scrollWidth > element.clientWidth),
+                )
+                .toBe(true);
+        }
+        await page.mouse.move(0, 0);
+        await expect(storageDetails).toHaveScreenshot('pdisk-storage-details-truncated.png');
+
+        await storageDetails.getByRole('button', {name: 'Copy PDisk Path', exact: true}).click();
+        await expect.poll(() => getClipboardContent(page)).toBe(pDiskPath);
+        await storageDetails
+            .getByTestId('pdisk-location-pdisk-path')
+            .locator('.ydb-cell-with-popover__children-wrapper')
+            .hover();
+        await expect(page.getByRole('dialog').filter({hasText: pDiskPath})).toBeVisible();
     });
 });
 
@@ -1177,8 +1261,6 @@ test.describe('Blob storage capacity metrics integration', () => {
             pDiskWhiteboardAvailableSize: '21000000000',
             pDiskWhiteboardTotalSize: '22000000000',
         };
-        const expectedPDiskSpace = /1 \/ 22\s*GB/;
-        const expectedPDiskUsage = '70.5%';
         const expectedPopupSize = /1\.00 \/ 22\.00\s*GB/;
         const expectedPopupVDiskSlotUsage = '82.25%';
         const expectedPopupPDiskUsage = '70.50%';
@@ -1283,13 +1365,11 @@ test.describe('Blob storage capacity metrics integration', () => {
 
         const pDiskInfo = page.locator('.ydb-pdisk-page__info');
         await expect(pDiskInfo.getByText('PDisk Usage', {exact: true})).toBeVisible();
-        await expect(
-            getInfoViewerRow(pDiskInfo, 'PDisk Usage').locator('.info-viewer__value'),
-        ).toHaveText(expectedPDiskUsage);
+        await expect(getDefinitionListValue(pDiskInfo, 'PDisk Usage')).toHaveText(
+            expectedPopupPDiskUsage,
+        );
         await expect(pDiskInfo.getByText('Slot Size In Units', {exact: true})).toBeVisible();
-        await expect(
-            getInfoViewerRow(pDiskInfo, 'Space').locator('.info-viewer__value'),
-        ).toHaveText(expectedPDiskSpace);
+        await expect(getDefinitionListValue(pDiskInfo, 'Space')).toHaveText(expectedPopupSize);
 
         const vDiskOnPDiskPage = page
             .locator('.ydb-pdisk-space-distribution__slot-wrapper a')
@@ -1531,8 +1611,8 @@ test.describe('Blob storage capacity metrics integration', () => {
         await page.goto(`/pDisk?nodeId=${NODE_ID}&pDiskId=${PDISK_ID}`);
 
         const pDiskInfo = page.locator('.ydb-pdisk-page__info');
-        await expectInfoViewerRowPlaceholder(pDiskInfo, 'PDisk Usage');
-        await expectInfoViewerRowValue(pDiskInfo, 'Slot Size In Units', '1 (implicit)');
+        await expectDefinitionListRowPlaceholder(pDiskInfo, 'PDisk Usage');
+        await expectDefinitionListRowValue(pDiskInfo, 'Slot Size In Units', '1 (implicit)');
 
         await page.goto(`/storageGroup?database=/local&groupId=${GROUP_ID}`);
 
