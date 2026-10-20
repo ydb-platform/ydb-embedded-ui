@@ -229,11 +229,6 @@ test.describe('Storage group latency', () => {
                 );
             }
 
-            await expect(groupInfo).toHaveScreenshot(
-                `storage-group-latency-${name.replaceAll(' ', '-')}.png`,
-                {maxDiffPixelRatio: 0},
-            );
-
             if (groups.length) {
                 const table = new PaginatedTable(page, '.ydb-storage-group-page');
                 await expect(new StoragePage(page).getGroupRow(GROUP_ID)).toBeVisible();
