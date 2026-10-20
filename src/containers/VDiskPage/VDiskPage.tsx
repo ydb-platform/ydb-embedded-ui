@@ -8,6 +8,7 @@ import {Helmet} from 'react-helmet-async';
 import {useHistory} from 'react-router-dom';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
+import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
 import {DiskTypeLabel} from '../../components/DiskStatus/DiskStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {
@@ -17,7 +18,6 @@ import {
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink/InternalLink';
 import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
-import {VDiskCopyableValue} from '../../components/VDiskInfo/VDiskCopyableValue';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {vDiskInfoKeyset} from '../../components/VDiskInfo/i18n';
 import {
@@ -160,26 +160,26 @@ export function VDiskPage() {
             >
                 <Flex direction="column" gap={1} className={vDiskPageCn('title-content')}>
                     <Flex gap={3} alignItems="center" wrap="wrap">
-                        <VDiskCopyableValue copyText={vDiskId} fieldName={vDiskPageKeyset('vdisk')}>
+                        <CopyableValue copyText={vDiskId} fieldName={vDiskPageKeyset('vdisk')}>
                             <Text as="h1" variant="header-1" className={vDiskPageCn('heading')}>
                                 {vDiskPageKeyset('vdisk')}{' '}
                                 <Text color="hint" variant="header-1">
                                     {vDiskId || EMPTY_DATA_PLACEHOLDER}
                                 </Text>
                             </Text>
-                        </VDiskCopyableValue>
+                        </CopyableValue>
                         {renderTitleMeta()}
                     </Flex>
                     <Flex gap={1} alignItems="center" className={vDiskPageCn('pool')}>
                         <Text color="secondary">{vDiskInfoKeyset('pool-name')}:</Text>
-                        <VDiskCopyableValue
+                        <CopyableValue
                             copyText={vDiskData?.StoragePoolName}
                             fieldName={vDiskInfoKeyset('pool-name')}
                         >
                             <Text color="secondary" className={vDiskPageCn('pool-name')}>
                                 {vDiskData?.StoragePoolName || EMPTY_DATA_PLACEHOLDER}
                             </Text>
-                        </VDiskCopyableValue>
+                        </CopyableValue>
                     </Flex>
                 </Flex>
                 {!showBackButton && (

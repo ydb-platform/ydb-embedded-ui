@@ -37,6 +37,16 @@ const normalizeMaxPercent = (value: number | string | null | undefined): number 
 
 // ==== Prepare groups ====
 
+function parseLatencyUsToMs(value: unknown): number | undefined {
+    if (typeof value !== 'string' && typeof value !== 'number') {
+        return undefined;
+    }
+
+    const latency = parseOptionalNonNegativeNumber(value);
+
+    return latency === undefined ? undefined : parseUsToMs(latency);
+}
+
 function getGroupDiskSpaceStatus(group: TGroupsStorageGroupInfo): EFlag {
     const {DiskSpace, VDisks = []} = group;
 
@@ -247,9 +257,9 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
             Used: Number(Used),
             Limit: Number(Limit),
 
-            LatencyPutTabletLogMs: parseUsToMs(LatencyPutTabletLog),
-            LatencyPutUserDataMs: parseUsToMs(LatencyPutUserData),
-            LatencyGetFastMs: parseUsToMs(LatencyGetFast),
+            LatencyPutTabletLogMs: parseLatencyUsToMs(LatencyPutTabletLog),
+            LatencyPutUserDataMs: parseLatencyUsToMs(LatencyPutUserData),
+            LatencyGetFastMs: parseLatencyUsToMs(LatencyGetFast),
 
             Degraded: Number(MissingDisks),
             Overall,

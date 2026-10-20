@@ -13,10 +13,7 @@ import {
 } from '../../utils/storageMetrics';
 import {formatToMs} from '../../utils/timeParsers';
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
-import {
-    getStorageGroupCapacityInfoItems,
-    toDefinitionListItems,
-} from '../DiskCapacityInfo/DiskCapacityInfo';
+import {getStorageGroupCapacityInfoItems} from '../DiskCapacityInfo/DiskCapacityInfo';
 import diskCapacityInfoKeyset from '../DiskCapacityInfo/i18n';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
@@ -125,7 +122,7 @@ export function StorageGroupInfo({data, className}: StorageGroupInfoProps) {
         },
     );
     if (capacityMetricsEnabled) {
-        capacityItems.push(...toDefinitionListItems(getStorageGroupCapacityInfoItems(data)));
+        capacityItems.push(...getStorageGroupCapacityInfoItems(data));
     } else {
         capacityItems.push(
             {

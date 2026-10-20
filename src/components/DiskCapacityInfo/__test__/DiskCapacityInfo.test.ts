@@ -12,7 +12,7 @@ import {
     CAPACITY_METRICS_HELP_TEXT,
 } from '../../capacityMetricsColumns/constants';
 import {
-    getPDiskCapacityInfoItems,
+    getPDiskCapacityItems,
     getStorageGroupCapacityInfoItems,
     getVDiskCapacityItems,
 } from '../DiskCapacityInfo';
@@ -30,14 +30,7 @@ describe('DiskCapacityInfo builders', () => {
                 'capacity-alert': CAPACITY_METRICS_HELP_TEXT.CapacityAlert,
             }),
         );
-        expect(
-            getNotesById(
-                getPDiskCapacityInfoItems(undefined, {
-                    withUsage: true,
-                    withCapacityAlert: true,
-                }),
-            ),
-        ).toEqual(
+        expect(getNotesById(getPDiskCapacityItems({}))).toEqual(
             expect.objectContaining({
                 'pdisk-usage': CAPACITY_METRICS_HELP_TEXT.MaxPDiskUsage,
                 'slot-size-in-units': CAPACITY_CONFIGURATION_HELP_TEXT.SlotSizeInUnits,
@@ -200,15 +193,13 @@ describe('DiskCapacityInfo builders', () => {
         },
     );
 
-    test('renders a known PDisk capacity alert as plain text', () => {
-        const items = getPDiskCapacityInfoItems(
-            {PDiskCapacityAlert: ECapacityAlert.LIGHTYELLOW},
-            {withUsage: false, withCapacityAlert: true},
-        );
+    test('renders a known PDisk capacity alert as a label', () => {
+        const items = getPDiskCapacityItems({PDiskCapacityAlert: ECapacityAlert.LIGHTYELLOW});
 
-        expect(items.find(({id}) => id === 'capacity-alert')?.value).toBe(
-            ECapacityAlert.LIGHTYELLOW,
-        );
+        expect(items.find(({id}) => id === 'capacity-alert')?.content).toMatchObject({
+            type: DiskCapacityAlertLabel,
+            props: {value: ECapacityAlert.LIGHTYELLOW},
+        });
     });
 
     test('shows PDisk slots from a Groups response without Whiteboard ExpectedSlotCount', () => {
@@ -227,117 +218,98 @@ describe('DiskCapacityInfo builders', () => {
                 },
             ],
         });
-        const items = getPDiskCapacityInfoItems(groups?.[0].VDisks?.[0].PDisk, {
-            withUsage: true,
-            withCapacityAlert: true,
-        });
+        const items = getPDiskCapacityItems(groups?.[0].VDisks?.[0].PDisk ?? {});
 
-        expect(items.find(({id}) => id === 'slots')?.value).toBe('14 / 16');
+        expect(items.find(({id}) => id === 'slots')?.content).toBe('14 / 16');
     });
 
-    test('builds exact PDisk scalar values without rendering a component', () => {
-        const items = getPDiskCapacityInfoItems(
-            {
-                AllocatedSize: 1_000_000_000,
-                TotalSize: 2_000_000_000,
-                PDiskUsage: 75,
-                NumActiveSlots: 0,
-                ExpectedSlotCount: 4,
-                SlotSizeInUnits: 2,
-                PDiskCapacityAlert: ECapacityAlert.ORANGE,
-            },
-            {withUsage: true, withCapacityAlert: true},
-        );
+    test('builds PDisk capacity fields in display order with two decimal places', () => {
+        const items = getPDiskCapacityItems({
+            AllocatedSize: 1_000_000_000,
+            TotalSize: 2_000_000_000,
+            PDiskUsage: 75,
+            NumActiveSlots: 0,
+            ExpectedSlotCount: 4,
+            SlotSizeInUnits: 2,
+            PDiskCapacityAlert: ECapacityAlert.ORANGE,
+        });
 
         expect(items.map(({id}) => id)).toEqual([
+            'slot-size-in-units',
             'space',
+            'capacity-alert',
             'pdisk-usage',
             'slots',
-            'slot-size-in-units',
-            'capacity-alert',
         ]);
-        expect(items.slice(0, 4).map(({value}) => value)).toEqual([
-            `1 / 2${UNBREAKABLE_GAP}GB`,
-            '75%',
-            '0 / 4',
-            '2',
-        ]);
+        expect(items.filter(({id}) => id !== 'capacity-alert').map(({content}) => content)).toEqual(
+            ['2', `1.00 / 2.00${UNBREAKABLE_GAP}GB`, '75.00%', '0 / 4'],
+        );
     });
 
     test('keeps missing PDisk metrics empty while using the implicit slot unit default', () => {
-        const items = getPDiskCapacityInfoItems(undefined, {
-            withUsage: true,
-            withCapacityAlert: true,
-        });
+        const items = getPDiskCapacityItems({});
 
-        expect(items.find(({id}) => id === 'pdisk-usage')?.value).toBe(EMPTY_DATA_PLACEHOLDER);
-        expect(items.find(({id}) => id === 'slot-size-in-units')?.value).toBe('1 (implicit)');
-        expect(items.find(({id}) => id === 'capacity-alert')?.value).toBe(EMPTY_DATA_PLACEHOLDER);
+        expect(items.find(({id}) => id === 'pdisk-usage')?.content).toBe(EMPTY_DATA_PLACEHOLDER);
+        expect(items.find(({id}) => id === 'slot-size-in-units')?.content).toBe('1 (implicit)');
+        expect(items.find(({id}) => id === 'capacity-alert')?.content).toMatchObject({
+            type: DiskCapacityAlertLabel,
+            props: {value: undefined},
+        });
     });
 
     test('uses the Whiteboard PDisk size instead of the legacy BSC size', () => {
-        const [spaceItem] = getPDiskCapacityInfoItems(
-            {
+        const items = getPDiskCapacityItems({
+            AllocatedSize: 1_000_000_000,
+            TotalSize: 4_000_000_000,
+            WhiteboardSize: {
                 AllocatedSize: 1_000_000_000,
-                TotalSize: 4_000_000_000,
-                WhiteboardSize: {
-                    AllocatedSize: 1_000_000_000,
-                    TotalSize: 22_000_000_000,
-                },
+                TotalSize: 22_000_000_000,
             },
-            {withUsage: true, withCapacityAlert: true},
-        );
+        });
 
-        expect(spaceItem.value).toBe(`1 / 22${UNBREAKABLE_GAP}GB`);
+        expect(items.find(({id}) => id === 'space')?.content).toBe(
+            `1.00 / 22.00${UNBREAKABLE_GAP}GB`,
+        );
     });
 
     test('preserves zero in the Whiteboard PDisk size', () => {
-        const [spaceItem] = getPDiskCapacityInfoItems(
-            {
-                AllocatedSize: 1_000_000_000,
-                TotalSize: 4_000_000_000,
-                WhiteboardSize: {
-                    AllocatedSize: 0,
-                    TotalSize: 22_000_000_000,
-                },
+        const items = getPDiskCapacityItems({
+            AllocatedSize: 1_000_000_000,
+            TotalSize: 4_000_000_000,
+            WhiteboardSize: {
+                AllocatedSize: 0,
+                TotalSize: 22_000_000_000,
             },
-            {withUsage: true, withCapacityAlert: true},
-        );
+        });
 
-        expect(spaceItem.value).toBe(`0 / 22${UNBREAKABLE_GAP}GB`);
+        expect(items.find(({id}) => id === 'space')?.content).toBe(`0 / 22.00${UNBREAKABLE_GAP}GB`);
     });
 
     test('does not mix a partial Whiteboard PDisk size with the legacy BSC size', () => {
-        const [spaceItem] = getPDiskCapacityInfoItems(
-            {
+        const items = getPDiskCapacityItems({
+            AllocatedSize: 1_000_000_000,
+            TotalSize: 4_000_000_000,
+            WhiteboardSize: {
                 AllocatedSize: 1_000_000_000,
-                TotalSize: 4_000_000_000,
-                WhiteboardSize: {
-                    AllocatedSize: 1_000_000_000,
-                },
             },
-            {withUsage: true, withCapacityAlert: true},
-        );
+        });
 
-        expect(spaceItem.value).toBe(`1${UNBREAKABLE_GAP}GB / —`);
+        expect(items.find(({id}) => id === 'space')?.content).toBe(`1.00${UNBREAKABLE_GAP}GB / —`);
     });
 
     test('uses legacy PDisk size when Whiteboard size is disabled', () => {
-        const [spaceItem] = getPDiskCapacityInfoItems(
+        const items = getPDiskCapacityItems(
             {
                 AllocatedSize: 40_000_000_000,
                 TotalSize: 100_000_000_000,
                 WhiteboardSize: {TotalSize: 22_000_000_000},
             },
-            {
-                withUsage: false,
-                withCapacityAlert: false,
-                fixedDecimalPlaces: 2,
-                useWhiteboardSize: false,
-            },
+            {useWhiteboardSize: false},
         );
 
-        expect(spaceItem.value).toBe(`40.00 / 100.00${UNBREAKABLE_GAP}GB`);
+        expect(items.find(({id}) => id === 'space')?.content).toBe(
+            `40.00 / 100.00${UNBREAKABLE_GAP}GB`,
+        );
     });
 
     test('formats normalized storage-group scalar values without rendering a component', () => {
@@ -358,8 +330,8 @@ describe('DiskCapacityInfo builders', () => {
             'vdisk-slot-usage',
             'vdisk-raw-usage',
         ]);
-        expect(items.find(({id}) => id === 'vdisk-slot-usage')?.value).toBe('82.25%');
-        expect(items.find(({id}) => id === 'capacity-alert')?.value).toEqual(
+        expect(items.find(({id}) => id === 'vdisk-slot-usage')?.content).toBe('82.25%');
+        expect(items.find(({id}) => id === 'capacity-alert')?.content).toEqual(
             expect.objectContaining({
                 type: DiskCapacityAlertLabel,
                 props: expect.objectContaining({
@@ -367,6 +339,6 @@ describe('DiskCapacityInfo builders', () => {
                 }),
             }),
         );
-        expect(items.find(({id}) => id === 'vdisk-raw-usage')?.value).toBe('0%');
+        expect(items.find(({id}) => id === 'vdisk-raw-usage')?.content).toBe('0%');
     });
 });

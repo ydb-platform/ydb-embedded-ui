@@ -9,6 +9,7 @@ import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {formatMetricPercent} from '../../utils/storageMetrics';
+import {CopyableValue} from '../CopyableValue/CopyableValue';
 import {getVDiskCapacityItems} from '../DiskCapacityInfo/DiskCapacityInfo';
 import {DiskFlagLabel} from '../DiskStatus/DiskStatus';
 import {VDisk} from '../VDisk/VDisk';
@@ -16,7 +17,6 @@ import {VDiskCompactionRankLabel, VDiskFrontQueuesLabel} from '../VDiskStatus';
 import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
-import {VDiskCopyableValue} from './VDiskCopyableValue';
 import {getVDiskIdentityItems, getVDiskThroughputItems} from './getVDiskDetails';
 import {vDiskInfoKeyset} from './i18n';
 
@@ -101,12 +101,12 @@ export function VDiskInfo({data = {}, className}: VDiskInfoProps) {
     }).map(({copyText, ...item}) => ({
         ...item,
         content: (
-            <VDiskCopyableValue
+            <CopyableValue
                 copyText={copyText === undefined ? undefined : String(copyText)}
                 fieldName={item.name}
             >
                 {item.content}
-            </VDiskCopyableValue>
+            </CopyableValue>
         ),
     }));
 

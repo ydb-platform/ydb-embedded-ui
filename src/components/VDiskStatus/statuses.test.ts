@@ -1,4 +1,4 @@
-import {ArrowsRotateLeft, ArrowsRotateLeftSlash} from '@gravity-ui/icons';
+import {ArrowsRotateLeft, ArrowsRotateLeftSlash, CircleQuestionFill} from '@gravity-ui/icons';
 
 import type {EVDiskDetailedReplicationStatus} from '../../types/api/vdisk';
 import {EVDiskState} from '../../types/api/vdisk';
@@ -12,6 +12,7 @@ describe('VDisk state label', () => {
             expect(getVDiskStateLabel({VDiskState: state as EVDiskState})).toMatchObject({
                 value: 'No data',
                 theme: 'unknown',
+                icon: CircleQuestionFill,
             });
         },
     );

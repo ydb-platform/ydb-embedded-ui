@@ -1,6 +1,7 @@
 import {HeaderBreadcrumbs} from './HeaderBreadcrumbs';
 import {HeaderLeftControls} from './HeaderLeftControls';
 import {HeaderRightControls} from './HeaderRightControls';
+import {PDiskLeftControls} from './PDiskLeftControls';
 import {StorageGroupLeftControls} from './StorageGroupLeftControls';
 import {VDiskLeftControls} from './VDiskLeftControls';
 import {b} from './constants';
@@ -74,6 +75,9 @@ export function Header() {
         }
         if (page === 'vDisk') {
             return <VDiskLeftControls />;
+        }
+        if (page === 'pDisk') {
+            return <PDiskLeftControls />;
         }
         return database && isDatabasePage && isV2NavigationEnabled ? (
             <HeaderLeftControls
