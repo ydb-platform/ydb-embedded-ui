@@ -24,7 +24,10 @@ export async function mockHealthcheckWithIssue(page: Page) {
     );
 }
 
-export async function mockHealthcheckMeta(page: Page) {
+export async function mockHealthcheckMeta(
+    page: Page,
+    {withSecondTarget = false}: {withSecondTarget?: boolean} = {},
+) {
     await page.addInitScript(() => {
         Object.defineProperty(window, 'meta_backend', {get: () => '/meta', set: () => {}});
         Object.defineProperty(window, 'web_version', {get: () => 'true', set: () => {}});
@@ -37,19 +40,44 @@ export async function mockHealthcheckMeta(page: Page) {
         cluster: {Domain: database, Overall: 'Yellow', overall_source: 'healthcheck'},
     };
     const tenant = {Name: database, Type: 'Dedicated', State: 'RUNNING', Overall: 'Yellow'};
+    const clusters = withSecondTarget
+        ? [cluster, {...cluster, name: 'healthcheck-second', title: 'Second healthcheck cluster'}]
+        : [cluster];
+    const tenants = withSecondTarget ? [tenant, {...tenant, Name: '/local-second'}] : [tenant];
     await page.route('**/meta/**', (route) => {
-        const endpoint = new URL(route.request().url()).pathname.split('/').pop();
+        const url = new URL(route.request().url());
+        const endpoint = url.pathname.split('/').pop();
         switch (endpoint) {
             case 'clusters':
             case 'db_clusters':
-                return route.fulfill({json: {clusters: [cluster]}});
+                return route.fulfill({json: {clusters}});
             case 'cp_databases':
-                return route.fulfill({json: {databases: [tenant]}});
+                return route.fulfill({json: {databases: tenants}});
             case 'tenantinfo':
-                return route.fulfill({json: {TenantInfo: [tenant]}});
+                return route.fulfill({json: {TenantInfo: tenants}});
             case 'cluster_health':
-            case 'healthcheck':
+            case 'healthcheck': {
+                if (withSecondTarget) {
+                    const targetDatabase = url.searchParams.get('database') ?? database;
+                    const isSecondTarget =
+                        targetDatabase === '/local-second' ||
+                        url.searchParams.get('cluster_name') === 'healthcheck-second';
+                    return route.fulfill({
+                        json: {
+                            ...healthcheckWithIssue,
+                            issue_log: [
+                                {
+                                    ...healthcheckWithIssue.issue_log[0],
+                                    id: `drawer-healthcheck-${isSecondTarget ? 'b' : 'a'}`,
+                                    message: `Healthcheck issue ${isSecondTarget ? 'B' : 'A'}`,
+                                    location: {database: {name: targetDatabase}},
+                                },
+                            ],
+                        },
+                    });
+                }
                 return route.fulfill({json: healthcheckWithIssue});
+            }
             case 'cluster':
                 return route.fulfill({json: cluster.cluster});
             case 'whoami':

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Drawer, ThemeProvider} from '@gravity-ui/uikit';
-import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 
 import {DrawerWrapper} from '../Drawer';
 import {DrawerContextProvider} from '../DrawerContext';
@@ -96,4 +96,101 @@ test('does not steal focus from an adjacent panel when closed externally', async
         expect(screen.queryByRole('dialog', {name: 'Healthcheck'})).not.toBeInTheDocument(),
     );
     expect(assistantClose).toHaveFocus();
+});
+
+function SwitchingFixture({showSecond = true}: {showSecond?: boolean}) {
+    const [target, setTarget] = React.useState<string>();
+    return (
+        <ThemeProvider theme="light">
+            <DrawerContextProvider>
+                <DrawerWrapper
+                    title="Healthcheck"
+                    isDrawerVisible={Boolean(target)}
+                    focusReturnKey={target}
+                    onCloseDrawer={() => setTarget(undefined)}
+                    drawerControls={[{type: 'close'}]}
+                    disableModal
+                    renderDrawerContent={() => <input aria-label="Healthcheck filter" />}
+                >
+                    <button onClick={() => setTarget('first')}>Open first</button>
+                    {showSecond ? (
+                        <button onClick={() => setTarget('second')}>Open second</button>
+                    ) : null}
+                    <input aria-label="Page input" />
+                </DrawerWrapper>
+            </DrawerContextProvider>
+        </ThemeProvider>
+    );
+}
+
+async function switchToSecondOpener() {
+    const first = screen.getByRole('button', {name: 'Open first'});
+    first.focus();
+    fireEvent.click(first);
+    const drawer = await screen.findByRole('dialog', {name: 'Healthcheck'});
+    await waitFor(() => expect(drawer).toHaveFocus());
+    const second = screen.getByRole('button', {name: 'Open second'});
+    second.focus();
+    fireEvent.click(second);
+    expect(screen.getByRole('dialog', {name: 'Healthcheck'})).toBe(drawer);
+    return {first, second, drawer, filter: within(drawer).getByRole('textbox')};
+}
+
+test.each(['Close', 'Escape'])(
+    'returns focus to the replacement opener after %s without remounting',
+    async (close) => {
+        render(<SwitchingFixture />);
+        const {second, drawer, filter} = await switchToSecondOpener();
+        if (close === 'Escape') {
+            filter.focus();
+            fireEvent.keyDown(filter, {key: 'Escape'});
+        } else {
+            const closeButton = within(drawer).getByRole('button', {name: 'Close'});
+            act(() => closeButton.focus());
+            fireEvent.click(closeButton);
+        }
+        await waitFor(() => expect(drawer).not.toBeInTheDocument());
+        expect(second).toHaveFocus();
+    },
+);
+
+test('does not steal external focus after replacing the target', async () => {
+    render(<SwitchingFixture />);
+    const {drawer} = await switchToSecondOpener();
+    const pageInput = screen.getByRole('textbox', {name: 'Page input'});
+    pageInput.focus();
+    fireEvent.click(within(drawer).getByRole('button', {name: 'Close'}));
+    await waitFor(() => expect(drawer).not.toBeInTheDocument());
+    expect(pageInput).toHaveFocus();
+});
+
+test('does not restore a detached replacement opener', async () => {
+    const {rerender} = render(<SwitchingFixture />);
+    const {first, second, drawer, filter} = await switchToSecondOpener();
+    filter.focus();
+    rerender(<SwitchingFixture showSecond={false} />);
+    expect(second).not.toBeInTheDocument();
+    fireEvent.keyDown(filter, {key: 'Escape'});
+    await waitFor(() => expect(drawer).not.toBeInTheDocument());
+    expect(document.body).toHaveFocus();
+    expect(first).not.toHaveFocus();
+});
+
+test('captures a fresh opener after close and reopen', async () => {
+    render(<SwitchingFixture />);
+    const {first, second, drawer: previousDrawer, filter} = await switchToSecondOpener();
+    filter.focus();
+    fireEvent.keyDown(filter, {key: 'Escape'});
+    await waitFor(() => expect(second).toHaveFocus());
+    await waitFor(() => expect(previousDrawer).not.toBeInTheDocument());
+
+    first.focus();
+    fireEvent.click(first);
+    const drawer = await screen.findByRole('dialog', {name: 'Healthcheck'});
+    await waitFor(() => expect(drawer).toHaveFocus());
+    const reopenedFilter = within(drawer).getByRole('textbox');
+    reopenedFilter.focus();
+    fireEvent.keyDown(reopenedFilter, {key: 'Escape'});
+    await waitFor(() => expect(drawer).not.toBeInTheDocument());
+    expect(first).toHaveFocus();
 });

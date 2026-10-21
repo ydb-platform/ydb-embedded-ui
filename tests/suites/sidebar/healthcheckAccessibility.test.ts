@@ -384,3 +384,118 @@ test.describe('Additional Healthcheck openers', () => {
         }
     }
 });
+
+test.describe('Healthcheck target switching', () => {
+    for (const surface of ['databases', 'clusters'] as const) {
+        for (const close of ['Close', 'Escape'] as const) {
+            test(`${surface} returns focus to the second opener after ${close}`, async ({
+                page,
+                browserName,
+            }, info) => {
+                await page.addInitScript(() => {
+                    window.e2eHealthcheckDrawerMode = 'non-modal-meta-page';
+                });
+                await mockHealthcheckMeta(page, {withSecondTarget: true});
+                await page.goto(
+                    surface === 'databases'
+                        ? '/cluster/databases?clusterName=healthcheck-test'
+                        : '/',
+                    {waitUntil: 'commit'},
+                );
+                await page
+                    .locator(surface === 'databases' ? '.ydb-cluster' : '.ydb-clusters')
+                    .waitFor({state: 'visible', timeout: 30000});
+
+                const names =
+                    surface === 'databases'
+                        ? ['local', 'local-second']
+                        : ['Healthcheck test cluster', 'Second healthcheck cluster'];
+                const [firstOpener, secondOpener] = names.map((name) =>
+                    page
+                        .getByRole('row')
+                        .filter({has: page.getByRole('link', {name, exact: true})})
+                        .getByRole('button', {name: 'Warning', exact: true}),
+                );
+                await expect(secondOpener).toBeVisible();
+                await firstOpener.focus();
+                await firstOpener.press('Enter');
+
+                const drawer = page
+                    .getByTestId(
+                        surface === 'databases'
+                            ? 'database-list-healthcheck-details'
+                            : 'cluster-healthcheck-details',
+                    )
+                    .getByRole('dialog');
+                await expect(drawer).toBeVisible();
+                await expect(
+                    drawer.locator('.ydb-healthcheck__issue-title').filter({
+                        hasText: /^Healthcheck issue A$/,
+                    }),
+                ).toBeVisible();
+                const initialDrawer = await drawer.elementHandle();
+
+                // macOS WebKit uses Option+Tab to include these status buttons.
+                const tabKey =
+                    browserName === 'webkit' && process.platform === 'darwin' ? 'Alt+Tab' : 'Tab';
+                for (let step = 0; step < 80; step++) {
+                    if (
+                        await secondOpener.evaluate((element) => element === document.activeElement)
+                    ) {
+                        break;
+                    }
+                    await page.keyboard.press(tabKey);
+                }
+                await expect(secondOpener).toBeFocused();
+                await page.keyboard.press('Enter');
+
+                const target = surface === 'databases' ? '/local-second' : 'healthcheck-second';
+                await expect(drawer).toHaveAccessibleName(new RegExp(target));
+                await expect(
+                    drawer.locator('.ydb-healthcheck__issue-title').filter({
+                        hasText: /^Healthcheck issue B$/,
+                    }),
+                ).toBeVisible();
+                expect(
+                    await drawer.evaluate(
+                        (element, original) => element === original,
+                        initialDrawer,
+                    ),
+                ).toBe(true);
+
+                if (close === 'Escape') {
+                    await drawer.getByRole('textbox').first().focus();
+                    await page.keyboard.press('Escape');
+                } else {
+                    await drawer.getByRole('button', {name: 'Close', exact: true}).focus();
+                    await page.keyboard.press('Enter');
+                }
+                await expect(drawer).toHaveCount(0);
+                await expect(page).toHaveURL((url) =>
+                    [
+                        'showHealthcheck',
+                        'healthcheckIssue',
+                        'healthcheckLeaf',
+                        'issuesFilter',
+                        'view',
+                    ].every((key) => !url.searchParams.has(key)),
+                );
+                await info.attach('target-switch-focus', {
+                    body: JSON.stringify({
+                        surface,
+                        close,
+                        target,
+                        firstFocused: await firstOpener.evaluate(
+                            (element) => element === document.activeElement,
+                        ),
+                        secondFocused: await secondOpener.evaluate(
+                            (element) => element === document.activeElement,
+                        ),
+                    }),
+                    contentType: 'application/json',
+                });
+                await expect(secondOpener).toBeFocused();
+            });
+        }
+    }
+});

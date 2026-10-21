@@ -46,6 +46,13 @@ export function HealthcheckDrawer({
     downloadTooltip,
     isDownloadDisabled,
 }: HealthcheckDrawerProps) {
+    const focusReturnKey = target
+        ? JSON.stringify([
+              target.scope,
+              target.request.clusterName ?? null,
+              'database' in target.request ? target.request.database : null,
+          ])
+        : undefined;
     const renderDrawerExtension = uiFactory.healthcheck.renderDrawerExtension;
     const renderContentWithExtension = React.useCallback(() => {
         if (!renderDrawerExtension) {
@@ -101,6 +108,7 @@ export function HealthcheckDrawer({
 
     return (
         <DrawerWrapper
+            focusReturnKey={focusReturnKey}
             isDrawerVisible={isDrawerVisible}
             onCloseDrawer={onCloseDrawer}
             onTransitionInComplete={onTransitionInComplete}

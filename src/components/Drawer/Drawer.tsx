@@ -29,6 +29,7 @@ type DrawerEvent = MouseEvent & {
 
 interface DrawerPaneContentWrapperProps {
     labelledBy?: string;
+    focusReturnKey?: string;
     isVisible: boolean;
     onClose: () => void;
     onTransitionInComplete?: () => void;
@@ -59,6 +60,7 @@ const DrawerPaneContentWrapper = ({
     hideVeil = true,
     disableModal = false,
     labelledBy,
+    focusReturnKey,
 }: DrawerPaneContentWrapperProps) => {
     const [savedWidthString, setSavedWidthString] = useSetting<string | undefined>(storageKey);
     const [userDrawerWidth, setUserDrawerWidth] = React.useState<number | undefined>(undefined);
@@ -88,7 +90,7 @@ const DrawerPaneContentWrapper = ({
             }
             openerRef.current = null;
         }
-    }, [disableModal, isVisible]);
+    }, [disableModal, isVisible, focusReturnKey]);
     const {containerWidth, itemContainerRef, rightInset, visibleRightInset} =
         useDrawerContextInternal();
     const availableWidth = Math.max(0, containerWidth - visibleRightInset);
@@ -254,6 +256,7 @@ export type DrawerControl =
     | {type: 'custom'; node: React.ReactNode; key: string};
 
 interface DrawerPaneProps {
+    focusReturnKey?: string;
     children: React.ReactNode;
     renderDrawerContent: () => React.ReactNode;
     isDrawerVisible: boolean;
@@ -291,6 +294,7 @@ export const DrawerWrapper = ({
     headerClassName,
     hideVeil,
     disableModal,
+    focusReturnKey,
 }: DrawerPaneProps) => {
     const titleId = React.useId();
     const onCloseDrawerRef = React.useRef(onCloseDrawer);
@@ -350,6 +354,7 @@ export const DrawerWrapper = ({
             <DrawerPaneContentWrapper
                 hideVeil={hideVeil}
                 disableModal={disableModal}
+                focusReturnKey={focusReturnKey}
                 labelledBy={title ? titleId : undefined}
                 isVisible={isDrawerVisible}
                 onClose={onCloseDrawer}

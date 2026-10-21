@@ -166,58 +166,65 @@ describe('Healthcheck drawer extension', () => {
         },
     );
 
-    test('preserves the extension, target and inset across data states, then cleans up on close', () => {
-        const target: HealthcheckAssistantTarget = {
-            scope: 'cluster',
-            request: {clusterName: 'alpha'},
-        };
-        const renderExtension = jest.fn(() => <Extension />);
-        configureUIFactory({healthcheck: {renderDrawerExtension: renderExtension}});
-        const degraded = mockHealthcheck;
-        const {rerender, unmount} = render(<DrawerFixture target={target} />);
-        const extension = screen.getByTestId('drawer-extension');
-        expect(renderExtension).toHaveBeenLastCalledWith({target});
-        expect(screen.getByTestId('right-inset')).toHaveTextContent('434');
-        expect(screen.getByRole('button', {name: 'Diagnostics'})).toBeInTheDocument();
-
-        const states = [
-            {selfCheckResult: SelfCheckResult.GOOD, issues: [], leavesIssues: []},
-            {loading: true, successful: false},
-            {loading: false, error: {message: 'Unavailable'}},
-            {error: undefined, successful: true, selfCheckResult: SelfCheckResult.GOOD},
-        ];
-        for (const state of states) {
-            mockHealthcheck = {...mockHealthcheck, ...state};
-            rerender(<DrawerFixture target={target} />);
-            expect(screen.getByTestId('drawer-extension')).toBe(extension);
+    test.each([false, true])(
+        'preserves the extension, target and inset across data states with disableModal=%s, then cleans up on close',
+        (disableModal) => {
+            configureUIFactory({healthcheck: {disableModal}});
+            const target: HealthcheckAssistantTarget = {
+                scope: 'cluster',
+                request: {clusterName: 'alpha'},
+            };
+            const renderExtension = jest.fn(() => <Extension />);
+            configureUIFactory({healthcheck: {renderDrawerExtension: renderExtension}});
+            const degraded = mockHealthcheck;
+            const {rerender, unmount} = render(<DrawerFixture target={target} />);
+            const extension = screen.getByTestId('drawer-extension');
             expect(renderExtension).toHaveBeenLastCalledWith({target});
             expect(screen.getByTestId('right-inset')).toHaveTextContent('434');
-            expect(screen.queryByRole('button', {name: 'Diagnostics'})).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Diagnostics'})).toBeInTheDocument();
+
+            const states = [
+                {selfCheckResult: SelfCheckResult.GOOD, issues: [], leavesIssues: []},
+                {loading: true, successful: false},
+                {loading: false, error: {message: 'Unavailable'}},
+                {error: undefined, successful: true, selfCheckResult: SelfCheckResult.GOOD},
+            ];
+            for (const state of states) {
+                mockHealthcheck = {...mockHealthcheck, ...state};
+                rerender(<DrawerFixture target={target} />);
+                expect(screen.getByTestId('drawer-extension')).toBe(extension);
+                expect(renderExtension).toHaveBeenLastCalledWith({target});
+                expect(screen.getByTestId('right-inset')).toHaveTextContent('434');
+                expect(screen.queryByRole('button', {name: 'Diagnostics'})).not.toBeInTheDocument();
+                expect(onInsetChange.mock.calls).toEqual([[434]]);
+            }
+
+            mockHealthcheck = degraded;
+            rerender(<DrawerFixture target={target} />);
+            expect(screen.getByRole('button', {name: 'Diagnostics'})).toBeInTheDocument();
             expect(onInsetChange.mock.calls).toEqual([[434]]);
-        }
 
-        mockHealthcheck = degraded;
-        rerender(<DrawerFixture target={target} />);
-        expect(screen.getByRole('button', {name: 'Diagnostics'})).toBeInTheDocument();
-        expect(onInsetChange.mock.calls).toEqual([[434]]);
+            const nextTarget: HealthcheckAssistantTarget = {
+                ...target,
+                request: {clusterName: 'beta'},
+            };
+            rerender(<DrawerFixture target={nextTarget} />);
+            expect(renderExtension).toHaveBeenLastCalledWith({target: nextTarget});
+            expect(screen.getByTestId('drawer-extension')).toBe(extension);
+            expect(onInsetChange.mock.calls).toEqual([[434]]);
 
-        const nextTarget: HealthcheckAssistantTarget = {...target, request: {clusterName: 'beta'}};
-        rerender(<DrawerFixture target={nextTarget} />);
-        expect(renderExtension).toHaveBeenLastCalledWith({target: nextTarget});
-        expect(screen.getByTestId('drawer-extension')).toBe(extension);
-        expect(onInsetChange.mock.calls).toEqual([[434]]);
+            rerender(<DrawerFixture open={false} />);
+            expect(screen.queryByTestId('drawer-extension')).not.toBeInTheDocument();
+            expect(screen.getByTestId('right-inset')).toHaveTextContent('0');
+            expect(onInsetChange.mock.calls).toEqual([[434], [0]]);
 
-        rerender(<DrawerFixture open={false} />);
-        expect(screen.queryByTestId('drawer-extension')).not.toBeInTheDocument();
-        expect(screen.getByTestId('right-inset')).toHaveTextContent('0');
-        expect(onInsetChange.mock.calls).toEqual([[434], [0]]);
-
-        rerender(<DrawerFixture />);
-        expect(renderExtension).toHaveBeenLastCalledWith({target: undefined});
-        expect(onInsetChange.mock.calls).toEqual([[434], [0], [434]]);
-        unmount();
-        expect(onInsetChange.mock.calls).toEqual([[434], [0], [434], [0]]);
-    });
+            rerender(<DrawerFixture />);
+            expect(renderExtension).toHaveBeenLastCalledWith({target: undefined});
+            expect(onInsetChange.mock.calls).toEqual([[434], [0], [434]]);
+            unmount();
+            expect(onInsetChange.mock.calls).toEqual([[434], [0], [434], [0]]);
+        },
+    );
 
     test('keeps the extension mounted while Diagnostics receives the new target', () => {
         const {rerender} = render(<DrawerFixture database="/first" clusterName="alpha" />);
@@ -253,5 +260,96 @@ describe('Healthcheck drawer extension', () => {
         expect(screen.getByText('Issue list')).toBeInTheDocument();
         expect(screen.getByTestId('right-inset')).toHaveTextContent('0');
         expect(screen.queryByTestId('drawer-extension')).not.toBeInTheDocument();
+    });
+    function FocusFixture({
+        target,
+        open = true,
+    }: {
+        target: HealthcheckAssistantTarget;
+        open?: boolean;
+    }) {
+        return (
+            <React.Fragment>
+                <button>First opener</button>
+                <button>Second opener</button>
+                <input aria-label="Other control" />
+                <DrawerFixture target={target} open={open} />
+            </React.Fragment>
+        );
+    }
+
+    async function openWithTarget(target: HealthcheckAssistantTarget) {
+        configureUIFactory({healthcheck: {disableModal: true}});
+        const rendered = render(<FocusFixture target={target} open={false} />);
+        screen.getByRole('button', {name: 'First opener'}).focus();
+        rendered.rerender(<FocusFixture target={target} />);
+        const drawer = await screen.findByRole('dialog', {name: 'Healthcheck'});
+        await waitFor(() => expect(drawer).toHaveFocus());
+        return {...rendered, drawer, second: screen.getByRole('button', {name: 'Second opener'})};
+    }
+
+    const firstTarget: HealthcheckAssistantTarget = {
+        scope: 'database',
+        request: {database: '/first', clusterName: 'alpha'},
+    };
+    const targetChanges: {field: string; target: HealthcheckAssistantTarget}[] = [
+        {
+            field: 'database',
+            target: {scope: 'database', request: {database: '/second', clusterName: 'alpha'}},
+        },
+        {
+            field: 'clusterName',
+            target: {scope: 'database', request: {database: '/first', clusterName: 'beta'}},
+        },
+        {
+            field: 'scope',
+            target: {scope: 'cluster', request: {database: '/first', clusterName: 'alpha'}},
+        },
+    ];
+
+    test.each(targetChanges)('refreshes the opener when only $field changes', async ({target}) => {
+        const {rerender, drawer, second} = await openWithTarget(firstTarget);
+        second.focus();
+        rerender(<FocusFixture target={target} />);
+        expect(screen.getByRole('dialog', {name: 'Healthcheck'})).toBe(drawer);
+        drawer.focus();
+        rerender(<FocusFixture target={target} open={false} />);
+        await waitFor(() => expect(second).toHaveFocus());
+    });
+
+    test('keeps the opener when the same target is recreated across data updates', async () => {
+        const {rerender, drawer, second} = await openWithTarget(firstTarget);
+        const target: HealthcheckAssistantTarget = {
+            scope: 'database',
+            request: {database: '/second', clusterName: 'alpha'},
+        };
+        second.focus();
+        rerender(<FocusFixture target={target} />);
+        const extension = screen.getByTestId('drawer-extension');
+        const other = screen.getByRole('textbox', {name: 'Other control'});
+        other.focus();
+        const states = [
+            {loading: true, successful: false},
+            {loading: false, error: {message: 'Unavailable'}},
+            {error: undefined, successful: true, selfCheckResult: SelfCheckResult.GOOD},
+        ];
+        for (const state of states) {
+            mockHealthcheck = {...mockHealthcheck, ...state};
+            rerender(
+                <FocusFixture
+                    target={{
+                        scope: 'database',
+                        request: {clusterName: 'alpha', database: '/second'},
+                    }}
+                />,
+            );
+            expect(screen.getByRole('dialog', {name: 'Healthcheck'})).toBe(drawer);
+            expect(screen.getByTestId('drawer-extension')).toBe(extension);
+            expect(other).toHaveFocus();
+            expect(screen.getByTestId('right-inset')).toHaveTextContent('434');
+        }
+        drawer.focus();
+        rerender(<FocusFixture target={target} open={false} />);
+        await waitFor(() => expect(second).toHaveFocus());
     });
 });
