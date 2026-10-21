@@ -21,6 +21,7 @@ import './ClusterInfo.scss';
 
 interface ClusterInfoProps {
     cluster?: TClusterInfo;
+    clusterName?: string;
     loading?: boolean;
     error?: IResponseError | string;
     additionalClusterProps?: AdditionalClusterProps;
@@ -30,6 +31,7 @@ interface ClusterInfoProps {
 
 export const ClusterInfo = ({
     cluster,
+    clusterName,
     loading,
     error,
     additionalClusterProps = {},
@@ -131,7 +133,11 @@ export const ClusterInfo = ({
                         {formatNumber(bridgePiles.length)}
                     </Text>
                 </Text>
-                <BridgeInfoTable piles={bridgePiles} />
+                <BridgeInfoTable
+                    piles={bridgePiles}
+                    database={cluster?.Domain}
+                    clusterName={clusterName}
+                />
             </InfoSection>
         );
     };

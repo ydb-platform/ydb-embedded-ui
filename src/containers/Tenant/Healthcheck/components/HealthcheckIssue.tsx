@@ -13,10 +13,18 @@ import {HealthcheckIssueTabs} from './HealthcheckIssueTabs';
 interface HealthcheckIssueProps {
     issue: IssuesTree;
     expanded?: boolean;
+    targeted?: boolean;
+    targetIssueId?: string;
+    targetRef?: React.Ref<HTMLDivElement>;
 }
 
-export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
-    const [selectedTab, setSelectedTab] = React.useState(issue.id);
+export function HealthcheckIssue({
+    issue,
+    expanded,
+    targeted,
+    targetIssueId,
+    targetRef,
+}: HealthcheckIssueProps) {
     const parents = React.useMemo(() => {
         const parents = [];
         let current: IssuesTree | undefined = issue;
@@ -26,14 +34,19 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
         }
         return parents.reverse();
     }, [issue]);
+    const [selectedTab, setSelectedTab] = React.useState(
+        targetIssueId && parents.some((parentIssue) => parentIssue.id === targetIssueId)
+            ? targetIssueId
+            : issue.id,
+    );
 
     const currentIssue = React.useMemo(() => {
         return parents.find((parent) => parent.id === selectedTab);
     }, [parents, selectedTab]);
 
     return (
-        <Flex className={b('issue-wrapper')}>
-            <Disclosure className={b('issue-content')} defaultExpanded={expanded}>
+        <Flex ref={targetRef} className={b('issue-wrapper')} qa={`healthcheck-issue-${issue.id}`}>
+            <Disclosure className={b('issue-content')} defaultExpanded={expanded || targeted}>
                 <Disclosure.Summary>
                     {({expanded: isExpanded, ariaControls, qa, className, ...buttonProps}) => (
                         <button

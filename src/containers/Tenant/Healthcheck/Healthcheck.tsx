@@ -26,17 +26,29 @@ import cryCatIcon from '../../../assets/icons/cry-cat.svg';
 
 import './Healthcheck.scss';
 
-type HealthcheckDetailsProps =
-    | {database: string; clusterName?: string}
-    | {clusterName: string; database?: undefined};
+interface HealthcheckTargetProps {
+    targetIssueId?: string;
+    targetLeafIssueId?: string;
+    targetLeafIssueRef?: React.Ref<HTMLDivElement>;
+}
 
-export function Healthcheck({database, clusterName}: HealthcheckDetailsProps) {
+type HealthcheckDetailsProps = (
+    | {database: string; clusterName?: string}
+    | {clusterName: string; database?: undefined}
+) &
+    HealthcheckTargetProps;
+
+export function Healthcheck({database, clusterName, ...targetProps}: HealthcheckDetailsProps) {
     return (
         <HealthcheckContext.Provider value={{clusterName}}>
             {database !== undefined ? (
-                <DatabaseHealthcheckInner database={database} clusterName={clusterName} />
+                <DatabaseHealthcheckInner
+                    database={database}
+                    clusterName={clusterName}
+                    {...targetProps}
+                />
             ) : (
-                <ClusterHealthcheckInner clusterName={clusterName as string} />
+                <ClusterHealthcheckInner clusterName={clusterName as string} {...targetProps} />
             )}
         </HealthcheckContext.Provider>
     );
@@ -45,17 +57,21 @@ export function Healthcheck({database, clusterName}: HealthcheckDetailsProps) {
 function DatabaseHealthcheckInner({
     database,
     clusterName,
+    ...targetProps
 }: {
     database: string;
     clusterName?: string;
-}) {
+} & HealthcheckTargetProps) {
     const healthcheck = useHealthcheck(database, {clusterName});
-    return <HealthcheckContent healthcheck={healthcheck} />;
+    return <HealthcheckContent healthcheck={healthcheck} {...targetProps} />;
 }
 
-function ClusterHealthcheckInner({clusterName}: {clusterName: string}) {
+function ClusterHealthcheckInner({
+    clusterName,
+    ...targetProps
+}: {clusterName: string} & HealthcheckTargetProps) {
     const healthcheck = useClusterHealthcheck(clusterName);
-    return <HealthcheckContent healthcheck={healthcheck} />;
+    return <HealthcheckContent healthcheck={healthcheck} {...targetProps} />;
 }
 
 interface HealthcheckResult {
@@ -67,7 +83,10 @@ interface HealthcheckResult {
     fulfilledTimeStamp?: number;
 }
 
-function HealthcheckContent({healthcheck}: {healthcheck: HealthcheckResult}) {
+function HealthcheckContent({
+    healthcheck,
+    ...targetProps
+}: {healthcheck: HealthcheckResult} & HealthcheckTargetProps) {
     const SuccessImage = getIllustration('SuccessOperation');
 
     const fullscreen = useTypedSelector((state) => state.fullscreen);
@@ -119,7 +138,7 @@ function HealthcheckContent({healthcheck}: {healthcheck: HealthcheckResult}) {
             <Flex direction="column" grow={1}>
                 {renderControls()}
                 <Flex direction="column" gap={4} grow={1} className={b('issues')}>
-                    <Issues issues={leavesIssues} />
+                    <Issues issues={leavesIssues} {...targetProps} />
                 </Flex>
             </Flex>
         );

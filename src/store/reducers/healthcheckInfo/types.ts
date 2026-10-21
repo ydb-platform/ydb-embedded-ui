@@ -4,4 +4,5 @@ export interface IssuesTree extends IssueLog {
     reasonsItems?: IssuesTree[];
     parent?: IssuesTree;
     categoryForUI: string;
+    sourceOrderPath?: number[];
 }
