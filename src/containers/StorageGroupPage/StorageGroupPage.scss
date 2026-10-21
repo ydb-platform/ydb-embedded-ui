@@ -22,22 +22,15 @@
         margin-bottom: var(--g-spacing-6);
     }
 
-    &__meta {
-        margin-bottom: var(--g-spacing-4);
-    }
-
     &__title {
         margin-bottom: var(--g-spacing-4);
+        padding-right: 125px;
     }
 
     &__title-content {
         flex: 1;
 
         min-width: 0;
-    }
-
-    &__title_with-refresh {
-        padding-right: 125px;
     }
 
     &__storage-title {

@@ -1,10 +1,8 @@
 import React from 'react';
 
-import {ArrowLeft} from '@gravity-ui/icons';
-import {Button, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {Flex, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
-import {useHistory} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {StickyAutoRefreshControl} from '../../components/AutoRefreshControl/StickyAutoRefreshControl';
@@ -19,7 +17,6 @@ import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
-import {useBrowserCanGoBack} from '../../utils/hooks/useBrowserCanGoBack';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
@@ -33,8 +30,6 @@ const storageGroupPageCn = cn('ydb-storage-group-page');
 
 export function StorageGroupPage() {
     const dispatch = useTypedDispatch();
-    const history = useHistory();
-    const showBackButton = useBrowserCanGoBack(history) ?? true;
     const database = useDatabaseFromQuery();
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -75,30 +70,10 @@ export function StorageGroupPage() {
         );
     };
 
-    const renderPageMeta = () => {
-        if (!showBackButton) {
-            return null;
-        }
-
-        return (
-            <Flex
-                className={storageGroupPageCn('meta')}
-                alignItems="center"
-                justifyContent="space-between"
-                gap={2}
-            >
-                <Button view="outlined" onClick={() => history.goBack()}>
-                    <Icon data={ArrowLeft} />
-                    {storageGroupPageKeyset('action_back')}
-                </Button>
-            </Flex>
-        );
-    };
-
     const renderPageTitle = () => {
         return (
             <Flex
-                className={storageGroupPageCn('title', {'with-refresh': !showBackButton})}
+                className={storageGroupPageCn('title')}
                 alignItems="flex-start"
                 gap={2}
                 wrap="nowrap"
@@ -165,7 +140,6 @@ export function StorageGroupPage() {
             {renderHelmet()}
             {groupId ? <StickyAutoRefreshControl /> : null}
             <div className={storageGroupPageCn('summary')}>
-                {renderPageMeta()}
                 {renderPageTitle()}
                 {renderError()}
                 {renderInfo()}

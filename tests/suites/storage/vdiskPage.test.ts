@@ -599,7 +599,7 @@ test.describe('VDisk page storage tab', () => {
         await expect(page).toHaveScreenshot('vdisk-stack-expanded.png', {clip: backgroundBox!});
     });
 
-    test('Go to PDisk navigates to PDisk page', async ({page, baseURL}) => {
+    test('Go to PDisk navigates to PDisk page', async ({page}) => {
         await page.setViewportSize({width: 1440, height: 900});
         await page.addInitScript(() => {
             localStorage.setItem('theme', JSON.stringify('light'));
@@ -607,27 +607,14 @@ test.describe('VDisk page storage tab', () => {
         await enableBlobStorageCapacityMetrics(page);
         await setupVDiskPageMocks(page);
         await setupPDiskInfoMock(page, {withCapacityMetrics: true});
-        // Replace the initial about:blank entry to model opening the page without history.
-        await page.evaluate(
-            (url) => window.location.replace(url),
-            new URL(VDISK_PAGE_PATH, baseURL).href,
-        );
+        await page.goto(VDISK_PAGE_PATH);
 
         const storageDetails = page.locator('.ydb-vdisk-storage-details');
         const goToPDiskLink = storageDetails.getByRole('link', {name: 'Go to PDisk'});
         const backButton = page.getByRole('button', {name: 'Back', exact: true});
-        const expectBackButtonToMatchBrowser = async () => {
-            const canGoBack = await page.evaluate(() => {
-                const navigation = (window as Window & {navigation?: {readonly canGoBack: boolean}})
-                    .navigation;
-                return navigation?.canGoBack ?? true;
-            });
-            await expect(backButton).toBeVisible({visible: canGoBack});
-            return canGoBack;
-        };
 
         await expect(goToPDiskLink).toBeVisible();
-        await expectBackButtonToMatchBrowser();
+        await expect(backButton).toHaveCount(0);
         const autoRefreshControl = page.locator('.auto-refresh-control');
         const refreshButton = autoRefreshControl.getByRole('button', {
             name: 'Refresh',
@@ -653,7 +640,7 @@ test.describe('VDisk page storage tab', () => {
         await expect(page.locator('.ydb-pdisk-page__info')).toBeVisible();
         await expect(page.locator('.ydb-pdisk-space-distribution')).toBeVisible();
         await expect(page.getByText('Space distribution', {exact: true})).toBeVisible();
-        await expectBackButtonToMatchBrowser();
+        await expect(backButton).toHaveCount(0);
 
         const pDiskPage = page.locator('.ydb-pdisk-page');
         const pDiskHeading = pDiskPage.getByRole('heading', {
@@ -753,33 +740,20 @@ test.describe('VDisk page storage tab', () => {
         await page.setViewportSize({width: 1440, height: 900});
 
         const pDiskUrl = page.url();
-        if (await expectBackButtonToMatchBrowser()) {
-            await backButton.click();
-        } else {
-            await page.goBack();
-        }
+        await page.goBack();
         await expect(goToPDiskLink).toBeVisible();
         await expect(refreshButton).toBeVisible();
         await expect(autoRefreshControl.getByTestId('ydb-autorefresh-select')).toBeVisible();
-        await expectBackButtonToMatchBrowser();
+        await expect(backButton).toHaveCount(0);
         await page.reload();
         await expect(goToPDiskLink).toBeVisible();
-        await expectBackButtonToMatchBrowser();
+        await expect(backButton).toHaveCount(0);
 
         await page.goForward();
         await expect(page).toHaveURL(pDiskUrl);
-        await expectBackButtonToMatchBrowser();
+        await expect(backButton).toHaveCount(0);
         await page.reload();
-        await expectBackButtonToMatchBrowser();
-
-        await page.addInitScript(() => {
-            Object.defineProperty(window, 'navigation', {configurable: true, value: undefined});
-        });
-        await page.reload();
-        await expect(backButton).toBeVisible();
-        await backButton.click();
-        await expect(goToPDiskLink).toBeVisible();
-        await expect(backButton).toBeVisible();
+        await expect(backButton).toHaveCount(0);
     });
 });
 

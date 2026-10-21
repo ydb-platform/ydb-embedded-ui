@@ -12,7 +12,6 @@
     height: 100%;
     padding: 0 20px;
 
-    &__meta,
     &__title,
     &__controls,
     &__storage-details,
@@ -40,7 +39,7 @@
         min-width: 0;
     }
 
-    &__title_with-refresh {
+    &__title {
         padding-right: 125px;
     }
 

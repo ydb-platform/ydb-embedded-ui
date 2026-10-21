@@ -1,10 +1,9 @@
 import React from 'react';
 
-import {ArrowLeft, ArrowRotateLeft, Wrench} from '@gravity-ui/icons';
-import {Button, Flex, Icon, Tab, TabList, TabProvider, Text} from '@gravity-ui/uikit';
+import {ArrowRotateLeft, Wrench} from '@gravity-ui/icons';
+import {Flex, Icon, Tab, TabList, TabProvider, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
-import {useHistory} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
@@ -34,7 +33,6 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getPDiskId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
-import {useBrowserCanGoBack} from '../../utils/hooks/useBrowserCanGoBack';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
@@ -71,8 +69,6 @@ const pDiskTabSchema = z.nativeEnum(PDISK_TABS_IDS).catch(PDISK_TABS_IDS.spaceDi
 
 export function PDiskPage() {
     const dispatch = useTypedDispatch();
-    const history = useHistory();
-    const showBackButton = useBrowserCanGoBack(history) ?? true;
     const hasDeveloperUi = useHasDeveloperUi();
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
@@ -145,26 +141,6 @@ export function PDiskPage() {
         );
     };
 
-    const renderPageMeta = () => {
-        if (!showBackButton) {
-            return null;
-        }
-
-        return (
-            <Flex
-                className={pdiskPageCn('meta')}
-                alignItems="center"
-                justifyContent="space-between"
-                gap={1}
-            >
-                <Button size="m" view="outlined" onClick={() => history.goBack()}>
-                    <Icon data={ArrowLeft} size={16} />
-                    {pDiskPageKeyset('action_back')}
-                </Button>
-            </Flex>
-        );
-    };
-
     const renderPageTitle = () => {
         const statusLabels = [
             {id: 'state', label: getPDiskStateLabel(pDiskData?.State)},
@@ -174,7 +150,7 @@ export function PDiskPage() {
         ];
         return (
             <Flex
-                className={pdiskPageCn('title', {'with-refresh': !showBackButton})}
+                className={pdiskPageCn('title')}
                 gap={2}
                 alignItems="flex-start"
                 qa="pdisk-header"
@@ -309,7 +285,6 @@ export function PDiskPage() {
         <div className={pdiskPageCn(null)} ref={containerRef}>
             {renderHelmet()}
             <StickyAutoRefreshControl />
-            {renderPageMeta()}
             {renderPageTitle()}
             {renderControls()}
             {renderError()}
