@@ -27,6 +27,16 @@
         margin-bottom: var(--g-spacing-4);
     }
 
+    &__title-content {
+        flex: 1;
+
+        min-width: 0;
+    }
+
+    &__refresh-control {
+        flex-shrink: 0;
+    }
+
     &__storage-title {
         margin: 0;
     }

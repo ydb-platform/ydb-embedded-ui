@@ -6,13 +6,14 @@ import {isNonEmptyValue} from '../../utils';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatMetricPercent, formatStorageMetricPair} from '../../utils/storageMetrics';
+import {
+    formatMetricPercent,
+    formatStorageMetricPair,
+    formatStorageThroughput,
+} from '../../utils/storageMetrics';
 import {formatToMs} from '../../utils/timeParsers';
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
-import {
-    getStorageGroupCapacityInfoItems,
-    toDefinitionListItems,
-} from '../DiskCapacityInfo/DiskCapacityInfo';
+import {getStorageGroupCapacityInfoItems} from '../DiskCapacityInfo/DiskCapacityInfo';
 import diskCapacityInfoKeyset from '../DiskCapacityInfo/i18n';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
@@ -94,13 +95,7 @@ export function StorageGroupInfo({data, className}: StorageGroupInfoProps) {
         ] as const
     ).map(([name, value]) => ({
         name,
-        content:
-            formatBytes({
-                value: parseOptionalNonNegativeNumber(value),
-                size: 'mb',
-                fixedDecimalPlaces: 2,
-                withSpeedLabel: true,
-            }) || EMPTY_DATA_PLACEHOLDER,
+        content: formatStorageThroughput(value),
     }));
     const capacityItems: YDBDefinitionListItem[] = [];
 
@@ -127,7 +122,7 @@ export function StorageGroupInfo({data, className}: StorageGroupInfoProps) {
         },
     );
     if (capacityMetricsEnabled) {
-        capacityItems.push(...toDefinitionListItems(getStorageGroupCapacityInfoItems(data)));
+        capacityItems.push(...getStorageGroupCapacityInfoItems(data));
     } else {
         capacityItems.push(
             {

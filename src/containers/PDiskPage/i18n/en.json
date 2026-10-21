@@ -2,6 +2,8 @@
   "fqdn": "FQDN",
   "pdisk": "PDisk",
   "node": "Node",
+  "action_back": "Back",
+  "action_open-in-developer-ui": "Open in Developer UI",
 
   "storage": "Storage",
   "space-distribution": "Space distribution",

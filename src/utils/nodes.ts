@@ -34,11 +34,12 @@ export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
         if (valueIsDefined(node.Id)) {
             const physicalLocation = node.PhysicalLocation;
             // The legacy numeric Rack can be a hash of the actual rack name.
-            const Rack = physicalLocation?.Location?.match(/(?:^|\/)R=([^/]+)/)?.[1];
+            const Rack =
+                node.Location?.Rack || physicalLocation?.Location?.match(/(?:^|\/)R=([^/]+)/)?.[1];
 
             nodeHosts.set(node.Id, {
                 Host: node.Host,
-                DC: physicalLocation?.DataCenterId,
+                DC: node.Location?.DataCenter || physicalLocation?.DataCenterId,
                 Rack,
             });
         }

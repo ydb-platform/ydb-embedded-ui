@@ -1,13 +1,14 @@
 import React from 'react';
 
 import {ArrowLeft} from '@gravity-ui/icons';
-import {Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {Button, Flex, Icon, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {useHistory} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
+import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {StorageGroupInfo} from '../../components/StorageGroupInfo/StorageGroupInfo';
@@ -36,6 +37,8 @@ export function StorageGroupPage() {
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     const [{groupId}] = useQueryParams({groupId: StringParam});
+    const showBackButton = Boolean(groupId) && history.length > 1;
+    const showRefreshInTitle = Boolean(groupId) && !showBackButton;
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const capabilitiesLoaded = useCapabilitiesLoaded();
@@ -73,49 +76,55 @@ export function StorageGroupPage() {
     };
 
     const renderPageMeta = () => {
-        if (!groupId) {
+        if (!showBackButton) {
             return null;
         }
-
-        const hasPreviousPage = history.length > 1;
 
         return (
             <Flex
                 className={storageGroupPageCn('meta')}
                 alignItems="center"
-                justifyContent={hasPreviousPage ? 'space-between' : 'flex-end'}
+                justifyContent="space-between"
                 gap={2}
             >
-                {hasPreviousPage && (
-                    <Button view="outlined" onClick={() => history.goBack()}>
-                        <Icon data={ArrowLeft} />
-                        {storageGroupPageKeyset('action_back')}
-                    </Button>
-                )}
-                <AutoRefreshControl />
+                <Button view="outlined" onClick={() => history.goBack()}>
+                    <Icon data={ArrowLeft} />
+                    {storageGroupPageKeyset('action_back')}
+                </Button>
+                <AutoRefreshControl className={storageGroupPageCn('refresh-control')} />
             </Flex>
         );
     };
 
     const renderPageTitle = () => {
         return (
-            <Flex className={storageGroupPageCn('title')} alignItems="center" gap={2} wrap="wrap">
-                <Text variant="header-1">{storageGroupPageKeyset('storage-group')}</Text>
-                <Flex alignItems="center" gap={1}>
-                    <Text variant="header-1" color="hint">
-                        {groupId || EMPTY_DATA_PLACEHOLDER}
-                    </Text>
-                    {groupId && (
-                        <ClipboardButton
-                            text={groupId}
-                            view="flat-secondary"
-                            size="s"
-                            aria-label={storageGroupPageKeyset('action_copy-group-id-from-title')}
-                            tooltipInitialText={storageGroupPageKeyset('action_copy-group-id')}
-                        />
-                    )}
+            <Flex
+                className={storageGroupPageCn('title')}
+                alignItems="flex-start"
+                gap={2}
+                wrap="nowrap"
+            >
+                <Flex
+                    className={storageGroupPageCn('title-content')}
+                    alignItems="center"
+                    gap={2}
+                    wrap="wrap"
+                >
+                    <Text variant="header-1">{storageGroupPageKeyset('storage-group')}</Text>
+                    <CopyableValue
+                        copyText={groupId}
+                        fieldName={storageGroupPageKeyset('storage-group')}
+                        copyButtonLabel={storageGroupPageKeyset('action_copy-group-id-from-title')}
+                    >
+                        <Text variant="header-1" color="hint">
+                            {groupId || EMPTY_DATA_PLACEHOLDER}
+                        </Text>
+                    </CopyableValue>
+                    <StorageGroupStateLabel state={state} />
                 </Flex>
-                <StorageGroupStateLabel state={state} />
+                {showRefreshInTitle && (
+                    <AutoRefreshControl className={storageGroupPageCn('refresh-control')} />
+                )}
             </Flex>
         );
     };

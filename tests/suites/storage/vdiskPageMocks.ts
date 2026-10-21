@@ -26,6 +26,7 @@ export interface SetupVDiskPageMocksOptions {
     pDiskId?: string;
     isViewerAllowed?: boolean;
     withDonors?: boolean;
+    replicated?: boolean;
     withSlotOnlyDonor?: boolean;
     withoutCompaction?: boolean;
     storagePoolName?: string;
@@ -117,6 +118,7 @@ function createStorageGroupsResponse({
     availableSize = '186000000000',
     pDiskId = PDISK_ID,
     withDonors,
+    replicated,
     withoutCompaction,
     storagePoolName = STORAGE_POOL_NAME,
     withCapacityMetrics,
@@ -133,6 +135,7 @@ function createStorageGroupsResponse({
     | 'availableSize'
     | 'pDiskId'
     | 'withDonors'
+    | 'replicated'
     | 'withoutCompaction'
     | 'storagePoolName'
     | 'withCapacityMetrics'
@@ -187,6 +190,7 @@ function createStorageGroupsResponse({
                               }
                             : {}),
                         ...(withDonors ? {VDiskState: 'OK', Replicated: false} : {}),
+                        ...(replicated === undefined ? {} : {Replicated: replicated}),
                         SatisfactionRank: withoutCompaction
                             ? undefined
                             : {
@@ -389,6 +393,7 @@ async function setupStorageGroupsMock(
         availableSize,
         pDiskId = PDISK_ID,
         withDonors,
+        replicated,
         withoutCompaction,
         storagePoolName,
         withCapacityMetrics,
@@ -405,6 +410,7 @@ async function setupStorageGroupsMock(
         | 'availableSize'
         | 'pDiskId'
         | 'withDonors'
+        | 'replicated'
         | 'withoutCompaction'
         | 'storagePoolName'
         | 'withCapacityMetrics'
@@ -427,6 +433,7 @@ async function setupStorageGroupsMock(
                     availableSize,
                     pDiskId,
                     withDonors,
+                    replicated,
                     withoutCompaction,
                     storagePoolName,
                     withCapacityMetrics,
@@ -510,6 +517,7 @@ export async function setupPDiskInfoMock(
     {
         withCapacityMetrics = false,
         withSlotOnlyDonor = false,
+        pDiskPath = '/dev/pdisk0',
         whiteboardAllocatedSize,
         whiteboardAvailableSize,
         whiteboardSlotSize = '20000000000',
@@ -528,7 +536,7 @@ export async function setupPDiskInfoMock(
         | 'pDiskBscTotalSize'
         | 'pDiskWhiteboardAvailableSize'
         | 'pDiskWhiteboardTotalSize'
-    > = {},
+    > & {pDiskPath?: string} = {},
 ) {
     await page.route('**/pdisk/info*', async (route) => {
         await route.fulfill({
@@ -536,11 +544,14 @@ export async function setupPDiskInfoMock(
             contentType: 'application/json',
             body: JSON.stringify({
                 Whiteboard: {
-                    PDisk: createPDiskWhiteboardData(withCapacityMetrics, {
-                        whiteboardSlotSize,
-                        pDiskWhiteboardAvailableSize,
-                        pDiskWhiteboardTotalSize,
-                    }),
+                    PDisk: {
+                        ...createPDiskWhiteboardData(withCapacityMetrics, {
+                            whiteboardSlotSize,
+                            pDiskWhiteboardAvailableSize,
+                            pDiskWhiteboardTotalSize,
+                        }),
+                        Path: pDiskPath,
+                    },
                     VDisks: [
                         withSlotOnlyDonor
                             ? {
@@ -561,7 +572,7 @@ export async function setupPDiskInfoMock(
                 BSC: {
                     PDisk: {
                         Type: 'ROT',
-                        Path: '/dev/pdisk0',
+                        Path: pDiskPath,
                         Guid: '123456789',
                         AvailableSize: pDiskBscAvailableSize,
                         TotalSize: pDiskBscTotalSize,

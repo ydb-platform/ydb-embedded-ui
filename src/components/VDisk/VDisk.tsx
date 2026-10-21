@@ -175,7 +175,7 @@ function getAccessibleName(
     {mode, allMode, isNoData, driveType}: VDiskDisplayState,
 ) {
     if (!mode) {
-        return undefined;
+        return getAccessibleDiskName(data, {mode, isNoData});
     }
     if (mode === 'all') {
         return getAllModeAccessibleName(data, allMode?.hasIssues);

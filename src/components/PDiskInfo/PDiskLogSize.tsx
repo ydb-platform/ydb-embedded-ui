@@ -23,14 +23,18 @@ export function PDiskLogSize({used, total}: {used?: string; total?: string}) {
     }
 
     return (
-        <Flex gap={1} alignItems="center" className={b()}>
-            <Progress
-                className={b('progress')}
-                value={percentage}
-                theme="success"
-                size="s"
-                aria-label={i18n('log-size')}
-            />
+        <Flex
+            gap={1}
+            alignItems="center"
+            className={b()}
+            role="meter"
+            aria-label={i18n('log-size')}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={percentage}
+            aria-valuetext={formatStorageMetricPair(usedSize, totalSize, 2)}
+        >
+            <Progress className={b('progress')} value={percentage} theme="success" size="s" />
             <span>{formatStorageMetricPair(usedSize, totalSize, 2)}</span>
         </Flex>
     );
