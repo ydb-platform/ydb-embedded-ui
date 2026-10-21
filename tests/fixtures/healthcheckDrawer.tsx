@@ -1,6 +1,14 @@
 import React from 'react';
 
-import {Button, Dialog, Drawer, ThemeProvider} from '@gravity-ui/uikit';
+import {
+    Button,
+    Dialog,
+    Drawer,
+    DropdownMenu,
+    Popover,
+    Select,
+    ThemeProvider,
+} from '@gravity-ui/uikit';
 import {createRoot} from 'react-dom/client';
 import {Provider} from 'react-redux';
 
@@ -8,6 +16,38 @@ import {DrawerContextProvider} from '../../src/components/Drawer/DrawerContext';
 import {HealthcheckDrawer} from '../../src/containers/Tenant/Healthcheck/components/HealthcheckDrawer';
 import {store} from '../../src/store/defaultStore';
 import {configureUIFactory} from '../../src/uiFactory/uiFactory';
+
+function PopupControl({kind}: {kind: string}) {
+    switch (kind) {
+        case 'menu':
+            return (
+                <DropdownMenu
+                    renderSwitcher={(props) => (
+                        <Button {...props} qa="fixture-popup">
+                            Nested menu
+                        </Button>
+                    )}
+                    items={[{text: 'Nested menu item', action: () => {}}]}
+                />
+            );
+        case 'select':
+            return (
+                <Select
+                    qa="fixture-popup"
+                    placeholder="Nested select"
+                    options={[{value: 'a', content: 'Nested option A'}]}
+                />
+            );
+        case 'popover':
+            return (
+                <Popover trigger="click" content={<div>Nested popover content</div>}>
+                    <Button qa="fixture-popup">Nested popover</Button>
+                </Popover>
+            );
+        default:
+            return null;
+    }
+}
 
 const COMPANION_WIDTH = 320;
 
@@ -107,7 +147,13 @@ function HealthcheckDrawerFixture() {
 
 export function renderHealthcheckDrawerFixture(mode: 'default' | 'modal' | 'non-modal') {
     const overrides = mode === 'default' ? {} : {disableModal: mode === 'non-modal'};
-    configureUIFactory({healthcheck: overrides});
+    const popup = new URLSearchParams(window.location.search).get('fixturePopup');
+    configureUIFactory({
+        healthcheck: {
+            ...overrides,
+            renderDrawerExtension: popup ? () => <PopupControl kind={popup} /> : undefined,
+        },
+    });
 
     const container = document.getElementById('root');
     if (!container) {

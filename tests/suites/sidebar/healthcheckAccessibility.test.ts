@@ -9,11 +9,15 @@ import {TenantPage} from '../tenant/TenantPage';
 
 type Panel = 'Healthcheck' | 'companion';
 
-async function openFixture(page: Page, mode: 'default' | 'modal' | 'non-modal' = 'non-modal') {
+async function openFixture(
+    page: Page,
+    mode: 'default' | 'modal' | 'non-modal' = 'non-modal',
+    popup?: string,
+) {
     await page.addInitScript((value) => {
         window.e2eHealthcheckDrawerMode = value;
     }, mode);
-    await page.goto('/');
+    await page.goto(popup ? `/?fixturePopup=${popup}` : '/');
     await expect(page.getByTestId('healthcheck-drawer-fixture')).toBeVisible();
 }
 
@@ -495,6 +499,37 @@ test.describe('Healthcheck target switching', () => {
                     contentType: 'application/json',
                 });
                 await expect(secondOpener).toBeFocused();
+            });
+        }
+    }
+});
+
+test.describe('Healthcheck nested popup Escape', () => {
+    for (const mode of ['modal', 'non-modal'] as const) {
+        for (const popup of ['menu', 'select', 'popover'] as const) {
+            test(`${mode} ${popup}: dismiss popup before drawer`, async ({page}) => {
+                await openFixture(page, mode, popup);
+                await openPanel(page, 'companion');
+                await openPanel(page, 'Healthcheck');
+                const overlay = page.getByTestId('fixture-healthcheck');
+                const drawer = overlay.getByRole('dialog');
+                await drawer.getByTestId('fixture-popup').click();
+                const popupContent = {
+                    menu: 'Nested menu item',
+                    select: 'Nested option A',
+                    popover: 'Nested popover content',
+                };
+                const content = page.getByText(popupContent[popup], {exact: true});
+                await expect(content).toBeVisible();
+                await page.keyboard.press('Escape');
+                await expect(content).not.toBeVisible();
+                await expect(overlay).toHaveAttribute('data-floating-ui-status', 'open');
+                await page.keyboard.press('Escape');
+                await expect(drawer).toHaveCount(0);
+                await expect(
+                    page.getByRole('button', {name: 'Open Healthcheck', exact: true}),
+                ).toBeFocused();
+                await expect(panel(page, 'companion')).toBeVisible();
             });
         }
     }

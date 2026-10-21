@@ -1,7 +1,17 @@
 import React from 'react';
 
 import {Xmark} from '@gravity-ui/icons';
-import {ActionTooltip, Button, Flex, Drawer as GravityDrawer, Icon, Text} from '@gravity-ui/uikit';
+import type {EventBrokerData} from '@gravity-ui/uikit';
+import {
+    ActionTooltip,
+    Button,
+    Flex,
+    Drawer as GravityDrawer,
+    Icon,
+    Text,
+    eventBroker,
+    layerManager,
+} from '@gravity-ui/uikit';
 import {debounce} from 'lodash';
 
 import {cn} from '../../utils/cn';
@@ -22,6 +32,17 @@ const DEFAULT_DRAWER_WIDTH = 600;
 const DRAWER_WIDTH_KEY = 'drawer-width';
 const SAVE_DEBOUNCE_MS = 200;
 const b = cn('ydb-drawer');
+const NON_MODAL_LAYER_PREFIX = 'ydb-drawer-non-modal-';
+
+function subscribeToLayers(onStoreChange: () => void) {
+    const onEvent = ({eventId}: EventBrokerData) => {
+        if (eventId === 'layerschange') {
+            onStoreChange();
+        }
+    };
+    eventBroker.subscribe(onEvent);
+    return () => eventBroker.unsubscribe(onEvent);
+}
 
 type DrawerEvent = MouseEvent & {
     _capturedInsideDrawer?: boolean;
@@ -67,6 +88,38 @@ const DrawerPaneContentWrapper = ({
 
     const drawerRef = React.useRef<HTMLDivElement>(null);
     const openerRef = React.useRef<HTMLElement | null>(null);
+    const layerId = React.useId();
+    const layerType = `${disableModal ? NON_MODAL_LAYER_PREFIX : 'ydb-drawer-modal-'}${layerId}`;
+    const blockedEscapes = React.useRef(new WeakSet<Event>());
+
+    // UIKit popups register in passive effects, after this drawer's priority marker.
+    React.useLayoutEffect(() => {
+        if (!isVisible) {
+            return;
+        }
+        const layer = {type: layerType, disableEscapeKeyDown: true, disableOutsideClick: true};
+        layerManager.add(layer);
+        return () => layerManager.remove(layer);
+    }, [isVisible, layerType]);
+
+    const hasLayerAbove = React.useCallback(() => {
+        const layers = layerManager.getLayers();
+        const index = layers.findIndex(({type}) => type === layerType);
+        return (
+            index !== -1 &&
+            layers.slice(index + 1).some(({type}) => !type?.startsWith(NON_MODAL_LAYER_PREFIX))
+        );
+    }, [layerType]);
+
+    // Avoid UIKit stopping Escape propagation before the popup's document handler runs.
+    const escapeBlocked = React.useSyncExternalStore(subscribeToLayers, hasLayerAbove, () => false);
+
+    const handleKeyDownCapture = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === 'Escape' && hasLayerAbove()) {
+            // A child may remove its layer before this same event reaches our bubble handler.
+            blockedEscapes.current.add(event.nativeEvent);
+        }
+    };
 
     // Floating UI suppresses return focus after focus-out, even if the drawer stays open.
     React.useLayoutEffect(() => {
@@ -184,12 +237,21 @@ const DrawerPaneContentWrapper = ({
     const handleOpenChange = React.useCallback<
         NonNullable<React.ComponentProps<typeof GravityDrawer>['onOpenChange']>
     >(
-        (open, _event, reason) => {
+        (open, event, reason) => {
+            if (
+                reason === 'escape-key' &&
+                ((event && blockedEscapes.current.has(event)) ||
+                    hasLayerAbove() ||
+                    event?.defaultPrevented ||
+                    (event instanceof KeyboardEvent && event.isComposing))
+            ) {
+                return;
+            }
             if (!open && !(disableModal && reason === 'focus-out')) {
                 onClose();
             }
         },
-        [disableModal, onClose],
+        [disableModal, hasLayerAbove, onClose],
     );
 
     const handleClickInsideDrawer = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -201,6 +263,8 @@ const DrawerPaneContentWrapper = ({
         if (
             disableModal &&
             event.key === 'Escape' &&
+            !blockedEscapes.current.has(event.nativeEvent) &&
+            !hasLayerAbove() &&
             !event.defaultPrevented &&
             !event.nativeEvent.isComposing &&
             event.target instanceof Element &&
@@ -218,7 +282,11 @@ const DrawerPaneContentWrapper = ({
     }
 
     return (
-        <div className={b('event-boundary')} onKeyDown={handleKeyDown}>
+        <div
+            className={b('event-boundary')}
+            onKeyDownCapture={handleKeyDownCapture}
+            onKeyDown={handleKeyDown}
+        >
             <GravityDrawer
                 qa={drawerId}
                 open={isVisible}
@@ -236,7 +304,7 @@ const DrawerPaneContentWrapper = ({
                 onResizeEnd={handleResizeDrawer}
                 aria-labelledby={labelledBy}
                 disableModal={disableModal}
-                disableEscapeKeyDown={disableModal}
+                disableEscapeKeyDown={disableModal || escapeBlocked}
                 disableBodyScrollLock
                 disableOutsideClick={detectClickOutside}
                 floatingRef={drawerRef}

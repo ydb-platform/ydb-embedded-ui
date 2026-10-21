@@ -1,7 +1,8 @@
 import React from 'react';
 
-import {Drawer, ThemeProvider} from '@gravity-ui/uikit';
+import {Drawer, Popup, ThemeProvider, layerManager, useLayer} from '@gravity-ui/uikit';
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
+import {flushSync} from 'react-dom';
 
 import {DrawerWrapper} from '../Drawer';
 import {DrawerContextProvider} from '../DrawerContext';
@@ -193,4 +194,157 @@ test('captures a fresh opener after close and reopen', async () => {
     fireEvent.keyDown(reopenedFilter, {key: 'Escape'});
     await waitFor(() => expect(drawer).not.toBeInTheDocument());
     expect(first).toHaveFocus();
+});
+
+function NestedLayer({removeBeforeBubble = false}: {removeBeforeBubble?: boolean}) {
+    const [open, setOpen] = React.useState(true);
+    useLayer({open, type: 'popup', onEscapeKeyDown: () => setOpen(false)});
+    return (
+        <input
+            aria-label="Nested layer"
+            onKeyDown={(event) => {
+                if (removeBeforeBubble && event.key === 'Escape') {
+                    flushSync(() => setOpen(false));
+                }
+            }}
+        />
+    );
+}
+
+function LayerFixture({
+    disableModal = true,
+    content,
+    visible = true,
+    onClose = jest.fn(),
+}: {
+    disableModal?: boolean;
+    content?: React.ReactNode;
+    visible?: boolean;
+    onClose?: () => void;
+}) {
+    return (
+        <ThemeProvider theme="light">
+            <DrawerContextProvider>
+                <DrawerWrapper
+                    title="Layer drawer"
+                    isDrawerVisible={visible}
+                    onCloseDrawer={onClose}
+                    disableModal={disableModal}
+                    renderDrawerContent={() => content ?? <input aria-label="Layer input" />}
+                >
+                    <button>Layer opener</button>
+                </DrawerWrapper>
+            </DrawerContextProvider>
+        </ThemeProvider>
+    );
+}
+
+function InitiallyOpenPopup() {
+    const anchor = React.useRef<HTMLInputElement>(null);
+    return (
+        <React.Fragment>
+            <input ref={anchor} aria-label="Popup anchor" />
+            <Popup open anchorRef={anchor}>
+                <button>Popup item</button>
+            </Popup>
+        </React.Fragment>
+    );
+}
+
+test.each([true, false])(
+    'registers before an initially open popup (non-modal=%s)',
+    async (disableModal) => {
+        const baseline = layerManager.getLayers();
+        const close = jest.fn();
+        const {unmount} = render(
+            <LayerFixture
+                disableModal={disableModal}
+                onClose={close}
+                content={<InitiallyOpenPopup />}
+            />,
+        );
+        const input = await screen.findByRole('textbox', {name: 'Popup anchor'});
+        await waitFor(() =>
+            expect(screen.getByRole('dialog', {name: 'Layer drawer'})).toHaveFocus(),
+        );
+        expect(
+            layerManager
+                .getLayers()
+                .slice(baseline.length)
+                .map((layer) => layer.type),
+        ).toEqual([expect.stringContaining('ydb-drawer-'), 'popup']);
+        input.focus();
+        fireEvent.keyDown(input, {key: 'Escape'});
+        expect(close).not.toHaveBeenCalled();
+        unmount();
+        expect(layerManager.getLayers()).toEqual(baseline);
+    },
+);
+
+test.each([true, false])(
+    'remembers a popup removed before the same Escape bubbles (non-modal=%s)',
+    async (disableModal) => {
+        const close = jest.fn();
+        render(
+            <LayerFixture
+                disableModal={disableModal}
+                onClose={close}
+                content={<NestedLayer removeBeforeBubble />}
+            />,
+        );
+        const input = await screen.findByRole('textbox', {name: 'Nested layer'});
+        await waitFor(() =>
+            expect(screen.getByRole('dialog', {name: 'Layer drawer'})).toHaveFocus(),
+        );
+        input.focus();
+        fireEvent.keyDown(input, {key: 'Escape'});
+        expect(close).not.toHaveBeenCalled();
+        fireEvent.keyDown(input, {key: 'Escape'});
+        expect(close).toHaveBeenCalledTimes(1);
+    },
+);
+
+test('keeps marker order across rerender and cleans up in StrictMode', async () => {
+    const baseline = layerManager.getLayers();
+    const close = jest.fn();
+    const fixture = (visible: boolean) => (
+        <React.StrictMode>
+            <LayerFixture visible={visible} onClose={close} content={<NestedLayer />} />
+        </React.StrictMode>
+    );
+    const {rerender, unmount} = render(fixture(true));
+    await screen.findByRole('textbox', {name: 'Nested layer'});
+    const layers = layerManager.getLayers();
+    expect(layers.slice(baseline.length).map((layer) => layer.type)).toEqual([
+        expect.stringContaining('ydb-drawer-'),
+        'popup',
+    ]);
+    rerender(fixture(true));
+    expect(layerManager.getLayers()).toEqual(layers);
+    rerender(fixture(false));
+    expect(
+        layerManager.getLayers().filter((layer) => layer.type?.startsWith('ydb-drawer-')),
+    ).toEqual([]);
+    unmount();
+    expect(layerManager.getLayers()).toEqual(baseline);
+});
+
+test('another non-modal drawer does not block Escape in the focused drawer', async () => {
+    const firstClose = jest.fn();
+    const secondClose = jest.fn();
+    render(
+        <React.Fragment>
+            <LayerFixture onClose={firstClose} content={<input aria-label="First layer" />} />
+            <LayerFixture onClose={secondClose} content={<input aria-label="Second layer" />} />
+        </React.Fragment>,
+    );
+    const first = await screen.findByRole('textbox', {name: 'First layer'});
+    const second = screen.getByRole('textbox', {name: 'Second layer'});
+    first.focus();
+    fireEvent.keyDown(first, {key: 'Escape'});
+    expect(firstClose).toHaveBeenCalledTimes(1);
+    expect(secondClose).not.toHaveBeenCalled();
+    second.focus();
+    fireEvent.keyDown(second, {key: 'Escape'});
+    expect(secondClose).toHaveBeenCalledTimes(1);
 });
