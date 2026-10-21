@@ -9,6 +9,7 @@ export const selectStatusFilter = (state: ClustersStateSlice) => state.clusters.
 export const selectServiceFilter = (state: ClustersStateSlice) => state.clusters.service;
 export const selectVersionFilter = (state: ClustersStateSlice) => state.clusters.version;
 export const selectGalaxyFilter = (state: ClustersStateSlice) => state.clusters.galaxy;
+export const selectAvailabilityFilter = (state: ClustersStateSlice) => state.clusters.availability;
 
 // ==== Filters ====
 
@@ -85,6 +86,9 @@ const isMatchesByTextQuery = (clusterData: PreparedCluster, searchQuery = '') =>
 export function filterClusters(clusters: PreparedCluster[], filters: ClustersFilters) {
     return clusters.filter((cluster) => {
         return (
+            filters.availability.includes(
+                cluster.settings?.unavailable === true ? 'unavailable' : 'available',
+            ) &&
             isMatchesByGalaxy(cluster, filters.galaxy) &&
             isMatchesByStatus(cluster, filters.status) &&
             isMatchesByService(cluster, filters.service) &&

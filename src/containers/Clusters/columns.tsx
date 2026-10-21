@@ -1,13 +1,15 @@
-import {Pencil, TrashBin} from '@gravity-ui/icons';
+import {CircleXmark, Pencil, TrashBin} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 import {
     ClipboardButton,
     Link as ExternalLink,
     Flex,
+    Icon,
     Label,
     Progress,
     Text,
+    Tooltip,
 } from '@gravity-ui/uikit';
 
 import type {DropdownMenuItemWithDescription} from '../../components/DropdownMenu';
@@ -240,9 +242,9 @@ function getTitleColumn({
 
             return (
                 <Flex direction={'column'} gap={0.5}>
-                    <Flex alignItems={'flex-start'} justifyContent={'space-between'} gap={1}>
+                    <Flex alignItems="center" justifyContent="space-between" gap={1}>
                         {renderName()}
-                        <Flex gap={1}>
+                        <Flex alignItems="center" gap={1}>
                             {renderStatus()}
                             {renderActions()}
                         </Flex>
@@ -262,9 +264,37 @@ function ClusterName({row}: ClusterNameProps) {
     const clusterPath = calculateClusterPath(row);
 
     return (
-        <div className={b('cluster-name')}>
-            <ExternalLink href={clusterPath}>{row.title || row.name}</ExternalLink>
-        </div>
+        <Flex alignItems="center" gap={1} className={b('cluster-name-wrapper')}>
+            <ExternalLink
+                href={clusterPath}
+                className={b('cluster-name')}
+                title={row.title || row.name}
+            >
+                {row.title || row.name}
+            </ExternalLink>
+            {row.settings?.unavailable === true ? (
+                <Tooltip content={i18n('tooltip_unavailable')}>
+                    <span
+                        className={b('unavailable-label')}
+                        tabIndex={0}
+                        data-qa="cluster-unavailable-label"
+                        onKeyDown={(event) => {
+                            if (['ArrowUp', 'ArrowDown', 'Enter'].includes(event.key)) {
+                                event.stopPropagation();
+                            }
+                        }}
+                    >
+                        <Label
+                            theme="unknown"
+                            size="xs"
+                            icon={<Icon data={CircleXmark} size={12} />}
+                        >
+                            {i18n('value_unavailable')}
+                        </Label>
+                    </span>
+                </Tooltip>
+            ) : null}
+        </Flex>
     );
 }
 
