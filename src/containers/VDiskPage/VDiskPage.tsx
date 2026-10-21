@@ -50,7 +50,7 @@ const vDiskPageCn = cn('ydb-vdisk-page');
 export function VDiskPage() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
-    const showBackButton = useBrowserCanGoBack() ?? true;
+    const showBackButton = useBrowserCanGoBack(history) ?? true;
     const getVDiskPagePath = useVDiskPagePath();
 
     const containerRef = React.useRef<HTMLDivElement>(null);

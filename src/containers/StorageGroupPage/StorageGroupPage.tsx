@@ -34,7 +34,7 @@ const storageGroupPageCn = cn('ydb-storage-group-page');
 export function StorageGroupPage() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
-    const showBackButton = useBrowserCanGoBack() ?? true;
+    const showBackButton = useBrowserCanGoBack(history) ?? true;
     const database = useDatabaseFromQuery();
     const containerRef = React.useRef<HTMLDivElement>(null);
 

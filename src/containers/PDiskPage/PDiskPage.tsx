@@ -72,7 +72,7 @@ const pDiskTabSchema = z.nativeEnum(PDISK_TABS_IDS).catch(PDISK_TABS_IDS.spaceDi
 export function PDiskPage() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
-    const showBackButton = useBrowserCanGoBack() ?? true;
+    const showBackButton = useBrowserCanGoBack(history) ?? true;
     const hasDeveloperUi = useHasDeveloperUi();
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
