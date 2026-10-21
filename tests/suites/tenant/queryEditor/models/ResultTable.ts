@@ -100,7 +100,8 @@ export class ResultTable {
 
     async getResultTitleCount() {
         await this.resultTitle.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return this.resultTitle.locator('.g-text').nth(1).textContent();
+        const count = await this.resultTitle.locator('.g-text').nth(1).innerText();
+        return count.replace(/\s/g, '');
     }
 
     async getResultTabTitleText(index: number) {

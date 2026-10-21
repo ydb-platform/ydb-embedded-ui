@@ -312,4 +312,17 @@ test.describe('Query editor redesign @query-editor-redesign', () => {
                 .evaluate((element) => getComputedStyle(element).gap),
         ).toBe('8px');
     });
+    test('reads formatted result counts without losing thousands', async ({page}) => {
+        const editor = await openEditor(page);
+        const response = makeResponse();
+        response.resultSets[0].result = Array.from({length: 1000}, (_, value) => ({value}));
+        response.stats.Executions[0].ResultRows = '1000';
+        await page.route(queryUrl, (route) => route.fulfill({json: response}));
+        await analyze(editor);
+        await mainViews(page).getByRole('radio', {name: 'Result 1', exact: true}).check();
+        await expect(page.locator('.ydb-query-result-sets-viewer__title')).toContainText(
+            '1\u00a0000',
+        );
+        await expect(editor.resultTable.getResultTitleCount()).resolves.toBe('1000');
+    });
 });

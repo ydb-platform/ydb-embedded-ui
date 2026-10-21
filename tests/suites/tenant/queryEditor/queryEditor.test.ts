@@ -413,7 +413,9 @@ test.describe('Test Query Editor', async () => {
         await expect(errorMessage).toContain('Column references are not allowed without FROM');
     });
 
-    test('Error is displayed for invalid query for explain analyze', async ({page}) => {
+    test('Error is displayed for invalid query for explain analyze @query-editor-redesign', async ({
+        page,
+    }) => {
         const queryEditor = new QueryEditor(page);
 
         const invalidQuery = 'Select d';
@@ -421,6 +423,10 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.clickExplainAnalyzeButton();
 
         await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
+        await expect(
+            queryEditor.getResultAreaLocator().getByText('Query Failed', {exact: true}),
+        ).toBeVisible();
+        await queryEditor.paneWrapper.selectTab(ResultTabNames.Result);
         const errorMessage = await queryEditor.getErrorMessage();
         await expect(errorMessage).toContain('Column references are not allowed without FROM');
     });
@@ -441,7 +447,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isExplainAnalyzeButtonEnabled()).resolves.toBe(true);
     });
 
-    test('Explain Analyze warns that the query is executed and its results are ignored', async ({
+    test('Explain Analyze warns that the query is executed and changes are applied', async ({
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
