@@ -1,13 +1,13 @@
 import {randomUUID} from 'node:crypto';
 
 import {expect, request as playwrightRequest, test} from '@playwright/test';
-import type {Page} from '@playwright/test';
+import type {Page, Request} from '@playwright/test';
 
 import type {ExecuteQueryResponse} from '../../../../../src/types/api/query';
 import {getClipboardContent} from '../../../../utils/clipboard';
 import {backend, database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
-import {getLongRunningStreamQuery, longRunningStreamQuery} from '../../constants';
+import {longRunningStreamQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {
     Diagnostics,
@@ -46,25 +46,89 @@ async function checkRunningQuery(page: Page, failAssertion = false) {
     await tenantPage.goto(pageQueryParams);
 
     const diagnostics = new Diagnostics(page);
-    await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
+    const readRunningQueries = async (action: () => Promise<void>, timeout: number) => {
+        let startedRequest: Request | undefined;
+        const onRequest = (request: Request) => {
+            if (
+                startedRequest ||
+                new URL(request.url()).pathname !== '/viewer/json/query' ||
+                request.method() !== 'POST'
+            ) {
+                return;
+            }
+            const body: {query?: string; database?: string} = request.postDataJSON();
+            if (
+                body.database === database &&
+                body.query?.includes('`.sys/query_sessions`') &&
+                /SELECT\s+\*/i.test(body.query)
+            ) {
+                startedRequest = request;
+            }
+        };
+        page.on('request', onRequest);
+        try {
+            const [requestResult, actionResult] = await Promise.allSettled([
+                page.waitForEvent('requestfinished', {
+                    predicate: (request) => request === startedRequest,
+                    timeout,
+                }),
+                action(),
+            ]);
+            if (actionResult.status === 'rejected') {
+                throw actionResult.reason;
+            }
+            if (requestResult.status === 'rejected') {
+                throw requestResult.reason;
+            }
+            const response = await requestResult.value.response();
+            if (!response) {
+                throw new Error('Running queries request completed without a response');
+            }
+            expect(response.ok(), `Running queries HTTP status: ${response.status()}`).toBe(true);
+            const body: ExecuteQueryResponse & {status?: string} = await response.json();
+            expect(body.status, `Running queries response: ${await response.text()}`).toBe(
+                'SUCCESS',
+            );
+            return body.result?.[0];
+        } finally {
+            page.off('request', onRequest);
+        }
+    };
+
+    // Finish the initial load before starting the query and its observation deadline.
+    await readRunningQueries(() => diagnostics.clickRadioSwitch(QueriesSwitch.Running), 10_000);
 
     const queryId = randomUUID();
     const runningQueryMarker = `e2e-running-query-${queryId}`;
-    const runningQuery = `-- ${runningQueryMarker}\n${getLongRunningStreamQuery(500_000)}`;
+    // Large rows keep the unread stream running without CPU-heavy, slow-to-cancel hashing.
+    const runningQuery = `-- ${runningQueryMarker}
+$data = ListFromRange(1, 50000);
+SELECT x, String::RightPad(CAST(x AS String), 65536) AS payload
+FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;`;
     const storageState = await page.context().storageState();
     const queryRequestContext = await playwrightRequest.newContext({storageState});
-    const csrfToken = (await page.context().cookies(backend)).find(
-        ({name}) => name === 'csrf_token',
-    )?.value;
+    const cookies = await page.context().cookies(backend);
+    const csrfToken = cookies.find(({name}) => name === 'csrf_token')?.value;
+    const executionController = new AbortController();
     let runningQueryRequestError: unknown;
-    const runningQueryRequest = queryRequestContext
-        .post(`${backend}/viewer/query`, {
-            params: {database, schema: 'multipart', timeout: 15_000},
+    // Wait for response headers, keeping the stream open while checking the running row.
+    const runningQueryRequest = fetch(
+        `${backend}/viewer/query?${new URLSearchParams({
+            database,
+            schema: 'multipart',
+            timeout: '15000',
+        })}`,
+        {
+            method: 'POST',
             headers: {
                 Accept: 'multipart/form-data',
+                'Content-Type': 'application/json',
+                ...(cookies.length
+                    ? {Cookie: cookies.map(({name, value}) => `${name}=${value}`).join('; ')}
+                    : {}),
                 ...(csrfToken ? {'X-CSRF-Token': csrfToken} : {}),
             },
-            data: {
+            body: JSON.stringify({
                 query: runningQuery,
                 database,
                 action: 'execute-query',
@@ -72,21 +136,23 @@ async function checkRunningQuery(page: Page, failAssertion = false) {
                 schema: 'multipart',
                 query_id: queryId,
                 timeout: 15_000,
-            },
-            timeout: 20_000,
-        })
+            }),
+            signal: AbortSignal.any([executionController.signal, AbortSignal.timeout(20_000)]),
+        },
+    )
         .then(async (response) => {
-            if (!response.ok()) {
+            if (!response.ok) {
                 throw new Error(
-                    `Running query request failed with ${response.status()}: ${await response.text()}`,
+                    `Running query request failed with ${response.status}: ${await response.text()}`,
                 );
             }
+            return response;
         })
         .catch((error: unknown) => {
             runningQueryRequestError = error;
         });
 
-    const deadline = Date.now() + 10_000;
+    let deadline: number;
     let pendingPoll: Promise<boolean> | undefined;
     const refreshRunningQueries = async () => {
         if (runningQueryRequestError) {
@@ -94,39 +160,10 @@ async function checkRunningQuery(page: Page, failAssertion = false) {
         }
 
         const timeout = Math.max(1, deadline - Date.now());
-        const [requestResult, refreshResult] = await Promise.allSettled([
-            page.waitForEvent('requestfinished', {
-                predicate: (request) => {
-                    if (
-                        new URL(request.url()).pathname !== '/viewer/json/query' ||
-                        request.method() !== 'POST'
-                    ) {
-                        return false;
-                    }
-                    const body: {query?: string} = request.postDataJSON();
-                    return Boolean(
-                        body.query?.includes('`.sys/query_sessions`') &&
-                            /SELECT\s+\*/i.test(body.query),
-                    );
-                },
-                timeout,
-            }),
-            diagnostics.clickRefreshButton(timeout),
-        ]);
-        if (refreshResult.status === 'rejected') {
-            throw refreshResult.reason;
-        }
-        if (requestResult.status === 'rejected') {
-            throw requestResult.reason;
-        }
-        const response = await requestResult.value.response();
-        if (!response) {
-            throw new Error('Running queries request completed without a response');
-        }
-        expect(response.ok(), `Running queries HTTP status: ${response.status()}`).toBe(true);
-        const body: ExecuteQueryResponse & {status?: string} = await response.json();
-        expect(body.status, `Running queries response: ${await response.text()}`).toBe('SUCCESS');
-        const result = body.result?.[0];
+        const result = await readRunningQueries(
+            () => diagnostics.clickRefreshButton(timeout),
+            timeout,
+        );
         const queryColumn = result?.columns?.findIndex(({name}) => name === 'Query') ?? -1;
         const stateColumn = result?.columns?.findIndex(({name}) => name === 'State') ?? -1;
         return Boolean(
@@ -166,7 +203,14 @@ async function checkRunningQuery(page: Page, failAssertion = false) {
         );
     };
 
+    let checkError: unknown;
+    let cleanupError: unknown;
     try {
+        await runningQueryRequest;
+        if (runningQueryRequestError) {
+            throw runningQueryRequestError;
+        }
+        deadline = Date.now() + 10_000;
         await expect
             .poll(
                 () => {
@@ -184,12 +228,13 @@ async function checkRunningQuery(page: Page, failAssertion = false) {
                 true,
             );
         }
+    } catch (error) {
+        checkError = error;
     } finally {
         await pendingPoll?.catch(() => undefined);
         try {
-            // HTTP cancellation can finish before the server query actually stops.
-            await runningQueryRequest;
-            if (runningQueryRequestError || (await isRunningQueryActive())) {
+            try {
+                // Cancel while the viewer still owns query_id, before its execution timeout.
                 const cancelled = await queryRequestContext.post(`${backend}/viewer/json/query`, {
                     params: {database, schema: 'multi'},
                     headers: csrfToken ? {'X-CSRF-Token': csrfToken} : {},
@@ -201,19 +246,41 @@ async function checkRunningQuery(page: Page, failAssertion = false) {
                     },
                     timeout: 5_000,
                 });
-                expect(cancelled.ok(), `Cancel request HTTP status: ${cancelled.status()}`).toBe(
-                    true,
-                );
+                if (!cancelled.ok()) {
+                    const message = await cancelled.text();
+                    // Completion can remove the cancellation handle before session state catches up.
+                    expect(
+                        cancelled.status() === 400 && message.trim() === 'Query not found',
+                        `Cancel request HTTP status: ${cancelled.status()}: ${message}`,
+                    ).toBe(true);
+                }
+            } finally {
+                executionController.abort();
+                await runningQueryRequest;
+                await expect
+                    .poll(isRunningQueryActive, {
+                        timeout: 5_000,
+                        message: 'The test query must no longer be active on the server',
+                    })
+                    .toBe(false);
             }
-            await expect
-                .poll(isRunningQueryActive, {
-                    timeout: 5_000,
-                    message: 'The test query must no longer be active on the server',
-                })
-                .toBe(false);
+        } catch (error) {
+            cleanupError = error;
         } finally {
             await queryRequestContext.dispose();
         }
+    }
+    if (checkError !== undefined && cleanupError !== undefined) {
+        throw new AggregateError(
+            [checkError, cleanupError],
+            'Running query check and cleanup both failed',
+        );
+    }
+    if (cleanupError !== undefined) {
+        throw cleanupError;
+    }
+    if (checkError !== undefined) {
+        throw checkError;
     }
     if (runningQueryRequestError) {
         throw runningQueryRequestError;
