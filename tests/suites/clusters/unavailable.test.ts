@@ -127,6 +127,40 @@ test('filters by availability and keeps the selector available during search', a
     await expect(availability).toBeVisible();
 });
 
+test('does not activate or change the selected row from an unavailable label', async ({page}) => {
+    await openClusters(page);
+    await toggleAvailability(page, 'Unavailable');
+    const list = page.locator('.ydb-clusters');
+    await list.getByPlaceholder('Cluster name, version, domain, host...').focus();
+    await page.keyboard.press('ArrowDown');
+    const selectedRow = list.locator('.ydb-keyboard-focused-row');
+    await expect(selectedRow).toBeVisible();
+    await expect(
+        selectedRow.getByRole('link', {name: 'unavailable-json', exact: true}),
+    ).toHaveCount(0);
+    const selectedClusterName = await selectedRow
+        .locator('.ydb-clusters__cluster-name')
+        .innerText();
+    const clusterLink = list.getByRole('link', {name: 'unavailable-json', exact: true});
+    const label = list
+        .getByRole('row')
+        .filter({hasText: 'unavailable-json'})
+        .getByTestId('cluster-unavailable-label');
+    const listUrl = page.url();
+    await clusterLink.focus();
+    await page.keyboard.press('Tab');
+    await expect(label).toBeFocused();
+
+    for (const key of ['Enter', 'ArrowDown', 'ArrowUp']) {
+        await page.keyboard.press(key);
+        await expect(page).toHaveURL(listUrl);
+        await expect(label).toBeFocused();
+        await expect(selectedRow.locator('.ydb-clusters__cluster-name')).toHaveText(
+            selectedClusterName,
+        );
+    }
+});
+
 test('combines availability with the version filter', async ({page}) => {
     await openClusters(page);
     const list = page.locator('.ydb-clusters');

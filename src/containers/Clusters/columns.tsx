@@ -278,6 +278,11 @@ function ClusterName({row}: ClusterNameProps) {
                         className={b('unavailable-label')}
                         tabIndex={0}
                         data-qa="cluster-unavailable-label"
+                        onKeyDown={(event) => {
+                            if (['ArrowUp', 'ArrowDown', 'Enter'].includes(event.key)) {
+                                event.stopPropagation();
+                            }
+                        }}
                     >
                         <Label
                             theme="unknown"
