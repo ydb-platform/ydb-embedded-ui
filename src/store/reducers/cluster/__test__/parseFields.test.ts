@@ -3,6 +3,7 @@ import {
     parseLinksField,
     parseLoggingUrls,
     parseMonitoringField,
+    parseSettingsField,
     parseTraceField,
 } from '../parseFields';
 
@@ -155,6 +156,29 @@ describe('parseTraceField', () => {
     test('It should return the object as-is if input is already an object', () => {
         const traceObject = {url: 'https://tracing.com/trace?cluster=my_cluster'};
         expect(parseTraceField(traceObject)).toEqual(traceObject);
+    });
+});
+
+describe.each(['object', 'JSON'])('parseSettingsField (%s)', (format) => {
+    const otherSettings = {
+        use_meta_proxy: false,
+        cluster_domain: 'example.test',
+        cluster_external_name: 'external',
+    };
+
+    test.each([true, false, undefined])('preserves unavailable=%s', (unavailable) => {
+        const settings = {...otherSettings, unavailable};
+        const parsed = parseSettingsField(format === 'JSON' ? JSON.stringify(settings) : settings);
+
+        expect(parsed).toEqual(settings);
+    });
+
+    test.each([null, 'true'])('preserves other settings when unavailable=%s', (unavailable) => {
+        const json = JSON.stringify({...otherSettings, unavailable});
+        const parsed = parseSettingsField(format === 'JSON' ? json : JSON.parse(json));
+
+        expect(parsed).toMatchObject(otherSettings);
+        expect(parsed?.unavailable).not.toBe(true);
     });
 });
 

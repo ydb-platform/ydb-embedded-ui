@@ -118,7 +118,7 @@ export function parseLoggingUrls(
 }
 
 const settingsSchema = z.object({
-    unavailable: z.boolean().optional(),
+    unavailable: z.boolean().optional().catch(undefined),
     use_meta_proxy: z.boolean().optional(),
     cluster_domain: z.string().optional(),
     cluster_external_name: z.string().optional(),
