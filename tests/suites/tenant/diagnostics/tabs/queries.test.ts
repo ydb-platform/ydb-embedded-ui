@@ -1,11 +1,10 @@
-import {expect, test} from '@playwright/test';
+import {expect, request as playwrightRequest, test} from '@playwright/test';
 
-import {prepareQueryWithPragmas} from '../../../../../src/store/reducers/query/utils';
-import {defaultPragma} from '../../../../../src/utils/query';
+import type {ExecuteQueryResponse} from '../../../../../src/types/api/query';
 import {getClipboardContent} from '../../../../utils/clipboard';
-import {database} from '../../../../utils/constants';
+import {backend, database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
-import {longRunningQuery, longRunningStreamQuery} from '../../constants';
+import {getLongRunningStreamQuery, longRunningStreamQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {
     Diagnostics,
@@ -53,24 +52,127 @@ test.describe('Diagnostics Queries tab', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            databasePage: 'query',
+            databasePage: 'database',
+            diagnosticsTab: 'topQueries',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        const queryEditor = new QueryEditor(page);
-
-        await queryEditor.setQuery(longRunningQuery);
-        await queryEditor.clickRunButton();
-
-        const inProgressStatuses = ['Preparing', 'Running', 'Fetching'];
-        await expect(queryEditor.waitForAnyStatus(inProgressStatuses)).resolves.toBeTruthy();
-        const diagnostics = await navigateToTopQueries(tenantPage);
+        const diagnostics = new Diagnostics(page);
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
-        const finalQueryText = prepareQueryWithPragmas(longRunningQuery, defaultPragma);
-        expect(
-            await diagnostics.table.waitForCellValueByHeader(1, 'Query text', finalQueryText),
-        ).toBe(true);
+
+        const runningQueryMarker = `e2e-running-query-${test.info().project.name}-${Date.now()}`;
+        const runningQuery = `-- ${runningQueryMarker}\n${getLongRunningStreamQuery(500_000)}`;
+        const storageState = await page.context().storageState();
+        const queryRequestContext = await playwrightRequest.newContext({storageState});
+        const csrfToken = (await page.context().cookies(backend)).find(
+            ({name}) => name === 'csrf_token',
+        )?.value;
+        let runningQueryRequestError: unknown;
+        const runningQueryRequest = queryRequestContext
+            .post(`${backend}/viewer/query`, {
+                params: {database, schema: 'multipart'},
+                headers: {
+                    Accept: 'multipart/form-data',
+                    ...(csrfToken ? {'X-CSRF-Token': csrfToken} : {}),
+                },
+                data: {
+                    query: runningQuery,
+                    database,
+                    action: 'execute-query',
+                    syntax: 'yql_v1',
+                    schema: 'multipart',
+                },
+                timeout: 20_000,
+            })
+            .then(async (response) => {
+                if (!response.ok()) {
+                    throw new Error(
+                        `Running query request failed with ${response.status()}: ${await response.text()}`,
+                    );
+                }
+            })
+            .catch((error: unknown) => {
+                runningQueryRequestError = error;
+            });
+
+        const deadline = Date.now() + 10_000;
+        let pendingPoll: Promise<boolean> | undefined;
+        const refreshRunningQueries = async () => {
+            if (runningQueryRequestError) {
+                throw runningQueryRequestError;
+            }
+
+            const timeout = Math.max(1, deadline - Date.now());
+            const [requestResult, refreshResult] = await Promise.allSettled([
+                page.waitForEvent('requestfinished', {
+                    predicate: (request) => {
+                        if (
+                            new URL(request.url()).pathname !== '/viewer/json/query' ||
+                            request.method() !== 'POST'
+                        ) {
+                            return false;
+                        }
+                        const body: {query?: string} = request.postDataJSON();
+                        return Boolean(
+                            body.query?.includes('`.sys/query_sessions`') &&
+                                /SELECT\s+\*/i.test(body.query),
+                        );
+                    },
+                    timeout,
+                }),
+                diagnostics.clickRefreshButton(timeout),
+            ]);
+            if (refreshResult.status === 'rejected') {
+                throw refreshResult.reason;
+            }
+            if (requestResult.status === 'rejected') {
+                throw requestResult.reason;
+            }
+            const response = await requestResult.value.response();
+            if (!response) {
+                throw new Error('Running queries request completed without a response');
+            }
+            expect(response.ok(), `Running queries HTTP status: ${response.status()}`).toBe(true);
+            const body: ExecuteQueryResponse & {status?: string} = await response.json();
+            expect(body.status, `Running queries response: ${await response.text()}`).toBe(
+                'SUCCESS',
+            );
+            const result = body.result?.[0];
+            const queryColumn = result?.columns?.findIndex(({name}) => name === 'Query') ?? -1;
+            return Boolean(
+                result?.rows?.some((row) => {
+                    const query = row[queryColumn];
+                    return typeof query === 'string' && query.includes(runningQueryMarker);
+                }),
+            );
+        };
+
+        try {
+            await expect
+                .poll(
+                    () => {
+                        pendingPoll = refreshRunningQueries();
+                        return pendingPoll;
+                    },
+                    {timeout: 10_000},
+                )
+                .toBe(true);
+            await expect(
+                page.locator('.ydb-fixed-height-query').filter({hasText: runningQueryMarker}),
+            ).toBeVisible();
+        } finally {
+            await pendingPoll?.catch(() => undefined);
+            try {
+                // Closing the HTTP context can leave the server query running.
+                await runningQueryRequest;
+            } finally {
+                await queryRequestContext.dispose();
+            }
+        }
+        if (runningQueryRequestError) {
+            throw runningQueryRequestError;
+        }
     });
 
     test('Query tab defaults to Top mode', async ({page}) => {
