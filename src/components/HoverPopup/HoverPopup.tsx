@@ -2,6 +2,7 @@ import React from 'react';
 
 import type {PopupProps} from '@gravity-ui/uikit';
 import {Popup} from '@gravity-ui/uikit';
+import debounce from 'lodash/debounce';
 
 import {YDB_POPOVER_CLASS_NAME} from '../../utils/constants';
 import {useEventHandler} from '../../utils/hooks/useEventHandler';
@@ -11,13 +12,42 @@ import {usePopupPriority} from './usePopupPriority';
 
 const DEBOUNCE_TIMEOUT = 100;
 
+function useVisibleAnchor(
+    anchorElement: HTMLElement | null,
+    open: boolean,
+    onHidden: VoidFunction,
+) {
+    const [visibleAnchor, setVisibleAnchor] = React.useState<HTMLElement | null>(null);
+    // Mouse events can arrive before React renders the observer's next visibility state.
+    const visibleAnchorRef = React.useRef<HTMLElement | null>(null);
+
+    React.useLayoutEffect(() => {
+        setVisibleAnchor(null);
+        visibleAnchorRef.current = null;
+        if (!open || !anchorElement) {
+            return undefined;
+        }
+
+        const observer = new IntersectionObserver(([entry]) => {
+            visibleAnchorRef.current = entry.isIntersecting ? anchorElement : null;
+            setVisibleAnchor(visibleAnchorRef.current);
+            if (!entry.isIntersecting) {
+                onHidden();
+            }
+        });
+        observer.observe(anchorElement);
+        return () => observer.disconnect();
+    }, [anchorElement, open, onHidden]);
+
+    return [anchorElement !== null && visibleAnchor === anchorElement, visibleAnchorRef] as const;
+}
+
 type HoverPopupProps = {
     children: React.ReactNode;
     renderPopupContent: (controls: {
         onClose: VoidFunction;
         holdOpen: () => VoidFunction;
     }) => React.ReactNode;
-    // Controlled visibility; omit to use local hover state.
     showPopup?: boolean;
     anchorRef?: React.RefObject<HTMLElement>;
     onShowPopup?: VoidFunction;
@@ -42,76 +72,101 @@ export const HoverPopup = ({
     delayClose = DEBOUNCE_TIMEOUT,
     delayOpen = DEBOUNCE_TIMEOUT,
 }: HoverPopupProps) => {
-    const [localOpen, setLocalOpen] = React.useState(false);
-    const open = showPopup ?? localOpen;
+    const [isPopupVisible, setIsPopupVisible] = React.useState(false);
+    const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
+    const [isFocused, setIsFocused] = React.useState(false);
     const [hoverClosing, setHoverClosing] = React.useState(false);
-    const observeAnchor = open || hoverClosing;
-    const timer = React.useRef<ReturnType<typeof setTimeout>>();
-    const keepOpen = React.useRef<'context-menu' | object | null>(null);
+    const dialogHoldRef = React.useRef<object | null>(null);
+
     const anchor = React.useRef<HTMLSpanElement>(null);
     const popupContent = React.useRef<HTMLDivElement>(null);
-    const anchorElement = anchorRef?.current || anchor.current;
-    const [visibleAnchor, setVisibleAnchor] = React.useState<HTMLElement | null>(null);
-    const visibleAnchorRef = React.useRef<HTMLElement | null>(null);
     const {activate, zIndex} = usePopupPriority();
+    const bringToFront = useEventHandler(() => activate(anchorRef?.current || anchor.current));
 
-    const applyOpen = useEventHandler((next: boolean, reason: 'hover' | 'dismiss') => {
-        setHoverClosing(
-            !next && reason === 'hover' && open && visibleAnchorRef.current === anchorElement,
-        );
-        if (showPopup === undefined) {
-            setLocalOpen(next);
+    const reportedOpenRef = React.useRef(false);
+
+    const reportOpen = useEventHandler((nextOpen: boolean, force = false) => {
+        if (!force && reportedOpenRef.current === nextOpen) {
+            return;
         }
-        (next ? onShowPopup : onHidePopup)?.();
+
+        reportedOpenRef.current = nextOpen;
+
+        if (nextOpen) {
+            onShowPopup?.();
+        } else {
+            onHidePopup?.();
+        }
     });
-    const requestOpen = useEventHandler(
-        (next: boolean, delay = 0, reason: 'hover' | 'dismiss' = 'hover') => {
-            clearTimeout(timer.current);
-            if (!next && keepOpen.current) {
-                return;
-            }
-            if (delay) {
-                timer.current = setTimeout(() => applyOpen(next, reason), delay);
-            } else {
-                applyOpen(next, reason);
-            }
-        },
+
+    const debouncedHandleShowPopup = React.useMemo(
+        () =>
+            debounce(() => {
+                setIsPopupVisible(true);
+                reportOpen(true);
+            }, delayOpen),
+        [delayOpen, reportOpen],
     );
 
-    React.useEffect(
-        () => () => {
-            clearTimeout(timer.current);
-            keepOpen.current = null;
-        },
-        [],
+    const hidePopup = useEventHandler(() => {
+        if (dialogHoldRef.current || isFocused) {
+            return;
+        }
+        setHoverClosing(open && visibleAnchorRef.current === anchorElement);
+        setIsPopupVisible(false);
+        reportOpen(false);
+    });
+
+    const debouncedHandleHidePopup = React.useMemo(
+        () => debounce(hidePopup, delayClose),
+        [delayClose, hidePopup],
     );
 
-    const closePopup = () => {
-        keepOpen.current = null;
-        requestOpen(false, 0, 'dismiss');
+    React.useEffect(() => {
+        return () => {
+            debouncedHandleShowPopup.cancel();
+            debouncedHandleHidePopup.cancel();
+            dialogHoldRef.current = null;
+        };
+    }, [debouncedHandleShowPopup, debouncedHandleHidePopup]);
+
+    const closePopup = React.useCallback(() => {
+        debouncedHandleShowPopup.cancel();
+        debouncedHandleHidePopup.cancel();
+        dialogHoldRef.current = null;
+        setIsPopupVisible(false);
+        setIsPopupContentHovered(false);
+        setIsFocused(false);
+        setHoverClosing(false);
+        reportOpen(false, true);
         onClosePopup?.();
-    };
-    const leave = () => requestOpen(false, delayClose);
-    React.useLayoutEffect(() => {
-        setVisibleAnchor(null);
-        visibleAnchorRef.current = null;
-        if (!observeAnchor || !anchorElement) {
+    }, [debouncedHandleHidePopup, debouncedHandleShowPopup, onClosePopup, reportOpen]);
+
+    const hideClippedPopup = useEventHandler(() => {
+        debouncedHandleShowPopup.cancel();
+        setIsPopupContentHovered(false);
+        setIsFocused(false);
+        setHoverClosing(false);
+        debouncedHandleHidePopup();
+    });
+
+    const internalOpen = isPopupVisible || isPopupContentHovered || isFocused;
+    const open = Boolean(internalOpen || showPopup);
+
+    const anchorElement = anchorRef?.current || anchor.current;
+    // Release only this popup's hover source; a hovered peer can keep the pair open.
+    const [isAnchorVisible, visibleAnchorRef] = useVisibleAnchor(
+        anchorElement,
+        open || hoverClosing,
+        hideClippedPopup,
+    );
+    const container = getPopupScrollContainer(anchorElement);
+
+    React.useEffect(() => {
+        if (!hoverClosing || !anchorElement) {
             return undefined;
         }
-        const observer = new IntersectionObserver(([entry]) => {
-            // Mouse events can arrive before React renders this visibility change.
-            visibleAnchorRef.current = entry.isIntersecting ? anchorElement : null;
-            setVisibleAnchor(visibleAnchorRef.current);
-            if (!entry.isIntersecting) {
-                setHoverClosing(false);
-                if (keepOpen.current === 'context-menu') {
-                    keepOpen.current = null;
-                }
-                requestOpen(false, delayClose, 'dismiss');
-            }
-        });
-        observer.observe(anchorElement);
-        // Escape can dismiss this popup through its paired sibling's handler.
+        // Escape may close this popup through its paired sibling's handler.
         const preventHoverReturn = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 setHoverClosing(false);
@@ -119,103 +174,144 @@ export const HoverPopup = ({
         };
         const doc = anchorElement.ownerDocument;
         doc.addEventListener('keydown', preventHoverReturn, true);
-        return () => {
-            observer.disconnect();
-            doc.removeEventListener('keydown', preventHoverReturn, true);
-        };
-    }, [anchorElement, observeAnchor, delayClose, requestOpen]);
+        return () => doc.removeEventListener('keydown', preventHoverReturn, true);
+    }, [anchorElement, hoverClosing]);
+
     const resumeHover = useEventHandler(() => {
+        const contentHovered = Boolean(popupContent.current?.matches(':hover'));
         const hovered =
             visibleAnchorRef.current === anchorElement &&
-            (anchorElement?.matches(':hover') || popupContent.current?.matches(':hover'));
-        requestOpen(Boolean(hovered), hovered ? 0 : delayClose);
+            (anchorElement?.matches(':hover') || contentHovered);
+        debouncedHandleShowPopup.cancel();
+        debouncedHandleHidePopup.cancel();
+        setIsFocused(false);
+        setIsPopupContentHovered(Boolean(hovered && contentHovered));
+        if (hovered) {
+            setIsPopupVisible(true);
+            reportOpen(true);
+        } else {
+            debouncedHandleHidePopup();
+        }
     });
+
     const holdOpen = () => {
         const interaction = {};
-        keepOpen.current = interaction;
-        requestOpen(true);
+        dialogHoldRef.current = interaction;
+        debouncedHandleShowPopup.cancel();
+        debouncedHandleHidePopup.cancel();
+        setIsFocused(false);
+        setIsPopupVisible(true);
+        reportOpen(true);
         return () => {
-            if (keepOpen.current === interaction) {
-                keepOpen.current = null;
+            if (dialogHoldRef.current === interaction) {
+                dialogHoldRef.current = null;
                 resumeHover();
             }
         };
     };
-    const enter = (event: React.MouseEvent, delay = 0) => {
-        if (event.buttons === 0) {
-            activate(anchorElement);
+
+    const onMouseEnter = (event: React.MouseEvent<HTMLSpanElement>) => {
+        if (event.buttons !== 0) {
+            return;
         }
-        requestOpen(true, delay);
+        bringToFront();
+        debouncedHandleHidePopup.cancel();
+        debouncedHandleShowPopup();
     };
+
+    const onMouseLeave = () => {
+        debouncedHandleShowPopup.cancel();
+        debouncedHandleHidePopup();
+    };
+
+    const onPopupMouseEnter = React.useCallback(
+        (event: React.MouseEvent<HTMLDivElement>) => {
+            if ((!open && !hoverClosing) || visibleAnchorRef.current !== anchorElement) {
+                return;
+            }
+            if (event.buttons === 0) {
+                bringToFront();
+            }
+            debouncedHandleHidePopup.cancel();
+            setHoverClosing(false);
+            setIsPopupVisible(true);
+            setIsPopupContentHovered(true);
+            reportOpen(true);
+        },
+        [
+            bringToFront,
+            reportOpen,
+            debouncedHandleHidePopup,
+            open,
+            hoverClosing,
+            visibleAnchorRef,
+            anchorElement,
+        ],
+    );
+
+    const onPopupMouseLeave = React.useCallback(() => {
+        setIsPopupContentHovered(false);
+        debouncedHandleHidePopup();
+    }, [debouncedHandleHidePopup]);
+
+    const onPopupContextMenu = React.useCallback(() => {
+        if (dialogHoldRef.current || !open || visibleAnchorRef.current !== anchorElement) {
+            return;
+        }
+        bringToFront();
+        setIsFocused(true);
+        reportOpen(true);
+    }, [bringToFront, reportOpen, open, visibleAnchorRef, anchorElement]);
+
+    const onPopupBlur = useEventHandler(() => {
+        if (isFocused && !dialogHoldRef.current) {
+            resumeHover();
+        }
+    });
+
+    const onPopupEscapeKeyDown = React.useCallback(() => {
+        if (!dialogHoldRef.current) {
+            closePopup();
+        }
+    }, [closePopup]);
 
     return (
         <React.Fragment>
-            <span
-                ref={anchor}
-                onMouseEnter={(event) => {
-                    if (event.buttons === 0) {
-                        enter(event, delayOpen);
-                    }
-                }}
-                onMouseLeave={leave}
-            >
+            <span ref={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
                 {children}
             </span>
             {anchorElement ? (
                 <Popup
-                    container={getPopupScrollContainer(anchorElement)}
+                    container={container}
                     zIndex={zIndex}
                     // Keep portal typography when the page uses a different font.
                     floatingStyles={{fontFamily: 'var(--g-text-body-font-family)'}}
                     anchorElement={anchorElement}
                     onOpenChange={(_open, _event, reason) => {
-                        if (
-                            reason === 'escape-key' &&
-                            (!keepOpen.current || keepOpen.current === 'context-menu')
-                        ) {
-                            closePopup();
-                        } else if (
-                            reason === 'outside-press' &&
-                            keepOpen.current === 'context-menu'
-                        ) {
-                            // Release this pin without dismissing a hovered peer or its dialog.
-                            keepOpen.current = null;
-                            resumeHover();
+                        if (reason === 'escape-key') {
+                            onPopupEscapeKeyDown();
+                        } else if (reason === 'outside-press') {
+                            onPopupBlur();
                         }
                     }}
                     placement={placement}
+                    // Exiting popups must not expand the page when their anchors scroll offscreen.
                     strategy="fixed"
                     returnFocus={false}
                     hasArrow
-                    open={open && visibleAnchor === anchorElement}
+                    open={open && isAnchorVisible}
                     onTransitionOutComplete={() => setHoverClosing(false)}
+                    // bigger offset for easier switching to neighbour nodes
+                    // matches the default offset for popup with arrow out of a sense of beauty
                     offset={offset || {mainAxis: 12, crossAxis: 0}}
                 >
                     <div
                         ref={popupContent}
                         className={contentClassName}
-                        onContextMenu={() => {
-                            if (open && visibleAnchorRef.current === anchorElement) {
-                                keepOpen.current ||= 'context-menu';
-                                activate(anchorElement);
-                                requestOpen(true);
-                            }
-                        }}
-                        onMouseEnter={(event) => {
-                            if (
-                                (open || hoverClosing) &&
-                                visibleAnchorRef.current === anchorElement
-                            ) {
-                                enter(event);
-                            }
-                        }}
-                        onMouseLeave={leave}
-                        onBlur={() => {
-                            if (keepOpen.current === 'context-menu') {
-                                keepOpen.current = null;
-                                resumeHover();
-                            }
-                        }}
+                        onContextMenu={onPopupContextMenu}
+                        onMouseEnter={onPopupMouseEnter}
+                        onMouseLeave={onPopupMouseLeave}
+                        onBlur={onPopupBlur}
                     >
                         <div className={YDB_POPOVER_CLASS_NAME}>
                             {renderPopupContent({onClose: closePopup, holdOpen})}

@@ -9,6 +9,7 @@ import type {
     PDisksGroupByValue,
     VDisksGroupByValue,
 } from '../../../src/containers/Storage/StorageExpertModePanel/constants';
+import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../../../src/containers/Storage/shared';
 import {ECapacityAlert, EFlag} from '../../../src/types/api/enums';
 import {TPDiskState} from '../../../src/types/api/pdisk';
 import {EVDiskState} from '../../../src/types/api/vdisk';
@@ -625,6 +626,73 @@ for (const firstDisk of ['vdisk', 'pdisk'] as const) {
         for (const popup of nextPopups) {
             await expect(popup).toBeHidden();
         }
+    });
+}
+
+for (const openDialog of [false, true]) {
+    test(`keeps the active VDisk ${openDialog ? 'eviction dialog' : 'card'} after briefly crossing another disk`, async ({
+        page,
+    }) => {
+        const response = createMockStorageGroupsResponse();
+        const disks = response.StorageGroups?.[0].VDisks;
+        const first = disks?.[0];
+        const complete = disks?.[ALL_GREEN_VDISK_INDEX].Whiteboard;
+        if (!first || !complete?.VDiskId) {
+            throw new Error('Missing storage VDisk fixture');
+        }
+        first.Whiteboard = {
+            ...complete,
+            VDiskId: {...complete.VDiskId, VDisk: 0},
+            NodeId: 7000,
+            PDiskId: 100,
+            VDiskSlotId: 200,
+        };
+        await page.setViewportSize({width: 1800, height: 1000});
+        await enableExpertMode(page, VDisksGroupBy.State, false);
+        await setupVDiskColoringMocks(page, response);
+        await gotoStoragePage(page, VDisksGroupBy.State, false);
+        const row = getStorageGroupRow(page, 0);
+        const disksInRow = row.locator('.ydb-storage-vdisks__item');
+        const popup = page.locator('.vdisk-storage-popup').filter({hasText: '9000000000-1-0-0-0'});
+        const otherPopup = page
+            .locator('.vdisk-storage-popup')
+            .filter({hasText: '9000000000-1-0-0-1'});
+        await disksInRow.nth(0).hover();
+        await expect(popup).toBeVisible();
+        await popup.getByText('9000000000-1-0-0-0', {exact: true}).hover();
+        const otherBox = await disksInRow.nth(1).boundingBox();
+        const target = openDialog
+            ? popup.getByRole('button', {name: 'Evict VDisk', exact: true})
+            : popup.getByText('9000000000-1-0-0-0', {exact: true});
+        const targetBox = await target.boundingBox();
+        if (!otherBox || !targetBox) {
+            throw new Error('Missing disk or popup target bounds');
+        }
+        await page.clock.install({time: new Date('2026-01-01T00:00:00Z')});
+        await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
+        await page.mouse.move(otherBox.x + otherBox.width / 2, otherBox.y + otherBox.height / 2);
+        await page.clock.runFor(DISKS_POPUP_DEBOUNCE_TIMEOUT / 4);
+        await page.mouse.move(
+            targetBox.x + targetBox.width / 2,
+            targetBox.y + targetBox.height / 2,
+        );
+        if (openDialog) {
+            await page.mouse.click(
+                targetBox.x + targetBox.width / 2,
+                targetBox.y + targetBox.height / 2,
+            );
+        }
+        await page.clock.runFor(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+        await page.clock.resume();
+        await expect(otherPopup).toHaveCount(0);
+        await expect(popup).toBeVisible();
+        if (openDialog) {
+            await expect(page.getByRole('dialog')).toBeVisible();
+            await page.keyboard.press('Escape');
+            await expect(page.getByRole('dialog')).toBeHidden();
+        }
+        await page.mouse.move(0, 0);
+        await expect(popup).toBeHidden();
     });
 }
 
