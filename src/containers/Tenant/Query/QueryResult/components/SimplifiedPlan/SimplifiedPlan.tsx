@@ -36,7 +36,8 @@ const columns: ColumnDef<ExtendedSimplifiesPlanItem>[] = [
         accessorKey: 'name',
         accessorFn: nameAccessorFn,
         header: () => <ColumnHeader>Operation</ColumnHeader>,
-        size: 600,
+        size: 400,
+        minSize: 240,
         cell: (info) => (
             <OperationCell
                 row={info.row}

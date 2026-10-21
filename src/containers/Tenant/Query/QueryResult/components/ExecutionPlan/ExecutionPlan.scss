@@ -1,0 +1,30 @@
+.ydb-execution-plan {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+    min-height: var(--g-spacing-10);
+
+    &__viewport {
+        overflow: auto;
+
+        width: 100%;
+        height: 100%;
+        padding: var(--g-spacing-4);
+        padding-top: var(--g-spacing-10);
+    }
+
+    &__download {
+        position: absolute;
+        z-index: 1;
+        top: var(--g-spacing-3);
+        right: var(--g-spacing-6);
+
+        border-radius: var(--g-border-radius-s);
+        background: var(--g-color-base-background);
+    }
+
+    &__error {
+        padding: var(--g-spacing-4);
+    }
+}

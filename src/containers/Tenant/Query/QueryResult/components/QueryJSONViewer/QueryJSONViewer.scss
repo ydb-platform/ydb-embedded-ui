@@ -1,12 +1,11 @@
 .ydb-query-json-viewer {
     width: 100%;
     height: 100%;
-    padding: 15px 0;
+    padding: var(--g-spacing-3) var(--g-spacing-6) var(--g-spacing-3) var(--g-spacing-4);
     &__tree {
         overflow-y: auto;
 
         width: 100%;
         height: 100%;
-        padding: 0 10px;
     }
 }

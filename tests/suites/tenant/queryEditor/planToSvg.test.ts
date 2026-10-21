@@ -27,13 +27,12 @@ async function runQuery(queryEditor: QueryEditor) {
 
 async function openResultActions(page: Page) {
     const controls = page.locator('.ydb-query-result__controls-right');
-    const dropdownButton = controls.locator('.g-dropdown-menu__switcher-wrapper button');
-    await expect(dropdownButton).toBeVisible();
-    await dropdownButton.click();
-    return dropdownButton;
+    const executionPlan = page.getByRole('radio', {name: 'Execution Plan', exact: true});
+    await executionPlan.click();
+    return controls;
 }
 
-test.describe('Plan to SVG functionality', () => {
+test.describe('Plan to SVG functionality @query-editor-redesign', () => {
     test.beforeEach(async ({page}) => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto({
@@ -51,15 +50,9 @@ test.describe('Plan to SVG functionality', () => {
         await setStatisticsMode(queryEditor, STATISTICS_MODES.none);
         await openResultActions(page);
 
-        const openInNewTabOption = page.getByRole('menuitem', {name: /Open Execution Plan/i});
-        await expect(openInNewTabOption).toBeVisible();
-        await expect(page.getByRole('menuitem', {name: /Download Execution Plan/i})).toBeVisible();
-
-        const popupPromise = page.waitForEvent('popup');
-        await openInNewTabOption.click();
-        const popup = await popupPromise;
-        await popup.waitForLoadState('domcontentloaded');
-        await expect(popup.locator('svg').first()).toBeVisible();
+        const downloadButton = page.getByRole('button', {name: 'Download .SVG', exact: true});
+        await expect(downloadButton).toBeVisible();
+        await expect(page.getByRole('img', {name: 'Execution Plan'})).toBeVisible();
     });
 
     test('downloads a Profile execution plan as SVG', async ({page}) => {
@@ -69,9 +62,7 @@ test.describe('Plan to SVG functionality', () => {
         await openResultActions(page);
 
         const downloadPromise = page.waitForEvent('download');
-        const downloadPlanOption = page.getByRole('menuitem', {
-            name: /Download Execution Plan/i,
-        });
+        const downloadPlanOption = page.getByRole('button', {name: 'Download .SVG', exact: true});
         await expect(downloadPlanOption).toBeVisible();
         await downloadPlanOption.click();
 
@@ -92,20 +83,9 @@ test.describe('Plan to SVG functionality', () => {
             });
         });
 
-        const dropdownButton = await openResultActions(page);
-        const openExecutionPlanOption = page.getByRole('menuitem', {
-            name: /Open Execution Plan/i,
-        });
-        await expect(openExecutionPlanOption).toBeVisible();
-        await openExecutionPlanOption.click();
-
-        const errorToast = page.locator('.g-toast.g-toast_theme_danger');
-        await expect(errorToast).toBeVisible();
-        await expect(errorToast.locator('.g-toast__title')).toContainText('Error');
-
-        await dropdownButton.click();
-        await expect(openExecutionPlanOption).toBeVisible();
-        await expect(page.getByRole('menuitem', {name: /Download Execution Plan/i})).toBeVisible();
+        await openResultActions(page);
+        await expect(page.locator('.ydb-execution-plan__error').getByRole('alert')).toBeVisible();
+        await expect(page.getByRole('button', {name: 'Retry', exact: true})).toBeVisible();
     });
 
     test('does not show plan actions for a None statistics result', async ({page}) => {
@@ -114,7 +94,7 @@ test.describe('Plan to SVG functionality', () => {
         await runQuery(queryEditor);
         await openResultActions(page);
 
-        await expect(page.getByRole('menuitem', {name: /Open Execution Plan/i})).toHaveCount(0);
-        await expect(page.getByRole('menuitem', {name: /Download Execution Plan/i})).toHaveCount(0);
+        await expect(page.getByText('There is no execution plan for this query')).toBeVisible();
+        await expect(page.getByRole('button', {name: 'Download .SVG', exact: true})).toHaveCount(0);
     });
 });

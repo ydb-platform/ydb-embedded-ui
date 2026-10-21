@@ -1,12 +1,14 @@
 import React from 'react';
 
 import type {Settings} from '@gravity-ui/react-data-table';
-import {Flex, Tab, TabList, TabProvider, Text} from '@gravity-ui/uikit';
+import {Flex, Label, Tab, TabList, TabProvider, Text} from '@gravity-ui/uikit';
 
 import {QueryResultTable} from '../../../../../../components/QueryResultTable';
 import type {QuerySourcePosition} from '../../../../../../store/reducers/query/types';
 import type {ParsedResultSet} from '../../../../../../types/store/query';
 import {cn} from '../../../../../../utils/cn';
+import {configuredNumeral} from '../../../../../../utils/numeral';
+import i18n from '../../i18n';
 import {QueryResultError} from '../QueryResultError/QueryResultError';
 
 import './ResultSetsViewer.scss';
@@ -16,6 +18,7 @@ const b = cn('ydb-query-result-sets-viewer');
 interface ResultSetsViewerProps {
     resultSets?: ParsedResultSet[];
     selectedResultSet: number;
+    rowsPerSecond?: number;
     error?: unknown;
     sourcePosition?: QuerySourcePosition;
     tableSettings?: Partial<Settings>;
@@ -59,8 +62,17 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
         const result = resultSets?.[0];
         return (
             <Flex gap={2} alignItems="center" className={b('title')}>
-                <Text>{result?.truncated ? 'Truncated' : 'Result'}</Text>
-                <Text color="secondary">{result?.result?.length || 0}</Text>
+                <Text>{result?.truncated ? i18n('title.truncated') : i18n('title.result')}</Text>
+                <Text color="secondary">
+                    {configuredNumeral(result?.result?.length || 0).format('0,0')}
+                </Text>
+                {props.rowsPerSecond === undefined ? null : (
+                    <Label size="xs" className={b('throughput')}>
+                        {i18n('value_rows-per-second', {
+                            value: configuredNumeral(props.rowsPerSecond).format('0.[00]a'),
+                        })}
+                    </Label>
+                )}
             </Flex>
         );
     };

@@ -10,7 +10,9 @@ export class PaneWrapper {
 
     constructor(page: Page) {
         this.paneWrapper = page.locator('.query-editor__pane-wrapper');
-        this.radioButton = this.paneWrapper.locator('.g-segmented-radio-group');
+        this.radioButton = this.paneWrapper.locator(
+            '.ydb-query-result__controls-left .g-segmented-radio-group',
+        );
     }
 
     async selectTab(tabName: ResultTabNames) {

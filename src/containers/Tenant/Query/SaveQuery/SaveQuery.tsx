@@ -1,8 +1,9 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
+import {FloppyDisk} from '@gravity-ui/icons';
 import type {ButtonButtonProps} from '@gravity-ui/uikit';
-import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Dialog, DropdownMenu, Icon, TextInput} from '@gravity-ui/uikit';
 
 import {
     selectActiveTab,
@@ -82,16 +83,23 @@ function useSaveQueryHandler(dialogProps: SaveQueryDialogCommonProps) {
 
 interface SaveQueryButtonProps extends ButtonButtonProps {
     dialogProps: SaveQueryDialogCommonProps;
+    tooltipTitle?: string;
 }
 
-export function SaveQueryButton({dialogProps, children, ...buttonProps}: SaveQueryButtonProps) {
+export function SaveQueryButton({
+    dialogProps,
+    tooltipTitle,
+    children,
+    ...buttonProps
+}: SaveQueryButtonProps) {
     const onSaveQueryClick = useSaveQueryHandler(dialogProps);
 
-    return (
+    const button = (
         <Button onClick={onSaveQueryClick} {...buttonProps}>
             {children ?? i18n('action.save')}
         </Button>
     );
+    return tooltipTitle ? <ActionTooltip title={tooltipTitle}>{button}</ActionTooltip> : button;
 }
 
 export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
@@ -125,9 +133,11 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
             <DropdownMenu
                 items={items}
                 renderSwitcher={(props) => (
-                    <Button {...props} {...buttonProps}>
-                        {i18n('action.edit')}
-                    </Button>
+                    <ActionTooltip title={i18n('action.edit')}>
+                        <Button {...props} {...buttonProps} aria-label={i18n('action.edit')}>
+                            <Icon data={FloppyDisk} size={16} />
+                        </Button>
+                    </ActionTooltip>
                 )}
                 popupProps={{placement: 'top'}}
             />
@@ -137,7 +147,14 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     return currentSavedQueryName ? (
         renderSaveDropdownMenu()
     ) : (
-        <SaveQueryButton {...buttonProps} dialogProps={{queryBody: currentInput}} />
+        <SaveQueryButton
+            tooltipTitle={i18n('action.save')}
+            {...buttonProps}
+            aria-label={i18n('action.save')}
+            dialogProps={{queryBody: currentInput}}
+        >
+            <Icon data={FloppyDisk} size={16} />
+        </SaveQueryButton>
     );
 }
 
