@@ -7,6 +7,10 @@ import {TenantDrawerHealthcheck} from '../TenantDrawerHealthcheck';
 
 let mockHealthcheckStatus: SelfCheckResult | undefined;
 
+jest.mock('../../../utils/hooks/useWhoami', () => ({
+    useIsUserAllowedToMakeChanges: () => true,
+}));
+
 jest.mock('../../../components/Drawer', () => ({
     DrawerWrapper: ({title}: {title?: React.ReactNode}) => <div>{title}</div>,
 }));

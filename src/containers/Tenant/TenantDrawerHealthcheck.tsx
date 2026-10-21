@@ -5,6 +5,7 @@ import {
     selectCheckStatus,
 } from '../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {useTypedSelector} from '../../utils/hooks';
+import {useDatabaseHealthcheckAvailable} from '../../utils/hooks/useDatabaseHealthcheckAvailable';
 
 import {Healthcheck} from './Healthcheck/Healthcheck';
 import {HealthcheckDrawer} from './Healthcheck/components/HealthcheckDrawer';
@@ -19,6 +20,7 @@ interface TenantDrawerHealthcheckProps {
 }
 
 export function TenantDrawerHealthcheck({children, clusterName}: TenantDrawerHealthcheckProps) {
+    const healthcheckAvailable = useDatabaseHealthcheckAvailable();
     const {database} = useCurrentSchema();
     const {
         handleShowHealthcheckChange,
@@ -56,7 +58,7 @@ export function TenantDrawerHealthcheck({children, clusterName}: TenantDrawerHea
                       })
                     : undefined
             }
-            isDrawerVisible={Boolean(showHealthcheck)}
+            isDrawerVisible={Boolean(healthcheckAvailable && showHealthcheck)}
             onCloseDrawer={handleCloseDrawer}
             renderDrawerContent={renderDrawerContent}
             drawerId="tenant-healthcheck-details"
