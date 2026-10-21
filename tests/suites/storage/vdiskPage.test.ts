@@ -645,9 +645,11 @@ test.describe('VDisk page storage tab', () => {
         await expect(page.getByText('Space distribution', {exact: true})).toBeVisible();
 
         const pDiskPage = page.locator('.ydb-pdisk-page');
-        await expect(
-            pDiskPage.getByRole('heading', {name: `PDisk ${NODE_ID}-${PDISK_ID}`, exact: true}),
-        ).toBeVisible();
+        const pDiskHeading = pDiskPage.getByRole('heading', {
+            name: `PDisk ${NODE_ID}-${PDISK_ID}`,
+            exact: true,
+        });
+        await expect(pDiskHeading).toBeVisible();
         await expect(pDiskPage.getByText('PDisk Usage', {exact: true})).toBeVisible();
         const header = page.locator('header.header');
         const copyPDiskId = header.getByRole('button', {
@@ -696,6 +698,48 @@ test.describe('VDisk page storage tab', () => {
             await expectDefinitionListRowValue(logPopup, label, value);
         }
         await closeDiskPopup(page, logPopup);
+
+        await page.setViewportSize({width: 1440, height: 400});
+        await pDiskPage.evaluate((element) => element.scrollTo({top: 0}));
+        await expect(pDiskHeading).toBeInViewport();
+        const refreshInterval = autoRefreshControl.getByTestId('ydb-autorefresh-select');
+        const refreshBox = await autoRefreshControl.boundingBox();
+        expect(refreshBox).not.toBeNull();
+
+        await pDiskPage.evaluate((element) => element.scrollTo({top: element.scrollHeight}));
+        await expect
+            .poll(() => pDiskPage.evaluate((element) => element.scrollTop))
+            .toBeGreaterThan(0);
+        await expect(pDiskHeading).not.toBeInViewport();
+        await expect(refreshButton).toBeInViewport({ratio: 1});
+        await expect(refreshInterval).toBeInViewport({ratio: 1});
+        await expect.poll(() => autoRefreshControl.boundingBox()).toEqual(refreshBox);
+
+        const refreshResponse = page.waitForResponse((response) => {
+            const url = new URL(response.url());
+            return (
+                url.pathname.endsWith('/pdisk/info') &&
+                url.searchParams.get('node_id') === NODE_ID &&
+                url.searchParams.get('pdisk_id') === PDISK_ID
+            );
+        });
+        await refreshButton.click();
+        expect((await refreshResponse).ok()).toBe(true);
+
+        await refreshInterval.click();
+        await page.getByRole('option', {name: '15 sec', exact: true}).click();
+        await expect(refreshInterval).toHaveText('15 sec');
+        await expect(refreshButton).toBeInViewport({ratio: 1});
+        await expect(refreshInterval).toBeInViewport({ratio: 1});
+        await expect.poll(() => autoRefreshControl.boundingBox()).toEqual(refreshBox);
+        await expect
+            .poll(() => pDiskPage.evaluate((element) => element.scrollTop))
+            .toBeGreaterThan(0);
+
+        await refreshInterval.click();
+        await page.getByRole('option', {name: 'None', exact: true}).click();
+        await expect(refreshInterval).toHaveText('None');
+        await page.setViewportSize({width: 1440, height: 900});
 
         const pDiskUrl = page.url();
         await page.getByRole('button', {name: 'Back', exact: true}).click();
