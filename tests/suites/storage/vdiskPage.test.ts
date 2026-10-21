@@ -615,9 +615,19 @@ test.describe('VDisk page storage tab', () => {
 
         const storageDetails = page.locator('.ydb-vdisk-storage-details');
         const goToPDiskLink = storageDetails.getByRole('link', {name: 'Go to PDisk'});
+        const backButton = page.getByRole('button', {name: 'Back', exact: true});
+        const expectBackButtonToMatchBrowser = async () => {
+            const canGoBack = await page.evaluate(() => {
+                const navigation = (window as Window & {navigation?: {readonly canGoBack: boolean}})
+                    .navigation;
+                return navigation?.canGoBack ?? true;
+            });
+            await expect(backButton).toBeVisible({visible: canGoBack});
+            return canGoBack;
+        };
 
         await expect(goToPDiskLink).toBeVisible();
-        await expect(page.getByRole('button', {name: 'Back', exact: true})).toHaveCount(0);
+        await expectBackButtonToMatchBrowser();
         const autoRefreshControl = page.locator('.auto-refresh-control');
         const refreshButton = autoRefreshControl.getByRole('button', {
             name: 'Refresh',
@@ -643,6 +653,7 @@ test.describe('VDisk page storage tab', () => {
         await expect(page.locator('.ydb-pdisk-page__info')).toBeVisible();
         await expect(page.locator('.ydb-pdisk-space-distribution')).toBeVisible();
         await expect(page.getByText('Space distribution', {exact: true})).toBeVisible();
+        await expectBackButtonToMatchBrowser();
 
         const pDiskPage = page.locator('.ydb-pdisk-page');
         const pDiskHeading = pDiskPage.getByRole('heading', {
@@ -742,20 +753,33 @@ test.describe('VDisk page storage tab', () => {
         await page.setViewportSize({width: 1440, height: 900});
 
         const pDiskUrl = page.url();
-        await page.getByRole('button', {name: 'Back', exact: true}).click();
+        if (await expectBackButtonToMatchBrowser()) {
+            await backButton.click();
+        } else {
+            await page.goBack();
+        }
         await expect(goToPDiskLink).toBeVisible();
         await expect(refreshButton).toBeVisible();
         await expect(autoRefreshControl.getByTestId('ydb-autorefresh-select')).toBeVisible();
-        await expect(page.getByRole('button', {name: 'Back', exact: true})).toHaveCount(0);
+        await expectBackButtonToMatchBrowser();
         await page.reload();
         await expect(goToPDiskLink).toBeVisible();
-        await expect(page.getByRole('button', {name: 'Back', exact: true})).toHaveCount(0);
+        await expectBackButtonToMatchBrowser();
 
         await page.goForward();
         await expect(page).toHaveURL(pDiskUrl);
-        await expect(page.getByRole('button', {name: 'Back', exact: true})).toBeVisible();
+        await expectBackButtonToMatchBrowser();
         await page.reload();
-        await expect(page.getByRole('button', {name: 'Back', exact: true})).toBeVisible();
+        await expectBackButtonToMatchBrowser();
+
+        await page.addInitScript(() => {
+            Object.defineProperty(window, 'navigation', {configurable: true, value: undefined});
+        });
+        await page.reload();
+        await expect(backButton).toBeVisible();
+        await backButton.click();
+        await expect(goToPDiskLink).toBeVisible();
+        await expect(backButton).toBeVisible();
     });
 });
 

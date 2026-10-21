@@ -19,9 +19,9 @@ import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useBrowserCanGoBack} from '../../utils/hooks/useBrowserCanGoBack';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useAppTitle} from '../App/AppTitleContext';
-import {useCanGoBack} from '../App/BackNavigationContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {StorageGroupStateLabel} from '../Storage/StorageGroupStateLabel';
 
@@ -34,12 +34,11 @@ const storageGroupPageCn = cn('ydb-storage-group-page');
 export function StorageGroupPage() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
-    const canGoBack = useCanGoBack();
+    const showBackButton = useBrowserCanGoBack() ?? true;
     const database = useDatabaseFromQuery();
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     const [{groupId}] = useQueryParams({groupId: StringParam});
-    const showBackButton = Boolean(groupId) && canGoBack;
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const capabilitiesLoaded = useCapabilitiesLoaded();

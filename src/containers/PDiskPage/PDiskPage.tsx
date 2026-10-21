@@ -34,9 +34,9 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getPDiskId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useBrowserCanGoBack} from '../../utils/hooks/useBrowserCanGoBack';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useAppTitle} from '../App/AppTitleContext';
-import {useCanGoBack} from '../App/BackNavigationContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
 import {PDiskSpaceDistribution} from './PDiskSpaceDistribution/PDiskSpaceDistribution';
@@ -72,7 +72,7 @@ const pDiskTabSchema = z.nativeEnum(PDISK_TABS_IDS).catch(PDISK_TABS_IDS.spaceDi
 export function PDiskPage() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
-    const showBackButton = useCanGoBack();
+    const showBackButton = useBrowserCanGoBack() ?? true;
     const hasDeveloperUi = useHasDeveloperUi();
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
@@ -149,6 +149,7 @@ export function PDiskPage() {
         if (!showBackButton) {
             return null;
         }
+
         return (
             <Flex
                 className={pdiskPageCn('meta')}

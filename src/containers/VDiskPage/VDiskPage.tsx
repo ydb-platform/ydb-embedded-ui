@@ -34,8 +34,8 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {parseVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useBrowserCanGoBack} from '../../utils/hooks/useBrowserCanGoBack';
 import {useAppTitle} from '../App/AppTitleContext';
-import {useCanGoBack} from '../App/BackNavigationContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
 import {VDiskStorageDetails} from './VDiskStorageDetails';
@@ -50,7 +50,7 @@ const vDiskPageCn = cn('ydb-vdisk-page');
 export function VDiskPage() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
-    const showBackButton = useCanGoBack();
+    const showBackButton = useBrowserCanGoBack() ?? true;
     const getVDiskPagePath = useVDiskPagePath();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
