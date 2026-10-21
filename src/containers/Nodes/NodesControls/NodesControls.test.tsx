@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {ThemeProvider} from '@gravity-ui/uikit';
 import {act, fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {createMemoryHistory} from 'history';
@@ -51,11 +52,13 @@ describe('Nodes search URL integration', () => {
         });
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         render(
-            <Router history={history}>
-                <QueryParamProvider adapter={ReactRouter5Adapter}>
-                    <NodesSearch />
-                </QueryParamProvider>
-            </Router>,
+            <ThemeProvider>
+                <Router history={history}>
+                    <QueryParamProvider adapter={ReactRouter5Adapter}>
+                        <NodesSearch />
+                    </QueryParamProvider>
+                </Router>
+            </ThemeProvider>,
         );
         return {history, user, input: screen.getByRole('textbox')};
     }

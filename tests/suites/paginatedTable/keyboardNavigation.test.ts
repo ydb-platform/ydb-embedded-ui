@@ -380,17 +380,22 @@ test('nodes: repeated arrows keep selection across chunks in a large list', asyn
     await expect(page.getByRole('link', {name: 'host-0.test', exact: true})).toBeVisible();
     await page.locator('input').first().focus();
     for (let round = 0; round < 2; round++) {
-        for (let index = 1; index <= 100; index++) {
-            await page.keyboard.press('ArrowDown');
-            if (index % 20 === 0) {
+        // Send native key repeats in batches between the existing row checkpoints.
+        try {
+            for (let index = 20; index <= 100; index += 20) {
+                await Promise.all(Array.from({length: 20}, () => page.keyboard.down('ArrowDown')));
                 await expect(page.locator(focusedRow)).toContainText(`host-${index}.test`);
             }
+        } finally {
+            await page.keyboard.up('ArrowDown');
         }
-        for (let index = 99; index >= 0; index--) {
-            await page.keyboard.press('ArrowUp');
-            if (index % 20 === 0) {
+        try {
+            for (let index = 80; index >= 0; index -= 20) {
+                await Promise.all(Array.from({length: 20}, () => page.keyboard.down('ArrowUp')));
                 await expect(page.locator(focusedRow)).toContainText(`host-${index}.test`);
             }
+        } finally {
+            await page.keyboard.up('ArrowUp');
         }
     }
     expect(errors).toEqual([]);
