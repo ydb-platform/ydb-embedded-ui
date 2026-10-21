@@ -3,6 +3,11 @@
   "controls_service-select-label": "Service:",
   "controls_version-select-label": "Version:",
   "controls_galaxy-select-label": "Galaxy:",
+  "controls_availability-select-label": "Availability:",
+  "value_available": "Available",
+  "value_unavailable": "Unavailable",
+  "value_none": "None",
+  "context_unavailable-admin": "Marked by an administrator",
 
   "controls_search-placeholder": "Cluster name, version, domain, host...",
   "controls_select-placeholder": "All",
@@ -14,6 +19,7 @@
   "statistics_storage": "Storage",
 
   "tooltip_no-cluster-data": "No cluster data",
+  "tooltip_unavailable": "Marked as unavailable by an administrator. This is independent of healthcheck. You can still open the cluster",
 
   "clusters-count": {
     "one": "{{count}} cluster found",
