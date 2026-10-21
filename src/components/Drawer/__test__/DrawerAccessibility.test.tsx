@@ -348,3 +348,132 @@ test('another non-modal drawer does not block Escape in the focused drawer', asy
     fireEvent.keyDown(second, {key: 'Escape'});
     expect(secondClose).toHaveBeenCalledTimes(1);
 });
+
+function ExplicitOpenerFixture({
+    openerRef,
+    showSecond = true,
+    disableModal = true,
+}: {
+    disableModal?: boolean;
+    openerRef: React.MutableRefObject<HTMLElement | null>;
+    showSecond?: boolean;
+}) {
+    const [open, setOpen] = React.useState(false);
+    const activate = (event: React.MouseEvent<HTMLButtonElement>) => {
+        openerRef.current = event.currentTarget;
+        setOpen(true);
+    };
+    return (
+        <ThemeProvider theme="light">
+            <DrawerContextProvider>
+                <DrawerWrapper
+                    title="Healthcheck"
+                    returnFocusRef={openerRef}
+                    focusReturnKey="same-target-and-leaf"
+                    isDrawerVisible={open}
+                    onCloseDrawer={() => setOpen(false)}
+                    disableModal={disableModal}
+                    drawerControls={[{type: 'close'}]}
+                    renderDrawerContent={() => <input aria-label="Healthcheck filter" />}
+                >
+                    <button onClick={activate}>Open first</button>
+                    {showSecond && <button onClick={activate}>Open second</button>}
+                    <input aria-label="Page input" />
+                </DrawerWrapper>
+            </DrawerContextProvider>
+        </ThemeProvider>
+    );
+}
+
+test('uses the latest explicit opener for the same target and on reopening', async () => {
+    const openerRef = {current: null};
+    render(<ExplicitOpenerFixture openerRef={openerRef} />);
+    const {first, second, drawer, filter} = await switchToSecondOpener();
+    filter.focus();
+    fireEvent.keyDown(filter, {key: 'Escape'});
+    await waitFor(() => expect(drawer).not.toBeInTheDocument());
+    expect(second).toHaveFocus();
+    first.focus();
+    fireEvent.click(first);
+    const reopened = await screen.findByRole('dialog', {name: 'Healthcheck'});
+    await waitFor(() => expect(reopened).toHaveFocus());
+    fireEvent.keyDown(reopened, {key: 'Escape'});
+    await waitFor(() => expect(reopened).not.toBeInTheDocument());
+    expect(first).toHaveFocus();
+});
+
+test.each(['null', 'detached'])(
+    'does not fall back to the old opener when explicit ref is %s',
+    async (state) => {
+        const openerRef: React.MutableRefObject<HTMLElement | null> = {current: null};
+        const {rerender} = render(<ExplicitOpenerFixture openerRef={openerRef} />);
+        const {first, drawer, filter} = await switchToSecondOpener();
+        filter.focus();
+        if (state === 'null') {
+            openerRef.current = null;
+        } else {
+            rerender(<ExplicitOpenerFixture openerRef={openerRef} showSecond={false} />);
+        }
+        fireEvent.keyDown(filter, {key: 'Escape'});
+        await waitFor(() => expect(drawer).not.toBeInTheDocument());
+        expect(document.body).toHaveFocus();
+        expect(first).not.toHaveFocus();
+    },
+);
+
+test('explicit opener does not steal focus from outside the drawer', async () => {
+    render(<ExplicitOpenerFixture openerRef={{current: null}} />);
+    const {drawer} = await switchToSecondOpener();
+    const external = screen.getByRole('textbox', {name: 'Page input'});
+    external.focus();
+    fireEvent.click(within(drawer).getByRole('button', {name: 'Close'}));
+    await waitFor(() => expect(drawer).not.toBeInTheDocument());
+    expect(external).toHaveFocus();
+});
+
+test.each(['second', 'null', 'detached', 'external'])(
+    'honors the explicit ref in modal mode: %s',
+    async (state) => {
+        const openerRef: React.MutableRefObject<HTMLElement | null> = {current: null};
+        const {rerender} = render(
+            <ExplicitOpenerFixture openerRef={openerRef} disableModal={false} />,
+        );
+        const first = screen.getByRole('button', {name: 'Open first'});
+        const second = screen.getByRole('button', {name: 'Open second'});
+        const external = screen.getByRole('textbox', {name: 'Page input'});
+        first.focus();
+        fireEvent.click(first);
+        const drawer = await screen.findByRole('dialog', {name: 'Healthcheck'});
+        await waitFor(() => expect(drawer).toHaveFocus());
+        // Change the explicit target without a new open cycle or focusReturnKey.
+        openerRef.current = second;
+        if (state === 'null') {
+            openerRef.current = null;
+        } else if (state === 'detached') {
+            rerender(
+                <ExplicitOpenerFixture
+                    openerRef={openerRef}
+                    disableModal={false}
+                    showSecond={false}
+                />,
+            );
+        }
+        const filter = within(drawer).getByRole('textbox');
+        filter.focus();
+        if (state === 'external') {
+            external.focus();
+            fireEvent.click(within(drawer).getByRole('button', {name: 'Close'}));
+        } else {
+            fireEvent.keyDown(filter, {key: 'Escape'});
+        }
+        await waitFor(() => expect(drawer).not.toBeInTheDocument());
+        if (state === 'second') {
+            expect(second).toHaveFocus();
+        } else if (state === 'external') {
+            expect(external).toHaveFocus();
+        } else {
+            expect(document.body).toHaveFocus();
+        }
+        expect(first).not.toHaveFocus();
+    },
+);

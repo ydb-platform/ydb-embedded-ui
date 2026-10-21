@@ -99,6 +99,7 @@ function getBridgePileStateInfo(state?: BridgePileState): BridgePileStateInfo {
 }
 
 interface BridgeInfoTableProps {
+    onHealthcheckOpen?: (opener: HTMLElement) => void;
     piles: TBridgePile[];
     database?: string;
     clusterName?: string;
@@ -111,7 +112,7 @@ interface BridgePileCardProps {
     healthcheckSupportsPiles: boolean;
     healthcheckLoading: boolean;
     leavesIssues: ReturnType<typeof selectLeavesIssues>;
-    onHealthcheckClick: (target: BridgePileHealthcheckTarget) => void;
+    onHealthcheckClick: (target: BridgePileHealthcheckTarget, opener: HTMLElement) => void;
 }
 
 const BridgePileCard = React.memo(function BridgePileCard({
@@ -165,10 +166,11 @@ const BridgePileCard = React.memo(function BridgePileCard({
     const nodes = pile.Nodes === undefined ? EMPTY_DATA_PLACEHOLDER : formatNumber(pile.Nodes);
     const handleHealthcheckClick = (event: React.MouseEvent<HTMLElement>) => {
         if (pileHealthcheck.target) {
+            event.stopPropagation();
             if (uiFactory.healthcheck.disableModal) {
                 event.currentTarget.focus();
             }
-            onHealthcheckClick(pileHealthcheck.target);
+            onHealthcheckClick(pileHealthcheck.target, event.currentTarget);
         }
     };
 
@@ -228,9 +230,17 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
     piles,
     database,
     clusterName,
+    onHealthcheckOpen,
 }: BridgeInfoTableProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {handleOpenHealthcheckIssue} = useClusterHealthcheckQueryParams();
+    const handleHealthcheckClick = React.useCallback(
+        (target: BridgePileHealthcheckTarget, opener: HTMLElement) => {
+            onHealthcheckOpen?.(opener);
+            handleOpenHealthcheckIssue(target);
+        },
+        [handleOpenHealthcheckIssue, onHealthcheckOpen],
+    );
     const {
         currentData: healthcheckData,
         isFetching: healthcheckFetching,
@@ -275,7 +285,7 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
                     healthcheckSupportsPiles={healthcheckSupportsPiles}
                     healthcheckLoading={healthcheckLoading}
                     leavesIssues={leavesIssues}
-                    onHealthcheckClick={handleOpenHealthcheckIssue}
+                    onHealthcheckClick={handleHealthcheckClick}
                 />
             ))}
         </Flex>

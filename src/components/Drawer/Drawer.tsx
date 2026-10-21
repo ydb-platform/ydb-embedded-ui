@@ -51,6 +51,7 @@ type DrawerEvent = MouseEvent & {
 interface DrawerPaneContentWrapperProps {
     labelledBy?: string;
     focusReturnKey?: string;
+    returnFocusRef?: React.RefObject<HTMLElement>;
     isVisible: boolean;
     onClose: () => void;
     onTransitionInComplete?: () => void;
@@ -82,6 +83,7 @@ const DrawerPaneContentWrapper = ({
     disableModal = false,
     labelledBy,
     focusReturnKey,
+    returnFocusRef,
 }: DrawerPaneContentWrapperProps) => {
     const [savedWidthString, setSavedWidthString] = useSetting<string | undefined>(storageKey);
     const [userDrawerWidth, setUserDrawerWidth] = React.useState<number | undefined>(undefined);
@@ -123,7 +125,7 @@ const DrawerPaneContentWrapper = ({
 
     // Floating UI suppresses return focus after focus-out, even if the drawer stays open.
     React.useLayoutEffect(() => {
-        if (!disableModal) {
+        if (!disableModal && !returnFocusRef) {
             return;
         }
         const activeElement = document.activeElement;
@@ -135,15 +137,16 @@ const DrawerPaneContentWrapper = ({
                 openerRef.current = activeElement;
             }
         } else {
+            const opener = returnFocusRef ? returnFocusRef.current : openerRef.current;
             if (
                 (drawerRef.current?.contains(activeElement) || activeElement === document.body) &&
-                openerRef.current?.isConnected
+                opener?.isConnected
             ) {
-                openerRef.current.focus();
+                opener.focus();
             }
             openerRef.current = null;
         }
-    }, [disableModal, isVisible, focusReturnKey]);
+    }, [disableModal, isVisible, focusReturnKey, returnFocusRef]);
     const {containerWidth, itemContainerRef, rightInset, visibleRightInset} =
         useDrawerContextInternal();
     const availableWidth = Math.max(0, containerWidth - visibleRightInset);
@@ -308,7 +311,7 @@ const DrawerPaneContentWrapper = ({
                 disableBodyScrollLock
                 disableOutsideClick={detectClickOutside}
                 floatingRef={drawerRef}
-                returnFocus={disableModal ? false : undefined}
+                returnFocus={disableModal || returnFocusRef ? false : undefined}
             >
                 <div className={b('click-handler')} onClickCapture={handleClickInsideDrawer}>
                     {children}
@@ -325,6 +328,7 @@ export type DrawerControl =
 
 interface DrawerPaneProps {
     focusReturnKey?: string;
+    returnFocusRef?: React.RefObject<HTMLElement>;
     children: React.ReactNode;
     renderDrawerContent: () => React.ReactNode;
     isDrawerVisible: boolean;
@@ -363,6 +367,7 @@ export const DrawerWrapper = ({
     hideVeil,
     disableModal,
     focusReturnKey,
+    returnFocusRef,
 }: DrawerPaneProps) => {
     const titleId = React.useId();
     const onCloseDrawerRef = React.useRef(onCloseDrawer);
@@ -423,6 +428,7 @@ export const DrawerWrapper = ({
                 hideVeil={hideVeil}
                 disableModal={disableModal}
                 focusReturnKey={focusReturnKey}
+                returnFocusRef={returnFocusRef}
                 labelledBy={title ? titleId : undefined}
                 isVisible={isDrawerVisible}
                 onClose={onCloseDrawer}

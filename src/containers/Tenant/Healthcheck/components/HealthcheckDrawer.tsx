@@ -15,6 +15,7 @@ import {HealthcheckDrawerTitle} from './HealthcheckDrawerTitle';
 
 interface HealthcheckDrawerProps {
     target?: HealthcheckAssistantTarget;
+    returnFocusRef?: React.RefObject<HTMLElement>;
     children: React.ReactNode;
     isDrawerVisible: boolean;
     onCloseDrawer: () => void;
@@ -32,6 +33,7 @@ interface HealthcheckDrawerProps {
 
 export function HealthcheckDrawer({
     target,
+    returnFocusRef,
     children,
     isDrawerVisible,
     onCloseDrawer,
@@ -109,6 +111,7 @@ export function HealthcheckDrawer({
     return (
         <DrawerWrapper
             focusReturnKey={focusReturnKey}
+            returnFocusRef={returnFocusRef}
             isDrawerVisible={isDrawerVisible}
             onCloseDrawer={onCloseDrawer}
             onTransitionInComplete={onTransitionInComplete}

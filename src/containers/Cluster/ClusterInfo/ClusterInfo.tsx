@@ -21,6 +21,7 @@ import {b} from './shared';
 import './ClusterInfo.scss';
 
 interface ClusterInfoProps {
+    onHealthcheckOpen?: (opener: HTMLElement) => void;
     cluster?: TClusterInfo;
     clusterName?: string;
     loading?: boolean;
@@ -38,6 +39,7 @@ export const ClusterInfo = ({
     additionalClusterProps = {},
     groupStats,
     bridgePiles,
+    onHealthcheckOpen,
 }: ClusterInfoProps) => {
     const {info = [], links = []} = additionalClusterProps;
 
@@ -134,6 +136,7 @@ export const ClusterInfo = ({
                     </Text>
                 </Text>
                 <BridgeInfoTable
+                    onHealthcheckOpen={onHealthcheckOpen}
                     piles={bridgePiles}
                     database={cluster?.Domain}
                     clusterName={clusterName}

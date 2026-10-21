@@ -61,6 +61,10 @@ interface ClusterProps {
 
 export function Cluster({additionalClusterProps, additionalTenantsProps}: ClusterProps) {
     const container = React.useRef<HTMLDivElement>(null);
+    const healthcheckOpenerRef = React.useRef<HTMLElement | null>(null);
+    const handleHealthcheckOpen = React.useCallback((opener: HTMLElement) => {
+        healthcheckOpenerRef.current = opener;
+    }, []);
     const isClusterDashboardAvailable = useClusterDashboardAvailable();
 
     const shouldShowNetworkTable = useNodesHandlerHasWorkingClusterNetworkStats();
@@ -126,12 +130,14 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
 
     const handleStatusClick = React.useCallback(
         (event: React.MouseEvent<HTMLElement>) => {
+            event.stopPropagation();
+            handleHealthcheckOpen(event.currentTarget);
             if (uiFactory.healthcheck.disableModal) {
                 event.currentTarget.focus();
             }
             handleShowHealthcheckChange(true);
         },
-        [handleShowHealthcheckChange],
+        [handleHealthcheckOpen, handleShowHealthcheckChange],
     );
 
     const getClusterTitle = () => {
@@ -158,6 +164,7 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
     return (
         <DrawerContextProvider>
             <ClusterDrawerHealthcheck
+                returnFocusRef={healthcheckOpenerRef}
                 database={cluster?.Domain || ''}
                 clusterName={clusterName ?? undefined}
             >
@@ -175,6 +182,7 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
                     {isClusterDashboardAvailable && (
                         <div className={b('dashboard')}>
                             <ClusterOverview
+                                onHealthcheckOpen={handleHealthcheckOpen}
                                 cluster={cluster ?? {}}
                                 clusterName={clusterName ?? undefined}
                                 groupStats={groupsStats}

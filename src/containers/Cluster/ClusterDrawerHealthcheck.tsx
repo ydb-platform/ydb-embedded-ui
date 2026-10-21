@@ -17,6 +17,7 @@ interface ClusterDrawerHealthcheckProps {
     children: React.ReactNode;
     database: string;
     clusterName?: string;
+    returnFocusRef?: React.MutableRefObject<HTMLElement | null>;
 }
 
 export function useClusterHealthcheckQueryParams() {
@@ -99,9 +100,18 @@ export function ClusterDrawerHealthcheck({
     children,
     database,
     clusterName,
+    returnFocusRef,
 }: ClusterDrawerHealthcheckProps) {
     const {showHealthcheck, healthcheckIssue, healthcheckLeaf, handleCloseHealthcheck} =
         useClusterHealthcheckQueryParams();
+
+    const isDrawerVisible = Boolean(showHealthcheck) && Boolean(database);
+    React.useEffect(() => {
+        // The drawer restores focus in a layout effect before this ref is cleared.
+        if (!isDrawerVisible && returnFocusRef) {
+            returnFocusRef.current = null;
+        }
+    }, [isDrawerVisible, returnFocusRef]);
 
     const healthcheckStatus = useTypedSelector((state) =>
         selectCheckStatus(state, database, clusterName),
@@ -190,7 +200,8 @@ export function ClusterDrawerHealthcheck({
                 clusterName,
                 scope: 'cluster',
             })}
-            isDrawerVisible={Boolean(showHealthcheck) && Boolean(database)}
+            isDrawerVisible={isDrawerVisible}
+            returnFocusRef={returnFocusRef}
             onCloseDrawer={handleCloseDrawer}
             onTransitionInComplete={
                 healthcheckIssue && healthcheckLeaf ? handleTransitionInComplete : undefined

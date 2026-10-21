@@ -534,3 +534,97 @@ test.describe('Healthcheck nested popup Escape', () => {
         }
     }
 });
+
+test.describe('Healthcheck Bridge pile switching', () => {
+    for (const close of ['Close', 'Escape'] as const) {
+        test(`${close} restores the second pile opener`, async ({page, browserName}) => {
+            await page.addInitScript(() => {
+                window.e2eHealthcheckDrawerMode = 'non-modal-page';
+            });
+            await mockCapabilities(page, true);
+            await mockClusterWithBridgePiles(page);
+            const issues = ['all-group-statuses-pile', 'r2'].flatMap((name, index) => [
+                {
+                    id: `pile-root-${index}`,
+                    status: 'ORANGE',
+                    message: `Pile ${index} requires maintenance`,
+                    type: 'STORAGE',
+                    level: 1,
+                    reason: [`pile-leaf-${index}`],
+                    location: {storage: {pool: {group: {pile: {name}}}}},
+                },
+                {
+                    id: `pile-leaf-${index}`,
+                    status: 'RED',
+                    message: `Pile ${index} VDisk failure`,
+                    type: 'VDISK',
+                    level: 2,
+                },
+            ]);
+            await page.route('**/viewer/json/healthcheck?*', (route) =>
+                route.fulfill({
+                    json: {
+                        self_check_result: 'MAINTENANCE_REQUIRED',
+                        location: {pile: {name: 'r2'}},
+                        issue_log: issues,
+                    },
+                }),
+            );
+            await page.goto('/cluster/databases', {waitUntil: 'commit'});
+            await page.locator('.ydb-cluster').waitFor({state: 'visible', timeout: 30000});
+            const first = page.getByRole('button', {
+                name: 'Health status for pile all-group-statuses-pile: Caution',
+                exact: true,
+            });
+            const second = page.getByRole('button', {
+                name: 'Health status for pile r2: Caution',
+                exact: true,
+            });
+            await expect(second).toBeVisible();
+            await first.focus();
+            await page.keyboard.press('Enter');
+            const overlay = page.getByTestId('cluster-healthcheck-details');
+            const drawer = overlay.getByRole('dialog');
+            await expect(drawer).toBeVisible();
+            await expect(page).toHaveURL(
+                (url) => url.searchParams.get('healthcheckLeaf') === 'pile-leaf-0',
+            );
+            const initialDrawer = await drawer.elementHandle();
+            const tabKey =
+                browserName === 'webkit' && process.platform === 'darwin' ? 'Alt+Tab' : 'Tab';
+            for (let step = 0; step < 100; step++) {
+                if (await second.evaluate((element) => element === document.activeElement)) {
+                    break;
+                }
+                await page.keyboard.press(tabKey);
+            }
+            await expect(second).toBeFocused();
+            await page.keyboard.press('Enter');
+            await expect(page).toHaveURL(
+                (url) => url.searchParams.get('healthcheckLeaf') === 'pile-leaf-1',
+            );
+            await expect(overlay).toHaveAttribute('data-floating-ui-status', 'open');
+            expect(
+                await drawer.evaluate((element, original) => element === original, initialDrawer),
+            ).toBe(true);
+            if (close === 'Escape') {
+                await drawer.getByRole('textbox').first().focus();
+                await page.keyboard.press('Escape');
+            } else {
+                await drawer.getByRole('button', {name: 'Close', exact: true}).focus();
+                await page.keyboard.press('Enter');
+            }
+            await expect(drawer).toHaveCount(0);
+            await expect(page).toHaveURL((url) =>
+                [
+                    'showHealthcheck',
+                    'healthcheckIssue',
+                    'healthcheckLeaf',
+                    'issuesFilter',
+                    'view',
+                ].every((key) => !url.searchParams.has(key)),
+            );
+            await expect(second).toBeFocused();
+        });
+    }
+});

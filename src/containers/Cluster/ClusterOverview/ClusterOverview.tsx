@@ -31,6 +31,7 @@ import overviewIcon from '../../../assets/icons/overview.svg';
 import './ClusterOverview.scss';
 
 interface ClusterOverviewProps {
+    onHealthcheckOpen?: (opener: HTMLElement) => void;
     cluster: TClusterInfo;
     clusterName?: string;
     groupStats?: ClusterGroupsStats;
