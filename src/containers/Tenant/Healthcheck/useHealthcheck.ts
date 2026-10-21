@@ -19,7 +19,7 @@ interface HealthcheckParams {
 
 export const useHealthcheck = (
     database: string,
-    {autorefresh}: {autorefresh?: number} = {},
+    {autorefresh, clusterName}: {autorefresh?: number; clusterName?: string} = {},
 ): HealthcheckParams => {
     const {databaseType} = useTenantBaseInfo(database);
     const {
@@ -29,7 +29,7 @@ export const useHealthcheck = (
         refetch,
         fulfilledTimeStamp,
     } = healthcheckApi.useGetHealthcheckInfoQuery(
-        {database},
+        {database, clusterName},
         {
             pollingInterval: autorefresh,
             skip: databaseType === 'Serverless',
@@ -37,7 +37,9 @@ export const useHealthcheck = (
     );
 
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
-    const leavesIssues = useTypedSelector((state) => selectLeavesIssues(state, database));
+    const leavesIssues = useTypedSelector((state) =>
+        selectLeavesIssues(state, database, clusterName),
+    );
 
     return {
         loading: data === undefined && isFetching,

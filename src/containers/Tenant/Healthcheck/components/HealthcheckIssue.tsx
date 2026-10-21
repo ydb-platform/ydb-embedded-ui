@@ -35,8 +35,15 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
         <Flex className={b('issue-wrapper')}>
             <Disclosure className={b('issue-content')} defaultExpanded={expanded}>
                 <Disclosure.Summary>
-                    {(props) => (
-                        <button {...props} className={b('disclosure-trigger')}>
+                    {({expanded: isExpanded, ariaControls, qa, className, ...buttonProps}) => (
+                        <button
+                            {...buttonProps}
+                            type="button"
+                            aria-controls={ariaControls}
+                            aria-expanded={isExpanded}
+                            data-qa={qa}
+                            className={b('disclosure-trigger', className)}
+                        >
                             <Flex
                                 wrap="nowrap"
                                 gap={2}
@@ -65,7 +72,7 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                                         className={b('issue-divider')}
                                         orientation="vertical"
                                     />
-                                    <ArrowToggle direction={props.expanded ? 'top' : 'bottom'} />
+                                    <ArrowToggle direction={isExpanded ? 'top' : 'bottom'} />
                                 </Flex>
                             </Flex>
                         </button>

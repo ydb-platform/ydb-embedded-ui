@@ -27,22 +27,29 @@ import cryCatIcon from '../../../assets/icons/cry-cat.svg';
 import './Healthcheck.scss';
 
 type HealthcheckDetailsProps =
-    | {database: string; clusterName?: undefined}
+    | {database: string; clusterName?: string}
     | {clusterName: string; database?: undefined};
 
 export function Healthcheck({database, clusterName}: HealthcheckDetailsProps) {
-    if (clusterName) {
-        return (
-            <HealthcheckContext.Provider value={{clusterName}}>
-                <ClusterHealthcheckInner clusterName={clusterName} />
-            </HealthcheckContext.Provider>
-        );
-    }
-    return <DatabaseHealthcheckInner database={database as string} />;
+    return (
+        <HealthcheckContext.Provider value={{clusterName}}>
+            {database !== undefined ? (
+                <DatabaseHealthcheckInner database={database} clusterName={clusterName} />
+            ) : (
+                <ClusterHealthcheckInner clusterName={clusterName as string} />
+            )}
+        </HealthcheckContext.Provider>
+    );
 }
 
-function DatabaseHealthcheckInner({database}: {database: string}) {
-    const healthcheck = useHealthcheck(database);
+function DatabaseHealthcheckInner({
+    database,
+    clusterName,
+}: {
+    database: string;
+    clusterName?: string;
+}) {
+    const healthcheck = useHealthcheck(database, {clusterName});
     return <HealthcheckContent healthcheck={healthcheck} />;
 }
 

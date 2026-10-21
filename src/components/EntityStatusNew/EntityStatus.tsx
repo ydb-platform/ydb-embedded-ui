@@ -48,6 +48,9 @@ interface EntityStatusLabelProps {
     status: EFlag;
     note?: React.ReactNode;
     children?: React.ReactNode;
+    className?: string;
+    endContent?: React.ReactNode;
+    qa?: string;
     withStatusName?: boolean;
     size?: LabelProps['size'];
     iconSize?: number;
@@ -56,6 +59,9 @@ interface EntityStatusLabelProps {
 
 function EntityStatusLabel({
     children,
+    className,
+    endContent,
+    qa,
     status,
     withStatusName = true,
     note,
@@ -71,13 +77,15 @@ function EntityStatusLabel({
                 theme={theme === 'orange' ? undefined : theme}
                 icon={<StatusIcon size={iconSize} status={status} />}
                 size={size}
-                className={b({orange: theme === 'orange', clickable: isClickable})}
+                className={b({orange: theme === 'orange', clickable: isClickable}, className)}
+                qa={qa}
                 onClick={onClick}
                 interactive={isClickable}
             >
                 <Flex gap="2" wrap="nowrap">
                     {children}
                     {withStatusName ? EFlagToStatusName[status] : null}
+                    {endContent ? <Flex alignSelf="center">{endContent}</Flex> : null}
                     {note && <HelpMark className={b('note')}>{note}</HelpMark>}
                 </Flex>
             </Label>

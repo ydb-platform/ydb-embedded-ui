@@ -657,11 +657,15 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getHealthcheckInfo(
-        {database, maxLevel}: {database: string; maxLevel?: number},
+        {
+            database,
+            maxLevel,
+            clusterName,
+        }: {database: string; maxLevel?: number; clusterName?: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<HealthCheckAPIResponse>(
-            this.getPath('/viewer/json/healthcheck?merge_records=true'),
+            this.getPath('/viewer/json/healthcheck?merge_records=true', clusterName),
             {database, max_level: maxLevel},
             {concurrentId, requestConfig: {signal}},
         );
