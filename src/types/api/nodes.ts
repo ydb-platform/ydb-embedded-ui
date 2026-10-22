@@ -363,6 +363,8 @@ export interface NodesRequestParams {
     uptime?: number;
     /** return nodes with SystemState !== EFlag.Green */
     problems_only?: boolean;
+    /** exclude disconnected nodes; requires /viewer/nodes/alive capability */
+    alive?: boolean;
     /** filter nodes by id or host */
     filter?: string;
     filter_peer_role?: NodesPeerRole; // v14

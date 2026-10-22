@@ -1,6 +1,7 @@
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
+import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageNodesTable} from '../PaginatedStorageNodesTable/PaginatedStorageNodesTable';
@@ -22,6 +23,7 @@ export function StorageNodesComponent({
         useStorageQueryParams();
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
+    const {hideUnavailable} = useHideUnavailableNodes();
 
     const expertMode = useIsStorageExpertMode();
     const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings({
@@ -69,7 +71,12 @@ export function StorageNodesComponent({
             }
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [nodesSearchValue, visibleEntities, nodesUptimeFilter],
+                scrollDependencies: [
+                    nodesSearchValue,
+                    visibleEntities,
+                    nodesUptimeFilter,
+                    hideUnavailable,
+                ],
             }}
         />
     );

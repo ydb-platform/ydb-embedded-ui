@@ -14,6 +14,7 @@ import {nodesApi} from '../../../store/reducers/nodes/nodes';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
+import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {TableGroup} from '../../Storage/TableGroup/TableGroup';
@@ -127,6 +128,7 @@ export function GroupedNodesComponent({
     const searchFilter = useDebouncedSearch(searchValue);
     const useMetaProxy = useClusterWithProxy();
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const {hideUnavailable} = useHideUnavailableNodes();
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         columns,
@@ -147,6 +149,7 @@ export function GroupedNodesComponent({
         {
             path: schemaPathParam,
             database,
+            alive: hideUnavailable || undefined,
             filter: searchFilter.trim(),
             filter_peer_role: peerRoleFilter,
             group: groupByParam,

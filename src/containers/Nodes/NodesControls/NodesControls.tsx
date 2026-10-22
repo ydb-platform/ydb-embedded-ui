@@ -3,6 +3,7 @@ import React from 'react';
 import {Select, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount';
+import {HideUnavailableNodesSwitch} from '../../../components/HideUnavailableNodesSwitch/HideUnavailableNodesSwitch';
 import {ProblemFilter} from '../../../components/ProblemFilter/ProblemFilter';
 import {Search} from '../../../components/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
@@ -102,6 +103,7 @@ export function NodesControls({
                     />
                 </React.Fragment>
             ) : null}
+            <HideUnavailableNodesSwitch />
             <EntitiesCount
                 current={entitiesCountCurrent}
                 total={entitiesCountTotal}
