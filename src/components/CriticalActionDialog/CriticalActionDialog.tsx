@@ -45,6 +45,7 @@ interface CriticalActionDialogProps<T> {
     applyButtonView?: ButtonView;
     withCheckBox?: boolean;
     onClose: VoidFunction;
+    onTransitionOutComplete?: VoidFunction;
     onConfirm: (isRetry?: boolean) => Promise<T>;
     onConfirmActionSuccess: VoidFunction;
     onConfirmActionError: (error: unknown) => void;
@@ -61,6 +62,7 @@ export function CriticalActionDialog<T>({
     applyButtonView,
     withCheckBox,
     onClose,
+    onTransitionOutComplete,
     onConfirm,
     onConfirmActionSuccess,
     onConfirmActionError,
@@ -89,6 +91,7 @@ export function CriticalActionDialog<T>({
     const handleTransitionExited = () => {
         setError(undefined);
         setCheckBoxChecked(false);
+        onTransitionOutComplete?.();
     };
 
     const renderCheckBox = () => {
