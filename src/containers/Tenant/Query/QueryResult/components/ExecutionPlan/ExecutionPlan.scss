@@ -22,6 +22,10 @@
 
         border-radius: var(--g-border-radius-s);
         background: var(--g-color-base-background);
+
+        .ydb-fullscreen_fullscreen & {
+            right: calc(var(--g-spacing-6) + var(--g-spacing-10));
+        }
     }
 
     &__error {

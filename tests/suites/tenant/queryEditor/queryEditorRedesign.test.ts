@@ -26,9 +26,7 @@ const plan = {
 const makeResponse = () => ({
     plan,
     ast: '(return (Int32 1))',
-    resultSets: [
-        {columns: [{name: 'value', type: 'Int32'}], result: [{value: 1}], truncated: false},
-    ],
+    result: [{columns: [{name: 'value', type: 'Int32'}], rows: [[1]], truncated: false}],
     stats: {DurationUs: '500000', Executions: [{ResultRows: '1', DurationUs: '500000'}]},
 });
 const svg =
@@ -140,6 +138,61 @@ test.describe('Query editor redesign @query-editor-redesign', () => {
         await page.screenshot({path: testInfo.outputPath('real-execution-plan.png')});
     });
 
+    for (const theme of ['light', 'dark']) {
+        test(`downloads SVG in fullscreen without closing it in ${theme} theme`, async ({
+            page,
+        }, testInfo) => {
+            await page.addInitScript(
+                (themeName) => localStorage.setItem('theme', themeName),
+                theme,
+            );
+            const editor = await openEditor(page);
+            await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
+            await page.route('**/plan2svg?*', (route) =>
+                route.fulfill({contentType: 'image/svg+xml', body: svg}),
+            );
+            await analyze(editor);
+            await selectView(page, 'Execution Plan');
+            const image = page.getByRole('img', {name: 'Execution Plan'});
+            await expect(image).toBeVisible();
+            await expect(page.locator('body')).toHaveClass(new RegExp(`g-root_theme_${theme}`));
+            const displayedSvg = await image.evaluate((element: HTMLImageElement) =>
+                fetch(element.src).then((response) => response.text()),
+            );
+            expect(displayedSvg).toBe(svg);
+
+            const downloadButton = page.getByRole('button', {name: 'Download .SVG', exact: true});
+            const fullscreen = page.locator('.ydb-fullscreen_fullscreen');
+            const closeButton = fullscreen.locator('.ydb-fullscreen__close-button');
+            for (const width of [1280, 1000]) {
+                await page.setViewportSize({width, height: 720});
+                await page.getByRole('button', {name: 'Fullscreen', exact: true}).click();
+                await expect(fullscreen).toBeVisible();
+                const downloadBounds = await downloadButton.boundingBox();
+                const closeBounds = await closeButton.boundingBox();
+                if (!downloadBounds || !closeBounds) {
+                    throw new Error('Expected visible fullscreen controls');
+                }
+                expect(downloadBounds.x + downloadBounds.width).toBeLessThanOrEqual(closeBounds.x);
+                const downloadPromise = page.waitForEvent('download');
+                await downloadButton.click();
+                const download = await downloadPromise;
+                expect(download.suggestedFilename()).toBe('query-plan.svg');
+                expect(await readDownload(download)).toBe(displayedSvg);
+                await expect(fullscreen).toBeVisible();
+                await page.screenshot({
+                    path: testInfo.outputPath(`fullscreen-${theme}-${width}.png`),
+                });
+                if (width === 1280) {
+                    await closeButton.click();
+                } else {
+                    await page.keyboard.press('Escape');
+                }
+                await expect(fullscreen).toHaveCount(0);
+            }
+        });
+    }
+
     test('mocked summary distinguishes exact, truncated and multiple results', async ({
         page,
     }, testInfo) => {
@@ -149,15 +202,15 @@ test.describe('Query editor redesign @query-editor-redesign', () => {
         await analyze(editor);
         await mainViews(page).getByRole('radio', {name: 'Result 1', exact: true}).check();
         await expect(page.getByText('2 rows/s', {exact: true})).toBeVisible();
-        response.resultSets[0].truncated = true;
+        response.result[0].truncated = true;
         await analyze(editor);
         await mainViews(page).getByRole('radio', {name: 'Result 1', exact: true}).check();
         await expect(page.getByText(/rows\/s/)).toHaveCount(0);
         await expect(page.getByText('Truncated', {exact: true})).toBeVisible();
-        response.resultSets[0].truncated = false;
-        response.resultSets.push({
+        response.result[0].truncated = false;
+        response.result.push({
             columns: [{name: 'value', type: 'Int32'}],
-            result: [{value: 2}],
+            rows: [[2]],
             truncated: false,
         });
         await analyze(editor);
@@ -315,7 +368,7 @@ test.describe('Query editor redesign @query-editor-redesign', () => {
     test('reads formatted result counts without losing thousands', async ({page}) => {
         const editor = await openEditor(page);
         const response = makeResponse();
-        response.resultSets[0].result = Array.from({length: 1000}, (_, value) => ({value}));
+        response.result[0].rows = Array.from({length: 1000}, (_, value) => [value]);
         response.stats.Executions[0].ResultRows = '1000';
         await page.route(queryUrl, (route) => route.fulfill({json: response}));
         await analyze(editor);
