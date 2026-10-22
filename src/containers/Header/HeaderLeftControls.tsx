@@ -4,6 +4,7 @@ import {ActionTooltip, Button, ClipboardButton, Flex, Icon} from '@gravity-ui/ui
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import {ServerlessDBLabel} from '../../components/ServerlessDBLabel/ServerlessDBLabel';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
+import {useDatabaseHealthcheckAvailable} from '../../utils/hooks/useDatabaseHealthcheckAvailable';
 import {HealthcheckPreview} from '../Tenant/Diagnostics/TenantOverview/Healthcheck/HealthcheckPreview';
 
 import {b} from './constants';
@@ -20,9 +21,10 @@ export function HeaderLeftControls({
     databaseData,
     isDatabaseDataLoading,
 }: HeaderLeftControlsProps) {
+    const healthcheckAvailable = useDatabaseHealthcheckAvailable(databaseData?.Type);
     const showCopyButton = Boolean(databaseData?.Name);
     const isServerless = databaseData?.Type === 'Serverless';
-    const showHealthcheck = !isServerless && !isDatabaseDataLoading;
+    const showHealthcheck = healthcheckAvailable && !isDatabaseDataLoading;
 
     return (
         <Flex direction="row" alignItems={'center'} gap={2} className={b('left-controls')}>
