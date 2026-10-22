@@ -4,6 +4,8 @@ import {backend, database} from '../../utils/constants';
 
 import {TenantPage} from './TenantPage';
 
+const backendPathPrefix = new URL(`${backend}/`).pathname.slice(0, -1);
+
 const roles = [
     {
         name: 'database',
@@ -52,7 +54,9 @@ for (const navigationV2 of [false, true]) {
                 localStorage.setItem('enableTenantNavigationV2', JSON.stringify(enabled));
             }, navigationV2);
             await page.route(`${backend}/**`, async (route) => {
-                const {pathname} = new URL(route.request().url());
+                const pathname = new URL(route.request().url()).pathname.slice(
+                    backendPathPrefix.length,
+                );
                 let json = {};
                 if (pathname === '/viewer/json/whoami') {
                     json = {
