@@ -211,7 +211,7 @@ function TabletTabs({
     return (
         <Flex gap={5} direction="column" qa="tablet-tabs">
             {/* block wrapper fror tabs to preserve height */}
-            <div className={b('tabs')}>
+            <div>
                 <TabProvider value={tabletTab}>
                     <TabList size="l">
                         {TABLET_PAGE_TABS.filter(({isAdvanced}) =>

@@ -5,7 +5,7 @@
     top: 74px;
     left: 0;
 
-    // Keep the page inset in the flow so sticky tabs can reach the top edge.
+    // Keep the initial page inset in the flow.
     margin-bottom: 20px;
 
     &__control {

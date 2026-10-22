@@ -1,8 +1,4 @@
-@use '../../styles/mixins.scss';
-
 .ydb-storage-group-page {
-    --sticky-tabs-height: 40px;
-    --data-table-start: var(--sticky-tabs-height);
     position: relative;
 
     overflow: auto;
@@ -34,15 +30,6 @@
     }
 
     &__storage-title {
-        z-index: 3;
-
-        display: flex;
-        align-items: center;
-
-        height: var(--sticky-tabs-height);
         margin: 0;
-        padding-right: 125px;
-
-        @include mixins.sticky-top();
     }
 }

@@ -2,7 +2,6 @@
 
 .ydb-tablet-page {
     $_: &;
-    --sticky-tabs-height: 40px;
     position: relative;
 
     overflow: auto;
@@ -19,15 +18,6 @@
     &__meta {
         min-height: 28px;
         padding-right: 121px;
-    }
-
-    &__tabs {
-        z-index: 3;
-
-        height: var(--sticky-tabs-height);
-        padding-right: 125px;
-
-        @include mixins.sticky-top();
     }
 
     &__placeholder {
