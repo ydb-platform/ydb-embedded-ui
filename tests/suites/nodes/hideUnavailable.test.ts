@@ -171,7 +171,7 @@ for (const storage of [false, true]) {
             }
             for (const width of [1440, 1280]) {
                 await page.setViewportSize({width, height: 900});
-                await expect(view.toggle).toBeInViewport();
+                await view.expectToolbarLayout(storage);
                 await page.screenshot({path: testInfo.outputPath(`switch-off-${width}.png`)});
             }
             await view.toggleControl.click();
@@ -180,7 +180,7 @@ for (const storage of [false, true]) {
             await expect(view.node('connected-red')).toBeVisible();
             for (const width of [1440, 1280]) {
                 await page.setViewportSize({width, height: 900});
-                await expect(view.toggle).toBeInViewport();
+                await view.expectToolbarLayout(storage);
                 await page.screenshot({path: testInfo.outputPath(`switch-on-${width}.png`)});
             }
         });
