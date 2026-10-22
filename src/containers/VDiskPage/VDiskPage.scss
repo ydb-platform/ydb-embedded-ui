@@ -56,6 +56,11 @@
 
     &__tablets-content {
         margin-top: var(--g-spacing-4);
+
+        .data-table__sticky_moving {
+            // Override the table's inline sticky offset.
+            top: var(--sticky-tabs-height) !important;
+        }
     }
 
     &__tabs {
@@ -66,5 +71,6 @@
         padding-right: 125px;
 
         @include mixins.sticky-top();
+        @include mixins.tabs-wrapper-styles();
     }
 }
