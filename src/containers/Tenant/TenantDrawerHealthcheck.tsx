@@ -27,6 +27,8 @@ export function TenantDrawerHealthcheck({children, clusterName}: TenantDrawerHea
         showHealthcheck,
         handleIssuesFilterChange,
         handleHealthcheckViewChange,
+        issuesFilter,
+        view,
     } = useTenantQueryParams();
 
     const healthcheckStatus = useTypedSelector((state) =>
@@ -42,6 +44,15 @@ export function TenantDrawerHealthcheck({children, clusterName}: TenantDrawerHea
         handleIssuesFilterChange(undefined);
         handleHealthcheckViewChange(undefined);
     }, [handleShowHealthcheckChange, handleIssuesFilterChange, handleHealthcheckViewChange]);
+
+    React.useEffect(() => {
+        if (
+            healthcheckAvailable === false &&
+            (showHealthcheck !== undefined || view !== undefined || issuesFilter !== undefined)
+        ) {
+            handleCloseDrawer();
+        }
+    }, [healthcheckAvailable, showHealthcheck, view, issuesFilter, handleCloseDrawer]);
 
     const renderDrawerContent = React.useCallback(() => {
         return <Healthcheck database={database} clusterName={clusterName} />;

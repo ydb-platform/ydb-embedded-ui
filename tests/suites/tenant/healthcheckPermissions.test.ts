@@ -50,6 +50,7 @@ for (const navigationV2 of [false, true]) {
             page,
         }) => {
             const healthcheckRequests: string[] = [];
+            let hasElevatedAccess = false;
             await page.addInitScript((enabled) => {
                 localStorage.setItem('enableTenantNavigationV2', JSON.stringify(enabled));
             }, navigationV2);
@@ -62,8 +63,8 @@ for (const navigationV2 of [false, true]) {
                     json = {
                         UserSID: 'healthcheck-test-user',
                         IsDatabaseAllowed: true,
-                        IsViewerAllowed: role.isViewerAllowed,
-                        IsMonitoringAllowed: role.isMonitoringAllowed,
+                        IsViewerAllowed: hasElevatedAccess || role.isViewerAllowed,
+                        IsMonitoringAllowed: hasElevatedAccess || role.isMonitoringAllowed,
                         IsAdministrationAllowed: role.isAdministrationAllowed,
                     };
                 } else if (pathname === '/viewer/json/tenantinfo') {
@@ -99,6 +100,8 @@ for (const navigationV2 of [false, true]) {
                 schema: database,
                 databasePage: navigationV2 ? 'database' : 'diagnostics',
                 showHealthcheck: 1,
+                view: 'storage',
+                issuesFilter: 'Database healthcheck issue',
             });
             await page.waitForLoadState('networkidle');
             await expect(page.locator('.tenant-overview')).toBeVisible();
@@ -113,11 +116,28 @@ for (const navigationV2 of [false, true]) {
                 await expect(preview).toBeVisible();
                 await expect(drawer).toBeVisible();
                 await expect(drawer).toContainText('Database healthcheck issue');
+                await expect(page).toHaveURL(
+                    (url) =>
+                        url.searchParams.get('showHealthcheck') === '1' &&
+                        url.searchParams.get('view') === 'storage' &&
+                        url.searchParams.get('issuesFilter') === 'Database healthcheck issue',
+                );
                 expect(healthcheckRequests.length).toBeGreaterThan(0);
             } else {
                 await expect(preview).toBeHidden();
                 await expect(drawer).toBeHidden();
                 expect(healthcheckRequests).toEqual([]);
+                await expect(page).toHaveURL((url) =>
+                    ['showHealthcheck', 'view', 'issuesFilter'].every(
+                        (param) => !url.searchParams.has(param),
+                    ),
+                );
+
+                hasElevatedAccess = true;
+                await page.reload();
+                await expect(page.locator('.tenant-overview')).toBeVisible();
+                await expect(preview).toBeVisible();
+                await expect(drawer).toBeHidden();
             }
         });
     }
