@@ -1,15 +1,16 @@
 @use '../../styles//mixins.scss';
 
 .ydb-pdisk-page {
+    --sticky-tabs-height: 40px;
+    --data-table-start: var(--sticky-tabs-height);
     position: relative;
 
     overflow: auto;
     overflow-anchor: none;
 
     height: 100%;
-    padding: 20px 20px 0;
+    padding: 0 20px;
 
-    &__meta,
     &__title,
     &__storage-details,
     &__info,
@@ -32,8 +33,8 @@
         min-width: 0;
     }
 
-    &__refresh-control {
-        flex-shrink: 0;
+    &__title {
+        padding-right: 125px;
     }
 
     &__storage-details {
@@ -56,6 +57,12 @@
     }
 
     &__tabs {
+        z-index: 3;
+
+        height: var(--sticky-tabs-height);
+        padding-right: 125px;
+
+        @include mixins.sticky-top();
         @include mixins.tabs-wrapper-styles();
     }
 }

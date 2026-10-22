@@ -1,14 +1,13 @@
 import React from 'react';
 
-import {ArrowLeft, ArrowRotateLeft, Wrench} from '@gravity-ui/icons';
-import {Button, Flex, Icon, Tab, TabList, TabProvider, Text} from '@gravity-ui/uikit';
+import {ArrowRotateLeft, Wrench} from '@gravity-ui/icons';
+import {Flex, Icon, Tab, TabList, TabProvider, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
-import {useHistory} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
-import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
+import {StickyAutoRefreshControl} from '../../components/AutoRefreshControl/StickyAutoRefreshControl';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
 import {DiskStatusLabel, DiskTypeLabel} from '../../components/DiskStatus/DiskStatus';
@@ -70,8 +69,6 @@ const pDiskTabSchema = z.nativeEnum(PDISK_TABS_IDS).catch(PDISK_TABS_IDS.spaceDi
 
 export function PDiskPage() {
     const dispatch = useTypedDispatch();
-    const history = useHistory();
-    const showBackButton = history.length > 1;
     const hasDeveloperUi = useHasDeveloperUi();
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
@@ -144,26 +141,6 @@ export function PDiskPage() {
         );
     };
 
-    const renderPageMeta = () => {
-        if (!showBackButton) {
-            return null;
-        }
-        return (
-            <Flex
-                className={pdiskPageCn('meta')}
-                alignItems="center"
-                justifyContent="space-between"
-                gap={1}
-            >
-                <Button size="m" view="outlined" onClick={() => history.goBack()}>
-                    <Icon data={ArrowLeft} size={16} />
-                    {pDiskPageKeyset('action_back')}
-                </Button>
-                <AutoRefreshControl className={pdiskPageCn('refresh-control')} />
-            </Flex>
-        );
-    };
-
     const renderPageTitle = () => {
         const statusLabels = [
             {id: 'state', label: getPDiskStateLabel(pDiskData?.State)},
@@ -199,9 +176,6 @@ export function PDiskPage() {
                         <DiskTypeLabel type={pDiskData?.Type} size="s" />
                     </Flex>
                 </Flex>
-                {!showBackButton && (
-                    <AutoRefreshControl className={pdiskPageCn('refresh-control')} />
-                )}
             </Flex>
         );
     };
@@ -310,7 +284,7 @@ export function PDiskPage() {
     return (
         <div className={pdiskPageCn(null)} ref={containerRef}>
             {renderHelmet()}
-            {renderPageMeta()}
+            <StickyAutoRefreshControl />
             {renderPageTitle()}
             {renderControls()}
             {renderError()}

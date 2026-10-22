@@ -599,7 +599,7 @@ test.describe('VDisk page storage tab', () => {
         await expect(page).toHaveScreenshot('vdisk-stack-expanded.png', {clip: backgroundBox!});
     });
 
-    test('Go to PDisk navigates to PDisk page', async ({page, baseURL}) => {
+    test('Go to PDisk navigates to PDisk page', async ({page}) => {
         await page.setViewportSize({width: 1440, height: 900});
         await page.addInitScript(() => {
             localStorage.setItem('theme', JSON.stringify('light'));
@@ -607,17 +607,14 @@ test.describe('VDisk page storage tab', () => {
         await enableBlobStorageCapacityMetrics(page);
         await setupVDiskPageMocks(page);
         await setupPDiskInfoMock(page, {withCapacityMetrics: true});
-        // Replace the initial about:blank entry to model opening the page without history.
-        await page.evaluate(
-            (url) => window.location.replace(url),
-            new URL(VDISK_PAGE_PATH, baseURL).href,
-        );
+        await page.goto(VDISK_PAGE_PATH);
 
         const storageDetails = page.locator('.ydb-vdisk-storage-details');
         const goToPDiskLink = storageDetails.getByRole('link', {name: 'Go to PDisk'});
+        const backButton = page.getByRole('button', {name: 'Back', exact: true});
 
         await expect(goToPDiskLink).toBeVisible();
-        await expect(page.getByRole('button', {name: 'Back', exact: true})).toHaveCount(0);
+        await expect(backButton).toHaveCount(0);
         const autoRefreshControl = page.locator('.auto-refresh-control');
         const refreshButton = autoRefreshControl.getByRole('button', {
             name: 'Refresh',
@@ -643,11 +640,14 @@ test.describe('VDisk page storage tab', () => {
         await expect(page.locator('.ydb-pdisk-page__info')).toBeVisible();
         await expect(page.locator('.ydb-pdisk-space-distribution')).toBeVisible();
         await expect(page.getByText('Space distribution', {exact: true})).toBeVisible();
+        await expect(backButton).toHaveCount(0);
 
         const pDiskPage = page.locator('.ydb-pdisk-page');
-        await expect(
-            pDiskPage.getByRole('heading', {name: `PDisk ${NODE_ID}-${PDISK_ID}`, exact: true}),
-        ).toBeVisible();
+        const pDiskHeading = pDiskPage.getByRole('heading', {
+            name: `PDisk ${NODE_ID}-${PDISK_ID}`,
+            exact: true,
+        });
+        await expect(pDiskHeading).toBeVisible();
         await expect(pDiskPage.getByText('PDisk Usage', {exact: true})).toBeVisible();
         const header = page.locator('header.header');
         const copyPDiskId = header.getByRole('button', {
@@ -697,12 +697,63 @@ test.describe('VDisk page storage tab', () => {
         }
         await closeDiskPopup(page, logPopup);
 
+        await page.setViewportSize({width: 1440, height: 400});
+        await pDiskPage.evaluate((element) => element.scrollTo({top: 0}));
+        await expect(pDiskHeading).toBeInViewport();
+        const refreshInterval = autoRefreshControl.getByTestId('ydb-autorefresh-select');
+        const refreshBox = await autoRefreshControl.boundingBox();
+        expect(refreshBox).not.toBeNull();
+
+        await pDiskPage.evaluate((element) => element.scrollTo({top: element.scrollHeight}));
+        await expect
+            .poll(() => pDiskPage.evaluate((element) => element.scrollTop))
+            .toBeGreaterThan(0);
+        await expect(pDiskHeading).not.toBeInViewport();
+        await expect(refreshButton).toBeInViewport({ratio: 1});
+        await expect(refreshInterval).toBeInViewport({ratio: 1});
+        await expect.poll(() => autoRefreshControl.boundingBox()).toEqual(refreshBox);
+
+        const refreshResponse = page.waitForResponse((response) => {
+            const url = new URL(response.url());
+            return (
+                url.pathname.endsWith('/pdisk/info') &&
+                url.searchParams.get('node_id') === NODE_ID &&
+                url.searchParams.get('pdisk_id') === PDISK_ID
+            );
+        });
+        await refreshButton.click();
+        expect((await refreshResponse).ok()).toBe(true);
+
+        await refreshInterval.click();
+        await page.getByRole('option', {name: '15 sec', exact: true}).click();
+        await expect(refreshInterval).toHaveText('15 sec');
+        await expect(refreshButton).toBeInViewport({ratio: 1});
+        await expect(refreshInterval).toBeInViewport({ratio: 1});
+        await expect.poll(() => autoRefreshControl.boundingBox()).toEqual(refreshBox);
+        await expect
+            .poll(() => pDiskPage.evaluate((element) => element.scrollTop))
+            .toBeGreaterThan(0);
+
+        await refreshInterval.click();
+        await page.getByRole('option', {name: 'None', exact: true}).click();
+        await expect(refreshInterval).toHaveText('None');
+        await page.setViewportSize({width: 1440, height: 900});
+
         const pDiskUrl = page.url();
-        await page.goto(VDISK_PAGE_PATH);
+        await page.goBack();
+        await expect(goToPDiskLink).toBeVisible();
         await expect(refreshButton).toBeVisible();
         await expect(autoRefreshControl.getByTestId('ydb-autorefresh-select')).toBeVisible();
-        await page.getByRole('button', {name: 'Back', exact: true}).click();
+        await expect(backButton).toHaveCount(0);
+        await page.reload();
+        await expect(goToPDiskLink).toBeVisible();
+        await expect(backButton).toHaveCount(0);
+
+        await page.goForward();
         await expect(page).toHaveURL(pDiskUrl);
+        await expect(backButton).toHaveCount(0);
+        await page.reload();
+        await expect(backButton).toHaveCount(0);
     });
 });
 

@@ -1,0 +1,18 @@
+.ydb-sticky-auto-refresh-control {
+    // Match the cluster page: the floating control does not allocate a header row.
+    position: sticky;
+    z-index: 4;
+    top: 74px;
+    left: 0;
+
+    // Keep the initial page inset in the flow.
+    margin-bottom: 20px;
+
+    &__control {
+        float: right;
+
+        margin-top: -54px;
+
+        background-color: var(--g-color-base-background);
+    }
+}

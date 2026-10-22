@@ -2,9 +2,23 @@
 
 .ydb-tablet-page {
     $_: &;
+    position: relative;
+
+    overflow: auto;
+
     height: 100%;
-    padding: 20px;
+    padding: 0 20px 20px;
     @include mixins.body-2-typography();
+
+    &__content {
+        // The sticky refresh wrapper already supplies the initial 20px page inset.
+        min-height: calc(100% - 20px);
+    }
+
+    &__meta {
+        min-height: 28px;
+        padding-right: 121px;
+    }
 
     &__placeholder {
         display: flex;
