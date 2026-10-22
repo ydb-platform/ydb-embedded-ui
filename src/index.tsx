@@ -50,27 +50,39 @@ function applyE2EStorageGroupsOverride() {
     configureUIFactory({maxVDisksInStorageGroup: 11});
 }
 
+async function applyE2EHealthcheckOverride() {
+    // Rspack needs the direct env condition to omit the fixture chunk from production builds.
+    if (process.env.REACT_APP_E2E_UI_OVERRIDES === 'true') {
+        const mode = window.e2eHealthcheckDrawerMode;
+        if (!mode) {
+            return false;
+        }
+
+        if (mode === 'non-modal-page' || mode === 'non-modal-meta-page') {
+            configureUIFactory({healthcheck: {disableModal: true}});
+            if (mode === 'non-modal-meta-page') {
+                configureUIFactory({useMetaProxy: true});
+            }
+            return false;
+        }
+
+        const {renderHealthcheckDrawerFixture} = await import(
+            '../tests/fixtures/healthcheckDrawer'
+        );
+        renderHealthcheckDrawerFixture(mode);
+        return true;
+    }
+
+    return false;
+}
+
 async function render() {
     applyE2EQueryEditorModeOverride();
     applyE2EMonitoringOverride();
     applyE2EStorageGroupsOverride();
 
-    if (process.env.REACT_APP_E2E_UI_OVERRIDES === 'true' && window.e2eHealthcheckDrawerMode) {
-        if (
-            window.e2eHealthcheckDrawerMode === 'non-modal-page' ||
-            window.e2eHealthcheckDrawerMode === 'non-modal-meta-page'
-        ) {
-            configureUIFactory({healthcheck: {disableModal: true}});
-            if (window.e2eHealthcheckDrawerMode === 'non-modal-meta-page') {
-                configureUIFactory({useMetaProxy: true});
-            }
-        } else {
-            const {renderHealthcheckDrawerFixture} = await import(
-                '../tests/fixtures/healthcheckDrawer'
-            );
-            renderHealthcheckDrawerFixture(window.e2eHealthcheckDrawerMode);
-            return;
-        }
+    if (await applyE2EHealthcheckOverride()) {
+        return;
     }
 
     let App;

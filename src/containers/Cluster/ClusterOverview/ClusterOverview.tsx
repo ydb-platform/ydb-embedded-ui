@@ -41,7 +41,7 @@ interface ClusterOverviewProps {
     collapsed?: boolean;
 }
 
-export function ClusterOverview(props: ClusterOverviewProps) {
+export function ClusterOverview({onHealthcheckOpen, ...props}: ClusterOverviewProps) {
     const [expandDashboard, setExpandDashboard] = useSetting<boolean>(
         SETTING_KEYS.EXPAND_CLUSTER_DASHBOARD,
     );
@@ -88,7 +88,11 @@ export function ClusterOverview(props: ClusterOverviewProps) {
         >
             <div className={b('disclosure-content')}>
                 <ClusterDashboard {...props} />
-                <ClusterInfo {...props} bridgePiles={bridgePiles} />
+                <ClusterInfo
+                    {...props}
+                    bridgePiles={bridgePiles}
+                    onHealthcheckOpen={onHealthcheckOpen}
+                />
             </div>
         </Disclosure>
     );

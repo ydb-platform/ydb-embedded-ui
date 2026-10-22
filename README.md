@@ -110,6 +110,40 @@ REACT_APP_META_BACKEND=undefined
 META_YDB_BACKEND=http://your-meta-host:8765
 ```
 
+## Package consumers
+
+### Healthcheck drawers
+
+Healthcheck is modal by default: its focus containment and accessibility isolation remain enabled. To keep Healthcheck accessible alongside another panel, configure the application before rendering it:
+
+```tsx
+import {configureUIFactory} from 'ydb-embedded-ui';
+
+configureUIFactory({
+  healthcheck: {disableModal: true},
+});
+```
+
+This option applies to Healthcheck. Configure adjacent custom panels for compatible non-modal behavior as well. It does not disable the veil or change outside-click dismissal.
+
+The shared Drawer handles Escape with UIKit's layer stack in both modal and non-modal modes, including drawers other than Healthcheck. A popup or modal above the Drawer receives the first Escape, even if it belongs to another panel. A later Escape can close the Drawer; another non-modal Drawer alone does not block dismissal of the focused panel. This is a change to Escape handling, not to the default modality setting.
+
+Non-modal Healthcheck restores focus to its opener when focus is still in the closing panel or on the document body. Focus already moved to another control is preserved. Clicking the veil or another non-focusable area can therefore still return focus to the opener. Switching the selected object updates the return target without remounting the panel.
+
+### UIKit compatibility
+
+The package now requires `@gravity-ui/uikit` `^7.48.0` instead of `^7.31.1`, including the public `Drawer.disableModal` API. Update the consumer lockfile and remove any override that forces the older UIKit version.
+
+`SingleClusterApp` and `MultiClusterApp` provide the theme context for their contents. Consumers rendering individual components outside these app roots, including isolated component tests, must provide the required `ThemeProvider` from the same UIKit instance. For example:
+
+```tsx
+import {ThemeProvider} from '@gravity-ui/uikit';
+
+<ThemeProvider theme="light">{/* Individually rendered components */}</ThemeProvider>;
+```
+
+The UIKit update also changes Alert rendering. Review affected visual snapshots when upgrading; the package's ErrorDisplay snapshots and isolated Search/NodesControls tests have been updated accordingly.
+
 ## E2E Tests
 
 For e2e tests we use `@playwright/tests`. Tests configuration is in `playwright.config.ts`. Tests are set up in `tests` dir.
