@@ -1,4 +1,8 @@
+@use '../../styles/mixins.scss';
+
 .ydb-vdisk-page {
+    --sticky-tabs-height: 40px;
+    --data-table-start: var(--sticky-tabs-height);
     --g-definition-list-item-gap: var(--g-spacing-3);
     position: relative;
 
@@ -52,5 +56,15 @@
 
     &__tablets-content {
         margin-top: var(--g-spacing-4);
+    }
+
+    &__tabs {
+        z-index: 3;
+
+        height: var(--sticky-tabs-height);
+        margin-bottom: 0;
+        padding-right: 125px;
+
+        @include mixins.sticky-top();
     }
 }
