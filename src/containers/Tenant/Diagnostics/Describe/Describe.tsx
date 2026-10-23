@@ -29,7 +29,7 @@ const Describe = ({path, database, databaseFullPath, scrollContainerRef}: IDescr
     const loading = isFetching && currentData === undefined;
 
     return (
-        <div className={b()}>
+        <div className={b()} data-qa="describe">
             {loading ? <Loader size="m" /> : null}
             {!loading && !currentData && !error ? (
                 <div className={b('message-container')}>Empty</div>

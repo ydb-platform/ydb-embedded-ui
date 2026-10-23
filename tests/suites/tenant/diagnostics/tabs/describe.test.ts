@@ -3,6 +3,8 @@ import {expect, test} from '@playwright/test';
 import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 
+import {Describe} from './DescribeModel';
+
 test('Describe preserves expanded and collapsed fields when switching objects', async ({page}) => {
     let releaseDescribe: (() => void) | undefined;
     await page.route('**/viewer/**', async (route) => {
@@ -47,22 +49,20 @@ test('Describe preserves expanded and collapsed fields when switching objects', 
         diagnosticsTab: 'describe',
     });
 
-    const describe = page.locator('.ydb-describe');
-    const pathDescription = describe.locator('[title="PathDescription"] button');
-    const self = describe.locator('[title="PathDescription/Self"] button');
-    await pathDescription.click();
-    await self.click();
-    await expect(describe.getByText('first', {exact: true})).toBeVisible();
+    const describe = new Describe(page);
+    await describe.toggleField('PathDescription');
+    await describe.toggleField('Self');
+    await expect(describe.getValue('first')).toBeVisible();
 
     await page.getByText('second', {exact: true}).click();
     await expect.poll(() => Boolean(releaseDescribe)).toBe(true);
-    await expect(describe.getByText('first', {exact: true})).toBeHidden();
+    await expect(describe.getValue('first')).toBeHidden();
     releaseDescribe?.();
-    await expect(describe.getByText('second', {exact: true})).toBeVisible();
+    await expect(describe.getValue('second')).toBeVisible();
 
-    await self.click();
+    await describe.toggleField('Self');
     await page.getByText('first', {exact: true}).click();
-    await expect(describe.getByText(`"${database}/first"`, {exact: true})).toBeVisible();
-    await expect(self).toBeVisible();
-    await expect(describe.getByText('Name', {exact: true})).toBeHidden();
+    await expect(describe.getValue(`"${database}/first"`)).toBeVisible();
+    await expect(describe.getFieldRow('Self')).toBeVisible();
+    await expect(describe.getFieldRow('Name')).toBeHidden();
 });
