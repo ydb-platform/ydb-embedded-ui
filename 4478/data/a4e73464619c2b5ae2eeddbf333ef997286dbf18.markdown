@@ -1,0 +1,165 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list
+      - link "Developer UI" [ref=e45] [cursor=pointer]:
+        - /url: /meta/proxy/cluster/bravo/internal
+        - img [ref=e48]:
+          - img [ref=e49]
+        - generic [ref=e51]: Developer UI
+    - main [ref=e52]:
+      - generic [ref=e54]:
+        - generic [ref=e56]:
+          - text: bravo
+          - generic [ref=e57] [cursor=pointer]:
+            - img [ref=e59]:
+              - img [ref=e60]
+            - button "Unknown" [ref=e62]:
+              - generic [ref=e65]: Unknown
+        - generic [ref=e66]:
+          - button "Refresh" [ref=e67] [cursor=pointer]:
+            - img [ref=e70]
+          - group [ref=e73] [cursor=pointer]:
+            - combobox [ref=e74]:
+              - generic [ref=e75]: None
+            - img [ref=e76]:
+              - img [ref=e77]
+        - tablist [ref=e80]:
+          - tab "Databases" [selected] [ref=e81] [cursor=pointer]:
+            - link "Databases" [ref=e84]:
+              - /url: /cluster/databases?clusterName=bravo
+          - tab "Nodes" [ref=e85] [cursor=pointer]:
+            - link "Nodes" [ref=e88]:
+              - /url: /cluster/nodes?clusterName=bravo
+          - tab "Storage" [ref=e89] [cursor=pointer]:
+            - link "Storage" [ref=e92]:
+              - /url: /cluster/storage?clusterName=bravo
+          - tab "Tablets" [ref=e93] [cursor=pointer]:
+            - link "Tablets" [ref=e96]:
+              - /url: /cluster/tablets?clusterName=bravo
+          - tab "Versions" [ref=e97] [cursor=pointer]:
+            - link "Versions" [ref=e100]:
+              - /url: /cluster/versions?clusterName=bravo
+        - generic [ref=e102]:
+          - generic [ref=e103]:
+            - generic [ref=e104]:
+              - generic [ref=e105]:
+                - textbox "Database name" [active] [ref=e108]
+                - radiogroup [ref=e109]:
+                  - generic [ref=e110]:
+                    - radio "All" [checked] [ref=e111]
+                    - generic [ref=e112]: All
+                  - generic [ref=e113] [cursor=pointer]:
+                    - radio "With problems" [ref=e114]
+                    - generic [ref=e115]: With problems
+                - generic [ref=e118]: "Databases: 1"
+              - button "10/10" [ref=e122] [cursor=pointer]:
+                - img [ref=e125]:
+                  - img [ref=e126]
+                - generic [ref=e129]: 10/10
+            - generic [ref=e134]:
+              - table [ref=e137]:
+                - rowgroup [ref=e138]:
+                  - row "Database Type State CPU Memory Storage Network Nodes Groups Pools" [ref=e139]:
+                    - columnheader "Database" [ref=e140]:
+                      - generic [ref=e141]: Database
+                    - columnheader "Type" [ref=e142]:
+                      - generic [ref=e143]: Type
+                    - columnheader "State" [ref=e144]:
+                      - generic [ref=e145]: State
+                    - columnheader "CPU" [ref=e146]:
+                      - generic [ref=e147]: CPU
+                    - columnheader "Memory" [ref=e148]:
+                      - generic [ref=e149]: Memory
+                    - columnheader "Storage" [ref=e150]:
+                      - generic [ref=e151]: Storage
+                    - columnheader "Network" [ref=e152]:
+                      - generic [ref=e153]: Network
+                    - columnheader "Nodes" [ref=e154]:
+                      - generic [ref=e155]: Nodes
+                    - columnheader "Groups" [ref=e156]:
+                      - generic [ref=e157]: Groups
+                    - columnheader "Pools" [ref=e158]:
+                      - generic [ref=e159]: Pools
+              - table [ref=e164]:
+                - rowgroup:
+                  - row "Database Type State CPU Memory Storage Network Nodes Groups Pools":
+                    - columnheader "Database":
+                      - generic: Database
+                    - columnheader "Type":
+                      - generic: Type
+                    - columnheader "State":
+                      - generic: State
+                    - columnheader "CPU":
+                      - generic: CPU
+                    - columnheader "Memory":
+                      - generic: Memory
+                    - columnheader "Storage":
+                      - generic: Storage
+                    - columnheader "Network":
+                      - generic: Network
+                    - columnheader "Nodes":
+                      - generic: Nodes
+                    - columnheader "Groups":
+                      - generic: Groups
+                    - columnheader "Pools":
+                      - generic: Pools
+                - rowgroup [ref=e165]:
+                  - row "alpha Unknown /local/alpha Copy Dedicated Running — — — — — —" [ref=e166]:
+                    - cell "alpha Unknown /local/alpha Copy" [ref=e167]:
+                      - generic [ref=e168]:
+                        - generic [ref=e169]:
+                          - link "alpha" [ref=e171] [cursor=pointer]:
+                            - /url: /database?clusterName=bravo&database=%2Flocal%2Falpha
+                          - generic [ref=e172]:
+                            - generic [ref=e173]:
+                              - img [ref=e175]:
+                                - img [ref=e176]
+                              - generic [ref=e180]: Unknown
+                            - button [ref=e182] [cursor=pointer]:
+                              - img [ref=e185]:
+                                - img [ref=e186]
+                        - generic [ref=e188]:
+                          - generic [ref=e189]: /local/alpha
+                          - button "Copy" [ref=e190] [cursor=pointer]:
+                            - generic:
+                              - generic:
+                                - img:
+                                  - img
+                    - cell "Dedicated" [ref=e191]
+                    - cell "Running" [ref=e192]:
+                      - generic [ref=e195]: Running
+                    - cell "—" [ref=e196]
+                    - cell "—" [ref=e197]
+                    - cell "—" [ref=e198]
+                    - cell "—" [ref=e199]
+                    - cell "—" [ref=e200]
+                    - cell "—" [ref=e201]
+                    - cell [ref=e202]
+          - status [ref=e203]
+```

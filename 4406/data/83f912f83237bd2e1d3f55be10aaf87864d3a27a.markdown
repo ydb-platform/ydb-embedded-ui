@@ -1,0 +1,2068 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - link "Cluster" [disabled] [ref=e46]:
+            - generic [ref=e48]: Cluster
+      - link "Developer UI" [ref=e50] [cursor=pointer]:
+        - /url: http://localhost:8765/internal
+        - img [ref=e53]:
+          - img [ref=e54]
+        - generic [ref=e56]: Developer UI
+    - main [ref=e57]:
+      - generic [ref=e59]:
+        - generic [ref=e61]:
+          - text: LOCAL
+          - generic [ref=e62] [cursor=pointer]:
+            - img [ref=e64]:
+              - img [ref=e65]
+            - button "Good" [ref=e67]:
+              - generic [ref=e70]: Good
+        - generic [ref=e71]:
+          - button "Refresh" [ref=e72] [cursor=pointer]:
+            - img [ref=e75]
+          - group [ref=e78] [cursor=pointer]:
+            - combobox [ref=e79]:
+              - generic [ref=e80]: None
+            - img [ref=e81]:
+              - img [ref=e82]
+        - tablist [ref=e85]:
+          - tab "Databases" [ref=e86] [cursor=pointer]:
+            - link "Databases" [ref=e89]:
+              - /url: /cluster/databases
+          - tab "Nodes" [ref=e90] [cursor=pointer]:
+            - link "Nodes" [ref=e93]:
+              - /url: /cluster/nodes
+          - tab "Storage" [selected] [ref=e94] [cursor=pointer]:
+            - link "Storage" [ref=e97]:
+              - /url: /cluster/storage
+          - tab "Network" [ref=e98] [cursor=pointer]:
+            - link "Network" [ref=e101]:
+              - /url: /cluster/network
+          - tab "Tablets" [ref=e102] [cursor=pointer]:
+            - link "Tablets" [ref=e105]:
+              - /url: /cluster/tablets
+          - tab "Versions" [ref=e106] [cursor=pointer]:
+            - link "Versions" [ref=e109]:
+              - /url: /cluster/versions
+        - generic [ref=e110]:
+          - generic [ref=e111]:
+            - generic [ref=e112]:
+              - generic [ref=e115]:
+                - textbox "Group ID, Pool name" [active] [ref=e118]
+                - radiogroup [ref=e119]:
+                  - generic [ref=e120]:
+                    - radio "Groups" [checked] [ref=e121]
+                    - generic [ref=e122]: Groups
+                  - generic [ref=e123] [cursor=pointer]:
+                    - radio "Nodes" [ref=e124]
+                    - generic [ref=e125]: Nodes
+                - generic [ref=e126]: "Group by:"
+                - group [ref=e128] [cursor=pointer]:
+                  - combobox [ref=e129]:
+                    - generic [ref=e130]: "-"
+                  - img [ref=e131]:
+                    - img [ref=e132]
+                - generic [ref=e136]: "Groups: 40"
+                - button "Expert mode" [ref=e137] [cursor=pointer]:
+                  - img [ref=e140]:
+                    - img [ref=e141]
+                  - generic [ref=e143]: Expert mode
+              - button "6/17" [ref=e146] [cursor=pointer]:
+                - img [ref=e149]:
+                  - img [ref=e150]
+                - generic [ref=e153]: 6/17
+            - table [ref=e156]:
+              - rowgroup [ref=e164]:
+                - row "Group ID Pool Name Erasure Used VDisks VDisks PDisks" [ref=e165]:
+                  - columnheader "Group ID" [ref=e166]:
+                    - generic [ref=e167] [cursor=pointer]:
+                      - generic [ref=e169]: Group ID
+                      - img [ref=e171]
+                  - columnheader "Pool Name" [ref=e173]:
+                    - generic [ref=e174] [cursor=pointer]:
+                      - generic [ref=e176]: Pool Name
+                      - img [ref=e178]
+                  - columnheader "Erasure" [ref=e180]:
+                    - generic [ref=e181] [cursor=pointer]:
+                      - generic [ref=e183]: Erasure
+                      - img [ref=e185]
+                  - columnheader "Used" [ref=e187]:
+                    - generic [ref=e188] [cursor=pointer]:
+                      - generic [ref=e190]: Used
+                      - img [ref=e192]
+                  - columnheader "VDisks" [ref=e194]:
+                    - generic [ref=e197]: VDisks
+                  - columnheader "VDisks PDisks" [ref=e198]:
+                    - generic [ref=e202]:
+                      - generic [ref=e203]: VDisks
+                      - generic [ref=e204]: PDisks
+              - rowgroup [ref=e205]:
+                - row "9000000000 Copy mock-vdisk-states block-4-2 34 GB VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010 VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e206]:
+                  - cell "9000000000 Copy" [ref=e207]:
+                    - generic [ref=e209]:
+                      - generic "9000000000" [ref=e210]:
+                        - link "9000000000" [ref=e211] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000000&database=%2FRoot
+                      - button "Copy" [ref=e212] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e213]:
+                    - generic [ref=e215] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e216]
+                  - cell "34 GB" [ref=e217]
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e218]:
+                    - generic [ref=e219]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e223] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e224]:
+                          - generic [ref=e226]: 10%
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e230] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e231]:
+                          - generic [ref=e233]: 20%
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e237] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e238]:
+                          - generic [ref=e240]: 30%
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e244] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e245]:
+                          - img [ref=e246]:
+                            - img [ref=e247]
+                          - generic [ref=e250]: 40%
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e254] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e255]:
+                          - img [ref=e256]:
+                            - img [ref=e257]
+                          - generic [ref=e260]: 50%
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e264] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e265]:
+                          - generic [ref=e267]: 60%
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e271] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e272]:
+                          - img [ref=e273]:
+                            - img [ref=e274]
+                          - generic [ref=e277]: 70%
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e281] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e282]:
+                          - img [ref=e283]:
+                            - img [ref=e284]
+                          - generic [ref=e287]: 80%
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e291] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e292]:
+                          - img [ref=e293]:
+                            - img [ref=e294]
+                          - generic [ref=e297]: 90%
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e301] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e302]:
+                          - img [ref=e303]:
+                            - img [ref=e304]
+                          - generic [ref=e307]: 30%
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e311] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e312]:
+                          - generic [ref=e314]: 50%
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e315]:
+                    - generic [ref=e317]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e322] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e323]:
+                          - generic [ref=e324]: N/D
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e329] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e330]
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e335] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e336]:
+                          - generic [ref=e337]: N/D
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e342] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e343]:
+                          - img [ref=e344]:
+                            - img [ref=e345]
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e351] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e352]:
+                          - img [ref=e353]:
+                            - img [ref=e354]
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e360] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e361]
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e366] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e367]:
+                          - img [ref=e368]:
+                            - img [ref=e369]
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e375] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e376]:
+                          - img [ref=e377]:
+                            - img [ref=e378]
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e384] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e385]:
+                          - img [ref=e386]:
+                            - img [ref=e387]
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e393] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e394]:
+                          - img [ref=e395]:
+                            - img [ref=e396]
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e402] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e403]
+                - row "9000000001 Copy mock-vdisk-states block-4-2 34 GB VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010 VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e416]:
+                  - cell "9000000001 Copy" [ref=e417]:
+                    - generic [ref=e419]:
+                      - generic "9000000001" [ref=e420]:
+                        - link "9000000001" [ref=e421] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000001&database=%2FRoot
+                      - button "Copy" [ref=e422] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e423]:
+                    - generic [ref=e425] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e426]
+                  - cell "34 GB" [ref=e427]
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e428]:
+                    - generic [ref=e429]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e433] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e434]:
+                          - generic [ref=e436]: 10%
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e440] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e441]:
+                          - generic [ref=e443]: 20%
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e447] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e448]:
+                          - generic [ref=e450]: 30%
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e454] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e455]:
+                          - img [ref=e456]:
+                            - img [ref=e457]
+                          - generic [ref=e460]: 40%
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e464] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e465]:
+                          - img [ref=e466]:
+                            - img [ref=e467]
+                          - generic [ref=e470]: 50%
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e474] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e475]:
+                          - generic [ref=e477]: 60%
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e481] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e482]:
+                          - img [ref=e483]:
+                            - img [ref=e484]
+                          - generic [ref=e487]: 70%
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e491] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e492]:
+                          - img [ref=e493]:
+                            - img [ref=e494]
+                          - generic [ref=e497]: 80%
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e501] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e502]:
+                          - img [ref=e503]:
+                            - img [ref=e504]
+                          - generic [ref=e507]: 90%
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e511] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e512]:
+                          - img [ref=e513]:
+                            - img [ref=e514]
+                          - generic [ref=e517]: 30%
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e521] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e522]:
+                          - generic [ref=e524]: 50%
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e525]:
+                    - generic [ref=e527]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e532] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e533]:
+                          - generic [ref=e534]: N/D
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e539] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e540]
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e545] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e546]:
+                          - generic [ref=e547]: N/D
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e552] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e553]:
+                          - img [ref=e554]:
+                            - img [ref=e555]
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e561] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e562]:
+                          - img [ref=e563]:
+                            - img [ref=e564]
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e570] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e571]
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e576] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e577]:
+                          - img [ref=e578]:
+                            - img [ref=e579]
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e585] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e586]:
+                          - img [ref=e587]:
+                            - img [ref=e588]
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e594] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e595]:
+                          - img [ref=e596]:
+                            - img [ref=e597]
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e603] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e604]:
+                          - img [ref=e605]:
+                            - img [ref=e606]
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e612] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e613]
+                - row "9000000002 Copy mock-vdisk-states block-4-2 34 GB VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010 VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e626]:
+                  - cell "9000000002 Copy" [ref=e627]:
+                    - generic [ref=e629]:
+                      - generic "9000000002" [ref=e630]:
+                        - link "9000000002" [ref=e631] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000002&database=%2FRoot
+                      - button "Copy" [ref=e632] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e633]:
+                    - generic [ref=e635] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e636]
+                  - cell "34 GB" [ref=e637]
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e638]:
+                    - generic [ref=e639]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e643] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e644]:
+                          - generic [ref=e646]: 10%
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e650] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e651]:
+                          - generic [ref=e653]: 20%
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e657] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e658]:
+                          - generic [ref=e660]: 30%
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e664] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e665]:
+                          - img [ref=e666]:
+                            - img [ref=e667]
+                          - generic [ref=e670]: 40%
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e674] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e675]:
+                          - img [ref=e676]:
+                            - img [ref=e677]
+                          - generic [ref=e680]: 50%
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e684] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e685]:
+                          - generic [ref=e687]: 60%
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e691] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e692]:
+                          - img [ref=e693]:
+                            - img [ref=e694]
+                          - generic [ref=e697]: 70%
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e701] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e702]:
+                          - img [ref=e703]:
+                            - img [ref=e704]
+                          - generic [ref=e707]: 80%
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e711] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e712]:
+                          - img [ref=e713]:
+                            - img [ref=e714]
+                          - generic [ref=e717]: 90%
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e721] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e722]:
+                          - img [ref=e723]:
+                            - img [ref=e724]
+                          - generic [ref=e727]: 30%
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e731] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e732]:
+                          - generic [ref=e734]: 50%
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e735]:
+                    - generic [ref=e737]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e742] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e743]:
+                          - generic [ref=e744]: N/D
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e749] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e750]
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e755] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e756]:
+                          - generic [ref=e757]: N/D
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e762] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e763]:
+                          - img [ref=e764]:
+                            - img [ref=e765]
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e771] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e772]:
+                          - img [ref=e773]:
+                            - img [ref=e774]
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e780] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e781]
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e786] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e787]:
+                          - img [ref=e788]:
+                            - img [ref=e789]
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e795] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e796]:
+                          - img [ref=e797]:
+                            - img [ref=e798]
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e804] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e805]:
+                          - img [ref=e806]:
+                            - img [ref=e807]
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e813] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e814]:
+                          - img [ref=e815]:
+                            - img [ref=e816]
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e822] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e823]
+                - row "9000000003 Copy mock-vdisk-states block-4-2 34 GB VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010 VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e836]:
+                  - cell "9000000003 Copy" [ref=e837]:
+                    - generic [ref=e839]:
+                      - generic "9000000003" [ref=e840]:
+                        - link "9000000003" [ref=e841] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000003&database=%2FRoot
+                      - button "Copy" [ref=e842] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e843]:
+                    - generic [ref=e845] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e846]
+                  - cell "34 GB" [ref=e847]
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e848]:
+                    - generic [ref=e849]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e853] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e854]:
+                          - generic [ref=e856]: 10%
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e860] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e861]:
+                          - generic [ref=e863]: 20%
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e867] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e868]:
+                          - generic [ref=e870]: 30%
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e874] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e875]:
+                          - img [ref=e876]:
+                            - img [ref=e877]
+                          - generic [ref=e880]: 40%
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e884] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e885]:
+                          - img [ref=e886]:
+                            - img [ref=e887]
+                          - generic [ref=e890]: 50%
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e894] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e895]:
+                          - generic [ref=e897]: 60%
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e901] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e902]:
+                          - img [ref=e903]:
+                            - img [ref=e904]
+                          - generic [ref=e907]: 70%
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e911] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e912]:
+                          - img [ref=e913]:
+                            - img [ref=e914]
+                          - generic [ref=e917]: 80%
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e921] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e922]:
+                          - img [ref=e923]:
+                            - img [ref=e924]
+                          - generic [ref=e927]: 90%
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e931] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e932]:
+                          - img [ref=e933]:
+                            - img [ref=e934]
+                          - generic [ref=e937]: 30%
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e941] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e942]:
+                          - generic [ref=e944]: 50%
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e945]:
+                    - generic [ref=e947]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e952] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e953]:
+                          - generic [ref=e954]: N/D
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e959] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e960]
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e965] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e966]:
+                          - generic [ref=e967]: N/D
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e972] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e973]:
+                          - img [ref=e974]:
+                            - img [ref=e975]
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e981] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e982]:
+                          - img [ref=e983]:
+                            - img [ref=e984]
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e990] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e991]
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e996] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e997]:
+                          - img [ref=e998]:
+                            - img [ref=e999]
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e1005] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1006]:
+                          - img [ref=e1007]:
+                            - img [ref=e1008]
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e1014] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1015]:
+                          - img [ref=e1016]:
+                            - img [ref=e1017]
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e1023] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1024]:
+                          - img [ref=e1025]:
+                            - img [ref=e1026]
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1032] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1033]
+                - row "9000000004 Copy mock-vdisk-states block-4-2 34 GB VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010 VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1046]:
+                  - cell "9000000004 Copy" [ref=e1047]:
+                    - generic [ref=e1049]:
+                      - generic "9000000004" [ref=e1050]:
+                        - link "9000000004" [ref=e1051] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000004&database=%2FRoot
+                      - button "Copy" [ref=e1052] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e1053]:
+                    - generic [ref=e1055] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e1056]
+                  - cell "34 GB" [ref=e1057]
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1058]:
+                    - generic [ref=e1059]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e1063] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1064]:
+                          - generic [ref=e1066]: 10%
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e1070] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1071]:
+                          - generic [ref=e1073]: 20%
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e1077] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1078]:
+                          - generic [ref=e1080]: 30%
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e1084] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1085]:
+                          - img [ref=e1086]:
+                            - img [ref=e1087]
+                          - generic [ref=e1090]: 40%
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e1094] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1095]:
+                          - img [ref=e1096]:
+                            - img [ref=e1097]
+                          - generic [ref=e1100]: 50%
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e1104] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1105]:
+                          - generic [ref=e1107]: 60%
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e1111] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1112]:
+                          - img [ref=e1113]:
+                            - img [ref=e1114]
+                          - generic [ref=e1117]: 70%
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e1121] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1122]:
+                          - img [ref=e1123]:
+                            - img [ref=e1124]
+                          - generic [ref=e1127]: 80%
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e1131] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1132]:
+                          - img [ref=e1133]:
+                            - img [ref=e1134]
+                          - generic [ref=e1137]: 90%
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e1141] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1142]:
+                          - img [ref=e1143]:
+                            - img [ref=e1144]
+                          - generic [ref=e1147]: 30%
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1151] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1152]:
+                          - generic [ref=e1154]: 50%
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1155]:
+                    - generic [ref=e1157]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e1162] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1163]:
+                          - generic [ref=e1164]: N/D
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e1169] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1170]
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e1175] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1176]:
+                          - generic [ref=e1177]: N/D
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e1182] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1183]:
+                          - img [ref=e1184]:
+                            - img [ref=e1185]
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e1191] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1192]:
+                          - img [ref=e1193]:
+                            - img [ref=e1194]
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e1200] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1201]
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e1206] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1207]:
+                          - img [ref=e1208]:
+                            - img [ref=e1209]
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e1215] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1216]:
+                          - img [ref=e1217]:
+                            - img [ref=e1218]
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e1224] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1225]:
+                          - img [ref=e1226]:
+                            - img [ref=e1227]
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e1233] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1234]:
+                          - img [ref=e1235]:
+                            - img [ref=e1236]
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1242] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1243]
+                - row "9000000005 Copy mock-vdisk-states block-4-2 34 GB VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010 VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1256]:
+                  - cell "9000000005 Copy" [ref=e1257]:
+                    - generic [ref=e1259]:
+                      - generic "9000000005" [ref=e1260]:
+                        - link "9000000005" [ref=e1261] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000005&database=%2FRoot
+                      - button "Copy" [ref=e1262] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e1263]:
+                    - generic [ref=e1265] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e1266]
+                  - cell "34 GB" [ref=e1267]
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1268]:
+                    - generic [ref=e1269]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e1273] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1274]:
+                          - generic [ref=e1276]: 10%
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e1280] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1281]:
+                          - generic [ref=e1283]: 20%
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e1287] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1288]:
+                          - generic [ref=e1290]: 30%
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e1294] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1295]:
+                          - img [ref=e1296]:
+                            - img [ref=e1297]
+                          - generic [ref=e1300]: 40%
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e1304] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1305]:
+                          - img [ref=e1306]:
+                            - img [ref=e1307]
+                          - generic [ref=e1310]: 50%
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e1314] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1315]:
+                          - generic [ref=e1317]: 60%
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e1321] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1322]:
+                          - img [ref=e1323]:
+                            - img [ref=e1324]
+                          - generic [ref=e1327]: 70%
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e1331] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1332]:
+                          - img [ref=e1333]:
+                            - img [ref=e1334]
+                          - generic [ref=e1337]: 80%
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e1341] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1342]:
+                          - img [ref=e1343]:
+                            - img [ref=e1344]
+                          - generic [ref=e1347]: 90%
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e1351] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1352]:
+                          - img [ref=e1353]:
+                            - img [ref=e1354]
+                          - generic [ref=e1357]: 30%
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1361] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1362]:
+                          - generic [ref=e1364]: 50%
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1365]:
+                    - generic [ref=e1367]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e1372] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1373]:
+                          - generic [ref=e1374]: N/D
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e1379] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1380]
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e1385] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1386]:
+                          - generic [ref=e1387]: N/D
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e1392] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1393]:
+                          - img [ref=e1394]:
+                            - img [ref=e1395]
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e1401] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1402]:
+                          - img [ref=e1403]:
+                            - img [ref=e1404]
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e1410] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1411]
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e1416] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1417]:
+                          - img [ref=e1418]:
+                            - img [ref=e1419]
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e1425] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1426]:
+                          - img [ref=e1427]:
+                            - img [ref=e1428]
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e1434] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1435]:
+                          - img [ref=e1436]:
+                            - img [ref=e1437]
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e1443] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1444]:
+                          - img [ref=e1445]:
+                            - img [ref=e1446]
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1452] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1453]
+                - row "9000000006 Copy mock-vdisk-states block-4-2 34 GB VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010 VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1466]:
+                  - cell "9000000006 Copy" [ref=e1467]:
+                    - generic [ref=e1469]:
+                      - generic "9000000006" [ref=e1470]:
+                        - link "9000000006" [ref=e1471] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000006&database=%2FRoot
+                      - button "Copy" [ref=e1472] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e1473]:
+                    - generic [ref=e1475] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e1476]
+                  - cell "34 GB" [ref=e1477]
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1478]:
+                    - generic [ref=e1479]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e1483] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1484]:
+                          - generic [ref=e1486]: 10%
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e1490] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1491]:
+                          - generic [ref=e1493]: 20%
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e1497] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1498]:
+                          - generic [ref=e1500]: 30%
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e1504] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1505]:
+                          - img [ref=e1506]:
+                            - img [ref=e1507]
+                          - generic [ref=e1510]: 40%
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e1514] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1515]:
+                          - img [ref=e1516]:
+                            - img [ref=e1517]
+                          - generic [ref=e1520]: 50%
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e1524] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1525]:
+                          - generic [ref=e1527]: 60%
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e1531] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1532]:
+                          - img [ref=e1533]:
+                            - img [ref=e1534]
+                          - generic [ref=e1537]: 70%
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e1541] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1542]:
+                          - img [ref=e1543]:
+                            - img [ref=e1544]
+                          - generic [ref=e1547]: 80%
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e1551] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1552]:
+                          - img [ref=e1553]:
+                            - img [ref=e1554]
+                          - generic [ref=e1557]: 90%
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e1561] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1562]:
+                          - img [ref=e1563]:
+                            - img [ref=e1564]
+                          - generic [ref=e1567]: 30%
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1571] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1572]:
+                          - generic [ref=e1574]: 50%
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1575]:
+                    - generic [ref=e1577]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e1582] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1583]:
+                          - generic [ref=e1584]: N/D
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e1589] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1590]
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e1595] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1596]:
+                          - generic [ref=e1597]: N/D
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e1602] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1603]:
+                          - img [ref=e1604]:
+                            - img [ref=e1605]
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e1611] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1612]:
+                          - img [ref=e1613]:
+                            - img [ref=e1614]
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e1620] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1621]
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e1626] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1627]:
+                          - img [ref=e1628]:
+                            - img [ref=e1629]
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e1635] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1636]:
+                          - img [ref=e1637]:
+                            - img [ref=e1638]
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e1644] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1645]:
+                          - img [ref=e1646]:
+                            - img [ref=e1647]
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e1653] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1654]:
+                          - img [ref=e1655]:
+                            - img [ref=e1656]
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1662] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1663]
+                - row "9000000007 Copy mock-vdisk-states block-4-2 34 GB VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010 VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1676]:
+                  - cell "9000000007 Copy" [ref=e1677]:
+                    - generic [ref=e1679]:
+                      - generic "9000000007" [ref=e1680]:
+                        - link "9000000007" [ref=e1681] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000007&database=%2FRoot
+                      - button "Copy" [ref=e1682] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e1683]:
+                    - generic [ref=e1685] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e1686]
+                  - cell "34 GB" [ref=e1687]
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1688]:
+                    - generic [ref=e1689]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e1693] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1694]:
+                          - generic [ref=e1696]: 10%
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e1700] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1701]:
+                          - generic [ref=e1703]: 20%
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e1707] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1708]:
+                          - generic [ref=e1710]: 30%
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e1714] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1715]:
+                          - img [ref=e1716]:
+                            - img [ref=e1717]
+                          - generic [ref=e1720]: 40%
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e1724] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1725]:
+                          - img [ref=e1726]:
+                            - img [ref=e1727]
+                          - generic [ref=e1730]: 50%
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e1734] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1735]:
+                          - generic [ref=e1737]: 60%
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e1741] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1742]:
+                          - img [ref=e1743]:
+                            - img [ref=e1744]
+                          - generic [ref=e1747]: 70%
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e1751] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1752]:
+                          - img [ref=e1753]:
+                            - img [ref=e1754]
+                          - generic [ref=e1757]: 80%
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e1761] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1762]:
+                          - img [ref=e1763]:
+                            - img [ref=e1764]
+                          - generic [ref=e1767]: 90%
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e1771] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1772]:
+                          - img [ref=e1773]:
+                            - img [ref=e1774]
+                          - generic [ref=e1777]: 30%
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1781] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1782]:
+                          - generic [ref=e1784]: 50%
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1785]:
+                    - generic [ref=e1787]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e1792] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1793]:
+                          - generic [ref=e1794]: N/D
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e1799] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1800]
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e1805] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1806]:
+                          - generic [ref=e1807]: N/D
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e1812] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1813]:
+                          - img [ref=e1814]:
+                            - img [ref=e1815]
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e1821] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1822]:
+                          - img [ref=e1823]:
+                            - img [ref=e1824]
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e1830] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1831]
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e1836] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1837]:
+                          - img [ref=e1838]:
+                            - img [ref=e1839]
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e1845] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1846]:
+                          - img [ref=e1847]:
+                            - img [ref=e1848]
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e1854] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1855]:
+                          - img [ref=e1856]:
+                            - img [ref=e1857]
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e1863] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1864]:
+                          - img [ref=e1865]:
+                            - img [ref=e1866]
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1872] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1873]
+                - row "9000000008 Copy mock-vdisk-states block-4-2 34 GB VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010 VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1886]:
+                  - cell "9000000008 Copy" [ref=e1887]:
+                    - generic [ref=e1889]:
+                      - generic "9000000008" [ref=e1890]:
+                        - link "9000000008" [ref=e1891] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000008&database=%2FRoot
+                      - button "Copy" [ref=e1892] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e1893]:
+                    - generic [ref=e1895] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e1896]
+                  - cell "34 GB" [ref=e1897]
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1898]:
+                    - generic [ref=e1899]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e1903] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1904]:
+                          - generic [ref=e1906]: 10%
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e1910] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1911]:
+                          - generic [ref=e1913]: 20%
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e1917] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1918]:
+                          - generic [ref=e1920]: 30%
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e1924] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1925]:
+                          - img [ref=e1926]:
+                            - img [ref=e1927]
+                          - generic [ref=e1930]: 40%
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e1934] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1935]:
+                          - img [ref=e1936]:
+                            - img [ref=e1937]
+                          - generic [ref=e1940]: 50%
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e1944] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1945]:
+                          - generic [ref=e1947]: 60%
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e1951] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1952]:
+                          - img [ref=e1953]:
+                            - img [ref=e1954]
+                          - generic [ref=e1957]: 70%
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e1961] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1962]:
+                          - img [ref=e1963]:
+                            - img [ref=e1964]
+                          - generic [ref=e1967]: 80%
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e1971] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1972]:
+                          - img [ref=e1973]:
+                            - img [ref=e1974]
+                          - generic [ref=e1977]: 90%
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e1981] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1982]:
+                          - img [ref=e1983]:
+                            - img [ref=e1984]
+                          - generic [ref=e1987]: 30%
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1991] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e1992]:
+                          - generic [ref=e1994]: 50%
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e1995]:
+                    - generic [ref=e1997]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e2002] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2003]:
+                          - generic [ref=e2004]: N/D
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e2009] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2010]
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e2015] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2016]:
+                          - generic [ref=e2017]: N/D
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e2022] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2023]:
+                          - img [ref=e2024]:
+                            - img [ref=e2025]
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e2031] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2032]:
+                          - img [ref=e2033]:
+                            - img [ref=e2034]
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e2040] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2041]
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e2046] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2047]:
+                          - img [ref=e2048]:
+                            - img [ref=e2049]
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e2055] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2056]:
+                          - img [ref=e2057]:
+                            - img [ref=e2058]
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e2064] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2065]:
+                          - img [ref=e2066]:
+                            - img [ref=e2067]
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e2073] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2074]:
+                          - img [ref=e2075]:
+                            - img [ref=e2076]
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2082] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2083]
+                - row "9000000009 Copy mock-vdisk-states block-4-2 34 GB VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010 VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2096]:
+                  - cell "9000000009 Copy" [ref=e2097]:
+                    - generic [ref=e2099]:
+                      - generic "9000000009" [ref=e2100]:
+                        - link "9000000009" [ref=e2101] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000009&database=%2FRoot
+                      - button "Copy" [ref=e2102] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e2103]:
+                    - generic [ref=e2105] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e2106]
+                  - cell "34 GB" [ref=e2107]
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2108]:
+                    - generic [ref=e2109]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e2113] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2114]:
+                          - generic [ref=e2116]: 10%
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e2120] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2121]:
+                          - generic [ref=e2123]: 20%
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e2127] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2128]:
+                          - generic [ref=e2130]: 30%
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e2134] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2135]:
+                          - img [ref=e2136]:
+                            - img [ref=e2137]
+                          - generic [ref=e2140]: 40%
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e2144] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2145]:
+                          - img [ref=e2146]:
+                            - img [ref=e2147]
+                          - generic [ref=e2150]: 50%
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e2154] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2155]:
+                          - generic [ref=e2157]: 60%
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e2161] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2162]:
+                          - img [ref=e2163]:
+                            - img [ref=e2164]
+                          - generic [ref=e2167]: 70%
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e2171] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2172]:
+                          - img [ref=e2173]:
+                            - img [ref=e2174]
+                          - generic [ref=e2177]: 80%
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e2181] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2182]:
+                          - img [ref=e2183]:
+                            - img [ref=e2184]
+                          - generic [ref=e2187]: 90%
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e2191] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2192]:
+                          - img [ref=e2193]:
+                            - img [ref=e2194]
+                          - generic [ref=e2197]: 30%
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2201] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2202]:
+                          - generic [ref=e2204]: 50%
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2205]:
+                    - generic [ref=e2207]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e2212] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2213]:
+                          - generic [ref=e2214]: N/D
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e2219] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2220]
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e2225] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2226]:
+                          - generic [ref=e2227]: N/D
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e2232] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2233]:
+                          - img [ref=e2234]:
+                            - img [ref=e2235]
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e2241] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2242]:
+                          - img [ref=e2243]:
+                            - img [ref=e2244]
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e2250] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2251]
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e2256] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2257]:
+                          - img [ref=e2258]:
+                            - img [ref=e2259]
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e2265] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2266]:
+                          - img [ref=e2267]:
+                            - img [ref=e2268]
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e2274] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2275]:
+                          - img [ref=e2276]:
+                            - img [ref=e2277]
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e2283] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2284]:
+                          - img [ref=e2285]:
+                            - img [ref=e2286]
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2292] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2293]
+                - row "9000000010 Copy mock-vdisk-states block-4-2 34 GB VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010 VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2306]:
+                  - cell "9000000010 Copy" [ref=e2307]:
+                    - generic [ref=e2309]:
+                      - generic "9000000010" [ref=e2310]:
+                        - link "9000000010" [ref=e2311] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000010&database=%2FRoot
+                      - button "Copy" [ref=e2312] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e2313]:
+                    - generic [ref=e2315] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e2316]
+                  - cell "34 GB" [ref=e2317]
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2318]:
+                    - generic [ref=e2319]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e2323] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2324]:
+                          - generic [ref=e2326]: 10%
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e2330] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2331]:
+                          - generic [ref=e2333]: 20%
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e2337] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2338]:
+                          - generic [ref=e2340]: 30%
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e2344] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2345]:
+                          - img [ref=e2346]:
+                            - img [ref=e2347]
+                          - generic [ref=e2350]: 40%
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e2354] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2355]:
+                          - img [ref=e2356]:
+                            - img [ref=e2357]
+                          - generic [ref=e2360]: 50%
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e2364] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2365]:
+                          - generic [ref=e2367]: 60%
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e2371] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2372]:
+                          - img [ref=e2373]:
+                            - img [ref=e2374]
+                          - generic [ref=e2377]: 70%
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e2381] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2382]:
+                          - img [ref=e2383]:
+                            - img [ref=e2384]
+                          - generic [ref=e2387]: 80%
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e2391] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2392]:
+                          - img [ref=e2393]:
+                            - img [ref=e2394]
+                          - generic [ref=e2397]: 90%
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e2401] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2402]:
+                          - img [ref=e2403]:
+                            - img [ref=e2404]
+                          - generic [ref=e2407]: 30%
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2411] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2412]:
+                          - generic [ref=e2414]: 50%
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2415]:
+                    - generic [ref=e2417]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e2422] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2423]:
+                          - generic [ref=e2424]: N/D
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e2429] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2430]
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e2435] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2436]:
+                          - generic [ref=e2437]: N/D
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e2442] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2443]:
+                          - img [ref=e2444]:
+                            - img [ref=e2445]
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e2451] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2452]:
+                          - img [ref=e2453]:
+                            - img [ref=e2454]
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e2460] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2461]
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e2466] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2467]:
+                          - img [ref=e2468]:
+                            - img [ref=e2469]
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e2475] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2476]:
+                          - img [ref=e2477]:
+                            - img [ref=e2478]
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e2484] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2485]:
+                          - img [ref=e2486]:
+                            - img [ref=e2487]
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e2493] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2494]:
+                          - img [ref=e2495]:
+                            - img [ref=e2496]
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2502] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2503]
+                - row "9000000011 Copy mock-vdisk-states block-4-2 34 GB VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010 VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2516]:
+                  - cell "9000000011 Copy" [ref=e2517]:
+                    - generic [ref=e2519]:
+                      - generic "9000000011" [ref=e2520]:
+                        - link "9000000011" [ref=e2521] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000011&database=%2FRoot
+                      - button "Copy" [ref=e2522] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e2523]:
+                    - generic [ref=e2525] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e2526]
+                  - cell "34 GB" [ref=e2527]
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2528]:
+                    - generic [ref=e2529]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e2533] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2534]:
+                          - generic [ref=e2536]: 10%
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e2540] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2541]:
+                          - generic [ref=e2543]: 20%
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e2547] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2548]:
+                          - generic [ref=e2550]: 30%
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e2554] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2555]:
+                          - img [ref=e2556]:
+                            - img [ref=e2557]
+                          - generic [ref=e2560]: 40%
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e2564] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2565]:
+                          - img [ref=e2566]:
+                            - img [ref=e2567]
+                          - generic [ref=e2570]: 50%
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e2574] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2575]:
+                          - generic [ref=e2577]: 60%
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e2581] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2582]:
+                          - img [ref=e2583]:
+                            - img [ref=e2584]
+                          - generic [ref=e2587]: 70%
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e2591] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2592]:
+                          - img [ref=e2593]:
+                            - img [ref=e2594]
+                          - generic [ref=e2597]: 80%
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e2601] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2602]:
+                          - img [ref=e2603]:
+                            - img [ref=e2604]
+                          - generic [ref=e2607]: 90%
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e2611] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2612]:
+                          - img [ref=e2613]:
+                            - img [ref=e2614]
+                          - generic [ref=e2617]: 30%
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2621] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2622]:
+                          - generic [ref=e2624]: 50%
+                  - cell "VDisk 9000000000-1-0-0-0 on node 7000 VDisk 9000000000-1-0-0-1 on node 7001 VDisk 9000000000-1-0-0-2 on node 7002 VDisk 9000000000-1-0-0-3 on node 7003 VDisk 9000000000-1-0-0-4 on node 7004 VDisk 9000000000-1-0-0-5 on node 7005 VDisk 9000000000-1-0-0-6 on node 7006 VDisk 9000000000-1-0-0-7 on node 7007 VDisk 9000000000-1-0-0-8 on node 7008 VDisk 9000000000-1-0-0-9 on node 7009 VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2625]:
+                    - generic [ref=e2627]:
+                      - link "VDisk 9000000000-1-0-0-0 on node 7000" [ref=e2632] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2633]:
+                          - generic [ref=e2634]: N/D
+                      - link "VDisk 9000000000-1-0-0-1 on node 7001" [ref=e2639] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2640]
+                      - link "VDisk 9000000000-1-0-0-2 on node 7002" [ref=e2645] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2646]:
+                          - generic [ref=e2647]: N/D
+                      - link "VDisk 9000000000-1-0-0-3 on node 7003" [ref=e2652] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2653]:
+                          - img [ref=e2654]:
+                            - img [ref=e2655]
+                      - link "VDisk 9000000000-1-0-0-4 on node 7004" [ref=e2661] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2662]:
+                          - img [ref=e2663]:
+                            - img [ref=e2664]
+                      - link "VDisk 9000000000-1-0-0-5 on node 7005" [ref=e2670] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2671]
+                      - link "VDisk 9000000000-1-0-0-6 on node 7006" [ref=e2676] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2677]:
+                          - img [ref=e2678]:
+                            - img [ref=e2679]
+                      - link "VDisk 9000000000-1-0-0-7 on node 7007" [ref=e2685] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2686]:
+                          - img [ref=e2687]:
+                            - img [ref=e2688]
+                      - link "VDisk 9000000000-1-0-0-8 on node 7008" [ref=e2694] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2695]:
+                          - img [ref=e2696]:
+                            - img [ref=e2697]
+                      - link "VDisk 9000000000-1-0-0-9 on node 7009" [ref=e2703] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2704]:
+                          - img [ref=e2705]:
+                            - img [ref=e2706]
+                      - link "VDisk 9000000000-1-0-0-10 on node 7010" [ref=e2712] [cursor=pointer]:
+                        - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                        - meter "Disk allocated space" [ref=e2713]
+                - row "9000000012 Copy mock-vdisk-states block-4-2 34 GB" [ref=e2726]:
+                  - cell "9000000012 Copy" [ref=e2727]:
+                    - generic [ref=e2729]:
+                      - generic "9000000012" [ref=e2730]:
+                        - link "9000000012" [ref=e2731] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000012&database=%2FRoot
+                      - button "Copy" [ref=e2732] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e2733]:
+                    - generic [ref=e2735] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e2736]
+                  - cell "34 GB" [ref=e2737]
+                  - cell [ref=e2738]
+                  - cell [ref=e2751]
+                - row "9000000013 Copy mock-vdisk-states block-4-2 34 GB" [ref=e2777]:
+                  - cell "9000000013 Copy" [ref=e2778]:
+                    - generic [ref=e2780]:
+                      - generic "9000000013" [ref=e2781]:
+                        - link "9000000013" [ref=e2782] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000013&database=%2FRoot
+                      - button "Copy" [ref=e2783] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e2784]:
+                    - generic [ref=e2786] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e2787]
+                  - cell "34 GB" [ref=e2788]
+                  - cell [ref=e2789]
+                  - cell [ref=e2802]
+                - row "9000000014 Copy mock-vdisk-states block-4-2 34 GB" [ref=e2828]:
+                  - cell "9000000014 Copy" [ref=e2829]:
+                    - generic [ref=e2831]:
+                      - generic "9000000014" [ref=e2832]:
+                        - link "9000000014" [ref=e2833] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000014&database=%2FRoot
+                      - button "Copy" [ref=e2834] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e2835]:
+                    - generic [ref=e2837] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e2838]
+                  - cell "34 GB" [ref=e2839]
+                  - cell [ref=e2840]
+                  - cell [ref=e2853]
+                - row "9000000015 Copy mock-vdisk-states block-4-2 34 GB" [ref=e2879]:
+                  - cell "9000000015 Copy" [ref=e2880]:
+                    - generic [ref=e2882]:
+                      - generic "9000000015" [ref=e2883]:
+                        - link "9000000015" [ref=e2884] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000015&database=%2FRoot
+                      - button "Copy" [ref=e2885] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e2886]:
+                    - generic [ref=e2888] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e2889]
+                  - cell "34 GB" [ref=e2890]
+                  - cell [ref=e2891]
+                  - cell [ref=e2904]
+                - row "9000000016 Copy mock-vdisk-states block-4-2 34 GB" [ref=e2930]:
+                  - cell "9000000016 Copy" [ref=e2931]:
+                    - generic [ref=e2933]:
+                      - generic "9000000016" [ref=e2934]:
+                        - link "9000000016" [ref=e2935] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000016&database=%2FRoot
+                      - button "Copy" [ref=e2936] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e2937]:
+                    - generic [ref=e2939] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e2940]
+                  - cell "34 GB" [ref=e2941]
+                  - cell [ref=e2942]
+                  - cell [ref=e2955]
+                - row "9000000017 Copy mock-vdisk-states block-4-2 34 GB" [ref=e2981]:
+                  - cell "9000000017 Copy" [ref=e2982]:
+                    - generic [ref=e2984]:
+                      - generic "9000000017" [ref=e2985]:
+                        - link "9000000017" [ref=e2986] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000017&database=%2FRoot
+                      - button "Copy" [ref=e2987] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e2988]:
+                    - generic [ref=e2990] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e2991]
+                  - cell "34 GB" [ref=e2992]
+                  - cell [ref=e2993]
+                  - cell [ref=e3006]
+                - row "9000000018 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3032]:
+                  - cell "9000000018 Copy" [ref=e3033]:
+                    - generic [ref=e3035]:
+                      - generic "9000000018" [ref=e3036]:
+                        - link "9000000018" [ref=e3037] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000018&database=%2FRoot
+                      - button "Copy" [ref=e3038] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3039]:
+                    - generic [ref=e3041] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3042]
+                  - cell "34 GB" [ref=e3043]
+                  - cell [ref=e3044]
+                  - cell [ref=e3057]
+                - row "9000000019 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3083]:
+                  - cell "9000000019 Copy" [ref=e3084]:
+                    - generic [ref=e3086]:
+                      - generic "9000000019" [ref=e3087]:
+                        - link "9000000019" [ref=e3088] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000019&database=%2FRoot
+                      - button "Copy" [ref=e3089] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3090]:
+                    - generic [ref=e3092] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3093]
+                  - cell "34 GB" [ref=e3094]
+                  - cell [ref=e3095]
+                  - cell [ref=e3108]
+                - row "9000000000 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3134]:
+                  - cell "9000000000 Copy" [ref=e3135]:
+                    - generic [ref=e3137]:
+                      - generic "9000000000" [ref=e3138]:
+                        - link "9000000000" [ref=e3139] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000000&database=%2FRoot
+                      - button "Copy" [ref=e3140] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3141]:
+                    - generic [ref=e3143] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3144]
+                  - cell "34 GB" [ref=e3145]
+                  - cell [ref=e3146]
+                  - cell [ref=e3159]
+                - row "9000000001 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3185]:
+                  - cell "9000000001 Copy" [ref=e3186]:
+                    - generic [ref=e3188]:
+                      - generic "9000000001" [ref=e3189]:
+                        - link "9000000001" [ref=e3190] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000001&database=%2FRoot
+                      - button "Copy" [ref=e3191] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3192]:
+                    - generic [ref=e3194] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3195]
+                  - cell "34 GB" [ref=e3196]
+                  - cell [ref=e3197]
+                  - cell [ref=e3210]
+                - row "9000000002 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3236]:
+                  - cell "9000000002 Copy" [ref=e3237]:
+                    - generic [ref=e3239]:
+                      - generic "9000000002" [ref=e3240]:
+                        - link "9000000002" [ref=e3241] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000002&database=%2FRoot
+                      - button "Copy" [ref=e3242] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3243]:
+                    - generic [ref=e3245] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3246]
+                  - cell "34 GB" [ref=e3247]
+                  - cell [ref=e3248]
+                  - cell [ref=e3261]
+                - row "9000000003 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3287]:
+                  - cell "9000000003 Copy" [ref=e3288]:
+                    - generic [ref=e3290]:
+                      - generic "9000000003" [ref=e3291]:
+                        - link "9000000003" [ref=e3292] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000003&database=%2FRoot
+                      - button "Copy" [ref=e3293] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3294]:
+                    - generic [ref=e3296] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3297]
+                  - cell "34 GB" [ref=e3298]
+                  - cell [ref=e3299]
+                  - cell [ref=e3312]
+                - row "9000000004 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3338]:
+                  - cell "9000000004 Copy" [ref=e3339]:
+                    - generic [ref=e3341]:
+                      - generic "9000000004" [ref=e3342]:
+                        - link "9000000004" [ref=e3343] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000004&database=%2FRoot
+                      - button "Copy" [ref=e3344] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3345]:
+                    - generic [ref=e3347] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3348]
+                  - cell "34 GB" [ref=e3349]
+                  - cell [ref=e3350]
+                  - cell [ref=e3363]
+                - row "9000000005 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3389]:
+                  - cell "9000000005 Copy" [ref=e3390]:
+                    - generic [ref=e3392]:
+                      - generic "9000000005" [ref=e3393]:
+                        - link "9000000005" [ref=e3394] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000005&database=%2FRoot
+                      - button "Copy" [ref=e3395] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3396]:
+                    - generic [ref=e3398] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3399]
+                  - cell "34 GB" [ref=e3400]
+                  - cell [ref=e3401]
+                  - cell [ref=e3414]
+                - row "9000000006 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3440]:
+                  - cell "9000000006 Copy" [ref=e3441]:
+                    - generic [ref=e3443]:
+                      - generic "9000000006" [ref=e3444]:
+                        - link "9000000006" [ref=e3445] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000006&database=%2FRoot
+                      - button "Copy" [ref=e3446] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3447]:
+                    - generic [ref=e3449] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3450]
+                  - cell "34 GB" [ref=e3451]
+                  - cell [ref=e3452]
+                  - cell [ref=e3465]
+                - row "9000000007 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3491]:
+                  - cell "9000000007 Copy" [ref=e3492]:
+                    - generic [ref=e3494]:
+                      - generic "9000000007" [ref=e3495]:
+                        - link "9000000007" [ref=e3496] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000007&database=%2FRoot
+                      - button "Copy" [ref=e3497] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3498]:
+                    - generic [ref=e3500] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3501]
+                  - cell "34 GB" [ref=e3502]
+                  - cell [ref=e3503]
+                  - cell [ref=e3516]
+                - row "9000000008 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3542]:
+                  - cell "9000000008 Copy" [ref=e3543]:
+                    - generic [ref=e3545]:
+                      - generic "9000000008" [ref=e3546]:
+                        - link "9000000008" [ref=e3547] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000008&database=%2FRoot
+                      - button "Copy" [ref=e3548] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3549]:
+                    - generic [ref=e3551] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3552]
+                  - cell "34 GB" [ref=e3553]
+                  - cell [ref=e3554]
+                  - cell [ref=e3567]
+                - row "9000000009 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3593]:
+                  - cell "9000000009 Copy" [ref=e3594]:
+                    - generic [ref=e3596]:
+                      - generic "9000000009" [ref=e3597]:
+                        - link "9000000009" [ref=e3598] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000009&database=%2FRoot
+                      - button "Copy" [ref=e3599] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3600]:
+                    - generic [ref=e3602] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3603]
+                  - cell "34 GB" [ref=e3604]
+                  - cell [ref=e3605]
+                  - cell [ref=e3618]
+                - row "9000000010 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3644]:
+                  - cell "9000000010 Copy" [ref=e3645]:
+                    - generic [ref=e3647]:
+                      - generic "9000000010" [ref=e3648]:
+                        - link "9000000010" [ref=e3649] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000010&database=%2FRoot
+                      - button "Copy" [ref=e3650] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3651]:
+                    - generic [ref=e3653] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3654]
+                  - cell "34 GB" [ref=e3655]
+                  - cell [ref=e3656]
+                  - cell [ref=e3669]
+                - row "9000000011 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3695]:
+                  - cell "9000000011 Copy" [ref=e3696]:
+                    - generic [ref=e3698]:
+                      - generic "9000000011" [ref=e3699]:
+                        - link "9000000011" [ref=e3700] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000011&database=%2FRoot
+                      - button "Copy" [ref=e3701] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3702]:
+                    - generic [ref=e3704] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3705]
+                  - cell "34 GB" [ref=e3706]
+                  - cell [ref=e3707]
+                  - cell [ref=e3720]
+                - row "9000000012 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3746]:
+                  - cell "9000000012 Copy" [ref=e3747]:
+                    - generic [ref=e3749]:
+                      - generic "9000000012" [ref=e3750]:
+                        - link "9000000012" [ref=e3751] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000012&database=%2FRoot
+                      - button "Copy" [ref=e3752] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3753]:
+                    - generic [ref=e3755] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3756]
+                  - cell "34 GB" [ref=e3757]
+                  - cell [ref=e3758]
+                  - cell [ref=e3771]
+                - row "9000000013 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3797]:
+                  - cell "9000000013 Copy" [ref=e3798]:
+                    - generic [ref=e3800]:
+                      - generic "9000000013" [ref=e3801]:
+                        - link "9000000013" [ref=e3802] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000013&database=%2FRoot
+                      - button "Copy" [ref=e3803] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3804]:
+                    - generic [ref=e3806] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3807]
+                  - cell "34 GB" [ref=e3808]
+                  - cell [ref=e3809]
+                  - cell [ref=e3822]
+                - row "9000000014 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3848]:
+                  - cell "9000000014 Copy" [ref=e3849]:
+                    - generic [ref=e3851]:
+                      - generic "9000000014" [ref=e3852]:
+                        - link "9000000014" [ref=e3853] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000014&database=%2FRoot
+                      - button "Copy" [ref=e3854] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3855]:
+                    - generic [ref=e3857] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3858]
+                  - cell "34 GB" [ref=e3859]
+                  - cell [ref=e3860]
+                  - cell [ref=e3873]
+                - row "9000000015 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3899]:
+                  - cell "9000000015 Copy" [ref=e3900]:
+                    - generic [ref=e3902]:
+                      - generic "9000000015" [ref=e3903]:
+                        - link "9000000015" [ref=e3904] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000015&database=%2FRoot
+                      - button "Copy" [ref=e3905] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3906]:
+                    - generic [ref=e3908] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3909]
+                  - cell "34 GB" [ref=e3910]
+                  - cell [ref=e3911]
+                  - cell [ref=e3924]
+                - row "9000000016 Copy mock-vdisk-states block-4-2 34 GB" [ref=e3950]:
+                  - cell "9000000016 Copy" [ref=e3951]:
+                    - generic [ref=e3953]:
+                      - generic "9000000016" [ref=e3954]:
+                        - link "9000000016" [ref=e3955] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000016&database=%2FRoot
+                      - button "Copy" [ref=e3956] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e3957]:
+                    - generic [ref=e3959] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e3960]
+                  - cell "34 GB" [ref=e3961]
+                  - cell [ref=e3962]
+                  - cell [ref=e3975]
+                - row "9000000017 Copy mock-vdisk-states block-4-2 34 GB" [ref=e4001]:
+                  - cell "9000000017 Copy" [ref=e4002]:
+                    - generic [ref=e4004]:
+                      - generic "9000000017" [ref=e4005]:
+                        - link "9000000017" [ref=e4006] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000017&database=%2FRoot
+                      - button "Copy" [ref=e4007] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e4008]:
+                    - generic [ref=e4010] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e4011]
+                  - cell "34 GB" [ref=e4012]
+                  - cell [ref=e4013]
+                  - cell [ref=e4026]
+                - row "9000000018 Copy mock-vdisk-states block-4-2 34 GB" [ref=e4052]:
+                  - cell "9000000018 Copy" [ref=e4053]:
+                    - generic [ref=e4055]:
+                      - generic "9000000018" [ref=e4056]:
+                        - link "9000000018" [ref=e4057] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000018&database=%2FRoot
+                      - button "Copy" [ref=e4058] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e4059]:
+                    - generic [ref=e4061] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e4062]
+                  - cell "34 GB" [ref=e4063]
+                  - cell [ref=e4064]
+                  - cell [ref=e4077]
+                - row "9000000019 Copy mock-vdisk-states block-4-2 34 GB" [ref=e4103]:
+                  - cell "9000000019 Copy" [ref=e4104]:
+                    - generic [ref=e4106]:
+                      - generic "9000000019" [ref=e4107]:
+                        - link "9000000019" [ref=e4108] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000019&database=%2FRoot
+                      - button "Copy" [ref=e4109] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e4110]:
+                    - generic [ref=e4112] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e4113]
+                  - cell "34 GB" [ref=e4114]
+                  - cell [ref=e4115]
+                  - cell [ref=e4128]
+          - status [ref=e4154]
+```
