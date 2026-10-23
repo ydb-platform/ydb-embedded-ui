@@ -5,6 +5,8 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
+const {readPlaywrightVideo} = require('./read-playwright-video');
+
 const runner = path.resolve(__dirname, '../../../scripts/playwright-docker.sh');
 const command = fs.readFileSync(
     path.resolve(__dirname, '../../../scripts/playwright-container.sh'),
@@ -18,7 +20,7 @@ const testCommand = workflow.match(
 )?.[0];
 const releaseRetries = testCommand?.match(/--retries=\d+\b/)?.[0];
 const releaseTrace = testCommand?.match(/--trace=[a-z-]+\b/)?.[0];
-const releaseVideo = workflow.match(/^\s+PLAYWRIGHT_VIDEO: ([a-z-]+)$/m)?.[1];
+const releaseVideo = readPlaywrightVideo(workflow);
 assert.ok(releaseRetries, 'Release workflow must specify the retry policy');
 assert.ok(releaseTrace, 'Release workflow must specify the trace policy');
 assert.ok(releaseVideo, 'Release workflow must specify the video policy');
