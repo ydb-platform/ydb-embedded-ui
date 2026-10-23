@@ -21,38 +21,37 @@ const Describe = ({path, database, databaseFullPath, scrollContainerRef}: IDescr
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const useMetaProxy = useClusterWithProxy();
 
-    const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
+    const {data, currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
         {path, database, databaseFullPath, useMetaProxy},
         {pollingInterval: autoRefreshInterval},
     );
 
     const loading = isFetching && currentData === undefined;
 
-    if (loading) {
-        return <Loader size="m" />;
-    }
-
-    if (!currentData && !error) {
-        return <div className={b('message-container')}>Empty</div>;
-    }
-
     return (
-        <div className={b()}>
-            {error ? <ResponseError error={error} /> : null}
-            {currentData ? (
-                <div className={b('result')}>
-                    <JsonViewer
-                        value={currentData}
-                        withClipboardButton={{
-                            withLabel: false,
-                            copyText: JSON.stringify(currentData),
-                        }}
-                        search
-                        collapsedInitially
-                        scrollContainerRef={scrollContainerRef}
-                    />
-                </div>
+        <div className={b()} data-qa="describe">
+            {loading ? <Loader size="m" /> : null}
+            {!loading && !currentData && !error ? (
+                <div className={b('message-container')}>Empty</div>
             ) : null}
+            {error ? <ResponseError error={error} /> : null}
+            {/* Keep the viewer mounted while the next object loads to preserve expanded paths. */}
+            <div hidden={!currentData}>
+                {data ? (
+                    <div className={b('result')}>
+                        <JsonViewer
+                            value={data}
+                            withClipboardButton={{
+                                withLabel: false,
+                                copyText: JSON.stringify(data),
+                            }}
+                            search
+                            collapsedInitially
+                            scrollContainerRef={scrollContainerRef}
+                        />
+                    </div>
+                ) : null}
+            </div>
         </div>
     );
 };
