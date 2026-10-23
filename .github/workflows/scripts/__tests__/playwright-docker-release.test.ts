@@ -93,7 +93,9 @@ describe('release Playwright container boundary', () => {
                     env: {...env, [variable]: 'main', PLAYWRIGHT_APP_BACKEND: ''},
                     stdio: 'pipe',
                 }),
-            ).toThrow('release mode requires a commit SHA');
+            ).toThrow(
+                'release mode requires full UI and test commit SHAs and a pinned Playwright version',
+            );
         },
     );
 

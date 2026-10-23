@@ -12,7 +12,7 @@ RELEASE_OUTPUT="${PLAYWRIGHT_RELEASE_OUTPUT:-${PROJECT_DIR}/playwright-artifacts
 
 if [ -n "$RELEASE_REF" ]; then
   if [[ ! "$RELEASE_REF" =~ ^[a-f0-9]{40}$ ]] || [[ ! "$TEST_REF" =~ ^[a-f0-9]{40}$ ]] || [[ ! "${PLAYWRIGHT_RELEASE_VERSION:-}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
-    echo "Error: release mode requires a commit SHA and a pinned Playwright version" >&2
+    echo "Error: release mode requires full UI and test commit SHAs and a pinned Playwright version" >&2
     exit 1
   fi
   if [[ "$RELEASE_MODE" != test && "$RELEASE_MODE" != report ]]; then
