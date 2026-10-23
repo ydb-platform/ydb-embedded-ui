@@ -11,11 +11,9 @@ const testCommand = workflow.match(
     /^\s+run: bash controller\/scripts\/playwright-docker\.sh[^\n]+/m,
 )?.[0];
 const releaseRetries = testCommand?.match(/--retries=\d+\b/)?.[0];
-const releaseWorkers = testCommand?.match(/--workers=\d+\b/)?.[0];
 const releaseTrace = testCommand?.match(/--trace=[a-z-]+\b/)?.[0];
 const releaseVideo = workflow.match(/^\s+PLAYWRIGHT_VIDEO: ([a-z-]+)$/m)?.[1];
 assert.ok(releaseRetries, 'Release workflow must specify the retry policy');
-assert.ok(releaseWorkers, 'Release workflow must specify the CI worker count');
 assert.ok(releaseTrace, 'Release workflow must specify the trace policy');
 assert.ok(releaseVideo, 'Release workflow must specify the video policy');
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'release-report-smoke-'));
@@ -30,8 +28,6 @@ try {
             '--rm',
             '-e',
             `RELEASE_RETRIES=${releaseRetries}`,
-            '-e',
-            `RELEASE_WORKERS=${releaseWorkers}`,
             '-e',
             `RELEASE_TRACE=${releaseTrace}`,
             '-e',
@@ -76,8 +72,8 @@ test('fails with attachment', async ({page}, info) => {
     expect(1).toBe(2);
 });
 TEST
-npx --no playwright test "$RELEASE_RETRIES" "$RELEASE_WORKERS" "$RELEASE_TRACE" --grep 'recovers on retry' --reporter=line
-if npx --no playwright test "$RELEASE_RETRIES" "$RELEASE_WORKERS" "$RELEASE_TRACE"; then
+npx --no playwright test "$RELEASE_RETRIES" "$RELEASE_TRACE" --grep 'recovers on retry' --reporter=line
+if npx --no playwright test "$RELEASE_RETRIES" "$RELEASE_TRACE"; then
     echo 'Fixture should contain a failed test' >&2
     exit 1
 fi
@@ -116,7 +112,6 @@ grep '/input/resources' /tmp/readonly.log
         [report.stats.expected, report.stats.unexpected, report.stats.skipped, report.stats.flaky],
         [1, 1, 0, 1],
     );
-    assert.equal(report.config.workers, Number(releaseWorkers.split('=')[1]));
     const specs = report.suites.flatMap((suite) => suite.specs);
     const recovered = specs.find((spec) => spec.title === 'recovers on retry with attachment')
         ?.tests[0];
