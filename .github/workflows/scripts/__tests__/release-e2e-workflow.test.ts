@@ -62,15 +62,14 @@ describe('release and pull-request E2E environment', () => {
         }
     });
 
-    test('matches the current CI workers, retries, trace and video policy for historical tests', () => {
+    test('matches the current CI workers and retries for historical tests', () => {
         const config: PlaywrightTestConfig = JSON.parse(
             execFileSync(
                 process.execPath,
                 [
                     '-e',
                     `const {default: config} = require('./playwright.config.ts');
-console.log(JSON.stringify({workers: config.workers, retries: config.retries,
-    use: {trace: config.use.trace, video: config.use.video}}));`,
+console.log(JSON.stringify({workers: config.workers, retries: config.retries}));`,
                 ],
                 {
                     cwd: root,
@@ -82,8 +81,11 @@ console.log(JSON.stringify({workers: config.workers, retries: config.retries,
         );
         expect(releaseJob).toContain(`--workers=${config.workers}`);
         expect(releaseJob).toContain(`--retries=${config.retries}`);
-        expect(releaseJob).toContain(`--trace=${config.use?.trace}`);
-        expect(setting(releaseJob, 'PLAYWRIGHT_VIDEO')).toBe(config.use?.video);
+    });
+
+    test('retains release failure recordings independently of the PR recording policy', () => {
+        expect(releaseJob).toContain('--trace=retain-on-failure');
+        expect(setting(releaseJob, 'PLAYWRIGHT_VIDEO')).toBe('retain-on-failure');
     });
 });
 

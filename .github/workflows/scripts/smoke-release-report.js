@@ -139,7 +139,8 @@ grep '/input/resources' /tmp/readonly.log
         const names = result.attachments.map(({name}) => name);
         assert.deepEqual(
             names.filter((name) => name === 'trace' || name === 'video').sort(),
-            result.retry === 1 ? ['trace', 'video'] : [],
+            result.status === 'failed' ? ['trace', 'video'] : [],
+            `Attempt ${result.retry} (${result.status}) must retain only failure recordings`,
         );
         if (result.status === 'failed') {
             assert.ok(names.includes('screenshot'), 'Every failed attempt keeps its screenshot');
@@ -164,7 +165,7 @@ grep '/input/resources' /tmp/readonly.log
     assert.equal(digest(), before);
     assert.deepEqual(fs.readdirSync(blobs), inputs);
     console.info(
-        'Report smoke passed: CI retries and first-retry trace/video verified; failed-attempt screenshots and attachments retained; input ZIP unchanged.',
+        'Report smoke passed: original and retry failures retain trace/video; successful attempts discard recordings; screenshots and attachments retained; input ZIP unchanged.',
     );
 } finally {
     // The runner writes files as root; remove only this smoke's temporary output.
