@@ -1,5 +1,17 @@
 # Changelog
 
+## [22.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.5.0...v22.6.0) (2026-10-23)
+
+
+### Features
+
+* **nodes:** add capability-gated unavailable nodes filter ([#4510](https://github.com/ydb-platform/ydb-embedded-ui/issues/4510)) ([4d63ab2](https://github.com/ydb-platform/ydb-embedded-ui/commit/4d63ab2c4d6fe1c92bdd1b5506b89292a958e5a4))
+
+
+### Bug Fixes
+
+* keep entity page refresh controls visible ([#4489](https://github.com/ydb-platform/ydb-embedded-ui/issues/4489)) ([1296973](https://github.com/ydb-platform/ydb-embedded-ui/commit/1296973459caf945c0ff5893eecb215c275156e8))
+
 ## [22.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.4.0...v22.5.0) (2026-10-22)
 
 
