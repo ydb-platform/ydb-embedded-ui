@@ -19,7 +19,7 @@ permissions:
 jobs:
   resolve:
     name: Resolve release identity
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       ui_sha: ${{ steps.release.outputs.ui_sha }}
@@ -61,7 +61,7 @@ jobs:
   e2e:
     name: Release UI tests (${{ matrix.shard }}/8)
     needs: resolve
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
