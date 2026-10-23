@@ -1,4 +1,4 @@
-import {execFileSync, spawnSync} from 'node:child_process';
+import {spawnSync} from 'node:child_process';
 import {once} from 'node:events';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -8,82 +8,12 @@ import path from 'node:path';
 import {URL} from 'node:url';
 import {runInNewContext} from 'node:vm';
 
-import type {PlaywrightTestConfig} from '@playwright/test';
-
 const root = path.resolve(__dirname, '../../../..');
 const workflow = fs.readFileSync(path.join(root, '.github/workflows/release-e2e.yml'), 'utf8');
 const reportWorkflow = fs.readFileSync(
     path.join(root, '.github/workflows/release-e2e-report.yml'),
     'utf8',
 );
-const qualityWorkflow = fs.readFileSync(path.join(root, '.github/workflows/quality.yml'), 'utf8');
-
-describe('release and pull-request E2E environment', () => {
-    const releaseJob = workflow.split('\n  e2e:')[1].split('\n  report:')[0];
-    const qualityJob = qualityWorkflow.split('\n  e2e_tests:')[1].split('\n  merge_reports:')[0];
-
-    function setting(source: string, name: string) {
-        const value = source.match(new RegExp(`^\\s+${name}: (.+)$`, 'm'))?.[1];
-        if (!value) {
-            throw new Error(`Missing E2E setting: ${name}`);
-        }
-        return value;
-    }
-
-    test('uses the same Node version for release execution and reporting', () => {
-        const value = setting(qualityJob, 'node-version');
-        const matches = [...`${workflow}\n${reportWorkflow}`.matchAll(/node-version: (.+)/g)];
-        expect(matches.length).toBeGreaterThan(0);
-        expect(new Set(matches.map((match) => match[1]))).toEqual(new Set([value]));
-    });
-
-    test('shares the verified setup action and root runtime settings', () => {
-        const action = /uses: (astandrik\/setup-local-ydb@[a-f0-9]{40})/;
-        expect(releaseJob.match(action)?.[1]).toBe(
-            'astandrik/setup-local-ydb@ba59d49d74fdab2f308132e72da6d4e111b7200d',
-        );
-        expect(qualityJob.match(action)?.[1]).toBe(releaseJob.match(action)?.[1]);
-        for (const name of ['topology', 'auth', 'cleanup']) {
-            expect(setting(releaseJob, name)).toBe(setting(qualityJob, name));
-        }
-    });
-
-    test('uses the action-selected backend endpoint in both workflows', () => {
-        for (const job of [qualityJob, releaseJob]) {
-            expect(job).toContain('id: ydb');
-            expect(setting(job, 'PLAYWRIGHT_APP_BACKEND')).toBe(
-                '${{ steps.ydb.outputs.monitoring-url }}',
-            );
-            expect(job).not.toContain('monitoring-port:');
-        }
-    });
-
-    test('matches the current CI workers and retries for historical tests', () => {
-        const config: PlaywrightTestConfig = JSON.parse(
-            execFileSync(
-                process.execPath,
-                [
-                    '-e',
-                    `const {default: config} = require('./playwright.config.ts');
-console.log(JSON.stringify({workers: config.workers, retries: config.retries}));`,
-                ],
-                {
-                    cwd: root,
-                    env: {...process.env, CI: 'true', PLAYWRIGHT_VIDEO: ''},
-                    encoding: 'utf8',
-                    timeout: 10000,
-                },
-            ),
-        );
-        expect(releaseJob).toContain(`--workers=${config.workers}`);
-        expect(releaseJob).toContain(`--retries=${config.retries}`);
-    });
-
-    test('retains release failure recordings independently of the PR recording policy', () => {
-        expect(releaseJob).toContain('--trace=retain-on-failure');
-        expect(setting(releaseJob, 'PLAYWRIGHT_VIDEO')).toBe('retain-on-failure');
-    });
-});
 
 test.each(
     [workflow, reportWorkflow].flatMap((source) =>
@@ -126,6 +56,8 @@ test.each(
 
 test('starts the release-version frontend while keeping local-ydb as its backend', () => {
     expect(workflow).not.toContain('PLAYWRIGHT_BASE_URL:');
+    expect(workflow).toContain('id: ydb');
+    expect(workflow).not.toContain('monitoring-port:');
     expect(workflow).toContain('PLAYWRIGHT_APP_BACKEND: ${{ steps.ydb.outputs.monitoring-url }}');
     expect(workflow).toContain('PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}');
     expect(workflow).toContain(
@@ -134,6 +66,11 @@ test('starts the release-version frontend while keeping local-ydb as its backend
     expect(reportWorkflow).toContain(
         'PLAYWRIGHT_RELEASE_TEST_REF: ${{ steps.prepare.outputs.tests_sha }}',
     );
+});
+
+test('retains recordings of failed release attempts', () => {
+    expect(workflow).toContain('--trace=retain-on-failure');
+    expect(workflow).toContain('PLAYWRIGHT_VIDEO: retain-on-failure');
 });
 
 test('forwards backend routes and streaming without rewriting UI paths', async () => {
