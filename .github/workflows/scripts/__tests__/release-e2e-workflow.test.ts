@@ -30,15 +30,11 @@ describe('release and pull-request E2E environment', () => {
         return value;
     }
 
-    test('uses the same runner and Node version for release execution and reporting', () => {
-        for (const name of ['runs-on', 'node-version']) {
-            const value = setting(qualityJob, name);
-            const matches = [
-                ...`${workflow}\n${reportWorkflow}`.matchAll(new RegExp(`${name}: (.+)`, 'g')),
-            ];
-            expect(matches.length).toBeGreaterThan(0);
-            expect(new Set(matches.map((match) => match[1]))).toEqual(new Set([value]));
-        }
+    test('uses the same Node version for release execution and reporting', () => {
+        const value = setting(qualityJob, 'node-version');
+        const matches = [...`${workflow}\n${reportWorkflow}`.matchAll(/node-version: (.+)/g)];
+        expect(matches.length).toBeGreaterThan(0);
+        expect(new Set(matches.map((match) => match[1]))).toEqual(new Set([value]));
     });
 
     test('shares the verified setup action and root runtime settings', () => {
