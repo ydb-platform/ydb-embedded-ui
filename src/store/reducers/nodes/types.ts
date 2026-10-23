@@ -3,6 +3,7 @@ import type {NodesUptimeFilterValues} from '../../../utils/nodes';
 
 export interface NodesFilters {
     searchValue: string;
+    hideUnavailable?: boolean;
     withProblems: boolean;
     uptimeFilter: NodesUptimeFilterValues;
     peerRoleFilter?: NodesPeerRole;

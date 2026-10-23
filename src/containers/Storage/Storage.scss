@@ -1,6 +1,10 @@
 @use '../../styles/mixins.scss';
 
 .global-storage {
+    &__hide-unavailable {
+        margin-inline-start: var(--g-spacing-1);
+    }
+
     &__search {
         @include mixins.search();
     }

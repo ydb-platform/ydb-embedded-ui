@@ -14,6 +14,7 @@ import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import type {NodesFilters} from '../../store/reducers/nodes/types';
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
+import {useHideUnavailableNodes} from '../../utils/hooks/useHideUnavailableNodes';
 import {getIllustration} from '../../utils/illustrations';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {renderPaginatedTableErrorMessage} from '../../utils/renderPaginatedTableErrorMessage';
@@ -61,6 +62,7 @@ export function NodesTable({
     onDataFetched,
 }: NodesTableProps) {
     const history = useHistory();
+    const {hideUnavailable} = useHideUnavailableNodes();
     const SuccessImage = getIllustration('SuccessOperation');
 
     const useMetaProxy = useClusterWithProxy();
@@ -71,6 +73,7 @@ export function NodesTable({
             useMetaProxy,
             database,
             searchValue,
+            hideUnavailable,
             withProblems,
             uptimeFilter,
             peerRoleFilter,
@@ -78,6 +81,7 @@ export function NodesTable({
             filterGroupBy,
         };
     }, [
+        hideUnavailable,
         path,
         databaseFullPath,
         useMetaProxy,

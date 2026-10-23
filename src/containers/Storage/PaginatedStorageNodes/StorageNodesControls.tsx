@@ -4,6 +4,7 @@ import {ChartTreemap} from '@gravity-ui/icons';
 import {Button, Flex, Icon, Select, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
+import {HideUnavailableNodesSwitch} from '../../../components/HideUnavailableNodesSwitch/HideUnavailableNodesSwitch';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
 import {Search} from '../../../components/Search/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
@@ -127,6 +128,7 @@ export function StorageNodesControls({
                         {i18n('controls_expert-mode')}
                     </Button>
                 ) : null}
+                <HideUnavailableNodesSwitch className={b('hide-unavailable')} />
             </Flex>
             {canUseStorageExpertMode && isStorageExpertMode ? (
                 <StorageNodesExpertModePanel />

@@ -9,6 +9,7 @@ import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
+import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesTable} from '../NodesTable';
 import {useDebouncedSearch} from '../useDebouncedSearch';
@@ -49,6 +50,7 @@ export function NodesComponent({
     );
     const searchFilter = useDebouncedSearch(searchValue);
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
+    const {hideUnavailable} = useHideUnavailableNodes();
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         columns,
@@ -91,7 +93,13 @@ export function NodesComponent({
             }
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchFilter, withProblems, uptimeFilter, peerRoleFilter],
+                scrollDependencies: [
+                    searchFilter,
+                    withProblems,
+                    uptimeFilter,
+                    peerRoleFilter,
+                    hideUnavailable,
+                ],
             }}
         />
     );

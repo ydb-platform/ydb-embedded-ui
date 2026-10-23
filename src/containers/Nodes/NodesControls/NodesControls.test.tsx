@@ -15,6 +15,8 @@ import {NodesControls} from './NodesControls';
 jest.mock('../../../store/reducers/capabilities/hooks', () => ({
     useViewerNodesHandlerHasGroupingBySystemState: () => true,
     useViewerNodesHandlerHasNetworkStats: () => false,
+    useViewerNodesAliveFilterAvailable: () => false,
+    useCapabilitiesLoaded: () => true,
 }));
 
 jest.mock('../../../utils/hooks/useIsUserAllowedToMakeChanges', () => ({
