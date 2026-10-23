@@ -82,8 +82,8 @@ test('forwards backend routes and streaming without rewriting UI paths', async (
     await once(upstream, 'listening');
     let proxy: Server | undefined;
     try {
-        const runner = fs.readFileSync(path.join(root, 'scripts/playwright-docker.sh'), 'utf8');
-        const script = runner.split("node <<'NODE' &\n")[1].split('\nNODE')[0];
+        const command = fs.readFileSync(path.join(root, 'scripts/playwright-container.sh'), 'utf8');
+        const script = command.split("node <<'NODE' &\n")[1].split('\nNODE')[0];
         // Execute the shipped proxy; only its bind port changes to avoid local services.
         proxy = runInNewContext(
             `${script.replace('server.listen(8765,', 'server.listen(0,')}\nserver`,

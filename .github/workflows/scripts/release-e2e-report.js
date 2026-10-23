@@ -2,7 +2,12 @@ const {execFileSync} = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const {IMAGE_REPOSITORY, readGithub} = require('./resolve-release-ui');
+const {
+    IMAGE_REPOSITORY,
+    readGithub,
+    SHA_PATTERN,
+    PLAYWRIGHT_VERSION_PATTERN,
+} = require('./resolve-release-ui');
 
 function verifyImage(provenance, container, image) {
     if (
@@ -29,7 +34,7 @@ async function readReportSource({runId, repository, workflowSha}, github = readG
         run.path !== '.github/workflows/release-e2e.yml' ||
         run.event !== 'workflow_dispatch' ||
         run.head_branch !== 'main' ||
-        !/^[a-f0-9]{40}$/.test(run.head_sha || '') ||
+        !SHA_PATTERN.test(run.head_sha || '') ||
         !Number.isInteger(run.run_attempt) ||
         run.run_attempt < 1
     ) {
@@ -76,9 +81,9 @@ async function readReportSource({runId, repository, workflowSha}, github = readG
 function prepareReport(provenance, source) {
     if (
         !provenance ||
-        !/^[a-f0-9]{40}$/.test(provenance.ui_sha || '') ||
-        !/^[a-f0-9]{40}$/.test(provenance.tests_sha ?? provenance.ui_sha) ||
-        !/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/.test(provenance.playwright_version || '') ||
+        !SHA_PATTERN.test(provenance.ui_sha || '') ||
+        !SHA_PATTERN.test(provenance.tests_sha ?? provenance.ui_sha) ||
+        !PLAYWRIGHT_VERSION_PATTERN.test(provenance.playwright_version || '') ||
         provenance.workflow_sha !== source.source_workflow_sha
     ) {
         throw new Error('Missing or invalid provenance for the source release run');
@@ -127,7 +132,7 @@ function sanitizeArtifacts(directory) {
 
 function summarize(report, provenance, {shards, jobs, artifacts, merge}) {
     const formatSha = (value) =>
-        typeof value === 'string' && /^[a-f0-9]{40}$/.test(value) ? value : 'unavailable';
+        typeof value === 'string' && SHA_PATTERN.test(value) ? value : 'unavailable';
     const frontend = provenance
         ? `Frontend: ${provenance.frontend_mode ?? 'image'}. UI: ${formatSha(provenance.ui_sha)}. Tests: ${formatSha(provenance.tests_sha ?? provenance.ui_sha)}.\n\n`
         : '';

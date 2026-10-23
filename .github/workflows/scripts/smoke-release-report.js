@@ -6,10 +6,10 @@ const os = require('node:os');
 const path = require('node:path');
 
 const runner = path.resolve(__dirname, '../../../scripts/playwright-docker.sh');
-const command = fs
-    .readFileSync(runner, 'utf8')
-    .match(/PLAYWRIGHT_COMMAND=\$\(cat <<'SCRIPT'\n([\s\S]*?)\nSCRIPT\n\)/)?.[1];
-assert.ok(command, 'Runner must provide its container command');
+const command = fs.readFileSync(
+    path.resolve(__dirname, '../../../scripts/playwright-container.sh'),
+    'utf8',
+);
 
 const image = 'mcr.microsoft.com/playwright:v1.58.0-noble';
 const workflow = fs.readFileSync(path.resolve(__dirname, '../release-e2e.yml'), 'utf8');

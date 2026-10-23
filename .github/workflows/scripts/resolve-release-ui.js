@@ -2,6 +2,7 @@ const fs = require('node:fs');
 
 const IMAGE_REPOSITORY = 'ghcr.io/ydb-platform/local-ydb';
 const SHA_PATTERN = /^[a-f0-9]{40}$/;
+const PLAYWRIGHT_VERSION_PATTERN = /^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/;
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/;
 
 function getEmbeddedVersion(changelog) {
@@ -67,7 +68,7 @@ async function getPlaywrightVersion(testsSha, github) {
         ),
     );
     const version = lockfile.packages?.['node_modules/@playwright/test']?.version;
-    if (!/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/.test(version || '')) {
+    if (!PLAYWRIGHT_VERSION_PATTERN.test(version || '')) {
         throw new Error('Test lockfile has no valid Playwright version');
     }
     return version;
@@ -174,4 +175,11 @@ if (require.main === module) {
         });
 }
 
-module.exports = {getEmbeddedVersion, resolveRelease, IMAGE_REPOSITORY, readGithub};
+module.exports = {
+    getEmbeddedVersion,
+    resolveRelease,
+    IMAGE_REPOSITORY,
+    readGithub,
+    SHA_PATTERN,
+    PLAYWRIGHT_VERSION_PATTERN,
+};
