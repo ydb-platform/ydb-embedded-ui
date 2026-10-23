@@ -103,12 +103,12 @@ jobs:
           YDB_CONTAINER: release-ui-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}-static
       - name: Run all release-version tests
         id: tests
-        # Apply current CI policy even when the released config has older defaults.
-        run: bash controller/scripts/playwright-docker.sh --shard=${{ matrix.shard }}/8 --workers=2 --retries=2 --trace=on-first-retry --update-snapshots=none --forbid-only
+        # Apply CI concurrency/retries while keeping diagnostics from every failed attempt.
+        run: bash controller/scripts/playwright-docker.sh --shard=${{ matrix.shard }}/8 --workers=2 --retries=2 --trace=retain-on-failure --update-snapshots=none --forbid-only
         env:
           CI: 'true'
           PLAYWRIGHT_APP_BACKEND: ${{ steps.ydb.outputs.monitoring-url }}
-          PLAYWRIGHT_VIDEO: on-first-retry
+          PLAYWRIGHT_VIDEO: retain-on-failure
           PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}
           PLAYWRIGHT_RELEASE_TEST_REF: ${{ needs.resolve.outputs.tests_sha }}
           PLAYWRIGHT_RELEASE_VERSION: ${{ needs.resolve.outputs.playwright_version }}
