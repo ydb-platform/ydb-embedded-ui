@@ -10,7 +10,12 @@
     &__right,
     &__left {
         display: flex;
-        gap: 12px;
+        align-items: center;
+        gap: var(--g-spacing-2);
+    }
+
+    &__divider {
+        height: var(--g-spacing-4);
     }
 
     &__action-button {

@@ -37,6 +37,7 @@ export {
     setQueryResult,
     setQueryTabContent,
     setResultTab,
+    setQueryPlanView,
     setStreamQueryResponse,
     setStreamSession,
     syncSavedQueryTab,
