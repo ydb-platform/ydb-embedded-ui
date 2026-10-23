@@ -8,6 +8,8 @@ import path from 'node:path';
 import {URL} from 'node:url';
 import {runInNewContext} from 'node:vm';
 
+import {readPlaywrightVideo} from '../read-playwright-video';
+
 const root = path.resolve(__dirname, '../../../..');
 const workflow = fs.readFileSync(path.join(root, '.github/workflows/release-e2e.yml'), 'utf8');
 const reportWorkflow = fs.readFileSync(
@@ -64,7 +66,7 @@ test('starts the release-version frontend while keeping local-ydb as its backend
 
 test('retains recordings of failed release attempts', () => {
     expect(workflow).toContain('--trace=retain-on-failure');
-    expect(workflow).toContain('PLAYWRIGHT_VIDEO: retain-on-failure');
+    expect(readPlaywrightVideo(workflow)).toBe('retain-on-failure');
 });
 
 test('forwards backend routes and streaming without rewriting UI paths', async () => {
