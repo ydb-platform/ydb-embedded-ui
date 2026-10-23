@@ -111,10 +111,19 @@ async function resolveRelease(
         throw new Error(`UI package version ${uiPackage.version} does not match ${uiVersion}`);
     }
     const testsSha = requestedTestsSha || uiCommit.sha;
-    if (testsSha !== uiCommit.sha) {
+    if (requestedTestsSha) {
         const testsCommit = await github(`ydb-platform/ydb-embedded-ui/commits/${testsSha}`);
         if (testsCommit.sha !== testsSha) {
             throw new Error('Test revision does not match tests_sha');
+        }
+        // The workflow only runs from main; pin ancestry to its exact revision.
+        const comparison = await github(
+            `ydb-platform/ydb-embedded-ui/compare/${workflowSha}...${testsSha}`,
+        );
+        if (!['behind', 'identical'].includes(comparison.status)) {
+            throw new Error(
+                `tests_sha must belong to main history at workflow revision ${workflowSha}`,
+            );
         }
     }
     const playwrightVersion = await getPlaywrightVersion(testsSha, github);

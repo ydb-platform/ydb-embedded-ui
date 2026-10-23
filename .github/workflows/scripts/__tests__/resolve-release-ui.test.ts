@@ -13,7 +13,10 @@ const file = (content: string) => ({
 
 function fixture(version = '18.1.0') {
     const viewer = `ydb-platform/ydb/contents/ydb/core/viewer/monitoring`;
-    const responses: Record<string, ReturnType<typeof file> | {sha: string} | Error> = {
+    const responses: Record<
+        string,
+        ReturnType<typeof file> | {sha: string} | {status?: string} | Error
+    > = {
         [ydbCommit]: {sha: input.ydbSha},
         [`${uiRepo}/commits/v${version}`]: {sha: uiSha},
         [`${viewer}/CHANGELOG.md?ref=${input.ydbSha}`]: file(
@@ -24,12 +27,14 @@ function fixture(version = '18.1.0') {
             JSON.stringify({packages: {'node_modules/@playwright/test': {version: '1.58.0'}}}),
         ),
     };
+    const requests: string[] = [];
     const run = (
         options: {ydbTag: string; ydbSha?: string; testsSha?: string; workflowSha: string} = input,
     ) =>
         resolveRelease(
             options,
             async (path: string) => {
+                requests.push(path);
                 const response = responses[path];
                 if (!response || response instanceof Error) {
                     throw response || new Error(`Unexpected GitHub path: ${path}`);
@@ -38,7 +43,7 @@ function fixture(version = '18.1.0') {
             },
             async () => imageDigest,
         );
-    return {responses, run};
+    return {responses, requests, run};
 }
 
 test.each(['18.1.0', '15.6.0-hotfix.1'])(
@@ -56,25 +61,61 @@ test.each(['18.1.0', '15.6.0-hotfix.1'])(
     },
 );
 
-test('selects test dependencies without changing the release UI identity', async () => {
+test.each(['behind', 'identical'])(
+    'selects test dependencies from the main snapshot (%s) without changing the release UI',
+    async (status) => {
+        const {responses, run} = fixture();
+        const testsSha = status === 'identical' ? input.workflowSha : 'e'.repeat(40);
+        responses[`${uiRepo}/commits/${testsSha}`] = {sha: testsSha};
+        responses[`${uiRepo}/compare/${input.workflowSha}...${testsSha}`] = {status};
+        responses[`${uiRepo}/contents/package-lock.json?ref=${testsSha}`] = file(
+            JSON.stringify({packages: {'node_modules/@playwright/test': {version: '1.59.0'}}}),
+        );
+        await expect(run({...input, testsSha})).resolves.toMatchObject({
+            ui_sha: uiSha,
+            ui_version: '18.1.0',
+            tests_sha: testsSha,
+            playwright_version: '1.59.0',
+        });
+        await expect(run({...input, testsSha: ''})).resolves.toMatchObject({tests_sha: uiSha});
+        responses[`${uiRepo}/commits/${testsSha}`] = {sha: uiSha};
+        await expect(run({...input, testsSha})).rejects.toThrow('Test revision');
+        responses[`${uiRepo}/commits/${testsSha}`] = new Error('Commit not found');
+        await expect(run({...input, testsSha})).rejects.toThrow('Commit not found');
+        await expect(run({...input, testsSha: 'main'})).rejects.toThrow('tests_sha');
+    },
+);
+
+test.each(['ahead', 'diverged', 'unexpected', undefined])(
+    'rejects a test revision outside verified main history (%s) before reading its lockfile',
+    async (status) => {
+        const {responses, requests, run} = fixture();
+        const testsSha = 'e'.repeat(40);
+        const lockfile = `${uiRepo}/contents/package-lock.json?ref=${testsSha}`;
+        responses[`${uiRepo}/commits/${testsSha}`] = {sha: testsSha};
+        responses[`${uiRepo}/compare/${input.workflowSha}...${testsSha}`] = {status};
+        responses[lockfile] = file(
+            JSON.stringify({packages: {'node_modules/@playwright/test': {version: '1.58.0'}}}),
+        );
+        await expect(run({...input, testsSha})).rejects.toThrow('main');
+        expect(requests).not.toContain(lockfile);
+    },
+);
+
+test('does not bypass main ancestry when explicit tests_sha equals the release UI', async () => {
     const {responses, run} = fixture();
-    const testsSha = 'e'.repeat(40);
-    responses[`${uiRepo}/commits/${testsSha}`] = {sha: testsSha};
-    responses[`${uiRepo}/contents/package-lock.json?ref=${testsSha}`] = file(
-        JSON.stringify({packages: {'node_modules/@playwright/test': {version: '1.59.0'}}}),
-    );
-    await expect(run({...input, testsSha})).resolves.toMatchObject({
-        ui_sha: uiSha,
-        ui_version: '18.1.0',
-        tests_sha: testsSha,
-        playwright_version: '1.59.0',
-    });
+    responses[`${uiRepo}/commits/${uiSha}`] = {sha: uiSha};
+    responses[`${uiRepo}/compare/${input.workflowSha}...${uiSha}`] = {status: 'diverged'};
+    await expect(run({...input, testsSha: uiSha})).rejects.toThrow('main');
     await expect(run({...input, testsSha: ''})).resolves.toMatchObject({tests_sha: uiSha});
-    responses[`${uiRepo}/commits/${testsSha}`] = {sha: uiSha};
-    await expect(run({...input, testsSha})).rejects.toThrow('Test revision');
-    responses[`${uiRepo}/commits/${testsSha}`] = new Error('Commit not found');
-    await expect(run({...input, testsSha})).rejects.toThrow('Commit not found');
-    await expect(run({...input, testsSha: 'main'})).rejects.toThrow('tests_sha');
+});
+
+test('rejects an unavailable comparison before reading test dependencies', async () => {
+    const {responses, requests, run} = fixture();
+    responses[`${uiRepo}/commits/${uiSha}`] = {sha: uiSha};
+    responses[`${uiRepo}/compare/${input.workflowSha}...${uiSha}`] = new Error('HTTP 404');
+    await expect(run({...input, testsSha: uiSha})).rejects.toThrow('HTTP 404');
+    expect(requests).not.toContain(uiFile('package-lock.json'));
 });
 
 test.each([undefined, ''])(

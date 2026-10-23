@@ -126,8 +126,10 @@ function sanitizeArtifacts(directory) {
 }
 
 function summarize(report, provenance, {shards, jobs, artifacts, merge}) {
+    const formatSha = (value) =>
+        typeof value === 'string' && /^[a-f0-9]{40}$/.test(value) ? value : 'unavailable';
     const frontend = provenance
-        ? `Frontend: ${provenance.frontend_mode ?? 'image'}. UI: ${provenance.ui_sha}. Tests: ${provenance.tests_sha ?? provenance.ui_sha}.\n\n`
+        ? `Frontend: ${provenance.frontend_mode ?? 'image'}. UI: ${formatSha(provenance.ui_sha)}. Tests: ${formatSha(provenance.tests_sha ?? provenance.ui_sha)}.\n\n`
         : '';
     const problems = [];
     if (shards !== 8) {

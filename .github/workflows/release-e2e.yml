@@ -1,5 +1,5 @@
 name: Release UI E2E
-run-name: UI e2e for YDB ${{ inputs.ydb_tag }}
+run-name: UI e2e for YDB ${{ inputs.ydb_tag }}${{ inputs.tests_sha && format(' (tests {0})', inputs.tests_sha) || '' }}
 
 on:
   workflow_dispatch:
@@ -13,7 +13,9 @@ on:
         required: false
         type: string
       tests_sha:
-        description: Optional full UI repository commit SHA for tests (defaults to the embedded UI revision)
+        description: >-
+          Optional full commit SHA from main history (defaults to the embedded UI revision).
+          Tests, imported src/ code, snapshots, config and dependencies must be compatible with the release UI.
         required: false
         type: string
 
