@@ -18,6 +18,7 @@ import type {Column} from '../../utils/tableUtils/types';
 import {formatToMs, parseUsToMs} from '../../utils/timeParsers';
 import {bytesToSpeed, isNumeric} from '../../utils/utils';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
+import {DatacenterLabel} from '../Datacenter/DatacenterLabel';
 import {MemoryViewer} from '../MemoryViewer/MemoryViewer';
 import {NodeHostWrapper} from '../NodeHostWrapper/NodeHostWrapper';
 import {PoolsGraph} from '../PoolsGraph/PoolsGraph';
@@ -116,12 +117,19 @@ export function getDatabaseColumn<T extends {Database?: string}>(): Column<T> {
         width: 200,
     };
 }
-export function getDataCenterColumn<T extends {DC?: string}>(): Column<T> {
+export function getDataCenterColumn<T extends {DC?: string; DCKey?: string}>({
+    colored = false,
+}: {colored?: boolean} = {}): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.DC,
         header: NODES_COLUMNS_TITLES.DC,
         align: DataTable.LEFT,
-        render: ({row}) => row.DC || EMPTY_DATA_PLACEHOLDER,
+        render: ({row}) =>
+            colored ? (
+                <DatacenterLabel name={row.DCKey || row.DC} />
+            ) : (
+                row.DC || EMPTY_DATA_PLACEHOLDER
+            ),
         width: 60,
     };
 }

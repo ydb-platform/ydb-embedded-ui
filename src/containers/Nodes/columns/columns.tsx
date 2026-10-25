@@ -27,7 +27,7 @@ export function getNodesColumns(params: GetNodesColumnsParams): NodesColumn[] {
         getICPortColumn(),
         getNodeNameColumn(),
         getDatabaseColumn(),
-        getDataCenterColumn(),
+        getDataCenterColumn({colored: true}),
         getPileNameColumn(),
         getRackColumn(),
         getUptimeColumn(),
