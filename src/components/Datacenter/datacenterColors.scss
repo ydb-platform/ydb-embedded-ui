@@ -1,0 +1,77 @@
+.ydb-datacenter-color {
+    --ydb-dc-swatch: var(--g-color-base-neutral-heavy);
+    --ydb-dc-base-background: color-mix(in sRGB, var(--ydb-dc-swatch) 20%, transparent);
+    --ydb-dc-base-hover: color-mix(in sRGB, var(--ydb-dc-swatch) 28%, transparent);
+    --ydb-dc-base-text: var(--g-color-base-neutral-heavy);
+    --ydb-dc-background: var(--ydb-dc-base-background);
+    --ydb-dc-hover: var(--ydb-dc-base-hover);
+    --ydb-dc-text: var(--ydb-dc-base-text);
+    --ydb-dc-hover-text: var(--ydb-dc-text);
+    --ydb-dc-outline: transparent;
+
+    // Reuse the Figma palette already defined for versions, one swatch per family.
+    @each $family in 'orange', 'yellow', 'green', 'lightblue', 'blue', 'violet', 'pink', 'caramel',
+        'moss', 'turquoise', 'barbie', 'night'
+    {
+        &_color_reserve-#{$family} {
+            --ydb-dc-swatch: var(--versions-#{$family}-1);
+            --ydb-dc-base-background: var(--ydb-dc-swatch);
+            --ydb-dc-base-hover: var(--ydb-dc-swatch);
+            --ydb-dc-base-text: #000;
+
+            @if $family == 'night' {
+                --ydb-dc-base-text: #fff;
+            }
+
+            @if $family == 'blue' or $family == 'violet' {
+                .g-root_theme_dark &,
+                .g-root_theme_dark-hc & {
+                    --ydb-dc-base-text: #fff;
+                }
+            }
+
+            &.ydb-datacenter-color_variant_outline {
+                --ydb-dc-hover: transparent;
+                --ydb-dc-text: var(--g-color-text-primary);
+                --ydb-dc-hover-text: var(--g-color-text-primary);
+            }
+        }
+    }
+
+    @each $family, $swatch, $text, $dark-swatch,
+        $dark-text in ('turquoise', #00b8a9, #005c54, #00c9ba, #71f1de),
+        ('purple', #9836f4, #6420aa, #ad60ff, #e3beff),
+        ('blue', #2059ff, #153ab0, #4176ff, #abc4ff),
+        ('orange', #f58400, #843e00, #ff8800, #ffce95), ('red', #e62e40, #951121, #ff4052, #ffb4ba),
+        ('pink', #e3269f, #86115b, #f444b7, #ffb0e2), ('sky', #00a7ef, #00577f, #24bfff, #98e4ff),
+        ('brown', #865a3d, #5f3b23, #ac7958, #eac5a7),
+        ('green', #36b23b, #166020, #49ce45, #a0f485),
+        ('yellow', #e6c800, #655500, #ebd500, #fff278)
+    {
+        &_color_#{$family} {
+            --ydb-dc-swatch: #{$swatch};
+            --ydb-dc-base-text: #{$text};
+
+            .g-root_theme_dark & {
+                --ydb-dc-swatch: #{$dark-swatch};
+                --ydb-dc-base-text: #{$dark-text};
+            }
+        }
+    }
+
+    &_variant_muted {
+        --ydb-dc-background: color-mix(in sRGB, var(--ydb-dc-swatch) 10%, transparent);
+        --ydb-dc-hover: color-mix(in sRGB, var(--ydb-dc-swatch) 18%, transparent);
+    }
+
+    &_variant_outline {
+        --ydb-dc-background: transparent;
+        --ydb-dc-hover: color-mix(in sRGB, var(--ydb-dc-swatch) 8%, transparent);
+        --ydb-dc-outline: var(--ydb-dc-swatch);
+    }
+
+    &_color_neutral {
+        --ydb-dc-base-background: var(--g-color-base-neutral-medium);
+        --ydb-dc-base-hover: var(--g-color-base-neutral-medium-hover);
+    }
+}

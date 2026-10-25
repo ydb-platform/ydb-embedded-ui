@@ -18,6 +18,7 @@ import type {ClusterLink, DatabaseLink} from '../types/additionalProps';
 import type {MetaBaseClusterInfo} from '../types/api/meta';
 import type {ETenantType} from '../types/api/tenant';
 import type {TUserToken} from '../types/api/whoami';
+import type {DatacenterColorIndexes} from '../utils/datacenters';
 import type {GetLogsLink} from '../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../utils/monitoring';
 
@@ -42,6 +43,13 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     onDeleteCluster?: HandleDeleteCluster;
 
     homePageTitle?: string;
+
+    /**
+     * Permanent positive indexes keyed by the full uppercase DC name.
+     * Other DCs get local indexes after the registry's maximum, sorted by the full cluster list.
+     * Invalid indexes remain neutral.
+     */
+    datacenterColorIndexes?: DatacenterColorIndexes;
 
     getLogsLink?: GetLogsLink;
     getMonitoringLink?: GetMonitoringLink;

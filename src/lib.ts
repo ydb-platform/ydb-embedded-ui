@@ -56,3 +56,5 @@ export type {
 
 export {configureUIFactory} from './uiFactory/uiFactory';
 export {configureZod} from './utils/zod/configureZod';
+
+export type {DatacenterColorIndexes} from './utils/datacenters';

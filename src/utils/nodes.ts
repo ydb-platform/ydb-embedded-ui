@@ -6,6 +6,7 @@ import type {TNodeInfo} from '../types/api/nodesList';
 import type {NodesMap} from '../types/store/nodesList';
 
 import {HOUR_IN_SECONDS} from './constants';
+import {getDatacenterKey} from './datacenters';
 
 import {valueIsDefined} from '.';
 
@@ -40,6 +41,7 @@ export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
             nodeHosts.set(node.Id, {
                 Host: node.Host,
                 DC: node.Location?.DataCenter || physicalLocation?.DataCenterId,
+                DCKey: getDatacenterKey(node.Location, physicalLocation?.DataCenterId),
                 Rack,
             });
         }
@@ -63,6 +65,7 @@ export function calculateLoadAveragePercents(node: TSystemStateInfo = {}) {
 export interface PreparedNodeSystemState extends TSystemStateInfo {
     Rack?: string;
     DC?: string;
+    DCKey?: string;
     LoadAveragePercents?: number[];
     TenantName?: string;
     SharedCacheLimit?: number;
@@ -89,6 +92,7 @@ export function prepareNodeSystemState(
         ...systemState,
         Rack,
         DC,
+        DCKey: getDatacenterKey(systemState.Location, systemState.DataCenter),
         LoadAveragePercents,
         TenantName,
         SharedCacheLimit,

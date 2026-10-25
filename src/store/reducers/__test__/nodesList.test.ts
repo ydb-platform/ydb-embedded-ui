@@ -47,7 +47,7 @@ test('updates nodes and data centers when data changes and clears after cache re
     );
     const after = selectNodesMap(store.getState());
     expect(after).not.toBe(before);
-    expect(after).toEqual(new Map([[1, {Host: 'new', DC: 'dc-2'}]]));
+    expect(after).toEqual(new Map([[1, {Host: 'new', DC: 'dc-2', DCKey: 'DC-2'}]]));
 
     store.dispatch(api.util.resetApiState());
     expect(selectNodesMap(store.getState())).toBeUndefined();
@@ -107,6 +107,7 @@ test.each([
         Host: 'node-1',
         Rack: rack,
         DC: dc,
+        DCKey: dc.toUpperCase(),
     });
     store.dispatch(api.util.resetApiState());
 });
