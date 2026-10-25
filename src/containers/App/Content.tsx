@@ -12,6 +12,7 @@ import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
 import routes, {CLUSTER, getClusterPath} from '../../routes';
 import type {RootState} from '../../store';
+import {getQueryScope} from '../../store/queryScope';
 import {
     useAllCapabilitiesLoaded,
     useCapabilitiesQuery,
@@ -226,7 +227,7 @@ function HomePageDataWrapper({children}: {children: React.ReactNode}) {
 
 function GetNodesList() {
     const database = useDatabaseFromQuery();
-    nodesListApi.useGetNodesListQuery({database}, undefined);
+    nodesListApi.useGetNodesListQuery({database, scope: getQueryScope()});
     return null;
 }
 

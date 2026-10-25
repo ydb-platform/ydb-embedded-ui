@@ -1,21 +1,11 @@
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
-import type {ValueOf} from '../../types/common';
+import {clusterTabsIds} from '../../store/reducers/cluster/slice';
 import {uiFactory} from '../../uiFactory/uiFactory';
 
 import i18n from './i18n';
 
-export const clusterTabsIds = {
-    tenants: 'databases',
-    nodes: 'nodes',
-    storage: 'storage',
-    network: 'network',
-    versions: 'versions',
-    tablets: 'tablets',
-    events: 'events',
-    configs: 'configs',
-} as const;
-
-export type ClusterTab = ValueOf<typeof clusterTabsIds>;
+export {clusterTabsIds, isClusterTab} from '../../store/reducers/cluster/slice';
+export type {ClusterTab} from '../../store/reducers/cluster/slice';
 
 const tenants = {
     id: clusterTabsIds.tenants,
@@ -67,10 +57,6 @@ const configs = {
 };
 
 export const clusterTabs = [tenants, nodes, storage, network, tablets, versions, events, configs];
-
-export function isClusterTab(tab: any): tab is ClusterTab {
-    return Object.values(clusterTabsIds).includes(tab);
-}
 
 export function useShouldShowEventsTab() {
     return useEmMetaAvailable() && uiFactory.renderEvents;

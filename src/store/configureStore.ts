@@ -9,15 +9,15 @@ import {YdbEmbeddedAPI} from '../services/api';
 import {parseJson} from '../utils/utils';
 
 import {getUrlData} from './getUrlData';
+import {setQueryScope} from './queryScope';
 import rootReducer from './reducers';
 import {api as storeApi} from './reducers/api';
 import {preloadUserSettingsFromLS, syncUserSettingsFromLS} from './reducers/settings/settings';
 import getLocationMiddleware from './state-url-mapping';
 
-export let backend: string | undefined,
-    basename: string,
-    clusterName: string | undefined,
-    environment: string | undefined;
+export {backend, clusterName, environment} from './queryScope';
+
+export let basename: string;
 
 function getUrlDataAndSetParams({
     singleClusterMode,
@@ -33,7 +33,8 @@ function getUrlDataAndSetParams({
         customBackend,
         allowedEnvironments,
     });
-    ({basename, clusterName, environment, backend} = params);
+    basename = params.basename;
+    setQueryScope(params);
 }
 
 function _configureStore<

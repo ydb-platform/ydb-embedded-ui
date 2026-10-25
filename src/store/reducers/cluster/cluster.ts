@@ -1,9 +1,6 @@
-import {createSelector, createSlice} from '@reduxjs/toolkit';
-import type {Dispatch, PayloadAction} from '@reduxjs/toolkit';
+import {createSelector} from '@reduxjs/toolkit';
 import {skipToken} from '@reduxjs/toolkit/query';
 
-import type {ClusterTab} from '../../../containers/Cluster/utils';
-import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
 import {isClusterInfoV2} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
@@ -12,6 +9,8 @@ import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery
 import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {isQueryErrorResponse} from '../../../utils/query';
 import type {RootState} from '../../defaultStore';
+import type {QueryScope} from '../../queryScope';
+import {getQueryScope} from '../../queryScope';
 import {api} from '../api';
 import {getClusterDataTag} from '../entityDataTags';
 import {selectNodesMap} from '../nodesList';
@@ -23,7 +22,7 @@ import {
     parseSettingsField,
     parseTraceField,
 } from './parseFields';
-import type {ClusterGroupsStats, ClusterState} from './types';
+import type {ClusterGroupsStats} from './types';
 import {
     createSelectClusterGroupsQuery,
     getGroupStatsFromClusterInfo,
@@ -32,30 +31,13 @@ import {
     prepareClusterInfo,
 } from './utils';
 
-export const INITIAL_DEFAULT_CLUSTER_TAB = clusterTabsIds.tenants;
+export {default, INITIAL_DEFAULT_CLUSTER_TAB, updateDefaultClusterTab} from './slice';
 
-const initialState: ClusterState = {
-    defaultClusterTab: INITIAL_DEFAULT_CLUSTER_TAB,
-};
-const clusterSlice = createSlice({
-    name: 'cluster',
-    initialState,
-    reducers: {
-        setDefaultClusterTab(state, action: PayloadAction<ClusterTab>) {
-            state.defaultClusterTab = action.payload;
-        },
-    },
-});
+type ClusterInfoQueryArgs = string | undefined | QueryScope;
 
-export function updateDefaultClusterTab(tab: string) {
-    return (dispatch: Dispatch) => {
-        if (isClusterTab(tab)) {
-            dispatch(clusterSlice.actions.setDefaultClusterTab(tab));
-        }
-    };
+function getClusterInfoQueryScope(args: ClusterInfoQueryArgs) {
+    return getQueryScope(typeof args === 'object' ? args : {clusterName: args});
 }
-
-export default clusterSlice.reducer;
 
 export const clusterApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -64,9 +46,10 @@ export const clusterApi = api.injectEndpoints({
                 clusterData: TClusterInfo;
                 groupsStats?: ClusterGroupsStats;
             },
-            string | undefined
+            ClusterInfoQueryArgs
         >({
-            queryFn: async (clusterName, {signal}) => {
+            queryFn: async (args, {signal}) => {
+                const {clusterName} = getClusterInfoQueryScope(args);
                 try {
                     const rawClusterData = await window.api.viewer.getClusterInfo(clusterName, {
                         signal,
@@ -118,7 +101,11 @@ export const clusterApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: (_result, _error, clusterName) => ['All', getClusterDataTag(clusterName)],
+            serializeQueryArgs: ({queryArgs}) => getClusterInfoQueryScope(queryArgs),
+            providesTags: (_result, _error, args) => [
+                'All',
+                getClusterDataTag(getClusterInfoQueryScope(args).clusterName),
+            ],
         }),
         getClusterBaseInfo: builder.query({
             queryFn: async (clusterName: string, {signal}) => {
@@ -206,15 +193,16 @@ type ClusterBaseInfo = ReturnType<typeof useClusterBaseInfo>;
 export type ClusterInfo = Omit<ClusterBaseInfo, 'isError' | 'isResolved'>;
 
 const createClusterInfoSelector = createSelector(
-    (clusterName?: string) => clusterName,
-    (clusterName) => clusterApi.endpoints.getClusterInfo.select(clusterName),
+    (clusterName: string | undefined) => clusterName,
+    (_clusterName: string | undefined, scope: QueryScope) => scope.backend,
+    (_clusterName: string | undefined, scope: QueryScope) => scope.environment,
+    (clusterName, backend, environment) =>
+        clusterApi.endpoints.getClusterInfo.select({clusterName, backend, environment}),
 );
 
-const selectClusterInfo = createSelector(
-    (state: RootState) => state,
-    (_state: RootState, clusterName?: string) => createClusterInfoSelector(clusterName),
-    (state, selectGetClusterInfo) => selectGetClusterInfo(state).data,
-);
+function selectClusterInfo(state: RootState, clusterName?: string) {
+    return createClusterInfoSelector(clusterName, getQueryScope())(state).data;
+}
 
 export const selectClusterTitle = createSelector(
     (_state: RootState, clusterName?: string) => clusterName,

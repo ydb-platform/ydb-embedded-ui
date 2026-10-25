@@ -6,6 +6,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {getQueryScope} from '../../../../store/queryScope';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
@@ -54,7 +55,7 @@ export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) 
         currentData: nodesData,
         isFetching: nodesIsFetching,
         error: nodesError,
-    } = nodesListApi.useGetNodesListQuery({database}, undefined);
+    } = nodesListApi.useGetNodesListQuery({database, scope: getQueryScope()});
     const nodesLoading = nodesIsFetching && nodesData === undefined;
     const nodeHostsMap = useTypedSelector((state) => selectNodesMap(state, database));
 

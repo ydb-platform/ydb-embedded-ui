@@ -11,6 +11,7 @@ import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../components/InternalLink';
 import {NetworkTable} from '../../components/NetworkTable/NetworkTable';
 import routes, {getClusterPath, getLocationObjectFromHref} from '../../routes';
+import {getQueryScope} from '../../store/queryScope';
 import {
     useClusterDashboardAvailable,
     useConfigAvailable,
@@ -94,7 +95,7 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
         data: {clusterData: cluster, groupsStats} = {},
         isLoading: infoLoading,
         error,
-    } = clusterApi.useGetClusterInfoQuery(clusterName ?? undefined, {
+    } = clusterApi.useGetClusterInfoQuery(getQueryScope({clusterName: clusterName ?? undefined}), {
         pollingInterval: autoRefreshInterval,
     });
 
