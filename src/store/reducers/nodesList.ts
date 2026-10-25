@@ -7,12 +7,24 @@ import {getQueryScope} from '../queryScope';
 
 import {api} from './api';
 
+export interface NodesListQueryArgs {
+    database?: string;
+    scope?: QueryScope;
+    include_storage?: boolean;
+}
+
 export const nodesListApi = api.injectEndpoints({
     endpoints: (build) => ({
         getNodesList: build.query({
-            queryFn: async ({database}: {database?: string; scope?: QueryScope}, {signal}) => {
+            queryFn: async (
+                {database, include_storage: includeStorage}: NodesListQueryArgs,
+                {signal},
+            ) => {
                 try {
-                    const data = await window.api.viewer.getNodesList({database}, {signal});
+                    const data = await window.api.viewer.getNodesList(
+                        {database, include_storage: includeStorage},
+                        {signal},
+                    );
                     return {data};
                 } catch (error) {
                     return {error};
@@ -21,6 +33,7 @@ export const nodesListApi = api.injectEndpoints({
             serializeQueryArgs: ({queryArgs}) => ({
                 ...getQueryScope(queryArgs.scope),
                 database: queryArgs.database,
+                include_storage: queryArgs.include_storage,
             }),
             providesTags: ['All'],
         }),
@@ -33,19 +46,21 @@ const createGetNodesListSelector = createSelector(
     (_database: string | undefined, scope: QueryScope) => scope.backend,
     (_database: string | undefined, scope: QueryScope) => scope.environment,
     (_database: string | undefined, scope: QueryScope) => scope.clusterName,
-    (database, backend, environment, clusterName) =>
+    (_database: string | undefined, _scope: QueryScope, includeStorage?: boolean) => includeStorage,
+    (database, backend, environment, clusterName, includeStorage) =>
         nodesListApi.endpoints.getNodesList.select({
             database,
             scope: {backend, environment, clusterName},
+            include_storage: includeStorage,
         }),
 );
 
 const selectScopedNodesMap = createSelector(
-    (state: RootState, database: string | undefined, scope: QueryScope) =>
-        createGetNodesListSelector(database, scope)(state).data,
+    (state: RootState, database: string | undefined, scope: QueryScope, includeStorage?: boolean) =>
+        createGetNodesListSelector(database, scope, includeStorage)(state).data,
     prepareNodesMap,
 );
 
-export function selectNodesMap(state: RootState, database?: string) {
-    return selectScopedNodesMap(state, database, getQueryScope());
+export function selectNodesMap(state: RootState, database?: string, includeStorage?: boolean) {
+    return selectScopedNodesMap(state, database, getQueryScope(), includeStorage);
 }

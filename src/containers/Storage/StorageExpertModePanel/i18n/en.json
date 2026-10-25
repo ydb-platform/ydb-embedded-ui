@@ -1,4 +1,5 @@
 {
+  "value_datacenter": "DC",
   "value_drive-type": "Drive type",
   "value_ssd": "SSD",
   "value_hdd": "HDD",

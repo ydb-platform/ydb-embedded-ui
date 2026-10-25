@@ -12,7 +12,6 @@ import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
 import routes, {CLUSTER, getClusterPath} from '../../routes';
 import type {RootState} from '../../store';
-import {getQueryScope} from '../../store/queryScope';
 import {
     useAllCapabilitiesLoaded,
     useCapabilitiesQuery,
@@ -20,10 +19,11 @@ import {
     useMetaCapabilitiesLoaded,
     useMetaCapabilitiesQuery,
 } from '../../store/reducers/capabilities/hooks';
-import {nodesListApi} from '../../store/reducers/nodesList';
+import {nodesListApi, selectNodesMap} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
-import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
+import {NodeMetadataContext} from '../../utils/hooks/useNodesMap';
+import {useTypedSelector} from '../../utils/hooks/useTypedSelector';
 import {lazyComponent} from '../../utils/lazyComponent';
 import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
 import Authentication from '../Authentication/Authentication';
@@ -44,6 +44,7 @@ import {
 } from './appSlots';
 import {shouldRedirectClusterRouteToRoot} from './clusterRouteGuard';
 import {getLegacyClusterTenantsRedirect, getLegacyTenantRedirect} from './legacyRedirects';
+import {useNodesListQueryOptions} from './useNodesListQueryOptions';
 
 import './App.scss';
 
@@ -212,9 +213,10 @@ function DataWrapper({children}: {children: React.ReactNode}) {
         // capabilities is going to work without authentication, but not all running systems are supporting this yet
         <GetCapabilities>
             <GetUser>
-                <GetNodesList />
-                {/* this GetCapabilities will be removed */}
-                <GetCapabilities>{children}</GetCapabilities>
+                <GetNodesList>
+                    {/* this GetCapabilities will be removed */}
+                    <GetCapabilities>{children}</GetCapabilities>
+                </GetNodesList>
             </GetUser>
         </GetCapabilities>
     );
@@ -225,10 +227,13 @@ function HomePageDataWrapper({children}: {children: React.ReactNode}) {
     return <GetMetaCapabilities>{children}</GetMetaCapabilities>;
 }
 
-function GetNodesList() {
-    const database = useDatabaseFromQuery();
-    nodesListApi.useGetNodesListQuery({database, scope: getQueryScope()});
-    return null;
+function GetNodesList({children}: {children: React.ReactNode}) {
+    const {args, options} = useNodesListQueryOptions();
+    nodesListApi.useGetNodesListQuery(args, options);
+    const nodes = useTypedSelector((state) =>
+        selectNodesMap(state, args.database, args.include_storage),
+    );
+    return <NodeMetadataContext.Provider value={nodes}>{children}</NodeMetadataContext.Provider>;
 }
 
 function GetCapabilities({children}: {children: React.ReactNode}) {
