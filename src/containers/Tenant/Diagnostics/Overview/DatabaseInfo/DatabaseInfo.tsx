@@ -7,8 +7,10 @@ import {useTenantBaseInfo} from '../../../../../store/reducers/tenant/tenant';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
+import type {DatacenterNodes} from '../../../../../utils/datacenters';
 import {SchemaObjectInfo} from '../SchemaObjectInfo';
 
+import {DatabaseDatacenters} from './DatabaseDatacenters';
 import {dbInfoKeyset} from './i18n';
 import {prepareAdditionalDatabaseInfoItems} from './utils';
 
@@ -16,17 +18,25 @@ import './DatabaseInfo.scss';
 
 const b = cn('ydb-diagnostics-database-info');
 
-interface DBInfoProps {
+export interface DBInfoProps {
+    datacenters?: DatacenterNodes[] | null;
     data?: TEvDescribeSchemeResult;
     path: string;
     database: string;
 }
 
-export function DatabaseInfo({data, path, database}: DBInfoProps) {
+export function DatabaseInfo({data, path, database, datacenters}: DBInfoProps) {
     const {databaseData} = useTenantBaseInfo(database);
     const additionalItems = React.useMemo(
-        () => prepareAdditionalDatabaseInfoItems(databaseData),
-        [databaseData],
+        () => [
+            {
+                name: dbInfoKeyset('field_datacenters'),
+                content: <DatabaseDatacenters datacenters={datacenters} />,
+                note: dbInfoKeyset('description_datacenters'),
+            },
+            ...(prepareAdditionalDatabaseInfoItems(databaseData) ?? []),
+        ],
+        [databaseData, datacenters],
     );
 
     const {PathsInside, PathsLimit, ShardsInside, ShardsLimit} =

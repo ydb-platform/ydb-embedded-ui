@@ -14,7 +14,7 @@ import {useNavigationV2Enabled} from '../../utils/useNavigationV2Enabled';
 
 import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
-import {DatabaseInfo} from './DatabaseInfo/DatabaseInfo';
+import {DatabaseInfoWithDatacenters} from './DatabaseInfo/DatabaseInfoWithDatacenters';
 import {DefaultEntityInfo} from './DefaultEntityInfo';
 import {ResourcePoolInfo} from './ResourcePoolInfo';
 import {ResourcePoolUsage} from './ResourcePoolInfo/ResourcePoolUsage';
@@ -120,7 +120,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
             isDomain(path, type);
 
         if (isV2Navigation && isDatabase) {
-            return <DatabaseInfo data={data} path={path} database={database} />;
+            return <DatabaseInfoWithDatacenters data={data} path={path} database={database} />;
         }
 
         if (!type || type === EPathType.EPathTypeInvalid) {
