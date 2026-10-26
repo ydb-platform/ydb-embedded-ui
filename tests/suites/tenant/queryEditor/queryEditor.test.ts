@@ -460,7 +460,9 @@ test.describe('Test Query Editor', async () => {
     });
 
     for (const theme of queryActionScreenshotThemes) {
-        test(`renders three query actions in ${theme} theme`, async ({page}) => {
+        test(`renders three query actions in ${theme} theme @query-editor-redesign`, async ({
+            page,
+        }) => {
             await page.evaluate((themeName) => {
                 localStorage.setItem('theme', themeName);
             }, theme);
