@@ -32,3 +32,19 @@ export function getResultRowsPerSecond(result: QueryResult): number | undefined 
     const rate = (rows * 1_000_000) / duration;
     return Number.isFinite(rate) ? rate : undefined;
 }
+
+export function isQueryPlanNotEnabled(result: QueryResult): boolean {
+    const {data, error, isLoading, statisticsMode, type} = result;
+    return Boolean(
+        !error &&
+            !isLoading &&
+            !result.streamingStatus &&
+            result.endTime &&
+            type === 'execute' &&
+            (statisticsMode === 'none' || statisticsMode === 'basic') &&
+            !data?.plan &&
+            !data?.preparedPlan?.pristine &&
+            !data?.preparedPlan?.nodes?.length &&
+            !data?.simplifiedPlan?.plan?.length,
+    );
+}

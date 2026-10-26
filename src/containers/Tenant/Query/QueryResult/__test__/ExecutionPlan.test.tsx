@@ -48,10 +48,10 @@ afterEach(() => {
     URL.revokeObjectURL = originalRevokeUrl;
 });
 
-function panel(plan?: QueryPlan, database = '/local') {
+function panel(plan?: QueryPlan, database = '/local', theme = 'light') {
     return (
         <Provider store={store}>
-            <ThemeProvider theme="light">
+            <ThemeProvider theme={theme}>
                 <ExecutionPlan plan={plan} database={database} />
             </ThemeProvider>
         </Provider>
@@ -110,4 +110,25 @@ test('retries a conversion failure and a failed image load', async () => {
     await waitFor(() => expect(screen.getByRole('img')).toHaveAttribute('src', 'blob:retry'));
     expect(convert).toHaveBeenCalledTimes(3);
     view.unmount();
+});
+
+test('rejects malformed SVG before creating an image and retries it', async () => {
+    convert.mockResolvedValueOnce('<svg><broken></svg>');
+    const view = render(panel(firstPlan));
+    fireEvent.click(await screen.findByRole('button', {name: 'Retry'}));
+    await screen.findByRole('img', {name: 'Execution Plan'});
+    expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
+    view.unmount();
+});
+
+test('replaces and revokes the displayed image on theme change without reconversion', async () => {
+    const view = render(panel(firstPlan));
+    await screen.findByRole('img', {name: 'Execution Plan'});
+    URL.createObjectURL = jest.fn().mockReturnValue('blob:dark');
+    view.rerender(panel(firstPlan, '/local', 'dark'));
+    await waitFor(() => expect(screen.getByRole('img')).toHaveAttribute('src', 'blob:dark'));
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:plan');
+    expect(convert).toHaveBeenCalledTimes(1);
+    view.unmount();
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:dark');
 });

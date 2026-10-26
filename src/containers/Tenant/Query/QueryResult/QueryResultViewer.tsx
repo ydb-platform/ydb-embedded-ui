@@ -20,10 +20,12 @@ import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import {
     selectActiveTab,
     selectResultTab,
+    setQueryPlanColumnSizing,
     setQueryPlanView,
     setResultTab,
 } from '../../../../store/reducers/query/query';
 import type {QueryPlanView, QueryResult} from '../../../../store/reducers/query/types';
+import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
@@ -37,13 +39,14 @@ import {isQueryCancelledError} from '../utils/isQueryCancelledError';
 
 import {DiagnosticsButton} from './components/DiagnosticsButton/DiagnosticsButton';
 import {PlanSection} from './components/PlanSection/PlanSection';
+import {QueryPlanNotEnabled} from './components/QueryPlanNotEnabled/QueryPlanNotEnabled';
 import {QueryResultError} from './components/QueryResultError/QueryResultError';
 import {ResultSetsViewer} from './components/ResultSetsViewer/ResultSetsViewer';
 import {TraceButton} from './components/TraceButton/TraceButton';
 import type {SectionID} from './constants';
 import {RESULT_OPTIONS_IDS, getResultSections, resolveResultSection} from './constants';
 import i18n from './i18n';
-import {getResultRowsPerSecond} from './utils';
+import {getResultRowsPerSecond, isQueryPlanNotEnabled} from './utils';
 
 import './QueryResultViewer.scss';
 
@@ -299,12 +302,30 @@ export function QueryResultViewer({
             return <QueryResultError error={error} sourcePosition={result.sourcePosition} />;
         }
 
+        if (activeSection === RESULT_OPTIONS_IDS.queryPlan && isQueryPlanNotEnabled(result)) {
+            return (
+                <QueryPlanNotEnabled onOpenSettings={() => dispatch(setQueryAction('settings'))} />
+            );
+        }
+
         return (
             <PlanSection
                 activeSection={activeSection}
                 sectionTitle={RESULT_OPTIONS_TITLES[activeSection]}
                 data={data}
                 planView={planView}
+                columnSizing={activeTab?.queryPlanColumnSizing}
+                onColumnSizingChange={(sizing) => {
+                    if (activeTab) {
+                        dispatch(
+                            setQueryPlanColumnSizing({
+                                tabId: activeTab.id,
+                                executionId: result.executionId,
+                                sizing,
+                            }),
+                        );
+                    }
+                }}
                 onPlanViewChange={onPlanViewChange}
                 database={database}
                 executionId={result.executionId}

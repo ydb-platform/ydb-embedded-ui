@@ -5,8 +5,11 @@ import type {Download, Page, Route} from '@playwright/test';
 
 import {getClipboardContent} from '../../../utils/clipboard';
 import {backend, database} from '../../../utils/constants';
+import {toggleEditorSetting} from '../../../utils/toggleExperiment';
+import {Sidebar} from '../../sidebar/Sidebar';
 import {TenantPage} from '../TenantPage';
 
+import {ButtonNames} from './models/QueryEditor';
 import type {QueryEditor} from './models/QueryEditor';
 
 const queryUrl = `${backend}/viewer/json/query?*`;
@@ -61,6 +64,267 @@ async function analyze(editor: QueryEditor) {
 }
 
 test.describe('Query editor redesign @query-editor-redesign', () => {
+    test('visual contract: table, divider and dark JSON palette', async ({page}, testInfo) => {
+        await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
+        await page.setViewportSize({width: 1440, height: 900});
+        const editor = await openEditor(page);
+        await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
+        await editor.explain('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        const headers = page.locator('.ydb-query-simplified-plan th');
+        await expect(headers).toHaveCount(6);
+        expect(
+            await headers.first().evaluate((element) => element.getBoundingClientRect().height),
+        ).toBe(40);
+        expect(
+            await page
+                .locator('.ydb-query-simplified-plan tbody tr')
+                .evaluateAll((elements) =>
+                    elements.map((element) => element.getBoundingClientRect().height),
+                ),
+        ).toEqual([30, 30]);
+        const style = await headers.first().evaluate((element) => {
+            const css = getComputedStyle(element);
+            return {
+                weight: css.fontWeight,
+                color: css.color,
+                size: css.fontSize,
+                height: css.lineHeight,
+            };
+        });
+        expect.soft(style).toEqual({
+            weight: '500',
+            color: 'rgba(255, 255, 255, 0.7)',
+            size: '15px',
+            height: '20px',
+        });
+        const widths = await headers.evaluateAll((elements) =>
+            elements.map((element) => element.getBoundingClientRect().width),
+        );
+        expect.soft(widths.slice(1)).toEqual([89, 89, 89, 89, 85]);
+        await page.screenshot({path: testInfo.outputPath('table-dark.png')});
+        const divider = page.locator('.ydb-query-editor-controls__divider');
+        expect
+            .soft(
+                await divider.evaluate((element) => {
+                    const css = getComputedStyle(element);
+                    return [
+                        css.marginLeft,
+                        css.marginRight,
+                        element.getBoundingClientRect().width,
+                        element.getBoundingClientRect().height,
+                    ];
+                }),
+            )
+            .toEqual(['4px', '4px', 1, 16]);
+        await planViews(page).getByRole('radio', {name: 'JSON', exact: true}).check();
+        expect
+            .soft(
+                await page
+                    .locator('.ydb-query-json-viewer .g-ru-cell__key')
+                    .first()
+                    .evaluate((element) => getComputedStyle(element).color),
+            )
+            .toBe('rgb(156, 220, 254)');
+        expect
+            .soft(
+                await page
+                    .locator('.ydb-query-json-viewer .g-ru-cell__value_type_string')
+                    .first()
+                    .evaluate((element) => getComputedStyle(element).color),
+            )
+            .toBe('rgb(206, 145, 120)');
+        expect
+            .soft(
+                await page
+                    .locator('.ydb-query-json-viewer .unipika')
+                    .first()
+                    .evaluate((element) => getComputedStyle(element).color),
+            )
+            .toBe('rgb(128, 128, 128)');
+    });
+
+    test('visual contract: missing basic plan opens settings without executing', async ({
+        page,
+    }, testInfo) => {
+        const editor = await openEditor(page);
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
+        let requests = 0;
+        await page.route(queryUrl, (route) => {
+            requests++;
+            return route.fulfill({json: {result: makeResponse().result}});
+        });
+        await page.getByRole('button', {name: 'Query settings', exact: true}).click();
+        await editor.settingsDialog.changeStatsLevel('basic');
+        await editor.settingsDialog.clickButton(ButtonNames.Save);
+        await editor.run('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        await selectView(page, 'Query Plan');
+        await expect(page.getByText('Query plan not enabled', {exact: true})).toBeVisible();
+        await expect(planViews(page)).toHaveCount(0);
+        await page.screenshot({path: testInfo.outputPath('query-plan-not-enabled.png')});
+        await page.getByRole('button', {name: 'Open query settings', exact: true}).press('Enter');
+        await expect(page.locator('.ydb-query-settings-dialog')).toBeVisible();
+        expect(requests).toBe(1);
+        await editor.settingsDialog.changeStatsLevel('full');
+        await editor.settingsDialog.clickButton(ButtonNames.Save);
+        await expect(page.getByText('Query plan not enabled', {exact: true})).toBeVisible();
+        expect(requests).toBe(1);
+    });
+
+    test('manual column widths survive view switches and reset for a new result', async ({
+        page,
+    }, testInfo) => {
+        const editor = await openEditor(page);
+        await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
+        await editor.explain('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        const headers = page.locator('.ydb-query-simplified-plan th');
+        const widths = () =>
+            headers.evaluateAll((elements) =>
+                elements.map((element) => element.getBoundingClientRect().width),
+            );
+        await page.setViewportSize({width: 1440, height: 900});
+        const before = await widths();
+        await page.setViewportSize({width: 1640, height: 900});
+        await expect.poll(async () => (await widths())[0]).toBeGreaterThan(before[0]);
+        expect((await widths()).slice(1)).toEqual([89, 89, 89, 89, 85]);
+        const handle = headers.nth(1).locator('.gt-resize-handle');
+        await handle.hover();
+        const box = await handle.boundingBox();
+        if (!box) {
+            throw new Error('Missing column resize handle');
+        }
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.down();
+        await expect(handle).toHaveClass(/gt-resize-handle_resizing/);
+        await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2, {steps: 4});
+        await page.mouse.up();
+        await expect.poll(async () => (await widths())[1]).toBe(129);
+        const manual = await widths();
+        await selectView(page, 'AST');
+        await selectView(page, 'Query Plan');
+        expect(await widths()).toEqual(manual);
+        await page.setViewportSize({width: 1000, height: 800});
+        expect(await widths()).toEqual(manual);
+        expect(
+            await page
+                .locator('.ydb-query-simplified-plan')
+                .evaluate((element) => element.scrollWidth > element.clientWidth),
+        ).toBe(true);
+        await page.screenshot({path: testInfo.outputPath('table-narrow-resized.png')});
+        await editor.explain('SELECT 2;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        expect((await widths()).slice(1)).toEqual([89, 89, 89, 89, 85]);
+    });
+
+    test('theme switch updates SVG palette without SQL or conversion requests', async ({
+        page,
+    }, testInfo) => {
+        await page.addInitScript(() => localStorage.setItem('theme', 'light'));
+        const editor = await openEditor(page);
+        let conversions = 0;
+        let queries = 0;
+        const themedSvg =
+            '<svg xmlns="http://www.w3.org/2000/svg" width="500" height="100"><rect width="500" height="100" fill="var(--stage-main, #eee)"/><text x="10" y="50" fill="var(--stage-text, #111)">Current plan</text><rect x="450" width="20" height="10" fill="var(--cpu-main, green)"/></svg>';
+        await page.route(queryUrl, (route) => {
+            queries++;
+            return route.fulfill({json: makeResponse()});
+        });
+        await page.route('**/plan2svg?*', (route) => {
+            conversions++;
+            return route.fulfill({contentType: 'image/svg+xml', body: themedSvg});
+        });
+        await editor.explain('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        await selectView(page, 'Execution Plan');
+        const image = page.getByRole('img', {name: 'Execution Plan'});
+        await expect(image).toBeVisible();
+        const source = await image.getAttribute('src');
+        if (!source) {
+            throw new Error('Missing displayed SVG URL');
+        }
+        const light = await image.evaluate((element: HTMLImageElement) =>
+            fetch(element.src).then((r) => r.text()),
+        );
+        expect(light).toContain('ydb-query-plan-palette');
+        const sidebar = new Sidebar(page);
+        await sidebar.clickSettings();
+        await page.getByRole('radio', {name: 'Dark', exact: true}).check();
+        await sidebar.closeDrawer();
+        await expect(image).not.toHaveAttribute('src', source);
+        const dark = await image.evaluate((element: HTMLImageElement) =>
+            fetch(element.src).then((r) => r.text()),
+        );
+        expect(dark).not.toBe(light);
+        expect(dark).toContain('var(--cpu-main, green)');
+        const matches = await image.evaluate(async (element: HTMLImageElement) => {
+            const text = await fetch(element.src).then((r) => r.text());
+            const document = new DOMParser().parseFromString(text, 'image/svg+xml');
+            const expected = getComputedStyle(element)
+                .getPropertyValue('--g-color-text-primary')
+                .trim();
+            return document
+                .getElementById('ydb-query-plan-palette')
+                ?.textContent?.includes(`--stage-text: ${expected};`);
+        });
+        expect(matches).toBe(true);
+        const downloadPromise = page.waitForEvent('download');
+        await page.getByRole('button', {name: 'Download .SVG', exact: true}).click();
+        expect(await readDownload(await downloadPromise)).toBe(dark);
+        expect({queries, conversions}).toEqual({queries: 1, conversions: 1});
+        await selectView(page, 'Query Plan');
+        await selectView(page, 'Execution Plan');
+        await expect(image).toBeVisible();
+        expect(conversions).toBe(1);
+        await page.screenshot({path: testInfo.outputPath('svg-dark-themed.png')});
+    });
+
+    test('JSON and Stats retain search and expand controls in both themes', async ({
+        page,
+    }, testInfo) => {
+        await page.addInitScript(() => localStorage.setItem('theme', 'light'));
+        await page.setViewportSize({width: 1440, height: 900});
+        const editor = await openEditor(page);
+        await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
+        await analyze(editor);
+        for (const theme of ['light', 'dark']) {
+            if (theme === 'dark') {
+                const sidebar = new Sidebar(page);
+                await sidebar.clickSettings();
+                await page.getByRole('radio', {name: 'Dark', exact: true}).check();
+                await sidebar.closeDrawer();
+            }
+            await selectView(page, 'Query Plan');
+            await planViews(page).getByRole('radio', {name: 'Table', exact: true}).check();
+            await page.screenshot({path: testInfo.outputPath(`table-${theme}.png`)});
+            await planViews(page).getByRole('radio', {name: 'JSON', exact: true}).check();
+            for (const view of ['JSON', 'Stats']) {
+                if (view === 'Stats') {
+                    await selectView(page, 'Stats');
+                }
+                const viewer = page.locator('.ydb-query-json-viewer');
+                const search = viewer.getByPlaceholder('Search...');
+                await search.fill(view === 'JSON' ? 'Query' : 'Executions');
+                await expect(viewer.locator('.ydb-json-viewer__match-counter')).not.toHaveText(
+                    '0 / 0',
+                );
+                await search.fill('');
+                const buttons = viewer.locator('.ydb-json-viewer__toolbar button');
+                const count = await buttons.count();
+                await buttons.nth(count - 1).click();
+                const collapsed = await viewer.locator('.g-ru-cell__key').count();
+                await buttons.nth(count - 2).click();
+                await expect
+                    .poll(() => viewer.locator('.g-ru-cell__key').count())
+                    .toBeGreaterThan(collapsed);
+                await page.screenshot({
+                    path: testInfo.outputPath(`${view.toLowerCase()}-${theme}.png`),
+                });
+            }
+        }
+    });
+
     test('copies the active result set, full plan, statistics and AST', async ({page}) => {
         const editor = await openEditor(page);
         const response = makeResponse();
@@ -155,17 +419,31 @@ test.describe('Query editor redesign @query-editor-redesign', () => {
         await selectView(page, 'Execution Plan');
         const response = await responsePromise;
         expect(response.status()).toBe(200);
-        const expectedSvg = await response.text();
+        const rawSvg = await response.text();
         const image = page.getByRole('img', {name: 'Execution Plan'});
         await expect(image).toBeVisible();
         await expect
             .poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth))
             .toBeGreaterThan(0);
+        const displayedSvg = await image.evaluate((element: HTMLImageElement) =>
+            fetch(element.src).then((result) => result.text()),
+        );
+        const geometryPreserved = await page.evaluate(
+            ({raw, displayed}) => {
+                const parser = new DOMParser();
+                const before = parser.parseFromString(raw, 'image/svg+xml');
+                const after = parser.parseFromString(displayed, 'image/svg+xml');
+                after.getElementById('ydb-query-plan-palette')?.remove();
+                return before.documentElement.isEqualNode(after.documentElement);
+            },
+            {raw: rawSvg, displayed: displayedSvg},
+        );
+        expect(geometryPreserved).toBe(true);
         const downloadPromise = page.waitForEvent('download');
         await page.getByRole('button', {name: 'Download .SVG', exact: true}).click();
         const download = await downloadPromise;
         expect(download.suggestedFilename()).toBe('query-plan.svg');
-        expect(await readDownload(download)).toBe(expectedSvg);
+        expect(await readDownload(download)).toBe(displayedSvg);
         const diagnosticsPromise = page.waitForEvent('download');
         await page.getByRole('button', {name: 'Diagnostics .JSON', exact: true}).click();
         const diagnostics = await diagnosticsPromise;

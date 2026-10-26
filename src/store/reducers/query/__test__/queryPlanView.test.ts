@@ -2,6 +2,7 @@ import {QUERY_EDITOR_CURRENT_QUERY_KEY} from '../../../../utils/constants';
 import queryReducer, {
     changeUserInput,
     setActiveQueryTab,
+    setQueryPlanColumnSizing,
     setQueryPlanView,
     setQueryResult,
     setResultTab,
@@ -59,4 +60,31 @@ test('does not persist the representation with editor contents', () => {
     state = queryReducer(state, changeUserInput({input: 'SELECT 2;'}));
     expect(state.tabsById.one.queryPlanView).toBe('json');
     expect(sessionStorage.getItem(QUERY_EDITOR_CURRENT_QUERY_KEY)).not.toContain('queryPlanView');
+});
+
+test('keeps manual widths per editor and execution without persisting them', () => {
+    const sizing = {name: 500, aCpu: 110};
+    let state = queryReducer(
+        initialState(),
+        setQueryPlanColumnSizing({tabId: 'one', executionId: 'run-1', sizing}),
+    );
+    state = queryReducer(state, setActiveQueryTab({tabId: 'two'}));
+    expect(state.tabsById.two.queryPlanColumnSizing).toBeUndefined();
+    state = queryReducer(state, setActiveQueryTab({tabId: 'one'}));
+    state = queryReducer(state, setResultTab({queryType: 'explain', tabId: 'ast'}));
+    expect(state.tabsById.one.queryPlanColumnSizing).toEqual(sizing);
+    state = queryReducer(state, changeUserInput({input: 'SELECT 2;'}));
+    expect(sessionStorage.getItem(QUERY_EDITOR_CURRENT_QUERY_KEY)).not.toContain(
+        'queryPlanColumnSizing',
+    );
+    state = queryReducer(
+        state,
+        setQueryResult({tabId: 'one', result: {...result, executionId: 'run-2'}}),
+    );
+    expect(state.tabsById.one.queryPlanColumnSizing).toBeUndefined();
+    state = queryReducer(
+        state,
+        setQueryPlanColumnSizing({tabId: 'one', executionId: 'run-1', sizing}),
+    );
+    expect(state.tabsById.one.queryPlanColumnSizing).toBeUndefined();
 });

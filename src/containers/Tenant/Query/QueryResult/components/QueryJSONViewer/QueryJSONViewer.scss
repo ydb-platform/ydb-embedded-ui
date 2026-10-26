@@ -2,6 +2,24 @@
     width: 100%;
     height: 100%;
     padding: var(--g-spacing-3) var(--g-spacing-6) var(--g-spacing-3) var(--g-spacing-4);
+    &_dark {
+        --ydb-query-json-key: #9cdcfe;
+        --ydb-query-json-string: #ce9178;
+        --ydb-query-json-structure: #808080;
+
+        .unipika {
+            color: var(--ydb-query-json-structure);
+        }
+
+        .g-ru-cell__key {
+            color: var(--ydb-query-json-key);
+        }
+
+        .g-ru-cell__value_type_string {
+            color: var(--ydb-query-json-string);
+        }
+    }
+
     &__tree {
         overflow-y: auto;
 

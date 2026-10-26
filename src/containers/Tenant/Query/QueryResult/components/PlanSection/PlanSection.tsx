@@ -22,6 +22,8 @@ interface PlanSectionProps {
     sectionTitle: string;
     data: PreparedQueryData;
     planView: QueryPlanView;
+    columnSizing?: Record<string, number>;
+    onColumnSizingChange: (sizing: Record<string, number>) => void;
     onPlanViewChange: (view: QueryPlanView) => void;
     database: string;
     executionId: string;
@@ -33,6 +35,8 @@ export function PlanSection({
     sectionTitle,
     data,
     planView,
+    columnSizing,
+    onColumnSizingChange,
     onPlanViewChange,
     database,
     executionId,
@@ -46,7 +50,12 @@ export function PlanSection({
         switch (planView) {
             case 'table':
                 return simplifiedPlan?.plan?.length ? (
-                    <SimplifiedPlan plan={simplifiedPlan.plan} />
+                    <SimplifiedPlan
+                        key={executionId}
+                        plan={simplifiedPlan.plan}
+                        columnSizing={columnSizing}
+                        onColumnSizingChange={onColumnSizingChange}
+                    />
                 ) : (
                     empty
                 );

@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {useThemeValue} from '@gravity-ui/uikit';
+
 import {JsonViewer} from '../../../../../../components/JsonViewer/JsonViewer';
 import {cn} from '../../../../../../utils/cn';
 import {useTypedSelector} from '../../../../../../utils/hooks';
@@ -13,10 +15,11 @@ interface QueryJSONViewerProps {
 }
 
 export function QueryJSONViewer({data}: QueryJSONViewerProps) {
+    const theme = useThemeValue();
     const scrollRef = React.useRef<HTMLDivElement>(null);
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     return (
-        <div className={b()}>
+        <div className={b({dark: theme === 'dark'})}>
             <div className={b('tree')} ref={scrollRef}>
                 <JsonViewer
                     value={data}
