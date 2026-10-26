@@ -5,6 +5,7 @@ import {useResizeObserver} from '@gravity-ui/uikit';
 import type {
     CellContext,
     ColumnDef,
+    ColumnSizingInfoState,
     ColumnSizingState,
     ExpandedState,
     OnChangeFn,
@@ -105,6 +106,23 @@ export function SimplifiedPlan({plan, columnSizing, onColumnSizingChange}: Simpl
     const planWithLinesInfo = React.useMemo(() => getExtendedTreeNodes(plan), [plan]);
     const [expanded, setExpanded] = React.useState<ExpandedState>(true);
 
+    const resizeInfoRef = React.useRef<ColumnSizingInfoState>({
+        startOffset: null,
+        startSize: null,
+        deltaOffset: null,
+        deltaPercentage: null,
+        isResizingColumn: false,
+        columnSizingStart: [],
+    });
+    const [columnSizingInfo, setColumnSizingInfo] = React.useState(resizeInfoRef.current);
+    const handleColumnSizingInfoChange: OnChangeFn<ColumnSizingInfoState> = (update) => {
+        // TanStack computes the next width inside this updater. Resolve it before
+        // notifying the external sizing store, including batched move/up events.
+        resizeInfoRef.current =
+            typeof update === 'function' ? update(resizeInfoRef.current) : update;
+        setColumnSizingInfo(resizeInfoRef.current);
+    };
+
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [availableWidth, setAvailableWidth] = React.useState(0);
     const measure = React.useCallback(() => {
@@ -135,8 +153,10 @@ export function SimplifiedPlan({plan, columnSizing, onColumnSizingChange}: Simpl
         state: {
             expanded,
             columnSizing: sizing,
+            columnSizingInfo,
         },
         onColumnSizingChange: handleColumnSizingChange,
+        onColumnSizingInfoChange: handleColumnSizingInfoChange,
         enableColumnResizing: true,
         columnResizeMode: 'onChange',
     });
