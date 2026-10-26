@@ -3,6 +3,7 @@ import {readFile} from 'node:fs/promises';
 import {expect, test} from '@playwright/test';
 import type {Download, Page, Route} from '@playwright/test';
 
+import {getClipboardContent} from '../../../utils/clipboard';
 import {backend, database} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 
@@ -60,6 +61,43 @@ async function analyze(editor: QueryEditor) {
 }
 
 test.describe('Query editor redesign @query-editor-redesign', () => {
+    test('copies the active result set, full plan, statistics and AST', async ({page}) => {
+        const editor = await openEditor(page);
+        const response = makeResponse();
+        response.result.push({
+            columns: [{name: 'value', type: 'Int32'}],
+            rows: [[2]],
+            truncated: false,
+        });
+        await page.route(queryUrl, (route) => route.fulfill({json: response}));
+        await page.route('**/plan2svg?*', (route) =>
+            route.fulfill({contentType: 'image/svg+xml', body: svg}),
+        );
+        await editor.explain('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        for (const view of ['Table', 'Graph', 'JSON']) {
+            await planViews(page).getByRole('radio', {name: view, exact: true}).check();
+            await page.getByRole('button', {name: 'Copy query-plan', exact: true}).click();
+            await expect.poll(() => getClipboardContent(page)).toBe(JSON.stringify(plan));
+        }
+        await selectView(page, 'AST');
+        await page.getByRole('button', {name: 'Copy ast', exact: true}).click();
+        await expect.poll(() => getClipboardContent(page)).toBe(response.ast);
+        await analyze(editor);
+        await selectView(page, 'Stats');
+        await page.getByRole('button', {name: 'Copy stats', exact: true}).click();
+        await expect.poll(() => getClipboardContent(page)).toBe(JSON.stringify(response.stats));
+        await selectView(page, 'Result 2');
+        await page.getByRole('tab', {name: /Result #2/}).click();
+        await page.getByRole('button', {name: 'Copy result', exact: true}).click();
+        await expect.poll(() => getClipboardContent(page)).toBe('value\n2');
+        await selectView(page, 'Execution Plan');
+        await expect(page.getByRole('img', {name: 'Execution Plan'})).toBeVisible();
+        await expect(
+            page.locator('.ydb-query-result__controls-right').getByRole('button', {name: /^Copy /}),
+        ).toHaveCount(0);
+    });
+
     test('real Explain never executes and Analyze retains results', async ({page}, testInfo) => {
         const editor = await openEditor(page);
         const actions: string[] = [];

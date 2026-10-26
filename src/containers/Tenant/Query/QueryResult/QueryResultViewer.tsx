@@ -128,6 +128,14 @@ export function QueryResultViewer({
     const {preparedPlan, stats, resultSets, ast} = data;
     const rawPlan = data.plan ?? preparedPlan?.pristine;
     const resultSetCount = resultSets?.filter(Boolean).length ?? 0;
+    const currentResultRows = resultSets?.[selectedResultSet]?.result;
+    const copyData = {
+        [RESULT_OPTIONS_IDS.result]: currentResultRows,
+        [RESULT_OPTIONS_IDS.queryPlan]: rawPlan,
+        [RESULT_OPTIONS_IDS.executionPlan]: undefined,
+        [RESULT_OPTIONS_IDS.stats]: stats,
+        [RESULT_OPTIONS_IDS.ast]: ast,
+    }[activeSection];
 
     React.useEffect(() => {
         return () => {
@@ -182,47 +190,19 @@ export function QueryResultViewer({
         </SegmentedRadioGroup.Option>
     ));
 
-    const hasCopyableData = React.useCallback((): boolean => {
-        switch (activeSection) {
-            case RESULT_OPTIONS_IDS.result:
-                return Boolean(data?.resultSets?.[selectedResultSet]?.result?.length);
-            case RESULT_OPTIONS_IDS.queryPlan:
-                return Boolean(rawPlan);
-            case RESULT_OPTIONS_IDS.stats:
-                return Boolean(stats);
-            case RESULT_OPTIONS_IDS.ast:
-                return Boolean(ast);
-            default:
-                return false;
-        }
-    }, [activeSection, data?.resultSets, selectedResultSet, rawPlan, stats, ast]);
-
     const handleCopy = React.useCallback(async () => {
         window.clearTimeout(copyTimeoutRef.current);
 
-        let success = false;
-        switch (activeSection) {
-            case RESULT_OPTIONS_IDS.result: {
-                const currentResult = data?.resultSets?.[selectedResultSet];
-                success = await copyResultToClipboard(currentResult?.result);
-                break;
-            }
-            case RESULT_OPTIONS_IDS.queryPlan:
-                success = await copyTextDataToClipboard(rawPlan);
-                break;
-            case RESULT_OPTIONS_IDS.stats:
-                success = await copyTextDataToClipboard(stats);
-                break;
-            case RESULT_OPTIONS_IDS.ast:
-                success = await copyTextDataToClipboard(ast);
-                break;
-        }
+        const success =
+            activeSection === RESULT_OPTIONS_IDS.result
+                ? await copyResultToClipboard(currentResultRows)
+                : await copyTextDataToClipboard(copyData);
 
         setCopyStatus(success ? 'success' : 'error');
         copyTimeoutRef.current = window.setTimeout(() => {
             setCopyStatus('pending');
         }, COPY_STATUS_RESET_TIMEOUT);
-    }, [activeSection, data?.resultSets, selectedResultSet, rawPlan, stats, ast]);
+    }, [activeSection, currentResultRows, copyData]);
 
     const getCopyTooltipTitle = (status: CopyToClipboardStatus): string => {
         if (status === 'success') {
@@ -235,7 +215,11 @@ export function QueryResultViewer({
     };
 
     const renderCopyButton = () => {
-        if (isLoading || !hasCopyableData()) {
+        const hasCopyableData =
+            activeSection === RESULT_OPTIONS_IDS.result
+                ? Boolean(currentResultRows?.length)
+                : Boolean(copyData);
+        if (isLoading || !hasCopyableData) {
             return null;
         }
 

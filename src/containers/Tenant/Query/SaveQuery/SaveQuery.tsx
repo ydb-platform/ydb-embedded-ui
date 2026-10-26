@@ -83,23 +83,16 @@ function useSaveQueryHandler(dialogProps: SaveQueryDialogCommonProps) {
 
 interface SaveQueryButtonProps extends ButtonButtonProps {
     dialogProps: SaveQueryDialogCommonProps;
-    tooltipTitle?: string;
 }
 
-export function SaveQueryButton({
-    dialogProps,
-    tooltipTitle,
-    children,
-    ...buttonProps
-}: SaveQueryButtonProps) {
+export function SaveQueryButton({dialogProps, children, ...buttonProps}: SaveQueryButtonProps) {
     const onSaveQueryClick = useSaveQueryHandler(dialogProps);
 
-    const button = (
+    return (
         <Button onClick={onSaveQueryClick} {...buttonProps}>
             {children ?? i18n('action.save')}
         </Button>
     );
-    return tooltipTitle ? <ActionTooltip title={tooltipTitle}>{button}</ActionTooltip> : button;
 }
 
 export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
@@ -147,14 +140,11 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     return currentSavedQueryName ? (
         renderSaveDropdownMenu()
     ) : (
-        <SaveQueryButton
-            tooltipTitle={i18n('action.save')}
-            {...buttonProps}
-            aria-label={i18n('action.save')}
-            dialogProps={{queryBody: currentInput}}
-        >
-            <Icon data={FloppyDisk} size={16} />
-        </SaveQueryButton>
+        <ActionTooltip title={i18n('action.save')}>
+            <Button onClick={onSaveQueryClick} {...buttonProps} aria-label={i18n('action.save')}>
+                <Icon data={FloppyDisk} size={16} />
+            </Button>
+        </ActionTooltip>
     );
 }
 
