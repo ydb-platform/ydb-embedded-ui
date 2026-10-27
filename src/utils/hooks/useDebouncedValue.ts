@@ -4,10 +4,13 @@ export function useDebouncedValue<T extends string | number | null>({
     value,
     onUpdate,
     debounce = 200,
+    normalizeValue,
 }: {
     value: T;
     onUpdate?: (value: T) => void;
     debounce?: number;
+    /** The value expected back from the parent; does not change the onUpdate argument. */
+    normalizeValue?: (value: T) => T;
 }) {
     const [currentValue, setCurrentValue] = React.useState<T>(value);
 
@@ -38,7 +41,9 @@ export function useDebouncedValue<T extends string | number | null>({
         window.clearTimeout(timer.current);
         timer.current = window.setTimeout(() => {
             timer.current = undefined;
-            submittedValue.current = {value: newValue};
+            submittedValue.current = {
+                value: normalizeValue ? normalizeValue(newValue) : newValue,
+            };
             onUpdate?.(newValue);
         }, debounce);
     };
