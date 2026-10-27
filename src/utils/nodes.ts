@@ -30,11 +30,6 @@ export const isUnavailableNode = <
     node: T,
 ) => !node.SystemState || node.SystemState === EFlag.Grey;
 
-function getNodePileName(node: TNodeInfo) {
-    const legacyLocation = node.PhysicalLocation?.Location || node.PhysicalLocation?.DataCenterId;
-    return node.Location?.BridgePileName || legacyLocation?.match(/(?:^|\/)P=([^/]+)/)?.[1];
-}
-
 export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
     return nodesList?.reduce<NodesMap>((nodeHosts, node) => {
         if (valueIsDefined(node.Id)) {
@@ -48,7 +43,6 @@ export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
                 DC: node.Location?.DataCenter || physicalLocation?.DataCenterId,
                 DCKey: getDatacenterKey(node.Location, physicalLocation?.DataCenterId),
                 Rack,
-                PileName: getNodePileName(node),
             });
         }
         return nodeHosts;

@@ -1,18 +1,15 @@
-import type React from 'react';
+import React from 'react';
 
-import {CircleQuestionFill} from '@gravity-ui/icons';
-import {Flex, Icon} from '@gravity-ui/uikit';
+import {Flex} from '@gravity-ui/uikit';
 
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {cn} from '../../utils/cn';
-import type {BaseDiskDisplayState, DiskDisplayMode} from '../../utils/disks/displayState';
+import type {DiskDisplayMode} from '../../utils/disks/displayState';
 import type {DiskBarTone} from '../../utils/disks/types';
 import {useSetting} from '../../utils/hooks';
 import {isNumeric} from '../../utils/utils';
-import datacenterI18n from '../Datacenter/i18n';
 
 import './DiskStateProgressBar.scss';
-import '../Datacenter/datacenterColors.scss';
 
 const b = cn('storage-disk-progress-bar');
 
@@ -20,7 +17,6 @@ interface DiskStateProgressBarProps {
     allocation?: number;
     tone: DiskBarTone;
     mode?: DiskDisplayMode;
-    datacenter?: BaseDiskDisplayState['datacenter'];
     compact?: boolean;
     faded?: boolean;
     inactive?: boolean;
@@ -41,34 +37,10 @@ function getToneModifier(tone: DiskBarTone) {
     return tone === 'LightGrey' ? 'light-grey' : tone.toLowerCase();
 }
 
-function DatacenterDiskBar({
-    datacenter,
-    className,
-}: Pick<DiskStateProgressBarProps, 'datacenter' | 'className'>) {
-    const name = datacenter?.name || datacenterI18n('value_unknown');
-    const colorClass = cn('ydb-datacenter-color')({
-        color: datacenter?.color || 'neutral',
-        variant: datacenter?.variant,
-    });
-
-    return (
-        <Flex
-            alignItems="center"
-            justifyContent="flex-start"
-            className={[className, colorClass].filter(Boolean).join(' ')}
-            title={name}
-        >
-            {!datacenter?.name && <Icon data={CircleQuestionFill} size={10} />}
-            <span className={b('datacenter-name')}>{name}</span>
-        </Flex>
-    );
-}
-
 export function DiskStateProgressBar({
     allocation,
     tone,
     mode,
-    datacenter,
     compact,
     faded,
     inactive,
@@ -98,16 +70,12 @@ export function DiskStateProgressBar({
         borderless,
         'all-mode-has-issues': mode === 'all' && strongFill,
         'overlap-icon-at-top-left': overflowVisible,
-        [getToneModifier(tone)]: mode !== 'datacenter',
+        [getToneModifier(tone)]: true,
     };
 
     if (mode) {
         mods[`mode-${mode.toLowerCase()}`] = true;
         mods['expert-mode'] = true;
-    }
-
-    if (mode === 'datacenter') {
-        return <DatacenterDiskBar datacenter={datacenter} className={b(mods, className)} />;
     }
 
     const hasAllocation = isNumeric(allocation) && allocation >= 0;

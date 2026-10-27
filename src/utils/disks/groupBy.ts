@@ -4,7 +4,6 @@ export const VDisksGroupBy = {
     FrontQueues: 'FrontQueues',
     Compaction: 'Compaction',
     DriveType: 'DriveType',
-    Datacenter: 'DC',
     All: 'All',
 } as const;
 

@@ -27,9 +27,6 @@ export function getDiskLocationItems(
         {id: 'fqdn', name: i18n('field_fqdn'), value: nodeData.Host},
         {id: 'rack', name: i18n('field_rack'), value: nodeData.Rack},
         {id: 'datacenter', name: i18n('field_datacenter'), value: nodeData.DC},
-        ...(nodeData.PileName
-            ? [{id: 'pile-name', name: i18n('field_pile-name'), value: nodeData.PileName}]
-            : []),
         {id: 'pdisk-path', name: i18n('field_pdisk-path'), value: data.Path},
         {id: 'node-id', name: i18n('field_node-id'), value: data.NodeId || undefined},
         {id: 'pdisk-id', name: i18n('field_pdisk-id'), value: data.PDiskId},

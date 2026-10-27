@@ -12,14 +12,6 @@ const mockUseIsStorageExpertMode = jest.fn();
 const mockUsePDisksGroupByParam = jest.fn();
 const mockUseSpaceLegendSelection = jest.fn();
 
-jest.mock('../../../utils/hooks/useNodesMap', () => ({
-    useNodesMap: () => undefined,
-}));
-
-jest.mock('../../../utils/hooks/useDatacenterColorIndexes', () => ({
-    useDatacenterColorIndexes: () => undefined,
-}));
-
 jest.mock('../useStorageQueryParams', () => ({
     useIsStorageExpertMode: () => mockUseIsStorageExpertMode(),
     usePDisksGroupByParam: () => mockUsePDisksGroupByParam(),

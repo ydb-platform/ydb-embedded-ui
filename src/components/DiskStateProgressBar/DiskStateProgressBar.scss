@@ -684,33 +684,3 @@
         color: var(--ydb-progress-bar-font-color, var(--entity-state-border-color));
     }
 }
-
-.storage-disk-progress-bar_mode-datacenter {
-    gap: 2px;
-
-    box-sizing: border-box;
-    padding-inline: 4px 0;
-
-    color: var(--ydb-dc-text);
-    border: none;
-    border-radius: 6px;
-    background: var(--ydb-dc-background);
-    box-shadow: inset 0 0 0 2px var(--ydb-dc-outline);
-
-    &.storage-disk-progress-bar_highlighted,
-    &:hover {
-        color: var(--ydb-dc-hover-text);
-        background: var(--ydb-dc-hover);
-    }
-
-    .storage-disk-progress-bar__datacenter-name {
-        overflow: hidden;
-
-        min-width: 0;
-
-        font-size: var(--g-text-caption-2-font-size);
-        line-height: var(--g-text-caption-2-line-height);
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-}

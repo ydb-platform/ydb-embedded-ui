@@ -30,7 +30,6 @@ import type {SpaceLegendSelectionScope} from './StorageExpertModePanel/component
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
 import {PDisksGroupBy} from './StorageExpertModePanel/constants';
 import type {PDisksGroupByValue} from './StorageExpertModePanel/constants';
-import {useStorageDatacenter} from './useStorageDatacenter';
 import {
     useIsStorageExpertMode,
     useNodesPDisksGroupByParam,
@@ -199,17 +198,12 @@ function usePDiskDisplayStateGetter(
     selectionScope: SpaceLegendSelectionScope,
 ): PDiskDisplayStateGetter {
     const isExpertMode = useIsStorageExpertMode();
-    const getDatacenter = useStorageDatacenter();
     const inactiveAlerts = useSpaceLegendSelection(selectionScope);
 
     return React.useCallback(
         (pDisk) => {
             if (!isExpertMode) {
                 return getDefaultPDiskDisplayState(pDisk);
-            }
-
-            if (pdisksGroupBy === PDisksGroupBy.Datacenter) {
-                return {...getDatacenter(pDisk.NodeId), width: EXPERT_MODE_PDISK_WIDTH};
             }
 
             if (pdisksGroupBy === PDisksGroupBy.DriveType) {
@@ -293,7 +287,7 @@ function usePDiskDisplayStateGetter(
                 width: EXPERT_MODE_PDISK_WIDTH,
             };
         },
-        [getDatacenter, inactiveAlerts, isExpertMode, pdisksGroupBy],
+        [inactiveAlerts, isExpertMode, pdisksGroupBy],
     );
 }
 

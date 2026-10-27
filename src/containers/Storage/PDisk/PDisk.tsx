@@ -2,7 +2,6 @@ import React from 'react';
 
 import {isNil} from 'lodash';
 
-import datacenterI18n from '../../../components/Datacenter/i18n';
 import {DiskBarLabel} from '../../../components/DiskStateProgressBar/DiskBarLabel';
 import {DiskIndicator} from '../../../components/DiskStateProgressBar/DiskIndicator';
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
@@ -193,8 +192,10 @@ function getAllModeAccessibleName(
     });
 }
 
-function getAccessibleName(data: PreparedPDisk, displayState: PDiskDisplayState) {
-    const {mode, allMode, isNoData, allocatedPercent} = displayState;
+function getAccessibleName(
+    data: PreparedPDisk,
+    {mode, allMode, isNoData, allocatedPercent, driveType}: PDiskDisplayState,
+) {
     if (!mode) {
         return undefined;
     }
@@ -207,24 +208,9 @@ function getAccessibleName(data: PreparedPDisk, displayState: PDiskDisplayState)
     if (isNoData) {
         diskName = i18n('context_pdisk-no-whiteboard', {disk: diskName, noData});
     }
-
-    return getModeAccessibleName(data, displayState, diskName);
-}
-
-function getModeAccessibleName(
-    data: PreparedPDisk,
-    {mode, isNoData, allocatedPercent, driveType, datacenter}: PDiskDisplayState,
-    diskName: string,
-) {
-    const noData = i18n('context_no-data');
     const {State, Device, Realtime} = isNoData ? {} : data;
 
     switch (mode) {
-        case 'datacenter':
-            return datacenterI18n('context_disk-datacenter', {
-                disk: diskName,
-                datacenter: datacenter?.name || datacenterI18n('value_unknown'),
-            });
         case 'driveType':
             return i18n('context_drive-type-accessible-name', {
                 disk: diskName,
@@ -384,7 +370,6 @@ export const PDisk = ({
                     <DiskStateProgressBar
                         allocation={allocatedPercent}
                         tone={tone}
-                        datacenter={displayState.datacenter}
                         mode={displayState.mode}
                         leading={leading}
                         content={content}

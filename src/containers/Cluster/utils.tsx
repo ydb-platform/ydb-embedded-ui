@@ -68,8 +68,8 @@ const configs = {
 
 export const clusterTabs = [tenants, nodes, storage, network, tablets, versions, events, configs];
 
-export function isClusterTab(tab: unknown): tab is ClusterTab {
-    return Object.values(clusterTabsIds).some((id) => id === tab);
+export function isClusterTab(tab: any): tab is ClusterTab {
+    return Object.values(clusterTabsIds).includes(tab);
 }
 
 export function useShouldShowEventsTab() {

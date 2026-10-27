@@ -12,6 +12,7 @@ import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
 import routes, {CLUSTER, getClusterPath} from '../../routes';
 import type {RootState} from '../../store';
+import {getQueryScope} from '../../store/queryScope';
 import {
     useAllCapabilitiesLoaded,
     useCapabilitiesQuery,
@@ -21,6 +22,7 @@ import {
 } from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
 import {lazyComponent} from '../../utils/lazyComponent';
 import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
@@ -42,7 +44,6 @@ import {
 } from './appSlots';
 import {shouldRedirectClusterRouteToRoot} from './clusterRouteGuard';
 import {getLegacyClusterTenantsRedirect, getLegacyTenantRedirect} from './legacyRedirects';
-import {useNodesListQueryOptions} from './useNodesListQueryOptions';
 
 import './App.scss';
 
@@ -225,8 +226,8 @@ function HomePageDataWrapper({children}: {children: React.ReactNode}) {
 }
 
 function GetNodesList() {
-    const {args, options} = useNodesListQueryOptions();
-    nodesListApi.useGetNodesListQuery(args, options);
+    const database = useDatabaseFromQuery();
+    nodesListApi.useGetNodesListQuery({database, scope: getQueryScope()});
     return null;
 }
 

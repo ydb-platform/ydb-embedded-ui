@@ -31,7 +31,6 @@ import type {PreparedVDisk} from '../../utils/disks/types';
 
 import type {SpaceLegendSelectionScope} from './StorageExpertModePanel/components/getSpaceLegendSelection';
 import {useSpaceLegendSelection} from './StorageExpertModePanel/components/useSpaceLegendSelection';
-import {useStorageDatacenter} from './useStorageDatacenter';
 import {
     useIsStorageExpertMode,
     useNodesVDisksGroupByParam,
@@ -222,17 +221,12 @@ function useVDiskDisplayStateGetter(
     selectionScope: SpaceLegendSelectionScope,
 ): VDiskDisplayStateGetter {
     const isExpertMode = useIsStorageExpertMode();
-    const getDatacenter = useStorageDatacenter();
     const inactiveLegendItems = useSpaceLegendSelection(selectionScope);
 
     return React.useCallback(
         (vDisk, isDonor) => {
             if (!isExpertMode) {
                 return getDefaultDiskDisplayState(vDisk, isDonor);
-            }
-
-            if (vdisksGroupBy === VDisksGroupBy.Datacenter) {
-                return getDatacenter(vDisk.NodeId);
             }
 
             return getExpertVDiskDisplayState({
@@ -243,7 +237,7 @@ function useVDiskDisplayStateGetter(
                 vdisksGroupBy,
             });
         },
-        [getDatacenter, inactiveLegendItems, isExpertMode, selectionScope, vdisksGroupBy],
+        [inactiveLegendItems, isExpertMode, selectionScope, vdisksGroupBy],
     );
 }
 

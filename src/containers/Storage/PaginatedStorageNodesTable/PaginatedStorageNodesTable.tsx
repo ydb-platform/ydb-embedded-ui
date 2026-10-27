@@ -14,7 +14,6 @@ import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {cn} from '../../../utils/cn';
-import {useDatacenterNodesFetcher} from '../../../utils/hooks/useDatacenterNodesFetcher';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {NodesUptimeFilterValues, isUnavailableNode} from '../../../utils/nodes';
 import {STORAGE_NODES_DEFAULT_ROW_HEIGHT} from '../PaginatedStorageNodes/nodeExpertModeLayout';
@@ -71,7 +70,6 @@ export const PaginatedStorageNodesTable = ({
     onDataFetched,
 }: PaginatedStorageNodesTableProps) => {
     const history = useHistory();
-    const fetchNodes = useDatacenterNodesFetcher(getStorageNodes);
     const {hideUnavailable} = useHideUnavailableNodes();
     const tableFilters = React.useMemo(() => {
         return {
@@ -127,7 +125,7 @@ export const PaginatedStorageNodesTable = ({
             columnsWidthLSKey={STORAGE_NODES_COLUMNS_WIDTH_LS_KEY}
             scrollContainerRef={scrollContainerRef}
             columns={columns}
-            fetchData={fetchNodes}
+            fetchData={getStorageNodes}
             rowHeight={
                 columns.some((column) => column.name === NODES_COLUMNS_IDS.PDisks)
                     ? rowHeight
