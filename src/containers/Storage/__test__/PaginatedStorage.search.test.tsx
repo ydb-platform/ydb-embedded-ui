@@ -2,7 +2,7 @@ import React from 'react';
 
 import {act, fireEvent, render, screen} from '@testing-library/react';
 import {createMemoryHistory} from 'history';
-import {Router} from 'react-router-dom';
+import {Route, Router} from 'react-router-dom';
 import {QueryParamProvider} from 'use-query-params';
 import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 
@@ -89,24 +89,36 @@ describe.each([
         jest.mocked(storageApi.useGetStorageGroupsInfoQuery).mockReturnValue({
             currentData: {tableGroups: []},
             isFetching: false,
+            refetch: jest.fn(),
         } as ReturnType<typeof storageApi.useGetStorageGroupsInfoQuery>);
         jest.mocked(storageApi.useGetStorageNodesInfoQuery).mockReturnValue({
             currentData: {tableGroups: []},
             isFetching: false,
+            refetch: jest.fn(),
         } as ReturnType<typeof storageApi.useGetStorageNodesInfoQuery>);
     });
     afterEach(() => jest.useRealTimers());
 
-    function setup(grouped = false) {
+    function setup(grouped = false, entries?: string[]) {
         const history = createMemoryHistory({
-            initialEntries: [
+            initialIndex: entries ? entries.length - 1 : 0,
+            initialEntries: entries ?? [
                 `/cluster/storage?type=${type}&${searchParam}=a${grouped ? `&${groupParam}=${group}` : ''}`,
             ],
         });
         render(
             <Router history={history}>
                 <QueryParamProvider adapter={ReactRouter5Adapter}>
-                    <Page scrollContainerRef={React.createRef<HTMLElement>()} />
+                    <Route
+                        render={({location}) => (
+                            <Page
+                                groupId={
+                                    new URLSearchParams(location.search).get('groupId') ?? undefined
+                                }
+                                scrollContainerRef={React.createRef<HTMLElement>()}
+                            />
+                        )}
+                    />
                 </QueryParamProvider>
             </Router>,
         );
@@ -134,6 +146,49 @@ describe.each([
             expectFilter('a');
             act(() => jest.advanceTimersByTime(1));
             expectFilter('abc');
+        },
+    );
+
+    it.each([false, true])(
+        'resets the filter immediately on Back/Forward between groups (grouped: %s)',
+        (grouped) => {
+            const entries = ['one', 'two'].map(
+                (id) =>
+                    `/storageGroup?groupId=${id}&type=${type}&${searchParam}=${id}${grouped ? `&${groupParam}=${group}` : ''}`,
+            );
+            const {history, input} = setup(grouped, entries);
+            const expectFilter = (id: string, value = id) => {
+                expect(input).toHaveValue(value);
+                if (grouped) {
+                    expect(mockQuery).toHaveBeenCalled();
+                    for (const [params] of mockQuery.mock.calls) {
+                        expect(params).toEqual(
+                            expect.objectContaining({
+                                [type === 'nodes' ? 'group_id' : 'groupId']: id,
+                                filter: value,
+                            }),
+                        );
+                    }
+                } else {
+                    expect(mockTable).toHaveBeenCalled();
+                    for (const [props] of mockTable.mock.calls) {
+                        expect(props).toEqual(
+                            expect.objectContaining({groupId: id, searchValue: value}),
+                        );
+                    }
+                }
+            };
+            fireEvent.change(input, {target: {value: 'pending'}});
+            jest.clearAllMocks();
+            act(() => history.goBack());
+            expectFilter('one');
+            act(() => jest.advanceTimersByTime(200));
+            expectFilter('one');
+            jest.clearAllMocks();
+            act(() => history.goForward());
+            expectFilter('two', 'pending');
+            act(() => jest.advanceTimersByTime(200));
+            expectFilter('two', 'pending');
         },
     );
 

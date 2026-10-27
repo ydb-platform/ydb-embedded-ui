@@ -53,9 +53,11 @@ const mockQuery = jest.mocked(tenantsApi.useGetTenantsInfoQuery);
 beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
-    mockQuery.mockReturnValue({currentData: tenants, isFetching: false} as ReturnType<
-        typeof tenantsApi.useGetTenantsInfoQuery
-    >);
+    mockQuery.mockReturnValue({
+        currentData: tenants,
+        isFetching: false,
+        refetch: jest.fn(),
+    } as ReturnType<typeof tenantsApi.useGetTenantsInfoQuery>);
 });
 afterEach(() => jest.useRealTimers());
 

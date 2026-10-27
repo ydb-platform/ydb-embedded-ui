@@ -8,9 +8,18 @@ export function useDebouncedSearch(value: string) {
     const params = new URLSearchParams(search);
     const scope = JSON.stringify([
         pathname,
-        ...['environment', 'clusterName', 'database', 'schema', 'path', 'backend'].map((key) =>
-            params.get(key),
-        ),
+        ...[
+            'environment',
+            'clusterName',
+            'database',
+            'schema',
+            'path',
+            'backend',
+            'groupId',
+            'nodeId',
+            'pDiskId',
+            'vDiskId',
+        ].map((key) => params.get(key)),
     ]);
     const [applied, setApplied] = React.useState({value, scope});
 
@@ -19,7 +28,7 @@ export function useDebouncedSearch(value: string) {
         return () => window.clearTimeout(timer);
     }, [value, scope]);
 
-    // Never use a previous database's filter, even for the first render after navigation.
+    // Never use a previous entity's filter, even for the first render after navigation.
     if (applied.scope !== scope) {
         setApplied({value, scope});
         return value;

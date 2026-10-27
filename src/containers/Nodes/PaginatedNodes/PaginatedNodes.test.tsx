@@ -65,9 +65,11 @@ function setup(grouped = false) {
 beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
-    mockQuery.mockReturnValue({currentData: {tableGroups: []}, isFetching: false} as ReturnType<
-        typeof nodesApi.useGetNodesQuery
-    >);
+    mockQuery.mockReturnValue({
+        currentData: {tableGroups: []},
+        isFetching: false,
+        refetch: jest.fn(),
+    } as ReturnType<typeof nodesApi.useGetNodesQuery>);
 });
 afterEach(() => jest.useRealTimers());
 

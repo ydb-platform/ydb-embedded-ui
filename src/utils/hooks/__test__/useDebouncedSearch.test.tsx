@@ -32,7 +32,18 @@ describe('useDebouncedSearch', () => {
         expect(result.current).toBe('abc');
     });
 
-    it.each(['database', 'clusterName', 'environment', 'backend', 'schema', 'path'])(
+    it.each([
+        'database',
+        'clusterName',
+        'environment',
+        'backend',
+        'schema',
+        'path',
+        'groupId',
+        'nodeId',
+        'pDiskId',
+        'vDiskId',
+    ])(
         'uses the current value immediately after %s changes, then debounces new edits',
         (scopeParam) => {
             const {result, rerender, history} = setup();
