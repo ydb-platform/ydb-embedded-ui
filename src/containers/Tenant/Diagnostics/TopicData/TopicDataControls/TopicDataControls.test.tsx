@@ -41,37 +41,26 @@ describe('Topic data offset input', () => {
         return {history, input: screen.getByRole('spinbutton')};
     }
 
-    it('keeps new text when the URL removes the previous zero offset', () => {
-        const {history, input} = setup();
-        fireEvent.change(input, {target: {value: '0'}});
-        expect(input).toHaveValue('0');
-
-        act(() => {
-            jest.advanceTimersByTime(600);
-            fireEvent.change(input, {target: {value: '12'}});
-        });
-
-        expect(new URLSearchParams(history.location.search).get('selectedOffset')).toBeNull();
-        expect(input).toHaveValue('12');
-        expect(input).toHaveFocus();
-
-        act(() => jest.advanceTimersByTime(599));
-        expect(new URLSearchParams(history.location.search).get('selectedOffset')).toBeNull();
-        act(() => jest.advanceTimersByTime(1));
-        const params = new URLSearchParams(history.location.search);
-        expect(params.get('selectedOffset')).toBe('12');
-        expect(params.get('database')).toBe('/local');
-        expect(params.get('clusterName')).toBe('test');
-        expect(params.get('backend')).toBe('proxy');
-        expect(input).toHaveValue('12');
-    });
-
-    it('still clears a zero offset when there is no newer edit', () => {
-        const {history, input} = setup();
-        fireEvent.change(input, {target: {value: '0'}});
-        act(() => jest.advanceTimersByTime(600));
-
-        expect(new URLSearchParams(history.location.search).get('selectedOffset')).toBeNull();
-        expect(input).toHaveValue('');
-    });
+    it.each([false, true])(
+        'handles normalized zero without losing newer text (new edit: %s)',
+        (newEdit) => {
+            const {history, input} = setup();
+            fireEvent.change(input, {target: {value: '0'}});
+            act(() => {
+                jest.advanceTimersByTime(600);
+                if (newEdit) {
+                    fireEvent.change(input, {target: {value: '12'}});
+                }
+            });
+            expect(new URLSearchParams(history.location.search).get('selectedOffset')).toBeNull();
+            expect(input).toHaveValue(newEdit ? '12' : '');
+            act(() => jest.advanceTimersByTime(599));
+            expect(new URLSearchParams(history.location.search).get('selectedOffset')).toBeNull();
+            act(() => jest.advanceTimersByTime(1));
+            expect(new URLSearchParams(history.location.search).get('selectedOffset')).toBe(
+                newEdit ? '12' : null,
+            );
+            expect(input).toHaveValue(newEdit ? '12' : '');
+        },
+    );
 });

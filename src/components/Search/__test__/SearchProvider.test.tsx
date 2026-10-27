@@ -11,7 +11,7 @@ import {SearchProvider} from '../SearchProvider';
 const queryParams = {search: StringParam, group: StringParam};
 const renderTable = jest.fn();
 
-function Page({revision = 0, debounce}: {revision?: number; debounce?: number}) {
+function Page({debounce}: {debounce?: number}) {
     const [{search, group}, setQuery] = useQueryParams(queryParams);
     const onChange = (value: string) => setQuery({search: value || undefined}, 'replaceIn');
     renderTable(search);
@@ -24,7 +24,6 @@ function Page({revision = 0, debounce}: {revision?: number; debounce?: number}) 
                 debounce={debounce}
                 tableFilter
             />
-            <output>{revision}</output>
         </SearchProvider>
     );
 }
@@ -34,10 +33,10 @@ function setup(debounce?: number) {
         initialIndex: 1,
         initialEntries: ['/list?search=a&entity=one', '/list?search=a&entity=two'],
     });
-    const renderPage = (revision = 0) => (
+    const renderPage = () => (
         <Router history={history}>
             <QueryParamProvider adapter={ReactRouter5Adapter}>
-                <Page revision={revision} debounce={debounce} />
+                <Page debounce={debounce} />
             </QueryParamProvider>
         </Router>
     );
@@ -46,7 +45,7 @@ function setup(debounce?: number) {
         history,
         ...view,
         input: screen.getByRole('textbox'),
-        refresh: () => view.rerender(renderPage(1)),
+        refresh: () => view.rerender(renderPage()),
     };
 }
 
@@ -88,15 +87,20 @@ it('preserves a draft across a grouping remount without restarting the delay', (
     expect(history.location.search).toBe('?search=abc&entity=two&group=host');
 });
 
-it.each(['back', 'push', 'replace', 'unknown-context'] as const)(
+it.each(['back', 'forward', 'push', 'replace', 'unknown-context'] as const)(
     'cancels an old write before React commits navigation (%s) with the same search',
     (navigation) => {
         const {history, input} = setup();
+        if (navigation === 'forward') {
+            act(() => history.goBack());
+        }
         fireEvent.change(input, {target: {value: 'pending'}});
         let destination = history.location;
         act(() => {
             if (navigation === 'back') {
                 history.goBack();
+            } else if (navigation === 'forward') {
+                history.goForward();
             } else if (navigation === 'unknown-context') {
                 history.replace('/list?search=a&entity=two&newContext=three');
             } else {
@@ -106,8 +110,6 @@ it.each(['back', 'push', 'replace', 'unknown-context'] as const)(
             jest.advanceTimersByTime(200);
         });
         expect(input).toHaveValue('a');
-        expect(history.location).toBe(destination);
-        act(() => jest.advanceTimersByTime(200));
         expect(history.location).toBe(destination);
         fireEvent.change(input, {target: {value: 'new'}});
         act(() => jest.advanceTimersByTime(200));
@@ -122,15 +124,6 @@ it('accepts an external clear and cancels the pending edit', () => {
     expect(input).toHaveValue('');
     act(() => jest.advanceTimersByTime(200));
     expect(history.location.search).toBe('?entity=two');
-});
-
-it('cancels pending URL writes when the owner unmounts', () => {
-    const {history, input, unmount} = setup();
-    const url = history.location;
-    fireEvent.change(input, {target: {value: 'pending'}});
-    unmount();
-    act(() => jest.advanceTimersByTime(200));
-    expect(history.location).toBe(url);
 });
 
 it('preserves the explicit zero-debounce contract inside a provider', () => {

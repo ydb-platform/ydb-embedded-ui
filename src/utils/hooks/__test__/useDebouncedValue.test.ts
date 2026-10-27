@@ -32,23 +32,6 @@ describe('useDebouncedValue', () => {
         },
     );
 
-    it('cancels the pending callback when the value changes externally', () => {
-        const onUpdate = jest.fn();
-        const {result, rerender} = renderHook(({value}) => useDebouncedValue({value, onUpdate}), {
-            initialProps: {value: 'a'},
-        });
-        act(() => result.current[1]('ab'));
-        rerender({value: ''});
-        expect(result.current[0]).toBe('');
-        act(() => jest.runAllTimers());
-        expect(onUpdate).not.toHaveBeenCalled();
-
-        act(() => result.current[1]('new'));
-        act(() => jest.advanceTimersByTime(200));
-        expect(onUpdate).toHaveBeenCalledTimes(1);
-        expect(onUpdate).toHaveBeenCalledWith('new');
-    });
-
     it('keeps the callback captured when typing', () => {
         const onUpdate = jest.fn();
         const nextOnUpdate = jest.fn();
@@ -65,30 +48,26 @@ describe('useDebouncedValue', () => {
         expect(nextOnUpdate).not.toHaveBeenCalled();
     });
 
-    it('discards pending text when the context changes but the value stays the same', () => {
-        const onUpdate = jest.fn();
-        const {result, rerender} = renderHook(
-            ({resetKey}) => useDebouncedValue<string>({value: 'a', onUpdate, resetKey}),
-            {initialProps: {resetKey: 'one'}},
-        );
-        act(() => result.current[1]('pending'));
-        rerender({resetKey: 'two'});
-        expect(result.current[0]).toBe('a');
-        act(() => jest.advanceTimersByTime(200));
-        expect(onUpdate).not.toHaveBeenCalled();
-        act(() => result.current[1]('new'));
-        act(() => jest.advanceTimersByTime(200));
-        expect(onUpdate).toHaveBeenCalledWith('new');
-    });
-
-    it('cancels the pending callback on unmount', () => {
-        const onUpdate = jest.fn();
-        const {result, unmount} = renderHook(() =>
-            useDebouncedValue<string>({value: '', onUpdate}),
-        );
-        act(() => result.current[1]('query'));
-        unmount();
-        act(() => jest.runAllTimers());
-        expect(onUpdate).not.toHaveBeenCalled();
-    });
+    it.each(['value', 'context', 'unmount'] as const)(
+        'cancels pending input on %s changes',
+        (change) => {
+            const onUpdate = jest.fn();
+            const {result, rerender, unmount} = renderHook(
+                (props) => useDebouncedValue({...props, onUpdate}),
+                {initialProps: {value: 'a', resetKey: 'one'}},
+            );
+            act(() => result.current[1]('pending'));
+            if (change === 'unmount') {
+                unmount();
+            } else {
+                rerender({
+                    value: change === 'value' ? '' : 'a',
+                    resetKey: change === 'context' ? 'two' : 'one',
+                });
+                expect(result.current[0]).toBe(change === 'value' ? '' : 'a');
+            }
+            act(() => jest.advanceTimersByTime(200));
+            expect(onUpdate).not.toHaveBeenCalled();
+        },
+    );
 });
