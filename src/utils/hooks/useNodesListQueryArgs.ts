@@ -3,6 +3,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 
 import routes from '../../routes';
 import {getQueryScope} from '../../store/queryScope';
+import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import type {NodesListQueryArgs} from '../../store/reducers/nodesList';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {getSettingValue} from '../../store/reducers/settings/settings';
@@ -28,9 +29,8 @@ function isClusterStoragePage(pathname: string) {
     return match?.params.activeTab === 'storage';
 }
 
-export function useNodesListQueryArgs(): NodesListQueryArgs {
+export function useIsStoragePage() {
     const {pathname} = useLocation();
-    const database = useDatabaseFromQuery();
     const [query] = useQueryParams({
         databasePage: StringParam,
         tenantPage: StringParam,
@@ -42,9 +42,20 @@ export function useNodesListQueryArgs(): NodesListQueryArgs {
     const diagnosticsTab = useTypedSelector((state) => state.tenant.diagnosticsTab);
     const defaultPage = tenantPageSchema.catch(TENANT_PAGES_IDS.query).parse(initialPage);
     const page = tenantPageSchema.catch(defaultPage).parse(query.databasePage ?? query.tenantPage);
-    const storagePage =
+    return (
         isStoragePage(pathname, page, query.diagnosticsTab ?? diagnosticsTab) ||
-        isClusterStoragePage(pathname);
+        isClusterStoragePage(pathname)
+    );
+}
 
-    return {database, scope: getQueryScope(), include_storage: storagePage || undefined};
+export function useNodesListQueryArgs(): NodesListQueryArgs {
+    const database = useDatabaseFromQuery();
+    const storagePage = useIsStoragePage();
+    const {currentData: permissions} = authenticationApi.endpoints.whoami.useQueryState({database});
+
+    return {
+        database,
+        scope: getQueryScope(),
+        include_storage: (storagePage && permissions?.IsViewerAllowed === true) || undefined,
+    };
 }

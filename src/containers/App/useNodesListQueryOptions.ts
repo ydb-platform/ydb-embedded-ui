@@ -7,7 +7,7 @@ import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import type {StorageType} from '../../store/reducers/storage/types';
 import {storageTypeSchema} from '../../store/reducers/storage/types';
 import {useAutoRefreshInterval} from '../../utils/hooks/useAutoRefreshInterval';
-import {useNodesListQueryArgs} from '../../utils/hooks/useNodesListQueryArgs';
+import {useIsStoragePage, useNodesListQueryArgs} from '../../utils/hooks/useNodesListQueryArgs';
 import {useSetting} from '../../utils/hooks/useSetting';
 
 export function useNodesListQueryOptions(): {
@@ -17,6 +17,7 @@ export function useNodesListQueryOptions(): {
     // Load the remote setting here; cache readers only use its value from the store.
     useSetting(SETTING_KEYS.TENANT_INITIAL_PAGE);
     const args = useNodesListQueryArgs();
+    const storagePage = useIsStoragePage();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [query] = useQueryParams({
         type: StringParam,
@@ -31,7 +32,7 @@ export function useNodesListQueryOptions(): {
     const storageType = storageTypeSchema.parse(query.type ?? savedStorageType);
     const isGroups =
         storageType === STORAGE_TYPES.groups || permissions?.IsMonitoringAllowed === false;
-    const shouldPoll = isGroups && args.include_storage;
+    const shouldPoll = isGroups && storagePage;
 
     return {
         args,
