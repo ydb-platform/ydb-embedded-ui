@@ -19,7 +19,11 @@ export function StorageGroupsComponent({
     scrollContainerRef,
     initialEntitiesCount,
 }: PaginatedStorageProps) {
-    const {groupsSearchValue: rawGroupsSearchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();
+    const {
+        groupsSearchValue: rawGroupsSearchValue,
+        visibleEntities,
+        handleShowAllGroups,
+    } = useStorageQueryParams();
     const groupsSearchValue = useDebouncedSearch(rawGroupsSearchValue);
 
     const storageGroupsHandlerHasGrouping = useStorageGroupsHandlerHasGrouping();

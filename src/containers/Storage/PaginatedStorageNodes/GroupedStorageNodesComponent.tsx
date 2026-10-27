@@ -109,8 +109,11 @@ export function GroupedStorageNodesComponent({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {hideUnavailable} = useHideUnavailableNodes();
 
-    const {nodesSearchValue: rawNodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
-        useStorageQueryParams();
+    const {
+        nodesSearchValue: rawNodesSearchValue,
+        storageNodesGroupByParam,
+        handleShowAllNodes,
+    } = useStorageQueryParams();
     const nodesSearchValue = useDebouncedSearch(rawNodesSearchValue);
 
     const expertMode = useIsStorageExpertMode();

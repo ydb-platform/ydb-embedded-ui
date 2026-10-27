@@ -20,8 +20,12 @@ export function StorageNodesComponent({
     scrollContainerRef,
     initialEntitiesCount,
 }: PaginatedStorageProps) {
-    const {nodesSearchValue: rawNodesSearchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
-        useStorageQueryParams();
+    const {
+        nodesSearchValue: rawNodesSearchValue,
+        visibleEntities,
+        nodesUptimeFilter,
+        handleShowAllNodes,
+    } = useStorageQueryParams();
     const nodesSearchValue = useDebouncedSearch(rawNodesSearchValue);
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();

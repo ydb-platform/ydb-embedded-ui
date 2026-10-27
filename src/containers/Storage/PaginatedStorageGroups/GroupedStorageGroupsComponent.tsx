@@ -98,8 +98,12 @@ export function GroupedStorageGroupsComponent({
     viewContext,
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const {groupsSearchValue: rawGroupsSearchValue, storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
-        useStorageQueryParams();
+    const {
+        groupsSearchValue: rawGroupsSearchValue,
+        storageGroupsGroupByParam,
+        visibleEntities,
+        handleShowAllGroups,
+    } = useStorageQueryParams();
     const groupsSearchValue = useDebouncedSearch(rawGroupsSearchValue);
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({

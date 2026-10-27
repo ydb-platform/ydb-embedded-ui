@@ -150,8 +150,12 @@ const TenantsTableContent = ({
 
     const {domain: domainRoot, settings} = useClusterBaseInfo();
 
-    const {search: rawSearch, withProblems, handleSearchChange, handleWithProblemsChange} =
-        useTenantsQueryParams();
+    const {
+        search: rawSearch,
+        withProblems,
+        handleSearchChange,
+        handleWithProblemsChange,
+    } = useTenantsQueryParams();
     const search = useDebouncedSearch(rawSearch);
 
     // We should apply domain filter before other filters
