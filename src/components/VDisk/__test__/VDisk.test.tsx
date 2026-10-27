@@ -15,6 +15,10 @@ const mockUseIsStorageExpertMode = jest.fn();
 const mockUseVDisksGroupByParam = jest.fn();
 const mockUseSpaceLegendSelection = jest.fn();
 
+jest.mock('../../../utils/hooks/useNodesMap', () => ({
+    useNodesMap: () => undefined,
+}));
+
 jest.mock('../../../routes', () => ({
     useVDiskPagePath: () => () => '/vdisk',
 }));

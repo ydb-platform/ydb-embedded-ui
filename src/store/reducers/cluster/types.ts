@@ -1,4 +1,4 @@
-import type {ClusterTab} from './slice';
+import type {ClusterTab} from '../../../containers/Cluster/utils';
 
 export interface DiskErasureGroupsStats {
     diskType: string;

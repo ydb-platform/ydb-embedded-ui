@@ -32,7 +32,6 @@ export function DatabaseInfo({data, path, database, datacenters}: DBInfoProps) {
             {
                 name: dbInfoKeyset('field_datacenters'),
                 content: <DatabaseDatacenters datacenters={datacenters} />,
-                note: dbInfoKeyset('description_datacenters'),
             },
             ...(prepareAdditionalDatabaseInfoItems(databaseData) ?? []),
         ],

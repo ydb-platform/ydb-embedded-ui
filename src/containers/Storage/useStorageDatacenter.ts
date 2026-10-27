@@ -8,10 +8,10 @@ import {
 } from '../../utils/datacenters';
 import {NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
 import type {VDiskDisplayState} from '../../utils/disks/displayState';
-import {NodeMetadataContext} from '../../utils/hooks/useNodesMap';
+import {useNodesMap} from '../../utils/hooks/useNodesMap';
 
 export function useStorageDatacenter() {
-    const nodes = React.useContext(NodeMetadataContext);
+    const nodes = useNodesMap();
     const indexes = useDatacenterColorIndexes();
 
     return React.useCallback(

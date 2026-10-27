@@ -2,7 +2,7 @@ import {combineReducers} from '@reduxjs/toolkit';
 
 import {api} from './api';
 import authentication from './authentication/authentication';
-import cluster from './cluster/slice';
+import cluster from './cluster/cluster';
 import clusters from './clusters/clusters';
 import executeTopQueries from './executeTopQueries/executeTopQueries';
 import fullscreen from './fullscreen';

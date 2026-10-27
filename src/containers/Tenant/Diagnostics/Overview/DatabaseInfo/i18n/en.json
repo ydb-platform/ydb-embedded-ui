@@ -1,6 +1,5 @@
 {
   "field_datacenters": "Datacenters",
-  "description_datacenters": "Datacenters hosting the database nodes",
   "title_limits-and-usage": "Limits & usage",
   "title_paths": "Paths",
   "title_shards": "Shards",

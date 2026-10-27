@@ -1,6 +1,9 @@
-import {createSelector} from '@reduxjs/toolkit';
+import {createSelector, createSlice} from '@reduxjs/toolkit';
+import type {Dispatch, PayloadAction} from '@reduxjs/toolkit';
 import {skipToken} from '@reduxjs/toolkit/query';
 
+import type {ClusterTab} from '../../../containers/Cluster/utils';
+import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
 import {isClusterInfoV2} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
@@ -22,7 +25,7 @@ import {
     parseSettingsField,
     parseTraceField,
 } from './parseFields';
-import type {ClusterGroupsStats} from './types';
+import type {ClusterGroupsStats, ClusterState} from './types';
 import {
     createSelectClusterGroupsQuery,
     getGroupStatsFromClusterInfo,
@@ -31,7 +34,30 @@ import {
     prepareClusterInfo,
 } from './utils';
 
-export {default, INITIAL_DEFAULT_CLUSTER_TAB, updateDefaultClusterTab} from './slice';
+export const INITIAL_DEFAULT_CLUSTER_TAB = clusterTabsIds.tenants;
+
+const initialState: ClusterState = {
+    defaultClusterTab: INITIAL_DEFAULT_CLUSTER_TAB,
+};
+const clusterSlice = createSlice({
+    name: 'cluster',
+    initialState,
+    reducers: {
+        setDefaultClusterTab(state, action: PayloadAction<ClusterTab>) {
+            state.defaultClusterTab = action.payload;
+        },
+    },
+});
+
+export function updateDefaultClusterTab(tab: string) {
+    return (dispatch: Dispatch) => {
+        if (isClusterTab(tab)) {
+            dispatch(clusterSlice.actions.setDefaultClusterTab(tab));
+        }
+    };
+}
+
+export default clusterSlice.reducer;
 
 type ClusterInfoQueryArgs = string | undefined | QueryScope;
 

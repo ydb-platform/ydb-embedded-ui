@@ -4,10 +4,10 @@ import {Flex} from '@gravity-ui/uikit';
 
 import {DatacenterLabel} from '../../../../components/Datacenter/DatacenterLabel';
 import {normalizeDatacenter} from '../../../../utils/datacenters';
-import {NodeMetadataContext} from '../../../../utils/hooks/useNodesMap';
+import {useNodesMap} from '../../../../utils/hooks/useNodesMap';
 
 export function DatacenterLegend() {
-    const nodes = React.useContext(NodeMetadataContext);
+    const nodes = useNodesMap();
     const names = React.useMemo(
         () =>
             [
