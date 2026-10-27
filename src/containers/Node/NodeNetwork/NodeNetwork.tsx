@@ -4,6 +4,7 @@ import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/Pagin
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useBridgeModeEnabled} from '../../../store/reducers/capabilities/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
+import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {useNodesPageQueryParams} from '../../Nodes/useNodesPageQueryParams';
 
@@ -31,6 +32,8 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
         undefined, // We don't need use groupByParams yet
         false, // withPeerRoleFilter = false for this tab
     );
+
+    const searchFilter = useDebouncedSearch(searchValue);
 
     const allColumns = React.useMemo(() => {
         const columns = getNodeNetworkColumns({database});
@@ -69,14 +72,14 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
             table={
                 <NodeNetworkTable
                     nodeId={nodeId}
-                    searchValue={searchValue}
+                    searchValue={searchFilter}
                     columns={columnsToShow}
                     scrollContainerRef={scrollContainerRef}
                 />
             }
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchValue],
+                scrollDependencies: [searchFilter],
             }}
             fullHeight
         />

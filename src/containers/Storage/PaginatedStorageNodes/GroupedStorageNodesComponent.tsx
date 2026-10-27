@@ -7,6 +7,7 @@ import {NODES_COLUMNS_TO_DATA_FIELDS} from '../../../components/nodesColumns/con
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {NodesGroupByField, NodesRequiredField} from '../../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
+import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
@@ -110,6 +111,7 @@ export function GroupedStorageNodesComponent({
 
     const {nodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
         useStorageQueryParams();
+    const searchFilter = useDebouncedSearch(nodesSearchValue);
 
     const expertMode = useIsStorageExpertMode();
     const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings({
@@ -135,11 +137,11 @@ export function GroupedStorageNodesComponent({
             database,
             alive: hideUnavailable || undefined,
             with: 'all',
-            filter: nodesSearchValue.trim(),
+            filter: searchFilter.trim(),
             node_id: nodeId,
             group_id: groupId,
             group: storageNodesGroupByParam,
-            fieldsRequired: nodesSearchValue.trim() ? searchFieldsRequired : undefined,
+            fieldsRequired: searchFilter.trim() ? searchFieldsRequired : undefined,
         },
         {
             pollingInterval: autoRefreshInterval,
@@ -176,7 +178,7 @@ export function GroupedStorageNodesComponent({
                         database={database}
                         nodeId={nodeId}
                         groupId={groupId}
-                        searchValue={nodesSearchValue}
+                        searchValue={searchFilter}
                         visibleEntities="all"
                         filterGroupBy={storageNodesGroupByParam}
                         scrollContainerRef={scrollContainerRef}
@@ -217,7 +219,7 @@ export function GroupedStorageNodesComponent({
             initialState={initialState}
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [nodesSearchValue, storageNodesGroupByParam, tableGroups],
+                scrollDependencies: [searchFilter, storageNodesGroupByParam, tableGroups],
                 loading: isLoading,
                 className: b('groups-wrapper'),
             }}

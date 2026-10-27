@@ -6,6 +6,7 @@ import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumn
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {GroupsGroupByField} from '../../../types/api/storage';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
+import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageGroupsTable} from '../PaginatedStorageGroupsTable';
@@ -99,6 +100,7 @@ export function GroupedStorageGroupsComponent({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {groupsSearchValue, storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
         useStorageQueryParams();
+    const searchFilter = useDebouncedSearch(groupsSearchValue);
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
@@ -112,7 +114,7 @@ export function GroupedStorageGroupsComponent({
             nodeId,
             groupId,
             pDiskId,
-            filter: groupsSearchValue.trim(),
+            filter: searchFilter.trim(),
             group: storageGroupsGroupByParam,
         },
         {
@@ -152,7 +154,7 @@ export function GroupedStorageGroupsComponent({
                         groupId={groupId}
                         pDiskId={pDiskId}
                         filterGroupBy={storageGroupsGroupByParam}
-                        searchValue={groupsSearchValue}
+                        searchValue={searchFilter}
                         visibleEntities={'all'}
                         scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
@@ -191,7 +193,7 @@ export function GroupedStorageGroupsComponent({
             initialState={initialState}
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [groupsSearchValue, storageGroupsGroupByParam, tableGroups],
+                scrollDependencies: [searchFilter, storageGroupsGroupByParam, tableGroups],
                 loading: isLoading,
                 className: b('groups-wrapper'),
             }}

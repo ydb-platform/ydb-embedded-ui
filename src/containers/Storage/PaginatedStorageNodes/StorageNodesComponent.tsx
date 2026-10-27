@@ -1,6 +1,7 @@
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
+import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
@@ -21,6 +22,7 @@ export function StorageNodesComponent({
 }: PaginatedStorageProps) {
     const {nodesSearchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
         useStorageQueryParams();
+    const searchFilter = useDebouncedSearch(nodesSearchValue);
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
     const {hideUnavailable} = useHideUnavailableNodes();
@@ -57,7 +59,7 @@ export function StorageNodesComponent({
                     database={database}
                     nodeId={nodeId}
                     groupId={groupId}
-                    searchValue={nodesSearchValue}
+                    searchValue={searchFilter}
                     visibleEntities={visibleEntities}
                     nodesUptimeFilter={nodesUptimeFilter}
                     onShowAll={handleShowAllNodes}
@@ -72,7 +74,7 @@ export function StorageNodesComponent({
             tableWrapperProps={{
                 scrollContainerRef,
                 scrollDependencies: [
-                    nodesSearchValue,
+                    searchFilter,
                     visibleEntities,
                     nodesUptimeFilter,
                     hideUnavailable,

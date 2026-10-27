@@ -9,6 +9,7 @@ import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
+import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesTable} from '../NodesTable';
@@ -47,6 +48,7 @@ export function NodesComponent({
         groupByParams,
         withPeerRoleFilter,
     );
+    const searchFilter = useDebouncedSearch(searchValue);
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
     const {hideUnavailable} = useHideUnavailableNodes();
 
@@ -80,7 +82,7 @@ export function NodesComponent({
                     path={path}
                     database={database}
                     databaseFullPath={databaseFullPath}
-                    searchValue={searchValue}
+                    searchValue={searchFilter}
                     withProblems={withProblems}
                     uptimeFilter={uptimeFilter}
                     peerRoleFilter={peerRoleFilter}
@@ -92,7 +94,7 @@ export function NodesComponent({
             tableWrapperProps={{
                 scrollContainerRef,
                 scrollDependencies: [
-                    searchValue,
+                    searchFilter,
                     withProblems,
                     uptimeFilter,
                     peerRoleFilter,

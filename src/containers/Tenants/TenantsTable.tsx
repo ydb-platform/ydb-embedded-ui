@@ -42,6 +42,7 @@ import {
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval} from '../../utils/hooks';
+import {useDebouncedSearch} from '../../utils/hooks/useDebouncedSearch';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
 import {isNumeric} from '../../utils/utils';
@@ -151,6 +152,7 @@ const TenantsTableContent = ({
 
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
+    const searchFilter = useDebouncedSearch(search);
 
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count
@@ -167,10 +169,10 @@ const TenantsTableContent = ({
             filteredByProblems = filterTenantsByProblems(tenants, withProblems);
         }
 
-        const filteredBySearch = filterTenantsBySearch(filteredByProblems, search);
+        const filteredBySearch = filterTenantsBySearch(filteredByProblems, searchFilter);
 
         return filteredBySearch;
-    }, [tenants, withProblems, search, showWithProblemsFilter]);
+    }, [tenants, withProblems, searchFilter, showWithProblemsFilter]);
 
     const tenantLinks = React.useMemo(
         () =>
@@ -228,6 +230,7 @@ const TenantsTableContent = ({
         return (
             <React.Fragment>
                 <Search
+                    debounce={0}
                     tableFilter
                     value={search}
                     onChange={handleSearchChange}
@@ -477,7 +480,7 @@ const TenantsTableContent = ({
                 <TableWithControlsLayout.Table
                     scrollContainerRef={scrollContainerRef}
                     loading={loading}
-                    scrollDependencies={[search, withProblems, sortParams]}
+                    scrollDependencies={[searchFilter, withProblems, sortParams]}
                 >
                     <div>{currentData ? renderTable() : null}</div>
                 </TableWithControlsLayout.Table>

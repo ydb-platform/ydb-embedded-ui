@@ -8,10 +8,15 @@ import {QueryParamProvider} from 'use-query-params';
 import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 
 import {NodesControls} from '../../../containers/Nodes/NodesControls/NodesControls';
+import {PaginatedNodes} from '../../../containers/Nodes/PaginatedNodes/PaginatedNodes';
 import {useNodesPageQueryParams} from '../../../containers/Nodes/useNodesPageQueryParams';
+import {PaginatedStorageGroups} from '../../../containers/Storage/PaginatedStorageGroups/PaginatedStorageGroups';
 import {StorageGroupsControls} from '../../../containers/Storage/PaginatedStorageGroups/StorageGroupsControls';
+import {PaginatedStorageNodes} from '../../../containers/Storage/PaginatedStorageNodes/PaginatedStorageNodes';
+import {StorageNodesControls} from '../../../containers/Storage/PaginatedStorageNodes/StorageNodesControls';
 import {useStorageQueryParams} from '../../../containers/Storage/useStorageQueryParams';
 import {useTenantsQueryParams} from '../../../containers/Tenants/useTenantsQueryParams';
+import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {Search} from '../Search';
 
 jest.mock('../../../store/reducers/capabilities/hooks', () => ({
@@ -19,6 +24,8 @@ jest.mock('../../../store/reducers/capabilities/hooks', () => ({
     useViewerNodesHandlerHasNetworkStats: () => false,
     useViewerNodesAliveFilterAvailable: () => false,
     useCapabilitiesLoaded: () => true,
+    useViewerNodesHandlerHasGrouping: () => true,
+    useStorageGroupsHandlerHasGrouping: () => true,
     useBlobStorageCapacityMetricsAvailable: () => false,
     useBlobStorageCapacityMetricsEnabled: () => false,
     useBridgeModeEnabled: () => false,
@@ -34,8 +41,36 @@ jest.mock('../../../utils/hooks/useIsUserAllowedToMakeChanges', () => ({
     useIsUserAllowedToMakeChanges: () => false,
 }));
 
-function NodesSearch({revision}: {revision: number}) {
+jest.mock('../../../containers/Nodes/PaginatedNodes/NodesComponent', () => ({
+    NodesComponent: () => <MockNodesSearch revision={0} />,
+}));
+
+jest.mock('../../../containers/Nodes/PaginatedNodes/GroupedNodesComponent', () => ({
+    GroupedNodesComponent: () => <MockNodesSearch revision={0} />,
+}));
+
+jest.mock('../../../containers/Storage/PaginatedStorageGroups/StorageGroupsComponent', () => ({
+    StorageGroupsComponent: () => <MockGroupsSearch revision={0} />,
+}));
+
+jest.mock(
+    '../../../containers/Storage/PaginatedStorageGroups/GroupedStorageGroupsComponent',
+    () => ({
+        GroupedStorageGroupsComponent: () => <MockGroupsSearch revision={0} />,
+    }),
+);
+
+jest.mock('../../../containers/Storage/PaginatedStorageNodes/StorageNodesComponent', () => ({
+    StorageNodesComponent: () => <MockStorageNodesSearch revision={0} />,
+}));
+
+jest.mock('../../../containers/Storage/PaginatedStorageNodes/GroupedStorageNodesComponent', () => ({
+    GroupedStorageNodesComponent: () => <MockStorageNodesSearch revision={0} />,
+}));
+
+function MockNodesSearch({revision}: {revision: number}) {
     const {searchValue} = useNodesPageQueryParams([], false);
+    const searchFilter = useDebouncedSearch(searchValue);
     return (
         <React.Fragment>
             <NodesControls
@@ -44,13 +79,14 @@ function NodesSearch({revision}: {revision: number}) {
                 entitiesCountCurrent={revision}
                 entitiesLoading={false}
             />
-            <output aria-label="Table filter">{searchValue}</output>
+            <output aria-label="Table filter">{searchFilter}</output>
         </React.Fragment>
     );
 }
 
-function GroupsSearch({revision}: {revision: number}) {
+function MockGroupsSearch({revision}: {revision: number}) {
     const {groupsSearchValue} = useStorageQueryParams();
+    const searchFilter = useDebouncedSearch(groupsSearchValue);
     return (
         <React.Fragment>
             <StorageGroupsControls
@@ -58,26 +94,43 @@ function GroupsSearch({revision}: {revision: number}) {
                 entitiesCountCurrent={revision}
                 entitiesLoading={false}
             />
-            <output aria-label="Table filter">{groupsSearchValue}</output>
+            <output aria-label="Table filter">{searchFilter}</output>
+        </React.Fragment>
+    );
+}
+
+function MockStorageNodesSearch({revision}: {revision: number}) {
+    const {nodesSearchValue} = useStorageQueryParams();
+    const searchFilter = useDebouncedSearch(nodesSearchValue);
+    return (
+        <React.Fragment>
+            <StorageNodesControls
+                withGroupBySelect
+                entitiesCountCurrent={revision}
+                entitiesLoading={false}
+            />
+            <output aria-label="Table filter">{searchFilter}</output>
         </React.Fragment>
     );
 }
 
 function DatabasesSearch({revision}: {revision: number}) {
     const {search, handleSearchChange} = useTenantsQueryParams();
+    const searchFilter = useDebouncedSearch(search);
     return (
         <React.Fragment>
-            <Search tableFilter value={search} onChange={handleSearchChange} />
+            <Search debounce={0} tableFilter value={search} onChange={handleSearchChange} />
             <output aria-label="Table filter" data-revision={revision}>
-                {search}
+                {searchFilter}
             </output>
         </React.Fragment>
     );
 }
 
 describe.each([
-    {page: 'nodes', param: 'search', Fixture: NodesSearch},
-    {page: 'storage', param: 'groupsSearch', Fixture: GroupsSearch},
+    {page: 'nodes', param: 'search', Fixture: MockNodesSearch},
+    {page: 'storage', param: 'groupsSearch', Fixture: MockGroupsSearch},
+    {page: 'storage-nodes', param: 'nodesSearch', Fixture: MockStorageNodesSearch},
     {page: 'databases', param: 'search', Fixture: DatabasesSearch},
 ])('$page search URL integration', ({page, param, Fixture}) => {
     beforeEach(() => jest.useFakeTimers());
@@ -110,12 +163,12 @@ describe.each([
         };
     }
 
-    it('updates text immediately and debounces the URL and table filter', async () => {
-        const {history, user, input} = setup();
-        await user.type(input, 'bc');
+    it('updates text and URL immediately and debounces only the table filter', async () => {
+        const {history, input} = setup();
+        fireEvent.change(input, {target: {value: 'abc'}});
 
         expect(input).toHaveValue('abc');
-        expect(new URLSearchParams(history.location.search).get(param)).toBe('a');
+        expect(new URLSearchParams(history.location.search).get(param)).toBe('abc');
         expect(screen.getByRole('status')).toHaveTextContent(/^a$/);
 
         act(() => jest.advanceTimersByTime(200));
@@ -138,13 +191,13 @@ describe.each([
 
         act(() => {
             jest.advanceTimersByTime(200);
-            // Type before React commits the previous debounced URL update.
+            // Type before React commits the previous table filter update.
             fireEvent.change(input, {target: {value: nextValue}});
         });
 
         expect(input).toHaveValue(nextValue);
         expect(input).toHaveFocus();
-        expect(new URLSearchParams(history.location.search).get(param)).toBe('ab');
+        expect(new URLSearchParams(history.location.search).get(param)).toBe(nextValue || null);
 
         act(() => jest.advanceTimersByTime(200));
         expect(input).toHaveValue(nextValue);
@@ -152,7 +205,7 @@ describe.each([
         expect(screen.getByRole('status').textContent).toBe(nextValue);
     });
 
-    it('cancels pending writes on Back, Forward and external clearing', async () => {
+    it('keeps Back, Forward and external clearing while filtering is pending', async () => {
         const {history, user, input} = setup();
         await user.type(input, 'b');
         act(() => history.goBack());
@@ -165,11 +218,11 @@ describe.each([
 
         await user.type(input, 'next');
         act(() => history.goForward());
-        expect(input).toHaveValue('a');
+        expect(input).toHaveValue('ab');
         const forwardUrl = history.location.search;
         act(() => jest.advanceTimersByTime(200));
         expect(history.location.search).toBe(forwardUrl);
-        expect(input).toHaveValue('a');
+        expect(input).toHaveValue('ab');
 
         await user.type(input, 'b');
         act(() => history.replace(`/cluster/${page}`));
@@ -180,6 +233,25 @@ describe.each([
         expect(history.location.search).toBe('');
     });
 
+    it.each(['database', 'clusterName', 'backend', 'environment', 'schema', 'path'])(
+        'does not carry a pending filter across %s changes with the same search',
+        async (scopeParam) => {
+            const {history, user, input} = setup();
+            act(() => history.push(`/cluster/${page}?${param}=a&${scopeParam}=other`));
+            await user.type(input, 'b');
+            expect(new URLSearchParams(history.location.search).get(param)).toBe('ab');
+            // Navigate while the latest filter (ab) is still pending.
+            act(() => history.goBack());
+            const destination = history.location.search;
+            expect(input).toHaveValue('a');
+            expect(screen.getByRole('status')).toHaveTextContent(/^a$/);
+            act(() => jest.advanceTimersByTime(200));
+            expect(history.location.search).toBe(destination);
+            expect(input).toHaveValue('a');
+            expect(screen.getByRole('status')).toHaveTextContent(/^a$/);
+        },
+    );
+
     it('does not write to the next page after the search unmounts', async () => {
         const {history, user, unmount} = setup();
         await user.type(screen.getByRole('textbox'), 'b');
@@ -188,5 +260,73 @@ describe.each([
         act(() => jest.advanceTimersByTime(200));
         expect(history.location.pathname).toBe('/another-page');
         expect(history.location.search).toBe('?search=keep');
+    });
+});
+
+// Keep the real grouping switches and controls; replace data-loading children with search fixtures.
+describe.each([
+    {
+        page: 'nodes',
+        searchParam: 'search',
+        groupParam: 'nodesGroupBy',
+        group: 'Host',
+        Page: PaginatedNodes,
+    },
+    {
+        page: 'groups',
+        searchParam: 'groupsSearch',
+        groupParam: 'storageGroupsGroupBy',
+        group: 'PoolName',
+        Page: PaginatedStorageGroups,
+    },
+    {
+        page: 'storage-nodes',
+        searchParam: 'nodesSearch',
+        groupParam: 'storageNodesGroupBy',
+        group: 'Host',
+        Page: PaginatedStorageNodes,
+    },
+])('$page grouping', ({searchParam, groupParam, group, Page}) => {
+    beforeEach(() => jest.useFakeTimers());
+    afterEach(() => jest.useRealTimers());
+
+    it('keeps the latest text when switching grouping before filtering finishes', () => {
+        const history = createMemoryHistory({initialEntries: [`/cluster/nodes?${searchParam}=a`]});
+        render(
+            <Router history={history}>
+                <QueryParamProvider adapter={ReactRouter5Adapter}>
+                    <Page
+                        scrollContainerRef={React.createRef<HTMLDivElement>()}
+                        groupByParams={['Host']}
+                        columns={[]}
+                        defaultColumnsIds={[]}
+                        requiredColumnsIds={[]}
+                        selectedColumnsKey="test"
+                    />
+                </QueryParamProvider>
+            </Router>,
+        );
+        const input = screen.getByRole('textbox');
+        fireEvent.change(input, {target: {value: 'abc'}});
+        expect(screen.getByRole('status')).toHaveTextContent(/^a$/);
+        act(() =>
+            history.replace(
+                `${history.location.pathname}${history.location.search}&${groupParam}=${group}`,
+            ),
+        );
+        expect(screen.getByRole('textbox')).not.toBe(input);
+        expect(screen.getByRole('textbox')).toHaveValue('abc');
+        const groupedInput = screen.getByRole('textbox');
+        fireEvent.change(groupedInput, {target: {value: 'abcd'}});
+        act(() => {
+            const params = new URLSearchParams(history.location.search);
+            params.delete(groupParam);
+            history.replace(`${history.location.pathname}?${params}`);
+        });
+        expect(screen.getByRole('textbox')).not.toBe(groupedInput);
+        expect(screen.getByRole('textbox')).toHaveValue('abcd');
+        act(() => jest.advanceTimersByTime(200));
+        expect(new URLSearchParams(history.location.search).get(searchParam)).toBe('abcd');
+        expect(screen.getByRole('status')).toHaveTextContent(/^abcd$/);
     });
 });
