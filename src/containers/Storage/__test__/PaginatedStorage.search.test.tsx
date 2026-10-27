@@ -59,6 +59,16 @@ jest.mock('../PaginatedStorageNodes/useStorageNodesColumnsToSelect', () => ({
     }),
 }));
 
+const originalApi = window.api;
+const getPath = jest.fn(() => '/first-backend');
+beforeEach(() => {
+    getPath.mockReturnValue('/first-backend');
+    window.api = {viewer: {getPath}, storage: {getPath}} as unknown as typeof window.api;
+});
+afterEach(() => {
+    window.api = originalApi;
+});
+
 // Exercise the real page, controls and query hooks; mock only the data boundary and column setup.
 describe.each([
     {
@@ -106,7 +116,7 @@ describe.each([
                 `/cluster/storage?type=${type}&${searchParam}=a${grouped ? `&${groupParam}=${group}` : ''}`,
             ],
         });
-        render(
+        const renderPage = (props: Partial<React.ComponentProps<typeof Page>> = {}) => (
             <Router history={history}>
                 <QueryParamProvider adapter={ReactRouter5Adapter}>
                     <Route
@@ -115,14 +125,21 @@ describe.each([
                                 groupId={
                                     new URLSearchParams(location.search).get('groupId') ?? undefined
                                 }
+                                {...props}
                                 scrollContainerRef={React.createRef<HTMLElement>()}
                             />
                         )}
                     />
                 </QueryParamProvider>
-            </Router>,
+            </Router>
         );
-        return {history, input: screen.getByRole('textbox')};
+        const view = render(renderPage());
+        return {
+            history,
+            input: screen.getByRole('textbox'),
+            updateProps: (props: Partial<React.ComponentProps<typeof Page>>) =>
+                view.rerender(renderPage(props)),
+        };
     }
 
     it.each([false, true])(
@@ -189,6 +206,64 @@ describe.each([
             expectFilter('two', 'pending');
             act(() => jest.advanceTimersByTime(200));
             expectFilter('two', 'pending');
+        },
+    );
+
+    it.each([false, true])(
+        'resets from data props and API address, without URL changes (grouped: %s)',
+        (grouped) => {
+            const {history, input, updateProps} = setup(grouped);
+            const targets = [
+                {database: '/db', nodeId: '1', groupId: '10'},
+                {database: '/db', nodeId: '2', groupId: '10'},
+                {database: '/db', nodeId: '2', groupId: '20'},
+                ...(type === 'groups'
+                    ? [{database: '/db', nodeId: '2', groupId: '20', pDiskId: '3'}]
+                    : []),
+            ];
+            const expectFilter = (filter: string) =>
+                grouped
+                    ? expect(mockQuery).toHaveBeenLastCalledWith(
+                          expect.objectContaining({filter}),
+                          expect.any(Object),
+                      )
+                    : expect(mockTable).toHaveBeenLastCalledWith(
+                          expect.objectContaining({searchValue: filter}),
+                          {},
+                      );
+            for (const props of targets) {
+                const filter = JSON.stringify(props);
+                fireEvent.change(input, {target: {value: filter}});
+                const url = history.location;
+                updateProps(props);
+                expect(history.location).toBe(url);
+                expect(screen.getByRole('textbox')).toBe(input);
+                expectFilter(filter);
+                if (grouped) {
+                    const request =
+                        type === 'nodes'
+                            ? {
+                                  database: props.database,
+                                  node_id: props.nodeId,
+                                  group_id: props.groupId,
+                              }
+                            : props;
+                    expect(mockQuery).toHaveBeenLastCalledWith(
+                        expect.objectContaining(request),
+                        expect.any(Object),
+                    );
+                } else {
+                    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining(props), {});
+                }
+            }
+            fireEvent.change(input, {target: {value: 'after-backend-change'}});
+            const url = history.location;
+            getPath.mockReturnValue('/second-backend');
+            updateProps(targets[targets.length - 1]);
+            expect(history.location).toBe(url);
+            expectFilter('after-backend-change');
+            act(() => jest.advanceTimersByTime(200));
+            expectFilter('after-backend-change');
         },
     );
 

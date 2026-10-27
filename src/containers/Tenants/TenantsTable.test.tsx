@@ -47,6 +47,16 @@ const tenants: PreparedTenant[] = ['alpha', 'beta'].map((Name) => ({
     nodesCount: 0,
     groupsCount: 0,
 }));
+const originalApi = window.api;
+const getPath = jest.fn(() => '/first-backend');
+beforeEach(() => {
+    getPath.mockReturnValue('/first-backend');
+    window.api = {viewer: {getPath}} as unknown as typeof window.api;
+});
+afterEach(() => {
+    window.api = originalApi;
+});
+
 const mockTable = jest.mocked(ResizeableDataTable);
 const mockQuery = jest.mocked(tenantsApi.useGetTenantsInfoQuery);
 
@@ -82,4 +92,36 @@ it('updates the search URL immediately and filters the actual table data after t
     expect(history.location.search).toBe('?clusterName=test');
     act(() => jest.advanceTimersByTime(200));
     expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({data: tenants}), {});
+});
+
+it.each([false, true])('resets filtering when the API address changes (meta: %s)', (meta) => {
+    if (meta) {
+        window.api.meta = {getPath} as unknown as NonNullable<typeof window.api.meta>;
+    }
+    const history = createMemoryHistory({initialEntries: ['/home/databases']});
+    const renderPage = (isMetaDatabasesAvailable = false) => (
+        <Router history={history}>
+            <QueryParamProvider adapter={ReactRouter5Adapter}>
+                <TenantsTable
+                    isMetaDatabasesAvailable={isMetaDatabasesAvailable}
+                    scrollContainerRef={React.createRef<HTMLElement>()}
+                />
+            </QueryParamProvider>
+        </Router>
+    );
+    const view = render(renderPage());
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, {target: {value: 'alpha'}});
+    const url = history.location;
+    getPath.mockReturnValue('/second-backend');
+    view.rerender(renderPage());
+    expect(history.location).toBe(url);
+    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({data: [tenants[0]]}), {});
+    fireEvent.change(input, {target: {value: 'beta'}});
+    view.rerender(renderPage(true));
+    expect(mockQuery).toHaveBeenLastCalledWith(
+        expect.objectContaining({isMetaDatabasesAvailable: true}),
+        expect.any(Object),
+    );
+    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({data: [tenants[1]]}), {});
 });

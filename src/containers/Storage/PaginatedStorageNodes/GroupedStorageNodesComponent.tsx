@@ -18,11 +18,7 @@ import {TableGroup} from '../TableGroup/TableGroup';
 import {useExpandedGroups} from '../TableGroup/useExpandedTableGroups';
 import i18n from '../i18n';
 import {b} from '../shared';
-import {
-    useIsStorageExpertMode,
-    useStorageQueryParams,
-    useStorageSearchScope,
-} from '../useStorageQueryParams';
+import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
 import {useStorageColumnsSettings} from '../utils';
 
 import {StorageNodesControls} from './StorageNodesControls';
@@ -118,7 +114,11 @@ export function GroupedStorageNodesComponent({
         storageNodesGroupByParam,
         handleShowAllNodes,
     } = useStorageQueryParams();
-    const nodesSearchValue = useDebouncedSearch(rawNodesSearchValue, useStorageSearchScope());
+    const requestParams = {database, node_id: nodeId, group_id: groupId};
+    const nodesSearchValue = useDebouncedSearch(
+        rawNodesSearchValue,
+        JSON.stringify([window.api.viewer.getPath(''), requestParams]),
+    );
 
     const expertMode = useIsStorageExpertMode();
     const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings({
@@ -141,12 +141,10 @@ export function GroupedStorageNodesComponent({
 
     const {currentData, isFetching, error} = storageApi.useGetStorageNodesInfoQuery(
         {
-            database,
+            ...requestParams,
             alive: hideUnavailable || undefined,
             with: 'all',
             filter: nodesSearchValue.trim(),
-            node_id: nodeId,
-            group_id: groupId,
             group: storageNodesGroupByParam,
             fieldsRequired: nodesSearchValue.trim() ? searchFieldsRequired : undefined,
         },

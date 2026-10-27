@@ -5,9 +5,12 @@ export function useDebouncedSearch(value: string, scope: string) {
     const [applied, setApplied] = React.useState({value, scope});
 
     React.useEffect(() => {
+        if (applied.value === value && applied.scope === scope) {
+            return undefined;
+        }
         const timer = window.setTimeout(() => setApplied({value, scope}), 200);
         return () => window.clearTimeout(timer);
-    }, [value, scope]);
+    }, [value, scope, applied]);
 
     // Never use a previous entity's filter, even for the first render after navigation.
     if (applied.scope !== scope) {

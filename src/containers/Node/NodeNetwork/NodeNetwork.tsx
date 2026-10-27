@@ -6,7 +6,7 @@ import {useBridgeModeEnabled} from '../../../store/reducers/capabilities/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
-import {useNodesPageQueryParams, useNodesSearchScope} from '../../Nodes/useNodesPageQueryParams';
+import {useNodesPageQueryParams} from '../../Nodes/useNodesPageQueryParams';
 
 import {NodeNetworkControlsWithTableState} from './NodeNetworkControls/NodeNetworkControlsWithTableState';
 import {NodeNetworkTable} from './NodeNetworkTable';
@@ -32,7 +32,11 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
         undefined, // We don't need use groupByParams yet
         false, // withPeerRoleFilter = false for this tab
     );
-    const searchValue = useDebouncedSearch(rawSearchValue, useNodesSearchScope());
+    const requestParams = {nodeId};
+    const searchValue = useDebouncedSearch(
+        rawSearchValue,
+        JSON.stringify([window.api.viewer.getPath(''), requestParams]),
+    );
 
     const allColumns = React.useMemo(() => {
         const columns = getNodeNetworkColumns({database});
@@ -70,7 +74,7 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
             }
             table={
                 <NodeNetworkTable
-                    nodeId={nodeId}
+                    {...requestParams}
                     searchValue={searchValue}
                     columns={columnsToShow}
                     scrollContainerRef={scrollContainerRef}

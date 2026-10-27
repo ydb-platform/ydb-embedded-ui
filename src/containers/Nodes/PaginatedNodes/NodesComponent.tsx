@@ -13,7 +13,7 @@ import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesTable} from '../NodesTable';
-import {useNodesPageQueryParams, useNodesSearchScope} from '../useNodesPageQueryParams';
+import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
 
 import {NodesControlsWithTableState} from './NodesControlsWithTableState';
 
@@ -48,7 +48,11 @@ export function NodesComponent({
         groupByParams,
         withPeerRoleFilter,
     );
-    const searchFilter = useDebouncedSearch(searchValue, useNodesSearchScope());
+    const requestParams = {path, database, databaseFullPath};
+    const searchFilter = useDebouncedSearch(
+        searchValue,
+        JSON.stringify([window.api.viewer.getPath(''), requestParams]),
+    );
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
     const {hideUnavailable} = useHideUnavailableNodes();
 
@@ -79,9 +83,7 @@ export function NodesComponent({
             }
             table={
                 <NodesTable
-                    path={path}
-                    database={database}
-                    databaseFullPath={databaseFullPath}
+                    {...requestParams}
                     searchValue={searchFilter}
                     withProblems={withProblems}
                     uptimeFilter={uptimeFilter}

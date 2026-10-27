@@ -57,7 +57,7 @@ import {
     DATABASES_SELECTED_COLUMNS_KEY,
 } from './constants';
 import i18n from './i18n';
-import {useTenantsQueryParams, useTenantsSearchScope} from './useTenantsQueryParams';
+import {useTenantsQueryParams} from './useTenantsQueryParams';
 
 import './Tenants.scss';
 
@@ -137,10 +137,10 @@ const TenantsTableContent = ({
     const history = useHistory();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
-        {clusterName, environmentName, isMetaDatabasesAvailable},
-        {pollingInterval: autoRefreshInterval},
-    );
+    const requestParams = {clusterName, environmentName, isMetaDatabasesAvailable};
+    const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(requestParams, {
+        pollingInterval: autoRefreshInterval,
+    });
     const loading = isFetching && currentData === undefined;
 
     // Track sort state for scroll dependencies
@@ -156,7 +156,15 @@ const TenantsTableContent = ({
         handleSearchChange,
         handleWithProblemsChange,
     } = useTenantsQueryParams();
-    const search = useDebouncedSearch(rawSearch, useTenantsSearchScope());
+    const search = useDebouncedSearch(
+        rawSearch,
+        JSON.stringify([
+            window.api.meta
+                ? window.api.meta.getPath('', isMetaDatabasesAvailable ? clusterName : undefined)
+                : window.api.viewer.getPath(''),
+            requestParams,
+        ]),
+    );
 
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count

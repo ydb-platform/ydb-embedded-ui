@@ -16,7 +16,7 @@ import {TableGroup} from '../TableGroup/TableGroup';
 import {useExpandedGroups} from '../TableGroup/useExpandedTableGroups';
 import i18n from '../i18n';
 import {b} from '../shared';
-import {useStorageQueryParams, useStorageSearchScope} from '../useStorageQueryParams';
+import {useStorageQueryParams} from '../useStorageQueryParams';
 
 import {StorageGroupsControls} from './StorageGroupsControls';
 
@@ -104,7 +104,11 @@ export function GroupedStorageGroupsComponent({
         visibleEntities,
         handleShowAllGroups,
     } = useStorageQueryParams();
-    const groupsSearchValue = useDebouncedSearch(rawGroupsSearchValue, useStorageSearchScope());
+    const requestParams = {database, nodeId, groupId, pDiskId};
+    const groupsSearchValue = useDebouncedSearch(
+        rawGroupsSearchValue,
+        JSON.stringify([window.api.storage.getPath(''), requestParams]),
+    );
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
@@ -113,11 +117,8 @@ export function GroupedStorageGroupsComponent({
 
     const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(
         {
-            database,
+            ...requestParams,
             with: 'all',
-            nodeId,
-            groupId,
-            pDiskId,
             filter: groupsSearchValue.trim(),
             group: storageGroupsGroupByParam,
         },
@@ -153,10 +154,7 @@ export function GroupedStorageGroupsComponent({
                         name={name}
                         count={count}
                         isExpanded={isExpanded}
-                        database={database}
-                        nodeId={nodeId}
-                        groupId={groupId}
-                        pDiskId={pDiskId}
+                        {...requestParams}
                         filterGroupBy={storageGroupsGroupByParam}
                         searchValue={groupsSearchValue}
                         visibleEntities={'all'}

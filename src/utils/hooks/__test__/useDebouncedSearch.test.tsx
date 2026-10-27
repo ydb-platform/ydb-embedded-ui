@@ -12,6 +12,19 @@ describe('useDebouncedSearch', () => {
         });
     }
 
+    it('does not schedule an update when the value is already applied', () => {
+        const {result, rerender} = setup();
+        expect(jest.getTimerCount()).toBe(0);
+        rerender({value: 'ab', scope: 'one'});
+        expect(jest.getTimerCount()).toBe(1);
+        rerender({value: 'a', scope: 'one'});
+        expect(jest.getTimerCount()).toBe(0);
+        rerender({value: 'ab', scope: 'one'});
+        rerender({value: 'b', scope: 'two'});
+        expect(result.current).toBe('b');
+        expect(jest.getTimerCount()).toBe(0);
+    });
+
     it('applies only the latest filter after 200 ms of inactivity', () => {
         const {result, rerender} = setup();
         rerender({value: 'ab', scope: 'one'});

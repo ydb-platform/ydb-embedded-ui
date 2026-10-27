@@ -2,7 +2,7 @@ import React from 'react';
 
 import {act, fireEvent, render, screen} from '@testing-library/react';
 import {createMemoryHistory} from 'history';
-import {Router} from 'react-router-dom';
+import {Route, Router} from 'react-router-dom';
 import {QueryParamProvider} from 'use-query-params';
 import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 
@@ -34,6 +34,16 @@ jest.mock('../../../utils/hooks/useIsUserAllowedToMakeChanges', () => ({
     useIsViewerUser: () => true,
 }));
 
+const originalApi = window.api;
+const getPath = jest.fn(() => '/first-backend');
+beforeEach(() => {
+    getPath.mockReturnValue('/first-backend');
+    window.api = {viewer: {getPath}} as unknown as typeof window.api;
+});
+afterEach(() => {
+    window.api = originalApi;
+});
+
 const mockTable = jest.mocked(NodesTable);
 const mockQuery = jest.mocked(nodesApi.useGetNodesQuery);
 
@@ -45,21 +55,35 @@ function setup(grouped = false) {
             `/cluster/nodes?search=a&database=two${grouped ? '&nodesGroupBy=Host' : ''}`,
         ],
     });
-    render(
+    const renderPage = (props: Partial<React.ComponentProps<typeof PaginatedNodes>> = {}) => (
         <Router history={history}>
             <QueryParamProvider adapter={ReactRouter5Adapter}>
-                <PaginatedNodes
-                    scrollContainerRef={React.createRef<HTMLElement>()}
-                    groupByParams={['Host']}
-                    columns={[]}
-                    defaultColumnsIds={[]}
-                    requiredColumnsIds={[]}
-                    selectedColumnsKey="test"
+                <Route
+                    render={({location}) => (
+                        <PaginatedNodes
+                            database={
+                                new URLSearchParams(location.search).get('database') ?? undefined
+                            }
+                            {...props}
+                            scrollContainerRef={React.createRef<HTMLElement>()}
+                            groupByParams={['Host']}
+                            columns={[]}
+                            defaultColumnsIds={[]}
+                            requiredColumnsIds={[]}
+                            selectedColumnsKey="test"
+                        />
+                    )}
                 />
             </QueryParamProvider>
-        </Router>,
+        </Router>
     );
-    return {history, input: screen.getByRole('textbox')};
+    const view = render(renderPage());
+    return {
+        history,
+        input: screen.getByRole('textbox'),
+        updateProps: (props: Partial<React.ComponentProps<typeof PaginatedNodes>>) =>
+            view.rerender(renderPage(props)),
+    };
 }
 
 beforeEach(() => {
@@ -148,3 +172,47 @@ it('restores the destination search on Back and Forward while filtering is pendi
     expect(history.location.search).toBe(forwardUrl);
     expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({searchValue: 'abc'}), {});
 });
+
+it.each([false, true])(
+    'uses the actual request target when the URL stays unchanged (grouped: %s)',
+    (grouped) => {
+        const {history, input, updateProps} = setup(grouped);
+        const expectFilter = (filter: string) =>
+            grouped
+                ? expect(mockQuery).toHaveBeenLastCalledWith(
+                      expect.objectContaining({filter}),
+                      expect.any(Object),
+                  )
+                : expect(mockTable).toHaveBeenLastCalledWith(
+                      expect.objectContaining({searchValue: filter}),
+                      {},
+                  );
+        for (const props of [
+            {database: 'three'},
+            {database: 'three', path: '/three/table', databaseFullPath: '/three'},
+        ]) {
+            fireEvent.change(input, {target: {value: JSON.stringify(props)}});
+            const url = history.location;
+            updateProps(props);
+            expect(history.location).toBe(url);
+            expect(screen.getByRole('textbox')).toBe(input);
+            expectFilter(JSON.stringify(props));
+            if (grouped) {
+                expect(mockQuery).toHaveBeenLastCalledWith(
+                    expect.objectContaining({database: props.database}),
+                    expect.any(Object),
+                );
+            } else {
+                expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining(props), {});
+            }
+        }
+        fireEvent.change(input, {target: {value: 'after-backend-change'}});
+        const url = history.location;
+        getPath.mockReturnValue('/second-backend');
+        updateProps({database: 'three', path: '/three/table', databaseFullPath: '/three'});
+        expect(history.location).toBe(url);
+        expectFilter('after-backend-change');
+        act(() => jest.advanceTimersByTime(200));
+        expectFilter('after-backend-change');
+    },
+);
