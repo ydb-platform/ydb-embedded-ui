@@ -17,6 +17,7 @@ import {formatPDiskType} from '../../utils/disks/getPDiskType';
 import {getVDiskStatusIcon} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {isNumeric} from '../../utils/utils';
+import datacenterI18n from '../Datacenter/i18n';
 import {AllModeIndicators} from '../DiskStateProgressBar/AllModeIndicators';
 import {DiskBarLabel} from '../DiskStateProgressBar/DiskBarLabel';
 import {DiskIndicator} from '../DiskStateProgressBar/DiskIndicator';
@@ -172,7 +173,7 @@ function getAccessibleDiskName(
 
 function getAccessibleName(
     data: PreparedVDisk,
-    {mode, allMode, isNoData, driveType}: VDiskDisplayState,
+    {mode, allMode, isNoData, driveType, datacenter}: VDiskDisplayState,
 ) {
     if (!mode) {
         return getAccessibleDiskName(data, {mode, isNoData});
@@ -187,6 +188,11 @@ function getAccessibleName(
     const {FreshRank, LevelRank} = SatisfactionRank ?? {};
 
     switch (mode) {
+        case 'datacenter':
+            return datacenterI18n('context_disk-datacenter', {
+                disk: diskName,
+                datacenter: datacenter?.name || datacenterI18n('value_unknown'),
+            });
         case 'driveType':
             return i18n('context_drive-type-accessible-name', {
                 disk: diskName,
@@ -359,6 +365,7 @@ export const VDisk = ({
                     <DiskStateProgressBar
                         allocation={allocatedPercent}
                         tone={tone}
+                        datacenter={displayState.datacenter}
                         mode={mode}
                         compact={compact}
                         inactive={inactive}
