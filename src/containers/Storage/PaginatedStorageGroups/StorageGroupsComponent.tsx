@@ -6,7 +6,7 @@ import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTa
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageGroupsTable} from '../PaginatedStorageGroupsTable';
 import {useStorageGroupsSelectedColumns} from '../PaginatedStorageGroupsTable/columns/hooks';
-import {useStorageQueryParams} from '../useStorageQueryParams';
+import {useStorageQueryParams, useStorageSearchScope} from '../useStorageQueryParams';
 
 import {StorageGroupsControlsWithTableState} from './StorageGroupsControls';
 
@@ -24,7 +24,7 @@ export function StorageGroupsComponent({
         visibleEntities,
         handleShowAllGroups,
     } = useStorageQueryParams();
-    const groupsSearchValue = useDebouncedSearch(rawGroupsSearchValue);
+    const groupsSearchValue = useDebouncedSearch(rawGroupsSearchValue, useStorageSearchScope());
 
     const storageGroupsHandlerHasGrouping = useStorageGroupsHandlerHasGrouping();
 

@@ -13,7 +13,7 @@ import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesTable} from '../NodesTable';
-import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
+import {useNodesPageQueryParams, useNodesSearchScope} from '../useNodesPageQueryParams';
 
 import {NodesControlsWithTableState} from './NodesControlsWithTableState';
 
@@ -48,7 +48,7 @@ export function NodesComponent({
         groupByParams,
         withPeerRoleFilter,
     );
-    const searchFilter = useDebouncedSearch(searchValue);
+    const searchFilter = useDebouncedSearch(searchValue, useNodesSearchScope());
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
     const {hideUnavailable} = useHideUnavailableNodes();
 

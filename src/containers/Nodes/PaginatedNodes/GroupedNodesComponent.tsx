@@ -24,7 +24,7 @@ import {NodesControls} from '../NodesControls/NodesControls';
 import {NodesTable} from '../NodesTable';
 import i18n from '../i18n';
 import {b} from '../shared';
-import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
+import {useNodesPageQueryParams, useNodesSearchScope} from '../useNodesPageQueryParams';
 
 interface NodeGroupProps {
     name: string;
@@ -125,7 +125,7 @@ export function GroupedNodesComponent({
         groupByParams,
         withPeerRoleFilter,
     );
-    const searchFilter = useDebouncedSearch(searchValue);
+    const searchFilter = useDebouncedSearch(searchValue, useNodesSearchScope());
     const useMetaProxy = useClusterWithProxy();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {hideUnavailable} = useHideUnavailableNodes();

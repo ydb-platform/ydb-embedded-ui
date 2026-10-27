@@ -12,6 +12,7 @@ import type {StorageType, VisibleEntities} from '../../store/reducers/storage/ty
 import {storageTypeSchema, visibleEntitiesSchema} from '../../store/reducers/storage/types';
 import {useSetting} from '../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useQueryParamsScope} from '../../utils/hooks/useQueryParamsScope';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
 import {
@@ -489,4 +490,19 @@ export function useSaveStorageType() {
             setQueryStorageType(normalizedStorageType, 'replaceIn');
         }
     }, [normalizedStorageType, queryStorageType, setQueryStorageType]);
+}
+
+export function useStorageSearchScope() {
+    return useQueryParamsScope([
+        'environment',
+        'clusterName',
+        'database',
+        'schema',
+        'path',
+        'backend',
+        'groupId',
+        'nodeId',
+        'pDiskId',
+        'vDiskId',
+    ]);
 }

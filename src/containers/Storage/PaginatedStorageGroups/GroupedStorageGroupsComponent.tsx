@@ -16,7 +16,7 @@ import {TableGroup} from '../TableGroup/TableGroup';
 import {useExpandedGroups} from '../TableGroup/useExpandedTableGroups';
 import i18n from '../i18n';
 import {b} from '../shared';
-import {useStorageQueryParams} from '../useStorageQueryParams';
+import {useStorageQueryParams, useStorageSearchScope} from '../useStorageQueryParams';
 
 import {StorageGroupsControls} from './StorageGroupsControls';
 
@@ -104,7 +104,7 @@ export function GroupedStorageGroupsComponent({
         visibleEntities,
         handleShowAllGroups,
     } = useStorageQueryParams();
-    const groupsSearchValue = useDebouncedSearch(rawGroupsSearchValue);
+    const groupsSearchValue = useDebouncedSearch(rawGroupsSearchValue, useStorageSearchScope());
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,

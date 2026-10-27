@@ -5,6 +5,7 @@ import {BooleanParam, StringParam, useQueryParams} from 'use-query-params';
 import {useViewerNodesHandlerHasGroupingBySystemState} from '../../store/reducers/capabilities/hooks';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useQueryParamsScope} from '../../utils/hooks/useQueryParamsScope';
 import type {NodesUptimeFilterValues} from '../../utils/nodes';
 import {nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
@@ -89,4 +90,15 @@ export function useNodesPageQueryParams(
         handleGroupByParamChange,
         handleWithProblemsChange,
     };
+}
+
+export function useNodesSearchScope() {
+    return useQueryParamsScope([
+        'environment',
+        'clusterName',
+        'database',
+        'schema',
+        'path',
+        'backend',
+    ]);
 }
