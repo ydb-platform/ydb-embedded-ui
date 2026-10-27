@@ -16,14 +16,10 @@ import {StorageNodesComponent} from './StorageNodesComponent';
 import '../Storage.scss';
 
 export function PaginatedStorageNodes(props: PaginatedStorageProps) {
-    const {
-        nodesSearchValue,
-        handleTextFilterNodesChange,
-        storageNodesGroupByParam,
-        visibleEntities,
-        nodesUptimeFilter,
-        handleShowAllNodes,
-    } = useStorageQueryParams();
+    const queryParams = useStorageQueryParams();
+    const {storageNodesGroupByParam, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
+        queryParams;
+    const {nodesSearchValue, handleTextFilterNodesChange} = queryParams;
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();

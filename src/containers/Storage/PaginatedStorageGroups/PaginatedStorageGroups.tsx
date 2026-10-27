@@ -15,13 +15,9 @@ import {StorageGroupsComponent} from './StorageGroupsComponent';
 import '../Storage.scss';
 
 export function PaginatedStorageGroups(props: PaginatedStorageProps) {
-    const {
-        groupsSearchValue,
-        handleTextFilterGroupsChange,
-        storageGroupsGroupByParam,
-        visibleEntities,
-        handleShowAllGroups,
-    } = useStorageQueryParams();
+    const queryParams = useStorageQueryParams();
+    const {storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} = queryParams;
+    const {groupsSearchValue, handleTextFilterGroupsChange} = queryParams;
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const storageGroupsHandlerHasGrouping = useStorageGroupsHandlerHasGrouping();
