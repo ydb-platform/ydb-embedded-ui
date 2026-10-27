@@ -71,7 +71,7 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
-it('updates the search URL immediately and filters the actual table data after the delay', () => {
+it('updates the search URL and filters the actual table data only after the delay', () => {
     const history = createMemoryHistory({initialEntries: ['/cluster/databases?clusterName=test']});
     render(
         <Router history={history}>
@@ -83,18 +83,19 @@ it('updates the search URL immediately and filters the actual table data after t
     const input = screen.getByRole('textbox');
     fireEvent.change(input, {target: {value: 'alpha'}});
     expect(input).toHaveValue('alpha');
-    expect(history.location.search).toBe('?clusterName=test&search=alpha');
+    expect(history.location.search).toBe('?clusterName=test');
     act(() => jest.advanceTimersByTime(199));
     expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({data: tenants}), {});
     act(() => jest.advanceTimersByTime(1));
     expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({data: [tenants[0]]}), {});
+    expect(history.location.search).toBe('?clusterName=test&search=alpha');
     fireEvent.change(input, {target: {value: ''}});
-    expect(history.location.search).toBe('?clusterName=test');
+    expect(history.location.search).toBe('?clusterName=test&search=alpha');
     act(() => jest.advanceTimersByTime(200));
     expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({data: tenants}), {});
 });
 
-it.each([false, true])('resets filtering when the API address changes (meta: %s)', (meta) => {
+it.each([false, true])('discards drafts when the API address changes (meta: %s)', (meta) => {
     if (meta) {
         window.api.meta = {getPath} as unknown as NonNullable<typeof window.api.meta>;
     }
@@ -116,12 +117,15 @@ it.each([false, true])('resets filtering when the API address changes (meta: %s)
     getPath.mockReturnValue('/second-backend');
     view.rerender(renderPage());
     expect(history.location).toBe(url);
-    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({data: [tenants[0]]}), {});
+    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({data: tenants}), {});
     fireEvent.change(input, {target: {value: 'beta'}});
     view.rerender(renderPage(true));
     expect(mockQuery).toHaveBeenLastCalledWith(
         expect.objectContaining({isMetaDatabasesAvailable: true}),
         expect.any(Object),
     );
-    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({data: [tenants[1]]}), {});
+    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({data: tenants}), {});
+    act(() => jest.advanceTimersByTime(200));
+    expect(input).toHaveValue('');
+    expect(history.location).toBe(url);
 });

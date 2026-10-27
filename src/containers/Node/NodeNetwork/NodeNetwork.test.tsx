@@ -38,7 +38,7 @@ afterEach(() => {
     jest.useRealTimers();
 });
 
-it('delays typing but resets immediately when the requested node or backend changes', () => {
+it('delays URL updates and discards drafts when the requested node or backend changes', () => {
     const history = createMemoryHistory({initialEntries: ['/node/one/network?search=a']});
     const renderPage = (nodeId: string) => (
         <Router history={history}>
@@ -53,7 +53,7 @@ it('delays typing but resets immediately when the requested node or backend chan
     const view = render(renderPage('one'));
     const input = screen.getByRole('textbox');
     fireEvent.change(input, {target: {value: 'abc'}});
-    expect(new URLSearchParams(history.location.search).get('search')).toBe('abc');
+    expect(new URLSearchParams(history.location.search).get('search')).toBe('a');
     expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({searchValue: 'a'}), {});
     act(() => jest.advanceTimersByTime(200));
     expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({searchValue: 'abc'}), {});
@@ -61,16 +61,20 @@ it('delays typing but resets immediately when the requested node or backend chan
     const url = history.location;
     view.rerender(renderPage('two'));
     expect(history.location).toBe(url);
+    expect(input).toHaveValue('abc');
     expect(screen.getByRole('textbox')).toBe(input);
     expect(mockTable).toHaveBeenLastCalledWith(
-        expect.objectContaining({nodeId: 'two', searchValue: 'abcd'}),
+        expect.objectContaining({nodeId: 'two', searchValue: 'abc'}),
         {},
     );
     fireEvent.change(input, {target: {value: 'abcde'}});
     getPath.mockReturnValue('/second-backend');
     view.rerender(renderPage('two'));
     expect(mockTable).toHaveBeenLastCalledWith(
-        expect.objectContaining({nodeId: 'two', searchValue: 'abcde'}),
+        expect.objectContaining({nodeId: 'two', searchValue: 'abc'}),
         {},
     );
+    act(() => jest.advanceTimersByTime(200));
+    expect(history.location).toBe(url);
+    expect(input).toHaveValue('abc');
 });

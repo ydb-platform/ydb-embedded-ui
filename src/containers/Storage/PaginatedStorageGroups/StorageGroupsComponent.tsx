@@ -1,7 +1,6 @@
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useStorageGroupsHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
-import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageGroupsTable} from '../PaginatedStorageGroupsTable';
@@ -19,16 +18,7 @@ export function StorageGroupsComponent({
     scrollContainerRef,
     initialEntitiesCount,
 }: PaginatedStorageProps) {
-    const {
-        groupsSearchValue: rawGroupsSearchValue,
-        visibleEntities,
-        handleShowAllGroups,
-    } = useStorageQueryParams();
-    const requestParams = {database, nodeId, groupId, pDiskId};
-    const groupsSearchValue = useDebouncedSearch(
-        rawGroupsSearchValue,
-        JSON.stringify([window.api.storage.getPath(''), requestParams]),
-    );
+    const {groupsSearchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();
 
     const storageGroupsHandlerHasGrouping = useStorageGroupsHandlerHasGrouping();
 
@@ -56,7 +46,10 @@ export function StorageGroupsComponent({
             }
             table={
                 <PaginatedStorageGroupsTable
-                    {...requestParams}
+                    database={database}
+                    nodeId={nodeId}
+                    groupId={groupId}
+                    pDiskId={pDiskId}
                     searchValue={groupsSearchValue}
                     visibleEntities={visibleEntities}
                     onShowAll={handleShowAllGroups}

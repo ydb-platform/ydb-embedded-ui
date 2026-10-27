@@ -75,22 +75,24 @@ export function getStorageGroupByCleanupPatch({
     return patch;
 }
 
+export const storageQueryParams = {
+    type: StringParam,
+    visible: StringParam,
+    groupsSearch: StringParam,
+    nodesSearch: StringParam,
+    search: StringParam,
+    uptimeFilter: StringParam,
+    storageNodesGroupBy: StringParam,
+    storageGroupsGroupBy: StringParam,
+    storageExpertMode: BooleanParam,
+    vdisksGroupBy: StringParam,
+    pdisksGroupBy: StringParam,
+    nodesVdisksGroupBy: StringParam,
+    nodesPdisksGroupBy: StringParam,
+};
+
 export function useStorageQueryParams() {
-    const [queryParams, setQueryParams] = useQueryParams({
-        type: StringParam,
-        visible: StringParam,
-        groupsSearch: StringParam,
-        nodesSearch: StringParam,
-        search: StringParam,
-        uptimeFilter: StringParam,
-        storageNodesGroupBy: StringParam,
-        storageGroupsGroupBy: StringParam,
-        storageExpertMode: BooleanParam,
-        vdisksGroupBy: StringParam,
-        pdisksGroupBy: StringParam,
-        nodesVdisksGroupBy: StringParam,
-        nodesPdisksGroupBy: StringParam,
-    });
+    const [queryParams, setQueryParams] = useQueryParams(storageQueryParams);
 
     const [savedStorageType, setSavedStorageType] = useSetting<StorageType>(
         SETTING_KEYS.STORAGE_TYPE,

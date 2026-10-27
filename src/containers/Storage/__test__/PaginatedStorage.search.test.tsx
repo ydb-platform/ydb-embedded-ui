@@ -143,12 +143,12 @@ describe.each([
     }
 
     it.each([false, true])(
-        'updates the URL immediately and delays the data filter (grouped: %s)',
+        'shows text immediately and delays the URL and data filter (grouped: %s)',
         (grouped) => {
             const {history, input} = setup(grouped);
             fireEvent.change(input, {target: {value: 'abc'}});
             expect(input).toHaveValue('abc');
-            expect(new URLSearchParams(history.location.search).get(searchParam)).toBe('abc');
+            expect(new URLSearchParams(history.location.search).get(searchParam)).toBe('a');
             const expectFilter = (value: string) =>
                 grouped
                     ? expect(mockQuery).toHaveBeenLastCalledWith(
@@ -163,11 +163,12 @@ describe.each([
             expectFilter('a');
             act(() => jest.advanceTimersByTime(1));
             expectFilter('abc');
+            expect(new URLSearchParams(history.location.search).get(searchParam)).toBe('abc');
         },
     );
 
     it.each([false, true])(
-        'resets the filter immediately on Back/Forward between groups (grouped: %s)',
+        'cancels pending URL writes on Back/Forward between groups (grouped: %s)',
         (grouped) => {
             const entries = ['one', 'two'].map(
                 (id) =>
@@ -203,14 +204,14 @@ describe.each([
             expectFilter('one');
             jest.clearAllMocks();
             act(() => history.goForward());
-            expectFilter('two', 'pending');
+            expectFilter('two');
             act(() => jest.advanceTimersByTime(200));
-            expectFilter('two', 'pending');
+            expectFilter('two');
         },
     );
 
     it.each([false, true])(
-        'resets from data props and API address, without URL changes (grouped: %s)',
+        'discards drafts on data props and API address changes, without URL changes (grouped: %s)',
         (grouped) => {
             const {history, input, updateProps} = setup(grouped);
             const targets = [
@@ -238,7 +239,8 @@ describe.each([
                 updateProps(props);
                 expect(history.location).toBe(url);
                 expect(screen.getByRole('textbox')).toBe(input);
-                expectFilter(filter);
+                expectFilter('a');
+                expect(input).toHaveValue('a');
                 if (grouped) {
                     const request =
                         type === 'nodes'
@@ -261,9 +263,11 @@ describe.each([
             getPath.mockReturnValue('/second-backend');
             updateProps(targets[targets.length - 1]);
             expect(history.location).toBe(url);
-            expectFilter('after-backend-change');
+            expectFilter('a');
+            expect(input).toHaveValue('a');
             act(() => jest.advanceTimersByTime(200));
-            expectFilter('after-backend-change');
+            expectFilter('a');
+            expect(input).toHaveValue('a');
         },
     );
 
@@ -279,7 +283,7 @@ describe.each([
         expect(groupedInput).not.toBe(input);
         expect(groupedInput).toHaveValue('abc');
         expect(mockQuery).toHaveBeenLastCalledWith(
-            expect.objectContaining({filter: 'abc'}),
+            expect.objectContaining({filter: 'a'}),
             expect.any(Object),
         );
         fireEvent.change(groupedInput, {target: {value: 'abcd'}});

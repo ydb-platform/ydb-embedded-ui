@@ -23,7 +23,6 @@ export function NodeNetworkControls({
     return (
         <React.Fragment>
             <Search
-                debounce={0}
                 tableFilter
                 value={searchValue}
                 onChange={onSearchChange}

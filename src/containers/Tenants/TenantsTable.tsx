@@ -13,6 +13,7 @@ import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProblemFilter} from '../../components/ProblemFilter/ProblemFilter';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
+import {SearchProvider} from '../../components/Search/SearchProvider';
 import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
@@ -42,7 +43,6 @@ import {
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval} from '../../utils/hooks';
-import {useDebouncedSearch} from '../../utils/hooks/useDebouncedSearch';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
 import {isNumeric} from '../../utils/utils';
@@ -57,7 +57,7 @@ import {
     DATABASES_SELECTED_COLUMNS_KEY,
 } from './constants';
 import i18n from './i18n';
-import {useTenantsQueryParams} from './useTenantsQueryParams';
+import {tenantsQueryParams, useTenantsQueryParams} from './useTenantsQueryParams';
 
 import './Tenants.scss';
 
@@ -137,10 +137,10 @@ const TenantsTableContent = ({
     const history = useHistory();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const requestParams = {clusterName, environmentName, isMetaDatabasesAvailable};
-    const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(requestParams, {
-        pollingInterval: autoRefreshInterval,
-    });
+    const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
+        {clusterName, environmentName, isMetaDatabasesAvailable},
+        {pollingInterval: autoRefreshInterval},
+    );
     const loading = isFetching && currentData === undefined;
 
     // Track sort state for scroll dependencies
@@ -150,21 +150,8 @@ const TenantsTableContent = ({
 
     const {domain: domainRoot, settings} = useClusterBaseInfo();
 
-    const {
-        search: rawSearch,
-        withProblems,
-        handleSearchChange,
-        handleWithProblemsChange,
-    } = useTenantsQueryParams();
-    const search = useDebouncedSearch(
-        rawSearch,
-        JSON.stringify([
-            window.api.meta
-                ? window.api.meta.getPath('', isMetaDatabasesAvailable ? clusterName : undefined)
-                : window.api.viewer.getPath(''),
-            requestParams,
-        ]),
-    );
+    const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
+        useTenantsQueryParams();
 
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count
@@ -241,14 +228,30 @@ const TenantsTableContent = ({
     const renderControls = () => {
         return (
             <React.Fragment>
-                <Search
-                    debounce={0}
-                    tableFilter
-                    value={rawSearch}
+                <SearchProvider
+                    value={search}
                     onChange={handleSearchChange}
-                    placeholder="Database name"
-                    className={b('search')}
-                />
+                    queryParams={tenantsQueryParams}
+                    scope={JSON.stringify([
+                        clusterName,
+                        environmentName,
+                        isMetaDatabasesAvailable,
+                        window.api.meta
+                            ? window.api.meta.getPath(
+                                  '',
+                                  isMetaDatabasesAvailable ? clusterName : undefined,
+                              )
+                            : window.api.viewer.getPath(''),
+                    ])}
+                >
+                    <Search
+                        tableFilter
+                        value={search}
+                        onChange={handleSearchChange}
+                        placeholder="Database name"
+                        className={b('search')}
+                    />
+                </SearchProvider>
                 {showWithProblemsFilter ? (
                     <ProblemFilter value={withProblems} onChange={handleWithProblemsChange} />
                 ) : null}

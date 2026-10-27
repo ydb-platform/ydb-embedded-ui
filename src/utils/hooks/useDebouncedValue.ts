@@ -5,20 +5,26 @@ export function useDebouncedValue<T extends string | number | null>({
     onUpdate,
     debounce = 200,
     normalizeValue,
+    resetKey,
 }: {
     value: T;
     onUpdate?: (value: T) => void;
     debounce?: number;
     /** The value expected back from the parent; does not change the onUpdate argument. */
     normalizeValue?: (value: T) => T;
+    /** Discard pending input when its owner changes context. */
+    resetKey?: unknown;
 }) {
     const [currentValue, setCurrentValue] = React.useState<T>(value);
 
     const timer = React.useRef<number>();
     const submittedValue = React.useRef<T>();
+    const previousResetKey = React.useRef(resetKey);
 
     React.useEffect(() => {
-        const isAcknowledgement = submittedValue.current === value;
+        const isAcknowledgement =
+            previousResetKey.current === resetKey && submittedValue.current === value;
+        previousResetKey.current = resetKey;
         submittedValue.current = undefined;
 
         // Preserve a newer pending edit when the parent acknowledges an earlier one.
@@ -36,7 +42,7 @@ export function useDebouncedValue<T extends string | number | null>({
 
             return prevValue;
         });
-    }, [value]);
+    }, [value, resetKey]);
 
     React.useEffect(() => () => window.clearTimeout(timer.current), []);
 

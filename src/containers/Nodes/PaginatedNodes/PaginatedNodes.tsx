@@ -2,6 +2,7 @@ import React from 'react';
 
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
+import {SearchProvider} from '../../../components/Search/SearchProvider';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {
@@ -11,7 +12,7 @@ import {
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
-import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
+import {nodesQueryParams, useNodesPageQueryParams} from '../useNodesPageQueryParams';
 
 import {GroupedNodesComponent} from './GroupedNodesComponent';
 import {NodesComponent} from './NodesComponent';
@@ -34,6 +35,8 @@ export interface PaginatedNodesProps {
 
 export function PaginatedNodes(props: PaginatedNodesProps) {
     const {
+        searchValue,
+        handleSearchQueryChange,
         uptimeFilter,
         groupByParam,
         withProblems,
@@ -70,5 +73,19 @@ export function PaginatedNodes(props: PaginatedNodesProps) {
         return <NodesComponent {...props} />;
     };
 
-    return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
+    return (
+        <SearchProvider
+            value={searchValue}
+            onChange={handleSearchQueryChange}
+            queryParams={nodesQueryParams}
+            scope={JSON.stringify([
+                props.path,
+                props.database,
+                props.databaseFullPath,
+                window.api.viewer.getPath(''),
+            ])}
+        >
+            <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>
+        </SearchProvider>
+    );
 }

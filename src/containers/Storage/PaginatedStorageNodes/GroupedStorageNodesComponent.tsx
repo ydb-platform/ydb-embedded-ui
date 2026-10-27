@@ -7,7 +7,6 @@ import {NODES_COLUMNS_TO_DATA_FIELDS} from '../../../components/nodesColumns/con
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {NodesGroupByField, NodesRequiredField} from '../../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
-import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
@@ -109,16 +108,8 @@ export function GroupedStorageNodesComponent({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {hideUnavailable} = useHideUnavailableNodes();
 
-    const {
-        nodesSearchValue: rawNodesSearchValue,
-        storageNodesGroupByParam,
-        handleShowAllNodes,
-    } = useStorageQueryParams();
-    const requestParams = {database, node_id: nodeId, group_id: groupId};
-    const nodesSearchValue = useDebouncedSearch(
-        rawNodesSearchValue,
-        JSON.stringify([window.api.viewer.getPath(''), requestParams]),
-    );
+    const {nodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
+        useStorageQueryParams();
 
     const expertMode = useIsStorageExpertMode();
     const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings({
@@ -141,10 +132,12 @@ export function GroupedStorageNodesComponent({
 
     const {currentData, isFetching, error} = storageApi.useGetStorageNodesInfoQuery(
         {
-            ...requestParams,
+            database,
             alive: hideUnavailable || undefined,
             with: 'all',
             filter: nodesSearchValue.trim(),
+            node_id: nodeId,
+            group_id: groupId,
             group: storageNodesGroupByParam,
             fieldsRequired: nodesSearchValue.trim() ? searchFieldsRequired : undefined,
         },

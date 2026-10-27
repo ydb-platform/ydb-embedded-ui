@@ -1,12 +1,12 @@
 import React from 'react';
 
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {SearchProvider} from '../../../components/Search/SearchProvider';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useBridgeModeEnabled} from '../../../store/reducers/capabilities/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
-import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
-import {useNodesPageQueryParams} from '../../Nodes/useNodesPageQueryParams';
+import {nodesQueryParams, useNodesPageQueryParams} from '../../Nodes/useNodesPageQueryParams';
 
 import {NodeNetworkControlsWithTableState} from './NodeNetworkControls/NodeNetworkControlsWithTableState';
 import {NodeNetworkTable} from './NodeNetworkTable';
@@ -28,14 +28,9 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
     const database = useDatabaseFromQuery();
     const isBridgeModeEnabled = useBridgeModeEnabled();
 
-    const {searchValue: rawSearchValue, handleSearchQueryChange} = useNodesPageQueryParams(
+    const {searchValue, handleSearchQueryChange} = useNodesPageQueryParams(
         undefined, // We don't need use groupByParams yet
         false, // withPeerRoleFilter = false for this tab
-    );
-    const requestParams = {nodeId};
-    const searchValue = useDebouncedSearch(
-        rawSearchValue,
-        JSON.stringify([window.api.viewer.getPath(''), requestParams]),
     );
 
     const allColumns = React.useMemo(() => {
@@ -59,10 +54,17 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
     return (
         <PaginatedTableWithLayout
             controls={
-                <NodeNetworkControlsWithTableState
-                    searchValue={rawSearchValue}
-                    onSearchChange={handleSearchQueryChange}
-                />
+                <SearchProvider
+                    value={searchValue}
+                    onChange={handleSearchQueryChange}
+                    queryParams={nodesQueryParams}
+                    scope={JSON.stringify([nodeId, database, window.api.viewer.getPath('')])}
+                >
+                    <NodeNetworkControlsWithTableState
+                        searchValue={searchValue}
+                        onSearchChange={handleSearchQueryChange}
+                    />
+                </SearchProvider>
             }
             extraControls={
                 <TableColumnSetup
@@ -74,7 +76,7 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
             }
             table={
                 <NodeNetworkTable
-                    {...requestParams}
+                    nodeId={nodeId}
                     searchValue={searchValue}
                     columns={columnsToShow}
                     scrollContainerRef={scrollContainerRef}

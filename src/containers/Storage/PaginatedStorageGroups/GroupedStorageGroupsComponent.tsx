@@ -6,7 +6,6 @@ import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumn
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {GroupsGroupByField} from '../../../types/api/storage';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
-import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageGroupsTable} from '../PaginatedStorageGroupsTable';
@@ -98,17 +97,8 @@ export function GroupedStorageGroupsComponent({
     viewContext,
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const {
-        groupsSearchValue: rawGroupsSearchValue,
-        storageGroupsGroupByParam,
-        visibleEntities,
-        handleShowAllGroups,
-    } = useStorageQueryParams();
-    const requestParams = {database, nodeId, groupId, pDiskId};
-    const groupsSearchValue = useDebouncedSearch(
-        rawGroupsSearchValue,
-        JSON.stringify([window.api.storage.getPath(''), requestParams]),
-    );
+    const {groupsSearchValue, storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
+        useStorageQueryParams();
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
@@ -117,8 +107,11 @@ export function GroupedStorageGroupsComponent({
 
     const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(
         {
-            ...requestParams,
+            database,
             with: 'all',
+            nodeId,
+            groupId,
+            pDiskId,
             filter: groupsSearchValue.trim(),
             group: storageGroupsGroupByParam,
         },
@@ -154,7 +147,10 @@ export function GroupedStorageGroupsComponent({
                         name={name}
                         count={count}
                         isExpanded={isExpanded}
-                        {...requestParams}
+                        database={database}
+                        nodeId={nodeId}
+                        groupId={groupId}
+                        pDiskId={pDiskId}
                         filterGroupBy={storageGroupsGroupByParam}
                         searchValue={groupsSearchValue}
                         visibleEntities={'all'}

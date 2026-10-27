@@ -2,11 +2,13 @@ import React from 'react';
 
 import {BooleanParam, StringParam, useQueryParams} from 'use-query-params';
 
+export const tenantsQueryParams = {
+    withProblems: BooleanParam,
+    search: StringParam,
+};
+
 export function useTenantsQueryParams() {
-    const [{withProblems, search}, setQueryParams] = useQueryParams({
-        withProblems: BooleanParam,
-        search: StringParam,
-    });
+    const [{withProblems, search}, setQueryParams] = useQueryParams(tenantsQueryParams);
 
     const handleWithProblemsChange = React.useCallback(
         (value: boolean) => {

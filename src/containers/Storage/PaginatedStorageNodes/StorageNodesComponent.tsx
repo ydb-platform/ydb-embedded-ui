@@ -1,7 +1,6 @@
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
-import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
@@ -20,17 +19,8 @@ export function StorageNodesComponent({
     scrollContainerRef,
     initialEntitiesCount,
 }: PaginatedStorageProps) {
-    const {
-        nodesSearchValue: rawNodesSearchValue,
-        visibleEntities,
-        nodesUptimeFilter,
-        handleShowAllNodes,
-    } = useStorageQueryParams();
-    const requestParams = {database, nodeId, groupId};
-    const nodesSearchValue = useDebouncedSearch(
-        rawNodesSearchValue,
-        JSON.stringify([window.api.viewer.getPath(''), requestParams]),
-    );
+    const {nodesSearchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
+        useStorageQueryParams();
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
     const {hideUnavailable} = useHideUnavailableNodes();
@@ -64,7 +54,9 @@ export function StorageNodesComponent({
             }
             table={
                 <PaginatedStorageNodesTable
-                    {...requestParams}
+                    database={database}
+                    nodeId={nodeId}
+                    groupId={groupId}
                     searchValue={nodesSearchValue}
                     visibleEntities={visibleEntities}
                     nodesUptimeFilter={nodesUptimeFilter}

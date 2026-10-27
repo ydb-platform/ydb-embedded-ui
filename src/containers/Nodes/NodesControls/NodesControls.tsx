@@ -69,7 +69,6 @@ export function NodesControls({
         <React.Fragment>
             <Search
                 tableFilter
-                debounce={0}
                 onChange={handleSearchQueryChange}
                 placeholder={i18n('controls_search-placeholder')}
                 width={238}

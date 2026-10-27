@@ -14,7 +14,6 @@ import {nodesApi} from '../../../store/reducers/nodes/nodes';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
-import {useDebouncedSearch} from '../../../utils/hooks/useDebouncedSearch';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
@@ -144,17 +143,12 @@ export function GroupedNodesComponent({
         return undefined;
     }, [path, databaseFullPath, useMetaProxy]);
 
-    const requestParams = {path: schemaPathParam, database};
-    const searchFilter = useDebouncedSearch(
-        searchValue,
-        JSON.stringify([window.api.viewer.getPath(''), requestParams]),
-    );
-
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
-            ...requestParams,
+            path: schemaPathParam,
+            database,
             alive: hideUnavailable || undefined,
-            filter: searchFilter.trim(),
+            filter: searchValue.trim(),
             filter_peer_role: peerRoleFilter,
             group: groupByParam,
             limit: 0,
@@ -194,7 +188,7 @@ export function GroupedNodesComponent({
                         path={path}
                         databaseFullPath={databaseFullPath}
                         database={database}
-                        searchValue={searchFilter}
+                        searchValue={searchValue}
                         peerRoleFilter={peerRoleFilter}
                         groupByParam={groupByParam}
                         columns={columnsToShow}
@@ -234,7 +228,7 @@ export function GroupedNodesComponent({
             table={renderGroups()}
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchFilter, groupByParam, tableGroups, peerRoleFilter],
+                scrollDependencies: [searchValue, groupByParam, tableGroups, peerRoleFilter],
                 loading: isLoading,
                 className: b('groups-wrapper'),
             }}

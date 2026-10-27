@@ -98,12 +98,12 @@ beforeEach(() => {
 afterEach(() => jest.useRealTimers());
 
 it.each([false, true])(
-    'updates the URL immediately and delays the data filter (grouped: %s)',
+    'shows text immediately and delays the URL and data filter (grouped: %s)',
     (grouped) => {
         const {history, input} = setup(grouped);
         fireEvent.change(input, {target: {value: 'abc'}});
         expect(input).toHaveValue('abc');
-        expect(new URLSearchParams(history.location.search).get('search')).toBe('abc');
+        expect(new URLSearchParams(history.location.search).get('search')).toBe('a');
         const expectFilter = (value: string) =>
             grouped
                 ? expect(mockQuery).toHaveBeenLastCalledWith(
@@ -122,10 +122,13 @@ it.each([false, true])(
             fireEvent.change(input, {target: {value: 'abcd'}});
         });
         expect(input).toHaveValue('abcd');
-        expect(new URLSearchParams(history.location.search).get('search')).toBe('abcd');
+        expect(new URLSearchParams(history.location.search).get('search')).toBe('abc');
         expectFilter('abc');
         act(() => jest.advanceTimersByTime(200));
         expectFilter('abcd');
+        expect(new URLSearchParams(history.location.search).get('search')).toBe('abcd');
+        expect(new URLSearchParams(history.location.search).get('database')).toBe('two');
+        expect(history.length).toBe(2);
     },
 );
 
@@ -139,7 +142,7 @@ it('keeps the latest search through both grouping switches', () => {
     expect(groupedInput).not.toBe(input);
     expect(groupedInput).toHaveValue('abc');
     expect(mockQuery).toHaveBeenLastCalledWith(
-        expect.objectContaining({filter: 'abc'}),
+        expect.objectContaining({filter: 'a'}),
         expect.any(Object),
     );
     fireEvent.change(groupedInput, {target: {value: 'abcd'}});
@@ -154,7 +157,7 @@ it('keeps the latest search through both grouping switches', () => {
     expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({searchValue: 'abcd'}), {});
 });
 
-it('restores the destination search on Back and Forward while filtering is pending', () => {
+it('cancels pending URL writes on Back and Forward', () => {
     const {history, input} = setup();
     fireEvent.change(input, {target: {value: 'abc'}});
     act(() => history.goBack());
@@ -167,14 +170,14 @@ it('restores the destination search on Back and Forward while filtering is pendi
     fireEvent.change(input, {target: {value: 'other'}});
     act(() => history.goForward());
     const forwardUrl = history.location.search;
-    expect(input).toHaveValue('abc');
+    expect(input).toHaveValue('a');
     act(() => jest.advanceTimersByTime(200));
     expect(history.location.search).toBe(forwardUrl);
-    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({searchValue: 'abc'}), {});
+    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({searchValue: 'a'}), {});
 });
 
 it.each([false, true])(
-    'uses the actual request target when the URL stays unchanged (grouped: %s)',
+    'discards the previous target draft when the URL stays unchanged (grouped: %s)',
     (grouped) => {
         const {history, input, updateProps} = setup(grouped);
         const expectFilter = (filter: string) =>
@@ -196,7 +199,8 @@ it.each([false, true])(
             updateProps(props);
             expect(history.location).toBe(url);
             expect(screen.getByRole('textbox')).toBe(input);
-            expectFilter(JSON.stringify(props));
+            expectFilter('a');
+            expect(input).toHaveValue('a');
             if (grouped) {
                 expect(mockQuery).toHaveBeenLastCalledWith(
                     expect.objectContaining({database: props.database}),
@@ -211,8 +215,10 @@ it.each([false, true])(
         getPath.mockReturnValue('/second-backend');
         updateProps({database: 'three', path: '/three/table', databaseFullPath: '/three'});
         expect(history.location).toBe(url);
-        expectFilter('after-backend-change');
+        expectFilter('a');
+        expect(input).toHaveValue('a');
         act(() => jest.advanceTimersByTime(200));
-        expectFilter('after-backend-change');
+        expectFilter('a');
+        expect(input).toHaveValue('a');
     },
 );

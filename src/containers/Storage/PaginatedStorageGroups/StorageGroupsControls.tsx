@@ -90,7 +90,6 @@ export function StorageGroupsControls({
         <Flex direction="column" gap={2} width="100%">
             <Flex gap={2} alignItems="center" wrap className={b('controls-row')}>
                 <Search
-                    debounce={0}
                     tableFilter
                     value={groupsSearchValue}
                     onChange={handleTextFilterGroupsChange}

@@ -65,6 +65,22 @@ describe('useDebouncedValue', () => {
         expect(nextOnUpdate).not.toHaveBeenCalled();
     });
 
+    it('discards pending text when the context changes but the value stays the same', () => {
+        const onUpdate = jest.fn();
+        const {result, rerender} = renderHook(
+            ({resetKey}) => useDebouncedValue<string>({value: 'a', onUpdate, resetKey}),
+            {initialProps: {resetKey: 'one'}},
+        );
+        act(() => result.current[1]('pending'));
+        rerender({resetKey: 'two'});
+        expect(result.current[0]).toBe('a');
+        act(() => jest.advanceTimersByTime(200));
+        expect(onUpdate).not.toHaveBeenCalled();
+        act(() => result.current[1]('new'));
+        act(() => jest.advanceTimersByTime(200));
+        expect(onUpdate).toHaveBeenCalledWith('new');
+    });
+
     it('cancels the pending callback on unmount', () => {
         const onUpdate = jest.fn();
         const {result, unmount} = renderHook(() =>

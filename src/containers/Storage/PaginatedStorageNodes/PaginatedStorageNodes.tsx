@@ -1,13 +1,14 @@
 import React from 'react';
 
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
+import {SearchProvider} from '../../../components/Search/SearchProvider';
 import {
     useCapabilitiesLoaded,
     useViewerNodesHandlerHasGrouping,
 } from '../../../store/reducers/capabilities/hooks';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
-import {useStorageQueryParams} from '../useStorageQueryParams';
+import {storageQueryParams, useStorageQueryParams} from '../useStorageQueryParams';
 
 import {GroupedStorageNodesComponent} from './GroupedStorageNodesComponent';
 import {StorageNodesComponent} from './StorageNodesComponent';
@@ -15,8 +16,14 @@ import {StorageNodesComponent} from './StorageNodesComponent';
 import '../Storage.scss';
 
 export function PaginatedStorageNodes(props: PaginatedStorageProps) {
-    const {storageNodesGroupByParam, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
-        useStorageQueryParams();
+    const {
+        nodesSearchValue,
+        handleTextFilterNodesChange,
+        storageNodesGroupByParam,
+        visibleEntities,
+        nodesUptimeFilter,
+        handleShowAllNodes,
+    } = useStorageQueryParams();
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
@@ -40,5 +47,19 @@ export function PaginatedStorageNodes(props: PaginatedStorageProps) {
         return <StorageNodesComponent {...props} />;
     };
 
-    return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
+    return (
+        <SearchProvider
+            value={nodesSearchValue}
+            onChange={handleTextFilterNodesChange}
+            queryParams={storageQueryParams}
+            scope={JSON.stringify([
+                props.database,
+                props.nodeId,
+                props.groupId,
+                window.api.viewer.getPath(''),
+            ])}
+        >
+            <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>
+        </SearchProvider>
+    );
 }
