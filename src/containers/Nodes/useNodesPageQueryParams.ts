@@ -11,7 +11,7 @@ import {nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 import {parseNodesPeerRoleFilter} from './PeerRoleFilter/utils';
 import {parseNodesGroupByParam} from './columns/constants';
 
-export const nodesQueryParams = {
+export const nodesQueryParamConfig = {
     uptimeFilter: StringParam,
     peerRole: StringParam,
     search: StringParam,
@@ -23,7 +23,7 @@ export function useNodesPageQueryParams(
     groupByParams: NodesGroupByField[] | undefined,
     withPeerRoleFilter: boolean | undefined,
 ) {
-    const [queryParams, setQueryParams] = useQueryParams(nodesQueryParams);
+    const [queryParams, setQueryParams] = useQueryParams(nodesQueryParamConfig);
 
     const isViewerUser = useIsViewerUser();
 

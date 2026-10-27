@@ -13,8 +13,8 @@ export const SearchContext = React.createContext<
 interface SearchProviderProps {
     value: string;
     onChange: (value: string) => void;
-    queryParams: QueryParamConfigMap;
-    scope?: string;
+    queryParamConfig: QueryParamConfigMap;
+    resetKey?: string;
     children: React.ReactNode;
 }
 
@@ -22,43 +22,43 @@ interface SearchProviderProps {
 export function SearchProvider({
     value,
     onChange,
-    queryParams,
-    scope,
+    queryParamConfig,
+    resetKey,
     children,
 }: SearchProviderProps) {
     const history = useHistory();
-    const generation = React.useRef(0);
-    const [navigation, setNavigation] = React.useState(0);
+    const latestNavigationId = React.useRef(0);
+    const [navigationId, setNavigationId] = React.useState(0);
 
     React.useEffect(() => {
-        const context = (location: Location) => {
+        const getContextKey = (location: Location) => {
             const params = new URLSearchParams(location.search);
             // Local filters may change while typing. Any other query parameter is context.
-            Object.keys(queryParams).forEach((key) => params.delete(key));
+            Object.keys(queryParamConfig).forEach((key) => params.delete(key));
             params.sort();
             return JSON.stringify([location.pathname, location.hash, params.toString()]);
         };
-        let previous = context(history.location);
+        let previousContextKey = getContextKey(history.location);
         return history.listen((location, action) => {
-            const next = context(location);
-            if (action !== 'REPLACE' || next !== previous) {
-                generation.current += 1;
-                setNavigation(generation.current);
+            const nextContextKey = getContextKey(location);
+            if (action !== 'REPLACE' || nextContextKey !== previousContextKey) {
+                latestNavigationId.current += 1;
+                setNavigationId(latestNavigationId.current);
             }
-            previous = next;
+            previousContextKey = nextContextKey;
         });
-    }, [history, queryParams]);
+    }, [history, queryParamConfig]);
 
-    const search = useDebouncedValue({
+    const draftState = useDebouncedValue({
         value,
-        onUpdate: (next) => {
+        onUpdate: (nextValue) => {
             // Navigation can happen before React commits the reset and clears the timer.
-            if (generation.current === navigation) {
-                onChange(next);
+            if (latestNavigationId.current === navigationId) {
+                onChange(nextValue);
             }
         },
-        resetKey: JSON.stringify([scope, navigation]),
+        resetKey: JSON.stringify([resetKey, navigationId]),
     });
 
-    return <SearchContext.Provider value={search}>{children}</SearchContext.Provider>;
+    return <SearchContext.Provider value={draftState}>{children}</SearchContext.Provider>;
 }

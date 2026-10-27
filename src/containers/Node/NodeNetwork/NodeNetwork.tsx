@@ -6,7 +6,7 @@ import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumn
 import {useBridgeModeEnabled} from '../../../store/reducers/capabilities/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
-import {nodesQueryParams, useNodesPageQueryParams} from '../../Nodes/useNodesPageQueryParams';
+import {nodesQueryParamConfig, useNodesPageQueryParams} from '../../Nodes/useNodesPageQueryParams';
 
 import {NodeNetworkControlsWithTableState} from './NodeNetworkControls/NodeNetworkControlsWithTableState';
 import {NodeNetworkTable} from './NodeNetworkTable';
@@ -57,8 +57,8 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
                 <SearchProvider
                     value={searchValue}
                     onChange={handleSearchQueryChange}
-                    queryParams={nodesQueryParams}
-                    scope={JSON.stringify([nodeId, database, window.api.viewer.getPath('')])}
+                    queryParamConfig={nodesQueryParamConfig}
+                    resetKey={JSON.stringify([nodeId, database, window.api.viewer.getPath('')])}
                 >
                     <NodeNetworkControlsWithTableState
                         searchValue={searchValue}

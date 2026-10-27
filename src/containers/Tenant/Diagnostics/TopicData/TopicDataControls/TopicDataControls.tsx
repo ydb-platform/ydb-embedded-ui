@@ -165,7 +165,7 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
                     min={0}
                     value={isNil(selectedOffset) ? null : safeParseNumber(selectedOffset)}
                     onUpdate={onStartOffsetChange}
-                    normalizeValue={(value) => value || null}
+                    isEqual={(submitted, received) => (submitted || null) === received}
                     label={i18n('label_from')}
                     placeholder={i18n('label_offset')}
                     debounce={600}

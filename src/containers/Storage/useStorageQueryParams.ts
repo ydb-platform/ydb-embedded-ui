@@ -75,7 +75,7 @@ export function getStorageGroupByCleanupPatch({
     return patch;
 }
 
-export const storageQueryParams = {
+export const storageQueryParamConfig = {
     type: StringParam,
     visible: StringParam,
     groupsSearch: StringParam,
@@ -92,7 +92,7 @@ export const storageQueryParams = {
 };
 
 export function useStorageQueryParams() {
-    const [queryParams, setQueryParams] = useQueryParams(storageQueryParams);
+    const [queryParams, setQueryParams] = useQueryParams(storageQueryParamConfig);
 
     const [savedStorageType, setSavedStorageType] = useSetting<StorageType>(
         SETTING_KEYS.STORAGE_TYPE,

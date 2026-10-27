@@ -8,15 +8,19 @@ import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 import {Search} from '../Search';
 import {SearchProvider} from '../SearchProvider';
 
-const queryParams = {search: StringParam, group: StringParam};
+const queryParamConfig = {search: StringParam, group: StringParam};
 const renderTable = jest.fn();
 
 function Page({debounce}: {debounce?: number}) {
-    const [{search, group}, setQuery] = useQueryParams(queryParams);
+    const [{search, group}, setQuery] = useQueryParams(queryParamConfig);
     const onChange = (value: string) => setQuery({search: value || undefined}, 'replaceIn');
     renderTable(search);
     return (
-        <SearchProvider value={search ?? ''} onChange={onChange} queryParams={queryParams}>
+        <SearchProvider
+            value={search ?? ''}
+            onChange={onChange}
+            queryParamConfig={queryParamConfig}
+        >
             <Search
                 key={group ?? ''}
                 value={search ?? ''}
@@ -58,17 +62,17 @@ afterEach(() => jest.useRealTimers());
 it('keeps typing local, preserves focus during data refresh and updates the URL once', async () => {
     const {history, input, refresh} = setup();
     const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-    const url = history.location;
+    const initialLocation = history.location;
     renderTable.mockClear();
     await user.type(input, 'bc');
     expect(input).toHaveValue('abc');
     expect(renderTable).not.toHaveBeenCalled();
-    expect(history.location).toBe(url);
+    expect(history.location).toBe(initialLocation);
     refresh();
     expect(input).toHaveValue('abc');
     expect(input).toHaveFocus();
     act(() => jest.advanceTimersByTime(199));
-    expect(history.location).toBe(url);
+    expect(history.location).toBe(initialLocation);
     act(() => jest.advanceTimersByTime(1));
     expect(history.location.search).toBe('?search=abc&entity=two');
     expect(history.length).toBe(2);

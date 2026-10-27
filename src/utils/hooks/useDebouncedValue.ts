@@ -4,28 +4,31 @@ export function useDebouncedValue<T extends string | number | null>({
     value,
     onUpdate,
     debounce = 200,
-    normalizeValue,
+    isEqual,
     resetKey,
 }: {
     value: T;
     onUpdate?: (value: T) => void;
     debounce?: number;
-    /** The value expected back from the parent; does not change the onUpdate argument. */
-    normalizeValue?: (value: T) => T;
+    /** Compare a submitted value with the value returned by the parent. */
+    isEqual?: (submitted: T, received: T) => boolean;
     /** Discard pending input when its owner changes context. */
     resetKey?: unknown;
 }) {
     const [currentValue, setCurrentValue] = React.useState<T>(value);
 
     const timer = React.useRef<number>();
-    const submittedValue = React.useRef<T>();
+    const submittedUpdate = React.useRef<{value: T; isEqual?: typeof isEqual}>();
     const previousResetKey = React.useRef(resetKey);
 
     React.useEffect(() => {
+        const submitted = submittedUpdate.current;
         const isAcknowledgement =
-            previousResetKey.current === resetKey && submittedValue.current === value;
+            previousResetKey.current === resetKey &&
+            submitted !== undefined &&
+            (submitted.isEqual?.(submitted.value, value) ?? submitted.value === value);
         previousResetKey.current = resetKey;
-        submittedValue.current = undefined;
+        submittedUpdate.current = undefined;
 
         // Preserve a newer pending edit when the parent acknowledges an earlier one.
         if (isAcknowledgement && timer.current !== undefined) {
@@ -52,7 +55,7 @@ export function useDebouncedValue<T extends string | number | null>({
         window.clearTimeout(timer.current);
         timer.current = window.setTimeout(() => {
             timer.current = undefined;
-            submittedValue.current = normalizeValue ? normalizeValue(newValue) : newValue;
+            submittedUpdate.current = {value: newValue, isEqual};
             onUpdate?.(newValue);
         }, debounce);
     };

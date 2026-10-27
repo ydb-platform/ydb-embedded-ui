@@ -7,7 +7,7 @@ import {
     useStorageGroupsHandlerHasGrouping,
 } from '../../../store/reducers/capabilities/hooks';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
-import {storageQueryParams, useStorageQueryParams} from '../useStorageQueryParams';
+import {storageQueryParamConfig, useStorageQueryParams} from '../useStorageQueryParams';
 
 import {GroupedStorageGroupsComponent} from './GroupedStorageGroupsComponent';
 import {StorageGroupsComponent} from './StorageGroupsComponent';
@@ -46,8 +46,8 @@ export function PaginatedStorageGroups(props: PaginatedStorageProps) {
         <SearchProvider
             value={groupsSearchValue}
             onChange={handleTextFilterGroupsChange}
-            queryParams={storageQueryParams}
-            scope={JSON.stringify([
+            queryParamConfig={storageQueryParamConfig}
+            resetKey={JSON.stringify([
                 props.database,
                 props.nodeId,
                 props.groupId,

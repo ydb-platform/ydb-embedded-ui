@@ -111,7 +111,7 @@ const scrollContainerRef = React.createRef<HTMLDivElement>();
 const pages = [
     {
         name: 'Nodes',
-        param: 'search',
+        searchParam: 'search',
         Table: NodesTable,
         element: (
             <PaginatedNodes
@@ -123,41 +123,41 @@ const pages = [
                 selectedColumnsKey="test"
             />
         ),
-        context: {database: '/other'},
+        contextProps: {database: '/other'},
         grouping: 'nodesGroupBy=Host',
-        query: nodesApi.useGetNodesQuery,
+        groupedQuery: nodesApi.useGetNodesQuery,
     },
     {
         name: 'Storage Groups',
-        param: 'groupsSearch',
+        searchParam: 'groupsSearch',
         Table: PaginatedStorageGroupsTable,
         element: <PaginatedStorageGroups scrollContainerRef={scrollContainerRef} />,
-        context: {groupId: 'other'},
+        contextProps: {groupId: 'other'},
         grouping: 'storageGroupsGroupBy=PoolName',
-        query: storageApi.useGetStorageGroupsInfoQuery,
+        groupedQuery: storageApi.useGetStorageGroupsInfoQuery,
     },
     {
         name: 'Storage Nodes',
-        param: 'nodesSearch',
+        searchParam: 'nodesSearch',
         Table: PaginatedStorageNodesTable,
         element: <PaginatedStorageNodes scrollContainerRef={scrollContainerRef} />,
-        context: {nodeId: 'other'},
+        contextProps: {nodeId: 'other'},
         grouping: 'storageNodesGroupBy=Host',
-        query: storageApi.useGetStorageNodesInfoQuery,
+        groupedQuery: storageApi.useGetStorageNodesInfoQuery,
     },
     {
         name: 'Network',
-        param: 'search',
+        searchParam: 'search',
         Table: NodeNetworkTable,
         element: <NodeNetwork nodeId="one" scrollContainerRef={scrollContainerRef} />,
-        context: {nodeId: 'other'},
+        contextProps: {nodeId: 'other'},
     },
     {
         name: 'Databases',
-        param: 'search',
+        searchParam: 'search',
         Table: ResizeableDataTable,
         element: <TenantsTable scrollContainerRef={scrollContainerRef} />,
-        context: {clusterName: 'other'},
+        contextProps: {clusterName: 'other'},
     },
 ];
 const originalApi = window.api;
@@ -167,15 +167,15 @@ beforeEach(() => {
     jest.clearAllMocks();
     getPath.mockReturnValue('/backend');
     window.api = {viewer: {getPath}, storage: {getPath}} as unknown as typeof window.api;
-    const result = {currentData: {tableGroups: []}, isFetching: false, refetch: jest.fn()};
+    const queryResult = {currentData: {tableGroups: []}, isFetching: false, refetch: jest.fn()};
     jest.mocked(nodesApi.useGetNodesQuery).mockReturnValue(
-        result as ReturnType<typeof nodesApi.useGetNodesQuery>,
+        queryResult as ReturnType<typeof nodesApi.useGetNodesQuery>,
     );
     jest.mocked(storageApi.useGetStorageGroupsInfoQuery).mockReturnValue(
-        result as ReturnType<typeof storageApi.useGetStorageGroupsInfoQuery>,
+        queryResult as ReturnType<typeof storageApi.useGetStorageGroupsInfoQuery>,
     );
     jest.mocked(storageApi.useGetStorageNodesInfoQuery).mockReturnValue(
-        result as ReturnType<typeof storageApi.useGetStorageNodesInfoQuery>,
+        queryResult as ReturnType<typeof storageApi.useGetStorageNodesInfoQuery>,
     );
     jest.mocked(tenantsApi.useGetTenantsInfoQuery).mockReturnValue({
         currentData: tenants,
@@ -200,7 +200,7 @@ function setup(element: React.ReactElement) {
 
 it.each(pages)(
     '$name: delays the URL and actual table filtering',
-    ({name, param, element, Table}) => {
+    ({name, searchParam, element, Table}) => {
         const {history} = setup(element);
         const input = screen.getByRole('textbox');
         fireEvent.change(input, {target: {value: 'alpha'}});
@@ -212,7 +212,7 @@ it.each(pages)(
             {},
         );
         act(() => jest.advanceTimersByTime(1));
-        expect(new URLSearchParams(history.location.search).get(param)).toBe('alpha');
+        expect(new URLSearchParams(history.location.search).get(searchParam)).toBe('alpha');
         expect(Table).toHaveBeenLastCalledWith(
             expect.objectContaining(
                 name === 'Databases' ? {data: [tenants[0]]} : {searchValue: 'alpha'},
@@ -224,7 +224,7 @@ it.each(pages)(
 
 it.each(pages.filter(({grouping}) => grouping))(
     '$name: retains drafts through both grouping switches',
-    ({element, grouping, query, Table, param}) => {
+    ({element, grouping, groupedQuery, Table, searchParam}) => {
         const {history} = setup(element);
         for (const [group, text] of [
             [grouping, 'alpha'],
@@ -238,13 +238,13 @@ it.each(pages.filter(({grouping}) => grouping))(
         }
         act(() => jest.advanceTimersByTime(200));
         expect(Table).toHaveBeenLastCalledWith(expect.objectContaining({searchValue: 'beta'}), {});
-        expect(new URLSearchParams(history.location.search).get(param)).toBe('beta');
+        expect(new URLSearchParams(history.location.search).get(searchParam)).toBe('beta');
         fireEvent.change(screen.getByRole('textbox'), {target: {value: 'alpha'}});
         act(() =>
             history.replace(`${history.location.pathname}${history.location.search}&${grouping}`),
         );
         act(() => jest.advanceTimersByTime(200));
-        expect(query).toHaveBeenLastCalledWith(
+        expect(groupedQuery).toHaveBeenLastCalledWith(
             expect.objectContaining({filter: 'alpha'}),
             expect.any(Object),
         );
@@ -253,10 +253,10 @@ it.each(pages.filter(({grouping}) => grouping))(
 
 it.each(pages)(
     '$name: discards drafts after data context or backend changes',
-    ({element, context}) => {
+    ({element, contextProps}) => {
         const {history, rerender} = setup(element);
-        const url = history.location;
-        const nextPage = React.cloneElement(element, context);
+        const initialLocation = history.location;
+        const nextPage = React.cloneElement(element, contextProps);
         for (const update of [
             () => rerender(nextPage),
             () => {
@@ -268,7 +268,7 @@ it.each(pages)(
             act(update);
             expect(screen.getByRole('textbox')).toHaveValue('');
             act(() => jest.advanceTimersByTime(200));
-            expect(history.location).toBe(url);
+            expect(history.location).toBe(initialLocation);
         }
     },
 );

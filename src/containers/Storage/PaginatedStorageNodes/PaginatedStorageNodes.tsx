@@ -8,7 +8,7 @@ import {
 } from '../../../store/reducers/capabilities/hooks';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
-import {storageQueryParams, useStorageQueryParams} from '../useStorageQueryParams';
+import {storageQueryParamConfig, useStorageQueryParams} from '../useStorageQueryParams';
 
 import {GroupedStorageNodesComponent} from './GroupedStorageNodesComponent';
 import {StorageNodesComponent} from './StorageNodesComponent';
@@ -51,8 +51,8 @@ export function PaginatedStorageNodes(props: PaginatedStorageProps) {
         <SearchProvider
             value={nodesSearchValue}
             onChange={handleTextFilterNodesChange}
-            queryParams={storageQueryParams}
-            scope={JSON.stringify([
+            queryParamConfig={storageQueryParamConfig}
+            resetKey={JSON.stringify([
                 props.database,
                 props.nodeId,
                 props.groupId,

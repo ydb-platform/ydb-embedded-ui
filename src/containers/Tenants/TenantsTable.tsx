@@ -57,7 +57,7 @@ import {
     DATABASES_SELECTED_COLUMNS_KEY,
 } from './constants';
 import i18n from './i18n';
-import {tenantsQueryParams, useTenantsQueryParams} from './useTenantsQueryParams';
+import {tenantsQueryParamConfig, useTenantsQueryParams} from './useTenantsQueryParams';
 
 import './Tenants.scss';
 
@@ -231,8 +231,8 @@ const TenantsTableContent = ({
                 <SearchProvider
                     value={search}
                     onChange={handleSearchChange}
-                    queryParams={tenantsQueryParams}
-                    scope={JSON.stringify([
+                    queryParamConfig={tenantsQueryParamConfig}
+                    resetKey={JSON.stringify([
                         clusterName,
                         environmentName,
                         isMetaDatabasesAvailable,

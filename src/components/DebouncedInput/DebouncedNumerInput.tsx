@@ -5,21 +5,21 @@ import {useDebouncedValue} from '../../utils/hooks/useDebouncedValue';
 
 interface DebouncedInputProps extends NumberInputProps {
     debounce?: number;
-    normalizeValue?: (value: number | null) => number | null;
+    isEqual?: (submitted: number | null, received: number | null) => boolean;
 }
 
 export const DebouncedNumberInput = ({
     onUpdate,
     value = null,
     debounce = 200,
-    normalizeValue,
+    isEqual,
     ...rest
 }: DebouncedInputProps) => {
     const [currentValue, handleUpdate] = useDebouncedValue<number | null>({
         value,
         onUpdate,
         debounce,
-        normalizeValue,
+        isEqual,
     });
 
     return <NumberInput value={currentValue} onUpdate={handleUpdate} {...rest} />;

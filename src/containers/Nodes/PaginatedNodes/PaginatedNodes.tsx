@@ -12,7 +12,7 @@ import {
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
-import {nodesQueryParams, useNodesPageQueryParams} from '../useNodesPageQueryParams';
+import {nodesQueryParamConfig, useNodesPageQueryParams} from '../useNodesPageQueryParams';
 
 import {GroupedNodesComponent} from './GroupedNodesComponent';
 import {NodesComponent} from './NodesComponent';
@@ -77,8 +77,8 @@ export function PaginatedNodes(props: PaginatedNodesProps) {
         <SearchProvider
             value={searchValue}
             onChange={handleSearchQueryChange}
-            queryParams={nodesQueryParams}
-            scope={JSON.stringify([
+            queryParamConfig={nodesQueryParamConfig}
+            resetKey={JSON.stringify([
                 props.path,
                 props.database,
                 props.databaseFullPath,

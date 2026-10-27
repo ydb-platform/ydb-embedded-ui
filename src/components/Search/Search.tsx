@@ -33,7 +33,7 @@ export const Search = ({
     ...props
 }: SearchProps) => {
     const sharedSearch = React.useContext(SearchContext);
-    const draft = tableFilter && debounce === undefined ? sharedSearch : undefined;
+    const draftState = tableFilter && debounce === undefined ? sharedSearch : undefined;
     const ownRef = React.useRef<HTMLInputElement>(null);
     const controlRef = inputRef ?? ownRef;
     useTableSearch(controlRef, tableFilter, value);
@@ -45,18 +45,18 @@ export const Search = ({
         [onChange],
     );
 
-    const Input = draft || debounce === 0 ? TextInput : DebouncedTextInput;
+    const Input = draftState || debounce === 0 ? TextInput : DebouncedTextInput;
 
     return (
         <Input
-            {...(draft || debounce === 0 ? {} : {debounce})}
+            {...(draftState || debounce === 0 ? {} : {debounce})}
             hasClear
             autoFocus
             controlRef={controlRef}
             style={{width}}
             className={b(null, className)}
-            value={draft?.[0] ?? value}
-            onUpdate={draft?.[1] ?? onUpdate}
+            value={draftState?.[0] ?? value}
+            onUpdate={draftState?.[1] ?? onUpdate}
             {...props}
         />
     );
