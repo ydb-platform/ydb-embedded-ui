@@ -12,7 +12,6 @@ import type {NodesGroupByField} from '../../../types/api/nodes';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesTable} from '../NodesTable';
-import {useDebouncedSearch} from '../useDebouncedSearch';
 import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
 
 import {NodesControlsWithTableState} from './NodesControlsWithTableState';
@@ -48,7 +47,6 @@ export function NodesComponent({
         groupByParams,
         withPeerRoleFilter,
     );
-    const searchFilter = useDebouncedSearch(searchValue);
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
     const {hideUnavailable} = useHideUnavailableNodes();
 
@@ -82,7 +80,7 @@ export function NodesComponent({
                     path={path}
                     database={database}
                     databaseFullPath={databaseFullPath}
-                    searchValue={searchFilter}
+                    searchValue={searchValue}
                     withProblems={withProblems}
                     uptimeFilter={uptimeFilter}
                     peerRoleFilter={peerRoleFilter}
@@ -94,7 +92,7 @@ export function NodesComponent({
             tableWrapperProps={{
                 scrollContainerRef,
                 scrollDependencies: [
-                    searchFilter,
+                    searchValue,
                     withProblems,
                     uptimeFilter,
                     peerRoleFilter,
