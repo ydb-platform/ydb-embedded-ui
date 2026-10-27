@@ -7,6 +7,7 @@ import {Router} from 'react-router-dom';
 import {QueryParamProvider} from 'use-query-params';
 import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 
+import {useDebouncedSearch} from '../useDebouncedSearch';
 import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
 
 import {NodesControls} from './NodesControls';
@@ -24,6 +25,7 @@ jest.mock('../../../utils/hooks/useIsUserAllowedToMakeChanges', () => ({
 
 function NodesSearch() {
     const {searchValue} = useNodesPageQueryParams([], false);
+    const debouncedSearch = useDebouncedSearch(searchValue);
     return (
         <React.Fragment>
             <NodesControls
@@ -32,7 +34,7 @@ function NodesSearch() {
                 entitiesCountCurrent={0}
                 entitiesLoading={false}
             />
-            <output aria-label="Table filter">{searchValue}</output>
+            <output aria-label="Table filter">{debouncedSearch}</output>
         </React.Fragment>
     );
 }
@@ -60,20 +62,19 @@ describe('Nodes search URL integration', () => {
         return {history, user, input: screen.getByRole('textbox')};
     }
 
-    it('updates text immediately and debounces the URL and table filter together', async () => {
+    it('updates text and URL immediately, but only applies the latest table filter', async () => {
         const {history, user, input} = setup();
         await user.type(input, 'bc');
 
         expect(input).toHaveValue('abc');
-        expect(new URLSearchParams(history.location.search).get('search')).toBe('a');
-        expect(screen.getByRole('status')).toHaveTextContent(/^a$/);
-
-        act(() => jest.advanceTimersByTime(200));
         expect(new URLSearchParams(history.location.search).get('search')).toBe('abc');
         expect(new URLSearchParams(history.location.search).get('database')).toBe('/local');
         expect(new URLSearchParams(history.location.search).get('clusterName')).toBe('test');
         expect(new URLSearchParams(history.location.search).get('backend')).toBe('proxy');
         expect(history.length).toBe(2);
+        expect(screen.getByRole('status')).toHaveTextContent(/^a$/);
+
+        act(() => jest.advanceTimersByTime(200));
         expect(screen.getByRole('status')).toHaveTextContent(/^abc$/);
         expect(input).toHaveValue('abc');
         expect(input).toHaveFocus();
@@ -107,8 +108,7 @@ describe('Nodes search URL integration', () => {
         expect(screen.getByRole('status')).toHaveTextContent(/^previous$/);
 
         act(() => history.goForward());
-        expect(input).toHaveValue('a');
-        await user.type(input, 'c');
+        expect(input).toHaveValue('ab');
         act(() => history.replace('/cluster/nodes'));
         expect(input).toHaveValue('');
         act(() => jest.runAllTimers());
