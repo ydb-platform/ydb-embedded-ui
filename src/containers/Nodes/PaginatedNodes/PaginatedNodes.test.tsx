@@ -1,0 +1,148 @@
+import React from 'react';
+
+import {act, fireEvent, render, screen} from '@testing-library/react';
+import {createMemoryHistory} from 'history';
+import {Router} from 'react-router-dom';
+import {QueryParamProvider} from 'use-query-params';
+import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
+
+import {nodesApi} from '../../../store/reducers/nodes/nodes';
+import {NodesTable} from '../NodesTable';
+
+import {PaginatedNodes} from './PaginatedNodes';
+
+jest.mock('../NodesTable', () => ({NodesTable: jest.fn(() => null)}));
+jest.mock('../../../components/TableColumnSetup/TableColumnSetup', () => ({
+    TableColumnSetup: () => null,
+}));
+jest.mock('../../../store/reducers/nodes/nodes', () => ({
+    nodesApi: {useGetNodesQuery: jest.fn()},
+}));
+jest.mock('../../../store/reducers/cluster/cluster', () => ({useClusterWithProxy: () => false}));
+jest.mock('../../../store/reducers/capabilities/hooks', () => ({
+    useCapabilitiesLoaded: () => true,
+    useViewerNodesHandlerHasGrouping: () => true,
+    useViewerNodesHandlerHasGroupingBySystemState: () => true,
+    useViewerNodesHandlerHasNetworkStats: () => false,
+    useViewerNodesAliveFilterAvailable: () => false,
+}));
+jest.mock('../../../utils/hooks', () => ({useAutoRefreshInterval: () => [0]}));
+jest.mock('../../../utils/hooks/useSelectedColumns', () => ({
+    useSelectedColumns: () => ({columnsToShow: [], columnsToSelect: [], setColumns: jest.fn()}),
+}));
+jest.mock('../../../utils/hooks/useIsUserAllowedToMakeChanges', () => ({
+    useIsViewerUser: () => true,
+}));
+
+const mockTable = jest.mocked(NodesTable);
+const mockQuery = jest.mocked(nodesApi.useGetNodesQuery);
+
+function setup(grouped = false) {
+    const history = createMemoryHistory({
+        initialIndex: 1,
+        initialEntries: [
+            '/cluster/nodes?search=a&database=one',
+            `/cluster/nodes?search=a&database=two${grouped ? '&nodesGroupBy=Host' : ''}`,
+        ],
+    });
+    render(
+        <Router history={history}>
+            <QueryParamProvider adapter={ReactRouter5Adapter}>
+                <PaginatedNodes
+                    scrollContainerRef={React.createRef<HTMLElement>()}
+                    groupByParams={['Host']}
+                    columns={[]}
+                    defaultColumnsIds={[]}
+                    requiredColumnsIds={[]}
+                    selectedColumnsKey="test"
+                />
+            </QueryParamProvider>
+        </Router>,
+    );
+    return {history, input: screen.getByRole('textbox')};
+}
+
+beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+    mockQuery.mockReturnValue({currentData: {tableGroups: []}, isFetching: false} as ReturnType<
+        typeof nodesApi.useGetNodesQuery
+    >);
+});
+afterEach(() => jest.useRealTimers());
+
+it.each([false, true])(
+    'updates the URL immediately and delays the data filter (grouped: %s)',
+    (grouped) => {
+        const {history, input} = setup(grouped);
+        fireEvent.change(input, {target: {value: 'abc'}});
+        expect(input).toHaveValue('abc');
+        expect(new URLSearchParams(history.location.search).get('search')).toBe('abc');
+        const expectFilter = (value: string) =>
+            grouped
+                ? expect(mockQuery).toHaveBeenLastCalledWith(
+                      expect.objectContaining({filter: value}),
+                      expect.any(Object),
+                  )
+                : expect(mockTable).toHaveBeenLastCalledWith(
+                      expect.objectContaining({searchValue: value}),
+                      {},
+                  );
+        act(() => jest.advanceTimersByTime(199));
+        expectFilter('a');
+        act(() => {
+            jest.advanceTimersByTime(1);
+            // A new keystroke arrives before the previous filter update commits.
+            fireEvent.change(input, {target: {value: 'abcd'}});
+        });
+        expect(input).toHaveValue('abcd');
+        expect(new URLSearchParams(history.location.search).get('search')).toBe('abcd');
+        expectFilter('abc');
+        act(() => jest.advanceTimersByTime(200));
+        expectFilter('abcd');
+    },
+);
+
+it('keeps the latest search through both grouping switches', () => {
+    const {history, input} = setup();
+    fireEvent.change(input, {target: {value: 'abc'}});
+    act(() =>
+        history.replace(`${history.location.pathname}${history.location.search}&nodesGroupBy=Host`),
+    );
+    const groupedInput = screen.getByRole('textbox');
+    expect(groupedInput).not.toBe(input);
+    expect(groupedInput).toHaveValue('abc');
+    expect(mockQuery).toHaveBeenLastCalledWith(
+        expect.objectContaining({filter: 'abc'}),
+        expect.any(Object),
+    );
+    fireEvent.change(groupedInput, {target: {value: 'abcd'}});
+    act(() => {
+        const params = new URLSearchParams(history.location.search);
+        params.delete('nodesGroupBy');
+        history.replace(`${history.location.pathname}?${params}`);
+    });
+    expect(screen.getByRole('textbox')).not.toBe(groupedInput);
+    expect(screen.getByRole('textbox')).toHaveValue('abcd');
+    act(() => jest.advanceTimersByTime(200));
+    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({searchValue: 'abcd'}), {});
+});
+
+it('restores the destination search on Back and Forward while filtering is pending', () => {
+    const {history, input} = setup();
+    fireEvent.change(input, {target: {value: 'abc'}});
+    act(() => history.goBack());
+    const destination = history.location.search;
+    expect(input).toHaveValue('a');
+    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({searchValue: 'a'}), {});
+    act(() => jest.advanceTimersByTime(200));
+    expect(history.location.search).toBe(destination);
+    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({searchValue: 'a'}), {});
+    fireEvent.change(input, {target: {value: 'other'}});
+    act(() => history.goForward());
+    const forwardUrl = history.location.search;
+    expect(input).toHaveValue('abc');
+    act(() => jest.advanceTimersByTime(200));
+    expect(history.location.search).toBe(forwardUrl);
+    expect(mockTable).toHaveBeenLastCalledWith(expect.objectContaining({searchValue: 'abc'}), {});
+});

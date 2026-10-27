@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import {Search} from '../Search';
@@ -10,6 +10,16 @@ describe('Search', () => {
 
     afterEach(() => {
         jest.useRealTimers();
+    });
+
+    it('calls onChange synchronously when debounce is zero', () => {
+        const onChange = jest.fn();
+        render(<Search debounce={0} value="" onChange={onChange} />);
+
+        fireEvent.change(screen.getByRole('textbox'), {target: {value: 'query'}});
+
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(onChange).toHaveBeenCalledWith('query');
     });
 
     it('preserves leading and trailing whitespace in the onChange value', async () => {
