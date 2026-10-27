@@ -32,7 +32,7 @@ describe('useDebouncedValue', () => {
         },
     );
 
-    it('keeps the pending callback when the value changes externally', () => {
+    it('cancels the pending callback when the value changes externally', () => {
         const onUpdate = jest.fn();
         const {result, rerender} = renderHook(({value}) => useDebouncedValue({value, onUpdate}), {
             initialProps: {value: 'a'},
@@ -41,10 +41,12 @@ describe('useDebouncedValue', () => {
         rerender({value: ''});
         expect(result.current[0]).toBe('');
         act(() => jest.runAllTimers());
+        expect(onUpdate).not.toHaveBeenCalled();
+
+        act(() => result.current[1]('new'));
+        act(() => jest.advanceTimersByTime(200));
         expect(onUpdate).toHaveBeenCalledTimes(1);
-        expect(onUpdate).toHaveBeenCalledWith('ab');
-        rerender({value: 'ab'});
-        expect(result.current[0]).toBe('ab');
+        expect(onUpdate).toHaveBeenCalledWith('new');
     });
 
     it('keeps the callback captured when typing', () => {
@@ -63,7 +65,7 @@ describe('useDebouncedValue', () => {
         expect(nextOnUpdate).not.toHaveBeenCalled();
     });
 
-    it('keeps the pending callback on unmount', () => {
+    it('cancels the pending callback on unmount', () => {
         const onUpdate = jest.fn();
         const {result, unmount} = renderHook(() =>
             useDebouncedValue<string>({value: '', onUpdate}),
@@ -71,7 +73,6 @@ describe('useDebouncedValue', () => {
         act(() => result.current[1]('query'));
         unmount();
         act(() => jest.runAllTimers());
-        expect(onUpdate).toHaveBeenCalledTimes(1);
-        expect(onUpdate).toHaveBeenCalledWith('query');
+        expect(onUpdate).not.toHaveBeenCalled();
     });
 });

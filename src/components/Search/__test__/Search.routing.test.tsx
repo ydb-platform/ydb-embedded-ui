@@ -100,12 +100,13 @@ describe.each([
                 </QueryParamProvider>
             </Router>
         );
-        const {rerender} = render(content(0));
+        const {rerender, unmount} = render(content(0));
         return {
             history,
             user,
             input: screen.getByRole('textbox'),
             refresh: () => rerender(content(1)),
+            unmount,
         };
     }
 
@@ -151,20 +152,41 @@ describe.each([
         expect(screen.getByRole('status').textContent).toBe(nextValue);
     });
 
-    it('accepts Back, Forward and external clearing', async () => {
+    it('cancels pending writes on Back, Forward and external clearing', async () => {
         const {history, user, input} = setup();
         await user.type(input, 'b');
-        act(() => jest.advanceTimersByTime(200));
-
         act(() => history.goBack());
+        expect(input).toHaveValue('previous');
+        const previousUrl = history.location.search;
+        act(() => jest.advanceTimersByTime(200));
+        expect(history.location.search).toBe(previousUrl);
         expect(input).toHaveValue('previous');
         expect(screen.getByRole('status')).toHaveTextContent(/^previous$/);
 
+        await user.type(input, 'next');
         act(() => history.goForward());
-        expect(input).toHaveValue('ab');
+        expect(input).toHaveValue('a');
+        const forwardUrl = history.location.search;
+        act(() => jest.advanceTimersByTime(200));
+        expect(history.location.search).toBe(forwardUrl);
+        expect(input).toHaveValue('a');
+
+        await user.type(input, 'b');
         act(() => history.replace(`/cluster/${page}`));
+        expect(input).toHaveValue('');
+        act(() => jest.advanceTimersByTime(200));
         expect(input).toHaveValue('');
         expect(screen.getByRole('status')).toBeEmptyDOMElement();
         expect(history.location.search).toBe('');
+    });
+
+    it('does not write to the next page after the search unmounts', async () => {
+        const {history, user, unmount} = setup();
+        await user.type(screen.getByRole('textbox'), 'b');
+        unmount();
+        history.push('/another-page?search=keep');
+        act(() => jest.advanceTimersByTime(200));
+        expect(history.location.pathname).toBe('/another-page');
+        expect(history.location.search).toBe('?search=keep');
     });
 });

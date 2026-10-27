@@ -26,6 +26,9 @@ export function useDebouncedValue<T extends string | number | null>({
             return;
         }
 
+        window.clearTimeout(timer.current);
+        timer.current = undefined;
+
         setCurrentValue((prevValue) => {
             if (prevValue !== value) {
                 return value;
@@ -34,6 +37,8 @@ export function useDebouncedValue<T extends string | number | null>({
             return prevValue;
         });
     }, [value]);
+
+    React.useEffect(() => () => window.clearTimeout(timer.current), []);
 
     const handleUpdate = (newValue: T) => {
         setCurrentValue(newValue);
