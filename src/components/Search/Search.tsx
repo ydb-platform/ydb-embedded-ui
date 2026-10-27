@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {TextInput} from '@gravity-ui/uikit';
 import type {TextInputProps} from '@gravity-ui/uikit';
+import {TextInput} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {DebouncedTextInput} from '../DebouncedInput/DebouncedTextInput';

@@ -15,10 +15,10 @@ export function useDebouncedValue<T extends string | number | null>({
     const [currentValue, setCurrentValue] = React.useState<T>(value);
 
     const timer = React.useRef<number>();
-    const submittedValue = React.useRef<{value: T}>();
+    const submittedValue = React.useRef<T>();
 
     React.useEffect(() => {
-        const isAcknowledgement = submittedValue.current?.value === value;
+        const isAcknowledgement = submittedValue.current === value;
         submittedValue.current = undefined;
 
         // Preserve a newer pending edit when the parent acknowledges an earlier one.
@@ -46,9 +46,7 @@ export function useDebouncedValue<T extends string | number | null>({
         window.clearTimeout(timer.current);
         timer.current = window.setTimeout(() => {
             timer.current = undefined;
-            submittedValue.current = {
-                value: normalizeValue ? normalizeValue(newValue) : newValue,
-            };
+            submittedValue.current = normalizeValue ? normalizeValue(newValue) : newValue;
             onUpdate?.(newValue);
         }, debounce);
     };

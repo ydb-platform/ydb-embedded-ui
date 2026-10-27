@@ -32,7 +32,6 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
         undefined, // We don't need use groupByParams yet
         false, // withPeerRoleFilter = false for this tab
     );
-
     const searchValue = useDebouncedSearch(rawSearchValue);
 
     const allColumns = React.useMemo(() => {
