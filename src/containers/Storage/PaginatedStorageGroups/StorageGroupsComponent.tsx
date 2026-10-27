@@ -19,8 +19,8 @@ export function StorageGroupsComponent({
     scrollContainerRef,
     initialEntitiesCount,
 }: PaginatedStorageProps) {
-    const {groupsSearchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();
-    const searchFilter = useDebouncedSearch(groupsSearchValue);
+    const {groupsSearchValue: rawGroupsSearchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();
+    const groupsSearchValue = useDebouncedSearch(rawGroupsSearchValue);
 
     const storageGroupsHandlerHasGrouping = useStorageGroupsHandlerHasGrouping();
 
@@ -52,7 +52,7 @@ export function StorageGroupsComponent({
                     nodeId={nodeId}
                     groupId={groupId}
                     pDiskId={pDiskId}
-                    searchValue={searchFilter}
+                    searchValue={groupsSearchValue}
                     visibleEntities={visibleEntities}
                     onShowAll={handleShowAllGroups}
                     scrollContainerRef={scrollContainerRef}
@@ -63,7 +63,7 @@ export function StorageGroupsComponent({
             }
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchFilter, visibleEntities],
+                scrollDependencies: [groupsSearchValue, visibleEntities],
             }}
         />
     );

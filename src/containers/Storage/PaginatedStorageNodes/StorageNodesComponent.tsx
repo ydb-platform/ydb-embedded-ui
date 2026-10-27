@@ -20,9 +20,9 @@ export function StorageNodesComponent({
     scrollContainerRef,
     initialEntitiesCount,
 }: PaginatedStorageProps) {
-    const {nodesSearchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
+    const {nodesSearchValue: rawNodesSearchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
         useStorageQueryParams();
-    const searchFilter = useDebouncedSearch(nodesSearchValue);
+    const nodesSearchValue = useDebouncedSearch(rawNodesSearchValue);
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
     const {hideUnavailable} = useHideUnavailableNodes();
@@ -59,7 +59,7 @@ export function StorageNodesComponent({
                     database={database}
                     nodeId={nodeId}
                     groupId={groupId}
-                    searchValue={searchFilter}
+                    searchValue={nodesSearchValue}
                     visibleEntities={visibleEntities}
                     nodesUptimeFilter={nodesUptimeFilter}
                     onShowAll={handleShowAllNodes}
@@ -74,7 +74,7 @@ export function StorageNodesComponent({
             tableWrapperProps={{
                 scrollContainerRef,
                 scrollDependencies: [
-                    searchFilter,
+                    nodesSearchValue,
                     visibleEntities,
                     nodesUptimeFilter,
                     hideUnavailable,

@@ -150,9 +150,9 @@ const TenantsTableContent = ({
 
     const {domain: domainRoot, settings} = useClusterBaseInfo();
 
-    const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
+    const {search: rawSearch, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
-    const searchFilter = useDebouncedSearch(search);
+    const search = useDebouncedSearch(rawSearch);
 
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count
@@ -169,10 +169,10 @@ const TenantsTableContent = ({
             filteredByProblems = filterTenantsByProblems(tenants, withProblems);
         }
 
-        const filteredBySearch = filterTenantsBySearch(filteredByProblems, searchFilter);
+        const filteredBySearch = filterTenantsBySearch(filteredByProblems, search);
 
         return filteredBySearch;
-    }, [tenants, withProblems, searchFilter, showWithProblemsFilter]);
+    }, [tenants, withProblems, search, showWithProblemsFilter]);
 
     const tenantLinks = React.useMemo(
         () =>
@@ -232,7 +232,7 @@ const TenantsTableContent = ({
                 <Search
                     debounce={0}
                     tableFilter
-                    value={search}
+                    value={rawSearch}
                     onChange={handleSearchChange}
                     placeholder="Database name"
                     className={b('search')}
@@ -480,7 +480,7 @@ const TenantsTableContent = ({
                 <TableWithControlsLayout.Table
                     scrollContainerRef={scrollContainerRef}
                     loading={loading}
-                    scrollDependencies={[searchFilter, withProblems, sortParams]}
+                    scrollDependencies={[search, withProblems, sortParams]}
                 >
                     <div>{currentData ? renderTable() : null}</div>
                 </TableWithControlsLayout.Table>

@@ -109,9 +109,9 @@ export function GroupedStorageNodesComponent({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {hideUnavailable} = useHideUnavailableNodes();
 
-    const {nodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
+    const {nodesSearchValue: rawNodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
         useStorageQueryParams();
-    const searchFilter = useDebouncedSearch(nodesSearchValue);
+    const nodesSearchValue = useDebouncedSearch(rawNodesSearchValue);
 
     const expertMode = useIsStorageExpertMode();
     const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings({
@@ -137,11 +137,11 @@ export function GroupedStorageNodesComponent({
             database,
             alive: hideUnavailable || undefined,
             with: 'all',
-            filter: searchFilter.trim(),
+            filter: nodesSearchValue.trim(),
             node_id: nodeId,
             group_id: groupId,
             group: storageNodesGroupByParam,
-            fieldsRequired: searchFilter.trim() ? searchFieldsRequired : undefined,
+            fieldsRequired: nodesSearchValue.trim() ? searchFieldsRequired : undefined,
         },
         {
             pollingInterval: autoRefreshInterval,
@@ -178,7 +178,7 @@ export function GroupedStorageNodesComponent({
                         database={database}
                         nodeId={nodeId}
                         groupId={groupId}
-                        searchValue={searchFilter}
+                        searchValue={nodesSearchValue}
                         visibleEntities="all"
                         filterGroupBy={storageNodesGroupByParam}
                         scrollContainerRef={scrollContainerRef}
@@ -219,7 +219,7 @@ export function GroupedStorageNodesComponent({
             initialState={initialState}
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchFilter, storageNodesGroupByParam, tableGroups],
+                scrollDependencies: [nodesSearchValue, storageNodesGroupByParam, tableGroups],
                 loading: isLoading,
                 className: b('groups-wrapper'),
             }}

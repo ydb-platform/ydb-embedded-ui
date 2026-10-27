@@ -28,12 +28,12 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
     const database = useDatabaseFromQuery();
     const isBridgeModeEnabled = useBridgeModeEnabled();
 
-    const {searchValue, handleSearchQueryChange} = useNodesPageQueryParams(
+    const {searchValue: rawSearchValue, handleSearchQueryChange} = useNodesPageQueryParams(
         undefined, // We don't need use groupByParams yet
         false, // withPeerRoleFilter = false for this tab
     );
 
-    const searchFilter = useDebouncedSearch(searchValue);
+    const searchValue = useDebouncedSearch(rawSearchValue);
 
     const allColumns = React.useMemo(() => {
         const columns = getNodeNetworkColumns({database});
@@ -57,7 +57,7 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
         <PaginatedTableWithLayout
             controls={
                 <NodeNetworkControlsWithTableState
-                    searchValue={searchValue}
+                    searchValue={rawSearchValue}
                     onSearchChange={handleSearchQueryChange}
                 />
             }
@@ -72,14 +72,14 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
             table={
                 <NodeNetworkTable
                     nodeId={nodeId}
-                    searchValue={searchFilter}
+                    searchValue={searchValue}
                     columns={columnsToShow}
                     scrollContainerRef={scrollContainerRef}
                 />
             }
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchFilter],
+                scrollDependencies: [searchValue],
             }}
             fullHeight
         />
