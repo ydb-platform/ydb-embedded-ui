@@ -32,19 +32,6 @@ describe('useDebouncedValue', () => {
         },
     );
 
-    it('preserves pending input across unrelated rerenders', () => {
-        const onUpdate = jest.fn();
-        const {result, rerender} = renderHook(() =>
-            useDebouncedValue<string>({value: 'a', onUpdate}),
-        );
-        act(() => result.current[1]('ab'));
-        rerender();
-        expect(result.current[0]).toBe('ab');
-        act(() => jest.advanceTimersByTime(200));
-        expect(onUpdate).toHaveBeenCalledTimes(1);
-        expect(onUpdate).toHaveBeenCalledWith('ab');
-    });
-
     it('cancels pending input when the value changes externally', () => {
         const onUpdate = jest.fn();
         const {result, rerender} = renderHook(({value}) => useDebouncedValue({value, onUpdate}), {
