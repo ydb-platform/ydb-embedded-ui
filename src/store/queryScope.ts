@@ -16,3 +16,7 @@ export function setQueryScope(scope: QueryScope) {
 export function getQueryScope(overrides?: QueryScope): QueryScope {
     return {backend, environment, clusterName, ...overrides};
 }
+
+export function getQueryScopeKey(scope: QueryScope) {
+    return JSON.stringify([scope.backend, scope.environment, scope.clusterName]);
+}

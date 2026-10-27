@@ -1,5 +1,7 @@
 import type {NodesRequestParams} from '../../../types/api/nodes';
 import type {GroupsRequestParams} from '../../../types/api/storage';
+import {getDatacenterQueryContext} from '../../datacenterQueryContext';
+import type {QueryScope} from '../../queryScope';
 import {api} from '../api';
 
 import {requestStorageData} from './requestStorageData';
@@ -8,13 +10,17 @@ import {prepareStorageNodesResponse} from './utils';
 export const storageApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getStorageNodesInfo: builder.query({
-            queryFn: async (params: Omit<NodesRequestParams, 'type'>, {signal}) => {
+            queryFn: async (
+                {scope, ...params}: Omit<NodesRequestParams, 'type'> & {scope?: QueryScope},
+                {signal, getState},
+            ) => {
+                const meta = getDatacenterQueryContext(getState, scope);
                 try {
                     const result = await window.api.viewer.getNodes(
                         {storage: true, type: 'static', ...params},
                         {signal},
                     );
-                    return {data: prepareStorageNodesResponse(result)};
+                    return {data: prepareStorageNodesResponse(result), meta};
                 } catch (error) {
                     return {error};
                 }

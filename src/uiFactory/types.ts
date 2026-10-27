@@ -46,7 +46,8 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
 
     /**
      * Permanent positive indexes keyed by the full uppercase DC name.
-     * Other DCs get local indexes after the registry's maximum, sorted by the full cluster list.
+     * Other DCs get session-local indexes after the registry's maximum as responses arrive.
+     * Existing assignments are retained; only newly received names are sorted.
      * Invalid indexes remain neutral.
      */
     datacenterColorIndexes?: DatacenterColorIndexes;

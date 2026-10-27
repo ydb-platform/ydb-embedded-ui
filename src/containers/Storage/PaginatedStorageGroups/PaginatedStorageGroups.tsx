@@ -6,7 +6,6 @@ import {
     useStorageGroupsHandlerHasGrouping,
 } from '../../../store/reducers/capabilities/hooks';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
-import {StorageDatacenterProvider} from '../StorageDatacenterProvider';
 import {useStorageQueryParams} from '../useStorageQueryParams';
 
 import {GroupedStorageGroupsComponent} from './GroupedStorageGroupsComponent';
@@ -37,9 +36,5 @@ export function PaginatedStorageGroups(props: PaginatedStorageProps) {
         return <StorageGroupsComponent {...props} />;
     };
 
-    return (
-        <LoaderWrapper loading={!capabilitiesLoaded}>
-            <StorageDatacenterProvider>{renderContent()}</StorageDatacenterProvider>
-        </LoaderWrapper>
-    );
+    return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
 }

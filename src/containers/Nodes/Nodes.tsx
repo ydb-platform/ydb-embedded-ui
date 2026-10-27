@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {DatacenterProvider} from '../../components/Datacenter/DatacenterProvider';
 import {
     NODES_COLUMNS_IDS,
     isMonitoringUserNodesColumn,
@@ -98,20 +97,18 @@ export function Nodes({
     }, [bridgeModeEnabled, groupByParams]);
 
     return (
-        <DatacenterProvider>
-            <PaginatedNodes
-                path={path}
-                databaseFullPath={databaseFullPath}
-                database={database}
-                scrollContainerRef={scrollContainerRef}
-                withPeerRoleFilter={withPeerRoleFilter}
-                columns={preparedColumns}
-                defaultColumnsIds={effectiveDefaultColumns}
-                requiredColumnsIds={requiredColumnsIds}
-                selectedColumnsKey={selectedColumnsKey}
-                groupByParams={effectiveGroupByParams}
-                onDataFetched={handleDataFetched}
-            />
-        </DatacenterProvider>
+        <PaginatedNodes
+            path={path}
+            databaseFullPath={databaseFullPath}
+            database={database}
+            scrollContainerRef={scrollContainerRef}
+            withPeerRoleFilter={withPeerRoleFilter}
+            columns={preparedColumns}
+            defaultColumnsIds={effectiveDefaultColumns}
+            requiredColumnsIds={requiredColumnsIds}
+            selectedColumnsKey={selectedColumnsKey}
+            groupByParams={effectiveGroupByParams}
+            onDataFetched={handleDataFetched}
+        />
     );
 }

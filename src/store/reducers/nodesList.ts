@@ -1,6 +1,7 @@
 import {createSelector} from '@reduxjs/toolkit';
 
 import {prepareNodesMap} from '../../utils/nodes';
+import {getDatacenterQueryContext} from '../datacenterQueryContext';
 import type {RootState} from '../defaultStore';
 import type {QueryScope} from '../queryScope';
 import {getQueryScope} from '../queryScope';
@@ -17,15 +18,16 @@ export const nodesListApi = api.injectEndpoints({
     endpoints: (build) => ({
         getNodesList: build.query({
             queryFn: async (
-                {database, include_storage: includeStorage}: NodesListQueryArgs,
-                {signal},
+                {database, include_storage: includeStorage, scope}: NodesListQueryArgs,
+                {signal, getState},
             ) => {
+                const meta = getDatacenterQueryContext(getState, scope);
                 try {
                     const data = await window.api.viewer.getNodesList(
                         {database, include_storage: includeStorage},
                         {signal},
                     );
-                    return {data};
+                    return {data, meta};
                 } catch (error) {
                     return {error};
                 }

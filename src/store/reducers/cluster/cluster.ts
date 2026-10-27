@@ -11,6 +11,7 @@ import {CLUSTER_DEFAULT_TITLE} from '../../../utils/constants';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {isQueryErrorResponse} from '../../../utils/query';
+import {getDatacenterQueryContext} from '../../datacenterQueryContext';
 import type {RootState} from '../../defaultStore';
 import type {QueryScope} from '../../queryScope';
 import {getQueryScope} from '../../queryScope';
@@ -74,8 +75,10 @@ export const clusterApi = api.injectEndpoints({
             },
             ClusterInfoQueryArgs
         >({
-            queryFn: async (args, {signal}) => {
-                const {clusterName} = getClusterInfoQueryScope(args);
+            queryFn: async (args, {signal, getState}) => {
+                const scope = getClusterInfoQueryScope(args);
+                const {clusterName} = scope;
+                const meta = getDatacenterQueryContext(getState, scope);
                 try {
                     const rawClusterData = await window.api.viewer.getClusterInfo(clusterName, {
                         signal,
@@ -85,7 +88,7 @@ export const clusterApi = api.injectEndpoints({
                     const clusterRoot = clusterData.Domain;
                     // Without domain we cannot get stats from system tables
                     if (!clusterRoot) {
-                        return {data: {clusterData}};
+                        return {data: {clusterData}, meta};
                     }
 
                     if (isClusterInfoV2(clusterData)) {
@@ -94,6 +97,7 @@ export const clusterApi = api.injectEndpoints({
                                 clusterData,
                                 groupsStats: getGroupStatsFromClusterInfo(clusterData),
                             },
+                            meta,
                         };
                     }
 
@@ -111,7 +115,7 @@ export const clusterApi = api.injectEndpoints({
                         });
 
                         if (isQueryErrorResponse(groupsStatsResponse)) {
-                            return {data: {clusterData}};
+                            return {data: {clusterData}, meta};
                         }
 
                         return {
@@ -119,9 +123,10 @@ export const clusterApi = api.injectEndpoints({
                                 clusterData,
                                 groupsStats: parseGroupsStatsQueryResponse(groupsStatsResponse),
                             },
+                            meta,
                         };
                     } catch {
-                        return {data: {clusterData}};
+                        return {data: {clusterData}, meta};
                     }
                 } catch (error) {
                     return {error};

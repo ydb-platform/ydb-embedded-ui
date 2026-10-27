@@ -7,8 +7,8 @@ import {
     getDatacenterColorVariant,
     normalizeDatacenter,
 } from '../../utils/datacenters';
+import {useDatacenterColorIndexes} from '../../utils/hooks/useDatacenterColorIndexes';
 
-import {useDatacenterColorIndexes} from './DatacenterContext';
 import i18n from './i18n';
 
 import './DatacenterLabel.scss';

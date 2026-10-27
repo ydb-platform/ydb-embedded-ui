@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {DatacenterProvider} from '../../../../../components/Datacenter/DatacenterProvider';
 import {getQueryScope} from '../../../../../store/queryScope';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
 import {getDatabaseDatacenters} from '../../../../../utils/datacenters';
@@ -28,9 +27,5 @@ export function DatabaseInfoWithDatacenters(props: DBInfoProps) {
         () => (currentData ? (getDatabaseDatacenters(currentData) ?? null) : undefined),
         [currentData],
     );
-    return (
-        <DatacenterProvider>
-            <DatabaseInfo {...props} datacenters={isError ? undefined : datacenters} />
-        </DatacenterProvider>
-    );
+    return <DatabaseInfo {...props} datacenters={isError ? undefined : datacenters} />;
 }

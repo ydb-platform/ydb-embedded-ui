@@ -29,12 +29,29 @@ function isClusterStoragePage(pathname: string) {
     return match?.params.activeTab === 'storage';
 }
 
+function isNodeStoragePage(pathname: string) {
+    const match = matchPath<{activeTab?: string}>(pathname, {path: routes.node, exact: true});
+    // The old "structure" route is redirected to Storage by the Node page.
+    return match?.params.activeTab === 'storage' || match?.params.activeTab === 'structure';
+}
+
+function isDiskStoragePage(pathname: string, activeTab?: string | null) {
+    if (matchPath(pathname, {path: routes.pDisk, exact: true})) {
+        return activeTab === 'storage';
+    }
+    // Storage is the default (and the invalid-value fallback) on the VDisk page.
+    return (
+        Boolean(matchPath(pathname, {path: routes.vDisk, exact: true})) && activeTab !== 'tablets'
+    );
+}
+
 export function useIsStoragePage() {
     const {pathname} = useLocation();
     const [query] = useQueryParams({
         databasePage: StringParam,
         tenantPage: StringParam,
         diagnosticsTab: StringParam,
+        activeTab: StringParam,
     });
     const initialPage = useTypedSelector((state) =>
         getSettingValue(state, SETTING_KEYS.TENANT_INITIAL_PAGE),
@@ -44,7 +61,9 @@ export function useIsStoragePage() {
     const page = tenantPageSchema.catch(defaultPage).parse(query.databasePage ?? query.tenantPage);
     return (
         isStoragePage(pathname, page, query.diagnosticsTab ?? diagnosticsTab) ||
-        isClusterStoragePage(pathname)
+        isClusterStoragePage(pathname) ||
+        isNodeStoragePage(pathname) ||
+        isDiskStoragePage(pathname, query.activeTab)
     );
 }
 

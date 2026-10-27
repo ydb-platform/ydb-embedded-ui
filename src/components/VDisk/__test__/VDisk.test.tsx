@@ -19,6 +19,10 @@ jest.mock('../../../utils/hooks/useNodesMap', () => ({
     useNodesMap: () => undefined,
 }));
 
+jest.mock('../../../utils/hooks/useDatacenterColorIndexes', () => ({
+    useDatacenterColorIndexes: () => undefined,
+}));
+
 jest.mock('../../../routes', () => ({
     useVDiskPagePath: () => () => '/vdisk',
 }));

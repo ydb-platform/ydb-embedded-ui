@@ -14,6 +14,7 @@ import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import type {NodesFilters} from '../../store/reducers/nodes/types';
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
+import {useDatacenterNodesFetcher} from '../../utils/hooks/useDatacenterNodesFetcher';
 import {useHideUnavailableNodes} from '../../utils/hooks/useHideUnavailableNodes';
 import {getIllustration} from '../../utils/illustrations';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
@@ -62,6 +63,7 @@ export function NodesTable({
     onDataFetched,
 }: NodesTableProps) {
     const history = useHistory();
+    const fetchNodes = useDatacenterNodesFetcher(getNodes);
     const {hideUnavailable} = useHideUnavailableNodes();
     const SuccessImage = getIllustration('SuccessOperation');
 
@@ -120,7 +122,7 @@ export function NodesTable({
                     ? ROW_HEIGHT_WITH_PDISKS
                     : undefined
             }
-            fetchData={getNodes}
+            fetchData={fetchNodes}
             initialEntitiesCount={initialEntitiesCount}
             renderErrorMessage={renderPaginatedTableErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}

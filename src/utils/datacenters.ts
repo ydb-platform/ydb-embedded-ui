@@ -70,9 +70,9 @@ export function getNodeDatacenterKey(node: Pick<TNodeInfo, 'SystemState' | 'Pile
     );
 }
 
-/** Local assignments depend only on the complete cluster set, never a page's filtered rows. */
+/** Extend existing assignments without renumbering previously encountered DCs. */
 export function createDatacenterColorIndexes(
-    names: readonly string[],
+    names: readonly (string | undefined)[],
     configuredIndexes: DatacenterColorIndexes = {},
 ): DatacenterColorIndexes {
     const normalized = names.map(normalizeDatacenter).filter((name) => name !== undefined);
@@ -81,8 +81,8 @@ export function createDatacenterColorIndexes(
         (max, index) => (Number.isInteger(index) && index > max ? index : max),
         0,
     );
-    // Preserve all configured assignments, including DCs absent from this cluster.
-    // Only names outside the registry get local indexes, after its maximum index.
+    // Preserve configured and accumulated assignments, including absent DCs.
+    // Sort only the new batch; later responses must not change earlier colors.
     for (const name of [...new Set(normalized)].sort()) {
         if (!Object.hasOwn(indexes, name)) {
             indexes[name] = ++lastIndex;
