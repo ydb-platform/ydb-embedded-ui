@@ -32,7 +32,7 @@ describe('useDebouncedValue', () => {
         },
     );
 
-    it('cancels pending input when the value changes externally', () => {
+    it('keeps the pending callback when the value changes externally', () => {
         const onUpdate = jest.fn();
         const {result, rerender} = renderHook(({value}) => useDebouncedValue({value, onUpdate}), {
             initialProps: {value: 'a'},
@@ -41,10 +41,13 @@ describe('useDebouncedValue', () => {
         rerender({value: ''});
         expect(result.current[0]).toBe('');
         act(() => jest.runAllTimers());
-        expect(onUpdate).not.toHaveBeenCalled();
+        expect(onUpdate).toHaveBeenCalledTimes(1);
+        expect(onUpdate).toHaveBeenCalledWith('ab');
+        rerender({value: 'ab'});
+        expect(result.current[0]).toBe('ab');
     });
 
-    it('uses the latest callback without restarting the debounce', () => {
+    it('keeps the callback captured when typing', () => {
         const onUpdate = jest.fn();
         const nextOnUpdate = jest.fn();
         const {result, rerender} = renderHook(
@@ -55,12 +58,12 @@ describe('useDebouncedValue', () => {
         act(() => jest.advanceTimersByTime(100));
         rerender({callback: nextOnUpdate});
         act(() => jest.advanceTimersByTime(100));
-        expect(onUpdate).not.toHaveBeenCalled();
-        expect(nextOnUpdate).toHaveBeenCalledTimes(1);
-        expect(nextOnUpdate).toHaveBeenCalledWith('query');
+        expect(onUpdate).toHaveBeenCalledTimes(1);
+        expect(onUpdate).toHaveBeenCalledWith('query');
+        expect(nextOnUpdate).not.toHaveBeenCalled();
     });
 
-    it('cancels pending updates on unmount', () => {
+    it('keeps the pending callback on unmount', () => {
         const onUpdate = jest.fn();
         const {result, unmount} = renderHook(() =>
             useDebouncedValue<string>({value: '', onUpdate}),
@@ -68,6 +71,7 @@ describe('useDebouncedValue', () => {
         act(() => result.current[1]('query'));
         unmount();
         act(() => jest.runAllTimers());
-        expect(onUpdate).not.toHaveBeenCalled();
+        expect(onUpdate).toHaveBeenCalledTimes(1);
+        expect(onUpdate).toHaveBeenCalledWith('query');
     });
 });
