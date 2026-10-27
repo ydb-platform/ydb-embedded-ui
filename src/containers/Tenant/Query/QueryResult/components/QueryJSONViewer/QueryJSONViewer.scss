@@ -2,7 +2,7 @@
     width: 100%;
     height: 100%;
     padding: var(--g-spacing-3) var(--g-spacing-6) var(--g-spacing-3) var(--g-spacing-4);
-    &_dark {
+    &_default-theme {
         --ydb-query-json-key: #9cdcfe;
         --ydb-query-json-string: #ce9178;
         --ydb-query-json-structure: #808080;

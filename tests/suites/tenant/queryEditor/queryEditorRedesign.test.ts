@@ -144,6 +144,109 @@ test.describe('Query editor redesign @query-editor-redesign', () => {
             .toBe('rgb(128, 128, 128)');
     });
 
+    test('Figma follow-up: disabled Stats uses result settings and opens settings without SQL', async ({
+        page,
+    }, testInfo) => {
+        const editor = await openEditor(page);
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
+        let requests = 0;
+        await page.route(queryUrl, (route) => {
+            requests++;
+            return route.fulfill({json: {result: makeResponse().result}});
+        });
+        await editor.clickGearButton();
+        await editor.settingsDialog.changeStatsLevel('none');
+        await editor.settingsDialog.clickButton(ButtonNames.Save);
+        await editor.run('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        await selectView(page, 'Stats');
+        await expect(page.getByText('Statistics not enabled', {exact: true})).toBeVisible();
+        await page.screenshot({path: testInfo.outputPath('statistics-not-enabled.png')});
+        await page.getByRole('button', {name: 'Open query settings', exact: true}).press('Enter');
+        await expect(page.locator('.ydb-query-settings-dialog')).toBeVisible();
+        expect(requests).toBe(1);
+        await editor.settingsDialog.changeStatsLevel('full');
+        await editor.settingsDialog.clickButton(ButtonNames.Save);
+        await expect(page.getByText('Statistics not enabled', {exact: true})).toBeVisible();
+        expect(requests).toBe(1);
+        await editor.run('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        await selectView(page, 'Stats');
+        await expect(page.getByText('Statistics not enabled', {exact: true})).toHaveCount(0);
+        await expect(
+            page.getByText('There is no Stats for the request', {exact: true}),
+        ).toBeVisible();
+    });
+
+    test('Figma follow-up: light JSON and Stats use the design palette', async ({
+        page,
+    }, testInfo) => {
+        await page.addInitScript(() => localStorage.setItem('theme', 'light'));
+        const editor = await openEditor(page);
+        await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
+        await analyze(editor);
+        await planViews(page).getByRole('radio', {name: 'JSON', exact: true}).check();
+        for (const section of ['JSON', 'Stats']) {
+            if (section === 'Stats') {
+                await selectView(page, 'Stats');
+            }
+            const viewer = page.locator('.ydb-query-json-viewer');
+            await expect(viewer.locator('.g-ru-cell__key').first()).toHaveCSS(
+                'color',
+                'rgb(156, 220, 254)',
+            );
+            await expect(viewer.locator('.g-ru-cell__value_type_string').first()).toHaveCSS(
+                'color',
+                'rgb(206, 145, 120)',
+            );
+            await expect(viewer.locator('.unipika').first()).toHaveCSS(
+                'color',
+                'rgb(128, 128, 128)',
+            );
+            await page.screenshot({
+                path: testInfo.outputPath(`${section.toLowerCase()}-light-palette.png`),
+            });
+        }
+    });
+
+    test('Figma follow-up: action and Stop widths remain fixed while loading', async ({page}) => {
+        const editor = await openEditor(page);
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
+        const run = page.getByRole('button', {name: 'Run', exact: true});
+        const analyzeButton = page.getByRole('button', {name: 'Explain Analyze', exact: true});
+        await expect(run).toHaveCSS('width', '72px');
+        await expect(analyzeButton).toHaveCSS('width', '115px');
+        let held: Route | undefined;
+        await page.route(queryUrl, (route) => {
+            held = route;
+        });
+        try {
+            await editor.run('SELECT 1;', 'query');
+            await expect.poll(() => Boolean(held)).toBe(true);
+            await expect(page.locator('.ydb-query-editor-button__stop-button')).toHaveCSS(
+                'width',
+                '72px',
+            );
+            await expect(analyzeButton).toHaveCSS('width', '115px');
+            await held?.fulfill({json: makeResponse()});
+            held = undefined;
+            await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+            await editor.explainAnalyze('SELECT 1;', 'query');
+            await expect.poll(() => Boolean(held)).toBe(true);
+            await expect(page.locator('.ydb-query-editor-button__stop-button')).toHaveCSS(
+                'width',
+                '115px',
+            );
+            await expect(run).toHaveCSS('width', '72px');
+        } finally {
+            await held?.fulfill({json: makeResponse()});
+        }
+        await page.mouse.move(0, 0);
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(run).toHaveCSS('width', '72px');
+        await expect(analyzeButton).toHaveCSS('width', '115px');
+    });
+
     test('visual contract: missing basic plan opens settings without executing', async ({
         page,
     }, testInfo) => {
@@ -502,7 +605,7 @@ test.describe('Query editor redesign @query-editor-redesign', () => {
                 if (width === 1280) {
                     await closeButton.click();
                 } else {
-                    await page.keyboard.press('Escape');
+                    await closeButton.press('Escape');
                 }
                 await expect(fullscreen).toHaveCount(0);
             }

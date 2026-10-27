@@ -19,7 +19,7 @@ export function QueryJSONViewer({data}: QueryJSONViewerProps) {
     const scrollRef = React.useRef<HTMLDivElement>(null);
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     return (
-        <div className={b({dark: theme === 'dark'})}>
+        <div className={b({'default-theme': theme === 'dark' || theme === 'light'})}>
             <div className={b('tree')} ref={scrollRef}>
                 <JsonViewer
                     value={data}

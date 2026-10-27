@@ -39,14 +39,14 @@ import {isQueryCancelledError} from '../utils/isQueryCancelledError';
 
 import {DiagnosticsButton} from './components/DiagnosticsButton/DiagnosticsButton';
 import {PlanSection} from './components/PlanSection/PlanSection';
-import {QueryPlanNotEnabled} from './components/QueryPlanNotEnabled/QueryPlanNotEnabled';
+import {QueryDataNotEnabled} from './components/QueryDataNotEnabled/QueryDataNotEnabled';
 import {QueryResultError} from './components/QueryResultError/QueryResultError';
 import {ResultSetsViewer} from './components/ResultSetsViewer/ResultSetsViewer';
 import {TraceButton} from './components/TraceButton/TraceButton';
 import type {SectionID} from './constants';
 import {RESULT_OPTIONS_IDS, getResultSections, resolveResultSection} from './constants';
 import i18n from './i18n';
-import {getResultRowsPerSecond, isQueryPlanNotEnabled} from './utils';
+import {getResultRowsPerSecond, isQueryPlanNotEnabled, isStatisticsNotEnabled} from './utils';
 
 import './QueryResultViewer.scss';
 
@@ -302,9 +302,16 @@ export function QueryResultViewer({
             return <QueryResultError error={error} sourcePosition={result.sourcePosition} />;
         }
 
-        if (activeSection === RESULT_OPTIONS_IDS.queryPlan && isQueryPlanNotEnabled(result)) {
+        const planNotEnabled =
+            activeSection === RESULT_OPTIONS_IDS.queryPlan && isQueryPlanNotEnabled(result);
+        const statisticsNotEnabled =
+            activeSection === RESULT_OPTIONS_IDS.stats && isStatisticsNotEnabled(result);
+        if (planNotEnabled || statisticsNotEnabled) {
             return (
-                <QueryPlanNotEnabled onOpenSettings={() => dispatch(setQueryAction('settings'))} />
+                <QueryDataNotEnabled
+                    kind={planNotEnabled ? 'plan' : 'stats'}
+                    onOpenSettings={() => dispatch(setQueryAction('settings'))}
+                />
             );
         }
 

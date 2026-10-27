@@ -509,7 +509,7 @@ test.describe('Test Query Editor', async () => {
 
         await queryEditor.setQuery(simpleQuery);
         const runButton = queryEditor.getQueryActionButton(ButtonNames.Run);
-        await expectLocatorWidth(runButton, 76);
+        await expectLocatorWidth(runButton, 72);
         const runButtonWidth = await getLocatorWidth(runButton);
         const queryActionsWidth = await getLocatorWidth(queryEditor.getQueryActionsLocator());
         await queryEditor.clickRunButton();
@@ -579,7 +579,7 @@ test.describe('Test Query Editor', async () => {
             const explainAnalyzeButton = queryEditor.getQueryActionButton(
                 ButtonNames.ExplainAnalyze,
             );
-            await expectLocatorWidth(explainAnalyzeButton, 111);
+            await expectLocatorWidth(explainAnalyzeButton, 115);
             const explainAnalyzeButtonWidth = await getLocatorWidth(explainAnalyzeButton);
             const queryActionsWidth = await getLocatorWidth(queryEditor.getQueryActionsLocator());
 

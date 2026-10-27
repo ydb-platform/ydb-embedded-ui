@@ -33,18 +33,28 @@ export function getResultRowsPerSecond(result: QueryResult): number | undefined 
     return Number.isFinite(rate) ? rate : undefined;
 }
 
-export function isQueryPlanNotEnabled(result: QueryResult): boolean {
-    const {data, error, isLoading, statisticsMode, type} = result;
+function isCompletedRun(result: QueryResult): boolean {
     return Boolean(
-        !error &&
-            !isLoading &&
+        !result.error &&
+            !result.isLoading &&
             !result.streamingStatus &&
             result.endTime &&
-            type === 'execute' &&
-            (statisticsMode === 'none' || statisticsMode === 'basic') &&
-            !data?.plan &&
-            !data?.preparedPlan?.pristine &&
-            !data?.preparedPlan?.nodes?.length &&
-            !data?.simplifiedPlan?.plan?.length,
+            result.type === 'execute',
     );
+}
+
+export function isQueryPlanNotEnabled(result: QueryResult): boolean {
+    const {data, statisticsMode} = result;
+    return (
+        isCompletedRun(result) &&
+        (statisticsMode === 'none' || statisticsMode === 'basic') &&
+        !data?.plan &&
+        !data?.preparedPlan?.pristine &&
+        !data?.preparedPlan?.nodes?.length &&
+        !data?.simplifiedPlan?.plan?.length
+    );
+}
+
+export function isStatisticsNotEnabled(result: QueryResult): boolean {
+    return isCompletedRun(result) && result.statisticsMode === 'none' && !result.data?.stats;
 }
