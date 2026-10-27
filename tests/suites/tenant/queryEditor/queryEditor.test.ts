@@ -1394,7 +1394,9 @@ test.describe('Test Query Editor', async () => {
     });
 
     test.describe('Statistics Modes Tests', async () => {
-        test('Stats tab shows no stats message when STATISTICS_MODES.none', async ({page}) => {
+        test('Stats tab explains disabled statistics when STATISTICS_MODES.none @query-editor-redesign', async ({
+            page,
+        }) => {
             const queryEditor = new QueryEditor(page);
 
             // Set query and configure statistics mode to none
@@ -1409,10 +1411,18 @@ test.describe('Test Query Editor', async () => {
 
             // Check Stats tab content
             const statsContent = await queryEditor.getStatsTabContent();
-            expect(statsContent).toContain('There is no Stats for the request');
+            expect(statsContent).toContain('Statistics not enabled');
+            expect(statsContent).toContain(
+                'Select Basic or Full mode for statistics collection in query settings',
+            );
+            await expect(
+                page.getByRole('button', {name: 'Open query settings', exact: true}),
+            ).toBeVisible();
         });
 
-        test('Stats tab shows JSON viewer when STATISTICS_MODES.basic', async ({page}) => {
+        test('Stats tab shows JSON viewer when STATISTICS_MODES.basic @query-editor-redesign', async ({
+            page,
+        }) => {
             const queryEditor = new QueryEditor(page);
 
             // Set query and configure statistics mode to basic
