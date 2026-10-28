@@ -5,8 +5,6 @@ import type {DatacenterColorIndexes} from '../../utils/datacenters';
 import {createDatacenterColorIndexes, getDatacenterKey} from '../../utils/datacenters';
 import type {DatacenterQueryContext} from '../datacenterQueryContext';
 import {getDatacenterQueryContext} from '../datacenterQueryContext';
-import type {QueryScope} from '../queryScope';
-import {getQueryScopeKey} from '../queryScope';
 
 import {setIsAuthenticated} from './authentication/authentication';
 import {clusterApi} from './cluster/cluster';
@@ -15,7 +13,7 @@ import {nodesListApi} from './nodesList';
 import {storageApi} from './storage/storage';
 
 export interface DatacentersState {
-    indexesByScope: Record<string, DatacenterColorIndexes>;
+    indexes: DatacenterColorIndexes;
     generation: number;
 }
 
@@ -23,21 +21,20 @@ interface RegisterDatacentersPayload extends DatacenterQueryContext {
     names: readonly (string | undefined)[];
 }
 
-const initialState: DatacentersState = {indexesByScope: {}, generation: 0};
+const initialState: DatacentersState = {indexes: {}, generation: 0};
 
 function registerDatacenters(state: DatacentersState, payload: RegisterDatacentersPayload) {
     if (payload.generation !== state.generation) {
         return state;
     }
-    const key = getQueryScopeKey(payload.scope);
-    const current = state.indexesByScope[key];
+    const current = state.indexes;
     const indexes = createDatacenterColorIndexes(payload.names, {
         ...current,
         ...payload.configuredIndexes,
     });
     // Polling and duplicate batches should not invalidate every color selector.
-    if (Object.keys(indexes).some((name) => current?.[name] !== indexes[name])) {
-        return {...state, indexesByScope: {...state.indexesByScope, [key]: indexes}};
+    if (Object.keys(indexes).some((name) => current[name] !== indexes[name])) {
+        return {...state, indexes};
     }
     return state;
 }
@@ -45,7 +42,6 @@ function registerDatacenters(state: DatacentersState, payload: RegisterDatacente
 function registerQueryDatacenters(
     state: DatacentersState,
     meta: unknown,
-    scope: QueryScope | undefined,
     names: readonly (string | undefined)[] = [],
 ) {
     // These endpoints attach this snapshot before the request starts. Cache-only
@@ -56,8 +52,6 @@ function registerQueryDatacenters(
     }
     return registerDatacenters(state, {
         ...context,
-        // Prefer original arguments; keep the captured defaults for legacy callers.
-        scope: {...context.scope, ...scope},
         names,
     });
 }
@@ -74,7 +68,7 @@ const datacentersSlice = createSlice({
         builder.addCase(setIsAuthenticated, (state, {payload}) => {
             if (!payload) {
                 // Ignore responses from requests started before logout.
-                return {indexesByScope: {}, generation: state.generation + 1};
+                return {indexes: {}, generation: state.generation + 1};
             }
             return state;
         });
@@ -82,7 +76,6 @@ const datacentersSlice = createSlice({
             registerQueryDatacenters(
                 state,
                 action.meta.baseQueryMeta,
-                action.meta.arg.originalArgs.scope,
                 action.payload?.map((node) =>
                     getDatacenterKey(node.Location, node.PhysicalLocation?.DataCenterId),
                 ),
@@ -92,7 +85,6 @@ const datacentersSlice = createSlice({
             registerQueryDatacenters(
                 state,
                 action.meta.baseQueryMeta,
-                action.meta.arg.originalArgs.scope,
                 action.payload?.nodes?.map((node) => node.DCKey),
             ),
         );
@@ -102,30 +94,30 @@ const datacentersSlice = createSlice({
                 registerQueryDatacenters(
                     state,
                     action.meta.baseQueryMeta,
-                    action.meta.arg.originalArgs.scope,
                     action.payload?.nodes?.map((node) => node.DCKey),
                 ),
         );
-        builder.addMatcher(clusterApi.endpoints.getClusterInfo.matchFulfilled, (state, action) => {
-            const args = action.meta.arg.originalArgs;
-            return registerQueryDatacenters(
+        builder.addMatcher(clusterApi.endpoints.getClusterInfo.matchFulfilled, (state, action) =>
+            registerQueryDatacenters(
                 state,
                 action.meta.baseQueryMeta,
-                typeof args === 'object' ? args : {clusterName: args},
                 action.payload.clusterData.DataCenters,
-            );
-        });
+            ),
+        );
     },
 });
 
 export default datacentersSlice.reducer;
 
-/** Capture the request's cluster and session before awaiting its response. */
-export function createDatacenterRegistrar(
-    {dispatch, getState}: {dispatch: Dispatch; getState: () => unknown},
-    scope?: QueryScope,
-) {
-    const context = getDatacenterQueryContext(getState, scope);
+/** Capture the session before awaiting the response. */
+export function createDatacenterRegistrar({
+    dispatch,
+    getState,
+}: {
+    dispatch: Dispatch;
+    getState: () => unknown;
+}) {
+    const context = getDatacenterQueryContext(getState);
     return (names: readonly (string | undefined)[] = []) => {
         dispatch(
             datacentersSlice.actions.registerDatacenters({

@@ -3,21 +3,18 @@ import {createSelector} from '@reduxjs/toolkit';
 import {prepareNodesMap} from '../../utils/nodes';
 import {getDatacenterQueryContext} from '../datacenterQueryContext';
 import type {RootState} from '../defaultStore';
-import type {QueryScope} from '../queryScope';
-import {getQueryScope} from '../queryScope';
 
 import {api} from './api';
 
 export interface NodesListQueryArgs {
     database?: string;
-    scope?: QueryScope;
 }
 
 export const nodesListApi = api.injectEndpoints({
     endpoints: (build) => ({
         getNodesList: build.query({
-            queryFn: async ({database, scope}: NodesListQueryArgs, {signal, getState}) => {
-                const meta = getDatacenterQueryContext(getState, scope);
+            queryFn: async ({database}: NodesListQueryArgs, {signal, getState}) => {
+                const meta = getDatacenterQueryContext(getState);
                 try {
                     const data = await window.api.viewer.getNodesList({database}, {signal});
                     return {data, meta};
@@ -25,11 +22,6 @@ export const nodesListApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            serializeQueryArgs: ({queryArgs}) => ({
-                ...getQueryScope(queryArgs.scope),
-                database: queryArgs.database,
-            }),
-            providesTags: ['All'],
         }),
     }),
     overrideExisting: 'throw',
@@ -37,22 +29,10 @@ export const nodesListApi = api.injectEndpoints({
 
 const createGetNodesListSelector = createSelector(
     (database: string | undefined) => database,
-    (_database: string | undefined, scope: QueryScope) => scope.backend,
-    (_database: string | undefined, scope: QueryScope) => scope.environment,
-    (_database: string | undefined, scope: QueryScope) => scope.clusterName,
-    (database, backend, environment, clusterName) =>
-        nodesListApi.endpoints.getNodesList.select({
-            database,
-            scope: {backend, environment, clusterName},
-        }),
+    (database) => nodesListApi.endpoints.getNodesList.select({database}),
 );
 
-const selectScopedNodesMap = createSelector(
-    (state: RootState, database: string | undefined, scope: QueryScope) =>
-        createGetNodesListSelector(database, scope)(state).data,
+export const selectNodesMap = createSelector(
+    (state: RootState, database?: string) => createGetNodesListSelector(database)(state).data,
     prepareNodesMap,
 );
-
-export function selectNodesMap(state: RootState, database?: string) {
-    return selectScopedNodesMap(state, database, getQueryScope());
-}

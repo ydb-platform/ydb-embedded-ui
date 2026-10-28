@@ -13,8 +13,6 @@ import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChange
 import {isQueryErrorResponse} from '../../../utils/query';
 import {getDatacenterQueryContext} from '../../datacenterQueryContext';
 import type {RootState} from '../../defaultStore';
-import type {QueryScope} from '../../queryScope';
-import {getQueryScope} from '../../queryScope';
 import {api} from '../api';
 import {getClusterDataTag} from '../entityDataTags';
 import {selectNodesMap} from '../nodesList';
@@ -60,12 +58,6 @@ export function updateDefaultClusterTab(tab: string) {
 
 export default clusterSlice.reducer;
 
-type ClusterInfoQueryArgs = string | undefined | QueryScope;
-
-function getClusterInfoQueryScope(args: ClusterInfoQueryArgs) {
-    return getQueryScope(typeof args === 'object' ? args : {clusterName: args});
-}
-
 export const clusterApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getClusterInfo: builder.query<
@@ -73,12 +65,10 @@ export const clusterApi = api.injectEndpoints({
                 clusterData: TClusterInfo;
                 groupsStats?: ClusterGroupsStats;
             },
-            ClusterInfoQueryArgs
+            string | undefined
         >({
-            queryFn: async (args, {signal, getState}) => {
-                const scope = getClusterInfoQueryScope(args);
-                const {clusterName} = scope;
-                const meta = getDatacenterQueryContext(getState, scope);
+            queryFn: async (clusterName, {signal, getState}) => {
+                const meta = getDatacenterQueryContext(getState);
                 try {
                     const rawClusterData = await window.api.viewer.getClusterInfo(clusterName, {
                         signal,
@@ -132,11 +122,7 @@ export const clusterApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            serializeQueryArgs: ({queryArgs}) => getClusterInfoQueryScope(queryArgs),
-            providesTags: (_result, _error, args) => [
-                'All',
-                getClusterDataTag(getClusterInfoQueryScope(args).clusterName),
-            ],
+            providesTags: (_result, _error, clusterName) => ['All', getClusterDataTag(clusterName)],
         }),
         getClusterBaseInfo: builder.query({
             queryFn: async (clusterName: string, {signal}) => {
@@ -224,16 +210,15 @@ type ClusterBaseInfo = ReturnType<typeof useClusterBaseInfo>;
 export type ClusterInfo = Omit<ClusterBaseInfo, 'isError' | 'isResolved'>;
 
 const createClusterInfoSelector = createSelector(
-    (clusterName: string | undefined) => clusterName,
-    (_clusterName: string | undefined, scope: QueryScope) => scope.backend,
-    (_clusterName: string | undefined, scope: QueryScope) => scope.environment,
-    (clusterName, backend, environment) =>
-        clusterApi.endpoints.getClusterInfo.select({clusterName, backend, environment}),
+    (clusterName?: string) => clusterName,
+    (clusterName) => clusterApi.endpoints.getClusterInfo.select(clusterName),
 );
 
-function selectClusterInfo(state: RootState, clusterName?: string) {
-    return createClusterInfoSelector(clusterName, getQueryScope())(state).data;
-}
+const selectClusterInfo = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, clusterName?: string) => createClusterInfoSelector(clusterName),
+    (state, selectGetClusterInfo) => selectGetClusterInfo(state).data,
+);
 
 export const selectClusterTitle = createSelector(
     (_state: RootState, clusterName?: string) => clusterName,
