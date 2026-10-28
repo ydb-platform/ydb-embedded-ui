@@ -1,12 +1,11 @@
 import React from 'react';
 
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
-import {SearchProvider} from '../../../components/Search/SearchProvider';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useBridgeModeEnabled} from '../../../store/reducers/capabilities/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
-import {nodesQueryParamConfig, useNodesPageQueryParams} from '../../Nodes/useNodesPageQueryParams';
+import {useNodesPageQueryParams} from '../../Nodes/useNodesPageQueryParams';
 
 import {NodeNetworkControlsWithTableState} from './NodeNetworkControls/NodeNetworkControlsWithTableState';
 import {NodeNetworkTable} from './NodeNetworkTable';
@@ -54,17 +53,10 @@ export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
     return (
         <PaginatedTableWithLayout
             controls={
-                <SearchProvider
-                    value={searchValue}
-                    onChange={handleSearchQueryChange}
-                    queryParamConfig={nodesQueryParamConfig}
-                    resetKey={JSON.stringify([nodeId, database, window.api.viewer.getPath('')])}
-                >
-                    <NodeNetworkControlsWithTableState
-                        searchValue={searchValue}
-                        onSearchChange={handleSearchQueryChange}
-                    />
-                </SearchProvider>
+                <NodeNetworkControlsWithTableState
+                    searchValue={searchValue}
+                    onSearchChange={handleSearchQueryChange}
+                />
             }
             extraControls={
                 <TableColumnSetup

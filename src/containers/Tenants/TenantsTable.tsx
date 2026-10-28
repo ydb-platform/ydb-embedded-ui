@@ -13,7 +13,6 @@ import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProblemFilter} from '../../components/ProblemFilter/ProblemFilter';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
-import {SearchProvider} from '../../components/Search/SearchProvider';
 import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
@@ -57,7 +56,7 @@ import {
     DATABASES_SELECTED_COLUMNS_KEY,
 } from './constants';
 import i18n from './i18n';
-import {tenantsQueryParamConfig, useTenantsQueryParams} from './useTenantsQueryParams';
+import {useTenantsQueryParams} from './useTenantsQueryParams';
 
 import './Tenants.scss';
 
@@ -228,30 +227,13 @@ const TenantsTableContent = ({
     const renderControls = () => {
         return (
             <React.Fragment>
-                <SearchProvider
+                <Search
+                    tableFilter
                     value={search}
                     onChange={handleSearchChange}
-                    queryParamConfig={tenantsQueryParamConfig}
-                    resetKey={JSON.stringify([
-                        clusterName,
-                        environmentName,
-                        isMetaDatabasesAvailable,
-                        window.api.meta
-                            ? window.api.meta.getPath(
-                                  '',
-                                  isMetaDatabasesAvailable ? clusterName : undefined,
-                              )
-                            : window.api.viewer.getPath(''),
-                    ])}
-                >
-                    <Search
-                        tableFilter
-                        value={search}
-                        onChange={handleSearchChange}
-                        placeholder="Database name"
-                        className={b('search')}
-                    />
-                </SearchProvider>
+                    placeholder="Database name"
+                    className={b('search')}
+                />
                 {showWithProblemsFilter ? (
                     <ProblemFilter value={withProblems} onChange={handleWithProblemsChange} />
                 ) : null}

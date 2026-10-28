@@ -1,7 +1,18 @@
-import {fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {createMemoryHistory} from 'history';
+import {Router} from 'react-router-dom';
+import {QueryParamProvider, StringParam, useQueryParam} from 'use-query-params';
+import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 
 import {Search} from '../Search';
+
+function SearchWithQueryParam() {
+    const [value, setValue] = useQueryParam('search', StringParam);
+    return (
+        <Search tableFilter value={value ?? ''} onChange={(next) => setValue(next, 'replaceIn')} />
+    );
+}
 
 describe('Search', () => {
     beforeEach(() => {
@@ -10,6 +21,31 @@ describe('Search', () => {
 
     afterEach(() => {
         jest.useRealTimers();
+    });
+
+    it('keeps newer input while the debounced URL update arrives', () => {
+        const history = createMemoryHistory({initialEntries: ['/?search=a']});
+        render(
+            <Router history={history}>
+                <QueryParamProvider adapter={ReactRouter5Adapter}>
+                    <SearchWithQueryParam />
+                </QueryParamProvider>
+            </Router>,
+        );
+        const input = screen.getByRole('textbox');
+
+        fireEvent.change(input, {target: {value: 'ab'}});
+        expect(input).toHaveValue('ab');
+        expect(history.location.search).toBe('?search=a');
+        act(() => {
+            jest.advanceTimersByTime(200);
+            fireEvent.change(input, {target: {value: 'abc'}});
+        });
+        expect(input).toHaveValue('abc');
+        expect(history.location.search).toBe('?search=ab');
+        act(() => jest.advanceTimersByTime(200));
+        expect(input).toHaveValue('abc');
+        expect(history.location.search).toBe('?search=abc');
     });
 
     it('calls onChange synchronously when debounce is zero', () => {

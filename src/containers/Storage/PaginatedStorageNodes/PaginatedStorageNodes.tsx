@@ -1,14 +1,13 @@
 import React from 'react';
 
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
-import {SearchProvider} from '../../../components/Search/SearchProvider';
 import {
     useCapabilitiesLoaded,
     useViewerNodesHandlerHasGrouping,
 } from '../../../store/reducers/capabilities/hooks';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
-import {storageQueryParamConfig, useStorageQueryParams} from '../useStorageQueryParams';
+import {useStorageQueryParams} from '../useStorageQueryParams';
 
 import {GroupedStorageNodesComponent} from './GroupedStorageNodesComponent';
 import {StorageNodesComponent} from './StorageNodesComponent';
@@ -16,10 +15,8 @@ import {StorageNodesComponent} from './StorageNodesComponent';
 import '../Storage.scss';
 
 export function PaginatedStorageNodes(props: PaginatedStorageProps) {
-    const queryParams = useStorageQueryParams();
     const {storageNodesGroupByParam, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
-        queryParams;
-    const {nodesSearchValue, handleTextFilterNodesChange} = queryParams;
+        useStorageQueryParams();
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
@@ -43,19 +40,5 @@ export function PaginatedStorageNodes(props: PaginatedStorageProps) {
         return <StorageNodesComponent {...props} />;
     };
 
-    return (
-        <SearchProvider
-            value={nodesSearchValue}
-            onChange={handleTextFilterNodesChange}
-            queryParamConfig={storageQueryParamConfig}
-            resetKey={JSON.stringify([
-                props.database,
-                props.nodeId,
-                props.groupId,
-                window.api.viewer.getPath(''),
-            ])}
-        >
-            <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>
-        </SearchProvider>
-    );
+    return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
 }

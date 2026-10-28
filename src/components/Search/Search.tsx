@@ -7,8 +7,6 @@ import {cn} from '../../utils/cn';
 import {DebouncedTextInput} from '../DebouncedInput/DebouncedTextInput';
 import {useTableSearch} from '../TableKeyboardNavigation/TableKeyboardNavigation';
 
-import {SearchContext} from './SearchProvider';
-
 import './Search.scss';
 
 const b = cn('ydb-search');
@@ -32,8 +30,6 @@ export const Search = ({
     tableFilter = false,
     ...props
 }: SearchProps) => {
-    const sharedSearch = React.useContext(SearchContext);
-    const draftState = tableFilter && debounce === undefined ? sharedSearch : undefined;
     const ownRef = React.useRef<HTMLInputElement>(null);
     const controlRef = inputRef ?? ownRef;
     useTableSearch(controlRef, tableFilter, value);
@@ -45,18 +41,18 @@ export const Search = ({
         [onChange],
     );
 
-    const Input = draftState || debounce === 0 ? TextInput : DebouncedTextInput;
+    const Input = debounce === 0 ? TextInput : DebouncedTextInput;
 
     return (
         <Input
-            {...(draftState || debounce === 0 ? {} : {debounce})}
+            {...(debounce === 0 ? {} : {debounce})}
             hasClear
             autoFocus
             controlRef={controlRef}
             style={{width}}
             className={b(null, className)}
-            value={draftState?.[0] ?? value}
-            onUpdate={draftState?.[1] ?? onUpdate}
+            value={value}
+            onUpdate={onUpdate}
             {...props}
         />
     );
