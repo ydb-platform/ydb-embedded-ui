@@ -929,6 +929,87 @@ test.describe('Capacity alert popup palette', () => {
     }
 });
 
+test.describe('Datacenter storage screenshots', () => {
+    for (const theme of ['light', 'dark']) {
+        test(`colors both disk types and the legend in ${theme} theme`, async ({page}) => {
+            const response = createMockStorageGroupsResponse();
+            const group = response.StorageGroups?.[0];
+            if (!group?.VDisks) {
+                throw new Error('The storage fixture must contain a group with disks');
+            }
+            const originalDisks = group.VDisks;
+            const disks = [7, 8, ALL_GREEN_VDISK_INDEX].map((index) => originalDisks[index]);
+            group.VDisks = disks;
+            response.StorageGroups = [group];
+            response.TotalGroups = response.FoundGroups = 1;
+            const nodeList = disks.map((disk, index) => ({
+                Id: disk.NodeId,
+                Host: `dc-storage-node-${index + 1}`,
+                Location: {DataCenter: ['dc-a', 'DC-B', undefined][index]},
+            }));
+            await setupVDiskColoringMocks(page, response);
+            await page.route('**/viewer/json/nodelist?*', (route) => {
+                expect(new URL(route.request().url()).searchParams.get('include_storage')).toBe(
+                    'true',
+                );
+                return route.fulfill({json: nodeList});
+            });
+            await page.route('**/viewer/json/cluster?*', (route) =>
+                route.fulfill({json: {DataCenters: ['DC-A', 'DC-B']}}),
+            );
+            await page.addInitScript((value) => {
+                localStorage.setItem('theme', value);
+                localStorage.setItem('enableStorageExpertMode', 'true');
+                localStorage.setItem('storageExpertMode', 'true');
+                localStorage.setItem('storagePDisksGroupBy', JSON.stringify('DC'));
+                localStorage.setItem(
+                    'storageGroupsSelectedColumns',
+                    JSON.stringify([
+                        {id: 'GroupId', selected: true},
+                        {id: 'VDisksPDisks', selected: true},
+                    ]),
+                );
+            }, theme);
+            await page.setViewportSize({width: 1400, height: 700});
+            await gotoStoragePage(page, VDisksGroupBy.Datacenter);
+
+            const row = getStorageGroupRow(page, 0);
+            for (const items of [
+                getVDiskItems(row),
+                row.locator('.ydb-storage-disks__pdisk-item'),
+            ]) {
+                const links = items.getByRole('link');
+                await expect(links).toHaveText(['DC-A', 'DC-B', 'Unknown']);
+                for (const [index, color] of ['turquoise', 'purple', 'neutral'].entries()) {
+                    await expect(
+                        links.nth(index).locator('.storage-disk-progress-bar'),
+                    ).toHaveClass(new RegExp(`ydb-datacenter-color_color_${color}`));
+                }
+            }
+            const legend = page.getByTestId('storage-pdisks-expert-mode-legend');
+            await expect(legend.locator('.ydb-datacenter-label')).toHaveText([
+                'DC-A',
+                'DC-B',
+                'Unknown',
+            ]);
+            const panel = page.locator('.ydb-storage-expert-mode-panel');
+            const panelBox = await panel.boundingBox();
+            const rowBox = await row.boundingBox();
+            if (!panelBox || !rowBox) {
+                throw new Error('The datacenter legend and storage group must be visible');
+            }
+            await expect(page).toHaveScreenshot(`storage-datacenters-${theme}.png`, {
+                clip: {
+                    x: panelBox.x,
+                    y: panelBox.y,
+                    width: panelBox.width,
+                    height: rowBox.y + rowBox.height - panelBox.y,
+                },
+            });
+        });
+    }
+});
+
 test.describe('Drive type - groups expert mode', () => {
     for (const theme of ['light', 'dark']) {
         test(`shows drive types and preserves group-only selection in ${theme} theme`, async ({
