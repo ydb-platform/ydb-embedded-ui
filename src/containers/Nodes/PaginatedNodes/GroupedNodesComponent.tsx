@@ -23,7 +23,6 @@ import {NodesControls} from '../NodesControls/NodesControls';
 import {NodesTable} from '../NodesTable';
 import i18n from '../i18n';
 import {b} from '../shared';
-import {useDebouncedSearch} from '../useDebouncedSearch';
 import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
 
 interface NodeGroupProps {
@@ -125,7 +124,6 @@ export function GroupedNodesComponent({
         groupByParams,
         withPeerRoleFilter,
     );
-    const searchFilter = useDebouncedSearch(searchValue);
     const useMetaProxy = useClusterWithProxy();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {hideUnavailable} = useHideUnavailableNodes();
@@ -150,7 +148,7 @@ export function GroupedNodesComponent({
             path: schemaPathParam,
             database,
             alive: hideUnavailable || undefined,
-            filter: searchFilter.trim(),
+            filter: searchValue.trim(),
             filter_peer_role: peerRoleFilter,
             group: groupByParam,
             limit: 0,
@@ -190,7 +188,7 @@ export function GroupedNodesComponent({
                         path={path}
                         databaseFullPath={databaseFullPath}
                         database={database}
-                        searchValue={searchFilter}
+                        searchValue={searchValue}
                         peerRoleFilter={peerRoleFilter}
                         groupByParam={groupByParam}
                         columns={columnsToShow}
@@ -230,7 +228,7 @@ export function GroupedNodesComponent({
             table={renderGroups()}
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchFilter, groupByParam, tableGroups, peerRoleFilter],
+                scrollDependencies: [searchValue, groupByParam, tableGroups, peerRoleFilter],
                 loading: isLoading,
                 className: b('groups-wrapper'),
             }}
