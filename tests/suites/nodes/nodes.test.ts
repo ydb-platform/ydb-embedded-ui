@@ -347,3 +347,53 @@ test.describe('Test Node Page Threads Tab', async () => {
         expect(tabNames).not.toContain('Threads');
     });
 });
+
+test.describe('Datacenter nodes screenshots', () => {
+    for (const theme of ['light', 'dark']) {
+        test(`shows normalized datacenters and unknown in ${theme} theme`, async ({page}) => {
+            const nodes = ['dc-a', 'DC-A', 'DC-B', undefined].map((dc, index) => ({
+                NodeId: index + 1,
+                SystemState: {
+                    NodeId: index + 1,
+                    Host: `dc-node-${index + 1}`,
+                    SystemState: 'Green',
+                    Location: {DataCenter: dc},
+                },
+            }));
+            const responses: Record<string, unknown> = {
+                whoami: {IsViewerAllowed: true, IsMonitoringAllowed: true},
+                capabilities: {Capabilities: {'/viewer/nodes': 20}},
+                cluster: {Overall: 'Green', DataCenters: ['DC-A', 'DC-B']},
+                nodes: {TotalNodes: '4', FoundNodes: '4', Nodes: nodes},
+                nodelist: nodes.map(({NodeId, SystemState}) => ({
+                    Id: NodeId,
+                    Host: SystemState.Host,
+                    Location: SystemState.Location,
+                })),
+            };
+            await page.route('**/viewer/**', (route) => {
+                const endpoint = new URL(route.request().url()).pathname.split('/').pop() ?? '';
+                return route.fulfill({json: responses[endpoint] ?? {}});
+            });
+            await page.addInitScript((value) => {
+                localStorage.setItem('theme', value);
+                localStorage.setItem('nodesTableSelectedColumns', JSON.stringify(['Host', 'DC']));
+                localStorage.setItem(
+                    'nodesTableColumnsWidth',
+                    JSON.stringify({Host: 240, DC: 140}),
+                );
+            }, theme);
+            await page.setViewportSize({width: 1100, height: 700});
+            const nodesPage = new NodesPage(page);
+            await nodesPage.goto();
+
+            const labels = nodesPage.table.locator('.ydb-datacenter-label');
+            await expect(labels).toHaveText(['DC-A', 'DC-A', 'DC-B', 'Unknown']);
+            await expect(labels.nth(0)).toHaveClass(/ydb-datacenter-color_color_turquoise/);
+            await expect(labels.nth(1)).toHaveClass(/ydb-datacenter-color_color_turquoise/);
+            await expect(labels.nth(2)).toHaveClass(/ydb-datacenter-color_color_purple/);
+            await expect(labels.nth(3)).toHaveClass(/ydb-datacenter-color_color_neutral/);
+            await expect(nodesPage.table).toHaveScreenshot(`nodes-datacenters-${theme}.png`);
+        });
+    }
+});
