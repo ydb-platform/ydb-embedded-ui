@@ -1,3 +1,11 @@
+jest.mock('../store', () => ({
+    basename: '',
+    clusterName: undefined,
+    environment: undefined,
+    backend: undefined,
+    webVersion: false,
+}));
+
 import {getTenantLink} from '../components/TenantNameWrapper/utils';
 import {parseSettingsField} from '../store/reducers/cluster/parseFields';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
@@ -134,3 +142,22 @@ test('shared navigation uses the shared database CP ID, not the serverless ID', 
     );
     expect(getDatabaseNavigationId(shared, {settings: {use_database_id: false}})).toBe(sharedName);
 });
+
+afterEach(() => jest.restoreAllMocks());
+
+test.each([false, true])(
+    'inherited backend keeps navigation in-app (webVersion=%s)',
+    (webVersion) => {
+        const backend = 'https://viewer.example.test:8765';
+        const store = jest.requireMock('../store');
+        jest.replaceProperty(store, 'backend', backend);
+        jest.replaceProperty(store, 'webVersion', webVersion);
+
+        const link = getTenantLink({tenant});
+        const params = new URL(link.href, 'https://ui.example.test').searchParams;
+
+        expect(link.database).toBe(tenant.Name);
+        expect(link.isExternalLink).toBe(false);
+        expect(params.get('backend')).toBe(webVersion ? backend : null);
+    },
+);

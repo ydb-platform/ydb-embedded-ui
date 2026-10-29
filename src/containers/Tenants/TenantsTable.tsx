@@ -172,6 +172,8 @@ const TenantsTableContent = ({
         return filteredBySearch;
     }, [tenants, withProblems, search, showWithProblemsFilter]);
 
+    const useMetaProxySetting = settings?.use_meta_proxy;
+    const useDatabaseIdSetting = settings?.use_database_id;
     const tenantLinks = React.useMemo(
         () =>
             new Map(
@@ -182,11 +184,20 @@ const TenantsTableContent = ({
                         additionalTenantsProps,
                         externalLink: Boolean(environmentName),
                         useDatabaseId: uiFactory.useDatabaseId,
-                        settings,
+                        settings: {
+                            use_meta_proxy: useMetaProxySetting,
+                            use_database_id: useDatabaseIdSetting,
+                        },
                     }),
                 ]),
             ),
-        [tenants, additionalTenantsProps, environmentName, settings],
+        [
+            tenants,
+            additionalTenantsProps,
+            environmentName,
+            useMetaProxySetting,
+            useDatabaseIdSetting,
+        ],
     );
 
     const openTenant = React.useCallback(

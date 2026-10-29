@@ -142,11 +142,13 @@ export function useClusterBaseInfo() {
     const clusterNameFromQuery = useClusterNameFromQuery();
     const isViewerUser = useIsViewerUser();
 
-    const shouldFetchClusterBaseInfo = Boolean(clusterNameFromQuery && isViewerUser);
+    const shouldFetchClusterBaseInfo = Boolean(
+        window.api.meta && clusterNameFromQuery && isViewerUser,
+    );
     const {currentData, isSuccess, isError} = clusterApi.useGetClusterBaseInfoQuery(
         clusterNameFromQuery || skipToken,
         {
-            skip: !isViewerUser,
+            skip: !shouldFetchClusterBaseInfo,
         },
     );
 
