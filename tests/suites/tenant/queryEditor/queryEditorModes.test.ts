@@ -64,13 +64,16 @@ test.describe('Query Editor modes', () => {
             await tenantPage.queryEditor.setQuery('');
             await page.reload();
             await tenantPage.queryEditor.waitForEditorReady();
+            await tenantPage.queryEditor.setQuery(query);
+            await expect.poll(hasHorizontalOverflow).toBe(true);
+            await expect.poll(() => tenantPage.queryEditor.getEditorContent()).toBe(query);
+
             await sidebar.clickSettings();
             await sidebar.clickEditorSection();
             await expect(wordWrap.getByRole('radio', {name: 'Off', exact: true})).toBeChecked();
             await wordWrap.getByRole('radio', {name: 'On', exact: true}).check();
             await sidebar.closeDrawer();
 
-            await tenantPage.queryEditor.setQuery(query);
             await expect.poll(hasHorizontalOverflow).toBe(false);
             await expect.poll(() => tenantPage.queryEditor.getEditorContent()).toBe(query);
         });
