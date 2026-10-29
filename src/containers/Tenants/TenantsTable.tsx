@@ -184,6 +184,7 @@ const TenantsTableContent = ({
                         additionalTenantsProps,
                         externalLink: Boolean(environmentName),
                         useDatabaseId: uiFactory.useDatabaseId,
+                        isMetaDatabasesAvailable,
                         settings: {
                             use_meta_proxy: useMetaProxySetting,
                             use_database_id: useDatabaseIdSetting,
@@ -195,6 +196,7 @@ const TenantsTableContent = ({
             tenants,
             additionalTenantsProps,
             environmentName,
+            isMetaDatabasesAvailable,
             useMetaProxySetting,
             useDatabaseIdSetting,
         ],

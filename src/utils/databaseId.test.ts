@@ -29,22 +29,45 @@ const tenant: PreparedTenant = {
 };
 
 describe('database navigation ID', () => {
-    test.each([false, true])('prefers CP ID with global flag=%s', (useDatabaseId) => {
-        expect(getDatabaseNavigationId(tenant, {useDatabaseId})).toBe('cp-id');
-    });
+    test.each([
+        {isMetaDatabasesAvailable: false, useDatabaseId: false, expected: tenant.Name},
+        {isMetaDatabasesAvailable: false, useDatabaseId: true, expected: tenant.Id},
+        {isMetaDatabasesAvailable: true, useDatabaseId: false, expected: 'cp-id'},
+        {isMetaDatabasesAvailable: true, useDatabaseId: true, expected: 'cp-id'},
+    ])(
+        'selects the ID for API mode $isMetaDatabasesAvailable and global flag $useDatabaseId',
+        ({isMetaDatabasesAvailable, useDatabaseId, expected}) => {
+            const link = getTenantLink({tenant, isMetaDatabasesAvailable, useDatabaseId});
+            expect(link.database).toBe(expected);
+            expect(new URL(link.href, 'https://ui.example.test').searchParams.get('database')).toBe(
+                expected,
+            );
+        },
+    );
 
     test.each([undefined, ''])('falls back without a CP ID (%s)', (id) => {
         const database = {...tenant, ControlPlane: id === undefined ? undefined : {id}};
-        expect(getDatabaseNavigationId(database)).toBe(tenant.Name);
-        expect(getDatabaseNavigationId(database, {useDatabaseId: true})).toBe(tenant.Id);
+        expect(getDatabaseNavigationId(database, {isMetaDatabasesAvailable: true})).toBe(
+            tenant.Name,
+        );
+        expect(
+            getDatabaseNavigationId(database, {
+                isMetaDatabasesAvailable: true,
+                useDatabaseId: true,
+            }),
+        ).toBe(tenant.Id);
     });
 
     test.each([{use_database_id: false}, {use_meta_proxy: false}])(
         'cluster opt-out overrides CP and global IDs (%j)',
         (settings) => {
-            expect(getDatabaseNavigationId(tenant, {settings, useDatabaseId: true})).toBe(
-                tenant.Name,
-            );
+            expect(
+                getDatabaseNavigationId(tenant, {
+                    settings,
+                    isMetaDatabasesAvailable: true,
+                    useDatabaseId: true,
+                }),
+            ).toBe(tenant.Name);
         },
     );
 });
@@ -52,6 +75,7 @@ describe('database navigation ID', () => {
 test('JSON cluster opt-out produces a path-based link', () => {
     const link = getTenantLink({
         tenant,
+        isMetaDatabasesAvailable: true,
         useDatabaseId: true,
         settings: parseSettingsField('{"use_database_id":false}'),
     });
@@ -62,7 +86,7 @@ test('JSON cluster opt-out produces a path-based link', () => {
 
 test('mixed-cluster list selects each row ID without cluster settings', () => {
     const rows = [tenant, {...tenant, Cluster: 'other', ControlPlane: undefined}];
-    const links = rows.map((row) => getTenantLink({tenant: row}));
+    const links = rows.map((row) => getTenantLink({tenant: row, isMetaDatabasesAvailable: true}));
     expect(
         links.map(({href}) =>
             new URL(href, 'https://ui.example.test').searchParams.get('database'),
@@ -77,6 +101,7 @@ test.each([false, true])('direct backend uses paths with global ID flag=%s', (us
     const prepareTenantBackend = jest.fn(() => 'https://viewer.example.test:8765');
     const link = getTenantLink({
         tenant,
+        isMetaDatabasesAvailable: true,
         useDatabaseId,
         additionalTenantsProps: {prepareTenantBackend},
     });
@@ -107,11 +132,19 @@ test('shared navigation uses the shared database CP ID, not the serverless ID', 
         Id: serverless.ResourceId,
         ControlPlane: serverless.sharedControlPlane,
     };
-    expect(getDatabaseNavigationId(shared)).toBe('shared-cp-id');
-    expect(getDatabaseNavigationId(shared, {backend: 'https://viewer.example.test'})).toBe(
-        sharedName,
-    );
-    expect(getDatabaseNavigationId(shared, {settings: {use_database_id: false}})).toBe(sharedName);
+    expect(getDatabaseNavigationId(shared, {isMetaDatabasesAvailable: true})).toBe('shared-cp-id');
+    expect(
+        getDatabaseNavigationId(shared, {
+            isMetaDatabasesAvailable: true,
+            backend: 'https://viewer.example.test',
+        }),
+    ).toBe(sharedName);
+    expect(
+        getDatabaseNavigationId(shared, {
+            isMetaDatabasesAvailable: true,
+            settings: {use_database_id: false},
+        }),
+    ).toBe(sharedName);
 });
 
 afterEach(() => jest.restoreAllMocks());
@@ -124,7 +157,7 @@ test.each([false, true])(
         jest.replaceProperty(store, 'backend', backend);
         jest.replaceProperty(store, 'webVersion', webVersion);
 
-        const link = getTenantLink({tenant});
+        const link = getTenantLink({tenant, isMetaDatabasesAvailable: true});
         const params = new URL(link.href, 'https://ui.example.test').searchParams;
 
         expect(link.database).toBe(tenant.Name);

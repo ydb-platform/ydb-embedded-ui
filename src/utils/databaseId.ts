@@ -6,10 +6,12 @@ export function getDatabaseNavigationId(
     {
         settings,
         useDatabaseId,
+        isMetaDatabasesAvailable,
         backend,
     }: {
         settings?: MetaClusterSettings;
         useDatabaseId?: boolean;
+        isMetaDatabasesAvailable?: boolean;
         backend?: string;
     } = {},
 ) {
@@ -17,5 +19,9 @@ export function getDatabaseNavigationId(
         return database.Name;
     }
 
-    return database.ControlPlane?.id || (useDatabaseId && database.Id) || database.Name;
+    return (
+        (isMetaDatabasesAvailable && database.ControlPlane?.id) ||
+        (useDatabaseId && database.Id) ||
+        database.Name
+    );
 }

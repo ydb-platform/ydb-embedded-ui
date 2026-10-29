@@ -192,7 +192,7 @@ export function useSharedDatabasePath({
             Id: databaseData?.ResourceId,
             ControlPlane: sharedDatabaseTarget?.controlPlane,
         },
-        {settings, useDatabaseId: uiFactory.useDatabaseId, backend},
+        {settings, useDatabaseId: uiFactory.useDatabaseId, isMetaDatabasesAvailable, backend},
     );
 
     return {

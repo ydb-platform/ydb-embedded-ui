@@ -27,18 +27,21 @@ export function getTenantLink({
     additionalTenantsProps,
     externalLink,
     useDatabaseId,
+    isMetaDatabasesAvailable,
     settings,
 }: {
     tenant: PreparedTenant;
     additionalTenantsProps?: AdditionalTenantsProps;
     externalLink?: boolean;
     useDatabaseId?: boolean;
+    isMetaDatabasesAvailable?: boolean;
     settings?: MetaClusterSettings;
 }) {
     const backend = getTenantBackend(tenant, additionalTenantsProps);
     const isExternalLink = Boolean(externalLink || backend);
     const database = getDatabaseNavigationId(tenant, {
         useDatabaseId,
+        isMetaDatabasesAvailable,
         settings,
         backend: backend ?? activeBackend,
     });
