@@ -32,7 +32,10 @@ import {cn} from '../../utils/cn';
 import {DEFAULT_CLUSTER_TAB_KEY} from '../../utils/constants';
 import {isModifiedClickEvent} from '../../utils/events';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {
+    useIsUserAllowedToMakeChanges,
+    useIsViewerUser,
+} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useSetting} from '../../utils/hooks/useSetting';
 import {useAppTitle} from '../App/AppTitleContext';
 import {Configs} from '../Configs/Configs';
@@ -66,6 +69,7 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
     const shouldShowNetworkTable = useNodesHandlerHasWorkingClusterNetworkStats();
     const shouldShowEventsTab = useShouldShowEventsTab();
     const isViewerUser = useIsViewerUser();
+    const healthcheckAvailable = useIsUserAllowedToMakeChanges();
     const isConfigsAvailable = useConfigAvailable();
 
     const showConfigs = isViewerUser && isConfigsAvailable;
@@ -137,7 +141,9 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
         return (
             <EntityStatus className={b('title')}>
                 {clusterTitle}
-                <EntityStatus.Label status={clusterStatus} onClick={handleStatusClick} />
+                {healthcheckAvailable && (
+                    <EntityStatus.Label status={clusterStatus} onClick={handleStatusClick} />
+                )}
             </EntityStatus>
         );
     };
