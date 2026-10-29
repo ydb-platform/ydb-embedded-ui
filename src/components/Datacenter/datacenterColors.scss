@@ -1,12 +1,9 @@
 .ydb-datacenter-color {
     --ydb-dc-swatch: var(--g-color-base-neutral-heavy);
     --ydb-dc-base-background: color-mix(in sRGB, var(--ydb-dc-swatch) 20%, transparent);
-    --ydb-dc-base-hover: color-mix(in sRGB, var(--ydb-dc-swatch) 28%, transparent);
     --ydb-dc-base-text: var(--g-color-base-neutral-heavy);
     --ydb-dc-background: var(--ydb-dc-base-background);
-    --ydb-dc-hover: var(--ydb-dc-base-hover);
     --ydb-dc-text: var(--ydb-dc-base-text);
-    --ydb-dc-hover-text: var(--ydb-dc-text);
     --ydb-dc-outline: transparent;
 
     // Reuse the Figma palette already defined for versions, one swatch per family.
@@ -16,7 +13,6 @@
         &_color_reserve-#{$family} {
             --ydb-dc-swatch: var(--versions-#{$family}-1);
             --ydb-dc-base-background: var(--ydb-dc-swatch);
-            --ydb-dc-base-hover: var(--ydb-dc-swatch);
             --ydb-dc-base-text: #000;
 
             @if $family == 'night' {
@@ -31,9 +27,7 @@
             }
 
             &.ydb-datacenter-color_variant_outline {
-                --ydb-dc-hover: transparent;
                 --ydb-dc-text: var(--g-color-text-primary);
-                --ydb-dc-hover-text: var(--g-color-text-primary);
             }
         }
     }
@@ -52,7 +46,8 @@
             --ydb-dc-swatch: #{$swatch};
             --ydb-dc-base-text: #{$text};
 
-            .g-root_theme_dark & {
+            .g-root_theme_dark &,
+            .g-root_theme_dark-hc & {
                 --ydb-dc-swatch: #{$dark-swatch};
                 --ydb-dc-base-text: #{$dark-text};
             }
@@ -61,17 +56,14 @@
 
     &_variant_muted {
         --ydb-dc-background: color-mix(in sRGB, var(--ydb-dc-swatch) 10%, transparent);
-        --ydb-dc-hover: color-mix(in sRGB, var(--ydb-dc-swatch) 18%, transparent);
     }
 
     &_variant_outline {
         --ydb-dc-background: transparent;
-        --ydb-dc-hover: color-mix(in sRGB, var(--ydb-dc-swatch) 8%, transparent);
         --ydb-dc-outline: var(--ydb-dc-swatch);
     }
 
     &_color_neutral {
         --ydb-dc-base-background: var(--g-color-base-neutral-medium);
-        --ydb-dc-base-hover: var(--g-color-base-neutral-medium-hover);
     }
 }

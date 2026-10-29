@@ -4,7 +4,7 @@ import {useStore} from 'react-redux';
 
 import {createDatacenterRegistrar} from '../../store/reducers/datacenters';
 
-/** Paginated tables fetch nodes outside RTK Query but share the same DC registry. */
+/** Register DCs from node fetchers used by the generic RTK Query table endpoint. */
 export function useDatacenterNodesFetcher<
     Params,
     Result extends {data: readonly {DCKey?: string}[]},

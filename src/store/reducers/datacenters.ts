@@ -76,9 +76,11 @@ const datacentersSlice = createSlice({
             registerQueryDatacenters(
                 state,
                 action.meta.baseQueryMeta,
-                action.payload?.map((node) =>
-                    getDatacenterKey(node.Location, node.PhysicalLocation?.DataCenterId),
-                ),
+                Array.isArray(action.payload)
+                    ? action.payload.map((node) =>
+                          getDatacenterKey(node.Location, node.PhysicalLocation?.DataCenterId),
+                      )
+                    : undefined,
             ),
         );
         builder.addMatcher(nodesApi.endpoints.getNodes.matchFulfilled, (state, action) =>

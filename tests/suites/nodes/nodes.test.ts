@@ -351,24 +351,46 @@ test.describe('Test Node Page Threads Tab', async () => {
 test.describe('Datacenter nodes screenshots', () => {
     for (const theme of ['light', 'dark']) {
         test(`shows normalized datacenters and unknown in ${theme} theme`, async ({page}) => {
-            const nodes = ['dc-a', 'DC-A', 'DC-B', undefined].map((dc, index) => ({
-                NodeId: index + 1,
-                SystemState: {
+            const piles = [
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                'pile-a',
+                'pile-b',
+                'pile-c',
+            ];
+            const nodes = ['dc-a', 'DC-A', 'DC-B', undefined, 'dc-a', 'dc-a', undefined].map(
+                (dc, index) => ({
                     NodeId: index + 1,
-                    Host: `dc-node-${index + 1}`,
-                    SystemState: 'Green',
-                    Location: {DataCenter: dc},
-                },
-            }));
+                    PileName: piles[index],
+                    SystemState: {
+                        NodeId: index + 1,
+                        Host: `dc-node-${index + 1}`,
+                        SystemState: 'Green',
+                        Location: {DataCenter: dc},
+                    },
+                }),
+            );
             const responses: Record<string, unknown> = {
                 whoami: {IsViewerAllowed: true, IsMonitoringAllowed: true},
-                capabilities: {Capabilities: {'/viewer/nodes': 20}},
-                cluster: {Overall: 'Green', DataCenters: ['DC-A', 'DC-B']},
-                nodes: {TotalNodes: '4', FoundNodes: '4', Nodes: nodes},
-                nodelist: nodes.map(({NodeId, SystemState}) => ({
+                capabilities: {
+                    Capabilities: {'/viewer/nodes': 20},
+                    Settings: {Cluster: {BridgeModeEnabled: true}},
+                },
+                cluster: {
+                    Overall: 'Green',
+                    DataCenters: ['DC-A', 'DC-B', 'P=pile-a/dc-a', 'P=pile-b/dc-a', 'P=pile-c/'],
+                },
+                nodes: {
+                    TotalNodes: String(nodes.length),
+                    FoundNodes: String(nodes.length),
+                    Nodes: nodes,
+                },
+                nodelist: nodes.map(({NodeId, SystemState, PileName}) => ({
                     Id: NodeId,
                     Host: SystemState.Host,
-                    Location: SystemState.Location,
+                    Location: {...SystemState.Location, BridgePileName: PileName},
                 })),
             };
             await page.route('**/viewer/**', (route) => {
@@ -377,10 +399,13 @@ test.describe('Datacenter nodes screenshots', () => {
             });
             await page.addInitScript((value) => {
                 localStorage.setItem('theme', value);
-                localStorage.setItem('nodesTableSelectedColumns', JSON.stringify(['Host', 'DC']));
+                localStorage.setItem(
+                    'nodesTableSelectedColumns',
+                    JSON.stringify(['Host', 'DC', 'PileName']),
+                );
                 localStorage.setItem(
                     'nodesTableColumnsWidth',
-                    JSON.stringify({Host: 240, DC: 140}),
+                    JSON.stringify({Host: 240, DC: 140, PileName: 120}),
                 );
             }, theme);
             await page.setViewportSize({width: 1100, height: 700});
@@ -388,12 +413,56 @@ test.describe('Datacenter nodes screenshots', () => {
             await nodesPage.goto();
 
             const labels = nodesPage.table.locator('.ydb-datacenter-label');
-            await expect(labels).toHaveText(['DC-A', 'DC-A', 'DC-B', 'Unknown']);
-            await expect(labels.nth(0)).toHaveClass(/ydb-datacenter-color_color_turquoise/);
-            await expect(labels.nth(1)).toHaveClass(/ydb-datacenter-color_color_turquoise/);
-            await expect(labels.nth(2)).toHaveClass(/ydb-datacenter-color_color_purple/);
-            await expect(labels.nth(3)).toHaveClass(/ydb-datacenter-color_color_neutral/);
+            await expect(labels).toHaveText([
+                'DC-A',
+                'DC-A',
+                'DC-B',
+                'Unknown',
+                'DC-A',
+                'DC-A',
+                'Unknown',
+            ]);
+            for (const [index, color] of [
+                'turquoise',
+                'turquoise',
+                'purple',
+                'neutral',
+                'blue',
+                'orange',
+                'red',
+            ].entries()) {
+                await expect(labels.nth(index)).toHaveClass(
+                    new RegExp(`ydb-datacenter-color_color_${color}`),
+                );
+            }
+            for (const pile of ['pile-a', 'pile-b', 'pile-c']) {
+                await expect(
+                    nodesPage.table.getByRole('cell', {name: pile, exact: true}),
+                ).toBeVisible();
+            }
+            const label = labels.first();
             await expect(nodesPage.table).toHaveScreenshot(`nodes-datacenters-${theme}.png`);
+            const background = await label.evaluate(
+                (element) => getComputedStyle(element).backgroundColor,
+            );
+            await label.hover();
+            await label.evaluate((element) => {
+                element.getAnimations().forEach((animation) => animation.finish());
+            });
+            await expect(label).toHaveCSS('background-color', background);
+            await expect(label).not.toHaveClass(/g-label_interactive/);
+            await page.mouse.move(0, 0);
+            await expect(label).toHaveCSS('background-color', background);
+            if (theme === 'dark') {
+                const color = await label.evaluate((element) => getComputedStyle(element).color);
+                await page
+                    .locator('.g-root_theme_dark')
+                    .first()
+                    .evaluate((element) => {
+                        element.classList.replace('g-root_theme_dark', 'g-root_theme_dark-hc');
+                    });
+                await expect(label).toHaveCSS('color', color);
+            }
         });
     }
 });

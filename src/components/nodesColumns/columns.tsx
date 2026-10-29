@@ -126,7 +126,7 @@ export function getDataCenterColumn<T extends {DC?: string; DCKey?: string}>({
         align: DataTable.LEFT,
         render: ({row}) =>
             colored ? (
-                <DatacenterLabel name={row.DCKey || row.DC} />
+                <DatacenterLabel name={row.DC} colorKey={row.DCKey} />
             ) : (
                 row.DC || EMPTY_DATA_PLACEHOLDER
             ),
