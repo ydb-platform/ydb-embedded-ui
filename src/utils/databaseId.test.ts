@@ -28,75 +28,46 @@ const tenant: PreparedTenant = {
     groupsCount: 0,
 };
 
-describe.each(['object', 'JSON'])('database navigation (%s settings)', (format) => {
-    test.each([
-        {
-            name: 'CP ID takes precedence over viewer ID',
-            cpId: 'cp-id',
-            global: false,
-            settings: {},
-            expected: 'cp-id',
-        },
-        {
-            name: 'CP ID takes precedence over global flag',
-            cpId: 'cp-id',
-            global: true,
-            settings: {},
-            expected: 'cp-id',
-        },
-        {
-            name: 'no CP keeps paths',
-            cpId: undefined,
-            global: false,
-            settings: {},
-            expected: tenant.Name,
-        },
-        {
-            name: 'empty CP ID keeps paths',
-            cpId: '',
-            global: false,
-            settings: {},
-            expected: tenant.Name,
-        },
-        {
-            name: 'global flag keeps legacy IDs',
-            cpId: undefined,
-            global: true,
-            settings: {},
-            expected: 'viewer-id',
-        },
-        {
-            name: 'cluster opt-out overrides CP and global flag',
-            cpId: 'cp-id',
-            global: true,
-            settings: {use_database_id: false},
-            expected: tenant.Name,
-        },
-        {
-            name: 'disabled meta proxy keeps paths',
-            cpId: 'cp-id',
-            global: true,
-            settings: {use_meta_proxy: false},
-            expected: tenant.Name,
-        },
-    ])('$name', ({cpId, global, settings, expected}) => {
-        const parsed = parseSettingsField(format === 'JSON' ? JSON.stringify(settings) : settings);
-        const link = getTenantLink({
-            tenant: {...tenant, ControlPlane: cpId === undefined ? undefined : {id: cpId}},
-            useDatabaseId: global,
-            settings: parsed,
-        });
-        const params = new URL(link.href, 'https://ui.example.test').searchParams;
-        expect(link.database).toBe(expected);
-        expect(params.get('database')).toBe(expected);
-        expect(params.get('clusterName')).toBe('vault-sam');
+describe('database navigation ID', () => {
+    test.each([false, true])('prefers CP ID with global flag=%s', (useDatabaseId) => {
+        expect(getDatabaseNavigationId(tenant, {useDatabaseId})).toBe('cp-id');
     });
+
+    test.each([undefined, ''])('falls back without a CP ID (%s)', (id) => {
+        const database = {...tenant, ControlPlane: id === undefined ? undefined : {id}};
+        expect(getDatabaseNavigationId(database)).toBe(tenant.Name);
+        expect(getDatabaseNavigationId(database, {useDatabaseId: true})).toBe(tenant.Id);
+    });
+
+    test.each([{use_database_id: false}, {use_meta_proxy: false}])(
+        'cluster opt-out overrides CP and global IDs (%j)',
+        (settings) => {
+            expect(getDatabaseNavigationId(tenant, {settings, useDatabaseId: true})).toBe(
+                tenant.Name,
+            );
+        },
+    );
+});
+
+test('JSON cluster opt-out produces a path-based link', () => {
+    const link = getTenantLink({
+        tenant,
+        useDatabaseId: true,
+        settings: parseSettingsField('{"use_database_id":false}'),
+    });
+    const params = new URL(link.href, 'https://ui.example.test').searchParams;
+    expect(params.get('database')).toBe(tenant.Name);
+    expect(params.get('clusterName')).toBe(tenant.Cluster);
 });
 
 test('mixed-cluster list selects each row ID without cluster settings', () => {
     const rows = [tenant, {...tenant, Cluster: 'other', ControlPlane: undefined}];
     const links = rows.map((row) => getTenantLink({tenant: row}));
-    expect(links.map(({database}) => database)).toEqual(['cp-id', tenant.Name]);
+    expect(
+        links.map(({href}) =>
+            new URL(href, 'https://ui.example.test').searchParams.get('database'),
+        ),
+    ).toEqual(['cp-id', tenant.Name]);
     expect(new URL(links[1].href, 'https://ui.example.test').searchParams.get('clusterName')).toBe(
         'other',
     );

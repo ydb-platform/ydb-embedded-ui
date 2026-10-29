@@ -50,7 +50,7 @@ export function TenantNameWrapper({
     const isEditDBAvailable = emMetaAvailable && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable = emMetaAvailable && uiFactory.onDeleteDB !== undefined;
 
-    const {settings, isResolved: isClusterInfoResolved} = useClusterBaseInfo();
+    const {settings} = useClusterBaseInfo();
 
     const {
         href: dbUrl,
@@ -176,9 +176,6 @@ export function TenantNameWrapper({
     }, [dbActions]);
 
     const renderName = React.useCallback(() => {
-        if (!isClusterInfoResolved) {
-            return <Text className={b('db-name')}>{dbName}</Text>;
-        }
         if (isExternalLink) {
             return (
                 <Link href={dbUrl} target="_blank" className={b('db-name')}>
@@ -191,7 +188,7 @@ export function TenantNameWrapper({
                 {dbName}
             </InternalLink>
         );
-    }, [isClusterInfoResolved, isExternalLink, dbUrl, dbName]);
+    }, [isExternalLink, dbUrl, dbName]);
 
     const handleStatusClick = React.useCallback(
         (event: React.MouseEvent<HTMLElement>) => {
