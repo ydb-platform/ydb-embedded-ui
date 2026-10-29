@@ -2,7 +2,7 @@ import React from 'react';
 
 import {configureStore} from '@reduxjs/toolkit';
 import {act, renderHook, waitFor} from '@testing-library/react';
-import {Provider} from 'react-redux';
+import {Provider, useSelector} from 'react-redux';
 
 import type {YdbEmbeddedAPI} from '../../../services/api';
 import {api} from '../../../store/reducers/api';
@@ -133,33 +133,64 @@ test('captures deadlines at request start across Meta adapters without renewing 
     store.dispatch(api.util.resetApiState());
 });
 
-test('switching the Meta database contract cannot reuse a legacy list cache entry', async () => {
-    const tenant = {Name: '/Root/db', Id: 'db', Overall: EFlag.Green};
-    window.api = {
-        meta: {
-            getTenants: jest.fn().mockResolvedValue({TenantInfo: [tenant]}),
-            getTenantsV2: jest
-                .fn()
-                .mockResolvedValue({TenantInfo: [{...tenant, status_ttl_ms: 5000}]}),
-        },
-    } as unknown as YdbEmbeddedAPI;
-    const store = createTestStore();
-    const legacy = await store.dispatch(
-        tenantsApi.endpoints.getTenantsInfo.initiate({
-            clusterName: 'selected',
-            isMetaDatabasesAvailable: false,
-        }),
-    );
-    expect(legacy.data?.[0]).not.toHaveProperty('healthExpiresAt');
-    const current = await store.dispatch(
-        tenantsApi.endpoints.getTenantsInfo.initiate({
-            clusterName: 'selected',
-            isMetaDatabasesAvailable: true,
-        }),
-    );
-    expect(current.data?.[0]).toHaveProperty('healthExpiresAt', 6000);
-    store.dispatch(api.util.resetApiState());
-});
+test.each([
+    ['list', false],
+    ['list', true],
+    ['single', false],
+    ['single', true],
+] as const)(
+    'switching the Meta %s contract after V2=%s cannot reuse the fulfilled cache entry',
+    async (endpoint, initiallyV2) => {
+        const tenant = {Name: '/Root/db', Id: 'db', Overall: EFlag.Green};
+        const getTenants = jest.fn().mockResolvedValue({TenantInfo: [tenant]});
+        const getTenantsV2 = jest
+            .fn()
+            .mockResolvedValue({TenantInfo: [{...tenant, status_ttl_ms: 5000}]});
+        window.api = {meta: {getTenants, getTenantsV2}} as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const read = async (isMetaDatabasesAvailable: boolean) => {
+            const args = {clusterName: 'selected', isMetaDatabasesAvailable};
+            if (endpoint === 'list') {
+                const result = await store.dispatch(
+                    tenantsApi.endpoints.getTenantsInfo.initiate(args),
+                );
+                return result.data?.[0];
+            }
+            const result = await store.dispatch(
+                tenantApi.endpoints.getTenantInfo.initiate({...args, database: '/Root/db'}),
+            );
+            return result.data;
+        };
+        const first = await read(initiallyV2);
+        const second = await read(!initiallyV2);
+        expect(getTenants).toHaveBeenCalledTimes(1);
+        expect(getTenantsV2).toHaveBeenCalledTimes(1);
+        expect(first).not.toBe(second);
+        const current = initiallyV2 ? first : second;
+        const legacy = initiallyV2 ? second : first;
+        expect(current).toHaveProperty('healthExpiresAt', 6000);
+        expect(legacy).not.toHaveProperty('healthExpiresAt');
+        if (!current || !legacy) {
+            throw new Error('Expected both database contracts');
+        }
+        expect(getEffectiveHealth(current, 6000, {message: 'refresh failed'}).Overall).toBe(
+            EFlag.Grey,
+        );
+        expect(getEffectiveHealth(legacy, 6000, {message: 'refresh failed'}).Overall).toBe(
+            EFlag.Green,
+        );
+        if (endpoint === 'single') {
+            expect(
+                tenantApi.endpoints.getTenantInfo.select({
+                    clusterName: 'selected',
+                    database: '/Root/db',
+                    isMetaDatabasesAvailable: !initiallyV2,
+                })(store.getState()).data,
+            ).toBe(second);
+        }
+        store.dispatch(api.util.resetApiState());
+    },
+);
 
 test('retains issues and Unknown during a failed refresh and pending retry, then recovers in its own scope', async () => {
     // Feature hooks load after store modules in the application's lazy entry.
@@ -180,10 +211,19 @@ test('retains issues and Unknown during a failed refresh and pending retry, then
     const wrapper = ({children}: {children: React.ReactNode}) => (
         <Provider store={store}>{children}</Provider>
     );
-    const {result, rerender, unmount} = renderHook(({cluster}) => useClusterHealthcheck(cluster), {
-        initialProps: {cluster: 'first'},
-        wrapper,
-    });
+    const {result, rerender, unmount} = renderHook(
+        ({cluster}) => {
+            const healthcheck = useClusterHealthcheck(cluster);
+            const queryStatus = useSelector(
+                (state: ReturnType<typeof store.getState>) =>
+                    healthcheckApi.endpoints.getClusterHealthcheckInfo.select({
+                        clusterName: cluster,
+                    })(state).status,
+            );
+            return {...healthcheck, queryStatus};
+        },
+        {initialProps: {cluster: 'first'}, wrapper},
+    );
     expect(result.current.selfCheckResult).toBe(SelfCheckResult.GOOD);
     const failure = deferred<object>();
     getClusterHealth.mockReturnValueOnce(failure.promise);
@@ -196,15 +236,18 @@ test('retains issues and Unknown during a failed refresh and pending retry, then
             ),
         );
     });
-    await act(async () => {
-        jest.advanceTimersByTime(20);
-    });
+    await waitFor(() => expect(result.current.queryStatus).toBe('pending'));
     expect(result.current.selfCheckResult).toBe(SelfCheckResult.GOOD);
     await act(async () => {
         failure.reject({status: 400, statusText: 'Bad Request'});
         await refresh;
-        jest.advanceTimersByTime(20);
     });
+    expect(
+        healthcheckApi.endpoints.getClusterHealthcheckInfo.select({clusterName: 'first'})(
+            store.getState(),
+        ).error,
+    ).toMatchObject({status: 400});
+    await waitFor(() => expect(result.current.queryStatus).toBe('rejected'));
     expect(result.current.selfCheckResult).toBe(SelfCheckResult.UNSPECIFIED);
     expect(result.current.issues).toEqual([issue]);
     const retry = deferred<object>();
@@ -217,9 +260,7 @@ test('retains issues and Unknown during a failed refresh and pending retry, then
             ),
         );
     });
-    await act(async () => {
-        jest.advanceTimersByTime(20);
-    });
+    await waitFor(() => expect(result.current.queryStatus).toBe('pending'));
     expect(result.current.selfCheckResult).toBe(SelfCheckResult.UNSPECIFIED);
     await act(async () => {
         retry.resolve({
@@ -228,7 +269,6 @@ test('retains issues and Unknown during a failed refresh and pending retry, then
             issue_log: [issue],
         });
         await refresh;
-        jest.advanceTimersByTime(20);
     });
     await waitFor(() => expect(result.current.selfCheckResult).toBe(SelfCheckResult.DEGRADED));
     expect(result.current.error).toBeUndefined();
@@ -243,9 +283,6 @@ test('retains issues and Unknown during a failed refresh and pending retry, then
     });
     await act(async () => {
         rerender({cluster: 'second'});
-    });
-    await act(async () => {
-        jest.advanceTimersByTime(20);
     });
     await waitFor(() => expect(result.current.selfCheckResult).toBe(SelfCheckResult.EMERGENCY));
     expect(result.current.issues).toEqual([]);

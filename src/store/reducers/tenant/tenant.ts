@@ -116,8 +116,8 @@ export const tenantApi = api.injectEndpoints({
                 ];
             },
             serializeQueryArgs: ({queryArgs}) => {
-                const {clusterName, database} = queryArgs;
-                return {clusterName, database};
+                const {clusterName, database, isMetaDatabasesAvailable} = queryArgs;
+                return {clusterName, database, isMetaDatabasesAvailable};
             },
         }),
     }),
