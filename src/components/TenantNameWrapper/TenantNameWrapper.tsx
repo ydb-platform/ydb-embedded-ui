@@ -13,7 +13,6 @@ import {getDatabaseLinks} from '../../utils/additionalProps';
 import {CLUSTER_LINK_CONTEXT} from '../../utils/clusterLinks/clusterLinkConstants';
 import {useDatabaseLinks} from '../../utils/clusterLinks/useDatabaseLinks';
 import {cn} from '../../utils/cn';
-import {shouldUseDatabaseId} from '../../utils/databaseId';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {canShowTenantMonitoring} from '../../utils/monitoringVisibility';
 import {getConnectToDBDialog} from '../ConnectToDB/ConnectToDBDialog';
@@ -51,7 +50,7 @@ export function TenantNameWrapper({
     const isEditDBAvailable = emMetaAvailable && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable = emMetaAvailable && uiFactory.onDeleteDB !== undefined;
 
-    const {control_plane: controlPlane, settings} = useClusterBaseInfo();
+    const {settings, isResolved: isClusterInfoResolved} = useClusterBaseInfo();
 
     const {
         href: dbUrl,
@@ -62,10 +61,8 @@ export function TenantNameWrapper({
         tenant,
         additionalTenantsProps,
         externalLink,
-        useDatabaseId: shouldUseDatabaseId(
-            {control_plane: controlPlane, settings},
-            uiFactory.useDatabaseId,
-        ),
+        useDatabaseId: uiFactory.useDatabaseId,
+        settings,
     });
     const useMetaProxy = uiFactory.useMetaProxy && settings?.use_meta_proxy !== false;
 
@@ -179,6 +176,9 @@ export function TenantNameWrapper({
     }, [dbActions]);
 
     const renderName = React.useCallback(() => {
+        if (!isClusterInfoResolved) {
+            return <Text className={b('db-name')}>{dbName}</Text>;
+        }
         if (isExternalLink) {
             return (
                 <Link href={dbUrl} target="_blank" className={b('db-name')}>
@@ -191,7 +191,7 @@ export function TenantNameWrapper({
                 {dbName}
             </InternalLink>
         );
-    }, [isExternalLink, dbUrl, dbName]);
+    }, [isClusterInfoResolved, isExternalLink, dbUrl, dbName]);
 
     const handleStatusClick = React.useCallback(
         (event: React.MouseEvent<HTMLElement>) => {

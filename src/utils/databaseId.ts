@@ -1,17 +1,21 @@
-import type {MetaBaseClusterInfo, MetaClusterSettings} from '../types/api/meta';
+import type {MetaClusterSettings} from '../types/api/meta';
+import type {TTenant} from '../types/api/tenant';
 
-export function shouldUseDatabaseId(
+export function getDatabaseNavigationId(
+    database: Pick<TTenant, 'Name' | 'Id' | 'ControlPlane'>,
     {
-        control_plane: controlPlane,
         settings,
-    }: Pick<MetaBaseClusterInfo, 'control_plane'> & {
+        useDatabaseId,
+        backend,
+    }: {
         settings?: MetaClusterSettings;
-    },
-    globalUseDatabaseId?: boolean,
+        useDatabaseId?: boolean;
+        backend?: string;
+    } = {},
 ) {
-    return (
-        Boolean(globalUseDatabaseId || controlPlane) &&
-        settings?.use_database_id !== false &&
-        settings?.use_meta_proxy !== false
-    );
+    if (backend || settings?.use_database_id === false || settings?.use_meta_proxy === false) {
+        return database.Name;
+    }
+
+    return database.ControlPlane?.id || (useDatabaseId && database.Id) || database.Name;
 }

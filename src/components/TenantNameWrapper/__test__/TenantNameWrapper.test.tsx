@@ -12,7 +12,7 @@ jest.mock('../../../store/reducers/capabilities/hooks', () => ({
     useEmMetaAvailable: () => false,
 }));
 jest.mock('../../../store/reducers/cluster/cluster', () => ({
-    useClusterBaseInfo: () => ({settings: {use_meta_proxy: false}}),
+    useClusterBaseInfo: () => ({settings: {use_meta_proxy: false}, isResolved: true}),
 }));
 jest.mock('../../../utils/hooks/useIsUserAllowedToMakeChanges', () => ({
     useIsUserAllowedToMakeChanges: () => false,

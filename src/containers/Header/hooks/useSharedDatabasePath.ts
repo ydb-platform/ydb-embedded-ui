@@ -10,7 +10,7 @@ import {tenantsApi} from '../../../store/reducers/tenants/tenants';
 import type {PreparedTenant, SharedDatabaseTarget} from '../../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import {uiFactory} from '../../../uiFactory/uiFactory';
-import {shouldUseDatabaseId} from '../../../utils/databaseId';
+import {getDatabaseNavigationId} from '../../../utils/databaseId';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
 import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 
@@ -25,21 +25,18 @@ interface SharedDatabaseNameResolutionParams {
     databaseData?: PreparedTenant;
     isClusterBaseInfoResolved: boolean;
     isViewerUser?: boolean;
-    useDatabaseId?: boolean;
 }
 
 function canResolveSharedDatabaseName({
     databaseData,
     isClusterBaseInfoResolved,
     isViewerUser,
-    useDatabaseId,
 }: SharedDatabaseNameResolutionParams) {
     return Boolean(
         isViewerUser &&
             isClusterBaseInfoResolved &&
             databaseData?.Type === 'Serverless' &&
             databaseData.ResourceId &&
-            !useDatabaseId &&
             !databaseData.sharedTenantName,
     );
 }
@@ -110,7 +107,6 @@ export function useSharedDatabasePath({
     const isMetaDatabasesAvailable = useDatabasesV2();
     const {
         balancer,
-        control_plane: controlPlane,
         settings,
         isError: isClusterBaseInfoError,
         isResolved: isClusterBaseInfoResolved,
@@ -118,10 +114,6 @@ export function useSharedDatabasePath({
     const isMonitoringAllowed = useIsUserAllowedToMakeChanges();
     const isClusterBaseInfoAvailable = isClusterBaseInfoResolved && !isClusterBaseInfoError;
 
-    const useDatabaseId = shouldUseDatabaseId(
-        {control_plane: controlPlane, settings},
-        uiFactory.useDatabaseId,
-    );
     const needSharedDatabaseNodeIds = shouldResolveSharedDatabaseNodeIds(
         balancer,
         settings,
@@ -131,7 +123,6 @@ export function useSharedDatabasePath({
         databaseData,
         isClusterBaseInfoResolved: isClusterBaseInfoAvailable,
         isViewerUser,
-        useDatabaseId,
     });
 
     const shouldResolveSharedDatabaseFromViewer =
@@ -167,6 +158,7 @@ export function useSharedDatabasePath({
             return {
                 name: databaseData.sharedTenantName,
                 nodeIds: databaseData.sharedNodeIds,
+                controlPlane: databaseData.sharedControlPlane,
             };
         }
 
@@ -178,18 +170,30 @@ export function useSharedDatabasePath({
         const sharedDatabaseName = sharedDatabase?.Name?.trim();
 
         return sharedDatabaseName
-            ? {name: sharedDatabaseName, nodeIds: sharedDatabase?.NodeIds}
+            ? {
+                  name: sharedDatabaseName,
+                  nodeIds: sharedDatabase?.NodeIds,
+                  controlPlane: sharedDatabase?.ControlPlane,
+              }
             : undefined;
     }, [
         databaseData?.ResourceId,
         databaseData?.sharedNodeIds,
+        databaseData?.sharedControlPlane,
         databaseData?.sharedTenantName,
         databases,
         sharedDatabaseFromViewer,
     ]);
 
-    const sharedDatabase = useDatabaseId ? databaseData?.ResourceId : sharedDatabaseTarget?.name;
     const backend = getSharedDatabaseBackend(sharedDatabaseTarget, prepareTenantBackend);
+    const sharedDatabase = getDatabaseNavigationId(
+        {
+            Name: sharedDatabaseTarget?.name,
+            Id: databaseData?.ResourceId,
+            ControlPlane: sharedDatabaseTarget?.controlPlane,
+        },
+        {settings, useDatabaseId: uiFactory.useDatabaseId, backend},
+    );
 
     return {
         isSharedDatabaseLoading:

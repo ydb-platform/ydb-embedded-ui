@@ -377,6 +377,9 @@ export const prepareTenants = (tenants: TTenant[]): PreparedTenant[] => {
 
             sharedTenantName,
             sharedNodeIds,
+            ...(sharedDatabase?.ControlPlane
+                ? {sharedControlPlane: sharedDatabase.ControlPlane}
+                : {}),
             controlPlaneName,
             cpu,
             memory,

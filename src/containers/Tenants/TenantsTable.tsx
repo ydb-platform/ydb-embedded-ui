@@ -41,7 +41,6 @@ import {
     formatNumber,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
-import {shouldUseDatabaseId} from '../../utils/databaseId';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
@@ -141,18 +140,14 @@ const TenantsTableContent = ({
         {clusterName, environmentName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
-    const loading = isFetching && currentData === undefined;
 
     // Track sort state for scroll dependencies
     const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
     const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
 
-    const {domain: domainRoot, control_plane: controlPlane, settings} = useClusterBaseInfo();
-    const useDatabaseId = shouldUseDatabaseId(
-        {control_plane: controlPlane, settings},
-        uiFactory.useDatabaseId,
-    );
+    const {domain: domainRoot, settings, isResolved: isClusterInfoResolved} = useClusterBaseInfo();
+    const loading = (isFetching && currentData === undefined) || !isClusterInfoResolved;
 
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
@@ -186,17 +181,18 @@ const TenantsTableContent = ({
                         tenant,
                         additionalTenantsProps,
                         externalLink: Boolean(environmentName),
-                        useDatabaseId,
+                        useDatabaseId: uiFactory.useDatabaseId,
+                        settings,
                     }),
                 ]),
             ),
-        [tenants, additionalTenantsProps, environmentName, useDatabaseId],
+        [tenants, additionalTenantsProps, environmentName, settings],
     );
 
     const openTenant = React.useCallback(
         (tenant: PreparedTenant) => {
             const link = tenantLinks.get(tenant);
-            if (!link) {
+            if (!isClusterInfoResolved || !link) {
                 return;
             }
             if (link.isExternalLink) {
@@ -206,7 +202,7 @@ const TenantsTableContent = ({
 
             history.push(link.href);
         },
-        [tenantLinks, history],
+        [tenantLinks, history, isClusterInfoResolved],
     );
 
     const renderCreateDBButton = () => {
