@@ -169,3 +169,22 @@ test.each(['navigation-v2', 'serverless', 'tenant-not-loaded'])(
         }
     },
 );
+
+test('expires the Meta Serverless Overall fallback while Viewer healthcheck is skipped', () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(1000);
+    mockTenant = {
+        Name: database,
+        Type: 'Serverless',
+        Overall: EFlag.Green,
+        healthExpiresAt: 2000,
+    } as TTenant & {healthExpiresAt: number};
+    setup('alpha');
+    expect(statusColor()).toHaveClass('ydb-status-color_state_green');
+    act(() => {
+        jest.advanceTimersByTime(1000);
+    });
+    expect(statusColor()).toHaveClass('ydb-status-color_state_grey');
+    expect(getHealthcheckInfo).not.toHaveBeenCalled();
+    jest.useRealTimers();
+});

@@ -2,6 +2,7 @@
   "field_links": "Links",
   "field_monitoring-link": "Monitoring",
   "field_logs-link": "Logs",
+  "action_healthcheck-details": "Healthcheck details for {{database}}",
   "context_unknown": "unknown database",
   "action_edit": "Edit Database",
   "action_remove": "Remove Database",

@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
+import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
 import {api} from '../api';
 import {CLUSTER_DATA_LIST_TAG} from '../entityDataTags';
 
@@ -36,8 +37,17 @@ export const clustersApi = api.injectEndpoints({
             queryFn: async (_, {signal}) => {
                 try {
                     if (window.api.meta) {
+                        const requestStartedAt = Date.now();
                         const data = await window.api.meta.getClustersList(undefined, {signal});
-                        return {data: prepareClustersData(data)};
+                        return {
+                            data: prepareClustersData(data).map((cluster) => ({
+                                ...cluster,
+                                cluster: prepareHealthStatus(
+                                    cluster.cluster ?? {},
+                                    requestStartedAt,
+                                ),
+                            })),
+                        };
                     } else {
                         throw new Error('Method is not implemented.');
                     }

@@ -79,6 +79,9 @@ export default defineConfig({
     source: {
         entry: {
             index: './src/index.tsx',
+            ...(process.env.REACT_APP_E2E_UI_OVERRIDES === 'true'
+                ? {metaHealth: './tests/fixtures/metaHealth.tsx'}
+                : {}),
         },
         include: [
             'node_modules/antlr4-c3',

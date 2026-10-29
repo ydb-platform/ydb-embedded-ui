@@ -1,4 +1,5 @@
 import type {TTenantInfo} from '../../../types/api/tenant';
+import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
 import {api} from '../api';
 import {DATABASE_DATA_LIST_TAG} from '../entityDataTags';
 
@@ -24,10 +25,17 @@ export const tenantsApi = api.injectEndpoints({
                     let response: TTenantInfo;
 
                     if (isMetaDatabasesAvailable && window.api.meta) {
+                        const requestStartedAt = Date.now();
                         response = await window.api.meta.getTenantsV2(
                             {clusterName, environmentName},
                             {signal},
                         );
+                        response = {
+                            ...response,
+                            TenantInfo: response.TenantInfo?.map((tenant) =>
+                                prepareHealthStatus(tenant, requestStartedAt),
+                            ),
+                        };
                     } else if (window.api.meta) {
                         response = await window.api.meta.getTenants({clusterName}, {signal});
                     } else {
@@ -45,8 +53,8 @@ export const tenantsApi = api.injectEndpoints({
                 }
             },
             serializeQueryArgs: ({queryArgs}) => {
-                const {clusterName, environmentName} = queryArgs;
-                return {clusterName, environmentName};
+                const {clusterName, environmentName, isMetaDatabasesAvailable} = queryArgs;
+                return {clusterName, environmentName, isMetaDatabasesAvailable};
             },
             providesTags: ['All', DATABASE_DATA_LIST_TAG],
         }),

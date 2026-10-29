@@ -1,7 +1,8 @@
-import {CircleXmark, Pencil, TrashBin} from '@gravity-ui/icons';
+import {ChevronRight, CircleXmark, Pencil, TrashBin} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 import {
+    Button,
     ClipboardButton,
     Link as ExternalLink,
     Flex,
@@ -190,12 +191,13 @@ function getTitleColumn({
             };
 
             const renderStatus = () => {
-                const statusLabel = clusterStatus ? (
-                    <EntityStatus.Label status={clusterStatus} size="xs" />
-                ) : (
+                const statusLabel = (
                     <EntityStatus.Label
-                        status={EFlag.Grey}
-                        note={row.cluster?.error || i18n('tooltip_no-cluster-data')}
+                        status={clusterStatus ?? EFlag.Grey}
+                        note={
+                            row.cluster?.error ||
+                            (!clusterStatus ? i18n('tooltip_no-cluster-data') : undefined)
+                        }
                         size="xs"
                     />
                 );
@@ -207,17 +209,23 @@ function getTitleColumn({
                 }
 
                 return (
-                    <button
-                        type="button"
-                        className={b('status-button')}
-                        onClickCapture={(e) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            onStatusClick(row);
-                        }}
-                    >
+                    <Flex gap={1} alignItems="center">
                         {statusLabel}
-                    </button>
+                        <Button
+                            view="flat-secondary"
+                            size="xs"
+                            aria-label={i18n('action_healthcheck-details', {
+                                cluster: row.title || row.name || '',
+                            })}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                event.preventDefault();
+                                onStatusClick(row);
+                            }}
+                        >
+                            <Icon data={ChevronRight} size={14} />
+                        </Button>
+                    </Flex>
                 );
             };
 

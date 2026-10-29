@@ -1,9 +1,12 @@
 import React from 'react';
 
 import {
+    healthcheckApi,
     selectAllClusterHealthcheckInfo,
-    selectClusterCheckStatus,
 } from '../../store/reducers/healthcheckInfo/healthcheckInfo';
+import {SelfCheckResult} from '../../types/api/healthcheck';
+import {getHealthStatusError} from '../../utils/healthStatus/healthStatus';
+import {useHealthStatusNow} from '../../utils/healthStatus/useHealthStatusNow';
 import {useTypedSelector} from '../../utils/hooks';
 import {Healthcheck} from '../Tenant/Healthcheck/Healthcheck';
 import {HealthcheckDrawer} from '../Tenant/Healthcheck/components/HealthcheckDrawer';
@@ -25,13 +28,23 @@ export function ClusterDrawerHealthcheck({
 }: ClusterDrawerHealthcheckProps) {
     const {handleIssuesFilterChange, handleHealthcheckViewChange} = useTenantQueryParams();
 
-    const healthcheckStatus = useTypedSelector((state) =>
-        selectClusterCheckStatus(state, clusterName || ''),
+    const now = useHealthStatusNow(isVisible);
+    const query = useTypedSelector((state) =>
+        healthcheckApi.endpoints.getClusterHealthcheckInfo.select({clusterName: clusterName || ''})(
+            state,
+        ),
     );
-
-    const healthcheckData = useTypedSelector((state) =>
+    const data = useTypedSelector((state) =>
         selectAllClusterHealthcheckInfo(state, clusterName || ''),
     );
+    const healthError = data ? getHealthStatusError(data, now, query.error) : undefined;
+    const healthcheckStatus = healthError ? SelfCheckResult.UNSPECIFIED : data?.self_check_result;
+    const healthcheckData = data
+        ? {...data, self_check_result: healthcheckStatus, error: healthError}
+        : undefined;
+    if (healthcheckData) {
+        delete healthcheckData.healthExpiresAt;
+    }
 
     const handleCloseDrawer = React.useCallback(() => {
         onClose();
@@ -43,8 +56,8 @@ export function ClusterDrawerHealthcheck({
         if (!clusterName) {
             return null;
         }
-        return <Healthcheck clusterName={clusterName} />;
-    }, [clusterName]);
+        return <Healthcheck clusterName={clusterName} healthStatusNow={now} />;
+    }, [clusterName, now]);
 
     return (
         <HealthcheckDrawer

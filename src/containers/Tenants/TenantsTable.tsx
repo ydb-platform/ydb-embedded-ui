@@ -41,6 +41,8 @@ import {
     formatNumber,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
+import {getEffectiveHealth} from '../../utils/healthStatus/healthStatus';
+import {useHealthStatusNow} from '../../utils/healthStatus/useHealthStatusNow';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
@@ -152,14 +154,17 @@ const TenantsTableContent = ({
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
 
+    const healthNow = useHealthStatusNow();
+
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count
     // It should be 8/8 instead of 8/9 when no filters applied but show domain setting is off
     const tenants = React.useMemo(() => {
-        const rawTenants = currentData ?? [];
+        const rawTenants =
+            currentData?.map((tenant) => getEffectiveHealth(tenant, healthNow, error)) ?? [];
 
         return filterTenantsByDomain(rawTenants, showDomainDatabase);
-    }, [currentData, showDomainDatabase]);
+    }, [currentData, showDomainDatabase, healthNow, error]);
 
     const filteredTenants = React.useMemo(() => {
         let filteredByProblems = tenants;

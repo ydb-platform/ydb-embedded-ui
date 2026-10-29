@@ -29,6 +29,8 @@ import type {TMemoryStats} from '../../../../types/api/nodes';
 import type {ETenantType, TTenant, TTenantResource} from '../../../../types/api/tenant';
 import {getInfoTabLinks} from '../../../../utils/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
+import {getEffectiveHealth} from '../../../../utils/healthStatus/healthStatus';
+import {useHealthStatusNow} from '../../../../utils/healthStatus/useHealthStatusNow';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabaseHealthcheckAvailable} from '../../../../utils/hooks/useDatabaseHealthcheckAvailable';
@@ -281,7 +283,9 @@ export function TenantOverview({
     );
 
     const tenantLoading = isTenantLoading(isFetching, tenant, error);
-    const {Name, Type, Overall, CoresTotal} = tenant || {};
+    const healthNow = useHealthStatusNow();
+    const effectiveTenant = tenant ? getEffectiveHealth(tenant, healthNow, error) : tenant;
+    const {Name, Type, Overall, CoresTotal} = effectiveTenant || {};
     const isServerless = Type === 'Serverless';
     const healthcheckAvailable = useDatabaseHealthcheckAvailable(Type);
     const showHealthcheck = healthcheckAvailable && !isV2NavigationEnabled;
@@ -365,7 +369,10 @@ export function TenantOverview({
 
     return (
         <LoaderWrapper loading={tenantLoading}>
-            {renderTenantError(error, i18n('alert_database-information-not-available'))}
+            {renderTenantError(
+                error ?? effectiveTenant?.error,
+                i18n('alert_database-information-not-available'),
+            )}
             {tenant ? (
                 <div className={b()}>
                     <div className={b('info')}>

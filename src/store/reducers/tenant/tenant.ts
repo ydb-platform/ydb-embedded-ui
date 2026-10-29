@@ -2,6 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
 import type {TTenantInfo} from '../../../types/api/tenant';
+import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
 import {api} from '../api';
@@ -65,10 +66,17 @@ export const tenantApi = api.injectEndpoints({
                 try {
                     let tenantData: TTenantInfo;
                     if (window.api.meta && clusterName && isMetaDatabasesAvailable) {
+                        const requestStartedAt = Date.now();
                         tenantData = await window.api.meta.getTenantsV2(
                             {database, clusterName},
                             {signal},
                         );
+                        tenantData = {
+                            ...tenantData,
+                            TenantInfo: tenantData.TenantInfo?.map((tenant) =>
+                                prepareHealthStatus(tenant, requestStartedAt),
+                            ),
+                        };
                     } else if (window.api.meta && clusterName) {
                         tenantData = await window.api.meta.getTenants(
                             {database, clusterName},

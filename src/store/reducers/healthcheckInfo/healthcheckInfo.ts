@@ -1,6 +1,7 @@
 import {createSelector} from '@reduxjs/toolkit';
 
 import type {IssueLog, StatusFlag} from '../../../types/api/healthcheck';
+import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 
@@ -39,8 +40,9 @@ export const healthcheckApi = api.injectEndpoints({
                     if (!window.api.meta) {
                         throw new Error('Meta API is not available');
                     }
+                    const requestStartedAt = Date.now();
                     const data = await window.api.meta.getClusterHealth({clusterName}, {signal});
-                    return {data};
+                    return {data: prepareHealthStatus(data, requestStartedAt)};
                 } catch (error) {
                     return {error};
                 }

@@ -62,6 +62,7 @@ export interface MetaGeneralClusterInfo extends MetaBaseClusterInfo {
 // In case of error in viewer /cluster request mvp return error field instead of cluster data
 export type MetaViewerClusterInfo = TClusterInfo & {
     error?: string;
+    status_ttl_ms?: number;
     /**
      * Source of the `Overall` status. When equal to "healthcheck", the cluster
      * status was derived from the healthcheck response and the healthcheck
