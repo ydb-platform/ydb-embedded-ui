@@ -107,6 +107,7 @@ export interface MetaClusterTraceCheck {
 export interface MetaClusterSettings {
     unavailable?: boolean;
     use_meta_proxy?: boolean;
+    use_database_id?: boolean;
     auth_service?: string;
     cluster_domain?: string;
     cluster_external_name?: string;

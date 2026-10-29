@@ -81,7 +81,10 @@ export const tenantApi = api.injectEndpoints({
                     // previous meta versions do not support filtering databases by name
                     const data =
                         databases.find(
-                            (tenant) => tenant.Name === database || tenant.Id === database,
+                            (tenant) =>
+                                tenant.Name === database ||
+                                tenant.Id === database ||
+                                tenant.ControlPlane?.id === database,
                         ) ?? databases[0];
                     if (!data) {
                         return {error: {code: 'EMPTY_TENANT_INFO'}};
