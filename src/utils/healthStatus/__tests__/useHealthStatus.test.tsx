@@ -79,6 +79,9 @@ test.each([
 
 test('captures deadlines at request start across Meta adapters without renewing each item', async () => {
     const clusterResponse = deferred<object>();
+    const healthResponse = deferred<object>();
+    const listResponse = deferred<object>();
+    const singleResponse = deferred<object>();
     const databaseResponse = {
         TenantInfo: [
             {
@@ -90,17 +93,36 @@ test('captures deadlines at request start across Meta adapters without renewing 
             },
         ],
     };
+    const getClustersList = jest.fn().mockReturnValue(clusterResponse.promise);
+    const getClusterHealth = jest.fn().mockReturnValue(healthResponse.promise);
+    const getTenantsV2 = jest
+        .fn()
+        .mockReturnValueOnce(listResponse.promise)
+        .mockReturnValueOnce(singleResponse.promise);
     window.api = {
-        meta: {
-            getClustersList: jest.fn().mockReturnValue(clusterResponse.promise),
-            getClusterHealth: jest
-                .fn()
-                .mockResolvedValue({self_check_result: SelfCheckResult.GOOD, status_ttl_ms: 5000}),
-            getTenantsV2: jest.fn().mockResolvedValue(databaseResponse),
-        },
+        meta: {getClustersList, getClusterHealth, getTenantsV2},
     } as unknown as YdbEmbeddedAPI;
     const store = createTestStore();
     const request = store.dispatch(clustersApi.endpoints.getClustersList.initiate(undefined));
+    const healthRequest = store.dispatch(
+        healthcheckApi.endpoints.getClusterHealthcheckInfo.initiate({clusterName: 'selected'}),
+    );
+    const listRequest = store.dispatch(
+        tenantsApi.endpoints.getTenantsInfo.initiate({
+            clusterName: 'selected',
+            isMetaDatabasesAvailable: true,
+        }),
+    );
+    const singleRequest = store.dispatch(
+        tenantApi.endpoints.getTenantInfo.initiate({
+            database: '/Root/db',
+            clusterName: 'selected',
+            isMetaDatabasesAvailable: true,
+        }),
+    );
+    expect(getClustersList).toHaveBeenCalledTimes(1);
+    expect(getClusterHealth).toHaveBeenCalledTimes(1);
+    expect(getTenantsV2).toHaveBeenCalledTimes(2);
     jest.setSystemTime(2000);
     clusterResponse.resolve({
         clusters: [
@@ -108,28 +130,20 @@ test('captures deadlines at request start across Meta adapters without renewing 
             {name: 'long', cluster: {Overall: EFlag.Yellow, status_ttl_ms: 10000}},
         ],
     });
-    const result = await request;
+    healthResponse.resolve({self_check_result: SelfCheckResult.GOOD, status_ttl_ms: 5000});
+    listResponse.resolve(databaseResponse);
+    singleResponse.resolve(databaseResponse);
+    const [result, health, list, single] = await Promise.all([
+        request,
+        healthRequest,
+        listRequest,
+        singleRequest,
+    ]);
     expect(result.data?.[0].cluster).toHaveProperty('healthExpiresAt', 6000);
     expect(result.data?.[1].cluster).toHaveProperty('healthExpiresAt', 11000);
-    const health = await store.dispatch(
-        healthcheckApi.endpoints.getClusterHealthcheckInfo.initiate({clusterName: 'selected'}),
-    );
-    expect(health.data).toHaveProperty('healthExpiresAt', 7000);
-    const list = await store.dispatch(
-        tenantsApi.endpoints.getTenantsInfo.initiate({
-            clusterName: 'selected',
-            isMetaDatabasesAvailable: true,
-        }),
-    );
-    expect(list.data?.[0]).toHaveProperty('healthExpiresAt', 7000);
-    const single = await store.dispatch(
-        tenantApi.endpoints.getTenantInfo.initiate({
-            database: '/Root/db',
-            clusterName: 'selected',
-            isMetaDatabasesAvailable: true,
-        }),
-    );
-    expect(single.data).toHaveProperty('healthExpiresAt', 7000);
+    expect(health.data).toHaveProperty('healthExpiresAt', 6000);
+    expect(list.data?.[0]).toHaveProperty('healthExpiresAt', 6000);
+    expect(single.data).toHaveProperty('healthExpiresAt', 6000);
     store.dispatch(api.util.resetApiState());
 });
 
