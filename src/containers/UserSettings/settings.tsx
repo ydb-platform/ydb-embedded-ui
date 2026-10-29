@@ -200,6 +200,16 @@ export const autocompleteOnEnterSetting: SettingProps = {
     description: i18n('settings.editor.autocomplete-on-enter.description'),
 };
 
+export const wordWrapSetting: SettingProps = {
+    settingKey: SETTING_KEYS.WORD_WRAP,
+    title: i18n('field_word-wrap'),
+    type: 'radio',
+    options: [
+        {value: 'on', content: i18n('value_on')},
+        {value: 'off', content: i18n('value_off')},
+    ],
+};
+
 const aclSyntaxOptions = [
     {
         value: AclSyntax.Kikimr,
@@ -252,7 +262,12 @@ export const experimentsSection: SettingsSection = {
 export const devSettingsSection: SettingsSection = {
     id: SECTION_IDS.DEV_SETTINGS,
     title: i18n('section.dev-setting'),
-    settings: [enableAutocompleteSetting, autocompleteOnEnterSetting, enableQueryStreamingSetting],
+    settings: [
+        enableAutocompleteSetting,
+        autocompleteOnEnterSetting,
+        wordWrapSetting,
+        enableQueryStreamingSetting,
+    ],
 };
 
 export const resultsSettingsSection: SettingsSection = {
