@@ -1006,6 +1006,26 @@ test.describe('Datacenter storage screenshots', () => {
                     height: rowBox.y + rowBox.height - panelBox.y,
                 },
             });
+            await hideFloatingPopups(page);
+            for (const item of [
+                getVDiskItems(row).first(),
+                row.locator('.ydb-storage-disks__pdisk-item').first(),
+            ]) {
+                const bar = item.locator('.storage-disk-progress-bar');
+                const background = await bar.evaluate(
+                    (element) => getComputedStyle(element).backgroundColor,
+                );
+                await bar.hover();
+                await bar.evaluate((element) => {
+                    element.getAnimations().forEach((animation) => animation.finish());
+                });
+                await expect(bar).not.toHaveCSS('background-color', background);
+                await page.mouse.move(0, 0);
+                await bar.evaluate((element) => {
+                    element.getAnimations().forEach((animation) => animation.finish());
+                });
+                await expect(bar).toHaveCSS('background-color', background);
+            }
         });
     }
 });
