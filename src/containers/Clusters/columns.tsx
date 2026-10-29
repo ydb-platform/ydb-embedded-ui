@@ -392,9 +392,9 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             return NodesTotal;
         },
         render: ({row}) => {
-            const {NodesAlive = 0, NodesTotal = 0, Overall} = row.cluster || {};
+            const {NodesAlive = 0, NodesTotal = 0} = row.cluster || {};
 
-            if (!Overall) {
+            if (row.cluster?.NodesAlive === undefined && row.cluster?.NodesTotal === undefined) {
                 return EMPTY_CELL;
             }
 
@@ -420,14 +420,13 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             return cluster?.NumberOfCpus || 0;
         },
         render: ({row}) => {
-            const {
-                LoadAverage = 0,
-                NumberOfCpus = 0,
-                RealNumberOfCpus,
-                Overall,
-            } = row.cluster || {};
+            const {LoadAverage = 0, NumberOfCpus = 0, RealNumberOfCpus} = row.cluster || {};
 
-            if (!Overall) {
+            if (
+                row.cluster?.LoadAverage === undefined &&
+                row.cluster?.NumberOfCpus === undefined &&
+                RealNumberOfCpus === undefined
+            ) {
                 return EMPTY_CELL;
             }
 
@@ -453,9 +452,9 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             return Number(cluster?.StorageTotal) || 0;
         },
         render: ({row}) => {
-            const {StorageUsed = 0, StorageTotal = 0, Overall} = row.cluster || {};
+            const {StorageUsed = 0, StorageTotal = 0} = row.cluster || {};
 
-            if (!Overall) {
+            if (row.cluster?.StorageUsed === undefined && row.cluster?.StorageTotal === undefined) {
                 return EMPTY_CELL;
             }
 

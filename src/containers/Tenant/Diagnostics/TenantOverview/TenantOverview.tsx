@@ -67,7 +67,12 @@ function isTenantLoading(isFetching: boolean, tenant: TTenant | undefined, error
     return isFetching && tenant === undefined && !error;
 }
 
-function getDatabaseStatus(overall?: EFlag, selfCheckResult?: SelfCheckResult) {
+function getDatabaseStatus(tenant?: TTenant, selfCheckResult?: SelfCheckResult) {
+    const overall = tenant?.Overall;
+    // Prepared Meta health errors (including expiry) take priority over cached Viewer health.
+    if (tenant?.error && Object.hasOwn(tenant, 'healthExpiresAt')) {
+        return overall;
+    }
     const healthcheckStatus =
         selfCheckResult === undefined ? undefined : selfCheckResultToHcStatus[selfCheckResult];
 
@@ -285,7 +290,7 @@ export function TenantOverview({
     const tenantLoading = isTenantLoading(isFetching, tenant, error);
     const healthNow = useHealthStatusNow();
     const effectiveTenant = tenant ? getEffectiveHealth(tenant, healthNow, error) : tenant;
-    const {Name, Type, Overall, CoresTotal} = effectiveTenant || {};
+    const {Name, Type, CoresTotal} = effectiveTenant || {};
     const isServerless = Type === 'Serverless';
     const healthcheckAvailable = useDatabaseHealthcheckAvailable(Type);
     const showHealthcheck = healthcheckAvailable && !isV2NavigationEnabled;
@@ -301,7 +306,7 @@ export function TenantOverview({
             skip: !showHealthcheck || tenant === undefined,
         },
     );
-    const databaseStatus = getDatabaseStatus(Overall, healthcheckData?.self_check_result);
+    const databaseStatus = getDatabaseStatus(effectiveTenant, healthcheckData?.self_check_result);
     const activeMetricsTab = getActiveMetricsTab(isServerless, metricsTab);
 
     const tenantType = mapDatabaseTypeToDBName(Type);
