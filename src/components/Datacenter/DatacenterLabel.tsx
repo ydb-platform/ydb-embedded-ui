@@ -17,11 +17,20 @@ import './datacenterColors.scss';
 const b = cn('ydb-datacenter-label');
 const colors = cn('ydb-datacenter-color');
 
-export function DatacenterLabel({name, colorKey = name}: {name?: string; colorKey?: string}) {
+export function DatacenterLabel({
+    name,
+    colorKey = name,
+    count,
+}: {
+    name?: string;
+    colorKey?: string;
+    count?: number;
+}) {
     const indexes = useDatacenterColorIndexes();
     const normalized = normalizeDatacenter(name);
     const key = normalized ? colorKey : undefined;
     const text = normalized || i18n('value_unknown');
+    const value = count === undefined ? undefined : i18n('value_nodes', {count});
     return (
         <Label
             size="xs"
@@ -34,6 +43,7 @@ export function DatacenterLabel({name, colorKey = name}: {name?: string; colorKe
                 }),
             )}
             icon={normalized ? undefined : <Icon data={CircleQuestionFill} size={10} />}
+            value={value}
         >
             {text}
         </Label>

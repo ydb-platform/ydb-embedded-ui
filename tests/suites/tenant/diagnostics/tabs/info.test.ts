@@ -1006,7 +1006,11 @@ test.describe('Diagnostics Info tab', async () => {
     });
 });
 
-async function setupDatabaseDatacentersMock(page: Page, datacenters: (string | undefined)[]) {
+async function setupDatabaseDatacentersMock(
+    page: Page,
+    datacenters: (string | undefined)[],
+    tenantType: 'Dedicated' | 'Serverless' = 'Dedicated',
+) {
     const nodeListRequests: URL[] = [];
     const clusterRequests: string[] = [];
     const responses: Record<string, unknown> = {
@@ -1017,7 +1021,7 @@ async function setupDatabaseDatacentersMock(page: Page, datacenters: (string | u
             IsAdministrationAllowed: false,
         },
         capabilities: {Capabilities: {}},
-        tenantinfo: {TenantInfo: [{Name: database, Type: 'Dedicated', Overall: 'Green'}]},
+        tenantinfo: {TenantInfo: [{Name: database, Type: tenantType, Overall: 'Green'}]},
         describe: {
             Status: 'StatusSuccess',
             Path: database,
@@ -1044,6 +1048,22 @@ async function setupDatabaseDatacentersMock(page: Page, datacenters: (string | u
 }
 
 test.describe('Datacenter info screenshots', () => {
+    test('hides datacenters for a serverless database', async ({page}) => {
+        await page.addInitScript(() => localStorage.setItem('enableTenantNavigationV2', 'true'));
+        await setupDatabaseDatacentersMock(page, ['DC-A', 'DC-B'], 'Serverless');
+        await new TenantPage(page).goto({
+            database,
+            schema: database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+        await expect(page.getByText('Serverless', {exact: true})).toBeVisible();
+        const info = page.getByTestId('schema-object-info');
+        await expect(info).toBeVisible();
+        await expect(info.getByText('Datacenters', {exact: true})).toHaveCount(0);
+        await expect(page.getByTestId('database-datacenters')).toHaveCount(0);
+    });
+
     for (const theme of ['light', 'dark']) {
         test.describe(theme, () => {
             test.beforeEach(async ({page}) => {
@@ -1121,6 +1141,16 @@ test.describe('Datacenter info screenshots', () => {
                     );
                 }
                 await expect(palette).toHaveScreenshot(`datacenter-full-palette-${theme}.png`);
+                for (const index of [0, 30, 42]) {
+                    const label = labels.nth(index);
+                    const background = await label.evaluate(
+                        (element) => getComputedStyle(element).backgroundColor,
+                    );
+                    await label.hover();
+                    await expect(palette).toHaveScreenshot(`datacenter-full-palette-${theme}.png`);
+                    await expect(label).toHaveCSS('background-color', background);
+                    await page.mouse.move(0, 0);
+                }
             });
         });
     }

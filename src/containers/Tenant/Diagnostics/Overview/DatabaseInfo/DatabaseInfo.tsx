@@ -29,10 +29,14 @@ export function DatabaseInfo({data, path, database, datacenters}: DBInfoProps) {
     const {databaseData} = useTenantBaseInfo(database);
     const additionalItems = React.useMemo(
         () => [
-            {
-                name: dbInfoKeyset('field_datacenters'),
-                content: <DatabaseDatacenters datacenters={datacenters} />,
-            },
+            ...(databaseData && databaseData.Type !== 'Serverless'
+                ? [
+                      {
+                          name: dbInfoKeyset('field_datacenters'),
+                          content: <DatabaseDatacenters datacenters={datacenters} />,
+                      },
+                  ]
+                : []),
             ...(prepareAdditionalDatabaseInfoItems(databaseData) ?? []),
         ],
         [databaseData, datacenters],
