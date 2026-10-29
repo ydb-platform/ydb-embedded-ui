@@ -41,6 +41,7 @@ import {
     formatNumber,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
+import {shouldUseDatabaseId} from '../../utils/databaseId';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
@@ -147,7 +148,11 @@ const TenantsTableContent = ({
 
     const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
 
-    const {domain: domainRoot, settings} = useClusterBaseInfo();
+    const {domain: domainRoot, control_plane: controlPlane, settings} = useClusterBaseInfo();
+    const useDatabaseId = shouldUseDatabaseId(
+        {control_plane: controlPlane, settings},
+        uiFactory.useDatabaseId,
+    );
 
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
@@ -181,12 +186,11 @@ const TenantsTableContent = ({
                         tenant,
                         additionalTenantsProps,
                         externalLink: Boolean(environmentName),
-                        useDatabaseId:
-                            uiFactory.useDatabaseId && settings?.use_meta_proxy !== false,
+                        useDatabaseId,
                     }),
                 ]),
             ),
-        [tenants, additionalTenantsProps, environmentName, settings?.use_meta_proxy],
+        [tenants, additionalTenantsProps, environmentName, useDatabaseId],
     );
 
     const openTenant = React.useCallback(

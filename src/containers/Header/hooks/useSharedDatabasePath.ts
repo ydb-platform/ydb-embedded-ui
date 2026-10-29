@@ -10,6 +10,7 @@ import {tenantsApi} from '../../../store/reducers/tenants/tenants';
 import type {PreparedTenant, SharedDatabaseTarget} from '../../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import {uiFactory} from '../../../uiFactory/uiFactory';
+import {shouldUseDatabaseId} from '../../../utils/databaseId';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
 import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 
@@ -109,6 +110,7 @@ export function useSharedDatabasePath({
     const isMetaDatabasesAvailable = useDatabasesV2();
     const {
         balancer,
+        control_plane: controlPlane,
         settings,
         isError: isClusterBaseInfoError,
         isResolved: isClusterBaseInfoResolved,
@@ -116,7 +118,10 @@ export function useSharedDatabasePath({
     const isMonitoringAllowed = useIsUserAllowedToMakeChanges();
     const isClusterBaseInfoAvailable = isClusterBaseInfoResolved && !isClusterBaseInfoError;
 
-    const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
+    const useDatabaseId = shouldUseDatabaseId(
+        {control_plane: controlPlane, settings},
+        uiFactory.useDatabaseId,
+    );
     const needSharedDatabaseNodeIds = shouldResolveSharedDatabaseNodeIds(
         balancer,
         settings,

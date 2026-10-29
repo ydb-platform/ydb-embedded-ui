@@ -13,6 +13,7 @@ import {getDatabaseLinks} from '../../utils/additionalProps';
 import {CLUSTER_LINK_CONTEXT} from '../../utils/clusterLinks/clusterLinkConstants';
 import {useDatabaseLinks} from '../../utils/clusterLinks/useDatabaseLinks';
 import {cn} from '../../utils/cn';
+import {shouldUseDatabaseId} from '../../utils/databaseId';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {canShowTenantMonitoring} from '../../utils/monitoringVisibility';
 import {getConnectToDBDialog} from '../ConnectToDB/ConnectToDBDialog';
@@ -50,7 +51,7 @@ export function TenantNameWrapper({
     const isEditDBAvailable = emMetaAvailable && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable = emMetaAvailable && uiFactory.onDeleteDB !== undefined;
 
-    const {settings} = useClusterBaseInfo();
+    const {control_plane: controlPlane, settings} = useClusterBaseInfo();
 
     const {
         href: dbUrl,
@@ -61,7 +62,10 @@ export function TenantNameWrapper({
         tenant,
         additionalTenantsProps,
         externalLink,
-        useDatabaseId: uiFactory.useDatabaseId && settings?.use_meta_proxy !== false,
+        useDatabaseId: shouldUseDatabaseId(
+            {control_plane: controlPlane, settings},
+            uiFactory.useDatabaseId,
+        ),
     });
     const useMetaProxy = uiFactory.useMetaProxy && settings?.use_meta_proxy !== false;
 
