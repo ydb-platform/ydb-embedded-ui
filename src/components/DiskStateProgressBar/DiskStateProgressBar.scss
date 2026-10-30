@@ -695,13 +695,12 @@
     border: none;
     border-radius: 6px;
     background: var(--ydb-dc-background);
-    box-shadow: inset 0 0 0 2px var(--ydb-dc-outline);
+    box-shadow: inset 0 0 0 1px var(--ydb-dc-outline);
 
     &.storage-disk-progress-bar_highlighted,
     &:hover {
         color: var(--ydb-dc-hover-text);
         background: var(--ydb-dc-hover);
-        box-shadow: inset 0 0 0 2px var(--ydb-dc-hover-outline);
     }
 
     .storage-disk-progress-bar__datacenter-name {
