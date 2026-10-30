@@ -3,6 +3,7 @@ import {isNil} from 'lodash';
 
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
 import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
+import {DatacenterLabel} from '../../components/Datacenter/DatacenterLabel';
 import {InternalLinkButton} from '../../components/InternalLinkButton';
 import {getVDiskLocationItems} from '../../components/VDiskInfo/getVDiskDetails';
 import {getPDiskPagePath} from '../../routes';
@@ -24,7 +25,13 @@ interface VDiskStorageDetailsProps {
     data?: VDiskData;
 }
 
-function DetailItem({item}: {item: DiskDetailItem}) {
+function DetailItem({
+    item,
+    datacenterColorKey,
+}: {
+    item: DiskDetailItem;
+    datacenterColorKey?: string;
+}) {
     const copyText = item.copyText === undefined ? undefined : String(item.copyText);
     return (
         <div
@@ -43,7 +50,17 @@ function DetailItem({item}: {item: DiskDetailItem}) {
                         'with-left-trim': item.id === 'pdisk-path',
                     })}
                 >
-                    <span tabIndex={copyText ? 0 : undefined}>{item.content}</span>
+                    <span tabIndex={copyText ? 0 : undefined}>
+                        {item.id === 'datacenter' && copyText ? (
+                            <DatacenterLabel
+                                name={copyText}
+                                colorKey={datacenterColorKey}
+                                size="xxs"
+                            />
+                        ) : (
+                            item.content
+                        )}
+                    </span>
                 </CellWithPopover>
             </CopyableValue>
         </div>
@@ -68,7 +85,9 @@ export function VDiskStorageDetails({className, data = {}}: VDiskStorageDetailsP
             <div className={b('card')}>
                 {LOCATION_IDS.map((id) => {
                     const item = items.find((entry) => entry.id === id);
-                    return item ? <DetailItem key={id} item={item} /> : null;
+                    return item ? (
+                        <DetailItem key={id} item={item} datacenterColorKey={data.NodeDCKey} />
+                    ) : null;
                 })}
             </div>
             <div className={b('card', {ids: true})}>

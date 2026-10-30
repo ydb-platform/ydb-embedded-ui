@@ -2,6 +2,7 @@ import {DefinitionList} from '@gravity-ui/uikit';
 
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
 import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
+import {DatacenterLabel} from '../../components/Datacenter/DatacenterLabel';
 import type {PDiskData} from '../../store/reducers/pdisk/types';
 import {cn} from '../../utils/cn';
 import {getDiskLocationItems} from '../../utils/disks/diskInfo/getDiskLocationItems';
@@ -52,7 +53,17 @@ export function PDiskStorageDetails({
                                         'with-left-trim': id === 'pdisk-path',
                                     })}
                                 >
-                                    <span tabIndex={copyText ? 0 : undefined}>{item.content}</span>
+                                    <span tabIndex={copyText ? 0 : undefined}>
+                                        {id === 'datacenter' && copyText ? (
+                                            <DatacenterLabel
+                                                name={copyText}
+                                                colorKey={data.NodeDCKey}
+                                                size="xxs"
+                                            />
+                                        ) : (
+                                            item.content
+                                        )}
+                                    </span>
                                 </CellWithPopover>
                             </CopyableValue>
                         </DefinitionList.Item>

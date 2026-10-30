@@ -374,7 +374,7 @@ test.describe('VDisk page storage details', () => {
         await expect(storageDetails.locator('.ydb-vdisk-storage-details__detail')).toHaveCount(5);
         await expect(storageDetails.getByRole('link', {name: 'Go to PDisk'})).toBeVisible();
         for (const [id, value] of [
-            ['datacenter', LONG_DATACENTER],
+            ['datacenter', LONG_DATACENTER.toUpperCase()],
             ['fqdn', LONG_HOST],
             ['node-id', NODE_ID],
             ['pdisk-id', PDISK_ID],
@@ -414,6 +414,7 @@ test.describe('VDisk page storage details', () => {
             allocatedSize: '1000000',
             availableSize: '35999999990000',
         });
+        await page.route('**/viewer/json/nodelist?*', (route) => route.fulfill({json: []}));
         await page.goto(VDISK_PAGE_PATH);
 
         const storageDetails = page.locator('.ydb-vdisk-storage-details');
@@ -422,6 +423,9 @@ test.describe('VDisk page storage details', () => {
         await expect(storageDetails).toHaveCount(1);
         await expect(storageDetails.getByText('Go to PDisk')).toBeVisible();
         await expect(storageDetails.locator('.ydb-vdisk-storage-details__detail')).toHaveCount(7);
+        await expect(storageDetails.locator('.ydb-datacenter-label')).toHaveClass(
+            /ydb-datacenter-color_color_turquoise/,
+        );
         await expect(page.locator('.ydb-paginated-table__table')).toBeVisible();
 
         await page.setViewportSize({width: 1500, height: 1000});
@@ -771,14 +775,18 @@ test.describe('PDisk page storage details', () => {
             host: LONG_HOST,
         });
         await setupPDiskInfoMock(page, {pDiskPath});
+        await page.route('**/viewer/json/nodelist?*', (route) => route.fulfill({json: []}));
         await page.goto(`/pDisk?nodeId=${NODE_ID}&pDiskId=${PDISK_ID}`);
 
         await expect(
             page.getByRole('heading', {name: `PDisk ${NODE_ID}-${PDISK_ID}`, exact: true}),
         ).toBeVisible();
         const storageDetails = page.getByTestId('pdisk-location');
+        await expect(storageDetails.locator('.ydb-datacenter-label')).toHaveClass(
+            /ydb-datacenter-color_color_turquoise/,
+        );
         for (const [id, value] of [
-            ['datacenter', LONG_DATACENTER],
+            ['datacenter', LONG_DATACENTER.toUpperCase()],
             ['rack', rack],
             ['fqdn', LONG_HOST],
             ['pdisk-path', pDiskPath],
@@ -787,9 +795,10 @@ test.describe('PDisk page storage details', () => {
                 .getByTestId(`pdisk-location-${id}`)
                 .locator('.ydb-cell-with-popover__children-wrapper');
             await expect(content).toHaveText(value);
+            const clipped = id === 'datacenter' ? content.locator('.g-label__content') : content;
             await expect
                 .poll(() =>
-                    content.evaluate((element) => element.scrollWidth > element.clientWidth),
+                    clipped.evaluate((element) => element.scrollWidth > element.clientWidth),
                 )
                 .toBe(true);
         }
