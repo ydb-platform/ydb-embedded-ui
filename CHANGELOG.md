@@ -1,5 +1,18 @@
 # Changelog
 
+## [22.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.7.0...v22.8.0) (2026-10-30)
+
+
+### Features
+
+* **query:** add word wrap setting ([#4545](https://github.com/ydb-platform/ydb-embedded-ui/issues/4545)) ([1ac4b2a](https://github.com/ydb-platform/ydb-embedded-ui/commit/1ac4b2ae12c73dfeb43308f0463f581de48fd345))
+
+
+### Bug Fixes
+
+* hide cluster healthcheck without monitoring permission ([#4541](https://github.com/ydb-platform/ydb-embedded-ui/issues/4541)) ([6966563](https://github.com/ydb-platform/ydb-embedded-ui/commit/6966563085619832abc48b3d77424b92e966b885))
+* **nodes:** preserve search fields when grouping ([#4533](https://github.com/ydb-platform/ydb-embedded-ui/issues/4533)) ([6681765](https://github.com/ydb-platform/ydb-embedded-ui/commit/6681765f288eafc44244b5a704fa5163b21180a0))
+
 ## [22.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.6.0...v22.7.0) (2026-10-29)
 
 
