@@ -25,6 +25,7 @@ import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useClusterHealthcheckQueryParams} from '../../ClusterDrawerHealthcheck';
 import i18n from '../../i18n';
 
@@ -106,6 +107,7 @@ interface BridgeInfoTableProps {
 interface BridgePileCardProps {
     pile: TBridgePile;
     current: boolean;
+    healthcheckAllowed: boolean;
     healthcheckAvailable: boolean;
     healthcheckSupportsPiles: boolean;
     healthcheckLoading: boolean;
@@ -116,6 +118,7 @@ interface BridgePileCardProps {
 const BridgePileCard = React.memo(function BridgePileCard({
     pile,
     current,
+    healthcheckAllowed,
     healthcheckAvailable,
     healthcheckSupportsPiles,
     healthcheckLoading,
@@ -187,28 +190,29 @@ const BridgePileCard = React.memo(function BridgePileCard({
             </Flex>
             <Flex gap={2} alignItems="center" wrap>
                 {stateStatus}
-                {healthcheckLoading ? (
-                    <Skeleton className={b('healthcheck-skeleton')} />
-                ) : (
-                    <EntityStatus.Label
-                        status={pileHealthcheck.status}
-                        size="xs"
-                        className={b('healthcheck-status')}
-                        onClick={pileHealthcheck.target ? handleHealthcheckClick : undefined}
-                        endContent={
-                            pileHealthcheck.target ? (
-                                <Icon data={ChevronRight} size={12} />
-                            ) : undefined
-                        }
-                        qa="bridge-pile-healthcheck"
-                    >
-                        {pileHealthcheck.target ? (
-                            <span className={b('healthcheck-accessible-prefix')}>
-                                {i18n('label_bridge-pile-health-status-prefix', {pileName})}
-                            </span>
-                        ) : null}
-                    </EntityStatus.Label>
-                )}
+                {healthcheckAllowed &&
+                    (healthcheckLoading ? (
+                        <Skeleton className={b('healthcheck-skeleton')} />
+                    ) : (
+                        <EntityStatus.Label
+                            status={pileHealthcheck.status}
+                            size="xs"
+                            className={b('healthcheck-status')}
+                            onClick={pileHealthcheck.target ? handleHealthcheckClick : undefined}
+                            endContent={
+                                pileHealthcheck.target ? (
+                                    <Icon data={ChevronRight} size={12} />
+                                ) : undefined
+                            }
+                            qa="bridge-pile-healthcheck"
+                        >
+                            {pileHealthcheck.target ? (
+                                <span className={b('healthcheck-accessible-prefix')}>
+                                    {i18n('label_bridge-pile-health-status-prefix', {pileName})}
+                                </span>
+                            ) : null}
+                        </EntityStatus.Label>
+                    ))}
             </Flex>
             <Flex gap={1} alignItems="center" className={b('nodes')}>
                 <Icon data={Archive} size={14} />
@@ -226,6 +230,7 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
     clusterName,
 }: BridgeInfoTableProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const isMonitoringAllowed = useIsUserAllowedToMakeChanges();
     const {handleOpenHealthcheckIssue} = useClusterHealthcheckQueryParams();
     const {
         currentData: healthcheckData,
@@ -235,14 +240,17 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
         {database: database ?? '', clusterName},
         {
             pollingInterval: autoRefreshInterval,
-            skip: !database,
+            skip: !database || !isMonitoringAllowed,
         },
     );
     const leavesIssues = useTypedSelector((state) =>
         selectLeavesIssues(state, database ?? '', clusterName),
     );
 
-    const healthcheckAvailable = healthcheckData !== undefined && healthcheckError === undefined;
+    const healthcheckAvailable =
+        Boolean(isMonitoringAllowed) &&
+        healthcheckData !== undefined &&
+        healthcheckError === undefined;
     const healthcheckLoading = healthcheckData === undefined && healthcheckFetching;
     const currentPileName = healthcheckData?.location?.pile?.name;
     const healthcheckSupportsPiles = healthcheckData?.location?.pile !== undefined;
@@ -267,6 +275,7 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
                     key={pile.PileId ?? pile.Name ?? index}
                     pile={pile}
                     current={Boolean(currentPileName?.trim() && pile.Name === currentPileName)}
+                    healthcheckAllowed={Boolean(isMonitoringAllowed)}
                     healthcheckAvailable={healthcheckAvailable}
                     healthcheckSupportsPiles={healthcheckSupportsPiles}
                     healthcheckLoading={healthcheckLoading}

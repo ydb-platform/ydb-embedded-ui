@@ -24,6 +24,7 @@ import type {ClusterAvailability, PreparedCluster} from '../../store/reducers/cl
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
 
@@ -54,6 +55,8 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const dispatch = useTypedDispatch();
 
     const emMetaAvailable = useEmMetaAvailable();
+    const isMonitoringAllowed = useIsUserAllowedToMakeChanges();
+    const healthcheckAvailable = !emMetaAvailable || isMonitoringAllowed;
     const isEditClusterAvailable = emMetaAvailable && uiFactory.onEditCluster !== undefined;
     const isDeleteClusterAvailable = emMetaAvailable && uiFactory.onDeleteCluster !== undefined;
 
@@ -106,11 +109,12 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     }, []);
     const rawColumns = React.useMemo(() => {
         return getClustersColumns({
+            healthcheckAvailable: Boolean(healthcheckAvailable),
             isEditClusterAvailable,
             isDeleteClusterAvailable,
-            onStatusClick: handleStatusClick,
+            onStatusClick: healthcheckAvailable ? handleStatusClick : undefined,
         });
-    }, [isDeleteClusterAvailable, isEditClusterAvailable, handleStatusClick]);
+    }, [isDeleteClusterAvailable, isEditClusterAvailable, handleStatusClick, healthcheckAvailable]);
 
     const clusters = query.data;
     const hasUnavailableClusters = clusters?.some(
@@ -376,7 +380,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     return (
         <ClusterDrawerHealthcheck
             clusterName={healthcheckClusterName}
-            isVisible={Boolean(healthcheckClusterName)}
+            isVisible={Boolean(healthcheckAvailable && healthcheckClusterName)}
             onClose={handleDrawerClose}
         >
             <div>

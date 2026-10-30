@@ -7,6 +7,7 @@ import {
     selectCheckStatus,
 } from '../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {useTypedSelector} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {Healthcheck} from '../Tenant/Healthcheck/Healthcheck';
 import {HealthcheckDrawer} from '../Tenant/Healthcheck/components/HealthcheckDrawer';
 import {getDatabaseHealthcheckAssistantTarget} from '../Tenant/Healthcheck/utils';
@@ -100,8 +101,15 @@ export function ClusterDrawerHealthcheck({
     database,
     clusterName,
 }: ClusterDrawerHealthcheckProps) {
-    const {showHealthcheck, healthcheckIssue, healthcheckLeaf, handleCloseHealthcheck} =
-        useClusterHealthcheckQueryParams();
+    const healthcheckAvailable = useIsUserAllowedToMakeChanges();
+    const {
+        showHealthcheck,
+        healthcheckIssue,
+        healthcheckLeaf,
+        issuesFilter,
+        view,
+        handleCloseHealthcheck,
+    } = useClusterHealthcheckQueryParams();
 
     const healthcheckStatus = useTypedSelector((state) =>
         selectCheckStatus(state, database, clusterName),
@@ -170,6 +178,25 @@ export function ClusterDrawerHealthcheck({
         handleCloseHealthcheck();
     }, [handleCloseHealthcheck]);
 
+    React.useEffect(() => {
+        if (
+            healthcheckAvailable === false &&
+            [showHealthcheck, healthcheckIssue, healthcheckLeaf, issuesFilter, view].some(
+                (value) => value !== undefined,
+            )
+        ) {
+            handleCloseDrawer();
+        }
+    }, [
+        healthcheckAvailable,
+        showHealthcheck,
+        healthcheckIssue,
+        healthcheckLeaf,
+        issuesFilter,
+        view,
+        handleCloseDrawer,
+    ]);
+
     const renderDrawerContent = React.useCallback(() => {
         return (
             <Healthcheck
@@ -190,7 +217,7 @@ export function ClusterDrawerHealthcheck({
                 clusterName,
                 scope: 'cluster',
             })}
-            isDrawerVisible={Boolean(showHealthcheck) && Boolean(database)}
+            isDrawerVisible={Boolean(healthcheckAvailable && showHealthcheck && database)}
             onCloseDrawer={handleCloseDrawer}
             onTransitionInComplete={
                 healthcheckIssue && healthcheckLeaf ? handleTransitionInComplete : undefined
