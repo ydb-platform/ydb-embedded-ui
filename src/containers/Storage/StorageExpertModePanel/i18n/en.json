@@ -1,4 +1,9 @@
 {
+  "action_more-datacenters": "+{{count}} more",
+  "action_show-more-datacenters": "Show {{count}} more datacenters for {{disk}}",
+  "action_close-datacenters": "Close additional datacenters for {{disk}}",
+  "value_vdisks": "VDisks",
+  "value_pdisks": "PDisks",
   "value_datacenter": "DC",
   "value_drive-type": "Drive type",
   "value_ssd": "SSD",

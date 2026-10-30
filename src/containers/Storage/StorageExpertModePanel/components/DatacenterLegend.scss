@@ -1,0 +1,74 @@
+.ydb-datacenter-legend {
+    position: relative;
+
+    flex: 1;
+
+    min-width: 0;
+
+    &__visible,
+    &__measure-row {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-2);
+
+        > * {
+            flex-shrink: 0;
+        }
+    }
+
+    &__measure {
+        position: absolute;
+
+        visibility: hidden;
+        overflow: hidden;
+
+        width: 1px;
+        height: 1px;
+
+        pointer-events: none;
+    }
+
+    &__measure-row {
+        width: max-content;
+    }
+
+    &__visible .ydb-datacenter-label,
+    &__measure-row .ydb-datacenter-label,
+    &__popover-label .ydb-datacenter-label {
+        --g-border-radius-xs: var(--g-border-radius-s);
+    }
+
+    &__popup {
+        --g-popup-border-radius: var(--g-border-radius-s);
+    }
+
+    &__popover {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--g-spacing-2);
+
+        max-width: min(420px, calc(100vw - 32px));
+        padding: var(--g-spacing-4);
+    }
+
+    &__popover-labels {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, max-content));
+        gap: var(--g-spacing-2);
+
+        min-width: 0;
+    }
+
+    &__popover-label {
+        display: flex;
+
+        min-width: 0;
+        max-width: 112px;
+    }
+
+    &__close {
+        flex-shrink: 0;
+
+        margin: -7px;
+    }
+}

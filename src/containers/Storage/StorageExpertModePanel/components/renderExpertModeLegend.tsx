@@ -21,7 +21,7 @@ export function renderVDiskLegend(
 ) {
     switch (vdisksGroupBy) {
         case VDisksGroupBy.Datacenter:
-            return <DatacenterLegend />;
+            return <DatacenterLegend diskType="vdisk" />;
         case VDisksGroupBy.DriveType:
             return <DriveTypeLegend />;
         case VDisksGroupBy.State:
@@ -45,7 +45,7 @@ export function renderPDiskLegend(
 ) {
     switch (pdisksGroupBy) {
         case PDisksGroupBy.Datacenter:
-            return <DatacenterLegend />;
+            return <DatacenterLegend diskType="pdisk" />;
         case PDisksGroupBy.DriveType:
             return <DriveTypeLegend />;
         case PDisksGroupBy.State:

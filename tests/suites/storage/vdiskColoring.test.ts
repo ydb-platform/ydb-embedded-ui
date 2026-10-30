@@ -987,7 +987,7 @@ test.describe('Datacenter storage screenshots', () => {
                 }
             }
             const legend = page.getByTestId('storage-pdisks-expert-mode-legend');
-            await expect(legend.locator('.ydb-datacenter-label')).toHaveText([
+            await expect(legend.locator('.ydb-datacenter-label:visible')).toHaveText([
                 'DC-A',
                 'DC-B',
                 'Unknown',
@@ -1026,6 +1026,21 @@ test.describe('Datacenter storage screenshots', () => {
                 });
                 await expect(bar).toHaveCSS('background-color', background);
             }
+            await page.route('**/viewer/json/nodelist?*', (route) =>
+                route.fulfill({
+                    json: nodeList.map((node, index) =>
+                        index === 2 ? {...node, Location: {BridgePileName: 'pile-c'}} : node,
+                    ),
+                }),
+            );
+            await page.reload();
+            const pileLabel = legend
+                .locator('.ydb-datacenter-label:visible')
+                .filter({hasText: 'P=PILE-C/'});
+            await expect(pileLabel).toHaveClass(/ydb-datacenter-color_color_blue/);
+            await expect(
+                legend.locator('.ydb-datacenter-label:visible').filter({hasText: 'Unknown'}),
+            ).toHaveClass(/ydb-datacenter-color_color_neutral/);
         });
     }
 });

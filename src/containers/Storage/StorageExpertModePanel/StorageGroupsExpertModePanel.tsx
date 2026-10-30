@@ -3,7 +3,7 @@ import {useStorageQueryParams} from '../useStorageQueryParams';
 import {ExpertModePanelLayout, ExpertModeRow} from './components/ExpertModePanelLayout';
 import type {ExpertModeOption} from './components/ExpertModePanelLayout';
 import {renderPDiskLegend, renderVDiskLegend} from './components/renderExpertModeLegend';
-import {PDisksGroupBy, VDisksGroupBy} from './constants';
+import {PDisksGroupBy, VDisksGroupBy, b} from './constants';
 import type {PDisksGroupByValue, VDisksGroupByValue} from './constants';
 import i18n from './i18n';
 
@@ -57,7 +57,12 @@ export function StorageGroupsExpertModePanel({className}: StorageGroupsExpertMod
                 onUpdate={handlePDisksGroupByChange}
                 options={getPDiskOptions()}
                 legend={
-                    <div data-qa="storage-pdisks-expert-mode-legend">
+                    <div
+                        className={b('dc-legend', {
+                            enabled: pdisksGroupBy === PDisksGroupBy.Datacenter,
+                        })}
+                        data-qa="storage-pdisks-expert-mode-legend"
+                    >
                         {renderPDiskLegend(pdisksGroupBy, 'pdisks')}
                     </div>
                 }
