@@ -13,6 +13,7 @@ export function useNodeMetadata(
     return {
         Host: parentNodeData?.Host || storedNodeData?.Host,
         DC: parentNodeData?.DC || storedNodeData?.DC,
+        DCKey: parentNodeData?.DCKey || storedNodeData?.DCKey,
         Rack: parentNodeData?.Rack || storedNodeData?.Rack,
         PileName: parentNodeData?.PileName || storedNodeData?.PileName,
     };

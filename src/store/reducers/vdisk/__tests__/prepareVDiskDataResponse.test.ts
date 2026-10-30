@@ -5,6 +5,19 @@ import {EVDiskState} from '../../../../types/api/vdisk';
 import {prepareVDiskDataResponse} from '../utils';
 
 describe('prepareVDiskDataResponse', () => {
+    test('keeps the datacenter caption separate from its bridge color key', () => {
+        const result = prepareVDiskDataResponse(
+            [
+                {},
+                {
+                    SystemStateInfo: [{Location: {DataCenter: 'dc-a', BridgePileName: 'pile-a'}}],
+                },
+            ],
+            '1-1-0-0-0',
+        );
+        expect(result).toMatchObject({NodeDC: 'dc-a', NodeDCKey: 'P=PILE-A/DC-A'});
+    });
+
     test('provides recipient metrics for a donor page without circular references', () => {
         const response: StorageGroupsResponse = {
             StorageGroups: [

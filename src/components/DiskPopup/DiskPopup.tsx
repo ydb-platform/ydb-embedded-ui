@@ -6,6 +6,7 @@ import {isNil} from 'lodash';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import type {DiskDetailItem} from '../../utils/disks/diskInfo/getDiskLocationItems';
+import {DatacenterLabel} from '../Datacenter/DatacenterLabel';
 import {DiskTypeLabel} from '../DiskStatus/DiskStatus';
 import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
@@ -81,9 +82,11 @@ export function DiskPopupHeader({
 export function DiskPopupText({
     value,
     withLeftTrim = false,
+    children,
 }: {
     value?: string | number;
     withLeftTrim?: boolean;
+    children?: React.ReactNode;
 }) {
     const hasValue = !isNil(value) && value !== '';
     const text = hasValue ? value : EMPTY_DATA_PLACEHOLDER;
@@ -93,18 +96,37 @@ export function DiskPopupText({
                 className={b('text', {'with-left-trim': withLeftTrim})}
                 tabIndex={hasValue ? 0 : undefined}
             >
-                {withLeftTrim ? <span>{text}</span> : text}
+                {children ?? (withLeftTrim ? <span>{text}</span> : text)}
             </span>
         </Tooltip>
     );
 }
 
-export function DiskPopupLocation({items}: {items: DiskDetailItem[]}) {
+export function DiskPopupLocation({
+    items,
+    datacenterColorKey,
+}: {
+    items: DiskDetailItem[];
+    datacenterColorKey?: string;
+}) {
     if (!items.length) {
         return null;
     }
     const locationItems = items.map((item) => {
-        if (['fqdn', 'rack', 'datacenter'].includes(item.id)) {
+        if (item.id === 'datacenter') {
+            const name = item.copyText === undefined ? undefined : String(item.copyText);
+            return {
+                ...item,
+                content: (
+                    <DiskPopupText value={name}>
+                        {name ? (
+                            <DatacenterLabel name={name} colorKey={datacenterColorKey} size="xxs" />
+                        ) : undefined}
+                    </DiskPopupText>
+                ),
+            };
+        }
+        if (['fqdn', 'rack'].includes(item.id)) {
             return {...item, content: <DiskPopupText value={item.copyText} />};
         }
         if (item.id === 'pdisk-path' && typeof item.copyText === 'string') {

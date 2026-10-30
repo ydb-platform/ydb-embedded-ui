@@ -1,6 +1,7 @@
 import type {StorageGroupsResponse} from '../../../types/api/storage';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
 import {getVDiskId} from '../../../utils/disks/helpers';
+import {getDatacenterQueryContext} from '../../datacenterQueryContext';
 import {api} from '../api';
 
 import {prepareVDiskDataResponse} from './utils';
@@ -22,7 +23,8 @@ export type VDiskBlobIndexStatParams = VDiskBlobIndexStatBasicParams & {
 export const vDiskApi = api.injectEndpoints({
     endpoints: (build) => ({
         getVDiskData: build.query({
-            queryFn: async (params: VDiskDataRequestParams, {signal}) => {
+            queryFn: async (params: VDiskDataRequestParams, {signal, getState}) => {
+                const meta = getDatacenterQueryContext(getState);
                 try {
                     const {nodeId, database, vDiskId} = params;
                     const groupId = vDiskId.split('-', 1)[0];
@@ -46,7 +48,7 @@ export const vDiskApi = api.injectEndpoints({
                     ];
                     const response = await Promise.all(promises);
                     const data = prepareVDiskDataResponse(response, vDiskId);
-                    return {data};
+                    return {data, meta};
                 } catch (error) {
                     return {error};
                 }
