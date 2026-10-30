@@ -11,10 +11,13 @@ type NodesGroupByOptions =
     | 'Version'
     | 'Uptime'
     | 'Missing'
-    | 'DiskSpaceUsage';
+    | 'DiskSpaceUsage'
+    | 'Pile Name';
 
 export class NodesPage extends PageModel {
     readonly table: Locator;
+    readonly searchInput: Locator;
+    readonly entitiesCount: Locator;
 
     private groupBySelect: Locator;
     private groupByPopup: Locator;
@@ -25,6 +28,8 @@ export class NodesPage extends PageModel {
         super(page, nodesPage);
 
         this.table = this.selector.locator('.ydb-paginated-table__table');
+        this.searchInput = this.selector.locator('.ydb-search input');
+        this.entitiesCount = this.selector.locator('.ydb-entities-count');
 
         this.groupBySelect = this.page.locator('.ydb-nodes__group-by-select');
         this.groupByPopup = this.page.locator('.ydb-nodes__group-by-popup');

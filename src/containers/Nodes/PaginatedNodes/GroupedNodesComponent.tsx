@@ -6,17 +6,21 @@ import {ResponseError} from '../../../components/Errors/ResponseError';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
-import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
+import {
+    NODES_COLUMNS_TITLES,
+    NODES_COLUMNS_TO_DATA_FIELDS,
+} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {nodesApi} from '../../../store/reducers/nodes/nodes';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
-import type {NodesGroupByField, NodesPeerRole} from '../../../types/api/nodes';
+import type {NodesGroupByField, NodesPeerRole, NodesRequiredField} from '../../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
 import {TableGroup} from '../../Storage/TableGroup/TableGroup';
 import {useExpandedGroups} from '../../Storage/TableGroup/useExpandedTableGroups';
 import {NodesControls} from '../NodesControls/NodesControls';
@@ -24,6 +28,8 @@ import {NodesTable} from '../NodesTable';
 import i18n from '../i18n';
 import {b} from '../shared';
 import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
+
+const NODE_SEARCH_FIELDS_REQUIRED = new Set<NodesRequiredField>(['Host', 'NodeName']);
 
 interface NodeGroupProps {
     name: string;
@@ -136,6 +142,15 @@ export function GroupedNodesComponent({
         requiredColumnsIds,
     );
 
+    const searchFieldsRequired = React.useMemo(() => {
+        const activeFieldsRequired = getRequiredDataFields(
+            columnsToShow.map(({name}) => name),
+            NODES_COLUMNS_TO_DATA_FIELDS,
+        );
+
+        return activeFieldsRequired.filter((field) => NODE_SEARCH_FIELDS_REQUIRED.has(field));
+    }, [columnsToShow]);
+
     const schemaPathParam = React.useMemo(() => {
         if (!isNil(path) && !isNil(databaseFullPath)) {
             return {path, databaseFullPath, useMetaProxy};
@@ -151,6 +166,7 @@ export function GroupedNodesComponent({
             filter: searchValue.trim(),
             filter_peer_role: peerRoleFilter,
             group: groupByParam,
+            fieldsRequired: searchValue.trim() ? searchFieldsRequired : undefined,
             limit: 0,
         },
         {
