@@ -67,16 +67,14 @@ describe('datacenter palette', () => {
     test.each([
         [1, 'turquoise', 'soft'],
         [10, 'yellow', 'soft'],
-        [11, 'turquoise', 'muted'],
-        [20, 'yellow', 'muted'],
-        [21, 'turquoise', 'outline'],
-        [30, 'yellow', 'outline'],
-        [31, 'reserve-orange', 'soft'],
-        [42, 'reserve-night', 'soft'],
-        [43, 'reserve-orange', 'outline'],
-        [54, 'reserve-night', 'outline'],
-        [55, 'turquoise', 'soft'],
-        [108, 'reserve-night', 'outline'],
+        [11, 'sage', 'soft'],
+        [12, 'slate', 'soft'],
+        [13, 'turquoise', 'outline'],
+        [24, 'slate', 'outline'],
+        [25, 'turquoise', 'filled-outline'],
+        [36, 'slate', 'filled-outline'],
+        [37, 'turquoise', 'soft'],
+        [72, 'slate', 'filled-outline'],
     ])('maps index %i to %s / %s', (index, color, variant) => {
         const indexes = {'DC-A': index};
         expect(getDatacenterColor('dc-a', indexes)).toBe(color);

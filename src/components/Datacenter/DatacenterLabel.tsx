@@ -20,6 +20,7 @@ const colors = cn('ydb-datacenter-color');
 export function DatacenterLabel({name, colorKey = name}: {name?: string; colorKey?: string}) {
     const indexes = useDatacenterColorIndexes();
     const normalized = normalizeDatacenter(name);
+    const key = normalized ? colorKey : undefined;
     const text = normalized || i18n('value_unknown');
     return (
         <Label
@@ -28,8 +29,8 @@ export function DatacenterLabel({name, colorKey = name}: {name?: string; colorKe
             className={b(
                 null,
                 colors({
-                    color: getDatacenterColor(colorKey, indexes),
-                    variant: getDatacenterColorVariant(colorKey, indexes),
+                    color: getDatacenterColor(key, indexes),
+                    variant: getDatacenterColorVariant(key, indexes),
                 }),
             )}
             icon={normalized ? undefined : <Icon data={CircleQuestionFill} size={10} />}

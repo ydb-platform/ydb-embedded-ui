@@ -2,7 +2,7 @@ import type {TNodeInfo, TSystemStateInfo} from '../types/api/nodes';
 
 export type DatacenterColorIndexes = Readonly<Record<string, number>>;
 
-// Base hues in priority order: original colors, then additional colors.
+// Base hues in priority order; every appearance uses the same hue sequence.
 export const DATACENTER_COLORS = [
     'turquoise',
     'purple',
@@ -14,38 +14,18 @@ export const DATACENTER_COLORS = [
     'brown',
     'green',
     'yellow',
-    // One base swatch per row of Figma's extended palette; themes share the same slot.
-    'reserve-orange',
-    'reserve-yellow',
-    'reserve-green',
-    'reserve-lightblue',
-    'reserve-blue',
-    'reserve-violet',
-    'reserve-pink',
-    'reserve-caramel',
-    'reserve-moss',
-    'reserve-turquoise',
-    'reserve-barbie',
-    'reserve-night',
+    'sage',
+    'slate',
 ] as const;
 
 export type DatacenterColor = (typeof DATACENTER_COLORS)[number] | 'neutral';
 
-const DATACENTER_COLOR_VARIANTS = ['soft', 'muted', 'outline'] as const;
-const RESERVE_DATACENTER_COLOR_VARIANTS = ['soft', 'outline'] as const;
+const DATACENTER_COLOR_VARIANTS = ['soft', 'outline', 'filled-outline'] as const;
 export type DatacenterColorVariant = (typeof DATACENTER_COLOR_VARIANTS)[number];
 
-const PRIMARY_DATACENTER_COLORS = DATACENTER_COLORS.slice(0, 10);
-const RESERVE_DATACENTER_COLORS = DATACENTER_COLORS.slice(10);
-// Use every primary appearance before the additional fills and outlines.
-const DATACENTER_PALETTE = [
-    ...DATACENTER_COLOR_VARIANTS.flatMap((variant) =>
-        PRIMARY_DATACENTER_COLORS.map((color) => ({color, variant})),
-    ),
-    ...RESERVE_DATACENTER_COLOR_VARIANTS.flatMap((variant) =>
-        RESERVE_DATACENTER_COLORS.map((color) => ({color, variant})),
-    ),
-];
+const DATACENTER_PALETTE = DATACENTER_COLOR_VARIANTS.flatMap((variant) =>
+    DATACENTER_COLORS.map((color) => ({color, variant})),
+);
 
 export function normalizeDatacenter(name?: string) {
     return name ? name.toUpperCase() : undefined;

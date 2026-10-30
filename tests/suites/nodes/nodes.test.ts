@@ -429,12 +429,13 @@ test.describe('Datacenter nodes screenshots', () => {
                 'neutral',
                 'blue',
                 'orange',
-                'red',
+                'neutral',
             ].entries()) {
                 await expect(labels.nth(index)).toHaveClass(
                     new RegExp(`ydb-datacenter-color_color_${color}`),
                 );
             }
+            await expect(labels.nth(6)).toHaveClass(/ydb-datacenter-color_variant_soft/);
             for (const pile of ['pile-a', 'pile-b', 'pile-c']) {
                 await expect(
                     nodesPage.table.getByRole('cell', {name: pile, exact: true}),
