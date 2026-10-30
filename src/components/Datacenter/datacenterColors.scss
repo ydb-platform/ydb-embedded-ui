@@ -1,67 +1,23 @@
-.ydb-datacenter-color {
-    --ydb-dc-swatch: var(--g-color-base-neutral-heavy);
-    --ydb-dc-base-background: color-mix(in sRGB, var(--ydb-dc-swatch) 20%, transparent);
-    --ydb-dc-base-text: var(--g-color-base-neutral-heavy);
-    --ydb-dc-background: var(--ydb-dc-base-background);
-    --ydb-dc-text: var(--ydb-dc-base-text);
-    --ydb-dc-outline: transparent;
-    --ydb-dc-outline-opacity: 85%;
-    --ydb-dc-filled-opacity: 12%;
-    --ydb-dc-filled-outline-opacity: 68%;
+@use '../../styles/datacenters';
 
-    @each $family, $swatch, $text, $dark-swatch,
-        $dark-text in ('turquoise', #00b8a9, #005c54, #00c9ba, #71f1de),
-        ('purple', #9836f4, #6420aa, #ad60ff, #e3beff),
-        ('blue', #2059ff, #153ab0, #4176ff, #abc4ff),
-        ('orange', #f58400, #843e00, #ff8800, #ffce95), ('red', #e62e40, #951121, #ff4052, #ffb4ba),
-        ('pink', #e3269f, #86115b, #f444b7, #ffb0e2), ('sky', #00a7ef, #00577f, #24bfff, #98e4ff),
-        ('brown', #865a3d, #5f3b23, #ac7958, #eac5a7),
-        ('green', #36b23b, #166020, #49ce45, #a0f485),
-        ('yellow', #e6c800, #655500, #ebd500, #fff278),
-        ('sage', #4d9b87, #305851, #65a495, #b8d7cf), ('slate', #7476a4, #44465f, #8586ac, #c7c8db)
+.ydb-datacenter-color {
+    --ydb-dc-background: var(--g-color-base-neutral-medium);
+    --ydb-dc-text: var(--g-color-base-neutral-heavy);
+    --ydb-dc-outline: transparent;
+
+    @each $family in 'turquoise', 'purple', 'blue', 'orange', 'red', 'pink', 'sky', 'brown',
+        'green', 'yellow', 'sage', 'slate'
     {
         &_color_#{$family} {
-            --ydb-dc-swatch: #{$swatch};
-            --ydb-dc-base-text: #{$text};
+            --ydb-dc-background: var(--ydb-dc-#{$family}-base);
+            --ydb-dc-text: var(--ydb-dc-#{$family}-text);
 
-            .g-root_theme_dark &,
-            .g-root_theme_dark-hc & {
-                --ydb-dc-swatch: #{$dark-swatch};
-                --ydb-dc-base-text: #{$dark-text};
+            @each $variant in 'outline', 'filled-outline' {
+                &.ydb-datacenter-color_variant_#{$variant} {
+                    --ydb-dc-background: var(--ydb-dc-#{$family}-#{$variant}-base);
+                    --ydb-dc-outline: var(--ydb-dc-#{$family}-#{$variant}-stroke);
+                }
             }
         }
-    }
-
-    .g-root_theme_dark &,
-    .g-root_theme_dark-hc & {
-        --ydb-dc-outline-opacity: 82%;
-        --ydb-dc-filled-opacity: 16%;
-        --ydb-dc-filled-outline-opacity: 65%;
-    }
-
-    &_variant_outline {
-        --ydb-dc-background: transparent;
-        --ydb-dc-outline: color-mix(
-            in sRGB,
-            var(--ydb-dc-swatch) var(--ydb-dc-outline-opacity),
-            transparent
-        );
-    }
-
-    &_variant_filled-outline {
-        --ydb-dc-background: color-mix(
-            in sRGB,
-            var(--ydb-dc-swatch) var(--ydb-dc-filled-opacity),
-            transparent
-        );
-        --ydb-dc-outline: color-mix(
-            in sRGB,
-            var(--ydb-dc-swatch) var(--ydb-dc-filled-outline-opacity),
-            transparent
-        );
-    }
-
-    &_color_neutral {
-        --ydb-dc-base-background: var(--g-color-base-neutral-medium);
     }
 }
