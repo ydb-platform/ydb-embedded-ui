@@ -28,6 +28,12 @@ $block: '.ydb-storage-expert-mode-panel';
         width: 100%;
     }
 
+    &__dc-legend_enabled {
+        flex: 1;
+
+        min-width: 0;
+    }
+
     &__capacity-alert-option-abbreviation {
         width: 40px;
         margin-inline-start: auto;

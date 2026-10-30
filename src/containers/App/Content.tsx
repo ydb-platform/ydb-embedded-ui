@@ -20,9 +20,11 @@ import {
     useMetaCapabilitiesQuery,
 } from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {cn} from '../../utils/cn';
-import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
+import {useNodesListQueryArgs} from '../../utils/hooks/useNodesListQueryArgs';
+import {useSetting} from '../../utils/hooks/useSetting';
 import {lazyComponent} from '../../utils/lazyComponent';
 import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
 import Authentication from '../Authentication/Authentication';
@@ -225,8 +227,10 @@ function HomePageDataWrapper({children}: {children: React.ReactNode}) {
 }
 
 function GetNodesList() {
-    const database = useDatabaseFromQuery();
-    nodesListApi.useGetNodesListQuery({database}, undefined);
+    // Load the remote setting here; cache readers only use its value from the store.
+    useSetting(SETTING_KEYS.TENANT_INITIAL_PAGE);
+    const args = useNodesListQueryArgs();
+    nodesListApi.useGetNodesListQuery(args);
     return null;
 }
 

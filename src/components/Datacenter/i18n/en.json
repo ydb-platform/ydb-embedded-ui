@@ -1,3 +1,4 @@
 {
-  "value_unknown": "Unknown"
+  "value_unknown": "Unknown",
+  "context_disk-datacenter": "{{disk}}: DC {{datacenter}}"
 }
