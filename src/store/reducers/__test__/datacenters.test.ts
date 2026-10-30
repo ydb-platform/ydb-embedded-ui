@@ -8,6 +8,8 @@ import {api} from '../api';
 import {setIsAuthenticated} from '../authentication/authentication';
 import {createDatacenterRegistrar} from '../datacenters';
 import {nodesListApi} from '../nodesList';
+import {pDiskApi} from '../pdisk/pdisk';
+import {vDiskApi} from '../vdisk/vdisk';
 
 function createStore() {
     return configureStore({
@@ -20,12 +22,21 @@ describe('datacenter registry', () => {
     const originalApi = window.api;
     const originalIndexes = uiFactory.datacenterColorIndexes;
     const getNodesList = jest.fn();
+    const getNodeInfo = jest.fn();
     let store: ReturnType<typeof createStore>;
 
     beforeEach(() => {
         getNodesList.mockReset();
+        getNodeInfo.mockReset();
         configureUIFactory({datacenterColorIndexes: undefined});
-        window.api = {viewer: {getNodesList}} as unknown as YdbEmbeddedAPI;
+        window.api = {
+            viewer: {
+                getNodesList,
+                getNodeInfo,
+                getNodeWhiteboardPDiskInfo: jest.fn().mockResolvedValue({}),
+            },
+            storage: {getStorageGroups: jest.fn().mockResolvedValue({})},
+        } as unknown as YdbEmbeddedAPI;
         store = createStore();
     });
 
@@ -40,6 +51,61 @@ describe('datacenter registry', () => {
             .dispatch(nodesListApi.endpoints.getNodesList.initiate({database}, {subscribe: false}))
             .unwrap();
     }
+
+    async function fetchDisk(kind: 'pdisk' | 'vdisk') {
+        if (kind === 'pdisk') {
+            return store
+                .dispatch(
+                    pDiskApi.endpoints.getPdiskInfo.initiate(
+                        {nodeId: 1, pDiskId: 1},
+                        {subscribe: false},
+                    ),
+                )
+                .unwrap();
+        }
+        return store
+            .dispatch(
+                vDiskApi.endpoints.getVDiskData.initiate(
+                    {nodeId: 1, vDiskId: '1-1-0-0-0'},
+                    {subscribe: false},
+                ),
+            )
+            .unwrap();
+    }
+
+    test.each(['pdisk', 'vdisk'] as const)(
+        'registers the %s sysinfo DC when nodelist does not contain the node',
+        async (kind) => {
+            getNodesList.mockResolvedValue([]);
+            await fetchNodes('/db-a');
+            getNodeInfo.mockResolvedValue({
+                SystemStateInfo: [{Location: {DataCenter: 'dc-a', BridgePileName: 'pile-a'}}],
+            });
+            await expect(fetchDisk(kind)).resolves.toMatchObject({
+                NodeDC: 'dc-a',
+                NodeDCKey: 'P=PILE-A/DC-A',
+            });
+            expect(store.getState().datacenters.indexes).toEqual({'P=PILE-A/DC-A': 1});
+            expect(getNodesList).toHaveBeenCalledTimes(1);
+        },
+    );
+
+    test.each(['pdisk', 'vdisk'] as const)(
+        'ignores %s metadata from a request started before logout',
+        async (kind) => {
+            let finishRequest: (value: unknown) => void = () => {};
+            getNodeInfo.mockReturnValue(
+                new Promise((resolve) => {
+                    finishRequest = resolve;
+                }),
+            );
+            const pending = fetchDisk(kind);
+            store.dispatch(setIsAuthenticated(false));
+            finishRequest({SystemStateInfo: [{Location: {DataCenter: 'DC-OLD'}}]});
+            await pending;
+            expect(store.getState().datacenters).toEqual({indexes: {}, generation: 1});
+        },
+    );
 
     test('registers normalized structured and legacy identities from a fulfilled request', async () => {
         configureUIFactory({datacenterColorIndexes: {'DC-PINNED': 7}});

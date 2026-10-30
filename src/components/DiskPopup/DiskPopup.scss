@@ -155,6 +155,12 @@
         .g-definition-list__definition {
             flex: 1;
         }
+
+        .ydb-datacenter-label {
+            --g-border-radius-xs: var(--g-border-radius-s);
+
+            vertical-align: top;
+        }
     }
 
     &__text {
