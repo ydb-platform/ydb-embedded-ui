@@ -1104,6 +1104,7 @@ test.describe('Datacenter info screenshots', () => {
                 expect(nodeListRequests[0].searchParams.get('database')).toBe(database);
                 expect(nodeListRequests[0].searchParams.has('include_storage')).toBe(false);
                 expect(clusterRequests).toEqual([]);
+                await page.evaluate(() => document.fonts.ready);
                 await expect(page.getByTestId('schema-object-info')).toHaveScreenshot(
                     `database-datacenters-${theme}.png`,
                 );
@@ -1111,7 +1112,7 @@ test.describe('Datacenter info screenshots', () => {
 
             test(`shows the full datacenter palette in ${theme} theme`, async ({page}) => {
                 const datacenters = Array.from(
-                    {length: 54},
+                    {length: 36},
                     (_, index) => `DC-${String(index + 1).padStart(2, '0')}`,
                 );
                 await setupDatabaseDatacentersMock(page, datacenters);
@@ -1123,14 +1124,14 @@ test.describe('Datacenter info screenshots', () => {
                 });
                 const palette = page.getByTestId('database-datacenters');
                 const labels = palette.locator('.ydb-datacenter-label');
-                await expect(labels).toHaveCount(54);
+                await expect(labels).toHaveCount(36);
                 for (const [index, color, variant] of [
                     [0, 'turquoise', 'soft'],
-                    [10, 'turquoise', 'muted'],
-                    [20, 'turquoise', 'outline'],
-                    [30, 'reserve-orange', 'soft'],
-                    [42, 'reserve-orange', 'outline'],
-                    [53, 'reserve-night', 'outline'],
+                    [10, 'sage', 'soft'],
+                    [11, 'slate', 'soft'],
+                    [12, 'turquoise', 'outline'],
+                    [24, 'turquoise', 'filled-outline'],
+                    [35, 'slate', 'filled-outline'],
                 ] as const) {
                     await expect(labels.nth(index)).toContainText(datacenters[index]);
                     await expect(labels.nth(index)).toHaveClass(
@@ -1140,8 +1141,9 @@ test.describe('Datacenter info screenshots', () => {
                         new RegExp(`ydb-datacenter-color_variant_${variant}`),
                     );
                 }
+                await page.evaluate(() => document.fonts.ready);
                 await expect(palette).toHaveScreenshot(`datacenter-full-palette-${theme}.png`);
-                for (const index of [0, 30, 42]) {
+                for (const index of [0, 12, 24]) {
                     const label = labels.nth(index);
                     const background = await label.evaluate(
                         (element) => getComputedStyle(element).backgroundColor,
