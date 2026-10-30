@@ -1005,3 +1005,155 @@ test.describe('Diagnostics Info tab', async () => {
         await expect(infoContent).toHaveScreenshot('view-info-yql-code-preview.png');
     });
 });
+
+async function setupDatabaseDatacentersMock(
+    page: Page,
+    datacenters: (string | undefined)[],
+    tenantType: 'Dedicated' | 'Serverless' = 'Dedicated',
+) {
+    const nodeListRequests: URL[] = [];
+    const clusterRequests: string[] = [];
+    const responses: Record<string, unknown> = {
+        whoami: {
+            IsDatabaseAllowed: true,
+            IsViewerAllowed: false,
+            IsMonitoringAllowed: false,
+            IsAdministrationAllowed: false,
+        },
+        capabilities: {Capabilities: {}},
+        tenantinfo: {TenantInfo: [{Name: database, Type: tenantType, Overall: 'Green'}]},
+        describe: {
+            Status: 'StatusSuccess',
+            Path: database,
+            PathDescription: {Self: {Name: 'local', PathType: 'EPathTypeSubDomain'}},
+        },
+        nodelist: datacenters.map((dc, index) => ({
+            Id: index + 1,
+            Host: `dc-node-${index + 1}`,
+            Location: {DataCenter: dc},
+        })),
+    };
+    await page.route('**/viewer/**', (route) => {
+        const url = new URL(route.request().url());
+        const endpoint = url.pathname.split('/').pop() ?? '';
+        if (endpoint === 'nodelist') {
+            nodeListRequests.push(url);
+        }
+        if (endpoint === 'cluster') {
+            clusterRequests.push(url.href);
+        }
+        return route.fulfill({json: responses[endpoint] ?? {}});
+    });
+    return {nodeListRequests, clusterRequests};
+}
+
+test.describe('Datacenter info screenshots', () => {
+    test('hides datacenters for a serverless database', async ({page}) => {
+        await page.addInitScript(() => localStorage.setItem('enableTenantNavigationV2', 'true'));
+        await setupDatabaseDatacentersMock(page, ['DC-A', 'DC-B'], 'Serverless');
+        await new TenantPage(page).goto({
+            database,
+            schema: database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+        await expect(page.getByText('Serverless', {exact: true})).toBeVisible();
+        const info = page.getByTestId('schema-object-info');
+        await expect(info).toBeVisible();
+        await expect(info.getByText('Datacenters', {exact: true})).toHaveCount(0);
+        await expect(page.getByTestId('database-datacenters')).toHaveCount(0);
+    });
+
+    for (const theme of ['light', 'dark']) {
+        test.describe(theme, () => {
+            test.beforeEach(async ({page}) => {
+                await page.addInitScript((value) => {
+                    localStorage.setItem('theme', value);
+                    localStorage.setItem('enableTenantNavigationV2', 'true');
+                }, theme);
+                await page.setViewportSize({width: 1200, height: 800});
+            });
+
+            test(`shows database node counts in ${theme} theme`, async ({page}) => {
+                const {nodeListRequests, clusterRequests} = await setupDatabaseDatacentersMock(
+                    page,
+                    ['dc-a', 'DC-A', 'DC-B', undefined],
+                );
+                await new TenantPage(page).goto({
+                    database,
+                    schema: database,
+                    databasePage: 'diagnostics',
+                    diagnosticsTab: 'overview',
+                });
+                const labels = page
+                    .getByTestId('database-datacenters')
+                    .locator('.ydb-datacenter-label');
+                await expect(labels).toHaveCount(3);
+                for (const [index, name, count, color] of [
+                    [0, 'DC-A', '2 nodes', 'turquoise'],
+                    [1, 'DC-B', '1 node', 'purple'],
+                    [2, 'Unknown', '1 node', 'neutral'],
+                ] as const) {
+                    await expect(labels.nth(index)).toContainText(name);
+                    await expect(labels.nth(index)).toContainText(count);
+                    await expect(labels.nth(index)).toHaveClass(
+                        new RegExp(`ydb-datacenter-color_color_${color}`),
+                    );
+                }
+                expect(nodeListRequests).toHaveLength(1);
+                expect(nodeListRequests[0].searchParams.get('database')).toBe(database);
+                expect(nodeListRequests[0].searchParams.has('include_storage')).toBe(false);
+                expect(clusterRequests).toEqual([]);
+                await page.evaluate(() => document.fonts.ready);
+                await expect(page.getByTestId('schema-object-info')).toHaveScreenshot(
+                    `database-datacenters-${theme}.png`,
+                );
+            });
+
+            test(`shows the full datacenter palette in ${theme} theme`, async ({page}) => {
+                const datacenters = Array.from(
+                    {length: 36},
+                    (_, index) => `DC-${String(index + 1).padStart(2, '0')}`,
+                );
+                await setupDatabaseDatacentersMock(page, datacenters);
+                await new TenantPage(page).goto({
+                    database,
+                    schema: database,
+                    databasePage: 'diagnostics',
+                    diagnosticsTab: 'overview',
+                });
+                const palette = page.getByTestId('database-datacenters');
+                const labels = palette.locator('.ydb-datacenter-label');
+                await expect(labels).toHaveCount(36);
+                for (const [index, color, variant] of [
+                    [0, 'turquoise', 'soft'],
+                    [10, 'sage', 'soft'],
+                    [11, 'slate', 'soft'],
+                    [12, 'turquoise', 'outline'],
+                    [24, 'turquoise', 'filled-outline'],
+                    [35, 'slate', 'filled-outline'],
+                ] as const) {
+                    await expect(labels.nth(index)).toContainText(datacenters[index]);
+                    await expect(labels.nth(index)).toHaveClass(
+                        new RegExp(`ydb-datacenter-color_color_${color}`),
+                    );
+                    await expect(labels.nth(index)).toHaveClass(
+                        new RegExp(`ydb-datacenter-color_variant_${variant}`),
+                    );
+                }
+                await page.evaluate(() => document.fonts.ready);
+                await expect(palette).toHaveScreenshot(`datacenter-full-palette-${theme}.png`);
+                for (const index of [0, 12, 24]) {
+                    const label = labels.nth(index);
+                    const background = await label.evaluate(
+                        (element) => getComputedStyle(element).backgroundColor,
+                    );
+                    await label.hover();
+                    await expect(palette).toHaveScreenshot(`datacenter-full-palette-${theme}.png`);
+                    await expect(label).toHaveCSS('background-color', background);
+                    await page.mouse.move(0, 0);
+                }
+            });
+        });
+    }
+});
