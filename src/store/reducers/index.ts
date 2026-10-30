@@ -4,6 +4,7 @@ import {api} from './api';
 import authentication from './authentication/authentication';
 import cluster from './cluster/cluster';
 import clusters from './clusters/clusters';
+import datacenters from './datacenters';
 import executeTopQueries from './executeTopQueries/executeTopQueries';
 import fullscreen from './fullscreen';
 import header from './header/header';
@@ -21,6 +22,7 @@ export const rootReducer = {
     [api.reducerPath]: api.reducer,
     singleClusterMode,
     cluster,
+    datacenters,
     tenant,
     schema,
     partitions,

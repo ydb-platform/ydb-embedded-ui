@@ -1,6 +1,7 @@
 export interface NodeMetadata {
     Host?: string;
     DC?: string;
+    DCKey?: string;
     Rack?: string;
 }
 
