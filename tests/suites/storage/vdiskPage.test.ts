@@ -926,11 +926,15 @@ test.describe('Storage disk popup snapshots', () => {
                         .locator('.ydb-disk-popup__text')
                         .filter({hasText: value})
                         .first();
-                    await expect(text).toHaveCSS('text-overflow', 'ellipsis');
-                    await expect(text).toHaveCSS('white-space', 'nowrap');
+                    const clipped =
+                        value === LONG_DATACENTER ? text.locator('.g-label__content') : text;
+                    await expect(clipped).toHaveCSS('text-overflow', 'ellipsis');
+                    await expect(clipped).toHaveCSS('white-space', 'nowrap');
                     await expect
                         .poll(() =>
-                            text.evaluate((element) => element.scrollWidth > element.clientWidth),
+                            clipped.evaluate(
+                                (element) => element.scrollWidth > element.clientWidth,
+                            ),
                         )
                         .toBe(true);
                     await text.hover();
@@ -1179,6 +1183,7 @@ test.describe('Storage disk popup snapshots', () => {
             datacenter: 'KLG',
         });
         await setupPDiskInfoMock(page, {withSlotOnlyDonor: true});
+        await page.route('**/viewer/json/nodelist?*', (route) => route.fulfill({json: []}));
         await page.goto(`/pDisk?nodeId=${NODE_ID}&pDiskId=${PDISK_ID}`);
 
         const slot = page.locator('.ydb-pdisk-space-distribution__slot-wrapper a').first();
@@ -1202,6 +1207,9 @@ test.describe('Storage disk popup snapshots', () => {
         await expectDefinitionListRowValue(popup, 'Storage Pool Name', STORAGE_POOL_NAME);
 
         await expectDefinitionListRowValue(popup, 'Datacenter', 'KLG');
+        await expect(popup.locator('.ydb-datacenter-label')).toHaveClass(
+            /ydb-datacenter-color_color_turquoise/,
+        );
         await expectDefinitionListRowValue(popup, 'Node ID', NODE_ID);
         await expectDefinitionListRowValue(popup, 'PDisk ID', PDISK_ID);
         await expectDefinitionListRowValue(popup, 'VDisk Slot ID', '1011');

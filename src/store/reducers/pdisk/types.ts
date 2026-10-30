@@ -5,6 +5,7 @@ export interface PDiskData extends PreparedPDisk {
     NodeHost?: string;
     NodeType?: string;
     NodeDC?: string;
+    NodeDCKey?: string;
     NodeRack?: string;
     SlotItems?: (SlotItem<'vDisk'> | SlotItem<'log'> | SlotItem<'empty'>)[];
 }

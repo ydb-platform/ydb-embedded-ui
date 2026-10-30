@@ -4,6 +4,16 @@ import {EVDiskState} from '../../../../types/api/vdisk';
 import {preparePDiskDataResponse} from '../utils';
 
 describe('preparePDiskDataResponse', () => {
+    test('keeps the datacenter caption separate from its bridge color key', () => {
+        const result = preparePDiskDataResponse([
+            {},
+            {
+                SystemStateInfo: [{Location: {DataCenter: 'dc-a', BridgePileName: 'pile-a'}}],
+            },
+        ]);
+        expect(result).toMatchObject({NodeDC: 'dc-a', NodeDCKey: 'P=PILE-A/DC-A'});
+    });
+
     const rawData = {
         Whiteboard: {
             PDisk: {
