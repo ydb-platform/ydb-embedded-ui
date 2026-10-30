@@ -11,7 +11,7 @@ import {PaneWrapper, ResultTable} from './ResultTable';
 import {SettingsDialog} from './SettingsDialog';
 
 export enum ExplainResultType {
-    Schema = 'Computation Graph',
+    Graph = 'Graph',
     JSON = 'JSON',
     AST = 'AST',
 }
@@ -34,8 +34,8 @@ export enum EditSavedSubMenuNames {
 export enum ResultTabNames {
     Result = 'Result',
     Stats = 'Stats',
-    Schema = 'Computation Graph',
-    ExplainPlan = 'Explain',
+    QueryPlan = 'Query Plan',
+    ExecutionPlan = 'Execution Plan',
 }
 
 export enum QueryTabs {
@@ -106,7 +106,7 @@ export class QueryEditor {
             .getByTestId('ydb-query-execution-status')
             .locator('.g-label__key');
         this.radioButton = this.selector.locator(
-            '.query-editor__pane-wrapper .g-segmented-radio-group',
+            '.ydb-query-result__controls-left .g-segmented-radio-group',
         );
         this.banner = this.page.locator('.ydb-query-settings-banner');
 
@@ -254,7 +254,7 @@ export class QueryEditor {
         await this.selectResultTypeRadio(type);
         const resultArea = this.selector.locator('.ydb-query-result__result');
         switch (type) {
-            case ExplainResultType.Schema:
+            case ExplainResultType.Graph:
                 return resultArea.locator('.ydb-query-explain-graph__canvas-container');
             case ExplainResultType.JSON:
                 return resultArea.locator('.ydb-query-json-viewer__tree');
@@ -542,7 +542,14 @@ export class QueryEditor {
     }
 
     async selectResultTypeRadio(type: ExplainResultType) {
-        const typeButton = this.radioButton.getByLabel(type);
+        if (type !== ExplainResultType.AST) {
+            await this.paneWrapper.selectTab(ResultTabNames.QueryPlan);
+        }
+        const group =
+            type === ExplainResultType.AST
+                ? this.radioButton
+                : this.selector.locator('.ydb-query-plan__switcher');
+        const typeButton = group.getByLabel(type, {exact: true});
         await typeButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await typeButton.click();
     }

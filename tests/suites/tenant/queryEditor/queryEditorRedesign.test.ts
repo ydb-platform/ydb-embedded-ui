@@ -1,0 +1,800 @@
+import {readFile} from 'node:fs/promises';
+
+import {expect, test} from '@playwright/test';
+import type {Download, Page, Route} from '@playwright/test';
+
+import {getClipboardContent} from '../../../utils/clipboard';
+import {backend, database} from '../../../utils/constants';
+import {toggleEditorSetting} from '../../../utils/toggleExperiment';
+import {Sidebar} from '../../sidebar/Sidebar';
+import {TenantPage} from '../TenantPage';
+
+import {ButtonNames} from './models/QueryEditor';
+import type {QueryEditor} from './models/QueryEditor';
+
+const queryUrl = `${backend}/viewer/json/query?*`;
+const plan = {
+    meta: {version: '0.2', type: 'query'},
+    Plan: {'Node Type': 'Query', Plans: [{'Node Type': 'ResultSet', PlanNodeId: 1}]},
+    SimplifiedPlan: {
+        'Node Type': 'Query',
+        Plans: [
+            {
+                'Node Type': 'Scan',
+                Operators: [{Name: 'Scan', 'A-Rows': 0, 'E-Rows': 2}],
+                Plans: [{'Node Type': 'Filter', Operators: [{Name: 'Filter', 'A-Cpu': 0}]}],
+            },
+        ],
+    },
+};
+const makeResponse = () => ({
+    plan,
+    ast: '(return (Int32 1))',
+    result: [{columns: [{name: 'value', type: 'Int32'}], rows: [[1]], truncated: false}],
+    stats: {DurationUs: '500000', Executions: [{ResultRows: '1', DurationUs: '500000'}]},
+});
+const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="500" height="100"><text x="10" y="50">Current plan</text></svg>';
+
+async function readDownload(download: Download) {
+    const path = await download.path();
+    if (!path) {
+        throw new Error('Expected a downloaded file');
+    }
+    return readFile(path, 'utf8');
+}
+
+function mainViews(page: Page) {
+    return page.locator('.ydb-query-result__controls-left .g-segmented-radio-group');
+}
+function planViews(page: Page) {
+    return page.locator('.ydb-query-plan__switcher');
+}
+async function selectView(page: Page, name: string) {
+    await mainViews(page).getByRole('radio', {name, exact: true}).check();
+}
+async function openEditor(page: Page) {
+    const tenant = new TenantPage(page);
+    await tenant.gotoQueryEditor({schema: database, database});
+    return tenant.queryEditor;
+}
+async function analyze(editor: QueryEditor) {
+    await editor.explainAnalyze('SELECT 1;', 'query');
+    await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+}
+
+test.describe('Query editor redesign @query-editor-redesign', () => {
+    test('visual contract: table, divider and dark JSON palette', async ({page}, testInfo) => {
+        await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
+        await page.setViewportSize({width: 1440, height: 900});
+        const editor = await openEditor(page);
+        await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
+        await editor.explain('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        const headers = page.locator('.ydb-query-simplified-plan th');
+        await expect(headers).toHaveCount(6);
+        expect(
+            await headers.first().evaluate((element) => element.getBoundingClientRect().height),
+        ).toBe(40);
+        expect(
+            await page
+                .locator('.ydb-query-simplified-plan tbody tr')
+                .evaluateAll((elements) =>
+                    elements.map((element) => element.getBoundingClientRect().height),
+                ),
+        ).toEqual([30, 30]);
+        const style = await headers.first().evaluate((element) => {
+            const css = getComputedStyle(element);
+            return {
+                weight: css.fontWeight,
+                color: css.color,
+                size: css.fontSize,
+                height: css.lineHeight,
+            };
+        });
+        expect.soft(style).toEqual({
+            weight: '500',
+            color: 'rgba(255, 255, 255, 0.7)',
+            size: '15px',
+            height: '20px',
+        });
+        const widths = await headers.evaluateAll((elements) =>
+            elements.map((element) => element.getBoundingClientRect().width),
+        );
+        expect.soft(widths.slice(1)).toEqual([89, 89, 89, 89, 85]);
+        await page.screenshot({path: testInfo.outputPath('table-dark.png')});
+        const divider = page.locator('.ydb-query-editor-controls__divider');
+        expect
+            .soft(
+                await divider.evaluate((element) => {
+                    const css = getComputedStyle(element);
+                    return [
+                        css.marginLeft,
+                        css.marginRight,
+                        element.getBoundingClientRect().width,
+                        element.getBoundingClientRect().height,
+                    ];
+                }),
+            )
+            .toEqual(['4px', '4px', 1, 16]);
+        await planViews(page).getByRole('radio', {name: 'JSON', exact: true}).check();
+        expect
+            .soft(
+                await page
+                    .locator('.ydb-query-json-viewer .g-ru-cell__key')
+                    .first()
+                    .evaluate((element) => getComputedStyle(element).color),
+            )
+            .toBe('rgb(156, 220, 254)');
+        expect
+            .soft(
+                await page
+                    .locator('.ydb-query-json-viewer .g-ru-cell__value_type_string')
+                    .first()
+                    .evaluate((element) => getComputedStyle(element).color),
+            )
+            .toBe('rgb(206, 145, 120)');
+        expect
+            .soft(
+                await page
+                    .locator('.ydb-query-json-viewer .unipika')
+                    .first()
+                    .evaluate((element) => getComputedStyle(element).color),
+            )
+            .toBe('rgb(128, 128, 128)');
+    });
+
+    test('Figma follow-up: disabled Stats uses result settings and opens settings without SQL', async ({
+        page,
+    }, testInfo) => {
+        const editor = await openEditor(page);
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
+        let requests = 0;
+        await page.route(queryUrl, (route) => {
+            requests++;
+            return route.fulfill({json: {result: makeResponse().result}});
+        });
+        await editor.clickGearButton();
+        await editor.settingsDialog.changeStatsLevel('none');
+        await editor.settingsDialog.clickButton(ButtonNames.Save);
+        await editor.run('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        await selectView(page, 'Stats');
+        await expect(page.getByText('Statistics not enabled', {exact: true})).toBeVisible();
+        await page.screenshot({path: testInfo.outputPath('statistics-not-enabled.png')});
+        await page.getByRole('button', {name: 'Open query settings', exact: true}).press('Enter');
+        await expect(page.locator('.ydb-query-settings-dialog')).toBeVisible();
+        expect(requests).toBe(1);
+        await editor.settingsDialog.changeStatsLevel('full');
+        await editor.settingsDialog.clickButton(ButtonNames.Save);
+        await expect(page.getByText('Statistics not enabled', {exact: true})).toBeVisible();
+        expect(requests).toBe(1);
+        await editor.run('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        await selectView(page, 'Stats');
+        await expect(page.getByText('Statistics not enabled', {exact: true})).toHaveCount(0);
+        await expect(
+            page.getByText('There is no Stats for the request', {exact: true}),
+        ).toBeVisible();
+    });
+
+    test('Figma follow-up: light JSON and Stats use the design palette', async ({
+        page,
+    }, testInfo) => {
+        await page.addInitScript(() => localStorage.setItem('theme', 'light'));
+        const editor = await openEditor(page);
+        await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
+        await analyze(editor);
+        await planViews(page).getByRole('radio', {name: 'JSON', exact: true}).check();
+        for (const section of ['JSON', 'Stats']) {
+            if (section === 'Stats') {
+                await selectView(page, 'Stats');
+            }
+            const viewer = page.locator('.ydb-query-json-viewer');
+            await expect(viewer.locator('.g-ru-cell__key').first()).toHaveCSS(
+                'color',
+                'rgb(156, 220, 254)',
+            );
+            await expect(viewer.locator('.g-ru-cell__value_type_string').first()).toHaveCSS(
+                'color',
+                'rgb(206, 145, 120)',
+            );
+            await expect(viewer.locator('.unipika').first()).toHaveCSS(
+                'color',
+                'rgb(128, 128, 128)',
+            );
+            await page.screenshot({
+                path: testInfo.outputPath(`${section.toLowerCase()}-light-palette.png`),
+            });
+        }
+    });
+
+    test('Figma follow-up: action and Stop widths remain fixed while loading', async ({page}) => {
+        const editor = await openEditor(page);
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
+        const run = page.getByRole('button', {name: 'Run', exact: true});
+        const analyzeButton = page.getByRole('button', {name: 'Explain Analyze', exact: true});
+        await expect(run).toHaveCSS('width', '72px');
+        await expect(analyzeButton).toHaveCSS('width', '115px');
+        let held: Route | undefined;
+        await page.route(queryUrl, (route) => {
+            held = route;
+        });
+        try {
+            await editor.run('SELECT 1;', 'query');
+            await expect.poll(() => Boolean(held)).toBe(true);
+            await expect(page.locator('.ydb-query-editor-button__stop-button')).toHaveCSS(
+                'width',
+                '72px',
+            );
+            await expect(analyzeButton).toHaveCSS('width', '115px');
+            await held?.fulfill({json: makeResponse()});
+            held = undefined;
+            await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+            await editor.explainAnalyze('SELECT 1;', 'query');
+            await expect.poll(() => Boolean(held)).toBe(true);
+            await expect(page.locator('.ydb-query-editor-button__stop-button')).toHaveCSS(
+                'width',
+                '115px',
+            );
+            await expect(run).toHaveCSS('width', '72px');
+        } finally {
+            await held?.fulfill({json: makeResponse()});
+        }
+        await page.mouse.move(0, 0);
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(run).toHaveCSS('width', '72px');
+        await expect(analyzeButton).toHaveCSS('width', '115px');
+    });
+
+    test('visual contract: missing basic plan opens settings without executing', async ({
+        page,
+    }, testInfo) => {
+        const editor = await openEditor(page);
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
+        let requests = 0;
+        await page.route(queryUrl, (route) => {
+            requests++;
+            return route.fulfill({json: {result: makeResponse().result}});
+        });
+        await page.getByRole('button', {name: 'Query settings', exact: true}).click();
+        await editor.settingsDialog.changeStatsLevel('basic');
+        await editor.settingsDialog.clickButton(ButtonNames.Save);
+        await editor.run('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        await selectView(page, 'Query Plan');
+        await expect(page.getByText('Query plan not enabled', {exact: true})).toBeVisible();
+        await expect(planViews(page)).toHaveCount(0);
+        await page.screenshot({path: testInfo.outputPath('query-plan-not-enabled.png')});
+        await page.getByRole('button', {name: 'Open query settings', exact: true}).press('Enter');
+        await expect(page.locator('.ydb-query-settings-dialog')).toBeVisible();
+        expect(requests).toBe(1);
+        await editor.settingsDialog.changeStatsLevel('full');
+        await editor.settingsDialog.clickButton(ButtonNames.Save);
+        await expect(page.getByText('Query plan not enabled', {exact: true})).toBeVisible();
+        expect(requests).toBe(1);
+    });
+
+    test('manual column widths survive view switches and reset for a new result', async ({
+        page,
+    }, testInfo) => {
+        const editor = await openEditor(page);
+        await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
+        await editor.explain('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        const headers = page.locator('.ydb-query-simplified-plan th');
+        const widths = () =>
+            headers.evaluateAll((elements) =>
+                elements.map((element) => element.getBoundingClientRect().width),
+            );
+        await page.setViewportSize({width: 1440, height: 900});
+        const before = await widths();
+        await page.setViewportSize({width: 1640, height: 900});
+        await expect.poll(async () => (await widths())[0]).toBeGreaterThan(before[0]);
+        expect((await widths()).slice(1)).toEqual([89, 89, 89, 89, 85]);
+        const handle = headers.nth(1).locator('.gt-resize-handle');
+        await handle.hover();
+        const box = await handle.boundingBox();
+        if (!box) {
+            throw new Error('Missing column resize handle');
+        }
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.down();
+        await expect(handle).toHaveClass(/gt-resize-handle_resizing/);
+        await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2, {steps: 4});
+        await page.mouse.up();
+        await expect.poll(async () => (await widths())[1]).toBe(129);
+        const manual = await widths();
+        await selectView(page, 'AST');
+        await selectView(page, 'Query Plan');
+        expect(await widths()).toEqual(manual);
+        await page.setViewportSize({width: 1000, height: 800});
+        expect(await widths()).toEqual(manual);
+        expect(
+            await page
+                .locator('.ydb-query-simplified-plan')
+                .evaluate((element) => element.scrollWidth > element.clientWidth),
+        ).toBe(true);
+        await page.screenshot({path: testInfo.outputPath('table-narrow-resized.png')});
+        await editor.explain('SELECT 2;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        expect((await widths()).slice(1)).toEqual([89, 89, 89, 89, 85]);
+    });
+
+    test('theme switch updates SVG palette without SQL or conversion requests', async ({
+        page,
+    }, testInfo) => {
+        await page.addInitScript(() => localStorage.setItem('theme', 'light'));
+        const editor = await openEditor(page);
+        let conversions = 0;
+        let queries = 0;
+        const themedSvg =
+            '<svg xmlns="http://www.w3.org/2000/svg" width="500" height="100"><rect width="500" height="100" fill="var(--stage-main, #eee)"/><text x="10" y="50" fill="var(--stage-text, #111)">Current plan</text><rect x="450" width="20" height="10" fill="var(--cpu-main, green)"/></svg>';
+        await page.route(queryUrl, (route) => {
+            queries++;
+            return route.fulfill({json: makeResponse()});
+        });
+        await page.route('**/plan2svg?*', (route) => {
+            conversions++;
+            return route.fulfill({contentType: 'image/svg+xml', body: themedSvg});
+        });
+        await editor.explain('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        await selectView(page, 'Execution Plan');
+        const image = page.getByRole('img', {name: 'Execution Plan'});
+        await expect(image).toBeVisible();
+        const source = await image.getAttribute('src');
+        if (!source) {
+            throw new Error('Missing displayed SVG URL');
+        }
+        const light = await image.evaluate((element: HTMLImageElement) =>
+            fetch(element.src).then((r) => r.text()),
+        );
+        expect(light).toContain('ydb-query-plan-palette');
+        const sidebar = new Sidebar(page);
+        await sidebar.clickSettings();
+        await page.getByRole('radio', {name: 'Dark', exact: true}).check();
+        await sidebar.closeDrawer();
+        await expect(image).not.toHaveAttribute('src', source);
+        const dark = await image.evaluate((element: HTMLImageElement) =>
+            fetch(element.src).then((r) => r.text()),
+        );
+        expect(dark).not.toBe(light);
+        expect(dark).toContain('var(--cpu-main, green)');
+        const matches = await image.evaluate(async (element: HTMLImageElement) => {
+            const text = await fetch(element.src).then((r) => r.text());
+            const document = new DOMParser().parseFromString(text, 'image/svg+xml');
+            const expected = getComputedStyle(element)
+                .getPropertyValue('--g-color-text-primary')
+                .trim();
+            return document
+                .getElementById('ydb-query-plan-palette')
+                ?.textContent?.includes(`--stage-text: ${expected};`);
+        });
+        expect(matches).toBe(true);
+        const downloadPromise = page.waitForEvent('download');
+        await page.getByRole('button', {name: 'Download .SVG', exact: true}).click();
+        expect(await readDownload(await downloadPromise)).toBe(dark);
+        expect({queries, conversions}).toEqual({queries: 1, conversions: 1});
+        await selectView(page, 'Query Plan');
+        await selectView(page, 'Execution Plan');
+        await expect(image).toBeVisible();
+        expect(conversions).toBe(1);
+        await page.screenshot({path: testInfo.outputPath('svg-dark-themed.png')});
+    });
+
+    test('JSON and Stats retain search and expand controls in both themes', async ({
+        page,
+    }, testInfo) => {
+        await page.addInitScript(() => localStorage.setItem('theme', 'light'));
+        await page.setViewportSize({width: 1440, height: 900});
+        const editor = await openEditor(page);
+        await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
+        await analyze(editor);
+        for (const theme of ['light', 'dark']) {
+            if (theme === 'dark') {
+                const sidebar = new Sidebar(page);
+                await sidebar.clickSettings();
+                await page.getByRole('radio', {name: 'Dark', exact: true}).check();
+                await sidebar.closeDrawer();
+            }
+            await selectView(page, 'Query Plan');
+            await planViews(page).getByRole('radio', {name: 'Table', exact: true}).check();
+            await page.screenshot({path: testInfo.outputPath(`table-${theme}.png`)});
+            await planViews(page).getByRole('radio', {name: 'JSON', exact: true}).check();
+            for (const view of ['JSON', 'Stats']) {
+                if (view === 'Stats') {
+                    await selectView(page, 'Stats');
+                }
+                const viewer = page.locator('.ydb-query-json-viewer');
+                const search = viewer.getByPlaceholder('Search...');
+                await search.fill(view === 'JSON' ? 'Query' : 'Executions');
+                await expect(viewer.locator('.ydb-json-viewer__match-counter')).not.toHaveText(
+                    '0 / 0',
+                );
+                await search.fill('');
+                const buttons = viewer.locator('.ydb-json-viewer__toolbar button');
+                const count = await buttons.count();
+                await buttons.nth(count - 1).click();
+                const collapsed = await viewer.locator('.g-ru-cell__key').count();
+                await buttons.nth(count - 2).click();
+                await expect
+                    .poll(() => viewer.locator('.g-ru-cell__key').count())
+                    .toBeGreaterThan(collapsed);
+                await page.screenshot({
+                    path: testInfo.outputPath(`${view.toLowerCase()}-${theme}.png`),
+                });
+            }
+        }
+    });
+
+    test('copies the active result set, full plan, statistics and AST', async ({page}) => {
+        const editor = await openEditor(page);
+        const response = makeResponse();
+        response.result.push({
+            columns: [{name: 'value', type: 'Int32'}],
+            rows: [[2]],
+            truncated: false,
+        });
+        await page.route(queryUrl, (route) => route.fulfill({json: response}));
+        await page.route('**/plan2svg?*', (route) =>
+            route.fulfill({contentType: 'image/svg+xml', body: svg}),
+        );
+        await editor.explain('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        for (const view of ['Table', 'Graph', 'JSON']) {
+            await planViews(page).getByRole('radio', {name: view, exact: true}).check();
+            await page.getByRole('button', {name: 'Copy query-plan', exact: true}).click();
+            await expect.poll(() => getClipboardContent(page)).toBe(JSON.stringify(plan));
+        }
+        await selectView(page, 'AST');
+        await page.getByRole('button', {name: 'Copy ast', exact: true}).click();
+        await expect.poll(() => getClipboardContent(page)).toBe(response.ast);
+        await analyze(editor);
+        await selectView(page, 'Stats');
+        await page.getByRole('button', {name: 'Copy stats', exact: true}).click();
+        await expect.poll(() => getClipboardContent(page)).toBe(JSON.stringify(response.stats));
+        await selectView(page, 'Result 2');
+        await page.getByRole('tab', {name: /Result #2/}).click();
+        await page.getByRole('button', {name: 'Copy result', exact: true}).click();
+        await expect.poll(() => getClipboardContent(page)).toBe('value\n2');
+        await selectView(page, 'Execution Plan');
+        await expect(page.getByRole('img', {name: 'Execution Plan'})).toBeVisible();
+        await expect(
+            page.locator('.ydb-query-result__controls-right').getByRole('button', {name: /^Copy /}),
+        ).toHaveCount(0);
+    });
+
+    test('real Explain never executes and Analyze retains results', async ({page}, testInfo) => {
+        const editor = await openEditor(page);
+        const actions: string[] = [];
+        page.on('request', (request) => {
+            if (request.url().includes('/viewer/json/query') && request.method() === 'POST') {
+                actions.push(request.postDataJSON().action);
+            }
+        });
+        await editor.explain('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        expect(actions).toEqual(['explain-query']);
+        await expect(mainViews(page).getByRole('radio')).toHaveCount(3);
+        await expect(
+            mainViews(page).getByRole('radio', {name: 'Query Plan', exact: true}),
+        ).toBeChecked();
+        await expect(
+            planViews(page).getByRole('radio', {name: 'Table', exact: true}),
+        ).toBeChecked();
+        await planViews(page).getByRole('radio', {name: 'Graph', exact: true}).check();
+        const firstTab = await editor.getRequiredActiveTabId();
+        await editor.editorTabs.clickAddTab();
+        await editor.editorTabs.selectTabById(firstTab);
+        await expect(
+            planViews(page).getByRole('radio', {name: 'Graph', exact: true}),
+        ).toBeChecked();
+        await selectView(page, 'AST');
+        await selectView(page, 'Query Plan');
+        await expect(
+            planViews(page).getByRole('radio', {name: 'Graph', exact: true}),
+        ).toBeChecked();
+        await selectView(page, 'Execution Plan');
+        await expect(page.getByRole('img', {name: 'Execution Plan'})).toBeVisible();
+        expect(actions).toEqual(['explain-query']);
+        await analyze(editor);
+        await expect(mainViews(page).getByRole('radio')).toHaveCount(4);
+        await expect(
+            planViews(page).getByRole('radio', {name: 'Table', exact: true}),
+        ).toBeChecked();
+        await mainViews(page)
+            .getByRole('radio', {name: /^Result/})
+            .check();
+        await expect(editor.resultTable.isVisible()).resolves.toBe(true);
+        expect(actions).toEqual(['explain-query', 'execute-query']);
+        await page.screenshot({path: testInfo.outputPath('real-analyze-result.png')});
+    });
+
+    test('real SVG download equals the displayed SVG and diagnostics retain their fields', async ({
+        page,
+    }, testInfo) => {
+        const editor = await openEditor(page);
+        await analyze(editor);
+        const responsePromise = page.waitForResponse((response) =>
+            response.url().includes('/plan2svg'),
+        );
+        await selectView(page, 'Execution Plan');
+        const response = await responsePromise;
+        expect(response.status()).toBe(200);
+        const rawSvg = await response.text();
+        const image = page.getByRole('img', {name: 'Execution Plan'});
+        await expect(image).toBeVisible();
+        await expect
+            .poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth))
+            .toBeGreaterThan(0);
+        const displayedSvg = await image.evaluate((element: HTMLImageElement) =>
+            fetch(element.src).then((result) => result.text()),
+        );
+        const geometryPreserved = await page.evaluate(
+            ({raw, displayed}) => {
+                const parser = new DOMParser();
+                const before = parser.parseFromString(raw, 'image/svg+xml');
+                const after = parser.parseFromString(displayed, 'image/svg+xml');
+                after.getElementById('ydb-query-plan-palette')?.remove();
+                return before.documentElement.isEqualNode(after.documentElement);
+            },
+            {raw: rawSvg, displayed: displayedSvg},
+        );
+        expect(geometryPreserved).toBe(true);
+        const downloadPromise = page.waitForEvent('download');
+        await page.getByRole('button', {name: 'Download .SVG', exact: true}).click();
+        const download = await downloadPromise;
+        expect(download.suggestedFilename()).toBe('query-plan.svg');
+        expect(await readDownload(download)).toBe(displayedSvg);
+        const diagnosticsPromise = page.waitForEvent('download');
+        await page.getByRole('button', {name: 'Diagnostics .JSON', exact: true}).click();
+        const diagnostics = await diagnosticsPromise;
+        const json = JSON.parse(await readDownload(diagnostics));
+        expect(json).toMatchObject({database, queryText: 'SELECT 1;'});
+        expect(json.plan).toBeDefined();
+        expect(json.stats).toBeDefined();
+        await page.screenshot({path: testInfo.outputPath('real-execution-plan.png')});
+    });
+
+    for (const theme of ['light', 'dark']) {
+        test(`downloads SVG in fullscreen without closing it in ${theme} theme`, async ({
+            page,
+        }, testInfo) => {
+            await page.addInitScript(
+                (themeName) => localStorage.setItem('theme', themeName),
+                theme,
+            );
+            const editor = await openEditor(page);
+            await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
+            await page.route('**/plan2svg?*', (route) =>
+                route.fulfill({contentType: 'image/svg+xml', body: svg}),
+            );
+            await analyze(editor);
+            await selectView(page, 'Execution Plan');
+            const image = page.getByRole('img', {name: 'Execution Plan'});
+            await expect(image).toBeVisible();
+            await expect(page.locator('body')).toHaveClass(new RegExp(`g-root_theme_${theme}`));
+            const displayedSvg = await image.evaluate((element: HTMLImageElement) =>
+                fetch(element.src).then((response) => response.text()),
+            );
+            expect(displayedSvg).toBe(svg);
+
+            const downloadButton = page.getByRole('button', {name: 'Download .SVG', exact: true});
+            const fullscreen = page.locator('.ydb-fullscreen_fullscreen');
+            const closeButton = fullscreen.locator('.ydb-fullscreen__close-button');
+            for (const width of [1280, 1000]) {
+                await page.setViewportSize({width, height: 720});
+                await page.getByRole('button', {name: 'Fullscreen', exact: true}).click();
+                await expect(fullscreen).toBeVisible();
+                const downloadBounds = await downloadButton.boundingBox();
+                const closeBounds = await closeButton.boundingBox();
+                if (!downloadBounds || !closeBounds) {
+                    throw new Error('Expected visible fullscreen controls');
+                }
+                expect(downloadBounds.x + downloadBounds.width).toBeLessThanOrEqual(closeBounds.x);
+                const downloadPromise = page.waitForEvent('download');
+                await downloadButton.click();
+                const download = await downloadPromise;
+                expect(download.suggestedFilename()).toBe('query-plan.svg');
+                expect(await readDownload(download)).toBe(displayedSvg);
+                await expect(fullscreen).toBeVisible();
+                await page.screenshot({
+                    path: testInfo.outputPath(`fullscreen-${theme}-${width}.png`),
+                });
+                if (width === 1280) {
+                    await closeButton.click();
+                } else {
+                    await closeButton.press('Escape');
+                }
+                await expect(fullscreen).toHaveCount(0);
+            }
+        });
+    }
+
+    test('mocked summary distinguishes exact, truncated and multiple results', async ({
+        page,
+    }, testInfo) => {
+        const editor = await openEditor(page);
+        const response = makeResponse();
+        await page.route(queryUrl, (route) => route.fulfill({json: response}));
+        await analyze(editor);
+        await mainViews(page).getByRole('radio', {name: 'Result 1', exact: true}).check();
+        await expect(page.getByText('2 rows/s', {exact: true})).toBeVisible();
+        response.result[0].truncated = true;
+        await analyze(editor);
+        await mainViews(page).getByRole('radio', {name: 'Result 1', exact: true}).check();
+        await expect(page.getByText(/rows\/s/)).toHaveCount(0);
+        await expect(page.getByText('Truncated', {exact: true})).toBeVisible();
+        response.result[0].truncated = false;
+        response.result.push({
+            columns: [{name: 'value', type: 'Int32'}],
+            rows: [[2]],
+            truncated: false,
+        });
+        await analyze(editor);
+        await mainViews(page).getByRole('radio', {name: 'Result 2', exact: true}).check();
+        await expect(page.getByText(/rows\/s/)).toHaveCount(0);
+        await page.getByRole('tab', {name: /Result #2/}).click();
+        await expect(editor.resultTable.getCellValue(1, 2)).resolves.toBe('2');
+        await page.screenshot({path: testInfo.outputPath('multiple-results.png')});
+    });
+
+    test('mocked SVG failure retries and a late response cannot replace the next execution', async ({
+        page,
+    }, testInfo) => {
+        const editor = await openEditor(page);
+        let queryNumber = 0;
+        await page.route(queryUrl, (route) =>
+            route.fulfill({
+                json: {...makeResponse(), plan: {...plan, tables: [{name: String(++queryNumber)}]}},
+            }),
+        );
+        let held: Route | undefined;
+        let conversion = 0;
+        await page.route('**/plan2svg?*', async (route) => {
+            conversion += 1;
+            if (conversion === 1) {
+                await route.fulfill({status: 400, body: 'Conversion failed'});
+            } else if (conversion === 2) {
+                held = route;
+            } else {
+                await route.fulfill({contentType: 'image/svg+xml', body: svg});
+            }
+        });
+        await analyze(editor);
+        await selectView(page, 'Execution Plan');
+        await expect(page.locator('.ydb-execution-plan__error').getByRole('alert')).toBeVisible();
+        await page.getByRole('button', {name: 'Retry', exact: true}).click();
+        await expect.poll(() => Boolean(held)).toBe(true);
+        await analyze(editor);
+        await selectView(page, 'Execution Plan');
+        const image = page.getByRole('img', {name: 'Execution Plan'});
+        await expect(image).toBeVisible();
+        const currentSource = await image.getAttribute('src');
+        if (!held || !currentSource) {
+            throw new Error('Expected the delayed conversion and the current SVG');
+        }
+        await held.fulfill({
+            contentType: 'image/svg+xml',
+            body: svg.replace('Current plan', 'OLD PLAN'),
+        });
+        await expect(image).toHaveAttribute('src', currentSource);
+        await selectView(page, 'Query Plan');
+        await selectView(page, 'Execution Plan');
+        await expect(image).toBeVisible();
+        expect(conversion).toBe(3);
+        await page.screenshot({path: testInfo.outputPath('svg-after-late-response.png')});
+    });
+
+    test('table hierarchy, JSON, keyboard AST tooltip and toolbar in light/dark narrow layout', async ({
+        page,
+    }, testInfo) => {
+        const editor = await openEditor(page);
+        await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
+        await page.route('**/plan2svg?*', (route) =>
+            route.fulfill({contentType: 'image/svg+xml', body: svg}),
+        );
+        await editor.explain('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        for (const name of ['Operation', 'A-Cpu', 'A-Rows', 'E-Cost', 'E-Rows', 'E-Size']) {
+            await expect(page.getByText(name, {exact: true})).toBeVisible();
+        }
+        await expect(page.getByText('Scan', {exact: true})).toBeVisible();
+        await expect(page.getByText('Filter', {exact: true})).toBeVisible();
+        await planViews(page).getByRole('radio', {name: 'JSON', exact: true}).check();
+        await expect(page.locator('.ydb-query-json-viewer')).toBeVisible();
+        await mainViews(page).getByRole('radio', {name: 'Query Plan', exact: true}).focus();
+        await page.keyboard.press('ArrowRight');
+        await page.keyboard.press('ArrowRight');
+        await expect(mainViews(page).getByRole('radio', {name: 'AST', exact: true})).toBeFocused();
+        await expect(page.getByText(/AST \(Abstract Syntax Tree\)/)).toBeVisible();
+        await page.keyboard.press('Tab');
+        await expect(mainViews(page).getByText('AST', {exact: true})).not.toBeFocused();
+        await mainViews(page).getByRole('radio', {name: 'AST', exact: true}).hover();
+        await expect(page.getByText(/AST \(Abstract Syntax Tree\)/)).toBeVisible();
+        await selectView(page, 'Query Plan');
+        await planViews(page).getByRole('radio', {name: 'Table', exact: true}).check();
+        for (const theme of ['light', 'dark']) {
+            await page.evaluate((themeName) => {
+                window.localStorage.setItem('theme', themeName);
+            }, theme);
+            await page.reload({waitUntil: 'domcontentloaded'});
+            await editor.explain('SELECT 1;', 'query');
+            await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+            await expect(page.locator('body')).toHaveClass(new RegExp(`g-root_theme_${theme}`));
+            await page.screenshot({path: testInfo.outputPath(`query-plan-${theme}.png`)});
+        }
+        await page.getByRole('button', {name: 'Fullscreen', exact: true}).click();
+        await expect(page.locator('.ydb-fullscreen_fullscreen')).toBeVisible();
+        await page.keyboard.press('Escape');
+        await expect(page.locator('.ydb-fullscreen_fullscreen')).toHaveCount(0);
+        await page.setViewportSize({width: 1000, height: 800});
+        await expect(
+            page.getByRole('button', {name: 'Diagnostics .JSON', exact: true}),
+        ).toBeVisible();
+        const controls = page.locator('.ydb-query-result__controls');
+        expect(
+            await controls.evaluate((element) => element.scrollWidth <= element.clientWidth),
+        ).toBe(true);
+        const layout = await controls.evaluate((element) => {
+            const right = element.querySelector('.ydb-query-result__controls-right');
+            return {
+                header: element.getBoundingClientRect().toJSON(),
+                right: right?.getBoundingClientRect().toJSON(),
+                flexShrink: getComputedStyle(element).flexShrink,
+            };
+        });
+        await testInfo.attach('header-layout.json', {
+            body: JSON.stringify(layout),
+            contentType: 'application/json',
+        });
+        expect(layout.right?.bottom).toBeLessThanOrEqual(layout.header.bottom);
+        await page.screenshot({path: testInfo.outputPath('query-plan-narrow.png')});
+    });
+    test('matches Figma plan controls and table density', async ({page}, testInfo) => {
+        await page.setViewportSize({width: 1440, height: 900});
+        await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
+        const editor = await openEditor(page);
+        await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
+        await editor.explain('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        for (const name of ['Table', 'Graph', 'JSON']) {
+            await expect(
+                planViews(page).getByText(name, {exact: true}).locator('..').locator('svg.g-icon'),
+            ).toBeVisible();
+        }
+        const firstRow = page.locator('.ydb-query-simplified-plan tbody tr').first();
+        expect((await firstRow.boundingBox())?.height).toBe(30);
+        await page.screenshot({path: testInfo.outputPath('figma-table.png')});
+        for (const name of ['Graph', 'JSON']) {
+            await planViews(page).getByRole('radio', {name, exact: true}).check();
+            await page.screenshot({path: testInfo.outputPath(`figma-${name.toLowerCase()}.png`)});
+        }
+        await analyze(editor);
+        await selectView(page, 'Stats');
+        await expect(page.getByPlaceholder('Search...')).toBeVisible();
+        await page.screenshot({path: testInfo.outputPath('figma-stats.png')});
+        await mainViews(page).getByRole('radio', {name: 'Result 1', exact: true}).check();
+        await expect(page.getByText('2 rows/s', {exact: true})).toBeVisible();
+        await page.screenshot({path: testInfo.outputPath('figma-result.png')});
+        expect(
+            await page
+                .locator('.ydb-query-result__controls-left')
+                .evaluate((element) => getComputedStyle(element).gap),
+        ).toBe('8px');
+    });
+    test('reads formatted result counts without losing thousands', async ({page}) => {
+        const editor = await openEditor(page);
+        const response = makeResponse();
+        response.result[0].rows = Array.from({length: 1000}, (_, value) => [value]);
+        response.stats.Executions[0].ResultRows = '1000';
+        await page.route(queryUrl, (route) => route.fulfill({json: response}));
+        await analyze(editor);
+        await mainViews(page).getByRole('radio', {name: 'Result 1', exact: true}).check();
+        await expect(page.locator('.ydb-query-result-sets-viewer__title')).toContainText(
+            '1\u00a0000',
+        );
+        await expect(editor.resultTable.getResultTitleCount()).resolves.toBe('1000');
+    });
+});

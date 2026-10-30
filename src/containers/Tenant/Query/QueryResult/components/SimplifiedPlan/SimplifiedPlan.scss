@@ -3,14 +3,39 @@
 .ydb-query-simplified-plan {
     $block: &;
 
-    // Allow table cell to be more than default 40px
-    // It is needed to properly display long operation names (with many columns) in Firefox
-    --ydb-table-cell-height: unset;
     overflow: auto;
 
     width: 100%;
     height: 100%;
-    padding: 0 15px 15px;
+    padding: 0 var(--g-spacing-6) var(--g-spacing-4) var(--g-spacing-4);
+
+    .ydb-table {
+        // Long operation names can grow beyond the normal row height.
+        --ydb-table-cell-height: unset;
+        --ydb-table-row-height: 30px;
+    }
+
+    .ydb-table__table tr:nth-of-type(2n + 1) {
+        background-color: transparent;
+    }
+
+    .ydb-table__table-header-cell {
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 20px;
+
+        color: var(--g-color-text-complementary);
+    }
+
+    .ydb-table__table-header-cell:not(:first-child) .ydb-table__table-header-content,
+    &__metrics-cell {
+        padding: var(--g-spacing-1) var(--g-spacing-1) var(--g-spacing-1) 0;
+    }
+
+    .ydb-table__table-header-cell:last-child .ydb-table__table-header-content,
+    .ydb-table__table-cell:last-child &__metrics-cell {
+        padding-right: 0;
+    }
 
     &__name {
         display: flex;
@@ -18,10 +43,6 @@
         gap: var(--g-spacing-1);
 
         max-width: 100%;
-    }
-
-    &__metrics-cell {
-        padding: var(--g-spacing-1) var(--g-spacing-2);
     }
 
     &__operation-params {

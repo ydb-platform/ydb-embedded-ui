@@ -121,7 +121,11 @@ export interface QueryResult {
     sourcePosition?: QuerySourcePosition;
 }
 
+export type QueryPlanView = 'table' | 'graph' | 'json';
+
 export interface QueryTabState {
+    queryPlanView?: QueryPlanView;
+    queryPlanColumnSizing?: Record<string, number>;
     id: string;
     title: string;
     /**

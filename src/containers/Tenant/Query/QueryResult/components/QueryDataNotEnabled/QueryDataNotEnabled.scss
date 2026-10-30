@@ -1,0 +1,16 @@
+@use '../../../../../../styles/mixins.scss';
+
+.ydb-query-data-not-enabled {
+    overflow: auto;
+
+    width: 100%;
+    height: 100%;
+
+    .g-placeholder-container__description {
+        @include mixins.text-body-1();
+    }
+
+    .g-placeholder-container__title {
+        font-weight: 500;
+    }
+}

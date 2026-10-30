@@ -65,6 +65,10 @@ export default defineConfig({
             },
         }),
     ],
+    dev: {
+        // On-demand rebuilds can interrupt E2E navigation with an HMR full reload.
+        lazyCompilation: process.env.REACT_APP_E2E_UI_OVERRIDES === 'true' ? false : undefined,
+    },
     server: {
         proxy:
             process.env.META_YDB_BACKEND && process.env.META_YDB_BACKEND !== 'undefined'

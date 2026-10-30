@@ -217,7 +217,7 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.explain(testQuery, QUERY_MODES.script);
 
-        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
+        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Graph);
         await expect(explainSchema).toBeVisible({timeout: VISIBILITY_TIMEOUT});
         await expect(explainSchema.getByRole('button', {name: 'Zoom in'})).toBeVisible();
         await expect(explainSchema.getByRole('button', {name: 'Zoom out'})).toBeVisible();
@@ -239,7 +239,7 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.explain(testQuery, QUERY_MODES.scan);
 
-        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
+        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Graph);
         await expect(explainSchema).toBeVisible({timeout: VISIBILITY_TIMEOUT});
 
         const explainJSON = await queryEditor.getExplainResult(ExplainResultType.JSON);
@@ -249,7 +249,9 @@ test.describe('Test Query Editor', async () => {
         await expect(explainAST).toBeVisible({timeout: VISIBILITY_TIMEOUT});
     });
 
-    test('Computation Graph fits a wide plan initially and after resize', async ({page}) => {
+    test('Computation Graph fits a wide plan initially and after resize @query-editor-redesign', async ({
+        page,
+    }) => {
         await mockExplainPlan(page, {
             PlanNodeId: 1,
             PlanNodeType: 'Query',
@@ -266,7 +268,7 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.explain(testQuery, QUERY_MODES.query);
 
-        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
+        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Graph);
         await expect.poll(() => isGraphContentInsideViewport(explainSchema)).toBe(true);
 
         await explainSchema.evaluate((element) => {
@@ -275,7 +277,9 @@ test.describe('Test Query Editor', async () => {
         await expect.poll(() => isGraphContentInsideViewport(explainSchema)).toBe(true);
     });
 
-    test('Computation Graph shows an error state when layout fails', async ({page}) => {
+    test('Computation Graph shows an error state when layout fails @query-editor-redesign', async ({
+        page,
+    }) => {
         await mockExplainPlan(page, {
             PlanNodeId: 1,
             PlanNodeType: 'Query',
@@ -284,7 +288,7 @@ test.describe('Test Query Editor', async () => {
         });
         const queryEditor = new QueryEditor(page);
         await queryEditor.explain(testQuery, QUERY_MODES.query);
-        await queryEditor.getExplainResult(ExplainResultType.Schema);
+        await queryEditor.getExplainResult(ExplainResultType.Graph);
 
         const resultArea = queryEditor.getResultAreaLocator();
         await expect(resultArea.getByText('Graph can not be rendered')).toBeVisible();
@@ -293,7 +297,9 @@ test.describe('Test Query Editor', async () => {
         await expect(resultArea.getByRole('button', {name: 'Zoom out'})).toHaveCount(0);
     });
 
-    test('Computation Graph omits the Tables row for an empty array', async ({page}) => {
+    test('Computation Graph omits the Tables row for an empty array @query-editor-redesign', async ({
+        page,
+    }) => {
         await mockExplainPlan(page, {
             PlanNodeId: 1,
             PlanNodeType: 'Query',
@@ -310,7 +316,7 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.explain(testQuery, QUERY_MODES.query);
 
-        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
+        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Graph);
         await expect.poll(() => isGraphContentInsideViewport(explainSchema)).toBe(true);
         await explainSchema.getByRole('button', {name: '1:1'}).click();
         const stage = explainSchema
@@ -321,23 +327,23 @@ test.describe('Test Query Editor', async () => {
         await expect(stage).not.toContainText('Tables:');
     });
 
-    test('Explain Analyze runs full-stats explanation and shows plan tabs without result tab', async ({
+    test('Explain Analyze runs full-stats explanation and shows results and plan tabs @query-editor-redesign', async ({
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.explainAnalyze(testQuery, QUERY_MODES.query);
 
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
-        await expect(
-            queryEditor.paneWrapper.isTabSelected(ResultTabNames.ExplainPlan),
-        ).resolves.toBe(true);
-        await expect(queryEditor.isResultTabVisible(ResultTabNames.Schema)).resolves.toBe(true);
-        await expect(queryEditor.isResultTabVisible(ResultTabNames.ExplainPlan)).resolves.toBe(
+        await expect(queryEditor.paneWrapper.isTabSelected(ResultTabNames.QueryPlan)).resolves.toBe(
             true,
         );
+        await expect(queryEditor.isResultTabVisible(ResultTabNames.ExecutionPlan)).resolves.toBe(
+            true,
+        );
+        await expect(queryEditor.isResultTabVisible(ResultTabNames.QueryPlan)).resolves.toBe(true);
         await expect(queryEditor.isResultTabVisible(ResultTabNames.Stats)).resolves.toBe(true);
         await expect(queryEditor.isResultTabVisible(ResultTabNames.Result, 1000)).resolves.toBe(
-            false,
+            true,
         );
 
         await queryEditor.paneWrapper.selectTab(ResultTabNames.Stats);
@@ -348,12 +354,13 @@ test.describe('Test Query Editor', async () => {
         const repeatedExplainAnalyzeRequest = page.waitForRequest(isExplainAnalyzeRequest);
         await queryEditor.clickExplainAnalyzeButton();
         await repeatedExplainAnalyzeRequest;
-        await expect(
-            queryEditor.paneWrapper.isTabSelected(ResultTabNames.ExplainPlan),
-        ).resolves.toBe(true);
+        await expect(queryEditor.paneWrapper.isTabSelected(ResultTabNames.QueryPlan)).resolves.toBe(
+            true,
+        );
 
-        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
+        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Graph);
         await expect(explainSchema).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+        await queryEditor.paneWrapper.selectTab(ResultTabNames.Stats);
         await expect(queryEditor.hasStatsJsonViewer()).resolves.toBe(true);
         await expect(queryEditor.isQueryActionButtonHighlighted(ButtonNames.Run)).resolves.toBe(
             false,
@@ -388,7 +395,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
 
         // Switch to Explain tab — execute errors should show simple "Query Failed" with redirect
-        await queryEditor.paneWrapper.selectTab(ResultTabNames.ExplainPlan);
+        await queryEditor.paneWrapper.selectTab(ResultTabNames.QueryPlan);
 
         const resultArea = queryEditor.getResultAreaLocator();
         await expect(resultArea).toHaveScreenshot('query-error-on-explain-tab.png');
@@ -406,7 +413,9 @@ test.describe('Test Query Editor', async () => {
         await expect(errorMessage).toContain('Column references are not allowed without FROM');
     });
 
-    test('Error is displayed for invalid query for explain analyze', async ({page}) => {
+    test('Error is displayed for invalid query for explain analyze @query-editor-redesign', async ({
+        page,
+    }) => {
         const queryEditor = new QueryEditor(page);
 
         const invalidQuery = 'Select d';
@@ -414,6 +423,10 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.clickExplainAnalyzeButton();
 
         await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
+        await expect(
+            queryEditor.getResultAreaLocator().getByText('Query Failed', {exact: true}),
+        ).toBeVisible();
+        await queryEditor.paneWrapper.selectTab(ResultTabNames.Result);
         const errorMessage = await queryEditor.getErrorMessage();
         await expect(errorMessage).toContain('Column references are not allowed without FROM');
     });
@@ -434,7 +447,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isExplainAnalyzeButtonEnabled()).resolves.toBe(true);
     });
 
-    test('Explain Analyze warns that the query is executed and its results are ignored', async ({
+    test('Explain Analyze warns that the query is executed and changes are applied', async ({
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
@@ -443,15 +456,13 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.getQueryActionButton(ButtonNames.ExplainAnalyze).hover();
 
         await expect(page.getByText('The query will be executed')).toBeVisible();
-        await expect(
-            page.getByText(
-                'Any changes will be applied to the database. Query results are ignored.',
-            ),
-        ).toBeVisible();
+        await expect(page.getByText('Any changes will be applied to the database.')).toBeVisible();
     });
 
     for (const theme of queryActionScreenshotThemes) {
-        test(`renders three query actions in ${theme} theme`, async ({page}) => {
+        test(`renders three query actions in ${theme} theme @query-editor-redesign`, async ({
+            page,
+        }) => {
             await page.evaluate((themeName) => {
                 localStorage.setItem('theme', themeName);
             }, theme);
@@ -470,7 +481,7 @@ test.describe('Test Query Editor', async () => {
                 ButtonNames.ExplainAnalyze,
             );
             await expect(queryEditor.hasExplainActionDropdown()).resolves.toBe(false);
-            await expect(queryEditor.getQueryActionsGap()).resolves.toBe('12px');
+            await expect(queryEditor.getQueryActionsGap()).resolves.toBe('8px');
 
             const queryActionsBoundingBox = await queryEditor
                 .getQueryActionsLocator()
@@ -498,7 +509,7 @@ test.describe('Test Query Editor', async () => {
 
         await queryEditor.setQuery(simpleQuery);
         const runButton = queryEditor.getQueryActionButton(ButtonNames.Run);
-        await expectLocatorWidth(runButton, 76);
+        await expectLocatorWidth(runButton, 72);
         const runButtonWidth = await getLocatorWidth(runButton);
         const queryActionsWidth = await getLocatorWidth(queryEditor.getQueryActionsLocator());
         await queryEditor.clickRunButton();
@@ -568,7 +579,7 @@ test.describe('Test Query Editor', async () => {
             const explainAnalyzeButton = queryEditor.getQueryActionButton(
                 ButtonNames.ExplainAnalyze,
             );
-            await expectLocatorWidth(explainAnalyzeButton, 111);
+            await expectLocatorWidth(explainAnalyzeButton, 115);
             const explainAnalyzeButtonWidth = await getLocatorWidth(explainAnalyzeButton);
             const queryActionsWidth = await getLocatorWidth(queryEditor.getQueryActionsLocator());
 
@@ -733,7 +744,7 @@ test.describe('Test Query Editor', async () => {
         }
     });
 
-    test('Streaming query shows some results and banner when stop button is clicked', async ({
+    test('Streaming query shows some results and banner when stop button is clicked @query-editor-redesign', async ({
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
@@ -771,7 +782,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 
-    test('Stop button works for Explain mode', async ({page}) => {
+    test('Stop button works for Explain mode @query-editor-redesign', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         const pendingQuery = await setupPendingNonStreamingQueryMock(page);
 
@@ -792,7 +803,9 @@ test.describe('Test Query Editor', async () => {
         }
     });
 
-    test('repeated Explain Analyze hotkey aborts the previous request', async ({page}) => {
+    test('repeated Explain Analyze hotkey aborts the previous request @query-editor-redesign', async ({
+        page,
+    }) => {
         const queryEditor = new QueryEditor(page);
         const pendingQuery = await setupPendingNonStreamingQueryMock(page);
 
@@ -875,7 +888,7 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
         await queryEditor.clickRunButton();
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
-        await queryEditor.paneWrapper.selectTab(ResultTabNames.Schema);
+        await queryEditor.paneWrapper.selectTab(ResultTabNames.ExecutionPlan);
         await expect(queryEditor.resultTable.isHidden()).resolves.toBe(true);
         await queryEditor.paneWrapper.selectTab(ResultTabNames.Result);
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
@@ -1328,7 +1341,9 @@ test.describe('Test Query Editor', async () => {
         expect(fullTextReads).toBeLessThanOrEqual(2);
     });
 
-    test('Results controls collapse and expand functionality', async ({page}) => {
+    test('Results controls collapse and expand functionality @query-editor-redesign', async ({
+        page,
+    }) => {
         const queryEditor = new QueryEditor(page);
 
         // Run a query to show results
@@ -1349,7 +1364,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isResultsControlsCollapsed()).resolves.toBe(false);
     });
 
-    test('Copy result button copies to clipboard', async ({page}) => {
+    test('Copy result button copies to clipboard @query-editor-redesign', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         const query = 'SELECT 42 as answer;';
 
@@ -1379,7 +1394,9 @@ test.describe('Test Query Editor', async () => {
     });
 
     test.describe('Statistics Modes Tests', async () => {
-        test('Stats tab shows no stats message when STATISTICS_MODES.none', async ({page}) => {
+        test('Stats tab explains disabled statistics when STATISTICS_MODES.none @query-editor-redesign', async ({
+            page,
+        }) => {
             const queryEditor = new QueryEditor(page);
 
             // Set query and configure statistics mode to none
@@ -1394,10 +1411,18 @@ test.describe('Test Query Editor', async () => {
 
             // Check Stats tab content
             const statsContent = await queryEditor.getStatsTabContent();
-            expect(statsContent).toContain('There is no Stats for the request');
+            expect(statsContent).toContain('Statistics not enabled');
+            expect(statsContent).toContain(
+                'Select Basic or Full mode for statistics collection in query settings',
+            );
+            await expect(
+                page.getByRole('button', {name: 'Open query settings', exact: true}),
+            ).toBeVisible();
         });
 
-        test('Stats tab shows JSON viewer when STATISTICS_MODES.basic', async ({page}) => {
+        test('Stats tab shows JSON viewer when STATISTICS_MODES.basic @query-editor-redesign', async ({
+            page,
+        }) => {
             const queryEditor = new QueryEditor(page);
 
             // Set query and configure statistics mode to basic

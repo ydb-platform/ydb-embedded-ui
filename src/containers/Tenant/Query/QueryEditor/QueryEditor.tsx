@@ -609,14 +609,12 @@ export default function QueryEditor({
 
             const {tabId, queryId, startTime} = execution;
 
-            if (actionType === QUERY_ACTIONS.explainAnalyze) {
-                dispatch(
-                    setResultTab({
-                        queryType: QUERY_ACTIONS.explainAnalyze,
-                        tabId: RESULT_OPTIONS_IDS.simplified,
-                    }),
-                );
-            }
+            dispatch(
+                setResultTab({
+                    queryType: actionType,
+                    tabId: RESULT_OPTIONS_IDS.queryPlan,
+                }),
+            );
 
             reachExplainQueryMetricaGoals(actionType, querySettings);
 

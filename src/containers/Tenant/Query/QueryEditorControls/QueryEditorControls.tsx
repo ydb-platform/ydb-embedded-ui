@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {Divider} from '@gravity-ui/uikit';
+
 import {cancelQueryApi} from '../../../../store/reducers/cancelQuery';
 import {selectActiveTabId, selectUserInput} from '../../../../store/reducers/query/query';
 import type {QueryAction} from '../../../../types/store/query';
@@ -207,10 +209,11 @@ export const QueryEditorControls = ({
                     renderStopButton={renderStopButton}
                 />
                 <EditorButton.Settings onClick={onSettingsButtonClick} isLoading={isLoading} />
+                <Divider orientation="vertical" className={b('divider')} />
+                <SaveQuery buttonProps={{disabled, view: 'flat'}} />
             </div>
             <div className={b('right')}>
                 <NewSQL database={database} />
-                <SaveQuery buttonProps={{disabled}} />
             </div>
         </div>
     );

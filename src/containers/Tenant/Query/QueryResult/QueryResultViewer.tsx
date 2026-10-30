@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type {Settings} from '@gravity-ui/react-data-table';
-import type {ControlGroupOption, CopyToClipboardStatus} from '@gravity-ui/uikit';
+import type {CopyToClipboardStatus} from '@gravity-ui/uikit';
 import {
     ActionTooltip,
     Button,
@@ -9,6 +9,7 @@ import {
     Flex,
     SegmentedRadioGroup,
     Text,
+    Tooltip,
 } from '@gravity-ui/uikit';
 
 import {EnableFullscreenButton} from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
@@ -16,8 +17,15 @@ import {Fullscreen} from '../../../../components/Fullscreen/Fullscreen';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
-import {selectResultTab, setResultTab} from '../../../../store/reducers/query/query';
-import type {QueryResult} from '../../../../store/reducers/query/types';
+import {
+    selectActiveTab,
+    selectResultTab,
+    setQueryPlanColumnSizing,
+    setQueryPlanView,
+    setResultTab,
+} from '../../../../store/reducers/query/query';
+import type {QueryPlanView, QueryResult} from '../../../../store/reducers/query/types';
+import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
@@ -29,15 +37,16 @@ import {QueryStoppedBanner} from '../QueryStoppedBanner/QueryStoppedBanner';
 import {copyResultToClipboard, copyTextDataToClipboard} from '../utils/copyToClipboard';
 import {isQueryCancelledError} from '../utils/isQueryCancelledError';
 
+import {DiagnosticsButton} from './components/DiagnosticsButton/DiagnosticsButton';
 import {PlanSection} from './components/PlanSection/PlanSection';
-import {QueryInfoDropdown} from './components/QueryInfoDropdown/QueryInfoDropdown';
+import {QueryDataNotEnabled} from './components/QueryDataNotEnabled/QueryDataNotEnabled';
 import {QueryResultError} from './components/QueryResultError/QueryResultError';
 import {ResultSetsViewer} from './components/ResultSetsViewer/ResultSetsViewer';
 import {TraceButton} from './components/TraceButton/TraceButton';
 import type {SectionID} from './constants';
-import {RESULT_OPTIONS_IDS, getDefaultResultSection, getResultSections} from './constants';
+import {RESULT_OPTIONS_IDS, getResultSections, resolveResultSection} from './constants';
 import i18n from './i18n';
-import {canShowPlanToSvg} from './utils';
+import {getResultRowsPerSecond, isQueryPlanNotEnabled, isStatisticsNotEnabled} from './utils';
 
 import './QueryResultViewer.scss';
 
@@ -49,14 +58,11 @@ const RESULT_OPTIONS_TITLES: Record<SectionID, string> = {
     get result() {
         return i18n('action.result');
     },
-    get schema() {
-        return i18n('action.schema');
+    get 'query-plan'() {
+        return i18n('title_query-plan');
     },
-    get simplified() {
-        return i18n('action.explain-plan');
-    },
-    get json() {
-        return i18n('action.json');
+    get 'execution-plan'() {
+        return i18n('title_execution-plan');
     },
     get stats() {
         return i18n('action.stats');
@@ -94,27 +100,45 @@ export function QueryResultViewer({
 
     const dispatch = useTypedDispatch();
     const selectedTabs = useTypedSelector(selectResultTab);
+    const activeTab = useTypedSelector(selectActiveTab);
+    const planView = activeTab?.queryPlanView ?? 'table';
+    const onPlanViewChange = (view: QueryPlanView) => {
+        if (activeTab) {
+            dispatch(
+                setQueryPlanView({tabId: activeTab.id, executionId: result.executionId, view}),
+            );
+        }
+    };
 
     const isExecutionResult = isExecutionQueryAction(resultType);
     const hasResultSection = getResultSections(resultType).includes(RESULT_OPTIONS_IDS.result);
 
-    const [selectedResultSet, setSelectedResultSet] = React.useState(0);
+    const [resultSetSelection, setResultSetSelection] = React.useState({
+        executionId: result.executionId,
+        index: 0,
+    });
+    const selectedResultSet =
+        resultSetSelection.executionId === result.executionId ? resultSetSelection.index : 0;
+    const setSelectedResultSet = (index: number) =>
+        setResultSetSelection({executionId: result.executionId, index});
+    const [astTooltipOpen, setAstTooltipOpen] = React.useState(false);
     const [copyStatus, setCopyStatus] = React.useState<CopyToClipboardStatus>('pending');
     const copyTimeoutRef = React.useRef<number>();
 
-    const activeSection: SectionID = React.useMemo(() => {
-        const savedTab = selectedTabs?.[resultType];
-        if (savedTab) {
-            const validSections = getResultSections(resultType);
-            if (validSections.includes(savedTab as SectionID)) {
-                return savedTab as SectionID;
-            }
-        }
-        return getDefaultResultSection(resultType);
-    }, [selectedTabs, resultType]);
+    const activeSection = resolveResultSection(resultType, selectedTabs?.[resultType]);
 
     const {error, isLoading, streamingStatus, data = {}} = result;
-    const {preparedPlan, simplifiedPlan, stats, resultSets, ast} = data;
+    const {preparedPlan, stats, resultSets, ast} = data;
+    const rawPlan = data.plan ?? preparedPlan?.pristine;
+    const resultSetCount = resultSets?.filter(Boolean).length ?? 0;
+    const currentResultRows = resultSets?.[selectedResultSet]?.result;
+    const copyData = {
+        [RESULT_OPTIONS_IDS.result]: currentResultRows,
+        [RESULT_OPTIONS_IDS.queryPlan]: rawPlan,
+        [RESULT_OPTIONS_IDS.executionPlan]: undefined,
+        [RESULT_OPTIONS_IDS.stats]: stats,
+        [RESULT_OPTIONS_IDS.ast]: ast,
+    }[activeSection];
 
     React.useEffect(() => {
         return () => {
@@ -129,77 +153,59 @@ export function QueryResultViewer({
         window.clearTimeout(copyTimeoutRef.current);
     };
 
-    const radioButtonOptions: ControlGroupOption<SectionID>[] = React.useMemo(() => {
-        const sections = getResultSections(resultType);
-
-        return sections.map((section) => ({
-            value: section,
-            content: RESULT_OPTIONS_TITLES[section],
-        }));
-    }, [resultType]);
-
-    const hasCopyableData = React.useCallback((): boolean => {
-        switch (activeSection) {
-            case RESULT_OPTIONS_IDS.result:
-                return Boolean(data?.resultSets?.[selectedResultSet]?.result?.length);
-            case RESULT_OPTIONS_IDS.json:
-                return Boolean(preparedPlan?.pristine);
-            case RESULT_OPTIONS_IDS.simplified:
-                return Boolean(simplifiedPlan?.pristine);
-            case RESULT_OPTIONS_IDS.stats:
-                return Boolean(stats);
-            case RESULT_OPTIONS_IDS.ast:
-                return Boolean(ast);
-            default:
-                return false;
-        }
-    }, [
-        activeSection,
-        data?.resultSets,
-        selectedResultSet,
-        preparedPlan?.pristine,
-        simplifiedPlan?.pristine,
-        stats,
-        ast,
-    ]);
+    const radioButtonOptions = getResultSections(resultType).map((section) => (
+        <SegmentedRadioGroup.Option
+            key={section}
+            value={section}
+            onFocus={() => setAstTooltipOpen(section === RESULT_OPTIONS_IDS.ast)}
+            onBlur={() => setAstTooltipOpen(false)}
+            controlProps={
+                section === RESULT_OPTIONS_IDS.ast
+                    ? {
+                          'aria-description': i18n('context_ast'),
+                          onMouseEnter: () => setAstTooltipOpen(true),
+                          onMouseLeave: (event) => {
+                              if (event.currentTarget !== document.activeElement) {
+                                  setAstTooltipOpen(false);
+                              }
+                          },
+                      }
+                    : undefined
+            }
+        >
+            {section === RESULT_OPTIONS_IDS.ast ? (
+                <Tooltip
+                    content={i18n('context_ast')}
+                    open={astTooltipOpen}
+                    onOpenChange={setAstTooltipOpen}
+                    openDelay={500}
+                >
+                    <span>{RESULT_OPTIONS_TITLES[section]}</span>
+                </Tooltip>
+            ) : (
+                <React.Fragment>
+                    {RESULT_OPTIONS_TITLES[section]}
+                    {section === RESULT_OPTIONS_IDS.result ? (
+                        <Text color="secondary"> {resultSetCount}</Text>
+                    ) : null}
+                </React.Fragment>
+            )}
+        </SegmentedRadioGroup.Option>
+    ));
 
     const handleCopy = React.useCallback(async () => {
         window.clearTimeout(copyTimeoutRef.current);
 
-        let success = false;
-        switch (activeSection) {
-            case RESULT_OPTIONS_IDS.result: {
-                const currentResult = data?.resultSets?.[selectedResultSet];
-                success = await copyResultToClipboard(currentResult?.result);
-                break;
-            }
-            case RESULT_OPTIONS_IDS.json:
-                success = await copyTextDataToClipboard(preparedPlan?.pristine);
-                break;
-            case RESULT_OPTIONS_IDS.simplified:
-                success = await copyTextDataToClipboard(simplifiedPlan?.pristine);
-                break;
-            case RESULT_OPTIONS_IDS.stats:
-                success = await copyTextDataToClipboard(stats);
-                break;
-            case RESULT_OPTIONS_IDS.ast:
-                success = await copyTextDataToClipboard(ast);
-                break;
-        }
+        const success =
+            activeSection === RESULT_OPTIONS_IDS.result
+                ? await copyResultToClipboard(currentResultRows)
+                : await copyTextDataToClipboard(copyData);
 
         setCopyStatus(success ? 'success' : 'error');
         copyTimeoutRef.current = window.setTimeout(() => {
             setCopyStatus('pending');
         }, COPY_STATUS_RESET_TIMEOUT);
-    }, [
-        activeSection,
-        data?.resultSets,
-        selectedResultSet,
-        preparedPlan?.pristine,
-        simplifiedPlan?.pristine,
-        stats,
-        ast,
-    ]);
+    }, [activeSection, currentResultRows, copyData]);
 
     const getCopyTooltipTitle = (status: CopyToClipboardStatus): string => {
         if (status === 'success') {
@@ -212,7 +218,11 @@ export function QueryResultViewer({
     };
 
     const renderCopyButton = () => {
-        if (isLoading || !hasCopyableData()) {
+        const hasCopyableData =
+            activeSection === RESULT_OPTIONS_IDS.result
+                ? Boolean(currentResultRows?.length)
+                : Boolean(copyData);
+        if (isLoading || !hasCopyableData) {
             return null;
         }
 
@@ -231,22 +241,19 @@ export function QueryResultViewer({
         );
     };
 
-    const renderQueryInfoDropdown = () => {
+    const renderDiagnosticsButton = () => {
         if (isLoading || isQueryCancelledError(error)) {
             return null;
         }
 
         return (
-            <QueryInfoDropdown
-                queryResultsInfo={{
-                    queryText,
-                    ast: data.ast,
-                    stats: data.stats,
-                    plan: data.plan,
-                }}
+            <DiagnosticsButton
+                queryText={queryText}
+                ast={data.ast}
+                stats={data.stats}
+                plan={data.plan}
                 error={error}
                 database={database}
-                hasPlanToSvg={canShowPlanToSvg(result)}
             />
         );
     };
@@ -278,6 +285,7 @@ export function QueryResultViewer({
             return (
                 <ResultSetsViewer
                     resultSets={resultSets}
+                    rowsPerSecond={getResultRowsPerSecond(result)}
                     error={error}
                     selectedResultSet={selectedResultSet}
                     tableSettings={tableSettings}
@@ -294,14 +302,40 @@ export function QueryResultViewer({
             return <QueryResultError error={error} sourcePosition={result.sourcePosition} />;
         }
 
+        const planNotEnabled =
+            activeSection === RESULT_OPTIONS_IDS.queryPlan && isQueryPlanNotEnabled(result);
+        const statisticsNotEnabled =
+            activeSection === RESULT_OPTIONS_IDS.stats && isStatisticsNotEnabled(result);
+        if (planNotEnabled || statisticsNotEnabled) {
+            return (
+                <QueryDataNotEnabled
+                    kind={planNotEnabled ? 'plan' : 'stats'}
+                    onOpenSettings={() => dispatch(setQueryAction('settings'))}
+                />
+            );
+        }
+
         return (
             <PlanSection
                 activeSection={activeSection}
                 sectionTitle={RESULT_OPTIONS_TITLES[activeSection]}
-                preparedPlan={preparedPlan}
-                simplifiedPlan={simplifiedPlan}
-                stats={stats}
-                ast={ast}
+                data={data}
+                planView={planView}
+                columnSizing={activeTab?.queryPlanColumnSizing}
+                onColumnSizingChange={(sizing) => {
+                    if (activeTab) {
+                        dispatch(
+                            setQueryPlanColumnSizing({
+                                tabId: activeTab.id,
+                                executionId: result.executionId,
+                                sizing,
+                            }),
+                        );
+                    }
+                }}
+                onPlanViewChange={onPlanViewChange}
+                database={database}
+                executionId={result.executionId}
                 theme={theme}
             />
         );
@@ -312,10 +346,12 @@ export function QueryResultViewer({
             <div className={b('controls-left')}>
                 {radioButtonOptions.length && activeSection ? (
                     <SegmentedRadioGroup
-                        options={radioButtonOptions}
+                        aria-label={i18n('title_result-views')}
                         value={activeSection}
                         onUpdate={onSelectSection}
-                    />
+                    >
+                        {radioButtonOptions}
+                    </SegmentedRadioGroup>
                 ) : null}
                 <QueryExecutionStatus
                     error={error}
@@ -330,8 +366,8 @@ export function QueryResultViewer({
     const renderRightControls = () => {
         return (
             <div className={b('controls-right')}>
-                {renderQueryInfoDropdown()}
                 {renderCopyButton()}
+                {renderDiagnosticsButton()}
                 <EnableFullscreenButton />
                 <PaneVisibilityToggleButtons
                     onCollapse={onCollapseResults}
