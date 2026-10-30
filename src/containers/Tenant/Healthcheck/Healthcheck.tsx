@@ -48,6 +48,7 @@ type HealthcheckDetailsProps = (
           scope?: 'cluster';
       }
 ) & {
+    healthStatusNow?: number;
     targetIssueId?: string;
     targetLeafIssueId?: string;
     targetLeafIssueRef?: React.Ref<HTMLDivElement>;
@@ -74,7 +75,10 @@ export function Healthcheck(props: HealthcheckDetailsProps) {
 
     return (
         <HealthcheckContext.Provider value={{clusterName: props.clusterName}}>
-            <ClusterHealthcheckInner clusterName={props.clusterName} />
+            <ClusterHealthcheckInner
+                clusterName={props.clusterName}
+                healthStatusNow={props.healthStatusNow}
+            />
         </HealthcheckContext.Provider>
     );
 }
@@ -110,8 +114,14 @@ function DatabaseHealthcheckInner({
     );
 }
 
-function ClusterHealthcheckInner({clusterName}: {clusterName: string}) {
-    const healthcheck = useClusterHealthcheck(clusterName);
+function ClusterHealthcheckInner({
+    clusterName,
+    healthStatusNow,
+}: {
+    clusterName: string;
+    healthStatusNow?: number;
+}) {
+    const healthcheck = useClusterHealthcheck(clusterName, {now: healthStatusNow});
     return (
         <HealthcheckContent
             healthcheck={healthcheck}
@@ -127,6 +137,7 @@ interface HealthcheckResult {
     successful: boolean;
     error?: unknown;
     refetch: () => void;
+    canRefetch: boolean;
     selfCheckResult: SelfCheckResult;
     fulfilledTimeStamp?: number;
 }
@@ -159,6 +170,7 @@ function HealthcheckContent({
         leavesIssues,
         issues,
         refetch,
+        canRefetch,
     } = healthcheck;
     const snapshot = React.useMemo<HealthcheckAssistantSnapshot>(
         () => ({
@@ -180,6 +192,11 @@ function HealthcheckContent({
         snapshot,
     });
 
+    const renderRefresh = () =>
+        canRefetch ? (
+            <HealthcheckRefresh lastFullfiled={fulfilledTimeStamp} refresh={refetch} />
+        ) : null;
+
     const renderControls = () => {
         return (
             <Flex direction="column" gap={3} className={b('controls', {fullscreen})}>
@@ -194,18 +211,12 @@ function HealthcheckContent({
                                     snapshot: assistant.snapshot,
                                 })}
                             </Flex>
-                            <HealthcheckRefresh
-                                lastFullfiled={fulfilledTimeStamp}
-                                refresh={refetch}
-                            />
+                            {renderRefresh()}
                         </React.Fragment>
                     ) : (
                         <React.Fragment>
                             <HealthcheckStatus status={selfCheckResult} />
-                            <HealthcheckRefresh
-                                lastFullfiled={fulfilledTimeStamp}
-                                refresh={refetch}
-                            />
+                            {renderRefresh()}
                         </React.Fragment>
                     )}
                 </Flex>
@@ -216,11 +227,12 @@ function HealthcheckContent({
     };
 
     const renderContent = () => {
-        if (error) {
+        if (error && !leavesIssues.length) {
             return (
                 <Flex direction="column" gap={1} className={b('stub-wrapper')}>
                     <ResponseError error={error} defaultMessage={i18n('description_no-data')} />
                     <Icon data={cryCatIcon} size={100} />
+                    {renderRefresh()}
                 </Flex>
             );
         }
@@ -234,12 +246,16 @@ function HealthcheckContent({
                 <Flex direction="column" gap={1} className={b('stub-wrapper')}>
                     <SuccessImage width={200} height={200} />
                     {HEALTHCHECK_RESULT_TO_TEXT[selfCheckResult]}
+                    {renderRefresh()}
                 </Flex>
             );
         }
 
         return (
             <Flex direction="column" grow={1}>
+                {error ? (
+                    <ResponseError error={error} defaultMessage={i18n('description_no-data')} />
+                ) : null}
                 {renderControls()}
                 <Flex direction="column" gap={4} grow={1} className={b('issues')}>
                     <Issues

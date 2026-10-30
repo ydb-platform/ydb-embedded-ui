@@ -13,22 +13,28 @@ import {EFlag} from '../../../../../types/api/enums';
 import type {HealthCheckAPIResponse} from '../../../../../types/api/healthcheck';
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import type {TTenant} from '../../../../../types/api/tenant';
+import * as healthClock from '../../../../../utils/healthStatus/healthClock';
 import {TenantOverview} from '../TenantOverview';
 
 let mockTenant: TTenant | undefined;
 let mockNavigationV2 = false;
 const POLLING_INTERVAL = 200;
+let mockPollingInterval = POLLING_INTERVAL;
+let mockMetaDatabasesAvailable = false;
+let mockTenantQueryError: unknown;
 
 jest.mock('../../../../../utils/hooks/useWhoami', () => ({
     useIsUserAllowedToMakeChanges: () => true,
 }));
 
 jest.mock('../../../../../utils/hooks', () => ({
-    useAutoRefreshInterval: () => [POLLING_INTERVAL],
+    useAutoRefreshInterval: () => [mockPollingInterval],
     useTypedSelector: jest.requireActual('react-redux').useSelector,
     useTypedDispatch: jest.requireActual('react-redux').useDispatch,
 }));
-jest.mock('../../../../../utils/hooks/useDatabasesV2', () => ({useDatabasesV2: () => false}));
+jest.mock('../../../../../utils/hooks/useDatabasesV2', () => ({
+    useDatabasesV2: () => mockMetaDatabasesAvailable,
+}));
 jest.mock('../../../utils/useNavigationV2Enabled', () => ({
     useNavigationV2Enabled: () => mockNavigationV2,
 }));
@@ -39,7 +45,9 @@ jest.mock('../../../useTenantQueryParams', () => ({
     useTenantQueryParams: () => ({handleShowHealthcheckChange: jest.fn()}),
 }));
 jest.mock('../../../../../store/reducers/tenant/tenant', () => ({
-    tenantApi: {useGetTenantInfoQuery: () => ({currentData: mockTenant})},
+    tenantApi: {
+        useGetTenantInfoQuery: () => ({currentData: mockTenant, error: mockTenantQueryError}),
+    },
 }));
 jest.mock('../../../../../store/reducers/cluster/cluster', () => ({
     useClusterBaseInfo: () => ({}),
@@ -85,22 +93,26 @@ function setup(clusterName?: string) {
     const history = createMemoryHistory({
         initialEntries: [clusterName ? '/?clusterName=' + clusterName : '/'],
     });
-    render(
+    const overview = () => (
         <Provider store={store}>
             <Router history={history}>
                 <QueryParamProvider adapter={ReactRouter5Adapter}>
                     <TenantOverview database={database} databaseFullPath={database} />
                 </QueryParamProvider>
             </Router>
-        </Provider>,
+        </Provider>
     );
-    return history;
+    const view = render(overview());
+    return {history, rerender: () => view.rerender(overview())};
 }
 
 beforeEach(() => {
     getHealthcheckInfo.mockClear();
     mockTenant = {Name: database, Type: 'Dedicated', Overall: EFlag.Red};
     mockNavigationV2 = false;
+    mockPollingInterval = POLLING_INTERVAL;
+    mockMetaDatabasesAvailable = false;
+    mockTenantQueryError = undefined;
     healthcheckResult = {
         self_check_result: SelfCheckResult.DEGRADED,
         issue_log: [{id: 'issue', message: 'Storage issue'}],
@@ -113,7 +125,9 @@ beforeEach(() => {
 
 afterEach(() => {
     cleanup();
+    jest.restoreAllMocks();
     store.dispatch(healthcheckApi.util.resetApiState());
+    jest.useRealTimers();
     if (originalApi) {
         Object.defineProperty(window, 'api', originalApi);
     } else {
@@ -137,7 +151,7 @@ test.each([undefined, 'alpha'])(
 );
 
 test('does not reuse status for the same database path in another cluster', async () => {
-    const history = setup('alpha');
+    const {history} = setup('alpha');
     await screen.findByText(/1 issue/);
     expect(statusColor()).toHaveClass('ydb-status-color_state_yellow');
 
@@ -169,3 +183,99 @@ test.each(['navigation-v2', 'serverless', 'tenant-not-loaded'])(
         }
     },
 );
+
+test('expires the Meta Serverless Overall fallback while Viewer healthcheck is skipped', () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(1000);
+    jest.spyOn(healthClock, 'getHealthStatusNow').mockImplementation(
+        healthClock.createHealthClock(),
+    );
+    mockTenant = {
+        Name: database,
+        Type: 'Serverless',
+        Overall: EFlag.Green,
+        healthStatusSource: 'meta',
+        healthExpiresAt: 2000,
+    } as TTenant & {healthExpiresAt: number};
+    setup('alpha');
+    expect(statusColor()).toHaveClass('ydb-status-color_state_green');
+    act(() => {
+        jest.advanceTimersByTime(1000);
+    });
+    expect(statusColor()).toHaveClass('ydb-status-color_state_grey');
+    expect(
+        screen.queryByText('The healthcheck has expired. Refresh to obtain a current result.'),
+    ).not.toBeInTheDocument();
+    expect(
+        screen.getByRole('img', {
+            name: 'The healthcheck has expired. Refresh to obtain a current result.',
+        }),
+    ).toBeInTheDocument();
+    expect(getHealthcheckInfo).not.toHaveBeenCalled();
+    jest.useRealTimers();
+});
+
+test('cached Viewer GOOD does not override expired prepared Meta health', async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(1000);
+    jest.spyOn(healthClock, 'getHealthStatusNow').mockImplementation(
+        healthClock.createHealthClock(),
+    );
+    mockMetaDatabasesAvailable = true;
+    mockPollingInterval = 0;
+    mockTenant = {
+        Name: database,
+        Type: 'Dedicated',
+        Overall: EFlag.Green,
+        healthStatusSource: 'meta',
+        healthExpiresAt: 2000,
+    } as TTenant & {healthExpiresAt: number};
+    healthcheckResult = healthy;
+    setup('alpha');
+    await waitFor(() => expect(statusColor()).toHaveClass('ydb-status-color_state_green'));
+    await waitFor(() => {
+        const queries = store.getState()[healthcheckApi.reducerPath].queries;
+        expect(Object.values(queries).some((query) => query?.status === 'fulfilled')).toBe(true);
+    });
+    expect(getHealthcheckInfo).toHaveBeenCalledTimes(1);
+
+    act(() => jest.advanceTimersByTime(1000));
+
+    expect(statusColor()).toHaveClass('ydb-status-color_state_grey');
+    expect(getHealthcheckInfo).toHaveBeenCalledTimes(1);
+});
+
+test('current Meta query failure overrides cached Viewer GOOD and recovers before expiry', async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(1000);
+    jest.spyOn(healthClock, 'getHealthStatusNow').mockImplementation(
+        healthClock.createHealthClock(),
+    );
+    mockMetaDatabasesAvailable = true;
+    mockPollingInterval = 0;
+    mockTenant = {
+        Name: database,
+        Type: 'Dedicated',
+        Overall: EFlag.Green,
+        healthStatusSource: 'meta',
+        healthExpiresAt: 121000,
+    } as TTenant & {healthExpiresAt: number};
+    healthcheckResult = healthy;
+    const {rerender} = setup('alpha');
+    await waitFor(() => {
+        const queries = store.getState()[healthcheckApi.reducerPath].queries;
+        expect(Object.values(queries).some((query) => query?.status === 'fulfilled')).toBe(true);
+    });
+    expect(statusColor()).toHaveClass('ydb-status-color_state_green');
+    expect(getHealthcheckInfo).toHaveBeenCalledTimes(1);
+
+    mockTenantQueryError = {status: 400, statusText: 'Bad Request'};
+    rerender();
+    expect(statusColor()).toHaveClass('ydb-status-color_state_grey');
+    expect(getHealthcheckInfo).toHaveBeenCalledTimes(1);
+
+    mockTenantQueryError = undefined;
+    rerender();
+    expect(statusColor()).toHaveClass('ydb-status-color_state_green');
+    expect(getHealthcheckInfo).toHaveBeenCalledTimes(1);
+});

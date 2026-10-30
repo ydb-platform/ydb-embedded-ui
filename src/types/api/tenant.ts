@@ -39,6 +39,9 @@ export interface TTenant {
     PoolStats?: TPoolStats[];
     UserAttributes?: UserAttributes;
     Overall?: EFlag;
+    /** Remaining health lifetime provided by /meta/databases. */
+    status_ttl_ms?: number;
+    error?: string;
     SystemTablets?: TTabletStateInfo[];
     ResourceId?: string;
     Tablets?: TTabletStateInfo[];

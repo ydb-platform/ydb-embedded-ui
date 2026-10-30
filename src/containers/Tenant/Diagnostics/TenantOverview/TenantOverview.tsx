@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Button, Flex, Icon} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Flex, Icon} from '@gravity-ui/uikit';
 
 import {EntityName} from '../../../../components/EntityName/EntityName';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
@@ -29,6 +29,9 @@ import type {TMemoryStats} from '../../../../types/api/nodes';
 import type {ETenantType, TTenant, TTenantResource} from '../../../../types/api/tenant';
 import {getInfoTabLinks} from '../../../../utils/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
+import type {PreparedHealthStatus} from '../../../../utils/healthStatus/healthStatus';
+import {getEffectiveHealth} from '../../../../utils/healthStatus/healthStatus';
+import {useHealthStatusNow} from '../../../../utils/healthStatus/useHealthStatusNow';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabaseHealthcheckAvailable} from '../../../../utils/hooks/useDatabaseHealthcheckAvailable';
@@ -65,7 +68,15 @@ function isTenantLoading(isFetching: boolean, tenant: TTenant | undefined, error
     return isFetching && tenant === undefined && !error;
 }
 
-function getDatabaseStatus(overall?: EFlag, selfCheckResult?: SelfCheckResult) {
+function getDatabaseStatus(
+    tenant?: TTenant & PreparedHealthStatus,
+    selfCheckResult?: SelfCheckResult,
+) {
+    const overall = tenant?.Overall;
+    // Prepared Meta health errors (including expiry) take priority over cached Viewer health.
+    if (tenant?.error && tenant.healthStatusSource === 'meta') {
+        return overall;
+    }
     const healthcheckStatus =
         selfCheckResult === undefined ? undefined : selfCheckResultToHcStatus[selfCheckResult];
 
@@ -90,11 +101,13 @@ function getActiveMetricsTab(isServerless: boolean, metricsTab: TenantMetricsTab
 
 function TenantName({
     databaseStatus,
+    databaseStatusNote,
     name,
     hasTenant,
     isServerless,
 }: {
     databaseStatus?: EFlag;
+    databaseStatusNote?: string;
     name?: string;
     hasTenant: boolean;
     isServerless: boolean;
@@ -106,7 +119,17 @@ function TenantName({
                 withLeftTrim
                 hasClipboardButton={hasTenant}
                 clipboardButtonAlwaysVisible
-                leadingContent={<StatusColor status={databaseStatus} />}
+                leadingContent={
+                    <ActionTooltip title={databaseStatusNote ?? ''} disabled={!databaseStatusNote}>
+                        <span
+                            role={databaseStatusNote ? 'img' : undefined}
+                            aria-label={databaseStatusNote}
+                            tabIndex={databaseStatusNote ? 0 : undefined}
+                        >
+                            <StatusColor status={databaseStatus} />
+                        </span>
+                    </ActionTooltip>
+                }
             />
             {isServerless ? <ServerlessDBLabel className={b('serverless-tag')} /> : null}
         </Flex>
@@ -119,6 +142,7 @@ function renderTenantError(error: unknown, defaultMessage: string) {
 
 function renderOverviewHead({
     databaseStatus,
+    databaseStatusNote,
     handleOpenMonitoring,
     hasTenant,
     isServerless,
@@ -129,6 +153,7 @@ function renderOverviewHead({
     tenantType,
 }: {
     databaseStatus?: EFlag;
+    databaseStatusNote?: string;
     handleOpenMonitoring: () => void;
     hasTenant: boolean;
     isServerless: boolean;
@@ -156,6 +181,7 @@ function renderOverviewHead({
             <Flex alignItems="center" gap="1" className={b('top')}>
                 <TenantName
                     databaseStatus={databaseStatus}
+                    databaseStatusNote={databaseStatusNote}
                     name={name}
                     hasTenant={hasTenant}
                     isServerless={isServerless}
@@ -281,7 +307,9 @@ export function TenantOverview({
     );
 
     const tenantLoading = isTenantLoading(isFetching, tenant, error);
-    const {Name, Type, Overall, CoresTotal} = tenant || {};
+    const healthNow = useHealthStatusNow([tenant?.healthExpiresAt]);
+    const effectiveTenant = tenant ? getEffectiveHealth(tenant, healthNow, error) : tenant;
+    const {Name, Type, CoresTotal} = effectiveTenant || {};
     const isServerless = Type === 'Serverless';
     const healthcheckAvailable = useDatabaseHealthcheckAvailable(Type);
     const showHealthcheck = healthcheckAvailable && !isV2NavigationEnabled;
@@ -297,7 +325,7 @@ export function TenantOverview({
             skip: !showHealthcheck || tenant === undefined,
         },
     );
-    const databaseStatus = getDatabaseStatus(Overall, healthcheckData?.self_check_result);
+    const databaseStatus = getDatabaseStatus(effectiveTenant, healthcheckData?.self_check_result);
     const activeMetricsTab = getActiveMetricsTab(isServerless, metricsTab);
 
     const tenantType = mapDatabaseTypeToDBName(Type);
@@ -365,12 +393,16 @@ export function TenantOverview({
 
     return (
         <LoaderWrapper loading={tenantLoading}>
-            {renderTenantError(error, i18n('alert_database-information-not-available'))}
+            {renderTenantError(
+                error ?? tenant?.error,
+                i18n('alert_database-information-not-available'),
+            )}
             {tenant ? (
                 <div className={b()}>
                     <div className={b('info')}>
                         {renderOverviewHead({
                             databaseStatus,
+                            databaseStatusNote: effectiveTenant?.error,
                             handleOpenMonitoring,
                             hasTenant: Boolean(tenant),
                             isServerless,

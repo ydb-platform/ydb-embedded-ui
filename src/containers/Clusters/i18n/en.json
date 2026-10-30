@@ -18,6 +18,7 @@
   "statistics_load": "Load",
   "statistics_storage": "Storage",
 
+  "action_healthcheck-details": "Healthcheck details for {{cluster}}",
   "tooltip_no-cluster-data": "No cluster data",
   "tooltip_unavailable": "Marked as unavailable by an administrator. This is independent of healthcheck. You can still open the cluster",
 

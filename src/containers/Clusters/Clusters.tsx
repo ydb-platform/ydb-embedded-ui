@@ -23,6 +23,8 @@ import {
 import type {ClusterAvailability, PreparedCluster} from '../../store/reducers/clusters/types';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {getEffectiveHealth} from '../../utils/healthStatus/healthStatus';
+import {useHealthStatusNow} from '../../utils/healthStatus/useHealthStatusNow';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
@@ -112,7 +114,19 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         });
     }, [isDeleteClusterAvailable, isEditClusterAvailable, handleStatusClick]);
 
-    const clusters = query.data;
+    const healthNow = useHealthStatusNow(
+        query.data?.map((row) => row.cluster?.healthExpiresAt) ?? [],
+    );
+    const clusters = React.useMemo(
+        () =>
+            query.data?.map((row) => {
+                const cluster = row.cluster
+                    ? getEffectiveHealth(row.cluster, healthNow, query.error)
+                    : row.cluster;
+                return cluster === row.cluster ? row : {...row, cluster};
+            }),
+        [query.data, query.error, healthNow],
+    );
     const hasUnavailableClusters = clusters?.some(
         (cluster) => cluster.settings?.unavailable === true,
     );

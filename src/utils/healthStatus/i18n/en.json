@@ -1,0 +1,6 @@
+{
+  "description_freshness-unavailable": "Healthcheck freshness is unavailable. Refresh to obtain a current result.",
+  "description_expired": "The healthcheck has expired. Refresh to obtain a current result.",
+  "description_refresh-failed": "The latest healthcheck refresh failed.",
+  "description_result-unavailable": "Healthcheck status is unavailable."
+}

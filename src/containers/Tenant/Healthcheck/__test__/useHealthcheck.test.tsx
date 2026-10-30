@@ -55,12 +55,18 @@ describe('useHealthcheck', () => {
     });
 
     test('skips the healthcheck request for a supplied Serverless database', () => {
-        renderHook(() =>
+        mockUseGetHealthcheckInfoQuery.mockReturnValue({
+            isUninitialized: true,
+            isFetching: false,
+            refetch: jest.fn(),
+        });
+        const {result} = renderHook(() =>
             useHealthcheck('/Root/database', {
                 clusterName: 'test-cluster',
                 databaseType: 'Serverless',
             }),
         );
+        expect(result.current.canRefetch).toBe(false);
 
         expect(mockUseGetHealthcheckInfoQuery).toHaveBeenCalledWith(
             {database: '/Root/database', clusterName: 'test-cluster'},

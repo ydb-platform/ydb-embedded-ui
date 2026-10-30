@@ -183,6 +183,8 @@ interface DatabaseStatus {
 }
 
 export interface HealthCheckAPIResponse {
+    status_ttl_ms?: number;
+    error?: string;
     self_check_result?: SelfCheckResult;
 
     issue_log?: IssueLog[];
