@@ -114,15 +114,17 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         });
     }, [isDeleteClusterAvailable, isEditClusterAvailable, handleStatusClick]);
 
-    const healthNow = useHealthStatusNow();
+    const healthNow = useHealthStatusNow(
+        query.data?.map((row) => row.cluster?.healthExpiresAt) ?? [],
+    );
     const clusters = React.useMemo(
         () =>
-            query.data?.map((row) => ({
-                ...row,
-                cluster: row.cluster
+            query.data?.map((row) => {
+                const cluster = row.cluster
                     ? getEffectiveHealth(row.cluster, healthNow, query.error)
-                    : row.cluster,
-            })),
+                    : row.cluster;
+                return cluster === row.cluster ? row : {...row, cluster};
+            }),
         [query.data, query.error, healthNow],
     );
     const hasUnavailableClusters = clusters?.some(

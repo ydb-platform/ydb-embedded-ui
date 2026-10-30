@@ -87,7 +87,7 @@ export const useClusterHealthcheck = (
         },
     );
 
-    const localNow = useHealthStatusNow(now === undefined);
+    const localNow = useHealthStatusNow([data?.healthExpiresAt], now === undefined);
     const healthError = data ? getHealthStatusError(data, now ?? localNow, error) : undefined;
     const effectiveError = error ?? healthError;
     const selfCheckResult = effectiveError

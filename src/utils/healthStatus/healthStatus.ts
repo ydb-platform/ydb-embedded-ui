@@ -4,7 +4,13 @@ import {isEnumMember} from '../typecheckers';
 
 import i18n from './i18n';
 
+// Meta's health observation contract has a fixed two-minute maximum lifetime.
+// Reject larger values rather than extending trust in a response from another version.
+const MAX_HEALTH_TTL_MS = 120000;
+
 export interface PreparedHealthStatus {
+    /** Only Meta adapters opt in; Viewer and legacy cp_databases retain their behavior. */
+    healthStatusSource?: 'meta';
     /** Fixed local deadline captured by the query adapter; cache reads never renew it. */
     healthExpiresAt?: number;
 }
@@ -16,8 +22,9 @@ export function prepareHealthStatus<T extends {status_ttl_ms?: number}>(
     const ttl = data.status_ttl_ms;
     return {
         ...data,
+        healthStatusSource: 'meta',
         healthExpiresAt:
-            typeof ttl === 'number' && Number.isInteger(ttl) && ttl >= 0 && ttl <= 120000
+            typeof ttl === 'number' && Number.isInteger(ttl) && ttl >= 0 && ttl <= MAX_HEALTH_TTL_MS
                 ? requestStartedAt + ttl
                 : undefined,
     };
@@ -52,7 +59,7 @@ export function getEffectiveHealth<
 >(data: T, now: number, queryError?: unknown): T {
     // Only the Meta health query adapters establish this contract. Viewer and
     // legacy cp_databases results retain their existing behavior.
-    if (!Object.hasOwn(data, 'healthExpiresAt')) {
+    if (data.healthStatusSource !== 'meta') {
         return data;
     }
     const error =

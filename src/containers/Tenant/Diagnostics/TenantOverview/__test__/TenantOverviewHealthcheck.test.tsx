@@ -13,6 +13,7 @@ import {EFlag} from '../../../../../types/api/enums';
 import type {HealthCheckAPIResponse} from '../../../../../types/api/healthcheck';
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import type {TTenant} from '../../../../../types/api/tenant';
+import * as healthClock from '../../../../../utils/healthStatus/healthClock';
 import {TenantOverview} from '../TenantOverview';
 
 let mockTenant: TTenant | undefined;
@@ -124,6 +125,7 @@ beforeEach(() => {
 
 afterEach(() => {
     cleanup();
+    jest.restoreAllMocks();
     store.dispatch(healthcheckApi.util.resetApiState());
     jest.useRealTimers();
     if (originalApi) {
@@ -185,10 +187,14 @@ test.each(['navigation-v2', 'serverless', 'tenant-not-loaded'])(
 test('expires the Meta Serverless Overall fallback while Viewer healthcheck is skipped', () => {
     jest.useFakeTimers();
     jest.setSystemTime(1000);
+    jest.spyOn(healthClock, 'getHealthStatusNow').mockImplementation(
+        healthClock.createHealthClock(),
+    );
     mockTenant = {
         Name: database,
         Type: 'Serverless',
         Overall: EFlag.Green,
+        healthStatusSource: 'meta',
         healthExpiresAt: 2000,
     } as TTenant & {healthExpiresAt: number};
     setup('alpha');
@@ -197,6 +203,14 @@ test('expires the Meta Serverless Overall fallback while Viewer healthcheck is s
         jest.advanceTimersByTime(1000);
     });
     expect(statusColor()).toHaveClass('ydb-status-color_state_grey');
+    expect(
+        screen.queryByText('The healthcheck has expired. Refresh to obtain a current result.'),
+    ).not.toBeInTheDocument();
+    expect(
+        screen.getByRole('img', {
+            name: 'The healthcheck has expired. Refresh to obtain a current result.',
+        }),
+    ).toBeInTheDocument();
     expect(getHealthcheckInfo).not.toHaveBeenCalled();
     jest.useRealTimers();
 });
@@ -204,12 +218,16 @@ test('expires the Meta Serverless Overall fallback while Viewer healthcheck is s
 test('cached Viewer GOOD does not override expired prepared Meta health', async () => {
     jest.useFakeTimers();
     jest.setSystemTime(1000);
+    jest.spyOn(healthClock, 'getHealthStatusNow').mockImplementation(
+        healthClock.createHealthClock(),
+    );
     mockMetaDatabasesAvailable = true;
     mockPollingInterval = 0;
     mockTenant = {
         Name: database,
         Type: 'Dedicated',
         Overall: EFlag.Green,
+        healthStatusSource: 'meta',
         healthExpiresAt: 2000,
     } as TTenant & {healthExpiresAt: number};
     healthcheckResult = healthy;
@@ -230,12 +248,16 @@ test('cached Viewer GOOD does not override expired prepared Meta health', async 
 test('current Meta query failure overrides cached Viewer GOOD and recovers before expiry', async () => {
     jest.useFakeTimers();
     jest.setSystemTime(1000);
+    jest.spyOn(healthClock, 'getHealthStatusNow').mockImplementation(
+        healthClock.createHealthClock(),
+    );
     mockMetaDatabasesAvailable = true;
     mockPollingInterval = 0;
     mockTenant = {
         Name: database,
         Type: 'Dedicated',
         Overall: EFlag.Green,
+        healthStatusSource: 'meta',
         healthExpiresAt: 121000,
     } as TTenant & {healthExpiresAt: number};
     healthcheckResult = healthy;

@@ -8,10 +8,11 @@ import type {
     MetaExtendedClusterInfo,
     MetaViewerClusterInfo,
 } from '../../../types/api/meta';
+import type {PreparedHealthStatus} from '../../../utils/healthStatus/healthStatus';
 import type {PreparedVersion} from '../../../utils/versions/types';
 
 export interface PreparedCluster extends Omit<MetaExtendedClusterInfo, 'name' | 'title'> {
-    cluster?: MetaViewerClusterInfo & {healthExpiresAt?: number};
+    cluster?: MetaViewerClusterInfo & PreparedHealthStatus;
     name: string | undefined;
     title: string | undefined;
     preparedVersions: PreparedVersion[];

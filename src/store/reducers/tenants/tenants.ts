@@ -1,4 +1,5 @@
 import type {TTenantInfo} from '../../../types/api/tenant';
+import {getHealthStatusNow} from '../../../utils/healthStatus/healthClock';
 import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
 import {api} from '../api';
 import {DATABASE_DATA_LIST_TAG} from '../entityDataTags';
@@ -25,7 +26,7 @@ export const tenantsApi = api.injectEndpoints({
                     let response: TTenantInfo;
 
                     if (isMetaDatabasesAvailable && window.api.meta) {
-                        const requestStartedAt = Date.now();
+                        const requestStartedAt = getHealthStatusNow();
                         response = await window.api.meta.getTenantsV2(
                             {clusterName, environmentName},
                             {signal},

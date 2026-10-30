@@ -28,23 +28,23 @@ export function ClusterDrawerHealthcheck({
 }: ClusterDrawerHealthcheckProps) {
     const {handleIssuesFilterChange, handleHealthcheckViewChange} = useTenantQueryParams();
 
-    const now = useHealthStatusNow(isVisible);
-    const query = useTypedSelector((state) =>
-        healthcheckApi.endpoints.getClusterHealthcheckInfo.select({clusterName: clusterName || ''})(
-            state,
-        ),
+    const selectQuery = React.useMemo(
+        () =>
+            healthcheckApi.endpoints.getClusterHealthcheckInfo.select({
+                clusterName: clusterName || '',
+            }),
+        [clusterName],
     );
+    const queryError = useTypedSelector((state) => selectQuery(state).error);
     const data = useTypedSelector((state) =>
         selectAllClusterHealthcheckInfo(state, clusterName || ''),
     );
-    const healthError = data ? getHealthStatusError(data, now, query.error) : undefined;
+    const now = useHealthStatusNow([data?.healthExpiresAt], isVisible);
+    const healthError = data ? getHealthStatusError(data, now, queryError) : undefined;
     const healthcheckStatus = healthError ? SelfCheckResult.UNSPECIFIED : data?.self_check_result;
     const healthcheckData = data
         ? {...data, self_check_result: healthcheckStatus, error: healthError}
         : undefined;
-    if (healthcheckData) {
-        delete healthcheckData.healthExpiresAt;
-    }
 
     const handleCloseDrawer = React.useCallback(() => {
         onClose();

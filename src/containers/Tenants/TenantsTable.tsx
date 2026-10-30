@@ -154,7 +154,9 @@ const TenantsTableContent = ({
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
 
-    const healthNow = useHealthStatusNow();
+    const healthNow = useHealthStatusNow(
+        currentData?.map((tenant) => tenant.healthExpiresAt) ?? [],
+    );
 
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count

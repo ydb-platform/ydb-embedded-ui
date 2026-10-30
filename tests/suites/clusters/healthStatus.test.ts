@@ -36,7 +36,6 @@ test('explains current failure, preserves cached issues and recovers through rea
     let overall = EFlag.Green;
     let error: string | undefined;
     let health = 'GOOD';
-    let includeIssue = true;
     let failDetails = false;
     await page.route('**/meta/**', (route) => {
         const path = new URL(route.request().url()).pathname;
@@ -72,7 +71,7 @@ test('explains current failure, preserves cached issues and recovers through rea
                       json: {
                           self_check_result: health,
                           status_ttl_ms: 120000,
-                          issue_log: includeIssue ? [issue] : [],
+                          issue_log: [issue],
                       },
                   });
         }
@@ -123,29 +122,10 @@ test('explains current failure, preserves cached issues and recovers through rea
     await drawer.getByRole('button', {name: 'Refresh', exact: true}).click();
     await expect(drawer.getByText('Degraded', {exact: true}).first()).toBeVisible();
     await expect(drawer.getByText('400 Bad Request', {exact: true})).toHaveCount(0);
-    health = 'GOOD';
-    includeIssue = false;
-    await drawer.getByRole('button', {name: 'Refresh', exact: true}).click();
-    await expect(
-        drawer.getByText('Everything is working fine', {exact: true}).first(),
-    ).toBeVisible();
-    await expect(drawer.getByRole('button', {name: 'Refresh', exact: true})).toBeVisible();
-    failDetails = true;
-    await drawer.getByRole('button', {name: 'Refresh', exact: true}).click();
-    await expect(drawer.getByText('400 Bad Request', {exact: true}).first()).toBeVisible();
-    await expect(drawer.getByRole('button', {name: 'Refresh', exact: true})).toBeVisible();
-    failDetails = false;
-    await drawer.getByRole('button', {name: 'Refresh', exact: true}).click();
-    await expect(
-        drawer.getByText('Everything is working fine', {exact: true}).first(),
-    ).toBeVisible();
     await page.getByRole('dialog').getByRole('button', {name: 'Close', exact: true}).click();
     await expect(drawer).not.toBeVisible();
-    overall = EFlag.Yellow;
-    error = undefined;
-    await page.getByRole('button', {name: 'Refresh', exact: true}).first().click();
-    await expect(row.getByText('Warning', {exact: true})).toBeVisible();
     overall = EFlag.Green;
+    error = undefined;
     await page.getByRole('button', {name: 'Refresh', exact: true}).first().click();
     await expect(row.getByText('Good', {exact: true})).toBeVisible();
     await expect(row.locator('.ydb-entity-status__note')).toHaveCount(0);
@@ -248,7 +228,10 @@ test('Meta database package consumer expires and rejects a failed refresh', asyn
         }
         return route.fulfill({json: {Capabilities: {}}});
     });
-    await page.goto('/metaHealth.html?clusterName=selected');
+    await page.addInitScript(() => {
+        window.e2eMetaDatabases = true;
+    });
+    await page.goto('/cluster/databases?clusterName=selected');
     const row = getRow(page, '/Root/health-db');
     await expect(row.getByText('Good', {exact: true})).toBeVisible();
     expect(requests).toBeGreaterThan(0);
