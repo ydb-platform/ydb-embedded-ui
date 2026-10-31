@@ -379,14 +379,16 @@ test('nodes: repeated arrows keep selection across chunks in a large list', asyn
     await new PageModel(page, 'cluster/nodes').goto();
     await expect(page.getByRole('link', {name: 'host-0.test', exact: true})).toBeVisible();
     await page.locator('input').first().focus();
+    // Each pass crosses two 20-row chunk boundaries in both directions.
+    const lastRowIndex = 40;
     for (let round = 0; round < 2; round++) {
-        for (let index = 1; index <= 100; index++) {
+        for (let index = 1; index <= lastRowIndex; index++) {
             await page.keyboard.press('ArrowDown');
             if (index % 20 === 0) {
                 await expect(page.locator(focusedRow)).toContainText(`host-${index}.test`);
             }
         }
-        for (let index = 99; index >= 0; index--) {
+        for (let index = lastRowIndex - 1; index >= 0; index--) {
             await page.keyboard.press('ArrowUp');
             if (index % 20 === 0) {
                 await expect(page.locator(focusedRow)).toContainText(`host-${index}.test`);

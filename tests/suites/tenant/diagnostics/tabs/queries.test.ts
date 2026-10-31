@@ -1,3 +1,5 @@
+import {randomUUID} from 'node:crypto';
+
 import {expect, request as playwrightRequest, test} from '@playwright/test';
 
 import type {ExecuteQueryResponse} from '../../../../../src/types/api/query';
@@ -62,6 +64,7 @@ test.describe('Diagnostics Queries tab', async () => {
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
 
         const runningQueryMarker = `e2e-running-query-${test.info().project.name}-${Date.now()}`;
+        const runningQueryId = randomUUID();
         const runningQuery = `-- ${runningQueryMarker}\n${getLongRunningStreamQuery(500_000)}`;
         const storageState = await page.context().storageState();
         const queryRequestContext = await playwrightRequest.newContext({storageState});
@@ -80,6 +83,7 @@ test.describe('Diagnostics Queries tab', async () => {
                     query: runningQuery,
                     database,
                     action: 'execute-query',
+                    query_id: runningQueryId,
                     syntax: 'yql_v1',
                     schema: 'multipart',
                 },
@@ -164,7 +168,21 @@ test.describe('Diagnostics Queries tab', async () => {
         } finally {
             await pendingPoll?.catch(() => undefined);
             try {
-                // Closing the HTTP context can leave the server query running.
+                // Closing the HTTP context alone can leave the server query running.
+                const cancelResponse = await queryRequestContext.post(
+                    `${backend}/viewer/json/query`,
+                    {
+                        params: {database},
+                        headers: csrfToken ? {'X-CSRF-Token': csrfToken} : undefined,
+                        data: {
+                            database,
+                            action: 'cancel-query',
+                            query_id: runningQueryId,
+                        },
+                        timeout: 5_000,
+                    },
+                );
+                expect(cancelResponse.ok(), await cancelResponse.text()).toBe(true);
                 await runningQueryRequest;
             } finally {
                 await queryRequestContext.dispose();
