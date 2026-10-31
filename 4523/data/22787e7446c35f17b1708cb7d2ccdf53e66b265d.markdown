@@ -1,0 +1,205 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list
+    - main [ref=e44]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e48]: Clusters
+          - generic [ref=e49]:
+            - button "Refresh" [ref=e50] [cursor=pointer]:
+              - img [ref=e53]
+            - group [ref=e56] [cursor=pointer]:
+              - combobox [ref=e57]:
+                - generic [ref=e58]: None
+              - img [ref=e59]:
+                - img [ref=e60]
+        - generic [ref=e63]:
+          - generic [ref=e64]:
+            - generic [ref=e65]:
+              - generic [ref=e66]:
+                - generic [ref=e68]:
+                  - textbox "Cluster name, version, domain, host..." [active] [ref=e69]
+                  - img [ref=e71]:
+                    - img [ref=e72]
+                - group [ref=e75] [cursor=pointer]:
+                  - combobox [ref=e76]:
+                    - generic [ref=e77]: "Service:"
+                    - generic [ref=e78]: All
+                  - img [ref=e79]:
+                    - img [ref=e80]
+              - button "9/14" [ref=e84] [cursor=pointer]:
+                - img [ref=e87]:
+                  - img [ref=e88]
+                - generic [ref=e91]: 9/14
+            - text: 3 clusters found
+            - generic [ref=e96]:
+              - table [ref=e99]:
+                - rowgroup [ref=e100]:
+                  - row "Cluster Versions Status Service Nodes Load Storage Hosts Databases" [ref=e101]:
+                    - columnheader "Cluster" [ref=e102] [cursor=pointer]:
+                      - generic [ref=e103]:
+                        - text: Cluster
+                        - img [ref=e105]
+                    - columnheader "Versions" [ref=e107] [cursor=pointer]:
+                      - generic [ref=e108]:
+                        - text: Versions
+                        - img [ref=e110]
+                    - columnheader "Status" [ref=e112] [cursor=pointer]:
+                      - generic [ref=e113]:
+                        - text: Status
+                        - img [ref=e115]
+                    - columnheader "Service" [ref=e117] [cursor=pointer]:
+                      - generic [ref=e118]:
+                        - text: Service
+                        - img [ref=e120]
+                    - columnheader "Nodes" [ref=e122] [cursor=pointer]:
+                      - generic [ref=e123]:
+                        - text: Nodes
+                        - img [ref=e125]
+                    - columnheader "Load" [ref=e127] [cursor=pointer]:
+                      - generic [ref=e128]:
+                        - text: Load
+                        - img [ref=e130]
+                    - columnheader "Storage" [ref=e132] [cursor=pointer]:
+                      - generic [ref=e133]:
+                        - text: Storage
+                        - img [ref=e135]
+                    - columnheader "Hosts" [ref=e137] [cursor=pointer]:
+                      - generic [ref=e138]:
+                        - text: Hosts
+                        - img [ref=e140]
+                    - columnheader "Databases" [ref=e142] [cursor=pointer]:
+                      - generic [ref=e143]:
+                        - text: Databases
+                        - img [ref=e145]
+              - table [ref=e149]:
+                - rowgroup:
+                  - row "Cluster Versions Status Service Nodes Load Storage Hosts Databases":
+                    - columnheader "Cluster":
+                      - generic:
+                        - text: Cluster
+                        - img [ref=e151] [cursor=pointer]
+                    - columnheader "Versions":
+                      - generic:
+                        - text: Versions
+                        - img [ref=e154] [cursor=pointer]
+                    - columnheader "Status":
+                      - generic:
+                        - text: Status
+                        - img [ref=e157] [cursor=pointer]
+                    - columnheader "Service":
+                      - generic:
+                        - text: Service
+                        - img [ref=e160] [cursor=pointer]
+                    - columnheader "Nodes":
+                      - generic:
+                        - text: Nodes
+                        - img [ref=e163] [cursor=pointer]
+                    - columnheader "Load":
+                      - generic:
+                        - text: Load
+                        - img [ref=e166] [cursor=pointer]
+                    - columnheader "Storage":
+                      - generic:
+                        - text: Storage
+                        - img [ref=e169] [cursor=pointer]
+                    - columnheader "Hosts":
+                      - generic:
+                        - text: Hosts
+                        - img [ref=e172] [cursor=pointer]
+                    - columnheader "Databases":
+                      - generic:
+                        - text: Databases
+                        - img [ref=e175] [cursor=pointer]
+                - rowgroup [ref=e177]:
+                  - row "Alpha Unknown — — — — — —" [ref=e178]:
+                    - cell "Alpha Unknown" [ref=e179]:
+                      - generic [ref=e181]:
+                        - link "Alpha" [ref=e183] [cursor=pointer]:
+                          - /url: /cluster?clusterName=alpha
+                        - generic [ref=e185]:
+                          - img [ref=e187]:
+                            - img [ref=e188]
+                          - generic [ref=e192]:
+                            - text: Unknown
+                            - button [ref=e193] [cursor=pointer]:
+                              - img [ref=e194]:
+                                - img [ref=e195]
+                    - cell "—" [ref=e197]
+                    - cell [ref=e198]
+                    - cell [ref=e199]
+                    - cell "—" [ref=e200]
+                    - cell "—" [ref=e201]
+                    - cell "—" [ref=e202]
+                    - cell "—" [ref=e203]
+                    - cell "—" [ref=e204]
+                  - row "Bravo Unknown — analytics — — — — —" [ref=e205]:
+                    - cell "Bravo Unknown" [ref=e206]:
+                      - generic [ref=e208]:
+                        - link "Bravo" [ref=e210] [cursor=pointer]:
+                          - /url: /cluster?clusterName=bravo
+                        - generic [ref=e212]:
+                          - img [ref=e214]:
+                            - img [ref=e215]
+                          - generic [ref=e219]:
+                            - text: Unknown
+                            - button [ref=e220] [cursor=pointer]:
+                              - img [ref=e221]:
+                                - img [ref=e222]
+                    - cell "—" [ref=e224]
+                    - cell [ref=e225]
+                    - cell "analytics" [ref=e226]
+                    - cell "—" [ref=e227]
+                    - cell "—" [ref=e228]
+                    - cell "—" [ref=e229]
+                    - cell "—" [ref=e230]
+                    - cell "—" [ref=e231]
+                  - row "Zulu Unknown — — — — — —" [ref=e232]:
+                    - cell "Zulu Unknown" [ref=e233]:
+                      - generic [ref=e235]:
+                        - link "Zulu" [ref=e237] [cursor=pointer]:
+                          - /url: /cluster?clusterName=zulu
+                        - generic [ref=e239]:
+                          - img [ref=e241]:
+                            - img [ref=e242]
+                          - generic [ref=e246]:
+                            - text: Unknown
+                            - button [ref=e247] [cursor=pointer]:
+                              - img [ref=e248]:
+                                - img [ref=e249]
+                    - cell "—" [ref=e251]
+                    - cell [ref=e252]
+                    - cell [ref=e253]
+                    - cell "—" [ref=e254]
+                    - cell "—" [ref=e255]
+                    - cell "—" [ref=e256]
+                    - cell "—" [ref=e257]
+                    - cell "—" [ref=e258]
+          - status [ref=e259]
+```

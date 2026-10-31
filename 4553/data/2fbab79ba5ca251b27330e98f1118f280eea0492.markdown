@@ -1,0 +1,559 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - link "Cluster" [disabled] [ref=e46]:
+            - generic [ref=e48]: Cluster
+      - link "Developer UI" [ref=e50] [cursor=pointer]:
+        - /url: http://localhost:8765/internal
+        - img [ref=e53]:
+          - img [ref=e54]
+        - generic [ref=e56]: Developer UI
+    - main [ref=e57]:
+      - generic [ref=e59]:
+        - generic [ref=e61]:
+          - text: LOCAL
+          - generic [ref=e62] [cursor=pointer]:
+            - img [ref=e64]:
+              - img [ref=e65]
+            - button "Good" [ref=e67]:
+              - generic [ref=e70]: Good
+        - generic [ref=e71]:
+          - button "Refresh" [ref=e72] [cursor=pointer]:
+            - img [ref=e75]
+          - group [ref=e78] [cursor=pointer]:
+            - combobox [ref=e79]:
+              - generic [ref=e80]: None
+            - img [ref=e81]:
+              - img [ref=e82]
+        - tablist [ref=e85]:
+          - tab "Databases" [ref=e86] [cursor=pointer]:
+            - link "Databases" [ref=e89]:
+              - /url: /cluster/databases
+          - tab "Nodes" [ref=e90] [cursor=pointer]:
+            - link "Nodes" [ref=e93]:
+              - /url: /cluster/nodes
+          - tab "Storage" [selected] [ref=e94] [cursor=pointer]:
+            - link "Storage" [ref=e97]:
+              - /url: /cluster/storage
+          - tab "Network" [ref=e98] [cursor=pointer]:
+            - link "Network" [ref=e101]:
+              - /url: /cluster/network
+          - tab "Tablets" [ref=e102] [cursor=pointer]:
+            - link "Tablets" [ref=e105]:
+              - /url: /cluster/tablets
+          - tab "Versions" [ref=e106] [cursor=pointer]:
+            - link "Versions" [ref=e109]:
+              - /url: /cluster/versions
+        - generic [ref=e110]:
+          - generic [ref=e111]:
+            - generic [ref=e112]:
+              - generic [ref=e114]:
+                - generic [ref=e115]:
+                  - textbox "Group ID, Pool name" [ref=e118]
+                  - radiogroup [ref=e119]:
+                    - generic [ref=e120]:
+                      - radio "Groups" [checked] [ref=e121]
+                      - generic [ref=e122]: Groups
+                    - generic [ref=e123] [cursor=pointer]:
+                      - radio "Nodes" [ref=e124]
+                      - generic [ref=e125]: Nodes
+                  - generic [ref=e126]: "Group by:"
+                  - group [ref=e128] [cursor=pointer]:
+                    - combobox [ref=e129]:
+                      - generic [ref=e130]: "-"
+                    - img [ref=e131]:
+                      - img [ref=e132]
+                  - generic [ref=e136]: "Groups: 2"
+                  - button "Expert mode" [pressed] [ref=e137] [cursor=pointer]:
+                    - img [ref=e140]:
+                      - img [ref=e141]
+                    - generic [ref=e143]: Expert mode
+                - generic [ref=e144]:
+                  - generic [ref=e145]:
+                    - generic [ref=e146]: "VDisks:"
+                    - radiogroup "VDisks:" [ref=e147]:
+                      - generic [ref=e148] [cursor=pointer]:
+                        - radio "State" [ref=e149]
+                        - generic [ref=e150]: State
+                      - generic [ref=e151]:
+                        - radio "Space" [checked] [ref=e152]
+                        - generic [ref=e153]: Space
+                      - generic [ref=e154] [cursor=pointer]:
+                        - radio "Front queues" [ref=e155]
+                        - generic [ref=e156]: Front queues
+                      - generic [ref=e157] [cursor=pointer]:
+                        - radio "Compaction" [ref=e158]
+                        - generic [ref=e159]: Compaction
+                      - generic [ref=e160] [cursor=pointer]:
+                        - radio "Drive type" [ref=e161]
+                        - generic [ref=e162]: Drive type
+                      - generic [ref=e163] [cursor=pointer]:
+                        - radio "DC" [ref=e164]
+                        - generic [ref=e165]: DC
+                      - generic [ref=e166] [cursor=pointer]:
+                        - radio "All" [ref=e167]
+                        - generic [ref=e168]: All
+                    - generic [ref=e169]:
+                      - generic [ref=e170]:
+                        - button "G" [ref=e174] [cursor=pointer]:
+                          - generic [ref=e176]: G
+                        - button "C" [ref=e180] [cursor=pointer]:
+                          - generic [ref=e182]: C
+                        - generic [ref=e183] [cursor=pointer]:
+                          - img [ref=e186]:
+                            - img [ref=e187]
+                          - button "LY" [ref=e189]:
+                            - generic [ref=e191]: LY
+                        - generic [ref=e192] [cursor=pointer]:
+                          - img [ref=e195]:
+                            - img [ref=e196]
+                          - button "Y" [ref=e198]:
+                            - generic [ref=e200]: "Y"
+                        - generic [ref=e201] [cursor=pointer]:
+                          - img [ref=e204]:
+                            - img [ref=e205]
+                          - button "LO" [ref=e207]:
+                            - generic [ref=e209]: LO
+                        - generic [ref=e210] [cursor=pointer]:
+                          - img [ref=e213]:
+                            - img [ref=e214]
+                          - button "PO" [ref=e216]:
+                            - generic [ref=e218]: PO
+                        - generic [ref=e219] [cursor=pointer]:
+                          - img [ref=e222]:
+                            - img [ref=e223]
+                          - button "O" [ref=e225]:
+                            - generic [ref=e227]: O
+                        - generic [ref=e228] [cursor=pointer]:
+                          - img [ref=e231]:
+                            - img [ref=e232]
+                          - button "R" [ref=e234]:
+                            - generic [ref=e236]: R
+                        - generic [ref=e237] [cursor=pointer]:
+                          - img [ref=e240]:
+                            - img [ref=e241]
+                          - button "B" [ref=e243]:
+                            - generic [ref=e245]: B
+                        - generic [ref=e248]: No data
+                      - generic [ref=e249]: No statistics available
+                  - generic [ref=e250]:
+                    - generic [ref=e251]: "PDisks:"
+                    - radiogroup "PDisks:" [ref=e252]:
+                      - generic [ref=e253] [cursor=pointer]:
+                        - radio "State" [ref=e254]
+                        - generic [ref=e255]: State
+                      - generic [ref=e256]:
+                        - radio "Space" [checked] [active] [ref=e257]
+                        - generic [ref=e258]: Space
+                      - generic [ref=e259] [cursor=pointer]:
+                        - radio "Drive" [ref=e260]
+                        - generic [ref=e261]: Drive
+                      - generic [ref=e262] [cursor=pointer]:
+                        - radio "Decommit" [ref=e263]
+                        - generic [ref=e264]: Decommit
+                      - generic [ref=e265] [cursor=pointer]:
+                        - radio "Maintenance" [ref=e266]
+                        - generic [ref=e267]: Maintenance
+                      - generic [ref=e268] [cursor=pointer]:
+                        - radio "Device" [ref=e269]
+                        - generic [ref=e270]: Device
+                      - generic [ref=e271] [cursor=pointer]:
+                        - radio "Drive type" [ref=e272]
+                        - generic [ref=e273]: Drive type
+                      - generic [ref=e274] [cursor=pointer]:
+                        - radio "DC" [ref=e275]
+                        - generic [ref=e276]: DC
+                      - generic [ref=e277] [cursor=pointer]:
+                        - radio "All" [ref=e278]
+                        - generic [ref=e279]: All
+                    - generic [ref=e281]:
+                      - generic [ref=e282]:
+                        - button "G" [ref=e286] [cursor=pointer]:
+                          - generic [ref=e288]: G
+                        - button "C" [ref=e292] [cursor=pointer]:
+                          - generic [ref=e294]: C
+                        - generic [ref=e295] [cursor=pointer]:
+                          - img [ref=e298]:
+                            - img [ref=e299]
+                          - button "LY" [ref=e301]:
+                            - generic [ref=e303]: LY
+                        - generic [ref=e304] [cursor=pointer]:
+                          - img [ref=e307]:
+                            - img [ref=e308]
+                          - button "Y" [ref=e310]:
+                            - generic [ref=e312]: "Y"
+                        - generic [ref=e313] [cursor=pointer]:
+                          - img [ref=e316]:
+                            - img [ref=e317]
+                          - button "LO" [ref=e319]:
+                            - generic [ref=e321]: LO
+                        - generic [ref=e322] [cursor=pointer]:
+                          - img [ref=e325]:
+                            - img [ref=e326]
+                          - button "PO" [ref=e328]:
+                            - generic [ref=e330]: PO
+                        - generic [ref=e331] [cursor=pointer]:
+                          - img [ref=e334]:
+                            - img [ref=e335]
+                          - button "O" [ref=e337]:
+                            - generic [ref=e339]: O
+                        - generic [ref=e340] [cursor=pointer]:
+                          - img [ref=e343]:
+                            - img [ref=e344]
+                          - button "R" [ref=e346]:
+                            - generic [ref=e348]: R
+                        - generic [ref=e349] [cursor=pointer]:
+                          - img [ref=e352]:
+                            - img [ref=e353]
+                          - button "B" [ref=e355]:
+                            - generic [ref=e357]: B
+                        - generic [ref=e360]: No data
+                      - generic [ref=e361]: No statistics available
+              - button "5/18" [ref=e364] [cursor=pointer]:
+                - img [ref=e367]:
+                  - img [ref=e368]
+                - generic [ref=e371]: 5/18
+            - table [ref=e374]:
+              - rowgroup [ref=e375]:
+                - row "Group ID Pool Name Erasure Used VDisks PDisks" [ref=e376]:
+                  - columnheader "Group ID" [ref=e377]:
+                    - generic [ref=e378] [cursor=pointer]:
+                      - generic [ref=e380]: Group ID
+                      - img [ref=e382]
+                  - columnheader "Pool Name" [ref=e384]:
+                    - generic [ref=e385] [cursor=pointer]:
+                      - generic [ref=e387]: Pool Name
+                      - img [ref=e389]
+                  - columnheader "Erasure" [ref=e391]:
+                    - generic [ref=e392] [cursor=pointer]:
+                      - generic [ref=e394]: Erasure
+                      - img [ref=e396]
+                  - columnheader "Used" [ref=e398]:
+                    - generic [ref=e399] [cursor=pointer]:
+                      - generic [ref=e401]: Used
+                      - img [ref=e403]
+                  - columnheader "VDisks PDisks" [ref=e405]:
+                    - generic [ref=e409]:
+                      - generic [ref=e410]: VDisks
+                      - generic [ref=e411]: PDisks
+              - rowgroup [ref=e412]:
+                - row [ref=e413]:
+                  - cell "9000000000 Copy" [ref=e414]:
+                    - generic [ref=e416]:
+                      - generic "9000000000" [ref=e417]:
+                        - link "9000000000" [ref=e418] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000000&database=%2FRoot
+                      - button "Copy" [ref=e419] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-vdisk-states" [ref=e420]:
+                    - generic [ref=e422] [cursor=pointer]: mock-vdisk-states
+                  - cell "block-4-2" [ref=e423]
+                  - cell "34 GB" [ref=e424]
+                  - cell [ref=e425]:
+                    - generic [ref=e426]:
+                      - generic [ref=e427]:
+                        - 'link "VDisk 9000000000-1-0-0-0 on node 7000. Whiteboard: N/D. Capacity alert: N/D." [ref=e432] [cursor=pointer]':
+                          - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-0&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e433]:
+                            - generic [ref=e434]: N/D
+                        - 'link "VDisk 9000000000-1-0-0-1 on node 7001. Capacity alert: CYAN." [ref=e439] [cursor=pointer]':
+                          - /url: /vDisk?nodeId=7001&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e440]
+                        - 'link "VDisk 9000000000-1-0-0-2 on node 7002. Capacity alert: YELLOW." [ref=e445] [cursor=pointer]':
+                          - /url: /vDisk?nodeId=7002&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e446]:
+                            - generic [ref=e447]: "Y"
+                        - 'link "VDisk 9000000000-1-0-0-3 on node 7003. Capacity alert: ORANGE." [ref=e452] [cursor=pointer]':
+                          - /url: /vDisk?nodeId=7003&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e453]:
+                            - generic [ref=e454]: O
+                        - 'link "VDisk 9000000000-1-0-0-4 on node 7004. Capacity alert: RED." [ref=e459] [cursor=pointer]':
+                          - /url: /vDisk?nodeId=7004&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e460]:
+                            - generic [ref=e461]: R
+                        - 'link "VDisk 9000000000-1-0-0-5 on node 7005. Capacity alert: LIGHT_YELLOW." [ref=e466] [cursor=pointer]':
+                          - /url: /vDisk?nodeId=7005&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e467]:
+                            - generic [ref=e468]: LY
+                        - 'link "VDisk 9000000000-1-0-0-6 on node 7006. Capacity alert: LIGHT_ORANGE." [ref=e473] [cursor=pointer]':
+                          - /url: /vDisk?nodeId=7006&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e474]:
+                            - generic [ref=e475]: LO
+                        - 'link "VDisk 9000000000-1-0-0-7 on node 7007. Capacity alert: PRE_ORANGE." [ref=e480] [cursor=pointer]':
+                          - /url: /vDisk?nodeId=7007&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e481]:
+                            - generic [ref=e482]: PO
+                        - 'link "VDisk 9000000000-1-0-0-8 on node 7008. Capacity alert: BLACK." [ref=e487] [cursor=pointer]':
+                          - /url: /vDisk?nodeId=7008&vDiskId=9000000000-1-0-0-8&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e488]:
+                            - generic [ref=e489]: B
+                        - 'link "VDisk 9000000000-1-0-0-9 on node 7009. Capacity alert: N/D." [ref=e494] [cursor=pointer]':
+                          - /url: /vDisk?nodeId=7009&vDiskId=9000000000-1-0-0-9&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e495]:
+                            - img [ref=e496]:
+                              - img [ref=e497]
+                        - 'link "VDisk 9000000000-1-0-0-10 on node 7010. Capacity alert: GREEN." [ref=e503] [cursor=pointer]':
+                          - /url: /vDisk?nodeId=7010&vDiskId=9000000000-1-0-0-10&database=%2FRoot
+                          - meter "Disk allocated space" [ref=e504]
+                      - generic [ref=e505]:
+                        - 'link "PDisk 7000-100. Capacity alert: GREEN. Allocated: 10%." [ref=e509] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7000&pDiskId=100
+                          - meter "Disk allocated space" [ref=e510]:
+                            - generic [ref=e512]: 10%
+                        - 'link "PDisk 7001-101. Capacity alert: CYAN. Allocated: 20%." [ref=e516] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7001&pDiskId=101
+                          - meter "Disk allocated space" [ref=e517]:
+                            - generic [ref=e519]: 20%
+                        - 'link "PDisk 7002-102. Capacity alert: YELLOW. Allocated: 30%." [ref=e523] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7002&pDiskId=102
+                          - meter "Disk allocated space" [ref=e524]:
+                            - generic [ref=e525]: "Y"
+                            - generic [ref=e527]: 30%
+                        - 'link "PDisk 7003-103. Capacity alert: ORANGE. Allocated: 40%." [ref=e531] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7003&pDiskId=103
+                          - meter "Disk allocated space" [ref=e532]:
+                            - generic [ref=e533]: O
+                            - generic [ref=e535]: 40%
+                        - 'link "PDisk 7004-104. Capacity alert: RED. Allocated: 50%." [ref=e539] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7004&pDiskId=104
+                          - meter "Disk allocated space" [ref=e540]:
+                            - generic [ref=e541]: R
+                            - generic [ref=e543]: 50%
+                        - 'link "PDisk 7005-105. Capacity alert: LIGHT_YELLOW. Allocated: 60%." [ref=e547] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7005&pDiskId=105
+                          - meter "Disk allocated space" [ref=e548]:
+                            - generic [ref=e549]: LY
+                            - generic [ref=e551]: 60%
+                        - 'link "PDisk 7006-106. Capacity alert: LIGHT_ORANGE. Allocated: 70%." [ref=e555] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7006&pDiskId=106
+                          - meter "Disk allocated space" [ref=e556]:
+                            - generic [ref=e557]: LO
+                            - generic [ref=e559]: 70%
+                        - 'link "PDisk 7007-107. Capacity alert: PRE_ORANGE. Allocated: 80%." [ref=e563] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7007&pDiskId=107
+                          - meter "Disk allocated space" [ref=e564]:
+                            - generic [ref=e565]: PO
+                            - generic [ref=e567]: 80%
+                        - 'link "PDisk 7008-108. Capacity alert: BLACK. Allocated: 90%." [ref=e571] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7008&pDiskId=108
+                          - meter "Disk allocated space" [ref=e572]:
+                            - generic [ref=e573]: B
+                            - generic [ref=e575]: 90%
+                        - 'link "PDisk 7009-109. Whiteboard: N/D. Capacity alert: N/D. Allocated: 50%." [ref=e579] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7009&pDiskId=109
+                          - meter "Disk allocated space" [ref=e580]:
+                            - generic [ref=e582]: 50%
+                        - 'link "PDisk 7010-110. Capacity alert: GREEN. Allocated: 75%." [ref=e586] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7010&pDiskId=110
+                          - meter "Disk allocated space" [ref=e587]:
+                            - generic [ref=e589]: 75%
+                - row [ref=e590]:
+                  - cell "9000000001 Copy" [ref=e591]:
+                    - generic [ref=e593]:
+                      - generic "9000000001" [ref=e594]:
+                        - link "9000000001" [ref=e595] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000001&database=%2FRoot
+                      - button "Copy" [ref=e596] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                  - cell "mock-replicating-disks" [ref=e597]:
+                    - generic [ref=e599] [cursor=pointer]: mock-replicating-disks
+                  - cell "block-4-2" [ref=e600]
+                  - cell "34 GB" [ref=e601]
+                  - cell [ref=e602]:
+                    - generic [ref=e603]:
+                      - generic [ref=e604]:
+                        - generic [ref=e607]:
+                          - 'link "VDisk 9000000001-1-0-0-0 on node 7000. Capacity alert: GREEN." [ref=e611] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000001-1-0-0-0&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e612]
+                          - 'link "Donor VDisk 9000000001-1-0-0-100 on node 7100. Capacity alert: GREEN." [ref=e616] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7100&vDiskId=9000000001-1-0-0-100&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e617]:
+                              - img [ref=e618]:
+                                - img [ref=e619]
+                        - generic [ref=e623]:
+                          - 'link "VDisk 9000000001-1-0-0-1 on node 7001. Capacity alert: CYAN." [ref=e627] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-1&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e628]
+                          - 'link "Donor VDisk 9000000001-1-0-0-101 on node 7101. Capacity alert: CYAN." [ref=e632] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7101&vDiskId=9000000001-1-0-0-101&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e633]:
+                              - img [ref=e634]:
+                                - img [ref=e635]
+                        - generic [ref=e639]:
+                          - 'link "VDisk 9000000001-1-0-0-2 on node 7002. Capacity alert: YELLOW." [ref=e643] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7002&vDiskId=9000000001-1-0-0-2&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e644]:
+                              - generic [ref=e645]: "Y"
+                          - 'link "Donor VDisk 9000000001-1-0-0-102 on node 7102. Capacity alert: YELLOW." [ref=e649] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7102&vDiskId=9000000001-1-0-0-102&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e650]:
+                              - img [ref=e651]:
+                                - img [ref=e652]
+                        - generic [ref=e656]:
+                          - 'link "VDisk 9000000001-1-0-0-3 on node 7003. Capacity alert: ORANGE." [ref=e660] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7003&vDiskId=9000000001-1-0-0-3&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e661]:
+                              - generic [ref=e662]: O
+                          - 'link "Donor VDisk 9000000001-1-0-0-103 on node 7103. Capacity alert: ORANGE." [ref=e666] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7103&vDiskId=9000000001-1-0-0-103&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e667]:
+                              - img [ref=e668]:
+                                - img [ref=e669]
+                        - generic [ref=e673]:
+                          - 'link "VDisk 9000000001-1-0-0-4 on node 7004. Capacity alert: RED." [ref=e677] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7004&vDiskId=9000000001-1-0-0-4&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e678]:
+                              - generic [ref=e679]: R
+                          - 'link "Donor VDisk 9000000001-1-0-0-104 on node 7104. Capacity alert: RED." [ref=e683] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7104&vDiskId=9000000001-1-0-0-104&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e684]:
+                              - img [ref=e685]:
+                                - img [ref=e686]
+                        - generic [ref=e690]:
+                          - 'link "VDisk 9000000001-1-0-0-5 on node 7005. Capacity alert: LIGHT_YELLOW." [ref=e694] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7005&vDiskId=9000000001-1-0-0-5&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e695]:
+                              - generic [ref=e696]: LY
+                          - 'link "Donor VDisk 9000000001-1-0-0-105 on node 7105. Capacity alert: LIGHT_YELLOW." [ref=e700] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7105&vDiskId=9000000001-1-0-0-105&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e701]:
+                              - img [ref=e702]:
+                                - img [ref=e703]
+                        - generic [ref=e707]:
+                          - 'link "VDisk 9000000001-1-0-0-6 on node 7006. Capacity alert: LIGHT_ORANGE." [ref=e711] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7006&vDiskId=9000000001-1-0-0-6&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e712]:
+                              - generic [ref=e713]: LO
+                          - 'link "Donor VDisk 9000000001-1-0-0-106 on node 7106. Capacity alert: LIGHT_ORANGE." [ref=e717] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7106&vDiskId=9000000001-1-0-0-106&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e718]:
+                              - img [ref=e719]:
+                                - img [ref=e720]
+                        - generic [ref=e724]:
+                          - 'link "VDisk 9000000001-1-0-0-7 on node 7007. Capacity alert: PRE_ORANGE." [ref=e728] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7007&vDiskId=9000000001-1-0-0-7&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e729]:
+                              - generic [ref=e730]: PO
+                          - 'link "Donor VDisk 9000000001-1-0-0-107 on node 7107. Capacity alert: PRE_ORANGE." [ref=e734] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7107&vDiskId=9000000001-1-0-0-107&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e735]:
+                              - img [ref=e736]:
+                                - img [ref=e737]
+                        - generic [ref=e741]:
+                          - 'link "VDisk 9000000001-1-0-0-8 on node 7008. Capacity alert: BLACK." [ref=e745] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7008&vDiskId=9000000001-1-0-0-8&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e746]:
+                              - generic [ref=e747]: B
+                          - 'link "Donor VDisk 9000000001-1-0-0-108 on node 7108. Capacity alert: BLACK." [ref=e751] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7108&vDiskId=9000000001-1-0-0-108&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e752]:
+                              - img [ref=e753]:
+                                - img [ref=e754]
+                        - generic [ref=e758]:
+                          - 'link "VDisk 9000000001-1-0-0-9 on node 7009. Capacity alert: N/D." [ref=e762] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7009&vDiskId=9000000001-1-0-0-9&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e763]:
+                              - img [ref=e764]:
+                                - img [ref=e765]
+                          - 'link "Donor VDisk 9000000001-1-0-0-109 on node 7109. Capacity alert: N/D." [ref=e770] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7109&vDiskId=9000000001-1-0-0-109&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e771]:
+                              - img [ref=e772]:
+                                - img [ref=e773]
+                        - generic [ref=e777]:
+                          - 'link "VDisk 9000000001-1-0-0-10 on node 7010. Capacity alert: GREEN." [ref=e781] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7010&vDiskId=9000000001-1-0-0-10&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e782]
+                          - 'link "Donor VDisk 9000000001-1-0-0-110 on node 7110. Capacity alert: GREEN." [ref=e786] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7110&vDiskId=9000000001-1-0-0-110&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e787]:
+                              - img [ref=e788]:
+                                - img [ref=e789]
+                      - generic [ref=e791]:
+                        - 'link "PDisk 7000-100. Capacity alert: GREEN. Allocated: 10%." [ref=e795] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7000&pDiskId=100
+                          - meter "Disk allocated space" [ref=e796]:
+                            - generic [ref=e798]: 10%
+                        - 'link "PDisk 7001-101. Capacity alert: CYAN. Allocated: 20%." [ref=e802] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7001&pDiskId=101
+                          - meter "Disk allocated space" [ref=e803]:
+                            - generic [ref=e805]: 20%
+                        - 'link "PDisk 7002-102. Capacity alert: YELLOW. Allocated: 30%." [ref=e809] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7002&pDiskId=102
+                          - meter "Disk allocated space" [ref=e810]:
+                            - generic [ref=e811]: "Y"
+                            - generic [ref=e813]: 30%
+                        - 'link "PDisk 7003-103. Capacity alert: ORANGE. Allocated: 40%." [ref=e817] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7003&pDiskId=103
+                          - meter "Disk allocated space" [ref=e818]:
+                            - generic [ref=e819]: O
+                            - generic [ref=e821]: 40%
+                        - 'link "PDisk 7004-104. Capacity alert: RED. Allocated: 50%." [ref=e825] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7004&pDiskId=104
+                          - meter "Disk allocated space" [ref=e826]:
+                            - generic [ref=e827]: R
+                            - generic [ref=e829]: 50%
+                        - 'link "PDisk 7005-105. Capacity alert: LIGHT_YELLOW. Allocated: 60%." [ref=e833] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7005&pDiskId=105
+                          - meter "Disk allocated space" [ref=e834]:
+                            - generic [ref=e835]: LY
+                            - generic [ref=e837]: 60%
+                        - 'link "PDisk 7006-106. Capacity alert: LIGHT_ORANGE. Allocated: 70%." [ref=e841] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7006&pDiskId=106
+                          - meter "Disk allocated space" [ref=e842]:
+                            - generic [ref=e843]: LO
+                            - generic [ref=e845]: 70%
+                        - 'link "PDisk 7007-107. Capacity alert: PRE_ORANGE. Allocated: 80%." [ref=e849] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7007&pDiskId=107
+                          - meter "Disk allocated space" [ref=e850]:
+                            - generic [ref=e851]: PO
+                            - generic [ref=e853]: 80%
+                        - 'link "PDisk 7008-108. Capacity alert: BLACK. Allocated: 90%." [ref=e857] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7008&pDiskId=108
+                          - meter "Disk allocated space" [ref=e858]:
+                            - generic [ref=e859]: B
+                            - generic [ref=e861]: 90%
+                        - 'link "PDisk 7009-109. Whiteboard: N/D. Capacity alert: N/D. Allocated: 50%." [ref=e865] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7009&pDiskId=109
+                          - meter "Disk allocated space" [ref=e866]:
+                            - generic [ref=e868]: 50%
+                        - 'link "PDisk 7010-110. Capacity alert: GREEN. Allocated: 75%." [ref=e872] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7010&pDiskId=110
+                          - meter "Disk allocated space" [ref=e873]:
+                            - generic [ref=e875]: 75%
+          - status [ref=e876]
+```
