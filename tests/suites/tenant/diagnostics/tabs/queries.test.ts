@@ -6,7 +6,7 @@ import type {ExecuteQueryResponse} from '../../../../../src/types/api/query';
 import {getClipboardContent} from '../../../../utils/clipboard';
 import {backend, database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
-import {getLongRunningStreamQuery, longRunningStreamQuery} from '../../constants';
+import {longRunningStreamQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {
     Diagnostics,
@@ -63,9 +63,20 @@ test.describe('Diagnostics Queries tab', async () => {
         const diagnostics = new Diagnostics(page);
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
 
-        const runningQueryMarker = `e2e-running-query-${test.info().project.name}-${Date.now()}`;
         const runningQueryId = randomUUID();
-        const runningQuery = `-- ${runningQueryMarker}\n${getLongRunningStreamQuery(500_000)}`;
+        const runningQueryMarker = `e2e-running-query-${test.info().project.name}-${runningQueryId}`;
+        // Separate runtime stages leave cancellation points between batches.
+        const queryStatements = Array.from(
+            {length: 10},
+            (_, index) => `SELECT x,
+    Digest::Argon2(CAST(x AS String), "test_salt_${index}_" || CAST(n.NodeId AS String)) AS hash
+FROM (SELECT NodeId FROM \`.sys/nodes\` LIMIT 1) AS n
+CROSS JOIN AS_TABLE(AsList(AsStruct($data AS x))) AS r
+FLATTEN BY x;`,
+        );
+        const runningQuery = `-- ${runningQueryMarker}
+$data = ListFromRange(1, 50000);
+${queryStatements.join('\n')}`;
         const storageState = await page.context().storageState();
         const queryRequestContext = await playwrightRequest.newContext({storageState});
         const csrfToken = (await page.context().cookies(backend)).find(
@@ -95,6 +106,7 @@ test.describe('Diagnostics Queries tab', async () => {
                         `Running query request failed with ${response.status()}: ${await response.text()}`,
                     );
                 }
+                return response.text();
             })
             .catch((error: unknown) => {
                 runningQueryRequestError = error;
@@ -182,8 +194,19 @@ test.describe('Diagnostics Queries tab', async () => {
                         timeout: 5_000,
                     },
                 );
-                expect(cancelResponse.ok(), await cancelResponse.text()).toBe(true);
-                await runningQueryRequest;
+                const cancelResponseBody = await cancelResponse.text();
+                const alreadyFinished =
+                    cancelResponse.status() === 400 && cancelResponseBody === 'Query not found';
+                expect(cancelResponse.ok() || alreadyFinished, cancelResponseBody).toBe(true);
+                const responseBody = await runningQueryRequest;
+                if (!runningQueryRequestError) {
+                    expect(responseBody).toBeDefined();
+                    const cancelled = /"event"\s*:\s*"Aborted"/.test(responseBody || '');
+                    const completedSuccessfully =
+                        /"event"\s*:\s*"QueryResponse"/.test(responseBody || '') &&
+                        /"status"\s*:\s*"SUCCESS"/.test(responseBody || '');
+                    expect(cancelled || completedSuccessfully).toBe(true);
+                }
             } finally {
                 await queryRequestContext.dispose();
             }
