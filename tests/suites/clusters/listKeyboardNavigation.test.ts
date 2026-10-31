@@ -158,8 +158,29 @@ for (const firstKey of ['ArrowUp', 'ArrowDown']) {
             await expect(selected).toHaveCount(1);
             await expect(selected).toContainText('Bravo');
         }
-        await search.press('Enter');
-        await expect(page).toHaveURL(/clusterName=bravo/);
+
+        const href = await page
+            .locator('.ydb-keyboard-focused-row')
+            .getByRole('link', {name: 'Bravo', exact: true})
+            .getAttribute('href');
+        if (!href) {
+            throw new Error('The selected cluster must have a navigation link');
+        }
+        const destination = new URL(href, page.url());
+        expect(destination.searchParams.get('clusterName')).toBe('bravo');
+
+        await page.route(destination.href, (route) =>
+            route.fulfill({contentType: 'text/html', body: '<title>Cluster destination</title>'}),
+        );
+        const [navigationRequest] = await Promise.all([
+            page.waitForRequest(
+                (request) => request.isNavigationRequest() && request.frame() === page.mainFrame(),
+                {timeout: 5000},
+            ),
+            search.press('Enter'),
+        ]);
+        expect(navigationRequest.url()).toBe(destination.href);
+        await expect(page).toHaveURL(destination.href);
     });
 }
 
