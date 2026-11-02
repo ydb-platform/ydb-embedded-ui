@@ -13,6 +13,7 @@ for (const theme of ['light', 'dark']) {
             {length: 36},
             (_, index) => `DC-${String(index + 1).padStart(2, '0')}`,
         );
+        let displayedNames = names;
         const groups = createMockStorageGroupsResponse();
         const nodeIds = [
             ...new Set(
@@ -24,14 +25,14 @@ for (const theme of ['light', 'dark']) {
         await setupVDiskColoringMocks(page, groups);
         await page.route('**/viewer/json/nodelist?*', (route) =>
             route.fulfill({
-                json: names.map((name, index) => ({
+                json: displayedNames.map((name, index) => ({
                     Id: nodeIds[index] ?? 1000 + index,
                     Location: {DataCenter: name},
                 })),
             }),
         );
         await page.route('**/viewer/json/cluster?*', (route) =>
-            route.fulfill({json: {DataCenters: names}}),
+            route.fulfill({json: {DataCenters: displayedNames}}),
         );
         await page.addInitScript((value) => {
             localStorage.setItem('theme', value);
@@ -48,22 +49,19 @@ for (const theme of ['light', 'dark']) {
         await page.goto(url.pathname + url.search);
         await page.evaluate(() => document.fonts.ready);
 
-        const hiddenCounts: number[] = [];
         for (const kind of ['vdisk', 'pdisk']) {
             const legend = page.getByTestId(`${kind}-datacenter-legend`);
             const more = legend.getByRole('button', {name: /Show \d+ more datacenters/});
-            await expect(more).toBeVisible();
+            await expect(more).toHaveText('+26 more');
             await more.click();
             const popover = page.getByTestId(`${kind}-datacenter-popover`);
             await expect(popover).toBeVisible();
             const labels = popover.locator('.ydb-datacenter-label');
-            const hiddenCount = Number((await more.innerText()).match(/\d+/)?.[0]);
-            hiddenCounts.push(hiddenCount);
-            expect(hiddenCount).toBeGreaterThan(0);
-            await expect(labels).toHaveCount(hiddenCount);
+            await expect(labels).toHaveText(names.slice(10));
             const visibleNames = await legend
                 .locator('.ydb-datacenter-legend__visible > .ydb-datacenter-label')
                 .allTextContents();
+            expect(visibleNames).toEqual([...names.slice(0, 10), 'Unknown']);
             const hiddenNames = await labels.allTextContents();
             expect([...visibleNames, ...hiddenNames].sort()).toEqual([...names, 'Unknown'].sort());
             await popover.getByRole('button', {name: /Close additional datacenters/}).click();
@@ -76,24 +74,39 @@ for (const theme of ['light', 'dark']) {
             await expect(more).toBeFocused();
         }
 
-        await page.setViewportSize({width: 1000, height: 900});
-        for (const [index, kind] of ['vdisk', 'pdisk'].entries()) {
-            const more = page
-                .getByTestId(`${kind}-datacenter-legend`)
-                .getByRole('button', {name: /Show \d+ more datacenters/});
-            await expect
-                .poll(async () => Number((await more.innerText()).match(/\d+/)?.[0]))
-                .toBeGreaterThan(hiddenCounts[index]);
+        for (const width of [1000, 3800]) {
+            await page.setViewportSize({width, height: 900});
+            for (const kind of ['vdisk', 'pdisk']) {
+                const legend = page.getByTestId(`${kind}-datacenter-legend`);
+                await expect(
+                    legend.getByRole('button', {name: /Show \d+ more datacenters/}),
+                ).toHaveText('+26 more');
+                await expect(
+                    legend.locator('.ydb-datacenter-legend__visible > .ydb-datacenter-label'),
+                ).toHaveText([...names.slice(0, 10), 'Unknown']);
+            }
         }
-        await page.setViewportSize({width: 3800, height: 900});
-        for (const kind of ['vdisk', 'pdisk']) {
-            const legend = page.getByTestId(`${kind}-datacenter-legend`);
-            await expect(
-                legend.getByRole('button', {name: /Show \d+ more datacenters/}),
-            ).toHaveCount(0);
-            await expect(
-                legend.locator('.ydb-datacenter-legend__visible > .ydb-datacenter-label'),
-            ).toHaveCount(37);
+
+        for (const count of [0, 10, 11]) {
+            displayedNames = names.slice(0, count);
+            await page.reload();
+            for (const kind of ['vdisk', 'pdisk']) {
+                const legend = page.getByTestId(`${kind}-datacenter-legend`);
+                await expect(
+                    legend.locator('.ydb-datacenter-legend__visible > .ydb-datacenter-label'),
+                ).toHaveText([...displayedNames.slice(0, 10), 'Unknown']);
+                const more = legend.getByRole('button', {name: /Show \d+ more datacenters/});
+                if (count <= 10) {
+                    await expect(more).toHaveCount(0);
+                } else {
+                    await expect(more).toHaveText('+1 more');
+                    await more.click();
+                    const popover = page.getByTestId(`${kind}-datacenter-popover`);
+                    await expect(popover.locator('.ydb-datacenter-label')).toHaveText(['DC-11']);
+                    await page.keyboard.press('Escape');
+                    await expect(popover).toBeHidden();
+                }
+            }
         }
     });
 }

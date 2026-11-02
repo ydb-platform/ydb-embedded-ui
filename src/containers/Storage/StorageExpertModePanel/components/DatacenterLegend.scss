@@ -1,12 +1,9 @@
 .ydb-datacenter-legend {
-    position: relative;
-
     flex: 1;
 
     min-width: 0;
 
-    &__visible,
-    &__measure-row {
+    &__visible {
         display: flex;
         align-items: center;
         gap: var(--g-spacing-2);
@@ -16,24 +13,7 @@
         }
     }
 
-    &__measure {
-        position: absolute;
-
-        visibility: hidden;
-        overflow: hidden;
-
-        width: 1px;
-        height: 1px;
-
-        pointer-events: none;
-    }
-
-    &__measure-row {
-        width: max-content;
-    }
-
     &__visible .ydb-datacenter-label,
-    &__measure-row .ydb-datacenter-label,
     &__popover-label .ydb-datacenter-label {
         --g-border-radius-xs: var(--g-border-radius-s);
     }
