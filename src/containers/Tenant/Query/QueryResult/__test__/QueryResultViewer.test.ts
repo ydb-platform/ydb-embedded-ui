@@ -1,38 +1,20 @@
-import {QUERY_ACTIONS} from '../../../../../utils/query';
-import {RESULT_OPTIONS_IDS, getDefaultResultSection, getResultSections} from '../constants';
+import {getDefaultResultSection, getResultSections, resolveResultSection} from '../constants';
 
 describe('QueryResultViewer result sections', () => {
-    test('keeps execute result sections unchanged', () => {
-        expect(getResultSections(QUERY_ACTIONS.execute)).toEqual([
-            RESULT_OPTIONS_IDS.result,
-            RESULT_OPTIONS_IDS.schema,
-            RESULT_OPTIONS_IDS.simplified,
-            RESULT_OPTIONS_IDS.stats,
-        ]);
-        expect(getDefaultResultSection(QUERY_ACTIONS.execute)).toBe(RESULT_OPTIONS_IDS.result);
-    });
-
-    test('keeps explain result sections unchanged', () => {
-        expect(getResultSections(QUERY_ACTIONS.explain)).toEqual([
-            RESULT_OPTIONS_IDS.schema,
-            RESULT_OPTIONS_IDS.simplified,
-            RESULT_OPTIONS_IDS.json,
-            RESULT_OPTIONS_IDS.ast,
-        ]);
-        expect(getDefaultResultSection(QUERY_ACTIONS.explain)).toBe(RESULT_OPTIONS_IDS.schema);
-    });
-
-    test('shows plan and stats sections for explain analyze without result tab', () => {
-        expect(getResultSections(QUERY_ACTIONS.explainAnalyze)).toEqual([
-            RESULT_OPTIONS_IDS.schema,
-            RESULT_OPTIONS_IDS.simplified,
-            RESULT_OPTIONS_IDS.stats,
-        ]);
-        expect(getResultSections(QUERY_ACTIONS.explainAnalyze)).not.toContain(
-            RESULT_OPTIONS_IDS.result,
-        );
-        expect(getDefaultResultSection(QUERY_ACTIONS.explainAnalyze)).toBe(
-            RESULT_OPTIONS_IDS.simplified,
-        );
+    test.each([
+        ['execute', ['result', 'query-plan', 'execution-plan', 'stats'], 'result'],
+        ['explain', ['query-plan', 'execution-plan', 'ast'], 'query-plan'],
+        ['explain-analyze', ['result', 'query-plan', 'execution-plan', 'stats'], 'query-plan'],
+    ] as const)('shows the result views for %s', (action, sections, initial) => {
+        expect(getResultSections(action)).toEqual(sections);
+        expect(getDefaultResultSection(action)).toBe(initial);
     });
 });
+
+test.each(['schema', 'simplified', 'json', 'unknown'])(
+    'falls back for obsolete view %s',
+    (saved) => {
+        expect(resolveResultSection('explain', saved)).toBe('query-plan');
+        expect(resolveResultSection('execute', saved)).toBe('result');
+    },
+);

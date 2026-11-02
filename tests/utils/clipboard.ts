@@ -15,22 +15,19 @@ export const getClipboardContent = async (page: Page): Promise<string> => {
         return clipboardText;
     }
 
-    // Fallback: Create a contenteditable element, focus it, and send keyboard shortcuts
+    // A plain-text field preserves line breaks that contenteditable textContent omits.
     return page.evaluate(async () => {
-        const el = document.createElement('div');
-        el.contentEditable = 'true';
-        document.body.appendChild(el);
-        el.focus();
+        const input = document.createElement('textarea');
+        document.body.appendChild(input);
+        input.focus();
 
         try {
-            // Send paste command
             document.execCommand('paste');
-            const text = el.textContent || '';
-            document.body.removeChild(el);
-            return text;
+            return input.value;
         } catch {
-            document.body.removeChild(el);
             return '';
+        } finally {
+            input.remove();
         }
     });
 };

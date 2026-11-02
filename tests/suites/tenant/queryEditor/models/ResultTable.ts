@@ -10,7 +10,9 @@ export class PaneWrapper {
 
     constructor(page: Page) {
         this.paneWrapper = page.locator('.query-editor__pane-wrapper');
-        this.radioButton = this.paneWrapper.locator('.g-segmented-radio-group');
+        this.radioButton = this.paneWrapper.locator(
+            '.ydb-query-result__controls-left .g-segmented-radio-group',
+        );
     }
 
     async selectTab(tabName: ResultTabNames) {
@@ -98,7 +100,8 @@ export class ResultTable {
 
     async getResultTitleCount() {
         await this.resultTitle.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return this.resultTitle.locator('.g-text').nth(1).textContent();
+        const count = await this.resultTitle.locator('.g-text').nth(1).innerText();
+        return count.replace(/\s/g, '');
     }
 
     async getResultTabTitleText(index: number) {

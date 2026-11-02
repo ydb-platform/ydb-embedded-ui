@@ -27,12 +27,6 @@ test.describe('Copy query result', () => {
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
 
         await queryEditor.clickCopyResultButton();
-        await expect.poll(() => getClipboardContent(page)).toContain('col1');
-
-        const clipboardText = await getClipboardContent(page);
-        expect(clipboardText).toContain('col1');
-        expect(clipboardText).toContain('col2');
-        expect(clipboardText).toContain('1');
-        expect(clipboardText).toContain('2');
+        await expect.poll(() => getClipboardContent(page)).toBe('col1\tcol2\n1\t2');
     });
 });
