@@ -43,6 +43,7 @@ export interface MetaCapabilitiesResponse {
 
 export type MetaCapability =
     | '/meta/clusters'
+    | '/meta/cluster_health'
     | '/meta/db_clusters'
     | '/meta/cp_databases'
     | '/meta/get_config'

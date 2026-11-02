@@ -6,7 +6,9 @@ import {getHealthStatusNow} from '../../../utils/healthStatus/healthClock';
 import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
+import type {GetState} from '../../defaultStore';
 import {api} from '../api';
+import {queryMetaCapability} from '../capabilities/capabilities';
 import {getDatabaseDataTag} from '../entityDataTags';
 import {prepareTenants} from '../tenants/utils';
 
@@ -62,7 +64,7 @@ export const tenantApi = api.injectEndpoints({
                     clusterName?: string;
                     isMetaDatabasesAvailable: boolean;
                 },
-                {signal},
+                {signal, dispatch, getState},
             ) => {
                 try {
                     let tenantData: TTenantInfo;
@@ -72,10 +74,14 @@ export const tenantApi = api.injectEndpoints({
                             {database, clusterName},
                             {signal},
                         );
+                        const version = await queryMetaCapability('/meta/databases', {
+                            dispatch,
+                            getState: getState as GetState,
+                        });
                         tenantData = {
                             ...tenantData,
                             TenantInfo: tenantData.TenantInfo?.map((tenant) =>
-                                prepareHealthStatus(tenant, requestStartedAt),
+                                prepareHealthStatus(tenant, requestStartedAt, version),
                             ),
                         };
                     } else if (window.api.meta && clusterName) {

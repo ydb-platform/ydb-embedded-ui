@@ -14,6 +14,10 @@ async function configureMeta(page: Page) {
     await page.route('**/viewer/json/nodelist*', (route) => route.fulfill({json: []}));
 }
 
+const capabilities = {
+    Capabilities: {'/meta/clusters': 2, '/meta/databases': 2, '/meta/cluster_health': 2},
+};
+
 const issue = {
     id: 'disk',
     status: 'RED',
@@ -75,7 +79,7 @@ test('explains current failure, preserves cached issues and recovers through rea
                       },
                   });
         }
-        return route.fulfill({json: {}});
+        return route.fulfill({json: capabilities});
     });
     await new PageModel(page).goto();
     const row = getRow(page, 'monitored').filter({
@@ -160,7 +164,7 @@ test('expires with polling disabled and cached data stays expired after navigati
         if (new URL(route.request().url()).pathname.endsWith('/db_clusters')) {
             return route.fulfill({json: {clusters: [{name: 'short-lived', domain: '/Root'}]}});
         }
-        return route.fulfill({json: {}});
+        return route.fulfill({json: capabilities});
     });
     await new PageModel(page).goto();
     await expect(getRow(page, 'short-lived').getByText('Good', {exact: true})).toBeVisible();
@@ -226,7 +230,7 @@ test('Meta database package consumer expires and rejects a failed refresh', asyn
         if (path.endsWith('/nodelist')) {
             return route.fulfill({json: []});
         }
-        return route.fulfill({json: {Capabilities: {}}});
+        return route.fulfill({json: capabilities});
     });
     await page.addInitScript(() => {
         window.e2eMetaDatabases = true;
@@ -247,3 +251,48 @@ test('Meta database package consumer expires and rejects a failed refresh', asyn
     await expect(row.getByText('Unknown', {exact: true})).toBeVisible();
     await expectNote(page, row, '400 Bad Request');
 });
+
+for (const {version, status, detailStatus} of [
+    {version: 1, status: 'Good', detailStatus: 'Good'},
+    {version: 2, status: 'Unknown', detailStatus: 'Unspecified'},
+]) {
+    test(`version ${version} determines whether missing TTL makes health unknown`, async ({
+        page,
+    }) => {
+        await configureMeta(page);
+        await page.route('**/meta/**', (route) => {
+            const path = new URL(route.request().url()).pathname;
+            if (path.endsWith('/clusters')) {
+                return route.fulfill({
+                    json: {
+                        clusters: [
+                            {
+                                name: 'cluster',
+                                cluster: {Overall: EFlag.Green, overall_source: 'healthcheck'},
+                            },
+                        ],
+                    },
+                });
+            }
+            if (path.endsWith('/cluster_health')) {
+                return route.fulfill({json: {self_check_result: 'GOOD', issue_log: [issue]}});
+            }
+            return route.fulfill({
+                json: {Capabilities: {'/meta/clusters': version, '/meta/cluster_health': version}},
+            });
+        });
+        await new PageModel(page).goto();
+        const row = getRow(page, 'cluster').filter({
+            has: page.getByRole('link', {name: 'cluster', exact: true}),
+        });
+        await expect(row.getByText(status, {exact: true})).toBeVisible();
+        await row
+            .getByRole('button', {name: 'Healthcheck details for cluster', exact: true})
+            .click();
+        const drawer = page.getByTestId('cluster-healthcheck-details');
+        await expect(drawer.getByText(detailStatus, {exact: true}).first()).toBeVisible();
+        await expect(
+            drawer.getByRole('button', {name: 'Critical Original disk failure', exact: true}),
+        ).toBeVisible();
+    });
+}

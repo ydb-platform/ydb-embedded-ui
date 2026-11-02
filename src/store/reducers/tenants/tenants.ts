@@ -1,7 +1,9 @@
 import type {TTenantInfo} from '../../../types/api/tenant';
 import {getHealthStatusNow} from '../../../utils/healthStatus/healthClock';
 import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
+import type {GetState} from '../../defaultStore';
 import {api} from '../api';
+import {queryMetaCapability} from '../capabilities/capabilities';
 import {DATABASE_DATA_LIST_TAG} from '../entityDataTags';
 
 import type {PreparedTenant, SharedDatabaseTarget} from './types';
@@ -20,7 +22,7 @@ export const tenantsApi = api.injectEndpoints({
                     environmentName?: string;
                     isMetaDatabasesAvailable?: boolean;
                 },
-                {signal},
+                {signal, dispatch, getState},
             ) => {
                 try {
                     let response: TTenantInfo;
@@ -31,10 +33,14 @@ export const tenantsApi = api.injectEndpoints({
                             {clusterName, environmentName},
                             {signal},
                         );
+                        const version = await queryMetaCapability('/meta/databases', {
+                            dispatch,
+                            getState: getState as GetState,
+                        });
                         response = {
                             ...response,
                             TenantInfo: response.TenantInfo?.map((tenant) =>
-                                prepareHealthStatus(tenant, requestStartedAt),
+                                prepareHealthStatus(tenant, requestStartedAt, version),
                             ),
                         };
                     } else if (window.api.meta) {

@@ -113,3 +113,13 @@ export const selectMetaCapabilityVersion = createSelector(
         return selectMetaCapabilities(state).data?.Capabilities?.[capability];
     },
 );
+
+export async function queryMetaCapability(
+    capability: MetaCapability,
+    {dispatch, getState}: {dispatch: AppDispatch; getState: () => RootState},
+) {
+    const thunk = capabilitiesApi.util.getRunningQueryThunk('getMetaCapabilities', {});
+    await dispatch(thunk);
+
+    return selectMetaCapabilityVersion(getState(), capability) || 0;
+}

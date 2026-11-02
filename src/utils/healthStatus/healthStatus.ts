@@ -9,7 +9,7 @@ import i18n from './i18n';
 const MAX_HEALTH_TTL_MS = 120000;
 
 export interface PreparedHealthStatus {
-    /** Only Meta adapters opt in; Viewer and legacy cp_databases retain their behavior. */
+    /** Only Meta endpoint versions with freshness metadata opt in. */
     healthStatusSource?: 'meta';
     /** Fixed local deadline captured by the query adapter; cache reads never renew it. */
     healthExpiresAt?: number;
@@ -18,7 +18,11 @@ export interface PreparedHealthStatus {
 export function prepareHealthStatus<T extends {status_ttl_ms?: number}>(
     data: T,
     requestStartedAt: number,
+    capabilityVersion: number,
 ): T & PreparedHealthStatus {
+    if (!(capabilityVersion >= 2)) {
+        return data;
+    }
     const ttl = data.status_ttl_ms;
     return {
         ...data,
@@ -45,7 +49,10 @@ export function getHealthStatusError(
     if (data?.error) {
         return data.error;
     }
-    if (data?.healthExpiresAt === undefined || !Number.isFinite(data.healthExpiresAt)) {
+    if (data?.healthStatusSource !== 'meta') {
+        return undefined;
+    }
+    if (data.healthExpiresAt === undefined || !Number.isFinite(data.healthExpiresAt)) {
         return i18n('description_freshness-unavailable');
     }
     if (now >= data.healthExpiresAt) {
