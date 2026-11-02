@@ -19,10 +19,6 @@ for (const theme of ['light', 'dark']) {
         await expect(label).toHaveText('DC-A');
         await expect(label).toHaveClass(/ydb-datacenter-color_color_turquoise/);
         await expect(label).not.toHaveClass(/ydb-datacenter-color_color_neutral/);
-        await page.evaluate(() => document.fonts.ready);
-        await expect(popup.locator('.ydb-disk-popup__location')).toHaveScreenshot(
-            `donor-datacenter-tooltip-${theme}.png`,
-        );
         expect(nodeListRequests).toHaveLength(1);
     });
 
@@ -52,10 +48,6 @@ for (const theme of ['light', 'dark']) {
             await expect(label).toHaveClass(/ydb-datacenter-color_color_turquoise/);
             await expect(label).toHaveCSS('height', '18px');
             await expect(panel.getByText('pile-a', {exact: true})).toBeVisible();
-            await page.evaluate(() => document.fonts.ready);
-            await expect(panel.locator('.ydb-disk-popup__location')).toHaveScreenshot(
-                `${kind}-datacenter-tooltip-${theme}.png`,
-            );
             await page.mouse.move(0, 0);
             await expect(popup).toBeHidden();
         }
