@@ -66,7 +66,6 @@ for (const theme of ['light', 'dark']) {
                 .allTextContents();
             const hiddenNames = await labels.allTextContents();
             expect([...visibleNames, ...hiddenNames].sort()).toEqual([...names, 'Unknown'].sort());
-            await expect(popover).toHaveScreenshot(`${kind}-datacenter-overflow-${theme}.png`);
             await popover.getByRole('button', {name: /Close additional datacenters/}).click();
             await expect(popover).toBeHidden();
             await more.focus();

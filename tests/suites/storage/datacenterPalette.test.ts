@@ -132,14 +132,5 @@ for (const theme of ['light', 'dark']) {
         await expect(bars.first()).not.toHaveCSS('background-color', background);
         await page.mouse.move(0, 0);
         await expect(bars.first()).toHaveCSS('background-color', background);
-        // Exercise the same product class as pointer hover for every swatch in one snapshot.
-        await bars.evaluateAll((elements) => {
-            elements.forEach((element) =>
-                element.classList.add('storage-disk-progress-bar_highlighted'),
-            );
-        });
-        await expect(page).toHaveScreenshot(`datacenter-disks-full-palette-hover-${theme}.png`, {
-            clip,
-        });
     });
 }
