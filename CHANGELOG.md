@@ -1,5 +1,17 @@
 # Changelog
 
+## [22.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.6.0...v22.7.0) (2026-10-29)
+
+
+### Features
+
+* **databases:** use control plane ids from database records ([#4540](https://github.com/ydb-platform/ydb-embedded-ui/issues/4540)) ([62b2db3](https://github.com/ydb-platform/ydb-embedded-ui/commit/62b2db392f70fa02df2b46a2def61304aa860fd8))
+
+
+### Bug Fixes
+
+* preserve debounced search input across list updates ([#4530](https://github.com/ydb-platform/ydb-embedded-ui/issues/4530)) ([215fa6e](https://github.com/ydb-platform/ydb-embedded-ui/commit/215fa6e5abb19c3fcefac797225c971044597db8))
+
 ## [22.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.5.0...v22.6.0) (2026-10-23)
 
 

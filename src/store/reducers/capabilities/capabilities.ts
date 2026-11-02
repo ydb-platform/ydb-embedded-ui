@@ -114,12 +114,14 @@ export const selectMetaCapabilityVersion = createSelector(
     },
 );
 
-export async function queryMetaCapability(
-    capability: MetaCapability,
-    {dispatch, getState}: {dispatch: AppDispatch; getState: () => RootState},
-) {
-    const thunk = capabilitiesApi.util.getRunningQueryThunk('getMetaCapabilities', {});
-    await dispatch(thunk);
+const META_HEALTH_FRESHNESS_VERSIONS = {
+    '/meta/clusters': 2,
+    '/meta/databases': 2,
+    '/meta/cluster_health': 2,
+} satisfies Partial<Record<MetaCapability, number>>;
 
-    return selectMetaCapabilityVersion(getState(), capability) || 0;
-}
+export const selectMetaHealthFreshnessAvailable = createSelector(
+    selectMetaCapabilityVersion,
+    (_state: RootState, capability: keyof typeof META_HEALTH_FRESHNESS_VERSIONS) => capability,
+    (version, capability) => (version ?? 0) >= META_HEALTH_FRESHNESS_VERSIONS[capability],
+);

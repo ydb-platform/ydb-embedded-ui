@@ -166,6 +166,13 @@ describe.each(['object', 'JSON'])('parseSettingsField (%s)', (format) => {
         cluster_external_name: 'external',
     };
 
+    test.each([true, false, undefined])('preserves use_database_id=%s', (useDatabaseId) => {
+        const settings = {...otherSettings, use_database_id: useDatabaseId};
+        const parsed = parseSettingsField(format === 'JSON' ? JSON.stringify(settings) : settings);
+
+        expect(parsed).toEqual(settings);
+    });
+
     test.each([true, false, undefined])('preserves unavailable=%s', (unavailable) => {
         const settings = {...otherSettings, unavailable};
         const parsed = parseSettingsField(format === 'JSON' ? JSON.stringify(settings) : settings);

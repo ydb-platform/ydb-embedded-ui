@@ -1,11 +1,10 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import {getHealthStatusNow} from '../../../utils/healthStatus/healthClock';
 import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
-import type {GetState} from '../../defaultStore';
+import type {RootState} from '../../defaultStore';
 import {api} from '../api';
-import {queryMetaCapability} from '../capabilities/capabilities';
+import {selectMetaHealthFreshnessAvailable} from '../capabilities/capabilities';
 import {CLUSTER_DATA_LIST_TAG} from '../entityDataTags';
 
 import type {ClustersFilters} from './types';
@@ -37,25 +36,22 @@ export const {changeClustersFilters} = slice.actions;
 export const clustersApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getClustersList: builder.query({
-            queryFn: async (_, {signal, dispatch, getState}) => {
+            queryFn: async (_, {signal, getState}) => {
                 try {
                     if (window.api.meta) {
-                        const requestStartedAt = getHealthStatusNow();
+                        const isHealthFreshnessAvailable = selectMetaHealthFreshnessAvailable(
+                            getState() as RootState,
+                            '/meta/clusters',
+                        );
+                        const requestStartedAt = Date.now();
                         const data = await window.api.meta.getClustersList(undefined, {signal});
-                        const version = await queryMetaCapability('/meta/clusters', {
-                            dispatch,
-                            getState: getState as GetState,
-                        });
                         return {
                             data: prepareClustersData(data).map((cluster) => ({
                                 ...cluster,
-                                cluster: cluster.cluster
-                                    ? prepareHealthStatus(
-                                          cluster.cluster,
-                                          requestStartedAt,
-                                          version,
-                                      )
-                                    : undefined,
+                                cluster:
+                                    isHealthFreshnessAvailable && cluster.cluster
+                                        ? prepareHealthStatus(cluster.cluster, requestStartedAt)
+                                        : cluster.cluster,
                             })),
                         };
                     } else {

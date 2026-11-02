@@ -8,8 +8,7 @@ import {useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {IssueLog} from '../../../types/api/healthcheck';
 import {SelfCheckResult} from '../../../types/api/healthcheck';
 import type {ETenantType} from '../../../types/api/tenant';
-import {getHealthStatusError} from '../../../utils/healthStatus/healthStatus';
-import {useHealthStatusNow} from '../../../utils/healthStatus/useHealthStatusNow';
+import {useHealthStatusError} from '../../../utils/healthStatus/useEffectiveHealth';
 import {useTypedSelector} from '../../../utils/hooks';
 
 interface HealthcheckParams {
@@ -87,8 +86,7 @@ export const useClusterHealthcheck = (
         },
     );
 
-    const localNow = useHealthStatusNow([data?.healthExpiresAt], now === undefined);
-    const healthError = data ? getHealthStatusError(data, now ?? localNow, error) : undefined;
+    const {error: healthError} = useHealthStatusError(data, error, {now});
     const effectiveError = error ?? healthError;
     const selfCheckResult = effectiveError
         ? SelfCheckResult.UNSPECIFIED

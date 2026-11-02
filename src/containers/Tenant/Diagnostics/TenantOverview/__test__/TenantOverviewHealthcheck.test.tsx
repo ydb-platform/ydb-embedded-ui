@@ -13,7 +13,6 @@ import {EFlag} from '../../../../../types/api/enums';
 import type {HealthCheckAPIResponse} from '../../../../../types/api/healthcheck';
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import type {TTenant} from '../../../../../types/api/tenant';
-import * as healthClock from '../../../../../utils/healthStatus/healthClock';
 import {TenantOverview} from '../TenantOverview';
 
 let mockTenant: TTenant | undefined;
@@ -187,9 +186,6 @@ test.each(['navigation-v2', 'serverless', 'tenant-not-loaded'])(
 test('expires the Meta Serverless Overall fallback while Viewer healthcheck is skipped', () => {
     jest.useFakeTimers();
     jest.setSystemTime(1000);
-    jest.spyOn(healthClock, 'getHealthStatusNow').mockImplementation(
-        healthClock.createHealthClock(),
-    );
     mockTenant = {
         Name: database,
         Type: 'Serverless',
@@ -218,9 +214,6 @@ test('expires the Meta Serverless Overall fallback while Viewer healthcheck is s
 test('cached Viewer GOOD does not override expired prepared Meta health', async () => {
     jest.useFakeTimers();
     jest.setSystemTime(1000);
-    jest.spyOn(healthClock, 'getHealthStatusNow').mockImplementation(
-        healthClock.createHealthClock(),
-    );
     mockMetaDatabasesAvailable = true;
     mockPollingInterval = 0;
     mockTenant = {
@@ -248,9 +241,6 @@ test('cached Viewer GOOD does not override expired prepared Meta health', async 
 test('current Meta query failure overrides cached Viewer GOOD and recovers before expiry', async () => {
     jest.useFakeTimers();
     jest.setSystemTime(1000);
-    jest.spyOn(healthClock, 'getHealthStatusNow').mockImplementation(
-        healthClock.createHealthClock(),
-    );
     mockMetaDatabasesAvailable = true;
     mockPollingInterval = 0;
     mockTenant = {

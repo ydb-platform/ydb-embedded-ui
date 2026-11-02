@@ -1,6 +1,9 @@
 import {getTenantPath} from '../../routes';
+import {backend as activeBackend} from '../../store';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
+import type {MetaClusterSettings} from '../../types/api/meta';
+import {getDatabaseNavigationId} from '../../utils/databaseId';
 
 export function getTenantBackend(
     tenant: Pick<PreparedTenant, 'NodeIds'> & Partial<Pick<PreparedTenant, 'sharedNodeIds'>>,
@@ -24,15 +27,24 @@ export function getTenantLink({
     additionalTenantsProps,
     externalLink,
     useDatabaseId,
+    isMetaDatabasesAvailable,
+    settings,
 }: {
     tenant: PreparedTenant;
     additionalTenantsProps?: AdditionalTenantsProps;
     externalLink?: boolean;
     useDatabaseId?: boolean;
+    isMetaDatabasesAvailable?: boolean;
+    settings?: MetaClusterSettings;
 }) {
     const backend = getTenantBackend(tenant, additionalTenantsProps);
     const isExternalLink = Boolean(externalLink || backend);
-    const database = useDatabaseId ? tenant.Id : tenant.Name;
+    const database = getDatabaseNavigationId(tenant, {
+        useDatabaseId,
+        isMetaDatabasesAvailable,
+        settings,
+        backend: backend ?? activeBackend,
+    });
 
     return {
         database,

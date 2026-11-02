@@ -8,6 +8,8 @@ import path from 'node:path';
 import {URL} from 'node:url';
 import {runInNewContext} from 'node:vm';
 
+import {readPlaywrightVideo} from '../read-playwright-video';
+
 const root = path.resolve(__dirname, '../../../..');
 const workflow = fs.readFileSync(path.join(root, '.github/workflows/release-e2e.yml'), 'utf8');
 const reportWorkflow = fs.readFileSync(
@@ -56,7 +58,9 @@ test.each(
 
 test('starts the release-version frontend while keeping local-ydb as its backend', () => {
     expect(workflow).not.toContain('PLAYWRIGHT_BASE_URL:');
-    expect(workflow).toContain('PLAYWRIGHT_APP_BACKEND: http://localhost:8765');
+    expect(workflow).toContain('id: ydb');
+    expect(workflow).not.toContain('monitoring-port:');
+    expect(workflow).toContain('PLAYWRIGHT_APP_BACKEND: ${{ steps.ydb.outputs.monitoring-url }}');
     expect(workflow).toContain('PLAYWRIGHT_RELEASE_REF: ${{ needs.resolve.outputs.ui_sha }}');
     expect(workflow).toContain(
         'PLAYWRIGHT_RELEASE_TEST_REF: ${{ needs.resolve.outputs.tests_sha }}',
@@ -64,6 +68,11 @@ test('starts the release-version frontend while keeping local-ydb as its backend
     expect(reportWorkflow).toContain(
         'PLAYWRIGHT_RELEASE_TEST_REF: ${{ steps.prepare.outputs.tests_sha }}',
     );
+});
+
+test('retains recordings of failed release attempts', () => {
+    expect(workflow).toContain('--trace=retain-on-failure');
+    expect(readPlaywrightVideo(workflow)).toBe('retain-on-failure');
 });
 
 test('forwards backend routes and streaming without rewriting UI paths', async () => {

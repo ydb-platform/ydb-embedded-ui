@@ -1,5 +1,4 @@
 import {configureStore} from '@reduxjs/toolkit';
-import {act, renderHook} from '@testing-library/react';
 
 import type {YdbEmbeddedAPI} from '../../../services/api';
 import {api} from '../../../store/reducers/api';
@@ -10,12 +9,10 @@ import {tenantApi} from '../../../store/reducers/tenant/tenant';
 import {tenantsApi} from '../../../store/reducers/tenants/tenants';
 import type {MetaCapabilitiesResponse} from '../../../types/api/capabilities';
 import {EFlag} from '../../../types/api/enums';
-import * as healthClock from '../healthClock';
 import {getEffectiveHealth, getHealthStatusError, prepareHealthStatus} from '../healthStatus';
-import {useHealthStatusNow} from '../useHealthStatusNow';
 
 async function createTestStore(
-    versions: Record<string, number> = {
+    versions: Record<string, number> | null = {
         '/meta/clusters': 2,
         '/meta/databases': 2,
         '/meta/cluster_health': 2,
@@ -26,11 +23,13 @@ async function createTestStore(
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({serializableCheck: false}).concat(api.middleware),
     });
-    await store.dispatch(
-        capabilitiesApi.util.upsertQueryData('getMetaCapabilities', {}, {
-            Capabilities: versions,
-        } as MetaCapabilitiesResponse),
-    );
+    if (versions) {
+        await store.dispatch(
+            capabilitiesApi.util.upsertQueryData('getMetaCapabilities', {}, {
+                Capabilities: versions,
+            } as MetaCapabilitiesResponse),
+        );
+    }
     return store;
 }
 
@@ -48,11 +47,7 @@ const originalApi = window.api;
 
 beforeEach(() => {
     jest.useFakeTimers();
-    jest.setSystemTime(0);
-    jest.advanceTimersByTime(1000);
-    jest.spyOn(healthClock, 'getHealthStatusNow').mockImplementation(
-        healthClock.createHealthClock(),
-    );
+    jest.setSystemTime(1000);
 });
 
 afterEach(() => {
@@ -74,7 +69,7 @@ test.each([
     [1, 1001],
     [120000, 121000],
 ])('prepares TTL %s conservatively', (ttl, expectedDeadline) => {
-    const data = prepareHealthStatus({status_ttl_ms: ttl as number, Overall: EFlag.Green}, 1000, 2);
+    const data = prepareHealthStatus({status_ttl_ms: ttl as number, Overall: EFlag.Green}, 1000);
     expect(data.healthExpiresAt).toBe(expectedDeadline);
     expect(getEffectiveHealth(data, 1000).Overall).toBe(
         expectedDeadline === undefined || expectedDeadline <= 1000 ? EFlag.Grey : EFlag.Green,
@@ -199,43 +194,6 @@ test.each([
     expect(getHealthStatusError({...data, healthStatusSource: 'meta'}, now, error)).toBe(expected);
 });
 
-test('a fresh Meta response recovers after a wall-clock rollback without reviving expired data', async () => {
-    window.api = {
-        meta: {
-            getClustersList: jest.fn().mockResolvedValue({
-                clusters: [{name: 'cluster', cluster: {Overall: EFlag.Green, status_ttl_ms: 1000}}],
-            }),
-        },
-    } as unknown as YdbEmbeddedAPI;
-    const store = await createTestStore();
-    const first = await store.dispatch(clustersApi.endpoints.getClustersList.initiate(undefined));
-    const initial = first.data?.[0].cluster;
-    if (!initial) {
-        throw new Error('Expected a prepared Meta cluster');
-    }
-    const mounted = renderHook(
-        ({data}) => {
-            const now = useHealthStatusNow([data.healthExpiresAt]);
-            return {now, cluster: getEffectiveHealth(data, now)};
-        },
-        {initialProps: {data: initial}},
-    );
-    act(() => jest.advanceTimersByTime(1000));
-    expect(mounted.result.current.cluster.Overall).toBe(EFlag.Grey);
-    act(() => jest.setSystemTime(-100000));
-    const fresh = await store.dispatch(
-        clustersApi.endpoints.getClustersList.initiate(undefined, {forceRefetch: true}),
-    );
-    if (!fresh.data?.[0].cluster) {
-        throw new Error('Expected a refreshed Meta cluster');
-    }
-    mounted.rerender({data: fresh.data[0].cluster});
-    expect(mounted.result.current.cluster.Overall).toBe(EFlag.Green);
-    expect(getEffectiveHealth(initial, mounted.result.current.now).Overall).toBe(EFlag.Grey);
-    mounted.unmount();
-    store.dispatch(api.util.resetApiState());
-});
-
 // A version from a different endpoint must not opt this response into the new contract.
 describe.each([
     ['clusters', '/meta/clusters'],
@@ -244,23 +202,33 @@ describe.each([
     ['cluster health', '/meta/cluster_health'],
 ])('%s capability compatibility', (endpoint, capability) => {
     test.each([
-        [undefined, false],
-        [1, false],
-        [2, true],
-        [3, true],
+        ['failed', undefined, false],
+        [undefined, undefined, false],
+        [1, undefined, false],
+        [2, undefined, true],
+        [3, undefined, true],
+        [undefined, 1, false],
+        [1, 1, false],
+        [2, 1, true],
+        [3, 1, true],
     ] as const)(
-        'handles a response without TTL at version %s',
-        async (version, requiresFreshness) => {
-            const tenant = {Name: '/Root/db', Id: 'db', Overall: EFlag.Green};
+        'handles a response at version %s with TTL %s',
+        async (version, ttl, requiresFreshness) => {
+            const tenant = {Name: '/Root/db', Id: 'db', Overall: EFlag.Green, status_ttl_ms: ttl};
             window.api = {
                 meta: {
+                    getMetaCapabilities: jest.fn().mockRejectedValue(new Error('Not available')),
                     getClustersList: jest.fn().mockResolvedValue({
-                        clusters: [{name: 'cluster', cluster: {Overall: EFlag.Green}}],
+                        clusters: [
+                            {name: 'cluster', cluster: {Overall: EFlag.Green, status_ttl_ms: ttl}},
+                        ],
                     }),
                     getTenantsV2: jest.fn().mockResolvedValue({TenantInfo: [tenant]}),
-                    getClusterHealth: jest
-                        .fn()
-                        .mockResolvedValue({self_check_result: 'GOOD', issue_log: []}),
+                    getClusterHealth: jest.fn().mockResolvedValue({
+                        self_check_result: 'GOOD',
+                        issue_log: [],
+                        status_ttl_ms: ttl,
+                    }),
                 },
             } as unknown as YdbEmbeddedAPI;
             const versions: Record<string, number> = {
@@ -268,13 +236,18 @@ describe.each([
                 '/meta/databases': 2,
                 '/meta/cluster_health': 2,
             };
-            if (version === undefined) {
+            if (version === undefined || version === 'failed') {
                 delete versions[capability];
             } else {
                 versions[capability] = version;
             }
-            const store = await createTestStore(versions);
+            const store = await createTestStore(version === 'failed' ? null : versions);
             try {
+                if (version === 'failed') {
+                    await store.dispatch(
+                        capabilitiesApi.endpoints.getMetaCapabilities.initiate({}),
+                    );
+                }
                 if (endpoint === 'cluster health') {
                     const {data} = await store.dispatch(
                         healthcheckApi.endpoints.getClusterHealthcheckInfo.initiate({
@@ -282,7 +255,7 @@ describe.each([
                         }),
                     );
                     expect(data?.self_check_result).toBe('GOOD');
-                    expect(Boolean(getHealthStatusError(data, 1000))).toBe(requiresFreshness);
+                    expect(Boolean(getHealthStatusError(data, 2000))).toBe(requiresFreshness);
                 } else {
                     const args = {clusterName: 'cluster', isMetaDatabasesAvailable: true};
                     const readHealth = async () => {
@@ -313,7 +286,7 @@ describe.each([
                     if (!data) {
                         throw new Error('Expected health response');
                     }
-                    expect(getEffectiveHealth(data, 1000).Overall).toBe(
+                    expect(getEffectiveHealth(data, 2000).Overall).toBe(
                         requiresFreshness ? EFlag.Grey : EFlag.Green,
                     );
                 }
@@ -324,38 +297,24 @@ describe.each([
     );
 });
 
-test('waits for an in-flight capabilities lookup before classifying a health response', async () => {
-    const capabilities = deferred<MetaCapabilitiesResponse>();
+test('captures the capability before waiting for the Meta cluster response', async () => {
+    const response = deferred<object>();
     window.api = {
-        meta: {
-            getMetaCapabilities: jest.fn().mockReturnValue(capabilities.promise),
-            getClustersList: jest.fn().mockResolvedValue({
-                clusters: [{name: 'cluster', cluster: {Overall: EFlag.Green}}],
-            }),
-        },
+        meta: {getClustersList: jest.fn().mockReturnValue(response.promise)},
     } as unknown as YdbEmbeddedAPI;
-    const store = await createTestStore({});
-    const lookup = store.dispatch(
-        capabilitiesApi.endpoints.getMetaCapabilities.initiate({}, {forceRefetch: true}),
-    );
+    const store = await createTestStore({'/meta/clusters': 1});
     const request = store.dispatch(clustersApi.endpoints.getClustersList.initiate(undefined));
-    await jest.advanceTimersByTimeAsync(0);
-    expect(
-        clustersApi.endpoints.getClustersList.select(undefined)(store.getState()).isLoading,
-    ).toBe(true);
-    capabilities.resolve({Capabilities: {'/meta/clusters': 2}} as MetaCapabilitiesResponse);
-    await lookup;
+    await store.dispatch(
+        capabilitiesApi.util.upsertQueryData('getMetaCapabilities', {}, {
+            Capabilities: {'/meta/clusters': 2},
+        } as MetaCapabilitiesResponse),
+    );
+    response.resolve({clusters: [{name: 'cluster', cluster: {Overall: EFlag.Green}}]});
     const {data} = await request;
     const cluster = data?.[0].cluster;
     if (!cluster) {
         throw new Error('Expected health response');
     }
-    expect(getEffectiveHealth(cluster, 1000).Overall).toBe(EFlag.Grey);
+    expect(getEffectiveHealth(cluster, 1000).Overall).toBe(EFlag.Green);
     store.dispatch(api.util.resetApiState());
-});
-
-test('an unexpected TTL does not enable freshness checks on a legacy endpoint', () => {
-    const data = prepareHealthStatus({Overall: EFlag.Green, status_ttl_ms: 1}, 1000, 1);
-    expect(getEffectiveHealth(data, 2000).Overall).toBe(EFlag.Green);
-    expect(getHealthStatusError(data, 2000)).toBeUndefined();
 });

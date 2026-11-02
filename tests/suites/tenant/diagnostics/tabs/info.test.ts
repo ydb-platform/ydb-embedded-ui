@@ -286,6 +286,8 @@ test.describe('Diagnostics Info tab', async () => {
     });
 
     test('Info tab shows resource utilization', async ({page}) => {
+        await setupMetricTabsTenantInfoMock(page);
+
         const pageQueryParams = {
             schema: database,
             database,

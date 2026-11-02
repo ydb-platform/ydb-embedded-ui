@@ -41,8 +41,7 @@ import {
     formatNumber,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
-import {getEffectiveHealth} from '../../utils/healthStatus/healthStatus';
-import {useHealthStatusNow} from '../../utils/healthStatus/useHealthStatusNow';
+import {useEffectiveHealthList} from '../../utils/healthStatus/useEffectiveHealth';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
@@ -63,6 +62,9 @@ import {useTenantsQueryParams} from './useTenantsQueryParams';
 import './Tenants.scss';
 
 const b = cn('tenants');
+
+const getTenantHealth = (tenant: PreparedTenant) => tenant;
+const setTenantHealth = (_tenant: PreparedTenant, health: PreparedTenant) => health;
 
 const DATABASES_COLUMNS_WIDTH_LS_KEY = 'databasesTableColumnsWidth';
 
@@ -142,33 +144,28 @@ const TenantsTableContent = ({
         {clusterName, environmentName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
-    const loading = isFetching && currentData === undefined;
 
     // Track sort state for scroll dependencies
     const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
     const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
 
-    const {domain: domainRoot, settings} = useClusterBaseInfo();
+    const {domain: domainRoot, settings, isResolved: isClusterInfoResolved} = useClusterBaseInfo();
+    const loading = (isFetching && currentData === undefined) || !isClusterInfoResolved;
 
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
 
-    const healthNow = useHealthStatusNow(
-        currentData?.map((tenant) => tenant.healthExpiresAt) ?? [],
-    );
-
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count
     // It should be 8/8 instead of 8/9 when no filters applied but show domain setting is off
-    const tenants = React.useMemo(() => {
-        const rawTenants =
-            currentData?.map((tenant) => getEffectiveHealth(tenant, healthNow, error)) ?? [];
+    const tenants = React.useMemo(
+        () => filterTenantsByDomain(currentData ?? [], showDomainDatabase),
+        [currentData, showDomainDatabase],
+    );
 
-        return filterTenantsByDomain(rawTenants, showDomainDatabase);
-    }, [currentData, showDomainDatabase, healthNow, error]);
-
-    const filteredTenants = React.useMemo(() => {
+    // Filter the backend observation before applying display-only expiration.
+    const filteredObservations = React.useMemo(() => {
         let filteredByProblems = tenants;
         if (showWithProblemsFilter) {
             filteredByProblems = filterTenantsByProblems(tenants, withProblems);
@@ -179,27 +176,43 @@ const TenantsTableContent = ({
         return filteredBySearch;
     }, [tenants, withProblems, search, showWithProblemsFilter]);
 
+    const filteredTenants =
+        useEffectiveHealthList(filteredObservations, getTenantHealth, setTenantHealth) ?? [];
+
+    const useMetaProxySetting = settings?.use_meta_proxy;
+    const useDatabaseIdSetting = settings?.use_database_id;
     const tenantLinks = React.useMemo(
         () =>
             new Map(
-                tenants.map((tenant) => [
+                filteredTenants.map((tenant) => [
                     tenant,
                     getTenantLink({
                         tenant,
                         additionalTenantsProps,
                         externalLink: Boolean(environmentName),
-                        useDatabaseId:
-                            uiFactory.useDatabaseId && settings?.use_meta_proxy !== false,
+                        useDatabaseId: uiFactory.useDatabaseId,
+                        isMetaDatabasesAvailable,
+                        settings: {
+                            use_meta_proxy: useMetaProxySetting,
+                            use_database_id: useDatabaseIdSetting,
+                        },
                     }),
                 ]),
             ),
-        [tenants, additionalTenantsProps, environmentName, settings?.use_meta_proxy],
+        [
+            filteredTenants,
+            additionalTenantsProps,
+            environmentName,
+            isMetaDatabasesAvailable,
+            useMetaProxySetting,
+            useDatabaseIdSetting,
+        ],
     );
 
     const openTenant = React.useCallback(
         (tenant: PreparedTenant) => {
             const link = tenantLinks.get(tenant);
-            if (!link) {
+            if (!isClusterInfoResolved || !link) {
                 return;
             }
             if (link.isExternalLink) {
@@ -209,7 +222,7 @@ const TenantsTableContent = ({
 
             history.push(link.href);
         },
-        [tenantLinks, history],
+        [tenantLinks, history, isClusterInfoResolved],
     );
 
     const renderCreateDBButton = () => {

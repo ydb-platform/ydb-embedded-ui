@@ -1,9 +1,8 @@
 import type {TTenantInfo} from '../../../types/api/tenant';
-import {getHealthStatusNow} from '../../../utils/healthStatus/healthClock';
 import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
-import type {GetState} from '../../defaultStore';
+import type {RootState} from '../../defaultStore';
 import {api} from '../api';
-import {queryMetaCapability} from '../capabilities/capabilities';
+import {selectMetaHealthFreshnessAvailable} from '../capabilities/capabilities';
 import {DATABASE_DATA_LIST_TAG} from '../entityDataTags';
 
 import type {PreparedTenant, SharedDatabaseTarget} from './types';
@@ -22,27 +21,29 @@ export const tenantsApi = api.injectEndpoints({
                     environmentName?: string;
                     isMetaDatabasesAvailable?: boolean;
                 },
-                {signal, dispatch, getState},
+                {signal, getState},
             ) => {
                 try {
                     let response: TTenantInfo;
 
                     if (isMetaDatabasesAvailable && window.api.meta) {
-                        const requestStartedAt = getHealthStatusNow();
+                        const isHealthFreshnessAvailable = selectMetaHealthFreshnessAvailable(
+                            getState() as RootState,
+                            '/meta/databases',
+                        );
+                        const requestStartedAt = Date.now();
                         response = await window.api.meta.getTenantsV2(
                             {clusterName, environmentName},
                             {signal},
                         );
-                        const version = await queryMetaCapability('/meta/databases', {
-                            dispatch,
-                            getState: getState as GetState,
-                        });
-                        response = {
-                            ...response,
-                            TenantInfo: response.TenantInfo?.map((tenant) =>
-                                prepareHealthStatus(tenant, requestStartedAt, version),
-                            ),
-                        };
+                        if (isHealthFreshnessAvailable) {
+                            response = {
+                                ...response,
+                                TenantInfo: response.TenantInfo?.map((tenant) =>
+                                    prepareHealthStatus(tenant, requestStartedAt),
+                                ),
+                            };
+                        }
                     } else if (window.api.meta) {
                         response = await window.api.meta.getTenants({clusterName}, {signal});
                     } else {

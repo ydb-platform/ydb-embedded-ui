@@ -30,8 +30,7 @@ import type {ETenantType, TTenant, TTenantResource} from '../../../../types/api/
 import {getInfoTabLinks} from '../../../../utils/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import type {PreparedHealthStatus} from '../../../../utils/healthStatus/healthStatus';
-import {getEffectiveHealth} from '../../../../utils/healthStatus/healthStatus';
-import {useHealthStatusNow} from '../../../../utils/healthStatus/useHealthStatusNow';
+import {useEffectiveHealth} from '../../../../utils/healthStatus/useEffectiveHealth';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabaseHealthcheckAvailable} from '../../../../utils/hooks/useDatabaseHealthcheckAvailable';
@@ -307,8 +306,7 @@ export function TenantOverview({
     );
 
     const tenantLoading = isTenantLoading(isFetching, tenant, error);
-    const healthNow = useHealthStatusNow([tenant?.healthExpiresAt]);
-    const effectiveTenant = tenant ? getEffectiveHealth(tenant, healthNow, error) : tenant;
+    const effectiveTenant = useEffectiveHealth(tenant, error);
     const {Name, Type, CoresTotal} = effectiveTenant || {};
     const isServerless = Type === 'Serverless';
     const healthcheckAvailable = useDatabaseHealthcheckAvailable(Type);

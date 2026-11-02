@@ -5,8 +5,7 @@ import {
     selectAllClusterHealthcheckInfo,
 } from '../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {SelfCheckResult} from '../../types/api/healthcheck';
-import {getHealthStatusError} from '../../utils/healthStatus/healthStatus';
-import {useHealthStatusNow} from '../../utils/healthStatus/useHealthStatusNow';
+import {useHealthStatusError} from '../../utils/healthStatus/useEffectiveHealth';
 import {useTypedSelector} from '../../utils/hooks';
 import {Healthcheck} from '../Tenant/Healthcheck/Healthcheck';
 import {HealthcheckDrawer} from '../Tenant/Healthcheck/components/HealthcheckDrawer';
@@ -39,8 +38,7 @@ export function ClusterDrawerHealthcheck({
     const data = useTypedSelector((state) =>
         selectAllClusterHealthcheckInfo(state, clusterName || ''),
     );
-    const now = useHealthStatusNow([data?.healthExpiresAt], isVisible);
-    const healthError = data ? getHealthStatusError(data, now, queryError) : undefined;
+    const {now, error: healthError} = useHealthStatusError(data, queryError, {enabled: isVisible});
     const healthcheckStatus = healthError ? SelfCheckResult.UNSPECIFIED : data?.self_check_result;
     const healthcheckData = data
         ? {...data, self_check_result: healthcheckStatus, error: healthError}

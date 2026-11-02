@@ -18,11 +18,7 @@ export interface PreparedHealthStatus {
 export function prepareHealthStatus<T extends {status_ttl_ms?: number}>(
     data: T,
     requestStartedAt: number,
-    capabilityVersion: number,
 ): T & PreparedHealthStatus {
-    if (!(capabilityVersion >= 2)) {
-        return data;
-    }
     const ttl = data.status_ttl_ms;
     return {
         ...data,

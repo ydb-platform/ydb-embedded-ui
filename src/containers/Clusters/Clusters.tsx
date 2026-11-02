@@ -23,9 +23,9 @@ import {
 import type {ClusterAvailability, PreparedCluster} from '../../store/reducers/clusters/types';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {getEffectiveHealth} from '../../utils/healthStatus/healthStatus';
-import {useHealthStatusNow} from '../../utils/healthStatus/useHealthStatusNow';
+import {useEffectiveHealthList} from '../../utils/healthStatus/useEffectiveHealth';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
 
@@ -47,6 +47,12 @@ interface ClustersProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
 }
 
+const getClusterHealth = (row: PreparedCluster) => row.cluster;
+const setClusterHealth = (
+    row: PreparedCluster,
+    cluster: NonNullable<PreparedCluster['cluster']>,
+) => ({...row, cluster});
+
 export function Clusters({scrollContainerRef}: ClustersProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const query = clustersApi.useGetClustersListQuery(undefined, {
@@ -56,6 +62,8 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const dispatch = useTypedDispatch();
 
     const emMetaAvailable = useEmMetaAvailable();
+    const isMonitoringAllowed = useIsUserAllowedToMakeChanges();
+    const healthcheckAvailable = !emMetaAvailable || isMonitoringAllowed;
     const isEditClusterAvailable = emMetaAvailable && uiFactory.onEditCluster !== undefined;
     const isDeleteClusterAvailable = emMetaAvailable && uiFactory.onDeleteCluster !== undefined;
 
@@ -108,25 +116,14 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     }, []);
     const rawColumns = React.useMemo(() => {
         return getClustersColumns({
+            healthcheckAvailable: Boolean(healthcheckAvailable),
             isEditClusterAvailable,
             isDeleteClusterAvailable,
-            onStatusClick: handleStatusClick,
+            onStatusClick: healthcheckAvailable ? handleStatusClick : undefined,
         });
-    }, [isDeleteClusterAvailable, isEditClusterAvailable, handleStatusClick]);
+    }, [isDeleteClusterAvailable, isEditClusterAvailable, handleStatusClick, healthcheckAvailable]);
 
-    const healthNow = useHealthStatusNow(
-        query.data?.map((row) => row.cluster?.healthExpiresAt) ?? [],
-    );
-    const clusters = React.useMemo(
-        () =>
-            query.data?.map((row) => {
-                const cluster = row.cluster
-                    ? getEffectiveHealth(row.cluster, healthNow, query.error)
-                    : row.cluster;
-                return cluster === row.cluster ? row : {...row, cluster};
-            }),
-        [query.data, query.error, healthNow],
-    );
+    const clusters = useEffectiveHealthList(query.data, getClusterHealth, setClusterHealth);
     const hasUnavailableClusters = clusters?.some(
         (cluster) => cluster.settings?.unavailable === true,
     );
@@ -390,7 +387,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     return (
         <ClusterDrawerHealthcheck
             clusterName={healthcheckClusterName}
-            isVisible={Boolean(healthcheckClusterName)}
+            isVisible={Boolean(healthcheckAvailable && healthcheckClusterName)}
             onClose={handleDrawerClose}
         >
             <div>

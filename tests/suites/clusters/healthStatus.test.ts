@@ -135,16 +135,17 @@ test('explains current failure, preserves cached issues and recovers through rea
     await expect(row.locator('.ydb-entity-status__note')).toHaveCount(0);
 });
 
-test('expires with polling disabled and cached data stays expired after navigation', async ({
+test('failed cluster refresh preserves fresh health until expiry and cached data stays expired after navigation', async ({
     page,
 }) => {
     await configureMeta(page);
     await page.clock.install();
+    let fail = false;
     let requests = 0;
     const clusters: MetaExtendedClusterInfo[] = [
         {
             name: 'short-lived',
-            cluster: {Overall: EFlag.Green, status_ttl_ms: 3000, overall_source: 'healthcheck'},
+            cluster: {Overall: EFlag.Green, status_ttl_ms: 10000, overall_source: 'healthcheck'},
         },
         {
             name: 'expired',
@@ -159,7 +160,9 @@ test('expires with polling disabled and cached data stays expired after navigati
     await page.route('**/meta/**', (route) => {
         if (new URL(route.request().url()).pathname.endsWith('/clusters')) {
             requests++;
-            return route.fulfill({json: {clusters}});
+            return fail
+                ? route.fulfill({status: 400, json: {error: '400 Bad Request'}})
+                : route.fulfill({json: {clusters}});
         }
         if (new URL(route.request().url()).pathname.endsWith('/db_clusters')) {
             return route.fulfill({json: {clusters: [{name: 'short-lived', domain: '/Root'}]}});
@@ -169,8 +172,15 @@ test('expires with polling disabled and cached data stays expired after navigati
     await new PageModel(page).goto();
     await expect(getRow(page, 'short-lived').getByText('Good', {exact: true})).toBeVisible();
     await expect(getRow(page, 'expired').getByText('Unknown', {exact: true})).toBeVisible();
+    fail = true;
+    await page.getByRole('button', {name: 'Refresh', exact: true}).first().click();
+    const listError = page.locator('.ydb-clusters .ydb-response-error');
+    await expect(listError).toHaveCount(1);
+    await expect(listError).toContainText('400 Bad Request');
+    await expect(getRow(page, 'short-lived').getByText('Good', {exact: true})).toBeVisible();
+    await expect(getRow(page, 'short-lived').locator('.ydb-entity-status__note')).toHaveCount(0);
     const requestsBefore = requests;
-    await page.clock.runFor(4000);
+    await page.clock.runFor(11000);
     await expect(getRow(page, 'short-lived').getByText('Unknown', {exact: true})).toBeVisible();
     await expectNote(
         page,
@@ -190,11 +200,13 @@ test('expires with polling disabled and cached data stays expired after navigati
     expect(requests).toBe(requestsBefore);
 });
 
-test('Meta database package consumer expires and rejects a failed refresh', async ({page}) => {
+test('Meta database list preserves fresh health on failure and backend problem membership after expiry', async ({
+    page,
+}) => {
     await configureMeta(page);
     await page.clock.install();
     let fail = false;
-    let ttl = 3000;
+    let ttl = 10000;
     let requests = 0;
     await page.route('**/meta/**', (route) => {
         const path = new URL(route.request().url()).pathname;
@@ -211,6 +223,15 @@ test('Meta database package consumer expires and rejects a failed refresh', asyn
                     Type: 'Dedicated',
                     State: 'RUNNING',
                     Overall: EFlag.Green,
+                    status_ttl_ms: ttl,
+                },
+                {
+                    Name: '/Root/problem-db',
+                    Id: 'problem-db',
+                    Cluster: 'selected',
+                    Type: 'Dedicated',
+                    State: 'RUNNING',
+                    Overall: EFlag.Red,
                     status_ttl_ms: ttl,
                 },
             ];
@@ -237,19 +258,55 @@ test('Meta database package consumer expires and rejects a failed refresh', asyn
     });
     await page.goto('/cluster/databases?clusterName=selected');
     const row = getRow(page, '/Root/health-db');
+    const problemRow = getRow(page, '/Root/problem-db');
     await expect(row.getByText('Good', {exact: true})).toBeVisible();
+    await expect(problemRow.getByText('Critical', {exact: true})).toBeVisible();
     expect(requests).toBeGreaterThan(0);
     const initial = requests;
-    await page.clock.runFor(4000);
+    await page.getByRole('radio', {name: 'With problems', exact: true}).check();
+    await expect(row).toHaveCount(0);
+    await expect(problemRow.getByText('Critical', {exact: true})).toBeVisible();
+    await page.clock.runFor(11000);
+    await expect(problemRow.getByText('Unknown', {exact: true})).toBeVisible();
+    await expect(row).toHaveCount(0);
+    await page.getByRole('radio', {name: 'All', exact: true}).check();
     await expect(row.getByText('Unknown', {exact: true})).toBeVisible();
     expect(requests).toBe(initial);
     ttl = 120000;
     await page.getByRole('button', {name: 'Refresh', exact: true}).first().click();
     await expect(row.getByText('Good', {exact: true})).toBeVisible();
+    await expect(problemRow.getByText('Critical', {exact: true})).toBeVisible();
     fail = true;
     await page.getByRole('button', {name: 'Refresh', exact: true}).first().click();
+    const listError = page.locator('.ydb-response-error');
+    await expect(listError).toHaveCount(1);
+    await expect(listError).toContainText('400 Bad Request');
+    await expect(row.getByText('Good', {exact: true})).toBeVisible();
+    await expect(problemRow.getByText('Critical', {exact: true})).toBeVisible();
+    await expect(row.locator('.ydb-entity-status__note')).toHaveCount(0);
+    await expect(problemRow.locator('.ydb-entity-status__note')).toHaveCount(0);
+    const requestsAfterFailure = requests;
+    await page.clock.fastForward(120000);
     await expect(row.getByText('Unknown', {exact: true})).toBeVisible();
-    await expectNote(page, row, '400 Bad Request');
+    await expect(problemRow.getByText('Unknown', {exact: true})).toBeVisible();
+    await expectNote(page, row, 'The healthcheck has expired. Refresh to obtain a current result.');
+    expect(requests).toBe(requestsAfterFailure);
+    await page.getByRole('radio', {name: 'With problems', exact: true}).check();
+    await expect(row).toHaveCount(0);
+    await expect(problemRow.getByText('Unknown', {exact: true})).toBeVisible();
+    const href = await problemRow
+        .getByRole('link', {name: 'problem-db', exact: true})
+        .getAttribute('href');
+    if (!href) {
+        throw new Error('The expired database must keep its navigation link');
+    }
+    const destination = new URL(href, page.url());
+    expect(destination.searchParams.get('database')).toBe('/Root/problem-db');
+    expect(destination.searchParams.get('clusterName')).toBe('selected');
+    const search = page.getByPlaceholder('Database name');
+    await search.press('ArrowDown');
+    await expect(page.locator('.ydb-keyboard-focused-row')).toContainText('/Root/problem-db');
+    await Promise.all([page.waitForURL(destination.href), search.press('Enter')]);
 });
 
 for (const {version, status, detailStatus} of [

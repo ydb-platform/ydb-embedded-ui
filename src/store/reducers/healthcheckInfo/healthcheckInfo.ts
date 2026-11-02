@@ -1,11 +1,11 @@
 import {createSelector} from '@reduxjs/toolkit';
 
-import type {IssueLog, StatusFlag} from '../../../types/api/healthcheck';
-import {getHealthStatusNow} from '../../../utils/healthStatus/healthClock';
+import type {HealthCheckAPIResponse, IssueLog, StatusFlag} from '../../../types/api/healthcheck';
 import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
-import type {GetState, RootState} from '../../defaultStore';
+import type {PreparedHealthStatus} from '../../../utils/healthStatus/healthStatus';
+import type {RootState} from '../../defaultStore';
 import {api} from '../api';
-import {queryMetaCapability} from '../capabilities/capabilities';
+import {selectMetaHealthFreshnessAvailable} from '../capabilities/capabilities';
 
 import {getLeavesFromTree, linkStateStorageSummaries} from './utils';
 
@@ -36,19 +36,26 @@ export const healthcheckApi = api.injectEndpoints({
             },
             providesTags: ['All'],
         }),
-        getClusterHealthcheckInfo: builder.query({
-            queryFn: async ({clusterName}: {clusterName: string}, {signal, dispatch, getState}) => {
+        getClusterHealthcheckInfo: builder.query<
+            HealthCheckAPIResponse & PreparedHealthStatus,
+            {clusterName: string}
+        >({
+            queryFn: async ({clusterName}, {signal, getState}) => {
                 try {
                     if (!window.api.meta) {
                         throw new Error('Meta API is not available');
                     }
-                    const requestStartedAt = getHealthStatusNow();
+                    const isHealthFreshnessAvailable = selectMetaHealthFreshnessAvailable(
+                        getState() as RootState,
+                        '/meta/cluster_health',
+                    );
+                    const requestStartedAt = Date.now();
                     const data = await window.api.meta.getClusterHealth({clusterName}, {signal});
-                    const version = await queryMetaCapability('/meta/cluster_health', {
-                        dispatch,
-                        getState: getState as GetState,
-                    });
-                    return {data: prepareHealthStatus(data, requestStartedAt, version)};
+                    return {
+                        data: isHealthFreshnessAvailable
+                            ? prepareHealthStatus(data, requestStartedAt)
+                            : data,
+                    };
                 } catch (error) {
                     return {error};
                 }

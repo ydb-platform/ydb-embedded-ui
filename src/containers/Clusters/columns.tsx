@@ -82,12 +82,14 @@ export function getFirstVersion(preparedVersions: PreparedVersion[]): string | u
 }
 
 interface ClustersColumnsParams {
+    healthcheckAvailable?: boolean;
     isEditClusterAvailable?: boolean;
     isDeleteClusterAvailable?: boolean;
     onStatusClick?: (row: PreparedCluster) => void;
 }
 
 function getTitleColumn({
+    healthcheckAvailable = true,
     isEditClusterAvailable,
     isDeleteClusterAvailable,
     onStatusClick,
@@ -191,6 +193,10 @@ function getTitleColumn({
             };
 
             const renderStatus = () => {
+                if (!healthcheckAvailable) {
+                    return null;
+                }
+
                 const statusLabel = (
                     <EntityStatus.Label
                         status={clusterStatus ?? EFlag.Grey}
