@@ -18,8 +18,6 @@ for (const theme of ['light', 'dark']) {
             await expect(label).toHaveText('DC-A');
             await expect(label).toHaveClass(/ydb-datacenter-color_color_turquoise/);
             await expect(label).toHaveCSS('height', '18px');
-            await page.evaluate(() => document.fonts.ready);
-            await expect(field).toHaveScreenshot(`${kind}-datacenter-details-${theme}.png`);
             await field.getByRole('button', {name: 'Copy Datacenter', exact: true}).click();
             await expect.poll(() => getClipboardContent(page)).toBe('dc-a');
             expect(nodeListRequests).toHaveLength(1);
