@@ -4,6 +4,7 @@ import type {Page} from '@playwright/test';
 import {backend} from '../../utils/constants';
 import {NodePage} from '../nodes/NodePage';
 import {NodesPage} from '../nodes/NodesPage';
+import {generateNodeMock} from '../paginatedTable/mocks';
 import {ClusterNodesTable} from '../paginatedTable/paginatedTable';
 
 const THREADS_TEST_DATABASE = '/Root/db';
@@ -171,18 +172,67 @@ test.describe('Test Nodes Paginated Table', async () => {
     });
 
     test('Refresh button updates the table data', async ({page}) => {
+        const now = new Date('2025-01-01T00:00:00Z');
+        await page.clock.setFixedTime(now);
+        const [node] = await generateNodeMock({offset: 0, limit: 1});
+        const refreshGate = Promise.withResolvers<void>();
+        let useUpdatedStartTime = false;
+        await page.route('**/viewer/json/nodes?*', async (route) => {
+            const isRefresh = useUpdatedStartTime;
+            if (isRefresh) {
+                await refreshGate.promise;
+            }
+            const startTime = String(now.getTime() - (isRefresh ? 60_000 : 300_000));
+            const params = new URL(route.request().url()).searchParams;
+            const hasNode = Number(params.get('offset')) === 0 && Number(params.get('limit')) > 0;
+            await route.fulfill({
+                json: {
+                    Nodes: hasNode
+                        ? [
+                              {
+                                  ...node,
+                                  SystemState: {
+                                      ...node.SystemState,
+                                      StartTime: startTime,
+                                  },
+                              },
+                          ]
+                        : [],
+                    TotalNodes: '1',
+                    FoundNodes: '1',
+                },
+            });
+        });
+        await page.reload();
         const paginatedTable = new ClusterNodesTable(page);
-
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
+        await expect.poll(() => paginatedTable.getColumnValues('Host')).toEqual(['host-0.test']);
+        await expect.poll(() => paginatedTable.getColumnValues('Uptime')).toEqual(['5:00']);
+        await paginatedTable.getControls().setRefreshInterval('None');
+        await expect.poll(() => paginatedTable.getControls().getRefreshInterval()).toBe('None');
 
-        const initialUptimeValues = await paginatedTable.getColumnValues('Uptime');
-        await page.waitForTimeout(2000); // Wait for some time to pass
-        await paginatedTable.getControls().clickRefreshButton();
-        await paginatedTable.waitForTableData();
-
-        const updatedUptimeValues = await paginatedTable.getColumnValues('Uptime');
-        expect(updatedUptimeValues).not.toEqual(initialUptimeValues);
+        useUpdatedStartTime = true;
+        const refreshRequest = page.waitForRequest((request) => {
+            const url = new URL(request.url());
+            return (
+                url.pathname === '/viewer/json/nodes' &&
+                Number(url.searchParams.get('offset')) === 0 &&
+                Number(url.searchParams.get('limit')) > 0
+            );
+        });
+        try {
+            await paginatedTable.getControls().clickRefreshButton();
+            const request = await refreshRequest;
+            expect(await paginatedTable.getColumnValues('Uptime')).toEqual(['5:00']);
+            refreshGate.resolve();
+            const response = await request.response();
+            expect(response?.ok()).toBe(true);
+            await expect.poll(() => paginatedTable.getColumnValues('Uptime')).toEqual(['1:00']);
+            expect(await paginatedTable.getColumnValues('Host')).toEqual(['host-0.test']);
+        } finally {
+            refreshGate.resolve();
+        }
     });
 
     test('Row data can be retrieved correctly', async ({page}) => {
