@@ -17,7 +17,15 @@ export class Describe extends BaseModel {
         return this.selector.getByText(value, {exact: true});
     }
 
+    getFullValueDialog() {
+        return this.page.getByRole('dialog').filter({hasText: 'Full value'});
+    }
+
     async toggleField(name: string) {
+        await this.getFieldRow(name).getByRole('button').click();
+    }
+
+    async openFullValue(name: string) {
         await this.getFieldRow(name).getByRole('button').click();
     }
 }

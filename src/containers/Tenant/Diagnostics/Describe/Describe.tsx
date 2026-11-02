@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {JsonViewer} from '../../../../components/JsonViewer/JsonViewer';
 import {Loader} from '../../../../components/Loader';
@@ -9,6 +11,15 @@ import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import './Describe.scss';
 
 const b = cn('ydb-describe');
+
+// react-unipika keeps the Full value dialog in its internal state when the viewer value changes
+// and has no API to close it, so close it the same way a user would.
+function closeFullValueDialog() {
+    const dialog = document
+        .querySelector('.g-ru-full-value-dialog__full-value')
+        ?.closest('[role="dialog"]');
+    dialog?.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
+}
 
 interface IDescribeProps {
     path: string;
@@ -25,6 +36,11 @@ const Describe = ({path, database, databaseFullPath, scrollContainerRef}: IDescr
         {path, database, databaseFullPath, useMetaProxy},
         {pollingInterval: autoRefreshInterval},
     );
+
+    // The viewer stays mounted between objects, so its Full value dialog must not outlive the object.
+    React.useEffect(() => {
+        closeFullValueDialog();
+    }, [path, database]);
 
     const loading = isFetching && currentData === undefined;
 
