@@ -31,6 +31,7 @@ import {getInfoTabLinks} from '../../../../utils/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
+import {useDatabaseHealthcheckAvailable} from '../../../../utils/hooks/useDatabaseHealthcheckAvailable';
 import {useDatabasesV2} from '../../../../utils/hooks/useDatabasesV2';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
 import {useTenantPage} from '../../TenantNavigation/useTenantNavigation';
@@ -62,18 +63,6 @@ interface TenantOverviewProps {
 
 function isTenantLoading(isFetching: boolean, tenant: TTenant | undefined, error: unknown) {
     return isFetching && tenant === undefined && !error;
-}
-
-function shouldSkipHealthcheck({
-    isServerless,
-    isV2NavigationEnabled,
-    tenant,
-}: {
-    isServerless: boolean;
-    isV2NavigationEnabled: boolean;
-    tenant?: TTenant;
-}) {
-    return isServerless || isV2NavigationEnabled || tenant === undefined;
 }
 
 function getDatabaseStatus(overall?: EFlag, selfCheckResult?: SelfCheckResult) {
@@ -126,20 +115,6 @@ function TenantName({
 
 function renderTenantError(error: unknown, defaultMessage: string) {
     return error ? <ResponseError error={error} defaultMessage={defaultMessage} /> : null;
-}
-
-function renderHealthcheckPreview({
-    database,
-    isServerless,
-    isV2NavigationEnabled,
-}: {
-    database: string;
-    isServerless: boolean;
-    isV2NavigationEnabled: boolean;
-}) {
-    return !isServerless && !isV2NavigationEnabled ? (
-        <HealthcheckPreview database={database} />
-    ) : null;
 }
 
 function renderOverviewHead({
@@ -308,6 +283,8 @@ export function TenantOverview({
     const tenantLoading = isTenantLoading(isFetching, tenant, error);
     const {Name, Type, Overall, CoresTotal} = tenant || {};
     const isServerless = Type === 'Serverless';
+    const healthcheckAvailable = useDatabaseHealthcheckAvailable(Type);
+    const showHealthcheck = healthcheckAvailable && !isV2NavigationEnabled;
 
     // Use healthcheck self_check_result as the database status color when available;
     // fall back to tenantinfo.Overall (e.g. for Serverless databases where healthcheck is skipped).
@@ -317,7 +294,7 @@ export function TenantOverview({
     const {currentData: healthcheckData} = healthcheckApi.useGetHealthcheckInfoQuery(
         {database, clusterName},
         {
-            skip: shouldSkipHealthcheck({isServerless, isV2NavigationEnabled, tenant}),
+            skip: !showHealthcheck || tenant === undefined,
         },
     );
     const databaseStatus = getDatabaseStatus(Overall, healthcheckData?.self_check_result);
@@ -404,11 +381,7 @@ export function TenantOverview({
                             tenantType,
                         })}
                         <Flex direction="column" gap={4}>
-                            {renderHealthcheckPreview({
-                                database,
-                                isServerless,
-                                isV2NavigationEnabled,
-                            })}
+                            {showHealthcheck && <HealthcheckPreview database={database} />}
                             <QueriesActivityBar database={database} />
                             <MetricsTabs
                                 metrics={metricOverview}

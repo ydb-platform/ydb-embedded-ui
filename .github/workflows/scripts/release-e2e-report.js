@@ -2,7 +2,12 @@ const {execFileSync} = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const {IMAGE_REPOSITORY, readGithub} = require('./resolve-release-ui');
+const {
+    IMAGE_REPOSITORY,
+    readGithub,
+    SHA_PATTERN,
+    PLAYWRIGHT_VERSION_PATTERN,
+} = require('./resolve-release-ui');
 
 function verifyImage(provenance, container, image) {
     if (
@@ -29,7 +34,7 @@ async function readReportSource({runId, repository, workflowSha}, github = readG
         run.path !== '.github/workflows/release-e2e.yml' ||
         run.event !== 'workflow_dispatch' ||
         run.head_branch !== 'main' ||
-        !/^[a-f0-9]{40}$/.test(run.head_sha || '') ||
+        !SHA_PATTERN.test(run.head_sha || '') ||
         !Number.isInteger(run.run_attempt) ||
         run.run_attempt < 1
     ) {
@@ -76,13 +81,14 @@ async function readReportSource({runId, repository, workflowSha}, github = readG
 function prepareReport(provenance, source) {
     if (
         !provenance ||
-        !/^[a-f0-9]{40}$/.test(provenance.ui_sha || '') ||
-        !/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/.test(provenance.playwright_version || '') ||
+        !SHA_PATTERN.test(provenance.ui_sha || '') ||
+        !SHA_PATTERN.test(provenance.tests_sha ?? provenance.ui_sha) ||
+        !PLAYWRIGHT_VERSION_PATTERN.test(provenance.playwright_version || '') ||
         provenance.workflow_sha !== source.source_workflow_sha
     ) {
         throw new Error('Missing or invalid provenance for the source release run');
     }
-    return provenance;
+    return {...provenance, tests_sha: provenance.tests_sha ?? provenance.ui_sha};
 }
 
 function collectReports(directory, destination) {
@@ -125,7 +131,11 @@ function sanitizeArtifacts(directory) {
 }
 
 function summarize(report, provenance, {shards, jobs, artifacts, merge}) {
-    const frontend = provenance ? `Frontend: ${provenance.frontend_mode ?? 'image'}.\n\n` : '';
+    const formatSha = (value) =>
+        typeof value === 'string' && SHA_PATTERN.test(value) ? value : 'unavailable';
+    const frontend = provenance
+        ? `Frontend: ${provenance.frontend_mode ?? 'image'}. UI: ${formatSha(provenance.ui_sha)}. Tests: ${formatSha(provenance.tests_sha ?? provenance.ui_sha)}.\n\n`
+        : '';
     const problems = [];
     if (shards !== 8) {
         problems.push(`Reports received from ${shards}/8 shards`);
@@ -190,7 +200,7 @@ async function main() {
         );
         fs.appendFileSync(
             process.env.GITHUB_OUTPUT,
-            `ui_sha=${provenance.ui_sha}\nplaywright_version=${provenance.playwright_version}\n`,
+            `ui_sha=${provenance.ui_sha}\ntests_sha=${provenance.tests_sha}\nplaywright_version=${provenance.playwright_version}\n`,
         );
     } else if (command === 'verify') {
         const provenance = JSON.parse(fs.readFileSync(args[0], 'utf8'));

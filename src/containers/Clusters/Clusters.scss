@@ -3,19 +3,37 @@
 .ydb-clusters {
     @include mixins.body-2-typography();
 
-    &__controls {
-        padding-bottom: var(--g-spacing-2);
-    }
-
     &__clusters-count {
         padding-bottom: var(--g-spacing-2);
     }
 
-    &__cluster-name {
-        white-space: normal;
-        text-decoration: none;
+    &__availability-popup .g-select-list__option {
+        align-items: flex-start;
 
-        color: var(--g-color-text-link);
+        padding-block: var(--g-spacing-2);
+    }
+
+    &__cluster-name-wrapper {
+        min-width: 0;
+    }
+
+    &__cluster-name {
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    &__unavailable-label {
+        display: inline-flex;
+        flex-shrink: 0;
+
+        border-radius: var(--g-focus-border-radius);
+
+        &:focus-visible {
+            outline: 2px solid var(--g-color-line-focus);
+            outline-offset: 2px;
+        }
     }
     &__cluster-versions {
         text-decoration: none;

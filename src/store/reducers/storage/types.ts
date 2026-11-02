@@ -16,6 +16,7 @@ export type StorageType = z.infer<typeof storageTypeSchema>;
 
 export interface PreparedStorageNodeFilters {
     searchValue: string;
+    hideUnavailable?: boolean;
     nodesUptimeFilter: NodesUptimeFilterValues;
     visibleEntities: VisibleEntities;
 

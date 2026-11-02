@@ -1,4 +1,8 @@
+@use '../../styles/mixins.scss';
+
 .ydb-vdisk-page {
+    --sticky-tabs-height: 40px;
+    --data-table-start: var(--sticky-tabs-height);
     --g-definition-list-item-gap: var(--g-spacing-3);
     position: relative;
 
@@ -6,9 +10,8 @@
     overflow-anchor: none;
 
     height: 100%;
-    padding: 20px 20px 0;
+    padding: 0 20px;
 
-    &__meta,
     &__title,
     &__controls,
     &__storage-details,
@@ -36,8 +39,8 @@
         min-width: 0;
     }
 
-    &__refresh-control {
-        flex-shrink: 0;
+    &__title {
+        padding-right: 125px;
     }
 
     &__controls {
@@ -53,5 +56,21 @@
 
     &__tablets-content {
         margin-top: var(--g-spacing-4);
+
+        .data-table__sticky_moving {
+            // Override the table's inline sticky offset.
+            top: var(--sticky-tabs-height) !important;
+        }
+    }
+
+    &__tabs {
+        z-index: 3;
+
+        height: var(--sticky-tabs-height);
+        margin-bottom: 0;
+        padding-right: 125px;
+
+        @include mixins.sticky-top();
+        @include mixins.tabs-wrapper-styles();
     }
 }

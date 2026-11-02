@@ -6,24 +6,30 @@ import {ResponseError} from '../../../components/Errors/ResponseError';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
-import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
+import {
+    NODES_COLUMNS_TITLES,
+    NODES_COLUMNS_TO_DATA_FIELDS,
+} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {nodesApi} from '../../../store/reducers/nodes/nodes';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
-import type {NodesGroupByField, NodesPeerRole} from '../../../types/api/nodes';
+import type {NodesGroupByField, NodesPeerRole, NodesRequiredField} from '../../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
+import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
 import {TableGroup} from '../../Storage/TableGroup/TableGroup';
 import {useExpandedGroups} from '../../Storage/TableGroup/useExpandedTableGroups';
 import {NodesControls} from '../NodesControls/NodesControls';
 import {NodesTable} from '../NodesTable';
 import i18n from '../i18n';
 import {b} from '../shared';
-import {useDebouncedSearch} from '../useDebouncedSearch';
 import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
+
+const NODE_SEARCH_FIELDS_REQUIRED = new Set<NodesRequiredField>(['Host', 'NodeName']);
 
 interface NodeGroupProps {
     name: string;
@@ -124,9 +130,9 @@ export function GroupedNodesComponent({
         groupByParams,
         withPeerRoleFilter,
     );
-    const searchFilter = useDebouncedSearch(searchValue);
     const useMetaProxy = useClusterWithProxy();
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const {hideUnavailable} = useHideUnavailableNodes();
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         columns,
@@ -135,6 +141,15 @@ export function GroupedNodesComponent({
         defaultColumnsIds,
         requiredColumnsIds,
     );
+
+    const searchFieldsRequired = React.useMemo(() => {
+        const activeFieldsRequired = getRequiredDataFields(
+            columnsToShow.map(({name}) => name),
+            NODES_COLUMNS_TO_DATA_FIELDS,
+        );
+
+        return activeFieldsRequired.filter((field) => NODE_SEARCH_FIELDS_REQUIRED.has(field));
+    }, [columnsToShow]);
 
     const schemaPathParam = React.useMemo(() => {
         if (!isNil(path) && !isNil(databaseFullPath)) {
@@ -147,9 +162,11 @@ export function GroupedNodesComponent({
         {
             path: schemaPathParam,
             database,
-            filter: searchFilter.trim(),
+            alive: hideUnavailable || undefined,
+            filter: searchValue.trim(),
             filter_peer_role: peerRoleFilter,
             group: groupByParam,
+            fieldsRequired: searchValue.trim() ? searchFieldsRequired : undefined,
             limit: 0,
         },
         {
@@ -187,7 +204,7 @@ export function GroupedNodesComponent({
                         path={path}
                         databaseFullPath={databaseFullPath}
                         database={database}
-                        searchValue={searchFilter}
+                        searchValue={searchValue}
                         peerRoleFilter={peerRoleFilter}
                         groupByParam={groupByParam}
                         columns={columnsToShow}
@@ -227,7 +244,7 @@ export function GroupedNodesComponent({
             table={renderGroups()}
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchFilter, groupByParam, tableGroups, peerRoleFilter],
+                scrollDependencies: [searchValue, groupByParam, tableGroups, peerRoleFilter],
                 loading: isLoading,
                 className: b('groups-wrapper'),
             }}

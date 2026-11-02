@@ -106,6 +106,10 @@ export const useStorageGroupsHandlerHasGrouping = () => {
     return useGetFeatureVersion('/storage/groups') > 4;
 };
 
+export const useViewerNodesAliveFilterAvailable = () => {
+    return useGetFeatureVersion('/viewer/nodes/alive') >= 1;
+};
+
 export const useViewerNodesHandlerHasGrouping = () => {
     return useGetFeatureVersion('/viewer/nodes') > 6;
 };

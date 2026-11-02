@@ -334,10 +334,11 @@ export const VDisk = ({
             onShowPopup={onShowPopup}
             onHidePopup={onHidePopup}
             onClosePopup={onClosePopup}
-            renderPopupContent={({onClose}) => (
+            renderPopupContent={({onClose, holdOpen}) => (
                 <VDiskPopup
                     data={hidePDiskInPopup ? {...data, PDisk: undefined} : data}
                     onClose={onClose}
+                    onDialogOpen={holdOpen}
                 />
             )}
             offset={popupOffset}

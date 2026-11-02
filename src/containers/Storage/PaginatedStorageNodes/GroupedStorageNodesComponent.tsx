@@ -7,6 +7,7 @@ import {NODES_COLUMNS_TO_DATA_FIELDS} from '../../../components/nodesColumns/con
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {NodesGroupByField, NodesRequiredField} from '../../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
+import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
@@ -105,6 +106,7 @@ export function GroupedStorageNodesComponent({
     scrollContainerRef,
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const {hideUnavailable} = useHideUnavailableNodes();
 
     const {nodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
         useStorageQueryParams();
@@ -131,6 +133,7 @@ export function GroupedStorageNodesComponent({
     const {currentData, isFetching, error} = storageApi.useGetStorageNodesInfoQuery(
         {
             database,
+            alive: hideUnavailable || undefined,
             with: 'all',
             filter: nodesSearchValue.trim(),
             node_id: nodeId,

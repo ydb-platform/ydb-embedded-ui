@@ -140,14 +140,14 @@ const TenantsTableContent = ({
         {clusterName, environmentName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
-    const loading = isFetching && currentData === undefined;
 
     // Track sort state for scroll dependencies
     const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
     const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
 
-    const {domain: domainRoot, settings} = useClusterBaseInfo();
+    const {domain: domainRoot, settings, isResolved: isClusterInfoResolved} = useClusterBaseInfo();
+    const loading = (isFetching && currentData === undefined) || !isClusterInfoResolved;
 
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
@@ -172,6 +172,8 @@ const TenantsTableContent = ({
         return filteredBySearch;
     }, [tenants, withProblems, search, showWithProblemsFilter]);
 
+    const useMetaProxySetting = settings?.use_meta_proxy;
+    const useDatabaseIdSetting = settings?.use_database_id;
     const tenantLinks = React.useMemo(
         () =>
             new Map(
@@ -181,18 +183,29 @@ const TenantsTableContent = ({
                         tenant,
                         additionalTenantsProps,
                         externalLink: Boolean(environmentName),
-                        useDatabaseId:
-                            uiFactory.useDatabaseId && settings?.use_meta_proxy !== false,
+                        useDatabaseId: uiFactory.useDatabaseId,
+                        isMetaDatabasesAvailable,
+                        settings: {
+                            use_meta_proxy: useMetaProxySetting,
+                            use_database_id: useDatabaseIdSetting,
+                        },
                     }),
                 ]),
             ),
-        [tenants, additionalTenantsProps, environmentName, settings?.use_meta_proxy],
+        [
+            tenants,
+            additionalTenantsProps,
+            environmentName,
+            isMetaDatabasesAvailable,
+            useMetaProxySetting,
+            useDatabaseIdSetting,
+        ],
     );
 
     const openTenant = React.useCallback(
         (tenant: PreparedTenant) => {
             const link = tenantLinks.get(tenant);
-            if (!link) {
+            if (!isClusterInfoResolved || !link) {
                 return;
             }
             if (link.isExternalLink) {
@@ -202,7 +215,7 @@ const TenantsTableContent = ({
 
             history.push(link.href);
         },
-        [tenantLinks, history],
+        [tenantLinks, history, isClusterInfoResolved],
     );
 
     const renderCreateDBButton = () => {

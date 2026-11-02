@@ -106,6 +106,45 @@ describe('tenantApi.getTenantInfo', () => {
         });
     });
 
+    test.each([false, true])(
+        'selects a non-first database by CP ID from an unfiltered meta response (V2=%s)',
+        async (isMetaDatabasesAvailable) => {
+            const firstTenant: TTenant = {
+                Id: 'viewer-first',
+                Name: '/local/first',
+                ControlPlane: {id: 'cp-first'},
+            };
+            const matchingTenant: TTenant = {
+                Id: 'viewer-second',
+                Name: '/local/second',
+                ControlPlane: {id: 'cp-second'},
+            };
+            const getTenants = jest
+                .fn()
+                .mockResolvedValue({TenantInfo: [firstTenant, matchingTenant]});
+            window.api = {
+                meta: {getTenants, getTenantsV2: getTenants},
+            } as unknown as YdbEmbeddedAPI;
+            const store = createTestStore();
+
+            const result = await store.dispatch(
+                tenantApi.endpoints.getTenantInfo.initiate(
+                    {database: 'cp-second', clusterName: 'test-cluster', isMetaDatabasesAvailable},
+                    {subscribe: false},
+                ),
+            );
+
+            expect(getTenants).toHaveBeenCalledWith(
+                {database: 'cp-second', clusterName: 'test-cluster'},
+                expect.objectContaining({signal: expect.any(AbortSignal)}),
+            );
+            expect(result).toMatchObject({
+                status: 'fulfilled',
+                data: expect.objectContaining(matchingTenant),
+            });
+        },
+    );
+
     test('uses the first database for the legacy meta path when no exact match exists', async () => {
         const firstTenant: TTenant = {Id: '/local/first', Name: '/local/first'};
         const secondTenant: TTenant = {Id: '/local/second', Name: '/local/second'};

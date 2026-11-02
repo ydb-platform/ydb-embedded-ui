@@ -22,7 +22,8 @@ interface EvictVDiskButtonProps {
     donorMode?: boolean;
     fullWidth?: boolean;
     view?: ButtonProps['view'];
-    onSuccess?: () => void;
+    onSuccess?: (isDialogOpen: boolean) => void;
+    onDialogOpen?: () => VoidFunction;
 }
 
 export function isAllVdiskParamsDefined(vDiskId?: TVDiskID): vDiskId is Required<TVDiskID> {
@@ -41,6 +42,7 @@ export const EvictVDiskButton = ({
     fullWidth,
     view = 'normal',
     onSuccess,
+    onDialogOpen,
 }: EvictVDiskButtonProps) => {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const newDiskApiAvailable = useDiskPagesAvailable();
@@ -83,6 +85,7 @@ export const EvictVDiskButton = ({
         <ButtonWithConfirmDialog
             onConfirmAction={handleEvictVDisk}
             onConfirmActionSuccess={onSuccess}
+            onDialogOpen={onDialogOpen}
             buttonDisabled={!isUserAllowedToMakeChanges || donorMode}
             buttonView={view}
             buttonClassName={view === 'action' ? BRAND_BUTTON_CLASS : undefined}

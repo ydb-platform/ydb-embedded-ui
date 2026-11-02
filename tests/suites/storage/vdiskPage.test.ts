@@ -599,7 +599,7 @@ test.describe('VDisk page storage tab', () => {
         await expect(page).toHaveScreenshot('vdisk-stack-expanded.png', {clip: backgroundBox!});
     });
 
-    test('Go to PDisk navigates to PDisk page', async ({page, baseURL}) => {
+    test('Go to PDisk navigates to PDisk page', async ({page}) => {
         await page.setViewportSize({width: 1440, height: 900});
         await page.addInitScript(() => {
             localStorage.setItem('theme', JSON.stringify('light'));
@@ -607,17 +607,14 @@ test.describe('VDisk page storage tab', () => {
         await enableBlobStorageCapacityMetrics(page);
         await setupVDiskPageMocks(page);
         await setupPDiskInfoMock(page, {withCapacityMetrics: true});
-        // Replace the initial about:blank entry to model opening the page without history.
-        await page.evaluate(
-            (url) => window.location.replace(url),
-            new URL(VDISK_PAGE_PATH, baseURL).href,
-        );
+        await page.goto(VDISK_PAGE_PATH);
 
         const storageDetails = page.locator('.ydb-vdisk-storage-details');
         const goToPDiskLink = storageDetails.getByRole('link', {name: 'Go to PDisk'});
+        const backButton = page.getByRole('button', {name: 'Back', exact: true});
 
         await expect(goToPDiskLink).toBeVisible();
-        await expect(page.getByRole('button', {name: 'Back', exact: true})).toHaveCount(0);
+        await expect(backButton).toHaveCount(0);
         const autoRefreshControl = page.locator('.auto-refresh-control');
         const refreshButton = autoRefreshControl.getByRole('button', {
             name: 'Refresh',
@@ -643,11 +640,14 @@ test.describe('VDisk page storage tab', () => {
         await expect(page.locator('.ydb-pdisk-page__info')).toBeVisible();
         await expect(page.locator('.ydb-pdisk-space-distribution')).toBeVisible();
         await expect(page.getByText('Space distribution', {exact: true})).toBeVisible();
+        await expect(backButton).toHaveCount(0);
 
         const pDiskPage = page.locator('.ydb-pdisk-page');
-        await expect(
-            pDiskPage.getByRole('heading', {name: `PDisk ${NODE_ID}-${PDISK_ID}`, exact: true}),
-        ).toBeVisible();
+        const pDiskHeading = pDiskPage.getByRole('heading', {
+            name: `PDisk ${NODE_ID}-${PDISK_ID}`,
+            exact: true,
+        });
+        await expect(pDiskHeading).toBeVisible();
         await expect(pDiskPage.getByText('PDisk Usage', {exact: true})).toBeVisible();
         const header = page.locator('header.header');
         const copyPDiskId = header.getByRole('button', {
@@ -697,12 +697,63 @@ test.describe('VDisk page storage tab', () => {
         }
         await closeDiskPopup(page, logPopup);
 
+        await page.setViewportSize({width: 1440, height: 400});
+        await pDiskPage.evaluate((element) => element.scrollTo({top: 0}));
+        await expect(pDiskHeading).toBeInViewport();
+        const refreshInterval = autoRefreshControl.getByTestId('ydb-autorefresh-select');
+        const refreshBox = await autoRefreshControl.boundingBox();
+        expect(refreshBox).not.toBeNull();
+
+        await pDiskPage.evaluate((element) => element.scrollTo({top: element.scrollHeight}));
+        await expect
+            .poll(() => pDiskPage.evaluate((element) => element.scrollTop))
+            .toBeGreaterThan(0);
+        await expect(pDiskHeading).not.toBeInViewport();
+        await expect(refreshButton).toBeInViewport({ratio: 1});
+        await expect(refreshInterval).toBeInViewport({ratio: 1});
+        await expect.poll(() => autoRefreshControl.boundingBox()).toEqual(refreshBox);
+
+        const refreshResponse = page.waitForResponse((response) => {
+            const url = new URL(response.url());
+            return (
+                url.pathname.endsWith('/pdisk/info') &&
+                url.searchParams.get('node_id') === NODE_ID &&
+                url.searchParams.get('pdisk_id') === PDISK_ID
+            );
+        });
+        await refreshButton.click();
+        expect((await refreshResponse).ok()).toBe(true);
+
+        await refreshInterval.click();
+        await page.getByRole('option', {name: '15 sec', exact: true}).click();
+        await expect(refreshInterval).toHaveText('15 sec');
+        await expect(refreshButton).toBeInViewport({ratio: 1});
+        await expect(refreshInterval).toBeInViewport({ratio: 1});
+        await expect.poll(() => autoRefreshControl.boundingBox()).toEqual(refreshBox);
+        await expect
+            .poll(() => pDiskPage.evaluate((element) => element.scrollTop))
+            .toBeGreaterThan(0);
+
+        await refreshInterval.click();
+        await page.getByRole('option', {name: 'None', exact: true}).click();
+        await expect(refreshInterval).toHaveText('None');
+        await page.setViewportSize({width: 1440, height: 900});
+
         const pDiskUrl = page.url();
-        await page.goto(VDISK_PAGE_PATH);
+        await page.goBack();
+        await expect(goToPDiskLink).toBeVisible();
         await expect(refreshButton).toBeVisible();
         await expect(autoRefreshControl.getByTestId('ydb-autorefresh-select')).toBeVisible();
-        await page.getByRole('button', {name: 'Back', exact: true}).click();
+        await expect(backButton).toHaveCount(0);
+        await page.reload();
+        await expect(goToPDiskLink).toBeVisible();
+        await expect(backButton).toHaveCount(0);
+
+        await page.goForward();
         await expect(page).toHaveURL(pDiskUrl);
+        await expect(backButton).toHaveCount(0);
+        await page.reload();
+        await expect(backButton).toHaveCount(0);
     });
 });
 
@@ -960,6 +1011,127 @@ test.describe('Storage disk popup snapshots', () => {
         });
     }
 
+    for (const disk of ['PDisk', 'VDisk'] as const) {
+        for (const reason of ['hover', 'Escape'] as const) {
+            test(`${disk} popup return during ${reason} exit`, async ({page}) => {
+                await page.setViewportSize({width: 1500, height: 1000});
+                await setupVDiskPageMocks(page);
+                await page.goto(VDISK_PAGE_PATH);
+                await new ClusterStorageTable(page).waitForTableData();
+                const anchor = page
+                    .locator(
+                        disk === 'PDisk'
+                            ? '.ydb-storage-disks__pdisk-progress-bar'
+                            : '.ydb-storage-vdisks__wrapper .storage-disk-progress-bar',
+                    )
+                    .first();
+                await anchor.hover();
+                const popup = await waitForDiskPopup(page, `Go to ${disk}`);
+                const action = popup.getByRole('link', {name: `Go to ${disk}`, exact: true});
+                await expect(action).toHaveAttribute('href', new RegExp(`nodeId=${NODE_ID}`));
+                const box = await action.boundingBox();
+                if (!box) {
+                    throw new Error('Popup action has no bounding box');
+                }
+                await page.clock.install({time: new Date('2026-01-01T00:00:00Z')});
+                await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
+                await page.mouse.move(0, 0);
+                if (reason === 'Escape') {
+                    await page.keyboard.press('Escape');
+                    await page.clock.runFor(25);
+                } else {
+                    await page.clock.runFor(DISKS_POPUP_DEBOUNCE_TIMEOUT + 25);
+                }
+                // The popup is logically closed but still visible during its exit animation.
+                await expect(popup).toBeVisible();
+                await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+                await page.clock.runFor(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+                // Only the return during the exit animation needs a paused clock.
+                await page.clock.resume();
+                if (reason === 'hover') {
+                    await expect(popup).toBeVisible();
+                    await expect(action).toHaveAttribute('href', new RegExp(`nodeId=${NODE_ID}`));
+                    await page.mouse.move(0, 0);
+                }
+                await expect(popup).toBeHidden();
+                await anchor.hover();
+                await expect(popup).toBeVisible();
+            });
+        }
+    }
+
+    for (const disk of ['PDisk', 'VDisk'] as const) {
+        test(`keeps ${disk} popup pinned after contextmenu until focus leaves`, async ({page}) => {
+            await page.setViewportSize({width: 1500, height: 1000});
+            await setupVDiskPageMocks(page);
+            await page.goto(VDISK_PAGE_PATH);
+            await new ClusterStorageTable(page).waitForTableData();
+            await page
+                .locator(
+                    disk === 'PDisk'
+                        ? '.ydb-storage-disks__pdisk-progress-bar'
+                        : '.ydb-storage-vdisks__wrapper .storage-disk-progress-bar',
+                )
+                .first()
+                .hover();
+            const popup = await waitForDiskPopup(page, `Go to ${disk}`);
+            const action = popup.getByRole('link', {name: `Go to ${disk}`, exact: true});
+            await action.focus();
+            // Exercise the app's pinning independently of the browser's native menu.
+            await action.dispatchEvent('contextmenu');
+            await expect(action).toBeFocused();
+            await page.mouse.move(0, 0);
+            await page.waitForTimeout(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+            await expect(popup).toBeVisible();
+            await page.getByRole('textbox', {name: 'Group ID, Pool name', exact: true}).focus();
+            await expect(popup).toBeHidden();
+        });
+    }
+
+    for (const disk of ['PDisk', 'VDisk'] as const) {
+        for (const outsideTarget of ['input', 'background'] as const) {
+            test(`releases ${disk} contextmenu pin on ${outsideTarget} click without a popup blur`, async ({
+                page,
+            }) => {
+                await page.setViewportSize({width: 1500, height: 1000});
+                await setupVDiskPageMocks(page);
+                await page.goto(VDISK_PAGE_PATH);
+                await new ClusterStorageTable(page).waitForTableData();
+                const search = page.getByRole('textbox', {
+                    name: 'Group ID, Pool name',
+                    exact: true,
+                });
+                await search.focus();
+                const anchor = page
+                    .locator(
+                        disk === 'PDisk'
+                            ? '.ydb-storage-disks__pdisk-progress-bar'
+                            : '.ydb-storage-vdisks__wrapper .storage-disk-progress-bar',
+                    )
+                    .first();
+                await anchor.hover();
+                const popup = await waitForDiskPopup(page, `Go to ${disk}`);
+                const id = disk === 'PDisk' ? `${NODE_ID}-${PDISK_ID}` : VDISK_ID;
+                // The plain header does not take focus, so clicking outside cannot blur it.
+                await popup.getByText(id, {exact: true}).dispatchEvent('contextmenu');
+                await expect(search).toBeFocused();
+                await page.mouse.move(0, 0);
+                await page.waitForTimeout(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+                await expect(popup).toBeVisible();
+                if (outsideTarget === 'input') {
+                    await search.click();
+                } else {
+                    await page.mouse.click(0, 0);
+                }
+                await expect(popup).toBeHidden();
+                await expect(anchor).toBeVisible();
+                await anchor.hover();
+                await expect(popup).toBeVisible();
+                await closeDiskPopup(page, popup);
+            });
+        }
+    }
+
     test('renders redesigned VDisk popup actions', async ({page}) => {
         await page.setViewportSize({width: 1500, height: 1000});
         await setupVDiskPageMocks(page);
@@ -1040,6 +1212,112 @@ test.describe('Storage disk popup snapshots', () => {
             await expectDefinitionListRowPlaceholder(popup, field);
         }
         await expect(popup).toHaveScreenshot('unavailable-donor-popup.png');
+    });
+
+    for (const pointerTarget of ['outside', 'popup', 'anchor'] as const) {
+        test(`resumes VDisk popup hover after closing eviction dialog with pointer on ${pointerTarget}`, async ({
+            page,
+        }) => {
+            await page.setViewportSize({width: 1500, height: 1000});
+            await setupVDiskPageMocks(page);
+            await setupDiskNodeMetadataMock(page, {});
+            await page.goto(VDISK_PAGE_PATH);
+            await new ClusterStorageTable(page).waitForTableData();
+
+            const vDisk = page
+                .locator(
+                    `.ydb-storage-vdisks__wrapper [data-disk-id="${VDISK_ID}"] .storage-disk-progress-bar`,
+                )
+                .first();
+            await vDisk.hover();
+            const popup = page.locator('.vdisk-storage-popup').filter({hasText: VDISK_ID}).last();
+            await expect(popup).toBeVisible();
+            const anchorBox = await vDisk.boundingBox();
+            const popupBox = await popup.boundingBox();
+            if (!anchorBox || !popupBox) {
+                throw new Error('VDisk anchor or popup has no bounding box');
+            }
+
+            await popup.getByRole('button', {name: 'Evict VDisk', exact: true}).click();
+            const dialog = page.getByRole('dialog');
+            await expect(dialog).toBeVisible();
+            // Events from the nested dialog must not replace the card's active hold.
+            const cancel = dialog.getByRole('button', {name: 'Cancel', exact: true});
+            await cancel.focus();
+            await cancel.dispatchEvent('contextmenu');
+            if (pointerTarget === 'anchor') {
+                await page.mouse.move(
+                    anchorBox.x + anchorBox.width / 2,
+                    anchorBox.y + anchorBox.height / 2,
+                );
+            } else if (pointerTarget === 'popup') {
+                await page.mouse.move(popupBox.x + 8, popupBox.y + 8);
+            } else {
+                await page.mouse.move(0, 0);
+            }
+            await dialog.getByRole('button', {name: 'Evict', exact: true}).focus();
+            // The nested dialog must outlive the card's normal hover close delay.
+            await page.waitForTimeout(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+            await expect(dialog).toBeVisible();
+            await expect(popup).toBeVisible();
+            await page.keyboard.press('Escape');
+            await expect(dialog).toBeHidden();
+
+            if (pointerTarget !== 'outside') {
+                await page.waitForTimeout(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+                await expect(popup).toBeVisible();
+                await page.mouse.move(0, 0);
+            }
+            await expect(popup).toBeHidden();
+            await vDisk.hover();
+            await expect(popup).toBeVisible();
+            await closeDiskPopup(page, popup);
+        });
+    }
+
+    test('opens a persistent eviction dialog from a card that is already closing', async ({
+        page,
+    }) => {
+        await page.setViewportSize({width: 1500, height: 1000});
+        await setupVDiskPageMocks(page);
+        await page.goto(VDISK_PAGE_PATH);
+        await new ClusterStorageTable(page).waitForTableData();
+        const disk = page
+            .locator(
+                `.ydb-storage-vdisks__wrapper [data-disk-id="${VDISK_ID}"] .storage-disk-progress-bar`,
+            )
+            .first();
+        await disk.hover();
+        const popup = page.locator('.vdisk-storage-popup').filter({hasText: VDISK_ID}).last();
+        await expect(popup).toBeVisible();
+        const buttonBox = await popup
+            .getByRole('button', {name: 'Evict VDisk', exact: true})
+            .boundingBox();
+        if (!buttonBox) {
+            throw new Error('Evict button has no bounding box');
+        }
+        await page.clock.install({time: new Date('2026-01-01T00:00:00Z')});
+        await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
+        await page.mouse.move(0, 0);
+        // The close delay elapsed, but the card is still visible during its exit animation.
+        await page.clock.runFor(DISKS_POPUP_DEBOUNCE_TIMEOUT + 25);
+        await expect(popup).toBeVisible();
+        await page.mouse.click(
+            buttonBox.x + buttonBox.width / 2,
+            buttonBox.y + buttonBox.height / 2,
+        );
+        await page.clock.runFor(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+        const dialog = page.getByRole('dialog');
+        await expect(dialog).toBeVisible();
+        await expect(popup).toBeVisible();
+        await page.mouse.move(0, 0);
+        await page.clock.runFor(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+        await expect(dialog).toBeVisible();
+        await expect(popup).toBeVisible();
+        await page.clock.resume();
+        await page.keyboard.press('Escape');
+        await expect(dialog).toBeHidden();
+        await expect(popup).toBeHidden();
     });
 
     test('closes VDisk popup after successful eviction', async ({page}) => {

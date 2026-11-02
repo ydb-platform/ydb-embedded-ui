@@ -14,6 +14,9 @@ jest.mock('../HealthcheckDrawer', () => ({
     HealthcheckDrawer: jest.fn(({children}: {children: React.ReactNode}) => children),
 }));
 jest.mock('../../../../../utils/hooks', () => ({useTypedSelector: () => undefined}));
+jest.mock('../../../../../utils/hooks/useWhoami', () => ({
+    useIsUserAllowedToMakeChanges: () => true,
+}));
 jest.mock('../../../TenantContext', () => ({useCurrentSchema: () => ({database: '/Root/db'})}));
 jest.mock('../../../useTenantQueryParams', () => ({
     useTenantQueryParams: () => ({

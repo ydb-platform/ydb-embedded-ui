@@ -29,6 +29,7 @@ export const getStorageNodes: FetchData<
     } = params;
     const {
         searchValue,
+        hideUnavailable,
         nodesUptimeFilter,
         visibleEntities,
         database,
@@ -51,6 +52,7 @@ export const getStorageNodes: FetchData<
         offset,
         sort,
         filter: searchValue?.trim(),
+        alive: hideUnavailable || undefined,
         uptime: getUptimeParamValue(nodesUptimeFilter),
         with: visibleEntities,
         database,

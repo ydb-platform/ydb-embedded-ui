@@ -1,5 +1,51 @@
 # Changelog
 
+## [22.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.6.0...v22.7.0) (2026-10-29)
+
+
+### Features
+
+* **databases:** use control plane ids from database records ([#4540](https://github.com/ydb-platform/ydb-embedded-ui/issues/4540)) ([62b2db3](https://github.com/ydb-platform/ydb-embedded-ui/commit/62b2db392f70fa02df2b46a2def61304aa860fd8))
+
+
+### Bug Fixes
+
+* preserve debounced search input across list updates ([#4530](https://github.com/ydb-platform/ydb-embedded-ui/issues/4530)) ([215fa6e](https://github.com/ydb-platform/ydb-embedded-ui/commit/215fa6e5abb19c3fcefac797225c971044597db8))
+
+## [22.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.5.0...v22.6.0) (2026-10-23)
+
+
+### Features
+
+* **nodes:** add capability-gated unavailable nodes filter ([#4510](https://github.com/ydb-platform/ydb-embedded-ui/issues/4510)) ([4d63ab2](https://github.com/ydb-platform/ydb-embedded-ui/commit/4d63ab2c4d6fe1c92bdd1b5506b89292a958e5a4))
+
+
+### Bug Fixes
+
+* keep entity page refresh controls visible ([#4489](https://github.com/ydb-platform/ydb-embedded-ui/issues/4489)) ([1296973](https://github.com/ydb-platform/ydb-embedded-ui/commit/1296973459caf945c0ff5893eecb215c275156e8))
+
+## [22.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.4.0...v22.5.0) (2026-10-22)
+
+
+### Features
+
+* **clusters:** add availability filtering and unavailable labels ([#4505](https://github.com/ydb-platform/ydb-embedded-ui/issues/4505)) ([4a1a6a3](https://github.com/ydb-platform/ydb-embedded-ui/commit/4a1a6a3ae5433b783aa59bcf37c7f26fce5e4e8c))
+* compact Healthcheck issue rows ([#4463](https://github.com/ydb-platform/ydb-embedded-ui/issues/4463)) ([74b270f](https://github.com/ydb-platform/ydb-embedded-ui/commit/74b270fa17a1d09f63af70c8e694ee6e6d24eecb))
+* redesign pdisk page ([#4497](https://github.com/ydb-platform/ydb-embedded-ui/issues/4497)) ([bbcfffb](https://github.com/ydb-platform/ydb-embedded-ui/commit/bbcfffbb797d6abe3673902ae2e2c07d75591c30))
+* redesign vdisk page ([#4476](https://github.com/ydb-platform/ydb-embedded-ui/issues/4476)) ([2a7fb43](https://github.com/ydb-platform/ydb-embedded-ui/commit/2a7fb43357d6bf91e8761ff74285aeee72dda09a))
+
+
+### Bug Fixes
+
+* **nodes:** keep search input stable during list updates ([#4496](https://github.com/ydb-platform/ydb-embedded-ui/issues/4496)) ([7f98709](https://github.com/ydb-platform/ydb-embedded-ui/commit/7f98709562b406e768845d1ea4e8b98e49ea7136))
+* restrict database healthcheck to monitoring users ([#4508](https://github.com/ydb-platform/ydb-embedded-ui/issues/4508)) ([f4d18ab](https://github.com/ydb-platform/ydb-embedded-ui/commit/f4d18aba1305a243e2a6ef5d40c358ddb339b06f))
+* **storage:** preserve missing group latency values ([#4500](https://github.com/ydb-platform/ydb-embedded-ui/issues/4500)) ([af4accd](https://github.com/ydb-platform/ydb-embedded-ui/commit/af4accd649572146dbb3418498dda4caa9eb101e))
+* **storage:** restore pdisk slot limits in groups ([#4488](https://github.com/ydb-platform/ydb-embedded-ui/issues/4488)) ([31fa39b](https://github.com/ydb-platform/ydb-embedded-ui/commit/31fa39b66fcecc4df6cbbffd9ed6a05115cd913a))
+* **storage:** show unavailable disk statuses in popups ([#4491](https://github.com/ydb-platform/ydb-embedded-ui/issues/4491)) ([1be9d03](https://github.com/ydb-platform/ydb-embedded-ui/commit/1be9d032801261807586540f572196f672c15308))
+* **storage:** stabilize disk popup hover and eviction dialogs ([#4493](https://github.com/ydb-platform/ydb-embedded-ui/issues/4493)) ([592c579](https://github.com/ydb-platform/ydb-embedded-ui/commit/592c579f8da0d5521dd7894a347bef82f6085509))
+* **storage:** support structured node location ([#4487](https://github.com/ydb-platform/ydb-embedded-ui/issues/4487)) ([3ba97a5](https://github.com/ydb-platform/ydb-embedded-ui/commit/3ba97a566a458e0669812107dc8d28d1ddca1561))
+* use system memory limits consistently in node views ([#4417](https://github.com/ydb-platform/ydb-embedded-ui/issues/4417)) ([edf1666](https://github.com/ydb-platform/ydb-embedded-ui/commit/edf16667b59255e0cf1da05b670d25aee4ace7d4))
+
 ## [22.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.3.0...v22.4.0) (2026-10-09)
 
 

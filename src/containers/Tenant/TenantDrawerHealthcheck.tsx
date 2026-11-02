@@ -5,6 +5,7 @@ import {
     selectCheckStatus,
 } from '../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {useTypedSelector} from '../../utils/hooks';
+import {useDatabaseHealthcheckAvailable} from '../../utils/hooks/useDatabaseHealthcheckAvailable';
 
 import {Healthcheck} from './Healthcheck/Healthcheck';
 import {HealthcheckDrawer} from './Healthcheck/components/HealthcheckDrawer';
@@ -19,12 +20,15 @@ interface TenantDrawerHealthcheckProps {
 }
 
 export function TenantDrawerHealthcheck({children, clusterName}: TenantDrawerHealthcheckProps) {
+    const healthcheckAvailable = useDatabaseHealthcheckAvailable();
     const {database} = useCurrentSchema();
     const {
         handleShowHealthcheckChange,
         showHealthcheck,
         handleIssuesFilterChange,
         handleHealthcheckViewChange,
+        issuesFilter,
+        view,
     } = useTenantQueryParams();
 
     const healthcheckStatus = useTypedSelector((state) =>
@@ -41,6 +45,15 @@ export function TenantDrawerHealthcheck({children, clusterName}: TenantDrawerHea
         handleHealthcheckViewChange(undefined);
     }, [handleShowHealthcheckChange, handleIssuesFilterChange, handleHealthcheckViewChange]);
 
+    React.useEffect(() => {
+        if (
+            healthcheckAvailable === false &&
+            (showHealthcheck !== undefined || view !== undefined || issuesFilter !== undefined)
+        ) {
+            handleCloseDrawer();
+        }
+    }, [healthcheckAvailable, showHealthcheck, view, issuesFilter, handleCloseDrawer]);
+
     const renderDrawerContent = React.useCallback(() => {
         return <Healthcheck database={database} clusterName={clusterName} />;
     }, [database, clusterName]);
@@ -56,7 +69,7 @@ export function TenantDrawerHealthcheck({children, clusterName}: TenantDrawerHea
                       })
                     : undefined
             }
-            isDrawerVisible={Boolean(showHealthcheck)}
+            isDrawerVisible={Boolean(healthcheckAvailable && showHealthcheck)}
             onCloseDrawer={handleCloseDrawer}
             renderDrawerContent={renderDrawerContent}
             drawerId="tenant-healthcheck-details"
