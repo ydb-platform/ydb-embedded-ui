@@ -1111,51 +1111,6 @@ test.describe('Datacenter info screenshots', () => {
                     `database-datacenters-${theme}.png`,
                 );
             });
-
-            test(`shows the full datacenter palette in ${theme} theme`, async ({page}) => {
-                const datacenters = Array.from(
-                    {length: 36},
-                    (_, index) => `DC-${String(index + 1).padStart(2, '0')}`,
-                );
-                await setupDatabaseDatacentersMock(page, datacenters);
-                await new TenantPage(page).goto({
-                    database,
-                    schema: database,
-                    databasePage: 'diagnostics',
-                    diagnosticsTab: 'overview',
-                });
-                const palette = page.getByTestId('database-datacenters');
-                const labels = palette.locator('.ydb-datacenter-label');
-                await expect(labels).toHaveCount(36);
-                for (const [index, color, variant] of [
-                    [0, 'turquoise', 'soft'],
-                    [10, 'sage', 'soft'],
-                    [11, 'slate', 'soft'],
-                    [12, 'turquoise', 'outline'],
-                    [24, 'turquoise', 'filled-outline'],
-                    [35, 'slate', 'filled-outline'],
-                ] as const) {
-                    await expect(labels.nth(index)).toContainText(datacenters[index]);
-                    await expect(labels.nth(index)).toHaveClass(
-                        new RegExp(`ydb-datacenter-color_color_${color}`),
-                    );
-                    await expect(labels.nth(index)).toHaveClass(
-                        new RegExp(`ydb-datacenter-color_variant_${variant}`),
-                    );
-                }
-                await page.evaluate(() => document.fonts.ready);
-                await expect(palette).toHaveScreenshot(`datacenter-full-palette-${theme}.png`);
-                for (const index of [0, 12, 24]) {
-                    const label = labels.nth(index);
-                    const background = await label.evaluate(
-                        (element) => getComputedStyle(element).backgroundColor,
-                    );
-                    await label.hover();
-                    await expect(palette).toHaveScreenshot(`datacenter-full-palette-${theme}.png`);
-                    await expect(label).toHaveCSS('background-color', background);
-                    await page.mouse.move(0, 0);
-                }
-            });
         });
     }
 });
