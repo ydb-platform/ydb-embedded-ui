@@ -32,7 +32,11 @@ export function StorageGroupLeftControls() {
                 aria-label={headerKeyset('action_copy-group-id-from-breadcrumb')}
                 tooltipInitialText={headerKeyset('action_copy-group-id')}
             />
-            <StorageGroupStateLabel state={currentData?.groups?.[0]?.State} size="xs" />
+            <StorageGroupStateLabel
+                state={currentData?.groups?.[0]?.State}
+                stateInfo={currentData?.groups?.[0]?.StateInfo}
+                size="xs"
+            />
         </Flex>
     );
 }
