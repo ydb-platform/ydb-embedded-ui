@@ -117,19 +117,12 @@ export function getDatabaseColumn<T extends {Database?: string}>(): Column<T> {
         width: 200,
     };
 }
-export function getDataCenterColumn<T extends {DC?: string; DCKey?: string}>({
-    colored = false,
-}: {colored?: boolean} = {}): Column<T> {
+export function getDataCenterColumn<T extends {DC?: string; DCKey?: string}>(): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.DC,
         header: NODES_COLUMNS_TITLES.DC,
         align: DataTable.LEFT,
-        render: ({row}) =>
-            colored ? (
-                <DatacenterLabel name={row.DC} colorKey={row.DCKey} />
-            ) : (
-                row.DC || EMPTY_DATA_PLACEHOLDER
-            ),
+        render: ({row}) => <DatacenterLabel name={row.DC} colorKey={row.DCKey} />,
         width: 60,
     };
 }
