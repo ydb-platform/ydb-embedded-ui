@@ -1,5 +1,8 @@
 {
   "description_no-data": "No healthcheck data",
+  "label_current-health": "Current health",
+  "label_background-monitoring": "Background monitoring",
+  "description_current-health-unavailable": "Current health is unavailable",
   "label_storage": "Storage",
   "label_compute": "Compute",
   "label_unknown": "Unknown",

@@ -17,7 +17,7 @@ export interface PreparedHealthStatus {
 
 export function prepareHealthStatus<T extends {status_ttl_ms?: number}>(
     data: T,
-    requestStartedAt: number,
+    responseReceivedAt: number,
 ): T & PreparedHealthStatus {
     const ttl = data.status_ttl_ms;
     return {
@@ -25,7 +25,7 @@ export function prepareHealthStatus<T extends {status_ttl_ms?: number}>(
         healthStatusSource: 'meta',
         healthExpiresAt:
             typeof ttl === 'number' && Number.isInteger(ttl) && ttl >= 0 && ttl <= MAX_HEALTH_TTL_MS
-                ? requestStartedAt + ttl
+                ? responseReceivedAt + ttl
                 : undefined,
     };
 }

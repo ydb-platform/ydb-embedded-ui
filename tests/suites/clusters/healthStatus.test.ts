@@ -98,6 +98,10 @@ test('explains current failure, preserves cached issues and recovers through rea
     });
     await details.click();
     const drawer = page.getByTestId('cluster-healthcheck-details');
+    const currentHealth = drawer.getByRole('group', {name: 'Current health'});
+    const backgroundMonitoring = drawer.getByRole('region', {name: 'Background monitoring'});
+    await expect(currentHealth.getByText('Good', {exact: true})).toBeVisible();
+    await expect(backgroundMonitoring.getByText('Good', {exact: true})).toBeVisible();
     await expect(
         drawer.getByRole('button', {name: 'Critical Original disk failure', exact: true}),
     ).toBeVisible();
@@ -111,12 +115,15 @@ test('explains current failure, preserves cached issues and recovers through rea
     await expect(row.locator('button button')).toHaveCount(0);
     await expect(details).toBeEnabled();
     await details.click();
+    await expect(currentHealth.getByText('Unknown', {exact: true})).toBeVisible();
+    await expect(currentHealth.getByText('400 Bad Request', {exact: true})).toBeVisible();
+    await expect(backgroundMonitoring.getByText('Good', {exact: true})).toBeVisible();
     await expect(
         drawer.getByRole('button', {name: 'Critical Original disk failure', exact: true}),
     ).toBeVisible();
     failDetails = true;
     await drawer.getByRole('button', {name: 'Refresh', exact: true}).click();
-    await expect(drawer.getByText('400 Bad Request', {exact: true}).first()).toBeVisible();
+    await expect(backgroundMonitoring.getByText('400 Bad Request', {exact: true})).toBeVisible();
     await expect(
         drawer.getByRole('button', {name: 'Critical Original disk failure', exact: true}),
     ).toBeVisible();
@@ -125,7 +132,8 @@ test('explains current failure, preserves cached issues and recovers through rea
     health = 'DEGRADED';
     await drawer.getByRole('button', {name: 'Refresh', exact: true}).click();
     await expect(drawer.getByText('Degraded', {exact: true}).first()).toBeVisible();
-    await expect(drawer.getByText('400 Bad Request', {exact: true})).toHaveCount(0);
+    await expect(backgroundMonitoring.getByText('400 Bad Request', {exact: true})).toHaveCount(0);
+    await expect(currentHealth.getByText('400 Bad Request', {exact: true})).toBeVisible();
     await page.getByRole('dialog').getByRole('button', {name: 'Close', exact: true}).click();
     await expect(drawer).not.toBeVisible();
     overall = EFlag.Green;
@@ -133,6 +141,10 @@ test('explains current failure, preserves cached issues and recovers through rea
     await page.getByRole('button', {name: 'Refresh', exact: true}).first().click();
     await expect(row.getByText('Good', {exact: true})).toBeVisible();
     await expect(row.locator('.ydb-entity-status__note')).toHaveCount(0);
+    await details.click();
+    await expect(currentHealth.getByText('Good', {exact: true})).toBeVisible();
+    await expect(currentHealth.getByText('400 Bad Request', {exact: true})).toHaveCount(0);
+    await expect(backgroundMonitoring.getByText('Degraded', {exact: true})).toBeVisible();
 });
 
 test('failed cluster refresh preserves fresh health until expiry and cached data stays expired after navigation', async ({

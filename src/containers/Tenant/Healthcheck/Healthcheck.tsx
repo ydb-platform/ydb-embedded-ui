@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Flex, Icon} from '@gravity-ui/uikit';
+import {Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {useDrawerContextInternal} from '../../../components/Drawer/DrawerContext';
 import {ResponseError} from '../../../components/Errors/ResponseError';
@@ -46,6 +46,7 @@ type HealthcheckDetailsProps = (
           database?: undefined;
           databaseType?: undefined;
           scope?: 'cluster';
+          backgroundMonitoring?: boolean;
       }
 ) & {
     healthStatusNow?: number;
@@ -78,6 +79,7 @@ export function Healthcheck(props: HealthcheckDetailsProps) {
             <ClusterHealthcheckInner
                 clusterName={props.clusterName}
                 healthStatusNow={props.healthStatusNow}
+                backgroundMonitoring={props.backgroundMonitoring}
             />
         </HealthcheckContext.Provider>
     );
@@ -117,15 +119,18 @@ function DatabaseHealthcheckInner({
 function ClusterHealthcheckInner({
     clusterName,
     healthStatusNow,
+    backgroundMonitoring,
 }: {
     clusterName: string;
     healthStatusNow?: number;
+    backgroundMonitoring?: boolean;
 }) {
     const healthcheck = useClusterHealthcheck(clusterName, {now: healthStatusNow});
     return (
         <HealthcheckContent
             healthcheck={healthcheck}
             target={{scope: 'cluster', request: {clusterName}}}
+            backgroundMonitoring={backgroundMonitoring}
         />
     );
 }
@@ -148,12 +153,14 @@ function HealthcheckContent({
     targetIssueId,
     targetLeafIssueId,
     targetLeafIssueRef,
+    backgroundMonitoring,
 }: {
     healthcheck: HealthcheckResult;
     target: HealthcheckAssistantTarget;
     targetIssueId?: string;
     targetLeafIssueId?: string;
     targetLeafIssueRef?: React.Ref<HTMLDivElement>;
+    backgroundMonitoring?: boolean;
 }) {
     const SuccessImage = getIllustration('SuccessOperation');
     const renderAssistantAction = uiFactory.healthcheck.renderAssistantAction;
@@ -272,7 +279,20 @@ function HealthcheckContent({
     return (
         <HealthcheckContext.Provider value={{...healthcheckContext, assistant}}>
             <Fullscreen rightInset={visibleRightInset}>
-                <Flex className={b()} grow={1}>
+                <Flex
+                    className={b()}
+                    grow={1}
+                    direction={backgroundMonitoring ? 'column' : undefined}
+                    role={backgroundMonitoring ? 'region' : undefined}
+                    aria-label={
+                        backgroundMonitoring ? i18n('label_background-monitoring') : undefined
+                    }
+                >
+                    {backgroundMonitoring ? (
+                        <Flex spacing={{px: 4, pt: 4}}>
+                            <Text variant="subheader-1">{i18n('label_background-monitoring')}</Text>
+                        </Flex>
+                    ) : null}
                     {renderContent()}
                 </Flex>
             </Fullscreen>

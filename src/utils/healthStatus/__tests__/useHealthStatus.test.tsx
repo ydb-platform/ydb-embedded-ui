@@ -76,7 +76,7 @@ test.each([
     );
 });
 
-test('captures the deadline before waiting for the Meta cluster response', async () => {
+test('starts the remaining lifetime when the Meta cluster response arrives', async () => {
     const response = deferred<object>();
     window.api = {
         meta: {getClustersList: jest.fn().mockReturnValue(response.promise)},
@@ -91,8 +91,8 @@ test('captures the deadline before waiting for the Meta cluster response', async
         ],
     });
     const result = await request;
-    expect(result.data?.[0].cluster?.healthExpiresAt).toBe(6000);
-    expect(result.data?.[1].cluster?.healthExpiresAt).toBe(11000);
+    expect(result.data?.[0].cluster?.healthExpiresAt).toBe(7000);
+    expect(result.data?.[1].cluster?.healthExpiresAt).toBe(12000);
     store.dispatch(api.util.resetApiState());
 });
 
