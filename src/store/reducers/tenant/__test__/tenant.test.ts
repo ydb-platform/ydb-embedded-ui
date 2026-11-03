@@ -1,6 +1,7 @@
 import {configureStore} from '@reduxjs/toolkit';
 
 import type {YdbEmbeddedAPI} from '../../../../services/api';
+import {parseMetaTenants} from '../../../../services/parsers/parseMetaTenants';
 import type {TTenant} from '../../../../types/api/tenant';
 import {api} from '../../api';
 import {tenantApi} from '../tenant';
@@ -170,4 +171,128 @@ describe('tenantApi.getTenantInfo', () => {
             data: expect.objectContaining({Id: firstTenant.Id, Name: firstTenant.Name}),
         });
     });
+    const compositeArgs = {...queryArgs, clusterName: 'cluster', isMetaDatabasesAvailable: true};
+    const cpTenant: TTenant = {
+        Id: 'cp-id',
+        Name: queryArgs.database,
+        ControlPlane: {id: 'cp-id', name: 'Display'},
+    };
+
+    test('keeps CP-only data raw without fabricated runtime counters and preserves partial errors', async () => {
+        const getTenantsV2 = jest
+            .fn()
+            .mockResolvedValue({TenantInfo: [cpTenant], sourceErrors: {viewer: 'Unavailable'}});
+        window.api = {meta: {getTenantsV2}} as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const result = await store.dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate(compositeArgs),
+        );
+        expect(result.data).toEqual({
+            ...cpTenant,
+            availability: 'control-plane',
+            sourceErrors: {viewer: 'Unavailable'},
+        });
+        expect(result.data).not.toHaveProperty('nodesCount');
+        expect(result.data).not.toHaveProperty('cpu');
+        expect(getTenantsV2).toHaveBeenCalledTimes(1);
+    });
+
+    test('rejects unrelated CP-only records instead of selecting the first item', async () => {
+        window.api = {
+            meta: {
+                getTenantsV2: jest.fn().mockResolvedValue({
+                    TenantInfo: [{...cpTenant, Name: '/other', Id: 'other-id'}],
+                    sourceErrors: {viewer: 'Unavailable'},
+                }),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const result = await createTestStore().dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate(compositeArgs),
+        );
+        expect(result).toMatchObject({status: 'rejected', error: {code: 'EMPTY_TENANT_INFO'}});
+    });
+
+    test('retains runtime data when only CP fails and supports recovery from CP-only', async () => {
+        window.api = {
+            meta: {
+                getTenantsV2: jest
+                    .fn()
+                    .mockResolvedValueOnce({
+                        TenantInfo: [cpTenant],
+                        sourceErrors: {viewer: 'Unavailable'},
+                    })
+                    .mockResolvedValueOnce({
+                        TenantInfo: [{...cpTenant, NodeIds: [1, 2]}],
+                        sourceErrors: {control_plane: 'Unavailable'},
+                    }),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        await store.dispatch(tenantApi.endpoints.getTenantInfo.initiate(compositeArgs));
+        const result = await store.dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate(compositeArgs, {forceRefetch: true}),
+        );
+        expect(result.data).toMatchObject({
+            availability: 'runtime',
+            nodesCount: 2,
+            sourceErrors: {control_plane: 'Unavailable'},
+        });
+    });
+
+    test('deduplicates direct extension subscribers with existing arguments', async () => {
+        const getTenantsV2 = jest
+            .fn()
+            .mockResolvedValue({TenantInfo: [cpTenant], sourceErrors: {viewer: 'Unavailable'}});
+        window.api = {meta: {getTenantsV2}} as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        await Promise.all([
+            store.dispatch(tenantApi.endpoints.getTenantInfo.initiate(compositeArgs)),
+            store.dispatch(tenantApi.endpoints.getTenantInfo.initiate({...compositeArgs})),
+        ]);
+        expect(getTenantsV2).toHaveBeenCalledTimes(1);
+    });
+
+    test('late pre-reset responses cannot overwrite a new scope with the same database', async () => {
+        let resolvePrevious: (value: unknown) => void = () => undefined;
+        const pending = new Promise((resolve) => {
+            resolvePrevious = resolve;
+        });
+        window.api = {
+            meta: {
+                getTenantsV2: jest
+                    .fn()
+                    .mockReturnValueOnce(pending)
+                    .mockResolvedValueOnce({
+                        TenantInfo: [{...cpTenant, ControlPlane: {id: 'new-scope'}}],
+                        sourceErrors: {viewer: 'Unavailable'},
+                    }),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const previous = store.dispatch(tenantApi.endpoints.getTenantInfo.initiate(compositeArgs));
+        store.dispatch(api.util.resetApiState());
+        const current = store.dispatch(tenantApi.endpoints.getTenantInfo.initiate(compositeArgs));
+        resolvePrevious({TenantInfo: [cpTenant], sourceErrors: {viewer: 'Unavailable'}});
+        await Promise.all([previous, current]);
+        expect(
+            tenantApi.endpoints.getTenantInfo.select(compositeArgs)(store.getState()).data
+                ?.ControlPlane?.id,
+        ).toBe('new-scope');
+    });
+    test.each([undefined, null, '', 'Viewer failed'])(
+        'only a normalized nonempty viewer error selects CP: %p',
+        async (viewer) => {
+            const response = parseMetaTenants({databases: [cpTenant], errors: {viewer}});
+            window.api = {
+                meta: {getTenantsV2: jest.fn().mockResolvedValue(response)},
+            } as unknown as YdbEmbeddedAPI;
+            const result = await createTestStore().dispatch(
+                tenantApi.endpoints.getTenantInfo.initiate(compositeArgs),
+            );
+            expect(result.data?.availability).toBe(viewer ? 'control-plane' : 'runtime');
+            if (viewer) {
+                expect(result.data).not.toHaveProperty('nodesCount');
+            }
+        },
+    );
 });

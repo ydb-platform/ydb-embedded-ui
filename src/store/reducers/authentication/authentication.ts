@@ -3,6 +3,7 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 
 import type {TUserToken} from '../../../types/api/whoami';
 import {isAxiosResponse} from '../../../utils/response';
+import {advanceRequestScope, getRequestScope} from '../../requestScope';
 import {api} from '../api';
 
 import type {AuthenticationState} from './types';
@@ -35,6 +36,7 @@ export const authenticationApi = api.injectEndpoints({
                 {database, useMeta}: {database?: string; useMeta?: boolean},
                 {dispatch},
             ) => {
+                const requestScope = getRequestScope();
                 try {
                     let data: TUserToken;
                     if (useMeta && window.api.meta) {
@@ -44,7 +46,12 @@ export const authenticationApi = api.injectEndpoints({
                     }
                     return {data};
                 } catch (error) {
-                    if (isAxiosResponse(error) && error.status === 401 && !error.data?.authUrl) {
+                    if (
+                        requestScope === getRequestScope() &&
+                        isAxiosResponse(error) &&
+                        error.status === 401 &&
+                        !error.data?.authUrl
+                    ) {
                         dispatch(setIsAuthenticated(false));
                     }
                     return {error};
@@ -65,6 +72,8 @@ export const authenticationApi = api.injectEndpoints({
                     } else {
                         data = await window.api.auth.authenticate(rest);
                     }
+                    advanceRequestScope();
+                    dispatch(api.util.resetApiState());
                     dispatch(setIsAuthenticated(true));
                     return {data};
                 } catch (error) {
@@ -82,6 +91,8 @@ export const authenticationApi = api.injectEndpoints({
                     } else {
                         data = await window.api.auth.logout();
                     }
+                    advanceRequestScope();
+                    dispatch(api.util.resetApiState());
                     dispatch(setIsAuthenticated(false));
                     return {data};
                 } catch (error) {

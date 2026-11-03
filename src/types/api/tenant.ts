@@ -16,9 +16,15 @@ export interface TTenants {
  *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
  */
+export interface TenantSourceErrors {
+    viewer?: string;
+    control_plane?: string;
+}
+
 export interface TTenantInfo {
     TenantInfo?: TTenant[];
     Errors?: string[];
+    sourceErrors?: TenantSourceErrors;
 }
 
 export interface TTenant {
@@ -136,6 +142,8 @@ export interface ControlPlane {
     name?: string;
     id?: string;
     endpoint?: string;
+    status?: string;
+    type?: string;
 
     folder_id?: string;
     location_id?: string;

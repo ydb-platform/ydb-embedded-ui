@@ -1,0 +1,21 @@
+{
+  "title_runtime-unavailable": "Database runtime is unavailable",
+  "description_runtime-unavailable": "Control plane information is available. Runtime health, metrics, schema and queries cannot be loaded. Control plane status does not indicate runtime health.",
+  "action_retry": "Retry runtime connection",
+  "action_overview": "View overview",
+  "title_overview": "Overview",
+  "title_backups": "Backups",
+  "title_monitoring": "Monitoring",
+  "field_name": "Display name",
+  "field_id": "Control plane ID",
+  "field_path": "Database path",
+  "field_endpoint": "Endpoint",
+  "field_folder": "Folder",
+  "field_location": "Location",
+  "field_type": "Type",
+  "field_status": "Control plane status",
+  "field_preset": "Resource preset",
+  "field_size": "Fixed scale size",
+  "field_storage-limit": "Storage size limit",
+  "field_storage-options": "Storage options"
+}

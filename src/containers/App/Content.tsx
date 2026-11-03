@@ -1,11 +1,13 @@
 import React from 'react';
 
+import {Button} from '@gravity-ui/uikit';
 import {connect} from 'react-redux';
 import type {RedirectProps} from 'react-router-dom';
 import {Redirect, Route, Switch, useLocation} from 'react-router-dom';
 
 import {Unauthenticated} from '../../components/Errors/401';
 import {AccessDenied} from '../../components/Errors/403';
+import {PageError} from '../../components/Errors/PageError/PageError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
 import type {SlotMap} from '../../components/slots/SlotMap';
@@ -20,6 +22,7 @@ import {
     useMetaCapabilitiesQuery,
 } from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
+import {getRequestScope} from '../../store/requestScope';
 import {cn} from '../../utils/cn';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
@@ -28,6 +31,12 @@ import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../
 import Authentication from '../Authentication/Authentication';
 import {GetUser} from '../GetUserWrapper/GetUserWrapper';
 import {Header} from '../Header/Header';
+import {ControlPlaneUnavailable} from '../Tenant/ControlPlaneUnavailable/ControlPlaneUnavailable';
+import controlPlaneI18n from '../Tenant/ControlPlaneUnavailable/i18n';
+import {
+    useDatabaseAvailability,
+    useIsMetaDatabaseCandidate,
+} from '../Tenant/useDatabaseAvailability';
 
 import {
     ClusterSlot,
@@ -66,7 +75,7 @@ const routesSlots: RouteSlot[] = [
         path: routes.tenant,
         slot: TenantSlot,
         component: lazyComponent(() => import('../Tenant/Tenant'), 'Tenant'),
-        wrapper: DataWrapper,
+        wrapper: DatabaseDataWrapper,
     },
     {
         path: routes.node,
@@ -204,6 +213,68 @@ export function Content(props: ContentProps) {
             </Route>
         </Switch>
     );
+}
+
+function DatabaseDataWrapper({children}: {children: React.ReactNode}) {
+    const candidate = useIsMetaDatabaseCandidate();
+    return candidate ? (
+        <MetaDatabaseDataWrapper>{children}</MetaDatabaseDataWrapper>
+    ) : (
+        <DataWrapper>{children}</DataWrapper>
+    );
+}
+
+function MetaDatabaseDataWrapper({children}: {children: React.ReactNode}) {
+    useMetaCapabilitiesQuery();
+    const {composed, database, tenant, authorizationError, controlPlaneOnly, isLoading, retry} =
+        useDatabaseAvailability();
+    if (isRedirectToAuth(authorizationError)) {
+        return null;
+    }
+    if (authorizationError) {
+        return <PageError error={authorizationError} size="l" />;
+    }
+    if (isLoading) {
+        return (
+            <LoaderWrapper loading size="l">
+                {null}
+            </LoaderWrapper>
+        );
+    }
+    if (!composed) {
+        return <DataWrapper>{children}</DataWrapper>;
+    }
+    if (tenant.error && tenant.databaseData?.availability === 'control-plane') {
+        return (
+            <PageError
+                error={tenant.error}
+                size="l"
+                actions={[
+                    <Button key="retry" onClick={retry}>
+                        {controlPlaneI18n('action_retry')}
+                    </Button>,
+                ]}
+            />
+        );
+    }
+    if (controlPlaneOnly && tenant.databaseData) {
+        return (
+            <ControlPlaneUnavailable
+                key={`${getRequestScope()}:${database}`}
+                tenant={tenant.databaseData}
+                onRetry={retry}
+            />
+        );
+    }
+    if (tenant.databaseData?.availability === 'control-plane') {
+        return (
+            <PageError
+                error={{status: 503, data: tenant.databaseData.sourceErrors?.viewer}}
+                size="l"
+            />
+        );
+    }
+    return <DataWrapper>{children}</DataWrapper>;
 }
 
 function DataWrapper({children}: {children: React.ReactNode}) {

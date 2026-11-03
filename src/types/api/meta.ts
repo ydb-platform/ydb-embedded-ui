@@ -1,5 +1,5 @@
 import type {TClusterInfo} from './cluster';
-import type {TTenant} from './tenant';
+import type {TTenant, TenantSourceErrors} from './tenant';
 
 /**
  * endpoint: /api/meta/meta/clusters
@@ -14,6 +14,7 @@ export interface MetaCluster {
 
 export interface MetaTenants {
     databases?: TTenant[];
+    errors?: {[Source in keyof TenantSourceErrors]?: string | null} | null;
 }
 
 /** With fields present only in /api/meta/meta/clusters */
