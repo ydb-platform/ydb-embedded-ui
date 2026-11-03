@@ -1,0 +1,12 @@
+.ydb-control-plane-unavailable {
+    height: 100%;
+    min-height: 0;
+    padding: var(--g-spacing-4);
+
+    &__content {
+        overflow: auto;
+        flex: 1;
+
+        min-height: 0;
+    }
+}

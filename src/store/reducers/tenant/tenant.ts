@@ -8,6 +8,8 @@ import {api} from '../api';
 import {getDatabaseDataTag} from '../entityDataTags';
 import {prepareTenants} from '../tenants/utils';
 
+import {matchesDatabase} from './availability';
+import type {TenantInfo} from './availability';
 import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
 import type {
     TenantDiagnosticsTab,
@@ -49,7 +51,14 @@ export const {setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab} = sl
 
 export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getTenantInfo: builder.query({
+        getTenantInfo: builder.query<
+            TenantInfo,
+            {
+                database: string;
+                clusterName?: string;
+                isMetaDatabasesAvailable: boolean;
+            }
+        >({
             queryFn: async (
                 {
                     database,
@@ -77,18 +86,30 @@ export const tenantApi = api.injectEndpoints({
                     } else {
                         tenantData = await window.api.viewer.getTenantInfo({database}, {signal});
                     }
-                    const databases = prepareTenants(tenantData.TenantInfo || []);
-                    // previous meta versions do not support filtering databases by name
-                    const data =
-                        databases.find(
-                            (tenant) =>
-                                tenant.Name === database ||
-                                tenant.Id === database ||
-                                tenant.ControlPlane?.id === database,
-                        ) ?? databases[0];
-                    if (!data) {
+                    const tenants = tenantData.TenantInfo || [];
+                    const matchingTenant = tenants.find((tenant) =>
+                        matchesDatabase(tenant, database),
+                    );
+                    // Preserve legacy healthy filtering behavior, but never select another database's CP data.
+                    const viewerUnavailable = Boolean(tenantData.sourceErrors?.viewer);
+                    const tenant = matchingTenant ?? (viewerUnavailable ? undefined : tenants[0]);
+                    if (!tenant) {
                         return {error: {code: 'EMPTY_TENANT_INFO'}};
                     }
+                    if (viewerUnavailable) {
+                        return {
+                            data: {
+                                ...tenant,
+                                availability: 'control-plane',
+                                sourceErrors: tenantData.sourceErrors,
+                            },
+                        };
+                    }
+                    const data: TenantInfo = {
+                        ...prepareTenants(tenants)[tenants.indexOf(tenant)],
+                        availability: 'runtime',
+                        sourceErrors: tenantData.sourceErrors,
+                    };
                     return {data};
                 } catch (error) {
                     return {error};
@@ -111,8 +132,8 @@ export const tenantApi = api.injectEndpoints({
                 ];
             },
             serializeQueryArgs: ({queryArgs}) => {
-                const {clusterName, database} = queryArgs;
-                return {clusterName, database};
+                const {clusterName, database, isMetaDatabasesAvailable} = queryArgs;
+                return {clusterName, database, isMetaDatabasesAvailable};
             },
         }),
     }),
@@ -128,7 +149,7 @@ export function useTenantBaseInfo(
     const clusterName = clusterNameOverride ?? clusterNameFromQuery;
     const isMetaDatabasesAvailable = useDatabasesV2();
 
-    const {currentData, isLoading, isError, error} = tenantApi.useGetTenantInfoQuery(
+    const {currentData, isLoading, isError, error, refetch} = tenantApi.useGetTenantInfoQuery(
         {
             database,
             clusterName,
@@ -141,6 +162,7 @@ export function useTenantBaseInfo(
 
     return {
         databaseData: currentData,
+        refetch,
         controlPlane: ControlPlane,
         name: Name,
         id: Id,

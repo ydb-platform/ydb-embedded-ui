@@ -24,7 +24,7 @@ export function HeaderLeftControls({
     const healthcheckAvailable = useDatabaseHealthcheckAvailable(databaseData?.Type);
     const showCopyButton = Boolean(databaseData?.Name);
     const isServerless = databaseData?.Type === 'Serverless';
-    const showHealthcheck = healthcheckAvailable && !isDatabaseDataLoading;
+    const showHealthcheck = healthcheckAvailable && Boolean(databaseData) && !isDatabaseDataLoading;
 
     return (
         <Flex direction="row" alignItems={'center'} gap={2} className={b('left-controls')}>

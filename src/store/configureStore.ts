@@ -12,6 +12,7 @@ import {getUrlData} from './getUrlData';
 import rootReducer from './reducers';
 import {api as storeApi} from './reducers/api';
 import {preloadUserSettingsFromLS, syncUserSettingsFromLS} from './reducers/settings/settings';
+import {advanceRequestScope} from './requestScope';
 import getLocationMiddleware from './state-url-mapping';
 
 export let backend: string | undefined,
@@ -97,17 +98,31 @@ export function configureStore({
     });
     const history = createBrowserHistory({basename});
 
-    history.listen(() => {
+    const store = _configureStore(aRootReducer, history, {singleClusterMode}, [
+        storeApi.middleware,
+    ]);
+
+    let selectedDatabase = new URLSearchParams(history.location.search).get('database');
+    history.listen((location) => {
+        const database = new URLSearchParams(location.search).get('database');
+        const databaseChanged = database !== selectedDatabase;
+        selectedDatabase = database;
+        const previousScope = JSON.stringify([backend, clusterName, environment]);
         getUrlDataAndSetParams({
             singleClusterMode,
             customBackend,
             allowedEnvironments: environments,
         });
+        const runtimeScopeChanged =
+            previousScope !== JSON.stringify([backend, clusterName, environment]);
+        if (runtimeScopeChanged || databaseChanged) {
+            advanceRequestScope();
+        }
+        if (runtimeScopeChanged) {
+            store.dispatch(storeApi.util.resetApiState());
+        }
     });
 
-    const store = _configureStore(aRootReducer, history, {singleClusterMode}, [
-        storeApi.middleware,
-    ]);
     listenForHistoryChange(store, history);
 
     syncUserSettingsFromLS(store);

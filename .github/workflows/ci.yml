@@ -42,3 +42,28 @@ jobs:
       - name: Release report Docker smoke
         timeout-minutes: 15
         run: node .github/workflows/scripts/smoke-release-report.js
+
+  control_plane_e2e:
+    name: Mocked control plane UI
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Install browsers for the lockfile-pinned Playwright version
+        run: npm exec --no -- playwright install --with-deps chromium webkit
+      - name: Run isolated mocked UI tests
+        run: npm run test:e2e:control-plane -- --workers=1
+      - name: Upload mocked UI artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: control-plane-ui-artifacts
+          path: playwright-artifacts/control-plane
+          retention-days: 5

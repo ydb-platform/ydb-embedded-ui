@@ -186,6 +186,7 @@ export function useClusterBaseInfo() {
 
         isError,
         isResolved,
+        isDataLoaded: Boolean(currentData),
     };
 }
 
@@ -209,7 +210,7 @@ export function useClusterProxySettingResolved() {
 
 type ClusterBaseInfo = ReturnType<typeof useClusterBaseInfo>;
 
-export type ClusterInfo = Omit<ClusterBaseInfo, 'isError' | 'isResolved'>;
+export type ClusterInfo = Omit<ClusterBaseInfo, 'isError' | 'isResolved' | 'isDataLoaded'>;
 
 const createClusterInfoSelector = createSelector(
     (clusterName?: string) => clusterName,

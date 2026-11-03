@@ -3,6 +3,7 @@ import React from 'react';
 import {Alert, Card, Flex, Text} from '@gravity-ui/uikit';
 
 import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
+import {isRuntimeTenant} from '../../../../../store/reducers/tenant/availability';
 import {useTenantBaseInfo} from '../../../../../store/reducers/tenant/tenant';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
@@ -25,7 +26,10 @@ interface DBInfoProps {
 export function DatabaseInfo({data, path, database}: DBInfoProps) {
     const {databaseData} = useTenantBaseInfo(database);
     const additionalItems = React.useMemo(
-        () => prepareAdditionalDatabaseInfoItems(databaseData),
+        () =>
+            prepareAdditionalDatabaseInfoItems(
+                isRuntimeTenant(databaseData) ? databaseData : undefined,
+            ),
         [databaseData],
     );
 
