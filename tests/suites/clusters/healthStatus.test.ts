@@ -28,7 +28,10 @@ const issue = {
 const getRow = (page: Page, name: string) => page.getByRole('row').filter({hasText: name});
 
 async function expectNote(page: Page, row: Locator, text: string) {
-    await row.locator('.ydb-entity-status__note').hover();
+    await row
+        .getByRole('button', {name: /^Healthcheck details/})
+        .or(row.locator('.ydb-entity-status__note'))
+        .hover();
     await expect(page.getByText(text, {exact: true})).toBeVisible();
     await page.mouse.move(0, 0);
 }
@@ -93,15 +96,15 @@ test('explains current failure, preserves cached issues and recovers through rea
         getRow(page, 'unmonitored').getByRole('button', {name: /Healthcheck details/}),
     ).toHaveCount(0);
     const details = row.getByRole('button', {
-        name: 'Healthcheck details for monitored',
-        exact: true,
+        name: /^Healthcheck details for monitored /,
     });
+    await expect(details).toContainText('Good');
     await details.click();
     const drawer = page.getByTestId('cluster-healthcheck-details');
     const currentHealth = drawer.getByRole('group', {name: 'Current health'});
-    const backgroundMonitoring = drawer.getByRole('region', {name: 'Background monitoring'});
+    const savedIssues = drawer.getByRole('region', {name: 'Saved issues'});
     await expect(currentHealth.getByText('Good', {exact: true})).toBeVisible();
-    await expect(backgroundMonitoring.getByText('Good', {exact: true})).toBeVisible();
+    await expect(savedIssues).toBeVisible();
     await expect(
         drawer.getByRole('button', {name: 'Critical Original disk failure', exact: true}),
     ).toBeVisible();
@@ -111,28 +114,37 @@ test('explains current failure, preserves cached issues and recovers through rea
     error = '400 Bad Request';
     await page.getByRole('button', {name: 'Refresh', exact: true}).first().click();
     await expect(row.getByText('Unknown', {exact: true})).toBeVisible();
-    await expectNote(page, row, '400 Bad Request');
+    await row.getByRole('link', {name: 'monitored', exact: true}).focus();
+    await page.keyboard.press('Tab');
+    await expect(details).toBeFocused();
+    await expect(page.getByRole('tooltip')).toContainText('400 Bad Request');
+    await expect(details).toHaveAccessibleDescription(/400 Bad Request/);
     await expect(row.locator('button button')).toHaveCount(0);
     await expect(details).toBeEnabled();
-    await details.click();
+    await expect(details).toContainText('Unknown');
+    await details.press('Enter');
     await expect(currentHealth.getByText('Unknown', {exact: true})).toBeVisible();
     await expect(currentHealth.getByText('400 Bad Request', {exact: true})).toBeVisible();
-    await expect(backgroundMonitoring.getByText('Good', {exact: true})).toBeVisible();
     await expect(
         drawer.getByRole('button', {name: 'Critical Original disk failure', exact: true}),
     ).toBeVisible();
     failDetails = true;
-    await drawer.getByRole('button', {name: 'Refresh', exact: true}).click();
-    await expect(backgroundMonitoring.getByText('400 Bad Request', {exact: true})).toBeVisible();
+    await Promise.all([
+        page.waitForResponse(
+            (response) =>
+                new URL(response.url()).pathname.endsWith('/cluster_health') &&
+                response.status() === 400,
+        ),
+        drawer.getByRole('button', {name: 'Refresh', exact: true}).click(),
+    ]);
+    await expect(drawer.getByText('400 Bad Request', {exact: true})).toHaveCount(1);
     await expect(
         drawer.getByRole('button', {name: 'Critical Original disk failure', exact: true}),
     ).toBeVisible();
-    await expect(drawer.getByText('Unspecified', {exact: true}).first()).toBeVisible();
     failDetails = false;
     health = 'DEGRADED';
     await drawer.getByRole('button', {name: 'Refresh', exact: true}).click();
-    await expect(drawer.getByText('Degraded', {exact: true}).first()).toBeVisible();
-    await expect(backgroundMonitoring.getByText('400 Bad Request', {exact: true})).toHaveCount(0);
+    await expect(savedIssues.getByText('400 Bad Request', {exact: true})).toHaveCount(0);
     await expect(currentHealth.getByText('400 Bad Request', {exact: true})).toBeVisible();
     await page.getByRole('dialog').getByRole('button', {name: 'Close', exact: true}).click();
     await expect(drawer).not.toBeVisible();
@@ -144,7 +156,9 @@ test('explains current failure, preserves cached issues and recovers through rea
     await details.click();
     await expect(currentHealth.getByText('Good', {exact: true})).toBeVisible();
     await expect(currentHealth.getByText('400 Bad Request', {exact: true})).toHaveCount(0);
-    await expect(backgroundMonitoring.getByText('Degraded', {exact: true})).toBeVisible();
+    await expect(
+        savedIssues.getByRole('button', {name: 'Critical Original disk failure', exact: true}),
+    ).toBeVisible();
 });
 
 test('failed cluster refresh preserves fresh health until expiry and cached data stays expired after navigation', async ({
@@ -321,9 +335,9 @@ test('Meta database list preserves fresh health on failure and backend problem m
     await Promise.all([page.waitForURL(destination.href), search.press('Enter')]);
 });
 
-for (const {version, status, detailStatus} of [
-    {version: 1, status: 'Good', detailStatus: 'Good'},
-    {version: 2, status: 'Unknown', detailStatus: 'Unspecified'},
+for (const {version, status} of [
+    {version: 1, status: 'Good'},
+    {version: 2, status: 'Unknown'},
 ]) {
     test(`version ${version} determines whether missing TTL makes health unknown`, async ({
         page,
@@ -356,10 +370,10 @@ for (const {version, status, detailStatus} of [
         });
         await expect(row.getByText(status, {exact: true})).toBeVisible();
         await row
-            .getByRole('button', {name: 'Healthcheck details for cluster', exact: true})
+            .getByRole('button', {name: `Healthcheck details for cluster ${status}`, exact: true})
             .click();
         const drawer = page.getByTestId('cluster-healthcheck-details');
-        await expect(drawer.getByText(detailStatus, {exact: true}).first()).toBeVisible();
+        await expect(drawer.getByText(status, {exact: true}).first()).toBeVisible();
         await expect(
             drawer.getByRole('button', {name: 'Critical Original disk failure', exact: true}),
         ).toBeVisible();

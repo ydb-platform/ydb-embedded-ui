@@ -17,15 +17,18 @@ export interface PreparedHealthStatus {
 
 export function prepareHealthStatus<T extends {status_ttl_ms?: number}>(
     data: T,
-    responseReceivedAt: number,
+    requestStartedAt: number,
 ): T & PreparedHealthStatus {
+    // Meta computes the remaining lifetime when it produces the response.
+    // Starting at request initiation conservatively covers transfer delay without
+    // relying on synchronized clocks. Slow requests can therefore expire early.
     const ttl = data.status_ttl_ms;
     return {
         ...data,
         healthStatusSource: 'meta',
         healthExpiresAt:
             typeof ttl === 'number' && Number.isInteger(ttl) && ttl >= 0 && ttl <= MAX_HEALTH_TTL_MS
-                ? responseReceivedAt + ttl
+                ? requestStartedAt + ttl
                 : undefined,
     };
 }

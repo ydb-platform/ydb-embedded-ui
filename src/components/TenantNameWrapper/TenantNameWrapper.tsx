@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {ChevronRight, Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
-import {Button, ClipboardButton, Flex, Icon, Link, Text} from '@gravity-ui/uikit';
+import {Pencil, PlugConnection, TrashBin} from '@gravity-ui/icons';
+import {ClipboardButton, Flex, Link, Text} from '@gravity-ui/uikit';
 
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
@@ -203,19 +203,17 @@ export function TenantNameWrapper({
         const canOpenDetails =
             onStatusClick && database && useMetaProxy && tenant.Type !== 'Serverless';
         return (
-            <Flex gap={1} alignItems="center">
-                <EntityStatus.Label status={dbStatus ?? EFlag.Grey} note={tenant.error} size="xs" />
-                {canOpenDetails ? (
-                    <Button
-                        view="flat-secondary"
-                        size="xs"
-                        aria-label={i18n('action_healthcheck-details', {database: dbPath})}
-                        onClick={handleStatusClick}
-                    >
-                        <Icon data={ChevronRight} size={14} />
-                    </Button>
-                ) : null}
-            </Flex>
+            <EntityStatus.Label
+                status={dbStatus ?? EFlag.Grey}
+                note={tenant.error}
+                size="xs"
+                onClick={canOpenDetails ? handleStatusClick : undefined}
+                ariaLabelPrefix={
+                    canOpenDetails
+                        ? i18n('action_healthcheck-details', {database: dbPath})
+                        : undefined
+                }
+            />
         );
     }, [
         database,

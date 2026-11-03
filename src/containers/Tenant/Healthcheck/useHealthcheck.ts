@@ -83,6 +83,7 @@ export const useClusterHealthcheck = (
         {clusterName},
         {
             pollingInterval: autorefresh,
+            refetchOnMountOrArgChange: true,
         },
     );
 

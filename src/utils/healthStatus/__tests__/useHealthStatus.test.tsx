@@ -76,23 +76,53 @@ test.each([
     );
 });
 
-test('starts the remaining lifetime when the Meta cluster response arrives', async () => {
-    const response = deferred<object>();
+test('does not revive a TTL consumed while Meta responses are in flight', async () => {
+    const clustersResponse = deferred<object>();
+    const tenantsResponse = deferred<object>();
+    const healthResponse = deferred<object>();
     window.api = {
-        meta: {getClustersList: jest.fn().mockReturnValue(response.promise)},
+        meta: {
+            getClustersList: jest.fn().mockReturnValue(clustersResponse.promise),
+            getTenantsV2: jest.fn().mockReturnValue(tenantsResponse.promise),
+            getClusterHealth: jest.fn().mockReturnValue(healthResponse.promise),
+        },
     } as unknown as YdbEmbeddedAPI;
     const store = await createTestStore();
-    const request = store.dispatch(clustersApi.endpoints.getClustersList.initiate(undefined));
+    const clustersRequest = store.dispatch(
+        clustersApi.endpoints.getClustersList.initiate(undefined),
+    );
+    const args = {clusterName: 'selected', isMetaDatabasesAvailable: true};
+    const tenantsRequest = store.dispatch(tenantsApi.endpoints.getTenantsInfo.initiate(args));
+    const tenantRequest = store.dispatch(
+        tenantApi.endpoints.getTenantInfo.initiate({...args, database: '/Root/db'}),
+    );
+    const healthRequest = store.dispatch(
+        healthcheckApi.endpoints.getClusterHealthcheckInfo.initiate({clusterName: 'selected'}),
+    );
     jest.setSystemTime(2000);
-    response.resolve({
+    clustersResponse.resolve({
         clusters: [
-            {name: 'short', cluster: {Overall: EFlag.Green, status_ttl_ms: 5000}},
+            {name: 'short', cluster: {Overall: EFlag.Green, status_ttl_ms: 500}},
             {name: 'long', cluster: {Overall: EFlag.Yellow, status_ttl_ms: 10000}},
         ],
     });
-    const result = await request;
-    expect(result.data?.[0].cluster?.healthExpiresAt).toBe(7000);
-    expect(result.data?.[1].cluster?.healthExpiresAt).toBe(12000);
+    tenantsResponse.resolve({
+        TenantInfo: [{Name: '/Root/db', Id: 'db', Overall: EFlag.Green, status_ttl_ms: 500}],
+    });
+    healthResponse.resolve({self_check_result: 'GOOD', issue_log: [], status_ttl_ms: 500});
+    const [clusters, tenants, tenant, health] = await Promise.all([
+        clustersRequest,
+        tenantsRequest,
+        tenantRequest,
+        healthRequest,
+    ]);
+    for (const data of [clusters.data?.[0].cluster, tenants.data?.[0], tenant.data]) {
+        expect(data?.healthExpiresAt).toBe(1500);
+        expect(data && getEffectiveHealth(data, 2000).Overall).toBe(EFlag.Grey);
+    }
+    expect(health.data?.healthExpiresAt).toBe(1500);
+    expect(getHealthStatusError(health.data, 2000)).toBeDefined();
+    expect(clusters.data?.[1].cluster?.healthExpiresAt).toBe(11000);
     store.dispatch(api.util.resetApiState());
 });
 

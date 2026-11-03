@@ -72,16 +72,16 @@ export const tenantApi = api.injectEndpoints({
                             getState() as RootState,
                             '/meta/databases',
                         );
+                        const requestStartedAt = Date.now();
                         tenantData = await window.api.meta.getTenantsV2(
                             {database, clusterName},
                             {signal},
                         );
-                        const responseReceivedAt = Date.now();
                         if (isHealthFreshnessAvailable) {
                             tenantData = {
                                 ...tenantData,
                                 TenantInfo: tenantData.TenantInfo?.map((tenant) =>
-                                    prepareHealthStatus(tenant, responseReceivedAt),
+                                    prepareHealthStatus(tenant, requestStartedAt),
                                 ),
                             };
                         }

@@ -49,11 +49,11 @@ export const healthcheckApi = api.injectEndpoints({
                         getState() as RootState,
                         '/meta/cluster_health',
                     );
+                    const requestStartedAt = Date.now();
                     const data = await window.api.meta.getClusterHealth({clusterName}, {signal});
-                    const responseReceivedAt = Date.now();
                     return {
                         data: isHealthFreshnessAvailable
-                            ? prepareHealthStatus(data, responseReceivedAt)
+                            ? prepareHealthStatus(data, requestStartedAt)
                             : data,
                     };
                 } catch (error) {

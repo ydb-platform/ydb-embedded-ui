@@ -32,20 +32,18 @@ export function HealthcheckDrawerTitle({
             {currentHealth ? (
                 <Flex
                     direction="column"
+                    alignItems="flex-start"
                     gap={1}
                     role="group"
                     aria-label={i18n('label_current-health')}
                 >
-                    <Flex alignItems="center" gap={2}>
-                        <Text color="secondary">{i18n('label_current-health')}</Text>
-                        <EntityStatus.Label
-                            status={
-                                currentHealth.error || !isEnumMember(EFlag, currentHealth.Overall)
-                                    ? EFlag.Grey
-                                    : currentHealth.Overall
-                            }
-                        />
-                    </Flex>
+                    <EntityStatus.Label
+                        status={
+                            currentHealth.error || !isEnumMember(EFlag, currentHealth.Overall)
+                                ? EFlag.Grey
+                                : currentHealth.Overall
+                        }
+                    />
                     {currentHealth.error ? (
                         <Text color="secondary">{currentHealth.error}</Text>
                     ) : null}

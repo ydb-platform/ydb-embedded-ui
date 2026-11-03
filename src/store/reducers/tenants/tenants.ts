@@ -31,16 +31,16 @@ export const tenantsApi = api.injectEndpoints({
                             getState() as RootState,
                             '/meta/databases',
                         );
+                        const requestStartedAt = Date.now();
                         response = await window.api.meta.getTenantsV2(
                             {clusterName, environmentName},
                             {signal},
                         );
-                        const responseReceivedAt = Date.now();
                         if (isHealthFreshnessAvailable) {
                             response = {
                                 ...response,
                                 TenantInfo: response.TenantInfo?.map((tenant) =>
-                                    prepareHealthStatus(tenant, responseReceivedAt),
+                                    prepareHealthStatus(tenant, requestStartedAt),
                                 ),
                             };
                         }

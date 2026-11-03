@@ -66,6 +66,10 @@ export function ClusterDrawerHealthcheck({
         ? currentHealth.error
         : getHealthStatusError(undefined, now, currentQueryError) ||
           healthcheckI18n('description_current-health-unavailable');
+    const drawerCurrentHealth = React.useMemo(
+        () => (separateCurrentHealth ? {...currentHealth, error: currentError} : undefined),
+        [separateCurrentHealth, currentHealth, currentError],
+    );
     const healthcheckStatus = healthError ? SelfCheckResult.UNSPECIFIED : data?.self_check_result;
     const healthcheckData = data
         ? {...data, self_check_result: healthcheckStatus, error: healthError}
@@ -85,10 +89,10 @@ export function ClusterDrawerHealthcheck({
             <Healthcheck
                 clusterName={clusterName}
                 healthStatusNow={now}
-                backgroundMonitoring={separateCurrentHealth}
+                currentHealth={drawerCurrentHealth}
             />
         );
-    }, [clusterName, now, separateCurrentHealth]);
+    }, [clusterName, now, drawerCurrentHealth]);
 
     return (
         <HealthcheckDrawer
@@ -102,9 +106,7 @@ export function ClusterDrawerHealthcheck({
                 clusterName ? `: ${clusterName}` : ''
             }`}
             status={healthcheckStatus}
-            currentHealth={
-                separateCurrentHealth ? {...currentHealth, error: currentError} : undefined
-            }
+            currentHealth={drawerCurrentHealth}
             healthcheckData={healthcheckData}
             downloadFilePrefix={`${clusterName}-cluster-healthcheck`}
             downloadTooltip={tenantI18n('action_download-healthcheck')}

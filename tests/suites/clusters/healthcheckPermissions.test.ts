@@ -78,7 +78,10 @@ for (const {name, emMetaAuth, metaAllowed, clusterAllowed, visible} of cases) {
         expect(healthcheckRequests).toEqual([]);
 
         const badge = row.getByText('Caution', {exact: true});
-        const button = row.getByRole('button', {name: 'Healthcheck details for Test Cluster'});
+        const button = row.getByRole('button', {
+            name: 'Healthcheck details for Test Cluster Caution',
+            exact: true,
+        });
         const drawer = page.getByTestId('cluster-healthcheck-details');
         await expect(drawer).toBeHidden();
         if (visible) {

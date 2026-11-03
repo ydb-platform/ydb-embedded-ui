@@ -43,14 +43,14 @@ export const clustersApi = api.injectEndpoints({
                             getState() as RootState,
                             '/meta/clusters',
                         );
+                        const requestStartedAt = Date.now();
                         const data = await window.api.meta.getClustersList(undefined, {signal});
-                        const responseReceivedAt = Date.now();
                         return {
                             data: prepareClustersData(data).map((cluster) => ({
                                 ...cluster,
                                 cluster:
                                     isHealthFreshnessAvailable && cluster.cluster
-                                        ? prepareHealthStatus(cluster.cluster, responseReceivedAt)
+                                        ? prepareHealthStatus(cluster.cluster, requestStartedAt)
                                         : cluster.cluster,
                             })),
                         };

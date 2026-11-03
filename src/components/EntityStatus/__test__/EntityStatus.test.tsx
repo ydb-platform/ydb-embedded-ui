@@ -1,5 +1,6 @@
 import {ThemeProvider} from '@gravity-ui/uikit';
 import {fireEvent, render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import {EFlag} from '../../../types/api/enums';
 import {EntityStatus} from '../EntityStatus';
@@ -60,5 +61,37 @@ describe('EntityStatus.Label', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Replication'}));
         expect(onClick).toHaveBeenCalledTimes(1);
         expect(screen.queryByText('Normal')).not.toBeInTheDocument();
+    });
+
+    test('shows clickable notes in the label tooltip and static notes in a help mark', async () => {
+        const user = userEvent.setup();
+        const {container, rerender} = render(
+            <EntityStatus.Label
+                status={EFlag.Grey}
+                note="Healthcheck expired"
+                onClick={() => {}}
+                ariaLabelPrefix="Healthcheck details for cluster"
+            />,
+            {wrapper: ThemeProvider},
+        );
+        const label = screen.getByRole('button', {name: 'Healthcheck details for cluster Unknown'});
+
+        expect(container.querySelector('button button')).not.toBeInTheDocument();
+        expect(screen.getAllByRole('button')).toHaveLength(1);
+        await user.tab();
+        expect(label).toHaveFocus();
+        expect(await screen.findByText('Healthcheck expired')).toBeVisible();
+        expect(label).toHaveAccessibleName('Healthcheck details for cluster Unknown');
+        expect(label).toHaveAccessibleDescription(expect.stringContaining('Healthcheck expired'));
+        await user.tab();
+        await user.hover(label);
+        expect(await screen.findByText('Healthcheck expired')).toBeVisible();
+        await user.unhover(label);
+
+        rerender(<EntityStatus.Label status={EFlag.Grey} note="Healthcheck expired" />);
+        expect(screen.queryByRole('button', {name: 'Unknown'})).not.toBeInTheDocument();
+        const helpMark = screen.getByRole('button');
+        await user.hover(helpMark);
+        expect(await screen.findByText('Healthcheck expired')).toBeVisible();
     });
 });

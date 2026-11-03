@@ -1,8 +1,7 @@
-import {ChevronRight, CircleXmark, Pencil, TrashBin} from '@gravity-ui/icons';
+import {CircleXmark, Pencil, TrashBin} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 import {
-    Button,
     ClipboardButton,
     Link as ExternalLink,
     Flex,
@@ -197,7 +196,10 @@ function getTitleColumn({
                     return null;
                 }
 
-                const statusLabel = (
+                const canOpenDetails =
+                    onStatusClick && clusterStatus && row.cluster?.overall_source === 'healthcheck';
+
+                return (
                     <EntityStatus.Label
                         status={clusterStatus ?? EFlag.Grey}
                         note={
@@ -205,33 +207,23 @@ function getTitleColumn({
                             (!clusterStatus ? i18n('tooltip_no-cluster-data') : undefined)
                         }
                         size="xs"
+                        onClick={
+                            canOpenDetails
+                                ? (event) => {
+                                      event.stopPropagation();
+                                      event.preventDefault();
+                                      onStatusClick(row);
+                                  }
+                                : undefined
+                        }
+                        ariaLabelPrefix={
+                            canOpenDetails
+                                ? i18n('action_healthcheck-details', {
+                                      cluster: row.title || row.name || '',
+                                  })
+                                : undefined
+                        }
                     />
-                );
-
-                const isHealthcheckSource = row.cluster?.overall_source === 'healthcheck';
-
-                if (!onStatusClick || !clusterStatus || !isHealthcheckSource) {
-                    return statusLabel;
-                }
-
-                return (
-                    <Flex gap={1} alignItems="center">
-                        {statusLabel}
-                        <Button
-                            view="flat-secondary"
-                            size="xs"
-                            aria-label={i18n('action_healthcheck-details', {
-                                cluster: row.title || row.name || '',
-                            })}
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                event.preventDefault();
-                                onStatusClick(row);
-                            }}
-                        >
-                            <Icon data={ChevronRight} size={14} />
-                        </Button>
-                    </Flex>
                 );
             };
 
