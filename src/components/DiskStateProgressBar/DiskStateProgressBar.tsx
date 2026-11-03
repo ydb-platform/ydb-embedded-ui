@@ -56,10 +56,15 @@ function DatacenterDiskBar({
             alignItems="center"
             justifyContent="flex-start"
             className={[className, colorClass].filter(Boolean).join(' ')}
+            role="img"
+            aria-label={name}
             title={name}
         >
-            {!datacenter?.name && <Icon data={CircleQuestionFill} size={10} />}
-            <span className={b('datacenter-name')}>{name}</span>
+            {datacenter?.name ? (
+                <span className={b('datacenter-name')}>{name}</span>
+            ) : (
+                <Icon data={CircleQuestionFill} size={10} />
+            )}
         </Flex>
     );
 }

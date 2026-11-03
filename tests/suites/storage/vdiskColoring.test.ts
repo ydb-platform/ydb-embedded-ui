@@ -979,7 +979,14 @@ test.describe('Datacenter storage screenshots', () => {
                 row.locator('.ydb-storage-disks__pdisk-item'),
             ]) {
                 const links = items.getByRole('link');
-                await expect(links).toHaveText(['DC-A', 'DC-B', 'Unknown']);
+                await expect(links).toHaveText(['DC-A', 'DC-B', '']);
+                const unknown = links.nth(2).getByRole('img', {name: 'Unknown', exact: true});
+                await expect(unknown).toBeVisible();
+                await expect(unknown).toHaveAttribute('title', 'Unknown');
+                await expect(unknown.locator(':scope > svg')).toBeVisible();
+                await expect(
+                    links.first().locator('.storage-disk-progress-bar__datacenter-name'),
+                ).toHaveCSS('text-overflow', 'clip');
                 for (const [index, color] of ['turquoise', 'purple', 'neutral'].entries()) {
                     await expect(
                         links.nth(index).locator('.storage-disk-progress-bar'),
