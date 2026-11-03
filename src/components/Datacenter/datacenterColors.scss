@@ -1,0 +1,23 @@
+@use '../../styles/datacenters';
+
+.ydb-datacenter-color {
+    --ydb-dc-background: var(--g-color-base-neutral-medium);
+    --ydb-dc-text: var(--g-color-base-neutral-heavy);
+    --ydb-dc-outline: transparent;
+
+    @each $family in 'turquoise', 'purple', 'blue', 'orange', 'red', 'pink', 'sky', 'brown',
+        'green', 'yellow', 'sage', 'slate'
+    {
+        &_color_#{$family} {
+            --ydb-dc-background: var(--ydb-dc-#{$family}-base);
+            --ydb-dc-text: var(--ydb-dc-#{$family}-text);
+
+            @each $variant in 'outline', 'filled-outline' {
+                &.ydb-datacenter-color_variant_#{$variant} {
+                    --ydb-dc-background: var(--ydb-dc-#{$family}-#{$variant}-base);
+                    --ydb-dc-outline: var(--ydb-dc-#{$family}-#{$variant}-stroke);
+                }
+            }
+        }
+    }
+}

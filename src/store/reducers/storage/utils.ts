@@ -2,6 +2,7 @@ import type {EFlag} from '../../../types/api/enums';
 import type {TNodeInfo, TNodesInfo} from '../../../types/api/nodes';
 import {TPDiskState} from '../../../types/api/pdisk';
 import type {StorageGroupsResponse, TGroupsStorageGroupInfo} from '../../../types/api/storage';
+import {getNodeDatacenterKey} from '../../../utils/datacenters';
 import {
     getColorSeverity,
     getDataSeverityColor,
@@ -112,6 +113,7 @@ const prepareStorageNodeData = (
     return {
         ...restNodeParams,
         ...prepareNodeSystemState(SystemState),
+        DCKey: getNodeDatacenterKey(node),
         // There is NodeId both in node and its system state
         // We should use only NodeId from node, since it's always present (there may be no SystemState)
         NodeId,
