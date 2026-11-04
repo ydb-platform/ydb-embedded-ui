@@ -4,6 +4,8 @@
     --ydb-dc-background: var(--g-color-base-neutral-medium);
     --ydb-dc-text: var(--g-color-base-neutral-heavy);
     --ydb-dc-outline: transparent;
+    --ydb-dc-hover: var(--g-color-base-neutral-medium-hover);
+    --ydb-dc-hover-text: var(--ydb-dc-text);
 
     @each $family in 'turquoise', 'purple', 'blue', 'orange', 'red', 'pink', 'sky', 'brown',
         'green', 'yellow', 'sage', 'slate'
@@ -11,11 +13,13 @@
         &_color_#{$family} {
             --ydb-dc-background: var(--ydb-dc-#{$family}-base);
             --ydb-dc-text: var(--ydb-dc-#{$family}-text);
+            --ydb-dc-hover: var(--ydb-dc-#{$family}-base-hover);
 
             @each $variant in 'outline', 'filled-outline' {
                 &.ydb-datacenter-color_variant_#{$variant} {
                     --ydb-dc-background: var(--ydb-dc-#{$family}-#{$variant}-base);
                     --ydb-dc-outline: var(--ydb-dc-#{$family}-#{$variant}-stroke);
+                    --ydb-dc-hover: var(--ydb-dc-#{$family}-#{$variant}-base-hover);
                 }
             }
         }

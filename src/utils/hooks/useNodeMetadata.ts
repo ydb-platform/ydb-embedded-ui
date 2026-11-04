@@ -1,21 +1,19 @@
 import {isNil} from 'lodash';
 
-import {selectNodesMap} from '../../store/reducers/nodesList';
 import type {NodeMetadata} from '../../types/store/nodesList';
-import {useTypedSelector} from '../hooks';
 
-import {useDatabaseFromQuery} from './useDatabaseFromQuery';
+import {useNodesMap} from './useNodesMap';
 
 export function useNodeMetadata(
     nodeId: number | undefined,
     parentNodeData?: NodeMetadata,
 ): NodeMetadata {
-    const database = useDatabaseFromQuery();
-    const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
+    const nodesMap = useNodesMap();
     const storedNodeData = isNil(nodeId) ? undefined : nodesMap?.get(nodeId);
     return {
         Host: parentNodeData?.Host || storedNodeData?.Host,
         DC: parentNodeData?.DC || storedNodeData?.DC,
         Rack: parentNodeData?.Rack || storedNodeData?.Rack,
+        PileName: parentNodeData?.PileName || storedNodeData?.PileName,
     };
 }
