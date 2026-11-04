@@ -51,15 +51,17 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - name: Install browsers for the lockfile-pinned Playwright version
-        run: npm exec --no -- playwright install --with-deps chromium webkit
-      - name: Run isolated mocked UI tests
-        run: npm run test:e2e:control-plane -- --workers=1
+      # Same approach as scripts/playwright-docker.sh: the Playwright image matches the
+      # lockfile version and does not depend on the runner OS being supported by Playwright.
+      - name: Run mocked UI tests in the Playwright Docker image
+        run: |
+          PLAYWRIGHT_VERSION=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")
+          docker run --rm \
+            -v "${PWD}:/work" \
+            -w /work \
+            -e CI=true \
+            "mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-noble" \
+            /bin/bash -c "npm ci && npm run test:e2e:control-plane"
       - name: Upload mocked UI artifacts
         if: always()
         uses: actions/upload-artifact@v4

@@ -28,3 +28,10 @@ export function canShowTenantMonitoringTab(
         canShowTenantMonitoring(controlPlane, clusterMonitoring)
     );
 }
+
+/**
+ * Visibility check for the Backups tab: backups are managed by the control plane.
+ */
+export function canShowTenantBackupsTab(controlPlane?: ControlPlane): boolean {
+    return typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane);
+}

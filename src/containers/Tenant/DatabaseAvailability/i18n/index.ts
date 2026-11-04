@@ -2,4 +2,4 @@ import {registerKeysets} from '../../../../utils/i18n';
 
 import en from './en.json';
 
-export default registerKeysets('ydb-control-plane-unavailable', {en});
+export default registerKeysets('ydb-database-availability', {en});

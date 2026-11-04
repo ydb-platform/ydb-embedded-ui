@@ -33,11 +33,13 @@ export function prepareControlPlaneInfo(tenant: TTenant) {
     };
 }
 
+export type ControlPlaneTab = 'overview' | 'backups' | 'monitoring';
+
 export function getControlPlaneTab(
     requestedTab: unknown,
     hasBackups: boolean,
     hasMonitoring: boolean,
-) {
+): ControlPlaneTab {
     if (requestedTab === 'backups' && hasBackups) {
         return 'backups';
     }
@@ -45,40 +47,4 @@ export function getControlPlaneTab(
         return 'monitoring';
     }
     return 'overview';
-}
-
-export function getControlPlaneExtensions({
-    tenant,
-    database,
-    clusterName,
-    clusterDataLoaded,
-    backupsRenderer,
-    monitoringRenderer,
-}: {
-    tenant: TTenant;
-    database: string;
-    clusterName?: string;
-    clusterDataLoaded: boolean;
-    backupsRenderer: boolean;
-    monitoringRenderer: boolean;
-}) {
-    const cp = tenant.ControlPlane;
-    // Existing Backups derives its folder fallback from the renderer's database argument.
-    const parentPath = database.startsWith('/') && database.split('/').filter(Boolean).length > 1;
-    const folder = cp?.folder_id;
-    const folderAvailable =
-        folder === undefined || folder === null ? parentPath : Boolean(folder.trim());
-    const backupContext = Boolean(clusterName && cp?.id?.trim() && folderAvailable);
-    return {
-        hasBackups: backupsRenderer && backupContext,
-        hasMonitoring: Boolean(
-            monitoringRenderer &&
-                clusterDataLoaded &&
-                clusterName &&
-                cp?.id?.trim() &&
-                cp.name?.trim() &&
-                cp.folder_id?.trim() &&
-                tenant.Name,
-        ),
-    };
 }

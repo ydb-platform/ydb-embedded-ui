@@ -9,7 +9,9 @@ type DatabaseData = Parameters<GetAdditionalDatabaseInfoItems>[0]['databaseData'
 let mockDatabaseData: DatabaseData | undefined;
 
 jest.mock('../../../../../../store/reducers/tenant/tenant', () => ({
-    useTenantBaseInfo: () => ({databaseData: mockDatabaseData}),
+    useTenantBaseInfo: () => ({
+        databaseData: mockDatabaseData && {...mockDatabaseData, availability: 'runtime'},
+    }),
 }));
 
 jest.mock('../../../../../../utils/hooks/useWhoami', () => ({

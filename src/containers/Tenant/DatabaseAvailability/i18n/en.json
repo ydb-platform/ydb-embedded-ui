@@ -1,8 +1,8 @@
 {
   "title_runtime-unavailable": "Database runtime is unavailable",
   "description_runtime-unavailable": "Control plane information is available. Runtime health, metrics, schema and queries cannot be loaded. Control plane status does not indicate runtime health.",
+  "description_runtime-lost": "The last response came from the control plane only. Runtime data on this page may be outdated or fail to load.",
   "action_retry": "Retry runtime connection",
-  "action_overview": "View overview",
   "title_overview": "Overview",
   "title_backups": "Backups",
   "title_monitoring": "Monitoring",

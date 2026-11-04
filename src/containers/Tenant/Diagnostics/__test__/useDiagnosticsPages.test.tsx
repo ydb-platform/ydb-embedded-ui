@@ -42,6 +42,7 @@ jest.mock('../../../../utils/hooks/useWhoami', () => ({
 }));
 
 jest.mock('../../../../utils/monitoringVisibility', () => ({
+    canShowTenantBackupsTab: jest.fn(),
     canShowTenantMonitoringTab: jest.fn(),
 }));
 

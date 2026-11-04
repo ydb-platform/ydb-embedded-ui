@@ -279,6 +279,24 @@ describe('tenantApi.getTenantInfo', () => {
                 ?.ControlPlane?.id,
         ).toBe('new-scope');
     });
+    test('only the composite API can mark the runtime as unavailable', async () => {
+        window.api = {
+            meta: {
+                getTenants: jest.fn().mockResolvedValue({
+                    TenantInfo: [cpTenant],
+                    sourceErrors: {viewer: 'Unavailable'},
+                }),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const result = await createTestStore().dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate({
+                ...compositeArgs,
+                isMetaDatabasesAvailable: false,
+            }),
+        );
+        expect(result.data?.availability).toBe('runtime');
+    });
+
     test.each([undefined, null, '', 'Viewer failed'])(
         'only a normalized nonempty viewer error selects CP: %p',
         async (viewer) => {

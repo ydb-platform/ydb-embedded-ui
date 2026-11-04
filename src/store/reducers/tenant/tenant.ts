@@ -9,7 +9,7 @@ import {getDatabaseDataTag} from '../entityDataTags';
 import {prepareTenants} from '../tenants/utils';
 
 import {matchesDatabase} from './availability';
-import type {TenantInfo} from './availability';
+import type {TenantInfoData} from './availability';
 import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
 import type {
     TenantDiagnosticsTab,
@@ -52,7 +52,7 @@ export const {setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab} = sl
 export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getTenantInfo: builder.query<
-            TenantInfo,
+            TenantInfoData,
             {
                 database: string;
                 clusterName?: string;
@@ -73,6 +73,9 @@ export const tenantApi = api.injectEndpoints({
             ) => {
                 try {
                     let tenantData: TTenantInfo;
+                    const composite = Boolean(
+                        window.api.meta && clusterName && isMetaDatabasesAvailable,
+                    );
                     if (window.api.meta && clusterName && isMetaDatabasesAvailable) {
                         tenantData = await window.api.meta.getTenantsV2(
                             {database, clusterName},
@@ -87,26 +90,34 @@ export const tenantApi = api.injectEndpoints({
                         tenantData = await window.api.viewer.getTenantInfo({database}, {signal});
                     }
                     const tenants = tenantData.TenantInfo || [];
-                    const matchingTenant = tenants.find((tenant) =>
-                        matchesDatabase(tenant, database),
-                    );
-                    // Preserve legacy healthy filtering behavior, but never select another database's CP data.
-                    const viewerUnavailable = Boolean(tenantData.sourceErrors?.viewer);
-                    const tenant = matchingTenant ?? (viewerUnavailable ? undefined : tenants[0]);
+                    // Only the composite API reports that the runtime part of the response is missing
+                    const runtimeUnavailable =
+                        composite && Boolean(tenantData.sourceErrors?.viewer);
+                    // Previous meta versions do not support filtering databases by name, so the first
+                    // item is a fallback. Control plane data of another database is never selected.
+                    const tenant =
+                        tenants.find((item) => matchesDatabase(item, database)) ??
+                        (runtimeUnavailable ? undefined : tenants[0]);
                     if (!tenant) {
                         return {error: {code: 'EMPTY_TENANT_INFO'}};
                     }
-                    if (viewerUnavailable) {
-                        return {
-                            data: {
-                                ...tenant,
-                                availability: 'control-plane',
-                                sourceErrors: tenantData.sourceErrors,
-                            },
+                    if (runtimeUnavailable) {
+                        const data: TenantInfoData = {
+                            ...tenant,
+                            availability: 'control-plane',
+                            sourceErrors: tenantData.sourceErrors,
                         };
+                        return {data};
                     }
-                    const data: TenantInfo = {
-                        ...prepareTenants(tenants)[tenants.indexOf(tenant)],
+                    // Metrics of a serverless database depend on its shared database only
+                    const sharedTenants = tenants.filter(
+                        (item) =>
+                            item !== tenant &&
+                            Boolean(tenant.ResourceId) &&
+                            item.Id === tenant.ResourceId,
+                    );
+                    const data: TenantInfoData = {
+                        ...prepareTenants([tenant, ...sharedTenants])[0],
                         availability: 'runtime',
                         sourceErrors: tenantData.sourceErrors,
                     };

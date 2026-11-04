@@ -14,17 +14,19 @@ interface HeaderLeftControlsProps {
     database: string;
     databaseData?: PreparedTenant;
     isDatabaseDataLoading: boolean;
+    isRuntimeUnavailable?: boolean;
 }
 
 export function HeaderLeftControls({
     database,
     databaseData,
     isDatabaseDataLoading,
+    isRuntimeUnavailable,
 }: HeaderLeftControlsProps) {
     const healthcheckAvailable = useDatabaseHealthcheckAvailable(databaseData?.Type);
     const showCopyButton = Boolean(databaseData?.Name);
     const isServerless = databaseData?.Type === 'Serverless';
-    const showHealthcheck = healthcheckAvailable && Boolean(databaseData) && !isDatabaseDataLoading;
+    const showHealthcheck = healthcheckAvailable && !isDatabaseDataLoading && !isRuntimeUnavailable;
 
     return (
         <Flex direction="row" alignItems={'center'} gap={2} className={b('left-controls')}>

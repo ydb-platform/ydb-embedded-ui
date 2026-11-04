@@ -12,7 +12,8 @@ import {getUrlData} from './getUrlData';
 import rootReducer from './reducers';
 import {api as storeApi} from './reducers/api';
 import {preloadUserSettingsFromLS, syncUserSettingsFromLS} from './reducers/settings/settings';
-import {advanceRequestScope} from './requestScope';
+import {getNextRuntimeScope} from './runtimeScope';
+import type {RuntimeScope} from './runtimeScope';
 import getLocationMiddleware from './state-url-mapping';
 
 export let backend: string | undefined,
@@ -102,23 +103,21 @@ export function configureStore({
         storeApi.middleware,
     ]);
 
-    let selectedDatabase = new URLSearchParams(history.location.search).get('database');
-    history.listen((location) => {
-        const database = new URLSearchParams(location.search).get('database');
-        const databaseChanged = database !== selectedDatabase;
-        selectedDatabase = database;
-        const previousScope = JSON.stringify([backend, clusterName, environment]);
+    let runtimeScope: RuntimeScope = {backend, clusterName, environment};
+    history.listen(() => {
         getUrlDataAndSetParams({
             singleClusterMode,
             customBackend,
             allowedEnvironments: environments,
         });
-        const runtimeScopeChanged =
-            previousScope !== JSON.stringify([backend, clusterName, environment]);
-        if (runtimeScopeChanged || databaseChanged) {
-            advanceRequestScope();
-        }
-        if (runtimeScopeChanged) {
+        const {scope, changed} = getNextRuntimeScope(runtimeScope, {
+            backend,
+            clusterName,
+            environment,
+        });
+        runtimeScope = scope;
+        if (changed) {
+            // Responses of another runtime must not be reused for the same cache keys
             store.dispatch(storeApi.util.resetApiState());
         }
     });

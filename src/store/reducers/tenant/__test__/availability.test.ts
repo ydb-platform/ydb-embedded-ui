@@ -1,144 +1,141 @@
+import type {TUserToken} from '../../../../types/api/whoami';
 import {prepareTenants} from '../../tenants/utils';
-import {
-    getDatabaseAvailability,
-    getRuntimeTenant,
-    isTenantRequestReady,
-    matchesDatabase,
-} from '../availability';
-import type {TenantInfo} from '../availability';
+import {getDatabaseAvailability, isTenantRequestReady, matchesDatabase} from '../availability';
+import type {ControlPlaneTenant, RuntimeTenant} from '../availability';
 
 const raw = {Id: 'id', Name: '/db', ControlPlane: {id: 'id'}};
-const cp: TenantInfo = {...raw, availability: 'control-plane'};
-const runtime: TenantInfo = {...prepareTenants([raw])[0], availability: 'runtime'};
+const cp: ControlPlaneTenant = {...raw, availability: 'control-plane'};
+const runtime: RuntimeTenant = {...prepareTenants([raw])[0], availability: 'runtime'};
+const whoamiData: TUserToken = {UserSID: 'user', IsViewerAllowed: true};
 const operational = {status: 400, data: 'Failed to resolve database nodes'};
 
-describe('database availability', () => {
-    test.each(['id', '/db'])('matches CP by verified ID or canonical path: %s', (database) => {
-        expect(matchesDatabase(cp, database)).toBe(true);
-        expect(getDatabaseAvailability({database, tenant: cp}).controlPlaneOnly).toBe(true);
+const ready = {
+    database: '/db',
+    composite: true,
+    whoamiData,
+    clusterInfoResolved: true,
+};
+
+describe('getDatabaseAvailability', () => {
+    test.each(['id', '/db'])('selects CP by its ID or canonical path: %s', (database) => {
+        expect(getDatabaseAvailability({...ready, database, tenantData: cp})).toEqual({
+            status: 'control-plane',
+            tenant: cp,
+        });
     });
-    test.each([cp, runtime])(
-        'matches CP ID when the Viewer ID differs: $availability',
-        (tenant) => {
-            const data = {...tenant, Id: 'viewer-id', ControlPlane: {id: 'cp-id'}};
-            expect(matchesDatabase(data, 'cp-id')).toBe(true);
-            expect(
-                getDatabaseAvailability({
-                    database: 'cp-id',
-                    tenant: data,
-                    whoamiError: operational,
-                }).controlPlaneOnly,
-            ).toBe(true);
-            expect(matchesDatabase(data, 'other-id')).toBe(false);
-        },
-    );
-    test('requires CP identity and never matches its display name', () => {
+
+    test('matches the CP ID when the Viewer ID differs', () => {
+        const tenant = {...cp, Id: 'viewer-id', ControlPlane: {id: 'cp-id'}};
+        expect(matchesDatabase(tenant, 'cp-id')).toBe(true);
+        expect(matchesDatabase(tenant, 'other-id')).toBe(false);
+    });
+
+    test('never matches the CP display name and requires a CP identity', () => {
         expect(
             getDatabaseAvailability({
+                ...ready,
                 database: 'display',
-                tenant: {...cp, ControlPlane: {id: 'id', name: 'display'}},
-            }).controlPlaneOnly,
-        ).toBe(false);
-        expect(
-            getDatabaseAvailability({database: '/db', tenant: {...cp, ControlPlane: {}}})
-                .controlPlaneOnly,
-        ).toBe(false);
+                tenantData: {...cp, ControlPlane: {id: 'id', name: 'display'}},
+            }).status,
+        ).toBe('unavailable');
+        expect(getDatabaseAvailability({...ready, tenantData: {...cp, ControlPlane: {}}})).toEqual({
+            status: 'unavailable',
+            error: {status: 503, data: undefined},
+        });
     });
-    test('allows CP with a healthy composite and operational whoami failure', () => {
-        expect(
-            getDatabaseAvailability({database: '/db', tenant: runtime, whoamiError: operational})
-                .controlPlaneOnly,
-        ).toBe(true);
-        expect(
-            getDatabaseAvailability({database: '/other', tenant: runtime, whoamiError: operational})
-                .controlPlaneOnly,
-        ).toBe(false);
-    });
-    test('operational/pending capabilities do not independently block authorized CP', () => {
-        expect(
-            getDatabaseAvailability({database: '/db', tenant: cp, capabilitiesError: operational})
-                .controlPlaneOnly,
-        ).toBe(true);
-        expect(getDatabaseAvailability({database: '/db', tenant: cp}).controlPlaneOnly).toBe(true);
+
+    test('runtime data is exposed only with a confirmed whoami', () => {
+        expect(getDatabaseAvailability({...ready, tenantData: runtime})).toEqual({
+            status: 'runtime',
+            tenant: runtime,
+        });
         expect(
             getDatabaseAvailability({
-                database: '/db',
-                tenant: runtime,
-                capabilitiesError: operational,
-            }).controlPlaneOnly,
-        ).toBe(false);
+                ...ready,
+                whoamiData: undefined,
+                whoamiError: operational,
+                tenantData: {...runtime, ControlPlane: undefined},
+            }),
+        ).toEqual({status: 'runtime', tenant: undefined});
     });
+
+    test('a healthy composite with an operational whoami failure shows CP', () => {
+        expect(
+            getDatabaseAvailability({...ready, whoamiError: operational, tenantData: runtime})
+                .status,
+        ).toBe('control-plane');
+        expect(
+            getDatabaseAvailability({
+                ...ready,
+                database: '/other',
+                whoamiError: operational,
+                tenantData: runtime,
+            }).status,
+        ).toBe('runtime');
+    });
+
+    test('operational capabilities failure does not block CP', () => {
+        expect(
+            getDatabaseAvailability({...ready, capabilitiesError: operational, tenantData: cp})
+                .status,
+        ).toBe('control-plane');
+    });
+
     test.each(['tenantError', 'whoamiError', 'capabilitiesError'])(
-        '%s authorization failure takes precedence over retained CP',
+        '%s authorization failure wins over retained data',
         (source) => {
             const error = {status: 403};
-            expect(getDatabaseAvailability({database: '/db', tenant: cp, [source]: error})).toEqual(
-                {authorizationError: error, controlPlaneOnly: false},
-            );
+            expect(getDatabaseAvailability({...ready, tenantData: cp, [source]: error})).toEqual({
+                status: 'access-error',
+                error,
+            });
         },
     );
-    test('a failed composite never authorizes old CP and recovery restores runtime mode', () => {
+
+    test('a failed request never authorizes retained CP, but keeps retained runtime', () => {
         expect(
-            getDatabaseAvailability({database: '/db', tenant: cp, tenantError: operational})
-                .controlPlaneOnly,
-        ).toBe(false);
-        expect(getDatabaseAvailability({database: '/db', tenant: runtime}).controlPlaneOnly).toBe(
-            false,
-        );
+            getDatabaseAvailability({...ready, tenantData: cp, tenantError: operational}),
+        ).toEqual({status: 'unavailable', error: operational});
+        expect(
+            getDatabaseAvailability({...ready, tenantData: runtime, tenantError: operational}),
+        ).toEqual({status: 'runtime', tenant: runtime});
+    });
+
+    test('a cold composite failure keeps the regular page', () => {
+        expect(getDatabaseAvailability({...ready, tenantError: operational})).toEqual({
+            status: 'runtime',
+            tenant: undefined,
+        });
+        expect(getDatabaseAvailability(ready)).toEqual({status: 'loading'});
+    });
+
+    test('without the composite API the regular data flow is used', () => {
+        expect(getDatabaseAvailability({...ready, composite: false})).toEqual({status: 'legacy'});
     });
 });
 
-describe('selected database API readiness', () => {
+describe('isTenantRequestReady', () => {
     test.each([
-        ['pending whoami even when cluster query is skipped', undefined, undefined, true, false],
-        ['pending permitted cluster settings', {IsViewerAllowed: true}, undefined, false, false],
-        ['permitted loaded settings', {IsViewerAllowed: true}, undefined, true, true],
+        ['pending whoami', undefined, undefined, true, false],
+        ['pending cluster settings for a Viewer', {IsViewerAllowed: true}, undefined, false, false],
+        ['loaded cluster settings for a Viewer', {IsViewerAllowed: true}, undefined, true, true],
         [
-            'non-viewer role uses default API policy',
+            'non-Viewer uses the default API policy',
             {IsViewerAllowed: false},
             undefined,
-            true,
-            true,
-        ],
-        ['operational whoami uses default API policy', undefined, operational, true, true],
-        ['whoami401 blocks', undefined, {status: 401}, true, false],
-        [
-            'whoami403 blocks with cached permission',
-            {IsViewerAllowed: true},
-            {status: 403},
-            true,
             false,
+            true,
         ],
-        ['redirect blocks', undefined, {status: 401, data: {authUrl: '/login'}}, true, false],
-    ])('%s', (_name, whoamiData, whoamiError, clusterInfoResolved, expected) => {
-        expect(isTenantRequestReady({whoamiData, whoamiError, clusterInfoResolved})).toBe(expected);
+        ['operational whoami failure uses the default policy', undefined, operational, false, true],
+        ['whoami 401', undefined, {status: 401}, true, false],
+        ['whoami 403 with retained data', {IsViewerAllowed: true}, {status: 403}, true, false],
+    ])('%s', (_name, data, whoamiError, clusterInfoResolved, expected) => {
+        expect(
+            isTenantRequestReady({
+                whoamiData: data as TUserToken | undefined,
+                whoamiError,
+                clusterInfoResolved,
+            }),
+        ).toBe(expected);
     });
-});
-
-test('retained healthy tenant survives an operational tenant error, but cannot authorize CP', () => {
-    const availability = getDatabaseAvailability({
-        database: '/db',
-        tenant: runtime,
-        tenantError: operational,
-    });
-    expect(availability.controlPlaneOnly).toBe(false);
-    expect(
-        getRuntimeTenant({...availability, tenant: runtime, whoamiData: {IsViewerAllowed: true}}),
-    ).toBe(runtime);
-    expect(
-        getRuntimeTenant({
-            ...availability,
-            tenant: runtime,
-            whoamiData: {IsViewerAllowed: true},
-            whoamiError: operational,
-        }),
-    ).toBeUndefined();
-    expect(
-        getRuntimeTenant({
-            ...availability,
-            tenant: runtime,
-            whoamiData: {IsViewerAllowed: true},
-            authorizationError: {status: 403},
-        }),
-    ).toBeUndefined();
 });

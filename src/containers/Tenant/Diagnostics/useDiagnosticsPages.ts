@@ -11,7 +11,10 @@ import {useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {EPathSubType, EPathType} from '../../../types/api/schema';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useIsViewerUser, useUserPermissions} from '../../../utils/hooks/useWhoami';
-import {canShowTenantMonitoringTab} from '../../../utils/monitoringVisibility';
+import {
+    canShowTenantBackupsTab,
+    canShowTenantMonitoringTab,
+} from '../../../utils/monitoringVisibility';
 import {isDatabaseEntityType} from '../utils/schema';
 
 import {getPagesByType} from './DiagnosticsPages';
@@ -52,7 +55,7 @@ export function useDiagnosticsPages({
             hasTopicData,
             isDatabase,
             hasStorageUsage,
-            hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
+            hasBackups: canShowTenantBackupsTab(controlPlane),
             hasConfigs: isViewerUser && hasConfigs,
             hasAccess: uiFactory.hasAccess({userPermissions}),
             hasMonitoring: canShowTenantMonitoringTab(controlPlane, clusterMonitoring),

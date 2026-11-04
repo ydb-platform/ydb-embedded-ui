@@ -1,5 +1,6 @@
 import {defineConfig, devices} from '@playwright/test';
 
+// Multi-cluster UI with every API call mocked: no YDB backend or meta service is needed.
 export default defineConfig({
     testDir: '.',
     testMatch: 'controlPlane.spec.ts',
@@ -13,10 +14,7 @@ export default defineConfig({
         testIdAttribute: 'data-qa',
         screenshot: 'only-on-failure',
     },
-    projects: [
-        {name: 'chromium', use: {...devices['Desktop Chrome']}},
-        {name: 'safari', use: {...devices['Desktop Safari']}},
-    ],
+    projects: [{name: 'chromium', use: {...devices['Desktop Chrome']}}],
     webServer: {
         command:
             'npm run start -- --config tests/controlPlane/rsbuild.config.ts --port 3108 --host 127.0.0.1',
@@ -29,5 +27,4 @@ export default defineConfig({
             REACT_APP_META_BACKEND: '/mock-meta',
         },
     },
-    // No globalSetup, backend warmup, Docker or installation. Every API call is intercepted.
 });

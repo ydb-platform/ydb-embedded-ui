@@ -1,7 +1,6 @@
 import {configureStore} from '@reduxjs/toolkit';
 
 import type {YdbEmbeddedAPI} from '../../../../services/api';
-import {advanceRequestScope} from '../../../requestScope';
 import {api} from '../../api';
 import {tenantApi} from '../../tenant/tenant';
 import authentication, {authenticationApi} from '../authentication';
@@ -20,7 +19,11 @@ function createStore() {
     });
 }
 
-test('a late whoami 401 from a previous runtime scope cannot log out the current user', async () => {
+function flushQueryLifecycle() {
+    return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+async function rejectWhoamiLate(beforeReject: (store: ReturnType<typeof createStore>) => void) {
     const originalApi = window.api;
     let rejectPrevious: (error: unknown) => void = () => undefined;
     const pending = new Promise((_resolve, reject) => {
@@ -34,28 +37,39 @@ test('a late whoami 401 from a previous runtime scope cannot log out the current
         const previous = store.dispatch(
             authenticationApi.endpoints.whoami.initiate({database: '/db'}),
         );
-        advanceRequestScope();
-        store.dispatch(api.util.resetApiState());
+        beforeReject(store);
         rejectPrevious({status: 401});
         await previous;
-        expect(store.getState().authentication.isAuthenticated).toBe(true);
+        await flushQueryLifecycle();
+        return store.getState().authentication.isAuthenticated;
     } finally {
         window.api = originalApi;
     }
+}
+
+afterEach(() => {
+    window.history.replaceState({}, '', '/');
 });
 
-test('current-scope whoami 401 retains the existing login semantics', async () => {
-    const originalApi = window.api;
-    window.api = {
-        viewer: {whoami: jest.fn().mockRejectedValue({status: 401})},
-    } as unknown as YdbEmbeddedAPI;
-    try {
-        const store = createStore();
-        await store.dispatch(authenticationApi.endpoints.whoami.initiate({database: '/db'}));
-        expect(store.getState().authentication.isAuthenticated).toBe(false);
-    } finally {
-        window.api = originalApi;
-    }
+test('a late whoami 401 after a cache reset cannot log out the current user', async () => {
+    const isAuthenticated = await rejectWhoamiLate((store) => {
+        store.dispatch(api.util.resetApiState());
+    });
+    expect(isAuthenticated).toBe(true);
+});
+
+test('a late whoami 401 for a previously selected database cannot log out the user', async () => {
+    const isAuthenticated = await rejectWhoamiLate(() => {
+        window.history.replaceState({}, '', '/database?database=/other');
+    });
+    expect(isAuthenticated).toBe(true);
+});
+
+test('whoami 401 for the selected database retains the existing login semantics', async () => {
+    const isAuthenticated = await rejectWhoamiLate(() => {
+        window.history.replaceState({}, '', '/database?database=/db');
+    });
+    expect(isAuthenticated).toBe(false);
 });
 
 test.each(['authenticate', 'logout'] as const)(
