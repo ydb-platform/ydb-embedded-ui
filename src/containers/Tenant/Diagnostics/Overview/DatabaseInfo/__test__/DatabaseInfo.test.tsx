@@ -12,6 +12,10 @@ jest.mock('../../../../../../store/reducers/tenant/tenant', () => ({
     useTenantBaseInfo: () => ({databaseData: mockDatabaseData}),
 }));
 
+jest.mock('../../../../../../utils/hooks/useTypedSelector', () => ({
+    useTypedSelector: () => undefined,
+}));
+
 jest.mock('../../../../../../utils/hooks/useWhoami', () => ({
     useUserPermissions: () => undefined,
 }));

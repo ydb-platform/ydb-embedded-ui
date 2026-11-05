@@ -3,29 +3,31 @@ import React from 'react';
 import {Alert, Card, Flex, Text} from '@gravity-ui/uikit';
 
 import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
+import {selectNodesMap} from '../../../../../store/reducers/nodesList';
 import {useTenantBaseInfo} from '../../../../../store/reducers/tenant/tenant';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
+import {useTypedSelector} from '../../../../../utils/hooks/useTypedSelector';
 import {SchemaObjectInfo} from '../SchemaObjectInfo';
 
 import {DatabaseDatacenters} from './DatabaseDatacenters';
 import {dbInfoKeyset} from './i18n';
-import type {DatacenterNodes} from './utils';
-import {prepareAdditionalDatabaseInfoItems} from './utils';
+import {countDatacenterNodes, prepareAdditionalDatabaseInfoItems} from './utils';
 
 import './DatabaseInfo.scss';
 
 const b = cn('ydb-diagnostics-database-info');
 
 export interface DBInfoProps {
-    datacenters?: DatacenterNodes[] | null;
     data?: TEvDescribeSchemeResult;
     path: string;
     database: string;
 }
 
-export function DatabaseInfo({data, path, database, datacenters}: DBInfoProps) {
+export function DatabaseInfo({data, path, database}: DBInfoProps) {
+    const nodes = useTypedSelector((state) => selectNodesMap(state, database));
+    const datacenters = React.useMemo(() => countDatacenterNodes(nodes?.values() ?? []), [nodes]);
     const {databaseData} = useTenantBaseInfo(database);
     const additionalItems = React.useMemo(
         () => [
