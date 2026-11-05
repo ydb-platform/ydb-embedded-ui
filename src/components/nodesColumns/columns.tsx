@@ -145,6 +145,21 @@ export function getPileNameColumn<T extends {PileName?: string}>(): Column<T> {
         width: 100,
     };
 }
+export function getRolesColumn<T extends {Roles?: string[]}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.Roles,
+        header: NODES_COLUMNS_TITLES.Roles,
+        width: 200,
+        align: DataTable.LEFT,
+        render: ({row}) => {
+            if (!row.Roles?.length) {
+                return EMPTY_DATA_PLACEHOLDER;
+            }
+            const roles = row.Roles.join(', ');
+            return <CellWithPopover content={roles}>{roles}</CellWithPopover>;
+        },
+    };
+}
 export function getVersionColumn<T extends {Version?: string}>(): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.Version,
