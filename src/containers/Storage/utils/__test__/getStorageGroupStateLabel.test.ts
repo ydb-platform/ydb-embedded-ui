@@ -89,6 +89,20 @@ describe('getStorageGroupStateLabel', () => {
         expect(getStorageGroupStateLabel(state)).toBeUndefined();
     });
 
+    test.each([':()', ':0()', '  :0()  ', ':1(1)'])(
+        'returns no label for State without a status: %p',
+        (state) => {
+            expect(getStorageGroupStateLabel(state)).toBeUndefined();
+            expect(getStorageGroupStateLabel(state, {})).toBeUndefined();
+            expect(getStorageGroupStateLabel(state, {Status: 'ok'})).toEqual({
+                title: 'Ok',
+                value: undefined,
+                theme: 'success',
+                dangerHeavy: false,
+            });
+        },
+    );
+
     test('normalizes surrounding whitespace and spacing before the details', () => {
         expect(getStorageGroupStateLabel('  degraded: 2  (3, 1)  ')).toEqual({
             title: 'Degraded',
@@ -170,7 +184,7 @@ describe('getStorageGroupStateLabel', () => {
         });
     });
 
-    test.each([':0()', 'future-state:7(2,1)', 'unknown format', '', undefined])(
+    test.each(['future-state:7(2,1)', 'unknown format', '', undefined])(
         'preserves unknown or missing legacy State %p without StateInfo',
         (state) => {
             expect(getStorageGroupStateLabel(state, {})).toEqual(getStorageGroupStateLabel(state));

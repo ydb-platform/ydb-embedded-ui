@@ -3,6 +3,7 @@ import type {LabelProps} from '@gravity-ui/uikit';
 
 import {DiskStatusLabel} from '../../components/DiskStatus/DiskStatus';
 import type {TStorageGroupStateInfo} from '../../types/api/storage';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 
 import {getStorageGroupStateLabel} from './utils/getStorageGroupStateLabel';
 
@@ -20,5 +21,7 @@ export function StorageGroupStateLabel({
             iconSize={size === 'xs' ? 12 : 14}
             icon={label.theme === 'success' ? Check : undefined}
         />
-    ) : null;
+    ) : (
+        EMPTY_DATA_PLACEHOLDER
+    );
 }

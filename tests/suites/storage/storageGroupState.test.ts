@@ -1,6 +1,8 @@
+import type {Locator} from '@playwright/test';
 import {expect, test} from '@playwright/test';
 
 import type {TGroupsStorageGroupInfo} from '../../../src/types/api/storage';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../src/utils/emptyDataPlaceholder';
 import {PageModel} from '../../models/PageModel';
 
 import {StoragePage} from './StoragePage';
@@ -50,22 +52,41 @@ const scenarios = [
         value: '2 (3,1)',
         theme: 'danger',
     },
-    {
-        name: 'new backend preserves unknown State without StateInfo',
+    ...[':()', ':0()'].map((State) => ({
+        name: `shows a plain placeholder for State ${State} without a status`,
         version: 13,
-        group: {State: ':0()'},
-        title: ':0()',
+        group: {State},
+        title: EMPTY_DATA_PLACEHOLDER,
         value: undefined,
-        theme: 'normal',
-    },
+        theme: undefined,
+    })),
 ] satisfies {
     name: string;
     version: number;
     group: TGroupsStorageGroupInfo;
     title: string;
     value?: string;
-    theme: string;
+    theme?: string;
 }[];
+
+async function expectState(container: Locator, scenario: (typeof scenarios)[number]) {
+    const label = container.locator('.ydb-disk-status__label');
+    if (!scenario.theme) {
+        await expect(container).toBeVisible();
+        await expect(container).toContainText(EMPTY_DATA_PLACEHOLDER);
+        await expect(label).toHaveCount(0);
+        return;
+    }
+
+    await expect(label).toBeVisible();
+    await expect(label.locator('.g-label__content')).toHaveText(scenario.title);
+    await expect(label).toHaveClass(new RegExp(`g-label_theme_${scenario.theme}`));
+    if (scenario.value) {
+        await expect(label.locator('.g-label__key')).toHaveText(scenario.value);
+    } else {
+        await expect(label.locator('.g-label__key')).toHaveCount(0);
+    }
+}
 
 test.describe('Storage group state labels', () => {
     for (const theme of ['light', 'dark']) {
@@ -115,14 +136,7 @@ test.describe('Storage group state labels', () => {
                 await storageResponse;
 
                 const row = new StoragePage(page).getGroupRow(GROUP_ID);
-                const tableLabel = row.locator('.ydb-disk-status__label');
-                await expect(tableLabel.locator('.g-label__content')).toHaveText(scenario.title);
-                await expect(tableLabel).toHaveClass(new RegExp(`g-label_theme_${scenario.theme}`));
-                if (scenario.value) {
-                    await expect(tableLabel.locator('.g-label__key')).toHaveText(scenario.value);
-                } else {
-                    await expect(tableLabel.locator('.g-label__key')).toHaveCount(0);
-                }
+                await expectState(row, scenario);
 
                 const groupResponse = page.waitForResponse(
                     (response) =>
@@ -134,19 +148,12 @@ test.describe('Storage group state labels', () => {
                 await row.getByRole('link', {name: GROUP_ID, exact: true}).click();
                 await groupResponse;
 
-                for (const label of [
-                    tableLabel,
-                    page.locator('.ydb-storage-group-page__title .ydb-disk-status__label'),
-                    page.locator('.header__left-controls .ydb-disk-status__label'),
+                for (const container of [
+                    row,
+                    page.locator('.ydb-storage-group-page__title'),
+                    page.locator('.header__left-controls'),
                 ]) {
-                    await expect(label).toBeVisible();
-                    await expect(label.locator('.g-label__content')).toHaveText(scenario.title);
-                    await expect(label).toHaveClass(new RegExp(`g-label_theme_${scenario.theme}`));
-                    if (scenario.value) {
-                        await expect(label.locator('.g-label__key')).toHaveText(scenario.value);
-                    } else {
-                        await expect(label.locator('.g-label__key')).toHaveCount(0);
-                    }
+                    await expectState(container, scenario);
                 }
 
                 await page.screenshot({path: testInfo.outputPath('storage-group-state.png')});

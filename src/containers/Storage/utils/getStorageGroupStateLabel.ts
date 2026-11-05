@@ -61,7 +61,7 @@ function parseStructuredState(
 function parseLegacyState(state?: string | null): ParsedGroupState | undefined {
     const normalizedState = state?.trim();
 
-    if (!normalizedState) {
+    if (!normalizedState || normalizedState.startsWith(':')) {
         return undefined;
     }
 
