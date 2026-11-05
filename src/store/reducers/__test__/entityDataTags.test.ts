@@ -4,6 +4,7 @@ import type {YdbEmbeddedAPI} from '../../../services/api';
 import {api} from '../api';
 import {clusterApi} from '../cluster/cluster';
 import {clustersApi} from '../clusters/clusters';
+import datacenters from '../datacenters';
 import {tenantApi} from '../tenant/tenant';
 import {tenantsApi} from '../tenants/tenants';
 
@@ -31,7 +32,7 @@ const CLUSTER_LIST_TAG = {type: 'ClusterData', id: 'LIST'} as const;
 
 function createTestStore() {
     return configureStore({
-        reducer: {[api.reducerPath]: api.reducer},
+        reducer: {[api.reducerPath]: api.reducer, datacenters},
         middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware),
     });
 }

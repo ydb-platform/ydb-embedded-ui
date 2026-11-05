@@ -131,14 +131,52 @@ test.describe('Query Templates', () => {
         const tenantPage = new TenantPage(page);
         const queryEditor = new QueryEditor(page);
 
-        const tableName = await queryEditor.createNewFakeTable();
+        const readEditorText = async () =>
+            (await queryEditor.getEditorContent()).replace(/\r\n/g, '\n');
+
+        const tableName = 'template_switch_table';
+        const tablePath = `${database}/${tableName}`;
+        const table = {Name: tableName, PathType: 'EPathTypeTable'};
+
+        await page.route(`${backend}/viewer/json/describe?*`, async (route) => {
+            const path = new URL(route.request().url()).searchParams.get('path');
+            if (path !== database && path !== tablePath) {
+                await route.continue();
+                return;
+            }
+
+            await route.fulfill({
+                json: {
+                    Status: 'StatusSuccess',
+                    Path: path,
+                    PathDescription:
+                        path === tablePath
+                            ? {
+                                  Self: table,
+                                  Table: {
+                                      Columns: [
+                                          {Name: 'id', Type: 'Int32'},
+                                          {Name: 'name', Type: 'Utf8'},
+                                      ],
+                                      KeyColumnNames: ['id'],
+                                  },
+                              }
+                            : {
+                                  Self: {Name: 'local', PathType: 'EPathTypeSubDomain'},
+                                  Children: [table],
+                              },
+                },
+            });
+        });
         await objectSummary.clickRefreshButton();
 
-        // First action - Add index
         await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddIndex);
-        await page.waitForTimeout(500);
+        await expect
+            .poll(readEditorText)
+            .toBe(`ALTER TABLE \`${tableName}\` ADD INDEX index_name GLOBAL ON (<column_name>);`);
 
         await queryEditor.setQuery('SELECT 1;');
+        await expect.poll(readEditorText).toBe('SELECT 1;');
         const initialTabId = await queryEditor.editorTabs.getActiveTabId();
         if (!initialTabId) {
             throw new Error('Expected an active editor tab');
@@ -146,9 +184,9 @@ test.describe('Query Templates', () => {
 
         const initialTabCount = await queryEditor.editorTabs.getTabCount();
 
-        // Try to switch to Select query
         await objectSummary.clickActionMenuItem(tableName, RowTableAction.SelectQuery);
-        await page.waitForTimeout(500);
+        const selectQuery = `SELECT \`id\`, \`name\`\nFROM \`${tableName}\`\nLIMIT 10;`;
+        await expect.poll(readEditorText).toBe(selectQuery);
 
         const isModalHidden = await tenantPage.isUnsavedChangesModalHidden();
         expect(isModalHidden).toBe(true);
@@ -157,10 +195,16 @@ test.describe('Query Templates', () => {
         );
 
         const nextTabId = await queryEditor.editorTabs.getActiveTabId();
+        if (!nextTabId) {
+            throw new Error('Expected an active select template tab');
+        }
         expect(nextTabId).not.toBe(initialTabId);
 
         await queryEditor.editorTabs.selectTabById(initialTabId);
-        await expect.poll(() => queryEditor.getEditorContent(), {timeout: 5000}).toBe('SELECT 1;');
+        await expect.poll(readEditorText, {timeout: 5000}).toBe('SELECT 1;');
+
+        await queryEditor.editorTabs.selectTabById(nextTabId);
+        await expect.poll(readEditorText).toBe(selectQuery);
     });
 
     test('Save query flow saves query and shows it in Saved tab', async ({page}) => {

@@ -3,7 +3,7 @@ import {useStorageQueryParams} from '../useStorageQueryParams';
 import {ExpertModePanelLayout, ExpertModeRow} from './components/ExpertModePanelLayout';
 import type {ExpertModeOption} from './components/ExpertModePanelLayout';
 import {renderPDiskLegend, renderVDiskLegend} from './components/renderExpertModeLegend';
-import {PDisksGroupBy, VDisksGroupBy} from './constants';
+import {PDisksGroupBy, VDisksGroupBy, b} from './constants';
 import type {PDisksGroupByValue, VDisksGroupByValue} from './constants';
 import i18n from './i18n';
 
@@ -18,6 +18,7 @@ function getVDiskOptions(): ExpertModeOption<VDisksGroupByValue>[] {
         {value: VDisksGroupBy.FrontQueues, content: i18n('value_front-queues')},
         {value: VDisksGroupBy.Compaction, content: i18n('value_compaction')},
         {value: VDisksGroupBy.DriveType, content: i18n('value_drive-type')},
+        {value: VDisksGroupBy.Datacenter, content: i18n('value_datacenter')},
         {value: VDisksGroupBy.All, content: i18n('value_all')},
     ];
 }
@@ -31,6 +32,7 @@ function getPDiskOptions(): ExpertModeOption<PDisksGroupByValue>[] {
         {value: PDisksGroupBy.Maintenance, content: i18n('value_pdisks-maintenance')},
         {value: PDisksGroupBy.Device, content: i18n('value_pdisks-device')},
         {value: PDisksGroupBy.DriveType, content: i18n('value_drive-type')},
+        {value: PDisksGroupBy.Datacenter, content: i18n('value_datacenter')},
         {value: PDisksGroupBy.All, content: i18n('value_pdisks-all')},
     ];
 }
@@ -55,7 +57,12 @@ export function StorageGroupsExpertModePanel({className}: StorageGroupsExpertMod
                 onUpdate={handlePDisksGroupByChange}
                 options={getPDiskOptions()}
                 legend={
-                    <div data-qa="storage-pdisks-expert-mode-legend">
+                    <div
+                        className={b('dc-legend', {
+                            enabled: pdisksGroupBy === PDisksGroupBy.Datacenter,
+                        })}
+                        data-qa="storage-pdisks-expert-mode-legend"
+                    >
                         {renderPDiskLegend(pdisksGroupBy, 'pdisks')}
                     </div>
                 }

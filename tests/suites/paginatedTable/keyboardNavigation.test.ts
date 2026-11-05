@@ -373,26 +373,36 @@ test('nodes: arrows do not update uptime cells', async ({page}, testInfo) => {
 
 test('nodes: repeated arrows keep selection across chunks in a large list', async ({page}) => {
     await mockList(page, 'nodes', 5000);
+    await page.setViewportSize({width: 1100, height: 600});
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     page.on('crash', () => errors.push('Page crashed'));
     await new PageModel(page, 'cluster/nodes').goto();
-    await expect(page.getByRole('link', {name: 'host-0.test', exact: true})).toBeVisible();
-    await page.locator('input').first().focus();
-    for (let round = 0; round < 2; round++) {
-        for (let index = 1; index <= 100; index++) {
-            await page.keyboard.press('ArrowDown');
-            if (index % 20 === 0) {
-                await expect(page.locator(focusedRow)).toContainText(`host-${index}.test`);
-            }
-        }
-        for (let index = 99; index >= 0; index--) {
-            await page.keyboard.press('ArrowUp');
-            if (index % 20 === 0) {
-                await expect(page.locator(focusedRow)).toContainText(`host-${index}.test`);
-            }
+    const table = page.locator('[data-keyboard-navigation]');
+    const firstRow = table.locator('[data-row-index="0"]');
+    await expect(firstRow).toContainText('host-0.test');
+    const search = page.locator('input').first();
+    await search.focus();
+    // Move beyond both browsers' render overscan before returning to the first chunk.
+    const lastRowIndex = 80;
+    for (let index = 1; index <= lastRowIndex; index++) {
+        await page.keyboard.press('ArrowDown');
+        if (index % 20 === 0) {
+            await expect(table.locator(focusedRow)).toContainText(`host-${index}.test`);
         }
     }
+    await expect(firstRow).toHaveCount(0);
+    expect(await table.locator('[data-row-index]').count()).toBeLessThan(200);
+
+    for (let index = lastRowIndex - 1; index >= 0; index--) {
+        await page.keyboard.press('ArrowUp');
+        if (index % 20 === 0) {
+            await expect(table.locator(focusedRow)).toContainText(`host-${index}.test`);
+        }
+    }
+    await expect(firstRow).toBeVisible();
+    await expect(firstRow).toHaveClass(/ydb-keyboard-focused-row/);
+    await expect(search).toBeFocused();
     expect(errors).toEqual([]);
-    expect(await page.locator('[data-row-index]').count()).toBeLessThan(200);
+    expect(await table.locator('[data-row-index]').count()).toBeLessThan(200);
 });

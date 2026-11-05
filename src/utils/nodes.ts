@@ -6,6 +6,7 @@ import type {TNodeInfo} from '../types/api/nodesList';
 import type {NodesMap} from '../types/store/nodesList';
 
 import {HOUR_IN_SECONDS} from './constants';
+import {getDatacenterKey} from './datacenters';
 
 import {valueIsDefined} from '.';
 
@@ -29,6 +30,11 @@ export const isUnavailableNode = <
     node: T,
 ) => !node.SystemState || node.SystemState === EFlag.Grey;
 
+function getNodePileName(node: TNodeInfo) {
+    const legacyLocation = node.PhysicalLocation?.Location || node.PhysicalLocation?.DataCenterId;
+    return node.Location?.BridgePileName || legacyLocation?.match(/(?:^|\/)P=([^/]+)/)?.[1];
+}
+
 export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
     return nodesList?.reduce<NodesMap>((nodeHosts, node) => {
         if (valueIsDefined(node.Id)) {
@@ -40,7 +46,9 @@ export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
             nodeHosts.set(node.Id, {
                 Host: node.Host,
                 DC: node.Location?.DataCenter || physicalLocation?.DataCenterId,
+                DCKey: getDatacenterKey(node.Location, physicalLocation?.DataCenterId),
                 Rack,
+                PileName: getNodePileName(node),
             });
         }
         return nodeHosts;
@@ -63,6 +71,7 @@ export function calculateLoadAveragePercents(node: TSystemStateInfo = {}) {
 export interface PreparedNodeSystemState extends TSystemStateInfo {
     Rack?: string;
     DC?: string;
+    DCKey?: string;
     LoadAveragePercents?: number[];
     TenantName?: string;
     SharedCacheLimit?: number;
@@ -89,6 +98,7 @@ export function prepareNodeSystemState(
         ...systemState,
         Rack,
         DC,
+        DCKey: getDatacenterKey(systemState.Location, systemState.DataCenter),
         LoadAveragePercents,
         TenantName,
         SharedCacheLimit,
