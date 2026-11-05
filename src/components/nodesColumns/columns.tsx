@@ -149,7 +149,7 @@ export function getRolesColumn<T extends {Roles?: string[]}>(): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.Roles,
         header: NODES_COLUMNS_TITLES.Roles,
-        width: 200,
+        width: 300,
         align: DataTable.LEFT,
         render: ({row}) => {
             if (!row.Roles?.length) {
