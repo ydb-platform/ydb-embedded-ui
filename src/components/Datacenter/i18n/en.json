@@ -1,4 +1,5 @@
 {
   "value_unknown": "Unknown",
-  "context_disk-datacenter": "{{disk}}: DC {{datacenter}}"
+  "context_disk-datacenter": "{{disk}}: DC {{datacenter}}",
+  "value_nodes": {"one": "{{count}} node", "other": "{{count}} nodes"}
 }
