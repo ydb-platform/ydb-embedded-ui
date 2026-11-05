@@ -85,15 +85,13 @@ export function useStorageNodesSelectedColumns({
 
     // Hidden columns stay in saved settings, so their selection and position survive mode switches
     const hiddenColumnIds = React.useMemo(() => {
-        const hidden: NodesColumnId[] = blobMetricsEnabled
-            ? [...LEGACY_CAPACITY_COLUMN_IDS]
-            : [...CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS];
+        const hiddenCapacityColumnIds = blobMetricsEnabled
+            ? LEGACY_CAPACITY_COLUMN_IDS
+            : CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS;
 
-        if (!columnsSettings?.expertMode) {
-            hidden.push(...EXPERT_MODE_ONLY_COLUMN_IDS);
-        }
-
-        return hidden;
+        return columnsSettings?.expertMode
+            ? hiddenCapacityColumnIds
+            : [...hiddenCapacityColumnIds, ...EXPERT_MODE_ONLY_COLUMN_IDS];
     }, [blobMetricsEnabled, columnsSettings?.expertMode]);
     const setColumns: typeof selectedColumns.setColumns = React.useCallback(
         (value) => {
