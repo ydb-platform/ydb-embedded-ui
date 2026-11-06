@@ -26,6 +26,9 @@ async function setupTopShardsMocks(page: Page, view: TopShardsView) {
             case '/viewer/capabilities':
                 await route.fulfill({json: {Database: database, Capabilities: {}, Settings: {}}});
                 return;
+            case '/viewer/json/nodelist':
+                await route.fulfill({json: []});
+                return;
             case '/viewer/json/tenantinfo':
                 await route.fulfill({
                     json: {TenantInfo: [{Name: database, Type: 'Serverless', Overall: 'Green'}]},

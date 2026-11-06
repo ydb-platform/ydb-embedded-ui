@@ -1,3 +1,5 @@
+import {randomUUID} from 'node:crypto';
+
 import {expect, test} from '@playwright/test';
 
 import type {ExecuteQueryResponse} from '../../../../../src/types/api/query';
@@ -61,23 +63,36 @@ test.describe('Diagnostics Queries tab', async () => {
         const diagnostics = new Diagnostics(page);
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
 
-        const runningQueryMarker = `e2e-running-query-${test.info().project.name}-${Date.now()}`;
-        const queryText = `-- ${runningQueryMarker}\n${longRunningStreamQuery}`;
+        const runningQueryId = randomUUID();
+        const runningQueryMarker = `e2e-running-query-${test.info().project.name}-${runningQueryId}`;
+        // Separate runtime stages leave cancellation points between batches.
+        const queryStatements = Array.from(
+            {length: 10},
+            (_, index) => `SELECT x,
+    Digest::Argon2(CAST(x AS String), "test_salt_${index}_" || CAST(n.NodeId AS String)) AS hash
+FROM (SELECT NodeId FROM \`.sys/nodes\` LIMIT 1) AS n
+CROSS JOIN AS_TABLE(AsList(AsStruct($data AS x))) AS r
+FLATTEN BY x;`,
+        );
+        const queryText = `-- ${runningQueryMarker}
+$data = ListFromRange(1, 50000);
+${queryStatements.join('\n')}`;
         // APIRequestContext buffers the whole response, so use the app's streaming transport.
         const runningQuery = await page.evaluateHandle(
-            ({query, database: databasePath}) => {
+            ({query, queryId, database: databasePath}) => {
                 const controller = new AbortController();
                 const state: {
                     error?: string;
                     queryId?: string;
                     stopping: boolean;
                     completed: boolean;
-                } = {stopping: false, completed: false};
+                } = {queryId, stopping: false, completed: false};
                 const completion = window.api.streaming
                     .streamQuery(
                         {
                             database: databasePath,
                             query,
+                            query_id: queryId,
                             action: 'execute-query',
                             syntax: 'yql_v1',
                             // Keep result batches small so the running query remains cancellable.
@@ -127,7 +142,7 @@ test.describe('Diagnostics Queries tab', async () => {
                     },
                 };
             },
-            {query: queryText, database},
+            {query: queryText, queryId: runningQueryId, database},
         );
 
         let deadline = Date.now() + 10_000;
