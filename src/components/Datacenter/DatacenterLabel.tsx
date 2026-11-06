@@ -1,4 +1,5 @@
 import {CircleQuestionFill} from '@gravity-ui/icons';
+import type {LabelProps} from '@gravity-ui/uikit';
 import {Icon, Label} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
@@ -21,10 +22,12 @@ export function DatacenterLabel({
     name,
     colorKey = name,
     count,
+    size = 'xs',
 }: {
     name?: string;
     colorKey?: string;
     count?: number;
+    size?: LabelProps['size'];
 }) {
     const indexes = useDatacenterColorIndexes();
     const normalized = normalizeDatacenter(name);
@@ -33,7 +36,7 @@ export function DatacenterLabel({
     const value = count === undefined ? undefined : i18n('value_nodes', {count});
     return (
         <Label
-            size="xs"
+            size={size}
             theme="unknown"
             className={b(
                 null,

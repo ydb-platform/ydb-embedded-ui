@@ -297,7 +297,7 @@ export function VDiskPopup({
             {pdisk && <PDiskPopupContent data={pdisk} nodeData={nodeData} />}
             <DiskPopupPanel footer={vdiskFooter}>
                 <DiskHeader data={fullData} donorMode={data.DonorMode} withPDiskType={!pdisk} />
-                <DiskPopupLocation items={locationItems} />
+                <DiskPopupLocation items={locationItems} datacenterColorKey={nodeData.DCKey} />
                 {runtimeItems.length > 0 && (
                     <YDBDefinitionList items={runtimeItems} nameMaxWidth={150} />
                 )}

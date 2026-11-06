@@ -109,7 +109,7 @@ export function PDiskPopupContent({data, nodeData: parentNodeData}: PDiskPopupPr
                     label ? <DiskStatusLabel key={id} {...label} size="xs" /> : null,
                 )}
             />
-            <DiskPopupLocation items={locationItems} />
+            <DiskPopupLocation items={locationItems} datacenterColorKey={nodeData.DCKey} />
             <YDBDefinitionList items={getPDiskRuntimeItems(data)} nameMaxWidth={150} />
             {storageItems.length > 0 && (
                 <React.Fragment>

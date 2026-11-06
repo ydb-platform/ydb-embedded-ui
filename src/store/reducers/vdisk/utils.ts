@@ -42,6 +42,7 @@ export function prepareVDiskDataResponse(
     const NodeId = currentVDisk.NodeId ?? preparedPDisk?.NodeId ?? preparedNode.NodeId;
     const NodeHost = preparedNode.Host;
     const NodeDC = preparedNode.DC;
+    const NodeDCKey = preparedNode.DCKey;
     const NodeRack = preparedNode.Rack;
 
     const PDiskId = currentVDisk.PDiskId ?? preparedPDisk?.PDiskId;
@@ -53,6 +54,7 @@ export function prepareVDiskDataResponse(
         NodeId,
         NodeHost,
         NodeDC,
+        NodeDCKey,
         NodeRack,
 
         PDiskId,

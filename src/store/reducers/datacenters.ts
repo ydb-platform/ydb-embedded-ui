@@ -10,7 +10,9 @@ import {setIsAuthenticated} from './authentication/authentication';
 import {clusterApi} from './cluster/cluster';
 import {nodesApi} from './nodes/nodes';
 import {nodesListApi} from './nodesList';
+import {pDiskApi} from './pdisk/pdisk';
 import {storageApi} from './storage/storage';
+import {vDiskApi} from './vdisk/vdisk';
 
 export interface DatacentersState {
     indexes: DatacenterColorIndexes;
@@ -105,6 +107,12 @@ const datacentersSlice = createSlice({
                 action.meta.baseQueryMeta,
                 action.payload.clusterData.DataCenters,
             ),
+        );
+        builder.addMatcher(pDiskApi.endpoints.getPdiskInfo.matchFulfilled, (state, action) =>
+            registerQueryDatacenters(state, action.meta.baseQueryMeta, [action.payload?.NodeDCKey]),
+        );
+        builder.addMatcher(vDiskApi.endpoints.getVDiskData.matchFulfilled, (state, action) =>
+            registerQueryDatacenters(state, action.meta.baseQueryMeta, [action.payload?.NodeDCKey]),
         );
     },
 });
