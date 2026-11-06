@@ -1,5 +1,8 @@
 import type {TTenantInfo} from '../../../types/api/tenant';
+import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
+import type {RootState} from '../../defaultStore';
 import {api} from '../api';
+import {selectMetaHealthFreshnessAvailable} from '../capabilities/capabilities';
 import {DATABASE_DATA_LIST_TAG} from '../entityDataTags';
 
 import type {PreparedTenant, SharedDatabaseTarget} from './types';
@@ -18,16 +21,29 @@ export const tenantsApi = api.injectEndpoints({
                     environmentName?: string;
                     isMetaDatabasesAvailable?: boolean;
                 },
-                {signal},
+                {signal, getState},
             ) => {
                 try {
                     let response: TTenantInfo;
 
                     if (isMetaDatabasesAvailable && window.api.meta) {
+                        const isHealthFreshnessAvailable = selectMetaHealthFreshnessAvailable(
+                            getState() as RootState,
+                            '/meta/databases',
+                        );
+                        const requestStartedAt = Date.now();
                         response = await window.api.meta.getTenantsV2(
                             {clusterName, environmentName},
                             {signal},
                         );
+                        if (isHealthFreshnessAvailable) {
+                            response = {
+                                ...response,
+                                TenantInfo: response.TenantInfo?.map((tenant) =>
+                                    prepareHealthStatus(tenant, requestStartedAt),
+                                ),
+                            };
+                        }
                     } else if (window.api.meta) {
                         response = await window.api.meta.getTenants({clusterName}, {signal});
                     } else {
@@ -45,8 +61,8 @@ export const tenantsApi = api.injectEndpoints({
                 }
             },
             serializeQueryArgs: ({queryArgs}) => {
-                const {clusterName, environmentName} = queryArgs;
-                return {clusterName, environmentName};
+                const {clusterName, environmentName, isMetaDatabasesAvailable} = queryArgs;
+                return {clusterName, environmentName, isMetaDatabasesAvailable};
             },
             providesTags: ['All', DATABASE_DATA_LIST_TAG],
         }),

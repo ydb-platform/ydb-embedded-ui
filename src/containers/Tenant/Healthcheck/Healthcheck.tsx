@@ -1,9 +1,13 @@
 import React from 'react';
 
-import {Flex, Icon} from '@gravity-ui/uikit';
+import {Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {useDrawerContextInternal} from '../../../components/Drawer/DrawerContext';
-import {ResponseError} from '../../../components/Errors/ResponseError';
+import {
+    ResponseError,
+    ResponseErrorMessage,
+    useErrorInfo,
+} from '../../../components/Errors/ResponseError';
 import {Fullscreen} from '../../../components/Fullscreen/Fullscreen';
 import {HealthcheckStatus} from '../../../components/HealthcheckStatus/HealthcheckStatus';
 import {Loader} from '../../../components/Loader';
@@ -46,8 +50,10 @@ type HealthcheckDetailsProps = (
           database?: undefined;
           databaseType?: undefined;
           scope?: 'cluster';
+          currentHealth?: {error?: string};
       }
 ) & {
+    healthStatusNow?: number;
     targetIssueId?: string;
     targetLeafIssueId?: string;
     targetLeafIssueRef?: React.Ref<HTMLDivElement>;
@@ -74,7 +80,11 @@ export function Healthcheck(props: HealthcheckDetailsProps) {
 
     return (
         <HealthcheckContext.Provider value={{clusterName: props.clusterName}}>
-            <ClusterHealthcheckInner clusterName={props.clusterName} />
+            <ClusterHealthcheckInner
+                clusterName={props.clusterName}
+                healthStatusNow={props.healthStatusNow}
+                currentHealth={props.currentHealth}
+            />
         </HealthcheckContext.Provider>
     );
 }
@@ -110,12 +120,21 @@ function DatabaseHealthcheckInner({
     );
 }
 
-function ClusterHealthcheckInner({clusterName}: {clusterName: string}) {
-    const healthcheck = useClusterHealthcheck(clusterName);
+function ClusterHealthcheckInner({
+    clusterName,
+    healthStatusNow,
+    currentHealth,
+}: {
+    clusterName: string;
+    healthStatusNow?: number;
+    currentHealth?: {error?: string};
+}) {
+    const healthcheck = useClusterHealthcheck(clusterName, {now: healthStatusNow});
     return (
         <HealthcheckContent
             healthcheck={healthcheck}
             target={{scope: 'cluster', request: {clusterName}}}
+            currentHealth={currentHealth}
         />
     );
 }
@@ -127,6 +146,7 @@ interface HealthcheckResult {
     successful: boolean;
     error?: unknown;
     refetch: () => void;
+    canRefetch: boolean;
     selfCheckResult: SelfCheckResult;
     fulfilledTimeStamp?: number;
 }
@@ -137,12 +157,14 @@ function HealthcheckContent({
     targetIssueId,
     targetLeafIssueId,
     targetLeafIssueRef,
+    currentHealth,
 }: {
     healthcheck: HealthcheckResult;
     target: HealthcheckAssistantTarget;
     targetIssueId?: string;
     targetLeafIssueId?: string;
     targetLeafIssueRef?: React.Ref<HTMLDivElement>;
+    currentHealth?: {error?: string};
 }) {
     const SuccessImage = getIllustration('SuccessOperation');
     const renderAssistantAction = uiFactory.healthcheck.renderAssistantAction;
@@ -159,7 +181,9 @@ function HealthcheckContent({
         leavesIssues,
         issues,
         refetch,
+        canRefetch,
     } = healthcheck;
+    const errorInfo = useErrorInfo(error);
     const snapshot = React.useMemo<HealthcheckAssistantSnapshot>(
         () => ({
             selfCheckResult,
@@ -180,47 +204,71 @@ function HealthcheckContent({
         snapshot,
     });
 
+    const renderRefresh = () =>
+        canRefetch ? (
+            <HealthcheckRefresh
+                lastFullfiled={currentHealth ? undefined : fulfilledTimeStamp}
+                refresh={refetch}
+            />
+        ) : null;
+
     const renderControls = () => {
         return (
             <Flex direction="column" gap={3} className={b('controls', {fullscreen})}>
                 <Flex justifyContent="space-between" gap={2}>
-                    {assistant && issues.length > 0 ? (
-                        <React.Fragment>
-                            <Flex gap={2} alignItems="center">
-                                <HealthcheckStatus status={selfCheckResult} />
-                                {assistant.renderAction({
-                                    action: 'diagnostics',
-                                    target: assistant.target,
-                                    snapshot: assistant.snapshot,
-                                })}
-                            </Flex>
-                            <HealthcheckRefresh
-                                lastFullfiled={fulfilledTimeStamp}
-                                refresh={refetch}
-                            />
-                        </React.Fragment>
-                    ) : (
-                        <React.Fragment>
+                    <Flex gap={2} alignItems="center">
+                        {currentHealth ? (
+                            <Text variant="subheader-1">{i18n('label_saved-issues')}</Text>
+                        ) : (
                             <HealthcheckStatus status={selfCheckResult} />
-                            <HealthcheckRefresh
-                                lastFullfiled={fulfilledTimeStamp}
-                                refresh={refetch}
-                            />
-                        </React.Fragment>
-                    )}
+                        )}
+                        {assistant && issues.length > 0
+                            ? assistant.renderAction({
+                                  action: 'diagnostics',
+                                  target: assistant.target,
+                                  snapshot: assistant.snapshot,
+                              })
+                            : null}
+                    </Flex>
+                    {renderRefresh()}
                 </Flex>
-                <HealthcheckView issuesCount={issuesCount} />
-                <HealthcheckFilter />
+                {currentHealth ? (
+                    <Text color="secondary">{i18n('description_saved-issues')}</Text>
+                ) : null}
+                {!currentHealth || leavesIssues.length ? (
+                    <React.Fragment>
+                        <HealthcheckView issuesCount={issuesCount} />
+                        <HealthcheckFilter />
+                    </React.Fragment>
+                ) : null}
             </Flex>
         );
     };
 
+    const renderError = () => {
+        if (!error) {
+            return null;
+        }
+        if (currentHealth && currentHealth.error === errorInfo.title) {
+            return errorInfo.showSubtitle || errorInfo.details ? (
+                <ResponseErrorMessage
+                    subtitle={errorInfo.subtitle}
+                    showSubtitle={errorInfo.showSubtitle}
+                    details={errorInfo.details}
+                    renderedTitle={currentHealth.error}
+                />
+            ) : null;
+        }
+        return <ResponseError error={error} defaultMessage={i18n('description_no-data')} />;
+    };
+
     const renderContent = () => {
-        if (error) {
+        if (!currentHealth && error && !leavesIssues.length) {
             return (
                 <Flex direction="column" gap={1} className={b('stub-wrapper')}>
                     <ResponseError error={error} defaultMessage={i18n('description_no-data')} />
                     <Icon data={cryCatIcon} size={100} />
+                    {renderRefresh()}
                 </Flex>
             );
         }
@@ -229,25 +277,31 @@ function HealthcheckContent({
             return <Loader size="m" />;
         }
 
-        if (selfCheckResult === SelfCheckResult.GOOD && (!leavesIssues || !leavesIssues.length)) {
+        if (!currentHealth && selfCheckResult === SelfCheckResult.GOOD && !leavesIssues.length) {
             return (
                 <Flex direction="column" gap={1} className={b('stub-wrapper')}>
                     <SuccessImage width={200} height={200} />
                     {HEALTHCHECK_RESULT_TO_TEXT[selfCheckResult]}
+                    {renderRefresh()}
                 </Flex>
             );
         }
 
         return (
             <Flex direction="column" grow={1}>
+                {renderError()}
                 {renderControls()}
                 <Flex direction="column" gap={4} grow={1} className={b('issues')}>
-                    <Issues
-                        issues={leavesIssues}
-                        targetIssueId={targetIssueId}
-                        targetLeafIssueId={targetLeafIssueId}
-                        targetLeafIssueRef={targetLeafIssueRef}
-                    />
+                    {currentHealth && !leavesIssues.length ? (
+                        <Text color="secondary">{i18n('label_no-saved-issues')}</Text>
+                    ) : (
+                        <Issues
+                            issues={leavesIssues}
+                            targetIssueId={targetIssueId}
+                            targetLeafIssueId={targetLeafIssueId}
+                            targetLeafIssueRef={targetLeafIssueRef}
+                        />
+                    )}
                 </Flex>
             </Flex>
         );
@@ -256,7 +310,12 @@ function HealthcheckContent({
     return (
         <HealthcheckContext.Provider value={{...healthcheckContext, assistant}}>
             <Fullscreen rightInset={visibleRightInset}>
-                <Flex className={b()} grow={1}>
+                <Flex
+                    className={b()}
+                    grow={1}
+                    role={currentHealth ? 'region' : undefined}
+                    aria-label={currentHealth ? i18n('label_saved-issues') : undefined}
+                >
                     {renderContent()}
                 </Flex>
             </Fullscreen>

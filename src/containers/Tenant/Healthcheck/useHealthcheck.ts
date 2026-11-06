@@ -8,6 +8,7 @@ import {useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {IssueLog} from '../../../types/api/healthcheck';
 import {SelfCheckResult} from '../../../types/api/healthcheck';
 import type {ETenantType} from '../../../types/api/tenant';
+import {useHealthStatusError} from '../../../utils/healthStatus/useEffectiveHealth';
 import {useTypedSelector} from '../../../utils/hooks';
 
 interface HealthcheckParams {
@@ -17,6 +18,7 @@ interface HealthcheckParams {
     successful: boolean;
     error?: unknown;
     refetch: () => void;
+    canRefetch: boolean;
     selfCheckResult: SelfCheckResult;
     fulfilledTimeStamp?: number;
 }
@@ -36,6 +38,7 @@ export const useHealthcheck = (
     const {
         currentData: data,
         isFetching,
+        isUninitialized,
         error,
         refetch,
         fulfilledTimeStamp,
@@ -57,6 +60,7 @@ export const useHealthcheck = (
         successful: data !== undefined && error === undefined,
         error,
         refetch,
+        canRefetch: !isUninitialized,
         selfCheckResult,
         fulfilledTimeStamp,
         leavesIssues,
@@ -66,11 +70,12 @@ export const useHealthcheck = (
 
 export const useClusterHealthcheck = (
     clusterName: string,
-    {autorefresh}: {autorefresh?: number} = {},
+    {autorefresh, now}: {autorefresh?: number; now?: number} = {},
 ): HealthcheckParams => {
     const {
         currentData: data,
         isFetching,
+        isUninitialized,
         error,
         refetch,
         fulfilledTimeStamp,
@@ -78,17 +83,23 @@ export const useClusterHealthcheck = (
         {clusterName},
         {
             pollingInterval: autorefresh,
+            refetchOnMountOrArgChange: true,
         },
     );
 
-    const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
+    const {error: healthError} = useHealthStatusError(data, error, {now});
+    const effectiveError = error ?? healthError;
+    const selfCheckResult = effectiveError
+        ? SelfCheckResult.UNSPECIFIED
+        : data?.self_check_result || SelfCheckResult.UNSPECIFIED;
     const leavesIssues = useTypedSelector((state) => selectClusterLeavesIssues(state, clusterName));
 
     return {
         loading: data === undefined && isFetching,
-        successful: data !== undefined && error === undefined,
-        error,
+        successful: data !== undefined && effectiveError === undefined,
+        error: effectiveError,
         refetch,
+        canRefetch: !isUninitialized,
         selfCheckResult,
         fulfilledTimeStamp,
         leavesIssues,

@@ -41,6 +41,7 @@ import {
     formatNumber,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
+import {useEffectiveHealthList} from '../../utils/healthStatus/useEffectiveHealth';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
@@ -61,6 +62,9 @@ import {useTenantsQueryParams} from './useTenantsQueryParams';
 import './Tenants.scss';
 
 const b = cn('tenants');
+
+const getTenantHealth = (tenant: PreparedTenant) => tenant;
+const setTenantHealth = (_tenant: PreparedTenant, health: PreparedTenant) => health;
 
 const DATABASES_COLUMNS_WIDTH_LS_KEY = 'databasesTableColumnsWidth';
 
@@ -155,13 +159,13 @@ const TenantsTableContent = ({
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count
     // It should be 8/8 instead of 8/9 when no filters applied but show domain setting is off
-    const tenants = React.useMemo(() => {
-        const rawTenants = currentData ?? [];
+    const tenants = React.useMemo(
+        () => filterTenantsByDomain(currentData ?? [], showDomainDatabase),
+        [currentData, showDomainDatabase],
+    );
 
-        return filterTenantsByDomain(rawTenants, showDomainDatabase);
-    }, [currentData, showDomainDatabase]);
-
-    const filteredTenants = React.useMemo(() => {
+    // Filter the backend observation before applying display-only expiration.
+    const filteredObservations = React.useMemo(() => {
         let filteredByProblems = tenants;
         if (showWithProblemsFilter) {
             filteredByProblems = filterTenantsByProblems(tenants, withProblems);
@@ -172,12 +176,15 @@ const TenantsTableContent = ({
         return filteredBySearch;
     }, [tenants, withProblems, search, showWithProblemsFilter]);
 
+    const filteredTenants =
+        useEffectiveHealthList(filteredObservations, getTenantHealth, setTenantHealth) ?? [];
+
     const useMetaProxySetting = settings?.use_meta_proxy;
     const useDatabaseIdSetting = settings?.use_database_id;
     const tenantLinks = React.useMemo(
         () =>
             new Map(
-                tenants.map((tenant) => [
+                filteredTenants.map((tenant) => [
                     tenant,
                     getTenantLink({
                         tenant,
@@ -193,7 +200,7 @@ const TenantsTableContent = ({
                 ]),
             ),
         [
-            tenants,
+            filteredTenants,
             additionalTenantsProps,
             environmentName,
             isMetaDatabasesAvailable,

@@ -54,11 +54,16 @@ async function render() {
     applyE2EQueryEditorModeOverride();
     applyE2EMonitoringOverride();
     applyE2EStorageGroupsOverride();
+    const metaDatabasesOverride = E2E_UI_OVERRIDES_ENABLED && window.e2eMetaDatabases;
+    if (metaDatabasesOverride) {
+        configureUIFactory({emMetaAvailable: true, useMetaProxy: true});
+    }
 
     let App;
     if (
-        process.env.REACT_APP_META_BACKEND === undefined ||
-        process.env.REACT_APP_META_BACKEND === 'undefined'
+        !metaDatabasesOverride &&
+        (process.env.REACT_APP_META_BACKEND === undefined ||
+            process.env.REACT_APP_META_BACKEND === 'undefined')
     ) {
         App = await import('./lib').then(({SingleClusterApp}) => SingleClusterApp);
     } else {

@@ -200,18 +200,31 @@ export function TenantNameWrapper({
     );
 
     const renderStatus = React.useCallback(() => {
+        const canOpenDetails =
+            onStatusClick && database && useMetaProxy && tenant.Type !== 'Serverless';
         return (
             <EntityStatus.Label
                 status={dbStatus ?? EFlag.Grey}
+                note={tenant.error}
                 size="xs"
-                onClick={
-                    onStatusClick && database && useMetaProxy && tenant.Type !== 'Serverless'
-                        ? handleStatusClick
+                onClick={canOpenDetails ? handleStatusClick : undefined}
+                ariaLabelPrefix={
+                    canOpenDetails
+                        ? i18n('action_healthcheck-details', {database: dbPath})
                         : undefined
                 }
             />
         );
-    }, [database, dbStatus, handleStatusClick, onStatusClick, tenant.Type, useMetaProxy]);
+    }, [
+        database,
+        dbStatus,
+        dbPath,
+        handleStatusClick,
+        onStatusClick,
+        tenant.Type,
+        tenant.error,
+        useMetaProxy,
+    ]);
 
     const renderPath = React.useCallback(() => {
         if (!dbPath) {

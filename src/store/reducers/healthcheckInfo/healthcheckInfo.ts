@@ -1,8 +1,11 @@
 import {createSelector} from '@reduxjs/toolkit';
 
-import type {IssueLog, StatusFlag} from '../../../types/api/healthcheck';
+import type {HealthCheckAPIResponse, IssueLog, StatusFlag} from '../../../types/api/healthcheck';
+import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
+import type {PreparedHealthStatus} from '../../../utils/healthStatus/healthStatus';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
+import {selectMetaHealthFreshnessAvailable} from '../capabilities/capabilities';
 
 import {getLeavesFromTree, linkStateStorageSummaries} from './utils';
 
@@ -33,14 +36,26 @@ export const healthcheckApi = api.injectEndpoints({
             },
             providesTags: ['All'],
         }),
-        getClusterHealthcheckInfo: builder.query({
-            queryFn: async ({clusterName}: {clusterName: string}, {signal}) => {
+        getClusterHealthcheckInfo: builder.query<
+            HealthCheckAPIResponse & PreparedHealthStatus,
+            {clusterName: string}
+        >({
+            queryFn: async ({clusterName}, {signal, getState}) => {
                 try {
                     if (!window.api.meta) {
                         throw new Error('Meta API is not available');
                     }
+                    const isHealthFreshnessAvailable = selectMetaHealthFreshnessAvailable(
+                        getState() as RootState,
+                        '/meta/cluster_health',
+                    );
+                    const requestStartedAt = Date.now();
                     const data = await window.api.meta.getClusterHealth({clusterName}, {signal});
-                    return {data};
+                    return {
+                        data: isHealthFreshnessAvailable
+                            ? prepareHealthStatus(data, requestStartedAt)
+                            : data,
+                    };
                 } catch (error) {
                     return {error};
                 }

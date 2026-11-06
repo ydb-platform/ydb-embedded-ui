@@ -2,9 +2,12 @@ import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
 import type {TTenantInfo} from '../../../types/api/tenant';
+import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
+import type {RootState} from '../../defaultStore';
 import {api} from '../api';
+import {selectMetaHealthFreshnessAvailable} from '../capabilities/capabilities';
 import {getDatabaseDataTag} from '../entityDataTags';
 import {prepareTenants} from '../tenants/utils';
 
@@ -60,15 +63,28 @@ export const tenantApi = api.injectEndpoints({
                     clusterName?: string;
                     isMetaDatabasesAvailable: boolean;
                 },
-                {signal},
+                {signal, getState},
             ) => {
                 try {
                     let tenantData: TTenantInfo;
                     if (window.api.meta && clusterName && isMetaDatabasesAvailable) {
+                        const isHealthFreshnessAvailable = selectMetaHealthFreshnessAvailable(
+                            getState() as RootState,
+                            '/meta/databases',
+                        );
+                        const requestStartedAt = Date.now();
                         tenantData = await window.api.meta.getTenantsV2(
                             {database, clusterName},
                             {signal},
                         );
+                        if (isHealthFreshnessAvailable) {
+                            tenantData = {
+                                ...tenantData,
+                                TenantInfo: tenantData.TenantInfo?.map((tenant) =>
+                                    prepareHealthStatus(tenant, requestStartedAt),
+                                ),
+                            };
+                        }
                     } else if (window.api.meta && clusterName) {
                         tenantData = await window.api.meta.getTenants(
                             {database, clusterName},
@@ -111,8 +127,8 @@ export const tenantApi = api.injectEndpoints({
                 ];
             },
             serializeQueryArgs: ({queryArgs}) => {
-                const {clusterName, database} = queryArgs;
-                return {clusterName, database};
+                const {clusterName, database, isMetaDatabasesAvailable} = queryArgs;
+                return {clusterName, database, isMetaDatabasesAvailable};
             },
         }),
     }),

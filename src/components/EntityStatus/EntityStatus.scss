@@ -1,6 +1,18 @@
 @use '../../styles/mixins.scss';
 
 .ydb-entity-status {
+    &__button {
+        display: inline-flex;
+
+        border-radius: var(--g-focus-border-radius);
+
+        @include mixins.button-reset();
+
+        &:focus-visible {
+            @include mixins.focus-outline();
+        }
+    }
+
     &__compact {
         display: inline-flex;
         flex-shrink: 0;

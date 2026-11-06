@@ -113,3 +113,15 @@ export const selectMetaCapabilityVersion = createSelector(
         return selectMetaCapabilities(state).data?.Capabilities?.[capability];
     },
 );
+
+const META_HEALTH_FRESHNESS_VERSIONS = {
+    '/meta/clusters': 2,
+    '/meta/databases': 2,
+    '/meta/cluster_health': 2,
+} satisfies Partial<Record<MetaCapability, number>>;
+
+export const selectMetaHealthFreshnessAvailable = createSelector(
+    selectMetaCapabilityVersion,
+    (_state: RootState, capability: keyof typeof META_HEALTH_FRESHNESS_VERSIONS) => capability,
+    (version, capability) => (version ?? 0) >= META_HEALTH_FRESHNESS_VERSIONS[capability],
+);
