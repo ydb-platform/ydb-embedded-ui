@@ -19,6 +19,22 @@ const vDiskWithCapacityMetrics = {
 } satisfies TVDiskStateInfo;
 
 describe('prepareGroupsResponse', () => {
+    test('preserves structured state and its fail-realm count independently of MissingDisks', () => {
+        const group = {
+            GroupId: '1',
+            State: 'degraded:2(3,1)',
+            StateInfo: {
+                Status: 'degraded',
+                Count: {FailRealms: {Value: 2}},
+                FailedDomainsPerRealm: [3, 1],
+            },
+            MissingDisks: '5',
+        };
+        const {groups} = prepareGroupsResponse({StorageGroups: [group]});
+
+        expect(groups?.[0]).toEqual(expect.objectContaining({...group, Degraded: 5}));
+    });
+
     test('Should preserve missing latency fields as absent', () => {
         const {groups} = prepareGroupsResponse({StorageGroups: [{GroupId: '1'}]});
 

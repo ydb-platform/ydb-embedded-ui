@@ -141,7 +141,7 @@ const stateColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.State,
     width: 150,
     render: ({row}) => {
-        const state = getStorageGroupStateLabel(row.State);
+        const state = getStorageGroupStateLabel(row.State, row.StateInfo);
 
         return state ? (
             <DiskStatusLabel

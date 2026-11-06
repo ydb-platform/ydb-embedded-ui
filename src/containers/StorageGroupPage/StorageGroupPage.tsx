@@ -48,7 +48,6 @@ export function StorageGroupPage() {
     );
 
     const storageGroupData = groupQuery.currentData?.groups?.[0];
-    const state = storageGroupData?.State;
 
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('storageGroup', {groupId: groupId ?? undefined, database}));
@@ -94,7 +93,10 @@ export function StorageGroupPage() {
                             {groupId || EMPTY_DATA_PLACEHOLDER}
                         </Text>
                     </CopyableValue>
-                    <StorageGroupStateLabel state={state} />
+                    <StorageGroupStateLabel
+                        state={storageGroupData?.State}
+                        stateInfo={storageGroupData?.StateInfo}
+                    />
                 </Flex>
             </Flex>
         );

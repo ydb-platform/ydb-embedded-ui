@@ -147,6 +147,7 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
         NodeHost: preparedNode.Host,
         NodeType: preparedNode.Roles?.[0],
         NodeDC: preparedNode.DC,
+        NodeDCKey: preparedNode.DCKey,
         NodeRack: preparedNode.Rack,
         SlotItems: diskSlots,
     };

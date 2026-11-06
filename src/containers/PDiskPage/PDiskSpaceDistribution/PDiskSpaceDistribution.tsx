@@ -81,7 +81,12 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
                     minNonLogTotal={minNonLogTotal}
                     pDiskId={PDiskId}
                     nodeId={NodeId}
-                    nodeData={{Host: data.NodeHost, DC: data.NodeDC, Rack: data.NodeRack}}
+                    nodeData={{
+                        Host: data.NodeHost,
+                        DC: data.NodeDC,
+                        DCKey: data.NodeDCKey,
+                        Rack: data.NodeRack,
+                    }}
                     getVDiskPagePath={getVDiskPagePath}
                     key={index}
                 />
