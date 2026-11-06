@@ -27,7 +27,6 @@ import {
 import type {QuerySourcePosition, QueryStats} from './types';
 import {
     getActionAndSyntaxFromQueryMode,
-    getEffectiveQueryDataForAction,
     getEffectiveQuerySettingsForAction,
     prepareQueryWithPragmasMetadata,
 } from './utils';
@@ -441,9 +440,8 @@ export const queryApi = api.injectEndpoints({
                         };
                     }
 
-                    const preparedData = prepareQueryData(response);
-                    preparedData.traceId = response?._meta?.traceId;
-                    const data = getEffectiveQueryDataForAction(actionType, preparedData);
+                    const data = prepareQueryData(response);
+                    data.traceId = response?._meta?.traceId;
 
                     const queryStats: QueryStats = isExecutionQueryAction(actionType)
                         ? createExecuteQueryStats(data, startTime, 'completed')

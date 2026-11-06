@@ -9,7 +9,7 @@ import i18n from '../../../i18n';
 import {OperationParams} from './OperationParams';
 import {block} from './utils';
 
-const LEVEL_PADDING = 25;
+const LEVEL_PADDING = 24;
 const FIRST_PADDING = 9;
 
 interface OperationCellProps<TData> {
@@ -28,7 +28,7 @@ function Divider({modifiers, left}: DividerProps) {
         <div
             className={block('divider', modifiers)}
             style={{
-                left,
+                left: `calc(var(--g-spacing-8) + ${left}px)`,
             }}
         />
     );
@@ -95,7 +95,7 @@ export function OperationCell<TData>({row, depth = 0, params}: OperationCellProp
     return (
         <div
             style={{
-                paddingLeft: LEVEL_PADDING * depth,
+                paddingLeft: `calc(var(--g-spacing-8) + ${LEVEL_PADDING * depth}px)`,
             }}
             className={block('operation-name')}
         >
