@@ -6,7 +6,7 @@
   "pull-request-title-pattern": "chore(${branch}): release ${version}",
   "packages": {
     ".": {
-      "release-as": "18.1.0-hotfix.1"
+      "release-as": "18.1.0-hotfix.2"
     }
   }
 }
