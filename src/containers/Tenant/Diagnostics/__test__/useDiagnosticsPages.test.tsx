@@ -11,6 +11,7 @@ import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {useTenantBaseInfo} from '../../../../store/reducers/tenant/tenant';
 import {EPathType} from '../../../../types/api/schema';
+import {configureUIFactory, uiFactory} from '../../../../uiFactory/uiFactory';
 import {useIsViewerUser, useUserPermissions} from '../../../../utils/hooks/useWhoami';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
 import {useDiagnosticsPages} from '../useDiagnosticsPages';
@@ -46,6 +47,12 @@ jest.mock('../../../../utils/monitoringVisibility', () => ({
 }));
 
 describe('useDiagnosticsPages', () => {
+    const originalRenderBackups = uiFactory.renderBackups;
+
+    afterEach(() => {
+        configureUIFactory({renderBackups: originalRenderBackups});
+    });
+
     beforeEach(() => {
         jest.clearAllMocks();
 
@@ -62,6 +69,62 @@ describe('useDiagnosticsPages', () => {
         (useIsViewerUser as jest.Mock).mockReturnValue(true);
         (canShowTenantMonitoringTab as jest.Mock).mockReturnValue(true);
         (useUserPermissions as jest.Mock).mockReturnValue(undefined);
+    });
+
+    test.each(['Dedicated', 'Serverless'] as const)(
+        'updates backups visibility when a control plane error changes for a %s database',
+        (databaseType) => {
+            configureUIFactory({renderBackups: () => null});
+            (useTenantBaseInfo as jest.Mock).mockReturnValue({databaseType});
+            const {result, rerender} = renderHook(() =>
+                useDiagnosticsPages({
+                    path: '/local',
+                    database: '/local',
+                    databaseFullPath: '/local',
+                    type: EPathType.EPathTypeSubDomain,
+                }),
+            );
+            expect(result.current.map((page) => page.id)).not.toContain(
+                TENANT_DIAGNOSTICS_TABS_IDS.backups,
+            );
+
+            (useTenantBaseInfo as jest.Mock).mockReturnValue({
+                databaseType,
+                metaErrors: {control_plane: 'Control plane unavailable'},
+            });
+            rerender();
+            expect(result.current.map((page) => page.id)).toContain(
+                TENANT_DIAGNOSTICS_TABS_IDS.backups,
+            );
+
+            (useTenantBaseInfo as jest.Mock).mockReturnValue({
+                databaseType,
+                metaErrors: {viewer: 'Viewer unavailable'},
+            });
+            rerender();
+            expect(result.current.map((page) => page.id)).not.toContain(
+                TENANT_DIAGNOSTICS_TABS_IDS.backups,
+            );
+        },
+    );
+
+    test('hides backups without a renderer even when control plane has failed', () => {
+        configureUIFactory({renderBackups: undefined});
+        (useTenantBaseInfo as jest.Mock).mockReturnValue({
+            metaErrors: {control_plane: 'Control plane unavailable'},
+        });
+        const {result} = renderHook(() =>
+            useDiagnosticsPages({
+                path: '/local',
+                database: '/local',
+                databaseFullPath: '/local',
+                type: EPathType.EPathTypeSubDomain,
+            }),
+        );
+
+        expect(result.current.map((page) => page.id)).not.toContain(
+            TENANT_DIAGNOSTICS_TABS_IDS.backups,
+        );
     });
 
     test('hides storage usage tab when storage stats capability is unavailable', () => {

@@ -35,9 +35,14 @@ export const tenantsApi = api.injectEndpoints({
                     }
                     let data: PreparedTenant[];
                     if (Array.isArray(response.TenantInfo)) {
-                        data = prepareTenants(response.TenantInfo);
+                        data = prepareTenants(response.TenantInfo, response.errors);
                     } else {
                         data = [];
+                    }
+                    if (!data.length && Object.keys(response.errors ?? {}).length) {
+                        return {
+                            error: {code: 'EMPTY_TENANT_INFO', metaErrors: response.errors},
+                        };
                     }
                     return {data};
                 } catch (error) {

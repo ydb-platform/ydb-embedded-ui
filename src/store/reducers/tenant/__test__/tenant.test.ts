@@ -1,6 +1,7 @@
 import {configureStore} from '@reduxjs/toolkit';
 
 import type {YdbEmbeddedAPI} from '../../../../services/api';
+import {parseMetaTenants} from '../../../../services/parsers/parseMetaTenants';
 import type {TTenant} from '../../../../types/api/tenant';
 import {api} from '../../api';
 import {tenantApi} from '../tenant';
@@ -46,6 +47,59 @@ describe('tenantApi.getTenantInfo', () => {
         expect(result).toMatchObject({
             status: 'rejected',
             error: {code: 'EMPTY_TENANT_INFO'},
+        });
+    });
+
+    test('preserves partial meta errors alongside the selected database', async () => {
+        const response = {
+            databases: [{Id: 'database-id', Name: '/local/database'}],
+            errors: {control_plane: 'Simulated CP outage: database-id'},
+        };
+        window.api = {
+            meta: {
+                getTenantsV2: jest.fn().mockResolvedValue(parseMetaTenants(response)),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const args = {...queryArgs, clusterName: 'test-cluster', isMetaDatabasesAvailable: true};
+
+        await store.dispatch(tenantApi.endpoints.getTenantInfo.initiate(args, {subscribe: false}));
+
+        expect(tenantApi.endpoints.getTenantInfo.select(args)(store.getState())).toMatchObject({
+            status: 'fulfilled',
+            data: {
+                Id: 'database-id',
+                Name: '/local/database',
+                metaErrors: {control_plane: 'Simulated CP outage: database-id'},
+            },
+        });
+    });
+
+    test('preserves meta errors when no database is returned', async () => {
+        window.api = {
+            meta: {
+                getTenantsV2: jest.fn().mockResolvedValue(
+                    parseMetaTenants({
+                        errors: {control_plane: 'Control plane unavailable'},
+                    }),
+                ),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+
+        const result = await store.dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate(
+                {...queryArgs, clusterName: 'test-cluster', isMetaDatabasesAvailable: true},
+                {subscribe: false},
+            ),
+        );
+
+        expect(result).toMatchObject({
+            status: 'rejected',
+            error: {
+                code: 'EMPTY_TENANT_INFO',
+                metaErrors: {control_plane: 'Control plane unavailable'},
+            },
         });
     });
 
