@@ -3,6 +3,7 @@ import {configureStore} from '@reduxjs/toolkit';
 import type {YdbEmbeddedAPI} from '../../../../services/api';
 import {parseMetaTenants} from '../../../../services/parsers/parseMetaTenants';
 import type {TTenant} from '../../../../types/api/tenant';
+import {extractErrorDetails} from '../../../../utils/errors';
 import {api} from '../../api';
 import {tenantsApi} from '../tenants';
 
@@ -55,34 +56,58 @@ describe('tenantsApi.getTenantsInfo', () => {
         });
     });
 
-    test.each([undefined, []])('preserves meta errors with databases=%s', async (databases) => {
-        window.api = {
-            meta: {
-                getTenantsV2: jest.fn().mockResolvedValue(
-                    parseMetaTenants({
-                        databases,
-                        errors: {control_plane: 'Control plane unavailable'},
-                    }),
+    test.each([
+        {
+            databases: undefined,
+            errors: {control_plane: 'Control plane unavailable'},
+            message: 'control_plane: Control plane unavailable',
+        },
+        {
+            databases: [],
+            errors: {viewer: 'Viewer unavailable'},
+            message: 'viewer: Viewer unavailable',
+        },
+        {
+            databases: [],
+            errors: {
+                control_plane: 'Control plane unavailable',
+                viewer: 'Viewer unavailable',
+            },
+            message: 'control_plane: Control plane unavailable\nviewer: Viewer unavailable',
+        },
+    ])(
+        'exposes meta errors as a displayable message: $message',
+        async ({databases, errors, message}) => {
+            window.api = {
+                meta: {
+                    getTenantsV2: jest.fn().mockResolvedValue(
+                        parseMetaTenants({
+                            databases,
+                            errors,
+                        }),
+                    ),
+                },
+            } as unknown as YdbEmbeddedAPI;
+            const store = createTestStore();
+
+            const result = await store.dispatch(
+                tenantsApi.endpoints.getTenantsInfo.initiate(
+                    {clusterName: 'test-cluster', isMetaDatabasesAvailable: true},
+                    {subscribe: false},
                 ),
-            },
-        } as unknown as YdbEmbeddedAPI;
-        const store = createTestStore();
+            );
 
-        const result = await store.dispatch(
-            tenantsApi.endpoints.getTenantsInfo.initiate(
-                {clusterName: 'test-cluster', isMetaDatabasesAvailable: true},
-                {subscribe: false},
-            ),
-        );
-
-        expect(result).toMatchObject({
-            status: 'rejected',
-            error: {
-                code: 'EMPTY_TENANT_INFO',
-                metaErrors: {control_plane: 'Control plane unavailable'},
-            },
-        });
-    });
+            expect(result).toMatchObject({
+                status: 'rejected',
+                error: {
+                    code: 'EMPTY_TENANT_INFO',
+                    metaErrors: errors,
+                    message,
+                },
+            });
+            expect(extractErrorDetails(result.error)?.title).toBe(message);
+        },
+    );
 });
 
 describe('tenantsApi.getSharedDatabase', () => {

@@ -41,7 +41,13 @@ export const tenantsApi = api.injectEndpoints({
                     }
                     if (!data.length && Object.keys(response.errors ?? {}).length) {
                         return {
-                            error: {code: 'EMPTY_TENANT_INFO', metaErrors: response.errors},
+                            error: {
+                                code: 'EMPTY_TENANT_INFO',
+                                metaErrors: response.errors,
+                                message: Object.entries(response.errors ?? {})
+                                    .map(([source, message]) => `${source}: ${message}`)
+                                    .join('\n'),
+                            },
                         };
                     }
                     return {data};
