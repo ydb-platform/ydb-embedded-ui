@@ -1,5 +1,26 @@
 # Changelog
 
+## [22.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.7.0...v22.8.0) (2026-11-09)
+
+
+### Features
+
+* **database:** show node counts by datacenter ([#4553](https://github.com/ydb-platform/ydb-embedded-ui/issues/4553)) ([6c50649](https://github.com/ydb-platform/ydb-embedded-ui/commit/6c5064969c0c7885cc12880caac1baa47d7a62c9))
+* **nodes:** add shared datacenter colors ([#4523](https://github.com/ydb-platform/ydb-embedded-ui/issues/4523)) ([15f8ba0](https://github.com/ydb-platform/ydb-embedded-ui/commit/15f8ba0120c10ab045316c0faa0858e13c3206fb))
+* **query:** add word wrap setting ([#4545](https://github.com/ydb-platform/ydb-embedded-ui/issues/4545)) ([1ac4b2a](https://github.com/ydb-platform/ydb-embedded-ui/commit/1ac4b2ae12c73dfeb43308f0463f581de48fd345))
+* **storage:** add datacenter disk views ([#4535](https://github.com/ydb-platform/ydb-embedded-ui/issues/4535)) ([96aa26f](https://github.com/ydb-platform/ydb-embedded-ui/commit/96aa26fe414dd53f20a46c567d05b2e7abde66c0))
+* **storage:** add hidden Roles column to nodes table in expert mode ([#4561](https://github.com/ydb-platform/ydb-embedded-ui/issues/4561)) ([ce125a6](https://github.com/ydb-platform/ydb-embedded-ui/commit/ce125a63ab0334247227e8c9fc2d326b540db228))
+* **storage:** color datacenters in disk tooltips ([#4551](https://github.com/ydb-platform/ydb-embedded-ui/issues/4551)) ([5c57772](https://github.com/ydb-platform/ydb-embedded-ui/commit/5c5777256a0a38ddc614b4f5e0e27080f399b3b0))
+* **storage:** label datacenters on disk detail pages ([#4548](https://github.com/ydb-platform/ydb-embedded-ui/issues/4548)) ([ab00fef](https://github.com/ydb-platform/ydb-embedded-ui/commit/ab00fef6ee3b1fe49fa4371d959fab6b2f118157))
+* **storage:** support structured group state labels ([#4558](https://github.com/ydb-platform/ydb-embedded-ui/issues/4558)) ([c6306fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/c6306fa18493fbe66306d3bbbf70d22656c311ba))
+
+
+### Bug Fixes
+
+* **describe:** preserve expanded fields between objects ([#4521](https://github.com/ydb-platform/ydb-embedded-ui/issues/4521)) ([89efe84](https://github.com/ydb-platform/ydb-embedded-ui/commit/89efe84cad3deb60bfbad870776cac9c3ee5daf0))
+* hide cluster healthcheck without monitoring permission ([#4541](https://github.com/ydb-platform/ydb-embedded-ui/issues/4541)) ([6966563](https://github.com/ydb-platform/ydb-embedded-ui/commit/6966563085619832abc48b3d77424b92e966b885))
+* **nodes:** preserve search fields when grouping ([#4533](https://github.com/ydb-platform/ydb-embedded-ui/issues/4533)) ([6681765](https://github.com/ydb-platform/ydb-embedded-ui/commit/6681765f288eafc44244b5a704fa5163b21180a0))
+
 ## [22.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.6.0...v22.7.0) (2026-10-29)
 
 
