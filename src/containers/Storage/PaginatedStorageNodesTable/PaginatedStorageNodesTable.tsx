@@ -2,6 +2,7 @@ import React from 'react';
 
 import {useHistory} from 'react-router-dom';
 
+import {getEmptyDataWithIssuesMessage} from '../../../components/DataIssuesAlert/DataIssuesAlert';
 import {
     getNodeHostLabel,
     getNodeHostPath,
@@ -51,6 +52,8 @@ interface PaginatedStorageNodesTableProps {
     initialEntitiesCount?: number;
     rowHeight?: number;
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+    /** The response reported problems: an empty table does not prove there are no such nodes */
+    hasDataIssues?: boolean;
 }
 
 export const PaginatedStorageNodesTable = ({
@@ -69,6 +72,7 @@ export const PaginatedStorageNodesTable = ({
     initialEntitiesCount,
     rowHeight = STORAGE_NODES_DEFAULT_ROW_HEIGHT,
     onDataFetched,
+    hasDataIssues,
 }: PaginatedStorageNodesTableProps) => {
     const history = useHistory();
     const fetchNodes = useDatacenterNodesFetcher(getStorageNodes);
@@ -107,11 +111,12 @@ export const PaginatedStorageNodesTable = ({
                     onShowAll={onShowAll}
                     nodesUptimeFilter={nodesUptimeFilter}
                     visibleEntities={visibleEntities}
+                    hasDataIssues={hasDataIssues}
                 />
             );
         }
 
-        return i18n('empty.default');
+        return hasDataIssues ? getEmptyDataWithIssuesMessage() : i18n('empty.default');
     };
 
     return (

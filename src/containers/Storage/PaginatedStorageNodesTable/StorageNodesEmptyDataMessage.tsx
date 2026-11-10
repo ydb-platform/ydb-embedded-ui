@@ -1,3 +1,4 @@
+import {getEmptyDataWithIssuesMessage} from '../../../components/DataIssuesAlert/DataIssuesAlert';
 import {EmptyFilter} from '../../../components/EmptyFilter/EmptyFilter';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
@@ -9,12 +10,14 @@ interface StorageNodesEmptyDataMessageProps {
     visibleEntities: VisibleEntities;
     nodesUptimeFilter: NodesUptimeFilterValues;
     onShowAll?: VoidFunction;
+    hasDataIssues?: boolean;
 }
 
 export const StorageNodesEmptyDataMessage = ({
     visibleEntities,
     nodesUptimeFilter,
     onShowAll,
+    hasDataIssues,
 }: StorageNodesEmptyDataMessageProps) => {
     let message;
 
@@ -35,6 +38,11 @@ export const StorageNodesEmptyDataMessage = ({
         nodesUptimeFilter !== NodesUptimeFilterValues.All
     ) {
         message = i18n('empty.several_filters');
+    }
+
+    if (message && hasDataIssues) {
+        // Do not claim there are no such nodes when the data is known to be incomplete
+        message = getEmptyDataWithIssuesMessage();
     }
 
     if (message) {

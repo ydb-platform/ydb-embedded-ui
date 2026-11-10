@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {DataIssuesAlert} from '../../../components/DataIssuesAlert/DataIssuesAlert';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
@@ -9,6 +10,8 @@ import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
+import {getNodesDataIssues} from '../../../utils/dataIssues/classify';
+import {useTableDataQuality} from '../../../utils/dataIssues/useTableDataQuality';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesTable} from '../NodesTable';
@@ -58,8 +61,38 @@ export function NodesComponent({
         requiredColumnsIds,
     );
 
+    const {dataQuality, handleDataFetched: handleQualityDataFetched} = useTableDataQuality(
+        JSON.stringify([
+            path,
+            database,
+            databaseFullPath,
+            searchValue,
+            uptimeFilter,
+            peerRoleFilter,
+            withProblems,
+            hideUnavailable,
+        ]),
+    );
+    const dataIssues = React.useMemo(
+        () => getNodesDataIssues(dataQuality, {hasDatabase: Boolean(database)}),
+        [dataQuality, database],
+    );
+
+    const handleDataFetched = React.useCallback(
+        (data: PaginatedTableData<PreparedStorageNode>) => {
+            onDataFetched?.(data);
+            handleQualityDataFetched(data);
+        },
+        [onDataFetched, handleQualityDataFetched],
+    );
+
     return (
         <PaginatedTableWithLayout
+            notice={
+                dataIssues.length > 0 ? (
+                    <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />
+                ) : null
+            }
             controls={
                 <NodesControlsWithTableState
                     withGroupBySelect={viewerNodesHandlerHasGrouping}
@@ -86,7 +119,8 @@ export function NodesComponent({
                     peerRoleFilter={peerRoleFilter}
                     columns={columnsToShow}
                     scrollContainerRef={scrollContainerRef}
-                    onDataFetched={onDataFetched}
+                    onDataFetched={handleDataFetched}
+                    hasDataIssues={dataIssues.length > 0}
                 />
             }
             tableWrapperProps={{

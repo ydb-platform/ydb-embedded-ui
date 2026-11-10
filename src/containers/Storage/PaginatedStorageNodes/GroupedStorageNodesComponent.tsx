@@ -1,11 +1,21 @@
 import React from 'react';
 
+import {
+    DataIssuesAlert,
+    getEmptyDataWithIssuesMessage,
+} from '../../../components/DataIssuesAlert/DataIssuesAlert';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {NODES_COLUMNS_TO_DATA_FIELDS} from '../../../components/nodesColumns/constants';
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {NodesGroupByField, NodesRequiredField} from '../../../types/api/nodes';
+import {getNodesDataIssues} from '../../../utils/dataIssues/classify';
+import {
+    getResponseDataQuality,
+    mergeGroupedDataQuality,
+} from '../../../utils/dataIssues/dataQuality';
+import {useTableDataQuality} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
@@ -17,8 +27,9 @@ import {TableGroup} from '../TableGroup/TableGroup';
 import {useExpandedGroups} from '../TableGroup/useExpandedTableGroups';
 import i18n from '../i18n';
 import {b} from '../shared';
+import type {StorageNodesPaginatedTableData} from '../types';
 import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
-import {useStorageColumnsSettings} from '../utils';
+import {getStorageNodesDataIssuesContext, useStorageColumnsSettings} from '../utils';
 
 import {StorageNodesControls} from './StorageNodesControls';
 import {useStorageNodesColumnsToSelect} from './useStorageNodesColumnsToSelect';
@@ -39,8 +50,9 @@ interface StorageNodeGroupProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     handleShowAllNodes: VoidFunction;
-    onDataFetched: (data: any) => void;
+    onDataFetched: (data: StorageNodesPaginatedTableData, source: string) => void;
     rowHeight: number;
+    hasDataIssues: boolean;
 }
 
 export const StorageNodeGroup = React.memo(function StorageNodeGroup({
@@ -58,7 +70,13 @@ export const StorageNodeGroup = React.memo(function StorageNodeGroup({
     handleShowAllNodes,
     onDataFetched,
     rowHeight,
+    hasDataIssues,
 }: StorageNodeGroupProps) {
+    const handleDataFetched = React.useCallback(
+        (data: StorageNodesPaginatedTableData) => onDataFetched(data, name),
+        [onDataFetched, name],
+    );
+
     return (
         <TableGroup
             key={name}
@@ -87,7 +105,8 @@ export const StorageNodeGroup = React.memo(function StorageNodeGroup({
                         columns={columns}
                         initialEntitiesCount={count}
                         rowHeight={rowHeight}
-                        onDataFetched={onDataFetched}
+                        onDataFetched={handleDataFetched}
+                        hasDataIssues={hasDataIssues}
                     />
                 }
                 tableWrapperProps={{
@@ -112,7 +131,11 @@ export function GroupedStorageNodesComponent({
         useStorageQueryParams();
 
     const expertMode = useIsStorageExpertMode();
-    const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings({
+    const {
+        handleDataFetched: handleColumnsDataFetched,
+        columnsSettings,
+        rowHeight,
+    } = useStorageColumnsSettings({
         expertMode,
     });
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
@@ -151,6 +174,40 @@ export function GroupedStorageNodesComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
+    const {dataQualityBySource, handleDataFetched: handleQualityDataFetched} = useTableDataQuality(
+        JSON.stringify([
+            database,
+            nodeId,
+            groupId,
+            nodesSearchValue,
+            storageNodesGroupByParam,
+            hideUnavailable,
+        ]),
+    );
+    const dataQuality = React.useMemo(() => {
+        const groupingQuality = getResponseDataQuality(currentData);
+        // Without grouping the handler returns a plain list of nodes
+        if (groupingQuality && !tableGroups?.length && currentData?.nodes?.length) {
+            groupingQuality.needGroup = true;
+        }
+
+        return mergeGroupedDataQuality(groupingQuality, dataQualityBySource, expandedGroups);
+    }, [currentData, tableGroups, dataQualityBySource, expandedGroups]);
+    const dataIssues = React.useMemo(
+        () =>
+            getNodesDataIssues(dataQuality, getStorageNodesDataIssuesContext({database, groupId})),
+        [dataQuality, database, groupId],
+    );
+    const hasDataIssues = dataIssues.length > 0;
+
+    const handleDataFetched = React.useCallback(
+        (data: StorageNodesPaginatedTableData, source: string) => {
+            handleColumnsDataFetched(data);
+            handleQualityDataFetched(data, source);
+        },
+        [handleColumnsDataFetched, handleQualityDataFetched],
+    );
+
     // Initialize the table state with the API data
     const initialState = React.useMemo(
         () => ({
@@ -185,16 +242,27 @@ export function GroupedStorageNodesComponent({
                         columns={columnsToShow}
                         rowHeight={rowHeight}
                         onDataFetched={handleDataFetched}
+                        hasDataIssues={hasDataIssues}
                     />
                 );
             });
         }
 
-        return i18n('no-nodes');
+        if (dataIssues.includes('group-not-applied')) {
+            // The warning above the table says why there are no groups to show
+            return null;
+        }
+
+        return hasDataIssues ? getEmptyDataWithIssuesMessage() : i18n('no-nodes');
     };
 
     return (
         <PaginatedTableWithLayout
+            notice={
+                hasDataIssues ? (
+                    <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />
+                ) : null
+            }
             controls={
                 <StorageNodesControls
                     withTypeSelector

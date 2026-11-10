@@ -2,6 +2,10 @@ import React from 'react';
 
 import {isNil} from 'lodash';
 
+import {
+    DataIssuesAlert,
+    getEmptyDataWithIssuesMessage,
+} from '../../../components/DataIssuesAlert/DataIssuesAlert';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
@@ -16,6 +20,12 @@ import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {nodesApi} from '../../../store/reducers/nodes/nodes';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole, NodesRequiredField} from '../../../types/api/nodes';
+import {getNodesDataIssues} from '../../../utils/dataIssues/classify';
+import {
+    getResponseDataQuality,
+    mergeGroupedDataQuality,
+} from '../../../utils/dataIssues/dataQuality';
+import {useTableDataQuality} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
@@ -44,7 +54,8 @@ interface NodeGroupProps {
     columns: NodesColumn[];
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
-    onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+    onDataFetched: (data: PaginatedTableData<PreparedStorageNode>, source: string) => void;
+    hasDataIssues: boolean;
 }
 
 const NodeGroup = React.memo(function NodeGroup({
@@ -61,7 +72,13 @@ const NodeGroup = React.memo(function NodeGroup({
     scrollContainerRef,
     onIsExpandedChange,
     onDataFetched,
+    hasDataIssues,
 }: NodeGroupProps) {
+    const handleDataFetched = React.useCallback(
+        (data: PaginatedTableData<PreparedStorageNode>) => onDataFetched(data, name),
+        [onDataFetched, name],
+    );
+
     return (
         <TableGroup
             key={name}
@@ -88,7 +105,8 @@ const NodeGroup = React.memo(function NodeGroup({
                         initialEntitiesCount={count}
                         columns={columns}
                         scrollContainerRef={scrollContainerRef}
-                        onDataFetched={onDataFetched}
+                        onDataFetched={handleDataFetched}
+                        hasDataIssues={hasDataIssues}
                     />
                 }
                 tableWrapperProps={{
@@ -179,6 +197,40 @@ export function GroupedNodesComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
+    const {dataQualityBySource, handleDataFetched: handleQualityDataFetched} = useTableDataQuality(
+        JSON.stringify([
+            path,
+            database,
+            databaseFullPath,
+            searchValue,
+            peerRoleFilter,
+            groupByParam,
+            hideUnavailable,
+        ]),
+    );
+    const dataQuality = React.useMemo(
+        () =>
+            mergeGroupedDataQuality(
+                getResponseDataQuality(currentData),
+                dataQualityBySource,
+                expandedGroups,
+            ),
+        [currentData, dataQualityBySource, expandedGroups],
+    );
+    const dataIssues = React.useMemo(
+        () => getNodesDataIssues(dataQuality, {hasDatabase: Boolean(database)}),
+        [dataQuality, database],
+    );
+    const hasDataIssues = dataIssues.length > 0;
+
+    const handleDataFetched = React.useCallback(
+        (data: PaginatedTableData<PreparedStorageNode>, source: string) => {
+            onDataFetched?.(data);
+            handleQualityDataFetched(data, source);
+        },
+        [onDataFetched, handleQualityDataFetched],
+    );
+
     // Initialize the table state with the API data
     const initialState = React.useMemo(
         () => ({
@@ -210,18 +262,29 @@ export function GroupedNodesComponent({
                         columns={columnsToShow}
                         scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
-                        onDataFetched={onDataFetched}
+                        onDataFetched={handleDataFetched}
+                        hasDataIssues={hasDataIssues}
                     />
                 );
             });
         }
 
-        return i18n('no-nodes-groups');
+        if (dataIssues.includes('group-not-applied')) {
+            // The warning above the table says why there are no groups to show
+            return null;
+        }
+
+        return hasDataIssues ? getEmptyDataWithIssuesMessage() : i18n('no-nodes-groups');
     };
 
     return (
         <PaginatedTableWithLayout
             initialState={initialState}
+            notice={
+                hasDataIssues ? (
+                    <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />
+                ) : null
+            }
             controls={
                 <NodesControls
                     groupByParams={groupByParams}

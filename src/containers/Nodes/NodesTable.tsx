@@ -2,6 +2,7 @@ import React from 'react';
 
 import {useHistory} from 'react-router-dom';
 
+import {getEmptyDataWithIssuesMessage} from '../../components/DataIssuesAlert/DataIssuesAlert';
 import {getNodeHostLabel, getNodeHostPath} from '../../components/NodeHostWrapper/NodeHostWrapper';
 import type {PaginatedTableData} from '../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../components/PaginatedTable';
@@ -45,6 +46,8 @@ interface NodesTableProps {
     initialEntitiesCount?: number;
 
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+    /** The response reported problems: an empty table does not prove there are no such nodes */
+    hasDataIssues?: boolean;
 }
 
 export function NodesTable({
@@ -61,6 +64,7 @@ export function NodesTable({
     scrollContainerRef,
     initialEntitiesCount,
     onDataFetched,
+    hasDataIssues,
 }: NodesTableProps) {
     const history = useHistory();
     const fetchNodes = useDatacenterNodesFetcher(getNodes);
@@ -97,6 +101,10 @@ export function NodesTable({
     ]);
 
     const renderEmptyDataMessage = () => {
+        if (hasDataIssues) {
+            return getEmptyDataWithIssuesMessage();
+        }
+
         if (withProblems || uptimeFilter !== NodesUptimeFilterValues.All) {
             return <SuccessImage width={200} height={200} />;
         }
