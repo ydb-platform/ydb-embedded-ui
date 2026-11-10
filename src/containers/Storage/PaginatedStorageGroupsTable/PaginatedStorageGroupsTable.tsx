@@ -2,13 +2,14 @@ import React from 'react';
 
 import {useHistory} from 'react-router-dom';
 
+import {getEmptyDataWithIssuesMessage} from '../../../components/DataIssuesAlert/DataIssuesAlert';
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
-import type {RenderErrorMessage} from '../../../components/PaginatedTable';
+import type {PaginatedTableData, RenderErrorMessage} from '../../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {useStorageGroupPath} from '../../../routes';
 import {useCapabilitiesLoaded} from '../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
-import type {VisibleEntities} from '../../../store/reducers/storage/types';
+import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {GroupsGroupByField} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
@@ -48,6 +49,10 @@ interface PaginatedStorageGroupsTableProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;
+
+    onDataFetched?: (data: PaginatedTableData<PreparedStorageGroup>) => void;
+    /** The response reported problems: an empty table does not prove there are no such groups */
+    hasDataIssues?: boolean;
 }
 
 export const PaginatedStorageGroupsTable = ({
@@ -64,6 +69,8 @@ export const PaginatedStorageGroupsTable = ({
     scrollContainerRef,
     renderErrorMessage,
     initialEntitiesCount,
+    onDataFetched,
+    hasDataIssues,
 }: PaginatedStorageGroupsTableProps) => {
     const history = useHistory();
     const getStorageGroupPath = useStorageGroupPath();
@@ -105,11 +112,12 @@ export const PaginatedStorageGroupsTable = ({
                 <StorageGroupsEmptyDataMessage
                     onShowAll={onShowAll}
                     visibleEntities={visibleEntities}
+                    hasDataIssues={hasDataIssues}
                 />
             );
         }
 
-        return i18n('empty.default');
+        return hasDataIssues ? getEmptyDataWithIssuesMessage() : i18n('empty.default');
     };
 
     return (
@@ -135,6 +143,7 @@ export const PaginatedStorageGroupsTable = ({
                 renderEmptyDataMessage={renderEmptyDataMessage}
                 filters={tableFilters}
                 tableName={PAGINATED_TABLE_IDS.STORAGE_GROUPS}
+                onDataFetched={onDataFetched}
             />
         </LoaderWrapper>
     );

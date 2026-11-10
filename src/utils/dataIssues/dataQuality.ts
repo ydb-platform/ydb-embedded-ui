@@ -64,6 +64,22 @@ export function mergeDataQuality(
     };
 }
 
+/**
+ * Grouped tables get one response with the list of groups
+ * and one report from the table of every expanded group.
+ */
+export function mergeGroupedDataQuality(
+    groupingQuality: ResponseDataQuality | undefined,
+    groupsQuality: Record<string, ResponseDataQuality>,
+    expandedGroups: Record<string, boolean>,
+) {
+    const expandedGroupsQuality = Object.keys(groupsQuality)
+        .filter((name) => expandedGroups[name])
+        .map((name) => groupsQuality[name]);
+
+    return mergeDataQuality([groupingQuality, ...expandedGroupsQuality]);
+}
+
 export function isSameDataQuality(a: ResponseDataQuality, b: ResponseDataQuality) {
     return (
         a.needFilter === b.needFilter &&

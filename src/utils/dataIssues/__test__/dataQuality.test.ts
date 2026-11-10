@@ -3,6 +3,7 @@ import {
     getResponseDataQuality,
     isSameDataQuality,
     mergeDataQuality,
+    mergeGroupedDataQuality,
     prepareResponseDataQuality,
 } from '../dataQuality';
 import type {ResponseDataQuality} from '../types';
@@ -64,6 +65,26 @@ describe('mergeDataQuality', () => {
             needSort: true,
             needGroup: true,
         });
+    });
+});
+
+describe('mergeGroupedDataQuality', () => {
+    test('Should add reports of expanded groups only', () => {
+        expect(
+            mergeGroupedDataQuality(
+                {...clean, problems: ['bsc-timeout']},
+                {
+                    ssd: {...clean, problems: ['wb-incomplete-disks']},
+                    hdd: {...clean, needSort: true},
+                    removed: {...clean, needFilter: true},
+                },
+                {ssd: true, hdd: false},
+            ),
+        ).toEqual({...clean, problems: ['bsc-timeout', 'wb-incomplete-disks']});
+    });
+
+    test('Should return undefined until the list of groups is loaded', () => {
+        expect(mergeGroupedDataQuality(undefined, {}, {})).toBeUndefined();
     });
 });
 

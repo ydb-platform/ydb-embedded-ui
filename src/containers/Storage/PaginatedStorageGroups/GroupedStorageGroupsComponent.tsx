@@ -1,10 +1,21 @@
 import React from 'react';
 
+import {
+    DataIssuesAlert,
+    getEmptyDataWithIssuesMessage,
+} from '../../../components/DataIssuesAlert/DataIssuesAlert';
 import {ResponseError} from '../../../components/Errors/ResponseError/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {GroupsGroupByField} from '../../../types/api/storage';
+import {getStorageGroupsDataIssues} from '../../../utils/dataIssues/classify';
+import {
+    getResponseDataQuality,
+    mergeGroupedDataQuality,
+} from '../../../utils/dataIssues/dataQuality';
+import type {TableDataWithQuality} from '../../../utils/dataIssues/types';
+import {useTableDataQuality} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
@@ -34,6 +45,8 @@ interface StorageGroupGroupProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     handleShowAllGroups: VoidFunction;
+    onDataFetched: (data: TableDataWithQuality<unknown>, source: string) => void;
+    hasDataIssues: boolean;
 }
 
 export const StorageGroupGroup = React.memo(function StorageGroupGroup({
@@ -50,7 +63,14 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
     columns,
     onIsExpandedChange,
     handleShowAllGroups,
+    onDataFetched,
+    hasDataIssues,
 }: StorageGroupGroupProps) {
+    const handleDataFetched = React.useCallback(
+        (data: TableDataWithQuality<unknown>) => onDataFetched(data, name),
+        [onDataFetched, name],
+    );
+
     return (
         <TableGroup
             key={name}
@@ -78,6 +98,8 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
                         renderErrorMessage={renderPaginatedTableErrorMessage}
                         columns={columns}
                         initialEntitiesCount={count}
+                        onDataFetched={handleDataFetched}
+                        hasDataIssues={hasDataIssues}
                     />
                 }
                 tableWrapperProps={{
@@ -125,6 +147,28 @@ export function GroupedStorageGroupsComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
+    const {dataQualityBySource, handleDataFetched} = useTableDataQuality(
+        JSON.stringify([
+            database,
+            nodeId,
+            groupId,
+            pDiskId,
+            groupsSearchValue,
+            storageGroupsGroupByParam,
+        ]),
+    );
+    const dataQuality = React.useMemo(() => {
+        const groupingQuality = getResponseDataQuality(currentData);
+        // Without grouping the handler returns a plain list of storage groups
+        if (groupingQuality && !tableGroups?.length && currentData?.groups?.length) {
+            groupingQuality.needGroup = true;
+        }
+
+        return mergeGroupedDataQuality(groupingQuality, dataQualityBySource, expandedGroups);
+    }, [currentData, tableGroups, dataQualityBySource, expandedGroups]);
+    const dataIssues = React.useMemo(() => getStorageGroupsDataIssues(dataQuality), [dataQuality]);
+    const hasDataIssues = dataIssues.length > 0;
+
     // Initialize the table state with the API data
     const initialState = React.useMemo(
         () => ({
@@ -158,16 +202,28 @@ export function GroupedStorageGroupsComponent({
                         onIsExpandedChange={setIsGroupExpanded}
                         handleShowAllGroups={handleShowAllGroups}
                         columns={columnsToShow}
+                        onDataFetched={handleDataFetched}
+                        hasDataIssues={hasDataIssues}
                     />
                 );
             });
         }
 
-        return i18n('no-groups');
+        if (dataIssues.includes('group-not-applied')) {
+            // The warning above the table says why there are no groups to show
+            return null;
+        }
+
+        return hasDataIssues ? getEmptyDataWithIssuesMessage() : i18n('no-groups');
     };
 
     return (
         <PaginatedTableWithLayout
+            notice={
+                hasDataIssues ? (
+                    <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />
+                ) : null
+            }
             controls={
                 <StorageGroupsControls
                     withTypeSelector

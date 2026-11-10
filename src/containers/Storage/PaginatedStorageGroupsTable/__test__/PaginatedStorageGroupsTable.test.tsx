@@ -38,14 +38,26 @@ const defaultProps = {
     renderErrorMessage: jest.fn(),
 };
 
-function renderTable(columns: StorageGroupsColumn[]) {
+function renderTable(
+    columns: StorageGroupsColumn[],
+    props: Partial<React.ComponentProps<typeof PaginatedStorageGroupsTable>> = {},
+) {
     render(
         <MemoryRouter>
             <QueryParamProvider adapter={ReactRouter5Adapter}>
-                <PaginatedStorageGroupsTable {...defaultProps} columns={columns} />
+                <PaginatedStorageGroupsTable {...defaultProps} {...props} columns={columns} />
             </QueryParamProvider>
         </MemoryRouter>,
     );
+}
+
+function renderEmptyDataMessage() {
+    const {renderEmptyDataMessage: renderMessage} =
+        ResizeablePaginatedTableMock.mock.calls[
+            ResizeablePaginatedTableMock.mock.calls.length - 1
+        ][0];
+
+    return render(<div>{renderMessage?.()}</div>).container;
 }
 
 describe('PaginatedStorageGroupsTable', () => {
@@ -88,4 +100,35 @@ describe('PaginatedStorageGroupsTable', () => {
             {},
         );
     });
+
+    test('passes the data callback to the table', () => {
+        const onDataFetched = jest.fn();
+        renderTable([], {onDataFetched});
+
+        expect(ResizeablePaginatedTableMock).toHaveBeenCalledWith(
+            expect.objectContaining({onDataFetched}),
+            {},
+        );
+    });
+
+    test.each([
+        ['all', 'No such groups'],
+        ['missing', 'No degraded groups'],
+        ['space', 'No groups with out of space errors'],
+    ] as const)('says there are no groups for %s entities', (visibleEntities, message) => {
+        renderTable([], {visibleEntities});
+
+        expect(renderEmptyDataMessage()).toHaveTextContent(message);
+    });
+
+    test.each(['all', 'missing', 'space'] as const)(
+        'does not claim there are no groups for %s entities when the data has issues',
+        (visibleEntities) => {
+            renderTable([], {visibleEntities, hasDataIssues: true});
+
+            const message = renderEmptyDataMessage();
+            expect(message).toHaveTextContent('Nothing to show, but the data may be incomplete');
+            expect(message).not.toHaveTextContent(/No .*groups/);
+        },
+    );
 });
