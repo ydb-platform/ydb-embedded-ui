@@ -61,4 +61,43 @@ describe('prepareStorageNodesResponse', () => {
             }),
         );
     });
+
+    test('Should keep the problems and unapplied operations reported by the handler', () => {
+        const response = {
+            TotalNodes: '1',
+            FoundNodes: '1',
+            Nodes: [{NodeId: 1, SystemState: {}}],
+            Problems: ['bsc-timeout', 'bsc-storage-slots-no-data'],
+            NeedFilter: true,
+            NeedGroup: true,
+        } satisfies TNodesInfo;
+
+        expect(prepareStorageNodesResponse(response)).toEqual(
+            expect.objectContaining({
+                problems: ['bsc-timeout', 'bsc-storage-slots-no-data'],
+                needFilter: true,
+                needSort: false,
+                needGroup: true,
+            }),
+        );
+    });
+
+    test('Should report no problems when the handler does not send them', () => {
+        const response = {
+            TotalNodes: '1',
+            FoundNodes: '1',
+            Nodes: [{NodeId: 1, SystemState: {}}],
+            Problems: 'bsc-timeout' as unknown as string[],
+            NeedSort: 'true' as unknown as boolean,
+        } satisfies TNodesInfo;
+
+        expect(prepareStorageNodesResponse(response)).toEqual(
+            expect.objectContaining({
+                problems: [],
+                needFilter: false,
+                needSort: false,
+                needGroup: false,
+            }),
+        );
+    });
 });

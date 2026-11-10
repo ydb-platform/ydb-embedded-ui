@@ -23,6 +23,15 @@ export interface TNodesInfo {
     MaximumSlotsPerDisk?: string;
     /** uint64 */
     MaximumDisksPerNode?: string;
+
+    /** Data sources that failed while the response was collected, e.g. `bsc-timeout` */
+    Problems?: string[];
+    /** Raised when the requested filter was not applied */
+    NeedFilter?: boolean;
+    /** Raised when the requested grouping was not applied */
+    NeedGroup?: boolean;
+    /** Raised when the requested sorting was not applied */
+    NeedSort?: boolean;
 }
 
 export interface TNodeInfo {

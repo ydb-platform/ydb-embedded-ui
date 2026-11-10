@@ -6,6 +6,7 @@ import type {
     PreparedStorageGroup,
     PreparedStorageGroupFilters,
 } from '../../../store/reducers/storage/types';
+import {createTableDataQualityReport} from '../../../utils/dataIssues/dataQuality';
 import {prepareSortValue} from '../../../utils/filters';
 import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
 
@@ -32,7 +33,7 @@ export function useGroupsGetter() {
         const sort = sortField ? prepareSortValue(sortField, sortOrder) : undefined;
         const dataFieldsRequired = getRequiredDataFields(columnsIds, GROUPS_COLUMNS_TO_DATA_FIELDS);
 
-        const {groups, found, total} = await requestStorageData({
+        const response = await requestStorageData({
             limit,
             offset,
             sort,
@@ -48,9 +49,10 @@ export function useGroupsGetter() {
         });
 
         return {
-            data: groups || [],
-            found: found || 0,
-            total: total || 0,
+            data: response.groups || [],
+            found: response.found || 0,
+            total: response.total || 0,
+            dataQuality: createTableDataQualityReport(response, {filters, sortParams}),
         };
     }, []);
 

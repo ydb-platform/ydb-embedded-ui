@@ -1,5 +1,5 @@
-import type {PaginatedTableData} from '../../components/PaginatedTable';
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
+import type {TableDataWithQuality} from '../../utils/dataIssues/types';
 
 export type StorageViewContext = {
     groupId?: string;
@@ -8,7 +8,7 @@ export type StorageViewContext = {
     vDiskSlotId?: string;
 };
 
-export type StorageNodesPaginatedTableData = PaginatedTableData<PreparedStorageNode> & {
+export type StorageNodesPaginatedTableData = TableDataWithQuality<PreparedStorageNode> & {
     columnsSettings?: {
         maxSlotsPerDisk: number;
         maxDisksPerNode: number;

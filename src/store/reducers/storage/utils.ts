@@ -2,6 +2,7 @@ import type {EFlag} from '../../../types/api/enums';
 import type {TNodeInfo, TNodesInfo} from '../../../types/api/nodes';
 import {TPDiskState} from '../../../types/api/pdisk';
 import type {StorageGroupsResponse, TGroupsStorageGroupInfo} from '../../../types/api/storage';
+import {prepareResponseDataQuality} from '../../../utils/dataIssues/dataQuality';
 import {getNodeDatacenterKey} from '../../../utils/datacenters';
 import {
     getColorSeverity,
@@ -220,6 +221,7 @@ export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageRe
         found: Number(FoundNodes),
         tableGroups,
         columnsSettings: {maxSlotsPerDisk, maxDisksPerNode},
+        ...prepareResponseDataQuality(data),
     };
 };
 
@@ -293,5 +295,6 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
         total: Number(TotalGroups) || preparedGroups.length,
         found: Number(FoundGroups),
         tableGroups,
+        ...prepareResponseDataQuality(data),
     };
 }

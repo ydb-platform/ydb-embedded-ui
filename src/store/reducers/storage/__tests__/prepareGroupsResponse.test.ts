@@ -211,4 +211,32 @@ describe('prepareGroupsResponse', () => {
             }),
         );
     });
+
+    test('Should keep the problems and unapplied operations reported by the handler', () => {
+        const response = {
+            StorageGroups: [{GroupId: '1'}],
+            Problems: ['bsc-timeout', 'wb-incomplete-groups', 'bsc-timeout', 42, null, ''],
+            NeedSort: true,
+        } as unknown as StorageGroupsResponse;
+
+        expect(prepareGroupsResponse(response)).toEqual(
+            expect.objectContaining({
+                problems: ['bsc-timeout', 'wb-incomplete-groups'],
+                needFilter: false,
+                needSort: true,
+                needGroup: false,
+            }),
+        );
+    });
+
+    test('Should report no problems when the handler does not send them', () => {
+        expect(prepareGroupsResponse({StorageGroups: [{GroupId: '1'}]})).toEqual(
+            expect.objectContaining({
+                problems: [],
+                needFilter: false,
+                needSort: false,
+                needGroup: false,
+            }),
+        );
+    });
 });

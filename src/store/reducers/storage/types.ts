@@ -4,6 +4,7 @@ import type {ECapacityAlert, EFlag} from '../../../types/api/enums';
 import type {NodesGroupByField, TNodeInfo} from '../../../types/api/nodes';
 import type {Erasure, GroupsGroupByField, TStorageGroupStateInfo} from '../../../types/api/storage';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
+import type {ResponseDataQuality} from '../../../utils/dataIssues/types';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {NodesUptimeFilterValues, PreparedNodeSystemState} from '../../../utils/nodes';
 
@@ -109,7 +110,7 @@ export type TableGroup = {
     count: number;
 };
 
-export interface PreparedStorageResponse {
+export interface PreparedStorageResponse extends Partial<ResponseDataQuality> {
     nodes?: PreparedStorageNode[];
     groups?: PreparedStorageGroup[];
     found: number | undefined;
