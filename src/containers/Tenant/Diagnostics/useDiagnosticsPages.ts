@@ -36,7 +36,8 @@ export function useDiagnosticsPages({
 }: UseDiagnosticsPagesParams): Page[] {
     const isDatabase = isDatabaseEntityType(type) || path === databaseFullPath;
 
-    const {controlPlane, databaseType} = useTenantBaseInfo(isDatabase ? database : '');
+    const {controlPlane, databaseType, metaErrors} = useTenantBaseInfo(isDatabase ? database : '');
+    const controlPlaneError = metaErrors?.control_plane;
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();
 
     const hasConfigs = useConfigAvailable();
@@ -52,7 +53,9 @@ export function useDiagnosticsPages({
             hasTopicData,
             isDatabase,
             hasStorageUsage,
-            hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
+            hasBackups:
+                typeof uiFactory.renderBackups === 'function' &&
+                Boolean(controlPlane || controlPlaneError),
             hasConfigs: isViewerUser && hasConfigs,
             hasAccess: uiFactory.hasAccess({userPermissions}),
             hasMonitoring: canShowTenantMonitoringTab(controlPlane, clusterMonitoring),
@@ -66,6 +69,7 @@ export function useDiagnosticsPages({
         isDatabase,
         hasStorageUsage,
         controlPlane,
+        controlPlaneError,
         isViewerUser,
         hasConfigs,
         clusterMonitoring,

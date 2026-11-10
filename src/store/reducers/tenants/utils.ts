@@ -363,7 +363,10 @@ const calculateTenantEntities = (tenant: TTenant) => {
     return {nodesCount, groupsCount};
 };
 
-export const prepareTenants = (tenants: TTenant[]): PreparedTenant[] => {
+export const prepareTenants = (
+    tenants: TTenant[],
+    metaErrors?: PreparedTenant['metaErrors'],
+): PreparedTenant[] => {
     return tenants.map((tenant) => {
         const sharedDatabase = tenants.find((item) => item.Id === tenant.ResourceId);
         const sharedTenantName = sharedDatabase?.Name;
@@ -374,6 +377,7 @@ export const prepareTenants = (tenants: TTenant[]): PreparedTenant[] => {
 
         return {
             ...tenant,
+            ...(metaErrors !== undefined ? {metaErrors} : {}),
 
             sharedTenantName,
             sharedNodeIds,
