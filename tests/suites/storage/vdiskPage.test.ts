@@ -360,8 +360,13 @@ async function expectVDiskDetailsOrder(page: Page, capacityLabels: string[]) {
 }
 
 test.describe('VDisk page storage details', () => {
-    test('hides only Rack and PDisk Path when experiment is disabled', async ({page}) => {
-        await setupVDiskPageMocks(page, {datacenter: LONG_DATACENTER, host: LONG_HOST});
+    test('shows Rack and PDisk Path with the experiment on and off', async ({page}) => {
+        await setupVDiskPageMocks(page, {
+            withCapacityMetrics: true,
+            datacenter: LONG_DATACENTER,
+            rack: LONG_RACK,
+            host: LONG_HOST,
+        });
         await page.goto(VDISK_PAGE_PATH);
 
         const storageDetails = page.getByTestId('vdisk-location');
@@ -371,11 +376,13 @@ test.describe('VDisk page storage details', () => {
         await expect(page.locator('.ydb-paginated-table__table')).toBeVisible();
         await expect(storageDetails).toBeVisible();
         await expect(storageDetails).toHaveCount(1);
-        await expect(storageDetails.locator('.ydb-vdisk-storage-details__detail')).toHaveCount(5);
+        await expect(storageDetails.locator('.ydb-vdisk-storage-details__detail')).toHaveCount(7);
         await expect(storageDetails.getByRole('link', {name: 'Go to PDisk'})).toBeVisible();
         for (const [id, value] of [
             ['datacenter', LONG_DATACENTER.toUpperCase()],
+            ['rack', LONG_RACK],
             ['fqdn', LONG_HOST],
+            ['pdisk-path', '/dev/pdisk0'],
             ['node-id', NODE_ID],
             ['pdisk-id', PDISK_ID],
             ['vdisk-slot-id', '1001'],
@@ -384,22 +391,20 @@ test.describe('VDisk page storage details', () => {
                 storageDetails.getByTestId(`vdisk-location-${id}`).getByText(value, {exact: true}),
             ).toBeVisible();
         }
-        await expect(rack).toHaveCount(0);
-        await expect(pDiskPath).toHaveCount(0);
         await expectVDiskDetailsOrder(page, ['Size', 'Usage', 'Disk Space']);
 
         const sidebar = new Sidebar(page);
-        for (const enabled of [true, false]) {
+        for (let toggle = 0; toggle < 2; toggle++) {
             await sidebar.clickSettings();
             await sidebar.clickExperimentsSection();
             await sidebar.toggleExperimentByTitle('Detailed storage view');
             await sidebar.closeDrawer();
 
             await expect(storageDetails.locator('.ydb-vdisk-storage-details__detail')).toHaveCount(
-                enabled ? 7 : 5,
+                7,
             );
-            await expect(rack).toHaveCount(enabled ? 1 : 0);
-            await expect(pDiskPath).toHaveCount(enabled ? 1 : 0);
+            await expect(rack.getByText(LONG_RACK, {exact: true})).toBeVisible();
+            await expect(pDiskPath.getByText('/dev/pdisk0', {exact: true})).toBeVisible();
             await expect(storageDetails.getByRole('link', {name: 'Go to PDisk'})).toBeVisible();
         }
     });
