@@ -5,12 +5,16 @@ import {Button, Flex, Icon, Select, Text} from '@gravity-ui/uikit';
 import {StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
+import {DataIssuesAlert} from '../../components/DataIssuesAlert/DataIssuesAlert';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {VersionsBar} from '../../components/VersionsBar/VersionsBar';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {TClusterInfo} from '../../types/api/cluster';
 import {cn} from '../../utils/cn';
+import {getNodesDataIssues} from '../../utils/dataIssues/classify';
+import {getResponseDataQuality} from '../../utils/dataIssues/dataQuality';
+import type {ResponseDataQuality} from '../../utils/dataIssues/types';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import type {PreparedVersion, VersionsDataMap} from '../../utils/versions/types';
 
@@ -49,6 +53,7 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
             <Versions
                 preparedVersions={preparedVersions}
                 nodes={currentData?.nodes}
+                nodesDataQuality={getResponseDataQuality(currentData)}
                 versionsDataMap={versionsDataMap}
             />
         </LoaderWrapper>
@@ -57,13 +62,14 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
 
 interface VersionsProps {
     nodes?: PreparedStorageNode[];
+    nodesDataQuality?: ResponseDataQuality;
     preparedVersions: PreparedVersion[];
     versionsDataMap?: VersionsDataMap;
 }
 
 const groupByValueSchema = z.nativeEnum(GroupByValue).catch(GroupByValue.VERSION);
 
-function Versions({preparedVersions, nodes, versionsDataMap}: VersionsProps) {
+function Versions({preparedVersions, nodes, nodesDataQuality, versionsDataMap}: VersionsProps) {
     const [{groupBy: rawGroupByValue}, setQueryParams] = useQueryParams({
         groupBy: StringParam,
     });
@@ -103,6 +109,10 @@ function Versions({preparedVersions, nodes, versionsDataMap}: VersionsProps) {
 
     return (
         <Flex className={b()} direction={'column'} gap={6}>
+            <DataIssuesAlert
+                issues={getNodesDataIssues(nodesDataQuality)}
+                problems={nodesDataQuality?.problems}
+            />
             <Flex gap={3} direction={'column'} className={b('overall')}>
                 <Text variant="subheader-3">{i18n('title_overall')}</Text>
                 <VersionsBar preparedVersions={preparedVersions} size="m" />

@@ -17,6 +17,7 @@ import {
 } from '../../../../Storage/PaginatedStorageGroupsTable/columns/constants';
 import type {StorageGroupsColumn} from '../../../../Storage/PaginatedStorageGroupsTable/columns/types';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
+import {TopGroupsDataIssues} from '../TopTablesDataIssues';
 
 export interface TopGroupsTableConfig {
     columns: StorageGroupsColumn[];
@@ -72,6 +73,7 @@ export function TopGroups({tenant, capacityMetricsEnabled}: TopGroupsProps) {
             loading={loading || !capabilitiesLoaded}
             error={error}
             withData={Boolean(currentData)}
+            notice={<TopGroupsDataIssues response={currentData} />}
         >
             <ResizeableDataTable
                 columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}

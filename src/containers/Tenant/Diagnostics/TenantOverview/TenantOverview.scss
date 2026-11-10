@@ -43,6 +43,10 @@
         @include mixins.subheader-1-typography();
     }
 
+    &__data-issues {
+        margin-bottom: var(--g-spacing-2);
+    }
+
     &__table {
         &:not(:last-child) {
             margin-bottom: var(--diagnostics-section-margin);

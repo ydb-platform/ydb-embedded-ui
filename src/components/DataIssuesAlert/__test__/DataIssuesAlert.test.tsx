@@ -1,6 +1,7 @@
 import {render, screen} from '@testing-library/react';
 
 import {DataIssuesAlert} from '../DataIssuesAlert';
+import {DataIssuesIndicator} from '../DataIssuesIndicator';
 
 describe('DataIssuesAlert', () => {
     test('Should render nothing without issues', () => {
@@ -33,5 +34,21 @@ describe('DataIssuesAlert', () => {
 
         expect(screen.getByText('Grouping was not applied.')).toBeInTheDocument();
         expect(screen.queryByText(/Problems reported by the server/)).not.toBeInTheDocument();
+    });
+});
+
+describe('DataIssuesIndicator', () => {
+    test('Should render nothing without issues', () => {
+        const {container} = render(<DataIssuesIndicator issues={[]} problems={['bsc-timeout']} />);
+
+        expect(container).toBeEmptyDOMElement();
+    });
+
+    test('Should render a focusable control that names the problem', () => {
+        render(<DataIssuesIndicator issues={['list-incomplete']} problems={['bsc-timeout']} />);
+
+        expect(
+            screen.getByRole('button', {name: 'Data may be incomplete or inaccurate'}),
+        ).toBeInTheDocument();
     });
 });

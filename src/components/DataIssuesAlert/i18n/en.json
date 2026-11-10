@@ -6,7 +6,7 @@
   "alert_group-not-applied": "Grouping was not applied.",
   "alert_nodes-status-unreliable": "Some nodes did not respond in time and may be shown as unavailable.",
   "alert_disks-unavailable": "Disks of unavailable nodes are not shown, and disk filters may skip such nodes.",
-  "alert_partial-data": "Some data is unavailable: part of the columns may be empty.",
+  "alert_partial-data": "Some data is unavailable: some values may be missing.",
   "context_problem-codes": "Problems reported by the server: {{codes}}",
   "context_empty-with-issues": "Nothing to show, but the data may be incomplete",
   "title_data-issues": "Data may be incomplete or inaccurate"

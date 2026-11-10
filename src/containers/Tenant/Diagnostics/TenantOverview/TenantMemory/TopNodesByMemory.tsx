@@ -25,6 +25,7 @@ import {
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {getRequiredDataFields} from '../../../../../utils/tableUtils/getRequiredDataFields';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
+import {TopNodesDataIssues} from '../TopTablesDataIssues';
 import i18n from '../i18n';
 
 function getTopNodesByMemoryColumns(
@@ -71,7 +72,12 @@ export function TopNodesByMemory({database}: TopNodesByMemoryProps) {
     const topNodes = currentData?.nodes || [];
 
     return (
-        <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>
+        <TenantOverviewTableLayout
+            loading={loading}
+            error={error}
+            withData={Boolean(currentData)}
+            notice={<TopNodesDataIssues response={currentData} />}
+        >
             <ResizeableDataTable
                 columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
                 data={topNodes}

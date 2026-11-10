@@ -2,4 +2,9 @@
     &__codes {
         word-break: break-word;
     }
+
+    &__popover {
+        max-width: 400px;
+        padding: var(--g-spacing-3);
+    }
 }
