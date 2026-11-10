@@ -4,7 +4,7 @@
 @forward '../../styles/versions.scss';
 @forward '../../styles/unipika.scss';
 
-@import '../../assets/fonts/rubik/fonts.css';
+@import '@fontsource/rubik/400.css';
 
 * {
     // FIXME: this is an overkill, potentially could break external components, needs refactoring
