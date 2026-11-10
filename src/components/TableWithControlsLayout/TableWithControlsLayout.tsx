@@ -71,6 +71,16 @@ TableWithControlsLayout.Controls = function TableControls({
     );
 };
 
+TableWithControlsLayout.Notice = function TableNotice({
+    children,
+    className,
+}: {
+    children: React.ReactNode;
+    className?: string;
+}) {
+    return <div className={b('notice', className)}>{children}</div>;
+};
+
 TableWithControlsLayout.Table = function Table({
     children,
     loading,

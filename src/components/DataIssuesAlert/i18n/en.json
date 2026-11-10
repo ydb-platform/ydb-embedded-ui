@@ -1,0 +1,13 @@
+{
+  "alert_database-unavailable": "Database information is unavailable, so its nodes cannot be listed.",
+  "alert_list-incomplete": "The list may be incomplete: some data sources did not respond.",
+  "alert_filter-not-applied": "Filters were not applied: the list may contain rows that do not match them.",
+  "alert_sort-not-applied": "Sorting was not applied: rows are shown in arbitrary order.",
+  "alert_group-not-applied": "Grouping was not applied.",
+  "alert_nodes-status-unreliable": "Some nodes did not respond in time and may be shown as unavailable.",
+  "alert_disks-unavailable": "Disks of unavailable nodes are not shown, and disk filters may skip such nodes.",
+  "alert_partial-data": "Some data is unavailable: part of the columns may be empty.",
+  "context_problem-codes": "Problems reported by the server: {{codes}}",
+  "context_empty-with-issues": "Nothing to show, but the data may be incomplete",
+  "title_data-issues": "Data may be incomplete or inaccurate"
+}

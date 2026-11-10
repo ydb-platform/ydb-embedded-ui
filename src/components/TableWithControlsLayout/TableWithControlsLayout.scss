@@ -45,6 +45,21 @@
         margin: 0 0 0 auto;
     }
 
+    // Scrolls away with the content, unlike controls and the table head
+    &__notice {
+        position: sticky;
+        left: 0;
+
+        box-sizing: border-box;
+        width: fit-content;
+        max-width: min(100%, 900px);
+        padding-bottom: var(--g-spacing-4);
+
+        &:empty {
+            display: none;
+        }
+    }
+
     &__table {
         position: relative;
         z-index: 2;
