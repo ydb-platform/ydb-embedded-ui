@@ -4,6 +4,8 @@
 @forward '../../styles/versions.scss';
 @forward '../../styles/unipika.scss';
 
+@import '../../assets/fonts/rubik/fonts.css';
+
 * {
     // FIXME: this is an overkill, potentially could break external components, needs refactoring
     box-sizing: border-box;

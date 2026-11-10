@@ -50,14 +50,7 @@ function AppContent({
 
     return (
         <React.Fragment>
-            <Helmet defaultTitle={appTitle} titleTemplate={`%s — ${appTitle}`}>
-                {singleClusterMode && (
-                    <link
-                        rel="stylesheet"
-                        href="https://fonts.googleapis.com/css2?family=Rubik&display=swap"
-                    />
-                )}
-            </Helmet>
+            <Helmet defaultTitle={appTitle} titleTemplate={`%s — ${appTitle}`} />
             <FullscreenProvider fullscreenRootRef={fullscreenRootRef}>
                 <ContentWrapper>
                     <NavigationWrapper

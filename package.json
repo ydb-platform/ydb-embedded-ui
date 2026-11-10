@@ -82,7 +82,7 @@
     "lint:other": "npm run prettier -- --check",
     "prettier": "prettier '**/*.{json,yaml,yml,md}'",
     "unused": "npx knip --include dependencies,files,exports,types",
-    "package": "rm -rf dist && tsc -p tsconfig.package.json && copyfiles -u 1 'src/**/*.{css,scss,svg}' dist",
+    "package": "rm -rf dist && tsc -p tsconfig.package.json && copyfiles -u 1 'src/**/*.{css,scss,svg,woff2}' 'src/assets/fonts/rubik/LICENSE' dist",
     "test": "jest",
     "prepublishOnly": "npm run package",
     "typecheck": "tsc --noEmit",
