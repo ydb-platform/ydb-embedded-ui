@@ -77,7 +77,10 @@ export const tenantApi = api.injectEndpoints({
                     } else {
                         tenantData = await window.api.viewer.getTenantInfo({database}, {signal});
                     }
-                    const databases = prepareTenants(tenantData.TenantInfo || []);
+                    const databases = prepareTenants(
+                        tenantData.TenantInfo || [],
+                        tenantData.errors,
+                    );
                     // previous meta versions do not support filtering databases by name
                     const data =
                         databases.find(
@@ -87,7 +90,14 @@ export const tenantApi = api.injectEndpoints({
                                 tenant.ControlPlane?.id === database,
                         ) ?? databases[0];
                     if (!data) {
-                        return {error: {code: 'EMPTY_TENANT_INFO'}};
+                        return {
+                            error: {
+                                code: 'EMPTY_TENANT_INFO',
+                                ...(tenantData.errors !== undefined
+                                    ? {metaErrors: tenantData.errors}
+                                    : {}),
+                            },
+                        };
                     }
                     return {data};
                 } catch (error) {
@@ -142,6 +152,7 @@ export function useTenantBaseInfo(
     return {
         databaseData: currentData,
         controlPlane: ControlPlane,
+        metaErrors: currentData?.metaErrors,
         name: Name,
         id: Id,
         databaseType: Type,

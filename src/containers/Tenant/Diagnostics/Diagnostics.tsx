@@ -1,14 +1,16 @@
 import React from 'react';
 
-import {Text} from '@gravity-ui/uikit';
+import {Flex, Text} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 
+import {CopyableValue} from '../../../components/CopyableValue/CopyableValue';
 import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab, useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import type {EPathSubType, EPathType} from '../../../types/api/schema';
 import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import i18n from '../i18n';
 import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
 import type {DatabasePagesDisplay} from './DiagnosticsPages';
@@ -47,7 +49,8 @@ function Diagnostics({
 
     const isV2NavigationEnabled = useNavigationV2Enabled();
 
-    const {name} = useTenantBaseInfo(database);
+    const {name, id, controlPlane, metaErrors} = useTenantBaseInfo(database);
+    const showDatabaseId = Boolean(id && (controlPlane || metaErrors?.control_plane));
 
     const pages = useDiagnosticsPages({
         path,
@@ -94,9 +97,22 @@ function Diagnostics({
     const renderDBName = () => {
         if (isV2NavigationEnabled && databasePagesDisplay === 'database') {
             return (
-                <Text variant="header-1" className={b('db-name')}>
-                    {name}
-                </Text>
+                <Flex
+                    alignItems="center"
+                    gap={3}
+                    wrap="wrap"
+                    className={b('db-name')}
+                    qa="database-header"
+                >
+                    <Text variant="header-1">{name}</Text>
+                    {showDatabaseId && (
+                        <CopyableValue copyText={id} fieldName={i18n('title_database')}>
+                            <Text variant="header-1" color="hint">
+                                {id}
+                            </Text>
+                        </CopyableValue>
+                    )}
+                </Flex>
             );
         }
 

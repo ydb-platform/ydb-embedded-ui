@@ -14,6 +14,10 @@ export interface MetaCluster {
 
 export interface MetaTenants {
     databases?: TTenant[];
+    errors?: {
+        viewer?: string;
+        control_plane?: string;
+    };
 }
 
 /** With fields present only in /api/meta/meta/clusters */
