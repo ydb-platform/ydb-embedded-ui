@@ -30,6 +30,16 @@ export const isUnavailableNode = <
     node: T,
 ) => !node.SystemState || node.SystemState === EFlag.Grey;
 
+/**
+ * The node has no state only because it did not answer in time (see `TNodeInfo.ResponseTimeout`).
+ * It may be alive, so it must not be presented as unavailable for sure.
+ */
+export const isNodeResponseTimedOut = <
+    T extends Pick<TSystemStateInfo, 'SystemState'> & {ResponseTimeout?: boolean},
+>(
+    node: T,
+) => node.ResponseTimeout === true && isUnavailableNode(node);
+
 function getNodePileName(node: TNodeInfo) {
     const legacyLocation = node.PhysicalLocation?.Location || node.PhysicalLocation?.DataCenterId;
     return node.Location?.BridgePileName || legacyLocation?.match(/(?:^|\/)P=([^/]+)/)?.[1];

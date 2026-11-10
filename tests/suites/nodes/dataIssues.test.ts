@@ -1,6 +1,7 @@
 import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
+import type {TNodesInfo} from '../../../src/types/api/nodes';
 import {DataIssuesAlert} from '../../models/DataIssuesAlert';
 import {PageModel} from '../../models/PageModel';
 import {createNodesResponse, setupDataIssuesMocks} from '../storage/dataIssuesMocks';
@@ -53,6 +54,52 @@ test.describe('Database nodes data issues', () => {
         expect(requests.at(-1)?.searchParams.get('database')).toBe('/local');
 
         await page.screenshot({path: testInfo.outputPath('database-nodes-data-issues.png')});
+    });
+
+    test('marks a node that did not answer in time and keeps the link to its page', async ({
+        page,
+    }, testInfo) => {
+        await setupDataIssuesMocks(page, {
+            nodes: () =>
+                createNodesResponse({
+                    TotalNodes: '3',
+                    FoundNodes: '3',
+                    Nodes: [
+                        {NodeId: 1, SystemState: {Host: 'storage-node-1', SystemState: 'Green'}},
+                        // Reported as disconnected only because it did not answer in time
+                        {
+                            NodeId: 2,
+                            Disconnected: true,
+                            ResponseTimeout: true,
+                            SystemState: {Host: 'storage-node-2'},
+                        },
+                        // Really disconnected
+                        {NodeId: 3, Disconnected: true, SystemState: {Host: 'storage-node-3'}},
+                    ] as TNodesInfo['Nodes'],
+                    Problems: ['wb-incomplete'],
+                }),
+        });
+        await openDatabaseNodes(page);
+
+        const table = page.locator('table');
+        const timedOutRow = table.locator('tr', {hasText: 'storage-node-2'});
+        const disconnectedRow = table.locator('tr', {hasText: 'storage-node-3'});
+
+        const stateUnknownIcon = timedOutRow.getByTestId('node-state-unknown');
+        await expect(stateUnknownIcon).toBeVisible();
+        await expect(table.getByTestId('node-state-unknown')).toHaveCount(1);
+
+        await stateUnknownIcon.hover();
+        await expect(
+            page.getByText('The node did not respond in time. Its state is unknown.'),
+        ).toBeVisible();
+        await page.screenshot({path: testInfo.outputPath('node-response-timeout.png')});
+
+        await expect(
+            timedOutRow.getByRole('link', {name: 'storage-node-2', exact: true}),
+        ).toHaveAttribute('href', /\/node\/2\//);
+        await expect(disconnectedRow.getByText('storage-node-3', {exact: true})).toBeVisible();
+        await expect(disconnectedRow.getByRole('link')).toHaveCount(0);
     });
 
     test('explains an empty list when database information is unavailable', async ({page}) => {

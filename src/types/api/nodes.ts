@@ -43,6 +43,12 @@ export interface TNodeInfo {
     DiskSpaceUsage?: number;
     UptimeSeconds?: number;
     Disconnected?: boolean;
+    /**
+     * The node is reported as disconnected only because it did not answer in time:
+     * no answer and no disconnect were received, so its real state is unknown.
+     * Sent by newer backends only.
+     */
+    ResponseTimeout?: boolean;
 
     SystemState: TSystemStateInfo;
     PDisks?: TPDiskStateInfo[];

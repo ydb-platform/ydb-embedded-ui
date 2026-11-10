@@ -82,6 +82,20 @@ describe('prepareStorageNodesResponse', () => {
         );
     });
 
+    test('Should keep the flag of a node that did not answer in time', () => {
+        const result = prepareStorageNodesResponse({
+            TotalNodes: '2',
+            FoundNodes: '2',
+            Nodes: [
+                {NodeId: 1, Disconnected: true, ResponseTimeout: true, SystemState: {Host: 'a'}},
+                {NodeId: 2, Disconnected: true, SystemState: {Host: 'b'}},
+            ],
+        });
+
+        expect(result.nodes?.[0].ResponseTimeout).toBe(true);
+        expect(result.nodes?.[1].ResponseTimeout).toBeUndefined();
+    });
+
     test('Should report no problems when the handler does not send them', () => {
         const response = {
             TotalNodes: '1',
