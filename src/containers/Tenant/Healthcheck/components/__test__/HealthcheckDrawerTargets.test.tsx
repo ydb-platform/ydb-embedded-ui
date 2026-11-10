@@ -14,6 +14,7 @@ jest.mock('../HealthcheckDrawer', () => ({
     HealthcheckDrawer: jest.fn(({children}: {children: React.ReactNode}) => children),
 }));
 jest.mock('../../../../../utils/hooks', () => ({useTypedSelector: () => undefined}));
+jest.mock('../../../../../store', () => ({environment: ''}));
 jest.mock('../../../../../utils/hooks/useWhoami', () => ({
     useIsUserAllowedToMakeChanges: () => true,
 }));

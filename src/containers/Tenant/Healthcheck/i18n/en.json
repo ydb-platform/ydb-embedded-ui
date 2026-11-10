@@ -1,5 +1,10 @@
 {
   "description_no-data": "No healthcheck data",
+  "label_current-health": "Current health",
+  "label_saved-issues": "Saved issues",
+  "description_saved-issues": "Previously reported issues. They may not reflect current health.",
+  "label_no-saved-issues": "No saved issues available",
+  "description_current-health-unavailable": "Current health is unavailable",
   "label_storage": "Storage",
   "label_compute": "Compute",
   "label_unknown": "Unknown",

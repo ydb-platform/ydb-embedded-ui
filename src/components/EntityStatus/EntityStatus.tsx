@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type {LabelProps} from '@gravity-ui/uikit';
-import {ActionTooltip, Flex, HelpMark, Label} from '@gravity-ui/uikit';
+import {ActionTooltip, Flex, HelpMark, Label, Tooltip} from '@gravity-ui/uikit';
 
 import {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
@@ -54,6 +54,7 @@ interface EntityStatusLabelBaseProps {
 
 interface DefaultEntityStatusLabelProps {
     view?: 'default';
+    ariaLabelPrefix?: string;
     note?: React.ReactNode;
     children?: React.ReactNode;
     endContent?: React.ReactNode;
@@ -63,6 +64,7 @@ interface DefaultEntityStatusLabelProps {
 
 interface CompactEntityStatusLabelProps {
     view: 'compact';
+    ariaLabelPrefix?: never;
     note?: never;
     children?: never;
     endContent?: never;
@@ -74,6 +76,7 @@ type EntityStatusLabelProps = EntityStatusLabelBaseProps &
     (DefaultEntityStatusLabelProps | CompactEntityStatusLabelProps);
 
 function EntityStatusLabel({
+    ariaLabelPrefix,
     children,
     className,
     endContent,
@@ -104,24 +107,54 @@ function EntityStatusLabel({
     }
     const theme = EFlagToLabelTheme[status];
     const isClickable = Boolean(onClick);
+    const label = (
+        <Label
+            theme={theme}
+            icon={<StatusIcon size={iconSize} status={status} />}
+            size={size}
+            className={b({critical: status === EFlag.Red, clickable: isClickable}, className)}
+            interactive={isClickable}
+            qa={qa}
+        >
+            <Flex gap="2" wrap="nowrap">
+                {children}
+                {withStatusName ? EFlagToStatusName[status] : null}
+                {endContent ? <Flex alignSelf="center">{endContent}</Flex> : null}
+                {note && !isClickable && <HelpMark className={b('note')}>{note}</HelpMark>}
+            </Flex>
+        </Label>
+    );
+
+    if (isClickable) {
+        return (
+            <Tooltip
+                openDelay={500}
+                content={
+                    <Flex direction="column" gap="1">
+                        <span>{EFlagToDescription[status]}</span>
+                        {note ? <span>{note}</span> : null}
+                    </Flex>
+                }
+            >
+                <button
+                    type="button"
+                    className={b('button')}
+                    onClick={onClick}
+                    aria-label={
+                        ariaLabelPrefix
+                            ? `${ariaLabelPrefix} ${EFlagToStatusName[status]}`
+                            : undefined
+                    }
+                >
+                    {label}
+                </button>
+            </Tooltip>
+        );
+    }
+
     return (
         <ActionTooltip title={EFlagToDescription[status]} disabled={Boolean(note)}>
-            <Label
-                theme={theme}
-                icon={<StatusIcon size={iconSize} status={status} />}
-                size={size}
-                className={b({critical: status === EFlag.Red, clickable: isClickable}, className)}
-                onClick={onClick}
-                interactive={isClickable}
-                qa={qa}
-            >
-                <Flex gap="2" wrap="nowrap">
-                    {children}
-                    {withStatusName ? EFlagToStatusName[status] : null}
-                    {endContent ? <Flex alignSelf="center">{endContent}</Flex> : null}
-                    {note && <HelpMark className={b('note')}>{note}</HelpMark>}
-                </Flex>
-            </Label>
+            {label}
         </ActionTooltip>
     );
 }

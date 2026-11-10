@@ -6,6 +6,7 @@ import {ActionTooltip, Button, Icon} from '@gravity-ui/uikit';
 import {DrawerWrapper} from '../../../../components/Drawer';
 import type {DrawerControl} from '../../../../components/Drawer';
 import {EnableFullscreenButton} from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import type {EFlag} from '../../../../types/api/enums';
 import type {SelfCheckResult} from '../../../../types/api/healthcheck';
 import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {createAndDownloadJsonFile} from '../../../../utils/downloadFile';
@@ -24,6 +25,7 @@ interface HealthcheckDrawerProps {
     storageKey: string;
     title: React.ReactNode;
     status?: SelfCheckResult;
+    currentHealth?: {Overall?: EFlag; error?: string};
     healthcheckData: unknown;
     downloadFilePrefix: string;
     downloadTooltip: string;
@@ -41,6 +43,7 @@ export function HealthcheckDrawer({
     storageKey,
     title,
     status,
+    currentHealth,
     healthcheckData,
     downloadFilePrefix,
     downloadTooltip,
@@ -111,7 +114,13 @@ export function HealthcheckDrawer({
             hideVeil={false}
             isPercentageWidth
             drawerControls={drawerControls}
-            title={<HealthcheckDrawerTitle title={title} status={status} />}
+            title={
+                <HealthcheckDrawerTitle
+                    title={title}
+                    status={status}
+                    currentHealth={currentHealth}
+                />
+            }
         >
             {children}
         </DrawerWrapper>

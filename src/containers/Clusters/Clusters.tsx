@@ -23,6 +23,7 @@ import {
 import type {ClusterAvailability, PreparedCluster} from '../../store/reducers/clusters/types';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {useEffectiveHealthList} from '../../utils/healthStatus/useEffectiveHealth';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
@@ -45,6 +46,12 @@ import './Clusters.scss';
 interface ClustersProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
 }
+
+const getClusterHealth = (row: PreparedCluster) => row.cluster;
+const setClusterHealth = (
+    row: PreparedCluster,
+    cluster: NonNullable<PreparedCluster['cluster']>,
+) => ({...row, cluster});
 
 export function Clusters({scrollContainerRef}: ClustersProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -116,7 +123,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         });
     }, [isDeleteClusterAvailable, isEditClusterAvailable, handleStatusClick, healthcheckAvailable]);
 
-    const clusters = query.data;
+    const clusters = useEffectiveHealthList(query.data, getClusterHealth, setClusterHealth);
     const hasUnavailableClusters = clusters?.some(
         (cluster) => cluster.settings?.unavailable === true,
     );

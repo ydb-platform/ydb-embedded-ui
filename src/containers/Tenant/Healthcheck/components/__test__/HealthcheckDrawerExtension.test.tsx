@@ -121,6 +121,7 @@ describe('Healthcheck drawer extension', () => {
             issues: [{id: 'issue'}],
             leavesIssues: [{id: 'issue', categoryForUI: 'storage'}],
             refetch: jest.fn(),
+            canRefetch: true,
         };
         configureUIFactory({
             healthcheck: {

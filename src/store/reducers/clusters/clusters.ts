@@ -1,7 +1,10 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
+import {prepareHealthStatus} from '../../../utils/healthStatus/healthStatus';
+import type {RootState} from '../../defaultStore';
 import {api} from '../api';
+import {selectMetaHealthFreshnessAvailable} from '../capabilities/capabilities';
 import {CLUSTER_DATA_LIST_TAG} from '../entityDataTags';
 
 import type {ClustersFilters} from './types';
@@ -33,11 +36,24 @@ export const {changeClustersFilters} = slice.actions;
 export const clustersApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getClustersList: builder.query({
-            queryFn: async (_, {signal}) => {
+            queryFn: async (_, {signal, getState}) => {
                 try {
                     if (window.api.meta) {
+                        const isHealthFreshnessAvailable = selectMetaHealthFreshnessAvailable(
+                            getState() as RootState,
+                            '/meta/clusters',
+                        );
+                        const requestStartedAt = Date.now();
                         const data = await window.api.meta.getClustersList(undefined, {signal});
-                        return {data: prepareClustersData(data)};
+                        return {
+                            data: prepareClustersData(data).map((cluster) => ({
+                                ...cluster,
+                                cluster:
+                                    isHealthFreshnessAvailable && cluster.cluster
+                                        ? prepareHealthStatus(cluster.cluster, requestStartedAt)
+                                        : cluster.cluster,
+                            })),
+                        };
                     } else {
                         throw new Error('Method is not implemented.');
                     }

@@ -196,34 +196,34 @@ function getTitleColumn({
                     return null;
                 }
 
-                const statusLabel = clusterStatus ? (
-                    <EntityStatus.Label status={clusterStatus} size="xs" />
-                ) : (
-                    <EntityStatus.Label
-                        status={EFlag.Grey}
-                        note={row.cluster?.error || i18n('tooltip_no-cluster-data')}
-                        size="xs"
-                    />
-                );
-
-                const isHealthcheckSource = row.cluster?.overall_source === 'healthcheck';
-
-                if (!onStatusClick || !clusterStatus || !isHealthcheckSource) {
-                    return statusLabel;
-                }
+                const canOpenDetails =
+                    onStatusClick && clusterStatus && row.cluster?.overall_source === 'healthcheck';
 
                 return (
-                    <button
-                        type="button"
-                        className={b('status-button')}
-                        onClickCapture={(e) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            onStatusClick(row);
-                        }}
-                    >
-                        {statusLabel}
-                    </button>
+                    <EntityStatus.Label
+                        status={clusterStatus ?? EFlag.Grey}
+                        note={
+                            row.cluster?.error ||
+                            (!clusterStatus ? i18n('tooltip_no-cluster-data') : undefined)
+                        }
+                        size="xs"
+                        onClick={
+                            canOpenDetails
+                                ? (event) => {
+                                      event.stopPropagation();
+                                      event.preventDefault();
+                                      onStatusClick(row);
+                                  }
+                                : undefined
+                        }
+                        ariaLabelPrefix={
+                            canOpenDetails
+                                ? i18n('action_healthcheck-details', {
+                                      cluster: row.title || row.name || '',
+                                  })
+                                : undefined
+                        }
+                    />
                 );
             };
 
@@ -390,9 +390,9 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             return NodesTotal;
         },
         render: ({row}) => {
-            const {NodesAlive = 0, NodesTotal = 0, Overall} = row.cluster || {};
+            const {NodesAlive = 0, NodesTotal = 0} = row.cluster || {};
 
-            if (!Overall) {
+            if (row.cluster?.NodesAlive === undefined && row.cluster?.NodesTotal === undefined) {
                 return EMPTY_CELL;
             }
 
@@ -418,14 +418,13 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             return cluster?.NumberOfCpus || 0;
         },
         render: ({row}) => {
-            const {
-                LoadAverage = 0,
-                NumberOfCpus = 0,
-                RealNumberOfCpus,
-                Overall,
-            } = row.cluster || {};
+            const {LoadAverage = 0, NumberOfCpus = 0, RealNumberOfCpus} = row.cluster || {};
 
-            if (!Overall) {
+            if (
+                row.cluster?.LoadAverage === undefined &&
+                row.cluster?.NumberOfCpus === undefined &&
+                RealNumberOfCpus === undefined
+            ) {
                 return EMPTY_CELL;
             }
 
@@ -451,9 +450,9 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             return Number(cluster?.StorageTotal) || 0;
         },
         render: ({row}) => {
-            const {StorageUsed = 0, StorageTotal = 0, Overall} = row.cluster || {};
+            const {StorageUsed = 0, StorageTotal = 0} = row.cluster || {};
 
-            if (!Overall) {
+            if (row.cluster?.StorageUsed === undefined && row.cluster?.StorageTotal === undefined) {
                 return EMPTY_CELL;
             }
 
