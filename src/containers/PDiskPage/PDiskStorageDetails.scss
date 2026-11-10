@@ -39,6 +39,10 @@
         min-width: 0;
         max-width: 100%;
 
+        &:has(.ydb-datacenter-label) {
+            text-overflow: clip;
+        }
+
         &_with-left-trim {
             text-align: end;
             direction: rtl;

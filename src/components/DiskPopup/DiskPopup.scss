@@ -172,6 +172,10 @@
         white-space: nowrap;
         text-overflow: ellipsis;
 
+        &:has(> .ydb-datacenter-label) {
+            text-overflow: clip;
+        }
+
         &_with-left-trim {
             text-align: end;
             direction: rtl;
