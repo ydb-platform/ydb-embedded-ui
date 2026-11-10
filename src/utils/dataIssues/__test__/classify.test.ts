@@ -31,8 +31,17 @@ describe('getStorageGroupsDataIssues', () => {
         ['hive-storage-stats-no-reliable-data', 'partial-data'],
         ['empty-node-warden-bridge-info', 'partial-data'],
         ['some-code-of-a-newer-backend', 'partial-data'],
+        ['filter-not-applied', 'filter-not-applied'],
+        ['sort-not-applied', 'sort-not-applied'],
+        ['group-not-applied', 'group-not-applied'],
     ])('Should classify %s as %s', (problem, issue) => {
         expect(getStorageGroupsDataIssues(quality([problem]))).toEqual([issue]);
+    });
+
+    test('Should not report an unapplied operation twice when the code comes with its flag', () => {
+        expect(getStorageGroupsDataIssues(quality(['sort-not-applied'], {needSort: true}))).toEqual(
+            ['sort-not-applied'],
+        );
     });
 
     test.each<[Partial<ResponseDataQuality>, DataIssueKind]>([
@@ -102,6 +111,11 @@ describe('getNodesDataIssues', () => {
         ['no-node-state-info', anyNodes, 'partial-data'],
         ['no-path-info', databaseNodes, 'partial-data'],
         ['some-code-of-a-newer-backend', groupNodes, 'partial-data'],
+        // newer backends name the unapplied operation themselves
+        ['filter-not-applied', anyNodes, 'filter-not-applied'],
+        ['filter-not-applied', groupNodes, 'filter-not-applied'],
+        ['sort-not-applied', anyNodes, 'sort-not-applied'],
+        ['group-not-applied', databaseNodes, 'group-not-applied'],
     ])('Should classify %s in %j as %s', (problem, context, issue) => {
         expect(getNodesDataIssues(quality([problem]), context)).toEqual([issue]);
     });

@@ -34,6 +34,16 @@ function addUnappliedOperations(issues: Set<DataIssueKind>, quality: ResponseDat
 }
 
 /**
+ * Newer backends also name an unapplied operation in `Problems`, next to the `Need*` flag.
+ * For /viewer/nodes the code is the only signal of a dropped storage group or pool filter.
+ */
+const NOT_APPLIED_PROBLEMS: Partial<Record<string, DataIssueKind>> = {
+    'filter-not-applied': 'filter-not-applied',
+    'sort-not-applied': 'sort-not-applied',
+    'group-not-applied': 'group-not-applied',
+};
+
+/**
  * /storage/groups builds the list of groups from BS controller data and falls back
  * to whiteboard when the controller does not answer. With these problems
  * some groups may be missing from the list.
@@ -54,7 +64,10 @@ export function getStorageGroupsDataIssues(quality?: ResponseDataQuality): DataI
     const issues = new Set<DataIssueKind>();
 
     for (const problem of quality.problems) {
-        if (STORAGE_GROUPS_LIST_INCOMPLETE_PROBLEMS.has(problem)) {
+        const notApplied = NOT_APPLIED_PROBLEMS[problem];
+        if (notApplied) {
+            issues.add(notApplied);
+        } else if (STORAGE_GROUPS_LIST_INCOMPLETE_PROBLEMS.has(problem)) {
             issues.add('list-incomplete');
         } else {
             // Unknown codes of newer backends also get here
@@ -89,6 +102,10 @@ function getNodesProblemIssue(
     problem: string,
     {hasGroupFilter, hasDatabase, storageNodes}: NodesDataIssuesContext,
 ): DataIssueKind {
+    const notApplied = NOT_APPLIED_PROBLEMS[problem];
+    if (notApplied) {
+        return notApplied;
+    }
     if (NODES_DATABASE_UNAVAILABLE_PROBLEMS.has(problem)) {
         // The handler clears the list in this case
         return 'database-unavailable';
