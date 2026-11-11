@@ -1,5 +1,5 @@
 {
-  "column.dstPath.name": "Dist",
+  "column.dstPath.name": "Destination",
   "column.srcPath.name": "Source",
   "everythingWithPrefix": "Everything with prefix:",
   "noData": "No data.",
