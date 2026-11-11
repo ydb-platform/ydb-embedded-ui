@@ -58,6 +58,48 @@ describe('getNodeHostPath', () => {
         expect(getNodeHostPath(createNode({ResponseTimeout: true}))).toContain('/node/7');
     });
 
+    test('Should treat a node without a state as a storage node in a table of storage nodes', () => {
+        const path = getNodeHostPath(createNode({ResponseTimeout: true}), '/Root/db', {
+            storageNodes: true,
+        });
+
+        // like an available storage node: its own storage tab and no database in the link
+        expect(path).toBe(
+            getNodeHostPath(createNode({SystemState: EFlag.Green, Roles: ['Storage']}), '/Root/db'),
+        );
+        expect(path).toContain('/node/7/storage');
+        expect(path).not.toContain('database');
+    });
+
+    test('Should treat a node without a state as a database node among the nodes of a database', () => {
+        const path = getNodeHostPath(createNode({ResponseTimeout: true}), '/Root/db');
+
+        // like an available node of the database: its tablets and the database in the link
+        expect(path).toBe(
+            getNodeHostPath(
+                createNode({SystemState: EFlag.Green, TenantName: '/Root/db'}),
+                '/Root/db',
+            ),
+        );
+        expect(path).toContain('/node/7/tablets');
+        expect(path).toContain('database=');
+    });
+
+    test('Should not guess the kind of a node without a state when nothing tells it', () => {
+        const path = getNodeHostPath(createNode({ResponseTimeout: true}));
+
+        expect(path).toContain('/node/7/storage');
+        expect(path).not.toContain('database');
+    });
+
+    test('Should not let the table override the roles a node has reported', () => {
+        const node = createNode({SystemState: EFlag.Green, TenantName: '/Root/db'});
+
+        expect(getNodeHostPath(node, '/Root/db', {storageNodes: true})).toBe(
+            getNodeHostPath(node, '/Root/db'),
+        );
+    });
+
     test('Should give no path without a host even when the node did not answer in time', () => {
         expect(
             getNodeHostPath(createNode({Host: undefined, ResponseTimeout: true})),
@@ -94,6 +136,22 @@ describe('NodeHostWrapper', () => {
             getStateUnknownIcon(container),
         );
         expect(container.querySelector('.ydb-status-color')).not.toBeInTheDocument();
+    });
+
+    test('Should link a node without a state as the table it is in tells', () => {
+        render(
+            <MemoryRouter>
+                <NodeHostWrapper
+                    node={createNode({ResponseTimeout: true})}
+                    database="/Root/db"
+                    storageNodes
+                />
+            </MemoryRouter>,
+        );
+
+        const href = screen.getByRole('link', {name: 'node-7.example.net'}).getAttribute('href');
+        expect(href).toContain('/node/7/storage');
+        expect(href).not.toContain('database');
     });
 
     test('Should keep the connect status but still give the link in the network column', () => {

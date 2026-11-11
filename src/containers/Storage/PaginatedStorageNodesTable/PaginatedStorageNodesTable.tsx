@@ -130,7 +130,7 @@ export const PaginatedStorageNodesTable = ({
             getKeyboardRowKey={(node) => node.NodeId}
             getKeyboardRowLabel={getNodeHostLabel}
             onKeyboardActivate={(node) => {
-                const nodePath = getNodeHostPath(node, database);
+                const nodePath = getNodeHostPath(node, database, {storageNodes: true});
                 if (nodePath) {
                     history.push(nodePath);
                 }

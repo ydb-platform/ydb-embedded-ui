@@ -28,7 +28,15 @@ export type NodeHostData = NodeAddress &
         TenantName?: string;
     };
 
-interface NodeHostWrapperProps {
+interface NodeHostPathOptions {
+    /**
+     * The node is from a table of storage nodes. A node that did not answer in time has no roles
+     * and no tenant to tell what it is, so the table it is listed in has to say that.
+     */
+    storageNodes?: boolean;
+}
+
+interface NodeHostWrapperProps extends NodeHostPathOptions {
     node: PreparedStorageNode;
     database?: string;
     statusForIcon?: 'SystemState' | 'ConnectStatus';
@@ -37,19 +45,27 @@ interface NodeHostWrapperProps {
 export function getNodeHostPath(
     node: PreparedNodeSystemState & Pick<TNodeInfo, 'ResponseTimeout'>,
     database?: string,
+    {storageNodes = false}: NodeHostPathOptions = {},
 ) {
     if (!node.Host || node.NodeId === undefined) {
         return undefined;
     }
     // A node that only did not answer in time may be alive, and its page makes its own request
-    if (isUnavailableNode(node) && !isNodeResponseTimedOut(node)) {
+    const hasNoState = isNodeResponseTimedOut(node);
+    if (isUnavailableNode(node) && !hasNoState) {
         return undefined;
     }
 
-    const databaseInPath = checkIsStorageNode(node) ? undefined : (database ?? node.TenantName);
+    // Without the state the kind of the node follows from where it is listed:
+    // a table of storage nodes, or the nodes of a database
+    const isStorageNode = hasNoState ? storageNodes : checkIsStorageNode(node);
+    const isDatabaseNode = hasNoState
+        ? !storageNodes && Boolean(database)
+        : Boolean(node.TenantName);
+    const databaseInPath = isStorageNode ? undefined : (database ?? node.TenantName);
 
     return getDefaultNodePath(
-        {id: node.NodeId, activeTab: node.TenantName ? 'tablets' : 'storage'},
+        {id: node.NodeId, activeTab: isDatabaseNode ? 'tablets' : 'storage'},
         {database: databaseInPath},
     );
 }
@@ -83,6 +99,7 @@ export const NodeHostWrapper = ({
     node,
     database,
     statusForIcon = 'SystemState',
+    storageNodes,
 }: NodeHostWrapperProps) => {
     if (!node.Host) {
         return EMPTY_DATA_PLACEHOLDER;
@@ -94,7 +111,7 @@ export const NodeHostWrapper = ({
     // ConnectStatus is known from the peers of the node, so it stays as is
     const isStateUnknown = statusForIcon === 'SystemState' && isNodeResponseTimedOut(node);
 
-    const nodePath = getNodeHostPath(node, database);
+    const nodePath = getNodeHostPath(node, database, {storageNodes});
 
     return (
         <EntityName

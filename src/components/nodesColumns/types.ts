@@ -5,6 +5,8 @@ import type {Column} from '../../utils/tableUtils/types';
 
 export interface GetNodesColumnsParams {
     database?: string;
+    /** The table lists storage nodes, see `getNodeHostPath` */
+    storageNodes?: boolean;
 
     viewContext?: StorageViewContext;
     columnsSettings?: StorageNodesColumnsSettings;
