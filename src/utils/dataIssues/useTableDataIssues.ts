@@ -7,7 +7,7 @@ import type {ResponseDataQuality} from './types';
 import {useTableDataQuality} from './useTableDataQuality';
 
 export interface TableDataIssues {
-    /** What to tell the user about the rows on screen, in the display order */
+    /** What to tell the user about the rows rendered in the table, in the display order */
     issues: DataIssueKind[];
     /** Raw problem codes of the responses */
     problems: string[];

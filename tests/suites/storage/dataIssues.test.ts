@@ -154,6 +154,8 @@ test.describe('Storage groups data issues', () => {
 
 test.describe('Storage groups data issues of a long list', () => {
     const BSC_TIMEOUT = ['bsc-timeout'];
+    const CHUNK_SIZE = 20;
+    const ROW_HEIGHT = 41;
 
     /** Where the table starts in the scrolled content: changes only if something above it does */
     function getTableContentOffset(page: Page) {
@@ -172,7 +174,7 @@ test.describe('Storage groups data issues of a long list', () => {
         });
     }
 
-    test('shows the warning for problems of a middle chunk when its rows are on screen', async ({
+    test('shows the warning for problems of a middle chunk when its rows are rendered', async ({
         page,
     }, testInfo) => {
         // Only the requests for the rows of the middle of the list report a problem
@@ -235,7 +237,15 @@ test.describe('Storage groups data issues of a long list', () => {
         await expect(storagePage.getGroupRow(getLongListGroupId(25))).toBeVisible();
         await expect(indicator.button).toBeVisible();
 
-        // Far away the rows of the first chunk are not rendered any more
+        // A few chunks further the first chunk is still kept loaded, but its rows are not in the table:
+        // the warning is about the rendered rows only
+        await table.scrollToPosition(ROW_HEIGHT * 5 * CHUNK_SIZE);
+        await expect(storagePage.getGroupRow(getLongListGroupId(5 * CHUNK_SIZE))).toBeVisible();
+        await expect(storagePage.getGroupRow(getLongListGroupId(0))).toHaveCount(0);
+        await expect(indicator.button).toHaveCount(0);
+        expect(await getTableContentOffset(page)).toBe(tableOffset);
+
+        // Far away the first chunk is not even mounted
         await table.scrollToBottom();
         await expect(
             storagePage.getGroupRow(getLongListGroupId(LONG_LIST_GROUPS_COUNT - 1)),

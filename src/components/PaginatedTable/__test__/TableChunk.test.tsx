@@ -34,11 +34,13 @@ function createFetchData(note?: string) {
 function Chunk({
     id = 1,
     filters = 'first',
+    shouldRender = true,
     fetchData,
     onChunkDataChange,
 }: {
     id?: number;
     filters?: string;
+    shouldRender?: boolean;
     fetchData: FetchData<Row, string>;
     onChunkDataChange: jest.Mock;
 }) {
@@ -58,7 +60,7 @@ function Chunk({
                         onDataFetched={() => undefined}
                         onChunkDataChange={onChunkDataChange}
                         shouldFetch
-                        shouldRender
+                        shouldRender={shouldRender}
                     />
                 </tbody>
             </table>
@@ -105,7 +107,35 @@ describe('TableChunk onChunkDataChange', () => {
         await waitFor(() => expect(lastCall(onChunkDataChange)[1]?.note).toBe('second'));
     });
 
-    test('reports that the chunk holds nothing when it is no longer rendered', async () => {
+    test('follows the rows as the chunk leaves and enters the render range', async () => {
+        const onChunkDataChange = jest.fn();
+        const fetchData = createFetchData();
+        const {rerender} = renderWithStore(
+            <Chunk fetchData={fetchData} onChunkDataChange={onChunkDataChange} />,
+        );
+        await waitFor(() => expect(lastCall(onChunkDataChange)[1]?.note).toBe('first'));
+
+        // Scrolled away: the chunk stays mounted and loaded, but its rows are not in the table
+        rerender(
+            <Chunk
+                fetchData={fetchData}
+                shouldRender={false}
+                onChunkDataChange={onChunkDataChange}
+            />,
+        );
+
+        expect(screen.queryByText(`row-${CHUNK_SIZE}`)).not.toBeInTheDocument();
+        expect(lastCall(onChunkDataChange)).toEqual([CHUNK_SIZE, undefined]);
+
+        // Scrolled back: the rows are rendered from the data the chunk already has
+        rerender(<Chunk fetchData={fetchData} onChunkDataChange={onChunkDataChange} />);
+
+        expect(screen.getByText(`row-${CHUNK_SIZE}`)).toBeInTheDocument();
+        expect(lastCall(onChunkDataChange)[1]?.note).toBe('first');
+        expect(fetchData).toHaveBeenCalledTimes(1);
+    });
+
+    test('reports that the chunk holds nothing when it is unmounted', async () => {
         const onChunkDataChange = jest.fn();
         const {unmount} = renderWithStore(
             <Chunk fetchData={createFetchData()} onChunkDataChange={onChunkDataChange} />,

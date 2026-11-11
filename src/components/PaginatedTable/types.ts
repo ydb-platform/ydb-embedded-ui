@@ -57,8 +57,9 @@ export type FetchData<T, F = undefined, E = {}> = (
 ) => Promise<PaginatedTableData<T>>;
 
 /**
- * Tells what a chunk of the table currently holds: its data when it is loaded for the current
- * filters and sorting, `undefined` when it has no such data or is no longer rendered.
+ * Tells what rows of a chunk are in the table now: its data while the chunk renders its rows
+ * and is loaded for the current filters and sorting, `undefined` otherwise. Chunks are kept
+ * loaded further from the viewport than they are rendered, and such a chunk reports `undefined`.
  */
 export type OnChunkDataChange<T> = (
     chunkOffset: number,

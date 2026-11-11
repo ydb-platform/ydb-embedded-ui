@@ -47,7 +47,7 @@ export interface PaginatedTableProps<T, F> {
     renderErrorMessage?: RenderErrorMessage;
     containerClassName?: string;
     onDataFetched?: (data: PaginatedTableData<T>) => void;
-    /** Reports the data every rendered chunk holds, e.g. to describe the rows on screen */
+    /** Reports the data of every chunk whose rows are rendered, e.g. to describe the rows in the table */
     onChunkDataChange?: OnChunkDataChange<T>;
     keepCache?: boolean;
     fetchOverscan?: number;

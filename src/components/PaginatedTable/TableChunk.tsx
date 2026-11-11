@@ -120,13 +120,15 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     }, [currentData, onDataFetched]);
 
     const chunkOffset = id * chunkSize;
+    // A chunk is mounted in the whole fetch range, but its rows are in the table only in the render range.
+    // `currentData` is undefined until the chunk is loaded for the current filters and sorting.
+    const renderedData = shouldRender ? currentData : undefined;
 
-    // `currentData` is undefined until the chunk is loaded for the current filters and sorting
     React.useLayoutEffect(() => {
-        onChunkDataChange?.(chunkOffset, currentData as PaginatedTableData<T> | undefined);
-    }, [chunkOffset, currentData, onChunkDataChange]);
+        onChunkDataChange?.(chunkOffset, renderedData as PaginatedTableData<T> | undefined);
+    }, [chunkOffset, renderedData, onChunkDataChange]);
 
-    // The chunk is no longer rendered: it left the fetched range or the table is unmounted
+    // The chunk is unmounted: it left the fetch range or the table is gone
     React.useLayoutEffect(() => {
         return () => onChunkDataChange?.(chunkOffset, undefined);
     }, [chunkOffset, onChunkDataChange]);
