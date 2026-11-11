@@ -75,7 +75,12 @@ export function TopNodesByLoad({database}: TopNodesByLoadProps) {
             loading={loading}
             error={error}
             withData={Boolean(currentData)}
-            notice={<TopNodesDataIssues response={currentData} />}
+            notice={
+                <TopNodesDataIssues
+                    dataQuality={currentData?.dataQuality}
+                    tableTitle={i18n('title_top-nodes-load')}
+                />
+            }
         >
             <ResizeableDataTable
                 columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}

@@ -8,6 +8,7 @@
   "alert_disks-unavailable": "Диски недоступных узлов не показаны, а фильтры по дискам могут пропускать такие узлы.",
   "alert_partial-data": "Часть данных недоступна: некоторые значения могут отсутствовать.",
   "context_problem-codes": "Проблемы, о которых сообщил сервер: {{codes}}",
+  "context_data-issues-of": "{{title}}: {{subject}}",
   "context_empty-with-issues": "Показывать нечего, но данные могут быть неполными",
   "title_data-issues": "Данные могут быть неполными или неточными",
   "title_data-issues-short": "Проблемы с данными"

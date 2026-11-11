@@ -63,6 +63,16 @@ describe('DataIssuesIndicator', () => {
         expect(screen.getByRole('button', {name: 'Data issues'})).toBeInTheDocument();
     });
 
+    test('Should add what the data is to its name when it is told', () => {
+        render(<DataIssuesIndicator issues={['list-incomplete']} subject="Top nodes by load" />);
+
+        const indicator = screen.getByRole('button', {
+            name: 'Data may be incomplete or inaccurate: Top nodes by load',
+        });
+        // the visible text stays short
+        expect(indicator).toHaveTextContent(/^Data may be incomplete or inaccurate$/);
+    });
+
     test('Should look like a warning label, not like an action', () => {
         render(<DataIssuesIndicator compact issues={['list-incomplete']} />);
 

@@ -108,7 +108,11 @@ export function TenantStorage({
                 title={topGroupsTitle}
                 allEntitiesLink={getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.storage)}
             >
-                <TopGroups tenant={database} capacityMetricsEnabled={capacityMetricsEnabled} />
+                <TopGroups
+                    tenant={database}
+                    capacityMetricsEnabled={capacityMetricsEnabled}
+                    title={topGroupsTitle}
+                />
             </StatsWrapper>
         </Flex>
     );

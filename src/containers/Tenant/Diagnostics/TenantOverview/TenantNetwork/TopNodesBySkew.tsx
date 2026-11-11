@@ -40,7 +40,12 @@ export function TopNodesBySkew({database}: TopNodesBySkewProps) {
             loading={loading}
             error={error}
             withData={Boolean(currentData)}
-            notice={<TopNodesDataIssues response={currentData} />}
+            notice={
+                <TopNodesDataIssues
+                    dataQuality={currentData?.dataQuality}
+                    tableTitle={i18n('title_nodes-by-skew')}
+                />
+            }
         >
             <ResizeableDataTable
                 columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}

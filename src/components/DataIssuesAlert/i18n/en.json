@@ -8,6 +8,7 @@
   "alert_disks-unavailable": "Disks of unavailable nodes are not shown, and disk filters may skip such nodes.",
   "alert_partial-data": "Some data is unavailable: some values may be missing.",
   "context_problem-codes": "Problems reported by the server: {{codes}}",
+  "context_data-issues-of": "{{title}}: {{subject}}",
   "context_empty-with-issues": "Nothing to show, but the data may be incomplete",
   "title_data-issues": "Data may be incomplete or inaccurate",
   "title_data-issues-short": "Data issues"

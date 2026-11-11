@@ -16,6 +16,8 @@ export const DATA_ISSUES_INDICATOR_QA = 'data-issues-indicator';
 interface DataIssuesIndicatorProps extends DataIssuesProps {
     /** A shorter label for places where the width is shared with other controls */
     compact?: boolean;
+    /** What the data is, e.g. a table title: tells several indicators of one page apart */
+    subject?: string;
     className?: string;
 }
 
@@ -28,11 +30,14 @@ export function DataIssuesIndicator({
     issues,
     problems,
     compact,
+    subject,
     className,
 }: DataIssuesIndicatorProps) {
     if (!issues.length) {
         return null;
     }
+
+    const title = compact ? i18n('title_data-issues-short') : i18n('title_data-issues');
 
     // Label does not pass the popover handlers to its element, so the trigger is a wrapper around it
     return (
@@ -44,6 +49,7 @@ export function DataIssuesIndicator({
             <span
                 role="button"
                 tabIndex={0}
+                aria-label={subject ? i18n('context_data-issues-of', {title, subject}) : undefined}
                 className={b('indicator', className)}
                 data-qa={DATA_ISSUES_INDICATOR_QA}
             >
@@ -53,7 +59,7 @@ export function DataIssuesIndicator({
                     interactive
                     icon={<Icon data={TriangleExclamation} size={14} />}
                 >
-                    {compact ? i18n('title_data-issues-short') : i18n('title_data-issues')}
+                    {title}
                 </Label>
             </span>
         </Popover>
