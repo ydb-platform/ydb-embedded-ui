@@ -88,12 +88,6 @@ export default defineConfig({
         define: prepareEnvVars(),
     },
     output: {
-        copy: [
-            {
-                from: './node_modules/@fontsource/rubik/LICENSE',
-                to: 'static/media/rubik-LICENSE.txt',
-            },
-        ],
         distPath: {
             root: './build',
             // YDB server that serves static files expects fonts to be in media folder
