@@ -221,7 +221,7 @@ export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageRe
         found: Number(FoundNodes),
         tableGroups,
         columnsSettings: {maxSlotsPerDisk, maxDisksPerNode},
-        ...prepareResponseDataQuality(data),
+        dataQuality: prepareResponseDataQuality(data),
     };
 };
 
@@ -295,6 +295,6 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
         total: Number(TotalGroups) || preparedGroups.length,
         found: Number(FoundGroups),
         tableGroups,
-        ...prepareResponseDataQuality(data),
+        dataQuality: prepareResponseDataQuality(data),
     };
 }

@@ -13,7 +13,6 @@ import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {TClusterInfo} from '../../types/api/cluster';
 import {cn} from '../../utils/cn';
 import {getNodesDataIssues} from '../../utils/dataIssues/classify';
-import {getResponseDataQuality} from '../../utils/dataIssues/dataQuality';
 import type {ResponseDataQuality} from '../../utils/dataIssues/types';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import type {PreparedVersion, VersionsDataMap} from '../../utils/versions/types';
@@ -53,7 +52,7 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
             <Versions
                 preparedVersions={preparedVersions}
                 nodes={currentData?.nodes}
-                nodesDataQuality={getResponseDataQuality(currentData)}
+                nodesDataQuality={currentData?.dataQuality}
                 versionsDataMap={versionsDataMap}
             />
         </LoaderWrapper>

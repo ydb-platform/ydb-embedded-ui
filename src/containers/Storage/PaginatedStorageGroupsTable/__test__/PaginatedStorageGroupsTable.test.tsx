@@ -102,9 +102,9 @@ describe('PaginatedStorageGroupsTable', () => {
     });
 
     test.each(['all', 'missing', 'space'] as const)(
-        'does not claim there are no groups for %s entities when the data has issues',
+        'does not claim there are no groups for %s entities when rows may be missing',
         (visibleEntities) => {
-            renderTable([], {visibleEntities, hasDataIssues: true});
+            renderTable([], {visibleEntities, rowsMayBeMissing: true});
 
             const message = renderEmptyDataMessage();
             expect(message).toHaveTextContent('Nothing to show, but the data may be incomplete');

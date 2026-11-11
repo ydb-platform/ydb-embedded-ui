@@ -1,5 +1,4 @@
 import {
-    getResponseDataQuality,
     isCleanDataQuality,
     isSameDataQuality,
     mergeDataQuality,
@@ -33,16 +32,6 @@ describe('prepareResponseDataQuality', () => {
             needSort: false,
             needGroup: false,
         });
-    });
-});
-
-describe('getResponseDataQuality', () => {
-    test('Should return undefined until there is a response', () => {
-        expect(getResponseDataQuality(undefined)).toBeUndefined();
-    });
-
-    test('Should fill the defaults for a response without quality fields', () => {
-        expect(getResponseDataQuality({})).toEqual(clean);
     });
 });
 

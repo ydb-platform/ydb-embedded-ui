@@ -8,13 +8,13 @@ import i18n from './i18n';
 interface StorageNodesEmptyDataMessageProps {
     visibleEntities?: VisibleEntities;
     onShowAll?: VoidFunction;
-    hasDataIssues?: boolean;
+    rowsMayBeMissing?: boolean;
 }
 
 export const StorageGroupsEmptyDataMessage = ({
     visibleEntities,
     onShowAll,
-    hasDataIssues,
+    rowsMayBeMissing,
 }: StorageNodesEmptyDataMessageProps) => {
     let message;
 
@@ -26,7 +26,7 @@ export const StorageGroupsEmptyDataMessage = ({
         message = i18n('empty.degraded');
     }
 
-    if (message && hasDataIssues) {
+    if (message && rowsMayBeMissing) {
         // Do not claim there are no such groups when the data is known to be incomplete
         message = getEmptyDataWithIssuesMessage();
     }

@@ -32,21 +32,6 @@ export function prepareResponseDataQuality(response: RawResponseDataQuality): Re
     };
 }
 
-export function getResponseDataQuality(
-    response?: Partial<ResponseDataQuality>,
-): ResponseDataQuality | undefined {
-    if (!response) {
-        return undefined;
-    }
-
-    return {
-        problems: response.problems ?? [],
-        needFilter: Boolean(response.needFilter),
-        needSort: Boolean(response.needSort),
-        needGroup: Boolean(response.needGroup),
-    };
-}
-
 export function mergeDataQuality(
     items: (ResponseDataQuality | undefined)[],
 ): ResponseDataQuality | undefined {

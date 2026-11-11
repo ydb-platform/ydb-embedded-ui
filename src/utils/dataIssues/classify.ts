@@ -167,3 +167,35 @@ export function getNodesDataIssues(
 
     return orderIssues(issues);
 }
+
+/**
+ * What the table shows: storage groups (/storage/groups) or nodes (/viewer/nodes)
+ * together with what is known about the request for them.
+ */
+export type DataIssuesSubject =
+    | {type: 'storageGroups'}
+    | ({type: 'nodes'} & NodesDataIssuesContext);
+
+export function getDataIssues(
+    quality: ResponseDataQuality | undefined,
+    subject: DataIssuesSubject,
+): DataIssueKind[] {
+    return subject.type === 'storageGroups'
+        ? getStorageGroupsDataIssues(quality)
+        : getNodesDataIssues(quality, subject);
+}
+
+/** These issues add rows or change their order, the rows that should be shown are all there */
+const DATA_ISSUES_THAT_HIDE_NO_ROWS = new Set<DataIssueKind>([
+    'filter-not-applied',
+    'sort-not-applied',
+    'group-not-applied',
+]);
+
+/**
+ * Tells whether rows may be missing from the list because of the issues.
+ * If so, an empty table does not prove that there is nothing to show.
+ */
+export function canDataIssuesHideRows(issues: DataIssueKind[]) {
+    return issues.some((kind) => !DATA_ISSUES_THAT_HIDE_NO_ROWS.has(kind));
+}

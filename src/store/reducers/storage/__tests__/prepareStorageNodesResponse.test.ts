@@ -62,7 +62,7 @@ describe('prepareStorageNodesResponse', () => {
         );
     });
 
-    test('Should keep the problems and unapplied operations reported by the handler', () => {
+    test('Should keep what the handler reported about the response', () => {
         const response = {
             TotalNodes: '1',
             FoundNodes: '1',
@@ -72,14 +72,12 @@ describe('prepareStorageNodesResponse', () => {
             NeedGroup: true,
         } satisfies TNodesInfo;
 
-        expect(prepareStorageNodesResponse(response)).toEqual(
-            expect.objectContaining({
-                problems: ['bsc-timeout', 'bsc-storage-slots-no-data'],
-                needFilter: true,
-                needSort: false,
-                needGroup: true,
-            }),
-        );
+        expect(prepareStorageNodesResponse(response).dataQuality).toEqual({
+            problems: ['bsc-timeout', 'bsc-storage-slots-no-data'],
+            needFilter: true,
+            needSort: false,
+            needGroup: true,
+        });
     });
 
     test('Should keep the flag of a node that did not answer in time', () => {
@@ -94,24 +92,5 @@ describe('prepareStorageNodesResponse', () => {
 
         expect(result.nodes?.[0].ResponseTimeout).toBe(true);
         expect(result.nodes?.[1].ResponseTimeout).toBeUndefined();
-    });
-
-    test('Should report no problems when the handler does not send them', () => {
-        const response = {
-            TotalNodes: '1',
-            FoundNodes: '1',
-            Nodes: [{NodeId: 1, SystemState: {}}],
-            Problems: 'bsc-timeout' as unknown as string[],
-            NeedSort: 'true' as unknown as boolean,
-        } satisfies TNodesInfo;
-
-        expect(prepareStorageNodesResponse(response)).toEqual(
-            expect.objectContaining({
-                problems: [],
-                needFilter: false,
-                needSort: false,
-                needGroup: false,
-            }),
-        );
     });
 });

@@ -4,7 +4,7 @@ import {isNil} from 'lodash';
 
 import type {PreparedStorageGroup} from '../../../store/reducers/storage/types';
 import type {Erasure} from '../../../types/api/storage';
-import type {NodesDataIssuesContext} from '../../../utils/dataIssues/classify';
+import type {DataIssuesSubject} from '../../../utils/dataIssues/classify';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
 import {useNodesMap} from '../../../utils/hooks/useNodesMap';
@@ -102,14 +102,16 @@ export function getStorageGroupsInitialEntitiesCount(
     return DEFAULT_ENTITIES_COUNT;
 }
 
-export function getStorageNodesDataIssuesContext({
+/** Describes the storage nodes table to the classification of the problems of its responses */
+export function getStorageNodesDataIssuesSubject({
     database,
     groupId,
 }: {
     database?: string;
     groupId?: string | number;
-}): NodesDataIssuesContext {
+}): DataIssuesSubject {
     return {
+        type: 'nodes',
         storageNodes: true,
         hasDatabase: Boolean(database),
         hasGroupFilter: !isNil(groupId) && groupId !== '',

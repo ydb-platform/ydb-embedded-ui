@@ -1,4 +1,10 @@
-import {getNodesDataIssues, getStorageGroupsDataIssues} from '../classify';
+import {
+    DATA_ISSUE_KINDS,
+    canDataIssuesHideRows,
+    getDataIssues,
+    getNodesDataIssues,
+    getStorageGroupsDataIssues,
+} from '../classify';
 import type {DataIssueKind, NodesDataIssuesContext} from '../classify';
 import type {ResponseDataQuality} from '../types';
 
@@ -155,5 +161,48 @@ describe('getNodesDataIssues', () => {
                 databaseNodes,
             ),
         ).toEqual(['database-unavailable', 'list-incomplete', 'partial-data']);
+    });
+});
+
+describe('getDataIssues', () => {
+    test('Should classify for the subject of the table', () => {
+        const report = quality(['bsc-storage-slots-no-data']);
+
+        expect(getDataIssues(report, {type: 'storageGroups'})).toEqual(['partial-data']);
+        expect(
+            getDataIssues(report, {type: 'nodes', storageNodes: true, hasGroupFilter: true}),
+        ).toEqual(['filter-not-applied']);
+        expect(getDataIssues(undefined, {type: 'nodes'})).toEqual([]);
+    });
+});
+
+describe('canDataIssuesHideRows', () => {
+    test('Should not suspect missing rows without issues', () => {
+        expect(canDataIssuesHideRows([])).toBe(false);
+    });
+
+    test.each<[DataIssueKind, boolean]>([
+        // the rows are all there: extra ones, in another order or not split into groups
+        ['filter-not-applied', false],
+        ['sort-not-applied', false],
+        ['group-not-applied', false],
+        // some rows may be absent, or filtered out by the values that were not received
+        ['database-unavailable', true],
+        ['list-incomplete', true],
+        ['nodes-status-unreliable', true],
+        ['disks-unavailable', true],
+        ['partial-data', true],
+    ])('Should tell for %s: %p', (issue, expected) => {
+        expect(canDataIssuesHideRows([issue])).toBe(expected);
+    });
+
+    test('Should decide for every kind of issue', () => {
+        // a new kind has to be put on one of the sides above
+        expect(DATA_ISSUE_KINDS).toHaveLength(8);
+    });
+
+    test('Should suspect missing rows when at least one issue can hide them', () => {
+        expect(canDataIssuesHideRows(['sort-not-applied', 'list-incomplete'])).toBe(true);
+        expect(canDataIssuesHideRows(['filter-not-applied', 'sort-not-applied'])).toBe(false);
     });
 });

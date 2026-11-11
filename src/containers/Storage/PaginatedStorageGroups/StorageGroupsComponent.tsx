@@ -1,11 +1,8 @@
-import React from 'react';
-
 import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useStorageGroupsHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
-import {getStorageGroupsDataIssues} from '../../../utils/dataIssues/classify';
-import {useTableDataQuality} from '../../../utils/dataIssues/useTableDataQuality';
+import {useTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageGroupsTable} from '../PaginatedStorageGroupsTable';
@@ -32,8 +29,9 @@ export function StorageGroupsComponent({
         viewContext,
     });
 
-    const {dataQuality, handleChunkDataChange} = useTableDataQuality();
-    const dataIssues = React.useMemo(() => getStorageGroupsDataIssues(dataQuality), [dataQuality]);
+    const {issues, problems, rowsMayBeMissing, handleChunkDataChange} = useTableDataIssues({
+        type: 'storageGroups',
+    });
 
     return (
         <PaginatedTableWithLayout
@@ -43,11 +41,7 @@ export function StorageGroupsComponent({
                     withGroupBySelect={storageGroupsHandlerHasGrouping}
                     columns={columnsToShow}
                     dataIssuesIndicator={
-                        <DataIssuesIndicator
-                            compact
-                            issues={dataIssues}
-                            problems={dataQuality?.problems}
-                        />
+                        <DataIssuesIndicator compact issues={issues} problems={problems} />
                     }
                 />
             }
@@ -73,7 +67,7 @@ export function StorageGroupsComponent({
                     columns={columnsToShow}
                     initialEntitiesCount={initialEntitiesCount}
                     onChunkDataChange={handleChunkDataChange}
-                    hasDataIssues={dataIssues.length > 0}
+                    rowsMayBeMissing={rowsMayBeMissing}
                 />
             }
             tableWrapperProps={{

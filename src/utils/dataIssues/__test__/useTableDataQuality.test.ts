@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {act, renderHook} from '@testing-library/react';
 
 import type {ResponseDataQuality, TableDataWithQuality} from '../types';
@@ -33,7 +35,6 @@ describe('useTableDataQuality', () => {
         act(() => result.current.handleChunkDataChange(40, undefined));
 
         expect(result.current.dataQuality).toBeUndefined();
-        expect(result.current.dataQualityBySource).toEqual({});
     });
 
     test('Should keep the problems of a chunk whatever the other chunks report', () => {
@@ -109,47 +110,59 @@ describe('useTableDataQuality', () => {
         expect(result.current.dataQuality).toBeUndefined();
     });
 
-    test('Should keep the state when a chunk repeats its report', () => {
-        const {result} = renderHook(() => useTableDataQuality());
+    test('Should not make its owner render for chunk events that change nothing', () => {
+        let renders = 0;
+        const {result} = renderHook(() => {
+            renders += 1;
+            return useTableDataQuality();
+        });
 
         act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
-        const {dataQuality, dataQualityBySource} = result.current;
+        const {dataQuality} = result.current;
+        const rendersWithProblem = renders;
 
+        // A healthy table reports like this all the time while it is scrolled
         act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
         act(() => result.current.handleChunkDataChange(20, chunkData({})));
+        act(() => result.current.handleChunkDataChange(20, undefined));
         act(() => result.current.handleChunkDataChange(40, undefined));
 
+        expect(renders).toBe(rendersWithProblem);
         expect(result.current.dataQuality).toBe(dataQuality);
-        expect(result.current.dataQualityBySource).toBe(dataQualityBySource);
     });
 
-    test('Should keep the reports of several tables apart', () => {
+    test('Should unite the reports of several tables and tell their chunks apart', () => {
         const {result} = renderHook(() => useTableDataQuality());
+        const reportSsd = result.current.getChunkDataChangeHandler('ssd');
+        const reportHdd = result.current.getChunkDataChangeHandler('hdd');
 
-        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout'), 'ssd'));
-        act(() => result.current.handleChunkDataChange(0, withProblem('hive-timeout'), 'hdd'));
+        // The same chunk offset in the tables of two expanded groups
+        act(() => reportSsd(0, withProblem('bsc-timeout')));
+        act(() => reportHdd(0, withProblem('hive-timeout')));
 
-        expect(result.current.dataQuality).toBeUndefined();
-        expect(result.current.dataQualityBySource).toEqual({
-            ssd: {...clean, problems: ['bsc-timeout']},
-            hdd: {...clean, problems: ['hive-timeout']},
+        expect(result.current.dataQuality).toEqual({
+            ...clean,
+            problems: ['bsc-timeout', 'hive-timeout'],
         });
 
         // The table of a collapsed group is unmounted and its chunks report that they are gone
-        act(() => result.current.handleChunkDataChange(0, undefined, 'ssd'));
+        act(() => reportSsd(0, undefined));
 
-        expect(result.current.dataQualityBySource).toEqual({
-            hdd: {...clean, problems: ['hive-timeout']},
-        });
+        expect(result.current.dataQuality).toEqual({...clean, problems: ['hive-timeout']});
     });
 
-    test('Should keep the callback stable', () => {
-        const {result, rerender} = renderHook(() => useTableDataQuality());
-        const {handleChunkDataChange} = result.current;
+    test('Should keep the handlers stable, also in strict mode', () => {
+        const {result, rerender} = renderHook(() => useTableDataQuality(), {
+            wrapper: React.StrictMode,
+        });
+        const {handleChunkDataChange, getChunkDataChangeHandler} = result.current;
+        const reportSsd = getChunkDataChangeHandler('ssd');
 
         act(() => handleChunkDataChange(0, withProblem('bsc-timeout')));
         rerender();
 
         expect(result.current.handleChunkDataChange).toBe(handleChunkDataChange);
+        expect(result.current.getChunkDataChangeHandler('ssd')).toBe(reportSsd);
+        expect(result.current.dataQuality).toEqual({...clean, problems: ['bsc-timeout']});
     });
 });

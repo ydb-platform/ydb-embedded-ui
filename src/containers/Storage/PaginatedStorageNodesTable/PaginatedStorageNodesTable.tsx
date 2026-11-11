@@ -57,8 +57,8 @@ interface PaginatedStorageNodesTableProps {
     rowHeight?: number;
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
     onChunkDataChange?: OnChunkDataChange<PreparedStorageNode>;
-    /** The response reported problems: an empty table does not prove there are no such nodes */
-    hasDataIssues?: boolean;
+    /** Rows may be missing: an empty table does not prove there are no such nodes */
+    rowsMayBeMissing?: boolean;
 }
 
 export const PaginatedStorageNodesTable = ({
@@ -78,7 +78,7 @@ export const PaginatedStorageNodesTable = ({
     rowHeight = STORAGE_NODES_DEFAULT_ROW_HEIGHT,
     onDataFetched,
     onChunkDataChange,
-    hasDataIssues,
+    rowsMayBeMissing,
 }: PaginatedStorageNodesTableProps) => {
     const history = useHistory();
     const fetchNodes = useDatacenterNodesFetcher(getStorageNodes);
@@ -117,12 +117,12 @@ export const PaginatedStorageNodesTable = ({
                     onShowAll={onShowAll}
                     nodesUptimeFilter={nodesUptimeFilter}
                     visibleEntities={visibleEntities}
-                    hasDataIssues={hasDataIssues}
+                    rowsMayBeMissing={rowsMayBeMissing}
                 />
             );
         }
 
-        return hasDataIssues ? getEmptyDataWithIssuesMessage() : i18n('empty.default');
+        return rowsMayBeMissing ? getEmptyDataWithIssuesMessage() : i18n('empty.default');
     };
 
     return (

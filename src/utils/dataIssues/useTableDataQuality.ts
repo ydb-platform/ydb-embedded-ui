@@ -8,6 +8,11 @@ const DEFAULT_SOURCE = '';
 /** Reports of the chunks that were loaded with something to tell, by table and chunk offset */
 type ChunkReports = Record<string, Record<number, ResponseDataQuality>>;
 
+export type ChunkDataChangeHandler = (
+    chunkOffset: number,
+    data: TableDataWithQuality<unknown> | undefined,
+) => void;
+
 const NO_REPORTS: ChunkReports = {};
 
 function updateChunkReports(
@@ -51,45 +56,54 @@ function updateChunkReports(
  * - a chunk has no data for new filters or sorting until it is loaded for them,
  *   so a warning does not outlive the request it was received for.
  *
- * `source` separates several tables that share the warning, e.g. expanded table groups.
+ * Several tables can share the warning, e.g. the tables of expanded groups:
+ * each of them reports through its own handler from `getChunkDataChangeHandler(source)`.
  */
 export function useTableDataQuality() {
+    // The chunks report on every mount, unmount and reload, mostly that they have nothing to tell.
+    // The reports live in a ref and get into the state only when they change, so a table
+    // without problems does not make its owner render while it is scrolled.
+    const reportsRef = React.useRef(NO_REPORTS);
     const [reports, setReports] = React.useState(NO_REPORTS);
+    const handlersRef = React.useRef(new Map<string, ChunkDataChangeHandler>());
 
-    const handleChunkDataChange = React.useCallback(
-        (
-            chunkOffset: number,
-            data: TableDataWithQuality<unknown> | undefined,
-            source: string = DEFAULT_SOURCE,
-        ) => {
-            const quality = data?.dataQuality;
-            // Only the chunks that have something to tell are kept
-            const reported = quality && !isCleanDataQuality(quality) ? quality : undefined;
+    const getChunkDataChangeHandler = React.useCallback((source: string) => {
+        let handler = handlersRef.current.get(source);
 
-            setReports((prevReports) =>
-                updateChunkReports(prevReports, source, chunkOffset, reported),
-            );
-        },
-        [],
-    );
+        if (!handler) {
+            handler = (chunkOffset, data) => {
+                const quality = data?.dataQuality;
+                // Only the chunks that have something to tell are kept
+                const reported = quality && !isCleanDataQuality(quality) ? quality : undefined;
+                const nextReports = updateChunkReports(
+                    reportsRef.current,
+                    source,
+                    chunkOffset,
+                    reported,
+                );
 
-    const dataQualityBySource = React.useMemo(() => {
-        const result: Record<string, ResponseDataQuality> = {};
-
-        for (const [source, chunks] of Object.entries(reports)) {
-            const quality = mergeDataQuality(Object.values(chunks));
-            if (quality) {
-                result[source] = quality;
-            }
+                if (nextReports !== reportsRef.current) {
+                    reportsRef.current = nextReports;
+                    setReports(nextReports);
+                }
+            };
+            handlersRef.current.set(source, handler);
         }
 
-        return result;
-    }, [reports]);
+        return handler;
+    }, []);
+
+    const dataQuality = React.useMemo(
+        () => mergeDataQuality(Object.values(reports).flatMap((chunks) => Object.values(chunks))),
+        [reports],
+    );
 
     return {
-        /** Report of the table that does not name its source */
-        dataQuality: dataQualityBySource[DEFAULT_SOURCE] as ResponseDataQuality | undefined,
-        dataQualityBySource,
-        handleChunkDataChange,
+        /** United report of all the chunks that are rendered now */
+        dataQuality,
+        /** For a single table */
+        handleChunkDataChange: getChunkDataChangeHandler(DEFAULT_SOURCE),
+        /** For one of several tables; the handler of a source is always the same function */
+        getChunkDataChangeHandler,
     };
 }

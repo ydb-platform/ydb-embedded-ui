@@ -1,19 +1,14 @@
 import React from 'react';
 
-import {
-    DataIssuesAlert,
-    getEmptyDataWithIssuesMessage,
-} from '../../../components/DataIssuesAlert/DataIssuesAlert';
 import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
+import {EmptyTableGroups} from '../../../components/DataIssuesAlert/EmptyTableGroups';
 import {ResponseError} from '../../../components/Errors/ResponseError/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {GroupsGroupByField} from '../../../types/api/storage';
-import {getStorageGroupsDataIssues} from '../../../utils/dataIssues/classify';
-import {getResponseDataQuality, mergeDataQuality} from '../../../utils/dataIssues/dataQuality';
-import type {TableDataWithQuality} from '../../../utils/dataIssues/types';
-import {useTableDataQuality} from '../../../utils/dataIssues/useTableDataQuality';
+import {useGroupedTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
+import type {ChunkDataChangeHandler} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
@@ -43,12 +38,8 @@ interface StorageGroupGroupProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     handleShowAllGroups: VoidFunction;
-    onChunkDataChange: (
-        chunkOffset: number,
-        data: TableDataWithQuality<unknown> | undefined,
-        source: string,
-    ) => void;
-    hasDataIssues: boolean;
+    onChunkDataChange: ChunkDataChangeHandler;
+    rowsMayBeMissing: boolean;
 }
 
 export const StorageGroupGroup = React.memo(function StorageGroupGroup({
@@ -66,14 +57,8 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
     onIsExpandedChange,
     handleShowAllGroups,
     onChunkDataChange,
-    hasDataIssues,
+    rowsMayBeMissing,
 }: StorageGroupGroupProps) {
-    const handleChunkDataChange = React.useCallback(
-        (chunkOffset: number, data: TableDataWithQuality<unknown> | undefined) =>
-            onChunkDataChange(chunkOffset, data, name),
-        [onChunkDataChange, name],
-    );
-
     return (
         <TableGroup
             key={name}
@@ -101,8 +86,8 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
                         renderErrorMessage={renderPaginatedTableErrorMessage}
                         columns={columns}
                         initialEntitiesCount={count}
-                        onChunkDataChange={handleChunkDataChange}
-                        hasDataIssues={hasDataIssues}
+                        onChunkDataChange={onChunkDataChange}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 }
                 tableWrapperProps={{
@@ -150,19 +135,8 @@ export function GroupedStorageGroupsComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
-    const {dataQualityBySource, handleChunkDataChange} = useTableDataQuality();
-    const dataQuality = React.useMemo(() => {
-        const groupingQuality = getResponseDataQuality(currentData);
-        // Without grouping the handler returns a plain list of storage groups
-        if (groupingQuality && !tableGroups?.length && currentData?.groups?.length) {
-            groupingQuality.needGroup = true;
-        }
-
-        // A collapsed group renders no table, so only the expanded groups report their chunks
-        return mergeDataQuality([groupingQuality, ...Object.values(dataQualityBySource)]);
-    }, [currentData, tableGroups, dataQualityBySource]);
-    const dataIssues = React.useMemo(() => getStorageGroupsDataIssues(dataQuality), [dataQuality]);
-    const hasDataIssues = dataIssues.length > 0;
+    const {issues, problems, rowsMayBeMissing, getGroupChunkDataChangeHandler} =
+        useGroupedTableDataIssues({type: 'storageGroups'}, currentData);
 
     // Initialize the table state with the API data
     const initialState = React.useMemo(
@@ -197,19 +171,21 @@ export function GroupedStorageGroupsComponent({
                         onIsExpandedChange={setIsGroupExpanded}
                         handleShowAllGroups={handleShowAllGroups}
                         columns={columnsToShow}
-                        onChunkDataChange={handleChunkDataChange}
-                        hasDataIssues={hasDataIssues}
+                        onChunkDataChange={getGroupChunkDataChangeHandler(name)}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 );
             });
         }
 
-        if (dataIssues.includes('group-not-applied')) {
-            // There are no groups to show, so the reason takes their place
-            return <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />;
-        }
-
-        return hasDataIssues ? getEmptyDataWithIssuesMessage() : i18n('no-groups');
+        return (
+            <EmptyTableGroups
+                issues={issues}
+                problems={problems}
+                rowsMayBeMissing={rowsMayBeMissing}
+                emptyMessage={i18n('no-groups')}
+            />
+        );
     };
 
     return (
@@ -223,11 +199,7 @@ export function GroupedStorageGroupsComponent({
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
                     dataIssuesIndicator={
-                        <DataIssuesIndicator
-                            compact
-                            issues={dataIssues}
-                            problems={dataQuality?.problems}
-                        />
+                        <DataIssuesIndicator compact issues={issues} problems={problems} />
                     }
                 />
             }

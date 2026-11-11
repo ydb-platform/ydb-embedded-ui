@@ -1,20 +1,15 @@
 import React from 'react';
 
-import {
-    DataIssuesAlert,
-    getEmptyDataWithIssuesMessage,
-} from '../../../components/DataIssuesAlert/DataIssuesAlert';
 import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
+import {EmptyTableGroups} from '../../../components/DataIssuesAlert/EmptyTableGroups';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {NODES_COLUMNS_TO_DATA_FIELDS} from '../../../components/nodesColumns/constants';
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {NodesGroupByField, NodesRequiredField} from '../../../types/api/nodes';
-import {getNodesDataIssues} from '../../../utils/dataIssues/classify';
-import {getResponseDataQuality, mergeDataQuality} from '../../../utils/dataIssues/dataQuality';
-import type {TableDataWithQuality} from '../../../utils/dataIssues/types';
-import {useTableDataQuality} from '../../../utils/dataIssues/useTableDataQuality';
+import {useGroupedTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
+import type {ChunkDataChangeHandler} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
@@ -28,7 +23,7 @@ import i18n from '../i18n';
 import {b} from '../shared';
 import type {StorageNodesPaginatedTableData} from '../types';
 import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
-import {getStorageNodesDataIssuesContext, useStorageColumnsSettings} from '../utils';
+import {getStorageNodesDataIssuesSubject, useStorageColumnsSettings} from '../utils';
 
 import {StorageNodesControls} from './StorageNodesControls';
 import {useStorageNodesColumnsToSelect} from './useStorageNodesColumnsToSelect';
@@ -50,13 +45,9 @@ interface StorageNodeGroupProps {
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     handleShowAllNodes: VoidFunction;
     onDataFetched: (data: StorageNodesPaginatedTableData) => void;
-    onChunkDataChange: (
-        chunkOffset: number,
-        data: TableDataWithQuality<unknown> | undefined,
-        source: string,
-    ) => void;
+    onChunkDataChange: ChunkDataChangeHandler;
     rowHeight: number;
-    hasDataIssues: boolean;
+    rowsMayBeMissing: boolean;
 }
 
 export const StorageNodeGroup = React.memo(function StorageNodeGroup({
@@ -75,14 +66,8 @@ export const StorageNodeGroup = React.memo(function StorageNodeGroup({
     onDataFetched,
     onChunkDataChange,
     rowHeight,
-    hasDataIssues,
+    rowsMayBeMissing,
 }: StorageNodeGroupProps) {
-    const handleChunkDataChange = React.useCallback(
-        (chunkOffset: number, data: TableDataWithQuality<unknown> | undefined) =>
-            onChunkDataChange(chunkOffset, data, name),
-        [onChunkDataChange, name],
-    );
-
     return (
         <TableGroup
             key={name}
@@ -112,8 +97,8 @@ export const StorageNodeGroup = React.memo(function StorageNodeGroup({
                         initialEntitiesCount={count}
                         rowHeight={rowHeight}
                         onDataFetched={onDataFetched}
-                        onChunkDataChange={handleChunkDataChange}
-                        hasDataIssues={hasDataIssues}
+                        onChunkDataChange={onChunkDataChange}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 }
                 tableWrapperProps={{
@@ -177,23 +162,11 @@ export function GroupedStorageNodesComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
-    const {dataQualityBySource, handleChunkDataChange} = useTableDataQuality();
-    const dataQuality = React.useMemo(() => {
-        const groupingQuality = getResponseDataQuality(currentData);
-        // Without grouping the handler returns a plain list of nodes
-        if (groupingQuality && !tableGroups?.length && currentData?.nodes?.length) {
-            groupingQuality.needGroup = true;
-        }
-
-        // A collapsed group renders no table, so only the expanded groups report their chunks
-        return mergeDataQuality([groupingQuality, ...Object.values(dataQualityBySource)]);
-    }, [currentData, tableGroups, dataQualityBySource]);
-    const dataIssues = React.useMemo(
-        () =>
-            getNodesDataIssues(dataQuality, getStorageNodesDataIssuesContext({database, groupId})),
-        [dataQuality, database, groupId],
-    );
-    const hasDataIssues = dataIssues.length > 0;
+    const {issues, problems, rowsMayBeMissing, getGroupChunkDataChangeHandler} =
+        useGroupedTableDataIssues(
+            getStorageNodesDataIssuesSubject({database, groupId}),
+            currentData,
+        );
 
     // Initialize the table state with the API data
     const initialState = React.useMemo(
@@ -229,19 +202,21 @@ export function GroupedStorageNodesComponent({
                         columns={columnsToShow}
                         rowHeight={rowHeight}
                         onDataFetched={handleDataFetched}
-                        onChunkDataChange={handleChunkDataChange}
-                        hasDataIssues={hasDataIssues}
+                        onChunkDataChange={getGroupChunkDataChangeHandler(name)}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 );
             });
         }
 
-        if (dataIssues.includes('group-not-applied')) {
-            // There are no groups to show, so the reason takes their place
-            return <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />;
-        }
-
-        return hasDataIssues ? getEmptyDataWithIssuesMessage() : i18n('no-nodes');
+        return (
+            <EmptyTableGroups
+                issues={issues}
+                problems={problems}
+                rowsMayBeMissing={rowsMayBeMissing}
+                emptyMessage={i18n('no-nodes')}
+            />
+        );
     };
 
     return (
@@ -254,11 +229,7 @@ export function GroupedStorageNodesComponent({
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
                     dataIssuesIndicator={
-                        <DataIssuesIndicator
-                            compact
-                            issues={dataIssues}
-                            problems={dataQuality?.problems}
-                        />
+                        <DataIssuesIndicator compact issues={issues} problems={problems} />
                     }
                 />
             }

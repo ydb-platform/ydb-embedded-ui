@@ -10,14 +10,14 @@ interface StorageNodesEmptyDataMessageProps {
     visibleEntities: VisibleEntities;
     nodesUptimeFilter: NodesUptimeFilterValues;
     onShowAll?: VoidFunction;
-    hasDataIssues?: boolean;
+    rowsMayBeMissing?: boolean;
 }
 
 export const StorageNodesEmptyDataMessage = ({
     visibleEntities,
     nodesUptimeFilter,
     onShowAll,
-    hasDataIssues,
+    rowsMayBeMissing,
 }: StorageNodesEmptyDataMessageProps) => {
     let message;
 
@@ -40,7 +40,7 @@ export const StorageNodesEmptyDataMessage = ({
         message = i18n('empty.several_filters');
     }
 
-    if (message && hasDataIssues) {
+    if (message && rowsMayBeMissing) {
         // Do not claim there are no such nodes when the data is known to be incomplete
         message = getEmptyDataWithIssuesMessage();
     }

@@ -47,8 +47,8 @@ interface NodesTableProps {
 
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
     onChunkDataChange?: OnChunkDataChange<PreparedStorageNode>;
-    /** The response reported problems: an empty table does not prove there are no such nodes */
-    hasDataIssues?: boolean;
+    /** Rows may be missing: an empty table does not prove there are no such nodes */
+    rowsMayBeMissing?: boolean;
 }
 
 export function NodesTable({
@@ -66,7 +66,7 @@ export function NodesTable({
     initialEntitiesCount,
     onDataFetched,
     onChunkDataChange,
-    hasDataIssues,
+    rowsMayBeMissing,
 }: NodesTableProps) {
     const history = useHistory();
     const fetchNodes = useDatacenterNodesFetcher(getNodes);
@@ -103,7 +103,7 @@ export function NodesTable({
     ]);
 
     const renderEmptyDataMessage = () => {
-        if (hasDataIssues) {
+        if (rowsMayBeMissing) {
             return getEmptyDataWithIssuesMessage();
         }
 

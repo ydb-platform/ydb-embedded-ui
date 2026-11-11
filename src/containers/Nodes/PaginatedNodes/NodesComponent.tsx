@@ -10,8 +10,7 @@ import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
-import {getNodesDataIssues} from '../../../utils/dataIssues/classify';
-import {useTableDataQuality} from '../../../utils/dataIssues/useTableDataQuality';
+import {useTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesTable} from '../NodesTable';
@@ -61,11 +60,10 @@ export function NodesComponent({
         requiredColumnsIds,
     );
 
-    const {dataQuality, handleChunkDataChange} = useTableDataQuality();
-    const dataIssues = React.useMemo(
-        () => getNodesDataIssues(dataQuality, {hasDatabase: Boolean(database)}),
-        [dataQuality, database],
-    );
+    const {issues, problems, rowsMayBeMissing, handleChunkDataChange} = useTableDataIssues({
+        type: 'nodes',
+        hasDatabase: Boolean(database),
+    });
 
     return (
         <PaginatedTableWithLayout
@@ -74,11 +72,7 @@ export function NodesComponent({
                     withGroupBySelect={viewerNodesHandlerHasGrouping}
                     groupByParams={groupByParams}
                     dataIssuesIndicator={
-                        <DataIssuesIndicator
-                            compact
-                            issues={dataIssues}
-                            problems={dataQuality?.problems}
-                        />
+                        <DataIssuesIndicator compact issues={issues} problems={problems} />
                     }
                     withPeerRoleFilter={withPeerRoleFilter}
                 />
@@ -104,7 +98,7 @@ export function NodesComponent({
                     scrollContainerRef={scrollContainerRef}
                     onDataFetched={onDataFetched}
                     onChunkDataChange={handleChunkDataChange}
-                    hasDataIssues={dataIssues.length > 0}
+                    rowsMayBeMissing={rowsMayBeMissing}
                 />
             }
             tableWrapperProps={{

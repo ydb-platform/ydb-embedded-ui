@@ -110,7 +110,7 @@ export type TableGroup = {
     count: number;
 };
 
-export interface PreparedStorageResponse extends Partial<ResponseDataQuality> {
+export interface PreparedStorageResponse {
     nodes?: PreparedStorageNode[];
     groups?: PreparedStorageGroup[];
     found: number | undefined;
@@ -120,4 +120,6 @@ export interface PreparedStorageResponse extends Partial<ResponseDataQuality> {
         maxSlotsPerDisk: number;
         maxDisksPerNode: number;
     };
+    /** What the handler reported about this response, see `ResponseDataQuality` */
+    dataQuality: ResponseDataQuality;
 }

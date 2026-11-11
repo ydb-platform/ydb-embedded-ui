@@ -2,11 +2,8 @@ import React from 'react';
 
 import {isNil} from 'lodash';
 
-import {
-    DataIssuesAlert,
-    getEmptyDataWithIssuesMessage,
-} from '../../../components/DataIssuesAlert/DataIssuesAlert';
 import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
+import {EmptyTableGroups} from '../../../components/DataIssuesAlert/EmptyTableGroups';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
@@ -21,10 +18,8 @@ import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {nodesApi} from '../../../store/reducers/nodes/nodes';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole, NodesRequiredField} from '../../../types/api/nodes';
-import {getNodesDataIssues} from '../../../utils/dataIssues/classify';
-import {getResponseDataQuality, mergeDataQuality} from '../../../utils/dataIssues/dataQuality';
-import type {TableDataWithQuality} from '../../../utils/dataIssues/types';
-import {useTableDataQuality} from '../../../utils/dataIssues/useTableDataQuality';
+import {useGroupedTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
+import type {ChunkDataChangeHandler} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
@@ -54,12 +49,8 @@ interface NodeGroupProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
-    onChunkDataChange: (
-        chunkOffset: number,
-        data: TableDataWithQuality<unknown> | undefined,
-        source: string,
-    ) => void;
-    hasDataIssues: boolean;
+    onChunkDataChange: ChunkDataChangeHandler;
+    rowsMayBeMissing: boolean;
 }
 
 const NodeGroup = React.memo(function NodeGroup({
@@ -77,14 +68,8 @@ const NodeGroup = React.memo(function NodeGroup({
     onIsExpandedChange,
     onDataFetched,
     onChunkDataChange,
-    hasDataIssues,
+    rowsMayBeMissing,
 }: NodeGroupProps) {
-    const handleChunkDataChange = React.useCallback(
-        (chunkOffset: number, data: TableDataWithQuality<unknown> | undefined) =>
-            onChunkDataChange(chunkOffset, data, name),
-        [onChunkDataChange, name],
-    );
-
     return (
         <TableGroup
             key={name}
@@ -112,8 +97,8 @@ const NodeGroup = React.memo(function NodeGroup({
                         columns={columns}
                         scrollContainerRef={scrollContainerRef}
                         onDataFetched={onDataFetched}
-                        onChunkDataChange={handleChunkDataChange}
-                        hasDataIssues={hasDataIssues}
+                        onChunkDataChange={onChunkDataChange}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 }
                 tableWrapperProps={{
@@ -204,21 +189,8 @@ export function GroupedNodesComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
-    const {dataQualityBySource, handleChunkDataChange} = useTableDataQuality();
-    const dataQuality = React.useMemo(
-        () =>
-            // A collapsed group renders no table, so only the expanded groups report their chunks
-            mergeDataQuality([
-                getResponseDataQuality(currentData),
-                ...Object.values(dataQualityBySource),
-            ]),
-        [currentData, dataQualityBySource],
-    );
-    const dataIssues = React.useMemo(
-        () => getNodesDataIssues(dataQuality, {hasDatabase: Boolean(database)}),
-        [dataQuality, database],
-    );
-    const hasDataIssues = dataIssues.length > 0;
+    const {issues, problems, rowsMayBeMissing, getGroupChunkDataChangeHandler} =
+        useGroupedTableDataIssues({type: 'nodes', hasDatabase: Boolean(database)}, currentData);
 
     // Initialize the table state with the API data
     const initialState = React.useMemo(
@@ -252,19 +224,21 @@ export function GroupedNodesComponent({
                         scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
                         onDataFetched={onDataFetched}
-                        onChunkDataChange={handleChunkDataChange}
-                        hasDataIssues={hasDataIssues}
+                        onChunkDataChange={getGroupChunkDataChangeHandler(name)}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 );
             });
         }
 
-        if (dataIssues.includes('group-not-applied')) {
-            // There are no groups to show, so the reason takes their place
-            return <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />;
-        }
-
-        return hasDataIssues ? getEmptyDataWithIssuesMessage() : i18n('no-nodes-groups');
+        return (
+            <EmptyTableGroups
+                issues={issues}
+                problems={problems}
+                rowsMayBeMissing={rowsMayBeMissing}
+                emptyMessage={i18n('no-nodes-groups')}
+            />
+        );
     };
 
     return (
@@ -278,11 +252,7 @@ export function GroupedNodesComponent({
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
                     dataIssuesIndicator={
-                        <DataIssuesIndicator
-                            compact
-                            issues={dataIssues}
-                            problems={dataQuality?.problems}
-                        />
+                        <DataIssuesIndicator compact issues={issues} problems={problems} />
                     }
                     withGroupBySelect
                 />

@@ -9,7 +9,6 @@ import type {
 } from '../../../store/reducers/storage/types';
 import {prepareStorageNodesResponse} from '../../../store/reducers/storage/utils';
 import type {NodesRequestParams} from '../../../types/api/nodes';
-import {getResponseDataQuality} from '../../../utils/dataIssues/dataQuality';
 import {prepareSortValue} from '../../../utils/filters';
 import {getUptimeParamValue} from '../../../utils/nodes';
 import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
@@ -69,6 +68,6 @@ export const getStorageNodes: FetchData<
         found: preparedResponse.found || 0,
         total: preparedResponse.total || 0,
         columnsSettings: preparedResponse.columnsSettings,
-        dataQuality: getResponseDataQuality(preparedResponse),
+        dataQuality: preparedResponse.dataQuality,
     };
 };

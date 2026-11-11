@@ -51,8 +51,8 @@ interface PaginatedStorageGroupsTableProps {
     initialEntitiesCount?: number;
 
     onChunkDataChange?: OnChunkDataChange<PreparedStorageGroup>;
-    /** The response reported problems: an empty table does not prove there are no such groups */
-    hasDataIssues?: boolean;
+    /** Rows may be missing: an empty table does not prove there are no such groups */
+    rowsMayBeMissing?: boolean;
 }
 
 export const PaginatedStorageGroupsTable = ({
@@ -70,7 +70,7 @@ export const PaginatedStorageGroupsTable = ({
     renderErrorMessage,
     initialEntitiesCount,
     onChunkDataChange,
-    hasDataIssues,
+    rowsMayBeMissing,
 }: PaginatedStorageGroupsTableProps) => {
     const history = useHistory();
     const getStorageGroupPath = useStorageGroupPath();
@@ -112,12 +112,12 @@ export const PaginatedStorageGroupsTable = ({
                 <StorageGroupsEmptyDataMessage
                     onShowAll={onShowAll}
                     visibleEntities={visibleEntities}
-                    hasDataIssues={hasDataIssues}
+                    rowsMayBeMissing={rowsMayBeMissing}
                 />
             );
         }
 
-        return hasDataIssues ? getEmptyDataWithIssuesMessage() : i18n('empty.default');
+        return rowsMayBeMissing ? getEmptyDataWithIssuesMessage() : i18n('empty.default');
     };
 
     return (
