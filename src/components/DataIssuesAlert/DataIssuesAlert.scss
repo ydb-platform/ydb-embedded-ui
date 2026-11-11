@@ -3,6 +3,17 @@
         word-break: break-word;
     }
 
+    &__indicator {
+        display: inline-flex;
+        flex-shrink: 0;
+
+        border-radius: var(--g-border-radius-s);
+
+        &:focus-visible {
+            outline: 2px solid var(--g-color-line-focus);
+        }
+    }
+
     &__popover {
         max-width: 400px;
         padding: var(--g-spacing-3);

@@ -1,5 +1,5 @@
 import {TriangleExclamation} from '@gravity-ui/icons';
-import {Button, Icon, Popover} from '@gravity-ui/uikit';
+import {Icon, Label, Popover} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 
@@ -20,9 +20,9 @@ interface DataIssuesIndicatorProps extends DataIssuesProps {
 }
 
 /**
- * Compact form of `DataIssuesAlert`: the details open in a popover on hover or on click.
- * Takes no space of its own in the page flow, so it fits sticky table controls:
- * the rows do not move when it appears or disappears.
+ * Compact form of `DataIssuesAlert`: a warning label, the details open in a popover on hover
+ * or with Enter when it is focused. Takes no space of its own in the page flow, so it fits
+ * sticky table controls: the rows do not move when it appears or disappears.
  */
 export function DataIssuesIndicator({
     issues,
@@ -34,21 +34,28 @@ export function DataIssuesIndicator({
         return null;
     }
 
+    // Label does not pass the popover handlers to its element, so the trigger is a wrapper around it
     return (
         <Popover
             placement={['bottom-start', 'top-start']}
             className={b('popover')}
             content={<DataIssuesList issues={issues} problems={problems} />}
         >
-            <Button
-                view="flat-warning"
-                size="s"
+            <span
+                role="button"
+                tabIndex={0}
                 className={b('indicator', className)}
-                qa={DATA_ISSUES_INDICATOR_QA}
+                data-qa={DATA_ISSUES_INDICATOR_QA}
             >
-                <Icon data={TriangleExclamation} size={14} />
-                {compact ? i18n('title_data-issues-short') : i18n('title_data-issues')}
-            </Button>
+                <Label
+                    theme="warning"
+                    size="m"
+                    interactive
+                    icon={<Icon data={TriangleExclamation} size={14} />}
+                >
+                    {compact ? i18n('title_data-issues-short') : i18n('title_data-issues')}
+                </Label>
+            </span>
         </Popover>
     );
 }

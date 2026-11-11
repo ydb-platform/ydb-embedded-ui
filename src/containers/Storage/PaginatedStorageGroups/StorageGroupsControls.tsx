@@ -132,7 +132,6 @@ export function StorageGroupsControls({
                     total={entitiesCountTotal}
                     current={entitiesCountCurrent}
                 />
-                {dataIssuesIndicator}
                 {canUseStorageExpertMode ? (
                     <Button
                         selected={isStorageExpertMode}
@@ -142,6 +141,7 @@ export function StorageGroupsControls({
                         {i18n('controls_expert-mode')}
                     </Button>
                 ) : null}
+                {dataIssuesIndicator}
             </Flex>
             {canUseStorageExpertMode && isStorageExpertMode && isVDisksPDisksColumnVisible ? (
                 <StorageGroupsExpertModePanel />

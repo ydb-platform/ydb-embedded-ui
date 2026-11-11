@@ -124,7 +124,6 @@ export function StorageNodesControls({
                     total={entitiesCountTotal}
                     current={entitiesCountCurrent}
                 />
-                {dataIssuesIndicator}
                 {canUseStorageExpertMode ? (
                     <Button
                         selected={isStorageExpertMode}
@@ -135,6 +134,7 @@ export function StorageNodesControls({
                     </Button>
                 ) : null}
                 <HideUnavailableNodesSwitch className={b('hide-unavailable')} />
+                {dataIssuesIndicator}
             </Flex>
             {canUseStorageExpertMode && isStorageExpertMode ? (
                 <StorageNodesExpertModePanel />

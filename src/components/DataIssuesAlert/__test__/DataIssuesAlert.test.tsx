@@ -63,6 +63,17 @@ describe('DataIssuesIndicator', () => {
         expect(screen.getByRole('button', {name: 'Data issues'})).toBeInTheDocument();
     });
 
+    test('Should look like a warning label, not like an action', () => {
+        render(<DataIssuesIndicator compact issues={['list-incomplete']} />);
+
+        const indicator = screen.getByRole('button', {name: 'Data issues'});
+        expect(indicator.querySelector('.g-label_theme_warning')).toBeInTheDocument();
+        expect(indicator.tagName).not.toBe('BUTTON');
+        expect(indicator.querySelector('button')).not.toBeInTheDocument();
+        // reachable from the keyboard, the details open with Enter
+        expect(indicator).toHaveAttribute('tabindex', '0');
+    });
+
     // The popover is rendered in a portal, which needs the theme
     function renderInteractive(issues: DataIssueKind[]) {
         return render(

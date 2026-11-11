@@ -145,6 +145,25 @@ describe('StorageGroupsControls', () => {
         expect(screen.getByText('data may be incomplete')).toBeInTheDocument();
     });
 
+    test('puts the data issues indicator last in the row, after the expert mode button', () => {
+        render(
+            <StorageGroupsControls
+                entitiesCountCurrent={0}
+                entitiesLoading={false}
+                dataIssuesIndicator={<span>data may be incomplete</span>}
+            />,
+        );
+
+        const expertMode = screen.getByRole('button', {name: 'controls_expert-mode'});
+        const indicator = screen.getByText('data may be incomplete');
+        const rowItems = Array.from(indicator.parentElement?.children ?? []);
+
+        expect(rowItems.indexOf(indicator)).toBeGreaterThan(
+            rowItems.findIndex((item) => item.contains(expertMode)),
+        );
+        expect(rowItems.at(-1)).toBe(indicator);
+    });
+
     test('hides active expert mode controls when the capability is unavailable', () => {
         useBlobStorageCapacityMetricsAvailable.mockReturnValue(false);
         useIsStorageExpertMode.mockReturnValue(true);
