@@ -19,6 +19,7 @@ import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {cn} from '../../../utils/cn';
+import type {DataQualityMeta} from '../../../utils/dataIssues/types';
 import {useDatacenterNodesFetcher} from '../../../utils/hooks/useDatacenterNodesFetcher';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {NodesUptimeFilterValues, isUnavailableNode} from '../../../utils/nodes';
@@ -56,7 +57,7 @@ interface PaginatedStorageNodesTableProps {
     initialEntitiesCount?: number;
     rowHeight?: number;
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
-    onChunkDataChange?: OnChunkDataChange<PreparedStorageNode>;
+    onChunkDataChange?: OnChunkDataChange<PreparedStorageNode, DataQualityMeta>;
     /** Rows may be missing: an empty table does not prove there are no such nodes */
     rowsMayBeMissing?: boolean;
 }

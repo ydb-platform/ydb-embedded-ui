@@ -12,7 +12,7 @@ const clean: ResponseDataQuality = {
 };
 
 function chunkData(quality: Partial<ResponseDataQuality>): TableDataWithQuality<unknown> {
-    return {data: [], found: 0, total: 0, dataQuality: {...clean, ...quality}};
+    return {data: [], found: 0, total: 0, meta: {dataQuality: {...clean, ...quality}}};
 }
 
 const STORAGE_GROUPS: DataIssuesSubject = {type: 'storageGroups'};

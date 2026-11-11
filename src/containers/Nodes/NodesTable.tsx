@@ -15,6 +15,7 @@ import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import type {NodesFilters} from '../../store/reducers/nodes/types';
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
+import type {DataQualityMeta} from '../../utils/dataIssues/types';
 import {useDatacenterNodesFetcher} from '../../utils/hooks/useDatacenterNodesFetcher';
 import {useHideUnavailableNodes} from '../../utils/hooks/useHideUnavailableNodes';
 import {getIllustration} from '../../utils/illustrations';
@@ -46,7 +47,7 @@ interface NodesTableProps {
     initialEntitiesCount?: number;
 
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
-    onChunkDataChange?: OnChunkDataChange<PreparedStorageNode>;
+    onChunkDataChange?: OnChunkDataChange<PreparedStorageNode, DataQualityMeta>;
     /** Rows may be missing: an empty table does not prove there are no such nodes */
     rowsMayBeMissing?: boolean;
 }

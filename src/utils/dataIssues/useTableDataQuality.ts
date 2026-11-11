@@ -74,7 +74,7 @@ export function useTableDataQuality() {
 
         if (!handler) {
             handler = (chunkOffset, data) => {
-                const quality = data?.dataQuality;
+                const quality = data?.meta?.dataQuality;
                 // Only the chunks that have something to tell are kept
                 const reported = quality && !isCleanDataQuality(quality) ? quality : undefined;
                 const nextReports = updateChunkReports(

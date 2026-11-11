@@ -26,7 +26,7 @@ import {typedMemo} from './utils';
 
 const DEBOUNCE_TIMEOUT = 200;
 
-interface TableChunkProps<T, F> {
+interface TableChunkProps<T, F, M = unknown> {
     id: number;
     chunkSize: number;
     rowHeight: number;
@@ -38,19 +38,19 @@ interface TableChunkProps<T, F> {
     shouldRender: boolean;
     tableName: PaginatedTableId;
 
-    fetchData: FetchData<T, F>;
+    fetchData: FetchData<T, F, {}, M>;
     getRowClassName?: GetRowClassName<T>;
     onRowClick?: OnRowClick<T>;
     renderErrorMessage?: RenderErrorMessage;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     onDataFetched: (data: PaginatedTableData<T>) => void;
-    onChunkDataChange?: OnChunkDataChange<T>;
+    onChunkDataChange?: OnChunkDataChange<T, M>;
 
     keepCache?: boolean;
 }
 
 // Memoisation prevents chunks rerenders that could cause perfomance issues on big tables
-export const TableChunk = typedMemo(function TableChunk<T, F>({
+export const TableChunk = typedMemo(function TableChunk<T, F, M = unknown>({
     id,
     chunkSize,
     calculatedCount,
@@ -69,7 +69,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     shouldFetch,
     shouldRender,
     keepCache,
-}: TableChunkProps<T, F>) {
+}: TableChunkProps<T, F, M>) {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {noBatching} = usePaginatedTableState();
@@ -122,10 +122,13 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     const chunkOffset = id * chunkSize;
     // A chunk is mounted in the whole fetch range, but its rows are in the table only in the render range.
     // `currentData` is undefined until the chunk is loaded for the current filters and sorting.
-    const renderedData = shouldRender ? currentData : undefined;
+    // The cache keeps what `fetchData` returned, so the rows are `T` and the metadata is `M`
+    const renderedData = shouldRender
+        ? (currentData as PaginatedTableData<T, M> | undefined)
+        : undefined;
 
     React.useLayoutEffect(() => {
-        onChunkDataChange?.(chunkOffset, renderedData as PaginatedTableData<T> | undefined);
+        onChunkDataChange?.(chunkOffset, renderedData);
     }, [chunkOffset, renderedData, onChunkDataChange]);
 
     // The chunk is unmounted: it left the fetch range or the table is gone

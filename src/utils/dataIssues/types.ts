@@ -12,7 +12,10 @@ export interface ResponseDataQuality {
     needGroup: boolean;
 }
 
-/** A chunk of a paginated table together with what the handler reported about its response */
-export type TableDataWithQuality<T> = PaginatedTableData<T> & {
-    dataQuality?: ResponseDataQuality;
-};
+/** Metadata of a table chunk: what the handler reported about the response the chunk is made of */
+export interface DataQualityMeta {
+    dataQuality: ResponseDataQuality;
+}
+
+/** A chunk of a paginated table whose fetcher tells about the quality of the response */
+export type TableDataWithQuality<T> = PaginatedTableData<T, DataQualityMeta>;

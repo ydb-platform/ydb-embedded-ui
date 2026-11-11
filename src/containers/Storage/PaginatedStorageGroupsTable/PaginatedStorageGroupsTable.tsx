@@ -13,6 +13,7 @@ import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducer
 import type {GroupsGroupByField} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
+import type {DataQualityMeta} from '../../../utils/dataIssues/types';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
 import {STORAGE_GROUPS_COLUMNS_IDS, STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
@@ -50,7 +51,7 @@ interface PaginatedStorageGroupsTableProps {
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;
 
-    onChunkDataChange?: OnChunkDataChange<PreparedStorageGroup>;
+    onChunkDataChange?: OnChunkDataChange<PreparedStorageGroup, DataQualityMeta>;
     /** Rows may be missing: an empty table does not prove there are no such groups */
     rowsMayBeMissing?: boolean;
 }

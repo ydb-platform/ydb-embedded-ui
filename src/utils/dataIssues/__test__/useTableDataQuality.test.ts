@@ -17,7 +17,7 @@ function chunkData(quality?: Partial<ResponseDataQuality>): TableDataWithQuality
         data: [],
         found: 0,
         total: 0,
-        dataQuality: quality ? {...clean, ...quality} : undefined,
+        meta: quality ? {dataQuality: {...clean, ...quality}} : undefined,
     };
 }
 

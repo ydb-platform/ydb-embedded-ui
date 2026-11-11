@@ -16,18 +16,18 @@ function updateColumnsWidth<T>(columns: Column<T>[], columnsWidthSetup: ColumnWi
     });
 }
 
-interface ResizeablePaginatedTableProps<T, F>
-    extends Omit<PaginatedTableProps<T, F>, 'onColumnsResize'> {
+interface ResizeablePaginatedTableProps<T, F, M = unknown>
+    extends Omit<PaginatedTableProps<T, F, M>, 'onColumnsResize'> {
     columnsWidthLSKey: string;
     containerClassName?: string;
 }
 
-export function ResizeablePaginatedTable<T, F>({
+export function ResizeablePaginatedTable<T, F, M = unknown>({
     columnsWidthLSKey,
     columns,
     containerClassName,
     ...props
-}: ResizeablePaginatedTableProps<T, F>) {
+}: ResizeablePaginatedTableProps<T, F, M>) {
     const [tableColumnsWidth, setTableColumnsWidth, isTableWidthLoading] =
         useTableResize(columnsWidthLSKey);
 
