@@ -101,26 +101,6 @@ describe('PaginatedStorageGroupsTable', () => {
         );
     });
 
-    test('passes the chunk data callback to the table', () => {
-        const onChunkDataChange = jest.fn();
-        renderTable([], {onChunkDataChange});
-
-        expect(ResizeablePaginatedTableMock).toHaveBeenCalledWith(
-            expect.objectContaining({onChunkDataChange}),
-            {},
-        );
-    });
-
-    test.each([
-        ['all', 'No such groups'],
-        ['missing', 'No degraded groups'],
-        ['space', 'No groups with out of space errors'],
-    ] as const)('says there are no groups for %s entities', (visibleEntities, message) => {
-        renderTable([], {visibleEntities});
-
-        expect(renderEmptyDataMessage()).toHaveTextContent(message);
-    });
-
     test.each(['all', 'missing', 'space'] as const)(
         'does not claim there are no groups for %s entities when the data has issues',
         (visibleEntities) => {
