@@ -1,5 +1,20 @@
 # Changelog
 
+## [22.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.8.0...v22.9.0) (2026-11-11)
+
+
+### Features
+
+* **database:** show copyable database id in header ([#4577](https://github.com/ydb-platform/ydb-embedded-ui/issues/4577)) ([b9532e4](https://github.com/ydb-platform/ydb-embedded-ui/commit/b9532e4fc59171c9ff2bf1b12242e36c724cf3b7))
+
+
+### Bug Fixes
+
+* **backups:** keep tab visible when control plane fails ([#4572](https://github.com/ydb-platform/ydb-embedded-ui/issues/4572)) ([84c7ca2](https://github.com/ydb-platform/ydb-embedded-ui/commit/84c7ca2ff6a061f557770b55ea1e6966ae980b6d))
+* rename replication destination column ([#4581](https://github.com/ydb-platform/ydb-embedded-ui/issues/4581)) ([adea948](https://github.com/ydb-platform/ydb-embedded-ui/commit/adea948ad2a729bad92f4348b8b70ae1317d9b53))
+* **styles:** load rubik only in single-cluster mode ([#4578](https://github.com/ydb-platform/ydb-embedded-ui/issues/4578)) ([6066195](https://github.com/ydb-platform/ydb-embedded-ui/commit/60661957d511e4b0adfc5bbde654c6b031b38f34))
+* **vdisk:** show location fields without detailed storage view ([#4573](https://github.com/ydb-platform/ydb-embedded-ui/issues/4573)) ([a6f55fd](https://github.com/ydb-platform/ydb-embedded-ui/commit/a6f55fd80bdf8e77baaefe892b8fe268e7c95f97))
+
 ## [22.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.7.0...v22.8.0) (2026-11-09)
 
 
