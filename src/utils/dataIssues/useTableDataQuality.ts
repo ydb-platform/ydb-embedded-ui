@@ -1,85 +1,95 @@
 import React from 'react';
 
-import {isSameDataQuality} from './dataQuality';
+import {isCleanDataQuality, isSameDataQuality, mergeDataQuality} from './dataQuality';
 import type {ResponseDataQuality, TableDataWithQuality} from './types';
 
 const DEFAULT_SOURCE = '';
-const NO_REPORTS: Record<string, ResponseDataQuality> = {};
 
-interface TableDataQualityState {
-    scopeKey: string;
-    reports: Record<string, ResponseDataQuality>;
-}
+/** Reports of the chunks that were loaded with something to tell, by table and chunk offset */
+type ChunkReports = Record<string, Record<number, ResponseDataQuality>>;
 
-interface LatestReports {
-    scopeKey: string;
-    bySource: Record<string, {requestKey: string; receivedAt: number}>;
+const NO_REPORTS: ChunkReports = {};
+
+function updateChunkReports(
+    reports: ChunkReports,
+    source: string,
+    chunkOffset: number,
+    quality: ResponseDataQuality | undefined,
+): ChunkReports {
+    const chunks = reports[source];
+    const current = chunks?.[chunkOffset];
+
+    if (!quality) {
+        if (!current) {
+            return reports;
+        }
+
+        const {[chunkOffset]: _removedChunk, ...otherChunks} = chunks;
+        if (Object.keys(otherChunks).length > 0) {
+            return {...reports, [source]: otherChunks};
+        }
+
+        const {[source]: _removedSource, ...otherSources} = reports;
+        return otherSources;
+    }
+
+    if (current && isSameDataQuality(current, quality)) {
+        return reports;
+    }
+
+    return {...reports, [source]: {...chunks, [chunkOffset]: quality}};
 }
 
 /**
- * Keeps what the last response of a paginated table said about its data.
+ * Collects what the handler reported about the rows a paginated table currently renders.
  *
- * The table reports through `onDataFetched` once per chunk, so reports of one view arrive
- * several times and not always in the order the responses were received.
- * - Within one request (same filters and sorting) the most recently received response wins.
- * - A report for another request replaces the current one: chunks report only the data
- *   they currently show, cached data included.
- * - Reports collected for another `scopeKey` are ignored, so a warning does not outlive
- *   the filters it was received for.
+ * A table is loaded in chunks, every chunk by a request of its own, and a problem
+ * of one request says nothing about the others. So the reports are kept per chunk
+ * (see `onChunkDataChange` of `PaginatedTable`) and united:
+ * - a chunk loaded with problems keeps the warning until it is reloaded without them
+ *   or is no longer rendered, whatever the other chunks report and in whatever order;
+ * - a chunk has no data for new filters or sorting until it is loaded for them,
+ *   so a warning does not outlive the request it was received for.
  *
- * `source` separates several tables that share the scope, e.g. expanded table groups.
+ * `source` separates several tables that share the warning, e.g. expanded table groups.
  */
-export function useTableDataQuality(scopeKey: string) {
-    const [state, setState] = React.useState<TableDataQualityState>();
-    const latestRef = React.useRef<LatestReports>();
+export function useTableDataQuality() {
+    const [reports, setReports] = React.useState(NO_REPORTS);
 
-    const handleDataFetched = React.useCallback(
-        (data: TableDataWithQuality<unknown>, source: string = DEFAULT_SOURCE) => {
-            const report = data.dataQuality;
-            if (!report) {
-                return;
-            }
+    const handleChunkDataChange = React.useCallback(
+        (
+            chunkOffset: number,
+            data: TableDataWithQuality<unknown> | undefined,
+            source: string = DEFAULT_SOURCE,
+        ) => {
+            const quality = data?.dataQuality;
+            // Only the chunks that have something to tell are kept
+            const reported = quality && !isCleanDataQuality(quality) ? quality : undefined;
 
-            if (latestRef.current?.scopeKey !== scopeKey) {
-                latestRef.current = {scopeKey, bySource: {}};
-            }
-
-            const latest = latestRef.current.bySource[source];
-            if (
-                latest &&
-                latest.requestKey === report.requestKey &&
-                latest.receivedAt > report.receivedAt
-            ) {
-                return;
-            }
-            latestRef.current.bySource[source] = {
-                requestKey: report.requestKey,
-                receivedAt: report.receivedAt,
-            };
-
-            const {problems, needFilter, needSort, needGroup} = report;
-            const quality: ResponseDataQuality = {problems, needFilter, needSort, needGroup};
-
-            setState((prevState) => {
-                const reports = prevState?.scopeKey === scopeKey ? prevState.reports : NO_REPORTS;
-                const current = reports[source];
-
-                if (prevState && current && isSameDataQuality(current, quality)) {
-                    return prevState;
-                }
-
-                return {scopeKey, reports: {...reports, [source]: quality}};
-            });
+            setReports((prevReports) =>
+                updateChunkReports(prevReports, source, chunkOffset, reported),
+            );
         },
-        [scopeKey],
+        [],
     );
 
-    const dataQualityBySource = state?.scopeKey === scopeKey ? state.reports : NO_REPORTS;
+    const dataQualityBySource = React.useMemo(() => {
+        const result: Record<string, ResponseDataQuality> = {};
+
+        for (const [source, chunks] of Object.entries(reports)) {
+            const quality = mergeDataQuality(Object.values(chunks));
+            if (quality) {
+                result[source] = quality;
+            }
+        }
+
+        return result;
+    }, [reports]);
 
     return {
         /** Report of the table that does not name its source */
         dataQuality: dataQualityBySource[DEFAULT_SOURCE] as ResponseDataQuality | undefined,
         dataQualityBySource,
-        handleDataFetched,
+        handleChunkDataChange,
     };
 }

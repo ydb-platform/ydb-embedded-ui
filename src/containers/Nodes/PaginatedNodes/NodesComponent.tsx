@@ -61,29 +61,10 @@ export function NodesComponent({
         requiredColumnsIds,
     );
 
-    const {dataQuality, handleDataFetched: handleQualityDataFetched} = useTableDataQuality(
-        JSON.stringify([
-            path,
-            database,
-            databaseFullPath,
-            searchValue,
-            uptimeFilter,
-            peerRoleFilter,
-            withProblems,
-            hideUnavailable,
-        ]),
-    );
+    const {dataQuality, handleChunkDataChange} = useTableDataQuality();
     const dataIssues = React.useMemo(
         () => getNodesDataIssues(dataQuality, {hasDatabase: Boolean(database)}),
         [dataQuality, database],
-    );
-
-    const handleDataFetched = React.useCallback(
-        (data: PaginatedTableData<PreparedStorageNode>) => {
-            onDataFetched?.(data);
-            handleQualityDataFetched(data);
-        },
-        [onDataFetched, handleQualityDataFetched],
     );
 
     return (
@@ -119,7 +100,8 @@ export function NodesComponent({
                     peerRoleFilter={peerRoleFilter}
                     columns={columnsToShow}
                     scrollContainerRef={scrollContainerRef}
-                    onDataFetched={handleDataFetched}
+                    onDataFetched={onDataFetched}
+                    onChunkDataChange={handleChunkDataChange}
                     hasDataIssues={dataIssues.length > 0}
                 />
             }

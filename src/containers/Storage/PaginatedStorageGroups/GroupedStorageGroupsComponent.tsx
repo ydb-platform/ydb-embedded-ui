@@ -10,10 +10,7 @@ import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumn
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {GroupsGroupByField} from '../../../types/api/storage';
 import {getStorageGroupsDataIssues} from '../../../utils/dataIssues/classify';
-import {
-    getResponseDataQuality,
-    mergeGroupedDataQuality,
-} from '../../../utils/dataIssues/dataQuality';
+import {getResponseDataQuality, mergeDataQuality} from '../../../utils/dataIssues/dataQuality';
 import type {TableDataWithQuality} from '../../../utils/dataIssues/types';
 import {useTableDataQuality} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
@@ -45,7 +42,11 @@ interface StorageGroupGroupProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     handleShowAllGroups: VoidFunction;
-    onDataFetched: (data: TableDataWithQuality<unknown>, source: string) => void;
+    onChunkDataChange: (
+        chunkOffset: number,
+        data: TableDataWithQuality<unknown> | undefined,
+        source: string,
+    ) => void;
     hasDataIssues: boolean;
 }
 
@@ -63,12 +64,13 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
     columns,
     onIsExpandedChange,
     handleShowAllGroups,
-    onDataFetched,
+    onChunkDataChange,
     hasDataIssues,
 }: StorageGroupGroupProps) {
-    const handleDataFetched = React.useCallback(
-        (data: TableDataWithQuality<unknown>) => onDataFetched(data, name),
-        [onDataFetched, name],
+    const handleChunkDataChange = React.useCallback(
+        (chunkOffset: number, data: TableDataWithQuality<unknown> | undefined) =>
+            onChunkDataChange(chunkOffset, data, name),
+        [onChunkDataChange, name],
     );
 
     return (
@@ -98,7 +100,7 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
                         renderErrorMessage={renderPaginatedTableErrorMessage}
                         columns={columns}
                         initialEntitiesCount={count}
-                        onDataFetched={handleDataFetched}
+                        onChunkDataChange={handleChunkDataChange}
                         hasDataIssues={hasDataIssues}
                     />
                 }
@@ -147,16 +149,7 @@ export function GroupedStorageGroupsComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
-    const {dataQualityBySource, handleDataFetched} = useTableDataQuality(
-        JSON.stringify([
-            database,
-            nodeId,
-            groupId,
-            pDiskId,
-            groupsSearchValue,
-            storageGroupsGroupByParam,
-        ]),
-    );
+    const {dataQualityBySource, handleChunkDataChange} = useTableDataQuality();
     const dataQuality = React.useMemo(() => {
         const groupingQuality = getResponseDataQuality(currentData);
         // Without grouping the handler returns a plain list of storage groups
@@ -164,8 +157,9 @@ export function GroupedStorageGroupsComponent({
             groupingQuality.needGroup = true;
         }
 
-        return mergeGroupedDataQuality(groupingQuality, dataQualityBySource, expandedGroups);
-    }, [currentData, tableGroups, dataQualityBySource, expandedGroups]);
+        // A collapsed group renders no table, so only the expanded groups report their chunks
+        return mergeDataQuality([groupingQuality, ...Object.values(dataQualityBySource)]);
+    }, [currentData, tableGroups, dataQualityBySource]);
     const dataIssues = React.useMemo(() => getStorageGroupsDataIssues(dataQuality), [dataQuality]);
     const hasDataIssues = dataIssues.length > 0;
 
@@ -202,7 +196,7 @@ export function GroupedStorageGroupsComponent({
                         onIsExpandedChange={setIsGroupExpanded}
                         handleShowAllGroups={handleShowAllGroups}
                         columns={columnsToShow}
-                        onDataFetched={handleDataFetched}
+                        onChunkDataChange={handleChunkDataChange}
                         hasDataIssues={hasDataIssues}
                     />
                 );

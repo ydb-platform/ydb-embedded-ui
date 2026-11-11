@@ -89,7 +89,7 @@ function tableData(quality: Partial<ResponseDataQuality>): TableDataWithQuality<
         data: [],
         found: 0,
         total: 0,
-        dataQuality: {...cleanQuality, ...quality, receivedAt: 1, requestKey: 'request'},
+        dataQuality: {...cleanQuality, ...quality},
     };
 }
 
@@ -97,7 +97,8 @@ function getTableProps() {
     const {calls} = NodesTableMock.mock;
 
     return calls[calls.length - 1][0] as {
-        onDataFetched: (data: TableDataWithQuality<never>) => void;
+        onDataFetched?: (data: TableDataWithQuality<never>) => void;
+        onChunkDataChange: (chunkOffset: number, data?: TableDataWithQuality<never>) => void;
         hasDataIssues?: boolean;
     };
 }
@@ -120,10 +121,9 @@ describe('NodesComponent', () => {
         const onDataFetched = jest.fn();
         render(<NodesComponent {...commonProps} onDataFetched={onDataFetched} />);
 
-        const data = tableData({});
-        act(() => getTableProps().onDataFetched(data));
+        act(() => getTableProps().onChunkDataChange(0, tableData({})));
 
-        expect(onDataFetched).toHaveBeenCalledWith(data);
+        expect(getTableProps().onDataFetched).toBe(onDataFetched);
         expect(screen.getByTestId('notice')).toBeEmptyDOMElement();
         expect(getTableProps().hasDataIssues).toBe(false);
     });
@@ -131,7 +131,7 @@ describe('NodesComponent', () => {
     test('warns that the list of database nodes may be incomplete without Hive', () => {
         render(<NodesComponent {...commonProps} database="/Root/db" />);
 
-        act(() => getTableProps().onDataFetched(tableData({problems: ['hive-timeout']})));
+        act(() => getTableProps().onChunkDataChange(0, tableData({problems: ['hive-timeout']})));
 
         expect(screen.getByTestId('notice')).toHaveTextContent('The list may be incomplete');
         expect(getTableProps().hasDataIssues).toBe(true);
@@ -140,7 +140,7 @@ describe('NodesComponent', () => {
     test('treats Hive problems of cluster nodes as partially unavailable data', () => {
         render(<NodesComponent {...commonProps} />);
 
-        act(() => getTableProps().onDataFetched(tableData({problems: ['hive-timeout']})));
+        act(() => getTableProps().onChunkDataChange(0, tableData({problems: ['hive-timeout']})));
 
         const notice = screen.getByTestId('notice');
         expect(notice).toHaveTextContent('Some data is unavailable');
@@ -150,7 +150,7 @@ describe('NodesComponent', () => {
     test('warns that sorting was not applied', () => {
         render(<NodesComponent {...commonProps} />);
 
-        act(() => getTableProps().onDataFetched(tableData({needSort: true})));
+        act(() => getTableProps().onChunkDataChange(0, tableData({needSort: true})));
 
         expect(screen.getByTestId('notice')).toHaveTextContent('Sorting was not applied');
     });
@@ -216,7 +216,7 @@ describe('GroupedNodesComponent', () => {
         });
 
         act(() => screen.getByRole('button', {name: /26\.1/}).click());
-        act(() => getTableProps().onDataFetched(tableData({problems: ['wb-incomplete']})));
+        act(() => getTableProps().onChunkDataChange(0, tableData({problems: ['wb-incomplete']})));
 
         // The table of the expanded group has a layout of its own
         const [notice] = screen.getAllByTestId('notice');

@@ -12,13 +12,7 @@ export interface ResponseDataQuality {
     needGroup: boolean;
 }
 
-export interface TableDataQualityReport extends ResponseDataQuality {
-    /** Client time when the response was received */
-    receivedAt: number;
-    /** Identifies filters and sorting of the request; chunks of one table view share it */
-    requestKey: string;
-}
-
+/** A chunk of a paginated table together with what the handler reported about its response */
 export type TableDataWithQuality<T> = PaginatedTableData<T> & {
-    dataQuality?: TableDataQualityReport;
+    dataQuality?: ResponseDataQuality;
 };

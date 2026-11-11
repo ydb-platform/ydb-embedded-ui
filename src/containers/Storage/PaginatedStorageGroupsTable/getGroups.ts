@@ -6,7 +6,7 @@ import type {
     PreparedStorageGroup,
     PreparedStorageGroupFilters,
 } from '../../../store/reducers/storage/types';
-import {createTableDataQualityReport} from '../../../utils/dataIssues/dataQuality';
+import {getResponseDataQuality} from '../../../utils/dataIssues/dataQuality';
 import {prepareSortValue} from '../../../utils/filters';
 import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
 
@@ -52,7 +52,7 @@ export function useGroupsGetter() {
             data: response.groups || [],
             found: response.found || 0,
             total: response.total || 0,
-            dataQuality: createTableDataQualityReport(response, {filters, sortParams}),
+            dataQuality: getResponseDataQuality(response),
         };
     }, []);
 

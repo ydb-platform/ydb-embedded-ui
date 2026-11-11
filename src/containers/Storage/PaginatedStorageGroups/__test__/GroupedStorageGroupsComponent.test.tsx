@@ -146,21 +146,18 @@ describe('GroupedStorageGroupsComponent', () => {
 
         act(() => screen.getByRole('button', {name: /SSD/}).click());
 
-        const {onDataFetched} = PaginatedStorageGroupsTableMock.mock.calls[
+        const {onChunkDataChange} = PaginatedStorageGroupsTableMock.mock.calls[
             PaginatedStorageGroupsTableMock.mock.calls.length - 1
-        ][0] as {onDataFetched: (data: TableDataWithQuality<unknown>) => void};
+        ][0] as {
+            onChunkDataChange: (chunkOffset: number, data?: TableDataWithQuality<unknown>) => void;
+        };
 
         act(() =>
-            onDataFetched({
+            onChunkDataChange(0, {
                 data: [],
                 found: 3,
                 total: 3,
-                dataQuality: {
-                    ...cleanQuality,
-                    problems: ['wb-incomplete-disks'],
-                    receivedAt: 1,
-                    requestKey: 'ssd',
-                },
+                dataQuality: {...cleanQuality, problems: ['wb-incomplete-disks']},
             }),
         );
 
@@ -169,6 +166,8 @@ describe('GroupedStorageGroupsComponent', () => {
         expect(notice).toHaveTextContent('Some data is unavailable');
         expect(notice).toHaveTextContent('wb-incomplete-disks');
 
+        // The chunks of a collapsed group are unmounted and report that they are gone
+        act(() => onChunkDataChange(0, undefined));
         act(() => screen.getByRole('button', {name: /SSD/}).click());
 
         expect(screen.getByTestId('notice')).toBeEmptyDOMElement();

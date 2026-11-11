@@ -4,7 +4,7 @@ import {useHistory} from 'react-router-dom';
 
 import {getEmptyDataWithIssuesMessage} from '../../../components/DataIssuesAlert/DataIssuesAlert';
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
-import type {PaginatedTableData, RenderErrorMessage} from '../../../components/PaginatedTable';
+import type {OnChunkDataChange, RenderErrorMessage} from '../../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {useStorageGroupPath} from '../../../routes';
 import {useCapabilitiesLoaded} from '../../../store/reducers/capabilities/hooks';
@@ -50,7 +50,7 @@ interface PaginatedStorageGroupsTableProps {
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;
 
-    onDataFetched?: (data: PaginatedTableData<PreparedStorageGroup>) => void;
+    onChunkDataChange?: OnChunkDataChange<PreparedStorageGroup>;
     /** The response reported problems: an empty table does not prove there are no such groups */
     hasDataIssues?: boolean;
 }
@@ -69,7 +69,7 @@ export const PaginatedStorageGroupsTable = ({
     scrollContainerRef,
     renderErrorMessage,
     initialEntitiesCount,
-    onDataFetched,
+    onChunkDataChange,
     hasDataIssues,
 }: PaginatedStorageGroupsTableProps) => {
     const history = useHistory();
@@ -143,7 +143,7 @@ export const PaginatedStorageGroupsTable = ({
                 renderEmptyDataMessage={renderEmptyDataMessage}
                 filters={tableFilters}
                 tableName={PAGINATED_TABLE_IDS.STORAGE_GROUPS}
-                onDataFetched={onDataFetched}
+                onChunkDataChange={onChunkDataChange}
             />
         </LoaderWrapper>
     );

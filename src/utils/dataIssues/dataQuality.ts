@@ -1,4 +1,4 @@
-import type {ResponseDataQuality, TableDataQualityReport} from './types';
+import type {ResponseDataQuality} from './types';
 
 interface RawResponseDataQuality {
     Problems?: unknown;
@@ -64,22 +64,6 @@ export function mergeDataQuality(
     };
 }
 
-/**
- * Grouped tables get one response with the list of groups
- * and one report from the table of every expanded group.
- */
-export function mergeGroupedDataQuality(
-    groupingQuality: ResponseDataQuality | undefined,
-    groupsQuality: Record<string, ResponseDataQuality>,
-    expandedGroups: Record<string, boolean>,
-) {
-    const expandedGroupsQuality = Object.keys(groupsQuality)
-        .filter((name) => expandedGroups[name])
-        .map((name) => groupsQuality[name]);
-
-    return mergeDataQuality([groupingQuality, ...expandedGroupsQuality]);
-}
-
 export function isSameDataQuality(a: ResponseDataQuality, b: ResponseDataQuality) {
     return (
         a.needFilter === b.needFilter &&
@@ -90,21 +74,12 @@ export function isSameDataQuality(a: ResponseDataQuality, b: ResponseDataQuality
     );
 }
 
-interface TableRequestDescription {
-    filters?: unknown;
-    sortParams?: unknown;
-}
-
-export function createTableDataQualityReport(
-    response: Partial<ResponseDataQuality>,
-    {filters, sortParams}: TableRequestDescription,
-): TableDataQualityReport {
-    return {
-        problems: response.problems ?? [],
-        needFilter: Boolean(response.needFilter),
-        needSort: Boolean(response.needSort),
-        needGroup: Boolean(response.needGroup),
-        receivedAt: Date.now(),
-        requestKey: JSON.stringify([filters ?? null, sortParams ?? null]),
-    };
+/** Nothing to tell the user about: no failed sources and every requested operation was applied */
+export function isCleanDataQuality(quality: ResponseDataQuality) {
+    return (
+        quality.problems.length === 0 &&
+        !quality.needFilter &&
+        !quality.needSort &&
+        !quality.needGroup
+    );
 }

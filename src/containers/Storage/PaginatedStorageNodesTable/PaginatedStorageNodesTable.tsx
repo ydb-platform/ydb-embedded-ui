@@ -7,7 +7,11 @@ import {
     getNodeHostLabel,
     getNodeHostPath,
 } from '../../../components/NodeHostWrapper/NodeHostWrapper';
-import type {PaginatedTableData, RenderErrorMessage} from '../../../components/PaginatedTable';
+import type {
+    OnChunkDataChange,
+    PaginatedTableData,
+    RenderErrorMessage,
+} from '../../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {NODES_COLUMNS_IDS} from '../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../components/nodesColumns/types';
@@ -52,6 +56,7 @@ interface PaginatedStorageNodesTableProps {
     initialEntitiesCount?: number;
     rowHeight?: number;
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+    onChunkDataChange?: OnChunkDataChange<PreparedStorageNode>;
     /** The response reported problems: an empty table does not prove there are no such nodes */
     hasDataIssues?: boolean;
 }
@@ -72,6 +77,7 @@ export const PaginatedStorageNodesTable = ({
     initialEntitiesCount,
     rowHeight = STORAGE_NODES_DEFAULT_ROW_HEIGHT,
     onDataFetched,
+    onChunkDataChange,
     hasDataIssues,
 }: PaginatedStorageNodesTableProps) => {
     const history = useHistory();
@@ -145,6 +151,7 @@ export const PaginatedStorageNodesTable = ({
             filters={tableFilters}
             tableName={PAGINATED_TABLE_IDS.STORAGE_NODES}
             onDataFetched={onDataFetched}
+            onChunkDataChange={onChunkDataChange}
         />
     );
 };

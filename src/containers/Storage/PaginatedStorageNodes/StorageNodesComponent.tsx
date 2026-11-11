@@ -10,7 +10,6 @@ import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNo
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageNodesTable} from '../PaginatedStorageNodesTable/PaginatedStorageNodesTable';
-import type {StorageNodesPaginatedTableData} from '../types';
 import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
 import {getStorageNodesDataIssuesContext, useStorageColumnsSettings} from '../utils';
 
@@ -32,37 +31,15 @@ export function StorageNodesComponent({
     const {hideUnavailable} = useHideUnavailableNodes();
 
     const expertMode = useIsStorageExpertMode();
-    const {
-        handleDataFetched: handleColumnsDataFetched,
-        columnsSettings,
-        rowHeight,
-    } = useStorageColumnsSettings({
+    const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings({
         expertMode,
     });
 
-    const {dataQuality, handleDataFetched: handleQualityDataFetched} = useTableDataQuality(
-        JSON.stringify([
-            database,
-            nodeId,
-            groupId,
-            nodesSearchValue,
-            visibleEntities,
-            nodesUptimeFilter,
-            hideUnavailable,
-        ]),
-    );
+    const {dataQuality, handleChunkDataChange} = useTableDataQuality();
     const dataIssues = React.useMemo(
         () =>
             getNodesDataIssues(dataQuality, getStorageNodesDataIssuesContext({database, groupId})),
         [dataQuality, database, groupId],
-    );
-
-    const handleDataFetched = React.useCallback(
-        (data: StorageNodesPaginatedTableData) => {
-            handleColumnsDataFetched(data);
-            handleQualityDataFetched(data);
-        },
-        [handleColumnsDataFetched, handleQualityDataFetched],
     );
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
@@ -107,6 +84,7 @@ export function StorageNodesComponent({
                     initialEntitiesCount={initialEntitiesCount}
                     rowHeight={rowHeight}
                     onDataFetched={handleDataFetched}
+                    onChunkDataChange={handleChunkDataChange}
                     hasDataIssues={dataIssues.length > 0}
                 />
             }

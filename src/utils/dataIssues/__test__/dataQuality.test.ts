@@ -1,9 +1,8 @@
 import {
-    createTableDataQualityReport,
     getResponseDataQuality,
+    isCleanDataQuality,
     isSameDataQuality,
     mergeDataQuality,
-    mergeGroupedDataQuality,
     prepareResponseDataQuality,
 } from '../dataQuality';
 import type {ResponseDataQuality} from '../types';
@@ -68,26 +67,6 @@ describe('mergeDataQuality', () => {
     });
 });
 
-describe('mergeGroupedDataQuality', () => {
-    test('Should add reports of expanded groups only', () => {
-        expect(
-            mergeGroupedDataQuality(
-                {...clean, problems: ['bsc-timeout']},
-                {
-                    ssd: {...clean, problems: ['wb-incomplete-disks']},
-                    hdd: {...clean, needSort: true},
-                    removed: {...clean, needFilter: true},
-                },
-                {ssd: true, hdd: false},
-            ),
-        ).toEqual({...clean, problems: ['bsc-timeout', 'wb-incomplete-disks']});
-    });
-
-    test('Should return undefined until the list of groups is loaded', () => {
-        expect(mergeGroupedDataQuality(undefined, {}, {})).toBeUndefined();
-    });
-});
-
 describe('isSameDataQuality', () => {
     test('Should compare flags and problem codes', () => {
         expect(isSameDataQuality(clean, {...clean})).toBe(true);
@@ -102,38 +81,12 @@ describe('isSameDataQuality', () => {
     });
 });
 
-describe('createTableDataQualityReport', () => {
-    test('Should stamp the report with the receive time and the request it belongs to', () => {
-        jest.spyOn(Date, 'now').mockReturnValue(1000);
-
-        const report = createTableDataQualityReport(
-            {problems: ['bsc-timeout'], needSort: true},
-            {filters: {searchValue: 'a'}, sortParams: {columnId: 'Usage', sortOrder: -1}},
-        );
-
-        expect(report).toEqual({
-            problems: ['bsc-timeout'],
-            needFilter: false,
-            needSort: true,
-            needGroup: false,
-            receivedAt: 1000,
-            requestKey: '[{"searchValue":"a"},{"columnId":"Usage","sortOrder":-1}]',
-        });
-
-        jest.restoreAllMocks();
-    });
-
-    test('Should give different keys to different filters or sorting', () => {
-        const base = createTableDataQualityReport({}, {filters: {searchValue: 'a'}});
-
-        expect(createTableDataQualityReport({}, {filters: {searchValue: 'b'}}).requestKey).not.toBe(
-            base.requestKey,
-        );
-        expect(
-            createTableDataQualityReport(
-                {},
-                {filters: {searchValue: 'a'}, sortParams: {columnId: 'Usage'}},
-            ).requestKey,
-        ).not.toBe(base.requestKey);
+describe('isCleanDataQuality', () => {
+    test('Should tell a response with nothing to report from the others', () => {
+        expect(isCleanDataQuality(clean)).toBe(true);
+        expect(isCleanDataQuality({...clean, problems: ['bsc-error']})).toBe(false);
+        expect(isCleanDataQuality({...clean, needFilter: true})).toBe(false);
+        expect(isCleanDataQuality({...clean, needSort: true})).toBe(false);
+        expect(isCleanDataQuality({...clean, needGroup: true})).toBe(false);
     });
 });

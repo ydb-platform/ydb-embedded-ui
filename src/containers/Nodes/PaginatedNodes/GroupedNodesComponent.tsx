@@ -21,10 +21,8 @@ import {nodesApi} from '../../../store/reducers/nodes/nodes';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole, NodesRequiredField} from '../../../types/api/nodes';
 import {getNodesDataIssues} from '../../../utils/dataIssues/classify';
-import {
-    getResponseDataQuality,
-    mergeGroupedDataQuality,
-} from '../../../utils/dataIssues/dataQuality';
+import {getResponseDataQuality, mergeDataQuality} from '../../../utils/dataIssues/dataQuality';
+import type {TableDataWithQuality} from '../../../utils/dataIssues/types';
 import {useTableDataQuality} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
@@ -54,7 +52,12 @@ interface NodeGroupProps {
     columns: NodesColumn[];
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
-    onDataFetched: (data: PaginatedTableData<PreparedStorageNode>, source: string) => void;
+    onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+    onChunkDataChange: (
+        chunkOffset: number,
+        data: TableDataWithQuality<unknown> | undefined,
+        source: string,
+    ) => void;
     hasDataIssues: boolean;
 }
 
@@ -72,11 +75,13 @@ const NodeGroup = React.memo(function NodeGroup({
     scrollContainerRef,
     onIsExpandedChange,
     onDataFetched,
+    onChunkDataChange,
     hasDataIssues,
 }: NodeGroupProps) {
-    const handleDataFetched = React.useCallback(
-        (data: PaginatedTableData<PreparedStorageNode>) => onDataFetched(data, name),
-        [onDataFetched, name],
+    const handleChunkDataChange = React.useCallback(
+        (chunkOffset: number, data: TableDataWithQuality<unknown> | undefined) =>
+            onChunkDataChange(chunkOffset, data, name),
+        [onChunkDataChange, name],
     );
 
     return (
@@ -105,7 +110,8 @@ const NodeGroup = React.memo(function NodeGroup({
                         initialEntitiesCount={count}
                         columns={columns}
                         scrollContainerRef={scrollContainerRef}
-                        onDataFetched={handleDataFetched}
+                        onDataFetched={onDataFetched}
+                        onChunkDataChange={handleChunkDataChange}
                         hasDataIssues={hasDataIssues}
                     />
                 }
@@ -197,39 +203,21 @@ export function GroupedNodesComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
-    const {dataQualityBySource, handleDataFetched: handleQualityDataFetched} = useTableDataQuality(
-        JSON.stringify([
-            path,
-            database,
-            databaseFullPath,
-            searchValue,
-            peerRoleFilter,
-            groupByParam,
-            hideUnavailable,
-        ]),
-    );
+    const {dataQualityBySource, handleChunkDataChange} = useTableDataQuality();
     const dataQuality = React.useMemo(
         () =>
-            mergeGroupedDataQuality(
+            // A collapsed group renders no table, so only the expanded groups report their chunks
+            mergeDataQuality([
                 getResponseDataQuality(currentData),
-                dataQualityBySource,
-                expandedGroups,
-            ),
-        [currentData, dataQualityBySource, expandedGroups],
+                ...Object.values(dataQualityBySource),
+            ]),
+        [currentData, dataQualityBySource],
     );
     const dataIssues = React.useMemo(
         () => getNodesDataIssues(dataQuality, {hasDatabase: Boolean(database)}),
         [dataQuality, database],
     );
     const hasDataIssues = dataIssues.length > 0;
-
-    const handleDataFetched = React.useCallback(
-        (data: PaginatedTableData<PreparedStorageNode>, source: string) => {
-            onDataFetched?.(data);
-            handleQualityDataFetched(data, source);
-        },
-        [onDataFetched, handleQualityDataFetched],
-    );
 
     // Initialize the table state with the API data
     const initialState = React.useMemo(
@@ -262,7 +250,8 @@ export function GroupedNodesComponent({
                         columns={columnsToShow}
                         scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
-                        onDataFetched={handleDataFetched}
+                        onDataFetched={onDataFetched}
+                        onChunkDataChange={handleChunkDataChange}
                         hasDataIssues={hasDataIssues}
                     />
                 );

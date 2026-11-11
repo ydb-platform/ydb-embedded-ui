@@ -4,7 +4,7 @@ import {useHistory} from 'react-router-dom';
 
 import {getEmptyDataWithIssuesMessage} from '../../components/DataIssuesAlert/DataIssuesAlert';
 import {getNodeHostLabel, getNodeHostPath} from '../../components/NodeHostWrapper/NodeHostWrapper';
-import type {PaginatedTableData} from '../../components/PaginatedTable';
+import type {OnChunkDataChange, PaginatedTableData} from '../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import {
     NODES_COLUMNS_IDS,
@@ -46,6 +46,7 @@ interface NodesTableProps {
     initialEntitiesCount?: number;
 
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+    onChunkDataChange?: OnChunkDataChange<PreparedStorageNode>;
     /** The response reported problems: an empty table does not prove there are no such nodes */
     hasDataIssues?: boolean;
 }
@@ -64,6 +65,7 @@ export function NodesTable({
     scrollContainerRef,
     initialEntitiesCount,
     onDataFetched,
+    onChunkDataChange,
     hasDataIssues,
 }: NodesTableProps) {
     const history = useHistory();
@@ -138,6 +140,7 @@ export function NodesTable({
             filters={tableFilters}
             tableName={PAGINATED_TABLE_IDS.NODES}
             onDataFetched={onDataFetched}
+            onChunkDataChange={onChunkDataChange}
         />
     );
 }

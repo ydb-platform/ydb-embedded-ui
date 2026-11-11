@@ -96,7 +96,7 @@ function tableData(quality: Partial<ResponseDataQuality>): StorageNodesPaginated
         data: [],
         found: 0,
         total: 0,
-        dataQuality: {...cleanQuality, ...quality, receivedAt: 1, requestKey: 'request'},
+        dataQuality: {...cleanQuality, ...quality},
     };
 }
 
@@ -105,6 +105,7 @@ function getTableProps() {
 
     return calls[calls.length - 1][0] as {
         onDataFetched: (data: StorageNodesPaginatedTableData) => void;
+        onChunkDataChange: (chunkOffset: number, data?: StorageNodesPaginatedTableData) => void;
         hasDataIssues?: boolean;
     };
 }
@@ -120,10 +121,10 @@ describe('StorageNodesComponent', () => {
     test('shows no warning for a clean response and keeps columns settings updated', () => {
         render(<StorageNodesComponent scrollContainerRef={scrollContainerRef} />);
 
-        const data = tableData({});
-        act(() => getTableProps().onDataFetched(data));
+        act(() => getTableProps().onChunkDataChange(0, tableData({})));
 
-        expect(mockHandleColumnsDataFetched).toHaveBeenCalledWith(data);
+        // Columns settings keep their own callback
+        expect(getTableProps().onDataFetched).toBe(mockHandleColumnsDataFetched);
         expect(screen.getByTestId('notice')).toBeEmptyDOMElement();
         expect(getTableProps().hasDataIssues).toBe(false);
     });
@@ -132,7 +133,8 @@ describe('StorageNodesComponent', () => {
         render(<StorageNodesComponent scrollContainerRef={scrollContainerRef} />);
 
         act(() =>
-            getTableProps().onDataFetched(
+            getTableProps().onChunkDataChange(
+                0,
                 tableData({problems: ['bsc-timeout', 'bsc-pdisks-no-data']}),
             ),
         );
@@ -150,7 +152,8 @@ describe('StorageNodesComponent', () => {
         );
 
         act(() =>
-            getTableProps().onDataFetched(
+            getTableProps().onChunkDataChange(
+                0,
                 tableData({problems: ['bsc-timeout', 'bsc-storage-slots-no-data']}),
             ),
         );
@@ -163,7 +166,7 @@ describe('StorageNodesComponent', () => {
     test('warns that slow nodes may look unavailable', () => {
         render(<StorageNodesComponent scrollContainerRef={scrollContainerRef} />);
 
-        act(() => getTableProps().onDataFetched(tableData({problems: ['wb-incomplete']})));
+        act(() => getTableProps().onChunkDataChange(0, tableData({problems: ['wb-incomplete']})));
 
         expect(screen.getByTestId('notice')).toHaveTextContent(
             'Some nodes did not respond in time and may be shown as unavailable.',
@@ -243,10 +246,9 @@ describe('GroupedStorageNodesComponent', () => {
 
         act(() => screen.getByRole('button', {name: /dc-1/}).click());
 
-        const data = tableData({problems: ['wb-incomplete']});
-        act(() => getTableProps().onDataFetched(data));
+        act(() => getTableProps().onChunkDataChange(0, tableData({problems: ['wb-incomplete']})));
 
-        expect(mockHandleColumnsDataFetched).toHaveBeenCalledWith(data);
+        expect(getTableProps().onDataFetched).toBe(mockHandleColumnsDataFetched);
         // The table of the expanded group has a layout of its own
         const [notice] = screen.getAllByTestId('notice');
         expect(notice).toHaveTextContent('Some nodes did not respond in time');

@@ -10,112 +10,146 @@ const clean: ResponseDataQuality = {
     needGroup: false,
 };
 
-function tableData(
-    receivedAt: number,
-    quality: Partial<ResponseDataQuality> = {},
-    requestKey = 'request-1',
-): TableDataWithQuality<unknown> {
+function chunkData(quality?: Partial<ResponseDataQuality>): TableDataWithQuality<unknown> {
     return {
         data: [],
         found: 0,
         total: 0,
-        dataQuality: {...clean, ...quality, receivedAt, requestKey},
+        dataQuality: quality ? {...clean, ...quality} : undefined,
     };
 }
 
+const withProblem = (problem: string) => chunkData({problems: [problem]});
+
 describe('useTableDataQuality', () => {
-    test('Should have no report until the table receives data', () => {
-        const {result} = renderHook(() => useTableDataQuality('scope'));
+    test('Should have no report until a chunk has something to tell', () => {
+        const {result} = renderHook(() => useTableDataQuality());
+
+        expect(result.current.dataQuality).toBeUndefined();
+
+        // Loaded without problems, loaded by a fetcher that reports nothing, not loaded at all
+        act(() => result.current.handleChunkDataChange(0, chunkData({})));
+        act(() => result.current.handleChunkDataChange(20, chunkData()));
+        act(() => result.current.handleChunkDataChange(40, undefined));
 
         expect(result.current.dataQuality).toBeUndefined();
         expect(result.current.dataQualityBySource).toEqual({});
     });
 
-    test('Should ignore data without a quality report', () => {
-        const {result} = renderHook(() => useTableDataQuality('scope'));
+    test('Should keep the problems of a chunk whatever the other chunks report', () => {
+        const {result} = renderHook(() => useTableDataQuality());
 
-        act(() => result.current.handleDataFetched({data: [], found: 0, total: 0}));
-
-        expect(result.current.dataQuality).toBeUndefined();
-    });
-
-    test('Should keep the most recently received response of one request', () => {
-        const {result} = renderHook(() => useTableDataQuality('scope'));
-
-        act(() => result.current.handleDataFetched(tableData(200, {problems: ['bsc-timeout']})));
-        // A chunk that still holds an older response reports after a newer one
-        act(() => result.current.handleDataFetched(tableData(100)));
+        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
+        // Clean neighbours arrive later: they say nothing about the rows of the first chunk
+        act(() => result.current.handleChunkDataChange(20, chunkData({})));
+        act(() => result.current.handleChunkDataChange(40, chunkData({})));
 
         expect(result.current.dataQuality).toEqual({...clean, problems: ['bsc-timeout']});
-
-        act(() => result.current.handleDataFetched(tableData(300)));
-
-        expect(result.current.dataQuality).toEqual(clean);
     });
 
-    test('Should not go back to an older response after equal reports', () => {
-        const {result} = renderHook(() => useTableDataQuality('scope'));
+    test('Should not depend on the order the chunks report in', () => {
+        const first = renderHook(() => useTableDataQuality());
+        const second = renderHook(() => useTableDataQuality());
 
-        act(() => result.current.handleDataFetched(tableData(100)));
-        act(() => result.current.handleDataFetched(tableData(300)));
-        act(() => result.current.handleDataFetched(tableData(200, {needSort: true})));
-
-        expect(result.current.dataQuality).toEqual(clean);
-    });
-
-    test('Should show the report of another request even if it was received earlier', () => {
-        const {result} = renderHook(() => useTableDataQuality('scope'));
-
-        act(() => result.current.handleDataFetched(tableData(200, {}, 'sorted-by-id')));
-        // The user returns to a sorting whose chunks are still cached
-        act(() =>
-            result.current.handleDataFetched(tableData(100, {needSort: true}, 'sorted-by-type')),
-        );
-
-        expect(result.current.dataQuality).toEqual({...clean, needSort: true});
-    });
-
-    test('Should keep the state when a repeated report changes nothing', () => {
-        const {result} = renderHook(() => useTableDataQuality('scope'));
-
-        act(() => result.current.handleDataFetched(tableData(100, {problems: ['bsc-timeout']})));
-        const firstReports = result.current.dataQualityBySource;
-        act(() => result.current.handleDataFetched(tableData(200, {problems: ['bsc-timeout']})));
-
-        expect(result.current.dataQualityBySource).toBe(firstReports);
-    });
-
-    test('Should drop the reports when the scope changes', () => {
-        const {result, rerender} = renderHook(({scopeKey}) => useTableDataQuality(scopeKey), {
-            initialProps: {scopeKey: 'search-a'},
+        act(() => {
+            first.result.current.handleChunkDataChange(100, withProblem('bsc-timeout'));
+            first.result.current.handleChunkDataChange(0, chunkData({needSort: true}));
+            first.result.current.handleChunkDataChange(20, chunkData({}));
+        });
+        act(() => {
+            second.result.current.handleChunkDataChange(20, chunkData({}));
+            second.result.current.handleChunkDataChange(0, chunkData({needSort: true}));
+            second.result.current.handleChunkDataChange(100, withProblem('bsc-timeout'));
         });
 
-        act(() => result.current.handleDataFetched(tableData(100, {problems: ['bsc-timeout']})));
-        expect(result.current.dataQuality).toEqual({...clean, problems: ['bsc-timeout']});
+        const expected = {...clean, problems: ['bsc-timeout'], needSort: true};
+        expect(first.result.current.dataQuality).toEqual(expected);
+        expect(second.result.current.dataQuality).toEqual(expected);
+    });
 
-        rerender({scopeKey: 'search-b'});
-        expect(result.current.dataQuality).toBeUndefined();
+    test('Should unite the problems of all chunks without repeating them', () => {
+        const {result} = renderHook(() => useTableDataQuality());
 
-        // An earlier response is accepted: it belongs to the new scope
-        act(() => result.current.handleDataFetched(tableData(50, {needFilter: true})));
-        expect(result.current.dataQuality).toEqual({...clean, needFilter: true});
+        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
+        act(() =>
+            result.current.handleChunkDataChange(
+                20,
+                chunkData({problems: ['bsc-timeout', 'hive-timeout'], needFilter: true}),
+            ),
+        );
 
-        rerender({scopeKey: 'search-a'});
+        expect(result.current.dataQuality).toEqual({
+            ...clean,
+            problems: ['bsc-timeout', 'hive-timeout'],
+            needFilter: true,
+        });
+    });
+
+    test('Should drop the problems of a chunk reloaded without them', () => {
+        const {result} = renderHook(() => useTableDataQuality());
+
+        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
+        act(() => result.current.handleChunkDataChange(20, withProblem('hive-timeout')));
+        act(() => result.current.handleChunkDataChange(0, chunkData({})));
+
+        expect(result.current.dataQuality).toEqual({...clean, problems: ['hive-timeout']});
+
+        act(() => result.current.handleChunkDataChange(20, chunkData({})));
+
         expect(result.current.dataQuality).toBeUndefined();
     });
 
-    test('Should keep reports of several sources separately', () => {
-        const {result} = renderHook(() => useTableDataQuality('scope'));
+    test('Should drop the problems of a chunk that holds no data any more', () => {
+        const {result} = renderHook(() => useTableDataQuality());
 
-        act(() =>
-            result.current.handleDataFetched(tableData(100, {problems: ['bsc-timeout']}), 'ssd'),
-        );
-        act(() => result.current.handleDataFetched(tableData(50, {needSort: true}), 'hdd'));
+        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
+        // New filters or sorting, or the chunk is no longer rendered
+        act(() => result.current.handleChunkDataChange(0, undefined));
+
+        expect(result.current.dataQuality).toBeUndefined();
+    });
+
+    test('Should keep the state when a chunk repeats its report', () => {
+        const {result} = renderHook(() => useTableDataQuality());
+
+        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
+        const {dataQuality, dataQualityBySource} = result.current;
+
+        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
+        act(() => result.current.handleChunkDataChange(20, chunkData({})));
+        act(() => result.current.handleChunkDataChange(40, undefined));
+
+        expect(result.current.dataQuality).toBe(dataQuality);
+        expect(result.current.dataQualityBySource).toBe(dataQualityBySource);
+    });
+
+    test('Should keep the reports of several tables apart', () => {
+        const {result} = renderHook(() => useTableDataQuality());
+
+        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout'), 'ssd'));
+        act(() => result.current.handleChunkDataChange(0, withProblem('hive-timeout'), 'hdd'));
 
         expect(result.current.dataQuality).toBeUndefined();
         expect(result.current.dataQualityBySource).toEqual({
             ssd: {...clean, problems: ['bsc-timeout']},
-            hdd: {...clean, needSort: true},
+            hdd: {...clean, problems: ['hive-timeout']},
         });
+
+        // The table of a collapsed group is unmounted and its chunks report that they are gone
+        act(() => result.current.handleChunkDataChange(0, undefined, 'ssd'));
+
+        expect(result.current.dataQualityBySource).toEqual({
+            hdd: {...clean, problems: ['hive-timeout']},
+        });
+    });
+
+    test('Should keep the callback stable', () => {
+        const {result, rerender} = renderHook(() => useTableDataQuality());
+        const {handleChunkDataChange} = result.current;
+
+        act(() => handleChunkDataChange(0, withProblem('bsc-timeout')));
+        rerender();
+
+        expect(result.current.handleChunkDataChange).toBe(handleChunkDataChange);
     });
 });

@@ -101,12 +101,12 @@ describe('PaginatedStorageGroupsTable', () => {
         );
     });
 
-    test('passes the data callback to the table', () => {
-        const onDataFetched = jest.fn();
-        renderTable([], {onDataFetched});
+    test('passes the chunk data callback to the table', () => {
+        const onChunkDataChange = jest.fn();
+        renderTable([], {onChunkDataChange});
 
         expect(ResizeablePaginatedTableMock).toHaveBeenCalledWith(
-            expect.objectContaining({onDataFetched}),
+            expect.objectContaining({onChunkDataChange}),
             {},
         );
     });

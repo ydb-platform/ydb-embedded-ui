@@ -32,9 +32,7 @@ export function StorageGroupsComponent({
         viewContext,
     });
 
-    const {dataQuality, handleDataFetched} = useTableDataQuality(
-        JSON.stringify([database, nodeId, groupId, pDiskId, groupsSearchValue, visibleEntities]),
-    );
+    const {dataQuality, handleChunkDataChange} = useTableDataQuality();
     const dataIssues = React.useMemo(() => getStorageGroupsDataIssues(dataQuality), [dataQuality]);
 
     return (
@@ -72,7 +70,7 @@ export function StorageGroupsComponent({
                     renderErrorMessage={renderPaginatedTableErrorMessage}
                     columns={columnsToShow}
                     initialEntitiesCount={initialEntitiesCount}
-                    onDataFetched={handleDataFetched}
+                    onChunkDataChange={handleChunkDataChange}
                     hasDataIssues={dataIssues.length > 0}
                 />
             }
