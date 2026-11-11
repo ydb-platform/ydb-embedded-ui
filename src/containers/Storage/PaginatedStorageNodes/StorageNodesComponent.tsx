@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {DataIssuesAlert} from '../../../components/DataIssuesAlert/DataIssuesAlert';
+import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
@@ -50,15 +50,17 @@ export function StorageNodesComponent({
 
     return (
         <PaginatedTableWithLayout
-            notice={
-                dataIssues.length > 0 ? (
-                    <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />
-                ) : null
-            }
             controls={
                 <StorageNodesControlsWithTableState
                     withTypeSelector
                     withGroupBySelect={viewerNodesHandlerHasGrouping}
+                    dataIssuesIndicator={
+                        <DataIssuesIndicator
+                            compact
+                            issues={dataIssues}
+                            problems={dataQuality?.problems}
+                        />
+                    }
                 />
             }
             extraControls={

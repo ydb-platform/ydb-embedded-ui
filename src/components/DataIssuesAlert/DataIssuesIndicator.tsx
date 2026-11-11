@@ -14,11 +14,22 @@ const b = cn('ydb-data-issues-alert');
 export const DATA_ISSUES_INDICATOR_QA = 'data-issues-indicator';
 
 interface DataIssuesIndicatorProps extends DataIssuesProps {
+    /** A shorter label for places where the width is shared with other controls */
+    compact?: boolean;
     className?: string;
 }
 
-/** Compact form of `DataIssuesAlert` for small tables: the details open in a popover */
-export function DataIssuesIndicator({issues, problems, className}: DataIssuesIndicatorProps) {
+/**
+ * Compact form of `DataIssuesAlert`: the details open in a popover on hover or on click.
+ * Takes no space of its own in the page flow, so it fits sticky table controls:
+ * the rows do not move when it appears or disappears.
+ */
+export function DataIssuesIndicator({
+    issues,
+    problems,
+    compact,
+    className,
+}: DataIssuesIndicatorProps) {
     if (!issues.length) {
         return null;
     }
@@ -36,7 +47,7 @@ export function DataIssuesIndicator({issues, problems, className}: DataIssuesInd
                 qa={DATA_ISSUES_INDICATOR_QA}
             >
                 <Icon data={TriangleExclamation} size={14} />
-                {i18n('title_data-issues')}
+                {compact ? i18n('title_data-issues-short') : i18n('title_data-issues')}
             </Button>
         </Popover>
     );

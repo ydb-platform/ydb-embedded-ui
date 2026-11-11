@@ -2,6 +2,7 @@ import React from 'react';
 
 import {act, render, screen} from '@testing-library/react';
 
+import type {DataIssuesProps} from '../../../../components/DataIssuesAlert/DataIssuesAlert';
 import type {PaginatedTableWithLayoutProps} from '../../../../components/PaginatedTable/PaginatedTableWithLayout';
 import type {PreparedStorageResponse} from '../../../../store/reducers/storage/types';
 import type {ResponseDataQuality, TableDataWithQuality} from '../../../../utils/dataIssues/types';
@@ -9,14 +10,26 @@ import {GroupedNodesComponent} from '../GroupedNodesComponent';
 import {NodesComponent} from '../NodesComponent';
 
 jest.mock('../../../../components/PaginatedTable/PaginatedTableWithLayout', () => ({
-    PaginatedTableWithLayout: ({notice, error, table}: PaginatedTableWithLayoutProps) => (
+    PaginatedTableWithLayout: ({controls, error, table}: PaginatedTableWithLayoutProps) => (
         <div>
-            <div data-testid="notice">{notice}</div>
+            <div data-testid="controls">{controls}</div>
             {error}
             <div data-testid="table">{table}</div>
         </div>
     ),
 }));
+
+// The indicator keeps the details in a popover: show them inline to read what it tells
+jest.mock('../../../../components/DataIssuesAlert/DataIssuesIndicator', () => {
+    const {DataIssuesList} = jest.requireActual(
+        '../../../../components/DataIssuesAlert/DataIssuesAlert',
+    );
+
+    return {
+        DataIssuesIndicator: (props: DataIssuesProps) =>
+            props.issues.length > 0 ? <DataIssuesList {...props} /> : null,
+    };
+});
 
 jest.mock('../../../../components/TableColumnSetup/TableColumnSetup', () => ({
     TableColumnSetup: () => null,
@@ -51,7 +64,8 @@ jest.mock('../../../../utils/hooks/useSelectedColumns', () => ({
 }));
 
 jest.mock('../../NodesControls/NodesControls', () => ({
-    NodesControls: () => null,
+    NodesControls: ({dataIssuesIndicator}: {dataIssuesIndicator?: React.ReactNode}) =>
+        dataIssuesIndicator ?? null,
 }));
 
 jest.mock('../../NodesTable', () => ({
@@ -69,7 +83,8 @@ jest.mock('../../useNodesPageQueryParams', () => ({
 }));
 
 jest.mock('../NodesControlsWithTableState', () => ({
-    NodesControlsWithTableState: () => null,
+    NodesControlsWithTableState: ({dataIssuesIndicator}: {dataIssuesIndicator?: React.ReactNode}) =>
+        dataIssuesIndicator ?? null,
 }));
 
 const {useGetNodesQuery} = jest.requireMock('../../../../store/reducers/nodes/nodes').nodesApi as {
@@ -124,7 +139,7 @@ describe('NodesComponent', () => {
         act(() => getTableProps().onChunkDataChange(0, tableData({})));
 
         expect(getTableProps().onDataFetched).toBe(onDataFetched);
-        expect(screen.getByTestId('notice')).toBeEmptyDOMElement();
+        expect(screen.getByTestId('controls')).toBeEmptyDOMElement();
         expect(getTableProps().hasDataIssues).toBe(false);
     });
 
@@ -133,7 +148,7 @@ describe('NodesComponent', () => {
 
         act(() => getTableProps().onChunkDataChange(0, tableData({problems: ['hive-timeout']})));
 
-        expect(screen.getByTestId('notice')).toHaveTextContent('The list may be incomplete');
+        expect(screen.getByTestId('controls')).toHaveTextContent('The list may be incomplete');
         expect(getTableProps().hasDataIssues).toBe(true);
     });
 
@@ -142,9 +157,9 @@ describe('NodesComponent', () => {
 
         act(() => getTableProps().onChunkDataChange(0, tableData({problems: ['hive-timeout']})));
 
-        const notice = screen.getByTestId('notice');
-        expect(notice).toHaveTextContent('Some data is unavailable');
-        expect(notice).not.toHaveTextContent('The list may be incomplete');
+        const controls = screen.getByTestId('controls');
+        expect(controls).toHaveTextContent('Some data is unavailable');
+        expect(controls).not.toHaveTextContent('The list may be incomplete');
     });
 
     test('warns that sorting was not applied', () => {
@@ -152,7 +167,7 @@ describe('NodesComponent', () => {
 
         act(() => getTableProps().onChunkDataChange(0, tableData({needSort: true})));
 
-        expect(screen.getByTestId('notice')).toHaveTextContent('Sorting was not applied');
+        expect(screen.getByTestId('controls')).toHaveTextContent('Sorting was not applied');
     });
 });
 
@@ -176,7 +191,7 @@ describe('GroupedNodesComponent', () => {
         });
 
         expect(screen.getByText('26.1')).toBeInTheDocument();
-        expect(screen.getByTestId('notice')).toBeEmptyDOMElement();
+        expect(screen.getByTestId('controls')).toBeEmptyDOMElement();
     });
 
     test('explains an empty list when database information is unavailable', () => {
@@ -185,7 +200,7 @@ describe('GroupedNodesComponent', () => {
             '/Root/db',
         );
 
-        expect(screen.getByTestId('notice')).toHaveTextContent(
+        expect(screen.getByTestId('controls')).toHaveTextContent(
             'Database information is unavailable',
         );
         expect(screen.getByTestId('table')).toHaveTextContent(
@@ -196,15 +211,15 @@ describe('GroupedNodesComponent', () => {
     test('warns that grouping was not applied instead of saying there are no groups', () => {
         renderGroups({found: 8, total: 8, nodes: [], ...cleanQuality, needGroup: true});
 
-        expect(screen.getByTestId('notice')).toHaveTextContent('Grouping was not applied.');
-        expect(screen.getByTestId('table')).toBeEmptyDOMElement();
+        expect(screen.getByTestId('controls')).toHaveTextContent('Grouping was not applied.');
+        expect(screen.getByTestId('table')).toHaveTextContent('Grouping was not applied.');
     });
 
     test('keeps the regular empty message when there are no nodes and no problems', () => {
         renderGroups({found: 0, total: 0, nodes: [], ...cleanQuality});
 
         expect(screen.getByTestId('table')).toHaveTextContent('No nodes groups');
-        expect(screen.getByTestId('notice')).toBeEmptyDOMElement();
+        expect(screen.getByTestId('controls')).toBeEmptyDOMElement();
     });
 
     test('adds problems reported by the table of an expanded group', () => {
@@ -219,7 +234,7 @@ describe('GroupedNodesComponent', () => {
         act(() => getTableProps().onChunkDataChange(0, tableData({problems: ['wb-incomplete']})));
 
         // The table of the expanded group has a layout of its own
-        const [notice] = screen.getAllByTestId('notice');
-        expect(notice).toHaveTextContent('Some nodes did not respond in time');
+        const [controls] = screen.getAllByTestId('controls');
+        expect(controls).toHaveTextContent('Some nodes did not respond in time');
     });
 });

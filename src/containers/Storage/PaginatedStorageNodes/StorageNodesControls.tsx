@@ -30,6 +30,9 @@ interface StorageControlsProps {
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
     entitiesLoading: boolean;
+
+    /** Warning about the data of the table; the controls are sticky, so it is always in sight */
+    dataIssuesIndicator?: React.ReactNode;
 }
 
 export function StorageNodesControls({
@@ -39,6 +42,8 @@ export function StorageNodesControls({
     entitiesCountCurrent,
     entitiesCountTotal,
     entitiesLoading,
+
+    dataIssuesIndicator,
 }: StorageControlsProps) {
     const {
         nodesSearchValue,
@@ -119,6 +124,7 @@ export function StorageNodesControls({
                     total={entitiesCountTotal}
                     current={entitiesCountCurrent}
                 />
+                {dataIssuesIndicator}
                 {canUseStorageExpertMode ? (
                     <Button
                         selected={isStorageExpertMode}
@@ -140,9 +146,11 @@ export function StorageNodesControls({
 export function StorageNodesControlsWithTableState({
     withTypeSelector,
     withGroupBySelect,
+    dataIssuesIndicator,
 }: {
     withTypeSelector?: boolean;
     withGroupBySelect?: boolean;
+    dataIssuesIndicator?: React.ReactNode;
 }) {
     const {tableState} = usePaginatedTableState();
 
@@ -153,6 +161,7 @@ export function StorageNodesControlsWithTableState({
             entitiesCountCurrent={tableState.foundEntities}
             entitiesCountTotal={tableState.totalEntities}
             entitiesLoading={tableState.isInitialLoad}
+            dataIssuesIndicator={dataIssuesIndicator}
         />
     );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {DataIssuesAlert} from '../../../components/DataIssuesAlert/DataIssuesAlert';
+import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
@@ -69,15 +69,17 @@ export function NodesComponent({
 
     return (
         <PaginatedTableWithLayout
-            notice={
-                dataIssues.length > 0 ? (
-                    <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />
-                ) : null
-            }
             controls={
                 <NodesControlsWithTableState
                     withGroupBySelect={viewerNodesHandlerHasGrouping}
                     groupByParams={groupByParams}
+                    dataIssuesIndicator={
+                        <DataIssuesIndicator
+                            compact
+                            issues={dataIssues}
+                            problems={dataQuality?.problems}
+                        />
+                    }
                     withPeerRoleFilter={withPeerRoleFilter}
                 />
             }

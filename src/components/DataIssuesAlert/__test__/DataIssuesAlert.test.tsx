@@ -1,5 +1,8 @@
+import {ThemeProvider} from '@gravity-ui/uikit';
 import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
+import type {DataIssueKind} from '../../../utils/dataIssues/classify';
 import {DataIssuesAlert} from '../DataIssuesAlert';
 import {DataIssuesIndicator} from '../DataIssuesIndicator';
 
@@ -50,5 +53,46 @@ describe('DataIssuesIndicator', () => {
         expect(
             screen.getByRole('button', {name: 'Data may be incomplete or inaccurate'}),
         ).toBeInTheDocument();
+    });
+
+    test('Should use a shorter label where the width is shared with other controls', () => {
+        render(
+            <DataIssuesIndicator compact issues={['list-incomplete']} problems={['bsc-timeout']} />,
+        );
+
+        expect(screen.getByRole('button', {name: 'Data issues'})).toBeInTheDocument();
+    });
+
+    // The popover is rendered in a portal, which needs the theme
+    function renderInteractive(issues: DataIssueKind[]) {
+        return render(
+            <ThemeProvider theme="light">
+                <DataIssuesIndicator compact issues={issues} problems={['bsc-timeout']} />
+            </ThemeProvider>,
+        );
+    }
+
+    test('Should explain the issues and list the codes on hover', async () => {
+        renderInteractive(['list-incomplete']);
+
+        expect(screen.queryByText(/The list may be incomplete/)).not.toBeInTheDocument();
+
+        await userEvent.hover(screen.getByRole('button', {name: 'Data issues'}));
+
+        expect(await screen.findByText(/The list may be incomplete/)).toBeInTheDocument();
+        expect(
+            screen.getByText('Problems reported by the server: bsc-timeout'),
+        ).toBeInTheDocument();
+    });
+
+    test('Should open the details from the keyboard', async () => {
+        const user = userEvent.setup();
+        renderInteractive(['sort-not-applied']);
+
+        await user.tab();
+        expect(screen.getByRole('button', {name: 'Data issues'})).toHaveFocus();
+        await user.keyboard('{Enter}');
+
+        expect(await screen.findByText(/Sorting was not applied/)).toBeInTheDocument();
     });
 });

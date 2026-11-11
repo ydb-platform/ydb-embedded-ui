@@ -2,6 +2,7 @@ import React from 'react';
 
 import {act, render, screen} from '@testing-library/react';
 
+import type {DataIssuesProps} from '../../../../components/DataIssuesAlert/DataIssuesAlert';
 import type {PaginatedTableWithLayoutProps} from '../../../../components/PaginatedTable/PaginatedTableWithLayout';
 import type {PreparedStorageResponse} from '../../../../store/reducers/storage/types';
 import type {ResponseDataQuality} from '../../../../utils/dataIssues/types';
@@ -10,14 +11,26 @@ import {GroupedStorageNodesComponent} from '../GroupedStorageNodesComponent';
 import {StorageNodesComponent} from '../StorageNodesComponent';
 
 jest.mock('../../../../components/PaginatedTable/PaginatedTableWithLayout', () => ({
-    PaginatedTableWithLayout: ({notice, error, table}: PaginatedTableWithLayoutProps) => (
+    PaginatedTableWithLayout: ({controls, error, table}: PaginatedTableWithLayoutProps) => (
         <div>
-            <div data-testid="notice">{notice}</div>
+            <div data-testid="controls">{controls}</div>
             {error}
             <div data-testid="table">{table}</div>
         </div>
     ),
 }));
+
+// The indicator keeps the details in a popover: show them inline to read what it tells
+jest.mock('../../../../components/DataIssuesAlert/DataIssuesIndicator', () => {
+    const {DataIssuesList} = jest.requireActual(
+        '../../../../components/DataIssuesAlert/DataIssuesAlert',
+    );
+
+    return {
+        DataIssuesIndicator: (props: DataIssuesProps) =>
+            props.issues.length > 0 ? <DataIssuesList {...props} /> : null,
+    };
+});
 
 jest.mock('../../../../components/TableColumnSetup/TableColumnSetup', () => ({
     TableColumnSetup: () => null,
@@ -66,8 +79,13 @@ jest.mock('../../utils', () => ({
 }));
 
 jest.mock('../StorageNodesControls', () => ({
-    StorageNodesControls: () => null,
-    StorageNodesControlsWithTableState: () => null,
+    StorageNodesControls: ({dataIssuesIndicator}: {dataIssuesIndicator?: React.ReactNode}) =>
+        dataIssuesIndicator ?? null,
+    StorageNodesControlsWithTableState: ({
+        dataIssuesIndicator,
+    }: {
+        dataIssuesIndicator?: React.ReactNode;
+    }) => dataIssuesIndicator ?? null,
 }));
 
 jest.mock('../useStorageNodesColumnsToSelect', () => ({
@@ -125,7 +143,7 @@ describe('StorageNodesComponent', () => {
 
         // Columns settings keep their own callback
         expect(getTableProps().onDataFetched).toBe(mockHandleColumnsDataFetched);
-        expect(screen.getByTestId('notice')).toBeEmptyDOMElement();
+        expect(screen.getByTestId('controls')).toBeEmptyDOMElement();
         expect(getTableProps().hasDataIssues).toBe(false);
     });
 
@@ -139,10 +157,10 @@ describe('StorageNodesComponent', () => {
             ),
         );
 
-        const notice = screen.getByTestId('notice');
-        expect(notice).toHaveTextContent('Disks of unavailable nodes are not shown');
-        expect(notice).not.toHaveTextContent('Filters were not applied');
-        expect(notice).toHaveTextContent('bsc-timeout, bsc-pdisks-no-data');
+        const controls = screen.getByTestId('controls');
+        expect(controls).toHaveTextContent('Disks of unavailable nodes are not shown');
+        expect(controls).not.toHaveTextContent('Filters were not applied');
+        expect(controls).toHaveTextContent('bsc-timeout, bsc-pdisks-no-data');
         expect(getTableProps().hasDataIssues).toBe(true);
     });
 
@@ -158,9 +176,9 @@ describe('StorageNodesComponent', () => {
             ),
         );
 
-        const notice = screen.getByTestId('notice');
-        expect(notice).toHaveTextContent('Filters were not applied');
-        expect(notice).not.toHaveTextContent('Disks of unavailable nodes');
+        const controls = screen.getByTestId('controls');
+        expect(controls).toHaveTextContent('Filters were not applied');
+        expect(controls).not.toHaveTextContent('Disks of unavailable nodes');
     });
 
     test('warns that slow nodes may look unavailable', () => {
@@ -168,7 +186,7 @@ describe('StorageNodesComponent', () => {
 
         act(() => getTableProps().onChunkDataChange(0, tableData({problems: ['wb-incomplete']})));
 
-        expect(screen.getByTestId('notice')).toHaveTextContent(
+        expect(screen.getByTestId('controls')).toHaveTextContent(
             'Some nodes did not respond in time and may be shown as unavailable.',
         );
     });
@@ -198,7 +216,7 @@ describe('GroupedStorageNodesComponent', () => {
         });
 
         expect(screen.getByText('dc-1')).toBeInTheDocument();
-        expect(screen.getByTestId('notice')).toBeEmptyDOMElement();
+        expect(screen.getByTestId('controls')).toBeEmptyDOMElement();
     });
 
     test('warns that the storage group filter was dropped', () => {
@@ -213,7 +231,7 @@ describe('GroupedStorageNodesComponent', () => {
             {groupId: '2181038080'},
         );
 
-        expect(screen.getByTestId('notice')).toHaveTextContent('Filters were not applied');
+        expect(screen.getByTestId('controls')).toHaveTextContent('Filters were not applied');
     });
 
     test('warns that grouping was not applied instead of saying there are no nodes', () => {
@@ -225,15 +243,15 @@ describe('GroupedStorageNodesComponent', () => {
             needGroup: true,
         });
 
-        expect(screen.getByTestId('notice')).toHaveTextContent('Grouping was not applied.');
-        expect(screen.getByTestId('table')).toBeEmptyDOMElement();
+        expect(screen.getByTestId('controls')).toHaveTextContent('Grouping was not applied.');
+        expect(screen.getByTestId('table')).toHaveTextContent('Grouping was not applied.');
     });
 
     test('keeps the regular empty message when there are no nodes and no problems', () => {
         renderGroups({found: 0, total: 0, nodes: [], ...cleanQuality});
 
         expect(screen.getByTestId('table')).toHaveTextContent('No such nodes');
-        expect(screen.getByTestId('notice')).toBeEmptyDOMElement();
+        expect(screen.getByTestId('controls')).toBeEmptyDOMElement();
     });
 
     test('adds problems of an expanded group and keeps columns settings updated', () => {
@@ -250,7 +268,7 @@ describe('GroupedStorageNodesComponent', () => {
 
         expect(getTableProps().onDataFetched).toBe(mockHandleColumnsDataFetched);
         // The table of the expanded group has a layout of its own
-        const [notice] = screen.getAllByTestId('notice');
-        expect(notice).toHaveTextContent('Some nodes did not respond in time');
+        const [controls] = screen.getAllByTestId('controls');
+        expect(controls).toHaveTextContent('Some nodes did not respond in time');
     });
 });

@@ -6,6 +6,7 @@ import {
     DataIssuesAlert,
     getEmptyDataWithIssuesMessage,
 } from '../../../components/DataIssuesAlert/DataIssuesAlert';
+import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
@@ -259,8 +260,8 @@ export function GroupedNodesComponent({
         }
 
         if (dataIssues.includes('group-not-applied')) {
-            // The warning above the table says why there are no groups to show
-            return null;
+            // There are no groups to show, so the reason takes their place
+            return <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />;
         }
 
         return hasDataIssues ? getEmptyDataWithIssuesMessage() : i18n('no-nodes-groups');
@@ -269,11 +270,6 @@ export function GroupedNodesComponent({
     return (
         <PaginatedTableWithLayout
             initialState={initialState}
-            notice={
-                hasDataIssues ? (
-                    <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />
-                ) : null
-            }
             controls={
                 <NodesControls
                     groupByParams={groupByParams}
@@ -281,6 +277,13 @@ export function GroupedNodesComponent({
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
+                    dataIssuesIndicator={
+                        <DataIssuesIndicator
+                            compact
+                            issues={dataIssues}
+                            problems={dataQuality?.problems}
+                        />
+                    }
                     withGroupBySelect
                 />
             }

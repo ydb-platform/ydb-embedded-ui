@@ -35,6 +35,9 @@ interface StorageControlsProps {
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
     entitiesLoading: boolean;
+
+    /** Warning about the data of the table; the controls are sticky, so it is always in sight */
+    dataIssuesIndicator?: React.ReactNode;
 }
 
 export function StorageGroupsControls({
@@ -46,6 +49,8 @@ export function StorageGroupsControls({
     entitiesCountCurrent,
     entitiesCountTotal,
     entitiesLoading,
+
+    dataIssuesIndicator,
 }: StorageControlsProps) {
     const {
         groupsSearchValue,
@@ -127,6 +132,7 @@ export function StorageGroupsControls({
                     total={entitiesCountTotal}
                     current={entitiesCountCurrent}
                 />
+                {dataIssuesIndicator}
                 {canUseStorageExpertMode ? (
                     <Button
                         selected={isStorageExpertMode}
@@ -148,10 +154,12 @@ export function StorageGroupsControlsWithTableState({
     withTypeSelector,
     withGroupBySelect,
     columns,
+    dataIssuesIndicator,
 }: {
     withTypeSelector?: boolean;
     withGroupBySelect?: boolean;
     columns?: StorageGroupsColumn[];
+    dataIssuesIndicator?: React.ReactNode;
 }) {
     const {tableState} = usePaginatedTableState();
 
@@ -163,6 +171,7 @@ export function StorageGroupsControlsWithTableState({
             entitiesCountCurrent={tableState.foundEntities}
             entitiesCountTotal={tableState.totalEntities}
             entitiesLoading={tableState.isInitialLoad}
+            dataIssuesIndicator={dataIssuesIndicator}
         />
     );
 }

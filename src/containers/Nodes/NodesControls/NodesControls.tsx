@@ -28,6 +28,9 @@ interface NodesControlsProps {
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
     entitiesLoading: boolean;
+
+    /** Warning about the data of the table; the controls are sticky, so it is always in sight */
+    dataIssuesIndicator?: React.ReactNode;
 }
 
 export function NodesControls({
@@ -39,6 +42,8 @@ export function NodesControls({
     entitiesCountCurrent,
     entitiesCountTotal,
     entitiesLoading,
+
+    dataIssuesIndicator,
 }: NodesControlsProps) {
     const {
         searchValue,
@@ -109,6 +114,7 @@ export function NodesControls({
                 label={i18n('nodes')}
                 loading={entitiesLoading}
             />
+            {dataIssuesIndicator}
         </React.Fragment>
     );
 }

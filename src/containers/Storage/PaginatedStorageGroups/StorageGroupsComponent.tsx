@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {DataIssuesAlert} from '../../../components/DataIssuesAlert/DataIssuesAlert';
+import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useStorageGroupsHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
@@ -37,16 +37,18 @@ export function StorageGroupsComponent({
 
     return (
         <PaginatedTableWithLayout
-            notice={
-                dataIssues.length > 0 ? (
-                    <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />
-                ) : null
-            }
             controls={
                 <StorageGroupsControlsWithTableState
                     withTypeSelector
                     withGroupBySelect={storageGroupsHandlerHasGrouping}
                     columns={columnsToShow}
+                    dataIssuesIndicator={
+                        <DataIssuesIndicator
+                            compact
+                            issues={dataIssues}
+                            problems={dataQuality?.problems}
+                        />
+                    }
                 />
             }
             extraControls={

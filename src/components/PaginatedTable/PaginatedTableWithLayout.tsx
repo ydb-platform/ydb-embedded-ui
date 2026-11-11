@@ -13,8 +13,6 @@ export interface PaginatedTableWithLayoutProps {
     footer?: React.ReactNode;
     tableWrapperProps?: Omit<TableWrapperProps, 'children'>;
     error?: React.ReactNode;
-    /** Shown between controls and the table, e.g. a warning about the data in the table */
-    notice?: React.ReactNode;
     initialState?: Partial<PaginatedTableState>;
     fullHeight?: boolean;
     noBatching?: boolean;
@@ -73,14 +71,6 @@ const ErrorSection = ({error}: {error?: React.ReactNode}) => {
     return <React.Fragment>{error}</React.Fragment>;
 };
 
-const NoticeSection = ({notice}: {notice?: React.ReactNode}) => {
-    if (!notice) {
-        return null;
-    }
-
-    return <TableWithControlsLayout.Notice>{notice}</TableWithControlsLayout.Notice>;
-};
-
 const FooterSection = ({footer}: {footer?: React.ReactNode}) => {
     if (!footer) {
         return null;
@@ -96,7 +86,6 @@ export const PaginatedTableWithLayout = ({
     footer,
     tableWrapperProps,
     error,
-    notice,
     initialState,
     noBatching,
     fullHeight = true,
@@ -109,7 +98,6 @@ export const PaginatedTableWithLayout = ({
                 inheritKeyboardNavigation={inheritKeyboardNavigation}
             >
                 <ControlsSection controls={controls} extraControls={extraControls} />
-                <NoticeSection notice={notice} />
                 <ErrorSection error={error} />
                 <TableWrapper table={table} tableWrapperProps={tableWrapperProps} />
                 <FooterSection footer={footer} />

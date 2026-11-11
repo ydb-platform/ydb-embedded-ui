@@ -2,20 +2,33 @@ import React from 'react';
 
 import {act, render, screen} from '@testing-library/react';
 
+import type {DataIssuesProps} from '../../../../components/DataIssuesAlert/DataIssuesAlert';
 import type {PaginatedTableWithLayoutProps} from '../../../../components/PaginatedTable/PaginatedTableWithLayout';
 import type {PreparedStorageResponse} from '../../../../store/reducers/storage/types';
 import type {TableDataWithQuality} from '../../../../utils/dataIssues/types';
 import {GroupedStorageGroupsComponent} from '../GroupedStorageGroupsComponent';
 
 jest.mock('../../../../components/PaginatedTable/PaginatedTableWithLayout', () => ({
-    PaginatedTableWithLayout: ({notice, error, table}: PaginatedTableWithLayoutProps) => (
+    PaginatedTableWithLayout: ({controls, error, table}: PaginatedTableWithLayoutProps) => (
         <div>
-            <div data-testid="notice">{notice}</div>
+            <div data-testid="controls">{controls}</div>
             {error}
             <div data-testid="table">{table}</div>
         </div>
     ),
 }));
+
+// The indicator keeps the details in a popover: show them inline to read what it tells
+jest.mock('../../../../components/DataIssuesAlert/DataIssuesIndicator', () => {
+    const {DataIssuesList} = jest.requireActual(
+        '../../../../components/DataIssuesAlert/DataIssuesAlert',
+    );
+
+    return {
+        DataIssuesIndicator: (props: DataIssuesProps) =>
+            props.issues.length > 0 ? <DataIssuesList {...props} /> : null,
+    };
+});
 
 jest.mock('../../../../components/TableColumnSetup/TableColumnSetup', () => ({
     TableColumnSetup: () => null,
@@ -51,7 +64,8 @@ jest.mock('../../useStorageQueryParams', () => ({
 }));
 
 jest.mock('../StorageGroupsControls', () => ({
-    StorageGroupsControls: () => null,
+    StorageGroupsControls: ({dataIssuesIndicator}: {dataIssuesIndicator?: React.ReactNode}) =>
+        dataIssuesIndicator ?? null,
 }));
 
 const {useGetStorageGroupsInfoQuery} = jest.requireMock(
@@ -82,14 +96,14 @@ describe('GroupedStorageGroupsComponent', () => {
         });
 
         expect(screen.getByText('SSD')).toBeInTheDocument();
-        expect(screen.getByTestId('notice')).toBeEmptyDOMElement();
+        expect(screen.getByTestId('controls')).toBeEmptyDOMElement();
     });
 
     test('keeps the regular empty message when there are no groups and no problems', () => {
         renderGroups({found: 0, total: 0, groups: [], ...cleanQuality});
 
         expect(screen.getByTestId('table')).toHaveTextContent('No such groups');
-        expect(screen.getByTestId('notice')).toBeEmptyDOMElement();
+        expect(screen.getByTestId('controls')).toBeEmptyDOMElement();
     });
 
     test('warns that grouping was not applied instead of saying there are no groups', () => {
@@ -102,11 +116,14 @@ describe('GroupedStorageGroupsComponent', () => {
             needGroup: true,
         });
 
-        const notice = screen.getByTestId('notice');
-        expect(notice).toHaveTextContent('Grouping was not applied.');
-        expect(notice).toHaveTextContent('The list may be incomplete');
-        expect(notice).toHaveTextContent('bsc-timeout, bsc-storage-pools-no-data');
-        expect(screen.getByTestId('table')).toBeEmptyDOMElement();
+        const controls = screen.getByTestId('controls');
+        expect(controls).toHaveTextContent('Grouping was not applied.');
+        expect(controls).toHaveTextContent('The list may be incomplete');
+        expect(controls).toHaveTextContent('bsc-timeout, bsc-storage-pools-no-data');
+        // There are no groups to show, so the reason takes their place
+        const table = screen.getByTestId('table');
+        expect(table).toHaveTextContent('Grouping was not applied.');
+        expect(table).not.toHaveTextContent('No such groups');
     });
 
     test('treats a plain list of storage groups as grouping that was not applied', () => {
@@ -117,8 +134,8 @@ describe('GroupedStorageGroupsComponent', () => {
             ...cleanQuality,
         });
 
-        expect(screen.getByTestId('notice')).toHaveTextContent('Grouping was not applied.');
-        expect(screen.getByTestId('table')).toBeEmptyDOMElement();
+        expect(screen.getByTestId('controls')).toHaveTextContent('Grouping was not applied.');
+        expect(screen.getByTestId('table')).toHaveTextContent('Grouping was not applied.');
     });
 
     test('does not claim there are no groups when the list may be incomplete', () => {
@@ -130,7 +147,7 @@ describe('GroupedStorageGroupsComponent', () => {
             problems: ['bsc-error'],
         });
 
-        expect(screen.getByTestId('notice')).toHaveTextContent('The list may be incomplete');
+        expect(screen.getByTestId('controls')).toHaveTextContent('The list may be incomplete');
         expect(screen.getByTestId('table')).toHaveTextContent(
             'Nothing to show, but the data may be incomplete',
         );
@@ -162,14 +179,14 @@ describe('GroupedStorageGroupsComponent', () => {
         );
 
         // The table of the expanded group has a layout of its own
-        const [notice] = screen.getAllByTestId('notice');
-        expect(notice).toHaveTextContent('Some data is unavailable');
-        expect(notice).toHaveTextContent('wb-incomplete-disks');
+        const [controls] = screen.getAllByTestId('controls');
+        expect(controls).toHaveTextContent('Some data is unavailable');
+        expect(controls).toHaveTextContent('wb-incomplete-disks');
 
         // The chunks of a collapsed group are unmounted and report that they are gone
         act(() => onChunkDataChange(0, undefined));
         act(() => screen.getByRole('button', {name: /SSD/}).click());
 
-        expect(screen.getByTestId('notice')).toBeEmptyDOMElement();
+        expect(screen.getByTestId('controls')).toBeEmptyDOMElement();
     });
 });

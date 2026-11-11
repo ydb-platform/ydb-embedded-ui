@@ -4,6 +4,7 @@ import {
     DataIssuesAlert,
     getEmptyDataWithIssuesMessage,
 } from '../../../components/DataIssuesAlert/DataIssuesAlert';
+import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
@@ -236,8 +237,8 @@ export function GroupedStorageNodesComponent({
         }
 
         if (dataIssues.includes('group-not-applied')) {
-            // The warning above the table says why there are no groups to show
-            return null;
+            // There are no groups to show, so the reason takes their place
+            return <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />;
         }
 
         return hasDataIssues ? getEmptyDataWithIssuesMessage() : i18n('no-nodes');
@@ -245,11 +246,6 @@ export function GroupedStorageNodesComponent({
 
     return (
         <PaginatedTableWithLayout
-            notice={
-                hasDataIssues ? (
-                    <DataIssuesAlert issues={dataIssues} problems={dataQuality?.problems} />
-                ) : null
-            }
             controls={
                 <StorageNodesControls
                     withTypeSelector
@@ -257,6 +253,13 @@ export function GroupedStorageNodesComponent({
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
+                    dataIssuesIndicator={
+                        <DataIssuesIndicator
+                            compact
+                            issues={dataIssues}
+                            problems={dataQuality?.problems}
+                        />
+                    }
                 />
             }
             extraControls={
