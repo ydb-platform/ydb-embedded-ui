@@ -3,7 +3,7 @@ import type {Page} from '@playwright/test';
 
 import type {TNodesInfo} from '../../../src/types/api/nodes';
 import {DataIssuesAlert} from '../../models/DataIssuesAlert';
-import {DataIssuesIndicator} from '../../models/DataIssuesIndicator';
+import {DataIssuesIndicator, LAST_IN_CONTROLS} from '../../models/DataIssuesIndicator';
 import {PageModel} from '../../models/PageModel';
 import {createNodesResponse, setupDataIssuesMocks} from '../storage/dataIssuesMocks';
 
@@ -45,6 +45,9 @@ test.describe('Database nodes data issues', () => {
         ).toBeVisible();
 
         const indicator = new DataIssuesIndicator(page);
+        await expect(indicator.button).toBeVisible();
+        // The label is the last item of the controls row
+        expect(await indicator.getPlaceInControls()).toEqual(LAST_IN_CONTROLS);
         await indicator.open();
         await expect(indicator.item('list-incomplete')).toHaveText(
             'The list may be incomplete: some data sources did not respond.',

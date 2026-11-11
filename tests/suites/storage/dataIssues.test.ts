@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
 import {DataIssuesAlert} from '../../models/DataIssuesAlert';
-import {DataIssuesIndicator} from '../../models/DataIssuesIndicator';
+import {DataIssuesIndicator, LAST_IN_CONTROLS} from '../../models/DataIssuesIndicator';
 import {PaginatedTable} from '../paginatedTable/paginatedTable';
 
 import {StoragePage} from './StoragePage';
@@ -59,6 +59,8 @@ test.describe('Storage groups data issues', () => {
 
         const indicator = new DataIssuesIndicator(page);
         await expect(indicator.button).toHaveText('Data issues');
+        // The label is the last item of the controls row
+        expect(await indicator.getPlaceInControls()).toEqual(LAST_IN_CONTROLS);
         await indicator.open();
         await expect(indicator.item('list-incomplete')).toHaveText(
             'The list may be incomplete: some data sources did not respond.',
@@ -199,8 +201,10 @@ test.describe('Storage groups data issues of a long list', () => {
             storagePage.getGroupRow(getLongListGroupId(LONG_LIST_GROUPS_COUNT / 2)),
         ).toBeVisible();
 
-        // The controls are sticky: the warning is in sight next to the rows it is about
-        await expect(indicator.button).toBeInViewport();
+        // The controls are sticky: the warning is in sight next to the rows it is about,
+        // still the last item of the controls row
+        await expect(indicator.button).toBeInViewport({ratio: 1});
+        expect(await indicator.getPlaceInControls()).toEqual(LAST_IN_CONTROLS);
         await indicator.open();
         await expect(indicator.item('list-incomplete')).toBeVisible();
         await expect(indicator.codes).toHaveText('Problems reported by the server: bsc-timeout');
@@ -284,6 +288,9 @@ test.describe('Storage nodes data issues', () => {
         await expect(storagePage.table.getByText('storage-node-1', {exact: true})).toBeVisible();
 
         const indicator = new DataIssuesIndicator(page);
+        await expect(indicator.button).toBeVisible();
+        // The label is the last item of the controls row
+        expect(await indicator.getPlaceInControls()).toEqual(LAST_IN_CONTROLS);
         await indicator.open();
         await expect(indicator.item('nodes-status-unreliable')).toHaveText(
             'Some nodes did not respond in time and may be shown as unavailable.',
