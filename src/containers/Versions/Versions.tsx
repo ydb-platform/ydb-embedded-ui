@@ -112,7 +112,7 @@ function Versions({preparedVersions, nodes, nodesDataQuality, versionsDataMap}: 
                 issues={getNodesDataIssues(nodesDataQuality)}
                 problems={nodesDataQuality?.problems}
             />
-            <Flex gap={3} direction={'column'} className={b('overall')}>
+            <Flex gap={3} direction={'column'}>
                 <Text variant="subheader-3">{i18n('title_overall')}</Text>
                 <VersionsBar preparedVersions={preparedVersions} size="m" />
             </Flex>
