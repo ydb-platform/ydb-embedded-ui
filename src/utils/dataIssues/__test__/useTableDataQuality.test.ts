@@ -131,6 +131,54 @@ describe('useTableDataQuality', () => {
         expect(result.current.dataQuality).toBe(dataQuality);
     });
 
+    test('Should publish one change for many chunks that report the same problem', () => {
+        let renders = 0;
+        const {result} = renderHook(() => {
+            renders += 1;
+            return useTableDataQuality();
+        });
+        const rendersBefore = renders;
+
+        // A degraded table: every chunk that gets rendered while it is scrolled has the same problem
+        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
+        const {dataQuality} = result.current;
+        act(() => result.current.handleChunkDataChange(20, withProblem('bsc-timeout')));
+        act(() => result.current.handleChunkDataChange(40, withProblem('bsc-timeout')));
+        act(() => result.current.handleChunkDataChange(0, undefined));
+        act(() => result.current.handleChunkDataChange(60, withProblem('bsc-timeout')));
+        act(() => result.current.handleChunkDataChange(20, undefined));
+
+        expect(renders).toBe(rendersBefore + 1);
+        expect(result.current.dataQuality).toBe(dataQuality);
+
+        // The last chunks with the problem leave: this is the second and the last change
+        act(() => result.current.handleChunkDataChange(40, undefined));
+        act(() => result.current.handleChunkDataChange(60, undefined));
+
+        expect(renders).toBe(rendersBefore + 2);
+        expect(result.current.dataQuality).toBeUndefined();
+    });
+
+    test('Should not publish a change when the same problems arrive in another order', () => {
+        const {result} = renderHook(() => useTableDataQuality());
+
+        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
+        act(() => result.current.handleChunkDataChange(20, withProblem('hive-timeout')));
+        const {dataQuality} = result.current;
+
+        // The chunk that brought the first code leaves and comes back: the set is the same
+        act(() =>
+            result.current.handleChunkDataChange(
+                40,
+                chunkData({problems: ['hive-timeout', 'bsc-timeout']}),
+            ),
+        );
+        act(() => result.current.handleChunkDataChange(0, undefined));
+        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
+
+        expect(result.current.dataQuality).toBe(dataQuality);
+    });
+
     test('Should unite the reports of several tables and tell their chunks apart', () => {
         const {result} = renderHook(() => useTableDataQuality());
         const reportSsd = result.current.getChunkDataChangeHandler('ssd');

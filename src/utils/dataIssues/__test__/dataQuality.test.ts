@@ -67,6 +67,27 @@ describe('isSameDataQuality', () => {
                 {...clean, problems: ['bsc-error']},
             ),
         ).toBe(true);
+        expect(
+            isSameDataQuality(
+                {...clean, problems: ['bsc-error']},
+                {...clean, problems: ['bsc-timeout']},
+            ),
+        ).toBe(false);
+    });
+
+    test('Should not depend on the order of the problem codes', () => {
+        expect(
+            isSameDataQuality(
+                {...clean, problems: ['bsc-error', 'hive-timeout']},
+                {...clean, problems: ['hive-timeout', 'bsc-error']},
+            ),
+        ).toBe(true);
+    });
+
+    test('Should tell a report from no report', () => {
+        expect(isSameDataQuality(undefined, undefined)).toBe(true);
+        expect(isSameDataQuality(clean, undefined)).toBe(false);
+        expect(isSameDataQuality(undefined, clean)).toBe(false);
     });
 });
 

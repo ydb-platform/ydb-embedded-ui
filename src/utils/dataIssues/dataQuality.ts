@@ -49,13 +49,18 @@ export function mergeDataQuality(
     };
 }
 
-export function isSameDataQuality(a: ResponseDataQuality, b: ResponseDataQuality) {
+/** The same flags and the same set of problem codes; the order of the codes does not matter */
+export function isSameDataQuality(a?: ResponseDataQuality, b?: ResponseDataQuality) {
+    if (!a || !b) {
+        return a === b;
+    }
+
     return (
         a.needFilter === b.needFilter &&
         a.needSort === b.needSort &&
         a.needGroup === b.needGroup &&
         a.problems.length === b.problems.length &&
-        a.problems.every((problem, index) => problem === b.problems[index])
+        a.problems.every((problem) => b.problems.includes(problem))
     );
 }
 
