@@ -3,6 +3,7 @@ import type {Page} from '@playwright/test';
 
 import type {TNodesInfo} from '../../../src/types/api/nodes';
 import {DataIssuesAlert} from '../../models/DataIssuesAlert';
+import {DataIssuesIndicator} from '../../models/DataIssuesIndicator';
 import {PageModel} from '../../models/PageModel';
 import {createNodesResponse, setupDataIssuesMocks} from '../storage/dataIssuesMocks';
 
@@ -28,7 +29,7 @@ test.describe('Database nodes data issues', () => {
         await expect(
             page.locator('table').getByText('storage-node-1', {exact: true}),
         ).toBeVisible();
-        await expect(new DataIssuesAlert(page).selector).toHaveCount(0);
+        await expect(new DataIssuesIndicator(page).button).toHaveCount(0);
     });
 
     test('warns that the list of database nodes may be incomplete without Hive', async ({
@@ -43,12 +44,13 @@ test.describe('Database nodes data issues', () => {
             page.locator('table').getByText('storage-node-1', {exact: true}),
         ).toBeVisible();
 
-        const alert = new DataIssuesAlert(page);
-        await expect(alert.item('list-incomplete')).toHaveText(
+        const indicator = new DataIssuesIndicator(page);
+        await indicator.open();
+        await expect(indicator.item('list-incomplete')).toHaveText(
             'The list may be incomplete: some data sources did not respond.',
         );
-        await expect(alert.item('nodes-status-unreliable')).toBeVisible();
-        await expect(alert.codes).toHaveText(
+        await expect(indicator.item('nodes-status-unreliable')).toBeVisible();
+        await expect(indicator.codes).toHaveText(
             'Problems reported by the server: hive-timeout, wb-incomplete',
         );
         expect(requests.at(-1)?.searchParams.get('database')).toBe('/local');
@@ -114,7 +116,9 @@ test.describe('Database nodes data issues', () => {
         });
         await openDatabaseNodes(page);
 
-        await expect(new DataIssuesAlert(page).item('database-unavailable')).toHaveText(
+        const indicator = new DataIssuesIndicator(page);
+        await indicator.open();
+        await expect(indicator.item('database-unavailable')).toHaveText(
             'Database information is unavailable, so its nodes cannot be listed.',
         );
         await expect(
@@ -130,9 +134,11 @@ test.describe('Database nodes data issues', () => {
         });
         await openDatabaseNodes(page, {nodesGroupBy: 'Version'});
 
+        // There are no groups to show, so the reason takes their place
         await expect(new DataIssuesAlert(page).item('group-not-applied')).toHaveText(
             'Grouping was not applied.',
         );
+        await expect(new DataIssuesIndicator(page).button).toBeVisible();
         await expect(page.getByText('No nodes groups')).toHaveCount(0);
     });
 });

@@ -24,6 +24,37 @@ export function createGroupsResponse(
     };
 }
 
+export const LONG_LIST_GROUPS_COUNT = 400;
+
+export function getLongListGroupId(index: number) {
+    return String(Number(DATA_ISSUES_GROUP_ID) + index);
+}
+
+/**
+ * A page of a long list of groups. The table loads such a list in chunks, each chunk
+ * (or several neighbouring ones) by a request of its own, so `getProblems` decides
+ * by the rows the request asks for.
+ */
+export function createLongGroupsResponse(
+    url: URL,
+    getProblems: (rows: {from: number; to: number}) => string[],
+): StorageGroupsResponse {
+    const offset = Number(url.searchParams.get('offset')) || 0;
+    const limit = Number(url.searchParams.get('limit')) || LONG_LIST_GROUPS_COUNT;
+    const to = Math.min(offset + limit, LONG_LIST_GROUPS_COUNT);
+    const problems = getProblems({from: offset, to});
+
+    return {
+        TotalGroups: LONG_LIST_GROUPS_COUNT,
+        FoundGroups: LONG_LIST_GROUPS_COUNT,
+        StorageGroups: Array.from({length: Math.max(to - offset, 0)}, (_, index) => ({
+            GroupId: getLongListGroupId(offset + index),
+            PoolName: 'pool-ssd',
+        })),
+        ...(problems.length > 0 ? {Problems: problems} : {}),
+    };
+}
+
 export function createNodesResponse(extra: Partial<TNodesInfo> = {}): Partial<TNodesInfo> {
     return {
         TotalNodes: '2',
