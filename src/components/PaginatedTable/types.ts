@@ -56,6 +56,15 @@ export type FetchData<T, F = undefined, E = {}> = (
     params: FetchDataParams<F, E>,
 ) => Promise<PaginatedTableData<T>>;
 
+/**
+ * Tells what a chunk of the table currently holds: its data when it is loaded for the current
+ * filters and sorting, `undefined` when it has no such data or is no longer rendered.
+ */
+export type OnChunkDataChange<T> = (
+    chunkOffset: number,
+    data: PaginatedTableData<T> | undefined,
+) => void;
+
 export type OnError = (error?: IResponseError) => void;
 
 export interface PaginatedTableState {

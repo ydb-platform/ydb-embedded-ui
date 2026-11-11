@@ -15,6 +15,7 @@ import type {
     Column,
     FetchData,
     GetRowClassName,
+    OnChunkDataChange,
     OnRowClick,
     PaginatedTableData,
     RenderEmptyDataMessage,
@@ -43,6 +44,7 @@ interface TableChunkProps<T, F> {
     renderErrorMessage?: RenderErrorMessage;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     onDataFetched: (data: PaginatedTableData<T>) => void;
+    onChunkDataChange?: OnChunkDataChange<T>;
 
     keepCache?: boolean;
 }
@@ -63,6 +65,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     renderErrorMessage,
     renderEmptyDataMessage,
     onDataFetched,
+    onChunkDataChange,
     shouldFetch,
     shouldRender,
     keepCache,
@@ -115,6 +118,18 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
             });
         }
     }, [currentData, onDataFetched]);
+
+    const chunkOffset = id * chunkSize;
+
+    // `currentData` is undefined until the chunk is loaded for the current filters and sorting
+    React.useLayoutEffect(() => {
+        onChunkDataChange?.(chunkOffset, currentData as PaginatedTableData<T> | undefined);
+    }, [chunkOffset, currentData, onChunkDataChange]);
+
+    // The chunk is no longer rendered: it left the fetched range or the table is unmounted
+    React.useLayoutEffect(() => {
+        return () => onChunkDataChange?.(chunkOffset, undefined);
+    }, [chunkOffset, onChunkDataChange]);
 
     const dataLength = currentData?.data?.length || calculatedCount;
 

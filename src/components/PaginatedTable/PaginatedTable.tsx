@@ -21,6 +21,7 @@ import type {
     FetchData,
     GetRowClassName,
     HandleTableColumnsResize,
+    OnChunkDataChange,
     OnRowClick,
     PaginatedTableData,
     RenderEmptyDataMessage,
@@ -46,6 +47,8 @@ export interface PaginatedTableProps<T, F> {
     renderErrorMessage?: RenderErrorMessage;
     containerClassName?: string;
     onDataFetched?: (data: PaginatedTableData<T>) => void;
+    /** Reports the data every rendered chunk holds, e.g. to describe the rows on screen */
+    onChunkDataChange?: OnChunkDataChange<T>;
     keepCache?: boolean;
     fetchOverscan?: number;
     onKeyboardActivate?: (row: T) => void;
@@ -71,6 +74,7 @@ export const PaginatedTable = <T, F>({
     renderEmptyDataMessage,
     containerClassName,
     onDataFetched,
+    onChunkDataChange,
     keepCache = true,
     fetchOverscan,
     onKeyboardActivate,
@@ -248,6 +252,7 @@ export const PaginatedTable = <T, F>({
                     renderErrorMessage={renderErrorMessage}
                     renderEmptyDataMessage={renderEmptyDataMessage}
                     onDataFetched={handleDataFetched}
+                    onChunkDataChange={onChunkDataChange}
                     onActiveChunkOffsetsChange={handleActiveChunkOffsetsChange}
                     keepCache={keepCache}
                     fetchOverscan={fetchOverscan}

@@ -7,6 +7,7 @@ import type {
     Column,
     FetchData,
     GetRowClassName,
+    OnChunkDataChange,
     OnRowClick,
     PaginatedTableData,
     RenderEmptyDataMessage,
@@ -31,6 +32,7 @@ export interface TableChunksRendererProps<T, F> {
     renderErrorMessage?: RenderErrorMessage;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     onDataFetched: (data: PaginatedTableData<T>) => void;
+    onChunkDataChange?: OnChunkDataChange<T>;
     onActiveChunkOffsetsChange: (offsets: number[]) => void;
     keepCache: boolean;
     fetchOverscan?: number;
@@ -52,6 +54,7 @@ export const TableChunksRenderer = <T, F>({
     renderErrorMessage,
     renderEmptyDataMessage,
     onDataFetched,
+    onChunkDataChange,
     onActiveChunkOffsetsChange,
     keepCache,
     fetchOverscan,
@@ -142,6 +145,7 @@ export const TableChunksRenderer = <T, F>({
                     renderErrorMessage={renderErrorMessage}
                     renderEmptyDataMessage={renderEmptyDataMessage}
                     onDataFetched={onDataFetched}
+                    onChunkDataChange={onChunkDataChange}
                     shouldFetch={chunkState.shouldFetch}
                     shouldRender={chunkState.shouldRender}
                     keepCache={keepCache}
@@ -157,6 +161,7 @@ export const TableChunksRenderer = <T, F>({
             getRowClassName,
             keepCache,
             lastChunkSize,
+            onChunkDataChange,
             onDataFetched,
             onRowClick,
             renderEmptyDataMessage,
