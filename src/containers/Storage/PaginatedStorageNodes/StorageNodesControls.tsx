@@ -134,7 +134,9 @@ export function StorageNodesControls({
                     </Button>
                 ) : null}
                 <HideUnavailableNodesSwitch className={b('hide-unavailable')} />
-                {dataIssuesIndicator}
+                {dataIssuesIndicator ? (
+                    <div className={b('data-issues')}>{dataIssuesIndicator}</div>
+                ) : null}
             </Flex>
             {canUseStorageExpertMode && isStorageExpertMode ? (
                 <StorageNodesExpertModePanel />

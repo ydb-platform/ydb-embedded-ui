@@ -141,7 +141,9 @@ export function StorageGroupsControls({
                         {i18n('controls_expert-mode')}
                     </Button>
                 ) : null}
-                {dataIssuesIndicator}
+                {dataIssuesIndicator ? (
+                    <div className={b('data-issues')}>{dataIssuesIndicator}</div>
+                ) : null}
             </Flex>
             {canUseStorageExpertMode && isStorageExpertMode && isVDisksPDisksColumnVisible ? (
                 <StorageGroupsExpertModePanel />

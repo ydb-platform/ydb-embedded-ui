@@ -28,8 +28,13 @@ export class DataIssuesIndicator {
      */
     async getPlaceInControls() {
         return this.button.evaluate((label) => {
-            const items = Array.from(label.parentElement?.children ?? []).filter(
-                (item) => item.getBoundingClientRect().width > 0,
+            // In the storage controls the label stands in a zero-width slot of the row
+            let rowItem: Element = label;
+            while (rowItem.parentElement && rowItem.parentElement.children.length === 1) {
+                rowItem = rowItem.parentElement;
+            }
+            const items = Array.from(rowItem.parentElement?.children ?? []).filter(
+                (item) => item === rowItem || item.getBoundingClientRect().width > 0,
             );
             const labelRect = label.getBoundingClientRect();
             const itemsOnTheLine = items.filter((item) => {
@@ -38,7 +43,7 @@ export class DataIssuesIndicator {
             });
 
             return {
-                isLastItem: items[items.length - 1] === label,
+                isLastItem: items[items.length - 1] === rowItem,
                 isRightmostOnItsLine: itemsOnTheLine.every(
                     (item) => item.getBoundingClientRect().right <= labelRect.right + 0.5,
                 ),

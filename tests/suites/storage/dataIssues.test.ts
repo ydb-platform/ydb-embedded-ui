@@ -106,6 +106,41 @@ test.describe('Storage groups data issues', () => {
         await expect(indicator.button).toHaveCount(0);
     });
 
+    test('keeps the width of the expert mode panel when the label appears', async ({page}) => {
+        let broken = false;
+        await setupDataIssuesMocks(page, {
+            groups: () => createGroupsResponse(broken ? {Problems: ['bsc-timeout']} : {}),
+        });
+        await page.addInitScript(() => {
+            localStorage.setItem('enableStorageExpertMode', 'true');
+            localStorage.setItem('storageExpertMode', 'true');
+            // the panel belongs to the disks column, which the default columns have
+            localStorage.removeItem('storageGroupsSelectedColumns');
+        });
+        // With the short legends of this mode the panel is exactly as wide as the controls row
+        await openStoragePage(page, {
+            type: 'groups',
+            storageExpertMode: '1',
+            vdisksGroupBy: 'DriveType',
+            pdisksGroupBy: 'DriveType',
+        });
+
+        const panel = page.locator('.ydb-storage-expert-mode-panel');
+        const indicator = new DataIssuesIndicator(page);
+        await expect(panel).toBeVisible();
+        await expect(indicator.button).toHaveCount(0);
+        const panelWidth = (await panel.boundingBox())?.width;
+
+        broken = true;
+        const tableResponse = waitForTableResponse(page, 'groups');
+        await page.reload();
+        await tableResponse;
+
+        await expect(indicator.button).toBeVisible();
+        expect(await indicator.getPlaceInControls()).toEqual(LAST_IN_CONTROLS);
+        expect((await panel.boundingBox())?.width).toBe(panelWidth);
+    });
+
     test('does not claim there are no degraded groups while the list may be incomplete', async ({
         page,
     }) => {

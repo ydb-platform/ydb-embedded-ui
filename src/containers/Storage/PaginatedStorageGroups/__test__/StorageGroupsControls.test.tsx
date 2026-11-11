@@ -155,13 +155,15 @@ describe('StorageGroupsControls', () => {
         );
 
         const expertMode = screen.getByRole('button', {name: 'controls_expert-mode'});
-        const indicator = screen.getByText('data may be incomplete');
-        const rowItems = Array.from(indicator.parentElement?.children ?? []);
+        // The label stands in a slot of the row that takes no width, see Storage.scss
+        const slot = screen.getByText('data may be incomplete').parentElement as HTMLElement;
+        const rowItems = Array.from(slot.parentElement?.children ?? []);
 
-        expect(rowItems.indexOf(indicator)).toBeGreaterThan(
+        expect(slot).toHaveClass('global-storage__data-issues');
+        expect(rowItems.indexOf(slot)).toBeGreaterThan(
             rowItems.findIndex((item) => item.contains(expertMode)),
         );
-        expect(rowItems.at(-1)).toBe(indicator);
+        expect(rowItems.at(-1)).toBe(slot);
     });
 
     test('hides active expert mode controls when the capability is unavailable', () => {
